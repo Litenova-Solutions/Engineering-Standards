@@ -1,27 +1,25 @@
 # Exception Hierarchy
 
-This document defines the exception hierarchy used across all Litenova Solutions projects. It is a critical contract document. Deviating from it produces incorrect HTTP responses and breaks the agreement between the API layer and its clients.
+This document defines the exception hierarchy used across all projects following these standards. It is a critical contract document. Deviating from it produces incorrect HTTP responses and breaks the agreement between the API layer and its clients.
 
 ---
 
 ## Why This Matters
 
-When a server returns a 500 response to a client, the client has no idea whether the operation failed because the input was invalid, the resource was not found, or an unexpected error occurred. Each of these situations requires a different client action: show a validation message, navigate to a not-found page, or show a generic error and retry. A single status code for all failures gives clients no actionable information.
+When a server returns a 500 response to a client, the client has no idea whether the operation failed because the input was invalid, the resource was not found, or an unexpected error occurred. Each situation requires a different client action: show a validation message, navigate to a not-found page, or show a generic error and retry.
 
-Without a defined hierarchy, teams inevitably drift into patterns like throwing `InvalidOperationException` from domain logic and `ArgumentException` from validators. Both produce 500 responses in a default ASP.NET Core setup. Clients cannot differentiate them, and the codebase has no consistent contract for what "an error" means.
-
-The exception hierarchy defines exactly three failure categories for expected failures. Every exception class in this codebase maps to exactly one category. The `GlobalExceptionHandler` maps categories to HTTP status codes automatically. This is the contract.
+Without a defined hierarchy, teams drift into patterns like throwing `InvalidOperationException` from domain logic and `ArgumentException` from validators. Both produce 500 responses in a default ASP.NET Core setup. The hierarchy defines exactly three failure categories for expected failures. Every exception class in this codebase maps to exactly one category. The `GlobalExceptionHandler` maps categories to HTTP status codes automatically. This is the contract.
 
 ---
 
 ## The Three Categories
 
 | Category | Base Class | Location | HTTP Status | When to Throw |
-|---|---|---|---|---|
-| Input Validation Failure | `ApplicationValidationException` | `Application/Shared/Exceptions/` | 400 | Thrown by `ICommandValidator` and `IQueryValidator` implementations when input data is structurally invalid (missing required field, value out of range, malformed format). |
+|:---|:---|:---|:---|:---|
+| Input Validation Failure | `ApplicationValidationException` | `Application.Write.Contracts/Shared/` or `Application.Read.Contracts/Shared/` | 400 | Thrown by `ICommandValidator` and `IQueryValidator` implementations when input is structurally invalid. |
 | Resource Not Found | `AggregateNotFoundException` | `Domain/Shared/Exceptions/` | 404 | Thrown by repository implementations when an aggregate cannot be located by its ID. |
-| Domain Invariant Violation | `DomainException` | `Domain/Shared/Exceptions/` | 409 | Thrown by aggregate methods when the requested operation is not permitted in the current state (e.g., publishing an already-published post). |
-| Unhandled | _(none — any `Exception`)_ | Anywhere | 500 | Any exception that does not match the above categories. These indicate a bug or an unexpected external failure. |
+| Domain Invariant Violation | `DomainException` | `Domain/Shared/Exceptions/` | 409 | Thrown by aggregate methods when the requested operation is not permitted in the current state. |
+| Unhandled | _(any `Exception`)_ | Anywhere | 500 | Any exception that does not match the above. These indicate a bug or unexpected external failure. |
 
 ---
 
@@ -42,7 +40,7 @@ abstract class DomainException : Exception
         : base(message) { }
 }
 
-// Application/Shared/Exceptions/ApplicationValidationException.cs
+// Application.Write.Contracts/Shared/Exceptions/ApplicationValidationException.cs
 abstract class ApplicationValidationException : Exception
 {
     protected ApplicationValidationException(string message)
@@ -50,7 +48,7 @@ abstract class ApplicationValidationException : Exception
 }
 ```
 
-All three base classes are `abstract`. You never throw a base class directly. You always throw a concrete subclass that names the specific failure.
+All three base classes are `abstract`. You never throw a base class directly. Always throw a concrete subclass that names the specific failure.
 
 ---
 
@@ -59,7 +57,6 @@ All three base classes are `abstract`. You never throw a base class directly. Yo
 ### Resource Not Found
 
 ```csharp
-// Domain/Posts/Exceptions/PostNotFoundException.cs
 sealed class PostNotFoundException : AggregateNotFoundException
 {
     public PostNotFoundException(PostId id)
@@ -70,7 +67,6 @@ sealed class PostNotFoundException : AggregateNotFoundException
 ### Domain Invariant Violation
 
 ```csharp
-// Domain/Posts/Exceptions/PostAlreadyPublishedException.cs
 sealed class PostAlreadyPublishedException : DomainException
 {
     public PostAlreadyPublishedException(PostId id)
@@ -81,7 +77,6 @@ sealed class PostAlreadyPublishedException : DomainException
 ### Input Validation Failure
 
 ```csharp
-// Application/Posts/Create/Exceptions/PostTitleRequiredException.cs
 sealed class PostTitleRequiredException : ApplicationValidationException
 {
     public PostTitleRequiredException()
@@ -96,8 +91,15 @@ sealed class PostTitleRequiredException : ApplicationValidationException
 The `GlobalExceptionHandler` is an `IExceptionHandler` implementation registered in `Program.cs`. It maps exception types to problem details responses. Endpoints MUST NOT contain `try-catch` blocks.
 
 ```csharp
-sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
+internal sealed class GlobalExceptionHandler : IExceptionHandler
 {
+    private readonly ILogger<GlobalExceptionHandler> _logger;
+
+    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+    {
+        _logger = logger;
+    }
+
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
         Exception exception,
@@ -113,11 +115,11 @@ sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
 
         if (statusCode == StatusCodes.Status500InternalServerError)
         {
-            logger.LogError(exception, "Unhandled exception: {Message}", exception.Message);
+            _logger.LogError(exception, "Unhandled exception: {Message}", exception.Message);
         }
         else
         {
-            logger.LogWarning(exception, "Handled exception ({StatusCode}): {Message}", statusCode, exception.Message);
+            _logger.LogWarning(exception, "Handled exception ({StatusCode}): {Message}", statusCode, exception.Message);
         }
 
         httpContext.Response.StatusCode = statusCode;
@@ -149,51 +151,37 @@ app.UseExceptionHandler();
 
 ---
 
-## The ApplicationGuard Helper
-
-For common validation patterns, use the `ApplicationGuard` helper to throw the correct exception type without needing to write an `if` block every time.
-
-```csharp
-static class ApplicationGuard
-{
-    public static void AgainstDefault<T>(T value, Func<ApplicationValidationException> exceptionFactory)
-        where T : struct
-    {
-        if (value.Equals(default(T)))
-        {
-            throw exceptionFactory();
-        }
-    }
-
-    public static void AgainstNullOrWhiteSpace(
-        string? value,
-        Func<ApplicationValidationException> exceptionFactory)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw exceptionFactory();
-        }
-    }
-}
-```
-
-Usage:
-
-```csharp
-ApplicationGuard.AgainstNullOrWhiteSpace(command.Title, () => new PostTitleRequiredException());
-```
-
----
-
 ## Throw Site Contract
 
-This table defines exactly where each exception category is thrown. Do not throw an exception from the wrong site.
-
 | Exception Category | Thrown By | Never Thrown By |
-|---|---|---|
+|:---|:---|:---|
 | `ApplicationValidationException` | `ICommandValidator`, `IQueryValidator` implementations | Handlers, aggregates, repositories |
 | `AggregateNotFoundException` | Repository implementations (`GetByIdAsync`) | Handlers, validators, aggregates, endpoints |
 | `DomainException` | Aggregate root methods | Handlers, validators, repositories, endpoints |
+
+---
+
+## Using Guard.Against
+
+Use `Guard.Against` from Ardalis.GuardClauses for common structural checks in validators.
+
+```csharp
+// GOOD: use Guard.Against for common structural checks
+Guard.Against.NullOrWhiteSpace(command.Title, nameof(command.Title));
+Guard.Against.Default(command.AuthorId, nameof(command.AuthorId));
+
+// GOOD: throw custom exception directly when Guard.Against is not expressive enough
+if (command.Title.StartsWith(' '))
+{
+    throw new PostTitleCannotStartWithSpaceException();
+}
+
+// BAD: throwing wrong exception type from a validator
+if (string.IsNullOrWhiteSpace(command.Title))
+{
+    throw new ArgumentNullException(nameof(command.Title)); // BAD: wrong category, produces 500
+}
+```
 
 ---
 
@@ -201,7 +189,7 @@ This table defines exactly where each exception category is thrown. Do not throw
 
 ```csharp
 // BAD: throwing a generic exception from a handler
-sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCommand>
+internal sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCommand>
 {
     public async Task HandleAsync(PublishPostCommand command, CancellationToken cancellationToken)
     {
@@ -209,7 +197,7 @@ sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCommand>
 
         if (post is null)
         {
-            throw new InvalidOperationException("Post not found."); // ← wrong type, wrong throw site, produces 500
+            throw new InvalidOperationException("Post not found."); // BAD: wrong type, produces 500
         }
 
         post.Publish();
@@ -218,17 +206,24 @@ sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCommand>
 }
 
 // GOOD: repository throws the correct type; handler does not check for null
-sealed class PublishPostCommandHandler(IPostRepository postRepository) : ICommandHandler<PublishPostCommand>
+internal sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCommand>
 {
+    private readonly IPostRepository _postRepository;
+
+    public PublishPostCommandHandler(IPostRepository postRepository)
+    {
+        _postRepository = postRepository;
+    }
+
     public async Task HandleAsync(PublishPostCommand command, CancellationToken cancellationToken)
     {
-        var post = await postRepository.GetByIdAsync(command.PostId, cancellationToken);
-        // ← GetByIdAsync throws PostNotFoundException (a 404) if not found
+        var post = await _postRepository.GetByIdAsync(command.PostId, cancellationToken);
+        // GetByIdAsync throws PostNotFoundException (404) if not found
 
         post.Publish();
-        // ← Publish() throws PostAlreadyPublishedException (a 409) if already published
+        // Publish() throws PostAlreadyPublishedException (409) if already published
 
-        await postRepository.UpdateAsync(post, cancellationToken);
+        await _postRepository.UpdateAsync(post, cancellationToken);
     }
 }
 ```
@@ -237,12 +232,10 @@ sealed class PublishPostCommandHandler(IPostRepository postRepository) : IComman
 
 ## Project-Specific Exception Types
 
-> **Note:** This section is filled in per-project. It lists all concrete exception types defined in the project so that engineers and agents can find them quickly.
-
-When filling in this section, list every custom exception class with its category, file path, and the HTTP status code it produces.
+> **Note:** This section is filled in per project.
 
 | Exception Class | Category | Location | HTTP Status |
-|---|---|---|---|
+|:---|:---|:---|:---|
 | _(example) `PostNotFoundException`_ | Resource Not Found | `Domain/Posts/Exceptions/` | 404 |
 | _(example) `PostAlreadyPublishedException`_ | Domain Invariant | `Domain/Posts/Exceptions/` | 409 |
-| _(example) `PostTitleRequiredException`_ | Validation | `Application/Posts/Create/Exceptions/` | 400 |
+| _(example) `PostTitleRequiredException`_ | Validation | `Application.Write.Contracts/Posts/Exceptions/` | 400 |

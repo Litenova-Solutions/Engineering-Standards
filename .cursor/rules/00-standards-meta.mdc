@@ -1,30 +1,33 @@
 ---
-description: Meta-rules for editing the engineering-standards repository itself.
+description: Rules for editing the engineering-standards repository itself.
 alwaysApply: true
 ---
 
 # Meta-Rules for This Repository
 
-These rules apply when an agent is editing files inside the `engineering-standards` repository itself — that is, editing the standards, not a project that consumes them.
+These rules apply when an agent is editing files inside the `engineering-standards` repository itself, editing the standards, not a project that consumes them.
 
-## Tone
+## Tone and Writing Rules
 
-Always maintain the tone described in the repository writing style: direct, concrete, short sentences, RFC 2119 keywords (`MUST`, `MUST NOT`, `SHOULD`) for mandatory rules, no filler phrases (`leverage`, `utilize`, `holistic`, `streamline`). Write as a senior engineer documenting conventions for peers.
+- Maintain the tone defined in `AGENTS.md`: direct, concrete, no filler. RFC 2119 keywords (`MUST`, `MUST NOT`, `SHOULD`) for mandatory rules.
+- MUST NOT use em dashes anywhere. Replace with a comma, semicolon, colon, or a new sentence.
+- MUST NOT use forbidden words: delve, leverage, utilize, streamline, holistic, robust (except strict fault-tolerance), seamless, cutting-edge, innovative, empower, unlock, harness, navigate, realm, tapestry, multifaceted, pivotal.
+- All diagrams MUST use Mermaid syntax in a fenced code block. No ASCII art.
 
 ## Rule Integrity
 
-- MUST NOT remove a rule from any convention file without adding a corresponding entry in `CHANGELOG.md` explaining why the rule was removed.
-- MUST NOT downgrade a `MUST` rule to a `SHOULD` rule without a CHANGELOG entry and a rationale comment in the convention file itself.
+- MUST NOT remove a rule from any convention file without adding a corresponding entry in `CHANGELOG.md`.
+- MUST NOT downgrade a `MUST` rule to a `SHOULD` rule without a CHANGELOG entry and a rationale in the convention file.
 - MUST NOT add a rule without verifying it does not conflict with an existing rule in another convention file.
 
 ## AGENTS.md Size Limit
 
-`AGENTS.md` MUST remain under 120 lines at all times. If content must be added, summarize rather than append. Detailed explanations belong in the layer-specific convention files, not in `AGENTS.md`.
+`AGENTS.md` MUST remain under 150 lines. If content must be added, summarize rather than append. Detailed rules belong in the layer-specific convention files.
 
 ## Convention File Index
 
-If a new convention file is added under `docs/conventions/`, the Convention File Index table in `AGENTS.md` MUST be updated in the same commit or PR.
+When a new convention file is added under `docs/conventions/`, the Convention File Index table in `AGENTS.md` MUST be updated in the same commit or PR.
 
 ## Code Examples
 
-Every new rule that can be illustrated with a code example MUST include both a `// GOOD:` and a `// BAD:` example. Do not add rules without examples where examples are applicable. C# examples MUST omit `namespace` and `using` directives. Use `sealed` where appropriate.
+Every new rule that can be illustrated with a code example MUST include both a `// GOOD:` and a `// BAD:` example. C# examples MUST omit `namespace` and `using` directives. Use `sealed` on all concrete types.
