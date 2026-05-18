@@ -1,6 +1,6 @@
 # Component Conventions
 
-This file will contain the React component design conventions for all Litenova Solutions frontend projects once the frontend stack is standardized. It covers how to design, organize, and compose React components using Next.js 15, TypeScript, and shadcn/ui.
+This file will contain the React component design conventions for all frontend projects once the frontend stack is standardized. It covers how to design, organize, and compose React components using Next.js 15, TypeScript, and shadcn/ui.
 
 This file is intentionally incomplete. Frontend conventions will be added in a future release. Pin to a version tag that includes these files before relying on them in a project.
 

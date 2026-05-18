@@ -1,6 +1,6 @@
 ---
-description: Backend C# conventions for all Litenova Solutions .NET projects.
-globs: ["src/**/Domain/**/*.cs", "src/**/Application/**/*.cs", "src/**/Infrastructure/**/*.cs", "src/**/WebApi/**/*.cs"]
+description: Backend C# conventions for .NET projects following this standard.
+globs: ["src/**/Domain/**/*.cs", "src/**/Application.*/**/*.cs", "src/**/Infrastructure/**/*.cs", "src/**/WebApi/**/*.cs"]
 alwaysApply: false
 ---
 
@@ -8,21 +8,21 @@ alwaysApply: false
 
 Full convention guides are in `docs/conventions/backend/`. Read the relevant file before editing a layer. This file is a quick reference only.
 
-## The Five Critical Rules
+## Ten Critical Rules
 
 ### 1. Sealed by Default
 
-All classes not designed for inheritance MUST be declared `sealed`. This includes all aggregates, entities, value objects, handlers, validators, endpoints, and EF Core configuration classes.
+All concrete classes and records MUST be `sealed` unless the type is explicitly a base class.
 
 ```csharp
 // GOOD:
-sealed class CreatePostCommandHandler : ICommandHandler<CreatePostCommand> { }
+sealed class CreatePostCommandHandler : ICommandHandler<CreatePostCommand, PostId> { }
 
 // BAD:
-class CreatePostCommandHandler : ICommandHandler<CreatePostCommand> { }
+class CreatePostCommandHandler : ICommandHandler<CreatePostCommand, PostId> { }
 ```
 
-### 2. No Controllers — IEndpoint Only
+### 2. No Controllers - IEndpoint Only
 
 Never create a class that inherits from `ControllerBase` or `Controller`. All HTTP endpoints MUST implement `IEndpoint`.
 
@@ -41,35 +41,62 @@ class PostsController : ControllerBase { }
 
 ### 3. No Aggregate Loading in Query Handlers
 
-Query handlers MUST inject a read store interface (`IXxxReadStore`), not a domain repository. Never call a repository inside a query handler.
+Query handlers MUST inject `IXxxReadStore`, not `IXxxRepository`.
 
 ```csharp
 // GOOD:
-sealed class GetPostByIdQueryHandler(IPostReadStore readStore)
-    : IQueryHandler<GetPostByIdQuery, PostResult> { }
+sealed class GetPostByIdQueryHandler : IQueryHandler<GetPostByIdQuery, PostResult>
+{
+    public GetPostByIdQueryHandler(IPostReadStore postReadStore) { ... }
+}
 
 // BAD:
-sealed class GetPostByIdQueryHandler(IPostRepository repository)
-    : IQueryHandler<GetPostByIdQuery, PostResult> { }
+sealed class GetPostByIdQueryHandler : IQueryHandler<GetPostByIdQuery, PostResult>
+{
+    public GetPostByIdQueryHandler(IPostRepository postRepository) { ... }
+}
 ```
 
 ### 4. Correct Exception Hierarchy
 
-See `docs/conventions/backend/06-exception-hierarchy.md` for the full contract.
-
-- Validators throw `ApplicationValidationException` subclasses.
-- Repositories throw `AggregateNotFoundException` subclasses.
-- Aggregate methods throw `DomainException` subclasses.
-- NEVER throw `InvalidOperationException`, `ArgumentException`, or `ArgumentNullException` in domain or application code.
+See `docs/conventions/backend/06-exception-hierarchy.md`. Validators throw `ApplicationValidationException` subclasses. Repositories throw `AggregateNotFoundException` subclasses. Aggregates throw `DomainException` subclasses. Never throw `InvalidOperationException` or `ArgumentException` in domain or application code.
 
 ### 5. CancellationToken on All Async Methods
 
-Every `async` method and every method that calls an `async` method MUST accept and propagate a `CancellationToken`.
+The last parameter of every async method MUST be named exactly `cancellationToken`.
 
 ```csharp
 // GOOD:
 Task<PostResult> HandleAsync(GetPostByIdQuery query, CancellationToken cancellationToken);
 
 // BAD:
-Task<PostResult> HandleAsync(GetPostByIdQuery query);
+Task<PostResult> HandleAsync(GetPostByIdQuery query, CancellationToken ct);
 ```
+
+### 6. No Handlers or Validators in Contracts Projects
+
+`Application.Write.Contracts` and `Application.Read.Contracts` contain only records and interfaces. Handlers and validators belong in the implementation projects.
+
+### 7. No External Libraries in Application.Reactions
+
+Event handlers define narrow interfaces for external capabilities. Infrastructure implements those interfaces. The Reactions project MUST NOT reference EF Core, email clients, HTTP clients, or any similar external library.
+
+### 8. Named cancellationToken Parameter
+
+The `CancellationToken` parameter MUST be named `cancellationToken`, not `ct`, `token`, or `cancel`.
+
+### 9. AwesomeAssertions in Tests
+
+All test assertions use AwesomeAssertions. The API surface is identical to FluentAssertions.
+
+```csharp
+// GOOD:
+post.State.Should().BeOfType<PublishedPostState>();
+
+// BAD:
+Assert.IsType<PublishedPostState>(post.State);
+```
+
+### 10. Mermaid for All Diagrams
+
+All diagrams in documentation files MUST use Mermaid syntax in a fenced code block. No ASCII art.

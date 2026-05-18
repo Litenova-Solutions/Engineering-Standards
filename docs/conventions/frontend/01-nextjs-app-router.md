@@ -1,6 +1,6 @@
 # Next.js App Router Conventions
 
-This file will contain the Next.js 15 App Router conventions for all Litenova Solutions frontend projects once the frontend stack is standardized. The backend stack uses Next.js 15 (App Router), TypeScript, Tailwind CSS v4, and shadcn/ui.
+This file will contain the Next.js 15 App Router conventions for all frontend projects once the frontend stack is standardized. The frontend stack uses Next.js 15 (App Router), TypeScript, Tailwind CSS v4, and shadcn/ui.
 
 This file is intentionally incomplete. Frontend conventions will be added in a future release. Pin to a version tag that includes these files before relying on them in a project.
 

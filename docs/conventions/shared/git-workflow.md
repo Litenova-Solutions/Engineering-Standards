@@ -1,6 +1,6 @@
 # Git Workflow
 
-This document defines the branch naming, commit message, pull request, and merge conventions for all Litenova Solutions projects.
+This document defines the branch naming, commit message, pull request, and merge conventions for all projects following these standards.
 
 ---
 
@@ -9,15 +9,15 @@ This document defines the branch naming, commit message, pull request, and merge
 Branch names follow the pattern `{type}/{short-description}` where the description is lowercase kebab-case.
 
 | Type | When to Use | Example |
-|---|---|---|
+|:---|:---|:---|
 | `feat` | A new feature or user-facing functionality | `feat/add-post-publishing` |
 | `fix` | A bug fix | `fix/post-not-found-returns-500` |
-| `chore` | Maintenance tasks, dependency updates, CI changes | `chore/update-efcore-to-9-0-4` |
+| `chore` | Maintenance tasks, dependency updates, CI changes | `chore/update-efcore-to-10-0-4` |
 | `docs` | Documentation changes only | `docs/add-read-store-examples` |
 | `refactor` | Code restructuring with no behavior change | `refactor/extract-post-read-store` |
 | `test` | Adding or fixing tests | `test/add-publish-post-integration-test` |
 
-Branch names MUST be all lowercase. Use hyphens, not underscores or spaces. Keep descriptions short (3–5 words).
+Branch names MUST be all lowercase. Use hyphens, not underscores or spaces. Keep descriptions short (3-5 words).
 
 ---
 
@@ -36,15 +36,15 @@ All commits MUST follow the [Conventional Commits](https://www.conventionalcommi
 The short description is lowercase, imperative mood, no trailing period. Maximum 72 characters on the first line.
 
 | Type | When to Use | Example |
-|---|---|---|
+|:---|:---|:---|
 | `feat` | A new feature | `feat(posts): add publishing endpoint` |
 | `fix` | A bug fix | `fix(posts): return 404 when post not found` |
-| `chore` | Maintenance | `chore: update Npgsql to 8.0.3` |
+| `chore` | Maintenance | `chore: update Npgsql to 10.0.3` |
 | `docs` | Documentation | `docs(readme): add submodule setup instructions` |
 | `refactor` | Refactoring | `refactor(posts): extract IPostReadStore` |
 | `test` | Test changes | `test(posts): add integration test for publish endpoint` |
 | `ci` | CI/CD pipeline | `ci: add vulnerability scan step` |
-| `build` | Build system changes | `build: switch to sdk-style csproj` |
+| `build` | Build system changes | `build: switch to slnx solution format` |
 | `perf` | Performance improvements | `perf(posts): use select projection in read store` |
 
 **Breaking changes** are indicated with a `!` after the type or with `BREAKING CHANGE:` in the footer:
@@ -59,7 +59,7 @@ feat(api)!: change post ID from int to guid
 
 Every pull request MUST meet all of the following before it can be merged:
 
-1. **Description:** The PR description explains _what_ changed and _why_. Link to any related issues or ADRs.
+1. **Description:** The PR description explains what changed and why. Link to any related issues or ADRs.
 2. **CI passes:** All build and test steps must be green. No exceptions.
 3. **No test coverage decrease:** Adding code without tests for it is not acceptable. Integration tests are required for every new endpoint.
 4. **CHANGELOG entry:** Every PR that changes a convention, adds a feature, or fixes a bug MUST include a corresponding entry in `CHANGELOG.md` under `[Unreleased]`.
@@ -70,7 +70,7 @@ Every pull request MUST meet all of the following before it can be merged:
 
 ## Merge Strategy
 
-- **Feature branches → `main`:** Squash and merge. The squashed commit message MUST follow the Conventional Commits format.
+- **Feature branches to `main`:** Squash and merge. The squashed commit message MUST follow the Conventional Commits format.
 - **No merge commits on `main`.** The `main` branch history must be linear.
 - **No force-pushes to `main`.**
 
@@ -101,3 +101,4 @@ git push origin v1.2.0
 ## Protected Branches
 
 `main` is a protected branch. Direct pushes are not permitted. All changes to `main` MUST go through a pull request that passes CI and receives at least one approval.
+

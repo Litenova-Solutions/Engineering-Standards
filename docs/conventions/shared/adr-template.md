@@ -1,6 +1,6 @@
 # Architecture Decision Record Template
 
-An Architecture Decision Record (ADR) captures a significant architectural or technology decision, including the context that prompted it and the consequences of making it. ADRs are the institutional memory of design decisions — they explain not just _what_ was decided but _why_, which is the information that matters when the decision is revisited months or years later.
+An Architecture Decision Record (ADR) captures a significant architectural or technology decision, including the context that prompted it and the consequences of making it. ADRs are the institutional memory of design decisions; they explain not just what was decided but why, which is the information that matters when the decision is revisited months or years later.
 
 ---
 
@@ -10,17 +10,17 @@ Write an ADR for any decision that meets one or more of the following criteria:
 
 - The decision adds a new dependency (NuGet package, external service, infrastructure component).
 - The decision involves a trade-off between at least two viable alternatives.
-- The decision is non-obvious: a future engineer reading the code would wonder "why was this done this way?"
+- The decision is non-obvious: a future engineer reading the code would wonder why this was done this way.
 - The decision reverses or significantly changes an earlier decision.
 - The decision affects multiple projects or teams.
 
-**When NOT to write an ADR:** Implementation details that follow directly from existing conventions do not need an ADR. If the decision is "use `IEndpoint` for this new endpoint" (because that's what the convention says), no ADR is needed.
+**When NOT to write an ADR:** Implementation details that follow directly from existing conventions do not need an ADR. If the decision is "use `IEndpoint` for this new endpoint" (because that is what the convention says), no ADR is needed.
 
 ---
 
 ## ADR File Naming
 
-ADR files live in `docs/adr/` within the project repository (not in the standards repository).
+ADR files live in `docs/adr/` within the project repository.
 
 File name format: `docs/adr/{NNNN}-{kebab-case-title}.md`
 
@@ -36,7 +36,7 @@ Where `NNNN` is a zero-padded sequential number starting at `0001`.
 ## ADR Structure
 
 ```markdown
-# {NNNN}. {Title — short, imperative, describes the decision}
+# {NNNN}. {Title - short, imperative, describes the decision}
 
 **Status:** Proposed | Accepted | Deprecated | Superseded by [ADR-NNNN](NNNN-title.md)
 
@@ -73,41 +73,41 @@ Below is a complete, realistic example ADR.
 
 ---
 
-# 0002. Use Minimal API Endpoint Classes over MVC Controllers
+# 0006. Contracts Projects for the Application Layer
 
 **Status:** Accepted
 
-**Date:** 2024-03-01
+**Date:** 2025-01-01
 
 ## Context
 
-The project initially scaffolded with MVC controllers as the default ASP.NET Core pattern. As the endpoint count grew, the controller classes accumulated multiple action methods, leading to files that violated the Single Responsibility Principle. Routing logic, dependency injection, and response shaping were all mixed together.
+With the application layer split into Write, Read, and Reactions projects, the WebApi layer needs to reference command and query types to dispatch them. If WebApi references the implementation projects (`Application.Write`, `Application.Read`), it pulls in handler implementations as a transitive dependency. This is unnecessary and creates a larger dependency surface. It also means that a future refactoring of a handler implementation could break the WebApi build, even when the command or query type did not change.
 
-We evaluated two approaches for the next phase of development:
+Two approaches were considered:
 
-1. Continue with MVC controllers, but enforce one action per controller.
-2. Switch to Minimal API endpoint classes (`IEndpoint`), where each use case is its own class.
+1. Let WebApi reference the implementation projects and accept the larger dependency surface.
+2. Create separate Contracts projects (`Application.Write.Contracts`, `Application.Read.Contracts`) containing only the public-facing types. WebApi references only the Contracts projects.
 
-The team has also adopted LiteBus as a mediator, which means endpoints no longer need to inject multiple services — they inject `ILiteBus` only. This makes the per-class endpoint pattern trivial to implement and removes the primary advantage controllers had (shared DI between actions).
+The compiler enforces the boundary in approach 2: WebApi cannot call a handler directly because it has no reference to the implementation project. The only way to invoke a handler is through the mediator (`IMessageBus`), which is the correct pattern.
 
 ## Decision
 
-All HTTP endpoints will be implemented as classes implementing `IEndpoint`. No new MVC controllers will be created. Existing controllers will be migrated as their use cases are touched.
+`Application.Write.Contracts` and `Application.Read.Contracts` are dedicated projects containing only the public contract types: commands, command results, queries, query results, and read store interfaces. WebApi references only the Contracts projects, not the implementation projects. The implementation projects also reference their own Contracts project.
 
 ## Consequences
 
 ### Positive
 
-- Each use case is fully self-contained: one folder, one endpoint class, one request model, one response model, one mappings class.
-- Endpoints are trivially testable in isolation.
-- Folder structure screams intent: `Endpoints/Posts/Create/` is unambiguous.
-- No accidental coupling between different use cases that previously shared a controller.
+- WebApi has a minimal, stable dependency surface that changes only when the command or query API changes.
+- The compiler prevents handlers from accidentally being placed in Contracts projects.
+- The Contracts projects are the versioned API surface of the application layer.
+- Agents cannot put a handler in a Contracts project because the build will fail if they try.
 
 ### Negative
 
-- Slightly more files per feature compared to a single controller with multiple actions.
-- New team members familiar with MVC need to learn the `IEndpoint` pattern.
+- Two additional projects per application layer split.
+- The distinction between Contracts and implementation must be understood by all engineers and agents.
 
 ### Risks
 
-- The `IEndpoint` interface is a hand-rolled abstraction, not a framework primitive. If the team grows significantly, the registration mechanism (assembly scanning) must be documented clearly to avoid duplicate registration bugs.
+- Contracts projects can become bloated if non-contract types are placed there. The rule "no handlers in Contracts" must be enforced by architecture tests as a second line of defense.

@@ -1,6 +1,6 @@
 # Engineering Principles
 
-These principles apply to all Litenova Solutions projects regardless of language or framework. They are the foundation from which all layer-specific conventions derive. When a specific convention appears to conflict with a general rule, the specific convention takes precedence — but that convention must itself be grounded in one of these principles.
+These principles apply to all projects following these standards, regardless of language or framework. They are the foundation from which all layer-specific conventions derive. When a specific convention appears to conflict with a general rule, the specific convention takes precedence, but that convention must itself be grounded in one of these principles.
 
 ---
 
@@ -16,10 +16,10 @@ The cost of verbosity is measured in keystrokes. The cost of magic is measured i
 
 ## 2. Screaming Architecture
 
-Folder structure communicates business intent. A developer should be able to identify the business domain from the folder names alone — not from file names, not from class names, but from the folder hierarchy.
+Folder structure communicates business intent. A developer should be able to identify the business domain from the folder names alone, not from file names, not from class names, but from the folder hierarchy.
 
 ```
-// GOOD: folder structure that screams intent
+// GOOD: folder structure that communicates intent
 Features/
   Posts/
     Create/
@@ -52,7 +52,7 @@ If you find yourself needing to reference an outer layer from an inner layer, th
 
 A single database transaction modifies a single aggregate. If an operation appears to require modifying two aggregates in a single transaction, either the aggregate boundaries are wrong or the operation should be modeled as a domain event that triggers a separate handler.
 
-Cross-aggregate coordination happens via domain events, not by loading multiple aggregates in the same command handler and saving both. The transaction boundary is the aggregate — not the use case.
+Cross-aggregate coordination happens via domain events, not by loading multiple aggregates in the same command handler and saving both. The transaction boundary is the aggregate, not the use case.
 
 ---
 
@@ -79,20 +79,22 @@ Code starts where it is first needed. It does not move to a `Shared/` folder pre
 
 Most code never reaches Strike 2. The rule prevents the accumulation of a `Shared/` folder full of types that are only used once, which is the most common source of unnecessary coupling.
 
+The promotion rule applies within a single project. Types that are part of the public contract of a layer (commands, queries, read store interfaces, result records) belong in the Contracts project from the start, not after promotion. Promotion is for implementation-level code that unexpectedly becomes reusable.
+
 ---
 
 ## 7. Exception Hierarchy as Contract
 
-Every exception type communicates its category. The category determines the HTTP response code. This mapping is a team contract enforced by the `GlobalExceptionHandler` middleware — it is not an implementation detail.
+Every exception type communicates its category. The category determines the HTTP response code. This mapping is a team contract enforced by the `GlobalExceptionHandler` middleware.
 
 | Category | HTTP Status |
-|---|---|
+|:---|:---|
 | Input validation failure | 400 |
 | Resource not found | 404 |
 | Domain invariant violation | 409 |
 | Unhandled | 500 |
 
-Throwing a generic `Exception` or `InvalidOperationException` breaks the contract and produces an incorrect HTTP response (500 instead of 409, for example). All custom exception types are defined in `docs/conventions/backend/06-exception-hierarchy.md`.
+Throwing a generic `Exception` or `InvalidOperationException` breaks the contract and produces an incorrect HTTP response. All custom exception types are defined in `docs/conventions/backend/06-exception-hierarchy.md`.
 
 ---
 
@@ -100,4 +102,41 @@ Throwing a generic `Exception` or `InvalidOperationException` breaks the contrac
 
 Rules that a linter, formatter, or static analyzer already enforces automatically MUST NOT appear in agent context files (`AGENTS.md`, Cursor rules, Copilot instructions). Agent context files are for rules that require human or AI reasoning.
 
-If a rule can be expressed as an `.editorconfig` setting, a Roslyn analyzer, or an ESLint rule, it belongs in that tooling configuration — not in a prose document that agents must read. Keeping agent files free of mechanical rules makes them smaller and more effective.
+If a rule can be expressed as an `.editorconfig` setting, a Roslyn analyzer, or an ESLint rule, it belongs in that tooling configuration, not in a prose document that agents must read. Keeping agent files free of mechanical rules makes them smaller and more effective.
+
+---
+
+## 9. Contracts Before Implementation
+
+Every public-facing type (commands, queries, results, read store interfaces) lives in a Contracts project before any handler or implementation is written. This enforces the dependency rule at the compiler level: a project that references only the Contracts project cannot accidentally depend on handler implementations.
+
+The Contracts project is the API surface of a layer. The implementation project is the private body. A WebApi endpoint references `Application.Write.Contracts` for the command type and `LiteBus.Messaging.Abstractions` to dispatch it. It never needs to reference `Application.Write` at all. The boundary is explicit, enforced by the project reference graph, and visible to any engineer reading the solution file.
+
+```csharp
+// GOOD: WebApi endpoint references only Contracts types
+sealed class CreatePostEndpoint : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapPost("/posts", HandleAsync);
+    }
+
+    private static async Task<IResult> HandleAsync(
+        CreatePostRequest request,
+        IMessageBus messageBus,
+        CancellationToken cancellationToken)
+    {
+        // CreatePostCommand is from Application.Write.Contracts
+        // IMessageBus is from LiteBus.Messaging.Abstractions
+        var command = request.ToCommand();
+        var postId = await messageBus.SendAsync(command, cancellationToken);
+        return Results.Created($"/posts/{postId.Value}", postId.ToResponse());
+    }
+}
+
+// BAD: WebApi endpoint references handler implementation directly
+sealed class CreatePostEndpoint : IEndpoint
+{
+    private readonly CreatePostCommandHandler _handler; // BAD: references implementation project
+}
+```

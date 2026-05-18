@@ -1,42 +1,40 @@
 # Clean Architecture
 
-This document explains how Clean Architecture is applied across all Litenova Solutions projects. Every project follows this structure regardless of domain complexity.
+This document explains how Clean Architecture is applied across all projects following these standards. Every project follows this structure regardless of domain complexity.
 
 ---
 
-## Layer Diagram
+## 1. Layer Diagram
 
-```
-         ┌─────────────────────────────────────────┐
-         │                  WebApi                  │
-         │   Endpoints · Request/Response Models    │
-         │   ApiMappings · GlobalExceptionHandler   │
-         └──────────────────┬──────────────────────┘
-                            │ depends on
-         ┌──────────────────▼──────────────────────┐
-         │               Application                │
-         │   Handlers · Validators · Read Stores    │
-         │   Application Models · Mapping Exts      │
-         └──────────────────┬──────────────────────┘
-                            │ depends on
-         ┌──────────────────▼──────────────────────┐
-         │                 Domain                   │
-         │   Aggregates · Value Objects · Events    │
-         │   Repository Interfaces · Exceptions     │
-         └─────────────────────────────────────────┘
-                            ▲
-         ┌──────────────────┴──────────────────────┐
-         │             Infrastructure               │
-         │   EF Core · Repositories · Read Stores  │
-         │   External Clients · Migrations          │
-         └─────────────────────────────────────────┘
-```
+```mermaid
+graph TD
+    WebApi["WebApi\n(Endpoints, Request/Response Models, ApiMappings)"]
+    WriteContracts["Application.Write.Contracts\n(Commands, Command Results)"]
+    ReadContracts["Application.Read.Contracts\n(Queries, Query Results, IXxxReadStore)"]
+    Write["Application.Write\n(Command Handlers, Validators)"]
+    Read["Application.Read\n(Query Handlers, Validators)"]
+    Reactions["Application.Reactions\n(Event Handlers, Narrow Interfaces)"]
+    Domain["Domain\n(Aggregates, Value Objects, Events, Repository Interfaces)"]
+    Infrastructure["Infrastructure\n(EF Core, Repositories, Read Stores, External Clients)"]
 
-Dependencies flow inward only. Infrastructure sits outside the main ring and implements the interfaces defined by Domain and Application. WebApi depends on Application; it may reference Infrastructure only in `Program.cs` for DI registration.
+    WebApi --> WriteContracts
+    WebApi --> ReadContracts
+    Write --> WriteContracts
+    Write --> Domain
+    Read --> ReadContracts
+    Read --> Domain
+    Reactions --> WriteContracts
+    Reactions --> ReadContracts
+    Reactions --> Domain
+    Infrastructure --> Domain
+    Infrastructure --> WriteContracts
+    Infrastructure --> ReadContracts
+    Infrastructure --> Reactions
+```
 
 ---
 
-## Layer Responsibilities
+## 2. Layer Responsibilities
 
 ### Domain
 
@@ -56,118 +54,287 @@ The Domain layer contains the core business model. It has zero dependencies on a
 - Application models, DTOs, or read projection types
 - Infrastructure concerns: connection strings, HTTP clients, file paths
 
-### Application
+### Application.Write.Contracts
 
-The Application layer orchestrates use cases. It depends on Domain interfaces and defines its own interfaces for external dependencies (read stores, external service contracts). It contains no business rules.
+The public contract of the write path. Contains only types that form the API surface of write operations.
 
 **Contains:**
-- Command handlers (`ICommandHandler<TCommand>`, `ICommandHandler<TCommand, TResult>`)
-- Query handlers (`IQueryHandler<TQuery, TResult>`)
-- Command and query validators (`ICommandValidator<TCommand>`, `IQueryValidator<TQuery>`)
-- Read store interfaces (`IPostReadStore`, `ICustomerReadStore`, etc.)
-- Application result records and projection types
-- Mapping extensions for translating between application models and domain input
+- Command record types (`CreatePostCommand`, `PublishPostCommand`)
+- Command result record types (`PostId` as a result, or dedicated result records)
+- Write-side contract interfaces that Infrastructure implements
+- NuGet reference: `LiteBus.Commands.Abstractions`
 
 **Forbidden:**
-- Any reference to `Microsoft.EntityFrameworkCore` (no `DbContext`, no `DbSet<T>`)
-- Any reference to `Microsoft.AspNetCore.*`
-- Business rule enforcement (invariants belong in Domain)
-- Loading full domain aggregates in query handlers — use read stores
+- Command handler implementations
+- Command validator implementations
+- Any business logic
+
+### Application.Write
+
+The private implementation of the write path.
+
+**Contains:**
+- Command handler implementations (`ICommandHandler<TCommand>`, `ICommandHandler<TCommand, TResult>`)
+- Command validator implementations (`ICommandValidator<TCommand>`)
+- References: `Application.Write.Contracts`, `Domain`
+- NuGet reference: `LiteBus.Commands.Abstractions`
+
+**Forbidden:**
+- Command or query type definitions (those belong in Contracts)
+- Read store interfaces or query types
+- Any reference to `Microsoft.EntityFrameworkCore`
+
+### Application.Read.Contracts
+
+The public contract of the read path. Contains only types that form the API surface of read operations.
+
+**Contains:**
+- Query record types (`GetPostByIdQuery`)
+- Query result record types (`PostResult`, `PostSummary`)
+- Read store interfaces (`IPostReadStore`) that Infrastructure implements
+- NuGet reference: `LiteBus.Queries.Abstractions`
+
+**Forbidden:**
+- Query handler implementations
+- Query validator implementations
+- Any business logic
+
+### Application.Read
+
+The private implementation of the read path.
+
+**Contains:**
+- Query handler implementations (`IQueryHandler<TQuery, TResult>`)
+- Query validator implementations (`IQueryValidator<TQuery>`)
+- References: `Application.Read.Contracts`, `Domain`
+- NuGet reference: `LiteBus.Queries.Abstractions`
+
+**Forbidden:**
+- Query or result type definitions (those belong in Contracts)
+- Any reference to `Microsoft.EntityFrameworkCore`
+- Any injection of repository interfaces (use `IXxxReadStore` only)
+
+### Application.Reactions
+
+Event handler implementations that react to domain events.
+
+**Contains:**
+- Event handler implementations (`IEventHandler<TEvent>`)
+- Narrow, per-handler interfaces for external side effects (`IPostPublishedNotifier`)
+- References: `Application.Write.Contracts`, `Application.Read.Contracts`, `Domain`
+- NuGet reference: `LiteBus.Events.Abstractions`
+
+**Forbidden:**
+- Any reference to external library packages (EF Core, email clients, HTTP clients)
+- Any business rule enforcement (that belongs in Domain)
 
 ### Infrastructure
 
-The Infrastructure layer adapts external systems to the interfaces defined by Domain and Application. It contains all database and I/O concerns.
+Adapts external systems to the interfaces defined by Domain and Application.
 
 **Contains:**
 - EF Core `DbContext` implementation
 - `IEntityTypeConfiguration<T>` classes for all aggregates
 - `IXxxRepository` implementations
 - `IXxxReadStore` implementations (using EF Core `Select` projections)
-- External service clients (email, payment providers, blob storage, etc.)
+- Implementations of narrow interfaces defined in `Application.Reactions`
+- External service clients (email, payment, blob storage)
 - EF Core migrations
 - DI registration extension methods
 
 **Forbidden:**
-- Business logic or domain rule enforcement of any kind
-- Knowledge of HTTP context or request lifecycle
-- References to `Microsoft.AspNetCore.*` except for DI types (`IServiceCollection`, etc.)
+- Business logic or domain rule enforcement
+- Knowledge of the HTTP request lifecycle
+- References to `Microsoft.AspNetCore.*` except for DI types
 
 ### WebApi
 
-The WebApi layer is the HTTP adapter. Its only job is to translate HTTP into application commands and queries, and translate results back into HTTP responses.
+The HTTP adapter. Translates HTTP requests into application commands and queries.
 
 **Contains:**
 - `IEndpoint` implementations (one class per use case)
 - Request and response record types
-- `ApiMappings` extension classes for translating between HTTP models and application models
+- `ApiMappings` extension classes
 - `GlobalExceptionHandler` middleware
-- OpenAPI/Swagger configuration
+- OpenAPI configuration
 
 **Forbidden:**
 - Business logic of any kind
-- Direct access to repositories, read stores, or the `DbContext`
-- `try-catch` blocks (exception handling is centralized in `GlobalExceptionHandler`)
-- Domain types in response models (always map to dedicated response records)
+- Direct access to repositories, read stores, or `DbContext`
+- `try-catch` blocks (handled by `GlobalExceptionHandler`)
+- Domain types in response models
 
 ---
 
-## Dependency Rule
+## 3. Dependency Rule
 
-Dependencies only point inward. No inner layer may reference an outer layer at any time.
+Dependencies point inward only. No inner layer may reference an outer layer.
 
-| Layer | May Reference |
-|---|---|
-| Domain | Nothing (no project references) |
-| Application | Domain |
-| Infrastructure | Domain, Application |
-| WebApi | Application (and Infrastructure only in `Program.cs` for DI registration) |
+```mermaid
+graph LR
+    Domain["Domain"]
+    WriteContracts["App.Write.Contracts"]
+    ReadContracts["App.Read.Contracts"]
+    Write["App.Write"]
+    Read["App.Read"]
+    Reactions["App.Reactions"]
+    Infra["Infrastructure"]
+    WebApi["WebApi"]
 
-If you are about to add a project reference that goes in the wrong direction, stop. Extract an interface in the inner layer and implement it in the outer layer instead.
+    WriteContracts --> Domain
+    ReadContracts --> Domain
+    Write --> WriteContracts
+    Write --> Domain
+    Read --> ReadContracts
+    Read --> Domain
+    Reactions --> WriteContracts
+    Reactions --> ReadContracts
+    Reactions --> Domain
+    Infra --> Domain
+    Infra --> WriteContracts
+    Infra --> ReadContracts
+    Infra --> Reactions
+    WebApi --> WriteContracts
+    WebApi --> ReadContracts
+    WebApi -.->|"Program.cs only"| Infra
+    WebApi -.->|"Program.cs only"| Write
+    WebApi -.->|"Program.cs only"| Read
+    WebApi -.->|"Program.cs only"| Reactions
+```
+
+| Project | May Reference |
+|:---|:---|
+| `Domain` | Nothing |
+| `Application.Write.Contracts` | `Domain` |
+| `Application.Read.Contracts` | `Domain` |
+| `Application.Write` | `Application.Write.Contracts`, `Domain` |
+| `Application.Read` | `Application.Read.Contracts`, `Domain` |
+| `Application.Reactions` | `Application.Write.Contracts`, `Application.Read.Contracts`, `Domain` |
+| `Infrastructure` | `Domain`, `Application.Write.Contracts`, `Application.Read.Contracts`, `Application.Reactions` |
+| `WebApi` | `Application.Write.Contracts`, `Application.Read.Contracts` |
+| `WebApi` (`Program.cs` only) | `Infrastructure`, `Application.Write`, `Application.Read`, `Application.Reactions` for DI registration |
 
 ---
 
-## CQRS Split
+## 4. CQRS Split
 
-Commands and queries are handled by separate classes. This is not purely organizational — it enforces a hard split between the read path and the write path.
+Commands and queries are handled by separate classes in separate projects. This enforces a hard split between the read path and the write path at the compiler level.
 
 **Commands** modify state. A command handler:
-1. Validates input (via a separate validator that runs before the handler).
+1. Validates input (a separate validator runs before the handler via LiteBus pipeline).
 2. Loads the aggregate from its repository.
 3. Calls a method on the aggregate that enforces the business rule.
 4. Saves the aggregate back via the repository.
-5. Returns void or a simple creation result (e.g., the new ID).
+5. Returns void or a simple creation result.
 
 **Queries** return data. A query handler:
-1. Validates input (via a separate validator).
-2. Injects an `IXxxReadStore` interface.
-3. Calls a projection method on the read store.
-4. Returns the projection result or throws `AggregateNotFoundException` if not found.
+1. Validates input (a separate validator runs before the handler).
+2. Calls a projection method on an `IXxxReadStore` interface.
+3. Returns the projection result or throws an `AggregateNotFoundException` subclass if not found.
 
-Query handlers MUST NOT load domain aggregates. This is not a suggestion. It is a hard rule enforced by code review. See `docs/conventions/backend/07-query-read-strategy.md` for the full explanation and options.
-
-This split enables:
-- **Independent optimization:** Read projections can be tuned (indexed views, read replicas, in-memory caching) without touching any domain logic.
-- **Reduced coupling:** Query performance is not coupled to aggregate complexity.
-- **Clear intent:** A class named `GetPostByIdQueryHandler` tells you it fetches data without side effects.
+Query handlers MUST NOT load domain aggregates. The `Application.Read` project has no reference to repository interfaces, so the compiler enforces this rule. See `docs/conventions/backend/07-query-read-strategy.md` for full details.
 
 ---
 
-## LiteBus as Mediator
+## 5. LiteBus as Mediator
 
-LiteBus is the mediator used to dispatch commands and queries throughout the solution. Endpoints call `liteBus.SendAsync(command, cancellationToken)` or `liteBus.QueryAsync(query, cancellationToken)` — they do not call handlers directly.
+LiteBus is a modular mediator. Each project references only the package it needs, not the full metapackage. This keeps project dependencies minimal and explicit.
 
-**Why a mediator?**
-- Endpoints remain thin. They translate HTTP to a command/query object and hand off immediately.
-- Handlers are independently testable with no HTTP context required.
-- Cross-cutting pipeline behaviors (logging, validation, performance tracing) can be wired once into the pipeline without modifying every handler.
+| LiteBus Package | Project | Purpose |
+|:---|:---|:---|
+| `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write` | `ICommand`, `ICommandHandler`, `ICommandValidator` |
+| `LiteBus.Queries.Abstractions` | `Application.Read.Contracts`, `Application.Read` | `IQuery`, `IQueryHandler`, `IQueryValidator` |
+| `LiteBus.Events.Abstractions` | `Application.Reactions` | `IEvent`, `IEventHandler` |
+| `LiteBus.Messaging.Abstractions` | `WebApi` | `IMessageBus` - the unified dispatcher for endpoints |
+| `LiteBus.Extensions.Microsoft.DependencyInjection` | `WebApi` | Full DI registration |
 
-**Interfaces provided by LiteBus:**
+Endpoints dispatch via `IMessageBus` from `LiteBus.Messaging.Abstractions`. This interface is the only LiteBus type that endpoints reference directly. The handler resolution happens at runtime via DI. WebApi does not reference the handler implementation projects directly in endpoint code; it references only the Contracts projects for the command and query types.
 
-| Interface | Used For |
-|---|---|
-| `ICommandHandler<TCommand>` | Command with no return value |
-| `ICommandHandler<TCommand, TResult>` | Command that returns a result (e.g., a new ID) |
-| `IQueryHandler<TQuery, TResult>` | Query that returns a result |
-| `ICommandValidator<TCommand>` | Validator that runs before a command handler |
-| `IQueryValidator<TQuery>` | Validator that runs before a query handler |
-| `ILiteBus` | Injected into endpoints to dispatch commands and queries |
+```csharp
+// GOOD: endpoint dispatches via IMessageBus, references only Contracts types
+sealed class CreatePostEndpoint : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapPost("/posts", HandleAsync);
+    }
+
+    private static async Task<IResult> HandleAsync(
+        CreatePostRequest request,
+        IMessageBus messageBus,
+        CancellationToken cancellationToken)
+    {
+        var command = request.ToCommand();
+        var postId = await messageBus.SendAsync(command, cancellationToken);
+        return Results.Created($"/posts/{postId.Value}", postId.ToResponse());
+    }
+}
+```
+
+---
+
+## 6. Event Handling and the Reactions Project
+
+Domain events originate in aggregates. An aggregate method raises a domain event by calling `RaiseDomainEvent(new PostPublished(Id))`. LiteBus dispatches these events after the command handler completes.
+
+The `Application.Reactions` project contains event handlers. Each handler reacts to one domain event. There are three categories:
+
+1. **Dispatches a command:** The handler receives an event and sends a follow-up command via `IMessageBus`. Example: `OnOrderPlaced` dispatches a `SendOrderConfirmationEmailCommand`.
+2. **Updates a read model projection:** The handler receives an event and updates a denormalized read model. Example: `OnPostPublished` updates a `PublishedPostsSummary` table.
+3. **Triggers an external side effect:** The handler receives an event and calls a narrow interface to notify an external system. Example: `OnPostPublished` calls `IPostPublishedNotifier.NotifySubscribersAsync(...)`.
+
+The Reactions project MUST NOT reference external libraries. All external capabilities are accessed through narrow interfaces defined in the Reactions project and implemented by Infrastructure.
+
+```csharp
+// GOOD: narrow interface defined in Application.Reactions
+internal interface IPostPublishedNotifier
+{
+    Task NotifySubscribersAsync(PostId postId, string postTitle, CancellationToken cancellationToken);
+}
+
+// GOOD: event handler uses the narrow interface
+internal sealed class NotifySubscribersOnPostPublishedEventHandler : IEventHandler<PostPublished>
+{
+    private readonly IPostPublishedNotifier _notifier;
+    private readonly IPostReadStore _postReadStore;
+
+    public NotifySubscribersOnPostPublishedEventHandler(
+        IPostPublishedNotifier notifier,
+        IPostReadStore postReadStore)
+    {
+        _notifier = notifier;
+        _postReadStore = postReadStore;
+    }
+
+    public async Task HandleAsync(PostPublished @event, CancellationToken cancellationToken)
+    {
+        var post = await _postReadStore.GetByIdAsync(@event.PostId, cancellationToken);
+        if (post is not null)
+        {
+            await _notifier.NotifySubscribersAsync(@event.PostId, post.Title, cancellationToken);
+        }
+    }
+}
+
+// BAD: event handler references an external library directly
+internal sealed class NotifySubscribersOnPostPublishedEventHandler : IEventHandler<PostPublished>
+{
+    private readonly IEmailClient _emailClient; // BAD: external library in Application.Reactions
+}
+```
+
+---
+
+## 7. Architecture Tests
+
+Structural rules are enforced by architecture tests using NetArchTest in addition to project reference constraints. Project references prevent the most obvious violations. Architecture tests catch violations that project references cannot.
+
+Architecture tests live in `{ProjectName}.Architecture.Tests`. They run in CI on every PR. See `docs/conventions/backend/08-testing.md` for full examples.
+
+Three concrete examples of rules that architecture tests enforce:
+
+1. **Query handlers must not depend on repository interfaces.** The project reference alone does not prevent this if a future refactoring introduces a shared project containing both. The test explicitly asserts no such dependency exists.
+
+2. **Handlers must be `internal sealed`.** Handlers are implementation details and must not be `public`. The test asserts this for all types implementing `ICommandHandler<,>` or `IQueryHandler<,>`.
+
+3. **Reactions must not reference external libraries.** NetArchTest checks that no type in the Reactions assembly has a dependency on `Microsoft.EntityFrameworkCore` or similar packages.

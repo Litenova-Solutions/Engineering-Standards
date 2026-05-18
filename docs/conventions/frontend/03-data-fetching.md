@@ -1,6 +1,6 @@
 # Data Fetching Conventions
 
-This file will contain the data fetching conventions for all Litenova Solutions frontend projects once the frontend stack is standardized. It covers how to fetch data from the backend API using Next.js 15 App Router patterns, including Server Components, Route Handlers, and client-side fetching.
+This file will contain the data fetching conventions for all frontend projects once the frontend stack is standardized. It covers how to fetch data from the backend API using Next.js 15 App Router patterns, including Server Components, Route Handlers, and client-side fetching.
 
 This file is intentionally incomplete. Frontend conventions will be added in a future release. Pin to a version tag that includes these files before relying on them in a project.
 
