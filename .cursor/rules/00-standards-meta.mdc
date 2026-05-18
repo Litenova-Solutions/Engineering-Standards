@@ -1,0 +1,30 @@
+---
+description: Meta-rules for editing the engineering-standards repository itself.
+alwaysApply: true
+---
+
+# Meta-Rules for This Repository
+
+These rules apply when an agent is editing files inside the `engineering-standards` repository itself — that is, editing the standards, not a project that consumes them.
+
+## Tone
+
+Always maintain the tone described in the repository writing style: direct, concrete, short sentences, RFC 2119 keywords (`MUST`, `MUST NOT`, `SHOULD`) for mandatory rules, no filler phrases (`leverage`, `utilize`, `holistic`, `streamline`). Write as a senior engineer documenting conventions for peers.
+
+## Rule Integrity
+
+- MUST NOT remove a rule from any convention file without adding a corresponding entry in `CHANGELOG.md` explaining why the rule was removed.
+- MUST NOT downgrade a `MUST` rule to a `SHOULD` rule without a CHANGELOG entry and a rationale comment in the convention file itself.
+- MUST NOT add a rule without verifying it does not conflict with an existing rule in another convention file.
+
+## AGENTS.md Size Limit
+
+`AGENTS.md` MUST remain under 120 lines at all times. If content must be added, summarize rather than append. Detailed explanations belong in the layer-specific convention files, not in `AGENTS.md`.
+
+## Convention File Index
+
+If a new convention file is added under `docs/conventions/`, the Convention File Index table in `AGENTS.md` MUST be updated in the same commit or PR.
+
+## Code Examples
+
+Every new rule that can be illustrated with a code example MUST include both a `// GOOD:` and a `// BAD:` example. Do not add rules without examples where examples are applicable. C# examples MUST omit `namespace` and `using` directives. Use `sealed` where appropriate.
