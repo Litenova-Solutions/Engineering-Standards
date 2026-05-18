@@ -62,6 +62,8 @@ Do NOT load `docs/philosophy.md` or `docs/agentic-development.md` for routine co
 
 ## Common Agent Mistakes
 
+- Injecting `ICommandMediator` into an Application.Read handler or `IQueryMediator` into an Application.Write handler. Only inject the mediator interface corresponding to the layer's responsibility.
+- Using `IMessageMediator` or `IMessageBus` instead of the specific `ICommandMediator` or `IQueryMediator`.
 - Injecting `IXxxRepository` into a query handler instead of `IXxxReadStore`.
 - Putting handlers or validators in the Contracts projects instead of the implementation projects.
 - Putting mapping logic inside the endpoint handler method instead of the `ApiMappings` class.

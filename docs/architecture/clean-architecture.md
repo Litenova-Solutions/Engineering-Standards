@@ -242,16 +242,15 @@ LiteBus is a modular mediator. Each project references only the package it needs
 
 | LiteBus Package | Project | Purpose |
 |:---|:---|:---|
-| `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write` | `ICommand`, `ICommandHandler`, `ICommandValidator` |
-| `LiteBus.Queries.Abstractions` | `Application.Read.Contracts`, `Application.Read` | `IQuery`, `IQueryHandler`, `IQueryValidator` |
-| `LiteBus.Events.Abstractions` | `Application.Reactions` | `IEvent`, `IEventHandler` |
-| `LiteBus.Messaging.Abstractions` | `WebApi` | `IMessageBus` - the unified dispatcher for endpoints |
+| `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write` | `ICommand`, `ICommandHandler`, `ICommandValidator`, `ICommandMediator` |
+| `LiteBus.Queries.Abstractions` | `Application.Read.Contracts`, `Application.Read` | `IQuery`, `IQueryHandler`, `IQueryValidator`, `IQueryMediator` |
+| `LiteBus.Events.Abstractions` | `Application.Reactions` | `IEvent`, `IEventHandler`, `IEventPublisher` |
 | `LiteBus.Extensions.Microsoft.DependencyInjection` | `WebApi` | Full DI registration |
 
-Endpoints dispatch via `IMessageBus` from `LiteBus.Messaging.Abstractions`. This interface is the only LiteBus type that endpoints reference directly. The handler resolution happens at runtime via DI. WebApi does not reference the handler implementation projects directly in endpoint code; it references only the Contracts projects for the command and query types.
+Endpoints dispatch via `ICommandMediator` or `IQueryMediator`. These interfaces are the specific entry points for endpoints. WebApi does not reference the handler implementation projects directly in endpoint code; it references only the Contracts projects for the command and query types.
 
 ```csharp
-// GOOD: endpoint dispatches via IMessageBus, references only Contracts types
+// GOOD: endpoint dispatches via specific mediator, references only Contracts types
 sealed class CreatePostEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -261,11 +260,11 @@ sealed class CreatePostEndpoint : IEndpoint
 
     private static async Task<IResult> HandleAsync(
         CreatePostRequest request,
-        IMessageBus messageBus,
+        ICommandMediator commandMediator,
         CancellationToken cancellationToken)
     {
         var command = request.ToCommand();
-        var postId = await messageBus.SendAsync(command, cancellationToken);
+        var postId = await commandMediator.SendAsync(command, cancellationToken);
         return Results.Created($"/posts/{postId.Value}", postId.ToResponse());
     }
 }
