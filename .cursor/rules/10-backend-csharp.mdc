@@ -1,0 +1,75 @@
+---
+description: Backend C# conventions for all Litenova Solutions .NET projects.
+globs: ["src/**/Domain/**/*.cs", "src/**/Application/**/*.cs", "src/**/Infrastructure/**/*.cs", "src/**/WebApi/**/*.cs"]
+alwaysApply: false
+---
+
+# Backend C# — Critical Rules Summary
+
+Full convention guides are in `docs/conventions/backend/`. Read the relevant file before editing a layer. This file is a quick reference only.
+
+## The Five Critical Rules
+
+### 1. Sealed by Default
+
+All classes not designed for inheritance MUST be declared `sealed`. This includes all aggregates, entities, value objects, handlers, validators, endpoints, and EF Core configuration classes.
+
+```csharp
+// GOOD:
+sealed class CreatePostCommandHandler : ICommandHandler<CreatePostCommand> { }
+
+// BAD:
+class CreatePostCommandHandler : ICommandHandler<CreatePostCommand> { }
+```
+
+### 2. No Controllers — IEndpoint Only
+
+Never create a class that inherits from `ControllerBase` or `Controller`. All HTTP endpoints MUST implement `IEndpoint`.
+
+```csharp
+// GOOD:
+sealed class CreatePostEndpoint : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app) { ... }
+}
+
+// BAD:
+[ApiController]
+[Route("api/posts")]
+class PostsController : ControllerBase { }
+```
+
+### 3. No Aggregate Loading in Query Handlers
+
+Query handlers MUST inject a read store interface (`IXxxReadStore`), not a domain repository. Never call a repository inside a query handler.
+
+```csharp
+// GOOD:
+sealed class GetPostByIdQueryHandler(IPostReadStore readStore)
+    : IQueryHandler<GetPostByIdQuery, PostResult> { }
+
+// BAD:
+sealed class GetPostByIdQueryHandler(IPostRepository repository)
+    : IQueryHandler<GetPostByIdQuery, PostResult> { }
+```
+
+### 4. Correct Exception Hierarchy
+
+See `docs/conventions/backend/06-exception-hierarchy.md` for the full contract.
+
+- Validators throw `ApplicationValidationException` subclasses.
+- Repositories throw `AggregateNotFoundException` subclasses.
+- Aggregate methods throw `DomainException` subclasses.
+- NEVER throw `InvalidOperationException`, `ArgumentException`, or `ArgumentNullException` in domain or application code.
+
+### 5. CancellationToken on All Async Methods
+
+Every `async` method and every method that calls an `async` method MUST accept and propagate a `CancellationToken`.
+
+```csharp
+// GOOD:
+Task<PostResult> HandleAsync(GetPostByIdQuery query, CancellationToken cancellationToken);
+
+// BAD:
+Task<PostResult> HandleAsync(GetPostByIdQuery query);
+```
