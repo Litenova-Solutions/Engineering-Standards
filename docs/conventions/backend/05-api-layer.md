@@ -17,7 +17,7 @@ An endpoint that makes a domain decision is wrong. An endpoint that queries a da
 1. **Thin endpoints.** No business logic. No domain decisions. Translate, dispatch, return.
 2. **Screaming architecture.** Folder structure reveals intent. The `Endpoints/Posts/Create/` folder communicates everything.
 3. **Dedicated mapping classes.** HTTP request to application command translation lives in `ApiMappings` classes, not in the endpoint handler method.
-4. **Mediator only.** Endpoints inject `IMessageBus`. They do not inject repositories, read stores, domain services, or any other application type directly.
+4. **Mediator only.** Endpoints inject `ICommandMediator` or `IQueryMediator` depending on their role. They do not inject repositories, read stores, domain services, or any other application type directly.
 5. **Centralized error handling.** No `try-catch` in endpoints. All exception handling goes through `GlobalExceptionHandler`.
 6. **Rich OpenAPI documentation.** Every endpoint MUST call `.WithName()`, `.WithTags()`, `.WithSummary()`, and the appropriate `.Produces<T>()` and `.ProducesProblem()` calls.
 
@@ -162,7 +162,7 @@ internal static class CreatePostApiMappings
 
 ### Endpoint Class
 
-WebApi references `Application.Write.Contracts` for `CreatePostCommand` and `PostId`. It references `LiteBus.Messaging.Abstractions` for `IMessageBus`. It does not reference `Application.Write` at all.
+WebApi references `Application.Write.Contracts` for `CreatePostCommand` and `PostId`. It references `LiteBus.Commands.Abstractions` for `ICommandMediator`. It does not reference `Application.Write` at all.
 
 ```csharp
 sealed class CreatePostEndpoint : IEndpoint
@@ -180,13 +180,13 @@ sealed class CreatePostEndpoint : IEndpoint
 
     private static async Task<IResult> HandleAsync(
         CreatePostRequest request,
-        IMessageBus messageBus,
+        ICommandMediator commandMediator,
         IHttpContextAccessor httpContextAccessor,
         CancellationToken cancellationToken)
     {
         var authorId = httpContextAccessor.HttpContext!.User.GetAuthorId();
         var command = request.ToCommand(authorId);
-        var postId = await messageBus.SendAsync(command, cancellationToken);
+        var postId = await commandMediator.SendAsync(command, cancellationToken);
 
         return Results.Created($"/posts/{postId.Value}", postId.ToResponse());
     }
@@ -252,11 +252,11 @@ sealed class GetPostByIdEndpoint : IEndpoint
 
     private static async Task<IResult> HandleAsync(
         Guid id,
-        IMessageBus messageBus,
+        IQueryMediator queryMediator,
         CancellationToken cancellationToken)
     {
         var query = id.ToQuery();
-        var result = await messageBus.SendAsync(query, cancellationToken);
+        var result = await queryMediator.QueryAsync(query, cancellationToken);
 
         return Results.Ok(result.ToResponse());
     }

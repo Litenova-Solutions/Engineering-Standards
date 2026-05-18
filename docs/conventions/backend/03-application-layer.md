@@ -235,17 +235,17 @@ sealed record PostResult
 // Category 1: dispatches a follow-up command
 internal sealed class SendConfirmationOnOrderPlacedEventHandler : IEventHandler<OrderPlaced>
 {
-    private readonly IMessageBus _messageBus;
+    private readonly ICommandMediator _commandMediator;
 
-    public SendConfirmationOnOrderPlacedEventHandler(IMessageBus messageBus)
+    public SendConfirmationOnOrderPlacedEventHandler(ICommandMediator commandMediator)
     {
-        _messageBus = messageBus;
+        _commandMediator = commandMediator;
     }
 
     public async Task HandleAsync(OrderPlaced @event, CancellationToken cancellationToken)
     {
         var command = new SendOrderConfirmationEmailCommand { OrderId = @event.OrderId };
-        await _messageBus.SendAsync(command, cancellationToken);
+        await _commandMediator.SendAsync(command, cancellationToken);
     }
 }
 
