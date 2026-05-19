@@ -1,16 +1,353 @@
 # Component Conventions
 
-This file will contain the React component design conventions for all frontend projects once the frontend stack is standardized. It covers how to design, organize, and compose React components using Next.js 15, TypeScript, and shadcn/ui.
+## 1. Guiding Philosophy
 
-This file is intentionally incomplete. Frontend conventions will be added in a future release. Pin to a version tag that includes these files before relying on them in a project.
+Components are the unit of UI composition, not the unit of architecture. The feature folder is the unit of architecture. A component answers one question: given this data, what should the UI look like? Business logic, data fetching, and state management are not component concerns. The component receives data via props or reads it from a server component parent. It renders. It dispatches events upward. Nothing else.
 
-## Sections That Will Be Present When Complete
+This separation is enforced structurally: server components fetch, client components interact, and neither category does the other's job. A component that fetches data AND handles button clicks is a design problem, not a convenience. Split it: server component fetches and passes data down, client component handles interaction and fires callbacks up.
 
-- **Component Taxonomy:** The distinction between page components, feature components, shared UI components, and layout components. Rules for where each type lives in the file system.
-- **Naming Conventions:** File naming (`PascalCase.tsx`), component function naming, and prop type naming (e.g., `ComponentNameProps`).
-- **Props Design:** Rules for prop types (always a named `type` or `interface`, never inline), required vs. optional props, and when to use `children`.
-- **Server vs. Client Component Boundary:** Rules for where the server/client boundary should be drawn within a feature. How to pass Server Component data down to Client Components without prop-drilling.
-- **Composition Patterns:** Slot patterns, compound components, and when to use `React.forwardRef`. When composition is preferred over configuration props.
-- **shadcn/ui Extension Pattern:** How to extend shadcn/ui components with additional variants using `cva`, where extended components live, and how to avoid overriding installed components.
-- **Accessibility Requirements:** ARIA roles, keyboard navigation requirements, and focus management rules for interactive components.
-- **Error Boundaries:** When to add `error.tsx` boundaries and how to design useful error UI.
+---
+
+## 2. Component Taxonomy
+
+Four categories of components exist, each with a defined location and purpose:
+
+### Page Components
+
+**Location:** `features/{feature}/{usecase}/{FeatureName}Page.tsx`
+
+Server components that receive data from the `app/` page shell and orchestrate feature rendering. They own the layout of a use case. MUST be server components unless the entire page requires client-side interactivity with no static data.
+
+### Feature Components
+
+**Location:** `features/{feature}/{usecase}/{ComponentName}.tsx`
+
+Components specific to a single use case within a feature. Can be server or client. One component per file. Named after what they represent, not where they appear (`PostCard`, not `ListItem`).
+
+### Shared Feature Components
+
+**Location:** `features/{feature}/shared/{ComponentName}.tsx`
+
+Components shared within a feature but not across features. Promoted here after appearing in two use cases within the same feature (the Strike 2 rule). Do not promote early.
+
+### UI Components
+
+**Location:** `components/ui/{component-name}.tsx`
+
+shadcn/ui components. Owned in this codebase. Never imported from `@shadcn/ui` (which is not an importable package). Modified here, not in `node_modules`. See Section 4.
+
+```typescript
+// GOOD: PostCard is a feature component inside the posts/list use case
+// features/posts/list/PostCard.tsx
+type PostCardProps = {
+  id: string
+  title: string
+  publishedAt: Date | null
+}
+
+export function PostCard({ id, title, publishedAt }: PostCardProps) {
+  return (
+    <article>
+      <h2>{title}</h2>
+      {publishedAt && <time>{publishedAt.toLocaleDateString()}</time>}
+    </article>
+  )
+}
+```
+
+```typescript
+// BAD: generic component placed directly in app/ without a feature folder
+// app/components/Card.tsx   <- BAD: no feature ownership, no use case context
+export function Card({ children }: { children: React.ReactNode }) {
+  return <div className="rounded border p-4">{children}</div>
+}
+```
+
+---
+
+## 3. Props Design
+
+Rules:
+
+- Props MUST be typed as a named `type`. Never use inline prop types. The type name follows the `{ComponentName}Props` convention.
+- Required props have no default value. Optional props use `?` and are handled with conditional rendering or a default value.
+- Callback props are named `on{Event}` (`onPublish`, `onDelete`, `onSelect`).
+- Never pass entire objects when only a few fields are needed. Destructure at the call site and pass only what the component needs.
+- Never use `any` in prop types.
+
+```typescript
+// GOOD: named props type, specific fields, callback naming
+type PostCardProps = {
+  id: string
+  title: string
+  publishedAt: Date | null
+  onPublish: (id: string) => void
+}
+
+function PostCard({ id, title, publishedAt, onPublish }: PostCardProps) {
+  // ...
+}
+```
+
+```typescript
+// BAD: inline props type, entire object passed, ambiguous callback name
+function PostCard({ post, publish }: { post: Post; publish: Function }) {
+  // BAD: inline type, entire Post object, "publish" is not an event name
+}
+```
+
+---
+
+## 4. The shadcn/ui Ownership Model
+
+Components from shadcn/ui are copied into `components/ui/` via the CLI and owned in this codebase. The CLI adds a component as a file in `components/ui/`; it is not installed as a package.
+
+Rules:
+
+- Never import from `@shadcn/ui` or `shadcn/ui` directly. Components live in `components/ui/`. If an import from those specifiers appears, it is a bug.
+- `forwardRef` has been removed from shadcn/ui. Do not add it to new components or to customized copies of shadcn/ui components.
+- All shadcn/ui components include `data-slot` attributes on their root element. Use `data-slot` selectors for styling targets rather than fragile class name overrides.
+- The `toast` component is deprecated in shadcn/ui. Use `sonner` for all toast notifications.
+- To add a component: `npx shadcn@latest add <component-name>`. This copies the component into `components/ui/`.
+
+```typescript
+// GOOD: import from local components/ui/
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Dialog } from "@/components/ui/dialog"
+```
+
+```typescript
+// BAD: import from package (not how shadcn/ui works)
+import { Button } from "shadcn/ui"      // BAD: not an importable package
+import { Button } from "@shadcn/ui"     // BAD: not an importable package
+```
+
+---
+
+## 5. Component Variants with `cva`
+
+`cva` (class-variance-authority) is the tool for component variants. Use it inside `components/ui/` files when adding new variants to a shadcn/ui component.
+
+```typescript
+// components/ui/button.tsx (excerpt showing cva usage)
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
+import { Slot } from "radix-ui"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input bg-background hover:bg-accent",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        // Custom variant added for this project
+        publish: "bg-green-600 text-white hover:bg-green-700",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 px-3",
+        lg: "h-11 px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+type ButtonProps = React.ComponentPropsWithoutRef<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }
+
+function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
+  const Comp = asChild ? Slot : "button"
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
+}
+```
+
+Note: import `Slot` from `"radix-ui"`, not from `"@radix-ui/react-slot"`. The unified `radix-ui` package was introduced in February 2026 and replaces all individual `@radix-ui/react-*` packages.
+
+---
+
+## 6. The `cn` Utility
+
+The `cn` utility combines `clsx` and `tailwind-merge`. It is the only accepted way to apply conditional Tailwind classes. Direct string concatenation is never acceptable because it does not resolve class conflicts.
+
+```typescript
+// lib/utils.ts
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+```
+
+```typescript
+// GOOD: conditional classes via cn()
+function StatusBadge({ isPublished }: { isPublished: boolean }) {
+  return (
+    <span className={cn(
+      "rounded-full px-2 py-1 text-xs font-medium",
+      isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"
+    )}>
+      {isPublished ? "Published" : "Draft"}
+    </span>
+  )
+}
+```
+
+```typescript
+// BAD: string concatenation for conditional classes
+function StatusBadge({ isPublished }: { isPublished: boolean }) {
+  return (
+    <span className={"rounded-full px-2 py-1 text-xs " + (isPublished ? "bg-green-100" : "bg-gray-100")}>
+      {/* BAD: string concatenation, Tailwind class conflicts are not resolved */}
+    </span>
+  )
+}
+```
+
+---
+
+## 7. Accessibility Requirements
+
+Rules:
+
+- All interactive elements MUST be keyboard-accessible. Use semantic HTML elements (`button`, `a`, `input`) rather than `div` or `span` with `onClick`.
+- All images MUST have descriptive `alt` text. Decorative images use `alt=""`.
+- Form inputs MUST have associated labels via `htmlFor`/`id` pairing or `aria-label` on the input itself.
+- All modal dialogs MUST trap focus and return focus to the trigger element on close. shadcn/ui `Dialog` handles this automatically via Radix UI.
+- Color alone MUST NOT convey information. Always pair color with text or an icon.
+
+```typescript
+// GOOD: semantic button element, keyboard accessible
+function DeleteButton({ onDelete }: { onDelete: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onDelete}
+      aria-label="Delete post"
+      className="text-destructive hover:text-destructive/80"
+    >
+      <TrashIcon aria-hidden="true" />
+      <span>Delete</span>
+    </button>
+  )
+}
+```
+
+```typescript
+// BAD: div with onClick, not keyboard accessible
+function DeleteButton({ onDelete }: { onDelete: () => void }) {
+  return (
+    <div onClick={onDelete} className="cursor-pointer text-red-500">
+      {/* BAD: div is not focusable, cannot be activated with keyboard */}
+      Delete
+    </div>
+  )
+}
+```
+
+---
+
+## 8. Branded Types for IDs
+
+The frontend uses branded types for IDs received from the backend. This prevents passing a `PostId` where an `AuthorId` is expected at compile time.
+
+```typescript
+// lib/types/branded.ts
+type Brand<T, TBrand extends string> = T & { readonly _brand: TBrand }
+
+export type PostId = Brand<string, "PostId">
+export type AuthorId = Brand<string, "AuthorId">
+export type UserId = Brand<string, "UserId">
+
+export function asPostId(value: string): PostId {
+  return value as PostId
+}
+
+export function asAuthorId(value: string): AuthorId {
+  return value as AuthorId
+}
+
+export function asUserId(value: string): UserId {
+  return value as UserId
+}
+```
+
+Branded types are applied at the API boundary when mapping raw API responses to feature types. The `asXxxId` cast functions are the only place where the cast is permitted. Inside feature code, the branded type is passed without casting.
+
+```typescript
+// Applying branded types at the API boundary
+const post = {
+  id: asPostId(rawPost.id),
+  authorId: asAuthorId(rawPost.authorId),
+  title: rawPost.title,
+}
+
+// TypeScript now prevents passing post.authorId where PostId is expected
+```
+
+---
+
+## 9. Error Boundaries
+
+`error.tsx` files catch errors thrown during rendering within their segment. They MUST be client components (add `"use client"` as the first line).
+
+Add an `error.tsx` at the feature level, not at the root `app/` level for most cases. Root-level error boundaries are too coarse: an error in one feature should not crash the entire app.
+
+```typescript
+// app/(main)/posts/error.tsx
+"use client"
+// Error boundaries must be client components — required by Next.js.
+
+import { useEffect } from "react"
+
+type Props = {
+  error: Error & { digest?: string }
+  reset: () => void
+}
+
+export default function PostsError({ error, reset }: Props) {
+  useEffect(() => {
+    // Log to an error reporting service
+    console.error(error)
+  }, [error])
+
+  return (
+    <div role="alert" className="flex flex-col items-center gap-4 p-8">
+      <h2 className="text-lg font-semibold">Something went wrong loading posts.</h2>
+      <button type="button" onClick={reset} className="text-sm underline">
+        Try again
+      </button>
+    </div>
+  )
+}
+```
+
+---
+
+## 10. Project-Specific Component Conventions
+
+> **Project teams: fill in this section when adopting these standards.**
+
+The following is project-specific and not defined in this standards file:
+
+- **Design system tokens:** Custom color palette, typography scale, and spacing tokens defined in the Tailwind CSS `@theme` block.
+- **Custom component categories:** Any additional component categories beyond the four in Section 2.
+- **Project-specific accessibility requirements:** WCAG level target (AA or AAA), screen reader testing tooling, contrast ratio requirements beyond WCAG minimum.
+- **Storybook:** Whether Storybook is used and which component categories have stories.

@@ -70,7 +70,11 @@ engineering-standards/
     │   ├── 0007-read-store-pattern-for-queries.md
     │   ├── 0008-reactions-project-depends-only-on-abstractions.md
     │   ├── 0009-architecture-tests-as-enforcement.md
-    │   └── 0010-outbox-pattern-as-reliability-escalation.md
+    │   ├── 0010-outbox-pattern-as-reliability-escalation.md
+    │   ├── 0011-turborepo-as-monorepo-tool.md
+    │   ├── 0012-openapi-typescript-client-generation.md
+    │   ├── 0013-authjs-v5-authentication.md
+    │   └── 0014-animation-tailwind-first-framer-motion-escalation.md
     ├── architecture/
     │   └── clean-architecture.md                     Full Clean Architecture guide for all projects.
     ├── templates/                                    Templates for project-specific documentation. Copy these into each project repository.
@@ -79,7 +83,9 @@ engineering-standards/
     │   ├── feature-inventory.md                      Template for listing all implemented and planned use cases.
     │   ├── exception-inventory.md                    Template for listing all custom exception types.
     │   ├── read-store-inventory.md                   Template for listing all read store interfaces and projections.
-    │   └── project-agents.md                         Template for the per-project AGENTS.md file.
+    │   ├── project-agents.md                         Template for the per-project AGENTS.md file.
+    │   ├── frontend-feature-inventory.md             Template for listing all frontend routes and use cases.
+    │   └── frontend-api-endpoints.md                 Template for documenting consumed backend API endpoints.
     └── conventions/
         ├── 00-principles.md                          Language-agnostic engineering principles.
         ├── backend/
@@ -92,10 +98,10 @@ engineering-standards/
         │   ├── 07-query-read-strategy.md             Read-side strategy using read stores.
         │   └── 08-testing.md                         Testing philosophy, patterns, and structure.
         ├── frontend/
-        │   ├── 01-nextjs-app-router.md               Next.js 15 App Router conventions. [PLACEHOLDER]
-        │   ├── 02-components.md                      Component design conventions. [PLACEHOLDER]
-        │   ├── 03-data-fetching.md                   Data fetching patterns. [PLACEHOLDER]
-        │   └── 04-state-and-forms.md                 State management and forms. [PLACEHOLDER]
+        │   ├── 01-nextjs-app-router.md               Next.js 16 App Router conventions.
+        │   ├── 02-components.md                      React component design conventions.
+        │   ├── 03-data-fetching.md                   Data fetching patterns.
+        │   └── 04-state-and-forms.md                 State management and forms.
         └── shared/
             ├── naming.md                             Cross-layer naming conventions.
             ├── git-workflow.md                       Branch, commit, and PR conventions.
@@ -116,16 +122,18 @@ engineering-standards/
 | `docs/conventions/backend/06-exception-hierarchy.md` | Exception hierarchy, categories, HTTP status mappings, and the `GlobalExceptionHandler`. |
 | `docs/conventions/backend/07-query-read-strategy.md` | Read store pattern for query handlers and the escalation path to raw SQL. |
 | `docs/conventions/backend/08-testing.md` | Testing philosophy, test project structure, naming conventions, and architecture tests. |
-| `docs/conventions/frontend/01-nextjs-app-router.md` | Next.js 15 App Router conventions. (Placeholder) |
-| `docs/conventions/frontend/02-components.md` | React component design conventions. (Placeholder) |
-| `docs/conventions/frontend/03-data-fetching.md` | Data fetching patterns for Next.js. (Placeholder) |
-| `docs/conventions/frontend/04-state-and-forms.md` | State management and form handling conventions. (Placeholder) |
+| `docs/conventions/frontend/01-nextjs-app-router.md` | Next.js 16 App Router conventions: server vs. client components, proxy.ts, React Compiler, caching. |
+| `docs/conventions/frontend/02-components.md` | React component design: taxonomy, shadcn/ui ownership, cva variants, branded types, accessibility. |
+| `docs/conventions/frontend/03-data-fetching.md` | Data fetching: server components, TanStack Query, Server Actions, error handling, optimistic updates. |
+| `docs/conventions/frontend/04-state-and-forms.md` | State management and forms: Zustand, React Hook Form with Zod v4, useActionState, discriminated unions. |
 | `docs/templates/ubiquitous-language.md` | Template for the domain term glossary. Copy to `docs/domain/` in a project repository. |
 | `docs/templates/aggregate-inventory.md` | Template for listing all aggregates, states, domain events, and repository interfaces. |
 | `docs/templates/feature-inventory.md` | Template for listing all implemented and planned use cases with handler class names. |
 | `docs/templates/exception-inventory.md` | Template for listing all custom exception types with categories and HTTP status codes. |
 | `docs/templates/read-store-inventory.md` | Template for listing all read store interfaces and the projection types they return. |
 | `docs/templates/project-agents.md` | Template for the per-project `AGENTS.md` file that imports these standards. |
+| `docs/templates/frontend-feature-inventory.md` | Template for listing all frontend routes and use cases. Copy to `docs/domain/` in each project. |
+| `docs/templates/frontend-api-endpoints.md` | Template for documenting which backend API endpoints the frontend consumes. |
 
 ## ADR Index
 
@@ -141,6 +149,10 @@ engineering-standards/
 | `docs/adr/0008-reactions-project-depends-only-on-abstractions.md` | Requires the Reactions project to define narrow interfaces rather than referencing external libraries directly. |
 | `docs/adr/0009-architecture-tests-as-enforcement.md` | Adds architecture tests using NetArchTest to enforce structural rules that project references cannot enforce. |
 | `docs/adr/0010-outbox-pattern-as-reliability-escalation.md` | Documents the outbox pattern as the escalation path for reliable event dispatch. |
+| `docs/adr/0011-turborepo-as-monorepo-tool.md` | Selects Turborepo with pnpm workspaces as the monorepo tool. |
+| `docs/adr/0012-openapi-typescript-client-generation.md` | Establishes openapi-typescript for type-safe API client generation with owned openapi-fetch source. |
+| `docs/adr/0013-authjs-v5-authentication.md` | Adopts Auth.js v5 as the authentication standard with proxy.ts for optimistic redirects only. |
+| `docs/adr/0014-animation-tailwind-first-framer-motion-escalation.md` | Tailwind CSS transitions as the default; Framer Motion added only when Tailwind is insufficient. |
 
 ## Project-Specific Documentation
 
