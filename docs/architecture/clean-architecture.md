@@ -9,13 +9,13 @@ This document explains how Clean Architecture is applied across all projects fol
 ```mermaid
 graph TD
     WebApi["WebApi\n(Endpoints, Request/Response Models, ApiMappings)"]
-    WriteContracts["Application.Write.Contracts\n(Commands, Command Results)"]
-    ReadContracts["Application.Read.Contracts\n(Queries, Query Results, IXxxReadStore)"]
+    WriteContracts["Application.Write.Contracts\n(Commands, Command Results, CommandValidationException)"]
+    ReadContracts["Application.Read.Contracts\n(Queries, Query Results, IDatabaseContext, PagedResult<T>, QueryValidationException)"]
     Write["Application.Write\n(Command Handlers, Validators)"]
-    Read["Application.Read\n(Query Handlers, Validators)"]
+    Read["Application.Read\n(Query Handlers, Validators)\nReferences Microsoft.EntityFrameworkCore"]
     Reactions["Application.Reactions\n(Event Handlers, Narrow Interfaces)"]
     Domain["Domain\n(Aggregates, Value Objects, Events, Repository Interfaces)"]
-    Infrastructure["Infrastructure\n(EF Core, Repositories, Read Stores, External Clients)"]
+    Infrastructure["Infrastructure\n(EF Core, Repositories, AppDbContext implements IDatabaseContext,\nTransaction Pipeline Behaviors, External Clients)"]
 
     WebApi --> WriteContracts
     WebApi --> ReadContracts
@@ -91,7 +91,9 @@ The public contract of the read path. Contains only types that form the API surf
 **Contains:**
 - Query record types (`GetPostByIdQuery`)
 - Query result record types (`PostResult`, `PostSummary`)
-- Read store interfaces (`IPostReadStore`) that Infrastructure implements
+- `IDatabaseContext` interface exposing `IQueryable<T>` per aggregate
+- `PagedResult<T>` and `PaginationParameters` shared pagination types
+- `QueryValidationException` base class
 - NuGet reference: `LiteBus.Queries.Abstractions`
 
 **Forbidden:**
@@ -106,13 +108,13 @@ The private implementation of the read path.
 **Contains:**
 - Query handler implementations (`IQueryHandler<TQuery, TResult>`)
 - Query validator implementations (`IQueryValidator<TQuery>`)
-- References: `Application.Read.Contracts`, `Domain`
+- References: `Application.Read.Contracts`, `Domain`, `Microsoft.EntityFrameworkCore`
 - NuGet reference: `LiteBus.Queries.Abstractions`
+- Injects `IDatabaseContext` for all data access
 
 **Forbidden:**
 - Query or result type definitions (those belong in Contracts)
-- Any reference to `Microsoft.EntityFrameworkCore`
-- Any injection of repository interfaces (use `IXxxReadStore` only)
+- Any reference to the Infrastructure project directly (use `IDatabaseContext` from `Application.Read.Contracts`)
 
 ### Application.Reactions
 
@@ -133,10 +135,10 @@ Event handler implementations that react to domain events.
 Adapts external systems to the interfaces defined by Domain and Application.
 
 **Contains:**
-- EF Core `DbContext` implementation
+- EF Core `DbContext` implementation (`AppDbContext` implements `IDatabaseContext`)
 - `IEntityTypeConfiguration<T>` classes for all aggregates
 - `IXxxRepository` implementations
-- `IXxxReadStore` implementations (using EF Core `Select` projections)
+- Global LiteBus pipeline behaviors: `TransactionCommandPreHandler`, `SaveChangesCommandPostHandler`, `RollbackCommandErrorHandler`
 - Implementations of narrow interfaces defined in `Application.Reactions`
 - External service clients (email, payment, blob storage)
 - EF Core migrations
@@ -208,7 +210,7 @@ graph LR
 | `Application.Write.Contracts` | `Domain` |
 | `Application.Read.Contracts` | `Domain` |
 | `Application.Write` | `Application.Write.Contracts`, `Domain` |
-| `Application.Read` | `Application.Read.Contracts`, `Domain` |
+| `Application.Read` | `Application.Read.Contracts`, `Domain`, `Microsoft.EntityFrameworkCore` |
 | `Application.Reactions` | `Application.Write.Contracts`, `Application.Read.Contracts`, `Domain` |
 | `Infrastructure` | `Domain`, `Application.Write.Contracts`, `Application.Read.Contracts`, `Application.Reactions` |
 | `WebApi` | `Application.Write.Contracts`, `Application.Read.Contracts` |
@@ -229,10 +231,10 @@ Commands and queries are handled by separate classes in separate projects. This 
 
 **Queries** return data. A query handler:
 1. Validates input (a separate validator runs before the handler).
-2. Calls a projection method on an `IXxxReadStore` interface.
+2. Writes a LINQ projection against `IDatabaseContext`.
 3. Returns the projection result or throws an `AggregateNotFoundException` subclass if not found.
 
-Query handlers MUST NOT load domain aggregates. The `Application.Read` project has no reference to repository interfaces, so the compiler enforces this rule. See `docs/conventions/backend/07-query-read-strategy.md` for full details.
+Query handlers MUST NOT load domain aggregates. They MUST NOT inject repository interfaces. See `docs/conventions/backend/07-query-read-strategy.md` for full details.
 
 ---
 
@@ -246,6 +248,7 @@ LiteBus is a modular mediator. Each project references only the package it needs
 | `LiteBus.Queries.Abstractions` | `Application.Read.Contracts`, `Application.Read` | `IQuery`, `IQueryHandler`, `IQueryValidator`, `IQueryMediator` |
 | `LiteBus.Events.Abstractions` | `Application.Reactions` | `IEvent`, `IEventHandler`, `IEventPublisher` |
 | `LiteBus.Extensions.Microsoft.DependencyInjection` | `WebApi` | Full DI registration |
+| `LiteBus.Commands.Abstractions` | `Infrastructure` | `ICommandPreHandler<ICommand>`, `ICommandPostHandler<ICommand>`, `ICommandErrorHandler<ICommand>` for global pipeline behaviors |
 
 Endpoints dispatch via `ICommandMediator` or `IQueryMediator`. These interfaces are the specific entry points for endpoints. WebApi does not reference the handler implementation projects directly in endpoint code; it references only the Contracts projects for the command and query types.
 
@@ -295,23 +298,19 @@ internal interface IPostPublishedNotifier
 internal sealed class NotifySubscribersOnPostPublishedEventHandler : IEventHandler<PostPublished>
 {
     private readonly IPostPublishedNotifier _notifier;
-    private readonly IPostReadStore _postReadStore;
 
     public NotifySubscribersOnPostPublishedEventHandler(
-        IPostPublishedNotifier notifier,
-        IPostReadStore postReadStore)
+        IPostPublishedNotifier notifier)
     {
         _notifier = notifier;
-        _postReadStore = postReadStore;
     }
 
     public async Task HandleAsync(PostPublished @event, CancellationToken cancellationToken)
     {
-        var post = await _postReadStore.GetByIdAsync(@event.PostId, cancellationToken);
-        if (post is not null)
-        {
-            await _notifier.NotifySubscribersAsync(@event.PostId, post.Title, cancellationToken);
-        }
+        await _notifier.NotifySubscribersAsync(
+            @event.PostId,
+            @event.PostTitle,
+            cancellationToken);
     }
 }
 
@@ -320,6 +319,173 @@ internal sealed class NotifySubscribersOnPostPublishedEventHandler : IEventHandl
 {
     private readonly IEmailClient _emailClient; // BAD: external library in Application.Reactions
 }
+```
+
+---
+
+## 8. Transaction Pipeline Behaviors
+
+Transaction management is handled by three global LiteBus pipeline behaviors registered in Infrastructure. Command handlers do not call `SaveChangesAsync`. Repositories do not call `SaveChangesAsync`. The pipeline handles all persistence.
+
+The execution order for every command:
+
+```mermaid
+sequenceDiagram
+    participant Mediator
+    participant Validator as ICommandValidator<T><br/>(priority 0)
+    participant TxPre as TransactionCommandPreHandler<br/>(priority 10)
+    participant Handler as ICommandHandler<T>
+    participant TxPost as SaveChangesCommandPostHandler
+    participant ErrorH as RollbackCommandErrorHandler
+
+    Mediator->>Validator: PreHandleAsync (validate input)
+    alt Validation fails
+        Validator-->>Mediator: throws CommandValidationException
+    end
+    Mediator->>TxPre: PreHandleAsync (begin transaction)
+    Mediator->>Handler: HandleAsync (business logic)
+    alt Handler throws
+        Handler-->>ErrorH: exception
+        ErrorH->>ErrorH: RollbackTransactionAsync
+        ErrorH-->>Mediator: re-throws
+    end
+    Mediator->>TxPost: PostHandleAsync (SaveChanges + Commit)
+```
+
+### Handler Priority Scheme
+
+| Priority | Handler | Scope |
+|:---|:---|:---|
+| 0 (default) | `ICommandValidator<TCommand>` | Specific per command; runs before the transaction opens |
+| 10 | `TransactionCommandPreHandler` | Global for all `ICommand`; opens transaction after validation |
+
+### Implementation
+
+```csharp
+// Infrastructure/Behaviors/TransactionCommandPreHandler.cs
+/// <summary>
+/// Opens a database transaction before every command executes.
+/// Runs at priority 10, after validators (priority 0), so no transaction
+/// is opened for invalid input.
+/// </summary>
+[HandlerPriority(10)]
+internal sealed class TransactionCommandPreHandler
+    : ICommandPreHandler<ICommand>
+{
+    private readonly AppDbContext _dbContext;
+
+    public TransactionCommandPreHandler(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task PreHandleAsync(
+        ICommand command,
+        CancellationToken cancellationToken)
+    {
+        await _dbContext.Database
+            .BeginTransactionAsync(cancellationToken);
+    }
+}
+```
+
+```csharp
+// Infrastructure/Behaviors/SaveChangesCommandPostHandler.cs
+/// <summary>
+/// Saves all pending changes and commits the transaction after every
+/// command handler completes successfully.
+/// </summary>
+internal sealed class SaveChangesCommandPostHandler
+    : ICommandPostHandler<ICommand>
+{
+    private readonly AppDbContext _dbContext;
+
+    public SaveChangesCommandPostHandler(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task PostHandleAsync(
+        ICommand command,
+        object? result,
+        CancellationToken cancellationToken)
+    {
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.Database.CommitTransactionAsync(cancellationToken);
+    }
+}
+```
+
+```csharp
+// Infrastructure/Behaviors/RollbackCommandErrorHandler.cs
+/// <summary>
+/// Rolls back the active transaction if any exception is thrown during
+/// command execution, then re-throws the exception so the
+/// GlobalExceptionHandler maps it to the correct HTTP response.
+/// </summary>
+internal sealed class RollbackCommandErrorHandler
+    : ICommandErrorHandler<ICommand>
+{
+    private readonly AppDbContext _dbContext;
+
+    public RollbackCommandErrorHandler(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task HandleErrorAsync(
+        ICommand command,
+        Exception exception,
+        CancellationToken cancellationToken)
+    {
+        if (_dbContext.Database.CurrentTransaction is not null)
+        {
+            await _dbContext.Database
+                .RollbackTransactionAsync(cancellationToken);
+        }
+
+        throw exception;
+    }
+}
+```
+
+### LiteBus Registration
+
+LiteBus supports incremental module registration. Each assembly registers its own handlers:
+
+```csharp
+// WebApi/Program.cs (LiteBus registration excerpt)
+builder.Services.AddLiteBus(liteBus =>
+{
+    liteBus.AddCommandModule(module =>
+    {
+        // Application.Write assembly — command handlers and validators
+        module.RegisterFromAssembly(
+            typeof(CreatePostCommandHandler).Assembly);
+    });
+
+    liteBus.AddCommandModule(module =>
+    {
+        // Infrastructure assembly — global pipeline behaviors
+        // Explicit registration makes pipeline behaviors visible
+        // to engineers reading Program.cs
+        module.Register(typeof(TransactionCommandPreHandler));
+        module.Register(typeof(SaveChangesCommandPostHandler));
+        module.Register(typeof(RollbackCommandErrorHandler));
+    });
+
+    liteBus.AddQueryModule(module =>
+    {
+        module.RegisterFromAssembly(
+            typeof(GetPostByIdQueryHandler).Assembly);
+    });
+
+    liteBus.AddEventModule(module =>
+    {
+        module.RegisterFromAssembly(
+            typeof(UpdateReadModelOnPostPublishedEventHandler).Assembly);
+    });
+});
 ```
 
 ---

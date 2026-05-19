@@ -42,15 +42,14 @@ One class per file. File name matches the primary type name exactly, including c
 | `Command` | `Application.Write.Contracts` | Input record for a write operation |
 | `CommandResult` | `Application.Write.Contracts` | Output record from a write operation |
 | `CommandHandler` | `Application.Write` | Handler implementation for a command |
-| `CommandValidator` | `Application.Write` | Validator for a command |
+| `CommandValidator` | `Application.Write` | Validator for a command. Throws `CommandValidationException` subclasses. |
 | `Query` | `Application.Read.Contracts` | Input record for a read operation |
 | `Result` | `Application.Read.Contracts` | Full output record returned by a query handler |
 | `Summary` | `Application.Read.Contracts` | Abbreviated projection for list queries |
-| `IReadStore` | `Application.Read.Contracts` | Read-side store interface (not a repository) |
+| `IDatabaseContext` | `Application.Read.Contracts` | Single read-side database context interface. One property per aggregate. |
 | `QueryHandler` | `Application.Read` | Handler implementation for a query |
-| `QueryValidator` | `Application.Read` | Validator for a query |
+| `QueryValidator` | `Application.Read` | Validator for a query. Throws `QueryValidationException` subclasses. |
 | `EventHandler` | `Application.Reactions` | Handler that reacts to a domain event |
-| `ReadStore` | `Infrastructure` | Implementation of an `IXxxReadStore` interface |
 | `Repository` | `Infrastructure` | Implementation of an `IXxxRepository` interface |
 | `Configuration` | `Infrastructure` | EF Core `IEntityTypeConfiguration<T>` class |
 | `Endpoint` | `WebApi` | `IEndpoint` implementation class |
@@ -58,6 +57,17 @@ One class per file. File name matches the primary type name exactly, including c
 | `Response` | `WebApi` | HTTP response body model |
 | `ApiMappings` | `WebApi` | `internal static` class with mapping extension methods |
 | `ServiceRegistration` | `Infrastructure`, `WebApi` | DI extension method class |
+
+---
+
+## Exception Naming Convention
+
+| Exception Category | Naming Pattern | Example |
+|:---|:---|:---|
+| `DomainException` subclass | `{AggregateName}{Reason}Exception` | `PostAlreadyPublishedException` |
+| `AggregateNotFoundException` subclass | `{AggregateName}NotFoundException` | `PostNotFoundException` |
+| `CommandValidationException` subclass | `{FieldOrConcept}RequiredException` or `{FieldOrConcept}{Reason}Exception` | `PostTitleRequiredException`, `PostTitleTooLongException` |
+| `QueryValidationException` subclass | `{FieldOrConcept}RequiredException` | `PostIdRequiredException` |
 
 ---
 

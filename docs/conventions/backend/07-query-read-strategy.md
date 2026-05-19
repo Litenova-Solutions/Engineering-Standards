@@ -1,111 +1,46 @@
 # Query Read Strategy
 
-This document defines the read-side strategy for all query handlers. The read store pattern is the standard. Alternatives are documented in ADR 0007 as rejected options with rationale.
+This document defines the read-side strategy for all query handlers. The `IDatabaseContext` pattern is the standard. The per-aggregate read store pattern was superseded by this approach (see ADR 0015).
 
 ---
 
-## Why IReadStore, Not IReadRepository
+## 1. Why IDatabaseContext
 
-The read-side abstraction is named `IXxxReadStore`, not `IXxxReadRepository`. The distinction is deliberate. A repository in DDD terms loads and persists aggregates. This interface does neither. It returns flat projection records and never constructs an aggregate. Calling it a repository would imply aggregate loading behavior that does not exist here and would invite the pattern this abstraction is specifically designed to prevent. The name "store" reflects that this is a data retrieval mechanism for the read side, not a domain object lifecycle manager.
+The previous read-side convention defined a separate `IXxxReadStore` interface per aggregate. For each aggregate, this produced three files: the interface, the Infrastructure implementation, and the handler. None of those extra files contain business logic. They contain only EF Core projection code wrapped in an interface that exists solely to satisfy a dependency rule. The ceremony grows with every new query without adding any value.
 
----
+The alternative of injecting `AppDbContext` directly into query handlers would violate the dependency rule: `Application.Read` would reference Infrastructure. That is not acceptable.
 
-## 1. Why Read Stores
+`IDatabaseContext` is the middle path. It is a single interface defined in `Application.Read.Contracts/Shared/`. It exposes one `IQueryable<T>` property per aggregate. `AppDbContext` in Infrastructure implements it. Query handlers inject `IDatabaseContext` and write LINQ projections directly, with no per-aggregate indirection. `Application.Read` still does not reference Infrastructure. The dependency boundary is preserved.
 
-Loading a full domain aggregate to answer a read query creates two problems that compound over time.
-
-The first problem is performance. Aggregates accumulate collections, computed properties, and complex state as a system grows. A `Post` aggregate that was small at the start now loads its tags, its history entries, and its state machine. A query that asks "what is the title of this post?" must load 20 related objects to answer it. Read performance becomes coupled to write complexity. The aggregate's repository loading behavior is designed for write operations; it is a poor fit for reads.
-
-The second problem is behavioral contamination. Aggregates enforce invariants and apply domain logic when methods are called. A read operation should not trigger any of that. Loading an aggregate for a read creates an opportunity for a future developer to accidentally call a method on the aggregate they just loaded for reading, triggering state changes that were never intended.
-
-The read store pattern eliminates both problems. A read store is a query interface that returns projected types, not aggregates. Infrastructure implements it using database projections that fetch only the columns needed by the query. Query handlers inject the read store, not the repository.
+`IDatabaseContext` is not called `IReadRepository` or `IReadStore`. It is not a repository. It does not load aggregates. It exposes queryable collections for EF Core projections. The name reflects its role: it is the read-side view of the database context.
 
 ---
 
-## 2. The Read Store Interface
+## 2. The IDatabaseContext Interface
 
-The `IXxxReadStore` interface lives in `Application.Read.Contracts`. This placement is critical: both the query handlers (in `Application.Read`) and the Infrastructure implementation reference `Application.Read.Contracts`, avoiding any circular dependency. Infrastructure references `Application.Read.Contracts` directly to implement the interface; it does not reference `Application.Read`.
+`IDatabaseContext` lives in `Application.Read.Contracts/Shared/IDatabaseContext.cs`. Add one property when a new aggregate needs query handlers.
 
 ```csharp
-// Application.Read.Contracts/Posts/IPostReadStore.cs
-interface IPostReadStore
+// GOOD: query handler injects IDatabaseContext
+internal sealed class GetPostByIdQueryHandler
+    : IQueryHandler<GetPostByIdQuery, PostResult>
 {
-    Task<PostResult?> GetByIdAsync(PostId postId, CancellationToken cancellationToken);
-    Task<IReadOnlyList<PostSummary>> GetAllByAuthorAsync(AuthorId authorId, CancellationToken cancellationToken);
-}
-```
+    private readonly IDatabaseContext _db;
 
----
-
-## 3. The Read Store Implementation
-
-Infrastructure implements `IPostReadStore` using EF Core `Select` projections. The full aggregate is never loaded.
-
-```csharp
-// Infrastructure/Persistence/ReadStores/PostReadStore.cs
-internal sealed class PostReadStore : IPostReadStore
-{
-    private readonly AppDbContext _dbContext;
-
-    public PostReadStore(AppDbContext dbContext)
+    public GetPostByIdQueryHandler(IDatabaseContext db)
     {
-        _dbContext = dbContext;
+        _db = db;
     }
 
-    public async Task<PostResult?> GetByIdAsync(PostId postId, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Posts
-            .Where(p => p.Id == postId)
-            .Select(p => new PostResult
-            {
-                Id = p.Id,
-                Title = p.Title.Value,
-                Content = p.Content.Value,
-                AuthorName = p.Author.DisplayName,
-                PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
-            })
-            .FirstOrDefaultAsync(cancellationToken);
-    }
-
-    public async Task<IReadOnlyList<PostSummary>> GetAllByAuthorAsync(
-        AuthorId authorId,
+    public async Task<PostResult> HandleAsync(
+        GetPostByIdQuery query,
         CancellationToken cancellationToken)
     {
-        return await _dbContext.Posts
-            .Where(p => p.AuthorId == authorId)
-            .Select(p => new PostSummary
-            {
-                Id = p.Id,
-                Title = p.Title.Value,
-                PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
-            })
-            .ToListAsync(cancellationToken);
-    }
-}
-```
-
-`AsNoTracking()` is not needed. When EF Core evaluates a `Select` projection, the result type is not an entity and is never tracked. Adding `AsNoTracking()` is redundant.
-
----
-
-## 4. The Query Handler
-
-The query handler in `Application.Read` injects `IPostReadStore` and throws a `PostNotFoundException` subclass if the result is null.
-
-```csharp
-// Application.Read/Posts/GetById/GetPostByIdQueryHandler.cs
-internal sealed class GetPostByIdQueryHandler : IQueryHandler<GetPostByIdQuery, PostResult>
-{
-    private readonly IPostReadStore _postReadStore;
-
-    public GetPostByIdQueryHandler(IPostReadStore postReadStore)
-    {
-        _postReadStore = postReadStore;
-    }
-
-    public async Task<PostResult> HandleAsync(GetPostByIdQuery query, CancellationToken cancellationToken)
-    {
-        var result = await _postReadStore.GetByIdAsync(query.PostId, cancellationToken);
+        // Write projections directly
+        var result = await _db.Posts
+            .Where(p => p.Id == query.PostId)
+            .Select(p => new PostResult { Id = p.Id, Title = p.Title.Value })
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (result is null)
         {
@@ -115,32 +50,116 @@ internal sealed class GetPostByIdQueryHandler : IQueryHandler<GetPostByIdQuery, 
         return result;
     }
 }
+
+// BAD: query handler injects IPostRepository
+internal sealed class GetPostByIdQueryHandler
+    : IQueryHandler<GetPostByIdQuery, PostResult>
+{
+    private readonly IPostRepository _postRepository; // BAD: repository in query handler
+}
+
+// BAD: query handler injects AppDbContext directly
+internal sealed class GetPostByIdQueryHandler
+    : IQueryHandler<GetPostByIdQuery, PostResult>
+{
+    private readonly AppDbContext _dbContext; // BAD: references Infrastructure project
+}
 ```
 
 ---
 
-## 5. Multi-Aggregate Projections
+## 3. Writing Projections
 
-Read stores can join across multiple aggregate tables in a single EF Core query. This is a natural EF Core projection and does not require any changes to the handler.
+### Simple Single-Aggregate Projection
 
 ```csharp
-public async Task<IReadOnlyList<PostWithAuthorSummary>> GetPublishedWithAuthorAsync(
+public async Task<PostResult> HandleAsync(
+    GetPostByIdQuery query,
     CancellationToken cancellationToken)
 {
-    return await _dbContext.Posts
+    var result = await _db.Posts
+        .Where(p => p.Id == query.PostId)
+        .Select(p => new PostResult
+        {
+            Id = p.Id,
+            Title = p.Title.Value,
+            Content = p.Content.Value,
+            AuthorName = p.Author.DisplayName,
+            PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
+        })
+        .FirstOrDefaultAsync(cancellationToken);
+
+    if (result is null)
+    {
+        throw new PostNotFoundException(query.PostId);
+    }
+
+    return result;
+}
+```
+
+### Paginated Projection
+
+```csharp
+public async Task<PagedResult<PostSummary>> HandleAsync(
+    GetAllPostsQuery query,
+    CancellationToken cancellationToken)
+{
+    var pageSize = Math.Min(
+        query.Pagination.PageSize,
+        PaginationParameters.MaxPageSize);
+
+    var baseQuery = _db.Posts
+        .Where(p => p.State is PublishedPostState);
+
+    var totalCount = query.Pagination.SkipTotalCount
+        ? 0
+        : await baseQuery.CountAsync(cancellationToken);
+
+    var items = await baseQuery
+        .OrderByDescending(p => ((PublishedPostState)p.State).PublishedAt)
+        .Skip((query.Pagination.PageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .Select(p => new PostSummary
+        {
+            Id = p.Id,
+            Title = p.Title.Value,
+            PublishedAt = ((PublishedPostState)p.State).PublishedAt
+        })
+        .ToListAsync(cancellationToken);
+
+    return new PagedResult<PostSummary>
+    {
+        Items = items,
+        TotalCount = totalCount,
+        PageNumber = query.Pagination.PageNumber,
+        PageSize = pageSize
+    };
+}
+```
+
+### Multi-Aggregate Projection
+
+`IDatabaseContext` exposes multiple aggregates. A single LINQ projection can join across them without multiple round trips:
+
+```csharp
+public async Task<PostWithAuthorResult> HandleAsync(
+    GetPostWithAuthorQuery query,
+    CancellationToken cancellationToken)
+{
+    return await _db.Posts
         .Where(p => p.State is PublishedPostState)
-        .Join(
-            _dbContext.Authors,
-            p => p.AuthorId,
-            a => a.Id,
-            (p, a) => new PostWithAuthorSummary
-            {
-                PostId = p.Id,
-                PostTitle = p.Title.Value,
-                AuthorId = a.Id,
-                AuthorName = a.DisplayName,
-                PublishedAt = ((PublishedPostState)p.State).PublishedAt
-            })
+        .Select(p => new PostWithAuthorResult
+        {
+            PostId = p.Id,
+            PostTitle = p.Title.Value,
+            // EF Core resolves this as a JOIN, no separate Author query
+            AuthorName = _db.Authors
+                .Where(a => a.Id == p.AuthorId)
+                .Select(a => a.DisplayName)
+                .FirstOrDefault() ?? string.Empty,
+            PublishedAt = ((PublishedPostState)p.State).PublishedAt
+        })
         .OrderByDescending(r => r.PublishedAt)
         .ToListAsync(cancellationToken);
 }
@@ -148,11 +167,97 @@ public async Task<IReadOnlyList<PostWithAuthorSummary>> GetPublishedWithAuthorAs
 
 ---
 
-## 6. Escalation Path
+## 4. Null Handling
 
-When EF Core `Select` is insufficient (complex reporting queries, window functions, cross-schema joins), use Dapper raw SQL in a new implementation of the same `IReadStore` interface. The handler does not change. Only the Infrastructure implementation changes. This preserves the query handler's testability and the interface contract while allowing the flexibility of raw SQL where needed.
+Query handlers MUST throw `AggregateNotFoundException` subclasses when a resource is not found. MUST NOT return null to the caller.
+
+```csharp
+// GOOD: throw when not found
+var result = await _db.Posts
+    .Where(p => p.Id == query.PostId)
+    .Select(p => new PostResult { ... })
+    .FirstOrDefaultAsync(cancellationToken);
+
+if (result is null)
+{
+    throw new PostNotFoundException(query.PostId);
+}
+
+return result;
+
+// BAD: returning null
+var result = await _db.Posts
+    .Where(p => p.Id == query.PostId)
+    .Select(p => new PostResult { ... })
+    .FirstOrDefaultAsync(cancellationToken);
+
+return result; // BAD: caller must null-check; GlobalExceptionHandler cannot map null to 404
+```
 
 ---
 
-The read store inventory for a specific project lives in the project repository. Copy `docs/templates/read-store-inventory.md` from the standards repository into `docs/domain/read-store-inventory.md` in the project repository and fill it in.
+## 5. AsNoTracking Note
+
+`AsNoTracking()` is not needed when using `Select` projections. EF Core does not track projected types because the result type is not a registered entity. Adding `AsNoTracking()` is redundant and adds noise.
+
+```csharp
+// GOOD: no AsNoTracking() needed
+var result = await _db.Posts
+    .Where(p => p.Id == query.PostId)
+    .Select(p => new PostResult { Id = p.Id, Title = p.Title.Value })
+    .FirstOrDefaultAsync(cancellationToken);
+
+// BAD: redundant AsNoTracking() on a Select projection
+var result = await _db.Posts
+    .AsNoTracking() // BAD: redundant; EF Core does not track projected types
+    .Where(p => p.Id == query.PostId)
+    .Select(p => new PostResult { Id = p.Id, Title = p.Title.Value })
+    .FirstOrDefaultAsync(cancellationToken);
+```
+
+---
+
+## 6. IStreamQuery for Internal Processing
+
+LiteBus supports `IStreamQuery<T>` and `IStreamQueryHandler<T>` for streaming scenarios. This is appropriate for background processing and data export where the consumer processes items incrementally. It is NOT appropriate for HTTP endpoints because the HTTP client buffers the entire response before processing it, eliminating the streaming benefit.
+
+```csharp
+// For background processing and data export only
+public sealed record ExportAllPostsQuery : IStreamQuery<PostExportRow>;
+
+internal sealed class ExportAllPostsQueryHandler
+    : IStreamQueryHandler<ExportAllPostsQuery, PostExportRow>
+{
+    private readonly IDatabaseContext _db;
+
+    public ExportAllPostsQueryHandler(IDatabaseContext db)
+    {
+        _db = db;
+    }
+
+    public async IAsyncEnumerable<PostExportRow> HandleAsync(
+        ExportAllPostsQuery query,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await foreach (var post in _db.Posts
+            .Select(p => new PostExportRow
+            {
+                Id = p.Id,
+                Title = p.Title.Value
+            })
+            .AsAsyncEnumerable()
+            .WithCancellation(cancellationToken))
+        {
+            yield return post;
+        }
+    }
+}
+```
+
+HTTP list endpoints use `PagedResult<T>` with `PaginationParameters`. See ADR 0017 for the full pagination rationale.
+
+---
+
+The read query inventory for a specific project lives in the project repository. Copy `docs/templates/read-store-inventory.md` into `docs/domain/read-store-inventory.md` and fill it in.
+
 

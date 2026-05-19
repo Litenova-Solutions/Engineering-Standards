@@ -15,6 +15,10 @@ The Infrastructure layer adapts external systems (databases, file storage, email
 ```
 src/{ProjectName}.Infrastructure/
 ├── GlobalUsings.cs
+├── Behaviors/
+│   ├── TransactionCommandPreHandler.cs
+│   ├── SaveChangesCommandPostHandler.cs
+│   └── RollbackCommandErrorHandler.cs
 ├── Persistence/
 │   ├── {ProjectName}DbContext.cs
 │   ├── Configurations/
@@ -23,9 +27,6 @@ src/{ProjectName}.Infrastructure/
 │   ├── Repositories/
 │   │   ├── PostRepository.cs
 │   │   └── OrderRepository.cs
-│   ├── ReadStores/
-│   │   ├── PostReadStore.cs
-│   │   └── OrderReadStore.cs
 │   └── Migrations/
 │       └── (EF Core generated files - never edit manually)
 ├── ExternalServices/
@@ -213,67 +214,152 @@ internal sealed class PostRepository : IPostRepository
 
     public async Task AddAsync(Post post, CancellationToken cancellationToken)
     {
+        // Stage the insert. The pipeline post-handler calls SaveChangesAsync.
         await _dbContext.Posts.AddAsync(post, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateAsync(Post post, CancellationToken cancellationToken)
+    public Task UpdateAsync(Post post, CancellationToken cancellationToken)
     {
+        // EF Core change tracking detects the modification automatically.
+        // No SaveChangesAsync call needed here.
         _dbContext.Posts.Update(post);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;
     }
+}
+```
+
+// BAD: repository calls SaveChangesAsync directly
+```csharp
+public async Task AddAsync(Post post, CancellationToken cancellationToken)
+{
+    await _dbContext.Posts.AddAsync(post, cancellationToken);
+    await _dbContext.SaveChangesAsync(cancellationToken);
+    // BAD: this commits before the pipeline post-handler runs,
+    // breaking the transaction boundary
 }
 ```
 
 ---
 
-## Read Store Implementation Pattern
+## `IDatabaseContext` Implementation
 
-Read store implementations resolve the `IXxxReadStore` interface from `Application.Read.Contracts`. They use EF Core `Select` projections and never load the full aggregate.
+`AppDbContext` implements `IDatabaseContext` from `Application.Read.Contracts`. This is the only change required to `AppDbContext` to support the read-side query pattern. Add one `IQueryable<T>` property per aggregate.
 
 ```csharp
-internal sealed class PostReadStore : IPostReadStore
+// Infrastructure/Persistence/AppDbContext.cs
+internal sealed class AppDbContext : DbContext, IDatabaseContext
 {
-    private readonly AppDbContext _dbContext;
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options) { }
 
-    public PostReadStore(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    // DbSet properties satisfy both EF Core tracking and IDatabaseContext
+    public DbSet<Post> Posts => Set<Post>();
+    public DbSet<Author> Authors => Set<Author>();
+    public DbSet<Order> Orders => Set<Order>();
 
-    public async Task<PostResult?> GetByIdAsync(PostId postId, CancellationToken cancellationToken)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        return await _dbContext.Posts
-            .Where(p => p.Id == postId)
-            .Select(p => new PostResult
-            {
-                Id = p.Id,
-                Title = p.Title.Value,
-                Content = p.Content.Value,
-                AuthorName = p.Author.DisplayName,
-                PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
-            })
-            .FirstOrDefaultAsync(cancellationToken);
-    }
-
-    public async Task<IReadOnlyList<PostSummary>> GetAllByAuthorAsync(
-        AuthorId authorId,
-        CancellationToken cancellationToken)
-    {
-        return await _dbContext.Posts
-            .Where(p => p.AuthorId == authorId)
-            .Select(p => new PostSummary
-            {
-                Id = p.Id,
-                Title = p.Title.Value,
-                PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
-            })
-            .ToListAsync(cancellationToken);
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(AppDbContext).Assembly);
     }
 }
 ```
 
-`AsNoTracking()` is not needed here. When EF Core evaluates a `Select` projection, the result type is not an entity. EF Core does not track projected types. Adding `AsNoTracking()` is redundant.
+When a new aggregate is added to the domain, add its `DbSet<T>` property here and add the corresponding `IQueryable<T>` property to `IDatabaseContext` in `Application.Read.Contracts`.
+
+---
+
+## Transaction Pipeline Behaviors
+
+Transaction management is handled by three global LiteBus pipeline behaviors. Command handlers do not call `SaveChangesAsync`. Repositories do not call `SaveChangesAsync`.
+
+```csharp
+// Infrastructure/Behaviors/TransactionCommandPreHandler.cs
+/// <summary>
+/// Opens a database transaction before every command executes.
+/// Runs at priority 10, after validators (priority 0), so no transaction
+/// is opened for invalid input.
+/// </summary>
+[HandlerPriority(10)]
+internal sealed class TransactionCommandPreHandler
+    : ICommandPreHandler<ICommand>
+{
+    private readonly AppDbContext _dbContext;
+
+    public TransactionCommandPreHandler(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task PreHandleAsync(
+        ICommand command,
+        CancellationToken cancellationToken)
+    {
+        await _dbContext.Database
+            .BeginTransactionAsync(cancellationToken);
+    }
+}
+```
+
+```csharp
+// Infrastructure/Behaviors/SaveChangesCommandPostHandler.cs
+/// <summary>
+/// Saves all pending changes and commits the transaction after every
+/// command handler completes successfully.
+/// </summary>
+internal sealed class SaveChangesCommandPostHandler
+    : ICommandPostHandler<ICommand>
+{
+    private readonly AppDbContext _dbContext;
+
+    public SaveChangesCommandPostHandler(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task PostHandleAsync(
+        ICommand command,
+        object? result,
+        CancellationToken cancellationToken)
+    {
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.Database.CommitTransactionAsync(cancellationToken);
+    }
+}
+```
+
+```csharp
+// Infrastructure/Behaviors/RollbackCommandErrorHandler.cs
+/// <summary>
+/// Rolls back the active transaction if any exception is thrown during
+/// command execution, then re-throws the exception so the
+/// GlobalExceptionHandler maps it to the correct HTTP response.
+/// </summary>
+internal sealed class RollbackCommandErrorHandler
+    : ICommandErrorHandler<ICommand>
+{
+    private readonly AppDbContext _dbContext;
+
+    public RollbackCommandErrorHandler(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task HandleErrorAsync(
+        ICommand command,
+        Exception exception,
+        CancellationToken cancellationToken)
+    {
+        if (_dbContext.Database.CurrentTransaction is not null)
+        {
+            await _dbContext.Database
+                .RollbackTransactionAsync(cancellationToken);
+        }
+
+        throw exception;
+    }
+}
+```
 
 ---
 
@@ -294,12 +380,10 @@ internal interface IPostPublishedNotifier
 internal sealed class PostPublishedNotifier : IPostPublishedNotifier
 {
     private readonly IEmailClient _emailClient;
-    private readonly IPostReadStore _postReadStore;
 
-    public PostPublishedNotifier(IEmailClient emailClient, IPostReadStore postReadStore)
+    public PostPublishedNotifier(IEmailClient emailClient)
     {
         _emailClient = emailClient;
-        _postReadStore = postReadStore;
     }
 
     public async Task NotifySubscribersAsync(
@@ -308,11 +392,7 @@ internal sealed class PostPublishedNotifier : IPostPublishedNotifier
         CancellationToken cancellationToken)
     {
         // Implementation using real email client
-        var subscribers = await _postReadStore.GetSubscriberEmailsAsync(postId, cancellationToken);
-        foreach (var email in subscribers)
-        {
-            await _emailClient.SendAsync(email, $"New post: {postTitle}", cancellationToken);
-        }
+        await _emailClient.SendAsync($"New post: {postTitle}", cancellationToken);
     }
 }
 ```
@@ -333,13 +413,13 @@ internal static class InfrastructureServiceRegistration
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Database")));
 
+        // IDatabaseContext is satisfied by AppDbContext via DI
+        services.AddScoped<IDatabaseContext>(
+            sp => sp.GetRequiredService<AppDbContext>());
+
         // Repositories (write side)
         services.AddScoped<IPostRepository, PostRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
-
-        // Read stores (read side)
-        services.AddScoped<IPostReadStore, PostReadStore>();
-        services.AddScoped<IOrderReadStore, OrderReadStore>();
 
         // Reactions infrastructure implementations
         services.AddScoped<IPostPublishedNotifier, PostPublishedNotifier>();
@@ -349,10 +429,45 @@ internal static class InfrastructureServiceRegistration
 }
 ```
 
-In `Program.cs`:
+In `Program.cs`, call `AddInfrastructure` and register LiteBus with incremental module registration:
 
 ```csharp
+// WebApi/Program.cs (LiteBus registration excerpt)
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddLiteBus(liteBus =>
+{
+    // Application.Write assembly -- command handlers and validators
+    liteBus.AddCommandModule(module =>
+    {
+        module.RegisterFromAssembly(
+            typeof(CreatePostCommandHandler).Assembly);
+    });
+
+    // Infrastructure assembly -- global pipeline behaviors
+    // Explicit registration makes pipeline behaviors visible
+    // to engineers reading Program.cs
+    liteBus.AddCommandModule(module =>
+    {
+        module.Register(typeof(TransactionCommandPreHandler));
+        module.Register(typeof(SaveChangesCommandPostHandler));
+        module.Register(typeof(RollbackCommandErrorHandler));
+    });
+
+    // Application.Read assembly -- query handlers and validators
+    liteBus.AddQueryModule(module =>
+    {
+        module.RegisterFromAssembly(
+            typeof(GetPostByIdQueryHandler).Assembly);
+    });
+
+    // Application.Reactions assembly -- event handlers
+    liteBus.AddEventModule(module =>
+    {
+        module.RegisterFromAssembly(
+            typeof(UpdateReadModelOnPostPublishedEventHandler).Assembly);
+    });
+});
 ```
 
 ---
@@ -377,4 +492,4 @@ Never edit a migration file after it has been applied to any environment. If a m
 
 ---
 
-Project-specific infrastructure configuration (connection string keys, external service URLs, secrets management approach) is documented in the project repository in `docs/domain/` or in an ADR.
+Project-specific infrastructure configuration is documented in the project repository.

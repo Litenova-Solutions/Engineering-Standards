@@ -1,10 +1,12 @@
 # 0007. Read Store Pattern for Queries
 
-**Status:** Accepted
+**Status:** Superseded by [ADR 0015](0015-idatabasecontext-over-per-aggregate-read-stores.md)
 
 **Date:** 2025-01-01
 
 ## Context
+
+This ADR documents the original per-aggregate read store pattern (`IXxxReadStore`). That pattern was superseded in favor of the `IDatabaseContext` approach documented in ADR 0015. The original pattern is preserved here for historical reference.
 
 Query handlers need to retrieve data for display. There are several ways to implement this:
 

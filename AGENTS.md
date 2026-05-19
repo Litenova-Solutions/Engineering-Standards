@@ -36,7 +36,7 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 |:---|:---|
 | `Application.Write.Contracts` | Command records, command result records, write-side contract interfaces. No handlers, no validators. |
 | `Application.Write` | Command handler and validator implementations. References `Application.Write.Contracts` and `Domain`. |
-| `Application.Read.Contracts` | Query records, query result records, read store interfaces (`IXxxReadStore`). No handlers, no validators. |
+| `Application.Read.Contracts` | Query records, query result records, `IDatabaseContext` interface, `PagedResult<T>`, `PaginationParameters`. No handlers, no validators. |
 | `Application.Read` | Query handler and validator implementations. References `Application.Read.Contracts` and `Domain`. |
 | `Application.Reactions` | Event handler implementations. Defines narrow interfaces for external side effects. No direct external library dependencies. |
 
@@ -47,10 +47,10 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 | `Domain` | Aggregates, value objects, domain events, domain exceptions, repository interfaces, strongly-typed IDs. |
 | `Application.Write.Contracts` | Commands, command results, write-side interfaces. The public contract of the write path. |
 | `Application.Write` | Command handlers and validators. The private implementation of the write path. |
-| `Application.Read.Contracts` | Queries, query results, `IXxxReadStore` interfaces. The public contract of the read path. |
+| `Application.Read.Contracts` | Queries, query results, `IDatabaseContext` interface, `PagedResult<T>`. The public contract of the read path. |
 | `Application.Read` | Query handlers and validators. The private implementation of the read path. |
 | `Application.Reactions` | Event handlers and narrow side-effect interfaces. Reacts to domain events. |
-| `Infrastructure` | EF Core, repository implementations, read store implementations, external service clients. |
+| `Infrastructure` | EF Core, repository implementations, `AppDbContext` implements `IDatabaseContext`, transaction pipeline behaviors, external service clients. |
 | `WebApi` | `IEndpoint` implementations, request/response models, API mappings. References Contracts projects only. |
 | `apps/web/` | Next.js 16 frontend application. Endpoints, components, server actions, feature folders. |
 
@@ -58,8 +58,12 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 
 - MUST read the layer convention file before editing any file in that layer.
 - MUST use `IEndpoint` for all HTTP endpoints. Never use MVC controllers or `ControllerBase`.
-- MUST use `IReadStore` interfaces in query handlers. Never load a full aggregate for a read operation.
+- MUST inject `IDatabaseContext` in query handlers. Never inject `IXxxRepository` or `AppDbContext` directly in query handlers.
 - MUST throw the correct exception subclass per `docs/conventions/backend/06-exception-hierarchy.md`.
+- MUST throw `CommandValidationException` subclasses from command validators. Never throw `ArgumentException` or use `Guard.Against` in validators.
+- MUST throw `QueryValidationException` subclasses from query validators. Never throw `ArgumentException` or use `Guard.Against` in validators.
+- MUST NOT call `SaveChangesAsync` in command handlers or repository methods. The `SaveChangesCommandPostHandler` pipeline behavior handles all persistence.
+- MUST NOT add per-aggregate read store interfaces (`IXxxReadStore`). Use `IDatabaseContext` with LINQ projections.
 - MUST NOT use `InvalidOperationException`, `ArgumentException`, or `ArgumentNullException` in domain or application code.
 - MUST NOT add a NuGet package without a corresponding ADR.
 - MUST run `dotnet build` and `dotnet test` before marking any task complete.
@@ -82,16 +86,18 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 
 - Injecting `ICommandMediator` into an Application.Read handler or `IQueryMediator` into an Application.Write handler. Only inject the mediator interface corresponding to the layer's responsibility.
 - Using `IMessageMediator` or `IMessageBus` instead of the specific `ICommandMediator` or `IQueryMediator`.
-- Injecting `IXxxRepository` into a query handler instead of `IXxxReadStore`.
+- Injecting `IXxxRepository` or `AppDbContext` directly into a query handler instead of `IDatabaseContext`.
 - Putting handlers or validators in the Contracts projects instead of the implementation projects.
 - Putting mapping logic inside the endpoint handler method instead of the `ApiMappings` class.
 - Creating a controller class instead of an `IEndpoint` implementation.
 - Placing a type in `Shared/` before the Strike 2 promotion rule is triggered.
-- Throwing `ArgumentException` from a validator instead of an `ApplicationValidationException` subclass.
+- Calling `SaveChangesAsync` inside a command handler or repository method. The pipeline handles this.
+- Creating a per-aggregate `IXxxReadStore` interface. The correct pattern is `IDatabaseContext` with LINQ projections.
+- Throwing `ApplicationValidationException` -- this type no longer exists. Use `CommandValidationException` or `QueryValidationException`.
+- Using `Guard.Against` in validators. It throws `ArgumentException` which maps to HTTP 500. Throw `CommandValidationException` or `QueryValidationException` subclasses directly.
 - Forgetting `CancellationToken` propagation in async methods.
 - Referencing `Application.Write` or `Application.Read` from `WebApi` instead of only the Contracts projects.
 - Adding a direct dependency on an external library in `Application.Reactions` instead of defining a narrow interface.
-- Using `Guard.Against` in a validator and not realizing it throws `ArgumentException` by default, which maps to HTTP 500 instead of HTTP 400. Validators MUST throw `ApplicationValidationException` subclasses. Use direct `if` + `throw` for custom exceptions, or verify which `Guard.Against` overloads throw which types.
 - Naming the `CancellationToken` parameter `ct` instead of `cancellationToken`.
 - Placing project-specific content (ubiquitous language glossary, feature inventory, exception list) inside convention files. That content belongs in the project repository using the templates in `docs/templates/`.
 - Forgetting to `await` `params` or `searchParams` in page components. These are Promises in Next.js 15+/16.
@@ -116,7 +122,7 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 | Infrastructure | `docs/conventions/backend/04-infrastructure-layer.md` |
 | WebApi | `docs/conventions/backend/05-api-layer.md` |
 | Exceptions | `docs/conventions/backend/06-exception-hierarchy.md` |
-| Query/Read Strategy | `docs/conventions/backend/07-query-read-strategy.md` |
+| Query/Read Strategy | `docs/conventions/backend/07-query-read-strategy.md` | IDatabaseContext pattern, LINQ projections, pagination, IStreamQuery for export. |
 | Testing | `docs/conventions/backend/08-testing.md` |
 | Naming | `docs/conventions/shared/naming.md` |
 | Git Workflow | `docs/conventions/shared/git-workflow.md` |
