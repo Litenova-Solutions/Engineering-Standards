@@ -1,6 +1,6 @@
 # Exception Hierarchy
 
-This document defines the exception hierarchy used across all projects following these standards. It is a critical contract document. Deviating from it produces incorrect HTTP responses and breaks the agreement between the API layer and its clients.
+This document defines the exception hierarchy. It is a critical contract. Deviating from it produces incorrect HTTP responses and breaks the agreement between the API layer and its clients.
 
 ---
 
@@ -8,79 +8,135 @@ This document defines the exception hierarchy used across all projects following
 
 When a server returns a 500 response to a client, the client has no idea whether the operation failed because the input was invalid, the resource was not found, or an unexpected error occurred. Each situation requires a different client action: show a validation message, navigate to a not-found page, or show a generic error and retry.
 
-Without a defined hierarchy, teams drift into patterns like throwing `InvalidOperationException` from domain logic and `ArgumentException` from validators. Both produce 500 responses in a default ASP.NET Core setup. The hierarchy defines exactly three failure categories for expected failures. Every exception class in this codebase maps to exactly one category. The `GlobalExceptionHandler` maps categories to HTTP status codes automatically. This is the contract.
+Without a defined hierarchy, teams drift into patterns like throwing `InvalidOperationException` from domain logic and `ArgumentException` from validators. Both produce 500 responses in a default ASP.NET Core setup. The hierarchy defines exactly four failure categories for expected failures. Every exception class maps to exactly one category. The `GlobalExceptionHandler` maps categories to HTTP status codes automatically. This is the contract.
 
 ---
 
-## The Three Categories
+## The Exception Hierarchy
+
+```mermaid
+classDiagram
+    class Exception
+    class DomainException {
+        <<abstract>>
+        +DomainException(string message)
+    }
+    class AggregateNotFoundException {
+        <<abstract>>
+        +AggregateNotFoundException(string message)
+    }
+    class CommandValidationException {
+        <<abstract>>
+        +CommandValidationException(string message)
+    }
+    class QueryValidationException {
+        <<abstract>>
+        +QueryValidationException(string message)
+    }
+
+    Exception <|-- DomainException
+    Exception <|-- CommandValidationException
+    Exception <|-- QueryValidationException
+    DomainException <|-- AggregateNotFoundException
+```
+
+---
+
+## The Four Categories
 
 | Category | Base Class | Location | HTTP Status | When to Throw |
 |:---|:---|:---|:---|:---|
-| Input Validation Failure | `ApplicationValidationException` | `Application.Write.Contracts/Shared/` or `Application.Read.Contracts/Shared/` | 400 | Thrown by `ICommandValidator` and `IQueryValidator` implementations when input is structurally invalid. |
-| Resource Not Found | `AggregateNotFoundException` | `Domain/Shared/Exceptions/` | 404 | Thrown by repository implementations when an aggregate cannot be located by its ID. |
-| Domain Invariant Violation | `DomainException` | `Domain/Shared/Exceptions/` | 409 | Thrown by aggregate methods when the requested operation is not permitted in the current state. |
-| Unhandled | _(any `Exception`)_ | Anywhere | 500 | Any exception that does not match the above. These indicate a bug or unexpected external failure. |
+| Command Validation Failure | `CommandValidationException` | `Application.Write.Contracts/Shared/Exceptions/` | 400 | Thrown by `ICommandValidator<TCommand>` when command input is structurally invalid |
+| Query Validation Failure | `QueryValidationException` | `Application.Read.Contracts/Shared/Exceptions/` | 400 | Thrown by `IQueryValidator<TQuery>` when query input is structurally invalid |
+| Resource Not Found | `AggregateNotFoundException` | `Domain/Shared/Exceptions/` | 404 | Thrown by repository implementations when an aggregate cannot be found by ID |
+| Domain Invariant Violation | `DomainException` | `Domain/Shared/Exceptions/` | 409 | Thrown by aggregate methods when the requested operation is not permitted in the current state |
+| Unhandled | (any `Exception`) | Anywhere | 500 | Any exception not matching the above. Indicates a bug or unexpected external failure |
 
 ---
 
 ## Base Class Definitions
 
-```csharp
-// Domain/Shared/Exceptions/AggregateNotFoundException.cs
-abstract class AggregateNotFoundException : Exception
-{
-    protected AggregateNotFoundException(string message)
-        : base(message) { }
-}
+All base classes are `abstract`. Never throw a base class directly. Always throw a concrete subclass that names the specific failure.
 
+Note that `CommandValidationException` and `QueryValidationException` have no shared base class beyond `Exception`. They are independent.
+
+```csharp
 // Domain/Shared/Exceptions/DomainException.cs
-abstract class DomainException : Exception
+/// <summary>
+/// The base class for all domain invariant violations.
+/// Maps to HTTP 409 Conflict.
+/// </summary>
+public abstract class DomainException : Exception
 {
     protected DomainException(string message)
         : base(message) { }
 }
 
-// Application.Write.Contracts/Shared/Exceptions/ApplicationValidationException.cs
-abstract class ApplicationValidationException : Exception
+// Domain/Shared/Exceptions/AggregateNotFoundException.cs
+/// <summary>
+/// The base class for exceptions thrown when an aggregate cannot be
+/// found by its ID. Maps to HTTP 404 Not Found.
+/// </summary>
+public abstract class AggregateNotFoundException : DomainException
 {
-    protected ApplicationValidationException(string message)
+    protected AggregateNotFoundException(string message)
+        : base(message) { }
+}
+
+// Application.Write.Contracts/Shared/Exceptions/CommandValidationException.cs
+/// <summary>
+/// The base class for exceptions thrown by command validators when
+/// command input is structurally invalid. Maps to HTTP 400 Bad Request.
+/// </summary>
+public abstract class CommandValidationException : Exception
+{
+    protected CommandValidationException(string message)
+        : base(message) { }
+}
+
+// Application.Read.Contracts/Shared/Exceptions/QueryValidationException.cs
+/// <summary>
+/// The base class for exceptions thrown by query validators when
+/// query input is structurally invalid. Maps to HTTP 400 Bad Request.
+/// </summary>
+public abstract class QueryValidationException : Exception
+{
+    protected QueryValidationException(string message)
         : base(message) { }
 }
 ```
-
-All three base classes are `abstract`. You never throw a base class directly. Always throw a concrete subclass that names the specific failure.
 
 ---
 
 ## Concrete Exception Examples
 
-### Resource Not Found
-
 ```csharp
-sealed class PostNotFoundException : AggregateNotFoundException
+// AggregateNotFoundException subclass (in Domain/Posts/Exceptions/)
+public sealed class PostNotFoundException : AggregateNotFoundException
 {
     public PostNotFoundException(PostId id)
         : base($"Post '{id.Value}' was not found.") { }
 }
-```
 
-### Domain Invariant Violation
-
-```csharp
-sealed class PostAlreadyPublishedException : DomainException
+// DomainException subclass (in Domain/Posts/Exceptions/)
+public sealed class PostAlreadyPublishedException : DomainException
 {
     public PostAlreadyPublishedException(PostId id)
-        : base($"Post '{id.Value}' is already published and cannot be published again.") { }
+        : base($"Post '{id.Value}' is already published.") { }
 }
-```
 
-### Input Validation Failure
-
-```csharp
-sealed class PostTitleRequiredException : ApplicationValidationException
+// CommandValidationException subclass (in Application.Write.Contracts/Posts/Exceptions/)
+public sealed class PostTitleRequiredException : CommandValidationException
 {
     public PostTitleRequiredException()
         : base("A post title is required and cannot be empty.") { }
+}
+
+// QueryValidationException subclass (in Application.Read.Contracts/Posts/Exceptions/)
+public sealed class PostIdRequiredException : QueryValidationException
+{
+    public PostIdRequiredException()
+        : base("A post ID is required and cannot be the default value.") { }
 }
 ```
 
@@ -107,19 +163,33 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
     {
         var (statusCode, title) = exception switch
         {
-            ApplicationValidationException => (StatusCodes.Status400BadRequest, "Validation failure"),
-            AggregateNotFoundException => (StatusCodes.Status404NotFound, "Resource not found"),
-            DomainException => (StatusCodes.Status409Conflict, "Domain rule violated"),
-            _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
+            CommandValidationException =>
+                (StatusCodes.Status400BadRequest, "Command validation failure"),
+            QueryValidationException =>
+                (StatusCodes.Status400BadRequest, "Query validation failure"),
+            AggregateNotFoundException =>
+                (StatusCodes.Status404NotFound, "Resource not found"),
+            DomainException =>
+                (StatusCodes.Status409Conflict, "Domain rule violated"),
+            _ =>
+                (StatusCodes.Status500InternalServerError,
+                 "An unexpected error occurred")
         };
 
         if (statusCode == StatusCodes.Status500InternalServerError)
         {
-            _logger.LogError(exception, "Unhandled exception: {Message}", exception.Message);
+            _logger.LogError(
+                exception,
+                "Unhandled exception: {Message}",
+                exception.Message);
         }
         else
         {
-            _logger.LogWarning(exception, "Handled exception ({StatusCode}): {Message}", statusCode, exception.Message);
+            _logger.LogWarning(
+                exception,
+                "Handled exception ({StatusCode}): {Message}",
+                statusCode,
+                exception.Message);
         }
 
         httpContext.Response.StatusCode = statusCode;
@@ -132,7 +202,6 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
         };
 
         await httpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
-
         return true;
     }
 }
@@ -155,20 +224,21 @@ app.UseExceptionHandler();
 
 | Exception Category | Thrown By | Never Thrown By |
 |:---|:---|:---|
-| `ApplicationValidationException` | `ICommandValidator`, `IQueryValidator` implementations | Handlers, aggregates, repositories |
-| `AggregateNotFoundException` | Repository implementations (`GetByIdAsync`) | Handlers, validators, aggregates, endpoints |
+| `CommandValidationException` | `ICommandValidator<TCommand>` implementations | Handlers, aggregates, repositories, query validators |
+| `QueryValidationException` | `IQueryValidator<TQuery>` implementations | Handlers, aggregates, repositories, command validators |
+| `AggregateNotFoundException` | Repository `GetByIdAsync` implementations | Handlers, validators, aggregates, endpoints |
 | `DomainException` | Aggregate root methods | Handlers, validators, repositories, endpoints |
 
 ---
 
-## Validators and Guard Clauses
+## Why Not `Guard.Against` in Validators
 
-`Guard.Against` from Ardalis.GuardClauses throws `ArgumentException` and `ArgumentNullException`. These are not `ApplicationValidationException` subclasses and map to HTTP 500, not HTTP 400. Do not use `Guard.Against` in validators unless you have confirmed the specific overload throws the correct type.
+`Guard.Against` from Ardalis.GuardClauses throws `ArgumentException` and `ArgumentNullException` by default. These are not `CommandValidationException` or `QueryValidationException` subclasses. They map to HTTP 500, not HTTP 400.
 
-The correct pattern for validators is to throw custom exception subclasses directly:
+`Guard.Against` is appropriate in domain value object constructors where `ArgumentException` is the correct exception type for invalid construction arguments. In validators, always throw custom exception subclasses directly.
 
 ```csharp
-// GOOD: throw custom ApplicationValidationException subclasses directly
+// GOOD: throw CommandValidationException subclasses directly
 internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostCommand>
 {
     public Task ValidateAsync(CreatePostCommand command, CancellationToken cancellationToken)
@@ -205,8 +275,6 @@ internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostC
 }
 ```
 
-`Guard.Against` is still appropriate in domain value object constructors, where `ArgumentException` is the correct exception type for invalid construction arguments.
-
 ---
 
 ## What NOT to Do
@@ -225,7 +293,6 @@ internal sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCom
         }
 
         post.Publish();
-        await _repository.UpdateAsync(post, cancellationToken);
     }
 }
 
@@ -246,12 +313,11 @@ internal sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCom
 
         post.Publish();
         // Publish() throws PostAlreadyPublishedException (409) if already published
-
-        await _postRepository.UpdateAsync(post, cancellationToken);
     }
 }
 ```
 
 ---
 
-The exception inventory for a specific project lives in the project repository. Copy `docs/templates/exception-inventory.md` from the standards repository into `docs/domain/exception-inventory.md` in the project repository and fill it in.
+The exception inventory for a specific project lives in the project repository. Copy `docs/templates/exception-inventory.md` into `docs/domain/exception-inventory.md` and fill it in.
+

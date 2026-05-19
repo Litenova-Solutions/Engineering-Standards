@@ -14,10 +14,10 @@ The application layer orchestrates use cases. It contains no business rules. It 
 
 | Project | Responsibility | LiteBus Package |
 |:---|:---|:---|
-| `Application.Write.Contracts` | Commands, command results, write-side contract interfaces. No handlers. | `LiteBus.Commands.Abstractions` |
+| `Application.Write.Contracts` | Commands, command results, `CommandValidationException`, write-side contract interfaces. No handlers. | `LiteBus.Commands.Abstractions` |
 | `Application.Write` | Command handler and validator implementations. | `LiteBus.Commands.Abstractions` |
-| `Application.Read.Contracts` | Queries, query results, `IXxxReadStore` interfaces. No handlers. | `LiteBus.Queries.Abstractions` |
-| `Application.Read` | Query handler and validator implementations. | `LiteBus.Queries.Abstractions` |
+| `Application.Read.Contracts` | Query records, query result records, `IDatabaseContext` interface, `PagedResult<T>`, `PaginationParameters`, `QueryValidationException`. No handlers. | `LiteBus.Queries.Abstractions` |
+| `Application.Read` | Query handler and validator implementations. References `Application.Read.Contracts`, `Domain`, `Microsoft.EntityFrameworkCore`. | `LiteBus.Queries.Abstractions` |
 | `Application.Reactions` | Event handlers and narrow side-effect interfaces. | `LiteBus.Events.Abstractions` |
 
 ---
@@ -26,10 +26,10 @@ The application layer orchestrates use cases. It contains no business rules. It 
 
 ```mermaid
 graph TD
-    WriteContracts["Application.Write.Contracts/\nPosts/\n  CreatePostCommand.cs\n  PublishPostCommand.cs\n  CreatePostCommandResult.cs"]
+    WriteContracts["Application.Write.Contracts/\nShared/\n  Exceptions/\n    CommandValidationException.cs\nPosts/\n  CreatePostCommand.cs\n  PublishPostCommand.cs\n  CreatePostCommandResult.cs"]
     Write["Application.Write/\nPosts/\n  Create/\n    CreatePostCommandHandler.cs\n    CreatePostCommandValidator.cs\n  Publish/\n    PublishPostCommandHandler.cs\n    PublishPostCommandValidator.cs"]
-    ReadContracts["Application.Read.Contracts/\nPosts/\n  GetPostByIdQuery.cs\n  GetAllPostsByAuthorQuery.cs\n  PostResult.cs\n  PostSummary.cs\n  IPostReadStore.cs"]
-    Read["Application.Read/\nPosts/\n  GetById/\n    GetPostByIdQueryHandler.cs\n    GetPostByIdQueryValidator.cs\n  GetAllByAuthor/\n    GetAllPostsByAuthorQueryHandler.cs\n    GetAllPostsByAuthorQueryValidator.cs"]
+    ReadContracts["Application.Read.Contracts/\nShared/\n  IDatabaseContext.cs\n  PagedResult.cs\n  PaginationParameters.cs\n  Exceptions/\n    QueryValidationException.cs\nPosts/\n  GetPostByIdQuery.cs\n  GetAllPostsQuery.cs\n  PostResult.cs\n  PostSummary.cs"]
+    Read["Application.Read/\nPosts/\n  GetById/\n    GetPostByIdQueryHandler.cs\n    GetPostByIdQueryValidator.cs\n  GetAll/\n    GetAllPostsQueryHandler.cs\n    GetAllPostsQueryValidator.cs"]
     Reactions["Application.Reactions/\nPosts/\n  OnPostPublished/\n    UpdateReadModelOnPostPublishedEventHandler.cs\n    NotifySubscribersOnPostPublishedEventHandler.cs\n    IPostPublishedNotifier.cs\n  OnPostCreated/\n    LogOnPostCreatedEventHandler.cs"]
 ```
 
@@ -45,7 +45,7 @@ Feature folders are named after the aggregate. Use case folders inside are named
 | Command result record types | Command validator classes |
 | Query record types | Query handler classes |
 | Query result record types | Query validator classes |
-| `IXxxReadStore` interface | (Implementation is in Infrastructure) |
+| `IDatabaseContext` (single interface in `Shared/`) | Implementation is `AppDbContext` in Infrastructure |
 | Write-side contract interfaces | Narrow interfaces (in Reactions only) |
 
 ---
@@ -69,7 +69,7 @@ sealed record CreatePostCommand : ICommand<PostId>
 
 ### Command Handler (in Application.Write)
 
-A command handler loads an aggregate, calls the operation, and saves. Nothing else.
+A command handler loads an aggregate and calls the operation. It does not call `SaveChangesAsync`. The pipeline post-handler handles persistence.
 
 ```csharp
 // GOOD: handler in Application.Write/Posts/Create/CreatePostCommandHandler.cs
@@ -93,6 +93,7 @@ internal sealed class CreatePostCommandHandler : ICommandHandler<CreatePostComma
         await _postRepository.AddAsync(post, cancellationToken);
 
         return post.Id;
+        // SaveChangesAsync is called by SaveChangesCommandPostHandler in the pipeline
     }
 }
 
@@ -104,31 +105,40 @@ public class CreatePostCommandHandler : ICommandHandler<CreatePostCommand, PostI
 
 ### Command Validator (in Application.Write)
 
-Validators run before the handler. They check structural validity only (non-null, non-empty, within range). They do NOT check business rules.
+Validators run before the handler. They check structural validity only (non-null, non-empty, within range). They do NOT check business rules. Validators MUST throw `CommandValidationException` subclasses. Never throw `ArgumentException` or use `Guard.Against` in validators.
 
 ```csharp
-// GOOD:
+// GOOD: throw CommandValidationException subclasses directly
+internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostCommand>
+{
+    public Task ValidateAsync(CreatePostCommand command, CancellationToken cancellationToken)
+    {
+        if (command.Id == default)
+        {
+            throw new PostIdRequiredException();
+        }
+        if (string.IsNullOrWhiteSpace(command.Title))
+        {
+            throw new PostTitleRequiredException();
+        }
+        if (command.Title.Length > 200)
+        {
+            throw new PostTitleTooLongException(command.Title.Length);
+        }
+        return Task.CompletedTask;
+    }
+}
+
+// BAD: Guard.Against throws ArgumentException, not CommandValidationException
 internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostCommand>
 {
     public Task ValidateAsync(CreatePostCommand command, CancellationToken cancellationToken)
     {
         Guard.Against.Default(command.Id, nameof(command.Id));
-        Guard.Against.Default(command.AuthorId, nameof(command.AuthorId));
+        // BAD: throws ArgumentException -> GlobalExceptionHandler maps to 500, not 400
         Guard.Against.NullOrWhiteSpace(command.Title, nameof(command.Title));
-        Guard.Against.OutOfRange(command.Title.Length, nameof(command.Title), 1, 200);
-        Guard.Against.NullOrWhiteSpace(command.Content, nameof(command.Content));
-
         return Task.CompletedTask;
     }
-}
-```
-
-When `Guard.Against` is not expressive enough, throw the correct custom exception directly:
-
-```csharp
-if (command.Title.StartsWith(' '))
-{
-    throw new PostTitleCannotStartWithSpaceException();
 }
 ```
 
@@ -140,43 +150,96 @@ if (command.Title.StartsWith(' '))
 
 ```csharp
 // Application.Read.Contracts/Posts/GetPostByIdQuery.cs
-sealed record GetPostByIdQuery : IQuery<PostResult>
+public sealed record GetPostByIdQuery : IQuery<PostResult>
 {
     public required PostId PostId { get; init; }
 }
 ```
 
-### Read Store Interface (in Application.Read.Contracts)
+### `IDatabaseContext` Interface (in Application.Read.Contracts/Shared/)
 
-The read store interface lives in the Contracts project so both the query handlers (in Application.Read) and the Infrastructure implementation can reference it without circular dependencies.
+`IDatabaseContext` is the single read-side database abstraction. It exposes one `IQueryable<T>` property per aggregate. Add a property here when a new aggregate needs query handlers.
 
 ```csharp
-// Application.Read.Contracts/Posts/IPostReadStore.cs
-interface IPostReadStore
+// Application.Read.Contracts/Shared/IDatabaseContext.cs
+public interface IDatabaseContext
 {
-    Task<PostResult?> GetByIdAsync(PostId postId, CancellationToken cancellationToken);
-    Task<IReadOnlyList<PostSummary>> GetAllByAuthorAsync(AuthorId authorId, CancellationToken cancellationToken);
+    IQueryable<Post> Posts { get; }
+    IQueryable<Author> Authors { get; }
+    IQueryable<Order> Orders { get; }
+}
+```
+
+`IDatabaseContext` is NOT a repository. It does not load aggregates. It exposes queryable collections for EF Core LINQ projections. Query handlers write `Select` projections against these collections and never call aggregate methods.
+
+### Paginated Query (in Application.Read.Contracts)
+
+All list queries that return potentially large result sets MUST use `PagedResult<T>` and include `PaginationParameters` as a required property.
+
+```csharp
+// Application.Read.Contracts/Posts/GetAllPostsQuery.cs
+public sealed record GetAllPostsQuery : IQuery<PagedResult<PostSummary>>
+{
+    public required PaginationParameters Pagination { get; init; }
+}
+```
+
+`PaginationParameters` and `PagedResult<T>` are defined in `Application.Read.Contracts/Shared/`:
+
+```csharp
+// Application.Read.Contracts/Shared/PaginationParameters.cs
+public sealed record PaginationParameters
+{
+    public int PageNumber { get; init; } = 1;
+    public int PageSize { get; init; } = 20;
+    public bool SkipTotalCount { get; init; } = false;
+    public const int MaxPageSize = 100;
+}
+
+// Application.Read.Contracts/Shared/PagedResult.cs
+public sealed record PagedResult<T>
+{
+    public required IReadOnlyList<T> Items { get; init; }
+    public required int TotalCount { get; init; }
+    public required int PageNumber { get; init; }
+    public required int PageSize { get; init; }
+    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
+    public bool HasNextPage => PageNumber < TotalPages;
+    public bool HasPreviousPage => PageNumber > 1;
 }
 ```
 
 ### Query Handler (in Application.Read)
 
-A query handler injects the read store interface, never the repository.
+Query handlers inject `IDatabaseContext` and write LINQ projections directly. They MUST NOT call any aggregate method. They MUST NOT load a full aggregate. Every query handler uses `Select` to project only the fields needed.
 
 ```csharp
 // GOOD: Application.Read/Posts/GetById/GetPostByIdQueryHandler.cs
-internal sealed class GetPostByIdQueryHandler : IQueryHandler<GetPostByIdQuery, PostResult>
+internal sealed class GetPostByIdQueryHandler
+    : IQueryHandler<GetPostByIdQuery, PostResult>
 {
-    private readonly IPostReadStore _postReadStore;
+    private readonly IDatabaseContext _db;
 
-    public GetPostByIdQueryHandler(IPostReadStore postReadStore)
+    public GetPostByIdQueryHandler(IDatabaseContext db)
     {
-        _postReadStore = postReadStore;
+        _db = db;
     }
 
-    public async Task<PostResult> HandleAsync(GetPostByIdQuery query, CancellationToken cancellationToken)
+    public async Task<PostResult> HandleAsync(
+        GetPostByIdQuery query,
+        CancellationToken cancellationToken)
     {
-        var result = await _postReadStore.GetByIdAsync(query.PostId, cancellationToken);
+        var result = await _db.Posts
+            .Where(p => p.Id == query.PostId)
+            .Select(p => new PostResult
+            {
+                Id = p.Id,
+                Title = p.Title.Value,
+                Content = p.Content.Value,
+                AuthorName = p.Author.DisplayName,
+                PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
+            })
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (result is null)
         {
@@ -187,23 +250,129 @@ internal sealed class GetPostByIdQueryHandler : IQueryHandler<GetPostByIdQuery, 
     }
 }
 
-// BAD: injecting repository into query handler
-internal sealed class GetPostByIdQueryHandler : IQueryHandler<GetPostByIdQuery, PostResult>
+// BAD: loading a full aggregate in a query handler
+internal sealed class GetPostByIdQueryHandler
+    : IQueryHandler<GetPostByIdQuery, PostResult>
 {
     private readonly IPostRepository _postRepository; // BAD: repository in query handler
+
+    public async Task<PostResult> HandleAsync(
+        GetPostByIdQuery query,
+        CancellationToken cancellationToken)
+    {
+        var post = await _postRepository.GetByIdAsync(query.PostId, cancellationToken);
+        // BAD: loading full aggregate, triggering all EF Core navigation loading
+        return new PostResult { Id = post.Id, Title = post.Title.Value };
+    }
 }
+```
+
+### Paginated Query Handler (in Application.Read)
+
+```csharp
+// Application.Read/Posts/GetAll/GetAllPostsQueryHandler.cs
+internal sealed class GetAllPostsQueryHandler
+    : IQueryHandler<GetAllPostsQuery, PagedResult<PostSummary>>
+{
+    private readonly IDatabaseContext _db;
+
+    public GetAllPostsQueryHandler(IDatabaseContext db)
+    {
+        _db = db;
+    }
+
+    public async Task<PagedResult<PostSummary>> HandleAsync(
+        GetAllPostsQuery query,
+        CancellationToken cancellationToken)
+    {
+        var pageSize = Math.Min(
+            query.Pagination.PageSize,
+            PaginationParameters.MaxPageSize);
+
+        var baseQuery = _db.Posts
+            .Where(p => p.State is PublishedPostState);
+
+        var totalCount = query.Pagination.SkipTotalCount
+            ? 0
+            : await baseQuery.CountAsync(cancellationToken);
+
+        var items = await baseQuery
+            .OrderByDescending(p => ((PublishedPostState)p.State).PublishedAt)
+            .Skip((query.Pagination.PageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(p => new PostSummary
+            {
+                Id = p.Id,
+                Title = p.Title.Value,
+                PublishedAt = ((PublishedPostState)p.State).PublishedAt
+            })
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<PostSummary>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = query.Pagination.PageNumber,
+            PageSize = pageSize
+        };
+    }
+}
+```
+
+### Multi-Aggregate Projections
+
+`IDatabaseContext` exposes multiple aggregates. A single LINQ projection can join across them without multiple round trips:
+
+```csharp
+// Joining Post and Author in a single projection
+var result = await _db.Posts
+    .Where(p => p.Id == query.PostId)
+    .Select(p => new PostResult
+    {
+        Id = p.Id,
+        Title = p.Title.Value,
+        // EF Core resolves this as a JOIN, no separate Author query
+        AuthorName = _db.Authors
+            .Where(a => a.Id == p.AuthorId)
+            .Select(a => a.DisplayName)
+            .FirstOrDefault() ?? string.Empty,
+        PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
+    })
+    .FirstOrDefaultAsync(cancellationToken);
 ```
 
 ### Query Validator (in Application.Read)
 
-Every query that has validatable inputs MUST have a corresponding validator.
+Query validators throw `QueryValidationException` subclasses. Never throw `ArgumentException` or `ArgumentNullException`.
 
 ```csharp
-internal sealed class GetPostByIdQueryValidator : IQueryValidator<GetPostByIdQuery>
+// GOOD:
+internal sealed class GetPostByIdQueryValidator
+    : IQueryValidator<GetPostByIdQuery>
 {
-    public Task ValidateAsync(GetPostByIdQuery query, CancellationToken cancellationToken)
+    public Task ValidateAsync(
+        GetPostByIdQuery query,
+        CancellationToken cancellationToken)
+    {
+        if (query.PostId == default)
+        {
+            throw new PostIdRequiredException();
+        }
+        return Task.CompletedTask;
+    }
+}
+
+// BAD:
+internal sealed class GetPostByIdQueryValidator
+    : IQueryValidator<GetPostByIdQuery>
+{
+    public Task ValidateAsync(
+        GetPostByIdQuery query,
+        CancellationToken cancellationToken)
     {
         Guard.Against.Default(query.PostId, nameof(query.PostId));
+        // BAD: Guard.Against throws ArgumentException, not QueryValidationException
+        // This maps to HTTP 500, not HTTP 400
         return Task.CompletedTask;
     }
 }
@@ -215,7 +384,7 @@ Result records are defined in the Contracts project, next to the query that retu
 
 ```csharp
 // Application.Read.Contracts/Posts/PostResult.cs
-sealed record PostResult
+public sealed record PostResult
 {
     public required PostId Id { get; init; }
     public required string Title { get; init; }
@@ -252,17 +421,18 @@ internal sealed class SendConfirmationOnOrderPlacedEventHandler : IEventHandler<
 // Category 2: updates a read model projection (infrastructure handles the actual update)
 internal sealed class UpdateReadModelOnPostPublishedEventHandler : IEventHandler<PostPublished>
 {
-    private readonly IPostReadStore _postReadStore;
+    private readonly ICommandMediator _commandMediator;
 
-    public UpdateReadModelOnPostPublishedEventHandler(IPostReadStore postReadStore)
+    public UpdateReadModelOnPostPublishedEventHandler(ICommandMediator commandMediator)
     {
-        _postReadStore = postReadStore;
+        _commandMediator = commandMediator;
     }
 
     public async Task HandleAsync(PostPublished @event, CancellationToken cancellationToken)
     {
-        // Read store projection is updated via infrastructure
-        await _postReadStore.MarkAsPublishedAsync(@event.PostId, cancellationToken);
+        // Dispatch a command to update the read model via the write path
+        var command = new UpdatePostReadModelCommand { PostId = @event.PostId };
+        await _commandMediator.SendAsync(command, cancellationToken);
     }
 }
 
@@ -270,23 +440,19 @@ internal sealed class UpdateReadModelOnPostPublishedEventHandler : IEventHandler
 internal sealed class NotifySubscribersOnPostPublishedEventHandler : IEventHandler<PostPublished>
 {
     private readonly IPostPublishedNotifier _notifier;
-    private readonly IPostReadStore _postReadStore;
 
     public NotifySubscribersOnPostPublishedEventHandler(
-        IPostPublishedNotifier notifier,
-        IPostReadStore postReadStore)
+        IPostPublishedNotifier notifier)
     {
         _notifier = notifier;
-        _postReadStore = postReadStore;
     }
 
     public async Task HandleAsync(PostPublished @event, CancellationToken cancellationToken)
     {
-        var post = await _postReadStore.GetByIdAsync(@event.PostId, cancellationToken);
-        if (post is not null)
-        {
-            await _notifier.NotifySubscribersAsync(@event.PostId, post.Title, cancellationToken);
-        }
+        await _notifier.NotifySubscribersAsync(
+            @event.PostId,
+            @event.PostTitle,
+            cancellationToken);
     }
 }
 ```
@@ -315,14 +481,13 @@ internal sealed class NotifySubscribersOnPostPublishedEventHandler : IEventHandl
 Validators MUST:
 - Run before the handler (LiteBus pre-handler pipeline).
 - Check structural validity only: null checks, empty string checks, range checks, format checks.
-- Throw `ApplicationValidationException` subclasses. Never throw `ArgumentException` or `ArgumentNullException`.
+- Throw `CommandValidationException` subclasses (for command validators) or `QueryValidationException` subclasses (for query validators). Never throw `ArgumentException` or `ArgumentNullException`.
 - Be `internal sealed`.
 
 Validators MUST NOT:
-- Query the database to check business rules (e.g., do not check whether a post already exists in a validator).
+- Query the database to check business rules (do not check whether a post already exists in a validator).
 - Contain domain logic.
-
-`Guard.Against` from Ardalis.GuardClauses throws `ArgumentException` and `ArgumentNullException` by default. These are not `ApplicationValidationException` subclasses. They map to HTTP 500, not HTTP 400. Use `Guard.Against` in domain value object constructors where `ArgumentException` is acceptable. In validators, either throw custom `ApplicationValidationException` subclasses directly, or use `Guard.Against` only for checks where you have verified the thrown exception type is correct for your needs.
+- Use `Guard.Against` from Ardalis.GuardClauses. `Guard.Against` throws `ArgumentException` by default, which maps to HTTP 500. Always throw custom `CommandValidationException` or `QueryValidationException` subclasses directly.
 
 ```csharp
 // BAD: Guard.Against throws ArgumentException, which maps to HTTP 500

@@ -50,7 +50,7 @@ Unit tests for aggregates, value objects, and domain services. No mocking framew
 
 ### `{ProjectName}.Application.Tests`
 
-Unit tests for command handlers, query handlers, validators, and event handlers. Mock the read store and repository interfaces using NSubstitute. Do not mock domain types; construct them directly.
+Unit tests for command handlers, validators, and event handlers use NSubstitute to mock repository interfaces. Query handler tests use Testcontainers against a real PostgreSQL database. Query handlers write EF Core LINQ projections directly against `IDatabaseContext`. Mocking `IDatabaseContext` with an in-memory collection would not test the EF Core translation, which is where most query bugs occur. Use Testcontainers for query handler tests to catch translation issues early. Do not mock domain types; construct them directly.
 
 ### `{ProjectName}.Integration.Tests`
 
@@ -127,7 +127,9 @@ public sealed class PostTests
 
 ## Application Handler Test Pattern
 
-Handler tests use NSubstitute to mock repository and read store interfaces.
+### Command Handler Test
+
+Command handler tests use NSubstitute to mock repository interfaces. Command handlers no longer call `SaveChangesAsync`, so tests do not need to assert that `SaveChangesAsync` was called on a mock.
 
 ```csharp
 public sealed class CreatePostCommandHandlerTests
@@ -156,6 +158,7 @@ public sealed class CreatePostCommandHandlerTests
         await _postRepository.Received(1).AddAsync(
             Arg.Is<Post>(p => p.Title.Value == command.Title),
             Arg.Any<CancellationToken>());
+        // SaveChangesAsync is NOT called in the handler; do not assert it here
     }
 
     [Fact]
@@ -172,6 +175,96 @@ public sealed class CreatePostCommandHandlerTests
         var result = await _handler.HandleAsync(command, CancellationToken.None);
 
         result.Should().Be(command.Id);
+    }
+}
+```
+
+### Query Handler Test
+
+Query handler tests use Testcontainers against a real PostgreSQL database. Mocking `IDatabaseContext` would not validate EF Core query translation.
+
+```csharp
+// Application.Tests/Posts/GetPostByIdQueryHandlerTests.cs
+public sealed class GetPostByIdQueryHandlerTests
+    : IClassFixture<PostgreSqlFixture>
+{
+    private readonly PostgreSqlFixture _fixture;
+
+    public GetPostByIdQueryHandlerTests(PostgreSqlFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPostExists_ShouldReturnPostResult()
+    {
+        // Arrange
+        await using var dbContext = _fixture.CreateDbContext();
+        var post = Post.Create(
+            PostId.New(),
+            new PostTitle("Test Post"),
+            new PostContent("Content"),
+            new AuthorId(Guid.NewGuid()));
+        await dbContext.Posts.AddAsync(post);
+        await dbContext.SaveChangesAsync();
+
+        var handler = new GetPostByIdQueryHandler(dbContext);
+        var query = new GetPostByIdQuery { PostId = post.Id };
+
+        // Act
+        var result = await handler.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Id.Should().Be(post.Id);
+        result.Title.Should().Be("Test Post");
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPostDoesNotExist_ShouldThrowPostNotFoundException()
+    {
+        // Arrange
+        await using var dbContext = _fixture.CreateDbContext();
+        var handler = new GetPostByIdQueryHandler(dbContext);
+        var query = new GetPostByIdQuery { PostId = PostId.New() };
+
+        // Act
+        var act = () => handler.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        await act.Should().ThrowAsync<PostNotFoundException>();
+    }
+}
+```
+
+### PostgreSqlFixture
+
+```csharp
+// Application.Tests/Fixtures/PostgreSqlFixture.cs
+public sealed class PostgreSqlFixture : IAsyncLifetime
+{
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
+        .WithImage("postgres:16-alpine")
+        .Build();
+
+    public async Task InitializeAsync()
+    {
+        await _container.StartAsync();
+        await using var dbContext = CreateDbContext();
+        await dbContext.Database.MigrateAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await _container.StopAsync();
+    }
+
+    public AppDbContext CreateDbContext()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseNpgsql(_container.GetConnectionString())
+            .Options;
+        return new AppDbContext(options);
     }
 }
 ```
@@ -280,19 +373,19 @@ Architecture tests enforce structural rules that project references cannot enfor
 public sealed class ApplicationLayerTests
 {
     [Fact]
-    public void QueryHandlers_ShouldNotDependOn_RepositoryInterfaces()
+    public void QueryHandlers_ShouldNotDependOn_InfrastructureProject()
     {
+        // Query handlers inject IDatabaseContext, not AppDbContext directly.
+        // Application.Read must not reference the Infrastructure project.
         var result = Types
             .InAssembly(typeof(GetPostByIdQueryHandler).Assembly)
-            .That()
-            .ImplementInterface(typeof(IQueryHandler<,>))
             .ShouldNot()
-            .HaveDependencyOn("IRepository")
+            .HaveDependencyOn("Infrastructure")
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue(
-            because: "query handlers must inject IReadStore interfaces, not repositories. " +
-                     "See docs/conventions/backend/07-query-read-strategy.md");
+            because: "query handlers must inject IDatabaseContext from " +
+                     "Application.Read.Contracts, not AppDbContext from Infrastructure.");
     }
 
     [Fact]
