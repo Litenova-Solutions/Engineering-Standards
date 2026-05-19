@@ -19,7 +19,7 @@ With approach 2, the event handler is testable with NSubstitute mocks of the nar
 
 ## Decision
 
-`Application.Reactions` MUST NOT reference external libraries (SMTP clients, HTTP clients, message bus clients, EF Core) directly. For every external capability an event handler needs, `Application.Reactions` defines a narrow interface. Infrastructure implements that interface. This is the same pattern used for repository interfaces in the Domain layer.
+`Application.Reactions` MUST NOT reference external side-effect libraries (SMTP clients, HTTP clients, broker clients, EF Core) directly. For every external capability an event handler needs, `Application.Reactions` defines a narrow interface. Infrastructure implements that interface. LiteBus abstractions are allowed because they are the in-process mediator contracts used by the architecture.
 
 ## Consequences
 

@@ -20,7 +20,7 @@ The application layer orchestrates use cases. It contains no business rules. It 
 | `Application.Write` | Command handler and validator implementations. | `LiteBus.Commands.Abstractions` |
 | `Application.Read.Contracts` | Query records, query result records, `IDatabaseContext` interface, `PagedResult<T>`, `PaginationParameters`, `QueryValidationException`. No handlers. | `LiteBus.Queries.Abstractions` |
 | `Application.Read` | Query handler and validator implementations. References `Application.Read.Contracts`, `Domain`, `Microsoft.EntityFrameworkCore`. | `LiteBus.Queries.Abstractions` |
-| `Application.Reactions` | Event handlers and narrow side-effect interfaces. | `LiteBus.Events.Abstractions` |
+| `Application.Reactions` | Event handlers and narrow side-effect interfaces. May dispatch follow-up commands when eventual consistency is acceptable. | `LiteBus.Events.Abstractions`, `LiteBus.Commands.Abstractions` |
 
 ---
 
@@ -32,7 +32,7 @@ graph TD
     Write["Application.Write/\nPosts/\n  Create/\n    CreatePostCommandHandler.cs\n    CreatePostCommandValidator.cs\n  Publish/\n    PublishPostCommandHandler.cs\n    PublishPostCommandValidator.cs"]
     ReadContracts["Application.Read.Contracts/\nShared/\n  IDatabaseContext.cs\n  PagedResult.cs\n  PaginationParameters.cs\n  Exceptions/\n    QueryValidationException.cs\nPosts/\n  GetPostByIdQuery.cs\n  GetAllPostsQuery.cs\n  PostResult.cs\n  PostSummary.cs"]
     Read["Application.Read/\nPosts/\n  GetById/\n    GetPostByIdQueryHandler.cs\n    GetPostByIdQueryValidator.cs\n  GetAll/\n    GetAllPostsQueryHandler.cs\n    GetAllPostsQueryValidator.cs"]
-    Reactions["Application.Reactions/\nPosts/\n  OnPostPublished/\n    UpdateReadModelOnPostPublishedEventHandler.cs\n    NotifySubscribersOnPostPublishedEventHandler.cs\n    IPostPublishedNotifier.cs\n  OnPostCreated/\n    LogOnPostCreatedEventHandler.cs"]
+    Reactions["Application.Reactions/\nPosts/\n  OnPostPublished/\n    NotifySubscribersOnPostPublishedEventHandler.cs\n    IPostPublishedNotifier.cs\n  OnPostCreated/\n    LogOnPostCreatedEventHandler.cs"]
 ```
 
 Feature folders are named after the aggregate. Use case folders inside are named after the operation in imperative form (`Create/`, `Publish/`, `GetById/`). Event handler folders are named `On{EventName}/`.
@@ -400,7 +400,7 @@ public sealed record PostResult
 
 ## 7. Event Handler Pattern
 
-### Three Categories of Event Handler
+### Event Handler Categories
 
 ```csharp
 // Category 1: dispatches a follow-up command
@@ -420,25 +420,7 @@ internal sealed class SendConfirmationOnOrderPlacedEventHandler : IEventHandler<
     }
 }
 
-// Category 2: updates a read model projection (infrastructure handles the actual update)
-internal sealed class UpdateReadModelOnPostPublishedEventHandler : IEventHandler<PostPublished>
-{
-    private readonly ICommandMediator _commandMediator;
-
-    public UpdateReadModelOnPostPublishedEventHandler(ICommandMediator commandMediator)
-    {
-        _commandMediator = commandMediator;
-    }
-
-    public async Task HandleAsync(PostPublished @event, CancellationToken cancellationToken)
-    {
-        // Dispatch a command to update the read model via the write path
-        var command = new UpdatePostReadModelCommand { PostId = @event.PostId };
-        await _commandMediator.SendAsync(command, cancellationToken);
-    }
-}
-
-// Category 3: triggers an external side effect via a narrow interface
+// Category 2: triggers an external side effect via a narrow interface
 internal sealed class NotifySubscribersOnPostPublishedEventHandler : IEventHandler<PostPublished>
 {
     private readonly IPostPublishedNotifier _notifier;
@@ -458,6 +440,8 @@ internal sealed class NotifySubscribersOnPostPublishedEventHandler : IEventHandl
     }
 }
 ```
+
+Read model projection updates are not a default event-handler category. Query handlers use `IDatabaseContext` projections by default. If a project introduces denormalized read model tables, the project ADR must define whether they are updated inside the command transaction, by an outbox-backed projector, or by a reconciliation job. Do not dispatch ad hoc `UpdateReadModelCommand` commands from Reactions without that ADR.
 
 ### Narrow Interface Definition (in Application.Reactions)
 

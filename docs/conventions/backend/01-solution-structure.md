@@ -32,7 +32,7 @@ Every project follows this standard layout. Replace `{ProjectName}` with the act
     └── adr/
 ```
 
-The solution file uses the `.slnx` format (SDK-style solution files), not the legacy `.sln` format. See ADR 0001 for the decision.
+The solution file uses the `.slnx` format (SDK-style solution files), not the legacy `.sln` format.
 
 ---
 
@@ -89,12 +89,20 @@ All NuGet package versions are managed centrally via `Directory.Packages.props` 
     <PackageVersion Include="LiteBus.Commands.Abstractions" Version="x.x.x" />
     <PackageVersion Include="LiteBus.Queries.Abstractions" Version="x.x.x" />
     <PackageVersion Include="LiteBus.Events.Abstractions" Version="x.x.x" />
-    <PackageVersion Include="LiteBus.Messaging.Abstractions" Version="x.x.x" />
     <PackageVersion Include="LiteBus.Extensions.Microsoft.DependencyInjection" Version="x.x.x" />
     <PackageVersion Include="Ardalis.GuardClauses" Version="x.x.x" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="x.x.x" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="x.x.x" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="x.x.x" />
     <PackageVersion Include="Serilog.AspNetCore" Version="x.x.x" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="x.x.x" />
+    <PackageVersion Include="Serilog.Enrichers.Environment" Version="x.x.x" />
+    <PackageVersion Include="Serilog.Enrichers.Thread" Version="x.x.x" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="x.x.x" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="x.x.x" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="x.x.x" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="x.x.x" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="x.x.x" />
     <PackageVersion Include="xunit" Version="x.x.x" />
     <PackageVersion Include="NSubstitute" Version="x.x.x" />
     <PackageVersion Include="AwesomeAssertions" Version="x.x.x" />
@@ -156,7 +164,7 @@ graph TD
 | `{ProjectName}.Application.Write.Contracts` | `Domain` |
 | `{ProjectName}.Application.Read.Contracts` | `Domain` |
 | `{ProjectName}.Application.Write` | `Application.Write.Contracts`, `Domain` |
-| `{ProjectName}.Application.Read` | `Application.Read.Contracts`, `Domain` |
+| `{ProjectName}.Application.Read` | `Application.Read.Contracts`, `Domain`, `Microsoft.EntityFrameworkCore` |
 | `{ProjectName}.Application.Reactions` | `Application.Write.Contracts`, `Application.Read.Contracts`, `Domain` |
 | `{ProjectName}.Infrastructure` | `Domain`, `Application.Write.Contracts`, `Application.Read.Contracts`, `Application.Reactions` |
 | `{ProjectName}.WebApi` | `Application.Write.Contracts`, `Application.Read.Contracts` |
@@ -172,10 +180,11 @@ LiteBus is modular. Each project references only the package it needs. Never add
 
 | LiteBus Package | Project(s) | Purpose |
 |:---|:---|:---|
-| `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write` | `ICommand`, `ICommand<TResult>`, `ICommandHandler<TCommand>`, `ICommandHandler<TCommand, TResult>`, `ICommandValidator<TCommand>` |
-| `LiteBus.Queries.Abstractions` | `Application.Read.Contracts`, `Application.Read` | `IQuery<TResult>`, `IQueryHandler<TQuery, TResult>`, `IQueryValidator<TQuery>` |
-| `LiteBus.Events.Abstractions` | `Application.Reactions` | `IEvent`, `IEventHandler<TEvent>` |
-| `LiteBus.Messaging.Abstractions` | `WebApi` | `IMessageBus` - the unified dispatcher used in endpoints |
+| `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write`, `Application.Reactions` | `ICommand`, `ICommand<TResult>`, `ICommandHandler<TCommand>`, `ICommandHandler<TCommand, TResult>`, `ICommandValidator<TCommand>`, `ICommandMediator` |
+| `LiteBus.Queries.Abstractions` | `Application.Read.Contracts`, `Application.Read` | `IQuery<TResult>`, `IQueryHandler<TQuery, TResult>`, `IQueryValidator<TQuery>`, `IQueryMediator` |
+| `LiteBus.Events.Abstractions` | `Application.Reactions` | `IEvent`, `IEventHandler<TEvent>`, `IEventPublisher` |
+| `LiteBus.Commands.Abstractions` | `WebApi` | `ICommandMediator` for command endpoints |
+| `LiteBus.Queries.Abstractions` | `WebApi` | `IQueryMediator` for query endpoints |
 | `LiteBus.Extensions.Microsoft.DependencyInjection` | `WebApi` | Full DI registration for all handlers |
 
 ---
@@ -188,15 +197,25 @@ The following packages are pre-approved and do not require a new ADR:
 
 | Package | Layer(s) | Purpose |
 |:---|:---|:---|
-| `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write` | Command mediator abstractions |
+| `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write`, `Application.Reactions`, `WebApi` | Command mediator abstractions |
 | `LiteBus.Queries.Abstractions` | `Application.Read.Contracts`, `Application.Read` | Query mediator abstractions |
 | `LiteBus.Events.Abstractions` | `Application.Reactions` | Event mediator abstractions |
-| `LiteBus.Messaging.Abstractions` | `WebApi` | Unified message bus for dispatch |
+| `LiteBus.Commands.Abstractions` | `WebApi` | `ICommandMediator` for command endpoints |
+| `LiteBus.Queries.Abstractions` | `WebApi` | `IQueryMediator` for query endpoints |
 | `LiteBus.Extensions.Microsoft.DependencyInjection` | `WebApi` | LiteBus DI registration |
-| `Ardalis.GuardClauses` | `Domain`, `Application.Write`, `Application.Read` | Guard clause helpers |
-| `Microsoft.EntityFrameworkCore` | `Infrastructure` | ORM |
+| `Ardalis.GuardClauses` | `Domain` | Project-owned custom guard extensions that throw approved domain exceptions |
+| `Microsoft.EntityFrameworkCore` | `Infrastructure`, `Application.Read` | ORM and async LINQ extensions for query handlers |
+| `Microsoft.EntityFrameworkCore.Sqlite` | `Application.Tests` | Fast relational query handler tests |
 | `Npgsql.EntityFrameworkCore.PostgreSQL` | `Infrastructure` | PostgreSQL EF Core provider |
 | `Serilog.AspNetCore` | `WebApi` | Structured logging |
+| `Serilog.Sinks.Console` | `WebApi` | JSON console logs |
+| `Serilog.Enrichers.Environment` | `WebApi` | Environment log enrichment |
+| `Serilog.Enrichers.Thread` | `WebApi` | Thread log enrichment |
+| `OpenTelemetry.Extensions.Hosting` | `WebApi`, worker projects | OpenTelemetry registration |
+| `OpenTelemetry.Instrumentation.AspNetCore` | `WebApi` | HTTP server traces and metrics |
+| `OpenTelemetry.Instrumentation.Http` | `Infrastructure`, `WebApi` | Outbound HTTP traces |
+| `OpenTelemetry.Instrumentation.Runtime` | `WebApi`, worker projects | Runtime metrics |
+| `OpenTelemetry.Exporter.OpenTelemetryProtocol` | `WebApi`, worker projects | OTLP export |
 | `xunit` | All test projects | Test framework |
 | `NSubstitute` | `Application.Tests` | Mocking framework |
 | `AwesomeAssertions` | All test projects | Assertion library |

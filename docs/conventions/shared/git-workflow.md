@@ -13,8 +13,8 @@ Branch names follow the pattern `{type}/{short-description}` where the descripti
 | `feat` | A new feature or user-facing functionality | `feat/add-post-publishing` |
 | `fix` | A bug fix | `fix/post-not-found-returns-500` |
 | `chore` | Maintenance tasks, dependency updates, CI changes | `chore/update-efcore-to-10-0-4` |
-| `docs` | Documentation changes only | `docs/add-read-store-examples` |
-| `refactor` | Code restructuring with no behavior change | `refactor/extract-post-read-store` |
+| `docs` | Documentation changes only | `docs/add-query-projection-examples` |
+| `refactor` | Code restructuring with no behavior change | `refactor/extract-post-projection` |
 | `test` | Adding or fixing tests | `test/add-publish-post-integration-test` |
 
 Branch names MUST be all lowercase. Use hyphens, not underscores or spaces. Keep descriptions short (3-5 words).
@@ -41,11 +41,11 @@ The short description is lowercase, imperative mood, no trailing period. Maximum
 | `fix` | A bug fix | `fix(posts): return 404 when post not found` |
 | `chore` | Maintenance | `chore: update Npgsql to 10.0.3` |
 | `docs` | Documentation | `docs(readme): add submodule setup instructions` |
-| `refactor` | Refactoring | `refactor(posts): extract IPostReadStore` |
+| `refactor` | Refactoring | `refactor(posts): extract shared post projection` |
 | `test` | Test changes | `test(posts): add integration test for publish endpoint` |
 | `ci` | CI/CD pipeline | `ci: add vulnerability scan step` |
 | `build` | Build system changes | `build: switch to slnx solution format` |
-| `perf` | Performance improvements | `perf(posts): use select projection in read store` |
+| `perf` | Performance improvements | `perf(posts): reduce post list projection fields` |
 
 **Breaking changes** are indicated with a `!` after the type or with `BREAKING CHANGE:` in the footer:
 

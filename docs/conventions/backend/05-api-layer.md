@@ -17,7 +17,7 @@ An endpoint that makes a domain decision is wrong. An endpoint that queries a da
 1. **Thin endpoints.** No business logic. No domain decisions. Translate, dispatch, return.
 2. **Screaming architecture.** Folder structure reveals intent. The `Endpoints/Posts/Create/` folder communicates everything.
 3. **Dedicated mapping classes.** HTTP request to application command translation lives in `ApiMappings` classes, not in the endpoint handler method.
-4. **Mediator only.** Endpoints inject `ICommandMediator` or `IQueryMediator` depending on their role. They do not inject repositories, read stores, domain services, or any other application type directly. Endpoints inject `ICommandMediator` or `IQueryMediator` specifically. Do not inject a unified `IMessageBus` unless the endpoint genuinely needs to dispatch both commands and queries, which is rare. Using the specific mediator interface documents the endpoint's intent.
+4. **Mediator only.** Endpoints inject `ICommandMediator` or `IQueryMediator` depending on their role. They do not inject repositories, read-side abstractions, domain services, `DbContext`, or a unified message bus. Using the specific mediator interface documents the endpoint's intent.
 5. **Centralized error handling.** No `try-catch` in endpoints. All exception handling goes through `GlobalExceptionHandler`.
 6. **Rich OpenAPI documentation.** Every endpoint MUST call `.WithName()`, `.WithTags()`, `.WithSummary()`, and the appropriate `.Produces<T>()` and `.ProducesProblem()` calls.
 
@@ -319,7 +319,7 @@ Use resource names in plural lowercase. Nest sub-resources where the relationshi
 | `200 OK` | Success with body | `GET`, `PUT`, `PATCH` results |
 | `201 Created` | Resource created | `POST` that creates a resource; include `Location` header |
 | `204 No Content` | Success without body | `DELETE`, `PUT`/`PATCH` with no return value |
-| `400 Bad Request` | Validation failure | `ApplicationValidationException` |
+| `400 Bad Request` | Validation failure | `CommandValidationException` or `QueryValidationException` |
 | `401 Unauthorized` | Not authenticated | Missing or invalid authentication token |
 | `403 Forbidden` | Not authorized | Authenticated but lacks permission |
 | `404 Not Found` | Resource not found | `AggregateNotFoundException` |
@@ -346,6 +346,85 @@ app.MapPost("/posts", HandleAsync)
 ```
 
 Endpoints with no OpenAPI documentation MUST NOT be merged to `main`.
+
+---
+
+## API Versioning
+
+Internal applications start with unversioned routes. Public APIs, mobile APIs, partner APIs, and APIs consumed by independently deployed services use URL path versioning from their first public release. See ADR 0019. When a project has more than one active version, add `Asp.Versioning.Http` with a project ADR.
+
+```csharp
+// GOOD: versioned route group for public API
+var versionSet = app.NewApiVersionSet()
+    .HasApiVersion(new ApiVersion(1))
+    .ReportApiVersions()
+    .Build();
+
+var group = app.MapGroup("/api/v{version:apiVersion}/posts")
+    .WithApiVersionSet(versionSet)
+    .MapToApiVersion(1);
+```
+
+```csharp
+// BAD: public API route has no version boundary
+app.MapPost("/posts", HandleAsync);
+```
+
+Breaking changes require a new API version. Additive fields, new endpoints, and new optional query parameters do not.
+
+---
+
+## Idempotent Commands
+
+Re-triable `POST` and `PATCH` endpoints MUST support the `Idempotency-Key` header when duplicate execution would create duplicate state, send duplicate notifications, or repeat an external operation. See `docs/conventions/backend/10-reliability.md`.
+
+```csharp
+// GOOD: command endpoint accepts Idempotency-Key
+private static async Task<IResult> HandleAsync(
+    CreatePostRequest request,
+    [FromHeader(Name = "Idempotency-Key")] string idempotencyKey,
+    ICommandMediator commandMediator,
+    CancellationToken cancellationToken)
+{
+    var command = request.ToCommand(idempotencyKey);
+    var result = await commandMediator.SendAsync(command, cancellationToken);
+
+    return Results.Created($"/posts/{result.PostId.Value}", result.ToResponse());
+}
+```
+
+```csharp
+// BAD: retriable command endpoint has no idempotency key
+private static async Task<IResult> HandleAsync(
+    CreatePostRequest request,
+    ICommandMediator commandMediator,
+    CancellationToken cancellationToken)
+{
+    var result = await commandMediator.SendAsync(request.ToCommand(), cancellationToken);
+    return Results.Created($"/posts/{result.PostId.Value}", result.ToResponse());
+}
+```
+
+---
+
+## Rate Limiting
+
+Public, authentication, search, file upload, and expensive command endpoints MUST have a rate limiting policy. Apply policies at the route group when possible.
+
+```csharp
+// GOOD: route group applies named policy
+var group = app.MapGroup("/posts")
+    .RequireAuthorization()
+    .RequireRateLimiting("authenticated-api");
+```
+
+```csharp
+// BAD: expensive endpoint has no rate limit
+app.MapPost("/imports", HandleAsync)
+    .RequireAuthorization();
+```
+
+Rate limits must be load tested before production. Do not partition limits by untrusted arbitrary input because it can create unbounded limiter state.
 
 ---
 

@@ -39,7 +39,7 @@ async function Page({ params }: Props) {
 // GOOD: client component only handles interaction
 // features/posts/detail/PostPublishButton.tsx
 "use client"
-// Needs onClick handler and isPending state — client component required.
+// Needs onClick handler and isPending state - client component required.
 
 type PostPublishButtonProps = {
   postId: string
@@ -88,7 +88,7 @@ function PostDetail({ postId }: { postId: string }) {
 Every `page.tsx` file in `app/` is a thin shell. The page file handles Next.js-specific concerns only: `params` and `searchParams` extraction (with `await`), `notFound()` calls, and metadata export. The feature component handles all rendering.
 
 ```typescript
-// GOOD: app/(main)/posts/[id]/page.tsx — thin shell
+// GOOD: app/(main)/posts/[id]/page.tsx - thin shell
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { PostDetailPage } from "@/features/posts/detail/PostDetailPage"

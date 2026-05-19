@@ -64,7 +64,7 @@ import type { paths } from "@workspace/api-types"
 // See ADR 0012 for the decision.
 
 export async function getApiClient() {
-  // cookies() is async in Next.js 15+/16 — must be awaited
+  // cookies() is async in Next.js 15+/16 - must be awaited
   const cookieStore = await cookies()
   const token = cookieStore.get("access_token")?.value
 
@@ -123,7 +123,7 @@ TanStack Query manages server state that needs client-side freshness: background
 ```typescript
 // components/providers/QueryProvider.tsx
 "use client"
-// Needs useState to create a per-request QueryClient — client component required.
+// Needs useState to create a per-request QueryClient - client component required.
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useState } from "react"
@@ -157,7 +157,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 import type { PostId, AuthorId } from "@/lib/types/branded"
 
 // Query keys are defined as a const object per feature.
-// This mirrors the IPostReadStore interface naming on the backend.
+// This mirrors the backend aggregate and query naming.
 export const postQueryKeys = {
   all: ["posts"] as const,
   byId: (id: PostId) => ["posts", id] as const,
@@ -305,7 +305,7 @@ type ProblemDetails = {
 export function handleApiError(error: ProblemDetails): never {
   switch (error.status) {
     case 400:
-      // ApplicationValidationException: show field errors
+      // CommandValidationException or QueryValidationException: show field errors
       throw new ValidationError(error.detail ?? "Validation failed", error.errors)
     case 401:
       // Not authenticated: redirect to login
@@ -378,7 +378,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```typescript
 // features/posts/create/CreatePostForm.tsx (excerpt)
 "use client"
-// Needs useActionState and toast notifications — client component required.
+// Needs useActionState and toast notifications - client component required.
 
 import { useActionState, useEffect } from "react"
 import { toast } from "sonner"
@@ -419,7 +419,7 @@ type Props = {
 }
 
 async function PostListPage({ searchParams }: Props) {
-  // searchParams is a Promise in Next.js 15+/16 — must be awaited
+  // searchParams is a Promise in Next.js 15+/16 - must be awaited
   const { page = "1", pageSize = "20" } = await searchParams
   const client = await getApiClient()
   const { data } = await client.GET("/posts", {
@@ -452,7 +452,90 @@ export function useInfinitePosts() {
 
 ---
 
-## 9. Optimistic Updates
+## 9. Authorization in Data Fetching
+
+Authorization is enforced on the server. Frontend checks are for user experience only.
+
+Server components, Server Actions, and Route Handlers that read protected data MUST call the project auth helper and pass the authenticated token to the backend API client.
+
+```typescript
+// GOOD: Server Action checks auth before mutation
+"use server"
+
+import { auth } from "@/lib/auth"
+import { getApiClient } from "@/lib/api/client"
+
+export async function assignTicketAction(ticketId: string, assigneeId: string) {
+  const session = await auth()
+  if (!session) {
+    throw new Error("Not authenticated")
+  }
+
+  const client = await getApiClient()
+  return client.POST("/tickets/{id}/assign", {
+    params: { path: { id: ticketId } },
+    body: { assigneeId },
+  })
+}
+```
+
+```typescript
+// BAD: UI hiding is treated as authorization
+if (!user.isAdmin) return null
+await fetch("/api/admin/delete-user", { method: "POST" })
+```
+
+Client components may hide or disable controls based on permissions, but the backend and Server Actions must still enforce authorization.
+
+---
+
+## 10. Real-Time Updates
+
+Real-time messages are invalidation signals. They do not replace server reads.
+
+Use SignalR only from client components or client hooks. On a message, invalidate TanStack Query keys or call `router.refresh()` for server-rendered data. See `docs/conventions/shared/realtime-updates.md`.
+
+```typescript
+// GOOD: real-time event invalidates server state
+connection.on("ticketChanged", (ticketId: string) => {
+  queryClient.invalidateQueries({
+    queryKey: ticketQueryKeys.byId(ticketId),
+  })
+})
+```
+
+```typescript
+// BAD: real-time event stores server state in Zustand
+connection.on("ticketChanged", (ticket) => {
+  useTicketStore.setState({ ticket })
+})
+```
+
+---
+
+## 11. Loading and Empty States
+
+Every route that fetches data MUST provide a loading state. Use `loading.tsx` for route-level streaming and component-level skeletons for nested Suspense boundaries.
+
+List pages MUST define empty, loading, error, and loaded states. Empty state text should tell the user what exists, not explain implementation.
+
+```typescript
+// GOOD: route-level loading file
+export default function Loading() {
+  return <PostListSkeleton />
+}
+```
+
+```typescript
+// BAD: blank loading state
+export default function Loading() {
+  return null
+}
+```
+
+---
+
+## 12. Optimistic Updates
 
 Use `useOptimistic` (React 19) when the optimistic state feeds back into a server-rendered component tree and the mutation is triggered by a Server Action. Use TanStack Query's built-in `variables` optimism for client-side mutations managed by `useMutation`.
 
@@ -461,7 +544,7 @@ Use `useOptimistic` (React 19) when the optimistic state feeds back into a serve
 ```typescript
 // features/posts/list/PostListWithOptimisticPublish.tsx
 "use client"
-// Needs useOptimistic for immediate UI feedback — client component required.
+// Needs useOptimistic for immediate UI feedback - client component required.
 
 import { useOptimistic, useTransition } from "react"
 import { publishPostAction } from "../publish/publishPost.action"
@@ -505,7 +588,7 @@ export function PostListWithOptimisticPublish({ posts }: Props) {
 
 ---
 
-## 10. TanStack Query Security Notice
+## 13. TanStack Query Security Notice
 
 > **Security Notice:** On May 11, 2026, malicious package versions were published to npm across 42 `@tanstack/*` packages (GitHub Security Advisory GHSA-g7cv-rxg3-hmpx). Verify your lockfile pins a version prior to the attack window or after remediation. Run `npm audit` or `pnpm audit` to check. Do not upgrade TanStack Query without verifying the specific version is safe.
 
@@ -513,7 +596,7 @@ The current verified safe version is **5.100.10**. Check the GitHub advisory for
 
 ---
 
-## 11. Project-Specific Data Fetching Configuration
+## 14. Project-Specific Data Fetching Configuration
 
 > **Project teams: fill in this section when adopting these standards.**
 

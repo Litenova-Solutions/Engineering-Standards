@@ -93,7 +93,7 @@ URL state is the correct home for state that should persist across page refreshe
 ```typescript
 // features/posts/list/usePostFilters.ts
 "use client"
-// Needs useRouter and useSearchParams — client component hook required.
+// Needs useRouter and useSearchParams - client component hook required.
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useTransition } from "react"
@@ -160,7 +160,7 @@ export type CreatePostInput = z.infer<typeof createPostSchema>
 ```typescript
 // features/posts/create/CreatePostForm.tsx
 "use client"
-// Needs useForm, useState, and form event handlers — client component required.
+// Needs useForm, useState, and form event handlers - client component required.
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -235,7 +235,7 @@ For forms that do not need complex client-side validation UX, `useActionState` w
 ```typescript
 // features/posts/publish/PublishPostForm.tsx
 "use client"
-// Needs useActionState for form state management — client component required.
+// Needs useActionState for form state management - client component required.
 
 import { useActionState } from "react"
 import { publishPostAction } from "./publishPost.action"
@@ -278,7 +278,65 @@ export function PublishPostForm({ postId }: Props) {
 
 ---
 
-## 8. Discriminated Unions for State Modeling
+## 8. Form Error Display
+
+Validation errors returned from the backend use `ProblemDetails`. Field errors appear next to the field. Form-level errors appear once near the submit button or at the top of the form.
+
+```typescript
+// GOOD: field and form errors are displayed separately
+{form.formState.errors.title && (
+  <FormMessage>{form.formState.errors.title.message}</FormMessage>
+)}
+
+{serverError && (
+  <p role="alert" className="text-sm text-destructive">
+    {serverError}
+  </p>
+)}
+```
+
+```typescript
+// BAD: every error is collapsed into a generic toast
+toast.error("Something went wrong")
+```
+
+Use toasts for completion feedback and non-field failures. Do not use toasts as the only place where validation errors appear.
+
+---
+
+## 9. File Uploads
+
+File uploads use Server Actions or route handlers that stream to the backend or storage provider. Client components may collect files, show previews, and display progress, but they must not contain storage credentials.
+
+Rules:
+
+- Validate file type, size, and count on the server.
+- Store files through a narrow Infrastructure interface.
+- Virus scan or quarantine user-uploaded files when the project handles untrusted documents.
+- Do not persist uploads until the command that owns the business operation succeeds.
+- Do not put file bytes in Zustand or TanStack Query cache.
+
+```typescript
+// GOOD: Zod validates File metadata in a Server Action
+const uploadSchema = z.object({
+  attachment: z.instanceof(File)
+    .refine(file => file.size <= 10 * 1024 * 1024, {
+      error: "File must be 10 MB or smaller",
+    }),
+})
+```
+
+```typescript
+// BAD: client-only file validation is treated as sufficient
+if (file.size > maxSize) {
+  return
+}
+await uploadFile(file)
+```
+
+---
+
+## 10. Discriminated Unions for State Modeling
 
 TypeScript discriminated unions are the correct way to model states that have different shapes. They are the frontend equivalent of a backend state machine. They make impossible states impossible at compile time.
 
@@ -317,7 +375,7 @@ Map backend aggregate states to discriminated unions at the API boundary. The fr
 
 ---
 
-## 9. Project-Specific State Conventions
+## 11. Project-Specific State Conventions
 
 > **Project teams: fill in this section when adopting these standards.**
 

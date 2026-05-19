@@ -9,7 +9,7 @@ This document is a concise reference for naming conventions that apply across al
 | Concept | Convention | Example |
 |:---|:---|:---|
 | Class | `PascalCase` | `PostRepository`, `CreatePostCommandHandler` |
-| Interface | `IPascalCase` | `IPostRepository`, `IPostReadStore` |
+| Interface | `IPascalCase` | `IPostRepository`, `IDatabaseContext` |
 | Record | `PascalCase` | `PostResult`, `CreatePostCommand` |
 | Abstract class | `PascalCase` | `DomainException`, `AggregateNotFoundException` |
 | Enum | `PascalCase` (type and values) | `OrderStatus.Pending`, `OrderStatus.Placed` |
@@ -110,8 +110,8 @@ Event handler class names follow the pattern `{Action}On{EventName}EventHandler`
 
 ```csharp
 // GOOD: name describes the action and the triggering event
-UpdateReadModelOnPostPublishedEventHandler
 SendConfirmationOnOrderPlacedEventHandler
+NotifySubscribersOnPostPublishedEventHandler
 LogOnCustomerRegisteredEventHandler
 
 // BAD: name only describes the event, not the action

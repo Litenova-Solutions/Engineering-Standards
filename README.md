@@ -14,14 +14,14 @@ This repository is for engineers, human and AI, working on any [Litenova Solutio
 
 Add this repository as a git submodule. Two path conventions are available:
 
-**Option A — Visible path `standards/` (recommended for team projects)**
+**Option A - Visible path `standards/` (recommended for team projects)**
 
 ```bash
 git submodule add https://github.com/Litenova-Solutions/engineering-standards.git standards
 git submodule update --init --recursive
 ```
 
-**Option B — Hidden path `.standards/` (useful for solo projects)**
+**Option B - Hidden path `.standards/` (useful for solo projects)**
 
 The dot-prefix hides the folder from most file explorers while keeping it accessible to agents and tooling.
 
@@ -111,8 +111,9 @@ engineering-standards/
 │       ├── 00-standards-meta.mdc                    Cursor meta-rules for editing this standards repo.
 │       └── 10-backend-csharp.mdc                    Cursor backend C# rules summary.
 └── docs/
-    ├── philosophy.md                                 Why the architecture is designed the way it is.
-    ├── agentic-development.md                        How and why standards are built for agentic development.
+    ├── appendix-rationale.md                         Short rationale appendix for humans.
+    ├── philosophy.md                                 Extended human-facing architecture rationale.
+    ├── agentic-development.md                        Extended human-facing agentic development rationale.
     ├── adr/
     │   ├── README.md                                 ADR index and instructions.
     │   ├── 0001-agentic-development-as-primary-model.md
@@ -128,15 +129,24 @@ engineering-standards/
     │   ├── 0011-turborepo-as-monorepo-tool.md
     │   ├── 0012-openapi-typescript-client-generation.md
     │   ├── 0013-authjs-v5-authentication.md
-    │   └── 0014-animation-tailwind-first-framer-motion-escalation.md
+    │   ├── 0014-animation-tailwind-first-framer-motion-escalation.md
+    │   ├── 0015-idatabasecontext-over-per-aggregate-read-stores.md
+    │   ├── 0016-transaction-pipeline-behaviors.md
+    │   ├── 0017-pagination-convention.md
+    │   ├── 0018-opentelemetry-observability.md
+    │   ├── 0019-api-versioning-policy.md
+    │   ├── 0020-signalr-for-real-time-updates.md
+    │   └── 0021-multi-tenancy-default.md
     ├── architecture/
     │   └── clean-architecture.md                     Full Clean Architecture guide for all projects.
+    ├── guides/
+    │   └── add-new-feature.md                        End-to-end feature checklist.
     ├── templates/                                    Templates for project-specific documentation. Copy these into each project repository.
     │   ├── ubiquitous-language.md                    Template for the domain term glossary.
     │   ├── aggregate-inventory.md                    Template for listing all aggregates and domain events.
     │   ├── feature-inventory.md                      Template for listing all implemented and planned use cases.
     │   ├── exception-inventory.md                    Template for listing all custom exception types.
-    │   ├── read-store-inventory.md                   Template for listing all read store interfaces and projections.
+    │   ├── read-model-inventory.md                   Template for listing read-side context and query handlers.
     │   ├── project-agents.md                         Template for the per-project AGENTS.md file.
     │   ├── frontend-feature-inventory.md             Template for listing all frontend routes and use cases.
     │   └── frontend-api-endpoints.md                 Template for documenting consumed backend API endpoints.
@@ -146,20 +156,28 @@ engineering-standards/
         │   ├── 01-solution-structure.md              .NET solution layout, tooling, and project references.
         │   ├── 02-domain-layer.md                    Domain layer design guide.
         │   ├── 03-application-layer.md               Application layer (five-project split, CQRS, handlers).
-        │   ├── 04-infrastructure-layer.md            Infrastructure layer (EF Core, repos, read stores).
+        │   ├── 04-infrastructure-layer.md            Infrastructure layer (EF Core, repos, jobs, reliability).
         │   ├── 05-api-layer.md                       API layer (IEndpoint pattern, Minimal APIs).
         │   ├── 06-exception-hierarchy.md             Exception types, categories, and HTTP mappings.
-        │   ├── 07-query-read-strategy.md             Read-side strategy using read stores.
-        │   └── 08-testing.md                         Testing philosophy, patterns, and structure.
+        │   ├── 07-query-read-strategy.md             Read-side strategy using IDatabaseContext projections.
+        │   ├── 08-testing.md                         Testing philosophy, patterns, and structure.
+        │   ├── 09-observability.md                   Logs, metrics, tracing, correlation IDs, health checks.
+        │   ├── 10-reliability.md                     Idempotency, outbox, retries, failure handling.
+        │   ├── 11-background-jobs.md                 Hosted services, durable jobs, scheduling.
+        │   ├── 12-caching.md                         Cache types, keys, invalidation, metrics.
+        │   └── 13-deployment-and-migrations.md       Deployment gates and migration safety.
         ├── frontend/
         │   ├── 01-nextjs-app-router.md               Next.js 16 App Router conventions.
         │   ├── 02-components.md                      React component design conventions.
         │   ├── 03-data-fetching.md                   Data fetching patterns.
-        │   └── 04-state-and-forms.md                 State management and forms.
+        │   ├── 04-state-and-forms.md                 State management, forms, errors, uploads.
+        │   └── 05-internationalization.md            Locale routing, messages, formatting.
         └── shared/
             ├── naming.md                             Cross-layer naming conventions.
             ├── git-workflow.md                       Branch, commit, and PR conventions.
+            ├── ci.md                                 CI gates and local verification.
             ├── security.md                           Security baseline requirements.
+            ├── realtime-updates.md                   SignalR and frontend invalidation conventions.
             └── adr-template.md                       Architecture Decision Record template.
 ```
 
@@ -171,20 +189,33 @@ engineering-standards/
 | `docs/conventions/backend/01-solution-structure.md` | Standard .NET solution layout, tooling configuration, and NuGet package policy. |
 | `docs/conventions/backend/02-domain-layer.md` | Aggregates, value objects, domain events, strongly-typed IDs, and domain exception design. |
 | `docs/conventions/backend/03-application-layer.md` | Five-project application layer split, command/query/event handler patterns, and validators. |
-| `docs/conventions/backend/04-infrastructure-layer.md` | EF Core configuration, repository and read store implementations, and DI registration. |
+| `docs/conventions/backend/04-infrastructure-layer.md` | EF Core configuration, repositories, jobs, reliability infrastructure, and DI registration. |
 | `docs/conventions/backend/05-api-layer.md` | Minimal API `IEndpoint` pattern, request/response models, and OpenAPI documentation rules. |
 | `docs/conventions/backend/06-exception-hierarchy.md` | Exception hierarchy, categories, HTTP status mappings, and the `GlobalExceptionHandler`. |
-| `docs/conventions/backend/07-query-read-strategy.md` | Read store pattern for query handlers and the escalation path to raw SQL. |
+| `docs/conventions/backend/07-query-read-strategy.md` | `IDatabaseContext` projection pattern for query handlers and the escalation path to raw SQL. |
 | `docs/conventions/backend/08-testing.md` | Testing philosophy, test project structure, naming conventions, and architecture tests. |
+| `docs/conventions/backend/09-observability.md` | Structured logging, correlation IDs, OpenTelemetry, health checks, alerts. |
+| `docs/conventions/backend/10-reliability.md` | Idempotency keys, outbox escalation, retries, and failure handling. |
+| `docs/conventions/backend/11-background-jobs.md` | Hosted services, durable job tables, scheduling, and job boundaries. |
+| `docs/conventions/backend/12-caching.md` | Cache selection, key naming, invalidation, and cache metrics. |
+| `docs/conventions/backend/13-deployment-and-migrations.md` | Expand and contract migrations, release gates, feature flags, and seed data. |
 | `docs/conventions/frontend/01-nextjs-app-router.md` | Next.js 16 App Router conventions: server vs. client components, proxy.ts, React Compiler, caching. |
 | `docs/conventions/frontend/02-components.md` | React component design: taxonomy, shadcn/ui ownership, cva variants, branded types, accessibility. |
-| `docs/conventions/frontend/03-data-fetching.md` | Data fetching: server components, TanStack Query, Server Actions, error handling, optimistic updates. |
-| `docs/conventions/frontend/04-state-and-forms.md` | State management and forms: Zustand, React Hook Form with Zod v4, useActionState, discriminated unions. |
+| `docs/conventions/frontend/03-data-fetching.md` | Data fetching: server components, TanStack Query, Server Actions, authorization, realtime, loading states. |
+| `docs/conventions/frontend/04-state-and-forms.md` | State management and forms: Zustand, React Hook Form with Zod v4, errors, uploads, useActionState. |
+| `docs/conventions/frontend/05-internationalization.md` | Locale routing, message ownership, formatting, and backend contract rules. |
+| `docs/conventions/shared/naming.md` | Cross-layer naming conventions. |
+| `docs/conventions/shared/git-workflow.md` | Branch, commit, PR, and merge conventions. |
+| `docs/conventions/shared/ci.md` | CI gates, OpenAPI freshness, vulnerability scans, and local hooks. |
+| `docs/conventions/shared/security.md` | Security baseline: auth, rate limits, CORS, CSP, audit, PII, dependency scanning. |
+| `docs/conventions/shared/realtime-updates.md` | SignalR as the real-time standard and frontend cache invalidation rules. |
+| `docs/conventions/shared/adr-template.md` | ADR template and filing rules. |
+| `docs/guides/add-new-feature.md` | End-to-end checklist for adding a feature across backend and frontend layers. |
 | `docs/templates/ubiquitous-language.md` | Template for the domain term glossary. Copy to `docs/domain/` in a project repository. |
 | `docs/templates/aggregate-inventory.md` | Template for listing all aggregates, states, domain events, and repository interfaces. |
 | `docs/templates/feature-inventory.md` | Template for listing all implemented and planned use cases with handler class names. |
 | `docs/templates/exception-inventory.md` | Template for listing all custom exception types with categories and HTTP status codes. |
-| `docs/templates/read-store-inventory.md` | Template for listing all read store interfaces and the projection types they return. |
+| `docs/templates/read-model-inventory.md` | Template for listing `IDatabaseContext` properties, query handlers, and denormalized read models. |
 | `docs/templates/project-agents.md` | Template for the per-project `AGENTS.md` file that imports these standards. |
 | `docs/templates/frontend-feature-inventory.md` | Template for listing all frontend routes and use cases. Copy to `docs/domain/` in each project. |
 | `docs/templates/frontend-api-endpoints.md` | Template for documenting which backend API endpoints the frontend consumes. |
@@ -199,7 +230,7 @@ engineering-standards/
 | `docs/adr/0004-litebus-as-mediator.md` | Selects LiteBus as the mediator for commands, queries, and events. |
 | `docs/adr/0005-minimal-api-endpoint-classes.md` | Adopts the `IEndpoint` pattern over MVC controllers for all HTTP endpoints. |
 | `docs/adr/0006-contracts-projects-for-application-layer.md` | Introduces Contracts projects to give WebApi a minimal, stable dependency surface. |
-| `docs/adr/0007-read-store-pattern-for-queries.md` | Establishes the read store interface pattern as the default for all query handlers. |
+| `docs/adr/0007-read-store-pattern-for-queries.md` | Historical ADR for the superseded read store interface pattern. |
 | `docs/adr/0008-reactions-project-depends-only-on-abstractions.md` | Requires the Reactions project to define narrow interfaces rather than referencing external libraries directly. |
 | `docs/adr/0009-architecture-tests-as-enforcement.md` | Adds architecture tests using NetArchTest to enforce structural rules that project references cannot enforce. |
 | `docs/adr/0010-outbox-pattern-as-reliability-escalation.md` | Documents the outbox pattern as the escalation path for reliable event dispatch. |
@@ -207,6 +238,13 @@ engineering-standards/
 | `docs/adr/0012-openapi-typescript-client-generation.md` | Establishes openapi-typescript for type-safe API client generation with owned openapi-fetch source. |
 | `docs/adr/0013-authjs-v5-authentication.md` | Adopts Auth.js v5 as the authentication standard with proxy.ts for optimistic redirects only. |
 | `docs/adr/0014-animation-tailwind-first-framer-motion-escalation.md` | Tailwind CSS transitions as the default; Framer Motion added only when Tailwind is insufficient. |
+| `docs/adr/0015-idatabasecontext-over-per-aggregate-read-stores.md` | Replaces per-aggregate read stores with the `IDatabaseContext` projection pattern. |
+| `docs/adr/0016-transaction-pipeline-behaviors.md` | Moves transaction management and persistence into LiteBus pipeline behaviors. |
+| `docs/adr/0017-pagination-convention.md` | Establishes offset pagination with `PagedResult<T>` for HTTP list endpoints. |
+| `docs/adr/0018-opentelemetry-observability.md` | Adopts OpenTelemetry for metrics and traces with Serilog for structured logs. |
+| `docs/adr/0019-api-versioning-policy.md` | Defines when APIs are versioned and chooses URL path versioning for public APIs. |
+| `docs/adr/0020-signalr-for-real-time-updates.md` | Adopts SignalR for real-time updates and frontend invalidation. |
+| `docs/adr/0021-multi-tenancy-default.md` | Sets multi-tenancy as a project-level decision, out of scope by default. |
 
 ## Project-Specific Documentation
 

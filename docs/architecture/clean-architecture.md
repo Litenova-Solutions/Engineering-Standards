@@ -40,7 +40,7 @@ graph TD
 
 ### Domain
 
-The Domain layer contains the core business model. It has zero dependencies on any other project in the solution and zero dependencies on any external framework.
+The Domain layer contains the core business model. It has zero dependencies on any other project in the solution and no dependency on persistence, web, UI, or messaging frameworks. It may use the .NET BCL and the approved guard clause package. Its aggregate shape is deliberately compatible with EF Core materialisation, but the Domain project does not reference EF Core.
 
 **Contains:**
 - Aggregate roots and their child entities
@@ -55,7 +55,8 @@ The Domain layer contains the core business model. It has zero dependencies on a
 - Any reference to `Microsoft.AspNetCore.*`
 - Application models, DTOs, or read projection types
 - Infrastructure concerns: connection strings, HTTP clients, file paths
-- Private parameterless constructors and private collection backing fields are *permitted* in aggregate roots even though they exist primarily for EF Core materialisation compatibility. The Domain project has no package reference to EF Core; the compatibility is structural, not a package dependency.
+
+Private parameterless constructors and private collection backing fields are permitted in aggregate roots even though they exist primarily for EF Core materialisation compatibility. The compatibility is structural, not a package dependency.
 
 ### Application.Write.Contracts
 
@@ -127,7 +128,7 @@ Event handler implementations that react to domain events.
 - Event handler implementations (`IEventHandler<TEvent>`)
 - Narrow, per-handler interfaces for external side effects (`IPostPublishedNotifier`)
 - References: `Application.Write.Contracts`, `Application.Read.Contracts`, `Domain`
-- NuGet reference: `LiteBus.Events.Abstractions`
+- NuGet references: `LiteBus.Events.Abstractions`; `LiteBus.Commands.Abstractions` only when a handler dispatches follow-up commands
 
 **Forbidden:**
 - Any reference to external library packages (EF Core, email clients, HTTP clients)
@@ -165,7 +166,7 @@ The HTTP adapter. Translates HTTP requests into application commands and queries
 
 **Forbidden:**
 - Business logic of any kind
-- Direct access to repositories, read stores, or `DbContext`
+- Direct access to repositories, `IDatabaseContext`, or `DbContext`
 - `try-catch` blocks (handled by `GlobalExceptionHandler`)
 - Domain types in response models
 
@@ -247,7 +248,7 @@ LiteBus is a modular mediator. Each project references only the package it needs
 
 | LiteBus Package | Project | Purpose |
 |:---|:---|:---|
-| `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write` | `ICommand`, `ICommandHandler`, `ICommandValidator`, `ICommandMediator` |
+| `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write`, `Application.Reactions` | `ICommand`, `ICommandHandler`, `ICommandValidator`, `ICommandMediator` |
 | `LiteBus.Queries.Abstractions` | `Application.Read.Contracts`, `Application.Read` | `IQuery`, `IQueryHandler`, `IQueryValidator`, `IQueryMediator` |
 | `LiteBus.Events.Abstractions` | `Application.Reactions` | `IEvent`, `IEventHandler`, `IEventPublisher` |
 | `LiteBus.Extensions.Microsoft.DependencyInjection` | `WebApi` | Full DI registration |
@@ -280,13 +281,14 @@ sealed class CreatePostEndpoint : IEndpoint
 
 ## 6. Event Handling and the Reactions Project
 
-Domain events originate in aggregates. An aggregate method raises a domain event by calling `RaiseDomainEvent(new PostPublished(Id))`. LiteBus dispatches these events after the command handler completes.
+Domain events originate in aggregates. An aggregate method raises a domain event by calling `RaiseDomainEvent(new PostPublished(Id))`. Infrastructure collects these events during the command pipeline and dispatches them after the aggregate changes are committed, or writes them to the outbox when durable delivery is required.
 
-The `Application.Reactions` project contains event handlers. Each handler reacts to one domain event. There are three categories:
+The `Application.Reactions` project contains event handlers. Each handler reacts to one domain event. There are two default categories:
 
-1. **Dispatches a command:** The handler receives an event and sends a follow-up command via `IMessageBus`. Example: `OnOrderPlaced` dispatches a `SendOrderConfirmationEmailCommand`.
-2. **Updates a read model projection:** The handler receives an event and updates a denormalized read model. Example: `OnPostPublished` updates a `PublishedPostsSummary` table.
-3. **Triggers an external side effect:** The handler receives an event and calls a narrow interface to notify an external system. Example: `OnPostPublished` calls `IPostPublishedNotifier.NotifySubscribersAsync(...)`.
+1. **Dispatches a follow-up command:** The handler receives an event and sends a command via `ICommandMediator`. Use this only when eventual consistency is acceptable and the command is idempotent.
+2. **Triggers an external side effect through a narrow interface:** The handler receives an event and calls a project-owned interface such as `IPostPublishedNotifier`.
+
+Read model projection updates are not a default Reactions category. Query handlers read through `IDatabaseContext` projections by default. If a project needs denormalized read model tables, document the projection ownership in a project ADR and use the outbox pattern when stale projections are not acceptable.
 
 The Reactions project MUST NOT reference external libraries. All external capabilities are accessed through narrow interfaces defined in the Reactions project and implemented by Infrastructure.
 
@@ -462,14 +464,14 @@ builder.Services.AddLiteBus(liteBus =>
 {
     liteBus.AddCommandModule(module =>
     {
-        // Application.Write assembly — command handlers and validators
+        // Application.Write assembly - command handlers and validators
         module.RegisterFromAssembly(
             typeof(CreatePostCommandHandler).Assembly);
     });
 
     liteBus.AddCommandModule(module =>
     {
-        // Infrastructure assembly — global pipeline behaviors
+        // Infrastructure assembly - global pipeline behaviors
         // Explicit registration makes pipeline behaviors visible
         // to engineers reading Program.cs
         module.Register(typeof(TransactionCommandPreHandler));
@@ -486,7 +488,7 @@ builder.Services.AddLiteBus(liteBus =>
     liteBus.AddEventModule(module =>
     {
         module.RegisterFromAssembly(
-            typeof(UpdateReadModelOnPostPublishedEventHandler).Assembly);
+            typeof(NotifySubscribersOnPostPublishedEventHandler).Assembly);
     });
 });
 ```

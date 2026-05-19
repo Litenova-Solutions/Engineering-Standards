@@ -313,7 +313,7 @@ Add an `error.tsx` at the feature level, not at the root `app/` level for most c
 ```typescript
 // app/(main)/posts/error.tsx
 "use client"
-// Error boundaries must be client components — required by Next.js.
+// Error boundaries must be client components - required by Next.js.
 
 import { useEffect } from "react"
 
@@ -341,7 +341,36 @@ export default function PostsError({ error, reset }: Props) {
 
 ---
 
-## 10. Project-Specific Component Conventions
+## 10. Loading, Empty, and Permission States
+
+Feature pages MUST render stable states for loading, empty results, forbidden actions, and errors. Do not leave blank space while data loads.
+
+Skeletons live next to the component they represent. They use the same layout dimensions as the loaded component to prevent layout shift.
+
+```typescript
+// GOOD: skeleton preserves card shape
+export function PostCardSkeleton() {
+  return (
+    <article className="rounded-md border p-4" aria-hidden="true">
+      <div className="h-5 w-2/3 rounded bg-muted" />
+      <div className="mt-3 h-4 w-full rounded bg-muted" />
+    </article>
+  )
+}
+```
+
+```typescript
+// BAD: loading text changes layout and gives no structure
+export function PostCardSkeleton() {
+  return <p>Loading...</p>
+}
+```
+
+Permission-gated UI may hide or disable controls, but it is never the authorization boundary. Server Actions and backend endpoints must enforce authorization.
+
+---
+
+## 11. Project-Specific Component Conventions
 
 > **Project teams: fill in this section when adopting these standards.**
 

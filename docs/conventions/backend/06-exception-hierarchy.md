@@ -235,7 +235,7 @@ app.UseExceptionHandler();
 
 `Guard.Against` from Ardalis.GuardClauses throws `ArgumentException` and `ArgumentNullException` by default. These are not `CommandValidationException` or `QueryValidationException` subclasses. They map to HTTP 500, not HTTP 400.
 
-`Guard.Against` is appropriate in domain value object constructors where `ArgumentException` is the correct exception type for invalid construction arguments. In validators, always throw custom exception subclasses directly.
+Do not use direct `Guard.Against` calls in validators. In domain code, use explicit checks that throw concrete `DomainException` subclasses, or project-owned custom guard extensions that throw concrete `DomainException` subclasses. Never let `ArgumentException` or `ArgumentNullException` cross the domain or application boundary.
 
 ```csharp
 // GOOD: throw CommandValidationException subclasses directly
