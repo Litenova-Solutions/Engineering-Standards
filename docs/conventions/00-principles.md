@@ -104,16 +104,18 @@ Rules that a linter, formatter, or static analyzer already enforces automaticall
 
 If a rule can be expressed as an `.editorconfig` setting, a Roslyn analyzer, or an ESLint rule, it belongs in that tooling configuration, not in a prose document that agents must read. Keeping agent files free of mechanical rules makes them smaller and more effective.
 
+One exception applies: rules that are *both* tooling-enforceable and consistently violated by AI agents may appear in agent files as a redundant safety net. The `CancellationToken` parameter naming rule and the `'use client'` comment requirement are examples. They belong in `.editorconfig` or ESLint config *and* in the agent file. Duplication here is intentional, not an oversight.
+
 ---
 
 ## 9. Contracts Before Implementation
 
 Every public-facing type (commands, queries, results, read store interfaces) lives in a Contracts project before any handler or implementation is written. This enforces the dependency rule at the compiler level: a project that references only the Contracts project cannot accidentally depend on handler implementations.
 
-The Contracts project is the API surface of a layer. The implementation project is the private body. A WebApi endpoint references `Application.Write.Contracts` for the command type and `LiteBus.Messaging.Abstractions` to dispatch it. It never needs to reference `Application.Write` at all. The boundary is explicit, enforced by the project reference graph, and visible to any engineer reading the solution file.
+The Contracts project is the API surface of a layer. The implementation project is the private body. A WebApi endpoint references `Application.Write.Contracts` for the command type and `LiteBus.Commands.Abstractions` for `ICommandMediator` to dispatch it. For queries, reference `LiteBus.Queries.Abstractions` for `IQueryMediator`. It never needs to reference `Application.Write` at all. The boundary is explicit, enforced by the project reference graph, and visible to any engineer reading the solution file.
 
 ```csharp
-// GOOD: WebApi endpoint references only Contracts types
+// GOOD: WebApi endpoint references only Contracts types and the specific mediator interface
 sealed class CreatePostEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -123,13 +125,13 @@ sealed class CreatePostEndpoint : IEndpoint
 
     private static async Task<IResult> HandleAsync(
         CreatePostRequest request,
-        IMessageBus messageBus,
+        ICommandMediator commandMediator,
         CancellationToken cancellationToken)
     {
         // CreatePostCommand is from Application.Write.Contracts
-        // IMessageBus is from LiteBus.Messaging.Abstractions
+        // ICommandMediator is from LiteBus.Commands.Abstractions
         var command = request.ToCommand();
-        var postId = await messageBus.SendAsync(command, cancellationToken);
+        var postId = await commandMediator.SendAsync(command, cancellationToken: cancellationToken);
         return Results.Created($"/posts/{postId.Value}", postId.ToResponse());
     }
 }

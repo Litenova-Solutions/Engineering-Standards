@@ -1,3 +1,5 @@
+<!-- Last updated: (fill in date when first created in a project) -->
+<!-- Required sections: Standards, Project Tech Stack, Project-Specific Rules -->
 # {ProjectName} - Agent Context
 
 > Copy this file to the project root as `AGENTS.md`. Fill in all `{placeholder}` values. Do not remove the reference to `standards/AGENTS.md`.

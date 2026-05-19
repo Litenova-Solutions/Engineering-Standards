@@ -84,7 +84,7 @@ Every type, property, and method name in the Domain layer reflects the language 
 | State discriminated union base | `{AggregateName}State` | `PostState` |
 | State case | `{StateName}{AggregateName}State` | `DraftPostState`, `PublishedPostState` |
 
-The read-side counterpart to `IXxxRepository` is `IXxxReadStore`, defined in `Application.Read.Contracts`. It is deliberately not called `IXxxReadRepository` because it does not load aggregates. It returns flat projections. The different name reflects the different contract. See `docs/conventions/backend/07-query-read-strategy.md`.
+The read-side pattern for queries is `IDatabaseContext`, defined in `Application.Read.Contracts/Shared/`. Query handlers inject `IDatabaseContext` and write LINQ projections directly. There is no per-aggregate `IXxxReadStore` interface. See `docs/conventions/backend/07-query-read-strategy.md` and ADR 0015.
 
 ---
 
@@ -136,11 +136,118 @@ One folder per aggregate. Repository interfaces live inside the aggregate's fold
 
 ---
 
+## Strongly-Typed ID Reference
+
+A strongly-typed ID is a `readonly record struct` wrapping a `Guid`. Define one per aggregate root. This section shows every piece of supporting infrastructure required to make an ID work end-to-end.
+
+### Base Definition
+
+```csharp
+// Domain/Posts/PostId.cs
+readonly record struct PostId(Guid Value) : IParsable<PostId>
+{
+    public static PostId New() => new(Guid.NewGuid());
+
+    // Required for route and query-string binding (ASP.NET Core model binding)
+    public static PostId Parse(string s, IFormatProvider? provider)
+        => new(Guid.Parse(s));
+
+    public static bool TryParse(string? s, IFormatProvider? provider, out PostId result)
+    {
+        if (Guid.TryParse(s, out var guid))
+        {
+            result = new PostId(guid);
+            return true;
+        }
+        result = default;
+        return false;
+    }
+
+    public override string ToString() => Value.ToString();
+}
+```
+
+### JSON Serialization (System.Text.Json)
+
+Define the converter in Infrastructure or WebApi. Register it in `Program.cs` via `builder.Services.Configure<JsonOptions>(o => o.SerializerOptions.Converters.Add(new PostIdJsonConverter()))`.
+
+```csharp
+// Infrastructure/Converters/PostIdJsonConverter.cs
+sealed class PostIdJsonConverter : JsonConverter<PostId>
+{
+    public override PostId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => new(reader.GetGuid());
+
+    public override void Write(Utf8JsonWriter writer, PostId value, JsonSerializerOptions options)
+        => writer.WriteStringValue(value.Value);
+}
+```
+
+### EF Core Value Converter
+
+Register the value converter in `OnModelCreating` in `AppDbContext`, or in the aggregate's `IEntityTypeConfiguration<T>` class in Infrastructure.
+
+```csharp
+// Infrastructure/Posts/PostConfiguration.cs
+builder.Property(p => p.Id)
+    .HasConversion(id => id.Value, value => new PostId(value));
+```
+
+### OpenAPI Schema
+
+Without registration, OpenAPI documents `PostId` as an object with a `value` property. Register a schema transformer so it documents as a plain `string` (`format: uuid`).
+
+```csharp
+// WebApi/OpenApi/StronglyTypedIdSchemaTransformer.cs
+sealed class StronglyTypedIdSchemaTransformer : IOpenApiSchemaTransformer
+{
+    public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
+    {
+        if (context.JsonTypeInfo.Type.IsAssignableTo(typeof(IParsable<>).MakeGenericType(context.JsonTypeInfo.Type)))
+        {
+            schema.Type = "string";
+            schema.Format = "uuid";
+            schema.Properties.Clear();
+        }
+        return Task.CompletedTask;
+    }
+}
+```
+
+Register in `Program.cs`:
+```csharp
+builder.Services.AddOpenApi(options =>
+{
+    options.AddSchemaTransformer<StronglyTypedIdSchemaTransformer>();
+});
+```
+
+### TypeScript Generated Type
+
+After `openapi-typescript` generates types from the OpenAPI spec, `PostId` appears as `string` (not an object) because the schema transformer emits `type: string, format: uuid`. The generated type alias requires no further adjustment.
+
+### Route Binding
+
+Because `PostId` implements `IParsable<PostId>`, ASP.NET Core's minimal API model binder resolves it automatically from route parameters and query strings. No `TypeConverter` or custom binder is needed.
+
+```csharp
+// GOOD: PostId binds directly from route parameter
+app.MapGet("/posts/{id}", async (PostId id, IQueryMediator queryMediator, CancellationToken cancellationToken) =>
+{
+    var result = await queryMediator.QueryAsync(new GetPostByIdQuery { PostId = id }, cancellationToken: cancellationToken);
+    return Results.Ok(result);
+});
+```
+
+---
+
 ## Aggregate Root Design
 
 ### The AggregateRoot Base Class
 
 Every aggregate root extends `AggregateRoot<TId>` defined in `Domain/Shared/AggregateRoot.cs`. This base class is defined in each project, not provided by a NuGet package. See `docs/architecture/clean-architecture.md` for the canonical implementation.
+
+> **Note on EF Core compatibility.** The private parameterless constructor (`private Post() { }`) and `private set` properties on aggregates exist because EF Core requires a way to materialise objects without calling the public factory method. Collection navigation properties use private `List<T>` backing fields (e.g., `_lines`) configured in Infrastructure via field-mode navigation. The Domain project carries no EF Core package reference, but its structural conventions are deliberately compatible with EF Core materialisation. A future ORM change would require adjustments to aggregate shape.
 
 ```csharp
 // GOOD: aggregate root extends the base class

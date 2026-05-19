@@ -8,8 +8,9 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 2. Read `docs/architecture/clean-architecture.md`.
 3. Read the convention file for the layer you are about to edit (see index below).
 4. If the task involves exceptions: also read `docs/conventions/backend/06-exception-hierarchy.md`.
-5. If the task involves query handlers: also read `docs/conventions/backend/07-query-read-strategy.md`.
-6. Do NOT load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding tasks. Those are human-facing documents that provide no actionable rules for code generation.
+5. If the task involves logging, health checks, or observability: also read `docs/conventions/backend/09-observability.md`.
+6. If the task involves query handlers: also read `docs/conventions/backend/07-query-read-strategy.md`.
+7. Do NOT load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding tasks. Those are human-facing documents that provide no actionable rules for code generation.
 
 ## Tech Stack
 
@@ -81,11 +82,12 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 - MUST NOT add `useMemo`, `useCallback`, or `React.memo` when the React Compiler is enabled.
 - MUST use `sonner` for toast notifications. The shadcn/ui `toast` component is deprecated.
 - MUST import from `radix-ui` not `@radix-ui/react-*` (unified package since February 2026).
+- MUST use `ICommandMediator.SendAsync` for commands and `IQueryMediator.QueryAsync` for queries in WebApi endpoints. Never inject `IMessageBus`.
 
 ## Common Agent Mistakes
 
 - Injecting `ICommandMediator` into an Application.Read handler or `IQueryMediator` into an Application.Write handler. Only inject the mediator interface corresponding to the layer's responsibility.
-- Using `IMessageMediator` or `IMessageBus` instead of the specific `ICommandMediator` or `IQueryMediator`.
+- Using `IMessageBus` (from `LiteBus.Messaging.Abstractions`) instead of `ICommandMediator` (from `LiteBus.Commands.Abstractions`) or `IQueryMediator` (from `LiteBus.Queries.Abstractions`). The unified `IMessageBus` interface is not used in this architecture. Endpoints and handlers always inject the specific mediator type.
 - Injecting `IXxxRepository` or `AppDbContext` directly into a query handler instead of `IDatabaseContext`.
 - Putting handlers or validators in the Contracts projects instead of the implementation projects.
 - Putting mapping logic inside the endpoint handler method instead of the `ApiMappings` class.
@@ -124,6 +126,7 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 | Exceptions | `docs/conventions/backend/06-exception-hierarchy.md` |
 | Query/Read Strategy | `docs/conventions/backend/07-query-read-strategy.md` | IDatabaseContext pattern, LINQ projections, pagination, IStreamQuery for export. |
 | Testing | `docs/conventions/backend/08-testing.md` |
+| Observability | `docs/conventions/backend/09-observability.md` | Serilog structured logging, correlation IDs, health checks. |
 | Naming | `docs/conventions/shared/naming.md` |
 | Git Workflow | `docs/conventions/shared/git-workflow.md` |
 | Security | `docs/conventions/shared/security.md` |

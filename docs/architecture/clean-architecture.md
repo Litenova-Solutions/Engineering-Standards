@@ -2,6 +2,8 @@
 
 This document explains how Clean Architecture is applied across all projects following these standards. Every project follows this structure regardless of domain complexity.
 
+> Key decisions documented in `docs/adr/`: ADR 0002 (Clean Architecture as foundation), ADR 0003 (CQRS project split), ADR 0005 (IEndpoint pattern), ADR 0015 (IDatabaseContext), ADR 0016 (Transaction pipeline behaviors).
+
 ---
 
 ## 1. Layer Diagram
@@ -53,6 +55,7 @@ The Domain layer contains the core business model. It has zero dependencies on a
 - Any reference to `Microsoft.AspNetCore.*`
 - Application models, DTOs, or read projection types
 - Infrastructure concerns: connection strings, HTTP clients, file paths
+- Private parameterless constructors and private collection backing fields are *permitted* in aggregate roots even though they exist primarily for EF Core materialisation compatibility. The Domain project has no package reference to EF Core; the compatibility is structural, not a package dependency.
 
 ### Application.Write.Contracts
 

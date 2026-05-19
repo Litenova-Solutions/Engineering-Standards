@@ -267,6 +267,8 @@ internal sealed class AppDbContext : DbContext, IDatabaseContext
 
 When a new aggregate is added to the domain, add its `DbSet<T>` property here and add the corresponding `IQueryable<T>` property to `IDatabaseContext` in `Application.Read.Contracts`.
 
+> **Note on assembly visibility.** `AppDbContext` is `internal sealed` within the Infrastructure assembly. The DI container resolves it at runtime via the interface registration `services.AddScoped<IDatabaseContext>(sp => sp.GetRequiredService<AppDbContext>())`. This works because .NET's DI container uses runtime types, bypassing compile-time visibility. The `Application.Read` project references `IDatabaseContext` only; it never references `AppDbContext` or the Infrastructure assembly directly.
+
 ---
 
 ## Transaction Pipeline Behaviors

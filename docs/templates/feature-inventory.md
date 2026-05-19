@@ -1,3 +1,5 @@
+<!-- Last updated: (fill in date when first created in a project) -->
+<!-- Required sections: Implemented Features, Planned Features -->
 # Feature Inventory
 
 > Copy this file into `docs/domain/feature-inventory.md` in your project repository and keep it current as features are added. Update this table in the same PR that adds or removes a handler.

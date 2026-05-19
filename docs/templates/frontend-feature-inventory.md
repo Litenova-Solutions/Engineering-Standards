@@ -1,3 +1,5 @@
+<!-- Last updated: (fill in date when first created in a project) -->
+<!-- Required sections: Feature and Route Inventory -->
 # Frontend Feature Inventory
 
 This file is filled in per project and kept current as features are added or removed. It gives agents a complete map of all frontend features, use cases, and routes before they generate new components or pages. Consulting this file before creating a new page prevents duplicate routes, naming conflicts, and misaligned use case boundaries.

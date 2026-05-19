@@ -1,3 +1,5 @@
+<!-- Last updated: (fill in date when first created in a project) -->
+<!-- Required sections: Read Stores, Query Handlers per Store -->
 # Read Store Inventory
 
 > Copy this file into `docs/domain/read-store-inventory.md` in your project repository and fill it in. Update it whenever a new read store interface or projection type is added.

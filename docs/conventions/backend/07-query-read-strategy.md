@@ -2,6 +2,8 @@
 
 This document defines the read-side strategy for all query handlers. The `IDatabaseContext` pattern is the standard. The per-aggregate read store pattern was superseded by this approach (see ADR 0015).
 
+> This convention implements ADR 0015 (supersedes ADR 0007). Read ADR 0015 for the full decision rationale and trade-offs.
+
 ---
 
 ## 1. Why IDatabaseContext

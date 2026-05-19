@@ -50,7 +50,7 @@ Unit tests for aggregates, value objects, and domain services. No mocking framew
 
 ### `{ProjectName}.Application.Tests`
 
-Unit tests for command handlers, validators, and event handlers use NSubstitute to mock repository interfaces. Query handler tests use Testcontainers against a real PostgreSQL database. Query handlers write EF Core LINQ projections directly against `IDatabaseContext`. Mocking `IDatabaseContext` with an in-memory collection would not test the EF Core translation, which is where most query bugs occur. Use Testcontainers for query handler tests to catch translation issues early. Do not mock domain types; construct them directly.
+Unit tests for command handlers, validators, and event handlers use NSubstitute to mock repository interfaces. Query handler tests use the EF Core SQLite in-memory provider via `InMemoryDbContextFactory`. This exercises real EF Core query translation without requiring a running database, keeping Application.Tests a fast, dependency-free unit test project.
 
 ### `{ProjectName}.Integration.Tests`
 
@@ -181,40 +181,55 @@ public sealed class CreatePostCommandHandlerTests
 
 ### Query Handler Test
 
-Query handler tests use Testcontainers against a real PostgreSQL database. Mocking `IDatabaseContext` would not validate EF Core query translation.
+Query handler tests use EF Core's SQLite in-memory provider. The `IDatabaseContext` interface is satisfied by a real `AppDbContext` wired to an in-memory SQLite database, so EF Core query translation is exercised without requiring a running PostgreSQL instance. Application.Tests is a unit test project; no containers or external processes are needed.
+
+Add the SQLite provider package to the test project:
+```xml
+<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+```
+
+```csharp
+// Application.Tests/Fixtures/InMemoryDbContextFactory.cs
+static class InMemoryDbContextFactory
+{
+    public static AppDbContext Create()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseSqlite("DataSource=:memory:")
+            .Options;
+        var db = new AppDbContext(options);
+        db.Database.OpenConnection();
+        db.Database.EnsureCreated();
+        return db;
+    }
+}
+```
 
 ```csharp
 // Application.Tests/Posts/GetPostByIdQueryHandlerTests.cs
-public sealed class GetPostByIdQueryHandlerTests
-    : IClassFixture<PostgreSqlFixture>
+public sealed class GetPostByIdQueryHandlerTests : IDisposable
 {
-    private readonly PostgreSqlFixture _fixture;
+    private readonly AppDbContext _db = InMemoryDbContextFactory.Create();
 
-    public GetPostByIdQueryHandlerTests(PostgreSqlFixture fixture)
-    {
-        _fixture = fixture;
-    }
+    public void Dispose() => _db.Dispose();
 
     [Fact]
     public async Task HandleAsync_WhenPostExists_ShouldReturnPostResult()
     {
-        // Arrange
-        await using var dbContext = _fixture.CreateDbContext();
         var post = Post.Create(
             PostId.New(),
             new PostTitle("Test Post"),
             new PostContent("Content"),
             new AuthorId(Guid.NewGuid()));
-        await dbContext.Posts.AddAsync(post);
-        await dbContext.SaveChangesAsync();
 
-        var handler = new GetPostByIdQueryHandler(dbContext);
+        await _db.Posts.AddAsync(post);
+        await _db.SaveChangesAsync();
+
+        var handler = new GetPostByIdQueryHandler(_db);
         var query = new GetPostByIdQuery { PostId = post.Id };
 
-        // Act
         var result = await handler.HandleAsync(query, CancellationToken.None);
 
-        // Assert
         result.Should().NotBeNull();
         result.Id.Should().Be(post.Id);
         result.Title.Should().Be("Test Post");
@@ -223,51 +238,18 @@ public sealed class GetPostByIdQueryHandlerTests
     [Fact]
     public async Task HandleAsync_WhenPostDoesNotExist_ShouldThrowPostNotFoundException()
     {
-        // Arrange
-        await using var dbContext = _fixture.CreateDbContext();
-        var handler = new GetPostByIdQueryHandler(dbContext);
+        var handler = new GetPostByIdQueryHandler(_db);
         var query = new GetPostByIdQuery { PostId = PostId.New() };
 
-        // Act
         var act = () => handler.HandleAsync(query, CancellationToken.None);
 
-        // Assert
         await act.Should().ThrowAsync<PostNotFoundException>();
     }
 }
 ```
 
-### PostgreSqlFixture
-
-```csharp
-// Application.Tests/Fixtures/PostgreSqlFixture.cs
-public sealed class PostgreSqlFixture : IAsyncLifetime
-{
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-        .WithImage("postgres:16-alpine")
-        .Build();
-
-    public async Task InitializeAsync()
-    {
-        await _container.StartAsync();
-        await using var dbContext = CreateDbContext();
-        await dbContext.Database.MigrateAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _container.StopAsync();
-    }
-
-    public AppDbContext CreateDbContext()
-    {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(_container.GetConnectionString())
-            .Options;
-        return new AppDbContext(options);
-    }
-}
-```
+> **Why SQLite and not EF Core InMemory provider?**
+> The EF Core in-memory provider skips relational constraints and does not translate LINQ the same way PostgreSQL does. SQLite exercises real SQL translation while remaining a fully in-process, zero-infrastructure dependency. Queries that would silently succeed against the InMemory provider and fail at runtime against PostgreSQL are caught by the SQLite provider during development.
 
 ---
 
