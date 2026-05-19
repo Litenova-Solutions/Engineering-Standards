@@ -12,30 +12,84 @@ This repository is for engineers, human and AI, working on any [Litenova Solutio
 
 ## How to Use This in a Project
 
-Add this repository as a git submodule at `standards/` in your project:
+Add this repository as a git submodule. Two path conventions are available:
+
+**Option A — Visible path `standards/` (recommended for team projects)**
 
 ```bash
 git submodule add https://github.com/Litenova-Solutions/engineering-standards.git standards
 git submodule update --init --recursive
 ```
 
-To pin to a specific tag:
+**Option B — Hidden path `.standards/` (useful for solo projects)**
+
+The dot-prefix hides the folder from most file explorers while keeping it accessible to agents and tooling.
 
 ```bash
-cd standards
+git submodule add https://github.com/Litenova-Solutions/engineering-standards.git .standards
+git submodule update --init --recursive
+```
+
+Use `.standards/AGENTS.md` in your project's own `AGENTS.md` shim:
+```markdown
+# Project Agent Instructions
+Read `.standards/AGENTS.md` before editing any code.
+```
+
+### Pinning to a Specific Version
+
+```bash
+cd standards   # or .standards
 git checkout v1.0.0
 cd ..
 git add standards
 git commit -m "chore: pin engineering-standards to v1.0.0"
 ```
 
-In your project's own `AGENTS.md`, reference this repository so agents load it first:
+### Keeping Submodule Discipline
+
+Submodules cause problems when contributors forget `--recursive` clones or forget to update after a pull. Prevent this with a bootstrap script.
+
+Create `scripts/bootstrap.sh` (or `scripts/bootstrap.ps1`) in your project:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+git submodule update --init --recursive
+echo "Standards pinned to: $(cd standards && git describe --tags)"
+```
+
+Run it as the first step after cloning:
+```bash
+git clone --recursive https://github.com/your-org/your-project.git
+./scripts/bootstrap.sh
+```
+
+### Rules for the Consuming Project
+
+- MUST NOT edit files inside `standards/` (or `.standards/`) from within the consuming project. Changes to the standards belong in the standards repository.
+- MUST pin the submodule to a tagged version, not to a branch tip or bare commit hash.
+- The submodule pointer in the consuming project MUST point to a tag commit. A CI check that validates `git describe --exact-match --tags HEAD` inside the submodule directory is the enforcement mechanism.
+
+### Adding Project-Specific Agent Context
+
+After adding the submodule, create a project-level `AGENTS.md` at the repository root. Use `docs/templates/project-agents.md` from this repository as the starting template. The project `AGENTS.md` is a 30-50 line shim that:
+
+1. Tells agents to read the standards `AGENTS.md` first.
+2. Adds project-specific rules not covered by the standards (e.g., domain-specific naming, feature flags, deployment targets).
+3. Points agents to the filled-in `docs/domain/` templates for domain context.
 
 ```markdown
 # Project Agent Instructions
 
-This project follows the organization engineering standards.
-Read `standards/AGENTS.md` before editing any code.
+This project follows the Litenova Solutions engineering standards.
+Read `standards/AGENTS.md` (or `.standards/AGENTS.md`) before editing any code.
+
+## Project-Specific Rules
+
+- The bounded context name is `Ticketing`. Use it in all namespaces: `Ticketing.Domain`, `Ticketing.Application.Write`, etc.
+- Read `docs/domain/ubiquitous-language.md` before writing any domain code.
+- Read `docs/domain/aggregate-inventory.md` to see which aggregates exist.
 ```
 
 ## Repository Structure

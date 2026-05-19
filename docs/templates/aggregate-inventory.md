@@ -1,3 +1,5 @@
+<!-- Last updated: (fill in date when first created in a project) -->
+<!-- Required sections: Aggregates, Domain Events per Aggregate -->
 # Aggregate Inventory
 
 > Copy this file into `docs/domain/aggregate-inventory.md` in your project repository and fill it in. Update it whenever an aggregate is added, its states change, or new domain events are introduced.

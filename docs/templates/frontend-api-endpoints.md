@@ -1,3 +1,5 @@
+<!-- Last updated: (fill in date when first created in a project) -->
+<!-- Required sections: Consumed Endpoints -->
 # Frontend API Endpoints
 
 This file is filled in per project. It documents which OpenAPI endpoints the frontend actively consumes, what they map to in the feature folder structure, and any project-specific notes about authentication requirements or caching behavior. This file supplements the generated TypeScript types in `packages/api-types/src/api.d.ts`; the types tell you what endpoints exist, this file tells you which ones are used and how.

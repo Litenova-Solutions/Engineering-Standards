@@ -1,3 +1,5 @@
+<!-- Last updated: (fill in date when first created in a project) -->
+<!-- Required sections: Glossary, Related ADRs -->
 # Ubiquitous Language Glossary
 
 > Copy this file into `docs/domain/ubiquitous-language.md` in your project repository and fill it in. Update it whenever a stakeholder conversation introduces a new term or changes the meaning of an existing one.

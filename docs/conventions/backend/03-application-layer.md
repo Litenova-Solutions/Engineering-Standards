@@ -2,6 +2,8 @@
 
 This document is the authoritative guide for all design decisions in the five application layer projects. Read it in full before writing or modifying any application code.
 
+> This convention implements ADR 0003 (CQRS split), ADR 0006 (Contracts projects), ADR 0008 (Reactions depends only on abstractions), and ADR 0016 (Transaction pipeline behaviors).
+
 ---
 
 ## 1. Guiding Philosophy

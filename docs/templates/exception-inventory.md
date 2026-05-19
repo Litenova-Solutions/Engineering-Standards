@@ -1,3 +1,5 @@
+<!-- Last updated: (fill in date when first created in a project) -->
+<!-- Required sections: Exception Types, HTTP Mapping -->
 # Exception Inventory
 
 > Copy this file into `docs/domain/exception-inventory.md` in your project repository and fill it in. Update it whenever a new aggregate is added or a new domain invariant is introduced.
