@@ -21,7 +21,14 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 | LiteBus | Modular packages. See `docs/conventions/backend/01-solution-structure.md` for which package goes in which project. |
 | Ardalis.GuardClauses | Latest - guard clause helpers |
 | PostgreSQL | Primary database |
-| Next.js | 15 - App Router only |
+| Next.js | 16.2.6 - App Router only. `proxy.ts` replaces deprecated `middleware.ts`. |
+| React | 19.2.6 - React Compiler stable. `useActionState`/`useOptimistic` stable. |
+| TypeScript | 6.0.x - `--outFile` removed. `moduleResolution: bundler` recommended. |
+| TanStack Query | 5.100.10 - v5 API stable. Security note: verify lockfile against GHSA-g7cv-rxg3-hmpx (May 11 2026 supply-chain incident). |
+| Zustand | 5.0.13 - Requires React 18+. |
+| Zod | 4.4.3 - v4 breaking changes: `z.email()` not `z.string().email()`. |
+| Tailwind CSS | 4.3.x - CSS-first config via `@theme`. No `tailwind.config.js`. |
+| shadcn/ui | CLI v4 - `toast` deprecated, use `sonner`. `radix-ui` unified package replaces `@radix-ui/react-*`. |
 
 ## Application Layer Projects
 
@@ -45,6 +52,7 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 | `Application.Reactions` | Event handlers and narrow side-effect interfaces. Reacts to domain events. |
 | `Infrastructure` | EF Core, repository implementations, read store implementations, external service clients. |
 | `WebApi` | `IEndpoint` implementations, request/response models, API mappings. References Contracts projects only. |
+| `apps/web/` | Next.js 16 frontend application. Endpoints, components, server actions, feature folders. |
 
 ## Non-Negotiable Rules
 
@@ -61,6 +69,14 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 - MUST name the `CancellationToken` parameter exactly `cancellationToken` in all async methods. Never `ct`, `token`, or `cancel`.
 - MUST NOT reference `Application.Write` or `Application.Read` from `WebApi` endpoint code. Reference only the Contracts projects.
 - MUST NOT add direct NuGet package references for external libraries (EF Core, email clients, HTTP clients) to `Application.Reactions`. Define a narrow interface and implement it in Infrastructure.
+- MUST await `cookies()`, `headers()`, `params`, and `searchParams` in Next.js 15+/16. These are Promises.
+- MUST NOT use server-only modules (`cookies()`, `headers()`, database clients) in `'use client'` files.
+- MUST add a comment to every `'use client'` directive explaining why the client boundary is needed.
+- MUST use `z.email()`, `z.uuid()`, `z.url()` in Zod 4. Never `z.string().email()`, `z.string().uuid()`, or `z.string().url()`.
+- MUST NOT put business logic in `proxy.ts`. Optimistic checks only. See CVE-2025-29927.
+- MUST NOT add `useMemo`, `useCallback`, or `React.memo` when the React Compiler is enabled.
+- MUST use `sonner` for toast notifications. The shadcn/ui `toast` component is deprecated.
+- MUST import from `radix-ui` not `@radix-ui/react-*` (unified package since February 2026).
 
 ## Common Agent Mistakes
 
@@ -78,6 +94,15 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 - Using `Guard.Against` in a validator and not realizing it throws `ArgumentException` by default, which maps to HTTP 500 instead of HTTP 400. Validators MUST throw `ApplicationValidationException` subclasses. Use direct `if` + `throw` for custom exceptions, or verify which `Guard.Against` overloads throw which types.
 - Naming the `CancellationToken` parameter `ct` instead of `cancellationToken`.
 - Placing project-specific content (ubiquitous language glossary, feature inventory, exception list) inside convention files. That content belongs in the project repository using the templates in `docs/templates/`.
+- Forgetting to `await` `params` or `searchParams` in page components. These are Promises in Next.js 15+/16.
+- Forgetting to `await` `cookies()` from `next/headers`. It is async in Next.js 15+/16.
+- Using Zod v3 syntax: `z.string().email()`, `z.string().uuid()`. Use `z.email()`, `z.uuid()` in Zod 4.
+- Using `revalidateTag` without a `cacheLife` second argument in Next.js 16. This is a TypeScript error.
+- Adding `useMemo` or `useCallback` when the React Compiler is enabled. The compiler handles memoization automatically.
+- Importing `@radix-ui/react-dialog` or similar individual packages. Use the unified `radix-ui` package.
+- Using the shadcn/ui `toast` component. It is deprecated. Use `sonner`.
+- Putting server data in Zustand instead of TanStack Query.
+- Using `useEffect` for data fetching instead of server components or TanStack Query.
 
 ## Convention File Index
 
@@ -96,6 +121,10 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 | Naming | `docs/conventions/shared/naming.md` |
 | Git Workflow | `docs/conventions/shared/git-workflow.md` |
 | Security | `docs/conventions/shared/security.md` |
+| Frontend/App Router | `docs/conventions/frontend/01-nextjs-app-router.md` |
+| Frontend/Components | `docs/conventions/frontend/02-components.md` |
+| Frontend/Data Fetching | `docs/conventions/frontend/03-data-fetching.md` |
+| Frontend/State and Forms | `docs/conventions/frontend/04-state-and-forms.md` |
 
 ## Commands
 
