@@ -27,6 +27,19 @@ Turborepo with pnpm workspaces is the monorepo tool.
 
 The `turbo.json` uses the `tasks` key (not the deprecated `pipeline` key). The .NET backend (`backend/`) is co-located in the repository but excluded from `pnpm-workspace.yaml`. It is built independently via `dotnet build`.
 
+The repository root `package.json` defines full-stack scripts that run both toolchains:
+
+```json
+{
+  "scripts": {
+    "build": "turbo run build",
+    "build:backend": "dotnet build src/{ProjectName}.slnx",
+    "test:backend": "dotnet test src/{ProjectName}.slnx",
+    "verify": "pnpm build && pnpm build:backend && pnpm test:backend"
+  }
+}
+```
+
 Example `turbo.json`:
 
 ```json
@@ -57,7 +70,7 @@ Example `pnpm-workspace.yaml`:
 packages:
   - "apps/*"
   - "packages/*"
-# backend/ is intentionally excluded — managed by dotnet tooling
+# backend/ is intentionally excluded - managed by dotnet tooling
 ```
 
 ---
@@ -74,7 +87,7 @@ packages:
 **Negative:**
 
 - Anyone upgrading a project from Turborepo v1 must migrate `pipeline` to `tasks`. This is a one-time codemod.
-- The .NET build is not managed by Turborepo, so a full-stack build requires both `turbo run build` and `dotnet build src/{ProjectName}.slnx`.
+- The .NET build is not part of the pnpm workspace graph. Root scripts coordinate the full-stack verification command, but Turborepo does not cache .NET outputs by default.
 
 **Risks:**
 

@@ -260,6 +260,6 @@ HTTP list endpoints use `PagedResult<T>` with `PaginationParameters`. See ADR 00
 
 ---
 
-The read query inventory for a specific project lives in the project repository. Copy `docs/templates/read-store-inventory.md` into `docs/domain/read-store-inventory.md` and fill it in.
+The read model inventory for a specific project lives in the project repository. Copy `docs/templates/read-model-inventory.md` into `docs/domain/read-model-inventory.md` and fill it in.
 
 

@@ -87,7 +87,7 @@ The application layer handles two fundamentally different concerns: commands (wr
 - Write-side complexity (validation, business rules, domain event publishing) bleeds into query code.
 - Agents pattern-match on nearby code. If a query handler and a command handler are in the same folder, agents tend to write query handlers that look like command handlers (loading aggregates, calling domain methods, raising events).
 
-Command Query Responsibility Segregation (CQRS) separates the write model from the read model. The write side uses the domain model. The read side uses projections and read stores. These are different patterns, and they should be in different places.
+Command Query Responsibility Segregation (CQRS) separates the write model from the read model. The write side uses the domain model. The read side uses projections through `IDatabaseContext`. These are different patterns, and they should be in different places.
 
 Three structural options were considered:
 

@@ -80,7 +80,132 @@ app.MapPost("/posts", HandleAsync)
 
 ---
 
-## 5. Dependency Scanning
+## 5. Rate Limiting
+
+Public endpoints, authentication endpoints, file uploads, search endpoints, expensive commands, and webhooks MUST have rate limiting. Use ASP.NET Core rate limiting middleware for the backend and a reverse proxy or platform-level limiter for the Next.js app when self-hosted.
+
+```csharp
+// GOOD: named policy applied to a route group
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("authenticated-api", limiter =>
+    {
+        limiter.PermitLimit = 120;
+        limiter.Window = TimeSpan.FromMinutes(1);
+        limiter.QueueLimit = 0;
+    });
+});
+
+app.UseRateLimiter();
+
+app.MapGroup("/api")
+    .RequireAuthorization()
+    .RequireRateLimiting("authenticated-api");
+```
+
+```csharp
+// BAD: public search endpoint has no limiter
+app.MapGet("/search", HandleAsync);
+```
+
+Rate limiting policies MUST be load tested before production.
+
+---
+
+## 6. CORS
+
+CORS is not an authorization mechanism. It relaxes browser same-origin rules and MUST be configured narrowly.
+
+- Allow only known frontend origins per environment.
+- Do not use `AllowAnyOrigin()` with credentials.
+- Define policy names as constants.
+- Apply CORS before authorization in the ASP.NET Core middleware order.
+
+```csharp
+// GOOD: explicit origins
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy
+            .WithOrigins("https://app.example.com")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+```
+
+```csharp
+// BAD: any origin with credentials
+policy.AllowAnyOrigin()
+    .AllowCredentials();
+```
+
+---
+
+## 7. Content Security Policy
+
+Next.js projects MUST define a Content Security Policy before production. Use nonce-based CSP for applications that handle sensitive data or strict compliance requirements. Nonce-based CSP forces dynamic rendering and disables static optimization for affected routes, so document that trade-off in the project ADR.
+
+At minimum, production CSP MUST include:
+
+- `default-src 'self'`
+- `object-src 'none'`
+- `base-uri 'self'`
+- `form-action 'self'`
+- `frame-ancestors 'none'`
+
+Third-party script, image, analytics, and monitoring domains must be explicitly listed.
+
+---
+
+## 8. Audit Logging
+
+Security-sensitive business actions MUST emit audit events. Audit events are not normal logs and MUST be retained according to the project data policy.
+
+Audit events include:
+
+- Authentication and authorization changes.
+- Role, permission, tenant, or team membership changes.
+- Changes to externally visible business state.
+- Data export.
+- Administrative impersonation.
+- Payment, billing, and compliance actions.
+
+Audit records MUST include actor, action, target, timestamp, correlation ID, and tenant scope when applicable. Do not store secrets in audit records.
+
+---
+
+## 9. PII and Data Classification
+
+Every production project MUST classify data before launch.
+
+| Class | Examples | Rule |
+|:---|:---|:---|
+| Public | Published content, public metadata | May appear in logs when needed |
+| Internal | Non-sensitive operational metadata | Limit to authenticated users |
+| Confidential | Names, email addresses, phone numbers | Do not log by default |
+| Restricted | Secrets, tokens, payment data, credentials | Never log or expose to client code |
+
+Frontend server components and Server Actions MUST return minimal DTOs to client components. Do not pass full user, tenant, or permission objects to client components.
+
+---
+
+## 10. Secrets Rotation
+
+Projects MUST document how each production secret is rotated. Rotation must include:
+
+- Owner.
+- Storage location.
+- Rotation frequency.
+- Rollback plan.
+- How dependent services pick up the new value.
+
+Secrets used for signing or encryption need key versioning so old data or sessions can be read during rotation.
+
+---
+
+## 11. Dependency Scanning
 
 Run `dotnet list package --vulnerable` as part of the CI pipeline on every pull request. Any PR that introduces a vulnerable package MUST either:
 - Update to a patched version, or
@@ -88,9 +213,11 @@ Run `dotnet list package --vulnerable` as part of the CI pipeline on every pull 
 
 Do not merge PRs with known vulnerable dependencies without an explicit decision.
 
+Frontend projects MUST also run `pnpm audit` in CI. For high-severity supply-chain advisories, pin the lockfile to a known safe version and document the advisory in the PR.
+
 ---
 
-## 6. OWASP Top 10
+## 12. OWASP Top 10
 
 All engineers working on projects following these standards should be familiar with the [OWASP Top 10](https://owasp.org/www-project-top-ten/). The rules in this document address the most common of these risks, but they are not exhaustive.
 

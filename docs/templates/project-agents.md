@@ -32,7 +32,7 @@ The base tech stack is defined in `standards/AGENTS.md`. This table lists only p
 
 ## Project-Specific Context
 
-Read these files before generating any domain or application code. They contain the project's actual terms, aggregates, features, exceptions, and read stores.
+Read these files before generating any domain or application code. They contain the project's actual terms, aggregates, features, exceptions, and read models.
 
 | File | Contents |
 |:---|:---|
@@ -40,7 +40,7 @@ Read these files before generating any domain or application code. They contain 
 | `docs/domain/aggregate-inventory.md` | All aggregates, states, domain events, and repository interfaces. |
 | `docs/domain/feature-inventory.md` | All implemented and planned use cases with handler class names. |
 | `docs/domain/exception-inventory.md` | All custom exception types with categories and HTTP status codes. |
-| `docs/domain/read-store-inventory.md` | All read store interfaces and the projection types they return. |
+| `docs/domain/read-model-inventory.md` | `IDatabaseContext` properties, query handlers, and approved denormalized read models. |
 | `docs/adr/` | Project-specific architecture decisions. |
 
 ---

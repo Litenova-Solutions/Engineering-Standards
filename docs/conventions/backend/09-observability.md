@@ -1,6 +1,8 @@
 # Observability
 
-This document defines the observability conventions for structured logging, correlation IDs, and health checks. Every production project MUST implement these conventions before going live.
+This document defines the observability conventions for structured logging, correlation IDs, OpenTelemetry traces and metrics, and health checks. Every production project MUST implement these conventions before going live.
+
+> This convention implements ADR 0018.
 
 ---
 
@@ -8,13 +10,17 @@ This document defines the observability conventions for structured logging, corr
 
 All projects use Serilog with structured output. Serilog is configured in `Program.cs` and registered as the .NET logging provider.
 
-### Required NuGet Packages (in Infrastructure or WebApi)
+### Required NuGet Packages
 
 - `Serilog.AspNetCore`
 - `Serilog.Sinks.Console`
 - `Serilog.Enrichers.Environment`
 - `Serilog.Enrichers.Thread`
-- `Serilog.Enrichers.Context` (or equivalent for correlation ID enrichment)
+- `OpenTelemetry.Extensions.Hosting`
+- `OpenTelemetry.Instrumentation.AspNetCore`
+- `OpenTelemetry.Instrumentation.Http`
+- `OpenTelemetry.Instrumentation.Runtime`
+- `OpenTelemetry.Exporter.OpenTelemetryProtocol`
 
 ### Minimum Bootstrap Configuration
 
@@ -104,22 +110,77 @@ The correlation ID is always echoed back in the `X-Correlation-ID` response head
 
 ---
 
-## 3. Health Checks
+## 3. OpenTelemetry
+
+OpenTelemetry is the standard for traces and metrics. Export through OTLP by default. Vendor-specific exporters require a project ADR.
+
+### Minimum Registration
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddSource("ProjectName.Application")
+            .AddOtlpExporter();
+    })
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddRuntimeInstrumentation()
+            .AddMeter("ProjectName.Application")
+            .AddOtlpExporter();
+    });
+```
+
+Use stable, low-cardinality tags only.
+
+```csharp
+// GOOD: bounded metric tags
+activity?.SetTag("command.type", command.GetType().Name);
+activity?.SetTag("tenant.plan", tenant.PlanName);
+```
+
+```csharp
+// BAD: unbounded tags create high-cardinality telemetry
+activity?.SetTag("user.email", user.Email);
+activity?.SetTag("search.text", query.SearchText);
+```
+
+### Required Custom Metrics
+
+| Metric | Type | Tags |
+|:---|:---|:---|
+| `app.command.duration` | Histogram | `command.type`, `outcome` |
+| `app.query.duration` | Histogram | `query.type`, `outcome` |
+| `app.outbox.pending` | Gauge | none |
+| `app.outbox.oldest_age_seconds` | Gauge | none |
+| `app.background_job.duration` | Histogram | `job.type`, `outcome` |
+| `app.cache.hit_count` | Counter | `cache.name` |
+| `app.cache.miss_count` | Counter | `cache.name` |
+
+Metrics MUST NOT include user IDs, raw tenant IDs, email addresses, route IDs, or raw cache keys as tags.
+
+---
+
+## 4. Health Checks
 
 Every project MUST expose health check endpoints. Use ASP.NET Core's built-in health check infrastructure.
 
-### Required Packages
+### Database Check
 
-- `AspNetCore.HealthChecks.NpgSql` — PostgreSQL liveness check
+Use a project-owned `IHealthCheck` implementation for PostgreSQL. Do not add a community health-check NuGet package unless a project ADR approves it.
 
 ### Registration
 
 ```csharp
-// Program.cs
 builder.Services.AddHealthChecks()
-    .AddNpgSql(
-        connectionString: builder.Configuration.GetConnectionString("Default")!,
-        name: "postgresql",
+    .AddCheck<PostgreSqlHealthCheck>(
+        "postgresql",
         tags: ["ready"]);
 ```
 
@@ -143,3 +204,20 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 |:---|:---|:---|
 | `/health/live` | Is the process alive? | None (always 200 if running) |
 | `/health/ready` | Can the process serve traffic? | PostgreSQL connectivity |
+
+Health endpoints SHOULD be excluded from high-volume request metrics when they distort dashboards.
+
+---
+
+## 5. Alert Baseline
+
+Every production project MUST define alerts for:
+
+- HTTP 5xx rate above the project threshold.
+- p95 HTTP request duration above the project threshold.
+- Readiness health check failure.
+- Outbox oldest message age above the project threshold.
+- Background job dead-letter count above zero.
+- Database connection failures.
+
+Project-specific thresholds live in the project repository because they depend on product usage and hosting costs.

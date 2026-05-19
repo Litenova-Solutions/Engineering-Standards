@@ -79,7 +79,7 @@ Code starts where it is first needed. It does not move to a `Shared/` folder pre
 
 Most code never reaches Strike 2. The rule prevents the accumulation of a `Shared/` folder full of types that are only used once, which is the most common source of unnecessary coupling.
 
-The promotion rule applies within a single project. Types that are part of the public contract of a layer (commands, queries, read store interfaces, result records) belong in the Contracts project from the start, not after promotion. Promotion is for implementation-level code that unexpectedly becomes reusable.
+The promotion rule applies within a single project. Types that are part of the public contract of a layer (commands, queries, result records, `IDatabaseContext`, pagination envelopes) belong in the Contracts project from the start, not after promotion. Promotion is for implementation-level code that unexpectedly becomes reusable.
 
 ---
 
@@ -110,7 +110,7 @@ One exception applies: rules that are *both* tooling-enforceable and consistentl
 
 ## 9. Contracts Before Implementation
 
-Every public-facing type (commands, queries, results, read store interfaces) lives in a Contracts project before any handler or implementation is written. This enforces the dependency rule at the compiler level: a project that references only the Contracts project cannot accidentally depend on handler implementations.
+Every public-facing type (commands, queries, results, shared read contracts) lives in a Contracts project before any handler or implementation is written. This enforces the dependency rule at the compiler level: a project that references only the Contracts project cannot accidentally depend on handler implementations.
 
 The Contracts project is the API surface of a layer. The implementation project is the private body. A WebApi endpoint references `Application.Write.Contracts` for the command type and `LiteBus.Commands.Abstractions` for `ICommandMediator` to dispatch it. For queries, reference `LiteBus.Queries.Abstractions` for `IQueryMediator`. It never needs to reference `Application.Write` at all. The boundary is explicit, enforced by the project reference graph, and visible to any engineer reading the solution file.
 

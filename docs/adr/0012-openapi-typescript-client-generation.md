@@ -41,6 +41,17 @@ The generation command:
 npx openapi-typescript packages/api-types/openapi.json -o packages/api-types/src/api.d.ts
 ```
 
+CI validates freshness:
+
+```bash
+dotnet build src/{ProjectName}.slnx
+dotnet run --project src/{ProjectName}.WebApi -- --export-openapi packages/api-types/openapi.json
+npx openapi-typescript packages/api-types/openapi.json -o packages/api-types/src/api.d.ts
+git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
+```
+
+The project may implement `--export-openapi` with a small WebApi startup path or a dedicated test utility. The required outcome is that CI fails when the committed spec or generated TypeScript types are stale.
+
 The `packages/api-client/` directory contains:
 
 - `src/index.ts`: the `createClient` factory (copied from `openapi-fetch` source)

@@ -18,7 +18,7 @@ Understanding agent failure modes requires understanding how agents differ from 
 
 **Agents are stateless.** Each session starts with zero knowledge of the project unless context is explicitly provided. A human engineer builds up a mental model of a codebase over months. An agent builds its model from what it loaded into the current context window. If the context does not include the relevant convention, the agent will pattern-match against training data, which may include outdated or lower-quality examples from the public internet.
 
-**Agents pattern-match against examples.** A bad example in the codebase will be reproduced more reliably than a good example in a comment. If the codebase has one handler that injects a repository instead of a read store, agents will reproduce that pattern. If the convention file says "do not inject repositories in query handlers" but includes no `// BAD:` example showing exactly what not to do, the prohibition is weaker than it appears.
+**Agents pattern-match against examples.** A bad example in the codebase will be reproduced more reliably than a good example in a comment. If the codebase has one handler that injects a repository instead of `IDatabaseContext`, agents will reproduce that pattern. If the convention file says "do not inject repositories in query handlers" but includes no `// BAD:` example showing exactly what not to do, the prohibition is weaker than it appears.
 
 **Agents have context window limits.** Loading a 5,000-line convention file into every task wastes context budget and dilutes the signal. Scoped, short files loaded only when relevant are more effective than comprehensive documents loaded everywhere. The 150-line limit on `AGENTS.md` is a direct consequence of this constraint.
 

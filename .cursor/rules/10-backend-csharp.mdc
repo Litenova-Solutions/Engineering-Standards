@@ -8,7 +8,7 @@ globs:
 alwaysApply: false
 ---
 
-# Backend C# — Critical Rules Summary
+# Backend C# - Critical Rules Summary
 
 Full convention guides are in `docs/conventions/backend/`. Read the relevant file before editing a layer. This file is a quick reference only.
 
@@ -45,13 +45,13 @@ class PostsController : ControllerBase { }
 
 ### 3. No Aggregate Loading in Query Handlers
 
-Query handlers MUST inject `IXxxReadStore`, not `IXxxRepository`. Loading a full aggregate in a query handler couples read performance to write complexity and risks accidental state mutation. See `docs/conventions/backend/07-query-read-strategy.md`.
+Query handlers MUST inject `IDatabaseContext`, not `IXxxRepository` or `AppDbContext`. Loading a full aggregate in a query handler couples read performance to write complexity and risks accidental state mutation. See `docs/conventions/backend/07-query-read-strategy.md`.
 
 ```csharp
 // GOOD:
 sealed class GetPostByIdQueryHandler : IQueryHandler<GetPostByIdQuery, PostResult>
 {
-    public GetPostByIdQueryHandler(IPostReadStore postReadStore) { ... }
+    public GetPostByIdQueryHandler(IDatabaseContext db) { ... }
 }
 
 // BAD:
@@ -63,7 +63,7 @@ sealed class GetPostByIdQueryHandler : IQueryHandler<GetPostByIdQuery, PostResul
 
 ### 4. Correct Exception Hierarchy
 
-Validators throw `ApplicationValidationException` subclasses (HTTP 400). Repositories throw `AggregateNotFoundException` subclasses (HTTP 404). Aggregates throw `DomainException` subclasses (HTTP 409). Using the wrong type produces incorrect HTTP responses. See `docs/conventions/backend/06-exception-hierarchy.md`.
+Command validators throw `CommandValidationException` subclasses. Query validators throw `QueryValidationException` subclasses. Repositories throw `AggregateNotFoundException` subclasses. Aggregates throw `DomainException` subclasses. Using the wrong type produces incorrect HTTP responses. See `docs/conventions/backend/06-exception-hierarchy.md`.
 
 ### 5. CancellationToken Named Exactly
 

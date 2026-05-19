@@ -21,7 +21,19 @@ Two approaches were considered:
 
 ## Decision
 
-The default event handling approach is in-process: domain events are raised in the command handler and handled synchronously by `Application.Reactions` event handlers. The Outbox pattern is the approved escalation path when a specific, documented reliability requirement exists. When the Outbox pattern is adopted for a project, it is implemented in Infrastructure using the existing narrow interface pattern from `Application.Reactions`.
+The default event handling approach is in-process: domain events are raised by aggregates and handled by `Application.Reactions` event handlers after the command transaction succeeds. The Outbox pattern is the approved escalation path when a specific, documented reliability requirement exists.
+
+Escalate to the Outbox pattern when any of these are true:
+
+- Losing one event would require manual data repair.
+- The event triggers payment, billing, compliance, audit, or security work.
+- The event updates another system of record.
+- The event sends a user notification that must survive process restarts.
+- The project needs retry, dead-letter, or delivery-age monitoring.
+
+When the Outbox pattern is adopted for a project, Infrastructure owns the outbox table, serialization, leasing, retries, dead-letter handling, and dispatcher hosted service or worker. `Application.Reactions` keeps narrow interfaces and does not reference external libraries.
+
+Consumers must be idempotent because a dispatcher can deliver the same message more than once after a crash between external delivery and marking the row processed.
 
 ## Consequences
 
@@ -35,7 +47,8 @@ The default event handling approach is in-process: domain events are raised in t
 
 - Teams must recognize when the simple approach is no longer sufficient and escalate proactively. Missing this escalation point means events are lost in production before the pattern is adopted.
 - Once the Outbox pattern is introduced, it adds meaningful operational complexity (outbox table maintenance, dispatcher service, monitoring).
+- Every consumer must handle duplicate delivery safely.
 
 ### Risks
 
-- The escalation trigger ("when a specific reliability requirement is identified") requires a judgment call. Without clear criteria, teams may escalate too early (adding unnecessary complexity) or too late (losing events in production). Teams adopting this escalation should document their reliability requirements explicitly in an ADR at the time they escalate.
+- A project may delay escalation until after an event is lost. The reliability convention defines the required triggers and migration path. Teams adopting this escalation document their event delivery requirements explicitly in a project ADR.

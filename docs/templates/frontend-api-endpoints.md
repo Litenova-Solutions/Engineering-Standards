@@ -10,13 +10,13 @@ Run `npm run generate:api` to regenerate the TypeScript types whenever the backe
 
 ## Consumed Endpoints
 
-| Endpoint | Feature | Used In | Auth Required | Cache Strategy | Notes |
-|:---|:---|:---|:---|:---|:---|
-| `GET /posts` | Posts / List | `features/posts/list/PostListPage.tsx` | No | `revalidateTag("posts", "hours")` | Returns paginated list. `page` and `pageSize` query params. |
-| `GET /posts/{id}` | Posts / Detail | `features/posts/detail/PostDetailPage.tsx` | No | `revalidateTag("posts", "hours")` | Returns 404 if post not found; mapped to `notFound()`. |
-| `POST /posts` | Posts / Create | `features/posts/create/createPost.action.ts` | Yes | Calls `revalidateTag("posts", "minutes")` on success | Server Action. Validates with `createPostSchema` before calling. |
-| `GET /authors` | Authors / List | `features/authors/list/AuthorListPage.tsx` | No | `revalidateTag("authors", "days")` | Returns all active authors. No pagination. |
-| `GET /authors/{id}` | Authors / Detail | `features/authors/detail/AuthorDetailPage.tsx` | No | `revalidateTag("authors", "days")` | Returns 404 if author not found; mapped to `notFound()`. |
+| Endpoint | Feature | Used In | Auth Required | Idempotency | Cache Strategy | Notes |
+|:---|:---|:---|:---|:---|:---|:---|
+| `GET /posts` | Posts / List | `features/posts/list/PostListPage.tsx` | No | No | `revalidateTag("posts", "hours")` | Returns paginated list. `page` and `pageSize` query params. |
+| `GET /posts/{id}` | Posts / Detail | `features/posts/detail/PostDetailPage.tsx` | No | No | `revalidateTag("posts", "hours")` | Returns 404 if post not found; mapped to `notFound()`. |
+| `POST /posts` | Posts / Create | `features/posts/create/createPost.action.ts` | Yes | `Idempotency-Key` | Calls `revalidateTag("posts", "minutes")` on success | Server Action. Validates with `createPostSchema` before calling. |
+| `GET /authors` | Authors / List | `features/authors/list/AuthorListPage.tsx` | No | No | `revalidateTag("authors", "days")` | Returns all active authors. No pagination. |
+| `GET /authors/{id}` | Authors / Detail | `features/authors/detail/AuthorDetailPage.tsx` | No | No | `revalidateTag("authors", "days")` | Returns 404 if author not found; mapped to `notFound()`. |
 
 ---
 

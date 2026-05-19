@@ -13,11 +13,11 @@ Two approaches were considered:
 1. Let WebApi reference the implementation projects and accept the larger dependency surface.
 2. Create separate Contracts projects (`Application.Write.Contracts`, `Application.Read.Contracts`) containing only the public-facing types. WebApi references only the Contracts projects.
 
-The compiler enforces the boundary in approach 2: WebApi cannot call a handler directly because it has no reference to the implementation project. The only way to invoke a handler is through the mediator (`IMessageBus`), which is the correct pattern.
+The compiler enforces the boundary in approach 2: WebApi cannot call a handler directly because it has no reference to the implementation project. The only way to invoke a handler is through the specific mediator interface (`ICommandMediator` or `IQueryMediator`), which is the correct pattern.
 
 ## Decision
 
-`Application.Write.Contracts` and `Application.Read.Contracts` are dedicated projects containing only the public contract types: commands, command results, queries, query results, and read store interfaces. WebApi references only the Contracts projects, not the implementation projects. The implementation projects also reference their own Contracts project.
+`Application.Write.Contracts` and `Application.Read.Contracts` are dedicated projects containing only the public contract types: commands, command results, queries, query results, `IDatabaseContext`, and shared result envelope types. WebApi references only the Contracts projects, not the implementation projects. The implementation projects also reference their own Contracts project.
 
 ## Consequences
 

@@ -1,6 +1,6 @@
 # Engineering Philosophy
 
-This document explains why the architecture is designed the way it is. It is written for humans: engineers evaluating the standards, clients reviewing the approach, and new team members onboarding. AI agents MUST NOT load this file for routine coding tasks; it provides no actionable rules for code generation.
+This document explains why the architecture is designed the way it is. It is written for humans: engineers evaluating the standards, clients reviewing the approach, and new team members onboarding. AI agents MUST NOT load this file for routine coding tasks; it provides no actionable rules for code generation. For the short version, see `docs/appendix-rationale.md`.
 
 ---
 
@@ -56,7 +56,7 @@ Screaming architecture means the folder structure communicates the business mode
 
 AI agents are now primary contributors to codebases. This changes the requirements for good architecture in ways that are not obvious from a human-only team perspective.
 
-Explicit rules outperform cultural norms when agents are primary contributors. A rule that exists as a team understanding ("we prefer to inject read stores in query handlers") is invisible to an agent. A rule in `AGENTS.md` is visible but ignorable if no structural constraint enforces it. A rule enforced by a project reference (the query handler project has no reference to the repository interface) is enforced regardless of what the agent had in context. Architecture decisions that are enforced at the compiler level survive agent contributions more reliably than conventions that live only in documentation.
+Explicit rules outperform cultural norms when agents are primary contributors. A rule that exists as a team understanding ("we prefer to inject `IDatabaseContext` in query handlers") is invisible to an agent. A rule in `AGENTS.md` is visible but ignorable if no structural constraint enforces it. A rule enforced by a project reference (the query handler project has no reference to repository implementations) is enforced regardless of what the agent had in context. Architecture decisions that are enforced at the compiler level survive agent contributions more reliably than conventions that live only in documentation.
 
 Consistent, predictable structure lets agents navigate confidently. An agent that sees a handler in `Posts/Publish/PublishPostCommandHandler.cs` in one feature can infer with high confidence that the next handler belongs in `Posts/Archive/ArchivePostCommandHandler.cs`. Unpredictable structure forces agents to search the entire codebase before making a change. Verbose, ceremonious code is also easier for agents to extend correctly than clever, concise code. An agent extending a pattern it has seen clearly will make fewer errors than an agent inferring behavior from a compact abstraction.
 

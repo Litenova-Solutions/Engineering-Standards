@@ -29,6 +29,8 @@ tests/
 │       ├── CreatePostCommandHandlerTests.cs
 │       ├── GetPostByIdQueryHandlerTests.cs
 │       └── PublishPostCommandValidatorTests.cs
+│   └── TestData/
+│       └── PostBuilder.cs
 ├── {ProjectName}.Integration.Tests/
 │   ├── Posts/
 │   │   ├── CreatePostEndpointTests.cs
@@ -121,6 +123,45 @@ public sealed class PostTests
         act.Should().Throw<PostAlreadyPublishedException>();
     }
 }
+```
+
+## Test Data Builders
+
+Use test data builders for aggregates or request bodies that appear in more than two tests. Builders live in the test project that uses them. Do not put test builders in production projects.
+
+```csharp
+// GOOD: builder gives tests stable defaults
+internal sealed class PostBuilder
+{
+    private PostId _id = PostId.New();
+    private string _title = "My First Post";
+    private string _content = "Hello world.";
+    private AuthorId _authorId = new(Guid.CreateVersion7());
+
+    public PostBuilder WithTitle(string title)
+    {
+        _title = title;
+        return this;
+    }
+
+    public Post Build()
+    {
+        return Post.Create(
+            _id,
+            new PostTitle(_title),
+            new PostContent(_content),
+            _authorId);
+    }
+}
+```
+
+```csharp
+// BAD: every test repeats irrelevant aggregate construction details
+var post = Post.Create(
+    PostId.New(),
+    new PostTitle("My First Post"),
+    new PostContent("Hello world."),
+    new AuthorId(Guid.CreateVersion7()));
 ```
 
 ---
@@ -396,7 +437,7 @@ public sealed class ApplicationLayerTests
     public void ReactionsProject_ShouldNotDependOn_ExternalLibraries()
     {
         var result = Types
-            .InAssembly(typeof(UpdateReadModelOnPostPublishedEventHandler).Assembly)
+            .InAssembly(typeof(NotifySubscribersOnPostPublishedEventHandler).Assembly)
             .ShouldNot()
             .HaveDependencyOn("Microsoft.EntityFrameworkCore")
             .GetResult();
@@ -415,6 +456,39 @@ public sealed class ApplicationLayerTests
 - **Do not test EF Core mappings directly.** If the entity maps correctly to and from the database, the integration tests will surface that.
 - **Do not assert that a mock was called with specific arguments as the primary assertion.** Test the observable outcome. Use received-call assertions only when the outcome is not otherwise observable.
 - **Do not duplicate domain tests in handler tests.** If `Post.Publish()` throws when the post is already published, that is tested in the Domain tests.
+
+---
+
+## Contract and OpenAPI Tests
+
+Projects with a frontend MUST validate that the committed OpenAPI spec is fresh.
+
+CI MUST:
+
+1. Build the backend.
+2. Generate or export the OpenAPI spec.
+3. Compare it with `packages/api-types/openapi.json`.
+4. Run `openapi-typescript`.
+5. Fail if generated files differ from committed files.
+
+Snapshot tests are allowed for stable API response bodies and OpenAPI documents. Do not use snapshots for highly volatile data such as timestamps, generated IDs, or localized text without normalizing those values first.
+
+---
+
+## Performance, Load, and Mutation Testing
+
+Every production project defines a small performance baseline:
+
+| Target | Default Budget |
+|:---|:---|
+| Authenticated command endpoint p95 | Project-defined |
+| Authenticated query endpoint p95 | Project-defined |
+| Public list endpoint p95 | Project-defined |
+| Background job max lag | Project-defined |
+
+Run load tests before enabling rate limiting, caching, or realtime features in production. Rate limiting policies must be validated under realistic concurrency.
+
+Mutation testing is recommended for Domain tests and high-risk application validators. It is not required for every PR, but it SHOULD run on a scheduled CI job for critical projects.
 
 ---
 

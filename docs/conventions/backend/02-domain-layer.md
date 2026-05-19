@@ -8,7 +8,7 @@ This document is the authoritative guide for all design decisions in the Domain 
 
 The Domain layer models the business. It knows nothing about databases, HTTP, or the application that hosts it. Every class in this layer must be understandable by a domain expert who has never seen a line of C#.
 
-The Domain layer is the most important layer. It is the only layer that never changes because of a technology decision. If a team switches from EF Core to Dapper, or from REST to gRPC, the Domain layer does not change. That is its defining characteristic.
+The Domain layer is the most important layer. It is the only layer that never changes because of transport decisions such as REST, gRPC, or messaging. Its aggregate shape is deliberately compatible with EF Core materialisation, so an ORM change may require structural adjustments such as constructors, backing fields, and value converter setup. That compatibility is an accepted implementation constraint, not permission to reference Infrastructure.
 
 ---
 
@@ -16,9 +16,9 @@ The Domain layer is the most important layer. It is the only layer that never ch
 
 ### Purity and Isolation
 
-The Domain layer has no NuGet dependencies on any infrastructure or framework package. The only acceptable dependencies are:
-- `Ardalis.GuardClauses` for enforcing invariants
+The Domain layer has no NuGet dependencies on infrastructure, persistence, web, or UI packages. The only acceptable dependencies are:
 - The .NET BCL
+- `Ardalis.GuardClauses` only for project-owned custom guard extensions that throw approved `DomainException` subclasses
 
 Any class that imports `Microsoft.EntityFrameworkCore`, `Microsoft.AspNetCore.*`, or any third-party library not in the above list does not belong in the Domain layer.
 
@@ -146,7 +146,7 @@ A strongly-typed ID is a `readonly record struct` wrapping a `Guid`. Define one 
 // Domain/Posts/PostId.cs
 readonly record struct PostId(Guid Value) : IParsable<PostId>
 {
-    public static PostId New() => new(Guid.NewGuid());
+    public static PostId New() => new(Guid.CreateVersion7());
 
     // Required for route and query-string binding (ASP.NET Core model binding)
     public static PostId Parse(string s, IFormatProvider? provider)
@@ -167,12 +167,49 @@ readonly record struct PostId(Guid Value) : IParsable<PostId>
 }
 ```
 
-### JSON Serialization (System.Text.Json)
-
-Define the converter in Infrastructure or WebApi. Register it in `Program.cs` via `builder.Services.Configure<JsonOptions>(o => o.SerializerOptions.Converters.Add(new PostIdJsonConverter()))`.
+For global infrastructure support, define a marker interface once in `Domain/Shared/StronglyTypedIds/`.
 
 ```csharp
-// Infrastructure/Converters/PostIdJsonConverter.cs
+// Domain/Shared/StronglyTypedIds/IStronglyTypedId.cs
+public interface IStronglyTypedId
+{
+    Guid Value { get; }
+}
+```
+
+Each ID implements the marker:
+
+```csharp
+readonly record struct PostId(Guid Value) : IStronglyTypedId, IParsable<PostId>
+{
+    public static PostId New() => new(Guid.CreateVersion7());
+    public static PostId Empty => new(Guid.Empty);
+
+    public static PostId Parse(string s, IFormatProvider? provider)
+        => new(Guid.Parse(s));
+
+    public static bool TryParse(string? s, IFormatProvider? provider, out PostId result)
+    {
+        if (Guid.TryParse(s, out var guid))
+        {
+            result = new PostId(guid);
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
+
+    public override string ToString() => Value.ToString();
+}
+```
+
+### JSON Serialization (System.Text.Json)
+
+Define converters in WebApi. Register them in `Program.cs` via `builder.Services.ConfigureHttpJsonOptions(...)`.
+
+```csharp
+// WebApi/Json/PostIdJsonConverter.cs
 sealed class PostIdJsonConverter : JsonConverter<PostId>
 {
     public override PostId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -182,6 +219,8 @@ sealed class PostIdJsonConverter : JsonConverter<PostId>
         => writer.WriteStringValue(value.Value);
 }
 ```
+
+For a project with many IDs, use a converter factory in WebApi rather than repeating one converter per ID. The factory MUST only match `IStronglyTypedId` types, not every `IParsable<T>` type.
 
 ### EF Core Value Converter
 
@@ -203,11 +242,11 @@ sealed class StronglyTypedIdSchemaTransformer : IOpenApiSchemaTransformer
 {
     public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
     {
-        if (context.JsonTypeInfo.Type.IsAssignableTo(typeof(IParsable<>).MakeGenericType(context.JsonTypeInfo.Type)))
+        if (context.JsonTypeInfo.Type.IsAssignableTo(typeof(IStronglyTypedId)))
         {
             schema.Type = "string";
             schema.Format = "uuid";
-            schema.Properties.Clear();
+            schema.Properties?.Clear();
         }
         return Task.CompletedTask;
     }
@@ -294,8 +333,15 @@ sealed class Post : AggregateRoot<PostId>
     /// </summary>
     public static Post Create(PostId id, PostTitle title, PostContent content, AuthorId authorId)
     {
-        Guard.Against.Default(id, nameof(id));
-        Guard.Against.Default(authorId, nameof(authorId));
+        if (id == default)
+        {
+            throw new PostIdentityRequiredException();
+        }
+
+        if (authorId == default)
+        {
+            throw new AuthorIdentityRequiredException();
+        }
 
         var post = new Post
         {
@@ -421,8 +467,16 @@ sealed record PostTitle
 
     public PostTitle(string value)
     {
-        Guard.Against.NullOrWhiteSpace(value, nameof(value));
-        Guard.Against.OutOfRange(value.Length, nameof(value), 1, 200);
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new PostTitleRequiredException();
+        }
+
+        if (value.Length > 200)
+        {
+            throw new PostTitleTooLongException(value.Length);
+        }
+
         Value = value;
     }
 
@@ -455,8 +509,15 @@ sealed class Order : AggregateRoot<OrderId>
     /// </summary>
     public void AddLine(ProductId productId, int quantity, Money unitPrice)
     {
-        Guard.Against.Default(productId, nameof(productId));
-        Guard.Against.NegativeOrZero(quantity, nameof(quantity));
+        if (productId == default)
+        {
+            throw new OrderLineProductRequiredException();
+        }
+
+        if (quantity <= 0)
+        {
+            throw new OrderLineQuantityMustBePositiveException();
+        }
 
         _lines.Add(new OrderLine(productId, quantity, unitPrice));
     }
@@ -471,10 +532,23 @@ Use `Guid.CreateVersion7()` instead of `Guid.NewGuid()`. Version 7 GUIDs are tim
 
 ```csharp
 // GOOD: version 7 GUIDs are time-ordered, which improves database index performance
-readonly record struct PostId(Guid Value)
+readonly record struct PostId(Guid Value) : IStronglyTypedId, IParsable<PostId>
 {
     public static PostId New() => new(Guid.CreateVersion7());
     public static PostId Empty => new(Guid.Empty);
+    public static PostId Parse(string s, IFormatProvider? provider) => new(Guid.Parse(s));
+    public static bool TryParse(string? s, IFormatProvider? provider, out PostId result)
+    {
+        if (Guid.TryParse(s, out var guid))
+        {
+            result = new PostId(guid);
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
+
     public override string ToString() => Value.ToString();
 }
 
@@ -551,7 +625,10 @@ Aggregates call `RaiseDomainEvent(...)` inside their mutation methods.
 ```csharp
 public void Place()
 {
-    Guard.Against.Empty(_lines, nameof(_lines));
+    if (_lines.Count == 0)
+    {
+        throw new OrderMustContainAtLeastOneLineException(Id);
+    }
 
     State = new PlacedOrderState(placedAt: DateTime.UtcNow);
     RaiseDomainEvent(new OrderPlaced(Id, CustomerId));

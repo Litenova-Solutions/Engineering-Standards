@@ -34,7 +34,7 @@ A single `IDatabaseContext` interface in `Application.Read.Contracts/Shared/` re
 ### Negative
 
 - `Application.Read` references `Microsoft.EntityFrameworkCore` for LINQ extension methods. This is an EF Core dependency in the Application layer.
-- Query handlers are no longer testable by mocking an interface. Tests use Testcontainers against a real PostgreSQL database.
+- Query handlers are no longer testable by mocking a read store interface. Fast handler tests use EF Core with SQLite in-memory mode, and integration tests cover PostgreSQL behavior through Testcontainers.
 
 ### Risks
 
