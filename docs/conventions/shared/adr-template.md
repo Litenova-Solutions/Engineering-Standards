@@ -73,7 +73,7 @@ Below is a complete, realistic example ADR.
 
 ---
 
-# 0006. Contracts Projects for the Application Layer
+# 0003. CQRS with Split Application Projects
 
 **Status:** Accepted
 
@@ -81,33 +81,41 @@ Below is a complete, realistic example ADR.
 
 ## Context
 
-With the application layer split into Write, Read, and Reactions projects, the WebApi layer needs to reference command and query types to dispatch them. If WebApi references the implementation projects (`Application.Write`, `Application.Read`), it pulls in handler implementations as a transitive dependency. This is unnecessary and creates a larger dependency surface. It also means that a future refactoring of a handler implementation could break the WebApi build, even when the command or query type did not change.
+The application layer handles two fundamentally different concerns: commands (write operations that change state) and queries (read operations that return data). When these are co-located, several problems emerge over time:
 
-Two approaches were considered:
+- Query handlers load full domain aggregates to extract a small subset of fields for display, which is wasteful and slow.
+- Write-side complexity (validation, business rules, domain event publishing) bleeds into query code.
+- Agents pattern-match on nearby code. If a query handler and a command handler are in the same folder, agents tend to write query handlers that look like command handlers (loading aggregates, calling domain methods, raising events).
 
-1. Let WebApi reference the implementation projects and accept the larger dependency surface.
-2. Create separate Contracts projects (`Application.Write.Contracts`, `Application.Read.Contracts`) containing only the public-facing types. WebApi references only the Contracts projects.
+Command Query Responsibility Segregation (CQRS) separates the write model from the read model. The write side uses the domain model. The read side uses projections and read stores. These are different patterns, and they should be in different places.
 
-The compiler enforces the boundary in approach 2: WebApi cannot call a handler directly because it has no reference to the implementation project. The only way to invoke a handler is through the mediator (`IMessageBus`), which is the correct pattern.
+Three structural options were considered:
+
+1. **Single Application project:** Commands and queries co-located. No structural enforcement of the CQRS principle.
+2. **Two Application projects (Write + Read):** Structural separation at the project level. The compiler prevents cross-referencing between the two sides in most cases.
+3. **Five Application projects (Write.Contracts, Write, Read.Contracts, Read, Reactions):** Full separation including Contracts projects that the WebApi layer can reference without taking a dependency on handler implementations.
+
+Option 3 is more projects but provides the strongest enforcement. It prevents WebApi from directly calling a handler, prevents query handlers from importing command types, and separates the Reactions event handling concern into its own project with its own dependency rules.
 
 ## Decision
 
-`Application.Write.Contracts` and `Application.Read.Contracts` are dedicated projects containing only the public contract types: commands, command results, queries, query results, and read store interfaces. WebApi references only the Contracts projects, not the implementation projects. The implementation projects also reference their own Contracts project.
+The application layer is split into five projects: `Application.Write.Contracts`, `Application.Write`, `Application.Read.Contracts`, `Application.Read`, and `Application.Reactions`. This structure enforces the CQRS split at the compiler level. See `docs/conventions/backend/03-application-layer.md` for the full convention.
 
 ## Consequences
 
 ### Positive
 
-- WebApi has a minimal, stable dependency surface that changes only when the command or query API changes.
-- The compiler prevents handlers from accidentally being placed in Contracts projects.
-- The Contracts projects are the versioned API surface of the application layer.
-- Agents cannot put a handler in a Contracts project because the build will fail if they try.
+- Agents cannot write a query handler that loads a domain aggregate because the aggregate type is not available in the `Application.Read` project unless explicitly referenced (which the convention prohibits).
+- WebApi references only the Contracts projects, keeping the API layer's dependency surface minimal and stable.
+- Reactions have their own dependency rules (no external libraries) that are enforced by project references.
+- The separation makes the intent of each project immediately clear to any engineer or agent reading the solution.
 
 ### Negative
 
-- Two additional projects per application layer split.
-- The distinction between Contracts and implementation must be understood by all engineers and agents.
+- Five projects instead of one increases solution complexity and the number of files an agent must understand.
+- Every new feature requires touching multiple projects (the Contracts project for the type, the implementation project for the handler).
+- The correct project for a given type must be documented clearly; agents frequently put handlers in Contracts projects without explicit instruction.
 
 ### Risks
 
-- Contracts projects can become bloated if non-contract types are placed there. The rule "no handlers in Contracts" must be enforced by architecture tests as a second line of defense.
+- If the project reference rules are not enforced by architecture tests, the boundaries will erode as shortcuts are taken. Architecture tests are required (see ADR 0009).

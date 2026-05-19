@@ -29,16 +29,20 @@ tests/
 │       ├── CreatePostCommandHandlerTests.cs
 │       ├── GetPostByIdQueryHandlerTests.cs
 │       └── PublishPostCommandValidatorTests.cs
-└── {ProjectName}.Integration.Tests/
-    ├── Posts/
-    │   ├── CreatePostEndpointTests.cs
-    │   └── GetPostByIdEndpointTests.cs
-    └── Fixtures/
-        ├── IntegrationTestWebAppFactory.cs
-        └── DatabaseSeeder.cs
+├── {ProjectName}.Integration.Tests/
+│   ├── Posts/
+│   │   ├── CreatePostEndpointTests.cs
+│   │   └── GetPostByIdEndpointTests.cs
+│   └── Fixtures/
+│       ├── IntegrationTestWebAppFactory.cs
+│       └── DatabaseSeeder.cs
+└── {ProjectName}.Architecture.Tests/
+    └── ApplicationLayerTests.cs
 ```
 
 `Application.Tests` covers handlers and validators from all five application projects (`Application.Write`, `Application.Read`, and `Application.Reactions`). There is no separate test project per application project unless the project is very large.
+
+`{ProjectName}.Architecture.Tests` contains architecture tests using NetArchTest that enforce structural rules. These tests run as part of `dotnet test` and fail the build if a structural rule is violated.
 
 ### `{ProjectName}.Domain.Tests`
 
@@ -339,13 +343,4 @@ public sealed class ApplicationLayerTests
 
 ---
 
-## Project-Specific Test Configuration
-
-> **Note:** This section is filled in per project.
-
-When filling in this section, include:
-
-- **Shared test fixtures** and what they set up
-- **Seeding helpers** for common test data scenarios
-- **Authentication setup** for integration tests that require authenticated requests
-- **Coverage threshold** requirements if enforced in CI
+Project-specific test configuration (shared fixtures, seeding helpers, authentication setup, coverage thresholds) is documented in the project repository.

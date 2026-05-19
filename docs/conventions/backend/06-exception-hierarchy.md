@@ -161,27 +161,51 @@ app.UseExceptionHandler();
 
 ---
 
-## Using Guard.Against
+## Validators and Guard Clauses
 
-Use `Guard.Against` from Ardalis.GuardClauses for common structural checks in validators.
+`Guard.Against` from Ardalis.GuardClauses throws `ArgumentException` and `ArgumentNullException`. These are not `ApplicationValidationException` subclasses and map to HTTP 500, not HTTP 400. Do not use `Guard.Against` in validators unless you have confirmed the specific overload throws the correct type.
+
+The correct pattern for validators is to throw custom exception subclasses directly:
 
 ```csharp
-// GOOD: use Guard.Against for common structural checks
-Guard.Against.NullOrWhiteSpace(command.Title, nameof(command.Title));
-Guard.Against.Default(command.AuthorId, nameof(command.AuthorId));
-
-// GOOD: throw custom exception directly when Guard.Against is not expressive enough
-if (command.Title.StartsWith(' '))
+// GOOD: throw custom ApplicationValidationException subclasses directly
+internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostCommand>
 {
-    throw new PostTitleCannotStartWithSpaceException();
+    public Task ValidateAsync(CreatePostCommand command, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(command.Title))
+        {
+            throw new PostTitleRequiredException();
+        }
+
+        if (command.AuthorId == default)
+        {
+            throw new AuthorIdRequiredException();
+        }
+
+        if (command.Title.Length > 200)
+        {
+            throw new PostTitleTooLongException(command.Title.Length);
+        }
+
+        return Task.CompletedTask;
+    }
 }
 
-// BAD: throwing wrong exception type from a validator
-if (string.IsNullOrWhiteSpace(command.Title))
+// BAD: Guard.Against throws ArgumentException -> maps to HTTP 500
+internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostCommand>
 {
-    throw new ArgumentNullException(nameof(command.Title)); // BAD: wrong category, produces 500
+    public Task ValidateAsync(CreatePostCommand command, CancellationToken cancellationToken)
+    {
+        Guard.Against.NullOrWhiteSpace(command.Title, nameof(command.Title));
+        // This throws ArgumentException, not PostTitleRequiredException.
+        // The GlobalExceptionHandler maps it to 500, not 400.
+        return Task.CompletedTask;
+    }
 }
 ```
+
+`Guard.Against` is still appropriate in domain value object constructors, where `ArgumentException` is the correct exception type for invalid construction arguments.
 
 ---
 
@@ -230,12 +254,4 @@ internal sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCom
 
 ---
 
-## Project-Specific Exception Types
-
-> **Note:** This section is filled in per project.
-
-| Exception Class | Category | Location | HTTP Status |
-|:---|:---|:---|:---|
-| _(example) `PostNotFoundException`_ | Resource Not Found | `Domain/Posts/Exceptions/` | 404 |
-| _(example) `PostAlreadyPublishedException`_ | Domain Invariant | `Domain/Posts/Exceptions/` | 409 |
-| _(example) `PostTitleRequiredException`_ | Validation | `Application.Write.Contracts/Posts/Exceptions/` | 400 |
+The exception inventory for a specific project lives in the project repository. Copy `docs/templates/exception-inventory.md` from the standards repository into `docs/domain/exception-inventory.md` in the project repository and fill it in.

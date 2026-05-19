@@ -44,18 +44,19 @@ One class per file. File name matches the primary type name exactly, including c
 | `CommandHandler` | `Application.Write` | Handler implementation for a command |
 | `CommandValidator` | `Application.Write` | Validator for a command |
 | `Query` | `Application.Read.Contracts` | Input record for a read operation |
-| `Result` | `Application.Read.Contracts` | Output record returned by a query handler |
+| `Result` | `Application.Read.Contracts` | Full output record returned by a query handler |
 | `Summary` | `Application.Read.Contracts` | Abbreviated projection for list queries |
-| `IReadStore` | `Application.Read.Contracts` | Read-side store interface |
+| `IReadStore` | `Application.Read.Contracts` | Read-side store interface (not a repository) |
 | `QueryHandler` | `Application.Read` | Handler implementation for a query |
 | `QueryValidator` | `Application.Read` | Validator for a query |
-| `ReadStore` | `Infrastructure` | Implementation of an `IReadStore` interface |
+| `EventHandler` | `Application.Reactions` | Handler that reacts to a domain event |
+| `ReadStore` | `Infrastructure` | Implementation of an `IXxxReadStore` interface |
 | `Repository` | `Infrastructure` | Implementation of an `IXxxRepository` interface |
 | `Configuration` | `Infrastructure` | EF Core `IEntityTypeConfiguration<T>` class |
 | `Endpoint` | `WebApi` | `IEndpoint` implementation class |
 | `Request` | `WebApi` | HTTP request body model |
 | `Response` | `WebApi` | HTTP response body model |
-| `ApiMappings` | `WebApi` | Static class with mapping extension methods |
+| `ApiMappings` | `WebApi` | `internal static` class with mapping extension methods |
 | `ServiceRegistration` | `Infrastructure`, `WebApi` | DI extension method class |
 
 ---
@@ -89,4 +90,49 @@ Task AddAsync(Post post, CancellationToken cancellationToken);
 Task<Post> GetById(PostId id);
 Task<Post> GetByIdAsync(PostId id, CancellationToken ct); // BAD: parameter named 'ct', not 'cancellationToken'
 Task Add(Post post);
+```
+
+---
+
+## Event Handler Naming
+
+Event handler class names follow the pattern `{Action}On{EventName}EventHandler`. The action describes what the handler does. The event name is the domain event class name without the word "Event".
+
+```csharp
+// GOOD: name describes the action and the triggering event
+UpdateReadModelOnPostPublishedEventHandler
+SendConfirmationOnOrderPlacedEventHandler
+LogOnCustomerRegisteredEventHandler
+
+// BAD: name only describes the event, not the action
+PostPublishedEventHandler   // BAD: what does it do when the post is published?
+OnPostPublished             // BAD: missing "EventHandler" suffix
+```
+
+---
+
+## Narrow Interface Naming
+
+Narrow interfaces defined in `Application.Reactions` are named after their single purpose. They follow the pattern `I{Verb}{Context}` where the verb describes the action and the context names the subject.
+
+```csharp
+// GOOD: name describes the single capability the interface provides
+internal interface IPostPublishedNotifier
+{
+    Task NotifySubscribersAsync(PostId postId, string postTitle, CancellationToken cancellationToken);
+}
+
+internal interface IOrderConfirmationSender
+{
+    Task SendAsync(OrderId orderId, string recipientEmail, CancellationToken cancellationToken);
+}
+
+// BAD: broad service interface that exposes more than the handler needs
+internal interface IEmailService   // BAD: exposes 20 methods; the handler needs one
+{
+    Task SendAsync(...);
+    Task SendBulkAsync(...);
+    Task GetDeliveryStatusAsync(...);
+    // ...
+}
 ```

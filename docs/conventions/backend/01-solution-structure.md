@@ -26,7 +26,8 @@ Every project follows this standard layout. Replace `{ProjectName}` with the act
 ├── tests/
 │   ├── {ProjectName}.Domain.Tests/
 │   ├── {ProjectName}.Application.Tests/
-│   └── {ProjectName}.Integration.Tests/
+│   ├── {ProjectName}.Integration.Tests/
+│   └── {ProjectName}.Architecture.Tests/
 └── docs/
     └── adr/
 ```
@@ -226,14 +227,4 @@ Global usings MUST NOT contain:
 
 ---
 
-## 9. Project-Specific Configuration
-
-> **Note:** This section is filled in per project. It covers configuration specific to this particular project.
-
-When filling in this section for a project, include:
-
-- **Environment variable names** used by the application
-- **Connection string keys** as they appear in `appsettings.json`
-- **Feature flags** and their expected values
-- **Project-specific NuGet additions** not in the pre-approved list, with a reference to the approving ADR
-- **External service dependencies** and where their configuration is documented
+Project-specific configuration is documented in the project repository. See `docs/templates/` in the standards repository for the templates to use.

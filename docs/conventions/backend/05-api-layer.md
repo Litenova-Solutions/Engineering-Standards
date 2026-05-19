@@ -17,7 +17,7 @@ An endpoint that makes a domain decision is wrong. An endpoint that queries a da
 1. **Thin endpoints.** No business logic. No domain decisions. Translate, dispatch, return.
 2. **Screaming architecture.** Folder structure reveals intent. The `Endpoints/Posts/Create/` folder communicates everything.
 3. **Dedicated mapping classes.** HTTP request to application command translation lives in `ApiMappings` classes, not in the endpoint handler method.
-4. **Mediator only.** Endpoints inject `ICommandMediator` or `IQueryMediator` depending on their role. They do not inject repositories, read stores, domain services, or any other application type directly.
+4. **Mediator only.** Endpoints inject `ICommandMediator` or `IQueryMediator` depending on their role. They do not inject repositories, read stores, domain services, or any other application type directly. Endpoints inject `ICommandMediator` or `IQueryMediator` specifically. Do not inject a unified `IMessageBus` unless the endpoint genuinely needs to dispatch both commands and queries, which is rare. Using the specific mediator interface documents the endpoint's intent.
 5. **Centralized error handling.** No `try-catch` in endpoints. All exception handling goes through `GlobalExceptionHandler`.
 6. **Rich OpenAPI documentation.** Every endpoint MUST call `.WithName()`, `.WithTags()`, `.WithSummary()`, and the appropriate `.Produces<T>()` and `.ProducesProblem()` calls.
 
@@ -265,6 +265,39 @@ sealed class GetPostByIdEndpoint : IEndpoint
 
 ---
 
+## Route Grouping
+
+When multiple endpoints share a route prefix, use `MapGroup` to avoid repeating the prefix on each endpoint. The group is created in a feature-level registration extension method, not in `Program.cs`.
+
+```csharp
+// GOOD: feature-level route group
+internal static class PostEndpointGroup
+{
+    internal static IEndpointRouteBuilder MapPostEndpoints(this IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/posts")
+            .WithTags("Posts")
+            .RequireAuthorization();
+
+        group.MapPost("/", CreatePostEndpoint.Handle)
+            .WithName("CreatePost")
+            .WithSummary("Creates a new draft post.")
+            .Produces<CreatePostResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
+
+        group.MapGet("/{id:guid}", GetPostByIdEndpoint.Handle)
+            .WithName("GetPostById")
+            .WithSummary("Returns a single post by its ID.")
+            .Produces<GetPostByIdResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound);
+
+        return app;
+    }
+}
+```
+
+---
+
 ## RESTful Conventions
 
 | Verb | Usage | Example URL |
@@ -316,15 +349,4 @@ Endpoints with no OpenAPI documentation MUST NOT be merged to `main`.
 
 ---
 
-## Project-Specific Configuration
-
-> **Note:** This section is filled in per project.
-
-When filling in this section, include:
-
-- **Authentication scheme** used (JWT Bearer, API Key, cookie-based)
-- **Base route prefix** if any (`/api/v1`)
-- **API versioning strategy** (URL path versioning, header versioning)
-- **CORS policy names** and which origins are allowed in which environment
-- **Authorization policy names** defined as constants and what they require
-- **Rate limiting policies** if applicable
+Project-specific API configuration (authentication scheme, base route prefix, versioning strategy, CORS policies) is documented in a project ADR.

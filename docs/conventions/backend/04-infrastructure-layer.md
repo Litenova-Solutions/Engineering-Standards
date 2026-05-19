@@ -99,6 +99,60 @@ internal sealed class PostConfiguration : IEntityTypeConfiguration<Post>
 }
 ```
 
+### EF Core Owned Entities for Value Objects
+
+Value objects that are stored as columns in the owning aggregate's table (not in a separate table) are configured using `OwnsOne`. Value objects with multiple properties require explicit column mapping.
+
+```csharp
+// GOOD: PostTitle stored as a single column in the Posts table
+internal sealed class PostConfiguration : IEntityTypeConfiguration<Post>
+{
+    public void Configure(EntityTypeBuilder<Post> builder)
+    {
+        builder.ToTable("Posts");
+
+        builder.OwnsOne(p => p.Title, titleBuilder =>
+        {
+            titleBuilder.Property(t => t.Value)
+                .HasColumnName("Title")
+                .HasMaxLength(200)
+                .IsRequired();
+        });
+
+        builder.OwnsOne(p => p.Content, contentBuilder =>
+        {
+            contentBuilder.Property(c => c.Value)
+                .HasColumnName("Content")
+                .IsRequired();
+        });
+    }
+}
+
+// GOOD: Money value object with two properties stored in the same table
+internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
+{
+    public void Configure(EntityTypeBuilder<Order> builder)
+    {
+        builder.OwnsOne(o => o.TotalAmount, moneyBuilder =>
+        {
+            moneyBuilder.Property(m => m.Amount)
+                .HasColumnName("TotalAmount")
+                .HasPrecision(18, 2)
+                .IsRequired();
+
+            moneyBuilder.Property(m => m.Currency)
+                .HasColumnName("TotalCurrency")
+                .HasMaxLength(3)
+                .IsRequired();
+        });
+    }
+}
+
+// BAD: storing a value object by mapping its properties individually
+// without OwnsOne, which breaks the value object encapsulation
+builder.Property("Title_Value").HasColumnName("Title");
+```
+
 ### Private Backing Fields for Collections
 
 Aggregate collections use private `List<T>` backing fields. EF Core must be configured to use those fields.
@@ -323,13 +377,4 @@ Never edit a migration file after it has been applied to any environment. If a m
 
 ---
 
-## Project-Specific Configuration
-
-> **Note:** This section is filled in per project.
-
-When filling in this section, include:
-
-- **Connection string keys** as they appear in `appsettings.json` and their environment variable names
-- **External service base URLs** and where their configuration lives
-- **Cloud resource names** used by external service clients
-- **Secrets management approach** for this project
+Project-specific infrastructure configuration (connection string keys, external service URLs, secrets management approach) is documented in the project repository in `docs/domain/` or in an ADR.

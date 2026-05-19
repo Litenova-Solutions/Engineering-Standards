@@ -12,20 +12,20 @@ This repository is for engineers, human and AI, working on any [Litenova Solutio
 
 ## How to Use This in a Project
 
-Add this repository as a git submodule at `.standards/` in your project:
+Add this repository as a git submodule at `standards/` in your project:
 
 ```bash
-git submodule add https://github.com/Litenova-Solutions/engineering-standards.git .standards
+git submodule add https://github.com/Litenova-Solutions/engineering-standards.git standards
 git submodule update --init --recursive
 ```
 
 To pin to a specific tag:
 
 ```bash
-cd .standards
+cd standards
 git checkout v1.0.0
 cd ..
-git add .standards
+git add standards
 git commit -m "chore: pin engineering-standards to v1.0.0"
 ```
 
@@ -35,7 +35,7 @@ In your project's own `AGENTS.md`, reference this repository so agents load it f
 # Project Agent Instructions
 
 This project follows the organization engineering standards.
-Read `.standards/AGENTS.md` before editing any code.
+Read `standards/AGENTS.md` before editing any code.
 ```
 
 ## Repository Structure
@@ -49,6 +49,7 @@ engineering-standards/
 ├── .windsurfrules                                    Windsurf shim that references AGENTS.md.
 ├── LICENSE                                           MIT license.
 ├── CHANGELOG.md                                      Release history in Keep a Changelog format.
+├── CONTRIBUTING.md                                   How to contribute, create releases, and publish to GitHub.
 ├── .github/
 │   └── copilot-instructions.md                      GitHub Copilot shim that references AGENTS.md.
 ├── .cursor/
@@ -72,6 +73,13 @@ engineering-standards/
     │   └── 0010-outbox-pattern-as-reliability-escalation.md
     ├── architecture/
     │   └── clean-architecture.md                     Full Clean Architecture guide for all projects.
+    ├── templates/                                    Templates for project-specific documentation. Copy these into each project repository.
+    │   ├── ubiquitous-language.md                    Template for the domain term glossary.
+    │   ├── aggregate-inventory.md                    Template for listing all aggregates and domain events.
+    │   ├── feature-inventory.md                      Template for listing all implemented and planned use cases.
+    │   ├── exception-inventory.md                    Template for listing all custom exception types.
+    │   ├── read-store-inventory.md                   Template for listing all read store interfaces and projections.
+    │   └── project-agents.md                         Template for the per-project AGENTS.md file.
     └── conventions/
         ├── 00-principles.md                          Language-agnostic engineering principles.
         ├── backend/
@@ -112,6 +120,12 @@ engineering-standards/
 | `docs/conventions/frontend/02-components.md` | React component design conventions. (Placeholder) |
 | `docs/conventions/frontend/03-data-fetching.md` | Data fetching patterns for Next.js. (Placeholder) |
 | `docs/conventions/frontend/04-state-and-forms.md` | State management and form handling conventions. (Placeholder) |
+| `docs/templates/ubiquitous-language.md` | Template for the domain term glossary. Copy to `docs/domain/` in a project repository. |
+| `docs/templates/aggregate-inventory.md` | Template for listing all aggregates, states, domain events, and repository interfaces. |
+| `docs/templates/feature-inventory.md` | Template for listing all implemented and planned use cases with handler class names. |
+| `docs/templates/exception-inventory.md` | Template for listing all custom exception types with categories and HTTP status codes. |
+| `docs/templates/read-store-inventory.md` | Template for listing all read store interfaces and the projection types they return. |
+| `docs/templates/project-agents.md` | Template for the per-project `AGENTS.md` file that imports these standards. |
 
 ## ADR Index
 
@@ -128,13 +142,27 @@ engineering-standards/
 | `docs/adr/0009-architecture-tests-as-enforcement.md` | Adds architecture tests using NetArchTest to enforce structural rules that project references cannot enforce. |
 | `docs/adr/0010-outbox-pattern-as-reliability-escalation.md` | Documents the outbox pattern as the escalation path for reliable event dispatch. |
 
+## Project-Specific Documentation
+
+Convention files in this repository do not contain project-specific content. They define patterns and rules that apply to all projects. Putting project-specific terms, feature lists, or exception inventories in convention files makes those files unstable and project-dependent.
+
+Each project repository should copy the templates from `docs/templates/` into its own `docs/domain/` directory and fill them in. These project-specific files are referenced from the project's `AGENTS.md` so agents have the domain context they need when generating or modifying code.
+
 ## Versioning
 
 Versions use semantic versioning tags (`v{major}.{minor}.{patch}`) on `main`. Projects MUST pin to a specific tag via the submodule reference. Pinning prevents silent convention drift when this repository is updated.
 
+A breaking change is any convention update that makes previously compliant code non-compliant.
+
+| Increment | When to Use | Example |
+|:---|:---|:---|
+| `MAJOR` | A breaking change. Previously compliant code becomes non-compliant. | Renaming a required interface, removing a pattern projects depend on. |
+| `MINOR` | A new convention is added. Existing compliant code remains compliant. | Adding a new template, adding a new rule for new code only. |
+| `PATCH` | A clarification, typo fix, new example, new ADR, or agent file improvement. | Fixing a typo, adding a `// BAD:` example to an existing rule. |
+
 ## Contributing
 
-All changes require a pull request and at least one review approval. The same PR that changes a convention or adds a file MUST include a corresponding `CHANGELOG.md` entry under `[Unreleased]`. Changes that affect AI agent context files (`AGENTS.md`, `.cursor/rules/`, `.github/copilot-instructions.md`) should be tested against at least one representative task to confirm the agent behavior changes as intended.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full process, including how to create releases and publish them to GitHub.
 
 ## License
 
