@@ -1,4 +1,4 @@
-# Engineering Standards — Agent Context
+# Engineering Standards: Agent Context
 
 This file is the canonical behavioral contract for all AI agents and engineers working on projects that follow these standards. Read it before touching any code.
 
@@ -9,8 +9,7 @@ This file is the canonical behavioral contract for all AI agents and engineers w
 3. Read the convention file for the layer you are about to edit (see index below).
 4. If the task involves exceptions: also read `docs/conventions/backend/06-exception-hierarchy.md`.
 5. If the task involves query handlers: also read `docs/conventions/backend/07-query-read-strategy.md`.
-
-Do NOT load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding tasks. Those are human-facing documents.
+6. Do NOT load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding tasks. Those are human-facing documents that provide no actionable rules for code generation.
 
 ## Tech Stack
 
@@ -59,6 +58,9 @@ Do NOT load `docs/philosophy.md` or `docs/agentic-development.md` for routine co
 - MUST NOT put command handlers or query handlers in the Contracts projects.
 - MUST NOT reference external libraries (EF Core, HTTP clients, email clients) directly in `Application.Reactions`. Use narrow interfaces.
 - MUST NOT use em dashes, AI slop words, or cliche phrases in any generated documentation or code comments.
+- MUST name the `CancellationToken` parameter exactly `cancellationToken` in all async methods. Never `ct`, `token`, or `cancel`.
+- MUST NOT reference `Application.Write` or `Application.Read` from `WebApi` endpoint code. Reference only the Contracts projects.
+- MUST NOT add direct NuGet package references for external libraries (EF Core, email clients, HTTP clients) to `Application.Reactions`. Define a narrow interface and implement it in Infrastructure.
 
 ## Common Agent Mistakes
 
@@ -73,6 +75,9 @@ Do NOT load `docs/philosophy.md` or `docs/agentic-development.md` for routine co
 - Forgetting `CancellationToken` propagation in async methods.
 - Referencing `Application.Write` or `Application.Read` from `WebApi` instead of only the Contracts projects.
 - Adding a direct dependency on an external library in `Application.Reactions` instead of defining a narrow interface.
+- Using `Guard.Against` in a validator and not realizing it throws `ArgumentException` by default, which maps to HTTP 500 instead of HTTP 400. Validators MUST throw `ApplicationValidationException` subclasses. Use direct `if` + `throw` for custom exceptions, or verify which `Guard.Against` overloads throw which types.
+- Naming the `CancellationToken` parameter `ct` instead of `cancellationToken`.
+- Placing project-specific content (ubiquitous language glossary, feature inventory, exception list) inside convention files. That content belongs in the project repository using the templates in `docs/templates/`.
 
 ## Convention File Index
 

@@ -4,6 +4,12 @@ This document defines the read-side strategy for all query handlers. The read st
 
 ---
 
+## Why IReadStore, Not IReadRepository
+
+The read-side abstraction is named `IXxxReadStore`, not `IXxxReadRepository`. The distinction is deliberate. A repository in DDD terms loads and persists aggregates. This interface does neither. It returns flat projection records and never constructs an aggregate. Calling it a repository would imply aggregate loading behavior that does not exist here and would invite the pattern this abstraction is specifically designed to prevent. The name "store" reflects that this is a data retrieval mechanism for the read side, not a domain object lifecycle manager.
+
+---
+
 ## 1. Why Read Stores
 
 Loading a full domain aggregate to answer a read query creates two problems that compound over time.
@@ -18,7 +24,7 @@ The read store pattern eliminates both problems. A read store is a query interfa
 
 ## 2. The Read Store Interface
 
-The `IXxxReadStore` interface lives in `Application.Read.Contracts`. This placement is critical: both the query handlers (in `Application.Read`) and the Infrastructure implementation reference `Application.Read.Contracts`, avoiding any circular dependency.
+The `IXxxReadStore` interface lives in `Application.Read.Contracts`. This placement is critical: both the query handlers (in `Application.Read`) and the Infrastructure implementation reference `Application.Read.Contracts`, avoiding any circular dependency. Infrastructure references `Application.Read.Contracts` directly to implement the interface; it does not reference `Application.Read`.
 
 ```csharp
 // Application.Read.Contracts/Posts/IPostReadStore.cs
@@ -148,12 +154,5 @@ When EF Core `Select` is insufficient (complex reporting queries, window functio
 
 ---
 
-## 7. Project-Specific Read Store Inventory
-
-> **Note:** This section is filled in per project.
-
-| Read Store Interface | Implementation Class | Aggregate(s) Queried |
-|:---|:---|:---|
-| _(example) `IPostReadStore`_ | _(example) `PostReadStore`_ | `Post`, `Author` |
-| _(example) `IOrderReadStore`_ | _(example) `OrderReadStore`_ | `Order`, `Customer` |
+The read store inventory for a specific project lives in the project repository. Copy `docs/templates/read-store-inventory.md` from the standards repository into `docs/domain/read-store-inventory.md` in the project repository and fill it in.
 

@@ -44,6 +44,25 @@ sealed class Order : AggregateRoot<OrderId>
 }
 ```
 
+### Why Repository Interfaces Live in the Domain Layer
+
+Repository interfaces such as `IPostRepository` are defined in the Domain layer, not the Application layer. The reason is that the interface's signature is expressed entirely in Domain types: it accepts a `PostId` and returns a `Post`. Both types are Domain types. The Domain layer owns its own persistence contract. Infrastructure satisfies that contract. This keeps the Domain layer self-contained: it defines what it needs without knowing how the need is satisfied.
+
+```csharp
+// GOOD: repository interface in Domain/Posts/IPostRepository.cs
+// The signature uses only Domain types (PostId, Post)
+interface IPostRepository
+{
+    Task<Post> GetByIdAsync(PostId id, CancellationToken cancellationToken);
+    Task AddAsync(Post post, CancellationToken cancellationToken);
+    Task UpdateAsync(Post post, CancellationToken cancellationToken);
+}
+
+// BAD: repository interface in Application layer
+// Application layer now owns a contract expressed in Domain types,
+// creating a conceptual mismatch
+```
+
 ### Ubiquitous Language
 
 Every type, property, and method name in the Domain layer reflects the language used by domain experts and stakeholders. If the business calls it "publishing a post", the method is `Publish()`, not `SetStatus(PostStatus.Published)`. If the business calls it an "order line", the type is `OrderLine`, not `OrderItem` or `LineItem`.
@@ -64,6 +83,8 @@ Every type, property, and method name in the Domain layer reflects the language 
 | Not-found exception | `{AggregateName}NotFoundException` | `PostNotFoundException` |
 | State discriminated union base | `{AggregateName}State` | `PostState` |
 | State case | `{StateName}{AggregateName}State` | `DraftPostState`, `PublishedPostState` |
+
+The read-side counterpart to `IXxxRepository` is `IXxxReadStore`, defined in `Application.Read.Contracts`. It is deliberately not called `IXxxReadRepository` because it does not load aggregates. It returns flat projections. The different name reflects the different contract. See `docs/conventions/backend/07-query-read-strategy.md`.
 
 ---
 
@@ -116,6 +137,40 @@ One folder per aggregate. Repository interfaces live inside the aggregate's fold
 ---
 
 ## Aggregate Root Design
+
+### The AggregateRoot Base Class
+
+Every aggregate root extends `AggregateRoot<TId>` defined in `Domain/Shared/AggregateRoot.cs`. This base class is defined in each project, not provided by a NuGet package. See `docs/architecture/clean-architecture.md` for the canonical implementation.
+
+```csharp
+// GOOD: aggregate root extends the base class
+sealed class Post : AggregateRoot<PostId>
+{
+    private Post() { }
+
+    public static Post Create(PostId id, PostTitle title, PostContent content, AuthorId authorId)
+    {
+        var post = new Post
+        {
+            Id = id,
+            Title = title,
+            Content = content,
+            AuthorId = authorId,
+            State = new DraftPostState()
+        };
+        post.RaiseDomainEvent(new PostCreated(id, authorId));
+        return post;
+    }
+}
+
+// BAD: aggregate root defined without a base class, duplicating domain event infrastructure
+sealed class Post
+{
+    private readonly List<IDomainEvent> _events = [];
+    public IReadOnlyList<IDomainEvent> Events => _events.AsReadOnly();
+    // ... duplicated boilerplate in every aggregate
+}
+```
 
 ### Static Factory Methods
 
@@ -441,12 +496,4 @@ public void Publish() { ... }
 
 ---
 
-## Project-Specific: Ubiquitous Language Glossary
-
-> **Note:** This section is filled in per project. It defines the bounded context's key terms so that all developers and agents use consistent language.
-
-| Term | Definition | Aggregate / Concept |
-|:---|:---|:---|
-| _(example) Post_ | _(example) A piece of content created by an author, which can be in draft, published, or archived state._ | `Post` aggregate |
-| _(example) Author_ | _(example) A registered user who has been granted the ability to create posts._ | `Author` aggregate |
-| _(example) Tag_ | _(example) A keyword associated with a post for categorization. A post may have up to 10 tags._ | `PostTag` value object on `Post` |
+The ubiquitous language glossary for a specific project lives in the project repository. Copy `docs/templates/ubiquitous-language.md` from the standards repository into `docs/domain/ubiquitous-language.md` in the project repository and fill it in.

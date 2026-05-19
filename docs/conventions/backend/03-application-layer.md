@@ -322,6 +322,40 @@ Validators MUST NOT:
 - Query the database to check business rules (e.g., do not check whether a post already exists in a validator).
 - Contain domain logic.
 
+`Guard.Against` from Ardalis.GuardClauses throws `ArgumentException` and `ArgumentNullException` by default. These are not `ApplicationValidationException` subclasses. They map to HTTP 500, not HTTP 400. Use `Guard.Against` in domain value object constructors where `ArgumentException` is acceptable. In validators, either throw custom `ApplicationValidationException` subclasses directly, or use `Guard.Against` only for checks where you have verified the thrown exception type is correct for your needs.
+
+```csharp
+// BAD: Guard.Against throws ArgumentException, which maps to HTTP 500
+internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostCommand>
+{
+    public Task ValidateAsync(CreatePostCommand command, CancellationToken cancellationToken)
+    {
+        Guard.Against.NullOrWhiteSpace(command.Title, nameof(command.Title));
+        // Guard.Against throws ArgumentException -> GlobalExceptionHandler maps it to 500
+        return Task.CompletedTask;
+    }
+}
+
+// GOOD: throw the correct custom exception directly
+internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostCommand>
+{
+    public Task ValidateAsync(CreatePostCommand command, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(command.Title))
+        {
+            throw new PostTitleRequiredException();
+        }
+
+        if (command.AuthorId == default)
+        {
+            throw new AuthorIdRequiredException();
+        }
+
+        return Task.CompletedTask;
+    }
+}
+```
+
 ---
 
 ## 9. Application Models and Mapping
@@ -334,14 +368,4 @@ If the same mapping appears in multiple handlers, extract it to a feature-level 
 
 ---
 
-## 10. Project-Specific: Feature Inventory
-
-> **Note:** This section is filled in per project. It lists all features and their implemented use cases.
-
-| Feature | Use Case | Type | Status |
-|:---|:---|:---|:---|
-| _(example) Posts_ | _(example) Create Post_ | Command | Implemented |
-| _(example) Posts_ | _(example) Publish Post_ | Command | Implemented |
-| _(example) Posts_ | _(example) Get Post By Id_ | Query | Implemented |
-| _(example) Posts_ | _(example) List Posts by Author_ | Query | Planned |
-| _(example) Orders_ | _(example) Place Order_ | Command | Planned |
+The feature inventory for a specific project lives in the project repository. Copy `docs/templates/feature-inventory.md` from the standards repository into `docs/domain/feature-inventory.md` in the project repository and fill it in.

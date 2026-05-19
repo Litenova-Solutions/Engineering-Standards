@@ -337,3 +337,61 @@ Three concrete examples of rules that architecture tests enforce:
 2. **Handlers must be `internal sealed`.** Handlers are implementation details and must not be `public`. The test asserts this for all types implementing `ICommandHandler<,>` or `IQueryHandler<,>`.
 
 3. **Reactions must not reference external libraries.** NetArchTest checks that no type in the Reactions assembly has a dependency on `Microsoft.EntityFrameworkCore` or similar packages.
+
+---
+
+## 8. The AggregateRoot Base Class
+
+Every project defines two types in `Domain/Shared/`. They are not provided by a NuGet package; they are owned by the project.
+
+```csharp
+/// <summary>
+/// The base class for all aggregate roots. Provides domain event collection
+/// and the strongly-typed ID contract.
+/// </summary>
+abstract class AggregateRoot<TId>
+    where TId : struct
+{
+    private readonly List<IDomainEvent> _domainEvents = [];
+
+    /// <summary>
+    /// The unique identifier of this aggregate root.
+    /// </summary>
+    public TId Id { get; protected init; }
+
+    /// <summary>
+    /// Domain events raised during this aggregate's lifetime, dispatched
+    /// after the transaction commits.
+    /// </summary>
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+    /// <summary>
+    /// Records a domain event to be dispatched after the transaction commits.
+    /// </summary>
+    protected void RaiseDomainEvent(IDomainEvent domainEvent)
+    {
+        _domainEvents.Add(domainEvent);
+    }
+
+    /// <summary>
+    /// Clears all recorded domain events. Called by Infrastructure after
+    /// events have been dispatched.
+    /// </summary>
+    public void ClearDomainEvents()
+    {
+        _domainEvents.Clear();
+    }
+}
+```
+
+The `IDomainEvent` marker interface:
+
+```csharp
+/// <summary>
+/// Marker interface for all domain events. Implement this interface on
+/// every domain event record.
+/// </summary>
+interface IDomainEvent;
+```
+
+Both types live in `Domain/Shared/`. All aggregate roots extend `AggregateRoot<TId>`. All domain event records implement `IDomainEvent`. Infrastructure calls `ClearDomainEvents()` after dispatching events via LiteBus.

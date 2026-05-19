@@ -9,24 +9,33 @@ These rules apply when an agent is editing files inside the `engineering-standar
 
 ## Tone and Writing Rules
 
-- Maintain the tone defined in `AGENTS.md`: direct, concrete, no filler. RFC 2119 keywords (`MUST`, `MUST NOT`, `SHOULD`) for mandatory rules.
-- MUST NOT use em dashes anywhere. Replace with a comma, semicolon, colon, or a new sentence.
-- MUST NOT use forbidden words: delve, leverage, utilize, streamline, holistic, robust (except strict fault-tolerance), seamless, cutting-edge, innovative, empower, unlock, harness, navigate, realm, tapestry, multifaceted, pivotal.
-- All diagrams MUST use Mermaid syntax in a fenced code block. No ASCII art.
+- Maintain the tone and writing rules defined in `AGENTS.md` at all times.
+- MUST NOT use em dashes, en dashes, or any forbidden word listed in `AGENTS.md` in any generated content, documentation, or code comment.
+- All diagrams in markdown files MUST use Mermaid syntax in a fenced code block. Never use ASCII art.
 
 ## Rule Integrity
 
-- MUST NOT remove a rule from any convention file without adding a corresponding entry in `CHANGELOG.md`.
+- MUST NOT remove a rule from any convention file without adding a corresponding entry in `CHANGELOG.md` in the same commit.
 - MUST NOT downgrade a `MUST` rule to a `SHOULD` rule without a CHANGELOG entry and a rationale in the convention file.
 - MUST NOT add a rule without verifying it does not conflict with an existing rule in another convention file.
 
 ## AGENTS.md Size Limit
 
-`AGENTS.md` MUST remain under 150 lines. If content must be added, summarize rather than append. Detailed rules belong in the layer-specific convention files.
+`AGENTS.md` MUST remain under 150 lines. If it exceeds 150 lines, extract detail to a convention file and link to it.
 
 ## Convention File Index
 
-When a new convention file is added under `docs/conventions/`, the Convention File Index table in `AGENTS.md` MUST be updated in the same commit or PR.
+Update the convention file index table in `AGENTS.md` whenever a new convention file is added or renamed.
+
+## ADR Index
+
+When adding a new ADR, add a corresponding row to the index table in `docs/adr/README.md` in the same commit.
+
+## Templates
+
+When changing a convention that affects project-specific templates, update the corresponding file in `docs/templates/`.
+
+Project-specific content (ubiquitous language, feature inventories, exception lists) does NOT belong in convention files. It belongs in the project repository using the templates in `docs/templates/`.
 
 ## Code Examples
 
