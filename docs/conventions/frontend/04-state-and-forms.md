@@ -84,6 +84,81 @@ const usePostStore = create((set) => ({
 }))
 ```
 
+### Server Cache vs. UI State Division
+
+| Dimension | Server Cache (TanStack Query) | Ephemeral UI State (Zustand) |
+|:---|:---|:---|
+| **Source of Truth** | Remote database / Server endpoints | Browser memory / Local user actions |
+| **Ownership** | Shared across all clients; not owned by this tab | Private to this browser tab and session |
+| **Typical Data** | Post bodies, product catalogs, user details | Selected index, editor tabs, sidebar toggle, text drafts |
+| **Staleness** | Immediately stale after fetching; needs revalidation | Always 100% accurate relative to user actions |
+| **Primary Tool** | `useQuery`, `useMutation`, `useInfiniteQuery` | `useStore` custom hooks resolved via Zustand |
+| **Key Operations** | Cache invalidation, query key refetching, pagination | Atomic state updates, store resets, local events |
+
+### Coordination Code Example
+
+The example below demonstrates how to coordinate server data and client-side UI selections cleanly. Zustand stores the selected post ID (client UI state), while TanStack Query manages the corresponding query lifecycle and caching (server state).
+
+```typescript
+// features/posts/detail/usePostFocusStore.ts
+import { create } from "zustand"
+
+type FocusState = {
+  focusedPostId: string | null
+  setFocusedPostId: (id: string | null) => void
+  reset: () => void
+}
+
+export const usePostFocusStore = create<FocusState>((set) => ({
+  focusedPostId: null,
+  setFocusedPostId: (id) => set({ focusedPostId: id }),
+  reset: () => set({ focusedPostId: null }),
+}))
+```
+
+```tsx
+// features/posts/detail/PostDetailsViewer.tsx
+"use client"
+// Needs useQuery from TanStack and custom selector hook - client boundary required.
+
+import { useQuery } from "@tanstack/react-query"
+import { usePostFocusStore } from "./usePostFocusStore"
+import { fetchPostById } from "../api/fetchPost"
+
+export function PostDetailsViewer() {
+  // 1. Read ephemeral UI selection from Zustand
+  const focusedPostId = usePostFocusStore((state) => state.focusedPostId)
+  const setFocusedPostId = usePostFocusStore((state) => state.setFocusedPostId)
+
+  // 2. Read remote server data from TanStack Query
+  const { data: post, isLoading, error } = useQuery({
+    queryKey: ["posts", focusedPostId],
+    queryFn: () => fetchPostById(focusedPostId!),
+    enabled: !!focusedPostId, // ONLY execute query when an ID is active
+  })
+
+  if (!focusedPostId) {
+    return <p className="text-muted-foreground">Select a post to view details</p>
+  }
+
+  if (isLoading) return <span className="animate-pulse">Loading post data...</span>
+  if (error) return <span className="text-destructive">Failed to fetch post details.</span>
+
+  return (
+    <div className="p-4 border rounded shadow bg-card text-card-foreground">
+      <h2 className="text-xl font-bold">{post?.title}</h2>
+      <p className="mt-2 text-sm">{post?.content}</p>
+      <button 
+        onClick={() => setFocusedPostId(null)}
+        className="mt-4 px-3 py-1 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80"
+      >
+        Close View
+      </button>
+    </div>
+  )
+}
+```
+
 ---
 
 ## 4. URL State

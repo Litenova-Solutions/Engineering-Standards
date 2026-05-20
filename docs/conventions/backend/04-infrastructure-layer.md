@@ -48,6 +48,34 @@ src/{ProjectName}.Infrastructure/
 
 ## EF Core Conventions
 
+### PostgreSQL snake_case Mapping Rules
+
+To prevent PostgreSQL from requiring double-quotes (e.g., `"Posts"`, `"Id"`) in SQL queries, **all database objects (table names, columns, primary keys, foreign keys, and indexes) MUST be mapped in `snake_case`**.
+
+You **MUST** install the NuGet package `EFCore.NamingConventions` and configure `AppDbContext` to use snake_case in `InfrastructureServiceRegistration.cs`:
+
+```csharp
+services.AddDbContext<AppDbContext>(options =>
+    options
+        .UseNpgsql(configuration.GetConnectionString("Database"))
+        .UseSnakeCaseNamingConventions()); // Enforces snake_case across all tables and columns
+```
+
+#### Naming Conventions for Database Objects:
+*   **Table Names:** Singular, snake_case (e.g., `post`, `order_line`), or standard pluralized snake_case if preferred by project team (e.g., `posts`, `order_lines`), but **MUST** be consistent across the entire database.
+*   **Primary Keys:** `pk_{table_name}` (automatically handled by `.UseSnakeCaseNamingConventions()`).
+*   **Foreign Keys:** `fk_{child_table}_{parent_table}_{parent_column}` (automatically handled).
+*   **Single-Column Indexes:** `ix_{table_name}_{column_name}`
+*   **Composite Indexes:** `ix_{table_name}_{column1}_{column2}`
+*   **Unique Constraints:** `uq_{table_name}_{column_name}`
+
+```csharp
+// DO: Manually declare unique indexes with strict snake_case names
+builder.HasIndex(u => u.Email)
+    .IsUnique()
+    .HasDatabaseName("uq_users_email");
+```
+
 ### Configuration Classes
 
 Every aggregate MUST have a dedicated `IEntityTypeConfiguration<T>` class. Never put fluent API calls inline in `OnModelCreating`.

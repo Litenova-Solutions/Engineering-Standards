@@ -328,6 +328,45 @@ Use resource names in plural lowercase. Nest sub-resources where the relationshi
 
 The `GlobalExceptionHandler` maps exception types to these codes automatically. Endpoints MUST NOT manually set status codes based on exception types.
 
+### Standardized Validation Error Schema (RFC 7807)
+
+When an endpoint returns a `400 Bad Request` due to a command or query validation failure (`CommandValidationException` or `QueryValidationException`), the response body **MUST** conform strictly to the **RFC 7807 (Problem Details)** standard with the Content-Type header set to `application/problem+json`.
+
+The response **MUST** include a highly structured `extensions` dictionary containing a flat key-value dictionary of invalid fields and their corresponding error messages. This schema is the contract that the Next.js frontend relies on to display form-level validation errors automatically.
+
+#### Validation Error JSON Schema Example
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+  "title": "Command validation failure",
+  "status": 400,
+  "detail": "One or more validation errors occurred.",
+  "instance": "/posts",
+  "extensions": {
+    "invalidParams": {
+      "title": ["A post title is required and cannot be empty."],
+      "authorId": ["A valid Author ID is required."]
+    }
+  }
+}
+```
+
+In the backend `GlobalExceptionHandler`, this is achieved by enriching `ProblemDetails` when handling validation exception types:
+
+```csharp
+if (exception is CommandValidationException validationException)
+{
+    problem.Extensions["invalidParams"] = new Dictionary<string, string[]>
+    {
+        // Maps the exception field to its explicit constraint message in camelCase
+        { "title", new[] { validationException.Message } }
+    };
+}
+```
+
+The frontend **MUST** parse this `invalidParams` block and match the camelCase property names directly to Zod form fields.
+
 ---
 
 ## OpenAPI Documentation Rules

@@ -89,6 +89,45 @@ services.AddScoped<IOutboxDispatcher, OutboxDispatcher>();
 services.AddHostedService<OutboxDispatcherHostedService>();
 ```
 
+### 3.1 EF Core Change Tracker and Memory Management
+
+Hosted services process data iteratively over long runtimes. If a background job queries and processes database records inside an iteration, EF Core's active change tracker tracks every retrieved aggregate in memory. Over hours, this causes silent memory accumulation, slowing query speeds and leading to eventual `OutOfMemoryException` crashes. Furthermore, tracked entities can trigger unintended dirty updates if properties are modified in memory and a save operation is called subsequently.
+
+To prevent this, background jobs MUST follow these database tracking rules:
+
+1. **Use `AsNoTracking()` for read-only checks:** Any query executed by a background service that is not modifying state MUST explicitly utilize `.AsNoTracking()` to keep the change tracker empty.
+2. **Clear the Change Tracker explicitly:** For write operations that load aggregates, mutate them, and save them, engineers MUST call `dbContext.ChangeTracker.Clear()` at the end of every loop iteration to purge resolved entities from memory.
+3. **Control Scope Lifespans:** Never resolve a database context or repository outside the active iteration loop. The `using` block of the resolved scope ensures that DbContext instances are garbage-collected frequently.
+
+```csharp
+// GOOD: clearing the EF Core change tracker inside the processing loop
+protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+{
+    using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+
+    while (await timer.WaitForNextTickAsync(cancellationToken))
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        // Query read-only data without tracking to save memory
+        var pendingJobs = await dbContext.BackgroundJobs
+            .AsNoTracking()
+            .Where(j => j.Status == JobStatus.Pending)
+            .Take(20)
+            .ToListAsync(cancellationToken);
+
+        foreach (var job in pendingJobs)
+        {
+            await ProcessJobAsync(job, dbContext, cancellationToken);
+        }
+
+        // REQUIRED: Purge the tracker to release tracked entities from memory
+        dbContext.ChangeTracker.Clear();
+    }
+}
+```
+
 ---
 
 ## 4. Scheduling Rules

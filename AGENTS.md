@@ -7,11 +7,12 @@ This is the canonical contract for AI agents and engineers working on projects t
 1. Read this file in full.
 2. Read `docs/architecture/clean-architecture.md`.
 3. Read the convention file for the layer you are editing.
-4. If the task involves exceptions, read `docs/conventions/backend/06-exception-hierarchy.md`.
-5. If it involves logging, metrics, tracing, health checks, or alerts, read `docs/conventions/backend/09-observability.md`.
-6. If it involves query handlers, read `docs/conventions/backend/07-query-read-strategy.md`.
-7. If it involves retries, idempotency, outbox, background jobs, caching, realtime, migrations, or security, read the matching convention file from the index below.
-8. Do not load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding tasks. They are human-facing rationale docs.
+4. Read `docs/conventions/shared/agentic-guardrails.md` to understand strict dependency lockdowns and scaffolding constraints.
+5. If the task involves exceptions, read `docs/conventions/backend/06-exception-hierarchy.md`.
+6. If it involves logging, metrics, tracing, health checks, or alerts, read `docs/conventions/backend/09-observability.md`.
+7. If it involves query handlers, read `docs/conventions/backend/07-query-read-strategy.md`.
+8. If it involves retries, idempotency, outbox, background jobs, caching, realtime, migrations, or security, read the matching convention file from the index below.
+9. Do not load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding tasks. They are human-facing rationale docs.
 
 ## Tech Stack
 
@@ -63,8 +64,11 @@ This is the canonical contract for AI agents and engineers working on projects t
 - MUST use `ICommandMediator.SendAsync` for commands and `IQueryMediator.QueryAsync` for queries in endpoints. Never inject a unified message bus.
 - MUST name every async `CancellationToken` parameter exactly `cancellationToken`.
 - MUST NOT add a NuGet package without a corresponding ADR or pre-approved package row.
+- MUST NOT use forbidden packages under any circumstances (e.g. AutoMapper, MediatR, FluentValidation, Newtonsoft.Json, Axios, Lodash, Moment.js).
+- MUST map all PostgreSQL tables, columns, keys, and index names using `snake_case` mapping conventions (using `.UseSnakeCaseNamingConventions()`).
+- MUST use `.AsNoTracking()` or select-projections for all query handler queries in `Application.Read`.
 - MUST NOT use em dashes, en dashes, cliches, or AI slop wording in generated docs or comments.
-- MUST run `dotnet build` and `dotnet test` before marking code tasks complete.
+- MUST run the mandatory verification pipeline commands (e.g., `dotnet build`, `dotnet test`) before completing code tasks.
 - MUST await `cookies()`, `headers()`, `params`, and `searchParams` in Next.js 15 and later.
 - MUST NOT use server-only modules in `'use client'` files.
 - MUST add a comment to every `'use client'` directive explaining why the client boundary is needed.
@@ -75,6 +79,9 @@ This is the canonical contract for AI agents and engineers working on projects t
 ## Common Mistakes To Avoid
 
 - Using `IMessageBus` instead of the specific LiteBus mediator.
+- Importing forbidden libraries (AutoMapper, MediatR, FluentValidation, Axios, Lodash, Moment.js) instead of standard/lite alternatives.
+- Allowing PascalCase mappings in PostgreSQL, leading to double-quote sql queries.
+- Failing to use `.AsNoTracking()` in read-side query projections.
 - Putting mappings inside endpoint handler methods instead of `ApiMappings`.
 - Checking business rules in handlers instead of aggregates.
 - Updating read model tables from Reactions without a project ADR.
@@ -108,6 +115,7 @@ This is the canonical contract for AI agents and engineers working on projects t
 | CI and Local Gates | `docs/conventions/shared/ci.md` |
 | Security | `docs/conventions/shared/security.md` |
 | Real-Time Updates | `docs/conventions/shared/realtime-updates.md` |
+| Agentic Guardrails | `docs/conventions/shared/agentic-guardrails.md` |
 | Frontend/App Router | `docs/conventions/frontend/01-nextjs-app-router.md` |
 | Frontend/Components | `docs/conventions/frontend/02-components.md` |
 | Frontend/Data Fetching | `docs/conventions/frontend/03-data-fetching.md` |
