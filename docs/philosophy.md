@@ -61,3 +61,36 @@ Explicit rules outperform cultural norms when agents are primary contributors. A
 Consistent, predictable structure lets agents navigate confidently. An agent that sees a handler in `Posts/Publish/PublishPostCommandHandler.cs` in one feature can infer with high confidence that the next handler belongs in `Posts/Archive/ArchivePostCommandHandler.cs`. Unpredictable structure forces agents to search the entire codebase before making a change. Verbose, ceremonious code is also easier for agents to extend correctly than clever, concise code. An agent extending a pattern it has seen clearly will make fewer errors than an agent inferring behavior from a compact abstraction.
 
 See `docs/agentic-development.md` for the full treatment of this topic, including how the standards are specifically designed to manage agent failure modes.
+
+---
+
+## 8. Why We Ban Dual-Writes (Outbox Resiliency Philosophy)
+
+A dual-write occurs when an application attempts to update state in a database and simultaneously notify or update another system (e.g., publishing a message to a broker, calling an external payment gateway, or sending a transactional email) inside the same logical operation.
+
+Dual-writes are an architectural anti-pattern because **distributed systems fail in partial ways**:
+1. If the database commit succeeds but the network call to the external service fails (due to latency, packet loss, or service outage), the external system remains unaware of the change. State is now permanently desynchronized.
+2. If the external service call succeeds but the subsequent database transaction fails or is rolled back, the external system has committed a side effect for a change that never happened in our system (e.g., shipping an order that was canceled).
+
+We solve this using the Outbox pattern. A command handler's transaction writes *only* to the local database—modifying the aggregate state and inserting a pending event record into the `outbox` table in the exact same atomic transaction. The request then terminates immediately, returning success. A separate, resilient, background process reads these rows asynchronously and handles the external deliveries.
+
+By decoupling the persistence of the intent from the execution of the side effect, we guarantee that the event is eventually delivered at least once, even in the event of hardware, database, or network failure.
+
+---
+
+## 9. Why Client State and Server Cache are Mutually Exclusive
+
+A common frontend failure mode is storing fetched server data (e.g., user profiles, list of posts, shopping cart items) inside global UI state management systems (such as Zustand, Redux, or MobX). This is a conceptual error.
+
+Server state is fundamentally different from client state:
+- **Server state** is not owned by the client. It lives on a remote system, can be mutated by other users or background tasks, and represents a read-only snapshot that is immediately stale the moment it is retrieved.
+- **Client state** is owned entirely by the client. It lives in the browser's memory, represents ephemeral UI configuration (e.g., which sidebar is open, active tab, text input drafts), and is 100% accurate at all times.
+
+Attempting to merge these two distinct models into a single store forces engineers to write highly complex manual synchronization, loading state management, and manual cache invalidation code.
+
+We partition these concerns:
+1. **TanStack Query** acts as a highly optimized, automated **remote cache**. It owns all server state, handles polling, request deduplication, loading/error states, and automatic cache invalidation.
+2. **Zustand** acts as the **ephemeral UI state store**. It contains *zero* server-fetched properties and no manual fetch functions.
+
+This separation ensures that UI state remains predictable, rendering cycles are isolated, and server data stays synchronized without manual orchestration.
+

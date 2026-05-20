@@ -81,6 +81,16 @@ Most code never reaches Strike 2. The rule prevents the accumulation of a `Share
 
 The promotion rule applies within a single project. Types that are part of the public contract of a layer (commands, queries, result records, `IDatabaseContext`, pagination envelopes) belong in the Contracts project from the start, not after promotion. Promotion is for implementation-level code that unexpectedly becomes reusable.
 
+### Promotion Workflow Checklist
+
+When promoting code, engineers MUST follow this precise sequence to prevent circular dependencies, namespace drift, and compiler errors:
+
+1. **Verify strike triggers:** Assert that the class, record, or helper is actively needed by multiple boundaries before initiating the move.
+2. **Verify dependency directions:** Assert that the target shared folder does not violate one-way dependency rules (e.g., Application Shared code MUST NOT import Infrastructure assemblies).
+3. **Relocate and namespace-refactor:** Move the physical file to the target `Shared/` folder and change its namespace declaration to match its new physical location.
+4. **Compile and optimize imports:** Run the build system (`dotnet build` or equivalent) to capture broken imports. Update only the required call sites. Avoid importing global namespaces where single-type imports suffice.
+5. **Verify against architecture tests:** Execute test verification to ensure the newly shared code does not introduce forbidden references or break internal boundaries.
+
 ---
 
 ## 7. Exception Hierarchy as Contract
@@ -141,4 +151,20 @@ sealed class CreatePostEndpoint : IEndpoint
 {
     private readonly CreatePostCommandHandler _handler; // BAD: references implementation project
 }
+
+---
+
+## 10. Input Validation vs. Invariant Enforcement
+
+Every project MUST enforce a strict boundary between two categories of rule checks: input validation and domain invariant validation. Confusing these two roles leads to business rules bleeding into input validators and bad formatting checks crashing the domain.
+
+| Category | Responsibility | Location | Exception |
+|:---|:---|:---|:---|
+| **Input Validation** | Validates shape, syntax, formatting, and presence of fields. | Validators (e.g., `ICommandValidator<T>`, React/Zod schemas) | `CommandValidationException` / `QueryValidationException` |
+| **Domain Invariants** | Enforces state compliance, business policies, and aggregate consistency. | Domain Aggregates, Value Objects, and Domain Services | `DomainException` subclasses |
+
+### Key Rules:
+1. **Validators MUST NOT check database state or complex domain rules.** They inspect the shape and constraints of incoming data (e.g., string length, email formatting, UUID validity). Checking whether a username is unique or whether an account balance has sufficient funds belongs strictly within domain aggregates or domain query flows.
+2. **Aggregates MUST NOT perform basic formatting validation.** By the time a command reaches the aggregate, the command payload is already syntactically correct. The aggregate's sole responsibility is enforcing state transitions (e.g., "a post can only be published if it is currently a draft").
+3. **Never call validators or throw validation exceptions from inside the aggregate.** An aggregate throws specific domain exception subclasses (such as `PostAlreadyPublishedException`), never argument exceptions or generic validation exceptions.
 ```

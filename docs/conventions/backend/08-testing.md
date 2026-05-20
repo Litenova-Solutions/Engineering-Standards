@@ -16,6 +16,34 @@ Test behavior, not implementation. A test that breaks when you rename a private 
 
 ---
 
+## Strict Code Coverage and Mocking Constraints
+
+To ensure maximum system reliability and guard against regression, all active projects **MUST** adhere to strict test coverage thresholds and mocking boundaries.
+
+### 1. Code Coverage Budgets
+Test coverage is enforced in CI/CD pipeline gates via `coverlet.collector`. Any pull request that reduces coverage below these limits **SHALL** fail build verification:
+
+| Project / Layer | Minimum Coverage Threshold | Metric Scope |
+|:---|:---:|:---|
+| `{ProjectName}.Domain` | **90%** | Line & Branch coverage |
+| `{ProjectName}.Application.Write` | **85%** | Line & Branch coverage |
+| `{ProjectName}.Application.Read` | **80%** | Line & Branch coverage |
+| `{ProjectName}.Application.Reactions` | **80%** | Line coverage |
+
+CI verification pipeline commands **MUST** enforce this standard:
+```bash
+dotnet test src/{ProjectName}.slnx /p:CollectCoverage=true /p:Threshold=80 /p:ThresholdType=branch
+```
+
+### 2. Strict Mocking Guidelines
+Mocking is a powerful tool, but over-mocking creates fragile tests that lock implementation details rather than behavior.
+
+*   **Forbid Mocking `IDatabaseContext`:** You **MUST NOT** use NSubstitute or any mocking library to mock `IDatabaseContext` or `IQueryable<T>`. Because queries run direct EF Core LINQ projections, mocking the queryable interface is extremely error-prone and hides database translation issues. Query handler tests **MUST** use the real in-process SQLite provider (`InMemoryDbContextFactory.Create()`).
+*   **No Mock Verification on Queries:** Since queries are side-effect-free, you **MUST NOT** verify that a mock was called during a query handler test. Query assertions **MUST** rely exclusively on asserting the correctness of the returned result.
+*   **Limit Mock Depth (No Transitive Mocking):** NSubstitute mocks **MUST** only mock direct dependencies of the unit under test (e.g., `IPostRepository`). Mocking nested dependencies (e.g., mocking a dependency returned by another mocked object) is strictly forbidden. If a dependency requires complex setup, use a real lightweight test implementation or a Test Builder instead.
+
+---
+
 ## Test Project Structure
 
 ```
