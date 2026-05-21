@@ -1,12 +1,12 @@
 # Agentic Guardrails and Anti-Drift Standards
 
-This document establishes the canonical constraints and deterministic guardrails required to prevent architectural drift, dependency pollution, and code hallucination by autonomous AI agents and human developers. 
+This document establishes the canonical constraints and deterministic guardrails required to prevent architectural drift, dependency pollution, and code hallucination by autonomous AI agents and human developers.
 
 ---
 
 ## 1. Guiding Philosophy
 
-AI coding agents are highly efficient but prone to context-based drift, library hallucination, and boundary violations. To guarantee that all codebase additions remain enterprise-grade, clean-architecture compliant, and free of unnecessary dependencies, this contract defines **non-negotiable** operational constraints. 
+AI coding agents are highly efficient but prone to context-based drift, library hallucination, and boundary violations. To guarantee that all codebase additions remain enterprise-grade, clean-architecture compliant, and free of unnecessary dependencies, this contract defines **non-negotiable** operational constraints.
 
 Every automated agent **MUST** parse this file and execute the verification pipelines before completing any coding assignment.
 
@@ -77,6 +77,18 @@ Query handlers MUST inject IDatabaseContext and write direct LINQ projections. T
 
 <Rule id="TRANSACTION_COMMIT_BOUNDARY">
 Command handlers and repositories MUST NOT invoke `SaveChangesAsync()` or commit transactions. All database writes are committed by the SaveChangesCommandPostHandler pipeline.
+</Rule>
+
+<Rule id="FEATURE_FOLDER_ISOLATION">
+ALL React components, hooks, and utilities that belong to a feature MUST be placed in `features/{feature}/{usecase}/`. Never place feature-specific code in `app/`, `components/` (root level), or any directory other than the feature folder. `page.tsx` and `layout.tsx` files in `app/` are thin shells with no rendering logic, no direct `fetch()` calls, and no inline TypeScript types. A `page.tsx` that contains a component definition, a `useState`, or a hardcoded type is a guardrail violation.
+</Rule>
+
+<Rule id="NO_SHARED_UI_WORKSPACE_PACKAGE">
+Shared workspace UI packages (e.g. `@workspace/ui`, `@litenova/ui`, `@org/ui`) are forbidden. Each application owns its own `components/ui/` directory populated via `npx shadcn@latest add`. Never install a workspace package that exports React components for cross-app sharing. If a workspace package under `packages/` exports React components, it must be deleted and its consumers must generate their own copies via the shadcn/ui CLI.
+</Rule>
+
+<Rule id="NO_HAND_CODED_API_TYPES">
+Never define inline TypeScript interfaces or type aliases for API response shapes. ALL API types MUST come from the generated file produced by `openapi-typescript` (e.g. `packages/api-types/src/api.d.ts`). If the generated file does not exist, run the generation workflow documented in `docs/conventions/frontend/03-data-fetching.md` before writing any fetch call. Inline types that mirror API response shapes — even temporary ones — are forbidden.
 </Rule>
 
 ### DO / DON'T Code Block Guardrails
@@ -216,3 +228,6 @@ pnpm run build --filter apps/web
 - [ ] All async methods accept a `CancellationToken` named exactly `cancellationToken`.
 - [ ] All query handlers use `.AsNoTracking()` for read optimization.
 - [ ] Tested the full compilation pipeline and ensured 0 warnings or errors are treated as builds.
+- [ ] No React feature components exist in `app/`, `components/` root, or any non-feature directory (FEATURE_FOLDER_ISOLATION).
+- [ ] No workspace packages that export React components are referenced (NO_SHARED_UI_WORKSPACE_PACKAGE).
+- [ ] No inline TypeScript interfaces or type aliases duplicate API response shapes (NO_HAND_CODED_API_TYPES).

@@ -76,6 +76,10 @@ This is the canonical contract for AI agents and engineers working on projects t
 - MUST NOT put business logic in `proxy.ts`. Optimistic checks only.
 - MUST NOT add `useMemo`, `useCallback`, or `React.memo` when React Compiler is enabled.
 - MUST NOT put server data in Zustand or fetch data in `useEffect`.
+- MUST place all React feature components in `features/{feature}/{usecase}/`. Never put feature components in `app/`, root-level `components/`, or any non-feature directory. `page.tsx` files are thin shells only.
+- MUST NOT import React components from a shared workspace package (`@litenova/ui`, `@workspace/ui`, or similar). Each app owns its `components/ui/` via the shadcn/ui CLI.
+- MUST NOT define inline TypeScript interfaces or type aliases for API response shapes. All API types come from the generated `openapi-typescript` output. Generate before writing any fetch call.
+- MUST NOT use `NEXT_PUBLIC_` prefix for `API_URL` or `API_JWT_SECRET`. Both are server-only values.
 
 ## Common Mistakes To Avoid
 
@@ -122,6 +126,7 @@ This is the canonical contract for AI agents and engineers working on projects t
 | Frontend/Data Fetching | `docs/conventions/frontend/03-data-fetching.md` |
 | Frontend/State and Forms | `docs/conventions/frontend/04-state-and-forms.md` |
 | Frontend/Internationalization | `docs/conventions/frontend/05-internationalization.md` |
+| Frontend/Admin API Auth | `docs/conventions/frontend/06-admin-api-auth.md` |
 
 ## Commands
 
