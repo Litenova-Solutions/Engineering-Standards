@@ -125,6 +125,35 @@ import { Button } from "@shadcn/ui"     // BAD: not an importable package
 
 ---
 
+## 4.1. No Shared Workspace UI Package
+
+Shared workspace UI packages (`@workspace/ui`, `@litenova/ui`, `@org/ui`, or any workspace package that exports React components) are forbidden. Each application owns its `components/ui/` directory populated via the shadcn/ui CLI.
+
+Reasons:
+- Component output from the CLI is per-app and versioned differently across apps.
+- Shared workspace packages couple app release cycles and produce resolution ambiguity in Tailwind.
+- The shadcn/ui CLI assumes ownership inside the app; it cannot update components in a shared package.
+
+Rules:
+- NEVER add a workspace dependency (`workspace:*`) that exports React components.
+- NEVER create or reference a package named `ui` (or similar) under `packages/` in the monorepo.
+- If two apps need the same component, each app generates its own copy via `npx shadcn@latest add <component>` and customizes independently.
+
+```typescript
+// GOOD: each app owns its copy
+import { Button } from "@/components/ui/button"         // web app
+import { Button } from "@/components/ui/button"         // admin app (separate copy)
+```
+
+```typescript
+// BAD: importing from a shared workspace package
+import { Button } from "@litenova/ui"      // FORBIDDEN
+import { Button } from "@workspace/ui"     // FORBIDDEN
+import { Button } from "@/../../packages/ui" // FORBIDDEN
+```
+
+---
+
 ## 5. Component Variants with `cva`
 
 `cva` (class-variance-authority) is the tool for component variants. Use it inside `components/ui/` files when adding new variants to a shadcn/ui component.
@@ -380,3 +409,41 @@ The following is project-specific and not defined in this standards file:
 - **Custom component categories:** Any additional component categories beyond the four in Section 2.
 - **Project-specific accessibility requirements:** WCAG level target (AA or AAA), screen reader testing tooling, contrast ratio requirements beyond WCAG minimum.
 - **Storybook:** Whether Storybook is used and which component categories have stories.
+
+---
+
+## 12. `dangerouslySetInnerHTML` Safety
+
+`dangerouslySetInnerHTML` bypasses React's XSS protection. Use it only for HTML content that was sanitized at write time, not at render time.
+
+Rules:
+- Sanitize on write (server or API layer), not on read (component render). When the API stores sanitized HTML, the frontend can render it without a client-side sanitization step.
+- NEVER render raw user-submitted HTML without verifying the backend sanitizes it before storage. If the API stores whatever the user typed, the frontend must sanitize before rendering.
+- NEVER use `dangerouslySetInnerHTML` for content sourced from URL parameters, search inputs, or any other user-controlled value without sanitization.
+- Server-authored content (e.g. a blog post written by an admin with a rich text editor) is an acceptable risk when the backend strips disallowed tags before storing.
+- When a client-side sanitization pass is needed, use `DOMPurify` with a strict allowlist.
+
+```typescript
+// GOOD: rendering server-sanitized HTML (e.g. blog post content stored by the API)
+export function PostBody({ html }: { html: string }) {
+  return <div dangerouslySetInnerHTML={{ __html: html }} />
+  // Acceptable: the API sanitizes post content at write time.
+}
+```
+
+```typescript
+// BAD: rendering unsanitized user input directly
+export function CommentBody({ comment }: { comment: string }) {
+  return <div dangerouslySetInnerHTML={{ __html: comment }} />
+  // FORBIDDEN: comment comes from user input with no sanitization guarantee.
+}
+```
+
+```typescript
+// BAD: sanitizing on the wrong side
+export function PostBody({ rawHtml }: { rawHtml: string }) {
+  // Sanitize in the API before storage, not here at render time.
+  const clean = naiveSanitize(rawHtml)
+  return <div dangerouslySetInnerHTML={{ __html: clean }} />
+}
+```
