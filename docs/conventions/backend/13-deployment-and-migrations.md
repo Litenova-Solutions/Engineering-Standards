@@ -80,6 +80,50 @@ Aspire starts all services including the PostgreSQL container, performs health c
 
 Check the current Aspire docs for the latest package names and versions. The package ecosystem evolves with each Aspire release.
 
+### JavaScript and frontend apps in Aspire
+
+In Aspire 13+, the `Aspire.Hosting.JavaScript` package replaces the old `Aspire.Hosting.NodeJs` package. Update any existing AppHost projects accordingly.
+
+**Adding a Next.js app:**
+
+```csharp
+#pragma warning disable ASPIREJAVASCRIPT001 // AddNextJsApp is [Experimental]
+
+var web = builder.AddNextJsApp("web", "../apps/web")
+    .WithPnpm()                    // uses pnpm; auto-installs from workspace root
+    .WithHttpEndpoint(env: "PORT")
+    .WithExternalHttpEndpoints()
+    .DisableBuildValidation();     // remove once output: "standalone" is set in next.config
+```
+
+`DisableBuildValidation()` skips the check that `output: "standalone"` is set in `next.config.ts`. Use it during development. Remove it for production publish workflows.
+
+**pnpm workspaces.** When the repo uses a pnpm workspace (a single `pnpm-lock.yaml` at the repo root), run `pnpm install` from the workspace root before starting the AppHost. Aspire calls `pnpm install` in the app subdirectory, and pnpm walks up to find the workspace root automatically, so `WithPnpm()` requires no extra configuration.
+
+**Injecting service URLs across resources:**
+
+```csharp
+var api = builder.AddProject<Projects.{ProjectName}_WebApi>("api")
+    .WithReference(database)
+    .WaitFor(database)
+    .WithEnvironment("Cors__WebOrigin", web.GetEndpoint("http"));
+
+web.WithReference(api)
+   .WithEnvironment("API_BASE_URL", api.GetEndpoint("http"));
+```
+
+Use `GetEndpoint("http")` to pass a service's allocated URL to another resource at startup. Ports are dynamic; do not hard-code them.
+
+**`NEXT_PUBLIC_*` variables are substituted at build time, not at runtime.** Aspire injects environment variables at process startup. Variables prefixed `NEXT_PUBLIC_` are baked into the JavaScript bundle when `next build` runs, so they will not reflect Aspire-injected values in a pre-built container. Use server-only environment variables (no `NEXT_PUBLIC_` prefix) in Server Components and API routes, where `process.env` is read at request time. If client-side code needs a value that Aspire provides, expose it through a server-rendered config endpoint or a Next.js API route.
+
+**Package references for JavaScript hosting:**
+
+| Package | Project |
+|:---|:---|
+| `Aspire.Hosting.JavaScript` | `{ProjectName}.AppHost` |
+
+Add `<NoWarn>$(NoWarn);ASPIREJAVASCRIPT001</NoWarn>` to the AppHost `.csproj` to suppress the experimental diagnostic project-wide instead of using `#pragma warning disable` per file.
+
 ---
 
 ## 1. Production Migration Rule

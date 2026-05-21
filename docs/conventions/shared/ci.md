@@ -4,6 +4,28 @@ This document defines the required local and CI verification gates for projects 
 
 ---
 
+## 0. pnpm Workspace Setup
+
+All frontend apps and packages share a single pnpm workspace. The `pnpm-lock.yaml` and `pnpm-workspace.yaml` files live at the repository root. Individual app directories have their own `package.json` but no separate lockfile.
+
+Install from the root to populate the shared `node_modules`:
+
+```bash
+pnpm install
+```
+
+Running `pnpm install` from an app subdirectory also works: pnpm walks up to find the workspace root automatically.
+
+In CI, use `--frozen-lockfile` to fail if the lockfile is out of sync:
+
+```bash
+pnpm install --frozen-lockfile
+```
+
+When running the Aspire AppHost, run `pnpm install` from the workspace root before starting the AppHost. The `WithPnpm()` call in the AppHost triggers `pnpm install` in each app's subdirectory, which resolves back to the workspace root.
+
+---
+
 ## 1. Required CI Gates
 
 Every pull request MUST run:
