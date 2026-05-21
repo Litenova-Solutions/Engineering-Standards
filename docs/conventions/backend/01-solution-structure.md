@@ -22,7 +22,9 @@ Every project follows this standard layout. Replace `{ProjectName}` with the act
 │   ├── {ProjectName}.Application.Read/
 │   ├── {ProjectName}.Application.Reactions/
 │   ├── {ProjectName}.Infrastructure/
-│   └── {ProjectName}.WebApi/
+│   ├── {ProjectName}.WebApi/
+│   ├── {ProjectName}.AppHost/         ← .NET Aspire orchestration
+│   └── {ProjectName}.ServiceDefaults/ ← shared OTel, health checks
 ├── tests/
 │   ├── {ProjectName}.Domain.Tests/
 │   ├── {ProjectName}.Application.Tests/
@@ -33,6 +35,8 @@ Every project follows this standard layout. Replace `{ProjectName}` with the act
 ```
 
 The solution file uses the `.slnx` format (SDK-style solution files), not the legacy `.sln` format.
+
+The `AppHost` project is the local development entry point. Run `dotnet run --project src/{ProjectName}.AppHost` to start all services including the database container. See `docs/conventions/backend/13-deployment-and-migrations.md` for Aspire setup details.
 
 ---
 
@@ -73,6 +77,33 @@ A `Directory.Build.props` file at the solution root sets metadata shared across 
 ```
 
 `TreatWarningsAsErrors` ensures that nullable reference warnings, unused variable warnings, and similar issues are build failures, not silent warnings. `LangVersion: preview` enables the latest C# language features on the .NET 10 SDK.
+
+`EnforceCodeStyleInBuild` promotes IDE-only style rules to build-time errors. The following rules are enforced and **will cause build failures** if violated:
+
+| Rule | Behaviour |
+|:---|:---|
+| IDE0011 | Braces required for all `if`, `else`, `foreach`, `while`, and `switch` bodies, including single-line bodies. |
+| IDE0161 | File-scoped namespaces required. Block-scoped `namespace Foo { }` is a build error. This applies to EF Core generated migration files — convert them after generation. |
+| IDE0040 | Explicit access modifier required on every type member. Interface method implementations must declare `public`. |
+
+```csharp
+// IDE0011 — required braces
+if (x > 0)
+{
+    DoSomething();
+}
+
+// IDE0161 — file-scoped namespace
+namespace MyApp.Domain;
+
+public sealed class Post { }
+
+// IDE0040 — explicit access modifier
+public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
+{
+    public void Configure(EntityTypeBuilder<Post> builder) { }  // explicit public required
+}
+```
 
 ---
 
@@ -182,10 +213,19 @@ LiteBus is modular. Each project references only the package it needs. Never add
 |:---|:---|:---|
 | `LiteBus.Commands.Abstractions` | `Application.Write.Contracts`, `Application.Write`, `Application.Reactions` | `ICommand`, `ICommand<TResult>`, `ICommandHandler<TCommand>`, `ICommandHandler<TCommand, TResult>`, `ICommandValidator<TCommand>`, `ICommandMediator` |
 | `LiteBus.Queries.Abstractions` | `Application.Read.Contracts`, `Application.Read` | `IQuery<TResult>`, `IQueryHandler<TQuery, TResult>`, `IQueryValidator<TQuery>`, `IQueryMediator` |
-| `LiteBus.Events.Abstractions` | `Application.Reactions` | `IEvent`, `IEventHandler<TEvent>`, `IEventPublisher` |
+| `LiteBus.Events.Abstractions` | `Application.Reactions`, `Infrastructure` | `IEventHandler<TEvent>`, `IEventPublisher`. **Do not add this to the Domain project.** Domain event classes are plain records with no LiteBus dependency. |
 | `LiteBus.Commands.Abstractions` | `WebApi` | `ICommandMediator` for command endpoints |
 | `LiteBus.Queries.Abstractions` | `WebApi` | `IQueryMediator` for query endpoints |
-| `LiteBus.Extensions.Microsoft.DependencyInjection` | `WebApi` | Full DI registration for all handlers |
+| `LiteBus.Extensions.Microsoft.DependencyInjection` | `WebApi` | Full DI registration for all handlers. Provides `AddLiteBus`, `AddCommandModule`, `AddQueryModule`, `AddEventModule`. |
+
+> **Namespaces.** Each module's DI extension methods require a separate `using`:
+> - `using LiteBus.Commands;` for `AddCommandModule`
+> - `using LiteBus.Queries;` for `AddQueryModule`
+> - `using LiteBus.Events;` for `AddEventModule`
+>
+> Check the current LiteBus docs for the precise package and namespace names. The LiteBus package structure may change between major versions.
+
+> **Assembly markers.** Handler classes are `internal sealed`. Each implementation project must expose a `public static class {Layer}AssemblyMarker { }` so `Program.cs` in `WebApi` can pass `typeof({Layer}AssemblyMarker).Assembly` to `RegisterFromAssembly` without depending on internal types.
 
 ---
 

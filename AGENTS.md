@@ -18,21 +18,22 @@ This is the canonical contract for AI agents and engineers working on projects t
 
 | Technology | Version / Notes |
 |:---|:---|
-| .NET | 10 |
+| .NET | 10 (check `global.json` for pinned SDK version) |
 | ASP.NET Core | 10, Minimal APIs only |
 | EF Core | 10 |
-| LiteBus | Modular packages, specific mediators only |
+| LiteBus | Modular packages, specific mediators only. Check LiteBus docs for the current version. |
 | Ardalis.GuardClauses | Project-owned custom domain guard extensions only |
 | OpenTelemetry | Traces and metrics via OTLP |
 | PostgreSQL | Primary database |
-| Next.js | 16.2.6, App Router only, `proxy.ts` not `middleware.ts` |
-| React | 19.2.6, React Compiler stable |
-| TypeScript | 6.0.x, `moduleResolution: bundler` |
-| TanStack Query | 5.100.10, verify lockfile against GHSA-g7cv-rxg3-hmpx |
-| Zustand | 5.0.13 |
-| Zod | 4.4.3, use `z.email()`, `z.uuid()`, `z.url()` |
-| Tailwind CSS | 4.3.x, CSS-first `@theme`, no `tailwind.config.js` |
-| shadcn/ui | CLI v4, use `sonner`, import Radix from `radix-ui` |
+| .NET Aspire | Local development orchestration (replaces Docker Compose). AppHost project per solution. |
+| Next.js | App Router only, `proxy.ts` not `middleware.ts`. Check `package.json` for pinned version. |
+| React | React Compiler stable. Check `package.json` for pinned version. |
+| TypeScript | `moduleResolution: bundler`. Check `package.json` for pinned version. |
+| TanStack Query | Verify lockfile against current GHSA advisories. |
+| Zustand | Check `package.json` for pinned version. |
+| Zod | Use `z.email()`, `z.uuid()`, `z.url()`. Check `package.json` for pinned version. |
+| Tailwind CSS | CSS-first `@theme`, no `tailwind.config.js`. Check `package.json` for pinned version. |
+| shadcn/ui | CLI v4 or later, use `sonner`, import Radix from `radix-ui`. |
 
 ## Project Map
 
@@ -65,7 +66,7 @@ This is the canonical contract for AI agents and engineers working on projects t
 - MUST name every async `CancellationToken` parameter exactly `cancellationToken`.
 - MUST NOT add a NuGet package without a corresponding ADR or pre-approved package row.
 - MUST NOT use forbidden packages under any circumstances (e.g. AutoMapper, MediatR, FluentValidation, Newtonsoft.Json, Axios, Lodash, Moment.js).
-- MUST map all PostgreSQL tables, columns, keys, and index names using `snake_case` mapping conventions (using `.UseSnakeCaseNamingConventions()`).
+- MUST map all PostgreSQL tables, columns, keys, and index names using `snake_case`. Use the `EFCore.NamingConventions` package when it is compatible with the EF Core version in use. When the package is unavailable, apply snake_case manually in `OnModelCreating` (see `docs/conventions/backend/04-infrastructure-layer.md`).
 - MUST use `.AsNoTracking()` or select-projections for all query handler queries in `Application.Read`.
 - MUST NOT use em dashes, en dashes, cliches, or AI slop wording in generated docs or comments.
 - MUST run the mandatory verification pipeline commands (e.g., `dotnet build`, `dotnet test`) before completing code tasks.
@@ -125,9 +126,25 @@ This is the canonical contract for AI agents and engineers working on projects t
 ## Commands
 
 ```bash
+# Build and test
 dotnet build src/{ProjectName}.slnx
 dotnet test src/{ProjectName}.slnx
+
+# Run via Aspire AppHost (starts all services, including PostgreSQL)
+dotnet run --project src/{ProjectName}.AppHost
+
+# Run API directly (requires infrastructure running separately)
 dotnet run --project src/{ProjectName}.WebApi
+
+# EF Core migrations
 dotnet ef migrations add {MigrationName} --project src/{ProjectName}.Infrastructure --startup-project src/{ProjectName}.WebApi
 dotnet ef database update --project src/{ProjectName}.Infrastructure --startup-project src/{ProjectName}.WebApi
 ```
+
+> **dotnet ef tool version.** The `dotnet-ef` global tool version must match the EF Core runtime version. Install with:
+> `dotnet tool install --global dotnet-ef --version <same as Microsoft.EntityFrameworkCore package version>`
+> A mismatch causes cryptic errors at migration generation time.
+
+> **LiteBus assembly markers.** Handler classes are `internal sealed`. Each implementation project exposes a public `{Layer}AssemblyMarker` static class so `Program.cs` can reference the assembly without importing internal types. See `docs/conventions/backend/04-infrastructure-layer.md`.
+
+> **LiteBus domain events.** Domain events are plain C# records. They do not implement any LiteBus interface. `IDomainEvent` is a project-defined marker with no framework dependency. Publish via `IEventPublisher.PublishAsync(domainEvent, cancellationToken: cancellationToken)`. LiteBus silently ignores events with no handlers by default.
