@@ -69,6 +69,12 @@ export async function getApiClient() {
   const token = cookieStore.get("access_token")?.value
 
   return createClient<paths>({
+    // API_BASE_URL has no NEXT_PUBLIC_ prefix intentionally.
+    // Server Components read it at request time from process.env.
+    // When running under Aspire, this value is injected at process startup via
+    // WithEnvironment("API_BASE_URL", api.GetEndpoint("http")).
+    // NEXT_PUBLIC_ variables are baked into the client bundle at build time and
+    // cannot receive Aspire-injected values in a pre-built container.
     baseUrl: process.env.API_BASE_URL!,
     headers: token
       ? { Authorization: `Bearer ${token}` }
