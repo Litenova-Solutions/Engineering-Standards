@@ -8,6 +8,7 @@
 - `proxy.ts` MUST only do optimistic cookie checks; authoritative auth in Server Components/Actions.
 - MUST await `params`, `searchParams`, `cookies`, `headers`.
 - `route.ts` MUST NOT be used except webhooks, OAuth callbacks, or file/binary responses.
+- ALL environment variable access MUST go through `lib/env.ts`. MUST NOT use `process.env.X` directly. See `docs/conventions/frontend/09-environment-and-runtime-config.md`.
 
 ## 1. Guiding Philosophy
 

@@ -380,6 +380,8 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                 => (StatusCodes.Status404NotFound, "Not found"),
             DomainException
                 => (StatusCodes.Status409Conflict, "Domain rule violated"),
+            DbUpdateConcurrencyException
+                => (StatusCodes.Status409Conflict, "Concurrency conflict"),
             _
                 => (StatusCodes.Status500InternalServerError, "An error occurred")
         };
@@ -390,7 +392,10 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
         {
             Status = statusCode,
             Title = title,
-            Detail = exception.Message
+            // MUST NOT expose exception.Message for 500 responses (OWASP A05 information disclosure).
+            Detail = statusCode == StatusCodes.Status500InternalServerError
+                ? "An unexpected error occurred. Please contact support."
+                : exception.Message
         };
 
         // Attach field-level validation errors so the frontend can display
@@ -591,28 +596,20 @@ builder.Services.AddOpenApi(options =>
     options.AddSchemaTransformer<StronglyTypedIdSchemaTransformer>();
 });
 
-// Support --export-openapi <path> for CI OpenAPI freshness checks.
-// Exits immediately after writing the spec, without starting the server.
-if (args.Length == 2 && args[0] == "--export-openapi")
-{
-    var outputPath = args[1];
-    var specApp = builder.Build();
-    specApp.MapOpenApi();
-    await specApp.StartAsync();
-
-    var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
-    var spec = await httpClient.GetStringAsync("/openapi/v1.json");
-    await File.WriteAllTextAsync(outputPath, spec);
-    await specApp.StopAsync();
-    return;
-}
+// Support build-time OpenAPI generation via Microsoft.Extensions.ApiDescription.Server.
+// No custom --export-openapi flag is needed. The spec is written to the build output
+// directory automatically during `dotnet build`. See the WebApi .csproj configuration below.
 
 // CORS
 builder.Services.AddCors(options =>
 {
+    var corsOptions = builder.Configuration
+        .GetSection("Cors")
+        .Get<CorsOptions>()!;
+
     options.AddPolicy("Frontend", policy =>
         policy
-            .WithOrigins(builder.Configuration["Cors:WebOrigin"]!)
+            .WithOrigins(corsOptions.AllowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
@@ -667,8 +664,39 @@ app.Run();
 public partial class Program { }
 ```
 
-The `--export-openapi` flag is used by the CI gate in `docs/conventions/shared/ci.md`. The port (`http://localhost:5000`) must match the `launchSettings.json` configuration for the export to succeed in CI.
+Build-time OpenAPI generation uses `Microsoft.Extensions.ApiDescription.Server`. Add this to the WebApi `.csproj`:
 
----
+```xml
+<!-- {ProjectName}.WebApi.csproj -->
+<ItemGroup>
+  <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+</ItemGroup>
+
+<PropertyGroup>
+  <!-- Output the generated spec to the build output directory -->
+  <OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
+  <OpenApiDocumentsDirectory>$(OutputPath)</OpenApiDocumentsDirectory>
+</PropertyGroup>
+```
+
+During `dotnet build`, the spec is written to the build output directory (for example `bin/Release/net10.0/openapi.json`). Copy it to `packages/api-types/openapi.json` in the CI pipeline for the freshness check. No custom `--export-openapi` flag or runtime generation is needed.
+
+See `docs/conventions/shared/ci-cd.md` and `docs/conventions/shared/monorepo-structure.md` for the complete CI workflow.
+
+For the complete `Program.cs`, see `docs/blueprints/backend/program-cs.md`. The blueprint includes:
+
+- Authentication and authorization.
+- CORS with validated options.
+- Rate limiting.
+- Health checks.
+- Exception handler.
+- OpenAPI with JWT security scheme.
+- LiteBus registration.
+- Middleware order.
+- `public partial class Program { }` for integration tests.
 
 Project-specific API configuration (authentication scheme, base route prefix, versioning strategy, CORS policies) is documented in a project ADR.

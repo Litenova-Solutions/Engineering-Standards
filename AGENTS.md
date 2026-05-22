@@ -48,6 +48,9 @@ Canonical contract for AI agents and engineers. Read before touching code.
 ## Non-Negotiable Rules
 
 - MUST read the relevant convention before editing that layer.
+- MUST check `standards.manifest.json` for pinned dependency versions before changing package references.
+- MUST NOT upgrade framework versions unless the task is explicitly a standards upgrade.
+- MUST use blueprints in `docs/blueprints/` for complete file generation.
 - MUST use `IEndpoint`; MUST NOT use MVC `Controller` / `ControllerBase`.
 - MUST inject `IDatabaseContext` in query handlers; MUST NOT inject repositories or `AppDbContext`.
 - MUST NOT add per-aggregate `IXxxReadStore` interfaces.
@@ -62,7 +65,11 @@ Canonical contract for AI agents and engineers. Read before touching code.
 - MUST use `.AsNoTracking()` or projections in `Application.Read`.
 - MUST follow `writing-style.md` (no forbidden words, no em/en dashes).
 - MUST run gates in `docs/conventions/shared/ci.md` and complete `definition-of-done.md`.
+- MUST NOT accept actor IDs from request bodies when the actor is the authenticated user. Actor identity comes from validated JWT claims only.
+- MUST NOT use `configuration["Key"]!` directly; all config access goes through validated options classes.
+- MUST use `FromSqlInterpolated` for raw SQL; MUST NOT concatenate SQL strings.
 - Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; no business logic in `proxy.ts`; no `useMemo`/`useCallback`/`React.memo` with React Compiler; no server data in Zustand or `useEffect` fetch; no cross-feature imports; no `TODO`/`FIXME`/stubs; max 300 lines per file; no arbitrary Tailwind values.
+- Frontend: ALL environment variable access MUST go through `lib/env.ts`; MUST NOT use `process.env.X` directly in app code.
 
 ## Convention File Index
 
@@ -84,10 +91,18 @@ Canonical contract for AI agents and engineers. Read before touching code.
 | Caching | `docs/conventions/backend/12-caching.md` |
 | Deployment | `docs/conventions/backend/13-deployment-and-migrations.md` |
 | Worker projects | `docs/conventions/backend/14-worker-projects.md` |
+| Authentication / authorization | `docs/conventions/backend/15-authentication-and-authorization.md` |
+| Options and configuration | `docs/conventions/backend/16-options-and-configuration.md` |
+| Concurrency | `docs/conventions/backend/17-concurrency.md` |
+| Soft delete | `docs/conventions/backend/18-soft-delete.md` |
+| Raw SQL and reporting | `docs/conventions/backend/19-raw-sql-and-reporting.md` |
 | Naming | `docs/conventions/shared/naming.md` |
 | Git | `docs/conventions/shared/git-workflow.md` |
 | CI gates | `docs/conventions/shared/ci.md` |
+| CI/CD pipeline | `docs/conventions/shared/ci-cd.md` |
 | Security | `docs/conventions/shared/security.md` |
+| Supply-chain security | `docs/conventions/shared/supply-chain-security.md` |
+| Monorepo structure | `docs/conventions/shared/monorepo-structure.md` |
 | Realtime | `docs/conventions/shared/realtime-updates.md` |
 | Forbidden packages | `docs/conventions/shared/forbidden-packages.md` |
 | Decisions (rationale) | `docs/decisions/README.md` (do not load for routine coding) |
@@ -96,6 +111,7 @@ Canonical contract for AI agents and engineers. Read before touching code.
 | Containers | `docs/conventions/shared/containers.md` |
 | IaC | `docs/conventions/shared/infrastructure-as-code.md` |
 | Definition of Done | `docs/guides/definition-of-done.md` |
+| Create new project | `docs/guides/create-new-project.md` |
 | Add feature guide | `docs/guides/add-new-feature.md` |
 | App Router | `docs/conventions/frontend/01-nextjs-app-router.md` |
 | Components | `docs/conventions/frontend/02-components.md` |
@@ -104,6 +120,33 @@ Canonical contract for AI agents and engineers. Read before touching code.
 | i18n | `docs/conventions/frontend/05-internationalization.md` |
 | Frontend testing | `docs/conventions/frontend/06-testing.md` |
 | Feature boundaries | `docs/conventions/frontend/07-feature-boundaries.md` |
+| Error handling / ProblemDetails | `docs/conventions/frontend/08-error-handling-and-problem-details.md` |
+| Frontend environment config | `docs/conventions/frontend/09-environment-and-runtime-config.md` |
+
+## Blueprints
+
+Full-file reference implementations. Use these for generating complete artifacts.
+
+| Blueprint | File |
+|:---|:---|
+| Program.cs | `docs/blueprints/backend/program-cs.md` |
+| Outbox implementation | `docs/blueprints/backend/outbox.md` |
+| Idempotency implementation | `docs/blueprints/backend/idempotency.md` |
+
+## Runbooks
+
+| Runbook | File |
+|:---|:---|
+| Deploy a release | `docs/runbooks/deploy-release.md` |
+| Roll back a release | `docs/runbooks/rollback-release.md` |
+| Run a database migration | `docs/runbooks/run-database-migration.md` |
+| Recover an outbox message | `docs/runbooks/recover-outbox-message.md` |
+| Rotate a JWT secret | `docs/runbooks/rotate-jwt-secret.md` |
+| Handle a leaked secret | `docs/runbooks/handle-leaked-secret.md` |
+| Investigate 5xx spike | `docs/runbooks/investigate-5xx-spike.md` |
+| Investigate slow query | `docs/runbooks/investigate-slow-query.md` |
+| Restore database backup | `docs/runbooks/restore-database-backup.md` |
+| Handle npm compromise | `docs/runbooks/handle-tanstack-or-npm-compromise.md` |
 
 ## Commands
 

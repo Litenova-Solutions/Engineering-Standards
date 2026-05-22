@@ -51,11 +51,20 @@ Skip frontend gates when the project has no frontend. Skip Playwright when no `a
 ## 2. OpenAPI Freshness Gate
 
 ```bash
+# 1. Build (generates openapi.json into the WebApi build output via Microsoft.Extensions.ApiDescription.Server)
 dotnet build src/{ProjectName}.slnx --configuration Release
-dotnet run --project src/{ProjectName}.WebApi -- --export-openapi packages/api-types/openapi.json
-npx openapi-typescript packages/api-types/openapi.json -o packages/api-types/src/api.d.ts
+
+# 2. Copy the generated spec
+cp src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
+
+# 3. Regenerate TypeScript types
+pnpm --filter @myproject/api-types generate:api-types
+
+# 4. Fail if the generated files differ from what was committed
 git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
 ```
+
+Build-time generation requires `Microsoft.Extensions.ApiDescription.Server` in the WebApi project. See `docs/conventions/backend/05-api-layer.md` for the MSBuild configuration.
 
 If the diff is non-empty, the PR forgot to commit regenerated API artifacts.
 
