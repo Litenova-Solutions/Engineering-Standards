@@ -208,17 +208,152 @@ public sealed class PageSizeExceedsMaximumException : QueryValidationException
 
 ## The GlobalExceptionHandler
 
-The canonical `GlobalExceptionHandler` implementation is in `docs/blueprints/backend/program-cs.md` (Supporting Files). `docs/conventions/backend/05-api-layer.md` shows `Program.cs` registration only. Endpoints MUST NOT contain `try-catch` blocks.
+Endpoints MUST NOT contain `try-catch` blocks. All unhandled exceptions flow through a single `GlobalExceptionHandler` registered in `Program.cs`. The full implementation lives in this section. `docs/conventions/backend/05-api-layer.md` documents the HTTP status code table and the validation JSON schema the frontend consumes.
 
-`DbUpdateConcurrencyException` from EF Core MUST be caught in the `GlobalExceptionHandler` and mapped to HTTP 409. Add it to the exception switch alongside `DomainException`. See `docs/conventions/backend/17-concurrency.md` for the full pattern.
+### Exception mapping
 
-> **Security note.** Unhandled exceptions (HTTP 500) MUST NOT expose `exception.Message` in the `Detail` field of the response. Stack traces and internal system details in API responses are an information disclosure risk (OWASP A05). The `GlobalExceptionHandler` MUST use a generic message for 500 responses:
->
-> ```csharp
-> Detail = statusCode == StatusCodes.Status500InternalServerError
->     ? "An unexpected error occurred. Please contact support."
->     : exception.Message
-> ```
+| Exception type | HTTP status | Response detail |
+|:---|:---|:---|
+| `CommandValidationException` | 400 | `invalidParams` array (see below) |
+| `QueryValidationException` | 400 | `invalidParams` array (see below) |
+| `AggregateNotFoundException` | 404 | `exception.Message` |
+| `DomainException` | 409 | `exception.Message` |
+| `DbUpdateConcurrencyException` | 409 | Fixed conflict message (no exception text) |
+| All other exceptions | 500 | Generic message only (see security note) |
+
+`DbUpdateConcurrencyException` from EF Core MUST be caught alongside `DomainException`. See `docs/conventions/backend/17-concurrency.md` for client retry guidance.
+
+### Implementation
+
+Create `WebApi/Middleware/GlobalExceptionHandler.cs`:
+
+```csharp
+internal sealed class GlobalExceptionHandler : IExceptionHandler
+{
+    private readonly ILogger<GlobalExceptionHandler> _logger;
+
+    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+    {
+        _logger = logger;
+    }
+
+    public async ValueTask<bool> TryHandleAsync(
+        HttpContext httpContext,
+        Exception exception,
+        CancellationToken cancellationToken)
+    {
+        var (statusCode, title, detail) = exception switch
+        {
+            CommandValidationException ex =>
+                (StatusCodes.Status400BadRequest,
+                 "Validation failed.",
+                 BuildValidationProblem(ex, httpContext)),
+
+            QueryValidationException ex =>
+                (StatusCodes.Status400BadRequest,
+                 "Validation failed.",
+                 BuildValidationProblem(ex, httpContext)),
+
+            AggregateNotFoundException =>
+                (StatusCodes.Status404NotFound,
+                 "Resource not found.",
+                 (object)new ProblemDetails
+                 {
+                     Status = StatusCodes.Status404NotFound,
+                     Title = "Resource not found.",
+                     Detail = exception.Message
+                 }),
+
+            DomainException =>
+                (StatusCodes.Status409Conflict,
+                 "Domain conflict.",
+                 (object)new ProblemDetails
+                 {
+                     Status = StatusCodes.Status409Conflict,
+                     Title = "Conflict",
+                     Detail = exception.Message
+                 }),
+
+            DbUpdateConcurrencyException =>
+                (StatusCodes.Status409Conflict,
+                 "Conflict",
+                 (object)new ProblemDetails
+                 {
+                     Status = StatusCodes.Status409Conflict,
+                     Title = "Conflict",
+                     Detail = "The resource was modified by another actor. Retrieve the latest version and retry."
+                 }),
+
+            _ =>
+                (StatusCodes.Status500InternalServerError,
+                 "An unexpected error occurred.",
+                 (object)new ProblemDetails
+                 {
+                     Status = StatusCodes.Status500InternalServerError,
+                     Title = "Internal server error.",
+                     Detail = "An unexpected error occurred. Please contact support."
+                 })
+        };
+
+        if (statusCode == StatusCodes.Status500InternalServerError)
+        {
+            _logger.LogError(exception, "Unhandled exception");
+        }
+
+        httpContext.Response.StatusCode = statusCode;
+        httpContext.Response.ContentType = "application/problem+json";
+
+        await httpContext.Response.WriteAsJsonAsync(detail, cancellationToken);
+
+        return true;
+    }
+
+    private static object BuildValidationProblem(
+        Exception ex, HttpContext httpContext)
+    {
+        var validationErrors = ex switch
+        {
+            CommandValidationException cve => cve.ValidationErrors,
+            QueryValidationException qve => qve.ValidationErrors,
+            _ => []
+        };
+
+        return new
+        {
+            type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+            title = "Validation failed.",
+            status = StatusCodes.Status400BadRequest,
+            detail = "One or more fields failed validation.",
+            instance = httpContext.Request.Path.Value,
+            invalidParams = validationErrors.Select(e => new
+            {
+                name = ToCamelCase(e.PropertyName),
+                reason = e.ErrorMessage
+            })
+        };
+    }
+
+    private static string ToCamelCase(string name)
+        => string.IsNullOrEmpty(name)
+            ? name
+            : char.ToLowerInvariant(name[0]) + name[1..];
+}
+```
+
+Register the handler in `Program.cs`:
+
+```csharp
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+// ...
+
+app.UseExceptionHandler();
+```
+
+> **ValidationErrors shape.** The exact type of `ValidationErrors` on `CommandValidationException` and `QueryValidationException` depends on the validation library in use. Adjust the projection to match the exception's actual property names. The `invalidParams` array MUST use camelCase `name` values that match command and query property names on the frontend.
+
+> **Security note.** Unhandled exceptions (HTTP 500) MUST NOT expose `exception.Message` in the `Detail` field of the response. Stack traces and internal system details in API responses are an information disclosure risk (OWASP A05). The `GlobalExceptionHandler` MUST use a generic message for 500 responses, as shown in the default case above. The concurrency conflict case MUST NOT expose database-level exception text.
 
 ---
 

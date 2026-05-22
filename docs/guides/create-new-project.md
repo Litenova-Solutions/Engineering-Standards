@@ -201,7 +201,7 @@ Key packages:
 1. Copy `Program.cs` from `docs/blueprints/backend/program-cs.md`.
 2. Create `WebApi/Auth/JwtSettings.cs`, `ClaimsPrincipalExtensions.cs`, and `AuthorizationPolicies.cs` (see `docs/conventions/backend/15-authentication-and-authorization.md`).
 3. Create `WebApi/Options/CorsOptions.cs` and `RateLimitOptions.cs`.
-4. Create `WebApi/Middleware/GlobalExceptionHandler.cs` (from the blueprint).
+4. Create `WebApi/Middleware/GlobalExceptionHandler.cs` (from `docs/conventions/backend/06-exception-hierarchy.md`).
 5. Create `WebApi/Extensions/EndpointExtensions.cs`.
 6. Set up `appsettings.json` with empty required values.
 7. Set up `appsettings.Development.json` with local dev values.

@@ -334,99 +334,25 @@ The `GlobalExceptionHandler` maps exception types to these codes automatically. 
 
 When an endpoint returns a `400 Bad Request` due to a command or query validation failure (`CommandValidationException` or `QueryValidationException`), the response body **MUST** conform strictly to the **RFC 7807 (Problem Details)** standard with the Content-Type header set to `application/problem+json`.
 
-The response **MUST** include a highly structured `extensions` dictionary containing a flat key-value dictionary of invalid fields and their corresponding error messages. This schema is the contract that the Next.js frontend relies on to display form-level validation errors automatically.
+The response **MUST** include an `invalidParams` array at the top level. Each entry has `name` (camelCase field path) and `reason` (human-readable message). This schema is the contract the Next.js frontend relies on to display form-level validation errors automatically. See `docs/conventions/frontend/08-error-handling-and-problem-details.md`.
 
 #### Validation Error JSON Schema Example
 
 ```json
 {
-  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-  "title": "Command validation failure",
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "Validation failed.",
   "status": 400,
-  "detail": "One or more validation errors occurred.",
+  "detail": "One or more fields failed validation.",
   "instance": "/posts",
-  "extensions": {
-    "invalidParams": {
-      "title": ["A post title is required and cannot be empty."],
-      "authorId": ["A valid Author ID is required."]
-    }
-  }
+  "invalidParams": [
+    { "name": "title", "reason": "A post title is required and cannot be empty." },
+    { "name": "authorId", "reason": "A valid Author ID is required." }
+  ]
 }
 ```
 
-In the backend `GlobalExceptionHandler`, this is achieved by enriching `ProblemDetails` when handling validation exception types:
-
-```csharp
-// Middleware/GlobalExceptionHandler.cs
-internal sealed class GlobalExceptionHandler : IExceptionHandler
-{
-    private readonly IProblemDetailsService _problemDetailsService;
-
-    public GlobalExceptionHandler(IProblemDetailsService problemDetailsService)
-    {
-        _problemDetailsService = problemDetailsService;
-    }
-
-    public async ValueTask<bool> TryHandleAsync(
-        HttpContext httpContext,
-        Exception exception,
-        CancellationToken cancellationToken)
-    {
-        var (statusCode, title) = exception switch
-        {
-            CommandValidationException or QueryValidationException
-                => (StatusCodes.Status400BadRequest, "Validation failure"),
-            AggregateNotFoundException
-                => (StatusCodes.Status404NotFound, "Not found"),
-            DomainException
-                => (StatusCodes.Status409Conflict, "Domain rule violated"),
-            DbUpdateConcurrencyException
-                => (StatusCodes.Status409Conflict, "Concurrency conflict"),
-            _
-                => (StatusCodes.Status500InternalServerError, "An error occurred")
-        };
-
-        httpContext.Response.StatusCode = statusCode;
-
-        var problemDetails = new ProblemDetails
-        {
-            Status = statusCode,
-            Title = title,
-            // MUST NOT expose exception.Message for 500 responses (OWASP A05 information disclosure).
-            Detail = statusCode == StatusCodes.Status500InternalServerError
-                ? "An unexpected error occurred. Please contact support."
-                : exception.Message
-        };
-
-        // Attach field-level validation errors so the frontend can display
-        // them next to the relevant form fields.
-        if (exception is CommandValidationException commandValidation)
-        {
-            problemDetails.Extensions["invalidParams"] = commandValidation.ValidationErrors
-                .ToDictionary(
-                    e => e.PropertyName,
-                    e => new[] { e.ErrorMessage });
-        }
-        else if (exception is QueryValidationException queryValidation)
-        {
-            problemDetails.Extensions["invalidParams"] = queryValidation.ValidationErrors
-                .ToDictionary(
-                    e => e.PropertyName,
-                    e => new[] { e.ErrorMessage });
-        }
-
-        return await _problemDetailsService.TryWriteAsync(
-            new ProblemDetailsContext
-            {
-                HttpContext = httpContext,
-                ProblemDetails = problemDetails,
-                Exception = exception
-            });
-    }
-}
-```
-
-Register the handler in `Program.cs`:
+The canonical `GlobalExceptionHandler` implementation that produces this shape is in `docs/conventions/backend/06-exception-hierarchy.md`. Register it in `Program.cs`:
 
 ```csharp
 builder.Services.AddProblemDetails();
@@ -436,8 +362,6 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 app.UseExceptionHandler();
 ```
-
-> **ValidationErrors shape.** The exact type of `ValidationErrors` on `CommandValidationException` and `QueryValidationException` depends on the validation library in use. Adjust the projection to match the exception's actual property names. The `invalidParams` key in the extensions dictionary MUST be a `Dictionary<string, string[]>` where keys are camelCase property names.
 
 ---
 

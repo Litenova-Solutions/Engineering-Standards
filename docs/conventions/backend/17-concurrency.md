@@ -143,23 +143,7 @@ internal sealed class UpdatePostCommandHandler : ICommandHandler<UpdatePostComma
 
 ## 5. Handling `DbUpdateConcurrencyException`
 
-The `GlobalExceptionHandler` MUST catch `DbUpdateConcurrencyException` and map it to HTTP 409.
-
-```csharp
-// WebApi/Middleware/GlobalExceptionHandler.cs
-// Add this case alongside the existing exception mappings:
-
-case DbUpdateConcurrencyException:
-    problemDetails = new ProblemDetails
-    {
-        Status = StatusCodes.Status409Conflict,
-        Title = "Conflict",
-        Detail = "The resource was modified by another actor. Retrieve the latest version and retry."
-    };
-    break;
-```
-
-The response body MUST NOT include the exception message, stack trace, or any database-level detail. The `Detail` field is a human-readable explanation for the client.
+The `GlobalExceptionHandler` MUST catch `DbUpdateConcurrencyException` and map it to HTTP 409. The canonical handler in `docs/conventions/backend/06-exception-hierarchy.md` includes this case. The response body MUST NOT include the exception message, stack trace, or any database-level detail. The `Detail` field is a human-readable explanation for the client.
 
 ---
 

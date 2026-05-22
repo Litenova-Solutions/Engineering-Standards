@@ -85,6 +85,8 @@ Nothing in this repository has been released to consumers yet. All work below ta
 - `.github/copilot-instructions.md`: guardrails, DoD, forbidden packages.
 - RFC 2119 pass: `git-workflow.md`, `security.md`, `05-api-layer.md`, `02-components.md` (WCAG 2.2 AA default).
 - All `ADR NNNN` references replaced with `docs/decisions/{slug}.md` paths.
+- `docs/conventions/backend/06-exception-hierarchy.md`: canonical `GlobalExceptionHandler` implementation (single source; replaces duplicates in `05-api-layer.md` and `program-cs.md`).
+- `docs/conventions/backend/05-api-layer.md`: validation error JSON schema aligned with frontend `invalidParams` array contract.
 
 ### Removed
 
