@@ -58,27 +58,82 @@ src/{ProjectName}.Infrastructure/
 
 ### PostgreSQL snake_case Mapping Rules
 
-To prevent PostgreSQL from requiring double-quotes (e.g., `"Posts"`, `"Id"`) in SQL queries, **all database objects (table names, columns, primary keys, foreign keys, and indexes) MUST be mapped in `snake_case`**.
+To prevent PostgreSQL from requiring double-quoted identifiers (e.g., `"Posts"`, `"Id"`) in SQL queries, **all database objects — table names, column names, primary keys, foreign keys, and indexes — MUST be mapped in `snake_case`**.
 
-You **MUST** install the NuGet package `EFCore.NamingConventions` and configure `AppDbContext` to use snake_case in `InfrastructureServiceRegistration.cs`:
+#### Option A — `EFCore.NamingConventions` package (preferred when compatible)
+
+The community package `EFCore.NamingConventions` applies snake_case globally. Install it and configure the context:
 
 ```csharp
 services.AddDbContext<AppDbContext>(options =>
     options
         .UseNpgsql(configuration.GetConnectionString("Database"))
-        .UseSnakeCaseNamingConventions()); // Enforces snake_case across all tables and columns
+        .UseSnakeCaseNamingConventions());
 ```
 
-#### Naming Conventions for Database Objects:
-*   **Table Names:** Singular, snake_case (e.g., `post`, `order_line`), or standard pluralized snake_case if preferred by project team (e.g., `posts`, `order_lines`), but **MUST** be consistent across the entire database.
-*   **Primary Keys:** `pk_{table_name}` (automatically handled by `.UseSnakeCaseNamingConventions()`).
-*   **Foreign Keys:** `fk_{child_table}_{parent_table}_{parent_column}` (automatically handled).
-*   **Single-Column Indexes:** `ix_{table_name}_{column_name}`
-*   **Composite Indexes:** `ix_{table_name}_{column1}_{column2}`
-*   **Unique Constraints:** `uq_{table_name}_{column_name}`
+Verify the package version is compatible with your EF Core version before using it. Community packages do not always ship simultaneously with major EF Core releases. Check the package's NuGet page or GitHub releases before adding it.
+
+#### Option B — Manual mapping in `OnModelCreating` (fallback)
+
+When the package is unavailable or incompatible, apply snake_case in `OnModelCreating` after all configurations are applied. **Skip owned entity types** — they share the owner's table and columns and have their own explicit column names set inside `OwnsOne` blocks. Applying a blanket rename to shadow FK properties of owned types causes key conflicts.
 
 ```csharp
-// DO: Manually declare unique indexes with strict snake_case names
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+    foreach (var entity in modelBuilder.Model.GetEntityTypes())
+    {
+        // Skip owned entities — columns are configured explicitly inside OwnsOne blocks.
+        if (entity.IsOwned())
+        {
+            continue;
+        }
+
+        var tableName = entity.GetTableName();
+        if (!string.IsNullOrEmpty(tableName))
+        {
+            entity.SetTableName(ToSnakeCase(tableName));
+        }
+
+        foreach (var property in entity.GetProperties())
+        {
+            var columnName = property.GetColumnName();
+            if (!string.IsNullOrEmpty(columnName))
+            {
+                property.SetColumnName(ToSnakeCase(columnName));
+            }
+        }
+    }
+}
+
+private static string ToSnakeCase(string name)
+{
+    var result = System.Text.RegularExpressions.Regex.Replace(
+        System.Text.RegularExpressions.Regex.Replace(name, @"([A-Z]+)([A-Z][a-z])", "$1_$2"),
+        @"([a-z\d])([A-Z])", "$1_$2");
+    return result.ToLowerInvariant();
+}
+```
+
+Regardless of which option is used, explicitly set `HasColumnName`, `HasDatabaseName`, and `ToTable` inside every `IEntityTypeConfiguration<T>` class. Explicit beats convention — any name declared in configuration wins over the automatic transformation.
+
+#### Naming Conventions for Database Objects
+
+| Object | Convention | Example |
+|:---|:---|:---|
+| Table | plural snake_case | `posts`, `order_lines` |
+| Column | snake_case | `author_id`, `published_at` |
+| Primary key | `pk_{table}` | `pk_posts` |
+| Foreign key | `fk_{child}_{parent}_{col}` | `fk_post_tags_posts_post_id` |
+| Single-column index | `ix_{table}_{col}` | `ix_posts_author_id` |
+| Composite index | `ix_{table}_{col1}_{col2}` | `ix_order_lines_order_id_sku` |
+| Unique constraint | `uq_{table}_{col}` | `uq_posts_slug` |
+
+Always declare unique indexes explicitly with a `HasDatabaseName` call:
+
+```csharp
+// DO: explicit name, discoverable at a glance
 builder.HasIndex(u => u.Email)
     .IsUnique()
     .HasDatabaseName("uq_users_email");
@@ -198,27 +253,81 @@ builder.Property("Title_Value").HasColumnName("Title");
 
 ### Private Backing Fields for Collections
 
-Aggregate collections use private `List<T>` backing fields. EF Core must be configured to use those fields.
+Aggregate roots expose collections via a public read-only property backed by a private `List<T>` field:
 
 ```csharp
+// Domain/Orders/Order.cs
+public sealed class Order : AggregateRoot<OrderId>
+{
+    private readonly List<OrderLine> _lines = [];
+
+    public IReadOnlyList<OrderLine> Lines => _lines.AsReadOnly();
+}
+```
+
+EF Core discovers **both** the backing field and the public property. Using the string-based `HasMany<OrderLine>("_lines")` API when a public property also exists causes a conflict at startup:
+> "The member 'Order._lines' cannot use field '_lines' because it is already used by 'Order.Lines'."
+
+The correct configuration uses the lambda overload, then overrides the field via `HasField`:
+
+```csharp
+// DO: reference the public property; tell EF Core to use the backing field for access
 internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
     {
-        builder.ToTable("Orders");
+        builder.ToTable("orders");
         builder.HasKey(o => o.Id);
 
         builder.Property(o => o.Id)
             .HasConversion(id => id.Value, value => new OrderId(value));
 
-        builder.HasMany<OrderLine>("_lines")
+        builder.HasMany(o => o.Lines)
             .WithOne()
-            .HasForeignKey("OrderId")
+            .HasForeignKey(l => l.OrderId)
             .IsRequired();
 
-        builder.Navigation("_lines").UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(o => o.Lines)
+            .HasField("_lines")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
+```
+
+```csharp
+// DON'T: string-based HasMany on a field that is also exposed as a public property
+builder.HasMany<OrderLine>("_lines").WithOne(); // throws at startup
+builder.Navigation("_lines").UsePropertyAccessMode(PropertyAccessMode.Field);
+```
+
+### Composite Keys
+
+`HasKey` always takes CLR property names or lambda expressions, never column names. Passing the configured column name (e.g., `"order_id"`) instead of the property name (e.g., `"OrderId"`) causes EF Core to attempt creating a new shadow property and fail.
+
+```csharp
+// DO: CLR property names or lambda
+builder.HasKey(pt => new { pt.OrderId, pt.LineId });
+// or
+builder.HasKey("OrderId", "LineId");
+
+// DON'T: column names are not property names
+builder.HasKey("order_id", "line_id"); // fails — no such CLR properties
+```
+
+### Indexes on Owned Entity Properties
+
+When an owned entity's column needs a unique index, declare it **inside** the `OwnsOne` configuration block. Calling `HasIndex("Name_Value")` on the owning entity after the fact fails because EF Core does not expose shadow navigation properties on the owner.
+
+```csharp
+// DO: index inside the OwnsOne block
+builder.OwnsOne(t => t.Name, b =>
+{
+    b.Property(n => n.Value).HasColumnName("name").HasMaxLength(50).IsRequired();
+    b.HasIndex(n => n.Value).IsUnique().HasDatabaseName("uq_tags_name");
+});
+
+// DON'T: index on a shadow property name outside OwnsOne
+builder.HasIndex("Name_Value").IsUnique(); // fails — property not found on the owner
 ```
 
 ---
@@ -283,29 +392,64 @@ public async Task AddAsync(Post post, CancellationToken cancellationToken)
 
 ---
 
-## `IDatabaseContext` Implementation
+## `IDatabaseContext` Implementation and Domain Event Dispatch
 
-`AppDbContext` implements `IDatabaseContext` from `Application.Read.Contracts`. This is the only change required to `AppDbContext` to support the read-side query pattern. Add one `IQueryable<T>` property per aggregate.
+`AppDbContext` implements `IDatabaseContext` from `Application.Read.Contracts` and dispatches domain events from `SaveChangesAsync`. Add one `IQueryable<T>` property per aggregate.
+
+When the context needs to dispatch domain events, inject `IEventPublisher` (the preferred alias for `IEventMediator`) and publish each event after saving. Because LiteBus publishes any `notnull` object as an event, no cast or interface constraint is needed beyond what your collection type provides:
 
 ```csharp
 // Infrastructure/Persistence/AppDbContext.cs
 internal sealed class AppDbContext : DbContext, IDatabaseContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options) { }
+    private readonly IEventPublisher _eventPublisher;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, IEventPublisher eventPublisher)
+        : base(options)
+    {
+        _eventPublisher = eventPublisher;
+    }
 
     // DbSet properties satisfy both EF Core tracking and IDatabaseContext
     public DbSet<Post> Posts => Set<Post>();
     public DbSet<Author> Authors => Set<Author>();
-    public DbSet<Order> Orders => Set<Order>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(
-            typeof(AppDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        // Collect events before saving so they reflect the pre-save state.
+        var domainEvents = ChangeTracker.Entries<IAggregateRoot>()
+            .SelectMany(e => e.Entity.GetDomainEvents())
+            .ToList();
+
+        // Clear before saving to avoid re-dispatching on retry.
+        foreach (var entry in ChangeTracker.Entries<IAggregateRoot>())
+        {
+            entry.Entity.ClearDomainEvents();
+        }
+
+        var result = await base.SaveChangesAsync(cancellationToken);
+
+        foreach (var domainEvent in domainEvents)
+        {
+            // LiteBus publishes any notnull object. No cast needed.
+            await _eventPublisher.PublishAsync(
+                domainEvent,
+                cancellationToken: cancellationToken);
+        }
+
+        return result;
     }
 }
 ```
+
+> **When there is no event dispatch.** If the project has no domain events yet, omit the `IEventPublisher` constructor parameter and the dispatch loop. Add it only when the first domain event handler is wired up.
+
+> **No handler registered.** By default LiteBus silently ignores events with no registered handlers. No exception is thrown and no configuration is required to suppress it. If you want to detect unhandled events (for example, to log them), register an open-generic event handler: `IEventHandler<IDomainEvent>` will catch every domain event that no specific handler claimed. See the LiteBus docs for the current event-settings API.
 
 When a new aggregate is added to the domain, add its `DbSet<T>` property here and add the corresponding `IQueryable<T>` property to `IDatabaseContext` in `Application.Read.Contracts`.
 
@@ -391,6 +535,7 @@ internal sealed class RollbackCommandErrorHandler
 
     public async Task HandleErrorAsync(
         ICommand command,
+        object? commandResult,
         Exception exception,
         CancellationToken cancellationToken)
     {
@@ -473,7 +618,27 @@ internal static class InfrastructureServiceRegistration
 }
 ```
 
-In `Program.cs`, call `AddInfrastructure` and register LiteBus with incremental module registration:
+In `Program.cs`, call `AddInfrastructure` and register LiteBus. Each module type (`AddCommandModule`, `AddQueryModule`, `AddEventModule`) is called **once** per `AddLiteBus` invocation. All assemblies for a given module type are registered inside that single call.
+
+### Assembly Marker Classes
+
+LiteBus registers handlers by scanning assemblies. Handler classes are `internal sealed`, so they cannot be referenced by name from `WebApi`. Each implementation project must expose a public marker class so `WebApi` can reference the assembly without depending on internal types:
+
+```csharp
+// Application.Write/ApplicationWriteAssemblyMarker.cs
+public static class ApplicationWriteAssemblyMarker { }
+
+// Application.Read/ApplicationReadAssemblyMarker.cs
+public static class ApplicationReadAssemblyMarker { }
+
+// Application.Reactions/ApplicationReactionsAssemblyMarker.cs
+public static class ApplicationReactionsAssemblyMarker { }
+
+// Infrastructure/InfrastructureAssemblyMarker.cs
+public static class InfrastructureAssemblyMarker { }
+```
+
+### LiteBus Registration
 
 ```csharp
 // WebApi/Program.cs (LiteBus registration excerpt)
@@ -481,38 +646,82 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddLiteBus(liteBus =>
 {
-    // Application.Write assembly -- command handlers and validators
+    // All command-side assemblies in one AddCommandModule call.
+    // Application.Write: handlers and validators.
+    // Infrastructure: transaction pre/post/error pipeline behaviors.
     liteBus.AddCommandModule(module =>
     {
-        module.RegisterFromAssembly(
-            typeof(CreatePostCommandHandler).Assembly);
+        module.RegisterFromAssembly(typeof(ApplicationWriteAssemblyMarker).Assembly);
+        module.RegisterFromAssembly(typeof(InfrastructureAssemblyMarker).Assembly);
     });
 
-    // Infrastructure assembly -- global pipeline behaviors
-    // Explicit registration makes pipeline behaviors visible
-    // to engineers reading Program.cs
-    liteBus.AddCommandModule(module =>
-    {
-        module.Register(typeof(TransactionCommandPreHandler));
-        module.Register(typeof(SaveChangesCommandPostHandler));
-        module.Register(typeof(RollbackCommandErrorHandler));
-    });
-
-    // Application.Read assembly -- query handlers and validators
+    // Query handlers and validators.
     liteBus.AddQueryModule(module =>
     {
-        module.RegisterFromAssembly(
-            typeof(GetPostByIdQueryHandler).Assembly);
+        module.RegisterFromAssembly(typeof(ApplicationReadAssemblyMarker).Assembly);
     });
 
-    // Application.Reactions assembly -- event handlers
+    // Event handlers.
     liteBus.AddEventModule(module =>
     {
-        module.RegisterFromAssembly(
-            typeof(NotifySubscribersOnPostPublishedEventHandler).Assembly);
+        module.RegisterFromAssembly(typeof(ApplicationReactionsAssemblyMarker).Assembly);
     });
 });
 ```
+
+`RegisterFromAssembly` discovers open generic handlers automatically — no separate `module.Register(typeof(MyHandler<>))` call is needed unless the handler lives in a different assembly from what is being scanned.
+
+> **Note on required namespaces.** `AddCommandModule`, `AddQueryModule`, and `AddEventModule` are extension methods from separate packages. Each requires both its NuGet package and its `using` directive:
+> - `using LiteBus.Commands;` — from `LiteBus.Commands.Extensions.Microsoft.DependencyInjection`
+> - `using LiteBus.Queries;` — from `LiteBus.Queries.Extensions.Microsoft.DependencyInjection`
+> - `using LiteBus.Events;` — from `LiteBus.Events.Extensions.Microsoft.DependencyInjection`
+
+---
+
+## Design-Time DbContext Factory
+
+When `AppDbContext` has constructor parameters beyond `DbContextOptions<T>` (for example, `IEventPublisher` for domain event dispatch), the EF Core tooling cannot construct it automatically at design time. Without a factory, `dotnet ef migrations add` fails with a "no parameterless constructor" error.
+
+Add an `IDesignTimeDbContextFactory<AppDbContext>` implementation in the Infrastructure project:
+
+```csharp
+// Infrastructure/Persistence/AppDbContextFactory.cs
+internal sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+{
+    public AppDbContext CreateDbContext(string[] args)
+    {
+        // Read connection string from environment variable or fall back to a local default.
+        // Never hard-code production credentials here.
+        var connectionString =
+            Environment.GetEnvironmentVariable("ConnectionStrings__Database")
+            ?? "Host=localhost;Port=5432;Database=myapp;Username=myapp;Password=myapp";
+
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseNpgsql(connectionString)
+            .Options;
+
+        // Pass a no-op IEventPublisher so the factory can construct the context
+        // without requiring a running DI container.
+        return new AppDbContext(options, new NoOpEventPublisher());
+    }
+}
+```
+
+```csharp
+// Infrastructure/Persistence/NoOpEventPublisher.cs
+internal sealed class NoOpEventPublisher : IEventPublisher
+{
+    public Task PublishAsync(IEvent @event, EventMediationSettings? settings = null, CancellationToken cancellationToken = default)
+        => Task.CompletedTask;
+
+    Task IEventPublisher.PublishAsync<TEvent>(TEvent @event, EventMediationSettings? settings = null, CancellationToken cancellationToken = default)
+        => Task.CompletedTask;
+}
+```
+
+`IDesignTimeDbContextFactory<T>` is discovered automatically by `dotnet ef` tools when the class is in the same assembly as the DbContext. No DI registration is needed.
+
+> **Note:** `IEventPublisher` is the preferred alias for `IEventMediator`. The `where TEvent : notnull` constraint on the generic overload requires an explicit interface implementation when the stub returns `Task.CompletedTask` without the type constraint. See LiteBus docs for the current interface definition.
 
 ---
 

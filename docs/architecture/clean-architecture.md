@@ -456,42 +456,34 @@ internal sealed class RollbackCommandErrorHandler
 
 ### LiteBus Registration
 
-LiteBus supports incremental module registration. Each assembly registers its own handlers:
+Each module type (`AddCommandModule`, `AddQueryModule`, `AddEventModule`) is called **once** per `AddLiteBus` invocation. Multiple `RegisterFromAssembly` calls inside a single module block scan different assemblies. Calling the same module method twice causes a duplicate key error.
 
 ```csharp
 // WebApi/Program.cs (LiteBus registration excerpt)
 builder.Services.AddLiteBus(liteBus =>
 {
+    // All command-side handlers in one AddCommandModule call.
+    // Application.Write: handlers and validators.
+    // Infrastructure: transaction pipeline behaviors (discovered via scanning).
     liteBus.AddCommandModule(module =>
     {
-        // Application.Write assembly - command handlers and validators
-        module.RegisterFromAssembly(
-            typeof(CreatePostCommandHandler).Assembly);
-    });
-
-    liteBus.AddCommandModule(module =>
-    {
-        // Infrastructure assembly - global pipeline behaviors
-        // Explicit registration makes pipeline behaviors visible
-        // to engineers reading Program.cs
-        module.Register(typeof(TransactionCommandPreHandler));
-        module.Register(typeof(SaveChangesCommandPostHandler));
-        module.Register(typeof(RollbackCommandErrorHandler));
+        module.RegisterFromAssembly(typeof(ApplicationWriteAssemblyMarker).Assembly);
+        module.RegisterFromAssembly(typeof(InfrastructureAssemblyMarker).Assembly);
     });
 
     liteBus.AddQueryModule(module =>
     {
-        module.RegisterFromAssembly(
-            typeof(GetPostByIdQueryHandler).Assembly);
+        module.RegisterFromAssembly(typeof(ApplicationReadAssemblyMarker).Assembly);
     });
 
     liteBus.AddEventModule(module =>
     {
-        module.RegisterFromAssembly(
-            typeof(NotifySubscribersOnPostPublishedEventHandler).Assembly);
+        module.RegisterFromAssembly(typeof(ApplicationReactionsAssemblyMarker).Assembly);
     });
 });
 ```
+
+Handler classes are `internal sealed`. Each implementation project exposes a `public static class {Layer}AssemblyMarker { }` so `Program.cs` can reference the assembly without importing internal types. See `docs/conventions/backend/04-infrastructure-layer.md` for canonical examples.
 
 ---
 
@@ -564,5 +556,7 @@ The `IDomainEvent` marker interface:
 /// </summary>
 interface IDomainEvent;
 ```
+
+`IDomainEvent` is a project-defined marker. It has **no LiteBus dependency** and does not extend any LiteBus interface. LiteBus dispatches any `notnull` object as an event — no framework interface required. The marker exists purely for domain modeling: it provides a shared type to collect events in `AggregateRoot<TId>` and makes event dispatch explicit in Infrastructure.
 
 Both types live in `Domain/Shared/`. All aggregate roots extend `AggregateRoot<TId>`. All domain event records implement `IDomainEvent`. Infrastructure calls `ClearDomainEvents()` after dispatching events via LiteBus.

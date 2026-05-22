@@ -129,6 +129,52 @@ export async function publishPost(_postId: PostId) {
 <div className="p-[13px] text-[#3a3f51]" />
 ```
 
+#### 3. LiteBus Module Registration
+
+```csharp
+// DO: one AddCommandModule call, multiple RegisterFromAssembly inside
+builder.Services.AddLiteBus(liteBus =>
+{
+    liteBus.AddCommandModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ApplicationWriteAssemblyMarker).Assembly);
+        module.RegisterFromAssembly(typeof(InfrastructureAssemblyMarker).Assembly);
+    });
+});
+```
+
+```csharp
+// DON'T: calling AddCommandModule twice causes a duplicate key error
+builder.Services.AddLiteBus(liteBus =>
+{
+    liteBus.AddCommandModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ApplicationWriteAssemblyMarker).Assembly);
+    });
+
+    liteBus.AddCommandModule(module => // FORBIDDEN — duplicate module call
+    {
+        module.RegisterFromAssembly(typeof(InfrastructureAssemblyMarker).Assembly);
+    });
+});
+```
+
+#### 4. Domain Event Framework Coupling
+
+```csharp
+// DO: domain event is a plain record with no framework dependency
+sealed record PostPublished(PostId PostId) : IDomainEvent;
+
+// IDomainEvent is a project-defined marker — no base interface required:
+interface IDomainEvent;
+```
+
+```csharp
+// DON'T: coupling domain events to a framework interface
+sealed record PostPublished(PostId PostId) : IEvent; // FORBIDDEN — IEvent is a LiteBus interface
+sealed record PostPublished(PostId PostId) : IDomainEvent, IEvent; // FORBIDDEN — same problem
+```
+
 ---
 
 ## 4. Mandatory Verification Pipeline

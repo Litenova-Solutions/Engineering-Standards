@@ -16,7 +16,7 @@ Canonical contract for AI agents and engineers. Read before touching code.
 
 | Technology | Version / Notes |
 |:---|:---|
-| .NET | 10 |
+| .NET | 10 (check `global.json` for pinned SDK version) |
 | ASP.NET Core | 10, Minimal APIs only |
 | EF Core | 10 |
 | LiteBus | Modular packages; `ICommandMediator` / `IQueryMediator` only in endpoints |

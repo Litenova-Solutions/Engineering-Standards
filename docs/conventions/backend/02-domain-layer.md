@@ -624,6 +624,19 @@ sealed record PostPublished : IDomainEvent
 }
 ```
 
+`IDomainEvent` is a project-defined marker interface declared in `Domain/Shared/IDomainEvent.cs`:
+
+```csharp
+/// <summary>Marker interface for all domain events.</summary>
+interface IDomainEvent;
+```
+
+`IDomainEvent` has **no LiteBus dependency** and does not extend any LiteBus interface. LiteBus can dispatch any `notnull` class as an event without framework coupling. The marker exists to:
+
+- Provide a concrete collection type in `AggregateRoot<TId>` (`List<IDomainEvent>`)
+- Make domain event dispatch explicit and grep-able in Infrastructure
+- Enable architecture tests to assert all events are records in the Domain project
+
 ### Naming
 
 Domain event names are past tense: `PostCreated`, `OrderPlaced`, `CustomerRegistered`. They describe what happened, not what should happen.
