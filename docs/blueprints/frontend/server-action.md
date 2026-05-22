@@ -7,7 +7,7 @@ Complete Server Action pattern with Zod validation, ProblemDetails error mapping
 ## Action File
 
 ```typescript
-// apps/web/features/posts/create/actions.ts
+// apps/web/domain/posts/create/actions.ts
 "use server"
 
 import { revalidateTag } from "next/cache"
@@ -64,7 +64,7 @@ Import `z` from `"zod"` (Zod 4 is the default export on npm). Do not use `"zod/v
 ## Form Component
 
 ```typescript
-// apps/web/features/posts/create/CreatePostForm.tsx
+// apps/web/domain/posts/create/CreatePostForm.tsx
 "use client" // useActionState requires a client boundary
 
 import { useActionState } from "react"

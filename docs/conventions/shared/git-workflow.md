@@ -62,9 +62,10 @@ Every pull request MUST meet all of the following before it can be merged:
 1. **Description:** The PR description explains what changed and why. Link to any related issues or ADRs.
 2. **CI passes:** All build and test steps must be green. No exceptions.
 3. **No test coverage decrease:** Adding code without tests for it is not acceptable. Integration tests are required for every new endpoint.
-4. **CHANGELOG entry:** Every PR that changes a convention, adds a feature, or fixes a bug MUST include a corresponding entry in `CHANGELOG.md` under `[Unreleased]`.
-5. **Review:** At least one approval from another engineer before merge.
-6. **No unresolved comments:** All review comments must be resolved or acknowledged before merging.
+4. **Review:** At least one approval from another engineer before merge.
+5. **No unresolved comments:** All review comments must be resolved or acknowledged before merging.
+
+From **v2.0.0** onward, every PR that changes a convention MUST include a `CHANGELOG.md` entry under `[Unreleased]`. There is no changelog file before v2.
 
 ---
 
@@ -84,7 +85,7 @@ Tags follow semantic versioning: `v{major}.{minor}.{patch}`
 
 - Tags are created on `main` only.
 - A tag marks a stable, releasable state of the repository.
-- The `CHANGELOG.md` entry for the release MUST be updated before tagging (move content from `[Unreleased]` to the new version section).
+- From **v2.0.0** onward, update `CHANGELOG.md` before tagging (move content from `[Unreleased]` to the new version section). v1.x releases use GitHub Release notes only.
 
 ```bash
 git tag -a v1.2.0 -m "Release v1.2.0"

@@ -15,8 +15,8 @@ These rules apply when an agent is editing files inside the `engineering-standar
 
 ## Rule Integrity
 
-- Before **v1.0.0**, convention changes do not require a `CHANGELOG.md` entry. From v1.0.0 onward, MUST add a corresponding entry under `[Unreleased]` when removing or downgrading a rule.
-- MUST NOT downgrade a `MUST` rule to a `SHOULD` rule without a CHANGELOG entry (post-v1) and a rationale in the convention file.
+- There is no `CHANGELOG.md` before **v2.0.0**. From **v2.0.0** onward, MUST add a corresponding entry under `[Unreleased]` when removing or downgrading a rule.
+- MUST NOT downgrade a `MUST` rule to a `SHOULD` rule without a CHANGELOG entry (from v2) and a rationale in the convention file.
 - MUST NOT add a rule without verifying it does not conflict with an existing rule in another convention file.
 
 ## AGENTS.md Size Limit
@@ -35,7 +35,7 @@ When adding a new decision in `docs/decisions/`, add a row to `docs/decisions/RE
 
 When changing a convention that affects project-specific templates, update the corresponding file in `docs/templates/`.
 
-Project-specific content (ubiquitous language, feature inventories, exception lists) does NOT belong in convention files. It belongs in the project repository using the templates in `docs/templates/`.
+Project-specific domain content (feature READMEs, use case docs) does NOT belong in convention files. It belongs in the project repository under `docs/domain/` using templates in `docs/templates/`.
 
 ## Code Examples
 

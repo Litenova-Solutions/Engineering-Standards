@@ -1,6 +1,6 @@
 # Engineering Standards
 
-**Version 1.0.0** · [Changelog](CHANGELOG.md) · [MIT License](LICENSE)
+**Pre-release** · [MIT License](LICENSE)
 
 Normative conventions and agent contracts for full-stack .NET and Next.js projects. Use this repository as the single source of truth for architecture, coding rules, and AI agent behavior.
 
@@ -9,7 +9,7 @@ flowchart LR
   subgraph consume [Your project]
     App[Application code]
     Shim[Project AGENTS.md]
-    Domain[docs/domain inventories]
+    Domain[docs/domain tree]
   end
   subgraph standards [This repository]
     Agents[AGENTS.md]
@@ -30,13 +30,13 @@ flowchart LR
 |:---|:---|
 | AI agent | [`AGENTS.md`](AGENTS.md) |
 | Human engineer | [`docs/README.md`](docs/README.md) then the convention for your layer |
-| New feature | [`docs/guides/add-new-feature.md`](docs/guides/add-new-feature.md) then [`docs/guides/definition-of-done.md`](docs/guides/definition-of-done.md) |
+| New use case | [`docs/guides/agentic-domain-driven-design.md`](docs/guides/agentic-domain-driven-design.md), then [`docs/guides/add-new-use-case.md`](docs/guides/add-new-use-case.md) |
 
 ---
 
 ## Versioning philosophy
 
-**Standards v1** is the first complete pinned baseline. After the `1.0.0` tag, breaking changes are tracked in `CHANGELOG.md` and may increment to `2.0.0`.
+**v1.0.0** will be the first pinned release tag. Until then, `main` is the working baseline. There is no `CHANGELOG.md` before **v2.0.0**; release notes for v1.x are captured in GitHub Release descriptions only.
 
 | Semver | Meaning |
 |:---|:---|
@@ -44,7 +44,7 @@ flowchart LR
 | `MINOR` | Additive: new conventions or decisions; existing compliant code stays valid |
 | `PATCH` | Clarifications, examples, typo fixes |
 
-Future growth (more conventions, checklists, tooling) ships as `1.x` until a breaking change requires `2.0.0`. A long-term goal is broad coverage across backend, frontend, CI, security, and operations; version numbers track **compatibility**, not a count of documents.
+From **v2.0.0** onward, breaking and notable changes are tracked in `CHANGELOG.md`. A long-term goal is broad coverage across backend, frontend, CI, security, and operations; version numbers track **compatibility**, not a count of documents.
 
 Check `standards.manifest.json` at the tag you pin for machine-readable paths.
 
@@ -108,7 +108,7 @@ Copy [`docs/templates/project-agents.md`](docs/templates/project-agents.md) to y
 
 1. Point to `standards/AGENTS.md` (or `.standards/AGENTS.md`).
 2. List project-specific MUST rules.
-3. Point to filled-in `docs/domain/*` inventories.
+3. Point to the project `docs/domain/` tree (system index, feature READMEs, use case docs).
 
 ### CI enforcement
 
@@ -133,7 +133,6 @@ Full gate list: [`docs/conventions/shared/ci.md`](docs/conventions/shared/ci.md)
 engineering-standards/
 ├── AGENTS.md                 Agent contract (read first)
 ├── standards.manifest.json   Version and paths for tooling
-├── CHANGELOG.md
 ├── docs/
 │   ├── README.md             Documentation map
 │   ├── architecture/       Structural guide
@@ -163,18 +162,18 @@ Decisions use **slug filenames** (no linear numbers). Index: [`docs/decisions/RE
 
 ---
 
-## Project-specific documentation
+## Project domain documentation
 
-Convention files here stay generic. Each consumer project copies [`docs/templates/`](docs/templates/) into `docs/domain/` and maintains:
+Convention files here stay generic. Each consumer project maintains living domain docs under `docs/domain/`:
 
-- Ubiquitous language, aggregates, features, exceptions, read models
-- Frontend feature inventory and API endpoint map
+- System index (`README.md`), feature READMEs, and use case docs
+- See [`docs/guides/agentic-domain-driven-design.md`](docs/guides/agentic-domain-driven-design.md)
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Convention changes need a `CHANGELOG.md` entry. New decisions need a row in `docs/decisions/README.md`.
+See [CONTRIBUTING.md](CONTRIBUTING.md). New decisions need a row in `docs/decisions/README.md`.
 
 ---
 

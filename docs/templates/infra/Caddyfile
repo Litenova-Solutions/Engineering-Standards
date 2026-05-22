@@ -1,0 +1,10 @@
+# Copy to infra/Caddyfile alongside docker-compose.prod.yml.
+# Replace example.com with your domain. Caddy obtains and renews TLS certificates automatically.
+
+{$WEB_HOSTNAME:web.example.com} {
+	reverse_proxy web:3000
+}
+
+{$API_HOSTNAME:api.example.com} {
+	reverse_proxy api:8080
+}

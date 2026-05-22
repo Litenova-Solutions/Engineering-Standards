@@ -53,7 +53,7 @@ All runnable applications live under `apps/`. The .NET solution lives at `apps/a
 │       ├── app/
 │       ├── components/
 │       │   └── ui/
-│       ├── features/
+│       ├── domain/
 │       ├── lib/
 │       │   ├── api/
 │       │   │   └── client.ts
@@ -247,7 +247,7 @@ apps/web/
 │   └── globals.css
 ├── components/
 │   └── ui/                   ← generic primitives (shadcn/ui, Radix)
-├── features/                 ← product use cases; no cross-feature imports
+├── domain/                  ← DDD domain use cases; no cross-domain imports
 │   └── posts/
 │       ├── create/
 │       ├── detail/
@@ -259,10 +259,10 @@ apps/web/
 │   ├── env.ts                ← validated environment variables
 │   ├── errors/               ← error parsing and mapping
 │   └── stores/               ← Zustand UI-only stores
-└── shared/                   ← cross-feature non-UI logic
+└── shared/                   ← cross-domain non-UI logic
 ```
 
-Rule: `app/` contains routing shells only. Every `page.tsx` imports its feature entry component from `features/{feature}/`. `features/` contains product use cases. `shared/` contains cross-feature non-UI logic. `components/ui/` contains generic UI primitives only. MUST NOT import from `features/{a}/` inside `features/{b}/`. See `docs/conventions/frontend/07-feature-boundaries.md`.
+Rule: `app/` contains routing shells only. Every `page.tsx` imports its domain entry component from `domain/{feature}/`. `domain/` contains product use cases aligned with backend handlers and domain docs. `shared/` contains cross-domain non-UI logic. `components/ui/` contains generic UI primitives only. MUST NOT import from `domain/{a}/` inside `domain/{b}/`. See `docs/conventions/frontend/07-domain-boundaries.md`.
 
 ---
 
@@ -286,6 +286,6 @@ When bootstrapping a monorepo, copy files from `docs/templates/` in this reposit
 | `eslint.config.ts` | `apps/web/eslint.config.ts` |
 | `packages/api-types/package.json` | `packages/api-types/package.json` |
 | `packages/api-client/` | `packages/api-client/` |
-| `iac/azure-container-apps.bicep` | `infra/` (optional) |
+| `iac/docker-compose.prod.yml`, `iac/Caddyfile` | `infra/` (optional) |
 
 See `docs/guides/create-new-project.md` for the full bootstrap sequence.

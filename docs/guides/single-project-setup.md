@@ -30,8 +30,11 @@ Replace `apps/api/` nesting with the repository root:
 ├── tests/
 │   └── ...
 └── docs/
-    ├── domain/
-    └── specs/
+    └── domain/
+        ├── README.md
+        └── {feature}/
+            ├── README.md
+            └── {use-case}.md
 ```
 
 Do not create `apps/api/` when using this layout.

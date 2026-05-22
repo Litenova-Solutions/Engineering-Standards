@@ -3,8 +3,8 @@
 ## Agent Quick Rules
 
 - Default to Server Components; `'use client'` MUST have an explanatory comment.
-- `page.tsx` MUST be a thin shell; logic lives in `features/{feature}/`.
-- MUST NOT import across `features/{a}/` and `features/{b}/`.
+- `page.tsx` MUST be a thin shell; logic lives in `domain/{feature}/`.
+- MUST NOT import across `domain/{a}/` and `domain/{b}/`.
 - `proxy.ts` MUST only do optimistic cookie checks; authoritative auth in Server Components/Actions.
 - MUST await `params`, `searchParams`, `cookies`, `headers`.
 - `route.ts` MUST NOT be used except webhooks, OAuth callbacks, or file/binary responses.
@@ -48,7 +48,7 @@ async function Page({ params }: Props) {
 }
 
 // GOOD: client component only handles interaction
-// features/posts/detail/PostPublishButton.tsx
+// domain/posts/detail/PostPublishButton.tsx
 "use client"
 // Needs onClick handler and isPending state - client component required.
 
@@ -102,8 +102,8 @@ Every `page.tsx` file in `app/` is a thin shell. The page file handles Next.js-s
 // GOOD: app/(main)/posts/[id]/page.tsx - thin shell
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { PostDetailPage } from "@/features/posts/detail/PostDetailPage"
-import { getPostById } from "@/features/posts/detail/queries"
+import { PostDetailPage } from "@/domain/posts/detail/PostDetailPage"
+import { getPostById } from "@/domain/posts/detail/queries"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -312,7 +312,7 @@ revalidatePath("/posts")  // revalidates all cached data for the /posts route
 For functions that read from the database or external APIs, the `use cache` directive marks the function result as cacheable:
 
 ```typescript
-// features/posts/list/queries.ts
+// domain/posts/list/queries.ts
 import { getApiClient } from "@/lib/api/client"
 
 export async function getPublishedPosts() {
@@ -388,30 +388,32 @@ Projects MUST use this `tsconfig.json` baseline for Next.js 16 with TypeScript 6
 
 ---
 
-## 11. Feature Vertical Slices
+## 11. Domain Use Case Modules
 
-Frontend features follow the same vertical slice boundaries as backend use cases. Each feature folder owns its routes, components, actions, hooks, and stores.
+Frontend domain folders follow the same Feature → Use case boundaries as backend handlers and domain docs. Each domain folder owns its routes, components, actions, hooks, and stores for one bounded area (for example `posts`).
 
 **Import rules:**
 
-- Code under `features/{feature}/` MUST NOT import from `features/{otherFeature}/`.
-- Cross-feature reuse MUST follow the promotion rule in `docs/conventions/00-principles.md`: promote shared implementation code to `shared/` (import as `@/shared/...`) or generic UI to `components/ui/`.
-- `app/` route shells MUST import feature entry components from `features/{feature}/` only. They MUST NOT contain business logic.
+- Code under `domain/{feature}/` MUST NOT import from `domain/{otherFeature}/`.
+- Cross-domain reuse MUST follow the promotion rule in `docs/conventions/00-principles.md`: promote shared implementation code to `shared/` (import as `@/shared/...`) or generic UI to `components/ui/`.
+- `app/` route shells MUST import domain entry components from `domain/{feature}/` only. They MUST NOT contain business logic.
 
 ```typescript
-// GOOD: posts feature imports only its own modules and shared layers
-import { PostCard } from "@/features/posts/list/PostCard"
+// GOOD: posts domain imports only its own modules and shared layers
+import { PostCard } from "@/domain/posts/list/PostCard"
 import { formatRelativeDate } from "@/shared/dates/formatRelativeDate"
 import { Button } from "@/components/ui/button"
 ```
 
 ```typescript
-// BAD: posts feature imports authors feature internals
-import { AuthorAvatar } from "@/features/authors/shared/AuthorAvatar"
-// BAD: cross-feature coupling; promote AuthorAvatar to @/shared/ or components/ui/
+// BAD: posts domain imports authors domain internals
+import { AuthorAvatar } from "@/domain/authors/shared/AuthorAvatar"
+// BAD: cross-domain coupling; promote AuthorAvatar to @/shared/ or components/ui/
 ```
 
-Feature-local shared code (`features/{feature}/shared/`) is for reuse within one feature only. It MUST NOT be imported by other features.
+Domain-local shared code (`domain/{feature}/shared/`) is for reuse within one domain only. It MUST NOT be imported by other domains.
+
+See `docs/conventions/frontend/07-domain-boundaries.md`.
 
 ---
 
@@ -457,4 +459,4 @@ Add all required server-side variables to the schema. A Zod validation error at 
 
 ## 13. Project-Specific Configuration
 
-Document project-specific values in repository `docs/domain/frontend-api-endpoints.md` and validated `lib/env.ts`. Do not extend this standards file.
+Document project-specific API URLs and env values in the relevant use case doc under `docs/domain/` and in validated `lib/env.ts`. Do not extend this standards file.

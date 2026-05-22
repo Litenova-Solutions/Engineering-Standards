@@ -8,7 +8,7 @@
 
 Production systems need logs, metrics, traces, health checks, and correlation IDs that work across the API, background workers, database calls, and external services. Serilog provides structured logs, but logs alone do not show request latency, dependency timing, queue age, or cross-service traces.
 
-.NET provides built-in logging, metrics, and tracing APIs. OpenTelemetry is the vendor-neutral collection and export standard that connects those APIs to observability backends such as Prometheus, Grafana, Azure Monitor, and other APM tools.
+.NET provides built-in logging, metrics, and tracing APIs. OpenTelemetry is the vendor-neutral collection and export standard that connects those APIs to observability backends such as Prometheus, Grafana, and other OTLP-compatible APM tools.
 
 Options considered:
 

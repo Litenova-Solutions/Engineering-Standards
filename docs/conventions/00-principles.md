@@ -36,7 +36,7 @@ Utils/
 Managers/
 ```
 
-Every layer applies this principle. Feature folders are named after business concepts, not technical operations.
+Every layer applies this principle. Domain folders are named after business concepts, not technical operations.
 
 ---
 
@@ -74,8 +74,8 @@ If a business stakeholder would not recognize a name in the codebase, that name 
 Code starts where it is first needed. It does not move to a `Shared/` folder preemptively.
 
 - **Strike 0:** Code exists in exactly one place. It stays there.
-- **Strike 1 (same feature):** A second use appears within the same feature. Extract to a feature-local `Shared/` subfolder.
-- **Strike 2 (different feature):** A third use appears from a different feature. Extract to the layer-level `Shared/` folder.
+- **Strike 1 (same domain):** A second use appears within the same domain. Extract to a domain-local `Shared/` subfolder.
+- **Strike 2 (different domain):** A third use appears from a different domain. Extract to the layer-level `Shared/` folder.
 
 The promotion rule prevents the accumulation of a `Shared/` folder full of types that are only used once, which is the most common source of unnecessary coupling.
 

@@ -123,7 +123,7 @@ Infrastructure uses `LiteBus.Commands.Abstractions` and `LiteBus.Events.Abstract
 
 ## Step 9: Create the First Domain Aggregate
 
-Follow `docs/conventions/backend/02-domain-layer.md`. Write a feature spec first using `docs/templates/feature-spec.md`.
+Follow `docs/conventions/backend/02-domain-layer.md`. Write the use case doc first using `docs/templates/domain-use-case.md`.
 
 ---
 
@@ -163,21 +163,30 @@ Then:
 
 ---
 
-## Step 12: Project Domain Documentation
+## Step 12: Domain Documentation
 
-Copy templates from `docs/templates/` into repository `docs/domain/`:
+Set up the domain doc tree under `docs/domain/`:
 
-- `ubiquitous-language.md`
-- `aggregate-inventory.md`
-- `feature-inventory.md`
-- `exception-inventory.md`
-- `read-model-inventory.md`
-- `frontend-feature-inventory.md`
-- `frontend-api-endpoints.md`
+1. Copy `docs/templates/domain-system-index.md` to `docs/domain/README.md`.
+2. For the first feature, copy `docs/templates/domain-feature.md` to `docs/domain/{feature}/README.md`.
+3. For each use case, copy `docs/templates/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md`.
+
+Read `docs/guides/agentic-domain-driven-design.md` before the first use case.
 
 ---
 
-## Step 13: Verify
+## Step 13: Production Infrastructure (optional)
+
+Copy VPS deployment templates from `docs/templates/infra/` to `infra/`:
+
+- `docker-compose.prod.yml`
+- `Caddyfile`
+
+Add a committed `.env.example` with variable names only. See `docs/conventions/shared/infrastructure-as-code.md`.
+
+---
+
+## Step 14: Verify
 
 ```bash
 dotnet tool restore

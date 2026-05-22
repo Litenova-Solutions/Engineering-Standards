@@ -1,18 +1,21 @@
-# Add a New Feature
+# Add a New Use Case
 
 This guide shows the standard path for adding one backend use case and connecting it to the frontend. Use it as a checklist, not as a substitute for the layer convention files.
+
+**Prerequisite:** A use case doc at `docs/domain/{feature}/{use-case}.md`. If none exists, write one first using `docs/templates/domain-use-case.md` and `docs/guides/agentic-domain-driven-design.md`.
 
 ---
 
 ## 1. Read Context
 
-Read:
+Read in order:
 
 1. `AGENTS.md`.
-2. `docs/architecture/clean-architecture.md`.
-3. The convention files for each layer you will edit.
-4. The project `docs/domain/` inventories.
-5. `docs/guides/definition-of-done.md` before marking the work complete.
+2. `docs/domain/README.md` and `docs/domain/{feature}/README.md`.
+3. The use case doc at `docs/domain/{feature}/{use-case}.md`.
+4. `docs/architecture/clean-architecture.md`.
+5. The convention files for each layer you will edit.
+6. `docs/guides/definition-of-done.md` before marking the work complete.
 
 ---
 
@@ -102,7 +105,7 @@ In WebApi:
 
 ## 8. Add Frontend Integration
 
-In `apps/web/`:
+In `apps/web/domain/{feature}/{use-case}/`:
 
 - Fetch initial read data in Server Components on read-heavy pages.
 - Use Server Actions for form mutations.
@@ -113,18 +116,17 @@ In `apps/web/`:
 - Add or update Playwright happy-path tests in `apps/web/e2e/`.
 - Add Vitest tests for new hooks, utilities, or Zod schemas.
 
+See `docs/blueprints/frontend/domain-use-case.md`.
+
 ---
 
-## 9. Update Project Inventories
+## 9. Update Domain Documentation
 
-Update the project-specific files:
+In the same PR:
 
-- `docs/domain/aggregate-inventory.md`.
-- `docs/domain/feature-inventory.md`.
-- `docs/domain/exception-inventory.md`.
-- `docs/domain/read-model-inventory.md`.
-- `docs/domain/frontend-feature-inventory.md`.
-- `docs/domain/frontend-api-endpoints.md`.
+- Update `docs/domain/{feature}/{use-case}.md` to reflect current behavior.
+- Update `docs/domain/{feature}/README.md` if aggregates, language, events, or persistence changed.
+- Update `docs/domain/README.md` if this is a new or retired use case.
 
 ---
 
@@ -143,4 +145,3 @@ pnpm exec playwright test --config apps/web/playwright.config.ts
 ```
 
 Skip frontend commands when the consuming project has no `apps/web/`.
-

@@ -1,15 +1,15 @@
-# Blueprint: Frontend Feature Slice
+# Blueprint: Frontend Domain Use Case
 
-Complete vertical slice scaffold for a feature under `apps/web/features/{feature}/`. Adapt names to the feature spec.
+Complete scaffold for one use case under `apps/web/domain/{feature}/{use-case}/`. Adapt names to the use case doc in `docs/domain/{feature}/{use-case}.md`.
 
 ---
 
 ## Directory Layout
 
 ```text
-apps/web/features/posts/
+apps/web/domain/posts/
 ├── list/
-│   ├── PostListPage.tsx          ← feature entry; imported by app/(main)/posts/page.tsx
+│   ├── PostListPage.tsx          ← domain entry; imported by app/(main)/posts/page.tsx
 │   ├── PostList.tsx
 │   ├── PostListSkeleton.tsx
 │   ├── PostListEmpty.tsx
@@ -21,8 +21,10 @@ apps/web/features/posts/
 │   ├── CreatePostForm.tsx
 │   └── actions.ts                ← Server Actions with Zod validation
 └── shared/
-    └── postQueryKeys.ts          ← query key factory for this feature only
+    └── postQueryKeys.ts          ← query key factory for this domain only
 ```
+
+Each subfolder is one use case. Folder names align with backend handler folders and domain docs.
 
 ---
 
@@ -30,7 +32,7 @@ apps/web/features/posts/
 
 ```typescript
 // apps/web/app/(main)/posts/page.tsx
-import { PostListPage } from "@/features/posts/list/PostListPage"
+import { PostListPage } from "@/domain/posts/list/PostListPage"
 
 export default function Page() {
   return <PostListPage />
@@ -42,12 +44,12 @@ export default function Page() {
 ## Query Hook
 
 ```typescript
-// apps/web/features/posts/list/usePostList.ts
+// apps/web/domain/posts/list/usePostList.ts
 "use client" // Required: TanStack Query runs on the client
 
 import { useQuery } from "@tanstack/react-query"
 import { getApiClient } from "@/lib/api/client"
-import { postQueryKeys } from "@/features/posts/shared/postQueryKeys"
+import { postQueryKeys } from "@/domain/posts/shared/postQueryKeys"
 
 export function usePostList(page: number) {
   return useQuery({
@@ -68,10 +70,10 @@ export function usePostList(page: number) {
 
 ---
 
-## Feature Entry with Four States
+## Domain Entry with Four States
 
 ```typescript
-// apps/web/features/posts/list/PostListPage.tsx
+// apps/web/domain/posts/list/PostListPage.tsx
 "use client" // Composes client hooks and UI state
 
 import { useSearchParams } from "next/navigation"
@@ -101,4 +103,4 @@ export function PostListPage() {
 }
 ```
 
-See `docs/conventions/frontend/07-feature-boundaries.md` for import rules and `docs/conventions/frontend/03-data-fetching.md` for data patterns.
+See `docs/conventions/frontend/07-domain-boundaries.md` for import rules and `docs/conventions/frontend/03-data-fetching.md` for data patterns.

@@ -51,6 +51,12 @@ const requiredTemplates = [
   "docs/templates/packages/api-client/package.json",
   "docs/blueprints/backend/program-cs.md",
   "docs/blueprints/frontend/proxy-ts.md",
+  "docs/blueprints/frontend/domain-use-case.md",
+  "docs/conventions/frontend/07-domain-boundaries.md",
+  "docs/templates/domain-system-index.md",
+  "docs/templates/domain-feature.md",
+  "docs/templates/domain-use-case.md",
+  "docs/guides/agentic-domain-driven-design.md",
   "docs/blueprints/README.md",
   "docs/runbooks/README.md",
 ]
@@ -89,7 +95,7 @@ for (const file of mdFiles) {
 
     if (target.startsWith("/")) {
       resolved = path.join(root, target.slice(1))
-    } else if (target.startsWith("docs/") || target.startsWith("AGENTS") || target.startsWith("CHANGELOG") || target.startsWith("CONTRIBUTING") || target.startsWith("standards.manifest")) {
+    } else if (target.startsWith("docs/") || target.startsWith("AGENTS") || target.startsWith("CONTRIBUTING") || target.startsWith("standards.manifest")) {
       resolved = path.join(root, target)
     } else {
       resolved = path.resolve(fromDir, target)

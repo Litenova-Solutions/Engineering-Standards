@@ -104,7 +104,7 @@ export function setFormErrors<T extends FieldValues>(
 ```
 
 ```typescript
-// features/posts/create/CreatePostForm.tsx
+// domain/posts/create/CreatePostForm.tsx
 "use client"
 // Needs form interaction and error display — client component required.
 
@@ -148,7 +148,7 @@ export function CreatePostForm() {
 Server Actions use `useActionState` to carry errors across the server/client boundary.
 
 ```typescript
-// features/posts/create/create-post-action.ts
+// domain/posts/create/create-post-action.ts
 "use server"
 
 import { parseProblemDetails, isValidationError } from "@/lib/errors/parse-problem-details"
@@ -190,7 +190,7 @@ export async function createPostAction(
 ```
 
 ```typescript
-// features/posts/create/CreatePostForm.tsx (Server Action version)
+// domain/posts/create/CreatePostForm.tsx (Server Action version)
 "use client"
 // Needs useActionState — client component required.
 

@@ -779,4 +779,4 @@ public void Publish() { ... }
 
 ---
 
-The ubiquitous language glossary for a specific project lives in the project repository. Copy `docs/templates/ubiquitous-language.md` from the standards repository into `docs/domain/ubiquitous-language.md` in the project repository and fill it in.
+The ubiquitous language for a feature lives in the project repository at `docs/domain/{feature}/README.md`. Copy `docs/templates/domain-feature.md` when adding a new feature domain doc.

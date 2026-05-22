@@ -81,5 +81,5 @@ Convention files and `AGENTS.md` MUST use `MUST`, `MUST NOT`, `REQUIRED`, and `F
 
 ## UI Copy (Frontend)
 
-All user-visible strings in features MUST come from: (1) server data fields documented in `docs/domain/frontend-api-endpoints.md`, (2) next-intl message keys, or (3) static labels listed in `docs/domain/frontend-feature-inventory.md`. Agents MUST NOT invent product names, prices, policy text, or legal disclaimers.
+All user-visible strings in domain UI code MUST come from: (1) server data fields documented in the use case doc, (2) next-intl message keys, or (3) static labels written in the use case doc UI section. Agents MUST NOT invent product names, prices, policy text, or legal disclaimers.
 

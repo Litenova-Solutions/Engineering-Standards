@@ -12,7 +12,7 @@ This document is the authoritative guide for all design decisions in the five ap
 - Validators throw `CommandValidationException` / `QueryValidationException`; MUST NOT use `Guard.Against`.
 - Validators MUST NOT make database lookups. Structural validation only.
 - `Application.Reactions` MUST NOT reference external NuGet packages; define narrow interfaces.
-- Feature folders: `{Aggregate}/{UseCase}/` naming.
+- Domain folders: `{Aggregate}/{UseCase}/` naming.
 - Handlers that need the current time MUST inject `IClock` and pass `clock.UtcNow` explicitly to aggregate methods. MUST NOT call `DateTime.UtcNow` or `DateTimeOffset.UtcNow` directly in handlers.
 
 ---
@@ -92,7 +92,7 @@ graph TD
     Reactions["Application.Reactions/\nPosts/\n  OnPostPublished/\n    NotifySubscribersOnPostPublishedEventHandler.cs\n    IPostPublishedNotifier.cs\n  OnPostCreated/\n    LogOnPostCreatedEventHandler.cs"]
 ```
 
-Feature folders are named after the aggregate. Use case folders inside are named after the operation in imperative form (`Create/`, `Publish/`, `GetById/`). Event handler folders are named `On{EventName}/`.
+Domain folders are named after the aggregate. Use case folders inside are named after the operation in imperative form (`Create/`, `Publish/`, `GetById/`). Event handler folders are named `On{EventName}/`.
 
 ---
 
@@ -632,4 +632,4 @@ If the same mapping appears in multiple handlers, extract it to a feature-level 
 
 ---
 
-The feature inventory for a specific project lives in the project repository. Copy `docs/templates/feature-inventory.md` from the standards repository into `docs/domain/feature-inventory.md` in the project repository and fill it in.
+Use case documentation for a project lives at `docs/domain/{feature}/{use-case}.md`. Copy `docs/templates/domain-use-case.md` when adding a new use case. See `docs/guides/agentic-domain-driven-design.md`.

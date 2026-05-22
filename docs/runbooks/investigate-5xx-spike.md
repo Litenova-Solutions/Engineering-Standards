@@ -122,11 +122,11 @@ If the downstream service is unavailable, the fix may be outside your control. O
 ## Step 6: Check Memory and CPU
 
 ```bash
-# Kubernetes resource usage
-kubectl top pods -n your-namespace
-
-# Docker stats (if not on Kubernetes)
+# Docker stats on the VPS
 docker stats
+
+# Per-service logs
+docker compose -f /opt/your-app/infra/docker-compose.prod.yml logs api --tail 100
 ```
 
 If memory is near the container limit:
