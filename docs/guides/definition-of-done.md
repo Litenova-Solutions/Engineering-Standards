@@ -10,7 +10,7 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 - [ ] Command or query records added to the correct `.Contracts` project.
 - [ ] Handler implemented; domain invariants enforced in aggregates, not handlers.
 - [ ] `CommandValidationException` or `QueryValidationException` used for all structural input validation.
-- [ ] Backend unit and integration tests written and passing (`dotnet test src/{ProjectName}.slnx`).
+- [ ] Backend unit and integration tests written and passing (`dotnet test apps/api/{ProjectName}.slnx`).
 - [ ] `{ProjectName}.Architecture.Tests` exists and passes (REQUIRED for standard solutions per `docs/decisions/architecture-tests-as-enforcement.md`).
 
 ---
@@ -39,8 +39,8 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 ## 4. Verification
 
 - [ ] All applicable gates in `docs/conventions/shared/ci.md` passed locally or in CI.
-- [ ] `dotnet build src/{ProjectName}.slnx` succeeds.
-- [ ] `dotnet test src/{ProjectName}.slnx` succeeds, including Architecture.Tests.
+- [ ] `dotnet build apps/api/{ProjectName}.slnx` succeeds.
+- [ ] `dotnet test apps/api/{ProjectName}.slnx` succeeds, including Architecture.Tests.
 - [ ] `pnpm lint`, `pnpm type-check`, `pnpm test`, `pnpm build` succeed when `apps/web/` changed.
 - [ ] Playwright suite passes when E2E tests exist.
 - [ ] No `TODO`, `FIXME`, or placeholder stub comments remain in changed files.

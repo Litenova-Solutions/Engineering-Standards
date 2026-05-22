@@ -50,6 +50,10 @@ Frontend HTTP calls MUST use getApiClient() with openapi-typescript paths. Raw f
 Solutions following these standards MUST include {ProjectName}.Architecture.Tests with NetArchTest rules from `docs/decisions/architecture-tests-as-enforcement.md`.
 </Rule>
 
+<Rule id="MONOREPO_LAYOUT">
+In monorepos, the .NET solution MUST live under apps/api/, not at the repository root src/. All runnable apps MUST live under apps/. See `docs/conventions/shared/monorepo-structure.md`.
+</Rule>
+
 ---
 
 ## 2. Deterministic Scaffolding Sequence
@@ -187,8 +191,8 @@ Before marking any task complete, an agent **MUST** complete `docs/guides/defini
 Minimum commands:
 
 ```bash
-dotnet build src/{ProjectName}.slnx --configuration Release
-dotnet test src/{ProjectName}.slnx --configuration Release --no-build
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
+dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
 pnpm install --frozen-lockfile
 pnpm lint
 pnpm type-check

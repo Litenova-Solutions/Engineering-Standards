@@ -33,8 +33,8 @@ The repository root `package.json` defines full-stack scripts that run both tool
 {
   "scripts": {
     "build": "turbo run build",
-    "build:backend": "dotnet build src/{ProjectName}.slnx",
-    "test:backend": "dotnet test src/{ProjectName}.slnx",
+    "build:backend": "dotnet build apps/api/{ProjectName}.slnx",
+    "test:backend": "dotnet test apps/api/{ProjectName}.slnx",
     "verify": "pnpm build && pnpm build:backend && pnpm test:backend"
   }
 }

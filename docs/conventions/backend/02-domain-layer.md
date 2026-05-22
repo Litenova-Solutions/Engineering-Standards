@@ -393,14 +393,15 @@ sealed class Post : AggregateRoot<PostId>
     /// <summary>
     /// Publishes the post, making it visible to readers.
     /// </summary>
-    public void Publish()
+    /// <param name="utcNow">Current UTC time from the handler via <see cref="IClock"/>.</param>
+    public void Publish(DateTimeOffset utcNow)
     {
         if (State is PublishedPostState)
         {
             throw new PostAlreadyPublishedException(Id);
         }
 
-        State = new PublishedPostState(publishedAt: DateTime.UtcNow);
+        State = new PublishedPostState(publishedAt: utcNow.UtcDateTime);
         RaiseDomainEvent(new PostPublished(Id));
     }
 
@@ -425,12 +426,15 @@ Invariants are enforced inside the aggregate method, not in the command handler.
 
 ```csharp
 // GOOD: invariant enforced in the aggregate
-public void Publish()
+public void Publish(DateTimeOffset utcNow)
 {
     if (State is PublishedPostState)
     {
         throw new PostAlreadyPublishedException(Id);
     }
+
+    State = new PublishedPostState(utcNow.UtcDateTime);
+    RaiseDomainEvent(new PostPublished(Id));
 }
 
 // BAD: invariant checked in the handler
@@ -445,7 +449,7 @@ sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCommand>
             throw new InvalidOperationException("Post is already published.");
         }
 
-        post.Publish();
+        post.Publish(clock.UtcNow);
     }
 }
 ```
@@ -594,7 +598,7 @@ sealed record ArchivedPostState(DateTime ArchivedAt) : PostState;
 Aggregate methods switch on state using pattern matching:
 
 ```csharp
-public void Publish()
+public void Publish(DateTimeOffset utcNow)
 {
     switch (State)
     {
@@ -603,7 +607,7 @@ public void Publish()
         case ArchivedPostState:
             throw new PostArchivedException(Id);
         case DraftPostState:
-            State = new PublishedPostState(DateTime.UtcNow);
+            State = new PublishedPostState(utcNow.UtcDateTime);
             RaiseDomainEvent(new PostPublished(Id));
             break;
     }
@@ -611,6 +615,69 @@ public void Publish()
 ```
 
 EF Core stores the discriminator and state-specific properties. The configuration is in the Infrastructure layer.
+
+State transitions stay on the aggregate root as public methods. Do not move transition logic onto state record types unless a state machine library is adopted via ADR. Transition-specific data (such as `publishedAt`) comes from method parameters, typically `DateTimeOffset utcNow` from `IClock` in the handler.
+
+---
+
+## Domain Services
+
+Use a domain service when a business operation involves multiple aggregates and the logic does not belong on either aggregate root.
+
+| Rule | Detail |
+|:---|:---|
+| Naming | `{Concept}DomainService` (for example `OrderPricingDomainService`) |
+| Location | `Domain/{AggregateName}/` when scoped to one aggregate; `Domain/Shared/` when cross-aggregate |
+| Injection | Domain services MUST NOT use DI. Pass them as parameters to aggregate methods or call them from handlers as plain objects constructed in the handler |
+| Purity | Same dependency rules as aggregates: no EF Core, no HTTP, no application DTOs |
+
+```csharp
+// GOOD: domain service called from handler, result passed into aggregate method
+sealed class OrderPricingDomainService
+{
+    public Money CalculateTotal(IReadOnlyList<OrderLine> lines) { /* ... */ }
+}
+
+// BAD: domain service injected via DI inside the Domain layer
+sealed class Order
+{
+    private readonly OrderPricingDomainService _pricing; // BAD: no DI in Domain
+}
+```
+
+---
+
+## Value Object Collections and Money
+
+### Collections inside value objects
+
+`sealed record` equality compares collection properties by reference, not by contents. When a value object wraps a collection, implement `IEquatable<T>` with sequence-equal comparison or use an immutable collection type with value semantics.
+
+```csharp
+// GOOD: explicit equality for collection contents
+sealed record PostTags : IEquatable<PostTags>
+{
+    public IReadOnlyList<string> Values { get; }
+
+    public PostTags(IReadOnlyList<string> values)
+    {
+        Values = values.ToList().AsReadOnly();
+    }
+
+    public bool Equals(PostTags? other)
+        => other is not null && Values.SequenceEqual(other.Values);
+
+    public override int GetHashCode()
+        => Values.Aggregate(0, (hash, tag) => HashCode.Combine(hash, tag.GetHashCode(StringComparison.Ordinal)));
+}
+
+// BAD: record default equality on a List property compares references
+sealed record PostTags(IReadOnlyList<string> Values);
+```
+
+### Money and decimal precision
+
+Value objects that wrap `decimal` (such as `Money`) MUST document the precision rule in the project ubiquitous language glossary. EF Core maps `decimal` with explicit precision in Infrastructure (`HasPrecision(18, 2)` or project-specific scale). Domain code MUST NOT use `double` for monetary amounts.
 
 ---
 
@@ -655,14 +722,14 @@ Domain event names are past tense: `PostCreated`, `OrderPlaced`, `CustomerRegist
 Aggregates call `RaiseDomainEvent(...)` inside their mutation methods.
 
 ```csharp
-public void Place()
+public void Place(DateTimeOffset utcNow)
 {
     if (_lines.Count == 0)
     {
         throw new OrderMustContainAtLeastOneLineException(Id);
     }
 
-    State = new PlacedOrderState(placedAt: DateTime.UtcNow);
+    State = new PlacedOrderState(placedAt: utcNow.UtcDateTime);
     RaiseDomainEvent(new OrderPlaced(Id, CustomerId));
 }
 ```
@@ -701,7 +768,7 @@ All `public` members in the Domain layer MUST have XML documentation comments. C
 /// Publishes the post, making it visible to all readers. Raises <see cref="PostPublished"/>.
 /// </summary>
 /// <exception cref="PostAlreadyPublishedException">Thrown when the post is already in a published state.</exception>
-public void Publish() { ... }
+public void Publish(DateTimeOffset utcNow) { ... }
 
 // BAD:
 /// <summary>

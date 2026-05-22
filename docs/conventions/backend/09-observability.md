@@ -108,6 +108,42 @@ app.UseSerilogRequestLogging();
 
 The correlation ID is always echoed back in the `X-Correlation-ID` response header. Clients can include this value when reporting issues to support.
 
+### Outgoing HTTP calls
+
+Propagate the correlation ID to downstream HTTP services via a `DelegatingHandler` registered on all typed `HttpClient` instances.
+
+```csharp
+// Infrastructure/Http/CorrelationIdDelegatingHandler.cs
+sealed class CorrelationIdDelegatingHandler(IHttpContextAccessor httpContextAccessor)
+    : DelegatingHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken)
+    {
+        var correlationId = httpContextAccessor.HttpContext?.Response.Headers["X-Correlation-ID"].FirstOrDefault()
+            ?? httpContextAccessor.HttpContext?.TraceIdentifier;
+
+        if (!string.IsNullOrEmpty(correlationId))
+        {
+            request.Headers.TryAddWithoutValidation("X-Correlation-ID", correlationId);
+        }
+
+        return base.SendAsync(request, cancellationToken);
+    }
+}
+```
+
+Register in Infrastructure:
+
+```csharp
+services.AddTransient<CorrelationIdDelegatingHandler>();
+services.AddHttpClient<IExternalApiClient, ExternalApiClient>()
+    .AddHttpMessageHandler<CorrelationIdDelegatingHandler>();
+```
+
+Command and query execution logs SHOULD include `CommandName` or `QueryName`, `CorrelationId`, and `DurationMs` as structured properties alongside the OpenTelemetry metrics defined in section 4.
+
 ---
 
 ## 3. OpenTelemetry

@@ -20,6 +20,8 @@ This document defines how to declare, validate, and access environment variables
 // apps/web/lib/env.ts
 import { z } from "zod"
 
+// Import from "zod" (Zod 4 is the default npm export). Do not use "zod/v4" unless the lockfile pins the legacy subpath.
+
 // Server-side schema: validated at startup, never exposed to the browser.
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),

@@ -133,8 +133,8 @@ Update the project-specific files:
 Run every applicable gate in `docs/conventions/shared/ci.md`, then complete `docs/guides/definition-of-done.md`.
 
 ```bash
-dotnet build src/{ProjectName}.slnx --configuration Release
-dotnet test src/{ProjectName}.slnx --configuration Release --no-build
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
+dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
 pnpm lint
 pnpm type-check
 pnpm test

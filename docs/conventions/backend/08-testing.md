@@ -40,19 +40,19 @@ Test coverage is enforced in CI/CD pipeline gates via `coverlet.collector`. Any 
 
 CI verification pipeline commands **MUST** enforce this standard:
 ```bash
-dotnet test src/{ProjectName}.slnx /p:CollectCoverage=true /p:Threshold=80 /p:ThresholdType=branch
+dotnet test apps/api/{ProjectName}.slnx /p:CollectCoverage=true /p:Threshold=80 /p:ThresholdType=branch
 ```
 
 Use per-project thresholds to enforce the table above:
 
 ```bash
-dotnet test tests/{ProjectName}.Domain.Tests \
+dotnet test apps/api/tests/{ProjectName}.Domain.Tests \
     /p:CollectCoverage=true \
     /p:Threshold=90 \
     /p:ThresholdType=branch \
     /p:CoverletOutputFormat=opencover
 
-dotnet test tests/{ProjectName}.Application.Tests \
+dotnet test apps/api/tests/{ProjectName}.Application.Tests \
     /p:CollectCoverage=true \
     /p:Threshold=85 \
     /p:ThresholdType=branch \
@@ -62,7 +62,7 @@ dotnet test tests/{ProjectName}.Application.Tests \
 Add `coverlet.collector` to each test project's `.csproj`:
 
 ```xml
-<!-- tests/{ProjectName}.Domain.Tests/{ProjectName}.Domain.Tests.csproj -->
+<!-- apps/api/tests/{ProjectName}.Domain.apps/api/tests/{ProjectName}.Domain.Tests.csproj -->
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
@@ -309,6 +309,7 @@ static class InMemoryDbContextFactory
     }
 
     // Inline stub so Application.Tests does not need to reference Infrastructure.
+    // MUST match the interface implementation in Infrastructure/Persistence/NoOpEventPublisher.cs.
     private sealed class NoOpEventPublisher : IEventPublisher
     {
         Task IEventPublisher.PublishAsync<TEvent>(
@@ -596,8 +597,8 @@ Run against a specific test project:
 dotnet tool restore   # installs from dotnet-tools.json
 
 dotnet stryker \
-    --project src/{ProjectName}.Application.Write/{ProjectName}.Application.Write.csproj \
-    --test-project tests/{ProjectName}.Application.Tests/{ProjectName}.Application.Tests.csproj
+    --project apps/api/src/{ProjectName}.Application.Write/{ProjectName}.Application.Write.csproj \
+    --test-project apps/api/tests/{ProjectName}.Application.apps/api/tests/{ProjectName}.Application.Tests.csproj
 ```
 
 ---

@@ -366,94 +366,7 @@ sequenceDiagram
 
 ### Implementation
 
-```csharp
-// Infrastructure/Behaviors/TransactionCommandPreHandler.cs
-/// <summary>
-/// Opens a database transaction before every command executes.
-/// Runs at priority 10, after validators (priority 0), so no transaction
-/// is opened for invalid input.
-/// </summary>
-[HandlerPriority(10)]
-internal sealed class TransactionCommandPreHandler
-    : ICommandPreHandler<ICommand>
-{
-    private readonly AppDbContext _dbContext;
-
-    public TransactionCommandPreHandler(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public async Task PreHandleAsync(
-        ICommand command,
-        CancellationToken cancellationToken)
-    {
-        await _dbContext.Database
-            .BeginTransactionAsync(cancellationToken);
-    }
-}
-```
-
-```csharp
-// Infrastructure/Behaviors/SaveChangesCommandPostHandler.cs
-/// <summary>
-/// Saves all pending changes and commits the transaction after every
-/// command handler completes successfully.
-/// </summary>
-internal sealed class SaveChangesCommandPostHandler
-    : ICommandPostHandler<ICommand>
-{
-    private readonly AppDbContext _dbContext;
-
-    public SaveChangesCommandPostHandler(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public async Task PostHandleAsync(
-        ICommand command,
-        object? result,
-        CancellationToken cancellationToken)
-    {
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        await _dbContext.Database.CommitTransactionAsync(cancellationToken);
-    }
-}
-```
-
-```csharp
-// Infrastructure/Behaviors/RollbackCommandErrorHandler.cs
-/// <summary>
-/// Rolls back the active transaction if any exception is thrown during
-/// command execution, then re-throws the exception so the
-/// GlobalExceptionHandler maps it to the correct HTTP response.
-/// </summary>
-internal sealed class RollbackCommandErrorHandler
-    : ICommandErrorHandler<ICommand>
-{
-    private readonly AppDbContext _dbContext;
-
-    public RollbackCommandErrorHandler(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public async Task HandleErrorAsync(
-        ICommand command,
-        object? commandResult,
-        Exception exception,
-        CancellationToken cancellationToken)
-    {
-        if (_dbContext.Database.CurrentTransaction is not null)
-        {
-            await _dbContext.Database
-                .RollbackTransactionAsync(cancellationToken);
-        }
-
-        throw exception;
-    }
-}
-```
+Full handler implementations, assembly marker classes, and LiteBus registration live in `docs/conventions/backend/04-infrastructure-layer.md` (Transaction Pipeline Behaviors and LiteBus Registration sections). This document describes the pattern; the Infrastructure convention is authoritative for code.
 
 ### LiteBus Registration
 
@@ -562,19 +475,6 @@ abstract class AggregateRoot<TId> : IAggregateRoot
 }
 ```
 
-The `IDomainEvent` marker interface:
-
-```csharp
-// Domain/Shared/IDomainEvent.cs
-/// <summary>
-/// Marker interface for all domain events. Implement this interface on
-/// every domain event record.
-/// </summary>
-public interface IDomainEvent;
-```
-
-`IDomainEvent` MUST be `public`. Infrastructure references this interface when iterating domain events in `AppDbContext.SaveChangesAsync`. Making it `internal` requires `InternalsVisibleTo` configuration, which couples the Domain project to Infrastructure by name and is not permitted.
-
-`IDomainEvent` has **no LiteBus dependency** and does not extend any LiteBus interface. LiteBus dispatches any `notnull` object as an event — no framework interface required. The marker exists purely for domain modeling: it provides a shared type to collect events in `AggregateRoot<TId>` and makes event dispatch explicit in Infrastructure.
+The `IDomainEvent` marker interface and visibility rules are defined in `docs/conventions/backend/02-domain-layer.md` (Communication via Domain Events). That document is authoritative for event naming, structure, and the `public` visibility requirement.
 
 All three types live in `Domain/Shared/`. All aggregate roots extend `AggregateRoot<TId>`. All domain event records implement `IDomainEvent`. Infrastructure calls `ClearDomainEvents()` after dispatching events via LiteBus.

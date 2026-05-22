@@ -6,10 +6,14 @@ This document covers the physical structure of a .NET solution following these s
 
 ## 1. Solution Layout
 
-Every project follows this standard layout. Replace `{ProjectName}` with the actual project name (PascalCase, no spaces).
+Every project follows this internal layout. Replace `{ProjectName}` with the actual project name (PascalCase, no spaces).
+
+**Monorepo (default):** the solution root is `apps/api/` in the repository. See `docs/conventions/shared/monorepo-structure.md`.
+
+**Single-project repository:** the solution root is the repository root. See `docs/guides/single-project-setup.md`.
 
 ```
-{ProjectName}/
+apps/api/                          ← solution root (monorepo) or repository root (single-project)
 ├── global.json
 ├── Directory.Build.props
 ├── Directory.Packages.props
@@ -36,7 +40,7 @@ Every project follows this standard layout. Replace `{ProjectName}` with the act
 
 The solution file uses the `.slnx` format (SDK-style solution files), not the legacy `.sln` format.
 
-The `AppHost` project is the local development entry point. Run `dotnet run --project src/{ProjectName}.AppHost` to start all services including the database container. See `docs/conventions/backend/13-deployment-and-migrations.md` for Aspire setup details.
+The `AppHost` project is the local development entry point. Run `dotnet run --project apps/api/src/{ProjectName}.AppHost` (monorepo) or `dotnet run --project src/{ProjectName}.AppHost` (single-project) to start all services including the database container. See `docs/conventions/backend/13-deployment-and-migrations.md` for Aspire setup details.
 
 ---
 
@@ -275,7 +279,7 @@ Any package not in this list requires an ADR before being added to any project.
 
 The following `.csproj` templates show the minimal, correct project references and package references for each layer. Adjust for your project name.
 
-`src/{ProjectName}.Domain/{ProjectName}.Domain.csproj`:
+`apps/api/src/{ProjectName}.Domain/{ProjectName}.Domain.csproj`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -285,7 +289,7 @@ The following `.csproj` templates show the minimal, correct project references a
 </Project>
 ```
 
-`src/{ProjectName}.Application.Write.Contracts/{ProjectName}.Application.Write.Contracts.csproj`:
+`apps/api/src/{ProjectName}.Application.Write.Contracts/{ProjectName}.Application.Write.Contracts.csproj`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -296,7 +300,7 @@ The following `.csproj` templates show the minimal, correct project references a
 </Project>
 ```
 
-`src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj`:
+`apps/api/src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -313,7 +317,7 @@ The following `.csproj` templates show the minimal, correct project references a
 </Project>
 ```
 
-`tests/{ProjectName}.Architecture.Tests/{ProjectName}.Architecture.Tests.csproj`:
+`apps/api/tests/{ProjectName}.Architecture.apps/api/tests/{ProjectName}.Architecture.Tests.csproj`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">

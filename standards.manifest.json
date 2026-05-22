@@ -44,7 +44,7 @@
   },
   "advisories": {
     "GHSA-g7cv-rxg3-hmpx": {
-      "description": "84 malicious versions across 42 @tanstack/* packages. Verify @tanstack package versions before install or upgrade.",
+      "description": "84 malicious versions across 42 @tanstack/* packages (May 2026). @tanstack/query* confirmed clean. Audit all @tanstack/* versions before install or upgrade.",
       "url": "https://github.com/advisories/GHSA-g7cv-rxg3-hmpx"
     }
   }

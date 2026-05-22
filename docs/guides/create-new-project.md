@@ -27,43 +27,7 @@ git remote add origin https://github.com/your-org/{ProjectName}
 
 ## Step 2: Create Root Files
 
-### `global.json`
-
-```json
-{
-  "sdk": {
-    "version": "10.0.100",
-    "rollForward": "latestPatch"
-  }
-}
-```
-
-### `Directory.Build.props`
-
-Copy from `docs/templates/project/Directory.Build.props` in this standards repository.
-
-### `Directory.Packages.props`
-
-Copy from `docs/templates/project/Directory.Packages.props` in this standards repository. Update package versions from `standards.manifest.json`.
-
-### `.config/dotnet-tools.json`
-
-```json
-{
-  "version": 1,
-  "isRoot": true,
-  "tools": {
-    "dotnet-ef": {
-      "version": "10.0.0",
-      "commands": ["dotnet-ef"]
-    },
-    "dotnet-stryker": {
-      "version": "4.x",
-      "commands": ["dotnet-stryker"]
-    }
-  }
-}
-```
+Create Node.js and CI files at the repository root. .NET-specific files go in `apps/api/` (Step 3).
 
 ### `package.json` (root)
 
@@ -105,7 +69,12 @@ Copy from `docs/conventions/shared/monorepo-structure.md` section 4.
 
 ## Step 3: Create the .NET Solution
 
+Create the backend under `apps/api/`. For a backend-only single-project repository, use the repository root instead. See `docs/guides/single-project-setup.md`.
+
 ```bash
+mkdir -p apps/api
+cd apps/api
+
 # Create solution file
 dotnet new sln -n {ProjectName}
 
@@ -131,6 +100,27 @@ dotnet new xunit -n {ProjectName}.Architecture.Tests -o tests/{ProjectName}.Arch
 dotnet sln add src/**/*.csproj tests/**/*.csproj
 ```
 
+Copy `global.json`, `Directory.Build.props`, and `Directory.Packages.props` into `apps/api/` from `docs/conventions/backend/01-solution-structure.md` sections 2 and 4. Update package versions from `standards.manifest.json`.
+
+Create `apps/api/.config/dotnet-tools.json`:
+
+```json
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-ef": {
+      "version": "10.0.0",
+      "commands": ["dotnet-ef"]
+    },
+    "dotnet-stryker": {
+      "version": "4.x",
+      "commands": ["dotnet-stryker"]
+    }
+  }
+}
+```
+
 ---
 
 ## Step 4: Configure Project References
@@ -138,6 +128,8 @@ dotnet sln add src/**/*.csproj tests/**/*.csproj
 Add references following the clean architecture dependency rule:
 
 ```bash
+cd apps/api
+
 # Application layers depend on Domain
 dotnet add src/{ProjectName}.Application.Write.Contracts reference src/{ProjectName}.Domain
 dotnet add src/{ProjectName}.Application.Write reference src/{ProjectName}.Application.Write.Contracts src/{ProjectName}.Domain
@@ -247,8 +239,8 @@ Create the first aggregate as the "hello world" of your domain:
 dotnet tool restore
 
 dotnet ef migrations add InitialCreate \
-    --project src/{ProjectName}.Infrastructure \
-    --startup-project src/{ProjectName}.WebApi
+    --project apps/api/src/{ProjectName}.Infrastructure \
+    --startup-project apps/api/src/{ProjectName}.WebApi
 ```
 
 ---
@@ -300,8 +292,8 @@ Add the Next.js app to the AppHost `Program.cs` (see `docs/conventions/backend/1
 ```bash
 # .NET
 dotnet tool restore
-dotnet build src/{ProjectName}.slnx --configuration Release
-dotnet test src/{ProjectName}.slnx --configuration Release --no-build
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
+dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
 
 # Frontend
 pnpm install --frozen-lockfile
@@ -310,14 +302,14 @@ pnpm type-check
 pnpm build
 
 # Full stack local run
-dotnet run --project src/{ProjectName}.AppHost
+dotnet run --project apps/api/src/{ProjectName}.AppHost
 ```
 
 ---
 
 ## Step 14: Set Up CI
 
-Copy the GitHub Actions workflow from `docs/templates/ci/ci-workflow.yml`, replace `{ProjectName}`, and add it to `.github/workflows/ci.yml`.
+Copy the GitHub Actions workflow from `docs/templates/ci-workflow.yml`, replace `{ProjectName}`, and add it to `.github/workflows/ci.yml`.
 
 Add branch protection rules for `main` (see `docs/conventions/shared/ci-cd.md` section 4).
 

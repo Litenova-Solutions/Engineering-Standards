@@ -40,7 +40,7 @@ Workers MUST use the same OpenTelemetry and Serilog conventions as `WebApi` (`do
 
 ## 4. Hosting
 
-- Development: `dotnet run --project src/{ProjectName}.Worker`
+- Development: `dotnet run --project apps/api/src/{ProjectName}.Worker`
 - Production: container image per `docs/conventions/shared/containers.md`
 - Scale workers independently of API replicas
 

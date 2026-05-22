@@ -626,9 +626,9 @@ export function PostListWithOptimisticPublish({ posts }: Props) {
 
 ## 13. TanStack Query Security Notice
 
-> **Security Notice:** On May 11, 2026, malicious package versions were published to npm across 42 `@tanstack/*` packages (GitHub Security Advisory GHSA-g7cv-rxg3-hmpx). Verify your lockfile pins a version prior to the attack window or after remediation. Run `npm audit` or `pnpm audit` to check. Do not upgrade TanStack Query without verifying the specific version is safe.
+> **Security Notice:** On May 11, 2026, malicious package versions were published to npm across 42 `@tanstack/*` packages (GitHub Security Advisory [GHSA-g7cv-rxg3-hmpx](https://github.com/advisories/GHSA-g7cv-rxg3-hmpx)). The confirmed-clean families include `@tanstack/query*`, `@tanstack/table*`, `@tanstack/form*`, `@tanstack/virtual*`, `@tanstack/store`, and `@tanstack/start`. **`@tanstack/react-query` was not in the compromised package list.** Other `@tanstack/*` packages may still be affected. Run `pnpm audit` before every install or upgrade and verify each `@tanstack/*` package version against the advisory.
 
-The current verified safe version is **5.100.10**. Check the GitHub advisory for the full list of affected and remediated versions before upgrading.
+The current pinned version is **5.100.10**. When upgrading, check the advisory for affected and remediated version ranges. See `docs/conventions/shared/supply-chain-security.md` for lockfile and CI audit requirements.
 
 ---
 
@@ -656,7 +656,7 @@ This rule exists because hand-written interfaces drift from the API contract sil
 
 ```bash
 # 1. Start the backend API (must be running to export the spec)
-dotnet run --project src/{ProjectName}.WebApi
+dotnet run --project apps/api/src/{ProjectName}.WebApi
 
 # 2. Export the OpenAPI spec
 curl http://localhost:5000/openapi/v1.json -o openapi.json

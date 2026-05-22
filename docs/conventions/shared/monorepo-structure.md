@@ -17,15 +17,38 @@ This document defines the root layout and tooling conventions for the monorepo. 
 
 ## 1. Root Layout
 
+All runnable applications live under `apps/`. The .NET solution lives at `apps/api/`, not at the repository root. The root `src/` convention is for single-project repositories only. See `docs/guides/single-project-setup.md`.
+
 ```text
 {ProjectName}/                     ← repository root
-├── .config/
-│   └── dotnet-tools.json          ← pinned dotnet tool versions
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
 ├── .gitignore
 ├── apps/
+│   ├── api/                       ← .NET solution (Aspire AppHost, WebApi, domain layers)
+│   │   ├── .config/
+│   │   │   └── dotnet-tools.json  ← pinned dotnet tool versions
+│   │   ├── src/
+│   │   │   ├── {ProjectName}.Domain/
+│   │   │   ├── {ProjectName}.Application.Write.Contracts/
+│   │   │   ├── {ProjectName}.Application.Write/
+│   │   │   ├── {ProjectName}.Application.Read.Contracts/
+│   │   │   ├── {ProjectName}.Application.Read/
+│   │   │   ├── {ProjectName}.Application.Reactions/
+│   │   │   ├── {ProjectName}.Infrastructure/
+│   │   │   ├── {ProjectName}.WebApi/
+│   │   │   ├── {ProjectName}.AppHost/
+│   │   │   └── {ProjectName}.ServiceDefaults/
+│   │   ├── tests/
+│   │   │   ├── {ProjectName}.Domain.Tests/
+│   │   │   ├── {ProjectName}.Application.Tests/
+│   │   │   ├── {ProjectName}.Integration.Tests/
+│   │   │   └── {ProjectName}.Architecture.Tests/
+│   │   ├── Directory.Build.props
+│   │   ├── Directory.Packages.props
+│   │   ├── {ProjectName}.slnx
+│   │   └── global.json
 │   └── web/                       ← Next.js application
 │       ├── app/
 │       ├── components/
@@ -53,27 +76,7 @@ This document defines the root layout and tooling conventions for the monorepo. 
 │   └── api-client/                ← copied openapi-fetch source (maintenance mode)
 │       ├── src/
 │       └── package.json
-├── src/                           ← .NET source projects
-│   ├── {ProjectName}.Domain/
-│   ├── {ProjectName}.Application.Write.Contracts/
-│   ├── {ProjectName}.Application.Write/
-│   ├── {ProjectName}.Application.Read.Contracts/
-│   ├── {ProjectName}.Application.Read/
-│   ├── {ProjectName}.Application.Reactions/
-│   ├── {ProjectName}.Infrastructure/
-│   ├── {ProjectName}.WebApi/
-│   ├── {ProjectName}.AppHost/
-│   └── {ProjectName}.ServiceDefaults/
 ├── standards/                     ← this repository as a submodule (optional)
-├── tests/                         ← .NET test projects
-│   ├── {ProjectName}.Domain.Tests/
-│   ├── {ProjectName}.Application.Tests/
-│   ├── {ProjectName}.Integration.Tests/
-│   └── {ProjectName}.Architecture.Tests/
-├── Directory.Build.props
-├── Directory.Packages.props
-├── {ProjectName}.slnx
-├── global.json
 ├── package.json                   ← root package.json; no dependencies, only scripts
 ├── pnpm-workspace.yaml
 └── turbo.json
@@ -188,8 +191,8 @@ OpenAPI types are generated as part of the CI pipeline. The workflow:
 
 ```bash
 # Step 2-3: generate spec and copy to packages/
-dotnet build src/{ProjectName}.slnx --configuration Release
-cp src/{ProjectName}.WebApi/openapi.json packages/api-types/openapi.json
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
+cp apps/api/src/{ProjectName}.WebApi/openapi.json packages/api-types/openapi.json
 
 # Step 4: regenerate TypeScript types
 pnpm --filter @myproject/api-types generate:api-types
@@ -204,7 +207,7 @@ See `docs/conventions/backend/13-deployment-and-migrations.md` for build-time Op
 
 ## 7. `dotnet-tools.json`
 
-Pin all dotnet CLI tools in `.config/dotnet-tools.json`. This file is committed and restored by `dotnet tool restore`.
+Pin all dotnet CLI tools in `apps/api/.config/dotnet-tools.json`. This file is committed and restored by `dotnet tool restore` from the `apps/api/` directory.
 
 ```json
 {
@@ -259,4 +262,4 @@ apps/web/
 └── shared/                   ← cross-feature non-UI logic
 ```
 
-Rule: `features/` contains product use cases. `shared/` contains cross-feature non-UI logic. `components/ui/` contains generic UI primitives only. MUST NOT import from `features/{a}/` inside `features/{b}/`.
+Rule: `app/` contains routing shells only. Every `page.tsx` imports its feature entry component from `features/{feature}/`. `features/` contains product use cases. `shared/` contains cross-feature non-UI logic. `components/ui/` contains generic UI primitives only. MUST NOT import from `features/{a}/` inside `features/{b}/`. See `docs/conventions/frontend/07-feature-boundaries.md`.
