@@ -27,7 +27,7 @@ The ASP.NET Core backend generates an OpenAPI spec via `Microsoft.AspNetCore.Ope
 
 ## Decision
 
-`openapi-typescript` generates TypeScript types from the backend's OpenAPI specification into `packages/api-types/src/api.d.ts`. This generation step is a Turborepo task (`generate:api`) that runs before the Next.js build.
+`openapi-typescript` generates TypeScript types from the backend's OpenAPI specification into `packages/api-types/src/api.d.ts`. This generation step is a Turborepo task (`generate:api-types`) that runs before the Next.js build.
 
 The `openapi-fetch` source is copied into `packages/api-client/` as owned source code rather than installed from npm. This is justified because:
 
@@ -44,9 +44,9 @@ npx openapi-typescript packages/api-types/openapi.json -o packages/api-types/src
 CI validates freshness:
 
 ```bash
-dotnet build apps/api/{ProjectName}.slnx
-dotnet run --project apps/api/src/{ProjectName}.WebApi -- --export-openapi packages/api-types/openapi.json
-npx openapi-typescript packages/api-types/openapi.json -o packages/api-types/src/api.d.ts
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
+cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
+pnpm --filter @myproject/api-types generate:api-types
 git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
 ```
 

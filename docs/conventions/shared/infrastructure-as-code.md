@@ -32,14 +32,22 @@ Staging MUST mirror production topology at smaller scale (same services, fewer r
 
 ---
 
-## 4. Database and Migrations
+## 4. Azure Container Apps (V1 target)
+
+Copy `docs/templates/iac/azure-container-apps.bicep` as the starting point for Azure deployments. Customize image references, secrets, and scaling per environment.
+
+Deploy API and Worker as separate container apps. PostgreSQL may be Azure Flexible Server (as in the template) or a managed service referenced by connection string.
+
+---
+
+## 5. Database and Migrations
 
 - IaC provisions PostgreSQL instances, networking, and backups.
 - Schema changes follow `docs/conventions/backend/13-deployment-and-migrations.md`; MUST NOT run `Database.MigrateAsync()` on app startup in production.
 
 ---
 
-## 5. CI Integration
+## 6. CI Integration
 
 Infrastructure PRs MUST run:
 

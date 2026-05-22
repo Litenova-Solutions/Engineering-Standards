@@ -208,3 +208,16 @@ In GitHub Actions, pass environment variables as step-level `env` entries. Never
 ```
 
 Use `vars` for non-secret configuration values and `secrets` for credentials. Both are injected at runtime and never appear in logs when accessed this way.
+
+---
+
+## 8. TypeScript 6 Migration
+
+TypeScript 6.0 is a transition release before the native TypeScript 7 compiler. Projects MUST:
+
+- Pin `"typescript": "6.0.x"` in `package.json` per `standards.manifest.json`.
+- Set `"moduleResolution": "bundler"` in `tsconfig.json`.
+- Address deprecation warnings before adopting TypeScript 7 previews.
+- Use `"ignoreDeprecations": "6.0"` only temporarily; options removed in TS 7 MUST be fixed before upgrade.
+
+See [TypeScript 6.0 release notes](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-6-0.html).

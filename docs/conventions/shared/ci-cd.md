@@ -36,6 +36,8 @@ PR checks → Build → Test → Artifact → Staging deploy → Staging smoke �
 
 ## 2. GitHub Actions Workflow Structure
 
+Copy the PR-check workflow from `docs/templates/ci-workflow.yml`. The template covers backend, frontend, OpenAPI freshness, Playwright, and image build jobs. Extend it with deploy stages below for staging and production.
+
 ```yaml
 # .github/workflows/ci.yml
 name: CI
@@ -72,7 +74,7 @@ jobs:
             --collect:"XPlat Code Coverage"
 
       - name: Vulnerability scan
-        run: dotnet list apps/api/src/{ProjectName}.slnx package --vulnerable --include-transitive
+        run: dotnet list apps/api/{ProjectName}.slnx package --vulnerable --include-transitive
 
   frontend-checks:
     name: Frontend
@@ -112,7 +114,7 @@ jobs:
         run: dotnet build apps/api/{ProjectName}.slnx --configuration Release
 
       - name: Copy generated spec
-        run: cp apps/api/src/{ProjectName}.WebApi/openapi.json packages/api-types/openapi.json
+        run: cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -240,7 +242,7 @@ The OpenAPI freshness gate ensures the committed spec and TypeScript types match
 dotnet build apps/api/{ProjectName}.slnx --configuration Release
 
 # 2. Copy generated spec
-cp apps/api/src/{ProjectName}.WebApi/openapi.json packages/api-types/openapi.json
+cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
 
 # 3. Regenerate TypeScript types
 pnpm --filter @myproject/api-types generate:api-types

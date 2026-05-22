@@ -15,8 +15,8 @@ These rules apply when an agent is editing files inside the `engineering-standar
 
 ## Rule Integrity
 
-- MUST NOT remove a rule from any convention file without adding a corresponding entry in `CHANGELOG.md` in the same commit.
-- MUST NOT downgrade a `MUST` rule to a `SHOULD` rule without a CHANGELOG entry and a rationale in the convention file.
+- Before **v1.0.0**, convention changes do not require a `CHANGELOG.md` entry. From v1.0.0 onward, MUST add a corresponding entry under `[Unreleased]` when removing or downgrading a rule.
+- MUST NOT downgrade a `MUST` rule to a `SHOULD` rule without a CHANGELOG entry (post-v1) and a rationale in the convention file.
 - MUST NOT add a rule without verifying it does not conflict with an existing rule in another convention file.
 
 ## AGENTS.md Size Limit

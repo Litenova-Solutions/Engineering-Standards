@@ -36,4 +36,4 @@ Denormalized read model tables are not the default. Fill in this section only wh
 
 | Read Model | Owner | Update Mechanism | Reconciliation Job | ADR |
 |:---|:---|:---|:---|:---|
-| _(example) TicketDashboardRow_ | Infrastructure | Outbox projector | `RebuildTicketDashboardJob` | `docs/decisions/0008-ticket-dashboard-read-model.md` |
+| _(example) TicketDashboardRow_ | Infrastructure | Outbox projector | `RebuildTicketDashboardJob` | Project ADR required before denormalized read models |

@@ -302,3 +302,58 @@ Every production project MUST define alerts for:
 - Database connection failures.
 
 Project-specific thresholds live in the project repository because they depend on product usage and hosting costs.
+
+---
+
+## 6. Production Export Configuration
+
+Development uses console logging and optional local OTLP collectors. Production MUST export traces and metrics to an OTLP-compatible backend (Azure Monitor, Grafana Cloud, Honeycomb, or self-hosted Grafana Tempo).
+
+### appsettings.Production.json (Serilog sinks)
+
+```json
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "Microsoft.Hosting.Lifetime": "Information"
+      }
+    },
+    "WriteTo": [
+      { "Name": "Console", "Args": { "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog" } }
+    ]
+  },
+  "OpenTelemetry": {
+    "OtlpEndpoint": "https://otel-collector.example.com:4317"
+  }
+}
+```
+
+Add a production-only sink (Seq, Azure Application Insights, or a log aggregator) via `appsettings.Production.json` or environment variables. Do not hard-code sink credentials in source.
+
+### OpenTelemetry registration (Program.cs excerpt)
+
+```csharp
+// Program.cs — after builder.Services.AddInfrastructure(...)
+var otlpEndpoint = builder.Configuration["OpenTelemetry:OtlpEndpoint"];
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("{ProjectName}.WebApi"))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddEntityFrameworkCoreInstrumentation()
+        .AddOtlpExporter(options => options.Endpoint = new Uri(otlpEndpoint)))
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation()
+        .AddRuntimeInstrumentation()
+        .AddOtlpExporter(options => options.Endpoint = new Uri(otlpEndpoint)));
+```
+
+Validate `OpenTelemetry:OtlpEndpoint` through a typed options class in production. See `docs/conventions/backend/16-options-and-configuration.md`.
+
+### Worker projects
+
+Worker services MUST register the same OpenTelemetry resource name pattern (`{ProjectName}.Worker`) and export to the same OTLP endpoint so background jobs appear in the same trace backend as the API.

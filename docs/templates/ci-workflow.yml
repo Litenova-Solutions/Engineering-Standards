@@ -1,5 +1,5 @@
 # Copy to .github/workflows/ci.yml in consuming projects.
-# Replace {ProjectName} and adjust paths.
+# Replace {ProjectName} and @myproject scope names.
 
 name: ci
 
@@ -8,15 +8,39 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  verify:
+  backend-checks:
+    name: Backend
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-dotnet@v4
         with:
-          global-json-file: global.json
+          global-json-file: apps/api/global.json
+
+      - run: dotnet tool restore
+
+      - run: dotnet restore {ProjectName}.slnx
+
+      - run: dotnet build {ProjectName}.slnx --configuration Release --no-restore
+
+      - run: dotnet test {ProjectName}.slnx --configuration Release --no-build --collect:"XPlat Code Coverage"
+
+      - run: dotnet list {ProjectName}.slnx package --vulnerable --include-transitive
+
+  frontend-checks:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
         with:
@@ -27,31 +51,84 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      - run: dotnet restore apps/api/src/{ProjectName}.slnx
-      - run: dotnet build apps/api/{ProjectName}.slnx --configuration Release --no-restore
-      - run: dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
-      - run: dotnet list apps/api/src/{ProjectName}.slnx package --vulnerable
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+
+      - run: pnpm type-check
+
+      - run: pnpm test
+
+      - run: pnpm build
+
+      - run: pnpm audit --audit-level=high
+
+  openapi-freshness:
+    name: OpenAPI freshness
+    runs-on: ubuntu-latest
+    needs: [backend-checks]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: apps/api/global.json
+
+      - run: dotnet build apps/api/{ProjectName}.slnx --configuration Release
+
+      - run: cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
+
+      - uses: pnpm/action-setup@v4
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm type-check
-      - run: pnpm test
-      - run: pnpm build
-      - run: pnpm audit
 
-      - name: OpenAPI freshness
-        run: |
-          dotnet build apps/api/{ProjectName}.slnx --configuration Release
-          cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
-          pnpm --filter @myproject/api-types generate:api-types
-          git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
+      - run: pnpm --filter @myproject/api-types generate:api-types
 
-      - name: Playwright E2E
-        if: hashFiles('apps/web/**') != ''
-        run: pnpm exec playwright test --config apps/web/playwright.config.ts
+      - run: git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
 
-      - name: Standards submodule pinned to tag
-        if: hashFiles('standards/**') != ''
-        run: |
+  playwright:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    needs: [frontend-checks, openapi-freshness]
+    if: hashFiles('apps/web/**') != ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - run: pnpm exec playwright test --config apps/web/playwright.config.ts
+
+  build-image:
+    name: Build container image
+    runs-on: ubuntu-latest
+    needs: [backend-checks, frontend-checks, openapi-freshness]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.api
+          push: true
+          tags: ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+
+  standards-tag:
+    name: Standards submodule tag
+    runs-on: ubuntu-latest
+    if: hashFiles('standards/**') != ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: |
           cd standards
           git describe --exact-match --tags HEAD

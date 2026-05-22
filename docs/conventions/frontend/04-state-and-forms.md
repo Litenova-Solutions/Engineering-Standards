@@ -482,11 +482,4 @@ Map backend aggregate states to discriminated unions at the API boundary. The fr
 
 ## 11. Project-Specific State Conventions
 
-> **Project teams: fill in this section when adopting these standards.**
-
-The following is project-specific and not defined in this standards file:
-
-- **Global stores:** List any app-wide Zustand stores in `lib/stores/` and what UI state they own.
-- **Specific form patterns:** Any project-specific form abstractions beyond the standard patterns in this file.
-- **Project-wide validation rules:** Shared Zod schemas used across multiple features (e.g., `phoneNumber`, `postalCode`).
-- **Multi-step form state:** If multi-step forms are present, document which step state is in the URL vs. in a Zustand store.
+Document global Zustand stores and shared Zod schemas in `docs/domain/frontend-feature-inventory.md`.

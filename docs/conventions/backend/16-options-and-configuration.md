@@ -9,6 +9,7 @@ This document defines the standard for all backend configuration: options classe
 - ALL configuration access MUST go through strongly typed options classes.
 - MUST call `ValidateDataAnnotations()` and `ValidateOnStart()` on every options registration.
 - MUST NOT use `configuration["Key"]!` or `configuration.GetValue<T>("Key")` outside options binding.
+- Resolving validated options via `IOptions<T>` or `IOptionsSnapshot<T>` after `ValidateOnStart()` is required.
 - Connection strings use `ConnectionStrings__Database` env var naming (double underscore as section separator).
 - Secrets MUST use `dotnet user-secrets` locally; MUST NOT commit secrets to source control.
 - MUST use exact environment variable names documented in this file across all environments.

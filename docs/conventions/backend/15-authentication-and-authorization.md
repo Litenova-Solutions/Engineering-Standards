@@ -49,35 +49,20 @@ public sealed class JwtSettings
 ### Registration
 
 ```csharp
-// Program.cs (or InfrastructureServiceRegistration.cs)
 builder.Services
     .AddOptions<JwtSettings>()
     .BindConfiguration(JwtSettings.SectionName)
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
-var jwtSettings = builder.Configuration
-    .GetSection(JwtSettings.SectionName)
-    .Get<JwtSettings>()!;
+builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings.Secret)),
-            ValidateIssuer = true,
-            ValidIssuer = jwtSettings.Issuer,
-            ValidateAudience = true,
-            ValidAudience = jwtSettings.Audience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromSeconds(30)
-        };
-    });
+    .AddJwtBearer();
 ```
+
+`JwtBearerOptionsSetup` reads `IOptions<JwtSettings>` and configures validation parameters. Copy the implementation from `docs/blueprints/backend/program-cs.md` (Supporting Files section).
 
 All five parameters — signature, issuer, audience, expiration, and required claims — MUST be validated. Disabling any validation requires a comment with a justification.
 

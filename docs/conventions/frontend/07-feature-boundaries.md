@@ -30,7 +30,7 @@ Project repositories MUST enable `eslint-plugin-boundaries` (or equivalent) with
 | `shared` | `shared/**` | `lib`, other `shared` |
 | `app` | `app/**` | `features/*` entry points only, `lib`, `components` |
 
-Example dependency rule (project `.eslintrc`):
+Example dependency rule (copy full file from `docs/templates/eslint.config.ts`):
 
 ```json
 {

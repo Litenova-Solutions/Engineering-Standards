@@ -31,6 +31,8 @@ ENV ConnectionStrings__Default=$DATABASE_PASSWORD
 
 ## 2. Complete Backend Dockerfile
 
+Prefer the copy-paste template at `docs/templates/Dockerfile.api` over inlining this block.
+
 ```dockerfile
 # ---- build stage ----
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
@@ -40,13 +42,16 @@ WORKDIR /src
 COPY ["apps/api/src/{ProjectName}.WebApi/{ProjectName}.WebApi.csproj", "apps/api/src/{ProjectName}.WebApi/"]
 COPY ["apps/api/src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj", "apps/api/src/{ProjectName}.Infrastructure/"]
 # ... copy all .csproj files before copying source ...
-COPY ["Directory.Build.props", "Directory.Build.props"]
-COPY ["Directory.Packages.props", "Directory.Packages.props"]
-COPY ["{ProjectName}.slnx", "."]
+COPY ["apps/api/Directory.Build.props", "apps/api/"]
+COPY ["apps/api/Directory.Packages.props", "apps/api/"]
+COPY ["apps/api/{ProjectName}.slnx", "apps/api/"]
+WORKDIR /src/apps/api
 RUN dotnet restore "{ProjectName}.slnx"
 
+WORKDIR /src
 COPY . .
-RUN dotnet publish "apps/api/src/{ProjectName}.WebApi/{ProjectName}.WebApi.csproj" \
+WORKDIR /src/apps/api
+RUN dotnet publish "src/{ProjectName}.WebApi/{ProjectName}.WebApi.csproj" \
     --configuration Release \
     --no-restore \
     --output /app/publish

@@ -634,15 +634,7 @@ The current pinned version is **5.100.10**. When upgrading, check the advisory f
 
 ## 14. Project-Specific Data Fetching Configuration
 
-> **Project teams: fill in this section when adopting these standards.**
-
-The following is project-specific and not defined in this standards file:
-
-- **API base URL:** The value of `API_BASE_URL` for each environment and how it is validated at startup.
-- **Custom query defaults:** Any project-specific `defaultOptions` for the `QueryClient` beyond the standard `staleTime`.
-- **Cache invalidation strategies:** Which tags map to which backend resources and how they are revalidated after mutations.
-- **Polling intervals:** Any resources that require polling (e.g., job status, notifications) and their intervals.
-- **Authentication token source:** Which cookie name holds the access token and whether token refresh is handled client-side or by the backend.
+Document API URLs, polling intervals, and auth token sources in `docs/domain/frontend-api-endpoints.md` and `lib/env.ts`.
 
 ---
 
@@ -654,18 +646,13 @@ This rule exists because hand-written interfaces drift from the API contract sil
 
 ### Generation workflow
 
+Build-time OpenAPI generation (see `docs/conventions/shared/ci.md`):
+
 ```bash
-# 1. Start the backend API (must be running to export the spec)
-dotnet run --project apps/api/src/{ProjectName}.WebApi
-
-# 2. Export the OpenAPI spec
-curl http://localhost:5000/openapi/v1.json -o openapi.json
-
-# 3. Generate TypeScript types
-npx openapi-typescript openapi.json -o packages/api-types/src/api.d.ts
-
-# 4. Commit the generated file
-git add packages/api-types/src/api.d.ts
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
+cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
+pnpm --filter @myproject/api-types generate:api-types
+git add packages/api-types/openapi.json packages/api-types/src/api.d.ts
 ```
 
 Run these steps whenever the backend API changes. The generated file is committed and versioned alongside the frontend code.

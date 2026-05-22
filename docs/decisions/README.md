@@ -37,7 +37,7 @@ Write a new file in `docs/decisions/` when the standards repo adopts a new org-w
 | [reactions-project-depends-only-on-abstractions](reactions-project-depends-only-on-abstractions.md) | Accepted | `docs/conventions/backend/03-application-layer.md` |
 | [architecture-tests-as-enforcement](architecture-tests-as-enforcement.md) | Accepted | `docs/conventions/backend/08-testing.md` |
 | [outbox-pattern-as-reliability-escalation](outbox-pattern-as-reliability-escalation.md) | Accepted | `docs/conventions/backend/10-reliability.md` |
-| [turborepo-as-monorepo-tool](turborepo-as-monorepo-tool.md) | Accepted | `docs/conventions/backend/01-solution-structure.md` |
+| [turborepo-as-monorepo-tool](turborepo-as-monorepo-tool.md) | Accepted | `docs/conventions/shared/monorepo-structure.md` |
 | [openapi-typescript-client-generation](openapi-typescript-client-generation.md) | Accepted | `docs/conventions/frontend/03-data-fetching.md` |
 | [authjs-v5-authentication](authjs-v5-authentication.md) | Accepted | `docs/conventions/frontend/01-nextjs-app-router.md`, `03-data-fetching.md` |
 | [animation-tailwind-first-framer-motion-escalation](animation-tailwind-first-framer-motion-escalation.md) | Accepted | `docs/conventions/frontend/02-components.md` |

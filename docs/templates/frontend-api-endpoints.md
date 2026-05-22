@@ -4,7 +4,7 @@
 
 This file is filled in per project. It documents which OpenAPI endpoints the frontend actively consumes, what they map to in the feature folder structure, and any project-specific notes about authentication requirements or caching behavior. This file supplements the generated TypeScript types in `packages/api-types/src/api.d.ts`; the types tell you what endpoints exist, this file tells you which ones are used and how.
 
-Run `npm run generate:api` to regenerate the TypeScript types whenever the backend API changes. The generated types are the source of truth for request and response shapes; this file is the source of truth for usage context.
+Run `npm run generate:api-types` to regenerate the TypeScript types whenever the backend API changes. The generated types are the source of truth for request and response shapes; this file is the source of truth for usage context.
 
 ---
 
@@ -30,4 +30,4 @@ Endpoints marked **Auth Required: Yes** require a valid session. The `getApiClie
 
 This file is generated partially from the OpenAPI spec but requires manual annotation for the **Cache Strategy** and **Used In** columns. Update this table in the same pull request that adds or removes a fetch call in the frontend codebase.
 
-Run `npm run generate:api` to regenerate `packages/api-types/src/api.d.ts` whenever the backend OpenAPI spec changes. The spec is committed at `packages/api-types/openapi.json`.
+Run `pnpm generate:api-types` to regenerate `packages/api-types/src/api.d.ts` whenever the backend OpenAPI spec changes. The spec is committed at `packages/api-types/openapi.json`.

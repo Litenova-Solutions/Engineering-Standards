@@ -299,7 +299,7 @@ Add Testcontainers to the Application.Tests project:
 public sealed class PostgreSqlQueryFixture : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-        .WithImage("postgres:18-alpine")
+        .WithImage("postgres:17-alpine")
         .Build();
 
     public AppDbContext CreateContext()
@@ -373,7 +373,7 @@ public sealed class GetPostByIdQueryHandlerTests : IClassFixture<PostgreSqlQuery
 
 > **Why PostgreSQL and not SQLite?** SQLite cannot translate PostgreSQL full-text search, window functions, or many raw SQL patterns documented in `19-raw-sql-and-reporting.md`. Query tests that pass on SQLite and fail in staging are a common agent failure mode. Use Testcontainers for query handler tests; reserve SQLite only for Domain tests that never touch EF Core.
 
-> **PostgreSQL version.** Use `postgres:18-alpine` for new projects. Pin the major version in project ADR if the deployment target requires an older major.
+> **PostgreSQL version.** Use `postgres:17-alpine` for new projects. Pin the major version in project ADR if the deployment target requires an older major.
 
 ---
 
@@ -389,7 +389,7 @@ With top-level statements in .NET, `Program` is an implicit internal class. Add 
 public partial class Program { }
 ```
 
-This declaration is included in the canonical `Program.cs` template in `docs/conventions/backend/05-api-layer.md`.
+This declaration is included in `docs/blueprints/backend/program-cs.md`.
 
 ### Shared Fixture
 
@@ -397,7 +397,7 @@ This declaration is included in the canonical `Program.cs` template in `docs/con
 sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:18-alpine")
+        .WithImage("postgres:17-alpine")
         .Build();
 
     public async Task InitializeAsync()
