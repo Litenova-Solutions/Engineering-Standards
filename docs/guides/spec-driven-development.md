@@ -48,7 +48,14 @@ The spec provides inputs to each step of the deterministic scaffolding sequence:
 | Frontend | UI flows, feature slice layout, Server Actions |
 | Tests | Acceptance criteria mapped to unit, integration, and E2E tests |
 
-Do not start Step N+1 until Step N artifacts compile and pass architecture tests for that layer.
+Do not start Step N+1 until Step N artifacts compile and pass the checkpoint commands in `docs/conventions/shared/agentic-guardrails.md` section 2.
+
+Minimum commands between steps:
+
+```bash
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
+dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
+```
 
 ---
 

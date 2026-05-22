@@ -25,6 +25,36 @@ flowchart TD
 
 ---
 
+## 3.1 Zod v4 Syntax Cheat Sheet
+
+Projects use Zod 4.4.x. Import from `"zod"`. Agents frequently regress to v3 syntax from pre-training data. Use this table:
+
+| Validation | Zod 4 (GOOD) | Zod 3 (BAD) |
+|:---|:---|:---|
+| Email | `z.email()` | `z.string().email()` |
+| UUID | `z.uuid()` | `z.string().uuid()` |
+| URL | `z.url()` | `z.string().url()` |
+| Non-empty string | `z.string().min(1)` | same |
+| Optional field | `z.string().optional()` | same |
+| Object | `z.object({ ... })` | same |
+
+```typescript
+// GOOD: Zod 4 top-level validators
+const schema = z.object({
+  email: z.email(),
+  postId: z.uuid(),
+  website: z.url().optional(),
+})
+
+// BAD: v3 chained validators on z.string()
+const schema = z.object({
+  email: z.string().email(),
+  postId: z.string().uuid(),
+})
+```
+
+---
+
 ## 3. Zustand for UI State
 
 Zustand manages UI state that is shared across components that are not in a parent-child relationship: the active tab in an editor, draft-saved status shared between a toolbar and a footer, word count shown in multiple places on the page.

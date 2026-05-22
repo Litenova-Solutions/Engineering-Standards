@@ -370,34 +370,9 @@ Full handler implementations, assembly marker classes, and LiteBus registration 
 
 ### LiteBus Registration
 
-Each module type (`AddCommandModule`, `AddQueryModule`, `AddEventModule`) is called **once** per `AddLiteBus` invocation. Multiple `RegisterFromAssembly` calls inside a single module block scan different assemblies. Calling the same module method twice causes a duplicate key error.
+Register LiteBus in `WebApi/Program.cs` only. See `docs/blueprints/backend/program-cs.md` for the complete registration block. Do not duplicate registration in architecture or infrastructure convention files.
 
-```csharp
-// WebApi/Program.cs (LiteBus registration excerpt)
-builder.Services.AddLiteBus(liteBus =>
-{
-    // All command-side handlers in one AddCommandModule call.
-    // Application.Write: handlers and validators.
-    // Infrastructure: transaction pipeline behaviors (discovered via scanning).
-    liteBus.AddCommandModule(module =>
-    {
-        module.RegisterFromAssembly(typeof(ApplicationWriteAssemblyMarker).Assembly);
-        module.RegisterFromAssembly(typeof(InfrastructureAssemblyMarker).Assembly);
-    });
-
-    liteBus.AddQueryModule(module =>
-    {
-        module.RegisterFromAssembly(typeof(ApplicationReadAssemblyMarker).Assembly);
-    });
-
-    liteBus.AddEventModule(module =>
-    {
-        module.RegisterFromAssembly(typeof(ApplicationReactionsAssemblyMarker).Assembly);
-    });
-});
-```
-
-Handler classes are `internal sealed`. Each implementation project exposes a `public static class {Layer}AssemblyMarker { }` so `Program.cs` can reference the assembly without importing internal types. See `docs/conventions/backend/04-infrastructure-layer.md` for canonical examples.
+Handler classes are `internal sealed`. Each implementation project exposes a `public static class {Layer}AssemblyMarker { }` so `Program.cs` can reference the assembly without importing internal types. See `docs/conventions/backend/04-infrastructure-layer.md` for assembly marker examples.
 
 ---
 

@@ -317,15 +317,23 @@ internal sealed class OutboxDispatcherHostedService : BackgroundService
             {
                 await using var scope = _scopeFactory.CreateAsyncScope();
                 var dispatcher = scope.ServiceProvider.GetRequiredService<OutboxDispatcher>();
+
+                // Pass stoppingToken so in-flight batch can finish before host shutdown.
                 await dispatcher.DispatchPendingAsync(stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
+                // Graceful shutdown: current batch completed or cancellation requested.
                 break;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Outbox dispatcher encountered an error.");
+            }
+
+            if (stoppingToken.IsCancellationRequested)
+            {
+                break;
             }
 
             await Task.Delay(PollingInterval, stoppingToken);
@@ -334,6 +342,19 @@ internal sealed class OutboxDispatcherHostedService : BackgroundService
         _logger.LogInformation("Outbox dispatcher stopped.");
     }
 }
+```
+
+Configure the host to allow in-flight work to complete:
+
+```csharp
+// Worker/Program.cs or AppHost extension
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.ShutdownTimeout = TimeSpan.FromSeconds(30);
+});
+```
+
+During deployment, SIGTERM triggers `stoppingToken`. The dispatcher finishes the current `DispatchPendingAsync` batch before exiting, releasing `FOR UPDATE SKIP LOCKED` leases cleanly.
 ```
 
 ---

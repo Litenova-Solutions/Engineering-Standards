@@ -214,6 +214,8 @@ app.UseRouting();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Rate limiter after CORS so 429 responses include CORS headers for browser clients.
 app.UseRateLimiter();
 
 // ─── Health check endpoints ───────────────────────────────────────────────────

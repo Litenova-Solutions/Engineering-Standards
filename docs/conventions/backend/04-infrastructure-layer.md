@@ -457,63 +457,93 @@ public async Task AddAsync(Post post, CancellationToken cancellationToken)
 
 ## `IDatabaseContext` Implementation and Domain Event Dispatch
 
-`AppDbContext` implements `IDatabaseContext` from `Application.Read.Contracts` and dispatches domain events from `SaveChangesAsync`. Add one `IQueryable<T>` property per aggregate.
-
-When the context needs to dispatch domain events, inject `IEventPublisher` (the preferred alias for `IEventMediator`) and publish each event after saving. Because LiteBus publishes any `notnull` object as an event, no cast or interface constraint is needed beyond what your collection type provides:
+`AppDbContext` implements `IDatabaseContext` from `Application.Read.Contracts`. **`AppDbContext.SaveChangesAsync` MUST NOT publish domain events or write to the outbox.** Event dispatch is owned exclusively by `SaveChangesCommandPostHandler` so outbox and in-process modes do not double-dispatch.
 
 ```csharp
 // Infrastructure/Persistence/AppDbContext.cs
 internal sealed class AppDbContext : DbContext, IDatabaseContext
 {
-    private readonly IEventPublisher _eventPublisher;
-
-    public AppDbContext(DbContextOptions<AppDbContext> options, IEventPublisher eventPublisher)
+    public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
-        _eventPublisher = eventPublisher;
     }
 
-    // DbSet properties satisfy both EF Core tracking and IDatabaseContext
     public DbSet<Post> Posts => Set<Post>();
     public DbSet<Author> Authors => Set<Author>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+    public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
+
+    public IQueryable<Post> PostsQuery => Posts.AsQueryable();
+    public IQueryable<Author> AuthorsQuery => Authors.AsQueryable();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
+}
+```
 
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+### Event dispatch in `SaveChangesCommandPostHandler`
+
+Collect domain events, write outbox rows or schedule in-process dispatch, then save once:
+
+```csharp
+// Infrastructure/Behaviors/SaveChangesCommandPostHandler.cs
+internal sealed class SaveChangesCommandPostHandler
+    : ICommandPostHandler<ICommand>
+{
+    private readonly AppDbContext _dbContext;
+    private readonly OutboxWriter? _outboxWriter;
+    private readonly IEventPublisher? _eventPublisher;
+    private readonly ReliabilityOptions _reliabilityOptions;
+
+    public async Task PostHandleAsync(
+        ICommand command,
+        object? result,
+        CancellationToken cancellationToken)
     {
-        // Collect events before saving so they reflect the pre-save state.
-        var domainEvents = ChangeTracker.Entries<IAggregateRoot>()
+        var domainEvents = _dbContext.ChangeTracker.Entries<IAggregateRoot>()
             .SelectMany(e => e.Entity.DomainEvents)
             .ToList();
 
-        // Clear before saving to avoid re-dispatching on retry.
-        foreach (var entry in ChangeTracker.Entries<IAggregateRoot>())
+        foreach (var entry in _dbContext.ChangeTracker.Entries<IAggregateRoot>())
         {
             entry.Entity.ClearDomainEvents();
         }
 
-        var result = await base.SaveChangesAsync(cancellationToken);
-
-        foreach (var domainEvent in domainEvents)
+        if (_reliabilityOptions.UseOutbox)
         {
-            // LiteBus publishes any notnull object via the generic overload.
-            // IDomainEvent satisfies the `notnull` constraint.
-            await _eventPublisher.PublishAsync(
-                domainEvent,
-                cancellationToken: cancellationToken);
+            foreach (var domainEvent in domainEvents)
+            {
+                _outboxWriter!.Write(domainEvent);
+            }
         }
 
-        return result;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.Database.CommitTransactionAsync(cancellationToken);
+
+        // In-process dispatch only when outbox is disabled.
+        if (!_reliabilityOptions.UseOutbox)
+        {
+            foreach (var domainEvent in domainEvents)
+            {
+                await _eventPublisher!.PublishAsync(domainEvent, cancellationToken: cancellationToken);
+            }
+        }
     }
 }
 ```
 
-> **When there is no event dispatch.** If the project has no domain events yet, omit the `IEventPublisher` constructor parameter and the dispatch loop. Add it only when the first domain event handler is wired up.
+| Mode | When | Domain events |
+|:---|:---|:---|
+| In-process (default) | No outbox ADR | Published via `IEventPublisher` after commit in `SaveChangesCommandPostHandler` |
+| Outbox | Durable delivery ADR | Written to `outbox_messages` before commit; `OutboxDispatcher` publishes asynchronously |
 
-> **No handler registered.** By default LiteBus silently ignores events with no registered handlers. No exception is thrown and no configuration is required to suppress it. If you want to detect unhandled events (for example, to log them), register an open-generic event handler: `IEventHandler<IDomainEvent>` will catch every domain event that no specific handler claimed. See the LiteBus docs for the current event-settings API.
+MUST NOT publish in both `AppDbContext.SaveChangesAsync` and the outbox dispatcher for the same event.
+
+> **When there is no event dispatch.** If the project has no domain events yet, omit `IEventPublisher` and `OutboxWriter` from the post-handler. Add them when the first domain event handler is wired up.
+
+> **No handler registered.** By default LiteBus silently ignores events with no registered handlers. To detect unhandled events, register an open-generic `IEventHandler<IDomainEvent>` handler. See the LiteBus docs for the current event-settings API.
 
 When a new aggregate is added to the domain, add its `DbSet<T>` property here and add the corresponding `IQueryable<T>` property to `IDatabaseContext` in `Application.Read.Contracts`.
 
@@ -521,7 +551,7 @@ When a new aggregate is added to the domain, add its `DbSet<T>` property here an
 
 > **`IAggregateRoot` interface.** `ChangeTracker.Entries<IAggregateRoot>()` requires a non-generic marker interface. Define it in `Domain/Shared/IAggregateRoot.cs` (see `docs/architecture/clean-architecture.md` section 9). `IDomainEvent` MUST be `public` so Infrastructure can reference it across assembly boundaries.
 
-The `NoOpEventPublisher` used for design-time and test scenarios lives at `Infrastructure/Persistence/NoOpEventPublisher.cs`. See the canonical implementation in the Design-Time DbContext Factory section below. Test projects that cannot reference Infrastructure MAY use an inline stub that matches the same interface implementation.
+The `NoOpEventPublisher` at `Infrastructure/Persistence/NoOpEventPublisher.cs` is used only when a test or legacy context constructor requires `IEventPublisher`. The standard production `AppDbContext` does not take `IEventPublisher`; event dispatch lives in `SaveChangesCommandPostHandler`.
 
 ---
 
@@ -560,27 +590,14 @@ internal sealed class TransactionCommandPreHandler
 ```csharp
 // Infrastructure/Behaviors/SaveChangesCommandPostHandler.cs
 /// <summary>
-/// Saves all pending changes and commits the transaction after every
-/// command handler completes successfully.
+/// Collects domain events, persists outbox rows when enabled, saves changes,
+/// commits the transaction, then publishes in-process when outbox is disabled.
+/// See the Event dispatch section above for the full implementation.
 /// </summary>
 internal sealed class SaveChangesCommandPostHandler
     : ICommandPostHandler<ICommand>
 {
-    private readonly AppDbContext _dbContext;
-
-    public SaveChangesCommandPostHandler(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public async Task PostHandleAsync(
-        ICommand command,
-        object? result,
-        CancellationToken cancellationToken)
-    {
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        await _dbContext.Database.CommitTransactionAsync(cancellationToken);
-    }
+    // Full implementation shown in "Event dispatch in SaveChangesCommandPostHandler" above.
 }
 ```
 
@@ -750,9 +767,7 @@ builder.Services.AddLiteBus(liteBus =>
 
 ## Design-Time DbContext Factory
 
-When `AppDbContext` has constructor parameters beyond `DbContextOptions<T>` (for example, `IEventPublisher` for domain event dispatch), the EF Core tooling cannot construct it automatically at design time. Without a factory, `dotnet ef migrations add` fails with a "no parameterless constructor" error.
-
-Add an `IDesignTimeDbContextFactory<AppDbContext>` implementation in the Infrastructure project:
+When `AppDbContext` uses the standard constructor (`DbContextOptions<AppDbContext>` only), add a design-time factory as shown below.
 
 ```csharp
 // Infrastructure/Persistence/AppDbContextFactory.cs
@@ -770,28 +785,14 @@ internal sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbCon
             .UseNpgsql(connectionString)
             .Options;
 
-        // Pass a no-op IEventPublisher so the factory can construct the context
-        // without requiring a running DI container.
-        return new AppDbContext(options, new NoOpEventPublisher());
+        return new AppDbContext(options);
     }
-}
-```
-
-```csharp
-// Infrastructure/Persistence/NoOpEventPublisher.cs
-internal sealed class NoOpEventPublisher : IEventPublisher
-{
-    public Task PublishAsync(IEvent @event, EventMediationSettings? settings = null, CancellationToken cancellationToken = default)
-        => Task.CompletedTask;
-
-    Task IEventPublisher.PublishAsync<TEvent>(TEvent @event, EventMediationSettings? settings = null, CancellationToken cancellationToken = default)
-        => Task.CompletedTask;
 }
 ```
 
 `IDesignTimeDbContextFactory<T>` is discovered automatically by `dotnet ef` tools when the class is in the same assembly as the DbContext. No DI registration is needed.
 
-> **Note:** `IEventPublisher` is the preferred alias for `IEventMediator`. The `where TEvent : notnull` constraint on the generic overload requires an explicit interface implementation when the stub returns `Task.CompletedTask` without the type constraint. See LiteBus docs for the current interface definition.
+`NoOpEventPublisher` at `Infrastructure/Persistence/NoOpEventPublisher.cs` remains available for legacy test constructors that still inject `IEventPublisher`. Production `AppDbContext` does not use it.
 
 ---
 

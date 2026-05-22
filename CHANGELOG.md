@@ -47,7 +47,21 @@ Nothing in this repository has been released to consumers yet. All work below ta
 - Npgsql retry vs manual transaction guidance in `04-infrastructure-layer.md`.
 - Background job idempotency pattern in `10-reliability.md`.
 - Correlation ID propagation via `DelegatingHandler` in `09-observability.md`.
-- `MONOREPO_LAYOUT` rule in `agentic-guardrails.md`.
+- Agent scaffolding checkpoints (`dotnet build`, `dotnet test`, `dotnet ef migrations add`) in `agentic-guardrails.md`.
+- Idempotency single-transaction pipeline in `idempotency.md` blueprint (no separate `SaveChangesAsync` in endpoint).
+- Outbox vs in-process dispatch: events dispatched only from `SaveChangesCommandPostHandler`, not `AppDbContext.SaveChangesAsync`.
+- W3C trace context replaces custom `X-Correlation-ID` in `09-observability.md`.
+- Query handler tests require PostgreSQL Testcontainers (`postgres:18-alpine`); SQLite mandate removed from `08-testing.md`.
+- Route parameters use strongly typed `PostId` / `IParsable<T>` with OpenAPI transformer (not raw `Guid`).
+- Protected route `layout.tsx` MUST call `auth()`; `proxy.ts` is UX-only.
+- Pagination query validation exceptions in `06-exception-hierarchy.md`.
+- `IClock` / `SystemClock` pattern in `03-application-layer.md`.
+- Zod v4 cheat sheet in `04-state-and-forms.md`.
+- Next.js `use cache` + authenticated fetch rules in `01-nextjs-app-router.md`.
+- Outbox dispatcher graceful shutdown in `outbox.md` blueprint.
+- `docs/templates/Directory.Build.props` and `Directory.Packages.props` copy-paste templates.
+- Rate limiter ordered after CORS in `05-api-layer.md` and `program-cs.md`.
+- `RaiseDomainEvent` fix in `18-soft-delete.md`; `AddDomainEvent` removed.
 
 ### Changed
 

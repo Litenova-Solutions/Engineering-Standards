@@ -33,6 +33,52 @@ The application layer orchestrates use cases. It contains no business rules. It 
 | `Application.Read` | Query handler and validator implementations. References `Application.Read.Contracts`, `Domain`, `Microsoft.EntityFrameworkCore`. | `LiteBus.Queries.Abstractions` |
 | `Application.Reactions` | Event handlers and narrow side-effect interfaces. May dispatch follow-up commands when eventual consistency is acceptable. | `LiteBus.Events.Abstractions`, `LiteBus.Commands.Abstractions` |
 
+### IClock and Time in Handlers
+
+Domain aggregates MUST NOT call `DateTime.UtcNow` directly. Handlers inject `IClock` and pass `clock.UtcNow` into aggregate methods.
+
+```csharp
+// Application.Write.Contracts/Shared/IClock.cs
+public interface IClock
+{
+    DateTimeOffset UtcNow { get; }
+}
+
+// Infrastructure/Time/SystemClock.cs
+internal sealed class SystemClock : IClock
+{
+    public DateTimeOffset UtcNow => TimeProvider.System.GetUtcNow();
+}
+```
+
+Register in Infrastructure:
+
+```csharp
+services.AddSingleton<IClock, SystemClock>();
+services.AddSingleton(TimeProvider.System);
+```
+
+```csharp
+// GOOD: handler passes clock time to aggregate
+internal sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCommand>
+{
+    private readonly IPostRepository _repository;
+    private readonly IClock _clock;
+
+    public PublishPostCommandHandler(IPostRepository repository, IClock clock)
+    {
+        _repository = repository;
+        _clock = clock;
+    }
+
+    public async Task HandleAsync(PublishPostCommand command, CancellationToken cancellationToken)
+    {
+        var post = await _repository.GetByIdAsync(command.PostId, cancellationToken);
+        post.Publish(_clock.UtcNow);
+    }
+}
+```
+
 ---
 
 ## 3. Folder Structure

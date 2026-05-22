@@ -42,7 +42,8 @@ Every log entry MUST carry these properties. Use `LogContext.PushProperty` in mi
 
 | Property | Type | Source |
 |:---|:---|:---|
-| `CorrelationId` | `string` (UUID) | Incoming `X-Correlation-ID` header or generated |
+| `TraceId` | `string` | `Activity.Current?.TraceId` (W3C trace context) |
+| `SpanId` | `string` | `Activity.Current?.SpanId` |
 | `UserId` | `string` | Authenticated user claim, if present |
 | `MachineName` | `string` | Added by `WithMachineName()` enricher |
 | `Environment` | `string` | Added by `WithEnvironmentName()` enricher |
@@ -69,80 +70,55 @@ Every log entry MUST carry these properties. Use `LogContext.PushProperty` in mi
 
 ---
 
-## 2. Correlation IDs
+## 2. Distributed Tracing (W3C Trace Context)
 
-Every HTTP request MUST carry a correlation ID. The correlation ID is propagated to all outgoing calls, log entries, and async operations initiated by that request.
+Use OpenTelemetry and W3C `traceparent` headers as the primary correlation mechanism. MUST NOT introduce a parallel custom `X-Correlation-ID` header for distributed tracing; it fragments traces across service boundaries (for example, between the Next.js server and the .NET API).
 
-### Correlation ID Middleware
-
-Add this middleware to the pipeline before `UseSerilogRequestLogging`:
+Serilog log enrichment reads the active trace from `Activity.Current`:
 
 ```csharp
-// WebApi/Middleware/CorrelationIdMiddleware.cs
-sealed class CorrelationIdMiddleware(RequestDelegate next)
+// WebApi/Logging/TraceEnricher.cs
+sealed class TraceEnricher : ILogEventEnricher
 {
-    private const string HeaderName = "X-Correlation-ID";
-
-    public async Task InvokeAsync(HttpContext context)
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        var correlationId = context.Request.Headers[HeaderName].FirstOrDefault()
-            ?? Guid.NewGuid().ToString();
-
-        context.Response.Headers[HeaderName] = correlationId;
-
-        using (LogContext.PushProperty("CorrelationId", correlationId))
+        var activity = Activity.Current;
+        if (activity is null)
         {
-            await next(context);
+            return;
         }
+
+        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("TraceId", activity.TraceId.ToString()));
+        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("SpanId", activity.SpanId.ToString()));
     }
 }
 ```
 
-Register in `Program.cs` before `app.UseSerilogRequestLogging()`:
-```csharp
-app.UseMiddleware<CorrelationIdMiddleware>();
-app.UseSerilogRequestLogging();
-```
-
-### Response Header
-
-The correlation ID is always echoed back in the `X-Correlation-ID` response header. Clients can include this value when reporting issues to support.
-
-### Outgoing HTTP calls
-
-Propagate the correlation ID to downstream HTTP services via a `DelegatingHandler` registered on all typed `HttpClient` instances.
+Register in `Program.cs`:
 
 ```csharp
-// Infrastructure/Http/CorrelationIdDelegatingHandler.cs
-sealed class CorrelationIdDelegatingHandler(IHttpContextAccessor httpContextAccessor)
-    : DelegatingHandler
-{
-    protected override Task<HttpResponseMessage> SendAsync(
-        HttpRequestMessage request,
-        CancellationToken cancellationToken)
-    {
-        var correlationId = httpContextAccessor.HttpContext?.Response.Headers["X-Correlation-ID"].FirstOrDefault()
-            ?? httpContextAccessor.HttpContext?.TraceIdentifier;
-
-        if (!string.IsNullOrEmpty(correlationId))
-        {
-            request.Headers.TryAddWithoutValidation("X-Correlation-ID", correlationId);
-        }
-
-        return base.SendAsync(request, cancellationToken);
-    }
-}
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .Enrich.With<TraceEnricher>()
+        .WriteTo.Console(new JsonFormatter()));
 ```
 
-Register in Infrastructure:
+OpenTelemetry HTTP instrumentation propagates `traceparent` automatically on incoming and outgoing HTTP calls. Register in Infrastructure:
 
 ```csharp
-services.AddTransient<CorrelationIdDelegatingHandler>();
-services.AddHttpClient<IExternalApiClient, ExternalApiClient>()
-    .AddHttpMessageHandler<CorrelationIdDelegatingHandler>();
+services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddEntityFrameworkCoreInstrumentation());
 ```
 
-Command and query execution logs SHOULD include `CommandName` or `QueryName`, `CorrelationId`, and `DurationMs` as structured properties alongside the OpenTelemetry metrics defined in section 4.
+Support teams MAY expose `TraceId` in ProblemDetails extensions for user-facing error reports. Do not generate a separate correlation UUID.
+
+Command and query execution logs SHOULD include `CommandName` or `QueryName`, `TraceId`, and `DurationMs` as structured properties alongside the OpenTelemetry metrics defined in section 4.
 
 ---
 

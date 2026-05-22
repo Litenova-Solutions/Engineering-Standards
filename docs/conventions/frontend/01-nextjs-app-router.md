@@ -191,7 +191,23 @@ flowchart TD
 
 It MUST NOT perform authoritative validation: no database lookups, no cryptographic JWT verification, no permission checks.
 
-**CVE-2025-29927:** Relying on `proxy.ts` as the sole authorization gate is a known vulnerability. An attacker can bypass the proxy by sending a request with a specific internal routing header. Always validate the session in the Server Component or Server Action that actually needs it. `proxy.ts` is a UX optimization (fast redirect for obviously unauthenticated users), not a security boundary.
+**CVE-2025-29927:** Relying on `proxy.ts` as the sole authorization gate is a known vulnerability. Protected route groups MUST call `auth()` in their `layout.tsx` and `redirect()` when unauthenticated. `proxy.ts` is a UX optimization only, not a security boundary.
+
+```typescript
+// GOOD: protected route group layout enforces auth (authoritative)
+// app/(main)/layout.tsx
+import { auth } from "@/lib/auth"
+import { redirect } from "next/navigation"
+
+export default async function MainLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth()
+  if (!session) {
+    redirect("/login")
+  }
+
+  return <>{children}</>
+}
+```
 
 ```typescript
 // GOOD: proxy.ts performs only optimistic cookie presence check
@@ -319,6 +335,34 @@ export async function getPublishedPosts() {
   return data
 }
 ```
+
+### Authenticated data and `use cache`
+
+MUST NOT use `use cache` on functions that call `getApiClient()` with a user-specific Bearer token unless the cache key includes the authenticated user identity. Cached authenticated responses without a user-scoped key leak data across sessions.
+
+```typescript
+// GOOD: no use cache on authenticated fetch; fetch in Server Component per request
+export async function getMyPosts() {
+  const session = await auth()
+  if (!session) {
+    redirect("/login")
+  }
+
+  const client = await getApiClient()
+  const { data } = await client.GET("/posts/mine")
+  return data
+}
+
+// BAD: use cache on authenticated API call without user in cache key
+export async function getMyPosts() {
+  "use cache"  // BAD: same cached payload served to every user
+  const client = await getApiClient()
+  const { data } = await client.GET("/posts/mine")
+  return data
+}
+```
+
+Public, unauthenticated data MAY use `use cache` when the response is identical for all users.
 
 ---
 
