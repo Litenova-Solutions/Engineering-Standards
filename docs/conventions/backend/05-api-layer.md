@@ -355,17 +355,82 @@ The response **MUST** include a highly structured `extensions` dictionary contai
 In the backend `GlobalExceptionHandler`, this is achieved by enriching `ProblemDetails` when handling validation exception types:
 
 ```csharp
-if (exception is CommandValidationException validationException)
+// Middleware/GlobalExceptionHandler.cs
+internal sealed class GlobalExceptionHandler : IExceptionHandler
 {
-    problem.Extensions["invalidParams"] = new Dictionary<string, string[]>
+    private readonly IProblemDetailsService _problemDetailsService;
+
+    public GlobalExceptionHandler(IProblemDetailsService problemDetailsService)
     {
-        // Maps the exception field to its explicit constraint message in camelCase
-        { "title", new[] { validationException.Message } }
-    };
+        _problemDetailsService = problemDetailsService;
+    }
+
+    public async ValueTask<bool> TryHandleAsync(
+        HttpContext httpContext,
+        Exception exception,
+        CancellationToken cancellationToken)
+    {
+        var (statusCode, title) = exception switch
+        {
+            CommandValidationException or QueryValidationException
+                => (StatusCodes.Status400BadRequest, "Validation failure"),
+            AggregateNotFoundException
+                => (StatusCodes.Status404NotFound, "Not found"),
+            DomainException
+                => (StatusCodes.Status409Conflict, "Domain rule violated"),
+            _
+                => (StatusCodes.Status500InternalServerError, "An error occurred")
+        };
+
+        httpContext.Response.StatusCode = statusCode;
+
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = title,
+            Detail = exception.Message
+        };
+
+        // Attach field-level validation errors so the frontend can display
+        // them next to the relevant form fields.
+        if (exception is CommandValidationException commandValidation)
+        {
+            problemDetails.Extensions["invalidParams"] = commandValidation.ValidationErrors
+                .ToDictionary(
+                    e => e.PropertyName,
+                    e => new[] { e.ErrorMessage });
+        }
+        else if (exception is QueryValidationException queryValidation)
+        {
+            problemDetails.Extensions["invalidParams"] = queryValidation.ValidationErrors
+                .ToDictionary(
+                    e => e.PropertyName,
+                    e => new[] { e.ErrorMessage });
+        }
+
+        return await _problemDetailsService.TryWriteAsync(
+            new ProblemDetailsContext
+            {
+                HttpContext = httpContext,
+                ProblemDetails = problemDetails,
+                Exception = exception
+            });
+    }
 }
 ```
 
-The frontend **MUST** parse this `invalidParams` block and match the camelCase property names directly to Zod form fields.
+Register the handler in `Program.cs`:
+
+```csharp
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+// ...
+
+app.UseExceptionHandler();
+```
+
+> **ValidationErrors shape.** The exact type of `ValidationErrors` on `CommandValidationException` and `QueryValidationException` depends on the validation library in use. Adjust the projection to match the exception's actual property names. The `invalidParams` key in the extensions dictionary MUST be a `Dictionary<string, string[]>` where keys are camelCase property names.
 
 ---
 

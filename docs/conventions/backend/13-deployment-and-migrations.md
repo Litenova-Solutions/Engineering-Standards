@@ -1,6 +1,128 @@
 # Deployment and Migrations
 
-This document defines migration safety, environment promotion, feature flags, and deployment rules for production projects.
+This document defines local development orchestration, migration safety, environment promotion, feature flags, and deployment rules for production projects.
+
+---
+
+## 0. Local Development with .NET Aspire
+
+.NET Aspire is the standard local development orchestration layer. It replaces manually managed Docker Compose files. Every solution includes an AppHost project that models the entire application topology in code.
+
+### Project structure
+
+```
+src/
+├── {ProjectName}.AppHost/         # Aspire orchestration entry point
+│   ├── {ProjectName}.AppHost.csproj
+│   └── Program.cs
+└── {ProjectName}.ServiceDefaults/ # Shared OpenTelemetry, health checks, service discovery
+    ├── {ProjectName}.ServiceDefaults.csproj
+    └── Extensions.cs
+```
+
+The `ServiceDefaults` project contains the shared `AddServiceDefaults()` extension method that every service project calls from `Program.cs`. It wires up OpenTelemetry, health checks, and service discovery in one place.
+
+### AppHost program
+
+```csharp
+// AppHost/Program.cs
+var builder = DistributedApplication.CreateBuilder(args);
+
+// Aspire manages the PostgreSQL container. Credentials and port are
+// auto-generated. No hard-coded passwords or port numbers in source control.
+var postgres = builder.AddPostgres("postgres");
+var database = postgres.AddDatabase("database");
+
+builder.AddProject<Projects.{ProjectName}_WebApi>("api")
+    .WithReference(database)
+    .WaitFor(database);
+
+builder.Build().Run();
+```
+
+### Consuming apps
+
+In the WebApi project (and any other service), call `AddServiceDefaults()` and use the connection reference:
+
+```csharp
+// WebApi/Program.cs
+builder.AddServiceDefaults();
+
+// Aspire injects the connection string via environment variable.
+// The name "database" matches the name given to AddDatabase above.
+builder.AddNpgsqlDbContext<AppDbContext>("database");
+```
+
+Or keep using `GetConnectionString` if you prefer not to use the Aspire client integration:
+
+```csharp
+// Works with Aspire connection injection and without Aspire (reads from appsettings)
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("database")));
+```
+
+### Running locally
+
+```bash
+dotnet run --project src/{ProjectName}.AppHost
+```
+
+Aspire starts all services including the PostgreSQL container, performs health checks, and opens the Aspire Dashboard for logs, traces, and resource status.
+
+### Package references
+
+| Package | Project |
+|:---|:---|
+| `Aspire.Hosting.AppHost` | `{ProjectName}.AppHost` |
+| `Aspire.Hosting.PostgreSQL` | `{ProjectName}.AppHost` |
+| `{ProjectName}.ServiceDefaults` | `{ProjectName}.WebApi` (project reference) |
+| `Aspire.Npgsql.EntityFrameworkCore.PostgreSQL` | `{ProjectName}.WebApi` (optional, adds health checks and OTel) |
+
+Check the current Aspire docs for the latest package names and versions. The package ecosystem evolves with each Aspire release.
+
+### JavaScript and frontend apps in Aspire
+
+In Aspire 13+, the `Aspire.Hosting.JavaScript` package replaces the old `Aspire.Hosting.NodeJs` package. Update any existing AppHost projects accordingly.
+
+**Adding a Next.js app:**
+
+```csharp
+#pragma warning disable ASPIREJAVASCRIPT001 // AddNextJsApp is [Experimental]
+
+var web = builder.AddNextJsApp("web", "../apps/web")
+    .WithPnpm()                    // uses pnpm; auto-installs from workspace root
+    .WithHttpEndpoint(env: "PORT")
+    .WithExternalHttpEndpoints()
+    .DisableBuildValidation();     // remove once output: "standalone" is set in next.config
+```
+
+`DisableBuildValidation()` skips the check that `output: "standalone"` is set in `next.config.ts`. Use it during development. Remove it for production publish workflows.
+
+**pnpm workspaces.** When the repo uses a pnpm workspace (a single `pnpm-lock.yaml` at the repo root), run `pnpm install` from the workspace root before starting the AppHost. Aspire calls `pnpm install` in the app subdirectory, and pnpm walks up to find the workspace root automatically, so `WithPnpm()` requires no extra configuration.
+
+**Injecting service URLs across resources:**
+
+```csharp
+var api = builder.AddProject<Projects.{ProjectName}_WebApi>("api")
+    .WithReference(database)
+    .WaitFor(database)
+    .WithEnvironment("Cors__WebOrigin", web.GetEndpoint("http"));
+
+web.WithReference(api)
+   .WithEnvironment("API_BASE_URL", api.GetEndpoint("http"));
+```
+
+Use `GetEndpoint("http")` to pass a service's allocated URL to another resource at startup. Ports are dynamic; do not hard-code them.
+
+**`NEXT_PUBLIC_*` variables are substituted at build time, not at runtime.** Aspire injects environment variables at process startup. Variables prefixed `NEXT_PUBLIC_` are baked into the JavaScript bundle when `next build` runs, so they will not reflect Aspire-injected values in a pre-built container. Use server-only environment variables (no `NEXT_PUBLIC_` prefix) in Server Components and API routes, where `process.env` is read at request time. If client-side code needs a value that Aspire provides, expose it through a server-rendered config endpoint or a Next.js API route.
+
+**Package references for JavaScript hosting:**
+
+| Package | Project |
+|:---|:---|
+| `Aspire.Hosting.JavaScript` | `{ProjectName}.AppHost` |
+
+Add `<NoWarn>$(NoWarn);ASPIREJAVASCRIPT001</NoWarn>` to the AppHost `.csproj` to suppress the experimental diagnostic project-wide instead of using `#pragma warning disable` per file.
 
 ---
 
@@ -16,7 +138,61 @@ Use one of these deployment artifacts:
 
 Local development may use `dotnet ef database update`.
 
----
+### EF Core tooling requirements
+
+**Tool version must match the runtime.** The `dotnet-ef` global tool must be the same major.minor version as the `Microsoft.EntityFrameworkCore` package. A mismatch produces misleading errors. Install the matching version:
+
+```bash
+dotnet tool install --global dotnet-ef --version <same major.minor as EF Core package>
+```
+
+**`IDesignTimeDbContextFactory<T>` is required when the DbContext has extra constructor parameters.** If `AppDbContext` takes anything beyond `DbContextOptions<T>` (such as `IEventPublisher`), the tools cannot construct it at design time. Add a factory class in the Infrastructure project:
+
+```csharp
+// Infrastructure/Persistence/AppDbContextFactory.cs
+internal sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+{
+    public AppDbContext CreateDbContext(string[] args)
+    {
+        var connectionString =
+            Environment.GetEnvironmentVariable("ConnectionStrings__Database")
+            ?? "Host=localhost;Port=5432;Database=myapp;Username=myapp;Password=myapp";
+
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseNpgsql(connectionString)
+            .Options;
+
+        return new AppDbContext(options, new NoOpEventPublisher());
+    }
+}
+```
+
+The factory is auto-discovered by the EF tools when it is in the same assembly as the DbContext. No DI registration is needed.
+
+**File-scoped namespace requirement.** `EnforceCodeStyleInBuild=true` enforces IDE0161 (file-scoped namespaces). EF Core generates migration files with block-scoped namespaces (`namespace Foo { ... }`). After running `dotnet ef migrations add`, convert each generated file to file-scoped:
+
+```csharp
+// Generated (block-scoped) — violates IDE0161:
+namespace MyApp.Infrastructure.Migrations
+{
+    public partial class InitialCreate : Migration
+    {
+        // ...
+    }
+}
+
+// Required (file-scoped):
+namespace MyApp.Infrastructure.Migrations;
+
+public partial class InitialCreate : Migration
+{
+    // ...
+}
+```
+
+Convert all three generated files: the migration itself (`{Name}.cs`), the Designer file (`{Name}.Designer.cs`), and the snapshot update (`AppDbContextModelSnapshot.cs`).
+
+
 
 ## 2. Expand and Contract
 
