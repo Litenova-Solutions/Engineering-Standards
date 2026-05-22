@@ -37,8 +37,8 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Restore first for layer caching
-COPY ["src/{ProjectName}.WebApi/{ProjectName}.WebApi.csproj", "src/{ProjectName}.WebApi/"]
-COPY ["src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj", "src/{ProjectName}.Infrastructure/"]
+COPY ["apps/api/src/{ProjectName}.WebApi/{ProjectName}.WebApi.csproj", "apps/api/src/{ProjectName}.WebApi/"]
+COPY ["apps/api/src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj", "apps/api/src/{ProjectName}.Infrastructure/"]
 # ... copy all .csproj files before copying source ...
 COPY ["Directory.Build.props", "Directory.Build.props"]
 COPY ["Directory.Packages.props", "Directory.Packages.props"]
@@ -46,7 +46,7 @@ COPY ["{ProjectName}.slnx", "."]
 RUN dotnet restore "{ProjectName}.slnx"
 
 COPY . .
-RUN dotnet publish "src/{ProjectName}.WebApi/{ProjectName}.WebApi.csproj" \
+RUN dotnet publish "apps/api/src/{ProjectName}.WebApi/{ProjectName}.WebApi.csproj" \
     --configuration Release \
     --no-restore \
     --output /app/publish

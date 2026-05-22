@@ -35,6 +35,7 @@ public sealed class CorsOptions
     public const string SectionName = "Cors";
 
     [Required]
+    [MinLength(1, ErrorMessage = "At least one CORS origin is required.")]
     public required string[] AllowedOrigins { get; init; } = [];
 }
 
@@ -187,14 +188,14 @@ Use `dotnet user-secrets` for values that should not be committed even in develo
 
 ```bash
 # Initialize user secrets for the WebApi project
-dotnet user-secrets init --project src/{ProjectName}.WebApi
+dotnet user-secrets init --project apps/api/src/{ProjectName}.WebApi
 
 # Set a secret
 dotnet user-secrets set "JwtSettings:Secret" "my-local-secret" \
-    --project src/{ProjectName}.WebApi
+    --project apps/api/src/{ProjectName}.WebApi
 
 # List all secrets
-dotnet user-secrets list --project src/{ProjectName}.WebApi
+dotnet user-secrets list --project apps/api/src/{ProjectName}.WebApi
 ```
 
 User secrets are stored in `%APPDATA%\Microsoft\UserSecrets\{guid}\secrets.json` on Windows and `~/.microsoft/usersecrets/{guid}/secrets.json` on Linux/macOS. They are never in the repository.

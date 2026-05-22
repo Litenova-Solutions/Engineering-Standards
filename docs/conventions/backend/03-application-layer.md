@@ -384,6 +384,36 @@ var result = await _db.Posts
 
 Query validators throw `QueryValidationException` subclasses. Never throw `ArgumentException` or `ArgumentNullException`.
 
+List query validators MUST enforce pagination bounds before the handler runs.
+
+```csharp
+// GOOD: pagination validated in query validator
+internal sealed class GetAllPostsQueryValidator : IQueryValidator<GetAllPostsQuery>
+{
+    public Task ValidateAsync(
+        GetAllPostsQuery query,
+        CancellationToken cancellationToken)
+    {
+        if (query.Pagination.PageNumber < 1)
+        {
+            throw new PageNumberMustBePositiveException();
+        }
+
+        if (query.Pagination.PageSize < 1)
+        {
+            throw new PageSizeMustBePositiveException();
+        }
+
+        if (query.Pagination.PageSize > PaginationParameters.MaxPageSize)
+        {
+            throw new PageSizeExceedsMaximumException(PaginationParameters.MaxPageSize);
+        }
+
+        return Task.CompletedTask;
+    }
+}
+```
+
 ```csharp
 // GOOD:
 internal sealed class GetPostByIdQueryValidator

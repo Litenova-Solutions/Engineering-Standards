@@ -11,7 +11,7 @@ This document defines local development orchestration, migration safety, environ
 ### Project structure
 
 ```
-src/
+apps/api/src/
 ├── {ProjectName}.AppHost/         # Aspire orchestration entry point
 │   ├── {ProjectName}.AppHost.csproj
 │   └── Program.cs
@@ -64,7 +64,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 ### Running locally
 
 ```bash
-dotnet run --project src/{ProjectName}.AppHost
+dotnet run --project apps/api/src/{ProjectName}.AppHost
 ```
 
 Aspire starts all services including the PostgreSQL container, performs health checks, and opens the Aspire Dashboard for logs, traces, and resource status.
@@ -89,7 +89,7 @@ In Aspire 13+, the `Aspire.Hosting.JavaScript` package replaces the old `Aspire.
 ```csharp
 #pragma warning disable ASPIREJAVASCRIPT001 // AddNextJsApp is [Experimental]
 
-var web = builder.AddNextJsApp("web", "../apps/web")
+var web = builder.AddNextJsApp("web", "../../../apps/web")
     .WithPnpm()                    // uses pnpm; auto-installs from workspace root
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints()
@@ -174,8 +174,8 @@ In local development, run migrations manually before starting the AppHost. The A
 
 ```bash
 dotnet ef database update \
-    --project src/{ProjectName}.Infrastructure \
-    --startup-project src/{ProjectName}.WebApi
+    --project apps/api/src/{ProjectName}.Infrastructure \
+    --startup-project apps/api/src/{ProjectName}.WebApi
 ```
 
 Do NOT call `Database.MigrateAsync()` from `WebApi/Program.cs` startup in any environment. Migrations are a deployment operation, not a startup operation. For CI/CD, use a migration bundle or a reviewed SQL script as documented in Section 1 of this file.

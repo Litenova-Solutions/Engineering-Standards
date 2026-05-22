@@ -32,9 +32,9 @@ Every pull request MUST run:
 
 | Gate | Command |
 |:---|:---|
-| Backend build | `dotnet build src/{ProjectName}.slnx --configuration Release` |
-| Backend tests | `dotnet test src/{ProjectName}.slnx --configuration Release --no-build` |
-| Vulnerable NuGet packages | `dotnet list src/{ProjectName}.slnx package --vulnerable` |
+| Backend build | `dotnet build apps/api/{ProjectName}.slnx --configuration Release` |
+| Backend tests | `dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build` |
+| Vulnerable NuGet packages | `dotnet list apps/api/src/{ProjectName}.slnx package --vulnerable` |
 | Frontend install | `pnpm install --frozen-lockfile` |
 | Frontend lint | `pnpm lint` |
 | Frontend type check | `pnpm type-check` |
@@ -52,10 +52,10 @@ Skip frontend gates when the project has no frontend. Skip Playwright when no `a
 
 ```bash
 # 1. Build (generates openapi.json into the WebApi build output via Microsoft.Extensions.ApiDescription.Server)
-dotnet build src/{ProjectName}.slnx --configuration Release
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
 
 # 2. Copy the generated spec
-cp src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
+cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
 
 # 3. Regenerate TypeScript types
 pnpm --filter @myproject/api-types generate:api-types

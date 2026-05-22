@@ -44,8 +44,8 @@ npx openapi-typescript packages/api-types/openapi.json -o packages/api-types/src
 CI validates freshness:
 
 ```bash
-dotnet build src/{ProjectName}.slnx
-dotnet run --project src/{ProjectName}.WebApi -- --export-openapi packages/api-types/openapi.json
+dotnet build apps/api/{ProjectName}.slnx
+dotnet run --project apps/api/src/{ProjectName}.WebApi -- --export-openapi packages/api-types/openapi.json
 npx openapi-typescript packages/api-types/openapi.json -o packages/api-types/src/api.d.ts
 git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
 ```

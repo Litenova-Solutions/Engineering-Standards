@@ -297,7 +297,7 @@ builder.Services.AddOpenApi(options =>
 Integration tests MUST NOT use real JWT tokens. Use `TestAuthHandler` to inject controlled claims.
 
 ```csharp
-// tests/{ProjectName}.Integration.Tests/Auth/TestAuthHandler.cs
+// apps/api/tests/{ProjectName}.Integration.Tests/Auth/TestAuthHandler.cs
 public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string SchemeName = "TestAuth";
@@ -327,7 +327,7 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
 ```
 
 ```csharp
-// tests/{ProjectName}.Integration.Tests/Auth/TestUsers.cs
+// apps/api/tests/{ProjectName}.Integration.Tests/Auth/TestUsers.cs
 public static class TestUsers
 {
     public static readonly Guid DefaultUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");

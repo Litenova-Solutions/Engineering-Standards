@@ -94,7 +94,7 @@ Run vulnerability scans in every CI pipeline.
 pnpm audit
 
 # .NET
-dotnet list src/{ProjectName}.slnx package --vulnerable --include-transitive
+dotnet list apps/api/src/{ProjectName}.slnx package --vulnerable --include-transitive
 ```
 
 Both commands MUST produce zero high or critical severity findings. Exceptions require an ADR with the justification and the planned remediation date.

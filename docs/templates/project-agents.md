@@ -63,8 +63,8 @@ These rules extend the standards. They do not replace any rule in `standards/AGE
 
 ```bash
 # See standards/docs/conventions/shared/ci.md for the full verification pipeline.
-dotnet build src/{ProjectName}.slnx --configuration Release
-dotnet test src/{ProjectName}.slnx --configuration Release --no-build
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
+dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
 pnpm lint && pnpm type-check && pnpm test && pnpm build
 pnpm exec playwright test --config apps/web/playwright.config.ts
 ```

@@ -132,8 +132,8 @@ dotnet tool restore
 
 # Apply migrations from the backup's last migration to the current schema
 dotnet ef database update \
-  --project src/{ProjectName}.Infrastructure \
-  --startup-project src/{ProjectName}.WebApi
+  --project apps/api/src/{ProjectName}.Infrastructure \
+  --startup-project apps/api/src/{ProjectName}.WebApi
 ```
 
 This step is only required if the application has newer migrations than what the backup contains.

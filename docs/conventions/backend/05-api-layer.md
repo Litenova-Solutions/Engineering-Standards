@@ -89,7 +89,7 @@ app.MapEndpoints();
 ## Folder Structure
 
 ```
-src/{ProjectName}.WebApi/
+apps/api/src/{ProjectName}.WebApi/
 ├── GlobalUsings.cs
 ├── Endpoints/
 │   └── Posts/
@@ -600,19 +600,8 @@ builder.Services.AddOpenApi(options =>
 // No custom --export-openapi flag is needed. The spec is written to the build output
 // directory automatically during `dotnet build`. See the WebApi .csproj configuration below.
 
-// CORS
-builder.Services.AddCors(options =>
-{
-    var corsOptions = builder.Configuration
-        .GetSection("Cors")
-        .Get<CorsOptions>()!;
-
-    options.AddPolicy("Frontend", policy =>
-        policy
-            .WithOrigins(corsOptions.AllowedOrigins)
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-});
+// CORS (policy applied after app.Build() so IOptions<CorsOptions> is available)
+builder.Services.AddCors();
 
 // Authentication and authorization
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -641,8 +630,14 @@ app.UseSerilogRequestLogging();
 app.UseMiddleware<CorrelationIdMiddleware>();
 
 // UseCors MUST come after UseRouting but before UseAuthentication.
+// CorsOptions is validated at startup via ValidateOnStart().
+var corsOptions = app.Services.GetRequiredService<IOptions<CorsOptions>>().Value;
+
 app.UseRouting();
-app.UseCors("Frontend");
+app.UseCors(policy => policy
+    .WithOrigins(corsOptions.AllowedOrigins)
+    .AllowAnyHeader()
+    .AllowAnyMethod());
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();

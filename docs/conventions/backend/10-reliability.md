@@ -82,6 +82,28 @@ The `(scope, key)` pair MUST be unique. A repeated key with a different `Request
 
 Idempotency records are written in the same command transaction as the aggregate change. The `SaveChangesCommandPostHandler` remains the only place that commits.
 
+### Background jobs
+
+Background jobs that dispatch commands MUST reuse the same idempotency infrastructure as HTTP endpoints. Construct a deterministic `IdempotencyKey` from the job's own identifier and the command's logical operation.
+
+```csharp
+// GOOD: job idempotency key is deterministic from job ID and command type
+var idempotencyKey = $"job:{jobRunId}:send-reminder:{orderId.Value}";
+var command = new SendOrderReminderCommand
+{
+    OrderId = orderId,
+    IdempotencyKey = idempotencyKey
+};
+await _commandMediator.SendAsync(command, cancellationToken);
+```
+
+```csharp
+// BAD: job dispatches command with no idempotency key on a retriable operation
+await _commandMediator.SendAsync(new SendOrderReminderCommand { OrderId = orderId }, cancellationToken);
+```
+
+See `docs/blueprints/backend/idempotency.md` for the HTTP and Infrastructure wiring.
+
 ---
 
 ## 3. Outbox Escalation

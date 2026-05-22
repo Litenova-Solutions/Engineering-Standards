@@ -23,8 +23,8 @@ dotnet tool restore
 
 # Generate idempotent SQL migration script
 dotnet ef migrations script \
-  --project src/{ProjectName}.Infrastructure \
-  --startup-project src/{ProjectName}.WebApi \
+  --project apps/api/src/{ProjectName}.Infrastructure \
+  --startup-project apps/api/src/{ProjectName}.WebApi \
   --configuration Release \
   --output migration.sql \
   --idempotent \
@@ -32,8 +32,8 @@ dotnet ef migrations script \
 
 # Or from a specific migration to the latest
 dotnet ef migrations script <FromMigration> \
-  --project src/{ProjectName}.Infrastructure \
-  --startup-project src/{ProjectName}.WebApi \
+  --project apps/api/src/{ProjectName}.Infrastructure \
+  --startup-project apps/api/src/{ProjectName}.WebApi \
   --output migration.sql \
   --idempotent
 ```

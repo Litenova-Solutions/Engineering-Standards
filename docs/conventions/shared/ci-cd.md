@@ -62,17 +62,17 @@ jobs:
         run: dotnet tool restore
 
       - name: Build
-        run: dotnet build src/{ProjectName}.slnx --configuration Release
+        run: dotnet build apps/api/{ProjectName}.slnx --configuration Release
 
       - name: Test
         run: |
-          dotnet test src/{ProjectName}.slnx \
+          dotnet test apps/api/{ProjectName}.slnx \
             --configuration Release \
             --no-build \
             --collect:"XPlat Code Coverage"
 
       - name: Vulnerability scan
-        run: dotnet list src/{ProjectName}.slnx package --vulnerable --include-transitive
+        run: dotnet list apps/api/src/{ProjectName}.slnx package --vulnerable --include-transitive
 
   frontend-checks:
     name: Frontend
@@ -109,10 +109,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build backend
-        run: dotnet build src/{ProjectName}.slnx --configuration Release
+        run: dotnet build apps/api/{ProjectName}.slnx --configuration Release
 
       - name: Copy generated spec
-        run: cp src/{ProjectName}.WebApi/openapi.json packages/api-types/openapi.json
+        run: cp apps/api/src/{ProjectName}.WebApi/openapi.json packages/api-types/openapi.json
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -172,8 +172,8 @@ jobs:
         run: |
           dotnet tool restore
           dotnet ef migrations script \
-            --project src/{ProjectName}.Infrastructure \
-            --startup-project src/{ProjectName}.WebApi \
+            --project apps/api/src/{ProjectName}.Infrastructure \
+            --startup-project apps/api/src/{ProjectName}.WebApi \
             --output migration.sql \
             --idempotent
 
@@ -217,8 +217,8 @@ jobs:
         run: |
           dotnet tool restore
           dotnet ef migrations script \
-            --project src/{ProjectName}.Infrastructure \
-            --startup-project src/{ProjectName}.WebApi \
+            --project apps/api/src/{ProjectName}.Infrastructure \
+            --startup-project apps/api/src/{ProjectName}.WebApi \
             --output migration.sql \
             --idempotent
 
@@ -237,10 +237,10 @@ The OpenAPI freshness gate ensures the committed spec and TypeScript types match
 
 ```bash
 # 1. Build backend (generates openapi.json into the WebApi output directory)
-dotnet build src/{ProjectName}.slnx --configuration Release
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
 
 # 2. Copy generated spec
-cp src/{ProjectName}.WebApi/openapi.json packages/api-types/openapi.json
+cp apps/api/src/{ProjectName}.WebApi/openapi.json packages/api-types/openapi.json
 
 # 3. Regenerate TypeScript types
 pnpm --filter @myproject/api-types generate:api-types

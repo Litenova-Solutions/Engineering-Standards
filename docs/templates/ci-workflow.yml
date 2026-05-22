@@ -27,10 +27,10 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      - run: dotnet restore src/{ProjectName}.slnx
-      - run: dotnet build src/{ProjectName}.slnx --configuration Release --no-restore
-      - run: dotnet test src/{ProjectName}.slnx --configuration Release --no-build
-      - run: dotnet list src/{ProjectName}.slnx package --vulnerable
+      - run: dotnet restore apps/api/src/{ProjectName}.slnx
+      - run: dotnet build apps/api/{ProjectName}.slnx --configuration Release --no-restore
+      - run: dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
+      - run: dotnet list apps/api/src/{ProjectName}.slnx package --vulnerable
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
@@ -41,8 +41,8 @@ jobs:
 
       - name: OpenAPI freshness
         run: |
-          dotnet build src/{ProjectName}.slnx --configuration Release
-          cp src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
+          dotnet build apps/api/{ProjectName}.slnx --configuration Release
+          cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
           pnpm --filter @myproject/api-types generate:api-types
           git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
 

@@ -9,6 +9,7 @@
 - MUST await `params`, `searchParams`, `cookies`, `headers`.
 - `route.ts` MUST NOT be used except webhooks, OAuth callbacks, or file/binary responses.
 - ALL environment variable access MUST go through `lib/env.ts`. MUST NOT use `process.env.X` directly. See `docs/conventions/frontend/09-environment-and-runtime-config.md`.
+- Stay on the latest Next.js 16.x and React 19.x patch releases. RSC and middleware advisories (May 2026) require `next@16.2.6+` and matching `react@19.2.6`.
 
 ## 1. Guiding Philosophy
 
