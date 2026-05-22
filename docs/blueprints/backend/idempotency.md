@@ -13,6 +13,7 @@ For the conceptual rules, see `docs/conventions/backend/10-reliability.md`.
 - Keys are scoped per authenticated user. Two users may use the same key for different operations.
 - A key reused with a different request hash (different body) MUST return HTTP 409.
 - Records expire after 24 hours by default; a cleanup job hard-deletes expired records.
+- **Single transaction rule:** The idempotency record (`Started` and `Completed`), the aggregate change, and domain events MUST commit in one `SaveChangesAsync` call inside `SaveChangesCommandPostHandler`. MUST NOT call `SaveChangesAsync` in the endpoint or in `IdempotencyService`.
 
 ---
 
@@ -210,6 +211,8 @@ internal static class IdempotencyRequestHasher
 
 ## 5. Idempotency Service
 
+The service stages records on the EF Core `ChangeTracker` only. It MUST NOT call `SaveChangesAsync`. Persistence happens in `SaveChangesCommandPostHandler` in the same transaction as the aggregate change.
+
 ```csharp
 // Infrastructure/Reliability/Idempotency/IdempotencyService.cs
 internal sealed class IdempotencyService
@@ -218,72 +221,163 @@ internal sealed class IdempotencyService
 
     private readonly AppDbContext _context;
     private readonly TimeProvider _timeProvider;
-    private readonly ILogger<IdempotencyService> _logger;
 
-    public IdempotencyService(
-        AppDbContext context,
-        TimeProvider timeProvider,
-        ILogger<IdempotencyService> logger)
+    public IdempotencyService(AppDbContext context, TimeProvider timeProvider)
     {
         _context = context;
         _timeProvider = timeProvider;
-        _logger = logger;
     }
 
     public sealed record IdempotencyCheckResult(
-        bool IsNew,
-        IdempotencyRecord Record);
+        IdempotencyCheckOutcome Outcome,
+        IdempotencyRecord? Record);
+
+    public enum IdempotencyCheckOutcome
+    {
+        New,
+        Replay,
+        InProgress,
+        HashConflict
+    }
 
     /// <summary>
-    /// Finds an existing record or creates a new Started record.
-    /// Returns (IsNew: false, record) if a completed record exists — caller should replay.
-    /// Returns (IsNew: false, record) if a conflicting hash exists — caller should return 409.
-    /// Returns (IsNew: true, record) if this is the first time this key is seen.
+    /// Read-only check for completed or conflicting records. Used by the endpoint
+    /// before dispatching the command (no transaction opened yet).
     /// </summary>
-    public async Task<IdempotencyCheckResult> GetOrCreateAsync(
+    public async Task<IdempotencyCheckResult> CheckExistingAsync(
         Guid userId,
         string key,
         string requestHash,
         CancellationToken cancellationToken)
     {
         var existing = await _context.IdempotencyRecords
+            .AsNoTracking()
             .FirstOrDefaultAsync(
                 r => r.UserId == userId && r.Key == key,
                 cancellationToken);
 
-        if (existing is not null)
+        if (existing is null)
         {
-            return new IdempotencyCheckResult(IsNew: false, existing);
+            return new IdempotencyCheckResult(IdempotencyCheckOutcome.New, null);
         }
 
-        var record = IdempotencyRecord.StartProcessing(
-            userId, key, requestHash, _timeProvider.GetUtcNow(), DefaultTtl);
-
-        _context.IdempotencyRecords.Add(record);
-
-        try
+        if (existing.RequestHash != requestHash)
         {
-            await _context.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex))
-        {
-            // Race condition: another request inserted the record first. Load it.
-            var raceRecord = await _context.IdempotencyRecords
-                .FirstAsync(r => r.UserId == userId && r.Key == key, cancellationToken);
-            return new IdempotencyCheckResult(IsNew: false, raceRecord);
+            return new IdempotencyCheckResult(IdempotencyCheckOutcome.HashConflict, existing);
         }
 
-        return new IdempotencyCheckResult(IsNew: true, record);
+        if (existing.Status == IdempotencyStatus.Completed)
+        {
+            return new IdempotencyCheckResult(IdempotencyCheckOutcome.Replay, existing);
+        }
+
+        if (existing.Status == IdempotencyStatus.Started)
+        {
+            return new IdempotencyCheckResult(IdempotencyCheckOutcome.InProgress, existing);
+        }
+
+        return new IdempotencyCheckResult(IdempotencyCheckOutcome.New, null);
     }
 
-    private static bool IsUniqueConstraintViolation(DbUpdateException ex)
-        => ex.InnerException?.Message.Contains("uq_idempotency_records") == true;
+    /// <summary>
+    /// Stages a new Started record on the ChangeTracker. Does not save.
+    /// Called from IdempotencyCommandPreHandler inside the open command transaction.
+    /// </summary>
+    public IdempotencyRecord StageNewRecord(
+        Guid userId,
+        string key,
+        string requestHash)
+    {
+        var record = IdempotencyRecord.StartProcessing(
+            userId,
+            key,
+            requestHash,
+            _timeProvider.GetUtcNow(),
+            DefaultTtl);
+
+        _context.IdempotencyRecords.Add(record);
+        return record;
+    }
+
+    /// <summary>
+    /// Marks a tracked record Completed. Does not save.
+    /// Called from SaveChangesCommandPostHandler after the handler returns.
+    /// </summary>
+    public void MarkCompleted(IdempotencyRecord record, int statusCode, string? responseBody)
+    {
+        record.Complete(statusCode, responseBody);
+    }
 }
 ```
 
 ---
 
-## 6. Endpoint Integration
+## 6. Pipeline Behaviors
+
+Idempotency integrates with the command pipeline so the Started record, domain mutation, and Completed record share one transaction.
+
+```csharp
+// Infrastructure/Behaviors/IdempotencyCommandPreHandler.cs
+[HandlerPriority(8)]
+internal sealed class IdempotencyCommandPreHandler
+    : ICommandPreHandler<IIdempotentCommand>
+{
+    private readonly IdempotencyService _idempotencyService;
+
+    public IdempotencyCommandPreHandler(IdempotencyService idempotencyService)
+    {
+        _idempotencyService = idempotencyService;
+    }
+
+    public Task PreHandleAsync(
+        IIdempotentCommand command,
+        CancellationToken cancellationToken)
+    {
+        _idempotencyService.StageNewRecord(
+            command.UserId.Value,
+            command.IdempotencyKey,
+            command.RequestHash);
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+Commands that support idempotency implement `IIdempotentCommand` in `Application.Write.Contracts`:
+
+```csharp
+public interface IIdempotentCommand : ICommand
+{
+    UserId UserId { get; }
+    string IdempotencyKey { get; }
+    string RequestHash { get; }
+}
+```
+
+`SaveChangesCommandPostHandler` marks the idempotency record `Completed` before calling `SaveChangesAsync`:
+
+```csharp
+// Inside SaveChangesCommandPostHandler.PostHandleAsync (excerpt)
+if (command is IIdempotentCommand idempotent && result is not null)
+{
+    var record = _dbContext.IdempotencyRecords.Local
+        .Single(r => r.Key == idempotent.IdempotencyKey && r.UserId == idempotent.UserId.Value);
+
+    var responseJson = JsonSerializer.Serialize(result);
+    _idempotencyService.MarkCompleted(record, StatusCodes.Status201Created, responseJson);
+}
+
+await _dbContext.SaveChangesAsync(cancellationToken);
+await _dbContext.Database.CommitTransactionAsync(cancellationToken);
+```
+
+If the process crashes after commit, the record is `Completed` and replays correctly. If it crashes before commit, the transaction rolls back and no `Started` record persists.
+
+---
+
+## 7. Endpoint Integration
+
+The endpoint performs a read-only check before dispatching the command. It MUST NOT call `SaveChangesAsync`.
 
 ```csharp
 // Endpoint using idempotency
@@ -314,52 +408,38 @@ private static async Task<IResult> HandleAsync(
     var body = await new StreamReader(httpContext.Request.Body).ReadToEndAsync(cancellationToken);
     var requestHash = IdempotencyRequestHasher.Compute("POST", "/orders", body);
 
-    var check = await idempotencyService.GetOrCreateAsync(
+    var check = await idempotencyService.CheckExistingAsync(
         userId, idempotencyKey, requestHash, cancellationToken);
 
-    if (!check.IsNew)
+    switch (check.Outcome)
     {
-        if (check.Record.RequestHash != requestHash)
-        {
+        case IdempotencyService.IdempotencyCheckOutcome.HashConflict:
             return Results.Problem(
                 detail: "The Idempotency-Key was already used with a different request body.",
                 statusCode: StatusCodes.Status409Conflict);
-        }
 
-        if (check.Record.Status == IdempotencyStatus.Completed)
-        {
-            // Replay the original response
-            httpContext.Response.StatusCode = check.Record.ResponseStatusCode!.Value;
+        case IdempotencyService.IdempotencyCheckOutcome.Replay:
             return Results.Text(
-                check.Record.ResponseBody ?? "", "application/json",
+                check.Record!.ResponseBody ?? "",
+                "application/json",
                 statusCode: check.Record.ResponseStatusCode!.Value);
-        }
 
-        if (check.Record.Status == IdempotencyStatus.Started)
-        {
-            // In-flight concurrent request — return 409
+        case IdempotencyService.IdempotencyCheckOutcome.InProgress:
             return Results.Problem(
                 detail: "A request with this Idempotency-Key is currently being processed.",
                 statusCode: StatusCodes.Status409Conflict);
-        }
     }
 
-    var command = request.ToCommand(new UserId(userId));
+    var command = request.ToCommand(userId, idempotencyKey, requestHash);
     var result = await commandMediator.SendAsync(command, cancellationToken);
 
-    var response = result.ToResponse();
-    var responseJson = JsonSerializer.Serialize(response);
-
-    check.Record.Complete(StatusCodes.Status201Created, responseJson);
-    await idempotencyService.SaveAsync(cancellationToken);
-
-    return Results.Created($"/orders/{result.OrderId.Value}", response);
+    return Results.Created($"/orders/{result.OrderId.Value}", result.ToResponse());
 }
 ```
 
 ---
 
-## 7. Cleanup Job
+## 8. Cleanup Job
 
 ```csharp
 // Infrastructure/Reliability/Idempotency/CleanupIdempotencyRecordsHostedService.cs
@@ -415,7 +495,7 @@ internal sealed class CleanupIdempotencyRecordsHostedService : BackgroundService
 
 ---
 
-## 8. Registration
+## 9. Registration
 
 ```csharp
 // Infrastructure/DependencyInjection/InfrastructureServiceRegistration.cs

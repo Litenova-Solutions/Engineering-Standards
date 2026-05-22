@@ -80,7 +80,7 @@ Idempotency is enforced in Infrastructure with a table such as `IdempotencyRecor
 
 The `(scope, key)` pair MUST be unique. A repeated key with a different `RequestHash` MUST return `409 Conflict`.
 
-Idempotency records are written in the same command transaction as the aggregate change. The `SaveChangesCommandPostHandler` remains the only place that commits.
+Idempotency records are written in the same command transaction as the aggregate change. The `SaveChangesCommandPostHandler` remains the only place that commits. See `docs/blueprints/backend/idempotency.md` for the pipeline integration (no separate `SaveChangesAsync` in the endpoint or service).
 
 ### Background jobs
 

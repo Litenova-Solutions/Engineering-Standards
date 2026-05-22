@@ -215,9 +215,9 @@ sealed record GetPostByIdResponse
 ```csharp
 internal static class GetPostByIdApiMappings
 {
-    internal static GetPostByIdQuery ToQuery(this Guid postId)
+    internal static GetPostByIdQuery ToQuery(this PostId postId)
     {
-        return new GetPostByIdQuery { PostId = new PostId(postId) };
+        return new GetPostByIdQuery { PostId = postId };
     }
 
     internal static GetPostByIdResponse ToResponse(this PostResult result)
@@ -234,7 +234,7 @@ internal static class GetPostByIdApiMappings
 }
 ```
 
-> **Route parameter type rule.** Route parameters MUST use `Guid` in the endpoint method signature. The `ApiMappings` extension method constructs the strongly-typed ID. This keeps OpenAPI schema generation simple and avoids requiring OpenAPI schema transformers for route parameters.
+> **Route parameter type rule.** Route parameters MUST use strongly typed IDs (`PostId`, `OrderId`, etc.) that implement `IParsable<T>`. ASP.NET Core binds them from the route segment. Register `StronglyTypedIdSchemaTransformer` so OpenAPI documents them as `string` (`format: uuid`). See `docs/conventions/backend/02-domain-layer.md` (Strongly-Typed ID Reference).
 
 ### Endpoint Class
 
@@ -243,7 +243,7 @@ sealed class GetPostByIdEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/posts/{id:guid}", HandleAsync)
+        app.MapGet("/posts/{id}", HandleAsync)
             .WithName("GetPostById")
             .WithTags("Posts")
             .WithSummary("Returns a single post by its ID.")
@@ -253,7 +253,7 @@ sealed class GetPostByIdEndpoint : IEndpoint
     }
 
     private static async Task<IResult> HandleAsync(
-        Guid id,
+        PostId id,
         IQueryMediator queryMediator,
         CancellationToken cancellationToken)
     {
@@ -287,7 +287,7 @@ internal static class PostEndpointGroup
             .Produces<CreatePostResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
-        group.MapGet("/{id:guid}", GetPostByIdEndpoint.Handle)
+        group.MapGet("/{id}", GetPostByIdEndpoint.Handle)
             .WithName("GetPostById")
             .WithSummary("Returns a single post by its ID.")
             .Produces<GetPostByIdResponse>(StatusCodes.Status200OK)
@@ -627,10 +627,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
-app.UseMiddleware<CorrelationIdMiddleware>();
 
-// UseCors MUST come after UseRouting but before UseAuthentication.
-// CorsOptions is validated at startup via ValidateOnStart().
 var corsOptions = app.Services.GetRequiredService<IOptions<CorsOptions>>().Value;
 
 app.UseRouting();
@@ -640,6 +637,8 @@ app.UseCors(policy => policy
     .AllowAnyMethod());
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Rate limiter MUST run after CORS so 429 responses include CORS headers for browser clients.
 app.UseRateLimiter();
 
 app.MapEndpoints();

@@ -58,33 +58,54 @@ In monorepos, the .NET solution MUST live under apps/api/, not at the repository
 
 ## 2. Deterministic Scaffolding Sequence
 
-When implementing a new aggregate or business feature, developers and AI agents **MUST** follow this exact 7-step chronological sequence. Do not skip steps or write outer layers before completing inner boundaries.
+When implementing a new aggregate or business feature, developers and AI agents **MUST** follow this exact sequence. Run verification checkpoints after steps 3, 5, 7, and 8. Do not skip steps or write outer layers before completing inner boundaries.
 
 ```mermaid
 graph TD
     Step1["1. Domain Entity and ID"]
     Step2["2. Repository Interface"]
     Step3["3. EF Core Configuration"]
+    Step3b["Checkpoint: dotnet build + dotnet ef migrations add"]
     Step4["4. Contracts Projects"]
     Step5["5. Handlers and Validators"]
+    Step5b["Checkpoint: dotnet build + dotnet test Application.Tests"]
     Step6["6. Reactions (conditional)"]
     Step7["7. WebApi Endpoint and DI"]
+    Step7b["Checkpoint: dotnet build + dotnet test Integration.Tests"]
+    Step8["8. Frontend feature slice (if applicable)"]
+    Step8b["Checkpoint: pnpm lint + type-check + test"]
 
     Step1 --> Step2
     Step2 --> Step3
-    Step3 --> Step4
+    Step3 --> Step3b
+    Step3b --> Step4
     Step4 --> Step5
-    Step5 --> Step6
+    Step5 --> Step5b
+    Step5b --> Step6
     Step6 --> Step7
+    Step7 --> Step7b
+    Step7b --> Step8
+    Step8 --> Step8b
 ```
 
 1. **Domain:** Strongly-typed ID and aggregate root.
 2. **Repository interface** in `Domain`.
-3. **EF configuration** in `Infrastructure`.
+3. **EF configuration** in `Infrastructure`. **Checkpoint:** `dotnet build apps/api/{ProjectName}.slnx` and `dotnet ef migrations add {Name}` when schema changed.
 4. **Command/query records** in Contracts projects.
-5. **Handlers and validators** in `Application.Write` / `Application.Read`.
-6. **Narrow interface in `Application.Reactions` + Infrastructure implementation** (conditional: add only when an aggregate method raises a domain event that requires an external side effect; skip if no domain event is needed).
-7. **`IEndpoint` and DI** in `WebApi` / `Infrastructure`.
+5. **Handlers and validators** in `Application.Write` / `Application.Read`. **Checkpoint:** `dotnet test apps/api/tests/{ProjectName}.Application.Tests`.
+6. **Narrow interface in `Application.Reactions` + Infrastructure implementation** (conditional: add only when an aggregate method raises a domain event that requires an external side effect).
+7. **`IEndpoint` and DI** in `WebApi` / `Infrastructure`. **Checkpoint:** `dotnet test apps/api/tests/{ProjectName}.Integration.Tests` and architecture tests.
+8. **Frontend feature slice** (when the feature has UI). **Checkpoint:** `pnpm lint && pnpm type-check && pnpm test`.
+
+Minimum commands between checkpoints:
+
+```bash
+dotnet build apps/api/{ProjectName}.slnx --configuration Release
+dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
+dotnet ef migrations add {MigrationName} \
+  --project apps/api/src/{ProjectName}.Infrastructure \
+  --startup-project apps/api/src/{ProjectName}.WebApi
+```
 
 ---
 
@@ -138,17 +159,7 @@ export async function publishPost(_postId: PostId) {
 
 #### 3. LiteBus Module Registration
 
-```csharp
-// DO: one AddCommandModule call, multiple RegisterFromAssembly inside
-builder.Services.AddLiteBus(liteBus =>
-{
-    liteBus.AddCommandModule(module =>
-    {
-        module.RegisterFromAssembly(typeof(ApplicationWriteAssemblyMarker).Assembly);
-        module.RegisterFromAssembly(typeof(InfrastructureAssemblyMarker).Assembly);
-    });
-});
-```
+LiteBus registration is authoritative in `docs/blueprints/backend/program-cs.md` and `docs/conventions/backend/05-api-layer.md`. Other documents MUST reference those files instead of duplicating registration blocks.
 
 ```csharp
 // DON'T: calling AddCommandModule twice causes a duplicate key error

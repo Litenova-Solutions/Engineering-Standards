@@ -6,7 +6,7 @@ This document defines backend testing philosophy, test project structure, and pa
 
 - Assertions MUST use AwesomeAssertions; MUST NOT use xUnit `Assert.*` in new tests.
 - Domain tests: no mocks; Application command tests: mock repositories only.
-- Query handler tests: SQLite in-process; Integration: Testcontainers PostgreSQL.
+- Query handler tests: PostgreSQL via Testcontainers (same provider as production); Integration: Testcontainers PostgreSQL.
 - `{ProjectName}.Architecture.Tests` with NetArchTest is REQUIRED (`docs/decisions/architecture-tests-as-enforcement.md`).
 - Mutation testing REQUIRED for high-risk validators; OPTIONAL elsewhere.
 
@@ -62,7 +62,7 @@ dotnet test apps/api/tests/{ProjectName}.Application.Tests \
 Add `coverlet.collector` to each test project's `.csproj`:
 
 ```xml
-<!-- apps/api/tests/{ProjectName}.Domain.apps/api/tests/{ProjectName}.Domain.Tests.csproj -->
+<!-- apps/api/tests/{ProjectName}.Domain.Tests/{ProjectName}.Domain.Tests.csproj -->
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
@@ -73,7 +73,7 @@ Add `coverlet.collector` to each test project's `.csproj`:
 ### 2. Strict Mocking Guidelines
 Mocking is a powerful tool, but over-mocking creates fragile tests that lock implementation details rather than behavior.
 
-*   **Forbid Mocking `IDatabaseContext`:** You **MUST NOT** use NSubstitute or any mocking library to mock `IDatabaseContext` or `IQueryable<T>`. Because queries run direct EF Core LINQ projections, mocking the queryable interface is extremely error-prone and hides database translation issues. Query handler tests **MUST** use the real in-process SQLite provider (`InMemoryDbContextFactory.Create()`).
+*   **Forbid Mocking `IDatabaseContext`:** You **MUST NOT** use NSubstitute or any mocking library to mock `IDatabaseContext` or `IQueryable<T>`. Query handler tests **MUST** use a real PostgreSQL database via Testcontainers so LINQ translations match production (including PostgreSQL-specific functions in `docs/conventions/backend/19-raw-sql-and-reporting.md`).
 *   **No Mock Verification on Queries:** Since queries are side-effect-free, you **MUST NOT** verify that a mock was called during a query handler test. Query assertions **MUST** rely exclusively on asserting the correctness of the returned result.
 *   **Limit Mock Depth (No Transitive Mocking):** NSubstitute mocks **MUST** only mock direct dependencies of the unit under test (e.g., `IPostRepository`). Mocking nested dependencies (e.g., mocking a dependency returned by another mocked object) is strictly forbidden. If a dependency requires complex setup, use a real lightweight test implementation or a Test Builder instead.
 
@@ -115,7 +115,7 @@ Unit tests for aggregates, value objects, and domain services. No mocking framew
 
 ### `{ProjectName}.Application.Tests`
 
-Unit tests for command handlers, validators, and event handlers use NSubstitute to mock repository interfaces. Query handler tests use the EF Core SQLite in-memory provider via `InMemoryDbContextFactory`. This exercises real EF Core query translation without requiring a running database, keeping Application.Tests a fast, dependency-free unit test project.
+Unit tests for command handlers, validators, and event handlers use NSubstitute to mock repository interfaces. Query handler tests use PostgreSQL via Testcontainers with a shared fixture per test class. This exercises the same SQL dialect as production, including raw SQL and full-text search.
 
 ### `{ProjectName}.Integration.Tests`
 
@@ -285,47 +285,53 @@ public sealed class CreatePostCommandHandlerTests
 
 ### Query Handler Test
 
-Query handler tests use EF Core's SQLite in-memory provider. The `IDatabaseContext` interface is satisfied by a real `AppDbContext` wired to an in-memory SQLite database, so EF Core query translation is exercised without requiring a running PostgreSQL instance. Application.Tests is a unit test project; no containers or external processes are needed.
+Query handler tests use PostgreSQL via Testcontainers. The `IDatabaseContext` interface is satisfied by a real `AppDbContext` wired to the container, so EF Core query translation matches production. This is required for queries that use PostgreSQL-specific functions (`to_tsvector`, window functions, JSON operators).
 
-Add the SQLite provider package to the test project:
+Add Testcontainers to the Application.Tests project:
+
 ```xml
-<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+<PackageReference Include="Testcontainers.PostgreSql" />
+<PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
 ```
 
 ```csharp
-// Application.Tests/Fixtures/InMemoryDbContextFactory.cs
-static class InMemoryDbContextFactory
+// Application.Tests/Fixtures/PostgreSqlQueryFixture.cs
+public sealed class PostgreSqlQueryFixture : IAsyncLifetime
 {
-    public static AppDbContext Create()
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
+        .WithImage("postgres:18-alpine")
+        .Build();
+
+    public AppDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite("DataSource=:memory:")
+            .UseNpgsql(_container.GetConnectionString())
+            .UseSnakeCaseNamingConventions()
             .Options;
 
-        var db = new AppDbContext(options, new NoOpEventPublisher());
-        db.Database.OpenConnection();
-        db.Database.EnsureCreated();
-        return db;
+        var context = new AppDbContext(options);
+        context.Database.Migrate();
+        return context;
     }
 
-    // Inline stub so Application.Tests does not need to reference Infrastructure.
-    // MUST match the interface implementation in Infrastructure/Persistence/NoOpEventPublisher.cs.
-    private sealed class NoOpEventPublisher : IEventPublisher
-    {
-        Task IEventPublisher.PublishAsync<TEvent>(
-            TEvent @event,
-            EventMediationSettings? settings,
-            CancellationToken cancellationToken)
-            => Task.CompletedTask;
-    }
+    public Task InitializeAsync() => _container.StartAsync();
+
+    public Task DisposeAsync() => _container.DisposeAsync().AsTask();
 }
 ```
 
 ```csharp
 // Application.Tests/Posts/GetPostByIdQueryHandlerTests.cs
-public sealed class GetPostByIdQueryHandlerTests : IDisposable
+public sealed class GetPostByIdQueryHandlerTests : IClassFixture<PostgreSqlQueryFixture>, IDisposable
 {
-    private readonly AppDbContext _db = InMemoryDbContextFactory.Create();
+    private readonly AppDbContext _db;
+    private readonly PostgreSqlQueryFixture _fixture;
+
+    public GetPostByIdQueryHandlerTests(PostgreSqlQueryFixture fixture)
+    {
+        _fixture = fixture;
+        _db = fixture.CreateContext();
+    }
 
     public void Dispose() => _db.Dispose();
 
@@ -336,7 +342,8 @@ public sealed class GetPostByIdQueryHandlerTests : IDisposable
             PostId.New(),
             new PostTitle("Test Post"),
             new PostContent("Content"),
-            new AuthorId(Guid.NewGuid()));
+            new AuthorId(Guid.NewGuid()),
+            DateTimeOffset.UtcNow);
 
         await _db.Posts.AddAsync(post);
         await _db.SaveChangesAsync();
@@ -364,8 +371,9 @@ public sealed class GetPostByIdQueryHandlerTests : IDisposable
 }
 ```
 
-> **Why SQLite and not EF Core InMemory provider?**
-> The EF Core in-memory provider skips relational constraints and does not translate LINQ the same way PostgreSQL does. SQLite exercises real SQL translation while remaining a fully in-process, zero-infrastructure dependency. Queries that would silently succeed against the InMemory provider and fail at runtime against PostgreSQL are caught by the SQLite provider during development.
+> **Why PostgreSQL and not SQLite?** SQLite cannot translate PostgreSQL full-text search, window functions, or many raw SQL patterns documented in `19-raw-sql-and-reporting.md`. Query tests that pass on SQLite and fail in staging are a common agent failure mode. Use Testcontainers for query handler tests; reserve SQLite only for Domain tests that never touch EF Core.
+
+> **PostgreSQL version.** Use `postgres:18-alpine` for new projects. Pin the major version in project ADR if the deployment target requires an older major.
 
 ---
 
@@ -389,7 +397,7 @@ This declaration is included in the canonical `Program.cs` template in `docs/con
 sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:16-alpine")
+        .WithImage("postgres:18-alpine")
         .Build();
 
     public async Task InitializeAsync()

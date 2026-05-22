@@ -53,10 +53,10 @@ public sealed class Post : AggregateRoot<PostId>
         }
 
         DeletedAtUtc = utcNow;
-        AddDomainEvent(new PostDeleted(Id));
+        RaiseDomainEvent(new PostDeleted(Id));
     }
 
-    public void Restore()
+    public void Restore(DateTimeOffset utcNow)
     {
         if (!IsDeleted)
         {
@@ -64,7 +64,7 @@ public sealed class Post : AggregateRoot<PostId>
         }
 
         DeletedAtUtc = null;
-        AddDomainEvent(new PostRestored(Id));
+        RaiseDomainEvent(new PostRestored(Id));
     }
 }
 ```

@@ -46,7 +46,7 @@ The `AppHost` project is the local development entry point. Run `dotnet run --pr
 
 ## 2. `global.json`
 
-Every solution MUST include a `global.json` at the solution root that pins the .NET SDK version.
+Every solution MUST include a `global.json` at the solution root that pins the .NET SDK version. Copy from `docs/templates/` or the example below.
 
 ```json
 {
@@ -65,7 +65,7 @@ This file MUST be committed to source control. It MUST NOT appear in `.gitignore
 
 ## 3. `Directory.Build.props`
 
-A `Directory.Build.props` file at the solution root sets metadata shared across all projects. Every project in the solution inherits these settings automatically without any configuration in individual `.csproj` files.
+A `Directory.Build.props` file at the solution root sets metadata shared across all projects. Copy `docs/templates/Directory.Build.props` or use:
 
 ```xml
 <Project>
@@ -113,7 +113,7 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
 
 ## 4. `Directory.Packages.props`
 
-All NuGet package versions are managed centrally via `Directory.Packages.props` at the solution root. Individual `.csproj` files reference packages without version numbers.
+All NuGet package versions are managed centrally via `Directory.Packages.props` at the solution root. Copy `docs/templates/Directory.Packages.props` and pin versions from `standards.manifest.json`.
 
 ```xml
 <Project>

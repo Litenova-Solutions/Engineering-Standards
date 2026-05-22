@@ -183,23 +183,34 @@ public sealed class PostIdRequiredException : QueryValidationException
     public PostIdRequiredException()
         : base("A post ID is required and cannot be the default value.", nameof(GetPostByIdQuery.PostId)) { }
 }
+
+// Shared pagination validators (in Application.Read.Contracts/Shared/Exceptions/)
+public sealed class PageNumberMustBePositiveException : QueryValidationException
+{
+    public PageNumberMustBePositiveException()
+        : base("Page number must be at least 1.", nameof(PaginationParameters.PageNumber)) { }
+}
+
+public sealed class PageSizeMustBePositiveException : QueryValidationException
+{
+    public PageSizeMustBePositiveException()
+        : base("Page size must be at least 1.", nameof(PaginationParameters.PageSize)) { }
+}
+
+public sealed class PageSizeExceedsMaximumException : QueryValidationException
+{
+    public PageSizeExceedsMaximumException(int maxPageSize)
+        : base($"Page size cannot exceed {maxPageSize}.", nameof(PaginationParameters.PageSize)) { }
+}
 ```
 
 ---
 
 ## The GlobalExceptionHandler
 
-The canonical `GlobalExceptionHandler` implementation is in `docs/conventions/backend/05-api-layer.md`. Endpoints MUST NOT contain `try-catch` blocks.
+The canonical `GlobalExceptionHandler` implementation is in `docs/blueprints/backend/program-cs.md` (Supporting Files). `docs/conventions/backend/05-api-layer.md` shows `Program.cs` registration only. Endpoints MUST NOT contain `try-catch` blocks.
 
 `DbUpdateConcurrencyException` from EF Core MUST be caught in the `GlobalExceptionHandler` and mapped to HTTP 409. Add it to the exception switch alongside `DomainException`. See `docs/conventions/backend/17-concurrency.md` for the full pattern.
-
-> **Security note.** Unhandled exceptions (HTTP 500) MUST NOT expose `exception.Message` in the `Detail` field of the response. Stack traces and internal system details in API responses are an information disclosure risk (OWASP A05). The `GlobalExceptionHandler` MUST use a generic message for 500 responses:
->
-> ```csharp
-> Detail = statusCode == StatusCodes.Status500InternalServerError
->     ? "An unexpected error occurred. Please contact support."
->     : exception.Message
-> ```
 
 > **Security note.** Unhandled exceptions (HTTP 500) MUST NOT expose `exception.Message` in the `Detail` field of the response. Stack traces and internal system details in API responses are an information disclosure risk (OWASP A05). The `GlobalExceptionHandler` MUST use a generic message for 500 responses:
 >

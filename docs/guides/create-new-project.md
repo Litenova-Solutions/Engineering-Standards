@@ -100,7 +100,7 @@ dotnet new xunit -n {ProjectName}.Architecture.Tests -o tests/{ProjectName}.Arch
 dotnet sln add src/**/*.csproj tests/**/*.csproj
 ```
 
-Copy `global.json`, `Directory.Build.props`, and `Directory.Packages.props` into `apps/api/` from `docs/conventions/backend/01-solution-structure.md` sections 2 and 4. Update package versions from `standards.manifest.json`.
+Copy `global.json`, `Directory.Build.props`, and `Directory.Packages.props` into `apps/api/` from `docs/templates/` in this standards repository. Update package versions from `standards.manifest.json`.
 
 Create `apps/api/.config/dotnet-tools.json`:
 
