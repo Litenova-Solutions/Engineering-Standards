@@ -1,4 +1,4 @@
-# 0019. API Versioning Policy
+# API Versioning Policy
 
 **Status:** Accepted
 
@@ -42,4 +42,3 @@ Breaking changes require a new version. Additive changes do not.
 ### Risks
 
 - Teams may call a breaking response-shape change "additive" to avoid a new version. Contract tests and OpenAPI diff checks must catch this before merge.
-

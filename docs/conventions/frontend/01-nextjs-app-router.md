@@ -1,8 +1,17 @@
 # Next.js App Router Conventions
 
+## Agent Quick Rules
+
+- Default to Server Components; `'use client'` MUST have an explanatory comment.
+- `page.tsx` MUST be a thin shell; logic lives in `features/{feature}/`.
+- MUST NOT import across `features/{a}/` and `features/{b}/`.
+- `proxy.ts` MUST only do optimistic cookie checks; authoritative auth in Server Components/Actions.
+- MUST await `params`, `searchParams`, `cookies`, `headers`.
+- `route.ts` MUST NOT be used except webhooks, OAuth callbacks, or file/binary responses.
+
 ## 1. Guiding Philosophy
 
-The App Router is a full-stack rendering framework, not a client-side router. Its fundamental split between server components and client components maps directly to the read/write separation in the backend architecture. Server components are the read path: they fetch data, render HTML, and send it to the browser with zero JavaScript. Client components are the write path: they handle user interactions, manage local state, and trigger mutations. This split is enforced by the framework and should be respected, not worked around.
+The App Router is a full-stack rendering framework, not a client-side router. Its fundamental split between server components and client components maps directly to the read/write separation in the backend architecture. Server components are the read path: they fetch data, render HTML, and send it to the browser with zero JavaScript. Client components are the write path: they handle user interactions, manage local state, and trigger mutations. This split is enforced by the framework and MUST be respected, not worked around.
 
 Every architectural decision in this guide follows from that split. A component that fetches data and renders it statically is a server component. A component that responds to a button click is a client component. A page that does both passes data from a server component parent to a client component child. The boundary is explicit, deliberate, and documented with a comment on every `"use client"` directive.
 
@@ -76,7 +85,7 @@ function PostDetail({ postId }: { postId: string }) {
 | `loading.tsx` | Suspense boundary UI for a segment | Shown while the segment's `page.tsx` is streaming. |
 | `error.tsx` | Error boundary for a segment | MUST be a client component (`"use client"`). |
 | `not-found.tsx` | UI shown when `notFound()` is called | Can be a server component. |
-| `route.ts` | HTTP Route Handler for the segment | Use sparingly; prefer Server Actions or direct server component fetching. |
+| `route.ts` | HTTP Route Handler for the segment | MUST NOT be used except for OAuth callbacks, webhooks, or binary/file responses. Otherwise use Server Actions or server component fetching. |
 | `proxy.ts` | Runs before every request (renamed from `middleware.ts`) | `middleware.ts` is deprecated in Next.js 16. Run `npx @next/codemod@canary middleware-to-proxy` to migrate. MUST perform only optimistic checks (see Section 6). |
 | `template.tsx` | Like `layout.tsx` but re-renders on navigation | Use only when a fresh instance is explicitly required on each navigation. |
 | `default.tsx` | Fallback UI for parallel routes | Required when a slot has no matching segment during soft navigation. |
@@ -313,7 +322,7 @@ export async function getPublishedPosts() {
 
 ## 10. TypeScript Configuration
 
-Recommended `tsconfig.json` for a Next.js 16 project with TypeScript 6.0:
+Projects MUST use this `tsconfig.json` baseline for Next.js 16 with TypeScript 6.0:
 
 ```json
 {
@@ -340,11 +349,38 @@ Recommended `tsconfig.json` for a Next.js 16 project with TypeScript 6.0:
 }
 ```
 
-`moduleResolution: "bundler"` is recommended over `"node16"` for Next.js projects because it matches how Turbopack and Webpack resolve modules. The `--outFile` compiler option has been removed in TypeScript 6.0 and MUST NOT be used.
+`moduleResolution` MUST be `"bundler"` for Next.js projects. The `--outFile` compiler option has been removed in TypeScript 6.0 and MUST NOT be used.
 
 ---
 
-## 11. Project-Specific Configuration
+## 11. Feature Vertical Slices
+
+Frontend features follow the same vertical slice boundaries as backend use cases. Each feature folder owns its routes, components, actions, hooks, and stores.
+
+**Import rules:**
+
+- Code under `features/{feature}/` MUST NOT import from `features/{otherFeature}/`.
+- Cross-feature reuse MUST follow the promotion rule in `docs/conventions/00-principles.md`: promote shared implementation code to `shared/` (import as `@/shared/...`) or generic UI to `components/ui/`.
+- `app/` route shells MUST import feature entry components from `features/{feature}/` only. They MUST NOT contain business logic.
+
+```typescript
+// GOOD: posts feature imports only its own modules and shared layers
+import { PostCard } from "@/features/posts/list/PostCard"
+import { formatRelativeDate } from "@/shared/dates/formatRelativeDate"
+import { Button } from "@/components/ui/button"
+```
+
+```typescript
+// BAD: posts feature imports authors feature internals
+import { AuthorAvatar } from "@/features/authors/shared/AuthorAvatar"
+// BAD: cross-feature coupling; promote AuthorAvatar to @/shared/ or components/ui/
+```
+
+Feature-local shared code (`features/{feature}/shared/`) is for reuse within one feature only. It MUST NOT be imported by other features.
+
+---
+
+## 12. Project-Specific Configuration
 
 > **Project teams: fill in this section when adopting these standards.**
 

@@ -1,4 +1,4 @@
-# 0003. CQRS with Split Application Projects
+# CQRS with Split Application Projects
 
 **Status:** Accepted
 
@@ -43,4 +43,4 @@ The application layer is split into five projects: `Application.Write.Contracts`
 
 ### Risks
 
-- If the project reference rules are not enforced by architecture tests, the boundaries will erode as shortcuts are taken. Architecture tests are required (see ADR 0009).
+- If the project reference rules are not enforced by architecture tests, the boundaries will erode as shortcuts are taken. Architecture tests are required (see `docs/decisions/architecture-tests-as-enforcement.md`).

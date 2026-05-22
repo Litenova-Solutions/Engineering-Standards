@@ -1,4 +1,4 @@
-# 0001. Agentic Development as Primary Development Model
+# Agentic Development as Primary Development Model
 
 **Status:** Accepted
 

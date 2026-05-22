@@ -2,7 +2,7 @@
 
 This document defines the observability conventions for structured logging, correlation IDs, OpenTelemetry traces and metrics, and health checks. Every production project MUST implement these conventions before going live.
 
-> This convention implements ADR 0018.
+> This convention implements `docs/decisions/opentelemetry-observability.md`.
 
 ---
 
@@ -205,7 +205,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 | `/health/live` | Is the process alive? | None (always 200 if running) |
 | `/health/ready` | Can the process serve traffic? | PostgreSQL connectivity |
 
-Health endpoints SHOULD be excluded from high-volume request metrics when they distort dashboards.
+Health endpoints MUST be excluded from high-volume request metrics when they distort dashboards.
 
 ---
 

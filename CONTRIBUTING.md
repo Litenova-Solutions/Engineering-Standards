@@ -15,7 +15,7 @@ Anyone working on a project that follows these standards can propose a change. C
 Everything requires a pull request. This includes:
 
 - Adding or changing a convention file
-- Adding or changing an ADR
+- Adding or changing a decision record in `docs/decisions/`
 - Adding or changing a template
 - Updating agent context files (`AGENTS.md`, `.cursor/rules/`, `.github/copilot-instructions.md`, `.windsurfrules`, `CLAUDE.md`, `GEMINI.md`)
 - Fixing typos or adding examples to existing documents

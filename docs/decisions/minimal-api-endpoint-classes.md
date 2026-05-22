@@ -1,4 +1,4 @@
-# 0005. Minimal API Endpoint Classes
+# Minimal API Endpoint Classes
 
 **Status:** Accepted
 
@@ -25,7 +25,7 @@ All HTTP endpoints MUST implement `IEndpoint`. MVC controllers (classes inheriti
 - No MVC overhead, attribute routing, or action result conventions.
 - Each endpoint is a focused, independently testable class.
 - Endpoint registration is explicit and discoverable: all `IEndpoint` implementations are registered by scanning the WebApi assembly.
-- The constraint is easy to enforce with an architecture test (see ADR 0009).
+- The constraint is easy to enforce with an architecture test (see `docs/decisions/architecture-tests-as-enforcement.md`).
 
 ### Negative
 

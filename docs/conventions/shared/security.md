@@ -219,6 +219,6 @@ Frontend projects MUST also run `pnpm audit` in CI. For high-severity supply-cha
 
 ## 12. OWASP Top 10
 
-All engineers working on projects following these standards should be familiar with the [OWASP Top 10](https://owasp.org/www-project-top-ten/). The rules in this document address the most common of these risks, but they are not exhaustive.
+All engineers working on security-sensitive changes MUST review the [OWASP Top 10](https://owasp.org/www-project-top-ten/). The rules in this document address the most common of these risks, but they are not exhaustive.
 
 When designing a feature that handles sensitive data, authentication, or authorization, consult the OWASP guidelines for the relevant risk category before starting implementation.

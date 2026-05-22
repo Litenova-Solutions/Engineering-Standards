@@ -2,7 +2,7 @@
 
 This document defines the reliability conventions for idempotent HTTP commands, durable event dispatch, retries, and failure handling. Read it before implementing any operation where a retry could create duplicate state or where losing a side effect would harm users or the business.
 
-> This convention extends ADR 0010 (Outbox pattern), ADR 0016 (Transaction pipeline behaviors), and `docs/conventions/backend/09-observability.md`.
+> This convention extends `docs/decisions/outbox-pattern-as-reliability-escalation.md` (Outbox pattern), `docs/decisions/transaction-pipeline-behaviors.md` (Transaction pipeline behaviors), and `docs/conventions/backend/09-observability.md`.
 
 ---
 

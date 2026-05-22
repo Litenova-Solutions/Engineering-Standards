@@ -1,4 +1,4 @@
-# 0020. SignalR for Real-Time Updates
+# SignalR for Real-Time Updates
 
 **Status:** Accepted
 
@@ -40,4 +40,3 @@ The `@microsoft/signalr` package is pre-approved for frontend projects that impl
 ### Risks
 
 - SignalR delivery is not durable. If a notification is required for correctness, pair it with the Outbox pattern and make clients refetch current state after reconnecting.
-

@@ -1,4 +1,4 @@
-# 0021. Multi-Tenancy Default
+# Multi-Tenancy Default
 
 **Status:** Accepted
 
@@ -48,4 +48,3 @@ Partial tenancy is forbidden. Do not add `TenantId` to one feature without apply
 ### Risks
 
 - A project may delay the tenancy ADR until data already exists. Product discovery must answer the tenancy question before the first production release.
-

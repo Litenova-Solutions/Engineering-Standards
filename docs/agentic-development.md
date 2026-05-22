@@ -8,7 +8,7 @@ This document explains how and why the engineering standards are designed around
 
 Agentic AI development is the assumed primary development model for projects following these standards. This is not a future consideration; it is the current reality. Every architectural and documentation decision is made with the assumption that AI agents (GitHub Copilot, Claude Code, Cursor, Gemini CLI, and similar tools) are primary contributors alongside human engineers.
 
-This assumption is recorded formally in ADR 0001 (`docs/adr/0001-agentic-development-as-primary-model.md`). It affects every other decision in the standards: the five-project application layer split, the Contracts projects, the architecture tests, the size limit on `AGENTS.md`, and the requirement that every rule have a code example. None of these are arbitrary. Each is a direct response to an observed agent failure mode.
+This assumption is recorded formally in `docs/decisions/agentic-development-as-primary-model.md`. It affects every other decision in the standards: the five-project application layer split, the Contracts projects, the architecture tests, the size limit on `AGENTS.md`, and the requirement that every rule have a code example. None of these are arbitrary. Each is a direct response to an observed agent failure mode.
 
 ---
 
@@ -100,5 +100,8 @@ Different tasks require different context. Loading all convention files for ever
 | Adding an endpoint | `AGENTS.md`, `05-api-layer.md` |
 | Adding an event handler | `AGENTS.md`, `03-application-layer.md`, `06-exception-hierarchy.md` |
 | Adding infrastructure | `AGENTS.md`, `04-infrastructure-layer.md` |
-| Writing tests | `AGENTS.md`, `08-testing.md` |
+| Writing backend tests | `AGENTS.md`, `08-testing.md` |
+| Writing frontend tests | `AGENTS.md`, `frontend/06-testing.md` |
+| Adding a frontend feature | `AGENTS.md`, `frontend/01-nextjs-app-router.md`, `frontend/03-data-fetching.md`, `frontend/07-feature-boundaries.md` |
+| Completing a full-stack feature | `AGENTS.md`, `agentic-guardrails.md`, `definition-of-done.md`, `ci.md` |
 | Modifying standards | `AGENTS.md`, `00-standards-meta.mdc`, `adr-template.md` |

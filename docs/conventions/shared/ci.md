@@ -1,6 +1,6 @@
 # CI and Local Gates
 
-This document defines the required local and CI verification gates for projects that follow these standards.
+Required local and CI verification gates for projects that follow these standards. Agents MUST run every applicable gate before marking work complete.
 
 ---
 
@@ -16,12 +16,13 @@ Every pull request MUST run:
 | Frontend install | `pnpm install --frozen-lockfile` |
 | Frontend lint | `pnpm lint` |
 | Frontend type check | `pnpm type-check` |
-| Frontend tests | `pnpm test` |
+| Frontend unit tests | `pnpm test` |
 | Frontend build | `pnpm build` |
 | Frontend audit | `pnpm audit` |
-| OpenAPI freshness | Regenerate spec and generated types, then fail on git diff |
+| Playwright E2E | `pnpm exec playwright test --config apps/web/playwright.config.ts` |
+| OpenAPI freshness | Regenerate spec and types, then `git diff --exit-code` on artifacts |
 
-Skip frontend gates only when the project has no frontend. Skip OpenAPI freshness only when no generated frontend API types are committed.
+Skip frontend gates when the project has no frontend. Skip Playwright when no `apps/web/e2e/` exists yet (document in project ADR). Skip OpenAPI freshness when no generated frontend API types are committed.
 
 ---
 
@@ -40,56 +41,15 @@ If the diff is non-empty, the PR forgot to commit regenerated API artifacts.
 
 ## 3. Example GitHub Actions Workflow
 
-```yaml
-name: ci
-
-on:
-  pull_request:
-  push:
-    branches: [main]
-
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-
-      - uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - run: dotnet restore src/{ProjectName}.slnx
-      - run: dotnet build src/{ProjectName}.slnx --configuration Release --no-restore
-      - run: dotnet test src/{ProjectName}.slnx --configuration Release --no-build
-      - run: dotnet list src/{ProjectName}.slnx package --vulnerable
-
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm type-check
-      - run: pnpm test
-      - run: pnpm build
-      - run: pnpm audit
-```
-
-Project workflows add deployment, OpenAPI freshness, container build, and migration script review gates as needed.
+Use `docs/templates/ci-workflow.yml` as the canonical workflow template. It includes backend gates, frontend gates, OpenAPI freshness, Playwright, and optional standards submodule tag verification.
 
 ---
 
 ## 4. Pre-Commit Hooks
 
-Pre-commit hooks are optional but recommended. They should be fast and local.
+Pre-commit hooks are OPTIONAL. When used, they MUST be fast and local.
 
-Recommended local hooks:
+Local hooks MAY include:
 
 ```bash
 dotnet format --verify-no-changes
@@ -97,5 +57,4 @@ pnpm lint
 pnpm type-check
 ```
 
-Do not run containerized integration tests in pre-commit hooks. Keep slower checks in CI.
-
+Do not run containerized integration tests or Playwright in pre-commit hooks. Keep slower checks in CI.

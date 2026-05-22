@@ -1,18 +1,16 @@
 # Engineering Standards: Agent Context
 
-This is the canonical contract for AI agents and engineers working on projects that follow these standards. Read it before touching code.
+Canonical contract for AI agents and engineers. Read before touching code.
 
 ## Read Order
 
-1. Read this file in full.
-2. Read `docs/architecture/clean-architecture.md`.
-3. Read the convention file for the layer you are editing.
-4. Read `docs/conventions/shared/agentic-guardrails.md` to understand strict dependency lockdowns and scaffolding constraints.
-5. If the task involves exceptions, read `docs/conventions/backend/06-exception-hierarchy.md`.
-6. If it involves logging, metrics, tracing, health checks, or alerts, read `docs/conventions/backend/09-observability.md`.
-7. If it involves query handlers, read `docs/conventions/backend/07-query-read-strategy.md`.
-8. If it involves retries, idempotency, outbox, background jobs, caching, realtime, migrations, or security, read the matching convention file from the index below.
-9. Do not load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding tasks. They are human-facing rationale docs.
+1. This file in full.
+2. `docs/architecture/clean-architecture.md`.
+3. The convention file for the layer you are editing (index below).
+4. `docs/conventions/shared/agentic-guardrails.md` for scaffolding and verification.
+5. `docs/guides/definition-of-done.md` before marking any feature complete.
+6. Topic-specific conventions (exceptions, observability, queries, security, etc.) when the task touches them.
+7. Do not load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding.
 
 ## Tech Stack
 
@@ -21,113 +19,102 @@ This is the canonical contract for AI agents and engineers working on projects t
 | .NET | 10 |
 | ASP.NET Core | 10, Minimal APIs only |
 | EF Core | 10 |
-| LiteBus | Modular packages, specific mediators only |
-| Ardalis.GuardClauses | Project-owned custom domain guard extensions only |
-| OpenTelemetry | Traces and metrics via OTLP |
-| PostgreSQL | Primary database |
-| Next.js | 16.2.6, App Router only, `proxy.ts` not `middleware.ts` |
+| LiteBus | Modular packages; `ICommandMediator` / `IQueryMediator` only in endpoints |
+| PostgreSQL | Primary database; `snake_case` via `.UseSnakeCaseNamingConventions()` |
+| Next.js | 16.2.6 (security patch), App Router, `proxy.ts` not `middleware.ts` |
 | React | 19.2.6, React Compiler stable |
 | TypeScript | 6.0.x, `moduleResolution: bundler` |
-| TanStack Query | 5.100.10, verify lockfile against GHSA-g7cv-rxg3-hmpx |
-| Zustand | 5.0.13 |
-| Zod | 4.4.3, use `z.email()`, `z.uuid()`, `z.url()` |
+| TanStack Query | 5.100.10; verify lockfile against GHSA-g7cv-rxg3-hmpx |
+| Zustand | 5.0.13 (UI state only) |
+| Zod | 4.4.3; `z.email()`, `z.uuid()`, `z.url()` |
 | Tailwind CSS | 4.3.x, CSS-first `@theme`, no `tailwind.config.js` |
-| shadcn/ui | CLI v4, use `sonner`, import Radix from `radix-ui` |
+| shadcn/ui | CLI v4, `sonner`, Radix from `radix-ui` |
+| Frontend tests | Vitest + RTL; Playwright E2E |
 
 ## Project Map
 
 | Project | Responsibility |
 |:---|:---|
 | `Domain` | Aggregates, value objects, events, exceptions, repositories, strongly typed IDs |
-| `Application.Write.Contracts` | Commands, command results, write-side contracts |
+| `Application.Write.Contracts` | Commands, command results |
 | `Application.Write` | Command handlers and validators |
-| `Application.Read.Contracts` | Queries, results, `IDatabaseContext`, pagination, query validation |
-| `Application.Read` | Query handlers and validators using `IDatabaseContext` projections |
-| `Application.Reactions` | Event handlers and narrow side-effect interfaces |
-| `Infrastructure` | EF Core, repositories, transactions, outbox, jobs, external clients |
-| `WebApi` | `IEndpoint` classes, request/response models, mappings, OpenAPI |
-| `apps/web/` | Next.js App Router frontend |
+| `Application.Read.Contracts` | Queries, results, `IDatabaseContext`, pagination |
+| `Application.Read` | Query handlers; `IDatabaseContext` projections only |
+| `Application.Reactions` | Event handlers; narrow side-effect interfaces only |
+| `Infrastructure` | EF Core, repos, pipeline, outbox, jobs, external clients |
+| `WebApi` | `IEndpoint`, request/response models, OpenAPI |
+| `apps/web/` | Next.js; `features/{name}/` vertical slices |
 
 ## Non-Negotiable Rules
 
 - MUST read the relevant convention before editing that layer.
-- MUST use `IEndpoint` for HTTP endpoints. Never use MVC controllers or `ControllerBase`.
-- MUST inject `IDatabaseContext` in query handlers. Never inject repositories or `AppDbContext` there.
-- MUST NOT add per-aggregate `IXxxReadStore` interfaces. Use `IDatabaseContext` with LINQ projections.
-- MUST throw the correct exception subclass. Never throw generic domain or application exceptions.
-- MUST throw `CommandValidationException` from command validators and `QueryValidationException` from query validators.
-- MUST NOT use `Guard.Against` in validators. Direct guard calls throw argument exceptions.
-- MUST NOT call `SaveChangesAsync` in command handlers or repositories. The command pipeline persists.
+- MUST use `IEndpoint`; MUST NOT use MVC `Controller` / `ControllerBase`.
+- MUST inject `IDatabaseContext` in query handlers; MUST NOT inject repositories or `AppDbContext`.
+- MUST NOT add per-aggregate `IXxxReadStore` interfaces.
+- MUST use correct exception subclasses; validators throw `CommandValidationException` / `QueryValidationException`.
+- MUST NOT call `SaveChangesAsync` in handlers or repositories.
 - MUST NOT put handlers or validators in Contracts projects.
-- MUST NOT reference external side-effect libraries from `Application.Reactions`. Define narrow interfaces and implement them in Infrastructure.
-- MUST NOT reference `Application.Write` or `Application.Read` from endpoint code. `Program.cs` may reference implementation projects only for DI registration.
-- MUST use `ICommandMediator.SendAsync` for commands and `IQueryMediator.QueryAsync` for queries in endpoints. Never inject a unified message bus.
-- MUST name every async `CancellationToken` parameter exactly `cancellationToken`.
-- MUST NOT add a NuGet package without a corresponding ADR or pre-approved package row.
-- MUST NOT use forbidden packages under any circumstances (e.g. AutoMapper, MediatR, FluentValidation, Newtonsoft.Json, Axios, Lodash, Moment.js).
-- MUST map all PostgreSQL tables, columns, keys, and index names using `snake_case` mapping conventions (using `.UseSnakeCaseNamingConventions()`).
-- MUST use `.AsNoTracking()` or select-projections for all query handler queries in `Application.Read`.
-- MUST NOT use em dashes, en dashes, cliches, or AI slop wording in generated docs or comments.
-- MUST run the mandatory verification pipeline commands (e.g., `dotnet build`, `dotnet test`) before completing code tasks.
-- MUST await `cookies()`, `headers()`, `params`, and `searchParams` in Next.js 15 and later.
-- MUST NOT use server-only modules in `'use client'` files.
-- MUST add a comment to every `'use client'` directive explaining why the client boundary is needed.
-- MUST NOT put business logic in `proxy.ts`. Optimistic checks only.
-- MUST NOT add `useMemo`, `useCallback`, or `React.memo` when React Compiler is enabled.
-- MUST NOT put server data in Zustand or fetch data in `useEffect`.
-
-## Common Mistakes To Avoid
-
-- Using `IMessageBus` instead of the specific LiteBus mediator.
-- Importing forbidden libraries (AutoMapper, MediatR, FluentValidation, Axios, Lodash, Moment.js) instead of standard/lite alternatives.
-- Allowing PascalCase mappings in PostgreSQL, leading to double-quote sql queries.
-- Failing to use `.AsNoTracking()` in read-side query projections.
-- Putting mappings inside endpoint handler methods instead of `ApiMappings`.
-- Checking business rules in handlers instead of aggregates.
-- Updating read model tables from Reactions without a project ADR.
-- Adding external packages to `Application.Reactions`.
-- Using Zod v3 string format syntax.
-- Using `revalidateTag` without the required cache life argument.
-- Importing individual `@radix-ui/react-*` packages.
-- Using shadcn/ui `toast` instead of `sonner`.
+- MUST NOT reference external libraries from `Application.Reactions`.
+- WebApi endpoints MUST reference Contracts only; `Program.cs` registers implementations.
+- MUST use `ICommandMediator` / `IQueryMediator`; MUST NOT inject unified message bus or `IMessageMediator`.
+- MUST name async `CancellationToken` parameters `cancellationToken`.
+- MUST NOT add packages outside pre-approved lists or without an ADR (`forbidden-packages.md`, `01-solution-structure.md`).
+- MUST use `.AsNoTracking()` or projections in `Application.Read`.
+- MUST follow `writing-style.md` (no forbidden words, no em/en dashes).
+- MUST run gates in `docs/conventions/shared/ci.md` and complete `definition-of-done.md`.
+- Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; no business logic in `proxy.ts`; no `useMemo`/`useCallback`/`React.memo` with React Compiler; no server data in Zustand or `useEffect` fetch; no cross-feature imports; no `TODO`/`FIXME`/stubs; max 300 lines per file; no arbitrary Tailwind values.
 
 ## Convention File Index
 
-| Layer / Topic | Convention File |
+| Topic | File |
 |:---|:---|
 | Architecture | `docs/architecture/clean-architecture.md` |
 | Principles | `docs/conventions/00-principles.md` |
-| Solution Structure | `docs/conventions/backend/01-solution-structure.md` |
+| Solution / packages | `docs/conventions/backend/01-solution-structure.md` |
 | Domain | `docs/conventions/backend/02-domain-layer.md` |
 | Application | `docs/conventions/backend/03-application-layer.md` |
 | Infrastructure | `docs/conventions/backend/04-infrastructure-layer.md` |
 | WebApi | `docs/conventions/backend/05-api-layer.md` |
 | Exceptions | `docs/conventions/backend/06-exception-hierarchy.md` |
-| Query/Read Strategy | `docs/conventions/backend/07-query-read-strategy.md` |
-| Testing | `docs/conventions/backend/08-testing.md` |
+| Query/Read | `docs/conventions/backend/07-query-read-strategy.md` |
+| Backend testing | `docs/conventions/backend/08-testing.md` |
 | Observability | `docs/conventions/backend/09-observability.md` |
 | Reliability | `docs/conventions/backend/10-reliability.md` |
-| Background Jobs | `docs/conventions/backend/11-background-jobs.md` |
+| Background jobs | `docs/conventions/backend/11-background-jobs.md` |
 | Caching | `docs/conventions/backend/12-caching.md` |
-| Deployment and Migrations | `docs/conventions/backend/13-deployment-and-migrations.md` |
+| Deployment | `docs/conventions/backend/13-deployment-and-migrations.md` |
+| Worker projects | `docs/conventions/backend/14-worker-projects.md` |
 | Naming | `docs/conventions/shared/naming.md` |
-| Git Workflow | `docs/conventions/shared/git-workflow.md` |
-| CI and Local Gates | `docs/conventions/shared/ci.md` |
+| Git | `docs/conventions/shared/git-workflow.md` |
+| CI gates | `docs/conventions/shared/ci.md` |
 | Security | `docs/conventions/shared/security.md` |
-| Real-Time Updates | `docs/conventions/shared/realtime-updates.md` |
-| Agentic Guardrails | `docs/conventions/shared/agentic-guardrails.md` |
-| Frontend/App Router | `docs/conventions/frontend/01-nextjs-app-router.md` |
-| Frontend/Components | `docs/conventions/frontend/02-components.md` |
-| Frontend/Data Fetching | `docs/conventions/frontend/03-data-fetching.md` |
-| Frontend/State and Forms | `docs/conventions/frontend/04-state-and-forms.md` |
-| Frontend/Internationalization | `docs/conventions/frontend/05-internationalization.md` |
+| Realtime | `docs/conventions/shared/realtime-updates.md` |
+| Forbidden packages | `docs/conventions/shared/forbidden-packages.md` |
+| Decisions (rationale) | `docs/decisions/README.md` (do not load for routine coding) |
+| Writing style | `docs/conventions/shared/writing-style.md` |
+| Agentic guardrails | `docs/conventions/shared/agentic-guardrails.md` |
+| Containers | `docs/conventions/shared/containers.md` |
+| IaC | `docs/conventions/shared/infrastructure-as-code.md` |
+| Definition of Done | `docs/guides/definition-of-done.md` |
+| Add feature guide | `docs/guides/add-new-feature.md` |
+| App Router | `docs/conventions/frontend/01-nextjs-app-router.md` |
+| Components | `docs/conventions/frontend/02-components.md` |
+| Data fetching | `docs/conventions/frontend/03-data-fetching.md` |
+| State and forms | `docs/conventions/frontend/04-state-and-forms.md` |
+| i18n | `docs/conventions/frontend/05-internationalization.md` |
+| Frontend testing | `docs/conventions/frontend/06-testing.md` |
+| Feature boundaries | `docs/conventions/frontend/07-feature-boundaries.md` |
 
 ## Commands
 
+Run the full pipeline in `docs/conventions/shared/ci.md`. Minimum:
+
 ```bash
-dotnet build src/{ProjectName}.slnx
-dotnet test src/{ProjectName}.slnx
-dotnet run --project src/{ProjectName}.WebApi
-dotnet ef migrations add {MigrationName} --project src/{ProjectName}.Infrastructure --startup-project src/{ProjectName}.WebApi
-dotnet ef database update --project src/{ProjectName}.Infrastructure --startup-project src/{ProjectName}.WebApi
+dotnet build src/{ProjectName}.slnx --configuration Release
+dotnet test src/{ProjectName}.slnx --configuration Release --no-build
+pnpm install --frozen-lockfile
+pnpm lint && pnpm type-check && pnpm test && pnpm build
+pnpm exec playwright test --config apps/web/playwright.config.ts
 ```
+
+Skip frontend commands when the project has no `apps/web/`.

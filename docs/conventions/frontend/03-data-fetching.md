@@ -1,5 +1,14 @@
 # Data Fetching Conventions
 
+## Agent Quick Rules
+
+- Server state MUST use TanStack Query or Server Components; MUST NOT live in Zustand.
+- Form mutations MUST use Server Actions with Zod in the action file.
+- Non-form mutations MUST use `useMutation` with `getApiClient()`; MUST NOT use raw `fetch` or Axios.
+- MUST NOT fetch in `useEffect` for server data.
+- List pages MUST implement loading, empty, error, and loaded states.
+- `revalidateTag` MUST include the `cacheLife` second argument (Next.js 16).
+
 ## 1. The Three Kinds of State
 
 Understanding state categories is the conceptual foundation of the entire data fetching strategy. Conflating them produces overcomplicated systems.
@@ -61,7 +70,7 @@ import type { paths } from "@workspace/api-types"
 
 // IMPORTANT: openapi-fetch has moved to maintenance mode (May 2026).
 // The source is copied into packages/api-client/ rather than installed from npm.
-// See ADR 0012 for the decision.
+// See `docs/decisions/openapi-typescript-client-generation.md` for the decision.
 
 export async function getApiClient() {
   // cookies() is async in Next.js 15+/16 - must be awaited
@@ -191,7 +200,9 @@ export function usePostList() {
 
 ## 4. Server Actions as the Primary Mutation Pattern
 
-Server Actions are the default for all mutations triggered by form submissions. They run on the server, validate input with Zod, call the backend API, and return a result. They use the `"use server"` directive and MUST be in separate files from client components.
+Server Actions MUST be used for all mutations triggered by form submissions. They run on the server, validate input with Zod, call the backend API, and return a result. They use the `"use server"` directive and MUST be in separate files from client components.
+
+TanStack Query `useMutation` is permitted only for non-form interactions (see Section 5). Form submissions MUST NOT bypass Server Actions in favor of client-side `fetch` or `useMutation`.
 
 ```typescript
 // features/posts/create/createPost.action.ts
@@ -252,11 +263,12 @@ export async function createPostAction(
 
 ## 5. TanStack Query Mutations for Non-Form Interactions
 
-When a mutation is triggered by a non-form interaction (a toggle button, a drag-and-drop reorder, an inline edit), use TanStack Query `useMutation`:
+Non-form mutations (toggle, reorder, inline edit) **MUST** use TanStack Query `useMutation` with `getApiClient()`, not raw `fetch` or Axios.
 
 ```typescript
-// features/posts/publish/usePublishPost.ts
+// GOOD: features/posts/publish/usePublishPost.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { getApiClient } from "@/lib/api/client"
 import { postQueryKeys } from "../shared/queryKeys"
 import type { PostId } from "@/lib/types/branded"
 
@@ -265,21 +277,25 @@ export function usePublishPost() {
 
   return useMutation({
     mutationFn: async (postId: PostId) => {
-      const response = await fetch(`/api/posts/${postId}/publish`, {
-        method: "POST",
+      const client = await getApiClient()
+      const { data, error } = await client.POST("/posts/{id}/publish", {
+        params: { path: { id: postId } },
       })
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.detail ?? "Failed to publish post")
-      }
-      return response.json()
+      if (error) throw new Error("Failed to publish post")
+      return data
     },
     onSuccess: (_, postId) => {
-      // Invalidate the specific post and the post list
       queryClient.invalidateQueries({ queryKey: postQueryKeys.byId(postId) })
       queryClient.invalidateQueries({ queryKey: postQueryKeys.all })
     },
   })
+}
+```
+
+```typescript
+// BAD: raw fetch bypasses typed OpenAPI client
+mutationFn: async (postId: PostId) => {
+  const response = await fetch(`/api/posts/${postId}/publish`, { method: "POST" })
 }
 ```
 
@@ -517,7 +533,7 @@ connection.on("ticketChanged", (ticket) => {
 
 Every route that fetches data MUST provide a loading state. Use `loading.tsx` for route-level streaming and component-level skeletons for nested Suspense boundaries.
 
-List pages MUST define empty, loading, error, and loaded states. Empty state text should tell the user what exists, not explain implementation.
+List pages MUST define empty, loading, error, and loaded states. Empty state text MUST describe what the user can do next, not implementation details.
 
 ```typescript
 // GOOD: route-level loading file

@@ -1,4 +1,4 @@
-# 0009. Architecture Tests as Enforcement
+# Architecture Tests as Enforcement
 
 **Status:** Accepted
 

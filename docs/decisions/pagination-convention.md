@@ -1,4 +1,4 @@
-# 0017. Offset Pagination with PagedResult<T> as the Standard for HTTP List Endpoints
+# Offset Pagination with PagedResult<T> as the Standard for HTTP List Endpoints
 
 **Status:** Accepted
 

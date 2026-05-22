@@ -1,6 +1,6 @@
 # Engineering Philosophy
 
-This document explains why the architecture is designed the way it is. It is written for humans: engineers evaluating the standards, clients reviewing the approach, and new team members onboarding. AI agents MUST NOT load this file for routine coding tasks; it provides no actionable rules for code generation. For the short version, see `docs/appendix-rationale.md`.
+This document explains why the architecture is designed the way it is. It is written for humans: engineers evaluating the standards, clients reviewing the approach, and new team members onboarding. AI agents MUST NOT load this file for routine coding tasks; actionable rules live in `docs/conventions/` and `AGENTS.md`.
 
 ---
 

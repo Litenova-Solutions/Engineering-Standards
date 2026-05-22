@@ -74,7 +74,7 @@ Every pull request MUST meet all of the following before it can be merged:
 - **No merge commits on `main`.** The `main` branch history must be linear.
 - **No force-pushes to `main`.**
 
-The squash commit message should summarize the entire feature branch in one Conventional Commits line. If the branch contains multiple unrelated changes, it should have been split into multiple PRs.
+The squash commit message MUST summarize the entire feature branch in one Conventional Commits line. If the branch contains multiple unrelated changes, it MUST have been split into multiple PRs.
 
 ---
 

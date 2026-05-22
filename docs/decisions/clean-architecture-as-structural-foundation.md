@@ -1,4 +1,4 @@
-# 0002. Clean Architecture as Structural Foundation
+# Clean Architecture as Structural Foundation
 
 **Status:** Accepted
 

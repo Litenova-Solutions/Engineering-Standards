@@ -1,4 +1,4 @@
-# 0008. Reactions Project Depends Only on Abstractions
+# Reactions Project Depends Only on Abstractions
 
 **Status:** Accepted
 
