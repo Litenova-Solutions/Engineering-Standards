@@ -5,30 +5,39 @@ This project follows the shared engineering standards. Read `standards/AGENTS.md
 
 ---
 
-## Read Order
+## Read Order (always)
 
 1. `standards/AGENTS.md`
 2. `standards/docs/architecture/clean-architecture.md`
 3. `standards/docs/conventions/shared/agentic-guardrails.md`
 4. The convention file for the layer you are editing
 5. `standards/docs/guides/definition-of-done.md`
-6. Project files in `docs/domain/` below
 
 ---
 
-## Project-Specific Context
+## Read Order (use case implementation)
 
-| File | Contents |
+Follow this sequence when building or changing a use case. Do not skip to code without a use case doc.
+
+1. `docs/domain/README.md`
+2. `docs/domain/{feature}/README.md`
+3. `docs/domain/{feature}/{use-case}.md`
+4. `standards/docs/guides/agentic-domain-driven-design.md`
+5. `standards/docs/guides/add-new-use-case.md`
+6. Update domain docs in the same PR as the implementation
+
+---
+
+## Project Domain Documentation
+
+| Path | Contents |
 |:---|:---|
-| `docs/domain/ubiquitous-language.md` | Glossary |
-| `docs/domain/aggregate-inventory.md` | Aggregates and events |
-| `docs/domain/feature-inventory.md` | Use cases and handlers |
-| `docs/domain/exception-inventory.md` | Exception types |
-| `docs/domain/read-model-inventory.md` | Read models and queries |
-| `docs/domain/frontend-feature-inventory.md` | Frontend routes |
-| `docs/domain/frontend-api-endpoints.md` | API endpoints consumed |
-| `docs/specs/` | Approved feature specifications |
+| `docs/domain/README.md` | System map of features and use cases |
+| `docs/domain/{feature}/README.md` | Feature domain: language, aggregate, invariants, events |
+| `docs/domain/{feature}/{use-case}.md` | Use case: commands, endpoints, UI, acceptance criteria |
 | `docs/decisions/` | Project-specific ADRs |
+
+Domain docs are the living source of truth. Update them in the same PR as code changes.
 
 ---
 

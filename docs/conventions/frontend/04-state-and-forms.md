@@ -60,7 +60,7 @@ const schema = z.object({
 Zustand manages UI state that is shared across components that are not in a parent-child relationship: the active tab in an editor, draft-saved status shared between a toolbar and a footer, word count shown in multiple places on the page.
 
 ```typescript
-// features/posts/store/postEditorStore.ts
+// domain/posts/store/postEditorStore.ts
 import { create } from "zustand"
 
 type PostEditorTab = "write" | "preview" | "settings"
@@ -94,7 +94,7 @@ Rules:
 
 - Zustand stores MUST NOT contain server data. Use TanStack Query for anything fetched from the backend.
 - Zustand stores MUST have a `reset` action for cleanup between sessions or user switches.
-- Feature-specific stores live in `features/{feature}/store/`. App-wide stores live in `lib/stores/`.
+- Domain-specific stores live in `domain/{feature}/store/`. App-wide stores live in `lib/stores/`.
 - A Zustand store MUST NOT expose more than 6 actions (including `reset`). If a store exceeds 6 actions, the agent MUST split it into focused stores by concern.
 
 ```typescript
@@ -130,7 +130,7 @@ const usePostStore = create((set) => ({
 The example below demonstrates how to coordinate server data and client-side UI selections cleanly. Zustand stores the selected post ID (client UI state), while TanStack Query manages the corresponding query lifecycle and caching (server state).
 
 ```typescript
-// features/posts/detail/usePostFocusStore.ts
+// domain/posts/detail/usePostFocusStore.ts
 import { create } from "zustand"
 
 type FocusState = {
@@ -147,7 +147,7 @@ export const usePostFocusStore = create<FocusState>((set) => ({
 ```
 
 ```tsx
-// features/posts/detail/PostDetailsViewer.tsx
+// domain/posts/detail/PostDetailsViewer.tsx
 "use client"
 // Needs useQuery from TanStack and custom selector hook - client boundary required.
 
@@ -196,7 +196,7 @@ export function PostDetailsViewer() {
 URL state is the correct home for state that should persist across page refreshes and be shareable via link: search filters, sort order, current page, selected tab that forms part of the navigation context.
 
 ```typescript
-// features/posts/list/usePostFilters.ts
+// domain/posts/list/usePostFilters.ts
 "use client"
 // Needs useRouter and useSearchParams - client component hook required.
 
@@ -237,7 +237,7 @@ React Hook Form with Zod is the standard for forms that require complex client-s
 **Zod v4 schema:**
 
 ```typescript
-// features/posts/create/createPost.schema.ts
+// domain/posts/create/createPost.schema.ts
 import { z } from "zod"
 
 // Zod v4: string format validators are top-level functions, not chained methods.
@@ -263,7 +263,7 @@ export type CreatePostInput = z.infer<typeof createPostSchema>
 **React Hook Form integration with `useMutation`:**
 
 ```typescript
-// features/posts/create/CreatePostForm.tsx
+// domain/posts/create/CreatePostForm.tsx
 "use client"
 // Needs useForm, useState, and form event handlers - client component required.
 
@@ -338,7 +338,7 @@ export function CreatePostForm() {
 For forms that do not need complex client-side validation UX, `useActionState` with a Server Action is simpler and provides progressive enhancement (the form works without JavaScript):
 
 ```typescript
-// features/posts/publish/PublishPostForm.tsx
+// domain/posts/publish/PublishPostForm.tsx
 "use client"
 // Needs useActionState for form state management - client component required.
 
@@ -482,4 +482,4 @@ Map backend aggregate states to discriminated unions at the API boundary. The fr
 
 ## 11. Project-Specific State Conventions
 
-Document global Zustand stores and shared Zod schemas in `docs/domain/frontend-feature-inventory.md`.
+Document global Zustand stores in the relevant feature README or use case doc under `docs/domain/`.

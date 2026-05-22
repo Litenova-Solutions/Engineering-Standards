@@ -265,6 +265,6 @@ HTTP list endpoints use `PagedResult<T>` with `PaginationParameters`. See `docs/
 
 ---
 
-The read model inventory for a specific project lives in the project repository. Copy `docs/templates/read-model-inventory.md` into `docs/domain/read-model-inventory.md` and fill it in.
+Document query shapes and read models in the relevant use case doc at `docs/domain/{feature}/{use-case}.md`.
 
 

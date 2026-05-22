@@ -52,7 +52,7 @@ test("publish", async ({ page }) => {
 
 ## 4. Vitest Unit Rules
 
-Vitest tests live next to the code they cover (`*.test.ts`, `*.test.tsx`) or in `__tests__/` within the same feature folder.
+Vitest tests live next to the code they cover (`*.test.ts`, `*.test.tsx`) or in `__tests__/` within the same domain use case folder.
 
 - Hook and schema tests MUST use Vitest. Jest MUST NOT be added to the frontend toolchain.
 - React Testing Library MUST query by role, label, or text. `container.querySelector` MUST NOT be the primary assertion path.

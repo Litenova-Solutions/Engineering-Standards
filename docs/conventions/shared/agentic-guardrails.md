@@ -30,12 +30,12 @@ Committed code MUST NOT contain TODO, FIXME, NotImplementedException stubs, or p
 A single source file MUST NOT exceed 300 lines. Split into composed modules when approaching the limit.
 </Rule>
 
-<Rule id="FEATURE_IMPORT_BOUNDARY">
-features/{a}/ MUST NOT import from features/{b}/. Promote shared code to @/shared/ or components/ui/.
+<Rule id="DOMAIN_IMPORT_BOUNDARY">
+domain/{a}/ MUST NOT import from domain/{b}/. Promote shared code to @/shared/ or components/ui/.
 </Rule>
 
 <Rule id="UI_COPY_SOURCE">
-User-visible strings MUST come from API fields, next-intl keys, or frontend-feature-inventory.md. Agents MUST NOT invent product or policy text.
+User-visible strings MUST come from API fields, next-intl keys, or the use case doc UI section. Agents MUST NOT invent product or policy text.
 </Rule>
 
 <Rule id="TAILWIND_THEME_ONLY">
@@ -58,7 +58,7 @@ In monorepos, the .NET solution MUST live under apps/api/, not at the repository
 
 ## 2. Deterministic Scaffolding Sequence
 
-When implementing a new aggregate or business feature, developers and AI agents **MUST** follow this exact sequence. Run verification checkpoints after steps 3, 5, 7, and 8. Do not skip steps or write outer layers before completing inner boundaries.
+When implementing a new aggregate or use case, developers and AI agents **MUST** follow this exact sequence. If a use case doc exists at `docs/domain/{feature}/{use-case}.md`, treat its acceptance criteria as the completion contract and the feature README as domain input for steps 1 through 3. Run verification checkpoints after steps 3, 5, 7, and 8. Do not skip steps or write outer layers before completing inner boundaries.
 
 ```mermaid
 graph TD
@@ -72,7 +72,7 @@ graph TD
     Step6["6. Reactions (conditional)"]
     Step7["7. WebApi Endpoint and DI"]
     Step7b["Checkpoint: dotnet build + dotnet test Integration.Tests"]
-    Step8["8. Frontend feature slice (if applicable)"]
+    Step8["8. Frontend domain use case (if applicable)"]
     Step8b["Checkpoint: pnpm lint + type-check + test"]
 
     Step1 --> Step2
@@ -95,7 +95,7 @@ graph TD
 5. **Handlers and validators** in `Application.Write` / `Application.Read`. **Checkpoint:** `dotnet test apps/api/tests/{ProjectName}.Application.Tests`.
 6. **Narrow interface in `Application.Reactions` + Infrastructure implementation** (conditional: add only when an aggregate method raises a domain event that requires an external side effect).
 7. **`IEndpoint` and DI** in `WebApi` / `Infrastructure`. **Checkpoint:** `dotnet test apps/api/tests/{ProjectName}.Integration.Tests` and architecture tests.
-8. **Frontend feature slice** (when the feature has UI). **Checkpoint:** `pnpm lint && pnpm type-check && pnpm test`.
+8. **Frontend domain use case** under `domain/{feature}/{use-case}/` (when the use case has UI). **Checkpoint:** `pnpm lint && pnpm type-check && pnpm test`.
 
 Minimum commands between checkpoints:
 
@@ -221,5 +221,5 @@ Skip frontend steps when the project has no `apps/web/`.
 - [ ] `snake_case` on all PostgreSQL mappings.
 - [ ] `cancellationToken` naming on all async methods.
 - [ ] `.AsNoTracking()` on read queries.
-- [ ] No cross-feature imports when frontend changed.
+- [ ] No cross-domain imports when frontend changed.
 - [ ] OpenAPI artifacts committed when API contract changed.

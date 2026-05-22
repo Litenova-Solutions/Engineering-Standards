@@ -8,7 +8,7 @@ The canonical agent guide is `AGENTS.md` at the repository root (or `standards/A
 2. Read `docs/conventions/shared/agentic-guardrails.md` for scaffolding and verification.
 3. Read `docs/guides/definition-of-done.md` before marking work complete.
 4. Read the convention file for the layer you edit (backend or frontend index in `AGENTS.md`).
-5. For consuming projects, read `docs/domain/` inventories and the project `AGENTS.md` shim.
+5. For consuming projects, read `docs/domain/` (system index, feature README, use case doc) and the project `AGENTS.md` shim.
 
 ## Non-Negotiable Rules
 
@@ -19,7 +19,7 @@ The canonical agent guide is `AGENTS.md` at the repository root (or `standards/A
 - **No external libraries in Application.Reactions.** Narrow interfaces in Reactions; implementations in Infrastructure.
 - **`cancellationToken` naming.** Exact name on all async methods.
 - **Forbidden packages.** `docs/conventions/shared/forbidden-packages.md`.
-- **Frontend boundaries.** No cross-feature imports; use `getApiClient()`; complete DoD checklist.
+- **Frontend boundaries.** No cross-domain imports; use `getApiClient()`; complete DoD checklist.
 
 ## Verification
 

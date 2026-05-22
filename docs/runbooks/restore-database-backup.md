@@ -26,25 +26,21 @@ Use this runbook when:
 
 ---
 
-## Step 1: Scale Down the Application
+## Step 1: Stop the Application
 
 ```bash
-# Kubernetes
-kubectl scale deployment/api --replicas=0
-
-# Azure Container Apps
-az containerapp revision deactivate --name your-api --resource-group your-rg
+ssh deploy@your-vps "cd /opt/your-app && docker compose -f infra/docker-compose.prod.yml stop api worker web"
 ```
 
 ---
 
 ## Step 2: Locate the Backup
 
-Backups are stored in the designated backup location (S3 bucket, Azure Blob Storage, etc.). Identify the correct backup:
+Backups are stored in the designated backup location (local backup volume, Hetzner Storage Box, or another off-server path). Identify the correct backup:
 
 ```bash
-# Example: list recent backups in S3
-aws s3 ls s3://your-backup-bucket/postgres/ --recursive | sort | tail -20
+# Example: list recent backups on the backup host
+ls -lt /backups/postgres/ | head -20
 ```
 
 Choose the most recent backup that predates the corruption or data loss event.
@@ -140,14 +136,10 @@ This step is only required if the application has newer migrations than what the
 
 ---
 
-## Step 9: Scale Up the Application
+## Step 9: Start the Application
 
 ```bash
-# Kubernetes
-kubectl scale deployment/api --replicas=2
-
-# Azure Container Apps
-az containerapp revision activate --name your-api --resource-group your-rg
+ssh deploy@your-vps "cd /opt/your-app && docker compose -f infra/docker-compose.prod.yml up -d"
 ```
 
 ---

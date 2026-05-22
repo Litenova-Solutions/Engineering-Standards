@@ -34,7 +34,7 @@ The dual-key window below reduces session disruption by accepting both the old a
 openssl rand -base64 48
 ```
 
-Store the new secret in the secret manager (Key Vault, AWS Secrets Manager, GitHub Secrets).
+Store the new secret in GitHub Secrets (CI) and in the server `.env` file (runtime).
 
 ### 2. Configure dual-key validation (temporary)
 

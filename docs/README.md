@@ -8,10 +8,20 @@ Use this map to load the right files. Agents MUST follow `AGENTS.md` at the repo
 |:---|:---|
 | `conventions/` | MUST/MUST NOT rules and code examples |
 | `architecture/clean-architecture.md` | Layer diagram and dependency rules |
+| `guides/agentic-domain-driven-design.md` | Domain doc tree and agent workflow |
+| `guides/add-new-use-case.md` | Use case implementation playbook |
 | `guides/definition-of-done.md` | Completion checklist |
-| `guides/add-new-feature.md` | Feature implementation playbook |
-| `guides/spec-driven-development.md` | Feature spec workflow |
 | `guides/create-new-project.md` | Greenfield monorepo setup |
+
+## Domain documentation (consumer projects)
+
+Living source of truth under `docs/domain/` in each project:
+
+| Level | Path | Role |
+|:---|:---|:---|
+| System | `docs/domain/README.md` | Index of features and use cases |
+| Feature | `docs/domain/{feature}/README.md` | Aggregate, ubiquitous language, invariants |
+| Use case | `docs/domain/{feature}/{use-case}.md` | Behavior, endpoints, UI, acceptance criteria |
 
 ## Decisions (why, not what)
 
@@ -24,7 +34,7 @@ Use this map to load the right files. Agents MUST follow `AGENTS.md` at the repo
 
 | Path | Purpose |
 |:---|:---|
-| `templates/` | CI workflow, Dockerfiles, `global.json`, inventories, feature spec |
+| `templates/` | CI workflow, Dockerfiles, domain doc templates, infra |
 | `blueprints/README.md` | Complete Program.cs, AppHost, endpoints, frontend scaffolds |
 | `runbooks/README.md` | Operational procedures index |
 

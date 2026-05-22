@@ -203,7 +203,7 @@ The same image digest that passes staging MUST be promoted to production. Do not
 
 ## 8. Runtime Environment Variables
 
-Runtime variables are injected by the container orchestrator (Kubernetes, ECS, Azure Container Apps). They are never in the image. Use the `__` separator for nested ASP.NET Core sections:
+Runtime variables are injected at deploy time by Docker Compose, systemd, or the host environment. They are never in the image. Use the `__` separator for nested ASP.NET Core sections:
 
 ```bash
 ConnectionStrings__Database=Host=...;Database=...

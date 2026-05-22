@@ -13,6 +13,15 @@ Canonical contract for AI agents and engineers. Read before touching code.
 7. Do not load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding.
 8. Cursor rules in `.cursor/rules/` when using Cursor.
 
+### Use case implementation (consumer project)
+
+When implementing a use case in a project that consumes these standards:
+
+1. Project `docs/domain/README.md` and `docs/domain/{feature}/README.md`.
+2. Use case doc at `docs/domain/{feature}/{use-case}.md` (`docs/guides/agentic-domain-driven-design.md`).
+3. `docs/guides/add-new-use-case.md` and layer conventions for each step.
+4. Update domain docs in the same PR as the code.
+
 ## Tech Stack
 
 | Technology | Version / Notes |
@@ -45,7 +54,7 @@ Canonical contract for AI agents and engineers. Read before touching code.
 | `WebApi` | `IEndpoint`, request/response models, OpenAPI |
 | `Worker` | Outbox dispatch, scheduled jobs (`14-worker-projects.md`) |
 | `apps/api/` | .NET solution root (`src/`, `tests/`, `global.json`) |
-| `apps/web/` | Next.js; `features/{name}/` vertical slices |
+| `apps/web/` | Next.js; `domain/{feature}/{use-case}/` aligned with backend |
 
 ## Non-Negotiable Rules
 
@@ -70,7 +79,7 @@ Canonical contract for AI agents and engineers. Read before touching code.
 - MUST NOT accept actor IDs from request bodies when the actor is the authenticated user. Actor identity comes from validated JWT claims only.
 - MUST NOT use `configuration["Key"]!` directly; all config access goes through validated options classes and `IOptions<T>`.
 - MUST use `FromSqlInterpolated` for raw SQL; MUST NOT concatenate SQL strings.
-- Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; no business logic in `proxy.ts`; no `useMemo`/`useCallback`/`React.memo` with React Compiler; no server data in Zustand or `useEffect` fetch; no cross-feature imports; no `TODO`/`FIXME`/stubs; max 300 lines per file; no arbitrary Tailwind values; env vars only via `lib/env.ts`.
+- Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; no business logic in `proxy.ts`; no `useMemo`/`useCallback`/`React.memo` with React Compiler; no server data in Zustand or `useEffect` fetch; no cross-domain imports; no `TODO`/`FIXME`/stubs; max 300 lines per file; no arbitrary Tailwind values; env vars only via `lib/env.ts`.
 
 ## Convention File Index
 
@@ -104,7 +113,9 @@ Canonical contract for AI agents and engineers. Read before touching code.
 | Frontend App Router | `docs/conventions/frontend/01-nextjs-app-router.md` |
 | Frontend testing | `docs/conventions/frontend/06-testing.md` |
 | Admin API auth | `docs/conventions/frontend/10-admin-api-auth.md` |
+| Frontend domain boundaries | `docs/conventions/frontend/07-domain-boundaries.md` |
 | Other frontend topics | `docs/conventions/frontend/` (02 through 09) |
+| Agentic DDD | `docs/guides/agentic-domain-driven-design.md` |
 | Guides | `docs/guides/` |
 | Blueprints | `docs/blueprints/README.md` |
 | Runbooks | `docs/runbooks/README.md` |

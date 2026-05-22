@@ -1,6 +1,6 @@
 # Engineering Philosophy
 
-This document explains why the architecture is designed the way it is. It is written for humans: engineers evaluating the standards, clients reviewing the approach, and new team members onboarding. AI agents MUST NOT load this file for routine coding tasks; actionable rules live in `docs/conventions/` and `AGENTS.md`.
+This document explains why the architecture is designed the way it is. It is written for humans: engineers evaluating the standards, clients reviewing the approach, and new team members onboarding. AI agents MUST NOT load this file for routine coding tasks; actionable rules live in `docs/conventions/`, `docs/guides/agentic-domain-driven-design.md`, and `AGENTS.md`.
 
 ---
 
@@ -22,9 +22,19 @@ This matters in practice for three reasons. First, tests run in milliseconds. A 
 
 ## 3. Why Domain-Driven Design
 
-Domain-Driven Design is not primarily a set of patterns. Aggregates, value objects, and domain events are useful tools, but they are not the point. The point is that code should speak the language of the business.
+Domain-Driven Design is not primarily a set of patterns. Aggregates, value objects, and domain events are useful tools, but they are not the point. The point is that the **entire system** speaks the language of the business: code, documentation, folder structure, and agent context.
 
-When the code uses the same words as the business, the cost of translating requirements into implementation drops to near zero. A product owner says "a post can be published only once." The code has a method called `Publish()` on a `Post` aggregate that throws `PostAlreadyPublishedException`. There is no translation. The requirement and the code are in the same language. This is ubiquitous language, and it is the most valuable practice in DDD. When the language drifts, when the code calls something an `Item` that the business calls an `OrderLine`, or when a method called `ProcessData` represents what the business calls `PublishPost`, the translation cost reappears at every requirement meeting, every code review, and every bug investigation.
+When the code uses the same words as the business, the cost of translating requirements into implementation drops to near zero. A product owner says "a post can be published only once." The code has a method called `Publish()` on a `Post` aggregate that throws `PostAlreadyPublishedException`. There is no translation. The requirement and the code are in the same language. This is ubiquitous language, and it is the most valuable practice in DDD.
+
+When the language drifts, when the code calls something an `Item` that the business calls an `OrderLine`, or when a method called `ProcessData` represents what the business calls `PublishPost`, the translation cost reappears at every requirement meeting, every code review, and every bug investigation.
+
+DDD is not confined to the backend `Domain` project. It applies to:
+
+- **Living domain docs** under `docs/domain/{feature}/` (feature README + use case docs as the human-readable source of truth)
+- **Backend handlers** under `{Aggregate}/{UseCase}/`
+- **Frontend modules** under `domain/{feature}/{use-case}/` (not generic "feature slices" or technical folder names)
+
+The same Feature → Use case boundary appears in all three places. An agent or engineer moves through `posts/create-post.md`, `Posts/Create/`, and `domain/posts/create/` with the same mental model.
 
 ---
 
@@ -48,19 +58,41 @@ Explicit code is slower to write and faster to debug. In a long-lived codebase, 
 
 Folder structure is the first thing a new engineer sees when they open a codebase. It is the first signal about what the system does and how it is organized. A folder called `Services/` tells you nothing about the business. A folder called `Posts/` tells you the system handles posts. A folder called `Posts/Publish/` tells you that publishing is a distinct, named use case with its own handler, its own validator, and its own endpoint.
 
-Screaming architecture means the folder structure communicates the business model without requiring any code to be read. An engineer who has never seen the codebase should be able to understand what the system does from its folder names alone. This applies at every layer: `Application.Write`, `Application.Read`, and `Application.Reactions` scream their purpose. `Posts/Create/`, `Posts/Publish/`, `Posts/GetById/` scream their use cases. The folder hierarchy is documentation that never goes stale because it is enforced by the code that lives in it.
+Screaming architecture means the folder structure communicates the business model without requiring any code to be read. An engineer who has never seen the codebase should be able to understand what the system does from its folder names alone.
+
+This applies at every layer:
+
+| Layer | Example path | What it screams |
+|:---|:---|:---|
+| Domain docs | `docs/domain/posts/create-post.md` | Create Post use case |
+| Backend write | `Posts/Create/` | Same use case, command side |
+| Backend read | `Posts/List/` | List posts query |
+| Frontend | `domain/posts/create/` | Same use case, UI |
+| App Router | `app/(main)/posts/new/page.tsx` | Thin routing shell only |
+
+The hierarchy is documentation that stays honest when domain docs are updated in the same pull request as the code they describe.
 
 ---
 
-## 7. Why Agentic Development Changes the Rules
+## 7. Why Agentic Domain-Driven Design
 
-AI agents are now primary contributors to codebases. This changes the requirements for good architecture in ways that are not obvious from a human-only team perspective.
+AI agents are now primary contributors to codebases. That changes how we document and structure software.
 
-Explicit rules outperform cultural norms when agents are primary contributors. A rule that exists as a team understanding ("we prefer to inject `IDatabaseContext` in query handlers") is invisible to an agent. A rule in `AGENTS.md` is visible but ignorable if no structural constraint enforces it. A rule enforced by a project reference (the query handler project has no reference to repository implementations) is enforced regardless of what the agent had in context. Architecture decisions that are enforced at the compiler level survive agent contributions more reliably than conventions that live only in documentation.
+**Agentic development** means explicit rules and compiler-enforced boundaries outperform team culture when agents generate code. A rule in `AGENTS.md` helps; a project reference that makes the wrong pattern fail to compile helps more.
 
-Consistent, predictable structure lets agents navigate confidently. An agent that sees a handler in `Posts/Publish/PublishPostCommandHandler.cs` in one feature can infer with high confidence that the next handler belongs in `Posts/Archive/ArchivePostCommandHandler.cs`. Unpredictable structure forces agents to search the entire codebase before making a change. Verbose, ceremonious code is also easier for agents to extend correctly than clever, concise code. An agent extending a pattern it has seen clearly will make fewer errors than an agent inferring behavior from a compact abstraction.
+**Domain-driven documentation** means living domain docs under `docs/domain/` are the source of truth for what the system does. There are no parallel inventories, glossaries, route lists, or exception catalogs. Ubiquitous language, invariants, endpoints, UI flows, and acceptance criteria live in the feature README or use case doc where they belong. Docs are updated in the same pull request as code.
 
-See `docs/agentic-development.md` for the full treatment of this topic, including how the standards are specifically designed to manage agent failure modes.
+Together, **Agentic Domain-Driven Design (ADDD)** combines:
+
+1. DDD boundaries in docs, backend, and frontend
+2. Explicit, reviewable use case docs before agent implementation
+3. Structural guardrails (Clean Architecture, CQRS, architecture tests) that survive context window limits
+
+Industry practice calls the documentation half "spec-driven development." We use DDD terms: domain docs, features, and use cases. The intent is the same: write the contract in business language first, implement against it, keep the contract current.
+
+Consistent structure lets agents move through the codebase confidently. An agent that sees `Posts/Publish/PublishPostCommandHandler.cs` and `domain/posts/publish/` and `docs/domain/posts/publish-post.md` can extend the system without inventing new vocabulary or folder patterns.
+
+See `docs/agentic-development.md` for agent failure modes and guardrails. See `docs/guides/agentic-domain-driven-design.md` for the documentation workflow.
 
 ---
 
@@ -93,4 +125,3 @@ We partition these concerns:
 2. **Zustand** acts as the **ephemeral UI state store**. It contains *zero* server-fetched properties and no manual fetch functions.
 
 This separation ensures that UI state remains predictable, rendering cycles are isolated, and server data stays synchronized without manual orchestration.
-

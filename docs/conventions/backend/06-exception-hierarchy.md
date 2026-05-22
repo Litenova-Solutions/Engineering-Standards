@@ -458,5 +458,5 @@ internal sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCom
 
 ---
 
-The exception inventory for a specific project lives in the project repository. Copy `docs/templates/exception-inventory.md` into `docs/domain/exception-inventory.md` and fill it in.
+Document exception types in the relevant use case doc at `docs/domain/{feature}/{use-case}.md` and in the feature README when they are shared across use cases.
 

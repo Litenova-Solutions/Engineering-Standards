@@ -26,7 +26,7 @@ Write an ADR for any decision that meets one or more of the following criteria:
 
 **Examples:**
 - `docs/decisions/litebus-as-mediator.md` (standards repo)
-- `docs/decisions/azure-blob-storage-for-attachments.md` (consumer project)
+- `docs/decisions/object-storage-for-attachments.md` (consumer project)
 
 ---
 

@@ -295,21 +295,13 @@ The previous image digest MUST be recorded in the deployment artifact. When roll
 
 | Secret | Where to store |
 |:---|:---|
-| JWT signing secret | GitHub Secrets / Key Vault |
-| Database connection string | GitHub Secrets / Key Vault |
-| Container registry credentials | GitHub Secrets or OIDC |
-| External API keys | GitHub Secrets / Key Vault |
+| JWT signing secret | GitHub Secrets (CI) and server `.env` (runtime) |
+| Database connection string | GitHub Secrets (CI migrations) and server `.env` (runtime) |
+| Container registry credentials | GitHub Secrets |
+| SSH deploy key | GitHub Secrets |
+| External API keys | GitHub Secrets and server `.env` |
 
-Use OIDC where possible to avoid long-lived credentials. AWS and Azure both support GitHub Actions OIDC federation.
-
-```yaml
-# OIDC for AWS
-- name: Configure AWS credentials
-  uses: aws-actions/configure-aws-credentials@v4
-  with:
-    role-to-assume: arn:aws:iam::123456789:role/github-actions-deploy
-    aws-region: eu-west-1
-```
+Deploy jobs SSH to the VPS and pass image digests as environment variables. Do not store production secrets in the repository.
 
 ---
 

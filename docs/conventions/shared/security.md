@@ -9,8 +9,9 @@ This document defines the security baseline requirements for all projects follow
 No API keys, connection strings, passwords, tokens, or credentials of any kind MUST appear in source code, committed configuration files, or version history.
 
 **Acceptable approaches:**
-- Environment variables injected at runtime
-- A secrets manager (Azure Key Vault, AWS Secrets Manager, HashiCorp Vault)
+- Environment variables injected at runtime (server `.env`, Docker Compose `env_file`)
+- GitHub Actions secrets for CI and deploy pipelines
+- Encrypted secrets on the server (for example SOPS, age, or provider-specific secret tooling)
 - A `.env` file that is listed in `.gitignore` and never committed
 
 **If a secret is accidentally committed:** Rotate the secret immediately. Do not rely on rewriting git history as the primary mitigation; assume the secret is compromised the moment it appears in any commit.

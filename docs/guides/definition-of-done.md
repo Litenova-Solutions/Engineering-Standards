@@ -26,7 +26,8 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 ## 3. Frontend Execution
 
-- [ ] Route or feature entry documented in `docs/domain/frontend-feature-inventory.md`.
+- [ ] Use case doc at `docs/domain/{feature}/{use-case}.md` updated to reflect current behavior.
+- [ ] Feature README at `docs/domain/{feature}/README.md` updated when domain language or invariants changed.
 - [ ] Server Component used for initial data fetch on read-heavy pages.
 - [ ] Server Action used for form mutations, with Zod validation in the action file.
 - [ ] Error, loading, and empty states implemented (`error.tsx`, `loading.tsx`, or in-component equivalents).
@@ -52,4 +53,4 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 - [ ] Relevant convention files read for every layer touched.
 - [ ] No forbidden packages introduced (`docs/conventions/shared/forbidden-packages.md`).
-- [ ] Feature folders do not import across features (`docs/conventions/frontend/07-feature-boundaries.md`).
+- [ ] Domain folders do not import across domains (`docs/conventions/frontend/07-domain-boundaries.md`).

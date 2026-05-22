@@ -23,11 +23,10 @@ Do not wait to confirm whether exploitation occurred. Revoke first.
 | Secret type | Revocation action |
 |:---|:---|
 | JWT signing secret | Deploy a new secret (see `docs/runbooks/rotate-jwt-secret.md`, immediate path) |
-| Database password | Rotate via the database platform (RDS, Azure Database, etc.) |
+| Database password | Rotate on the PostgreSQL server (`ALTER USER ...`) and update server `.env` |
 | API key (third-party) | Revoke in the third-party provider's console |
 | GitHub Personal Access Token | Revoke in GitHub Settings > Developer settings |
-| AWS access key | Deactivate in IAM console, then delete |
-| Azure managed identity / service principal | Rotate credentials in Entra ID |
+| SSH deploy key | Remove from server `authorized_keys`, generate a new key pair |
 | Docker registry credentials | Rotate in the registry console |
 
 ### 2. If the secret is in Git history
@@ -70,11 +69,11 @@ The exposure window is from the first commit date to the revocation time.
 
 ### 5. Audit access logs
 
-Examine API logs, database audit logs, and cloud provider access logs for requests using the compromised credential during the exposure window.
+Examine API logs, database audit logs, and server access logs for requests using the compromised credential during the exposure window.
 
 ```bash
-# Example: search API logs for suspicious requests during exposure window
-# Adjust to your logging platform (CloudWatch, Azure Monitor, Datadog, etc.)
+# Example: search API container logs during exposure window
+ssh deploy@your-vps "docker compose -f /opt/your-app/infra/docker-compose.prod.yml logs api --since 2026-05-22T00:00:00"
 ```
 
 Look for:

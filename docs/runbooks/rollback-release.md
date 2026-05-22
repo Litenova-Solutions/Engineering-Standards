@@ -37,18 +37,14 @@ PREVIOUS_IMAGE=ghcr.io/your-org/your-project/api@sha256:<previous-digest>
 ### 2. Deploy the previous image
 
 ```bash
-# Azure Container Apps
-az containerapp update \
-  --name your-api \
-  --resource-group your-rg \
-  --image "$PREVIOUS_IMAGE"
-
-# Kubernetes
-kubectl set image deployment/api api="$PREVIOUS_IMAGE"
-kubectl rollout status deployment/api
-
-# Or use Kubernetes native rollback (reverts to previous revision)
-kubectl rollout undo deployment/api
+ssh deploy@your-vps << 'EOF'
+  cd /opt/your-app
+  export API_IMAGE="ghcr.io/your-org/your-project/api@sha256:<previous-digest>"
+  export WORKER_IMAGE="ghcr.io/your-org/your-project/worker@sha256:<previous-digest>"
+  export WEB_IMAGE="ghcr.io/your-org/your-project/web@sha256:<previous-digest>"
+  docker compose -f infra/docker-compose.prod.yml pull
+  docker compose -f infra/docker-compose.prod.yml up -d
+EOF
 ```
 
 ### 3. Verify health checks

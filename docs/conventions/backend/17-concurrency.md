@@ -156,7 +156,7 @@ When a client receives a 409 response from a concurrency conflict:
 3. Do not silently discard the user's unsaved changes without confirmation.
 
 ```typescript
-// features/posts/edit/useUpdatePost.ts
+// domain/posts/edit/useUpdatePost.ts
 const mutation = useMutation({
   mutationFn: updatePost,
   onError: (error) => {

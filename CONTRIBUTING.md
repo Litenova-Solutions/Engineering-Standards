@@ -36,15 +36,16 @@ node scripts/smoke-bootstrap.mjs
 ```
 
 CI runs the same checks via `.github/workflows/standards-ci.yml`.
-3. Include a `CHANGELOG.md` entry under `[Unreleased]` describing the change.
-4. Receive at least one review approval before merging.
-5. Have all review comments resolved before merging.
-6. Use squash merge. The squash commit message MUST follow [Conventional Commits](https://www.conventionalcommits.org/) format.
+3. Receive at least one review approval before merging.
+4. Have all review comments resolved before merging.
+5. Use squash merge. The squash commit message MUST follow [Conventional Commits](https://www.conventionalcommits.org/) format.
+
+From **v2.0.0** onward, every PR that changes a convention MUST also include a `CHANGELOG.md` entry under `[Unreleased]`. There is no changelog file before v2.
 
 Conventional Commits examples:
 
 ```
-feat: add docs/templates/ directory with six project-specific templates
+feat: add domain doc templates for consumer projects
 fix: correct CancellationToken naming rule in 03-application-layer.md
 chore: prepare release v1.1.0
 docs: add Guard.Against exception type warning to validators section
@@ -61,35 +62,19 @@ A breaking change is any convention update that makes previously compliant code 
 - Removing a pattern that projects depend on (e.g., removing the `ApplicationGuard` helper that projects reference)
 - Changing an exception base class location that projects import
 
-Breaking changes require a `MAJOR` version bump. Document breaking changes clearly in the `CHANGELOG.md` under `### Breaking Changes`. This affects downstream projects that pin to a version tag and must plan an upgrade.
+Breaking changes require a `MAJOR` version bump. From v2.0.0 onward, document breaking changes in `CHANGELOG.md` under `### Breaking Changes`. Before v2, describe breaking changes in the GitHub Release notes and PR description.
 
 ---
 
-## 5. The CHANGELOG Format
+## 5. Changelog (from v2.0.0 only)
 
-This repository follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format. The three sections used are:
+This repository has no `CHANGELOG.md` before **v2.0.0**. Release notes for v1.x tags are written in GitHub Releases only.
 
-- `### Breaking Changes` - convention updates that make previously compliant code non-compliant
-- `### Added` - new files, new rules, new examples, new templates
-- `### Changed` - updates to existing files, clarifications, corrections
+From **v2.0.0** onward, add `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com/) with these sections:
 
-Example entries for each section:
-
-```markdown
-### Breaking Changes
-- `docs/conventions/backend/02-domain-layer.md`: Removed `ApplicationGuard` helper. Projects that
-  reference this helper must switch to direct `if` + `throw` patterns with custom exception types.
-
-### Added
-- `docs/templates/` directory with six project-specific documentation templates.
-- `CONTRIBUTING.md` with release process instructions.
-
-### Changed
-- `AGENTS.md`: Added `cancellationToken` naming rule and Reactions NuGet restriction.
-- `docs/conventions/backend/05-api-layer.md`: Added route grouping section.
-```
-
-`[Unreleased]` entries are moved to a versioned section when a release is tagged.
+- `### Breaking Changes`
+- `### Added`
+- `### Changed`
 
 ---
 
@@ -97,43 +82,26 @@ Example entries for each section:
 
 **Step 1:** Ensure `main` is up to date and all pull requests for this release are merged.
 
-**Step 2:** Update `CHANGELOG.md`. Move all entries from `[Unreleased]` to a new versioned section. Set the date. Update the comparison links at the bottom of the file.
+**Step 2:** For **v2.0.0+**, update `CHANGELOG.md`. Move all entries from `[Unreleased]` to a new versioned section. Set the date.
 
-```markdown
-## [1.1.0] - 2025-06-15
-
-### Added
-- docs/templates/ directory with six project-specific documentation templates.
-- CONTRIBUTING.md with release process instructions.
-```
-
-**Step 3:** Commit the CHANGELOG update directly to `main`:
+**Step 3:** Create an annotated tag:
 
 ```bash
-git commit -m "chore: prepare release v1.1.0"
+git tag -a v1.0.0 -m "Release v1.0.0
+
+First pinned baseline for consumer projects."
+
+git push origin v1.0.0
 ```
 
-**Step 4:** Create an annotated tag:
-
-```bash
-git tag -a v1.1.0 -m "Release v1.1.0
-
-Added docs/templates/ directory.
-Added CONTRIBUTING.md.
-See CHANGELOG.md for full details."
-
-git push origin v1.1.0
-```
-
-**Step 5:** Create a GitHub Release from the tag:
+**Step 4:** Create a GitHub Release from the tag:
 
 - Go to the repository on GitHub.
 - Click "Releases" in the right sidebar.
 - Click "Draft a new release".
-- Select the tag you just pushed from the "Choose a tag" dropdown.
-- Set the release title to `v1.1.0`.
-- Paste the CHANGELOG entry for this version into the description field.
-- For `MAJOR` version releases, check "Set as pre-release" until the release has been validated against at least one project. Uncheck it when confirmed stable.
+- Select the tag from the "Choose a tag" dropdown.
+- Write release notes in the description (required for v1.x; for v2.x paste the CHANGELOG section).
+- For `MAJOR` version releases, check "Set as pre-release" until validated against at least one project.
 - Click "Publish release".
 
 ---
@@ -169,8 +137,7 @@ For `MAJOR` version upgrades, the commit message should list the breaking change
 chore: upgrade engineering-standards to v2.0.0
 
 Breaking changes addressed:
-- Renamed IXxxReadRepository to IXxxReadStore in Application.Read.Contracts.
-  Updated IPostReadRepository -> IPostReadStore and IOrderReadRepository -> IOrderReadStore.
-- Moved ApplicationGuard helper usages to direct if + throw patterns.
-  Updated CreatePostCommandValidator, CreateOrderCommandValidator.
+- Renamed apps/web/features/ to apps/web/domain/.
+  Updated imports and ESLint boundary zones.
+- Moved project docs to docs/domain/{feature}/{use-case}.md tree.
 ```

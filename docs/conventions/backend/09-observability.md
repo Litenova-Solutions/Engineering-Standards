@@ -307,7 +307,7 @@ Project-specific thresholds live in the project repository because they depend o
 
 ## 6. Production Export Configuration
 
-Development uses console logging and optional local OTLP collectors. Production MUST export traces and metrics to an OTLP-compatible backend (Azure Monitor, Grafana Cloud, Honeycomb, or self-hosted Grafana Tempo).
+Development uses console logging and optional local OTLP collectors. Production MUST export traces and metrics to an OTLP-compatible backend (self-hosted Grafana stack, Grafana Cloud, Honeycomb, or similar).
 
 ### appsettings.Production.json (Serilog sinks)
 
@@ -331,7 +331,7 @@ Development uses console logging and optional local OTLP collectors. Production 
 }
 ```
 
-Add a production-only sink (Seq, Azure Application Insights, or a log aggregator) via `appsettings.Production.json` or environment variables. Do not hard-code sink credentials in source.
+Add a production-only sink (Seq, Loki, or another log aggregator) via `appsettings.Production.json` or environment variables. Do not hard-code sink credentials in source.
 
 ### OpenTelemetry registration (Program.cs excerpt)
 

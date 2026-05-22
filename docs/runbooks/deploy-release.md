@@ -60,18 +60,18 @@ Check the output for errors. If any statement failed, do not start the new appli
 
 ### 5. Deploy the new image
 
-Use the platform-specific deployment command:
+Pull and restart on the production VPS:
 
 ```bash
-# Azure Container Apps example
-az containerapp update \
-  --name your-api \
-  --resource-group your-rg \
-  --image "$IMAGE"
-
-# Kubernetes example
-kubectl set image deployment/api api="$IMAGE"
-kubectl rollout status deployment/api
+# SSH deploy (image digests set in server .env or passed by CI)
+ssh deploy@your-vps << 'EOF'
+  cd /opt/your-app
+  export API_IMAGE="ghcr.io/your-org/your-project/api@sha256:<digest>"
+  export WORKER_IMAGE="ghcr.io/your-org/your-project/worker@sha256:<digest>"
+  export WEB_IMAGE="ghcr.io/your-org/your-project/web@sha256:<digest>"
+  docker compose -f infra/docker-compose.prod.yml pull
+  docker compose -f infra/docker-compose.prod.yml up -d
+EOF
 ```
 
 ### 6. Verify health checks

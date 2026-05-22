@@ -2,7 +2,7 @@
 
 ## 1. Guiding Philosophy
 
-Components are the unit of UI composition, not the unit of architecture. The feature folder is the unit of architecture. A component answers one question: given this data, what should the UI look like? Business logic, data fetching, and state management are not component concerns. The component receives data via props or reads it from a server component parent. It renders. It dispatches events upward. Nothing else.
+Components are the unit of UI composition, not the unit of architecture. The domain folder is the unit of architecture. A component answers one question: given this data, what should the UI look like? Business logic, data fetching, and state management are not component concerns. The component receives data via props or reads it from a server component parent. It renders. It dispatches events upward. Nothing else.
 
 This separation is enforced structurally: server components fetch, client components interact, and neither category does the other's job. A component that fetches data AND handles button clicks is a design problem, not a convenience. Split it: server component fetches and passes data down, client component handles interaction and fires callbacks up.
 
@@ -14,21 +14,21 @@ Four categories of components exist, each with a defined location and purpose:
 
 ### Page Components
 
-**Location:** `features/{feature}/{usecase}/{FeatureName}Page.tsx`
+**Location:** `domain/{feature}/{usecase}/{FeatureName}Page.tsx`
 
-Server components that receive data from the `app/` page shell and orchestrate feature rendering. They own the layout of a use case. MUST be server components unless the entire page requires client-side interactivity with no static data.
+Server components that receive data from the `app/` page shell and orchestrate domain rendering. They own the layout of a use case. MUST be server components unless the entire page requires client-side interactivity with no static data.
 
-### Feature Components
+### Use Case Components
 
-**Location:** `features/{feature}/{usecase}/{ComponentName}.tsx`
+**Location:** `domain/{feature}/{usecase}/{ComponentName}.tsx`
 
-Components specific to a single use case within a feature. Can be server or client. One component per file. Named after what they represent, not where they appear (`PostCard`, not `ListItem`).
+Components specific to a single use case within a domain. Can be server or client. One component per file. Named after what they represent, not where they appear (`PostCard`, not `ListItem`).
 
-### Shared Feature Components
+### Shared Domain Components
 
-**Location:** `features/{feature}/shared/{ComponentName}.tsx`
+**Location:** `domain/{feature}/shared/{ComponentName}.tsx`
 
-Components shared within a feature but not across features. Promoted here after appearing in two use cases within the same feature (the Strike 2 rule). Do not promote early.
+Components shared within a domain but not across domains. Promoted here after appearing in two use cases within the same domain (the Strike 2 rule). Do not promote early.
 
 ### UI Components
 
@@ -37,8 +37,8 @@ Components shared within a feature but not across features. Promoted here after 
 shadcn/ui components. Owned in this codebase. Never imported from `@shadcn/ui` (which is not an importable package). Modified here, not in `node_modules`. See Section 4.
 
 ```typescript
-// GOOD: PostCard is a feature component inside the posts/list use case
-// features/posts/list/PostCard.tsx
+// GOOD: PostCard is a use case component inside domain/posts/list
+// domain/posts/list/PostCard.tsx
 type PostCardProps = {
   id: string
   title: string
@@ -56,7 +56,7 @@ export function PostCard({ id, title, publishedAt }: PostCardProps) {
 ```
 
 ```typescript
-// BAD: generic component placed directly in app/ without a feature folder
+// BAD: generic component placed directly in app/ without a domain folder
 // app/components/Card.tsx   <- BAD: no feature ownership, no use case context
 export function Card({ children }: { children: React.ReactNode }) {
   return <div className="rounded border p-4">{children}</div>
@@ -403,7 +403,7 @@ Permission-gated UI may hide or disable controls, but it is never the authorizat
 
 ## 11. Project-Specific Component Conventions
 
-Document design tokens in the project Tailwind `@theme` block and list shared components in `docs/domain/frontend-feature-inventory.md`.
+Document design tokens in the project Tailwind `@theme` block. Document shared domain components in the relevant feature README at `docs/domain/{feature}/README.md`.
 
 ---
 

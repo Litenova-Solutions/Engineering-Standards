@@ -18,15 +18,15 @@ Pages and data reads MUST use Server Components unless the UI needs browser APIs
 
 ### 2. Thin `page.tsx` Shells
 
-Route files MUST only parse `params`/`searchParams`, call `notFound()`, and render a feature entry from `features/{feature}/`.
+Route files MUST only parse `params`/`searchParams`, call `notFound()`, and render a domain entry from `domain/{feature}/`.
 
-### 3. No Cross-Feature Imports
+### 3. No Cross-Domain Imports
 
-`features/posts/` MUST NOT import from `features/authors/`. Promote shared code to `@/shared/` or `components/ui/`. See `07-feature-boundaries.md`.
+`domain/posts/` MUST NOT import from `domain/authors/`. Promote shared code to `@/shared/` or `components/ui/`. See `07-domain-boundaries.md`.
 
 ### 4. Typed API Client Only
 
-HTTP calls MUST use `getApiClient()` with openapi-typescript paths. MUST NOT use Axios or ad-hoc `fetch` URLs in feature code.
+HTTP calls MUST use `getApiClient()` with openapi-typescript paths. MUST NOT use Axios or ad-hoc `fetch` URLs in domain code.
 
 ### 5. Server Actions for Form Mutations
 
@@ -50,4 +50,4 @@ Every happy-path user journey MUST have a Playwright test in `apps/web/e2e/` usi
 
 ### 10. Complete UI States
 
-Feature pages MUST render loading, empty, error, and forbidden states. MUST NOT ship blank placeholders.
+Domain pages MUST render loading, empty, error, and forbidden states. MUST NOT ship blank placeholders.

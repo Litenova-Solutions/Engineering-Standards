@@ -216,7 +216,7 @@ env:
   ConnectionStrings__Database: ${{ secrets.DATABASE_CONNECTION_STRING }}
 ```
 
-Secrets MUST be stored in the CI/CD platform's secret store (GitHub Actions Secrets, Azure Key Vault, AWS Secrets Manager). MUST NOT appear in `appsettings.json`, workflow files, or Dockerfiles.
+Secrets MUST be stored in GitHub Actions secrets (CI) and in the server environment file or encrypted secret store at runtime. MUST NOT appear in `appsettings.json`, workflow files, or Dockerfiles.
 
 ---
 

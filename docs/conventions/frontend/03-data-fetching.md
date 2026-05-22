@@ -96,7 +96,7 @@ export async function getApiClient() {
 A complete server component using this client:
 
 ```typescript
-// features/posts/list/PostListPage.tsx
+// domain/posts/list/PostListPage.tsx
 import { notFound } from "next/navigation"
 import { getApiClient } from "@/lib/api/client"
 import { PostCard } from "./PostCard"
@@ -169,7 +169,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 **Query key convention:**
 
 ```typescript
-// features/posts/shared/queryKeys.ts
+// domain/posts/shared/queryKeys.ts
 import type { PostId, AuthorId } from "@/lib/types/branded"
 
 // Query keys are defined as a const object per feature.
@@ -185,7 +185,7 @@ export const postQueryKeys = {
 **A complete `useQuery` hook:**
 
 ```typescript
-// features/posts/list/usePostList.ts
+// domain/posts/list/usePostList.ts
 import { useQuery } from "@tanstack/react-query"
 import { getApiClient } from "@/lib/api/client"
 import { postQueryKeys } from "../shared/queryKeys"
@@ -214,7 +214,7 @@ Server Actions MUST be used for all mutations triggered by form submissions. The
 TanStack Query `useMutation` is permitted only for non-form interactions (see Section 5). Form submissions MUST NOT bypass Server Actions in favor of client-side `fetch` or `useMutation`.
 
 ```typescript
-// features/posts/create/createPost.action.ts
+// domain/posts/create/createPost.action.ts
 "use server"
 
 import { redirect } from "next/navigation"
@@ -286,7 +286,7 @@ export async function createPostAction(
 Non-form mutations (toggle, reorder, inline edit) **MUST** use TanStack Query `useMutation` with `getApiClient()`, not raw `fetch` or Axios.
 
 ```typescript
-// GOOD: features/posts/publish/usePublishPost.ts
+// GOOD: domain/posts/publish/usePublishPost.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { getApiClient } from "@/lib/api/client"
 import { postQueryKeys } from "../shared/queryKeys"
@@ -412,7 +412,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 **Showing toasts after a Server Action using `useActionState`:**
 
 ```typescript
-// features/posts/create/CreatePostForm.tsx (excerpt)
+// domain/posts/create/CreatePostForm.tsx (excerpt)
 "use client"
 // Needs useActionState and toast notifications - client component required.
 
@@ -468,7 +468,7 @@ async function PostListPage({ searchParams }: Props) {
 **Infinite scroll** uses TanStack Query `useInfiniteQuery`:
 
 ```typescript
-// features/posts/list/useInfinitePosts.ts
+// domain/posts/list/useInfinitePosts.ts
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { postQueryKeys } from "../shared/queryKeys"
 
@@ -578,7 +578,7 @@ Use `useOptimistic` (React 19) when the optimistic state feeds back into a serve
 **`useOptimistic` with a Server Action:**
 
 ```typescript
-// features/posts/list/PostListWithOptimisticPublish.tsx
+// domain/posts/list/PostListWithOptimisticPublish.tsx
 "use client"
 // Needs useOptimistic for immediate UI feedback - client component required.
 
@@ -634,7 +634,7 @@ The current pinned version is **5.100.10**. When upgrading, check the advisory f
 
 ## 14. Project-Specific Data Fetching Configuration
 
-Document API URLs, polling intervals, and auth token sources in `docs/domain/frontend-api-endpoints.md` and `lib/env.ts`.
+Document API URLs, polling intervals, and auth token sources in the relevant use case doc under `docs/domain/` and in `lib/env.ts`.
 
 ---
 
