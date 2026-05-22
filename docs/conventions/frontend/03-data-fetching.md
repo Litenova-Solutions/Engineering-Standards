@@ -7,7 +7,8 @@
 - Non-form mutations MUST use `useMutation` with `getApiClient()`; MUST NOT use raw `fetch` or Axios.
 - MUST NOT fetch in `useEffect` for server data.
 - List pages MUST implement loading, empty, error, and loaded states.
-- `revalidateTag` MUST include the `cacheLife` second argument (Next.js 16).
+- `revalidateTag` MUST be called in Server Actions after a mutation; `updateTag` is for optimistic updates only.
+- All API calls MUST go through `getApiClient()`. MUST NOT call `fetch` directly against backend URLs.
 
 ## 1. The Three Kinds of State
 

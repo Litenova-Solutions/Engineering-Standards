@@ -41,8 +41,9 @@ jobs:
 
       - name: OpenAPI freshness
         run: |
-          dotnet run --project src/{ProjectName}.WebApi -- --export-openapi packages/api-types/openapi.json
-          npx openapi-typescript packages/api-types/openapi.json -o packages/api-types/src/api.d.ts
+          dotnet build src/{ProjectName}.slnx --configuration Release
+          cp src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
+          pnpm --filter @myproject/api-types generate:api-types
           git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
 
       - name: Playwright E2E

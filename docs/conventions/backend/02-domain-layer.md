@@ -11,6 +11,7 @@ This document is the authoritative guide for all design decisions in the Domain 
 - Concrete types MUST be `sealed` unless explicitly a base class.
 - MUST NOT reference EF Core, ASP.NET Core, or application DTOs in Domain.
 - Repository interfaces live in Domain; implementations live in Infrastructure only.
+- Domain aggregates MUST NOT call `DateTime.UtcNow` directly. Accept `utcNow` as a `DateTimeOffset` parameter from the handler, which gets it from `IClock`.
 
 ---
 

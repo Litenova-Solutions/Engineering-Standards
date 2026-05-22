@@ -261,6 +261,10 @@ The following packages are pre-approved and do not require a new ADR:
 | `AwesomeAssertions` | All test projects | Assertion library |
 | `Testcontainers.PostgreSql` | `Integration.Tests` | PostgreSQL container for tests |
 | `Microsoft.AspNetCore.Mvc.Testing` | `Integration.Tests` | `WebApplicationFactory<T>` |
+| `Microsoft.AspNetCore.Authentication.JwtBearer` | `WebApi` | JWT bearer authentication |
+| `Microsoft.AspNetCore.OpenApi` | `WebApi` | OpenAPI document generation |
+| `Microsoft.Extensions.ApiDescription.Server` | `WebApi` | Build-time OpenAPI spec output |
+| `Microsoft.Extensions.Options.DataAnnotations` | `WebApi`, `Infrastructure` | `ValidateDataAnnotations()` for options classes |
 | `coverlet.collector` | All test projects | Code coverage |
 
 Any package not in this list requires an ADR before being added to any project.

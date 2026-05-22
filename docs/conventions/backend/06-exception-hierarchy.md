@@ -191,6 +191,16 @@ public sealed class PostIdRequiredException : QueryValidationException
 
 The canonical `GlobalExceptionHandler` implementation is in `docs/conventions/backend/05-api-layer.md`. Endpoints MUST NOT contain `try-catch` blocks.
 
+`DbUpdateConcurrencyException` from EF Core MUST be caught in the `GlobalExceptionHandler` and mapped to HTTP 409. Add it to the exception switch alongside `DomainException`. See `docs/conventions/backend/17-concurrency.md` for the full pattern.
+
+> **Security note.** Unhandled exceptions (HTTP 500) MUST NOT expose `exception.Message` in the `Detail` field of the response. Stack traces and internal system details in API responses are an information disclosure risk (OWASP A05). The `GlobalExceptionHandler` MUST use a generic message for 500 responses:
+>
+> ```csharp
+> Detail = statusCode == StatusCodes.Status500InternalServerError
+>     ? "An unexpected error occurred. Please contact support."
+>     : exception.Message
+> ```
+
 > **Security note.** Unhandled exceptions (HTTP 500) MUST NOT expose `exception.Message` in the `Detail` field of the response. Stack traces and internal system details in API responses are an information disclosure risk (OWASP A05). The `GlobalExceptionHandler` MUST use a generic message for 500 responses:
 >
 > ```csharp

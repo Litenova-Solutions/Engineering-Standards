@@ -10,8 +10,10 @@ This document is the authoritative guide for all design decisions in the five ap
 - Query handlers MUST inject `IDatabaseContext`; MUST NOT inject repositories.
 - Command handlers MUST NOT call `SaveChangesAsync`.
 - Validators throw `CommandValidationException` / `QueryValidationException`; MUST NOT use `Guard.Against`.
+- Validators MUST NOT make database lookups. Structural validation only.
 - `Application.Reactions` MUST NOT reference external NuGet packages; define narrow interfaces.
 - Feature folders: `{Aggregate}/{UseCase}/` naming.
+- Handlers that need the current time MUST inject `IClock` and pass `clock.UtcNow` explicitly to aggregate methods. MUST NOT call `DateTime.UtcNow` or `DateTimeOffset.UtcNow` directly in handlers.
 
 ---
 
