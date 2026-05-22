@@ -234,6 +234,8 @@ internal static class GetPostByIdApiMappings
 }
 ```
 
+> **Route parameter type rule.** Route parameters MUST use `Guid` in the endpoint method signature. The `ApiMappings` extension method constructs the strongly-typed ID. This keeps OpenAPI schema generation simple and avoids requiring OpenAPI schema transformers for route parameters.
+
 ### Endpoint Class
 
 ```csharp
@@ -529,6 +531,143 @@ app.MapPost("/imports", HandleAsync)
 ```
 
 Rate limits must be load tested before production. Do not partition limits by untrusted arbitrary input because it can create unbounded limiter state.
+
+---
+
+## Canonical Program.cs Structure
+
+The canonical `Program.cs` for all WebApi projects follows this structure. Middleware order is not arbitrary; changing it without understanding the consequences will break authentication, CORS, or rate limiting.
+
+`IHttpContextAccessor` requires `builder.Services.AddHttpContextAccessor()` to be registered. This registration is included in the template below.
+
+```csharp
+// WebApi/Program.cs
+var builder = WebApplication.CreateBuilder(args);
+
+// Logging
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .Enrich.WithMachineName()
+        .Enrich.WithEnvironmentName()
+        .WriteTo.Console(new JsonFormatter()));
+
+// Infrastructure and application services
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// LiteBus
+builder.Services.AddLiteBus(liteBus =>
+{
+    liteBus.AddCommandModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ApplicationWriteAssemblyMarker).Assembly);
+        module.RegisterFromAssembly(typeof(InfrastructureAssemblyMarker).Assembly);
+    });
+    liteBus.AddQueryModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ApplicationReadAssemblyMarker).Assembly);
+    });
+    liteBus.AddEventModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ApplicationReactionsAssemblyMarker).Assembly);
+    });
+});
+
+// Endpoints
+builder.Services.AddEndpoints(typeof(Program).Assembly);
+
+// HTTP context accessor (required by endpoints that read claims)
+builder.Services.AddHttpContextAccessor();
+
+// Exception handling and problem details
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+// OpenAPI
+builder.Services.AddOpenApi(options =>
+{
+    options.AddSchemaTransformer<StronglyTypedIdSchemaTransformer>();
+});
+
+// Support --export-openapi <path> for CI OpenAPI freshness checks.
+// Exits immediately after writing the spec, without starting the server.
+if (args.Length == 2 && args[0] == "--export-openapi")
+{
+    var outputPath = args[1];
+    var specApp = builder.Build();
+    specApp.MapOpenApi();
+    await specApp.StartAsync();
+
+    var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
+    var spec = await httpClient.GetStringAsync("/openapi/v1.json");
+    await File.WriteAllTextAsync(outputPath, spec);
+    await specApp.StopAsync();
+    return;
+}
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+        policy
+            .WithOrigins(builder.Configuration["Cors:WebOrigin"]!)
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
+// Authentication and authorization
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(/* project-specific configuration */);
+builder.Services.AddAuthorization();
+
+// Health checks
+builder.Services.AddHealthChecks()
+    .AddCheck<PostgreSqlHealthCheck>("postgresql", tags: ["ready"]);
+
+// Rate limiting
+builder.Services.AddRateLimiter(/* project-specific policies */);
+
+var app = builder.Build();
+
+// Middleware order. See: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/
+app.UseExceptionHandler();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
+app.UseMiddleware<CorrelationIdMiddleware>();
+
+// UseCors MUST come after UseRouting but before UseAuthentication.
+app.UseRouting();
+app.UseCors("Frontend");
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseRateLimiter();
+
+app.MapEndpoints();
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false
+});
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
+
+app.Run();
+
+// Required for WebApplicationFactory<Program> in integration tests.
+public partial class Program { }
+```
+
+The `--export-openapi` flag is used by the CI gate in `docs/conventions/shared/ci.md`. The port (`http://localhost:5000`) must match the `launchSettings.json` configuration for the export to succeed in CI.
 
 ---
 

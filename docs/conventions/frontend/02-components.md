@@ -449,3 +449,35 @@ export function PostBody({ rawHtml }: { rawHtml: string }) {
   return <div dangerouslySetInnerHTML={{ __html: clean }} />
 }
 ```
+
+---
+
+## 13. Image Components
+
+Use `next/image` for all images that are part of content or layout. Raw `<img>` tags bypass Next.js image optimization (no lazy loading, no WebP conversion, no size constraints).
+
+```typescript
+// GOOD: use next/image for content and layout images
+import Image from "next/image"
+
+export function PostCoverImage({ src, alt }: { src: string; alt: string }) {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={800}
+      height={400}
+      className="rounded-md"
+    />
+  )
+}
+```
+
+```typescript
+// BAD: raw img tag bypasses Next.js image optimisation
+export function PostCoverImage({ src, alt }: { src: string; alt: string }) {
+  return <img src={src} alt={alt} />  // BAD: no lazy loading, no WebP, no size optimisation
+}
+```
+
+Use `<img>` only for images served from untrusted or dynamic domains where the Next.js Image Optimization API cannot be configured. Document any `<img>` usage with a comment explaining why `next/image` is not appropriate.

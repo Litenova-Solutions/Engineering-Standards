@@ -114,6 +114,32 @@ internal sealed class CreatePostCommandHandler : ICommandHandler<CreatePostComma
 public class CreatePostCommandHandler : ICommandHandler<CreatePostCommand, PostId> { }
 ```
 
+**Void command handler** (no result returned): use `ICommandHandler<TCommand>` with one type argument.
+
+```csharp
+// Application.Write/Posts/Publish/PublishPostCommandHandler.cs
+internal sealed class PublishPostCommandHandler : ICommandHandler<PublishPostCommand>
+{
+    private readonly IPostRepository _postRepository;
+
+    public PublishPostCommandHandler(IPostRepository postRepository)
+    {
+        _postRepository = postRepository;
+    }
+
+    public async Task HandleAsync(
+        PublishPostCommand command,
+        CancellationToken cancellationToken)
+    {
+        var post = await _postRepository.GetByIdAsync(command.PostId, cancellationToken);
+        post.Publish();
+        await _postRepository.UpdateAsync(post, cancellationToken);
+        // SaveChangesAsync is called by SaveChangesCommandPostHandler in the pipeline
+    }
+}
+```
+```
+
 ### Command Validator (in Application.Write)
 
 Validators run before the handler. They check structural validity only (non-null, non-empty, within range). They do NOT check business rules. Validators MUST throw `CommandValidationException` subclasses. Never throw `ArgumentException` or use `Guard.Against` in validators.

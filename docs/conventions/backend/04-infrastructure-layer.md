@@ -332,6 +332,45 @@ builder.HasIndex("Name_Value").IsUnique(); // fails — property not found on th
 
 ---
 
+## EF Core Configuration for Aggregate State (TPH)
+
+When a domain aggregate uses a discriminated union for state (e.g., `PostState` with `DraftPostState`, `PublishedPostState`, `ArchivedPostState`), EF Core maps the inheritance using Table Per Hierarchy (TPH) by default: a single table with a discriminator column.
+
+```csharp
+// Infrastructure/Persistence/Configurations/PostConfiguration.cs
+internal sealed class PostConfiguration : IEntityTypeConfiguration<Post>
+{
+    public void Configure(EntityTypeBuilder<Post> builder)
+    {
+        builder.ToTable("posts");
+
+        builder.HasKey(p => p.Id);
+        builder.Property(p => p.Id)
+            .HasConversion(id => id.Value, value => new PostId(value))
+            .HasColumnName("id");
+
+        // State is stored using TPH with a discriminator column.
+        // All PostState subtype properties are nullable columns on the posts table.
+        builder.HasDiscriminator<string>("state_type")
+            .HasValue<DraftPostState>("Draft")
+            .HasValue<PublishedPostState>("Published")
+            .HasValue<ArchivedPostState>("Archived");
+
+        // PublishedPostState maps its PublishedAt property.
+        builder.Property<DateTime?>("PublishedAt")
+            .HasColumnName("published_at");
+
+        // ArchivedPostState maps its ArchivedAt property.
+        builder.Property<DateTime?>("ArchivedAt")
+            .HasColumnName("archived_at");
+    }
+}
+```
+
+> The discriminator column (`state_type`) MUST be explicitly named in snake_case. The automatic snake_case convention does not apply to discriminator columns; they must be configured with `HasColumnName`. State-specific properties that are `null` for other states use nullable columns — this is the expected behaviour of TPH.
+
+---
+
 ## Repository Implementation Pattern
 
 Repository implementations resolve the domain interface defined in the Domain layer.
@@ -423,7 +462,7 @@ internal sealed class AppDbContext : DbContext, IDatabaseContext
     {
         // Collect events before saving so they reflect the pre-save state.
         var domainEvents = ChangeTracker.Entries<IAggregateRoot>()
-            .SelectMany(e => e.Entity.GetDomainEvents())
+            .SelectMany(e => e.Entity.DomainEvents)
             .ToList();
 
         // Clear before saving to avoid re-dispatching on retry.
@@ -436,7 +475,8 @@ internal sealed class AppDbContext : DbContext, IDatabaseContext
 
         foreach (var domainEvent in domainEvents)
         {
-            // LiteBus publishes any notnull object. No cast needed.
+            // LiteBus publishes any notnull object via the generic overload.
+            // IDomainEvent satisfies the `notnull` constraint.
             await _eventPublisher.PublishAsync(
                 domainEvent,
                 cancellationToken: cancellationToken);
@@ -454,6 +494,21 @@ internal sealed class AppDbContext : DbContext, IDatabaseContext
 When a new aggregate is added to the domain, add its `DbSet<T>` property here and add the corresponding `IQueryable<T>` property to `IDatabaseContext` in `Application.Read.Contracts`.
 
 > **Note on assembly visibility.** `AppDbContext` is `internal sealed` within the Infrastructure assembly. The DI container resolves it at runtime via the interface registration `services.AddScoped<IDatabaseContext>(sp => sp.GetRequiredService<AppDbContext>())`. This works because .NET's DI container uses runtime types, bypassing compile-time visibility. The `Application.Read` project references `IDatabaseContext` only; it never references `AppDbContext` or the Infrastructure assembly directly.
+
+> **`IAggregateRoot` interface.** `ChangeTracker.Entries<IAggregateRoot>()` requires a non-generic marker interface. Define it in `Domain/Shared/IAggregateRoot.cs` (see `docs/architecture/clean-architecture.md` section 9). `IDomainEvent` MUST be `public` so Infrastructure can reference it across assembly boundaries.
+
+The `NoOpEventPublisher` used for design-time and test scenarios MUST implement the generic overload:
+
+```csharp
+internal sealed class NoOpEventPublisher : IEventPublisher
+{
+    Task IEventPublisher.PublishAsync<TEvent>(
+        TEvent @event,
+        EventMediationSettings? settings,
+        CancellationToken cancellationToken)
+        => Task.CompletedTask;
+}
+```
 
 ---
 
@@ -549,6 +604,8 @@ internal sealed class RollbackCommandErrorHandler
     }
 }
 ```
+
+> **Pipeline scope.** The three global pipeline behaviors are typed against `ICommand` (the base interface). Due to LiteBus's polymorphic dispatch, they fire for both `ICommand` (void) and `ICommand<TResult>` (result-returning) commands. No additional registration is needed for result-returning commands.
 
 ---
 

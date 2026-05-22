@@ -440,6 +440,7 @@ internal sealed class RollbackCommandErrorHandler
 
     public async Task HandleErrorAsync(
         ICommand command,
+        object? commandResult,
         Exception exception,
         CancellationToken cancellationToken)
     {
@@ -505,14 +506,28 @@ Three concrete examples of rules that architecture tests enforce:
 
 ## 9. The AggregateRoot Base Class
 
-Every project defines two types in `Domain/Shared/`. They are not provided by a NuGet package; they are owned by the project.
+Every project defines three types in `Domain/Shared/`. They are not provided by a NuGet package; they are owned by the project.
+
+```csharp
+// Domain/Shared/IAggregateRoot.cs
+/// <summary>
+/// Non-generic marker interface implemented by all aggregate roots.
+/// Used by Infrastructure to query the EF Core change tracker without
+/// knowing the concrete ID type.
+/// </summary>
+public interface IAggregateRoot
+{
+    IReadOnlyList<IDomainEvent> DomainEvents { get; }
+    void ClearDomainEvents();
+}
+```
 
 ```csharp
 /// <summary>
 /// The base class for all aggregate roots. Provides domain event collection
 /// and the strongly-typed ID contract.
 /// </summary>
-abstract class AggregateRoot<TId>
+abstract class AggregateRoot<TId> : IAggregateRoot
     where TId : struct
 {
     private readonly List<IDomainEvent> _domainEvents = [];
@@ -520,7 +535,7 @@ abstract class AggregateRoot<TId>
     /// <summary>
     /// The unique identifier of this aggregate root.
     /// </summary>
-    public TId Id { get; protected init; }
+    public TId Id { get; protected set; }   // set, not init — required for EF Core materialisation
 
     /// <summary>
     /// Domain events raised during this aggregate's lifetime, dispatched
@@ -550,13 +565,16 @@ abstract class AggregateRoot<TId>
 The `IDomainEvent` marker interface:
 
 ```csharp
+// Domain/Shared/IDomainEvent.cs
 /// <summary>
 /// Marker interface for all domain events. Implement this interface on
 /// every domain event record.
 /// </summary>
-interface IDomainEvent;
+public interface IDomainEvent;
 ```
 
-`IDomainEvent` is a project-defined marker. It has **no LiteBus dependency** and does not extend any LiteBus interface. LiteBus dispatches any `notnull` object as an event — no framework interface required. The marker exists purely for domain modeling: it provides a shared type to collect events in `AggregateRoot<TId>` and makes event dispatch explicit in Infrastructure.
+`IDomainEvent` MUST be `public`. Infrastructure references this interface when iterating domain events in `AppDbContext.SaveChangesAsync`. Making it `internal` requires `InternalsVisibleTo` configuration, which couples the Domain project to Infrastructure by name and is not permitted.
 
-Both types live in `Domain/Shared/`. All aggregate roots extend `AggregateRoot<TId>`. All domain event records implement `IDomainEvent`. Infrastructure calls `ClearDomainEvents()` after dispatching events via LiteBus.
+`IDomainEvent` has **no LiteBus dependency** and does not extend any LiteBus interface. LiteBus dispatches any `notnull` object as an event — no framework interface required. The marker exists purely for domain modeling: it provides a shared type to collect events in `AggregateRoot<TId>` and makes event dispatch explicit in Infrastructure.
+
+All three types live in `Domain/Shared/`. All aggregate roots extend `AggregateRoot<TId>`. All domain event records implement `IDomainEvent`. Infrastructure calls `ClearDomainEvents()` after dispatching events via LiteBus.

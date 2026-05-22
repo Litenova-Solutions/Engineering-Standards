@@ -54,7 +54,7 @@ Solutions following these standards MUST include {ProjectName}.Architecture.Test
 
 ## 2. Deterministic Scaffolding Sequence
 
-When implementing a new aggregate or business feature, developers and AI agents **MUST** follow this exact 6-step chronological sequence. Do not skip steps or write outer layers before completing inner boundaries.
+When implementing a new aggregate or business feature, developers and AI agents **MUST** follow this exact 7-step chronological sequence. Do not skip steps or write outer layers before completing inner boundaries.
 
 ```mermaid
 graph TD
@@ -63,13 +63,15 @@ graph TD
     Step3["3. EF Core Configuration"]
     Step4["4. Contracts Projects"]
     Step5["5. Handlers and Validators"]
-    Step6["6. WebApi Endpoint and DI"]
+    Step6["6. Reactions (conditional)"]
+    Step7["7. WebApi Endpoint and DI"]
 
     Step1 --> Step2
     Step2 --> Step3
     Step3 --> Step4
     Step4 --> Step5
     Step5 --> Step6
+    Step6 --> Step7
 ```
 
 1. **Domain:** Strongly-typed ID and aggregate root.
@@ -77,7 +79,8 @@ graph TD
 3. **EF configuration** in `Infrastructure`.
 4. **Command/query records** in Contracts projects.
 5. **Handlers and validators** in `Application.Write` / `Application.Read`.
-6. **`IEndpoint` and DI** in `WebApi` / `Infrastructure`.
+6. **Narrow interface in `Application.Reactions` + Infrastructure implementation** (conditional: add only when an aggregate method raises a domain event that requires an external side effect; skip if no domain event is needed).
+7. **`IEndpoint` and DI** in `WebApi` / `Infrastructure`.
 
 ---
 

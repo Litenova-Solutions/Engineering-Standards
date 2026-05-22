@@ -298,6 +298,8 @@ Every aggregate root extends `AggregateRoot<TId>` defined in `Domain/Shared/Aggr
 
 > **Note on EF Core compatibility.** The private parameterless constructor (`private Post() { }`) and `private set` properties on aggregates exist because EF Core requires a way to materialise objects without calling the public factory method. Collection navigation properties use private `List<T>` backing fields (e.g., `_lines`) configured in Infrastructure via field-mode navigation. The Domain project carries no EF Core package reference, but its structural conventions are deliberately compatible with EF Core materialisation. A future ORM change would require adjustments to aggregate shape.
 
+> **Note on `Id` accessor.** `AggregateRoot<TId>.Id` uses `protected set` (not `protected init`). EF Core materialises aggregates via the parameterless constructor and then sets properties via reflection. `init`-only properties cannot be set after construction and produce a runtime exception when EF Core attempts to hydrate an aggregate from the database.
+
 ```csharp
 // GOOD: aggregate root extends the base class
 sealed class Post : AggregateRoot<PostId>
@@ -477,6 +479,10 @@ sealed record PostTitle
 
     public PostTitle(string value)
     {
+        // By the time a value object is constructed, the command validator
+        // has already verified structural constraints (non-empty, max length).
+        // The value object enforces the same rules as a last-resort defence
+        // for direct domain usage outside the command pipeline.
         if (string.IsNullOrWhiteSpace(value))
         {
             throw new PostTitleRequiredException();
@@ -628,8 +634,10 @@ sealed record PostPublished : IDomainEvent
 
 ```csharp
 /// <summary>Marker interface for all domain events.</summary>
-interface IDomainEvent;
+public interface IDomainEvent;
 ```
+
+`IDomainEvent` MUST be `public`. Infrastructure references this interface when iterating domain events in `AppDbContext.SaveChangesAsync`. Making it `internal` requires `InternalsVisibleTo` configuration, which couples the Domain project to Infrastructure by name and is not permitted.
 
 `IDomainEvent` has **no LiteBus dependency** and does not extend any LiteBus interface. LiteBus can dispatch any `notnull` class as an event without framework coupling. The marker exists to:
 

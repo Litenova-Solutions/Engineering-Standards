@@ -186,6 +186,7 @@ export const postQueryKeys = {
 ```typescript
 // features/posts/list/usePostList.ts
 import { useQuery } from "@tanstack/react-query"
+import { getApiClient } from "@/lib/api/client"
 import { postQueryKeys } from "../shared/queryKeys"
 
 // This hook is for client components that need live post data.
@@ -194,9 +195,10 @@ export function usePostList() {
   return useQuery({
     queryKey: postQueryKeys.all,
     queryFn: async () => {
-      const response = await fetch("/api/posts")
-      if (!response.ok) throw new Error("Failed to fetch posts")
-      return response.json()
+      const client = await getApiClient()
+      const { data, error } = await client.GET("/posts")
+      if (error) throw new Error("Failed to fetch posts")
+      return data
     },
   })
 }
@@ -215,7 +217,7 @@ TanStack Query `useMutation` is permitted only for non-form interactions (see Se
 "use server"
 
 import { redirect } from "next/navigation"
-import { revalidateTag } from "next/cache"
+import { updateTag } from "next/cache"
 import { getApiClient } from "@/lib/api/client"
 import { createPostSchema } from "./createPost.schema"
 
@@ -257,12 +259,23 @@ export async function createPostAction(
     throw new Error(error.detail ?? "Failed to create post")
   }
 
-  // Invalidate the posts cache after successful creation.
-  // cacheLife second argument is required in Next.js 16.
-  revalidateTag("posts", "minutes")
+  // Use updateTag (not revalidateTag) in Server Actions after mutations.
+  // updateTag provides read-your-writes semantics: the user sees their new post immediately.
+  updateTag("posts")
 
   return { success: true, postId: data.id }
 }
+```
+
+> **`updateTag` vs `revalidateTag` decision table:**
+>
+> | Situation | Function | Reason |
+> |:---|:---|:---|
+> | Server Action after user mutation | `updateTag("tag")` | User must see their change immediately |
+> | Background job or webhook | `revalidateTag("tag", "max")` | Stale-while-revalidate is acceptable |
+> | Route Handler | `revalidateTag("tag", "max")` | `updateTag` is Server Actions only |
+>
+> `updateTag` immediately expires the cached data for the specified tag. The next request fetches fresh data rather than serving stale content. `updateTag` can only be used in Server Actions. For Route Handlers, use `revalidateTag("tag", "max")` instead.
 ```
 
 ---
@@ -655,6 +668,41 @@ git add packages/api-types/src/api.d.ts
 ```
 
 Run these steps whenever the backend API changes. The generated file is committed and versioned alongside the frontend code.
+
+### `packages/api-types` workspace package
+
+The `packages/api-types` package must be configured so TypeScript workspaces resolve it correctly.
+
+`packages/api-types/package.json`:
+
+```json
+{
+  "name": "@workspace/api-types",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./src/api.d.ts"
+    }
+  },
+  "files": ["src"]
+}
+```
+
+`packages/api-types/tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*.d.ts"]
+}
+```
 
 ### Import pattern
 
