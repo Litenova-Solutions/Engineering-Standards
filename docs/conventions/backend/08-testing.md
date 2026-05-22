@@ -1,6 +1,14 @@
-# Testing
+# Backend Testing
 
-This document defines the testing philosophy, test project structure, and patterns used across all projects following these standards.
+This document defines backend testing philosophy, test project structure, and patterns. Frontend testing rules live in `docs/conventions/frontend/06-testing.md`.
+
+## Agent Quick Rules
+
+- Assertions MUST use AwesomeAssertions; MUST NOT use xUnit `Assert.*` in new tests.
+- Domain tests: no mocks; Application command tests: mock repositories only.
+- Query handler tests: SQLite in-process; Integration: Testcontainers PostgreSQL.
+- `{ProjectName}.Architecture.Tests` with NetArchTest is REQUIRED (`docs/decisions/architecture-tests-as-enforcement.md`).
+- Mutation testing REQUIRED for high-risk validators; OPTIONAL elsewhere.
 
 ---
 
@@ -472,7 +480,7 @@ public sealed class ApplicationLayerTests
 
         result.IsSuccessful.Should().BeTrue(
             because: "Application.Reactions must not reference Infrastructure libraries directly. " +
-                     "See docs/adr/0008-reactions-project-depends-only-on-abstractions.md");
+                     "See docs/decisions/reactions-project-depends-only-on-abstractions.md");
     }
 }
 ```
@@ -516,7 +524,7 @@ Every production project defines a small performance baseline:
 
 Run load tests before enabling rate limiting, caching, or realtime features in production. Rate limiting policies must be validated under realistic concurrency.
 
-Mutation testing is recommended for Domain tests and high-risk application validators. It is not required for every PR, but it SHOULD run on a scheduled CI job for critical projects.
+Mutation testing is REQUIRED for high-risk application validators (auth, payments, permissions, idempotency). Mutation testing is OPTIONAL for domain logic and other validators. Scheduled CI jobs MUST run mutation testing for projects that declare validators as high-risk in their test configuration.
 
 ---
 

@@ -225,6 +225,8 @@ function StatusBadge({ isPublished }: { isPublished: boolean }) {
 
 ## 7. Accessibility Requirements
 
+Projects MUST meet WCAG 2.2 AA for interactive UI unless a project ADR requires AAA.
+
 Rules:
 
 - All interactive elements MUST be keyboard-accessible. Use semantic HTML elements (`button`, `a`, `input`) rather than `div` or `span` with `onClick`.
@@ -308,7 +310,7 @@ const post = {
 
 `error.tsx` files catch errors thrown during rendering within their segment. They MUST be client components (add `"use client"` as the first line).
 
-Add an `error.tsx` at the feature level, not at the root `app/` level for most cases. Root-level error boundaries are too coarse: an error in one feature should not crash the entire app.
+Add an `error.tsx` at the feature level, not at the root `app/` level unless the failure is truly global. Root-level error boundaries are too coarse: an error in one feature MUST NOT crash the entire app shell.
 
 ```typescript
 // app/(main)/posts/error.tsx
@@ -378,5 +380,5 @@ The following is project-specific and not defined in this standards file:
 
 - **Design system tokens:** Custom color palette, typography scale, and spacing tokens defined in the Tailwind CSS `@theme` block.
 - **Custom component categories:** Any additional component categories beyond the four in Section 2.
-- **Project-specific accessibility requirements:** WCAG level target (AA or AAA), screen reader testing tooling, contrast ratio requirements beyond WCAG minimum.
+- **Project-specific accessibility requirements:** Default target is WCAG 2.2 AA unless a project ADR specifies AAA. Document screen reader tooling and any contrast requirements beyond WCAG minimum.
 - **Storybook:** Whether Storybook is used and which component categories have stories.

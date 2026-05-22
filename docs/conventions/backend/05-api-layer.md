@@ -390,7 +390,7 @@ Endpoints with no OpenAPI documentation MUST NOT be merged to `main`.
 
 ## API Versioning
 
-Internal applications start with unversioned routes. Public APIs, mobile APIs, partner APIs, and APIs consumed by independently deployed services use URL path versioning from their first public release. See ADR 0019. When a project has more than one active version, add `Asp.Versioning.Http` with a project ADR.
+Internal applications start with unversioned routes. Public APIs, mobile APIs, partner APIs, and APIs consumed by independently deployed services use URL path versioning from their first public release. See `docs/decisions/api-versioning-policy.md`. When a project has more than one active version, add `Asp.Versioning.Http` with a project ADR.
 
 ```csharp
 // GOOD: versioned route group for public API
@@ -448,7 +448,7 @@ private static async Task<IResult> HandleAsync(
 
 ## Rate Limiting
 
-Public, authentication, search, file upload, and expensive command endpoints MUST have a rate limiting policy. Apply policies at the route group when possible.
+Public, authentication, search, file upload, and expensive command endpoints MUST have a rate limiting policy. Apply policies at the route group when every route in the group shares the same policy; otherwise apply per endpoint.
 
 ```csharp
 // GOOD: route group applies named policy

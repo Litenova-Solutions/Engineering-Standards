@@ -2,7 +2,7 @@
 
 This document explains how Clean Architecture is applied across all projects following these standards. Every project follows this structure regardless of domain complexity.
 
-> Key decisions documented in `docs/adr/`: ADR 0002 (Clean Architecture as foundation), ADR 0003 (CQRS project split), ADR 0005 (IEndpoint pattern), ADR 0015 (IDatabaseContext), ADR 0016 (Transaction pipeline behaviors).
+> Key decisions documented in `docs/decisions/`: `docs/decisions/clean-architecture-as-structural-foundation.md` (Clean Architecture as foundation), `docs/decisions/cqrs-with-split-application-projects.md` (CQRS project split), `docs/decisions/minimal-api-endpoint-classes.md` (IEndpoint pattern), `docs/decisions/idatabasecontext-over-per-aggregate-read-stores.md` (IDatabaseContext), `docs/decisions/transaction-pipeline-behaviors.md` (Transaction pipeline behaviors).
 
 ---
 
@@ -328,7 +328,7 @@ internal sealed class NotifySubscribersOnPostPublishedEventHandler : IEventHandl
 
 ---
 
-## 8. Transaction Pipeline Behaviors
+## 7. Transaction Pipeline Behaviors
 
 Transaction management is handled by three global LiteBus pipeline behaviors registered in Infrastructure. Command handlers do not call `SaveChangesAsync`. Repositories do not call `SaveChangesAsync`. The pipeline handles all persistence.
 
@@ -495,7 +495,7 @@ builder.Services.AddLiteBus(liteBus =>
 
 ---
 
-## 7. Architecture Tests
+## 8. Architecture Tests
 
 Structural rules are enforced by architecture tests using NetArchTest in addition to project reference constraints. Project references prevent the most obvious violations. Architecture tests catch violations that project references cannot.
 
@@ -511,7 +511,7 @@ Three concrete examples of rules that architecture tests enforce:
 
 ---
 
-## 8. The AggregateRoot Base Class
+## 9. The AggregateRoot Base Class
 
 Every project defines two types in `Domain/Shared/`. They are not provided by a NuGet package; they are owned by the project.
 

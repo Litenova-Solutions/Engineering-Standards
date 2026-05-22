@@ -65,7 +65,7 @@ Rules:
 - Zustand stores MUST NOT contain server data. Use TanStack Query for anything fetched from the backend.
 - Zustand stores MUST have a `reset` action for cleanup between sessions or user switches.
 - Feature-specific stores live in `features/{feature}/store/`. App-wide stores live in `lib/stores/`.
-- A store that grows beyond 5-6 actions should be split. Large stores are a signal that multiple concerns have been combined.
+- A Zustand store MUST NOT expose more than 6 actions (including `reset`). If a store exceeds 6 actions, the agent MUST split it into focused stores by concern.
 
 ```typescript
 // GOOD: Zustand for UI state only
@@ -446,7 +446,7 @@ type Post = {
 // BAD: nothing prevents isPublished: true, isArchived: true simultaneously
 ```
 
-Map backend aggregate states to discriminated unions at the API boundary. The frontend should model state with the same rigor as the backend.
+Map backend aggregate states to discriminated unions at the API boundary. The frontend MUST model state with the same rigor as the backend.
 
 ---
 

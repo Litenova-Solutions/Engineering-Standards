@@ -1,4 +1,4 @@
-# 0016. Transaction Management via Global LiteBus Pipeline Behaviors
+# Transaction Management via Global LiteBus Pipeline Behaviors
 
 **Status:** Accepted
 
@@ -23,7 +23,7 @@ Three global handlers are registered in Infrastructure:
 - `SaveChangesCommandPostHandler : ICommandPostHandler<ICommand>`. Calls `SaveChangesAsync` and commits the transaction after the command handler succeeds.
 - `RollbackCommandErrorHandler : ICommandErrorHandler<ICommand>`. Rolls back the transaction on any exception and re-throws.
 
-The outbox pattern (ADR 0010) integrates into `SaveChangesCommandPostHandler`: before calling `SaveChangesAsync`, the post-handler collects domain events from tracked aggregates and writes them to the outbox table in the same transaction. Command handlers never change regardless of whether the outbox is active.
+The outbox pattern (`docs/decisions/outbox-pattern-as-reliability-escalation.md`) integrates into `SaveChangesCommandPostHandler`: before calling `SaveChangesAsync`, the post-handler collects domain events from tracked aggregates and writes them to the outbox table in the same transaction. Command handlers never change regardless of whether the outbox is active.
 
 ## Decision
 

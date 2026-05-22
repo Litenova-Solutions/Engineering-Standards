@@ -1,4 +1,4 @@
-# ADR 0013: Auth.js v5 Authentication
+# `docs/decisions/authjs-v5-authentication.md`: Auth.js v5 Authentication
 
 **Status:** Accepted
 **Date:** 2026-01-01

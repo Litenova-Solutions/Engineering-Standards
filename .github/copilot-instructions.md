@@ -5,18 +5,22 @@ The canonical agent guide is `AGENTS.md` at the repository root (or `standards/A
 ## Before Generating Code
 
 1. Read `AGENTS.md` in full.
-2. Identify the layer you are editing: Domain, Application.Write, Application.Read, Application.Reactions, Infrastructure, or WebApi.
-3. Read the corresponding convention file under `docs/conventions/backend/` before writing a single line of code.
+2. Read `docs/conventions/shared/agentic-guardrails.md` for scaffolding and verification.
+3. Read `docs/guides/definition-of-done.md` before marking work complete.
+4. Read the convention file for the layer you edit (backend or frontend index in `AGENTS.md`).
+5. For consuming projects, read `docs/domain/` inventories and the project `AGENTS.md` shim.
 
 ## Non-Negotiable Rules
 
-- **IEndpoint pattern only.** Never generate an MVC controller class. All HTTP endpoints MUST implement `IEndpoint`. Never inherit from `ControllerBase` or `Controller`.
-- **IDatabaseContext for queries.** Query handlers MUST inject `IDatabaseContext`, not domain repositories or `AppDbContext`. Never load a full domain aggregate inside a query handler.
-- **Correct exception types.** Use the exception hierarchy defined in `docs/conventions/backend/06-exception-hierarchy.md`. Never throw `InvalidOperationException`, `ArgumentException`, or `ArgumentNullException` in domain or application code.
-- **No handlers in Contracts projects.** `Application.Write.Contracts` and `Application.Read.Contracts` contain only records and interfaces. Handlers and validators live in the implementation projects.
-- **No external libraries in Application.Reactions.** Event handlers MUST define narrow interfaces for external capabilities. Infrastructure implements those interfaces. Never add a NuGet package for an email client, HTTP client, or message bus client to the `Application.Reactions` project.
-- **`cancellationToken` naming.** The `CancellationToken` parameter MUST be named exactly `cancellationToken` in all async methods. Never `ct`, `token`, or `cancel`.
+- **IEndpoint only.** Never generate MVC controllers.
+- **IDatabaseContext for queries.** Never load aggregates or inject repositories in query handlers.
+- **Correct exceptions.** See `docs/conventions/backend/06-exception-hierarchy.md`.
+- **No handlers in Contracts.** Records and interfaces only in Contracts projects.
+- **No external libraries in Application.Reactions.** Narrow interfaces in Reactions; implementations in Infrastructure.
+- **`cancellationToken` naming.** Exact name on all async methods.
+- **Forbidden packages.** `docs/conventions/shared/forbidden-packages.md`.
+- **Frontend boundaries.** No cross-feature imports; use `getApiClient()`; complete DoD checklist.
 
-## Project-Specific Context
+## Verification
 
-When working in a project that uses these standards as a submodule, also read the project-specific files in `docs/domain/` before generating domain or application code. These files contain the ubiquitous language glossary, aggregate inventory, feature inventory, exception inventory, and read model inventory for the specific project.
+Run gates in `docs/conventions/shared/ci.md` (including Playwright when `apps/web/` exists).

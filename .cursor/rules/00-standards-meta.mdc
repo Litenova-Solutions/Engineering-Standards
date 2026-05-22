@@ -10,7 +10,7 @@ These rules apply when an agent is editing files inside the `engineering-standar
 ## Tone and Writing Rules
 
 - Maintain the tone and writing rules defined in `AGENTS.md` at all times.
-- MUST NOT use em dashes, en dashes, or any forbidden word listed in `AGENTS.md` in any generated content, documentation, or code comment.
+- MUST NOT use em dashes, en dashes, or any forbidden word listed in `docs/conventions/shared/writing-style.md` in any generated content, documentation, or code comment.
 - All diagrams in markdown files MUST use Mermaid syntax in a fenced code block. Never use ASCII art.
 
 ## Rule Integrity
@@ -27,9 +27,9 @@ These rules apply when an agent is editing files inside the `engineering-standar
 
 Update the convention file index table in `AGENTS.md` whenever a new convention file is added or renamed.
 
-## ADR Index
+## Decision Index
 
-When adding a new ADR, add a corresponding row to the index table in `docs/adr/README.md` in the same commit.
+When adding a new decision in `docs/decisions/`, add a row to `docs/decisions/README.md` with the canonical convention path in the same commit.
 
 ## Templates
 

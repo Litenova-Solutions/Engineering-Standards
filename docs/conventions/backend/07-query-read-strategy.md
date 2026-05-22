@@ -1,8 +1,8 @@
 # Query Read Strategy
 
-This document defines the read-side strategy for all query handlers. The `IDatabaseContext` pattern is the standard. The per-aggregate read store pattern was superseded by this approach (see ADR 0015).
+This document defines the read-side strategy for all query handlers. The `IDatabaseContext` pattern is the standard.
 
-> This convention implements ADR 0015 (supersedes ADR 0007). Read ADR 0015 for the full decision rationale and trade-offs.
+> Canonical rules: this file. Rationale: `docs/decisions/idatabasecontext-over-per-aggregate-read-stores.md`.
 
 ---
 
@@ -256,7 +256,7 @@ internal sealed class ExportAllPostsQueryHandler
 }
 ```
 
-HTTP list endpoints use `PagedResult<T>` with `PaginationParameters`. See ADR 0017 for the full pagination rationale.
+HTTP list endpoints use `PagedResult<T>` with `PaginationParameters`. See `docs/decisions/pagination-convention.md` for the full pagination rationale.
 
 ---
 

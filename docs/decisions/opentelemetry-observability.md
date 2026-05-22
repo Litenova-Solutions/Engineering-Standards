@@ -1,4 +1,4 @@
-# 0018. OpenTelemetry as the Observability Standard
+# OpenTelemetry as the Observability Standard
 
 **Status:** Accepted
 

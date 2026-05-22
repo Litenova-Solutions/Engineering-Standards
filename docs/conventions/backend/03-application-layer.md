@@ -2,7 +2,16 @@
 
 This document is the authoritative guide for all design decisions in the five application layer projects. Read it in full before writing or modifying any application code.
 
-> This convention implements ADR 0003 (CQRS split), ADR 0006 (Contracts projects), ADR 0008 (Reactions depends only on abstractions), and ADR 0016 (Transaction pipeline behaviors).
+> This convention implements `docs/decisions/cqrs-with-split-application-projects.md` (CQRS split), `docs/decisions/contracts-projects-for-application-layer.md` (Contracts projects), `docs/decisions/reactions-project-depends-only-on-abstractions.md` (Reactions depends only on abstractions), and `docs/decisions/transaction-pipeline-behaviors.md` (Transaction pipeline behaviors).
+
+## Agent Quick Rules
+
+- Commands and queries MUST live in Contracts; handlers MUST be `internal sealed` in implementation projects.
+- Query handlers MUST inject `IDatabaseContext`; MUST NOT inject repositories.
+- Command handlers MUST NOT call `SaveChangesAsync`.
+- Validators throw `CommandValidationException` / `QueryValidationException`; MUST NOT use `Guard.Against`.
+- `Application.Reactions` MUST NOT reference external NuGet packages; define narrow interfaces.
+- Feature folders: `{Aggregate}/{UseCase}/` naming.
 
 ---
 

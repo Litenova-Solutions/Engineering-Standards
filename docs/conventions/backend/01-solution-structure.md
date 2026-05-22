@@ -191,7 +191,7 @@ LiteBus is modular. Each project references only the package it needs. Never add
 
 ## 7. NuGet Package Policy
 
-Every new NuGet package MUST be justified with an ADR in `docs/adr/`. The ADR explains why the package was chosen, what alternatives were considered, and what the trade-offs are.
+Every new NuGet package MUST be justified with an ADR in `docs/decisions/`. The ADR explains why the package was chosen, what alternatives were considered, and what the trade-offs are.
 
 The following packages are pre-approved and do not require a new ADR:
 
@@ -227,7 +227,36 @@ Any package not in this list requires an ADR before being added to any project.
 
 ---
 
-## 8. `GlobalUsings.cs`
+## 8. npm Package Policy (Frontend Monorepo)
+
+Every new npm package MUST be justified with an ADR unless listed below. Forbidden packages are in `docs/conventions/shared/forbidden-packages.md`.
+
+Pre-approved npm packages (no new ADR required):
+
+| Package | Purpose |
+|:---|:---|
+| `next`, `react`, `react-dom` | Framework (versions pinned in `AGENTS.md`) |
+| `typescript` | Type checking |
+| `openapi-typescript` | Generate `api.d.ts` from OpenAPI |
+| `@tanstack/react-query` | Server state cache and mutations |
+| `zustand` | Client UI state |
+| `zod` | Validation (v4 APIs) |
+| `react-hook-form`, `@hookform/resolvers` | Forms |
+| `tailwindcss`, `clsx`, `tailwind-merge` | Styling and `cn` helper |
+| `radix-ui` | shadcn/ui primitives (single package import) |
+| `next-auth` / `auth` (Auth.js v5) | Authentication per `docs/decisions/authjs-v5-authentication.md` |
+| `vitest` (4.x), `@testing-library/react`, `@testing-library/dom` | Unit and component tests |
+| `@playwright/test` | E2E tests |
+| `sonner` | Toasts |
+| `date-fns` | Dates when `Temporal` is unavailable |
+| `@microsoft/signalr` | Realtime per `docs/decisions/signalr-for-real-time-updates.md` |
+| `eslint`, `eslint-plugin-boundaries` | Lint and feature boundary enforcement |
+
+Owned source copied into the repo (for example vendored `openapi-fetch` in `packages/api-client/`) is allowed when documented in `docs/decisions/openapi-typescript-client-generation.md`.
+
+---
+
+## 9. `GlobalUsings.cs`
 
 Each project contains a single `GlobalUsings.cs` file at the project root. Global usings reduce repetition but MUST only contain namespaces used in the majority of files in that project.
 

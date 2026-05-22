@@ -1,0 +1,56 @@
+# Copy to .github/workflows/ci.yml in consuming projects.
+# Replace {ProjectName} and adjust paths.
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: dotnet restore src/{ProjectName}.slnx
+      - run: dotnet build src/{ProjectName}.slnx --configuration Release --no-restore
+      - run: dotnet test src/{ProjectName}.slnx --configuration Release --no-build
+      - run: dotnet list src/{ProjectName}.slnx package --vulnerable
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm type-check
+      - run: pnpm test
+      - run: pnpm build
+      - run: pnpm audit
+
+      - name: OpenAPI freshness
+        run: |
+          dotnet run --project src/{ProjectName}.WebApi -- --export-openapi packages/api-types/openapi.json
+          npx openapi-typescript packages/api-types/openapi.json -o packages/api-types/src/api.d.ts
+          git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
+
+      - name: Playwright E2E
+        if: hashFiles('apps/web/**') != ''
+        run: pnpm exec playwright test --config apps/web/playwright.config.ts
+
+      - name: Standards submodule pinned to tag
+        if: hashFiles('standards/**') != ''
+        run: |
+          cd standards
+          git describe --exact-match --tags HEAD

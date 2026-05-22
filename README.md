@@ -1,274 +1,183 @@
-# Litenova Solutions
+# Engineering Standards
 
-> Efficient, cost-effective and reliable software solutions, built on open-source expertise.
+**Version 1.0.0** · Standards v1 baseline · [Changelog](CHANGELOG.md) · [MIT License](LICENSE)
 
-## What This Repository Is
+Normative conventions and agent contracts for full-stack .NET and Next.js projects. Use this repository as the single source of truth for architecture, coding rules, and AI agent behavior.
 
-This is the engineering standards repository for all projects at Litenova Solutions. It contains the architectural guidelines, coding conventions, and AI agent context files that every project must follow. It is the single source of truth for how software is designed, structured, and built here.
+```mermaid
+flowchart LR
+  subgraph consume [Your project]
+    App[Application code]
+    Shim[Project AGENTS.md]
+    Domain[docs/domain inventories]
+  end
+  subgraph standards [This repository]
+    Agents[AGENTS.md]
+    Conv[docs/conventions]
+    Guides[docs/guides]
+  end
+  Shim --> Agents
+  App --> Conv
+  Domain --> Shim
+  Agents --> Conv
+```
 
-## Who This Is For
+---
 
-This repository is for engineers, human and AI, working on any [Litenova Solutions](https://github.com/Litenova-Solutions) project. If you are contributing to a project in this organization, read the relevant convention files before writing code. If you are an AI agent, start with `AGENTS.md` and follow the read order defined there.
+## Quick start
 
-## How to Use This in a Project
+| Role | Start here |
+|:---|:---|
+| AI agent | [`AGENTS.md`](AGENTS.md) |
+| Human engineer | [`docs/README.md`](docs/README.md) then the convention for your layer |
+| New feature | [`docs/guides/add-new-feature.md`](docs/guides/add-new-feature.md) then [`docs/guides/definition-of-done.md`](docs/guides/definition-of-done.md) |
 
-Add this repository as a git submodule. Two path conventions are available:
+---
 
-**Option A - Visible path `standards/` (recommended for team projects)**
+## Versioning philosophy
+
+**Standards v1** means this repository is the first complete, pinned baseline you can submodule into production repos. The `1.0.0` tag is that baseline.
+
+| Semver | Meaning |
+|:---|:---|
+| `MAJOR` | Breaking change: previously compliant code may violate a new MUST rule |
+| `MINOR` | Additive: new conventions or decisions; existing compliant code stays valid |
+| `PATCH` | Clarifications, examples, typo fixes |
+
+Future growth (more conventions, checklists, tooling) ships as `1.x` until a breaking change requires `2.0.0`. A long-term goal is broad coverage across backend, frontend, CI, security, and operations; version numbers track **compatibility**, not a count of documents.
+
+Check `standards.manifest.json` at the tag you pin for machine-readable paths.
+
+---
+
+## How to consume this repository
+
+Pick one approach for your repository type. All approaches MUST pin a **semver tag**, not a moving branch.
+
+### Consumption matrix
+
+| Scenario | Recommended approach | Pin strategy | Agent entry |
+|:---|:---|:---|:---|
+| Single application repo (API + optional web) | Git submodule at `standards/` | Tag, e.g. `v1.0.0` | `standards/AGENTS.md` via project shim |
+| Turborepo monorepo (api + web + packages) | Submodule at **repo root** `standards/` | Same tag for all packages | One shim at monorepo root |
+| Solo / minimal visibility | Submodule at `.standards/` | Same | `.standards/AGENTS.md` |
+| Platform team, many repos | Submodule + automated bump PRs | Renovate or internal bot on submodule SHA | Org template repo |
+| Air-gapped / no git submodule | CI copies tagged tarball into `standards-snapshot/` read-only | Extract from release asset | Point shim at snapshot path |
+
+**Avoid:** copying files manually into your repo without a submodule or tagged snapshot. Copies drift within weeks.
+
+**Avoid:** editing files inside the submodule from the consumer repo. Propose changes here instead.
+
+### Option A: Submodule at `standards/` (recommended)
 
 ```bash
-git submodule add https://github.com/Litenova-Solutions/engineering-standards.git standards
+git submodule add <YOUR_STANDARDS_REPO_URL> standards
 git submodule update --init --recursive
-```
-
-**Option B - Hidden path `.standards/` (useful for solo projects)**
-
-The dot-prefix hides the folder from most file explorers while keeping it accessible to agents and tooling.
-
-```bash
-git submodule add https://github.com/Litenova-Solutions/engineering-standards.git .standards
-git submodule update --init --recursive
-```
-
-Use `.standards/AGENTS.md` in your project's own `AGENTS.md` shim:
-```markdown
-# Project Agent Instructions
-Read `.standards/AGENTS.md` before editing any code.
-```
-
-### Pinning to a Specific Version
-
-```bash
-cd standards   # or .standards
-git checkout v1.0.0
-cd ..
+cd standards && git checkout v1.0.0 && cd ..
 git add standards
 git commit -m "chore: pin engineering-standards to v1.0.0"
 ```
 
-### Keeping Submodule Discipline
-
-Submodules cause problems when contributors forget `--recursive` clones or forget to update after a pull. Prevent this with a bootstrap script.
-
-Create `scripts/bootstrap.sh` (or `scripts/bootstrap.ps1`) in your project:
+### Option B: Submodule at `.standards/`
 
 ```bash
-#!/usr/bin/env bash
-set -euo pipefail
+git submodule add <YOUR_STANDARDS_REPO_URL> .standards
 git submodule update --init --recursive
-echo "Standards pinned to: $(cd standards && git describe --tags)"
+cd .standards && git checkout v1.0.0 && cd ..
 ```
 
-Run it as the first step after cloning:
+### Bootstrap after clone
+
 ```bash
-git clone --recursive https://github.com/your-org/your-project.git
-./scripts/bootstrap.sh
+git clone --recursive <YOUR_PROJECT_REPO_URL>
+./scripts/bootstrap.sh   # or bootstrap.ps1: git submodule update --init --recursive
 ```
 
-### Rules for the Consuming Project
+Example `scripts/bootstrap.ps1`:
 
-- MUST NOT edit files inside `standards/` (or `.standards/`) from within the consuming project. Changes to the standards belong in the standards repository.
-- MUST pin the submodule to a tagged version, not to a branch tip or bare commit hash.
-- The submodule pointer in the consuming project MUST point to a tag commit. A CI check that validates `git describe --exact-match --tags HEAD` inside the submodule directory is the enforcement mechanism.
-
-### Adding Project-Specific Agent Context
-
-After adding the submodule, create a project-level `AGENTS.md` at the repository root. Use `docs/templates/project-agents.md` from this repository as the starting template. The project `AGENTS.md` is a 30-50 line shim that:
-
-1. Tells agents to read the standards `AGENTS.md` first.
-2. Adds project-specific rules not covered by the standards (e.g., domain-specific naming, feature flags, deployment targets).
-3. Points agents to the filled-in `docs/domain/` templates for domain context.
-
-```markdown
-# Project Agent Instructions
-
-This project follows the Litenova Solutions engineering standards.
-Read `standards/AGENTS.md` (or `.standards/AGENTS.md`) before editing any code.
-
-## Project-Specific Rules
-
-- The bounded context name is `Ticketing`. Use it in all namespaces: `Ticketing.Domain`, `Ticketing.Application.Write`, etc.
-- Read `docs/domain/ubiquitous-language.md` before writing any domain code.
-- Read `docs/domain/aggregate-inventory.md` to see which aggregates exist.
+```powershell
+git submodule update --init --recursive
+Push-Location standards
+git describe --exact-match --tags
+Pop-Location
 ```
 
-## Repository Structure
+### Project `AGENTS.md` shim
+
+Copy [`docs/templates/project-agents.md`](docs/templates/project-agents.md) to your repo root as `AGENTS.md`. It should:
+
+1. Point to `standards/AGENTS.md` (or `.standards/AGENTS.md`).
+2. List project-specific MUST rules.
+3. Point to filled-in `docs/domain/*` inventories.
+
+### CI enforcement
+
+Copy [`docs/templates/ci-workflow.yml`](docs/templates/ci-workflow.yml) to `.github/workflows/ci.yml`. It runs backend and frontend gates plus optional checks:
+
+- OpenAPI artifact freshness
+- Playwright when `apps/web/` exists
+- Submodule pinned to an exact tag (`git describe --exact-match --tags` inside `standards/`)
+
+Full gate list: [`docs/conventions/shared/ci.md`](docs/conventions/shared/ci.md).
+
+### Cursor / Copilot
+
+- Submodule does not auto-load Cursor rules. Reference `standards/.cursor/rules/` from your project rules or duplicate thin shims that link to the standards paths.
+- GitHub Copilot: use [`.github/copilot-instructions.md`](.github/copilot-instructions.md) pattern in the consumer repo pointing at the submodule.
+
+---
+
+## Repository layout
 
 ```
 engineering-standards/
-├── README.md                                         This file.
-├── AGENTS.md                                         Canonical AI agent context file (read this first).
-├── CLAUDE.md                                         Claude Code shim that imports AGENTS.md.
-├── GEMINI.md                                         Gemini shim that references AGENTS.md.
-├── .windsurfrules                                    Windsurf shim that references AGENTS.md.
-├── LICENSE                                           MIT license.
-├── CHANGELOG.md                                      Release history in Keep a Changelog format.
-├── CONTRIBUTING.md                                   How to contribute, create releases, and publish to GitHub.
-├── .github/
-│   └── copilot-instructions.md                      GitHub Copilot shim that references AGENTS.md.
-├── .cursor/
-│   └── rules/
-│       ├── 00-standards-meta.mdc                    Cursor meta-rules for editing this standards repo.
-│       └── 10-backend-csharp.mdc                    Cursor backend C# rules summary.
-└── docs/
-    ├── appendix-rationale.md                         Short rationale appendix for humans.
-    ├── philosophy.md                                 Extended human-facing architecture rationale.
-    ├── agentic-development.md                        Extended human-facing agentic development rationale.
-    ├── adr/
-    │   ├── README.md                                 ADR index and instructions.
-    │   ├── 0001-agentic-development-as-primary-model.md
-    │   ├── 0002-clean-architecture-as-structural-foundation.md
-    │   ├── 0003-cqrs-with-split-application-projects.md
-    │   ├── 0004-litebus-as-mediator.md
-    │   ├── 0005-minimal-api-endpoint-classes.md
-    │   ├── 0006-contracts-projects-for-application-layer.md
-    │   ├── 0007-read-store-pattern-for-queries.md
-    │   ├── 0008-reactions-project-depends-only-on-abstractions.md
-    │   ├── 0009-architecture-tests-as-enforcement.md
-    │   ├── 0010-outbox-pattern-as-reliability-escalation.md
-    │   ├── 0011-turborepo-as-monorepo-tool.md
-    │   ├── 0012-openapi-typescript-client-generation.md
-    │   ├── 0013-authjs-v5-authentication.md
-    │   ├── 0014-animation-tailwind-first-framer-motion-escalation.md
-    │   ├── 0015-idatabasecontext-over-per-aggregate-read-stores.md
-    │   ├── 0016-transaction-pipeline-behaviors.md
-    │   ├── 0017-pagination-convention.md
-    │   ├── 0018-opentelemetry-observability.md
-    │   ├── 0019-api-versioning-policy.md
-    │   ├── 0020-signalr-for-real-time-updates.md
-    │   └── 0021-multi-tenancy-default.md
-    ├── architecture/
-    │   └── clean-architecture.md                     Full Clean Architecture guide for all projects.
-    ├── guides/
-    │   └── add-new-feature.md                        End-to-end feature checklist.
-    ├── templates/                                    Templates for project-specific documentation. Copy these into each project repository.
-    │   ├── ubiquitous-language.md                    Template for the domain term glossary.
-    │   ├── aggregate-inventory.md                    Template for listing all aggregates and domain events.
-    │   ├── feature-inventory.md                      Template for listing all implemented and planned use cases.
-    │   ├── exception-inventory.md                    Template for listing all custom exception types.
-    │   ├── read-model-inventory.md                   Template for listing read-side context and query handlers.
-    │   ├── project-agents.md                         Template for the per-project AGENTS.md file.
-    │   ├── frontend-feature-inventory.md             Template for listing all frontend routes and use cases.
-    │   └── frontend-api-endpoints.md                 Template for documenting consumed backend API endpoints.
-    └── conventions/
-        ├── 00-principles.md                          Language-agnostic engineering principles.
-        ├── backend/
-        │   ├── 01-solution-structure.md              .NET solution layout, tooling, and project references.
-        │   ├── 02-domain-layer.md                    Domain layer design guide.
-        │   ├── 03-application-layer.md               Application layer (five-project split, CQRS, handlers).
-        │   ├── 04-infrastructure-layer.md            Infrastructure layer (EF Core, repos, jobs, reliability).
-        │   ├── 05-api-layer.md                       API layer (IEndpoint pattern, Minimal APIs).
-        │   ├── 06-exception-hierarchy.md             Exception types, categories, and HTTP mappings.
-        │   ├── 07-query-read-strategy.md             Read-side strategy using IDatabaseContext projections.
-        │   ├── 08-testing.md                         Testing philosophy, patterns, and structure.
-        │   ├── 09-observability.md                   Logs, metrics, tracing, correlation IDs, health checks.
-        │   ├── 10-reliability.md                     Idempotency, outbox, retries, failure handling.
-        │   ├── 11-background-jobs.md                 Hosted services, durable jobs, scheduling.
-        │   ├── 12-caching.md                         Cache types, keys, invalidation, metrics.
-        │   └── 13-deployment-and-migrations.md       Deployment gates and migration safety.
-        ├── frontend/
-        │   ├── 01-nextjs-app-router.md               Next.js 16 App Router conventions.
-        │   ├── 02-components.md                      React component design conventions.
-        │   ├── 03-data-fetching.md                   Data fetching patterns.
-        │   ├── 04-state-and-forms.md                 State management, forms, errors, uploads.
-        │   └── 05-internationalization.md            Locale routing, messages, formatting.
-        └── shared/
-            ├── naming.md                             Cross-layer naming conventions.
-            ├── git-workflow.md                       Branch, commit, and PR conventions.
-            ├── ci.md                                 CI gates and local verification.
-            ├── security.md                           Security baseline requirements.
-            ├── realtime-updates.md                   SignalR and frontend invalidation conventions.
-            └── adr-template.md                       Architecture Decision Record template.
+├── AGENTS.md                 Agent contract (read first)
+├── standards.manifest.json   Version and paths for tooling
+├── CHANGELOG.md
+├── docs/
+│   ├── README.md             Documentation map
+│   ├── architecture/       Structural guide
+│   ├── conventions/        Normative rules (agents load these)
+│   ├── decisions/          Why choices were made (humans / new deps)
+│   ├── guides/             DoD, add-feature playbooks
+│   ├── philosophy.md       Human rationale (not for agents)
+│   ├── agentic-development.md
+│   └── templates/          Copy into consumer repos
+└── .cursor/rules/            Cursor summaries when editing standards
 ```
 
-## Convention Files
+Human-only rationale (not for routine agent loads): [`docs/philosophy.md`](docs/philosophy.md), [`docs/agentic-development.md`](docs/agentic-development.md).
 
-| File | Description |
-|:-----|:------------|
-| `docs/conventions/00-principles.md` | Language-agnostic principles that apply to all projects. |
-| `docs/conventions/backend/01-solution-structure.md` | Standard .NET solution layout, tooling configuration, and NuGet package policy. |
-| `docs/conventions/backend/02-domain-layer.md` | Aggregates, value objects, domain events, strongly-typed IDs, and domain exception design. |
-| `docs/conventions/backend/03-application-layer.md` | Five-project application layer split, command/query/event handler patterns, and validators. |
-| `docs/conventions/backend/04-infrastructure-layer.md` | EF Core configuration, repositories, jobs, reliability infrastructure, and DI registration. |
-| `docs/conventions/backend/05-api-layer.md` | Minimal API `IEndpoint` pattern, request/response models, and OpenAPI documentation rules. |
-| `docs/conventions/backend/06-exception-hierarchy.md` | Exception hierarchy, categories, HTTP status mappings, and the `GlobalExceptionHandler`. |
-| `docs/conventions/backend/07-query-read-strategy.md` | `IDatabaseContext` projection pattern for query handlers and the escalation path to raw SQL. |
-| `docs/conventions/backend/08-testing.md` | Testing philosophy, test project structure, naming conventions, and architecture tests. |
-| `docs/conventions/backend/09-observability.md` | Structured logging, correlation IDs, OpenTelemetry, health checks, alerts. |
-| `docs/conventions/backend/10-reliability.md` | Idempotency keys, outbox escalation, retries, and failure handling. |
-| `docs/conventions/backend/11-background-jobs.md` | Hosted services, durable job tables, scheduling, and job boundaries. |
-| `docs/conventions/backend/12-caching.md` | Cache selection, key naming, invalidation, and cache metrics. |
-| `docs/conventions/backend/13-deployment-and-migrations.md` | Expand and contract migrations, release gates, feature flags, and seed data. |
-| `docs/conventions/frontend/01-nextjs-app-router.md` | Next.js 16 App Router conventions: server vs. client components, proxy.ts, React Compiler, caching. |
-| `docs/conventions/frontend/02-components.md` | React component design: taxonomy, shadcn/ui ownership, cva variants, branded types, accessibility. |
-| `docs/conventions/frontend/03-data-fetching.md` | Data fetching: server components, TanStack Query, Server Actions, authorization, realtime, loading states. |
-| `docs/conventions/frontend/04-state-and-forms.md` | State management and forms: Zustand, React Hook Form with Zod v4, errors, uploads, useActionState. |
-| `docs/conventions/frontend/05-internationalization.md` | Locale routing, message ownership, formatting, and backend contract rules. |
-| `docs/conventions/shared/naming.md` | Cross-layer naming conventions. |
-| `docs/conventions/shared/git-workflow.md` | Branch, commit, PR, and merge conventions. |
-| `docs/conventions/shared/ci.md` | CI gates, OpenAPI freshness, vulnerability scans, and local hooks. |
-| `docs/conventions/shared/security.md` | Security baseline: auth, rate limits, CORS, CSP, audit, PII, dependency scanning. |
-| `docs/conventions/shared/realtime-updates.md` | SignalR as the real-time standard and frontend cache invalidation rules. |
-| `docs/conventions/shared/adr-template.md` | ADR template and filing rules. |
-| `docs/guides/add-new-feature.md` | End-to-end checklist for adding a feature across backend and frontend layers. |
-| `docs/templates/ubiquitous-language.md` | Template for the domain term glossary. Copy to `docs/domain/` in a project repository. |
-| `docs/templates/aggregate-inventory.md` | Template for listing all aggregates, states, domain events, and repository interfaces. |
-| `docs/templates/feature-inventory.md` | Template for listing all implemented and planned use cases with handler class names. |
-| `docs/templates/exception-inventory.md` | Template for listing all custom exception types with categories and HTTP status codes. |
-| `docs/templates/read-model-inventory.md` | Template for listing `IDatabaseContext` properties, query handlers, and denormalized read models. |
-| `docs/templates/project-agents.md` | Template for the per-project `AGENTS.md` file that imports these standards. |
-| `docs/templates/frontend-feature-inventory.md` | Template for listing all frontend routes and use cases. Copy to `docs/domain/` in each project. |
-| `docs/templates/frontend-api-endpoints.md` | Template for documenting which backend API endpoints the frontend consumes. |
+---
 
-## ADR Index
+## Normative vs decisions
 
-| File | Description |
-|:-----|:------------|
-| `docs/adr/0001-agentic-development-as-primary-model.md` | Establishes agentic AI development as the primary development model for all projects. |
-| `docs/adr/0002-clean-architecture-as-structural-foundation.md` | Adopts Clean Architecture as the structural pattern for all .NET projects. |
-| `docs/adr/0003-cqrs-with-split-application-projects.md` | Splits the application layer into five projects to enforce CQRS at the compiler level. |
-| `docs/adr/0004-litebus-as-mediator.md` | Selects LiteBus as the mediator for commands, queries, and events. |
-| `docs/adr/0005-minimal-api-endpoint-classes.md` | Adopts the `IEndpoint` pattern over MVC controllers for all HTTP endpoints. |
-| `docs/adr/0006-contracts-projects-for-application-layer.md` | Introduces Contracts projects to give WebApi a minimal, stable dependency surface. |
-| `docs/adr/0007-read-store-pattern-for-queries.md` | Historical ADR for the superseded read store interface pattern. |
-| `docs/adr/0008-reactions-project-depends-only-on-abstractions.md` | Requires the Reactions project to define narrow interfaces rather than referencing external libraries directly. |
-| `docs/adr/0009-architecture-tests-as-enforcement.md` | Adds architecture tests using NetArchTest to enforce structural rules that project references cannot enforce. |
-| `docs/adr/0010-outbox-pattern-as-reliability-escalation.md` | Documents the outbox pattern as the escalation path for reliable event dispatch. |
-| `docs/adr/0011-turborepo-as-monorepo-tool.md` | Selects Turborepo with pnpm workspaces as the monorepo tool. |
-| `docs/adr/0012-openapi-typescript-client-generation.md` | Establishes openapi-typescript for type-safe API client generation with owned openapi-fetch source. |
-| `docs/adr/0013-authjs-v5-authentication.md` | Adopts Auth.js v5 as the authentication standard with proxy.ts for optimistic redirects only. |
-| `docs/adr/0014-animation-tailwind-first-framer-motion-escalation.md` | Tailwind CSS transitions as the default; Framer Motion added only when Tailwind is insufficient. |
-| `docs/adr/0015-idatabasecontext-over-per-aggregate-read-stores.md` | Replaces per-aggregate read stores with the `IDatabaseContext` projection pattern. |
-| `docs/adr/0016-transaction-pipeline-behaviors.md` | Moves transaction management and persistence into LiteBus pipeline behaviors. |
-| `docs/adr/0017-pagination-convention.md` | Establishes offset pagination with `PagedResult<T>` for HTTP list endpoints. |
-| `docs/adr/0018-opentelemetry-observability.md` | Adopts OpenTelemetry for metrics and traces with Serilog for structured logs. |
-| `docs/adr/0019-api-versioning-policy.md` | Defines when APIs are versioned and chooses URL path versioning for public APIs. |
-| `docs/adr/0020-signalr-for-real-time-updates.md` | Adopts SignalR for real-time updates and frontend invalidation. |
-| `docs/adr/0021-multi-tenancy-default.md` | Sets multi-tenancy as a project-level decision, out of scope by default. |
+| Layer | Location | Agent loads? |
+|:---|:---|:---:|
+| Rules | `docs/conventions/` | Yes |
+| Playbooks | `docs/guides/` | Yes, when finishing work |
+| Decisions | `docs/decisions/` | No (unless adding a dependency) |
+| Rationale | `docs/philosophy.md` | No |
 
-## Project-Specific Documentation
+Decisions use **slug filenames** (no linear numbers). Index: [`docs/decisions/README.md`](docs/decisions/README.md).
 
-Convention files in this repository do not contain project-specific content. They define patterns and rules that apply to all projects. Putting project-specific terms, feature lists, or exception inventories in convention files makes those files unstable and project-dependent.
+---
 
-Each project repository should copy the templates from `docs/templates/` into its own `docs/domain/` directory and fill them in. These project-specific files are referenced from the project's `AGENTS.md` so agents have the domain context they need when generating or modifying code.
+## Project-specific documentation
 
-## Versioning
+Convention files here stay generic. Each consumer project copies [`docs/templates/`](docs/templates/) into `docs/domain/` and maintains:
 
-Versions use semantic versioning tags (`v{major}.{minor}.{patch}`) on `main`. Projects MUST pin to a specific tag via the submodule reference. Pinning prevents silent convention drift when this repository is updated.
+- Ubiquitous language, aggregates, features, exceptions, read models
+- Frontend feature inventory and API endpoint map
 
-A breaking change is any convention update that makes previously compliant code non-compliant.
-
-| Increment | When to Use | Example |
-|:---|:---|:---|
-| `MAJOR` | A breaking change. Previously compliant code becomes non-compliant. | Renaming a required interface, removing a pattern projects depend on. |
-| `MINOR` | A new convention is added. Existing compliant code remains compliant. | Adding a new template, adding a new rule for new code only. |
-| `PATCH` | A clarification, typo fix, new example, new ADR, or agent file improvement. | Fixing a typo, adding a `// BAD:` example to an existing rule. |
+---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full process, including how to create releases and publish them to GitHub.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Convention changes need a `CHANGELOG.md` entry. New decisions need a row in `docs/decisions/README.md`.
+
+---
 
 ## License
 
 [MIT](LICENSE)
-

@@ -1,4 +1,4 @@
-# ADR 0012: OpenAPI TypeScript Client Generation
+# `docs/decisions/openapi-typescript-client-generation.md`: OpenAPI TypeScript Client Generation
 
 **Status:** Accepted
 **Date:** 2026-01-01

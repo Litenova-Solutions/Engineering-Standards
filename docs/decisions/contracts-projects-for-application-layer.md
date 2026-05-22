@@ -1,4 +1,4 @@
-# 0006. Contracts Projects for the Application Layer
+# Contracts Projects for the Application Layer
 
 **Status:** Accepted
 
@@ -6,7 +6,7 @@
 
 ## Context
 
-With the application layer split into Write, Read, and Reactions projects (see ADR 0003), the WebApi layer needs to reference command and query types to dispatch them. If WebApi references the implementation projects (`Application.Write`, `Application.Read`), it pulls in handler implementations as a transitive dependency. This is unnecessary and creates a larger dependency surface. It also means that a future refactoring of a handler implementation could break the WebApi build, even when the command or query type did not change.
+With the application layer split into Write, Read, and Reactions projects (see `docs/decisions/cqrs-with-split-application-projects.md`), the WebApi layer needs to reference command and query types to dispatch them. If WebApi references the implementation projects (`Application.Write`, `Application.Read`), it pulls in handler implementations as a transitive dependency. This is unnecessary and creates a larger dependency surface. It also means that a future refactoring of a handler implementation could break the WebApi build, even when the command or query type did not change.
 
 Two approaches were considered:
 

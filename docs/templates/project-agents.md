@@ -14,8 +14,10 @@ Read order:
 
 1. `standards/AGENTS.md` - canonical rules, tech stack, non-negotiable rules.
 2. `standards/docs/architecture/clean-architecture.md` - layer diagram and responsibilities.
-3. The convention file for the layer you are editing (see index in `standards/AGENTS.md`).
-4. The project-specific files below for domain context.
+3. `standards/docs/conventions/shared/agentic-guardrails.md` - scaffolding and verification.
+4. The convention file for the layer you are editing (see index in `standards/AGENTS.md`).
+5. `standards/docs/guides/definition-of-done.md` - before marking any feature complete.
+6. The project-specific files below for domain context.
 
 ---
 
@@ -26,7 +28,7 @@ The base tech stack is defined in `standards/AGENTS.md`. This table lists only p
 | Technology | Version / Notes |
 |:---|:---|
 | _(example) Authentication_ | _(example) JWT Bearer via Microsoft.AspNetCore.Authentication.JwtBearer_ |
-| _(example) Blob Storage_ | _(example) Azure Blob Storage via Azure.Storage.Blobs - see ADR 0011_ |
+| _(example) Blob Storage_ | _(example) Azure Blob Storage via Azure.Storage.Blobs - see `docs/decisions/turborepo-as-monorepo-tool.md`_ |
 
 ---
 
@@ -41,7 +43,9 @@ Read these files before generating any domain or application code. They contain 
 | `docs/domain/feature-inventory.md` | All implemented and planned use cases with handler class names. |
 | `docs/domain/exception-inventory.md` | All custom exception types with categories and HTTP status codes. |
 | `docs/domain/read-model-inventory.md` | `IDatabaseContext` properties, query handlers, and approved denormalized read models. |
-| `docs/adr/` | Project-specific architecture decisions. |
+| `docs/domain/frontend-feature-inventory.md` | Frontend routes and use cases aligned with backend. |
+| `docs/domain/frontend-api-endpoints.md` | Consumed API endpoints and auth requirements. |
+| `docs/decisions/` | Project-specific architecture decisions. |
 
 ---
 
@@ -58,22 +62,9 @@ These rules extend the standards. They do not replace any rule in `standards/AGE
 ## Commands
 
 ```bash
-# Build
-dotnet build src/{ProjectName}.slnx
-
-# Test
-dotnet test src/{ProjectName}.slnx
-
-# Run
-dotnet run --project src/{ProjectName}.WebApi
-
-# Add migration
-dotnet ef migrations add {MigrationName} \
-  --project src/{ProjectName}.Infrastructure \
-  --startup-project src/{ProjectName}.WebApi
-
-# Apply migration
-dotnet ef database update \
-  --project src/{ProjectName}.Infrastructure \
-  --startup-project src/{ProjectName}.WebApi
+# See standards/docs/conventions/shared/ci.md for the full verification pipeline.
+dotnet build src/{ProjectName}.slnx --configuration Release
+dotnet test src/{ProjectName}.slnx --configuration Release --no-build
+pnpm lint && pnpm type-check && pnpm test && pnpm build
+pnpm exec playwright test --config apps/web/playwright.config.ts
 ```

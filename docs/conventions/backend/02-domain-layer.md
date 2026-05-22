@@ -2,6 +2,16 @@
 
 This document is the authoritative guide for all design decisions in the Domain layer. Read it in full before writing or modifying any domain code.
 
+## Agent Quick Rules
+
+- Aggregates MUST enforce invariants; handlers MUST NOT contain business rules.
+- Mutations MUST go through aggregate methods; MUST NOT set properties from handlers.
+- Domain events MUST use past-tense names (`PostPublished`, not `PublishPost`).
+- IDs MUST use `Guid.CreateVersion7()` for new aggregates.
+- Concrete types MUST be `sealed` unless explicitly a base class.
+- MUST NOT reference EF Core, ASP.NET Core, or application DTOs in Domain.
+- Repository interfaces live in Domain; implementations live in Infrastructure only.
+
 ---
 
 ## Guiding Philosophy
@@ -84,7 +94,7 @@ Every type, property, and method name in the Domain layer reflects the language 
 | State discriminated union base | `{AggregateName}State` | `PostState` |
 | State case | `{StateName}{AggregateName}State` | `DraftPostState`, `PublishedPostState` |
 
-The read-side pattern for queries is `IDatabaseContext`, defined in `Application.Read.Contracts/Shared/`. Query handlers inject `IDatabaseContext` and write LINQ projections directly. There is no per-aggregate `IXxxReadStore` interface. See `docs/conventions/backend/07-query-read-strategy.md` and ADR 0015.
+The read-side pattern for queries is `IDatabaseContext`, defined in `Application.Read.Contracts/Shared/`. Query handlers inject `IDatabaseContext` and write LINQ projections directly. There is no per-aggregate `IXxxReadStore` interface. See `docs/conventions/backend/07-query-read-strategy.md` and `docs/decisions/idatabasecontext-over-per-aggregate-read-stores.md`.
 
 ---
 

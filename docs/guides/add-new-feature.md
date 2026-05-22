@@ -12,6 +12,7 @@ Read:
 2. `docs/architecture/clean-architecture.md`.
 3. The convention files for each layer you will edit.
 4. The project `docs/domain/` inventories.
+5. `docs/guides/definition-of-done.md` before marking the work complete.
 
 ---
 
@@ -21,7 +22,7 @@ If the use case changes business state, update the aggregate first.
 
 - Add or update aggregate method.
 - Enforce invariants inside the aggregate.
-- Raise a domain event when downstream work should react.
+- Raise a domain event when downstream work MUST react asynchronously.
 - Add concrete domain exceptions.
 - Add domain tests.
 
@@ -103,12 +104,14 @@ In WebApi:
 
 In `apps/web/`:
 
-- Fetch initial read data in server components where possible.
+- Fetch initial read data in Server Components on read-heavy pages.
 - Use Server Actions for form mutations.
 - Use TanStack Query for client-side freshness.
 - Keep server data out of Zustand.
 - Add loading, empty, error, and forbidden states.
 - Regenerate API types when the backend contract changes.
+- Add or update Playwright happy-path tests in `apps/web/e2e/`.
+- Add Vitest tests for new hooks, utilities, or Zod schemas.
 
 ---
 
@@ -127,16 +130,17 @@ Update the project-specific files:
 
 ## 10. Verify
 
-Run:
+Run every applicable gate in `docs/conventions/shared/ci.md`, then complete `docs/guides/definition-of-done.md`.
 
 ```bash
-dotnet build src/{ProjectName}.slnx
-dotnet test src/{ProjectName}.slnx
+dotnet build src/{ProjectName}.slnx --configuration Release
+dotnet test src/{ProjectName}.slnx --configuration Release --no-build
 pnpm lint
 pnpm type-check
 pnpm test
 pnpm build
+pnpm exec playwright test --config apps/web/playwright.config.ts
 ```
 
-Run only the frontend commands that exist in the consuming project.
+Skip frontend commands when the consuming project has no `apps/web/`.
 

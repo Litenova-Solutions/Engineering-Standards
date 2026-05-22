@@ -1,4 +1,4 @@
-# ADR 0014: Animation - Tailwind First, Framer Motion Escalation
+# `docs/decisions/animation-tailwind-first-framer-motion-escalation.md`: Animation - Tailwind First, Framer Motion Escalation
 
 **Status:** Accepted
 **Date:** 2026-01-01
@@ -21,7 +21,7 @@ Four options were evaluated:
 
 The majority of animation needs in standard business applications are: hover state color changes, focus ring transitions, modal fade-in/slide-up, accordion expand/collapse, loading spinners. All of these are covered by Tailwind CSS utilities.
 
-This escalation pattern mirrors the outbox pattern on the backend (ADR 0010): start with the simplest solution, escalate only when the simpler solution is genuinely insufficient.
+This escalation pattern mirrors the outbox pattern on the backend (`docs/decisions/outbox-pattern-as-reliability-escalation.md`): start with the simplest solution, escalate only when the simpler solution is genuinely insufficient.
 
 ---
 
@@ -53,7 +53,7 @@ When Framer Motion is added to a project, it is scoped to the specific component
 **Positive:**
 
 - Zero animation JavaScript in the default setup. Tailwind animations are CSS-only.
-- Consistent with the "start simple, escalate when needed" philosophy established in ADR 0010.
+- Consistent with the "start simple, escalate when needed" philosophy established in `docs/decisions/outbox-pattern-as-reliability-escalation.md`.
 - The bundle size impact of Framer Motion is deferred until a specific requirement justifies it.
 - The `motion-reduce:` Tailwind prefix provides accessible animation reduction for free.
 

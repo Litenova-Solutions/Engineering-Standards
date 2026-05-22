@@ -1,4 +1,4 @@
-# ADR 0011: Turborepo as Monorepo Tool
+# `docs/decisions/turborepo-as-monorepo-tool.md`: Turborepo as Monorepo Tool
 
 **Status:** Accepted
 **Date:** 2026-01-01

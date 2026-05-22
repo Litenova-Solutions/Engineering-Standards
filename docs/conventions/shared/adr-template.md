@@ -18,27 +18,26 @@ Write an ADR for any decision that meets one or more of the following criteria:
 
 ---
 
-## ADR File Naming
+## Decision File Naming
 
-ADR files live in `docs/adr/` within the project repository.
+**In this standards repository:** `docs/decisions/{kebab-case-topic}.md` with no numeric prefix. Add a row to `docs/decisions/README.md` listing the canonical convention file.
 
-File name format: `docs/adr/{NNNN}-{kebab-case-title}.md`
-
-Where `NNNN` is a zero-padded sequential number starting at `0001`.
+**In a consumer project:** `docs/decisions/{kebab-case-topic}.md` in that project's repository for project-specific choices.
 
 **Examples:**
-- `docs/adr/0001-use-litebus-as-mediator.md`
-- `docs/adr/0002-use-minimal-api-endpoint-classes.md`
-- `docs/adr/0003-use-testcontainers-for-integration-tests.md`
+- `docs/decisions/litebus-as-mediator.md` (standards repo)
+- `docs/decisions/azure-blob-storage-for-attachments.md` (consumer project)
 
 ---
 
 ## ADR Structure
 
 ```markdown
-# {NNNN}. {Title - short, imperative, describes the decision}
+# {Title - short, imperative, describes the decision}
 
-**Status:** Proposed | Accepted | Deprecated | Superseded by [ADR-NNNN](NNNN-title.md)
+**Status:** Proposed | Accepted | Deprecated | Superseded by [{slug}]({slug}.md)
+
+**Canonical rules:** `docs/conventions/...` (path agents MUST follow)
 
 **Date:** YYYY-MM-DD
 
@@ -118,4 +117,4 @@ The application layer is split into five projects: `Application.Write.Contracts`
 
 ### Risks
 
-- If the project reference rules are not enforced by architecture tests, the boundaries will erode as shortcuts are taken. Architecture tests are required (see ADR 0009).
+- If the project reference rules are not enforced by architecture tests, the boundaries will erode as shortcuts are taken. Architecture tests are required (see `docs/decisions/architecture-tests-as-enforcement.md`).

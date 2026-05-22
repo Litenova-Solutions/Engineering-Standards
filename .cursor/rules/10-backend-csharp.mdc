@@ -10,7 +10,7 @@ alwaysApply: false
 
 # Backend C# - Critical Rules Summary
 
-Full convention guides are in `docs/conventions/backend/`. Read the relevant file before editing a layer. This file is a quick reference only.
+Full convention guides are in `docs/conventions/backend/`. Read the relevant file before editing a layer. Forbidden packages: `docs/conventions/shared/forbidden-packages.md`. Completion checklist: `docs/guides/definition-of-done.md`. This file is a quick reference only.
 
 ## Twelve Critical Rules
 

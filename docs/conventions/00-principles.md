@@ -6,7 +6,7 @@ These principles apply to all projects following these standards, regardless of 
 
 ## 1. Explicitness Over Magic
 
-Prefer code that is easy to follow over abstractions that hide behavior. Every behavior should be traceable from its call site without jumping through framework internals or documentation.
+Code **MUST** be easy to follow over abstractions that hide behavior. Every behavior **MUST** be traceable from its call site without jumping through framework internals or documentation.
 
 If a reader cannot understand what a piece of code does without reading framework source code, that is a signal to simplify. Auto-mapping libraries that infer transformations by convention, implicit framework behaviors configured via reflection, and magic string conventions all violate this principle.
 
@@ -16,7 +16,7 @@ The cost of verbosity is measured in keystrokes. The cost of magic is measured i
 
 ## 2. Screaming Architecture
 
-Folder structure communicates business intent. A developer should be able to identify the business domain from the folder names alone, not from file names, not from class names, but from the folder hierarchy.
+Folder structure **MUST** communicate business intent. A developer **MUST** be able to identify the business domain from folder names alone, not from file or class names.
 
 ```
 // GOOD: folder structure that communicates intent
@@ -50,7 +50,7 @@ If you find yourself needing to reference an outer layer from an inner layer, th
 
 ## 4. Aggregate as Consistency Boundary
 
-A single database transaction modifies a single aggregate. If an operation appears to require modifying two aggregates in a single transaction, either the aggregate boundaries are wrong or the operation should be modeled as a domain event that triggers a separate handler.
+A single database transaction **MUST** modify a single aggregate. If an operation appears to require modifying two aggregates in one transaction, either the aggregate boundaries are wrong or the operation **MUST** be modeled as a domain event that triggers a separate handler.
 
 Cross-aggregate coordination happens via domain events, not by loading multiple aggregates in the same command handler and saving both. The transaction boundary is the aggregate, not the use case.
 
@@ -77,7 +77,7 @@ Code starts where it is first needed. It does not move to a `Shared/` folder pre
 - **Strike 1 (same feature):** A second use appears within the same feature. Extract to a feature-local `Shared/` subfolder.
 - **Strike 2 (different feature):** A third use appears from a different feature. Extract to the layer-level `Shared/` folder.
 
-Most code never reaches Strike 2. The rule prevents the accumulation of a `Shared/` folder full of types that are only used once, which is the most common source of unnecessary coupling.
+The promotion rule prevents the accumulation of a `Shared/` folder full of types that are only used once, which is the most common source of unnecessary coupling.
 
 The promotion rule applies within a single project. Types that are part of the public contract of a layer (commands, queries, result records, `IDatabaseContext`, pagination envelopes) belong in the Contracts project from the start, not after promotion. Promotion is for implementation-level code that unexpectedly becomes reusable.
 

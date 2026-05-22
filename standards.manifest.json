@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "name": "engineering-standards",
+  "agentsEntry": "AGENTS.md",
+  "conventionsRoot": "docs/conventions",
+  "decisionsRoot": "docs/decisions",
+  "guidesRoot": "docs/guides"
+}

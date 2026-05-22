@@ -1,4 +1,4 @@
-# 0010. Outbox Pattern as Reliability Escalation Path
+# Outbox Pattern as Reliability Escalation Path
 
 **Status:** Accepted
 

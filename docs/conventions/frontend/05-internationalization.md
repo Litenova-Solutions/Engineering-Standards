@@ -74,5 +74,5 @@ const formatted = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()
 
 APIs return stable machine values, not localized display strings, unless the endpoint is explicitly a presentation endpoint. The frontend localizes labels, enum names, validation summaries, and dates.
 
-Backend validation error codes SHOULD be stable so the frontend can localize messages when the project requires it.
+Backend validation error codes MUST be stable so the frontend can localize messages when the project requires it.
 

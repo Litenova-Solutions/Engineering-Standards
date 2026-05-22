@@ -1,4 +1,4 @@
-# 0004. LiteBus as Mediator
+# LiteBus as Mediator
 
 **Status:** Accepted
 
@@ -17,7 +17,7 @@ Several factors were evaluated:
 
 The modular design of LiteBus has a practical benefit for both performance and developer context. When an agent or engineer sees a constructor injecting `ICommandMediator`, its responsibility for state mutation is explicit. When it sees `IQueryMediator`, its read-only nature is clear.
 
-The combined `IMessageMediator` interface is available but generally discouraged in favor of the specific mediators to maintain high-fidelity CQS.
+The combined `IMessageMediator` interface MUST NOT be injected in production code paths. Endpoints and handlers MUST use `ICommandMediator`, `IQueryMediator`, or `IEventPublisher` as appropriate.
 
 ## Decision
 

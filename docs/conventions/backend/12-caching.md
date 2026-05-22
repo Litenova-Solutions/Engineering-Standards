@@ -95,7 +95,7 @@ Every cache entry MUST have at least one of these invalidation paths:
 - Tag-based invalidation at the frontend cache layer.
 - Outbox-backed invalidation when multiple services consume the same event.
 
-Command handlers do not call cache APIs directly unless the cache interface is part of the write-side contract and the invalidation is part of the use case. Prefer invalidation in Infrastructure after `SaveChangesAsync` succeeds.
+Command handlers MUST NOT call cache APIs directly unless the cache interface is part of the write-side contract and the invalidation is part of the use case. Cache invalidation MUST occur in Infrastructure after `SaveChangesAsync` succeeds.
 
 ---
 
