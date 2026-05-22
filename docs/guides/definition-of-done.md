@@ -19,7 +19,7 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 - [ ] Minimal API `IEndpoint` created and mapped.
 - [ ] OpenAPI spec regenerated and committed (`openapi.json` in `packages/api-types/`).
-- [ ] Frontend TypeScript types regenerated (`pnpm run generate:api` or project-equivalent script).
+- [ ] Frontend TypeScript types regenerated (`pnpm generate:api-types` or project-equivalent script).
 - [ ] No drift between generated API types and committed files.
 
 ---

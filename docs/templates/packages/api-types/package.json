@@ -1,0 +1,14 @@
+{
+  "name": "@myproject/api-types",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/api.d.ts"
+  },
+  "scripts": {
+    "generate:api-types": "openapi-typescript ../../packages/api-types/openapi.json -o ./src/api.d.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.8.0"
+  }
+}

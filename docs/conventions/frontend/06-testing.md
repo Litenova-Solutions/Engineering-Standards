@@ -96,8 +96,4 @@ Project repositories MAY scope Playwright to changed specs in local development.
 
 ## 6. Project-Specific Testing Configuration
 
-> **Project teams: fill in this section when adopting these standards.**
-
-- **Playwright base URL:** Per-environment frontend URL.
-- **Auth setup:** Shared storage state or login fixture for authenticated journeys.
-- **Skipped journeys:** Any happy path temporarily excluded from CI and the reason.
+Document Playwright base URLs and auth fixtures in the project repository `AGENTS.md` and `apps/web/playwright.config.ts`.

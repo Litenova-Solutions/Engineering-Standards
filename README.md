@@ -1,6 +1,6 @@
 # Engineering Standards
 
-**Version 1.0.0** · Standards v1 baseline · [Changelog](CHANGELOG.md) · [MIT License](LICENSE)
+**Version 1.0.0** · [Changelog](CHANGELOG.md) · [MIT License](LICENSE)
 
 Normative conventions and agent contracts for full-stack .NET and Next.js projects. Use this repository as the single source of truth for architecture, coding rules, and AI agent behavior.
 
@@ -36,7 +36,7 @@ flowchart LR
 
 ## Versioning philosophy
 
-**Standards v1** means this repository is the first complete, pinned baseline you can submodule into production repos. The `1.0.0` tag is that baseline.
+**Standards v1** is the first complete pinned baseline. After the `1.0.0` tag, breaking changes are tracked in `CHANGELOG.md` and may increment to `2.0.0`.
 
 | Semver | Meaning |
 |:---|:---|

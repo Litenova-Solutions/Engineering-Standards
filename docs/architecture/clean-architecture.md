@@ -370,7 +370,7 @@ Full handler implementations, assembly marker classes, and LiteBus registration 
 
 ### LiteBus Registration
 
-Register LiteBus in `WebApi/Program.cs` only. See `docs/blueprints/backend/program-cs.md` for the complete registration block. Do not duplicate registration in architecture or infrastructure convention files.
+Register LiteBus in `WebApi/Program.cs` only. See `docs/blueprints/backend/program-cs.md` for the complete composition root. Do not duplicate registration in other convention files.
 
 Handler classes are `internal sealed`. Each implementation project exposes a `public static class {Layer}AssemblyMarker { }` so `Program.cs` can reference the assembly without importing internal types. See `docs/conventions/backend/04-infrastructure-layer.md` for assembly marker examples.
 

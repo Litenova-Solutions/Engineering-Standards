@@ -1,18 +1,27 @@
 # Blueprint: Program.cs
 
-This is the canonical `Program.cs` for the `{ProjectName}.WebApi` project. It is the complete composition root. Copy it, replace `{ProjectName}` and adjust the options sections for the project's specific requirements.
+This is the **only** authoritative `Program.cs` for `{ProjectName}.WebApi`. Copy it, replace `{ProjectName}`, and copy supporting files from the sections below. Other convention files MUST reference this blueprint instead of duplicating registration blocks.
 
 ---
 
 ## Complete Program.cs
 
 ```csharp
-using System.Text;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using LiteBus.Commands;
+using LiteBus.Events;
+using LiteBus.Extensions.Microsoft.DependencyInjection;
+using LiteBus.Queries;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Formatting.Json;
+using {ProjectName}.Application.Read;
+using {ProjectName}.Application.Reactions;
+using {ProjectName}.Application.Write;
+using {ProjectName}.Infrastructure;
 using {ProjectName}.Infrastructure.DependencyInjection;
+using {ProjectName}.Infrastructure.HealthChecks;
 using {ProjectName}.WebApi.Auth;
 using {ProjectName}.WebApi.Extensions;
 using {ProjectName}.WebApi.Middleware;
@@ -20,10 +29,17 @@ using {ProjectName}.WebApi.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ─── Aspire service defaults ─────────────────────────────────────────────────
 builder.AddServiceDefaults();
 
-// ─── Options with startup validation ────────────────────────────────────────
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .Enrich.WithMachineName()
+        .Enrich.WithEnvironmentName()
+        .WriteTo.Console(new JsonFormatter()));
+
 builder.Services
     .AddOptions<JwtSettings>()
     .BindConfiguration(JwtSettings.SectionName)
@@ -42,34 +58,11 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
-// ─── Logging ─────────────────────────────────────────────────────────────────
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
+builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 
-// ─── Authentication ───────────────────────────────────────────────────────────
-var jwtSettings = builder.Configuration
-    .GetSection(JwtSettings.SectionName)
-    .Get<JwtSettings>()!;
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer();
 
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings.Secret)),
-            ValidateIssuer = true,
-            ValidIssuer = jwtSettings.Issuer,
-            ValidateAudience = true,
-            ValidAudience = jwtSettings.Audience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromSeconds(30)
-        };
-    });
-
-// ─── Authorization ────────────────────────────────────────────────────────────
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(AuthorizationPolicies.RequireAuthenticatedUser, policy =>
@@ -82,36 +75,16 @@ builder.Services.AddAuthorization(options =>
         AuthorizationPolicies.RequireAuthenticatedUser)!;
 });
 
-// ─── CORS ─────────────────────────────────────────────────────────────────────
-var corsOptions = builder.Configuration
-    .GetSection(CorsOptions.SectionName)
-    .Get<CorsOptions>()!;
-
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-        policy
-            .WithOrigins(corsOptions.AllowedOrigins)
-            .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE")
-            .WithHeaders("Content-Type", "Authorization", "Idempotency-Key")
-            .AllowCredentials());
-});
-
-// ─── Rate limiting ────────────────────────────────────────────────────────────
-var rateLimitOptions = builder.Configuration
-    .GetSection(RateLimitOptions.SectionName)
-    .Get<RateLimitOptions>()!;
+builder.Services.AddCors();
 
 builder.Services.AddRateLimiter(options =>
 {
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: context.User.Identity?.Name ?? context.Request.Headers.Host.ToString(),
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = rateLimitOptions.PermitLimit,
-                Window = TimeSpan.FromSeconds(rateLimitOptions.WindowSeconds)
-            }));
+    options.AddFixedWindowLimiter(RateLimitPolicies.AuthenticatedApi, limiter =>
+    {
+        limiter.PermitLimit = 120;
+        limiter.Window = TimeSpan.FromMinutes(1);
+        limiter.QueueLimit = 0;
+    });
 
     options.OnRejected = async (context, cancellationToken) =>
     {
@@ -127,27 +100,37 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
-// ─── Health checks ────────────────────────────────────────────────────────────
-builder.Services
-    .AddHealthChecks()
-    .AddDbContextCheck<{ProjectName}DbContext>("database");
+builder.Services.AddInfrastructure(builder.Configuration);
 
-// ─── Exception handler and ProblemDetails ─────────────────────────────────────
+builder.Services.AddLiteBus(liteBus =>
+{
+    liteBus.AddCommandModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ApplicationWriteAssemblyMarker).Assembly);
+        module.RegisterFromAssembly(typeof(InfrastructureAssemblyMarker).Assembly);
+    });
+
+    liteBus.AddQueryModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ApplicationReadAssemblyMarker).Assembly);
+    });
+
+    liteBus.AddEventModule(module =>
+    {
+        module.RegisterFromAssembly(typeof(ApplicationReactionsAssemblyMarker).Assembly);
+    });
+});
+
+builder.Services.AddEndpoints(typeof(Program).Assembly);
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-// ─── OpenAPI ─────────────────────────────────────────────────────────────────
 builder.Services.AddOpenApi(options =>
 {
+    options.AddSchemaTransformer<StronglyTypedIdSchemaTransformer>();
     options.AddDocumentTransformer((document, _, _) =>
     {
-        document.Info = new()
-        {
-            Title = "{ProjectName} API",
-            Version = "v1",
-            Description = "API for {ProjectName}."
-        };
-
         document.Components ??= new();
         document.Components.SecuritySchemes ??= new Dictionary<string, OpenApiSecurityScheme>();
         document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
@@ -157,51 +140,14 @@ builder.Services.AddOpenApi(options =>
             BearerFormat = "JWT",
             Description = "Enter your JWT access token."
         };
-
-        return Task.CompletedTask;
-    });
-
-    options.AddOperationTransformer((operation, context, _) =>
-    {
-        var hasAuthorize = context.Description.ActionDescriptor.EndpointMetadata
-            .OfType<IAuthorizeData>()
-            .Any();
-
-        if (hasAuthorize)
-        {
-            operation.Security ??= [];
-            operation.Security.Add(new OpenApiSecurityRequirement
-            {
-                [new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                }] = Array.Empty<string>()
-            });
-        }
-
         return Task.CompletedTask;
     });
 });
 
-// ─── Infrastructure registration ─────────────────────────────────────────────
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddHealthChecks()
+    .AddCheck<PostgreSqlHealthCheck>("postgresql", tags: ["ready"]);
 
-// ─── Endpoint discovery ───────────────────────────────────────────────────────
-builder.Services.AddEndpoints(typeof(Program).Assembly);
-
-// ─── HttpContext accessor (for claims extraction in endpoints) ────────────────
-builder.Services.AddHttpContextAccessor();
-
-// ═════════════════════════════════════════════════════════════════════════════
 var app = builder.Build();
-// ═════════════════════════════════════════════════════════════════════════════
-
-// ─── Middleware order is CRITICAL ─────────────────────────────────────────────
-// Reference: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/
 
 app.UseExceptionHandler();
 
@@ -210,15 +156,20 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseSerilogRequestLogging();
+
+var corsOptions = app.Services.GetRequiredService<IOptions<CorsOptions>>().Value;
+
 app.UseRouting();
-app.UseCors();
+app.UseCors(policy => policy
+    .WithOrigins(corsOptions.AllowedOrigins)
+    .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE")
+    .WithHeaders("Content-Type", "Authorization", "Idempotency-Key")
+    .AllowCredentials());
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Rate limiter after CORS so 429 responses include CORS headers for browser clients.
 app.UseRateLimiter();
 
-// ─── Health check endpoints ───────────────────────────────────────────────────
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = HealthCheckResponseWriter.WriteDetailedJson
@@ -226,26 +177,106 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
-    Predicate = check => check.Tags.Contains("ready")
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = HealthCheckResponseWriter.WriteDetailedJson
 });
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
-    Predicate = _ => false   // liveness: always 200 if process is running
+    Predicate = _ => false
 });
 
-// ─── Endpoints ────────────────────────────────────────────────────────────────
 app.MapEndpoints();
 
 app.Run();
 
-// Required for integration test WebApplicationFactory
 public partial class Program { }
 ```
 
 ---
 
 ## Supporting Files
+
+### `WebApi/Auth/JwtBearerOptionsSetup.cs`
+
+Binds JWT validation from validated `IOptions<JwtSettings>`.
+
+```csharp
+internal sealed class JwtBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
+{
+    private readonly IOptions<JwtSettings> _jwtSettings;
+
+    public JwtBearerOptionsSetup(IOptions<JwtSettings> jwtSettings)
+    {
+        _jwtSettings = jwtSettings;
+    }
+
+    public void Configure(JwtBearerOptions options)
+    {
+        Configure(JwtBearerDefaults.AuthenticationScheme, options);
+    }
+
+    public void Configure(string? name, JwtBearerOptions options)
+    {
+        if (name != JwtBearerDefaults.AuthenticationScheme)
+        {
+            return;
+        }
+
+        var settings = _jwtSettings.Value;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(settings.Secret)),
+            ValidateIssuer = true,
+            ValidIssuer = settings.Issuer,
+            ValidateAudience = true,
+            ValidAudience = settings.Audience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30)
+        };
+    }
+}
+```
+
+### `WebApi/Auth/RateLimitPolicies.cs`
+
+```csharp
+internal static class RateLimitPolicies
+{
+    public const string AuthenticatedApi = "authenticated-api";
+}
+```
+
+### `WebApi/HealthChecks/HealthCheckResponseWriter.cs`
+
+```csharp
+internal static class HealthCheckResponseWriter
+{
+    internal static Task WriteDetailedJson(HttpContext context, HealthReport report)
+    {
+        context.Response.ContentType = "application/json";
+
+        var payload = new
+        {
+            status = report.Status.ToString(),
+            totalDuration = report.TotalDuration.TotalMilliseconds,
+            entries = report.Entries.ToDictionary(
+                entry => entry.Key,
+                entry => new
+                {
+                    status = entry.Value.Status.ToString(),
+                    duration = entry.Value.Duration.TotalMilliseconds,
+                    description = entry.Value.Description
+                })
+        };
+
+        return context.Response.WriteAsJsonAsync(payload);
+    }
+}
+```
 
 ### `WebApi/Options/CorsOptions.cs`
 
@@ -255,6 +286,7 @@ public sealed class CorsOptions
     public const string SectionName = "Cors";
 
     [Required]
+    [MinLength(1, ErrorMessage = "At least one CORS origin is required.")]
     public required string[] AllowedOrigins { get; init; } = [];
 }
 ```
@@ -267,7 +299,7 @@ public sealed class RateLimitOptions
     public const string SectionName = "RateLimit";
 
     [Range(1, 10000)]
-    public int PermitLimit { get; init; } = 100;
+    public int PermitLimit { get; init; } = 120;
 
     [Range(1, 3600)]
     public int WindowSeconds { get; init; } = 60;
@@ -276,13 +308,21 @@ public sealed class RateLimitOptions
 
 ### `WebApi/Middleware/GlobalExceptionHandler.cs`
 
-Copy the full implementation from `docs/conventions/backend/06-exception-hierarchy.md` (section **The GlobalExceptionHandler**). Do not maintain a separate copy in the blueprint.
+Copy the full implementation from `docs/conventions/backend/06-exception-hierarchy.md` (section **The GlobalExceptionHandler**).
+
+### `WebApi/Extensions/EndpointExtensions.cs`
+
+Copy from `docs/blueprints/backend/endpoint-extensions.md`.
+
+### `Infrastructure/HealthChecks/PostgreSqlHealthCheck.cs`
+
+Copy from `docs/conventions/backend/09-observability.md` section 4.
 
 ---
 
 ## Notes
 
-- The middleware order (`UseRouting` → `UseCors` → `UseAuthentication` → `UseAuthorization` → `UseRateLimiter`) is enforced by the ASP.NET Core middleware pipeline contract. Do not reorder.
-- `public partial class Program { }` at the end enables `WebApplicationFactory<Program>` in integration tests.
-- The `GlobalExceptionHandler` MUST NOT expose stack traces or internal exception messages in 500 responses.
-- Health check endpoints are mapped outside the rate limiter because they are called by orchestrators on a fixed schedule.
+- Middleware order (`UseRouting` → `UseCors` → `UseAuthentication` → `UseAuthorization` → `UseRateLimiter`) is required. Do not reorder.
+- Apply `.RequireRateLimiting(RateLimitPolicies.AuthenticatedApi)` on route groups per `docs/conventions/backend/05-api-layer.md`.
+- `public partial class Program { }` enables `WebApplicationFactory<Program>` in integration tests.
+- Health check endpoints are not rate limited.

@@ -11,17 +11,18 @@ Canonical contract for AI agents and engineers. Read before touching code.
 5. `docs/guides/definition-of-done.md` before marking any feature complete.
 6. Topic-specific conventions when the task touches them (see index).
 7. Do not load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding.
+8. Cursor rules in `.cursor/rules/` when using Cursor.
 
 ## Tech Stack
 
 | Technology | Version / Notes |
 |:---|:---|
-| .NET | 10 (check `global.json` for pinned SDK version) |
+| .NET | 10 (check `apps/api/global.json`) |
 | ASP.NET Core | 10, Minimal APIs only |
 | EF Core | 10 |
-| LiteBus | Modular packages; `ICommandMediator` / `IQueryMediator` only in endpoints |
+| LiteBus | 4.3.x modular packages; `ICommandMediator` / `IQueryMediator` only in endpoints |
 | PostgreSQL | Primary database; `snake_case` via `.UseSnakeCaseNamingConventions()` |
-| Next.js | 16.2.6 (latest 16.x security patch; stay on current patch release) |
+| Next.js | 16.2.6 (latest 16.x security patch) |
 | React | 19.2.6 (match react-server-dom patch with Next.js advisory) |
 | TypeScript | 6.0.x, `moduleResolution: bundler` |
 | TanStack Query | 5.100.10; `@tanstack/query*` confirmed clean in GHSA-g7cv-rxg3-hmpx |
@@ -42,7 +43,8 @@ Canonical contract for AI agents and engineers. Read before touching code.
 | `Application.Reactions` | Event handlers; narrow side-effect interfaces only |
 | `Infrastructure` | EF Core, repos, pipeline, outbox, jobs, external clients |
 | `WebApi` | `IEndpoint`, request/response models, OpenAPI |
-| `apps/api/` | .NET solution root in monorepos (`src/`, `tests/`, `global.json`) |
+| `Worker` | Outbox dispatch, scheduled jobs (`14-worker-projects.md`) |
+| `apps/api/` | .NET solution root (`src/`, `tests/`, `global.json`) |
 | `apps/web/` | Next.js; `features/{name}/` vertical slices |
 
 ## Non-Negotiable Rules
@@ -50,7 +52,7 @@ Canonical contract for AI agents and engineers. Read before touching code.
 - MUST read the relevant convention before editing that layer.
 - MUST check `standards.manifest.json` for pinned dependency versions before changing package references.
 - MUST NOT upgrade framework versions unless the task is explicitly a standards upgrade.
-- MUST use blueprints in `docs/blueprints/` for complete file generation.
+- MUST use blueprints in `docs/blueprints/` for complete file generation (see `docs/blueprints/README.md`).
 - MUST use `IEndpoint`; MUST NOT use MVC `Controller` / `ControllerBase`.
 - MUST inject `IDatabaseContext` in query handlers; MUST NOT inject repositories or `AppDbContext`.
 - MUST NOT add per-aggregate `IXxxReadStore` interfaces.
@@ -66,7 +68,7 @@ Canonical contract for AI agents and engineers. Read before touching code.
 - MUST follow `writing-style.md` (no forbidden words, no em/en dashes).
 - MUST run gates in `docs/conventions/shared/ci.md` and complete `definition-of-done.md`.
 - MUST NOT accept actor IDs from request bodies when the actor is the authenticated user. Actor identity comes from validated JWT claims only.
-- MUST NOT use `configuration["Key"]!` directly; all config access goes through validated options classes.
+- MUST NOT use `configuration["Key"]!` directly; all config access goes through validated options classes and `IOptions<T>`.
 - MUST use `FromSqlInterpolated` for raw SQL; MUST NOT concatenate SQL strings.
 - Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; no business logic in `proxy.ts`; no `useMemo`/`useCallback`/`React.memo` with React Compiler; no server data in Zustand or `useEffect` fetch; no cross-feature imports; no `TODO`/`FIXME`/stubs; max 300 lines per file; no arbitrary Tailwind values; env vars only via `lib/env.ts`.
 
@@ -87,54 +89,27 @@ Canonical contract for AI agents and engineers. Read before touching code.
 | Observability | `docs/conventions/backend/09-observability.md` |
 | Reliability | `docs/conventions/backend/10-reliability.md` |
 | Background jobs | `docs/conventions/backend/11-background-jobs.md` |
+| Caching | `docs/conventions/backend/12-caching.md` |
 | Deployment | `docs/conventions/backend/13-deployment-and-migrations.md` |
-| Authentication / authorization | `docs/conventions/backend/15-authentication-and-authorization.md` |
-| Options and configuration | `docs/conventions/backend/16-options-and-configuration.md` |
-| Raw SQL and reporting | `docs/conventions/backend/19-raw-sql-and-reporting.md` |
-| Naming | `docs/conventions/shared/naming.md` |
-| Git | `docs/conventions/shared/git-workflow.md` |
-| CI gates | `docs/conventions/shared/ci.md` |
-| CI/CD pipeline | `docs/conventions/shared/ci-cd.md` |
+| Worker projects | `docs/conventions/backend/14-worker-projects.md` |
+| Authentication | `docs/conventions/backend/15-authentication-and-authorization.md` |
+| Options / config | `docs/conventions/backend/16-options-and-configuration.md` |
+| Concurrency | `docs/conventions/backend/17-concurrency.md` |
+| Soft delete | `docs/conventions/backend/18-soft-delete.md` |
+| Raw SQL | `docs/conventions/backend/19-raw-sql-and-reporting.md` |
+| CI / CD | `docs/conventions/shared/ci.md`, `ci-cd.md` |
 | Security | `docs/conventions/shared/security.md` |
-| Supply-chain security | `docs/conventions/shared/supply-chain-security.md` |
-| Monorepo structure | `docs/conventions/shared/monorepo-structure.md` |
-| Realtime | `docs/conventions/shared/realtime-updates.md` |
-| Forbidden packages | `docs/conventions/shared/forbidden-packages.md` |
-| Decisions (rationale) | `docs/decisions/README.md` (do not load for routine coding) |
-| Writing style | `docs/conventions/shared/writing-style.md` |
+| Monorepo | `docs/conventions/shared/monorepo-structure.md` |
 | Agentic guardrails | `docs/conventions/shared/agentic-guardrails.md` |
-| Containers | `docs/conventions/shared/containers.md` |
-| IaC | `docs/conventions/shared/infrastructure-as-code.md` |
-| Guides | `docs/guides/` (create-new-project, add-new-feature, spec-driven-development, definition-of-done) |
-| App Router | `docs/conventions/frontend/01-nextjs-app-router.md` |
-| Components | `docs/conventions/frontend/02-components.md` |
-| Data fetching | `docs/conventions/frontend/03-data-fetching.md` |
-| State and forms | `docs/conventions/frontend/04-state-and-forms.md` |
-| i18n | `docs/conventions/frontend/05-internationalization.md` |
+| Frontend App Router | `docs/conventions/frontend/01-nextjs-app-router.md` |
 | Frontend testing | `docs/conventions/frontend/06-testing.md` |
-| Feature boundaries | `docs/conventions/frontend/07-feature-boundaries.md` |
-| Error handling / ProblemDetails | `docs/conventions/frontend/08-error-handling-and-problem-details.md` |
-| Frontend environment config | `docs/conventions/frontend/09-environment-and-runtime-config.md` |
-
-## Blueprints
-
-Full-file reference implementations. Use these for generating complete artifacts.
-
-| Blueprint | File |
-|:---|:---|
-| Program.cs | `docs/blueprints/backend/program-cs.md` |
-| Outbox implementation | `docs/blueprints/backend/outbox.md` |
-| Idempotency implementation | `docs/blueprints/backend/idempotency.md` |
-| Feature slice | `docs/blueprints/frontend/feature-slice.md` |
-| Server Action | `docs/blueprints/frontend/server-action.md` |
-
-## Runbooks
-
-Operational procedures: `docs/runbooks/` (load during incidents, not routine coding).
+| Admin API auth | `docs/conventions/frontend/10-admin-api-auth.md` |
+| Other frontend topics | `docs/conventions/frontend/` (02 through 09) |
+| Guides | `docs/guides/` |
+| Blueprints | `docs/blueprints/README.md` |
+| Runbooks | `docs/runbooks/README.md` |
 
 ## Commands
-
-Run the full pipeline in `docs/conventions/shared/ci.md`. Minimum:
 
 ```bash
 dotnet build apps/api/{ProjectName}.slnx --configuration Release

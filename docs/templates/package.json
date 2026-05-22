@@ -1,0 +1,20 @@
+{
+  "name": "@myproject/root",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "test": "turbo run test",
+    "generate:api-types": "turbo run generate:api-types"
+  },
+  "devDependencies": {
+    "turbo": "2.x"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "packageManager": "pnpm@10.0.0"
+}

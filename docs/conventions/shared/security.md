@@ -62,27 +62,23 @@ Authentication is handled by ASP.NET Core middleware. Do not implement custom au
 - Endpoints that are intentionally public MUST call `.AllowAnonymous()` explicitly to make the intent clear.
 - Authorization policy names MUST be defined as `const string` fields in a central `AuthorizationPolicies` static class, not as inline magic strings.
 
+Policy constant names are defined in `docs/conventions/backend/15-authentication-and-authorization.md` (`RequireAuthenticatedUser`, `RequireAdminRole`). Do not redefine them here.
+
 ```csharp
 // GOOD:
-internal static class AuthorizationPolicies
-{
-    public const string AuthenticatedUser = "AuthenticatedUser";
-    public const string AdminOnly = "AdminOnly";
-}
-
 app.MapPost("/posts", HandleAsync)
-    .RequireAuthorization(AuthorizationPolicies.AuthenticatedUser);
+    .RequireAuthorization(AuthorizationPolicies.RequireAuthenticatedUser);
 
 // BAD:
 app.MapPost("/posts", HandleAsync)
-    .RequireAuthorization("AuthenticatedUser"); // BAD: magic string, not refactoring-safe
+    .RequireAuthorization("RequireAuthenticatedUser"); // BAD: magic string
 ```
 
 ---
 
 ## 5. Rate Limiting
 
-Public endpoints, authentication endpoints, file uploads, search endpoints, expensive commands, and webhooks MUST have rate limiting. Use ASP.NET Core rate limiting middleware for the backend and a reverse proxy or platform-level limiter for the Next.js app when self-hosted.
+Public endpoints, authentication endpoints, file uploads, search endpoints, expensive commands, and webhooks MUST have rate limiting. Use named policies from `docs/blueprints/backend/program-cs.md` (`RateLimitPolicies.AuthenticatedApi`) and apply with `.RequireRateLimiting()` on route groups.
 
 ```csharp
 // GOOD: named policy applied to a route group
@@ -145,7 +141,7 @@ policy.AllowAnyOrigin()
 
 ## 7. Content Security Policy
 
-Next.js projects MUST define a Content Security Policy before production. Use nonce-based CSP for applications that handle sensitive data or strict compliance requirements. Nonce-based CSP forces dynamic rendering and disables static optimization for affected routes, so document that trade-off in the project ADR.
+Next.js projects MUST define a Content Security Policy before production. Copy the nonce-based implementation from `docs/blueprints/frontend/csp-headers.md`. Use nonce-based CSP for applications that handle sensitive data or strict compliance requirements. Nonce-based CSP forces dynamic rendering and disables static optimization for affected routes, so document that trade-off in the project ADR.
 
 At minimum, production CSP MUST include:
 

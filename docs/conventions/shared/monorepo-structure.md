@@ -192,7 +192,7 @@ OpenAPI types are generated as part of the CI pipeline. The workflow:
 ```bash
 # Step 2-3: generate spec and copy to packages/
 dotnet build apps/api/{ProjectName}.slnx --configuration Release
-cp apps/api/src/{ProjectName}.WebApi/openapi.json packages/api-types/openapi.json
+cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json packages/api-types/openapi.json
 
 # Step 4: regenerate TypeScript types
 pnpm --filter @myproject/api-types generate:api-types
@@ -263,3 +263,29 @@ apps/web/
 ```
 
 Rule: `app/` contains routing shells only. Every `page.tsx` imports its feature entry component from `features/{feature}/`. `features/` contains product use cases. `shared/` contains cross-feature non-UI logic. `components/ui/` contains generic UI primitives only. MUST NOT import from `features/{a}/` inside `features/{b}/`. See `docs/conventions/frontend/07-feature-boundaries.md`.
+
+---
+
+## 9. Standards Templates
+
+When bootstrapping a monorepo, copy files from `docs/templates/` in this repository:
+
+| Template | Destination |
+|:---|:---|
+| `global.json` | `apps/api/global.json` |
+| `Directory.Build.props` | `apps/api/Directory.Build.props` |
+| `Directory.Packages.props` | `apps/api/Directory.Packages.props` |
+| `dotnet-tools.json` | `apps/api/.config/dotnet-tools.json` |
+| `package.json` | repository root |
+| `pnpm-workspace.yaml` | repository root |
+| `turbo.json` | repository root |
+| `.nvmrc` | repository root |
+| `ci-workflow.yml` | `.github/workflows/ci.yml` |
+| `Dockerfile.api`, `Dockerfile.web`, `dockerignore` | repository root |
+| `playwright.config.ts` | `apps/web/playwright.config.ts` |
+| `eslint.config.ts` | `apps/web/eslint.config.ts` |
+| `packages/api-types/package.json` | `packages/api-types/package.json` |
+| `packages/api-client/` | `packages/api-client/` |
+| `iac/azure-container-apps.bicep` | `infra/` (optional) |
+
+See `docs/guides/create-new-project.md` for the full bootstrap sequence.

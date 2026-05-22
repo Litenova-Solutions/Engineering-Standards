@@ -403,14 +403,7 @@ Permission-gated UI may hide or disable controls, but it is never the authorizat
 
 ## 11. Project-Specific Component Conventions
 
-> **Project teams: fill in this section when adopting these standards.**
-
-The following is project-specific and not defined in this standards file:
-
-- **Design system tokens:** Custom color palette, typography scale, and spacing tokens defined in the Tailwind CSS `@theme` block.
-- **Custom component categories:** Any additional component categories beyond the four in Section 2.
-- **Project-specific accessibility requirements:** Default target is WCAG 2.2 AA unless a project ADR specifies AAA. Document screen reader tooling and any contrast requirements beyond WCAG minimum.
-- **Storybook:** Whether Storybook is used and which component categories have stories.
+Document design tokens in the project Tailwind `@theme` block and list shared components in `docs/domain/frontend-feature-inventory.md`.
 
 ---
 

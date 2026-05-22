@@ -1,0 +1,37 @@
+name: standards-ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate standards
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: AGENTS.md, links, templates, manifest
+        run: node scripts/validate-standards.mjs
+
+      - name: Bootstrap template smoke test
+        run: node scripts/smoke-bootstrap.mjs
+
+      - name: Manifest JSON schema sanity
+        run: node -e "
+          const m = require('./standards.manifest.json');
+          const required = ['version','agentsEntry','conventionsRoot','blueprintsRoot','stack','pinnedNuGetPackages'];
+          for (const k of required) {
+            if (!(k in m)) { console.error('Missing manifest key:', k); process.exit(1); }
+          }
+          if (m.version !== '1.0.0') { console.error('Unexpected version', m.version); process.exit(1); }
+          console.log('manifest OK', m.version);
+        "

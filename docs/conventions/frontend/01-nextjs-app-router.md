@@ -187,7 +187,12 @@ flowchart TD
 
 ## 6. `proxy.ts` (Renamed from `middleware.ts`)
 
-`proxy.ts` runs before every request. It MUST perform only optimistic checks: verifying the presence of a session cookie and redirecting unauthenticated users based on cookie existence.
+`proxy.ts` runs before every request. It MAY combine two non-authoritative concerns in one file:
+
+1. **Optimistic auth redirect:** verify session cookie presence and redirect unauthenticated users.
+2. **CSP nonce:** generate a per-request nonce and set the `Content-Security-Policy` header.
+
+Copy the combined implementation from `docs/blueprints/frontend/proxy-ts.md`. For CSP layout wiring, see `docs/blueprints/frontend/csp-headers.md`.
 
 It MUST NOT perform authoritative validation: no database lookups, no cryptographic JWT verification, no permission checks.
 
@@ -210,24 +215,8 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 ```
 
 ```typescript
-// GOOD: proxy.ts performs only optimistic cookie presence check
-// proxy.ts
-import type { NextRequest } from "next/server"
-import { NextResponse } from "next/server"
-
-export function proxy(request: NextRequest) {
-  const sessionCookie = request.cookies.get("session")
-
-  if (!sessionCookie && !request.nextUrl.pathname.startsWith("/login")) {
-    return NextResponse.redirect(new URL("/login", request.url))
-  }
-
-  return NextResponse.next()
-}
-
-export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
-}
+// GOOD: use the combined blueprint (auth redirect + CSP nonce)
+// See docs/blueprints/frontend/proxy-ts.md
 ```
 
 ```typescript
@@ -468,12 +457,4 @@ Add all required server-side variables to the schema. A Zod validation error at 
 
 ## 13. Project-Specific Configuration
 
-> **Project teams: fill in this section when adopting these standards.**
-
-The following configuration is project-specific and not defined in this standards file:
-
-- **API base URL:** The value of `API_BASE_URL` for each environment (development, staging, production).
-- **Custom `cacheLife` profiles:** Any project-specific cache duration profiles beyond the built-in ones.
-- **Feature flags:** Whether feature flags are implemented and how they are read (environment variable, edge config, database).
-- **Deployment target:** Vercel (with Edge Runtime), self-hosted Node.js, or Docker container. This affects which Next.js features are available.
-- **Custom `next.config.js` options:** Any project-specific Next.js configuration beyond `reactCompiler: true`.
+Document project-specific values in repository `docs/domain/frontend-api-endpoints.md` and validated `lib/env.ts`. Do not extend this standards file.

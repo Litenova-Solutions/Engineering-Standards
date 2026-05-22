@@ -46,7 +46,7 @@ The `AppHost` project is the local development entry point. Run `dotnet run --pr
 
 ## 2. `global.json`
 
-Every solution MUST include a `global.json` at the solution root that pins the .NET SDK version. Copy from `docs/templates/` or the example below.
+Every solution MUST include a `global.json` at the solution root that pins the .NET SDK version. Copy `docs/templates/global.json`.
 
 ```json
 {
@@ -317,7 +317,7 @@ The following `.csproj` templates show the minimal, correct project references a
 </Project>
 ```
 
-`apps/api/tests/{ProjectName}.Architecture.apps/api/tests/{ProjectName}.Architecture.Tests.csproj`:
+`apps/api/tests/{ProjectName}.Architecture.Tests/{ProjectName}.Architecture.Tests.csproj`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -360,7 +360,7 @@ Pre-approved npm packages (no new ADR required):
 | `date-fns` | Dates when `Temporal` is unavailable |
 | `@microsoft/signalr` | Realtime per `docs/decisions/signalr-for-real-time-updates.md` |
 | `eslint`, `eslint-plugin-boundaries` | Lint and feature boundary enforcement |
-| `jose` | JWT signing for server-to-server API authentication (Admin apps only, per `docs/conventions/frontend/06-admin-api-auth.md`) |
+| `jose` | JWT signing for server-to-server API authentication (Admin apps only, per `docs/conventions/frontend/10-admin-api-auth.md`) |
 
 Owned source copied into the repo (for example vendored `openapi-fetch` in `packages/api-client/`) is allowed when documented in `docs/decisions/openapi-typescript-client-generation.md`.
 

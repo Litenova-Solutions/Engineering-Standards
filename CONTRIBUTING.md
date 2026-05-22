@@ -28,7 +28,14 @@ Everything requires a pull request. This includes:
 Every pull request MUST:
 
 1. Have a description explaining what changed and why. Reference the ADR if the change is architectural.
-2. Pass all checks. This repository has no automated CI at this time; the author is responsible for verifying content manually before requesting review.
+2. Pass all checks. Run locally before opening a PR:
+
+```bash
+node scripts/validate-standards.mjs
+node scripts/smoke-bootstrap.mjs
+```
+
+CI runs the same checks via `.github/workflows/standards-ci.yml`.
 3. Include a `CHANGELOG.md` entry under `[Unreleased]` describing the change.
 4. Receive at least one review approval before merging.
 5. Have all review comments resolved before merging.

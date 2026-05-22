@@ -1,0 +1,12 @@
+.git
+.github
+**/bin
+**/obj
+**/node_modules
+**/.next
+**/coverage
+**/*.user
+**/.vs
+**/TestResults
+apps/web/e2e/test-results
+apps/web/playwright-report

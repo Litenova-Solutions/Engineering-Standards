@@ -159,7 +159,7 @@ export async function publishPost(_postId: PostId) {
 
 #### 3. LiteBus Module Registration
 
-LiteBus registration is authoritative in `docs/blueprints/backend/program-cs.md` and `docs/conventions/backend/05-api-layer.md`. Other documents MUST reference those files instead of duplicating registration blocks.
+LiteBus registration is authoritative in `docs/blueprints/backend/program-cs.md` only. Other documents MUST reference that file instead of duplicating registration blocks.
 
 ```csharp
 // DON'T: calling AddCommandModule twice causes a duplicate key error

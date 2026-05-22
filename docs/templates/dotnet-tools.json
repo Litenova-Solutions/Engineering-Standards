@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-ef": {
+      "version": "10.0.0",
+      "commands": ["dotnet-ef"]
+    },
+    "dotnet-stryker": {
+      "version": "4.x",
+      "commands": ["dotnet-stryker"]
+    }
+  }
+}

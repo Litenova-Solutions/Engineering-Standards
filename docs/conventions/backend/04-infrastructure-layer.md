@@ -705,7 +705,7 @@ internal static class InfrastructureServiceRegistration
 }
 ```
 
-In `Program.cs`, call `AddInfrastructure` and register LiteBus. Each module type (`AddCommandModule`, `AddQueryModule`, `AddEventModule`) is called **once** per `AddLiteBus` invocation. All assemblies for a given module type are registered inside that single call.
+In `Program.cs`, call `AddInfrastructure` and register LiteBus per `docs/blueprints/backend/program-cs.md`. Do not duplicate registration blocks in this file.
 
 ### Assembly Marker Classes
 
@@ -727,38 +727,11 @@ public static class InfrastructureAssemblyMarker { }
 
 ### LiteBus Registration
 
-```csharp
-// WebApi/Program.cs (LiteBus registration excerpt)
-builder.Services.AddInfrastructure(builder.Configuration);
+Copy the full `AddLiteBus` block from `docs/blueprints/backend/program-cs.md`. Each module type (`AddCommandModule`, `AddQueryModule`, `AddEventModule`) is called **once** per `AddLiteBus` invocation.
 
-builder.Services.AddLiteBus(liteBus =>
-{
-    // All command-side assemblies in one AddCommandModule call.
-    // Application.Write: handlers and validators.
-    // Infrastructure: transaction pre/post/error pipeline behaviors.
-    liteBus.AddCommandModule(module =>
-    {
-        module.RegisterFromAssembly(typeof(ApplicationWriteAssemblyMarker).Assembly);
-        module.RegisterFromAssembly(typeof(InfrastructureAssemblyMarker).Assembly);
-    });
+`RegisterFromAssembly` discovers open generic handlers automatically. No separate `module.Register(typeof(MyHandler<>))` call is needed unless the handler lives in a different assembly from what is being scanned.
 
-    // Query handlers and validators.
-    liteBus.AddQueryModule(module =>
-    {
-        module.RegisterFromAssembly(typeof(ApplicationReadAssemblyMarker).Assembly);
-    });
-
-    // Event handlers.
-    liteBus.AddEventModule(module =>
-    {
-        module.RegisterFromAssembly(typeof(ApplicationReactionsAssemblyMarker).Assembly);
-    });
-});
-```
-
-`RegisterFromAssembly` discovers open generic handlers automatically — no separate `module.Register(typeof(MyHandler<>))` call is needed unless the handler lives in a different assembly from what is being scanned.
-
-> **Note on required namespaces.** `AddCommandModule`, `AddQueryModule`, and `AddEventModule` are extension methods from separate packages. Each requires both its NuGet package and its `using` directive:
+> **Required namespaces.** `AddCommandModule`, `AddQueryModule`, and `AddEventModule` are extension methods from separate packages. Each requires both its NuGet package and its `using` directive:
 > - `using LiteBus.Commands;` — from `LiteBus.Commands.Extensions.Microsoft.DependencyInjection`
 > - `using LiteBus.Queries;` — from `LiteBus.Queries.Extensions.Microsoft.DependencyInjection`
 > - `using LiteBus.Events;` — from `LiteBus.Events.Extensions.Microsoft.DependencyInjection`

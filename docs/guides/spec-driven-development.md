@@ -94,4 +94,5 @@ Before assigning an agent to implement a spec, confirm:
 | `docs/guides/add-new-feature.md` | Step-by-step implementation after the spec is approved |
 | `docs/guides/definition-of-done.md` | Completion checklist before closing the feature |
 | `docs/templates/feature-spec.md` | Spec template |
+| `docs/templates/feature-spec.example.md` | Approved example spec (Create Post) |
 | `docs/templates/ubiquitous-language.md` | Glossary template for the project repository |

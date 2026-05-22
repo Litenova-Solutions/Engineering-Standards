@@ -84,7 +84,7 @@ Convention files are treated as code. They are reviewed in pull requests. They a
 
 A PR that changes a pattern in the codebase without updating the relevant convention file MUST be rejected. The convention file and the code it describes must stay synchronized. When they diverge, the convention file becomes misleading: it describes a pattern that does not exist, and agents trained on it will produce code that does not match the actual codebase.
 
-The CHANGELOG entry for a convention change MUST be included in the same PR as the change. "What changed and why" is the institutional memory of the project. Without the CHANGELOG, the only record of a decision is the git diff, which shows what changed but not why.
+The CHANGELOG entry for a convention change MUST be included in the same PR as the change.
 
 ---
 

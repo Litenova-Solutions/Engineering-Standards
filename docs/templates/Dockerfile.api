@@ -1,0 +1,40 @@
+# ---- build stage ----
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY ["apps/api/Directory.Build.props", "apps/api/"]
+COPY ["apps/api/Directory.Packages.props", "apps/api/"]
+COPY ["apps/api/global.json", "apps/api/"]
+COPY ["apps/api/{ProjectName}.slnx", "apps/api/"]
+
+COPY ["apps/api/src/{ProjectName}.WebApi/{ProjectName}.WebApi.csproj", "apps/api/src/{ProjectName}.WebApi/"]
+COPY ["apps/api/src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj", "apps/api/src/{ProjectName}.Infrastructure/"]
+COPY ["apps/api/src/{ProjectName}.Application.Write/{ProjectName}.Application.Write.csproj", "apps/api/src/{ProjectName}.Application.Write/"]
+COPY ["apps/api/src/{ProjectName}.Application.Read/{ProjectName}.Application.Read.csproj", "apps/api/src/{ProjectName}.Application.Read/"]
+COPY ["apps/api/src/{ProjectName}.Application.Reactions/{ProjectName}.Application.Reactions.csproj", "apps/api/src/{ProjectName}.Application.Reactions/"]
+COPY ["apps/api/src/{ProjectName}.Application.Write.Contracts/{ProjectName}.Application.Write.Contracts.csproj", "apps/api/src/{ProjectName}.Application.Write.Contracts/"]
+COPY ["apps/api/src/{ProjectName}.Application.Read.Contracts/{ProjectName}.Application.Read.Contracts.csproj", "apps/api/src/{ProjectName}.Application.Read.Contracts/"]
+COPY ["apps/api/src/{ProjectName}.Domain/{ProjectName}.Domain.csproj", "apps/api/src/{ProjectName}.Domain/"]
+COPY ["apps/api/src/{ProjectName}.ServiceDefaults/{ProjectName}.ServiceDefaults.csproj", "apps/api/src/{ProjectName}.ServiceDefaults/"]
+
+WORKDIR /src/apps/api
+RUN dotnet restore "{ProjectName}.slnx"
+
+WORKDIR /src
+COPY . .
+
+WORKDIR /src/apps/api
+RUN dotnet publish "src/{ProjectName}.WebApi/{ProjectName}.WebApi.csproj" \
+    --configuration Release \
+    --no-restore \
+    --output /app/publish
+
+# ---- runtime stage ----
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+USER $APP_UID
+COPY --from=build /app/publish .
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8080/health/live || exit 1
+ENTRYPOINT ["dotnet", "{ProjectName}.WebApi.dll"]

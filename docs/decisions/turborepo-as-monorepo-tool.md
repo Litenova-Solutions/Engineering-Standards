@@ -25,7 +25,7 @@ The key requirements for evaluation were: incremental builds, remote caching, su
 
 Turborepo with pnpm workspaces is the monorepo tool.
 
-The `turbo.json` uses the `tasks` key (not the deprecated `pipeline` key). The .NET backend (`backend/`) is co-located in the repository but excluded from `pnpm-workspace.yaml`. It is built independently via `dotnet build`.
+The `turbo.json` uses the `tasks` key (not the deprecated `pipeline` key). The .NET backend lives at `apps/api/` and is excluded from `pnpm-workspace.yaml`. It is built independently via `dotnet build`.
 
 The repository root `package.json` defines full-stack scripts that run both toolchains:
 
@@ -57,8 +57,8 @@ Example `turbo.json`:
     "type-check": {
       "dependsOn": ["^build"]
     },
-    "generate:api": {
-      "outputs": ["src/api.d.ts"]
+    "generate:api-types": {
+      "outputs": ["../../packages/api-types/src/api.d.ts"]
     }
   }
 }
@@ -70,7 +70,7 @@ Example `pnpm-workspace.yaml`:
 packages:
   - "apps/*"
   - "packages/*"
-# backend/ is intentionally excluded - managed by dotnet tooling
+# apps/api/ is not a pnpm package - managed by dotnet tooling
 ```
 
 ---
