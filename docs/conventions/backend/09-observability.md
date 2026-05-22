@@ -151,6 +151,39 @@ activity?.SetTag("user.email", user.Email);
 activity?.SetTag("search.text", query.SearchText);
 ```
 
+### ActivitySource Definition
+
+Define a single `ActivitySource` per application layer. The name must match the source registered in `AddSource()` in `Program.cs`.
+
+```csharp
+// Application.Write/Shared/Telemetry.cs
+internal static class Telemetry
+{
+    /// <summary>
+    /// The ActivitySource for all Application.Write spans.
+    /// Name must match the source registered in AddSource() in Program.cs.
+    /// </summary>
+    internal static readonly ActivitySource Source =
+        new("ProjectName.Application");
+}
+```
+
+Example usage in a command handler (optional, for performance-sensitive paths):
+
+```csharp
+public async Task<PostId> HandleAsync(
+    CreatePostCommand command,
+    CancellationToken cancellationToken)
+{
+    using var activity = Telemetry.Source.StartActivity("CreatePost");
+    activity?.SetTag("command.type", nameof(CreatePostCommand));
+
+    var post = Post.Create(/* ... */);
+    await _postRepository.AddAsync(post, cancellationToken);
+    return post.Id;
+}
+```
+
 ### Required Custom Metrics
 
 | Metric | Type | Tags |
@@ -174,6 +207,42 @@ Every project MUST expose health check endpoints. Use ASP.NET Core's built-in he
 ### Database Check
 
 Use a project-owned `IHealthCheck` implementation for PostgreSQL. Do not add a community health-check NuGet package unless a project ADR approves it.
+
+```csharp
+// Infrastructure/HealthChecks/PostgreSqlHealthCheck.cs
+internal sealed class PostgreSqlHealthCheck : IHealthCheck
+{
+    private readonly AppDbContext _dbContext;
+
+    public PostgreSqlHealthCheck(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync("SELECT 1", cancellationToken);
+            return HealthCheckResult.Healthy();
+        }
+        catch (Exception ex)
+        {
+            return HealthCheckResult.Unhealthy(
+                "PostgreSQL connectivity check failed.",
+                ex);
+        }
+    }
+}
+```
+
+Register in `InfrastructureServiceRegistration`:
+
+```csharp
+services.AddScoped<PostgreSqlHealthCheck>();
+```
 
 ### Registration
 

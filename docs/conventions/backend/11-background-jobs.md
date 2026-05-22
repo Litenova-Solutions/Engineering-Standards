@@ -57,13 +57,33 @@ internal sealed class OutboxDispatcherHostedService : BackgroundService
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
 
-        while (await timer.WaitForNextTickAsync(cancellationToken))
+        // WaitForNextTickAsync throws OperationCanceledException on shutdown.
+        // Catching it here prevents a spurious error log entry on graceful shutdown.
+        while (true)
         {
+            try
+            {
+                await timer.WaitForNextTickAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                // Application is shutting down. Exit cleanly.
+                break;
+            }
+
             using var scope = _scopeFactory.CreateScope();
             var dispatcher = scope.ServiceProvider
                 .GetRequiredService<IOutboxDispatcher>();
 
-            await dispatcher.DispatchPendingAsync(cancellationToken);
+            try
+            {
+                await dispatcher.DispatchPendingAsync(cancellationToken);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _logger.LogError(ex, "Outbox dispatch failed. Will retry on next tick.");
+                // Do not rethrow. The hosted service continues running.
+            }
         }
     }
 }

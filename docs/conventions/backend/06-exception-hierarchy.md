@@ -83,6 +83,9 @@ public abstract class AggregateNotFoundException : DomainException
         : base(message) { }
 }
 
+// Application.Write.Contracts/Shared/Exceptions/ValidationError.cs
+public sealed record ValidationError(string PropertyName, string ErrorMessage);
+
 // Application.Write.Contracts/Shared/Exceptions/CommandValidationException.cs
 /// <summary>
 /// The base class for exceptions thrown by command validators when
@@ -90,8 +93,25 @@ public abstract class AggregateNotFoundException : DomainException
 /// </summary>
 public abstract class CommandValidationException : Exception
 {
-    protected CommandValidationException(string message)
-        : base(message) { }
+    protected CommandValidationException(string message, string propertyName)
+        : base(message)
+    {
+        ValidationErrors = [new ValidationError(propertyName, message)];
+    }
+
+    protected CommandValidationException(
+        string message,
+        IReadOnlyList<ValidationError> validationErrors)
+        : base(message)
+    {
+        ValidationErrors = validationErrors;
+    }
+
+    /// <summary>
+    /// Field-level validation errors. Used by GlobalExceptionHandler to populate
+    /// the RFC 7807 invalidParams extension.
+    /// </summary>
+    public IReadOnlyList<ValidationError> ValidationErrors { get; }
 }
 
 // Application.Read.Contracts/Shared/Exceptions/QueryValidationException.cs
@@ -101,8 +121,25 @@ public abstract class CommandValidationException : Exception
 /// </summary>
 public abstract class QueryValidationException : Exception
 {
-    protected QueryValidationException(string message)
-        : base(message) { }
+    protected QueryValidationException(string message, string propertyName)
+        : base(message)
+    {
+        ValidationErrors = [new ValidationError(propertyName, message)];
+    }
+
+    protected QueryValidationException(
+        string message,
+        IReadOnlyList<ValidationError> validationErrors)
+        : base(message)
+    {
+        ValidationErrors = validationErrors;
+    }
+
+    /// <summary>
+    /// Field-level validation errors. Used by GlobalExceptionHandler to populate
+    /// the RFC 7807 invalidParams extension.
+    /// </summary>
+    public IReadOnlyList<ValidationError> ValidationErrors { get; }
 }
 ```
 
@@ -125,18 +162,26 @@ public sealed class PostAlreadyPublishedException : DomainException
         : base($"Post '{id.Value}' is already published.") { }
 }
 
-// CommandValidationException subclass (in Application.Write.Contracts/Posts/Exceptions/)
+// CommandValidationException subclasses (in Application.Write.Contracts/Posts/Exceptions/)
+// PostTitleRequiredException — thrown by command validator (and as last-resort defence in the value object)
 public sealed class PostTitleRequiredException : CommandValidationException
 {
     public PostTitleRequiredException()
-        : base("A post title is required and cannot be empty.") { }
+        : base("A post title is required and cannot be empty.", nameof(CreatePostCommand.Title)) { }
+}
+
+// PostTitleTooLongException — thrown by command validator for structural length check
+public sealed class PostTitleTooLongException : CommandValidationException
+{
+    public PostTitleTooLongException(int length)
+        : base($"Post title cannot exceed 200 characters (was {length}).", nameof(CreatePostCommand.Title)) { }
 }
 
 // QueryValidationException subclass (in Application.Read.Contracts/Posts/Exceptions/)
 public sealed class PostIdRequiredException : QueryValidationException
 {
     public PostIdRequiredException()
-        : base("A post ID is required and cannot be the default value.") { }
+        : base("A post ID is required and cannot be the default value.", nameof(GetPostByIdQuery.PostId)) { }
 }
 ```
 
@@ -144,79 +189,15 @@ public sealed class PostIdRequiredException : QueryValidationException
 
 ## The GlobalExceptionHandler
 
-The `GlobalExceptionHandler` is an `IExceptionHandler` implementation registered in `Program.cs`. It maps exception types to problem details responses. Endpoints MUST NOT contain `try-catch` blocks.
+The canonical `GlobalExceptionHandler` implementation is in `docs/conventions/backend/05-api-layer.md`. Endpoints MUST NOT contain `try-catch` blocks.
 
-```csharp
-internal sealed class GlobalExceptionHandler : IExceptionHandler
-{
-    private readonly ILogger<GlobalExceptionHandler> _logger;
-
-    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
-    {
-        _logger = logger;
-    }
-
-    public async ValueTask<bool> TryHandleAsync(
-        HttpContext httpContext,
-        Exception exception,
-        CancellationToken cancellationToken)
-    {
-        var (statusCode, title) = exception switch
-        {
-            CommandValidationException =>
-                (StatusCodes.Status400BadRequest, "Command validation failure"),
-            QueryValidationException =>
-                (StatusCodes.Status400BadRequest, "Query validation failure"),
-            AggregateNotFoundException =>
-                (StatusCodes.Status404NotFound, "Resource not found"),
-            DomainException =>
-                (StatusCodes.Status409Conflict, "Domain rule violated"),
-            _ =>
-                (StatusCodes.Status500InternalServerError,
-                 "An unexpected error occurred")
-        };
-
-        if (statusCode == StatusCodes.Status500InternalServerError)
-        {
-            _logger.LogError(
-                exception,
-                "Unhandled exception: {Message}",
-                exception.Message);
-        }
-        else
-        {
-            _logger.LogWarning(
-                exception,
-                "Handled exception ({StatusCode}): {Message}",
-                statusCode,
-                exception.Message);
-        }
-
-        httpContext.Response.StatusCode = statusCode;
-
-        var problem = new ProblemDetails
-        {
-            Status = statusCode,
-            Title = title,
-            Detail = exception.Message
-        };
-
-        await httpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
-        return true;
-    }
-}
-```
-
-Register in `Program.cs`:
-
-```csharp
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
-
-// ...
-
-app.UseExceptionHandler();
-```
+> **Security note.** Unhandled exceptions (HTTP 500) MUST NOT expose `exception.Message` in the `Detail` field of the response. Stack traces and internal system details in API responses are an information disclosure risk (OWASP A05). The `GlobalExceptionHandler` MUST use a generic message for 500 responses:
+>
+> ```csharp
+> Detail = statusCode == StatusCodes.Status500InternalServerError
+>     ? "An unexpected error occurred. Please contact support."
+>     : exception.Message
+> ```
 
 ---
 
@@ -224,10 +205,12 @@ app.UseExceptionHandler();
 
 | Exception Category | Thrown By | Never Thrown By |
 |:---|:---|:---|
-| `CommandValidationException` | `ICommandValidator<TCommand>` implementations | Handlers, aggregates, repositories, query validators |
+| `CommandValidationException` | `ICommandValidator<TCommand>` implementations; value object constructors (last-resort defence) | Handlers, repositories, query validators |
 | `QueryValidationException` | `IQueryValidator<TQuery>` implementations | Handlers, aggregates, repositories, command validators |
 | `AggregateNotFoundException` | Repository `GetByIdAsync` implementations | Handlers, validators, aggregates, endpoints |
 | `DomainException` | Aggregate root methods | Handlers, validators, repositories, endpoints |
+
+> **Intentional duplication in validators and value objects.** The same validation rule (e.g., empty title) appears in both the command validator and the value object constructor. The validator provides a structured 400 response with `invalidParams`. The value object provides a last-resort defence for direct domain usage outside the command pipeline. Both throw `PostTitleRequiredException` (`CommandValidationException`). This duplication is deliberate.
 
 ---
 

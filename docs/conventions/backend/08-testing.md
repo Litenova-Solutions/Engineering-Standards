@@ -43,6 +43,33 @@ CI verification pipeline commands **MUST** enforce this standard:
 dotnet test src/{ProjectName}.slnx /p:CollectCoverage=true /p:Threshold=80 /p:ThresholdType=branch
 ```
 
+Use per-project thresholds to enforce the table above:
+
+```bash
+dotnet test tests/{ProjectName}.Domain.Tests \
+    /p:CollectCoverage=true \
+    /p:Threshold=90 \
+    /p:ThresholdType=branch \
+    /p:CoverletOutputFormat=opencover
+
+dotnet test tests/{ProjectName}.Application.Tests \
+    /p:CollectCoverage=true \
+    /p:Threshold=85 \
+    /p:ThresholdType=branch \
+    /p:CoverletOutputFormat=opencover
+```
+
+Add `coverlet.collector` to each test project's `.csproj`:
+
+```xml
+<!-- tests/{ProjectName}.Domain.Tests/{ProjectName}.Domain.Tests.csproj -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+</Project>
+```
+
 ### 2. Strict Mocking Guidelines
 Mocking is a powerful tool, but over-mocking creates fragile tests that lock implementation details rather than behavior.
 
@@ -274,10 +301,21 @@ static class InMemoryDbContextFactory
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite("DataSource=:memory:")
             .Options;
-        var db = new AppDbContext(options);
+
+        var db = new AppDbContext(options, new NoOpEventPublisher());
         db.Database.OpenConnection();
         db.Database.EnsureCreated();
         return db;
+    }
+
+    // Inline stub so Application.Tests does not need to reference Infrastructure.
+    private sealed class NoOpEventPublisher : IEventPublisher
+    {
+        Task IEventPublisher.PublishAsync<TEvent>(
+            TEvent @event,
+            EventMediationSettings? settings,
+            CancellationToken cancellationToken)
+            => Task.CompletedTask;
     }
 }
 ```
@@ -333,6 +371,16 @@ public sealed class GetPostByIdQueryHandlerTests : IDisposable
 ## Integration Test Pattern
 
 Integration tests use `WebApplicationFactory<T>` from `Microsoft.AspNetCore.Mvc.Testing` and `Testcontainers.PostgreSql` for a real database.
+
+With top-level statements in .NET, `Program` is an implicit internal class. Add the following at the very end of `WebApi/Program.cs` so `WebApplicationFactory<Program>` compiles:
+
+```csharp
+// WebApi/Program.cs — add at the very end of the file, after app.Run()
+// Required for WebApplicationFactory<Program> in integration tests.
+public partial class Program { }
+```
+
+This declaration is included in the canonical `Program.cs` template in `docs/conventions/backend/05-api-layer.md`.
 
 ### Shared Fixture
 
@@ -456,6 +504,8 @@ public sealed class ApplicationLayerTests
                 typeof(GetPostByIdQueryHandler).Assembly
             ])
             .That()
+            .ImplementInterface(typeof(ICommandHandler<>))
+            .Or()
             .ImplementInterface(typeof(ICommandHandler<,>))
             .Or()
             .ImplementInterface(typeof(IQueryHandler<,>))
@@ -525,6 +575,30 @@ Every production project defines a small performance baseline:
 Run load tests before enabling rate limiting, caching, or realtime features in production. Rate limiting policies must be validated under realistic concurrency.
 
 Mutation testing is REQUIRED for high-risk application validators (auth, payments, permissions, idempotency). Mutation testing is OPTIONAL for domain logic and other validators. Scheduled CI jobs MUST run mutation testing for projects that declare validators as high-risk in their test configuration.
+
+**Tooling:** Use Stryker.NET (`dotnet-stryker`). Add it to `.config/dotnet-tools.json` alongside `dotnet-ef`:
+
+```json
+// .config/dotnet-tools.json
+{
+  "tools": {
+    "dotnet-stryker": {
+      "version": "4.14.2",
+      "commands": ["dotnet-stryker"]
+    }
+  }
+}
+```
+
+Run against a specific test project:
+
+```bash
+dotnet tool restore   # installs from dotnet-tools.json
+
+dotnet stryker \
+    --project src/{ProjectName}.Application.Write/{ProjectName}.Application.Write.csproj \
+    --test-project tests/{ProjectName}.Application.Tests/{ProjectName}.Application.Tests.csproj
+```
 
 ---
 

@@ -267,6 +267,67 @@ Any package not in this list requires an ADR before being added to any project.
 
 ---
 
+## Project File Templates
+
+The following `.csproj` templates show the minimal, correct project references and package references for each layer. Adjust for your project name.
+
+`src/{ProjectName}.Domain/{ProjectName}.Domain.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Ardalis.GuardClauses" />
+  </ItemGroup>
+</Project>
+```
+
+`src/{ProjectName}.Application.Write.Contracts/{ProjectName}.Application.Write.Contracts.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\{ProjectName}.Domain\{ProjectName}.Domain.csproj" />
+    <PackageReference Include="LiteBus.Commands.Abstractions" />
+  </ItemGroup>
+</Project>
+```
+
+`src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\{ProjectName}.Domain\{ProjectName}.Domain.csproj" />
+    <ProjectReference Include="..\{ProjectName}.Application.Write.Contracts\{ProjectName}.Application.Write.Contracts.csproj" />
+    <ProjectReference Include="..\{ProjectName}.Application.Read.Contracts\{ProjectName}.Application.Read.Contracts.csproj" />
+    <ProjectReference Include="..\{ProjectName}.Application.Reactions\{ProjectName}.Application.Reactions.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="LiteBus.Commands.Abstractions" />
+    <PackageReference Include="LiteBus.Events.Abstractions" />
+  </ItemGroup>
+</Project>
+```
+
+`tests/{ProjectName}.Architecture.Tests/{ProjectName}.Architecture.Tests.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\{ProjectName}.Application.Write\{ProjectName}.Application.Write.csproj" />
+    <ProjectReference Include="..\..\src\{ProjectName}.Application.Read\{ProjectName}.Application.Read.csproj" />
+    <ProjectReference Include="..\..\src\{ProjectName}.Application.Reactions\{ProjectName}.Application.Reactions.csproj" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="AwesomeAssertions" />
+    <PackageReference Include="NetArchTest.Rules" />
+  </ItemGroup>
+</Project>
+```
+
+`NetArchTest.Rules` is a pre-approved package. Add it to `Directory.Packages.props`.
+
+---
+
 ## 8. npm Package Policy (Frontend Monorepo)
 
 Every new npm package MUST be justified with an ADR unless listed below. Forbidden packages are in `docs/conventions/shared/forbidden-packages.md`.
@@ -291,6 +352,7 @@ Pre-approved npm packages (no new ADR required):
 | `date-fns` | Dates when `Temporal` is unavailable |
 | `@microsoft/signalr` | Realtime per `docs/decisions/signalr-for-real-time-updates.md` |
 | `eslint`, `eslint-plugin-boundaries` | Lint and feature boundary enforcement |
+| `jose` | JWT signing for server-to-server API authentication (Admin apps only, per `docs/conventions/frontend/06-admin-api-auth.md`) |
 
 Owned source copied into the repo (for example vendored `openapi-fetch` in `packages/api-client/`) is allowed when documented in `docs/decisions/openapi-typescript-client-generation.md`.
 

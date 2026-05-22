@@ -149,23 +149,28 @@ public async Task<PostWithAuthorResult> HandleAsync(
     GetPostWithAuthorQuery query,
     CancellationToken cancellationToken)
 {
+    // Use an explicit Join to avoid correlated subquery risk.
+    // Correlated subqueries inside Select may be evaluated client-side in some
+    // EF Core configurations, producing N+1 queries.
     return await _db.Posts
         .Where(p => p.State is PublishedPostState)
-        .Select(p => new PostWithAuthorResult
-        {
-            PostId = p.Id,
-            PostTitle = p.Title.Value,
-            // EF Core resolves this as a JOIN, no separate Author query
-            AuthorName = _db.Authors
-                .Where(a => a.Id == p.AuthorId)
-                .Select(a => a.DisplayName)
-                .FirstOrDefault() ?? string.Empty,
-            PublishedAt = ((PublishedPostState)p.State).PublishedAt
-        })
+        .Join(
+            _db.Authors,
+            p => p.AuthorId,
+            a => a.Id,
+            (p, a) => new PostWithAuthorResult
+            {
+                PostId = p.Id,
+                PostTitle = p.Title.Value,
+                AuthorName = a.DisplayName,
+                PublishedAt = ((PublishedPostState)p.State).PublishedAt
+            })
         .OrderByDescending(r => r.PublishedAt)
         .ToListAsync(cancellationToken);
 }
 ```
+
+> Avoid correlated subqueries (a `Where`/`Select` inside a `Select`) for cross-aggregate joins. EF Core may evaluate these client-side in some configurations, producing N+1 queries. Use `Join` or `SelectMany` for cross-aggregate projections to guarantee SQL JOIN translation.
 
 ---
 

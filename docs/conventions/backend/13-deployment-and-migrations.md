@@ -140,11 +140,45 @@ Local development may use `dotnet ef database update`.
 
 ### EF Core tooling requirements
 
-**Tool version must match the runtime.** The `dotnet-ef` global tool must be the same major.minor version as the `Microsoft.EntityFrameworkCore` package. A mismatch produces misleading errors. Install the matching version:
+**Tool version must match the runtime.** The `dotnet-ef` global tool must be the same major.minor version as the `Microsoft.EntityFrameworkCore` package. Pin the version in `.config/dotnet-tools.json`:
+
+```json
+// .config/dotnet-tools.json — commit this file to pin the tool version
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-ef": {
+      "version": "10.0.0",
+      "commands": ["dotnet-ef"]
+    }
+  }
+}
+```
+
+Install the pinned version with:
 
 ```bash
-dotnet tool install --global dotnet-ef --version <same major.minor as EF Core package>
+# Install from the manifest (recommended for CI and onboarding)
+dotnet tool restore
+
+# Or install globally (version must match Microsoft.EntityFrameworkCore in Directory.Packages.props)
+dotnet tool install --global dotnet-ef --version 10.0.0
 ```
+
+> The version in `dotnet-tools.json` MUST match the `Microsoft.EntityFrameworkCore` package version in `Directory.Packages.props`. Mismatches produce misleading "no migrations" or "model has changed" errors.
+
+### Running Migrations in the Aspire Development Flow
+
+In local development, run migrations manually before starting the AppHost. The Aspire `.WaitFor(database)` call ensures the database container is ready before the API starts, but it does not run migrations:
+
+```bash
+dotnet ef database update \
+    --project src/{ProjectName}.Infrastructure \
+    --startup-project src/{ProjectName}.WebApi
+```
+
+Do NOT call `Database.MigrateAsync()` from `WebApi/Program.cs` startup in any environment. Migrations are a deployment operation, not a startup operation. For CI/CD, use a migration bundle or a reviewed SQL script as documented in Section 1 of this file.
 
 **`IDesignTimeDbContextFactory<T>` is required when the DbContext has extra constructor parameters.** If `AppDbContext` takes anything beyond `DbContextOptions<T>` (such as `IEventPublisher`), the tools cannot construct it at design time. Add a factory class in the Infrastructure project:
 

@@ -20,7 +20,7 @@ Understanding agent failure modes requires understanding how agents differ from 
 
 **Agents pattern-match against examples.** A bad example in the codebase will be reproduced more reliably than a good example in a comment. If the codebase has one handler that injects a repository instead of `IDatabaseContext`, agents will reproduce that pattern. If the convention file says "do not inject repositories in query handlers" but includes no `// BAD:` example showing exactly what not to do, the prohibition is weaker than it appears.
 
-**Agents have context window limits.** Loading a 5,000-line convention file into every task wastes context budget and dilutes the signal. Scoped, short files loaded only when relevant are more effective than comprehensive documents loaded everywhere. The 150-line limit on `AGENTS.md` is a direct consequence of this constraint.
+**Agents have context window limits.** Loading a 5,000-line convention file into every task wastes context budget and dilutes the signal. Scoped, short files loaded only when relevant are more effective than comprehensive documents loaded everywhere. `AGENTS.md` is kept as focused as possible; every line must earn its place by preventing a known agent failure mode.
 
 **Agents follow explicit rules more reliably than cultural norms.** "The team prefers X" is weak. "MUST use X, MUST NOT use Y" is stronger. A compiler error that prevents the bad pattern is stronger still. The standards are designed with this hierarchy in mind: compiler constraints first, architecture tests second, explicit written rules third, cultural norms never.
 
@@ -40,7 +40,7 @@ Each failure mode has a corresponding mitigation built into the standards.
 
 **Bad example reproduction:** The `// BAD:` examples in convention files show agents what not to do. This is more reliable than only showing the correct pattern. An agent that has seen a bad pattern labeled as bad is less likely to reproduce it than an agent that has only seen the good pattern and encounters the bad pattern in the codebase itself.
 
-**Context bloat:** `AGENTS.md` is kept under 150 lines. It is an index and a behavioral contract. Detailed rules live in the convention files, which are loaded only when relevant. Every line in `AGENTS.md` costs context budget on every task; the file must earn its place.
+**Context bloat:** `AGENTS.md` is kept as focused as possible. It is an index and a behavioral contract. Detailed rules live in the convention files, which are loaded only when relevant. Every line in `AGENTS.md` costs context budget on every task; the file must earn its place.
 
 ---
 
@@ -68,7 +68,7 @@ Practical guidance for maintaining `AGENTS.md` and the convention files.
 
 **Include explicit anti-patterns.** Agents learn from `// BAD:` examples as reliably as from `// GOOD:` examples. Show both.
 
-**Keep `AGENTS.md` under 150 lines.** It loads on every task. Every line costs context budget. Detailed rules belong in the layer-specific convention files.
+**Keep `AGENTS.md` as focused as possible.** It loads on every task. Every line costs context budget. Detailed rules belong in the layer-specific convention files.
 
 **Update convention files in the same PR as the code change they describe.** A convention file that describes a pattern that no longer exists in the codebase is worse than no convention file: it teaches agents to reproduce a deleted pattern.
 

@@ -86,7 +86,7 @@ function PostDetail({ postId }: { postId: string }) {
 | `error.tsx` | Error boundary for a segment | MUST be a client component (`"use client"`). |
 | `not-found.tsx` | UI shown when `notFound()` is called | Can be a server component. |
 | `route.ts` | HTTP Route Handler for the segment | MUST NOT be used except for OAuth callbacks, webhooks, or binary/file responses. Otherwise use Server Actions or server component fetching. |
-| `proxy.ts` | Runs before every request (renamed from `middleware.ts`) | `middleware.ts` is deprecated in Next.js 16. Run `npx @next/codemod@canary middleware-to-proxy` to migrate. MUST perform only optimistic checks (see Section 6). |
+| `proxy.ts` | Runs before every request (renamed from `middleware.ts`) | `middleware.ts` is deprecated in Next.js 16. Run `npx @next/codemod@latest middleware-to-proxy` to migrate (run once when upgrading from Next.js 15; renames the file and updates the exported function name). MUST perform only optimistic checks (see Section 6). |
 | `template.tsx` | Like `layout.tsx` but re-renders on navigation | Use only when a fresh instance is explicitly required on each navigation. |
 | `default.tsx` | Fallback UI for parallel routes | Required when a slot has no matching segment during soft navigation. |
 
@@ -380,7 +380,47 @@ Feature-local shared code (`features/{feature}/shared/`) is for reuse within one
 
 ---
 
-## 12. Project-Specific Configuration
+## 12. Environment Variable Validation
+
+Define `lib/env.ts` in every project. Validate all required server-side environment variables at module load time so a missing variable causes an immediate startup failure with a clear error message, not a cryptic `TypeError` at request time.
+
+```typescript
+// lib/env.ts
+import { z } from "zod"
+
+const serverEnvSchema = z.object({
+    API_BASE_URL: z.string().url({ error: "API_BASE_URL must be a valid URL" }),
+    AUTH_SECRET: z.string().min(32, { error: "AUTH_SECRET must be at least 32 characters" }),
+})
+
+// Runs at module import time on the server.
+// A missing variable causes an immediate startup failure with a clear error message.
+export const serverEnv = serverEnvSchema.parse({
+    API_BASE_URL: process.env.API_BASE_URL,
+    AUTH_SECRET: process.env.AUTH_SECRET,
+})
+```
+
+Use `serverEnv` in `lib/api/client.ts` instead of `process.env` directly:
+
+```typescript
+// lib/api/client.ts
+import { serverEnv } from "@/lib/env"
+
+export async function getApiClient() {
+    // ...
+    return createClient<paths>({
+        baseUrl: serverEnv.API_BASE_URL,
+        // ...
+    })
+}
+```
+
+Add all required server-side variables to the schema. A Zod validation error at startup names the missing variable and the violated constraint.
+
+---
+
+## 13. Project-Specific Configuration
 
 > **Project teams: fill in this section when adopting these standards.**
 
