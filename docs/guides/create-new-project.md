@@ -2,6 +2,8 @@
 
 This guide walks through creating a new monorepo project from scratch. Follow the steps in order.
 
+**Prefer a working example?** Clone **[LitePress](https://github.com/Litenova-Solutions/LitePress)** — the reference implementation of these standards — and adapt it instead of greenfield scaffolding.
+
 ---
 
 ## Prerequisites

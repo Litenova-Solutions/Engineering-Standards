@@ -23,6 +23,10 @@ Living source of truth under `docs/domain/` in each project:
 | Feature | `docs/domain/{feature}/README.md` | Aggregate, ubiquitous language, invariants |
 | Use case | `docs/domain/{feature}/{use-case}.md` | Behavior, endpoints, UI, acceptance criteria |
 
+## Reference implementation (consumer project)
+
+**[LitePress](https://github.com/Litenova-Solutions/LitePress)** implements these standards end to end: clean architecture solution layout, `docs/domain/` tree, OpenAPI-driven frontends, and the verification gates in `conventions/shared/ci.md`. Study it alongside the templates and blueprints here when building a similar stack.
+
 ## Decisions (why, not what)
 
 | Path | Purpose |

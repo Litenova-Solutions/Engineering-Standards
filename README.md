@@ -34,6 +34,17 @@ flowchart LR
 
 ---
 
+## Reference implementation
+
+**[LitePress](https://github.com/Litenova-Solutions/LitePress)** is the canonical consumer of these standards: dual Next.js apps, ASP.NET Core 10 API, ADDD domain docs, pinned `standards/` submodule, and CI gates from [`docs/conventions/shared/ci.md`](docs/conventions/shared/ci.md). Use it as a working example when adopting this repository in a new project.
+
+| Repository | Role |
+|:---|:---|
+| [Litenova-Solutions/LitePress](https://github.com/Litenova-Solutions/LitePress) | Reference application monorepo |
+| This repository | Normative standards consumed via submodule |
+
+---
+
 ## Versioning philosophy
 
 **v1.0.0** will be the first pinned release tag. Until then, `main` is the working baseline. There is no `CHANGELOG.md` before **v2.0.0**; release notes for v1.x are captured in GitHub Release descriptions only.

@@ -15,7 +15,7 @@ Canonical contract for AI agents and engineers. Read before touching code.
 
 ### Use case implementation (consumer project)
 
-When implementing a use case in a project that consumes these standards:
+When implementing a use case in a project that consumes these standards (for example [LitePress](https://github.com/Litenova-Solutions/LitePress)):
 
 1. Project `docs/domain/README.md` and `docs/domain/{feature}/README.md`.
 2. Use case doc at `docs/domain/{feature}/{use-case}.md` (`docs/guides/agentic-domain-driven-design.md`).
