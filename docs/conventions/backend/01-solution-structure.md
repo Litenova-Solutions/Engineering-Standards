@@ -42,6 +42,10 @@ The solution file uses the `.slnx` format (SDK-style solution files), not the le
 
 The `AppHost` project is the local development entry point. Run `dotnet run --project apps/api/src/{ProjectName}.AppHost` (monorepo) or `dotnet run --project src/{ProjectName}.AppHost` (single-project) to start all services including the database container. See `docs/conventions/backend/13-deployment-and-migrations.md` for Aspire setup details.
 
+Every Aspire solution MUST include a `{ProjectName}.ServiceDefaults` project. The WebApi MUST call `builder.AddServiceDefaults()` and `app.MapDefaultEndpoints()` in Development.
+
+Every solution MUST commit `.config/dotnet-tools.json` at the repository root with a pinned `dotnet-ef` version matching `Microsoft.EntityFrameworkCore` in `Directory.Packages.props`. Copy `docs/templates/dotnet-tools.json`.
+
 ---
 
 ## 2. `global.json`

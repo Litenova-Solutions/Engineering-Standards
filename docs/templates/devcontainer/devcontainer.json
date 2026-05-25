@@ -1,0 +1,22 @@
+{
+  "name": "Aspire Monorepo Dev",
+  "dockerComposeFile": [],
+  "image": "mcr.microsoft.com/devcontainers/dotnet:10.0",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "postCreateCommand": "dotnet workload install aspire && dotnet tool restore && npm install -g pnpm@10 && pnpm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "ms-azuretools.vscode-aspire",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "forwardPorts": [5000, 3000, 3002, 15888]
+}

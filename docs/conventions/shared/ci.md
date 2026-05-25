@@ -26,6 +26,24 @@ When running the Aspire AppHost, run `pnpm install` from the workspace root befo
 
 ---
 
+## 0.1 Recommended Root Scripts
+
+Monorepos SHOULD expose common workflows from root `package.json`:
+
+| Script | Command purpose |
+|:---|:---|
+| `dev:aspire` | Start AppHost |
+| `dev:api` | Run WebApi standalone (manual path) |
+| `dev:web` / `dev:admin` | Run individual Next.js apps |
+| `db:migrate` | `dotnet ef database update` with standard project paths |
+| `db:migrate:add` | Wrapper for `dotnet ef migrations add` |
+
+Document which path (Aspire vs manual) each script targets in the project development guide.
+
+See also `docs/conventions/shared/local-ide-setup.md` for VS Code / Cursor debug configs.
+
+---
+
 ## 1. Required CI Gates
 
 Every pull request MUST run:

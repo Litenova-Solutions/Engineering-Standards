@@ -107,6 +107,7 @@ When implementing a use case in a project that consumes these standards (for exa
 | Soft delete | `docs/conventions/backend/18-soft-delete.md` |
 | Raw SQL | `docs/conventions/backend/19-raw-sql-and-reporting.md` |
 | CI / CD | `docs/conventions/shared/ci.md`, `ci-cd.md` |
+| Local IDE setup | `docs/conventions/shared/local-ide-setup.md` |
 | Security | `docs/conventions/shared/security.md` |
 | Monorepo | `docs/conventions/shared/monorepo-structure.md` |
 | Agentic guardrails | `docs/conventions/shared/agentic-guardrails.md` |
