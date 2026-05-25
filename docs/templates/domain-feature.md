@@ -65,4 +65,4 @@ stateDiagram-v2
 
 | Use case | Doc | Backend | Frontend |
 |:---|:---|:---|:---|
-| `{Use case name}` | [{use-case}.md]({use-case}.md) | `{Feature}/{UseCase}/` | `domain/{feature}/{use-case}/` |
+| `{Use case name}` | [{use-case}.md]({use-case}.md) | `{Feature}/{UseCase}/` | `features/{feature}/{use-case}/` |

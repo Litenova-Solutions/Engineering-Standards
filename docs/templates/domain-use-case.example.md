@@ -63,7 +63,7 @@ Returns 201 with Location header.
 ### Route and entry
 
 - Route: `app/(main)/posts/new/page.tsx`
-- Domain entry: `domain/posts/create/CreatePostPage.tsx`
+- Feature entry: `features/posts/create/CreatePostPage.tsx`
 
 ### States
 
@@ -76,7 +76,7 @@ Returns 201 with Location header.
 
 ### Mutations
 
-Server Action with Zod validation in `domain/posts/create/actions.ts`.
+Server Action with Zod validation in `features/posts/create/actions.ts`.
 
 ---
 

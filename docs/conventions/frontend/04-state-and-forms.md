@@ -94,7 +94,7 @@ Rules:
 
 - Zustand stores MUST NOT contain server data. Use TanStack Query for anything fetched from the backend.
 - Zustand stores MUST have a `reset` action for cleanup between sessions or user switches.
-- Domain-specific stores live in `domain/{feature}/store/`. App-wide stores live in `lib/stores/`.
+- Domain-specific stores live in `features/{feature}/store/`. App-wide stores live in `lib/stores/`.
 - A Zustand store MUST NOT expose more than 6 actions (including `reset`). If a store exceeds 6 actions, the agent MUST split it into focused stores by concern.
 
 ```typescript

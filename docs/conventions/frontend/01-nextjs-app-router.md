@@ -3,8 +3,8 @@
 ## Agent Quick Rules
 
 - Default to Server Components; `'use client'` MUST have an explanatory comment.
-- `page.tsx` MUST be a thin shell; logic lives in `domain/{feature}/`.
-- MUST NOT import across `domain/{a}/` and `domain/{b}/`.
+- `page.tsx` MUST be a thin shell; logic lives in `features/{feature}/`.
+- MUST NOT import across `features/{a}/` and `features/{b}/`.
 - `proxy.ts` MUST only do optimistic cookie checks; authoritative auth in Server Components/Actions.
 - MUST await `params`, `searchParams`, `cookies`, `headers`.
 - `route.ts` MUST NOT be used except webhooks, OAuth callbacks, or file/binary responses.
@@ -102,8 +102,8 @@ Every `page.tsx` file in `app/` is a thin shell. The page file handles Next.js-s
 // GOOD: app/(main)/posts/[id]/page.tsx - thin shell
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { PostDetailPage } from "@/domain/posts/detail/PostDetailPage"
-import { getPostById } from "@/domain/posts/detail/queries"
+import { PostDetailPage } from "@/features/posts/detail/PostDetailPage"
+import { getPostById } from "@/features/posts/detail/queries"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -388,32 +388,32 @@ Projects MUST use this `tsconfig.json` baseline for Next.js 16 with TypeScript 6
 
 ---
 
-## 11. Domain Use Case Modules
+## 11. Feature Use Case Modules
 
-Frontend domain folders follow the same Feature → Use case boundaries as backend handlers and domain docs. Each domain folder owns its routes, components, actions, hooks, and stores for one bounded area (for example `posts`).
+Frontend feature folders follow the same Feature → Use case boundaries as backend handlers and domain docs. Each feature folder owns its routes, components, actions, hooks, and stores for one bounded area (for example `posts`).
 
 **Import rules:**
 
-- Code under `domain/{feature}/` MUST NOT import from `domain/{otherFeature}/`.
-- Cross-domain reuse MUST follow the promotion rule in `docs/conventions/00-principles.md`: promote shared implementation code to `shared/` (import as `@/shared/...`) or generic UI to `components/ui/`.
-- `app/` route shells MUST import domain entry components from `domain/{feature}/` only. They MUST NOT contain business logic.
+- Code under `features/{feature}/` MUST NOT import from `features/{otherFeature}/`.
+- Cross-feature reuse MUST follow the promotion rule in `docs/conventions/00-principles.md`: promote shared implementation code to `shared/` (import as `@/shared/...`) or generic UI to `components/ui/`.
+- `app/` route shells MUST import feature entry components from `features/{feature}/` only. They MUST NOT contain business logic.
 
 ```typescript
 // GOOD: posts domain imports only its own modules and shared layers
-import { PostCard } from "@/domain/posts/list/PostCard"
+import { PostCard } from "@/features/posts/list/PostCard"
 import { formatRelativeDate } from "@/shared/dates/formatRelativeDate"
 import { Button } from "@/components/ui/button"
 ```
 
 ```typescript
 // BAD: posts domain imports authors domain internals
-import { AuthorAvatar } from "@/domain/authors/shared/AuthorAvatar"
-// BAD: cross-domain coupling; promote AuthorAvatar to @/shared/ or components/ui/
+import { AuthorAvatar } from "@/features/authors/shared/AuthorAvatar"
+// BAD: cross-feature coupling; promote AuthorAvatar to @/shared/ or components/ui/
 ```
 
-Domain-local shared code (`domain/{feature}/shared/`) is for reuse within one domain only. It MUST NOT be imported by other domains.
+Feature-local shared code (`features/{feature}/shared/`) is for reuse within one domain only. It MUST NOT be imported by other features.
 
-See `docs/conventions/frontend/07-domain-boundaries.md`.
+See `docs/conventions/frontend/07-feature-boundaries.md`.
 
 ---
 

@@ -32,9 +32,9 @@ DDD is not confined to the backend `Domain` project. It applies to:
 
 - **Living domain docs** under `docs/domain/{feature}/` (feature README + use case docs as the human-readable source of truth)
 - **Backend handlers** under `{Aggregate}/{UseCase}/`
-- **Frontend modules** under `domain/{feature}/{use-case}/` (not generic "feature slices" or technical folder names)
+- **Frontend modules** under `features/{feature}/{use-case}/` (not generic "feature slices" or technical folder names)
 
-The same Feature → Use case boundary appears in all three places. An agent or engineer moves through `posts/create-post.md`, `Posts/Create/`, and `domain/posts/create/` with the same mental model.
+The same Feature → Use case boundary appears in all three places. An agent or engineer moves through `posts/create-post.md`, `Posts/Create/`, and `features/posts/create/` with the same mental model.
 
 ---
 
@@ -67,7 +67,7 @@ This applies at every layer:
 | Domain docs | `docs/domain/posts/create-post.md` | Create Post use case |
 | Backend write | `Posts/Create/` | Same use case, command side |
 | Backend read | `Posts/List/` | List posts query |
-| Frontend | `domain/posts/create/` | Same use case, UI |
+| Frontend | `features/posts/create/` | Same use case, UI |
 | App Router | `app/(main)/posts/new/page.tsx` | Thin routing shell only |
 
 The hierarchy is documentation that stays honest when domain docs are updated in the same pull request as the code they describe.
@@ -90,7 +90,7 @@ Together, **Agentic Domain-Driven Design (ADDD)** combines:
 
 Industry practice calls the documentation half "spec-driven development." We use DDD terms: domain docs, features, and use cases. The intent is the same: write the contract in business language first, implement against it, keep the contract current.
 
-Consistent structure lets agents move through the codebase confidently. An agent that sees `Posts/Publish/PublishPostCommandHandler.cs` and `domain/posts/publish/` and `docs/domain/posts/publish-post.md` can extend the system without inventing new vocabulary or folder patterns.
+Consistent structure lets agents move through the codebase confidently. An agent that sees `Posts/Publish/PublishPostCommandHandler.cs` and `features/posts/publish/` and `docs/domain/posts/publish-post.md` can extend the system without inventing new vocabulary or folder patterns.
 
 See `docs/agentic-development.md` for agent failure modes and guardrails. See `docs/guides/agentic-domain-driven-design.md` for the documentation workflow.
 

@@ -31,7 +31,7 @@ A single source file MUST NOT exceed 300 lines. Split into composed modules when
 </Rule>
 
 <Rule id="DOMAIN_IMPORT_BOUNDARY">
-domain/{a}/ MUST NOT import from domain/{b}/. Promote shared code to @/shared/ or components/ui/.
+features/{a}/ MUST NOT import from features/{b}/. Promote shared code to @/shared/ or components/ui/.
 </Rule>
 
 <Rule id="UI_COPY_SOURCE">
@@ -80,7 +80,7 @@ graph TD
     Step6["6. Reactions (conditional)"]
     Step7["7. WebApi Endpoint and DI"]
     Step7b["Checkpoint: dotnet build + dotnet test Integration.Tests"]
-    Step8["8. Frontend domain use case (if applicable)"]
+    Step8["8. Frontend feature use case (if applicable)"]
     Step8b["Checkpoint: pnpm lint + type-check + test"]
 
     Step1 --> Step2
@@ -103,7 +103,7 @@ graph TD
 5. **Handlers and validators** in `Application.Write` / `Application.Read`. **Checkpoint:** `dotnet test apps/api/tests/{ProjectName}.Application.Tests`.
 6. **Narrow interface in `Application.Reactions` + Infrastructure implementation** (conditional: add only when an aggregate method raises a domain event that requires an external side effect).
 7. **`IEndpoint` and DI** in `WebApi` / `Infrastructure`. **Checkpoint:** `dotnet test apps/api/tests/{ProjectName}.Integration.Tests` and architecture tests.
-8. **Frontend domain use case** under `domain/{feature}/{use-case}/` (when the use case has UI). **Checkpoint:** `pnpm lint && pnpm type-check && pnpm test`.
+8. **Frontend feature use case** under `features/{feature}/{use-case}/` (when the use case has UI). **Checkpoint:** `pnpm lint && pnpm type-check && pnpm test`.
 
 Minimum commands between checkpoints:
 
@@ -159,7 +159,7 @@ Each Next.js app MUST have:
 
 - `postcss.config.mjs` with `@tailwindcss/postcss`
 - `app/globals.css` with `@import "tailwindcss"` in the **app entry file** (not only via a package re-export; shadcn CLI validates the app file)
-- `@source` directives covering `app/`, `components/`, and `domain/`
+- `@source` directives covering `app/`, `components/`, and `features/`
 - `npx shadcn@latest init` completed (`components.json`, `lib/utils.ts`)
 
 Shared theme tokens MAY live in `packages/{name}-config-tailwind/theme.css`. Each app imports tokens and owns its own `@source` scan roots.
@@ -182,7 +182,7 @@ Shared theme tokens MAY live in `packages/{name}-config-tailwind/theme.css`. Eac
 
 @source "../app/**/*.{js,ts,jsx,tsx}";
 @source "../components/**/*.{js,ts,jsx,tsx}";
-@source "../domain/**/*.{js,ts,jsx,tsx}";
+@source "../features/**/*.{js,ts,jsx,tsx}";
 ```
 
 #### 3. LiteBus Module Registration
@@ -249,5 +249,5 @@ Skip frontend steps when the project has no `apps/web/`.
 - [ ] `snake_case` on all PostgreSQL mappings.
 - [ ] `cancellationToken` naming on all async methods.
 - [ ] `.AsNoTracking()` on read queries.
-- [ ] No cross-domain imports when frontend changed.
+- [ ] No cross-feature imports when frontend changed.
 - [ ] OpenAPI artifacts committed when API contract changed.

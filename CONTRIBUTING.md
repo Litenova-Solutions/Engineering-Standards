@@ -137,7 +137,7 @@ For `MAJOR` version upgrades, the commit message should list the breaking change
 chore: upgrade engineering-standards to v2.0.0
 
 Breaking changes addressed:
-- Renamed apps/web/features/ to apps/web/domain/.
+- Renamed apps/web/features/ to apps/web/features/.
   Updated imports and ESLint boundary zones.
 - Moved project docs to docs/domain/{feature}/{use-case}.md tree.
 ```

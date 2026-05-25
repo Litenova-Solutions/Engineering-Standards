@@ -105,7 +105,7 @@ In WebApi:
 
 ## 8. Add Frontend Integration
 
-In `apps/{app}/domain/{feature}/{use-case}/`:
+In `apps/{app}/features/{feature}/{use-case}/`:
 
 - Fetch initial read data in Server Components on read-heavy pages.
 - Use Server Actions for form mutations.
@@ -118,9 +118,10 @@ In `apps/{app}/domain/{feature}/{use-case}/`:
 
 When the project uses `docs/ui/` (recommended for multi-app frontends):
 
-- Add or update `docs/ui/{app}/pages/{page}.md` for the route (use `docs/templates/ui-page.md`).
+- Add or update `docs/ui/{app}/pages/{page}.md` for the route (copy from `standards/docs/templates/ui-page.md` in the consuming project).
 - Update `docs/ui/{app}/README.md` route index.
-- Update `docs/ui/{app}/shell.md` when shared layout changes (use `docs/templates/ui-shell.md`).
+- Update `docs/ui/{app}/shell.md` when shared layout changes (copy from `standards/docs/templates/ui-shell.md`).
+- Update each affected use-case doc § UI projection with links to the page doc(s).
 
 See `docs/guides/agentic-domain-driven-design.md` § UI Projection Docs.
 

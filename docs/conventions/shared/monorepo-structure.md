@@ -55,8 +55,8 @@ A monorepo MAY contain any number of Next.js (or other) frontends under `apps/`:
 
 Each frontend:
 
-- Owns `app/`, `domain/`, `components/ui/`, and `lib/env.ts` independently.
-- MUST NOT import from another app's `domain/` folder.
+- Owns `app/`, `features/`, `components/ui/`, and `lib/env.ts` independently.
+- MUST NOT import from another app's `features/` folder.
 - MAY share **design tokens** via a workspace CSS package (see [Frontend UI defaults](../frontend/02-components.md#41-shared-theme-vs-shared-components)).
 - Runs its own dev script (`pnpm --filter {name} dev`) and CI workflow when present.
 
@@ -96,6 +96,6 @@ Each app under `apps/` SHOULD have a README covering run commands, env vars, rou
 
 ## Related
 
-- `docs/conventions/frontend/07-domain-boundaries.md` — no cross-app domain imports
+- `docs/conventions/frontend/07-feature-boundaries.md` — no cross-app feature imports
 - `docs/conventions/shared/ci.md` — monorepo CI gates
 - `docs/guides/definition-of-done.md` — per-app frontend checklist

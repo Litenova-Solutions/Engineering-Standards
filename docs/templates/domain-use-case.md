@@ -62,7 +62,7 @@ Describe aggregate method(s) invoked and invariants enforced. Reference terms fr
 ### Route and entry
 
 - Route: `app/(main)/...`
-- Domain entry: `domain/{feature}/{use-case}/...`
+- Feature entry: `features/{feature}/{use-case}/...`
 
 ### States
 
