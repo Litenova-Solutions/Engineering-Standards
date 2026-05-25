@@ -68,13 +68,13 @@ Domain docs, backend projects, and frontend folders MUST use the same boundaries
 | Domain docs | `docs/domain/{feature}/{use-case}.md` | `docs/domain/posts/create-post.md` |
 | Backend write | `{Feature}/{UseCase}/` handlers | `Posts/Create/PublishPostCommandHandler.cs` |
 | Backend read | `{Feature}/{UseCase}/` handlers | `Posts/List/GetAllPostsQueryHandler.cs` |
-| Frontend | `domain/{feature}/{use-case}/` | `domain/posts/create/CreatePostForm.tsx` |
-| App Router | Thin shell imports domain entry | `app/(main)/posts/new/page.tsx` |
+| Frontend | `features/{feature}/{use-case}/` | `features/posts/create/CreatePostForm.tsx` |
+| App Router | Thin shell imports feature entry | `app/(main)/posts/new/page.tsx` |
 | UI projection | `docs/ui/{app}/pages/{page}.md` | Composes one or more use cases on a route |
 
 Use cases and pages are **many-to-many**. One page (for example admin post editor) may compose several use cases. One use case may appear on several pages (for example list published posts on home and tag filter). Page docs capture that mapping; use case docs stay one operation each.
 
-This is screaming architecture applied to documentation and UI: an engineer or agent should follow Feature → Use case the same way in docs, backend, and frontend domain folders.
+This is screaming architecture applied to documentation and UI: an engineer or agent should follow Feature → Use case the same way in docs, backend, and frontend `features/` folders.
 
 ---
 
@@ -115,7 +115,7 @@ Update the use case doc in the same PR as the handler, endpoint, or UI change.
 
 ## 5. UI Projection Docs
 
-Copy `docs/templates/ui-shell.md` and `docs/templates/ui-page.md` when adding or changing frontend routes.
+Copy `docs/templates/ui-shell.md` and `docs/templates/ui-page.md` from this standards repository when adding or changing frontend routes. In a consuming monorepo, paths are `{project}/standards/docs/templates/...`. See `ui-page.example.md` for a multi-use-case page shape.
 
 UI projection docs live under `docs/ui/{app}/` where `{app}` matches the folder name under `apps/` (for example `web`, `admin`).
 
@@ -124,9 +124,10 @@ UI projection docs live under `docs/ui/{app}/` where `{app}` matches the folder 
 **Page doc** (`pages/{name}.md`) — one user-facing route:
 
 - Route path and route shell file
-- Domain component entry path(s)
+- Feature component entry path(s), or `(inline in route shell)` / `(none — reason)`
 - Table of **use case doc links** composed on this page
-- Visible states on this screen (not domain invariants)
+- **Screen states** on this route (loading, empty, error)
+- **Content modes** when aggregate state changes visible actions (optional)
 - Links to e2e specs and use-case acceptance criteria
 
 UI docs MUST NOT restate domain invariants. Link to the feature README or use case doc instead (for example "Delete hidden when Published — see delete-post.md").
@@ -196,3 +197,4 @@ Everything else requires a use case doc.
 | `docs/templates/domain-use-case.example.md` | Approved example (Create Post) |
 | `docs/templates/ui-shell.md` | App shell / layout template |
 | `docs/templates/ui-page.md` | Page composition template |
+| `docs/templates/ui-page.example.md` | Multi-use-case page example |

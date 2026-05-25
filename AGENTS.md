@@ -56,7 +56,7 @@ When implementing a use case in a project that consumes these standards (for exa
 | `WebApi` | `IEndpoint`, request/response models, OpenAPI |
 | `Worker` | Outbox dispatch, scheduled jobs (`14-worker-projects.md`) |
 | `apps/api/` | .NET solution root (`src/`, `tests/`, `global.json`) |
-| `apps/{name}/` | One or more frontends; each with `domain/{feature}/{use-case}/` aligned to backend use cases |
+| `apps/{name}/` | One or more frontends; each with `features/{feature}/{use-case}/` aligned to backend use cases |
 
 Projects MAY define additional apps under `apps/` (multiple frontends, workers, or secondary APIs). See `docs/conventions/shared/monorepo-structure.md`.
 
@@ -84,7 +84,7 @@ Projects MAY define additional apps under `apps/` (multiple frontends, workers, 
 - MUST NOT accept actor IDs from request bodies when the actor is the authenticated user. Actor identity comes from validated JWT claims only.
 - MUST NOT use `configuration["Key"]!` directly; all config access goes through validated options classes and `IOptions<T>`.
 - MUST use `FromSqlInterpolated` for raw SQL; MUST NOT concatenate SQL strings.
-- Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; no business logic in `proxy.ts`; no `useMemo`/`useCallback`/`React.memo` with React Compiler; no server data in Zustand or `useEffect` fetch; no cross-domain imports; no `TODO`/`FIXME`/stubs; max 300 lines per file; no arbitrary Tailwind values; env vars only via `lib/env.ts`.
+- Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; no business logic in `proxy.ts`; no `useMemo`/`useCallback`/`React.memo` with React Compiler; no server data in Zustand or `useEffect` fetch; no cross-feature imports; no `TODO`/`FIXME`/stubs; max 300 lines per file; no arbitrary Tailwind values; env vars only via `lib/env.ts`.
 
 ## Convention File Index
 
@@ -119,7 +119,7 @@ Projects MAY define additional apps under `apps/` (multiple frontends, workers, 
 | Frontend App Router | `docs/conventions/frontend/01-nextjs-app-router.md` |
 | Frontend testing | `docs/conventions/frontend/06-testing.md` |
 | Admin API auth | `docs/conventions/frontend/10-admin-api-auth.md` |
-| Frontend domain boundaries | `docs/conventions/frontend/07-domain-boundaries.md` |
+| Frontend feature boundaries | `docs/conventions/frontend/07-feature-boundaries.md` |
 | Other frontend topics | `docs/conventions/frontend/` (02 through 09) |
 | Agentic DDD | `docs/guides/agentic-domain-driven-design.md` |
 | Guides | `docs/guides/` |

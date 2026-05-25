@@ -6,7 +6,7 @@ export default tseslint.config(
     plugins: { boundaries },
     settings: {
       "boundaries/elements": [
-        { type: "domain", pattern: "domain/*", mode: "folder" },
+        { type: "features", pattern: "features/*", mode: "folder" },
         { type: "shared", pattern: "shared/**" },
         { type: "app", pattern: "app/**" },
         { type: "lib", pattern: "lib/**" },
@@ -21,8 +21,8 @@ export default tseslint.config(
           default: "disallow",
           rules: [
             {
-              from: "domain",
-              allow: ["domain", "shared", "lib", "ui"],
+              from: "features",
+              allow: ["features", "shared", "lib", "ui"],
             },
             {
               from: "shared",
@@ -30,7 +30,7 @@ export default tseslint.config(
             },
             {
               from: "app",
-              allow: ["domain", "shared", "lib", "ui"],
+              allow: ["features", "shared", "lib", "ui"],
             },
           ],
         },

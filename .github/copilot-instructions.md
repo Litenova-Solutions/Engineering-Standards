@@ -19,7 +19,7 @@ The canonical agent guide is `AGENTS.md` at the repository root (or `standards/A
 - **No external libraries in Application.Reactions.** Narrow interfaces in Reactions; implementations in Infrastructure.
 - **`cancellationToken` naming.** Exact name on all async methods.
 - **Forbidden packages.** `docs/conventions/shared/forbidden-packages.md`.
-- **Frontend boundaries.** No cross-domain imports; use `getApiClient()`; complete DoD checklist.
+- **Frontend boundaries.** No cross-feature imports; use `getApiClient()`; complete DoD checklist.
 
 ## Verification
 

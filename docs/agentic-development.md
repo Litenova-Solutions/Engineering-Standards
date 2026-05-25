@@ -48,7 +48,7 @@ Each failure mode has a corresponding mitigation built into the standards.
 
 Each structural decision in the project layout has a direct benefit for agent navigation and correctness.
 
-**Screaming architecture:** Agents follow folder names across docs, backend, and frontend. `docs/domain/posts/publish-post.md`, `Posts/Publish/`, and `domain/posts/publish/` describe the same use case. A flat `Services/` folder forces the agent to read many files before understanding where a new handler belongs.
+**Screaming architecture:** Agents follow folder names across docs, backend, and frontend. `docs/domain/posts/publish-post.md`, `Posts/Publish/`, and `features/posts/publish/` describe the same use case. A flat `Services/` folder forces the agent to read many files before understanding where a new handler belongs.
 
 **Contracts projects:** The compiler prevents an agent from putting a handler in a Contracts project. No written rule is sufficient; the build fails. This is the most reliable form of enforcement.
 
@@ -102,6 +102,6 @@ Different tasks require different context. Loading all convention files for ever
 | Adding infrastructure | `AGENTS.md`, `04-infrastructure-layer.md` |
 | Writing backend tests | `AGENTS.md`, `08-testing.md` |
 | Writing frontend tests | `AGENTS.md`, `frontend/06-testing.md` |
-| Adding frontend UI for a use case | `AGENTS.md`, `frontend/01-nextjs-app-router.md`, `frontend/03-data-fetching.md`, `frontend/07-domain-boundaries.md` |
+| Adding frontend UI for a use case | `AGENTS.md`, `frontend/01-nextjs-app-router.md`, `frontend/03-data-fetching.md`, `frontend/07-feature-boundaries.md` |
 | Completing a full-stack use case | `AGENTS.md`, `agentic-guardrails.md`, `agentic-domain-driven-design.md`, `definition-of-done.md`, `ci.md` |
 | Modifying standards | `AGENTS.md`, `00-standards-meta.mdc`, `adr-template.md` |

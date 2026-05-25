@@ -31,7 +31,7 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 - [ ] Feature README at `docs/domain/{feature}/README.md` updated when domain language or invariants changed.
 - [ ] UI projection docs updated when routes, shell, or page composition changed (`docs/ui/{app}/shell.md`, `docs/ui/{app}/pages/*.md`, `docs/ui/{app}/README.md` route index).
 - [ ] shadcn/ui bootstrapped in each touched frontend app (`components.json`, `components/ui/`, `lib/utils.ts`) unless a project ADR documents a different UI stack.
-- [ ] Tailwind v4 entry CSS in each touched app: `@import "tailwindcss"` in `app/globals.css`, `@source` for `app/`, `components/`, and `domain/`, and `postcss.config.mjs` with `@tailwindcss/postcss`.
+- [ ] Tailwind v4 entry CSS in each touched app: `@import "tailwindcss"` in `app/globals.css`, `@source` for `app/`, `components/`, and `features/`, and `postcss.config.mjs` with `@tailwindcss/postcss`.
 - [ ] Shared theme tokens imported from a workspace CSS package when all frontends use shadcn (project-specific; optional).
 - [ ] Server Component used for initial data fetch on read-heavy pages.
 - [ ] Server Action or typed client mutation pattern documented in the use-case doc; Zod validation at the mutation boundary.
@@ -58,4 +58,4 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 - [ ] Relevant convention files read for every layer touched.
 - [ ] No forbidden packages introduced (`docs/conventions/shared/forbidden-packages.md`).
-- [ ] Domain folders do not import across domains (`docs/conventions/frontend/07-domain-boundaries.md`).
+- [ ] Feature folders do not import across features (`docs/conventions/frontend/07-feature-boundaries.md`).

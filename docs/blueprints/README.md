@@ -21,7 +21,7 @@ Full-file reference implementations. Agents MUST copy from blueprints instead of
 
 | Blueprint | File |
 |:---|:---|
-| Domain use case module | [frontend/domain-use-case.md](frontend/domain-use-case.md) |
+| Feature use case module | [frontend/feature-use-case.md](frontend/feature-use-case.md) |
 | Server Action | [frontend/server-action.md](frontend/server-action.md) |
 | lib/env.ts | [frontend/lib-env.md](frontend/lib-env.md) |
 | lib/api/client.ts | [frontend/lib-api-client.md](frontend/lib-api-client.md) |
