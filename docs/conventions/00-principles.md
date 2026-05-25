@@ -177,9 +177,10 @@ These standards define defaults for Litenova projects. Consumer repositories (fo
 
 When guidance overlaps:
 
-1. **Project use-case docs** (`docs/domain/{feature}/{use-case}.md`) win for that feature's commands, endpoints, UI flows, and acceptance criteria.
-2. **Project app READMEs and ADRs** win for app-specific runbooks, env vars, auth, and UI choices.
-3. **These standards** win when project docs are silent.
+1. **Project use-case docs** (`docs/domain/{feature}/{use-case}.md`) win for that operation's commands, endpoints, exceptions, and acceptance criteria.
+2. **Project UI projection docs** (`docs/ui/{app}/pages/*.md`, `docs/ui/{app}/shell.md`) win for route composition, shell layout, and which use cases appear on a page.
+3. **Project app READMEs and ADRs** win for runbooks, env vars, auth setup, and project-level UI decisions.
+4. **These standards** win when project docs are silent.
 
 Agents and engineers MUST read standards first, then project docs, and follow the most specific applicable document. If project docs intentionally diverge from a standard (different UI library, extra frontend app, alternate API docs UI), the project doc MUST state the override explicitly.
 
