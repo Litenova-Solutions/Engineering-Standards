@@ -29,7 +29,8 @@ Any package not in the pre-approved list in `docs/conventions/backend/01-solutio
 | `axios` | Bypasses the typed OpenAPI client | `getApiClient()` from the owned `openapi-fetch` client in `packages/api-client/` |
 | `moment`, `day.js` | Deprecated or large bundle | `Temporal` API or `date-fns` |
 | `@shadcn/ui` | Not an importable package | `components/ui/` populated via `npx shadcn@latest add` |
-| `@radix-ui/react-*` (individual packages) | Replaced by unified `radix-ui` package | `import { ... } from "radix-ui"` |
+| `@radix-ui/react-*` (individual packages) | Legacy Radix split packages; not used with shadcn CLI v4 `base-nova` | `@base-ui/react` subpath imports (see generated `components/ui/`) |
+| `radix-ui` (unified meta-package) | Legacy shadcn/Radix stack; replaced by Base UI in CLI v4 | `@base-ui/react` |
 | `redux`, `@reduxjs/toolkit`, `mobx`, `jotai`, `recoil` | Requires ADR; Zustand is the approved UI state tool | `zustand` |
 | `react-query` (v3 package name) | Old package name; contains security advisories | `@tanstack/react-query` 5.x |
 | `lodash`, `underscore` | Redundant with ES2022+ native utilities | Native `Array`, `Object`, and `String` methods |

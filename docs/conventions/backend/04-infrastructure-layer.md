@@ -354,6 +354,24 @@ builder.OwnsOne(t => t.Name, b =>
 builder.HasIndex("Name_Value").IsUnique(); // fails — property not found on the owner
 ```
 
+### LINQ queries on owned value objects
+
+Do not compare owned types by reference in repository or read-store LINQ (`entity.Owned == valueObject`). EF Core may translate that into shadow FK properties without getters and throw at runtime.
+
+Compare mapped scalar properties instead:
+
+```csharp
+// DO: compare the mapped column property
+return await _context.Posts
+    .AnyAsync(p => p.Slug.Value == slug.Value, cancellationToken);
+
+// DON'T: compare owned types directly
+return await _context.Posts
+    .AnyAsync(p => p.Slug == slug, cancellationToken); // may throw on translation
+```
+
+The same rule applies in query handlers that filter on owned fields: use `.Value` (or the explicitly mapped property) in the expression.
+
 ---
 
 ## EF Core Configuration for Aggregate State (TPH)

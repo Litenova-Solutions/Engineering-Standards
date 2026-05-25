@@ -151,6 +151,7 @@ sealed class CreatePostEndpoint : IEndpoint
 {
     private readonly CreatePostCommandHandler _handler; // BAD: references implementation project
 }
+```
 
 ---
 
@@ -167,4 +168,19 @@ Every project MUST enforce a strict boundary between two categories of rule chec
 1. **Validators MUST NOT check database state or complex domain rules.** They inspect the shape and constraints of incoming data (e.g., string length, email formatting, UUID validity). Checking whether a username is unique or whether an account balance has sufficient funds belongs strictly within domain aggregates or domain query flows.
 2. **Aggregates MUST NOT perform basic formatting validation.** By the time a command reaches the aggregate, the command payload is already syntactically correct. The aggregate's sole responsibility is enforcing state transitions (e.g., "a post can only be published if it is currently a draft").
 3. **Never call validators or throw validation exceptions from inside the aggregate.** An aggregate throws specific domain exception subclasses (such as `PostAlreadyPublishedException`), never argument exceptions or generic validation exceptions.
-```
+
+---
+
+## 11. Documentation Precedence
+
+These standards define defaults for Litenova projects. Consumer repositories (for example LitePress) add project-specific docs under `docs/`, `apps/{name}/README.md`, and ADRs under `docs/decisions/`.
+
+When guidance overlaps:
+
+1. **Project use-case docs** (`docs/domain/{feature}/{use-case}.md`) win for that feature's commands, endpoints, UI flows, and acceptance criteria.
+2. **Project app READMEs and ADRs** win for app-specific runbooks, env vars, auth, and UI choices.
+3. **These standards** win when project docs are silent.
+
+Agents and engineers MUST read standards first, then project docs, and follow the most specific applicable document. If project docs intentionally diverge from a standard (different UI library, extra frontend app, alternate API docs UI), the project doc MUST state the override explicitly.
+
+During co-development of standards and a reference app, treat the latest committed text in both repositories as authoritative. Prefer current package versions in `standards.manifest.json` and project lockfiles over older examples in either repo.
