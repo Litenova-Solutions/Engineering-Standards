@@ -29,6 +29,7 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 - [ ] Use case doc at `docs/domain/{feature}/{use-case}.md` updated to reflect current behavior.
 - [ ] Feature README at `docs/domain/{feature}/README.md` updated when domain language or invariants changed.
+- [ ] UI projection docs updated when routes, shell, or page composition changed (`docs/ui/{app}/shell.md`, `docs/ui/{app}/pages/*.md`, `docs/ui/{app}/README.md` route index).
 - [ ] shadcn/ui bootstrapped in each touched frontend app (`components.json`, `components/ui/`, `lib/utils.ts`) unless a project ADR documents a different UI stack.
 - [ ] Tailwind v4 entry CSS in each touched app: `@import "tailwindcss"` in `app/globals.css`, `@source` for `app/`, `components/`, and `domain/`, and `postcss.config.mjs` with `@tailwindcss/postcss`.
 - [ ] Shared theme tokens imported from a workspace CSS package when all frontends use shadcn (project-specific; optional).

@@ -105,7 +105,7 @@ In WebApi:
 
 ## 8. Add Frontend Integration
 
-In `apps/web/domain/{feature}/{use-case}/`:
+In `apps/{app}/domain/{feature}/{use-case}/`:
 
 - Fetch initial read data in Server Components on read-heavy pages.
 - Use Server Actions for form mutations.
@@ -113,20 +113,27 @@ In `apps/web/domain/{feature}/{use-case}/`:
 - Keep server data out of Zustand.
 - Add loading, empty, error, and forbidden states.
 - Regenerate API types when the backend contract changes.
-- Add or update Playwright happy-path tests in `apps/web/e2e/`.
+- Add or update Playwright happy-path tests in `apps/{app}/e2e/`.
 - Add Vitest tests for new hooks, utilities, or Zod schemas.
 
-See `docs/blueprints/frontend/domain-use-case.md`.
+When the project uses `docs/ui/` (recommended for multi-app frontends):
+
+- Add or update `docs/ui/{app}/pages/{page}.md` for the route (use `docs/templates/ui-page.md`).
+- Update `docs/ui/{app}/README.md` route index.
+- Update `docs/ui/{app}/shell.md` when shared layout changes (use `docs/templates/ui-shell.md`).
+
+See `docs/guides/agentic-domain-driven-design.md` § UI Projection Docs.
 
 ---
 
-## 9. Update Domain Documentation
+## 9. Update Documentation
 
 In the same PR:
 
 - Update `docs/domain/{feature}/{use-case}.md` to reflect current behavior.
 - Update `docs/domain/{feature}/README.md` if aggregates, language, events, or persistence changed.
 - Update `docs/domain/README.md` if this is a new or retired use case.
+- Update `docs/ui/{app}/` when routes, shell, or page composition changed.
 
 ---
 
