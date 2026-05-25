@@ -100,6 +100,8 @@ function PostCard({ post, publish }: { post: Post; publish: Function }) {
 
 ## 4. The shadcn/ui Ownership Model
 
+**Default UI:** shadcn/ui (CLI v4) is the default component system for Next.js apps in Litenova monorepos. Initialize with `npx shadcn@latest init` per app unless a project ADR documents an alternate UI stack for that app.
+
 Components from shadcn/ui are copied into `components/ui/` via the CLI and owned in this codebase. The CLI adds a component as a file in `components/ui/`; it is not installed as a package.
 
 Rules:
@@ -109,6 +111,7 @@ Rules:
 - All shadcn/ui components include `data-slot` attributes on their root element. Use `data-slot` selectors for styling targets rather than fragile class name overrides.
 - The `toast` component is deprecated in shadcn/ui. Use `sonner` for all toast notifications.
 - To add a component: `npx shadcn@latest add <component-name>`. This copies the component into `components/ui/`.
+- shadcn CLI v4 with style `base-nova` generates primitives from `@base-ui/react` (for example `@base-ui/react/button`, `@base-ui/react/input`). Do not add `radix-ui` or `@radix-ui/react-*` for new work.
 
 ```typescript
 // GOOD: import from local components/ui/
@@ -125,19 +128,28 @@ import { Button } from "@shadcn/ui"     // BAD: not an importable package
 
 ---
 
-## 4.1. No Shared Workspace UI Package
+## 4.1. Shared Theme vs. Shared Components
 
-Shared workspace UI packages (`@workspace/ui`, `@litenova/ui`, `@org/ui`, or any workspace package that exports React components) are forbidden. Each application owns its `components/ui/` directory populated via the shadcn/ui CLI.
+Shared workspace UI **component** packages (`@workspace/ui`, `@litenova/ui`, `@org/ui`, or any workspace package that exports React components) are forbidden. Each application owns its `components/ui/` directory populated via the shadcn/ui CLI.
 
-Reasons:
+**Shared theme CSS is allowed.** When every frontend in a monorepo uses shadcn with the same design tokens, extract `:root` variables and `@theme inline` mappings into a workspace package (for example `packages/config-tailwind/theme.css`). Each app still:
+
+- Imports `@import "tailwindcss"` in its own `app/globals.css`
+- Declares its own `@source` scan paths
+- Owns its own `components/ui/` copies via the CLI
+
+An individual app MAY override tokens in its `globals.css` or use a project ADR to adopt a different UI stack entirely. Project docs win over this section when they document an override.
+
+Reasons component packages are forbidden:
 - Component output from the CLI is per-app and versioned differently across apps.
 - Shared workspace packages couple app release cycles and produce resolution ambiguity in Tailwind.
 - The shadcn/ui CLI assumes ownership inside the app; it cannot update components in a shared package.
 
 Rules:
 - NEVER add a workspace dependency (`workspace:*`) that exports React components.
-- NEVER create or reference a package named `ui` (or similar) under `packages/` in the monorepo.
+- NEVER create or reference a package named `ui` (or similar) under `packages/` that exports React.
 - If two apps need the same component, each app generates its own copy via `npx shadcn@latest add <component>` and customizes independently.
+- MAY share CSS theme tokens across apps when all apps use shadcn defaults.
 
 ```typescript
 // GOOD: each app owns its copy
@@ -159,46 +171,39 @@ import { Button } from "@/../../packages/ui" // FORBIDDEN
 `cva` (class-variance-authority) is the tool for component variants. Use it inside `components/ui/` files when adding new variants to a shadcn/ui component.
 
 ```typescript
-// components/ui/button.tsx (excerpt showing cva usage)
+// components/ui/button.tsx (excerpt showing cva + Base UI)
+import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
-import { Slot } from "radix-ui"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors",
+  "inline-flex items-center justify-center rounded-lg text-sm font-medium",
   {
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-accent",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        // Custom variant added for this project
-        publish: "bg-green-600 text-white hover:bg-green-700",
+        destructive: "bg-destructive/10 text-destructive hover:bg-destructive/20",
+        outline: "border border-input bg-background hover:bg-muted",
+        ghost: "hover:bg-muted hover:text-foreground",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 px-3",
-        lg: "h-11 px-8",
-        icon: "h-10 w-10",
+        default: "h-8 px-2.5",
+        sm: "h-7 px-2",
+        lg: "h-9 px-3",
       },
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
+    defaultVariants: { variant: "default", size: "default" },
   }
 )
 
-type ButtonProps = React.ComponentPropsWithoutRef<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }
-
-function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
-  const Comp = asChild ? Slot : "button"
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  ...props
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
   return (
-    <Comp
+    <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
@@ -207,7 +212,7 @@ function Button({ className, variant, size, asChild = false, ...props }: ButtonP
 }
 ```
 
-Note: import `Slot` from `"radix-ui"`, not from `"@radix-ui/react-slot"`. The unified `radix-ui` package was introduced in February 2026 and replaces all individual `@radix-ui/react-*` packages.
+Match primitive imports to your generated `components/ui/` files. Do not rewrite them to use `radix-ui`.
 
 ---
 
@@ -261,7 +266,7 @@ Rules:
 - All interactive elements MUST be keyboard-accessible. Use semantic HTML elements (`button`, `a`, `input`) rather than `div` or `span` with `onClick`.
 - All images MUST have descriptive `alt` text. Decorative images use `alt=""`.
 - Form inputs MUST have associated labels via `htmlFor`/`id` pairing or `aria-label` on the input itself.
-- All modal dialogs MUST trap focus and return focus to the trigger element on close. shadcn/ui `Dialog` handles this automatically via Radix UI.
+- All modal dialogs MUST trap focus and return focus to the trigger element on close. shadcn/ui `Dialog` (Base UI primitives) handles this when generated via the CLI.
 - Color alone MUST NOT convey information. Always pair color with text or an icon.
 
 ```typescript

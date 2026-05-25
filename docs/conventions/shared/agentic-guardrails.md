@@ -51,7 +51,15 @@ Solutions following these standards MUST include {ProjectName}.Architecture.Test
 </Rule>
 
 <Rule id="MONOREPO_LAYOUT">
-In monorepos, the .NET solution MUST live under apps/api/, not at the repository root src/. All runnable apps MUST live under apps/. See `docs/conventions/shared/monorepo-structure.md`.
+In monorepos, the .NET solution MUST live under apps/api/, not at the repository root src/. All runnable apps MUST live under apps/. A repo MAY contain multiple frontends and multiple .NET deployables. See `docs/conventions/shared/monorepo-structure.md`.
+</Rule>
+
+<Rule id="PROJECT_DOC_PRECEDENCE">
+When project docs (docs/domain/, app READMEs, project ADRs) overlap these standards, the project document wins. Read standards first, then project docs, then follow the most specific applicable guidance.
+</Rule>
+
+<Rule id="SHADCN_DEFAULT_UI">
+The default frontend UI stack is shadcn/ui (CLI v4) with Tailwind v4. Each app owns components/ui/. Shared workspace packages MAY export theme CSS tokens only, not React components. A project ADR MAY document a different UI stack for a specific app.
 </Rule>
 
 ---
@@ -145,7 +153,16 @@ export async function publishPost(_postId: PostId) {
 }
 ```
 
-#### Anti-drift: Tailwind
+#### Anti-drift: Tailwind and shadcn bootstrap
+
+Each Next.js app MUST have:
+
+- `postcss.config.mjs` with `@tailwindcss/postcss`
+- `app/globals.css` with `@import "tailwindcss"` in the **app entry file** (not only via a package re-export; shadcn CLI validates the app file)
+- `@source` directives covering `app/`, `components/`, and `domain/`
+- `npx shadcn@latest init` completed (`components.json`, `lib/utils.ts`)
+
+Shared theme tokens MAY live in `packages/{name}-config-tailwind/theme.css`. Each app imports tokens and owns its own `@source` scan roots.
 
 ```tsx
 // DO: theme token
@@ -155,6 +172,17 @@ export async function publishPost(_postId: PostId) {
 ```tsx
 // DON'T: arbitrary spacing/color
 <div className="p-[13px] text-[#3a3f51]" />
+```
+
+```css
+/* DO: app/globals.css (Tailwind v4 + monorepo) */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@project/config-tailwind/theme.css";
+
+@source "../app/**/*.{js,ts,jsx,tsx}";
+@source "../components/**/*.{js,ts,jsx,tsx}";
+@source "../domain/**/*.{js,ts,jsx,tsx}";
 ```
 
 #### 3. LiteBus Module Registration

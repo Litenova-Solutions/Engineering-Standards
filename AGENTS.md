@@ -38,7 +38,9 @@ When implementing a use case in a project that consumes these standards (for exa
 | Zustand | 5.0.13 (UI state only) |
 | Zod | 4.4.3; import from `"zod"`; `z.email()`, `z.uuid()`, `z.url()` |
 | Tailwind CSS | 4.3.x, CSS-first `@theme`, no `tailwind.config.js` |
-| shadcn/ui | CLI v4, `sonner`, Radix from `radix-ui` |
+| shadcn/ui | CLI v4 default UI; `sonner` for toasts; generated primitives use `@base-ui/react` (style `base-nova`) unless a project ADR picks another shadcn style |
+| OpenAPI | `Microsoft.AspNetCore.OpenApi` for spec generation |
+| API docs UI (dev) | `Scalar.AspNetCore` mapped in Development; not Swashbuckle by default |
 
 ## Project Map
 
@@ -54,7 +56,9 @@ When implementing a use case in a project that consumes these standards (for exa
 | `WebApi` | `IEndpoint`, request/response models, OpenAPI |
 | `Worker` | Outbox dispatch, scheduled jobs (`14-worker-projects.md`) |
 | `apps/api/` | .NET solution root (`src/`, `tests/`, `global.json`) |
-| `apps/web/` | Next.js; `domain/{feature}/{use-case}/` aligned with backend |
+| `apps/{name}/` | One or more frontends; each with `domain/{feature}/{use-case}/` aligned to backend use cases |
+
+Projects MAY define additional apps under `apps/` (multiple frontends, workers, or secondary APIs). See `docs/conventions/shared/monorepo-structure.md`.
 
 ## Non-Negotiable Rules
 
@@ -76,6 +80,7 @@ When implementing a use case in a project that consumes these standards (for exa
 - MUST use `.AsNoTracking()` or projections in `Application.Read`.
 - MUST follow `writing-style.md` (no forbidden words, no em/en dashes).
 - MUST run gates in `docs/conventions/shared/ci.md` and complete `definition-of-done.md`.
+- When project docs (`docs/domain/`, app READMEs, project ADRs) overlap these standards, project docs take precedence per `docs/conventions/00-principles.md#11-documentation-precedence`.
 - MUST NOT accept actor IDs from request bodies when the actor is the authenticated user. Actor identity comes from validated JWT claims only.
 - MUST NOT use `configuration["Key"]!` directly; all config access goes through validated options classes and `IOptions<T>`.
 - MUST use `FromSqlInterpolated` for raw SQL; MUST NOT concatenate SQL strings.
@@ -128,7 +133,7 @@ dotnet build apps/api/{ProjectName}.slnx --configuration Release
 dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
 pnpm install --frozen-lockfile
 pnpm lint && pnpm type-check && pnpm test && pnpm build
-pnpm exec playwright test --config apps/web/playwright.config.ts
+pnpm exec playwright test --config apps/{frontend}/playwright.config.ts
 ```
 
-Skip frontend commands when the project has no `apps/web/`.
+Skip frontend commands when the project has no frontend apps under `apps/`. Run gates for every frontend app you changed.

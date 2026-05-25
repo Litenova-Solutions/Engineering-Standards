@@ -31,6 +31,7 @@
     "LiteBus.Extensions.Microsoft.DependencyInjection": "4.3.0",
     "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.0",
     "Microsoft.AspNetCore.OpenApi": "10.0.0",
+    "Scalar.AspNetCore": "2.14.14",
     "Microsoft.Extensions.ApiDescription.Server": "10.0.0",
     "Microsoft.Extensions.Options.DataAnnotations": "10.0.0",
     "Microsoft.EntityFrameworkCore": "10.0.1",
@@ -71,6 +72,7 @@
     "vitest": "4.0.0",
     "@playwright/test": "1.52.0",
     "next-auth": "5.0.0",
+    "@base-ui/react": "1.5.x",
     "eslint-plugin-boundaries": "5.0.1"
   },
   "advisories": {

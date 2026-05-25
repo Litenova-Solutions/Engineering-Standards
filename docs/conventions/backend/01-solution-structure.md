@@ -355,8 +355,9 @@ Pre-approved npm packages (no new ADR required):
 | `zustand` | Client UI state |
 | `zod` | Validation (v4 APIs) |
 | `react-hook-form`, `@hookform/resolvers` | Forms |
-| `tailwindcss`, `clsx`, `tailwind-merge` | Styling and `cn` helper |
-| `radix-ui` | shadcn/ui primitives (single package import) |
+| `tailwindcss`, `@tailwindcss/postcss`, `clsx`, `tailwind-merge`, `tw-animate-css` | Styling and `cn` helper |
+| `@base-ui/react` | shadcn/ui CLI v4 (`base-nova`) primitives |
+| `class-variance-authority`, `lucide-react` | shadcn component variants and icons |
 | `next-auth` / `auth` (Auth.js v5) | Authentication per `docs/decisions/authjs-v5-authentication.md` |
 | `vitest` (4.x), `@testing-library/react`, `@testing-library/dom` | Unit and component tests |
 | `@playwright/test` | E2E tests |

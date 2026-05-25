@@ -490,6 +490,37 @@ Build-time OpenAPI generation uses `Microsoft.Extensions.ApiDescription.Server`.
 
 During `dotnet build`, the spec is written to the build output directory (for example `bin/Release/net10.0/openapi.json`). Copy it to `packages/api-types/openapi.json` in the CI pipeline for the freshness check. No custom `--export-openapi` flag or runtime generation is needed.
 
+### Browsable API reference (Development)
+
+`Microsoft.AspNetCore.OpenApi` generates the machine-readable spec only. For an interactive UI in local development, add `Scalar.AspNetCore` and map it alongside `MapOpenApi()`:
+
+```csharp
+using Scalar.AspNetCore;
+
+builder.Services.AddOpenApi();
+
+// after app.Build()
+app.MapOpenApi();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapScalarApiReference();
+}
+```
+
+Default URLs (ASP.NET Core OpenAPI versioning):
+
+| Resource | Typical path |
+|:---|:---|
+| OpenAPI JSON | `/openapi/v1.json` |
+| Scalar UI | `/scalar/v1` |
+
+Do not use Swashbuckle for new .NET 10 APIs unless a project ADR documents a legacy requirement. Swashbuckle.AspNetCore remains available but is not the platform default.
+
+Gate Scalar (and any docs UI) to non-production environments unless a project ADR documents a public API portal.
+
+See `docs/conventions/shared/monorepo-structure.md` and project `docs/decisions/` when a repo hosts multiple WebApi projects.
+
 See `docs/conventions/shared/ci-cd.md` and `docs/conventions/shared/monorepo-structure.md` for the complete CI workflow.
 
 For the complete `Program.cs`, see `docs/blueprints/backend/program-cs.md`. The blueprint includes:
@@ -500,6 +531,7 @@ For the complete `Program.cs`, see `docs/blueprints/backend/program-cs.md`. The 
 - Health checks.
 - Exception handler.
 - OpenAPI with JWT security scheme.
+- Scalar API reference in Development (`Scalar.AspNetCore`).
 - LiteBus registration.
 - Middleware order.
 - `public partial class Program { }` for integration tests.

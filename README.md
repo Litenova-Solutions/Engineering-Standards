@@ -36,7 +36,7 @@ flowchart LR
 
 ## Reference implementation
 
-**[LitePress](https://github.com/Litenova-Solutions/LitePress)** is the canonical consumer of these standards: dual Next.js apps, ASP.NET Core 10 API, ADDD domain docs, pinned `standards/` submodule, and CI gates from [`docs/conventions/shared/ci.md`](docs/conventions/shared/ci.md). Use it as a working example when adopting this repository in a new project.
+**[LitePress](https://github.com/Litenova-Solutions/LitePress)** is the canonical consumer of these standards: multiple Next.js apps under `apps/`, ASP.NET Core 10 API, ADDD domain docs, pinned `standards/` submodule, and CI gates from [`docs/conventions/shared/ci.md`](docs/conventions/shared/ci.md). Project docs in LitePress override these standards when they overlap. Use it as a working example when adopting this repository in a new project.
 
 | Repository | Role |
 |:---|:---|
