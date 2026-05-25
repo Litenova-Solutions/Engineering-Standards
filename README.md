@@ -107,10 +107,19 @@ git clone --recursive <YOUR_PROJECT_REPO_URL>
 Example `scripts/bootstrap.ps1`:
 
 ```powershell
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
 git submodule update --init --recursive
+
 Push-Location standards
-git describe --exact-match --tags
+git describe --tags HEAD
 Pop-Location
+
+dotnet tool restore
+pnpm install
+
+Write-Host "Next: pnpm dev:aspire (or see project development guide)"
 ```
 
 ### Project `AGENTS.md` shim

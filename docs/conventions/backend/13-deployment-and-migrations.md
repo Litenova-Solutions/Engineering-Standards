@@ -6,7 +6,19 @@ This document defines local development orchestration, migration safety, environ
 
 ## 0. Local Development with .NET Aspire
 
-.NET Aspire is the standard local development orchestration layer. It replaces manually managed Docker Compose files. Every solution includes an AppHost project that models the entire application topology in code.
+.NET Aspire is the standard local development orchestration layer. It replaces manually managed Docker Compose files for day-to-day local work. Every solution includes an AppHost project that models the entire application topology in code.
+
+### When Docker Compose is still allowed
+
+Docker Compose is **not** the default local Postgres when using AppHost. Keep a `docker-compose.yml` only for:
+
+| Use case | Example |
+|:---|:---|
+| CI service containers | GitHub Actions `services: postgres` |
+| Manual API-only debugging | Fixed port Postgres without Aspire |
+| Local E2E scripts | Mirror CI stack outside AppHost |
+
+Do not run docker-compose Postgres and Aspire Postgres in the same session unless you know which connection string each command targets.
 
 ### Project structure
 
@@ -114,6 +126,16 @@ web.WithReference(api)
 
 Use `GetEndpoint("http")` to pass a service's allocated URL to another resource at startup. Ports are dynamic; do not hard-code them.
 
+**Frontend OAuth and Auth.js secrets.** Inject server-only secrets via AppHost parameters or user secrets, not `NEXT_PUBLIC_*`:
+
+```csharp
+var authGithubId = builder.AddParameter("auth-github-id", secret: true);
+
+admin.WithEnvironment("AUTH_GITHUB_ID", authGithubId);
+```
+
+Projects MAY also use `.env.local` in the frontend app when not running under Aspire. Document both paths in the project environment guide.
+
 **`NEXT_PUBLIC_*` variables are substituted at build time, not at runtime.** Aspire injects environment variables at process startup. Variables prefixed `NEXT_PUBLIC_` are baked into the JavaScript bundle when `next build` runs, so they will not reflect Aspire-injected values in a pre-built container. Use server-only environment variables (no `NEXT_PUBLIC_` prefix) in Server Components and API routes, where `process.env` is read at request time. If client-side code needs a value that Aspire provides, expose it through a server-rendered config endpoint or a Next.js API route.
 
 **Package references for JavaScript hosting:**
@@ -168,17 +190,36 @@ dotnet tool install --global dotnet-ef --version 10.0.0
 
 > The version in `dotnet-tools.json` MUST match the `Microsoft.EntityFrameworkCore` package version in `Directory.Packages.props`. Mismatches produce misleading "no migrations" or "model has changed" errors.
 
-### Running Migrations in the Aspire Development Flow
+### Running Migrations in Local Development
 
-In local development, run migrations manually before starting the AppHost. The Aspire `.WaitFor(database)` call ensures the database container is ready before the API starts, but it does not run migrations:
+Production MUST NOT call `Database.MigrateAsync()` from application startup. Local development has two supported paths:
+
+#### Path A: Aspire (recommended)
+
+When Postgres is Aspire-managed, pick one strategy and document it in a project ADR:
+
+| Strategy | When to use |
+|:---|:---|
+| **Dev-only startup migrate** | Best daily DX. Gate with `IHostEnvironment.IsDevelopment()` and a config flag such as `Database:ApplyMigrationsOnStartup` (default `true` in Development). Integration tests MUST disable the flag. |
+| **Explicit CLI after AppHost starts** | Copy `ConnectionStrings__Database` from the Aspire dashboard, run `dotnet ef database update`, restart the API resource. |
+| **One-shot Aspire init resource** | Run EF update as an AppHost resource that `WaitFor(database)` before the API. |
+
+The Aspire `.WaitFor(database)` call ensures the database container is ready before the API starts; it does not run migrations by itself.
+
+#### Path B: Docker Compose / CI
+
+When Postgres runs via docker-compose or CI service containers with a fixed connection string:
 
 ```bash
+dotnet tool restore
 dotnet ef database update \
     --project apps/api/src/{ProjectName}.Infrastructure \
     --startup-project apps/api/src/{ProjectName}.WebApi
 ```
 
-Do NOT call `Database.MigrateAsync()` from `WebApi/Program.cs` startup in any environment. Migrations are a deployment operation, not a startup operation. For CI/CD, use a migration bundle or a reviewed SQL script as documented in Section 1 of this file.
+#### Production and staging
+
+Do NOT call `Database.MigrateAsync()` from `WebApi/Program.cs` startup in Production or Staging. Use a migration bundle or reviewed SQL script as documented in Section 1 of this file.
 
 **`IDesignTimeDbContextFactory<T>` is required when the DbContext has extra constructor parameters.** If `AppDbContext` takes anything beyond `DbContextOptions<T>` (such as `IEventPublisher`), the tools cannot construct it at design time. Add a factory class in the Infrastructure project:
 
