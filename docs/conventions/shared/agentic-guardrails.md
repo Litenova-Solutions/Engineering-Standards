@@ -54,6 +54,10 @@ Solutions following these standards MUST include {ProjectName}.Architecture.Test
 In monorepos, the .NET solution MUST live under apps/api/, not at the repository root src/. All runnable apps MUST live under apps/. A repo MAY contain multiple frontends and multiple .NET deployables. See `docs/conventions/shared/monorepo-structure.md`.
 </Rule>
 
+<Rule id="CONFLICT_STOP">
+When two normative standards files conflict and no project doc declares an override, stop. Quote both rules and ask for a human decision. Do not invent a compromise.
+</Rule>
+
 <Rule id="PROJECT_DOC_PRECEDENCE">
 When project docs (docs/domain/, app READMEs, project ADRs) overlap these standards, the project document wins. Read standards first, then project docs, then follow the most specific applicable guidance.
 </Rule>

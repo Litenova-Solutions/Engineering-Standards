@@ -140,13 +140,25 @@ permissions:
 
 Never use `permissions: write-all`. Restrict each workflow to the minimum permissions required for its jobs.
 
-Third-party GitHub Actions MUST be pinned to a commit SHA, not a tag:
+Pin GitHub Actions by commit SHA. Tags and branch names are mutable.
+
+| Action source | Pinning rule |
+|:---|:---|
+| Third-party actions (any repo outside your org) | MUST pin full 40-character commit SHA |
+| `actions/*` and `github/*` (GitHub-owned) | SHOULD pin full commit SHA; version tags such as `@v4` are acceptable only when your org policy allows and the tag is documented in the workflow comment |
+| Any action | MUST NOT use `@latest`, `@main`, or floating branch refs |
 
 ```yaml
-# GOOD: pinned to commit SHA
-- uses: actions/checkout@v4  # v4 = sha256:abc123... (update SHA and comment when upgrading)
+# GOOD: third-party action pinned to immutable commit SHA
+- uses: dorny/paths-filter@de90cc6dc764d2d6b48a7891be4eefd4a8c5e4c4 # v3.0.2
 
-# BAD: floating tag, not verified
+# GOOD: GitHub-owned action with documented tag (org policy may require SHA instead)
+- uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+# BAD: third-party action on a mutable tag
+- uses: some-vendor/deploy-action@v2
+
+# BAD: floating reference
 - uses: some-action/tool@latest
 ```
 

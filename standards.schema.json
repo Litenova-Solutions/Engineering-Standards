@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/standards.schema.json",
+  "title": "Engineering Standards Manifest",
+  "type": "object",
+  "required": [
+    "version",
+    "name",
+    "agentsEntry",
+    "conventionsRoot",
+    "blueprintsRoot",
+    "stack",
+    "pinnedNuGetPackages",
+    "pinnedNpmPackages"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[A-Za-z0-9.]+)?$"
+    },
+    "name": { "type": "string" },
+    "agentsEntry": { "type": "string" },
+    "conventionsRoot": { "type": "string" },
+    "blueprintsRoot": { "type": "string" },
+    "runbooksRoot": { "type": "string" },
+    "decisionsRoot": { "type": "string" },
+    "guidesRoot": { "type": "string" },
+    "stack": {
+      "type": "object",
+      "required": ["dotnet", "aspnetcore", "efcore", "nextjs", "react"],
+      "additionalProperties": { "type": "string" }
+    },
+    "sdkPolicy": {
+      "type": "object",
+      "properties": {
+        "rollForward": { "type": "string" },
+        "featureBandUpdateRequires": { "type": "string" }
+      }
+    },
+    "pinnedNuGetPackages": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "pinnedNpmPackages": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "advisories": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "url": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "agentLoadPlans": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -12,6 +12,7 @@ This document is the authoritative guide for all design decisions in the Domain 
 - MUST NOT reference EF Core, ASP.NET Core, or application DTOs in Domain.
 - Repository interfaces live in Domain; implementations live in Infrastructure only.
 - Domain aggregates MUST NOT call `DateTime.UtcNow` directly. Accept `utcNow` as a `DateTimeOffset` parameter from the handler, which gets it from `IClock`.
+- Value object constructors MUST throw `DomainException` subclasses only. MUST NOT throw `CommandValidationException` or reference Application assemblies.
 
 ---
 
@@ -35,7 +36,7 @@ Any class that imports `Microsoft.EntityFrameworkCore`, `Microsoft.AspNetCore.*`
 
 ### Aggregate as Consistency Boundary
 
-Each aggregate is a cluster of objects (the aggregate root and its child entities) that must be kept consistent together. A single transaction modifies a single aggregate. The aggregate root is the only entry point; nothing outside the aggregate calls methods on child entities directly.
+Each aggregate is a cluster of objects (the aggregate root and its child entities) that must be kept consistent together. Commands SHOULD modify one aggregate per transaction unless a use-case doc or ADR documents a cross-aggregate invariant that requires immediate consistency. The aggregate root is the only entry point; nothing outside the aggregate calls methods on child entities directly.
 
 ### Reference by ID
 
@@ -68,6 +69,10 @@ interface IPostRepository
     Task AddAsync(Post post, CancellationToken cancellationToken);
     Task UpdateAsync(Post post, CancellationToken cancellationToken);
 }
+
+// Repository interfaces MUST NOT expose IQueryable, paging DTOs, EF tracking
+// semantics, or persistence-specific options. Keep signatures aggregate-specific
+// and minimal.
 
 // BAD: repository interface in Application layer
 // Application layer now owns a contract expressed in Domain types,
@@ -484,24 +489,31 @@ sealed record PostTitle
 
     public PostTitle(string value)
     {
-        // By the time a value object is constructed, the command validator
-        // has already verified structural constraints (non-empty, max length).
-        // The value object enforces the same rules as a last-resort defence
-        // for direct domain usage outside the command pipeline.
+        // Command validators reject structurally invalid input before construction.
+        // The value object enforces invariants as last-resort defence for direct
+        // domain usage outside the command pipeline. Domain MUST NOT reference
+        // Application.Write.Contracts, so failures here use DomainException subclasses.
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new PostTitleRequiredException();
+            throw new PostTitleEmptyException();
         }
 
         if (value.Length > 200)
         {
-            throw new PostTitleTooLongException(value.Length);
+            throw new PostTitleExceedsMaximumLengthException(value.Length);
         }
 
         Value = value;
     }
 
     public static implicit operator string(PostTitle title) => title.Value;
+}
+
+// Domain/Posts/Exceptions/PostTitleEmptyException.cs
+public sealed class PostTitleEmptyException : DomainException
+{
+    public PostTitleEmptyException()
+        : base("A post title is required and cannot be empty.") { }
 }
 
 // BAD:

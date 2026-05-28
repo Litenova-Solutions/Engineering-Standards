@@ -2,6 +2,8 @@
 
 This document defines the security baseline requirements for all projects following these standards. These rules are non-negotiable. Violations MUST be caught in code review before any PR is merged.
 
+For the OWASP ASVS / API Top 10 control catalog, enforcement mapping, and CI gate checklist, see `docs/conventions/shared/security-controls.md`. Object-level authorization tests: `docs/conventions/backend/20-object-authorization.md`.
+
 ---
 
 ## 1. Never Commit Secrets

@@ -24,23 +24,43 @@ When implementing a use case in a project that consumes these standards (for exa
 
 ## Tech Stack
 
-| Technology | Version / Notes |
+Package and framework versions are defined only in `standards.manifest.json`. Read `stack`, `pinnedNuGetPackages`, and `pinnedNpmPackages` before changing dependencies. Do not copy version numbers from prose in other files.
+
+| Area | Source in manifest |
 |:---|:---|
-| .NET | 10 (check `apps/api/global.json`) |
-| ASP.NET Core | 10, Minimal APIs only |
-| EF Core | 10 |
-| LiteBus | 4.3.x modular packages; `ICommandMediator` / `IQueryMediator` only in endpoints |
-| PostgreSQL | Primary database; `snake_case` via `.UseSnakeCaseNamingConventions()` |
-| Next.js | 16.2.6 (latest 16.x security patch) |
-| React | 19.2.6 (match react-server-dom patch with Next.js advisory) |
-| TypeScript | 6.0.x, `moduleResolution: bundler` |
-| TanStack Query | 5.100.10; `@tanstack/query*` confirmed clean in GHSA-g7cv-rxg3-hmpx |
-| Zustand | 5.0.13 (UI state only) |
-| Zod | 4.4.3; import from `"zod"`; `z.email()`, `z.uuid()`, `z.url()` |
-| Tailwind CSS | 4.3.x, CSS-first `@theme`, no `tailwind.config.js` |
-| shadcn/ui | CLI v4 default UI; `sonner` for toasts; generated primitives use `@base-ui/react` (style `base-nova`) unless a project ADR picks another shadcn style |
-| OpenAPI | `Microsoft.AspNetCore.OpenApi` for spec generation |
-| API docs UI (dev) | `Scalar.AspNetCore` mapped in Development; not Swashbuckle by default |
+| .NET SDK | `stack.dotnet` → `global.json` |
+| ASP.NET Core / EF Core | `stack.aspnetcore`, `stack.efcore`, `pinnedNuGetPackages` |
+| Frontend | `stack.nextjs`, `stack.react`, `pinnedNpmPackages` |
+| Tooling | `pinnedNuGetPackages`, `pinnedNpmPackages` |
+
+Architectural constraints (not version pins): Minimal APIs only, PostgreSQL with `snake_case`, CQRS split Application projects, Scalar for dev API docs UI.
+
+## Conflict Resolution
+
+When two normative files conflict:
+
+1. Stop. Do not invent a compromise.
+2. Quote both conflicting rules with file paths.
+3. Prefer the more specific project document only when it explicitly declares an override.
+4. If no explicit override exists, ask for a human decision.
+
+## Pre-Edit Checkpoint
+
+Before editing code in a consumer repository:
+
+1. Confirm task scope and planned files.
+2. Load required conventions (see `agentLoadPlans` in `standards.manifest.json`).
+3. Identify the layer and any project-specific overrides in `docs/domain/`.
+4. Inspect existing local patterns; prefer minimal diffs.
+5. Stop without approval if the change requires a new package, migration, auth model change, or public API break.
+
+When existing code violates standards, report the deviation unless the task is explicitly a standards migration.
+
+## Preserve Existing Patterns
+
+- Read conventions before editing, but match established patterns in the target file when they differ from newer examples.
+- Do not rewrite unrelated files to match standards unless the task is a standards migration.
+- Do not mass-fix legacy violations unless asked.
 
 ## Project Map
 
@@ -84,7 +104,7 @@ Projects MAY define additional apps under `apps/` (multiple frontends, workers, 
 - MUST NOT accept actor IDs from request bodies when the actor is the authenticated user. Actor identity comes from validated JWT claims only.
 - MUST NOT use `configuration["Key"]!` directly; all config access goes through validated options classes and `IOptions<T>`.
 - MUST use `FromSqlInterpolated` for raw SQL; MUST NOT concatenate SQL strings.
-- Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; no business logic in `proxy.ts`; no `useMemo`/`useCallback`/`React.memo` with React Compiler; no server data in Zustand or `useEffect` fetch; no cross-feature imports; no `TODO`/`FIXME`/stubs; max 300 lines per file; no arbitrary Tailwind values; env vars only via `lib/env.ts`.
+- Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; see `docs/conventions/frontend/` for data fetching, state, Tailwind, and file-size guidance; no cross-feature imports; env vars only via `lib/env.ts`.
 
 ## Convention File Index
 
@@ -111,6 +131,9 @@ Projects MAY define additional apps under `apps/` (multiple frontends, workers, 
 | Concurrency | `docs/conventions/backend/17-concurrency.md` |
 | Soft delete | `docs/conventions/backend/18-soft-delete.md` |
 | Raw SQL | `docs/conventions/backend/19-raw-sql-and-reporting.md` |
+| Object authorization | `docs/conventions/backend/20-object-authorization.md` |
+| API compatibility | `docs/conventions/shared/api-compatibility.md` |
+| Security controls | `docs/conventions/shared/security-controls.md` |
 | CI / CD | `docs/conventions/shared/ci.md`, `ci-cd.md` |
 | Local IDE setup | `docs/conventions/shared/local-ide-setup.md` |
 | Security | `docs/conventions/shared/security.md` |

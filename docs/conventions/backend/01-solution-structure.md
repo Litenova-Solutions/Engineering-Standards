@@ -63,6 +63,16 @@ Every solution MUST include a `global.json` at the solution root that pins the .
 
 `rollForward: latestPatch` allows patch-level SDK updates (10.0.101, 10.0.102) without requiring a `global.json` update, while preventing major or minor version drift. This ensures all contributors and CI agents use the same SDK minor version.
 
+### SDK feature-band update policy
+
+| Change | Who approves | Action |
+|:---|:---|:---|
+| Patch SDK within feature band (`10.0.100` → `10.0.108`) | Platform owner or Renovate/Dependabot PR | Update `global.json` `sdk.version` when adopting a new patch; `rollForward: latestPatch` may pick patches automatically |
+| Feature band bump (`10.0.100` → `10.0.200`) | Platform owner ADR or standards release | Update `standards.manifest.json` `stack.dotnet`, template `global.json`, and release notes |
+| Major .NET version | Standards major release | Update manifest, templates, and consumer upgrade guide |
+
+Check [Microsoft .NET support policy](https://dotnet.microsoft.com/en-us/platform/support/policy) before bumping SDK or runtime versions.
+
 This file MUST be committed to source control. It MUST NOT appear in `.gitignore`.
 
 ---
@@ -79,12 +89,11 @@ A `Directory.Build.props` file at the solution root sets metadata shared across 
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 </Project>
 ```
 
-`TreatWarningsAsErrors` ensures that nullable reference warnings, unused variable warnings, and similar issues are build failures, not silent warnings. `LangVersion: preview` enables the latest C# language features on the .NET 10 SDK.
+`TreatWarningsAsErrors` ensures that nullable reference warnings, unused variable warnings, and similar issues are build failures, not silent warnings. Do not set `LangVersion` to `preview` in production projects. The SDK default language version for the pinned .NET release is the standard. Use `LangVersion=preview` only when a project ADR documents an experimental repository.
 
 `EnforceCodeStyleInBuild` promotes IDE-only style rules to build-time errors. The following rules are enforced and **will cause build failures** if violated:
 

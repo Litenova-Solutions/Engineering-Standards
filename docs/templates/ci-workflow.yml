@@ -86,6 +86,23 @@ jobs:
 
       - run: git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
 
+  # Optional: enable for public or independently consumed APIs.
+  # openapi-breaking-diff:
+  #   name: OpenAPI breaking change diff
+  #   runs-on: ubuntu-latest
+  #   needs: [backend-checks]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - uses: actions/setup-dotnet@v4
+  #       with:
+  #         global-json-file: apps/api/global.json
+  #     - run: dotnet build apps/api/{ProjectName}.slnx --configuration Release
+  #     - run: cp apps/api/src/{ProjectName}.WebApi/bin/Release/net10.0/openapi.json /tmp/openapi-current.json
+  #     - run: cp packages/api-types/openapi.baseline.json /tmp/openapi-baseline.json
+  #     - run: npx --yes oasdiff@latest breaking /tmp/openapi-baseline.json /tmp/openapi-current.json
+
   playwright:
     name: Playwright E2E
     runs-on: ubuntu-latest

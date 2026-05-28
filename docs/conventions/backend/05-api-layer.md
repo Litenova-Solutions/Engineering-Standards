@@ -382,6 +382,10 @@ app.MapPost("/posts", HandleAsync)
 
 Endpoints with no OpenAPI documentation MUST NOT be merged to `main`.
 
+Public and independently consumed APIs MUST also pass OpenAPI breaking-change diff checks. See `docs/conventions/shared/api-compatibility.md`.
+
+Every operation MUST have a stable `operationId` (use `.WithName()` consistently).
+
 ---
 
 ## API Versioning
@@ -515,7 +519,7 @@ Default URLs (ASP.NET Core OpenAPI versioning):
 | OpenAPI JSON | `/openapi/v1.json` |
 | Scalar UI | `/scalar/v1` |
 
-Do not use Swashbuckle for new .NET 10 APIs unless a project ADR documents a legacy requirement. Swashbuckle.AspNetCore remains available but is not the platform default.
+Do not use Swashbuckle for new .NET 10 APIs unless a project ADR documents a legacy requirement. Swashbuckle.AspNetCore remains available but is not the platform default. Existing Swashbuckle projects SHOULD follow the migration steps in `docs/conventions/shared/api-compatibility.md`.
 
 Gate Scalar (and any docs UI) to non-production environments unless a project ADR documents a public API portal.
 

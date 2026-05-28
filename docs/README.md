@@ -7,6 +7,11 @@ Use this map to load the right files. Agents MUST follow `AGENTS.md` at the repo
 | Path | Purpose |
 |:---|:---|
 | `conventions/` | MUST/MUST NOT rules and code examples |
+| `conventions/shared/security-controls.md` | OWASP control matrix and CI security gates |
+| `conventions/shared/api-compatibility.md` | OpenAPI diff and breaking-change policy |
+| `conventions/backend/20-object-authorization.md` | BOLA prevention and auth test matrix |
+| `controls/enforcement-matrix.md` | Rule-to-tool automation mapping |
+| `governance/` | Versioning, exceptions, release process |
 | `architecture/clean-architecture.md` | Layer diagram and dependency rules |
 | `guides/agentic-domain-driven-design.md` | Domain doc tree and agent workflow |
 | `guides/add-new-use-case.md` | Use case implementation playbook |
