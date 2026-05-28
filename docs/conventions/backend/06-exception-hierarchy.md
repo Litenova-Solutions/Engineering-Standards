@@ -163,7 +163,7 @@ public sealed class PostAlreadyPublishedException : DomainException
 }
 
 // CommandValidationException subclasses (in Application.Write.Contracts/Posts/Exceptions/)
-// PostTitleRequiredException — thrown by command validator (and as last-resort defence in the value object)
+// PostTitleRequiredException — thrown by command validator only
 public sealed class PostTitleRequiredException : CommandValidationException
 {
     public PostTitleRequiredException()
@@ -175,6 +175,19 @@ public sealed class PostTitleTooLongException : CommandValidationException
 {
     public PostTitleTooLongException(int length)
         : base($"Post title cannot exceed 200 characters (was {length}).", nameof(CreatePostCommand.Title)) { }
+}
+
+// DomainException subclasses for value object last-resort defence (in Domain/Posts/Exceptions/)
+public sealed class PostTitleEmptyException : DomainException
+{
+    public PostTitleEmptyException()
+        : base("A post title is required and cannot be empty.") { }
+}
+
+public sealed class PostTitleExceedsMaximumLengthException : DomainException
+{
+    public PostTitleExceedsMaximumLengthException(int length)
+        : base($"Post title cannot exceed 200 characters (was {length}).") { }
 }
 
 // QueryValidationException subclass (in Application.Read.Contracts/Posts/Exceptions/)
@@ -214,10 +227,10 @@ Endpoints MUST NOT contain `try-catch` blocks. All unhandled exceptions flow thr
 
 | Exception type | HTTP status | Response detail |
 |:---|:---|:---|
-| `CommandValidationException` | 400 | `invalidParams` array (see below) |
-| `QueryValidationException` | 400 | `invalidParams` array (see below) |
-| `AggregateNotFoundException` | 404 | `exception.Message` |
-| `DomainException` | 409 | `exception.Message` |
+| `CommandValidationException` | 400 | `invalidParams` array, `errorCode`, optional `traceId` (see below) |
+| `QueryValidationException` | 400 | `invalidParams` array, `errorCode`, optional `traceId` |
+| `AggregateNotFoundException` | 404 | `errorCode`, `detail`, optional `traceId` |
+| `DomainException` | 409 | `errorCode`, `detail`, optional `traceId` |
 | `DbUpdateConcurrencyException` | 409 | Fixed conflict message (no exception text) |
 | All other exceptions | 500 | Generic message only (see security note) |
 
@@ -261,7 +274,12 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                  {
                      Status = StatusCodes.Status404NotFound,
                      Title = "Resource not found.",
-                     Detail = exception.Message
+                     Detail = exception.Message,
+                     Extensions =
+                     {
+                         ["errorCode"] = "resource.not_found",
+                         ["traceId"] = httpContext.TraceIdentifier
+                     }
                  }),
 
             DomainException =>
@@ -271,7 +289,12 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
                  {
                      Status = StatusCodes.Status409Conflict,
                      Title = "Conflict",
-                     Detail = exception.Message
+                     Detail = exception.Message,
+                     Extensions =
+                     {
+                         ["errorCode"] = "domain.conflict",
+                         ["traceId"] = httpContext.TraceIdentifier
+                     }
                  }),
 
             DbUpdateConcurrencyException =>
@@ -325,6 +348,8 @@ internal sealed class GlobalExceptionHandler : IExceptionHandler
             status = StatusCodes.Status400BadRequest,
             detail = "One or more fields failed validation.",
             instance = httpContext.Request.Path.Value,
+            errorCode = "validation.failed",
+            traceId = httpContext.TraceIdentifier,
             invalidParams = validationErrors.Select(e => new
             {
                 name = ToCamelCase(e.PropertyName),
@@ -357,16 +382,42 @@ app.UseExceptionHandler();
 
 ---
 
+## Stable Error Codes
+
+Problem Details responses SHOULD include a machine-readable `errorCode` extension for expected failures:
+
+| Category | Suggested `errorCode` |
+|:---|:---|
+| Validation | `validation.failed` (plus field-level `invalidParams`) |
+| Not found | `resource.not_found` or aggregate-specific code in subclass |
+| Domain conflict | `domain.conflict` or aggregate-specific code |
+| Concurrency | `concurrency.conflict` |
+
+Include `traceId` from `HttpContext.TraceIdentifier` for support correlation. Keep `detail` human-readable. Frontend clients SHOULD branch on `errorCode`, not on `title` or `detail` text.
+
+Concrete exception subclasses MAY define more specific codes (for example `post.already_published`) when the frontend needs distinct handling.
+
+---
+
 ## Throw Site Contract
 
 | Exception Category | Thrown By | Never Thrown By |
 |:---|:---|:---|
-| `CommandValidationException` | `ICommandValidator<TCommand>` implementations; value object constructors (last-resort defence) | Handlers, repositories, query validators |
+| `CommandValidationException` | `ICommandValidator<TCommand>` implementations | Handlers, repositories, query validators, value objects, aggregates |
 | `QueryValidationException` | `IQueryValidator<TQuery>` implementations | Handlers, aggregates, repositories, command validators |
 | `AggregateNotFoundException` | Repository `GetByIdAsync` implementations | Handlers, validators, aggregates, endpoints |
-| `DomainException` | Aggregate root methods | Handlers, validators, repositories, endpoints |
+| `DomainException` | Aggregate root methods; value object constructors (last-resort invariant defence) | Handlers, validators, repositories, endpoints |
 
-> **Intentional duplication in validators and value objects.** The same validation rule (e.g., empty title) appears in both the command validator and the value object constructor. The validator provides a structured 400 response with `invalidParams`. The value object provides a last-resort defence for direct domain usage outside the command pipeline. Both throw `PostTitleRequiredException` (`CommandValidationException`). This duplication is deliberate.
+### Validators and value objects
+
+The same structural rule (for example, empty title) MAY appear in both a command validator and a value object constructor:
+
+- The **validator** throws `CommandValidationException` subclasses and produces structured HTTP 400 responses with `invalidParams`.
+- The **value object** throws `DomainException` subclasses as last-resort defence when domain code constructs the type outside the command pipeline.
+
+Domain value objects MUST NOT reference `Application.Write.Contracts` or throw validation exception types from Application assemblies. See `docs/conventions/00-principles.md` (Input Validation vs. Invariant Enforcement).
+
+Concrete exceptions MAY share similar messages across layers but MUST use the correct base class for their layer.
 
 ---
 

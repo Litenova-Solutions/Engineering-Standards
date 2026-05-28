@@ -6,7 +6,18 @@ This document defines local development orchestration, migration safety, environ
 
 ## 0. Local Development with .NET Aspire
 
-.NET Aspire is the standard local development orchestration layer. It replaces manually managed Docker Compose files for day-to-day local work. Every solution includes an AppHost project that models the entire application topology in code.
+.NET Aspire is the **default** local development orchestration layer for **full-stack** and **distributed** projects. It replaces manually managed Docker Compose files for day-to-day local work when multiple services or containers are involved.
+
+### Project tier exceptions
+
+| Project type | Local orchestration |
+|:---|:---|
+| Full-stack app (API + web + database) | Aspire AppHost (default) |
+| Distributed app (API + Worker + dependencies) | Aspire AppHost (default) |
+| API-only service | `dotnet run` WebApi + Docker Compose or Testcontainers Postgres |
+| Library-only (no runnable host) | No AppHost required |
+
+Document the chosen tier in the project README. See `docs/governance/exceptions.md` for waiver process.
 
 ### When Docker Compose is still allowed
 

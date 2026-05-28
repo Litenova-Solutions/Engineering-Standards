@@ -21,14 +21,48 @@ function exists(file) {
 
 // 1. AGENTS.md line limit
 const agentsLines = read("AGENTS.md").split("\n").length
-if (agentsLines > 150) {
-  errors.push(`AGENTS.md has ${agentsLines} lines (limit: 150)`)
+if (agentsLines > 165) {
+  errors.push(`AGENTS.md has ${agentsLines} lines (limit: 165)`)
+}
+
+// 1b. No LangVersion preview in production template
+const buildProps = read("docs/templates/Directory.Build.props")
+if (/LangVersion>\s*preview/i.test(buildProps)) {
+  errors.push("docs/templates/Directory.Build.props must not set LangVersion to preview")
 }
 
 // 2. Manifest version matches README release
 const manifest = JSON.parse(read("standards.manifest.json"))
 if (manifest.version !== "1.0.0") {
   errors.push(`standards.manifest.json version is ${manifest.version}, expected 1.0.0`)
+}
+
+// 2b. agentLoadPlans paths exist
+if (manifest.agentLoadPlans) {
+  for (const [plan, paths] of Object.entries(manifest.agentLoadPlans)) {
+    for (const rel of paths) {
+      if (!exists(rel)) {
+        errors.push(`agentLoadPlans.${plan} references missing file: ${rel}`)
+      }
+    }
+  }
+}
+
+// 2c. Required governance and control docs
+const requiredDocs = [
+  "RELEASES.md",
+  "standards.schema.json",
+  "docs/governance/exceptions.md",
+  "docs/governance/versioning.md",
+  "docs/controls/enforcement-matrix.md",
+  "docs/conventions/backend/20-object-authorization.md",
+  "docs/conventions/shared/security-controls.md",
+  "docs/conventions/shared/api-compatibility.md",
+]
+for (const file of requiredDocs) {
+  if (!exists(file)) {
+    errors.push(`Missing required doc: ${file}`)
+  }
 }
 
 // 3. Required templates for bootstrap

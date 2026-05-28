@@ -1,14 +1,29 @@
 # Background Jobs
 
-This document defines the standard for scheduled work, queued work, and long-running background processing.
+This document defines job **implementation** patterns: interfaces, loops, scheduling, and durable job tables. It does not define **where jobs are hosted**. Hosting rules live in `docs/conventions/backend/14-worker-projects.md`.
 
 > This convention depends on `docs/conventions/backend/10-reliability.md` for retry and idempotency rules.
 
 ---
 
-## 1. Default Choice
+## 1. Implementation vs. Host
 
-Use ASP.NET Core hosted services for background jobs. A hosted service is enough for:
+| Concern | Location | Hosted in |
+|:---|:---|:---|
+| Job interface | `Application.Write.Contracts` or `Application.Reactions` | N/A |
+| Job implementation and `BackgroundService` loop classes | `Infrastructure/BackgroundJobs/` | `{ProjectName}.Worker` for durable loops |
+| DI registration for job services | `Infrastructure/DependencyInjection/` | Worker registers hosted services; WebApi registers only allow-listed request-adjacent services |
+| Endpoint that enqueues work | `WebApi`, using `ICommandMediator` | WebApi |
+
+**WebApi MUST NOT host durable background loops** (outbox dispatch, scheduled reconciliation, queue consumers). Those loops run in `{ProjectName}.Worker`.
+
+WebApi MAY host only non-durable, request-adjacent hosted services when a project ADR documents the exception (for example, warming a local cache on startup). Default: no `BackgroundService` in WebApi.
+
+---
+
+## 2. Default Choice
+
+Use ASP.NET Core `BackgroundService` for background work. A hosted service is enough for:
 
 - Periodic reconciliation.
 - Outbox dispatch.
@@ -20,21 +35,22 @@ Do not add Hangfire, Quartz, MassTransit, Azure Service Bus, RabbitMQ, or anothe
 
 ---
 
-## 2. Where Code Lives
+## 3. Where Code Lives
 
 | Concern | Location |
 |:---|:---|
 | Job interface used by application code | `Application.Write.Contracts` or `Application.Reactions` when needed |
 | Job implementation | `Infrastructure/BackgroundJobs/` |
 | Hosted service loop | `Infrastructure/BackgroundJobs/` |
-| Job registration | `Infrastructure/DependencyInjection/InfrastructureServiceRegistration.cs` |
+| Job service registration | `Infrastructure/DependencyInjection/InfrastructureServiceRegistration.cs` |
+| Hosted service registration | `{ProjectName}.Worker/Program.cs` (not WebApi for durable loops) |
 | Endpoint that enqueues work | `WebApi`, using `ICommandMediator` |
 
 Background job implementations may depend on Infrastructure services and `AppDbContext`. They MUST NOT contain domain rules. Domain rules stay in aggregates and commands.
 
 ---
 
-## 3. Hosted Service Pattern
+## 4. Hosted Service Pattern
 
 Hosted services are singletons. They MUST create a scope before resolving scoped services such as `AppDbContext`, repositories, or application services.
 
@@ -102,14 +118,17 @@ internal sealed class OutboxDispatcherHostedService : BackgroundService
 }
 ```
 
-Register the hosted service in Infrastructure:
+Register job services in Infrastructure. Register the hosted service in **Worker**, not WebApi:
 
 ```csharp
+// Infrastructure/DependencyInjection/InfrastructureServiceRegistration.cs
 services.AddScoped<IOutboxDispatcher, OutboxDispatcher>();
+
+// Worker/Program.cs
 services.AddHostedService<OutboxDispatcherHostedService>();
 ```
 
-### 3.1 EF Core Change Tracker and Memory Management
+### 4.1 EF Core Change Tracker and Memory Management
 
 Hosted services process data iteratively over long runtimes. If a background job queries and processes database records inside an iteration, EF Core's active change tracker tracks every retrieved aggregate in memory. Over hours, this causes silent memory accumulation, slowing query speeds and leading to eventual `OutOfMemoryException` crashes. Furthermore, tracked entities can trigger unintended dirty updates if properties are modified in memory and a save operation is called subsequently.
 
@@ -150,7 +169,7 @@ protected override async Task ExecuteAsync(CancellationToken cancellationToken)
 
 ---
 
-## 4. Scheduling Rules
+## 5. Scheduling Rules
 
 Use `PeriodicTimer` for simple recurring jobs. Do not use `System.Threading.Timer` for async work.
 
@@ -165,7 +184,7 @@ Every job MUST:
 
 ---
 
-## 5. Durable Job Table
+## 6. Durable Job Table
 
 When queued work must survive process restarts, store it in PostgreSQL. Do not rely on an in-memory queue for durable business work.
 
@@ -186,7 +205,7 @@ Workers MUST claim jobs with a database-level lease so multiple app instances do
 
 ---
 
-## 6. What Not To Put In Background Jobs
+## 7. What Not To Put In Background Jobs
 
 Background jobs MUST NOT bypass the application layer for business use cases.
 

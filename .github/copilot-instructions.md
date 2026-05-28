@@ -12,6 +12,8 @@ The canonical agent guide is `AGENTS.md` at the repository root (or `standards/A
 
 ## Non-Negotiable Rules
 
+- **Versions:** Read `standards.manifest.json` only; do not copy versions from prose.
+- **Conflicts:** Stop and ask when normative files conflict without an explicit project override (`AGENTS.md`).
 - **IEndpoint only.** Never generate MVC controllers.
 - **IDatabaseContext for queries.** Never load aggregates or inject repositories in query handlers.
 - **Correct exceptions.** See `docs/conventions/backend/06-exception-hierarchy.md`.

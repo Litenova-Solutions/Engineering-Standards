@@ -50,9 +50,9 @@ If you find yourself needing to reference an outer layer from an inner layer, th
 
 ## 4. Aggregate as Consistency Boundary
 
-A single database transaction **MUST** modify a single aggregate. If an operation appears to require modifying two aggregates in one transaction, either the aggregate boundaries are wrong or the operation **MUST** be modeled as a domain event that triggers a separate handler.
+Commands SHOULD modify one aggregate per transaction. Cross-aggregate writes in a single transaction require a documented invariant in the use-case doc or an ADR. Cross-aggregate side effects SHOULD use domain events or integration events rather than loading multiple aggregate roots in one command when immediate consistency is not required.
 
-Cross-aggregate coordination happens via domain events, not by loading multiple aggregates in the same command handler and saving both. The transaction boundary is the aggregate, not the use case.
+If an operation appears to require modifying two aggregates in one transaction, first verify aggregate boundaries. When immediate, local consistency is required and documented, a single transaction MAY span multiple aggregates.
 
 ---
 
@@ -183,5 +183,7 @@ When guidance overlaps:
 4. **These standards** win when project docs are silent.
 
 Agents and engineers MUST read standards first, then project docs, and follow the most specific applicable document. If project docs intentionally diverge from a standard (different UI library, extra frontend app, alternate API docs UI), the project doc MUST state the override explicitly.
+
+When two **standards** files conflict and neither is a project override, stop and follow the conflict protocol in `AGENTS.md`. Do not invent a compromise.
 
 During co-development of standards and a reference app, treat the latest committed text in both repositories as authoritative. Prefer current package versions in `standards.manifest.json` and project lockfiles over older examples in either repo.

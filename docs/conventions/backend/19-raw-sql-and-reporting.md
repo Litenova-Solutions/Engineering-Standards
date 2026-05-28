@@ -231,7 +231,16 @@ When using `Database.SqlQueryRaw<T>` (EF Core 8+), manual parameterization with 
 
 ## 7. Performance Review Requirements
 
-Raw SQL that is merged to the main branch MUST include evidence that the query uses an appropriate index. The pull request description MUST include the `EXPLAIN (ANALYZE, BUFFERS)` output from a representative dataset or a comment confirming the relevant index exists.
+Raw SQL merged to the main branch MUST include evidence that the query uses an appropriate index. The pull request description MUST include:
+
+| Field | Requirement |
+|:---|:---|
+| `EXPLAIN (ANALYZE, BUFFERS)` output | From a **sanitized** plan (no production PII in literals or row samples) |
+| Dataset size | Minimum representative row count (state table name and approximate rows) |
+| Statement timeout | Expected `statement_timeout` for this query in production |
+| Index evidence | Link to migration or index definition if not obvious from the plan |
+
+Redact or parameterize literals that contain customer data before pasting plans into PRs.
 
 This prevents hot-path queries from performing sequential scans in production.
 

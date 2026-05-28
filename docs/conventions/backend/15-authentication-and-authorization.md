@@ -352,24 +352,26 @@ Endpoints MUST NOT return 401 or 403 by catching exceptions or calling `Results.
 
 ## 9. Resource-Based Authorization
 
-When authorization depends on domain data (for example, "only the author can edit their own post"), use resource-based checks inside the endpoint handler after loading the resource.
+When authorization depends on domain data (for example, "only the author can edit their own post"), verify object-level access before dispatching commands. See `docs/conventions/backend/20-object-authorization.md` for the mandatory test matrix.
+
+### Endpoint check (simple cases)
 
 ```csharp
 private static async Task<IResult> HandleAsync(
     Guid id,
     UpdatePostRequest request,
     HttpContext httpContext,
+    IQueryMediator queryMediator,
     ICommandMediator commandMediator,
     CancellationToken cancellationToken)
 {
     var postId = new PostId(id);
     var actorId = httpContext.User.GetUserId();
 
-    // Load the post first to check ownership
-    var post = await commandMediator.SendAsync(
+    var owner = await queryMediator.QueryAsync(
         new GetPostOwnerQuery { PostId = postId }, cancellationToken);
 
-    if (post.AuthorId != actorId.Value)
+    if (owner.AuthorId != actorId.Value)
     {
         return Results.Forbid();
     }
@@ -381,4 +383,10 @@ private static async Task<IResult> HandleAsync(
 }
 ```
 
-Resource-based authorization MUST NOT embed ownership logic in the Domain layer. It lives in the endpoint handler where the HTTP context is available.
+Queries MUST use `IQueryMediator`. Commands MUST use `ICommandMediator`.
+
+### Repeated ownership checks
+
+When the same ownership rule appears on multiple endpoints, extract an ASP.NET Core authorization handler or a project-owned `IResourceAuthorizationService` in `WebApi/Auth/`. The handler MAY dispatch read queries through `IQueryMediator` to load ownership facts. Domain aggregates MAY expose ownership data (for example `AuthorId`) but MUST NOT reference HTTP context or JWT claims.
+
+Resource-based authorization MUST NOT embed HTTP or claims logic in the Domain layer.

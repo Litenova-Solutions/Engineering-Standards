@@ -47,7 +47,17 @@ flowchart LR
 
 ## Versioning philosophy
 
-**v1.0.0** will be the first pinned release tag. Until then, `main` is the working baseline. There is no `CHANGELOG.md` before **v2.0.0**; release notes for v1.x are captured in GitHub Release descriptions only.
+**v1.0.0** will be the first pinned release tag. Until a GitHub Release exists, consumers MUST pin an exact commit SHA (not a moving branch). Record the SHA with `git rev-parse HEAD` inside the submodule at adoption time.
+
+Pre-v1 example:
+
+```bash
+git submodule add <YOUR_STANDARDS_REPO_URL> standards
+cd standards && git checkout <40-char-commit-sha> && cd ..
+git add standards && git commit -m "chore: pin engineering-standards to commit abc123..."
+```
+
+After **v1.0.0-rc.1** or **v1.0.0** is published, switch to semver tags. See [`RELEASES.md`](RELEASES.md) for prerelease notes. There is no `CHANGELOG.md` before **v2.0.0**; release notes for v1.x are captured in GitHub Release descriptions and `RELEASES.md`.
 
 | Semver | Meaning |
 |:---|:---|
@@ -63,7 +73,7 @@ Check `standards.manifest.json` at the tag you pin for machine-readable paths.
 
 ## How to consume this repository
 
-Pick one approach for your repository type. All approaches MUST pin a **semver tag**, not a moving branch.
+Pick one approach for your repository type. After the first release tag exists, all approaches MUST pin a **semver tag**, not a moving branch. Before the first release, pin an exact **commit SHA** as described above.
 
 ### Consumption matrix
 
@@ -153,8 +163,12 @@ Full gate list: [`docs/conventions/shared/ci.md`](docs/conventions/shared/ci.md)
 engineering-standards/
 ├── AGENTS.md                 Agent contract (read first)
 ├── standards.manifest.json   Version and paths for tooling
+├── standards.schema.json     JSON schema for manifest validation
+├── RELEASES.md               v1 release notes (pre-CHANGELOG)
 ├── docs/
 │   ├── README.md             Documentation map
+│   ├── governance/           Versioning, exceptions, adoption
+│   ├── controls/             Enforcement matrix
 │   ├── architecture/       Structural guide
 │   ├── conventions/        Normative rules (agents load these)
 │   ├── decisions/          Why choices were made (humans / new deps)

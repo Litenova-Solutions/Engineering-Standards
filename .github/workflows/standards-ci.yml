@@ -28,7 +28,7 @@ jobs:
       - name: Manifest JSON schema sanity
         run: node -e "
           const m = require('./standards.manifest.json');
-          const required = ['version','agentsEntry','conventionsRoot','blueprintsRoot','stack','pinnedNuGetPackages'];
+          const required = ['version','agentsEntry','conventionsRoot','blueprintsRoot','stack','pinnedNuGetPackages','agentLoadPlans'];
           for (const k of required) {
             if (!(k in m)) { console.error('Missing manifest key:', k); process.exit(1); }
           }

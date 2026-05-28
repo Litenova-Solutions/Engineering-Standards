@@ -80,5 +80,51 @@
       "description": "84 malicious versions across 42 @tanstack/* packages (May 2026). @tanstack/query* confirmed clean. Audit all @tanstack/* versions before install or upgrade.",
       "url": "https://github.com/advisories/GHSA-g7cv-rxg3-hmpx"
     }
+  },
+  "sdkPolicy": {
+    "rollForward": "latestPatch",
+    "featureBandUpdateRequires": "platform-owner-approval-or-standards-minor-release"
+  },
+  "agentLoadPlans": {
+    "backend.domain": [
+      "AGENTS.md",
+      "docs/architecture/clean-architecture.md",
+      "docs/conventions/00-principles.md",
+      "docs/conventions/backend/02-domain-layer.md",
+      "docs/conventions/backend/06-exception-hierarchy.md"
+    ],
+    "backend.api": [
+      "AGENTS.md",
+      "docs/architecture/clean-architecture.md",
+      "docs/conventions/backend/05-api-layer.md",
+      "docs/conventions/backend/15-authentication-and-authorization.md",
+      "docs/conventions/backend/20-object-authorization.md",
+      "docs/conventions/shared/security.md",
+      "docs/conventions/shared/api-compatibility.md"
+    ],
+    "backend.infrastructure": [
+      "AGENTS.md",
+      "docs/architecture/clean-architecture.md",
+      "docs/conventions/backend/04-infrastructure-layer.md",
+      "docs/conventions/backend/11-background-jobs.md",
+      "docs/conventions/backend/14-worker-projects.md"
+    ],
+    "backend.testing": [
+      "AGENTS.md",
+      "docs/conventions/backend/08-testing.md",
+      "docs/conventions/shared/ci.md"
+    ],
+    "frontend.app": [
+      "AGENTS.md",
+      "docs/conventions/frontend/01-nextjs-app-router.md",
+      "docs/conventions/frontend/03-data-fetching.md",
+      "docs/conventions/frontend/07-feature-boundaries.md"
+    ],
+    "security.review": [
+      "AGENTS.md",
+      "docs/conventions/shared/security.md",
+      "docs/conventions/shared/security-controls.md",
+      "docs/conventions/shared/supply-chain-security.md"
+    ]
   }
 }
