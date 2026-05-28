@@ -72,6 +72,35 @@ internal sealed class GetPostByIdQueryHandler
 
 ## 3. Writing Projections
 
+### Aggregate state (TPH columns)
+
+Domain code uses `p.State is PublishedPostState`. Query handlers run against `IDatabaseContext`, where `State` is not mapped to SQL directly. Filter and sort on the TPH shadow columns via shared constants (for example `PostStateColumns`) and `EF.Property`:
+
+```csharp
+// GOOD: SQL filter on TPH discriminator column
+var baseQuery = _db.Posts
+    .Where(p => EF.Property<string>(p, PostStateColumns.StateType) == PostStateColumns.Published);
+
+var items = await baseQuery
+    .OrderByDescending(p => EF.Property<DateTimeOffset>(p, PostStateColumns.PublishedAt))
+    .Select(p => new PostSummary
+    {
+        Id = p.Id,
+        Title = p.Title.Value,
+        PublishedAt = EF.Property<DateTimeOffset>(p, PostStateColumns.PublishedAt)
+    })
+    .ToListAsync(cancellationToken);
+```
+
+Projections that need a `PostState` instance for display logic SHOULD read the three column values in `Select` and reconstruct the union in memory with a shared helper (for example `PostStateQuery.FromColumns`).
+
+```csharp
+// DON'T: filter on State in LINQ when State is ignored in EF configuration
+.Where(p => p.State is PublishedPostState) // may fail translation or client-evaluate
+```
+
+Domain tests and command handlers continue to use `State is PublishedPostState` on loaded aggregates. Only Application.Read SQL projections use column predicates.
+
 ### Simple Single-Aggregate Projection
 
 ```csharp
@@ -87,7 +116,7 @@ public async Task<PostResult> HandleAsync(
             Title = p.Title.Value,
             Content = p.Content.Value,
             AuthorName = p.Author.DisplayName,
-            PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
+            PublishedAt = EF.Property<DateTimeOffset?>(p, PostStateColumns.PublishedAt)
         })
         .FirstOrDefaultAsync(cancellationToken);
 
@@ -112,21 +141,21 @@ public async Task<PagedResult<PostSummary>> HandleAsync(
         PaginationParameters.MaxPageSize);
 
     var baseQuery = _db.Posts
-        .Where(p => p.State is PublishedPostState);
+        .Where(p => EF.Property<string>(p, PostStateColumns.StateType) == PostStateColumns.Published);
 
     var totalCount = query.Pagination.SkipTotalCount
         ? 0
         : await baseQuery.CountAsync(cancellationToken);
 
     var items = await baseQuery
-        .OrderByDescending(p => ((PublishedPostState)p.State).PublishedAt)
+        .OrderByDescending(p => EF.Property<DateTimeOffset>(p, PostStateColumns.PublishedAt))
         .Skip((query.Pagination.PageNumber - 1) * pageSize)
         .Take(pageSize)
         .Select(p => new PostSummary
         {
             Id = p.Id,
             Title = p.Title.Value,
-            PublishedAt = ((PublishedPostState)p.State).PublishedAt
+            PublishedAt = EF.Property<DateTimeOffset>(p, PostStateColumns.PublishedAt)
         })
         .ToListAsync(cancellationToken);
 
@@ -153,7 +182,7 @@ public async Task<PostWithAuthorResult> HandleAsync(
     // Correlated subqueries inside Select may be evaluated client-side in some
     // EF Core configurations, producing N+1 queries.
     return await _db.Posts
-        .Where(p => p.State is PublishedPostState)
+        .Where(p => EF.Property<string>(p, PostStateColumns.StateType) == PostStateColumns.Published)
         .Join(
             _db.Authors,
             p => p.AuthorId,
@@ -163,7 +192,7 @@ public async Task<PostWithAuthorResult> HandleAsync(
                 PostId = p.Id,
                 PostTitle = p.Title.Value,
                 AuthorName = a.DisplayName,
-                PublishedAt = ((PublishedPostState)p.State).PublishedAt
+                PublishedAt = EF.Property<DateTimeOffset>(p, PostStateColumns.PublishedAt)
             })
         .OrderByDescending(r => r.PublishedAt)
         .ToListAsync(cancellationToken);

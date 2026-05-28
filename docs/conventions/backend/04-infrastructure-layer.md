@@ -376,40 +376,78 @@ The same rule applies in query handlers that filter on owned fields: use `.Value
 
 ## EF Core Configuration for Aggregate State (TPH)
 
-When a domain aggregate uses a discriminated union for state (e.g., `PostState` with `DraftPostState`, `PublishedPostState`, `ArchivedPostState`), EF Core maps the inheritance using Table Per Hierarchy (TPH) by default: a single table with a discriminator column.
+When an aggregate uses a discriminated union for lifecycle state (for example `PostState` with `DraftPostState`, `PublishedPostState`, `ArchivedPostState`), the **Domain model keeps one property**:
 
 ```csharp
-// Infrastructure/Persistence/Configurations/PostConfiguration.cs
+public PostState State { get; private set; } = new DraftPostState();
+```
+
+`Post` is **not** part of an entity inheritance hierarchy. Do not call `HasDiscriminator` on `EntityTypeBuilder<Post>` with `HasValue<DraftPostState>`; that API is for entity subtypes, not for a state property.
+
+Until EF Core supports complex type inheritance ([dotnet/efcore#31250](https://github.com/dotnet/efcore/issues/31250)), map state with **TPH columns on the aggregate table** plus an Infrastructure interceptor that syncs columns to `State` on load and `State` to columns on save.
+
+Copy the full pattern from `docs/blueprints/backend/post-state-tph.md`.
+
+### Column layout
+
+| Column | Type | Purpose |
+|:---|:---|:---|
+| `state_type` | `varchar`, not null | Discriminator (`Draft`, `Published`, `Archived`) |
+| `published_at` | `timestamptz`, nullable | Set when `State` is `PublishedPostState` |
+| `archived_at` | `timestamptz`, nullable | Set when `State` is `ArchivedPostState` |
+
+Add indexes on `state_type` and on state-specific columns used in list queries (for example `published_at`).
+
+### Configuration sketch
+
+```csharp
+// GOOD: shadow columns + ignored State property; interceptor syncs in Infrastructure
 internal sealed class PostConfiguration : IEntityTypeConfiguration<Post>
 {
     public void Configure(EntityTypeBuilder<Post> builder)
     {
         builder.ToTable("posts");
-
         builder.HasKey(p => p.Id);
-        builder.Property(p => p.Id)
-            .HasConversion(id => id.Value, value => new PostId(value))
-            .HasColumnName("id");
 
-        // State is stored using TPH with a discriminator column.
-        // All PostState subtype properties are nullable columns on the posts table.
-        builder.HasDiscriminator<string>("state_type")
-            .HasValue<DraftPostState>("Draft")
-            .HasValue<PublishedPostState>("Published")
-            .HasValue<ArchivedPostState>("Archived");
+        builder.Ignore(p => p.State);
 
-        // PublishedPostState maps its PublishedAt property.
-        builder.Property<DateTime?>("PublishedAt")
+        builder.Property<string>(PostStateColumns.StateType)
+            .HasColumnName("state_type")
+            .HasMaxLength(20)
+            .IsRequired()
+            .HasDefaultValue(PostStateColumns.Draft);
+
+        builder.Property<DateTimeOffset?>(PostStateColumns.PublishedAt)
             .HasColumnName("published_at");
 
-        // ArchivedPostState maps its ArchivedAt property.
-        builder.Property<DateTime?>("ArchivedAt")
+        builder.Property<DateTimeOffset?>(PostStateColumns.ArchivedAt)
             .HasColumnName("archived_at");
+
+        builder.HasIndex(PostStateColumns.StateType).HasDatabaseName("ix_posts_state_type");
+        builder.HasIndex(PostStateColumns.PublishedAt).HasDatabaseName("ix_posts_published_at");
     }
 }
 ```
 
-> The discriminator column (`state_type`) MUST be explicitly named in snake_case. The automatic snake_case convention does not apply to discriminator columns; they must be configured with `HasColumnName`. State-specific properties that are `null` for other states use nullable columns — this is the expected behaviour of TPH.
+Register `PostStatePersistenceInterceptor` on the `DbContext` options. It implements `IMaterializationInterceptor` and `ISaveChangesInterceptor`. It sets `State` from columns after load and writes columns from `State` before save. Use reflection or an internal setter helper in Infrastructure; do not add `RehydrateState` to Domain.
+
+Shadow property and discriminator string constants live in `Application.Read.Contracts` (for example `PostStateColumns`) so Infrastructure configuration and Application.Read query filters stay aligned.
+
+```csharp
+// DON'T: jsonb blob for the whole union when TPH columns are required
+builder.Property(p => p.State)
+    .HasColumnType("jsonb")
+    .HasConversion(...);
+
+// DON'T: entity-level discriminator on Post
+builder.HasDiscriminator<string>("state_type")
+    .HasValue<DraftPostState>("Draft"); // Post is not a DraftPostState subtype
+
+// DON'T: HasDiscriminator on OwnsOne(p => p.State) — API not available on owned navigations
+builder.OwnsOne(p => p.State, b => b.HasDiscriminator<string>("state_type")); // does not compile
+```
+
+Deviating from TPH columns (for example storing state in `jsonb`) requires a project ADR that documents query translation and indexing trade-offs.
 
 ---
 

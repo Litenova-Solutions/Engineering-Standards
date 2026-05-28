@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "conventionsRoot": "docs/conventions",
@@ -22,7 +22,8 @@
     "zustand": "5.0.13",
     "vitest": "4.x",
     "playwright": "1.52.x",
-    "openapiTypescript": "7.x"
+    "openapiTypescript": "7.x",
+    "reqnroll": "3.3.4"
   },
   "pinnedNuGetPackages": {
     "LiteBus.Commands.Abstractions": "4.3.0",
@@ -58,6 +59,19 @@
     "Microsoft.AspNetCore.Mvc.Testing": "10.0.0",
     "coverlet.collector": "6.0.4",
     "xunit": "2.9.3"
+  },
+  "conditionalNuGetPackages": {
+    "acceptanceTests": {
+      "Reqnroll": "3.3.4",
+      "Reqnroll.xUnit": "3.3.4",
+      "Reqnroll.Microsoft.Extensions.DependencyInjection": "3.3.4"
+    },
+    "externalDependencySimulation": {
+      "WireMock.Net": "1.7.4"
+    },
+    "databaseReset": {
+      "Respawn": "6.2.1"
+    }
   },
   "pinnedNpmPackages": {
     "next": "16.2.6",

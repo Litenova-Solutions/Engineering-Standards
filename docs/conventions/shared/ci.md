@@ -107,3 +107,24 @@ pnpm type-check
 ```
 
 Do not run containerized integration tests or Playwright in pre-commit hooks. Keep slower checks in CI.
+
+---
+
+## 5. Acceptance Test Stages
+
+When a project has `{ProjectName}.AcceptanceTests`:
+
+| Stage | Scope |
+|:---|:---|
+| Every PR | `dotnet test` on Architecture, Domain, Application, Integration smoke, and acceptance tests filtered to `@critical` |
+| Domain/API PRs | Full acceptance test project when `docs/domain/**`, `Application/**`, `WebApi/**`, `Infrastructure/**`, migrations, or OpenAPI changed |
+| Release candidate / nightly | All acceptance tests including `@slow` and `@external-dependency` |
+
+Filter Reqnroll scenarios by tag in CI, for example:
+
+```bash
+dotnet test apps/api/tests/{ProjectName}.AcceptanceTests \
+  --filter "Category=critical"
+```
+
+Projects MAY add `scripts/validate-feature-files.ps1` to enforce `@usecase:` and `@ac:` tags before merge.

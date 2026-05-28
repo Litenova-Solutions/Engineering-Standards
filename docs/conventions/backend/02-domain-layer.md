@@ -626,7 +626,29 @@ public void Publish(DateTimeOffset utcNow)
 }
 ```
 
-EF Core stores the discriminator and state-specific properties. The configuration is in the Infrastructure layer.
+EF Core stores the discriminator and state-specific properties. The configuration is in the Infrastructure layer. See `docs/blueprints/backend/post-state-tph.md` for the full mapping pattern.
+
+### State anti-patterns
+
+The following shortcuts drift from this model and MUST NOT appear in Domain or Application code:
+
+```csharp
+// DON'T: parallel nullable lifecycle columns on the aggregate root
+public DateTimeOffset? PublishedAt { get; private set; }
+public DateTimeOffset? ArchivedAt { get; private set; }
+public PostState State => PublishedAt.HasValue ? new PublishedPostState(PublishedAt.Value) : new DraftPostState();
+
+// DON'T: string discriminator shadow fields in Domain
+private string _stateType = "Draft";
+
+// DON'T: load-time rehydration methods on the aggregate
+internal void RehydrateState(string stateType, DateTimeOffset? publishedAt) { ... }
+
+// DON'T: derive State from timestamps in handlers or repositories
+post.State = post.PublishedAt.HasValue ? new PublishedPostState(post.PublishedAt.Value) : new DraftPostState();
+```
+
+`PostState` is the single lifecycle model. Transition timestamps live on the state records (`PublishedPostState.PublishedAt`, `ArchivedPostState.ArchivedAt`). Infrastructure maps those values to TPH columns; Domain MUST NOT duplicate them as aggregate properties.
 
 State transitions stay on the aggregate root as public methods. Do not move transition logic onto state record types unless a state machine library is adopted via ADR. Transition-specific data (such as `publishedAt`) comes from method parameters, typically `DateTimeOffset utcNow` from `IClock` in the handler.
 

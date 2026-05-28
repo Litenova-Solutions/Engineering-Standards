@@ -19,7 +19,25 @@ Read in order:
 
 ---
 
-## 2. Model the Domain Change
+## 2. Classify Acceptance Testing
+
+After the use-case doc exists, classify acceptance testing before writing tests:
+
+| Classification | When |
+|:---|:---|
+| **No BDD needed** | Simple internal CRUD or technical endpoint with no stakeholder-readable scenarios |
+| **Plain API acceptance test** | Meaningful use case, but Gherkin adds no stakeholder value |
+| **BDD acceptance test** | Business-critical, stakeholder-readable, security-sensitive, idempotent, event-producing, externally consumed, or complex workflow |
+| **Contract test required** | Public API or independently deployed client |
+| **E2E test required** | User-facing journey has frontend behavior backend tests cannot verify |
+
+Record the decision in the use-case doc **Acceptance coverage** section. Do not default every use case to BDD.
+
+See `docs/conventions/backend/20-api-acceptance-tests.md`.
+
+---
+
+## 3. Model the Domain Change
 
 If the use case changes business state, update the aggregate first.
 
@@ -33,7 +51,7 @@ Do not put business rules in command handlers, endpoints, jobs, or frontend code
 
 ---
 
-## 3. Add the Write Path
+## 4. Add the Write Path
 
 In `Application.Write.Contracts`:
 
@@ -50,7 +68,7 @@ In `Application.Write`:
 
 ---
 
-## 4. Add the Read Path
+## 5. Add the Read Path
 
 In `Application.Read.Contracts`:
 
@@ -63,12 +81,12 @@ In `Application.Read`:
 
 - Inject `IDatabaseContext`.
 - Use LINQ `Select` projections.
-- Return `PagedResult<T>` for lists.
+- Return `PagedResult` for lists.
 - Throw `AggregateNotFoundException` subclasses for missing resources.
 
 ---
 
-## 5. Add Reactions Only When Needed
+## 6. Add Reactions Only When Needed
 
 Use `Application.Reactions` for event-driven side effects. Define narrow interfaces there and implement them in Infrastructure.
 
@@ -76,7 +94,7 @@ If the event cannot be lost, use the Outbox pattern from `docs/conventions/backe
 
 ---
 
-## 6. Add Infrastructure
+## 7. Add Infrastructure
 
 Update Infrastructure for:
 
@@ -90,7 +108,7 @@ Use expand and contract migration rules for production-impacting schema changes.
 
 ---
 
-## 7. Add the Endpoint
+## 8. Add the Endpoint
 
 In WebApi:
 
@@ -103,7 +121,17 @@ In WebApi:
 
 ---
 
-## 8. Add Frontend Integration
+## 9. Add Acceptance and Integration Tests
+
+- Add API integration tests for endpoint wiring and smoke behavior (`Integration.Tests`).
+- Add plain API acceptance tests or Reqnroll scenarios traced to acceptance criterion IDs when the use-case doc requires them (`AcceptanceTests`).
+- Map each acceptance criterion in the use-case doc Acceptance coverage table.
+
+Copy patterns from `docs/blueprints/backend/api-acceptance-tests/` when introducing Reqnroll.
+
+---
+
+## 10. Add Frontend Integration
 
 In `apps/{app}/features/{feature}/{use-case}/`:
 
@@ -127,7 +155,7 @@ See `docs/guides/agentic-domain-driven-design.md` § UI Projection Docs.
 
 ---
 
-## 9. Update Documentation
+## 11. Update Documentation
 
 In the same PR:
 
@@ -138,7 +166,7 @@ In the same PR:
 
 ---
 
-## 10. Verify
+## 12. Verify
 
 Run every applicable gate in `docs/conventions/shared/ci.md`, then complete `docs/guides/definition-of-done.md`.
 

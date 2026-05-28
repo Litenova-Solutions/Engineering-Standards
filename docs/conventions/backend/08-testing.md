@@ -9,6 +9,23 @@ This document defines backend testing philosophy, test project structure, and pa
 - Query handler tests: PostgreSQL via Testcontainers (same provider as production); Integration: Testcontainers PostgreSQL.
 - `{ProjectName}.Architecture.Tests` with NetArchTest is REQUIRED (`docs/decisions/architecture-tests-as-enforcement.md`).
 - Mutation testing REQUIRED for high-risk validators; OPTIONAL elsewhere.
+- API acceptance tests trace to use-case docs; see `20-api-acceptance-tests.md`. Do not add Reqnroll without an acceptance test project, use-case BDD requirement, or explicit task request.
+
+---
+
+## Backend Test Categories
+
+Every backend test belongs to exactly one category:
+
+| Category | Project | Scope |
+|:---|:---|:---|
+| **Domain tests** | `{ProjectName}.Domain.Tests` | Aggregates, value objects, domain services, invariants, domain events. No HTTP. No database. No mocks. |
+| **Application tests** | `{ProjectName}.Application.Tests` | Command/query handler orchestration, validators, reactions, application-level side effects. Query handlers use PostgreSQL Testcontainers where EF translation matters. |
+| **API integration tests** | `{ProjectName}.Integration.Tests` | Endpoint tests through HTTP: routing, middleware, validation, auth test scheme, serialization, EF Core, PostgreSQL Testcontainers. |
+| **API acceptance tests** | `{ProjectName}.AcceptanceTests` (when Reqnroll or dedicated acceptance coverage) | Business use cases through HTTP, mapped to use-case doc acceptance criteria. Plain xUnit or Reqnroll Gherkin. See `20-api-acceptance-tests.md`. |
+| **Contract tests** | Integration or dedicated contract project | OpenAPI freshness, generated client compatibility, Problem Details shape, breaking-change checks. |
+
+API integration tests and API acceptance tests share `WebApplicationFactory` and Testcontainers foundations. Integration tests prove the HTTP pipeline works; acceptance tests prove documented use-case criteria hold.
 
 ---
 
@@ -109,6 +126,10 @@ tests/
 │   └── Fixtures/
 │       ├── IntegrationTestWebAppFactory.cs
 │       └── DatabaseSeeder.cs
+├── {ProjectName}.AcceptanceTests/          # Optional; required when using Reqnroll
+│   ├── Features/Posts/PublishPost.feature
+│   ├── Steps/
+│   └── Support/
 └── {ProjectName}.Architecture.Tests/
     └── ApplicationLayerTests.cs
 ```

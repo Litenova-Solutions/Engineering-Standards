@@ -25,7 +25,19 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 ---
 
-## 3. Frontend Execution
+## 3. Acceptance Testing
+
+- [ ] If the use-case doc has acceptance criteria, each criterion maps to at least one test type or a documented manual-only reason in the Acceptance coverage table.
+- [ ] If BDD scenarios were added, each scenario maps to a use-case doc (`@usecase:`) and acceptance criterion (`@ac:`).
+- [ ] If the use case is protected, authorization acceptance coverage includes negative cases (401/403) where applicable.
+- [ ] If the use case is idempotent, acceptance coverage includes replay behavior.
+- [ ] If the use case emits integration events with outbox ownership, acceptance coverage verifies event recording or externally observable consequence.
+- [ ] If Reqnroll was introduced, package approval and `standards.manifest.json` conditional entries exist.
+- [ ] If feature files changed, `dotnet test` runs the acceptance test project successfully.
+
+---
+
+## 4. Frontend Execution
 
 - [ ] Use case doc at `docs/domain/{feature}/{use-case}.md` updated to reflect current behavior.
 - [ ] Feature README at `docs/domain/{feature}/README.md` updated when domain language or invariants changed.
@@ -42,11 +54,11 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 ---
 
-## 4. Verification
+## 5. Verification
 
 - [ ] All applicable gates in `docs/conventions/shared/ci.md` passed locally or in CI.
 - [ ] `dotnet build apps/api/{ProjectName}.slnx` succeeds.
-- [ ] `dotnet test apps/api/{ProjectName}.slnx` succeeds, including Architecture.Tests.
+- [ ] `dotnet test apps/api/{ProjectName}.slnx` succeeds, including Architecture.Tests and AcceptanceTests when present.
 - [ ] `pnpm lint`, `pnpm type-check`, `pnpm test`, `pnpm build` succeed for every frontend app under `apps/` that changed.
 - [ ] Playwright suite passes when E2E tests exist.
 - [ ] No `TODO`, `FIXME`, or placeholder stub comments remain in changed files.
@@ -54,7 +66,7 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 ---
 
-## 5. Standards Compliance
+## 6. Standards Compliance
 
 - [ ] Relevant convention files read for every layer touched.
 - [ ] No forbidden packages introduced (`docs/conventions/shared/forbidden-packages.md`).

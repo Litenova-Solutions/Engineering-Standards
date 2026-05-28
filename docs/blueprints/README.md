@@ -15,7 +15,9 @@ Full-file reference implementations. Agents MUST copy from blueprints instead of
 | Outbox | [backend/outbox.md](backend/outbox.md) |
 | Idempotency | [backend/idempotency.md](backend/idempotency.md) |
 | Architecture tests | [backend/architecture-tests.md](backend/architecture-tests.md) |
+| Post state TPH | [backend/post-state-tph.md](backend/post-state-tph.md) |
 | Integration test factory | [backend/integration-test-factory.md](backend/integration-test-factory.md) |
+| API acceptance tests | [backend/api-acceptance-tests/acceptance-test-project.md](backend/api-acceptance-tests/acceptance-test-project.md) |
 
 ## Frontend
 

@@ -189,6 +189,28 @@ Shared theme tokens MAY live in `packages/{name}-config-tailwind/theme.css`. Eac
 @source "../features/**/*.{js,ts,jsx,tsx}";
 ```
 
+#### Anti-drift: aggregate state persistence
+
+```csharp
+// DO: TPH columns + interceptor; State stays on the aggregate in Domain
+builder.Ignore(p => p.State);
+builder.Property<string>(PostStateColumns.StateType).HasColumnName("state_type");
+```
+
+```csharp
+// DON'T: parallel PublishedAt on Post aggregate root
+public DateTimeOffset? PublishedAt { get; private set; }
+public PostState State => PublishedAt.HasValue ? new PublishedPostState(PublishedAt.Value) : new DraftPostState();
+
+// DON'T: jsonb blob when project standards require TPH columns
+builder.Property(p => p.State).HasColumnType("jsonb").HasConversion(...);
+
+// DON'T: RehydrateState on the aggregate
+internal void RehydrateState(string stateType, DateTimeOffset? publishedAt) { ... }
+```
+
+After step 3 (EF configuration), verify `dotnet ef migrations add` produces `state_type`, `published_at`, and `archived_at` columns on the aggregate table, not a single `jsonb state` column. Copy from `docs/blueprints/backend/post-state-tph.md`.
+
 #### 3. LiteBus Module Registration
 
 LiteBus registration is authoritative in `docs/blueprints/backend/program-cs.md` only. Other documents MUST reference that file instead of duplicating registration blocks.

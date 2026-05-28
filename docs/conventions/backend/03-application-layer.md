@@ -322,7 +322,7 @@ internal sealed class GetPostByIdQueryHandler
                 Title = p.Title.Value,
                 Content = p.Content.Value,
                 AuthorName = p.Author.DisplayName,
-                PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
+                PublishedAt = EF.Property<DateTimeOffset?>(p, PostStateColumns.PublishedAt)
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -375,21 +375,21 @@ internal sealed class GetAllPostsQueryHandler
             PaginationParameters.MaxPageSize);
 
         var baseQuery = _db.Posts
-            .Where(p => p.State is PublishedPostState);
+            .Where(p => EF.Property<string>(p, PostStateColumns.StateType) == PostStateColumns.Published);
 
         var totalCount = query.Pagination.SkipTotalCount
             ? 0
             : await baseQuery.CountAsync(cancellationToken);
 
         var items = await baseQuery
-            .OrderByDescending(p => ((PublishedPostState)p.State).PublishedAt)
+            .OrderByDescending(p => EF.Property<DateTimeOffset>(p, PostStateColumns.PublishedAt))
             .Skip((query.Pagination.PageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(p => new PostSummary
             {
                 Id = p.Id,
                 Title = p.Title.Value,
-                PublishedAt = ((PublishedPostState)p.State).PublishedAt
+                PublishedAt = EF.Property<DateTimeOffset>(p, PostStateColumns.PublishedAt)
             })
             .ToListAsync(cancellationToken);
 
@@ -421,7 +421,7 @@ var result = await _db.Posts
             .Where(a => a.Id == p.AuthorId)
             .Select(a => a.DisplayName)
             .FirstOrDefault() ?? string.Empty,
-        PublishedAt = p.State is PublishedPostState s ? s.PublishedAt : null
+        PublishedAt = EF.Property<DateTimeOffset?>(p, PostStateColumns.PublishedAt)
     })
     .FirstOrDefaultAsync(cancellationToken);
 ```

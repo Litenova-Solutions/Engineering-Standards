@@ -71,10 +71,9 @@ Domain docs, backend projects, and frontend folders MUST use the same boundaries
 | Frontend | `features/{feature}/{use-case}/` | `features/posts/create/CreatePostForm.tsx` |
 | App Router | Thin shell imports feature entry | `app/(main)/posts/new/page.tsx` |
 | UI projection | `docs/ui/{app}/pages/{page}.md` | Composes one or more use cases on a route |
+| Acceptance tests | `Features/{Feature}/{UseCase}.feature` | `Features/Posts/PublishPost.feature` |
 
 Use cases and pages are **many-to-many**. One page (for example admin post editor) may compose several use cases. One use case may appear on several pages (for example list published posts on home and tag filter). Page docs capture that mapping; use case docs stay one operation each.
-
-This is screaming architecture applied to documentation and UI: an engineer or agent should follow Feature → Use case the same way in docs, backend, and frontend `features/` folders.
 
 ---
 
@@ -101,6 +100,7 @@ Copy `docs/templates/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md
 A use case doc MUST include:
 
 - Summary and acceptance criteria (numbered, mapped to test types)
+- **Acceptance coverage** table with criterion IDs and required test types
 - Command or query contract (when applicable)
 - HTTP endpoint (method, path, auth, idempotency)
 - Operation-level UI notes (loading, empty, error, loaded) when a frontend implements this use case
@@ -138,7 +138,23 @@ Update UI projection docs in the same PR as route, layout, or page composition c
 
 ---
 
-## 6. Agent Workflow
+## 6. Executable Acceptance Criteria
+
+Use-case docs remain the source of truth for behavior. BDD feature files and plain API acceptance tests are **executable projections** of selected acceptance criteria, not a second specification.
+
+Rules:
+
+- Do not duplicate glossary, invariants, HTTP contract, or exception mapping in feature files.
+- When behavior changes, update the use-case doc first, then update tests and code.
+- Feature files MUST use terms from the feature README. If terms are missing, update the ubiquitous language table before writing scenarios.
+- Every Reqnroll scenario MUST reference a use-case doc (`@usecase:{feature}/{use-case}`) and at least one acceptance criterion (`@ac:AC-00N`).
+- If a scenario and the use-case doc disagree, the use-case doc wins until a human explicitly changes it.
+
+See `docs/conventions/backend/20-api-acceptance-tests.md` for BDD rules, tags, and project structure.
+
+---
+
+## 7. Agent Workflow
 
 ```mermaid
 flowchart LR
@@ -160,7 +176,7 @@ flowchart LR
 
 ---
 
-## 7. Relationship to Spec-Driven Development
+## 8. Relationship to Spec-Driven Development
 
 | Industry term | Our term |
 |:---|:---|
@@ -168,13 +184,14 @@ flowchart LR
 | Spec-first | Use case doc written before agent implementation |
 | Spec-anchored | Domain docs updated in the same PR as code |
 | Ubiquitous language | Glossary section in each feature README |
-| Acceptance criteria | Numbered section in each use case doc |
+| Acceptance criteria | Numbered section in each use case doc with coverage mapping |
+| Executable acceptance | BDD scenarios or plain API acceptance tests traced to criterion IDs |
 
 We do not use spec-as-source (code generated only from docs). Code remains explicit and compiler-enforced; domain docs remain the human-readable source of truth for intent and current behavior.
 
 ---
 
-## 8. When a Use Case Doc Is Optional
+## 9. When a Use Case Doc Is Optional
 
 Skip a formal use case doc only for:
 
@@ -186,7 +203,7 @@ Everything else requires a use case doc.
 
 ---
 
-## 9. Related Documents
+## 10. Related Documents
 
 | Document | Purpose |
 |:---|:---|
@@ -194,7 +211,5 @@ Everything else requires a use case doc.
 | `docs/guides/definition-of-done.md` | Completion checklist |
 | `docs/templates/domain-feature.md` | Feature README template |
 | `docs/templates/domain-use-case.md` | Use case doc template |
-| `docs/templates/domain-use-case.example.md` | Approved example (Create Post) |
-| `docs/templates/ui-shell.md` | App shell / layout template |
-| `docs/templates/ui-page.md` | Page composition template |
-| `docs/templates/ui-page.example.md` | Multi-use-case page example |
+| `docs/conventions/backend/20-api-acceptance-tests.md` | ADDD executable acceptance testing |
+| `docs/blueprints/backend/api-acceptance-tests/` | Reqnroll project blueprints |
