@@ -57,7 +57,7 @@ Each frontend:
 
 - Owns `app/`, `features/`, `components/ui/`, and `lib/env.ts` independently.
 - MUST NOT import from another app's `features/` folder.
-- MAY share **design tokens** via a workspace CSS package (see [Frontend UI defaults](../frontend/02-components.md#41-shared-theme-vs-shared-components)).
+- MAY share **design tokens** via a workspace CSS package (see [Frontend UI defaults](../frontend/components.md#41-shared-theme-vs-shared-components)).
 - Runs its own dev script (`pnpm --filter {name} dev`) and CI workflow when present.
 
 Playwright and Vitest paths are per app (`apps/{name}/e2e/`, `apps/{name}/vitest.config.ts`). DoD and CI commands MUST target every frontend that changed, not only `apps/web/`.
@@ -90,12 +90,12 @@ Allowed under `packages/`:
 
 ## Documentation per app
 
-Each app under `apps/` SHOULD have a README covering run commands, env vars, routes, and UI stack. When an app README or project ADR conflicts with these standards on an app-specific topic, **the project document wins**. See [Documentation precedence](../00-principles.md#11-documentation-precedence).
+Each app under `apps/` SHOULD have a README covering run commands, env vars, routes, and UI stack. When an app README or project ADR conflicts with these standards on an app-specific topic, **the project document wins**. See [Documentation precedence](../principles.md#11-documentation-precedence).
 
 ---
 
 ## Related
 
-- `docs/conventions/frontend/07-feature-boundaries.md` — no cross-app feature imports
+- `docs/conventions/frontend/feature-boundaries.md` — no cross-app feature imports
 - `docs/conventions/shared/ci.md` — monorepo CI gates
 - `docs/guides/definition-of-done.md` — per-app frontend checklist

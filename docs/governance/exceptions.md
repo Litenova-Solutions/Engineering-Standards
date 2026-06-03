@@ -29,7 +29,7 @@ Store active exceptions in `docs/decisions/exceptions/` or the project ADR index
 
 | Tier | Coverage thresholds | Testcontainers | Aspire | Mutation testing |
 |:---|:---|:---|:---|:---|
-| Production | Full (`backend/08-testing.md`) | Required for query/integration | Default | High-risk validators |
+| Production | Full (`backend/testing.md`) | Required for query/integration | Default | High-risk validators |
 | Internal | Reduced thresholds (document in ADR) | Required for query handlers touching SQL | Optional | Optional |
 | Prototype | Best-effort; architecture tests still recommended | Optional | Optional | No |
 
@@ -44,4 +44,4 @@ When a MUST rule is relaxed or replaced in a standards release:
 - Minor release: old pattern deprecated, new pattern required for new code.
 - Major release: old pattern forbidden.
 
-Document deprecations in GitHub Release notes and `RELEASES.md`.
+Document deprecations in GitHub Release notes.

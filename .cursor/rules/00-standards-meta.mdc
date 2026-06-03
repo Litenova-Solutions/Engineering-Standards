@@ -33,9 +33,9 @@ When adding a new decision in `docs/decisions/`, add a row to `docs/decisions/RE
 
 ## Templates
 
-When changing a convention that affects project-specific templates, update the corresponding file in `docs/templates/`.
+When changing a convention that affects project-specific templates, update the corresponding file in `docs/templates/docs/`.
 
-Project-specific domain content (feature READMEs, use case docs) does NOT belong in convention files. It belongs in the project repository under `docs/domain/` using templates in `docs/templates/`.
+Project-specific domain content (feature READMEs, use case docs) does NOT belong in convention files. It belongs in the project repository under `docs/domain/` using templates in `docs/templates/docs/`.
 
 ## Code Examples
 

@@ -2,7 +2,7 @@
 
 This is the complete implementation blueprint for idempotency key enforcement. Copy these files into `{ProjectName}.Infrastructure/Reliability/Idempotency/` and adjust to the project's requirements.
 
-For the conceptual rules, see `docs/conventions/backend/10-reliability.md`.
+For the conceptual rules, see `docs/conventions/backend/reliability.md`.
 
 ---
 

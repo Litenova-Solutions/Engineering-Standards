@@ -159,6 +159,6 @@ After deploying the fix, monitor the slow query log and `pg_stat_statements` to 
 
 If the query has improved but still appears, consider:
 
-- Query result caching at the application layer (see `docs/conventions/backend/12-caching.md`).
+- Query result caching at the application layer (see `docs/conventions/backend/caching.md`).
 - Materialized views for expensive aggregations.
 - Moving the query to a read replica.

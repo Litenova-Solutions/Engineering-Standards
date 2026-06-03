@@ -90,7 +90,7 @@ All five parameters — signature, issuer, audience, expiration, and required cl
 }
 ```
 
-In production, inject `JwtSettings__Secret` as an environment variable or secret store reference. See `docs/conventions/backend/16-options-and-configuration.md`.
+In production, inject `JwtSettings__Secret` as an environment variable or secret store reference. See `docs/conventions/backend/options-and-configuration.md`.
 
 ---
 
@@ -352,7 +352,7 @@ Endpoints MUST NOT return 401 or 403 by catching exceptions or calling `Results.
 
 ## 9. Resource-Based Authorization
 
-When authorization depends on domain data (for example, "only the author can edit their own post"), verify object-level access before dispatching commands. See `docs/conventions/backend/20-object-authorization.md` for the mandatory test matrix.
+When authorization depends on domain data (for example, "only the author can edit their own post"), verify object-level access before dispatching commands. See `docs/conventions/backend/object-authorization.md` for the mandatory test matrix.
 
 ### Endpoint check (simple cases)
 

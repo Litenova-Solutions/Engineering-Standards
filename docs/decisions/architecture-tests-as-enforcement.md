@@ -28,7 +28,7 @@ Approach 2 catches violations in CI before they reach code review. It is particu
 
 Every project that follows these standards MUST include an architecture test project (`{ProjectName}.Architecture.Tests`) with NetArchTest tests that assert the critical structural rules. Architecture tests are run as part of the standard `dotnet test` command. A failing architecture test blocks the build.
 
-The required tests are documented in `docs/conventions/backend/08-testing.md`.
+The required tests are documented in `docs/conventions/backend/testing.md`.
 
 ## Consequences
 

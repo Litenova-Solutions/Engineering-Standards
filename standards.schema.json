@@ -25,6 +25,13 @@
     "runbooksRoot": { "type": "string" },
     "decisionsRoot": { "type": "string" },
     "guidesRoot": { "type": "string" },
+    "templatesDocsRoot": { "type": "string" },
+    "templatesConfigRoot": { "type": "string" },
+    "glossary": { "type": "string" },
+    "conventionIndex": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
     "stack": {
       "type": "object",
       "required": ["dotnet", "aspnetcore", "efcore", "nextjs", "react"],
@@ -63,5 +70,5 @@
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }

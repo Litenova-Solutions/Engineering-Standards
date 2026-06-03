@@ -84,4 +84,4 @@ sealed class CreatePostEndpoint : IEndpoint
 }
 ```
 
-See `docs/conventions/backend/05-api-layer.md` for read endpoints and idempotency headers.
+See `docs/conventions/backend/api-layer.md` for read endpoints and idempotency headers.

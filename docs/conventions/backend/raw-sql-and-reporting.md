@@ -253,4 +253,4 @@ Reporting queries that aggregate large datasets MUST:
 - Not be exposed on endpoints with the same rate limit as standard CRUD endpoints.
 - Include a maximum date range or result limit in the query logic.
 - Return pagination or a streaming response for results larger than a few hundred rows.
-- Log query duration via the observability middleware (see `docs/conventions/backend/09-observability.md`).
+- Log query duration via the observability middleware (see `docs/conventions/backend/observability.md`).

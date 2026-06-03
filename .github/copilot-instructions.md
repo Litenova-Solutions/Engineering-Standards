@@ -16,7 +16,7 @@ The canonical agent guide is `AGENTS.md` at the repository root (or `standards/A
 - **Conflicts:** Stop and ask when normative files conflict without an explicit project override (`AGENTS.md`).
 - **IEndpoint only.** Never generate MVC controllers.
 - **IDatabaseContext for queries.** Never load aggregates or inject repositories in query handlers.
-- **Correct exceptions.** See `docs/conventions/backend/06-exception-hierarchy.md`.
+- **Correct exceptions.** See `docs/conventions/backend/exception-hierarchy.md`.
 - **No handlers in Contracts.** Records and interfaces only in Contracts projects.
 - **No external libraries in Application.Reactions.** Narrow interfaces in Reactions; implementations in Infrastructure.
 - **`cancellationToken` naming.** Exact name on all async methods.

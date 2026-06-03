@@ -2,7 +2,7 @@
 
 This document defines **ADDD executable acceptance tests**: HTTP-level tests that validate documented use cases against Test Coverage rows in `docs/domain/{feature}/{use-case}.tests.md`. They are not a parallel specification layer. The test spec remains normative for verification; acceptance tests are executable evidence.
 
-For the five-category backend testing taxonomy, see `08-testing.md`. For Reqnroll setup patterns, see `docs/blueprints/backend/api-acceptance-tests/`.
+For the five-category backend testing taxonomy, see `testing.md`. For Reqnroll setup patterns, see `docs/blueprints/backend/api-acceptance-tests/`.
 
 ---
 
@@ -27,7 +27,7 @@ API acceptance tests validate documented use cases through the public HTTP API s
 
 They execute the application the way an API client would.
 
-**API acceptance tests** differ from **API integration tests** (`08-testing.md`):
+**API acceptance tests** differ from **API integration tests** (`testing.md`):
 
 | Category | Purpose |
 |:---|:---|
@@ -96,7 +96,7 @@ Plain xUnit API acceptance tests MAY live in `{ProjectName}.AcceptanceTests` wit
 
 ## 5. Traceability
 
-Each use case MUST have a test spec at `docs/domain/{feature}/{use-case}.tests.md` (see `docs/templates/domain-use-case.tests.md`) with a **Test Coverage** table. Row number `N` is criterion ID `AC-00N` (for example row 1 → `AC-001`).
+Each use case MUST have a test spec at `docs/domain/{feature}/{use-case}.tests.md` (see `docs/templates/docs/domain-use-case.tests.md`) with a **Test Coverage** table. Row number `N` is criterion ID `AC-00N` (for example row 1 → `AC-001`).
 
 Every Reqnroll scenario MUST map to at least one acceptance criterion via tags:
 

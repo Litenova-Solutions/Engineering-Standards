@@ -39,7 +39,7 @@ Copy root templates from `docs/templates/`:
 
 ## Step 2: Create Root Monorepo Packages
 
-Copy `docs/templates/packages/api-types/` and `docs/templates/packages/api-client/` to `packages/`.
+Copy `docs/templates/config/packages/api-types/` and `docs/templates/config/packages/api-client/` to `packages/`.
 
 ---
 
@@ -83,7 +83,7 @@ Pin package versions from `standards.manifest.json`.
 
 ## Step 4: Configure Project References
 
-See `docs/conventions/backend/01-solution-structure.md` section 5. WebApi references `Application.Write.Contracts`, `Application.Read.Contracts`, `Infrastructure`, and `ServiceDefaults`.
+See `docs/conventions/backend/solution-structure.md` section 5. WebApi references `Application.Write.Contracts`, `Application.Read.Contracts`, `Infrastructure`, and `ServiceDefaults`.
 
 Worker references `Infrastructure`, `Application.Write`, `Application.Reactions`, and `ServiceDefaults`. Worker MUST NOT reference WebApi.
 
@@ -91,7 +91,7 @@ Worker references `Infrastructure`, `Application.Write`, `Application.Reactions`
 
 ## Step 5: Install NuGet Packages
 
-Use `docs/templates/Directory.Packages.props` as the starting point. Key packages per project are listed in `docs/conventions/backend/01-solution-structure.md` sections 6 and 7.
+Use `docs/templates/config/Directory.Packages.props` as the starting point. Key packages per project are listed in `docs/conventions/backend/solution-structure.md` sections 6 and 7.
 
 Infrastructure uses `LiteBus.Commands.Abstractions` and `LiteBus.Events.Abstractions` only, not full LiteBus packages.
 
@@ -101,9 +101,9 @@ Infrastructure uses `LiteBus.Commands.Abstractions` and `LiteBus.Events.Abstract
 
 1. Copy `Program.cs` and supporting files from `docs/blueprints/backend/program-cs.md`.
 2. Copy `EndpointExtensions` from `docs/blueprints/backend/endpoint-extensions.md`.
-3. Copy `GlobalExceptionHandler` from `docs/conventions/backend/06-exception-hierarchy.md`.
-4. Copy auth files from `docs/conventions/backend/15-authentication-and-authorization.md`.
-5. Configure WebApi `.csproj` for build-time OpenAPI per `docs/conventions/backend/05-api-layer.md`.
+3. Copy `GlobalExceptionHandler` from `docs/conventions/backend/exception-hierarchy.md`.
+4. Copy auth files from `docs/conventions/backend/authentication-and-authorization.md`.
+5. Configure WebApi `.csproj` for build-time OpenAPI per `docs/conventions/backend/api-layer.md`.
 
 ---
 
@@ -125,7 +125,7 @@ Infrastructure uses `LiteBus.Commands.Abstractions` and `LiteBus.Events.Abstract
 
 ## Step 9: Create the First Domain Aggregate
 
-Follow `docs/conventions/backend/02-domain-layer.md`. Write the operation and test docs first using `docs/guides/write-use-case-doc.md`.
+Follow `docs/conventions/backend/domain-layer.md`. Write the operation and test docs first using `docs/guides/write-use-case-doc.md`.
 
 ---
 
@@ -158,8 +158,8 @@ Do **not** pass `--src-dir`. The app lives at `apps/web/app/`.
 Then:
 
 1. Copy `next.config.ts` from `docs/blueprints/frontend/next-config.md`.
-2. Copy `playwright.config.ts` from `docs/templates/playwright.config.ts` to `apps/web/`.
-3. Copy `eslint.config.ts` from `docs/templates/eslint.config.ts`.
+2. Copy `playwright.config.ts` from `docs/templates/config/playwright.config.ts` to `apps/web/`.
+3. Copy `eslint.config.ts` from `docs/templates/config/eslint.config.ts`.
 4. Copy `lib/env.ts`, `lib/api/client.ts`, and `proxy.ts` from frontend blueprints.
 5. Install pinned versions from `standards.manifest.json`.
 
@@ -169,9 +169,9 @@ Then:
 
 Set up the domain doc tree under `docs/domain/`:
 
-1. Copy `docs/templates/domain-system-index.md` to `docs/domain/README.md`.
-2. For the first feature, copy `docs/templates/domain-feature.md` to `docs/domain/{feature}/README.md`.
-3. For each use case, copy `docs/templates/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md` and `domain-use-case.tests.md` to `docs/domain/{feature}/{use-case}.tests.md`.
+1. Copy `docs/templates/docs/domain-system-index.md` to `docs/domain/README.md`.
+2. For the first feature, copy `docs/templates/docs/domain-feature.md` to `docs/domain/{feature}/README.md`.
+3. For each use case, copy `docs/templates/docs/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md` and `domain-use-case.tests.md` to `docs/domain/{feature}/{use-case}.tests.md`.
 
 Read `docs/guides/write-use-case-doc.md` and `docs/guides/agentic-domain-driven-design.md` before the first use case.
 
@@ -179,7 +179,7 @@ Read `docs/guides/write-use-case-doc.md` and `docs/guides/agentic-domain-driven-
 
 ## Step 13: Production Infrastructure (optional)
 
-Copy VPS deployment templates from `docs/templates/infra/` to `infra/`:
+Copy VPS deployment templates from `docs/templates/config/infra/` to `infra/`:
 
 - `docker-compose.prod.yml`
 - `Caddyfile`

@@ -238,7 +238,7 @@ Commands and queries are handled by separate classes in separate projects. This 
 2. Writes a LINQ projection against `IDatabaseContext`.
 3. Returns the projection result or throws an `AggregateNotFoundException` subclass if not found.
 
-Query handlers MUST NOT load domain aggregates. They MUST NOT inject repository interfaces. See `docs/conventions/backend/07-query-read-strategy.md` for full details.
+Query handlers MUST NOT load domain aggregates. They MUST NOT inject repository interfaces. See `docs/conventions/backend/query-read-strategy.md` for full details.
 
 ---
 
@@ -366,13 +366,13 @@ sequenceDiagram
 
 ### Implementation
 
-Full handler implementations, assembly marker classes, and LiteBus registration live in `docs/conventions/backend/04-infrastructure-layer.md` (Transaction Pipeline Behaviors and LiteBus Registration sections). This document describes the pattern; the Infrastructure convention is authoritative for code.
+Full handler implementations, assembly marker classes, and LiteBus registration live in `docs/conventions/backend/infrastructure-layer.md` (Transaction Pipeline Behaviors and LiteBus Registration sections). This document describes the pattern; the Infrastructure convention is authoritative for code.
 
 ### LiteBus Registration
 
 Register LiteBus in `WebApi/Program.cs` only. See `docs/blueprints/backend/program-cs.md` for the complete composition root. Do not duplicate registration in other convention files.
 
-Handler classes are `internal sealed`. Each implementation project exposes a `public static class {Layer}AssemblyMarker { }` so `Program.cs` can reference the assembly without importing internal types. See `docs/conventions/backend/04-infrastructure-layer.md` for assembly marker examples.
+Handler classes are `internal sealed`. Each implementation project exposes a `public static class {Layer}AssemblyMarker { }` so `Program.cs` can reference the assembly without importing internal types. See `docs/conventions/backend/infrastructure-layer.md` for assembly marker examples.
 
 ---
 
@@ -380,7 +380,7 @@ Handler classes are `internal sealed`. Each implementation project exposes a `pu
 
 Structural rules are enforced by architecture tests using NetArchTest in addition to project reference constraints. Project references prevent the most obvious violations. Architecture tests catch violations that project references cannot.
 
-Architecture tests live in `{ProjectName}.Architecture.Tests`. They run in CI on every PR. See `docs/conventions/backend/08-testing.md` for full examples.
+Architecture tests live in `{ProjectName}.Architecture.Tests`. They run in CI on every PR. See `docs/conventions/backend/testing.md` for full examples.
 
 Three concrete examples of rules that architecture tests enforce:
 
@@ -450,6 +450,6 @@ abstract class AggregateRoot<TId> : IAggregateRoot
 }
 ```
 
-The `IDomainEvent` marker interface and visibility rules are defined in `docs/conventions/backend/02-domain-layer.md` (Communication via Domain Events). That document is authoritative for event naming, structure, and the `public` visibility requirement.
+The `IDomainEvent` marker interface and visibility rules are defined in `docs/conventions/backend/domain-layer.md` (Communication via Domain Events). That document is authoritative for event naming, structure, and the `public` visibility requirement.
 
 All three types live in `Domain/Shared/`. All aggregate roots extend `AggregateRoot<TId>`. All domain event records implement `IDomainEvent`. Infrastructure calls `ClearDomainEvents()` after dispatching events via LiteBus.

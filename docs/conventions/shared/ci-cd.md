@@ -36,7 +36,7 @@ PR checks → Build → Test → Artifact → Staging deploy → Staging smoke �
 
 ## 2. GitHub Actions Workflow Structure
 
-Copy the PR-check workflow from `docs/templates/ci-workflow.yml`. The template covers backend, frontend, OpenAPI freshness, Playwright, and image build jobs. Extend it with deploy stages below for staging and production.
+Copy the PR-check workflow from `docs/templates/config/ci-workflow.yml`. The template covers backend, frontend, OpenAPI freshness, Playwright, and image build jobs. Extend it with deploy stages below for staging and production.
 
 ```yaml
 # .github/workflows/ci.yml
@@ -251,7 +251,7 @@ pnpm --filter @myproject/api-types generate:api-types
 git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
 ```
 
-Build-time OpenAPI generation uses `Microsoft.Extensions.ApiDescription.Server`. See `docs/conventions/backend/13-deployment-and-migrations.md` for the MSBuild setup.
+Build-time OpenAPI generation uses `Microsoft.Extensions.ApiDescription.Server`. See `docs/conventions/backend/deployment-and-migrations.md` for the MSBuild setup.
 
 ---
 
@@ -277,7 +277,7 @@ Database migrations in production MUST be reviewed before execution:
 3. A designated reviewer reads the script and approves the deployment.
 4. The approved script runs against the production database before the new image is deployed.
 
-Never run `Database.MigrateAsync()` on application startup in production. See `docs/conventions/backend/13-deployment-and-migrations.md`.
+Never run `Database.MigrateAsync()` on application startup in production. See `docs/conventions/backend/deployment-and-migrations.md`.
 
 ---
 

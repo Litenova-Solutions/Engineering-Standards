@@ -2,7 +2,7 @@
 
 This document defines the security baseline requirements for all projects following these standards. These rules are non-negotiable. Violations MUST be caught in code review before any PR is merged.
 
-For the OWASP ASVS / API Top 10 control catalog, enforcement mapping, and CI gate checklist, see `docs/conventions/shared/security-controls.md`. Object-level authorization tests: `docs/conventions/backend/20-object-authorization.md`.
+For the OWASP ASVS / API Top 10 control catalog, enforcement mapping, and CI gate checklist, see `docs/conventions/shared/security-controls.md`. Object-level authorization tests: `docs/conventions/backend/object-authorization.md`.
 
 ---
 
@@ -65,7 +65,7 @@ Authentication is handled by ASP.NET Core middleware. Do not implement custom au
 - Endpoints that are intentionally public MUST call `.AllowAnonymous()` explicitly to make the intent clear.
 - Authorization policy names MUST be defined as `const string` fields in a central `AuthorizationPolicies` static class, not as inline magic strings.
 
-Policy constant names are defined in `docs/conventions/backend/15-authentication-and-authorization.md` (`RequireAuthenticatedUser`, `RequireAdminRole`). Do not redefine them here.
+Policy constant names are defined in `docs/conventions/backend/authentication-and-authorization.md` (`RequireAuthenticatedUser`, `RequireAdminRole`). Do not redefine them here.
 
 ```csharp
 // GOOD:

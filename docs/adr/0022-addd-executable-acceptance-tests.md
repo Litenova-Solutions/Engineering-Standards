@@ -10,7 +10,7 @@ Domain docs are the human-readable source of truth. Use-case docs hold acceptanc
 
 ## Decision
 
-1. Adopt **ADDD executable acceptance tests** as a distinct backend test category (see `08-testing.md` and `20-api-acceptance-tests.md`).
+1. Adopt **ADDD executable acceptance tests** as a distinct backend test category (see `testing.md` and `20-api-acceptance-tests.md`).
 2. Adopt **Reqnroll** as the standard optional BDD framework for new .NET API acceptance tests when Gherkin adds stakeholder value.
 3. Keep **plain xUnit API integration and acceptance tests** as the default request-to-response style.
 4. Require traceability from Reqnroll scenarios to use-case docs via `@usecase:` and `@ac:` tags.
@@ -34,7 +34,7 @@ SpecFlow remains allowed only in legacy projects until a dedicated migration tas
 
 ## Related
 
-- `docs/conventions/backend/08-testing.md`
-- `docs/conventions/backend/20-api-acceptance-tests.md`
+- `docs/conventions/backend/testing.md`
+- `docs/conventions/backend/api-acceptance-tests.md`
 - `docs/guides/agentic-domain-driven-design.md` § Executable Acceptance Criteria
 - `docs/blueprints/backend/api-acceptance-tests/`

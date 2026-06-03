@@ -104,7 +104,7 @@ Every exception type communicates its category. The category determines the HTTP
 | Domain invariant violation | 409 |
 | Unhandled | 500 |
 
-Throwing a generic `Exception` or `InvalidOperationException` breaks the contract and produces an incorrect HTTP response. All custom exception types are defined in `docs/conventions/backend/06-exception-hierarchy.md`.
+Throwing a generic `Exception` or `InvalidOperationException` breaks the contract and produces an incorrect HTTP response. All custom exception types are defined in `docs/conventions/backend/exception-hierarchy.md`.
 
 ---
 
@@ -187,3 +187,19 @@ Agents and engineers MUST read standards first, then project docs, and follow th
 When two **standards** files conflict and neither is a project override, stop and follow the conflict protocol in `AGENTS.md`. Do not invent a compromise.
 
 During co-development of standards and a reference app, treat the latest committed text in both repositories as authoritative. Prefer current package versions in `standards.manifest.json` and project lockfiles over older examples in either repo.
+
+---
+
+## 12. Convention File Structure
+
+Every file under `docs/conventions/` MUST use this section order:
+
+1. **Agent Quick Rules** (compact MUST list immediately after the title)
+2. **Overview** (why the convention exists)
+3. **Conventions** (normative rules with `// GOOD:` and `// BAD:` examples where applicable)
+4. **Anti-patterns** (consolidated prohibitions)
+5. **Related Documents** (cross-links)
+
+When editing an older convention file, add missing sections in the same pull request rather than leaving structural drift.
+
+Canonical `Guard.Against` prohibition for validators lives only in `docs/conventions/backend/exception-hierarchy.md`. Other files MUST link there instead of duplicating full examples.

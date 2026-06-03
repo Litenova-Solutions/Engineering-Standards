@@ -1,6 +1,6 @@
 # Backend Testing
 
-This document defines backend testing philosophy, test project structure, and patterns. Frontend testing rules live in `docs/conventions/frontend/06-testing.md`.
+This document defines backend testing philosophy, test project structure, and patterns. Frontend testing rules live in `docs/conventions/frontend/testing.md`.
 
 ## Agent Quick Rules
 
@@ -9,7 +9,7 @@ This document defines backend testing philosophy, test project structure, and pa
 - Query handler tests: PostgreSQL via Testcontainers (same provider as production); Integration: Testcontainers PostgreSQL.
 - `{ProjectName}.Architecture.Tests` with NetArchTest is REQUIRED (`docs/decisions/architecture-tests-as-enforcement.md`).
 - Mutation testing REQUIRED for high-risk validators; OPTIONAL elsewhere.
-- API acceptance tests trace to use-case docs; see `20-api-acceptance-tests.md`. Do not add Reqnroll without an acceptance test project, use-case BDD requirement, or explicit task request.
+- API acceptance tests trace to use-case docs; see `api-acceptance-tests.md`. Do not add Reqnroll without an acceptance test project, use-case BDD requirement, or explicit task request.
 
 ---
 
@@ -22,7 +22,7 @@ Every backend test belongs to exactly one category:
 | **Domain tests** | `{ProjectName}.Domain.Tests` | Aggregates, value objects, domain services, invariants, domain events. No HTTP. No database. No mocks. |
 | **Application tests** | `{ProjectName}.Application.Tests` | Command/query handler orchestration, validators, reactions, application-level side effects. Query handlers use PostgreSQL Testcontainers where EF translation matters. |
 | **API integration tests** | `{ProjectName}.Integration.Tests` | Endpoint tests through HTTP: routing, middleware, validation, auth test scheme, serialization, EF Core, PostgreSQL Testcontainers. |
-| **API acceptance tests** | `{ProjectName}.AcceptanceTests` (when Reqnroll or dedicated acceptance coverage) | Business use cases through HTTP, mapped to `{use-case}.tests.md` Test Coverage rows. Plain xUnit or Reqnroll Gherkin. See `20-api-acceptance-tests.md`. |
+| **API acceptance tests** | `{ProjectName}.AcceptanceTests` (when Reqnroll or dedicated acceptance coverage) | Business use cases through HTTP, mapped to `{use-case}.tests.md` Test Coverage rows. Plain xUnit or Reqnroll Gherkin. See `api-acceptance-tests.md`. |
 | **Contract tests** | Integration or dedicated contract project | OpenAPI freshness, generated client compatibility, Problem Details shape, breaking-change checks. |
 
 API integration tests and API acceptance tests share `WebApplicationFactory` and Testcontainers foundations. Integration tests prove the HTTP pipeline works; acceptance tests prove documented use-case criteria hold.
@@ -635,7 +635,21 @@ dotnet tool restore   # installs from dotnet-tools.json
 
 dotnet stryker \
     --project apps/api/src/{ProjectName}.Application.Write/{ProjectName}.Application.Write.csproj \
-    --test-project apps/api/tests/{ProjectName}.Application.apps/api/tests/{ProjectName}.Application.Tests.csproj
+    --test-project apps/api/tests/{ProjectName}.Application.Tests/{ProjectName}.Application.Tests.csproj
+```
+
+**Thresholds (production-tier):** mutation score MUST be at least **80%** for declared high-risk validator assemblies. Fail the CI step when below threshold.
+
+**Exclusions:** exclude generated code, migration designers, and `*.Designer.cs` via `stryker-config.json`. Do not exclude validators listed as high-risk in the project test plan.
+
+```json
+{
+  "stryker-config": {
+    "project": "Application.Write.csproj",
+    "thresholds": { "high": 80, "low": 60, "break": 75 },
+    "mutate": [ "!**/Migrations/**", "!**/*.Designer.cs" ]
+  }
+}
 ```
 
 ---

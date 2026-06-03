@@ -1,6 +1,6 @@
 # Blueprint: Worker Program.cs
 
-Copy into `apps/api/src/{ProjectName}.Worker/`. See `docs/conventions/backend/14-worker-projects.md`.
+Copy into `apps/api/src/{ProjectName}.Worker/`. See `docs/conventions/backend/worker-projects.md`.
 
 ---
 

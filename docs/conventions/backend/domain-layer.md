@@ -100,7 +100,7 @@ Every type, property, and method name in the Domain layer reflects the language 
 | State discriminated union base | `{AggregateName}State` | `PostState` |
 | State case | `{StateName}{AggregateName}State` | `DraftPostState`, `PublishedPostState` |
 
-The read-side pattern for queries is `IDatabaseContext`, defined in `Application.Read.Contracts/Shared/`. Query handlers inject `IDatabaseContext` and write LINQ projections directly. There is no per-aggregate `IXxxReadStore` interface. See `docs/conventions/backend/07-query-read-strategy.md` and `docs/decisions/idatabasecontext-over-per-aggregate-read-stores.md`.
+The read-side pattern for queries is `IDatabaseContext`, defined in `Application.Read.Contracts/Shared/`. Query handlers inject `IDatabaseContext` and write LINQ projections directly. There is no per-aggregate `IXxxReadStore` interface. See `docs/conventions/backend/query-read-strategy.md` and `docs/decisions/idatabasecontext-over-per-aggregate-read-stores.md`.
 
 ---
 
@@ -813,4 +813,4 @@ public void Publish() { ... }
 
 ---
 
-The ubiquitous language for a feature lives in the project repository at `docs/domain/{feature}/README.md`. Copy `docs/templates/domain-feature.md` when adding a new feature domain doc.
+The ubiquitous language for a feature lives in the project repository at `docs/domain/{feature}/README.md`. Copy `docs/templates/docs/domain-feature.md` when adding a new feature domain doc.

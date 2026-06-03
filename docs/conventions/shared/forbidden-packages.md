@@ -2,7 +2,7 @@
 
 Agents MUST NOT add any package in this list. Use the alternatives named in convention files.
 
-Any package not in the pre-approved list in `docs/conventions/backend/01-solution-structure.md` (NuGet) or section 8 of the same file (npm) requires an ADR before use.
+Any package not in the pre-approved list in `docs/conventions/backend/solution-structure.md` (NuGet) or section 8 of the same file (npm) requires an ADR before use.
 
 ---
 
@@ -14,9 +14,9 @@ Any package not in the pre-approved list in `docs/conventions/backend/01-solutio
 | `AutoMapper`, `TinyMapper`, `Mapster` | Convention-based mapping hides transformation logic; property name mismatches produce runtime errors | Explicit mapping extension methods in `ApiMappings` classes |
 | `Newtonsoft.Json` | `System.Text.Json` is the standard in .NET 10 | `System.Text.Json` |
 | `FluentValidation` | Throws `ValidationException` (not `CommandValidationException`); maps to HTTP 500 by default | Direct `if` + `throw` with custom `CommandValidationException` / `QueryValidationException` subclasses |
-| `MassTransit` | Requires ADR | Outbox pattern per `docs/conventions/backend/10-reliability.md` |
-| `Hangfire` | Requires ADR | `BackgroundService` + PostgreSQL-backed job table per `docs/conventions/backend/11-background-jobs.md` |
-| `Dapper` | Requires ADR for query handlers | `IDatabaseContext` with EF Core LINQ projections per `docs/conventions/backend/07-query-read-strategy.md` |
+| `MassTransit` | Requires ADR | Outbox pattern per `docs/conventions/backend/reliability.md` |
+| `Hangfire` | Requires ADR | `BackgroundService` + PostgreSQL-backed job table per `docs/conventions/backend/background-jobs.md` |
+| `Dapper` | Requires ADR for query handlers | `IDatabaseContext` with EF Core LINQ projections per `docs/conventions/backend/query-read-strategy.md` |
 | `RestSharp` | Redundant with `HttpClient` | `HttpClient` via `IHttpClientFactory` |
 | EF Core InMemory provider (`Microsoft.EntityFrameworkCore.InMemory`) | Skips relational constraints; does not translate LINQ the same way PostgreSQL does | `Microsoft.EntityFrameworkCore.Sqlite` |
 

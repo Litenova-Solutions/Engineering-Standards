@@ -14,13 +14,13 @@ Production deployments for projects following these standards target **self-mana
 | Frontend (`web`) | Docker container (Next.js standalone) |
 | TLS / reverse proxy | Caddy container (default) or nginx |
 
-Local development uses .NET Aspire (`docs/conventions/backend/13-deployment-and-migrations.md`). Production uses Compose on one or more VPS instances.
+Local development uses .NET Aspire (`docs/conventions/backend/deployment-and-migrations.md`). Production uses Compose on one or more VPS instances.
 
 ---
 
 ## 2. Required Artifacts
 
-Copy templates from `docs/templates/infra/` into the project repository:
+Copy templates from `docs/templates/config/infra/` into the project repository:
 
 | Template | Destination |
 |:---|:---|
@@ -99,7 +99,7 @@ Do not introduce Kubernetes or a cloud PaaS without a project ADR that justifies
 ## 8. Database and Migrations
 
 - Compose provisions the PostgreSQL container and persistent volume.
-- Schema changes follow `docs/conventions/backend/13-deployment-and-migrations.md`.
+- Schema changes follow `docs/conventions/backend/deployment-and-migrations.md`.
 - MUST NOT run `Database.MigrateAsync()` on app startup in production.
 
 ---

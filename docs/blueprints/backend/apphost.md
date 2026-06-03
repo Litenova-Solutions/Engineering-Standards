@@ -1,6 +1,6 @@
 # Blueprint: AppHost
 
-Copy into `apps/api/src/{ProjectName}.AppHost/`. See `docs/conventions/backend/13-deployment-and-migrations.md` for package references.
+Copy into `apps/api/src/{ProjectName}.AppHost/`. See `docs/conventions/backend/deployment-and-migrations.md` for package references.
 
 ---
 

@@ -4,6 +4,16 @@ This document is the authoritative guide for all design decisions in the WebApi 
 
 ---
 
+## Agent Quick Rules
+
+- MUST use `IEndpoint`; MUST NOT use MVC `Controller` / `ControllerBase`.
+- Endpoints inject `ICommandMediator` or `IQueryMediator` only; no repositories or `DbContext`.
+- WebApi references Contracts projects only; handlers register in `Program.cs`.
+- No `try-catch` in endpoints; `GlobalExceptionHandler` maps exceptions.
+- Actor identity from JWT claims only; MUST NOT accept actor IDs from request bodies for the authenticated user.
+
+---
+
 ## Guiding Philosophy
 
 The API layer is a thin adapter. Its only job is to translate HTTP into application commands and queries, and translate results back into HTTP responses. Any logic beyond this translation does not belong here.
@@ -234,7 +244,7 @@ internal static class GetPostByIdApiMappings
 }
 ```
 
-> **Route parameter type rule.** Route parameters MUST use strongly typed IDs (`PostId`, `OrderId`, etc.) that implement `IParsable<T>`. ASP.NET Core binds them from the route segment. Register `StronglyTypedIdSchemaTransformer` so OpenAPI documents them as `string` (`format: uuid`). See `docs/conventions/backend/02-domain-layer.md` (Strongly-Typed ID Reference).
+> **Route parameter type rule.** Route parameters MUST use strongly typed IDs (`PostId`, `OrderId`, etc.) that implement `IParsable<T>`. ASP.NET Core binds them from the route segment. Register `StronglyTypedIdSchemaTransformer` so OpenAPI documents them as `string` (`format: uuid`). See `docs/conventions/backend/domain-layer.md` (Strongly-Typed ID Reference).
 
 ### Endpoint Class
 
@@ -334,7 +344,7 @@ The `GlobalExceptionHandler` maps exception types to these codes automatically. 
 
 When an endpoint returns a `400 Bad Request` due to a command or query validation failure (`CommandValidationException` or `QueryValidationException`), the response body **MUST** conform strictly to the **RFC 7807 (Problem Details)** standard with the Content-Type header set to `application/problem+json`.
 
-The response **MUST** include an `invalidParams` array at the top level. Each entry has `name` (camelCase field path) and `reason` (human-readable message). This schema is the contract the Next.js frontend relies on to display form-level validation errors automatically. See `docs/conventions/frontend/08-error-handling-and-problem-details.md`.
+The response **MUST** include an `invalidParams` array at the top level. Each entry has `name` (camelCase field path) and `reason` (human-readable message). This schema is the contract the Next.js frontend relies on to display form-level validation errors automatically. See `docs/conventions/frontend/error-handling-and-problem-details.md`.
 
 #### Validation Error JSON Schema Example
 
@@ -352,7 +362,7 @@ The response **MUST** include an `invalidParams` array at the top level. Each en
 }
 ```
 
-The canonical `GlobalExceptionHandler` implementation that produces this shape is in `docs/conventions/backend/06-exception-hierarchy.md`. Register it in `Program.cs`:
+The canonical `GlobalExceptionHandler` implementation that produces this shape is in `docs/conventions/backend/exception-hierarchy.md`. Register it in `Program.cs`:
 
 ```csharp
 builder.Services.AddProblemDetails();
@@ -415,7 +425,7 @@ Breaking changes require a new API version. Additive fields, new endpoints, and 
 
 ## Idempotent Commands
 
-Re-triable `POST` and `PATCH` endpoints MUST support the `Idempotency-Key` header when duplicate execution would create duplicate state, send duplicate notifications, or repeat an external operation. See `docs/conventions/backend/10-reliability.md`.
+Re-triable `POST` and `PATCH` endpoints MUST support the `Idempotency-Key` header when duplicate execution would create duplicate state, send duplicate notifications, or repeat an external operation. See `docs/conventions/backend/reliability.md`.
 
 ```csharp
 // GOOD: command endpoint accepts Idempotency-Key

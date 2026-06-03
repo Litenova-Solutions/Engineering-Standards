@@ -103,4 +103,4 @@ export function PostListPage() {
 }
 ```
 
-See `docs/conventions/frontend/07-feature-boundaries.md` for import rules and `docs/conventions/frontend/03-data-fetching.md` for data patterns.
+See `docs/conventions/frontend/feature-boundaries.md` for import rules and `docs/conventions/frontend/data-fetching.md` for data patterns.

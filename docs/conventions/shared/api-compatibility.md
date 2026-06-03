@@ -52,13 +52,13 @@ Fail the pipeline on breaking changes unless:
 2. Document additive changes in GitHub Release notes.
 3. Regenerate frontend types (`openapi-typescript`) in the same release PR when the API is consumed by web or mobile clients.
 
-See `docs/conventions/backend/08-testing.md` for freshness commands.
+See `docs/conventions/backend/testing.md` for freshness commands.
 
 ---
 
 ## 4. Error Schema Stability
 
-Problem Details responses SHOULD expose stable `errorCode` values. See `docs/conventions/backend/06-exception-hierarchy.md`. Contract tests SHOULD assert error shape for documented failure cases.
+Problem Details responses SHOULD expose stable `errorCode` values. See `docs/conventions/backend/exception-hierarchy.md`. Contract tests SHOULD assert error shape for documented failure cases.
 
 ---
 
@@ -74,7 +74,7 @@ Existing projects on Swashbuckle SHOULD migrate to `Microsoft.AspNetCore.OpenApi
 
 1. Add ADR documenting the migration window.
 2. Replace Swashbuckle middleware with `AddOpenApi()` / `MapOpenApi()`.
-3. Add Scalar in Development only (`docs/conventions/backend/05-api-layer.md`).
+3. Add Scalar in Development only (`docs/conventions/backend/api-layer.md`).
 4. Export spec at build time with `Microsoft.Extensions.ApiDescription.Server`.
 5. Run OpenAPI diff against baseline before cutover.
 6. Remove Swashbuckle package references after consumers accept the new spec.

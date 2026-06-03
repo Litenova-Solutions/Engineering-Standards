@@ -9,7 +9,7 @@ Presentation code lives under `features/{feature}/`. Business rules and invarian
 ## 1. Import Rules
 
 - Code under `features/{feature}/` MUST NOT import from `features/{otherFeature}/`.
-- Cross-feature reuse MUST follow the promotion rule in `docs/conventions/00-principles.md`: promote to `shared/` (`@/shared/...`) or generic UI to `components/ui/`.
+- Cross-feature reuse MUST follow the promotion rule in `docs/conventions/principles.md`: promote to `shared/` (`@/shared/...`) or generic UI to `components/ui/`.
 - `app/` route shells MUST import feature entry components from `features/{feature}/` only.
 
 ```typescript
@@ -32,7 +32,7 @@ Project repositories MUST enable `eslint-plugin-boundaries` (or equivalent) with
 | `shared` | `shared/**` | `lib`, other `shared` |
 | `app` | `app/**` | `features/*` entry points only, `lib`, `components` |
 
-Example dependency rule (copy full file from `docs/templates/eslint.config.ts`):
+Example dependency rule (copy full file from `docs/templates/config/eslint.config.ts`):
 
 ```json
 {

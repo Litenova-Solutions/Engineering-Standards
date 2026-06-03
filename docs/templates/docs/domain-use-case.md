@@ -12,7 +12,9 @@
 
 ## Summary
 
-One paragraph: business outcome and primary user flow.
+<!-- One paragraph: business outcome and primary user flow.
+Example: Authenticated authors create draft posts with a title and body.
+The post appears in the author's draft list immediately after creation. -->
 
 ---
 

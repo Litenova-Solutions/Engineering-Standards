@@ -16,7 +16,7 @@ A third approach uses Minimal APIs with a structured `IEndpoint` pattern: each e
 
 ## Decision
 
-All HTTP endpoints MUST implement `IEndpoint`. MVC controllers (classes inheriting from `ControllerBase` or `Controller`) are not used and MUST NOT be added. The `IEndpoint` interface and registration pattern are defined in `docs/conventions/backend/05-api-layer.md`.
+All HTTP endpoints MUST implement `IEndpoint`. MVC controllers (classes inheriting from `ControllerBase` or `Controller`) are not used and MUST NOT be added. The `IEndpoint` interface and registration pattern are defined in `docs/conventions/backend/api-layer.md`.
 
 ## Consequences
 

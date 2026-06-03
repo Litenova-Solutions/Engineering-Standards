@@ -33,4 +33,4 @@ export async function getApiClient() {
 await fetch(`${process.env.API_URL}/posts`)
 ```
 
-See `docs/conventions/frontend/03-data-fetching.md`.
+See `docs/conventions/frontend/data-fetching.md`.

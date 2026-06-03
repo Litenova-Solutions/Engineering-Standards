@@ -98,7 +98,7 @@ Option 3 is more projects but provides the strongest enforcement. It prevents We
 
 ## Decision
 
-The application layer is split into five projects: `Application.Write.Contracts`, `Application.Write`, `Application.Read.Contracts`, `Application.Read`, and `Application.Reactions`. This structure enforces the CQRS split at the compiler level. See `docs/conventions/backend/03-application-layer.md` for the full convention.
+The application layer is split into five projects: `Application.Write.Contracts`, `Application.Write`, `Application.Read.Contracts`, `Application.Read`, and `Application.Reactions`. This structure enforces the CQRS split at the compiler level. See `docs/conventions/backend/application-layer.md` for the full convention.
 
 ## Consequences
 

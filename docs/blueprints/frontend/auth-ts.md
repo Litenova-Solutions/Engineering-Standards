@@ -33,6 +33,6 @@ import { handlers } from "@/auth"
 export const { GET, POST } = handlers
 ```
 
-Protected route groups MUST call `auth()` in `layout.tsx`. See `docs/conventions/frontend/01-nextjs-app-router.md` and `docs/decisions/authjs-v5-authentication.md`.
+Protected route groups MUST call `auth()` in `layout.tsx`. See `docs/conventions/frontend/nextjs-app-router.md` and `docs/decisions/authjs-v5-authentication.md`.
 
-Admin API JWT minting for backend calls: `docs/conventions/frontend/10-admin-api-auth.md`.
+Admin API JWT minting for backend calls: `docs/conventions/frontend/admin-api-auth.md`.

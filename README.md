@@ -4,6 +4,8 @@
 
 Normative conventions and agent contracts for full-stack .NET and Next.js projects. Use this repository as the single source of truth for architecture, coding rules, and AI agent behavior.
 
+**New to a project using these standards?** Read [`docs/guides/onboarding.md`](docs/guides/onboarding.md) first, then your project `AGENTS.md` shim.
+
 ```mermaid
 flowchart LR
   subgraph consume [Your project]
@@ -29,7 +31,7 @@ flowchart LR
 | Role | Start here |
 |:---|:---|
 | AI agent | [`AGENTS.md`](AGENTS.md) |
-| Human engineer | [`docs/README.md`](docs/README.md) then the convention for your layer |
+| Human engineer | [`docs/guides/onboarding.md`](docs/guides/onboarding.md), then [`docs/README.md`](docs/README.md) |
 | New use case | [`docs/guides/agentic-domain-driven-design.md`](docs/guides/agentic-domain-driven-design.md), then [`docs/guides/add-new-use-case.md`](docs/guides/add-new-use-case.md) |
 
 ---
@@ -57,7 +59,7 @@ cd standards && git checkout <40-char-commit-sha> && cd ..
 git add standards && git commit -m "chore: pin engineering-standards to commit abc123..."
 ```
 
-After **v1.0.0-rc.1** or **v1.0.0** is published, switch to semver tags. See [`RELEASES.md`](RELEASES.md) for prerelease notes. There is no `CHANGELOG.md` before **v2.0.0**; release notes for v1.x are captured in GitHub Release descriptions and `RELEASES.md`.
+After **v1.0.0-rc.1** or **v1.0.0** is published, switch to semver tags. There is no `CHANGELOG.md` before **v2.0.0**; release notes for v1.x are captured in GitHub Release descriptions only.
 
 | Semver | Meaning |
 |:---|:---|
@@ -134,7 +136,7 @@ Write-Host "Next: pnpm dev:aspire (or see project development guide)"
 
 ### Project `AGENTS.md` shim
 
-Copy [`docs/templates/project-agents.md`](docs/templates/project-agents.md) to your repo root as `AGENTS.md`. It should:
+Copy [`docs/templates/docs/project-agents.md`](docs/templates/docs/project-agents.md) to your repo root as `AGENTS.md`. It should:
 
 1. Point to `standards/AGENTS.md` (or `.standards/AGENTS.md`).
 2. List project-specific MUST rules.
@@ -142,7 +144,7 @@ Copy [`docs/templates/project-agents.md`](docs/templates/project-agents.md) to y
 
 ### CI enforcement
 
-Copy [`docs/templates/ci-workflow.yml`](docs/templates/ci-workflow.yml) to `.github/workflows/ci.yml`. It runs backend and frontend gates plus optional checks:
+Copy [`docs/templates/config/ci-workflow.yml`](docs/templates/config/ci-workflow.yml) to `.github/workflows/ci.yml`. It runs backend and frontend gates plus optional checks:
 
 - OpenAPI artifact freshness
 - Playwright when `apps/web/` exists
@@ -164,18 +166,17 @@ engineering-standards/
 ├── AGENTS.md                 Agent contract (read first)
 ├── standards.manifest.json   Version and paths for tooling
 ├── standards.schema.json     JSON schema for manifest validation
-├── RELEASES.md               v1 release notes (pre-CHANGELOG)
 ├── docs/
 │   ├── README.md             Documentation map
-│   ├── governance/           Versioning, exceptions, adoption
-│   ├── controls/             Enforcement matrix
+│   ├── glossary.md           ADDD term definitions
+│   ├── governance/           Standards exceptions process
 │   ├── architecture/       Structural guide
 │   ├── conventions/        Normative rules (agents load these)
 │   ├── decisions/          Why choices were made (humans / new deps)
 │   ├── guides/             DoD, add-feature playbooks
 │   ├── philosophy.md       Human rationale (not for agents)
 │   ├── agentic-development.md
-│   └── templates/          Copy into consumer repos
+│   └── templates/          docs/ (markdown) and config/ (CI, Docker, MSBuild)
 └── .cursor/rules/            Cursor summaries when editing standards
 ```
 

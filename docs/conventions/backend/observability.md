@@ -352,7 +352,7 @@ builder.Services.AddOpenTelemetry()
         .AddOtlpExporter(options => options.Endpoint = new Uri(otlpEndpoint)));
 ```
 
-Validate `OpenTelemetry:OtlpEndpoint` through a typed options class in production. See `docs/conventions/backend/16-options-and-configuration.md`.
+Validate `OpenTelemetry:OtlpEndpoint` through a typed options class in production. See `docs/conventions/backend/options-and-configuration.md`.
 
 ### Worker projects
 

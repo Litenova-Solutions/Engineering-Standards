@@ -31,7 +31,7 @@ ENV ConnectionStrings__Default=$DATABASE_PASSWORD
 
 ## 2. Complete Backend Dockerfile
 
-Prefer the copy-paste template at `docs/templates/Dockerfile.api` over inlining this block.
+Prefer the copy-paste template at `docs/templates/config/Dockerfile.api` over inlining this block.
 
 ```dockerfile
 # ---- build stage ----
@@ -197,7 +197,7 @@ Pass `GIT_SHA` and `BUILD_TIMESTAMP` as build args from the CI pipeline.
 
 ## 7. Promotion
 
-The same image digest that passes staging MUST be promoted to production. Do not rebuild between staging and production. See `docs/conventions/backend/13-deployment-and-migrations.md`.
+The same image digest that passes staging MUST be promoted to production. Do not rebuild between staging and production. See `docs/conventions/backend/deployment-and-migrations.md`.
 
 ---
 

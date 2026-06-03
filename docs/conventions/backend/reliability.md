@@ -2,7 +2,7 @@
 
 This document defines the reliability conventions for idempotent HTTP commands, durable event dispatch, retries, and failure handling. Read it before implementing any operation where a retry could create duplicate state or where losing a side effect would harm users or the business.
 
-> This convention extends `docs/decisions/outbox-pattern-as-reliability-escalation.md` (Outbox pattern), `docs/decisions/transaction-pipeline-behaviors.md` (Transaction pipeline behaviors), and `docs/conventions/backend/09-observability.md`.
+> This convention extends `docs/decisions/outbox-pattern-as-reliability-escalation.md` (Outbox pattern), `docs/decisions/transaction-pipeline-behaviors.md` (Transaction pipeline behaviors), and `docs/conventions/backend/observability.md`.
 
 ---
 
@@ -198,5 +198,5 @@ Retries MUST use bounded exponential backoff with jitter. Infinite tight loops a
 | `AggregateNotFoundException` | No |
 | HTTP 400, 401, 403, 404 from an external service | No |
 
-Every retry loop MUST log the operation name, attempt count, next attempt time, and correlation ID. See `docs/conventions/backend/09-observability.md`.
+Every retry loop MUST log the operation name, attempt count, next attempt time, and correlation ID. See `docs/conventions/backend/observability.md`.
 

@@ -586,20 +586,9 @@ Validators MUST:
 Validators MUST NOT:
 - Query the database to check business rules (do not check whether a post already exists in a validator).
 - Contain domain logic.
-- Use `Guard.Against` from Ardalis.GuardClauses. `Guard.Against` throws `ArgumentException` by default, which maps to HTTP 500. Always throw custom `CommandValidationException` or `QueryValidationException` subclasses directly.
+- Use `Guard.Against` in validators. See `exception-hierarchy.md` (canonical GOOD/BAD examples).
 
 ```csharp
-// BAD: Guard.Against throws ArgumentException, which maps to HTTP 500
-internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostCommand>
-{
-    public Task ValidateAsync(CreatePostCommand command, CancellationToken cancellationToken)
-    {
-        Guard.Against.NullOrWhiteSpace(command.Title, nameof(command.Title));
-        // Guard.Against throws ArgumentException -> GlobalExceptionHandler maps it to 500
-        return Task.CompletedTask;
-    }
-}
-
 // GOOD: throw the correct custom exception directly
 internal sealed class CreatePostCommandValidator : ICommandValidator<CreatePostCommand>
 {
@@ -628,8 +617,8 @@ The Application layer defines its own input and output types. It does not pass d
 
 When a command needs to pass data into domain factory methods or domain value objects, the handler constructs those types inline. There is no separate mapper class in the Application layer for domain construction; the handler is the translation site.
 
-If the same mapping appears in multiple handlers, extract it to a feature-level `Shared/` extension method, applying the Promotion Rule from `docs/conventions/00-principles.md`.
+If the same mapping appears in multiple handlers, extract it to a feature-level `Shared/` extension method, applying the Promotion Rule from `docs/conventions/principles.md`.
 
 ---
 
-Use case documentation for a project lives at `docs/domain/{feature}/{use-case}.md`. Copy `docs/templates/domain-use-case.md` when adding a new use case. See `docs/guides/agentic-domain-driven-design.md`.
+Use case documentation for a project lives at `docs/domain/{feature}/{use-case}.md`. Copy `docs/templates/docs/domain-use-case.md` when adding a new use case. See `docs/guides/agentic-domain-driven-design.md`.

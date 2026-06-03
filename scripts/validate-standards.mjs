@@ -26,18 +26,18 @@ if (agentsLines > 165) {
 }
 
 // 1b. No LangVersion preview in production template
-const buildProps = read("docs/templates/Directory.Build.props")
+const buildProps = read("docs/templates/config/Directory.Build.props")
 if (/LangVersion>\s*preview/i.test(buildProps)) {
-  errors.push("docs/templates/Directory.Build.props must not set LangVersion to preview")
+  errors.push("docs/templates/config/Directory.Build.props must not set LangVersion to preview")
 }
 
-// 2. Manifest version matches README release
+// 2. Manifest version
 const manifest = JSON.parse(read("standards.manifest.json"))
-if (manifest.version !== "1.0.0") {
-  errors.push(`standards.manifest.json version is ${manifest.version}, expected 1.0.0`)
+if (!manifest.version) {
+  errors.push("standards.manifest.json missing version")
 }
 
-// 2b. agentLoadPlans paths exist
+// 2b. agentLoadPlans and conventionIndex paths exist
 if (manifest.agentLoadPlans) {
   for (const [plan, paths] of Object.entries(manifest.agentLoadPlans)) {
     for (const rel of paths) {
@@ -47,17 +47,27 @@ if (manifest.agentLoadPlans) {
     }
   }
 }
+if (manifest.conventionIndex) {
+  for (const [key, rel] of Object.entries(manifest.conventionIndex)) {
+    if (!exists(rel)) {
+      errors.push(`conventionIndex.${key} references missing file: ${rel}`)
+    }
+  }
+}
 
-// 2c. Required governance and control docs
+// 2c. Required governance and docs
 const requiredDocs = [
-  "RELEASES.md",
   "standards.schema.json",
+  "docs/glossary.md",
+  "docs/guides/onboarding.md",
   "docs/governance/exceptions.md",
-  "docs/governance/versioning.md",
-  "docs/controls/enforcement-matrix.md",
-  "docs/conventions/backend/20-object-authorization.md",
+  "docs/conventions/backend/object-authorization.md",
+  "docs/conventions/backend/api-acceptance-tests.md",
+  "docs/conventions/backend/external-dependencies.md",
+  "docs/conventions/frontend/state-management.md",
   "docs/conventions/shared/security-controls.md",
   "docs/conventions/shared/api-compatibility.md",
+  "scripts/validate-feature-files.ps1",
 ]
 for (const file of requiredDocs) {
   if (!exists(file)) {
@@ -65,32 +75,46 @@ for (const file of requiredDocs) {
   }
 }
 
+// 2d. Removed legacy paths must not return
+const forbiddenPaths = [
+  "docs/controls/enforcement-matrix.md",
+  "docs/governance/versioning.md",
+  "RELEASES.md",
+  "docs/conventions/00-principles.md",
+  "docs/conventions/backend/08-testing.md",
+]
+for (const file of forbiddenPaths) {
+  if (exists(file)) {
+    errors.push(`Legacy path still exists (remove or rename): ${file}`)
+  }
+}
+
 // 3. Required templates for bootstrap
 const requiredTemplates = [
-  "docs/templates/global.json",
-  "docs/templates/Directory.Build.props",
-  "docs/templates/Directory.Packages.props",
-  "docs/templates/dotnet-tools.json",
-  "docs/templates/package.json",
-  "docs/templates/pnpm-workspace.yaml",
-  "docs/templates/turbo.json",
-  "docs/templates/.nvmrc",
-  "docs/templates/ci-workflow.yml",
-  "docs/templates/Dockerfile.api",
-  "docs/templates/Dockerfile.web",
-  "docs/templates/dockerignore",
-  "docs/templates/playwright.config.ts",
-  "docs/templates/eslint.config.ts",
-  "docs/templates/packages/api-types/package.json",
-  "docs/templates/packages/api-client/package.json",
+  "docs/templates/config/global.json",
+  "docs/templates/config/Directory.Build.props",
+  "docs/templates/config/Directory.Packages.props",
+  "docs/templates/config/dotnet-tools.json",
+  "docs/templates/config/package.json",
+  "docs/templates/config/pnpm-workspace.yaml",
+  "docs/templates/config/turbo.json",
+  "docs/templates/config/.nvmrc",
+  "docs/templates/config/ci-workflow.yml",
+  "docs/templates/config/Dockerfile.api",
+  "docs/templates/config/Dockerfile.web",
+  "docs/templates/config/dockerignore",
+  "docs/templates/config/playwright.config.ts",
+  "docs/templates/config/eslint.config.ts",
+  "docs/templates/config/packages/api-types/package.json",
+  "docs/templates/config/packages/api-client/package.json",
   "docs/blueprints/backend/program-cs.md",
   "docs/blueprints/frontend/proxy-ts.md",
   "docs/blueprints/frontend/feature-use-case.md",
-  "docs/conventions/frontend/07-feature-boundaries.md",
-  "docs/templates/domain-system-index.md",
-  "docs/templates/domain-feature.md",
-  "docs/templates/domain-use-case.md",
-  "docs/templates/domain-use-case.tests.md",
+  "docs/conventions/frontend/feature-boundaries.md",
+  "docs/templates/docs/domain-system-index.md",
+  "docs/templates/docs/domain-feature.md",
+  "docs/templates/docs/domain-use-case.md",
+  "docs/templates/docs/domain-use-case.tests.md",
   "docs/guides/write-use-case-doc.md",
   "docs/guides/agentic-domain-driven-design.md",
   "docs/blueprints/README.md",
@@ -131,7 +155,12 @@ for (const file of mdFiles) {
 
     if (target.startsWith("/")) {
       resolved = path.join(root, target.slice(1))
-    } else if (target.startsWith("docs/") || target.startsWith("AGENTS") || target.startsWith("CONTRIBUTING") || target.startsWith("standards.manifest")) {
+    } else if (
+      target.startsWith("docs/") ||
+      target.startsWith("AGENTS") ||
+      target.startsWith("CONTRIBUTING") ||
+      target.startsWith("standards.manifest")
+    ) {
       resolved = path.join(root, target)
     } else {
       resolved = path.resolve(fromDir, target)
@@ -143,7 +172,6 @@ for (const file of mdFiles) {
 
     if (!fs.existsSync(resolved)) {
       const rel = path.relative(root, file)
-      // Skip intentional consumer-repo paths
       if (target.includes("docs/domain/") || target.includes("standards/AGENTS")) continue
       errors.push(`Broken link in ${rel}: (${target})`)
     }
@@ -177,17 +205,9 @@ for (const file of scanFiles) {
 // 6. Stale admin auth path
 for (const file of mdFiles) {
   const content = fs.readFileSync(file, "utf8")
-  if (content.includes("06-admin-api-auth")) {
-    errors.push(`Stale reference to 06-admin-api-auth in ${path.relative(root, file)}`)
+  if (content.includes("06-admin-api-auth") || content.includes("frontend/01-")) {
+    errors.push(`Stale numbered convention reference in ${path.relative(root, file)}`)
   }
-}
-
-// 7. Duplicate frontend admin auth file
-if (exists("docs/conventions/frontend/06-admin-api-auth.md")) {
-  errors.push("Duplicate file docs/conventions/frontend/06-admin-api-auth.md still exists")
-}
-if (!exists("docs/conventions/frontend/10-admin-api-auth.md")) {
-  errors.push("Missing docs/conventions/frontend/10-admin-api-auth.md")
 }
 
 console.log(`Validated ${mdFiles.length} markdown files`)

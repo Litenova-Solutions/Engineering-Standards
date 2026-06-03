@@ -73,4 +73,4 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 - [ ] Relevant convention files read for every layer touched.
 - [ ] No forbidden packages introduced (`docs/conventions/shared/forbidden-packages.md`).
-- [ ] Feature folders do not import across features (`docs/conventions/frontend/07-feature-boundaries.md`).
+- [ ] Feature folders do not import across features (`docs/conventions/frontend/feature-boundaries.md`).

@@ -9,7 +9,7 @@ import os from "node:os"
 import { fileURLToPath } from "node:url"
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
-const templatesRoot = path.join(root, "docs/templates")
+const templatesRoot = path.join(root, "docs/templates/config")
 const errors = []
 
 const copyMap = [
@@ -38,7 +38,7 @@ function copyFile(src, dest, destRoot) {
   const srcPath = path.join(templatesRoot, src)
   const destPath = path.join(destRoot, dest)
   if (!fs.existsSync(srcPath)) {
-    errors.push(`Source missing: docs/templates/${src}`)
+    errors.push(`Source missing: docs/templates/config/${src}`)
     return
   }
   fs.mkdirSync(path.dirname(destPath), { recursive: true })
@@ -49,7 +49,7 @@ function copyDir(src, dest, destRoot) {
   const srcPath = path.join(templatesRoot, src)
   const destPath = path.join(destRoot, dest)
   if (!fs.existsSync(srcPath)) {
-    errors.push(`Source dir missing: docs/templates/${src}`)
+    errors.push(`Source dir missing: docs/templates/config/${src}`)
     return
   }
   fs.mkdirSync(destPath, { recursive: true })

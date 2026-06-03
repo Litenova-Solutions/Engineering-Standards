@@ -67,7 +67,7 @@ export const config = {
 
 The `AUTH_SECRET` environment variable MUST be set. All provider credentials use the `AUTH_*` prefix.
 
-Token attachment to ASP.NET Core API requests follows the pattern in `docs/conventions/frontend/03-data-fetching.md`: the `getApiClient()` factory reads the session token from the httpOnly cookie and attaches it as a Bearer header.
+Token attachment to ASP.NET Core API requests follows the pattern in `docs/conventions/frontend/data-fetching.md`: the `getApiClient()` factory reads the session token from the httpOnly cookie and attaches it as a Bearer header.
 
 ---
 

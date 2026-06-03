@@ -1,8 +1,8 @@
 # Background Jobs
 
-This document defines job **implementation** patterns: interfaces, loops, scheduling, and durable job tables. It does not define **where jobs are hosted**. Hosting rules live in `docs/conventions/backend/14-worker-projects.md`.
+This document defines job **implementation** patterns: interfaces, loops, scheduling, and durable job tables. It does not define **where jobs are hosted**. Hosting rules live in `docs/conventions/backend/worker-projects.md`.
 
-> This convention depends on `docs/conventions/backend/10-reliability.md` for retry and idempotency rules.
+> This convention depends on `docs/conventions/backend/reliability.md` for retry and idempotency rules.
 
 ---
 

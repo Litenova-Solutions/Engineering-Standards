@@ -33,7 +33,7 @@ If the endpoint accepts an ID that maps to persisted data owned by or scoped to 
 
 ### Endpoint ownership check
 
-See `docs/conventions/backend/15-authentication-and-authorization.md` for the endpoint pattern using `IQueryMediator`.
+See `docs/conventions/backend/authentication-and-authorization.md` for the endpoint pattern using `IQueryMediator`.
 
 ### Authorization handler (repeated rules)
 

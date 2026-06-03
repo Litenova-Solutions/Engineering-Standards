@@ -19,7 +19,7 @@ Commit `.vscode/extensions.json`:
 
 ## Launch configurations
 
-Copy `docs/templates/vscode-launch.json` to `.vscode/launch.json` and replace `{ProjectName}` with your project name.
+Copy `docs/templates/config/vscode-launch.json` to `.vscode/launch.json` and replace `{ProjectName}` with your project name.
 
 Typical configs:
 
@@ -52,11 +52,11 @@ Optional `.vscode/tasks.json` entries:
 
 ## Optional devcontainer
 
-For teams that want identical toolchains, copy `docs/templates/devcontainer/devcontainer.json`. Requires Docker. Not required for standards compliance.
+For teams that want identical toolchains, copy `docs/templates/config/devcontainer/devcontainer.json`. Requires Docker. Not required for standards compliance.
 
 ---
 
 ## References
 
-- `docs/conventions/backend/13-deployment-and-migrations.md` — Aspire orchestration
+- `docs/conventions/backend/deployment-and-migrations.md` — Aspire orchestration
 - `docs/conventions/shared/ci.md` — root script conventions

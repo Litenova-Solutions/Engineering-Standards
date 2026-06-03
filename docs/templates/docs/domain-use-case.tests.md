@@ -7,7 +7,7 @@
 | Risk Level | Low / Medium / High |
 | Last updated | |
 
-Risk level determines mandatory test layers (align with `docs/conventions/backend/08-testing.md`):
+Risk level determines mandatory test layers (align with `docs/conventions/backend/testing.md`):
 
 - **Low:** Integration required; other layers optional unless the operation has domain invariants.
 - **Medium:** Domain Unit + Integration + one E2E or frontend unit path required when UI exists.

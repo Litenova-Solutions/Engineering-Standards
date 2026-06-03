@@ -20,7 +20,7 @@ Understanding agent failure modes requires understanding how agents differ from 
 
 **Agents pattern-match against examples.** A bad example in the codebase will be reproduced more reliably than a good example in a comment. If the codebase has one handler that injects a repository instead of `IDatabaseContext`, agents will reproduce that pattern. If the convention file says "do not inject repositories in query handlers" but includes no `// BAD:` example showing exactly what not to do, the prohibition is weaker than it appears.
 
-**Agents have context window limits.** Loading a 5,000-line convention file into every task wastes context budget and dilutes the signal. Scoped, short files loaded only when relevant are more effective than comprehensive documents loaded everywhere. `AGENTS.md` is kept as focused as possible; every line must earn its place by preventing a known agent failure mode.
+**Agents have context window limits.** Loading a 5,000-line convention file into every task wastes context budget and dilutes the signal. Scoped, short files loaded only when relevant are more effective than loading every convention on every task. `AGENTS.md` is kept as focused as possible; every line must earn its place by preventing a known agent failure mode.
 
 **Agents follow explicit rules more reliably than cultural norms.** "The team prefers X" is weak. "MUST use X, MUST NOT use Y" is stronger. A compiler error that prevents the bad pattern is stronger still. The standards are designed with this hierarchy in mind: compiler constraints first, architecture tests second, explicit written rules third, cultural norms never.
 
@@ -32,9 +32,9 @@ Understanding agent failure modes requires understanding how agents differ from 
 
 Each failure mode has a corresponding mitigation built into the standards.
 
-**Stale context:** Convention files are scoped by layer. An agent editing a domain file loads `02-domain-layer.md` only. It does not load the full repository. This keeps context focused and reduces the chance that a convention from a different layer pollutes the current task.
+**Stale context:** Convention files are scoped by layer via `agentLoadPlans` in `standards.manifest.json`. An agent editing domain code loads `backend.domain` (for example `domain-layer.md`) only, not the full repository.
 
-**Pattern drift:** Architecture tests in `{ProjectName}.Architecture.Tests` enforce structural rules that survive context window limitations. A test that fails when a query handler injects a repository interface catches the violation regardless of what the agent had in context during generation. These tests are described in `docs/conventions/backend/08-testing.md`.
+**Pattern drift:** Architecture tests in `{ProjectName}.Architecture.Tests` enforce structural rules that survive context window limitations. A test that fails when a query handler injects a repository interface catches the violation regardless of what the agent had in context during generation. These tests are described in `docs/conventions/backend/testing.md`.
 
 **Hallucinated conventions:** All conventions are written down explicitly with `// GOOD:` and `// BAD:` code examples. An agent cannot invent a convention that contradicts a written rule that shows both what to do and what not to do. The examples are not decoration; they are the primary mechanism for preventing hallucinated patterns.
 
@@ -95,13 +95,13 @@ Different tasks require different context. Loading all convention files for ever
 | Task | Files to Load |
 |:---|:---|
 | Adding a domain aggregate | `AGENTS.md`, `02-domain-layer.md` |
-| Adding a command | `AGENTS.md`, `03-application-layer.md`, `06-exception-hierarchy.md` |
-| Adding a query | `AGENTS.md`, `03-application-layer.md`, `07-query-read-strategy.md` |
-| Adding an endpoint | `AGENTS.md`, `05-api-layer.md` |
-| Adding an event handler | `AGENTS.md`, `03-application-layer.md`, `06-exception-hierarchy.md` |
+| Adding a command | `AGENTS.md`, `application-layer.md`, `06-exception-hierarchy.md` |
+| Adding a query | `AGENTS.md`, `application-layer.md`, `07-query-read-strategy.md` |
+| Adding an endpoint | `AGENTS.md`, `api-layer.md` |
+| Adding an event handler | `AGENTS.md`, `application-layer.md`, `06-exception-hierarchy.md` |
 | Adding infrastructure | `AGENTS.md`, `04-infrastructure-layer.md` |
-| Writing backend tests | `AGENTS.md`, `08-testing.md` |
-| Writing frontend tests | `AGENTS.md`, `frontend/06-testing.md` |
-| Adding frontend UI for a use case | `AGENTS.md`, `frontend/01-nextjs-app-router.md`, `frontend/03-data-fetching.md`, `frontend/07-feature-boundaries.md` |
+| Writing backend tests | `AGENTS.md`, `testing.md` |
+| Writing frontend tests | `AGENTS.md`, `frontend/testing.md` |
+| Adding frontend UI for a use case | `AGENTS.md`, `frontend/nextjs-app-router.md`, `frontend/data-fetching.md`, `frontend/feature-boundaries.md` |
 | Completing a full-stack use case | `AGENTS.md`, `agentic-guardrails.md`, `agentic-domain-driven-design.md`, `definition-of-done.md`, `ci.md` |
 | Modifying standards | `AGENTS.md`, `00-standards-meta.mdc`, `adr-template.md` |

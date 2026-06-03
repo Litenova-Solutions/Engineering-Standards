@@ -10,6 +10,25 @@ Decision records explain **why** a stack or pattern was chosen. They are **not**
 
 ---
 
+## Status lifecycle
+
+| Status | Meaning |
+|:---|:---|
+| Proposed | Under discussion; not yet normative |
+| Accepted | Active; canonical rules in conventions apply |
+| Superseded | Replaced by another decision; link the successor in the old file header |
+| Deprecated | No longer recommended; retained for history |
+
+When superseding a decision, update the old file status in its header, add a row with status **Superseded**, and point **Canonical rules** at the new convention or decision.
+
+---
+
+## Concern tags
+
+Filter the index by area: `backend`, `frontend`, `infrastructure`, `tooling`, `process`.
+
+---
+
 ## When to Write a Decision Here
 
 Write a new file in `docs/decisions/` when the standards repo adopts a new org-wide technology or reverses an existing one. Project-specific decisions belong in the **consumer repository** under `docs/decisions/`, not in this repo.
@@ -26,25 +45,25 @@ Write a new file in `docs/decisions/` when the standards repo adopts a new org-w
 
 ## Active Decisions Index
 
-| Decision | Status | Canonical rules (agents use this) |
-|:---|:---|:---|
-| [agentic-development-as-primary-model](agentic-development-as-primary-model.md) | Accepted | `AGENTS.md`, `docs/conventions/shared/agentic-guardrails.md` |
-| [clean-architecture-as-structural-foundation](clean-architecture-as-structural-foundation.md) | Accepted | `docs/architecture/clean-architecture.md` |
-| [cqrs-with-split-application-projects](cqrs-with-split-application-projects.md) | Accepted | `docs/conventions/backend/03-application-layer.md` |
-| [litebus-as-mediator](litebus-as-mediator.md) | Accepted | `docs/conventions/backend/03-application-layer.md`, `05-api-layer.md` |
-| [minimal-api-endpoint-classes](minimal-api-endpoint-classes.md) | Accepted | `docs/conventions/backend/05-api-layer.md` |
-| [contracts-projects-for-application-layer](contracts-projects-for-application-layer.md) | Accepted | `docs/conventions/backend/03-application-layer.md` |
-| [reactions-project-depends-only-on-abstractions](reactions-project-depends-only-on-abstractions.md) | Accepted | `docs/conventions/backend/03-application-layer.md` |
-| [architecture-tests-as-enforcement](architecture-tests-as-enforcement.md) | Accepted | `docs/conventions/backend/08-testing.md` |
-| [outbox-pattern-as-reliability-escalation](outbox-pattern-as-reliability-escalation.md) | Accepted | `docs/conventions/backend/10-reliability.md` |
-| [turborepo-as-monorepo-tool](turborepo-as-monorepo-tool.md) | Accepted | `docs/conventions/shared/monorepo-structure.md` |
-| [openapi-typescript-client-generation](openapi-typescript-client-generation.md) | Accepted | `docs/conventions/frontend/03-data-fetching.md` |
-| [authjs-v5-authentication](authjs-v5-authentication.md) | Accepted | `docs/conventions/frontend/01-nextjs-app-router.md`, `03-data-fetching.md` |
-| [animation-tailwind-first-framer-motion-escalation](animation-tailwind-first-framer-motion-escalation.md) | Accepted | `docs/conventions/frontend/02-components.md` |
-| [idatabasecontext-over-per-aggregate-read-stores](idatabasecontext-over-per-aggregate-read-stores.md) | Accepted | `docs/conventions/backend/07-query-read-strategy.md` |
-| [transaction-pipeline-behaviors](transaction-pipeline-behaviors.md) | Accepted | `docs/architecture/clean-architecture.md`, `docs/conventions/backend/04-infrastructure-layer.md` |
-| [pagination-convention](pagination-convention.md) | Accepted | `docs/conventions/backend/07-query-read-strategy.md` |
-| [opentelemetry-observability](opentelemetry-observability.md) | Accepted | `docs/conventions/backend/09-observability.md` |
-| [api-versioning-policy](api-versioning-policy.md) | Accepted | `docs/conventions/backend/05-api-layer.md` |
-| [signalr-for-real-time-updates](signalr-for-real-time-updates.md) | Accepted | `docs/conventions/shared/realtime-updates.md` |
-| [multi-tenancy-default](multi-tenancy-default.md) | Accepted | Project ADR required before implementation |
+| Decision | Status | Concern | Canonical rules (agents use this) |
+|:---|:---|:---|:---|
+| [agentic-development-as-primary-model](agentic-development-as-primary-model.md) | Accepted | process | `AGENTS.md`, `docs/conventions/shared/agentic-guardrails.md` |
+| [clean-architecture-as-structural-foundation](clean-architecture-as-structural-foundation.md) | Accepted | backend | `docs/architecture/clean-architecture.md` |
+| [cqrs-with-split-application-projects](cqrs-with-split-application-projects.md) | Accepted | backend | `docs/conventions/backend/application-layer.md` |
+| [litebus-as-mediator](litebus-as-mediator.md) | Accepted | backend | `docs/conventions/backend/application-layer.md`, `api-layer.md` |
+| [minimal-api-endpoint-classes](minimal-api-endpoint-classes.md) | Accepted | backend | `docs/conventions/backend/api-layer.md` |
+| [contracts-projects-for-application-layer](contracts-projects-for-application-layer.md) | Accepted | backend | `docs/conventions/backend/application-layer.md` |
+| [reactions-project-depends-only-on-abstractions](reactions-project-depends-only-on-abstractions.md) | Accepted | backend | `docs/conventions/backend/application-layer.md` |
+| [architecture-tests-as-enforcement](architecture-tests-as-enforcement.md) | Accepted | backend | `docs/conventions/backend/testing.md` |
+| [outbox-pattern-as-reliability-escalation](outbox-pattern-as-reliability-escalation.md) | Accepted | backend | `docs/conventions/backend/reliability.md` |
+| [turborepo-as-monorepo-tool](turborepo-as-monorepo-tool.md) | Accepted | tooling | `docs/conventions/shared/monorepo-structure.md` |
+| [openapi-typescript-client-generation](openapi-typescript-client-generation.md) | Accepted | frontend | `docs/conventions/frontend/data-fetching.md` |
+| [authjs-v5-authentication](authjs-v5-authentication.md) | Accepted | frontend | `docs/conventions/frontend/nextjs-app-router.md`, `data-fetching.md` |
+| [animation-tailwind-first-framer-motion-escalation](animation-tailwind-first-framer-motion-escalation.md) | Accepted | frontend | `docs/conventions/frontend/components.md` |
+| [idatabasecontext-over-per-aggregate-read-stores](idatabasecontext-over-per-aggregate-read-stores.md) | Accepted | backend | `docs/conventions/backend/query-read-strategy.md` |
+| [transaction-pipeline-behaviors](transaction-pipeline-behaviors.md) | Accepted | backend | `docs/architecture/clean-architecture.md`, `infrastructure-layer.md` |
+| [pagination-convention](pagination-convention.md) | Accepted | backend | `docs/conventions/backend/query-read-strategy.md` |
+| [opentelemetry-observability](opentelemetry-observability.md) | Accepted | infrastructure | `docs/conventions/backend/observability.md` |
+| [api-versioning-policy](api-versioning-policy.md) | Accepted | backend | `docs/conventions/backend/api-layer.md` |
+| [signalr-for-real-time-updates](signalr-for-real-time-updates.md) | Accepted | infrastructure | `docs/conventions/shared/realtime-updates.md` |
+| [multi-tenancy-default](multi-tenancy-default.md) | Accepted | backend | Project ADR required before implementation |

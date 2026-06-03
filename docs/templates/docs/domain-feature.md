@@ -73,6 +73,8 @@ Add a row when a domain invariant has automated coverage. Link to the use case t
 
 ## Use Cases
 
-| Use case | Operation doc | Test spec | Backend | Frontend |
+| Use case | Operation doc | Test spec | Backend | UI appearances |
 |:---|:---|:---|:---|:---|
-| `{Use case name}` | [{use-case}.md]({use-case}.md) | [{use-case}.tests.md]({use-case}.tests.md) | `{Feature}/{UseCase}/` | `features/{feature}/{use-case}/` |
+| `{Use case name}` | [{use-case}.md]({use-case}.md) | [{use-case}.tests.md]({use-case}.tests.md) | `{Feature}/{UseCase}/` | `apps/web/features/{feature}/{use-case}/`, `apps/admin/features/...` |
+
+List every frontend app path where the use case has UI. Omit apps that have no surface for this use case.

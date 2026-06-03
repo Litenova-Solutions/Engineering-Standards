@@ -2,7 +2,7 @@
 
 This is the complete implementation blueprint for the Transactional Outbox pattern. Copy these files into `{ProjectName}.Infrastructure/Reliability/Outbox/` and adjust to the project's event and serialization requirements.
 
-For the conceptual decision, see `docs/decisions/outbox-pattern-as-reliability-escalation.md` and `docs/conventions/backend/10-reliability.md`.
+For the conceptual decision, see `docs/decisions/outbox-pattern-as-reliability-escalation.md` and `docs/conventions/backend/reliability.md`.
 
 ---
 

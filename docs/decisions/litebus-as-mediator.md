@@ -21,7 +21,7 @@ The combined `IMessageMediator` interface MUST NOT be injected in production cod
 
 ## Decision
 
-LiteBus is the approved mediator library. MediatR is not used and MUST NOT be added as a dependency. The specific LiteBus packages used per project are defined in `docs/conventions/backend/01-solution-structure.md`. Endpoints and services MUST inject `ICommandMediator` or `IQueryMediator` rather than a unified bus.
+LiteBus is the approved mediator library. MediatR is not used and MUST NOT be added as a dependency. The specific LiteBus packages used per project are defined in `docs/conventions/backend/solution-structure.md`. Endpoints and services MUST inject `ICommandMediator` or `IQueryMediator` rather than a unified bus.
 
 ## Consequences
 

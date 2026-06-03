@@ -8,7 +8,7 @@ Single `proxy.ts` for Next.js 16. Combines optimistic session cookie redirect wi
 - CSP nonce generation is allowed here. It is not business logic.
 - MUST NOT perform JWT verification, database lookups, or permission checks in `proxy.ts`.
 
-See `docs/conventions/frontend/01-nextjs-app-router.md` section 6 and `docs/blueprints/frontend/csp-headers.md` for layout and nonce helper.
+See `docs/conventions/frontend/nextjs-app-router.md` section 6 and `docs/blueprints/frontend/csp-headers.md` for layout and nonce helper.
 
 ```typescript
 // apps/web/proxy.ts

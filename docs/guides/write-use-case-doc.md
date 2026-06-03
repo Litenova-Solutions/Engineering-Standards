@@ -22,8 +22,8 @@ For each use case `{use-case}` under feature `{feature}`:
 
 | File | Template | Purpose |
 |:---|:---|:---|
-| `docs/domain/{feature}/{use-case}.md` | `docs/templates/domain-use-case.md` | Operation contract |
-| `docs/domain/{feature}/{use-case}.tests.md` | `docs/templates/domain-use-case.tests.md` | Test specification |
+| `docs/domain/{feature}/{use-case}.md` | `docs/templates/docs/domain-use-case.md` | Operation contract |
+| `docs/domain/{feature}/{use-case}.tests.md` | `docs/templates/docs/domain-use-case.tests.md` | Test specification |
 
 Copy `domain-use-case.example.md` and `domain-use-case.tests.example.md` for shape only; do not copy example content into production docs.
 
@@ -91,7 +91,7 @@ When the use case touches aggregate lifecycle:
 - Update the Mermaid state diagram with test annotations on transitions, for example `Draft --> Published : Publish (PostTests.Publish_*)`.
 - Add or update **Invariants Under Test** rows when a domain invariant gains or loses coverage.
 
-See `docs/templates/domain-feature.md`.
+See `docs/templates/docs/domain-feature.md`.
 
 ---
 
@@ -99,7 +99,7 @@ See `docs/templates/domain-feature.md`.
 
 When a frontend route exists:
 
-- Copy `docs/templates/ui-page.md` to `docs/ui/{app}/pages/{page}.md`.
+- Copy `docs/templates/docs/ui-page.md` to `docs/ui/{app}/pages/{page}.md`.
 - Link use cases to operation docs; link Tests section to `{use-case}.tests.md`.
 - Do not duplicate test tables in the page doc.
 
@@ -126,4 +126,4 @@ Implementation follows `docs/conventions/shared/agentic-guardrails.md` (Step 0: 
 | `docs/guides/agentic-domain-driven-design.md` | Documentation tree and agent workflow |
 | `docs/guides/add-new-use-case.md` | Implementation checklist |
 | `docs/guides/definition-of-done.md` | PR completion gates |
-| `docs/conventions/backend/20-api-acceptance-tests.md` | BDD and API acceptance traceability |
+| `docs/conventions/backend/api-acceptance-tests.md` | BDD and API acceptance traceability |

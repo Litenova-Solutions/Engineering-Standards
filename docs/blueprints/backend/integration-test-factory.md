@@ -54,4 +54,4 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
 
 ### `Fixtures/TestAuthHandler.cs`
 
-Copy from `docs/conventions/backend/15-authentication-and-authorization.md` section 8 (Integration Test Authentication).
+Copy from `docs/conventions/backend/authentication-and-authorization.md` section 8 (Integration Test Authentication).

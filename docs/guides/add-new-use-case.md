@@ -33,7 +33,7 @@ After the use-case doc exists, classify acceptance testing before writing tests:
 
 Record the decision in the test spec **Acceptance test classification** section. Do not default every use case to BDD.
 
-See `docs/conventions/backend/20-api-acceptance-tests.md`.
+See `docs/conventions/backend/api-acceptance-tests.md`.
 
 ---
 
@@ -90,7 +90,7 @@ In `Application.Read`:
 
 Use `Application.Reactions` for event-driven side effects. Define narrow interfaces there and implement them in Infrastructure.
 
-If the event cannot be lost, use the Outbox pattern from `docs/conventions/backend/10-reliability.md`.
+If the event cannot be lost, use the Outbox pattern from `docs/conventions/backend/reliability.md`.
 
 ---
 
@@ -146,9 +146,9 @@ In `apps/{app}/features/{feature}/{use-case}/`:
 
 When the project uses `docs/ui/` (recommended for multi-app frontends):
 
-- Add or update `docs/ui/{app}/pages/{page}.md` for the route (copy from `standards/docs/templates/ui-page.md` in the consuming project).
+- Add or update `docs/ui/{app}/pages/{page}.md` for the route (copy from `standards/docs/templates/docs/ui-page.md` in the consuming project).
 - Update `docs/ui/{app}/README.md` route index.
-- Update `docs/ui/{app}/shell.md` when shared layout changes (copy from `standards/docs/templates/ui-shell.md`).
+- Update `docs/ui/{app}/shell.md` when shared layout changes (copy from `standards/docs/templates/docs/ui-shell.md`).
 - Update each affected operation doc § UI with links to the page doc(s).
 
 See `docs/guides/agentic-domain-driven-design.md` § UI Projection Docs.

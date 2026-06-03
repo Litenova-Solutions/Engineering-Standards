@@ -82,7 +82,7 @@ pnpm --filter @myproject/api-types generate:api-types
 git diff --exit-code packages/api-types/openapi.json packages/api-types/src/api.d.ts
 ```
 
-Build-time generation requires `Microsoft.Extensions.ApiDescription.Server` in the WebApi project. See `docs/conventions/backend/05-api-layer.md` for the MSBuild configuration.
+Build-time generation requires `Microsoft.Extensions.ApiDescription.Server` in the WebApi project. See `docs/conventions/backend/api-layer.md` for the MSBuild configuration.
 
 If the diff is non-empty, the PR forgot to commit regenerated API artifacts.
 
@@ -90,7 +90,7 @@ If the diff is non-empty, the PR forgot to commit regenerated API artifacts.
 
 ## 3. Example GitHub Actions Workflow
 
-Use `docs/templates/ci-workflow.yml` as the canonical workflow template. It includes backend gates, frontend gates, OpenAPI freshness, Playwright, and optional standards submodule tag verification.
+Use `docs/templates/config/ci-workflow.yml` as the canonical workflow template. It includes backend gates, frontend gates, OpenAPI freshness, Playwright, and optional standards submodule tag verification.
 
 ---
 
@@ -127,4 +127,4 @@ dotnet test apps/api/tests/{ProjectName}.AcceptanceTests \
   --filter "Category=critical"
 ```
 
-Projects MAY add `scripts/validate-feature-files.ps1` to enforce `@usecase:` and `@ac:` tags before merge.
+Projects SHOULD copy `standards/scripts/validate-feature-files.ps1` and run it in CI when Reqnroll feature files exist. Tag rules: `docs/conventions/backend/api-acceptance-tests.md` section 5.

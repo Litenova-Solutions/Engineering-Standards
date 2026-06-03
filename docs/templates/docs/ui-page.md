@@ -51,10 +51,19 @@ Inherits the app shell at `docs/ui/{app}/shell.md` (copy from [ui-shell.md](ui-s
 
 ## Tests
 
-| Type | Location |
-|:---|:---|
-| Playwright | `{e2e spec path}` or `Not yet added` |
+| Type | Location | Traces to |
+|:---|:---|:---|
+| Playwright | `{e2e spec path}` or `Not yet added` | Rows in linked test specs below |
+| Vitest | `{unit test path}` or `Not yet added` | Zod schema or hook for this page |
 
-Test specification: link to [`docs/domain/{feature}/{use-case}.tests.md`](../../domain/{feature}/{use-case}.tests.md) for each use case on this page (Test Coverage table).
+### Acceptance criteria coverage
 
-In consuming projects, copy this template from the standards submodule (for example `{project}/standards/docs/templates/ui-page.md`).
+For each use case on this page, map UI-visible outcomes to test spec rows (not duplicate full tables here).
+
+| Use case | Test spec | AC rows exercised on this page |
+|:---|:---|:---|
+| `{use-case}` | [`{use-case}.tests.md`](../../domain/{feature}/{use-case}.tests.md) | AC-001, AC-002 |
+
+Add a Playwright spec comment header: `// Page: docs/ui/{app}/pages/{page}.md`.
+
+In consuming projects, copy this template from the standards submodule (for example `{project}/standards/docs/templates/docs/ui-page.md`).

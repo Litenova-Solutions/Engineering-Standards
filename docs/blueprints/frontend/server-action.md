@@ -93,4 +93,4 @@ export function CreatePostForm() {
 }
 ```
 
-See `docs/conventions/frontend/04-state-and-forms.md` and `docs/conventions/frontend/08-error-handling-and-problem-details.md`.
+See `docs/conventions/frontend/state-and-forms.md` and `docs/conventions/frontend/error-handling-and-problem-details.md`.

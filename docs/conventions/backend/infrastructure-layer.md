@@ -843,7 +843,7 @@ Examples:
 
 Never edit a migration file after it has been applied to any environment. If a migration has a mistake and has already been applied to staging or production, create a corrective migration. Do not modify the existing one.
 
-Production migration safety is defined in `docs/conventions/backend/13-deployment-and-migrations.md`. In short:
+Production migration safety is defined in `docs/conventions/backend/deployment-and-migrations.md`. In short:
 
 - Generate and review SQL scripts or migration bundles for production.
 - Do not call `Database.MigrateAsync()` from application startup in production.

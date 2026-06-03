@@ -2,7 +2,7 @@
 
 Long-running background processes (outbox dispatch, scheduled jobs, queue consumers) MUST live in dedicated worker host projects, not in `WebApi`.
 
-Job loop **implementations** live in `Infrastructure/BackgroundJobs/`. The **Worker host** registers and runs them. See `docs/conventions/backend/11-background-jobs.md` for implementation patterns.
+Job loop **implementations** live in `Infrastructure/BackgroundJobs/`. The **Worker host** registers and runs them. See `docs/conventions/backend/background-jobs.md` for implementation patterns.
 
 ---
 
@@ -44,7 +44,7 @@ Architecture tests SHOULD fail when `WebApi` references or registers `Background
 
 ## 4. Observability
 
-Workers MUST use the same OpenTelemetry and Serilog conventions as `WebApi` (`docs/conventions/backend/09-observability.md`). Every job execution MUST emit:
+Workers MUST use the same OpenTelemetry and Serilog conventions as `WebApi` (`docs/conventions/backend/observability.md`). Every job execution MUST emit:
 
 - A trace span with job name
 - Structured logs with correlation ID
@@ -62,4 +62,4 @@ Workers MUST use the same OpenTelemetry and Serilog conventions as `WebApi` (`do
 
 ## 6. Idempotency and Outbox
 
-Jobs that react to domain events or external webhooks MUST be idempotent. Durable delivery MUST use the outbox pattern from `docs/conventions/backend/10-reliability.md` when events cannot be lost.
+Jobs that react to domain events or external webhooks MUST be idempotent. Durable delivery MUST use the outbox pattern from `docs/conventions/backend/reliability.md` when events cannot be lost.

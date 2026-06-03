@@ -8,7 +8,7 @@
 - `proxy.ts` MUST only do optimistic cookie checks; authoritative auth in Server Components/Actions.
 - MUST await `params`, `searchParams`, `cookies`, `headers`.
 - `route.ts` MUST NOT be used except webhooks, OAuth callbacks, or file/binary responses.
-- ALL environment variable access MUST go through `lib/env.ts`. MUST NOT use `process.env.X` directly. See `docs/conventions/frontend/09-environment-and-runtime-config.md`.
+- ALL environment variable access MUST go through `lib/env.ts`. MUST NOT use `process.env.X` directly. See `docs/conventions/frontend/environment-and-runtime-config.md`.
 - Stay on the latest Next.js 16.x and React 19.x patch releases. RSC and middleware advisories (May 2026) require `next@16.2.6+` and matching `react@19.2.6`.
 
 ## 1. Guiding Philosophy
@@ -395,7 +395,7 @@ Frontend feature folders follow the same Feature → Use case boundaries as back
 **Import rules:**
 
 - Code under `features/{feature}/` MUST NOT import from `features/{otherFeature}/`.
-- Cross-feature reuse MUST follow the promotion rule in `docs/conventions/00-principles.md`: promote shared implementation code to `shared/` (import as `@/shared/...`) or generic UI to `components/ui/`.
+- Cross-feature reuse MUST follow the promotion rule in `docs/conventions/principles.md`: promote shared implementation code to `shared/` (import as `@/shared/...`) or generic UI to `components/ui/`.
 - `app/` route shells MUST import feature entry components from `features/{feature}/` only. They MUST NOT contain business logic.
 
 ```typescript
@@ -413,7 +413,7 @@ import { AuthorAvatar } from "@/features/authors/shared/AuthorAvatar"
 
 Feature-local shared code (`features/{feature}/shared/`) is for reuse within one domain only. It MUST NOT be imported by other features.
 
-See `docs/conventions/frontend/07-feature-boundaries.md`.
+See `docs/conventions/frontend/feature-boundaries.md`.
 
 ---
 

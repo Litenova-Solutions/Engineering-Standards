@@ -4,7 +4,7 @@
 
 **Date:** 2026-01-01
 
-**Canonical rules:** `docs/conventions/backend/07-query-read-strategy.md`
+**Canonical rules:** `docs/conventions/backend/query-read-strategy.md`
 
 ## Context
 

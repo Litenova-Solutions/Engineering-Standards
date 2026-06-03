@@ -308,7 +308,7 @@ public sealed class RateLimitOptions
 
 ### `WebApi/Middleware/GlobalExceptionHandler.cs`
 
-Copy the full implementation from `docs/conventions/backend/06-exception-hierarchy.md` (section **The GlobalExceptionHandler**).
+Copy the full implementation from `docs/conventions/backend/exception-hierarchy.md` (section **The GlobalExceptionHandler**).
 
 ### `WebApi/Extensions/EndpointExtensions.cs`
 
@@ -316,13 +316,13 @@ Copy from `docs/blueprints/backend/endpoint-extensions.md`.
 
 ### `Infrastructure/HealthChecks/PostgreSqlHealthCheck.cs`
 
-Copy from `docs/conventions/backend/09-observability.md` section 4.
+Copy from `docs/conventions/backend/observability.md` section 4.
 
 ---
 
 ## Notes
 
 - Middleware order (`UseRouting` → `UseCors` → `UseAuthentication` → `UseAuthorization` → `UseRateLimiter`) is required. Do not reorder.
-- Apply `.RequireRateLimiting(RateLimitPolicies.AuthenticatedApi)` on route groups per `docs/conventions/backend/05-api-layer.md`.
+- Apply `.RequireRateLimiting(RateLimitPolicies.AuthenticatedApi)` on route groups per `docs/conventions/backend/api-layer.md`.
 - `public partial class Program { }` enables `WebApplicationFactory<Program>` in integration tests.
 - Health check endpoints are not rate limited.

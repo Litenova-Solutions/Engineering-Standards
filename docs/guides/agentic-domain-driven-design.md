@@ -6,6 +6,34 @@ Industry practice (Thoughtworks, GitHub Spec Kit, BDD) treats specifications as 
 
 ---
 
+## Intellectual lineage
+
+ADDD inherits from established patterns. The table states what we take from each tradition and how faithfully it is applied.
+
+| Source tradition | What ADDD borrows | Fidelity |
+|:---|:---|:---|
+| DDD (Evans, Vernon) | Ubiquitous language, aggregates, domain events, bounded contexts (as features) | High |
+| Clean Architecture (Martin) | Dependency direction, layer separation | High (compiler-enforced) |
+| CQRS (Young) | Command/query split, separate read/write projects | High |
+| Specification by Example (Adzic) | Living documentation, spec-before-implementation | Partial: test specs are normative but not executable until acceptance tests exist |
+| BDD / Gherkin (North) | Given/When/Then via Reqnroll when warranted | Partial: syntax and tags; execution optional per use case |
+| Vertical Slice Architecture (Bogard) | Feature-centric naming on top of Clean Architecture layers | Selective |
+
+**Distinctive contributions:**
+
+1. **Tri-layer naming alignment.** `docs/domain/posts/create-post.md` → `Posts/Create/CreatePostCommandHandler.cs` → `features/posts/create/` is enforced convention, not incidental structure.
+2. **Agent-readable documentation.** `agentLoadPlans` in `standards.manifest.json` makes context budget machine-readable. Conventions load for agents; decisions and philosophy do not load for routine coding.
+
+**Known gaps (honest):**
+
+| Gap | Mitigation in these standards |
+|:---|:---|
+| Prose specs do not run by themselves | API acceptance tests + `@usecase:` / `@ac:` tags (`api-acceptance-tests.md`) |
+| Bounded context at scale | Cross-domain notes in system index; service extraction is project ADR territory |
+| Non-standard "Reactions" name | Defined in `docs/glossary.md`; layer behavior matches DDD event handlers |
+
+---
+
 ## Agent Quick Rules
 
 - Every non-trivial use case MUST have an operation doc and a test spec in the project repository before agent implementation starts.
@@ -79,7 +107,7 @@ Use cases and pages are **many-to-many**. One page may compose several use cases
 
 ## 3. Feature Domain Doc
 
-Copy `docs/templates/domain-feature.md` to `docs/domain/{feature}/README.md`.
+Copy `docs/templates/docs/domain-feature.md` to `docs/domain/{feature}/README.md`.
 
 A feature README MUST include:
 
@@ -96,7 +124,7 @@ Update the feature README when aggregate shape, language, or invariants change.
 
 ## 4. Operation Doc
 
-Copy `docs/templates/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md`.
+Copy `docs/templates/docs/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md`.
 
 An operation doc MUST include:
 
@@ -113,7 +141,7 @@ Authoring workflow: `docs/guides/write-use-case-doc.md`.
 
 ## 5. Test Specification Doc
 
-Copy `docs/templates/domain-use-case.tests.md` to `docs/domain/{feature}/{use-case}.tests.md`.
+Copy `docs/templates/docs/domain-use-case.tests.md` to `docs/domain/{feature}/{use-case}.tests.md`.
 
 A test spec MUST include:
 
@@ -129,7 +157,7 @@ A test spec MUST include:
 - **Variations:** list boundary and error variants; `N/A` when none apply.
 - Agents MUST add a row before writing a test for a scenario. MUST NOT write tests for undeclared scenarios.
 
-Risk Level on the test spec MUST match the operation doc. It drives mandatory layers (Low / Medium / High) per the template and `08-testing.md`.
+Risk Level on the test spec MUST match the operation doc. It drives mandatory layers (Low / Medium / High) per the template and `testing.md`.
 
 Update the test spec in the same PR as any new or changed test.
 
@@ -137,7 +165,7 @@ Update the test spec in the same PR as any new or changed test.
 
 ## 6. UI Projection Docs
 
-Copy `docs/templates/ui-shell.md` and `docs/templates/ui-page.md` from this standards repository when adding or changing frontend routes.
+Copy `docs/templates/docs/ui-shell.md` and `docs/templates/docs/ui-page.md` from this standards repository when adding or changing frontend routes.
 
 UI projection docs live under `docs/ui/{app}/` where `{app}` matches the folder name under `apps/`.
 
@@ -161,7 +189,7 @@ Rules:
 - Every Reqnroll scenario MUST reference `@usecase:{feature}/{use-case}` and `@ac:AC-00N` matching a Test Coverage row.
 - If a scenario and the test spec disagree, the test spec wins until a human explicitly changes it.
 
-See `docs/conventions/backend/20-api-acceptance-tests.md`.
+See `docs/conventions/backend/api-acceptance-tests.md`.
 
 ---
 
@@ -223,7 +251,7 @@ Everything else requires both docs.
 | `docs/guides/write-use-case-doc.md` | Authoring workflow for operation and test docs |
 | `docs/guides/add-new-use-case.md` | Implementation checklist after docs exist |
 | `docs/guides/definition-of-done.md` | Completion checklist |
-| `docs/templates/domain-use-case.md` | Operation doc template |
-| `docs/templates/domain-use-case.tests.md` | Test spec template |
-| `docs/conventions/backend/20-api-acceptance-tests.md` | ADDD executable acceptance testing |
+| `docs/templates/docs/domain-use-case.md` | Operation doc template |
+| `docs/templates/docs/domain-use-case.tests.md` | Test spec template |
+| `docs/conventions/backend/api-acceptance-tests.md` | ADDD executable acceptance testing |
 | `docs/blueprints/backend/api-acceptance-tests/` | Reqnroll project blueprints |

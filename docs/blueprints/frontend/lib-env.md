@@ -39,4 +39,4 @@ export const clientEnv = parseEnv(clientSchema, {
 const url = process.env.API_URL
 ```
 
-See `docs/conventions/frontend/09-environment-and-runtime-config.md`.
+See `docs/conventions/frontend/environment-and-runtime-config.md`.

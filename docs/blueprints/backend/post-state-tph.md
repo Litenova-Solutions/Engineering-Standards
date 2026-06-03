@@ -1,6 +1,6 @@
 # Blueprint: Post state TPH persistence
 
-Copy these files when an aggregate uses a discriminated union for lifecycle state. Replace `Post` / `PostState` with your aggregate names. See `docs/conventions/backend/04-infrastructure-layer.md` and `docs/conventions/backend/07-query-read-strategy.md`.
+Copy these files when an aggregate uses a discriminated union for lifecycle state. Replace `Post` / `PostState` with your aggregate names. See `docs/conventions/backend/infrastructure-layer.md` and `docs/conventions/backend/query-read-strategy.md`.
 
 EF Core complex type inheritance is not available yet ([dotnet/efcore#31250](https://github.com/dotnet/efcore/issues/31250)). Use TPH columns on the aggregate table and an interceptor until that ships.
 

@@ -4,6 +4,17 @@ This document defines the exception hierarchy. It is a critical contract. Deviat
 
 ---
 
+## Agent Quick Rules
+
+- Validators throw `CommandValidationException` / `QueryValidationException` subclasses; MUST NOT use `Guard.Against` (see [Why Not Guard.Against](#why-not-guardagainst-in-validators)).
+- Domain invariants throw `DomainException` subclasses; not-found throws `AggregateNotFoundException` subclasses.
+- `ValidationError` is defined in both Contracts projects as identical types (see [ValidationError placement](#validationerror-placement)); read and write contracts MUST NOT reference each other.
+- Unhandled exceptions map to HTTP 500 via `GlobalExceptionHandler`.
+
+---
+
+## Overview
+
 ## Why This Matters
 
 When a server returns a 500 response to a client, the client has no idea whether the operation failed because the input was invalid, the resource was not found, or an unexpected error occurred. Each situation requires a different client action: show a validation message, navigate to a not-found page, or show a generic error and retry.
@@ -59,6 +70,22 @@ classDiagram
 All base classes are `abstract`. Never throw a base class directly. Always throw a concrete subclass that names the specific failure.
 
 Note that `CommandValidationException` and `QueryValidationException` have no shared base class beyond `Exception`. They are independent.
+
+### ValidationError placement
+
+`ValidationError` is a `sealed record` with the same shape in **both** contracts projects:
+
+| Project | Path |
+|:---|:---|
+| `Application.Write.Contracts` | `Shared/Exceptions/ValidationError.cs` |
+| `Application.Read.Contracts` | `Shared/Exceptions/ValidationError.cs` |
+
+Rules:
+
+- The two definitions MUST remain byte-for-byte equivalent (same property names and types).
+- `Application.Read.Contracts` MUST NOT reference `Application.Write.Contracts` (and vice versa).
+- Do not introduce a third shared contracts project solely for this type unless a project ADR documents a migration.
+- `GlobalExceptionHandler` maps both exception families to the same RFC 7807 `invalidParams` shape.
 
 ```csharp
 // Domain/Shared/Exceptions/DomainException.cs
@@ -221,7 +248,7 @@ public sealed class PageSizeExceedsMaximumException : QueryValidationException
 
 ## The GlobalExceptionHandler
 
-Endpoints MUST NOT contain `try-catch` blocks. All unhandled exceptions flow through a single `GlobalExceptionHandler` registered in `Program.cs`. The full implementation lives in this section. `docs/conventions/backend/05-api-layer.md` documents the HTTP status code table and the validation JSON schema the frontend consumes.
+Endpoints MUST NOT contain `try-catch` blocks. All unhandled exceptions flow through a single `GlobalExceptionHandler` registered in `Program.cs`. The full implementation lives in this section. `docs/conventions/backend/api-layer.md` documents the HTTP status code table and the validation JSON schema the frontend consumes.
 
 ### Exception mapping
 
@@ -234,7 +261,7 @@ Endpoints MUST NOT contain `try-catch` blocks. All unhandled exceptions flow thr
 | `DbUpdateConcurrencyException` | 409 | Fixed conflict message (no exception text) |
 | All other exceptions | 500 | Generic message only (see security note) |
 
-`DbUpdateConcurrencyException` from EF Core MUST be caught alongside `DomainException`. See `docs/conventions/backend/17-concurrency.md` for client retry guidance.
+`DbUpdateConcurrencyException` from EF Core MUST be caught alongside `DomainException`. See `docs/conventions/backend/concurrency.md` for client retry guidance.
 
 ### Implementation
 
@@ -415,7 +442,7 @@ The same structural rule (for example, empty title) MAY appear in both a command
 - The **validator** throws `CommandValidationException` subclasses and produces structured HTTP 400 responses with `invalidParams`.
 - The **value object** throws `DomainException` subclasses as last-resort defence when domain code constructs the type outside the command pipeline.
 
-Domain value objects MUST NOT reference `Application.Write.Contracts` or throw validation exception types from Application assemblies. See `docs/conventions/00-principles.md` (Input Validation vs. Invariant Enforcement).
+Domain value objects MUST NOT reference `Application.Write.Contracts` or throw validation exception types from Application assemblies. See `docs/conventions/principles.md` (Input Validation vs. Invariant Enforcement).
 
 Concrete exceptions MAY share similar messages across layers but MUST use the correct base class for their layer.
 

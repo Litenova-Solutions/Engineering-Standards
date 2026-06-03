@@ -40,17 +40,17 @@ apps/api/                          ← solution root (monorepo) or repository ro
 
 The solution file uses the `.slnx` format (SDK-style solution files), not the legacy `.sln` format.
 
-The `AppHost` project is the local development entry point. Run `dotnet run --project apps/api/src/{ProjectName}.AppHost` (monorepo) or `dotnet run --project src/{ProjectName}.AppHost` (single-project) to start all services including the database container. See `docs/conventions/backend/13-deployment-and-migrations.md` for Aspire setup details.
+The `AppHost` project is the local development entry point. Run `dotnet run --project apps/api/src/{ProjectName}.AppHost` (monorepo) or `dotnet run --project src/{ProjectName}.AppHost` (single-project) to start all services including the database container. See `docs/conventions/backend/deployment-and-migrations.md` for Aspire setup details.
 
 Every Aspire solution MUST include a `{ProjectName}.ServiceDefaults` project. The WebApi MUST call `builder.AddServiceDefaults()` and `app.MapDefaultEndpoints()` in Development.
 
-Every solution MUST commit `.config/dotnet-tools.json` at the repository root with a pinned `dotnet-ef` version matching `Microsoft.EntityFrameworkCore` in `Directory.Packages.props`. Copy `docs/templates/dotnet-tools.json`.
+Every solution MUST commit `.config/dotnet-tools.json` at the repository root with a pinned `dotnet-ef` version matching `Microsoft.EntityFrameworkCore` in `Directory.Packages.props`. Copy `docs/templates/config/dotnet-tools.json`.
 
 ---
 
 ## 2. `global.json`
 
-Every solution MUST include a `global.json` at the solution root that pins the .NET SDK version. Copy `docs/templates/global.json`.
+Every solution MUST include a `global.json` at the solution root that pins the .NET SDK version. Copy `docs/templates/config/global.json`.
 
 ```json
 {
@@ -79,7 +79,7 @@ This file MUST be committed to source control. It MUST NOT appear in `.gitignore
 
 ## 3. `Directory.Build.props`
 
-A `Directory.Build.props` file at the solution root sets metadata shared across all projects. Copy `docs/templates/Directory.Build.props` or use:
+A `Directory.Build.props` file at the solution root sets metadata shared across all projects. Copy `docs/templates/config/Directory.Build.props` or use:
 
 ```xml
 <Project>
@@ -126,7 +126,7 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
 
 ## 4. `Directory.Packages.props`
 
-All NuGet package versions are managed centrally via `Directory.Packages.props` at the solution root. Copy `docs/templates/Directory.Packages.props` and pin versions from `standards.manifest.json`.
+All NuGet package versions are managed centrally via `Directory.Packages.props` at the solution root. Copy `docs/templates/config/Directory.Packages.props` and pin versions from `standards.manifest.json`.
 
 ```xml
 <Project>
@@ -374,7 +374,7 @@ Pre-approved npm packages (no new ADR required):
 | `date-fns` | Dates when `Temporal` is unavailable |
 | `@microsoft/signalr` | Realtime per `docs/decisions/signalr-for-real-time-updates.md` |
 | `eslint`, `eslint-plugin-boundaries` | Lint and feature boundary enforcement |
-| `jose` | JWT signing for server-to-server API authentication (Admin apps only, per `docs/conventions/frontend/10-admin-api-auth.md`) |
+| `jose` | JWT signing for server-to-server API authentication (Admin apps only, per `docs/conventions/frontend/admin-api-auth.md`) |
 
 Owned source copied into the repo (for example vendored `openapi-fetch` in `packages/api-client/`) is allowed when documented in `docs/decisions/openapi-typescript-client-generation.md`.
 

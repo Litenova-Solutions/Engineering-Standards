@@ -46,7 +46,7 @@ Conventional Commits examples:
 
 ```
 feat: add domain doc templates for consumer projects
-fix: correct CancellationToken naming rule in 03-application-layer.md
+fix: correct CancellationToken naming rule in application-layer.md
 chore: prepare release v1.1.0
 docs: add Guard.Against exception type warning to validators section
 ```
@@ -115,6 +115,29 @@ A breaking change is any convention update that makes previously compliant code 
 | `MAJOR` | A breaking change. Previously compliant code becomes non-compliant after upgrading. | Renaming a required interface, removing a pattern projects depend on. |
 | `MINOR` | A new convention is added. Existing compliant code remains compliant after upgrading. | Adding a new template, adding a new rule that applies only to new code. |
 | `PATCH` | A clarification, typo fix, new example, new ADR, or agent file improvement. No convention changes. | Fixing a typo in a code example, adding a `// BAD:` example to an existing rule. |
+
+### Pre-v1 consumption
+
+Until `v1.0.0` or `v1.0.0-rc.1` is published on GitHub Releases:
+
+- Pin an exact **commit SHA** in the submodule.
+- Record `git rev-parse HEAD` in the consumer adoption PR.
+- Do not track `main` in production repositories.
+
+### Maintainer release checklist
+
+1. Run `node scripts/validate-standards.mjs` and `node scripts/smoke-bootstrap.mjs`.
+2. Record `git rev-parse HEAD` in the GitHub Release notes.
+3. Tag `v1.0.0-rc.1` or `v1.0.0` and publish the release.
+4. Notify consumer repos to bump submodule tag or SHA.
+
+### Post-v1 upgrade (consumers)
+
+1. Read GitHub Release notes for the target tag.
+2. Bump submodule: `cd standards && git fetch && git checkout vX.Y.Z`.
+3. Diff template changes under `docs/templates/docs/` and `docs/templates/config/` and apply manually.
+4. Run consumer CI gates.
+5. Update project ADR if manifest package versions change.
 
 ---
 
