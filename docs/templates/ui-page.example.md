@@ -44,7 +44,7 @@ Do not restate invariants here. Use "Visible when" plus a link to the use-case o
 
 ## Shell
 
-Inherits [{app} shell](../shell.md).
+Inherits the app shell at `docs/ui/{app}/shell.md` (copy from [ui-shell.md](ui-shell.md)).
 
 ---
 
@@ -54,6 +54,6 @@ Inherits [{app} shell](../shell.md).
 |:---|:---|
 | Playwright | `{e2e spec path}` or `Not yet added` |
 
-Acceptance criteria: see each linked use-case doc § Acceptance Criteria.
+Test specification: see each linked use-case [`{use-case}.tests.md`](../../domain/{feature}/{use-case}.tests.md).
 
 See also: project-specific approved examples in consuming repos (for example LitePress `docs/ui/admin/pages/post-editor.md`).

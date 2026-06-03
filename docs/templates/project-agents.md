@@ -34,7 +34,8 @@ Follow this sequence when building or changing a use case. Do not skip to code w
 |:---|:---|
 | `docs/domain/README.md` | System map of features and use cases |
 | `docs/domain/{feature}/README.md` | Feature domain: language, aggregate, invariants, events |
-| `docs/domain/{feature}/{use-case}.md` | Use case: commands, endpoints, UI, acceptance criteria |
+| `docs/domain/{feature}/{use-case}.md` | Operation: commands, endpoints, domain behavior |
+| `docs/domain/{feature}/{use-case}.tests.md` | Test spec: Test Coverage table, variations |
 | `docs/decisions/` | Project-specific ADRs |
 
 Domain docs are the living source of truth. Update them in the same PR as code changes.

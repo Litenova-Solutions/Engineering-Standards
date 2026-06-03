@@ -125,7 +125,7 @@ Infrastructure uses `LiteBus.Commands.Abstractions` and `LiteBus.Events.Abstract
 
 ## Step 9: Create the First Domain Aggregate
 
-Follow `docs/conventions/backend/02-domain-layer.md`. Write the use case doc first using `docs/templates/domain-use-case.md`.
+Follow `docs/conventions/backend/02-domain-layer.md`. Write the operation and test docs first using `docs/guides/write-use-case-doc.md`.
 
 ---
 
@@ -171,9 +171,9 @@ Set up the domain doc tree under `docs/domain/`:
 
 1. Copy `docs/templates/domain-system-index.md` to `docs/domain/README.md`.
 2. For the first feature, copy `docs/templates/domain-feature.md` to `docs/domain/{feature}/README.md`.
-3. For each use case, copy `docs/templates/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md`.
+3. For each use case, copy `docs/templates/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md` and `domain-use-case.tests.md` to `docs/domain/{feature}/{use-case}.tests.md`.
 
-Read `docs/guides/agentic-domain-driven-design.md` before the first use case.
+Read `docs/guides/write-use-case-doc.md` and `docs/guides/agentic-domain-driven-design.md` before the first use case.
 
 ---
 

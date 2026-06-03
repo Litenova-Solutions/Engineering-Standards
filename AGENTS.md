@@ -18,9 +18,9 @@ Canonical contract for AI agents and engineers. Read before touching code.
 When implementing a use case in a project that consumes these standards (for example [LitePress](https://github.com/Litenova-Solutions/LitePress)):
 
 1. Project `docs/domain/README.md` and `docs/domain/{feature}/README.md`.
-2. Use case doc at `docs/domain/{feature}/{use-case}.md` (`docs/guides/agentic-domain-driven-design.md`).
-3. `docs/guides/add-new-use-case.md` and layer conventions for each step.
-4. Update domain docs in the same PR as the code.
+2. Operation doc `docs/domain/{feature}/{use-case}.md` and test spec `{use-case}.tests.md` (`docs/guides/agentic-domain-driven-design.md`).
+3. `docs/guides/write-use-case-doc.md` when authoring docs; `docs/guides/add-new-use-case.md` when implementing.
+4. Update operation docs, test specs, and UI docs in the same PR as the code.
 
 ## Tech Stack
 
@@ -105,6 +105,7 @@ Projects MAY define additional apps under `apps/` (multiple frontends, workers, 
 - MUST NOT use `configuration["Key"]!` directly; all config access goes through validated options classes and `IOptions<T>`.
 - MUST use `FromSqlInterpolated` for raw SQL; MUST NOT concatenate SQL strings.
 - Frontend: await `params` / `searchParams` / `cookies` / `headers`; comment every `'use client'`; see `docs/conventions/frontend/` for data fetching, state, Tailwind, and file-size guidance; no cross-feature imports; env vars only via `lib/env.ts`.
+- MUST maintain Test Coverage in `{use-case}.tests.md` per `TEST_SPEC_TRACEABILITY` in `agentic-guardrails.md` (row before test; no orphan tests).
 
 ## Convention File Index
 
@@ -144,7 +145,7 @@ Projects MAY define additional apps under `apps/` (multiple frontends, workers, 
 | Admin API auth | `docs/conventions/frontend/10-admin-api-auth.md` |
 | Frontend feature boundaries | `docs/conventions/frontend/07-feature-boundaries.md` |
 | Other frontend topics | `docs/conventions/frontend/` (02 through 09) |
-| Agentic DDD | `docs/guides/agentic-domain-driven-design.md` |
+| Agentic DDD / use case docs | `docs/guides/agentic-domain-driven-design.md`, `write-use-case-doc.md` |
 | Guides | `docs/guides/` |
 | Blueprints | `docs/blueprints/README.md` |
 | Runbooks | `docs/runbooks/README.md` |

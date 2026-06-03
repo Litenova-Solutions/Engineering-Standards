@@ -35,7 +35,11 @@ features/{a}/ MUST NOT import from features/{b}/. Promote shared code to @/share
 </Rule>
 
 <Rule id="UI_COPY_SOURCE">
-User-visible strings MUST come from API fields, next-intl keys, or the use case doc UI section. Agents MUST NOT invent product or policy text.
+User-visible strings MUST come from API fields, next-intl keys, or the UI page doc / operation doc UI notes. Agents MUST NOT invent product or policy text.
+</Rule>
+
+<Rule id="TEST_SPEC_TRACEABILITY">
+Agents MUST add or update a row in docs/domain/{feature}/{use-case}.tests.md Test Coverage table for every new or changed test (Layer, Class, Method, Variations). MUST NOT write a test for a scenario without a row; add the row first.
 </Rule>
 
 <Rule id="TAILWIND_THEME_ONLY">
@@ -70,30 +74,38 @@ The default frontend UI stack is shadcn/ui (CLI v4) with Tailwind v4. Each app o
 
 ## 2. Deterministic Scaffolding Sequence
 
-When implementing a new aggregate or use case, developers and AI agents **MUST** follow this exact sequence. If a use case doc exists at `docs/domain/{feature}/{use-case}.md`, treat its acceptance criteria as the completion contract and the feature README as domain input for steps 1 through 3. Run verification checkpoints after steps 3, 5, 7, and 8. Do not skip steps or write outer layers before completing inner boundaries.
+When implementing a new aggregate or use case, developers and AI agents **MUST** follow this exact sequence.
+
+**Step 0 (prerequisite):** `docs/domain/{feature}/{use-case}.md` and `{use-case}.tests.md` exist with a complete Test Coverage table for planned scenarios. If missing, write them per `docs/guides/write-use-case-doc.md` before any code. The test spec is the completion contract for tests; the feature README is domain input for steps 1 through 3.
+
+Run verification checkpoints after steps 3, 5, 5b, 7, and 8. Do not skip steps or write outer layers before completing inner boundaries.
 
 ```mermaid
 graph TD
+    Step0["0. Operation + test spec docs"]
     Step1["1. Domain Entity and ID"]
     Step2["2. Repository Interface"]
     Step3["3. EF Core Configuration"]
     Step3b["Checkpoint: dotnet build + dotnet ef migrations add"]
     Step4["4. Contracts Projects"]
     Step5["5. Handlers and Validators"]
-    Step5b["Checkpoint: dotnet build + dotnet test Application.Tests"]
+    Step5b["5b. Update test spec + checkpoint tests"]
+    Step5c["Checkpoint: dotnet build + dotnet test Application.Tests"]
     Step6["6. Reactions (conditional)"]
     Step7["7. WebApi Endpoint and DI"]
     Step7b["Checkpoint: dotnet build + dotnet test Integration.Tests"]
     Step8["8. Frontend feature use case (if applicable)"]
     Step8b["Checkpoint: pnpm lint + type-check + test"]
 
+    Step0 --> Step1
     Step1 --> Step2
     Step2 --> Step3
     Step3 --> Step3b
     Step3b --> Step4
     Step4 --> Step5
     Step5 --> Step5b
-    Step5b --> Step6
+    Step5b --> Step5c
+    Step5c --> Step6
     Step6 --> Step7
     Step7 --> Step7b
     Step7b --> Step8
@@ -104,7 +116,8 @@ graph TD
 2. **Repository interface** in `Domain`.
 3. **EF configuration** in `Infrastructure`. **Checkpoint:** `dotnet build apps/api/{ProjectName}.slnx` and `dotnet ef migrations add {Name}` when schema changed.
 4. **Command/query records** in Contracts projects.
-5. **Handlers and validators** in `Application.Write` / `Application.Read`. **Checkpoint:** `dotnet test apps/api/tests/{ProjectName}.Application.Tests`.
+5. **Handlers and validators** in `Application.Write` / `Application.Read`.
+5b. **Test spec checkpoint:** Update `{use-case}.tests.md` Test Coverage rows for scenarios implemented in step 5 (validators, handler orchestration). Add rows before writing Domain or Application tests discovered during implementation. **Checkpoint:** `dotnet test apps/api/tests/{ProjectName}.Application.Tests` and Domain tests when applicable.
 6. **Narrow interface in `Application.Reactions` + Infrastructure implementation** (conditional: add only when an aggregate method raises a domain event that requires an external side effect).
 7. **`IEndpoint` and DI** in `WebApi` / `Infrastructure`. **Checkpoint:** `dotnet test apps/api/tests/{ProjectName}.Integration.Tests` and architecture tests.
 8. **Frontend feature use case** under `features/{feature}/{use-case}/` (when the use case has UI). **Checkpoint:** `pnpm lint && pnpm type-check && pnpm test`.

@@ -2,19 +2,20 @@
 
 This guide defines how domain documentation is written, organized, and consumed by agents. It is our adaptation of spec-driven development: explicit, reviewable contracts written in ubiquitous language, aligned with screaming architecture and agent-first delivery.
 
-Industry practice (Thoughtworks, GitHub Spec Kit, BDD) treats specifications as living source-of-truth artifacts that agents implement against. We apply the same intent under DDD terms: **domain docs describe policy and operations; use case docs describe one operation; UI projection docs describe shell and page composition; code enforces all three.**
+Industry practice (Thoughtworks, GitHub Spec Kit, BDD) treats specifications as living source-of-truth artifacts that agents implement against. We apply the same intent under DDD terms: **domain docs describe policy and operations; test specs describe verification; UI projection docs describe shell and page composition; code enforces all three.**
 
 ---
 
 ## Agent Quick Rules
 
-- Every non-trivial use case MUST have a domain doc in the project repository before agent implementation starts.
+- Every non-trivial use case MUST have an operation doc and a test spec in the project repository before agent implementation starts.
 - Domain documentation lives under `docs/domain/` in a Feature → Use case tree.
+- Test specifications live at `docs/domain/{feature}/{use-case}.tests.md`, adjacent to the operation doc.
 - UI projection documentation lives under `docs/ui/{app}/` for shell and page composition (when the project has frontends).
-- Feature READMEs hold **invariants** and ubiquitous language. Use case docs hold **operations**, endpoints, and acceptance criteria. UI docs hold **routes, shell, and which use cases compose on each page**. Do not duplicate rules across layers.
-- Update the relevant domain, use case, and UI projection docs in the same PR as the code change they describe.
+- Feature READMEs hold **invariants** and ubiquitous language. Operation docs hold **contracts**. Test specs hold **Test Coverage** tables. UI docs hold **routes and composition**. Do not duplicate rules across layers.
+- Update operation docs, test specs, and UI projection docs in the same PR as the code change they describe.
 - Implementation MUST follow the scaffolding sequence in `docs/conventions/shared/agentic-guardrails.md` section 2.
-- OpenAPI is generated from WebApi; domain docs describe intent in business language.
+- OpenAPI is generated from WebApi; operation docs describe intent in business language.
 
 ---
 
@@ -22,40 +23,38 @@ Industry practice (Thoughtworks, GitHub Spec Kit, BDD) treats specifications as 
 
 ```text
 docs/domain/
-├── README.md                    # System map: all features and use cases
+├── README.md                    # System map: features, use cases, doc status
 ├── posts/
 │   ├── README.md                # Feature domain: Post aggregate, glossary, invariants
-│   ├── create-post.md           # Use case
+│   ├── create-post.md           # Operation contract
+│   ├── create-post.tests.md     # Test specification
 │   ├── publish-post.md
-│   └── list-published-posts.md
+│   └── publish-post.tests.md
 └── authors/
     ├── README.md
-    └── register-author.md
+    ├── register-author.md
+    └── register-author.tests.md
 
 docs/ui/                         # Optional but recommended when frontends exist
 ├── README.md                    # Layer model and agent read order
-├── web/                         # One folder per app under apps/
+├── web/
 │   ├── README.md                # Route index (links only)
 │   ├── shell.md                 # Shared layout chrome
 │   └── pages/
 │       └── home.md              # Page composition (many use cases allowed)
-└── admin/
-    ├── README.md
-    ├── shell.md
-    └── pages/
-        └── post-editor.md
 ```
 
 | Level | File | Describes |
 |:---|:---|:---|
-| System | `docs/domain/README.md` | Index of all features and use cases; cross-domain notes |
-| Feature | `docs/domain/{feature}/README.md` | Aggregate(s), ubiquitous language, **invariants**, events, persistence |
-| Use case | `docs/domain/{feature}/{use-case}.md` | One command or query; HTTP contract; **operation** acceptance criteria |
+| System | `docs/domain/README.md` | Index of features and use cases; doc completeness status |
+| Feature | `docs/domain/{feature}/README.md` | Aggregate(s), language, **invariants**, events, invariants under test |
+| Operation | `docs/domain/{feature}/{use-case}.md` | One command or query; HTTP contract; domain behavior |
+| Test spec | `docs/domain/{feature}/{use-case}.tests.md` | Test Coverage table, variations, explicit exclusions |
 | UI app | `docs/ui/{app}/README.md` | Route index linking to page docs and use cases |
 | UI shell | `docs/ui/{app}/shell.md` | Layout regions and cross-page presentation rules |
-| UI page | `docs/ui/{app}/pages/{page}.md` | One route; which use cases compose; visible states; e2e links |
+| UI page | `docs/ui/{app}/pages/{page}.md` | One route; which use cases compose; links to test specs |
 
-Do not maintain parallel **behavior** specs (duplicate glossaries, exception catalogs, or API maps). UI projection docs are **composition indexes**, not a second domain layer. Invariants stay in feature READMEs; operation rules stay in use case docs.
+Do not maintain parallel **behavior** specs (duplicate glossaries, exception catalogs, or API maps). UI projection docs are **composition indexes**, not a second domain layer. Invariants stay in feature READMEs; operation rules stay in operation docs; verification stays in test specs.
 
 ---
 
@@ -65,7 +64,8 @@ Domain docs, backend projects, and frontend folders MUST use the same boundaries
 
 | Layer | Pattern | Example |
 |:---|:---|:---|
-| Domain docs | `docs/domain/{feature}/{use-case}.md` | `docs/domain/posts/create-post.md` |
+| Operation doc | `docs/domain/{feature}/{use-case}.md` | `docs/domain/posts/create-post.md` |
+| Test spec | `docs/domain/{feature}/{use-case}.tests.md` | `docs/domain/posts/create-post.tests.md` |
 | Backend write | `{Feature}/{UseCase}/` handlers | `Posts/Create/PublishPostCommandHandler.cs` |
 | Backend read | `{Feature}/{UseCase}/` handlers | `Posts/List/GetAllPostsQueryHandler.cs` |
 | Frontend | `features/{feature}/{use-case}/` | `features/posts/create/CreatePostForm.tsx` |
@@ -73,7 +73,7 @@ Domain docs, backend projects, and frontend folders MUST use the same boundaries
 | UI projection | `docs/ui/{app}/pages/{page}.md` | Composes one or more use cases on a route |
 | Acceptance tests | `Features/{Feature}/{UseCase}.feature` | `Features/Posts/PublishPost.feature` |
 
-Use cases and pages are **many-to-many**. One page (for example admin post editor) may compose several use cases. One use case may appear on several pages (for example list published posts on home and tag filter). Page docs capture that mapping; use case docs stay one operation each.
+Use cases and pages are **many-to-many**. One page may compose several use cases. One use case may appear on several pages. Page docs capture that mapping; operation docs stay one operation each.
 
 ---
 
@@ -84,132 +84,146 @@ Copy `docs/templates/domain-feature.md` to `docs/domain/{feature}/README.md`.
 A feature README MUST include:
 
 - Ubiquitous language table for this feature (terms, definitions, banned synonyms)
-- Aggregate definition, state transitions, invariants
+- Aggregate definition, state transitions (with test annotations on transitions), invariants
+- **Invariants Under Test** table linking invariants to test class and method
 - Domain events and reactions
 - Persistence overview (tables, key relationships)
-- Links to all use case docs under this feature
+- Links to all operation and test spec docs under this feature
 
 Update the feature README when aggregate shape, language, or invariants change.
 
 ---
 
-## 4. Use Case Doc
+## 4. Operation Doc
 
 Copy `docs/templates/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md`.
 
-A use case doc MUST include:
+An operation doc MUST include:
 
-- Summary and acceptance criteria (numbered, mapped to test types)
-- **Acceptance coverage** table with criterion IDs and required test types
-- Command or query contract (when applicable)
-- HTTP endpoint (method, path, auth, idempotency)
-- Operation-level UI notes (loading, empty, error, loaded) when a frontend implements this use case
-- Exceptions raised and their HTTP mapping
-- Link to UI page doc(s) where this operation appears (when `docs/ui/` exists)
+- Summary, Risk Level, command or query contract, domain behavior, exceptions, HTTP endpoint
+- Persistence when schema changes
+- UI cross-reference to page doc(s), not full route or mutation detail
+- Pointer to `{use-case}.tests.md`
 
-Use case docs MUST NOT list Tailwind classes, shadcn variants, or page layout details. Those belong in UI projection docs or app README runbooks.
+Operation docs MUST NOT contain Test Coverage tables, numbered acceptance lists, or Tailwind or layout detail.
 
-Update the use case doc in the same PR as the handler, endpoint, or UI change.
+Authoring workflow: `docs/guides/write-use-case-doc.md`.
 
 ---
 
-## 5. UI Projection Docs
+## 5. Test Specification Doc
 
-Copy `docs/templates/ui-shell.md` and `docs/templates/ui-page.md` from this standards repository when adding or changing frontend routes. In a consuming monorepo, paths are `{project}/standards/docs/templates/...`. See `ui-page.example.md` for a multi-use-case page shape.
+Copy `docs/templates/domain-use-case.tests.md` to `docs/domain/{feature}/{use-case}.tests.md`.
 
-UI projection docs live under `docs/ui/{app}/` where `{app}` matches the folder name under `apps/` (for example `web`, `admin`).
+A test spec MUST include:
 
-**Shell doc** (`shell.md`) — shared layout: header, footer, nav, auth gates, presentation defaults. Cross-page rules (for example sticky footer) and links to Playwright layout specs.
+- **Test Coverage** table: scenario, Given, When, Then, Layer, Class, Method, Variations
+- **Acceptance test classification** when API acceptance or BDD applies
+- **Explicitly Not Tested** for intentional gaps
+- **Related E2E Specs** when Playwright applies
 
-**Page doc** (`pages/{name}.md`) — one user-facing route:
+### Test Coverage table conventions
 
-- Route path and route shell file
-- Feature component entry path(s), or `(inline in route shell)` / `(none — reason)`
-- Table of **use case doc links** composed on this page
-- **Screen states** on this route (loading, empty, error)
-- **Content modes** when aggregate state changes visible actions (optional)
-- Links to e2e specs and use-case acceptance criteria
+- Row number `N` is criterion ID `AC-00N` for `@ac:` tags in Reqnroll and plain API acceptance tests.
+- **Layer** values: `Domain Unit`, `Application Unit`, `Integration`, `Frontend Unit`, `E2E` only.
+- **Variations:** list boundary and error variants; `N/A` when none apply.
+- Agents MUST add a row before writing a test for a scenario. MUST NOT write tests for undeclared scenarios.
 
-UI docs MUST NOT restate domain invariants. Link to the feature README or use case doc instead (for example "Delete hidden when Published — see delete-post.md").
+Risk Level on the test spec MUST match the operation doc. It drives mandatory layers (Low / Medium / High) per the template and `08-testing.md`.
 
-**App README** (`apps/{app}/README.md`) remains the **runbook**: stack, env, run, build, test commands. Link to `docs/ui/{app}/` for screen composition.
-
-Update UI projection docs in the same PR as route, layout, or page composition changes.
+Update the test spec in the same PR as any new or changed test.
 
 ---
 
-## 6. Executable Acceptance Criteria
+## 6. UI Projection Docs
 
-Use-case docs remain the source of truth for behavior. BDD feature files and plain API acceptance tests are **executable projections** of selected acceptance criteria, not a second specification.
+Copy `docs/templates/ui-shell.md` and `docs/templates/ui-page.md` from this standards repository when adding or changing frontend routes.
+
+UI projection docs live under `docs/ui/{app}/` where `{app}` matches the folder name under `apps/`.
+
+**Shell doc** (`shell.md`): shared layout, nav, auth gates, presentation defaults.
+
+**Page doc** (`pages/{name}.md`): route, feature entry, use case links, screen states, content modes, links to test specs (not duplicated tables).
+
+UI docs MUST NOT restate domain invariants. Link to the feature README or operation doc instead.
+
+---
+
+## 7. Executable Acceptance Criteria
+
+Operation and test specs are the source of truth for behavior. BDD feature files and plain API acceptance tests are **executable projections** of selected Test Coverage rows, not a second specification.
 
 Rules:
 
 - Do not duplicate glossary, invariants, HTTP contract, or exception mapping in feature files.
-- When behavior changes, update the use-case doc first, then update tests and code.
-- Feature files MUST use terms from the feature README. If terms are missing, update the ubiquitous language table before writing scenarios.
-- Every Reqnroll scenario MUST reference a use-case doc (`@usecase:{feature}/{use-case}`) and at least one acceptance criterion (`@ac:AC-00N`).
-- If a scenario and the use-case doc disagree, the use-case doc wins until a human explicitly changes it.
+- When behavior changes, update the operation doc and test spec first, then update tests and code.
+- Feature files MUST use terms from the feature README.
+- Every Reqnroll scenario MUST reference `@usecase:{feature}/{use-case}` and `@ac:AC-00N` matching a Test Coverage row.
+- If a scenario and the test spec disagree, the test spec wins until a human explicitly changes it.
 
-See `docs/conventions/backend/20-api-acceptance-tests.md` for BDD rules, tags, and project structure.
+See `docs/conventions/backend/20-api-acceptance-tests.md`.
 
 ---
 
-## 7. Agent Workflow
+## 8. Agent Workflow
 
 ```mermaid
 flowchart LR
   A[domain/README.md]
   B[feature README]
-  C[use case doc]
+  C[operation doc]
+  T[test spec]
   U[ui page doc]
   D[scaffolding sequence]
   E[update docs]
-  A --> B --> C --> U --> D --> E
+  A --> B --> C --> T --> U --> D --> E
 ```
 
 1. Read `docs/domain/README.md` for orientation.
 2. Read `docs/domain/{feature}/README.md` for language and invariants.
 3. Read `docs/domain/{feature}/{use-case}.md` for the operation contract.
-4. For frontend work, read `docs/ui/{app}/shell.md` and the relevant `pages/*.md`.
-5. Implement per `agentic-guardrails.md` section 2 with checkpoint commands.
-6. Update domain, use case, and UI projection docs before marking complete.
+4. Read `docs/domain/{feature}/{use-case}.tests.md` before writing or changing tests.
+5. For frontend work, read `docs/ui/{app}/shell.md` and the relevant `pages/*.md`.
+6. Implement per `agentic-guardrails.md` section 2 with checkpoint commands.
+7. Update operation doc, test spec, and UI projection docs before marking complete.
 
 ---
 
-## 8. Relationship to Spec-Driven Development
+## 9. Relationship to Spec-Driven Development
 
 | Industry term | Our term |
 |:---|:---|
-| Specification | Domain doc (feature README or use case doc) |
-| Spec-first | Use case doc written before agent implementation |
+| Specification | Operation doc + test spec |
+| Spec-first | Operation and test docs written before implementation |
 | Spec-anchored | Domain docs updated in the same PR as code |
-| Ubiquitous language | Glossary section in each feature README |
-| Acceptance criteria | Numbered section in each use case doc with coverage mapping |
-| Executable acceptance | BDD scenarios or plain API acceptance tests traced to criterion IDs |
+| Ubiquitous language | Glossary in each feature README |
+| Acceptance criteria | Test Coverage rows in `{use-case}.tests.md` |
+| Executable acceptance | BDD or API acceptance tests traced to `AC-00N` |
 
-We do not use spec-as-source (code generated only from docs). Code remains explicit and compiler-enforced; domain docs remain the human-readable source of truth for intent and current behavior.
+We do not use spec-as-source. Code remains explicit and compiler-enforced; domain docs remain the human-readable source of truth for intent and current behavior.
 
 ---
 
-## 9. When a Use Case Doc Is Optional
+## 10. When a Use Case Doc Is Optional
 
-Skip a formal use case doc only for:
+Skip formal operation and test docs only for:
 
 - Typo or copy fix with no behavior change
 - Dependency patch with no contract change
 - Pure refactor with no observable behavior change
 
-Everything else requires a use case doc.
+Everything else requires both docs.
 
 ---
 
-## 10. Related Documents
+## 11. Related Documents
 
 | Document | Purpose |
 |:---|:---|
-| `docs/guides/add-new-use-case.md` | Implementation checklist after the use case doc exists |
+| `docs/guides/write-use-case-doc.md` | Authoring workflow for operation and test docs |
+| `docs/guides/add-new-use-case.md` | Implementation checklist after docs exist |
 | `docs/guides/definition-of-done.md` | Completion checklist |
-| `docs/templates/domain-feature.md` | Feature README template |
-| `docs/templates/domain-use-case.md` | Use case doc template |
+| `docs/templates/domain-use-case.md` | Operation doc template |
+| `docs/templates/domain-use-case.tests.md` | Test spec template |
 | `docs/conventions/backend/20-api-acceptance-tests.md` | ADDD executable acceptance testing |
 | `docs/blueprints/backend/api-acceptance-tests/` | Reqnroll project blueprints |

@@ -24,16 +24,26 @@ Describe the aggregate root, identity, and lifecycle.
 
 ### State transitions
 
+Annotate each transition with the test class and method prefix pattern that covers it, for example `(PostTests.Publish_*)`. A transition with no annotation is a coverage gap until a test spec row exists.
+
 ```mermaid
 stateDiagram-v2
-    [*] --> Draft
-    Draft --> Published: Publish
-    Published --> Archived: Archive
+    [*] --> Draft : Create (PostTests.Create_*)
+    Draft --> Published : Publish (PostTests.Publish_*)
+    Published --> Archived : Archive (PostTests.Archive_*)
 ```
 
 ### Invariants
 
 - ...
+
+### Invariants Under Test
+
+| Invariant | Use case doc | Test class | Test method |
+|:----------|:-------------|:-----------|:------------|
+| Post can only be published once | [{use-case}.md]({use-case}.md) | `PostTests` | `Publish_WhenPostIsAlreadyPublished_ShouldThrowPostAlreadyPublishedException` |
+
+Add a row when a domain invariant has automated coverage. Link to the use case test spec for full scenario and variation detail.
 
 ---
 
@@ -63,6 +73,6 @@ stateDiagram-v2
 
 ## Use Cases
 
-| Use case | Doc | Backend | Frontend |
-|:---|:---|:---|:---|
-| `{Use case name}` | [{use-case}.md]({use-case}.md) | `{Feature}/{UseCase}/` | `features/{feature}/{use-case}/` |
+| Use case | Operation doc | Test spec | Backend | Frontend |
+|:---|:---|:---|:---|:---|
+| `{Use case name}` | [{use-case}.md]({use-case}.md) | [{use-case}.tests.md]({use-case}.tests.md) | `{Feature}/{UseCase}/` | `features/{feature}/{use-case}/` |

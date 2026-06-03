@@ -26,7 +26,8 @@ Living source of truth under `docs/domain/` in each project:
 |:---|:---|:---|
 | System | `docs/domain/README.md` | Index of features and use cases |
 | Feature | `docs/domain/{feature}/README.md` | Aggregate, ubiquitous language, invariants |
-| Use case | `docs/domain/{feature}/{use-case}.md` | Behavior, endpoints, UI, acceptance criteria |
+| Operation | `docs/domain/{feature}/{use-case}.md` | Behavior, endpoints, HTTP contract |
+| Test spec | `docs/domain/{feature}/{use-case}.tests.md` | Test Coverage table, variations |
 
 ## Reference implementation (consumer project)
 

@@ -1,6 +1,6 @@
 # API Acceptance Tests (ADDD Executable Acceptance)
 
-This document defines **ADDD executable acceptance tests**: HTTP-level tests that validate documented use cases against acceptance criteria in `docs/domain/{feature}/{use-case}.md`. They are not a parallel specification layer. The use-case doc remains normative; acceptance tests are executable evidence.
+This document defines **ADDD executable acceptance tests**: HTTP-level tests that validate documented use cases against Test Coverage rows in `docs/domain/{feature}/{use-case}.tests.md`. They are not a parallel specification layer. The test spec remains normative for verification; acceptance tests are executable evidence.
 
 For the five-category backend testing taxonomy, see `08-testing.md`. For Reqnroll setup patterns, see `docs/blueprints/backend/api-acceptance-tests/`.
 
@@ -8,10 +8,10 @@ For the five-category backend testing taxonomy, see `08-testing.md`. For Reqnrol
 
 ## Agent Quick Rules
 
-- Every API acceptance test MUST trace to a use-case doc under `docs/domain/{feature}/{use-case}.md`.
+- Every API acceptance test MUST trace to a Test Coverage row in `docs/domain/{feature}/{use-case}.tests.md`.
 - Reqnroll is the preferred BDD library when Gherkin adds stakeholder value. Plain xUnit API acceptance tests are the default otherwise.
 - Agents MUST NOT add Reqnroll unless the project already has an acceptance test project, the use-case doc marks BDD coverage as required, or the human task explicitly requests BDD.
-- When a scenario conflicts with the use-case doc, the use-case doc wins. Stop and report the conflict; do not "fix" the doc from the test.
+- When a scenario conflicts with the test spec, the test spec wins. Stop and report the conflict; do not "fix" the test spec from the test without human review.
 - When steps execute the action under test, they MUST go through HTTP. MUST NOT call handlers, repositories, `DbContext`, or domain methods for the action under test.
 
 ---
@@ -96,7 +96,7 @@ Plain xUnit API acceptance tests MAY live in `{ProjectName}.AcceptanceTests` wit
 
 ## 5. Traceability
 
-Each use-case doc MUST include an **Acceptance coverage** section (see `docs/templates/domain-use-case.md`). Each acceptance criterion MUST have an ID (`AC-001`, `AC-002`, ...).
+Each use case MUST have a test spec at `docs/domain/{feature}/{use-case}.tests.md` (see `docs/templates/domain-use-case.tests.md`) with a **Test Coverage** table. Row number `N` is criterion ID `AC-00N` (for example row 1 → `AC-001`).
 
 Every Reqnroll scenario MUST map to at least one acceptance criterion via tags:
 
@@ -111,9 +111,9 @@ Feature: Publish Post
 
 Rules:
 
-- Every critical acceptance criterion MUST be covered by a BDD scenario, a plain API acceptance test, or a lower-level test with explicit rationale in the use-case doc.
-- Feature files MUST NOT redefine glossary, invariants, endpoint contracts, or exception catalogs. Reference the use-case doc.
-- If scenario and use-case doc disagree, update the test (or fix the code), not the normative doc without human review.
+- Every critical Test Coverage row MUST be covered by a BDD scenario, a plain API acceptance test, or a lower-level test with explicit rationale in **Explicitly Not Tested** when not automated.
+- Feature files MUST NOT redefine glossary, invariants, endpoint contracts, or exception catalogs. Reference the operation doc and test spec.
+- If scenario and test spec disagree, update the test (or fix the code), not the normative test spec without human review.
 
 ---
 

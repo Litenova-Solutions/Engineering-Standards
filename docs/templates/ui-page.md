@@ -45,7 +45,7 @@ Optional. Use when aggregate state on the page changes which actions or fields a
 
 ## Shell
 
-Inherits [{app} shell](../shell.md).
+Inherits the app shell at `docs/ui/{app}/shell.md` (copy from [ui-shell.md](ui-shell.md)).
 
 ---
 
@@ -55,6 +55,6 @@ Inherits [{app} shell](../shell.md).
 |:---|:---|
 | Playwright | `{e2e spec path}` or `Not yet added` |
 
-Acceptance criteria: link to use-case doc § Acceptance Criteria.
+Test specification: link to [`docs/domain/{feature}/{use-case}.tests.md`](../../domain/{feature}/{use-case}.tests.md) for each use case on this page (Test Coverage table).
 
 In consuming projects, copy this template from the standards submodule (for example `{project}/standards/docs/templates/ui-page.md`).

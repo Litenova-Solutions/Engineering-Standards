@@ -90,6 +90,8 @@ const requiredTemplates = [
   "docs/templates/domain-system-index.md",
   "docs/templates/domain-feature.md",
   "docs/templates/domain-use-case.md",
+  "docs/templates/domain-use-case.tests.md",
+  "docs/guides/write-use-case-doc.md",
   "docs/guides/agentic-domain-driven-design.md",
   "docs/blueprints/README.md",
   "docs/runbooks/README.md",

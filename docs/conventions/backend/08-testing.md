@@ -22,7 +22,7 @@ Every backend test belongs to exactly one category:
 | **Domain tests** | `{ProjectName}.Domain.Tests` | Aggregates, value objects, domain services, invariants, domain events. No HTTP. No database. No mocks. |
 | **Application tests** | `{ProjectName}.Application.Tests` | Command/query handler orchestration, validators, reactions, application-level side effects. Query handlers use PostgreSQL Testcontainers where EF translation matters. |
 | **API integration tests** | `{ProjectName}.Integration.Tests` | Endpoint tests through HTTP: routing, middleware, validation, auth test scheme, serialization, EF Core, PostgreSQL Testcontainers. |
-| **API acceptance tests** | `{ProjectName}.AcceptanceTests` (when Reqnroll or dedicated acceptance coverage) | Business use cases through HTTP, mapped to use-case doc acceptance criteria. Plain xUnit or Reqnroll Gherkin. See `20-api-acceptance-tests.md`. |
+| **API acceptance tests** | `{ProjectName}.AcceptanceTests` (when Reqnroll or dedicated acceptance coverage) | Business use cases through HTTP, mapped to `{use-case}.tests.md` Test Coverage rows. Plain xUnit or Reqnroll Gherkin. See `20-api-acceptance-tests.md`. |
 | **Contract tests** | Integration or dedicated contract project | OpenAPI freshness, generated client compatibility, Problem Details shape, breaking-change checks. |
 
 API integration tests and API acceptance tests share `WebApplicationFactory` and Testcontainers foundations. Integration tests prove the HTTP pipeline works; acceptance tests prove documented use-case criteria hold.

@@ -2,6 +2,13 @@
 
 Approved example for agents. Copy structure from `docs/templates/domain-use-case.md`, not this file directly.
 
+| Field | Value |
+|:---|:---|
+| Feature | `posts` |
+| Status | Active |
+| Risk Level | Medium |
+| Last updated | |
+
 ---
 
 ## Summary
@@ -60,34 +67,18 @@ Returns 201 with Location header.
 
 ## UI
 
-### Route and entry
+See [`docs/ui/{app}/pages/{page}.md`](../../ui/{app}/pages/{page}.md).
 
-- Route: `app/(main)/posts/new/page.tsx`
-- Feature entry: `features/posts/create/CreatePostPage.tsx`
-
-### States
-
-| State | Behavior |
-|:---|:---|
-| Loading | Submit button disabled, spinner on form |
-| Empty | Blank form ready for input |
-| Error | Inline validation errors or toast for API failure |
-| Loaded | Redirect to post detail after successful create |
-
-### Mutations
-
-Server Action with Zod validation in `features/posts/create/actions.ts`.
-
----
-
-## Acceptance Criteria
-
-1. Given an authenticated author, when they submit a valid title and body, then a draft post is created and they see the post detail page. (Playwright)
-2. Given an empty title, when they submit, then the Server Action returns a validation error. (Vitest on Zod schema)
-3. Given duplicate Idempotency-Key retries, when the same POST is sent twice, then the API returns the same post id without duplicate rows. (Integration)
+Operation notes: redirect to post detail after successful create; validation errors inline on the form.
 
 ---
 
 ## Out of Scope
 
 Publishing, editing, and deleting posts are separate use cases.
+
+---
+
+## Test Specification
+
+See [{use-case}.tests.md]({use-case}.tests.md).

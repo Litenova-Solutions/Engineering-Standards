@@ -11,6 +11,9 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 - [ ] Handler implemented; domain invariants enforced in aggregates, not handlers.
 - [ ] `CommandValidationException` or `QueryValidationException` used for all structural input validation.
 - [ ] Backend unit and integration tests written and passing (`dotnet test apps/api/{ProjectName}.slnx`).
+- [ ] Test Coverage table in `docs/domain/{feature}/{use-case}.tests.md` updated for all new and changed scenarios (Layer, Class, Method, Variations populated).
+- [ ] Every row in the Test Coverage table has a passing test, or **Explicitly Not Tested** documents why not.
+- [ ] No test in the test projects for this use case exists without a matching Test Coverage row.
 - [ ] `{ProjectName}.Architecture.Tests` exists and passes (REQUIRED for standard solutions per `docs/decisions/architecture-tests-as-enforcement.md`).
 
 ---
@@ -27,8 +30,8 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 ## 3. Acceptance Testing
 
-- [ ] If the use-case doc has acceptance criteria, each criterion maps to at least one test type or a documented manual-only reason in the Acceptance coverage table.
-- [ ] If BDD scenarios were added, each scenario maps to a use-case doc (`@usecase:`) and acceptance criterion (`@ac:`).
+- [ ] Each Test Coverage row maps to at least one executable test or an **Explicitly Not Tested** entry with reason.
+- [ ] If BDD scenarios were added, each scenario maps to the operation doc (`@usecase:`) and Test Coverage row (`@ac:AC-00N`).
 - [ ] If the use case is protected, authorization acceptance coverage includes negative cases (401/403) where applicable.
 - [ ] If the use case is idempotent, acceptance coverage includes replay behavior.
 - [ ] If the use case emits integration events with outbox ownership, acceptance coverage verifies event recording or externally observable consequence.
@@ -39,7 +42,7 @@ Before an AI agent marks a feature task as complete, it MUST verify every applic
 
 ## 4. Frontend Execution
 
-- [ ] Use case doc at `docs/domain/{feature}/{use-case}.md` updated to reflect current behavior.
+- [ ] Operation doc at `docs/domain/{feature}/{use-case}.md` and test spec at `docs/domain/{feature}/{use-case}.tests.md` updated to reflect current behavior.
 - [ ] Feature README at `docs/domain/{feature}/README.md` updated when domain language or invariants changed.
 - [ ] UI projection docs updated when routes, shell, or page composition changed (`docs/ui/{app}/shell.md`, `docs/ui/{app}/pages/*.md`, `docs/ui/{app}/README.md` route index).
 - [ ] shadcn/ui bootstrapped in each touched frontend app (`components.json`, `components/ui/`, `lib/utils.ts`) unless a project ADR documents a different UI stack.

@@ -2,7 +2,7 @@
 
 This guide shows the standard path for adding one backend use case and connecting it to the frontend. Use it as a checklist, not as a substitute for the layer convention files.
 
-**Prerequisite:** A use case doc at `docs/domain/{feature}/{use-case}.md`. If none exists, write one first using `docs/templates/domain-use-case.md` and `docs/guides/agentic-domain-driven-design.md`.
+**Prerequisite:** Operation doc at `docs/domain/{feature}/{use-case}.md` and test spec at `docs/domain/{feature}/{use-case}.tests.md`. If missing, write them first using `docs/guides/write-use-case-doc.md`.
 
 ---
 
@@ -12,7 +12,7 @@ Read in order:
 
 1. `AGENTS.md`.
 2. `docs/domain/README.md` and `docs/domain/{feature}/README.md`.
-3. The use case doc at `docs/domain/{feature}/{use-case}.md`.
+3. The operation doc and test spec at `docs/domain/{feature}/{use-case}.md` and `{use-case}.tests.md`.
 4. `docs/architecture/clean-architecture.md`.
 5. The convention files for each layer you will edit.
 6. `docs/guides/definition-of-done.md` before marking the work complete.
@@ -31,7 +31,7 @@ After the use-case doc exists, classify acceptance testing before writing tests:
 | **Contract test required** | Public API or independently deployed client |
 | **E2E test required** | User-facing journey has frontend behavior backend tests cannot verify |
 
-Record the decision in the use-case doc **Acceptance coverage** section. Do not default every use case to BDD.
+Record the decision in the test spec **Acceptance test classification** section. Do not default every use case to BDD.
 
 See `docs/conventions/backend/20-api-acceptance-tests.md`.
 
@@ -125,7 +125,7 @@ In WebApi:
 
 - Add API integration tests for endpoint wiring and smoke behavior (`Integration.Tests`).
 - Add plain API acceptance tests or Reqnroll scenarios traced to acceptance criterion IDs when the use-case doc requires them (`AcceptanceTests`).
-- Map each acceptance criterion in the use-case doc Acceptance coverage table.
+- Map each Test Coverage row in `{use-case}.tests.md` to Domain, Application, Integration, Acceptance, or E2E tests as appropriate.
 
 Copy patterns from `docs/blueprints/backend/api-acceptance-tests/` when introducing Reqnroll.
 
@@ -149,7 +149,7 @@ When the project uses `docs/ui/` (recommended for multi-app frontends):
 - Add or update `docs/ui/{app}/pages/{page}.md` for the route (copy from `standards/docs/templates/ui-page.md` in the consuming project).
 - Update `docs/ui/{app}/README.md` route index.
 - Update `docs/ui/{app}/shell.md` when shared layout changes (copy from `standards/docs/templates/ui-shell.md`).
-- Update each affected use-case doc § UI projection with links to the page doc(s).
+- Update each affected operation doc § UI with links to the page doc(s).
 
 See `docs/guides/agentic-domain-driven-design.md` § UI Projection Docs.
 
@@ -159,7 +159,7 @@ See `docs/guides/agentic-domain-driven-design.md` § UI Projection Docs.
 
 In the same PR:
 
-- Update `docs/domain/{feature}/{use-case}.md` to reflect current behavior.
+- Update `docs/domain/{feature}/{use-case}.md` and `{use-case}.tests.md` to reflect current behavior.
 - Update `docs/domain/{feature}/README.md` if aggregates, language, events, or persistence changed.
 - Update `docs/domain/README.md` if this is a new or retired use case.
 - Update `docs/ui/{app}/` when routes, shell, or page composition changed.
