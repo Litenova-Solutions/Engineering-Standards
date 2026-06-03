@@ -1,4 +1,23 @@
 {
+  "_meta": {
+    "description": "Machine-readable domain map for agents. Copy to docs/domain/agent-index.json in the consumer project.",
+    "layer-context": {
+      "rule": "Each value MUST be a key from standards.manifest.json agentLoadPlans.",
+      "validValues": {
+        "backend.domain": "Aggregate, value objects, domain events, invariants",
+        "backend.application": "Command/query handlers, validators, reactions",
+        "backend.api": "IEndpoint classes, request/response models, OpenAPI",
+        "backend.infrastructure": "EF Core, repositories, outbox, migrations, external clients",
+        "backend.testing": "Integration, acceptance, and architecture tests",
+        "frontend.app": "Next.js routes, features, hooks, Server Actions, Playwright E2E",
+        "security.review": "Auth, authorization, security controls review"
+      },
+      "multiValue": "List every agentLoadPlans key touched by the use case (for example write + API + UI)."
+    },
+    "conventions": {
+      "rule": "Each value MUST be a key from standards.manifest.json conventionIndex (for example backend.domainLayer)."
+    }
+  },
   "features": [
     {
       "name": "posts",
@@ -11,7 +30,7 @@
           "test-spec": "docs/domain/posts/create-post.tests.md",
           "status": "active",
           "risk-level": "medium",
-          "layer-context": ["backend.write", "frontend.form"]
+          "layer-context": ["backend.application", "backend.api", "frontend.app"]
         },
         {
           "name": "publish-post",
@@ -19,7 +38,7 @@
           "test-spec": "docs/domain/posts/publish-post.tests.md",
           "status": "active",
           "risk-level": "medium",
-          "layer-context": ["backend.write"]
+          "layer-context": ["backend.application", "backend.api"]
         }
       ]
     }

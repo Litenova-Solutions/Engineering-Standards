@@ -1,8 +1,10 @@
-# ADR 0022: ADDD Executable Acceptance Tests (Reqnroll)
+# ADDD Executable Acceptance Tests (Reqnroll)
 
-| Status | Accepted |
-|:---|:---|
-| Date | 2026-05-28 |
+**Status:** Accepted
+
+**Date:** 2026-05-28
+
+**Canonical rules:** `docs/conventions/backend/testing.md`, `docs/conventions/backend/api-acceptance-tests.md`
 
 ## Context
 
@@ -10,7 +12,7 @@ Domain docs are the human-readable source of truth. Use-case docs hold acceptanc
 
 ## Decision
 
-1. Adopt **ADDD executable acceptance tests** as a distinct backend test category (see `testing.md` and `20-api-acceptance-tests.md`).
+1. Adopt **ADDD executable acceptance tests** as a distinct backend test category (see `testing.md` and `api-acceptance-tests.md`).
 2. Adopt **Reqnroll** as the standard optional BDD framework for new .NET API acceptance tests when Gherkin adds stakeholder value.
 3. Keep **plain xUnit API integration and acceptance tests** as the default request-to-response style.
 4. Require traceability from Reqnroll scenarios to use-case docs via `@usecase:` and `@ac:` tags.
@@ -20,17 +22,21 @@ SpecFlow remains allowed only in legacy projects until a dedicated migration tas
 
 ## Consequences
 
-**Positive**
+### Positive
 
 - Stronger traceability from domain docs to executable behavior.
 - Stakeholder-readable examples for critical, security-sensitive, and complex use cases.
 - Better support for AI agents implementing against use-case docs.
 
-**Negative**
+### Negative
 
 - Additional framework, feature files, bindings, and maintenance cost.
-- Risk of generic step drift if agents ignore `20-api-acceptance-tests.md`.
+- Risk of generic step drift if agents ignore `api-acceptance-tests.md`.
 - Slower CI when BDD is overused; mitigated by `@critical` tag filtering.
+
+### Risks
+
+- Teams may over-adopt Gherkin for simple CRUD where plain xUnit is sufficient. Mitigated by acceptance test classification in the test spec and `add-new-use-case.md`.
 
 ## Related
 

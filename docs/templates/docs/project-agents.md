@@ -23,9 +23,9 @@ When working on any use case in a feature, MUST load the Feature Spec before the
 
 | Feature | Feature Spec | Use Cases | Load Also |
 |:---|:---|:---|:---|
-| `posts` | `docs/domain/posts/README.md` | `create-post`, `publish-post`, `list-posts` | `docs/domain/posts/*.md` |
-| `authors` | `docs/domain/authors/README.md` | `register-author` | |
+| `{feature}` | `docs/domain/{feature}/README.md` | `{use-case-1}`, `{use-case-2}` | `docs/domain/{feature}/*.md` |
 
+Replace with your project's actual features. Delete example rows when copying this template.
 Update this table when adding or renaming features.
 
 ---

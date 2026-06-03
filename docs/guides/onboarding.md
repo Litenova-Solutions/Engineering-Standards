@@ -18,7 +18,7 @@ Tri-layer naming is intentional: the same use case name appears in `docs/domain/
 2. Skim `standards/docs/architecture/clean-architecture.md` for layer boundaries.
 3. Open `docs/domain/README.md` in the **project** repo for features and doc status.
 4. Open the feature README and use case doc for the task you were assigned.
-5. Load Tier 1 Quick Rules from `agentLoadPlans` in `standards/standards.manifest.json` (for example `backend.domain`, `frontend.app`). Load Tier 2 full conventions only when a Quick Rule is unclear.
+5. Load Tier 1 Quick Rules from `agentLoadPlans` in `standards/standards.manifest.json`. Use the use case doc `layer-context` frontmatter when present (for example `backend.application`, `backend.api`, `frontend.app`). Load Tier 2 full conventions only when a Quick Rule is unclear.
 
 Do not read `docs/philosophy.md` or `docs/decisions/` unless you are choosing a new dependency or understanding a historical trade-off.
 

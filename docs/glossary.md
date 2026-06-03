@@ -31,7 +31,8 @@ Terms defined here are ADDD-specific or specialized in this standards repository
 
 | Term | Definition |
 |:---|:---|
-| **Agent index** | Machine-readable domain map at `docs/domain/agent-index.json`. Lists features, use cases, doc paths, risk levels, and layer context. Companion to `docs/domain/README.md`. |
+| **Agent index** | Machine-readable domain map at `docs/domain/agent-index.json`. Lists features, use cases, doc paths, risk levels, and `layer-context` keys matching `agentLoadPlans`. Companion to `docs/domain/README.md`. |
+| **Layer context** | YAML frontmatter and agent-index field listing `agentLoadPlans` keys (for example `backend.application`, `frontend.app`) that an agent MUST load for a use case. See `docs/guides/write-use-case-doc.md`. |
 | **Feature README** (Feature Spec) | `docs/domain/{feature}/README.md`: ubiquitous language, aggregate invariants, events, use case index. |
 | **System index** | `docs/domain/README.md`: map of features, use cases, and documentation completeness status. |
 | **Use case doc** (operation doc) | `docs/domain/{feature}/{use-case}.md`: operation specification for a single command or query. Contains business contract, HTTP interface, domain behavior, and pointer to Use Case Test Spec. Not a UML use case diagram. |

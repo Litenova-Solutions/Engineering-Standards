@@ -97,6 +97,7 @@ const requiredDocs = [
   "docs/glossary.md",
   "docs/guides/onboarding.md",
   "docs/governance/exceptions.md",
+  "docs/governance/README.md",
   "docs/conventions/backend/object-authorization.md",
   "docs/conventions/backend/api-acceptance-tests.md",
   "docs/conventions/backend/external-dependencies.md",
@@ -116,6 +117,7 @@ for (const file of requiredDocs) {
 const forbiddenPaths = [
   "docs/controls/enforcement-matrix.md",
   "docs/governance/versioning.md",
+  "docs/adr",
   "RELEASES.md",
   "docs/conventions/00-principles.md",
   "docs/conventions/backend/08-testing.md",
@@ -153,6 +155,12 @@ const requiredTemplates = [
   "docs/templates/docs/domain-feature.md",
   "docs/templates/docs/domain-use-case.md",
   "docs/templates/docs/domain-use-case.tests.md",
+  "docs/templates/docs/domain-use-case.example.md",
+  "docs/templates/docs/domain-use-case.tests.example.md",
+  "docs/blueprints/frontend/feature-test-utils.md",
+  "docs/governance/README.md",
+  "docs/decisions/adddd-executable-acceptance-tests.md",
+  "docs/decisions/validation-error-dual-contracts-placement.md",
   "docs/guides/write-use-case-doc.md",
   "docs/guides/agentic-domain-driven-design.md",
   "docs/blueprints/README.md",
@@ -162,6 +170,17 @@ const requiredTemplates = [
 for (const file of requiredTemplates) {
   if (!exists(file)) {
     errors.push(`Missing required file: ${file}`)
+  }
+}
+
+const frontmatterTemplates = [
+  "docs/templates/docs/domain-use-case.md",
+  "docs/templates/docs/domain-feature.md",
+]
+for (const file of frontmatterTemplates) {
+  const content = read(file)
+  if (!content.startsWith("---\n") && !content.startsWith("---\r\n")) {
+    errors.push(`${file} YAML frontmatter must start on line 1 (no content before opening ---)`)
   }
 }
 
@@ -181,6 +200,8 @@ const linkPattern = /\[[^\]]*\]\(([^)]+)\)/g
 const checked = new Set()
 
 for (const file of mdFiles) {
+  const relFile = path.relative(root, file)
+  if (relFile.includes(".example.md")) continue
   const content = fs.readFileSync(file, "utf8")
   let match
   while ((match = linkPattern.exec(content)) !== null) {

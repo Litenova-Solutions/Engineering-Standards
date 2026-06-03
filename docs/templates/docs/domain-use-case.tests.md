@@ -29,6 +29,8 @@ Record before writing API acceptance or BDD tests. See `docs/guides/add-new-use-
 
 Each row is one verifiable scenario. Row number `N` maps to acceptance criterion ID `AC-00N` in Reqnroll tags and API acceptance tests.
 
+**Placeholder convention:** Use `(none)` for intentionally empty fields. Use `(deferred — {reason})` in the Method column when the scenario is planned but not yet implemented.
+
 | # | Scenario | Given | When | Then | Layer | Class | Method | Variations |
 |:--|:---------|:------|:-----|:-----|:------|:------|:-------|:-----------|
 | 1 | | | | | | | | |

@@ -35,7 +35,7 @@ apps/api/                          ← solution root (monorepo) or repository ro
 │   ├── {ProjectName}.Integration.Tests/
 │   └── {ProjectName}.Architecture.Tests/
 └── docs/
-    └── adr/
+    └── decisions/
 ```
 
 The solution file uses the `.slnx` format (SDK-style solution files), not the legacy `.sln` format.

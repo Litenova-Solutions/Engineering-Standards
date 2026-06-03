@@ -1,12 +1,12 @@
-<!-- Copy to docs/domain/{feature}/{use-case}.md in the project repository -->
 ---
+_template-note: "Copy to docs/domain/{feature}/{use-case}.md in the project repository and remove this field"
 doc-type: use-case
-feature: {feature}
-aggregate: {AggregateName}
-operation: {Verb}{Aggregate}
-layer-context: [backend.write, backend.read, frontend.form]
-conventions: [backend.domainLayer, backend.applicationLayer, backend.apiLayer]
-test-spec: {use-case}.tests.md
+feature: "{feature}"
+aggregate: "{AggregateName}"
+operation: "{Verb}{Aggregate}"
+layer-context: ["backend.application", "backend.api", "frontend.app"]
+conventions: ["backend.domainLayer", "backend.applicationLayer", "backend.apiLayer"]
+test-spec: "{use-case}.tests.md"
 risk-level: medium
 status: active
 ---

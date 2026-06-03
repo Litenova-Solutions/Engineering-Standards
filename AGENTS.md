@@ -62,9 +62,9 @@ Report legacy violations unless the task is a standards migration.
 | Project | Responsibility |
 |:---|:---|
 | `Domain` | Aggregates, value objects, events, exceptions, repositories, strongly typed IDs |
-| `Application.Write.Contracts` | Commands, command results, `ValidationError` |
+| `Application.Write.Contracts` | Commands, command results; `ValidationError` (write-side canonical import) |
 | `Application.Write` | Command handlers and validators |
-| `Application.Read.Contracts` | Queries, results, `IDatabaseContext`, `ValidationError` |
+| `Application.Read.Contracts` | Queries, results, `IDatabaseContext`; `ValidationError` (read-side canonical import) |
 | `Application.Read` | Query handlers; projections only |
 | `Application.Reactions` | Event handlers; narrow side-effect interfaces only |
 | `Infrastructure` | EF Core, repos, pipeline, outbox, jobs, external clients |

@@ -12,7 +12,7 @@
 
 
 **Full convention:** `docs/conventions/frontend/testing.md`
-**When generating new files:** Load and copy from `docs/blueprints/backend/integration-test-factory.md` rather than assembling from examples in this file.
+**When generating new files:** Load and copy from `docs/blueprints/frontend/feature-test-utils.md` rather than assembling from examples in this file.
 
 ---
 

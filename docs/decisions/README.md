@@ -33,6 +33,8 @@ Filter the index by area: `backend`, `frontend`, `infrastructure`, `tooling`, `p
 
 Write a new file in `docs/decisions/` when the standards repo adopts a new org-wide technology or reverses an existing one. Project-specific decisions belong in the **consumer repository** under `docs/decisions/`, not in this repo.
 
+**Do not use `docs/adr/`.** All decision records for this repository live in `docs/decisions/` with kebab-case filenames (no numeric prefix). The manifest field `decisionsRoot` points here.
+
 **File naming:** `docs/decisions/{kebab-case-topic}.md` (no numeric prefix).
 
 **Filing steps:**
@@ -67,3 +69,5 @@ Write a new file in `docs/decisions/` when the standards repo adopts a new org-w
 | [api-versioning-policy](api-versioning-policy.md) | Accepted | backend | `docs/conventions/backend/api-layer.md` |
 | [signalr-for-real-time-updates](signalr-for-real-time-updates.md) | Accepted | infrastructure | `docs/conventions/shared/realtime-updates.md` |
 | [multi-tenancy-default](multi-tenancy-default.md) | Accepted | backend | Project ADR required before implementation |
+| [adddd-executable-acceptance-tests](adddd-executable-acceptance-tests.md) | Accepted | backend | `docs/conventions/backend/api-acceptance-tests.md`, `testing.md` |
+| [validation-error-dual-contracts-placement](validation-error-dual-contracts-placement.md) | Accepted | backend | `docs/conventions/backend/exception-hierarchy.md` |

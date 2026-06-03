@@ -171,6 +171,18 @@
       ],
       "blueprints": []
     },
+    "backend.application": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/backend/application-layer.md#agent-quick-rules",
+        "docs/conventions/backend/exception-hierarchy.md#agent-quick-rules"
+      ],
+      "tier2": [
+        "docs/conventions/backend/application-layer.md",
+        "docs/conventions/backend/exception-hierarchy.md"
+      ],
+      "blueprints": []
+    },
     "backend.api": {
       "tier0": ["AGENTS.md"],
       "tier1": [
@@ -253,6 +265,7 @@
       ],
       "blueprints": [
         "docs/blueprints/frontend/feature-use-case.md",
+        "docs/blueprints/frontend/feature-test-utils.md",
         "docs/blueprints/frontend/lib-api-client.md",
         "docs/blueprints/frontend/lib-env.md",
         "docs/blueprints/frontend/proxy-ts.md",

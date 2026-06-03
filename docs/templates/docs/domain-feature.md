@@ -1,11 +1,11 @@
-<!-- Copy to docs/domain/{feature}/README.md in the project repository -->
 ---
+_template-note: "Copy to docs/domain/{feature}/README.md in the project repository and remove this field"
 doc-type: feature-spec
-feature: {feature}
-aggregate: {AggregateName}
-use-cases: [{use-case}, {use-case-2}]
-layer-context: [backend.domain]
-conventions: [backend.domainLayer, backend.exceptionHierarchy]
+feature: "{feature}"
+aggregate: "{AggregateName}"
+use-cases: ["{use-case}", "{use-case-2}"]
+layer-context: ["backend.domain"]
+conventions: ["backend.domainLayer", "backend.exceptionHierarchy"]
 status: active
 ---
 # {Feature Name}

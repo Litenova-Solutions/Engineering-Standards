@@ -259,7 +259,7 @@ Everything else requires both docs.
 
 Agents load context in tiers (see `AGENTS.md` and `docs/agentic-development.md` §6). Consumer projects add routing metadata so agents do not scan the entire docs tree.
 
-**Document frontmatter.** Every Feature Spec and Use Case Doc MUST include YAML frontmatter (see templates in `docs/templates/docs/`). Frontmatter lists `layer-context`, `conventions`, `test-spec`, and `risk-level` so an agent opening one file knows which Tier 1 Quick Rules to load.
+**Document frontmatter.** Every Feature Spec and Use Case Doc MUST include YAML frontmatter (see templates in `docs/templates/docs/`). Frontmatter lists `layer-context` (keys from `agentLoadPlans`, for example `backend.application`), `conventions` (keys from `conventionIndex`), `test-spec`, and `risk-level` so an agent opening one file knows which Tier 1 Quick Rules to load.
 
 **Agent index.** Copy `docs/templates/docs/domain-agent-index.json` to `docs/domain/agent-index.json`. This machine-readable map lists features, use cases, doc paths, and status. Load it after `AGENTS.md` on any domain task.
 

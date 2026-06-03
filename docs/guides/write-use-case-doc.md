@@ -29,6 +29,24 @@ Copy `domain-use-case.example.md` and `domain-use-case.tests.example.md` for sha
 
 Update `docs/domain/{feature}/README.md` (feature template) when language, invariants, or the use case list changes. Update `docs/domain/README.md` when adding or retiring use cases (system index template).
 
+### `layer-context` frontmatter
+
+Each value MUST be a key from `standards.manifest.json` → `agentLoadPlans`. List every plan touched by the use case:
+
+| Key | When to include |
+|:---|:---|
+| `backend.domain` | Aggregate or invariant changes |
+| `backend.application` | Command/query handlers, validators, reactions |
+| `backend.api` | HTTP endpoint, request/response models |
+| `backend.infrastructure` | EF config, migrations, outbox, external clients |
+| `backend.testing` | Test-only work across backend layers |
+| `frontend.app` | UI routes, hooks, Server Actions, Playwright |
+| `security.review` | Auth, authorization, or security-sensitive changes |
+
+`conventions` frontmatter values MUST be keys from `conventionIndex` in the same manifest (for example `backend.applicationLayer`).
+
+See `docs/templates/docs/domain-agent-index.json` `_meta` for the machine-readable vocabulary.
+
 ---
 
 ## 3. Operation Contract (`{use-case}.md`)

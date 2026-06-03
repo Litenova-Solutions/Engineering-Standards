@@ -87,7 +87,7 @@ Rules:
 
 - The two definitions MUST remain byte-for-byte equivalent (same property names and types).
 - `Application.Read.Contracts` MUST NOT reference `Application.Write.Contracts` (and vice versa).
-- Do not introduce a third shared contracts project solely for this type unless a project ADR documents a migration.
+- Do not introduce a third shared contracts project solely for this type unless a project ADR documents a migration (see `docs/decisions/validation-error-dual-contracts-placement.md`).
 - `GlobalExceptionHandler` maps both exception families to the same RFC 7807 `invalidParams` shape.
 
 ```csharp

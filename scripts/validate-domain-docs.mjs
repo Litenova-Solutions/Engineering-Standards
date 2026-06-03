@@ -19,6 +19,39 @@ const domainRoot = path.join(root, "docs/domain")
 const errors = []
 const warnings = []
 
+function loadAgentLoadPlanKeys() {
+  const candidates = [
+    path.join(root, "standards.manifest.json"),
+    path.join(root, "standards/standards.manifest.json"),
+  ]
+  for (const manifestPath of candidates) {
+    if (!fs.existsSync(manifestPath)) continue
+    try {
+      const manifest = JSON.parse(read(manifestPath))
+      if (manifest.agentLoadPlans) return Object.keys(manifest.agentLoadPlans)
+    } catch {
+      warnings.push(`Could not parse agentLoadPlans from ${manifestPath}`)
+    }
+  }
+  return null
+}
+
+const validLayerContextKeys = loadAgentLoadPlanKeys()
+
+function validateLayerContext(fm, relPath) {
+  if (!validLayerContextKeys || !fm["layer-context"]) return
+  const values = Array.isArray(fm["layer-context"])
+    ? fm["layer-context"]
+    : [fm["layer-context"]]
+  for (const value of values) {
+    if (!validLayerContextKeys.includes(value)) {
+      errors.push(
+        `Invalid layer-context '${value}' in ${relPath}; must be an agentLoadPlans key (${validLayerContextKeys.join(", ")})`,
+      )
+    }
+  }
+}
+
 function read(file) {
   return fs.readFileSync(file, "utf8")
 }
@@ -115,6 +148,7 @@ for (const featureDir of featureDirs) {
     if (featureFm["doc-type"] && featureFm["doc-type"] !== "feature-spec") {
       errors.push(`Feature Spec doc-type must be 'feature-spec': ${rel(featureReadme)}`)
     }
+    validateLayerContext(featureFm, rel(featureReadme))
   }
 
   const invariantRows =
@@ -166,6 +200,7 @@ for (const featureDir of featureDirs) {
           `test-spec frontmatter '${fm["test-spec"]}' does not match expected '${base}.tests.md' (${rel(docPath)})`,
         )
       }
+      validateLayerContext(fm, rel(docPath))
     }
 
     if (!fs.existsSync(testSpecPath)) {
@@ -207,7 +242,14 @@ if (!fs.existsSync(agentIndexPath)) {
   warnings.push("Missing docs/domain/agent-index.json (machine-readable domain map)")
 } else {
   try {
-    JSON.parse(read(agentIndexPath))
+    const agentIndex = JSON.parse(read(agentIndexPath))
+    for (const feature of agentIndex.features ?? []) {
+      for (const uc of feature["use-cases"] ?? []) {
+        if (!uc["layer-context"]) continue
+        const relPath = `agent-index.json → ${feature.name}/${uc.name}`
+        validateLayerContext({ "layer-context": uc["layer-context"] }, relPath)
+      }
+    }
   } catch {
     errors.push("Invalid JSON in docs/domain/agent-index.json")
   }
