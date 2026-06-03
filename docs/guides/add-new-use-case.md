@@ -151,7 +151,7 @@ When the project uses `docs/ui/` (recommended for multi-app frontends):
 - Update `docs/ui/{app}/shell.md` when shared layout changes (copy from `standards/docs/templates/docs/ui-shell.md`).
 - Update each affected operation doc § UI with links to the page doc(s).
 
-See `docs/guides/agentic-domain-driven-design.md` § UI Projection Docs.
+See `docs/guides/agentic-domain-driven-design.md` § Page Composition Docs.
 
 ---
 

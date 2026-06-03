@@ -4,7 +4,7 @@ This document defines the standard for displaying, mapping, and handling backend
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - ALL API error responses follow the `ProblemDetails` (RFC 9457) shape. MUST NOT invent custom error formats.
 - Validation errors come as `application/problem+json` with `400` status and an `invalidParams` extension array.
@@ -12,6 +12,9 @@ This document defines the standard for displaying, mapping, and handling backend
 - Toast notifications are for non-field errors only (domain errors, network failures, unexpected 5xx).
 - Error boundaries catch render errors; they do not handle API errors.
 - MUST NOT expose raw `Error.message` strings from `catch` blocks to users.
+
+
+**Full convention:** `docs/conventions/frontend/error-handling-and-problem-details.md`
 
 ---
 

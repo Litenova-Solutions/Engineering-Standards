@@ -1,6 +1,6 @@
 # Data Fetching Conventions
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Server state MUST use TanStack Query or Server Components; MUST NOT live in Zustand.
 - Form mutations MUST use Server Actions with Zod in the action file.
@@ -54,6 +54,10 @@ function PostListPage() {
   useEffect(() => { fetchPosts() }, [])  // BAD: useEffect for data fetching
 }
 ```
+
+
+**Full convention:** `docs/conventions/frontend/data-fetching.md`
+**When generating new files:** Load and copy from `docs/blueprints/frontend/lib-api-client.md` rather than assembling from examples in this file.
 
 ---
 

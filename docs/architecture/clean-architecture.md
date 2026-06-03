@@ -2,6 +2,18 @@
 
 This document explains how Clean Architecture is applied across all projects following these standards. Every project follows this structure regardless of domain complexity.
 
+## Agent Quick Rules {#agent-quick-rules}
+
+- Dependencies MUST point inward: Domain has no infrastructure references.
+- WebApi references Contracts projects only, not Write/Read implementation projects.
+- Command handlers live in `Application.Write`; query handlers in `Application.Read`.
+- Query handlers MUST use `IDatabaseContext`; MUST NOT inject repository interfaces.
+- Reactions handle domain events with narrow side-effect interfaces only.
+- Infrastructure implements repositories, EF Core, pipeline, and external clients.
+- Endpoints use `IEndpoint`; MUST NOT use MVC controllers.
+
+**Full convention:** `docs/architecture/clean-architecture.md`
+
 > Key decisions documented in `docs/decisions/`: `docs/decisions/clean-architecture-as-structural-foundation.md` (Clean Architecture as foundation), `docs/decisions/cqrs-with-split-application-projects.md` (CQRS project split), `docs/decisions/minimal-api-endpoint-classes.md` (IEndpoint pattern), `docs/decisions/idatabasecontext-over-per-aggregate-read-stores.md` (IDatabaseContext), `docs/decisions/transaction-pipeline-behaviors.md` (Transaction pipeline behaviors).
 
 ---

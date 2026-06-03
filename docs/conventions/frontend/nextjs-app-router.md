@@ -1,6 +1,6 @@
 # Next.js App Router Conventions
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Default to Server Components; `'use client'` MUST have an explanatory comment.
 - `page.tsx` MUST be a thin shell; logic lives in `features/{feature}/`.
@@ -16,6 +16,10 @@
 The App Router is a full-stack rendering framework, not a client-side router. Its fundamental split between server components and client components maps directly to the read/write separation in the backend architecture. Server components are the read path: they fetch data, render HTML, and send it to the browser with zero JavaScript. Client components are the write path: they handle user interactions, manage local state, and trigger mutations. This split is enforced by the framework and MUST be respected, not worked around.
 
 Every architectural decision in this guide follows from that split. A component that fetches data and renders it statically is a server component. A component that responds to a button click is a client component. A page that does both passes data from a server component parent to a client component child. The boundary is explicit, deliberate, and documented with a comment on every `"use client"` directive.
+
+
+**Full convention:** `docs/conventions/frontend/nextjs-app-router.md`
+**When generating new files:** Load and copy from `docs/blueprints/frontend/feature-use-case.md` rather than assembling from examples in this file.
 
 ---
 

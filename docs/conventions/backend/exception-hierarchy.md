@@ -4,12 +4,15 @@ This document defines the exception hierarchy. It is a critical contract. Deviat
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Validators throw `CommandValidationException` / `QueryValidationException` subclasses; MUST NOT use `Guard.Against` (see [Why Not Guard.Against](#why-not-guardagainst-in-validators)).
 - Domain invariants throw `DomainException` subclasses; not-found throws `AggregateNotFoundException` subclasses.
 - `ValidationError` is defined in both Contracts projects as identical types (see [ValidationError placement](#validationerror-placement)); read and write contracts MUST NOT reference each other.
 - Unhandled exceptions map to HTTP 500 via `GlobalExceptionHandler`.
+
+
+**Full convention:** `docs/conventions/backend/exception-hierarchy.md`
 
 ---
 

@@ -38,11 +38,47 @@ if (!manifest.version) {
 }
 
 // 2b. agentLoadPlans and conventionIndex paths exist
+function slugifyHeading(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim()
+}
+
+function fileHasAnchor(filePath, anchor) {
+  const content = read(filePath)
+  if (content.includes(`{#${anchor}}`)) return true
+  const target = anchor.toLowerCase()
+  for (const line of content.split(/\r?\n/)) {
+    const m = line.match(/^#{1,6}\s+(.+?)\s*(?:\{#([^}]+)\})?\s*$/)
+    if (m && slugifyHeading(m[1]) === target) return true
+    if (m && m[2] === anchor) return true
+  }
+  return false
+}
+
+function validateLoadPlanPath(rel) {
+  const [filePath, anchor] = rel.split("#")
+  if (!exists(filePath)) {
+    return `missing file: ${rel}`
+  }
+  if (anchor && !fileHasAnchor(filePath, anchor)) {
+    return `missing anchor #${anchor} in ${filePath}`
+  }
+  return null
+}
+
 if (manifest.agentLoadPlans) {
-  for (const [plan, paths] of Object.entries(manifest.agentLoadPlans)) {
-    for (const rel of paths) {
-      if (!exists(rel)) {
-        errors.push(`agentLoadPlans.${plan} references missing file: ${rel}`)
+  for (const [plan, config] of Object.entries(manifest.agentLoadPlans)) {
+    const tiers = Array.isArray(config)
+      ? { tier1: config }
+      : config
+    for (const tier of ["tier0", "tier1", "tier2", "blueprints"]) {
+      for (const rel of tiers[tier] ?? []) {
+        const err = validateLoadPlanPath(rel)
+        if (err) errors.push(`agentLoadPlans.${plan}.${tier} ${err}`)
       }
     }
   }
@@ -68,6 +104,7 @@ const requiredDocs = [
   "docs/conventions/shared/security-controls.md",
   "docs/conventions/shared/api-compatibility.md",
   "scripts/validate-feature-files.ps1",
+  "scripts/validate-domain-docs.mjs",
 ]
 for (const file of requiredDocs) {
   if (!exists(file)) {
@@ -112,6 +149,7 @@ const requiredTemplates = [
   "docs/blueprints/frontend/feature-use-case.md",
   "docs/conventions/frontend/feature-boundaries.md",
   "docs/templates/docs/domain-system-index.md",
+  "docs/templates/docs/domain-agent-index.json",
   "docs/templates/docs/domain-feature.md",
   "docs/templates/docs/domain-use-case.md",
   "docs/templates/docs/domain-use-case.tests.md",

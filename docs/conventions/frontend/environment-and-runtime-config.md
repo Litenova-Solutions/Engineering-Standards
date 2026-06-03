@@ -4,13 +4,16 @@ This document defines how to declare, validate, and access environment variables
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - ALL environment variable access MUST go through `lib/env.ts`. MUST NOT use `process.env.X` directly in app code.
 - Server-only variables MUST be validated with a Zod schema in `lib/env.ts`; they MUST NOT be prefixed with `NEXT_PUBLIC_`.
 - Client-accessible variables MUST use `NEXT_PUBLIC_` prefix and be included in the public schema.
 - `lib/env.ts` MUST throw at module load time if a required server variable is missing.
 - Docker and CI environments inject variables at runtime; the validation in `lib/env.ts` is the contract.
+
+
+**Full convention:** `docs/conventions/frontend/environment-and-runtime-config.md`
 
 ---
 

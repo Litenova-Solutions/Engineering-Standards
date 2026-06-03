@@ -4,6 +4,17 @@ Enforces feature isolation in `apps/{app}/features/`. Complements `01-nextjs-app
 
 Presentation code lives under `features/{feature}/`. Business rules and invariants live in `docs/domain/` and the backend. Do not confuse the two.
 
+## Agent Quick Rules {#agent-quick-rules}
+
+- MUST NOT import `features/{a}/` from `features/{b}/`.
+- Promote shared code to `@/shared/` or `components/ui/` per Strike 2 rule in `principles.md`.
+- App Router shells MUST import feature entry components from `features/{feature}/` only.
+- MUST enable `eslint-plugin-boundaries` with feature isolation zones.
+- UI strings MUST come from API fields, i18n keys, or page composition docs; do not invent copy.
+
+**Full convention:** `docs/conventions/frontend/feature-boundaries.md`  
+**When generating new files:** Load and copy from `docs/blueprints/frontend/feature-use-case.md`.
+
 ---
 
 ## 1. Import Rules

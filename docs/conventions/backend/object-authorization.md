@@ -6,13 +6,16 @@ Route-level authentication (`RequireAuthorization()`) is necessary but not suffi
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Every `/{id}` route (and equivalent) MUST have positive and negative authorization integration tests.
 - Negative tests MUST return **403 Forbidden** when an authenticated user accesses another actor's resource.
 - Tenant-scoped endpoints MUST include cross-tenant negative tests.
 - Object-level checks run after authentication; use `Results.Forbid()` for failed ownership or tenant checks.
 - Queries for ownership facts MUST use `IQueryMediator`, not `ICommandMediator`.
+
+
+**Full convention:** `docs/conventions/backend/object-authorization.md`
 
 ---
 

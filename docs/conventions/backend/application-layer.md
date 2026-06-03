@@ -4,7 +4,7 @@ This document is the authoritative guide for all design decisions in the five ap
 
 > This convention implements `docs/decisions/cqrs-with-split-application-projects.md` (CQRS split), `docs/decisions/contracts-projects-for-application-layer.md` (Contracts projects), `docs/decisions/reactions-project-depends-only-on-abstractions.md` (Reactions depends only on abstractions), and `docs/decisions/transaction-pipeline-behaviors.md` (Transaction pipeline behaviors).
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Commands and queries MUST live in Contracts; handlers MUST be `internal sealed` in implementation projects.
 - Query handlers MUST inject `IDatabaseContext`; MUST NOT inject repositories.
@@ -14,6 +14,10 @@ This document is the authoritative guide for all design decisions in the five ap
 - `Application.Reactions` MUST NOT reference external NuGet packages; define narrow interfaces.
 - Domain folders: `{Aggregate}/{UseCase}/` naming.
 - Handlers that need the current time MUST inject `IClock` and pass `clock.UtcNow` explicitly to aggregate methods. MUST NOT call `DateTime.UtcNow` or `DateTimeOffset.UtcNow` directly in handlers.
+
+
+**Full convention:** `docs/conventions/backend/application-layer.md`
+**When generating new files:** Load and copy from `docs/blueprints/backend/write-endpoint.md` rather than assembling from examples in this file.
 
 ---
 

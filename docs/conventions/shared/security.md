@@ -4,6 +4,17 @@ This document defines the security baseline requirements for all projects follow
 
 For the OWASP ASVS / API Top 10 control catalog, enforcement mapping, and CI gate checklist, see `docs/conventions/shared/security-controls.md`. Object-level authorization tests: `docs/conventions/backend/object-authorization.md`.
 
+## Agent Quick Rules {#agent-quick-rules}
+
+- MUST NOT commit secrets, credentials, or real connection strings to source control.
+- MUST validate all external input at the application boundary before Domain.
+- Actor identity MUST come from JWT claims; MUST NOT accept actor IDs from request bodies for the authenticated user.
+- MUST use parameterized queries; MUST NOT concatenate SQL strings.
+- MUST use `IOptions<T>` with validation; MUST NOT read raw `configuration["Key"]`.
+- Rate limiting and CORS MUST be configured explicitly per environment.
+
+**Full convention:** `docs/conventions/shared/security.md`
+
 ---
 
 ## 1. Never Commit Secrets

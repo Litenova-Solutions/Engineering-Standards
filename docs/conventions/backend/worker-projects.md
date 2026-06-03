@@ -4,6 +4,17 @@ Long-running background processes (outbox dispatch, scheduled jobs, queue consum
 
 Job loop **implementations** live in `Infrastructure/BackgroundJobs/`. The **Worker host** registers and runs them. See `docs/conventions/backend/background-jobs.md` for implementation patterns.
 
+## Agent Quick Rules {#agent-quick-rules}
+
+- `{ProjectName}.Worker` hosts outbox dispatch, scheduled jobs, and queue consumers.
+- Worker references Infrastructure and Application Write/Reactions; MUST NOT reference WebApi.
+- WebApi MUST NOT register durable `BackgroundService` loops unless a project ADR documents an exception.
+- Worker `Program.cs` registers hosted services from Infrastructure job implementations.
+- Share EF Core and repositories via Infrastructure; do not duplicate persistence in Worker.
+
+**Full convention:** `docs/conventions/backend/worker-projects.md`  
+**When generating new files:** Load and copy from `docs/blueprints/backend/worker-program-cs.md`.
+
 ---
 
 ## 1. Solution Layout

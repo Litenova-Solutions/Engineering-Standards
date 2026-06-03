@@ -4,7 +4,7 @@ This document defines when and how to use raw SQL inside query handlers. Read it
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Raw SQL in query handlers is ALLOWED when LINQ produces an inefficient or unreadable query.
 - MUST use `FromSqlInterpolated` or `Database.SqlQueryRaw` with parameterized values only.
@@ -12,6 +12,9 @@ This document defines when and how to use raw SQL inside query handlers. Read it
 - Complex reports MUST use keyless entity types or database views, not anonymous projections from raw SQL.
 - Full-text search MUST use `to_tsvector` / `to_tsquery` via `EF.Functions` or raw SQL; MUST NOT use `LIKE '%term%'` on large tables.
 - Raw SQL that runs in production MUST be reviewed for index use before merge.
+
+
+**Full convention:** `docs/conventions/backend/raw-sql-and-reporting.md`
 
 ---
 

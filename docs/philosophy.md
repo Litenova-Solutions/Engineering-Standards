@@ -78,9 +78,11 @@ The hierarchy is documentation that stays honest when domain docs are updated in
 
 AI agents are now primary contributors to codebases. That changes how we document and structure software.
 
+ADDD applies to **single bounded-context monoliths**. It is not a multi-context decomposition strategy. Service extraction and cross-context integration belong in project ADRs, not these standards.
+
 **Agentic development** means explicit rules and compiler-enforced boundaries outperform team culture when agents generate code. A rule in `AGENTS.md` helps; a project reference that makes the wrong pattern fail to compile helps more.
 
-**Domain-driven documentation** means living domain docs under `docs/domain/` are the source of truth for what the system does. There are no parallel inventories, glossaries, route lists, or exception catalogs. Ubiquitous language, invariants, endpoints, UI flows, and acceptance criteria live in the feature README or use case doc where they belong. Docs are updated in the same pull request as code.
+**Domain-driven documentation** means living domain docs under `docs/domain/` are the source of truth for what the system does. There are no parallel inventories, glossaries, route lists, or exception catalogs. Ubiquitous language, invariants, endpoints, UI flows, and acceptance criteria live in the feature README or use case doc where they belong. Docs follow the **Spec sync rule**: updated in the same pull request as code.
 
 Together, **Agentic Domain-Driven Design (ADDD)** combines:
 

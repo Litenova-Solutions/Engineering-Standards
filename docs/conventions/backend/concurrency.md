@@ -4,13 +4,16 @@ This document defines how to detect and handle concurrent modification conflicts
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Aggregates that are edited by multiple concurrent actors MUST use a concurrency token.
 - MUST use `xmin` (PostgreSQL row version) or an explicit `row_version` column as the concurrency token.
 - `DbUpdateConcurrencyException` MUST be caught in the `GlobalExceptionHandler` and mapped to HTTP 409.
 - Clients receive the current server value in the 409 response body; they decide whether to retry or discard.
 - MUST NOT silently overwrite concurrent changes (last-write-wins).
+
+
+**Full convention:** `docs/conventions/backend/concurrency.md`
 
 ---
 

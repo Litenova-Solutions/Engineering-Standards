@@ -4,13 +4,17 @@ This document is the authoritative guide for all design decisions in the WebApi 
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - MUST use `IEndpoint`; MUST NOT use MVC `Controller` / `ControllerBase`.
 - Endpoints inject `ICommandMediator` or `IQueryMediator` only; no repositories or `DbContext`.
 - WebApi references Contracts projects only; handlers register in `Program.cs`.
 - No `try-catch` in endpoints; `GlobalExceptionHandler` maps exceptions.
 - Actor identity from JWT claims only; MUST NOT accept actor IDs from request bodies for the authenticated user.
+
+
+**Full convention:** `docs/conventions/backend/api-layer.md`
+**When generating new files:** Load and copy from `docs/blueprints/backend/write-endpoint.md` rather than assembling from examples in this file.
 
 ---
 

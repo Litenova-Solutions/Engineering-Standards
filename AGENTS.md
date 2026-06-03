@@ -2,6 +2,21 @@
 
 Canonical contract for AI agents and engineers. Read before touching code.
 
+These standards assume a single bounded context monolith. Multi-context decomposition is out of scope.
+
+## Context tiers
+
+Load documentation by tier. See `docs/agentic-development.md` §6 and `agentLoadPlans` in `standards.manifest.json`.
+
+| Tier | What to load | When |
+|:---|:---|:---|
+| 0 | This file (`AGENTS.md`) | Every task |
+| 1 | `#agent-quick-rules` sections from `agentLoadPlans.tier1` | Task start |
+| 2 | Full convention files from `agentLoadPlans.tier2` | When a Quick Rule is unclear |
+| 3 | Blueprints from `agentLoadPlans.blueprints` | Generating new files only |
+
+Consumer projects: load `docs/domain/agent-index.json`, then use case frontmatter for convention references. See project `AGENTS.md` shim.
+
 ## Read Order
 
 1. This file in full.
@@ -17,7 +32,7 @@ Canonical contract for AI agents and engineers. Read before touching code.
 1. Project `docs/domain/README.md` and `docs/domain/{feature}/README.md`.
 2. `docs/domain/{feature}/{use-case}.md` and `{use-case}.tests.md`.
 3. `docs/guides/write-use-case-doc.md` (authoring); `docs/guides/add-new-use-case.md` (implementation).
-4. Update operation docs, test specs, and UI docs in the same PR as the code.
+4. Update operation docs, test specs, and page composition docs in the same PR as the code.
 
 ## Tech Stack
 
@@ -35,7 +50,7 @@ Architectural constraints: Minimal APIs only, PostgreSQL `snake_case`, CQRS spli
 ## Pre-Edit Checkpoint
 
 1. Confirm scope and planned files.
-2. Load `agentLoadPlans` from `standards.manifest.json`.
+2. Load `agentLoadPlans` tier1 Quick Rules from `standards.manifest.json`; escalate to tier2 when a rule is unclear.
 3. Read project `docs/domain/` overrides.
 4. Match local patterns; prefer minimal diffs.
 5. Stop without approval for new packages, migrations, auth model changes, or public API breaks.
@@ -74,6 +89,7 @@ See `docs/conventions/shared/monorepo-structure.md` for multiple apps.
 - MUST NOT add per-aggregate `IXxxReadStore` interfaces. (One read abstraction.)
 - MUST use `.AsNoTracking()` or projections in `Application.Read`. (No accidental tracking on reads.)
 - MUST maintain Test Coverage in `{use-case}.tests.md` per `TEST_SPEC_TRACEABILITY` in `agentic-guardrails.md`. (No orphan tests.)
+- MUST follow the **Spec sync rule**: update domain and UI docs in the same PR as code. (`docs/glossary.md`)
 
 ### API layer
 

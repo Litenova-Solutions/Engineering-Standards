@@ -95,7 +95,7 @@ See `docs/templates/docs/domain-feature.md`.
 
 ---
 
-## 6. UI Projection Docs
+## 6. Page Composition Docs
 
 When a frontend route exists:
 
@@ -109,7 +109,8 @@ When a frontend route exists:
 
 Before handing off to implementation:
 
-- [ ] Operation doc and test spec both exist for the use case.
+- [ ] Operation doc and test spec both exist for the use case (Implementation Prerequisite Set).
+- [ ] YAML frontmatter populated on the use case doc; Feature Spec frontmatter updated if scope changed.
 - [ ] Risk Level set on both files and consistent.
 - [ ] Every planned scenario has a Test Coverage row (tests may be `(deferred — implement in PR)` in Method column only until implementation; prefer filling Method when known).
 - [ ] Explicitly Not Tested lists anything intentionally skipped.

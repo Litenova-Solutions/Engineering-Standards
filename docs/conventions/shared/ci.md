@@ -2,6 +2,16 @@
 
 Required local and CI verification gates for projects that follow these standards. Agents MUST run every applicable gate before marking work complete.
 
+## Agent Quick Rules {#agent-quick-rules}
+
+- MUST run backend build and test before marking backend work complete.
+- MUST run `pnpm lint`, `type-check`, `test`, and `build` for every changed frontend app.
+- MUST use `pnpm install --frozen-lockfile` in CI.
+- MUST verify OpenAPI freshness when generated API types are committed.
+- SHOULD run `node scripts/validate-domain-docs.mjs` when domain docs change.
+
+**Full convention:** `docs/conventions/shared/ci.md`
+
 ---
 
 ## 0. pnpm Workspace Setup
@@ -107,6 +117,27 @@ pnpm type-check
 ```
 
 Do not run containerized integration tests or Playwright in pre-commit hooks. Keep slower checks in CI.
+
+---
+
+## 4. Domain Documentation Validation
+
+When the project has `docs/domain/`, run structural completeness checks before merge:
+
+```bash
+node scripts/validate-domain-docs.mjs
+```
+
+Copy the script from the standards repository (`standards/scripts/validate-domain-docs.mjs`) or symlink it in consumer projects. The script checks:
+
+- YAML frontmatter on Feature Specs and Use Case Docs
+- Presence of Use Case Test Specs for each operation doc
+- `docs/domain/agent-index.json` exists and parses as JSON
+- Warnings for invariant coverage gaps, state transition coverage, and write/read asymmetry
+
+Warnings do not fail CI by default; errors (missing test specs, invalid frontmatter keys) fail CI. Projects MAY treat warnings as errors in release branches.
+
+See `docs/guides/agentic-domain-driven-design.md` §12 for the full check catalog.
 
 ---
 

@@ -4,7 +4,7 @@ This document defines the standard for all backend configuration: options classe
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - ALL configuration access MUST go through strongly typed options classes.
 - MUST call `ValidateDataAnnotations()` and `ValidateOnStart()` on every options registration.
@@ -13,6 +13,9 @@ This document defines the standard for all backend configuration: options classe
 - Connection strings use `ConnectionStrings__Database` env var naming (double underscore as section separator).
 - Secrets MUST use `dotnet user-secrets` locally; MUST NOT commit secrets to source control.
 - MUST use exact environment variable names documented in this file across all environments.
+
+
+**Full convention:** `docs/conventions/backend/options-and-configuration.md`
 
 ---
 

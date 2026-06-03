@@ -2,13 +2,17 @@
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - E2E: Playwright in `apps/{app}/e2e/`; mock APIs with `page.route`; selectors via roles or `data-testid`.
 - Unit: Vitest + RTL for hooks, Zod schemas, and complex `components/ui/` variants only.
 - MUST NOT unit-test Server Components with RTL; cover via Playwright or extracted pure functions.
 - Trace E2E scenarios to UI page docs and use case test specs where the page composes documented use cases.
 - Coverage: production-tier apps SHOULD meet minimums in section 3 unless a documented exception applies.
+
+
+**Full convention:** `docs/conventions/frontend/testing.md`
+**When generating new files:** Load and copy from `docs/blueprints/backend/integration-test-factory.md` rather than assembling from examples in this file.
 
 ---
 

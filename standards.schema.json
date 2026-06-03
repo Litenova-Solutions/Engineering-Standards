@@ -65,8 +65,14 @@
     "agentLoadPlans": {
       "type": "object",
       "additionalProperties": {
-        "type": "array",
-        "items": { "type": "string" }
+        "type": "object",
+        "properties": {
+          "tier0": { "type": "array", "items": { "type": "string" } },
+          "tier1": { "type": "array", "items": { "type": "string" } },
+          "tier2": { "type": "array", "items": { "type": "string" } },
+          "blueprints": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["tier1", "tier2"]
       }
     }
   },

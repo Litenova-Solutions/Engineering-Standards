@@ -170,8 +170,9 @@ Then:
 Set up the domain doc tree under `docs/domain/`:
 
 1. Copy `docs/templates/docs/domain-system-index.md` to `docs/domain/README.md`.
-2. For the first feature, copy `docs/templates/docs/domain-feature.md` to `docs/domain/{feature}/README.md`.
-3. For each use case, copy `docs/templates/docs/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md` and `domain-use-case.tests.md` to `docs/domain/{feature}/{use-case}.tests.md`.
+2. Copy `docs/templates/docs/domain-agent-index.json` to `docs/domain/agent-index.json` and fill from the system index.
+3. For the first feature, copy `docs/templates/docs/domain-feature.md` to `docs/domain/{feature}/README.md`.
+4. For each use case, copy `docs/templates/docs/domain-use-case.md` to `docs/domain/{feature}/{use-case}.md` and `domain-use-case.tests.md` to `docs/domain/{feature}/{use-case}.tests.md`. Fill YAML frontmatter on each doc.
 
 Read `docs/guides/write-use-case-doc.md` and `docs/guides/agentic-domain-driven-design.md` before the first use case.
 

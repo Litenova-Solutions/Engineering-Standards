@@ -156,49 +156,123 @@
     "featureBandUpdateRequires": "platform-owner-approval-or-standards-minor-release"
   },
   "agentLoadPlans": {
-    "backend.domain": [
-      "AGENTS.md",
-      "docs/architecture/clean-architecture.md",
-      "docs/conventions/principles.md",
-      "docs/conventions/backend/domain-layer.md",
-      "docs/conventions/backend/exception-hierarchy.md"
-    ],
-    "backend.api": [
-      "AGENTS.md",
-      "docs/architecture/clean-architecture.md",
-      "docs/conventions/backend/api-layer.md",
-      "docs/conventions/backend/authentication-and-authorization.md",
-      "docs/conventions/backend/object-authorization.md",
-      "docs/conventions/shared/security.md",
-      "docs/conventions/shared/api-compatibility.md"
-    ],
-    "backend.infrastructure": [
-      "AGENTS.md",
-      "docs/architecture/clean-architecture.md",
-      "docs/conventions/backend/infrastructure-layer.md",
-      "docs/conventions/backend/background-jobs.md",
-      "docs/conventions/backend/worker-projects.md"
-    ],
-    "backend.testing": [
-      "AGENTS.md",
-      "docs/conventions/backend/testing.md",
-      "docs/conventions/backend/api-acceptance-tests.md",
-      "docs/conventions/backend/external-dependencies.md",
-      "docs/conventions/shared/ci.md"
-    ],
-    "frontend.app": [
-      "AGENTS.md",
-      "docs/conventions/frontend/nextjs-app-router.md",
-      "docs/conventions/frontend/data-fetching.md",
-      "docs/conventions/frontend/state-management.md",
-      "docs/conventions/frontend/feature-boundaries.md",
-      "docs/conventions/frontend/testing.md"
-    ],
-    "security.review": [
-      "AGENTS.md",
-      "docs/conventions/shared/security.md",
-      "docs/conventions/shared/security-controls.md",
-      "docs/conventions/shared/supply-chain-security.md"
-    ]
+    "backend.domain": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/architecture/clean-architecture.md#agent-quick-rules",
+        "docs/conventions/backend/domain-layer.md#agent-quick-rules",
+        "docs/conventions/backend/exception-hierarchy.md#agent-quick-rules"
+      ],
+      "tier2": [
+        "docs/architecture/clean-architecture.md",
+        "docs/conventions/principles.md",
+        "docs/conventions/backend/domain-layer.md",
+        "docs/conventions/backend/exception-hierarchy.md"
+      ],
+      "blueprints": []
+    },
+    "backend.api": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/backend/api-layer.md#agent-quick-rules",
+        "docs/conventions/backend/authentication-and-authorization.md#agent-quick-rules",
+        "docs/conventions/backend/object-authorization.md#agent-quick-rules",
+        "docs/conventions/shared/security.md#agent-quick-rules",
+        "docs/conventions/shared/api-compatibility.md#agent-quick-rules"
+      ],
+      "tier2": [
+        "docs/architecture/clean-architecture.md",
+        "docs/conventions/backend/api-layer.md",
+        "docs/conventions/backend/authentication-and-authorization.md",
+        "docs/conventions/backend/object-authorization.md",
+        "docs/conventions/shared/security.md",
+        "docs/conventions/shared/api-compatibility.md"
+      ],
+      "blueprints": [
+        "docs/blueprints/backend/write-endpoint.md",
+        "docs/blueprints/backend/endpoint-extensions.md"
+      ]
+    },
+    "backend.infrastructure": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/architecture/clean-architecture.md#agent-quick-rules",
+        "docs/conventions/backend/infrastructure-layer.md#agent-quick-rules",
+        "docs/conventions/backend/background-jobs.md#agent-quick-rules",
+        "docs/conventions/backend/worker-projects.md#agent-quick-rules"
+      ],
+      "tier2": [
+        "docs/architecture/clean-architecture.md",
+        "docs/conventions/backend/infrastructure-layer.md",
+        "docs/conventions/backend/background-jobs.md",
+        "docs/conventions/backend/worker-projects.md",
+        "docs/conventions/backend/reliability.md"
+      ],
+      "blueprints": [
+        "docs/blueprints/backend/infrastructure-service-registration.md",
+        "docs/blueprints/backend/outbox.md",
+        "docs/blueprints/backend/worker-program-cs.md",
+        "docs/blueprints/backend/idempotency.md"
+      ]
+    },
+    "backend.testing": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/backend/testing.md#agent-quick-rules",
+        "docs/conventions/backend/api-acceptance-tests.md#agent-quick-rules",
+        "docs/conventions/backend/external-dependencies.md#agent-quick-rules",
+        "docs/conventions/shared/ci.md#agent-quick-rules"
+      ],
+      "tier2": [
+        "docs/conventions/backend/testing.md",
+        "docs/conventions/backend/api-acceptance-tests.md",
+        "docs/conventions/backend/external-dependencies.md",
+        "docs/conventions/shared/ci.md"
+      ],
+      "blueprints": [
+        "docs/blueprints/backend/integration-test-factory.md",
+        "docs/blueprints/backend/api-acceptance-tests/acceptance-test-project.md"
+      ]
+    },
+    "frontend.app": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/frontend/nextjs-app-router.md#agent-quick-rules",
+        "docs/conventions/frontend/data-fetching.md#agent-quick-rules",
+        "docs/conventions/frontend/state-management.md#agent-quick-rules",
+        "docs/conventions/frontend/feature-boundaries.md#agent-quick-rules",
+        "docs/conventions/frontend/testing.md#agent-quick-rules"
+      ],
+      "tier2": [
+        "docs/conventions/frontend/nextjs-app-router.md",
+        "docs/conventions/frontend/data-fetching.md",
+        "docs/conventions/frontend/state-management.md",
+        "docs/conventions/frontend/feature-boundaries.md",
+        "docs/conventions/frontend/testing.md",
+        "docs/conventions/frontend/state-and-forms.md"
+      ],
+      "blueprints": [
+        "docs/blueprints/frontend/feature-use-case.md",
+        "docs/blueprints/frontend/lib-api-client.md",
+        "docs/blueprints/frontend/lib-env.md",
+        "docs/blueprints/frontend/proxy-ts.md",
+        "docs/blueprints/frontend/server-action.md"
+      ]
+    },
+    "security.review": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/shared/security.md#agent-quick-rules",
+        "docs/conventions/shared/security-controls.md#agent-quick-rules",
+        "docs/conventions/shared/supply-chain-security.md#agent-quick-rules"
+      ],
+      "tier2": [
+        "docs/conventions/shared/security.md",
+        "docs/conventions/shared/security-controls.md",
+        "docs/conventions/shared/supply-chain-security.md",
+        "docs/conventions/backend/object-authorization.md"
+      ],
+      "blueprints": []
+    }
   }
 }

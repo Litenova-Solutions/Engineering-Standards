@@ -6,13 +6,17 @@ For the five-category backend testing taxonomy, see `testing.md`. For Reqnroll s
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Every API acceptance test MUST trace to a Test Coverage row in `docs/domain/{feature}/{use-case}.tests.md`.
 - Reqnroll is the preferred BDD library when Gherkin adds stakeholder value. Plain xUnit API acceptance tests are the default otherwise.
 - Agents MUST NOT add Reqnroll unless the project already has an acceptance test project, the use-case doc marks BDD coverage as required, or the human task explicitly requests BDD.
 - When a scenario conflicts with the test spec, the test spec wins. Stop and report the conflict; do not "fix" the test spec from the test without human review.
 - When steps execute the action under test, they MUST go through HTTP. MUST NOT call handlers, repositories, `DbContext`, or domain methods for the action under test.
+
+
+**Full convention:** `docs/conventions/backend/api-acceptance-tests.md`
+**When generating new files:** Load and copy from `docs/blueprints/backend/api-acceptance-tests/acceptance-test-project.md` rather than assembling from examples in this file.
 
 ---
 

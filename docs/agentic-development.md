@@ -32,7 +32,7 @@ Understanding agent failure modes requires understanding how agents differ from 
 
 Each failure mode has a corresponding mitigation built into the standards.
 
-**Stale context:** Convention files are scoped by layer via `agentLoadPlans` in `standards.manifest.json`. An agent editing domain code loads `backend.domain` (for example `domain-layer.md`) only, not the full repository.
+**Stale context:** Convention files are scoped by layer via `agentLoadPlans` in `standards.manifest.json`. An agent editing domain code loads `backend.domain` Tier 1 Quick Rules first, not full convention files or the entire repository.
 
 **Pattern drift:** Architecture tests in `{ProjectName}.Architecture.Tests` enforce structural rules that survive context window limitations. A test that fails when a query handler injects a repository interface catches the violation regardless of what the agent had in context during generation. These tests are described in `docs/conventions/backend/testing.md`.
 
@@ -78,7 +78,26 @@ Practical guidance for maintaining `AGENTS.md` and the convention files.
 
 ---
 
-## 6. The Convention Update Contract
+## 6. Context Tiers (Progressive Loading)
+
+Agent failures are primarily context failures, not model failures. The standards use a four-tier loading model implemented in `standards.manifest.json` → `agentLoadPlans` and convention file **Agent Quick Rules** sections.
+
+| Tier | Source | Load when |
+|:---|:---|:---|
+| **0** | `AGENTS.md` | Every task (routing layer, non-negotiables, project map) |
+| **1** | `#agent-quick-rules` sections from `agentLoadPlans.tier1` | Task start (highest-signal constraints, max 15 rules each) |
+| **2** | Full convention files from `agentLoadPlans.tier2` | A Quick Rule needs elaboration |
+| **3** | Blueprints from `agentLoadPlans.blueprints` | Generating a complete new file only |
+
+Tier 1 paths use `#agent-quick-rules` anchors matching convention headings. Tier 2 loads the full file. Tier 3 loads blueprints under `docs/blueprints/`; agents MUST copy from blueprints when scaffolding, not assemble from convention examples.
+
+Consumer projects add **just-in-time routing**: YAML frontmatter on domain docs, `docs/domain/agent-index.json`, and Feature Context Map tables in the project `AGENTS.md` shim. See `docs/guides/agentic-domain-driven-design.md` §11.
+
+If a Quick Rule is unclear, load the full convention file referenced at the bottom of the Quick Rules block before guessing.
+
+---
+
+## 7. The Convention Update Contract
 
 Convention files are treated as code. They are reviewed in pull requests. They are versioned via git tags. They are referenced by section number in code reviews.
 
@@ -88,20 +107,19 @@ From **v2.0.0** onward, the CHANGELOG entry for a convention change MUST be incl
 
 ---
 
-## 7. Scoped Loading Strategy
+## 8. Scoped Loading Strategy
 
-Different tasks require different context. Loading all convention files for every task wastes context budget. The following table defines which files to load for which tasks.
+Use `agentLoadPlans` in `standards.manifest.json` instead of ad hoc file lists. Each plan defines `tier1` (Quick Rules), `tier2` (full conventions), and `blueprints` (file generation).
 
-| Task | Files to Load |
+| Task type | Load plan key |
 |:---|:---|
-| Adding a domain aggregate | `AGENTS.md`, `02-domain-layer.md` |
-| Adding a command | `AGENTS.md`, `application-layer.md`, `06-exception-hierarchy.md` |
-| Adding a query | `AGENTS.md`, `application-layer.md`, `07-query-read-strategy.md` |
-| Adding an endpoint | `AGENTS.md`, `api-layer.md` |
-| Adding an event handler | `AGENTS.md`, `application-layer.md`, `06-exception-hierarchy.md` |
-| Adding infrastructure | `AGENTS.md`, `04-infrastructure-layer.md` |
-| Writing backend tests | `AGENTS.md`, `testing.md` |
-| Writing frontend tests | `AGENTS.md`, `frontend/testing.md` |
-| Adding frontend UI for a use case | `AGENTS.md`, `frontend/nextjs-app-router.md`, `frontend/data-fetching.md`, `frontend/feature-boundaries.md` |
-| Completing a full-stack use case | `AGENTS.md`, `agentic-guardrails.md`, `agentic-domain-driven-design.md`, `definition-of-done.md`, `ci.md` |
-| Modifying standards | `AGENTS.md`, `00-standards-meta.mdc`, `adr-template.md` |
+| Domain aggregate or value object | `backend.domain` |
+| API endpoint | `backend.api` |
+| Infrastructure, outbox, jobs | `backend.infrastructure` |
+| Backend tests | `backend.testing` |
+| Frontend app work | `frontend.app` |
+| Security review | `security.review` |
+
+For full-stack use case delivery, also load project `docs/domain/agent-index.json`, the Feature Spec, Use Case Doc, test spec, and `docs/conventions/shared/agentic-guardrails.md`. Completing work: `docs/guides/definition-of-done.md`.
+
+Modifying these standards: `.cursor/rules/00-standards-meta.mdc`, `docs/conventions/shared/adr-template.md`.

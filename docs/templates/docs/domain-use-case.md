@@ -1,4 +1,15 @@
 <!-- Copy to docs/domain/{feature}/{use-case}.md in the project repository -->
+---
+doc-type: use-case
+feature: {feature}
+aggregate: {AggregateName}
+operation: {Verb}{Aggregate}
+layer-context: [backend.write, backend.read, frontend.form]
+conventions: [backend.domainLayer, backend.applicationLayer, backend.apiLayer]
+test-spec: {use-case}.tests.md
+risk-level: medium
+status: active
+---
 # {Use Case Name}
 
 | Field | Value |
@@ -62,7 +73,7 @@ Describe aggregate method(s) invoked and invariants enforced. Reference terms fr
 
 ## UI
 
-See [`docs/ui/{app}/pages/{page}.md`](../../ui/{app}/pages/{page}.md) when the project uses UI projection docs.
+See [`docs/ui/{app}/pages/{page}.md`](../../ui/{app}/pages/{page}.md) when the project uses page composition docs.
 
 Operation-level notes only: loading trigger, empty state source, error mapping. Route, screen states, and mutations belong in the page doc.
 

@@ -1,0 +1,27 @@
+{
+  "features": [
+    {
+      "name": "posts",
+      "spec": "docs/domain/posts/README.md",
+      "aggregate": "Post",
+      "use-cases": [
+        {
+          "name": "create-post",
+          "doc": "docs/domain/posts/create-post.md",
+          "test-spec": "docs/domain/posts/create-post.tests.md",
+          "status": "active",
+          "risk-level": "medium",
+          "layer-context": ["backend.write", "frontend.form"]
+        },
+        {
+          "name": "publish-post",
+          "doc": "docs/domain/posts/publish-post.md",
+          "test-spec": "docs/domain/posts/publish-post.tests.md",
+          "status": "active",
+          "risk-level": "medium",
+          "layer-context": ["backend.write"]
+        }
+      ]
+    }
+  ]
+}

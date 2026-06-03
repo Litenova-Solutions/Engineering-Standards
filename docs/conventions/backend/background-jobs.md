@@ -4,6 +4,17 @@ This document defines job **implementation** patterns: interfaces, loops, schedu
 
 > This convention depends on `docs/conventions/backend/reliability.md` for retry and idempotency rules.
 
+## Agent Quick Rules {#agent-quick-rules}
+
+- Durable background loops (outbox, scheduled jobs) MUST run in `{ProjectName}.Worker`, not WebApi.
+- Job interfaces live in Contracts or Reactions; implementations in `Infrastructure/BackgroundJobs/`.
+- WebApi MAY enqueue work via `ICommandMediator`; MUST NOT host durable `BackgroundService` loops.
+- Job handlers MUST be idempotent; use the outbox pattern for side effects that leave the process.
+- Register hosted services in Worker `Program.cs`; WebApi registers only allow-listed request-adjacent services.
+
+**Full convention:** `docs/conventions/backend/background-jobs.md`  
+**When generating new files:** Load and copy from `docs/blueprints/backend/worker-program-cs.md` and `docs/blueprints/backend/outbox.md`.
+
 ---
 
 ## 1. Implementation vs. Host

@@ -4,7 +4,7 @@ This document defines the backend authentication and authorization model. Read i
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - JWT bearer configuration MUST use `JwtSettings` bound from options, not raw `configuration["Key"]!`.
 - Actor identity MUST come from validated claims only. MUST NOT accept actor IDs from request bodies when the actor is the authenticated user.
@@ -12,6 +12,9 @@ This document defines the backend authentication and authorization model. Read i
 - Authorization policies MUST be defined in `AuthorizationPolicies` constants; MUST NOT use magic strings.
 - Integration tests MUST use `TestAuthHandler`; MUST NOT use real JWT tokens.
 - 401 responses come from the authentication middleware; 403 responses come from the authorization middleware. Endpoints MUST NOT throw manual auth exceptions for normal auth failures.
+
+
+**Full convention:** `docs/conventions/backend/authentication-and-authorization.md`
 
 ---
 

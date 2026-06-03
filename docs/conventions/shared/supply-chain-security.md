@@ -4,7 +4,7 @@ This document defines the required practices for managing dependency risk. Read 
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - MUST use exact version pins (no `^` or `~`) for framework, auth, build, and security-sensitive packages.
 - MUST run `pnpm install --frozen-lockfile` in CI; MUST NOT run `pnpm install` without `--frozen-lockfile` in CI.
@@ -12,6 +12,9 @@ This document defines the required practices for managing dependency risk. Read 
 - MUST NOT install packages published within the last 48 hours without explicit team review.
 - MUST NOT install canary, alpha, or pre-release packages in production projects.
 - TanStack packages require mandatory advisory verification before install or upgrade (see section 6).
+
+
+**Full convention:** `docs/conventions/shared/supply-chain-security.md`
 
 ---
 

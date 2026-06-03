@@ -4,6 +4,16 @@ Maps engineering standards to OWASP ASVS themes, OWASP API Security Top 10 (2023
 
 Status legend: **M** = mandatory, **A** = advisory, **P** = project-specific (document in ADR or use-case doc).
 
+## Agent Quick Rules {#agent-quick-rules}
+
+- Every `{id}` route MUST have object-level authorization tests (API1).
+- JWT validation and claims-only actor identity are mandatory (API2).
+- Rate limits and pagination caps MUST protect sensitive flows (API4, API6).
+- OpenAPI freshness and diff gates MUST run in CI (API9).
+- Outbound HTTP MUST use allow-lists documented in project ADR until a dedicated standard exists (API7).
+
+**Full convention:** `docs/conventions/shared/security-controls.md`
+
 ---
 
 ## API Security Top 10 Mapping

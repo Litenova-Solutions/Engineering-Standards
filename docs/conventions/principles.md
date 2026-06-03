@@ -2,6 +2,18 @@
 
 These principles apply to all projects following these standards, regardless of language or framework. They are the foundation from which all layer-specific conventions derive. When a specific convention appears to conflict with a general rule, the specific convention takes precedence, but that convention must itself be grounded in one of these principles.
 
+## Agent Quick Rules {#agent-quick-rules}
+
+- Code MUST be explicit and traceable; magic and hidden framework behavior violate these standards.
+- Folder structure MUST reflect business intent (Screaming Architecture) in docs, backend, and frontend.
+- Dependencies MUST point inward; Domain MUST NOT reference infrastructure or UI packages.
+- **Lexical alignment:** use ubiquitous language in folder names, file names, and class names across all layers.
+- Follow the **Spec sync rule:** update domain docs in the same PR as the code they describe.
+- Promote shared frontend code only after the Strike 2 rule (two use cases need the same helper).
+- Project `docs/domain/` wins over these standards when overlapping; read standards first, then project docs.
+
+**Full convention:** `docs/conventions/principles.md`
+
 ---
 
 ## 1. Explicitness Over Magic
@@ -178,7 +190,7 @@ These standards define defaults for Litenova projects. Consumer repositories (fo
 When guidance overlaps:
 
 1. **Project operation docs** (`docs/domain/{feature}/{use-case}.md`) win for that operation's commands, endpoints, and exceptions. **Test specs** (`{use-case}.tests.md`) win for verification and Test Coverage rows.
-2. **Project UI projection docs** (`docs/ui/{app}/pages/*.md`, `docs/ui/{app}/shell.md`) win for route composition, shell layout, and which use cases appear on a page.
+2. **Project page composition docs** (`docs/ui/{app}/pages/*.md`, `docs/ui/{app}/shell.md`) win for route composition, shell layout, and which use cases appear on a page.
 3. **Project app READMEs and ADRs** win for runbooks, env vars, auth setup, and project-level UI decisions.
 4. **These standards** win when project docs are silent.
 
@@ -192,13 +204,22 @@ During co-development of standards and a reference app, treat the latest committ
 
 ## 12. Convention File Structure
 
-Every file under `docs/conventions/` MUST use this section order:
+Every file under `docs/conventions/` and `docs/architecture/clean-architecture.md` MUST use this section order:
 
-1. **Agent Quick Rules** (compact MUST list immediately after the title)
-2. **Overview** (why the convention exists)
+1. **Agent Quick Rules** `{#agent-quick-rules}` (compact MUST list immediately after the title; maximum 15 single-sentence rules)
+2. **Overview** or **Guiding Philosophy** (why the convention exists)
 3. **Conventions** (normative rules with `// GOOD:` and `// BAD:` examples where applicable)
 4. **Anti-patterns** (consolidated prohibitions)
 5. **Related Documents** (cross-links)
+
+Each Agent Quick Rules block MUST end with:
+
+```markdown
+**Full convention:** `docs/conventions/backend/{file}.md`
+**When generating new files:** Load and copy from the relevant blueprint in `docs/blueprints/` rather than assembling from examples in this file.
+```
+
+Omit the blueprints line when no blueprint applies to that layer. If a Quick Rule is unclear, agents MUST load the full convention file (Tier 2) before guessing.
 
 When editing an older convention file, add missing sections in the same pull request rather than leaving structural drift.
 

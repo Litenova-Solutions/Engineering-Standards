@@ -2,7 +2,7 @@
 
 This document defines backend testing philosophy, test project structure, and patterns. Frontend testing rules live in `docs/conventions/frontend/testing.md`.
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Assertions MUST use AwesomeAssertions; MUST NOT use xUnit `Assert.*` in new tests.
 - Domain tests: no mocks; Application command tests: mock repositories only.
@@ -10,6 +10,10 @@ This document defines backend testing philosophy, test project structure, and pa
 - `{ProjectName}.Architecture.Tests` with NetArchTest is REQUIRED (`docs/decisions/architecture-tests-as-enforcement.md`).
 - Mutation testing REQUIRED for high-risk validators; OPTIONAL elsewhere.
 - API acceptance tests trace to use-case docs; see `api-acceptance-tests.md`. Do not add Reqnroll without an acceptance test project, use-case BDD requirement, or explicit task request.
+
+
+**Full convention:** `docs/conventions/backend/testing.md`
+**When generating new files:** Load and copy from `docs/blueprints/backend/integration-test-factory.md` rather than assembling from examples in this file.
 
 ---
 

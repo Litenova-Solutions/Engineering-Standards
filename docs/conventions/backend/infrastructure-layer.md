@@ -2,13 +2,17 @@
 
 This document is the authoritative guide for all design decisions in the Infrastructure layer. Read it in full before writing or modifying any infrastructure code.
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - `AppDbContext` implements `IDatabaseContext`; repositories MUST NOT call `SaveChangesAsync`.
 - Global pipeline: transaction pre-handler, save post-handler, rollback error handler.
 - PostgreSQL mappings MUST use `snake_case` naming conventions.
 - MUST NOT contain business rules or HTTP lifecycle logic.
 - Outbox and external clients live here; implement Reactions narrow interfaces here.
+
+
+**Full convention:** `docs/conventions/backend/infrastructure-layer.md`
+**When generating new files:** Load and copy from `docs/blueprints/backend/infrastructure-service-registration.md` rather than assembling from examples in this file.
 
 ---
 

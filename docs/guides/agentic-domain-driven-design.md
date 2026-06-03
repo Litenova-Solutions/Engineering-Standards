@@ -2,7 +2,13 @@
 
 This guide defines how domain documentation is written, organized, and consumed by agents. It is our adaptation of spec-driven development: explicit, reviewable contracts written in ubiquitous language, aligned with screaming architecture and agent-first delivery.
 
-Industry practice (Thoughtworks, GitHub Spec Kit, BDD) treats specifications as living source-of-truth artifacts that agents implement against. We apply the same intent under DDD terms: **domain docs describe policy and operations; test specs describe verification; UI projection docs describe shell and page composition; code enforces all three.**
+## Scope
+
+ADDD is a documentation and delivery model for single bounded-context, monolithic applications. It is not a distributed systems pattern, a microservices decomposition strategy, or a full DDD methodology. It does not cover domain discovery (Event Storming, domain modeling workshops, or domain expert interviews). Discovery is a human activity. ADDD begins where discovery ends: with a domain model that is understood and needs to be documented, implemented, and maintained by a combination of humans and AI agents.
+
+These standards assume a single bounded context monolith. Multi-context decomposition is out of scope.
+
+Industry practice (Thoughtworks, GitHub Spec Kit, BDD) treats specifications as living source-of-truth artifacts that agents implement against. We apply the same intent under DDD terms: **domain docs describe policy and operations; test specs describe verification; page composition docs describe shell and page composition; code enforces all three.**
 
 ---
 
@@ -30,22 +36,23 @@ ADDD inherits from established patterns. The table states what we take from each
 |:---|:---|
 | Prose specs do not run by themselves | API acceptance tests + `@usecase:` / `@ac:` tags (`api-acceptance-tests.md`) |
 | Bounded context at scale | Cross-domain notes in system index; service extraction is project ADR territory |
-| Non-standard "Reactions" name | Defined in `docs/glossary.md`; layer behavior matches DDD event handlers |
+| Non-standard "Reactions" name | In DDD literature this layer is called event handlers or policies. ADDD uses Reactions to distinguish the narrow, single-responsibility implementation pattern used here from the broader concept. See `docs/glossary.md`. |
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
-- Every non-trivial use case MUST have an operation doc and a test spec in the project repository before agent implementation starts.
+- Every non-trivial use case MUST satisfy the **Implementation Prerequisite Set** (Feature Spec, Use Case Doc, Use Case Test Spec) before agent implementation starts.
 - Domain documentation lives under `docs/domain/` in a Feature → Use case tree.
 - Test specifications live at `docs/domain/{feature}/{use-case}.tests.md`, adjacent to the operation doc.
-- UI projection documentation lives under `docs/ui/{app}/` for shell and page composition (when the project has frontends).
-- Feature READMEs hold **invariants** and ubiquitous language. Operation docs hold **contracts**. Test specs hold **Test Coverage** tables. UI docs hold **routes and composition**. Do not duplicate rules across layers.
-- Update operation docs, test specs, and UI projection docs in the same PR as the code change they describe.
+- Page composition documentation lives under `docs/ui/{app}/` for shell and route composition (when the project has frontends).
+- Feature READMEs hold **invariants** and ubiquitous language. Operation docs hold **contracts**. Test specs hold **Test Coverage** tables. Page docs hold **routes and composition**. Do not duplicate rules across layers.
+- Follow the **Spec sync rule**: update operation docs, test specs, and page composition docs in the same PR as the code change they describe.
 - Implementation MUST follow the scaffolding sequence in `docs/conventions/shared/agentic-guardrails.md` section 2.
 - OpenAPI is generated from WebApi; operation docs describe intent in business language.
 
----
+**Full guide:** `docs/guides/agentic-domain-driven-design.md`  
+**Templates:** `docs/templates/docs/domain-use-case.md`, `docs/templates/docs/domain-feature.md`, `docs/templates/docs/ui-page.md`
 
 ## 1. Documentation Tree
 
@@ -82,7 +89,10 @@ docs/ui/                         # Optional but recommended when frontends exist
 | UI shell | `docs/ui/{app}/shell.md` | Layout regions and cross-page presentation rules |
 | UI page | `docs/ui/{app}/pages/{page}.md` | One route; which use cases compose; links to test specs |
 
-Do not maintain parallel **behavior** specs (duplicate glossaries, exception catalogs, or API maps). UI projection docs are **composition indexes**, not a second domain layer. Invariants stay in feature READMEs; operation rules stay in operation docs; verification stays in test specs.
+Do not maintain parallel **behavior** specs (duplicate glossaries, exception catalogs, or API maps). Page composition docs are **composition indexes**, not a second domain layer. Invariants stay in feature READMEs; operation rules stay in operation docs; verification stays in test specs.
+
+
+**Full convention:** `docs/guides/agentic-domain-driven-design.md`
 
 ---
 
@@ -98,7 +108,7 @@ Domain docs, backend projects, and frontend folders MUST use the same boundaries
 | Backend read | `{Feature}/{UseCase}/` handlers | `Posts/List/GetAllPostsQueryHandler.cs` |
 | Frontend | `features/{feature}/{use-case}/` | `features/posts/create/CreatePostForm.tsx` |
 | App Router | Thin shell imports feature entry | `app/(main)/posts/new/page.tsx` |
-| UI projection | `docs/ui/{app}/pages/{page}.md` | Composes one or more use cases on a route |
+| Page composition | `docs/ui/{app}/pages/{page}.md` | Composes one or more use cases on a route |
 | Acceptance tests | `Features/{Feature}/{UseCase}.feature` | `Features/Posts/PublishPost.feature` |
 
 Use cases and pages are **many-to-many**. One page may compose several use cases. One use case may appear on several pages. Page docs capture that mapping; operation docs stay one operation each.
@@ -163,11 +173,11 @@ Update the test spec in the same PR as any new or changed test.
 
 ---
 
-## 6. UI Projection Docs
+## 6. Page Composition Docs
 
 Copy `docs/templates/docs/ui-shell.md` and `docs/templates/docs/ui-page.md` from this standards repository when adding or changing frontend routes.
 
-UI projection docs live under `docs/ui/{app}/` where `{app}` matches the folder name under `apps/`.
+Page composition docs live under `docs/ui/{app}/` where `{app}` matches the folder name under `apps/`.
 
 **Shell doc** (`shell.md`): shared layout, nav, auth gates, presentation defaults.
 
@@ -213,7 +223,7 @@ flowchart LR
 4. Read `docs/domain/{feature}/{use-case}.tests.md` before writing or changing tests.
 5. For frontend work, read `docs/ui/{app}/shell.md` and the relevant `pages/*.md`.
 6. Implement per `agentic-guardrails.md` section 2 with checkpoint commands.
-7. Update operation doc, test spec, and UI projection docs before marking complete.
+7. Update operation doc, test spec, and page composition docs before marking complete.
 
 ---
 
@@ -223,7 +233,8 @@ flowchart LR
 |:---|:---|
 | Specification | Operation doc + test spec |
 | Spec-first | Operation and test docs written before implementation |
-| Spec-anchored | Domain docs updated in the same PR as code |
+| Spec sync rule | Domain docs updated in the same PR as code (see `docs/glossary.md`) |
+| Lexical alignment | Same vocabulary in docs, backend folders, and frontend features |
 | Ubiquitous language | Glossary in each feature README |
 | Acceptance criteria | Test Coverage rows in `{use-case}.tests.md` |
 | Executable acceptance | BDD or API acceptance tests traced to `AC-00N` |
@@ -244,7 +255,39 @@ Everything else requires both docs.
 
 ---
 
-## 11. Related Documents
+## 11. Agent Context Loading
+
+Agents load context in tiers (see `AGENTS.md` and `docs/agentic-development.md` §6). Consumer projects add routing metadata so agents do not scan the entire docs tree.
+
+**Document frontmatter.** Every Feature Spec and Use Case Doc MUST include YAML frontmatter (see templates in `docs/templates/docs/`). Frontmatter lists `layer-context`, `conventions`, `test-spec`, and `risk-level` so an agent opening one file knows which Tier 1 Quick Rules to load.
+
+**Agent index.** Copy `docs/templates/docs/domain-agent-index.json` to `docs/domain/agent-index.json`. This machine-readable map lists features, use cases, doc paths, and status. Load it after `AGENTS.md` on any domain task.
+
+**Project shim.** The project `AGENTS.md` MUST include a **Feature Context Map** and optional **Project Load Overrides** table (see `docs/templates/docs/project-agents.md`).
+
+When a Quick Rule is unclear, load the full convention file referenced at the bottom of the Quick Rules block (Tier 2). When generating a complete new file, load the relevant blueprint (Tier 3) rather than assembling from convention examples.
+
+---
+
+## 12. Spec Completeness Checking
+
+Discovery in the Evans sense (finding the domain model from scratch) remains a human activity. Once a domain model exists in documents, agents and CI MAY audit specifications for **structural completeness** without inventing new domain concepts. This is not discovery; it is the equivalent of a compiler warning.
+
+Checks an agent or script MAY run against the ADDD document set:
+
+| Check | What it compares | Gap signal |
+|:---|:---|:---|
+| **Invariant coverage** | Invariants in Feature Spec vs rows in Use Case Test Specs | Invariant with no test row |
+| **State transition coverage** | Mermaid state diagram transitions vs use case docs | Transition arrow with no use case |
+| **Acceptance criterion orphans** | Test Coverage rows vs named test class/method in test projects | Row references missing test |
+| **Use case asymmetry** | Write use cases vs read use cases that expose results | Command with no observable read path |
+| **Frontmatter completeness** | Required YAML fields on feature and use case docs | Missing or invalid frontmatter |
+
+Run these checks as a pre-implementation agent task ("Review `{feature}` docs for structural gaps") or via `node scripts/validate-domain-docs.mjs` in consumer projects. See `docs/conventions/shared/ci.md` §4.
+
+---
+
+## 13. Related Documents
 
 | Document | Purpose |
 |:---|:---|

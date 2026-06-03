@@ -4,12 +4,15 @@ Conventions for simulating outbound HTTP services and resetting databases betwee
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Use **WireMock.Net** only in test projects for outbound HTTP boundaries; MUST NOT ship WireMock in production hosts.
 - Use **Respawn** (or equivalent documented reset) for PostgreSQL isolation between integration or acceptance scenarios; MUST NOT rely on test execution order.
 - Reset database state per scenario or test class; shared mutable static state in tests is forbidden.
 - External API behavior MUST be stubbed in Playwright E2E (`page.route`); live third-party APIs in CI are forbidden unless a project ADR documents a sandbox contract.
+
+
+**Full convention:** `docs/conventions/backend/external-dependencies.md`
 
 ---
 

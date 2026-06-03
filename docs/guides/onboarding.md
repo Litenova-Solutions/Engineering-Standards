@@ -18,7 +18,7 @@ Tri-layer naming is intentional: the same use case name appears in `docs/domain/
 2. Skim `standards/docs/architecture/clean-architecture.md` for layer boundaries.
 3. Open `docs/domain/README.md` in the **project** repo for features and doc status.
 4. Open the feature README and use case doc for the task you were assigned.
-5. Load only the convention files for your layer (see `agentLoadPlans` in `standards/standards.manifest.json` or ask which plan applies: `backend.domain`, `frontend.app`, etc.).
+5. Load Tier 1 Quick Rules from `agentLoadPlans` in `standards/standards.manifest.json` (for example `backend.domain`, `frontend.app`). Load Tier 2 full conventions only when a Quick Rule is unclear.
 
 Do not read `docs/philosophy.md` or `docs/decisions/` unless you are choosing a new dependency or understanding a historical trade-off.
 
@@ -31,7 +31,7 @@ Do not read `docs/philosophy.md` or `docs/decisions/` unless you are choosing a 
 | Understand behavior | `docs/domain/{feature}/{use-case}.md` |
 | Understand tests expected | `docs/domain/{feature}/{use-case}.tests.md` |
 | Implement backend | Follow `docs/guides/add-new-use-case.md` and layer conventions |
-| Implement frontend | Same guide; UI page doc under `docs/ui/{app}/pages/` when applicable |
+| Implement frontend | Same guide; page composition doc under `docs/ui/{app}/pages/` when applicable |
 | Verify | Project commands in shim `AGENTS.md`; gates in `standards/docs/conventions/shared/ci.md` |
 | Finish | `standards/docs/guides/definition-of-done.md` |
 
@@ -43,7 +43,7 @@ If operation or test docs are missing, write them first per `docs/guides/write-u
 
 | Question | Document |
 |:---|:---|
-| Term definitions (Reactions, spec-anchored, tiers, tags) | `standards/docs/glossary.md` |
+| Term definitions (Reactions, Spec sync rule, context tiers, tags) | `standards/docs/glossary.md` |
 | All convention file paths | `standards/standards.manifest.json` → `conventionIndex` |
 | Why a stack choice exists | `standards/docs/decisions/README.md` (humans; not routine agent load) |
 | Copy-paste scaffolds | `standards/docs/blueprints/README.md` |

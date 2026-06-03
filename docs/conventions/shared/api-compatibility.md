@@ -4,12 +4,15 @@ OpenAPI **freshness** (generated spec matches committed spec) does not detect **
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Internal-only APIs: freshness check only unless a frontend consumes generated types from another repo.
 - Public or independently consumed APIs: freshness **and** breaking-change diff in CI.
 - Breaking changes require a new API version or explicit consumer approval.
 - Every operation MUST have a stable `operationId`.
+
+
+**Full convention:** `docs/conventions/shared/api-compatibility.md`
 
 ---
 

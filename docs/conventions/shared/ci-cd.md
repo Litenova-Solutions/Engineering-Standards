@@ -4,7 +4,7 @@ This document defines the continuous integration and delivery pipeline. Read it 
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Every PR MUST pass all CI gates defined in `docs/conventions/shared/ci.md` before merge.
 - MUST build a single Docker image artifact per service; MUST NOT rebuild between staging and production.
@@ -12,6 +12,9 @@ This document defines the continuous integration and delivery pipeline. Read it 
 - Production deployments MUST require manual approval after staging smoke tests pass.
 - MUST run EF Core migration review before any database migration reaches production.
 - Rollback MUST be available within 5 minutes of a failed production deployment.
+
+
+**Full convention:** `docs/conventions/shared/ci-cd.md`
 
 ---
 

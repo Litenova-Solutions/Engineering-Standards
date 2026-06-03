@@ -2,7 +2,7 @@
 
 This document is the authoritative guide for all design decisions in the Domain layer. Read it in full before writing or modifying any domain code.
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Aggregates MUST enforce invariants; handlers MUST NOT contain business rules.
 - Mutations MUST go through aggregate methods; MUST NOT set properties from handlers.
@@ -13,6 +13,10 @@ This document is the authoritative guide for all design decisions in the Domain 
 - Repository interfaces live in Domain; implementations live in Infrastructure only.
 - Domain aggregates MUST NOT call `DateTime.UtcNow` directly. Accept `utcNow` as a `DateTimeOffset` parameter from the handler, which gets it from `IClock`.
 - Value object constructors MUST throw `DomainException` subclasses only. MUST NOT throw `CommandValidationException` or reference Application assemblies.
+
+
+**Full convention:** `docs/conventions/backend/domain-layer.md`
+**When generating new files:** Load and copy from `docs/blueprints/backend/write-endpoint.md` rather than assembling from examples in this file.
 
 ---
 

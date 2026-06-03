@@ -34,6 +34,8 @@ Document shared concepts that span domain features here (for example authenticat
 - Feature README: `docs/domain/{feature}/README.md`
 - Operation doc: `docs/domain/{feature}/{use-case}.md` (kebab-case)
 - Test spec: `docs/domain/{feature}/{use-case}.tests.md`
-- Update domain docs in the same PR as the code they describe
+- Update domain docs in the same PR as the code they describe (Spec sync rule).
 
 See `standards/docs/guides/agentic-domain-driven-design.md` and `standards/docs/guides/write-use-case-doc.md`.
+
+Agents: maintain `docs/domain/agent-index.json` when features or use cases change.

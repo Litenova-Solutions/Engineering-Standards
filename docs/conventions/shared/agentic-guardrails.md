@@ -76,7 +76,7 @@ The default frontend UI stack is shadcn/ui (CLI v4) with Tailwind v4. Each app o
 
 When implementing a new aggregate or use case, developers and AI agents **MUST** follow this exact sequence.
 
-**Step 0 (prerequisite):** `docs/domain/{feature}/{use-case}.md` and `{use-case}.tests.md` exist with a complete Test Coverage table for planned scenarios. If missing, write them per `docs/guides/write-use-case-doc.md` before any code. The test spec is the completion contract for tests; the feature README is domain input for steps 1 through 3.
+**Step 0 (prerequisite):** The **Implementation Prerequisite Set** MUST exist: `docs/domain/{feature}/README.md`, `docs/domain/{feature}/{use-case}.md`, and `{use-case}.tests.md` with a complete Test Coverage table for planned scenarios. If missing, write them per `docs/guides/write-use-case-doc.md` before any code. The test spec is the completion contract for tests; the Feature Spec is domain input for steps 1 through 3.
 
 Run verification checkpoints after steps 3, 5, 5b, 7, and 8. Do not skip steps or write outer layers before completing inner boundaries.
 

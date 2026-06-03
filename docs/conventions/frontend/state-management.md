@@ -4,13 +4,16 @@ When to use Zustand versus server state (TanStack Query) and local React state. 
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - **Server state** (posts, users, orders): TanStack Query + `getApiClient()` only. MUST NOT store server entities in Zustand.
 - **Zustand** for client-only UI state that spans multiple client components on one route or feature (wizard step, panel layout, ephemeral filters not persisted to URL).
 - One store file per feature under `features/{feature}/stores/`; MUST NOT create a global app store without a project ADR.
 - MUST NOT import Zustand stores across feature boundaries; promote to `@/shared/` only with Strike 2 and ADR if truly cross-cutting.
 - Persist to `localStorage` only when a use case doc or UI page doc requires it; use Zustand `persist` middleware with a namespaced key `{appId}:{feature}:{store}`.
+
+
+**Full convention:** `docs/conventions/frontend/state-management.md`
 
 ---
 

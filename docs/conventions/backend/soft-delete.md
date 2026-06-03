@@ -4,7 +4,7 @@ This document defines when and how to implement soft delete. Read it before addi
 
 ---
 
-## Agent Quick Rules
+## Agent Quick Rules {#agent-quick-rules}
 
 - Default to hard delete. Only use soft delete when the business requires retention, audit, or restore.
 - If soft delete is used, prefer `deleted_at_utc` (nullable timestamp) over `is_deleted` (boolean).
@@ -12,6 +12,9 @@ This document defines when and how to implement soft delete. Read it before addi
 - EF Core 10 named filters MUST be used when multiple filters coexist (for example, soft delete plus multi-tenancy).
 - Unique constraints on soft-deleted rows MUST account for deleted state (partial index recommended).
 - Restore MUST be an explicit aggregate operation, not a property setter.
+
+
+**Full convention:** `docs/conventions/backend/soft-delete.md`
 
 ---
 
