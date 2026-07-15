@@ -30,4 +30,3 @@ A repeated completed request returns the original status and response. A concurr
 ## RECIPE.CONCURRENCY.GATES.001 - Test real conflicts and retries
 
 Use PostgreSQL integration tests for concurrent writes and repeated requests. Unit tests alone cannot prove transaction behavior.
-

@@ -28,4 +28,3 @@ Confirm the actor belongs to the resolved tenant and the target resource has the
 ## RECIPE.TENANCY.GATES.001 - Test isolation as a negative case
 
 Integration and acceptance tests attempt cross-tenant reads, updates, deletes, cache access, background dispatch, and export. Every attempt must fail without disclosing resource existence.
-

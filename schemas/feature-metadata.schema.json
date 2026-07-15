@@ -11,4 +11,3 @@
     "status": { "enum": ["planned", "active", "retired"] }
   }
 }
-

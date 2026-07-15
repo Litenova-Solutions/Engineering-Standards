@@ -30,4 +30,3 @@ Consumers must handle the same event more than once. Use an event ID or business
 ## RECIPE.OUTBOX.OPERATIONS.001 - Expose backlog state
 
 Publish pending count, failed count, oldest pending age, attempts, and dispatch duration. Provide a runbook for inspection and safe replay.
-

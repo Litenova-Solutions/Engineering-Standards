@@ -28,4 +28,3 @@ Expired or revoked sessions redirect to a safe login path. Authorization failure
 ## RECIPE.AUTHJS.GATES.001 - Test the complete session lifecycle
 
 Cover login, callback validation, logout, expiry, refresh failure, authenticated API calls, and forbidden resource access.
-

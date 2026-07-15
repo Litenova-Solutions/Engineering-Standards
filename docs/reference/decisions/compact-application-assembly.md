@@ -24,4 +24,3 @@ Use one Application project. Keep command and query intent through separate Lite
 WebApi references Application instead of contract-only assemblies. Compiler project boundaries no longer separate handlers from messages, so visibility and architecture tests carry that check. The project graph and agent instructions become smaller.
 
 This decision supersedes the split Application and contract-project decisions from the preliminary standard.
-

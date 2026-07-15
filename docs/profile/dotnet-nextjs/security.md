@@ -59,4 +59,3 @@ Use the exact versions in the standards manifest and the consumer lockfiles. Run
 ## SECURITY.FRONTEND.001 - Keep browser trust explicit
 
 Do not expose server secrets through public environment variables. Escape user content by default. Sanitization is required before rendering trusted HTML. Configure content security policy when the application renders third-party scripts or user HTML.
-

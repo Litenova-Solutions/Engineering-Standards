@@ -54,4 +54,3 @@ State who may perform or observe this operation and how target ownership is chec
 Given the required starting state
 When the actor performs the operation
 Then the expected result is observable
-

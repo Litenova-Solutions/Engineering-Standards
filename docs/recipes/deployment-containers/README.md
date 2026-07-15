@@ -28,4 +28,3 @@ Start new replicas, wait for readiness, then shift traffic. Run the primary-jour
 ## RECIPE.CONTAINERS.ROLLBACK.001 - Retain the previous artifact
 
 Keep the previous image reference and an executable rollback command. Confirm the new schema remains compatible with the previous application before deployment.
-

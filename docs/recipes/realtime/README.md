@@ -28,4 +28,3 @@ Treat realtime messages as hints to refresh authoritative server data unless the
 ## RECIPE.REALTIME.GATES.001 - Test connection lifecycle
 
 Cover connection, authorization failure, reconnect, duplicate notification, stale message, and missed-event refresh behavior.
-

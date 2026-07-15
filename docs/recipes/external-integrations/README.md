@@ -30,4 +30,3 @@ Map provider errors to project-owned outcomes. Do not leak provider response bod
 ## RECIPE.EXTERNAL.TEST.001 - Simulate the network boundary
 
 Use WireMock.Net or a protocol-specific local test endpoint. Cover timeout, connection failure, transient response, permanent response, invalid payload, and duplicate delivery.
-

@@ -54,4 +54,3 @@ Document how to return to the previous application artifact and how database com
 ## OPS.WORKER.001 - Operate background work independently
 
 When Worker exists, expose its health and backlog metrics separately. Durable dispatch must be idempotent because a worker may process the same message more than once.
-

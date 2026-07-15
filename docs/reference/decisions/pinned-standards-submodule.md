@@ -22,4 +22,3 @@ Application repositories add this repository at root path `standards/` and pin t
 ## Consequence
 
 Every standards upgrade is reviewable and repeatable. Consumers must initialize submodules after clone and update them through dedicated pull requests.
-

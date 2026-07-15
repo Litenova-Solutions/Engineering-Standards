@@ -27,4 +27,3 @@ Name the deployment environment, availability expectation, and support owner.
 ## Data classification
 
 List public, internal, personal, sensitive, and regulated data handled by v1.
-

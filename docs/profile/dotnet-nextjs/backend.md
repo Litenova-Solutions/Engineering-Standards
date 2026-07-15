@@ -118,4 +118,3 @@ Bind configuration sections to options classes and validate them during startup.
 ## DB.NAMING.001 - Use PostgreSQL snake_case
 
 Store table, column, index, and constraint names in `snake_case`. Keep .NET names in normal PascalCase or camelCase. Marten document aliases and custom indexes follow the database rule.
-

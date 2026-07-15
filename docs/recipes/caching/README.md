@@ -28,4 +28,3 @@ A cache outage falls back to the source when load permits. Do not use cache as t
 ## RECIPE.CACHE.GATES.001 - Prove correctness under staleness
 
 Test hits, misses, expiry, invalidation, concurrent refresh, and source fallback. Compare measured latency and source load with the adoption evidence.
-

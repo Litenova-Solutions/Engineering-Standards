@@ -28,4 +28,3 @@ Describe multi-step behavior, URL state, and focus or navigation results.
 ## Metadata
 
 Record public title, description, canonical URL, and indexing behavior when applicable.
-

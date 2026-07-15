@@ -28,4 +28,3 @@ Use locale-aware date, time, number, currency, plural, and relative-time formatt
 ## RECIPE.LOCALE.GATES.001 - Test fallback and critical journeys
 
 Test locale detection, explicit selection, fallback, missing keys, route generation, and the primary journey in each supported locale.
-

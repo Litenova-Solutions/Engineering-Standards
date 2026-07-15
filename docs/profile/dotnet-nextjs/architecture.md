@@ -103,4 +103,3 @@ Create Worker for durable outbox dispatch, queue consumption, or scheduled work 
 ## ARCH.ENFORCEMENT.001 - Test structural boundaries
 
 Architecture.Tests must verify project references, forbidden package dependencies, handler visibility, endpoint boundaries, and feature isolation rules that the compiler cannot prove alone.
-

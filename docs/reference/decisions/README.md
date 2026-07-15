@@ -18,4 +18,3 @@ These records explain the v1 baseline. Normative behavior remains in core, profi
 - [Pinned standards submodule](pinned-standards-submodule.md)
 
 When a decision changes, add a replacement record and mark the old record superseded. Do not rewrite the old outcome.
-

@@ -13,4 +13,3 @@ State the selected behavior.
 ## Consequences
 
 State the required work, accepted cost, and replacement or review condition.
-

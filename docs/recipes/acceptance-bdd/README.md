@@ -28,4 +28,3 @@ Each scenario owns its IDs, authentication context, requests, and responses. Res
 ## RECIPE.BDD.GATES.001 - Split critical and complete runs
 
 Run scenarios tagged `critical` on every pull request. Run the complete acceptance project when domain docs, Application, WebApi, Infrastructure, schema, or OpenAPI changes.
-

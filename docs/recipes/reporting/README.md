@@ -28,4 +28,3 @@ Run large exports through Worker, store the output in approved object storage, a
 ## RECIPE.REPORT.GATES.001 - Test cost and cancellation
 
 Test results, authorization, cancellation, timeout, maximum range, maximum rows, and execution plan. Record the representative data volume used by the performance check.
-
