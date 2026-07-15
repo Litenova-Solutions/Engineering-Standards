@@ -32,6 +32,24 @@ public sealed class StandardsValidatorTests : IDisposable
         Assert.Contains(report.Errors, issue => issue.Code == "RULE_ID");
     }
 
+    [Fact]
+    public void Validate_rejects_missing_load_plan_anchor()
+    {
+        TestRepositoryBuilder.Create(_root);
+        var path = Path.Combine(_root, "docs", "core", "principles.md");
+        File.WriteAllText(
+            path,
+            File.ReadAllText(path).Replace(
+                "Agent Quick Rules {#agent-quick-rules}",
+                "Renamed Rules {#renamed-rules}",
+                StringComparison.Ordinal));
+        var repository = StandardsRepository.Load(_root);
+
+        var report = StandardsValidator.Validate(repository);
+
+        Assert.Contains(report.Errors, issue => issue.Code == "LOAD_ANCHOR");
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_root))
@@ -40,4 +58,3 @@ public sealed class StandardsValidatorTests : IDisposable
         }
     }
 }
-

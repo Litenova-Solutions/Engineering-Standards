@@ -35,6 +35,10 @@ internal static class TestRepositoryBuilder
         ---
         # Test document
 
+        ## Agent Quick Rules {#agent-quick-rules}
+
+        - Load this document.
+
         {{body}}
         """;
 
@@ -63,7 +67,7 @@ internal static class TestRepositoryBuilder
           "loadPlans": {
             "all": {
               "tier0": ["AGENTS.md"],
-              "tier1": ["docs/core/principles.md"],
+              "tier1": ["docs/core/principles.md#agent-quick-rules"],
               "tier2": []
             }
           },
@@ -82,4 +86,3 @@ internal static class TestRepositoryBuilder
         }
         """;
 }
-

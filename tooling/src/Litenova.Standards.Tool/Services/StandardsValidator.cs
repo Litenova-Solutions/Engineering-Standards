@@ -95,15 +95,19 @@ internal static partial class StandardsValidator
     {
         foreach (var (name, plan) in repository.Manifest.LoadPlans)
         {
-            var taskDocuments = plan.Tier0.Concat(plan.Tier1).Concat(plan.Tier2).Distinct(StringComparer.Ordinal).ToArray();
-            if (taskDocuments.Length > repository.Manifest.Budgets.TaskMaxDocuments)
+            var tier1Load = plan.Tier0.Concat(plan.Tier1).Distinct(StringComparer.Ordinal).ToArray();
+            var tier2Load = plan.Tier0.Concat(plan.Tier2).Distinct(StringComparer.Ordinal).ToArray();
+            var taskDocumentCount = Math.Max(
+                CountPhysicalDocuments(tier1Load),
+                CountPhysicalDocuments(tier2Load));
+            if (taskDocumentCount > repository.Manifest.Budgets.TaskMaxDocuments)
             {
-                report.Error("LOAD_DOCUMENT_BUDGET", $"Load plan {name} selects {taskDocuments.Length} documents; the limit is {repository.Manifest.Budgets.TaskMaxDocuments}.");
+                report.Error("LOAD_DOCUMENT_BUDGET", $"Load plan {name} selects {taskDocumentCount} documents; the limit is {repository.Manifest.Budgets.TaskMaxDocuments}.");
             }
 
-            foreach (var path in taskDocuments)
+            foreach (var path in tier1Load.Concat(tier2Load).Distinct(StringComparer.Ordinal))
             {
-                ValidateExistingPath(repository, StripAnchor(path), "LOAD_PATH", report);
+                ValidateLoadPlanReference(repository, path, report);
             }
 
             var tier1Words = CountWords(repository, plan.Tier1);
@@ -112,7 +116,9 @@ internal static partial class StandardsValidator
                 report.Error("LOAD_TIER1_BUDGET", $"Load plan {name} Tier 1 has {tier1Words} words; the limit is {repository.Manifest.Budgets.Tier1MaxWords}.");
             }
 
-            var taskWords = CountWords(repository, taskDocuments);
+            var taskWords = Math.Max(
+                CountWords(repository, tier1Load),
+                CountWords(repository, tier2Load));
             if (taskWords > repository.Manifest.Budgets.TaskMaxWords)
             {
                 report.Error("LOAD_WORD_BUDGET", $"Load plan {name} has {taskWords} words; the limit is {repository.Manifest.Budgets.TaskMaxWords}.");
@@ -210,12 +216,15 @@ internal static partial class StandardsValidator
             var path = Path.Combine(repository.Root, StripAnchor(relativePath).Replace('/', Path.DirectorySeparatorChar));
             if (File.Exists(path))
             {
-                total += WordRegex().Matches(File.ReadAllText(path)).Count;
+                total += WordRegex().Matches(ReadReferencedContent(path, relativePath)).Count;
             }
         }
 
         return total;
     }
+
+    private static int CountPhysicalDocuments(IEnumerable<string> references) =>
+        references.Select(StripAnchor).Distinct(StringComparer.Ordinal).Count();
 
     private static void ValidateExistingPath(StandardsRepository repository, string relativePath, string code, ValidationReport report)
     {
@@ -232,6 +241,100 @@ internal static partial class StandardsValidator
         }
     }
 
+    private static void ValidateLoadPlanReference(
+        StandardsRepository repository,
+        string reference,
+        ValidationReport report)
+    {
+        var relativePath = StripAnchor(reference);
+        ValidateExistingPath(repository, relativePath, "LOAD_PATH", report);
+
+        var parts = reference.Split('#', 2);
+        if (parts.Length == 1)
+        {
+            return;
+        }
+
+        var path = Path.Combine(repository.Root, relativePath.Replace('/', Path.DirectorySeparatorChar));
+        if (!File.Exists(path))
+        {
+            return;
+        }
+
+        var anchor = parts[1];
+        var lines = File.ReadAllLines(path);
+        if (!lines.Any(line => HeadingMatchesAnchor(line, anchor)))
+        {
+            report.Error("LOAD_ANCHOR", $"Anchor #{anchor} does not exist in {relativePath}.", reference);
+        }
+    }
+
+    private static string ReadReferencedContent(string path, string reference)
+    {
+        var parts = reference.Split('#', 2);
+        var lines = File.ReadAllLines(path);
+        if (parts.Length == 1)
+        {
+            return string.Join('\n', lines);
+        }
+
+        var anchor = parts[1];
+        var start = Array.FindIndex(lines, line => HeadingMatchesAnchor(line, anchor));
+        if (start < 0)
+        {
+            return string.Empty;
+        }
+
+        var level = HeadingLevel(lines[start]);
+        var end = start + 1;
+        while (end < lines.Length)
+        {
+            var candidateLevel = HeadingLevel(lines[end]);
+            if (candidateLevel > 0 && candidateLevel <= level)
+            {
+                break;
+            }
+
+            end++;
+        }
+
+        return string.Join('\n', lines[start..end]);
+    }
+
+    private static bool HeadingMatchesAnchor(string line, string anchor)
+    {
+        if (!line.StartsWith('#'))
+        {
+            return false;
+        }
+
+        if (line.Contains($"{{#{anchor}}}", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        var heading = line.TrimStart('#').Trim();
+        var explicitAnchor = heading.IndexOf(" {#", StringComparison.Ordinal);
+        if (explicitAnchor >= 0)
+        {
+            heading = heading[..explicitAnchor];
+        }
+
+        var slug = SlugCharacterRegex().Replace(heading.ToLowerInvariant(), "-").Trim('-');
+        return string.Equals(slug, anchor, StringComparison.Ordinal);
+    }
+
+    private static int HeadingLevel(string line)
+    {
+        var level = 0;
+        while (level < line.Length && line[level] == '#')
+        {
+            level++;
+        }
+
+        return level is >= 1 and <= 6 && level < line.Length && line[level] == ' ' ? level : 0;
+    }
+
     private static string StripAnchor(string path) => path.Split('#', 2)[0];
 
     [GeneratedRegex(@"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")]
@@ -239,5 +342,7 @@ internal static partial class StandardsValidator
 
     [GeneratedRegex(@"[\p{L}\p{N}_'-]+")]
     private static partial Regex WordRegex();
-}
 
+    [GeneratedRegex(@"[^a-z0-9]+")]
+    private static partial Regex SlugCharacterRegex();
+}
