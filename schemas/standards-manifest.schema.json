@@ -12,7 +12,7 @@
     "defaultProfile",
     "paths",
     "profiles",
-    "recipes",
+    "extensions",
     "stack",
     "packages",
     "loadPlans"
@@ -30,11 +30,11 @@
     "paths": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["docs", "templates", "recipes"],
+      "required": ["docs", "templates", "extensions"],
       "properties": {
         "docs": { "$ref": "#/$defs/repositoryPath" },
         "templates": { "$ref": "#/$defs/repositoryPath" },
-        "recipes": { "$ref": "#/$defs/repositoryPath" }
+        "extensions": { "$ref": "#/$defs/repositoryPath" }
       }
     },
     "profiles": {
@@ -55,7 +55,7 @@
         }
       }
     },
-    "recipes": {
+    "extensions": {
       "type": "object",
       "additionalProperties": { "$ref": "#/$defs/repositoryPath" }
     },

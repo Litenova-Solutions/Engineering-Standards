@@ -10,6 +10,6 @@
     "uiDocs": "docs/ui",
     "frontends": []
   },
-  "recipes": [],
+  "extensions": [],
   "overrides": []
 }

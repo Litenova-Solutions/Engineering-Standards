@@ -2,14 +2,18 @@
 
 These files are optional starting points for consumer documentation. Copy only the files required by the current stage and replace every `__PLACEHOLDER__` before committing.
 
-- `standards.project.json` selects the profile, recipes, paths, and rule overrides.
-- `project-agents.md` is the short consumer agent shim.
-- `product-brief.md` defines the v1 product boundary.
-- `domain-index.md` maps the bounded context, capabilities, and primary journey.
-- `glossary.md` defines shared domain language.
-- `feature.md` defines one business capability.
-- `use-case.md` defines one operation and its acceptance criteria.
-- `page.md` applies only when the page-document trigger in `docs/core/addd.md` applies.
-- `decision.md` records a project override or an expensive-to-reverse choice.
+| Template | Purpose |
+|:---|:---|
+| `standards.project.json` | Selects the platform profile, paths, extensions, and standards overrides. |
+| `project-agents.md` | Provides the short consumer agent entry point. |
+| `product-brief.md` | Defines the application v1 product boundary. |
+| `domain-index.md` | Maps the bounded context, capabilities, and primary journey. |
+| `glossary.md` | Defines shared domain language. |
+| `capability.md` | Defines one business capability and its use cases. |
+| `use-case.md` | Defines one command or query and its acceptance criteria. |
+| `page.md` | Defines non-trivial page composition when the ADDD page criteria apply. |
+| `decision.md` | Records a standards override or expensive-to-reverse choice. |
 
-The standards do not generate application code. Agents read the selected profile and recipes, inspect local patterns, and implement the smallest complete use case.
+The JSON blocks in capability, use-case, and page documents route agents and record status. Their allowed fields are defined in [ADDD](../../docs/foundations/addd.md), not by a separate schema or CLI.
+
+The standards do not generate application code. Agents read the selected profile, task conventions, active use case, and enabled extensions before implementing the smallest complete slice.

@@ -1,20 +1,11 @@
----
-{
-  "id": "reference.decisions.index",
-  "kind": "reference",
-  "normative": false,
-  "appliesTo": ["all"],
-  "recipes": []
-}
----
 # Foundation Decisions
 
-These records explain the v1 baseline. Normative behavior remains in core, profile, and recipe rules.
+These records explain the version 1 baseline. Normative behavior lives in foundations, the selected platform profile, topic conventions, and enabled extensions.
 
 - [Compact Application assembly](compact-application-assembly.md)
 - [Marten default persistence](marten-default-persistence.md)
 - [LiteBus commit pipeline](litebus-commit-pipeline.md)
-- [One-file ADDD specification](one-file-addd-specification.md)
+- [Single use-case specification](single-use-case-specification.md)
 - [Pinned standards submodule](pinned-standards-submodule.md)
 
-When a decision changes, add a replacement record and mark the old record superseded. Do not rewrite the old outcome.
+Accepted records are historical. When a decision changes, add a replacement record, link the superseded record, and leave the old outcome intact.

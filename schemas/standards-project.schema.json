@@ -4,7 +4,7 @@
   "title": "Litenova Standards Consumer Project",
   "type": "object",
   "additionalProperties": false,
-  "required": ["project", "profile", "paths", "recipes", "overrides"],
+  "required": ["project", "profile", "paths", "extensions", "overrides"],
   "properties": {
     "$schema": { "type": "string" },
     "project": {
@@ -41,7 +41,7 @@
         }
       }
     },
-    "recipes": {
+    "extensions": {
       "type": "array",
       "uniqueItems": true,
       "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }

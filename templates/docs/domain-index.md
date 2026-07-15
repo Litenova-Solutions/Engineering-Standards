@@ -10,7 +10,7 @@ Use [glossary.md](glossary.md) as the canonical term list.
 
 ## Capabilities
 
-- Link each capability README and state its user outcome.
+- Link each `docs/domain/{capability}/README.md` and state its user outcome.
 
 ## Primary v1 journey
 

@@ -1,10 +1,9 @@
 ---
 {
   "id": "__APP__.__PAGE__",
-  "kind": "page",
   "app": "__APP__",
   "route": "__ROUTE__",
-  "useCases": ["__FEATURE__.__USE_CASE__"]
+  "useCases": ["__CAPABILITY__.__USE_CASE__"]
 }
 ---
 # __TITLE__
