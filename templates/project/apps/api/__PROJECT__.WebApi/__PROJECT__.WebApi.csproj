@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
+    <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)/../../../artifacts/openapi</OpenApiDocumentsDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../__PROJECT__.Application/__PROJECT__.Application.csproj" />
+    <ProjectReference Include="../__PROJECT__.Infrastructure/__PROJECT__.Infrastructure.csproj" />
+    <ProjectReference Include="../__PROJECT__.ServiceDefaults/__PROJECT__.ServiceDefaults.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="LiteBus.Commands.Abstractions" />
+    <PackageReference Include="LiteBus.Commands.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="LiteBus.Events.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="LiteBus.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="LiteBus.Queries.Abstractions" />
+    <PackageReference Include="LiteBus.Queries.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.OpenApi" />
+    <PackageReference Include="Scalar.AspNetCore" />
+  </ItemGroup>
+</Project>

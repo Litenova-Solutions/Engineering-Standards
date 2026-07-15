@@ -112,6 +112,17 @@ internal static class ToolProgram
 
     private static int Scaffold(StandardsRepository repository, string target, CliOptions options)
     {
+        if (target == "project")
+        {
+            ProjectScaffolder.Scaffold(
+                repository,
+                options.Require("name"),
+                options.Require("output"),
+                options.Has("with-web"));
+            Console.WriteLine("Created project.");
+            return 0;
+        }
+
         if (target != "use-case")
         {
             throw new InvalidOperationException($"Unknown scaffold target: {target}.");
@@ -189,6 +200,7 @@ internal static class ToolProgram
         Console.WriteLine("  check [--root PATH] [--project PATH] [--json]");
         Console.WriteLine("  context --task NAME [--project PATH] [--use-case ID] [--root PATH]");
         Console.WriteLine("  scaffold use-case --project PATH --feature SLUG --name SLUG --kind command|query [--actor SLUG] [--title TEXT]");
+        Console.WriteLine("  scaffold project --name NAME --output PATH [--with-web]");
     }
 }
 
