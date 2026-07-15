@@ -31,38 +31,24 @@ docs/profile/dotnet-nextjs/  Default application profile
 docs/recipes/                 Optional patterns loaded by trigger
 docs/reference/               Glossary and decision history
 schemas/                      Public JSON contracts
-templates/                    Runnable project and document templates
-tooling/                      Validation, generation, and context CLI
-generated/                    Committed machine indexes
+templates/docs/               Optional ADDD document starting points
 ```
+
+The schemas describe the manifest, consumer selection, recipe metadata, and ADDD frontmatter. They support editor or consumer validation but do not require a repository CLI.
 
 Start with [AGENTS.md](AGENTS.md). Human readers can begin with [scope](docs/core/scope.md) and [ADDD](docs/core/addd.md).
 
-## Tooling
+## Use the documentation
 
-Run the source-based .NET tool from a clean clone:
+Agents read `standards.project.json`, select the matching `loadPlans` entry in `standards.manifest.json`, and then read the named quick rules. There is no standards CLI and no application generator.
 
-```bash
-dotnet run --project tooling/src/Litenova.Standards.Tool -- validate
-dotnet run --project tooling/src/Litenova.Standards.Tool -- generate
-dotnet run --project tooling/src/Litenova.Standards.Tool -- check
-```
-
-Generated files are committed. CI fails when their sources and committed output differ.
-
-From a consumer repository:
+To start consumer documentation, copy only the files needed from [templates/docs](templates/docs/README.md) and replace their placeholders. Agents create application code from the profile and enabled recipes while matching the consumer repository's local patterns.
 
 ```bash
-dotnet run --project standards/tooling/src/Litenova.Standards.Tool -- \
-  scaffold use-case \
-  --project standards.project.json \
-  --feature posts \
-  --name create-post \
-  --kind command \
-  --actor author
-
-dotnet run --project standards/tooling/src/Litenova.Standards.Tool -- \
-  generate --project standards.project.json
+mkdir -p docs/product
+cp standards/templates/docs/standards.project.json standards.project.json
+cp standards/templates/docs/project-agents.md AGENTS.md
+cp standards/templates/docs/product-brief.md docs/product/brief.md
 ```
 
 ## Version policy

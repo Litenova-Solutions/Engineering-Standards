@@ -29,7 +29,6 @@ The global command post-handler calls `SaveChangesAsync` once. Handlers and repo
 
 Generate a migration for every schema change. Review table, column, index, foreign-key, and destructive operations before applying it. Run migrations as a deployment step rather than from each WebApi replica.
 
-## RECIPE.EFCORE.GATES.001 - Test the replacement fixture
+## RECIPE.EFCORE.GATES.001 - Test the replacement
 
-The recipe fixture must build without Marten packages, apply migrations to PostgreSQL, run command and query integration tests, and pass architecture tests.
-
+The consumer persistence replacement must build without Marten packages, apply migrations to PostgreSQL, run command and query integration tests, and pass architecture tests.

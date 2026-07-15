@@ -33,9 +33,9 @@ Extra specification and evidence required when a use case handles authorization,
 
 A package-free Domain record describing a business fact raised by an aggregate.
 
-## Generated artifact
+## Derived artifact
 
-A committed file produced deterministically from authored sources. Examples include the rule catalog, use-case index, trace report, OpenAPI document, and TypeScript API types.
+A committed application file produced deterministically from authored sources. Examples include an OpenAPI document and TypeScript API types.
 
 ## Profile rule
 
@@ -52,4 +52,3 @@ The default use-case depth when no criticality trigger applies.
 ## Use-case specification
 
 The one authored operation file containing intent, contract, business rules, flows, failures, examples, and acceptance criteria.
-

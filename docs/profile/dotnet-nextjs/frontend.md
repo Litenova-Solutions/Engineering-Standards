@@ -69,7 +69,7 @@ Use this order:
 4. TanStack Query when client-side server caching is required.
 5. Zustand when unrelated client branches share non-server state.
 
-Do not enable TanStack Query or Zustand in the baseline template without a use case that meets the trigger.
+Do not enable TanStack Query or Zustand in the baseline profile without a use case that meets the trigger.
 
 ## FRONTEND.UI.001 - Use Tailwind CSS and shadcn/ui
 
@@ -80,4 +80,3 @@ Each frontend owns its Tailwind entry file, content sources, `components.json`, 
 Route files select layouts, load server data, and compose feature UI. Business rules and reusable feature behavior stay outside `app/`.
 
 Create a page specification only when the ADDD page trigger applies.
-

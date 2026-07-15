@@ -21,5 +21,4 @@ Command handlers and repositories stage changes. One global LiteBus command post
 
 ## Consequence
 
-Transaction behavior is less visible inside each handler but consistent across commands. The template and tests show the commit boundary. Durable events join the same commit through the outbox-worker recipe.
-
+Transaction behavior is less visible inside each handler but consistent across commands. Profile rules and consumer tests make the commit boundary explicit. Durable events join the same commit through the outbox-worker recipe.

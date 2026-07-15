@@ -17,9 +17,8 @@ The preliminary method repeated operation state, examples, test class names, tes
 
 ## Decision
 
-Keep one authored use-case file with stable acceptance IDs. Generate catalogs and trace reports from use-case metadata and test references. Add page documents only for non-trivial composition.
+Keep one authored use-case file with stable acceptance IDs. Tests cite the IDs they prove, and reviewers verify that every active ID has evidence. Add page documents only for non-trivial composition.
 
 ## Consequence
 
-Agents have one behavior source. CI carries the trace check. The method retains explicit examples and critical risk analysis without requiring a separate test-spec document.
-
+Agents have one behavior source. Tests cite stable acceptance IDs, and review checks their coverage. The method retains explicit examples and critical risk analysis without requiring a separate test-spec document.

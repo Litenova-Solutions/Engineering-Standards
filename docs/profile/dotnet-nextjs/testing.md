@@ -85,5 +85,4 @@ Collect line and branch coverage for review. Do not fail v1 on one repository-wi
 
 ## TEST.GENERATED.001 - Verify generated contracts
 
-Build the API, regenerate OpenAPI and TypeScript types, and fail when Git reports a difference. The same freshness rule applies to standards indexes and trace reports.
-
+Build the API, regenerate OpenAPI and TypeScript types, and fail when Git reports a difference.

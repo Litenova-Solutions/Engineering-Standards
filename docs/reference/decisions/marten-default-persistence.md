@@ -21,5 +21,4 @@ Use Marten for the default profile. Commands write through aggregate repositorie
 
 ## Consequence
 
-The profile removes project-owned read contexts, callback wrappers, and a public unit-of-work interface. Application references Marten for query abstractions. EF Core remains available as an explicitly enabled replacement recipe with its own fixture.
-
+The profile removes project-owned read contexts, callback wrappers, and a public unit-of-work interface. Application references Marten for query abstractions. EF Core remains available as an explicitly enabled replacement recipe with its own gates.

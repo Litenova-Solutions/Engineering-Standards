@@ -12,8 +12,8 @@
 ## Agent Quick Rules {#agent-quick-rules}
 
 - Complete one primary journey before adding secondary capabilities.
-- Run backend, frontend, standards, and recipe gates that apply.
-- Keep generated artifacts current.
+- Run backend, frontend, documentation, and recipe gates that apply.
+- Keep derived application artifacts current.
 - Ship security, data safety, diagnostics, rollback, and operating instructions with v1.
 - Record every skipped gate with a specific reason.
 
@@ -25,9 +25,9 @@ An implementation slice includes its domain behavior, persistence, API, optional
 
 Backend changes require Release build and tests. Frontend changes require frozen install, lint, type check, tests, and build. Critical browser journeys require Playwright. Enabled recipes add their declared gates.
 
-## DELIVERY.GENERATED.001 - Commit generated artifacts
+## DELIVERY.DERIVED.001 - Commit derived application artifacts
 
-Regenerate standards indexes, trace reports, OpenAPI, and frontend API types with their sources. Generators must produce stable output without timestamps or absolute paths.
+Regenerate OpenAPI and frontend API types with their sources. Generators must produce stable output without timestamps or absolute paths.
 
 ## DELIVERY.V1.001 - Meet the application v1 gate
 
@@ -49,4 +49,3 @@ Scale, tenancy, realtime behavior, and provider-specific work remain outside v1 
 ## DELIVERY.REPORT.001 - Report verification precisely
 
 Completion reports name the commands run, their results, and any skipped checks. Do not claim a repository-wide result from a narrow test.
-

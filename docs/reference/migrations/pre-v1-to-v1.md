@@ -20,9 +20,9 @@ The released v1 replaces the unused preliminary `v1.0.0` tag and the later pre-r
 5. Replace Marten read wrappers with direct `IQuerySession` injection.
 6. Remove the public Marten unit-of-work wrapper and commit through the LiteBus pipeline.
 7. Merge each operation and test-spec pair into one use-case specification.
-8. Add acceptance IDs to tests and generate the trace report.
+8. Add acceptance IDs to tests and verify that every active ID appears in automated tests.
 9. Enable recipes for every retained advanced pattern.
-10. Run the complete application and standards gate set.
+10. Run the complete application gate set and review the standards integration manually.
 
 ## Removed preliminary concepts
 
@@ -33,4 +33,3 @@ The released v1 replaces the unused preliminary `v1.0.0` tag and the later pre-r
 - Mandatory page documentation for every route.
 - Default EF Core persistence.
 - Branch-tracking standards submodules.
-

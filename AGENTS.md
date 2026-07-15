@@ -7,20 +7,11 @@ These standards cover a single bounded-context business application built with A
 ## Context loading
 
 1. Read the consumer repository `AGENTS.md` and `standards.project.json`.
-2. Run the context command for the task when the standards tool is available.
-3. Read Tier 1 quick rules.
+2. Find the active task under `loadPlans` in `standards.manifest.json`.
+3. Read the listed Tier 1 quick rules.
 4. Read full Tier 2 documents when the task changes that area or a quick rule needs detail.
 5. Read a recipe only when `standards.project.json` enables it.
 6. Read the active use-case specification before changing application behavior.
-
-```bash
-dotnet run --project standards/tooling/src/Litenova.Standards.Tool -- \
-  context --task backend.application \
-  --project standards.project.json \
-  --use-case posts.create
-```
-
-When editing this standards repository, omit `standards/` from the project path.
 
 ## Source precedence
 
@@ -40,7 +31,7 @@ Stop when two rules conflict without an explicit replacement. Quote both rule ID
 3. Load the task context and active use-case specification.
 4. Check `standards.manifest.json` before changing dependencies.
 5. Match established project patterns unless the task is a standards migration.
-6. Plan documentation, implementation, tests, and generated artifacts as one unit.
+6. Plan documentation, implementation, tests, and derived artifacts as one unit.
 
 Do not add a package, migration, authentication model change, or public API break unless the request includes it or an accepted decision authorizes it.
 
@@ -57,19 +48,13 @@ Do not add a package, migration, authentication model change, or public API brea
 - Frontend features do not import another feature's internal files.
 - Environment variables pass through the validated environment module.
 - Active acceptance-criterion IDs must appear in automated tests.
-- Generated files must be regenerated in the same change as their sources.
+- Derived application files must be regenerated in the same change as their sources.
 
 The canonical rules and their reasons live under `docs/core/` and `docs/profile/`. Do not copy this list into consumer documentation.
 
 ## Required verification
 
-For this repository:
-
-```bash
-dotnet build tooling/Litenova.Standards.slnx --configuration Release
-dotnet test tooling/Litenova.Standards.slnx --configuration Release --no-build
-dotnet run --project tooling/src/Litenova.Standards.Tool -- check
-```
+For this repository, inspect changed links, rule IDs, frontmatter, manifest paths, and recipe references. Run `git diff --check` before committing. This repository has no executable standards checker.
 
 For a consumer backend:
 
@@ -95,7 +80,7 @@ Run Playwright when the project contains critical browser journeys. Run recipe-s
 Before reporting completion:
 
 - Run every applicable gate.
-- Regenerate indexes, trace reports, OpenAPI, and API types.
+- Regenerate consumer OpenAPI and API types when their sources change.
 - Confirm the active use-case document matches observable behavior.
 - Report skipped gates and the exact reason.
-- Leave no placeholder implementation, `TODO`, or untracked generated output.
+- Leave no placeholder implementation, `TODO`, or untracked derived output.

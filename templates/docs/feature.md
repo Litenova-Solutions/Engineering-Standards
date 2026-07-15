@@ -23,3 +23,6 @@ State the business capability and the user outcome it supports.
 
 - Record rules shared by more than one use case.
 
+## Use cases
+
+- Link each use-case specification and state whether it is planned, active, or retired.

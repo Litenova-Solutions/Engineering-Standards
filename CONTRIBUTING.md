@@ -2,23 +2,16 @@
 
 Changes use a branch and pull request against `main`. Direct pushes to `main` are not part of the release process.
 
-## Required checks
+## Required review
 
-Run before requesting review:
-
-```bash
-dotnet build tooling/Litenova.Standards.slnx --configuration Release
-dotnet test tooling/Litenova.Standards.slnx --configuration Release --no-build
-dotnet run --project tooling/src/Litenova.Standards.Tool -- check
-```
+Before requesting review, inspect changed links, rule IDs, frontmatter, manifest paths, recipe references, and migration notes. Run `git diff --check`. The repository intentionally has no standards CLI or application scaffold.
 
 A normative rule change must include:
 
 - One canonical rule ID.
-- Updated generated catalogs.
 - A `CHANGELOG.md` entry.
 - A migration note when a compliant consumer must change.
-- Template and fixture updates when code shape changes.
+- Document template updates when the ADDD document shape changes.
 
 ## Review for a solo maintainer
 
@@ -36,4 +29,4 @@ Accepted decision records are not rewritten to change their outcome. Add a new r
 
 ## Consumer upgrades
 
-Consumers update the pinned standards commit in a dedicated pull request, read the changelog and migration note, run `upgrade-check`, apply required work, and run their complete gate set.
+Consumers update the pinned standards commit in a dedicated pull request, read the changelog and migration note, apply required work, and run their complete application gate set.

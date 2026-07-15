@@ -17,7 +17,7 @@ ADDD turns product intent into one traceable vertical use case at a time. It use
 - Keep one specification file per use case.
 - Use stable acceptance IDs.
 - Add critical sections only when a criticality trigger applies.
-- Generate catalogs and trace reports instead of maintaining duplicate tables.
+- Keep feature indexes small and verify acceptance coverage from stable IDs.
 
 ## ADDD.INCEPTION.001 - Complete the thin inception gate
 
@@ -30,9 +30,23 @@ Before use-case implementation, create:
 
 The brief names the target user, problem, primary v1 journey, success measure, non-goals, operating target, and data classification.
 
+## ADDD.FLOW.001 - Move one use case through the delivery flow
+
+Use this sequence:
+
+1. Select one primary-journey use case from the capability map.
+2. Write its contract, rules, failures, examples, and acceptance criteria.
+3. Mark criticality and enable only recipes required by those risks or behaviors.
+4. Implement the complete domain-to-surface slice.
+5. Add automated evidence for every active acceptance ID.
+6. Run the application and enabled-recipe gates.
+7. Update the specification before starting another use case.
+
+Do not start a secondary capability while the primary slice has placeholder persistence, API, UI, tests, deployment work, or recovery instructions.
+
 ## ADDD.FEATURE.001 - Group use cases by business capability
 
-Each capability has `docs/domain/{feature}/README.md` with its purpose, shared terms, actors, and feature-level invariants. The generated index owns the use-case list.
+Each capability has `docs/domain/{feature}/README.md` with its purpose, shared terms, actors, feature-level invariants, and a short use-case list. Do not copy the full use-case specification into the index.
 
 ## ADDD.USECASE.001 - Keep one use-case specification
 
@@ -56,6 +70,8 @@ Required metadata:
 
 The directory supplies the feature name. The filename supplies the operation name.
 
+`planned` means the contract may still change and does not claim implementation. `active` means observable behavior exists and every acceptance ID has automated evidence. `retired` preserves history after the behavior and public entry points are removed.
+
 ## ADDD.ACCEPTANCE.001 - Give each criterion a stable ID
 
 Use `AC-{FEATURE}-{USECASE}-{NN}`. Never reuse or renumber an accepted ID.
@@ -69,6 +85,12 @@ with a unique slug.
 
 Every active ID must appear in at least one automated test. Tests for internal implementation details do not need an acceptance ID.
 
+## ADDD.TRACE.001 - Verify criterion coverage from source
+
+For each active use case, list its acceptance IDs and search the consumer test roots for each exact ID. A missing ID fails completion. Extra internal tests without IDs are valid.
+
+For example, `AC-POSTS-CREATE-01` may appear in a .NET `Trait`, a Reqnroll tag, or a TypeScript test title. Do not maintain a second table of test class and method names.
+
 ## ADDD.ASSURANCE.001 - Escalate critical use cases
 
 An empty `criticality` list uses standard assurance. Authorization, money, sensitive data, irreversible behavior, concurrency, durable external delivery, or availability requirements trigger critical assurance.
@@ -77,9 +99,8 @@ Add only applicable critical sections: abuse cases, concurrency, idempotency, pr
 
 ## ADDD.PAGE.001 - Document pages only when composition requires it
 
-Create a page document when a route combines two use cases, has a multi-step interaction, owns non-trivial state or permissions, or defines public metadata. A simple one-use-case page stays represented by the use-case specification and generated route index.
+Create a page document when a route combines two use cases, has a multi-step interaction, owns non-trivial state or permissions, or defines public metadata. A simple one-use-case page stays represented by the use-case specification and route code.
 
 ## ADDD.SYNC.001 - Update specifications with behavior
 
-Change the use-case specification, implementation, tests, OpenAPI, generated client, and generated indexes in the same pull request when observable behavior changes.
-
+Change the use-case specification, implementation, tests, OpenAPI, and generated client in the same pull request when observable behavior changes.

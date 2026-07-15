@@ -16,8 +16,7 @@
     "stack",
     "packages",
     "loadPlans",
-    "budgets",
-    "generatedFiles"
+    "budgets"
   ],
   "properties": {
     "$schema": { "type": "string" },
@@ -32,12 +31,11 @@
     "paths": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["docs", "templates", "recipes", "generated"],
+      "required": ["docs", "templates", "recipes"],
       "properties": {
         "docs": { "$ref": "#/$defs/repositoryPath" },
         "templates": { "$ref": "#/$defs/repositoryPath" },
-        "recipes": { "$ref": "#/$defs/repositoryPath" },
-        "generated": { "$ref": "#/$defs/repositoryPath" }
+        "recipes": { "$ref": "#/$defs/repositoryPath" }
       }
     },
     "profiles": {
@@ -90,12 +88,6 @@
         "taskMaxDocuments": { "type": "integer", "minimum": 1 },
         "taskMaxWords": { "type": "integer", "minimum": 1 }
       }
-    },
-    "generatedFiles": {
-      "type": "array",
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": { "$ref": "#/$defs/repositoryPath" }
     }
   },
   "$defs": {
@@ -136,4 +128,3 @@
     }
   }
 }
-
