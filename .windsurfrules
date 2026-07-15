@@ -1,1 +1,1 @@
-Treat `AGENTS.md` as the canonical agent contract. Select task documents from `standards.manifest.json`, then read only the active profile documents and enabled recipes.
+Treat `AGENTS.md` as the canonical agent protocol. Select task summaries from `standards.manifest.json`, then read full task documents and enabled extensions when required.

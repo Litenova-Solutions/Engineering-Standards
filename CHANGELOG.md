@@ -6,13 +6,17 @@ All notable changes to Litenova Engineering Standards are recorded here.
 
 ### Added
 
-- Compact single-Application architecture profile.
-- Marten and PostgreSQL default persistence.
-- Machine-readable consumer and recipe contracts.
-- One-file ADDD use-case specifications with acceptance-criterion traceability.
-- Small ADDD document templates.
+- Human-first documentation index, mental model, terminology, and worked ADDD example.
+- Task-sized repository, backend, frontend, testing, security, and operations conventions.
+- Exact monorepo, solution, folder, naming, dependency, configuration, API, and test layouts.
+- Compact single-Application architecture profile with Marten and PostgreSQL persistence.
+- Single ADDD use-case specifications with risk flags and acceptance-criterion traceability.
+- Conditional extension standards and small consumer document templates.
 
 ### Changed
 
 - Rebuilt the unused preliminary v1 baseline before its first GitHub Release.
 - Made the repository documentation-first by removing the standards CLI, generated catalogs, automation scripts, and full application scaffold.
+- Renamed recipes to extensions and merged activation metadata into readable Markdown.
+- Reduced JSON schemas to the manifest and consumer configuration contracts that have direct schema consumers.
+- Replaced broad profile documents with fine-grained task navigation and agent summaries.
