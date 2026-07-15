@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../schemas/recipe.schema.json",
+  "id": "realtime",
+  "version": "1.0.0",
+  "entry": "docs/recipes/realtime/README.md",
+  "triggers": [
+    "The user must receive server changes without polling within a documented latency target."
+  ],
+  "replaces": [],
+  "packages": { "nuget": [], "npm": [] },
+  "projects": [],
+  "compatibleWith": ["outbox-worker", "frontend-authjs"],
+  "incompatibleWith": [],
+  "gates": [
+    "Test authorization for connection and subscription.",
+    "Test reconnect and missed-event recovery."
+  ]
+}
+

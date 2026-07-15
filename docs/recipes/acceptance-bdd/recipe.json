@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../schemas/recipe.schema.json",
+  "id": "acceptance-bdd",
+  "version": "1.0.0",
+  "entry": "docs/recipes/acceptance-bdd/README.md",
+  "triggers": [
+    "A critical cross-layer journey benefits from stakeholder-readable executable examples."
+  ],
+  "replaces": [],
+  "packages": {
+    "nuget": ["Reqnroll", "Reqnroll.xUnit"],
+    "npm": []
+  },
+  "projects": ["{ProjectName}.Acceptance.Tests"],
+  "compatibleWith": ["persistence-ef-core", "outbox-worker", "external-integrations"],
+  "incompatibleWith": [],
+  "gates": [
+    "Run critical scenarios on every pull request.",
+    "Run the complete acceptance project for domain and API changes."
+  ]
+}
+

@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../schemas/recipe.schema.json",
+  "id": "frontend-authjs",
+  "version": "1.0.0",
+  "entry": "docs/recipes/frontend-authjs/README.md",
+  "triggers": [
+    "A Next.js application owns browser login and session handling for an OIDC provider."
+  ],
+  "replaces": [],
+  "packages": {
+    "nuget": [],
+    "npm": ["next-auth", "jose"]
+  },
+  "projects": [],
+  "compatibleWith": ["acceptance-bdd", "localization"],
+  "incompatibleWith": [],
+  "gates": [
+    "Test login, logout, expiration, and forbidden access.",
+    "Verify no provider token reaches browser JavaScript unless explicitly required."
+  ]
+}
+

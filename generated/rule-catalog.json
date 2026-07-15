@@ -392,6 +392,366 @@
       "line": 39
     },
     {
+      "id": "RECIPE.AUTHJS.ADOPT.001",
+      "title": "Keep provider behavior in the recipe",
+      "path": "docs/recipes/frontend-authjs/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.AUTHJS.API.001",
+      "title": "Call protected APIs through a server boundary",
+      "path": "docs/recipes/frontend-authjs/README.md",
+      "line": 20
+    },
+    {
+      "id": "RECIPE.AUTHJS.FAILURE.001",
+      "title": "Handle session failure explicitly",
+      "path": "docs/recipes/frontend-authjs/README.md",
+      "line": 24
+    },
+    {
+      "id": "RECIPE.AUTHJS.GATES.001",
+      "title": "Test the complete session lifecycle",
+      "path": "docs/recipes/frontend-authjs/README.md",
+      "line": 28
+    },
+    {
+      "id": "RECIPE.AUTHJS.SESSION.001",
+      "title": "Keep session processing server-side",
+      "path": "docs/recipes/frontend-authjs/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.BDD.ADOPT.001",
+      "title": "Use BDD for critical shared examples",
+      "path": "docs/recipes/acceptance-bdd/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.BDD.BOUNDARY.001",
+      "title": "Test through public behavior",
+      "path": "docs/recipes/acceptance-bdd/README.md",
+      "line": 20
+    },
+    {
+      "id": "RECIPE.BDD.GATES.001",
+      "title": "Split critical and complete runs",
+      "path": "docs/recipes/acceptance-bdd/README.md",
+      "line": 28
+    },
+    {
+      "id": "RECIPE.BDD.STATE.001",
+      "title": "Isolate scenario state",
+      "path": "docs/recipes/acceptance-bdd/README.md",
+      "line": 24
+    },
+    {
+      "id": "RECIPE.BDD.TRACE.001",
+      "title": "Tag scenarios with acceptance IDs",
+      "path": "docs/recipes/acceptance-bdd/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.CACHE.ADOPT.001",
+      "title": "Require measured need",
+      "path": "docs/recipes/caching/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.CACHE.FAILURE.001",
+      "title": "Keep cache failure non-destructive",
+      "path": "docs/recipes/caching/README.md",
+      "line": 24
+    },
+    {
+      "id": "RECIPE.CACHE.GATES.001",
+      "title": "Prove correctness under staleness",
+      "path": "docs/recipes/caching/README.md",
+      "line": 28
+    },
+    {
+      "id": "RECIPE.CACHE.INVALIDATE.001",
+      "title": "Define invalidation before implementation",
+      "path": "docs/recipes/caching/README.md",
+      "line": 20
+    },
+    {
+      "id": "RECIPE.CACHE.KEY.001",
+      "title": "Version cache keys",
+      "path": "docs/recipes/caching/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.CONCURRENCY.ADOPT.001",
+      "title": "Name the protected invariant",
+      "path": "docs/recipes/concurrency-idempotency/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.CONCURRENCY.GATES.001",
+      "title": "Test real conflicts and retries",
+      "path": "docs/recipes/concurrency-idempotency/README.md",
+      "line": 30
+    },
+    {
+      "id": "RECIPE.CONCURRENCY.VERSION.001",
+      "title": "Return conflicts explicitly",
+      "path": "docs/recipes/concurrency-idempotency/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.CONTAINERS.CONFIG.001",
+      "title": "Inject runtime configuration",
+      "path": "docs/recipes/deployment-containers/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.CONTAINERS.IMAGE.001",
+      "title": "Build immutable non-root images",
+      "path": "docs/recipes/deployment-containers/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.CONTAINERS.ROLLBACK.001",
+      "title": "Retain the previous artifact",
+      "path": "docs/recipes/deployment-containers/README.md",
+      "line": 28
+    },
+    {
+      "id": "RECIPE.CONTAINERS.SCHEMA.001",
+      "title": "Run schema work as a release job",
+      "path": "docs/recipes/deployment-containers/README.md",
+      "line": 20
+    },
+    {
+      "id": "RECIPE.CONTAINERS.TRAFFIC.001",
+      "title": "Gate traffic on readiness",
+      "path": "docs/recipes/deployment-containers/README.md",
+      "line": 24
+    },
+    {
+      "id": "RECIPE.EFCORE.ADOPT.001",
+      "title": "Record the persistence replacement",
+      "path": "docs/recipes/persistence-ef-core/README.md",
+      "line": 14
+    },
+    {
+      "id": "RECIPE.EFCORE.BOUNDARY.001",
+      "title": "Keep writes behind repositories",
+      "path": "docs/recipes/persistence-ef-core/README.md",
+      "line": 18
+    },
+    {
+      "id": "RECIPE.EFCORE.COMMIT.001",
+      "title": "Commit through the LiteBus pipeline",
+      "path": "docs/recipes/persistence-ef-core/README.md",
+      "line": 24
+    },
+    {
+      "id": "RECIPE.EFCORE.GATES.001",
+      "title": "Test the replacement fixture",
+      "path": "docs/recipes/persistence-ef-core/README.md",
+      "line": 32
+    },
+    {
+      "id": "RECIPE.EFCORE.MIGRATIONS.001",
+      "title": "Treat migrations as reviewed artifacts",
+      "path": "docs/recipes/persistence-ef-core/README.md",
+      "line": 28
+    },
+    {
+      "id": "RECIPE.EXTERNAL.CLIENT.001",
+      "title": "Use configured typed clients",
+      "path": "docs/recipes/external-integrations/README.md",
+      "line": 18
+    },
+    {
+      "id": "RECIPE.EXTERNAL.FAILURE.001",
+      "title": "Translate provider failures",
+      "path": "docs/recipes/external-integrations/README.md",
+      "line": 26
+    },
+    {
+      "id": "RECIPE.EXTERNAL.PORT.001",
+      "title": "Define an Application capability port",
+      "path": "docs/recipes/external-integrations/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.EXTERNAL.RETRY.001",
+      "title": "Retry only safe operations",
+      "path": "docs/recipes/external-integrations/README.md",
+      "line": 22
+    },
+    {
+      "id": "RECIPE.EXTERNAL.TEST.001",
+      "title": "Simulate the network boundary",
+      "path": "docs/recipes/external-integrations/README.md",
+      "line": 30
+    },
+    {
+      "id": "RECIPE.IDEMPOTENCY.KEY.001",
+      "title": "Scope idempotency keys",
+      "path": "docs/recipes/concurrency-idempotency/README.md",
+      "line": 20
+    },
+    {
+      "id": "RECIPE.IDEMPOTENCY.REPLAY.001",
+      "title": "Replay the completed result",
+      "path": "docs/recipes/concurrency-idempotency/README.md",
+      "line": 26
+    },
+    {
+      "id": "RECIPE.LOCALE.ADOPT.001",
+      "title": "Define supported locales",
+      "path": "docs/recipes/localization/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.LOCALE.FORMAT.001",
+      "title": "Format by active locale",
+      "path": "docs/recipes/localization/README.md",
+      "line": 24
+    },
+    {
+      "id": "RECIPE.LOCALE.GATES.001",
+      "title": "Test fallback and critical journeys",
+      "path": "docs/recipes/localization/README.md",
+      "line": 28
+    },
+    {
+      "id": "RECIPE.LOCALE.MESSAGES.001",
+      "title": "Keep message keys stable",
+      "path": "docs/recipes/localization/README.md",
+      "line": 20
+    },
+    {
+      "id": "RECIPE.LOCALE.ROUTES.001",
+      "title": "Keep locale routing canonical",
+      "path": "docs/recipes/localization/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.OUTBOX.ADOPT.001",
+      "title": "Use outbox for durable delivery",
+      "path": "docs/recipes/outbox-worker/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.OUTBOX.ATOMIC.001",
+      "title": "Store events with the business change",
+      "path": "docs/recipes/outbox-worker/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.OUTBOX.IDEMPOTENCY.001",
+      "title": "Accept duplicate delivery",
+      "path": "docs/recipes/outbox-worker/README.md",
+      "line": 26
+    },
+    {
+      "id": "RECIPE.OUTBOX.OPERATIONS.001",
+      "title": "Expose backlog state",
+      "path": "docs/recipes/outbox-worker/README.md",
+      "line": 30
+    },
+    {
+      "id": "RECIPE.OUTBOX.WORKER.001",
+      "title": "Dispatch from a separate Worker",
+      "path": "docs/recipes/outbox-worker/README.md",
+      "line": 22
+    },
+    {
+      "id": "RECIPE.REALTIME.ADOPT.001",
+      "title": "Record latency and polling limits",
+      "path": "docs/recipes/realtime/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.REALTIME.AUTH.001",
+      "title": "Authorize subscriptions",
+      "path": "docs/recipes/realtime/README.md",
+      "line": 20
+    },
+    {
+      "id": "RECIPE.REALTIME.GATES.001",
+      "title": "Test connection lifecycle",
+      "path": "docs/recipes/realtime/README.md",
+      "line": 28
+    },
+    {
+      "id": "RECIPE.REALTIME.RECOVERY.001",
+      "title": "Recover after disconnect",
+      "path": "docs/recipes/realtime/README.md",
+      "line": 24
+    },
+    {
+      "id": "RECIPE.REALTIME.TRANSPORT.001",
+      "title": "Select transport by interaction",
+      "path": "docs/recipes/realtime/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.REPORT.ADOPT.001",
+      "title": "Separate reporting after a real query requires it",
+      "path": "docs/recipes/reporting/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.REPORT.AUTHZ.001",
+      "title": "Apply the same data authorization",
+      "path": "docs/recipes/reporting/README.md",
+      "line": 20
+    },
+    {
+      "id": "RECIPE.REPORT.EXPORT.001",
+      "title": "Move long work outside the request",
+      "path": "docs/recipes/reporting/README.md",
+      "line": 24
+    },
+    {
+      "id": "RECIPE.REPORT.GATES.001",
+      "title": "Test cost and cancellation",
+      "path": "docs/recipes/reporting/README.md",
+      "line": 28
+    },
+    {
+      "id": "RECIPE.REPORT.SQL.001",
+      "title": "Keep SQL parameterized and reviewed",
+      "path": "docs/recipes/reporting/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.TENANCY.ADOPT.001",
+      "title": "Treat tenancy as a data boundary",
+      "path": "docs/recipes/multitenancy/README.md",
+      "line": 12
+    },
+    {
+      "id": "RECIPE.TENANCY.AUTHZ.001",
+      "title": "Verify membership and resource tenant",
+      "path": "docs/recipes/multitenancy/README.md",
+      "line": 24
+    },
+    {
+      "id": "RECIPE.TENANCY.GATES.001",
+      "title": "Test isolation as a negative case",
+      "path": "docs/recipes/multitenancy/README.md",
+      "line": 28
+    },
+    {
+      "id": "RECIPE.TENANCY.RESOLVE.001",
+      "title": "Resolve tenant from trusted context",
+      "path": "docs/recipes/multitenancy/README.md",
+      "line": 16
+    },
+    {
+      "id": "RECIPE.TENANCY.STORAGE.001",
+      "title": "Apply tenant scope in persistence",
+      "path": "docs/recipes/multitenancy/README.md",
+      "line": 20
+    },
+    {
       "id": "SECURITY.ACTOR.001",
       "title": "Trust claims for authenticated identity",
       "path": "docs/profile/dotnet-nextjs/security.md",

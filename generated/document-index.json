@@ -237,6 +237,363 @@
         "TEST.PROJECTS.001",
         "TEST.TRACE.001"
       ]
+    },
+    {
+      "id": "recipe.acceptance-bdd",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "testing",
+        "use-case.authoring"
+      ],
+      "recipes": [
+        "acceptance-bdd"
+      ],
+      "path": "docs/recipes/acceptance-bdd/README.md",
+      "wordCount": 177,
+      "rules": [
+        "RECIPE.BDD.ADOPT.001",
+        "RECIPE.BDD.BOUNDARY.001",
+        "RECIPE.BDD.GATES.001",
+        "RECIPE.BDD.STATE.001",
+        "RECIPE.BDD.TRACE.001"
+      ]
+    },
+    {
+      "id": "recipe.caching",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "backend.application",
+        "frontend.app",
+        "delivery"
+      ],
+      "recipes": [
+        "caching"
+      ],
+      "path": "docs/recipes/caching/README.md",
+      "wordCount": 153,
+      "rules": [
+        "RECIPE.CACHE.ADOPT.001",
+        "RECIPE.CACHE.FAILURE.001",
+        "RECIPE.CACHE.GATES.001",
+        "RECIPE.CACHE.INVALIDATE.001",
+        "RECIPE.CACHE.KEY.001"
+      ]
+    },
+    {
+      "id": "recipe.concurrency-idempotency",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "backend.application",
+        "backend.infrastructure",
+        "backend.api"
+      ],
+      "recipes": [
+        "concurrency-idempotency"
+      ],
+      "path": "docs/recipes/concurrency-idempotency/README.md",
+      "wordCount": 177,
+      "rules": [
+        "RECIPE.CONCURRENCY.ADOPT.001",
+        "RECIPE.CONCURRENCY.GATES.001",
+        "RECIPE.CONCURRENCY.VERSION.001",
+        "RECIPE.IDEMPOTENCY.KEY.001",
+        "RECIPE.IDEMPOTENCY.REPLAY.001"
+      ]
+    },
+    {
+      "id": "recipe.deployment-containers",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "delivery",
+        "security.review"
+      ],
+      "recipes": [
+        "deployment-containers"
+      ],
+      "path": "docs/recipes/deployment-containers/README.md",
+      "wordCount": 155,
+      "rules": [
+        "RECIPE.CONTAINERS.CONFIG.001",
+        "RECIPE.CONTAINERS.IMAGE.001",
+        "RECIPE.CONTAINERS.ROLLBACK.001",
+        "RECIPE.CONTAINERS.SCHEMA.001",
+        "RECIPE.CONTAINERS.TRAFFIC.001"
+      ]
+    },
+    {
+      "id": "recipe.external-integrations",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "backend.application",
+        "backend.infrastructure",
+        "testing"
+      ],
+      "recipes": [
+        "external-integrations"
+      ],
+      "path": "docs/recipes/external-integrations/README.md",
+      "wordCount": 157,
+      "rules": [
+        "RECIPE.EXTERNAL.CLIENT.001",
+        "RECIPE.EXTERNAL.FAILURE.001",
+        "RECIPE.EXTERNAL.PORT.001",
+        "RECIPE.EXTERNAL.RETRY.001",
+        "RECIPE.EXTERNAL.TEST.001"
+      ]
+    },
+    {
+      "id": "recipe.frontend-authjs",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "frontend.app",
+        "security.review"
+      ],
+      "recipes": [
+        "frontend-authjs"
+      ],
+      "path": "docs/recipes/frontend-authjs/README.md",
+      "wordCount": 157,
+      "rules": [
+        "RECIPE.AUTHJS.ADOPT.001",
+        "RECIPE.AUTHJS.API.001",
+        "RECIPE.AUTHJS.FAILURE.001",
+        "RECIPE.AUTHJS.GATES.001",
+        "RECIPE.AUTHJS.SESSION.001"
+      ]
+    },
+    {
+      "id": "recipe.localization",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "frontend.app",
+        "testing"
+      ],
+      "recipes": [
+        "localization"
+      ],
+      "path": "docs/recipes/localization/README.md",
+      "wordCount": 148,
+      "rules": [
+        "RECIPE.LOCALE.ADOPT.001",
+        "RECIPE.LOCALE.FORMAT.001",
+        "RECIPE.LOCALE.GATES.001",
+        "RECIPE.LOCALE.MESSAGES.001",
+        "RECIPE.LOCALE.ROUTES.001"
+      ]
+    },
+    {
+      "id": "recipe.multitenancy",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "backend.application",
+        "backend.infrastructure",
+        "security.review"
+      ],
+      "recipes": [
+        "multitenancy"
+      ],
+      "path": "docs/recipes/multitenancy/README.md",
+      "wordCount": 175,
+      "rules": [
+        "RECIPE.TENANCY.ADOPT.001",
+        "RECIPE.TENANCY.AUTHZ.001",
+        "RECIPE.TENANCY.GATES.001",
+        "RECIPE.TENANCY.RESOLVE.001",
+        "RECIPE.TENANCY.STORAGE.001"
+      ]
+    },
+    {
+      "id": "recipe.outbox-worker",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "backend.infrastructure",
+        "delivery"
+      ],
+      "recipes": [
+        "outbox-worker"
+      ],
+      "path": "docs/recipes/outbox-worker/README.md",
+      "wordCount": 182,
+      "rules": [
+        "RECIPE.OUTBOX.ADOPT.001",
+        "RECIPE.OUTBOX.ATOMIC.001",
+        "RECIPE.OUTBOX.IDEMPOTENCY.001",
+        "RECIPE.OUTBOX.OPERATIONS.001",
+        "RECIPE.OUTBOX.WORKER.001"
+      ]
+    },
+    {
+      "id": "recipe.persistence-ef-core",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "backend.application",
+        "backend.infrastructure"
+      ],
+      "recipes": [
+        "persistence-ef-core"
+      ],
+      "path": "docs/recipes/persistence-ef-core/README.md",
+      "wordCount": 226,
+      "rules": [
+        "RECIPE.EFCORE.ADOPT.001",
+        "RECIPE.EFCORE.BOUNDARY.001",
+        "RECIPE.EFCORE.COMMIT.001",
+        "RECIPE.EFCORE.GATES.001",
+        "RECIPE.EFCORE.MIGRATIONS.001"
+      ]
+    },
+    {
+      "id": "recipe.realtime",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "backend.api",
+        "frontend.app",
+        "delivery"
+      ],
+      "recipes": [
+        "realtime"
+      ],
+      "path": "docs/recipes/realtime/README.md",
+      "wordCount": 143,
+      "rules": [
+        "RECIPE.REALTIME.ADOPT.001",
+        "RECIPE.REALTIME.AUTH.001",
+        "RECIPE.REALTIME.GATES.001",
+        "RECIPE.REALTIME.RECOVERY.001",
+        "RECIPE.REALTIME.TRANSPORT.001"
+      ]
+    },
+    {
+      "id": "recipe.reporting",
+      "kind": "recipe",
+      "normative": true,
+      "appliesTo": [
+        "backend.application",
+        "backend.infrastructure",
+        "delivery"
+      ],
+      "recipes": [
+        "reporting"
+      ],
+      "path": "docs/recipes/reporting/README.md",
+      "wordCount": 164,
+      "rules": [
+        "RECIPE.REPORT.ADOPT.001",
+        "RECIPE.REPORT.AUTHZ.001",
+        "RECIPE.REPORT.EXPORT.001",
+        "RECIPE.REPORT.GATES.001",
+        "RECIPE.REPORT.SQL.001"
+      ]
+    },
+    {
+      "id": "reference.decisions.index",
+      "kind": "reference",
+      "normative": false,
+      "appliesTo": [
+        "all"
+      ],
+      "recipes": [],
+      "path": "docs/reference/decisions/README.md",
+      "wordCount": 67,
+      "rules": []
+    },
+    {
+      "id": "reference.decision.compact-application-assembly",
+      "kind": "reference",
+      "normative": false,
+      "appliesTo": [
+        "backend.application"
+      ],
+      "recipes": [],
+      "path": "docs/reference/decisions/compact-application-assembly.md",
+      "wordCount": 127,
+      "rules": []
+    },
+    {
+      "id": "reference.decision.litebus-commit-pipeline",
+      "kind": "reference",
+      "normative": false,
+      "appliesTo": [
+        "backend.application",
+        "backend.infrastructure"
+      ],
+      "recipes": [],
+      "path": "docs/reference/decisions/litebus-commit-pipeline.md",
+      "wordCount": 94,
+      "rules": []
+    },
+    {
+      "id": "reference.decision.marten-default-persistence",
+      "kind": "reference",
+      "normative": false,
+      "appliesTo": [
+        "backend.application",
+        "backend.infrastructure"
+      ],
+      "recipes": [],
+      "path": "docs/reference/decisions/marten-default-persistence.md",
+      "wordCount": 96,
+      "rules": []
+    },
+    {
+      "id": "reference.decision.one-file-addd-specification",
+      "kind": "reference",
+      "normative": false,
+      "appliesTo": [
+        "use-case.authoring"
+      ],
+      "recipes": [],
+      "path": "docs/reference/decisions/one-file-addd-specification.md",
+      "wordCount": 89,
+      "rules": []
+    },
+    {
+      "id": "reference.decision.pinned-standards-submodule",
+      "kind": "reference",
+      "normative": false,
+      "appliesTo": [
+        "delivery",
+        "agent"
+      ],
+      "recipes": [],
+      "path": "docs/reference/decisions/pinned-standards-submodule.md",
+      "wordCount": 93,
+      "rules": []
+    },
+    {
+      "id": "reference.glossary",
+      "kind": "reference",
+      "normative": false,
+      "appliesTo": [
+        "all"
+      ],
+      "recipes": [],
+      "path": "docs/reference/glossary.md",
+      "wordCount": 189,
+      "rules": []
+    },
+    {
+      "id": "reference.migration.pre-v1-to-v1",
+      "kind": "reference",
+      "normative": false,
+      "appliesTo": [
+        "delivery"
+      ],
+      "recipes": [],
+      "path": "docs/reference/migrations/pre-v1-to-v1.md",
+      "wordCount": 183,
+      "rules": []
     }
   ]
 }

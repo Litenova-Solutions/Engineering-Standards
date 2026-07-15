@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../schemas/recipe.schema.json",
+  "id": "deployment-containers",
+  "version": "1.0.0",
+  "entry": "docs/recipes/deployment-containers/README.md",
+  "triggers": [
+    "The application deploys as container images to a host or managed container platform."
+  ],
+  "replaces": [],
+  "packages": { "nuget": [], "npm": [] },
+  "projects": [],
+  "compatibleWith": ["outbox-worker", "frontend-authjs", "realtime"],
+  "incompatibleWith": [],
+  "gates": [
+    "Build images from a clean checkout.",
+    "Run schema, readiness, smoke, and rollback checks in a deployment environment."
+  ]
+}
+

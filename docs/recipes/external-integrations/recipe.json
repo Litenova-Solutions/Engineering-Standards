@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../schemas/recipe.schema.json",
+  "id": "external-integrations",
+  "version": "1.0.0",
+  "entry": "docs/recipes/external-integrations/README.md",
+  "triggers": [
+    "A use case calls an external HTTP service, message endpoint, or provider API."
+  ],
+  "replaces": [],
+  "packages": {
+    "nuget": ["Microsoft.Extensions.Http.Resilience", "WireMock.Net"],
+    "npm": []
+  },
+  "projects": [],
+  "compatibleWith": ["outbox-worker", "acceptance-bdd", "concurrency-idempotency"],
+  "incompatibleWith": [],
+  "gates": [
+    "Test timeout, transient failure, permanent failure, and malformed response behavior.",
+    "Verify retry policy does not duplicate non-idempotent calls."
+  ]
+}
+

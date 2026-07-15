@@ -80,6 +80,17 @@ internal static partial class StandardsValidator
             report.Error("NORMATIVE_RULES", "Normative documents must declare at least one rule heading.", document.RelativePath);
         }
 
+        foreach (var document in repository.Documents)
+        {
+            foreach (var recipe in document.Metadata.Recipes)
+            {
+                if (!repository.Manifest.Recipes.ContainsKey(recipe))
+                {
+                    report.Error("DOCUMENT_RECIPE", $"Document references unknown recipe {recipe}.", document.RelativePath);
+                }
+            }
+        }
+
         var agentsPath = Path.Combine(repository.Root, repository.Manifest.AgentsEntry);
         if (File.Exists(agentsPath))
         {
@@ -128,6 +139,11 @@ internal static partial class StandardsValidator
 
     private static void ValidateRecipes(StandardsRepository repository, ValidationReport report)
     {
+        var knownRules = repository.Documents
+            .SelectMany(document => document.Rules)
+            .Select(rule => rule.Id)
+            .ToHashSet(StringComparer.Ordinal);
+
         foreach (var (id, relativePath) in repository.Manifest.Recipes)
         {
             ValidateExistingPath(repository, relativePath, "RECIPE_PATH", report);
@@ -142,6 +158,38 @@ internal static partial class StandardsValidator
             }
 
             ValidateExistingPath(repository, recipe.Entry, "RECIPE_ENTRY", report);
+            foreach (var replacedRule in recipe.Replaces)
+            {
+                if (!knownRules.Contains(replacedRule))
+                {
+                    report.Error("RECIPE_REPLACEMENT", $"Recipe {id} replaces unknown rule {replacedRule}.", relativePath);
+                }
+            }
+
+            foreach (var package in recipe.Packages.Nuget)
+            {
+                if (!repository.Manifest.Packages.Nuget.ContainsKey(package))
+                {
+                    report.Error("RECIPE_PACKAGE", $"Recipe {id} names unpinned NuGet package {package}.", relativePath);
+                }
+            }
+
+            foreach (var package in recipe.Packages.Npm)
+            {
+                if (!repository.Manifest.Packages.Npm.ContainsKey(package))
+                {
+                    report.Error("RECIPE_PACKAGE", $"Recipe {id} names unpinned npm package {package}.", relativePath);
+                }
+            }
+
+            foreach (var compatible in recipe.CompatibleWith)
+            {
+                if (!repository.Manifest.Recipes.ContainsKey(compatible))
+                {
+                    report.Error("RECIPE_REFERENCE", $"Recipe {id} names unknown compatible recipe {compatible}.", relativePath);
+                }
+            }
+
             foreach (var incompatible in recipe.IncompatibleWith)
             {
                 if (!repository.Manifest.Recipes.ContainsKey(incompatible))

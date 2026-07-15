@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../schemas/recipe.schema.json",
+  "id": "outbox-worker",
+  "version": "1.0.0",
+  "entry": "docs/recipes/outbox-worker/README.md",
+  "triggers": [
+    "An event or external side effect must survive a process crash after the application commit."
+  ],
+  "replaces": ["PERSIST.EVENTS.001", "ARCH.WORKER.001"],
+  "packages": { "nuget": [], "npm": [] },
+  "projects": ["{ProjectName}.Worker"],
+  "compatibleWith": ["persistence-ef-core", "acceptance-bdd", "external-integrations"],
+  "incompatibleWith": [],
+  "gates": [
+    "Verify atomic aggregate and outbox persistence.",
+    "Verify retry and duplicate delivery behavior.",
+    "Verify Worker health and backlog metrics."
+  ]
+}
+
