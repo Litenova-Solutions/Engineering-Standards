@@ -6,20 +6,16 @@
   "additionalProperties": false,
   "required": [
     "id",
-    "version",
     "entry",
     "triggers",
     "replaces",
     "packages",
     "projects",
-    "compatibleWith",
-    "incompatibleWith",
     "gates"
   ],
   "properties": {
     "$schema": { "type": "string" },
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
     "entry": { "$ref": "#/$defs/path" },
     "triggers": { "$ref": "#/$defs/nonEmptyStrings" },
     "replaces": { "$ref": "#/$defs/strings" },
@@ -33,8 +29,6 @@
       }
     },
     "projects": { "$ref": "#/$defs/strings" },
-    "compatibleWith": { "$ref": "#/$defs/strings" },
-    "incompatibleWith": { "$ref": "#/$defs/strings" },
     "gates": { "$ref": "#/$defs/strings" }
   },
   "$defs": {
@@ -56,4 +50,3 @@
     }
   }
 }
-

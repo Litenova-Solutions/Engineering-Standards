@@ -1,7 +1,6 @@
 {
   "$schema": "../../../schemas/recipe.schema.json",
   "id": "caching",
-  "version": "1.0.0",
   "entry": "docs/recipes/caching/README.md",
   "triggers": [
     "Measured latency or load shows repeated reads whose staleness can be bounded."
@@ -9,11 +8,8 @@
   "replaces": [],
   "packages": { "nuget": [], "npm": [] },
   "projects": [],
-  "compatibleWith": ["outbox-worker", "reporting"],
-  "incompatibleWith": [],
   "gates": [
     "Test hit, miss, expiry, and invalidation behavior.",
     "Measure latency and correctness before and after adoption."
   ]
 }
-

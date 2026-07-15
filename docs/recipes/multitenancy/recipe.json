@@ -1,7 +1,6 @@
 {
   "$schema": "../../../schemas/recipe.schema.json",
   "id": "multitenancy",
-  "version": "1.0.0",
   "entry": "docs/recipes/multitenancy/README.md",
   "triggers": [
     "One deployment serves independent customer organizations whose data must be isolated."
@@ -9,11 +8,8 @@
   "replaces": [],
   "packages": { "nuget": [], "npm": [] },
   "projects": [],
-  "compatibleWith": ["outbox-worker", "reporting", "frontend-authjs"],
-  "incompatibleWith": [],
   "gates": [
     "Test cross-tenant reads and writes as denied.",
     "Test background work and diagnostics retain tenant context."
   ]
 }
-

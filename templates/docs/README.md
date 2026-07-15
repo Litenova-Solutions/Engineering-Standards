@@ -5,6 +5,8 @@ These files are optional starting points for consumer documentation. Copy only t
 - `standards.project.json` selects the profile, recipes, paths, and rule overrides.
 - `project-agents.md` is the short consumer agent shim.
 - `product-brief.md` defines the v1 product boundary.
+- `domain-index.md` maps the bounded context, capabilities, and primary journey.
+- `glossary.md` defines shared domain language.
 - `feature.md` defines one business capability.
 - `use-case.md` defines one operation and its acceptance criteria.
 - `page.md` applies only when the page-document trigger in `docs/core/addd.md` applies.

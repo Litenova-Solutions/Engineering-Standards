@@ -214,11 +214,5 @@
         "docs/profile/dotnet-nextjs/operations.md"
       ]
     }
-  },
-  "budgets": {
-    "agentsMaxWords": 1500,
-    "tier1MaxWords": 2500,
-    "taskMaxDocuments": 5,
-    "taskMaxWords": 8000
   }
 }

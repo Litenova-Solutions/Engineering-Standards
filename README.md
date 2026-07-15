@@ -45,10 +45,12 @@ Agents read `standards.project.json`, select the matching `loadPlans` entry in `
 To start consumer documentation, copy only the files needed from [templates/docs](templates/docs/README.md) and replace their placeholders. Agents create application code from the profile and enabled recipes while matching the consumer repository's local patterns.
 
 ```bash
-mkdir -p docs/product
+mkdir -p docs/product docs/domain
 cp standards/templates/docs/standards.project.json standards.project.json
 cp standards/templates/docs/project-agents.md AGENTS.md
 cp standards/templates/docs/product-brief.md docs/product/brief.md
+cp standards/templates/docs/domain-index.md docs/domain/README.md
+cp standards/templates/docs/glossary.md docs/domain/glossary.md
 ```
 
 ## Version policy
@@ -59,9 +61,9 @@ cp standards/templates/docs/product-brief.md docs/product/brief.md
 
 All releases have an annotated Git tag, GitHub Release, changelog entry, and migration note when consumer work is required.
 
-## Reference application
+## Planned reference application
 
-[LitePress](https://github.com/Litenova-Solutions/LitePress) is the conformance application for the default profile.
+[LitePress](https://github.com/Litenova-Solutions/LitePress) will be migrated in separate work after this standards version is reviewed. It is not current conformance evidence for the rebuilt v1.
 
 ## License
 

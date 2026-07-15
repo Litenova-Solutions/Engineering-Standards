@@ -1,7 +1,6 @@
 {
   "$schema": "../../../schemas/recipe.schema.json",
   "id": "reporting",
-  "version": "1.0.0",
   "entry": "docs/recipes/reporting/README.md",
   "triggers": [
     "A read requires joins, aggregates, exports, or execution time outside normal request projections."
@@ -9,11 +8,8 @@
   "replaces": [],
   "packages": { "nuget": [], "npm": [] },
   "projects": [],
-  "compatibleWith": ["caching", "multitenancy", "outbox-worker"],
-  "incompatibleWith": [],
   "gates": [
     "Test SQL against PostgreSQL with representative data volume.",
     "Verify cancellation, authorization, and export limits."
   ]
 }
-

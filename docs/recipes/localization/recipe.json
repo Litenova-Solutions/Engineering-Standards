@@ -1,7 +1,6 @@
 {
   "$schema": "../../../schemas/recipe.schema.json",
   "id": "localization",
-  "version": "1.0.0",
   "entry": "docs/recipes/localization/README.md",
   "triggers": [
     "The product supports more than one user-facing locale."
@@ -9,11 +8,8 @@
   "replaces": [],
   "packages": { "nuget": [], "npm": [] },
   "projects": [],
-  "compatibleWith": ["frontend-authjs"],
-  "incompatibleWith": [],
   "gates": [
     "Verify message catalogs have matching keys.",
     "Test locale routing, fallback, dates, numbers, and critical journeys."
   ]
 }
-

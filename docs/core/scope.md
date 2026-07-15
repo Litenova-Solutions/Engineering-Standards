@@ -41,9 +41,10 @@ For example, a publishing v1 may support author login, draft creation, publicati
 
 Caching, durable messaging, BDD, realtime updates, multi-tenancy, reporting, and provider-specific deployment are inactive until a declared trigger applies and the consumer enables the corresponding recipe.
 
+Enabled recipes compose with the profile and with each other. When two applicable recipes conflict, record the conflict and the selected replacement in a project decision before implementation.
+
 An email that may be retried manually can use post-commit in-process handling. A payment notification that cannot be lost triggers the outbox-worker recipe.
 
 ## Outside v1
 
 The default profile does not govern microservices, multiple bounded contexts, native clients, non-.NET backends, non-Next.js frontends, event sourcing, multi-region active-active deployment, or large data pipelines.
-

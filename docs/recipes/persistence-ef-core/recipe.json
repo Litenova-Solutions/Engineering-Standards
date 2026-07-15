@@ -1,7 +1,6 @@
 {
   "$schema": "../../../schemas/recipe.schema.json",
   "id": "persistence-ef-core",
-  "version": "1.0.0",
   "entry": "docs/recipes/persistence-ef-core/README.md",
   "triggers": [
     "The application requires relational change tracking, relational navigation mapping, or a supported provider that Marten does not cover."
@@ -21,12 +20,9 @@
     "npm": []
   },
   "projects": [],
-  "compatibleWith": ["outbox-worker", "acceptance-bdd", "concurrency-idempotency"],
-  "incompatibleWith": [],
   "gates": [
     "Generate and review every migration.",
     "Run integration tests against PostgreSQL.",
     "Verify migration application and rollback behavior."
   ]
 }
-

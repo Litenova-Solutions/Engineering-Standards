@@ -9,7 +9,7 @@
 ---
 # Preliminary Baseline to v1
 
-The released v1 replaces the unused preliminary `v1.0.0` tag and the later pre-release main branch.
+When released, the rebuilt v1 replaces the unused preliminary `v1.0.0` tag and the later pre-release main branch.
 
 ## Consumer work
 
