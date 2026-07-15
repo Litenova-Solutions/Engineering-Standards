@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Litenova.Standards.Tool/Litenova.Standards.Tool.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Litenova.Standards.Tool.Tests/Litenova.Standards.Tool.Tests.csproj" />
+  </Folder>
+</Solution>
+
