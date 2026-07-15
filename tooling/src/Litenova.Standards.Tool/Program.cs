@@ -16,7 +16,13 @@ internal static class ToolProgram
 
         try
         {
-            var options = CliOptions.Parse(args[1..]);
+            var optionStart = args[0] == "scaffold" ? 2 : 1;
+            if (args[0] == "scaffold" && args.Length < 2)
+            {
+                throw new InvalidOperationException("Missing scaffold target. Use scaffold use-case or scaffold project.");
+            }
+
+            var options = CliOptions.Parse(args[optionStart..]);
             var root = options.Get("root") is { } rootOption
                 ? Path.GetFullPath(rootOption)
                 : StandardsRepository.FindRoot(Directory.GetCurrentDirectory());
@@ -25,9 +31,10 @@ internal static class ToolProgram
             return Task.FromResult(args[0] switch
             {
                 "validate" => Validate(repository, options),
-                "generate" => Generate(repository),
+                "generate" => Generate(repository, options),
                 "check" => Check(repository, options),
                 "context" => Context(repository, options),
+                "scaffold" => Scaffold(repository, args[1], options),
                 _ => UnknownCommand(args[0]),
             });
         }
@@ -41,21 +48,43 @@ internal static class ToolProgram
     private static int Validate(StandardsRepository repository, CliOptions options)
     {
         var report = StandardsValidator.Validate(repository, options.Get("project"));
+        if (options.Get("project") is { } projectPath && File.Exists(projectPath))
+        {
+            Merge(report, ConsumerGenerator.Validate(repository, ConsumerRepository.Load(projectPath)));
+        }
+
         WriteReport(report, options.Has("json"));
         return report.IsValid ? 0 : 1;
     }
 
-    private static int Generate(StandardsRepository repository)
+    private static int Generate(StandardsRepository repository, CliOptions options)
     {
-        var report = StandardsValidator.Validate(repository);
+        var projectPath = options.Get("project");
+        var report = StandardsValidator.Validate(repository, projectPath);
+        ConsumerRepository? consumer = null;
+        if (projectPath is not null && File.Exists(projectPath))
+        {
+            consumer = ConsumerRepository.Load(projectPath);
+            Merge(report, ConsumerGenerator.Validate(repository, consumer));
+        }
+
         if (!report.IsValid)
         {
             WriteReport(report, asJson: false);
             return 1;
         }
 
-        StandardsGenerator.Write(repository);
-        Console.WriteLine($"Generated {StandardsGenerator.Render(repository).Count} files.");
+        if (consumer is null)
+        {
+            StandardsGenerator.Write(repository);
+            Console.WriteLine($"Generated {StandardsGenerator.Render(repository).Count} standards files.");
+        }
+        else
+        {
+            ConsumerGenerator.Write(consumer);
+            Console.WriteLine($"Generated {ConsumerGenerator.Render(consumer).Count} consumer files.");
+        }
+
         return 0;
     }
 
@@ -63,19 +92,14 @@ internal static class ToolProgram
     {
         var validation = StandardsValidator.Validate(repository, options.Get("project"));
         var generated = StandardsGenerator.Check(repository);
-        var combined = new ValidationReport();
-        foreach (var issue in validation.Errors.Concat(generated.Errors))
+        Merge(validation, generated);
+        if (options.Get("project") is { } projectPath && File.Exists(projectPath))
         {
-            combined.Error(issue.Code, issue.Message, issue.Path);
+            Merge(validation, ConsumerGenerator.Check(repository, ConsumerRepository.Load(projectPath)));
         }
 
-        foreach (var issue in validation.Warnings.Concat(generated.Warnings))
-        {
-            combined.Warning(issue.Code, issue.Message, issue.Path);
-        }
-
-        WriteReport(combined, options.Has("json"));
-        return combined.IsValid ? 0 : 1;
+        WriteReport(validation, options.Has("json"));
+        return validation.IsValid ? 0 : 1;
     }
 
     private static int Context(StandardsRepository repository, CliOptions options)
@@ -84,6 +108,38 @@ internal static class ToolProgram
         var result = ContextResolver.Resolve(repository, task, options.Get("project"), options.Get("use-case"));
         Console.Write(JsonSupport.Serialize(result));
         return 0;
+    }
+
+    private static int Scaffold(StandardsRepository repository, string target, CliOptions options)
+    {
+        if (target != "use-case")
+        {
+            throw new InvalidOperationException($"Unknown scaffold target: {target}.");
+        }
+
+        UseCaseScaffolder.Scaffold(
+            repository,
+            options.Require("project"),
+            options.Require("feature"),
+            options.Require("name"),
+            options.Require("kind"),
+            options.Get("actor") ?? "user",
+            options.Get("title"));
+        Console.WriteLine("Created use-case documentation.");
+        return 0;
+    }
+
+    private static void Merge(ValidationReport target, ValidationReport source)
+    {
+        foreach (var issue in source.Errors)
+        {
+            target.Error(issue.Code, issue.Message, issue.Path);
+        }
+
+        foreach (var issue in source.Warnings)
+        {
+            target.Warning(issue.Code, issue.Message, issue.Path);
+        }
     }
 
     private static void WriteReport(ValidationReport report, bool asJson)
@@ -129,9 +185,10 @@ internal static class ToolProgram
         Console.WriteLine();
         Console.WriteLine("Commands:");
         Console.WriteLine("  validate [--root PATH] [--project PATH] [--json]");
-        Console.WriteLine("  generate [--root PATH]");
+        Console.WriteLine("  generate [--root PATH] [--project PATH]");
         Console.WriteLine("  check [--root PATH] [--project PATH] [--json]");
         Console.WriteLine("  context --task NAME [--project PATH] [--use-case ID] [--root PATH]");
+        Console.WriteLine("  scaffold use-case --project PATH --feature SLUG --name SLUG --kind command|query [--actor SLUG] [--title TEXT]");
     }
 }
 
@@ -173,4 +230,3 @@ internal sealed class CliOptions
     public string Require(string name) => Get(name)
         ?? throw new InvalidOperationException($"Missing required option --{name}.");
 }
-

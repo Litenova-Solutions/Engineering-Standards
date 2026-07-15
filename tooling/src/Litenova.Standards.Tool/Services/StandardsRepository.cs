@@ -52,6 +52,12 @@ internal sealed class StandardsRepository
                 return directory.FullName;
             }
 
+            var submoduleRoot = Path.Combine(directory.FullName, "standards");
+            if (File.Exists(Path.Combine(submoduleRoot, "standards.manifest.json")))
+            {
+                return submoduleRoot;
+            }
+
             directory = directory.Parent;
         }
 
@@ -95,4 +101,3 @@ internal sealed class StandardsRepository
         return recipes;
     }
 }
-

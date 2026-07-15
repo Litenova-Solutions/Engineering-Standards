@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/feature-metadata.schema.json",
+  "title": "Litenova ADDD Feature Metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "status"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "kind": { "const": "feature" },
+    "status": { "enum": ["planned", "active", "retired"] }
+  }
+}
+

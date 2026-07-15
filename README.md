@@ -50,6 +50,21 @@ dotnet run --project tooling/src/Litenova.Standards.Tool -- check
 
 Generated files are committed. CI fails when their sources and committed output differ.
 
+From a consumer repository:
+
+```bash
+dotnet run --project standards/tooling/src/Litenova.Standards.Tool -- \
+  scaffold use-case \
+  --project standards.project.json \
+  --feature posts \
+  --name create-post \
+  --kind command \
+  --actor author
+
+dotnet run --project standards/tooling/src/Litenova.Standards.Tool -- \
+  generate --project standards.project.json
+```
+
 ## Version policy
 
 - Patch: clarification or correction that does not make compliant consumers invalid.

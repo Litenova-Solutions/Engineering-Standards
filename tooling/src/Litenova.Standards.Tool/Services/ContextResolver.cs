@@ -21,10 +21,10 @@ internal static class ContextResolver
             project = JsonSupport.ReadRequired<ProjectContract>(Path.GetFullPath(projectPath));
         }
 
-        RepositoryDocument? useCaseDocument = null;
-        if (!string.IsNullOrWhiteSpace(useCase))
+        ConsumerUseCase? useCaseDocument = null;
+        if (!string.IsNullOrWhiteSpace(useCase) && !string.IsNullOrWhiteSpace(projectPath))
         {
-            useCaseDocument = repository.Documents.SingleOrDefault(document =>
+            useCaseDocument = ConsumerRepository.Load(projectPath).UseCases.SingleOrDefault(document =>
                 string.Equals(document.Metadata.Id, useCase, StringComparison.Ordinal));
         }
 
@@ -52,4 +52,3 @@ internal static class ContextResolver
         };
     }
 }
-

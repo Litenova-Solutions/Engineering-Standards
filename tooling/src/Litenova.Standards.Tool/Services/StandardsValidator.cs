@@ -253,6 +253,15 @@ internal static partial class StandardsValidator
             {
                 report.Error("PROJECT_OVERRIDE", $"Override names unknown rule {projectOverride.RuleId}.", projectPath);
             }
+
+            var projectRoot = Path.GetDirectoryName(fullPath)!;
+            var decisionPath = Path.GetFullPath(Path.Combine(
+                projectRoot,
+                projectOverride.Decision.Replace('/', Path.DirectorySeparatorChar)));
+            if (!File.Exists(decisionPath))
+            {
+                report.Error("PROJECT_OVERRIDE", $"Override decision does not exist: {projectOverride.Decision}.", projectPath);
+            }
         }
     }
 

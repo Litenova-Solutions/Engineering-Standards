@@ -8,7 +8,7 @@
   "properties": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*$" },
     "kind": {
-      "enum": ["core", "profile", "recipe", "reference", "template", "use-case", "feature", "page"]
+      "enum": ["core", "profile", "recipe", "reference", "template"]
     },
     "normative": { "type": "boolean" },
     "appliesTo": {

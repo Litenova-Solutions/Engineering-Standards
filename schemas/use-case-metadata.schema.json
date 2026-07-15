@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/use-case-metadata.schema.json",
+  "title": "Litenova ADDD Use Case Metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "status", "actors", "surfaces", "criticality", "recipes"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$" },
+    "kind": { "enum": ["command", "query"] },
+    "status": { "enum": ["planned", "active", "retired"] },
+    "actors": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "surfaces": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "criticality": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "authorization",
+          "money",
+          "sensitive-data",
+          "irreversible",
+          "concurrency",
+          "durable-delivery",
+          "availability"
+        ]
+      }
+    },
+    "recipes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+    }
+  }
+}
+
