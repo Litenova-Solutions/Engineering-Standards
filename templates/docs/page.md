@@ -18,6 +18,8 @@
 - Empty
 - Error
 - Forbidden
+- Not found
+- Pending or disabled interaction
 - Ready
 
 ## Interaction

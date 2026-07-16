@@ -46,6 +46,26 @@ Map API Problem Details into one frontend error shape containing status, stable 
 
 Do not display raw response bodies, exception details, or unknown provider messages.
 
+Normalize the generated API error at the client boundary into this project-owned shape:
+
+```ts
+type ApiFieldError = {
+  field: string
+  code: string
+  message: string
+}
+
+type ApiError = {
+  status: number
+  code: string
+  message: string
+  traceId?: string
+  fieldErrors: ApiFieldError[]
+}
+```
+
+Unknown or malformed responses become a safe `unexpected_error` value. Preserve the trace ID for support, but do not use the safe message as a programmatic discriminator.
+
 ### Assign state to the narrowest owner (STATE.OWNER.001)
 
 Choose state in this order:
@@ -64,6 +84,16 @@ Do not copy server data into a shared client store as the default.
 Form fields and structural validation match the use-case input and OpenAPI contract. Domain invariants remain enforced by the API and Domain even when the browser provides earlier feedback.
 
 The form maps stable field errors to their controls and preserves user input after recoverable failure.
+
+Server Actions return one serializable discriminated result rather than a `Response`, thrown provider value, or generated client object:
+
+```ts
+type ActionResult<T> =
+  | { status: 'succeeded'; data: T }
+  | { status: 'failed'; error: ApiError }
+```
+
+Validate and map `FormData` on the server, then call the operation-specific typed API function. Disable repeat submission while pending. Refresh a route or cache tag only after success. Use `updateTag` inside a Server Action when the next read in that action requires read-your-writes, `revalidatePath` for a route refresh, and `revalidateTag` with the documented cache-life profile for stale-while-revalidate behavior. Client Components do not call these server APIs.
 
 ### Keep secrets out of browser storage (DATA.SECRETS.001)
 
@@ -117,4 +147,5 @@ A posts list reads on the server from the typed API client. Its search and curso
 - Search for direct `process.env` and browser token storage.
 - Inspect each shared store or client cache for a documented requirement.
 - Test form success, field errors, global errors, duplicate submission, and recovery.
+- Test malformed non-Problem-Details responses and trace-ID presentation for support.
 - Test optimistic rollback and reconciliation when optimistic behavior exists.

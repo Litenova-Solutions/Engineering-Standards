@@ -22,9 +22,20 @@ Each endpoint implements `IEndpoint`, maps one route operation, converts transpo
 
 MVC controllers and `ControllerBase` are outside this profile.
 
+The WebApi project owns this contract:
+
+```csharp
+internal interface IEndpoint
+{
+    void MapEndpoint(IEndpointRouteBuilder endpoints);
+}
+```
+
+At startup, WebApi discovers each non-abstract `IEndpoint` implementation in its own assembly, registers it once as an `IEndpoint` singleton, and calls `MapEndpoint` in deterministic type-name order. The discovery code uses framework reflection and dependency injection; it does not require another scanning package. An integration test reads the mapped endpoint data and fails for duplicate HTTP method and route combinations.
+
 ### Keep endpoint dependencies transport-focused (API.BOUNDARY.001)
 
-Endpoint constructors may receive mediators and HTTP-boundary services such as an actor accessor. They cannot receive aggregate repositories, Marten sessions, DbContext, provider SDKs, or broad application services.
+Endpoint route-handler parameters may receive mediators and HTTP-boundary services such as an actor accessor. Endpoint classes have no scoped constructor dependency because routes are mapped from the root application at startup. They cannot receive aggregate repositories, Marten sessions, DbContext, provider SDKs, or broad application services.
 
 Endpoints do not catch known application exceptions. Global exception handling owns error mapping.
 
@@ -50,6 +61,31 @@ Error responses use RFC Problem Details plus:
 
 Do not expose exception messages, stack traces, SQL, provider bodies, or secrets.
 
+The serialized contract is:
+
+```json
+{
+  "type": "https://example.test/problems/validation",
+  "title": "Request validation failed",
+  "status": 400,
+  "detail": "One or more values are invalid.",
+  "instance": "/api/posts",
+  "code": "validation_failed",
+  "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "errors": [
+    {
+      "field": "title",
+      "code": "required",
+      "message": "Title is required."
+    }
+  ]
+}
+```
+
+`type` is a stable absolute URI owned by the consumer. `errors` appears only when field or message validation entries exist. WebApi maps Application member names to their public JSON field names. `traceId` uses the current W3C trace identifier, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
+
+Use ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. Map validation exceptions to 400, missing targets to the operation's 404 policy, forbidden failures to 403 or the declared 404 disclosure policy, conflicts and mapped state rejections to 409, and unexpected exceptions to 500 with code `internal_error`. Cancellation caused by the disconnected request is not reported as an application error. Map known Domain exception types individually.
+
 ### Use consistent status codes (API.STATUS.001)
 
 | Outcome | Status |
@@ -74,15 +110,34 @@ Do not place the authenticated actor ID in the route unless the actor is intenti
 
 ### Bound collection queries (API.PAGING.001)
 
-Every collection endpoint has a documented maximum size and deterministic ordering. Use cursor pagination when data changes frequently or offsets become costly. Use offset pagination only for bounded datasets where its consistency behavior is acceptable.
+Every collection endpoint has deterministic ordering, a default limit of 20, and a maximum limit of 100 unless an accepted use case declares a smaller bound. The baseline request uses `after` as an opaque cursor and `limit` as a positive integer. Fetch one more record than the requested limit to determine whether another page exists.
 
-Return pagination metadata in one documented shape across the API.
+The response uses one shape:
+
+```json
+{
+  "items": [],
+  "page": {
+    "limit": 20,
+    "nextCursor": null,
+    "hasMore": false
+  }
+}
+```
+
+The cursor contains a version and the last stable sort values, including a unique tie-breaker. Treat it as untrusted input and return 400 with code `invalid_cursor` when it is malformed or unsupported. Do not place sensitive values in a readable cursor. An implementation may use an offset for a proven bounded dataset, but the public profile contract remains opaque unless a consumer convention replaces this rule across its API.
 
 ### Treat OpenAPI as a generated contract (API.OPENAPI.001)
 
 Generate OpenAPI during the Release build. Commit the artifact when a frontend or external consumer uses it. Regenerate TypeScript types in the same change and fail CI when committed output differs.
 
 Scalar may expose API documentation in Development. Hosted environments do not expose development tooling by default.
+
+The API source artifact is `apps/api/openapi/{ProjectName}.json`. WebApi references `Microsoft.AspNetCore.OpenApi` and `Microsoft.Extensions.ApiDescription.Server`, enables `OpenApiGenerateDocuments`, sets `OpenApiDocumentsDirectory` to that directory, and passes `--file-name {ProjectName}` through `OpenApiGenerateDocumentsOptions`. Build-time generation must start the entry point without contacting hosted dependencies or running schema changes.
+
+Every operation sets a stable name through `WithName`, which becomes `operationId`, and declares authorization, request, success, and Problem Details response metadata. Use typed results or `Produces` metadata so the generated document contains every documented status. Add explicit summaries and descriptions or enable XML documentation on named handler methods; comments on route lambdas are not contract documentation.
+
+When TypeScript consumes the API, run the pinned `openapi-typescript` executable against the source artifact. A single frontend writes generated types under `apps/{frontend}/lib/api/generated/`; multiple consumers use `packages/api-types/src/`. Run generation from a clean Release build and fail when a second generation changes committed files.
 
 ## Conventions
 
@@ -131,6 +186,8 @@ Use action segments only when the operation does not map cleanly to a resource o
 
 `Program.cs` registers approved modules, middleware order, endpoint discovery, health endpoints, OpenAPI, and host startup. Move coherent registration into layer-owned extension methods without hiding order-sensitive middleware.
 
+Keep the visible middleware order: forwarded headers from explicitly trusted proxies when the deployment boundary requires them, exception handling, transport security, authentication, authorization, endpoint mapping, and health mapping. Map OpenAPI and Scalar only in Development. End `Program.cs` with an empty `public partial class Program` so the integration test host can target the real entry point.
+
 ## Examples
 
 A create endpoint reads the author from claims, maps the title to `CreateDraftCommand`, sends it through `ICommandMediator`, and returns 201 with the new post location. The endpoint never calls `Post.CreateDraft` or `IPostRepository`.
@@ -140,5 +197,7 @@ A create endpoint reads the author from claims, maps the title to `CreateDraftCo
 - Inspect endpoint constructors and bodies for forbidden dependencies and business logic.
 - Compare routes and status codes with use-case specifications and OpenAPI.
 - Test validation, authentication, authorization, missing resources, conflicts, and success through `WebApplicationFactory`.
+- Validate the exact Problem Details and pagination JSON shapes.
 - Regenerate OpenAPI and typed consumers.
+- Generate OpenAPI twice and confirm the second run is clean.
 - Run architecture tests for endpoint boundaries.

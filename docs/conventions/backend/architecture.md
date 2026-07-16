@@ -12,6 +12,7 @@ CQRS separates write and read behavior inside one Application project. Capabilit
 - Point project references inward through Domain and Application.
 - Organize Domain, Application, Infrastructure, and WebApi by the same business capabilities.
 - Keep handlers and validators internal; expose only contracts required across project boundaries.
+- Keep dependency registration in the host and the outer layer that owns each implementation.
 - Add Worker only for a process that must run independently of HTTP requests.
 - Enforce boundaries with project references and architecture tests.
 
@@ -70,6 +71,12 @@ Create `{ProjectName}.Worker` for durable outbox dispatch, queue consumption, or
 
 Architecture.Tests verify project references, forbidden package dependencies, handler visibility, endpoint isolation, capability folder rules, and extension-specific boundaries.
 
+### Compose each process explicitly (ARCH.COMPOSITION.001)
+
+WebApi and Worker are composition roots. A host registers LiteBus from the public Application assembly marker, calls the Infrastructure registration entry point, and registers only its own transport or processing services. Infrastructure registers Marten, repositories, commit behavior, external adapters, and their validated options.
+
+Domain contains no registration code. Application exposes contracts and an assembly marker but does not resolve services or reference a host. Registration methods do not build an intermediate service provider, use a global service locator, or hide order-sensitive middleware.
+
 ## Conventions
 
 ### Use mirrored capability folders
@@ -86,6 +93,15 @@ The folder names identify one business capability even though each layer owns di
 ### Keep composition in hosts
 
 `Program.cs` and host registration modules connect Application abstractions to Infrastructure implementations. Domain and Application do not call service registration.
+
+Use one registration entry point per outer layer:
+
+```text
+InfrastructureServiceRegistration.AddInfrastructure(...)
+WebApiServiceRegistration.AddWebApi(...)
+```
+
+`AddInfrastructure` receives configuration and host environment values needed to bind and validate provider options. `AddWebApi` owns Problem Details, authentication, authorization, endpoint discovery, and OpenAPI. `Program.cs` keeps their call order visible.
 
 ### Use one public assembly marker per scanned project
 
@@ -107,4 +123,5 @@ Publishing a post follows this direction:
 - Confirm folders use business capability names.
 - Confirm handlers, validators, endpoints, and persistence implementations are internal sealed.
 - Confirm commands and queries use their prescribed persistence boundaries.
+- Confirm each deployable has one visible composition root and no intermediate service provider.
 - Run Architecture.Tests.

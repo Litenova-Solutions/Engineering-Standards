@@ -11,6 +11,7 @@ Application coordinates use cases. It translates a command or query into domain 
 - Dispatch writes through `ICommandMediator` and reads through `IQueryMediator`.
 - Keep handlers and validators internal sealed.
 - Validate input structure before handlers and keep business invariants in Domain.
+- Return stable, transport-neutral validation and use-case failures.
 - Write through aggregate repositories and read through `IQuerySession` projections.
 - Define narrow public capability ports for Infrastructure implementations.
 
@@ -41,6 +42,22 @@ Use one Application-owned `ValidationError` model for command and query input er
 LiteBus validators implement `ICommandValidator<TCommand>` or `IQueryValidator<TQuery>` and validate structural input through `ValidateAsync`. They throw the project command or query validation exception containing stable `ValidationError` values.
 
 Validators may reject an empty title, malformed identifier, invalid page size, or missing required field. Domain owns whether the current aggregate state permits the requested behavior.
+
+`ValidationError` has exactly `Field`, `Code`, and `Message`. `Field` names the Application input member and is empty for a message-wide error. `Code` is a stable lower snake-case identifier. `Message` is safe for a caller. Validation exceptions expose a non-empty read-only collection and no HTTP status.
+
+### Model expected use-case failures explicitly (APP.FAILURES.001)
+
+Application defines transport-neutral exceptions for a missing target, forbidden operation, and use-case conflict when the failure is not a Domain invariant. Each exception carries a stable code and a safe message. It does not carry an HTTP result, Problem Details value, provider exception, or stack detail.
+
+WebApi maps each Application and Domain exception type explicitly. Do not derive a public code from a CLR type name or map every `DomainException` to one status without reviewing its meaning.
+
+Use one public abstract `UseCaseException` with a non-empty `Code` and safe exception message, then public sealed `ResourceNotFoundException`, `UseCaseForbiddenException`, and `UseCaseConflictException` subclasses. Public visibility exists only because hosts map the contract. Do not catch these exceptions inside handlers or return them as successful results.
+
+### Enforce target authorization in the use case (APP.AUTHORIZATION.001)
+
+A protected command or query receives the typed actor identity and relevant declared grants from the trusted host boundary. The handler verifies ownership, tenant, role, state, or delegated access using the target data it already loads. Collection queries include the authorized scope in the database predicate.
+
+WebApi may enforce coarse authenticated, role, or scope policies before dispatch. It does not replace target authorization that depends on business data.
 
 ### Keep command handlers narrow (APP.COMMAND.001)
 
@@ -83,6 +100,10 @@ Place a reaction under the capability and triggering event. Name the handler for
       ValidationError.cs
       CommandValidationException.cs
       QueryValidationException.cs
+    Failures/
+      ResourceNotFoundException.cs
+      UseCaseForbiddenException.cs
+      UseCaseConflictException.cs
   Posts/
     CreateDraft/
       CreateDraftCommand.cs
@@ -150,4 +171,6 @@ Use the exact method signatures exposed by the pinned LiteBus package when they 
 - Confirm validators implement the pinned `ValidateAsync` contract.
 - Confirm command handlers do not commit and query handlers do not use repositories.
 - Confirm public ports contain no provider type.
+- Confirm protected messages carry trusted actor context and handlers authorize their targets.
+- Confirm expected failures have stable codes and no HTTP or provider types.
 - Run Application and architecture tests.

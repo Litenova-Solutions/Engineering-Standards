@@ -50,9 +50,27 @@ CI MUST build one immutable artifact, promote that exact artifact through stagin
 
 The default branch MUST require the applicable CI checks, a reviewed pull request, and a clean merge state. Direct pushes and bypassed required checks are FORBIDDEN except for a documented repository recovery action.
 
+### Keep a canonical job graph (CI.JOBS.001)
+
+Consumer CI uses stable jobs with these responsibilities:
+
+| Job | Triggered when | Required work |
+|:---|:---|:---|
+| `docs` | Every pull request | Validate selected JSON contracts, links, anchors, rule references, ASCII prose, and diff whitespace |
+| `backend` | Backend, shared standards, or build configuration changes | Locked restore, Release build, tests without rebuild, coverage artifact, and dependency review |
+| `frontend-{app}` | That frontend or shared TypeScript changes | Frozen install, lint, type check, unit tests, and production build |
+| `contracts` | API source or generated consumer changes | Release OpenAPI generation, typed consumer generation, and clean-diff check |
+| `browser` | A critical journey or its boundary changes | Playwright against the built application and real API dependencies |
+| `schema` | Persistence contracts change | Reviewable Marten schema plan and transformations, or EF migration and SQL |
+| `release` | Versioned release | Immutable artifacts, inventory, deployment evidence, readiness, smoke test, and rollback reference |
+
+Use path filters only to skip a job whose complete input surface is known. Changes to shared configuration, lock files, standards selection, or generators trigger every dependent job.
+
 ## Conventions
 
 Keep one workflow per repository responsibility when a single workflow would obscure ownership. Use stable job names that match the release evidence record. Run containerized integration tests and Playwright in CI rather than pre-commit hooks.
+
+Backend CI restores the solution in locked mode, builds once in Release, then tests with `--no-build`. Frontend CI installs once with the frozen root lockfile and invokes root scripts scoped to the affected application. Contract CI starts from the same source commit as the build and rejects any generated difference. Release jobs consume artifacts produced by required jobs rather than rebuilding source.
 
 ## Examples
 
@@ -61,6 +79,7 @@ A backend-only pull request runs the Release build, test, dependency scan, docum
 ## Verification
 
 - Inspect workflow triggers, required job names, and branch protection settings.
+- Change one shared input for each path-filtered job and confirm the expected job runs.
 - Run the backend and changed-frontend gates from a clean checkout.
 - Regenerate OpenAPI and typed consumers, then check for a clean diff.
 - Review dependency, action, image, SBOM, and schema artifacts.

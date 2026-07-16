@@ -27,11 +27,15 @@ Validate issuer, audience, signature, lifetime, and required claims through OIDC
 
 Do not accept unsigned tokens, decode a token without validation, or trust client-supplied identity headers.
 
+Keep inbound claim mapping disabled so configured claim names remain stable. Require a valid `sub` claim for actor-backed endpoints. Configure the exact scope and role claim names supplied by the selected identity provider; do not search several claim aliases until one matches.
+
 ### Derive the actor from claims (SECURITY.ACTOR.001)
 
 The authenticated actor ID comes from verified claims and is converted to the project's strongly typed ID at the WebApi boundary.
 
 Do not accept the current actor ID from request data.
+
+The current actor accessor exposes the typed subject plus the declared roles and scopes needed by endpoint policies. A protected endpoint fails authentication when the subject is missing or cannot be parsed. Anonymous access does not produce a default or empty actor.
 
 ### Authorize each target resource (SECURITY.AUTHZ.001)
 
@@ -109,7 +113,11 @@ Define Content Security Policy, frame restrictions, content-type protection, ref
 
 ### Use deny-by-default policies
 
-New protected endpoints require an explicit policy or authorization call. Anonymous access is declared intentionally for public routes.
+Set a fallback policy that requires an authenticated user. Public endpoints call `AllowAnonymous` intentionally. Endpoints add named role or scope policies when needed, while handlers retain resource authorization.
+
+### Test the resource authorization matrix
+
+For every protected operation, cover anonymous, invalid token, valid unrelated actor, valid owner, and each privileged grant that changes the outcome. Test both the chosen 403 or 404 disclosure behavior and the collection query predicate. A UI redirect or hidden control is not evidence for this matrix.
 
 ## Examples
 
@@ -118,6 +126,7 @@ New protected endpoints require an explicit policy or authorization call. Anonym
 ## Verification
 
 - Test missing, invalid, expired, and wrongly scoped tokens.
+- Test a missing or malformed subject claim and the configured role and scope claim names.
 - Test resource access by owner, permitted role, unrelated actor, and anonymous caller.
 - Search for actor IDs accepted from request models.
 - Scan logs, traces, generated files, and browser storage for sensitive data.

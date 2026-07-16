@@ -91,6 +91,14 @@ Active acceptance trace, domain negative cases, integration boundaries, security
 
 Generate OpenAPI and downstream API types during the verification flow. Fail when committed generated output differs.
 
+### Use one production-faithful integration harness (BTEST.HARNESS.001)
+
+`Integration.Tests` owns a PostgreSQL container fixture, `ApiFactory`, and `DatabaseReset`. The fixture starts the manifest-pinned PostgreSQL major once for a test collection or assembly and supplies its connection string before the WebApi host builds. `ApiFactory` targets the real `public partial Program`, replaces only external boundaries declared by the test, and retains production Marten, LiteBus, exception, authentication, authorization, and endpoint registration.
+
+Reset every application schema object that can affect behavior, including Marten documents, sequences, outbox records, idempotency records, and scheduled work. Serialize tests that share one database, or give parallel tests isolated databases or schemas. Never depend on test order.
+
+Security integration tests use locally issued JWTs that exercise the configured bearer validation, including issuer, audience, signature, lifetime, subject, scope, and role claims. A test authentication handler may simplify unrelated endpoint cases, but it is not evidence for authentication behavior.
+
 ## Conventions
 
 ### Mirror production capability names
@@ -110,6 +118,7 @@ Generate OpenAPI and downstream API types during the verification flow. Fail whe
     CreateDraftEndpointTests.cs
     GetPostQueryTests.cs
   Support/
+    PostgreSqlContainerFixture.cs
     ApiFactory.cs
     DatabaseReset.cs
 {ProjectName}.Architecture.Tests/
@@ -143,5 +152,7 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 - Confirm test projects and folders match the canonical layout.
 - Confirm Domain tests have no infrastructure dependency.
 - Confirm integration tests use the real database and API host.
+- Confirm the integration fixture uses the pinned PostgreSQL major and disposes its container and host.
+- Confirm shared-database tests cannot run in parallel across reset boundaries.
 - Search active acceptance IDs in test source.
 - Run Release build, all tests, generated-contract comparison, and coverage collection.
