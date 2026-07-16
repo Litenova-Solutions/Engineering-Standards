@@ -68,8 +68,10 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Glossary](reference/glossary.md) defines repository terms.
 - [Decision records](reference/decisions/README.md) explain baseline choices.
 - [Adopt standards v1](guides/adopt-v1.md) gives a greenfield consumer sequence.
+- [V1 release scope](guides/v1-release-scope.md) states the complete baseline, conditional catalog, release contents, and exclusions.
 - [Model a Domain capability](guides/model-domain.md) turns human discovery into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
 - [Runbook template](../templates/docs/runbook.md) gives the required operational record shape.
+- [V2 roadmap](../ROADMAP.md) records evidence-gated candidates after v1 adoption.
 
 Schemas are not part of the human reading path. They validate only `standards.manifest.json` and consumer `standards.project.json` files.

@@ -12,12 +12,15 @@ All notable changes to Litenova Engineering Standards are recorded here.
 - Compact single-Application architecture profile with Marten and PostgreSQL persistence.
 - Single ADDD use-case specifications with risk flags and acceptance-criterion traceability.
 - Conditional extension standards and small consumer document templates.
+- Exact endpoint discovery, Problem Details, pagination, OpenAPI generation, authentication, authorization, integration harness, frontend action, observability, alert, and CI job contracts.
+- V1 release-scope guide, release-evidence template, and evidence-gated v2 roadmap.
 
 ### Changed
 
 - Refreshed the v1 platform and dependency pins from official release metadata, including .NET servicing, PostgreSQL, Marten, LiteBus, Node.js LTS, pnpm, and the selected frontend toolchain.
 - Replaced the Auth.js prerelease pin with the latest compatible stable release.
 - Added locked NuGet restore, JavaScript toolchain pins, and a package-to-project ownership matrix.
+- Expanded durable delivery, concurrency, scheduled jobs, Auth.js, EF Core, BDD, container, and API compatibility safety rules.
 - Rebuilt the unused preliminary v1 baseline before its first GitHub Release.
 - Made the repository documentation-first by removing the standards CLI, generated catalogs, automation scripts, and full application scaffold.
 - Renamed recipes to extensions and merged activation metadata into readable Markdown.

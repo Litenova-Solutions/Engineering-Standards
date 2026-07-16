@@ -40,6 +40,8 @@ For a publishing application:
 
 Read [the ADDD foundation](docs/foundations/addd.md) for the complete method.
 
+Read [V1 Release Scope](docs/guides/v1-release-scope.md) for the complete release boundary and [the v2 roadmap](ROADMAP.md) for later candidates.
+
 ## How to read a standards document
 
 Topic documents use the same structure:
@@ -108,12 +110,13 @@ docs/profile/                 Platform profile composition
 docs/conventions/repository/  Repository layout, naming, dependencies, configuration
 docs/conventions/backend/     Architecture, Domain, Application, persistence, API
 docs/conventions/frontend/    Structure, rendering, components, data, testing
-docs/conventions/quality/     Backend testing, security, operations
+docs/conventions/quality/     Backend testing, security, operations, CI
 docs/extensions/              Conditional standards loaded by activation criteria
 docs/guides/                  Adoption and delivery guidance
 docs/reference/               Glossary and decisions
 schemas/                      JSON contracts for the manifest and consumer configuration
 templates/docs/               Consumer documentation starting points
+ROADMAP.md                    Evidence-gated candidates for v2
 ```
 
 ## Version policy
