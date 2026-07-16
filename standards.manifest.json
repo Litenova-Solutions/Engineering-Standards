@@ -18,6 +18,7 @@
         "docs/conventions/repository/naming.md",
         "docs/conventions/repository/dependencies.md",
         "docs/conventions/repository/configuration.md",
+        "docs/conventions/repository/writing.md",
         "docs/conventions/backend/architecture.md",
         "docs/conventions/backend/domain.md",
         "docs/conventions/backend/application.md",
@@ -30,14 +31,17 @@
         "docs/conventions/frontend/testing.md",
         "docs/conventions/quality/backend-testing.md",
         "docs/conventions/quality/security.md",
-        "docs/conventions/quality/operations.md"
+        "docs/conventions/quality/operations.md",
+        "docs/conventions/quality/ci.md"
       ]
     }
   },
   "extensions": {
     "acceptance-bdd": "docs/extensions/acceptance-bdd.md",
+    "api-compatibility": "docs/extensions/api-compatibility.md",
     "caching": "docs/extensions/caching.md",
     "concurrency-idempotency": "docs/extensions/concurrency-idempotency.md",
+    "data-lifecycle": "docs/extensions/data-lifecycle.md",
     "deployment-containers": "docs/extensions/deployment-containers.md",
     "external-integrations": "docs/extensions/external-integrations.md",
     "frontend-authjs": "docs/extensions/frontend-authjs.md",
@@ -46,7 +50,8 @@
     "outbox-worker": "docs/extensions/outbox-worker.md",
     "persistence-ef-core": "docs/extensions/persistence-ef-core.md",
     "realtime": "docs/extensions/realtime.md",
-    "reporting": "docs/extensions/reporting.md"
+    "reporting": "docs/extensions/reporting.md",
+    "scheduled-jobs": "docs/extensions/scheduled-jobs.md"
   },
   "stack": {
     "dotnet": "10.0.100",
@@ -141,13 +146,20 @@
       "tier1": [
         "docs/conventions/repository/structure.md#agent-summary",
         "docs/conventions/repository/naming.md#agent-summary",
-        "docs/conventions/repository/configuration.md#agent-summary"
+        "docs/conventions/repository/configuration.md#agent-summary",
+        "docs/conventions/repository/writing.md#agent-summary"
       ],
       "tier2": [
         "docs/conventions/repository/structure.md",
         "docs/conventions/repository/naming.md",
-        "docs/conventions/repository/configuration.md"
+        "docs/conventions/repository/configuration.md",
+        "docs/conventions/repository/writing.md"
       ]
+    },
+    "repository.writing": {
+      "tier0": ["AGENTS.md"],
+      "tier1": ["docs/conventions/repository/writing.md#agent-summary"],
+      "tier2": ["docs/conventions/repository/writing.md"]
     },
     "repository.dependencies": {
       "tier0": ["AGENTS.md"],
@@ -316,11 +328,13 @@
       "tier0": ["AGENTS.md"],
       "tier1": [
         "docs/conventions/quality/operations.md#agent-summary",
+        "docs/conventions/quality/ci.md#agent-summary",
         "docs/conventions/repository/configuration.md#agent-summary",
         "docs/foundations/release-standard.md#agent-summary"
       ],
       "tier2": [
         "docs/conventions/quality/operations.md",
+        "docs/conventions/quality/ci.md",
         "docs/conventions/repository/configuration.md",
         "docs/foundations/release-standard.md"
       ]
@@ -330,12 +344,14 @@
       "tier1": [
         "docs/foundations/release-standard.md#agent-summary",
         "docs/conventions/quality/security.md#agent-summary",
-        "docs/conventions/quality/operations.md#agent-summary"
+        "docs/conventions/quality/operations.md#agent-summary",
+        "docs/conventions/quality/ci.md#agent-summary"
       ],
       "tier2": [
         "docs/foundations/release-standard.md",
         "docs/conventions/quality/security.md",
-        "docs/conventions/quality/operations.md"
+        "docs/conventions/quality/operations.md",
+        "docs/conventions/quality/ci.md"
       ]
     }
   }

@@ -37,6 +37,7 @@ An extension or consumer override may replace a baseline choice only when it nam
 - [Naming and code style](../conventions/repository/naming.md)
 - [Dependencies](../conventions/repository/dependencies.md)
 - [Configuration](../conventions/repository/configuration.md)
+- [Repository writing](../conventions/repository/writing.md)
 
 ### Backend
 
@@ -59,6 +60,7 @@ An extension or consumer override may replace a baseline choice only when it nam
 - [Backend testing](../conventions/quality/backend-testing.md)
 - [Security](../conventions/quality/security.md)
 - [Operations](../conventions/quality/operations.md)
+- [Continuous integration](../conventions/quality/ci.md)
 
 ## Conventions
 

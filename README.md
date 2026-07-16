@@ -2,7 +2,7 @@
 
 Open-source engineering standards for Litenova Solutions applications developed by one maintainer with extensive AI assistance.
 
-The repository gives human contributors and AI agents the same architectural boundaries, naming rules, folder conventions, delivery method, and verification expectations. Version 1 targets one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and an optional Next.js frontend.
+The repository gives human contributors and AI agents the same architectural boundaries, naming rules, folder conventions, delivery method, and verification expectations. Version 1 targets one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends.
 
 ## Why this standard exists
 
@@ -110,7 +110,8 @@ docs/conventions/backend/     Architecture, Domain, Application, persistence, AP
 docs/conventions/frontend/    Structure, rendering, components, data, testing
 docs/conventions/quality/     Backend testing, security, operations
 docs/extensions/              Conditional standards loaded by activation criteria
-docs/reference/               Glossary, decisions, and upgrade guides
+docs/guides/                  Adoption and delivery guidance
+docs/reference/               Glossary and decisions
 schemas/                      JSON contracts for the manifest and consumer configuration
 templates/docs/               Consumer documentation starting points
 ```
@@ -121,7 +122,7 @@ templates/docs/               Consumer documentation starting points
 - Minor: additive rule, extension, or capability that does not invalidate compliant consumers.
 - Major: rule or contract change that requires consumer work.
 
-All releases have an annotated Git tag, GitHub Release, changelog entry, and upgrade guide when consumer work is required.
+Future standards releases add an annotated Git tag, GitHub Release, changelog entry, and upgrade guide when consumer work is required.
 
 ## License
 

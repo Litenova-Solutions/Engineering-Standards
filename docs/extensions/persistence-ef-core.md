@@ -8,12 +8,18 @@ This extension replaces Marten persistence for aggregates whose accepted require
 
 Enable `persistence-ef-core` only after a decision records the aggregate scope, relational requirement, migration effect, and reason the Marten baseline does not meet it.
 
-Do not use Marten and EF Core for the same aggregate. This extension replaces:
+Do not use Marten and EF Core for the same aggregate. For EF Core-owned aggregate paths, this extension replaces:
 
+- `DEP.APPLICATION.001` for EF Core-owned query paths
+- `ARCH.CQRS.001` for the baseline `IQuerySession` read boundary on EF Core-owned query paths
 - `PERSIST.WRITE.001`
 - `PERSIST.READ.001`
 - `PERSIST.COMMIT.001`
 - `PERSIST.EVENTS.001`
+- `PERSIST.MAPPING.001`
+- `PERSIST.SERIALIZATION.001`
+- `PERSIST.EVOLUTION.001`
+- `PERSIST.DOCUMENT.001`
 
 When `outbox-worker` is also enabled for an EF Core-owned command, this extension replaces `EXT.OUTBOX.ATOMIC.001` for that command.
 
@@ -23,6 +29,7 @@ When `outbox-worker` is also enabled for an EF Core-owned command, this extensio
 - Give Application one narrow `IApplicationDbContext` query boundary.
 - Use `AsNoTracking` and project query results.
 - Commit once in the provider-specific LiteBus command post-handler.
+- Register only the post-handler for the command's selected write provider.
 - Keep every command and its outbox record on one write provider.
 - Collect domain events from changed aggregates.
 - Generate and review every migration.
@@ -36,7 +43,7 @@ The decision names affected aggregates, data migration, transaction requirements
 
 ### Keep each command on one write provider (EXT.EFCORE.TRANSACTION.001)
 
-Each command stages writes through either Marten-backed repositories or EF Core-backed repositories, never both. The adoption decision names how command ownership selects one provider-specific commit behavior and how an architecture test enforces that selection.
+Each command stages writes through either Marten-backed repositories or EF Core-backed repositories, never both. The adoption decision names how command ownership selects one provider-specific commit behavior and how an architecture test enforces that selection. Register only that provider's post-handler for the command; a Marten post-handler must not commit an EF Core-owned command.
 
 If one accepted invariant requires atomic writes to aggregates assigned to different providers, move those aggregates to one provider or accept a decision that defines and verifies one shared transaction mechanism before implementation. Do not coordinate a local invariant through two independent commits.
 
@@ -46,7 +53,7 @@ Infrastructure repositories use a scoped `DbContext` and stage aggregate changes
 
 ### Query through IApplicationDbContext (EXT.EFCORE.READ.001)
 
-Application owns one public `IApplicationDbContext` exposing the generic set or named query roots required by query handlers. Infrastructure implements it with the application DbContext.
+Application owns one public `IApplicationDbContext` exposing the generic set or named query roots required by EF Core-owned query handlers. Infrastructure implements it with the application DbContext. Marten-owned query paths retain the baseline `IQuerySession` boundary.
 
 Query handlers use `AsNoTracking`, filter before materialization, apply deterministic ordering and limits, and project directly to result records. Do not add one read-store interface per aggregate.
 
@@ -100,7 +107,7 @@ Use `snake_case` through the pinned naming conventions package and verify genera
 
 ## Verification
 
-- Build without Marten packages for replaced aggregate paths.
+- Confirm EF Core-owned commands and queries do not inject Marten sessions or depend on Marten query abstractions. The application may retain Marten packages for unaffected aggregate paths.
 - Apply migrations to PostgreSQL from an empty database and the previous release schema.
 - Run command, query, concurrency, and API integration tests.
 - Confirm each command resolves repositories and commit behavior for one write provider.

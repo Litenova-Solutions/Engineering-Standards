@@ -144,7 +144,7 @@ An `Order` document may contain a `PaymentMethod` collection with `CardPayment` 
 
 Renaming `shippingAddress.postalCode` to `shippingAddress.postcode` uses a mixed-version reader and a reviewed data transformation before the old reader is removed. A CLR property rename without that rollout is not compatible document evolution.
 
-An accepted business rule may cap `Order.Lines` at 200 entries inside the aggregate document. An unbounded status history uses a separate read document or event stream instead of growing the `Order` document indefinitely.
+An accepted business rule may cap `Order.Lines` at 200 entries inside the aggregate document. An unbounded status history uses a separate read document or projection instead of growing the `Order` document indefinitely.
 
 ```csharp
 internal sealed class PostRepository(

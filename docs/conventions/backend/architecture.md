@@ -60,7 +60,7 @@ Aggregates and value objects enforce state transitions and invariants. Command h
 
 ### Separate command and query behavior (ARCH.CQRS.001)
 
-Commands mutate aggregates through repositories. Queries project read results through `IQuerySession`. A query does not load an aggregate for presentation, and a command does not use a read projection to enforce an aggregate invariant.
+Commands mutate aggregates through repositories. Baseline queries project read results through `IQuerySession`; an enabled persistence extension may replace that read boundary for named aggregate paths. A query does not load an aggregate for presentation, and a command does not use a read projection to enforce an aggregate invariant.
 
 ### Add Worker only for an independent process boundary (ARCH.WORKER.001)
 

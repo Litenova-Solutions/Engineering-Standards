@@ -1,0 +1,67 @@
+# Continuous Integration
+
+## Intent
+
+Continuous integration proves that a pull request preserves the selected standards, generated contracts, dependencies, and release artifacts. The workflow keeps slow deployment checks separate from fast local feedback while retaining one required merge gate.
+
+## Agent Summary {#agent-summary}
+
+- Run the required backend and changed-frontend gates on every pull request.
+- Verify OpenAPI and typed consumer freshness when those artifacts are committed.
+- Scan dependencies, actions, images, and release artifacts for known risk.
+- Review Marten schema plans or EF Core migrations as CI artifacts.
+- Promote the exact verified artifact and run a deployed smoke test.
+- Protect the default branch with required checks and review rules.
+
+## Standards
+
+### Run applicable gates on every pull request (CI.GATES.001)
+
+Every pull request MUST run the applicable gates from this table:
+
+| Area | Required gate |
+|:---|:---|
+| Backend | `dotnet build apps/api/{ProjectName}.slnx --configuration Release` |
+| Backend | `dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build` |
+| Frontend | `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm type-check`, `pnpm test`, and `pnpm build` |
+| Browser | Playwright for critical journeys |
+| Documentation | Link, anchor, rule-ID, ASCII, and `git diff --check` scans |
+| Contracts | OpenAPI freshness and typed consumer regeneration when committed |
+
+Skip a gate only when its surface does not exist. Record the reason in the workflow or completion report.
+
+### Keep generated contracts fresh (CI.CONTRACTS.001)
+
+When OpenAPI or generated API types are committed, CI MUST regenerate them from the source and fail when `git diff --exit-code` reports a difference. The check MUST also reject unstable timestamps, machine paths, or ordering changes.
+
+### Review schema artifacts (CI.SCHEMA.001)
+
+A persistence change MUST publish its reviewed artifact in CI. For Marten, the artifact is the schema plan and any document-contract transformation. For EF Core, the artifact is the generated migration and reviewed SQL. CI MUST fail when the source change has no matching artifact or when a destructive operation lacks the required rollout plan.
+
+### Scan dependencies and release artifacts (CI.SUPPLY.001)
+
+CI MUST scan NuGet and npm dependencies, container images when used, and generated release artifacts for known vulnerabilities. GitHub Actions MUST use immutable commit references or a repository-approved pin. A release publishes an SBOM or equivalent dependency inventory with the artifact.
+
+### Promote verified artifacts (CI.RELEASE.001)
+
+CI MUST build one immutable artifact, promote that exact artifact through staging and production, wait for readiness, and run the primary-journey smoke test. Do not rebuild from a mutable branch between environments. Retain the artifact reference and test evidence for rollback.
+
+### Protect the default branch (CI.PROTECTION.001)
+
+The default branch MUST require the applicable CI checks, a reviewed pull request, and a clean merge state. Direct pushes and bypassed required checks are FORBIDDEN except for a documented repository recovery action.
+
+## Conventions
+
+Keep one workflow per repository responsibility when a single workflow would obscure ownership. Use stable job names that match the release evidence record. Run containerized integration tests and Playwright in CI rather than pre-commit hooks.
+
+## Examples
+
+A backend-only pull request runs the Release build, test, dependency scan, documentation scan, and schema checks. A pull request that changes a frontend also runs the frozen pnpm gates and critical browser journeys. A release promotes the same image digest that passed staging.
+
+## Verification
+
+- Inspect workflow triggers, required job names, and branch protection settings.
+- Run the backend and changed-frontend gates from a clean checkout.
+- Regenerate OpenAPI and typed consumers, then check for a clean diff.
+- Review dependency, action, image, SBOM, and schema artifacts.
+- Verify staging-to-production artifact identity and smoke-test evidence.

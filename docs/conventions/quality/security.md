@@ -13,6 +13,10 @@ Security boundaries follow identity, resource ownership, data classification, an
 - Parameterize SQL and keep provider details out of public errors.
 - Keep secrets and sensitive data out of source, browser storage, logs, and traces.
 - Pin dependencies and review supply-chain changes.
+- Bound abuse on public and expensive endpoints.
+- Restrict cross-origin access to declared clients.
+- Record security-relevant audit events and retention.
+- Maintain production secret rotation and recovery procedures.
 - Treat frontend checks as user experience, never backend authorization.
 
 ## Standards
@@ -73,6 +77,26 @@ Do not disable integrity or certificate verification to make an installation suc
 
 Collect, return, log, export, and retain only fields required by the use case. A use case with the `sensitive-data` risk flag documents classification, access, retention, deletion, and audit behavior.
 
+### Bound abuse at exposed endpoints (SECURITY.ABUSE.001)
+
+Public, authentication, webhook, search, upload, and expensive endpoints MUST define a rate or concurrency limit, the limiting key, the response for rejection, and the monitoring owner. Return 429 with a stable error code when a caller exceeds a declared limit. Use a shared store when multiple replicas enforce the limit.
+
+### Restrict cross-origin access (SECURITY.CORS.001)
+
+When a browser client is hosted on another origin, allow only the declared origins, methods, headers, and credential mode. Wildcard origins MUST NOT be combined with credentials. Keep the allowlist in validated configuration and test a rejected origin.
+
+### Record security audit events (SECURITY.AUDIT.001)
+
+Security-relevant actions MUST record the actor, action, target, outcome, timestamp, trace ID, and reason when supplied by the use case. Audit records follow the documented retention and access policy, exclude secrets, and remain available for incident review.
+
+### Rotate production secrets (SECURITY.ROTATION.001)
+
+Every production secret MUST have an owner, rotation interval, storage location, revocation procedure, and recovery test. Rotation MUST support overlap when clients cannot switch at one instant. Secret values MUST NOT appear in the procedure, logs, artifacts, or audit records.
+
+### Enforce supply-chain gates in CI (SECURITY.SUPPLY.002)
+
+CI MUST scan direct and transitive dependencies, pin GitHub Actions to immutable references or an approved repository pin, and publish an SBOM or equivalent inventory for release artifacts. A known high-severity vulnerability requires a documented exception before release.
+
 ## Conventions
 
 ### Use one current actor abstraction
@@ -99,3 +123,4 @@ New protected endpoints require an explicit policy or authorization call. Anonym
 - Scan logs, traces, generated files, and browser storage for sensitive data.
 - Test security headers, rich content, redirects, and public error redaction.
 - Review dependency and lockfile changes.
+- Test rate limits, rejected origins, audit fields, secret rotation, and vulnerability gates when applicable.

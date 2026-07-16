@@ -13,6 +13,7 @@ These files are optional starting points for consumer documentation. Copy only t
 | `use-case.md` | Defines one command or query and its acceptance criteria. |
 | `page.md` | Defines non-trivial page composition when the ADDD page criteria apply. |
 | `decision.md` | Records a standards override or expensive-to-reverse choice. |
+| `runbook.md` | Records an operational trigger, procedure, verification, and recovery path. |
 
 The JSON blocks in capability, use-case, and page documents route agents and record status. Their allowed fields are defined in [ADDD](../../docs/foundations/addd.md), not by a separate schema or CLI.
 

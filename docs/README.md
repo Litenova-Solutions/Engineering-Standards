@@ -26,6 +26,7 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 | [Naming and code style](conventions/repository/naming.md) | Files, C# types, TypeScript files, suffixes, async methods, exceptions, and generic-name restrictions. |
 | [Dependencies](conventions/repository/dependencies.md) | Project references, package ownership, version pins, and package approval. |
 | [Configuration](conventions/repository/configuration.md) | SDK pins, central package files, build properties, environment access, and secrets. |
+| [Repository writing](conventions/repository/writing.md) | ASCII-safe prose, normative language, document structure, and repeatable writing checks. |
 
 ## Backend conventions
 
@@ -34,7 +35,7 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 | [Architecture](conventions/backend/architecture.md) | Four-project modular monolith, dependency direction, capability slices, and Worker activation. |
 | [Domain](conventions/backend/domain.md) | Aggregates, value objects, IDs, events, repositories, exceptions, time, and folders. |
 | [Application](conventions/backend/application.md) | Commands, queries, handlers, validators, results, reactions, ports, and folders. |
-| [Marten persistence](conventions/backend/persistence-marten.md) | Sessions, repositories, queries, commit pipeline, event collection, aliases, and schema changes. |
+| [Marten persistence](conventions/backend/persistence-marten.md) | Sessions, repositories, queries, commit pipeline, event collection, JSON contracts, document evolution, aliases, indexes, and schema changes. |
 | [HTTP API](conventions/backend/api.md) | Minimal API endpoints, routes, transport models, status codes, Problem Details, authorization, and OpenAPI. |
 
 ## Frontend conventions
@@ -54,18 +55,20 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 | [Backend testing](conventions/quality/backend-testing.md) | Test projects, naming, fixtures, PostgreSQL integration, architecture tests, and acceptance trace. |
 | [Security](conventions/quality/security.md) | Authentication, authorization, trust boundaries, secrets, SQL, errors, browser security, and dependencies. |
 | [Operations](conventions/quality/operations.md) | Aspire, diagnostics, health, schema rollout, backup, deployment, rollback, and Worker operation. |
+| [Continuous integration](conventions/quality/ci.md) | Pull request gates, generated contracts, supply-chain scans, schema artifacts, promotion, and branch protection. |
 
 ## Extensions
 
 Extensions are inactive until a current requirement meets their activation criteria and the consumer lists the extension in `standards.project.json`.
 
-Read the [extension index](extensions/README.md) to select conditional standards for authentication, BDD, caching, concurrency, deployment, external services, localization, tenancy, durable delivery, EF Core, realtime behavior, or reporting.
+Read the [extension index](extensions/README.md) to select conditional standards for API compatibility, authentication, BDD, caching, concurrency, data lifecycle, deployment, external services, localization, scheduled jobs, tenancy, durable delivery, EF Core, realtime behavior, or reporting.
 
 ## Reference and templates
 
 - [Glossary](reference/glossary.md) defines repository terms.
 - [Decision records](reference/decisions/README.md) explain baseline choices.
-- [Upgrade guides](reference/upgrade-guides/pre-v1-to-v1.md) describe consumer work across standards versions.
+- [Adopt standards v1](guides/adopt-v1.md) gives a greenfield consumer sequence.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
+- [Runbook template](../templates/docs/runbook.md) gives the required operational record shape.
 
 Schemas are not part of the human reading path. They validate only `standards.manifest.json` and consumer `standards.project.json` files.

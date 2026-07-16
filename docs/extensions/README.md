@@ -11,17 +11,20 @@ An extension may add requirements, packages, projects, and verification. It may 
 | Extension | Activate when |
 |:---|:---|
 | [acceptance-bdd](acceptance-bdd.md) | Shared cross-layer examples need executable BDD scenarios. |
+| [api-compatibility](api-compatibility.md) | Public or independently deployed consumers need breaking-change detection and versioning. |
 | [caching](caching.md) | Measurements show repeated expensive reads with bounded staleness. |
 | [concurrency-idempotency](concurrency-idempotency.md) | Conflicting writes or repeated requests can violate behavior. |
+| [data-lifecycle](data-lifecycle.md) | A use case requires deletion, retention, archival, restore, or legal hold behavior. |
 | [deployment-containers](deployment-containers.md) | The hosted release uses container images. |
 | [external-integrations](external-integrations.md) | A use case calls or receives data from an external system. |
 | [frontend-authjs](frontend-authjs.md) | Next.js owns interactive login and session cookies. |
 | [localization](localization.md) | The product commits to more than one locale. |
 | [multitenancy](multitenancy.md) | Independent customer organizations share one deployment. |
 | [outbox-worker](outbox-worker.md) | A committed change requires delivery that cannot be lost. |
-| [persistence-ef-core](persistence-ef-core.md) | Relational mapping needs replace Marten for selected aggregates. |
+| [persistence-ef-core](persistence-ef-core.md) | Relational persistence requirements replace Marten for selected aggregates. |
 | [realtime](realtime.md) | Polling cannot meet a measured update-latency requirement. |
 | [reporting](reporting.md) | Complex reports or large exports exceed normal request reads. |
+| [scheduled-jobs](scheduled-jobs.md) | A use case requires recurring, delayed, or calendar-based Worker work. |
 
 ## Activation process
 

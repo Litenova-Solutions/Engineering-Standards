@@ -17,7 +17,7 @@ Before requesting review:
 - Confirm extension names match the manifest and consumer template.
 - Validate `standards.manifest.json` and `templates/docs/standards.project.json` against their schemas.
 - Update the changelog.
-- Add an upgrade guide when compliant consumers must change.
+- Add an upgrade guide when an existing compliant consumer must change in a post-v1 release.
 - Update document templates when ADDD metadata or required sections change.
 - Run `git diff --check`.
 
@@ -57,4 +57,4 @@ Accepted decision records are historical. Add a replacement decision and mark th
 
 ## Consumer upgrades
 
-Consumers update the pinned standards commit in a dedicated pull request, read the changelog and applicable upgrade guide, apply required work, and run the complete application gate set.
+For standards releases after v1, consumers update the pinned standards commit in a dedicated pull request, read the changelog and applicable upgrade guide, apply required work, and run the complete application gate set.
