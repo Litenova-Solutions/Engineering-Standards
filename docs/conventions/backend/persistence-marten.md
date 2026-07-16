@@ -13,7 +13,10 @@ One scoped document session and one LiteBus command post-handler own the transac
 - Stage writes in handlers and repositories without committing.
 - Commit once in the global command post-handler.
 - Collect touched-aggregate events before commit and publish best-effort events after commit.
-- Use PostgreSQL `snake_case`, stable document aliases, and explicit indexes.
+- Configure JSON contracts and polymorphism in Infrastructure without Domain attributes.
+- Treat stored JSON shapes, aliases, and discriminators as database contracts.
+- Bound aggregate documents and use explicit indexes for accepted queries.
+- Use PostgreSQL `snake_case` for database identifiers.
 - Apply schema changes outside production request startup.
 
 ## Standards
@@ -52,9 +55,35 @@ A publication failure occurs after the business commit. Activate `outbox-worker`
 
 ### Keep mappings and aliases explicit (PERSIST.MAPPING.001)
 
-Infrastructure owns Marten store configuration. Each stored aggregate declares a stable document alias, typed-ID mapping, indexes required by accepted queries, and serialization behavior for private state.
+Infrastructure owns Marten store configuration. Each stored aggregate declares a stable document alias, typed-ID mapping, and indexes required by accepted queries.
 
 Do not rely on a CLR rename to preserve a document type or collection name.
+
+### Keep serialization behavior out of Domain (PERSIST.SERIALIZATION.001)
+
+Infrastructure owns the JSON contract for stored documents. Configure private-state access, JSON member names, constructors, converters, and polymorphic hierarchies through the `System.Text.Json` contract model or another serializer adapter approved as a dependency.
+
+Register every concrete type that may appear behind a base class or interface property, collection element, or nested value. Use stable string discriminators that do not depend on CLR type names, namespaces, or assembly-qualified names. Reject unknown discriminators instead of materializing incomplete state. Set `AllowOutOfOrderMetadataProperties` for `System.Text.Json` polymorphic documents because PostgreSQL `jsonb` does not preserve property order.
+
+Domain types do not use `JsonInclude`, `JsonDerivedType`, `JsonPolymorphic`, Marten attributes, provider base classes, or other serialization behavior. If Infrastructure configuration cannot round-trip an aggregate without weakening its encapsulation, persist an Infrastructure-owned document type and map it to the Domain aggregate.
+
+### Evolve stored document contracts explicitly (PERSIST.EVOLUTION.001)
+
+Treat JSON member names, required values, enum representation, discriminator property names, and discriminator values as database schema. An additive member defines behavior for documents written before that member existed.
+
+A rename, removal, type change, member move, collection-shape change, or discriminator change requires a reviewed data transformation or an expand-and-contract rollout that reads every shape present during deployment and rollback. Name the transformation order, mixed-version behavior, rollback condition, and representative production volume. Do not assume a Marten schema patch transforms existing document payloads.
+
+Retain old contract readers until no stored document or supported rollback artifact can produce or require the old shape.
+
+### Bound aggregate document growth (PERSIST.DOCUMENT.001)
+
+Store state required by the aggregate's transactional invariants in its document. Do not embed a collection with no accepted business bound. Use one of these patterns when growth does not belong inside the aggregate boundary:
+
+- Another aggregate for an independent consistency boundary.
+- An owned document record committed in the same Marten transaction.
+- A read-side projection for query-shaped history or detail.
+
+For aggregates with nested collections or large values, record representative serialized size and test load and write behavior at that size. When accepted writes can overlap, activate `concurrency-idempotency` and test conflicts with representative document sizes.
 
 ### Use database naming conventions (PERSIST.NAMING.001)
 
@@ -105,7 +134,17 @@ Every query returning more than one item specifies deterministic ordering and a 
 
 Add an index from an accepted query or measured operating need. Record representative data and inspect the PostgreSQL plan for complex or high-volume queries.
 
+### Add read documents for query-shaped data
+
+Query stored aggregate documents directly while accepted reads remain simple. Add a capability-owned read document or projection when a real query needs repeated cross-aggregate composition, deep polymorphic traversal, or an index shape that would distort the aggregate. Define its consistency and rebuild behavior with the use case.
+
 ## Examples
+
+An `Order` document may contain a `PaymentMethod` collection with `CardPayment` and `BankTransfer` values. Infrastructure registers stable `card` and `bank_transfer` discriminators through the JSON contract resolver. The Domain hierarchy carries no JSON attributes.
+
+Renaming `shippingAddress.postalCode` to `shippingAddress.postcode` uses a mixed-version reader and a reviewed data transformation before the old reader is removed. A CLR property rename without that rollout is not compatible document evolution.
+
+An accepted business rule may cap `Order.Lines` at 200 entries inside the aggregate document. An unbounded status history uses a separate read document or event stream instead of growing the `Order` document indefinitely.
 
 ```csharp
 internal sealed class PostRepository(
@@ -130,5 +169,9 @@ internal sealed class PostRepository(
 - Search handlers and repositories for `SaveChangesAsync`.
 - Confirm repositories use the scoped session and track changed aggregates.
 - Confirm queries project results and have deterministic limits and ordering.
-- Confirm aliases and indexes are explicit.
-- Run PostgreSQL integration tests for mappings, queries, commit behavior, and schema application.
+- Confirm aliases, JSON member contracts, discriminators, and indexes are explicit in Infrastructure.
+- Round-trip private state, nested values, collections, and every registered runtime subtype without serialization behavior in Domain.
+- Load stored fixtures from every supported document shape and test each required transformation and rollback reader.
+- Test representative document size and query plans for aggregates with nested collections.
+- When `concurrency-idempotency` is active, test conflicting writes with representative document sizes.
+- Run PostgreSQL integration tests for mappings, queries, commit behavior, document evolution, and schema application.

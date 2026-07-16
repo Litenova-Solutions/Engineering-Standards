@@ -15,12 +15,15 @@ Do not use Marten and EF Core for the same aggregate. This extension replaces:
 - `PERSIST.COMMIT.001`
 - `PERSIST.EVENTS.001`
 
+When `outbox-worker` is also enabled for an EF Core-owned command, this extension replaces `EXT.OUTBOX.ATOMIC.001` for that command.
+
 ## Agent Summary {#agent-summary}
 
 - Keep Domain repository interfaces and Infrastructure implementations.
 - Give Application one narrow `IApplicationDbContext` query boundary.
 - Use `AsNoTracking` and project query results.
-- Commit once in the LiteBus command post-handler.
+- Commit once in the provider-specific LiteBus command post-handler.
+- Keep every command and its outbox record on one write provider.
 - Collect domain events from changed aggregates.
 - Generate and review every migration.
 - Apply migrations as a release step.
@@ -30,6 +33,12 @@ Do not use Marten and EF Core for the same aggregate. This extension replaces:
 ### Record the persistence replacement (EXT.EFCORE.ADOPT.001)
 
 The decision names affected aggregates, data migration, transaction requirements, query impact, package changes, and rollback plan. Unaffected aggregates retain the baseline persistence rules.
+
+### Keep each command on one write provider (EXT.EFCORE.TRANSACTION.001)
+
+Each command stages writes through either Marten-backed repositories or EF Core-backed repositories, never both. The adoption decision names how command ownership selects one provider-specific commit behavior and how an architecture test enforces that selection.
+
+If one accepted invariant requires atomic writes to aggregates assigned to different providers, move those aggregates to one provider or accept a decision that defines and verifies one shared transaction mechanism before implementation. Do not coordinate a local invariant through two independent commits.
 
 ### Keep writes behind repositories (EXT.EFCORE.WRITE.001)
 
@@ -43,7 +52,13 @@ Query handlers use `AsNoTracking`, filter before materialization, apply determin
 
 ### Commit through the LiteBus pipeline (EXT.EFCORE.COMMIT.001)
 
-The global command post-handler calls `SaveChangesAsync` once. It collects domain events from changed aggregates and follows best-effort post-commit publication or the outbox extension.
+For an EF Core-owned command, the provider-specific LiteBus post-handler calls `SaveChangesAsync` once. It collects domain events from changed aggregates and follows best-effort post-commit publication or the outbox extension. It does not commit a Marten session.
+
+### Store an EF Core outbox with EF Core writes (EXT.EFCORE.OUTBOX.001)
+
+When `outbox-worker` is active for an EF Core-owned command, map and stage its outbox records through the same DbContext as the aggregate changes. Commit both through one `SaveChangesAsync` call. The Worker dispatch, idempotency, retry, compatibility, and operating rules from `outbox-worker` remain active.
+
+Do not store an EF Core aggregate change in one transaction and its required outbox record through a Marten session in another transaction.
 
 ### Configure mappings explicitly (EXT.EFCORE.MAPPING.001)
 
@@ -73,6 +88,10 @@ Infrastructure/
 
 Use `snake_case` through the pinned naming conventions package and verify generated names in each migration.
 
+## Examples
+
+`PublishPost` may write a Marten-backed `Post`, while `RecordInvoicePayment` may write an EF Core-backed `Invoice`. One command cannot update both aggregates. When `RecordInvoicePayment` requires durable delivery, its `InvoicePaymentRecorded` outbox record is staged and committed through the invoice DbContext.
+
 ## Dependencies
 
 - `Microsoft.EntityFrameworkCore`
@@ -84,6 +103,8 @@ Use `snake_case` through the pinned naming conventions package and verify genera
 - Build without Marten packages for replaced aggregate paths.
 - Apply migrations to PostgreSQL from an empty database and the previous release schema.
 - Run command, query, concurrency, and API integration tests.
+- Confirm each command resolves repositories and commit behavior for one write provider.
+- When `outbox-worker` is enabled, stop after the EF Core commit and verify the Worker later dispatches the atomically stored record.
 - Review SQL and query plans for accepted queries.
 - Run architecture tests for repository, context, and commit boundaries.
 - Test rollback compatibility or the documented recovery plan.
