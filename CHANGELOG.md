@@ -27,3 +27,4 @@ All notable changes to Litenova Engineering Standards are recorded here.
 - Added API compatibility, scheduled jobs, and data lifecycle extensions.
 - Added runbook and standards-decision metadata templates plus a greenfield v1 adoption guide.
 - Added security controls for abuse limits, CORS, audit events, secret rotation, and CI supply-chain gates.
+- Restored the detailed tactical DDD model with mandatory state records, aggregate roots, typed IDs, value semantics, domain services, event contracts, and ADDD model traceability.

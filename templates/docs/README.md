@@ -9,8 +9,8 @@ These files are optional starting points for consumer documentation. Copy only t
 | `product-brief.md` | Defines the application v1 product boundary. |
 | `domain-index.md` | Maps the bounded context, capabilities, and primary journey. |
 | `glossary.md` | Defines shared domain language. |
-| `capability.md` | Defines one business capability and its use cases. |
-| `use-case.md` | Defines one command or query and its acceptance criteria. |
+| `capability.md` | Defines language, aggregate boundaries, states, transitions, invariants, events, reactions, and use cases. |
+| `use-case.md` | Defines one command or query, its Domain behavior, and its acceptance criteria. |
 | `page.md` | Defines non-trivial page composition when the ADDD page criteria apply. |
 | `decision.md` | Records a standards override or expensive-to-reverse choice. |
 | `runbook.md` | Records an operational trigger, procedure, verification, and recovery path. |

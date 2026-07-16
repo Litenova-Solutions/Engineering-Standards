@@ -131,7 +131,7 @@ internal sealed class CreateDraftHandler(
         var post = Post.CreateDraft(
             PostId.New(),
             command.AuthorId,
-            command.Title,
+            PostTitle.Create(command.Title),
             clock.UtcNow);
 
         postRepository.Store(post);

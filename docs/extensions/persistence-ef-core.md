@@ -71,6 +71,14 @@ Do not store an EF Core aggregate change in one transaction and its required out
 
 Infrastructure owns `IEntityTypeConfiguration<T>` classes. Configure typed IDs, owned values, backing fields, indexes, constraints, precision, delete behavior, concurrency tokens, and database names explicitly.
 
+### Preserve the Domain state hierarchy (EXT.EFCORE.STATE.001)
+
+EF Core persistence retains the Domain aggregate's single `{Aggregate}State` value. Infrastructure maps a stable discriminator and every state-specific value without adding a lifecycle enum, status string, boolean flag, or duplicate nullable state property to Domain.
+
+Use direct owned or JSON mapping only when the pinned EF Core and provider versions can materialize, track, and round-trip every sealed state record. Otherwise, store an Infrastructure-owned persistence type with discriminator and state-specific columns, then map it to and from the Domain state hierarchy inside the repository.
+
+The persistence model may contain relational discriminator columns. Those columns are Infrastructure details and do not become Domain properties. A new state requires a reviewed migration, mixed-version behavior, rollback behavior, and an integration fixture for each stored state.
+
 ### Treat migrations as reviewed artifacts (EXT.EFCORE.MIGRATIONS.001)
 
 Generate a migration for every schema change. Review tables, columns, indexes, constraints, data movement, destructive operations, and rollback compatibility.
@@ -99,6 +107,8 @@ Use `snake_case` through the pinned naming conventions package and verify genera
 
 `PublishPost` may write a Marten-backed `Post`, while `RecordInvoicePayment` may write an EF Core-backed `Invoice`. One command cannot update both aggregates. When `RecordInvoicePayment` requires durable delivery, its `InvoicePaymentRecorded` outbox record is staged and committed through the invoice DbContext.
 
+An EF Core-backed `Post` may use an Infrastructure `PostRow` with `state_type`, `published_at`, and `archived_at` columns. `PostRepository` maps one valid column combination to one `PostState` record. The Domain `Post` still exposes only `PostState` and carries no relational discriminator fields.
+
 ## Dependencies
 
 - `Microsoft.EntityFrameworkCore`
@@ -111,6 +121,7 @@ Use `snake_case` through the pinned naming conventions package and verify genera
 - Apply migrations to PostgreSQL from an empty database and the previous release schema.
 - Run command, query, concurrency, and API integration tests.
 - Confirm each command resolves repositories and commit behavior for one write provider.
+- Round-trip every aggregate state record and reject unknown or invalid discriminator and value combinations.
 - When `outbox-worker` is enabled, stop after the EF Core commit and verify the Worker later dispatches the atomically stored record.
 - Review SQL and query plans for accepted queries.
 - Run architecture tests for repository, context, and commit boundaries.

@@ -35,7 +35,15 @@ State the observable result without exposing internal persistence types.
 
 ## Business rules
 
-- State each invariant or decision that changes the outcome.
+- Cite each capability invariant ID and state any operation-specific decision that changes the outcome.
+
+## Domain behavior
+
+For a command, complete the transition table. For a query, write `No domain transition` and name the read source.
+
+| Aggregate | Source state | Business action | Target state | Invariant IDs | Domain events |
+|:---|:---|:---|:---|:---|:---|
+| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `INV-__CAPABILITY_ID__-01` | `__PAST_TENSE_EVENT__` |
 
 ## Main flow
 
@@ -50,6 +58,12 @@ State the observable result without exposing internal persistence types.
 ## Acceptance criteria
 
 - [AC-__CAPABILITY_ID__-__USE_CASE_ID__-01] Replace with one observable criterion.
+
+## Invariant coverage
+
+| Invariant ID | Acceptance criteria |
+|:---|:---|
+| `INV-__CAPABILITY_ID__-01` | `AC-__CAPABILITY_ID__-__USE_CASE_ID__-01` |
 
 ## Examples
 

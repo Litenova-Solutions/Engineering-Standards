@@ -4,7 +4,9 @@
 
 Agentic Domain-Driven Delivery (ADDD) is Litenova's method for turning product intent into one traceable use case at a time. It gives human contributors and AI agents a durable source for business language, observable behavior, risk, and completion evidence.
 
-ADDD uses a focused set of domain-driven design ideas: one bounded context, shared language, business capabilities, aggregates as consistency boundaries, and use cases expressed in domain terms. It avoids a long modeling phase before the first user journey works.
+ADDD uses a focused set of domain-driven design ideas: one bounded context, shared language, business capabilities, aggregates as consistency boundaries, explicit state models, and use cases expressed in domain terms. It avoids a long modeling phase before the first user journey works.
+
+Human discovery establishes the business concepts and rules. ADDD begins when those findings can be named and recorded. Agents may identify missing definitions, unreferenced transitions, or uncovered invariants; they do not invent domain concepts to complete a template.
 
 ## Why ADDD exists
 
@@ -17,7 +19,7 @@ Each ADDD artifact controls one source of drift:
 | Product brief | Defines the first user, problem, primary journey, success measure, non-goals, operating target, and data classification. |
 | Domain glossary | Gives every contributor one business vocabulary. |
 | Domain index | Acts as the capability map and orders the use cases in the primary journey. |
-| Capability index | Defines capability-specific actors, terms, invariants, and use cases. |
+| Capability index | Defines actors, language, aggregate boundaries, states, transitions, invariants, events, reactions, and use cases. |
 | Use-case specification | Defines one operation, its contract, rules, failures, examples, risk flags, and acceptance criteria. |
 | Page specification | Defines composition only when a route combines behavior or owns non-trivial interaction state. |
 | Decision record | Preserves a costly or standards-changing choice and its reason. |
@@ -56,6 +58,7 @@ If publication must emit a notification that cannot be lost after a commit, the 
 | Capability | lowercase kebab-case | `posts` |
 | Use case | `{capability}.{use-case}` | `posts.create-draft` |
 | Acceptance criterion | `AC-{CAPABILITY}-{USE-CASE}-{NN}` | `AC-POSTS-CREATE-DRAFT-01` |
+| Invariant | `INV-{CAPABILITY}-{NN}` | `INV-POSTS-01` |
 | Rule | uppercase dotted ID | `ADDD.USECASE.001` |
 | Extension | lowercase kebab-case | `outbox-worker` |
 
@@ -64,6 +67,7 @@ Never reuse an accepted identifier for different behavior.
 ## Agent Summary {#agent-summary}
 
 - Start with a product brief, glossary, domain index, and costly decisions.
+- Record each capability's aggregate boundaries, state records, transitions, invariants, events, and language before implementing its first command.
 - Keep one Markdown specification per use case.
 - Use capability names consistently across documentation and code.
 - Add risk sections and extensions only when their criteria apply.
@@ -91,13 +95,36 @@ Finish one primary-journey use case across every required layer before starting 
 
 ### Group use cases by business capability (ADDD.CAPABILITY.001)
 
-Each capability owns `docs/domain/{capability}/README.md`. It records purpose, actors, capability terms, shared invariants, and a short use-case list.
+Each capability owns `docs/domain/{capability}/README.md`. It records purpose, actors, aggregate boundaries, capability terms, rejected synonyms, state records, transitions, shared invariants, domain events, reactions, and a short use-case list.
 
 Use the same capability name for Application folders, API endpoint groups, and frontend feature folders.
 
+### Record the tactical domain model (ADDD.MODEL.001)
+
+Before implementing a capability's first command, its capability document names:
+
+- Each aggregate root, its owned children, and referenced aggregate IDs.
+- Every aggregate state record and its state-specific data.
+- Every allowed transition with its source state, business action, target state, invariant IDs, and owning use cases.
+- Shared invariants with stable `INV-{CAPABILITY}-{NN}` identifiers.
+- Domain events and their known in-process or external reactions.
+- Ubiquitous language and rejected synonyms.
+
+Every aggregate has an explicit state record hierarchy, including an aggregate that currently has one state. The capability document does not use a lifecycle enum as a shorthand.
+
+When a required business fact is unknown, record a named modeling question and stop the affected use case. Do not create a state, transition, invariant, or event only to fill the document structure.
+
+### Keep invariant identifiers stable (ADDD.INVARIANT.001)
+
+Use `INV-{CAPABILITY}-{NN}` for capability invariants. Never reuse or renumber an accepted invariant ID. Update the capability document, affected use cases, and automated evidence together when the rule changes.
+
+Each active invariant maps to at least one use case and one acceptance criterion. An invariant with no accepted behavior remains a visible modeling or delivery gap.
+
 ### Keep one specification per use case (ADDD.USECASE.001)
 
-Each operation owns `docs/domain/{capability}/{use-case}.md`. The file contains intent, actors, authorization, preconditions, input, output, business rules, main flow, failures, examples, acceptance criteria, and applicable risk sections.
+Each operation owns `docs/domain/{capability}/{use-case}.md`. The file contains intent, actors, authorization, preconditions, input, output, business rules, domain behavior, main flow, failures, examples, acceptance criteria, invariant coverage, and applicable risk sections.
+
+A command names the aggregate action, source state, target state, invariant IDs, and emitted domain events. A query states that it has no domain transition and names its read source.
 
 The specification does not list test class or method names. Tests cite stable acceptance IDs instead.
 
@@ -133,6 +160,8 @@ with a unique slug.
 ### Verify acceptance coverage from source (ADDD.TRACE.001)
 
 Every active acceptance ID appears in at least one automated test. Search the consumer test roots for each exact ID. A missing ID fails completion. Internal implementation tests do not need an acceptance ID.
+
+Each active capability invariant maps to at least one active acceptance ID. Each documented state transition maps to at least one command use case. Keep these mappings in the capability and use-case documents without recording test class or method names.
 
 ### Increase assurance from risk flags (ADDD.ASSURANCE.001)
 
@@ -182,6 +211,8 @@ docs/
 
 Use JSON only for the short routing block. Write contracts, rules, failures, examples, and acceptance criteria in Markdown prose and tables.
 
+Use the [domain modeling guide](../guides/model-domain.md) when creating or changing aggregate boundaries, state records, transitions, invariants, value objects, or events.
+
 ### Record status accurately
 
 - `planned` means the contract may change and does not claim implementation.
@@ -190,12 +221,16 @@ Use JSON only for the short routing block. Write contracts, rules, failures, exa
 
 ## Examples
 
-A command use case normally contains authorization and failure behavior. A public catalog query may have no actor and no risk flags. A payment command normally carries `money`, `authorization`, `concurrency`, and `durable-delivery` risk flags and activates the corresponding extensions.
+A publish command maps `DraftPostState` to `PublishedPostState` through `Post.Publish`, cites `INV-POSTS-01`, and records `PostPublished`. Its acceptance criteria cover the allowed transition and rejected source states.
+
+A public catalog query may have no actor and no risk flags. It states that it performs no domain transition and names the Marten projection it reads.
 
 ## Verification
 
 - Confirm inception files exist before the first implementation slice.
 - Confirm capability and use-case names match code folders.
+- Confirm every aggregate has documented states and every transition names its owning use case.
+- Confirm every active invariant maps to an active acceptance ID.
 - Confirm every active acceptance ID appears in test source.
 - Confirm every listed extension exists in `standards.project.json`.
 - Confirm each risk flag has the required evidence.

@@ -31,7 +31,9 @@ Acceptance.Tests appears only when the executable BDD extension activates.
 
 ### Test Domain in isolation (BTEST.DOMAIN.001)
 
-Domain tests cover factories, state transitions, invariants, value equality, collection behavior, exceptions, and raised events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
+Domain tests cover factories, every state record, allowed and rejected transitions, invariants, value equality, collection behavior, money rules, exceptions, and raised events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
+
+Each capability invariant maps through its use-case specification to at least one cited acceptance ID. Domain tests may add narrower cases without an acceptance ID.
 
 ### Test Application coordination (BTEST.APPLICATION.001)
 
@@ -62,6 +64,7 @@ Architecture.Tests verify:
 - Public visibility of ports implemented across project boundaries.
 - Endpoint isolation from repositories and sessions.
 - Capability folder and naming conventions that static analysis can prove.
+- Aggregate inheritance from `AggregateRoot<TId>` and the absence of lifecycle enums.
 - Extension-specific replacements.
 
 ### Trace acceptance criteria (BTEST.TRACE.001)

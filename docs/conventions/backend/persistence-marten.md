@@ -67,6 +67,8 @@ Register every concrete type that may appear behind a base class or interface pr
 
 Domain types do not use `JsonInclude`, `JsonDerivedType`, `JsonPolymorphic`, Marten attributes, provider base classes, or other serialization behavior. If Infrastructure configuration cannot round-trip an aggregate without weakening its encapsulation, persist an Infrastructure-owned document type and map it to the Domain aggregate.
 
+Every aggregate `State` property is one persisted polymorphic value. Infrastructure registers the abstract `{Aggregate}State` base and every sealed state record with stable string discriminators. It does not persist a second enum, status string, boolean flag, or nullable timestamp on the Domain aggregate.
+
 ### Evolve stored document contracts explicitly (PERSIST.EVOLUTION.001)
 
 Treat JSON member names, required values, enum representation, discriminator property names, and discriminator values as database schema. An additive member defines behavior for documents written before that member existed.
@@ -138,9 +140,28 @@ Add an index from an accepted query or measured operating need. Record represent
 
 Query stored aggregate documents directly while accepted reads remain simple. Add a capability-owned read document or projection when a real query needs repeated cross-aggregate composition, deep polymorphic traversal, or an index shape that would distort the aggregate. Define its consistency and rebuild behavior with the use case.
 
+### Persist one explicit state object
+
+Use a stable discriminator property such as `$state` with values such as `draft`, `published`, and `archived`. The persisted state value contains its state-specific data:
+
+```json
+{
+  "state": {
+    "$state": "published",
+    "publishedAt": "2026-07-16T10:30:00Z"
+  }
+}
+```
+
+Register every concrete state record in Infrastructure. Round-trip each state through the configured Marten serializer in integration tests.
+
+Adding a state discriminator can break an older application version during a mixed-version deployment. The release plan either prevents the older version from reading the new state or introduces a compatible reader before commands can persist that state.
+
 ## Examples
 
 An `Order` document may contain a `PaymentMethod` collection with `CardPayment` and `BankTransfer` values. Infrastructure registers stable `card` and `bank_transfer` discriminators through the JSON contract resolver. The Domain hierarchy carries no JSON attributes.
+
+A `Post` document stores one `state` object. `PublishedPostState` uses the stable `published` discriminator and owns `publishedAt`. The document does not also store `isPublished` or an aggregate-level `publishedAt` value.
 
 Renaming `shippingAddress.postalCode` to `shippingAddress.postcode` uses a mixed-version reader and a reviewed data transformation before the old reader is removed. A CLR property rename without that rollout is not compatible document evolution.
 
@@ -170,7 +191,7 @@ internal sealed class PostRepository(
 - Confirm repositories use the scoped session and track changed aggregates.
 - Confirm queries project results and have deterministic limits and ordering.
 - Confirm aliases, JSON member contracts, discriminators, and indexes are explicit in Infrastructure.
-- Round-trip private state, nested values, collections, and every registered runtime subtype without serialization behavior in Domain.
+- Round-trip private state, nested values, collections, every aggregate state record, and every other registered runtime subtype without serialization behavior in Domain.
 - Load stored fixtures from every supported document shape and test each required transformation and rollback reader.
 - Test representative document size and query plans for aggregates with nested collections.
 - When `concurrency-idempotency` is active, test conflicting writes with representative document sizes.

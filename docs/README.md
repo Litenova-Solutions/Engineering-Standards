@@ -33,7 +33,7 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 | Document | Covers |
 |:---|:---|
 | [Architecture](conventions/backend/architecture.md) | Four-project modular monolith, dependency direction, capability slices, and Worker activation. |
-| [Domain](conventions/backend/domain.md) | Aggregates, value objects, IDs, events, repositories, exceptions, time, and folders. |
+| [Domain](conventions/backend/domain.md) | Aggregate roots, mandatory state records, value objects, IDs, entities, services, events, repositories, errors, and persistence-neutral object design. |
 | [Application](conventions/backend/application.md) | Commands, queries, handlers, validators, results, reactions, ports, and folders. |
 | [Marten persistence](conventions/backend/persistence-marten.md) | Sessions, repositories, queries, commit pipeline, event collection, JSON contracts, document evolution, aliases, indexes, and schema changes. |
 | [HTTP API](conventions/backend/api.md) | Minimal API endpoints, routes, transport models, status codes, Problem Details, authorization, and OpenAPI. |
@@ -68,6 +68,7 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Glossary](reference/glossary.md) defines repository terms.
 - [Decision records](reference/decisions/README.md) explain baseline choices.
 - [Adopt standards v1](guides/adopt-v1.md) gives a greenfield consumer sequence.
+- [Model a Domain capability](guides/model-domain.md) turns human discovery into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
 - [Runbook template](../templates/docs/runbook.md) gives the required operational record shape.
 
