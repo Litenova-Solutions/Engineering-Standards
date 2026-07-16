@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/standards-manifest.schema.json",
+  "title": "Litenova Engineering Standards Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "version",
+    "name",
+    "agentsEntry",
+    "defaultProfile",
+    "paths",
+    "profiles",
+    "extensions",
+    "stack",
+    "packages",
+    "loadPlans"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "agentsEntry": { "$ref": "#/$defs/repositoryPath" },
+    "defaultProfile": { "$ref": "#/$defs/identifier" },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["docs", "templates", "extensions"],
+      "properties": {
+        "docs": { "$ref": "#/$defs/repositoryPath" },
+        "templates": { "$ref": "#/$defs/repositoryPath" },
+        "extensions": { "$ref": "#/$defs/repositoryPath" }
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entry", "documents"],
+        "properties": {
+          "entry": { "$ref": "#/$defs/repositoryPath" },
+          "documents": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "$ref": "#/$defs/repositoryPath" }
+          }
+        }
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/repositoryPath" }
+    },
+    "stack": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "packages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nuget", "npm"],
+      "properties": {
+        "nuget": { "$ref": "#/$defs/versionMap" },
+        "npm": { "$ref": "#/$defs/versionMap" }
+      }
+    },
+    "loadPlans": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/loadPlan" }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "repositoryPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*\\.\\.)[^\\\\]+$"
+    },
+    "versionMap": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "loadPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier0", "tier1", "tier2"],
+      "properties": {
+        "tier0": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/repositoryPath" }
+        },
+        "tier1": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/repositoryPath" }
+        },
+        "tier2": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/repositoryPath" }
+        }
+      }
+    }
+  }
+}

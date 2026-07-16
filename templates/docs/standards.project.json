@@ -1,0 +1,15 @@
+{
+  "$schema": "./standards/schemas/standards-project.schema.json",
+  "project": {
+    "name": "__PROJECT__"
+  },
+  "profile": "dotnet-nextjs",
+  "paths": {
+    "apiSolution": "__API_SOLUTION__",
+    "domainDocs": "docs/domain",
+    "uiDocs": "docs/ui",
+    "frontends": []
+  },
+  "extensions": [],
+  "overrides": []
+}

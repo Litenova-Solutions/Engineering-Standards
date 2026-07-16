@@ -1,1 +1,1 @@
-Treat `AGENTS.md` at the repository root as the primary rules file for all agent activity in this repository. Before editing any file, read `AGENTS.md` in full, then read the relevant convention file under `docs/conventions/` that corresponds to the layer or topic you are editing. Do not generate code or modify documentation without completing this read order.
+Treat `AGENTS.md` as the canonical agent protocol. Select task summaries from `standards.manifest.json`, then read full task documents and enabled extensions when required.

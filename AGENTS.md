@@ -1,139 +1,111 @@
-# Engineering Standards: Agent Context
+# Litenova Engineering Standards Agent Protocol
 
-Canonical contract for AI agents and engineers. Read before touching code.
+Read this file before changing this repository or a consumer application.
 
-These standards assume a single bounded context monolith. Multi-context decomposition is out of scope.
+Version 1 covers one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends. The canonical human index is `docs/README.md`. Exact versions, profile composition, extensions, and task load plans live in `standards.manifest.json`.
 
-## Context tiers
+## Documentation model
 
-Load documentation by tier. See `docs/agentic-development.md` §6 and `agentLoadPlans` in `standards.manifest.json`.
+Each topic document separates:
 
-| Tier | What to load | When |
-|:---|:---|:---|
-| 0 | This file (`AGENTS.md`) | Every task |
-| 1 | `#agent-quick-rules` sections from `agentLoadPlans.tier1` | Task start |
-| 2 | Full convention files from `agentLoadPlans.tier2` | When a Quick Rule is unclear |
-| 3 | Blueprints from `agentLoadPlans.blueprints` | Generating new files only |
+- `Intent`: nonnormative explanation.
+- `Agent Summary`: Tier 1 task context.
+- `Standards`: required boundaries. Deviation requires a named override and decision.
+- `Conventions`: default names, locations, and implementation patterns. A consumer may replace one with an explicit local convention.
+- `Verification`: required evidence.
 
-Consumer projects: load `docs/domain/agent-index.json`, then use case frontmatter for convention references. See project `AGENTS.md` shim.
+Stable rule IDs appear in parentheses after human titles.
 
-## Read Order
+## Context loading
 
-1. This file in full.
-2. `docs/architecture/clean-architecture.md`.
-3. Convention files for your layer (`conventionIndex` and `agentLoadPlans` in `standards.manifest.json`).
-4. `docs/conventions/shared/agentic-guardrails.md` for scaffolding and verification.
-5. `docs/guides/definition-of-done.md` before marking any feature complete.
-6. Do not load `docs/philosophy.md` or `docs/agentic-development.md` for routine coding.
-7. Cursor rules in `.cursor/rules/` when using Cursor.
+1. Read the consumer root `AGENTS.md` and `standards.project.json`.
+2. Read the active use-case specification before changing observable behavior.
+3. Select the narrowest task under `loadPlans` in `standards.manifest.json`.
+4. Read the listed Tier 1 `Agent Summary` sections.
+5. Read Tier 2 before generating a file, changing a public boundary, or choosing between patterns.
+6. Read every extension enabled by the active use case or consumer configuration.
+7. Inspect neighboring consumer files after loading the applicable standard.
 
-### Use case implementation (consumer project)
+Do not load unrelated conventions or inactive extensions.
 
-1. Project `docs/domain/README.md` and `docs/domain/{feature}/README.md`.
-2. `docs/domain/{feature}/{use-case}.md` and `{use-case}.tests.md`.
-3. `docs/guides/write-use-case-doc.md` (authoring); `docs/guides/add-new-use-case.md` (implementation).
-4. Update operation docs, test specs, and page composition docs in the same PR as the code.
+## Source precedence
 
-## Tech Stack
+Apply applicable guidance in this order:
 
-Versions: `standards.manifest.json` only (`stack`, `pinnedNuGetPackages`, `pinnedNpmPackages`). Do not copy versions from prose.
+1. Consumer override backed by a decision and named rule ID.
+2. Enabled extension that names a baseline replacement.
+3. Selected platform profile and its conventions.
+4. Foundation standards.
 
-Architectural constraints: Minimal APIs only, PostgreSQL `snake_case`, CQRS split Application projects, Scalar for dev API docs.
+An explicit consumer convention may replace a baseline convention. Stop when applicable requirements conflict without declared precedence. Quote both rule IDs and paths before requesting a decision.
 
-## Conflict Resolution
+## Before editing
 
-1. Stop. Do not invent a compromise.
-2. Quote both conflicting rules with file paths.
-3. Prefer project docs only when they explicitly override.
-4. If no override exists, ask for a human decision.
+1. Confirm the requested scope and affected repositories.
+2. Read `git status` and preserve unrelated work.
+3. Load the task context, active use case, and enabled extensions.
+4. Check the manifest before changing dependencies.
+5. Match compliant local patterns.
+6. Plan documentation, code, tests, generated contracts, and operating impact as one unit.
 
-## Pre-Edit Checkpoint
+Do not add a package, migration, authentication model change, public API break, or external side effect unless the request or an accepted decision authorizes it.
 
-1. Confirm scope and planned files.
-2. Load `agentLoadPlans` tier1 Quick Rules from `standards.manifest.json`; escalate to tier2 when a rule is unclear.
-3. Read project `docs/domain/` overrides.
-4. Match local patterns; prefer minimal diffs.
-5. Stop without approval for new packages, migrations, auth model changes, or public API breaks.
+## Baseline boundaries
 
-Report legacy violations unless the task is a standards migration.
+- Use `apps/api/{ProjectName}.slnx`, production projects under `apps/api/src/`, and tests under `apps/api/tests/`.
+- Use Domain, Application, Infrastructure, and WebApi as the four application projects.
+- Keep Domain free of persistence, web, mediator, logging, and dependency injection packages.
+- Organize every layer by the same business capabilities and use cases.
+- Keep handlers, validators, endpoints, and persistence implementations internal sealed.
+- Write commands through aggregate repositories and read queries through `IQuerySession`.
+- Do not call `SaveChangesAsync` from handlers, repositories, endpoints, or reactions.
+- Commit once through the LiteBus command post-handler.
+- Use Minimal API `IEndpoint`; MVC controllers are outside the profile.
+- Derive authenticated actor IDs from verified claims and authorize the target resource.
+- Keep frontend capability internals isolated and route files focused on composition.
+- Validate backend options and frontend environment access through owned modules.
+- Cite every active acceptance-criterion ID from automated tests.
+- Regenerate OpenAPI and typed consumers with their sources.
 
-## Project Map
+Read the full task conventions before applying any boundary from this summary.
 
-| Project | Responsibility |
-|:---|:---|
-| `Domain` | Aggregates, value objects, events, exceptions, repositories, strongly typed IDs |
-| `Application.Write.Contracts` | Commands, command results; `ValidationError` (write-side canonical import) |
-| `Application.Write` | Command handlers and validators |
-| `Application.Read.Contracts` | Queries, results, `IDatabaseContext`; `ValidationError` (read-side canonical import) |
-| `Application.Read` | Query handlers; projections only |
-| `Application.Reactions` | Event handlers; narrow side-effect interfaces only |
-| `Infrastructure` | EF Core, repos, pipeline, outbox, jobs, external clients |
-| `WebApi` | `IEndpoint`, request/response models, OpenAPI |
-| `Worker` | Outbox dispatch, scheduled jobs (`worker-projects.md`) |
-| `apps/api/` | .NET solution root |
-| `apps/{name}/` | Frontends; `features/{feature}/{use-case}/` aligned to backend |
+## Repository verification
 
-See `docs/conventions/shared/monorepo-structure.md` for multiple apps.
+For this standards repository:
 
-## Non-Negotiable Rules
+- Validate the two tracked schema consumers.
+- Check manifest paths and `#agent-summary` anchors.
+- Check rule-ID uniqueness and extension references.
+- Check internal links, ASCII writing rules, and stale terminology.
+- Run `git diff --check`.
 
-### Domain and application
+The repository has no standards CLI, generated index, or application scaffold.
 
-- MUST read the relevant convention before editing that layer. (Prevents layer violations.)
-- MUST use correct exception subclasses; validators throw `CommandValidationException` / `QueryValidationException`. (Correct HTTP status mapping.)
-- MUST NOT call `SaveChangesAsync` in handlers or repositories. (Single commit boundary in pipeline.)
-- MUST NOT put handlers or validators in Contracts projects. (Contracts stay reference-safe from WebApi.)
-- MUST NOT reference external libraries from `Application.Reactions`. (Reactions stay testable and narrow.)
-- MUST use `ICommandMediator` / `IQueryMediator`; MUST NOT inject unified bus or `IMessageMediator`. (Explicit read vs write intent.)
-- MUST inject `IDatabaseContext` in query handlers; MUST NOT inject repositories or `AppDbContext`. (Read path isolation.)
-- MUST NOT add per-aggregate `IXxxReadStore` interfaces. (One read abstraction.)
-- MUST use `.AsNoTracking()` or projections in `Application.Read`. (No accidental tracking on reads.)
-- MUST maintain Test Coverage in `{use-case}.tests.md` per `TEST_SPEC_TRACEABILITY` in `agentic-guardrails.md`. (No orphan tests.)
-- MUST follow the **Spec sync rule**: update domain and UI docs in the same PR as code. (`docs/glossary.md`)
+## Consumer verification
 
-### API layer
-
-- MUST use `IEndpoint`; MUST NOT use MVC `Controller` / `ControllerBase`. (Thin adapter pattern.)
-- WebApi endpoints MUST reference Contracts only; `Program.cs` registers implementations. (No handler leakage.)
-
-### Security and configuration
-
-- MUST NOT accept actor IDs from request bodies when the actor is the authenticated user. (BOLA prevention.)
-- MUST NOT use `configuration["Key"]!` directly; use `IOptions<T>`. (Fail-fast validated config.)
-- MUST use `FromSqlInterpolated` for raw SQL; MUST NOT concatenate SQL strings. (Injection prevention.)
-
-### Frontend
-
-- MUST await `params` / `searchParams` / `cookies` / `headers`. (Next.js async dynamic APIs.)
-- MUST comment every `'use client'`. (Documents client boundary.)
-- MUST NOT cross-import `features/{a}/` from `features/{b}/`. (Feature isolation.)
-- Env vars only via `lib/env.ts`. (Validated public config.)
-- See `docs/conventions/frontend/` for data fetching, state, Tailwind, file size.
-
-### Process and dependencies
-
-- MUST check `standards.manifest.json` before changing package references. (Pin integrity.)
-- MUST NOT upgrade framework versions unless task is standards upgrade. (Controlled stack.)
-- MUST use blueprints in `docs/blueprints/` for complete file generation. (Consistent scaffolds.)
-- MUST NOT add packages outside approved lists without ADR (`forbidden-packages.md`, `solution-structure.md`).
-- MUST follow `writing-style.md`. (Consistent agent and human prose.)
-- MUST run gates in `docs/conventions/shared/ci.md` and `definition-of-done.md`.
-- Project `docs/domain/` wins over standards when overlapping (`principles.md` documentation precedence).
-
-## Conventions and load plans
-
-All normative convention paths are listed in `standards.manifest.json` under `conventionIndex`. Scoped agent loads use `agentLoadPlans` in the same file. Glossary: `docs/glossary.md`.
-
-## Commands
-
-Replace `{ProjectName}` with the .NET solution name from the consumer repo (for example `LitePress` → `LitePress.slnx` under `apps/api/`). Replace `{frontend}` with the app folder name (`web`, `admin`, etc.). The project `AGENTS.md` shim MUST document these substitutions.
+Replace `{ProjectName}` with the consumer solution name:
 
 ```bash
 dotnet build apps/api/{ProjectName}.slnx --configuration Release
 dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
-pnpm install --frozen-lockfile
-pnpm lint && pnpm type-check && pnpm test && pnpm build
-pnpm exec playwright test --config apps/{frontend}/playwright.config.ts
 ```
 
-Skip frontend commands when the project has no apps under `apps/`. Run gates for every frontend app you changed.
+For every changed frontend:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm lint
+pnpm type-check
+pnpm test
+pnpm build
+```
+
+Run Playwright for critical browser journeys and extension-specific verification for every enabled extension affected by the change.
+
+## Completion
+
+- Run every applicable check.
+- Confirm the use-case specification matches observable behavior.
+- Inspect generated application differences.
+- Report exact commands, outcomes, and skipped checks.
+- Leave no placeholder implementation, `TODO`, or untracked generated output.

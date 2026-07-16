@@ -1,166 +1,60 @@
-# Contributing to Engineering Standards
+# Contributing
 
-This document explains how to contribute to this repository, how to create releases, and how to publish them on GitHub.
+Changes use a branch and pull request against `main`. Direct pushes to `main` are outside the release process.
 
----
+## Documentation contract
 
-## 1. Who Can Contribute
+Each topic document begins with `Intent` and separates required `Standards` from replaceable `Conventions`. Actionable standards use a unique stable rule ID with the human title first.
 
-Anyone working on a project that follows these standards can propose a change. Changes are proposed via pull requests against the `main` branch. No direct pushes to `main` are permitted, regardless of role.
+Keep one canonical source for each rule, package version, extension, and upgrade requirement. Link instead of copying.
 
----
+## Required review
 
-## 2. What Requires a Pull Request
+Before requesting review:
 
-Everything requires a pull request. This includes:
+- Inspect changed links and rule IDs.
+- Confirm manifest paths and `#agent-summary` anchors exist.
+- Confirm extension names match the manifest and consumer template.
+- Validate `standards.manifest.json` and `templates/docs/standards.project.json` against their schemas.
+- Update the changelog.
+- Add an upgrade guide when an existing compliant consumer must change in a post-v1 release.
+- Update document templates when ADDD metadata or required sections change.
+- Run `git diff --check`.
 
-- Adding or changing a convention file
-- Adding or changing a decision record in `docs/decisions/`
-- Adding or changing a template
-- Updating agent context files (`AGENTS.md`, `.cursor/rules/`, `.github/copilot-instructions.md`, `.windsurfrules`, `CLAUDE.md`, `GEMINI.md`)
-- Fixing typos or adding examples to existing documents
-- Updating `README.md` or this file
+The repository intentionally has no standards CLI, generated catalog, or application scaffold.
 
----
+## Normative changes
 
-## 3. Pull Request Requirements
+A new or changed standard includes:
 
-Every pull request MUST:
+- One canonical rule ID.
+- Intent and at least one concrete example.
+- Verification that can be performed by an agent, reviewer, compiler, test, or operating check.
+- A changelog entry.
+- An upgrade note when an existing compliant consumer must change.
 
-1. Have a description explaining what changed and why. Reference the ADR if the change is architectural.
-2. Pass all checks. Run locally before opening a PR:
+A convention states how a consumer may document a local replacement. Do not use a convention to weaken a security, data, or architectural standard.
 
-```bash
-node scripts/validate-standards.mjs
-node scripts/smoke-bootstrap.mjs
-```
+## Extensions
 
-CI runs the same checks via `.github/workflows/standards-ci.yml`.
-3. Receive at least one review approval before merging.
-4. Have all review comments resolved before merging.
-5. Use squash merge. The squash commit message MUST follow [Conventional Commits](https://www.conventionalcommits.org/) format.
+An extension document contains activation criteria, baseline relationship, agent summary, standards, conventions, dependencies, and verification. It names every baseline rule it replaces.
 
-From **v2.0.0** onward, every PR that changes a convention MUST also include a `CHANGELOG.md` entry under `[Unreleased]`. There is no changelog file before v2.
+Do not add a separate extension descriptor or schema. The extension Markdown file is the contract, and the manifest maps its ID to that file.
 
-Conventional Commits examples:
+## Solo-maintainer review
 
-```
-feat: add domain doc templates for consumer projects
-fix: correct CancellationToken naming rule in application-layer.md
-chore: prepare release v1.1.0
-docs: add Guard.Against exception type warning to validators section
-```
+The maintainer may merge their own pull request after all required checks pass and an AI review examines the complete diff. A second human approval is encouraged when another maintainer is available, but it is not a merge requirement.
 
----
+Resolve every actionable review comment before merge. Use squash merge unless preserving separate migration commits materially helps review.
 
-## 4. What Constitutes a Breaking Change
+## Versioning
 
-A breaking change is any convention update that makes previously compliant code non-compliant. Examples:
+- Patch releases clarify or correct existing behavior.
+- Minor releases add backward-compatible standards, conventions, extensions, or capabilities.
+- Major releases require consumer work.
 
-- Renaming a required interface (e.g., renaming `IXxxReadStore` to `IXxxQueryStore`)
-- Changing a folder structure rule that affects existing file paths
-- Removing a pattern that projects depend on (e.g., removing the `ApplicationGuard` helper that projects reference)
-- Changing an exception base class location that projects import
+Accepted decision records are historical. Add a replacement decision and mark the old record superseded rather than rewriting its outcome.
 
-Breaking changes require a `MAJOR` version bump. From v2.0.0 onward, document breaking changes in `CHANGELOG.md` under `### Breaking Changes`. Before v2, describe breaking changes in the GitHub Release notes and PR description.
+## Consumer upgrades
 
----
-
-## 5. Changelog (from v2.0.0 only)
-
-This repository has no `CHANGELOG.md` before **v2.0.0**. Release notes for v1.x tags are written in GitHub Releases only.
-
-From **v2.0.0** onward, add `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com/) with these sections:
-
-- `### Breaking Changes`
-- `### Added`
-- `### Changed`
-
----
-
-## 6. Creating a Release
-
-**Step 1:** Ensure `main` is up to date and all pull requests for this release are merged.
-
-**Step 2:** For **v2.0.0+**, update `CHANGELOG.md`. Move all entries from `[Unreleased]` to a new versioned section. Set the date.
-
-**Step 3:** Create an annotated tag:
-
-```bash
-git tag -a v1.0.0 -m "Release v1.0.0
-
-First pinned baseline for consumer projects."
-
-git push origin v1.0.0
-```
-
-**Step 4:** Create a GitHub Release from the tag:
-
-- Go to the repository on GitHub.
-- Click "Releases" in the right sidebar.
-- Click "Draft a new release".
-- Select the tag from the "Choose a tag" dropdown.
-- Write release notes in the description (required for v1.x; for v2.x paste the CHANGELOG section).
-- For `MAJOR` version releases, check "Set as pre-release" until validated against at least one project.
-- Click "Publish release".
-
----
-
-## 7. Semantic Versioning Rules
-
-A breaking change is any convention update that makes previously compliant code non-compliant.
-
-| Increment | When to Use | Example |
-|:---|:---|:---|
-| `MAJOR` | A breaking change. Previously compliant code becomes non-compliant after upgrading. | Renaming a required interface, removing a pattern projects depend on. |
-| `MINOR` | A new convention is added. Existing compliant code remains compliant after upgrading. | Adding a new template, adding a new rule that applies only to new code. |
-| `PATCH` | A clarification, typo fix, new example, new ADR, or agent file improvement. No convention changes. | Fixing a typo in a code example, adding a `// BAD:` example to an existing rule. |
-
-### Pre-v1 consumption
-
-Until `v1.0.0` or `v1.0.0-rc.1` is published on GitHub Releases:
-
-- Pin an exact **commit SHA** in the submodule.
-- Record `git rev-parse HEAD` in the consumer adoption PR.
-- Do not track `main` in production repositories.
-
-### Maintainer release checklist
-
-1. Run `node scripts/validate-standards.mjs` and `node scripts/smoke-bootstrap.mjs`.
-2. Record `git rev-parse HEAD` in the GitHub Release notes.
-3. Tag `v1.0.0-rc.1` or `v1.0.0` and publish the release.
-4. Notify consumer repos to bump submodule tag or SHA.
-
-### Post-v1 upgrade (consumers)
-
-1. Read GitHub Release notes for the target tag.
-2. Bump submodule: `cd standards && git fetch && git checkout vX.Y.Z`.
-3. Diff template changes under `docs/templates/docs/` and `docs/templates/config/` and apply manually.
-4. Run consumer CI gates.
-5. Update project ADR if manifest package versions change.
-
----
-
-## 8. How Downstream Projects Stay Updated
-
-Projects include this repository as a git submodule pinned to a specific tag. To upgrade a project to a newer tag:
-
-```bash
-cd standards
-git fetch --tags
-git checkout v1.1.0
-cd ..
-git add standards
-git commit -m "chore: upgrade engineering-standards to v1.1.0"
-```
-
-For `MAJOR` version upgrades, the commit message should list the breaking changes and describe what was updated in the project to comply:
-
-```
-chore: upgrade engineering-standards to v2.0.0
-
-Breaking changes addressed:
-- Renamed apps/web/features/ to apps/web/features/.
-  Updated imports and ESLint boundary zones.
-- Moved project docs to docs/domain/{feature}/{use-case}.md tree.
-```
+For standards releases after v1, consumers update the pinned standards commit in a dedicated pull request, read the changelog and applicable upgrade guide, apply required work, and run the complete application gate set.

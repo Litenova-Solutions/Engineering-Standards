@@ -1,291 +1,360 @@
 {
-  "version": "1.1.0",
+  "$schema": "./schemas/standards-manifest.schema.json",
+  "schemaVersion": 1,
+  "version": "1.0.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
-  "conventionsRoot": "docs/conventions",
-  "blueprintsRoot": "docs/blueprints",
-  "runbooksRoot": "docs/runbooks",
-  "decisionsRoot": "docs/decisions",
-  "guidesRoot": "docs/guides",
-  "templatesDocsRoot": "docs/templates/docs",
-  "templatesConfigRoot": "docs/templates/config",
-  "glossary": "docs/glossary.md",
-  "conventionIndex": {
-    "architecture": "docs/architecture/clean-architecture.md",
-    "principles": "docs/conventions/principles.md",
-    "backend.solutionStructure": "docs/conventions/backend/solution-structure.md",
-    "backend.domainLayer": "docs/conventions/backend/domain-layer.md",
-    "backend.applicationLayer": "docs/conventions/backend/application-layer.md",
-    "backend.infrastructureLayer": "docs/conventions/backend/infrastructure-layer.md",
-    "backend.apiLayer": "docs/conventions/backend/api-layer.md",
-    "backend.exceptionHierarchy": "docs/conventions/backend/exception-hierarchy.md",
-    "backend.queryReadStrategy": "docs/conventions/backend/query-read-strategy.md",
-    "backend.testing": "docs/conventions/backend/testing.md",
-    "backend.apiAcceptanceTests": "docs/conventions/backend/api-acceptance-tests.md",
-    "backend.externalDependencies": "docs/conventions/backend/external-dependencies.md",
-    "backend.observability": "docs/conventions/backend/observability.md",
-    "backend.reliability": "docs/conventions/backend/reliability.md",
-    "backend.backgroundJobs": "docs/conventions/backend/background-jobs.md",
-    "backend.caching": "docs/conventions/backend/caching.md",
-    "backend.deploymentAndMigrations": "docs/conventions/backend/deployment-and-migrations.md",
-    "backend.workerProjects": "docs/conventions/backend/worker-projects.md",
-    "backend.authentication": "docs/conventions/backend/authentication-and-authorization.md",
-    "backend.options": "docs/conventions/backend/options-and-configuration.md",
-    "backend.concurrency": "docs/conventions/backend/concurrency.md",
-    "backend.softDelete": "docs/conventions/backend/soft-delete.md",
-    "backend.rawSql": "docs/conventions/backend/raw-sql-and-reporting.md",
-    "backend.objectAuthorization": "docs/conventions/backend/object-authorization.md",
-    "frontend.nextjsAppRouter": "docs/conventions/frontend/nextjs-app-router.md",
-    "frontend.components": "docs/conventions/frontend/components.md",
-    "frontend.dataFetching": "docs/conventions/frontend/data-fetching.md",
-    "frontend.stateAndForms": "docs/conventions/frontend/state-and-forms.md",
-    "frontend.stateManagement": "docs/conventions/frontend/state-management.md",
-    "frontend.internationalization": "docs/conventions/frontend/internationalization.md",
-    "frontend.testing": "docs/conventions/frontend/testing.md",
-    "frontend.featureBoundaries": "docs/conventions/frontend/feature-boundaries.md",
-    "frontend.errorHandling": "docs/conventions/frontend/error-handling-and-problem-details.md",
-    "frontend.environment": "docs/conventions/frontend/environment-and-runtime-config.md",
-    "frontend.adminApiAuth": "docs/conventions/frontend/admin-api-auth.md",
-    "shared.agenticGuardrails": "docs/conventions/shared/agentic-guardrails.md",
-    "shared.ci": "docs/conventions/shared/ci.md",
-    "shared.ciCd": "docs/conventions/shared/ci-cd.md",
-    "shared.security": "docs/conventions/shared/security.md",
-    "shared.securityControls": "docs/conventions/shared/security-controls.md",
-    "shared.apiCompatibility": "docs/conventions/shared/api-compatibility.md",
-    "shared.monorepoStructure": "docs/conventions/shared/monorepo-structure.md",
-    "shared.forbiddenPackages": "docs/conventions/shared/forbidden-packages.md",
-    "shared.supplyChainSecurity": "docs/conventions/shared/supply-chain-security.md",
-    "shared.writingStyle": "docs/conventions/shared/writing-style.md",
-    "guides.onboarding": "docs/guides/onboarding.md",
-    "guides.agenticDdd": "docs/guides/agentic-domain-driven-design.md",
-    "guides.writeUseCaseDoc": "docs/guides/write-use-case-doc.md",
-    "guides.addNewUseCase": "docs/guides/add-new-use-case.md",
-    "guides.definitionOfDone": "docs/guides/definition-of-done.md",
-    "guides.createNewProject": "docs/guides/create-new-project.md"
+  "defaultProfile": "dotnet-nextjs",
+  "paths": {
+    "docs": "docs",
+    "templates": "templates",
+    "extensions": "docs/extensions"
+  },
+  "profiles": {
+    "dotnet-nextjs": {
+      "entry": "docs/profile/dotnet-nextjs.md",
+      "documents": [
+        "docs/conventions/repository/structure.md",
+        "docs/conventions/repository/naming.md",
+        "docs/conventions/repository/dependencies.md",
+        "docs/conventions/repository/configuration.md",
+        "docs/conventions/repository/writing.md",
+        "docs/conventions/backend/architecture.md",
+        "docs/conventions/backend/domain.md",
+        "docs/conventions/backend/application.md",
+        "docs/conventions/backend/persistence-marten.md",
+        "docs/conventions/backend/api.md",
+        "docs/conventions/frontend/structure.md",
+        "docs/conventions/frontend/rendering.md",
+        "docs/conventions/frontend/components.md",
+        "docs/conventions/frontend/data-and-state.md",
+        "docs/conventions/frontend/testing.md",
+        "docs/conventions/quality/backend-testing.md",
+        "docs/conventions/quality/security.md",
+        "docs/conventions/quality/operations.md",
+        "docs/conventions/quality/ci.md"
+      ]
+    }
+  },
+  "extensions": {
+    "acceptance-bdd": "docs/extensions/acceptance-bdd.md",
+    "api-compatibility": "docs/extensions/api-compatibility.md",
+    "caching": "docs/extensions/caching.md",
+    "concurrency-idempotency": "docs/extensions/concurrency-idempotency.md",
+    "data-lifecycle": "docs/extensions/data-lifecycle.md",
+    "deployment-containers": "docs/extensions/deployment-containers.md",
+    "external-integrations": "docs/extensions/external-integrations.md",
+    "frontend-authjs": "docs/extensions/frontend-authjs.md",
+    "localization": "docs/extensions/localization.md",
+    "multitenancy": "docs/extensions/multitenancy.md",
+    "outbox-worker": "docs/extensions/outbox-worker.md",
+    "persistence-ef-core": "docs/extensions/persistence-ef-core.md",
+    "realtime": "docs/extensions/realtime.md",
+    "reporting": "docs/extensions/reporting.md",
+    "scheduled-jobs": "docs/extensions/scheduled-jobs.md"
   },
   "stack": {
-    "dotnet": "10.0.100",
-    "aspnetcore": "10.0.0",
-    "efcore": "10.0.1",
-    "litebus": "4.3.0",
-    "aspire": "13.0.0",
-    "nextjs": "16.2.6",
-    "react": "19.2.6",
-    "typescript": "6.0.x",
-    "tailwindcss": "4.3.x",
-    "zod": "4.4.3",
-    "tanstackQuery": "5.100.10",
-    "zustand": "5.0.13",
-    "vitest": "4.x",
-    "playwright": "1.52.x",
-    "openapiTypescript": "7.x",
-    "reqnroll": "3.3.4"
+    "dotnet": "10.0.302",
+    "aspnetcore": "10.0.10",
+    "marten": "9.15.4",
+    "postgresql": "18",
+    "litebus": "5.0.0",
+    "aspire": "13.4.6",
+    "node": "24.16.0",
+    "pnpm": "11.13.1",
+    "nextjs": "16.2.10",
+    "react": "19.2.7",
+    "typescript": "6.0.3",
+    "tailwindcss": "4.3.3",
+    "shadcn": "4.13.0"
   },
-  "pinnedNuGetPackages": {
-    "LiteBus.Commands.Abstractions": "4.3.0",
-    "LiteBus.Queries.Abstractions": "4.3.0",
-    "LiteBus.Events.Abstractions": "4.3.0",
-    "LiteBus.Extensions.Microsoft.DependencyInjection": "4.3.0",
-    "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.0",
-    "Microsoft.AspNetCore.OpenApi": "10.0.0",
-    "Scalar.AspNetCore": "2.14.14",
-    "Microsoft.Extensions.ApiDescription.Server": "10.0.0",
-    "Microsoft.Extensions.Options.DataAnnotations": "10.0.0",
-    "Microsoft.EntityFrameworkCore": "10.0.1",
-    "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0",
-    "EFCore.NamingConventions": "10.0.1",
-    "Aspire.Hosting.AppHost": "13.0.0",
-    "Aspire.Hosting.PostgreSQL": "13.0.0",
-    "Aspire.Hosting.JavaScript": "13.0.0",
-    "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "13.0.0",
-    "Serilog.AspNetCore": "10.0.0",
-    "Serilog.Sinks.Console": "6.1.1",
-    "Serilog.Enrichers.Environment": "3.0.1",
-    "Serilog.Enrichers.Thread": "4.0.0",
-    "OpenTelemetry.Extensions.Hosting": "1.15.3",
-    "OpenTelemetry.Instrumentation.AspNetCore": "1.15.2",
-    "OpenTelemetry.Instrumentation.Http": "1.15.1",
-    "OpenTelemetry.Instrumentation.Runtime": "1.15.1",
-    "OpenTelemetry.Exporter.OpenTelemetryProtocol": "1.15.3",
-    "Ardalis.GuardClauses": "5.0.0",
-    "NetArchTest.Rules": "1.3.2",
-    "NSubstitute": "5.3.0",
-    "AwesomeAssertions": "8.0.0",
-    "Testcontainers.PostgreSql": "4.4.0",
-    "Microsoft.AspNetCore.Mvc.Testing": "10.0.0",
-    "coverlet.collector": "6.0.4",
-    "xunit": "2.9.3"
-  },
-  "conditionalNuGetPackages": {
-    "acceptanceTests": {
+  "packages": {
+    "nuget": {
+      "Aspire.Hosting.AppHost": "13.4.6",
+      "Aspire.Hosting.JavaScript": "13.4.6",
+      "Aspire.Hosting.PostgreSQL": "13.4.6",
+      "AwesomeAssertions": "9.4.0",
+      "EFCore.NamingConventions": "10.0.1",
+      "LiteBus.Commands.Abstractions": "5.0.0",
+      "LiteBus.Commands.Extensions.Microsoft.DependencyInjection": "5.0.0",
+      "LiteBus.Events.Abstractions": "5.0.0",
+      "LiteBus.Events.Extensions.Microsoft.DependencyInjection": "5.0.0",
+      "LiteBus.Extensions.Microsoft.DependencyInjection": "5.0.0",
+      "LiteBus.Queries.Abstractions": "5.0.0",
+      "LiteBus.Queries.Extensions.Microsoft.DependencyInjection": "5.0.0",
+      "Marten": "9.15.4",
+      "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.10",
+      "Microsoft.AspNetCore.Mvc.Testing": "10.0.10",
+      "Microsoft.AspNetCore.OpenApi": "10.0.10",
+      "Microsoft.EntityFrameworkCore": "10.0.10",
+      "Microsoft.Extensions.ApiDescription.Server": "10.0.10",
+      "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+      "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10",
+      "Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions": "10.0.10",
+      "Microsoft.Extensions.Diagnostics.HealthChecks": "10.0.10",
+      "Microsoft.Extensions.Hosting.Abstractions": "10.0.10",
+      "Microsoft.Extensions.Http.Resilience": "10.8.0",
+      "Microsoft.Extensions.ServiceDiscovery": "10.8.0",
+      "Microsoft.OpenApi": "2.10.0",
+      "Microsoft.NET.Test.Sdk": "18.8.1",
+      "NetArchTest.Rules": "1.3.2",
+      "NSubstitute": "6.0.0",
+      "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.3",
+      "Npgsql": "10.0.3",
+      "OpenTelemetry.Exporter.OpenTelemetryProtocol": "1.17.0",
+      "OpenTelemetry.Extensions.Hosting": "1.17.0",
+      "OpenTelemetry.Instrumentation.AspNetCore": "1.16.0",
+      "OpenTelemetry.Instrumentation.Http": "1.16.0",
+      "OpenTelemetry.Instrumentation.Runtime": "1.16.0",
+      "Scalar.AspNetCore": "2.16.13",
       "Reqnroll": "3.3.4",
       "Reqnroll.xUnit": "3.3.4",
-      "Reqnroll.Microsoft.Extensions.DependencyInjection": "3.3.4"
+      "Testcontainers.PostgreSql": "4.13.0",
+      "WireMock.Net": "2.12.0",
+      "coverlet.collector": "10.0.1",
+      "xunit": "2.9.3",
+      "xunit.runner.visualstudio": "3.1.5"
     },
-    "externalDependencySimulation": {
-      "WireMock.Net": "1.7.4"
-    },
-    "databaseReset": {
-      "Respawn": "6.2.1"
+    "npm": {
+      "@microsoft/signalr": "10.0.0",
+      "@playwright/test": "1.61.1",
+      "@radix-ui/react-slot": "1.3.0",
+      "@tailwindcss/postcss": "4.3.3",
+      "@types/node": "24.13.3",
+      "@types/react": "19.2.17",
+      "@types/react-dom": "19.2.3",
+      "class-variance-authority": "0.7.1",
+      "clsx": "2.1.1",
+      "eslint": "10.7.0",
+      "eslint-config-next": "16.2.10",
+      "jose": "6.2.3",
+      "next-auth": "4.24.14",
+      "next": "16.2.10",
+      "openapi-fetch": "0.17.0",
+      "openapi-typescript": "7.13.0",
+      "react": "19.2.7",
+      "react-dom": "19.2.7",
+      "shadcn": "4.13.0",
+      "tailwind-merge": "3.6.0",
+      "tailwindcss": "4.3.3",
+      "typescript": "6.0.3",
+      "vitest": "4.1.10",
+      "zod": "4.4.3"
     }
   },
-  "pinnedNpmPackages": {
-    "next": "16.2.6",
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
-    "typescript": "6.0.2",
-    "@tanstack/react-query": "5.100.10",
-    "zustand": "5.0.13",
-    "zod": "4.4.3",
-    "turbo": "2.x",
-    "openapi-typescript": "7.8.0",
-    "vitest": "4.0.0",
-    "@playwright/test": "1.52.0",
-    "next-auth": "5.0.0",
-    "@base-ui/react": "1.5.x",
-    "eslint-plugin-boundaries": "5.0.1"
-  },
-  "advisories": {
-    "GHSA-g7cv-rxg3-hmpx": {
-      "description": "84 malicious versions across 42 @tanstack/* packages (May 2026). @tanstack/query* confirmed clean. Audit all @tanstack/* versions before install or upgrade.",
-      "url": "https://github.com/advisories/GHSA-g7cv-rxg3-hmpx"
-    }
-  },
-  "sdkPolicy": {
-    "rollForward": "latestPatch",
-    "featureBandUpdateRequires": "platform-owner-approval-or-standards-minor-release"
-  },
-  "agentLoadPlans": {
+  "loadPlans": {
+    "repository.structure": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/repository/structure.md#agent-summary",
+        "docs/conventions/repository/naming.md#agent-summary",
+        "docs/conventions/repository/configuration.md#agent-summary",
+        "docs/conventions/repository/writing.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/repository/structure.md",
+        "docs/conventions/repository/naming.md",
+        "docs/conventions/repository/configuration.md",
+        "docs/conventions/repository/writing.md"
+      ]
+    },
+    "repository.writing": {
+      "tier0": ["AGENTS.md"],
+      "tier1": ["docs/conventions/repository/writing.md#agent-summary"],
+      "tier2": ["docs/conventions/repository/writing.md"]
+    },
+    "repository.dependencies": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/foundations/principles.md#agent-summary",
+        "docs/conventions/repository/dependencies.md#agent-summary",
+        "docs/conventions/repository/configuration.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/foundations/principles.md",
+        "docs/conventions/repository/dependencies.md",
+        "docs/conventions/repository/configuration.md"
+      ]
+    },
     "backend.domain": {
       "tier0": ["AGENTS.md"],
       "tier1": [
-        "docs/architecture/clean-architecture.md#agent-quick-rules",
-        "docs/conventions/backend/domain-layer.md#agent-quick-rules",
-        "docs/conventions/backend/exception-hierarchy.md#agent-quick-rules"
+        "docs/conventions/backend/architecture.md#agent-summary",
+        "docs/conventions/backend/domain.md#agent-summary",
+        "docs/conventions/repository/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/architecture/clean-architecture.md",
-        "docs/conventions/principles.md",
-        "docs/conventions/backend/domain-layer.md",
-        "docs/conventions/backend/exception-hierarchy.md"
-      ],
-      "blueprints": []
+        "docs/conventions/backend/architecture.md",
+        "docs/conventions/backend/domain.md",
+        "docs/conventions/repository/naming.md"
+      ]
     },
     "backend.application": {
       "tier0": ["AGENTS.md"],
       "tier1": [
-        "docs/conventions/backend/application-layer.md#agent-quick-rules",
-        "docs/conventions/backend/exception-hierarchy.md#agent-quick-rules"
+        "docs/conventions/backend/architecture.md#agent-summary",
+        "docs/conventions/backend/application.md#agent-summary",
+        "docs/conventions/backend/persistence-marten.md#agent-summary",
+        "docs/conventions/repository/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/backend/application-layer.md",
-        "docs/conventions/backend/exception-hierarchy.md"
-      ],
-      "blueprints": []
+        "docs/conventions/backend/architecture.md",
+        "docs/conventions/backend/application.md",
+        "docs/conventions/backend/persistence-marten.md",
+        "docs/conventions/repository/naming.md"
+      ]
     },
     "backend.api": {
       "tier0": ["AGENTS.md"],
       "tier1": [
-        "docs/conventions/backend/api-layer.md#agent-quick-rules",
-        "docs/conventions/backend/authentication-and-authorization.md#agent-quick-rules",
-        "docs/conventions/backend/object-authorization.md#agent-quick-rules",
-        "docs/conventions/shared/security.md#agent-quick-rules",
-        "docs/conventions/shared/api-compatibility.md#agent-quick-rules"
+        "docs/conventions/backend/api.md#agent-summary",
+        "docs/conventions/quality/security.md#agent-summary",
+        "docs/conventions/repository/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/architecture/clean-architecture.md",
-        "docs/conventions/backend/api-layer.md",
-        "docs/conventions/backend/authentication-and-authorization.md",
-        "docs/conventions/backend/object-authorization.md",
-        "docs/conventions/shared/security.md",
-        "docs/conventions/shared/api-compatibility.md"
-      ],
-      "blueprints": [
-        "docs/blueprints/backend/write-endpoint.md",
-        "docs/blueprints/backend/endpoint-extensions.md"
+        "docs/conventions/backend/api.md",
+        "docs/conventions/quality/security.md",
+        "docs/conventions/repository/naming.md"
       ]
     },
     "backend.infrastructure": {
       "tier0": ["AGENTS.md"],
       "tier1": [
-        "docs/architecture/clean-architecture.md#agent-quick-rules",
-        "docs/conventions/backend/infrastructure-layer.md#agent-quick-rules",
-        "docs/conventions/backend/background-jobs.md#agent-quick-rules",
-        "docs/conventions/backend/worker-projects.md#agent-quick-rules"
+        "docs/conventions/backend/architecture.md#agent-summary",
+        "docs/conventions/backend/persistence-marten.md#agent-summary",
+        "docs/conventions/repository/dependencies.md#agent-summary",
+        "docs/conventions/quality/operations.md#agent-summary"
       ],
       "tier2": [
-        "docs/architecture/clean-architecture.md",
-        "docs/conventions/backend/infrastructure-layer.md",
-        "docs/conventions/backend/background-jobs.md",
-        "docs/conventions/backend/worker-projects.md",
-        "docs/conventions/backend/reliability.md"
-      ],
-      "blueprints": [
-        "docs/blueprints/backend/infrastructure-service-registration.md",
-        "docs/blueprints/backend/outbox.md",
-        "docs/blueprints/backend/worker-program-cs.md",
-        "docs/blueprints/backend/idempotency.md"
+        "docs/conventions/backend/architecture.md",
+        "docs/conventions/backend/persistence-marten.md",
+        "docs/conventions/repository/dependencies.md",
+        "docs/conventions/quality/operations.md"
       ]
     },
-    "backend.testing": {
+    "frontend.structure": {
       "tier0": ["AGENTS.md"],
       "tier1": [
-        "docs/conventions/backend/testing.md#agent-quick-rules",
-        "docs/conventions/backend/api-acceptance-tests.md#agent-quick-rules",
-        "docs/conventions/backend/external-dependencies.md#agent-quick-rules",
-        "docs/conventions/shared/ci.md#agent-quick-rules"
+        "docs/conventions/frontend/structure.md#agent-summary",
+        "docs/conventions/repository/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/backend/testing.md",
-        "docs/conventions/backend/api-acceptance-tests.md",
-        "docs/conventions/backend/external-dependencies.md",
-        "docs/conventions/shared/ci.md"
-      ],
-      "blueprints": [
-        "docs/blueprints/backend/integration-test-factory.md",
-        "docs/blueprints/backend/api-acceptance-tests/acceptance-test-project.md"
+        "docs/conventions/frontend/structure.md",
+        "docs/conventions/repository/naming.md"
       ]
     },
-    "frontend.app": {
+    "frontend.rendering": {
       "tier0": ["AGENTS.md"],
       "tier1": [
-        "docs/conventions/frontend/nextjs-app-router.md#agent-quick-rules",
-        "docs/conventions/frontend/data-fetching.md#agent-quick-rules",
-        "docs/conventions/frontend/state-management.md#agent-quick-rules",
-        "docs/conventions/frontend/feature-boundaries.md#agent-quick-rules",
-        "docs/conventions/frontend/testing.md#agent-quick-rules"
+        "docs/conventions/frontend/rendering.md#agent-summary",
+        "docs/conventions/frontend/components.md#agent-summary",
+        "docs/conventions/quality/security.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend/nextjs-app-router.md",
-        "docs/conventions/frontend/data-fetching.md",
-        "docs/conventions/frontend/state-management.md",
-        "docs/conventions/frontend/feature-boundaries.md",
+        "docs/conventions/frontend/rendering.md",
+        "docs/conventions/frontend/components.md",
+        "docs/conventions/quality/security.md"
+      ]
+    },
+    "frontend.data": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/frontend/data-and-state.md#agent-summary",
+        "docs/conventions/repository/configuration.md#agent-summary",
+        "docs/conventions/quality/security.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/frontend/data-and-state.md",
+        "docs/conventions/repository/configuration.md",
+        "docs/conventions/quality/security.md"
+      ]
+    },
+    "frontend.components": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/frontend/components.md#agent-summary",
+        "docs/conventions/frontend/rendering.md#agent-summary",
+        "docs/conventions/frontend/testing.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/frontend/components.md",
+        "docs/conventions/frontend/rendering.md",
+        "docs/conventions/frontend/testing.md"
+      ]
+    },
+    "testing.backend": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/quality/backend-testing.md#agent-summary",
+        "docs/foundations/release-standard.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/quality/backend-testing.md",
+        "docs/foundations/release-standard.md"
+      ]
+    },
+    "testing.frontend": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/frontend/testing.md#agent-summary",
+        "docs/foundations/release-standard.md#agent-summary"
+      ],
+      "tier2": [
         "docs/conventions/frontend/testing.md",
-        "docs/conventions/frontend/state-and-forms.md"
+        "docs/foundations/release-standard.md"
+      ]
+    },
+    "use-case.authoring": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/foundations/addd.md#agent-summary",
+        "docs/foundations/release-standard.md#agent-summary"
       ],
-      "blueprints": [
-        "docs/blueprints/frontend/feature-use-case.md",
-        "docs/blueprints/frontend/feature-test-utils.md",
-        "docs/blueprints/frontend/lib-api-client.md",
-        "docs/blueprints/frontend/lib-env.md",
-        "docs/blueprints/frontend/proxy-ts.md",
-        "docs/blueprints/frontend/server-action.md"
+      "tier2": [
+        "docs/foundations/addd.md",
+        "docs/foundations/release-standard.md"
       ]
     },
     "security.review": {
       "tier0": ["AGENTS.md"],
       "tier1": [
-        "docs/conventions/shared/security.md#agent-quick-rules",
-        "docs/conventions/shared/security-controls.md#agent-quick-rules",
-        "docs/conventions/shared/supply-chain-security.md#agent-quick-rules"
+        "docs/conventions/quality/security.md#agent-summary",
+        "docs/conventions/quality/operations.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/shared/security.md",
-        "docs/conventions/shared/security-controls.md",
-        "docs/conventions/shared/supply-chain-security.md",
-        "docs/conventions/backend/object-authorization.md"
+        "docs/conventions/quality/security.md",
+        "docs/conventions/quality/operations.md"
+      ]
+    },
+    "operations": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/conventions/quality/operations.md#agent-summary",
+        "docs/conventions/quality/ci.md#agent-summary",
+        "docs/conventions/repository/configuration.md#agent-summary",
+        "docs/foundations/release-standard.md#agent-summary"
       ],
-      "blueprints": []
+      "tier2": [
+        "docs/conventions/quality/operations.md",
+        "docs/conventions/quality/ci.md",
+        "docs/conventions/repository/configuration.md",
+        "docs/foundations/release-standard.md"
+      ]
+    },
+    "release": {
+      "tier0": ["AGENTS.md"],
+      "tier1": [
+        "docs/foundations/release-standard.md#agent-summary",
+        "docs/conventions/quality/security.md#agent-summary",
+        "docs/conventions/quality/operations.md#agent-summary",
+        "docs/conventions/quality/ci.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/foundations/release-standard.md",
+        "docs/conventions/quality/security.md",
+        "docs/conventions/quality/operations.md",
+        "docs/conventions/quality/ci.md"
+      ]
     }
   }
 }
