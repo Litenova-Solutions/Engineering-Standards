@@ -15,6 +15,9 @@ All notable changes to Litenova Engineering Standards are recorded here.
 
 ### Changed
 
+- Refreshed the v1 platform and dependency pins from official release metadata, including .NET servicing, PostgreSQL, Marten, LiteBus, Node.js LTS, pnpm, and the selected frontend toolchain.
+- Replaced the Auth.js prerelease pin with the latest compatible stable release.
+- Added locked NuGet restore, JavaScript toolchain pins, and a package-to-project ownership matrix.
 - Rebuilt the unused preliminary v1 baseline before its first GitHub Release.
 - Made the repository documentation-first by removing the standards CLI, generated catalogs, automation scripts, and full application scaffold.
 - Renamed recipes to extensions and merged activation metadata into readable Markdown.

@@ -7,6 +7,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 ## Agent Summary {#agent-summary}
 
 - Pin the .NET SDK in root `global.json` from the manifest.
+- Pin Node.js and pnpm from the manifest when TypeScript exists.
 - Manage NuGet versions in `apps/api/Directory.Packages.props`.
 - Set shared .NET build rules in `apps/api/Directory.Build.props`.
 - Use one root pnpm workspace and lockfile when TypeScript exists.
@@ -37,6 +38,8 @@ Do not enable preview language features without a project decision.
 
 `apps/api/Directory.Packages.props` enables central package management and copies exact NuGet pins from the manifest. Individual project files contain package names without version attributes.
 
+Enable NuGet lock files and commit the lock file for every project. CI restores with locked mode and fails when dependency resolution differs from the committed graph.
+
 ### Commit the tool manifest (CONFIG.TOOLS.001)
 
 Root `.config/dotnet-tools.json` pins every required local .NET tool. A tool version that corresponds to a framework package uses the compatible manifest pin.
@@ -61,6 +64,12 @@ Do not place credentials in `.env.example`, test snapshots, logs, container laye
 
 Repositories with TypeScript use one root `package.json`, `pnpm-workspace.yaml`, and `pnpm-lock.yaml`. Use frozen installation in CI. Do not commit nested lockfiles under applications.
 
+### Pin the JavaScript toolchain (CONFIG.NODE.001)
+
+The root `package.json` declares the exact pnpm release from the manifest in `packageManager` and a Node.js engine compatible with the manifest-pinned LTS release. CI provisions that Node.js release and invokes the declared pnpm release.
+
+Do not rely on a developer's global Node.js or pnpm version. A repository may add `.node-version` or an equivalent version-manager file, but it must match the manifest.
+
 ## Conventions
 
 ### Keep environment examples beside applications
@@ -83,7 +92,9 @@ Application code emits structured logs through standard logging abstractions. Ex
 
 - Run `dotnet --version` from the repository root and compare it with the manifest policy.
 - Inspect project files for inline package versions.
+- Run a locked NuGet restore and confirm committed lock files remain unchanged.
 - Build with warnings as errors.
 - Search for direct configuration indexers and direct `process.env` access.
 - Scan tracked files and generated output for secrets.
 - Run `pnpm install --frozen-lockfile` when TypeScript exists.
+- Compare Node.js and pnpm versions with the manifest when TypeScript exists.

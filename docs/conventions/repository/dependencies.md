@@ -71,6 +71,23 @@ Generated API types contain types only. The shared API client may depend on `ope
 
 Assertion, substitution, test host, container, and architecture-test packages do not enter production projects.
 
+### Use this baseline package ownership
+
+| Project | Direct package groups |
+|:---|:---|
+| Domain | None |
+| Application | Required LiteBus module abstractions; `Marten` for the selected `IQuerySession` read boundary; Microsoft abstractions used by public ports |
+| Infrastructure | `Marten`; LiteBus registration modules; provider, resilience, service-discovery, and configuration packages required by implemented adapters |
+| WebApi | JWT bearer authentication, ASP.NET Core OpenAPI, build-time OpenAPI generation, Scalar, and required LiteBus mediator abstractions |
+| ServiceDefaults | Health checks, service discovery, HTTP resilience, and OpenTelemetry registration and instrumentation |
+| AppHost | Aspire AppHost and resource hosting packages |
+| Domain.Tests | xUnit and assertions |
+| Application.Tests | xUnit, assertions, and NSubstitute |
+| Integration.Tests | xUnit, assertions, test host, Testcontainers PostgreSQL, and coverage collector |
+| Architecture.Tests | xUnit, assertions, and NetArchTest |
+
+Add a package to the narrowest owning project. A central version entry does not authorize every project to reference that package. Conditional packages such as EF Core, Reqnroll, SignalR, WireMock, and Auth.js are referenced only after their extension activates.
+
 ## Examples
 
 An Application query handler may inject `IQuerySession` because Marten is the selected read model. An Application command handler receives `IPostRepository`, because the Domain owns the aggregate boundary and Infrastructure owns the Marten implementation.
