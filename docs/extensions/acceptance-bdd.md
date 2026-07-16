@@ -38,9 +38,13 @@ Direct database assertions are allowed only for a documented durable boundary su
 
 Each scenario owns its identifiers, actor context, requests, responses, and expected state. Reset database state between scenarios and do not depend on scenario order.
 
+### Keep step code at public boundaries (EXT.BDD.STEPS.001)
+
+Step definitions translate business phrases into typed test-driver calls. They do not resolve repositories, command handlers, sessions, or the production service provider. Hooks own scenario reset and actor setup, always await asynchronous work, and preserve the original failure when cleanup also fails.
+
 ## Conventions
 
-Use capability folders under Acceptance.Tests. Keep step definitions narrow and reusable only within the same business vocabulary. A scenario context object stores values for one scenario and does not become a service locator.
+Use capability folders under Acceptance.Tests. Keep step definitions narrow and reusable only within the same business vocabulary. A scenario context object stores values for one scenario and does not become a service locator. Tag the small pull-request subset with `@critical`; acceptance-ID tags remain separate.
 
 ## Dependencies
 
@@ -53,3 +57,4 @@ Use capability folders under Acceptance.Tests. Keep step definitions narrow and 
 - Run the complete acceptance project when domain specs, Application, WebApi, Infrastructure, schema, or OpenAPI changes.
 - Search every scenario for acceptance tags.
 - Confirm scenarios are independent under random order.
+- Confirm step assemblies have no reference to Infrastructure or production internals.

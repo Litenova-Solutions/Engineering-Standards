@@ -45,6 +45,16 @@ Keep the previous image digest and an executable rollback command. Confirm schem
 
 Use a read-only filesystem where the application permits it, drop unnecessary capabilities, declare writable paths, and apply CPU and memory limits based on measurement.
 
+### Preserve runtime process behavior (EXT.CONTAINERS.PROCESS.001)
+
+Run the application as the container entry process so it receives termination signals. Set a shutdown grace period that exceeds the measured request or Worker stop time. Write application logs to standard output or error and keep mutable data outside the container filesystem.
+
+### Identify release images (EXT.CONTAINERS.METADATA.001)
+
+Add OCI source, revision, version, and created-time labels. The release record stores the image digest, not only a tag. Build timestamps may appear in image metadata but MUST NOT enter generated application contracts.
+
+Frontend image builds distinguish public build-time configuration from server-only runtime secrets. Secrets use build secret mounts or runtime injection and never `ARG`, copied environment files, or image layers.
+
 ## Conventions
 
 Keep one Dockerfile beside each deployable application. Build from the repository root so shared project and package files are available without copying unrelated secrets.
@@ -58,4 +68,6 @@ No application package is required.
 - Inspect image history and contents for secrets and build-only files.
 - Run the image as the declared non-root user.
 - Test liveness, readiness, shutdown, schema job, smoke test, and rollback.
+- Verify termination reaches the application and in-flight work stops within the declared grace period.
+- Compare OCI revision and release evidence with the deployed digest.
 - Scan the image and review base digest updates.

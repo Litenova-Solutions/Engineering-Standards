@@ -85,6 +85,12 @@ Generate a migration for every schema change. Review tables, columns, indexes, c
 
 Run migrations as a release step. WebApi replicas do not migrate the hosted database during startup.
 
+Commit the migration, model snapshot, and reviewed SQL together. Apply from an empty database and from the previous release database. Production and staging startup MUST NOT call `EnsureCreated`, `EnsureDeleted`, or `Migrate`.
+
+### Map optimistic concurrency explicitly (EXT.EFCORE.CONCURRENCY.001)
+
+When `concurrency-idempotency` is active for an EF Core aggregate, configure a provider-backed concurrency token and carry the expected version through the command. The commit post-handler translates `DbUpdateConcurrencyException` into the Application conflict contract. It does not retry the complete command automatically.
+
 ## Conventions
 
 Use:
@@ -119,6 +125,7 @@ An EF Core-backed `Post` may use an Infrastructure `PostRow` with `state_type`, 
 
 - Confirm EF Core-owned commands and queries do not inject Marten sessions or depend on Marten query abstractions. The application may retain Marten packages for unaffected aggregate paths.
 - Apply migrations to PostgreSQL from an empty database and the previous release schema.
+- Confirm production and staging processes never apply or create schemas during startup.
 - Run command, query, concurrency, and API integration tests.
 - Confirm each command resolves repositories and commit behavior for one write provider.
 - Round-trip every aggregate state record and reject unknown or invalid discriminator and value combinations.
@@ -126,3 +133,4 @@ An EF Core-backed `Post` may use an Infrastructure `PostRow` with `state_type`, 
 - Review SQL and query plans for accepted queries.
 - Run architecture tests for repository, context, and commit boundaries.
 - Test rollback compatibility or the documented recovery plan.
+- When concurrency is active, test two real DbContext instances updating the same aggregate.

@@ -22,7 +22,9 @@ This extension replaces no baseline rule.
 
 ### Classify contract changes (EXT.API.COMPATIBILITY.001)
 
-Removing an endpoint or field, renaming a field, narrowing an accepted value, changing a response type, or changing a documented status code is breaking. Adding an optional field, endpoint, or query parameter is compatible when existing clients keep their behavior.
+Removing an endpoint or field, renaming a field, making an input required, narrowing an accepted value, changing a response type, changing a documented status code, or changing an authentication requirement is breaking. Adding an optional field, endpoint, or query parameter is compatible when existing clients keep their behavior.
+
+Adding an enum value or a new polymorphic subtype may break generated exhaustive clients and requires consumer review. Removing or reassigning a stable Problem Details code is breaking even when the HTTP status stays the same.
 
 When classification is unclear, treat the change as breaking and require consumer review.
 
@@ -42,9 +44,13 @@ Use a new route or documented media-type version for a breaking contract. Keep t
 
 Public operations scheduled for removal MUST expose a documented deprecation signal, such as `Deprecation` and `Sunset` headers, and appear in release notes. The use-case or API decision records the sunset date and replacement operation.
 
+### Retain compatible error contracts (EXT.API.ERRORS.001)
+
+Treat Problem Details `type`, `code`, field-error codes, and documented statuses as versioned contract elements. A compatible release may add a new error outcome only when existing consumers can handle an unknown code through the safe fallback contract. Test representative generated clients against the new document.
+
 ## Conventions
 
-Keep baseline OpenAPI artifacts under the generated contract owner, such as `packages/api-types/`. Use the same diff tool in local verification and CI. Keep Problem Details error codes stable across versions.
+Keep the current source artifact at `apps/api/openapi/{ProjectName}.json`. Store each supported release baseline beside the generated contract owner or as a retained release artifact with an immutable reference. Use the same diff tool in local verification and CI. Keep Problem Details error codes stable across versions.
 
 ## Dependencies
 
@@ -54,5 +60,6 @@ The extension adds no required package. Use an approved OpenAPI diff tool and pi
 
 - Diff the current OpenAPI document against the previous supported baseline.
 - Test stable operation IDs and documented Problem Details shapes.
+- Review enum, discriminator, authentication, and stable error-code changes that a structural diff may classify incompletely.
 - Verify breaking changes use a version or an approved consumer decision.
 - Verify deprecation headers, release notes, support windows, and sunset behavior.

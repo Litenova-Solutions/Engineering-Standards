@@ -36,11 +36,15 @@ The command post-handler serializes pending durable events into outbox records i
 
 Each record contains event ID, stable type, schema version, occurrence time, payload, tenant when applicable, state, attempt count, next attempt, last error summary, and completion time.
 
+The outbox writer MUST stage through the same scoped `IDocumentSession` as the aggregate repository. A store that opens another connection or commits independently does not satisfy atomic delivery, even when it uses the same PostgreSQL database.
+
 ### Dispatch from Worker (EXT.OUTBOX.WORKER.001)
 
 Worker claims pending records without allowing two workers to own the same attempt, dispatches a bounded batch, and records success or retry information.
 
 WebApi does not dispatch durable events inside the request transaction.
+
+Claim records in a short database transaction with a unique lease owner, lease expiry, and fencing value. Do not hold the claim transaction open during the network call. A worker updates completion only while it still owns the matching lease and fencing value. Expired claims return to eligible work.
 
 ### Accept duplicate delivery (EXT.OUTBOX.IDEMPOTENCY.001)
 
@@ -58,9 +62,28 @@ Use stable event type names and explicit schema versions. A deployed Worker must
 
 Publish pending count, failed count, oldest pending age, attempts, dispatch duration, and success rate. Alert thresholds follow the use-case delivery target.
 
+### Use an explicit record lifecycle (EXT.OUTBOX.STATE.001)
+
+Use these logical states:
+
+| State | Meaning | Allowed next state |
+|:---|:---|:---|
+| `pending` | Eligible when `nextAttemptAt` is due | `processing` |
+| `processing` | Owned by one unexpired lease | `published`, `pending`, `dead_letter` |
+| `published` | Downstream accepted the event | None |
+| `dead_letter` | Automatic attempts ended or failure is permanent | `pending` only through audited replay |
+
+A crash after downstream acceptance but before `published` may deliver the event again. Preserve the event ID across retry and replay so downstream idempotency can suppress the duplicate. Record replay actor, reason, time, and previous failure without editing the original payload.
+
+### Keep dispatch compatibility during rollout (EXT.OUTBOX.ROLLOUT.001)
+
+New WebApi code may emit a record only after every active Worker can read its type and schema version. Deploy compatible readers before writers for additive event versions. Rollback planning includes records created by the new writer but not yet dispatched.
+
 ## Conventions
 
 Keep outbox record, storage, claim, and dispatch infrastructure under `Infrastructure/Messaging/Outbox/`. Keep the Worker host under its own project. Keep event-to-provider mapping in the integration that owns the side effect.
+
+The selected LiteBus release includes optional durable messaging packages, but this extension does not adopt them automatically. Add one only after the manifest pins it and an integration test proves that its writer shares the Marten business transaction. The core LiteBus command and event modules remain sufficient for the project-owned Marten record and Worker dispatcher.
 
 ## Dependencies
 
@@ -70,7 +93,10 @@ No additional baseline package is required. Provider-specific dispatch dependenc
 
 - Commit an aggregate and outbox record atomically.
 - Stop the process after commit and verify Worker later dispatches the record.
+- Fail between external acceptance and completion and verify duplicate-safe redelivery.
 - Run two Worker instances and verify one claim per attempt.
+- Expire a lease and verify a stale worker cannot complete the reclaimed record.
 - Deliver the same event more than once and verify idempotency.
 - Test retry exhaustion, poison-message inspection, replay, and rollback compatibility.
 - Verify backlog diagnostics and alerts.
+- Verify old and new Workers against records produced during rollout and rollback.

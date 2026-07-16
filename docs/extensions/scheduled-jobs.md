@@ -45,6 +45,16 @@ Executions MUST use bounded attempts, cancellation-aware backoff, and a poison s
 
 Persist the last scheduled, started, and completed occurrence. Define whether a missed occurrence is skipped, replayed once, or replayed for every interval. Provide inspection, manual replay, and disable procedures.
 
+### Identify each occurrence (EXT.JOBS.OCCURRENCE.001)
+
+Give each planned occurrence a stable identity derived from the schedule ID and scheduled instant. Persist `scheduled`, `processing`, `completed`, and `dead_letter` state with attempt, lease, start, completion, and safe error data. Use the occurrence identity as the command idempotency scope.
+
+A worker may mark completion only while its fencing value remains current. Manual replay creates an audited new attempt for the same occurrence identity rather than inventing a second scheduled instant.
+
+### Make time behavior deterministic (EXT.JOBS.TIME.001)
+
+Prefer UTC schedules. A business-local schedule records an IANA time-zone identifier and defines behavior for skipped and repeated local times during clock changes. Tests use an injected clock and representative time-zone transitions; production code does not depend on machine-local time.
+
 ## Conventions
 
 Create one handler per job under the capability that owns the behavior. Resolve scoped dependencies inside an execution scope and dispose the scope after the command completes. Keep schedule definitions separate from command behavior.
@@ -59,3 +69,4 @@ No additional baseline package is required. Use Marten or the selected persisten
 - Test cancellation, shutdown, lease expiry, renewal failure, and restart.
 - Test duplicate execution, retry exhaustion, poison handling, and manual replay.
 - Verify schedule state, metrics, alerts, and time-zone behavior.
+- Verify fencing prevents a stale execution from recording completion.
