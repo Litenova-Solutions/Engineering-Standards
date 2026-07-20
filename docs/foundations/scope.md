@@ -10,7 +10,7 @@ The boundary is deliberate. Applications outside it may still use individual ide
 
 - Apply version 1 to one bounded-context business application.
 - Use the selected ASP.NET Core, PostgreSQL, Marten, and optional Next.js profile.
-- Deliver one release-ready primary journey before secondary capabilities.
+- Deliver one release-ready primary journey before secondary subjects.
 - Activate conditional behavior through named extensions.
 - Record a decision before departing from a required standard.
 
@@ -24,9 +24,9 @@ An API-only catalog fits. A native mobile application without the supported API 
 
 ### Keep one bounded context (SCOPE.CONTEXT.001)
 
-The application has one business language and one deployment boundary. Capabilities group behavior inside that context. They do not become independent services or bounded contexts.
+The application has one business language and one deployment boundary. Subjects group a stable business noun, its model, and its use cases inside that context. They do not become independent services or bounded contexts.
 
-`Posts`, `Authors`, and `Comments` may be separate capabilities in one publishing context.
+`Posts`, `Authors`, and `Comments` may be separate subjects in one publishing context.
 
 ### Deliver a release-ready primary journey (SCOPE.V1.001)
 
@@ -62,5 +62,5 @@ A publishing v1 may support author sign-in, draft creation, publication, and pub
 
 - Confirm the product brief names one primary journey.
 - Confirm `standards.project.json` selects `dotnet-nextjs`.
-- Confirm each conditional capability appears in the extension list.
+- Confirm each active conditional concern appears in the extension list.
 - Confirm unsupported architecture choices have a project decision.

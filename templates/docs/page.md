@@ -3,7 +3,7 @@
   "id": "__APP__.__PAGE__",
   "app": "__APP__",
   "route": "__ROUTE__",
-  "useCases": ["__CAPABILITY__.__USE_CASE__"]
+  "useCases": ["__SUBJECT__.__USE_CASE__"]
 }
 ---
 # __TITLE__

@@ -1,6 +1,6 @@
 ---
 {
-  "id": "__CAPABILITY__",
+  "id": "__SUBJECT__",
   "status": "planned"
 }
 ---
@@ -16,11 +16,11 @@
 
 ## Purpose
 
-State the business capability and the user outcome it supports.
+State the business subject and the user outcome it supports.
 
 ## Actors
 
-- Name each actor and their responsibility in this capability.
+- Name each actor and their responsibility in this subject.
 
 ## Terms
 
@@ -28,17 +28,23 @@ State the business capability and the user outcome it supports.
 |:---|:---|:---|
 | `__TERM__` | Define the term in business language. | List words that must not replace it. |
 
-## Aggregate boundaries
+## Primary aggregate root
+
+Name the aggregate root that owns state changes for this subject. Write `None` for a read-only subject.
 
 | Aggregate root | Owns | References by ID | Consistency boundary |
 |:---|:---|:---|:---|
 | `__AGGREGATE__` | List child entities and values changed atomically. | List other aggregate IDs. | State the invariants protected in one command. |
 
+The subject is a documentation and navigation boundary. The aggregate root remains the runtime consistency and mutation boundary. Do not introduce `Subject`, `ISubject`, or `SubjectRoot` runtime abstractions.
+
 ## State model
 
 ### __AGGREGATE__
 
-Every aggregate has an explicit state record hierarchy, including an aggregate with one current state.
+Every state-changing aggregate has an explicit state record hierarchy, including an aggregate with one current state.
+
+For a read-only subject, write `No domain state model` and remove the aggregate-specific placeholder rows.
 
 | State record | Required data | Business meaning |
 |:---|:---|:---|
@@ -46,13 +52,13 @@ Every aggregate has an explicit state record hierarchy, including an aggregate w
 
 | From state | Business action | To state | Invariant IDs | Use cases |
 |:---|:---|:---|:---|:---|
-| `__FROM_STATE__` | `__ACTION__` | `__TO_STATE__` | `INV-__CAPABILITY_ID__-01` | Link the command specification. |
+| `__FROM_STATE__` | `__ACTION__` | `__TO_STATE__` | `INV-__SUBJECT_ID__-01` | Link the command specification. |
 
 ## Invariants
 
 | ID | Rule | Protected by | Failure |
 |:---|:---|:---|:---|
-| `INV-__CAPABILITY_ID__-01` | State one rule in business language. | Name the aggregate or value object. | Name the domain exception or rejected outcome. |
+| `INV-__SUBJECT_ID__-01` | State one rule in business language. | Name the aggregate or value object. | Name the domain exception or rejected outcome. |
 
 Do not renumber or reuse an accepted invariant ID.
 
@@ -70,11 +76,11 @@ Do not renumber or reuse an accepted invariant ID.
 
 | Invariant or transition | Use cases | Acceptance criteria |
 |:---|:---|:---|
-| `INV-__CAPABILITY_ID__-01` | Link each owning use case. | List stable acceptance IDs. |
+| `INV-__SUBJECT_ID__-01` | Link each owning use case. | List stable acceptance IDs. |
 
 ## Dependencies
 
-- Link another capability only when this capability requires its public behavior.
+- Link another subject only when this subject requires its public behavior.
 
 ## Open modeling questions
 

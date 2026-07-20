@@ -48,7 +48,7 @@ Escape formula-leading values in CSV or spreadsheet exports unless the field int
 
 ## Conventions
 
-Keep report definitions in Application under their business capability. Keep SQL, row mappings, and storage providers in Infrastructure. Keep Worker orchestration separate from report business rules.
+Keep report definitions in Application under their business subject. Keep SQL, row mappings, and storage providers in Infrastructure. Keep Worker orchestration separate from report business rules.
 
 ## Dependencies
 

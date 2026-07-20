@@ -35,7 +35,7 @@ Store a lease or claim in PostgreSQL with an owner, expiry, and fencing value. A
 
 ### Dispatch commands through Application (EXT.JOBS.COMMAND.001)
 
-A job dispatches an Application command or an approved capability port. It MUST NOT mutate a Marten session or DbContext directly, bypass Domain behavior, or call WebApi endpoints.
+A job dispatches an Application command or an approved Application port. It MUST NOT mutate a Marten session or DbContext directly, bypass Domain behavior, or call WebApi endpoints.
 
 ### Bound retries and require idempotency (EXT.JOBS.RETRY.001)
 
@@ -57,7 +57,7 @@ Prefer UTC schedules. A business-local schedule records an IANA time-zone identi
 
 ## Conventions
 
-Create one handler per job under the capability that owns the behavior. Resolve scoped dependencies inside an execution scope and dispose the scope after the command completes. Keep schedule definitions separate from command behavior.
+Create one handler per job under the subject that owns the behavior. Resolve scoped dependencies inside an execution scope and dispose the scope after the command completes. Keep schedule definitions separate from command behavior.
 
 ## Dependencies
 

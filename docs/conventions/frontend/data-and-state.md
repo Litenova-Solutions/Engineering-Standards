@@ -126,7 +126,7 @@ Move the generated types and client to workspace packages only when more than on
 
 ### Keep schemas operation-specific
 
-Place a form or view schema in the owning use-case folder. Move it to capability shared code only after another use case uses the same contract.
+Place a form or view schema in the owning use-case folder. Move it to subject shared code only after another use case uses the same contract.
 
 ### Use native and framework form support first
 

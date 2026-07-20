@@ -31,7 +31,7 @@ Resolve the tenant from verified claims, host mapping, or another authenticated 
 
 ### Verify membership and resource tenant (EXT.TENANCY.AUTHZ.001)
 
-Confirm the actor belongs to the resolved tenant and the target resource belongs to the same tenant. Administrative cross-tenant operations use a distinct policy, actor capability, and audit trail.
+Confirm the actor belongs to the resolved tenant and the target resource belongs to the same tenant. Administrative cross-tenant operations use a distinct policy, actor permission, and audit trail.
 
 ### Apply tenant scope in persistence (EXT.TENANCY.STORAGE.001)
 

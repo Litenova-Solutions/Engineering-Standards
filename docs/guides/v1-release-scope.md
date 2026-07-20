@@ -14,7 +14,7 @@ V1 contains:
 - A machine-readable manifest plus schemas for the standards manifest and consumer selection file.
 - Foundations for supported scope, engineering principles, ADDD, agent work, and application release evidence.
 - One `dotnet-nextjs` platform profile.
-- Fine-grained repository, backend, frontend, testing, security, operations, and CI conventions with stable rule IDs.
+- Fine-grained repository, backend, frontend, testing, security, operations, and CI conventions with canonical rule IDs.
 - Conditional extension standards selected by current use-case requirements and risk.
 - Guides for greenfield adoption and tactical Domain modeling.
 - Consumer templates for product, domain, use-case, page, decision, runbook, release-evidence, and agent documentation.
@@ -27,12 +27,12 @@ The standards repository does not include a CLI, generated catalog, or applicati
 | Area | V1 contains |
 |:---|:---|
 | Product delivery | One bounded context, one deployed primary journey, short inception documents, use-case specifications, stable acceptance IDs, and risk-driven assurance |
-| Backend shape | Domain, Application, Infrastructure, and WebApi projects, plus AppHost and ServiceDefaults; capability-first folders; inward references; internal sealed implementations |
+| Backend shape | Domain, Application, Infrastructure, and WebApi projects, plus AppHost and ServiceDefaults; subject-first folders; inward references; internal sealed implementations |
 | Domain model | Aggregate roots, typed IDs, value objects, explicit state record hierarchies, transitions, invariants, domain events, repository boundaries, and safe Domain failures |
 | Application | LiteBus commands and queries, structural validators, handlers, transport-neutral results and failures, target authorization, narrow ports, and explicit reactions |
 | Persistence | PostgreSQL and Marten, scoped sessions, aggregate repositories, direct query projections, one post-handler commit, explicit JSON contracts, document evolution, indexes, and release-time schema application |
 | HTTP | Minimal API endpoint classes, deterministic discovery, claims-derived actors, resource authorization, exact Problem Details and pagination contracts, documented statuses, and deterministic OpenAPI |
-| Frontend | Optional Next.js App Router applications, server-first rendering, capability isolation, generated API types, one typed client, serializable action results, explicit route states, accessibility, and layered tests |
+| Frontend | Optional Next.js App Router applications, server-first rendering, subject isolation, generated API types, one typed client, serializable action results, explicit route states, accessibility, and layered tests |
 | Verification | Domain, Application, Integration, and Architecture test projects; real PostgreSQL and API harnesses; acceptance trace; generated-contract freshness; browser tests for critical journeys |
 | Security | Provider-neutral JWT validation, deny-by-default access, resource authorization, safe errors, input and browser boundaries, secret handling, abuse controls, CORS, audit events, rotation, and supply-chain gates |
 | Operations | Aspire local orchestration, W3C-correlated diagnostics, low-cardinality metrics, liveness and readiness, schema rollout, tested restore, repeatable deployment and rollback, alerts, runbooks, and release evidence |

@@ -32,7 +32,7 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 
 | Document | Covers |
 |:---|:---|
-| [Architecture](conventions/backend/architecture.md) | Four-project modular monolith, dependency direction, capability slices, and Worker activation. |
+| [Architecture](conventions/backend/architecture.md) | Four-project modular monolith, dependency direction, subject and use-case slices, and Worker activation. |
 | [Domain](conventions/backend/domain.md) | Aggregate roots, mandatory state records, value objects, IDs, entities, services, events, repositories, errors, and persistence-neutral object design. |
 | [Application](conventions/backend/application.md) | Commands, queries, handlers, validators, results, reactions, ports, and folders. |
 | [Marten persistence](conventions/backend/persistence-marten.md) | Sessions, repositories, queries, commit pipeline, event collection, JSON contracts, document evolution, aliases, indexes, and schema changes. |
@@ -69,8 +69,9 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Decision records](reference/decisions/README.md) explain baseline choices.
 - [Adopt standards v1](guides/adopt-v1.md) gives a greenfield consumer sequence.
 - [Upgrade to standards v1.1](guides/upgrade-v1.1.md) gives the consumer migration sequence for document metadata and consistency checks.
+- [Upgrade to standards v1.2](guides/upgrade-v1.2.md) explains the Subject migration and aggregate root boundary.
 - [V1 release scope](guides/v1-release-scope.md) states the complete baseline, conditional catalog, release contents, and exclusions.
-- [Model a Domain capability](guides/model-domain.md) turns human discovery into aggregate, state, invariant, event, and use-case documentation.
+- [Model a Domain subject](guides/model-domain.md) turns known business language into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
 - [Runbook template](../templates/docs/runbook.md) gives the required operational record shape.
 - [V2 roadmap](../ROADMAP.md) records evidence-gated candidates after v1 adoption.

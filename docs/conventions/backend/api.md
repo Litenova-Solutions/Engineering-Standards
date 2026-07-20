@@ -7,8 +7,8 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 ## Agent Summary {#agent-summary}
 
 - Use one Minimal API `IEndpoint` class per operation.
-- Group endpoints by capability and use case.
-- Keep request, response, and mapping types beside the endpoint.
+- Group endpoints by subject and use case.
+- Keep request models, response models, and API mapping types beside the endpoint.
 - Derive the authenticated actor from trusted claims.
 - Return stable Problem Details codes and documented status codes.
 - Keep endpoints free of repositories, sessions, provider clients, and business rules.
@@ -19,6 +19,8 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 ### Use one endpoint per operation (API.ENDPOINTS.001)
 
 Each endpoint implements `IEndpoint`, maps one route operation, converts transport input to an Application message, dispatches through `ICommandMediator` or `IQueryMediator`, and maps the result.
+
+Name its passive HTTP DTOs `{UseCase}RequestModel` and `{UseCase}ResponseModel`. Name an operation-specific mapping class `{UseCase}ApiMappings`.
 
 MVC controllers and `ControllerBase` are outside this profile.
 
@@ -149,16 +151,16 @@ When TypeScript consumes the API, run the pinned `openapi-typescript` executable
     Posts/
       CreateDraft/
         CreateDraftEndpoint.cs
-        CreateDraftRequest.cs
-        CreateDraftResponse.cs
-        CreateDraftMappings.cs
+        CreateDraftRequestModel.cs
+        CreateDraftResponseModel.cs
+        CreateDraftApiMappings.cs
       GetPost/
         GetPostEndpoint.cs
-        GetPostResponse.cs
-        GetPostMappings.cs
+        GetPostResponseModel.cs
+        GetPostApiMappings.cs
   Errors/
     GlobalExceptionHandler.cs
-    ProblemDetailsMappings.cs
+    ProblemDetailsApiMappings.cs
   Security/
     CurrentActor.cs
   OpenApi/
@@ -167,7 +169,7 @@ When TypeScript consumes the API, run the pinned `openapi-typescript` executable
 
 ### Keep transport models independent
 
-Request and response models use JSON and OpenAPI concerns. Application messages and results remain transport-neutral. Explicit mapping may be a small method or an internal static mappings class.
+Request and response models use JSON and OpenAPI concerns. Their names end in `RequestModel` and `ResponseModel` so they cannot be mistaken for behavior or rich business objects. A response collection item uses `{UseCase}ResponseItemModel`; pagination metadata uses `PaginationModel`. Other project-owned, passive HTTP DTOs name their concrete boundary role and end in `Model`. Application messages and results remain transport-neutral. Explicit mapping may be a small method or an internal static class ending in `ApiMappings`.
 
 ### Name routes from resources
 
@@ -190,11 +192,12 @@ Keep the visible middleware order: forwarded headers from explicitly trusted pro
 
 ## Examples
 
-A create endpoint reads the author from claims, maps the title to `CreateDraftCommand`, sends it through `ICommandMediator`, and returns 201 with the new post location. The endpoint never calls `Post.CreateDraft` or `IPostRepository`.
+A create endpoint reads the author from claims, maps `CreateDraftRequestModel` to `CreateDraftCommand` through `CreateDraftApiMappings`, sends it through `ICommandMediator`, and maps `CreateDraftCommandResult` to `CreateDraftResponseModel` with the new post location. A read endpoint maps `GetPostQueryResult` to `GetPostResponseModel` through `GetPostApiMappings`. Neither endpoint calls `Post.CreateDraft` or `IPostRepository`.
 
 ## Verification
 
 - Inspect endpoint constructors and bodies for forbidden dependencies and business logic.
+- Confirm every passive HTTP DTO names its concrete boundary role and ends in `Model`; confirm operation mappings end in `ApiMappings`.
 - Compare routes and status codes with use-case specifications and OpenAPI.
 - Test validation, authentication, authorization, missing resources, conflicts, and success through `WebApplicationFactory`.
 - Validate the exact Problem Details and pagination JSON shapes.

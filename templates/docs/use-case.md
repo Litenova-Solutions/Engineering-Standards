@@ -1,6 +1,6 @@
 ---
 {
-  "id": "__CAPABILITY__.__USE_CASE__",
+  "id": "__SUBJECT__.__USE_CASE__",
   "operationType": "__OPERATION_TYPE__",
   "status": "planned",
   "actors": ["__ACTOR__"],
@@ -43,7 +43,7 @@ State the observable result without exposing internal persistence types.
 
 ## Business rules
 
-- Cite each capability invariant ID and state any operation-specific decision that changes the outcome.
+- Cite each subject invariant ID and state any operation-specific decision that changes the outcome.
 
 ## Domain behavior
 
@@ -51,7 +51,7 @@ For a command, complete the transition table. For a query, write `No domain tran
 
 | Aggregate | Source state | Business action | Target state | Invariant IDs | Domain events |
 |:---|:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `INV-__CAPABILITY_ID__-01` | `__PAST_TENSE_EVENT__` |
+| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `INV-__SUBJECT_ID__-01` | `__PAST_TENSE_EVENT__` |
 
 ## Main flow
 
@@ -65,13 +65,13 @@ For a command, complete the transition table. For a query, write `No domain tran
 
 ## Acceptance criteria
 
-- [AC-__CAPABILITY_ID__-__USE_CASE_ID__-01] Replace with one observable criterion.
+- [AC-__SUBJECT_ID__-__USE_CASE_ID__-01] Replace with one observable criterion.
 
 ## Invariant coverage
 
 | Invariant ID | Acceptance criteria |
 |:---|:---|
-| `INV-__CAPABILITY_ID__-01` | `AC-__CAPABILITY_ID__-__USE_CASE_ID__-01` |
+| `INV-__SUBJECT_ID__-01` | `AC-__SUBJECT_ID__-__USE_CASE_ID__-01` |
 
 ## Examples
 

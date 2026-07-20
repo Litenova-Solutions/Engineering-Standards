@@ -2,13 +2,13 @@
 
 ## Intent
 
-Each frontend is an independent Next.js application organized around the same business capabilities and use cases as the backend. Route files compose features. Feature folders own behavior. Shared folders contain only code with real cross-feature use.
+Each frontend is an independent Next.js application organized around the same business subjects and use cases as the backend. Route files compose features. Feature folders own behavior. Shared folders contain only code with real cross-feature use.
 
 ## Agent Summary {#agent-summary}
 
 - Place each frontend under `apps/{name}/` with its own `app`, `features`, `components`, and `lib` folders.
-- Organize feature code by capability and use case.
-- Do not import another capability's internal feature files.
+- Organize feature code by subject and use case.
+- Do not import another subject's internal feature files.
 - Keep route files as composition boundaries.
 - Keep shadcn/ui source inside each frontend.
 - Share generated API types, thin clients, configuration, or CSS tokens through packages only when multiple apps consume them.
@@ -36,15 +36,15 @@ apps/{frontend}/
 
 Framework-generated cache and build folders remain untracked.
 
-### Organize features by capability and use case (FRONTEND.FEATURES.001)
+### Organize features by subject and use case (FRONTEND.FEATURES.001)
 
-Use `features/{capability}/{use-case}/` for operation-specific components, server functions, schemas, hooks, and view mappings.
+Use `features/{subject}/{use-case}/` for operation-specific components, server functions, schemas, hooks, and view mappings.
 
-The capability and use-case names match ADDD documentation and backend Application folders.
+The subject and use-case names match ADDD documentation and backend Application folders.
 
-### Isolate capability internals (FRONTEND.BOUNDARIES.001)
+### Isolate subject internals (FRONTEND.BOUNDARIES.001)
 
-One capability cannot import another capability's internal feature path. Route composition may render public components from more than one capability when a page specification requires it.
+One subject cannot import another subject's internal feature path. Route composition may render public components from more than one subject when a page specification requires it.
 
 Move shared code to `components/`, `lib/`, or a workspace package only after two real consumers need the same responsibility.
 
@@ -85,7 +85,7 @@ features/
       PostStatusBadge.tsx
 ```
 
-Create capability `shared/` only for code used by two use cases in that capability. Cross-capability primitives belong outside `features/`.
+Create a subject-local `shared/` folder only for code used by two use cases in that subject. Cross-subject primitives belong outside `features/`.
 
 ### Use explicit public entry points for workspace packages
 
@@ -102,7 +102,7 @@ Unit and component tests may stay beside the module they test. Cross-route brows
 ## Verification
 
 - Compare frontend folders with the canonical tree.
-- Run lint rules that reject cross-capability and cross-application imports.
+- Run lint rules that reject cross-subject and cross-application imports.
 - Confirm shared modules have at least two consumers.
 - Confirm generated types and API clients expose public package entry points.
 - Confirm route files contain composition rather than reusable feature behavior.

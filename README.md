@@ -31,7 +31,7 @@ Litenova uses Agentic Domain-Driven Delivery (ADDD). ADDD keeps product intent, 
 For a publishing application:
 
 1. The product brief defines the primary journey: an author creates and publishes a post.
-2. The domain index identifies the `Posts` capability.
+2. The domain index identifies the `Posts` subject.
 3. `docs/domain/posts/create-draft.md` defines the first use case.
 4. Acceptance criterion `AC-POSTS-CREATE-DRAFT-01` states an observable outcome.
 5. The agent loads only the Application, API, persistence, and testing conventions required by that use case.
@@ -53,7 +53,7 @@ Topic documents use the same structure:
 - **Examples** show a concrete interpretation.
 - **Verification** states how to check the result.
 
-A heading such as `Organize every layer by capability and use case (ARCH.CAPABILITIES.001)` contains a human title followed by its stable rule ID.
+A heading such as `Organize every layer by subject and use case (ARCH.SUBJECTS.001)` contains a human title followed by its canonical rule ID. A later standards release may rename or remove a rule ID when the contract changes.
 
 Other IDs have separate purposes:
 
@@ -61,7 +61,7 @@ Other IDs have separate purposes:
 |:---|:---|
 | `posts.create-draft` | Consumer use-case ID |
 | `AC-POSTS-CREATE-DRAFT-01` | Acceptance-criterion ID |
-| `ARCH.CAPABILITIES.001` | Standards rule ID |
+| `ARCH.SUBJECTS.001` | Standards rule ID |
 | `persistence-ef-core` | Extension ID |
 
 ## Read the standards
@@ -77,7 +77,7 @@ Add the release as a root submodule and pin its exact commit:
 ```bash
 git submodule add https://github.com/Litenova-Solutions/Engineering-Standards.git standards
 git -C standards fetch --tags
-git -C standards checkout v1.1.0
+git -C standards checkout v1.2.0
 git add .gitmodules standards
 ```
 
@@ -121,9 +121,11 @@ ROADMAP.md                    Evidence-gated candidates for v2
 
 ## Version policy
 
-- Patch: clarification or correction that does not invalidate compliant consumers.
-- Minor: additive rule, extension, or capability that does not invalidate compliant consumers.
-- Major: rule or contract change that requires consumer work.
+- Patch: narrow correction or clarification.
+- Minor: coherent standards evolution, including changes that require consumer migration.
+- Major: substantial replacement of the supported scope, method, or platform profile.
+
+Version numbers identify standards releases. They do not promise backward compatibility. Each release keeps one current contract and records required consumer work in its changelog and upgrade guide.
 
 Future standards releases add an annotated Git tag, GitHub Release, changelog entry, and upgrade guide when consumer work is required.
 

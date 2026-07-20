@@ -43,7 +43,7 @@ Public metadata, form labels, validation messages, and user-safe errors follow t
 
 ## Conventions
 
-Keep catalogs under one application-owned locale root and split by capability only when catalog size requires it. Use BCP 47 locale identifiers. Keep locale selection in URL or documented session preference, not an implicit global variable.
+Keep catalogs under one application-owned locale root and split by subject only when catalog size requires it. Use BCP 47 locale identifiers. Keep locale selection in URL or documented session preference, not an implicit global variable.
 
 ## Dependencies
 

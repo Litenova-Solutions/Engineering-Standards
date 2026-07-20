@@ -1,6 +1,6 @@
-# Model a Domain Capability
+# Model a Domain Subject
 
-Use this guide after human discovery has identified the business language and rules for a capability. It converts those findings into the capability document, use-case specifications, and Domain object design required by the profile.
+Use this guide after the business language and rules for a subject are known. It converts those findings into the subject specification, use-case specifications, and Domain object design required by the profile.
 
 This guide does not replace interviews, Event Storming, policy review, or another discovery method. An agent may expose a missing definition or conflicting rule. It must not invent the business answer.
 
@@ -10,17 +10,17 @@ Start with:
 
 - The product brief and primary journey.
 - The domain glossary.
-- The capability purpose and actors.
+- The subject purpose and actors.
 - Known business policies, examples, and failure cases.
 - Decisions that constrain identity, persistence, security, or external behavior.
 
-If a command depends on an unknown policy, record it under `Open modeling questions` in the capability document and stop that use case. Other use cases with complete rules may continue.
+If a command depends on an unknown policy, record it under `Open modeling questions` in the subject specification and stop that use case. Other use cases with complete rules may continue.
 
-## Name the capability language
+## Name the subject language
 
-Record each capability term with one definition and any rejected synonyms. Use the same term in documentation, Domain types, Application operations, API descriptions, and frontend features.
+Record each subject term with one definition and any rejected synonyms. Use the same term in documentation, Domain types, Application operations, API descriptions, and frontend features.
 
-For a publishing capability:
+For the Posts subject:
 
 | Term | Definition | Rejected synonyms |
 |:---|:---|:---|
@@ -33,6 +33,8 @@ Rejected synonyms prevent later contributors from creating types such as `Articl
 ## Draw aggregate boundaries from invariants
 
 Group data that must remain consistent in one command transaction. Name the root, owned children, referenced aggregate IDs, and the invariant that requires the boundary.
+
+A state-changing subject begins with one primary aggregate root. If another consistency owner has independent language and use cases, model it as a separate subject. Reference its aggregate by typed ID when the current subject needs that identity.
 
 ```text
 Post
@@ -71,7 +73,7 @@ For each state, answer:
 - Which actions are allowed from this state?
 - Which actions are rejected from this state, and why?
 
-An unanswered question belongs in the capability document. It does not receive a guessed default.
+An unanswered question belongs in the subject specification. It does not receive a guessed default.
 
 ## Write the transition table
 
@@ -102,7 +104,7 @@ Document rejected source states in the use-case failure table and acceptance cri
 
 ## Give invariants stable identities
 
-Write each shared rule once in the capability document and assign `INV-{CAPABILITY}-{NN}`.
+Write each shared rule once in the subject specification and assign `INV-{SUBJECT}-{NN}`.
 
 | ID | Rule | Protected by | Failure |
 |:---|:---|:---|:---|
@@ -169,7 +171,7 @@ Each command use-case specification names:
 
 Each query states that it has no Domain transition and names its read source. A query may expose state as a stable response field, but the API representation does not replace the Domain state records.
 
-Update the capability coverage table after the use cases have stable acceptance IDs:
+Update the subject coverage table after the use cases have stable acceptance IDs:
 
 | Invariant or transition | Use cases | Acceptance criteria |
 |:---|:---|:---|
@@ -188,14 +190,15 @@ Agents and reviewers may report these gaps without deciding the missing business
 - An invariant with no acceptance criterion.
 - An event with a mutable value or aggregate reference.
 - A reaction with no delivery requirement.
-- A term used in code but absent from the glossary or capability language.
+- A term used in code but absent from the glossary or subject language.
 - Two names for the same domain concept.
 
 Structural completeness does not prove that the business model is correct. Domain experts still approve the language, boundaries, states, transitions, and invariants.
 
 ## Completion check
 
-- The capability language uses one term for each concept and records rejected synonyms.
+- The subject language uses one term for each concept and records rejected synonyms.
+- The state-changing subject names one primary aggregate root.
 - Every aggregate boundary names owned children and referenced aggregate IDs.
 - Every aggregate has an explicit state record hierarchy.
 - State-specific data appears only on its state record.

@@ -12,7 +12,7 @@ The extension adds the pinned HTTP resilience and network simulation packages. I
 
 ## Agent Summary {#agent-summary}
 
-- Define a narrow Application capability port.
+- Define a narrow Application port.
 - Keep provider clients and transport models in Infrastructure.
 - Bind base address, credentials, timeout, and policy through validated options.
 - Retry only safe operations with bounded attempts.
@@ -21,11 +21,11 @@ The extension adds the pinned HTTP resilience and network simulation packages. I
 
 ## Standards
 
-### Define an Application capability port (EXT.EXTERNAL.PORT.001)
+### Define an Application port (EXT.EXTERNAL.PORT.001)
 
-Application owns a public interface named for the business capability. Infrastructure owns provider clients, SDKs, authentication, and transport models.
+Application owns a public interface named for the business action. Infrastructure owns provider clients, SDKs, authentication, and transport models.
 
-`IPaymentAuthorizer` is a capability port. `IStripeClient` is a provider client and does not belong in Application.
+`IPaymentAuthorizer` is an Application port. `IStripeClient` is a provider client and does not belong in Application.
 
 ### Use configured typed clients (EXT.EXTERNAL.CLIENT.001)
 
@@ -49,7 +49,7 @@ Use WireMock.Net or a protocol-specific local endpoint. Cover timeout, connectio
 
 ## Conventions
 
-Place provider code under `Infrastructure/Integrations/{Provider}/`. Keep one options class, client, transport models, mappings, and registration module under the provider folder. Keep business capability ports with their Application use cases.
+Place provider code under `Infrastructure/Integrations/{Provider}/`. Keep one options class, client, transport models, mappings, and registration module under the provider folder. Keep business-action ports with their Application use cases.
 
 ## Dependencies
 

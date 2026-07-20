@@ -7,7 +7,7 @@ Written artifacts are part of the standards contract. Consistent structure and A
 ## Agent Summary {#agent-summary}
 
 - Write prose with ASCII characters and straight punctuation.
-- Use the required topic sections and stable rule IDs.
+- Use the required topic sections and canonical rule IDs.
 - State constraints and decisions with concrete examples.
 - Give new or materially changed consumer documents complete ownership and freshness metadata.
 - Use normative vocabulary for required and optional behavior.
@@ -29,7 +29,7 @@ A convention or extension document MUST separate `Intent`, `Agent Summary`, `Sta
 
 ### Use a consistent document metadata block (WRITING.METADATA.001)
 
-New or materially changed consumer-authored product, domain, capability, use-case, architecture, API, operations, decision, page, and runbook documents MUST include this block near the document title:
+New or materially changed consumer-authored product, domain, subject, use-case, architecture, API, operations, decision, page, and runbook documents MUST include this block near the document title:
 
 ```text
 ## Document metadata
@@ -53,7 +53,7 @@ Use short paragraphs, descriptive headings, and tables for exact mappings. Name 
 
 ## Examples
 
-Write `Use a hyphen in prose.` instead of inserting a typographic dash. Write `ARCH.CQRS.001` after a rule title instead of referring to an unnamed architecture requirement. A current capability document may list `apps/api/src/Example.Domain/Posts/Post.cs`, `apps/api/tests/Example.Domain.Tests/Posts/PostTests.cs`, and `AC-POSTS-CREATE-DRAFT-01` as implementation evidence.
+Write `Use a hyphen in prose.` instead of inserting a typographic dash. Write `ARCH.CQRS.001` after a rule title instead of referring to an unnamed architecture requirement. A current subject specification may list `apps/api/src/Example.Domain/Posts/Post.cs`, `apps/api/tests/Example.Domain.Tests/Posts/PostTests.cs`, and `AC-POSTS-CREATE-DRAFT-01` as implementation evidence.
 
 ## Verification
 

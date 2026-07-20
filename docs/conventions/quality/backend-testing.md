@@ -33,11 +33,11 @@ Acceptance.Tests appears only when the executable BDD extension activates.
 
 Domain tests cover factories, every state record, allowed and rejected transitions, invariants, value equality, collection behavior, money rules, exceptions, and raised events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
 
-Each capability invariant maps through its use-case specification to at least one cited acceptance ID. Domain tests may add narrower cases without an acceptance ID.
+Each subject invariant maps through its use-case specification to at least one cited acceptance ID. Domain tests may add narrower cases without an acceptance ID.
 
 ### Test Application coordination (BTEST.APPLICATION.001)
 
-Application tests use substitutes for aggregate repositories, clocks, actor accessors, and external capability ports. Confirm the handler loads the correct aggregate, calls the intended domain behavior, stages the result, and returns the correct result.
+Application tests use substitutes for aggregate repositories, clocks, actor accessors, and external ports. Confirm the handler loads the correct aggregate, calls the intended domain behavior, stages the result, and returns the correct result.
 
 Test validators for every structural error and stable error code. Do not mock Marten query internals.
 
@@ -63,8 +63,11 @@ Architecture.Tests verify:
 - Internal sealed handlers, validators, endpoints, and persistence implementations.
 - Public visibility of ports implemented across project boundaries.
 - Endpoint isolation from repositories and sessions.
-- Capability folder and naming conventions that static analysis can prove.
+- Subject folder and naming conventions that static analysis can prove.
+- Full `Command` and `Query` role suffixes on Application results, query result items, handlers, and validators.
+- Concrete boundary-role names ending in `Model` for passive WebApi DTOs and `ApiMappings` for operation mappings.
 - Aggregate inheritance from `AggregateRoot<TId>` and the absence of lifecycle enums.
+- Absence of `ISubject`, `SubjectRoot`, or another runtime subject abstraction.
 - Extension-specific replacements.
 
 ### Trace acceptance criteria (BTEST.TRACE.001)
@@ -101,7 +104,7 @@ Security integration tests use locally issued JWTs that exercise the configured 
 
 ## Conventions
 
-### Mirror production capability names
+### Mirror production subject names
 
 ```text
 {ProjectName}.Domain.Tests/
@@ -111,8 +114,11 @@ Security integration tests use locally issued JWTs that exercise the configured 
 {ProjectName}.Application.Tests/
   Posts/
     CreateDraft/
-      CreateDraftHandlerTests.cs
-      CreateDraftValidatorTests.cs
+      CreateDraftCommandHandlerTests.cs
+      CreateDraftCommandValidatorTests.cs
+    GetPost/
+      GetPostQueryHandlerTests.cs
+      GetPostQueryValidatorTests.cs
 {ProjectName}.Integration.Tests/
   Posts/
     CreateDraftEndpointTests.cs
@@ -129,7 +135,7 @@ Security integration tests use locally issued JWTs that exercise the configured 
 
 ### Name tests by observable behavior
 
-Use `{MethodOrOperation}_{Condition}_{ExpectedResult}` when it remains readable. A test class matches its subject, such as `CreateDraftHandlerTests`.
+Use `{MethodOrOperation}_{Condition}_{ExpectedResult}` when it remains readable. A test class matches the production type it tests, such as `CreateDraftCommandHandlerTests` or `GetPostQueryHandlerTests`.
 
 Avoid names such as `Test1`, `HappyPath`, or `Works`.
 
@@ -145,7 +151,7 @@ Assert the state, event, call, response, or error relevant to the test. Avoid br
 
 ## Examples
 
-A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mocks. `CreateDraftHandlerTests.HandleAsync_WhenValid_StoresCreatedPost` substitutes `IPostRepository` and `IClock`. `CreateDraftEndpointTests` uses the real API host and PostgreSQL.
+A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mocks. `CreateDraftCommandHandlerTests.HandleAsync_WhenValid_StoresCreatedPost` substitutes `IPostRepository` and `IClock`. `CreateDraftEndpointTests` uses the real API host and PostgreSQL.
 
 ## Verification
 
@@ -154,5 +160,6 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 - Confirm integration tests use the real database and API host.
 - Confirm the integration fixture uses the pinned PostgreSQL major and disposes its container and host.
 - Confirm shared-database tests cannot run in parallel across reset boundaries.
+- Confirm handler and validator test classes match the complete production type name.
 - Search active acceptance IDs in test source.
 - Run Release build, all tests, generated-contract comparison, and coverage collection.

@@ -24,7 +24,7 @@ Package versions belong in `standards.manifest.json`. Use-case status belongs in
 
 ### Assign document ownership and freshness (CORE.DOCUMENTS.001)
 
-Consumer-authored product, domain, capability, use-case, architecture, API, operations, decision, page, and runbook documents MUST declare an owner, document status, last verified date, canonical source, and implementation evidence. The [repository writing convention](../conventions/repository/writing.md) defines the metadata block.
+Consumer-authored product, domain, subject, use-case, architecture, API, operations, decision, page, and runbook documents MUST declare an owner, document status, last verified date, canonical source, and implementation evidence. The [repository writing convention](../conventions/repository/writing.md) defines the metadata block.
 
 Document status is one of `current`, `planned`, `retired`, or `reference`:
 
@@ -35,7 +35,7 @@ Document status is one of `current`, `planned`, `retired`, or `reference`:
 
 A `current` document MUST NOT present planned behavior as implemented. A document with implementation claims MUST name code, test, generated-contract, or operating evidence. Use `None` when the document makes no implementation claim. Mark the document `retired` after its supported public entry points are removed.
 
-The existing ADDD routing `status` field remains authoritative for a capability or use-case operation. Document status describes the document's authority and freshness; one field MUST NOT replace the other.
+The existing ADDD routing `status` field remains authoritative for a subject or use-case operation. Document status describes the document's authority and freshness; one field MUST NOT replace the other.
 
 ### Deliver vertical use cases (CORE.SLICE.001)
 
@@ -57,9 +57,9 @@ Enable an extension when its activation criteria apply. A preference or possible
 
 ### Name intent at boundaries (CORE.NAMING.001)
 
-Use business operation names, specific command and query mediators, and capability-specific external ports. Avoid generic bus, manager, helper, processor, and service names when a narrower name is available.
+Use business operation names, specific command and query mediators, and business-action-specific external ports. Avoid generic bus, manager, helper, processor, and service names when a narrower name is available.
 
-`IPostPublicationNotifier` communicates one capability. `IExternalService` does not.
+`IPostPublicationNotifier` communicates one business action. `IExternalService` does not.
 
 ## Conventions
 
