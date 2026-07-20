@@ -7,6 +7,7 @@ Continuous integration proves that a pull request preserves the selected standar
 ## Agent Summary {#agent-summary}
 
 - Run the required backend and changed-frontend gates on every pull request.
+- Run code and documentation consistency checks when product or implementation files change.
 - Verify OpenAPI and typed consumer freshness when those artifacts are committed.
 - Scan dependencies, actions, images, and release artifacts for known risk.
 - Review Marten schema plans or EF Core migrations as CI artifacts.
@@ -25,10 +26,23 @@ Every pull request MUST run the applicable gates from this table:
 | Backend | `dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build` |
 | Frontend | `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm type-check`, `pnpm test`, and `pnpm build` |
 | Browser | Playwright for critical journeys |
-| Documentation | Link, anchor, rule-ID, ASCII, and `git diff --check` scans |
+| Documentation | Link, anchor, rule-ID, ASCII, metadata, code-document consistency, and `git diff --check` scans |
 | Contracts | OpenAPI freshness and typed consumer regeneration when committed |
 
 Skip a gate only when its surface does not exist. Record the reason in the workflow or completion report.
+
+### Check code and documentation consistency (CI.DOCS.001)
+
+The documentation job MUST run on every pull request and MUST check the changed documentation together with its related code, tests, generated contracts, and operating records. When the related surface exists, the check MUST:
+
+- Validate the ownership and freshness metadata required by `WRITING.METADATA.001`.
+- Compare capability and use-case names with source and test folders.
+- Confirm current documented names, routes, errors, operation IDs, and authorization boundaries exist in source or generated contracts.
+- Confirm active acceptance IDs appear in automated tests.
+- Detect duplicate application or transport contracts for one operation.
+- Report references to removed entry points, including controllers, namespaces, packages, and features.
+
+The job MAY use repository scripts, architecture tests, generated-contract checks, or review tooling. It MUST report the exact checks and skipped surfaces. A passing Markdown link scan alone is not documentation consistency evidence.
 
 ### Keep generated contracts fresh (CI.CONTRACTS.001)
 
@@ -56,7 +70,7 @@ Consumer CI uses stable jobs with these responsibilities:
 
 | Job | Triggered when | Required work |
 |:---|:---|:---|
-| `docs` | Every pull request | Validate selected JSON contracts, links, anchors, rule references, ASCII prose, and diff whitespace |
+| `docs` | Every pull request | Validate selected JSON contracts, links, anchors, rule references, ASCII prose, document metadata, code-document consistency, and diff whitespace |
 | `backend` | Backend, shared standards, or build configuration changes | Locked restore, Release build, tests without rebuild, coverage artifact, and dependency review |
 | `frontend-{app}` | That frontend or shared TypeScript changes | Frozen install, lint, type check, unit tests, and production build |
 | `contracts` | API source or generated consumer changes | Release OpenAPI generation, typed consumer generation, and clean-diff check |
@@ -81,6 +95,7 @@ A backend-only pull request runs the Release build, test, dependency scan, docum
 - Inspect workflow triggers, required job names, and branch protection settings.
 - Change one shared input for each path-filtered job and confirm the expected job runs.
 - Run the backend and changed-frontend gates from a clean checkout.
+- Confirm the documentation job rejects missing metadata, stale current references, unmatched identifiers, duplicate contracts, and removed entry points.
 - Regenerate OpenAPI and typed consumers, then check for a clean diff.
 - Review dependency, action, image, SBOM, and schema artifacts.
 - Verify staging-to-production artifact identity and smoke-test evidence.

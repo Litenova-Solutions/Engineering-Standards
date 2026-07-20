@@ -8,6 +8,7 @@ Application v1 means one primary user journey works in a deployed environment an
 
 - Finish one observable primary journey before secondary capabilities.
 - Run backend, frontend, documentation, and enabled-extension checks.
+- Require current product and behavior documents to include freshness and implementation evidence.
 - Keep OpenAPI and generated API types current.
 - Include security, data safety, diagnostics, deployment, rollback, and operating instructions.
 - Report every skipped check with a specific reason.
@@ -20,7 +21,7 @@ A completed slice includes its domain behavior, persistence, API, optional UI, a
 
 ### Run applicable checks (RELEASE.GATES.001)
 
-Backend changes require a Release build and tests. Frontend changes require frozen dependency installation, lint, type checking, tests, and a production build. Critical browser journeys require Playwright. Enabled extensions add their stated verification.
+Backend changes require a Release build and tests. Frontend changes require frozen dependency installation, lint, type checking, tests, and a production build. Critical browser journeys require Playwright. Product, domain, implementation, and API changes require the code and documentation consistency check. Enabled extensions add their stated verification.
 
 ### Commit derived application contracts (RELEASE.DERIVED.001)
 
@@ -32,6 +33,7 @@ Application v1 requires:
 
 - One deployed primary user journey.
 - Automated evidence for every active acceptance criterion.
+- Current product and behavior documents with owner, freshness, canonical-source, and implementation-evidence metadata.
 - Authentication and authorization when access is restricted.
 - Repeatable database schema creation or upgrade.
 - Backup and restore instructions with a tested restore.
@@ -59,7 +61,7 @@ Build and lint warnings fail the corresponding check unless the repository recor
 
 ## Examples
 
-A use case with API and web changes runs the .NET build and tests, frontend lint and tests, frontend build, OpenAPI generation, generated type comparison, and the relevant browser journey. A documentation-only correction runs link, rule-ID, writing, and diff checks.
+A use case with API and web changes runs the .NET build and tests, frontend lint and tests, frontend build, OpenAPI generation, generated type comparison, the code and documentation consistency check, and the relevant browser journey. A documentation-only correction runs metadata, link, rule-ID, writing, consistency, and diff checks.
 
 ## Verification
 
@@ -67,4 +69,5 @@ A use case with API and web changes runs the .NET build and tests, frontend lint
 - Confirm active acceptance IDs have automated evidence.
 - Confirm schema, backup, deployment, and rollback instructions match the deployed system.
 - Confirm generated contracts have no uncommitted difference.
+- Confirm the code and documentation consistency check passed for the primary journey.
 - Confirm the completion report states the exact scope of every result.

@@ -91,6 +91,10 @@ Product, domain, UI, and decision documentation lives under root `docs/`, not in
 
 Application-specific README files may live beside their application for run commands and environment variables. They do not replace domain specifications.
 
+### Keep orientation documents separate from canonical records (REPO.DOCS.002)
+
+Root and application README files MAY summarize product or architecture decisions, but they MUST link to the canonical documents under `docs/` and MUST NOT become a second authored source for the same fact. If a README owns a fact, its document metadata MUST name the README as the canonical source. When a product, domain, or architecture decision changes, update the canonical document and reduce the README to a link or current summary in the same change.
+
 ## Conventions
 
 ### Name frontends by audience

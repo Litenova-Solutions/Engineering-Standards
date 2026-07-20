@@ -14,3 +14,5 @@ dotnet test __API_SOLUTION__ --configuration Release --no-build
 ```
 
 Run the root pnpm gates for every changed frontend listed in `standards.project.json`.
+
+Run documentation metadata and code-document consistency checks for every changed product, domain, implementation, test, or generated-contract file. Report skipped checks with reasons.

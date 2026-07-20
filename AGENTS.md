@@ -76,7 +76,7 @@ For this standards repository:
 - Validate the two tracked schema consumers.
 - Check manifest paths and `#agent-summary` anchors.
 - Check rule-ID uniqueness and extension references.
-- Check internal links, ASCII writing rules, and stale terminology.
+- Check internal links, ASCII writing rules, document metadata, code-document consistency, and stale terminology.
 - Run `git diff --check`.
 
 The repository has no standards CLI, generated index, or application scaffold.

@@ -68,6 +68,7 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Glossary](reference/glossary.md) defines repository terms.
 - [Decision records](reference/decisions/README.md) explain baseline choices.
 - [Adopt standards v1](guides/adopt-v1.md) gives a greenfield consumer sequence.
+- [Upgrade to standards v1.1](guides/upgrade-v1.1.md) gives the consumer migration sequence for document metadata and consistency checks.
 - [V1 release scope](guides/v1-release-scope.md) states the complete baseline, conditional catalog, release contents, and exclusions.
 - [Model a Domain capability](guides/model-domain.md) turns human discovery into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.

@@ -6,6 +6,9 @@ All notable changes to Litenova Engineering Standards are recorded here.
 
 ### Added
 
+- Document ownership, authority, freshness, and implementation-evidence rules for consumer documentation.
+- Code and documentation consistency checks for business names, capability and use-case paths, acceptance IDs, generated API contracts, duplicate contracts, and removed entry points.
+- Product and operating context fields for commercial, legal, provider, money, risk, audit, and support constraints.
 - Human-first documentation index, mental model, terminology, and worked ADDD example.
 - Task-sized repository, backend, frontend, testing, security, and operations conventions.
 - Exact monorepo, solution, folder, naming, dependency, configuration, API, and test layouts.

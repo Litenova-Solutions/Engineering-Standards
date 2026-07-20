@@ -77,7 +77,7 @@ Add the release as a root submodule and pin its exact commit:
 ```bash
 git submodule add https://github.com/Litenova-Solutions/Engineering-Standards.git standards
 git -C standards fetch --tags
-git -C standards checkout v1.0.0
+git -C standards checkout v1.1.0
 git add .gitmodules standards
 ```
 
