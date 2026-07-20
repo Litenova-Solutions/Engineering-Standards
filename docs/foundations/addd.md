@@ -16,7 +16,7 @@ Each ADDD artifact controls one source of drift:
 
 | Artifact | Purpose |
 |:---|:---|
-| Product brief | Defines the first user, problem, primary journey, success measure, non-goals, operating target, and data classification. |
+| Product brief | Defines the first user, problem, primary journey, success measure, non-goals, product and operating context, operating target, and data classification. |
 | Domain glossary | Gives every contributor one business vocabulary. |
 | Domain index | Acts as the capability map and orders the use cases in the primary journey. |
 | Capability index | Defines actors, language, aggregate boundaries, states, transitions, invariants, events, reactions, and use cases. |
@@ -67,6 +67,7 @@ Never reuse an accepted identifier for different behavior.
 ## Agent Summary {#agent-summary}
 
 - Start with a product brief, glossary, domain index, and costly decisions.
+- Give authored documents an owner, status, canonical source, verification date, and implementation evidence.
 - Record each capability's aggregate boundaries, state records, transitions, invariants, events, and language before implementing its first command.
 - Keep one Markdown specification per use case.
 - Use capability names consistently across documentation and code.
@@ -185,6 +186,19 @@ Create a page specification when a route combines multiple use cases, owns a mul
 
 Change the use-case specification, implementation, tests, OpenAPI, generated client, and affected page specification in the same pull request when observable behavior changes.
 
+### Check code and documentation consistency (ADDD.CONSISTENCY.001)
+
+Current capability and use-case documents MUST map to the implementation surface they describe. A consistency check MUST:
+
+- Compare capability and use-case IDs with their documentation folders and Application, API, and test folders.
+- Confirm current aggregate, state, action, event, route, error, and authorization names exist in the owning code or are explicitly marked planned.
+- Confirm every active acceptance ID appears in test source.
+- Compare documented routes, operation IDs, response statuses, and error codes with the generated OpenAPI contract when the API surface exists.
+- Detect more than one application or transport contract claiming ownership of the same operation.
+- Report references to removed controllers, namespaces, packages, features, or other entry points.
+
+When observable behavior or business language changes, update the owning documentation and evidence in the same change as the implementation. A current document that no longer maps to code MUST be marked planned, corrected, or retired.
+
 ## Conventions
 
 ### Use this consumer documentation layout
@@ -235,3 +249,4 @@ A public catalog query may have no actor and no risk flags. It states that it pe
 - Confirm every listed extension exists in `standards.project.json`.
 - Confirm each risk flag has the required evidence.
 - Confirm observable changes update specifications in the same diff.
+- Run the code and documentation consistency checks for changed capabilities, use cases, API contracts, and public names.

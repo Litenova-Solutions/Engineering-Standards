@@ -1,6 +1,6 @@
 # Litenova Engineering Standards
 
-Open-source engineering standards for Litenova Solutions applications developed by one maintainer with extensive AI assistance.
+Open-source engineering standards for Litenova Solutions applications.
 
 The repository gives human contributors and AI agents the same architectural boundaries, naming rules, folder conventions, delivery method, and verification expectations. Version 1 targets one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends.
 
@@ -77,7 +77,7 @@ Add the release as a root submodule and pin its exact commit:
 ```bash
 git submodule add https://github.com/Litenova-Solutions/Engineering-Standards.git standards
 git -C standards fetch --tags
-git -C standards checkout v1.0.0
+git -C standards checkout v1.1.0
 git add .gitmodules standards
 ```
 

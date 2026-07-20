@@ -1,5 +1,13 @@
 # __TITLE__
 
+## Document metadata
+
+- Owner: __OWNER__.
+- Document status: `current`, `planned`, `retired`, or `reference`.
+- Last verified: `YYYY-MM-DD`.
+- Canonical source: `This document` or one repository path.
+- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
+
 Status: Proposed.
 
 Decision ID: __DECISION_ID__.
@@ -19,8 +27,6 @@ State the selected behavior.
 ## Review metadata
 
 Scope: __SCOPE__.
-
-Owner: __OWNER__.
 
 Review or expiry date: __REVIEW_OR_EXPIRY_DATE__.
 
