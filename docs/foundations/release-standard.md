@@ -7,6 +7,7 @@ Application v1 means one primary user journey works in a deployed environment an
 ## Agent Summary {#agent-summary}
 
 - Finish one observable primary journey before secondary subjects.
+- Link the release claim to a critical journey and an evidence register when the outcome spans subjects.
 - Run backend, frontend, documentation, and enabled-extension checks.
 - Require current product and behavior documents to include freshness and implementation evidence.
 - Keep OpenAPI and generated API types current.
@@ -32,6 +33,8 @@ Regenerate OpenAPI and frontend API types with their source changes. Generated f
 Application v1 requires:
 
 - One deployed primary user journey.
+- A critical journey that names the ordered use cases, completion condition, exceptions, and release boundary.
+- An evidence register for material claims that affect the journey, release boundary, or unresolved decision.
 - Automated evidence for every active acceptance criterion.
 - Current product and behavior documents with owner, freshness, canonical-source, and implementation-evidence metadata.
 - Authentication and authorization when access is restricted.

@@ -88,7 +88,7 @@ For this standards repository:
 - Confirm removed terminology, rule IDs, templates, and aliases have no current standards references.
 - Run `git diff --check`.
 
-The repository has no standards CLI, generated index, or application scaffold.
+The repository has no standards CLI, generated index, or application scaffold. Use the read-only script under `scripts/` when a consumer needs cross-file domain metadata checks.
 
 ## Consumer verification
 

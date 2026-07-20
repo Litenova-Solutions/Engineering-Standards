@@ -16,6 +16,18 @@ A transactional consistency boundary that protects business invariants during a 
 
 The entity that controls changes inside an aggregate and protects its invariants. It remains the runtime Domain contract even when a subject provides the wider documentation and navigation boundary.
 
+## Critical journey
+
+An ordered set of use cases that produces one customer outcome and defines a release boundary.
+
+## Cross-cutting contract
+
+A documented behavior that applies across subjects, such as security, retention, operating limits, provider boundaries, or event delivery.
+
+## Evidence register
+
+A record that classifies claims as observed, calculated, inferred, hypothesized, or gated and links each claim to its source and decision impact.
+
 ## Subject
 
 A stable business noun that aligns domain documentation, backend folders, endpoint groups, frontend feature folders, tests, and related use cases inside the one bounded context. A state-changing subject names one primary aggregate root. Subject is not a runtime Domain interface or base class.
@@ -27,6 +39,10 @@ A default name, location, file shape, or implementation pattern. A consumer may 
 ## Delivery surface
 
 A public way an actor observes or invokes a use case, such as an HTTP API, web application, Worker-triggered process, or administrative interface.
+
+## Process coordinator
+
+An Application, reaction, or Worker boundary that sequences public behavior across subjects. It owns independent workflow state only when that state has its own business language, lifecycle, retry or idempotency rules, or operator actions.
 
 ## Derived artifact
 
@@ -43,6 +59,10 @@ A conditional standards bundle enabled by activation criteria in `standards.proj
 ## Normative
 
 Required for a conforming consumer. In this repository, content under a `Standards` section is normative.
+
+## Operating limit
+
+A supported boundary for a release or pilot, including capacity, dependency availability, support window, monitoring threshold, stop condition, or recovery target.
 
 ## Platform profile
 

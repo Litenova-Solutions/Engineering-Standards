@@ -35,6 +35,8 @@ Consumer repositories use this shape:
   docs/
     product/
     domain/
+      subjects/
+      cross-cutting/
     ui/
     decisions/
   standards/
@@ -119,4 +121,4 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 - Confirm production projects are under `apps/api/src/` and tests under `apps/api/tests/`.
 - Confirm every deployable is under `apps/`.
 - Confirm every shared package has a named consumer.
-- Confirm domain documentation is under root `docs/domain/`.
+- Confirm subject documentation is under `docs/domain/subjects/` and shared domain records are under `docs/domain/cross-cutting/`.

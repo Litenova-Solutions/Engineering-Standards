@@ -14,6 +14,7 @@ Application coordinates use cases. It translates a command or query into domain 
 - Return stable, transport-neutral validation and use-case failures.
 - Write through aggregate repositories and read through `IQuerySession` projections.
 - Define narrow public external ports for Infrastructure implementations.
+- Keep multi-subject process coordination explicit and separate from aggregate behavior.
 
 ## Standards
 
@@ -92,6 +93,12 @@ Provider names and transport models remain in Infrastructure.
 ### Keep reactions explicit (APP.REACTIONS.001)
 
 Place a reaction under the subject and triggering event. Name the handler for its action and event. Best-effort reactions run after the database commit. Durable reactions activate the outbox extension.
+
+### Keep process coordinators at the Application boundary (APP.COORDINATOR.001)
+
+Place a coordinator under the use case or reaction that starts the workflow. It sends public subject commands or calls narrow Application ports. It does not load or mutate another subject's aggregate to bypass that subject's command boundary.
+
+Give a coordinator its own operation folder and result when it has a business outcome, retry policy, idempotency key, durable state, or operator action. Keep a stateless sequence in the initiating handler or reaction. Document the sequence in the critical journey and state the subject that owns each invariant.
 
 ## Conventions
 

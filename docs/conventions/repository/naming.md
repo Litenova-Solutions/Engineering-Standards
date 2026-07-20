@@ -93,7 +93,7 @@ Next.js special files retain framework names such as `page.tsx`, `layout.tsx`, `
 
 ### Align business names across layers
 
-The `Posts` subject maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/posts`. Its primary Domain aggregate root is `Post`. Use-case names retain the same verb and subject across layers.
+The `Posts` subject maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/subjects/posts`. Its primary Domain aggregate root is `Post`. Use-case names retain the same verb and subject across layers.
 
 ### Keep namespaces aligned with folders
 
