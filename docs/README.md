@@ -70,10 +70,17 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Adopt standards v1](guides/adopt-v1.md) gives a greenfield consumer sequence.
 - [Upgrade to standards v1.1](guides/upgrade-v1.1.md) gives the consumer migration sequence for document metadata and consistency checks.
 - [Upgrade to standards v1.2](guides/upgrade-v1.2.md) explains the Subject migration and aggregate root boundary.
+- [Upgrade to standards v1.3](guides/upgrade-v1.3.md) explains typed domain directories, journey and evidence records, coordinator boundaries, and metadata checks.
 - [V1 release scope](guides/v1-release-scope.md) states the complete baseline, conditional catalog, release contents, and exclusions.
 - [Model a Domain subject](guides/model-domain.md) turns known business language into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
+- [Subject bucket template](../templates/docs/subjects-index.md) defines the subject documentation boundary.
+- [Cross-cutting bucket template](../templates/docs/cross-cutting-index.md) defines shared domain records.
+- [Critical journey template](../templates/docs/critical-journey.md) connects use cases to one customer outcome.
+- [Evidence register template](../templates/docs/evidence-register.md) classifies evidence and decision gates.
+- [Cross-cutting contract template](../templates/docs/cross-cutting-contract.md) records behavior shared across subjects.
+- [Operating limits template](../templates/docs/operating-limits.md) records the supported envelope and recovery limits.
 - [Runbook template](../templates/docs/runbook.md) gives the required operational record shape.
 - [V2 roadmap](../ROADMAP.md) records evidence-gated candidates after v1 adoption.
 
-Schemas are not part of the human reading path. They validate only `standards.manifest.json` and consumer `standards.project.json` files.
+Schemas are not part of the human reading path. They validate the standards manifest, consumer `standards.project.json`, and ADDD subject or use-case routing blocks. Cross-file checks still compare use-case extensions with the consumer configuration.

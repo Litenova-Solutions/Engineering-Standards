@@ -11,16 +11,16 @@ Exact versions, profile composition, extension paths, and task load plans live i
 V1 contains:
 
 - The root agent protocol and source-precedence rules.
-- A machine-readable manifest plus schemas for the standards manifest and consumer selection file.
+- A machine-readable manifest plus schemas for the standards manifest, consumer selection file, and ADDD routing blocks.
 - Foundations for supported scope, engineering principles, ADDD, agent work, and application release evidence.
 - One `dotnet-nextjs` platform profile.
 - Fine-grained repository, backend, frontend, testing, security, operations, and CI conventions with canonical rule IDs.
 - Conditional extension standards selected by current use-case requirements and risk.
 - Guides for greenfield adoption and tactical Domain modeling.
-- Consumer templates for product, domain, use-case, page, decision, runbook, release-evidence, and agent documentation.
+- Consumer templates for product, domain, subject bucket, cross-cutting bucket, use-case, critical journey, evidence register, cross-cutting contract, operating limits, page, decision, runbook, release-evidence, and agent documentation.
 - Reference decisions and a shared glossary.
 
-The standards repository does not include a CLI, generated catalog, or application code generator. Consumers remain normal source repositories and pin this repository as a standards dependency.
+The standards repository does not include a CLI, generated catalog, or application code generator. It includes a read-only domain validation script for cross-file metadata checks. Consumers remain normal source repositories and pin this repository as a standards dependency.
 
 ## Mandatory consumer baseline
 

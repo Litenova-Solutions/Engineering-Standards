@@ -21,7 +21,7 @@ Before requesting review:
 - Update document templates when ADDD metadata or required sections change.
 - Run `git diff --check`.
 
-The repository intentionally has no standards CLI, generated catalog, or application scaffold.
+The repository intentionally has no standards CLI, generated catalog, or application scaffold. The read-only domain validation script checks cross-file metadata rules that schemas cannot express.
 
 ## Normative changes
 

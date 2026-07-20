@@ -32,7 +32,7 @@ For a publishing application:
 
 1. The product brief defines the primary journey: an author creates and publishes a post.
 2. The domain index identifies the `Posts` subject.
-3. `docs/domain/posts/create-draft.md` defines the first use case.
+3. `docs/domain/subjects/posts/create-draft.md` defines the first use case.
 4. Acceptance criterion `AC-POSTS-CREATE-DRAFT-01` states an observable outcome.
 5. The agent loads only the Application, API, persistence, and testing conventions required by that use case.
 6. Automated tests cite the same acceptance ID.
@@ -77,7 +77,7 @@ Add the release as a root submodule and pin its exact commit:
 ```bash
 git submodule add https://github.com/Litenova-Solutions/Engineering-Standards.git standards
 git -C standards fetch --tags
-git -C standards checkout v1.2.0
+git -C standards checkout v1.3.0
 git add .gitmodules standards
 ```
 
@@ -92,15 +92,21 @@ Each consumer adds:
 Copy only the documentation templates needed for the current stage:
 
 ```bash
-mkdir -p docs/product docs/domain
+mkdir -p docs/product docs/domain/subjects docs/domain/cross-cutting
 cp standards/templates/docs/standards.project.json standards.project.json
 cp standards/templates/docs/project-agents.md AGENTS.md
 cp standards/templates/docs/product-brief.md docs/product/brief.md
 cp standards/templates/docs/domain-index.md docs/domain/README.md
 cp standards/templates/docs/glossary.md docs/domain/glossary.md
+cp standards/templates/docs/subjects-index.md docs/domain/subjects/README.md
+cp standards/templates/docs/cross-cutting-index.md docs/domain/cross-cutting/README.md
+cp standards/templates/docs/critical-journey.md docs/domain/cross-cutting/primary-journey.md
+cp standards/templates/docs/evidence-register.md docs/domain/cross-cutting/register.md
+cp standards/templates/docs/cross-cutting-contract.md docs/domain/cross-cutting/security-and-retention.md
+cp standards/templates/docs/operating-limits.md docs/domain/cross-cutting/operating-limits.md
 ```
 
-There is no standards CLI and no application generator. Agents create application code from the selected conventions and extensions while matching explicit consumer overrides.
+There is no standards CLI or application generator. The read-only domain validation script checks cross-file metadata rules. Agents create application code from the selected conventions and extensions while matching explicit consumer overrides.
 
 ## Repository map
 
@@ -116,6 +122,7 @@ docs/guides/                  Adoption and delivery guidance
 docs/reference/               Glossary and decisions
 schemas/                      JSON contracts for the manifest and consumer configuration
 templates/docs/               Consumer documentation starting points
+scripts/                      Read-only cross-file validation scripts
 ROADMAP.md                    Evidence-gated candidates for v2
 ```
 

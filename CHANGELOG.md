@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.3.0
+
+- Grouped domain documentation into `subjects/` and `cross-cutting/` buckets, with the shared glossary and domain index at the domain root.
+- Added templates for critical journeys, evidence registers, cross-cutting contracts, and operating limits.
+- Added bucket README templates for subjects and cross-cutting domain records.
+- Added explicit process-coordinator boundaries for workflows that invoke more than one subject.
+- Distinguished planned design contracts from active behavior and required active acceptance evidence.
+- Defined use-case extension metadata as a subset of the consumer extension allow-list.
+- Added the ADDD domain-routing schema and a read-only validation script for cross-file metadata checks.
+- Added decision-gate and unresolved-choice sections to the decision template.
+- Added the v1.3 consumer upgrade guide.
+
 ## v1.2.0
 
 - Replaced structural capability terminology with subject terminology across ADDD, architecture, templates, and layer conventions.
