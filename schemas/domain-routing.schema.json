@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/domain-routing.schema.json",
+  "title": "ADDD domain routing metadata",
+  "description": "JSON blocks embedded at the top of subject and use-case Markdown files.",
+  "oneOf": [
+    { "$ref": "#/$defs/subject" },
+    { "$ref": "#/$defs/useCase" }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "active", "retired"]
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "status": { "$ref": "#/$defs/status" }
+      }
+    },
+    "useCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "operationType",
+        "status",
+        "actors",
+        "deliverySurfaces",
+        "riskFlags",
+        "extensions"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+        },
+        "operationType": {
+          "type": "string",
+          "enum": ["command", "query"]
+        },
+        "status": { "$ref": "#/$defs/status" },
+        "actors": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "deliverySurfaces": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "riskFlags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "authorization",
+              "money",
+              "sensitive-data",
+              "irreversible",
+              "concurrency",
+              "durable-delivery",
+              "availability"
+            ]
+          }
+        },
+        "extensions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        }
+      }
+    }
+  }
+}

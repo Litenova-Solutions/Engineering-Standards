@@ -7,10 +7,16 @@ These files are optional starting points for consumer documentation. Copy only t
 | `standards.project.json` | Selects the platform profile, paths, extensions, and standards overrides. |
 | `project-agents.md` | Provides the short consumer agent entry point. |
 | `product-brief.md` | Defines the application v1 product boundary and product and operating context. |
-| `domain-index.md` | Maps the bounded context, subjects, and primary journey. |
+| `domain-index.md` | Maps the bounded context, subject bucket, cross-cutting bucket, and primary journey. |
+| `subjects-index.md` | Defines the subject documentation bucket and its allowed content. |
+| `cross-cutting-index.md` | Defines the shared domain record bucket and its allowed content. |
 | `glossary.md` | Defines shared domain language. |
 | `subject.md` | Defines language, the primary aggregate root, states, transitions, invariants, events, reactions, and use cases. |
 | `use-case.md` | Defines one command or query, its Domain behavior, and its acceptance criteria. |
+| `critical-journey.md` | Connects ordered use cases to one customer outcome and a release boundary. |
+| `evidence-register.md` | Classifies claims as observed, calculated, inferred, hypothesized, or gated. |
+| `cross-cutting-contract.md` | Defines behavior shared across subjects, such as security, retention, provider, or operating rules. |
+| `operating-limits.md` | Defines the supported pilot envelope, hard limits, monitoring, stop conditions, and recovery. |
 | `page.md` | Defines non-trivial page composition when the ADDD page criteria apply. |
 | `decision.md` | Records a standards override or expensive-to-reverse choice. |
 | `runbook.md` | Records an operational trigger, procedure, verification, and recovery path. |

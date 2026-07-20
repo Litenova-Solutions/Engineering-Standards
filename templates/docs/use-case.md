@@ -67,6 +67,8 @@ For a command, complete the transition table. For a query, write `No domain tran
 
 - [AC-__SUBJECT_ID__-__USE_CASE_ID__-01] Replace with one observable criterion.
 
+For a `planned` use case, acceptance IDs are design contracts and may have no test reference. For an `active` use case, every acceptance ID must appear in automated evidence. The subject and use-case segments must match the metadata `id` after uppercase conversion and replacement of `.` with `-`.
+
 ## Invariant coverage
 
 | Invariant ID | Acceptance criteria |
@@ -88,3 +90,7 @@ Add only the sections required by `riskFlags`: ownership and abuse cases, money 
 ## Operating impact
 
 State schema, external dependency, diagnostic, deployment, recovery, or runbook changes. Write `None` when the use case has no operating impact.
+
+## Extension activation
+
+List only extensions enabled in the consumer `standards.project.json`. An empty array means the baseline profile applies.

@@ -38,6 +38,8 @@ Name the aggregate root that owns state changes for this subject. Write `None` f
 
 The subject is a documentation and navigation boundary. The aggregate root remains the runtime consistency and mutation boundary. Do not introduce `Subject`, `ISubject`, or `SubjectRoot` runtime abstractions.
 
+This directory is a subject directory under `docs/domain/subjects/`. Cross-cutting contracts, critical journeys, evidence registers, and operating limits belong in `docs/domain/cross-cutting/`.
+
 ## State model
 
 ### __AGGREGATE__

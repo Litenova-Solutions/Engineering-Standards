@@ -18,7 +18,16 @@ Use [glossary.md](glossary.md) as the canonical term list.
 
 ## Subjects
 
-- Link each `docs/domain/{subject}/README.md` and state its user outcome.
+- Link each `docs/domain/subjects/{subject}/README.md` and state its user outcome.
+
+## Domain document buckets
+
+| Directory | Type | Allowed content |
+|:---|:---|:---|
+| `subjects/` | Subject specifications | Subject READMEs and their use-case specifications. |
+| `cross-cutting/` | Shared domain records | Journeys, evidence, security, retention, provider, operating, and delivery contracts. |
+
+Give both buckets a README that states its type, owner, and allowed artifacts. Do not place shared artifacts in a subject directory.
 
 ## Primary v1 journey
 
