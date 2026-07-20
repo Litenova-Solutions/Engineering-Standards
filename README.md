@@ -1,6 +1,6 @@
 # Litenova Engineering Standards
 
-Open-source engineering standards for Litenova Solutions applications developed by one maintainer with extensive AI assistance.
+Open-source engineering standards for Litenova Solutions applications.
 
 The repository gives human contributors and AI agents the same architectural boundaries, naming rules, folder conventions, delivery method, and verification expectations. Version 1 targets one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends.
 
