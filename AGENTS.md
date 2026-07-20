@@ -14,7 +14,13 @@ Each topic document separates:
 - `Conventions`: default names, locations, and implementation patterns. A consumer may replace one with an explicit local convention.
 - `Verification`: required evidence.
 
-Stable rule IDs appear in parentheses after human titles.
+Canonical rule IDs appear in parentheses after human titles.
+
+## Standards evolution
+
+Treat this repository as an authored specification, not a runtime compatibility surface. Prefer the clearest current rule, vocabulary, template, and repository structure even when the edit requires consumer migration.
+
+Do not preserve obsolete rule IDs, document paths, templates, aliases, or terminology solely for backward compatibility. Rename or remove them in the same change, update every current standards reference, and record required consumer work in the changelog and an upgrade guide. Historical changelogs, upgrade guides, and accepted decisions may name the removed contract. Version numbers identify standards releases; they do not promise backward compatibility.
 
 ## Context loading
 
@@ -55,14 +61,16 @@ Do not add a package, migration, authentication model change, public API break, 
 - Use `apps/api/{ProjectName}.slnx`, production projects under `apps/api/src/`, and tests under `apps/api/tests/`.
 - Use Domain, Application, Infrastructure, and WebApi as the four application projects.
 - Keep Domain free of persistence, web, mediator, logging, and dependency injection packages.
-- Organize every layer by the same business capabilities and use cases.
+- Organize every layer by the same business subjects and use cases.
+- Name Application handlers, validators, results, and query result items with explicit `Command` or `Query` role suffixes.
+- Name HTTP transport DTOs with a concrete boundary role ending in `Model`, including `RequestModel` and `ResponseModel`; name operation mappings with `ApiMappings`.
 - Keep handlers, validators, endpoints, and persistence implementations internal sealed.
 - Write commands through aggregate repositories and read queries through `IQuerySession`.
 - Do not call `SaveChangesAsync` from handlers, repositories, endpoints, or reactions.
 - Commit once through the LiteBus command post-handler.
 - Use Minimal API `IEndpoint`; MVC controllers are outside the profile.
 - Derive authenticated actor IDs from verified claims and authorize the target resource.
-- Keep frontend capability internals isolated and route files focused on composition.
+- Keep frontend subject internals isolated and route files focused on composition.
 - Validate backend options and frontend environment access through owned modules.
 - Cite every active acceptance-criterion ID from automated tests.
 - Regenerate OpenAPI and typed consumers with their sources.
@@ -77,6 +85,7 @@ For this standards repository:
 - Check manifest paths and `#agent-summary` anchors.
 - Check rule-ID uniqueness and extension references.
 - Check internal links, ASCII writing rules, document metadata, code-document consistency, and stale terminology.
+- Confirm removed terminology, rule IDs, templates, and aliases have no current standards references.
 - Run `git diff --check`.
 
 The repository has no standards CLI, generated index, or application scaffold.

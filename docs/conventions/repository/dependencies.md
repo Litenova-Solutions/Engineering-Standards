@@ -35,7 +35,7 @@ Domain uses the .NET base class library and project-owned types. It does not ref
 
 ### Keep Application dependencies narrow (DEP.APPLICATION.001)
 
-Application may reference LiteBus command and query abstractions, Marten query abstractions required by the selected read model, and Microsoft abstraction packages required by public capability ports.
+Application may reference LiteBus command and query abstractions, Marten query abstractions required by the selected read model, and Microsoft abstraction packages required by public external ports.
 
 Application does not reference ASP.NET Core, provider SDKs, Infrastructure, or a full mediator metapackage.
 
@@ -55,7 +55,7 @@ Extensions may introduce only the packages listed in their dependency section an
 
 ### Keep frontend applications isolated (DEP.FRONTEND.001)
 
-A frontend cannot import another application's source or another capability's internal feature files. Shared packages expose a documented public entry point and cannot depend on an application.
+A frontend cannot import another application's source or another subject's internal feature files. Shared packages expose a documented public entry point and cannot depend on an application.
 
 ## Conventions
 

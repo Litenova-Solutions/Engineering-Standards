@@ -42,7 +42,7 @@ Use bounded concurrency, request coalescing, or jittered expiry when simultaneou
 
 ## Conventions
 
-Keep cache access in Infrastructure or a frontend data boundary. Application owns any capability port required by a use case. Domain does not know that caching exists.
+Keep cache access in Infrastructure or a frontend data boundary. Application owns any external port required by a use case. Domain does not know that caching exists.
 
 ## Dependencies
 

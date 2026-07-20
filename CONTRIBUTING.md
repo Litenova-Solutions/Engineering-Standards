@@ -4,7 +4,7 @@ Changes use a branch and pull request against `main`. Direct pushes to `main` ar
 
 ## Documentation contract
 
-Each topic document begins with `Intent` and separates required `Standards` from replaceable `Conventions`. Actionable standards use a unique stable rule ID with the human title first.
+Each topic document begins with `Intent` and separates required `Standards` from replaceable `Conventions`. Actionable standards use a unique canonical rule ID with the human title first.
 
 Keep one canonical source for each rule, package version, extension, and upgrade requirement. Link instead of copying.
 
@@ -49,9 +49,11 @@ Resolve every actionable review comment before merge. Use squash merge unless pr
 
 ## Versioning
 
-- Patch releases clarify or correct existing behavior.
-- Minor releases add backward-compatible standards, conventions, extensions, or capabilities.
-- Major releases require consumer work.
+- Patch releases make narrow corrections or clarifications.
+- Minor releases make a coherent standards evolution, including changes that require consumer migration.
+- Major releases replace a substantial part of the supported scope, method, or platform profile.
+
+No release category promises backward compatibility. Prefer one clear current contract over deprecated aliases or retained vocabulary. The changelog and upgrade guide state required consumer work.
 
 Accepted decision records are historical. Add a replacement decision and mark the old record superseded rather than rewriting its outcome.
 

@@ -16,9 +16,9 @@ Name the single business boundary and the responsibilities inside it.
 
 Use [glossary.md](glossary.md) as the canonical term list.
 
-## Capabilities
+## Subjects
 
-- Link each `docs/domain/{capability}/README.md` and state its user outcome.
+- Link each `docs/domain/{subject}/README.md` and state its user outcome.
 
 ## Primary v1 journey
 
@@ -26,4 +26,4 @@ Use [glossary.md](glossary.md) as the canonical term list.
 
 ## Context-wide invariants
 
-- Record only rules shared across capabilities.
+- Record only rules shared across subjects.

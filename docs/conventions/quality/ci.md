@@ -36,7 +36,7 @@ Skip a gate only when its surface does not exist. Record the reason in the workf
 The documentation job MUST run on every pull request and MUST check the changed documentation together with its related code, tests, generated contracts, and operating records. When the related surface exists, the check MUST:
 
 - Validate the ownership and freshness metadata required by `WRITING.METADATA.001`.
-- Compare capability and use-case names with source and test folders.
+- Compare subject and use-case names with source and test folders.
 - Confirm current documented names, routes, errors, operation IDs, and authorization boundaries exist in source or generated contracts.
 - Confirm active acceptance IDs appear in automated tests.
 - Detect duplicate application or transport contracts for one operation.

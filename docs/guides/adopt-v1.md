@@ -10,7 +10,7 @@ This guide creates a consumer repository that follows the `dotnet-nextjs` profil
 4. Create `apps/api/{ProjectName}.slnx` and the Domain, Application, Infrastructure, WebApi, AppHost, ServiceDefaults, and four baseline test projects under the paths in [Repository Structure](../conventions/repository/structure.md). Add Worker only when an extension requires it.
 5. Add the project references from [Dependencies](../conventions/repository/dependencies.md). Keep Domain free of provider packages and keep provider registration in Infrastructure and hosts.
 6. Configure PostgreSQL, Marten, LiteBus, health checks, diagnostics, and the commit post-handler. Add the Infrastructure and WebApi registration entry points, endpoint discovery, Problem Details handler, authentication, authorization, and build-time OpenAPI generation.
-7. Create the product brief, domain index, capability document, and one use-case specification from the templates. Select only the extensions activated by the primary journey.
+7. Create the product brief, domain index, subject specification, and one use-case specification from the templates. Select only the extensions activated by the primary journey.
 8. Implement one complete slice through Domain, Application, Infrastructure, WebApi, optional frontend, tests, generated contracts, and operating instructions. Use the real PostgreSQL integration harness and cite each acceptance ID in automated tests.
 9. Add CI, branch protection, backup and restore evidence, schema review, deployment, rollback, and primary-journey smoke testing before calling v1 complete.
 10. Run the release gates from [Release Standard](../foundations/release-standard.md) and record exact commands and skipped checks in the release evidence.

@@ -2,13 +2,13 @@
 
 ## Intent
 
-Domain contains the business model and protects invariants without persistence, HTTP, mediator, dependency injection, or provider concepts. Its types use the language from the product glossary, capability documents, and use-case specifications.
+Domain contains the business model and protects invariants without persistence, HTTP, mediator, dependency injection, or provider concepts. Its types use the language from the product glossary, subject specifications, and use-case specifications.
 
 The profile deliberately gives every aggregate an explicit state record hierarchy, even when the aggregate currently has one state. This repetition keeps lifecycle modeling consistent and gives later states a defined home without replacing an enum, boolean, or string discriminator.
 
 ## Agent Summary {#agent-summary}
 
-- Organize Domain by business capability and use the documented ubiquitous language.
+- Organize Domain by business subject and use the documented ubiquitous language.
 - Model each transactional consistency boundary as an aggregate.
 - Derive every aggregate root from the project-owned `AggregateRoot<TId>` base.
 - Give every aggregate a sealed state record hierarchy. Do not use lifecycle enums, status strings, or boolean status flags.
@@ -29,9 +29,9 @@ Do not add ORM attributes, JSON attributes, HTTP models, Application messages, o
 
 ### Use one ubiquitous language (DOMAIN.LANGUAGE.001)
 
-Type, property, method, exception, and event names match the terms in `docs/domain/glossary.md`, the capability document, and the active use-case specification.
+Type, property, method, exception, and event names match the terms in `docs/domain/glossary.md`, the subject specification, and the active use-case specification.
 
-If the business action is "publish a post," name the method `Publish`. Do not use `SetStatus`, `UpdateEntity`, or another technical synonym. Record rejected synonyms in the capability document when agents or contributors could plausibly reintroduce them.
+If the business action is "publish a post," name the method `Publish`. Do not use `SetStatus`, `UpdateEntity`, or another technical synonym. Record rejected synonyms in the subject specification when agents or contributors could plausibly reintroduce them.
 
 ### Treat aggregates as consistency boundaries (DOMAIN.AGGREGATE.001)
 
@@ -44,6 +44,8 @@ Do not place an entity inside an aggregate only to make navigation convenient. F
 ### Use the project aggregate root contract (DOMAIN.BASE.001)
 
 Every aggregate root derives from the project-owned `AggregateRoot<TId>` type and implements its identity and domain-event mechanics through that base. Do not duplicate event lists in concrete aggregates or add a second aggregate base.
+
+A state-changing ADDD subject maps to one primary aggregate root, but the two terms are not interchangeable. Subject organizes documentation and code across layers. Aggregate root defines the Domain consistency and mutation boundary. A read-only subject has no aggregate root. Do not create `ISubject`, `SubjectRoot<TId>`, or another runtime subject contract.
 
 The base owns only:
 
@@ -134,13 +136,13 @@ Aggregate and value-object constructors copy incoming mutable collections. Publi
 
 Default record equality does not compare `List<T>` or `IReadOnlyList<T>` contents. A value object containing a collection implements content equality and a matching order-sensitive or order-insensitive hash according to the domain rule.
 
-For example, `PostTags` may treat tag order as irrelevant, while `RouteStops` treats order as part of the value. The capability glossary states which rule applies.
+For example, `PostTags` may treat tag order as irrelevant, while `RouteStops` treats order as part of the value. The subject terms state which rule applies.
 
 ### Make money and decimal rules explicit (DOMAIN.MONEY.001)
 
 Monetary amounts use `decimal` and a `Money` value object that includes currency. Domain code does not use `double` or `float` for money.
 
-The capability document or glossary defines:
+The subject specification or glossary defines:
 
 - Supported currency codes.
 - Amount scale and rounding mode.
@@ -182,7 +184,7 @@ Record the event inside the aggregate method that completes the transition. Pass
 
 ### Reject business violations with Domain exceptions (DOMAIN.ERROR.001)
 
-Domain defines a project `DomainException` base and specific subclasses named `{Subject}{Reason}Exception`. A rejected transition throws the exception that names the failed rule, such as `PostAlreadyPublishedException`.
+Domain defines a project `DomainException` base and specific subclasses named `{DomainType}{Reason}Exception`. `DomainType` names the concrete aggregate, entity, value object, or domain service that rejects the rule. A rejected transition throws the exception that names the failed rule, such as `PostAlreadyPublishedException`.
 
 Do not throw `InvalidOperationException`, `ArgumentException`, Application validation exceptions, HTTP exceptions, or provider exceptions for a business rejection. Domain exceptions contain safe business context and no transport status code.
 
@@ -210,7 +212,7 @@ For example, `Publish` documentation identifies allowed source states, the resul
 
 The code blocks in this section focus on the named design rule and omit namespaces and unrelated XML declarations. Consumer files still apply `DOMAIN.DOCUMENTATION.001` to their complete public contracts.
 
-### Use capability-first folders
+### Use subject-first folders
 
 ```text
 {ProjectName}.Domain/
@@ -239,22 +241,24 @@ The code blocks in this section focus on the named design rule and omit namespac
       PostAlreadyPublishedException.cs
 ```
 
-Create subfolders when the capability contains enough types to improve navigation. Do not create empty `Entities`, `ValueObjects`, `States`, or `Services` folders. Repository interfaces remain with their aggregate capability.
+Create subfolders when the subject contains enough types to improve navigation. Do not create empty `Entities`, `ValueObjects`, `States`, or `Services` folders. Repository interfaces remain with the subject whose primary aggregate they load.
 
 ### Use these Domain names
 
-| Concept | Pattern | Example |
+| Domain role | Pattern | Example |
 |:---|:---|:---|
 | Aggregate root | `{Aggregate}` | `Post` |
 | Child entity | `{Entity}` | `OrderLine` |
-| Value object | `{Concept}` | `PostTitle` |
+| Value object | `{BusinessTerm}` | `PostTitle` |
 | Strongly typed ID | `{Aggregate}Id` | `PostId` |
 | State base | `{Aggregate}State` | `PostState` |
 | State case | `{State}{Aggregate}State` | `PublishedPostState` |
 | Repository | `I{Aggregate}Repository` | `IPostRepository` |
-| Domain service | `{Concept}DomainService` | `OrderPricingDomainService` |
+| Domain service | `{BusinessRule}DomainService` | `OrderPricingDomainService` |
 | Domain event | `{PastTenseBusinessFact}` | `PostPublished` |
-| Domain exception | `{Subject}{Reason}Exception` | `PostAlreadyPublishedException` |
+| Domain exception | `{DomainType}{Reason}Exception` | `PostAlreadyPublishedException` |
+
+`BusinessTerm` is the exact glossary term represented by the value object. `BusinessRule` names the calculation or policy owned by the domain service. `DomainType` is the concrete Domain type that rejects the rule.
 
 ### Define the shared Domain contracts once
 
@@ -614,8 +618,10 @@ The event payload captures the publication fact without carrying the mutable `Po
 ## Verification
 
 - Inspect Domain package and project references for outer-layer dependencies.
-- Compare Domain names with the glossary, capability document, and active use-case specification.
+- Compare Domain names with the glossary, subject specification, and active use-case specification.
+- Confirm each state-changing subject names one primary aggregate root.
 - Confirm every aggregate derives from `AggregateRoot<TId>` and has exactly one state record hierarchy.
+- Confirm no runtime subject interface or base class exists.
 - Search Domain for lifecycle enums, state strings, status booleans, and duplicated nullable state fields.
 - Confirm aggregate constructors are not public and every mutation uses a business method.
 - Confirm handlers do not reproduce state checks or set aggregate properties.
@@ -626,4 +632,4 @@ The event payload captures the publication fact without carrying the mutable `Po
 - Confirm events are past-tense `IDomainEvent` records with no aggregate or provider reference.
 - Round-trip every concrete aggregate state through the selected persistence provider.
 - Test every factory, allowed transition, rejected transition, invariant, state-specific value, and emitted event.
-- Confirm capability invariant IDs and state transitions map to active use cases and acceptance criteria.
+- Confirm subject invariant IDs and state transitions map to active use cases and acceptance criteria.

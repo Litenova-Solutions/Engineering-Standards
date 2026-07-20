@@ -6,7 +6,7 @@ Application v1 means one primary user journey works in a deployed environment an
 
 ## Agent Summary {#agent-summary}
 
-- Finish one observable primary journey before secondary capabilities.
+- Finish one observable primary journey before secondary subjects.
 - Run backend, frontend, documentation, and enabled-extension checks.
 - Require current product and behavior documents to include freshness and implementation evidence.
 - Keep OpenAPI and generated API types current.
@@ -43,7 +43,7 @@ Application v1 requires:
 - A tested deployment and rollback path.
 - A deployed smoke test for the primary journey.
 
-Scale, tenancy, realtime behavior, provider-specific deployment, and other conditional capabilities remain outside v1 until their extensions activate.
+Scale, tenancy, realtime behavior, provider-specific deployment, and other conditional behavior remain outside v1 until a corresponding extension activates.
 
 ### Report verification precisely (RELEASE.REPORT.001)
 

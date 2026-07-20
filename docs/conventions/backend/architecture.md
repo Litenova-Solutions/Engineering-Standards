@@ -4,13 +4,13 @@
 
 The backend is a four-project modular monolith. Project boundaries separate business rules, use-case coordination, technical adapters, and HTTP hosting without splitting each concern into a separate assembly.
 
-CQRS separates write and read behavior inside one Application project. Capabilities and use cases provide the internal navigation boundary.
+CQRS separates write and read behavior inside one Application project. Subjects and use cases provide the internal navigation boundary.
 
 ## Agent Summary {#agent-summary}
 
 - Use Domain, Application, Infrastructure, and WebApi as the four application projects.
 - Point project references inward through Domain and Application.
-- Organize Domain, Application, Infrastructure, and WebApi by the same business capabilities.
+- Organize Domain, Application, Infrastructure, and WebApi by the same business subjects.
 - Keep handlers and validators internal; expose only contracts required across project boundaries.
 - Keep dependency registration in the host and the outer layer that owns each implementation.
 - Add Worker only for a process that must run independently of HTTP requests.
@@ -39,13 +39,15 @@ Follow the exact project reference matrix in [Dependencies](../repository/depend
 
 ### Keep one Application assembly (ARCH.APPLICATION.001)
 
-Commands, queries, results, validators, handlers, event reactions, and external capability ports live in one capability-first Application project.
+Commands, queries, results, validators, handlers, event reactions, and external ports live in one subject-first Application project.
 
 Separate Write, Read, Contracts, and Reactions assemblies are outside this profile.
 
-### Organize every layer by capability and use case (ARCH.CAPABILITIES.001)
+### Organize every layer by subject and use case (ARCH.SUBJECTS.001)
 
-Use the same business capability names across layers. Application operation folders contain one command or query and its supporting types.
+Use the same business subject names across layers. A subject is the stable business noun that groups related Application use cases. A state-changing subject names one primary Domain aggregate root; a read-only subject names no aggregate root. Application operation folders contain one command or query and its supporting types.
+
+Subject is an organization term, not a runtime base type. Domain aggregate roots continue to derive from `AggregateRoot<TId>`. Do not introduce `ISubject` or another subject base contract.
 
 Do not create project-wide `Commands`, `Queries`, `Handlers`, `Validators`, or `Services` folders.
 
@@ -69,7 +71,7 @@ Create `{ProjectName}.Worker` for durable outbox dispatch, queue consumption, or
 
 ### Test structural boundaries (ARCH.ENFORCEMENT.001)
 
-Architecture.Tests verify project references, forbidden package dependencies, handler visibility, endpoint isolation, capability folder rules, and extension-specific boundaries.
+Architecture.Tests verify project references, forbidden package dependencies, handler visibility, endpoint isolation, subject folder rules, aggregate root inheritance, and extension-specific boundaries.
 
 ### Compose each process explicitly (ARCH.COMPOSITION.001)
 
@@ -79,7 +81,7 @@ Domain contains no registration code. Application exposes contracts and an assem
 
 ## Conventions
 
-### Use mirrored capability folders
+### Use mirrored subject folders
 
 ```text
 Domain/Posts/
@@ -88,7 +90,7 @@ Infrastructure/Posts/
 WebApi/Endpoints/Posts/CreateDraft/
 ```
 
-The folder names identify one business capability even though each layer owns different responsibilities.
+The folder names identify one business subject even though each layer owns different responsibilities. `Posts` maps to the `Post` aggregate root in Domain and the documented Post use cases in Application and WebApi.
 
 ### Keep composition in hosts
 
@@ -120,7 +122,9 @@ Publishing a post follows this direction:
 ## Verification
 
 - Inspect the solution project list and reference graph.
-- Confirm folders use business capability names.
+- Confirm folders use business subject names.
+- Confirm each state-changing subject names one primary aggregate root derived from `AggregateRoot<TId>`.
+- Confirm no `ISubject`, `SubjectRoot`, or equivalent runtime abstraction exists.
 - Confirm handlers, validators, endpoints, and persistence implementations are internal sealed.
 - Confirm commands and queries use their prescribed persistence boundaries.
 - Confirm each deployable has one visible composition root and no intermediate service provider.

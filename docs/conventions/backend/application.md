@@ -6,20 +6,22 @@ Application coordinates use cases. It translates a command or query into domain 
 
 ## Agent Summary {#agent-summary}
 
-- Organize Application by capability and use case.
-- Co-locate each message, result, validator, and handler.
+- Organize Application by subject and use case.
+- Co-locate each message with its role-explicit result, validator, and handler.
 - Dispatch writes through `ICommandMediator` and reads through `IQueryMediator`.
 - Keep handlers and validators internal sealed.
 - Validate input structure before handlers and keep business invariants in Domain.
 - Return stable, transport-neutral validation and use-case failures.
 - Write through aggregate repositories and read through `IQuerySession` projections.
-- Define narrow public capability ports for Infrastructure implementations.
+- Define narrow public external ports for Infrastructure implementations.
 
 ## Standards
 
 ### Organize Application by operation (APP.STRUCTURE.001)
 
-Each command or query owns one operation folder under its capability. Keep its message, result, validator, handler, and operation-specific mapping together.
+Each command or query owns one operation folder under its subject. Keep its message, result, validator, handler, and operation-specific mapping together.
+
+Use the same use-case prefix across each operation. Command types end in `Command`, `CommandResult`, `CommandValidator`, and `CommandHandler`. Query types end in `Query`, `QueryResult`, `QueryResultItem`, `QueryValidator`, and `QueryHandler`.
 
 Do not group all handlers or messages by technical type.
 
@@ -34,6 +36,10 @@ Do not introduce a unified message bus abstraction.
 ### Co-locate contracts and implementations (APP.CONTRACTS.001)
 
 Messages and results are public when WebApi, Worker, or another host uses them. Handlers and validators remain internal sealed.
+
+Do not omit the `Command` or `Query` role from result, handler, or validator names.
+
+A collection query names each query-specific row `{UseCase}QueryResultItem`. Do not use a generic or Domain-wide `Summary` type as its default result item.
 
 Use one Application-owned `ValidationError` model for command and query input errors.
 
@@ -64,7 +70,7 @@ WebApi may enforce coarse authenticated, role, or scope policies before dispatch
 A command handler:
 
 1. Loads required aggregates through repositories.
-2. Resolves Application-owned capabilities such as time or the authenticated actor when not supplied by the host contract.
+2. Resolves Application-owned services such as time or the authenticated actor when not supplied by the host contract.
 3. Calls domain behavior.
 4. Stages changed aggregates.
 5. Returns the operation result.
@@ -77,15 +83,15 @@ Query handlers inject `IQuerySession`, filter by authorized scope, project direc
 
 Do not load aggregates, inject repositories, or introduce per-aggregate read-store interfaces for normal request queries.
 
-### Define narrow external capability ports (APP.PORTS.001)
+### Define narrow external ports (APP.PORTS.001)
 
-Application owns a public interface when Infrastructure must provide an external capability. Name the interface for the business action, keep its method surface narrow, and use project-owned request and result types.
+Application owns a public interface when Infrastructure must provide external behavior. Name the interface for the business action, keep its method surface narrow, and use project-owned request and result types.
 
 Provider names and transport models remain in Infrastructure.
 
 ### Keep reactions explicit (APP.REACTIONS.001)
 
-Place a reaction under the capability and triggering event. Name the handler for its action and event. Best-effort reactions run after the database commit. Durable reactions activate the outbox extension.
+Place a reaction under the subject and triggering event. Name the handler for its action and event. Best-effort reactions run after the database commit. Durable reactions activate the outbox extension.
 
 ## Conventions
 
@@ -107,20 +113,26 @@ Place a reaction under the capability and triggering event. Name the handler for
   Posts/
     CreateDraft/
       CreateDraftCommand.cs
-      CreateDraftResult.cs
-      CreateDraftValidator.cs
-      CreateDraftHandler.cs
+      CreateDraftCommandResult.cs
+      CreateDraftCommandValidator.cs
+      CreateDraftCommandHandler.cs
     GetPost/
       GetPostQuery.cs
-      PostResult.cs
-      GetPostValidator.cs
-      GetPostHandler.cs
+      GetPostQueryResult.cs
+      GetPostQueryValidator.cs
+      GetPostQueryHandler.cs
+    ListPosts/
+      ListPostsQuery.cs
+      ListPostsQueryResult.cs
+      ListPostsQueryResultItem.cs
+      ListPostsQueryValidator.cs
+      ListPostsQueryHandler.cs
     OnPostPublished/
       NotifySubscribersOnPostPublishedHandler.cs
       IPostPublicationNotifier.cs
 ```
 
-Create `Shared` children only for types used by multiple capabilities.
+Create `Shared` children only for types used by multiple subjects.
 
 ### Keep messages immutable
 
@@ -139,13 +151,15 @@ Application owns domain-to-result projection used by Application. WebApi owns re
 ```csharp
 public sealed record CreateDraftCommand(
     AuthorId AuthorId,
-    string Title) : ICommand<CreateDraftResult>;
+    string Title) : ICommand<CreateDraftCommandResult>;
 
-internal sealed class CreateDraftHandler(
+public sealed record CreateDraftCommandResult(PostId PostId);
+
+internal sealed class CreateDraftCommandHandler(
     IPostRepository postRepository,
-    IClock clock) : ICommandHandler<CreateDraftCommand, CreateDraftResult>
+    IClock clock) : ICommandHandler<CreateDraftCommand, CreateDraftCommandResult>
 {
-    public async Task<CreateDraftResult> HandleAsync(
+    public async Task<CreateDraftCommandResult> HandleAsync(
         CreateDraftCommand command,
         CancellationToken cancellationToken)
     {
@@ -157,7 +171,7 @@ internal sealed class CreateDraftHandler(
 
         postRepository.Store(post);
 
-        return new CreateDraftResult(post.Id);
+        return new CreateDraftCommandResult(post.Id);
     }
 }
 ```
@@ -167,6 +181,7 @@ Use the exact method signatures exposed by the pinned LiteBus package when they 
 ## Verification
 
 - Confirm every operation folder maps to a documented use case.
+- Confirm every command and query result, query result item, validator, and handler includes its full role suffix.
 - Confirm handlers and validators are internal sealed.
 - Confirm validators implement the pinned `ValidateAsync` contract.
 - Confirm command handlers do not commit and query handlers do not use repositories.

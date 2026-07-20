@@ -12,9 +12,13 @@ The anchored short section agents load as Tier 1 context for a task. The full do
 
 A transactional consistency boundary that protects business invariants during a command.
 
-## Capability
+## Aggregate root
 
-A business grouping inside the one bounded context. Capability names align domain documentation, backend folders, endpoint groups, and frontend feature folders.
+The entity that controls changes inside an aggregate and protects its invariants. It remains the runtime Domain contract even when a subject provides the wider documentation and navigation boundary.
+
+## Subject
+
+A stable business noun that aligns domain documentation, backend folders, endpoint groups, frontend feature folders, tests, and related use cases inside the one bounded context. A state-changing subject names one primary aggregate root. Subject is not a runtime Domain interface or base class.
 
 ## Convention
 
@@ -50,7 +54,7 @@ A use-case metadata value that activates additional specification and evidence f
 
 ## Rule ID
 
-A stable uppercase dotted identifier such as `APP.COMMAND.001` used by overrides, extensions, decisions, conflict reports, and review.
+A canonical uppercase dotted identifier such as `APP.COMMAND.001` used by overrides, extensions, decisions, conflict reports, and review within one standards release. A later release may rename or remove it.
 
 ## Standard assurance
 
