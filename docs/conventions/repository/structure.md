@@ -34,9 +34,21 @@ Consumer repositories use this shape:
   packages/
   docs/
     product/
+      brief.md
+      flows/                 create with the first end-to-end flow
     domain/
-    ui/
-    decisions/
+      README.md
+      glossary.md
+      modules/
+      workflows/             create with the first workflow
+      policies/              create with the first domain policy
+    decisions/               create with the first decision
+    operations/              create with the first operating record
+      limits.md              create when operating limits exist
+    runbooks/                create with the first runbook
+    releases/                create with the first release record
+    research/                create with the first research record
+    ui/                      create when a frontend needs page specifications
   standards/
   AGENTS.md
   global.json
@@ -93,7 +105,7 @@ Application-specific README files may live beside their application for run comm
 
 ### Keep orientation documents separate from canonical records (REPO.DOCS.002)
 
-Root and application README files MAY summarize product or architecture decisions, but they MUST link to the canonical documents under `docs/` and MUST NOT become a second authored source for the same fact. If a README owns a fact, its document metadata MUST name the README as the canonical source. When a product, domain, or architecture decision changes, update the canonical document and reduce the README to a link or current summary in the same change.
+Root and application README files MAY summarize product or architecture decisions, but they MUST link to the authoritative `specStatus: approved` documents under `docs/` and MUST NOT become a second authored source for the same fact. When a product, domain, or architecture decision changes, update the owning specification and reduce the README to a link or approved summary in the same change.
 
 ## Conventions
 
@@ -119,4 +131,6 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 - Confirm production projects are under `apps/api/src/` and tests under `apps/api/tests/`.
 - Confirm every deployable is under `apps/`.
 - Confirm every shared package has a named consumer.
-- Confirm domain documentation is under root `docs/domain/`.
+- Confirm module documentation is under `docs/domain/modules/`, end-to-end flows are under `docs/product/flows/`, workflows are under `docs/domain/workflows/`, and domain policies are under `docs/domain/policies/`.
+- Confirm Operating Limits are under `docs/operations/` and release records are under `docs/releases/`.
+- Confirm optional directories contain real artifacts and no placeholder files.

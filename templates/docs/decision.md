@@ -1,16 +1,13 @@
+---
+{
+  "kind": "decision",
+  "id": "__DECISION_ID__",
+  "specStatus": "draft",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD"
+}
+---
 # __TITLE__
-
-## Document metadata
-
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
-
-Status: Proposed.
-
-Decision ID: __DECISION_ID__.
 
 ## Context
 
@@ -18,28 +15,36 @@ State the concrete constraint or conflict.
 
 ## Decision
 
-State the selected behavior.
+State the selected behavior. Change `specStatus` to `approved` when accepted.
 
 ## Standards impact
 
 - Name every standards rule replaced or write `None`.
 
-## Review metadata
+## Activation conditions
 
-Scope: __SCOPE__.
+| Condition | Required claims or evidence | Owner | Status |
+|:---|:---|:---|:---|
+| State what must be true before activation. | Link Decision Evidence, a test, provider statement, policy, or review. | `__OWNER__` | `pending`, `met`, or `rejected` |
 
-Review or expiry date: __REVIEW_OR_EXPIRY_DATE__.
+Remove this section when the decision applies immediately without a gate.
 
-Compensating control: __COMPENSATING_CONTROL__.
+## Review controls
 
-Security approval: __SECURITY_APPROVAL__.
-
-Removal condition: __REMOVAL_CONDITION__.
+- Scope: `__SCOPE__`.
+- Review or expiry date: `__REVIEW_OR_EXPIRY_DATE__`.
+- Compensating control: `__COMPENSATING_CONTROL__`.
+- Security approval: `__SECURITY_APPROVAL__`.
+- Removal condition: `__REMOVAL_CONDITION__`.
 
 ## Consequences
 
-State the required work, accepted cost, and replacement or review condition.
+State required work, accepted cost, and replacement or review condition.
+
+## Pending decisions
+
+- Link a separate decision for each unresolved external, policy, or provider choice. Remove this section when none remain.
 
 ## Verification
 
-State how reviewers will confirm the decision is applied.
+State how reviewers confirm the decision is applied.

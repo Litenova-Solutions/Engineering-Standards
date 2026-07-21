@@ -1,12 +1,14 @@
+---
+{
+  "kind": "product",
+  "id": "__PROJECT_ID__",
+  "specStatus": "approved",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD",
+  "primaryReleaseFlow": "__PRIMARY_RELEASE_FLOW__"
+}
+---
 # __PROJECT__ Product Brief
-
-## Document metadata
-
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
 
 ## Target user
 
@@ -16,9 +18,9 @@ Name the first user group and the situation in which they use the product.
 
 State the current user problem without describing the implementation.
 
-## Primary v1 journey
+## Product outcome
 
-Describe the one end-to-end journey that must work in the first release.
+State the first observable product outcome. Link `docs/product/flows/__PRIMARY_RELEASE_FLOW__.md` as the primary release flow.
 
 ## Success measure
 
@@ -26,14 +28,12 @@ Name an observable product or operating result.
 
 ## Product and operating context
 
-Record the constraints that shape product behavior and runtime operation.
-
 - Commercial model: pricing, billing, fees, or `None`.
 - Legal and regulatory boundary: legal entity, jurisdiction, regulated responsibilities, and data obligations.
 - External systems: providers, their responsibilities, and which system owns each fact.
-- Money movement and risk: custody, settlement, payout, refund, reserve, chargeback, fraud, or `None`.
+- Money movement and Risk: custody, settlement, payout, refund, reserve, chargeback, fraud, or `None`.
 - Audit and support: required records, retention, support owner, and recovery obligations.
-- Current versus planned: label future assumptions as `planned` and do not present them as v1 behavior.
+- Current versus planned: label future assumptions as planned behavior.
 
 ## Non-goals
 

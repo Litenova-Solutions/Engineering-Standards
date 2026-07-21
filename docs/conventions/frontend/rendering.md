@@ -61,7 +61,7 @@ Use `proxy.ts` for coarse routing concerns such as session presence, locale sele
 
 Public routes define title, description, canonical behavior, and indexing policy when applicable. Authenticated and private routes prevent indexing.
 
-Create an ADDD page specification when route composition meets the page trigger.
+Create a page specification defined by the engineering system when route composition meets the page trigger.
 
 ## Conventions
 

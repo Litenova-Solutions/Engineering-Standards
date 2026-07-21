@@ -11,7 +11,7 @@ Backend tests prove domain behavior, use-case coordination, real persistence and
 - Test command coordination with narrow substitutes.
 - Test Marten queries, repositories, HTTP, authentication, and authorization against PostgreSQL.
 - Enforce project references, visibility, dependencies, and endpoint isolation in Architecture.Tests.
-- Cite each active acceptance ID from at least one automated test.
+- Cite each acceptance ID from a verified Use case in at least one automated test.
 - Collect coverage for review without one repository-wide percentage gate.
 
 ## Standards
@@ -31,9 +31,9 @@ Acceptance.Tests appears only when the executable BDD extension activates.
 
 ### Test Domain in isolation (BTEST.DOMAIN.001)
 
-Domain tests cover factories, every state record, allowed and rejected transitions, invariants, value equality, collection behavior, money rules, exceptions, and raised events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
+Domain tests cover factories, every supported lifecycle state, allowed and rejected transitions, aggregate invariants, value equality, collection behavior, money rules, exceptions, and raised events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
 
-Each subject invariant maps through its use-case specification to at least one cited acceptance ID. Domain tests may add narrower cases without an acceptance ID.
+Each module invariant maps through its use-case specification to at least one cited acceptance ID. Domain tests may add narrower cases without an acceptance ID.
 
 ### Test Application coordination (BTEST.APPLICATION.001)
 
@@ -63,16 +63,16 @@ Architecture.Tests verify:
 - Internal sealed handlers, validators, endpoints, and persistence implementations.
 - Public visibility of ports implemented across project boundaries.
 - Endpoint isolation from repositories and sessions.
-- Subject folder and naming conventions that static analysis can prove.
+- Module folder and naming conventions that static analysis can prove.
 - Full `Command` and `Query` role suffixes on Application results, query result items, handlers, and validators.
 - Concrete boundary-role names ending in `Model` for passive WebApi DTOs and `ApiMappings` for operation mappings.
 - Aggregate inheritance from `AggregateRoot<TId>` and the absence of lifecycle enums.
-- Absence of `ISubject`, `SubjectRoot`, or another runtime subject abstraction.
+- Absence of `IModule`, `ModuleRoot`, or another runtime module abstraction.
 - Extension-specific replacements.
 
 ### Trace acceptance criteria (BTEST.TRACE.001)
 
-Every active acceptance criterion appears in at least one recognized test reference:
+Every acceptance criterion from a verified Use case appears in at least one recognized test reference:
 
 ```csharp
 [Trait("AcceptanceCriterion", "AC-POSTS-CREATE-DRAFT-01")]
@@ -88,7 +88,7 @@ The trace is one-way. Internal implementation tests do not need an acceptance ID
 
 Collect line and branch coverage for review. Do not use one repository-wide percentage as the definition of sufficient testing.
 
-Active acceptance trace, domain negative cases, integration boundaries, security behavior, and architecture rules remain required regardless of the percentage.
+Verified acceptance trace, Domain negative cases, integration boundaries, security behavior, and architecture rules remain required regardless of the percentage.
 
 ### Verify generated contracts (BTEST.GENERATED.001)
 
@@ -104,7 +104,7 @@ Security integration tests use locally issued JWTs that exercise the configured 
 
 ## Conventions
 
-### Mirror production subject names
+### Mirror production module names
 
 ```text
 {ProjectName}.Domain.Tests/
@@ -161,5 +161,5 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 - Confirm the integration fixture uses the pinned PostgreSQL major and disposes its container and host.
 - Confirm shared-database tests cannot run in parallel across reset boundaries.
 - Confirm handler and validator test classes match the complete production type name.
-- Search active acceptance IDs in test source.
+- Search acceptance IDs from verified Use cases in test source.
 - Run Release build, all tests, generated-contract comparison, and coverage collection.

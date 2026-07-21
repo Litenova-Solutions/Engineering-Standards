@@ -2,7 +2,7 @@
 
 ## Intent
 
-This extension adds Reqnroll scenarios when product, domain, engineering, and testing discussions rely on the same critical cross-layer examples. The ADDD use-case specification remains the authored behavior source.
+This extension adds Reqnroll scenarios when product, domain, engineering, and testing discussions rely on the same critical cross-layer examples. The use-case specification remains the authored behavior source.
 
 ## Activation
 
@@ -26,7 +26,7 @@ Create a scenario only when its business-language form improves shared understan
 
 ### Tag scenarios with acceptance IDs (EXT.BDD.TRACE.001)
 
-Every scenario includes one or more `@AC-SUBJECT-USE-CASE-NN` tags. The use-case document owns the criterion text and examples.
+Every scenario includes one or more `@AC-MODULE-USE-CASE-NN` tags. The use-case document owns the criterion text and examples.
 
 ### Test through public behavior (EXT.BDD.BOUNDARY.001)
 
@@ -44,7 +44,7 @@ Step definitions translate business phrases into typed test-driver calls. They d
 
 ## Conventions
 
-Use subject folders under Acceptance.Tests. Keep step definitions narrow and reusable only within the same business vocabulary. A scenario context object stores values for one scenario and does not become a service locator. Tag the small pull-request subset with `@critical`; acceptance-ID tags remain separate.
+Use module folders under Acceptance.Tests. Keep step definitions narrow and reusable only within the same business vocabulary. A scenario context object stores values for one scenario and does not become a service locator. Tag the small pull-request subset with `@critical`; acceptance-ID tags remain separate.
 
 ## Dependencies
 

@@ -12,7 +12,7 @@ One scoped document session and one LiteBus command post-handler own the transac
 - Inject `IQuerySession` directly into Application query handlers.
 - Stage writes in handlers and repositories without committing.
 - Commit once in the global command post-handler.
-- Collect touched-aggregate events before commit and publish best-effort events after commit.
+- Collect touched-Aggregate Events before commit and apply their documented delivery classification.
 - Configure JSON contracts and polymorphism in Infrastructure without Domain attributes.
 - Treat stored JSON shapes, aliases, and discriminators as database contracts.
 - Bound aggregate documents and use explicit indexes for accepted queries.
@@ -37,13 +37,13 @@ Do not add `IDatabaseContext`, `IReadDatabase`, callback wrappers, generic read 
 
 A global LiteBus command post-handler calls `IDocumentSession.SaveChangesAsync` once after the command handler succeeds. A failed command leaves the scoped session uncommitted.
 
-Handlers, repositories, validators, reactions, and endpoints do not call `SaveChangesAsync`.
+Handlers, repositories, validators, event reaction implementations, workflow orchestrators, and endpoints do not call `SaveChangesAsync`.
 
 ### Collect events without a public unit of work (PERSIST.EVENTS.001)
 
 Infrastructure repositories register touched aggregates with an internal scoped event buffer. The command post-handler collects their pending events before committing.
 
-For best-effort in-process delivery:
+For `best-effort-optional` in-process delivery:
 
 1. Stage aggregate changes.
 2. Collect pending domain events.
@@ -51,7 +51,13 @@ For best-effort in-process delivery:
 4. Publish collected events through LiteBus.
 5. Clear events after successful publication or according to the documented retry behavior.
 
-A publication failure occurs after the business commit. Activate `outbox-worker` when that loss is unacceptable.
+A publication failure occurs after the business commit. Use this path only when loss is explicitly accepted. Activate `outbox-worker` for required durable delivery. Use an atomic or rebuildable projection path for required Read Models.
+
+### Stage Workflow progress with outgoing work (PERSIST.WORKFLOW.001)
+
+A durable Workflow advancement stages its Workflow state and outgoing Command envelope in the same scoped `IDocumentSession`. The command post-handler commits both once. The Worker dispatches the outgoing Command only after that commit.
+
+The Workflow Orchestrator, its handler, and its stores do not call `SaveChangesAsync`. A failure before commit advances neither progress nor outgoing work. At-least-once dispatch requires the issued Command to handle duplicate delivery safely.
 
 ### Keep mappings and aliases explicit (PERSIST.MAPPING.001)
 
@@ -67,11 +73,11 @@ Register every concrete type that may appear behind a base class or interface pr
 
 Domain types do not use `JsonInclude`, `JsonDerivedType`, `JsonPolymorphic`, Marten attributes, provider base classes, or other serialization behavior. If Infrastructure configuration cannot round-trip an aggregate without weakening its encapsulation, persist an Infrastructure-owned document type and map it to the Domain aggregate.
 
-Every aggregate `State` property is one persisted polymorphic value. Infrastructure registers the abstract `{Aggregate}State` base and every sealed state record with stable string discriminators. It does not persist a second enum, status string, boolean flag, or nullable timestamp on the Domain aggregate.
+Every Aggregate `State` property is one persisted polymorphic value. Infrastructure registers the abstract `{Aggregate}State` base and every sealed state record with stable string discriminators. It does not persist a second enum, status string, boolean flag, or nullable timestamp on the Domain Aggregate.
 
 ### Evolve stored document contracts explicitly (PERSIST.EVOLUTION.001)
 
-Treat JSON member names, required values, enum representation, discriminator property names, and discriminator values as database schema. An additive member defines behavior for documents written before that member existed.
+Treat JSON member names, required values, discriminator property names, and discriminator values as database schema. An additive member defines behavior for documents written before that member existed.
 
 A rename, removal, type change, member move, collection-shape change, or discriminator change requires a reviewed data transformation or an expand-and-contract rollout that reads every shape present during deployment and rollback. Name the transformation order, mixed-version behavior, rollback condition, and representative production volume. Do not assume a Marten schema patch transforms existing document payloads.
 
@@ -120,6 +126,9 @@ In-memory substitutes cannot prove persistence behavior.
       Posts/
         PostRepository.cs
         PostMartenConfiguration.cs
+      Workflows/
+        OrderFulfillmentWorkflowStore.cs
+        WorkflowCommandOutbox.cs
 ```
 
 Keep configuration beside the aggregate when it is aggregate-specific. Keep session and commit plumbing under the Marten root.
@@ -138,7 +147,7 @@ Add an index from an accepted query or measured operating need. Record represent
 
 ### Add read documents for query-shaped data
 
-Query stored aggregate documents directly while accepted reads remain simple. Add a subject-owned read document or projection when a real query needs repeated cross-aggregate composition, deep polymorphic traversal, or an index shape that would distort the aggregate. Define its consistency and rebuild behavior with the use case.
+Query stored aggregate documents directly while accepted reads remain simple. Add a module-owned read document or projection when a real query needs repeated cross-aggregate composition, deep polymorphic traversal, or an index shape that would distort the aggregate. Define its consistency and rebuild behavior with the use case.
 
 ### Persist one explicit state object
 
@@ -153,7 +162,7 @@ Use a stable discriminator property such as `$state` with values such as `draft`
 }
 ```
 
-Register every concrete state record in Infrastructure. Round-trip each state through the configured Marten serializer in integration tests.
+Register every concrete Aggregate state record in Infrastructure. Round-trip every state record through the configured Marten serializer in integration tests.
 
 Adding a state discriminator can break an older application version during a mixed-version deployment. The release plan either prevents the older version from reading the new state or introduces a compatible reader before commands can persist that state.
 
@@ -191,7 +200,7 @@ internal sealed class PostRepository(
 - Confirm repositories use the scoped session and track changed aggregates.
 - Confirm queries project results and have deterministic limits and ordering.
 - Confirm aliases, JSON member contracts, discriminators, and indexes are explicit in Infrastructure.
-- Round-trip private state, nested values, collections, every aggregate state record, and every other registered runtime subtype without serialization behavior in Domain.
+- Round-trip private state, nested values, collections, every Aggregate state record, and every other registered runtime subtype without serialization behavior in Domain.
 - Load stored fixtures from every supported document shape and test each required transformation and rollback reader.
 - Test representative document size and query plans for aggregates with nested collections.
 - When `concurrency-idempotency` is active, test conflicting writes with representative document sizes.

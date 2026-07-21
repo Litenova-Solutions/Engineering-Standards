@@ -1,77 +1,74 @@
 ---
 {
-  "id": "__SUBJECT__.__USE_CASE__",
+  "kind": "use-case",
+  "id": "__MODULE__.__USE_CASE__",
+  "specStatus": "approved",
+  "implementationStatus": "planned",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD",
   "operationType": "__OPERATION_TYPE__",
-  "status": "planned",
   "actors": ["__ACTOR__"],
-  "deliverySurfaces": [],
-  "riskFlags": [],
-  "extensions": []
+  "entryPoints": [],
+  "risks": [],
+  "applicableExtensions": []
 }
 ---
 # __TITLE__
 
-## Document metadata
+## Goal
 
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
+State the actor or system goal and its observable result.
 
-## Intent
+## Trigger
 
-State the actor's observable outcome and why it matters.
+State the actor action, event, schedule, or system condition that starts this use case.
 
 ## Authorization
 
-State who may perform or observe this operation, how actor identity is established, and how target ownership or policy is checked.
-
-## Preconditions
-
-- List required business state.
+State how actor identity is established and how target access is checked. Write `Not applicable` for a trusted system trigger with no actor decision.
 
 ## Input
 
-| Field | Meaning | Constraints |
+| Field | Meaning | Input Rules |
 |:---|:---|:---|
-| `__FIELD__` | State its business meaning. | State structural limits. |
+| `__FIELD__` | State its business meaning. | State required shape, range, or format. |
 
-## Output
+## Result
 
-State the observable result without exposing internal persistence types.
+State the observable result without exposing persistence types.
 
-## Business rules
+## Rules
 
-- Cite each subject invariant ID and state any operation-specific decision that changes the outcome.
+| Rule ID | Type | Required behavior |
+|:---|:---|:---|
+| `INV-__MODULE_ID__-01` | Aggregate Invariant | State how this use case applies the invariant. |
+| `POL-__POLICY_ID__-01` | Domain Policy | Remove when no domain policy applies. |
+
+## Successful path
+
+1. Describe successful behavior in business terms.
 
 ## Domain behavior
 
-For a command, complete the transition table. For a query, write `No domain transition` and name the read source.
+For a Command, list every aggregate changed. For a Query, write `No Domain transition` and name the Read Model.
 
-| Aggregate | Source state | Business action | Target state | Invariant IDs | Domain events |
+| Aggregate | Source state | Business action | Target state | Rules | Event references |
 |:---|:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `INV-__SUBJECT_ID__-01` | `__PAST_TENSE_EVENT__` |
+| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `INV-__MODULE_ID__-01` | `__MODULE__.__PAST_TENSE_EVENT__` |
 
-## Main flow
-
-1. Describe successful behavior in domain terms.
+When more than one aggregate appears, state the invariant or domain policy that requires one transaction.
 
 ## Failures
 
-| Code | Condition | Observable result |
-|:---|:---|:---|
-| `__ERROR_CODE__` | State the failed rule. | State the caller-visible behavior. |
+| Code | Condition | Observable result | Recovery |
+|:---|:---|:---|:---|
+| `__ERROR_CODE__` | State the failed rule. | State the caller-visible result. | State retry, correction, or no recovery. |
 
 ## Acceptance criteria
 
-- [AC-__SUBJECT_ID__-__USE_CASE_ID__-01] Replace with one observable criterion.
+- [AC-__MODULE_ID__-__USE_CASE_ID__-01] Replace with one observable criterion.
 
-## Invariant coverage
-
-| Invariant ID | Acceptance criteria |
-|:---|:---|
-| `INV-__SUBJECT_ID__-01` | `AC-__SUBJECT_ID__-__USE_CASE_ID__-01` |
+A use case with `implementationStatus: planned` may have no test reference. A verified use case has at least one acceptance criterion, every acceptance ID appears in automated test source, and applicable test commands have passed.
 
 ## Examples
 
@@ -81,10 +78,32 @@ Given the required starting state
 When the actor performs the operation
 Then the expected result is observable
 
+### Rejected example
+
+Given a state that violates `INV-__MODULE_ID__-01`
+When the actor performs the operation
+Then `__ERROR_CODE__` is returned without a state change
+
+## Implementation mapping
+
+| Role | Name or path |
+|:---|:---|
+| Command or Query | `__USE_CASE__Command` or `__USE_CASE__Query` |
+| Handler | `__USE_CASE__CommandHandler` or `__USE_CASE__QueryHandler` |
+| Aggregate method or Read Model | `__MAPPING__` |
+| Entry Point | `__MAPPING__` |
+| Automated tests | `__MAPPING__` |
+
+Add this section when implementation begins. Do not use it as the source for business behavior.
+
 ## Risk and assurance
 
-Add only the sections required by `riskFlags`: ownership and abuse cases, money and reconciliation, sensitive-data handling, irreversible recovery, concurrency, durable delivery, or availability failure.
+Add only sections required by `risks`: authorization, money, sensitive data, irreversible behavior, concurrency, durable delivery, or availability.
 
 ## Operating impact
 
-State schema, external dependency, diagnostic, deployment, recovery, or runbook changes. Write `None` when the use case has no operating impact.
+State schema, external dependency, diagnostic, deployment, recovery, or runbook changes. Write `None` when no operating change exists.
+
+## Verification
+
+- List exact commands and expected evidence for this use case.

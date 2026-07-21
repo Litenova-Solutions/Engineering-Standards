@@ -59,11 +59,11 @@ Query handlers use `AsNoTracking`, filter before materialization, apply determin
 
 ### Commit through the LiteBus pipeline (EXT.EFCORE.COMMIT.001)
 
-For an EF Core-owned command, the provider-specific LiteBus post-handler calls `SaveChangesAsync` once. It collects domain events from changed aggregates and follows best-effort post-commit publication or the outbox extension. It does not commit a Marten session.
+For an EF Core-owned Command, the provider-specific LiteBus post-handler calls `SaveChangesAsync` once. It collects Domain Events from changed Aggregates and follows the documented delivery classification. It uses the outbox extension for required durable delivery and does not commit a Marten session.
 
 ### Store an EF Core outbox with EF Core writes (EXT.EFCORE.OUTBOX.001)
 
-When `outbox-worker` is active for an EF Core-owned command, map and stage its outbox records through the same DbContext as the aggregate changes. Commit both through one `SaveChangesAsync` call. The Worker dispatch, idempotency, retry, compatibility, and operating rules from `outbox-worker` remain active.
+When `outbox-worker` is active for an EF Core-owned Command, map and stage its outbox records through the same DbContext as the Aggregate changes or Workflow progress. Commit both through one `SaveChangesAsync` call. The Worker dispatch, idempotency, retry, compatibility, and operating rules from `outbox-worker` remain active.
 
 Do not store an EF Core aggregate change in one transaction and its required outbox record through a Marten session in another transaction.
 
@@ -73,7 +73,7 @@ Infrastructure owns `IEntityTypeConfiguration<T>` classes. Configure typed IDs, 
 
 ### Preserve the Domain state hierarchy (EXT.EFCORE.STATE.001)
 
-EF Core persistence retains the Domain aggregate's single `{Aggregate}State` value. Infrastructure maps a stable discriminator and every state-specific value without adding a lifecycle enum, status string, boolean flag, or duplicate nullable state property to Domain.
+EF Core persistence retains the Domain Aggregate's single `{Aggregate}State` value. Infrastructure maps a stable discriminator and every state-specific value without adding a lifecycle enum, status string, boolean flag, or duplicate nullable state property to Domain.
 
 Use direct owned or JSON mapping only when the pinned EF Core and provider versions can materialize, track, and round-trip every sealed state record. Otherwise, store an Infrastructure-owned persistence type with discriminator and state-specific columns, then map it to and from the Domain state hierarchy inside the repository.
 
@@ -128,7 +128,7 @@ An EF Core-backed `Post` may use an Infrastructure `PostRow` with `state_type`, 
 - Confirm production and staging processes never apply or create schemas during startup.
 - Run command, query, concurrency, and API integration tests.
 - Confirm each command resolves repositories and commit behavior for one write provider.
-- Round-trip every aggregate state record and reject unknown or invalid discriminator and value combinations.
+- Round-trip every Aggregate state record and reject unknown or invalid discriminator and value combinations.
 - When `outbox-worker` is enabled, stop after the EF Core commit and verify the Worker later dispatches the atomically stored record.
 - Review SQL and query plans for accepted queries.
 - Run architecture tests for repository, context, and commit boundaries.

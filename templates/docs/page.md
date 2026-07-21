@@ -1,39 +1,52 @@
 ---
 {
+  "kind": "page",
   "id": "__APP__.__PAGE__",
+  "specStatus": "approved",
+  "implementationStatus": "planned",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD",
   "app": "__APP__",
   "route": "__ROUTE__",
-  "useCases": ["__SUBJECT__.__USE_CASE__"]
+  "useCases": ["__MODULE__.__USE_CASE__"],
+  "applicableExtensions": []
 }
 ---
 # __TITLE__
 
-## Document metadata
-
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
-
 ## Composition
 
-- Name each use case and the component that presents it.
+| Use case | Component | Trigger | Result presentation |
+|:---|:---|:---|:---|
+| `__MODULE__.__USE_CASE__` | `__COMPONENT__` | State the interaction. | State the visible result. |
 
 ## States
 
-- Loading
-- Empty
-- Error
-- Forbidden
-- Not found
-- Pending or disabled interaction
-- Ready
+- Loading.
+- Empty.
+- Error.
+- Forbidden.
+- Not found.
+- Pending or disabled interaction.
+- Ready.
 
 ## Interaction
 
-Describe multi-step behavior, URL state, and focus or navigation results.
+Describe multi-step behavior, URL state, focus, and navigation results.
+
+## Folder mapping
+
+```text
+apps/__APP__/src/
+  app/__ROUTE_FOLDER__/page.tsx
+  features/__MODULE__/__USE_CASE__/
+    __COMPONENT__.tsx
+```
 
 ## Metadata
 
 Record public title, description, canonical URL, and indexing behavior when applicable.
+
+## Verification
+
+List component, route, accessibility, and Playwright checks.

@@ -1,12 +1,13 @@
+---
+{
+  "kind": "domain-index",
+  "id": "__PROJECT_ID__",
+  "specStatus": "approved",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD"
+}
+---
 # __PROJECT__ Domain
-
-## Document metadata
-
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
 
 ## Bounded context
 
@@ -14,16 +15,39 @@ Name the single business boundary and the responsibilities inside it.
 
 ## Domain language
 
-Use [glossary.md](glossary.md) as the canonical term list.
+Use [glossary.md](glossary.md) as the shared term list. Module-specific terms remain in module specifications.
 
-## Subjects
+## Modules
 
-- Link each `docs/domain/{subject}/README.md` and state its user outcome.
+| Module | Purpose | Specification |
+|:---|:---|:---|
+| `__MODULE__` | State the related language and use cases. | Link `modules/__MODULE__/README.md`. |
 
-## Primary v1 journey
+## Workflows
 
-1. Link the ordered use cases that form the first releasable journey.
+| Workflow | Business purpose | Participating modules |
+|:---|:---|:---|
+| `__WORKFLOW__` | State the system-controlled outcome. | List module IDs. |
 
-## Context-wide invariants
+Remove this section when no Workflow specification exists.
 
-- Record only rules shared across subjects.
+## Domain policies
+
+| Domain policy | Purpose | Applies to modules |
+|:---|:---|:---|
+| `__POLICY__` | State the accepted policy. | List module IDs. |
+
+Remove this section when no domain policy specification exists.
+
+## Folder organization
+
+```text
+docs/domain/
+  README.md
+  glossary.md
+  modules/
+  workflows/       create with the first workflow
+  policies/        create with the first domain policy
+```
+
+End-to-end flow order belongs under `docs/product/flows/`, not in this index.

@@ -19,7 +19,7 @@
   ],
   "properties": {
     "$schema": { "type": "string" },
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": { "const": 2 },
     "version": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"
@@ -57,7 +57,7 @@
     },
     "extensions": {
       "type": "object",
-      "additionalProperties": { "$ref": "#/$defs/repositoryPath" }
+      "additionalProperties": { "$ref": "#/$defs/extension" }
     },
     "stack": {
       "type": "object",
@@ -91,6 +91,37 @@
     "versionMap": {
       "type": "object",
       "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "extension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "activationScope"],
+      "properties": {
+        "path": { "$ref": "#/$defs/repositoryPath" },
+        "activationScope": {
+          "type": "string",
+          "enum": ["project", "local"]
+        },
+        "applicableKinds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["module", "use-case", "end-to-end-flow", "workflow", "domain-policy", "page"]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "activationScope": { "const": "local" } },
+            "required": ["activationScope"]
+          },
+          "then": { "required": ["applicableKinds"] },
+          "else": { "not": { "required": ["applicableKinds"] } }
+        }
+      ]
     },
     "loadPlan": {
       "type": "object",

@@ -79,7 +79,7 @@ Do not disable integrity or certificate verification to make an installation suc
 
 ### Minimize sensitive data (SECURITY.DATA.001)
 
-Collect, return, log, export, and retain only fields required by the use case. A use case with the `sensitive-data` risk flag documents classification, access, retention, deletion, and audit behavior.
+Collect, return, log, export, and retain only fields required by the Use case. A Use case with the `sensitive-data` Risk documents classification, access, retention, deletion, and audit behavior.
 
 ### Bound abuse at exposed endpoints (SECURITY.ABUSE.001)
 

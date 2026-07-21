@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.3.0
+
+- Defined the Agentic Engineering System as a general specification, engineering, verification, and release model used by Litenova Solutions, with Agent-Driven Engineering as its operating model and Specification-Driven Delivery as its delivery approach.
+- Replaced Subject with Module, Business Flow with End-to-End Flow, Primary Business Flow with Primary Release Flow, and Flow Check with End-to-End Test.
+- Replaced Follow-up with Event Reaction, Aggregate Rule with Aggregate Invariant, and the Shared Rule umbrella with Domain Policy.
+- Replaced Claims and Evidence with Decision Evidence and Release Evidence with Release Record.
+- Retained mandatory aggregate state-record hierarchies and prohibited lifecycle enums, status strings, boolean flags, and computed discriminators as replacements.
+- Added kind-specific Specification Metadata with `specStatus` and `implementationStatus`.
+- Renamed structured kinds, fields, template paths, documentation directories, and `FC-*` identifiers; moved foundation rule IDs to `AGENTIC.*` without compatibility aliases.
+- Replaced consumer `extensions` with `selectedExtensions`, added project or local extension activation scopes, and advanced the manifest schema to version 2.
+- Replaced the routing schema with a kind-discriminated Specification Metadata schema.
+- Simplified the root README, linked the hosted documentation, added project badges and a standards icon, and defined repository writing tone in `AGENTS.md`.
+- Added the v1.3 consumer upgrade guide.
+
 ## v1.2.0
 
 - Replaced structural capability terminology with subject terminology across ADDD, architecture, templates, and layer conventions.

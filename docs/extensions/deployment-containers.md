@@ -35,7 +35,7 @@ Apply reviewed schema changes from one release job before shifting traffic. Appl
 
 ### Gate traffic on readiness (EXT.CONTAINERS.TRAFFIC.001)
 
-Start new replicas, wait for readiness, then shift traffic. Run the primary-journey smoke test after traffic reaches the new version.
+Start new replicas, wait for readiness, then shift traffic. Run the primary release flow's end-to-end test after traffic reaches the new version.
 
 ### Retain the previous artifact (EXT.CONTAINERS.ROLLBACK.001)
 
@@ -69,5 +69,5 @@ No application package is required.
 - Run the image as the declared non-root user.
 - Test liveness, readiness, shutdown, schema job, smoke test, and rollback.
 - Verify termination reaches the application and in-flight work stops within the declared grace period.
-- Compare OCI revision and release evidence with the deployed digest.
+- Compare the OCI revision and release record with the deployed digest.
 - Scan the image and review base digest updates.

@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
-  "schemaVersion": 1,
-  "version": "1.2.0",
+  "schemaVersion": 2,
+  "version": "1.3.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "defaultProfile": "dotnet-nextjs",
@@ -37,21 +37,76 @@
     }
   },
   "extensions": {
-    "acceptance-bdd": "docs/extensions/acceptance-bdd.md",
-    "api-compatibility": "docs/extensions/api-compatibility.md",
-    "caching": "docs/extensions/caching.md",
-    "concurrency-idempotency": "docs/extensions/concurrency-idempotency.md",
-    "data-lifecycle": "docs/extensions/data-lifecycle.md",
-    "deployment-containers": "docs/extensions/deployment-containers.md",
-    "external-integrations": "docs/extensions/external-integrations.md",
-    "frontend-authjs": "docs/extensions/frontend-authjs.md",
-    "localization": "docs/extensions/localization.md",
-    "multitenancy": "docs/extensions/multitenancy.md",
-    "outbox-worker": "docs/extensions/outbox-worker.md",
-    "persistence-ef-core": "docs/extensions/persistence-ef-core.md",
-    "realtime": "docs/extensions/realtime.md",
-    "reporting": "docs/extensions/reporting.md",
-    "scheduled-jobs": "docs/extensions/scheduled-jobs.md"
+    "acceptance-bdd": {
+      "path": "docs/extensions/acceptance-bdd.md",
+      "activationScope": "local",
+      "applicableKinds": ["use-case", "end-to-end-flow"]
+    },
+    "api-compatibility": {
+      "path": "docs/extensions/api-compatibility.md",
+      "activationScope": "project"
+    },
+    "caching": {
+      "path": "docs/extensions/caching.md",
+      "activationScope": "local",
+      "applicableKinds": ["use-case"]
+    },
+    "concurrency-idempotency": {
+      "path": "docs/extensions/concurrency-idempotency.md",
+      "activationScope": "local",
+      "applicableKinds": ["use-case", "workflow"]
+    },
+    "data-lifecycle": {
+      "path": "docs/extensions/data-lifecycle.md",
+      "activationScope": "local",
+      "applicableKinds": ["use-case", "workflow", "domain-policy"]
+    },
+    "deployment-containers": {
+      "path": "docs/extensions/deployment-containers.md",
+      "activationScope": "project"
+    },
+    "external-integrations": {
+      "path": "docs/extensions/external-integrations.md",
+      "activationScope": "local",
+      "applicableKinds": ["use-case", "workflow"]
+    },
+    "frontend-authjs": {
+      "path": "docs/extensions/frontend-authjs.md",
+      "activationScope": "project"
+    },
+    "localization": {
+      "path": "docs/extensions/localization.md",
+      "activationScope": "project"
+    },
+    "multitenancy": {
+      "path": "docs/extensions/multitenancy.md",
+      "activationScope": "project"
+    },
+    "outbox-worker": {
+      "path": "docs/extensions/outbox-worker.md",
+      "activationScope": "local",
+      "applicableKinds": ["use-case", "workflow"]
+    },
+    "persistence-ef-core": {
+      "path": "docs/extensions/persistence-ef-core.md",
+      "activationScope": "local",
+      "applicableKinds": ["module", "use-case"]
+    },
+    "realtime": {
+      "path": "docs/extensions/realtime.md",
+      "activationScope": "local",
+      "applicableKinds": ["use-case", "end-to-end-flow"]
+    },
+    "reporting": {
+      "path": "docs/extensions/reporting.md",
+      "activationScope": "local",
+      "applicableKinds": ["use-case"]
+    },
+    "scheduled-jobs": {
+      "path": "docs/extensions/scheduled-jobs.md",
+      "activationScope": "local",
+      "applicableKinds": ["use-case", "workflow"]
+    }
   },
   "stack": {
     "dotnet": "10.0.302",
@@ -307,11 +362,11 @@
     "use-case.authoring": {
       "tier0": ["AGENTS.md"],
       "tier1": [
-        "docs/foundations/addd.md#agent-summary",
+        "docs/foundations/engineering-system.md#agent-summary",
         "docs/foundations/release-standard.md#agent-summary"
       ],
       "tier2": [
-        "docs/foundations/addd.md",
+        "docs/foundations/engineering-system.md",
         "docs/foundations/release-standard.md"
       ]
     },

@@ -6,7 +6,7 @@ Application coordinates use cases. It translates a command or query into domain 
 
 ## Agent Summary {#agent-summary}
 
-- Organize Application by subject and use case.
+- Organize Application by module and use case.
 - Co-locate each message with its role-explicit result, validator, and handler.
 - Dispatch writes through `ICommandMediator` and reads through `IQueryMediator`.
 - Keep handlers and validators internal sealed.
@@ -14,12 +14,13 @@ Application coordinates use cases. It translates a command or query into domain 
 - Return stable, transport-neutral validation and use-case failures.
 - Write through aggregate repositories and read through `IQuerySession` projections.
 - Define narrow public external ports for Infrastructure implementations.
+- Keep atomic orchestration and durable Workflow orchestration explicit and separate from Aggregate behavior.
 
 ## Standards
 
 ### Organize Application by operation (APP.STRUCTURE.001)
 
-Each command or query owns one operation folder under its subject. Keep its message, result, validator, handler, and operation-specific mapping together.
+Each command or query owns one operation folder under its module. Keep its message, result, validator, handler, and operation-specific mapping together.
 
 Use the same use-case prefix across each operation. Command types end in `Command`, `CommandResult`, `CommandValidator`, and `CommandHandler`. Query types end in `Query`, `QueryResult`, `QueryResultItem`, `QueryValidator`, and `QueryHandler`.
 
@@ -29,7 +30,7 @@ Do not group all handlers or messages by technical type.
 
 Commands implement the pinned LiteBus command contract and dispatch through `ICommandMediator.SendAsync`. Queries implement the query contract and dispatch through `IQueryMediator.QueryAsync`.
 
-Domain events remain package-free. Application reactions may implement LiteBus event handler contracts at the adapter boundary.
+Domain events remain package-free. Application event reaction handlers may implement LiteBus event handler contracts at the adapter boundary.
 
 Do not introduce a unified message bus abstraction.
 
@@ -89,9 +90,23 @@ Application owns a public interface when Infrastructure must provide external be
 
 Provider names and transport models remain in Infrastructure.
 
-### Keep reactions explicit (APP.REACTIONS.001)
+### Keep event reaction implementations explicit (APP.REACTION.001)
 
-Place a reaction under the subject and triggering event. Name the handler for its action and event. Best-effort reactions run after the database commit. Durable reactions activate the outbox extension.
+Place an event reaction implementation under the module and triggering event when one module owns it. Name the handler for its action and event. Document whether delivery is `atomic`, `durable`, `rebuildable`, or `best-effort-optional`.
+
+An optional post-commit handler may run in process. Required delivery activates the outbox extension. Required derived state uses an atomic, durable, or rebuildable projection path.
+
+### Keep one state-changing Use case in one Command pipeline (APP.ORCHESTRATION.001)
+
+A Command handler MUST NOT dispatch another Command through `ICommandMediator`. Nested command dispatch can invoke the commit post-handler before the top-level Use case completes.
+
+The top-level handler MAY coordinate multiple aggregates through their repositories when one transaction is required. The approved use-case specification or an accepted decision MUST name the aggregate invariant or domain policy that requires atomic consistency. Domain objects continue to enforce their own aggregate invariants.
+
+### Advance durable Workflows through separate Commands (APP.WORKFLOW.001)
+
+A workflow orchestrator advances one durable workflow step from an event or scheduled trigger. It records workflow progress and stages the next Command for durable delivery. It does not mutate participating module aggregates directly.
+
+Each issued Command enters its own command pipeline and owns one transaction. Workflow state and the outgoing durable message are staged in one transaction. Duplicate triggers and Commands are safe. The Workflow specification names retries, timeouts, compensation, and operator actions.
 
 ## Conventions
 
@@ -127,12 +142,20 @@ Place a reaction under the subject and triggering event. Name the handler for it
       ListPostsQueryResultItem.cs
       ListPostsQueryValidator.cs
       ListPostsQueryHandler.cs
-    OnPostPublished/
-      NotifySubscribersOnPostPublishedHandler.cs
-      IPostPublicationNotifier.cs
+    FollowUps/
+      OnPostPublished/
+        NotifySubscribersOnPostPublishedHandler.cs
+        IPostPublicationNotifier.cs
+  Workflows/
+    PublicationDelivery/
+      PublicationDeliveryWorkflow.cs
+      PublicationDeliveryWorkflowState.cs
+      PublicationDeliveryWorkflowOrchestrator.cs
+      AdvancePublicationDeliveryWorkflowCommand.cs
+      AdvancePublicationDeliveryWorkflowCommandHandler.cs
 ```
 
-Create `Shared` children only for types used by multiple subjects.
+Create `Shared` children only for types used by multiple modules.
 
 ### Keep messages immutable
 
@@ -178,6 +201,64 @@ internal sealed class CreateDraftCommandHandler(
 
 Use the exact method signatures exposed by the pinned LiteBus package when they differ from an illustrative example.
 
+### Coordinate multiple Aggregates without nested dispatch
+
+```csharp
+internal sealed class ConfirmOrderCommandHandler(
+    IOrderRepository orders,
+    IReservationRepository reservations)
+    : ICommandHandler<ConfirmOrderCommand, ConfirmOrderCommandResult>
+{
+    public async Task<ConfirmOrderCommandResult> HandleAsync(
+        ConfirmOrderCommand command,
+        CancellationToken cancellationToken)
+    {
+        var order = await orders.GetAsync(command.OrderId, cancellationToken);
+        var reservation = await reservations.GetAsync(
+            command.ReservationId,
+            cancellationToken);
+
+        reservation.ConfirmFor(order.Id);
+        order.Confirm(reservation.Id);
+
+        reservations.Store(reservation);
+        orders.Store(order);
+
+        return new ConfirmOrderCommandResult(order.Id);
+    }
+}
+```
+
+The handler stages both Aggregates because the use-case specification names the rule that requires one transaction. It does not call `ICommandMediator` or commit.
+
+### Advance a durable workflow without mutating module aggregates
+
+```csharp
+internal sealed class AdvanceOrderFulfillmentWorkflowCommandHandler(
+    IOrderFulfillmentWorkflowStore workflows,
+    IWorkflowCommandOutbox outbox)
+    : ICommandHandler<AdvanceOrderFulfillmentWorkflowCommand>
+{
+    public async Task HandleAsync(
+        AdvanceOrderFulfillmentWorkflowCommand command,
+        CancellationToken cancellationToken)
+    {
+        var workflow = await workflows.GetAsync(
+            command.WorkflowId,
+            cancellationToken);
+
+        var nextCommand = workflow.RecordPaymentConfirmed(
+            command.PaymentId,
+            command.OccurredAt);
+
+        workflows.Store(workflow);
+        outbox.Enqueue(nextCommand, workflow.Id);
+    }
+}
+```
+
+Infrastructure stages Workflow state and the outgoing Command in the same session. The Worker later dispatches the outgoing Command through a new command pipeline.
+
 ## Verification
 
 - Confirm every operation folder maps to a documented use case.
@@ -185,6 +266,9 @@ Use the exact method signatures exposed by the pinned LiteBus package when they 
 - Confirm handlers and validators are internal sealed.
 - Confirm validators implement the pinned `ValidateAsync` contract.
 - Confirm command handlers do not commit and query handlers do not use repositories.
+- Confirm a Command handler never dispatches another Command through `ICommandMediator`.
+- Confirm a multi-Aggregate Command names the rule and transaction requirement in its use-case specification.
+- Confirm a workflow orchestrator stages progress and outgoing work without mutating participating module aggregates.
 - Confirm public ports contain no provider type.
 - Confirm protected messages carry trusted actor context and handlers authorize their targets.
 - Confirm expected failures have stable codes and no HTTP or provider types.

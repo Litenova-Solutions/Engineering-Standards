@@ -2,16 +2,16 @@
 
 ## Intent
 
-Domain contains the business model and protects invariants without persistence, HTTP, mediator, dependency injection, or provider concepts. Its types use the language from the product glossary, subject specifications, and use-case specifications.
+Domain contains the business model and protects aggregate invariants without persistence, HTTP, mediator, dependency injection, or provider concepts. Its types use the language from the product glossary, module specifications, and use-case specifications.
 
-The profile deliberately gives every aggregate an explicit state record hierarchy, even when the aggregate currently has one state. This repetition keeps lifecycle modeling consistent and gives later states a defined home without replacing an enum, boolean, or string discriminator.
+The profile gives every Aggregate an explicit state record hierarchy from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home and avoids replacing an enum, status string, or flag-based lifecycle model as the application grows.
 
 ## Agent Summary {#agent-summary}
 
-- Organize Domain by business subject and use the documented ubiquitous language.
+- Organize Domain by module and use the documented domain language.
 - Model each transactional consistency boundary as an aggregate.
 - Derive every aggregate root from the project-owned `AggregateRoot<TId>` base.
-- Give every aggregate a sealed state record hierarchy. Do not use lifecycle enums, status strings, or boolean status flags.
+- Give every Aggregate a sealed state record hierarchy. Do not use lifecycle enums, status strings, or boolean status flags.
 - Create aggregates through named factories and mutate them through business methods.
 - Use immutable value objects and typed IDs backed by `Guid.CreateVersion7()`.
 - Keep repository interfaces in Domain and implementations in Infrastructure.
@@ -29,9 +29,9 @@ Do not add ORM attributes, JSON attributes, HTTP models, Application messages, o
 
 ### Use one ubiquitous language (DOMAIN.LANGUAGE.001)
 
-Type, property, method, exception, and event names match the terms in `docs/domain/glossary.md`, the subject specification, and the active use-case specification.
+Type, property, method, exception, and event names match the terms in `docs/domain/glossary.md`, the module specification, and the approved use-case specification.
 
-If the business action is "publish a post," name the method `Publish`. Do not use `SetStatus`, `UpdateEntity`, or another technical synonym. Record rejected synonyms in the subject specification when agents or contributors could plausibly reintroduce them.
+If the business action is "publish a post," name the method `Publish`. Do not use `SetStatus`, `UpdateEntity`, or another technical synonym. Record rejected synonyms in the module specification when agents or contributors could plausibly reintroduce them.
 
 ### Treat aggregates as consistency boundaries (DOMAIN.AGGREGATE.001)
 
@@ -45,7 +45,7 @@ Do not place an entity inside an aggregate only to make navigation convenient. F
 
 Every aggregate root derives from the project-owned `AggregateRoot<TId>` type and implements its identity and domain-event mechanics through that base. Do not duplicate event lists in concrete aggregates or add a second aggregate base.
 
-A state-changing ADDD subject maps to one primary aggregate root, but the two terms are not interchangeable. Subject organizes documentation and code across layers. Aggregate root defines the Domain consistency and mutation boundary. A read-only subject has no aggregate root. Do not create `ISubject`, `SubjectRoot<TId>`, or another runtime subject contract.
+A module may contain no aggregate, one aggregate, or multiple related aggregates. Module organizes documentation and code across layers. Aggregate root defines one Domain consistency and mutation boundary. Do not create `IModule`, `ModuleRoot<TId>`, or another runtime module contract.
 
 The base owns only:
 
@@ -56,23 +56,30 @@ The base owns only:
 
 The base does not own timestamps, auditing, tenant identity, lifecycle transitions, persistence hooks, validation services, or dependency resolution.
 
-### Model every aggregate lifecycle with state records (DOMAIN.STATE.001)
+### Model every Aggregate lifecycle with state records (DOMAIN.STATE.001)
 
-Every aggregate defines an abstract `{Aggregate}State` record and one or more sealed state records. The aggregate exposes one `State` property whose runtime type represents its complete lifecycle state.
+Every Aggregate defines an abstract `{Aggregate}State` record and one or more sealed state records. The Aggregate exposes one `State` property whose runtime type represents its complete lifecycle state.
 
-Do not model aggregate lifecycle with:
+Do not model Aggregate lifecycle with:
 
 - An enum such as `PostStatus`.
 - A string discriminator such as `StateType`.
 - Boolean flags such as `IsPublished` or `IsArchived`.
-- Parallel nullable lifecycle fields such as `PublishedAt` and `ArchivedAt` on the aggregate.
+- Parallel nullable lifecycle fields such as `PublishedAt` and `ArchivedAt` on the Aggregate.
 - A computed state inferred from timestamps or flags.
 
-State-specific data belongs on the corresponding state record. `PublishedAt` belongs on `PublishedPostState`; it is not duplicated on `Post`.
+State-specific data belongs on the corresponding state record. State records are immutable data. Aggregate methods own transition rules and replace the current state; state records do not receive injected services or own transition methods.
 
-State records are immutable data. Aggregate methods own transition rules and replace the current state. Do not inject services into a state record or move transitions into state record methods.
+```csharp
+public abstract record PostState;
 
-Even an aggregate with one current state defines its hierarchy:
+public sealed record DraftPostState : PostState;
+
+public sealed record PublishedPostState(
+    DateTimeOffset PublishedAt) : PostState;
+```
+
+Even an Aggregate with one current state defines its hierarchy:
 
 ```csharp
 public abstract record ProfileState;
@@ -136,13 +143,13 @@ Aggregate and value-object constructors copy incoming mutable collections. Publi
 
 Default record equality does not compare `List<T>` or `IReadOnlyList<T>` contents. A value object containing a collection implements content equality and a matching order-sensitive or order-insensitive hash according to the domain rule.
 
-For example, `PostTags` may treat tag order as irrelevant, while `RouteStops` treats order as part of the value. The subject terms state which rule applies.
+For example, `PostTags` may treat tag order as irrelevant, while `RouteStops` treats order as part of the value. The module terms state which rule applies.
 
 ### Make money and decimal rules explicit (DOMAIN.MONEY.001)
 
 Monetary amounts use `decimal` and a `Money` value object that includes currency. Domain code does not use `double` or `float` for money.
 
-The subject specification or glossary defines:
+The module specification or glossary defines:
 
 - Supported currency codes.
 - Amount scale and rounding mode.
@@ -178,7 +185,7 @@ Every domain event is a public immutable record implementing the project-owned p
 
 An event contains enough immutable business data for its intended reactions to understand the fact. "Minimal" does not mean "identity only" when a reaction needs values from the moment of the transition. Do not include aggregate, entity, repository, session, service, or mutable collection references.
 
-`IDomainEvent` has no LiteBus or provider base interface. Domain events are internal business facts, not integration-event or public API contracts. An Application or Infrastructure reaction may translate a domain event into an integration event when an external contract requires one.
+`IDomainEvent` has no LiteBus or provider base interface. Domain events are internal business facts, not integration events or public API contracts. An Application or Infrastructure event reaction implementation may translate a domain event into an integration event when an external contract requires one.
 
 Record the event inside the aggregate method that completes the transition. Pass occurrence time into the method when time is part of the fact.
 
@@ -204,7 +211,7 @@ For example, a handler obtains `clock.UtcNow` and calls `post.Publish(clock.UtcN
 
 ### Document public Domain contracts (DOMAIN.DOCUMENTATION.001)
 
-Public aggregate methods, state records with data, value-object factories, events, repositories, and exceptions have XML documentation that states a business constraint, result, or failure. Do not restate the member name.
+Public Aggregate methods, state types with data, Value Object factories, Events, repositories, and exceptions have XML documentation that states a business constraint, result, or failure. Do not restate the member name.
 
 For example, `Publish` documentation identifies allowed source states, the resulting state, and `PostPublished`. The text `Publishes the post` alone is insufficient.
 
@@ -212,7 +219,7 @@ For example, `Publish` documentation identifies allowed source states, the resul
 
 The code blocks in this section focus on the named design rule and omit namespaces and unrelated XML declarations. Consumer files still apply `DOMAIN.DOCUMENTATION.001` to their complete public contracts.
 
-### Use subject-first folders
+### Use module-first folders
 
 ```text
 {ProjectName}.Domain/
@@ -241,7 +248,7 @@ The code blocks in this section focus on the named design rule and omit namespac
       PostAlreadyPublishedException.cs
 ```
 
-Create subfolders when the subject contains enough types to improve navigation. Do not create empty `Entities`, `ValueObjects`, `States`, or `Services` folders. Repository interfaces remain with the subject whose primary aggregate they load.
+Create subfolders when the module contains enough types to improve navigation. Do not create empty `Entities`, `ValueObjects`, `States`, or `Services` folders. Each aggregate-specific repository interface remains with the module that contains that aggregate.
 
 ### Use these Domain names
 
@@ -251,8 +258,8 @@ Create subfolders when the subject contains enough types to improve navigation. 
 | Child entity | `{Entity}` | `OrderLine` |
 | Value object | `{BusinessTerm}` | `PostTitle` |
 | Strongly typed ID | `{Aggregate}Id` | `PostId` |
-| State base | `{Aggregate}State` | `PostState` |
-| State case | `{State}{Aggregate}State` | `PublishedPostState` |
+| Typed state base | `{Aggregate}State` | `PostState` |
+| Typed state case | `{State}{Aggregate}State` | `PublishedPostState` |
 | Repository | `I{Aggregate}Repository` | `IPostRepository` |
 | Domain service | `{BusinessRule}DomainService` | `OrderPricingDomainService` |
 | Domain event | `{PastTenseBusinessFact}` | `PostPublished` |
@@ -306,7 +313,7 @@ public abstract class AggregateRoot<TId> : IAggregateRoot
 }
 ```
 
-`ClearDomainEvents` is event-delivery mechanics, not a business mutation entry point. Infrastructure calls it only after the selected best-effort or durable path has accepted the pending events.
+`ClearDomainEvents` is Event-delivery mechanics, not a business mutation entry point. Infrastructure calls it only after the selected atomic, durable, rebuildable, or optional path has accepted the pending Events.
 
 Concrete aggregates validate that `id.Value` is not `Guid.Empty` before calling or while calling the base constructor. The base remains free of aggregate-specific exceptions.
 
@@ -381,7 +388,7 @@ if (typeof(IStronglyTypedId).IsAssignableFrom(context.JsonTypeInfo.Type))
 }
 ```
 
-### Keep state records as the only lifecycle representation
+### Keep state records as the only Aggregate lifecycle representation
 
 ```csharp
 public abstract record PostState;
@@ -396,22 +403,17 @@ public sealed record ArchivedPostState(
     string Reason) : PostState;
 ```
 
-The following representation is forbidden:
+`PublishedAt` exists only on `PublishedPostState`, and archive facts exist only on `ArchivedPostState`. The Aggregate cannot combine facts from mutually exclusive states.
+
+A one-state Aggregate uses the same shape from its first implementation:
 
 ```csharp
-public enum PostStatus
-{
-    Draft,
-    Published,
-    Archived
-}
+public abstract record ProfileState;
 
-public PostStatus Status { get; private set; }
-public DateTimeOffset? PublishedAt { get; private set; }
-public DateTimeOffset? ArchivedAt { get; private set; }
+public sealed record ActiveProfileState : ProfileState;
 ```
 
-Infrastructure persists one state value with stable provider configuration. It does not add shadow state fields back into Domain or infer a state after loading.
+Infrastructure persists each state hierarchy with stable discriminators. It does not add a lifecycle enum or shadow state fields back into Domain or infer a different state after loading.
 
 ### Keep value creation and equality explicit
 
@@ -512,7 +514,7 @@ public interface IPostRepository
 
 The command pipeline owns the commit. `Store` stages the aggregate through the selected provider implementation.
 
-## Complete aggregate example
+## Complete Aggregate example using typed states
 
 ```csharp
 public sealed class Post : AggregateRoot<PostId>
@@ -613,15 +615,15 @@ public sealed record PostPublished(
     DateTimeOffset PublishedAt) : IDomainEvent;
 ```
 
-The event payload captures the publication fact without carrying the mutable `Post`. A reaction can use the values from the transition or load a current read model when it explicitly needs current data.
+The event payload captures the publication fact without carrying the mutable `Post`. An event reaction implementation can use values from the transition or load a current read model when it explicitly needs current data.
 
 ## Verification
 
 - Inspect Domain package and project references for outer-layer dependencies.
-- Compare Domain names with the glossary, subject specification, and active use-case specification.
-- Confirm each state-changing subject names one primary aggregate root.
-- Confirm every aggregate derives from `AggregateRoot<TId>` and has exactly one state record hierarchy.
-- Confirm no runtime subject interface or base class exists.
+- Compare Domain names with the glossary, module specification, and approved use-case specification.
+- Confirm every documented aggregate derives from `AggregateRoot<TId>` and appears in its module ownership table.
+- Confirm every documented Aggregate has exactly one abstract state base and at least one sealed state record.
+- Confirm no runtime module interface or base class exists.
 - Search Domain for lifecycle enums, state strings, status booleans, and duplicated nullable state fields.
 - Confirm aggregate constructors are not public and every mutation uses a business method.
 - Confirm handlers do not reproduce state checks or set aggregate properties.
@@ -630,6 +632,6 @@ The event payload captures the publication fact without carrying the mutable `Po
 - Confirm repositories expose aggregate operations rather than generic CRUD or query behavior.
 - Confirm domain services are stateless and contain no outer-layer dependency.
 - Confirm events are past-tense `IDomainEvent` records with no aggregate or provider reference.
-- Round-trip every concrete aggregate state through the selected persistence provider.
-- Test every factory, allowed transition, rejected transition, invariant, state-specific value, and emitted event.
-- Confirm subject invariant IDs and state transitions map to active use cases and acceptance criteria.
+- Round-trip every concrete Aggregate state record through the persistence provider.
+- Test every factory, allowed transition, rejected transition, aggregate invariant, state-specific value, and emitted event.
+- Confirm aggregate invariant IDs and state transitions map to verified use cases and acceptance criteria.

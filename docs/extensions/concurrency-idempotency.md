@@ -6,7 +6,7 @@ Concurrency control protects invariants when accepted writes overlap. Idempotenc
 
 ## Activation
 
-Enable `concurrency-idempotency` when the use case carries the `concurrency` risk flag, two accepted writes can conflict, or a retry can duplicate an irreversible or externally visible effect.
+Enable `concurrency-idempotency` when the Use case carries the `concurrency` Risk, two accepted writes can conflict, or a retry can duplicate an irreversible or externally visible effect.
 
 This extension adds no baseline project and replaces no baseline rule.
 

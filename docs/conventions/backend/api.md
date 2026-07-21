@@ -7,7 +7,7 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 ## Agent Summary {#agent-summary}
 
 - Use one Minimal API `IEndpoint` class per operation.
-- Group endpoints by subject and use case.
+- Group endpoints by module and use case.
 - Keep request models, response models, and API mapping types beside the endpoint.
 - Derive the authenticated actor from trusted claims.
 - Return stable Problem Details codes and documented status codes.
