@@ -29,6 +29,6 @@ These files are starting points for consumer documentation. Copy only the files 
 | `runbook.md` | `docs/runbooks/{runbook}.md` | An operator needs a repeatable recovery or operating procedure. |
 | `release-record.md` | `docs/releases/{release}.md` | One immutable release artifact is evaluated. |
 
-Structured templates begin with Specification Metadata validated by [the schema](../../schemas/specification-metadata.schema.json). The LES foundation defines semantic relationships that JSON Schema cannot prove across files.
+Structured templates begin with Specification Metadata validated by [the schema](../../schemas/specification-metadata.schema.json). The engineering system foundation defines semantic relationships that JSON Schema cannot prove across files.
 
 The standards do not generate application code. Agents load the active specification, selected profile, task conventions, and applicable extensions before implementing one complete slice.

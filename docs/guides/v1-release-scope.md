@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Standards v1 defines the Litenova Engineering System for one maintainer and collaborating agents building and operating one business web application. The system combines durable specifications, engineering rules, executable verification, and release records. It is a documentation and contract release, not generated application code.
+Standards v1 defines the Agentic Engineering System profile for one maintainer and collaborating agents building and operating one business web application. Litenova Solutions uses this standards repository as its engineering system for developing software. The model remains general enough for another technical team to adopt. It combines durable specifications, engineering rules, executable verification, and release records. It is a documentation and contract release, not generated application code.
 
 Exact versions, profile composition, extension paths, scopes, and task load plans live in `standards.manifest.json`.
 
@@ -12,7 +12,7 @@ V1 contains:
 
 - The root agent protocol and source-precedence rules.
 - A machine-readable manifest plus schemas for the manifest, consumer selection, and Specification Metadata.
-- Foundations for supported scope, engineering principles, LES, agent work, and application release control.
+- Foundations for supported scope, engineering principles, the Agentic Engineering System, agent work, and application release control.
 - One `dotnet-nextjs` platform profile.
 - Repository, backend, frontend, testing, security, operations, and CI conventions with canonical rule IDs.
 - Project-scoped and locally applicable extension standards.

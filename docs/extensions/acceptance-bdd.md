@@ -2,7 +2,7 @@
 
 ## Intent
 
-This extension adds Reqnroll scenarios when product, domain, engineering, and testing discussions rely on the same critical cross-layer examples. The LES use-case specification remains the authored behavior source.
+This extension adds Reqnroll scenarios when product, domain, engineering, and testing discussions rely on the same critical cross-layer examples. The use-case specification remains the authored behavior source.
 
 ## Activation
 

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/specification-metadata.schema.json",
-  "title": "LES Specification Metadata",
-  "description": "JSON metadata blocks embedded at the start of structured LES specifications.",
+  "title": "Agentic Engineering System Specification Metadata",
+  "description": "JSON metadata blocks embedded at the start of structured Agentic Engineering System specifications.",
   "oneOf": [
     { "$ref": "#/$defs/product" },
     { "$ref": "#/$defs/domainIndex" },

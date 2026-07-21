@@ -1,20 +1,22 @@
-# Litenova Engineering System
+# Agentic Engineering System
 
 ## Intent
 
-The Litenova Engineering System (LES) is the connected set of specifications, architecture standards, agent protocols, implementation conventions, automated tests, operating controls, and release records used to build and operate Litenova software.
+The Agentic Engineering System is a general system of specifications, architecture standards, agent protocols, implementation conventions, automated tests, operating controls, and release records for building and operating software with agents as active engineering participants.
 
 In this name:
 
-- `Litenova` identifies the company that owns the decisions and applies the system.
+- `Agentic` means agents can inspect context, reason about bounded work, change authorized artifacts, and run verification within explicit decision boundaries.
 - `Engineering` covers the design, implementation, verification, deployment, operation, and evolution of software. It is broader than writing code.
 - `System` means the parts work together and constrain one another. It does not mean a runtime framework, product dependency, or application service.
 
 ### Company context
 
-Litenova Solutions is a software company currently operated by one technical founder. A future contributor is likely to have a technical background. One person may therefore hold product, domain, architecture, implementation, testing, release, and operations responsibilities at the same time.
+Litenova Solutions authors and uses these standards as its engineering system for developing software. The system is general enough for another technical team to adopt; Litenova's company context defines the current defaults and explains the decisions in this repository.
 
-LES names responsibilities without assuming separate departments or job titles. `Decision owner`, `implementation owner`, and `operations owner` identify accountability. They may identify the same person.
+Litenova Solutions is currently operated by one technical founder. A future contributor is likely to have a technical background. One person may therefore hold product, domain, architecture, implementation, testing, release, and operations responsibilities at the same time.
+
+The system names responsibilities without assuming separate departments or job titles. `Decision owner`, `implementation owner`, and `operations owner` identify accountability. They may identify the same person.
 
 AI agents perform a substantial part of engineering work. They can read repositories, propose designs, edit specifications and code, run tools, and collect verification results. They do not own unresolved product policy, legal judgment, financial decisions, or risk acceptance. Consolidating execution into agents increases the need for explicit technical concepts because an agent must be able to distinguish a module from an aggregate, an end-to-end flow from a workflow, and an approved specification from an implementation claim.
 
@@ -22,7 +24,7 @@ AI agents perform a substantial part of engineering work. They can read reposito
 
 Without a shared engineering system, two capable contributors or agents can implement the same request with different boundaries, names, transaction behavior, and verification. Each local result may compile while the repository loses a coherent model.
 
-LES addresses five recurring problems:
+The system addresses five recurring problems:
 
 - Product intent can be lost between a request and its implementation.
 - Agents can invent missing rules when a specification leaves a decision implicit.
@@ -34,11 +36,11 @@ The system makes the specification durable and the agent replaceable. A differen
 
 ### Three connected layers
 
-LES contains one delivery approach and one operating model:
+The system contains one delivery approach and one operating model:
 
 | Layer | Meaning | Concrete example |
 |:---|:---|:---|
-| Litenova Engineering System | The complete company system of standards, specifications, implementation, verification, operations, and release control. | The repository structure, rule IDs, templates, tests, runbooks, and release records. |
+| Agentic Engineering System | The complete system of standards, specifications, implementation, verification, operations, and release control. | The repository structure, rule IDs, templates, tests, runbooks, and release records. |
 | Specification-Driven Delivery | Approved specifications select work and define completion. | `orders.cancel-order` defines behavior before its Command, endpoint, and tests are accepted. |
 | Agent-Driven Engineering | Agents perform substantial engineering execution within approved scope and report decisions they cannot make. | An agent loads the cancellation specification, implements it, runs its checks, and reports an unknown refund policy. |
 
@@ -48,7 +50,7 @@ LES contains one delivery approach and one operating model:
 
 ## Agent Summary {#agent-summary}
 
-- LES is the complete engineering system; Specification-Driven Delivery controls work; Agent-Driven Engineering performs much of the execution.
+- The Agentic Engineering System is the complete engineering system; Specification-Driven Delivery controls work; Agent-Driven Engineering performs much of the execution.
 - Responsibilities do not imply separate people. One person may own product, implementation, release, and operations decisions.
 - Decision owners approve product intent, domain language, policy, risk acceptance, and unresolved choices.
 - Agents implement approved specifications, identify missing facts, and do not invent policy.
@@ -62,7 +64,7 @@ LES contains one delivery approach and one operating model:
 
 ## Central model
 
-LES uses related concepts rather than one hierarchy:
+The system uses related concepts rather than one hierarchy:
 
 ```text
 Product
@@ -186,7 +188,7 @@ A `Command` is an Application message that may change business state. One top-le
 
 `Workflow Orchestrator` names the component that owns durable workflow progress. `Orchestrator` means it selects and schedules the next action; it does not perform every action itself. It receives facts, updates workflow state, issues the next Command, records retries and timeouts, and exposes failures that require an operator.
 
-Process Manager and orchestration-based Saga are industry mappings for this pattern. LES uses `Workflow Orchestrator` because the name identifies both the business record and its technical responsibility.
+Process Manager and orchestration-based Saga are industry mappings for this pattern. The system uses `Workflow Orchestrator` because the name identifies both the business record and its technical responsibility.
 
 ### Aggregate, root, state, and invariant
 
@@ -204,7 +206,7 @@ Process Manager and orchestration-based Saga are industry mappings for this patt
 
 For example, a refund limit based on provider-confirmed captured money may require facts from Orders, Payments, and Refunds. The policy names its owner, consistency requirement, enforcement point, failure behavior, and verification.
 
-LES classifies rules by where they are enforced:
+The system classifies rules by where they are enforced:
 
 | Term | Word-level meaning | Technical ownership |
 |:---|:---|:---|
@@ -235,19 +237,19 @@ Acceptance tests prove use-case behavior. End-to-end tests prove that connected 
 
 ## Standards
 
-### Keep decision authority with accountable people (LES.AUTHORITY.001)
+### Keep decision authority with accountable people (AGENTIC.AUTHORITY.001)
 
 Decision owners approve product outcomes, domain terms, policies, acceptance criteria, external commitments, and risk acceptance. Agents MAY propose missing language, examples, and implementation mappings, but MUST mark them as proposals until the accountable person accepts them.
 
 When an unknown fact changes observable behavior, authorization, money movement, data handling, or recovery, record the question and stop the affected work. Do not infer the answer from code structure or a neighboring use case.
 
-### Drive work from approved specifications (LES.SPECIFICATION.001)
+### Drive work from approved specifications (AGENTIC.SPECIFICATION.001)
 
 An approved specification is the authoritative source for its scope. An agent starts behavior work from the active product context, end-to-end flow, module language, use-case specification, decisions, selected profile, and applicable extensions.
 
 Prompts, tickets, chat messages, and code comments may initiate work, but approved behavior MUST be recorded in the owning specification. A code implementation does not silently replace an approved specification.
 
-### Connect one product outcome through an end-to-end flow (LES.FLOW.001)
+### Connect one product outcome through an end-to-end flow (AGENTIC.FLOW.001)
 
 An end-to-end flow connects use cases from a starting condition to one observable product outcome. It MAY include actor choices, system work, branches, waiting periods, failures, and recovery. It MAY cross modules.
 
@@ -255,7 +257,7 @@ The product brief MUST name exactly one primary release flow for application v1.
 
 An end-to-end test uses `E2E-{FLOW}-{NN}`. For `event-sales`, valid IDs begin with `E2E-EVENT-SALES-`. An end-to-end flow with `implementationStatus: verified` has at least one passing automated end-to-end test through a deployed public boundary.
 
-### Group language and use cases by module (LES.MODULE.001)
+### Group language and use cases by module (AGENTIC.MODULE.001)
 
 A module is a stable domain area that owns related language and use cases. Use the same module name in documentation, Domain and Application folders, API groups, frontend features, tests, and acceptance IDs.
 
@@ -263,7 +265,7 @@ A module is a navigation and ownership boundary. It does not define a transactio
 
 A module MAY contain no aggregate, one aggregate, or multiple related aggregates. Split a module when its language, business responsibility, or reasons for change are independent. Do not split it only because another aggregate exists.
 
-### Make aggregate ownership explicit (LES.AGGREGATE.001)
+### Make aggregate ownership explicit (AGENTIC.AGGREGATE.001)
 
 An aggregate protects every invariant that must hold in one transaction. Its aggregate root is the only external mutation entry point. A Command normally changes one aggregate.
 
@@ -276,7 +278,7 @@ The module specification maps each aggregate to the state it owns, its aggregate
 | `Order` | Lines, totals, and lifecycle | `INV-ORDERS-01` | `orders.create-order`, `orders.cancel-order` |
 | `OrderClaim` | Guest claim lifecycle | `INV-ORDERS-04` | `orders.claim-guest-order` |
 
-### Deliver one complete use case (LES.USECASE.001)
+### Deliver one complete use case (AGENTIC.USECASE.001)
 
 A use case is one independently testable actor or system goal. It defines its trigger, input, result, rules, failures, acceptance criteria, entry points, implementation impact, and operating impact.
 
@@ -298,7 +300,7 @@ Acceptance ID:  AC-ORDERS-CANCEL-ORDER-01
 
 Finish Domain behavior, Application coordination, persistence, entry points, automated evidence, and operating impact before setting `implementationStatus` to `verified`. Placeholder work leaves the use case `planned`.
 
-### Specify autonomous progress as a workflow (LES.WORKFLOW.001)
+### Specify autonomous progress as a workflow (AGENTIC.WORKFLOW.001)
 
 Create a workflow specification when system-controlled progress crosses a transaction or time boundary and requires durable state, an awaited event, a scheduled time, retry, idempotency, compensation, or operator recovery.
 
@@ -310,7 +312,7 @@ Use `{module}.{past-tense-event}` as the stable documented event reference, such
 
 Each Command issued by a workflow owns its own transaction. The workflow orchestrator updates workflow progress and stages outgoing work; it does not mutate participating aggregates directly.
 
-### Record events and event reactions separately (LES.REACTION.001)
+### Record events and event reactions separately (AGENTIC.REACTION.001)
 
 An event records a completed fact. An event reaction states behavior caused by that event. Technical implementation remains explicit as a Domain event handler, Integration event handler, workflow orchestrator, projection, or scheduled job.
 
@@ -325,7 +327,7 @@ Use one delivery classification:
 
 Do not classify a required projection refresh as `best-effort-optional`. Domain events are internal business facts. Integration events are versioned contracts delivered outside the bounded context.
 
-### Classify rules by enforcement boundary (LES.RULES.001)
+### Classify rules by enforcement boundary (AGENTIC.RULES.001)
 
 Use the rule classifications defined in the Vocabulary section. Do not rename an aggregate invariant to a validation rule because both reject input; their enforcement times and owners differ.
 
@@ -333,7 +335,7 @@ Use `INV-{MODULE}-{NN}` for aggregate invariants. Use `POL-{POLICY}-{NN}` for do
 
 An acceptance criterion cites every `INV-*` and `POL-*` rule required for that behavior. A domain policy MUST state its owner, affected modules, consistency requirement, enforcement point, failure behavior, and verification.
 
-### Model every aggregate lifecycle with state records (LES.STATE.001)
+### Model every aggregate lifecycle with state records (AGENTIC.STATE.001)
 
 Every aggregate defines an abstract `{Aggregate}State` record and one or more sealed immutable state records from its first implementation. This includes an aggregate with one current state. The aggregate exposes one `State` property whose runtime type represents its complete lifecycle state.
 
@@ -341,7 +343,7 @@ Use business state names in specification tables and map every state to its stat
 
 State-specific facts belong on the corresponding state record. Aggregate methods own transition rules and replace the current state. A Value Object may protect one fact within a state, but it does not replace the aggregate state hierarchy.
 
-### Declare Specification Metadata (LES.METADATA.001)
+### Declare Specification Metadata (AGENTIC.METADATA.001)
 
 Every structured specification starts with one JSON metadata block and an explicit `kind`. Common fields are `kind`, `id`, `specStatus`, `owner`, and `lastReviewed`.
 
@@ -358,7 +360,7 @@ Behavior specifications also use `implementationStatus`:
 
 Do not use `implementationStatus` on indexes, decisions, Decision Evidence, Operating Limits, Domain Policies, or other records that do not claim implemented behavior. The Specification Metadata schema defines fields permitted for each `kind`.
 
-### Select extensions before applying them (LES.EXTENSIONS.001)
+### Select extensions before applying them (AGENTIC.EXTENSIONS.001)
 
 `selectedExtensions` in `standards.project.json` is the project allow-list. Selection permits dependencies and repository structure.
 
@@ -366,7 +368,7 @@ An extension with `activationScope: project` applies whenever selected. An exten
 
 Do not list a project-scoped extension in `applicableExtensions`. Do not list a local extension on a specification kind excluded by `applicableKinds`.
 
-### Give acceptance criteria stable ownership (LES.ACCEPTANCE.001)
+### Give acceptance criteria stable ownership (AGENTIC.ACCEPTANCE.001)
 
 Use `AC-{MODULE}-{USE-CASE}-{NN}`. The module and use-case segments MUST match the owning use-case ID after uppercase conversion and replacement of `.` with `-`. The numeric suffix starts at `01` and uses two digits.
 
@@ -378,7 +380,7 @@ Define a criterion once in its owning use-case specification:
 
 Acceptance tests reference the ID without redefining its text. A static documentation check proves that the reference exists. A passing test provides execution evidence.
 
-### Update specifications with behavior (LES.SYNC.001)
+### Update specifications with behavior (AGENTIC.SYNC.001)
 
 Change the approved use-case specification, implementation, tests, OpenAPI, generated client, affected end-to-end flow, affected workflow, and operating records together when observable behavior changes.
 

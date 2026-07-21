@@ -1,8 +1,8 @@
 # Litenova Engineering Standards
 
-Open-source engineering standards for Litenova Solutions applications.
+An open-source Agentic Engineering System for developing software with human contributors and AI agents.
 
-The repository gives human contributors and AI agents the same architectural boundaries, naming rules, folder conventions, delivery method, and verification expectations. Version 1 targets one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends.
+Litenova Solutions authors and uses these standards as the system for developing its software. The repository gives human contributors and AI agents the same architectural boundaries, naming rules, folder conventions, delivery method, and verification expectations. Version 1 targets one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends.
 
 ## Why this standard exists
 
@@ -14,7 +14,7 @@ These standards make those choices explicit. They retain detailed conventions wh
 
 | Part | Purpose |
 |:---|:---|
-| Foundations | Define scope, engineering principles, the Litenova Engineering System, agent behavior, and release criteria. |
+| Foundations | Define scope, engineering principles, the Agentic Engineering System, agent behavior, and release criteria. |
 | Platform profile | Select the supported stack and baseline architecture. |
 | Conventions | Define exact folders, names, boundaries, implementation patterns, and checks by topic. |
 | Extensions | Activate conditional behavior such as durable delivery, EF Core, caching, or localization. |
@@ -26,7 +26,7 @@ The baseline profile applies first. An applicable extension may replace only the
 
 ## From an idea to application v1
 
-The Litenova Engineering System (LES) keeps product intent, implementation, tests, operations, and release records aligned. LES uses Specification-Driven Delivery to define work and Agent-Driven Engineering to execute much of it.
+The repository defines the Agentic Engineering System. The system is a general engineering model that another technical team can adopt. It uses Specification-Driven Delivery to define work and Agent-Driven Engineering to execute much of it.
 
 For a publishing application:
 
@@ -39,7 +39,7 @@ For a publishing application:
 7. Automated tests cite the same acceptance ID, and `E2E-POST-PUBLICATION-01` verifies the complete flow.
 8. The slice is complete after its code, documentation, tests, deployment impact, and release checks agree.
 
-Read [the Litenova Engineering System foundation](docs/foundations/engineering-system.md) for the complete model, company context, vocabulary, and decisions.
+Read [the Agentic Engineering System foundation](docs/foundations/engineering-system.md) for the complete model, Litenova Solutions context, vocabulary, and decisions.
 
 Read [V1 Release Scope](docs/guides/v1-release-scope.md) for the complete release boundary and [the v2 roadmap](ROADMAP.md) for later candidates.
 
@@ -67,7 +67,7 @@ Other IDs have separate purposes:
 
 ## Read the standards
 
-Human readers start with the [documentation index](docs/README.md), then read scope and the Litenova Engineering System before the platform conventions.
+Human readers start with the [documentation index](docs/README.md), then read scope and the Agentic Engineering System before the platform conventions.
 
 AI agents start with [AGENTS.md](AGENTS.md), the consumer's `standards.project.json`, and the task-specific load plan in `standards.manifest.json`.
 

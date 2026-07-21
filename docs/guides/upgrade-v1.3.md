@@ -1,8 +1,8 @@
 # Upgrade to Standards v1.3
 
-Standards v1.3 names the full specification, engineering, verification, and release model the Litenova Engineering System (LES). The migration is breaking. Current standards and consumer records use the v1.3 terms without aliases.
+Standards v1.3 names the full specification, engineering, verification, and release model the Agentic Engineering System. Litenova Solutions uses this general system to develop its software, but the company name is not part of the system name. The migration is breaking. Current standards and consumer records use the v1.3 terms without aliases.
 
-The earlier Agent-Driven Domain Delivery name described only part of the model and made `agent-driven` sound like the product being delivered. LES is the whole engineering system. Agent-Driven Engineering describes how people and agents work inside it. Specification-Driven Delivery describes how approved intent becomes verified software.
+The earlier Agent-Driven Domain Delivery name described only part of the model and made `agent-driven` sound like the product being delivered. The Agentic Engineering System is the whole engineering system. Agent-Driven Engineering describes how people and agents work inside it. Specification-Driven Delivery describes how approved intent becomes verified software.
 
 This distinction reflects Litenova Solutions' working context: one technical founder owns product and engineering work, future contributors are likely to have technical backgrounds, agents perform a substantial part of execution, and role boundaries often belong to one person. The vocabulary therefore favors established engineering terms over invented role names or softened business labels.
 
@@ -14,7 +14,7 @@ Replace the current vocabulary as one model. Do not retain both terms as synonym
 
 | Earlier term | v1.3 term | Meaning in v1.3 |
 |:---|:---|:---|
-| Agent-Driven Domain Delivery (ADDD) | Litenova Engineering System (LES) | The complete standards, specification, execution, verification, and release system. |
+| Agent-Driven Domain Delivery (ADDD) | Agentic Engineering System | The complete standards, specification, execution, verification, and release system. |
 | ADDD delivery method | Agent-Driven Engineering | The operating model in which people define authority and judgment while agents perform bounded engineering work. |
 | Implied delivery process | Specification-Driven Delivery | The approach in which approved specifications define intent and automated evidence verifies implementation. |
 | Subject | Module | One named business responsibility used across documentation and code layers. |
@@ -278,21 +278,21 @@ Update current references to these rule IDs:
 
 | Removed rule ID | Replacement |
 |:---|:---|
-| `ADDD.AUTHORITY.001` | `LES.AUTHORITY.001` |
-| `ADDD.SPECIFICATION.001` | `LES.SPECIFICATION.001` |
-| `ADDD.BUSINESSFLOW.001` | `LES.FLOW.001` |
-| `ADDD.SUBJECT.001` | `LES.MODULE.001` |
-| `ADDD.AGGREGATE.001` | `LES.AGGREGATE.001` |
-| `ADDD.USECASE.001` | `LES.USECASE.001` |
-| `ADDD.WORKFLOW.001` | `LES.WORKFLOW.001` |
-| `ADDD.FOLLOWUP.001` | `LES.REACTION.001` |
-| `ADDD.RULES.001` | `LES.RULES.001` |
-| `ADDD.STATE.001` | `LES.STATE.001` |
-| `ADDD.METADATA.001` | `LES.METADATA.001` |
-| `ADDD.EXTENSIONS.001` | `LES.EXTENSIONS.001` |
-| `ADDD.ACCEPTANCE.001` | `LES.ACCEPTANCE.001` |
-| `ADDD.SYNC.001` | `LES.SYNC.001` |
-| `ADDD.COORDINATOR.001` | `LES.WORKFLOW.001` and `APP.WORKFLOW.001` |
+| `ADDD.AUTHORITY.001` | `AGENTIC.AUTHORITY.001` |
+| `ADDD.SPECIFICATION.001` | `AGENTIC.SPECIFICATION.001` |
+| `ADDD.BUSINESSFLOW.001` | `AGENTIC.FLOW.001` |
+| `ADDD.SUBJECT.001` | `AGENTIC.MODULE.001` |
+| `ADDD.AGGREGATE.001` | `AGENTIC.AGGREGATE.001` |
+| `ADDD.USECASE.001` | `AGENTIC.USECASE.001` |
+| `ADDD.WORKFLOW.001` | `AGENTIC.WORKFLOW.001` |
+| `ADDD.FOLLOWUP.001` | `AGENTIC.REACTION.001` |
+| `ADDD.RULES.001` | `AGENTIC.RULES.001` |
+| `ADDD.STATE.001` | `AGENTIC.STATE.001` |
+| `ADDD.METADATA.001` | `AGENTIC.METADATA.001` |
+| `ADDD.EXTENSIONS.001` | `AGENTIC.EXTENSIONS.001` |
+| `ADDD.ACCEPTANCE.001` | `AGENTIC.ACCEPTANCE.001` |
+| `ADDD.SYNC.001` | `AGENTIC.SYNC.001` |
+| `ADDD.COORDINATOR.001` | `AGENTIC.WORKFLOW.001` and `APP.WORKFLOW.001` |
 | `ARCH.SUBJECTS.001` | `ARCH.MODULES.001` |
 | `APP.COORDINATOR.001` | `APP.ORCHESTRATION.001` and `APP.WORKFLOW.001` |
 | `APP.REACTIONS.001` | `APP.REACTION.001` |

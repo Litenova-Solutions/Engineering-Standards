@@ -14,11 +14,15 @@ A software system that can inspect repository context, reason about a bounded ta
 
 ## Agent-Driven Engineering
 
-The LES operating model in which agents perform substantial engineering execution from approved specifications. People retain decision authority and review responsibility.
+The operating model within the Agentic Engineering System in which agents perform substantial engineering execution from approved specifications. People retain decision authority and review responsibility.
 
 ## Agent Summary
 
 The anchored short section agents load as Tier 1 context for a task. The full document remains the source when a summary is insufficient.
+
+## Agentic Engineering System
+
+A general system for specifying, building, verifying, releasing, and operating software with agents as active engineering participants. Litenova Solutions authors and uses the standards in this repository as its implementation of the system. It uses Specification-Driven Delivery and Agent-Driven Engineering.
 
 ## Aggregate
 
@@ -34,7 +38,7 @@ The only external mutation entry point for an aggregate. `Root` identifies the o
 
 ## Aggregate state
 
-The complete lifecycle condition of an aggregate. LES represents it with one abstract `{Aggregate}State` record and one or more sealed state records.
+The complete lifecycle condition of an aggregate. The engineering system represents it with one abstract `{Aggregate}State` record and one or more sealed state records.
 
 ## Authorization policy
 
@@ -100,10 +104,6 @@ A conditional standards bundle selected in `standards.project.json`. Project-sco
 
 A versioned message contract delivered outside the bounded context.
 
-## Litenova Engineering System
-
-The complete company system for specifying, building, verifying, releasing, and operating Litenova software. It uses Specification-Driven Delivery and Agent-Driven Engineering.
-
 ## Module
 
 A cohesive area of the domain used to organize language, use cases, aggregates, code, and ownership. A module is not automatically an assembly, deployment unit, transaction boundary, or aggregate.
@@ -166,7 +166,7 @@ An approved, versioned statement of required behavior or constraint. A specifica
 
 ## Specification-Driven Delivery
 
-The LES delivery approach in which approved specifications select work and define completion. Prompts and tickets may initiate work, but the owning specification records approved behavior.
+The delivery approach within the Agentic Engineering System in which approved specifications select work and define completion. Prompts and tickets may initiate work, but the owning specification records approved behavior.
 
 ## Specification Metadata
 

@@ -54,7 +54,7 @@ Do not duplicate owner, status, or review date in a Markdown metadata section. P
 
 ### Use established terms and ordinary capitalization (WRITING.TERMS.001)
 
-Use established terms such as module, aggregate, invariant, Command, Query, workflow, orchestrator, repository, projection, transaction, outbox, and idempotency with the meanings defined by LES and the glossary. Explain a technical term with a concrete example instead of replacing it with a softer local synonym.
+Use established terms such as module, aggregate, invariant, Command, Query, workflow, orchestrator, repository, projection, transaction, outbox, and idempotency with the meanings defined by the Agentic Engineering System and the glossary. Explain a technical term with a concrete example instead of replacing it with a softer local synonym.
 
 Write module, use case, workflow, aggregate, invariant, event, reaction, and policy as ordinary lowercase nouns in prose. Capitalize a code type such as `CancelOrderCommand`, a project layer such as Domain, a title, or the first word of a sentence.
 

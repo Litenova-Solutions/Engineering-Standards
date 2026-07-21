@@ -40,7 +40,7 @@ Framework-generated cache and build folders remain untracked.
 
 Use `features/{module}/{use-case}/` for operation-specific components, server functions, schemas, hooks, and view mappings.
 
-The module and use-case names match LES documentation and backend Application folders.
+The module and use-case names match the system documentation and backend Application folders.
 
 ### Isolate module internals (FRONTEND.BOUNDARIES.001)
 
