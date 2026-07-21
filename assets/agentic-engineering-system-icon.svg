@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Agentic Engineering System</title>
+  <desc id="desc">Three horizontal charcoal lines connected by an angular amber path.</desc>
+  <g fill="none" stroke="#3e3643" stroke-linecap="round" stroke-width="9">
+    <path d="M18 28h92" />
+    <path d="M18 64h92" />
+    <path d="M18 100h92" />
+  </g>
+  <path
+    d="M36 28 78 64 52 100"
+    fill="none"
+    stroke="#f8c258"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="11"
+  />
+  <g fill="#f8c258" stroke="#3e3643" stroke-width="5">
+    <circle cx="36" cy="28" r="8" />
+    <circle cx="78" cy="64" r="8" />
+    <circle cx="52" cy="100" r="8" />
+  </g>
+</svg>

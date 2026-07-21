@@ -4,6 +4,21 @@ Read this file before changing this repository or a consumer application.
 
 Version 1 covers one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends. The canonical human index is `docs/README.md`. Exact versions, profile composition, extensions, and task load plans live in `standards.manifest.json`.
 
+## Writing Style (documentation and prose)
+
+Write for experienced software engineers and agent authors who understand DDD, CQS, HTTP APIs, persistence, testing, and software operations.
+
+- Use plain ASCII punctuation. Do not use em dashes, smart quotes, emoji, or decorative symbols.
+- Lead with the exact rule or capability, then a concrete example, then constraints and explanation. Keep reference pages dense and precise.
+- Prefer nouns and verbs over slogans or taglines. Headings name the concept or boundary.
+- Do not use sales cadence, rhetorical fragments, filler jargon, or unsupported superlatives.
+- Use established engineering terms for their technical meaning. Do not present DDD, CQS, workflow, aggregate, invariant, or agent concepts as branding.
+- Define a repository-specific term in one plain sentence on first use. Explain each part of a compound term when the combination is not self-evident.
+- Use Title Case for the root README and consumer-facing navigation. Use sentence case for normative rule headings and body text.
+- Use exact, sourced numbers. Label illustrative examples as illustrative and do not present them as measurements.
+- State limitations, excluded scope, and opt-in extension boundaries beside the related rule.
+- Keep the root README short. Put detailed standards, adoption steps, and migration instructions in the hosted documentation and canonical repository documents.
+
 ## Documentation model
 
 Each topic document separates:

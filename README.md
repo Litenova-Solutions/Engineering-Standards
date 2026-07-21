@@ -1,138 +1,67 @@
-# Litenova Engineering Standards
+<p align="center">
+  <img src="assets/agentic-engineering-system-icon.svg" alt="Agentic Engineering System" width="88" height="88">
+</p>
 
-An open-source Agentic Engineering System for developing software with human contributors and AI agents.
+<p align="center">
+  <a href="https://www.litenova.solutions/Standards"><img src="https://img.shields.io/badge/docs-online-f8c258?labelColor=3e3643" alt="Documentation"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.3.0--draft.1-3e3643" alt="Version 1.3.0 draft 1"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Litenova-Solutions/Engineering-Standards" alt="MIT license"></a>
+</p>
 
-Litenova Solutions authors and uses these standards as the system for developing its software. The repository gives human contributors and AI agents the same architectural boundaries, naming rules, folder conventions, delivery method, and verification expectations. Version 1 targets one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends.
+# Agentic Engineering System
 
-## Why this standard exists
+The Agentic Engineering System is the open-source set of standards Litenova Solutions
+uses to develop software with human contributors and AI agents. It defines product and
+domain specifications, architecture boundaries, implementation conventions, verification,
+operations, and release evidence as one connected system.
 
-AI agents can produce valid code while making different local choices across sessions. One agent may place handlers by technical type, another by use case, and a third may introduce a new abstraction because the repository does not state the preferred pattern.
+Version 1 targets one bounded-context business application built with ASP.NET Core,
+PostgreSQL, Marten, and optional Next.js frontends.
 
-These standards make those choices explicit. They retain detailed conventions while limiting each task to the documents that apply.
+## What It Defines
 
-## Mental model
+- Specification-Driven Delivery for turning approved intent into verified software.
+- Agent-Driven Engineering with explicit human decision authority and bounded agent work.
+- Domain, Application, Infrastructure, and WebApi boundaries organized by module and use case.
+- Required testing, security, operating, documentation, and release evidence.
+- Conditional extensions for concerns such as durable delivery, EF Core, caching, and localization.
 
-| Part | Purpose |
-|:---|:---|
-| Foundations | Define scope, engineering principles, the Agentic Engineering System, agent behavior, and release criteria. |
-| Platform profile | Select the supported stack and baseline architecture. |
-| Conventions | Define exact folders, names, boundaries, implementation patterns, and checks by topic. |
-| Extensions | Activate conditional behavior such as durable delivery, EF Core, caching, or localization. |
-| Manifest | Holds version pins, profile composition, extension paths, and agent load plans. |
-| Consumer configuration | Selects the profile, paths, extensions allowed by the project, and project overrides. |
-| Templates | Provide small starting points for consumer product and domain documentation. |
+The baseline profile applies first. An extension may replace only the rule IDs it names.
+A consumer override must name the affected rule and link to a project decision.
 
-The baseline profile applies first. An applicable extension may replace only the baseline rule IDs it names. A consumer override takes precedence when it names the affected rule ID and links to a project decision.
+## Documentation
 
-## From an idea to application v1
+- [Hosted documentation](https://www.litenova.solutions/Standards)
+- [Repository documentation index](docs/README.md)
+- [Agentic Engineering System](docs/foundations/engineering-system.md)
+- [V1 release scope](docs/guides/v1-release-scope.md)
+- [Adoption guide](docs/guides/adopt-v1.md)
+- [V1.3 upgrade guide](docs/guides/upgrade-v1.3.md)
 
-The repository defines the Agentic Engineering System. The system is a general engineering model that another technical team can adopt. It uses Specification-Driven Delivery to define work and Agent-Driven Engineering to execute much of it.
+## Use the Standards
 
-For a publishing application:
-
-1. The product brief names `post-publication` as the primary release flow.
-2. `docs/product/flows/post-publication.md` connects `posts.create-draft` and `posts.publish-post` to one product outcome.
-3. The domain index identifies the Posts module.
-4. `docs/domain/modules/posts/create-draft.md` defines the first use case.
-5. Acceptance criterion `AC-POSTS-CREATE-DRAFT-01` states an observable outcome.
-6. The agent loads only the Application, API, persistence, and testing conventions required by that Use case.
-7. Automated tests cite the same acceptance ID, and `E2E-POST-PUBLICATION-01` verifies the complete flow.
-8. The slice is complete after its code, documentation, tests, deployment impact, and release checks agree.
-
-Read [the Agentic Engineering System foundation](docs/foundations/engineering-system.md) for the complete model, Litenova Solutions context, vocabulary, and decisions.
-
-Read [V1 Release Scope](docs/guides/v1-release-scope.md) for the complete release boundary and [the v2 roadmap](ROADMAP.md) for later candidates.
-
-## How to read a standards document
-
-Topic documents use the same structure:
-
-- **Intent** explains the selected approach and the problem it addresses.
-- **Agent Summary** is the short section loaded for routine tasks.
-- **Standards** are required boundaries. A deviation needs a declared override and decision.
-- **Conventions** are project defaults for names, locations, and implementation shape. A consumer may replace one with an explicit local convention.
-- **Examples** show a concrete interpretation.
-- **Verification** states how to check the result.
-
-A heading such as `Organize every layer by module and use case (ARCH.MODULES.001)` contains a human title followed by its canonical rule ID. A later standards release may rename or remove a rule ID when the contract changes.
-
-Other IDs have separate purposes:
-
-| Example | Meaning |
-|:---|:---|
-| `posts.create-draft` | Consumer use-case ID |
-| `AC-POSTS-CREATE-DRAFT-01` | Acceptance-criterion ID |
-| `ARCH.MODULES.001` | Standards rule ID |
-| `persistence-ef-core` | Extension ID |
-
-## Read the standards
-
-Human readers start with the [documentation index](docs/README.md), then read scope and the Agentic Engineering System before the platform conventions.
-
-AI agents start with [AGENTS.md](AGENTS.md), the consumer's `standards.project.json`, and the task-specific load plan in `standards.manifest.json`.
-
-## Consume the repository
-
-Add the release as a root submodule and pin its exact commit. Set `APPROVED_STANDARDS_TAG` to the published tag approved for the consumer:
+Pin a published release as a repository submodule:
 
 ```bash
 git submodule add https://github.com/Litenova-Solutions/Engineering-Standards.git standards
-git -C standards fetch --tags
-git -C standards checkout --detach "$APPROVED_STANDARDS_TAG"
-git add .gitmodules standards
+git -C standards checkout --detach <approved-tag-or-commit>
 ```
 
-Do not add `branch = main` to `.gitmodules`. Upgrade through a dedicated pull request that updates the recorded submodule commit.
+Add `standards.project.json`, a short root `AGENTS.md`, and the product and domain
+specifications required by the current work. The [template index](templates/docs/README.md)
+lists each starting point and its target path.
 
-Each consumer adds:
-
-- `standards.project.json` for its profile, paths, selected extensions, and overrides.
-- A short root `AGENTS.md` that points agents to `standards/AGENTS.md`.
-- Product and use-case documentation under `docs/`.
-
-Copy only the thin inception templates:
-
-```bash
-mkdir -p docs/product docs/domain/modules
-cp standards/templates/docs/standards.project.json standards.project.json
-cp standards/templates/docs/project-agents.md AGENTS.md
-cp standards/templates/docs/product-brief.md docs/product/brief.md
-cp standards/templates/docs/domain-index.md docs/domain/README.md
-cp standards/templates/docs/glossary.md docs/domain/glossary.md
-cp standards/templates/docs/modules-index.md docs/domain/modules/README.md
-```
-
-Add `flows/`, `workflows/`, `policies/`, `operations/`, `runbooks/`, `releases/`, `research/`, and `ui/` only with their first real artifact. The [template index](templates/docs/README.md) names each trigger and target path.
-
-There is no standards CLI, application generator, or bundled consumer validator. JSON schemas validate machine-readable file shape. Consumer CI or review tooling checks cross-file references. Agents create application code from the selected conventions and extensions while matching explicit consumer overrides.
-
-## Repository map
+## Repository Structure
 
 ```text
-docs/foundations/             Scope, principles, engineering system, agent protocol, release standard
-docs/profile/                 Platform profile composition
-docs/conventions/repository/  Repository layout, naming, dependencies, configuration
-docs/conventions/backend/     Architecture, Domain, Application, persistence, API
-docs/conventions/frontend/    Structure, rendering, components, data, testing
-docs/conventions/quality/     Backend testing, security, operations, CI
-docs/extensions/              Conditional standards loaded by activation criteria
-docs/guides/                  Adoption and delivery guidance
-docs/reference/               Glossary and decisions
-schemas/                      JSON contracts for the manifest, consumer configuration, and Specification Metadata
-templates/docs/               Consumer documentation starting points
-ROADMAP.md                    Evidence-gated candidates for v2
+docs/               Authored standards, extensions, guides, and reference material
+schemas/            JSON contracts for standards and consumer configuration
+templates/docs/     Consumer specification templates
+standards.manifest.json  Version pins, profiles, extensions, and agent load plans
 ```
 
-## Version policy
+## Project
 
-- Patch: narrow correction or clarification.
-- Minor: coherent standards evolution, including changes that require consumer migration.
-- Major: substantial replacement of the supported scope, method, or platform profile.
-
-Version numbers identify standards releases. They do not promise backward compatibility. Each release keeps one current contract and records required consumer work in its changelog and upgrade guide.
-
-Future standards releases add an annotated Git tag, GitHub Release, changelog entry, and upgrade guide when consumer work is required.
-
-## License
-
-[MIT](LICENSE)
+- [Contributing](CONTRIBUTING.md)
+- [Roadmap](ROADMAP.md)
+- [MIT License](LICENSE)

@@ -13,6 +13,7 @@ Target release: `v1.3.0`.
 - Renamed structured kinds, fields, template paths, documentation directories, and `FC-*` identifiers; moved foundation rule IDs to `AGENTIC.*` without compatibility aliases.
 - Replaced consumer `extensions` with `selectedExtensions`, added project or local extension activation scopes, and advanced the manifest schema to version 2.
 - Replaced the routing schema with a kind-discriminated Specification Metadata schema.
+- Simplified the root README, linked the hosted documentation, added project badges and a standards icon, and defined repository writing tone in `AGENTS.md`.
 - Added the v1.3 consumer upgrade guide.
 
 ## v1.2.0
