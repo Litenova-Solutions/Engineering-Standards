@@ -38,15 +38,15 @@ Write `None` when the Subject has no Aggregate. A Subject may contain multiple r
 |:---|:---|:---|:---|
 | `__AGGREGATE__` | `__STATE__` | State the business meaning. | List facts required in this state. |
 
-Remove this section when no business lifecycle exists. Do not prescribe a C# representation here.
+Every Aggregate lists at least one business state, including an Aggregate with one current state. Remove this section only when the Subject has no Aggregate.
 
 ## Technical state mapping
 
-| Aggregate | Business state | Code representation |
-|:---|:---|:---|
-| `__AGGREGATE__` | `__STATE__` | `__STATE_TYPE_OR_ENUM__` |
+| Aggregate | Abstract state base | Business state | Sealed state record |
+|:---|:---|:---|:---|
+| `__AGGREGATE__` | `__AGGREGATE__State` | `__STATE__` | `__STATE____AGGREGATE__State` |
 
-Add this section only when implementation exists.
+Define this mapping before the first Command implementation. Do not use an enum, status string, boolean flags, or nullable lifecycle fields as the Aggregate lifecycle representation.
 
 ## Transitions
 

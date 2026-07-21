@@ -33,7 +33,7 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 | Document | Covers |
 |:---|:---|
 | [Architecture](conventions/backend/architecture.md) | Four-project modular monolith, dependency direction, subject and use-case slices, and Worker activation. |
-| [Domain](conventions/backend/domain.md) | Aggregate roots, state representation choices, Value Objects, IDs, entities, services, Events, repositories, errors, and persistence-neutral object design. |
+| [Domain](conventions/backend/domain.md) | Aggregate roots, required state record hierarchies, Value Objects, IDs, entities, services, Events, repositories, errors, and persistence-neutral object design. |
 | [Application](conventions/backend/application.md) | Commands, Queries, handlers, validators, results, Follow-ups, Workflows, ports, and folders. |
 | [Marten persistence](conventions/backend/persistence-marten.md) | Sessions, repositories, queries, commit pipeline, event collection, JSON contracts, document evolution, aliases, indexes, and schema changes. |
 | [HTTP API](conventions/backend/api.md) | Minimal API endpoints, routes, transport models, status codes, Problem Details, authorization, and OpenAPI. |

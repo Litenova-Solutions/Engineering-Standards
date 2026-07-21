@@ -4,12 +4,14 @@
 
 Domain contains the business model and protects Aggregate Rules without persistence, HTTP, mediator, dependency injection, or provider concepts. Its types use the language from the product glossary, Subject specifications, and Use-case specifications.
 
+The profile gives every Aggregate an explicit state record hierarchy from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home and avoids replacing an enum, status string, or flag-based lifecycle model as the application grows.
+
 ## Agent Summary {#agent-summary}
 
 - Organize Domain by business subject and use the documented ubiquitous language.
 - Model each transactional consistency boundary as an aggregate.
 - Derive every aggregate root from the project-owned `AggregateRoot<TId>` base.
-- Model lifecycle state only when behavior, required facts, or transitions differ, and choose the least complex representation that prevents invalid states.
+- Give every Aggregate a sealed state record hierarchy. Do not use lifecycle enums, status strings, or boolean status flags.
 - Create aggregates through named factories and mutate them through business methods.
 - Use immutable value objects and typed IDs backed by `Guid.CreateVersion7()`.
 - Keep repository interfaces in Domain and implementations in Infrastructure.
@@ -54,22 +56,19 @@ The base owns only:
 
 The base does not own timestamps, auditing, tenant identity, lifecycle transitions, persistence hooks, validation services, or dependency resolution.
 
-### Choose a state representation from business behavior (DOMAIN.STATE.001)
+### Model every Aggregate lifecycle with state records (DOMAIN.STATE.001)
 
-Document lifecycle state when behavior, required facts, or allowed transitions differ by state. Aggregate methods own transition rules regardless of representation.
+Every Aggregate defines an abstract `{Aggregate}State` record and one or more sealed state records. The Aggregate exposes one `State` property whose runtime type represents its complete lifecycle state.
 
-Use an enum when states differ only by label and all state data remains valid in every state:
+Do not model Aggregate lifecycle with:
 
-```csharp
-public enum PublicationStatus
-{
-    Draft,
-    Published,
-    Archived
-}
-```
+- An enum such as `PostStatus`.
+- A string discriminator such as `StateType`.
+- Boolean flags such as `IsPublished` or `IsArchived`.
+- Parallel nullable lifecycle fields such as `PublishedAt` and `ArchivedAt` on the Aggregate.
+- A computed state inferred from timestamps or flags.
 
-Use typed state objects when each state requires different data or behavior:
+State-specific data belongs on the corresponding state record. State records are immutable data. Aggregate methods own transition rules and replace the current state; state records do not receive injected services or own transition methods.
 
 ```csharp
 public abstract record PostState;
@@ -80,9 +79,13 @@ public sealed record PublishedPostState(
     DateTimeOffset PublishedAt) : PostState;
 ```
 
-Do not use independent flags or nullable fields that permit contradictory combinations. For example, `IsPublished`, `IsArchived`, `PublishedAt`, and `ArchivedAt` on one object can represent published and archived at the same time.
+Even an Aggregate with one current state defines its hierarchy:
 
-An Aggregate with no meaningful lifecycle uses no status property or state hierarchy. When typed state objects are selected, state-specific data belongs on the corresponding state object and the objects remain immutable.
+```csharp
+public abstract record ProfileState;
+
+public sealed record ActiveProfileState : ProfileState;
+```
 
 ### Create valid aggregates through named factories (DOMAIN.FACTORY.001)
 
@@ -92,7 +95,7 @@ A factory:
 
 - Accepts typed IDs and validated domain values.
 - Rejects empty identities and violated creation rules.
-- Selects the initial lifecycle representation when one exists.
+- Selects the initial state record.
 - Records creation events required by the domain.
 - Returns a complete valid aggregate.
 
@@ -110,7 +113,7 @@ Queries and convenience methods may expose domain facts without mutation. Avoid 
 
 A child entity has identity and continuity inside one aggregate. Its mutable state is inaccessible outside the aggregate root. The root creates, finds, and changes children through business methods.
 
-Child entities use typed identity when their identity participates in domain behavior. Their equality is identity-based. If a child has lifecycle states, apply `DOMAIN.STATE.001` independently to that lifecycle.
+Child entities use typed identity when their identity participates in domain behavior. Their equality is identity-based. If a child has lifecycle states, model them with the same sealed state record pattern and no enum.
 
 Expose child collections as read-only views. For example, `Order.Lines` may return `IReadOnlyList<OrderLine>`, while `Order.AddLine` remains the only public addition path.
 
@@ -385,7 +388,7 @@ if (typeof(IStronglyTypedId).IsAssignableFrom(context.JsonTypeInfo.Type))
 }
 ```
 
-### Match lifecycle representation to state data
+### Keep state records as the only Aggregate lifecycle representation
 
 ```csharp
 public abstract record PostState;
@@ -400,29 +403,17 @@ public sealed record ArchivedPostState(
     string Reason) : PostState;
 ```
 
-Typed states fit this example because publication and archive time exist only in their corresponding states. An Aggregate whose states differ only by label may use an enum:
+`PublishedAt` exists only on `PublishedPostState`, and archive facts exist only on `ArchivedPostState`. The Aggregate cannot combine facts from mutually exclusive states.
+
+A one-state Aggregate uses the same shape from its first implementation:
 
 ```csharp
-public enum PostStatus
-{
-    Draft,
-    Published,
-    Archived
-}
+public abstract record ProfileState;
 
-public PostStatus Status { get; private set; }
+public sealed record ActiveProfileState : ProfileState;
 ```
 
-Do not combine the enum with independent lifecycle fields that admit contradictions:
-
-```csharp
-public bool IsPublished { get; private set; }
-public bool IsArchived { get; private set; }
-public DateTimeOffset? PublishedAt { get; private set; }
-public DateTimeOffset? ArchivedAt { get; private set; }
-```
-
-Infrastructure persists the selected representation with a stable provider contract. It does not add shadow state fields back into Domain or infer a different state after loading.
+Infrastructure persists each state hierarchy with stable discriminators. It does not add a lifecycle enum or shadow state fields back into Domain or infer a different state after loading.
 
 ### Keep value creation and equality explicit
 
@@ -631,9 +622,9 @@ The Event payload captures the publication fact without carrying the mutable `Po
 - Inspect Domain package and project references for outer-layer dependencies.
 - Compare Domain names with the glossary, subject specification, and active use-case specification.
 - Confirm every documented Aggregate derives from `AggregateRoot<TId>` and appears in its Subject ownership table.
-- Confirm each lifecycle representation matches the documented state differences and cannot represent contradictory state.
+- Confirm every documented Aggregate has exactly one abstract state base and at least one sealed state record.
 - Confirm no runtime subject interface or base class exists.
-- Search Domain for independent lifecycle flags, mutable status strings, and nullable state fields that permit contradictions.
+- Search Domain for lifecycle enums, state strings, status booleans, and duplicated nullable state fields.
 - Confirm aggregate constructors are not public and every mutation uses a business method.
 - Confirm handlers do not reproduce state checks or set aggregate properties.
 - Confirm typed IDs use `Guid.CreateVersion7()`, reject empty values, and retain one UUID representation across boundaries.
@@ -641,6 +632,6 @@ The Event payload captures the publication fact without carrying the mutable `Po
 - Confirm repositories expose aggregate operations rather than generic CRUD or query behavior.
 - Confirm domain services are stateless and contain no outer-layer dependency.
 - Confirm events are past-tense `IDomainEvent` records with no aggregate or provider reference.
-- Round-trip every selected lifecycle representation through the persistence provider.
+- Round-trip every concrete Aggregate state record through the persistence provider.
 - Test every factory, allowed transition, rejected transition, Aggregate Rule, state-specific value, and emitted Event.
 - Confirm Aggregate Rule IDs and state transitions map to verified Use cases and acceptance criteria.

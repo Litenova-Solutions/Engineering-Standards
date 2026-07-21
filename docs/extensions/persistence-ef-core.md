@@ -71,11 +71,11 @@ Do not store an EF Core aggregate change in one transaction and its required out
 
 Infrastructure owns `IEntityTypeConfiguration<T>` classes. Configure typed IDs, owned values, backing fields, indexes, constraints, precision, delete behavior, concurrency tokens, and database names explicitly.
 
-### Preserve the selected Domain state representation (EXT.EFCORE.STATE.001)
+### Preserve the Domain state hierarchy (EXT.EFCORE.STATE.001)
 
-EF Core persistence retains the lifecycle representation selected under `DOMAIN.STATE.001`. Infrastructure maps enum values, typed state discriminators, and state-specific values explicitly. It does not add an independent status string, boolean flag, or duplicate nullable state property to Domain.
+EF Core persistence retains the Domain Aggregate's single `{Aggregate}State` value. Infrastructure maps a stable discriminator and every state-specific value without adding a lifecycle enum, status string, boolean flag, or duplicate nullable state property to Domain.
 
-Use direct owned or JSON mapping only when the pinned EF Core and provider versions can materialize, track, and round-trip the selected lifecycle representation. Otherwise, store an Infrastructure-owned persistence type with explicit state fields, then map it to and from the Domain representation inside the repository.
+Use direct owned or JSON mapping only when the pinned EF Core and provider versions can materialize, track, and round-trip every sealed state record. Otherwise, store an Infrastructure-owned persistence type with discriminator and state-specific columns, then map it to and from the Domain state hierarchy inside the repository.
 
 The persistence model may contain relational discriminator columns. Those columns are Infrastructure details and do not become Domain properties. A new state requires a reviewed migration, mixed-version behavior, rollback behavior, and an integration fixture for each stored state.
 
@@ -128,7 +128,7 @@ An EF Core-backed `Post` may use an Infrastructure `PostRow` with `state_type`, 
 - Confirm production and staging processes never apply or create schemas during startup.
 - Run command, query, concurrency, and API integration tests.
 - Confirm each command resolves repositories and commit behavior for one write provider.
-- Round-trip every selected lifecycle representation and reject unknown or invalid discriminator and value combinations.
+- Round-trip every Aggregate state record and reject unknown or invalid discriminator and value combinations.
 - When `outbox-worker` is enabled, stop after the EF Core commit and verify the Worker later dispatches the atomically stored record.
 - Review SQL and query plans for accepted queries.
 - Run architecture tests for repository, context, and commit boundaries.

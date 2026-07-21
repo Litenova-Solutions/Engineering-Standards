@@ -73,11 +73,11 @@ Register every concrete type that may appear behind a base class or interface pr
 
 Domain types do not use `JsonInclude`, `JsonDerivedType`, `JsonPolymorphic`, Marten attributes, provider base classes, or other serialization behavior. If Infrastructure configuration cannot round-trip an aggregate without weakening its encapsulation, persist an Infrastructure-owned document type and map it to the Domain aggregate.
 
-Persist the lifecycle representation selected by `DOMAIN.STATE.001` as an explicit storage contract. A typed state hierarchy registers every concrete state with stable string discriminators. An enum defines its stored representation and treats member renames or numeric changes as schema changes. An Aggregate with no lifecycle representation persists no synthetic state field.
+Every Aggregate `State` property is one persisted polymorphic value. Infrastructure registers the abstract `{Aggregate}State` base and every sealed state record with stable string discriminators. It does not persist a second enum, status string, boolean flag, or nullable timestamp on the Domain Aggregate.
 
 ### Evolve stored document contracts explicitly (PERSIST.EVOLUTION.001)
 
-Treat JSON member names, required values, enum representation, discriminator property names, and discriminator values as database schema. An additive member defines behavior for documents written before that member existed.
+Treat JSON member names, required values, discriminator property names, and discriminator values as database schema. An additive member defines behavior for documents written before that member existed.
 
 A rename, removal, type change, member move, collection-shape change, or discriminator change requires a reviewed data transformation or an expand-and-contract rollout that reads every shape present during deployment and rollback. Name the transformation order, mixed-version behavior, rollback condition, and representative production volume. Do not assume a Marten schema patch transforms existing document payloads.
 
@@ -162,7 +162,7 @@ Use a stable discriminator property such as `$state` with values such as `draft`
 }
 ```
 
-When typed states are selected, register every concrete state type in Infrastructure. Round-trip every supported lifecycle representation through the configured Marten serializer in integration tests.
+Register every concrete Aggregate state record in Infrastructure. Round-trip every state record through the configured Marten serializer in integration tests.
 
 Adding a state discriminator can break an older application version during a mixed-version deployment. The release plan either prevents the older version from reading the new state or introduces a compatible reader before commands can persist that state.
 
@@ -200,7 +200,7 @@ internal sealed class PostRepository(
 - Confirm repositories use the scoped session and track changed aggregates.
 - Confirm queries project results and have deterministic limits and ordering.
 - Confirm aliases, JSON member contracts, discriminators, and indexes are explicit in Infrastructure.
-- Round-trip private state, nested values, collections, every selected lifecycle representation, and every other registered runtime subtype without serialization behavior in Domain.
+- Round-trip private state, nested values, collections, every Aggregate state record, and every other registered runtime subtype without serialization behavior in Domain.
 - Load stored fixtures from every supported document shape and test each required transformation and rollback reader.
 - Test representative document size and query plans for aggregates with nested collections.
 - When `concurrency-idempotency` is active, test conflicting writes with representative document sizes.

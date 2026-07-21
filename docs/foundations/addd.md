@@ -15,6 +15,7 @@ ADDD defines its own delivery rules and maps selected domain-driven design, beha
 - A Workflow advances system-controlled work across transaction or time boundaries.
 - A Use case is one independently verifiable Command or Query goal and remains the delivery unit.
 - An Aggregate protects rules that must hold in one transaction.
+- Every Aggregate uses an abstract state base and at least one sealed state record from its first implementation.
 - Acceptance criteria verify one Use case. Flow checks verify one Business Flow.
 - Specification Metadata states document kind, authority, ownership, and applicable delivery data.
 - Selected extensions permit project structure and dependencies. Local applicability activates behavior for a specification.
@@ -180,18 +181,13 @@ Use `INV-{SUBJECT}-{NN}` for Aggregate Rules. Use `POL-{SHARED-RULE}-{NN}` for B
 
 An acceptance criterion cites every `INV-*` and `POL-*` rule required for that behavior. A Business Policy that spans Subjects MUST state its owner, consistency requirement, enforcement point, failure behavior, and verification.
 
-### Document business state without prescribing one representation (ADDD.STATE.001)
+### Model every Aggregate lifecycle with state objects (ADDD.STATE.001)
 
-Document lifecycle states when behavior, required facts, or allowed transitions differ by state. Use business state names in business tables.
+Every Aggregate defines an abstract `{Aggregate}State` record and one or more sealed immutable state records from its first implementation. This includes an Aggregate with one current state. The Aggregate exposes one `State` property whose runtime type represents its complete lifecycle state.
 
-Select the code representation that prevents invalid states with the least complexity:
+Use business state names in business tables and map every business state to its state record. Do not model Aggregate lifecycle with an enum, status string, boolean flags, parallel nullable fields, or a computed discriminator. Starting with state objects gives later states and state-specific facts a stable home without replacing the Aggregate's lifecycle contract.
 
-- Use an enum when states differ only by label and transitions remain simple.
-- Use typed state objects when states carry different required data or behavior.
-- Use a Value Object when one part of state owns validation.
-- Use no lifecycle representation when the concept has no meaningful states.
-
-Add a business-to-code mapping only when implementation exists. Do not require a state hierarchy for an Aggregate with one state.
+State-specific facts belong on the corresponding state record. Aggregate methods own transition rules and replace the current state object. A Value Object may protect one fact within a state, but it does not replace the Aggregate state hierarchy.
 
 ### Declare Specification Metadata (ADDD.METADATA.001)
 
@@ -284,6 +280,7 @@ The `Orders` Subject may contain `Order` and `OrderClaim`. `orders.cancel-order`
 - Confirm Business Flow use-case references resolve.
 - Confirm every Subject directory has one Subject specification.
 - Confirm Use-case IDs match Subject and filename.
+- Confirm every Aggregate has one abstract state base and at least one sealed state record.
 - Confirm each multi-Aggregate Command names the rule requiring one transaction.
 - Confirm durable Workflow Commands and Events resolve to documented behavior.
 - Confirm Shared Rule Subject references and `POL-*` IDs resolve.

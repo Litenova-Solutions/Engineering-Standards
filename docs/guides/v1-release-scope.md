@@ -28,7 +28,7 @@ The standards repository has no CLI, generated catalog, application generator, o
 |:---|:---|
 | Product delivery | One bounded context, one deployed Primary Business Flow, Use-case specifications, stable acceptance and Flow-check IDs, and Risk-driven assurance |
 | Backend shape | Domain, Application, Infrastructure, and WebApi projects, plus AppHost and ServiceDefaults; Subject-first folders; inward references; internal sealed implementations |
-| Domain model | Aggregate roots, typed IDs, Value Objects, selected lifecycle representations, transitions, Aggregate Rules, Domain Events, repository boundaries, and safe Domain failures |
+| Domain model | Aggregate roots, typed IDs, Value Objects, required state record hierarchies, transitions, Aggregate Rules, Domain Events, repository boundaries, and safe Domain failures |
 | Application | LiteBus Commands and Queries, validators, handlers, transport-neutral results and failures, target authorization, narrow ports, Follow-ups, and durable Workflow orchestration |
 | Persistence | PostgreSQL and Marten, scoped sessions, Aggregate repositories, direct Query projections, one post-handler commit, explicit JSON contracts, document evolution, indexes, and release-time schema application |
 | HTTP | Minimal API endpoints, deterministic discovery, claims-derived actors, resource authorization, Problem Details, pagination, documented statuses, and deterministic OpenAPI |

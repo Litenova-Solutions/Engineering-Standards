@@ -61,6 +61,7 @@ Do not add a package, migration, authentication model change, public API break, 
 - Use `apps/api/{ProjectName}.slnx`, production projects under `apps/api/src/`, and tests under `apps/api/tests/`.
 - Use Domain, Application, Infrastructure, and WebApi as the four application projects.
 - Keep Domain free of persistence, web, mediator, logging, and dependency injection packages.
+- Give every Aggregate an abstract state base and at least one sealed state record; do not use lifecycle enums, status strings, or status flags.
 - Organize every layer by the same business subjects and use cases.
 - Name Application handlers, validators, results, and query result items with explicit `Command` or `Query` role suffixes.
 - Name HTTP transport DTOs with a concrete boundary role ending in `Model`, including `RequestModel` and `ResponseModel`; name operation mappings with `ApiMappings`.

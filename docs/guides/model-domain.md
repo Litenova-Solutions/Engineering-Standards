@@ -58,9 +58,9 @@ Record the result in the Subject specification:
 | `Order` | Lines, totals, and lifecycle | `INV-ORDERS-01` | `orders.create-order`, `orders.cancel-order` |
 | `OrderClaim` | Guest claim lifecycle | `INV-ORDERS-04` | `orders.claim-guest-order` |
 
-## Choose a lifecycle representation
+## Define every Aggregate state
 
-Describe business states before choosing C# types:
+Describe business states before writing Aggregate transitions:
 
 | State | Meaning | Required facts |
 |:---|:---|:---|
@@ -68,20 +68,7 @@ Describe business states before choosing C# types:
 | `Published` | The Post is public. | Publication time |
 | `Archived` | The Post is retained but removed from discovery. | Archive time and reason |
 
-Use no lifecycle representation when no meaningful states exist.
-
-Use an enum when states differ only by label:
-
-```csharp
-public enum ReservationStatus
-{
-    Active,
-    Confirmed,
-    Expired
-}
-```
-
-Use typed state objects when states require different data or behavior:
+Create an abstract state record and sealed state records for every Aggregate, including an Aggregate with one current state:
 
 ```csharp
 public abstract record PostState;
@@ -96,7 +83,24 @@ public sealed record ArchivedPostState(
     ArchiveReason Reason) : PostState;
 ```
 
-Do not use independent flags and nullable dates that permit contradictory combinations.
+Put state-specific data on the state record. Do not duplicate `PublishedAt` or `ArchivedAt` on the Aggregate. Do not add `PostStatus`, `IsPublished`, or a state string.
+
+A one-state Aggregate still defines the extension point:
+
+```csharp
+public abstract record ProfileState;
+
+public sealed record ActiveProfileState : ProfileState;
+```
+
+For each state, answer:
+
+- What business fact makes this state true?
+- Which data is required only in this state?
+- Which actions are allowed from this state?
+- Which actions are rejected from this state, and why?
+
+An unanswered question belongs in the Subject specification. It does not receive a guessed default.
 
 ## Write transition rules
 
@@ -240,8 +244,15 @@ apps/api/src/Shop.Domain/
   Orders/
     Order.cs
     OrderId.cs
+    OrderState.cs
+    PendingOrderState.cs
+    ConfirmedOrderState.cs
+    CancelledOrderState.cs
     OrderClaim.cs
     OrderClaimId.cs
+    OrderClaimState.cs
+    UnclaimedOrderClaimState.cs
+    ClaimedOrderClaimState.cs
     IOrderRepository.cs
     IOrderClaimRepository.cs
     Events/
@@ -268,7 +279,7 @@ Create subfolders only when real types require them.
 
 - The Subject uses one term for each concept and records rejected synonyms.
 - Every Aggregate boundary names owned children, referenced Aggregate IDs, and protected `INV-*` rules.
-- Each lifecycle representation matches real business-state differences and prevents contradictions.
+- Every Aggregate has one abstract state base and at least one sealed state record.
 - Every transition maps to an Aggregate method and Command Use case.
 - Every `INV-*` and `POL-*` rule has acceptance coverage.
 - Value Objects define validation and equality.
@@ -277,4 +288,4 @@ Create subfolders only when real types require them.
 - Follow-ups state owner and delivery classification.
 - Multi-Aggregate Commands name the rule requiring one transaction.
 - Durable Workflows name progress state, Commands, Events, retries, and recovery.
-- Persistence tests round-trip the selected lifecycle representations.
+- Persistence tests round-trip every concrete Aggregate state record.

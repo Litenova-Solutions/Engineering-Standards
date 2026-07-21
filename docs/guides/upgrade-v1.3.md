@@ -67,11 +67,11 @@ Remove `Primary aggregate root` and the requirement to write `None` for a read-o
 
 For every Command that changes multiple Aggregates, name the `INV-*` rule or Business Policy that requires one transaction. Review the Aggregate boundaries when the same group changes together frequently.
 
-### Replace mandatory state hierarchies
+### Retain mandatory Aggregate state objects
 
-Rewrite business tables with business-state names. Select no lifecycle representation, an enum, typed state objects, or a Value Object from actual behavior and required facts.
+Rewrite Subject tables with business-state names, then map every state to a sealed state record beneath the Aggregate's abstract `{Aggregate}State` base. Every Aggregate retains this hierarchy, including an Aggregate with one current state.
 
-Update Domain, persistence mapping, document migration, and tests together when the selected representation changes stored data.
+Do not migrate Aggregate lifecycle to an enum, status string, boolean flags, parallel nullable fields, or a computed discriminator. Update Domain state records, persistence mapping, document migration, and tests together when a state changes stored data.
 
 ### Add Business Flow and Workflow records
 
@@ -172,7 +172,7 @@ Application v1 requires:
 | `APP.COORDINATOR.001` | `APP.ORCHESTRATION.001` and `APP.WORKFLOW.001` |
 | `APP.REACTIONS.001` | `APP.FOLLOWUP.001` |
 
-`DOMAIN.STATE.001` remains but now selects a representation from business behavior instead of requiring typed state records.
+`DOMAIN.STATE.001` retains the v1.2 requirement for an explicit state record hierarchy on every Aggregate.
 
 ## Validation
 

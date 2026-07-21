@@ -46,7 +46,7 @@ Before feature work expands beyond the first slice, confirm these outputs exist:
 | Toolchain | SDK and package-manager pins, central NuGet versions, lock files, and the root pnpm lockfile when TypeScript exists |
 | Composition | One visible WebApi composition root, Infrastructure registration, deterministic endpoint mapping, and no service locator |
 | Documentation | Current Specification Metadata, one Primary Business Flow, one Subject specification, and one Use-case specification |
-| Domain | Aggregate ownership, selected lifecycle representation, `INV-*` rules, Events, and Follow-ups for the first Command |
+| Domain | Aggregate ownership, required state record hierarchies, `INV-*` rules, Events, and Follow-ups for the first Command |
 | Persistence | Real Marten configuration, one scoped session, one command commit post-handler, explicit aliases and JSON contracts, and a reviewed schema plan |
 | HTTP | Stable routes, actor mapping, target authorization, Problem Details, pagination, OpenAPI operation IDs, and documented responses |
 | Testing | Four baseline test projects, PostgreSQL container fixture, real API factory, database reset, architecture rules, and acceptance-ID references |
