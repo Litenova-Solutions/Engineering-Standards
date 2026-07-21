@@ -38,7 +38,7 @@ V1 does not require speculative scale, multi-region operation, or optional produ
 
 Caching, durable messaging, executable BDD, realtime updates, multi-tenancy, reporting, provider-specific deployment, alternative persistence, and other conditional concerns remain inactive until their extension criteria apply.
 
-The consumer lists every active extension in `standards.project.json`.
+The consumer lists every selected extension in `selectedExtensions` in `standards.project.json`.
 
 ### Record work outside the profile (SCOPE.OUTSIDE.001)
 
@@ -56,7 +56,7 @@ Record the current load, latency target, and observed constraint before introduc
 
 ## Examples
 
-A publishing v1 may support author sign-in, draft creation, publication, and public reading. Multi-tenant publications, live collaborative editing, and bulk analytics remain outside the first journey unless the product brief makes one of them essential.
+A publishing v1 may support author sign-in, draft creation, publication, and public reading. Multi-tenant publications, live collaborative editing, and bulk analytics remain outside the Primary Business Flow unless the product brief makes one of them essential.
 
 ## Verification
 

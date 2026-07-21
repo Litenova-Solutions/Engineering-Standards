@@ -41,7 +41,7 @@ Expose:
 - `/health/live` for process liveness without external dependency checks.
 - `/health/ready` for readiness to receive traffic, including critical dependencies.
 
-Readiness fails when the application cannot safely serve the primary journey. Health responses do not reveal connection strings or internal exception details.
+Readiness fails when the application cannot safely serve the Primary Business Flow. Health responses do not reveal connection strings or internal exception details.
 
 Tag process-only checks for liveness and critical dependencies for readiness. Map each path with an explicit health-check predicate so adding a new check cannot silently change liveness behavior. Test the PostgreSQL readiness failure and recovery path.
 
@@ -59,7 +59,7 @@ A backup without a verified restore does not satisfy the release standard.
 
 ### Use a repeatable deployment (OPS.DEPLOY.001)
 
-Deployment uses versioned artifacts, declared configuration, a schema step, readiness checks, and a primary-journey smoke test. Do not deploy from an uncommitted working tree or a mutable branch reference.
+Deployment uses versioned artifacts, declared configuration, a schema step, readiness checks, and a Primary Business Flow check. Do not deploy from an uncommitted working tree or a mutable branch reference.
 
 The container deployment extension adds image-specific requirements.
 
@@ -81,7 +81,7 @@ Every network call has an explicit timeout and cancellation path. Retries apply 
 
 ### Define actionable baseline alerts (OPS.ALERTS.001)
 
-Before application v1, define an owner, threshold, evaluation window, severity, and runbook for sustained readiness failure, elevated unexpected HTTP errors, primary-journey latency, PostgreSQL unavailability, failed deployment smoke tests, and stale or failed backups. Worker-enabled applications also alert on the delivery or schedule thresholds named by their extension.
+Before application v1, define an owner, threshold, evaluation window, severity, and runbook for sustained readiness failure, elevated unexpected HTTP errors, Primary Business Flow latency, PostgreSQL unavailability, failed deployment Flow checks, and stale or failed backups. Worker-enabled applications also alert on the delivery or schedule thresholds named by their extension.
 
 Alert on user or recovery impact, not every logged exception. Test routing with a synthetic or controlled alert before release.
 
@@ -103,11 +103,13 @@ Service, resource, meter, and trace-source names remain stable across environmen
 
 Use `docs/runbooks/` for backup restore, deployment rollback, failed schema application, leaked secret response, critical dependency outage, and extension-specific recovery procedures that v1 needs. Each runbook states trigger, impact, prerequisites, exact commands or platform actions, verification, recovery or stop condition, owner, last-tested date, and next review date.
 
-Keep a release evidence record from the template. It links the immutable artifact, schema plan, automated gates, restore exercise, deployment result, primary-journey smoke test, rollback exercise, alert test, known limitations, and every skipped check.
+Keep Operating Limits at `docs/operations/limits.md`. Classify each value as enforced, tested, supported, or an alert threshold. Do not treat a tested value as an enforced or supported commitment without a separate classification.
+
+Keep a release evidence record from the template. It links the immutable artifact, schema plan, automated gates, restore exercise, deployment result, Primary Business Flow check, rollback exercise, alert test, known limitations, and every skipped check.
 
 ## Examples
 
-A release applies a reviewed Marten schema plan, deploys the versioned API artifact, waits for `/health/ready`, runs the create-and-read primary journey, and retains one command that restores the previous artifact if the smoke test fails.
+A release applies a reviewed Marten schema plan, deploys the versioned API artifact, waits for `/health/ready`, runs the Primary Business Flow check, and retains one command that restores the previous artifact if the smoke test fails.
 
 ## Verification
 
@@ -116,6 +118,6 @@ A release applies a reviewed Marten schema plan, deploys the versioned API artif
 - Inspect metric attributes for unbounded or sensitive values and verify cross-process trace context.
 - Test liveness and readiness under dependency failure.
 - Run schema application and rollback compatibility checks.
-- Restore the latest backup into an isolated environment and verify the primary journey.
+- Restore the latest backup into an isolated environment and run the Primary Business Flow check.
 - Run deployment, smoke-test, and rollback procedures.
 - Exercise baseline alert routing and confirm each alert links to an owned runbook.

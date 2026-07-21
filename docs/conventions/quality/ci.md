@@ -25,8 +25,8 @@ Every pull request MUST run the applicable gates from this table:
 | Backend | `dotnet build apps/api/{ProjectName}.slnx --configuration Release` |
 | Backend | `dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build` |
 | Frontend | `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm type-check`, `pnpm test`, and `pnpm build` |
-| Browser | Playwright for critical journeys |
-| Documentation | Link, anchor, rule-ID, ASCII, metadata, code-document consistency, and `git diff --check` scans |
+| Browser | Playwright Flow checks for browser Business Flows |
+| Documentation | Link, anchor, rule-ID, ASCII, Specification Metadata, code-document consistency, and `git diff --check` scans |
 | Contracts | OpenAPI freshness and typed consumer regeneration when committed |
 
 Skip a gate only when its surface does not exist. Record the reason in the workflow or completion report.
@@ -38,7 +38,7 @@ The documentation job MUST run on every pull request and MUST check the changed 
 - Validate the ownership and freshness metadata required by `WRITING.METADATA.001`.
 - Compare subject and use-case names with source and test folders.
 - Confirm current documented names, routes, errors, operation IDs, and authorization boundaries exist in source or generated contracts.
-- Confirm active acceptance IDs appear in automated tests.
+- Confirm acceptance IDs from verified Use cases appear in automated tests.
 - Detect duplicate application or transport contracts for one operation.
 - Report references to removed entry points, including controllers, namespaces, packages, and features.
 
@@ -58,7 +58,7 @@ CI MUST scan NuGet and npm dependencies, container images when used, and generat
 
 ### Promote verified artifacts (CI.RELEASE.001)
 
-CI MUST build one immutable artifact, promote that exact artifact through staging and production, wait for readiness, and run the primary-journey smoke test. Do not rebuild from a mutable branch between environments. Retain the artifact reference and test evidence for rollback.
+CI MUST build one immutable artifact, promote that exact artifact through staging and production, wait for readiness, and run the Primary Business Flow check. Do not rebuild from a mutable branch between environments. Retain the artifact reference and test evidence for rollback.
 
 ### Protect the default branch (CI.PROTECTION.001)
 
@@ -70,11 +70,11 @@ Consumer CI uses stable jobs with these responsibilities:
 
 | Job | Triggered when | Required work |
 |:---|:---|:---|
-| `docs` | Every pull request | Validate selected JSON contracts, links, anchors, rule references, ASCII prose, document metadata, code-document consistency, and diff whitespace |
+| `docs` | Every pull request | Validate selected JSON contracts, links, anchors, rule references, ASCII prose, Specification Metadata, code-document consistency, and diff whitespace |
 | `backend` | Backend, shared standards, or build configuration changes | Locked restore, Release build, tests without rebuild, coverage artifact, and dependency review |
 | `frontend-{app}` | That frontend or shared TypeScript changes | Frozen install, lint, type check, unit tests, and production build |
 | `contracts` | API source or generated consumer changes | Release OpenAPI generation, typed consumer generation, and clean-diff check |
-| `browser` | A critical journey or its boundary changes | Playwright against the built application and real API dependencies |
+| `browser` | A browser Business Flow or its boundary changes | Playwright Flow checks against the built application and real API dependencies |
 | `schema` | Persistence contracts change | Reviewable Marten schema plan and transformations, or EF migration and SQL |
 | `release` | Versioned release | Immutable artifacts, inventory, deployment evidence, readiness, smoke test, and rollback reference |
 
@@ -88,7 +88,7 @@ Backend CI restores the solution in locked mode, builds once in Release, then te
 
 ## Examples
 
-A backend-only pull request runs the Release build, test, dependency scan, documentation scan, and schema checks. A pull request that changes a frontend also runs the frozen pnpm gates and critical browser journeys. A release promotes the same image digest that passed staging.
+A backend-only pull request runs the Release build, test, dependency scan, documentation scan, and schema checks. A pull request that changes a frontend also runs the frozen pnpm gates and affected browser Flow checks. A release promotes the same image digest that passed staging.
 
 ## Verification
 

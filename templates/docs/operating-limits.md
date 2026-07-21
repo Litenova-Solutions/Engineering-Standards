@@ -1,38 +1,46 @@
+---
+{
+  "kind": "operating-limits",
+  "id": "operating-limits",
+  "recordStatus": "current",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD"
+}
+---
 # __LIMITS_TITLE__
-
-## Document metadata
-
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
 
 ## Supported envelope
 
-State the pilot or release population, request rate, data volume, dependency availability, support hours, and recovery target this document supports.
+State the pilot or release population, request rate, data volume, dependency availability, support hours, and recovery target.
 
-## Hard limits
+## Limits
 
-| Limit | Value | Scope | Observable response | Owner |
-|:---|:---|:---|:---|:---|
-| `__LIMIT__` | `__VALUE__` | State the affected subject or service. | State the caller or operator result. | `__OWNER__` |
+| Limit | Kind | Value | Scope | Observable behavior | Owner |
+|:---|:---|:---|:---|:---|:---|
+| `__LIMIT__` | `enforced`, `tested`, `supported`, or `alert-threshold` | `__VALUE__` | State the affected flow, Subject, or service. | State the caller or operator result. | `__OWNER__` |
+
+- An enforced limit is actively rejected beyond its value.
+- A tested limit has automated or operating evidence at its value.
+- A supported limit is the maintainer's operating commitment.
+- An alert threshold requires operator action when crossed.
+
+One value may have more than one row when it has more than one classification. A tested value does not automatically become enforced or supported.
 
 ## Monitoring
 
-| Signal | Source | Threshold | Action owner | Review interval |
-|:---|:---|:---|:---|:---|
-| `__SIGNAL__` | Name the metric, log, or alert. | State the threshold. | `__OWNER__` | `__INTERVAL__` |
+| Signal | Source | Alert threshold | Evaluation window | Action owner | Runbook |
+|:---|:---|:---|:---|:---|:---|
+| `__SIGNAL__` | Name the metric, log, or alert. | State the threshold. | `__WINDOW__` | `__OWNER__` | Link the runbook. |
 
 ## Stop conditions
 
-- State the condition that pauses new work or blocks release.
+- State the condition that blocks release, suspends a Business Flow, or requires operator intervention.
 - State who may declare the condition and who may resume work.
 
 ## Recovery
 
-State the runbook, rollback, replay, compensation, backup, or provider escalation path. Link the relevant decision and release gate.
+State the runbook, rollback, replay, compensation, backup, or provider escalation path.
 
 ## Verification
 
-List tests, operating checks, alert exercises, and the next review date.
+List load tests, operating checks, alert exercises, evidence, and the next review date.

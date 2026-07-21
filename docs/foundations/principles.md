@@ -7,7 +7,7 @@ These principles resolve choices that a narrower convention does not cover. They
 ## Agent Summary {#agent-summary}
 
 - Keep one authored source for each fact.
-- Give each authored document an owner, status, canonical source, and verification date.
+- Give each structured specification kind-specific authority, ownership, and review metadata.
 - Keep code and documentation names and behavior synchronized.
 - Complete one vertical use case before starting secondary work.
 - Encode structural boundaries in compiler, architecture, and test checks.
@@ -20,22 +20,21 @@ These principles resolve choices that a narrower convention does not cover. They
 
 Write each rule, package version, status, route, and acceptance criterion once. Other documents link to that source. Generated application artifacts may derive from authored sources.
 
-Package versions belong in `standards.manifest.json`. Use-case status belongs in the use-case specification. Tests cite the acceptance IDs they prove.
+Package versions belong in `standards.manifest.json`. Use-case record and delivery status belong in Specification Metadata. Tests cite the acceptance IDs they prove.
 
 ### Assign document ownership and freshness (CORE.DOCUMENTS.001)
 
-Consumer-authored product, domain, subject, use-case, architecture, API, operations, decision, page, and runbook documents MUST declare an owner, document status, last verified date, canonical source, and implementation evidence. The [repository writing convention](../conventions/repository/writing.md) defines the metadata block.
+Structured consumer specifications MUST declare `kind`, `id`, `recordStatus`, `owner`, and `lastReviewed` plus fields required for that kind. The [repository writing convention](../conventions/repository/writing.md) defines the metadata block.
 
-Document status is one of `current`, `planned`, `retired`, or `reference`:
+`recordStatus` is `draft`, `current`, or `retired`:
 
-- `current` is the authoritative record for the documented scope.
-- `planned` describes a target that is not an implementation claim.
-- `retired` preserves a record whose supported behavior or decision is no longer active.
-- `reference` explains a standard or implementation without owning product or behavior facts.
+- `draft` is under review and is not authoritative.
+- `current` is authoritative for the documented scope.
+- `retired` preserves history after the contract no longer applies.
 
-A `current` document MUST NOT present planned behavior as implemented. A document with implementation claims MUST name code, test, generated-contract, or operating evidence. Use `None` when the document makes no implementation claim. Mark the document `retired` after its supported public entry points are removed.
+Behavior specifications also use `deliveryStatus: planned` or `deliveryStatus: verified`. A current planned record can describe an approved target without claiming implementation. A verified record MUST name code, test, generated-contract, and operating evidence in its relevant sections. Retire the record after supported public Entry Points are removed.
 
-The existing ADDD routing `status` field remains authoritative for a subject or use-case operation. Document status describes the document's authority and freshness; one field MUST NOT replace the other.
+Do not encode record authority and delivery state in one field.
 
 ### Deliver vertical use cases (CORE.SLICE.001)
 
@@ -51,7 +50,7 @@ A project-reference test can prove Domain does not reference Infrastructure. A u
 
 ### Require an activation criterion for added complexity (CORE.COMPLEXITY.001)
 
-Do not add a package, project, wrapper, background process, cache, queue, or distributed pattern without a current use case that needs it.
+Do not add a package, project, wrapper, background process, cache, queue, or distributed pattern without a current Use case, Workflow, or project requirement that needs it.
 
 Enable an extension when its activation criteria apply. A preference or possible future need is not an activation criterion.
 
@@ -80,6 +79,6 @@ Keep operation-specific code in its operation folder. Move code to a shared loca
 ## Verification
 
 - Search for generic abstractions added without a named consumer.
-- Confirm every new package, project, or process has an active use case or extension.
+- Confirm every new package, project, or process has a current Use case, Workflow, project requirement, or applicable extension.
 - Confirm shared code has at least two concrete consumers.
 - Confirm generated artifacts identify their authored source.

@@ -35,7 +35,7 @@ Apply reviewed schema changes from one release job before shifting traffic. Appl
 
 ### Gate traffic on readiness (EXT.CONTAINERS.TRAFFIC.001)
 
-Start new replicas, wait for readiness, then shift traffic. Run the primary-journey smoke test after traffic reaches the new version.
+Start new replicas, wait for readiness, then shift traffic. Run the Primary Business Flow check after traffic reaches the new version.
 
 ### Retain the previous artifact (EXT.CONTAINERS.ROLLBACK.001)
 

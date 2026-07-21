@@ -11,7 +11,7 @@ Backend tests prove domain behavior, use-case coordination, real persistence and
 - Test command coordination with narrow substitutes.
 - Test Marten queries, repositories, HTTP, authentication, and authorization against PostgreSQL.
 - Enforce project references, visibility, dependencies, and endpoint isolation in Architecture.Tests.
-- Cite each active acceptance ID from at least one automated test.
+- Cite each acceptance ID from a verified Use case in at least one automated test.
 - Collect coverage for review without one repository-wide percentage gate.
 
 ## Standards
@@ -72,7 +72,7 @@ Architecture.Tests verify:
 
 ### Trace acceptance criteria (BTEST.TRACE.001)
 
-Every active acceptance criterion appears in at least one recognized test reference:
+Every acceptance criterion from a verified Use case appears in at least one recognized test reference:
 
 ```csharp
 [Trait("AcceptanceCriterion", "AC-POSTS-CREATE-DRAFT-01")]
@@ -88,7 +88,7 @@ The trace is one-way. Internal implementation tests do not need an acceptance ID
 
 Collect line and branch coverage for review. Do not use one repository-wide percentage as the definition of sufficient testing.
 
-Active acceptance trace, domain negative cases, integration boundaries, security behavior, and architecture rules remain required regardless of the percentage.
+Verified acceptance trace, Domain negative cases, integration boundaries, security behavior, and architecture rules remain required regardless of the percentage.
 
 ### Verify generated contracts (BTEST.GENERATED.001)
 
@@ -161,5 +161,5 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 - Confirm the integration fixture uses the pinned PostgreSQL major and disposes its container and host.
 - Confirm shared-database tests cannot run in parallel across reset boundaries.
 - Confirm handler and validator test classes match the complete production type name.
-- Search active acceptance IDs in test source.
+- Search acceptance IDs from verified Use cases in test source.
 - Run Release build, all tests, generated-contract comparison, and coverage collection.

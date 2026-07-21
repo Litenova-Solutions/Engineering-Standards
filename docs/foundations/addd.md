@@ -127,10 +127,11 @@ Use case:       orders.cancel-order
 Command:        CancelOrderCommand
 Result:         CancelOrderCommandResult
 Handler:        CancelOrderCommandHandler
-Aggregate call: Order.Cancel
-Event:          OrderCancelled
-Endpoint:       CancelOrderEndpoint
-Acceptance ID:  AC-ORDERS-CANCEL-ORDER-01
+Aggregate call:  Order.Cancel
+Event reference: orders.order-cancelled
+Event type:      OrderCancelled
+Endpoint:        CancelOrderEndpoint
+Acceptance ID:   AC-ORDERS-CANCEL-ORDER-01
 ```
 
 Finish the Domain behavior, Application operation, persistence, entry points, automated evidence, and operating impact before setting `deliveryStatus` to `verified`. Placeholder work leaves the Use case `planned`.
@@ -142,6 +143,8 @@ A Workflow advances system-controlled work without requiring an actor to invoke 
 Do not create a Workflow specification for branches inside one atomic Command or for a stateless synchronous sequence. Keep that coordination inside the top-level use-case handler.
 
 A Workflow names its business owner, participating Subjects, starting fact, completion and failure conditions, durable state owner, Commands issued, Events awaited, retry horizon, idempotency behavior, timeouts, compensation, operator actions, and verification.
+
+Use `{subject}.{past-tense-event}` as the stable documented Event reference, such as `orders.order-confirmed`. Map it to the code type `OrderConfirmed` in the owning Subject specification. Workflow records use the stable reference and link to that owner.
 
 The Workflow Orchestrator is the technical mapping for a durable Workflow. Industry mappings include Process Manager and orchestration-based Saga. These mappings do not become ADDD naming conventions.
 

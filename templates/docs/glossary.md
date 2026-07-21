@@ -1,15 +1,16 @@
+---
+{
+  "kind": "glossary",
+  "id": "__PROJECT_ID__",
+  "recordStatus": "current",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD"
+}
+---
 # __PROJECT__ Glossary
-
-## Document metadata
-
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
 
 | Term | Meaning | Avoid |
 |:---|:---|:---|
 | __TERM__ | Define the term in business language. | List an ambiguous synonym. |
 
-Use one term for each concept in product documents, code, API contracts, UI copy, and tests. Record subject-specific terms in the subject README when they are not shared across the bounded context.
+Use one term for each concept in product documents, code, API contracts, UI copy, and tests. Record Subject-specific terms in the Subject specification when they are not shared across the bounded context.

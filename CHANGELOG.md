@@ -10,7 +10,7 @@ Target release: `v1.3.0`.
 - Added Business Flow, Workflow, Workflow Orchestrator, Follow-up, Shared Rule, and Claims and Evidence records.
 - Replaced mandatory Aggregate state-record hierarchies with business-state documentation and representation choices.
 - Added kind-specific Specification Metadata with separate record and delivery status.
-- Replaced consumer `extensions` with `selectedExtensions` and added project or local extension activation scopes.
+- Replaced consumer `extensions` with `selectedExtensions`, added project or local extension activation scopes, and advanced the manifest schema to version 2.
 - Replaced the ADDD routing schema with a kind-discriminated Specification Metadata schema.
 - Added the v1.3 consumer upgrade guide.
 

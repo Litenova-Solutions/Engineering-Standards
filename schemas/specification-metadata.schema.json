@@ -6,6 +6,7 @@
   "oneOf": [
     { "$ref": "#/$defs/product" },
     { "$ref": "#/$defs/domainIndex" },
+    { "$ref": "#/$defs/glossary" },
     { "$ref": "#/$defs/subjectsIndex" },
     { "$ref": "#/$defs/subject" },
     { "$ref": "#/$defs/useCase" },
@@ -103,6 +104,18 @@
       "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "domain-index" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "glossary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "glossary" },
         "id": { "$ref": "#/$defs/identifier" },
         "recordStatus": { "$ref": "#/$defs/recordStatus" },
         "owner": { "$ref": "#/$defs/owner" },

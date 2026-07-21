@@ -33,8 +33,8 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 | Document | Covers |
 |:---|:---|
 | [Architecture](conventions/backend/architecture.md) | Four-project modular monolith, dependency direction, subject and use-case slices, and Worker activation. |
-| [Domain](conventions/backend/domain.md) | Aggregate roots, mandatory state records, value objects, IDs, entities, services, events, repositories, errors, and persistence-neutral object design. |
-| [Application](conventions/backend/application.md) | Commands, queries, handlers, validators, results, reactions, ports, and folders. |
+| [Domain](conventions/backend/domain.md) | Aggregate roots, state representation choices, Value Objects, IDs, entities, services, Events, repositories, errors, and persistence-neutral object design. |
+| [Application](conventions/backend/application.md) | Commands, Queries, handlers, validators, results, Follow-ups, Workflows, ports, and folders. |
 | [Marten persistence](conventions/backend/persistence-marten.md) | Sessions, repositories, queries, commit pipeline, event collection, JSON contracts, document evolution, aliases, indexes, and schema changes. |
 | [HTTP API](conventions/backend/api.md) | Minimal API endpoints, routes, transport models, status codes, Problem Details, authorization, and OpenAPI. |
 
@@ -70,15 +70,15 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Adopt standards v1](guides/adopt-v1.md) gives a greenfield consumer sequence.
 - [Upgrade to standards v1.1](guides/upgrade-v1.1.md) gives the consumer migration sequence for document metadata and consistency checks.
 - [Upgrade to standards v1.2](guides/upgrade-v1.2.md) explains the Subject migration and aggregate root boundary.
-- [Upgrade to standards v1.3](guides/upgrade-v1.3.md) explains typed domain directories, journey and evidence records, coordinator boundaries, and metadata checks.
+- [Upgrade to standards v1.3](guides/upgrade-v1.3.md) explains the ADDD vocabulary, document layout, metadata, extension, Workflow, and state-representation migration.
 - [V1 release scope](guides/v1-release-scope.md) states the complete baseline, conditional catalog, release contents, and exclusions.
 - [Model a Domain subject](guides/model-domain.md) turns known business language into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
-- [Subject bucket template](../templates/docs/subjects-index.md) defines the subject documentation boundary.
-- [Cross-cutting bucket template](../templates/docs/cross-cutting-index.md) defines shared domain records.
-- [Critical journey template](../templates/docs/critical-journey.md) connects use cases to one customer outcome.
-- [Evidence register template](../templates/docs/evidence-register.md) classifies evidence and decision gates.
-- [Cross-cutting contract template](../templates/docs/cross-cutting-contract.md) records behavior shared across subjects.
+- [Subject index template](../templates/docs/subjects-index.md) defines the Subject documentation boundary.
+- [Business Flow template](../templates/docs/business-flow.md) connects Use cases to one product outcome.
+- [Workflow template](../templates/docs/workflow.md) defines durable system-controlled progress.
+- [Shared Rule template](../templates/docs/shared-rule.md) records a rule that applies to multiple Subjects.
+- [Claims and Evidence template](../templates/docs/claims-and-evidence.md) separates claims from decision conditions.
 - [Operating limits template](../templates/docs/operating-limits.md) records the supported envelope and recovery limits.
 - [Runbook template](../templates/docs/runbook.md) gives the required operational record shape.
 - [V2 roadmap](../ROADMAP.md) records evidence-gated candidates after v1 adoption.

@@ -22,7 +22,7 @@ These standards make those choices explicit. They retain detailed conventions wh
 | Consumer configuration | Selects the profile, paths, extensions allowed by the project, and project overrides. |
 | Templates | Provide small starting points for consumer product and domain documentation. |
 
-The baseline profile applies first. An enabled extension may replace only the baseline rule IDs it names. A consumer override takes precedence when it names the affected rule ID and links to a project decision.
+The baseline profile applies first. An applicable extension may replace only the baseline rule IDs it names. A consumer override takes precedence when it names the affected rule ID and links to a project decision.
 
 ## From an idea to application v1
 
@@ -30,13 +30,14 @@ Litenova uses Agent-Driven Domain Delivery (ADDD). ADDD keeps product intent, im
 
 For a publishing application:
 
-1. The product brief defines the primary journey: an author creates and publishes a post.
-2. The domain index identifies the `Posts` subject.
-3. `docs/domain/subjects/posts/create-draft.md` defines the first use case.
-4. Acceptance criterion `AC-POSTS-CREATE-DRAFT-01` states an observable outcome.
-5. The agent loads only the Application, API, persistence, and testing conventions required by that use case.
-6. Automated tests cite the same acceptance ID.
-7. The slice is complete after its code, documentation, tests, deployment impact, and release checks agree.
+1. The product brief names `post-publication` as the Primary Business Flow.
+2. `docs/product/flows/post-publication.md` connects `posts.create-draft` and `posts.publish-post` to one product outcome.
+3. The domain index identifies the `Posts` Subject.
+4. `docs/domain/subjects/posts/create-draft.md` defines the first Use case.
+5. Acceptance criterion `AC-POSTS-CREATE-DRAFT-01` states an observable outcome.
+6. The agent loads only the Application, API, persistence, and testing conventions required by that Use case.
+7. Automated tests cite the same acceptance ID, and `FC-POST-PUBLICATION-01` checks the complete flow.
+8. The slice is complete after its code, documentation, tests, deployment impact, and release checks agree.
 
 Read [the ADDD foundation](docs/foundations/addd.md) for the complete method.
 
@@ -72,12 +73,12 @@ AI agents start with [AGENTS.md](AGENTS.md), the consumer's `standards.project.j
 
 ## Consume the repository
 
-Add the release as a root submodule and pin its exact commit:
+Add the release as a root submodule and pin its exact commit. Set `APPROVED_STANDARDS_TAG` to the published tag approved for the consumer:
 
 ```bash
 git submodule add https://github.com/Litenova-Solutions/Engineering-Standards.git standards
 git -C standards fetch --tags
-git -C standards checkout v1.3.0
+git -C standards checkout --detach "$APPROVED_STANDARDS_TAG"
 git add .gitmodules standards
 ```
 
@@ -89,24 +90,21 @@ Each consumer adds:
 - A short root `AGENTS.md` that points agents to `standards/AGENTS.md`.
 - Product and use-case documentation under `docs/`.
 
-Copy only the documentation templates needed for the current stage:
+Copy only the thin inception templates:
 
 ```bash
-mkdir -p docs/product docs/domain/subjects docs/domain/cross-cutting
+mkdir -p docs/product docs/domain/subjects
 cp standards/templates/docs/standards.project.json standards.project.json
 cp standards/templates/docs/project-agents.md AGENTS.md
 cp standards/templates/docs/product-brief.md docs/product/brief.md
 cp standards/templates/docs/domain-index.md docs/domain/README.md
 cp standards/templates/docs/glossary.md docs/domain/glossary.md
 cp standards/templates/docs/subjects-index.md docs/domain/subjects/README.md
-cp standards/templates/docs/cross-cutting-index.md docs/domain/cross-cutting/README.md
-cp standards/templates/docs/critical-journey.md docs/domain/cross-cutting/primary-journey.md
-cp standards/templates/docs/evidence-register.md docs/domain/cross-cutting/register.md
-cp standards/templates/docs/cross-cutting-contract.md docs/domain/cross-cutting/security-and-retention.md
-cp standards/templates/docs/operating-limits.md docs/domain/cross-cutting/operating-limits.md
 ```
 
-There is no standards CLI or application generator. The read-only domain validation script checks cross-file metadata rules. Agents create application code from the selected conventions and extensions while matching explicit consumer overrides.
+Add `flows/`, `workflows/`, `shared-rules/`, `operations/`, `runbooks/`, `release/`, `research/`, and `ui/` only with their first real artifact. The [template index](templates/docs/README.md) names each trigger and target path.
+
+There is no standards CLI, application generator, or bundled consumer validator. JSON schemas validate machine-readable file shape. Consumer CI or review tooling checks cross-file references. Agents create application code from the selected conventions and extensions while matching explicit consumer overrides.
 
 ## Repository map
 
@@ -120,9 +118,8 @@ docs/conventions/quality/     Backend testing, security, operations, CI
 docs/extensions/              Conditional standards loaded by activation criteria
 docs/guides/                  Adoption and delivery guidance
 docs/reference/               Glossary and decisions
-schemas/                      JSON contracts for the manifest and consumer configuration
+schemas/                      JSON contracts for the manifest, consumer configuration, and Specification Metadata
 templates/docs/               Consumer documentation starting points
-scripts/                      Read-only cross-file validation scripts
 ROADMAP.md                    Evidence-gated candidates for v2
 ```
 

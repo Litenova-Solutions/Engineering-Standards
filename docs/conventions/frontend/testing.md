@@ -2,12 +2,12 @@
 
 ## Intent
 
-Frontend tests should prove use-case behavior at the cheapest boundary that represents the risk. Utilities and interactive modules receive fast focused tests. Critical journeys receive browser evidence.
+Frontend tests should prove Use-case behavior at the cheapest boundary that represents the Risk. Utilities and interactive modules receive fast focused tests. Browser Business Flows receive Flow-check evidence.
 
 ## Agent Summary {#agent-summary}
 
 - Use Vitest for utilities, mappings, schemas, hooks, and interactive components.
-- Use Playwright for critical journeys and cross-route browser behavior.
+- Use Playwright for browser Business Flows and cross-route behavior.
 - Keep acceptance IDs in tests that prove documented criteria.
 - Test loading, empty, error, forbidden, pending, and ready states that apply.
 - Mock the network boundary, not framework internals, in component tests.
@@ -17,13 +17,13 @@ Frontend tests should prove use-case behavior at the cheapest boundary that repr
 
 ### Match test level to risk (FTEST.LEVEL.001)
 
-Use unit tests for pure formatting, mapping, validation, and state transitions. Use component tests for user interaction inside one component boundary. Use Playwright for navigation, authentication, browser integration, and primary journeys.
+Use unit tests for pure formatting, mapping, validation, and state transitions. Use component tests for user interaction inside one component boundary. Use Playwright for navigation, authentication, browser integration, and Business Flow checks.
 
 Do not add a browser test for every static route or a snapshot in place of behavior assertions.
 
 ### Trace acceptance behavior (FTEST.TRACE.001)
 
-When a frontend test proves an active acceptance criterion, include its exact ID in the test title or metadata.
+When a frontend test proves an acceptance criterion from a verified Use case, include its exact ID in the test title or metadata.
 
 ```typescript
 test('[AC-POSTS-CREATE-DRAFT-01] creates a draft', async ({ page }) => {
@@ -45,7 +45,7 @@ Each browser test creates or identifies its own data, authentication context, an
 
 ### Run the changed application gates (FTEST.GATES.001)
 
-For each changed frontend run frozen installation, lint, type checking, Vitest, and production build. Run Playwright when critical journeys, routes, authentication, or browser integration change.
+For each changed frontend run frozen installation, lint, type checking, Vitest, and production build. Run Playwright when a browser Business Flow, route, authentication, or browser integration changes.
 
 ## Conventions
 

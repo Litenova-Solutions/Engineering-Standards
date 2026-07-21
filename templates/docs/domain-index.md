@@ -1,12 +1,13 @@
+---
+{
+  "kind": "domain-index",
+  "id": "__PROJECT_ID__",
+  "recordStatus": "current",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD"
+}
+---
 # __PROJECT__ Domain
-
-## Document metadata
-
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
 
 ## Bounded context
 
@@ -14,25 +15,39 @@ Name the single business boundary and the responsibilities inside it.
 
 ## Domain language
 
-Use [glossary.md](glossary.md) as the canonical term list.
+Use [glossary.md](glossary.md) as the shared term list. Subject-specific terms remain in Subject specifications.
 
 ## Subjects
 
-- Link each `docs/domain/subjects/{subject}/README.md` and state its user outcome.
-
-## Domain document buckets
-
-| Directory | Type | Allowed content |
+| Subject | Purpose | Specification |
 |:---|:---|:---|
-| `subjects/` | Subject specifications | Subject READMEs and their use-case specifications. |
-| `cross-cutting/` | Shared domain records | Journeys, evidence, security, retention, provider, operating, and delivery contracts. |
+| `__SUBJECT__` | State the related language and use cases. | Link `subjects/__SUBJECT__/README.md`. |
 
-Give both buckets a README that states its type, owner, and allowed artifacts. Do not place shared artifacts in a subject directory.
+## Workflows
 
-## Primary v1 journey
+| Workflow | Business purpose | Participating Subjects |
+|:---|:---|:---|
+| `__WORKFLOW__` | State the system-controlled outcome. | List Subject IDs. |
 
-1. Link the ordered use cases that form the first releasable journey.
+Remove this section when no Workflow specification exists.
 
-## Context-wide invariants
+## Shared Rules
 
-- Record only rules shared across subjects.
+| Shared Rule | Type | Applies to |
+|:---|:---|:---|
+| `__SHARED_RULE__` | `business-policy` | List Subject IDs. |
+
+Remove this section when no Shared Rule exists.
+
+## Folder organization
+
+```text
+docs/domain/
+  README.md
+  glossary.md
+  subjects/
+  workflows/       create with the first Workflow
+  shared-rules/    create with the first Shared Rule
+```
+
+Business Flow order belongs under `docs/product/flows/`, not in this index.

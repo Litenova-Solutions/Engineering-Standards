@@ -34,11 +34,21 @@ Consumer repositories use this shape:
   packages/
   docs/
     product/
+      brief.md
+      flows/                 create with the first Business Flow
     domain/
+      README.md
+      glossary.md
       subjects/
-      cross-cutting/
-    ui/
-    decisions/
+      workflows/             create with the first Workflow
+      shared-rules/          create with the first Shared Rule
+    decisions/               create with the first decision
+    operations/              create with the first operating record
+      limits.md              create when operating limits exist
+    runbooks/                create with the first runbook
+    release/                 create with the first release evidence record
+    research/                create with the first research record
+    ui/                      create when a frontend needs page specifications
   standards/
   AGENTS.md
   global.json
@@ -95,7 +105,7 @@ Application-specific README files may live beside their application for run comm
 
 ### Keep orientation documents separate from canonical records (REPO.DOCS.002)
 
-Root and application README files MAY summarize product or architecture decisions, but they MUST link to the canonical documents under `docs/` and MUST NOT become a second authored source for the same fact. If a README owns a fact, its document metadata MUST name the README as the canonical source. When a product, domain, or architecture decision changes, update the canonical document and reduce the README to a link or current summary in the same change.
+Root and application README files MAY summarize product or architecture decisions, but they MUST link to the authoritative `recordStatus: current` documents under `docs/` and MUST NOT become a second authored source for the same fact. When a product, domain, or architecture decision changes, update the owning specification and reduce the README to a link or current summary in the same change.
 
 ## Conventions
 
@@ -121,4 +131,6 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 - Confirm production projects are under `apps/api/src/` and tests under `apps/api/tests/`.
 - Confirm every deployable is under `apps/`.
 - Confirm every shared package has a named consumer.
-- Confirm subject documentation is under `docs/domain/subjects/` and shared domain records are under `docs/domain/cross-cutting/`.
+- Confirm Subject documentation is under `docs/domain/subjects/`, Business Flows are under `docs/product/flows/`, Workflows are under `docs/domain/workflows/`, and Shared Rules are under `docs/domain/shared-rules/`.
+- Confirm Operating Limits are under `docs/operations/` and release records are under `docs/release/`.
+- Confirm optional directories contain real artifacts and no placeholder files.

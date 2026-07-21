@@ -21,7 +21,7 @@ Start with Tier 0, then select the active task from `loadPlans` in `standards.ma
 - Tier 0 contains repository agent instructions.
 - Tier 1 contains short `Agent Summary` sections.
 - Tier 2 contains complete topic documents.
-- Extensions load only when the consumer enables them or the task evaluates their activation criteria.
+- Project-scoped extensions load when selected. Local extensions load when selected and applicable to the active specification kind.
 
 Read the active use-case specification before changing observable application behavior.
 
@@ -30,7 +30,7 @@ Read the active use-case specification before changing observable application be
 Apply applicable guidance in this order:
 
 1. Consumer override backed by a decision and named rule ID.
-2. Enabled extension that declares a baseline replacement.
+2. Applicable extension that declares a baseline replacement.
 3. Selected platform profile and its conventions.
 4. Foundation standards.
 
@@ -70,12 +70,12 @@ After loading the applicable standard, inspect neighboring consumer files. Match
 
 ## Examples
 
-A command-handler change loads `backend.application`, the active use case, and enabled extensions. It does not load frontend rendering or container deployment guidance unless the requested behavior crosses those areas.
+A Command-handler change loads `backend.application`, the active Use case, selected project extensions, and locally applicable extensions. It does not load frontend rendering or container deployment guidance unless the requested behavior crosses those areas.
 
 ## Verification
 
 - Confirm the selected task exists in the manifest.
-- Confirm the active use case and enabled extensions were read.
+- Confirm the active Use case and applicable extensions were read.
 - Confirm precedence was applied to every local override.
 - Confirm unrelated working-tree changes remain intact.
 - Confirm the completion report names skipped checks and reasons.

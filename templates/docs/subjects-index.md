@@ -1,18 +1,23 @@
-# __PROJECT__ subject documents
+---
+{
+  "kind": "subjects-index",
+  "id": "__PROJECT_ID__",
+  "recordStatus": "current",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD"
+}
+---
+# __PROJECT__ Subject Specifications
 
-## Document metadata
+This directory contains one folder per business Subject. Each folder has one `README.md` Subject specification and one Markdown file per Use case.
 
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
+```text
+subjects/
+  README.md
+  orders/
+    README.md
+    create-order.md
+    cancel-order.md
+```
 
-This bucket contains one directory per business subject. Each subject directory has a routing README and one Markdown file per use case.
-
-## Allowed content
-
-- Subject READMEs with subject routing metadata.
-- One use-case specification per operation under its subject directory.
-
-Cross-cutting contracts, critical journeys, evidence registers, operating limits, and release coverage belong in `../cross-cutting/`.
+Business Flows belong under `docs/product/flows/`. Cross-Subject Workflows and Shared Rules belong under `docs/domain/workflows/` and `docs/domain/shared-rules/`.

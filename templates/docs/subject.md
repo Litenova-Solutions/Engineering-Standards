@@ -1,26 +1,22 @@
 ---
 {
+  "kind": "subject",
   "id": "__SUBJECT__",
-  "status": "planned"
+  "recordStatus": "current",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD",
+  "applicableExtensions": []
 }
 ---
 # __TITLE__
 
-## Document metadata
-
-- Owner: __OWNER__.
-- Document status: `current`, `planned`, `retired`, or `reference`.
-- Last verified: `YYYY-MM-DD`.
-- Canonical source: `This document` or one repository path.
-- Implementation evidence: code paths, test paths, acceptance IDs, generated artifacts, operating records, or `None`.
-
 ## Purpose
 
-State the business subject and the user outcome it supports.
+State the business topic and the outcomes its Use cases support.
 
 ## Actors
 
-- Name each actor and their responsibility in this subject.
+- Name each actor and responsibility in this Subject.
 
 ## Terms
 
@@ -28,62 +24,66 @@ State the business subject and the user outcome it supports.
 |:---|:---|:---|
 | `__TERM__` | Define the term in business language. | List words that must not replace it. |
 
-## Primary aggregate root
+## Aggregate ownership
 
-Name the aggregate root that owns state changes for this subject. Write `None` for a read-only subject.
-
-| Aggregate root | Owns | References by ID | Consistency boundary |
-|:---|:---|:---|:---|
-| `__AGGREGATE__` | List child entities and values changed atomically. | List other aggregate IDs. | State the invariants protected in one command. |
-
-The subject is a documentation and navigation boundary. The aggregate root remains the runtime consistency and mutation boundary. Do not introduce `Subject`, `ISubject`, or `SubjectRoot` runtime abstractions.
-
-This directory is a subject directory under `docs/domain/subjects/`. Cross-cutting contracts, critical journeys, evidence registers, and operating limits belong in `docs/domain/cross-cutting/`.
-
-## State model
-
-### __AGGREGATE__
-
-Every state-changing aggregate has an explicit state record hierarchy, including an aggregate with one current state.
-
-For a read-only subject, write `No domain state model` and remove the aggregate-specific placeholder rows.
-
-| State record | Required data | Business meaning |
-|:---|:---|:---|
-| `__STATE_RECORD__` | List state-specific values or `None`. | Describe the complete lifecycle state. |
-
-| From state | Business action | To state | Invariant IDs | Use cases |
+| Aggregate | Owns | References by ID | Aggregate Rules | Commands |
 |:---|:---|:---|:---|:---|
-| `__FROM_STATE__` | `__ACTION__` | `__TO_STATE__` | `INV-__SUBJECT_ID__-01` | Link the command specification. |
+| `__AGGREGATE__` | List state changed atomically. | List other Aggregate IDs. | `INV-__SUBJECT_ID__-01` | Link Command Use cases. |
 
-## Invariants
+Write `None` when the Subject has no Aggregate. A Subject may contain multiple related Aggregates. Each Aggregate remains one transaction boundary.
+
+## Business states
+
+| Aggregate | State | Meaning | Required facts |
+|:---|:---|:---|:---|
+| `__AGGREGATE__` | `__STATE__` | State the business meaning. | List facts required in this state. |
+
+Remove this section when no business lifecycle exists. Do not prescribe a C# representation here.
+
+## Technical state mapping
+
+| Aggregate | Business state | Code representation |
+|:---|:---|:---|
+| `__AGGREGATE__` | `__STATE__` | `__STATE_TYPE_OR_ENUM__` |
+
+Add this section only when implementation exists.
+
+## Transitions
+
+| Aggregate | From state | Business action | To state | Aggregate Rules | Use case |
+|:---|:---|:---|:---|:---|:---|
+| `__AGGREGATE__` | `__FROM_STATE__` | `__ACTION__` | `__TO_STATE__` | `INV-__SUBJECT_ID__-01` | Link the Command specification. |
+
+## Aggregate Rules
 
 | ID | Rule | Protected by | Failure |
 |:---|:---|:---|:---|
-| `INV-__SUBJECT_ID__-01` | State one rule in business language. | Name the aggregate or value object. | Name the domain exception or rejected outcome. |
+| `INV-__SUBJECT_ID__-01` | State one rule. | Name the Aggregate or Value Object. | Name the rejected outcome. |
 
-Do not renumber or reuse an accepted invariant ID.
+Do not renumber or reuse an accepted Aggregate Rule ID.
 
-## Domain events and reactions
+## Events and Follow-ups
 
-| Domain event | Business fact | Known reactions | Delivery requirement |
-|:---|:---|:---|:---|
-| `__PAST_TENSE_EVENT__` | State what completed. | Link or name each reaction. | State best-effort, durable, or none. |
+| Event reference | Code type | Business meaning | Follow-up | Owner | Delivery |
+|:---|:---|:---|:---|:---|:---|
+| `__SUBJECT__.__PAST_TENSE_EVENT__` | `__PAST_TENSE_EVENT_TYPE__` | State what completed. | State expected behavior or `None`. | Name the owner. | `atomic`, `durable`, `rebuildable`, or `best-effort-optional` |
 
 ## Use cases
 
-- Link each use-case specification and state whether it is planned, active, or retired.
-
-## Invariant and transition coverage
-
-| Invariant or transition | Use cases | Acceptance criteria |
+| Use case | Operation | Delivery status |
 |:---|:---|:---|
-| `INV-__SUBJECT_ID__-01` | Link each owning use case. | List stable acceptance IDs. |
+| `__SUBJECT__.__USE_CASE__` | `command` or `query` | `planned` or `verified` |
+
+## Rule and transition coverage
+
+| Rule or transition | Use cases | Acceptance criteria |
+|:---|:---|:---|
+| `INV-__SUBJECT_ID__-01` | Link each owning Use case. | List stable acceptance IDs. |
 
 ## Dependencies
 
-- Link another subject only when this subject requires its public behavior.
+- Link another Subject only when this Subject requires its public behavior.
 
 ## Open modeling questions
 
-- Record an unresolved business definition that blocks a state, transition, invariant, or event. Remove the entry after a human decision updates the model.
+- Record an unresolved business definition that blocks a state, transition, Aggregate Rule, or Event.

@@ -8,7 +8,7 @@ This roadmap records candidates to evaluate after the v1 standards are used by r
 
 V2 design starts after:
 
-1. V1 has an annotated release and at least one completed consumer application primary journey.
+1. V1 has an annotated release and at least one completed consumer Primary Business Flow.
 2. At least two consumer efforts have recorded deviations, repeated agent mistakes, and missing verification.
 3. Maintainers have reviewed context-load size, adoption time, release evidence, and operating incidents.
 4. Each proposed rule has a concrete failure or repeated cost that it would prevent.

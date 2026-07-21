@@ -29,7 +29,7 @@ Do not preserve obsolete rule IDs, document paths, templates, aliases, or termin
 3. Select the narrowest task under `loadPlans` in `standards.manifest.json`.
 4. Read the listed Tier 1 `Agent Summary` sections.
 5. Read Tier 2 before generating a file, changing a public boundary, or choosing between patterns.
-6. Read every extension enabled by the active use case or consumer configuration.
+6. Read every project-scoped extension selected by the consumer and every local extension applicable to the active specification.
 7. Inspect neighboring consumer files after loading the applicable standard.
 
 Do not load unrelated conventions or inactive extensions.
@@ -39,7 +39,7 @@ Do not load unrelated conventions or inactive extensions.
 Apply applicable guidance in this order:
 
 1. Consumer override backed by a decision and named rule ID.
-2. Enabled extension that names a baseline replacement.
+2. Applicable extension that names a baseline replacement.
 3. Selected platform profile and its conventions.
 4. Foundation standards.
 
@@ -49,7 +49,7 @@ An explicit consumer convention may replace a baseline convention. Stop when app
 
 1. Confirm the requested scope and affected repositories.
 2. Read `git status` and preserve unrelated work.
-3. Load the task context, active use case, and enabled extensions.
+3. Load the task context, active Use case, selected project extensions, and locally applicable extensions.
 4. Check the manifest before changing dependencies.
 5. Match compliant local patterns.
 6. Plan documentation, code, tests, generated contracts, and operating impact as one unit.
@@ -66,13 +66,13 @@ Do not add a package, migration, authentication model change, public API break, 
 - Name HTTP transport DTOs with a concrete boundary role ending in `Model`, including `RequestModel` and `ResponseModel`; name operation mappings with `ApiMappings`.
 - Keep handlers, validators, endpoints, and persistence implementations internal sealed.
 - Write commands through aggregate repositories and read queries through `IQuerySession`.
-- Do not call `SaveChangesAsync` from handlers, repositories, endpoints, or reactions.
+- Do not call `SaveChangesAsync` from handlers, repositories, endpoints, Follow-up implementations, or Workflow Orchestrators.
 - Commit once through the LiteBus command post-handler.
 - Use Minimal API `IEndpoint`; MVC controllers are outside the profile.
 - Derive authenticated actor IDs from verified claims and authorize the target resource.
 - Keep frontend subject internals isolated and route files focused on composition.
 - Validate backend options and frontend environment access through owned modules.
-- Cite every active acceptance-criterion ID from automated tests.
+- Cite every acceptance-criterion ID from verified Use cases in automated tests.
 - Regenerate OpenAPI and typed consumers with their sources.
 
 Read the full task conventions before applying any boundary from this summary.
@@ -84,11 +84,11 @@ For this standards repository:
 - Validate the two tracked schema consumers.
 - Check manifest paths and `#agent-summary` anchors.
 - Check rule-ID uniqueness and extension references.
-- Check internal links, ASCII writing rules, document metadata, code-document consistency, and stale terminology.
+- Check internal links, ASCII writing rules, Specification Metadata, code-document consistency, and stale terminology.
 - Confirm removed terminology, rule IDs, templates, and aliases have no current standards references.
 - Run `git diff --check`.
 
-The repository has no standards CLI, generated index, or application scaffold. Use the read-only script under `scripts/` when a consumer needs cross-file domain metadata checks.
+The repository has no standards CLI, generated index, application scaffold, or bundled consumer validator. JSON schemas define machine-readable file shape. Consumer CI or review tooling performs required cross-file checks.
 
 ## Consumer verification
 
@@ -109,7 +109,7 @@ pnpm test
 pnpm build
 ```
 
-Run Playwright for critical browser journeys and extension-specific verification for every enabled extension affected by the change.
+Run Playwright for affected browser Business Flows and extension-specific verification for every applicable extension affected by the change.
 
 ## Completion
 

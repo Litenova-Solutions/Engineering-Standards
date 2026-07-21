@@ -1,6 +1,6 @@
 # Foundation Decisions
 
-These records explain the version 1 baseline. Normative behavior lives in foundations, the selected platform profile, topic conventions, and enabled extensions.
+These records explain the version 1 baseline. Normative behavior lives in foundations, the selected platform profile, topic conventions, and applicable extensions.
 
 - [Compact Application assembly](compact-application-assembly.md)
 - [Marten default persistence](marten-default-persistence.md)

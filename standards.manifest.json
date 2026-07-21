@@ -1,6 +1,6 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "version": "1.3.0-draft.1",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",

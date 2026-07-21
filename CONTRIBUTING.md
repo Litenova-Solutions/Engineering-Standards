@@ -21,7 +21,7 @@ Before requesting review:
 - Update document templates when ADDD metadata or required sections change.
 - Run `git diff --check`.
 
-The repository intentionally has no standards CLI, generated catalog, or application scaffold. The read-only domain validation script checks cross-file metadata rules that schemas cannot express.
+The repository intentionally has no standards CLI, generated catalog, application scaffold, or bundled consumer validator. Validate JSON shape with the tracked schemas and run cross-file checks through consumer CI or review tooling.
 
 ## Normative changes
 
@@ -39,7 +39,7 @@ A convention states how a consumer may document a local replacement. Do not use 
 
 An extension document contains activation criteria, baseline relationship, agent summary, standards, conventions, dependencies, and verification. It names every baseline rule it replaces.
 
-Do not add a separate extension descriptor or schema. The extension Markdown file is the contract, and the manifest maps its ID to that file.
+Do not add a separate extension descriptor or schema. The extension Markdown file is the contract, and the manifest maps its ID to its path, activation scope, and allowed local specification kinds.
 
 ## Solo-maintainer review
 

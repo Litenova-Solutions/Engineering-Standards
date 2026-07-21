@@ -189,11 +189,11 @@ Application obtains required Aggregates and external facts before calling the se
 
 Name each Event as a completed fact. Include immutable values required to understand that fact without carrying the Aggregate.
 
-| Event | Business meaning | Follow-up | Owner | Delivery |
-|:---|:---|:---|:---|:---|
-| `OrderConfirmed` | The paid Order is final. | Issue tickets. | Tickets | `durable` |
-| `TicketIssued` | An admission entitlement exists. | Send it to the buyer. | Communications | `durable` |
-| `PostPublished` | A Post became public. | Refresh the public catalog. | Posts | `rebuildable` |
+| Event reference | Code type | Business meaning | Follow-up | Owner | Delivery |
+|:---|:---|:---|:---|:---|:---|
+| `orders.order-confirmed` | `OrderConfirmed` | The paid Order is final. | Issue tickets. | Tickets | `durable` |
+| `tickets.ticket-issued` | `TicketIssued` | An admission entitlement exists. | Send it to the buyer. | Communications | `durable` |
+| `posts.post-published` | `PostPublished` | A Post became public. | Refresh the public catalog. | Posts | `rebuildable` |
 
 A Domain Event remains an internal Domain contract. Translate it to an Integration Event when another system consumes a versioned external message.
 

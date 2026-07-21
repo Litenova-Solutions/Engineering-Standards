@@ -17,7 +17,7 @@ The product brief or a decision records supported locales, default locale, fallb
 - Store user-facing copy in locale catalogs with stable semantic keys.
 - Format dates, numbers, money, plural forms, and relative time by active locale.
 - Keep domain and database values locale-neutral.
-- Test fallback and the primary journey in every supported locale.
+- Test fallback and the Primary Business Flow in every supported locale.
 
 ## Standards
 
@@ -54,4 +54,4 @@ No library is selected by this extension. A localization package requires a deci
 - Test locale detection, explicit selection, canonical routing, and fallback.
 - Detect missing and unused catalog keys.
 - Test dates, numbers, money, plural forms, metadata, and validation messages.
-- Run the primary journey in every supported locale.
+- Run the Primary Business Flow in every supported locale.
