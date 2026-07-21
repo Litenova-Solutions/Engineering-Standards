@@ -6,6 +6,8 @@ The outbox makes a business or Workflow commit and its required outgoing message
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Use case, Workflow. List it in `applicableExtensions` only on those kinds.
+
 Enable `outbox-worker` when a committed change requires an Integration Event, provider side effect, or Workflow Command that cannot be reconstructed or retried manually after process failure.
 
 The Use case carries the `durable-delivery` Risk, or the Workflow lists the extension because its Commands require durable delivery. This extension:

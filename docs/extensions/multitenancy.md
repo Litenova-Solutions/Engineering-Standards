@@ -6,6 +6,8 @@ Multi-tenancy makes tenant identity part of authorization, persistence, caches, 
 
 ## Activation
 
+**Activation scope:** `project`. It applies to all project work whenever selected in `selectedExtensions`.
+
 Enable `multitenancy` only when independent customer organizations share one deployment and require isolated data or policy.
 
 Record the tenant resolution source, storage model, isolation guarantee, administrative access model, and migration path before implementation. This extension replaces no baseline rule.

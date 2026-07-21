@@ -29,6 +29,8 @@ These files are starting points for consumer documentation. Copy only the files 
 | `runbook.md` | `docs/runbooks/{runbook}.md` | An operator needs a repeatable recovery or operating procedure. |
 | `release-record.md` | `docs/releases/{release}.md` | One immutable release artifact is evaluated. |
 
+A template `id` is not always the filename. The operating-limits record lives at `docs/operations/limits.md` but keeps the fixed metadata `id` of `operating-limits`; the record kind, not the filename, sets the id. Use-case, module, flow, workflow, and policy ids follow their own kind rules in the engineering system foundation.
+
 Structured templates begin with Specification Metadata validated by [the schema](../../schemas/specification-metadata.schema.json). The engineering system foundation defines semantic relationships that JSON Schema cannot prove across files.
 
 The standards do not generate application code. Agents load the active specification, selected profile, task conventions, and applicable extensions before implementing one complete slice.

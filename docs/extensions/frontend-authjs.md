@@ -6,6 +6,8 @@ This extension defines interactive login and server-owned session handling when 
 
 ## Activation
 
+**Activation scope:** `project`. It applies to all project work whenever selected in `selectedExtensions`.
+
 Enable `frontend-authjs` when Next.js owns interactive login, callback handling, and session cookies for a browser application.
 
 The extension adds the pinned Auth.js and JOSE packages. It replaces no backend authentication rule.

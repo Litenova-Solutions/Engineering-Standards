@@ -6,6 +6,8 @@ This extension adds Reqnroll scenarios when product, domain, engineering, and te
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Use case, End-to-End Flow. List it in `applicableExtensions` only on those kinds.
+
 Enable `acceptance-bdd` when one or more critical examples must be reviewed in business language and executed through a public system boundary. Routine unit behavior does not activate it.
 
 This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and the Reqnroll packages pinned in the manifest. It does not replace a baseline rule.

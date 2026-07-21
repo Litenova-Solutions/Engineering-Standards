@@ -6,6 +6,8 @@ Localization makes routes, messages, formatting, metadata, and tests locale-awar
 
 ## Activation
 
+**Activation scope:** `project`. It applies to all project work whenever selected in `selectedExtensions`.
+
 Enable `localization` when the product commits to supporting more than one locale. A possible future translation does not activate it.
 
 The product brief or a decision records supported locales, default locale, fallback behavior, and URL strategy. This extension replaces no baseline rule.

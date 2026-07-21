@@ -6,6 +6,8 @@ Scheduled work runs independently of HTTP requests and must remain safe when rep
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Use case, Workflow. List it in `applicableExtensions` only on those kinds.
+
 Enable `scheduled-jobs` when a use case requires recurring, delayed, or calendar-based work. Add the Worker project permitted by `ARCH.WORKER.001`.
 
 This extension replaces no baseline rule.

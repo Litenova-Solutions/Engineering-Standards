@@ -6,6 +6,8 @@ This extension replaces Marten persistence for aggregates whose accepted require
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Module, Use case. List it in `applicableExtensions` only on those kinds.
+
 Enable `persistence-ef-core` only after a decision records the aggregate scope, relational requirement, migration effect, and reason the Marten baseline does not meet it.
 
 Do not use Marten and EF Core for the same aggregate. For EF Core-owned aggregate paths, this extension replaces:

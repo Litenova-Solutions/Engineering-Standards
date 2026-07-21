@@ -6,6 +6,8 @@ Realtime transport reduces visible update delay when polling cannot meet an acce
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Use case, End-to-End Flow. List it in `applicableExtensions` only on those kinds.
+
 Enable `realtime` after measuring the polling interval, user-visible delay, request cost, and required update target. Name acceptable disconnect and missed-message recovery.
 
 This extension replaces no baseline rule. SignalR browser clients add the pinned `@microsoft/signalr` package; server-sent events use platform capabilities.

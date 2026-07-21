@@ -6,6 +6,8 @@ Reporting separates complex joins, aggregate analysis, and large exports from no
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Use case. List it in `applicableExtensions` only on those kinds.
+
 Enable `reporting` for a documented query or export that requires complex relational SQL, large result sets, long processing, object storage, or a latency budget outside normal requests.
 
 The extension replaces no baseline read rule for ordinary queries. Long-running exports activate Worker under `ARCH.WORKER.001`.

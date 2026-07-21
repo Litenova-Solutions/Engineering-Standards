@@ -6,6 +6,8 @@ OpenAPI freshness proves that committed artifacts match source code. It does not
 
 ## Activation
 
+**Activation scope:** `project`. It applies to all project work whenever selected in `selectedExtensions`.
+
 Enable `api-compatibility` for public APIs, partner clients, mobile clients, or independently deployed consumers. Internal APIs consumed only by the same release retain the baseline freshness check.
 
 This extension replaces no baseline rule.

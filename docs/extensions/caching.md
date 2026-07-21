@@ -6,6 +6,8 @@ Caching trades freshness and invalidation work for lower latency or source load.
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Use case. List it in `applicableExtensions` only on those kinds.
+
 Enable `caching` after traces or load tests identify a repeated expensive read and the use case can state acceptable staleness. A possible future traffic increase does not activate it.
 
 The extension does not select a cache provider or replace a baseline rule. A provider package requires a project decision and manifest pin.

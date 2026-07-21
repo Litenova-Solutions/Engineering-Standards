@@ -6,6 +6,8 @@ Retention, deletion, archival, and restore behavior must follow the business and
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Use case, Workflow, Domain Policy. List it in `applicableExtensions` only on those kinds.
+
 Enable `data-lifecycle` when a use case requires deletion, retention, archival, restore, legal hold, subject access export, or post-deletion uniqueness behavior.
 
 This extension replaces no baseline rule.

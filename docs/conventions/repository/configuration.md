@@ -84,6 +84,19 @@ Use ignored local settings files or platform secret stores for developer values.
 
 Application code emits structured logs through standard logging abstractions. Exporter and sink configuration remains in hosts and deployment settings.
 
+### Keep documentation directories out of build-artifact ignore rules
+
+A platform `.gitignore` commonly ignores build output with case-insensitive patterns such as `[Rr]elease/` and `[Rr]eleases/`. These patterns also match the required `docs/releases/` documentation directory and silently exclude release records from source control. Add an explicit negation immediately after the build-output patterns so the documentation directory is tracked:
+
+```gitignore
+[Rr]elease/
+[Rr]eleases/
+!docs/releases/
+!docs/releases/*.md
+```
+
+Confirm with `git check-ignore docs/releases/<file>.md` that no release record is ignored. Apply the same negation to any other documentation directory whose name collides with a build-output pattern.
+
 ## Examples
 
 `EmailOptions` binds the `Email` section, validates its endpoint and sender during startup, and is injected through `IOptions<EmailOptions>`. The consumer repository's secret store supplies the credential.

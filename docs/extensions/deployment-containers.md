@@ -6,6 +6,8 @@ This extension defines container image and rollout requirements for hosted envir
 
 ## Activation
 
+**Activation scope:** `project`. It applies to all project work whenever selected in `selectedExtensions`.
+
 Enable `deployment-containers` when any production or staging environment deploys the API, Worker, or frontend as a container image.
 
 The extension adds no application package and replaces no baseline rule.

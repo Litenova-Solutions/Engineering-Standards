@@ -6,6 +6,8 @@ External systems are unreliable and outside the application's change control. Th
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Use case, Workflow. List it in `applicableExtensions` only on those kinds.
+
 Enable `external-integrations` for each use case that calls an external API, publishes to an external service, consumes an external webhook, or depends on a provider SDK.
 
 The extension adds the pinned HTTP resilience and network simulation packages. It replaces no baseline rule.

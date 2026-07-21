@@ -6,6 +6,8 @@ Concurrency control protects invariants when accepted writes overlap. Idempotenc
 
 ## Activation
 
+**Activation scope:** `local`. Applicable specification kinds: Use case, Workflow. List it in `applicableExtensions` only on those kinds.
+
 Enable `concurrency-idempotency` when the Use case carries the `concurrency` Risk, two accepted writes can conflict, or a retry can duplicate an irreversible or externally visible effect.
 
 This extension adds no baseline project and replaces no baseline rule.
