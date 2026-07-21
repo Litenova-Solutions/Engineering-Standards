@@ -2,7 +2,7 @@
 {
   "kind": "operating-limits",
   "id": "operating-limits",
-  "recordStatus": "current",
+  "specStatus": "approved",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD"
 }
@@ -17,7 +17,7 @@ State the pilot or release population, request rate, data volume, dependency ava
 
 | Limit | Kind | Value | Scope | Observable behavior | Owner |
 |:---|:---|:---|:---|:---|:---|
-| `__LIMIT__` | `enforced`, `tested`, `supported`, or `alert-threshold` | `__VALUE__` | State the affected flow, Subject, or service. | State the caller or operator result. | `__OWNER__` |
+| `__LIMIT__` | `enforced`, `tested`, `supported`, or `alert-threshold` | `__VALUE__` | State the affected flow, module, or service. | State the caller or operator result. | `__OWNER__` |
 
 - An enforced limit is actively rejected beyond its value.
 - A tested limit has automated or operating evidence at its value.
@@ -34,7 +34,7 @@ One value may have more than one row when it has more than one classification. A
 
 ## Stop conditions
 
-- State the condition that blocks release, suspends a Business Flow, or requires operator intervention.
+- State the condition that blocks release, suspends an end-to-end flow, or requires operator intervention.
 - State who may declare the condition and who may resume work.
 
 ## Recovery

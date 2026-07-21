@@ -41,7 +41,7 @@ Expose:
 - `/health/live` for process liveness without external dependency checks.
 - `/health/ready` for readiness to receive traffic, including critical dependencies.
 
-Readiness fails when the application cannot safely serve the Primary Business Flow. Health responses do not reveal connection strings or internal exception details.
+Readiness fails when the application cannot safely serve the primary release flow. Health responses do not reveal connection strings or internal exception details.
 
 Tag process-only checks for liveness and critical dependencies for readiness. Map each path with an explicit health-check predicate so adding a new check cannot silently change liveness behavior. Test the PostgreSQL readiness failure and recovery path.
 
@@ -59,7 +59,7 @@ A backup without a verified restore does not satisfy the release standard.
 
 ### Use a repeatable deployment (OPS.DEPLOY.001)
 
-Deployment uses versioned artifacts, declared configuration, a schema step, readiness checks, and a Primary Business Flow check. Do not deploy from an uncommitted working tree or a mutable branch reference.
+Deployment uses versioned artifacts, declared configuration, a schema step, readiness checks, and the primary release flow's end-to-end test. Do not deploy from an uncommitted working tree or a mutable branch reference.
 
 The container deployment extension adds image-specific requirements.
 
@@ -81,7 +81,7 @@ Every network call has an explicit timeout and cancellation path. Retries apply 
 
 ### Define actionable baseline alerts (OPS.ALERTS.001)
 
-Before application v1, define an owner, threshold, evaluation window, severity, and runbook for sustained readiness failure, elevated unexpected HTTP errors, Primary Business Flow latency, PostgreSQL unavailability, failed deployment Flow checks, and stale or failed backups. Worker-enabled applications also alert on the delivery or schedule thresholds named by their extension.
+Before application v1, define an owner, threshold, evaluation window, severity, and runbook for sustained readiness failure, elevated unexpected HTTP errors, primary release flow latency, PostgreSQL unavailability, failed deployed end-to-end tests, and stale or failed backups. Worker-enabled applications also alert on the delivery or schedule thresholds named by their extension.
 
 Alert on user or recovery impact, not every logged exception. Test routing with a synthetic or controlled alert before release.
 
@@ -105,11 +105,11 @@ Use `docs/runbooks/` for backup restore, deployment rollback, failed schema appl
 
 Keep Operating Limits at `docs/operations/limits.md`. Classify each value as enforced, tested, supported, or an alert threshold. Do not treat a tested value as an enforced or supported commitment without a separate classification.
 
-Keep a release evidence record from the template. It links the immutable artifact, schema plan, automated gates, restore exercise, deployment result, Primary Business Flow check, rollback exercise, alert test, known limitations, and every skipped check.
+Keep a release record from the template. It links the immutable artifact, schema plan, automated gates, restore exercise, deployment result, primary release flow end-to-end test, rollback exercise, alert test, known limitations, and every skipped check.
 
 ## Examples
 
-A release applies a reviewed Marten schema plan, deploys the versioned API artifact, waits for `/health/ready`, runs the Primary Business Flow check, and retains one command that restores the previous artifact if the smoke test fails.
+A release applies a reviewed Marten schema plan, deploys the versioned API artifact, waits for `/health/ready`, runs the primary release flow's end-to-end test, and retains one command that restores the previous artifact if the test fails.
 
 ## Verification
 
@@ -118,6 +118,6 @@ A release applies a reviewed Marten schema plan, deploys the versioned API artif
 - Inspect metric attributes for unbounded or sensitive values and verify cross-process trace context.
 - Test liveness and readiness under dependency failure.
 - Run schema application and rollback compatibility checks.
-- Restore the latest backup into an isolated environment and run the Primary Business Flow check.
+- Restore the latest backup into an isolated environment and run the primary release flow's end-to-end test.
 - Run deployment, smoke-test, and rollback procedures.
 - Exercise baseline alert routing and confirm each alert links to an owned runbook.

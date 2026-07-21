@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Standards v1 gives one maintainer and collaborating agents a bounded way to build and operate one business web application. It is a documentation and contract release, not generated application code.
+Standards v1 defines the Litenova Engineering System for one maintainer and collaborating agents building and operating one business web application. The system combines durable specifications, engineering rules, executable verification, and release records. It is a documentation and contract release, not generated application code.
 
 Exact versions, profile composition, extension paths, scopes, and task load plans live in `standards.manifest.json`.
 
@@ -12,12 +12,12 @@ V1 contains:
 
 - The root agent protocol and source-precedence rules.
 - A machine-readable manifest plus schemas for the manifest, consumer selection, and Specification Metadata.
-- Foundations for supported scope, engineering principles, ADDD, agent work, and application release evidence.
+- Foundations for supported scope, engineering principles, LES, agent work, and application release control.
 - One `dotnet-nextjs` platform profile.
 - Repository, backend, frontend, testing, security, operations, and CI conventions with canonical rule IDs.
 - Project-scoped and locally applicable extension standards.
 - Guides for adoption, Domain modeling, and release migration.
-- Templates for Product, Business Flow, Subject, Use case, Workflow, Shared Rule, Claims and Evidence, Operating Limits, Page, decision, runbook, and release evidence records.
+- Templates for product, end-to-end flow, module, use case, workflow, domain policy, decision evidence, operating limits, page, decision, runbook, and release records.
 - Reference decisions and a shared glossary.
 
 The standards repository has no CLI, generated catalog, application generator, or bundled consumer validator. Consumers remain normal source repositories and pin this repository as a standards dependency.
@@ -26,17 +26,17 @@ The standards repository has no CLI, generated catalog, application generator, o
 
 | Area | V1 contains |
 |:---|:---|
-| Product delivery | One bounded context, one deployed Primary Business Flow, Use-case specifications, stable acceptance and Flow-check IDs, and Risk-driven assurance |
-| Backend shape | Domain, Application, Infrastructure, and WebApi projects, plus AppHost and ServiceDefaults; Subject-first folders; inward references; internal sealed implementations |
-| Domain model | Aggregate roots, typed IDs, Value Objects, required state record hierarchies, transitions, Aggregate Rules, Domain Events, repository boundaries, and safe Domain failures |
-| Application | LiteBus Commands and Queries, validators, handlers, transport-neutral results and failures, target authorization, narrow ports, Follow-ups, and durable Workflow orchestration |
+| Product delivery | One bounded context, one deployed primary release flow, use-case specifications, stable acceptance and end-to-end test IDs, and risk-driven assurance |
+| Backend shape | Domain, Application, Infrastructure, and WebApi projects, plus AppHost and ServiceDefaults; module-first folders; inward references; internal sealed implementations |
+| Domain model | Aggregate roots, typed IDs, value objects, required state record hierarchies, transitions, aggregate invariants, domain events, repository boundaries, and safe domain failures |
+| Application | LiteBus commands and queries, validators, handlers, transport-neutral results and failures, target authorization, narrow ports, event reactions, and durable workflow orchestration |
 | Persistence | PostgreSQL and Marten, scoped sessions, Aggregate repositories, direct Query projections, one post-handler commit, explicit JSON contracts, document evolution, indexes, and release-time schema application |
 | HTTP | Minimal API endpoints, deterministic discovery, claims-derived actors, resource authorization, Problem Details, pagination, documented statuses, and deterministic OpenAPI |
-| Frontend | Optional Next.js App Router applications, server-first rendering, Subject isolation, generated API types, one typed client, serializable action results, explicit route states, accessibility, and layered tests |
-| Verification | Domain, Application, Integration, and Architecture tests; real PostgreSQL and API harnesses; acceptance trace; generated-contract freshness; Flow checks for Business Flows |
+| Frontend | Optional Next.js App Router applications, server-first rendering, module isolation, generated API types, one typed client, serializable action results, explicit route states, accessibility, and layered tests |
+| Verification | Domain, Application, Integration, and Architecture tests; real PostgreSQL and API harnesses; acceptance trace; generated-contract freshness; end-to-end tests for end-to-end flows |
 | Security | Provider-neutral JWT validation, deny-by-default access, resource authorization, safe errors, input and browser boundaries, secret handling, abuse controls, CORS, audit Events, rotation, and supply-chain gates |
-| Operations | Aspire local orchestration, trace-correlated diagnostics, bounded metrics, liveness and readiness, schema rollout, tested restore, repeatable deployment and rollback, alerts, Operating Limits, runbooks, and release evidence |
-| CI and release | Locked restores, applicable jobs, contract and schema checks, dependency inventory, immutable artifacts, readiness, deployed Flow checks, and branch protection |
+| Operations | Aspire local orchestration, trace-correlated diagnostics, bounded metrics, liveness and readiness, schema rollout, tested restore, repeatable deployment and rollback, alerts, operating limits, runbooks, and release records |
+| CI and release | Locked restores, applicable jobs, contract and schema checks, dependency inventory, immutable artifacts, readiness, deployed end-to-end tests, and branch protection |
 
 A frontend is optional. Worker and Acceptance.Tests projects are conditional. The baseline uses one API process and one PostgreSQL database.
 
@@ -48,7 +48,7 @@ An extension remains inactive until its activation rule applies and the consumer
 
 ## Application v1 claim
 
-A consumer may claim application v1 only after its Primary Business Flow is deployed and the complete [release gate](../foundations/release-standard.md) passes. The claim includes verified behavior specifications, a deployed Flow check, access control, schema repeatability, tested restore, diagnostics, CI, deployment, rollback, Operating Limits, runbooks, and release evidence for one artifact.
+A consumer may claim application v1 only after its primary release flow is deployed and the complete [release gate](../foundations/release-standard.md) passes. The claim includes verified behavior specifications, a deployed end-to-end test, access control, schema repeatability, tested restore, diagnostics, CI, deployment, rollback, operating limits, runbooks, and a release record for one artifact.
 
 Passing standards repository checks proves the standards package is internally consistent. It does not prove a consumer application is release-ready.
 

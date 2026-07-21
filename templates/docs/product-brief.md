@@ -2,10 +2,10 @@
 {
   "kind": "product",
   "id": "__PROJECT_ID__",
-  "recordStatus": "current",
+  "specStatus": "approved",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD",
-  "primaryBusinessFlow": "__PRIMARY_BUSINESS_FLOW__"
+  "primaryReleaseFlow": "__PRIMARY_RELEASE_FLOW__"
 }
 ---
 # __PROJECT__ Product Brief
@@ -20,7 +20,7 @@ State the current user problem without describing the implementation.
 
 ## Product outcome
 
-State the first observable product outcome. Link `docs/product/flows/__PRIMARY_BUSINESS_FLOW__.md` as the Primary Business Flow.
+State the first observable product outcome. Link `docs/product/flows/__PRIMARY_RELEASE_FLOW__.md` as the primary release flow.
 
 ## Success measure
 

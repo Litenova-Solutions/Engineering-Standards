@@ -2,11 +2,11 @@
 {
   "kind": "workflow",
   "id": "__WORKFLOW__",
-  "recordStatus": "current",
-  "deliveryStatus": "planned",
+  "specStatus": "approved",
+  "implementationStatus": "planned",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD",
-  "participatingSubjects": ["__SUBJECT__"],
+  "participatingModules": ["__MODULE__"],
   "applicableExtensions": []
 }
 ---
@@ -14,17 +14,17 @@
 
 ## Business purpose
 
-State the system-controlled result and link each Business Flow that uses it.
+State the system-controlled result and link each end-to-end flow that uses it.
 
 ## Ownership
 
 - Business owner: `__OWNER__`.
 - Workflow state owner: Name the Application and Infrastructure boundary.
-- Participating Subjects: List Subject IDs.
+- Participating modules: List module IDs.
 
 ## Start and completion
 
-- Starting Event, Command, or schedule: `__START__`.
+- Starting event, Command, or schedule: `__START__`.
 - Completion condition: State the durable completed outcome.
 - Failure condition: State when automatic progress stops.
 
@@ -36,16 +36,16 @@ State the system-controlled result and link each Business Flow that uses it.
 
 ## Progression
 
-| Current state | Received Event reference or trigger | Command issued | Next state |
+| Current state | Received event reference or trigger | Command issued | Next state |
 |:---|:---|:---|:---|
-| `__STATE__` | `__SUBJECT__.__EVENT__` | `__SUBJECT__.__USE_CASE__` | `__NEXT_STATE__` |
+| `__STATE__` | `__MODULE__.__EVENT__` | `__MODULE__.__USE_CASE__` | `__NEXT_STATE__` |
 
-Commands reference documented Command Use cases. Events use stable business names and link to their owning Subject.
+Commands reference documented Command use cases. Events use stable business names and link to their owning module.
 
 ## Delivery and duplicate handling
 
 - Idempotency key: State the stable key.
-- Duplicate Event behavior: State the result.
+- Duplicate event behavior: State the result.
 - Duplicate Command behavior: State the result.
 - Outgoing delivery: State the outbox or scheduler boundary.
 

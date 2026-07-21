@@ -57,7 +57,7 @@ Prefer UTC schedules. A business-local schedule records an IANA time-zone identi
 
 ## Conventions
 
-Create one handler per job under the subject that owns the behavior. Resolve scoped dependencies inside an execution scope and dispose the scope after the command completes. Keep schedule definitions separate from command behavior.
+Create one handler per job under the module that owns the behavior. Resolve scoped dependencies inside an execution scope and dispose the scope after the command completes. Keep schedule definitions separate from command behavior.
 
 ## Dependencies
 

@@ -37,7 +37,7 @@ Do not add `IDatabaseContext`, `IReadDatabase`, callback wrappers, generic read 
 
 A global LiteBus command post-handler calls `IDocumentSession.SaveChangesAsync` once after the command handler succeeds. A failed command leaves the scoped session uncommitted.
 
-Handlers, repositories, validators, Follow-up implementations, Workflow Orchestrators, and endpoints do not call `SaveChangesAsync`.
+Handlers, repositories, validators, event reaction implementations, workflow orchestrators, and endpoints do not call `SaveChangesAsync`.
 
 ### Collect events without a public unit of work (PERSIST.EVENTS.001)
 
@@ -147,7 +147,7 @@ Add an index from an accepted query or measured operating need. Record represent
 
 ### Add read documents for query-shaped data
 
-Query stored aggregate documents directly while accepted reads remain simple. Add a subject-owned read document or projection when a real query needs repeated cross-aggregate composition, deep polymorphic traversal, or an index shape that would distort the aggregate. Define its consistency and rebuild behavior with the use case.
+Query stored aggregate documents directly while accepted reads remain simple. Add a module-owned read document or projection when a real query needs repeated cross-aggregate composition, deep polymorphic traversal, or an index shape that would distort the aggregate. Define its consistency and rebuild behavior with the use case.
 
 ### Persist one explicit state object
 

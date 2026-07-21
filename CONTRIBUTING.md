@@ -18,7 +18,7 @@ Before requesting review:
 - Validate `standards.manifest.json` and `templates/docs/standards.project.json` against their schemas.
 - Update the changelog.
 - Add an upgrade guide when an existing compliant consumer must change in a post-v1 release.
-- Update document templates when ADDD metadata or required sections change.
+- Update document templates when LES Specification Metadata or required sections change.
 - Run `git diff --check`.
 
 The repository intentionally has no standards CLI, generated catalog, application scaffold, or bundled consumer validator. Validate JSON shape with the tracked schemas and run cross-file checks through consumer CI or review tooling.

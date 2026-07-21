@@ -4,14 +4,15 @@
 
 Target release: `v1.3.0`.
 
-- Renamed ADDD to Agent-Driven Domain Delivery and defined it as a delivery method with explicit industry mappings.
-- Replaced the planning hierarchy with relationships among Product, Business Flow, Subject, Use case, Workflow, Aggregate, acceptance criterion, and Flow check.
-- Defined Subject as a language and navigation boundary that may contain zero, one, or multiple Aggregates.
-- Added Business Flow, Workflow, Workflow Orchestrator, Follow-up, Shared Rule, and Claims and Evidence records.
-- Retained mandatory Aggregate state-record hierarchies while separating business-state documentation from the technical state mapping.
-- Added kind-specific Specification Metadata with separate record and delivery status.
+- Defined the Litenova Engineering System as the complete specification, engineering, verification, and release model, with Agent-Driven Engineering as its operating model and Specification-Driven Delivery as its delivery approach.
+- Replaced Subject with Module, Business Flow with End-to-End Flow, Primary Business Flow with Primary Release Flow, and Flow Check with End-to-End Test.
+- Replaced Follow-up with Event Reaction, Aggregate Rule with Aggregate Invariant, and the Shared Rule umbrella with Domain Policy.
+- Replaced Claims and Evidence with Decision Evidence and Release Evidence with Release Record.
+- Retained mandatory aggregate state-record hierarchies and prohibited lifecycle enums, status strings, boolean flags, and computed discriminators as replacements.
+- Added kind-specific Specification Metadata with `specStatus` and `implementationStatus`.
+- Renamed structured kinds, fields, template paths, documentation directories, rule IDs, and `FC-*` identifiers to their v1.3 LES forms without compatibility aliases.
 - Replaced consumer `extensions` with `selectedExtensions`, added project or local extension activation scopes, and advanced the manifest schema to version 2.
-- Replaced the ADDD routing schema with a kind-discriminated Specification Metadata schema.
+- Replaced the routing schema with a kind-discriminated Specification Metadata schema.
 - Added the v1.3 consumer upgrade guide.
 
 ## v1.2.0

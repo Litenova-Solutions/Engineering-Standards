@@ -2,13 +2,13 @@
 {
   "kind": "page",
   "id": "__APP__.__PAGE__",
-  "recordStatus": "current",
-  "deliveryStatus": "planned",
+  "specStatus": "approved",
+  "implementationStatus": "planned",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD",
   "app": "__APP__",
   "route": "__ROUTE__",
-  "useCases": ["__SUBJECT__.__USE_CASE__"],
+  "useCases": ["__MODULE__.__USE_CASE__"],
   "applicableExtensions": []
 }
 ---
@@ -18,7 +18,7 @@
 
 | Use case | Component | Trigger | Result presentation |
 |:---|:---|:---|:---|
-| `__SUBJECT__.__USE_CASE__` | `__COMPONENT__` | State the interaction. | State the visible result. |
+| `__MODULE__.__USE_CASE__` | `__COMPONENT__` | State the interaction. | State the visible result. |
 
 ## States
 
@@ -39,7 +39,7 @@ Describe multi-step behavior, URL state, focus, and navigation results.
 ```text
 apps/__APP__/src/
   app/__ROUTE_FOLDER__/page.tsx
-  features/__SUBJECT__/__USE_CASE__/
+  features/__MODULE__/__USE_CASE__/
     __COMPONENT__.tsx
 ```
 

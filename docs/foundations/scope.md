@@ -10,7 +10,7 @@ The boundary is deliberate. Applications outside it may still use individual ide
 
 - Apply version 1 to one bounded-context business application.
 - Use the selected ASP.NET Core, PostgreSQL, Marten, and optional Next.js profile.
-- Deliver one release-ready primary Business Flow before secondary product outcomes.
+- Deliver one release-ready primary release flow before secondary product outcomes.
 - Activate conditional behavior through named extensions.
 - Record a decision before departing from a required standard.
 
@@ -24,13 +24,13 @@ An API-only catalog fits. A native mobile application without the supported API 
 
 ### Keep one bounded context (SCOPE.CONTEXT.001)
 
-The application has one business language and one deployment boundary. Subjects group a stable business noun, its model, and its use cases inside that context. They do not become independent services or bounded contexts.
+The application has one business language and one deployment boundary. Modules group cohesive domain language, models, use cases, and code inside that context. They do not become independent services or bounded contexts.
 
-`Posts`, `Authors`, and `Comments` may be separate subjects in one publishing context.
+Posts, Authors, and Comments may be separate modules in one publishing context.
 
-### Deliver a release-ready primary Business Flow (SCOPE.V1.001)
+### Deliver a release-ready primary release flow (SCOPE.V1.001)
 
-Application v1 includes one deployed primary Business Flow plus its required security, persistence, diagnostics, automated evidence, backup, deployment, rollback, and operating instructions.
+Application v1 includes one deployed primary release flow plus its required security, persistence, diagnostics, automated evidence, backup, deployment, rollback, and operating instructions.
 
 V1 does not require speculative scale, multi-region operation, or optional product areas.
 
@@ -56,11 +56,11 @@ Record the current load, latency target, and observed constraint before introduc
 
 ## Examples
 
-A publishing v1 may support author sign-in, draft creation, publication, and public reading. Multi-tenant publications, live collaborative editing, and bulk analytics remain outside the Primary Business Flow unless the product brief makes one of them essential.
+A publishing v1 may support author sign-in, draft creation, publication, and public reading. Multi-tenant publications, live collaborative editing, and bulk analytics remain outside the primary release flow unless the product brief makes one of them essential.
 
 ## Verification
 
-- Confirm the product brief names one primary Business Flow.
+- Confirm the product brief names one primary release flow.
 - Confirm `standards.project.json` selects `dotnet-nextjs`.
 - Confirm each active conditional concern appears in `selectedExtensions` and each local extension appears on its applicable specifications.
 - Confirm unsupported architecture choices have a project decision.

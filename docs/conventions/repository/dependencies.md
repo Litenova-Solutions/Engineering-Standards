@@ -55,13 +55,13 @@ Extensions may introduce only the packages listed in their dependency section an
 
 ### Keep frontend applications isolated (DEP.FRONTEND.001)
 
-A frontend cannot import another application's source or another subject's internal feature files. Shared packages expose a documented public entry point and cannot depend on an application.
+A frontend cannot import another application's source or another module's internal feature files. Shared packages expose a documented public entry point and cannot depend on an application.
 
 ## Conventions
 
 ### Reference only the LiteBus module required
 
-Use command abstractions for Commands, query abstractions for Queries, and event abstractions for Follow-up handlers. Do not add a unified application bus or a broad package when the layer needs one module.
+Use command abstractions for commands, query abstractions for queries, and event abstractions for event reaction handlers. Do not add a unified application bus or a broad package when the layer needs one module.
 
 ### Keep generated packages dependency-light
 

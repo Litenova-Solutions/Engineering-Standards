@@ -1,17 +1,17 @@
 ---
 {
-  "kind": "claims-and-evidence",
-  "id": "__CLAIMS_RECORD__",
-  "recordStatus": "current",
+  "kind": "decision-evidence",
+  "id": "__EVIDENCE_RECORD__",
+  "specStatus": "approved",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD"
 }
 ---
-# __CLAIMS_TITLE__
+# __EVIDENCE_TITLE__
 
 ## Purpose
 
-State the decision, Business Flow, or release condition supported by this record.
+State the decision, end-to-end flow, or release condition supported by this investigation. Use a separate Decision Evidence record only when the research needs its own owner and lifecycle.
 
 ## Claims
 

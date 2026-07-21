@@ -62,16 +62,16 @@ Do not add a package, migration, authentication model change, public API break, 
 - Use Domain, Application, Infrastructure, and WebApi as the four application projects.
 - Keep Domain free of persistence, web, mediator, logging, and dependency injection packages.
 - Give every Aggregate an abstract state base and at least one sealed state record; do not use lifecycle enums, status strings, or status flags.
-- Organize every layer by the same business subjects and use cases.
+- Organize every layer by the same domain modules and use cases.
 - Name Application handlers, validators, results, and query result items with explicit `Command` or `Query` role suffixes.
 - Name HTTP transport DTOs with a concrete boundary role ending in `Model`, including `RequestModel` and `ResponseModel`; name operation mappings with `ApiMappings`.
 - Keep handlers, validators, endpoints, and persistence implementations internal sealed.
 - Write commands through aggregate repositories and read queries through `IQuerySession`.
-- Do not call `SaveChangesAsync` from handlers, repositories, endpoints, Follow-up implementations, or Workflow Orchestrators.
+- Do not call `SaveChangesAsync` from handlers, repositories, endpoints, event reaction implementations, or workflow orchestrators.
 - Commit once through the LiteBus command post-handler.
 - Use Minimal API `IEndpoint`; MVC controllers are outside the profile.
 - Derive authenticated actor IDs from verified claims and authorize the target resource.
-- Keep frontend subject internals isolated and route files focused on composition.
+- Keep frontend module internals isolated and route files focused on composition.
 - Validate backend options and frontend environment access through owned modules.
 - Cite every acceptance-criterion ID from verified Use cases in automated tests.
 - Regenerate OpenAPI and typed consumers with their sources.
@@ -110,7 +110,7 @@ pnpm test
 pnpm build
 ```
 
-Run Playwright for affected browser Business Flows and extension-specific verification for every applicable extension affected by the change.
+Run Playwright for affected browser end-to-end flows and extension-specific verification for every applicable extension affected by the change.
 
 ## Completion
 

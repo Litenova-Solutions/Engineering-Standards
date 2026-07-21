@@ -1,24 +1,24 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/specification-metadata.schema.json",
-  "title": "ADDD Specification Metadata",
-  "description": "JSON metadata blocks embedded at the start of structured ADDD specifications.",
+  "title": "LES Specification Metadata",
+  "description": "JSON metadata blocks embedded at the start of structured LES specifications.",
   "oneOf": [
     { "$ref": "#/$defs/product" },
     { "$ref": "#/$defs/domainIndex" },
     { "$ref": "#/$defs/glossary" },
-    { "$ref": "#/$defs/subjectsIndex" },
-    { "$ref": "#/$defs/subject" },
+    { "$ref": "#/$defs/modulesIndex" },
+    { "$ref": "#/$defs/module" },
     { "$ref": "#/$defs/useCase" },
-    { "$ref": "#/$defs/businessFlow" },
+    { "$ref": "#/$defs/endToEndFlow" },
     { "$ref": "#/$defs/workflow" },
-    { "$ref": "#/$defs/sharedRule" },
-    { "$ref": "#/$defs/claimsAndEvidence" },
+    { "$ref": "#/$defs/domainPolicy" },
+    { "$ref": "#/$defs/decisionEvidence" },
     { "$ref": "#/$defs/operatingLimits" },
     { "$ref": "#/$defs/page" },
     { "$ref": "#/$defs/decision" },
     { "$ref": "#/$defs/runbook" },
-    { "$ref": "#/$defs/releaseEvidence" }
+    { "$ref": "#/$defs/releaseRecord" }
   ],
   "$defs": {
     "identifier": {
@@ -37,11 +37,11 @@
       "type": "string",
       "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
     },
-    "recordStatus": {
+    "specStatus": {
       "type": "string",
-      "enum": ["draft", "current", "retired"]
+      "enum": ["draft", "approved", "retired"]
     },
-    "deliveryStatus": {
+    "implementationStatus": {
       "type": "string",
       "enum": ["planned", "verified"]
     },
@@ -88,24 +88,24 @@
     "product": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed", "primaryBusinessFlow"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed", "primaryReleaseFlow"],
       "properties": {
         "kind": { "const": "product" },
         "id": { "$ref": "#/$defs/identifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
-        "primaryBusinessFlow": { "$ref": "#/$defs/identifier" }
+        "primaryReleaseFlow": { "$ref": "#/$defs/identifier" }
       }
     },
     "domainIndex": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "domain-index" },
         "id": { "$ref": "#/$defs/identifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
       }
@@ -113,35 +113,35 @@
     "glossary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "glossary" },
         "id": { "$ref": "#/$defs/identifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
       }
     },
-    "subjectsIndex": {
+    "modulesIndex": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
-        "kind": { "const": "subjects-index" },
+        "kind": { "const": "modules-index" },
         "id": { "$ref": "#/$defs/identifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
       }
     },
-    "subject": {
+    "module": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
-        "kind": { "const": "subject" },
+        "kind": { "const": "module" },
         "id": { "$ref": "#/$defs/identifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
         "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
@@ -153,8 +153,8 @@
       "required": [
         "kind",
         "id",
-        "recordStatus",
-        "deliveryStatus",
+        "specStatus",
+        "implementationStatus",
         "owner",
         "lastReviewed",
         "operationType",
@@ -166,8 +166,8 @@
       "properties": {
         "kind": { "const": "use-case" },
         "id": { "$ref": "#/$defs/useCaseIdentifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
-        "deliveryStatus": { "$ref": "#/$defs/deliveryStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "implementationStatus": { "$ref": "#/$defs/implementationStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
         "operationType": {
@@ -180,24 +180,24 @@
         "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
       }
     },
-    "businessFlow": {
+    "endToEndFlow": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "kind",
         "id",
-        "recordStatus",
-        "deliveryStatus",
+        "specStatus",
+        "implementationStatus",
         "owner",
         "lastReviewed",
         "releaseRole",
         "useCases"
       ],
       "properties": {
-        "kind": { "const": "business-flow" },
+        "kind": { "const": "end-to-end-flow" },
         "id": { "$ref": "#/$defs/identifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
-        "deliveryStatus": { "$ref": "#/$defs/deliveryStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "implementationStatus": { "$ref": "#/$defs/implementationStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
         "releaseRole": {
@@ -214,21 +214,21 @@
       "required": [
         "kind",
         "id",
-        "recordStatus",
-        "deliveryStatus",
+        "specStatus",
+        "implementationStatus",
         "owner",
         "lastReviewed",
-        "participatingSubjects",
+        "participatingModules",
         "applicableExtensions"
       ],
       "properties": {
         "kind": { "const": "workflow" },
         "id": { "$ref": "#/$defs/identifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
-        "deliveryStatus": { "$ref": "#/$defs/deliveryStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "implementationStatus": { "$ref": "#/$defs/implementationStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
-        "participatingSubjects": {
+        "participatingModules": {
           "allOf": [
             { "$ref": "#/$defs/identifierArray" },
             { "minItems": 1 }
@@ -237,37 +237,33 @@
         "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
       }
     },
-    "sharedRule": {
+    "domainPolicy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed", "ruleType", "appliesTo"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed", "appliesToModules"],
       "properties": {
-        "kind": { "const": "shared-rule" },
+        "kind": { "const": "domain-policy" },
         "id": { "$ref": "#/$defs/identifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
-        "ruleType": {
-          "type": "string",
-          "enum": ["business-policy", "authorization-rule", "storage-constraint"]
-        },
-        "appliesTo": {
+        "appliesToModules": {
           "allOf": [
             { "$ref": "#/$defs/identifierArray" },
-            { "minItems": 2 }
+            { "minItems": 1 }
           ]
         },
         "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
       }
     },
-    "claimsAndEvidence": {
+    "decisionEvidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
-        "kind": { "const": "claims-and-evidence" },
+        "kind": { "const": "decision-evidence" },
         "id": { "$ref": "#/$defs/recordIdentifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
       }
@@ -275,11 +271,11 @@
     "operatingLimits": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "operating-limits" },
         "id": { "$ref": "#/$defs/recordIdentifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
       }
@@ -290,8 +286,8 @@
       "required": [
         "kind",
         "id",
-        "recordStatus",
-        "deliveryStatus",
+        "specStatus",
+        "implementationStatus",
         "owner",
         "lastReviewed",
         "app",
@@ -301,8 +297,8 @@
       "properties": {
         "kind": { "const": "page" },
         "id": { "$ref": "#/$defs/pageIdentifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
-        "deliveryStatus": { "$ref": "#/$defs/deliveryStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "implementationStatus": { "$ref": "#/$defs/implementationStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
         "app": { "$ref": "#/$defs/identifier" },
@@ -314,11 +310,11 @@
     "decision": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "decision" },
         "id": { "$ref": "#/$defs/recordIdentifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
       }
@@ -326,23 +322,23 @@
     "runbook": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "runbook" },
         "id": { "$ref": "#/$defs/recordIdentifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
       }
     },
-    "releaseEvidence": {
+    "releaseRecord": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed", "release"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed", "release"],
       "properties": {
-        "kind": { "const": "release-evidence" },
+        "kind": { "const": "release-record" },
         "id": { "$ref": "#/$defs/recordIdentifier" },
-        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
         "release": { "type": "string", "minLength": 1 }

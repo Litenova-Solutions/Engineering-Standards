@@ -20,8 +20,8 @@ Components should have one clear ownership level and expose accessible behavior 
 | Level | Location | Responsibility |
 |:---|:---|:---|
 | Route composition | `app/` | Select shell, data, metadata, and feature composition. |
-| Use-case component | `features/{subject}/{use-case}/` | Present and coordinate one documented use case. |
-| Shared product component | `components/` | Present UI used by at least two subjects. |
+| Use-case component | `features/{module}/{use-case}/` | Present and coordinate one documented use case. |
+| Shared product component | `components/` | Present UI used by at least two modules. |
 | UI primitive | `components/ui/` | Own shadcn/ui or project primitive source without business behavior. |
 
 Do not place business operations inside `components/ui/`.

@@ -1,9 +1,9 @@
 ---
 {
   "kind": "use-case",
-  "id": "__SUBJECT__.__USE_CASE__",
-  "recordStatus": "current",
-  "deliveryStatus": "planned",
+  "id": "__MODULE__.__USE_CASE__",
+  "specStatus": "approved",
+  "implementationStatus": "planned",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD",
   "operationType": "__OPERATION_TYPE__",
@@ -21,7 +21,7 @@ State the actor or system goal and its observable result.
 
 ## Trigger
 
-State the actor action, Event, schedule, or system condition that starts this Use case.
+State the actor action, event, schedule, or system condition that starts this use case.
 
 ## Authorization
 
@@ -41,8 +41,8 @@ State the observable result without exposing persistence types.
 
 | Rule ID | Type | Required behavior |
 |:---|:---|:---|
-| `INV-__SUBJECT_ID__-01` | Aggregate Rule | State how this Use case applies the rule. |
-| `POL-__SHARED_RULE_ID__-01` | Business Policy | Remove when no Shared Rule applies. |
+| `INV-__MODULE_ID__-01` | Aggregate Invariant | State how this use case applies the invariant. |
+| `POL-__POLICY_ID__-01` | Domain Policy | Remove when no domain policy applies. |
 
 ## Successful path
 
@@ -50,13 +50,13 @@ State the observable result without exposing persistence types.
 
 ## Domain behavior
 
-For a Command, list every Aggregate changed. For a Query, write `No Domain transition` and name the Read Model.
+For a Command, list every aggregate changed. For a Query, write `No Domain transition` and name the Read Model.
 
 | Aggregate | Source state | Business action | Target state | Rules | Event references |
 |:---|:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `INV-__SUBJECT_ID__-01` | `__SUBJECT__.__PAST_TENSE_EVENT__` |
+| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `INV-__MODULE_ID__-01` | `__MODULE__.__PAST_TENSE_EVENT__` |
 
-When more than one Aggregate appears, state the rule that requires one transaction.
+When more than one aggregate appears, state the invariant or domain policy that requires one transaction.
 
 ## Failures
 
@@ -66,9 +66,9 @@ When more than one Aggregate appears, state the rule that requires one transacti
 
 ## Acceptance criteria
 
-- [AC-__SUBJECT_ID__-__USE_CASE_ID__-01] Replace with one observable criterion.
+- [AC-__MODULE_ID__-__USE_CASE_ID__-01] Replace with one observable criterion.
 
-A `planned` Use case may have no test reference. A `verified` Use case has at least one acceptance criterion, every acceptance ID appears in automated test source, and applicable test commands have passed.
+A use case with `implementationStatus: planned` may have no test reference. A verified use case has at least one acceptance criterion, every acceptance ID appears in automated test source, and applicable test commands have passed.
 
 ## Examples
 
@@ -80,7 +80,7 @@ Then the expected result is observable
 
 ### Rejected example
 
-Given a state that violates `INV-__SUBJECT_ID__-01`
+Given a state that violates `INV-__MODULE_ID__-01`
 When the actor performs the operation
 Then `__ERROR_CODE__` is returned without a state change
 
@@ -106,4 +106,4 @@ State schema, external dependency, diagnostic, deployment, recovery, or runbook 
 
 ## Verification
 
-- List exact commands and expected evidence for this Use case.
+- List exact commands and expected evidence for this use case.

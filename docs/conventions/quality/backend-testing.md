@@ -31,9 +31,9 @@ Acceptance.Tests appears only when the executable BDD extension activates.
 
 ### Test Domain in isolation (BTEST.DOMAIN.001)
 
-Domain tests cover factories, every supported lifecycle state, allowed and rejected transitions, Aggregate Rules, value equality, collection behavior, money rules, exceptions, and raised Events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
+Domain tests cover factories, every supported lifecycle state, allowed and rejected transitions, aggregate invariants, value equality, collection behavior, money rules, exceptions, and raised events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
 
-Each subject invariant maps through its use-case specification to at least one cited acceptance ID. Domain tests may add narrower cases without an acceptance ID.
+Each module invariant maps through its use-case specification to at least one cited acceptance ID. Domain tests may add narrower cases without an acceptance ID.
 
 ### Test Application coordination (BTEST.APPLICATION.001)
 
@@ -63,11 +63,11 @@ Architecture.Tests verify:
 - Internal sealed handlers, validators, endpoints, and persistence implementations.
 - Public visibility of ports implemented across project boundaries.
 - Endpoint isolation from repositories and sessions.
-- Subject folder and naming conventions that static analysis can prove.
+- Module folder and naming conventions that static analysis can prove.
 - Full `Command` and `Query` role suffixes on Application results, query result items, handlers, and validators.
 - Concrete boundary-role names ending in `Model` for passive WebApi DTOs and `ApiMappings` for operation mappings.
 - Aggregate inheritance from `AggregateRoot<TId>` and the absence of lifecycle enums.
-- Absence of `ISubject`, `SubjectRoot`, or another runtime subject abstraction.
+- Absence of `IModule`, `ModuleRoot`, or another runtime module abstraction.
 - Extension-specific replacements.
 
 ### Trace acceptance criteria (BTEST.TRACE.001)
@@ -104,7 +104,7 @@ Security integration tests use locally issued JWTs that exercise the configured 
 
 ## Conventions
 
-### Mirror production subject names
+### Mirror production module names
 
 ```text
 {ProjectName}.Domain.Tests/

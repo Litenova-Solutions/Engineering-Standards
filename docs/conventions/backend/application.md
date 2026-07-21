@@ -6,7 +6,7 @@ Application coordinates use cases. It translates a command or query into domain 
 
 ## Agent Summary {#agent-summary}
 
-- Organize Application by subject and use case.
+- Organize Application by module and use case.
 - Co-locate each message with its role-explicit result, validator, and handler.
 - Dispatch writes through `ICommandMediator` and reads through `IQueryMediator`.
 - Keep handlers and validators internal sealed.
@@ -20,7 +20,7 @@ Application coordinates use cases. It translates a command or query into domain 
 
 ### Organize Application by operation (APP.STRUCTURE.001)
 
-Each command or query owns one operation folder under its subject. Keep its message, result, validator, handler, and operation-specific mapping together.
+Each command or query owns one operation folder under its module. Keep its message, result, validator, handler, and operation-specific mapping together.
 
 Use the same use-case prefix across each operation. Command types end in `Command`, `CommandResult`, `CommandValidator`, and `CommandHandler`. Query types end in `Query`, `QueryResult`, `QueryResultItem`, `QueryValidator`, and `QueryHandler`.
 
@@ -30,7 +30,7 @@ Do not group all handlers or messages by technical type.
 
 Commands implement the pinned LiteBus command contract and dispatch through `ICommandMediator.SendAsync`. Queries implement the query contract and dispatch through `IQueryMediator.QueryAsync`.
 
-Domain Events remain package-free. Application Follow-up handlers may implement LiteBus event handler contracts at the adapter boundary.
+Domain events remain package-free. Application event reaction handlers may implement LiteBus event handler contracts at the adapter boundary.
 
 Do not introduce a unified message bus abstraction.
 
@@ -90,9 +90,9 @@ Application owns a public interface when Infrastructure must provide external be
 
 Provider names and transport models remain in Infrastructure.
 
-### Keep Follow-up implementations explicit (APP.FOLLOWUP.001)
+### Keep event reaction implementations explicit (APP.REACTION.001)
 
-Place a Follow-up implementation under the Subject and triggering Event when one Subject owns it. Name the handler for its action and Event. Document whether delivery is `atomic`, `durable`, `rebuildable`, or `best-effort-optional`.
+Place an event reaction implementation under the module and triggering event when one module owns it. Name the handler for its action and event. Document whether delivery is `atomic`, `durable`, `rebuildable`, or `best-effort-optional`.
 
 An optional post-commit handler may run in process. Required delivery activates the outbox extension. Required derived state uses an atomic, durable, or rebuildable projection path.
 
@@ -100,11 +100,11 @@ An optional post-commit handler may run in process. Required delivery activates 
 
 A Command handler MUST NOT dispatch another Command through `ICommandMediator`. Nested command dispatch can invoke the commit post-handler before the top-level Use case completes.
 
-The top-level handler MAY coordinate multiple Aggregates through their repositories when one transaction is required. The current use-case specification or an accepted decision MUST name the Aggregate Rule or Business Policy that requires atomic consistency. Domain objects continue to enforce their own Aggregate Rules.
+The top-level handler MAY coordinate multiple aggregates through their repositories when one transaction is required. The approved use-case specification or an accepted decision MUST name the aggregate invariant or domain policy that requires atomic consistency. Domain objects continue to enforce their own aggregate invariants.
 
 ### Advance durable Workflows through separate Commands (APP.WORKFLOW.001)
 
-A Workflow Orchestrator advances one durable Workflow step from an Event or scheduled trigger. It records Workflow progress and stages the next Command for durable delivery. It does not mutate participating Subject Aggregates directly.
+A workflow orchestrator advances one durable workflow step from an event or scheduled trigger. It records workflow progress and stages the next Command for durable delivery. It does not mutate participating module aggregates directly.
 
 Each issued Command enters its own command pipeline and owns one transaction. Workflow state and the outgoing durable message are staged in one transaction. Duplicate triggers and Commands are safe. The Workflow specification names retries, timeouts, compensation, and operator actions.
 
@@ -155,7 +155,7 @@ Each issued Command enters its own command pipeline and owns one transaction. Wo
       AdvancePublicationDeliveryWorkflowCommandHandler.cs
 ```
 
-Create `Shared` children only for types used by multiple subjects.
+Create `Shared` children only for types used by multiple modules.
 
 ### Keep messages immutable
 
@@ -231,7 +231,7 @@ internal sealed class ConfirmOrderCommandHandler(
 
 The handler stages both Aggregates because the use-case specification names the rule that requires one transaction. It does not call `ICommandMediator` or commit.
 
-### Advance a durable Workflow without mutating Subject Aggregates
+### Advance a durable workflow without mutating module aggregates
 
 ```csharp
 internal sealed class AdvanceOrderFulfillmentWorkflowCommandHandler(
@@ -268,7 +268,7 @@ Infrastructure stages Workflow state and the outgoing Command in the same sessio
 - Confirm command handlers do not commit and query handlers do not use repositories.
 - Confirm a Command handler never dispatches another Command through `ICommandMediator`.
 - Confirm a multi-Aggregate Command names the rule and transaction requirement in its use-case specification.
-- Confirm a Workflow Orchestrator stages progress and outgoing work without mutating participating Subject Aggregates.
+- Confirm a workflow orchestrator stages progress and outgoing work without mutating participating module aggregates.
 - Confirm public ports contain no provider type.
 - Confirm protected messages carry trusted actor context and handlers authorize their targets.
 - Confirm expected failures have stable codes and no HTTP or provider types.

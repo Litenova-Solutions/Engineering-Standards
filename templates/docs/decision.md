@@ -2,7 +2,7 @@
 {
   "kind": "decision",
   "id": "__DECISION_ID__",
-  "recordStatus": "draft",
+  "specStatus": "draft",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD"
 }
@@ -15,7 +15,7 @@ State the concrete constraint or conflict.
 
 ## Decision
 
-State the selected behavior. Change `recordStatus` to `current` when accepted.
+State the selected behavior. Change `specStatus` to `approved` when accepted.
 
 ## Standards impact
 
@@ -25,7 +25,7 @@ State the selected behavior. Change `recordStatus` to `current` when accepted.
 
 | Condition | Required claims or evidence | Owner | Status |
 |:---|:---|:---|:---|
-| State what must be true before activation. | Link Claims and Evidence, a test, provider statement, policy, or review. | `__OWNER__` | `pending`, `met`, or `rejected` |
+| State what must be true before activation. | Link Decision Evidence, a test, provider statement, policy, or review. | `__OWNER__` | `pending`, `met`, or `rejected` |
 
 Remove this section when the decision applies immediately without a gate.
 
@@ -41,7 +41,7 @@ Remove this section when the decision applies immediately without a gate.
 
 State required work, accepted cost, and replacement or review condition.
 
-## Follow-up decisions
+## Pending decisions
 
 - Link a separate decision for each unresolved external, policy, or provider choice. Remove this section when none remain.
 

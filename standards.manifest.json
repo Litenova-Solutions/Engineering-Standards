@@ -40,7 +40,7 @@
     "acceptance-bdd": {
       "path": "docs/extensions/acceptance-bdd.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "business-flow"]
+      "applicableKinds": ["use-case", "end-to-end-flow"]
     },
     "api-compatibility": {
       "path": "docs/extensions/api-compatibility.md",
@@ -59,7 +59,7 @@
     "data-lifecycle": {
       "path": "docs/extensions/data-lifecycle.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "workflow", "shared-rule"]
+      "applicableKinds": ["use-case", "workflow", "domain-policy"]
     },
     "deployment-containers": {
       "path": "docs/extensions/deployment-containers.md",
@@ -90,12 +90,12 @@
     "persistence-ef-core": {
       "path": "docs/extensions/persistence-ef-core.md",
       "activationScope": "local",
-      "applicableKinds": ["subject", "use-case"]
+      "applicableKinds": ["module", "use-case"]
     },
     "realtime": {
       "path": "docs/extensions/realtime.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "business-flow"]
+      "applicableKinds": ["use-case", "end-to-end-flow"]
     },
     "reporting": {
       "path": "docs/extensions/reporting.md",
@@ -362,11 +362,11 @@
     "use-case.authoring": {
       "tier0": ["AGENTS.md"],
       "tier1": [
-        "docs/foundations/addd.md#agent-summary",
+        "docs/foundations/engineering-system.md#agent-summary",
         "docs/foundations/release-standard.md#agent-summary"
       ],
       "tier2": [
-        "docs/foundations/addd.md",
+        "docs/foundations/engineering-system.md",
         "docs/foundations/release-standard.md"
       ]
     },

@@ -47,7 +47,7 @@ Purge and archive work MUST be resumable, bounded, cancellation-aware, and obser
 
 ## Conventions
 
-Use `deleted_at_utc` when a timestamp is required for soft delete. Keep archive records under the owning subject and use a separate read model when archived history is query-shaped rather than part of the aggregate invariant.
+Use `deleted_at_utc` when a timestamp is required for soft delete. Keep archive records under the owning module and use a separate read model when archived history is query-shaped rather than part of the aggregate invariant.
 
 ## Verification
 

@@ -11,7 +11,7 @@ Names should expose business intent and architectural role without requiring a r
 - Use explicit `RequestModel`, `ResponseModel`, and `ApiMappings` suffixes at the HTTP boundary.
 - Use the required architectural suffix for endpoints and persistence classes.
 - Suffix every asynchronous method with `Async` and name its final token `cancellationToken`.
-- Use business subject and use-case names across documentation and code.
+- Use business module and use-case names across documentation and code.
 - Use `sealed` implementation classes, file-scoped namespaces, braces, and explicit access modifiers.
 - Avoid generic `Manager`, `Helper`, `Processor`, `Service`, and `Bus` names.
 
@@ -70,7 +70,7 @@ Domain exceptions use `{DomainType}{Reason}Exception`, such as `PostAlreadyPubli
 
 ### Use intent-revealing boolean names (NAME.BOOLEAN.001)
 
-Boolean properties and methods use `Is`, `Has`, `Can`, or a precise verb when those words fit. Use `IsPublished` and `CanPublish`, not `Published` or `CheckPublish`.
+Boolean properties and methods use `Is`, `Has`, `Can`, or a precise verb when those words fit. Use `HasLines` and `CanPublish`, not `LinesPresent` or `CheckPublish`.
 
 ### Keep implementation style consistent (NAME.CSHARP.001)
 
@@ -88,7 +88,7 @@ C# production code uses:
 
 ### Use predictable frontend names (NAME.FRONTEND.001)
 
-Frontend subject and use-case folders use lowercase kebab-case. React component files and exported component names use PascalCase. Hooks use `use-{name}.ts` or `use-{name}.tsx`. Non-component modules use lowercase kebab-case unless a framework requires another name.
+Frontend module and use-case folders use lowercase kebab-case. React component files and exported component names use PascalCase. Hooks use `use-{name}.ts` or `use-{name}.tsx`. Non-component files use lowercase kebab-case unless a framework requires another name.
 
 Next.js special files retain framework names such as `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`, and `route.ts`.
 
@@ -96,7 +96,7 @@ Next.js special files retain framework names such as `page.tsx`, `layout.tsx`, `
 
 ### Align business names across layers
 
-The `Posts` Subject maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/subjects/posts`. Its Domain folder may contain the `Post` Aggregate and other related Aggregates. Use-case names retain the same verb and Subject across layers.
+The Posts module maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/modules/posts`. Its Domain folder may contain the `Post` aggregate and other related aggregates. Use-case names retain the same verb and module across layers.
 
 ### Keep namespaces aligned with folders
 

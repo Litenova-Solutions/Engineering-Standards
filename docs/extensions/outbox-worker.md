@@ -28,7 +28,7 @@ The Use case carries the `durable-delivery` Risk, or the Workflow lists the exte
 
 ### Use outbox for required durable delivery (EXT.OUTBOX.ADOPT.001)
 
-Document the required delivery guarantee, downstream boundary, duplicate behavior, retry horizon, and recovery owner. Do not activate outbox for `best-effort-optional` Follow-ups that can be repeated manually.
+Document the required delivery guarantee, downstream boundary, duplicate behavior, retry horizon, and recovery owner. Do not activate outbox for `best-effort-optional` event reactions that can be repeated manually.
 
 ### Store messages with the committed change (EXT.OUTBOX.ATOMIC.001)
 

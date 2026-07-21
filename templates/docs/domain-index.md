@@ -2,7 +2,7 @@
 {
   "kind": "domain-index",
   "id": "__PROJECT_ID__",
-  "recordStatus": "current",
+  "specStatus": "approved",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD"
 }
@@ -15,29 +15,29 @@ Name the single business boundary and the responsibilities inside it.
 
 ## Domain language
 
-Use [glossary.md](glossary.md) as the shared term list. Subject-specific terms remain in Subject specifications.
+Use [glossary.md](glossary.md) as the shared term list. Module-specific terms remain in module specifications.
 
-## Subjects
+## Modules
 
-| Subject | Purpose | Specification |
+| Module | Purpose | Specification |
 |:---|:---|:---|
-| `__SUBJECT__` | State the related language and use cases. | Link `subjects/__SUBJECT__/README.md`. |
+| `__MODULE__` | State the related language and use cases. | Link `modules/__MODULE__/README.md`. |
 
 ## Workflows
 
-| Workflow | Business purpose | Participating Subjects |
+| Workflow | Business purpose | Participating modules |
 |:---|:---|:---|
-| `__WORKFLOW__` | State the system-controlled outcome. | List Subject IDs. |
+| `__WORKFLOW__` | State the system-controlled outcome. | List module IDs. |
 
 Remove this section when no Workflow specification exists.
 
-## Shared Rules
+## Domain policies
 
-| Shared Rule | Type | Applies to |
+| Domain policy | Purpose | Applies to modules |
 |:---|:---|:---|
-| `__SHARED_RULE__` | `business-policy` | List Subject IDs. |
+| `__POLICY__` | State the accepted policy. | List module IDs. |
 
-Remove this section when no Shared Rule exists.
+Remove this section when no domain policy specification exists.
 
 ## Folder organization
 
@@ -45,9 +45,9 @@ Remove this section when no Shared Rule exists.
 docs/domain/
   README.md
   glossary.md
-  subjects/
-  workflows/       create with the first Workflow
-  shared-rules/    create with the first Shared Rule
+  modules/
+  workflows/       create with the first workflow
+  policies/        create with the first domain policy
 ```
 
-Business Flow order belongs under `docs/product/flows/`, not in this index.
+End-to-end flow order belongs under `docs/product/flows/`, not in this index.

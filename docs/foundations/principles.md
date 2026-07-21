@@ -20,21 +20,21 @@ These principles resolve choices that a narrower convention does not cover. They
 
 Write each rule, package version, status, route, and acceptance criterion once. Other documents link to that source. Generated application artifacts may derive from authored sources.
 
-Package versions belong in `standards.manifest.json`. Use-case record and delivery status belong in Specification Metadata. Tests cite the acceptance IDs they prove.
+Package versions belong in `standards.manifest.json`. Use-case specification and implementation status belong in Specification Metadata. Tests cite the acceptance IDs they prove.
 
 ### Assign document ownership and freshness (CORE.DOCUMENTS.001)
 
-Structured consumer specifications MUST declare `kind`, `id`, `recordStatus`, `owner`, and `lastReviewed` plus fields required for that kind. The [repository writing convention](../conventions/repository/writing.md) defines the metadata block.
+Structured consumer specifications MUST declare `kind`, `id`, `specStatus`, `owner`, and `lastReviewed` plus fields required for that kind. The [repository writing convention](../conventions/repository/writing.md) defines the metadata block.
 
-`recordStatus` is `draft`, `current`, or `retired`:
+`specStatus` is `draft`, `approved`, or `retired`:
 
 - `draft` is under review and is not authoritative.
-- `current` is authoritative for the documented scope.
+- `approved` is authoritative for the documented scope.
 - `retired` preserves history after the contract no longer applies.
 
-Behavior specifications also use `deliveryStatus: planned` or `deliveryStatus: verified`. A current planned record can describe an approved target without claiming implementation. A verified record MUST name code, test, generated-contract, and operating evidence in its relevant sections. Retire the record after supported public Entry Points are removed.
+Behavior specifications also use `implementationStatus: planned` or `implementationStatus: verified`. An approved specification with planned implementation can describe a required target without claiming that code exists. A verified specification MUST name code, test, generated-contract, and operating evidence in its relevant sections. Retire the specification after supported public entry points are removed.
 
-Do not encode record authority and delivery state in one field.
+Do not encode specification authority and implementation state in one field.
 
 ### Deliver vertical use cases (CORE.SLICE.001)
 

@@ -10,6 +10,7 @@ Written artifacts are part of the standards contract. Consistent structure and A
 - Use the required topic sections and canonical rule IDs.
 - State constraints and decisions with concrete examples.
 - Give every structured consumer specification kind-specific ownership and freshness metadata.
+- Use established technical terms and ordinary capitalization in prose.
 - Use normative vocabulary for required and optional behavior.
 - Run the repository writing checks before review.
 
@@ -35,8 +36,8 @@ Every structured consumer specification MUST start with one JSON block validated
 {
   "kind": "use-case",
   "id": "orders.cancel-order",
-  "recordStatus": "current",
-  "deliveryStatus": "planned",
+  "specStatus": "approved",
+  "implementationStatus": "planned",
   "owner": "Product and engineering",
   "lastReviewed": "2026-07-21",
   "operationType": "command",
@@ -47,9 +48,15 @@ Every structured consumer specification MUST start with one JSON block validated
 }
 ```
 
-`recordStatus` states whether the record is draft, current, or retired. Behavior specifications use `deliveryStatus` to distinguish approved planned behavior from verified implementation. `lastReviewed` records the last review against current business and implementation facts, not the creation date.
+`specStatus` states whether the specification is draft, approved, or retired. Behavior specifications use `implementationStatus` to distinguish planned behavior from verified implementation. `lastReviewed` records the last review against current business and implementation facts, not the creation date.
 
 Do not duplicate owner, status, or review date in a Markdown metadata section. Put implementation paths and verification evidence in the relevant specification sections.
+
+### Use established terms and ordinary capitalization (WRITING.TERMS.001)
+
+Use established terms such as module, aggregate, invariant, Command, Query, workflow, orchestrator, repository, projection, transaction, outbox, and idempotency with the meanings defined by LES and the glossary. Explain a technical term with a concrete example instead of replacing it with a softer local synonym.
+
+Write module, use case, workflow, aggregate, invariant, event, reaction, and policy as ordinary lowercase nouns in prose. Capitalize a code type such as `CancelOrderCommand`, a project layer such as Domain, a title, or the first word of a sentence.
 
 ### Run repeatable writing checks (WRITING.CHECK.001)
 
@@ -61,7 +68,7 @@ Use short paragraphs, descriptive headings, and tables for exact mappings. Name 
 
 ## Examples
 
-Write `Use a hyphen in prose.` instead of inserting a typographic dash. Write `ARCH.CQRS.001` after a rule title instead of referring to an unnamed architecture requirement. A verified Use-case specification maps `apps/api/src/Example.Application/Orders/CancelOrder/`, `apps/api/tests/Example.Integration.Tests/Orders/CancelOrderTests.cs`, and `AC-ORDERS-CANCEL-ORDER-01` in its implementation and verification sections.
+Write `Use a hyphen in prose.` instead of inserting a typographic dash. Write `ARCH.CQRS.001` after a rule title instead of referring to an unnamed architecture requirement. A verified use-case specification maps `apps/api/src/Example.Application/Orders/CancelOrder/`, `apps/api/tests/Example.Integration.Tests/Orders/CancelOrderTests.cs`, and `AC-ORDERS-CANCEL-ORDER-01` in its implementation and verification sections.
 
 ## Verification
 

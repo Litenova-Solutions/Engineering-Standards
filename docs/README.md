@@ -10,7 +10,7 @@ This index gives humans and AI agents one navigation map. Read foundation docume
 |:---|:---|
 | [Supported scope](foundations/scope.md) | Evaluating whether an application fits version 1. |
 | [Engineering principles](foundations/principles.md) | Making a design choice not covered by a narrower convention. |
-| [Agent-Driven Domain Delivery](foundations/addd.md) | Planning, documenting, or implementing product behavior. |
+| [Litenova Engineering System](foundations/engineering-system.md) | Understanding company context, vocabulary, specifications, agent work, or product delivery. |
 | [Agent operating protocol](foundations/agent-protocol.md) | Configuring or reviewing agent behavior. |
 | [Release standard](foundations/release-standard.md) | Deciding whether a use case or application v1 is complete. |
 
@@ -32,9 +32,9 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 
 | Document | Covers |
 |:---|:---|
-| [Architecture](conventions/backend/architecture.md) | Four-project modular monolith, dependency direction, subject and use-case slices, and Worker activation. |
+| [Architecture](conventions/backend/architecture.md) | Four-project modular monolith, dependency direction, module and use-case slices, and Worker activation. |
 | [Domain](conventions/backend/domain.md) | Aggregate roots, required state record hierarchies, Value Objects, IDs, entities, services, Events, repositories, errors, and persistence-neutral object design. |
-| [Application](conventions/backend/application.md) | Commands, Queries, handlers, validators, results, Follow-ups, Workflows, ports, and folders. |
+| [Application](conventions/backend/application.md) | Commands, queries, handlers, validators, results, event reactions, workflows, ports, and folders. |
 | [Marten persistence](conventions/backend/persistence-marten.md) | Sessions, repositories, queries, commit pipeline, event collection, JSON contracts, document evolution, aliases, indexes, and schema changes. |
 | [HTTP API](conventions/backend/api.md) | Minimal API endpoints, routes, transport models, status codes, Problem Details, authorization, and OpenAPI. |
 
@@ -70,17 +70,17 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Adopt standards v1](guides/adopt-v1.md) gives a greenfield consumer sequence.
 - [Upgrade to standards v1.1](guides/upgrade-v1.1.md) gives the consumer migration sequence for document metadata and consistency checks.
 - [Upgrade to standards v1.2](guides/upgrade-v1.2.md) explains the Subject migration and aggregate root boundary.
-- [Upgrade to standards v1.3](guides/upgrade-v1.3.md) explains the ADDD vocabulary, document layout, metadata, extension, Workflow, and state-representation migration.
+- [Upgrade to standards v1.3](guides/upgrade-v1.3.md) explains the LES vocabulary, document layout, metadata, extension, workflow, and state-record migration.
 - [V1 release scope](guides/v1-release-scope.md) states the complete baseline, conditional catalog, release contents, and exclusions.
-- [Model a Domain subject](guides/model-domain.md) turns known business language into aggregate, state, invariant, event, and use-case documentation.
+- [Model a domain module](guides/model-domain.md) turns known business language into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
-- [Subject index template](../templates/docs/subjects-index.md) defines the Subject documentation boundary.
-- [Business Flow template](../templates/docs/business-flow.md) connects Use cases to one product outcome.
+- [Module index template](../templates/docs/modules-index.md) defines the module documentation boundary.
+- [End-to-End Flow template](../templates/docs/end-to-end-flow.md) connects use cases to one product outcome.
 - [Workflow template](../templates/docs/workflow.md) defines durable system-controlled progress.
-- [Shared Rule template](../templates/docs/shared-rule.md) records a rule that applies to multiple Subjects.
-- [Claims and Evidence template](../templates/docs/claims-and-evidence.md) separates claims from decision conditions.
+- [Domain Policy template](../templates/docs/domain-policy.md) records a domain rule that applies within one module or across multiple modules.
+- [Decision Evidence template](../templates/docs/decision-evidence.md) records evidence for a decision when the investigation needs its own document.
 - [Operating limits template](../templates/docs/operating-limits.md) records the supported envelope and recovery limits.
 - [Runbook template](../templates/docs/runbook.md) gives the required operational record shape.
 - [V2 roadmap](../ROADMAP.md) records evidence-gated candidates after v1 adoption.
 
-Schemas are not part of the human reading path. They validate the standards manifest, consumer `standards.project.json`, and kind-specific ADDD Specification Metadata. Cross-file checks still resolve references and compare local extension applicability with the manifest and consumer selection.
+Schemas are not part of the human reading path. They validate the standards manifest, consumer `standards.project.json`, and kind-specific LES Specification Metadata. Cross-file checks still resolve references and compare local extension applicability with the manifest and consumer selection.

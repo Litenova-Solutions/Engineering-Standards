@@ -2,13 +2,13 @@
 
 ## Intent
 
-Domain contains the business model and protects Aggregate Rules without persistence, HTTP, mediator, dependency injection, or provider concepts. Its types use the language from the product glossary, Subject specifications, and Use-case specifications.
+Domain contains the business model and protects aggregate invariants without persistence, HTTP, mediator, dependency injection, or provider concepts. Its types use the language from the product glossary, module specifications, and use-case specifications.
 
 The profile gives every Aggregate an explicit state record hierarchy from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home and avoids replacing an enum, status string, or flag-based lifecycle model as the application grows.
 
 ## Agent Summary {#agent-summary}
 
-- Organize Domain by business subject and use the documented ubiquitous language.
+- Organize Domain by module and use the documented domain language.
 - Model each transactional consistency boundary as an aggregate.
 - Derive every aggregate root from the project-owned `AggregateRoot<TId>` base.
 - Give every Aggregate a sealed state record hierarchy. Do not use lifecycle enums, status strings, or boolean status flags.
@@ -29,9 +29,9 @@ Do not add ORM attributes, JSON attributes, HTTP models, Application messages, o
 
 ### Use one ubiquitous language (DOMAIN.LANGUAGE.001)
 
-Type, property, method, exception, and event names match the terms in `docs/domain/glossary.md`, the subject specification, and the active use-case specification.
+Type, property, method, exception, and event names match the terms in `docs/domain/glossary.md`, the module specification, and the approved use-case specification.
 
-If the business action is "publish a post," name the method `Publish`. Do not use `SetStatus`, `UpdateEntity`, or another technical synonym. Record rejected synonyms in the subject specification when agents or contributors could plausibly reintroduce them.
+If the business action is "publish a post," name the method `Publish`. Do not use `SetStatus`, `UpdateEntity`, or another technical synonym. Record rejected synonyms in the module specification when agents or contributors could plausibly reintroduce them.
 
 ### Treat aggregates as consistency boundaries (DOMAIN.AGGREGATE.001)
 
@@ -45,7 +45,7 @@ Do not place an entity inside an aggregate only to make navigation convenient. F
 
 Every aggregate root derives from the project-owned `AggregateRoot<TId>` type and implements its identity and domain-event mechanics through that base. Do not duplicate event lists in concrete aggregates or add a second aggregate base.
 
-A Subject may contain no Aggregate, one Aggregate, or multiple related Aggregates. Subject organizes documentation and code across layers. Aggregate root defines one Domain consistency and mutation boundary. Do not create `ISubject`, `SubjectRoot<TId>`, or another runtime Subject contract.
+A module may contain no aggregate, one aggregate, or multiple related aggregates. Module organizes documentation and code across layers. Aggregate root defines one Domain consistency and mutation boundary. Do not create `IModule`, `ModuleRoot<TId>`, or another runtime module contract.
 
 The base owns only:
 
@@ -143,13 +143,13 @@ Aggregate and value-object constructors copy incoming mutable collections. Publi
 
 Default record equality does not compare `List<T>` or `IReadOnlyList<T>` contents. A value object containing a collection implements content equality and a matching order-sensitive or order-insensitive hash according to the domain rule.
 
-For example, `PostTags` may treat tag order as irrelevant, while `RouteStops` treats order as part of the value. The subject terms state which rule applies.
+For example, `PostTags` may treat tag order as irrelevant, while `RouteStops` treats order as part of the value. The module terms state which rule applies.
 
 ### Make money and decimal rules explicit (DOMAIN.MONEY.001)
 
 Monetary amounts use `decimal` and a `Money` value object that includes currency. Domain code does not use `double` or `float` for money.
 
-The subject specification or glossary defines:
+The module specification or glossary defines:
 
 - Supported currency codes.
 - Amount scale and rounding mode.
@@ -183,9 +183,9 @@ Do not introduce `IRepository<T>` as a substitute for aggregate-specific contrac
 
 Every domain event is a public immutable record implementing the project-owned public `IDomainEvent` marker. Event names use past-tense business language, such as `PostPublished` or `OrderPlaced`.
 
-An Event contains enough immutable business data for its intended Follow-ups to understand the fact. "Minimal" does not mean "identity only" when a Follow-up needs values from the moment of the transition. Do not include Aggregate, entity, repository, session, service, or mutable collection references.
+An event contains enough immutable business data for its intended reactions to understand the fact. "Minimal" does not mean "identity only" when a reaction needs values from the moment of the transition. Do not include aggregate, entity, repository, session, service, or mutable collection references.
 
-`IDomainEvent` has no LiteBus or provider base interface. Domain Events are internal business facts, not Integration Event or public API contracts. An Application or Infrastructure Follow-up implementation may translate a Domain Event into an Integration Event when an external contract requires one.
+`IDomainEvent` has no LiteBus or provider base interface. Domain events are internal business facts, not integration events or public API contracts. An Application or Infrastructure event reaction implementation may translate a domain event into an integration event when an external contract requires one.
 
 Record the event inside the aggregate method that completes the transition. Pass occurrence time into the method when time is part of the fact.
 
@@ -219,7 +219,7 @@ For example, `Publish` documentation identifies allowed source states, the resul
 
 The code blocks in this section focus on the named design rule and omit namespaces and unrelated XML declarations. Consumer files still apply `DOMAIN.DOCUMENTATION.001` to their complete public contracts.
 
-### Use subject-first folders
+### Use module-first folders
 
 ```text
 {ProjectName}.Domain/
@@ -248,7 +248,7 @@ The code blocks in this section focus on the named design rule and omit namespac
       PostAlreadyPublishedException.cs
 ```
 
-Create subfolders when the Subject contains enough types to improve navigation. Do not create empty `Entities`, `ValueObjects`, `States`, or `Services` folders. Each Aggregate-specific repository interface remains with the Subject that contains that Aggregate.
+Create subfolders when the module contains enough types to improve navigation. Do not create empty `Entities`, `ValueObjects`, `States`, or `Services` folders. Each aggregate-specific repository interface remains with the module that contains that aggregate.
 
 ### Use these Domain names
 
@@ -615,15 +615,15 @@ public sealed record PostPublished(
     DateTimeOffset PublishedAt) : IDomainEvent;
 ```
 
-The Event payload captures the publication fact without carrying the mutable `Post`. A Follow-up implementation can use values from the transition or load a current Read Model when it explicitly needs current data.
+The event payload captures the publication fact without carrying the mutable `Post`. An event reaction implementation can use values from the transition or load a current read model when it explicitly needs current data.
 
 ## Verification
 
 - Inspect Domain package and project references for outer-layer dependencies.
-- Compare Domain names with the glossary, subject specification, and active use-case specification.
-- Confirm every documented Aggregate derives from `AggregateRoot<TId>` and appears in its Subject ownership table.
+- Compare Domain names with the glossary, module specification, and approved use-case specification.
+- Confirm every documented aggregate derives from `AggregateRoot<TId>` and appears in its module ownership table.
 - Confirm every documented Aggregate has exactly one abstract state base and at least one sealed state record.
-- Confirm no runtime subject interface or base class exists.
+- Confirm no runtime module interface or base class exists.
 - Search Domain for lifecycle enums, state strings, status booleans, and duplicated nullable state fields.
 - Confirm aggregate constructors are not public and every mutation uses a business method.
 - Confirm handlers do not reproduce state checks or set aggregate properties.
@@ -633,5 +633,5 @@ The Event payload captures the publication fact without carrying the mutable `Po
 - Confirm domain services are stateless and contain no outer-layer dependency.
 - Confirm events are past-tense `IDomainEvent` records with no aggregate or provider reference.
 - Round-trip every concrete Aggregate state record through the persistence provider.
-- Test every factory, allowed transition, rejected transition, Aggregate Rule, state-specific value, and emitted Event.
-- Confirm Aggregate Rule IDs and state transitions map to verified Use cases and acceptance criteria.
+- Test every factory, allowed transition, rejected transition, aggregate invariant, state-specific value, and emitted event.
+- Confirm aggregate invariant IDs and state transitions map to verified use cases and acceptance criteria.

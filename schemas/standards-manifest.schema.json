@@ -108,7 +108,7 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "enum": ["subject", "use-case", "business-flow", "workflow", "shared-rule", "page"]
+            "enum": ["module", "use-case", "end-to-end-flow", "workflow", "domain-policy", "page"]
           }
         }
       },

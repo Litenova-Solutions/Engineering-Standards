@@ -4,13 +4,13 @@
 
 The backend is a four-project modular monolith. Project boundaries separate business rules, use-case coordination, technical adapters, and HTTP hosting without splitting each concern into a separate assembly.
 
-CQRS separates write and read behavior inside one Application project. Subjects and use cases provide the internal navigation boundary.
+CQRS separates write and read behavior inside one Application project. Modules and use cases provide the internal navigation boundary.
 
 ## Agent Summary {#agent-summary}
 
 - Use Domain, Application, Infrastructure, and WebApi as the four application projects.
 - Point project references inward through Domain and Application.
-- Organize Domain, Application, Infrastructure, and WebApi by the same business subjects.
+- Organize Domain, Application, Infrastructure, and WebApi by the same domain modules.
 - Keep handlers and validators internal; expose only contracts required across project boundaries.
 - Keep dependency registration in the host and the outer layer that owns each implementation.
 - Add Worker only for a process that must run independently of HTTP requests.
@@ -39,15 +39,15 @@ Follow the exact project reference matrix in [Dependencies](../repository/depend
 
 ### Keep one Application assembly (ARCH.APPLICATION.001)
 
-Commands, queries, results, validators, handlers, Follow-up implementations, Workflow Orchestrators, and external ports live in one Application project.
+Commands, queries, results, validators, handlers, event reaction implementations, workflow orchestrators, and external ports live in one Application project.
 
 Separate Write, Read, Contracts, and event-handler assemblies are outside this profile.
 
-### Organize every layer by subject and use case (ARCH.SUBJECTS.001)
+### Organize every layer by module and use case (ARCH.MODULES.001)
 
-Use the same business Subject names across layers. A Subject groups related language and Application use cases. It may contain no Aggregate, one Aggregate, or multiple related Aggregates. Application operation folders contain one Command or Query and its supporting types.
+Use the same domain module names across layers. A module groups related language and Application use cases. It may contain no aggregate, one aggregate, or multiple related aggregates. Application operation folders contain one Command or Query and its supporting types.
 
-Subject is an organization term, not a runtime base type. Domain aggregate roots continue to derive from `AggregateRoot<TId>`. Do not introduce `ISubject` or another subject base contract.
+Module is an organization and ownership term, not a runtime base type. Domain aggregate roots continue to derive from `AggregateRoot<TId>`. Do not introduce `IModule`, `ModuleRoot`, or another module base contract.
 
 Do not create project-wide `Commands`, `Queries`, `Handlers`, `Validators`, or `Services` folders.
 
@@ -59,7 +59,7 @@ An Infrastructure implementation requires a public Domain or Application interfa
 
 ### Keep business invariants in Domain (ARCH.DOMAIN.001)
 
-Aggregates and value objects enforce state transitions and invariants. Command handlers coordinate loading, calling domain behavior, and staging. They do not reproduce aggregate rules.
+Aggregates and value objects enforce state transitions and invariants. Command handlers coordinate loading, calling domain behavior, and staging. They do not reproduce aggregate invariants.
 
 ### Separate command and query behavior (ARCH.CQRS.001)
 
@@ -67,11 +67,11 @@ Commands mutate aggregates through repositories. Baseline queries project read r
 
 ### Add Worker only for an independent process boundary (ARCH.WORKER.001)
 
-Create `{ProjectName}.Worker` for durable outbox dispatch, queue consumption, Workflow advancement, or scheduled work that must continue without WebApi. Optional best-effort Follow-ups may remain inside the WebApi process when their loss is accepted.
+Create `{ProjectName}.Worker` for durable outbox dispatch, queue consumption, workflow advancement, or scheduled work that must continue without WebApi. Optional best-effort event reactions may remain inside the WebApi process when their loss is accepted.
 
 ### Test structural boundaries (ARCH.ENFORCEMENT.001)
 
-Architecture.Tests verify project references, forbidden package dependencies, handler visibility, endpoint isolation, Subject folder rules, Aggregate root inheritance, Workflow placement, and extension-specific boundaries.
+Architecture.Tests verify project references, forbidden package dependencies, handler visibility, endpoint isolation, module folder rules, aggregate root inheritance, workflow placement, and extension-specific boundaries.
 
 ### Compose each process explicitly (ARCH.COMPOSITION.001)
 
@@ -81,7 +81,7 @@ Domain contains no registration code. Application exposes contracts and an assem
 
 ## Conventions
 
-### Use mirrored subject folders
+### Use mirrored module folders
 
 ```text
 Domain/Posts/
@@ -92,7 +92,7 @@ Application/Workflows/PublicationDelivery/
 Infrastructure/Workflows/PublicationDelivery/
 ```
 
-The mirrored folder names identify one business Subject even though each layer owns different responsibilities. `Posts` may contain the `Post` Aggregate and another related Aggregate. A documented cross-Subject Workflow uses the separate `Workflows/{Workflow}` path.
+The mirrored folder names identify one domain module even though each layer owns different responsibilities. Posts may contain the `Post` aggregate and another related aggregate. A documented workflow that coordinates modules uses the separate `Workflows/{Workflow}` path.
 
 ### Keep composition in hosts
 
@@ -119,14 +119,14 @@ Publishing a post follows this direction:
 2. Application loads `Post` through `IPostRepository`.
 3. Domain `Post.Publish` enforces publication rules and raises `PostPublished`.
 4. Infrastructure stages and commits the document through the command pipeline.
-5. A Follow-up implementation handles the Event through its documented atomic, durable, rebuildable, or optional delivery path.
+5. An event reaction implementation handles the event through its documented atomic, durable, rebuildable, or optional delivery path.
 
 ## Verification
 
 - Inspect the solution project list and reference graph.
-- Confirm folders use business subject names.
-- Confirm every Aggregate root derives from `AggregateRoot<TId>` and appears in its Subject ownership table.
-- Confirm no `ISubject`, `SubjectRoot`, or equivalent runtime abstraction exists.
+- Confirm folders use domain module names.
+- Confirm every aggregate root derives from `AggregateRoot<TId>` and appears in its module ownership table.
+- Confirm no `IModule`, `ModuleRoot`, or equivalent runtime abstraction exists.
 - Confirm handlers, validators, endpoints, and persistence implementations are internal sealed.
 - Confirm commands and queries use their prescribed persistence boundaries.
 - Confirm each deployable has one visible composition root and no intermediate service provider.

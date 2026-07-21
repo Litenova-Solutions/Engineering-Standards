@@ -14,7 +14,7 @@ These standards make those choices explicit. They retain detailed conventions wh
 
 | Part | Purpose |
 |:---|:---|
-| Foundations | Define scope, engineering principles, ADDD, agent behavior, and release criteria. |
+| Foundations | Define scope, engineering principles, the Litenova Engineering System, agent behavior, and release criteria. |
 | Platform profile | Select the supported stack and baseline architecture. |
 | Conventions | Define exact folders, names, boundaries, implementation patterns, and checks by topic. |
 | Extensions | Activate conditional behavior such as durable delivery, EF Core, caching, or localization. |
@@ -26,20 +26,20 @@ The baseline profile applies first. An applicable extension may replace only the
 
 ## From an idea to application v1
 
-Litenova uses Agent-Driven Domain Delivery (ADDD). ADDD keeps product intent, implementation, tests, and release evidence aligned around one use case at a time.
+The Litenova Engineering System (LES) keeps product intent, implementation, tests, operations, and release records aligned. LES uses Specification-Driven Delivery to define work and Agent-Driven Engineering to execute much of it.
 
 For a publishing application:
 
-1. The product brief names `post-publication` as the Primary Business Flow.
+1. The product brief names `post-publication` as the primary release flow.
 2. `docs/product/flows/post-publication.md` connects `posts.create-draft` and `posts.publish-post` to one product outcome.
-3. The domain index identifies the `Posts` Subject.
-4. `docs/domain/subjects/posts/create-draft.md` defines the first Use case.
+3. The domain index identifies the Posts module.
+4. `docs/domain/modules/posts/create-draft.md` defines the first use case.
 5. Acceptance criterion `AC-POSTS-CREATE-DRAFT-01` states an observable outcome.
 6. The agent loads only the Application, API, persistence, and testing conventions required by that Use case.
-7. Automated tests cite the same acceptance ID, and `FC-POST-PUBLICATION-01` checks the complete flow.
+7. Automated tests cite the same acceptance ID, and `E2E-POST-PUBLICATION-01` verifies the complete flow.
 8. The slice is complete after its code, documentation, tests, deployment impact, and release checks agree.
 
-Read [the ADDD foundation](docs/foundations/addd.md) for the complete method.
+Read [the Litenova Engineering System foundation](docs/foundations/engineering-system.md) for the complete model, company context, vocabulary, and decisions.
 
 Read [V1 Release Scope](docs/guides/v1-release-scope.md) for the complete release boundary and [the v2 roadmap](ROADMAP.md) for later candidates.
 
@@ -54,7 +54,7 @@ Topic documents use the same structure:
 - **Examples** show a concrete interpretation.
 - **Verification** states how to check the result.
 
-A heading such as `Organize every layer by subject and use case (ARCH.SUBJECTS.001)` contains a human title followed by its canonical rule ID. A later standards release may rename or remove a rule ID when the contract changes.
+A heading such as `Organize every layer by module and use case (ARCH.MODULES.001)` contains a human title followed by its canonical rule ID. A later standards release may rename or remove a rule ID when the contract changes.
 
 Other IDs have separate purposes:
 
@@ -62,12 +62,12 @@ Other IDs have separate purposes:
 |:---|:---|
 | `posts.create-draft` | Consumer use-case ID |
 | `AC-POSTS-CREATE-DRAFT-01` | Acceptance-criterion ID |
-| `ARCH.SUBJECTS.001` | Standards rule ID |
+| `ARCH.MODULES.001` | Standards rule ID |
 | `persistence-ef-core` | Extension ID |
 
 ## Read the standards
 
-Human readers start with the [documentation index](docs/README.md), then read scope and ADDD before the platform conventions.
+Human readers start with the [documentation index](docs/README.md), then read scope and the Litenova Engineering System before the platform conventions.
 
 AI agents start with [AGENTS.md](AGENTS.md), the consumer's `standards.project.json`, and the task-specific load plan in `standards.manifest.json`.
 
@@ -93,23 +93,23 @@ Each consumer adds:
 Copy only the thin inception templates:
 
 ```bash
-mkdir -p docs/product docs/domain/subjects
+mkdir -p docs/product docs/domain/modules
 cp standards/templates/docs/standards.project.json standards.project.json
 cp standards/templates/docs/project-agents.md AGENTS.md
 cp standards/templates/docs/product-brief.md docs/product/brief.md
 cp standards/templates/docs/domain-index.md docs/domain/README.md
 cp standards/templates/docs/glossary.md docs/domain/glossary.md
-cp standards/templates/docs/subjects-index.md docs/domain/subjects/README.md
+cp standards/templates/docs/modules-index.md docs/domain/modules/README.md
 ```
 
-Add `flows/`, `workflows/`, `shared-rules/`, `operations/`, `runbooks/`, `release/`, `research/`, and `ui/` only with their first real artifact. The [template index](templates/docs/README.md) names each trigger and target path.
+Add `flows/`, `workflows/`, `policies/`, `operations/`, `runbooks/`, `releases/`, `research/`, and `ui/` only with their first real artifact. The [template index](templates/docs/README.md) names each trigger and target path.
 
 There is no standards CLI, application generator, or bundled consumer validator. JSON schemas validate machine-readable file shape. Consumer CI or review tooling checks cross-file references. Agents create application code from the selected conventions and extensions while matching explicit consumer overrides.
 
 ## Repository map
 
 ```text
-docs/foundations/             Scope, principles, ADDD, agent protocol, release standard
+docs/foundations/             Scope, principles, engineering system, agent protocol, release standard
 docs/profile/                 Platform profile composition
 docs/conventions/repository/  Repository layout, naming, dependencies, configuration
 docs/conventions/backend/     Architecture, Domain, Application, persistence, API

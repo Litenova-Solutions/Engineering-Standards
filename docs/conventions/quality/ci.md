@@ -25,7 +25,7 @@ Every pull request MUST run the applicable gates from this table:
 | Backend | `dotnet build apps/api/{ProjectName}.slnx --configuration Release` |
 | Backend | `dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build` |
 | Frontend | `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm type-check`, `pnpm test`, and `pnpm build` |
-| Browser | Playwright Flow checks for browser Business Flows |
+| Browser | Playwright end-to-end tests for browser end-to-end flows |
 | Documentation | Link, anchor, rule-ID, ASCII, Specification Metadata, code-document consistency, and `git diff --check` scans |
 | Contracts | OpenAPI freshness and typed consumer regeneration when committed |
 
@@ -36,7 +36,7 @@ Skip a gate only when its surface does not exist. Record the reason in the workf
 The documentation job MUST run on every pull request and MUST check the changed documentation together with its related code, tests, generated contracts, and operating records. When the related surface exists, the check MUST:
 
 - Validate the ownership and freshness metadata required by `WRITING.METADATA.001`.
-- Compare subject and use-case names with source and test folders.
+- Compare module and use-case names with source and test folders.
 - Confirm current documented names, routes, errors, operation IDs, and authorization boundaries exist in source or generated contracts.
 - Confirm acceptance IDs from verified Use cases appear in automated tests.
 - Detect duplicate application or transport contracts for one operation.
@@ -58,7 +58,7 @@ CI MUST scan NuGet and npm dependencies, container images when used, and generat
 
 ### Promote verified artifacts (CI.RELEASE.001)
 
-CI MUST build one immutable artifact, promote that exact artifact through staging and production, wait for readiness, and run the Primary Business Flow check. Do not rebuild from a mutable branch between environments. Retain the artifact reference and test evidence for rollback.
+CI MUST build one immutable artifact, promote that exact artifact through staging and production, wait for readiness, and run the primary release flow's end-to-end test. Do not rebuild from a mutable branch between environments. Retain the artifact reference and test evidence for rollback.
 
 ### Protect the default branch (CI.PROTECTION.001)
 
@@ -74,7 +74,7 @@ Consumer CI uses stable jobs with these responsibilities:
 | `backend` | Backend, shared standards, or build configuration changes | Locked restore, Release build, tests without rebuild, coverage artifact, and dependency review |
 | `frontend-{app}` | That frontend or shared TypeScript changes | Frozen install, lint, type check, unit tests, and production build |
 | `contracts` | API source or generated consumer changes | Release OpenAPI generation, typed consumer generation, and clean-diff check |
-| `browser` | A browser Business Flow or its boundary changes | Playwright Flow checks against the built application and real API dependencies |
+| `browser` | A browser end-to-end flow or its boundary changes | Playwright end-to-end tests against the built application and real API dependencies |
 | `schema` | Persistence contracts change | Reviewable Marten schema plan and transformations, or EF migration and SQL |
 | `release` | Versioned release | Immutable artifacts, inventory, deployment evidence, readiness, smoke test, and rollback reference |
 
@@ -82,13 +82,13 @@ Use path filters only to skip a job whose complete input surface is known. Chang
 
 ## Conventions
 
-Keep one workflow per repository responsibility when a single workflow would obscure ownership. Use stable job names that match the release evidence record. Run containerized integration tests and Playwright in CI rather than pre-commit hooks.
+Keep one workflow per repository responsibility when a single workflow would obscure ownership. Use stable job names that match the release record. Run containerized integration tests and Playwright in CI rather than pre-commit hooks.
 
 Backend CI restores the solution in locked mode, builds once in Release, then tests with `--no-build`. Frontend CI installs once with the frozen root lockfile and invokes root scripts scoped to the affected application. Contract CI starts from the same source commit as the build and rejects any generated difference. Release jobs consume artifacts produced by required jobs rather than rebuilding source.
 
 ## Examples
 
-A backend-only pull request runs the Release build, test, dependency scan, documentation scan, and schema checks. A pull request that changes a frontend also runs the frozen pnpm gates and affected browser Flow checks. A release promotes the same image digest that passed staging.
+A backend-only pull request runs the Release build, test, dependency scan, documentation scan, and schema checks. A pull request that changes a frontend also runs the frozen pnpm gates and affected browser end-to-end tests. A release promotes the same image digest that passed staging.
 
 ## Verification
 

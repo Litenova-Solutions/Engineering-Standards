@@ -2,13 +2,13 @@
 
 ## Intent
 
-Application v1 means one Primary Business Flow works in a deployed environment and can be supported by its maintainer. Passing one test category or completing an inner layer does not satisfy that outcome.
+Application v1 means one primary release flow works in a deployed environment and can be supported by its maintainer. Passing one test category or completing an inner layer does not satisfy that outcome.
 
 ## Agent Summary {#agent-summary}
 
-- Finish one observable Primary Business Flow before secondary product outcomes.
-- Require every included Use case and Workflow to have `deliveryStatus: verified`.
-- Run backend, frontend, documentation, Flow-check, and applicable extension checks.
+- Finish one observable primary release flow before secondary product outcomes.
+- Require every included use case and workflow to have `implementationStatus: verified`.
+- Run backend, frontend, documentation, end-to-end, and applicable extension checks.
 - Keep OpenAPI and generated API types current.
 - Record build, test, deployment, restore, rollback, diagnostics, and smoke-test evidence for one immutable artifact.
 - Resolve blocking external claims or exclude their behavior from release scope.
@@ -18,13 +18,13 @@ Application v1 means one Primary Business Flow works in a deployed environment a
 
 ### Finish one observable slice (RELEASE.SLICE.001)
 
-A completed Use-case slice includes Domain behavior, Application coordination, persistence, Entry Points, automated evidence, and operating impact. Placeholder work leaves `deliveryStatus: planned`.
+A completed use-case slice includes Domain behavior, Application coordination, persistence, entry points, automated evidence, and operating impact. Placeholder work leaves `implementationStatus: planned`.
 
-A completed Business Flow connects verified Use cases and Workflows to one observable outcome and has at least one passing `FC-*` check through a public system boundary.
+A completed end-to-end flow connects verified use cases and workflows to one observable outcome and has at least one passing `E2E-*` test through a deployed public system boundary.
 
 ### Run applicable checks (RELEASE.GATES.001)
 
-Backend changes require a Release build and tests. Frontend changes require frozen dependency installation, lint, type checking, tests, and a production build. Business Flow changes require their Flow checks. Product, domain, implementation, and API changes require code-document consistency checks. Selected extensions add their stated verification when project-scoped or locally applicable.
+Backend changes require a Release build and tests. Frontend changes require frozen dependency installation, lint, type checking, tests, and a production build. End-to-end flow changes require their end-to-end tests. Product, domain, implementation, and API changes require code-document consistency checks. Selected extensions add their stated verification when project-scoped or locally applicable.
 
 ### Commit derived application contracts (RELEASE.DERIVED.001)
 
@@ -34,9 +34,9 @@ Regenerate OpenAPI and frontend API types with their source changes. Generated f
 
 Application v1 requires:
 
-- One deployed Primary Business Flow referenced by the product brief.
-- `deliveryStatus: verified` on every included Use case, Workflow, Business Flow, and Page specification.
-- At least one passing Flow check through the deployed public boundary.
+- One deployed primary release flow referenced by the product brief.
+- `implementationStatus: verified` on every included use case, workflow, end-to-end flow, and page specification.
+- At least one passing end-to-end test through the deployed public boundary.
 - Authentication and authorization when access is restricted.
 - Repeatable database schema creation or upgrade.
 - Backup and restore instructions with a tested restore.
@@ -45,9 +45,9 @@ Application v1 requires:
 - CI for applicable checks.
 - A tested deployment and rollback path.
 - Current Operating Limits and required runbooks.
-- One release evidence record for the immutable artifact.
+- One release record for the immutable artifact.
 
-A blocking decision condition or external claim MUST be resolved before release. The release MAY exclude affected behavior when the product brief, Business Flow, Entry Points, and release evidence state the reduced boundary consistently.
+A blocking decision condition or external claim MUST be resolved before release. The release MAY exclude affected behavior when the product brief, end-to-end flow, entry points, and release record state the reduced boundary consistently.
 
 Scale, tenancy, realtime behavior, provider-specific deployment, and other conditional behavior remain outside v1 until a selected extension applies.
 
@@ -55,14 +55,14 @@ Scale, tenancy, realtime behavior, provider-specific deployment, and other condi
 
 Completion reports name exact commands, outcomes, evidence scope, and skipped checks. Do not claim a repository-wide result from one project or one test category.
 
-### Bind release evidence to one artifact (RELEASE.EVIDENCE.001)
+### Bind the release record to one artifact (RELEASE.RECORD.001)
 
-The release evidence record names:
+The release record names:
 
 - Source commit and immutable artifact reference.
-- Included Business Flows, Use cases, and Workflows.
+- Included end-to-end flows, use cases, and workflows.
 - Selected and locally applicable extensions.
-- Build, test, contract, security, and Flow-check results.
+- Build, test, contract, security, and end-to-end results.
 - Schema application and compatibility result.
 - Backup and restore exercise.
 - Deployment, readiness, diagnostics, and smoke-test result.
@@ -82,7 +82,7 @@ docs/
   runbooks/
     restore-backup.md
     deployment-rollback.md
-  release/
+  releases/
     v1.0.0.md
 ```
 
@@ -92,16 +92,16 @@ Build and lint warnings fail the corresponding check unless the repository recor
 
 ## Example
 
-An event-sales release includes `inventory.reserve-tickets`, `orders.create-guest-order`, the `order-fulfillment` Workflow, and `tickets.issue-ticket`. Every specification is verified. `FC-EVENT-SALES-01` passes against the deployed API and real PostgreSQL. The release evidence points to the image digest, schema plan, test artifacts, restore result, rollback result, limits, and runbooks.
+An event-sales release includes `inventory.reserve-tickets`, `orders.create-guest-order`, the `order-fulfillment` workflow, and `tickets.issue-ticket`. Every behavior specification is verified. `E2E-EVENT-SALES-01` passes against the deployed API and real PostgreSQL. The release record points to the image digest, schema plan, test artifacts, restore result, rollback result, limits, and runbooks.
 
-A payment-provider claim remains unconfirmed and blocks live money. The release may remain a provider sandbox only when the product brief, flow, configuration, Entry Points, and release evidence all exclude live payment.
+A payment-provider claim remains unconfirmed and blocks live money. The release may remain a provider sandbox only when the product brief, flow, configuration, entry points, and release record all exclude live payment.
 
 ## Verification
 
-- Confirm the product brief references exactly one Primary Business Flow.
-- Confirm release scope lists every included Use case and Workflow.
+- Confirm the product brief references exactly one primary release flow.
+- Confirm release scope lists every included use case and workflow.
 - Confirm every included behavior specification is verified.
-- Confirm the deployed Flow check passed against the immutable artifact.
+- Confirm the deployed end-to-end test passed against the immutable artifact.
 - Confirm schema, backup, restore, deployment, rollback, diagnostics, and alerts match the deployed system.
 - Confirm blocking claims are resolved or excluded from every affected boundary.
 - Confirm generated contracts have no uncommitted difference.
