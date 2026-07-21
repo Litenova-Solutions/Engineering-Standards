@@ -82,7 +82,7 @@ const files = [];
 (function walk(d) {
   if (!fs.existsSync(d)) return;
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-    if (e.name === 'research' || e.name === 'node_modules' || e.name.startsWith('.')) continue;
+    if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
     const p = path.join(d, e.name);
     if (e.isDirectory()) walk(p);
     else if (e.name.endsWith('.md')) files.push(p);
@@ -105,6 +105,13 @@ function parseBlock(raw, rel) {
 for (const f of files) {
   const rel = path.relative(root, f).replace(/\\/g, '/');
   const raw = fs.readFileSync(f, 'utf8');
+  const hasMeta = raw.startsWith('---');
+
+  // Research prose (Codex/Fable notes and indexes without a metadata block)
+  // is not a structured specification, so skip it. A structured spec placed
+  // under research/ (for example a decision-evidence record) still begins
+  // with a metadata block and is validated like any other spec.
+  if (/(^|\/)research\//.test(rel) && !hasMeta) continue;
 
   // acceptance and end-to-end id definitions (bracket form)
   for (const m of raw.matchAll(/\[(AC-[A-Z0-9-]+)\]/g)) (acDefs.get(m[1]) ?? acDefs.set(m[1], []).get(m[1])).push(rel);

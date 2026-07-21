@@ -25,5 +25,6 @@ Checks performed:
 - Acceptance `AC-*` and end-to-end `E2E-*` definitions are unique.
 - Local `applicableExtensions` are selected in `standards.project.json`, are not project-scoped, and are allowed for the specification kind (when the standards manifest is reachable).
 - Relative Markdown links resolve.
+- Structured specifications under `docs/research/` (for example decision-evidence records) are validated; research prose without a metadata block is skipped and not link-gated.
 
 Exit code is `0` on pass and non-zero on failure. It does not run backend, frontend, or extension verification; those remain in the release gates.
