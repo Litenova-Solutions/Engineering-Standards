@@ -331,7 +331,20 @@ Do not classify a required projection refresh as `best-effort-optional`. Domain 
 
 Use the rule classifications defined in the Vocabulary section. Do not rename an aggregate invariant to a validation rule because both reject input; their enforcement times and owners differ.
 
-Use `INV-{MODULE}-{NN}` for aggregate invariants. Use `POL-{POLICY}-{NN}` for domain policies. Never reuse or renumber an approved rule ID.
+Every rule uses the identifier prefix for its classification. The scope segment is the module for module-owned rules, the owning use case for request-time rules, the policy for a domain policy, and the workflow for a workflow rule. The numeric suffix starts at `01` and uses two digits. Never reuse or renumber an approved rule ID.
+
+| Classification | Identifier form | Scope of the ID |
+|:---|:---|:---|
+| Aggregate Invariant | `INV-{MODULE}-{NN}` | The owning module. |
+| Domain Policy | `POL-{POLICY}-{NN}` | The owning domain-policy specification. |
+| Validation Rule | `VAL-{MODULE}-{USE-CASE}-{NN}` | The owning use case. |
+| Authorization Policy | `AUTZ-{MODULE}-{USE-CASE}-{NN}` | The owning use case. |
+| Persistence Constraint | `PERS-{MODULE}-{NN}` | The owning module. |
+| Workflow Rule | `WFR-{WORKFLOW}-{NN}` | The owning workflow. |
+
+A caller-visible failure code uses `{MODULE}.{REASON}` with an uppercase module segment and an uppercase reason, such as `ORDERS.RESERVATION_INVALID`. A failure code is not a rule ID; a use case lists the failure codes its rules produce.
+
+A `POL-*` ID belongs only to a domain-policy specification. When a use-case rule enforces a constraint that a decision record establishes (for example an approved provider or retention choice), keep the rule under its enforcement classification (usually a Validation Rule, Authorization Policy, or Aggregate Invariant) and cite the decision by link in the rule behavior text. Do not mint a `POL-*` ID for a decision that has no domain-policy specification.
 
 An acceptance criterion cites every `INV-*` and `POL-*` rule required for that behavior. A domain policy MUST state its owner, affected modules, consistency requirement, enforcement point, failure behavior, and verification.
 
@@ -411,12 +424,17 @@ docs/
   decisions/
   operations/
     limits.md
+    security-and-privacy.md
   runbooks/
   releases/
   research/
 ```
 
 Create an optional directory only when its first real artifact is added. Do not create empty directories or placeholder records during inception.
+
+### Keep operational and security references under operations
+
+`docs/operations/` holds operating and security reference documents. `limits.md` is the only structured kind there (`operating-limits`). Cross-cutting security posture, trust boundaries, threat surfaces, and privacy references have no structured kind; record them as prose reference documents under `docs/operations/`, for example `security-and-privacy.md`. Enforceable security and privacy rules still belong to their owning use-case authorization sections and to domain policies such as data retention. Do not reintroduce a general cross-cutting bucket for these records.
 
 ### Use established technical terms
 
