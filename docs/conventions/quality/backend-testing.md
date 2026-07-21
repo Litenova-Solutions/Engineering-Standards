@@ -31,7 +31,7 @@ Acceptance.Tests appears only when the executable BDD extension activates.
 
 ### Test Domain in isolation (BTEST.DOMAIN.001)
 
-Domain tests cover factories, every state record, allowed and rejected transitions, invariants, value equality, collection behavior, money rules, exceptions, and raised events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
+Domain tests cover factories, every supported lifecycle state, allowed and rejected transitions, Aggregate Rules, value equality, collection behavior, money rules, exceptions, and raised Events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
 
 Each subject invariant maps through its use-case specification to at least one cited acceptance ID. Domain tests may add narrower cases without an acceptance ID.
 

@@ -10,7 +10,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 - Use one bounded-context modular monolith.
 - Use Domain, Application, Infrastructure, and WebApi as the four application projects.
-- Give every aggregate an explicit state record hierarchy and change it only through aggregate behavior.
+- Change Aggregate state only through Aggregate behavior and select the least complex representation that prevents invalid states.
 - Use PostgreSQL and Marten as baseline persistence.
 - Use LiteBus command and query entry points with one command commit pipeline.
 - Use Aspire for local service orchestration.

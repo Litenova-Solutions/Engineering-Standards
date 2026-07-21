@@ -39,13 +39,13 @@ Follow the exact project reference matrix in [Dependencies](../repository/depend
 
 ### Keep one Application assembly (ARCH.APPLICATION.001)
 
-Commands, queries, results, validators, handlers, event reactions, and external ports live in one subject-first Application project.
+Commands, queries, results, validators, handlers, Follow-up implementations, Workflow Orchestrators, and external ports live in one Application project.
 
-Separate Write, Read, Contracts, and Reactions assemblies are outside this profile.
+Separate Write, Read, Contracts, and event-handler assemblies are outside this profile.
 
 ### Organize every layer by subject and use case (ARCH.SUBJECTS.001)
 
-Use the same business subject names across layers. A subject is the stable business noun that groups related Application use cases. A state-changing subject names one primary Domain aggregate root; a read-only subject names no aggregate root. Application operation folders contain one command or query and its supporting types.
+Use the same business Subject names across layers. A Subject groups related language and Application use cases. It may contain no Aggregate, one Aggregate, or multiple related Aggregates. Application operation folders contain one Command or Query and its supporting types.
 
 Subject is an organization term, not a runtime base type. Domain aggregate roots continue to derive from `AggregateRoot<TId>`. Do not introduce `ISubject` or another subject base contract.
 
@@ -67,11 +67,11 @@ Commands mutate aggregates through repositories. Baseline queries project read r
 
 ### Add Worker only for an independent process boundary (ARCH.WORKER.001)
 
-Create `{ProjectName}.Worker` for durable outbox dispatch, queue consumption, or scheduled work that must continue without WebApi. Short best-effort post-commit reactions may remain inside the WebApi process.
+Create `{ProjectName}.Worker` for durable outbox dispatch, queue consumption, Workflow advancement, or scheduled work that must continue without WebApi. Optional best-effort Follow-ups may remain inside the WebApi process when their loss is accepted.
 
 ### Test structural boundaries (ARCH.ENFORCEMENT.001)
 
-Architecture.Tests verify project references, forbidden package dependencies, handler visibility, endpoint isolation, subject folder rules, aggregate root inheritance, and extension-specific boundaries.
+Architecture.Tests verify project references, forbidden package dependencies, handler visibility, endpoint isolation, Subject folder rules, Aggregate root inheritance, Workflow placement, and extension-specific boundaries.
 
 ### Compose each process explicitly (ARCH.COMPOSITION.001)
 
@@ -88,9 +88,11 @@ Domain/Posts/
 Application/Posts/CreateDraft/
 Infrastructure/Posts/
 WebApi/Endpoints/Posts/CreateDraft/
+Application/Workflows/PublicationDelivery/
+Infrastructure/Workflows/PublicationDelivery/
 ```
 
-The folder names identify one business subject even though each layer owns different responsibilities. `Posts` maps to the `Post` aggregate root in Domain and the documented Post use cases in Application and WebApi.
+The mirrored folder names identify one business Subject even though each layer owns different responsibilities. `Posts` may contain the `Post` Aggregate and another related Aggregate. A documented cross-Subject Workflow uses the separate `Workflows/{Workflow}` path.
 
 ### Keep composition in hosts
 
@@ -117,13 +119,13 @@ Publishing a post follows this direction:
 2. Application loads `Post` through `IPostRepository`.
 3. Domain `Post.Publish` enforces publication rules and raises `PostPublished`.
 4. Infrastructure stages and commits the document through the command pipeline.
-5. A post-commit reaction handles the event according to its delivery requirement.
+5. A Follow-up implementation handles the Event through its documented atomic, durable, rebuildable, or optional delivery path.
 
 ## Verification
 
 - Inspect the solution project list and reference graph.
 - Confirm folders use business subject names.
-- Confirm each state-changing subject names one primary aggregate root derived from `AggregateRoot<TId>`.
+- Confirm every Aggregate root derives from `AggregateRoot<TId>` and appears in its Subject ownership table.
 - Confirm no `ISubject`, `SubjectRoot`, or equivalent runtime abstraction exists.
 - Confirm handlers, validators, endpoints, and persistence implementations are internal sealed.
 - Confirm commands and queries use their prescribed persistence boundaries.

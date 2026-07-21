@@ -14,7 +14,7 @@ Application coordinates use cases. It translates a command or query into domain 
 - Return stable, transport-neutral validation and use-case failures.
 - Write through aggregate repositories and read through `IQuerySession` projections.
 - Define narrow public external ports for Infrastructure implementations.
-- Keep multi-subject process coordination explicit and separate from aggregate behavior.
+- Keep atomic orchestration and durable Workflow orchestration explicit and separate from Aggregate behavior.
 
 ## Standards
 
@@ -30,7 +30,7 @@ Do not group all handlers or messages by technical type.
 
 Commands implement the pinned LiteBus command contract and dispatch through `ICommandMediator.SendAsync`. Queries implement the query contract and dispatch through `IQueryMediator.QueryAsync`.
 
-Domain events remain package-free. Application reactions may implement LiteBus event handler contracts at the adapter boundary.
+Domain Events remain package-free. Application Follow-up handlers may implement LiteBus event handler contracts at the adapter boundary.
 
 Do not introduce a unified message bus abstraction.
 
@@ -90,15 +90,23 @@ Application owns a public interface when Infrastructure must provide external be
 
 Provider names and transport models remain in Infrastructure.
 
-### Keep reactions explicit (APP.REACTIONS.001)
+### Keep Follow-up implementations explicit (APP.FOLLOWUP.001)
 
-Place a reaction under the subject and triggering event. Name the handler for its action and event. Best-effort reactions run after the database commit. Durable reactions activate the outbox extension.
+Place a Follow-up implementation under the Subject and triggering Event when one Subject owns it. Name the handler for its action and Event. Document whether delivery is `atomic`, `durable`, `rebuildable`, or `best-effort-optional`.
 
-### Keep process coordinators at the Application boundary (APP.COORDINATOR.001)
+An optional post-commit handler may run in process. Required delivery activates the outbox extension. Required derived state uses an atomic, durable, or rebuildable projection path.
 
-Place a coordinator under the use case or reaction that starts the workflow. It sends public subject commands or calls narrow Application ports. It does not load or mutate another subject's aggregate to bypass that subject's command boundary.
+### Keep one state-changing Use case in one Command pipeline (APP.ORCHESTRATION.001)
 
-Give a coordinator its own operation folder and result when it has a business outcome, retry policy, idempotency key, durable state, or operator action. Keep a stateless sequence in the initiating handler or reaction. Document the sequence in the critical journey and state the subject that owns each invariant.
+A Command handler MUST NOT dispatch another Command through `ICommandMediator`. Nested command dispatch can invoke the commit post-handler before the top-level Use case completes.
+
+The top-level handler MAY coordinate multiple Aggregates through their repositories when one transaction is required. The current use-case specification or an accepted decision MUST name the Aggregate Rule or Business Policy that requires atomic consistency. Domain objects continue to enforce their own Aggregate Rules.
+
+### Advance durable Workflows through separate Commands (APP.WORKFLOW.001)
+
+A Workflow Orchestrator advances one durable Workflow step from an Event or scheduled trigger. It records Workflow progress and stages the next Command for durable delivery. It does not mutate participating Subject Aggregates directly.
+
+Each issued Command enters its own command pipeline and owns one transaction. Workflow state and the outgoing durable message are staged in one transaction. Duplicate triggers and Commands are safe. The Workflow specification names retries, timeouts, compensation, and operator actions.
 
 ## Conventions
 
@@ -134,9 +142,17 @@ Give a coordinator its own operation folder and result when it has a business ou
       ListPostsQueryResultItem.cs
       ListPostsQueryValidator.cs
       ListPostsQueryHandler.cs
-    OnPostPublished/
-      NotifySubscribersOnPostPublishedHandler.cs
-      IPostPublicationNotifier.cs
+    FollowUps/
+      OnPostPublished/
+        NotifySubscribersOnPostPublishedHandler.cs
+        IPostPublicationNotifier.cs
+  Workflows/
+    PublicationDelivery/
+      PublicationDeliveryWorkflow.cs
+      PublicationDeliveryWorkflowState.cs
+      PublicationDeliveryWorkflowOrchestrator.cs
+      AdvancePublicationDeliveryWorkflowCommand.cs
+      AdvancePublicationDeliveryWorkflowCommandHandler.cs
 ```
 
 Create `Shared` children only for types used by multiple subjects.
@@ -185,6 +201,64 @@ internal sealed class CreateDraftCommandHandler(
 
 Use the exact method signatures exposed by the pinned LiteBus package when they differ from an illustrative example.
 
+### Coordinate multiple Aggregates without nested dispatch
+
+```csharp
+internal sealed class ConfirmOrderCommandHandler(
+    IOrderRepository orders,
+    IReservationRepository reservations)
+    : ICommandHandler<ConfirmOrderCommand, ConfirmOrderCommandResult>
+{
+    public async Task<ConfirmOrderCommandResult> HandleAsync(
+        ConfirmOrderCommand command,
+        CancellationToken cancellationToken)
+    {
+        var order = await orders.GetAsync(command.OrderId, cancellationToken);
+        var reservation = await reservations.GetAsync(
+            command.ReservationId,
+            cancellationToken);
+
+        reservation.ConfirmFor(order.Id);
+        order.Confirm(reservation.Id);
+
+        reservations.Store(reservation);
+        orders.Store(order);
+
+        return new ConfirmOrderCommandResult(order.Id);
+    }
+}
+```
+
+The handler stages both Aggregates because the use-case specification names the rule that requires one transaction. It does not call `ICommandMediator` or commit.
+
+### Advance a durable Workflow without mutating Subject Aggregates
+
+```csharp
+internal sealed class AdvanceOrderFulfillmentWorkflowCommandHandler(
+    IOrderFulfillmentWorkflowStore workflows,
+    IWorkflowCommandOutbox outbox)
+    : ICommandHandler<AdvanceOrderFulfillmentWorkflowCommand>
+{
+    public async Task HandleAsync(
+        AdvanceOrderFulfillmentWorkflowCommand command,
+        CancellationToken cancellationToken)
+    {
+        var workflow = await workflows.GetAsync(
+            command.WorkflowId,
+            cancellationToken);
+
+        var nextCommand = workflow.RecordPaymentConfirmed(
+            command.PaymentId,
+            command.OccurredAt);
+
+        workflows.Store(workflow);
+        outbox.Enqueue(nextCommand, workflow.Id);
+    }
+}
+```
+
+Infrastructure stages Workflow state and the outgoing Command in the same session. The Worker later dispatches the outgoing Command through a new command pipeline.
+
 ## Verification
 
 - Confirm every operation folder maps to a documented use case.
@@ -192,6 +266,9 @@ Use the exact method signatures exposed by the pinned LiteBus package when they 
 - Confirm handlers and validators are internal sealed.
 - Confirm validators implement the pinned `ValidateAsync` contract.
 - Confirm command handlers do not commit and query handlers do not use repositories.
+- Confirm a Command handler never dispatches another Command through `ICommandMediator`.
+- Confirm a multi-Aggregate Command names the rule and transaction requirement in its use-case specification.
+- Confirm a Workflow Orchestrator stages progress and outgoing work without mutating participating Subject Aggregates.
 - Confirm public ports contain no provider type.
 - Confirm protected messages carry trusted actor context and handlers authorize their targets.
 - Confirm expected failures have stable codes and no HTTP or provider types.

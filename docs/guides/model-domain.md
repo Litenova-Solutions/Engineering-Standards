@@ -1,6 +1,6 @@
 # Model a Domain Subject
 
-Use this guide after the business language and rules for a subject are known. It converts those findings into the subject specification, use-case specifications, and Domain object design required by the profile.
+Use this guide after the business language and rules for a Subject are known. It converts those findings into a Subject specification, Use-case specifications, Aggregate boundaries, and Domain code.
 
 This guide does not replace interviews, Event Storming, policy review, or another discovery method. An agent may expose a missing definition or conflicting rule. It must not invent the business answer.
 
@@ -8,48 +8,80 @@ This guide does not replace interviews, Event Storming, policy review, or anothe
 
 Start with:
 
-- The product brief and primary journey.
+- The product brief and affected Business Flow.
 - The domain glossary.
-- The subject purpose and actors.
-- Known business policies, examples, and failure cases.
+- The Subject purpose and actors.
+- Known Business Policies, examples, and failure cases.
 - Decisions that constrain identity, persistence, security, or external behavior.
 
-If a command depends on an unknown policy, record it under `Open modeling questions` in the subject specification and stop that use case. Other use cases with complete rules may continue.
+If a Command depends on an unknown policy, record it under `Open modeling questions` and stop that Use case. Other Use cases with complete rules may continue.
 
-## Name the subject language
+## Name the Subject language
 
-Record each subject term with one definition and any rejected synonyms. Use the same term in documentation, Domain types, Application operations, API descriptions, and frontend features.
+Record each Subject term with one definition and rejected synonyms. Use the same term in documentation, Domain types, Application operations, API descriptions, and frontend features.
 
-For the Posts subject:
+For the Orders Subject:
 
 | Term | Definition | Rejected synonyms |
 |:---|:---|:---|
-| Post | Author-owned content that moves through the publication lifecycle. | Article, entry |
-| Publish | Make a draft post visible to readers. | Activate, enable |
-| Archive | Remove a published post from normal reader discovery while retaining it. | Delete, disable |
+| Order | One buyer commitment to one seller in one currency. | Cart, purchase record |
+| Cancel | End an Order before fulfillment under the accepted policy. | Delete, disable |
+| Claim | Attach an authenticated buyer to an existing guest Order. | Adopt, transfer |
 
-Rejected synonyms prevent later contributors from creating types such as `ArticleStatus` beside `PostState`.
+Rejected synonyms prevent later contributors from creating `PurchaseRecordStatus` beside `OrderState`.
 
-## Draw aggregate boundaries from invariants
+## Draw Aggregate boundaries from Aggregate Rules
 
-Group data that must remain consistent in one command transaction. Name the root, owned children, referenced aggregate IDs, and the invariant that requires the boundary.
-
-A state-changing subject begins with one primary aggregate root. If another consistency owner has independent language and use cases, model it as a separate subject. Reference its aggregate by typed ID when the current subject needs that identity.
+Group state that must remain consistent in one Command transaction. A Subject may contain no Aggregate, one Aggregate, or multiple related Aggregates.
 
 ```text
-Post
-  owns: PostTitle, PostContent, PostState, PostTag values
-  references: AuthorId
-  protects: publication and editing rules
+Orders Subject
+  Order Aggregate
+    owns: lines, totals, seller, currency, lifecycle
+    references: BuyerId, PaymentId
+    protects: INV-ORDERS-01, INV-ORDERS-02
+
+  OrderClaim Aggregate
+    owns: guest claim lifecycle and claim evidence
+    references: OrderId, BuyerId
+    protects: INV-ORDERS-04
 ```
 
-An aggregate owns a child when the child has no independent consistency boundary and is changed through the root. Reference another aggregate by typed ID when it can change independently.
+An Aggregate owns a child when the child has no independent consistency boundary and changes only through the root. Reference another Aggregate by typed ID when it can change independently.
 
-Do not place `Author` inside `Post` to make author data easy to read. Store `AuthorId` and use a read projection for author presentation.
+Do not place `Buyer` inside `Order` for convenient navigation. Store `BuyerId` and use a Read Model for buyer presentation.
 
-## Define every aggregate state
+Record the result in the Subject specification:
 
-Create an abstract state record and sealed state records before writing aggregate transitions. Every aggregate has this hierarchy, including an aggregate with one current state.
+| Aggregate | Owns | Aggregate Rules | Commands |
+|:---|:---|:---|:---|
+| `Order` | Lines, totals, and lifecycle | `INV-ORDERS-01` | `orders.create-order`, `orders.cancel-order` |
+| `OrderClaim` | Guest claim lifecycle | `INV-ORDERS-04` | `orders.claim-guest-order` |
+
+## Choose a lifecycle representation
+
+Describe business states before choosing C# types:
+
+| State | Meaning | Required facts |
+|:---|:---|:---|
+| `Draft` | The Post is editable and not public. | Author and content |
+| `Published` | The Post is public. | Publication time |
+| `Archived` | The Post is retained but removed from discovery. | Archive time and reason |
+
+Use no lifecycle representation when no meaningful states exist.
+
+Use an enum when states differ only by label:
+
+```csharp
+public enum ReservationStatus
+{
+    Active,
+    Confirmed,
+    Expired
+}
+```
+
+Use typed state objects when states require different data or behavior:
 
 ```csharp
 public abstract record PostState;
@@ -64,27 +96,18 @@ public sealed record ArchivedPostState(
     ArchiveReason Reason) : PostState;
 ```
 
-Put state-specific data on the state record. Do not duplicate `PublishedAt` or `ArchivedAt` on the aggregate. Do not add `PostStatus`, `IsPublished`, or a state string.
+Do not use independent flags and nullable dates that permit contradictory combinations.
 
-For each state, answer:
+## Write transition rules
 
-- What business fact makes this state true?
-- Which data is required only in this state?
-- Which actions are allowed from this state?
-- Which actions are rejected from this state, and why?
+Record each business action with its source state, target state, Aggregate Rule IDs, Event, and owning Use case.
 
-An unanswered question belongs in the subject specification. It does not receive a guessed default.
-
-## Write the transition table
-
-Record each business action with its source state, target state, invariant IDs, event, and owning use case.
-
-| From state | Business action | To state | Invariant IDs | Event | Use case |
+| From state | Business action | To state | Aggregate Rules | Event | Use case |
 |:---|:---|:---|:---|:---|:---|
-| `DraftPostState` | `Publish` | `PublishedPostState` | `INV-POSTS-01` | `PostPublished` | `posts.publish-post` |
-| `PublishedPostState` | `Archive` | `ArchivedPostState` | `INV-POSTS-02` | `PostArchived` | `posts.archive-post` |
+| `Draft` | `Publish` | `Published` | `INV-POSTS-01` | `PostPublished` | `posts.publish-post` |
+| `Published` | `Archive` | `Archived` | `INV-POSTS-02` | `PostArchived` | `posts.archive-post` |
 
-The aggregate root owns the transition method. State records remain immutable data.
+The Aggregate root owns the transition:
 
 ```csharp
 public void Publish(DateTimeOffset publishedAt)
@@ -100,35 +123,39 @@ public void Publish(DateTimeOffset publishedAt)
 }
 ```
 
-Document rejected source states in the use-case failure table and acceptance criteria. A transition table with no owning use case identifies behavior that cannot yet be delivered or tested.
+Document rejected source states in the Use-case failure table and acceptance criteria. A transition with no owning Use case cannot be delivered or tested.
 
-## Give invariants stable identities
+## Give rules stable identities
 
-Write each shared rule once in the subject specification and assign `INV-{SUBJECT}-{NN}`.
+An Aggregate Rule uses `INV-{SUBJECT}-{NN}`:
 
 | ID | Rule | Protected by | Failure |
 |:---|:---|:---|:---|
-| `INV-POSTS-01` | Only a draft post can be published. | `Post.Publish` | `PostCannotBePublishedException` |
-| `INV-POSTS-02` | Only a published post can be archived. | `Post.Archive` | `PostCannotBeArchivedException` |
+| `INV-POSTS-01` | Only a draft Post can be published. | `Post.Publish` | `PostCannotBePublishedException` |
+| `INV-POSTS-02` | Only a published Post can be archived. | `Post.Archive` | `PostCannotBeArchivedException` |
 
-Do not renumber an accepted invariant. A revised business rule updates the existing ID unless its meaning is replaced by a distinct rule. A removed rule remains traceable through history and retired use-case documentation.
+A Business Policy shared across Subjects belongs in one Shared Rule and uses `POL-{SHARED-RULE}-{NN}`:
 
-## Select entities and value objects
+| ID | Policy | Consistency | Enforcement |
+|:---|:---|:---|:---|
+| `POL-BUYER-DATA-RETENTION-01` | Buyer deletion completes within 24 hours unless legal hold applies. | Eventual within 24 hours | Buyer deletion Workflow |
 
-Use a child entity when identity and continuity matter inside the aggregate. Use a value object when complete value defines equality.
+Do not renumber or reuse an accepted rule ID. Link affected acceptance criteria.
 
-Examples:
+## Select entities and Value Objects
+
+Use a child entity when identity and continuity matter inside the Aggregate. Use a Value Object when complete value defines equality.
 
 - `OrderLineId` identifies one line through quantity changes, so `OrderLine` is an entity.
-- `PostTitle` is replaced as a complete value, so it is a value object.
-- `Money` combines amount and currency and defines arithmetic rules, so it is a value object.
-- `PostTags` defines collection equality and normalization, so it is a collection value object.
+- `PostTitle` is replaced as a complete value, so it is a Value Object.
+- `Money` combines amount and currency and defines arithmetic rules, so it is a Value Object.
+- `PostTags` defines collection equality and normalization, so it is a collection Value Object.
 
-Give each aggregate a typed version 7 ID. Use typed IDs for other identities that participate in Domain behavior. Keep raw primitives for mechanical values with no domain meaning, such as a loop index.
+Give each Aggregate a typed version 7 ID. Use typed IDs for identities that participate in Domain behavior.
 
-## Separate validation from invariants
+## Separate Input Rules from Aggregate Rules
 
-Application validation handles caller-correctable structure before the command handler. Domain objects repeat their own rules so no invalid object can enter through a test, background process, or future host.
+Application validation handles caller-correctable structure before the Command handler. Domain objects repeat their own construction rules so invalid values cannot enter through a test, background process, or future host.
 
 For `PostTitle`:
 
@@ -136,75 +163,118 @@ For `PostTitle`:
 - `PostTitle.Create` checks the same limits and throws a specific Domain exception if another caller bypasses validation.
 - `Post` accepts `PostTitle`, not the raw string.
 
-Aggregate state decides whether behavior is allowed. That check never moves into an Application validator because the validator does not own the aggregate's current state.
+Current Aggregate state decides whether behavior is allowed. That check does not move into an Application validator.
 
-## Identify domain services
+## Identify Domain services
 
-Place a rule on the aggregate or value object that owns it. Use a stateless domain service only when no object is a natural owner.
+Place a rule on the Aggregate or Value Object that owns it. Use a stateless Domain service only when no object is a natural owner.
 
-`Order.CalculateSubtotal` belongs on `Order` or its lines. A pricing policy combining order lines with a project-owned discount schedule may use `OrderPricingDomainService` when neither aggregate owns the complete calculation.
+```csharp
+public sealed class OrderPricingDomainService
+{
+    public Money CalculateTotal(
+        IReadOnlyList<OrderLine> lines,
+        Currency currency)
+    {
+        return lines.Aggregate(
+            Money.Zero(currency),
+            (total, line) => total.Add(line.Subtotal));
+    }
+}
+```
 
-The service accepts Domain values and returns a Domain value or decision. Application obtains required aggregates and external facts before calling it.
+Application obtains required Aggregates and external facts before calling the service.
 
-## Record events and reactions
+## Record Events and Follow-ups
 
-Name each event as a completed business fact. Include immutable values required to understand that fact, without carrying the aggregate.
+Name each Event as a completed fact. Include immutable values required to understand that fact without carrying the Aggregate.
 
-| Event | Fact | Reaction | Delivery |
-|:---|:---|:---|:---|
-| `PostPublished` | A draft became published at a specified time. | Notify subscribers. | Durable when subscriber notification cannot be lost. |
+| Event | Business meaning | Follow-up | Owner | Delivery |
+|:---|:---|:---|:---|:---|
+| `OrderConfirmed` | The paid Order is final. | Issue tickets. | Tickets | `durable` |
+| `TicketIssued` | An admission entitlement exists. | Send it to the buyer. | Communications | `durable` |
+| `PostPublished` | A Post became public. | Refresh the public catalog. | Posts | `rebuildable` |
 
-A domain event remains an internal Domain contract. Translate it to a separate integration event when another system consumes a versioned external message.
+A Domain Event remains an internal Domain contract. Translate it to an Integration Event when another system consumes a versioned external message.
 
-The event table may list no reaction. Events can remain useful as explicit business facts and test evidence. Do not create an event solely because every method is expected to emit one.
+An Event may have no Follow-up. Do not create an Event only because every method is expected to emit one.
 
-## Map the model to use cases
+## Separate atomic work from a durable Workflow
 
-Each command use-case specification names:
+One top-level Command handler may coordinate multiple Aggregates in one transaction when the Use case names the rule requiring atomic consistency. It stages every changed Aggregate and lets the command post-handler commit once.
 
-- Aggregate and business method.
-- Source and target states.
-- Invariant IDs.
-- Domain events.
-- Rejected states and observable failures.
+Do not dispatch another Command through `ICommandMediator` from that handler.
+
+Create a Workflow when the system advances work across a transaction or time boundary:
+
+```text
+PaymentConfirmed
+  OrderFulfillmentWorkflow
+    issue inventory.confirm-reservation
+    await ReservationConfirmed
+    issue tickets.issue-ticket
+    await TicketIssued
+    complete
+```
+
+Each issued Command owns one transaction. The Workflow Orchestrator records progress and the outgoing Command durably without mutating the participating Aggregates.
+
+## Map the model to Use cases
+
+Each Command Use-case specification names:
+
+- Aggregates changed.
+- Business methods called.
+- Source and target states when applicable.
+- `INV-*` and `POL-*` rule IDs.
+- Domain Events.
+- Rejected behavior and observable failures.
 - Acceptance criteria for allowed and rejected behavior.
 
-Each query states that it has no Domain transition and names its read source. A query may expose state as a stable response field, but the API representation does not replace the Domain state records.
+Each Query states `No Domain transition` and names its Read Model. It does not load an Aggregate for presentation.
 
-Update the subject coverage table after the use cases have stable acceptance IDs:
+## Use a matching folder shape
 
-| Invariant or transition | Use cases | Acceptance criteria |
-|:---|:---|:---|
-| `INV-POSTS-01` | `posts.publish-post` | `AC-POSTS-PUBLISH-POST-01`, `AC-POSTS-PUBLISH-POST-02` |
+```text
+apps/api/src/Shop.Domain/
+  Orders/
+    Order.cs
+    OrderId.cs
+    OrderClaim.cs
+    OrderClaimId.cs
+    IOrderRepository.cs
+    IOrderClaimRepository.cs
+    Events/
+      OrderConfirmed.cs
+    Exceptions/
+      OrderCannotBeCancelledException.cs
 
-Do not record test class or method names. Automated tests cite acceptance IDs, and the acceptance IDs map back to invariant IDs through the use-case specification.
+apps/api/src/Shop.Application/
+  Orders/
+    CancelOrder/
+      CancelOrderCommand.cs
+      CancelOrderCommandResult.cs
+      CancelOrderCommandValidator.cs
+      CancelOrderCommandHandler.cs
+  Workflows/
+    OrderFulfillment/
+      OrderFulfillmentWorkflow.cs
+      OrderFulfillmentWorkflowOrchestrator.cs
+```
 
-## Check structural completeness
-
-Agents and reviewers may report these gaps without deciding the missing business policy:
-
-- An aggregate with no state record hierarchy.
-- A state with no business definition.
-- A transition with no use case.
-- A command use case with no source or target state.
-- An invariant with no acceptance criterion.
-- An event with a mutable value or aggregate reference.
-- A reaction with no delivery requirement.
-- A term used in code but absent from the glossary or subject language.
-- Two names for the same domain concept.
-
-Structural completeness does not prove that the business model is correct. Domain experts still approve the language, boundaries, states, transitions, and invariants.
+Create subfolders only when real types require them.
 
 ## Completion check
 
-- The subject language uses one term for each concept and records rejected synonyms.
-- The state-changing subject names one primary aggregate root.
-- Every aggregate boundary names owned children and referenced aggregate IDs.
-- Every aggregate has an explicit state record hierarchy.
-- State-specific data appears only on its state record.
-- Every transition maps to an aggregate method and command use case.
-- Every invariant has a stable ID and acceptance coverage.
-- Value objects define validation and equality, including collection and money rules.
+- The Subject uses one term for each concept and records rejected synonyms.
+- Every Aggregate boundary names owned children, referenced Aggregate IDs, and protected `INV-*` rules.
+- Each lifecycle representation matches real business-state differences and prevents contradictions.
+- Every transition maps to an Aggregate method and Command Use case.
+- Every `INV-*` and `POL-*` rule has acceptance coverage.
+- Value Objects define validation and equality.
 - Domain services are stateless and have no outer-layer dependency.
-- Events contain stable business facts and no aggregate references.
-- Persistence tests round-trip every concrete state record.
+- Events contain stable business facts and no Aggregate references.
+- Follow-ups state owner and delivery classification.
+- Multi-Aggregate Commands name the rule requiring one transaction.
+- Durable Workflows name progress state, Commands, Events, retries, and recovery.
+- Persistence tests round-trip the selected lifecycle representations.

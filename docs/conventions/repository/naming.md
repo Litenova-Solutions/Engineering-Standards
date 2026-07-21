@@ -37,7 +37,10 @@ Each C# file contains one primary type and uses that type's exact name. Small pr
 | Query handler | `{UseCase}QueryHandler` | `GetPostQueryHandler` |
 | Query validator | `{UseCase}QueryValidator` | `GetPostQueryValidator` |
 | Domain event | `{BusinessFact}` | `PostPublished` |
-| Event reaction | `{Action}On{Event}Handler` | `NotifySubscribersOnPostPublishedHandler` |
+| Event handler | `{Action}On{Event}Handler` | `NotifySubscribersOnPostPublishedHandler` |
+| Workflow | `{BusinessPurpose}Workflow` | `OrderFulfillmentWorkflow` |
+| Workflow state | `{BusinessPurpose}WorkflowState` | `OrderFulfillmentWorkflowState` |
+| Workflow Orchestrator | `{BusinessPurpose}WorkflowOrchestrator` | `OrderFulfillmentWorkflowOrchestrator` |
 | Repository interface | `I{Aggregate}Repository` | `IPostRepository` |
 | Repository implementation | `{Aggregate}Repository` | `PostRepository` |
 | Endpoint | `{UseCase}Endpoint` | `CreateDraftEndpoint` |
@@ -93,7 +96,7 @@ Next.js special files retain framework names such as `page.tsx`, `layout.tsx`, `
 
 ### Align business names across layers
 
-The `Posts` subject maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/subjects/posts`. Its primary Domain aggregate root is `Post`. Use-case names retain the same verb and subject across layers.
+The `Posts` Subject maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/subjects/posts`. Its Domain folder may contain the `Post` Aggregate and other related Aggregates. Use-case names retain the same verb and Subject across layers.
 
 ### Keep namespaces aligned with folders
 
