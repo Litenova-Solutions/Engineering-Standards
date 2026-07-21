@@ -104,7 +104,7 @@ For this standards repository:
 - Confirm removed terminology, rule IDs, templates, and aliases have no current standards references.
 - Run `git diff --check`.
 
-The repository has no standards CLI, generated index, application scaffold, or bundled consumer validator. JSON schemas define machine-readable file shape. Consumer CI or review tooling performs required cross-file checks.
+The repository ships one reference consumer validator at `tools/validate-consumer.mjs`. It validates Specification Metadata against the schema and runs the cross-file checks the foundation Verification lists require (flow use-case references, module and use-case path alignment, acceptance and end-to-end ID uniqueness, domain-policy and workflow references, and local extension scope). It has no other standards CLI, generated index, or application scaffold. JSON schemas define machine-readable file shape; the reference validator is the baseline cross-file check, and consumer CI may extend it.
 
 ## Consumer verification
 
@@ -123,6 +123,12 @@ pnpm lint
 pnpm type-check
 pnpm test
 pnpm build
+```
+
+Run the reference consumer validator from the consumer root:
+
+```bash
+node standards/tools/validate-consumer.mjs
 ```
 
 Run Playwright for affected browser end-to-end flows and extension-specific verification for every applicable extension affected by the change.

@@ -24,7 +24,7 @@ A completed end-to-end flow connects verified use cases and workflows to one obs
 
 ### Run applicable checks (RELEASE.GATES.001)
 
-Backend changes require a Release build and tests. Frontend changes require frozen dependency installation, lint, type checking, tests, and a production build. End-to-end flow changes require their end-to-end tests. Product, domain, implementation, and API changes require code-document consistency checks. Selected extensions add their stated verification when project-scoped or locally applicable.
+Backend changes require a Release build and tests. Frontend changes require frozen dependency installation, lint, type checking, tests, and a production build. End-to-end flow changes require their end-to-end tests. Product, domain, implementation, and API changes require code-document consistency checks, including the reference consumer validator (`node standards/tools/validate-consumer.mjs`) for Specification Metadata, internal links, and cross-file references. Selected extensions add their stated verification when project-scoped or locally applicable.
 
 ### Commit derived application contracts (RELEASE.DERIVED.001)
 

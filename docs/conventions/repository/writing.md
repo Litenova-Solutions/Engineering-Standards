@@ -50,7 +50,7 @@ Every structured consumer specification MUST start with one JSON block validated
 
 `specStatus` states whether the specification is draft, approved, or retired. Behavior specifications use `implementationStatus` to distinguish planned behavior from verified implementation. `lastReviewed` records the last review against current business and implementation facts, not the creation date.
 
-Do not duplicate owner, status, or review date in a Markdown metadata section. Put implementation paths and verification evidence in the relevant specification sections.
+The JSON block is the only metadata carrier. Do not add a separate Markdown document-metadata section for owner, status, review date, canonical source, or implementation evidence. Record canonical source in the specification body where relevant and implementation paths and verification evidence in the relevant specification sections.
 
 ### Use established terms and ordinary capitalization (WRITING.TERMS.001)
 
@@ -60,7 +60,7 @@ Write module, use case, workflow, aggregate, invariant, event, reaction, and pol
 
 ### Run repeatable writing checks (WRITING.CHECK.001)
 
-Before review, scan changed written files for non-ASCII characters, placeholder text outside intentional templates, duplicate rule IDs, broken internal links, and missing or incomplete Specification Metadata. Run `git diff --check` and report every skipped check.
+Before review, scan changed written files for non-ASCII characters, placeholder text outside intentional templates, duplicate rule IDs, broken internal links, and missing or incomplete Specification Metadata. Run the reference consumer validator (`node standards/tools/validate-consumer.mjs`) to check Specification Metadata, internal links, and cross-file references in one pass. Run `git diff --check` and report every skipped check.
 
 ## Conventions
 
