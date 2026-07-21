@@ -47,4 +47,4 @@ Use a decision record for an unresolved policy, provider, or external choice. Li
 
 ## Version pin
 
-Update the consumer submodule pointer to the v1.3.0 tag or its exact release commit. Read the v1.3 changelog entry and run the complete application gate set after applying the required documentation changes.
+During draft review, pin the consumer submodule to the exact reviewed commit. After publication, update it to the `v1.3.0` tag. Read the v1.3 changelog entry and run the complete application gate set after applying the required documentation changes.

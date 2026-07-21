@@ -1,6 +1,8 @@
 # Changelog
 
-## v1.3.0
+## Unreleased
+
+Target release: `v1.3.0`.
 
 - Grouped domain documentation into `subjects/` and `cross-cutting/` buckets, with the shared glossary and domain index at the domain root.
 - Added templates for critical journeys, evidence registers, cross-cutting contracts, and operating limits.
