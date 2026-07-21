@@ -1,0 +1,339 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/specification-metadata.schema.json",
+  "title": "ADDD Specification Metadata",
+  "description": "JSON metadata blocks embedded at the start of structured ADDD specifications.",
+  "oneOf": [
+    { "$ref": "#/$defs/product" },
+    { "$ref": "#/$defs/domainIndex" },
+    { "$ref": "#/$defs/subjectsIndex" },
+    { "$ref": "#/$defs/subject" },
+    { "$ref": "#/$defs/useCase" },
+    { "$ref": "#/$defs/businessFlow" },
+    { "$ref": "#/$defs/workflow" },
+    { "$ref": "#/$defs/sharedRule" },
+    { "$ref": "#/$defs/claimsAndEvidence" },
+    { "$ref": "#/$defs/operatingLimits" },
+    { "$ref": "#/$defs/page" },
+    { "$ref": "#/$defs/decision" },
+    { "$ref": "#/$defs/runbook" },
+    { "$ref": "#/$defs/releaseEvidence" }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "recordIdentifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "useCaseIdentifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+    },
+    "pageIdentifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+    },
+    "recordStatus": {
+      "type": "string",
+      "enum": ["draft", "current", "retired"]
+    },
+    "deliveryStatus": {
+      "type": "string",
+      "enum": ["planned", "verified"]
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lastReviewed": {
+      "type": "string",
+      "format": "date"
+    },
+    "identifierArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/identifier" }
+    },
+    "useCaseArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/useCaseIdentifier" }
+    },
+    "extensionArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/identifier" }
+    },
+    "riskArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "authorization",
+          "money",
+          "sensitive-data",
+          "irreversible",
+          "concurrency",
+          "durable-delivery",
+          "availability"
+        ]
+      }
+    },
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed", "primaryBusinessFlow"],
+      "properties": {
+        "kind": { "const": "product" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "primaryBusinessFlow": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "domainIndex": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "domain-index" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "subjectsIndex": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "subjects-index" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "subject" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
+      }
+    },
+    "useCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "recordStatus",
+        "deliveryStatus",
+        "owner",
+        "lastReviewed",
+        "operationType",
+        "actors",
+        "entryPoints",
+        "risks",
+        "applicableExtensions"
+      ],
+      "properties": {
+        "kind": { "const": "use-case" },
+        "id": { "$ref": "#/$defs/useCaseIdentifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "deliveryStatus": { "$ref": "#/$defs/deliveryStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "operationType": {
+          "type": "string",
+          "enum": ["command", "query"]
+        },
+        "actors": { "$ref": "#/$defs/identifierArray" },
+        "entryPoints": { "$ref": "#/$defs/identifierArray" },
+        "risks": { "$ref": "#/$defs/riskArray" },
+        "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
+      }
+    },
+    "businessFlow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "recordStatus",
+        "deliveryStatus",
+        "owner",
+        "lastReviewed",
+        "releaseRole",
+        "useCases"
+      ],
+      "properties": {
+        "kind": { "const": "business-flow" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "deliveryStatus": { "$ref": "#/$defs/deliveryStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "releaseRole": {
+          "type": "string",
+          "enum": ["primary", "supporting"]
+        },
+        "useCases": { "$ref": "#/$defs/useCaseArray" },
+        "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "recordStatus",
+        "deliveryStatus",
+        "owner",
+        "lastReviewed",
+        "participatingSubjects",
+        "applicableExtensions"
+      ],
+      "properties": {
+        "kind": { "const": "workflow" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "deliveryStatus": { "$ref": "#/$defs/deliveryStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "participatingSubjects": {
+          "allOf": [
+            { "$ref": "#/$defs/identifierArray" },
+            { "minItems": 1 }
+          ]
+        },
+        "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
+      }
+    },
+    "sharedRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed", "ruleType", "appliesTo"],
+      "properties": {
+        "kind": { "const": "shared-rule" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "ruleType": {
+          "type": "string",
+          "enum": ["business-policy", "authorization-rule", "storage-constraint"]
+        },
+        "appliesTo": {
+          "allOf": [
+            { "$ref": "#/$defs/identifierArray" },
+            { "minItems": 2 }
+          ]
+        },
+        "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
+      }
+    },
+    "claimsAndEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "claims-and-evidence" },
+        "id": { "$ref": "#/$defs/recordIdentifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "operatingLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "operating-limits" },
+        "id": { "$ref": "#/$defs/recordIdentifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "recordStatus",
+        "deliveryStatus",
+        "owner",
+        "lastReviewed",
+        "app",
+        "route",
+        "useCases"
+      ],
+      "properties": {
+        "kind": { "const": "page" },
+        "id": { "$ref": "#/$defs/pageIdentifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "deliveryStatus": { "$ref": "#/$defs/deliveryStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "app": { "$ref": "#/$defs/identifier" },
+        "route": { "type": "string", "minLength": 1 },
+        "useCases": { "$ref": "#/$defs/useCaseArray" },
+        "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "decision" },
+        "id": { "$ref": "#/$defs/recordIdentifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "runbook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "runbook" },
+        "id": { "$ref": "#/$defs/recordIdentifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "releaseEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "recordStatus", "owner", "lastReviewed", "release"],
+      "properties": {
+        "kind": { "const": "release-evidence" },
+        "id": { "$ref": "#/$defs/recordIdentifier" },
+        "recordStatus": { "$ref": "#/$defs/recordStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "release": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

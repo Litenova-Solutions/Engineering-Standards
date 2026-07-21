@@ -4,14 +4,14 @@
 
 Target release: `v1.3.0`.
 
-- Grouped domain documentation into `subjects/` and `cross-cutting/` buckets, with the shared glossary and domain index at the domain root.
-- Added templates for critical journeys, evidence registers, cross-cutting contracts, and operating limits.
-- Added bucket README templates for subjects and cross-cutting domain records.
-- Added explicit process-coordinator boundaries for workflows that invoke more than one subject.
-- Distinguished planned design contracts from active behavior and required active acceptance evidence.
-- Defined use-case extension metadata as a subset of the consumer extension allow-list.
-- Added the ADDD domain-routing schema and a read-only validation script for cross-file metadata checks.
-- Added decision-gate and unresolved-choice sections to the decision template.
+- Renamed ADDD to Agent-Driven Domain Delivery and defined it as a delivery method with explicit industry mappings.
+- Replaced the planning hierarchy with relationships among Product, Business Flow, Subject, Use case, Workflow, Aggregate, acceptance criterion, and Flow check.
+- Defined Subject as a language and navigation boundary that may contain zero, one, or multiple Aggregates.
+- Added Business Flow, Workflow, Workflow Orchestrator, Follow-up, Shared Rule, and Claims and Evidence records.
+- Replaced mandatory Aggregate state-record hierarchies with business-state documentation and representation choices.
+- Added kind-specific Specification Metadata with separate record and delivery status.
+- Replaced consumer `extensions` with `selectedExtensions` and added project or local extension activation scopes.
+- Replaced the ADDD routing schema with a kind-discriminated Specification Metadata schema.
 - Added the v1.3 consumer upgrade guide.
 
 ## v1.2.0

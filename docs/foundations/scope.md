@@ -10,7 +10,7 @@ The boundary is deliberate. Applications outside it may still use individual ide
 
 - Apply version 1 to one bounded-context business application.
 - Use the selected ASP.NET Core, PostgreSQL, Marten, and optional Next.js profile.
-- Deliver one release-ready primary journey before secondary subjects.
+- Deliver one release-ready primary Business Flow before secondary product outcomes.
 - Activate conditional behavior through named extensions.
 - Record a decision before departing from a required standard.
 
@@ -28,9 +28,9 @@ The application has one business language and one deployment boundary. Subjects 
 
 `Posts`, `Authors`, and `Comments` may be separate subjects in one publishing context.
 
-### Deliver a release-ready primary journey (SCOPE.V1.001)
+### Deliver a release-ready primary Business Flow (SCOPE.V1.001)
 
-Application v1 includes one deployed primary journey plus its required security, persistence, diagnostics, automated evidence, backup, deployment, rollback, and operating instructions.
+Application v1 includes one deployed primary Business Flow plus its required security, persistence, diagnostics, automated evidence, backup, deployment, rollback, and operating instructions.
 
 V1 does not require speculative scale, multi-region operation, or optional product areas.
 
@@ -60,7 +60,7 @@ A publishing v1 may support author sign-in, draft creation, publication, and pub
 
 ## Verification
 
-- Confirm the product brief names one primary journey.
+- Confirm the product brief names one primary Business Flow.
 - Confirm `standards.project.json` selects `dotnet-nextjs`.
-- Confirm each active conditional concern appears in the extension list.
+- Confirm each active conditional concern appears in `selectedExtensions` and each local extension appears on its applicable specifications.
 - Confirm unsupported architecture choices have a project decision.

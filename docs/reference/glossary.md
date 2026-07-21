@@ -2,7 +2,11 @@
 
 ## ADDD
 
-Agentic Domain-Driven Delivery. Litenova's method for connecting a thin product brief, shared domain language, single use-case specifications, implementation, automated evidence, and release operation.
+Agent-Driven Domain Delivery. A delivery method in which human-approved product and domain records give agents durable context to implement one complete use case at a time.
+
+## Acceptance criterion
+
+One observable behavior owned by a Use-case specification and identified by `AC-{SUBJECT}-{USE-CASE}-{NN}`.
 
 ## Agent Summary
 
@@ -10,80 +14,128 @@ The anchored short section agents load as Tier 1 context for a task. The full do
 
 ## Aggregate
 
-A transactional consistency boundary that protects business invariants during a command.
+A cluster of Domain objects governed as one transactional consistency boundary.
 
 ## Aggregate root
 
-The entity that controls changes inside an aggregate and protects its invariants. It remains the runtime Domain contract even when a subject provides the wider documentation and navigation boundary.
+The only external mutation entry point for an Aggregate. It protects the Aggregate Rules that must hold after a transaction.
 
-## Critical journey
+## Aggregate Rule
 
-An ordered set of use cases that produces one customer outcome and defines a release boundary.
+A business rule that must remain true after every transaction that changes one Aggregate. Aggregate Rule IDs use `INV-{SUBJECT}-{NN}`.
 
-## Cross-cutting contract
+## Business Flow
 
-A documented behavior that applies across subjects, such as security, retention, operating limits, provider boundaries, or event delivery.
+A connection between use cases from one starting condition to an observable product outcome. A Business Flow may cross Subjects and include actor choices, system work, waiting, failures, and recovery.
 
-## Evidence register
+## Business Policy
 
-A record that classifies claims as observed, calculated, inferred, hypothesized, or gated and links each claim to its source and decision impact.
+A business rule not owned by one Aggregate invariant. It states its owner, consistency requirement, enforcement point, failure behavior, and verification. Shared Business Policy IDs use `POL-{SHARED-RULE}-{NN}`.
 
-## Subject
+## Claims and Evidence
 
-A stable business noun that aligns domain documentation, backend folders, endpoint groups, frontend feature folders, tests, and related use cases inside the one bounded context. A state-changing subject names one primary aggregate root. Subject is not a runtime Domain interface or base class.
+An optional record that separates observed, calculated, inferred, and hypothetical claims from the decisions or release conditions that depend on them.
+
+## Command
+
+An Application message that may change business state. One top-level Command owns one command pipeline and one transaction commit.
 
 ## Convention
 
-A default name, location, file shape, or implementation pattern. A consumer may replace a convention by documenting one explicit local convention.
-
-## Delivery surface
-
-A public way an actor observes or invokes a use case, such as an HTTP API, web application, Worker-triggered process, or administrative interface.
-
-## Process coordinator
-
-An Application, reaction, or Worker boundary that sequences public behavior across subjects. It owns independent workflow state only when that state has its own business language, lifecycle, retry or idempotency rules, or operator actions.
+A default name, location, file shape, or implementation pattern. A consumer may replace a convention through one explicit local convention.
 
 ## Derived artifact
 
-A committed application file produced deterministically from an authored source. Examples include OpenAPI and generated TypeScript API types.
+A committed application file produced deterministically from an authored source. OpenAPI and generated TypeScript API types are derived artifacts.
 
-## Domain event
+## Domain Event
 
-An immutable, package-free Domain record describing a business fact raised by an aggregate.
+An immutable, package-free Domain record describing a completed business fact inside the bounded context.
+
+## Entry Point
+
+A path through which an actor or system invokes or observes a Use case, such as an HTTP API, web application, webhook, Worker trigger, or administrative interface.
 
 ## Extension
 
-A conditional standards bundle enabled by activation criteria in `standards.project.json`. An extension may add packages, projects, conventions, verification, or named replacements for baseline rules.
+A conditional standards bundle selected in `standards.project.json`. Project-scoped extensions apply when selected. Local extensions apply only to allowed specification kinds that list them.
+
+## Flow check
+
+An automated check through a public system boundary that verifies one complete Business Flow. Flow-check IDs use `FC-{BUSINESS-FLOW}-{NN}`.
+
+## Follow-up
+
+Business behavior expected after an Event. A Follow-up maps to a precise implementation such as an event handler, Workflow Orchestrator, projection, or scheduled job.
+
+## Integration Event
+
+A versioned message contract delivered outside the bounded context.
 
 ## Normative
 
-Required for a conforming consumer. In this repository, content under a `Standards` section is normative.
+Required for a conforming consumer. Content under a `Standards` section is normative.
 
 ## Operating limit
 
-A supported boundary for a release or pilot, including capacity, dependency availability, support window, monitoring threshold, stop condition, or recovery target.
+An enforced, tested, or supported operating boundary, or an alert threshold that requires operator action.
 
 ## Platform profile
 
 A supported combination of architecture, frameworks, project layout, and baseline conventions. Version 1 contains the `dotnet-nextjs` profile.
 
-## Risk flag
+## Projection
 
-A use-case metadata value that activates additional specification and evidence for authorization, money, sensitive data, irreversible behavior, concurrency, durable delivery, or availability.
+A process that derives a Read Model from authoritative facts. Its delivery is atomic, durable, or rebuildable when the Read Model is required behavior.
+
+## Query
+
+An Application message that reads a Read Model without changing business state.
+
+## Read Model
+
+Data shaped for a Query without requiring Aggregate loading or mutation.
+
+## Repository
+
+A Domain-owned port that loads and stages complete Aggregates. It does not expose general queries or commit a transaction.
+
+## Risk
+
+A use-case metadata value that adds specification and verification for authorization, money, sensitive data, irreversible behavior, concurrency, durable delivery, or availability.
 
 ## Rule ID
 
-A canonical uppercase dotted identifier such as `APP.COMMAND.001` used by overrides, extensions, decisions, conflict reports, and review within one standards release. A later release may rename or remove it.
+A canonical uppercase dotted identifier such as `APP.COMMAND.001` used by standards overrides, extensions, decisions, conflict reports, and review within one standards release.
 
-## Standard assurance
+## Shared Rule
 
-The default use-case depth when no risk flag adds extra assurance requirements.
+A documented rule that applies to more than one Subject and identifies its owner, consistency, enforcement, failure behavior, and verification.
+
+## Specification Metadata
+
+The JSON block at the start of a structured specification. It identifies the document kind, ID, authority, owner, review date, and kind-specific delivery data.
 
 ## Standards override
 
 A consumer replacement for a normative rule. It names the rule ID and an accepted project decision in `standards.project.json`.
 
-## Use-case specification
+## Subject
 
-The one authored operation file containing intent, authorization, contract, business rules, flow, failures, examples, risk, operating impact, and acceptance criteria.
+A stable business topic that groups related language and use cases across documentation, backend folders, endpoint groups, frontend features, and tests. A Subject is a navigation boundary, not a transaction boundary or runtime type.
+
+## Use case
+
+One independently verifiable actor or system goal implemented as one top-level Command or Query operation.
+
+## Value Object
+
+An immutable Domain type defined by its values and rules rather than an independent identity.
+
+## Workflow
+
+System-controlled progress across a transaction or time boundary. A Workflow records durable state, awaited Events, issued Commands, retry or idempotency behavior, and recovery when those concerns apply.
+
+## Workflow Orchestrator
+
+The component that persists and advances a durable Workflow. Its industry mappings include Process Manager and orchestration-based Saga. ADDD uses `Workflow Orchestrator` in specifications and code examples.

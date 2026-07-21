@@ -19,14 +19,14 @@ These standards make those choices explicit. They retain detailed conventions wh
 | Conventions | Define exact folders, names, boundaries, implementation patterns, and checks by topic. |
 | Extensions | Activate conditional behavior such as durable delivery, EF Core, caching, or localization. |
 | Manifest | Holds version pins, profile composition, extension paths, and agent load plans. |
-| Consumer configuration | Selects the profile, paths, extensions, and project overrides. |
+| Consumer configuration | Selects the profile, paths, extensions allowed by the project, and project overrides. |
 | Templates | Provide small starting points for consumer product and domain documentation. |
 
 The baseline profile applies first. An enabled extension may replace only the baseline rule IDs it names. A consumer override takes precedence when it names the affected rule ID and links to a project decision.
 
 ## From an idea to application v1
 
-Litenova uses Agentic Domain-Driven Delivery (ADDD). ADDD keeps product intent, implementation, tests, and release evidence aligned around one use case at a time.
+Litenova uses Agent-Driven Domain Delivery (ADDD). ADDD keeps product intent, implementation, tests, and release evidence aligned around one use case at a time.
 
 For a publishing application:
 
@@ -85,7 +85,7 @@ Do not add `branch = main` to `.gitmodules`. Upgrade through a dedicated pull re
 
 Each consumer adds:
 
-- `standards.project.json` for its profile, paths, extensions, and overrides.
+- `standards.project.json` for its profile, paths, selected extensions, and overrides.
 - A short root `AGENTS.md` that points agents to `standards/AGENTS.md`.
 - Product and use-case documentation under `docs/`.
 

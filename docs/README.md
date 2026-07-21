@@ -10,7 +10,7 @@ This index gives humans and AI agents one navigation map. Read foundation docume
 |:---|:---|
 | [Supported scope](foundations/scope.md) | Evaluating whether an application fits version 1. |
 | [Engineering principles](foundations/principles.md) | Making a design choice not covered by a narrower convention. |
-| [Agentic Domain-Driven Delivery](foundations/addd.md) | Planning, documenting, or implementing product behavior. |
+| [Agent-Driven Domain Delivery](foundations/addd.md) | Planning, documenting, or implementing product behavior. |
 | [Agent operating protocol](foundations/agent-protocol.md) | Configuring or reviewing agent behavior. |
 | [Release standard](foundations/release-standard.md) | Deciding whether a use case or application v1 is complete. |
 
@@ -59,7 +59,7 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 
 ## Extensions
 
-Extensions are inactive until a current requirement meets their activation criteria and the consumer lists the extension in `standards.project.json`.
+Extensions are inactive until a current requirement meets their activation criteria and the consumer lists the extension in `selectedExtensions` in `standards.project.json`.
 
 Read the [extension index](extensions/README.md) to select conditional standards for API compatibility, authentication, BDD, caching, concurrency, data lifecycle, deployment, external services, localization, scheduled jobs, tenancy, durable delivery, EF Core, realtime behavior, or reporting.
 
@@ -83,4 +83,4 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Runbook template](../templates/docs/runbook.md) gives the required operational record shape.
 - [V2 roadmap](../ROADMAP.md) records evidence-gated candidates after v1 adoption.
 
-Schemas are not part of the human reading path. They validate the standards manifest, consumer `standards.project.json`, and ADDD subject or use-case routing blocks. Cross-file checks still compare use-case extensions with the consumer configuration.
+Schemas are not part of the human reading path. They validate the standards manifest, consumer `standards.project.json`, and kind-specific ADDD Specification Metadata. Cross-file checks still resolve references and compare local extension applicability with the manifest and consumer selection.

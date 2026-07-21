@@ -1,269 +1,237 @@
-# Agentic Domain-Driven Delivery
+# Agent-Driven Domain Delivery
 
 ## Intent
 
-Agentic Domain-Driven Delivery (ADDD) is Litenova's method for turning product intent into one traceable use case at a time. It gives human contributors and AI agents a durable source for business language, observable behavior, risk, and completion evidence.
+Agent-Driven Domain Delivery (ADDD) is a delivery method in which human-approved product and domain records give AI agents the durable context required to implement one complete use case at a time.
 
-ADDD uses a focused set of domain-driven design ideas: one bounded context, shared language, subjects as business navigation boundaries, aggregates as consistency boundaries, explicit state models, and use cases expressed in domain terms. It avoids a long modeling phase before the first user journey works.
-
-Human discovery establishes the business concepts and rules. ADDD begins when those findings can be named and recorded. Agents may identify missing definitions, unreferenced transitions, or uncovered invariants; they do not invent domain concepts to complete a template.
-
-## Why ADDD exists
-
-AI-assisted development happens across sessions with different context. Without a durable product and behavior record, agents may reinterpret requirements, rename business concepts, add architecture from habit, or update code without updating tests and documentation.
-
-Each ADDD artifact controls one source of drift:
-
-| Artifact | Purpose |
-|:---|:---|
-| Product brief | Defines the first user, problem, primary journey, success measure, non-goals, product and operating context, operating target, and data classification. |
-| Domain glossary | Gives every contributor one business vocabulary. |
-| Domain index | Lists the subjects and orders the use cases in the primary journey. |
-| Subject specification | Defines purpose, actors, language, the primary aggregate root, states, transitions, invariants, events, reactions, and use cases. |
-| Use-case specification | Defines one operation, its contract, rules, failures, examples, risk flags, and acceptance criteria. |
-| Page specification | Defines composition only when a route combines behavior or owns non-trivial interaction state. |
-| Decision record | Preserves a costly or standards-changing choice and its reason. |
-| Critical journey | Connects ordered use cases to one customer outcome and names the release boundary. |
-| Evidence register | Separates observed facts, calculations, inferences, hypotheses, and decision gates. |
-| Cross-cutting contract | States behavior shared across subjects, such as retention, security, operating limits, or provider boundaries. |
-
-ADDD uses the planning hierarchy `Product -> Bounded context -> Subject -> Use case -> Acceptance criterion`. Version 1 has one bounded context, represented by the Domain index and glossary. A subject groups one or more related use cases. An aggregate root is not another planning level; it is the runtime consistency and mutation boundary named by a state-changing subject.
-
-## Worked example
-
-Assume a publishing product whose first journey is "an author creates and publishes a post."
-
-1. `docs/product/brief.md` identifies authors as the first user and publication as the success path.
-2. `docs/domain/glossary.md` defines `Draft`, `Published`, and `Slug`.
-3. `docs/domain/README.md` lists the `Posts` subject and orders `create-draft` before `publish-post`.
-4. `docs/domain/subjects/posts/create-draft.md` defines inputs, ownership, failures, and acceptance criteria.
-5. The implementation uses the same `Posts` and `CreateDraft` names in Domain, Application, API, and frontend feature folders.
-6. Automated tests cite `AC-POSTS-CREATE-DRAFT-01`.
-7. The use case becomes active only after its observable behavior and automated evidence exist.
-
-If publication must emit a notification that cannot be lost after a commit, the use case activates `outbox-worker`. A notification that may be retried manually can remain a best-effort post-commit reaction.
-
-## Delivery flow
-
-1. Define the thin inception artifacts.
-2. Select the next use case in the primary journey.
-3. Write its contract and acceptance criteria.
-4. Mark risk flags and select required extensions.
-5. Load the task-specific conventions.
-6. Implement the complete domain-to-surface slice.
-7. Add automated evidence for every acceptance criterion.
-8. Run baseline and extension verification.
-9. Update the specification when observable behavior changes.
-10. Start the next use case only after the current slice is complete.
-
-## Identifier model
-
-| Identifier | Format | Example |
-|:---|:---|:---|
-| Subject | lowercase kebab-case | `posts` |
-| Use case | `{subject}.{use-case}` | `posts.create-draft` |
-| Acceptance criterion | `AC-{SUBJECT}-{USE-CASE}-{NN}` | `AC-POSTS-CREATE-DRAFT-01` |
-| Invariant | `INV-{SUBJECT}-{NN}` | `INV-POSTS-01` |
-| Rule | uppercase dotted ID | `ADDD.USECASE.001` |
-| Extension | lowercase kebab-case | `outbox-worker` |
-
-Never reuse an accepted identifier for different behavior.
+ADDD defines its own delivery rules and maps selected domain-driven design, behavior-driven development, CQRS, vertical-slice, and messaging patterns where they clarify implementation. It does not inherit any source method wholesale.
 
 ## Agent Summary {#agent-summary}
 
-- Start with a product brief, glossary, domain index, and costly decisions.
-- Give authored documents an owner, status, canonical source, verification date, and implementation evidence.
-- Record each subject's primary aggregate root, state records, transitions, invariants, events, and language before implementing its first command.
-- Keep one Markdown specification per use case.
-- Use subject names consistently across documentation and code.
-- Add risk sections and extensions only when their criteria apply.
-- Give every acceptance criterion a stable ID and cite it from automated tests.
-- Keep subject documents in `subjects/` and shared records in `cross-cutting/`.
-- Record critical journeys, evidence classifications, and cross-cutting contracts when the outcome spans subjects.
-- Treat planned behavior as a design contract and active behavior as tested behavior.
-- Keep use-case extension metadata within the consumer's enabled extension set.
-- Update specifications with observable behavior.
+- Humans own product intent, business language, and unresolved business decisions.
+- Agents implement current specifications, identify missing facts, and do not invent business rules.
+- A Subject groups related language and use cases. It is not a transaction boundary.
+- A Business Flow connects use cases to one product outcome and may cross Subjects.
+- A Workflow advances system-controlled work across transaction or time boundaries.
+- A Use case is one independently verifiable Command or Query goal and remains the delivery unit.
+- An Aggregate protects rules that must hold in one transaction.
+- Acceptance criteria verify one Use case. Flow checks verify one Business Flow.
+- Specification Metadata states document kind, authority, ownership, and applicable delivery data.
+- Selected extensions permit project structure and dependencies. Local applicability activates behavior for a specification.
+
+## Concept model
+
+ADDD uses related concepts rather than one planning hierarchy:
+
+```text
+Product
+  names outcomes and operating boundaries
+
+Business Flow
+  connects Use cases to one product outcome
+  may cross Subjects
+
+Subject
+  groups related business language and Use cases
+
+Use case
+  defines one actor or system goal
+  maps to one Command or Query operation
+
+Workflow
+  advances system-controlled work across transactions or time
+
+Workflow Orchestrator
+  persists and advances a durable Workflow
+
+Aggregate
+  protects state and rules changed in one transaction
+
+Acceptance criterion
+  defines observable behavior for one Use case
+
+Flow check
+  verifies a complete Business Flow
+```
+
+The central relationships are:
+
+```text
+Product outcome
+  Business Flow
+    Use cases
+      Acceptance criteria
+    Flow checks
+
+Subject
+  groups Use cases and language
+
+Workflow
+  advances Business Flow steps
+  issues Commands and awaits Events
+
+Command
+  normally changes one Aggregate
+
+Query
+  reads a Read Model
+```
 
 ## Standards
 
-### Complete the thin inception gate (ADDD.INCEPTION.001)
+### Keep business authority with humans (ADDD.AUTHORITY.001)
 
-Before implementing the first use case, create:
+Humans approve product outcomes, business terms, policies, acceptance criteria, and unresolved decisions. Agents MAY propose missing language, examples, and implementation mappings, but MUST mark them as proposals until a human accepts them.
 
-```text
-docs/product/brief.md
-docs/domain/glossary.md
-docs/domain/README.md
-docs/decisions/             when a costly or standards-changing choice exists
-```
+When an unknown fact changes observable behavior, authorization, money movement, data handling, or recovery, record the question and stop the affected work. Do not infer the answer from code structure or a neighboring use case.
 
-Keep each artifact short. The purpose is durable orientation, not a complete future product design.
+### Connect one product outcome through a Business Flow (ADDD.BUSINESSFLOW.001)
 
-### Move one use case through the delivery flow (ADDD.FLOW.001)
+A Business Flow connects use cases from a starting condition to one observable product outcome. It MAY include actor choices, system work, branches, waiting periods, failures, and recovery. It MAY cross Subjects.
 
-Finish one primary-journey use case across every required layer before starting a secondary subject. Placeholder persistence, API, UI, tests, deployment work, or recovery instructions mean the slice remains incomplete.
+The product brief MUST name exactly one `primary` Business Flow for application v1. Another flow uses the `supporting` release role. A Business Flow links its use-case specifications and does not copy their inputs, rules, failures, or acceptance criteria.
 
-### Group use cases by subject (ADDD.SUBJECT.001)
+A Flow check uses `FC-{BUSINESS-FLOW}-{NN}`. For `event-sales`, valid IDs begin with `FC-EVENT-SALES-`. A verified Business Flow has at least one automated Flow check through a public system boundary.
 
-Each subject owns `docs/domain/subjects/{subject}/README.md`. A subject is the stable business noun that aligns documentation and code around one cohesive model and its use cases. The subject specification records purpose, actors, its primary aggregate root, owned children, referenced aggregate IDs, subject terms, rejected synonyms, state records, transitions, shared invariants, domain events, reactions, and a short use-case list.
+### Group language and use cases by Subject (ADDD.SUBJECT.001)
 
-A state-changing subject has one primary aggregate root. Its command use cases normally change that root, and its query use cases read projections that describe the subject. If a use case has a different consistency owner and independent language, create another subject instead of hiding the boundary inside the existing subject.
+A Subject is a stable business topic that owns related language and use cases. Use the same Subject name in documentation, Domain and Application folders, API groups, frontend features, tests, and acceptance IDs.
 
-Subject is a documentation and navigation term. It does not replace the aggregate root runtime contract. Do not introduce `Subject`, `ISubject`, or `SubjectRoot` Domain types. Use the same subject name for Domain and Application folders, API endpoint groups, frontend feature folders, and test folders.
+A Subject is a navigation boundary. It does not define a transaction boundary and does not require a runtime `Subject`, `ISubject`, or `SubjectRoot` type.
 
-### Classify domain documentation directories (ADDD.DIRECTORY.001)
+A Subject MAY contain no Aggregate, one Aggregate, or multiple related Aggregates. Split a Subject when its language, business responsibility, or reasons for change are independent. Do not split it only because another Aggregate exists.
 
-Use `docs/domain/subjects/` and `docs/domain/cross-cutting/` as the two domain document buckets. The type is determined by the routing block and the directory README, not by a generic folder name.
+### Make Aggregate ownership explicit (ADDD.AGGREGATE.001)
 
-- `docs/domain/README.md` is the shared domain index. `docs/domain/glossary.md` is the shared language source.
-- `docs/domain/subjects/{subject}/` contains one subject README and its use-case specifications. The subject README has a routing block whose `id` matches the directory name.
-- `docs/domain/cross-cutting/` contains behavior shared across subjects, including critical journeys, evidence registers, security, retention, operating limits, provider boundaries, and event delivery contracts.
+An Aggregate is a cluster of Domain objects governed as one consistency boundary. Its Aggregate root is the only external mutation entry point. A Command normally changes one Aggregate.
 
-The `subjects/` and `cross-cutting/` directories each have a README that states their type, owner, and allowed artifact names. Do not place a cross-cutting artifact inside a subject directory. Do not create a `misc`, `shared`, or `common` directory as a substitute for one of the two buckets. A new domain bucket requires a decision record and a rule update.
+A Command MAY change multiple Aggregates in one transaction only when its current use-case specification or an accepted decision names the rule that requires atomic consistency. If the same Aggregates frequently change together, review their boundaries.
 
-### Record the tactical domain model (ADDD.MODEL.001)
+The Subject specification maps each Aggregate to the state it owns, its Aggregate Rules, and its Commands:
 
-Before implementing a subject's first command, its subject specification names:
+| Aggregate | Owns | Aggregate Rules | Commands |
+|:---|:---|:---|:---|
+| `Order` | Lines, totals, and lifecycle | `INV-ORDERS-01` | `orders.create-order`, `orders.cancel-order` |
+| `OrderClaim` | Guest claim lifecycle | `INV-ORDERS-04` | `orders.claim-guest-order` |
 
-- The primary aggregate root, its owned children, and referenced aggregate IDs.
-- Every primary aggregate state record and its state-specific data.
-- Every allowed transition with its source state, business action, target state, invariant IDs, and owning use cases.
-- Shared invariants with stable `INV-{SUBJECT}-{NN}` identifiers.
-- Domain events and their known in-process or external reactions.
-- Ubiquitous language and rejected synonyms.
+### Deliver one complete Use case (ADDD.USECASE.001)
 
-Every aggregate has an explicit state record hierarchy, including an aggregate that currently has one state. The subject specification does not use a lifecycle enum as a shorthand. A read-only subject records `None` as its primary aggregate root and names the read source in each query specification.
+A Use case is one independently verifiable actor or system goal. It defines its trigger, input, result, rules, failures, acceptance criteria, entry points, implementation impact, and operating impact.
 
-When a required business fact is unknown, record a named modeling question and stop the affected use case. Do not create a state, transition, invariant, or event only to fill the document structure.
+Each Use case maps to one top-level Command or Query operation. A Command may change state. A Query reads without changing business state. Multi-step product outcomes belong in a Business Flow; autonomous multi-transaction progress belongs in a Workflow.
 
-### Keep invariant identifiers stable (ADDD.INVARIANT.001)
-
-Use `INV-{SUBJECT}-{NN}` for subject invariants. Never reuse or renumber an accepted invariant ID. Update the subject specification, affected use cases, and automated evidence together when the rule changes.
-
-Each active invariant maps to at least one use case and one acceptance criterion. An invariant with no accepted behavior remains a visible modeling or delivery gap.
-
-### Keep one specification per use case (ADDD.USECASE.001)
-
-Each operation owns `docs/domain/subjects/{subject}/{use-case}.md`. The file contains intent, actors, authorization, preconditions, input, output, business rules, domain behavior, main flow, failures, examples, acceptance criteria, invariant coverage, and applicable risk sections.
-
-A command names the aggregate action, source state, target state, invariant IDs, and emitted domain events. A query states that it has no domain transition and names its read source.
-
-The specification does not list test class or method names. Tests cite stable acceptance IDs instead.
-
-### Coordinate multi-subject workflows at an explicit boundary (ADDD.COORDINATOR.001)
-
-A workflow that invokes behavior in more than one subject names a process coordinator. The coordinator is an Application handler, reaction, or Worker process when it has no independent business state. It calls each subject through its public command or port and does not mutate another subject's aggregate directly.
-
-Model the coordinator as a subject only when it has its own business language, lifecycle, durable state, retry or idempotency rules, or operator actions. Its aggregate owns coordinator state, not the aggregates it invokes. Give it use-case specifications and acceptance criteria like any other subject.
-
-Document the coordinator in the critical journey and the affected use-case specifications. State which subject owns each invariant, which step can be retried, and which failure requires operator action. A coordinator does not merge subject boundaries to reduce the number of handlers.
-
-### Declare subject and use-case routing metadata (ADDD.METADATA.001)
-
-Use this JSON block at the top of each subject specification:
-
-```json
-{
-  "id": "posts",
-  "status": "active"
-}
-```
-
-`id` matches the subject directory name. `status` is `planned`, `active`, or `retired`.
-
-Use this JSON block at the top of each use-case specification:
-
-```json
-{
-  "id": "posts.create-draft",
-  "operationType": "command",
-  "status": "active",
-  "actors": ["author"],
-  "deliverySurfaces": ["api", "web"],
-  "riskFlags": ["authorization"],
-  "extensions": []
-}
-```
-
-`id` combines the owning subject and use-case identifiers. `operationType` is `command` for behavior that may change state and `query` for read-only behavior. `status` is `planned`, `active`, or `retired`.
-
-`actors` lists the business actors that invoke or observe the use case. `deliverySurfaces` lists its public invocation or observation paths, such as `api`, `web`, or `worker`. `extensions` lists the extension IDs activated by the use case; each ID must exist in `standards.manifest.json` and be enabled in consumer `standards.project.json`.
-
-Allowed risk flags are `authorization`, `money`, `sensitive-data`, `irreversible`, `concurrency`, `durable-delivery`, and `availability`.
-
-### Inherit extensions by explicit activation (ADDD.EXTENSIONS.001)
-
-The consumer `standards.project.json` extension list is an allow-list for the repository. A use-case `extensions` array is the smaller activation set for that operation. A listed use-case extension MUST be present in both the standards manifest and the consumer list. Enabling an extension at project level does not activate its behavior for every use case.
-
-When a use case needs an extension that is not enabled, update the consumer configuration and the use-case metadata in one change. If the extension replaces a baseline rule, record the replacement in the extension document and load the extension conventions for the task. A use case with no extension requirement keeps an empty array.
-
-The document metadata schema defines the allowed values. A repository check MUST reject unknown risk flags, unknown extension IDs, and extension IDs that are not enabled for the consumer.
-
-### Give each criterion a stable ID (ADDD.ACCEPTANCE.001)
-
-Use `AC-{SUBJECT}-{USE-CASE}-{NN}`. Never reuse or renumber an accepted ID.
-
-The subject and use-case portions of an acceptance ID MUST match the owning use-case ID after conversion to uppercase and replacement of `.` with `-`. The numeric suffix is two digits and starts at `01`. For `posts.create-draft`, valid IDs start with `AC-POSTS-CREATE-DRAFT-`.
+Keep identifiers and implementation names aligned:
 
 ```text
-[AC-POSTS-CREATE-DRAFT-01] An authenticated author can create a draft
-with a unique slug.
+Use case:       orders.cancel-order
+Command:        CancelOrderCommand
+Result:         CancelOrderCommandResult
+Handler:        CancelOrderCommandHandler
+Aggregate call: Order.Cancel
+Event:          OrderCancelled
+Endpoint:       CancelOrderEndpoint
+Acceptance ID:  AC-ORDERS-CANCEL-ORDER-01
 ```
 
-### Verify acceptance coverage from source (ADDD.TRACE.001)
+Finish the Domain behavior, Application operation, persistence, entry points, automated evidence, and operating impact before setting `deliveryStatus` to `verified`. Placeholder work leaves the Use case `planned`.
 
-Planned specifications may contain acceptance IDs as design contracts. They do not claim implementation and do not require test references. Every active acceptance ID appears in at least one automated test. Search the consumer test roots for each exact ID. A missing ID fails completion. Internal implementation tests do not need an acceptance ID.
+### Specify autonomous progress as a Workflow (ADDD.WORKFLOW.001)
 
-Each active subject invariant maps to at least one active acceptance ID. Each documented state transition maps to at least one command use case. A planned invariant or transition remains a visible design gap until the owning use case becomes active. Keep these mappings in the subject and use-case documents without recording test class or method names.
+A Workflow advances system-controlled work without requiring an actor to invoke every step. Create a Workflow specification when progress crosses a transaction or time boundary and requires durable state, an awaited event, a scheduled time, retry, idempotency, compensation, or operator recovery.
 
-### Increase assurance from risk flags (ADDD.ASSURANCE.001)
+Do not create a Workflow specification for branches inside one atomic Command or for a stateless synchronous sequence. Keep that coordination inside the top-level use-case handler.
 
-An empty `riskFlags` list uses standard assurance. A listed risk adds only the relevant specification and evidence.
+A Workflow names its business owner, participating Subjects, starting fact, completion and failure conditions, durable state owner, Commands issued, Events awaited, retry horizon, idempotency behavior, timeouts, compensation, operator actions, and verification.
 
-| Risk flag | Add when applicable |
+The Workflow Orchestrator is the technical mapping for a durable Workflow. Industry mappings include Process Manager and orchestration-based Saga. These mappings do not become ADDD naming conventions.
+
+### Record Events and Follow-ups separately (ADDD.FOLLOWUP.001)
+
+An Event records a completed fact. A Follow-up states business behavior expected after that Event. Technical implementation remains explicit as a Domain event handler, Integration event handler, Workflow Orchestrator, projection, or scheduled job.
+
+Use one of these delivery classifications:
+
+| Delivery | Meaning |
 |:---|:---|
-| `authorization` | Ownership rules, forbidden cases, and resource-existence disclosure behavior. |
-| `money` | Precision, currency, duplicate-charge prevention, reconciliation, and audit evidence. |
-| `sensitive-data` | Classification, minimization, retention, logging restrictions, and access evidence. |
-| `irreversible` | Confirmation, compensation, audit, and recovery behavior. |
-| `concurrency` | Conflicting-write examples, version behavior, and integration evidence. |
-| `durable-delivery` | Delivery guarantee, idempotency, retry, dead-letter, and replay behavior. |
-| `availability` | Dependency failure, timeout, fallback, recovery, and operating evidence. |
+| `atomic` | The Follow-up is committed in the same transaction as the fact. |
+| `durable` | At-least-once delivery is recorded with retry and duplicate handling. |
+| `rebuildable` | Derived state may be rebuilt from an authoritative source after loss. |
+| `best-effort-optional` | Loss is accepted and does not leave required state incorrect. |
 
-### Document pages only when composition requires it (ADDD.PAGE.001)
+Do not classify a required projection refresh as `best-effort-optional`. Domain Events are internal business facts. Integration Events are versioned contracts delivered outside the bounded context.
 
-Create a page specification when a route combines multiple use cases, owns a multi-step interaction, has non-trivial permissions or URL state, or defines public metadata. A simple page represented by one use case stays documented by the use-case specification and route code.
+### Classify business rules by enforcement (ADDD.RULES.001)
 
-Use this JSON block at the top of each page specification:
+Use these terms:
 
-```json
-{
-  "id": "web.editor-page",
-  "app": "web",
-  "route": "/editor",
-  "useCases": ["posts.create-draft", "posts.publish-post"]
-}
+| ADDD term | Meaning | Technical mapping |
+|:---|:---|:---|
+| Input Rule | Validates message shape or format. | Command or Query validation |
+| Authorization Rule | Controls actor access to a target. | Policy and target authorization |
+| Aggregate Rule | Must hold after every transaction that changes one Aggregate. | Aggregate invariant |
+| Business Policy | Is not owned by one Aggregate invariant and names its consistency and enforcement. | Domain or Application policy |
+| Workflow Rule | Controls Workflow progression. | Workflow Orchestrator behavior |
+| Storage Constraint | Protects persistence-level uniqueness or references. | Database constraint |
+
+Use `INV-{SUBJECT}-{NN}` for Aggregate Rules. Use `POL-{SHARED-RULE}-{NN}` for Business Policies owned by a Shared Rule. Never reuse or renumber an accepted rule ID.
+
+An acceptance criterion cites every `INV-*` and `POL-*` rule required for that behavior. A Business Policy that spans Subjects MUST state its owner, consistency requirement, enforcement point, failure behavior, and verification.
+
+### Document business state without prescribing one representation (ADDD.STATE.001)
+
+Document lifecycle states when behavior, required facts, or allowed transitions differ by state. Use business state names in business tables.
+
+Select the code representation that prevents invalid states with the least complexity:
+
+- Use an enum when states differ only by label and transitions remain simple.
+- Use typed state objects when states carry different required data or behavior.
+- Use a Value Object when one part of state owns validation.
+- Use no lifecycle representation when the concept has no meaningful states.
+
+Add a business-to-code mapping only when implementation exists. Do not require a state hierarchy for an Aggregate with one state.
+
+### Declare Specification Metadata (ADDD.METADATA.001)
+
+Every structured specification starts with one JSON metadata block and an explicit `kind`. Common fields are `kind`, `id`, `recordStatus`, `owner`, and `lastReviewed`.
+
+`recordStatus` is `draft`, `current`, or `retired`:
+
+- `draft` is under review and is not authoritative.
+- `current` is authoritative for its documented scope.
+- `retired` preserves history after its contract no longer applies.
+
+Behavior specifications also use `deliveryStatus`:
+
+- `planned` describes approved target behavior without an implementation claim.
+- `verified` means implementation exists, every acceptance criterion has an automated test reference, and applicable checks have passed.
+
+Do not use `deliveryStatus` on indexes, decisions, Claims and Evidence, Operating Limits, or other records that do not claim implemented behavior. The Specification Metadata schema defines the fields permitted for each `kind`.
+
+### Select extensions before applying them (ADDD.EXTENSIONS.001)
+
+`selectedExtensions` in `standards.project.json` is the project allow-list. Selection permits dependencies and repository structure.
+
+An extension with `activationScope: project` applies whenever selected. An extension with `activationScope: local` applies only when selected and listed in `applicableExtensions` on a specification kind allowed by its manifest `applicableKinds`.
+
+Do not list a project-scoped extension in `applicableExtensions`. Do not list a local extension on a specification kind excluded by `applicableKinds`.
+
+### Give acceptance criteria stable ownership (ADDD.ACCEPTANCE.001)
+
+Use `AC-{SUBJECT}-{USE-CASE}-{NN}`. The Subject and Use-case segments MUST match the owning Use-case ID after uppercase conversion and replacement of `.` with `-`. The numeric suffix starts at `01` and uses two digits.
+
+Define a criterion once in its owning use-case specification:
+
+```text
+[AC-ORDERS-CANCEL-ORDER-01] An authorized buyer can cancel an unpaid order.
 ```
 
-`id` combines the frontend application and page identifiers. `app` matches the owning frontend name, `route` is the public route pattern, and `useCases` lists the composed use-case IDs.
+Other specifications and tests reference the ID without redefining its text. A static documentation check can prove the reference exists. A successful test run provides execution evidence.
 
 ### Update specifications with behavior (ADDD.SYNC.001)
 
-Change the use-case specification, implementation, tests, OpenAPI, generated client, and affected page specification in the same pull request when observable behavior changes.
+Change the current use-case specification, implementation, tests, OpenAPI, generated client, affected Business Flow, affected Workflow, and operating records in the same pull request when observable behavior changes.
 
-### Check code and documentation consistency (ADDD.CONSISTENCY.001)
-
-Current subject and use-case documents MUST map to the implementation surface they describe. A consistency check MUST:
-
-- Compare subject and use-case IDs with their documentation folders and Domain, Application, API, frontend, and test folders.
-- Confirm each state-changing subject names one primary aggregate root and that the corresponding Domain type derives from `AggregateRoot<TId>`.
-- Confirm current aggregate, state, action, event, route, error, and authorization names exist in the owning code or are explicitly marked planned.
-- Confirm every active acceptance ID appears in test source.
-- Compare documented routes, operation IDs, response statuses, and error codes with the generated OpenAPI contract when the API surface exists.
-- Detect more than one application or transport contract claiming ownership of the same operation.
-- Report references to removed controllers, namespaces, packages, features, or other entry points.
-
-When observable behavior or business language changes, update the owning documentation and evidence in the same change as the implementation. A current document that no longer maps to code MUST be marked planned, corrected, or retired.
+Current metadata MUST map to current names and paths. Planned implementation mappings MAY be absent. Retired specifications MUST NOT remain public entry points.
 
 ## Conventions
 
@@ -273,60 +241,51 @@ When observable behavior or business language changes, update the owning documen
 docs/
   product/
     brief.md
+    flows/
+      event-sales.md
   domain/
     README.md
     glossary.md
     subjects/
       README.md
-      posts/
+      orders/
         README.md
-        create-draft.md
-        publish-post.md
-    cross-cutting/
-      README.md
-      primary-journey.md
-      evidence-register.md
-      security-and-retention.md
-  ui/
-    web/
-      editor-page.md          only when the page trigger applies
+        cancel-order.md
+    workflows/
+      order-fulfillment.md
+    shared-rules/
+      buyer-data-retention.md
   decisions/
-    0001-example.md
+  operations/
+    limits.md
+  runbooks/
+  release/
+  research/
 ```
+
+Create an optional directory only when its first real artifact is added. Do not create empty directories or placeholder records during inception.
 
 ### Keep specifications readable without tooling
 
-Use JSON only for the short routing block. Write contracts, rules, failures, examples, and acceptance criteria in Markdown prose and tables.
+Use JSON only for the metadata block. Write outcomes, rules, failures, examples, mappings, and verification in Markdown prose, tables, code, and directory examples.
 
-Use the [domain modeling guide](../guides/model-domain.md) when creating or changing aggregate boundaries, state records, transitions, invariants, value objects, or events.
+## Example
 
-### Record status accurately
+An event-sales Business Flow links `inventory.reserve-tickets`, `orders.create-guest-order`, `payments.start-payment`, and `tickets.issue-ticket`. The payment-fulfillment Workflow begins with provider confirmation, issues one inventory confirmation Command, awaits its Event, then issues the ticket Command. Each Command owns one transaction. `FC-EVENT-SALES-01` verifies the connected public outcome.
 
-- `planned` means the contract may change and does not claim implementation.
-- `planned` acceptance IDs describe intended behavior and may have no test reference yet.
-- `active` means observable behavior exists and every acceptance ID has automated evidence.
-- `active` acceptance IDs, invariants, and transitions are release evidence obligations.
-- `retired` preserves history after behavior and public entry points are removed.
-
-## Examples
-
-A publish command maps `DraftPostState` to `PublishedPostState` through `Post.Publish`, cites `INV-POSTS-01`, and records `PostPublished`. Its acceptance criteria cover the allowed transition and rejected source states.
-
-A public catalog query may have no actor and no risk flags. It states that it performs no domain transition and names the Marten projection it reads.
+The `Orders` Subject may contain `Order` and `OrderClaim`. `orders.cancel-order` changes `Order` and cites `INV-ORDERS-01`. `orders.claim-guest-order` changes `OrderClaim` and cites `INV-ORDERS-04`. Their shared folder name does not merge their transaction boundaries.
 
 ## Verification
 
-- Confirm inception files exist before the first implementation slice.
-- Confirm subject and use-case names match code folders.
-- Confirm `docs/domain/subjects/` contains only subject directories and `docs/domain/cross-cutting/` contains only shared artifacts.
-- Confirm both domain buckets have READMEs that state their type and allowed artifacts.
-- Confirm each state-changing subject names one primary aggregate root and no `ISubject` runtime abstraction exists.
-- Confirm every aggregate has documented states and every transition names its owning use case.
-- Confirm every active invariant maps to an active acceptance ID.
-- Confirm every active acceptance ID appears in test source.
-- Confirm acceptance IDs match their owning use-case prefix and use a two-digit suffix.
-- Confirm use-case extension metadata is a subset of the consumer extension list.
-- Confirm every listed extension exists in `standards.project.json`.
-- Confirm each risk flag has the required evidence.
-- Confirm observable changes update specifications in the same diff.
-- Run the code and documentation consistency checks for changed subjects, use cases, API contracts, and public names.
+- Confirm the product brief references exactly one primary Business Flow.
+- Confirm Business Flow use-case references resolve.
+- Confirm every Subject directory has one Subject specification.
+- Confirm Use-case IDs match Subject and filename.
+- Confirm each multi-Aggregate Command names the rule requiring one transaction.
+- Confirm durable Workflow Commands and Events resolve to documented behavior.
+- Confirm Shared Rule Subject references and `POL-*` IDs resolve.
+- Confirm applicable extensions are selected and allowed for the specification kind.
+- Confirm acceptance and Flow-check definitions use their owning prefixes and are unique.
+- Confirm verified behavior has automated references and recorded passing checks.
+- Confirm current names match documentation, code, generated contracts, and tests.
+- Confirm optional directories contain real artifacts and no placeholder documents.
