@@ -1,8 +1,6 @@
 # Changelog
 
-## Unreleased
-
-Target release: `v1.3.0`.
+## v1.3.0
 
 - Defined the Agentic Engineering System as a general specification, engineering, verification, and release model used by Litenova Solutions, with Agent-Driven Engineering as its operating model and Specification-Driven Delivery as its delivery approach.
 - Replaced Subject with Module, Business Flow with End-to-End Flow, Primary Business Flow with Primary Release Flow, and Flow Check with End-to-End Test.

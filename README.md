@@ -2,13 +2,13 @@
   <img src="assets/agentic-engineering-system-icon.svg" alt="Agentic Engineering System" width="88" height="88">
 </p>
 
+<h1 align="center">Agentic Engineering System</h1>
+
 <p align="center">
   <a href="https://www.litenova.solutions/Standards"><img src="https://img.shields.io/badge/docs-online-f8c258?labelColor=3e3643" alt="Documentation"></a>
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.3.0--draft.1-3e3643" alt="Version 1.3.0 draft 1"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.3.0-3e3643" alt="Version 1.3.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/Litenova-Solutions/Engineering-Standards" alt="MIT license"></a>
 </p>
-
-# Agentic Engineering System
 
 The Agentic Engineering System is the open-source set of standards Litenova Solutions
 uses to develop software with human contributors and AI agents. It defines product and
