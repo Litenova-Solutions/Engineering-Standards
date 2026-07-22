@@ -74,6 +74,8 @@ Domain exceptions use `{DomainType}{Reason}Exception`, such as `PostAlreadyPubli
 
 Each distinct rule has its own exception type, and that type owns its stable failure code and message. An exception constructor accepts only the domain values of the specific failure, never a `code` or `message` string supplied by the throwing type. A shared `{DomainType}RuleException(code, message)` constructed with hard-coded strings at the call site is prohibited. See `DOMAIN.ERROR.001`.
 
+`Exception` is reserved for the type that rejects a rule. Do not use it as a domain business term for an anomaly, a discrepancy, or a case that needs manual handling, because it collides with `System.Exception` and the project `DomainException`, and a name such as `CancellationExceptionRaisedEvent` then reads as a thrown exception rather than a business fact. Name the business concept with a domain word, such as `CancellationDiscrepancy`, `PaidCapacityShortfall`, or `RefundHold`, and reserve the `Exception` suffix for `{DomainType}{Reason}Exception` failure types.
+
 ### Use intent-revealing boolean names (NAME.BOOLEAN.001)
 
 Boolean properties and methods use `Is`, `Has`, `Can`, or a precise verb when those words fit. Use `HasLines` and `CanPublish`, not `LinesPresent` or `CheckPublish`.
@@ -151,6 +153,7 @@ internal sealed class CreateDraftCommandHandler(
 - Compare file names with primary types and confirm no file declares more than one public or internal top-level type.
 - Confirm no `*Enums.cs` or `*ValueObjects.cs` grouping file remains.
 - Confirm each rejected rule has its own exception type that owns its code and message, with no caller-supplied strings.
+- Confirm no domain type, event, or business concept uses `Exception` as a business term, and that the `Exception` suffix names only failure types.
 - Confirm command and query results, query result items, handlers, and validators retain their full role suffixes.
 - Confirm every passive HTTP DTO names its concrete boundary role and ends in `Model`; confirm operation mappings end in `ApiMappings`.
 - Search for forbidden generic suffixes and unexplained base classes.

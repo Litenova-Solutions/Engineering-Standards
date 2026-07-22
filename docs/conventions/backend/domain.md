@@ -235,6 +235,8 @@ Every domain event is a public immutable record implementing the project-owned p
 
 An event contains enough immutable business data for its intended reactions to understand the fact. "Minimal" does not mean "identity only" when a reaction needs values from the moment of the transition. Do not include aggregate, entity, repository, session, service, or mutable collection references.
 
+An event carries no exception. Do not add an `Exception`, `DomainException`, or other error object as event data, and do not name the event after the language error type. An event records a business fact that happened, while an exception rejects an attempted transition; the two never travel together. When a failure is itself the recorded fact, such as a provider declining a charge or a batch line that could not be refunded, model that fact as immutable domain data, a value object or a discriminated-union case under `DOMAIN.CLOSEDSET.001`, and carry that data on the event. A domain business concept that means a manual-handling case or an anomaly uses a domain word for that concept, not `Exception`; see `NAME.EXCEPTION.001`.
+
 `IDomainEvent` has no LiteBus or provider base interface. Domain events are internal business facts, not integration events or public API contracts. An Application or Infrastructure event reaction implementation may translate a domain event into an integration event when an external contract requires one.
 
 Record the event inside the aggregate method that completes the transition. Pass occurrence time into the method when time is part of the fact.
@@ -770,7 +772,7 @@ The event payload captures the publication fact without carrying the mutable `Po
 - Test value-object validation, normalization, scalar equality, collection equality, money precision, and currency rules.
 - Confirm repositories expose aggregate operations rather than generic CRUD or query behavior.
 - Confirm domain services are stateless and contain no outer-layer dependency.
-- Confirm events are past-tense `IDomainEvent` records with no aggregate or provider reference.
+- Confirm events are past-tense `IDomainEvent` records with no aggregate or provider reference, carry no exception or error object, and are not named after the language error type.
 - Round-trip every concrete Aggregate state record through the persistence provider.
 - Test every factory, allowed transition, rejected transition, aggregate invariant, state-specific value, and emitted event.
 - Confirm aggregate invariant IDs and state transitions map to verified use cases and acceptance criteria.
