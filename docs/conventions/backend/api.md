@@ -7,7 +7,7 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 ## Agent Summary {#agent-summary}
 
 - Use one Minimal API `IEndpoint` class per operation.
-- Group endpoints by module and use case.
+- Group endpoints by module, then aggregate, then use case, matching `ARCH.MODULES.001`.
 - Keep request models, response models, and API mapping types beside the endpoint.
 - Derive the authenticated actor from trusted claims.
 - Return stable Problem Details codes and documented status codes.
@@ -166,7 +166,7 @@ Prefer expressing these through typed results, typed boundary enums, and paramet
 ```text
 {ProjectName}.WebApi/
   Endpoints/
-    Posts/
+    Posts/                          single aggregate: operations directly under the module
       CreateDraft/
         CreateDraftEndpoint.cs
         CreateDraftRequestModel.cs
@@ -176,6 +176,17 @@ Prefer expressing these through typed results, typed boundary enums, and paramet
         GetPostEndpoint.cs
         GetPostResponseModel.cs
         GetPostApiMappings.cs
+    Audience/                       two aggregates: operations nest under each aggregate
+      BuyerAccount/
+        RestrictAccount/
+          RestrictAccountEndpoint.cs
+          RestrictAccountRequestModel.cs
+          RestrictAccountApiMappings.cs
+      Consent/
+        GrantConsent/
+          GrantConsentEndpoint.cs
+          GrantConsentRequestModel.cs
+          GrantConsentApiMappings.cs
   Errors/
     GlobalExceptionHandler.cs
     ProblemDetailsApiMappings.cs
@@ -184,6 +195,8 @@ Prefer expressing these through typed results, typed boundary enums, and paramet
   OpenApi/
   Program.cs
 ```
+
+Endpoint folders follow `ARCH.MODULES.001`: module, then aggregate, then use case. A single-aggregate module nests use-case folders directly under the module; a module with more than one aggregate nests them under the aggregate.
 
 ### Keep transport models independent
 

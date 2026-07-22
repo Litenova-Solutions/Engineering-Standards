@@ -125,7 +125,7 @@ Each issued Command enters its own command pipeline and owns one transaction. Wo
       ResourceNotFoundException.cs
       UseCaseForbiddenException.cs
       UseCaseConflictException.cs
-  Posts/
+  Posts/                            single aggregate: operations sit directly under the module
     CreateDraft/
       CreateDraftCommand.cs
       CreateDraftCommandResult.cs
@@ -146,6 +146,15 @@ Each issued Command enters its own command pipeline and owns one transaction. Wo
       OnPostPublished/
         NotifySubscribersOnPostPublishedHandler.cs
         IPostPublicationNotifier.cs
+  Audience/                         two aggregates: operations nest under each aggregate
+    BuyerAccount/
+      RestrictAccount/
+        RestrictAccountCommand.cs
+        RestrictAccountCommandHandler.cs
+    Consent/
+      GrantConsent/
+        GrantConsentCommand.cs
+        GrantConsentCommandHandler.cs
   Workflows/
     PublicationDelivery/
       PublicationDeliveryWorkflow.cs
@@ -155,7 +164,7 @@ Each issued Command enters its own command pipeline and owns one transaction. Wo
       AdvancePublicationDeliveryWorkflowCommandHandler.cs
 ```
 
-Create `Shared` children only for types used by multiple modules.
+The folder hierarchy follows `ARCH.MODULES.001`: module, then aggregate, then operation. A single-aggregate module places its operation folders directly under the module; a module with more than one aggregate nests operation folders under the aggregate the use case targets. Create `Shared` children only for types used by multiple modules.
 
 ### Keep messages immutable
 
