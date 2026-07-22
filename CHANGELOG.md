@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.8.0
+
+- Replaced the module-first Domain folder convention with per-aggregate and per-concept folders. A module with more than one aggregate gives each aggregate its own folder with its own `Events/`, `States/`, and `Exceptions/`, and a closed set groups its base and cases in a folder named for the concept (for example `ScanResults/`) while the aggregate state hierarchy keeps its `States/` folder. Kind-bucket folders (`Entities/`, `ValueObjects/`, `Services/`) and empty folders remain prohibited. Mirrored the per-aggregate rule across layers in `ARCH.MODULES.001` and aligned the `naming.md` cross-layer note.
+- Tightened `DOMAIN.EVENT.001` so a domain event carries no `Exception`, `DomainException`, or other error object and is not named after the language error type. A failure that is itself the recorded fact is modeled as immutable domain data (a value object or discriminated-union case) and carried as event data.
+- Extended `NAME.EXCEPTION.001` to reserve the `Exception` suffix for `{DomainType}{Reason}Exception` failure types and to prohibit `Exception` as a domain business term for an anomaly or manual-handling case (for example `CancellationExceptionRaisedEvent`), with domain-word alternatives.
+- Bumped the manifest version to 1.8.0 and added the v1.8 consumer upgrade guide.
+
 ## v1.7.0
 
 - Added `API.OPENAPI.003`, which requires the generated contract to publish precise, complete schemas: a closed-set field or parameter declares its values as an `enum` (a response field projected from a Domain state hierarchy or discriminated union publishes its allowed values as a typed union rather than an open `string`, with the `enum` living only at the transport boundary per `DOMAIN.CLOSEDSET.001`); a parameter declares its real bounds, format, allowed values, and a description for a non-obvious business limit; and an operation that requires a control header declares it as a required parameter.
