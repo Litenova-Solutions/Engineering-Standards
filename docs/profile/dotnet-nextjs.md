@@ -70,6 +70,10 @@ An extension or consumer override may replace a baseline choice only when it nam
 
 Consumer `standards.project.json` names `dotnet-nextjs`. The root `AGENTS.md` identifies the .NET solution name, frontend app names, and commands that substitute project placeholders.
 
+### Note known toolchain interactions
+
+The pinned ESLint 10 removed context APIs (for example `context.getFilename()`) that `eslint-plugin-react` still calls during runtime React version detection, so a Next flat config that leaves the React version at `detect` throws `contextOrFilename.getFilename is not a function` until the plugin ships ESLint 10 support. Set a concrete `settings.react.version` in the flat config to skip detection, which is the current workaround and good practice regardless. If a consumer cannot pin the version, hold ESLint at the latest 9.x release until the plugin is compatible. Re-evaluate this note when the pins advance.
+
 ## Verification
 
 - Confirm the consumer profile is `dotnet-nextjs`.

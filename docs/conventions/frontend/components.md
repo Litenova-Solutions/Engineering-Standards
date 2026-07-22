@@ -36,6 +36,8 @@ Props crossing a Server Component to Client Component boundary must be serializa
 
 Run shadcn/ui changes in the owning frontend. Review generated source as application code. Do not edit generated primitives indirectly through a shared package that hides their implementation.
 
+The manifest pins the primitive and icon dependencies that shadcn/ui source imports: the unified `radix-ui` package (current shadcn styles import primitives from this single package rather than individual `@radix-ui/react-*` packages) and the `lucide-react` icon library. Adding a component whose source imports a package the manifest does not pin requires pinning that package first, in the same standards or consumer-override change (`DEP.APPROVAL.001`). Either the shadcn CLI or hand-authored canonical source may create the owned primitive once its dependencies are pinned; both are reviewed as application code. Prefer the unified `radix-ui` package over reintroducing individual `@radix-ui/react-*` dependencies.
+
 ### Meet accessibility requirements (UI.ACCESSIBILITY.001)
 
 Interactive UI supports keyboard operation, visible focus, semantic elements, programmatic labels, associated validation messages, and appropriate announcements for asynchronous status.
@@ -65,6 +67,10 @@ Use the Next.js image component when sizing, responsive delivery, or remote imag
 ### Name components for their role
 
 Use `CreateDraftForm`, `PostStatusBadge`, and `PostListEmptyState`. Avoid `PostComponent`, `GenericModal`, or `CommonForm`.
+
+### Give card and section titles heading semantics
+
+A visible card, panel, or section title carries a heading element at the correct level, not a styled `div`. Some primitive sources (for example a shadcn `CardTitle`) default to a non-heading element; give the title heading semantics so assistive technology and accessible-name queries can reach it (`UI.ACCESSIBILITY.001`). Prefer a heading role over a test id when asserting a title in a test.
 
 ### Keep domain values typed until display
 

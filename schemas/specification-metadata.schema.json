@@ -43,7 +43,7 @@
     },
     "implementationStatus": {
       "type": "string",
-      "enum": ["planned", "verified"]
+      "enum": ["planned", "implemented", "verified"]
     },
     "owner": {
       "type": "string",

@@ -13,6 +13,7 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 - Return stable Problem Details codes and documented status codes.
 - Keep endpoints free of repositories, sessions, provider clients, and business rules.
 - Generate OpenAPI and update typed consumers with contract changes.
+- Reflect enforced authentication in the generated OpenAPI security metadata.
 
 ## Standards
 
@@ -141,6 +142,12 @@ Every operation sets a stable name through `WithName`, which becomes `operationI
 
 When TypeScript consumes the API, run the pinned `openapi-typescript` executable against the source artifact. A single frontend writes generated types under `apps/{frontend}/lib/api/generated/`; multiple consumers use `packages/api-types/src/`. Run generation from a clean Release build and fail when a second generation changes committed files.
 
+### Reflect enforced authentication in the contract (API.OPENAPI.002)
+
+When endpoints enforce authentication (for example by deriving the actor from claims and returning 401 when absent, per `API.ACTOR.001`), the generated OpenAPI document declares the corresponding security scheme and per-operation security requirement. A consumer or a generated client must be able to learn from the contract that an operation requires authentication, rather than discovering it from a runtime 401.
+
+Register this with an OpenAPI document transformer that reads the registered authentication schemes (for example through `IAuthenticationSchemeProvider`) and adds the matching `securitySchemes` and `security` entries, instead of hand-writing security metadata that can drift from the registered schemes. An operation that is intentionally anonymous declares no security requirement. Endpoints authorized only at runtime with no declared scheme are a defect: the contract and the enforced behavior must agree.
+
 ## Conventions
 
 ### Use this endpoint layout
@@ -184,6 +191,10 @@ GET    /api/posts?after={cursor}&limit=20
 
 Use action segments only when the operation does not map cleanly to a resource or subresource.
 
+### Keep numeric transport types precise
+
+A numeric response or request field emits an OpenAPI schema that matches its real type. An `int32` or `double` field emits a plain numeric type, not a `number` or `string` union. Reserve the string-or-number union for `int64` and other values that can exceed the safe integer range of a JavaScript consumer, where the string form is the deliberate wire representation. An over-broad union (for example emitting `["integer","string"]` for a small integer) forces every consumer to coerce a value that was never a string, so keep the schema tight at the source rather than widening it and pushing coercion downstream.
+
 ### Keep Program.cs as composition
 
 `Program.cs` registers approved modules, middleware order, endpoint discovery, health endpoints, OpenAPI, and host startup. Move coherent registration into layer-owned extension methods without hiding order-sensitive middleware.
@@ -202,5 +213,6 @@ A create endpoint reads the author from claims, maps `CreateDraftRequestModel` t
 - Test validation, authentication, authorization, missing resources, conflicts, and success through `WebApplicationFactory`.
 - Validate the exact Problem Details and pagination JSON shapes.
 - Regenerate OpenAPI and typed consumers.
+- Confirm the generated document declares a security scheme and requirement for every operation that enforces authentication, and none for intentionally anonymous operations.
 - Generate OpenAPI twice and confirm the second run is clean.
 - Run architecture tests for endpoint boundaries.

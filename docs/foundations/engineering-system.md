@@ -369,6 +369,7 @@ Every structured specification starts with one JSON metadata block and an explic
 Behavior specifications also use `implementationStatus`:
 
 - `planned` describes approved target behavior without an implementation claim.
+- `implemented` means the implementation exists but its acceptance evidence is incomplete: not every acceptance criterion has a passing automated test reference yet. It records real, shipped behavior without overstating it as proven, and it is not sufficient for release.
 - `verified` means implementation exists, every acceptance criterion has an automated test reference, and applicable checks have passed.
 
 Do not use `implementationStatus` on indexes, decisions, Decision Evidence, Operating Limits, Domain Policies, or other records that do not claim implemented behavior. The Specification Metadata schema defines fields permitted for each `kind`.

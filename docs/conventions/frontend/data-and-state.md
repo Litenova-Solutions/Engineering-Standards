@@ -22,6 +22,8 @@ Generate TypeScript API types from the committed OpenAPI contract with the pinne
 
 A presentation view model may transform a generated transport type when the UI needs a different shape.
 
+Coerce a generated field typed as a `number | string` union at the read or view-model boundary before arithmetic or formatting. This union is the correct representation for values that can exceed a JavaScript consumer's safe integer range (for example `int64`), so the coercion belongs on the consumer side. When the union appears for a small integer or decimal that never needed a string form, fix the contract at the source instead (`API.OPENAPI.002` context, "Keep numeric transport types precise").
+
 ### Use one typed API client (DATA.CLIENT.001)
 
 Create one `openapi-fetch` client per API boundary. It owns the base URL, standard headers, authentication integration, request correlation, and Problem Details parsing.

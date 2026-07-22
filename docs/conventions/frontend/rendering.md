@@ -47,6 +47,8 @@ Every data-driven route defines applicable loading, empty, error, forbidden, not
 
 Use framework `loading.tsx`, `error.tsx`, and `not-found.tsx` where the state belongs to the route segment. Use feature state components where only one feature is affected.
 
+When a layout guards existence and calls `notFound()`, place the `not-found.tsx` boundary in the parent segment, not the layout's own segment. A segment's own `not-found.tsx` renders as a child of that segment's layout, so it cannot render a `notFound()` thrown by the layout itself; that throw is handled by the closest boundary in a parent segment. Verify the not-found state in a browser: a page that renders in parallel can stream partial output into the flight response even though the boundary replaces it in the DOM. Route groups and multiple root layouts change which boundary is closest, so confirm the boundary that actually catches the throw.
+
 ### Keep authenticated caching explicit (FRONTEND.CACHE.001)
 
 Do not apply shared route, fetch, or `use cache` behavior to actor-specific or authorization-filtered data without a documented cache key, partition boundary, invalidation owner, and security review.
@@ -75,7 +77,7 @@ Layouts own persistent shell UI and providers required by all child routes. Feat
 
 ### Keep server-only code identifiable
 
-Use `server-only` protection or a clearly server-owned module when a file reads secrets, server tokens, request headers, or privileged API clients.
+A file that reads secrets, server tokens, request headers, or privileged API clients is a clearly server-owned module, imported only by server code. That module boundary is the baseline requirement; the framework already bundles server dependencies without exposing them to the browser. The `server-only` package is an optional import-time guard that turns an accidental client import into a build error. It is not bundled by the framework as a dependency, so use it only when it is pinned in the manifest; otherwise rely on the module boundary.
 
 ## Examples
 

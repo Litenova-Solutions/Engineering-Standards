@@ -37,7 +37,7 @@ Describe multi-step behavior, URL state, focus, and navigation results.
 ## Folder mapping
 
 ```text
-apps/__APP__/src/
+apps/__APP__/
   app/__ROUTE_FOLDER__/page.tsx
   features/__MODULE__/__USE_CASE__/
     __COMPONENT__.tsx
