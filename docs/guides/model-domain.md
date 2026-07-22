@@ -259,24 +259,28 @@ Each query states `No domain transition` and names its read model. It does not l
 
 ```text
 apps/api/src/Shop.Domain/
-  Orders/
-    Order.cs
-    OrderId.cs
-    OrderState.cs
-    PendingOrderState.cs
-    ConfirmedOrderState.cs
-    CancelledOrderState.cs
-    OrderClaim.cs
-    OrderClaimId.cs
-    OrderClaimState.cs
-    UnclaimedOrderClaimState.cs
-    ClaimedOrderClaimState.cs
-    IOrderRepository.cs
-    IOrderClaimRepository.cs
-    Events/
-      OrderConfirmed.cs
-    Exceptions/
-      OrderCannotBeCancelledException.cs
+  Orders/                         two aggregates: one folder each
+    Order/
+      Order.cs
+      OrderId.cs
+      IOrderRepository.cs
+      States/
+        OrderState.cs
+        PendingOrderState.cs
+        ConfirmedOrderState.cs
+        CancelledOrderState.cs
+      Events/
+        OrderConfirmed.cs
+      Exceptions/
+        OrderCannotBeCancelledException.cs
+    OrderClaim/
+      OrderClaim.cs
+      OrderClaimId.cs
+      IOrderClaimRepository.cs
+      States/
+        OrderClaimState.cs
+        UnclaimedOrderClaimState.cs
+        ClaimedOrderClaimState.cs
 
 apps/api/src/Shop.Application/
   Orders/
