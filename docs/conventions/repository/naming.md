@@ -7,6 +7,7 @@ Names should expose business intent and architectural role without requiring a r
 ## Agent Summary {#agent-summary}
 
 - Use one primary top-level type per C# file, match the file name exactly, and never bundle types by kind in a `*Enums.cs` or `*ValueObjects.cs` file.
+- Anchor every aggregate-owned type on its aggregate root's full name in first position (events, states, unions, aggregate value objects, child entities, exceptions); leave only Shared kernel types unprefixed.
 - Use explicit command or query suffixes for Application messages, results, result items, handlers, and validators.
 - Use explicit `RequestModel`, `ResponseModel`, and `ApiMappings` suffixes at the HTTP boundary.
 - Use the required architectural suffix for endpoints and persistence classes.
@@ -27,6 +28,33 @@ Each C# file contains one primary top-level type and uses that type's exact name
 
 Grouping-suffix files that collect several types by kind rather than by name are prohibited: `RefundEnums.cs`, `PaymentEnums.cs`, `CancellationValueObjects.cs`, and `OrderStates.cs` each place two or more public types in one file. Split each type into its own file named for the type, and let the module folder provide the grouping. A discriminated union places its abstract base and each sealed case in separate files, exactly as a state hierarchy does.
 
+### Anchor aggregate-owned types on the aggregate root (NAME.AGGREGATE.001)
+
+Every type owned by an aggregate leads with that aggregate root's full name, in first position, so its owner is derivable from the name alone without folder context. This covers the aggregate's events, state base and cases, child entities, aggregate-specific value objects, discriminated union bases and cases, and exceptions.
+
+The name is `{Aggregate}{Specific}{RoleSuffix}`:
+
+- `{Aggregate}` is the aggregate root's full type name, never an abbreviation or partial form. An aggregate named `SalesCatalog` anchors `SalesCatalogPublishedEvent`, not `SalesPublishedEvent` or `CatalogPublishedEvent`.
+- `{Specific}` is the fact, state, rule, or case in domain language. When it would repeat the aggregate name it is not doubled: a `SalesCatalog` publication is `SalesCatalogPublishedEvent`, not `SalesCatalogSalesCatalogPublishedEvent`.
+- `{RoleSuffix}` is the fixed suffix for the kind: `Event`, `State`, or `Exception`. Child entities and value objects carry no suffix; a union case ends with its concept.
+
+The prefix chains to the aggregate root, not to an intermediate owner. A value object `FinanceAssurance` owned by the `Event` aggregate is `EventFinanceAssurance`, and its rejection is `EventFinanceAssuranceMislabeledException`, so both resolve to `Event`.
+
+| Kind | Pattern | Example |
+|:---|:---|:---|
+| Event | `{Aggregate}{PastFact}Event` | `OrganizationMemberAccessChangedEvent` |
+| State base | `{Aggregate}State` | `OrderState` |
+| State case | `{Aggregate}{State}State` | `OrderCompletedState` |
+| Child entity | `{Aggregate}{Part}` | `OrderLine` |
+| Aggregate value object | `{Aggregate}{Term}` | `OrganizationLegalProfile` |
+| Union base | `{Aggregate}{Concept}` | `RefundOutcome` |
+| Union case | `{Aggregate}{Case}{Concept}` | `RefundSucceededOutcome` |
+| Exception | `{DomainType}{Reason}Exception` | `OrderNotFulfillableException` |
+
+Shared kernel types are the only exception. A type in `Shared/` used by more than one aggregate keeps its bare domain name: `Money`, `EmailAddress`, `Currency`, `Address`, `DateRange`. Location is the signal, so a type in an aggregate's folder is anchored and a type in `Shared/` is not.
+
+Aggregate-first ordering also clusters every type of an aggregate together when a folder or symbol list is sorted, and gives an agent a single deterministic leading token to generate and to search by.
+
 ### Use architectural suffixes (NAME.SUFFIX.001)
 
 | Role | Pattern | Example |
@@ -40,8 +68,8 @@ Grouping-suffix files that collect several types by kind rather than by name are
 | Query result item | `{UseCase}QueryResultItem` | `ListPostsQueryResultItem` |
 | Query handler | `{UseCase}QueryHandler` | `GetPostQueryHandler` |
 | Query validator | `{UseCase}QueryValidator` | `GetPostQueryValidator` |
-| Domain event | `{BusinessFact}` | `PostPublished` |
-| Event handler | `{Action}On{Event}Handler` | `NotifySubscribersOnPostPublishedHandler` |
+| Domain event | `{Aggregate}{PastFact}Event` | `PostPublishedEvent` |
+| Event handler | `{Action}On{PastFact}Handler` | `NotifySubscribersOnPostPublishedHandler` |
 | Workflow | `{BusinessPurpose}Workflow` | `OrderFulfillmentWorkflow` |
 | Workflow state | `{BusinessPurpose}WorkflowState` | `OrderFulfillmentWorkflowState` |
 | Workflow Orchestrator | `{BusinessPurpose}WorkflowOrchestrator` | `OrderFulfillmentWorkflowOrchestrator` |
@@ -58,6 +86,8 @@ Grouping-suffix files that collect several types by kind rather than by name are
 | Registration class | `{Layer}ServiceRegistration` | `InfrastructureServiceRegistration` |
 | Assembly marker | `{Layer}AssemblyMarker` | `ApplicationAssemblyMarker` |
 
+An event-reaction handler and its operation folder name the event by its business fact after the `On` prefix, without the `Event` suffix: the folder is `OnPostPublished` and the handler is `NotifySubscribersOnPostPublishedHandler`, reacting to the `PostPublishedEvent` type. The `On` prefix already marks the reaction, and a folder name carries no technical suffix, so `OnPostPublishedEvent` is wrong. The `Event` suffix stays on the event type itself per `NAME.AGGREGATE.001`.
+
 Do not shorten an Application type to `{UseCase}Result`, `{UseCase}Handler`, or `{UseCase}Validator`. Do not use an unowned name such as `PostSummary` for a query-specific result item. The full role suffix distinguishes command coordination from query projection without opening the file.
 
 Do not shorten an HTTP transport type to `{UseCase}Request` or `{UseCase}Response`. `Model` marks the type as passive boundary data rather than an operation or rich business object. Other project-owned, passive HTTP DTOs also name their concrete role and end in `Model`, such as `ListPostsResponseItemModel` or `PaginationModel`. Use `ApiMappings` instead of the context-dependent `Mappings` suffix.
@@ -70,7 +100,7 @@ Do not shorten the parameter to `ct` in public or internal application code.
 
 ### Name exceptions by failed rule (NAME.EXCEPTION.001)
 
-Domain exceptions use `{DomainType}{Reason}Exception`, such as `PostAlreadyPublishedException`. `DomainType` is the concrete aggregate, entity, value object, or domain service that rejects the rule. Missing aggregates use `{Aggregate}NotFoundException`. Input validation errors use stable field and reason codes; create a custom exception type only when the exception hierarchy requires it.
+Domain exceptions use `{DomainType}{Reason}Exception`, such as `PostAlreadyPublishedException`. `DomainType` is the aggregate root, or an aggregate-anchored type it owns whose name already leads with the aggregate per `NAME.AGGREGATE.001`, so the exception name always leads with the aggregate root. A rule with no owning value object anchors directly on the aggregate: an `Event` finance-assurance rule is `EventFinanceAssuranceMislabeledException`, not `FinanceAssuranceMislabeledException`. Missing aggregates use `{Aggregate}NotFoundException`. Input validation errors use stable field and reason codes; create a custom exception type only when the exception hierarchy requires it.
 
 Each distinct rule has its own exception type, and that type owns its stable failure code and message. An exception constructor accepts only the domain values of the specific failure, never a `code` or `message` string supplied by the throwing type. A shared `{DomainType}RuleException(code, message)` constructed with hard-coded strings at the call site is prohibited. See `DOMAIN.ERROR.001`.
 
@@ -154,6 +184,7 @@ internal sealed class CreateDraftCommandHandler(
 - Confirm no `*Enums.cs` or `*ValueObjects.cs` grouping file remains.
 - Confirm each rejected rule has its own exception type that owns its code and message, with no caller-supplied strings.
 - Confirm no domain type, event, or business concept uses `Exception` as a business term, and that the `Exception` suffix names only failure types.
+- Confirm every aggregate-owned type name leads with its aggregate root's full name, and only Shared kernel types are unprefixed.
 - Confirm command and query results, query result items, handlers, and validators retain their full role suffixes.
 - Confirm every passive HTTP DTO names its concrete boundary role and ends in `Model`; confirm operation mappings end in `ApiMappings`.
 - Search for forbidden generic suffixes and unexplained base classes.

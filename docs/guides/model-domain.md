@@ -85,14 +85,14 @@ Create an abstract state record and sealed state records for every aggregate, in
 ```csharp
 public abstract record PostState;
 
-public sealed record DraftPostState : PostState;
+public sealed record PostDraftState : PostState;
 
-public sealed record PublishedPostState(
+public sealed record PostPublishedState(
     DateTimeOffset PublishedAt) : PostState;
 
-public sealed record ArchivedPostState(
+public sealed record PostArchivedState(
     DateTimeOffset ArchivedAt,
-    ArchiveReason Reason) : PostState;
+    PostArchiveReason Reason) : PostState;
 ```
 
 Put state-specific data on the state record. Do not duplicate `PublishedAt` or `ArchivedAt` on the aggregate. Do not add `PostStatus`, `IsPublished`, or a state string.
@@ -104,7 +104,7 @@ A one-state aggregate still defines the extension point:
 ```csharp
 public abstract record ProfileState;
 
-public sealed record ActiveProfileState : ProfileState;
+public sealed record ProfileActiveState : ProfileState;
 ```
 
 For each state, answer:
@@ -122,22 +122,22 @@ A transition is a business action that replaces one valid state with another. Re
 
 | From state | Business action | To state | Aggregate invariants | Event | Use case |
 |:---|:---|:---|:---|:---|:---|
-| `Draft` | `Publish` | `Published` | `INV-POSTS-01` | `PostPublished` | `posts.publish-post` |
-| `Published` | `Archive` | `Archived` | `INV-POSTS-02` | `PostArchived` | `posts.archive-post` |
+| `Draft` | `Publish` | `Published` | `INV-POSTS-01` | `PostPublishedEvent` | `posts.publish-post` |
+| `Published` | `Archive` | `Archived` | `INV-POSTS-02` | `PostArchivedEvent` | `posts.archive-post` |
 
 The aggregate root owns the transition:
 
 ```csharp
 public void Publish(DateTimeOffset publishedAt)
 {
-    if (State is not DraftPostState)
+    if (State is not PostDraftState)
     {
         throw new PostCannotBePublishedException(Id, State);
     }
 
-    State = new PublishedPostState(publishedAt);
+    State = new PostPublishedState(publishedAt);
     RaiseDomainEvent(
-        new PostPublished(Id, AuthorId, Title, publishedAt));
+        new PostPublishedEvent(Id, AuthorId, Title, publishedAt));
 }
 ```
 
@@ -213,9 +213,9 @@ An event is an immutable record of a completed fact. An event reaction is work t
 
 | Event reference | Code type | Business meaning | Event reaction | Owning module | Delivery |
 |:---|:---|:---|:---|:---|:---|
-| `orders.order-confirmed` | `OrderConfirmed` | The paid Order is final. | Issue tickets. | Tickets | `durable` |
+| `orders.order-confirmed` | `OrderConfirmedEvent` | The paid Order is final. | Issue tickets. | Tickets | `durable` |
 | `tickets.ticket-issued` | `TicketIssued` | An admission entitlement exists. | Send it to the buyer. | Communications | `durable` |
-| `posts.post-published` | `PostPublished` | A Post became public. | Refresh the public catalog. | Posts | `rebuildable` |
+| `posts.post-published` | `PostPublishedEvent` | A Post became public. | Refresh the public catalog. | Posts | `rebuildable` |
 
 A domain event remains an internal domain contract. Translate it to an integration event when another system consumes a versioned external message.
 
@@ -266,11 +266,11 @@ apps/api/src/Shop.Domain/
       IOrderRepository.cs
       States/
         OrderState.cs
-        PendingOrderState.cs
-        ConfirmedOrderState.cs
-        CancelledOrderState.cs
+        OrderPendingState.cs
+        OrderConfirmedState.cs
+        OrderCancelledState.cs
       Events/
-        OrderConfirmed.cs
+        OrderConfirmedEvent.cs
       Exceptions/
         OrderCannotBeCancelledException.cs
     OrderClaim/
@@ -279,8 +279,8 @@ apps/api/src/Shop.Domain/
       IOrderClaimRepository.cs
       States/
         OrderClaimState.cs
-        UnclaimedOrderClaimState.cs
-        ClaimedOrderClaimState.cs
+        OrderClaimUnclaimedState.cs
+        OrderClaimClaimedState.cs
 
 apps/api/src/Shop.Application/
   Orders/

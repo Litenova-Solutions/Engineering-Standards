@@ -170,7 +170,7 @@ Adding a state discriminator can break an older application version during a mix
 
 An `Order` document may contain a `PaymentMethod` collection with `CardPayment` and `BankTransfer` values. Infrastructure registers stable `card` and `bank_transfer` discriminators through the JSON contract resolver. The Domain hierarchy carries no JSON attributes.
 
-A `Post` document stores one `state` object. `PublishedPostState` uses the stable `published` discriminator and owns `publishedAt`. The document does not also store `isPublished` or an aggregate-level `publishedAt` value.
+A `Post` document stores one `state` object. `PostPublishedState` uses the stable `published` discriminator and owns `publishedAt`. The document does not also store `isPublished` or an aggregate-level `publishedAt` value.
 
 Renaming `shippingAddress.postalCode` to `shippingAddress.postcode` uses a mixed-version reader and a reviewed data transformation before the old reader is removed. A CLR property rename without that rollout is not compatible document evolution.
 
@@ -181,10 +181,13 @@ internal sealed class PostRepository(
     IDocumentSession session,
     DomainEventBuffer eventBuffer) : IPostRepository
 {
-    public Task<Post?> GetByIdAsync(
+    public async Task<Post> GetByIdAsync(
         PostId id,
-        CancellationToken cancellationToken) =>
-        session.LoadAsync<Post>(id.Value, cancellationToken);
+        CancellationToken cancellationToken)
+    {
+        var post = await session.LoadAsync<Post>(id, cancellationToken);
+        return post ?? throw new PostNotFoundException();
+    }
 
     public void Store(Post post)
     {

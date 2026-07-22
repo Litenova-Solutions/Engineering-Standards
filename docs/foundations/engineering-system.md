@@ -308,7 +308,7 @@ Do not create a workflow specification for branches inside one atomic Command or
 
 A workflow names its owner, participating modules, starting fact, completion and failure conditions, durable state owner, Commands issued, events awaited, retry horizon, idempotency behavior, timeouts, compensation, operator actions, and verification.
 
-Use `{module}.{past-tense-event}` as the stable documented event reference, such as `orders.order-confirmed`. Map it to the code type `OrderConfirmed` in the owning module specification. Workflow records use the stable reference and link to that owner.
+Use `{module}.{past-tense-event}` as the stable documented event reference, such as `orders.order-confirmed`. Map it to the code type `OrderConfirmedEvent` in the owning module specification. Workflow records use the stable reference and link to that owner.
 
 Each Command issued by a workflow owns its own transaction. The workflow orchestrator updates workflow progress and stages outgoing work; it does not mutate participating aggregates directly.
 

@@ -10,6 +10,7 @@ The profile gives every Aggregate an explicit state record hierarchy from its fi
 
 - Organize Domain by module and use the documented domain language.
 - Give each aggregate its own folder when a module holds more than one, and group each closed set's base and cases in a folder named for the concept.
+- Name every aggregate-owned type with the aggregate root's full name first: events, state cases, union bases and cases, aggregate value objects, child entities, and exceptions. Leave only Shared kernel types unprefixed.
 - Model each transactional consistency boundary as an aggregate.
 - Derive every aggregate root from the project-owned `AggregateRoot<TId>` base.
 - Give every Aggregate a sealed state record hierarchy. Do not use lifecycle enums, status strings, or boolean status flags.
@@ -17,7 +18,7 @@ The profile gives every Aggregate an explicit state record hierarchy from its fi
 - Create aggregates through named factories and mutate them through business methods.
 - Use immutable value objects and typed IDs backed by `Guid.CreateVersion7()`.
 - Keep repository interfaces in Domain and implementations in Infrastructure.
-- Raise package-free `IDomainEvent` records in past tense.
+- Raise package-free `IDomainEvent` records named `{Aggregate}{PastFact}Event` in past tense.
 - Keep domain services stateless and use them only for business rules with no natural aggregate owner.
 - Reject each violated business rule with its own specific Domain exception that owns its stable failure code and message; do not pass code or message strings into a shared exception.
 - Document every public Domain type and member with XML comments that state its business constraint, result, or failure.
@@ -73,12 +74,14 @@ Do not model Aggregate lifecycle with:
 
 State-specific data belongs on the corresponding state record. State records are immutable data. Aggregate methods own transition rules and replace the current state; state records do not receive injected services or own transition methods.
 
+State case names lead with the aggregate root per `NAME.AGGREGATE.001`: the case is `PostDraftState`, not `DraftPostState`.
+
 ```csharp
 public abstract record PostState;
 
-public sealed record DraftPostState : PostState;
+public sealed record PostDraftState : PostState;
 
-public sealed record PublishedPostState(
+public sealed record PostPublishedState(
     DateTimeOffset PublishedAt) : PostState;
 ```
 
@@ -87,7 +90,7 @@ Even an Aggregate with one current state defines its hierarchy:
 ```csharp
 public abstract record ProfileState;
 
-public sealed record ActiveProfileState : ProfileState;
+public sealed record ProfileActiveState : ProfileState;
 ```
 
 ### Model every closed set of domain values without enums (DOMAIN.CLOSEDSET.001)
@@ -96,18 +99,18 @@ Domain declares no `enum`. `DOMAIN.STATE.001` already removes the enum from Aggr
 
 A C# `enum` is a named integer. It carries no data, admits no exhaustiveness guarantee, silently accepts undefined values through a cast, and forces every new case that needs its own data into a parallel field elsewhere. When the set later grows a case that owns data, or a rule that applies to only some cases, the enum must be removed and every persisted value migrated. Modeling the set as a closed type hierarchy from the first case avoids that migration and lets the compiler and `switch` expression check exhaustiveness.
 
-Model a closed set as a discriminated union: one abstract record base named for the concept and one sealed record per case. This is the same shape as a state hierarchy, applied to a value that is not an Aggregate lifecycle.
+Model a closed set as a discriminated union: one abstract record base named for the aggregate and concept, and one sealed record per case. Base and cases lead with the aggregate root per `NAME.AGGREGATE.001`, and each case ends with the concept: the base is `RefundOutcome` and a case is `RefundSucceededOutcome`. This is the same shape as a state hierarchy, applied to a value that is not an Aggregate lifecycle.
 
 ```csharp
 public abstract record RefundOutcome;
 
-public sealed record RefundPending(string Reason) : RefundOutcome;
+public sealed record RefundPendingOutcome(string Reason) : RefundOutcome;
 
-public sealed record RefundSucceeded(DateTimeOffset ProviderTime) : RefundOutcome;
+public sealed record RefundSucceededOutcome(DateTimeOffset ProviderTime) : RefundOutcome;
 
-public sealed record RefundFailed(string Classification) : RefundOutcome;
+public sealed record RefundFailedOutcome(string Classification) : RefundOutcome;
 
-public sealed record RefundReversed(DateTimeOffset ProviderTime) : RefundOutcome;
+public sealed record RefundReversedOutcome(DateTimeOffset ProviderTime) : RefundOutcome;
 ```
 
 A case that owns no data is still a sealed record, so the set can grow case data later without a breaking change:
@@ -115,9 +118,9 @@ A case that owns no data is still a sealed record, so the set can grow case data
 ```csharp
 public abstract record OrganizationRole;
 
-public sealed record OwnerRole : OrganizationRole;
+public sealed record OrganizationOwnerRole : OrganizationRole;
 
-public sealed record ScannerRole : OrganizationRole;
+public sealed record OrganizationScannerRole : OrganizationRole;
 ```
 
 Callers branch with a `switch` expression on the case type. A `switch` that omits a case surfaces at review as a missing arm rather than a silent default, and a case that carries data exposes it directly instead of through a separate nullable field:
@@ -125,11 +128,11 @@ Callers branch with a `switch` expression on the case type. A `switch` that omit
 ```csharp
 var next = outcome switch
 {
-    RefundSucceeded succeeded => Settle(succeeded.ProviderTime),
-    RefundPending pending => HoldFor(pending.Reason),
-    RefundFailed failed => RaiseException(failed.Classification),
-    RefundReversed reversed => Reverse(reversed.ProviderTime),
-    _ => throw new UnsupportedRefundOutcomeException(),
+    RefundSucceededOutcome succeeded => Settle(succeeded.ProviderTime),
+    RefundPendingOutcome pending => HoldFor(pending.Reason),
+    RefundFailedOutcome failed => Reclassify(failed.Classification),
+    RefundReversedOutcome reversed => Reverse(reversed.ProviderTime),
+    _ => throw new RefundUnsupportedOutcomeException(),
 };
 ```
 
@@ -225,13 +228,15 @@ Application loads any required aggregates, calls the domain service, passes its 
 
 Domain owns one repository interface per aggregate that must be loaded for commands. Infrastructure implements it. The interface uses only aggregate and Domain types and exposes the minimum load and store operations required by accepted commands.
 
+A required load uses `GetByIdAsync`, which returns the aggregate and throws the aggregate's own `{Aggregate}NotFoundException` when no aggregate has that identity. The Infrastructure implementation throws it, so a command handler receives a loaded aggregate and never repeats a null check or constructs a not-found failure with a hard-coded code and message at the call site. The `{Aggregate}NotFoundException` is a `DomainException` that owns its stable code and message per `DOMAIN.ERROR.001`, and the host maps that code to `404`. Reserve a nullable `FindBy...Async` for a genuinely optional lookup, such as a deduplication-key or provider-reference probe, where absence is a normal result rather than a failure.
+
 Repositories do not expose `IQueryable`, sessions, tracking controls, provider options, query projections, generic CRUD methods, or `SaveChangesAsync`. Query handlers use the selected read boundary instead of aggregate repositories.
 
 Do not introduce `IRepository<T>` as a substitute for aggregate-specific contracts.
 
 ### Raise immutable domain facts (DOMAIN.EVENT.001)
 
-Every domain event is a public immutable record implementing the project-owned public `IDomainEvent` marker. Event names use past-tense business language, such as `PostPublished` or `OrderPlaced`.
+Every domain event is a public immutable record implementing the project-owned public `IDomainEvent` marker. Event names are `{Aggregate}{PastFact}Event`, leading with the aggregate root per `NAME.AGGREGATE.001` and ending with the `Event` suffix, such as `PostPublishedEvent` or `OrderPlacedEvent`. The name states which aggregate raised the fact without opening the file: an event named `MemberAccessChangedEvent` hides its owner, while `OrganizationMemberAccessChangedEvent` names it.
 
 An event contains enough immutable business data for its intended reactions to understand the fact. "Minimal" does not mean "identity only" when a reaction needs values from the moment of the transition. Do not include aggregate, entity, repository, session, service, or mutable collection references.
 
@@ -243,7 +248,7 @@ Record the event inside the aggregate method that completes the transition. Pass
 
 ### Reject business violations with Domain exceptions (DOMAIN.ERROR.001)
 
-Domain defines a project `DomainException` base and specific subclasses named `{DomainType}{Reason}Exception`. `DomainType` names the concrete aggregate, entity, value object, or domain service that rejects the rule. A rejected transition throws the exception that names the failed rule, such as `PostAlreadyPublishedException`.
+Domain defines a project `DomainException` base and specific subclasses named `{DomainType}{Reason}Exception`. `DomainType` is the aggregate root, or an aggregate-anchored type it owns whose own name already leads with the aggregate per `NAME.AGGREGATE.001`, so the exception name always leads with the aggregate root. A rejected transition throws the exception that names the failed rule, such as `PostAlreadyPublishedException`. A rule with no owning value object anchors directly on the aggregate: an `Event` finance-assurance rule is `EventFinanceAssuranceMislabeledException`, not `FinanceAssuranceMislabeledException`.
 
 Do not throw `InvalidOperationException`, `ArgumentException`, Application validation exceptions, HTTP exceptions, or provider exceptions for a business rejection. Domain exceptions contain safe business context and no transport status code.
 
@@ -301,7 +306,7 @@ For example, a handler obtains `clock.UtcNow` and calls `post.Publish(clock.UtcN
 
 Every public Domain type and every public member on it has XML documentation. This covers Aggregates and their mutation methods, child entities, state bases and cases, union bases and cases, Value Objects and their factories, typed IDs, domain services, repositories, Events, and exceptions. The `<summary>` states the business constraint, result, or failure that the member enforces or represents, not a restatement of its name.
 
-- A mutation method identifies its allowed source states, its resulting state, the invariant it protects, and the Event it records. `Publish` documentation names the allowed source states, the resulting `PublishedPostState`, and `PostPublished`. The text `Publishes the post` alone is insufficient.
+- A mutation method identifies its allowed source states, its resulting state, the invariant it protects, and the Event it records. `Publish` documentation names the allowed source states, the resulting `PostPublishedState`, and `PostPublishedEvent`. The text `Publishes the post` alone is insufficient.
 - A factory states the creation rules it enforces and the initial state it selects.
 - A property that carries a business fact states what the fact means and when it is set, using `<summary>`. A property whose meaning is fully evident from a well-named type (for example `PostId Id`) needs no restatement.
 - A state or union case, and each of its data members, states what the case represents and what its data means. Use `<param>` on positional record members.
@@ -338,12 +343,12 @@ Concept folders group a closed set. A discriminated union places its abstract ba
     IPostRepository.cs
     States/
       PostState.cs
-      DraftPostState.cs
-      PublishedPostState.cs
-      ArchivedPostState.cs
+      PostDraftState.cs
+      PostPublishedState.cs
+      PostArchivedState.cs
     Events/
-      PostCreated.cs
-      PostPublished.cs
+      PostCreatedEvent.cs
+      PostPublishedEvent.cs
     Exceptions/
       PostIdentityRequiredException.cs
       PostAlreadyPublishedException.cs
@@ -352,16 +357,16 @@ Concept folders group a closed set. A discriminated union places its abstract ba
     TicketAdmissionId.cs
     ITicketAdmissionRepository.cs
     ScanResults/
-      ScanResult.cs
-      AcceptedScanResult.cs
-      InvalidScanResult.cs
-      VoidScanResult.cs
+      TicketAdmissionScanResult.cs
+      TicketAdmissionAcceptedScanResult.cs
+      TicketAdmissionInvalidScanResult.cs
+      TicketAdmissionVoidScanResult.cs
     States/
       TicketAdmissionState.cs
       TicketAdmissionPendingState.cs
       TicketAdmissionAdmittedState.cs
     Events/
-      TicketScanRecorded.cs
+      TicketAdmissionScanRecordedEvent.cs
   Audience/                       more than one aggregate: one folder per aggregate
     BuyerAccount/
       BuyerAccount.cs
@@ -371,7 +376,7 @@ Concept folders group a closed set. A discriminated union places its abstract ba
         BuyerAccountState.cs
         BuyerAccountClaimedState.cs
       Events/
-        AccountRestricted.cs
+        BuyerAccountRestrictedEvent.cs
     Consent/
       Consent.cs
       ConsentId.cs
@@ -380,7 +385,7 @@ Concept folders group a closed set. A discriminated union places its abstract ba
         ConsentState.cs
         ConsentGrantedState.cs
       Events/
-        ConsentGranted.cs
+        ConsentGrantedEvent.cs
 ```
 
 Each aggregate-specific repository interface stays with the aggregate it loads. The other layers mirror this organization: Application, Infrastructure, and WebApi use the same module and per-aggregate folder names, per `ARCH.MODULES.001`.
@@ -390,19 +395,20 @@ Each aggregate-specific repository interface stays with the aggregate it loads. 
 | Domain role | Pattern | Example |
 |:---|:---|:---|
 | Aggregate root | `{Aggregate}` | `Post` |
-| Child entity | `{Entity}` | `OrderLine` |
-| Value object | `{BusinessTerm}` | `PostTitle` |
+| Child entity | `{Aggregate}{Part}` | `OrderLine` |
+| Aggregate value object | `{Aggregate}{Term}` | `OrganizationLegalProfile` |
+| Shared kernel value object | `{Term}` | `Money`, `EmailAddress` |
 | Strongly typed ID | `{Aggregate}Id` | `PostId` |
 | Typed state base | `{Aggregate}State` | `PostState` |
-| Typed state case | `{State}{Aggregate}State` | `PublishedPostState` |
-| Domain union base | `{Concept}` | `RefundOutcome` |
-| Domain union case | `{Case}` in domain language | `RefundSucceeded`, `ScannerRole` |
+| Typed state case | `{Aggregate}{State}State` | `PostPublishedState` |
+| Domain union base | `{Aggregate}{Concept}` | `RefundOutcome` |
+| Domain union case | `{Aggregate}{Case}{Concept}` | `RefundSucceededOutcome`, `OrganizationScannerRole` |
 | Repository | `I{Aggregate}Repository` | `IPostRepository` |
 | Domain service | `{BusinessRule}DomainService` | `OrderPricingDomainService` |
-| Domain event | `{PastTenseBusinessFact}` | `PostPublished` |
+| Domain event | `{Aggregate}{PastFact}Event` | `PostPublishedEvent` |
 | Domain exception | `{DomainType}{Reason}Exception` | `PostAlreadyPublishedException` |
 
-`BusinessTerm` is the exact glossary term represented by the value object. `BusinessRule` names the calculation or policy owned by the domain service. `DomainType` is the concrete Domain type that rejects the rule. A domain union case uses the domain term for the case and disambiguates against the concept when the bare term is ambiguous: outcome cases read `RefundSucceeded` and `RefundReversed`, while role cases read `OwnerRole` and `ScannerRole`. Each union base and each union case is one file named after the type, grouped in a folder named for the concept within its owning module or aggregate.
+Every aggregate-owned type leads with the aggregate root's full name, never an abbreviation, per `NAME.AGGREGATE.001`: an aggregate named `SalesCatalog` anchors `SalesCatalogPublishedEvent`, not `SalesPublishedEvent` or `CatalogPublishedEvent`. `Term` is the exact glossary term represented by the value object; a value object used by one aggregate leads with that aggregate (`OrganizationLegalProfile`), while a Shared kernel value object used across aggregates keeps its bare name (`Money`). `BusinessRule` names the calculation or policy owned by the domain service. `DomainType` is the aggregate root or an aggregate-anchored type it owns, so an exception name leads with the aggregate root. A union base ends with the concept (`RefundOutcome`, `OrganizationRole`) and each case leads with the aggregate and ends with the concept (`RefundSucceededOutcome`, `OrganizationScannerRole`). Each union base and each union case is one file named after the type, grouped in a folder named for the concept within its owning module or aggregate.
 
 ### Define the shared Domain contracts once
 
@@ -530,24 +536,24 @@ if (typeof(IStronglyTypedId).IsAssignableFrom(context.JsonTypeInfo.Type))
 ```csharp
 public abstract record PostState;
 
-public sealed record DraftPostState : PostState;
+public sealed record PostDraftState : PostState;
 
-public sealed record PublishedPostState(
+public sealed record PostPublishedState(
     DateTimeOffset PublishedAt) : PostState;
 
-public sealed record ArchivedPostState(
+public sealed record PostArchivedState(
     DateTimeOffset ArchivedAt,
     string Reason) : PostState;
 ```
 
-`PublishedAt` exists only on `PublishedPostState`, and archive facts exist only on `ArchivedPostState`. The Aggregate cannot combine facts from mutually exclusive states.
+`PublishedAt` exists only on `PostPublishedState`, and archive facts exist only on `PostArchivedState`. The Aggregate cannot combine facts from mutually exclusive states.
 
 A one-state Aggregate uses the same shape from its first implementation:
 
 ```csharp
 public abstract record ProfileState;
 
-public sealed record ActiveProfileState : ProfileState;
+public sealed record ProfileActiveState : ProfileState;
 ```
 
 Infrastructure persists each state hierarchy with stable discriminators. It does not add a lifecycle enum or shadow state fields back into Domain or infer a different state after loading.
@@ -641,7 +647,7 @@ Application supplies the lines and passes the returned `Money` to `Order.Confirm
 ```csharp
 public interface IPostRepository
 {
-    Task<Post?> FindByIdAsync(
+    Task<Post> GetByIdAsync(
         PostId id,
         CancellationToken cancellationToken);
 
@@ -649,7 +655,16 @@ public interface IPostRepository
 }
 ```
 
-The command pipeline owns the commit. `Store` stages the aggregate through the selected provider implementation.
+`GetByIdAsync` returns a loaded `Post` and throws `PostNotFoundException` when the identity has no aggregate; the Infrastructure implementation owns that throw. The command pipeline owns the commit. `Store` stages the aggregate through the selected provider implementation.
+
+```csharp
+// Infrastructure implementation throws the aggregate's own not-found exception.
+public async Task<Post> GetByIdAsync(PostId id, CancellationToken cancellationToken)
+{
+    var post = await session.LoadAsync<Post>(id, cancellationToken);
+    return post ?? throw new PostNotFoundException();
+}
+```
 
 ## Complete Aggregate example using typed states
 
@@ -699,17 +714,17 @@ public sealed class Post : AggregateRoot<PostId>
             id,
             authorId,
             title,
-            new DraftPostState());
+            new PostDraftState());
 
         post.RaiseDomainEvent(
-            new PostCreated(id, authorId, title, createdAt));
+            new PostCreatedEvent(id, authorId, title, createdAt));
 
         return post;
     }
 
     public void ChangeTitle(PostTitle title)
     {
-        if (State is not DraftPostState)
+        if (State is not PostDraftState)
         {
             throw new PostCannotBeEditedException(Id, State);
         }
@@ -721,31 +736,31 @@ public sealed class Post : AggregateRoot<PostId>
     {
         switch (State)
         {
-            case DraftPostState:
-                State = new PublishedPostState(publishedAt);
+            case PostDraftState:
+                State = new PostPublishedState(publishedAt);
                 RaiseDomainEvent(
-                    new PostPublished(Id, AuthorId, Title, publishedAt));
+                    new PostPublishedEvent(Id, AuthorId, Title, publishedAt));
                 break;
 
-            case PublishedPostState:
+            case PostPublishedState:
                 throw new PostAlreadyPublishedException(Id);
 
-            case ArchivedPostState:
-                throw new ArchivedPostCannotBePublishedException(Id);
+            case PostArchivedState:
+                throw new PostCannotPublishArchivedException(Id);
 
             default:
-                throw new UnsupportedPostStateException(Id, State);
+                throw new PostUnsupportedStateException(Id, State);
         }
     }
 }
 
-public sealed record PostCreated(
+public sealed record PostCreatedEvent(
     PostId PostId,
     AuthorId AuthorId,
     PostTitle Title,
     DateTimeOffset CreatedAt) : IDomainEvent;
 
-public sealed record PostPublished(
+public sealed record PostPublishedEvent(
     PostId PostId,
     AuthorId AuthorId,
     PostTitle Title,
@@ -765,6 +780,7 @@ The event payload captures the publication fact without carrying the mutable `Po
 - Confirm each violated rule throws its own exception type that owns its code and message, and that no aggregate constructs a shared exception with a hard-coded code or message string.
 - Confirm every public Domain type and member carries XML documentation that states a constraint, result, or failure rather than restating the name.
 - Confirm a module with more than one aggregate gives each aggregate its own folder, and each closed set's base and cases sit in a concept folder rather than loose in the module or in a technical-kind bucket.
+- Confirm every event, state case, union base and case, aggregate value object, child entity, and exception name leads with its aggregate root's full name, and that only Shared kernel types are unprefixed.
 - Confirm every file under Domain declares one primary public type.
 - Confirm aggregate constructors are not public and every mutation uses a business method.
 - Confirm handlers do not reproduce state checks or set aggregate properties.
