@@ -40,6 +40,15 @@ ScannerRole                ->  OrganizationScannerRole
 SellerConfiguration        ->  OrganizationSellerConfiguration
 ```
 
+The anchor is the aggregate root, not the module. Where a module name differs from its aggregate, drop the module prefix from the type and keep it only in the failure code:
+
+```text
+InventoryReservationNotFoundException  ->  ReservationNotFoundException   (code stays INVENTORY.RESERVATION_NOT_FOUND)
+CatalogNotReadyException               ->  SalesCatalogNotReadyException  (code stays CATALOG.NOT_READY)
+```
+
+Child-entity identities follow `{Aggregate}{Part}Id`, such as `OrderLineId`, with the same v7 and empty-rejection mechanics as an aggregate identity.
+
 Domain events now carry the `Event` suffix, `{Aggregate}{PastFact}Event`, such as `PostPublishedEvent`. An event-reaction handler and its operation folder keep the readable `On{PastFact}` form without the suffix (`OnPostPublished`, `NotifySubscribersOnPostPublishedHandler`), because `On` already marks the reaction and a folder name carries no technical suffix.
 
 Rename the type, its files, and any persisted discriminator together, and migrate stored discriminator values where an event, state, or union case was persisted. Exception and value-object renames are pure source changes.
