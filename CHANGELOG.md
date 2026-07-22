@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.6.1
+
+- Fixed the reference consumer validator (`tools/validate-consumer.mjs`) to accept the `implemented` `implementationStatus` value added to the schema in v1.6.0. The schema and the bundled validator now agree, so a specification marked `implemented` passes validation.
+- Bumped the manifest version to 1.6.1.
+
 ## v1.6.0
 
 - Added `API.OPENAPI.002`, which requires the generated OpenAPI document to reflect enforced authentication: when endpoints enforce authentication (per `API.ACTOR.001`), a document transformer that reads the registered authentication schemes declares the matching `securitySchemes` and per-operation `security`, so a consumer or generated client learns auth is required from the contract rather than from a runtime 401. Intentionally anonymous operations declare no requirement.
