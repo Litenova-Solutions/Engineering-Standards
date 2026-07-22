@@ -40,6 +40,8 @@ The name is `{Aggregate}{Specific}{RoleSuffix}`:
 
 The prefix chains to the aggregate root, not to an intermediate owner. A value object `FinanceAssurance` owned by the `Event` aggregate is `EventFinanceAssurance`, and its rejection is `EventFinanceAssuranceMislabeledException`, so both resolve to `Event`.
 
+The anchor is the aggregate root, not the module. When a module name differs from its aggregate, the type leads with the aggregate and never with the module: a `Reservation` aggregate in the `Inventory` module names `ReservationNotFoundException`, not `InventoryReservationNotFoundException`; a `SalesCatalog` aggregate in the `Catalog` module names `SalesCatalogNotReadyException`, not `CatalogNotReadyException`. The folder path already carries the module. Failure codes stay module-scoped as `{MODULE}.{REASON}` (`INVENTORY.RESERVATION_NOT_FOUND`), so the module lives in the code and the aggregate lives in the type name.
+
 | Kind | Pattern | Example |
 |:---|:---|:---|
 | Event | `{Aggregate}{PastFact}Event` | `OrganizationMemberAccessChangedEvent` |

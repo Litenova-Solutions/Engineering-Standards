@@ -174,6 +174,8 @@ Expose child collections as read-only views. For example, `Order.Lines` may retu
 
 Every aggregate identity is a public `readonly record struct` named `{Aggregate}Id`. It wraps one `Guid`, implements the project `IStronglyTypedId` marker and `IParsable<TId>`, and creates new values with `Guid.CreateVersion7()`.
 
+A child entity that carries typed identity uses the same mechanics with a `{Aggregate}{Part}Id` name anchored on its aggregate per `NAME.AGGREGATE.001`, such as `OrderLineId`. It rejects `Guid.Empty` and creates values with `Guid.CreateVersion7()` exactly as an aggregate identity does.
+
 Typed IDs reject `Guid.Empty` at creation and parsing boundaries. Because every struct still has a default value, each aggregate factory also rejects a default ID.
 
 Do not pass raw `Guid`, `long`, or `string` values across Domain and Application when the business identity is known. Do not add implicit conversions that silently erase the ID type.
