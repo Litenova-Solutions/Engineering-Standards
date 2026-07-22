@@ -9,6 +9,7 @@ The profile gives every Aggregate an explicit state record hierarchy from its fi
 ## Agent Summary {#agent-summary}
 
 - Organize Domain by module and use the documented domain language.
+- Give each aggregate its own folder when a module holds more than one, and group each closed set's base and cases in a folder named for the concept.
 - Model each transactional consistency boundary as an aggregate.
 - Derive every aggregate root from the project-owned `AggregateRoot<TId>` base.
 - Give every Aggregate a sealed state record hierarchy. Do not use lifecycle enums, status strings, or boolean status flags.
@@ -310,7 +311,13 @@ Prose repeats a constraint that lives in an approved specification; it does not 
 
 The code blocks in this section focus on the named design rule and omit namespaces and unrelated XML declarations. Consumer files still apply `DOMAIN.DOCUMENTATION.001` to their complete public contracts.
 
-### Use module-first folders
+### Organize a module by aggregate and concept
+
+A module folder holds one or more aggregates and the closed sets, value objects, events, and exceptions that belong to them. Two folder rules keep a growing module navigable.
+
+Aggregate folders decide the top level. A module with one aggregate keeps that aggregate and its members directly in the module folder. A module with more than one aggregate gives each aggregate its own folder named for the aggregate, and each aggregate folder owns its own `Events/`, `States/`, `Exceptions/`, and concept folders. One aggregate's lifecycle, events, and rejections stay separate from another's rather than mixing in one shared `States/` or `Events/` folder.
+
+Concept folders group a closed set. A discriminated union places its abstract base and every sealed case in one folder named for the concept, such as `ScanResults/` for `ScanResult` and its cases, and the aggregate state hierarchy uses a `States/` folder the same way. A concept folder holds exactly one concept's related types. It is not a grouping by technical kind: do not create an `Entities/`, `ValueObjects/`, or `Services/` folder that collects unrelated types, and do not leave an empty folder. Group a closed set into a concept folder once the set has its base and cases; a single loose value object stays in the module or aggregate folder until it grows a hierarchy.
 
 ```text
 {ProjectName}.Domain/
@@ -322,24 +329,59 @@ The code blocks in this section focus on the named design rule and omit namespac
       IStronglyTypedId.cs
     Exceptions/
       DomainException.cs
-  Posts/
+  Posts/                          one aggregate: kept flat in the module folder
     Post.cs
     PostId.cs
     PostTitle.cs
-    PostState.cs
-    DraftPostState.cs
-    PublishedPostState.cs
-    ArchivedPostState.cs
     IPostRepository.cs
+    States/
+      PostState.cs
+      DraftPostState.cs
+      PublishedPostState.cs
+      ArchivedPostState.cs
     Events/
       PostCreated.cs
       PostPublished.cs
     Exceptions/
       PostIdentityRequiredException.cs
       PostAlreadyPublishedException.cs
+  Admission/                      one aggregate with a domain union in a concept folder
+    TicketAdmission.cs
+    TicketAdmissionId.cs
+    ITicketAdmissionRepository.cs
+    ScanResults/
+      ScanResult.cs
+      AcceptedScanResult.cs
+      InvalidScanResult.cs
+      VoidScanResult.cs
+    States/
+      TicketAdmissionState.cs
+      TicketAdmissionPendingState.cs
+      TicketAdmissionAdmittedState.cs
+    Events/
+      TicketScanRecorded.cs
+  Audience/                       more than one aggregate: one folder per aggregate
+    BuyerAccount/
+      BuyerAccount.cs
+      BuyerAccountId.cs
+      IBuyerAccountRepository.cs
+      States/
+        BuyerAccountState.cs
+        BuyerAccountClaimedState.cs
+      Events/
+        AccountRestricted.cs
+    Consent/
+      Consent.cs
+      ConsentId.cs
+      IConsentRepository.cs
+      States/
+        ConsentState.cs
+        ConsentGrantedState.cs
+      Events/
+        ConsentGranted.cs
 ```
 
-Create subfolders when the module contains enough types to improve navigation. Do not create empty `Entities`, `ValueObjects`, `States`, or `Services` folders. Each aggregate-specific repository interface remains with the module that contains that aggregate.
+Each aggregate-specific repository interface stays with the aggregate it loads. The other layers mirror this organization: Application, Infrastructure, and WebApi use the same module and per-aggregate folder names, per `ARCH.MODULES.001`.
 
 ### Use these Domain names
 
@@ -358,7 +400,7 @@ Create subfolders when the module contains enough types to improve navigation. D
 | Domain event | `{PastTenseBusinessFact}` | `PostPublished` |
 | Domain exception | `{DomainType}{Reason}Exception` | `PostAlreadyPublishedException` |
 
-`BusinessTerm` is the exact glossary term represented by the value object. `BusinessRule` names the calculation or policy owned by the domain service. `DomainType` is the concrete Domain type that rejects the rule. A domain union case uses the domain term for the case and disambiguates against the concept when the bare term is ambiguous: outcome cases read `RefundSucceeded` and `RefundReversed`, while role cases read `OwnerRole` and `ScannerRole`. Each union base and each union case is one file named after the type, alongside the module it belongs to.
+`BusinessTerm` is the exact glossary term represented by the value object. `BusinessRule` names the calculation or policy owned by the domain service. `DomainType` is the concrete Domain type that rejects the rule. A domain union case uses the domain term for the case and disambiguates against the concept when the bare term is ambiguous: outcome cases read `RefundSucceeded` and `RefundReversed`, while role cases read `OwnerRole` and `ScannerRole`. Each union base and each union case is one file named after the type, grouped in a folder named for the concept within its owning module or aggregate.
 
 ### Define the shared Domain contracts once
 
@@ -720,6 +762,7 @@ The event payload captures the publication fact without carrying the mutable `Po
 - Search Domain for any `enum` declaration, lifecycle or discriminator strings, status booleans, and duplicated nullable state fields; confirm every closed set is a state hierarchy, a domain union, or a typed value object.
 - Confirm each violated rule throws its own exception type that owns its code and message, and that no aggregate constructs a shared exception with a hard-coded code or message string.
 - Confirm every public Domain type and member carries XML documentation that states a constraint, result, or failure rather than restating the name.
+- Confirm a module with more than one aggregate gives each aggregate its own folder, and each closed set's base and cases sit in a concept folder rather than loose in the module or in a technical-kind bucket.
 - Confirm every file under Domain declares one primary public type.
 - Confirm aggregate constructors are not public and every mutation uses a business method.
 - Confirm handlers do not reproduce state checks or set aggregate properties.

@@ -116,7 +116,7 @@ Next.js special files retain framework names such as `page.tsx`, `layout.tsx`, `
 
 ### Align business names across layers
 
-The Posts module maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/modules/posts`. Its Domain folder may contain the `Post` aggregate and other related aggregates. Use-case names retain the same verb and module across layers.
+The Posts module maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/modules/posts`. A single-aggregate module keeps its aggregate flat in the module folder; a module with more than one aggregate gives each aggregate its own folder, per `ARCH.MODULES.001`. Use-case names retain the same verb and module across layers.
 
 ### Keep namespaces aligned with folders
 

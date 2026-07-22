@@ -45,7 +45,7 @@ Separate Write, Read, Contracts, and event-handler assemblies are outside this p
 
 ### Organize every layer by module and use case (ARCH.MODULES.001)
 
-Use the same domain module names across layers. A module groups related language and Application use cases. It may contain no aggregate, one aggregate, or multiple related aggregates. Application operation folders contain one Command or Query and its supporting types.
+Use the same domain module names across layers. A module groups related language and Application use cases. It may contain no aggregate, one aggregate, or multiple related aggregates. A module with more than one aggregate gives each aggregate its own folder in every layer that organizes by aggregate, so one aggregate's types do not mix with another's; a module with one aggregate keeps it flat. Application operation folders contain one Command or Query and its supporting types.
 
 Module is an organization and ownership term, not a runtime base type. Domain aggregate roots continue to derive from `AggregateRoot<TId>`. Do not introduce `IModule`, `ModuleRoot`, or another module base contract.
 
@@ -92,7 +92,7 @@ Application/Workflows/PublicationDelivery/
 Infrastructure/Workflows/PublicationDelivery/
 ```
 
-The mirrored folder names identify one domain module even though each layer owns different responsibilities. Posts may contain the `Post` aggregate and another related aggregate. A documented workflow that coordinates modules uses the separate `Workflows/{Workflow}` path.
+The mirrored folder names identify one domain module even though each layer owns different responsibilities. A single-aggregate module such as Posts keeps its aggregate flat; a module with more than one aggregate gives each aggregate its own folder under the module. A documented workflow that coordinates modules uses the separate `Workflows/{Workflow}` path.
 
 ### Keep composition in hosts
 
