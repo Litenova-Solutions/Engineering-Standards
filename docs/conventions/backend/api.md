@@ -14,6 +14,7 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 - Keep endpoints free of repositories, sessions, provider clients, and business rules.
 - Generate OpenAPI and update typed consumers with contract changes.
 - Reflect enforced authentication in the generated OpenAPI security metadata.
+- Publish precise schemas: enums for closed-set fields, parameter constraints, and required control headers.
 
 ## Standards
 
@@ -148,6 +149,16 @@ When endpoints enforce authentication (for example by deriving the actor from cl
 
 Register this with an OpenAPI document transformer that reads the registered authentication schemes (for example through `IAuthenticationSchemeProvider`) and adds the matching `securitySchemes` and `security` entries, instead of hand-writing security metadata that can drift from the registered schemes. An operation that is intentionally anonymous declares no security requirement. Endpoints authorized only at runtime with no declared scheme are a defect: the contract and the enforced behavior must agree.
 
+### Publish precise, complete schemas (API.OPENAPI.003)
+
+The generated contract expresses the real shape and constraints of each operation, not only its base types. A consumer learns an operation's rules from the document rather than by receiving a runtime rejection.
+
+- A field or parameter whose values form a closed set declares those values as an OpenAPI `enum`. A response field projected from a closed Domain set, such as a state hierarchy or discriminated union, publishes its allowed values so a consumer receives a typed union instead of an open `string`. Domain still models the set without an `enum` (`DOMAIN.CLOSEDSET.001`); the `enum` exists only at the transport boundary, produced by a boundary type or a schema transformer.
+- A parameter declares its real constraints: bounds (`minimum`, `maximum`, length), format, and allowed values, plus a description for a non-obvious business limit such as a maximum date-range span. A caller must be able to learn a limit from the contract instead of by receiving a 400.
+- An operation that requires a control header declares it as a required parameter, for example `Idempotency-Key` or `If-Match`, so the requirement is discoverable and consistent across the operations that share it.
+
+Prefer expressing these through typed results, typed boundary enums, and parameter metadata so the generated document stays precise without hand-written schema that drifts from the code.
+
 ## Conventions
 
 ### Use this endpoint layout
@@ -214,5 +225,6 @@ A create endpoint reads the author from claims, maps `CreateDraftRequestModel` t
 - Validate the exact Problem Details and pagination JSON shapes.
 - Regenerate OpenAPI and typed consumers.
 - Confirm the generated document declares a security scheme and requirement for every operation that enforces authentication, and none for intentionally anonymous operations.
+- Confirm closed-set fields and parameters declare enums, parameters declare their bounds and formats, and every operation that requires a control header declares it.
 - Generate OpenAPI twice and confirm the second run is clean.
 - Run architecture tests for endpoint boundaries.

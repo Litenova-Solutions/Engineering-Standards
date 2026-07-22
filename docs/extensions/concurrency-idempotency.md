@@ -61,7 +61,7 @@ The use case lists the statuses and headers stored for replay. Store only safe r
 
 ## Conventions
 
-Use the `Idempotency-Key` request header for HTTP commands that adopt client keys. Keep persistence and transaction handling in Infrastructure. Keep response replay mapping at the API boundary.
+Use the `Idempotency-Key` request header for HTTP commands that adopt client keys. Keep persistence and transaction handling in Infrastructure. Keep response replay mapping at the API boundary. Declare the header as a required parameter on every operation that requires it so the requirement is discoverable in the generated contract (`API.OPENAPI.003`), rather than surfacing it on only some operations.
 
 ## Dependencies
 

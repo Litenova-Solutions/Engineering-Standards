@@ -56,6 +56,10 @@ Consumers handle the same message more than once. Use message ID or a business i
 
 Use bounded exponential backoff with jitter. Classify permanent failures, stop automatic retry after the configured limit, and retain enough data for investigation and safe replay.
 
+### Separate dependency outage from message failure (EXT.OUTBOX.READINESS.001)
+
+Distinguish a store that is unavailable from a record that fails. When the Worker cannot reach its store or the schema is not yet present, for example during a cold start or before a migration has run, it treats the condition as a transient dependency outage: it backs off with the bounded policy and rate-limits the logged error, rather than emitting a per-iteration exception storm. Message-level retry and poison handling (`EXT.OUTBOX.RETRY.001`) apply to individual claimed records, not to an unavailable store. Where the host exposes readiness, gate the dispatch loop on it so the Worker does not poll a store that is not ready to serve.
+
 ### Preserve message compatibility (EXT.OUTBOX.SCHEMA.001)
 
 Use stable message type names and explicit schema versions. A deployed Worker must process records produced by every application version that may coexist during rollout or rollback.
@@ -100,5 +104,6 @@ No additional baseline package is required. Provider-specific dispatch dependenc
 - Expire a lease and verify a stale worker cannot complete the reclaimed record.
 - Deliver the same Integration Event and Workflow Command more than once and verify idempotency.
 - Test retry exhaustion, poison-message inspection, replay, and rollback compatibility.
+- Test that an unavailable or not-yet-migrated store produces backed-off, rate-limited logging rather than a per-iteration exception storm.
 - Verify backlog diagnostics and alerts.
 - Verify old and new Workers against records produced during rollout and rollback.

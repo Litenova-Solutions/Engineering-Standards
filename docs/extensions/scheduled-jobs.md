@@ -41,7 +41,7 @@ A job dispatches an Application command or an approved Application port. It MUST
 
 ### Bound retries and require idempotency (EXT.JOBS.RETRY.001)
 
-Executions MUST use bounded attempts, cancellation-aware backoff, and a poison state for permanent failure. The command and side effects MUST tolerate duplicate execution after a lease or process failure.
+Executions MUST use bounded attempts, cancellation-aware backoff, and a poison state for permanent failure. The command and side effects MUST tolerate duplicate execution after a lease or process failure. Treat an unavailable scheduler store or dependency as a transient outage with backed-off, rate-limited logging rather than a per-iteration exception storm, as in `EXT.OUTBOX.READINESS.001`.
 
 ### Recover missed occurrences (EXT.JOBS.RECOVERY.001)
 
