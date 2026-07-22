@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://www.litenova.solutions/Standards"><img src="https://img.shields.io/badge/docs-online-f8c258?labelColor=3e3643" alt="Documentation"></a>
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.3.0-3e3643" alt="Version 1.3.0"></a>
+  <a href="https://github.com/Litenova-Solutions/Engineering-Standards/releases/latest"><img src="https://img.shields.io/github/v/release/Litenova-Solutions/Engineering-Standards?label=version&color=3e3643" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/Litenova-Solutions/Engineering-Standards" alt="MIT license"></a>
 </p>
 
