@@ -36,7 +36,7 @@ A consumer override must name the affected rule and link to a project decision.
 - [Agentic Engineering System](docs/foundations/engineering-system.md)
 - [V1 release scope](docs/guides/v1-release-scope.md)
 - [Adoption guide](docs/guides/adopt-v1.md)
-- [V1.3 upgrade guide](docs/guides/upgrade-v1.3.md)
+- [V1.5 upgrade guide](docs/guides/upgrade-v1.5.md)
 
 ## Use the Standards
 

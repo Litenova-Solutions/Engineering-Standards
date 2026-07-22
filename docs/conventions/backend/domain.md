@@ -12,12 +12,14 @@ The profile gives every Aggregate an explicit state record hierarchy from its fi
 - Model each transactional consistency boundary as an aggregate.
 - Derive every aggregate root from the project-owned `AggregateRoot<TId>` base.
 - Give every Aggregate a sealed state record hierarchy. Do not use lifecycle enums, status strings, or boolean status flags.
+- Model every closed set of domain values with a discriminated union of records or a typed value object. Declare no `enum` anywhere in Domain.
 - Create aggregates through named factories and mutate them through business methods.
 - Use immutable value objects and typed IDs backed by `Guid.CreateVersion7()`.
 - Keep repository interfaces in Domain and implementations in Infrastructure.
 - Raise package-free `IDomainEvent` records in past tense.
 - Keep domain services stateless and use them only for business rules with no natural aggregate owner.
-- Reject violated business rules with specific Domain exceptions.
+- Reject each violated business rule with its own specific Domain exception that owns its stable failure code and message; do not pass code or message strings into a shared exception.
+- Document every public Domain type and member with XML comments that state its business constraint, result, or failure.
 
 ## Standards
 
@@ -86,6 +88,53 @@ public abstract record ProfileState;
 
 public sealed record ActiveProfileState : ProfileState;
 ```
+
+### Model every closed set of domain values without enums (DOMAIN.CLOSEDSET.001)
+
+Domain declares no `enum`. `DOMAIN.STATE.001` already removes the enum from Aggregate lifecycle; this rule extends the same reasoning to every other closed set of domain values: an incident status, a refund outcome, a per-line status, a permission role, a category, or a severity.
+
+A C# `enum` is a named integer. It carries no data, admits no exhaustiveness guarantee, silently accepts undefined values through a cast, and forces every new case that needs its own data into a parallel field elsewhere. When the set later grows a case that owns data, or a rule that applies to only some cases, the enum must be removed and every persisted value migrated. Modeling the set as a closed type hierarchy from the first case avoids that migration and lets the compiler and `switch` expression check exhaustiveness.
+
+Model a closed set as a discriminated union: one abstract record base named for the concept and one sealed record per case. This is the same shape as a state hierarchy, applied to a value that is not an Aggregate lifecycle.
+
+```csharp
+public abstract record RefundOutcome;
+
+public sealed record RefundPending(string Reason) : RefundOutcome;
+
+public sealed record RefundSucceeded(DateTimeOffset ProviderTime) : RefundOutcome;
+
+public sealed record RefundFailed(string Classification) : RefundOutcome;
+
+public sealed record RefundReversed(DateTimeOffset ProviderTime) : RefundOutcome;
+```
+
+A case that owns no data is still a sealed record, so the set can grow case data later without a breaking change:
+
+```csharp
+public abstract record OrganizationRole;
+
+public sealed record OwnerRole : OrganizationRole;
+
+public sealed record ScannerRole : OrganizationRole;
+```
+
+Callers branch with a `switch` expression on the case type. A `switch` that omits a case surfaces at review as a missing arm rather than a silent default, and a case that carries data exposes it directly instead of through a separate nullable field:
+
+```csharp
+var next = outcome switch
+{
+    RefundSucceeded succeeded => Settle(succeeded.ProviderTime),
+    RefundPending pending => HoldFor(pending.Reason),
+    RefundFailed failed => RaiseException(failed.Classification),
+    RefundReversed reversed => Reverse(reversed.ProviderTime),
+    _ => throw new UnsupportedRefundOutcomeException(),
+};
+```
+
+When the closed set is a single scalar with validation, normalization, or formatting and no per-case data or behavior, a typed value object under `DOMAIN.VALUE.001` is the correct model instead of a union. Do not reintroduce the enum as the value object's backing field.
+
+Do not use a C# `enum`, an `int` or `string` discriminator, or a set of boolean flags to represent a closed set of domain values. This rule is scoped to the Domain layer. Application results, transport DTOs, and persistence records at a boundary may still use an `enum` or a string and map it to the Domain union at the boundary; the Domain type remains the union. Infrastructure persists each union with stable discriminators exactly as it persists a state hierarchy, and never stores a raw enum value that Domain no longer defines.
 
 ### Create valid aggregates through named factories (DOMAIN.FACTORY.001)
 
@@ -195,6 +244,42 @@ Domain defines a project `DomainException` base and specific subclasses named `{
 
 Do not throw `InvalidOperationException`, `ArgumentException`, Application validation exceptions, HTTP exceptions, or provider exceptions for a business rejection. Domain exceptions contain safe business context and no transport status code.
 
+Each distinct violated rule has its own exception type, and that type owns its stable failure code and its message. The exception constructor accepts only the domain values that describe the specific failure. It does not accept a `code` or `message` string from the throwing aggregate. A shared exception that is constructed with a hard-coded failure code and message string at the call site is prohibited, because it moves the rule identity out of the type system and into duplicated string literals inside aggregate behavior.
+
+```csharp
+// Prohibited: the aggregate carries the code and message, and one type covers unrelated rules.
+if (allocation.Count == 0)
+{
+    throw new RefundRuleException("REFUNDS.ALLOCATION_INVALID", "A refund requires at least one allocation line.");
+}
+
+if (allocation.Any(line => line.Quantity <= 0))
+{
+    throw new RefundRuleException("REFUNDS.ALLOCATION_INVALID", "Each allocation quantity must be positive.");
+}
+
+// Required: one type per rule; the type owns the code and message; the call site passes only domain values.
+if (allocation.Count == 0)
+{
+    throw new RefundAllocationRequiredException();
+}
+
+if (allocation.Any(line => line.Quantity <= 0))
+{
+    throw new RefundAllocationQuantityInvalidException();
+}
+```
+
+```csharp
+public sealed class RefundAllocationRequiredException()
+    : DomainException("A refund requires at least one allocation line.")
+{
+    public override string Code => "REFUNDS.ALLOCATION_REQUIRED";
+}
+```
+
+Two rules that share a caller-visible failure code because a boundary maps them to one response still get two exception types. The shared code lives in the two types, not in a string passed by the aggregate. Reuse a single exception type only when one rule can fail from more than one input and the differing values are carried as constructor parameters.
+
 Application validators handle malformed caller input through validation errors. Aggregate and value-object exceptions remain the last defense when direct Domain use violates a rule. Command handlers do not catch expected Domain exceptions; the host maps them through the documented error boundary.
 
 ### Reference other aggregates by ID (DOMAIN.REFERENCE.001)
@@ -209,11 +294,17 @@ Domain does not read system time, generate random business values, or call an ex
 
 For example, a handler obtains `clock.UtcNow` and calls `post.Publish(clock.UtcNow)`. Domain tests pass an explicit `DateTimeOffset`.
 
-### Document public Domain contracts (DOMAIN.DOCUMENTATION.001)
+### Document every public Domain contract (DOMAIN.DOCUMENTATION.001)
 
-Public Aggregate methods, state types with data, Value Object factories, Events, repositories, and exceptions have XML documentation that states a business constraint, result, or failure. Do not restate the member name.
+Every public Domain type and every public member on it has XML documentation. This covers Aggregates and their mutation methods, child entities, state bases and cases, union bases and cases, Value Objects and their factories, typed IDs, domain services, repositories, Events, and exceptions. The `<summary>` states the business constraint, result, or failure that the member enforces or represents, not a restatement of its name.
 
-For example, `Publish` documentation identifies allowed source states, the resulting state, and `PostPublished`. The text `Publishes the post` alone is insufficient.
+- A mutation method identifies its allowed source states, its resulting state, the invariant it protects, and the Event it records. `Publish` documentation names the allowed source states, the resulting `PublishedPostState`, and `PostPublished`. The text `Publishes the post` alone is insufficient.
+- A factory states the creation rules it enforces and the initial state it selects.
+- A property that carries a business fact states what the fact means and when it is set, using `<summary>`. A property whose meaning is fully evident from a well-named type (for example `PostId Id`) needs no restatement.
+- A state or union case, and each of its data members, states what the case represents and what its data means. Use `<param>` on positional record members.
+- An Event states the transition it records. An exception states the exact rule that was violated and its stable failure code.
+
+Prose repeats a constraint that lives in an approved specification; it does not invent a new rule. Keep the text in the repository writing style: plain ASCII, lead with the constraint, no filler.
 
 ## Conventions
 
@@ -260,12 +351,14 @@ Create subfolders when the module contains enough types to improve navigation. D
 | Strongly typed ID | `{Aggregate}Id` | `PostId` |
 | Typed state base | `{Aggregate}State` | `PostState` |
 | Typed state case | `{State}{Aggregate}State` | `PublishedPostState` |
+| Domain union base | `{Concept}` | `RefundOutcome` |
+| Domain union case | `{Case}` in domain language | `RefundSucceeded`, `ScannerRole` |
 | Repository | `I{Aggregate}Repository` | `IPostRepository` |
 | Domain service | `{BusinessRule}DomainService` | `OrderPricingDomainService` |
 | Domain event | `{PastTenseBusinessFact}` | `PostPublished` |
 | Domain exception | `{DomainType}{Reason}Exception` | `PostAlreadyPublishedException` |
 
-`BusinessTerm` is the exact glossary term represented by the value object. `BusinessRule` names the calculation or policy owned by the domain service. `DomainType` is the concrete Domain type that rejects the rule.
+`BusinessTerm` is the exact glossary term represented by the value object. `BusinessRule` names the calculation or policy owned by the domain service. `DomainType` is the concrete Domain type that rejects the rule. A domain union case uses the domain term for the case and disambiguates against the concept when the bare term is ambiguous: outcome cases read `RefundSucceeded` and `RefundReversed`, while role cases read `OwnerRole` and `ScannerRole`. Each union base and each union case is one file named after the type, alongside the module it belongs to.
 
 ### Define the shared Domain contracts once
 
@@ -624,7 +717,10 @@ The event payload captures the publication fact without carrying the mutable `Po
 - Confirm every documented aggregate derives from `AggregateRoot<TId>` and appears in its module ownership table.
 - Confirm every documented Aggregate has exactly one abstract state base and at least one sealed state record.
 - Confirm no runtime module interface or base class exists.
-- Search Domain for lifecycle enums, state strings, status booleans, and duplicated nullable state fields.
+- Search Domain for any `enum` declaration, lifecycle or discriminator strings, status booleans, and duplicated nullable state fields; confirm every closed set is a state hierarchy, a domain union, or a typed value object.
+- Confirm each violated rule throws its own exception type that owns its code and message, and that no aggregate constructs a shared exception with a hard-coded code or message string.
+- Confirm every public Domain type and member carries XML documentation that states a constraint, result, or failure rather than restating the name.
+- Confirm every file under Domain declares one primary public type.
 - Confirm aggregate constructors are not public and every mutation uses a business method.
 - Confirm handlers do not reproduce state checks or set aggregate properties.
 - Confirm typed IDs use `Guid.CreateVersion7()`, reject empty values, and retain one UUID representation across boundaries.

@@ -77,6 +77,9 @@ Do not add a package, migration, authentication model change, public API break, 
 - Use Domain, Application, Infrastructure, and WebApi as the four application projects.
 - Keep Domain free of persistence, web, mediator, logging, and dependency injection packages.
 - Give every Aggregate an abstract state base and at least one sealed state record; do not use lifecycle enums, status strings, or status flags.
+- Model every closed set of Domain values as a discriminated union of records or a typed value object; declare no `enum` in Domain.
+- Give each rejected Domain rule its own exception type that owns its stable failure code and message; do not pass code or message strings into a shared exception.
+- Place one primary top-level type per C# file; do not bundle types by kind in `*Enums.cs` or `*ValueObjects.cs` files.
 - Organize every layer by the same domain modules and use cases.
 - Name Application handlers, validators, results, and query result items with explicit `Command` or `Query` role suffixes.
 - Name HTTP transport DTOs with a concrete boundary role ending in `Model`, including `RequestModel` and `ResponseModel`; name operation mappings with `ApiMappings`.

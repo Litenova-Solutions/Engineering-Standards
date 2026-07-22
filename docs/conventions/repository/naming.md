@@ -6,22 +6,26 @@ Names should expose business intent and architectural role without requiring a r
 
 ## Agent Summary {#agent-summary}
 
-- Use one primary type per C# file and match the file name exactly.
+- Use one primary top-level type per C# file, match the file name exactly, and never bundle types by kind in a `*Enums.cs` or `*ValueObjects.cs` file.
 - Use explicit command or query suffixes for Application messages, results, result items, handlers, and validators.
 - Use explicit `RequestModel`, `ResponseModel`, and `ApiMappings` suffixes at the HTTP boundary.
 - Use the required architectural suffix for endpoints and persistence classes.
 - Suffix every asynchronous method with `Async` and name its final token `cancellationToken`.
 - Use business module and use-case names across documentation and code.
+- Give each rejected rule its own exception type that owns its code and message; do not pass code or message strings into a shared exception.
 - Use `sealed` implementation classes, file-scoped namespaces, braces, and explicit access modifiers.
+- Prefer current language features: collection expressions, `init`/`required` members, `readonly`, primary constructors for dependency-only classes, and `switch` expressions over unions.
 - Avoid generic `Manager`, `Helper`, `Processor`, `Service`, and `Bus` names.
 
 ## Standards
 
 ### Match C# files and primary types (NAME.FILE.001)
 
-Each C# file contains one primary type and uses that type's exact name. Small private nested types may remain with their owner.
+Each C# file contains one primary top-level type and uses that type's exact name. Only a small `private` or `file`-scoped nested type may remain with its owner. Two or more public or internal top-level types in one file are prohibited, including a set of related records, value objects, union cases, or exceptions.
 
 `CreatePostCommandHandler.cs` contains `CreatePostCommandHandler`. Do not use `PostHandlers.cs` for multiple unrelated types.
+
+Grouping-suffix files that collect several types by kind rather than by name are prohibited: `RefundEnums.cs`, `PaymentEnums.cs`, `CancellationValueObjects.cs`, and `OrderStates.cs` each place two or more public types in one file. Split each type into its own file named for the type, and let the module folder provide the grouping. A discriminated union places its abstract base and each sealed case in separate files, exactly as a state hierarchy does.
 
 ### Use architectural suffixes (NAME.SUFFIX.001)
 
@@ -68,6 +72,8 @@ Do not shorten the parameter to `ct` in public or internal application code.
 
 Domain exceptions use `{DomainType}{Reason}Exception`, such as `PostAlreadyPublishedException`. `DomainType` is the concrete aggregate, entity, value object, or domain service that rejects the rule. Missing aggregates use `{Aggregate}NotFoundException`. Input validation errors use stable field and reason codes; create a custom exception type only when the exception hierarchy requires it.
 
+Each distinct rule has its own exception type, and that type owns its stable failure code and message. An exception constructor accepts only the domain values of the specific failure, never a `code` or `message` string supplied by the throwing type. A shared `{DomainType}RuleException(code, message)` constructed with hard-coded strings at the call site is prohibited. See `DOMAIN.ERROR.001`.
+
 ### Use intent-revealing boolean names (NAME.BOOLEAN.001)
 
 Boolean properties and methods use `Is`, `Has`, `Can`, or a precise verb when those words fit. Use `HasLines` and `CanPublish`, not `LinesPresent` or `CheckPublish`.
@@ -85,6 +91,20 @@ C# production code uses:
 - PascalCase public members and types.
 - `_camelCase` private fields.
 - camelCase parameters and local variables.
+
+### Use current language features (NAME.CSHARP.002)
+
+Production code targets the pinned language version and prefers the current, more precise construct over an older equivalent:
+
+- Collection expressions `[]` and `[.. source]` for array, list, and span creation and copying, instead of `new List<T>()`, `Array.Empty<T>()`, or `.ToList()` initializers.
+- `init` accessors and `required` members for values that are set once at construction and never mutated, instead of a public setter or a setter left mutable by habit.
+- `readonly` on every field and struct that is not reassigned after construction.
+- Primary constructors for dependency-only classes such as handlers and services, instead of a constructor that only assigns fields.
+- Target-typed `new` where the type is already stated on the left.
+- `switch` expressions and type patterns over a discriminated union, instead of an `enum` switch or an `if` ladder on a discriminator. A closed-union `switch` includes a `_` arm that throws the union's unsupported-case exception.
+- `is null` and `is not null` for reference checks.
+
+Do not adopt a feature that reduces clarity. A collection expression that hides an intended defensive copy, or a primary constructor on a type with real construction logic, is not an improvement. The rule prefers the modern construct where it is at least as clear, not in every position.
 
 ### Use predictable frontend names (NAME.FRONTEND.001)
 
@@ -128,7 +148,9 @@ internal sealed class CreateDraftCommandHandler(
 
 ## Verification
 
-- Compare file names with primary types.
+- Compare file names with primary types and confirm no file declares more than one public or internal top-level type.
+- Confirm no `*Enums.cs` or `*ValueObjects.cs` grouping file remains.
+- Confirm each rejected rule has its own exception type that owns its code and message, with no caller-supplied strings.
 - Confirm command and query results, query result items, handlers, and validators retain their full role suffixes.
 - Confirm every passive HTTP DTO names its concrete boundary role and ends in `Model`; confirm operation mappings end in `ApiMappings`.
 - Search for forbidden generic suffixes and unexplained base classes.

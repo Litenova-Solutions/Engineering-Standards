@@ -71,6 +71,8 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Upgrade to standards v1.1](guides/upgrade-v1.1.md) gives the consumer migration sequence for document metadata and consistency checks.
 - [Upgrade to standards v1.2](guides/upgrade-v1.2.md) explains the Subject migration and aggregate root boundary.
 - [Upgrade to standards v1.3](guides/upgrade-v1.3.md) explains the Agentic Engineering System vocabulary, document layout, metadata, extension, workflow, and state-record migration.
+- [Upgrade to standards v1.4](guides/upgrade-v1.4.md) adds the reference validator, completes the rule identifier scheme, and closes two consumer footguns.
+- [Upgrade to standards v1.5](guides/upgrade-v1.5.md) removes the Domain enum, requires one exception type per rule, and hardens the documentation and one-type-per-file rules.
 - [V1 release scope](guides/v1-release-scope.md) states the complete baseline, conditional catalog, release contents, and exclusions.
 - [Model a domain module](guides/model-domain.md) turns known business language into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
