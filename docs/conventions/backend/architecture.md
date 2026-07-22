@@ -45,7 +45,7 @@ Separate Write, Read, Contracts, and event-handler assemblies are outside this p
 
 ### Organize every layer by module and use case (ARCH.MODULES.001)
 
-Use the same domain module names across layers. A module groups related language and Application use cases. It may contain no aggregate, one aggregate, or multiple related aggregates. A module with more than one aggregate gives each aggregate its own folder in every layer that organizes by aggregate, so one aggregate's types do not mix with another's; a module with one aggregate keeps it flat. Application operation folders contain one Command or Query and its supporting types.
+Use the same domain module names across layers. A module groups related language and Application use cases. It may contain no aggregate, one aggregate, or multiple related aggregates. The folder hierarchy is top-down and the same in every layer: module, then aggregate, then the layer's own detail. A module with more than one aggregate inserts an aggregate folder under the module in every layer, so one aggregate's types do not mix with another's; a module with one aggregate keeps it flat directly under the module. Application operation folders contain one Command or Query and its supporting types.
 
 Module is an organization and ownership term, not a runtime base type. Domain aggregate roots continue to derive from `AggregateRoot<TId>`. Do not introduce `IModule`, `ModuleRoot`, or another module base contract.
 
@@ -83,16 +83,31 @@ Domain contains no registration code. Application exposes contracts and an assem
 
 ### Use mirrored module folders
 
+The folder hierarchy is top-down and identical in every layer: module, then aggregate, then the layer's own detail. A single-aggregate module keeps its aggregate flat directly under the module; a module with more than one aggregate inserts an aggregate folder under the module in every layer.
+
 ```text
+# single-aggregate module: the aggregate stays flat under the module in every layer
 Domain/Posts/
 Application/Posts/CreateDraft/
 Infrastructure/Posts/
 WebApi/Endpoints/Posts/CreateDraft/
+
+# multi-aggregate module: module, then aggregate, then operation, mirrored in every layer
+Domain/Audience/BuyerAccount/
+Domain/Audience/Consent/
+Application/Audience/BuyerAccount/RestrictAccount/
+Application/Audience/Consent/GrantConsent/
+Infrastructure/Audience/BuyerAccount/
+Infrastructure/Audience/Consent/
+WebApi/Endpoints/Audience/BuyerAccount/RestrictAccount/
+WebApi/Endpoints/Audience/Consent/GrantConsent/
+
+# a workflow that coordinates modules uses the separate Workflows path
 Application/Workflows/PublicationDelivery/
 Infrastructure/Workflows/PublicationDelivery/
 ```
 
-The mirrored folder names identify one domain module even though each layer owns different responsibilities. A single-aggregate module such as Posts keeps its aggregate flat; a module with more than one aggregate gives each aggregate its own folder under the module. A documented workflow that coordinates modules uses the separate `Workflows/{Workflow}` path.
+The mirrored folder names identify one domain module even though each layer owns different responsibilities. A documented workflow that coordinates modules uses the separate `Workflows/{Workflow}` path.
 
 ### Keep composition in hosts
 
@@ -117,7 +132,7 @@ Publishing a post follows this direction:
 
 1. WebApi maps the HTTP request to `PublishPostCommand`.
 2. Application loads `Post` through `IPostRepository`.
-3. Domain `Post.Publish` enforces publication rules and raises `PostPublished`.
+3. Domain `Post.Publish` enforces publication rules and raises `PostPublishedEvent`.
 4. Infrastructure stages and commits the document through the command pipeline.
 5. An event reaction implementation handles the event through its documented atomic, durable, rebuildable, or optional delivery path.
 
