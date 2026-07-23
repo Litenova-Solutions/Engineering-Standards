@@ -324,7 +324,9 @@ The code blocks in this section focus on the named design rule and omit namespac
 
 A module folder holds one or more aggregates and the closed sets, value objects, events, and exceptions that belong to them. Two folder rules keep a growing module navigable.
 
-Aggregate folders decide the top level. A module with one aggregate keeps that aggregate and its members directly in the module folder. A module with more than one aggregate gives each aggregate its own folder named for the aggregate, and each aggregate folder owns its own `Events/`, `States/`, `Exceptions/`, and concept folders. One aggregate's lifecycle, events, and rejections stay separate from another's rather than mixing in one shared `States/` or `Events/` folder.
+Aggregate folders decide the top level. A module with one aggregate keeps that aggregate and its members directly in the module folder. A module with more than one aggregate gives each aggregate its own folder, and each aggregate folder owns its own `Events/`, `States/`, `Exceptions/`, and concept folders. One aggregate's lifecycle, events, and rejections stay separate from another's rather than mixing in one shared `States/` or `Events/` folder.
+
+Name each aggregate folder with the plural of the aggregate root, so the folder adds a proper namespace segment (`NAME.CSHARP.001`) that never collides with the singular aggregate type. `Audience/BuyerAccounts/BuyerAccount.cs` is `Entro.Domain.Audience.BuyerAccounts`, and `Audience/BuyerAccounts/States/BuyerAccountClaimedState.cs` is `Entro.Domain.Audience.BuyerAccounts.States`. A singular folder named exactly for the aggregate would put the `BuyerAccount` type in a namespace of the same name and trip the type-name-as-namespace warning (CA1724); the plural avoids that. When the module name is already the plural of its primary aggregate (a `Orders` module whose primary aggregate is `Order`), that aggregate stays flat in the module folder and the others take their plural folders.
 
 Concept folders group a closed set. A discriminated union places its abstract base and every sealed case in one folder named for the concept, such as `ScanResults/` for `ScanResult` and its cases, and the aggregate state hierarchy uses a `States/` folder the same way. A concept folder holds exactly one concept's related types. It is not a grouping by technical kind: do not create an `Entities/`, `ValueObjects/`, or `Services/` folder that collects unrelated types, and do not leave an empty folder. Group a closed set into a concept folder once the set has its base and cases; a single loose value object stays in the module or aggregate folder until it grows a hierarchy.
 
@@ -369,8 +371,8 @@ Concept folders group a closed set. A discriminated union places its abstract ba
       TicketAdmissionAdmittedState.cs
     Events/
       TicketAdmissionScanRecordedEvent.cs
-  Audience/                       more than one aggregate: one folder per aggregate
-    BuyerAccount/
+  Audience/                       more than one aggregate: one plural folder per aggregate
+    BuyerAccounts/                  namespace Entro.Domain.Audience.BuyerAccounts
       BuyerAccount.cs
       BuyerAccountId.cs
       IBuyerAccountRepository.cs
@@ -379,7 +381,7 @@ Concept folders group a closed set. A discriminated union places its abstract ba
         BuyerAccountClaimedState.cs
       Events/
         BuyerAccountRestrictedEvent.cs
-    Consent/
+    Consents/                       namespace Entro.Domain.Audience.Consents
       Consent.cs
       ConsentId.cs
       IConsentRepository.cs

@@ -259,21 +259,20 @@ Each query states `No domain transition` and names its read model. It does not l
 
 ```text
 apps/api/src/Shop.Domain/
-  Orders/                         two aggregates: one folder each
-    Order/
-      Order.cs
-      OrderId.cs
-      IOrderRepository.cs
-      States/
-        OrderState.cs
-        OrderPendingState.cs
-        OrderConfirmedState.cs
-        OrderCancelledState.cs
-      Events/
-        OrderConfirmedEvent.cs
-      Exceptions/
-        OrderCannotBeCancelledException.cs
-    OrderClaim/
+  Orders/                         Orders is the plural of the primary aggregate Order,
+    Order.cs                       so Order stays flat and OrderClaim takes a plural folder
+    OrderId.cs
+    IOrderRepository.cs
+    States/
+      OrderState.cs
+      OrderPendingState.cs
+      OrderConfirmedState.cs
+      OrderCancelledState.cs
+    Events/
+      OrderConfirmedEvent.cs
+    Exceptions/
+      OrderCannotBeCancelledException.cs
+    OrderClaims/                    namespace Shop.Domain.Orders.OrderClaims
       OrderClaim.cs
       OrderClaimId.cs
       IOrderClaimRepository.cs

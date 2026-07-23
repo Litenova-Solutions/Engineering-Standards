@@ -147,11 +147,11 @@ Each issued Command enters its own command pipeline and owns one transaction. Wo
         NotifySubscribersOnPostPublishedHandler.cs
         IPostPublicationNotifier.cs
   Audience/                         two aggregates: operations nest under each aggregate
-    BuyerAccount/
+    BuyerAccounts/
       RestrictAccount/
         RestrictAccountCommand.cs
         RestrictAccountCommandHandler.cs
-    Consent/
+    Consents/
       GrantConsent/
         GrantConsentCommand.cs
         GrantConsentCommandHandler.cs

@@ -127,10 +127,10 @@ In-memory substitutes cannot prove persistence behavior.
         PostRepository.cs
         PostMartenConfiguration.cs
       Audience/                     two aggregates: one folder per aggregate
-        BuyerAccount/
+        BuyerAccounts/
           BuyerAccountRepository.cs
           BuyerAccountMartenConfiguration.cs
-        Consent/
+        Consents/
           ConsentRepository.cs
           ConsentMartenConfiguration.cs
       Workflows/

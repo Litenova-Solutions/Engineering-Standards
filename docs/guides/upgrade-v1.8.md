@@ -17,15 +17,15 @@ Audience/                       before: one folder, two aggregates mixed
     BuyerAccountState.cs
     ConsentState.cs
 
-Domain/Audience/BuyerAccount/   after: module, aggregate, detail (every layer)
-Domain/Audience/Consent/
-Application/Audience/BuyerAccount/RestrictAccount/
-Application/Audience/Consent/GrantConsent/
-Infrastructure/Audience/BuyerAccount/
-WebApi/Endpoints/Audience/BuyerAccount/RestrictAccount/
+Domain/Audience/BuyerAccounts/   after: module, plural aggregate folder, detail (every layer)
+Domain/Audience/Consents/
+Application/Audience/BuyerAccounts/RestrictAccount/
+Application/Audience/Consents/GrantConsent/
+Infrastructure/Audience/BuyerAccounts/
+WebApi/Endpoints/Audience/BuyerAccounts/RestrictAccount/
 ```
 
-Namespaces follow the new folders (`NAME.CSHARP.001`), so update namespace declarations and `using` directives when files move. Persistence discriminators and stored data do not change; only source layout and namespaces move.
+Name the per-aggregate folder with the plural of the aggregate root (`BuyerAccounts`, `Consents`), so the folder adds a namespace segment that does not collide with the singular aggregate type (a singular `BuyerAccount` folder would trip CA1724). Namespaces follow the new folders (`NAME.CSHARP.001`), so `Audience/BuyerAccounts/BuyerAccount.cs` is `Entro.Domain.Audience.BuyerAccounts`; update namespace declarations and `using` directives when files move. Persistence discriminators and stored data do not change; only source layout and namespaces move.
 
 ## Anchor every aggregate-owned type on its aggregate root (`NAME.AGGREGATE.001`)
 

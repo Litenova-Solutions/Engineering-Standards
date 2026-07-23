@@ -177,12 +177,12 @@ Prefer expressing these through typed results, typed boundary enums, and paramet
         GetPostResponseModel.cs
         GetPostApiMappings.cs
     Audience/                       two aggregates: operations nest under each aggregate
-      BuyerAccount/
+      BuyerAccounts/
         RestrictAccount/
           RestrictAccountEndpoint.cs
           RestrictAccountRequestModel.cs
           RestrictAccountApiMappings.cs
-      Consent/
+      Consents/
         GrantConsent/
           GrantConsentEndpoint.cs
           GrantConsentRequestModel.cs

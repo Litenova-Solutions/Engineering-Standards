@@ -40,6 +40,10 @@ The name is `{Aggregate}{Specific}{RoleSuffix}`:
 
 The prefix chains to the aggregate root, not to an intermediate owner. A value object `FinanceAssurance` owned by the `Event` aggregate is `EventFinanceAssurance`, and its rejection is `EventFinanceAssuranceMislabeledException`, so both resolve to `Event`.
 
+A child entity with a first-class domain name is itself an anchor. A child entity is normally `{Aggregate}{Part}` (`OrderLine`), but keeps a standalone domain term when that term is first-class in the language (`Reservation`, a child of `CapacityPool`). Either way the child entity, not the aggregate root, anchors its own states and unions: a `Reservation` names `ReservationHeldState` and `ReservationConfirmOutcome`, never `CapacityPoolReservationHeldState`. Chaining stops at the nearest entity that carries identity.
+
+When the concept already embeds the aggregate name, reorder the case so the aggregate leads exactly once rather than doubling it. A `Suppression` basis is `SuppressionLegalBasis`, not `LegalSuppressionBasis` (owner not derivable) nor `SuppressionLegalSuppressionBasis` (doubled); a `Role` scope is `RoleEventScope`, not `EventRoleScope`.
+
 The anchor is the aggregate root, not the module. When a module name differs from its aggregate, the type leads with the aggregate and never with the module: a `Reservation` aggregate in the `Inventory` module names `ReservationNotFoundException`, not `InventoryReservationNotFoundException`; a `SalesCatalog` aggregate in the `Catalog` module names `SalesCatalogNotReadyException`, not `CatalogNotReadyException`. The folder path already carries the module. Failure codes stay module-scoped as `{MODULE}.{REASON}` (`INVENTORY.RESERVATION_NOT_FOUND`), so the module lives in the code and the aggregate lives in the type name.
 
 | Kind | Pattern | Example |
