@@ -9,6 +9,7 @@
     { "$ref": "#/$defs/glossary" },
     { "$ref": "#/$defs/modulesIndex" },
     { "$ref": "#/$defs/module" },
+    { "$ref": "#/$defs/aggregate" },
     { "$ref": "#/$defs/useCase" },
     { "$ref": "#/$defs/endToEndFlow" },
     { "$ref": "#/$defs/workflow" },
@@ -141,6 +142,19 @@
       "properties": {
         "kind": { "const": "module" },
         "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
+      }
+    },
+    "aggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "aggregate" },
+        "id": { "$ref": "#/$defs/useCaseIdentifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },

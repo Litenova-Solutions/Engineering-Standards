@@ -138,7 +138,9 @@ var next = outcome switch
 
 When the closed set is a single scalar with validation, normalization, or formatting and no per-case data or behavior, a typed value object under `DOMAIN.VALUE.001` is the correct model instead of a union. Do not reintroduce the enum as the value object's backing field.
 
-Do not use a C# `enum`, an `int` or `string` discriminator, or a set of boolean flags to represent a closed set of domain values. This rule is scoped to the Domain layer. Application results, transport DTOs, and persistence records at a boundary may still use an `enum` or a string and map it to the Domain union at the boundary; the Domain type remains the union. Infrastructure persists each union with stable discriminators exactly as it persists a state hierarchy, and never stores a raw enum value that Domain no longer defines.
+Do not use a C# `enum`, an `int` or `string` discriminator, or a set of boolean flags to represent a closed set of domain values. This rule is scoped to the Domain layer, and the outer layers mirror the union rather than flatten it: an Application result carries the same shape (`APP.CLOSEDSET.001`) and a transport model carries the same shape (`API.MODELS.001`), a `oneOf` polymorphic model for a data-bearing set and a string `enum` only for a label-only set or a deliberate narrowing. An `enum` or a string at a boundary is therefore the narrowed representation of a label-only set, not the default for a set whose cases carry data. Infrastructure persists each union with stable discriminators exactly as it persists a state hierarchy, and never stores a raw enum value that Domain no longer defines.
+
+Each union exposes one stable code or label member, and its `FromCode` factory round-trips with it: `FromCode(case.Name)` returns the same case for every case. A boundary that projects the union to a transport value maps through that member, never the record's default `ToString()`, which leaks the concrete type name (`OrganizationOwnerRole { Name = owner }`) instead of the code (`owner`). Add a test that round-trips every case, so a code that a rename altered, or a label left off a new case, is caught rather than shipped.
 
 ### Create valid aggregates through named factories (DOMAIN.FACTORY.001)
 
@@ -186,7 +188,7 @@ Transport, OpenAPI, frontend, and persistence boundaries represent the ID as a U
 
 Represent a named domain concept with a value object when the value has validation, normalization, equality, units, formatting, or likely rule growth. Examples include `PostTitle`, `Slug`, `EmailAddress`, `Money`, `Currency`, and `DateRange`.
 
-Value objects are immutable and compare by their complete value. They use static creation methods when construction can fail. They do not expose setters or implicit primitive conversions that bypass the domain type.
+Value objects are immutable and compare by their complete value. They use static creation methods when construction can fail. They expose no setters and define no implicit conversion operators in either direction. An implicit primitive-to-value conversion hides the validating factory and lets a cast throw, which the .NET conversion guidelines prohibit; an implicit value-to-primitive conversion erases the domain type and invites overload ambiguity, the same way an implicit typed-id conversion would (`DOMAIN.ID.001`). Construct through the named factory (`Create`, `From`), and read the underlying value through a named member (`Value`, `ToString`). Define an `explicit` operator only when a specific boundary genuinely needs a cast; the default is a named member, not an operator. This applies to Shared kernel value objects as much as to aggregate-owned ones, because a globally used value object erases its type in more places, not fewer.
 
 Application validators represent caller-correctable structural input failures as validation errors before the handler runs. A value object repeats its own invariant and throws a specific Domain exception when another caller bypasses that boundary. Domain never references an Application validation type.
 
@@ -324,9 +326,11 @@ The code blocks in this section focus on the named design rule and omit namespac
 
 A module folder holds one or more aggregates and the closed sets, value objects, events, and exceptions that belong to them. Two folder rules keep a growing module navigable.
 
-Aggregate folders decide the top level. A module with one aggregate keeps that aggregate and its members directly in the module folder. A module with more than one aggregate gives each aggregate its own folder, and each aggregate folder owns its own `Events/`, `States/`, `Exceptions/`, and concept folders. One aggregate's lifecycle, events, and rejections stay separate from another's rather than mixing in one shared `States/` or `Events/` folder.
+Aggregate folders decide the top level. A module with one aggregate keeps that aggregate and its members directly in the module folder only when the aggregate root's plural name equals the module name; when the single aggregate's name differs from the module name, that aggregate takes its own plural folder. A module with more than one aggregate gives each aggregate its own plural folder, with no flat exception for a namesake aggregate, and each aggregate folder owns its own `Events/`, `States/`, `Exceptions/`, and concept folders. One aggregate's lifecycle, events, and rejections stay separate from another's rather than mixing in one shared `States/` or `Events/` folder.
 
-Name each aggregate folder with the plural of the aggregate root, so the folder adds a proper namespace segment (`NAME.CSHARP.001`) that never collides with the singular aggregate type. `Audience/BuyerAccounts/BuyerAccount.cs` is `Entro.Domain.Audience.BuyerAccounts`, and `Audience/BuyerAccounts/States/BuyerAccountClaimedState.cs` is `Entro.Domain.Audience.BuyerAccounts.States`. A singular folder named exactly for the aggregate would put the `BuyerAccount` type in a namespace of the same name and trip the type-name-as-namespace warning (CA1724); the plural avoids that. When the module name is already the plural of its primary aggregate (a `Orders` module whose primary aggregate is `Order`), that aggregate stays flat in the module folder and the others take their plural folders.
+Name each aggregate folder with the plural of the aggregate root, so the folder adds a proper namespace segment (`NAME.CSHARP.001`) that never collides with the singular aggregate type. `Audience/BuyerAccounts/BuyerAccount.cs` is `Entro.Domain.Audience.BuyerAccounts`, and `Audience/BuyerAccounts/States/BuyerAccountClaimedState.cs` is `Entro.Domain.Audience.BuyerAccounts.States`. A singular folder named exactly for the aggregate would put the `BuyerAccount` type in a namespace of the same name and trip the type-name-as-namespace warning (CA1724); the plural avoids that. When a module has more than one aggregate, every aggregate takes its own plural folder, with no flat exception for a namesake: an `Inventory` module with `Capacity` and `VariantStock` uses `Inventory/Capacities/` and `Inventory/VariantStocks/`.
+
+A single-aggregate module whose own name equals its aggregate hits the same collision. Name the module folder with the plural of the aggregate (a `Catalog` aggregate lives in a `Catalogs` module folder, namespace `Entro.Domain.Catalogs`), so the type never sits in a namespace segment of its own name. Do not pad the type name to dodge the warning: a `Catalog` concept is the aggregate `Catalog` in a `Catalogs` folder, not an aggregate `SalesCatalog`. Pluralizing the folder is the fix; renaming the type is not.
 
 Concept folders group a closed set. A discriminated union places its abstract base and every sealed case in one folder named for the concept, such as `ScanResults/` for `ScanResult` and its cases, and the aggregate state hierarchy uses a `States/` folder the same way. A concept folder holds exactly one concept's related types. It is not a grouping by technical kind: do not create an `Entities/`, `ValueObjects/`, or `Services/` folder that collects unrelated types, and do not leave an empty folder. Group a closed set into a concept folder once the set has its base and cases; a single loose value object stays in the module or aggregate folder until it grows a hierarchy.
 
@@ -340,7 +344,7 @@ Concept folders group a closed set. A discriminated union places its abstract ba
       IStronglyTypedId.cs
     Exceptions/
       DomainException.cs
-  Posts/                          one aggregate: kept flat in the module folder
+  Posts/                          one aggregate whose name matches the module: kept flat in the module folder
     Post.cs
     PostId.cs
     PostTitle.cs
@@ -781,6 +785,7 @@ The event payload captures the publication fact without carrying the mutable `Po
 - Confirm every documented Aggregate has exactly one abstract state base and at least one sealed state record.
 - Confirm no runtime module interface or base class exists.
 - Search Domain for any `enum` declaration, lifecycle or discriminator strings, status booleans, and duplicated nullable state fields; confirm every closed set is a state hierarchy, a domain union, or a typed value object.
+- Confirm every closed-set union exposes a stable code or label whose `FromCode` round-trips for every case, and that no boundary projects a union through its default `ToString()`.
 - Confirm each violated rule throws its own exception type that owns its code and message, and that no aggregate constructs a shared exception with a hard-coded code or message string.
 - Confirm every public Domain type and member carries XML documentation that states a constraint, result, or failure rather than restating the name.
 - Confirm a module with more than one aggregate gives each aggregate its own folder, and each closed set's base and cases sit in a concept folder rather than loose in the module or in a technical-kind bucket.
@@ -793,6 +798,8 @@ The event payload captures the publication fact without carrying the mutable `Po
 - Confirm repositories expose aggregate operations rather than generic CRUD or query behavior.
 - Confirm domain services are stateless and contain no outer-layer dependency.
 - Confirm events are past-tense `IDomainEvent` records with no aggregate or provider reference, carry no exception or error object, and are not named after the language error type.
+- Search value objects for `implicit operator` and confirm none remain in either direction; construction goes through a named factory and the primitive is read through a named member.
+- Search for business types, events, and states whose names contain `Exception` (for example `*ExceptionRaisedEvent`, `*ExceptionsPendingState`) and confirm `Exception` names only `{DomainType}{Reason}Exception` failure types, never a business fact or state.
 - Round-trip every concrete Aggregate state record through the persistence provider.
 - Test every factory, allowed transition, rejected transition, aggregate invariant, state-specific value, and emitted event.
 - Confirm aggregate invariant IDs and state transitions map to verified use cases and acceptance criteria.

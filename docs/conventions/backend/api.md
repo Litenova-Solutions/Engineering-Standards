@@ -15,6 +15,7 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 - Generate OpenAPI and update typed consumers with contract changes.
 - Reflect enforced authentication in the generated OpenAPI security metadata.
 - Publish precise schemas: enums for closed-set fields, parameter constraints, and required control headers.
+- Mirror a Domain closed set as a transport model of the same shape: a string enum for a label-only set, a polymorphic `oneOf` model with a discriminator for a set whose cases carry data. Defer narrowing and request-versus-response splits to a deliberate decision.
 
 ## Standards
 
@@ -153,11 +154,31 @@ Register this with an OpenAPI document transformer that reads the registered aut
 
 The generated contract expresses the real shape and constraints of each operation, not only its base types. A consumer learns an operation's rules from the document rather than by receiving a runtime rejection.
 
-- A field or parameter whose values form a closed set declares those values as an OpenAPI `enum`. A response field projected from a closed Domain set, such as a state hierarchy or discriminated union, publishes its allowed values so a consumer receives a typed union instead of an open `string`. Domain still models the set without an `enum` (`DOMAIN.CLOSEDSET.001`); the `enum` exists only at the transport boundary, produced by a boundary type or a schema transformer.
+- A field or parameter whose values form a closed set publishes that set so a consumer receives a typed shape instead of an open `string`. A label-only set (no per-case data) declares its values as an OpenAPI `enum`. A set whose cases carry data publishes a polymorphic `oneOf` model with a discriminator per `API.MODELS.001`, not a flattened `enum` that discards the per-case data. Domain still models the set without an `enum` (`DOMAIN.CLOSEDSET.001`); the enum or polymorphic model exists only at the transport boundary, produced by a boundary type or a schema transformer. A boundary enum serialized by name carries the string-enum conversion on the type itself, through a `[JsonConverter(typeof(JsonStringEnumConverter<T>))]` attribute rather than only a host-registered converter, so every serializer honors the contract, including a consumer or a test client that reads with default options. A host-only registration silently breaks any reader that does not share the host configuration.
 - A parameter declares its real constraints: bounds (`minimum`, `maximum`, length), format, and allowed values, plus a description for a non-obvious business limit such as a maximum date-range span. A caller must be able to learn a limit from the contract instead of by receiving a 400.
 - An operation that requires a control header declares it as a required parameter, for example `Idempotency-Key` or `If-Match`, so the requirement is discoverable and consistent across the operations that share it.
 
 Prefer expressing these through typed results, typed boundary enums, and parameter metadata so the generated document stays precise without hand-written schema that drifts from the code.
+
+### Mirror a Domain closed set as a transport model of the same shape (API.MODELS.001)
+
+A Domain closed set (a state hierarchy or discriminated union under `DOMAIN.CLOSEDSET.001`) is represented at the transport boundary by a WebApi-owned model that preserves the set's shape, not by a shape that discards information the Domain carries.
+
+Match the transport shape to whether the cases carry data:
+
+- A label-only set (each case is a name with no per-case data) maps to a string `enum` per `API.OPENAPI.003`.
+- A set whose cases carry per-case data maps to a polymorphic transport model: an abstract base model and one sealed derived model per case, published as `oneOf` with a discriminator.
+
+Consistency over premature narrowing. WebApi owns its own transport model rather than serializing the Domain union or an Application result type directly (`ARCH.CONTRACTS.001`), and Application owns its own result shape (`APP.CLOSEDSET.001`); each layer mirrors the same set. Do not collapse a data-bearing union into an `enum`, and do not reach across a layer boundary to reuse another layer's type as the wire contract. Narrowing a mirrored model, by splitting one model into distinct request and response models or by reducing a union to an `enum` or a single field, is a deliberate change backed by a decision and an updated specification, not the default. Early in a use case, favor the faithful mirror so the layers stay aligned and the contract does not drift; narrow when a proven stable shape or a real consumer need justifies it and the union is confirmed label-only.
+
+Model the polymorphic transport type with `System.Text.Json` polymorphism so the serializer and the generated contract agree:
+
+- Declare an abstract base record and one sealed record per case. An abstract base is required for the generated document to carry the discriminator; a concrete base cannot mark the discriminator property as required, so the contract omits it.
+- Put `[JsonPolymorphic]` and one `[JsonDerivedType(typeof(CaseModel), "case-code")]` per case on the base, carried on the type itself rather than only in host-registered options, for the same reason the boundary enum carries its converter on the type (`API.OPENAPI.003`).
+- Use string discriminator values equal to the Domain union's stable case codes (the `FromCode` contract in `DOMAIN.CLOSEDSET.001`), never the integer form and never a mix. The discriminator string is a contract value that an identifier rename must not sweep (`naming.md`). Name the discriminator property for the concept (for example `type` or `outcome`) through `[JsonPolymorphic(TypeDiscriminatorPropertyName = "...")]`; do not publish the serializer default `$type` as a public field name.
+- Opt derived types in explicitly. An unregistered runtime subtype fails serialization; that failure is correct, because it means the contract and the model disagreed.
+
+The generated OpenAPI document expresses the model as `oneOf` (the cases are mutually exclusive) with a `discriminator` that declares `propertyName` and a `mapping` from each case code to its schema, and the discriminator property is required on every case. The ASP.NET Core generator emits the discriminator only for an abstract base and, depending on the pinned version, may not mark the discriminator property as required. When the generator omits the discriminator or the required marker, complete it with an OpenAPI document or schema transformer rather than hand-writing the whole schema, so the contract stays generated and precise. A TypeScript consumer then receives a discriminated union it can narrow on the discriminator. Regenerate the document and typed consumers with the change and fail CI on any diff (`API.OPENAPI.001`).
 
 ## Conventions
 
@@ -166,7 +187,7 @@ Prefer expressing these through typed results, typed boundary enums, and paramet
 ```text
 {ProjectName}.WebApi/
   Endpoints/
-    Posts/                          single aggregate: operations directly under the module
+    Posts/                          single aggregate whose name matches the module: operations directly under the module
       CreateDraft/
         CreateDraftEndpoint.cs
         CreateDraftRequestModel.cs
@@ -196,7 +217,7 @@ Prefer expressing these through typed results, typed boundary enums, and paramet
   Program.cs
 ```
 
-Endpoint folders follow `ARCH.MODULES.001`: module, then aggregate, then use case. A single-aggregate module nests use-case folders directly under the module; a module with more than one aggregate nests them under the aggregate.
+Endpoint folders follow `ARCH.MODULES.001`: module, then aggregate, then use case. A single-aggregate module nests use-case folders directly under the module only when the aggregate root's plural name equals the module name; otherwise, and for any module with more than one aggregate, use-case folders nest under the aggregate.
 
 ### Keep transport models independent
 
@@ -229,6 +250,123 @@ Keep the visible middleware order: forwarded headers from explicitly trusted pro
 
 A create endpoint reads the author from claims, maps `CreateDraftRequestModel` to `CreateDraftCommand` through `CreateDraftApiMappings`, sends it through `ICommandMediator`, and maps `CreateDraftCommandResult` to `CreateDraftResponseModel` with the new post location. A read endpoint maps `GetPostQueryResult` to `GetPostResponseModel` through `GetPostApiMappings`. Neither endpoint calls `Post.CreateDraft` or `IPostRepository`.
 
+### Mirror a data-bearing closed set from Domain to the wire
+
+A refund outcome is a closed set whose cases carry different data. It is modeled once in Domain and mirrored, not reused, in each outer layer per `API.MODELS.001`, `APP.CLOSEDSET.001`, and `ARCH.CONTRACTS.001`.
+
+Domain owns the union, aggregate-anchored per `NAME.AGGREGATE.001`, with a stable code that round-trips (`DOMAIN.CLOSEDSET.001`). The code blocks omit namespaces and documentation for focus.
+
+```csharp
+public abstract record PaymentRefundOutcome
+{
+    public abstract string Code { get; }
+}
+
+public sealed record PaymentRefundSucceededOutcome(Money Amount, DateOnly SettledOn)
+    : PaymentRefundOutcome
+{
+    public override string Code => "Succeeded";
+}
+
+public sealed record PaymentRefundFailedOutcome(string ReasonCode) : PaymentRefundOutcome
+{
+    public override string Code => "Failed";
+}
+```
+
+Application returns its own union in the result. The Domain union type never appears on the message; `Money` is a Shared-kernel value object and may cross (`ARCH.CONTRACTS.001`). The handler projects the Domain union to the Application union.
+
+```csharp
+public abstract record RefundOutcome;
+
+public sealed record RefundSucceeded(Money Amount, DateOnly SettledOn) : RefundOutcome;
+
+public sealed record RefundFailed(string ReasonCode) : RefundOutcome;
+
+public sealed record IssueRefundCommandResult(RefundOutcome Outcome);
+
+// In the handler, after domain behavior returns a PaymentRefundOutcome:
+RefundOutcome outcome = domainOutcome switch
+{
+    PaymentRefundSucceededOutcome s => new RefundSucceeded(s.Amount, s.SettledOn),
+    PaymentRefundFailedOutcome f => new RefundFailed(f.ReasonCode),
+    _ => throw new UnreachableException(),
+};
+```
+
+WebApi owns the transport model. The polymorphism sits on the type, the discriminator values equal the Domain stable codes, and the wire reduces even the Shared-kernel `Money` to primitives. The response model reuses no Application or Domain type.
+
+```csharp
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "outcome")]
+[JsonDerivedType(typeof(RefundSucceededOutcomeModel), "Succeeded")]
+[JsonDerivedType(typeof(RefundFailedOutcomeModel), "Failed")]
+public abstract record RefundOutcomeModel;
+
+public sealed record RefundSucceededOutcomeModel(
+    decimal Amount,
+    string Currency,
+    DateOnly SettledOn) : RefundOutcomeModel;
+
+public sealed record RefundFailedOutcomeModel(string ReasonCode) : RefundOutcomeModel;
+
+public sealed record IssueRefundResponseModel(RefundOutcomeModel Outcome);
+
+internal static class IssueRefundApiMappings
+{
+    public static RefundOutcomeModel ToModel(this RefundOutcome outcome) => outcome switch
+    {
+        RefundSucceeded s => new RefundSucceededOutcomeModel(
+            s.Amount.Amount, s.Amount.Currency.Code, s.SettledOn),
+        RefundFailed f => new RefundFailedOutcomeModel(f.ReasonCode),
+        _ => throw new UnreachableException(),
+    };
+}
+```
+
+The generated document expresses the model as `oneOf` with a discriminator mapping the codes to the case schemas:
+
+```json
+{
+  "oneOf": [
+    { "$ref": "#/components/schemas/RefundSucceededOutcomeModel" },
+    { "$ref": "#/components/schemas/RefundFailedOutcomeModel" }
+  ],
+  "discriminator": {
+    "propertyName": "outcome",
+    "mapping": {
+      "Succeeded": "#/components/schemas/RefundSucceededOutcomeModel",
+      "Failed": "#/components/schemas/RefundFailedOutcomeModel"
+    }
+  }
+}
+```
+
+When the pinned generator emits the discriminator but does not mark its property required on each case, a schema transformer completes it rather than hand-writing the schema. The exact transformer surface follows the pinned `Microsoft.AspNetCore.OpenApi` version; this shape is illustrative.
+
+```csharp
+internal sealed class RequireDiscriminatorSchemaTransformer : IOpenApiSchemaTransformer
+{
+    public Task TransformAsync(
+        OpenApiSchema schema,
+        OpenApiSchemaTransformerContext context,
+        CancellationToken cancellationToken)
+    {
+        if (schema.Discriminator?.PropertyName is { } name && !schema.Required.Contains(name))
+        {
+            schema.Required.Add(name);
+        }
+
+        return Task.CompletedTask;
+    }
+}
+
+// Registered with the document:
+builder.Services.AddOpenApi(options =>
+    options.AddSchemaTransformer<RequireDiscriminatorSchemaTransformer>());
+```
+
+A TypeScript consumer generated from this document receives a discriminated union it narrows on `outcome`, so the caller handles the succeeded and failed cases without reading an open string. Regenerating the document and typed clients is part of the change (`API.OPENAPI.001`).
+
 ## Verification
 
 - Inspect endpoint constructors and bodies for forbidden dependencies and business logic.
@@ -239,5 +377,6 @@ A create endpoint reads the author from claims, maps `CreateDraftRequestModel` t
 - Regenerate OpenAPI and typed consumers.
 - Confirm the generated document declares a security scheme and requirement for every operation that enforces authentication, and none for intentionally anonymous operations.
 - Confirm closed-set fields and parameters declare enums, parameters declare their bounds and formats, and every operation that requires a control header declares it.
+- Confirm a data-bearing closed set is published as a `oneOf` polymorphic model with a required discriminator whose `mapping` codes equal the Domain union's stable case codes, that its base model is abstract, that `[JsonPolymorphic]` and `[JsonDerivedType]` sit on the type, and that no layer serializes a Domain union or an Application result type directly as the wire contract.
 - Generate OpenAPI twice and confirm the second run is clean.
 - Run architecture tests for endpoint boundaries.
