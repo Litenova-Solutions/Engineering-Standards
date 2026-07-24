@@ -42,9 +42,11 @@ The prefix chains to the aggregate root, not to an intermediate owner. A value o
 
 A child entity with a first-class domain name is itself an anchor. A child entity is normally `{Aggregate}{Part}` (`OrderLine`), but keeps a standalone domain term when that term is first-class in the language (`Reservation`, a child of `CapacityPool`). Either way the child entity, not the aggregate root, anchors its own states and unions: a `Reservation` names `ReservationHeldState` and `ReservationConfirmOutcome`, never `CapacityPoolReservationHeldState`. Chaining stops at the nearest entity that carries identity.
 
-When the concept already embeds the aggregate name, reorder the case so the aggregate leads exactly once rather than doubling it. A `Suppression` basis is `SuppressionLegalBasis`, not `LegalSuppressionBasis` (owner not derivable) nor `SuppressionLegalSuppressionBasis` (doubled); a `Role` scope is `RoleEventScope`, not `EventRoleScope`.
+When the concept already embeds the aggregate name, reorder the case so the aggregate leads exactly once rather than doubling it. A `Suppression` basis is `SuppressionLegalBasis`, not `LegalSuppressionBasis` (owner not derivable) nor `SuppressionLegalSuppressionBasis` (doubled); a `Role` scope is `RoleEventScope`, not `EventRoleScope`. When the reason trails with the aggregate noun, drop the repeat there too: an insufficient-capacity failure on the `Capacity` aggregate is `CapacityInsufficientException`, not `CapacityInsufficientCapacityException`.
 
-The anchor is the aggregate root, not the module. When a module name differs from its aggregate, the type leads with the aggregate and never with the module: a `Reservation` aggregate in the `Inventory` module names `ReservationNotFoundException`, not `InventoryReservationNotFoundException`; a `SalesCatalog` aggregate in the `Catalog` module names `SalesCatalogNotReadyException`, not `CatalogNotReadyException`. The folder path already carries the module. Failure codes stay module-scoped as `{MODULE}.{REASON}` (`INVENTORY.RESERVATION_NOT_FOUND`), so the module lives in the code and the aggregate lives in the type name.
+The anchor is the aggregate root, not the module. When a module name differs from its aggregate, the type leads with the aggregate and never with the module: a `Reservation` aggregate in the `Inventory` module names `ReservationNotFoundException`, not `InventoryReservationNotFoundException`; a `Catalog` aggregate in a `Catalogs` module names `CatalogNotReadyException`, not `CatalogsNotReadyException`. The folder path already carries the module. Failure codes stay module-scoped as `{MODULE}.{REASON}` (`INVENTORY.RESERVATION_NOT_FOUND`), so the module lives in the code and the aggregate lives in the type name.
+
+A module's identity is one token that appears in four places: the folder and namespace segment, the `{MODULE}` in `{MODULE}.{REASON}` failure codes, the `INV-{MODULE}-NN` invariant-id prefix, and the `{module}.{use-case}` id prefix. They move as a unit. Renaming a module changes all four in one step; renaming only an aggregate leaves them unchanged, so the `inventory` module keeps its token when `CapacityPool` becomes `Capacity`. Re-scoping an invariant-id prefix during a deliberate module rename, such as `INV-CATALOG-01` to `INV-CATALOGS-01`, preserves the number and is not the renumbering that the module specifications forbid.
 
 | Kind | Pattern | Example |
 |:---|:---|:---|
@@ -86,6 +88,8 @@ Aggregate-first ordering also clusters every type of an aggregate together when 
 | HTTP response model | `{UseCase}ResponseModel` | `CreateDraftResponseModel` |
 | HTTP response item model | `{UseCase}ResponseItemModel` | `ListPostsResponseItemModel` |
 | HTTP pagination model | `PaginationModel` | `PaginationModel` |
+| Polymorphic transport model base | `{Concept}Model` | `RefundOutcomeModel` |
+| Polymorphic transport model case | `{Case}{Concept}Model` | `RefundSucceededOutcomeModel` |
 | API mapping class | `{UseCase}ApiMappings` | `CreateDraftApiMappings` |
 | Options class | `{ConfigurationPurpose}Options` | `EmailOptions` |
 | Persistence configuration | `{PersistedType}Configuration` | `PostConfiguration` |
@@ -97,6 +101,8 @@ An event-reaction handler and its operation folder name the event by its busines
 Do not shorten an Application type to `{UseCase}Result`, `{UseCase}Handler`, or `{UseCase}Validator`. Do not use an unowned name such as `PostSummary` for a query-specific result item. The full role suffix distinguishes command coordination from query projection without opening the file.
 
 Do not shorten an HTTP transport type to `{UseCase}Request` or `{UseCase}Response`. `Model` marks the type as passive boundary data rather than an operation or rich business object. Other project-owned, passive HTTP DTOs also name their concrete role and end in `Model`, such as `ListPostsResponseItemModel` or `PaginationModel`. Use `ApiMappings` instead of the context-dependent `Mappings` suffix.
+
+A polymorphic transport model that mirrors a Domain discriminated union (`API.MODELS.001`) names its abstract base for the concept and each sealed case for the case, both ending in `Model`: `RefundOutcomeModel` with `RefundSucceededOutcomeModel` and `RefundFailedOutcomeModel`. The type name drops the aggregate prefix that anchors the Domain union (`PaymentRefundOutcome`) per the boundary-name convention, while the discriminator string literal keeps the Domain union's stable case code unchanged.
 
 ### Name asynchronous methods completely (NAME.ASYNC.001)
 
@@ -154,7 +160,7 @@ Next.js special files retain framework names such as `page.tsx`, `layout.tsx`, `
 
 ### Align business names across layers
 
-The Posts module maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/modules/posts`. A single-aggregate module keeps its aggregate flat in the module folder; a module with more than one aggregate gives each aggregate its own folder, per `ARCH.MODULES.001`. Use-case names retain the same verb and module across layers.
+The Posts module maps to `Domain/Posts`, `Application/Posts`, `Endpoints/Posts`, `features/posts`, and `docs/domain/modules/posts`. A single-aggregate module keeps its aggregate flat in the module folder only when the aggregate root's plural name equals the module name (as `Post` does for `Posts`); when the single aggregate's name differs from the module, or a module has more than one aggregate, each aggregate takes its own folder, per `ARCH.MODULES.001`. Use-case names retain the same verb and module across layers.
 
 ### Keep namespaces aligned with folders
 
@@ -165,6 +171,14 @@ Namespaces start with the project name and follow folders beneath the project ro
 Do not introduce `Manager`, `Helper`, `Processor`, `Common`, `Utility`, `BaseService`, `DataService`, or `MessageBus` when the type has a narrower responsibility.
 
 `IPostPublicationNotifier` is preferred over `INotificationService`. `Slug.Create` is preferred over `StringHelper.ToSlug`.
+
+### Derive boundary names from the ubiquitous term
+
+A route path segment and a JSON field name derive from the current aggregate or ubiquitous term, so renaming a domain concept renames its route segments and transport field names in the same change. `/api/offers/{offerId}` follows the `Offer` term; while the concept was `Release` the segment was `/api/releases/{releaseId}`. A route segment or transport field that still names a retired concept is a defect, caught by regenerating the OpenAPI document and the typed clients and failing the build on any diff.
+
+A transport field name is the concise business field, not the domain type or aggregate name: a fee-kind field is `FeeKind`, not `CatalogFeeKind`, and it matches the field name in the use-case specification and its siblings (`FeeKind` beside `FeeAmount` and `FeeLabel`). The aggregate-anchoring rule (`NAME.AGGREGATE.001`) governs Domain types, not transport field names; a transport DTO that inherits the aggregate prefix has drifted from the documented input.
+
+A closed-set code or discriminator string literal is a contract value, not an identifier. An identifier rename must not sweep it: renaming a union case type `VenueContactPurpose` to `EventVenueContactPurpose` leaves its code literal `"Venue"` unchanged. The closed-set round-trip test (`DOMAIN.CLOSEDSET.001`) catches a literal that a rename altered.
 
 ## Examples
 
@@ -189,10 +203,13 @@ internal sealed class CreateDraftCommandHandler(
 - Compare file names with primary types and confirm no file declares more than one public or internal top-level type.
 - Confirm no `*Enums.cs` or `*ValueObjects.cs` grouping file remains.
 - Confirm each rejected rule has its own exception type that owns its code and message, with no caller-supplied strings.
-- Confirm no domain type, event, or business concept uses `Exception` as a business term, and that the `Exception` suffix names only failure types.
+- Confirm no domain type, event, or business concept uses `Exception` as a business term, and that the `Exception` suffix names only failure types. Search names for `Exception` outside `{DomainType}{Reason}Exception` (for example `*ExceptionRaised*`, `*ExceptionsPending*`) to catch a business fact or state misusing the word.
+- Confirm route path segments and transport field names match the current ubiquitous term, with no segment or field naming a retired concept; regenerate the OpenAPI document and typed clients and confirm no diff remains.
+- Confirm transport field names are the concise business field, carry no domain-type or aggregate prefix, and match the use-case specification field names.
 - Confirm every aggregate-owned type name leads with its aggregate root's full name, and only Shared kernel types are unprefixed.
 - Confirm command and query results, query result items, handlers, and validators retain their full role suffixes.
 - Confirm every passive HTTP DTO names its concrete boundary role and ends in `Model`; confirm operation mappings end in `ApiMappings`.
+- Confirm a polymorphic transport model names its abstract base for the concept and each sealed case for the case, both ending in `Model`, and that the discriminator literal keeps the Domain union's stable case code.
 - Search for forbidden generic suffixes and unexplained base classes.
 - Confirm async methods pass the full cancellation token.
 - Confirm namespaces and business names align with folders.

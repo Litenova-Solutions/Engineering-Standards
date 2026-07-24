@@ -47,6 +47,8 @@ Integration.Tests use Testcontainers PostgreSQL, the real Marten configuration, 
 
 Cover document mappings, repository loading and storage, query projections, commit behavior, Problem Details, authentication, resource authorization, OpenAPI, and extension-specific infrastructure.
 
+CI executes this suite against the container on every change. A suite that cannot execute, a missing container, a broken host, or an authentication misconfiguration that rejects every request, fails the build. It never reports success by skipping or by passing only the cases that never reach the host, because a suite that silently stops running hides regressions until the boundary has already drifted.
+
 ### Isolate integration state (BTEST.ISOLATION.001)
 
 Reset database state between cases using one documented strategy. Tests do not depend on order or share mutable business state.
@@ -158,6 +160,7 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 - Confirm test projects and folders match the canonical layout.
 - Confirm Domain tests have no infrastructure dependency.
 - Confirm integration tests use the real database and API host.
+- Confirm CI executes the integration suite against the container, and that a suite which cannot execute fails the build rather than reporting success.
 - Confirm the integration fixture uses the pinned PostgreSQL major and disposes its container and host.
 - Confirm shared-database tests cannot run in parallel across reset boundaries.
 - Confirm handler and validator test classes match the complete production type name.

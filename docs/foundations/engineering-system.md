@@ -418,6 +418,12 @@ docs/
       orders/
         README.md
         cancel-order.md
+      audience/
+        README.md
+        buyer-accounts/
+          claim-guest-order.md
+        consents/
+          grant-consent.md
     workflows/
       order-fulfillment.md
     policies/
@@ -432,6 +438,18 @@ docs/
 ```
 
 Create an optional directory only when its first real artifact is added. Do not create empty directories or placeholder records during inception.
+
+### Group module use-case files by aggregate root
+
+A module directory holds one `README.md` module specification. Its use-case specifications are grouped to mirror the module's aggregate roots, the same way the domain code layer groups aggregates under a module.
+
+- A module keeps its use-case files directly in the module directory only when it has exactly one aggregate root and that aggregate root's plural, kebab-case name equals the module directory name. For example, `catalogs/` holds its use-case files directly because its single aggregate root is `Catalog`.
+- A module with exactly one aggregate root whose name does not equal the module name places its use-case files in a subdirectory named as the plural, kebab-case form of that aggregate root. For example, a `finance` module whose single aggregate root is `ReconciliationCase` uses `finance/reconciliation-cases/`.
+- A module with more than one aggregate root places each aggregate's use-case files in its own subdirectory named as the plural, kebab-case form of that aggregate root, with no flat exception for a namesake aggregate. For example, the `audience` module uses `buyer-accounts/` and `consents/`.
+
+Every aggregate-root subdirectory holds one `README.md` aggregate specification (kind `aggregate`) that describes that aggregate root: its ownership, business states, technical state mapping, transitions, the aggregate invariants it upholds and events it raises (referenced by their module-scoped IDs), and its use-case index. The module `README.md` describes the module as a whole: purpose, actors, terms, the roster of aggregate roots with links to their subdirectories, the module's aggregate invariant and event definitions, rule and transition coverage, and cross-module dependencies. Aggregate invariant and event IDs stay module-scoped (`INV-<MODULE>-NN`, `<module>.<event>`) because one rule may span aggregates, so their definitions live once in the module README and the aggregate README references them. A module with a single flat aggregate root keeps both concerns in the one module `README.md`.
+
+A use-case id stays `{module}.{name}` and its filename stays `{name}.md`; only the directory changes. The aggregate subdirectory records the owning aggregate root and adds no segment to the id. The domain code layer groups aggregate files under the same rule, so the documentation tree and the code tree match module for module and aggregate for aggregate.
 
 ### Keep operational and security references under operations
 
@@ -464,7 +482,7 @@ The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` chang
 - Confirm the product brief references exactly one primary release flow.
 - Confirm end-to-end flow use-case references resolve.
 - Confirm every module directory has one module specification.
-- Confirm use-case IDs match their module and filename.
+- Confirm each use-case id is `{module}.{name}`, its filename is `{name}.md`, and its file sits directly in the module directory or in a single aggregate-root subdirectory of that module.
 - Confirm every aggregate has one abstract state base and at least one sealed state record.
 - Confirm each multi-aggregate Command names the invariant or domain policy requiring one transaction.
 - Confirm workflow Commands and events resolve to documented behavior.

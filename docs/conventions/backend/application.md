@@ -13,6 +13,7 @@ Application coordinates use cases. It translates a command or query into domain 
 - Validate input structure before handlers and keep business invariants in Domain.
 - Return stable, transport-neutral validation and use-case failures.
 - Write through aggregate repositories and read through `IQuerySession` projections.
+- Mirror a Domain closed set in a result with a result type of the same shape; do not collapse a data-bearing union to an `enum`.
 - Define narrow public external ports for Infrastructure implementations.
 - Keep atomic orchestration and durable Workflow orchestration explicit and separate from Aggregate behavior.
 
@@ -84,6 +85,15 @@ Query handlers inject `IQuerySession`, filter by authorized scope, project direc
 
 Do not load aggregates, inject repositories, or introduce per-aggregate read-store interfaces for normal request queries.
 
+### Mirror a Domain closed set in the result (APP.CLOSEDSET.001)
+
+When a command or query result carries a Domain closed set (a state hierarchy or discriminated union under `DOMAIN.CLOSEDSET.001`), the result models it with a type of the same shape, so the set's information survives to the caller and the layers stay aligned.
+
+- A set whose cases carry per-case data is represented by an Application-owned discriminated union of records that mirrors the Domain union. The result does not expose the Domain union type itself (`ARCH.CONTRACTS.001`), and it does not flatten the set to an `enum` plus loose nullable fields, which discards the invariant that the data belongs to one case.
+- A label-only set is represented by its stable code (the `FromCode` value from `DOMAIN.CLOSEDSET.001`), a string the Application result owns, not by a Domain-free `enum` reintroduced in Application and not by the Domain type.
+
+Consistency over premature narrowing. Prefer the faithful mirror while a use case is taking shape so Domain, Application, and the transport model (`API.MODELS.001`) carry the same set and the contract does not drift. Narrowing a mirrored result union to a scalar or an `enum` is a deliberate change backed by a decision and an updated specification, not a default applied to move a single field. Application still owns the projection from the Domain type to its result type per the owning-boundary convention; it does not return the aggregate itself.
+
 ### Define narrow external ports (APP.PORTS.001)
 
 Application owns a public interface when Infrastructure must provide external behavior. Name the interface for the business action, keep its method surface narrow, and use project-owned request and result types.
@@ -125,7 +135,7 @@ Each issued Command enters its own command pipeline and owns one transaction. Wo
       ResourceNotFoundException.cs
       UseCaseForbiddenException.cs
       UseCaseConflictException.cs
-  Posts/                            single aggregate: operations sit directly under the module
+  Posts/                            single aggregate whose name matches the module: operations sit directly under the module
     CreateDraft/
       CreateDraftCommand.cs
       CreateDraftCommandResult.cs
@@ -164,11 +174,11 @@ Each issued Command enters its own command pipeline and owns one transaction. Wo
       AdvancePublicationDeliveryWorkflowCommandHandler.cs
 ```
 
-The folder hierarchy follows `ARCH.MODULES.001`: module, then aggregate, then operation. A single-aggregate module places its operation folders directly under the module; a module with more than one aggregate nests operation folders under the aggregate the use case targets. Create `Shared` children only for types used by multiple modules.
+The folder hierarchy follows `ARCH.MODULES.001`: module, then aggregate, then operation. A single-aggregate module places its operation folders directly under the module only when the aggregate root's plural name equals the module name; otherwise, and for any module with more than one aggregate, operation folders nest under the aggregate the use case targets. Create `Shared` children only for types used by multiple modules.
 
 ### Keep messages immutable
 
-Use records for commands, queries, results, and validation errors. Use typed IDs and domain value types where those types cross the Application boundary safely.
+Use records for commands, queries, results, and validation errors. Typed IDs and Shared-kernel value objects (`PostId`, `Money`, `EmailAddress`) may cross the Application boundary as the sanctioned shared vocabulary (`ARCH.CONTRACTS.001`). An aggregate-owned value object does not cross: represent it by its primitive on the message and reconstruct it in the handler, as `CreateDraftCommand` takes a `string Title` that the handler passes to `PostTitle.Create`. Do not place a Domain aggregate, a closed-set union, or a Domain result record on a message or result.
 
 ### Return use-case results
 
@@ -281,4 +291,5 @@ Infrastructure stages Workflow state and the outgoing Command in the same sessio
 - Confirm public ports contain no provider type.
 - Confirm protected messages carry trusted actor context and handlers authorize their targets.
 - Confirm expected failures have stable codes and no HTTP or provider types.
+- Confirm a result that carries a Domain closed set mirrors its shape (a discriminated union for a data-bearing set, the stable code for a label-only set) and does not reintroduce a Domain-free `enum` or flatten a data-bearing union to nullable fields.
 - Run Application and architecture tests.

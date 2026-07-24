@@ -10,6 +10,7 @@ CQRS separates write and read behavior inside one Application project. Modules a
 
 - Use Domain, Application, Infrastructure, and WebApi as the four application projects.
 - Point project references inward through Domain and Application.
+- Own each layer's contract types: do not expose an inner layer's model outward; mirror the shape instead, with Shared-kernel typed IDs and value objects as the one sanctioned crossing.
 - Organize Domain, Application, Infrastructure, and WebApi by the same domain modules.
 - Keep handlers and validators internal; expose only contracts required across project boundaries.
 - Keep dependency registration in the host and the outer layer that owns each implementation.
@@ -37,6 +38,17 @@ Domain contains business rules and owns no outer-layer dependency. Application c
 
 Follow the exact project reference matrix in [Dependencies](../repository/dependencies.md).
 
+### Own each layer's contract types (ARCH.CONTRACTS.001)
+
+Project references point inward (`ARCH.DEPENDENCIES.001`), but the types a layer exposes in its own contract do not travel with them. A layer defines its own messages, results, and transport models and does not reuse an inner layer's model as its outward contract, so a change to an inner shape does not ripple through every outer layer.
+
+- Application owns its command and query messages and results. It does not expose a Domain aggregate, a Domain result-shaped record, or a Domain closed set (a state hierarchy or discriminated union) in a message or result; it mirrors the shape it needs (`APP.CLOSEDSET.001`). It never returns an aggregate, a session, a provider response, or an HTTP result.
+- WebApi owns its request and response models. It does not reuse an Application message or result, or a Domain type, as a transport model; it maps to its own `RequestModel` and `ResponseModel` and mirrors a closed set as its own transport shape (`API.MODELS.001`).
+
+The Shared kernel is the one sanctioned crossing. A typed ID and a Shared value object such as `PostId`, `Money`, or `EmailAddress` are stable, behavior-free shared vocabulary rather than an inner model, so they may appear in an Application message or result where they cross safely. An aggregate-owned type is not shared vocabulary: an aggregate value object with validation is represented at the Application boundary by its primitive and reconstructed in the handler, exactly as `CreateDraftCommand` takes a `string Title` and the handler calls `PostTitle.Create`. The external wire contract goes one step further and reduces even the Shared-kernel types to their primitive JSON form in the transport model, so an out-of-process consumer depends on no Domain type.
+
+This mirroring is deliberate duplication. Repeating a shape in each layer is accepted in exchange for isolating each layer from an inner change and keeping the dependency surface a stable, versioned contract rather than a shared mutable model. Do not remove the duplication by promoting a shared cross-layer DTO, contracts assembly, or reused result type.
+
 ### Keep one Application assembly (ARCH.APPLICATION.001)
 
 Commands, queries, results, validators, handlers, event reaction implementations, workflow orchestrators, and external ports live in one Application project.
@@ -45,7 +57,7 @@ Separate Write, Read, Contracts, and event-handler assemblies are outside this p
 
 ### Organize every layer by module and use case (ARCH.MODULES.001)
 
-Use the same domain module names across layers. A module groups related language and Application use cases. It may contain no aggregate, one aggregate, or multiple related aggregates. The folder hierarchy is top-down and the same in every layer: module, then aggregate, then the layer's own detail. A module with more than one aggregate inserts a per-aggregate folder, named with the plural of the aggregate root, under the module in every layer, so one aggregate's types do not mix with another's; a module with one aggregate keeps it flat directly under the module. Application operation folders contain one Command or Query and its supporting types.
+Use the same domain module names across layers. A module groups related language and Application use cases. It may contain no aggregate, one aggregate, or multiple related aggregates. The folder hierarchy is top-down and the same in every layer: module, then aggregate, then the layer's own detail. A module keeps an aggregate flat directly under the module only when the module has exactly one aggregate root and that aggregate root's plural name equals the module name. When a module's single aggregate root has a name that differs from the module name, or a module has more than one aggregate root, each aggregate root takes its own per-aggregate folder, named with the plural of the aggregate root, under the module in every layer, so one aggregate's types do not mix with another's. Application operation folders contain one Command or Query and its supporting types.
 
 Module is an organization and ownership term, not a runtime base type. Domain aggregate roots continue to derive from `AggregateRoot<TId>`. Do not introduce `IModule`, `ModuleRoot`, or another module base contract.
 
@@ -83,10 +95,10 @@ Domain contains no registration code. Application exposes contracts and an assem
 
 ### Use mirrored module folders
 
-The folder hierarchy is top-down and identical in every layer: module, then aggregate, then the layer's own detail. A single-aggregate module keeps its aggregate flat directly under the module; a module with more than one aggregate inserts a per-aggregate folder, named with the plural of the aggregate root, under the module in every layer (`DOMAIN` folder convention).
+The folder hierarchy is top-down and identical in every layer: module, then aggregate, then the layer's own detail. A single-aggregate module keeps its aggregate flat directly under the module only when the aggregate root's plural name equals the module name; when the single aggregate's name differs from the module, or a module has more than one aggregate, each aggregate takes a per-aggregate folder, named with the plural of the aggregate root, under the module in every layer (`DOMAIN` folder convention).
 
 ```text
-# single-aggregate module: the aggregate stays flat under the module in every layer
+# single-aggregate module whose aggregate name matches the module: the aggregate stays flat in every layer
 Domain/Posts/
 Application/Posts/CreateDraft/
 Infrastructure/Posts/
@@ -145,4 +157,5 @@ Publishing a post follows this direction:
 - Confirm handlers, validators, endpoints, and persistence implementations are internal sealed.
 - Confirm commands and queries use their prescribed persistence boundaries.
 - Confirm each deployable has one visible composition root and no intermediate service provider.
+- Confirm no Application message or result exposes a Domain aggregate, result record, or closed set, and no WebApi transport model reuses an Application or Domain type; confirm the only cross-layer types are Shared-kernel typed IDs and value objects, and confirm no shared cross-layer DTO or contracts assembly exists.
 - Run Architecture.Tests.

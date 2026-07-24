@@ -65,6 +65,7 @@ const KINDS = {
   glossary: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   'modules-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
+  aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: UC },
   'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: UC },
   'end-to-end-flow': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'releaseRole', 'useCases'], props: { ...base, implementationStatus: 1, releaseRole: 1, useCases: 1, applicableExtensions: 1 }, id: ID },
   workflow: { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'participatingModules', 'applicableExtensions'], props: { ...base, implementationStatus: 1, participatingModules: 1, applicableExtensions: 1 }, id: ID },
@@ -100,6 +101,23 @@ function parseBlock(raw, rel) {
   if (end < 0) { err(`${rel}: unterminated metadata block`); return null; }
   try { return JSON.parse(raw.slice(3, end).trim()); }
   catch (e) { err(`${rel}: JSON parse error: ${e.message}`); return null; }
+}
+
+// A use-case file lives directly in its module directory, or in a single
+// aggregate-root subdirectory of that module. See the module use-case
+// grouping rule in the engineering-system foundation.
+function useCaseFile(mod, name) {
+  const flat = path.join(domainDocs, 'modules', mod, `${name}.md`);
+  if (fs.existsSync(flat)) return flat;
+  const modDir = path.join(domainDocs, 'modules', mod);
+  if (fs.existsSync(modDir)) {
+    for (const e of fs.readdirSync(modDir, { withFileTypes: true })) {
+      if (!e.isDirectory() || e.name.startsWith('.')) continue;
+      const nested = path.join(modDir, e.name, `${name}.md`);
+      if (fs.existsSync(nested)) return nested;
+    }
+  }
+  return null;
 }
 
 for (const f of files) {
@@ -149,14 +167,26 @@ for (const f of files) {
   if (meta.kind === 'product') { products++; if (!fs.existsSync(path.join(docsRoot, 'product', 'flows', `${meta.primaryReleaseFlow}.md`))) err(`${rel}: primaryReleaseFlow '${meta.primaryReleaseFlow}' has no flow file`); }
   if (meta.kind === 'end-to-end-flow') {
     if (meta.releaseRole === 'primary') primaryFlows++;
-    for (const uc of meta.useCases ?? []) { const [mod, name] = uc.split('.'); if (!fs.existsSync(path.join(domainDocs, 'modules', mod, `${name}.md`))) err(`${rel}: useCase '${uc}' has no file`); }
+    for (const uc of meta.useCases ?? []) { const [mod, name] = uc.split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
   }
   if (meta.kind === 'workflow') for (const mod of meta.participatingModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: participatingModule '${mod}' has no module dir`);
   if (meta.kind === 'domain-policy') for (const mod of meta.appliesToModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: appliesToModule '${mod}' has no module dir`);
   if (meta.kind === 'use-case') {
     const [mod, name] = String(meta.id).split('.');
-    const want = path.join(domainDocs, 'modules', mod, `${name}.md`).replace(/\\/g, '/');
-    if (f.replace(/\\/g, '/') !== want) err(`${rel}: use-case id '${meta.id}' does not match its path`);
+    // A use-case file sits directly in its module directory, or in one
+    // aggregate-root subdirectory of that module.
+    const parts = path.relative(path.join(domainDocs, 'modules'), f).replace(/\\/g, '/').split('/');
+    const okFlat = parts.length === 2 && parts[0] === mod && parts[1] === `${name}.md`;
+    const okNested = parts.length === 3 && parts[0] === mod && parts[2] === `${name}.md`;
+    if (!okFlat && !okNested) err(`${rel}: use-case id '${meta.id}' does not match its path`);
+  }
+  if (meta.kind === 'aggregate') {
+    const [mod, agg] = String(meta.id).split('.');
+    // An aggregate README is the README.md of an aggregate-root subdirectory:
+    // modules/<module>/<aggregate-plural>/README.md, id '<module>.<aggregate-plural>'.
+    const parts = path.relative(path.join(domainDocs, 'modules'), f).replace(/\\/g, '/').split('/');
+    const ok = parts.length === 3 && parts[0] === mod && parts[1] === agg && parts[2] === 'README.md';
+    if (!ok) err(`${rel}: aggregate id '${meta.id}' does not match its path`);
   }
   // extension scope checks
   if (Array.isArray(meta.applicableExtensions) && extScope.size) {

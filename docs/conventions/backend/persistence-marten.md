@@ -123,7 +123,7 @@ In-memory substitutes cannot prove persistence behavior.
         SaveChangesCommandPostHandler.cs
       Events/
         DomainEventBuffer.cs
-      Posts/                        single aggregate: files directly under the module
+      Posts/                        single aggregate whose name matches the module: files directly under the module
         PostRepository.cs
         PostMartenConfiguration.cs
       Audience/                     two aggregates: one folder per aggregate
@@ -138,7 +138,7 @@ In-memory substitutes cannot prove persistence behavior.
         WorkflowCommandOutbox.cs
 ```
 
-The module folders follow `ARCH.MODULES.001`: a single-aggregate module keeps its repository and configuration directly under the module, and a module with more than one aggregate gives each aggregate its own folder. Keep configuration beside the aggregate when it is aggregate-specific. Keep session and commit plumbing under the Marten root.
+The module folders follow `ARCH.MODULES.001`: a single-aggregate module keeps its repository and configuration directly under the module only when the aggregate root's plural name equals the module name (as `Post` does for `Posts`); otherwise, and for any module with more than one aggregate, each aggregate takes its own folder. Keep configuration beside the aggregate when it is aggregate-specific. Keep session and commit plumbing under the Marten root.
 
 ### Register one scoped session
 

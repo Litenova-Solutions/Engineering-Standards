@@ -78,6 +78,8 @@ Do not add a package, migration, authentication model change, public API break, 
 - Keep Domain free of persistence, web, mediator, logging, and dependency injection packages.
 - Give every Aggregate an abstract state base and at least one sealed state record; do not use lifecycle enums, status strings, or status flags.
 - Model every closed set of Domain values as a discriminated union of records or a typed value object; declare no `enum` in Domain.
+- Mirror a Domain closed set in each outer layer with a type of the same shape: an Application result union and a transport `oneOf` polymorphic model with a discriminator; reduce a set to an `enum` only when it is label-only or a decision narrows it. Do not collapse a data-bearing union to an `enum` or serialize a Domain type directly as the wire contract.
+- Own each layer's contract types: an Application message or result exposes no Domain aggregate, closed set, or result record, and a WebApi transport model reuses no Application or Domain type. Mirror the shape per layer; Shared-kernel typed IDs and value objects are the one sanctioned crossing, and the wire contract reduces even those to primitives.
 - Give each rejected Domain rule its own exception type that owns its stable failure code and message; do not pass code or message strings into a shared exception.
 - Place one primary top-level type per C# file; do not bundle types by kind in `*Enums.cs` or `*ValueObjects.cs` files.
 - Organize every layer by the same domain modules and use cases.
