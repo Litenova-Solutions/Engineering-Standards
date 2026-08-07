@@ -4,10 +4,16 @@
 
 Components should have one clear ownership level and expose accessible behavior without leaking application state across boundaries. Each frontend owns its component source so shadcn/ui updates and product-specific composition remain local.
 
+The governance boundary limits agent-generated UI drift by making the approved primitive inventory,
+theme tokens, public imports, and automated checks the default choices. No library is assumed to prevent
+drift without these project-owned constraints.
+
 ## Agent Summary {#agent-summary}
 
 - Keep route composition in pages, use-case behavior in features, shared product UI in components, and primitives in `components/ui`.
 - Keep component props narrow and serializable across server-client boundaries.
+- Select and document one primary UI system per frontend surface, then reuse its approved public primitives before adding custom UI.
+- Keep vendor imports behind the owning UI package or primitive boundary so agents and features use a fixed, reviewable component inventory.
 - Treat shadcn/ui components as owned source.
 - Use theme tokens and declared variants instead of repeated arbitrary values.
 - Implement keyboard, focus, label, error, and semantic requirements with every interaction.
@@ -31,6 +37,32 @@ Do not place business operations inside `components/ui/`.
 Pass the values and callbacks a component needs rather than a broad service, complete API client, mutable store, or unrelated aggregate-shaped object.
 
 Props crossing a Server Component to Client Component boundary must be serializable.
+
+### Govern the UI system and primitive boundary (UI.GOVERNANCE.001)
+
+Each frontend surface selects one primary UI component and styling system and records the choice in a
+decision. The decision names the approved package or source boundary, its theme-token contract, its
+supported platforms, and the public exports that feature code may use. A headless or unstyled library
+is allowed, but the frontend still owns a wrapper boundary and a visual-token contract. Platform-native
+controls and explicitly approved accessibility utilities may support the primary system; they do not
+create a second ungoverned visual system.
+
+Before writing a new control, an agent or contributor searches the approved primitive inventory and
+composes an existing public export. Do not add a local button, field, dialog, card, or icon wrapper just
+to change a color, spacing value, or interaction label. Vendor imports stay inside the owning UI package
+or primitive directory. Features and routes import only documented public exports, not vendor internals
+or package-internal paths.
+
+Add a new primitive only when the approved inventory cannot provide the required behavior. Place it in
+the owning UI boundary, give it a narrow typed API, express visual differences through declared theme
+tokens and variants, document its intended use, and test its keyboard, focus, labeling, state, and
+responsive behavior. A deliberate exception records the affected rule ID and rationale in a decision.
+
+For example, a form that needs a button composes the approved `Button` primitive and one of its declared
+variants; it does not add a second button with local padding and a local color. If the form needs a
+split-button interaction that the inventory cannot provide, the contributor adds that primitive to the
+approved UI boundary, documents its variants, and tests keyboard and screen-reader behavior before using
+it in the form.
 
 ### Own shadcn/ui source per application (UI.SHADCN.001)
 
@@ -92,6 +124,13 @@ Use a route error boundary for route failure and a feature error boundary only w
 
 - Confirm every component has one ownership level.
 - Inspect client-boundary props for serializability.
+- Confirm each frontend surface has a decision naming one primary UI system, its approved public
+  exports, its token contract, and its vendor-import boundary.
+- Inspect new UI for direct vendor imports outside the owning boundary, package-internal imports, local
+  primitives that duplicate an approved component, and unexplained raw colors, spacing, radii, or font
+  values. Use an AST or lint check where the repository can enforce these boundaries.
+- Require component or browser evidence for every new primitive, including keyboard, focus, labeling,
+  state, and responsive behavior.
 - Run keyboard and accessibility checks for interactive components.
 - Search for repeated arbitrary values and unsafe HTML.
 - Test all applicable component states.

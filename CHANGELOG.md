@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Added `UI.GOVERNANCE.001`, a general frontend rule that requires each frontend surface to document
+  one primary UI system, keep vendor imports behind an approved public boundary, reuse existing
+  primitives before adding custom UI, and verify any new primitive with tokens, accessibility tests,
+  and responsive behavior. This rule is library-neutral and applies independently of the selected
+  platform profile.
+- Consumer action: record the primary UI system, public exports, token contract, and vendor-import
+  boundary in a decision. Add or update static checks and component evidence for new primitives before
+  adopting the next standards release.
+
 ## v1.9.0
 
 - Extended the Domain module-folder convention so a single-aggregate module whose own name equals its aggregate pluralizes the module folder (a `Catalog` aggregate lives in a `Catalogs` folder, namespace `Entro.Domain.Catalogs`) rather than padding the type name to dodge CA1724. Pluralizing the folder is the fix; renaming the type (for example `SalesCatalog`) is not.

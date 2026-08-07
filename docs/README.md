@@ -76,6 +76,7 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Upgrade to standards v1.6](guides/upgrade-v1.6.md) reflects enforced authentication in OpenAPI, adds the `implemented` status, and clarifies shadcn dependencies, numeric transport precision, and several frontend conventions.
 - [Upgrade to standards v1.7](guides/upgrade-v1.7.md) requires precise, complete OpenAPI schemas (enums, parameter constraints, control headers) and separates Worker dependency outages from message failures.
 - [Upgrade to standards v1.8](guides/upgrade-v1.8.md) reorganizes Domain into per-aggregate and per-concept folders and reserves exceptions for rule failures rather than events or business terms.
+- [Frontend UI governance upgrade](guides/upgrade-ui-governance.md) records a primary UI system, approved primitive boundary, token contract, and enforcement checks for `UI.GOVERNANCE.001`.
 - [V1 release scope](guides/v1-release-scope.md) states the complete baseline, conditional catalog, release contents, and exclusions.
 - [Model a domain module](guides/model-domain.md) turns known business language into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
