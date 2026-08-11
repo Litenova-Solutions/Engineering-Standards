@@ -20,6 +20,8 @@ Written artifacts are part of the standards contract. Consistent structure and A
 
 Prose, headings, comments, commit messages, and Specification Metadata MUST use ASCII characters. Use a hyphen, comma, colon, or new sentence instead of a non-ASCII dash, arrow, quote, bullet, or math symbol. Code, data, and genuine mathematical expressions MAY contain non-ASCII content when the content is required by the artifact.
 
+Natural-language product content is data for this purpose. A product whose subject is another language carries that language in its content files, and a diacritic there is part of a word rather than a typographic flourish. An ASCII check MUST exclude those paths by an explicit list and MUST still apply to every document about them.
+
 ### Use explicit normative language (WRITING.NORMATIVE.001)
 
 Standards and `AGENTS.md` MUST state required behavior directly. Use `MUST`, `MUST NOT`, `REQUIRED`, or `FORBIDDEN` when the requirement level needs explicit emphasis. Use `SHOULD` only when a documented reason permits a deviation. Conventions describe defaults and replacement points without weakening a standard.
