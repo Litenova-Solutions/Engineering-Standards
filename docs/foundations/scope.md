@@ -2,13 +2,16 @@
 
 ## Intent
 
-Version 1 supports one application class so agents can make concrete decisions without inventing an architecture for every task. The profile covers a small business web application that one maintainer can build and operate with extensive AI assistance.
+Standards v1.10.0 supports one application class so agents can make concrete decisions without inventing an
+architecture for every task. The profile covers a small business web application that one maintainer can
+build and operate with extensive AI assistance.
 
-The boundary is deliberate. Applications outside it may still use individual ideas from this repository, but they do not claim conformance with the version 1 profile.
+The boundary is deliberate. Applications outside it may still use individual ideas from this repository,
+but they do not claim conformance with the v1.10.0 profile.
 
 ## Agent Summary {#agent-summary}
 
-- Apply version 1 to one bounded-context business application.
+- Apply v1.10.0 to one bounded-context business application.
 - Use the selected ASP.NET Core, PostgreSQL, Marten, and optional Next.js profile.
 - Deliver one release-ready primary release flow before secondary product outcomes.
 - Activate conditional behavior through named extensions.

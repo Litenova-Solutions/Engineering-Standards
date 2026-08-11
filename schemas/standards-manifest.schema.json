@@ -15,11 +15,12 @@
     "extensions",
     "stack",
     "packages",
+    "uiBaseline",
     "loadPlans"
   ],
   "properties": {
     "$schema": { "type": "string" },
-    "schemaVersion": { "const": 2 },
+    "schemaVersion": { "const": 3 },
     "version": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"
@@ -70,6 +71,80 @@
       "properties": {
         "nuget": { "$ref": "#/$defs/versionMap" },
         "npm": { "$ref": "#/$defs/versionMap" }
+      }
+    },
+    "uiBaseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "platform",
+        "system",
+        "styling",
+        "base",
+        "style",
+        "presetCode",
+        "presetFingerprint",
+        "cssVariables",
+        "baseColor",
+        "theme",
+        "chartColor",
+        "font",
+        "fontHeading",
+        "icons",
+        "radius",
+        "menuAccent",
+        "menuColor",
+        "componentsStyle",
+        "sourceModel",
+        "registry",
+        "profiles",
+        "nativeBoundary"
+      ],
+      "properties": {
+        "platform": { "const": "react-web" },
+        "system": { "const": "shadcn/ui" },
+        "styling": { "const": "tailwindcss-v4" },
+        "base": { "const": "base-ui" },
+        "style": { "type": "string", "minLength": 1 },
+        "presetCode": { "type": "string", "minLength": 1 },
+        "presetFingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "cssVariables": { "const": true },
+        "baseColor": { "type": "string", "minLength": 1 },
+        "theme": { "type": "string", "minLength": 1 },
+        "chartColor": { "type": "string", "minLength": 1 },
+        "font": { "type": "string", "minLength": 1 },
+        "fontHeading": { "type": "string", "minLength": 1 },
+        "icons": { "const": "lucide" },
+        "radius": { "type": "string", "minLength": 1 },
+        "menuAccent": { "enum": ["subtle", "bold"] },
+        "menuColor": { "enum": ["default", "inverted", "default-translucent", "inverted-translucent"] },
+        "componentsStyle": { "type": "string", "minLength": 1 },
+        "sourceModel": { "const": "per-frontend-owned-source" },
+        "registry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "url", "allowAdditional"],
+          "properties": {
+            "name": { "const": "shadcn" },
+            "url": { "const": "https://ui.shadcn.com" },
+            "allowAdditional": { "const": false }
+          }
+        },
+        "profiles": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["public-light", "application-balanced", "admin-dense"]
+          }
+        },
+        "nativeBoundary": { "const": "separate-platform-profile" },
+        "compatibilityBases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["radix-ui"] }
+        }
       }
     },
     "loadPlans": {

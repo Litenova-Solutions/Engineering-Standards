@@ -17,11 +17,17 @@ Before requesting review:
 - Confirm extension names match the manifest and consumer template.
 - Validate `standards.manifest.json` and `templates/docs/standards.project.json` against their schemas.
 - Update the changelog.
-- Add an upgrade guide when an existing compliant consumer must change in a post-v1 release.
+- Add an upgrade guide when an existing compliant consumer must change in a post-v1.10.0 release.
 - Update document templates when Specification Metadata or required sections change.
 - Run `git diff --check`.
 
-The repository intentionally has no standards CLI, generated catalog, application scaffold, or bundled consumer validator. Validate JSON shape with the tracked schemas and run cross-file checks through consumer CI or review tooling.
+The repository ships reference validators for Specification Metadata and controlled React web UI. It has
+no generated catalog or application scaffold. Validate JSON shape with the tracked schemas and run both
+validators through consumer CI or review tooling.
+
+A change to a UI rule, schema, template, or the UI validator adds or updates a case in
+`tools/validate-ui.cases.mjs` in the same change, and `node tools/validate-ui.cases.mjs` passes. A rule
+without a passing and a failing case is unverified.
 
 ## Normative changes
 
@@ -59,4 +65,6 @@ Accepted decision records are historical. Add a replacement decision and mark th
 
 ## Consumer upgrades
 
-For standards releases after v1, consumers update the pinned standards commit in a dedicated pull request, read the changelog and applicable upgrade guide, apply required work, and run the complete application gate set.
+For standards releases after v1.10.0, consumers update the pinned standards commit in a dedicated pull
+request, read the changelog and applicable upgrade guide, apply required work, and run the complete
+application gate set.

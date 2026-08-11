@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/ui-source-lock.schema.json",
+  "title": "Litenova shadcn/ui Source Lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generator", "cli", "preset", "registry", "formatter", "components"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "generator": { "const": "shadcn/ui" },
+    "cli": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "preset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "fingerprint",
+        "style",
+        "base",
+        "cssVariables",
+        "baseColor",
+        "theme",
+        "chartColor",
+        "font",
+        "fontHeading",
+        "icons",
+        "radius",
+        "menuAccent",
+        "menuColor",
+        "componentsStyle"
+      ],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "style": { "type": "string", "minLength": 1 },
+        "base": { "enum": ["base-ui", "radix-ui"] },
+        "cssVariables": { "const": true },
+        "baseColor": { "type": "string", "minLength": 1 },
+        "theme": { "type": "string", "minLength": 1 },
+        "chartColor": { "type": "string", "minLength": 1 },
+        "font": { "type": "string", "minLength": 1 },
+        "fontHeading": { "type": "string", "minLength": 1 },
+        "icons": { "const": "lucide" },
+        "radius": { "type": "string", "minLength": 1 },
+        "menuAccent": { "enum": ["subtle", "bold"] },
+        "menuColor": { "enum": ["default", "inverted", "default-translucent", "inverted-translucent"] },
+        "componentsStyle": { "type": "string", "minLength": 1 }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url"],
+      "properties": {
+        "name": { "const": "shadcn" },
+        "url": { "const": "https://ui.shadcn.com" }
+      }
+    },
+    "formatter": { "type": "string", "minLength": 1 },
+    "components": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "address", "status", "paths", "digest", "dependencies"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "address": { "type": "string", "minLength": 1 },
+          "status": {
+            "enum": ["baseline", "extended", "forked", "specialist"]
+          },
+          "paths": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "dependencies": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}

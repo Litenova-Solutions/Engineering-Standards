@@ -15,7 +15,7 @@ uses to develop software with human contributors and AI agents. It defines produ
 domain specifications, architecture boundaries, implementation conventions, verification,
 operations, and release evidence as one connected system.
 
-Version 1 targets one bounded-context business application built with ASP.NET Core,
+The v1.10.0 baseline targets one bounded-context business application built with ASP.NET Core,
 PostgreSQL, Marten, and optional Next.js frontends.
 
 ## What It Defines
@@ -37,6 +37,7 @@ A consumer override must name the affected rule and link to a project decision.
 - [V1 release scope](docs/guides/v1-release-scope.md)
 - [Adoption guide](docs/guides/adopt-v1.md)
 - [V1.8 upgrade guide](docs/guides/upgrade-v1.8.md)
+- [V1.10 upgrade guide](docs/guides/upgrade-v1.10.md)
 
 ## Use the Standards
 
@@ -63,5 +64,4 @@ standards.manifest.json  Version pins, profiles, extensions, and agent load plan
 ## Project
 
 - [Contributing](CONTRIBUTING.md)
-- [Roadmap](ROADMAP.md)
 - [MIT License](LICENSE)

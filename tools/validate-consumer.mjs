@@ -15,6 +15,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(process.argv[2] ?? '.');
 const errors = [];
@@ -94,6 +96,7 @@ const metas = []; // {rel, meta, file}
 let products = 0, primaryFlows = 0;
 const acDefs = new Map();  // id -> [rel]
 const e2eDefs = new Map(); // id -> [rel]
+let uiOutput = '';
 
 function parseBlock(raw, rel) {
   if (!raw.startsWith('---')) return null;
@@ -205,10 +208,30 @@ if (primaryFlows !== 1) err(`Expected exactly one primary release flow, found ${
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
 
+// A React web consumer opts into the deterministic UI validator through its
+// frontend platform declaration or UI block. Existing consumers can migrate in
+// stages while their frontend entries remain platform-neutral, but a recorded UI
+// rule override still has to carry a live review date.
+const uiActivated = (project.paths?.frontends ?? []).some((frontend) => frontend.ui || frontend.platform === 'react-web')
+  || (project.overrides ?? []).some((override) => /^UI\./.test(override?.ruleId ?? ''));
+if (uiActivated) {
+  // Resolve the sibling validator from this file so a consumer may pin the
+  // standards repository at a path other than 'standards/'.
+  const uiValidator = path.join(path.dirname(fileURLToPath(import.meta.url)), 'validate-ui.mjs');
+  if (fs.existsSync(uiValidator)) {
+    const result = spawnSync(process.execPath, [uiValidator, root], { encoding: 'utf8' });
+    uiOutput = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim();
+    if (result.status !== 0) err('controlled UI validation failed; see the UI validator output above');
+  } else {
+    err(`controlled UI configuration is present but the UI validator is missing at ${uiValidator}`);
+  }
+}
+
 // ---- report ----------------------------------------------------------------
 console.log(`Consumer: ${root}`);
 console.log(`Files scanned: ${files.length}, metadata blocks: ${metas.length}`);
 console.log(`Acceptance ids: ${acDefs.size}, end-to-end test ids: ${e2eDefs.size}`);
+if (uiOutput) console.log(`\n${uiOutput}`);
 if (errors.length) {
   console.log(`\nFAIL (${errors.length} problem(s)):`);
   for (const e of errors) console.log(`  - ${e}`);

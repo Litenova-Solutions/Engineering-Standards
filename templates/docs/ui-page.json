@@ -1,0 +1,39 @@
+{
+  "$schema": "../../../standards/schemas/ui-page.schema.json",
+  "schemaVersion": 1,
+  "page": "web.page",
+  "profile": "application-balanced",
+  "shell": "application-shell/default",
+  "regions": [
+    {
+      "id": "page-header",
+      "pattern": "page-header/default",
+      "components": ["button"],
+      "order": 1,
+      "contentLimits": "One title and one supporting description.",
+      "overflow": "Wrap actions below the title at compact width."
+    }
+  ],
+  "states": ["loading", "empty", "error", "ready"],
+  "initial": {
+    "scroll": "top",
+    "focus": "body"
+  },
+  "responsive": {
+    "compact": "Stack header actions and preserve a 44px minimum target.",
+    "wide": "Keep the page header and primary action on one row."
+  },
+  "focus": {
+    "order": ["skip-link", "navigation", "main", "page-header", "content"],
+    "onOpen": "Move focus to the first control in the opened surface.",
+    "onClose": "Return focus to the control that opened the surface.",
+    "onError": "Move focus to the first invalid field or the error summary."
+  },
+  "accessibility": {
+    "landmarks": ["banner", "navigation", "main", "contentinfo"],
+    "headings": "One h1 followed by ordered section headings.",
+    "labels": "Every control has a visible or programmatic label and associated description.",
+    "statusAnnouncements": "Loading, save, and error results use the appropriate status channel."
+  },
+  "evidence": ["AC-PAGE-01", "E2E-PAGE-01"]
+}

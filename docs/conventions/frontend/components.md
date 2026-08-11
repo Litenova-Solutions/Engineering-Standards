@@ -4,10 +4,16 @@
 
 Components should have one clear ownership level and expose accessible behavior without leaking application state across boundaries. Each frontend owns its component source so shadcn/ui updates and product-specific composition remain local.
 
+The governance boundary limits agent-generated UI drift by making the approved primitive inventory,
+theme tokens, public imports, and automated checks the default choices. No library is assumed to prevent
+drift without these project-owned constraints.
+
 ## Agent Summary {#agent-summary}
 
 - Keep route composition in pages, use-case behavior in features, shared product UI in components, and primitives in `components/ui`.
 - Keep component props narrow and serializable across server-client boundaries.
+- Select and document one primary UI system per frontend surface, then reuse its approved public primitives before adding custom UI.
+- Keep vendor imports behind the owning UI package or primitive boundary so agents and features use a fixed, reviewable component inventory.
 - Treat shadcn/ui components as owned source.
 - Use theme tokens and declared variants instead of repeated arbitrary values.
 - Implement keyboard, focus, label, error, and semantic requirements with every interaction.
@@ -32,11 +38,13 @@ Pass the values and callbacks a component needs rather than a broad service, com
 
 Props crossing a Server Component to Client Component boundary must be serializable.
 
-### Own shadcn/ui source per application (UI.SHADCN.001)
+### Apply controlled UI governance
 
-Run shadcn/ui changes in the owning frontend. Review generated source as application code. Do not edit generated primitives indirectly through a shared package that hides their implementation.
-
-The manifest pins the primitive and icon dependencies that shadcn/ui source imports: the unified `radix-ui` package (current shadcn styles import primitives from this single package rather than individual `@radix-ui/react-*` packages) and the `lucide-react` icon library. Adding a component whose source imports a package the manifest does not pin requires pinning that package first, in the same standards or consumer-override change (`DEP.APPROVAL.001`). Either the shadcn CLI or hand-authored canonical source may create the owned primitive once its dependencies are pinned; both are reviewed as application code. Prefer the unified `radix-ui` package over reintroducing individual `@radix-ui/react-*` dependencies.
+The primary UI system, shadcn/ui baseline, source ownership, vocabulary, page grammar, Tailwind
+restrictions, source-lock lifecycle, companion policy, and evidence requirements are defined in the
+[controlled UI governance convention](ui-governance.md). Load it before creating or changing a
+frontend control. This document retains the ownership, props, accessibility, variant, state, content,
+and image rules that apply to every component regardless of the selected platform.
 
 ### Meet accessibility requirements (UI.ACCESSIBILITY.001)
 
@@ -92,6 +100,13 @@ Use a route error boundary for route failure and a feature error boundary only w
 
 - Confirm every component has one ownership level.
 - Inspect client-boundary props for serializability.
+- Confirm each frontend surface has a decision naming one primary UI system, its approved public
+  exports, its token contract, and its vendor-import boundary.
+- Inspect new UI for direct vendor imports outside the owning boundary, package-internal imports, local
+  primitives that duplicate an approved component, and unexplained raw colors, spacing, radii, or font
+  values. Use an AST or lint check where the repository can enforce these boundaries.
+- Require component or browser evidence for every new primitive, including keyboard, focus, labeling,
+  state, and responsive behavior.
 - Run keyboard and accessibility checks for interactive components.
 - Search for repeated arbitrary values and unsafe HTML.
 - Test all applicable component states.

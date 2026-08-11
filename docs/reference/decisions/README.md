@@ -1,6 +1,10 @@
 # Foundation Decisions
 
-These records explain the version 1 baseline. Normative behavior lives in foundations, the selected platform profile, topic conventions, and applicable extensions.
+These records explain the v1.10.0 baseline. Normative behavior lives in foundations, the selected platform
+profile, topic conventions, and applicable extensions.
+
+- [Controlled React web UI baseline](controlled-ui-baseline.md) records the pinned shadcn CLI output,
+  decoded preset, dependency review, and per-frontend ownership boundary.
 
 - [Compact Application assembly](compact-application-assembly.md)
 - [Marten default persistence](marten-default-persistence.md)

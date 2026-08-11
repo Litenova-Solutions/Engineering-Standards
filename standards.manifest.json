@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
-  "schemaVersion": 2,
-  "version": "1.9.0",
+  "schemaVersion": 3,
+  "version": "1.10.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "defaultProfile": "dotnet-nextjs",
@@ -27,6 +27,7 @@
         "docs/conventions/frontend/structure.md",
         "docs/conventions/frontend/rendering.md",
         "docs/conventions/frontend/components.md",
+        "docs/conventions/frontend/ui-governance.md",
         "docs/conventions/frontend/data-and-state.md",
         "docs/conventions/frontend/testing.md",
         "docs/conventions/quality/backend-testing.md",
@@ -40,7 +41,10 @@
     "acceptance-bdd": {
       "path": "docs/extensions/acceptance-bdd.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "end-to-end-flow"]
+      "applicableKinds": [
+        "use-case",
+        "end-to-end-flow"
+      ]
     },
     "api-compatibility": {
       "path": "docs/extensions/api-compatibility.md",
@@ -49,17 +53,26 @@
     "caching": {
       "path": "docs/extensions/caching.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case"]
+      "applicableKinds": [
+        "use-case"
+      ]
     },
     "concurrency-idempotency": {
       "path": "docs/extensions/concurrency-idempotency.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "workflow"]
+      "applicableKinds": [
+        "use-case",
+        "workflow"
+      ]
     },
     "data-lifecycle": {
       "path": "docs/extensions/data-lifecycle.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "workflow", "domain-policy"]
+      "applicableKinds": [
+        "use-case",
+        "workflow",
+        "domain-policy"
+      ]
     },
     "deployment-containers": {
       "path": "docs/extensions/deployment-containers.md",
@@ -68,7 +81,10 @@
     "external-integrations": {
       "path": "docs/extensions/external-integrations.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "workflow"]
+      "applicableKinds": [
+        "use-case",
+        "workflow"
+      ]
     },
     "frontend-authjs": {
       "path": "docs/extensions/frontend-authjs.md",
@@ -85,27 +101,41 @@
     "outbox-worker": {
       "path": "docs/extensions/outbox-worker.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "workflow"]
+      "applicableKinds": [
+        "use-case",
+        "workflow"
+      ]
     },
     "persistence-ef-core": {
       "path": "docs/extensions/persistence-ef-core.md",
       "activationScope": "local",
-      "applicableKinds": ["module", "use-case"]
+      "applicableKinds": [
+        "module",
+        "use-case"
+      ]
     },
     "realtime": {
       "path": "docs/extensions/realtime.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "end-to-end-flow"]
+      "applicableKinds": [
+        "use-case",
+        "end-to-end-flow"
+      ]
     },
     "reporting": {
       "path": "docs/extensions/reporting.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case"]
+      "applicableKinds": [
+        "use-case"
+      ]
     },
     "scheduled-jobs": {
       "path": "docs/extensions/scheduled-jobs.md",
       "activationScope": "local",
-      "applicableKinds": ["use-case", "workflow"]
+      "applicableKinds": [
+        "use-case",
+        "workflow"
+      ]
     }
   },
   "stack": {
@@ -117,11 +147,12 @@
     "aspire": "13.4.6",
     "node": "24.16.0",
     "pnpm": "11.13.1",
-    "nextjs": "16.2.10",
-    "react": "19.2.7",
+    "nextjs": "16.3.0",
+    "react": "19.2.3",
     "typescript": "6.0.3",
     "tailwindcss": "4.3.3",
-    "shadcn": "4.13.0"
+    "shadcn": "4.16.2",
+    "base-ui": "1.7.0"
   },
   "packages": {
     "nuget": {
@@ -171,37 +202,79 @@
       "xunit.runner.visualstudio": "3.1.5"
     },
     "npm": {
+      "@base-ui/react": "1.7.0",
       "@microsoft/signalr": "10.0.0",
-      "@playwright/test": "1.61.1",
-      "@radix-ui/react-slot": "1.3.0",
+      "@playwright/test": "1.62.1",
+      "@radix-ui/react-slot": "1.3.3",
       "@tailwindcss/postcss": "4.3.3",
-      "@types/node": "24.13.3",
-      "@types/react": "19.2.17",
-      "@types/react-dom": "19.2.3",
+      "@types/node": "26.2.0",
+      "@types/react": "19.2.18",
+      "@types/react-dom": "19.2.4",
       "class-variance-authority": "0.7.1",
       "clsx": "2.1.1",
-      "eslint": "10.7.0",
-      "eslint-config-next": "16.2.10",
+      "eslint": "10.8.1",
+      "eslint-config-next": "16.3.0",
       "jose": "6.2.3",
-      "lucide-react": "1.25.0",
+      "lucide-react": "1.31.0",
+      "next": "16.3.0",
       "next-auth": "4.24.14",
-      "next": "16.2.10",
+      "next-themes": "0.4.6",
       "openapi-fetch": "0.17.0",
       "openapi-typescript": "7.13.0",
-      "radix-ui": "1.6.4",
-      "react": "19.2.7",
-      "react-dom": "19.2.7",
-      "shadcn": "4.13.0",
+      "prettier": "3.9.6",
+      "prettier-plugin-tailwindcss": "0.8.1",
+      "radix-ui": "1.6.7",
+      "react": "19.2.3",
+      "react-dom": "19.2.3",
+      "shadcn": "4.16.2",
       "tailwind-merge": "3.6.0",
       "tailwindcss": "4.3.3",
+      "tw-animate-css": "1.4.0",
       "typescript": "6.0.3",
       "vitest": "4.1.10",
       "zod": "4.4.3"
     }
   },
+  "uiBaseline": {
+    "platform": "react-web",
+    "system": "shadcn/ui",
+    "styling": "tailwindcss-v4",
+    "base": "base-ui",
+    "style": "vega",
+    "presetCode": "bIkf1RQ",
+    "presetFingerprint": "sha256:87311f8e21348d5c467843284cbf4bbb75a34d383c6ed900c0c8e5c2539eadb0",
+    "cssVariables": true,
+    "baseColor": "neutral",
+    "theme": "neutral",
+    "chartColor": "neutral",
+    "font": "geist",
+    "fontHeading": "inherit",
+    "icons": "lucide",
+    "radius": "default",
+    "menuAccent": "subtle",
+    "menuColor": "default",
+    "componentsStyle": "base-vega",
+    "sourceModel": "per-frontend-owned-source",
+    "registry": {
+      "name": "shadcn",
+      "url": "https://ui.shadcn.com",
+      "allowAdditional": false
+    },
+    "profiles": [
+      "public-light",
+      "application-balanced",
+      "admin-dense"
+    ],
+    "nativeBoundary": "separate-platform-profile",
+    "compatibilityBases": [
+      "radix-ui"
+    ]
+  },
   "loadPlans": {
     "repository.structure": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/repository/structure.md#agent-summary",
         "docs/conventions/repository/naming.md#agent-summary",
@@ -216,12 +289,20 @@
       ]
     },
     "repository.writing": {
-      "tier0": ["AGENTS.md"],
-      "tier1": ["docs/conventions/repository/writing.md#agent-summary"],
-      "tier2": ["docs/conventions/repository/writing.md"]
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/conventions/repository/writing.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/repository/writing.md"
+      ]
     },
     "repository.dependencies": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/foundations/principles.md#agent-summary",
         "docs/conventions/repository/dependencies.md#agent-summary",
@@ -234,7 +315,9 @@
       ]
     },
     "backend.domain": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/backend/architecture.md#agent-summary",
         "docs/conventions/backend/domain.md#agent-summary",
@@ -247,7 +330,9 @@
       ]
     },
     "backend.application": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/backend/architecture.md#agent-summary",
         "docs/conventions/backend/application.md#agent-summary",
@@ -262,7 +347,9 @@
       ]
     },
     "backend.api": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/backend/api.md#agent-summary",
         "docs/conventions/quality/security.md#agent-summary",
@@ -275,7 +362,9 @@
       ]
     },
     "backend.infrastructure": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/backend/architecture.md#agent-summary",
         "docs/conventions/backend/persistence-marten.md#agent-summary",
@@ -290,31 +379,41 @@
       ]
     },
     "frontend.structure": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/frontend/structure.md#agent-summary",
+        "docs/conventions/frontend/ui-governance.md#agent-summary",
         "docs/conventions/repository/naming.md#agent-summary"
       ],
       "tier2": [
         "docs/conventions/frontend/structure.md",
+        "docs/conventions/frontend/ui-governance.md",
         "docs/conventions/repository/naming.md"
       ]
     },
     "frontend.rendering": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/frontend/rendering.md#agent-summary",
         "docs/conventions/frontend/components.md#agent-summary",
+        "docs/conventions/frontend/ui-governance.md#agent-summary",
         "docs/conventions/quality/security.md#agent-summary"
       ],
       "tier2": [
         "docs/conventions/frontend/rendering.md",
         "docs/conventions/frontend/components.md",
+        "docs/conventions/frontend/ui-governance.md",
         "docs/conventions/quality/security.md"
       ]
     },
     "frontend.data": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/frontend/data-and-state.md#agent-summary",
         "docs/conventions/repository/configuration.md#agent-summary",
@@ -327,20 +426,43 @@
       ]
     },
     "frontend.components": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/frontend/components.md#agent-summary",
+        "docs/conventions/frontend/ui-governance.md#agent-summary",
         "docs/conventions/frontend/rendering.md#agent-summary",
         "docs/conventions/frontend/testing.md#agent-summary"
       ],
       "tier2": [
         "docs/conventions/frontend/components.md",
+        "docs/conventions/frontend/ui-governance.md",
         "docs/conventions/frontend/rendering.md",
         "docs/conventions/frontend/testing.md"
       ]
     },
+    "frontend.ui": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/conventions/frontend/ui-governance.md#agent-summary",
+        "docs/conventions/frontend/components.md#agent-summary",
+        "docs/conventions/frontend/testing.md#agent-summary",
+        "docs/conventions/repository/dependencies.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/frontend/ui-governance.md",
+        "docs/conventions/frontend/components.md",
+        "docs/conventions/frontend/testing.md",
+        "docs/conventions/repository/dependencies.md"
+      ]
+    },
     "testing.backend": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/quality/backend-testing.md#agent-summary",
         "docs/foundations/release-standard.md#agent-summary"
@@ -351,7 +473,9 @@
       ]
     },
     "testing.frontend": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/frontend/testing.md#agent-summary",
         "docs/foundations/release-standard.md#agent-summary"
@@ -362,7 +486,9 @@
       ]
     },
     "use-case.authoring": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/foundations/engineering-system.md#agent-summary",
         "docs/foundations/release-standard.md#agent-summary"
@@ -373,7 +499,9 @@
       ]
     },
     "security.review": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/quality/security.md#agent-summary",
         "docs/conventions/quality/operations.md#agent-summary"
@@ -384,7 +512,9 @@
       ]
     },
     "operations": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/conventions/quality/operations.md#agent-summary",
         "docs/conventions/quality/ci.md#agent-summary",
@@ -399,7 +529,9 @@
       ]
     },
     "release": {
-      "tier0": ["AGENTS.md"],
+      "tier0": [
+        "AGENTS.md"
+      ],
       "tier1": [
         "docs/foundations/release-standard.md#agent-summary",
         "docs/conventions/quality/security.md#agent-summary",

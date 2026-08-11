@@ -10,7 +10,8 @@ Each frontend is an independent Next.js application organized around the same bu
 - Organize feature code by module and use case.
 - Do not import another module's internal feature files.
 - Keep route files as composition boundaries.
-- Keep shadcn/ui source inside each frontend.
+- Keep the selected shadcn/ui source, `components.json`, and source lock inside each React web frontend.
+- Keep each web frontend's UI vocabulary and page sidecars at the documented `uiDocs` path.
 - Share generated API types, thin clients, configuration, or CSS tokens through packages only when multiple apps consume them.
 
 ## Standards
@@ -29,6 +30,7 @@ apps/{frontend}/
   public/
   tests/
   components.json
+  ui-source-lock.json
   next.config.ts
   package.json
   tsconfig.json
@@ -50,7 +52,7 @@ Move shared code to `components/`, `lib/`, or a workspace package only after two
 
 ### Keep applications independent (FRONTEND.APPS.001)
 
-A frontend cannot import source from another frontend. Each application owns its routing, environment module, authentication integration, shadcn/ui components, Tailwind entry, tests, and deployment configuration.
+A frontend cannot import source from another frontend. Each application owns its routing, environment module, authentication integration, shadcn/ui components, source lock, Tailwind entry, tests, and deployment configuration. React web applications also own the vocabulary and page sidecars named by their UI configuration.
 
 ### Keep shared packages non-application-specific (FRONTEND.PACKAGES.001)
 

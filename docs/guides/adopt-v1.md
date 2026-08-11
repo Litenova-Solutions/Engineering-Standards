@@ -1,6 +1,8 @@
 # Adopt Standards v1
 
-This guide creates a consumer repository that follows the `dotnet-nextjs` profile. Read [V1 Release Scope](v1-release-scope.md) before adopting the profile.
+This guide creates a consumer repository that follows the `dotnet-nextjs` profile at standards v1.10.0.
+Read [V1 Release Scope](v1-release-scope.md) for the original profile boundary and
+[Upgrade to standards v1.10](upgrade-v1.10.md) for the current React web UI contract.
 
 ## Sequence
 
@@ -12,10 +14,11 @@ This guide creates a consumer repository that follows the `dotnet-nextjs` profil
 6. Configure PostgreSQL, Marten, LiteBus, diagnostics, the command commit post-handler, HTTP boundaries, and deterministic OpenAPI generation.
 7. Create the product brief, domain index, glossary, module index, first module, first use case, and first end-to-end flow from templates.
 8. Select only extensions justified by current requirements. Apply project-scoped extensions globally and list local extensions only on allowed specifications.
-9. Implement one complete Use case through Domain, Application, Infrastructure, WebApi, optional frontend, tests, generated contracts, and operating impact.
-10. Add a Workflow only when system-controlled progress crosses a transaction or time boundary.
-11. Add CI, schema review, backup and restore, deployment, rollback, operating limits, runbooks, and a deployed end-to-end test.
-12. Run the [Release Standard](../foundations/release-standard.md) and record exact results for one immutable artifact.
+9. For each React web frontend, declare `platform: react-web` and its `ui` block, initialize the manifest-pinned shadcn/ui baseline, commit `components.json`, the installed `components/ui/` source, `lib/utils.ts`, the global CSS entry, and `ui-source-lock.json`, then create the frontend UI vocabulary. Record a native platform decision instead for a native frontend.
+10. Implement one complete Use case through Domain, Application, Infrastructure, WebApi, optional frontend, tests, generated contracts, and operating impact. Add the page specification and its UI sidecar for every visible route the slice adds.
+11. Add a Workflow only when system-controlled progress crosses a transaction or time boundary.
+12. Add CI, schema review, backup and restore, deployment, rollback, operating limits, runbooks, and a deployed end-to-end test.
+13. Run the [Release Standard](../foundations/release-standard.md) and record exact results for one immutable artifact.
 
 ## Initial documentation shape
 
@@ -51,6 +54,7 @@ Before feature work expands beyond the first slice, confirm these outputs exist:
 | HTTP | Stable routes, actor mapping, target authorization, Problem Details, pagination, OpenAPI operation IDs, and documented responses |
 | Testing | Four baseline test projects, PostgreSQL container fixture, real API factory, database reset, architecture rules, and acceptance-ID references |
 | Frontend | Generated transport types, one typed client, normalized errors, serializable action results, and explicit route states when a frontend exists |
+| Web UI | Product profile, `components.json`, installed primitive source, one global CSS entry, `ui-source-lock.json`, the UI vocabulary, and a page sidecar for each visible route |
 | Operations | Health endpoints, trace-correlated diagnostics, bounded metrics, alerts, required runbooks, and Operating Limits |
 | Delivery | Required CI jobs, immutable artifact identity, deployment, end-to-end test, restore exercise, rollback exercise, and release record |
 
@@ -64,6 +68,7 @@ Do not enable conditional behavior in advance. Select `persistence-ef-core`, `ap
 
 - Validate the manifest and consumer configuration against their schemas.
 - Validate each structured metadata block against the Specification Metadata schema.
+- Run `node standards/tools/validate-consumer.mjs` and `node standards/tools/validate-ui.mjs` from the consumer root.
 - Confirm solution and project paths match the repository convention.
 - Confirm the primary release flow resolves to real use-case specifications.
 - Confirm the first Use case has Domain, persistence, API, test, generated-contract, and operating evidence before marking it verified.

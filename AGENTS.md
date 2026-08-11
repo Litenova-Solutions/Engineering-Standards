@@ -2,7 +2,11 @@
 
 Read this file before changing this repository or a consumer application.
 
-Version 1 covers one bounded-context business application built with ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends. The canonical human index is `docs/README.md`. Exact versions, profile composition, extensions, and task load plans live in `standards.manifest.json`.
+Standards v1.10.0 covers one bounded-context business application built with ASP.NET Core, PostgreSQL,
+Marten, and optional Next.js frontends. React web frontends use the controlled shadcn/ui and Tailwind
+CSS baseline; native frontends require a separate platform decision. The canonical human index is
+`docs/README.md`. Exact versions, profile composition, extensions, and task load plans live in
+`standards.manifest.json`.
 
 ## Writing Style (documentation and prose)
 
@@ -92,6 +96,8 @@ Do not add a package, migration, authentication model change, public API break, 
 - Use Minimal API `IEndpoint`; MVC controllers are outside the profile.
 - Derive authenticated actor IDs from verified claims and authorize the target resource.
 - Keep frontend module internals isolated and route files focused on composition.
+- Use the manifest-pinned shadcn/ui with Tailwind CSS v4 baseline for React web UI, and load the
+  controlled UI governance convention before changing a frontend surface.
 - Validate backend options and frontend environment access through owned modules.
 - Cite every acceptance-criterion ID from verified Use cases in automated tests.
 - Regenerate OpenAPI and typed consumers with their sources.
@@ -107,9 +113,16 @@ For this standards repository:
 - Check rule-ID uniqueness and extension references.
 - Check internal links, ASCII writing rules, Specification Metadata, code-document consistency, and stale terminology.
 - Confirm removed terminology, rule IDs, templates, and aliases have no current standards references.
+- Run `node tools/validate-ui.cases.mjs` after changing a UI rule, schema, template, or the UI validator.
 - Run `git diff --check`.
 
-The repository ships one reference consumer validator at `tools/validate-consumer.mjs`. It validates Specification Metadata against the schema and runs the cross-file checks the foundation Verification lists require (flow use-case references, module and use-case path alignment, acceptance and end-to-end ID uniqueness, domain-policy and workflow references, and local extension scope). It has no other standards CLI, generated index, or application scaffold. JSON schemas define machine-readable file shape; the reference validator is the baseline cross-file check, and consumer CI may extend it.
+The repository ships reference validators at `tools/validate-consumer.mjs` and `tools/validate-ui.mjs`,
+and reference passing and failing cases for the UI rules at `tools/validate-ui.cases.mjs`. The consumer validator validates Specification Metadata against the schema and
+runs cross-file checks for flow use-case references, module and use-case path alignment, acceptance and
+end-to-end ID uniqueness, domain-policy and workflow references, and local extension scope. The UI
+validator checks the opt-in React web configuration, vocabulary, page sidecars, source locks, and source
+boundaries without network access. The repository has no generated index or application scaffold. JSON
+schemas define machine-readable file shape; consumer CI may extend the reference checks.
 
 ## Consumer verification
 
@@ -134,6 +147,7 @@ Run the reference consumer validator from the consumer root:
 
 ```bash
 node standards/tools/validate-consumer.mjs
+node standards/tools/validate-ui.mjs
 ```
 
 Run Playwright for affected browser end-to-end flows and extension-specific verification for every applicable extension affected by the change.

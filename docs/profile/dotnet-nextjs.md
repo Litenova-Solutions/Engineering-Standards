@@ -16,6 +16,8 @@ Exact framework and package versions live only in `standards.manifest.json`.
 - Use Aspire for local service orchestration.
 - Use the manifest-pinned Node.js LTS and pnpm toolchain for TypeScript workspaces.
 - Add Next.js frontends only when the product has a web surface.
+- Use the controlled shadcn/ui with Tailwind CSS v4 baseline for React web frontends and a separate
+  platform decision for native frontends.
 
 ## Standards
 
@@ -54,6 +56,7 @@ An extension or consumer override may replace a baseline choice only when it nam
 - [Frontend structure](../conventions/frontend/structure.md)
 - [Rendering and routes](../conventions/frontend/rendering.md)
 - [Components and UI](../conventions/frontend/components.md)
+- [Controlled UI governance](../conventions/frontend/ui-governance.md)
 - [Data, forms, and state](../conventions/frontend/data-and-state.md)
 - [Frontend testing](../conventions/frontend/testing.md)
 

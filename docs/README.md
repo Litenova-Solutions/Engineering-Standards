@@ -8,7 +8,7 @@ This index gives humans and AI agents one navigation map. Read foundation docume
 
 | Document | Read when |
 |:---|:---|
-| [Supported scope](foundations/scope.md) | Evaluating whether an application fits version 1. |
+| [Supported scope](foundations/scope.md) | Evaluating whether an application fits the supported profile. |
 | [Engineering principles](foundations/principles.md) | Making a design choice not covered by a narrower convention. |
 | [Agentic Engineering System](foundations/engineering-system.md) | Understanding system context, vocabulary, specifications, agent work, or product delivery. |
 | [Agent operating protocol](foundations/agent-protocol.md) | Configuring or reviewing agent behavior. |
@@ -16,7 +16,7 @@ This index gives humans and AI agents one navigation map. Read foundation docume
 
 ## Platform profile
 
-The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack and lists every convention included in version 1.
+The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack and lists every convention included in standards v1.10.0.
 
 ## Repository conventions
 
@@ -45,6 +45,7 @@ The [dotnet-nextjs profile](profile/dotnet-nextjs.md) selects the baseline stack
 | [Frontend structure](conventions/frontend/structure.md) | App tree, feature boundaries, shared code, generated types, and multiple frontends. |
 | [Rendering and routes](conventions/frontend/rendering.md) | App Router, Server Components, client boundaries, route files, loading, errors, and metadata. |
 | [Components and UI](conventions/frontend/components.md) | Component categories, props, shadcn/ui ownership, accessibility, variants, and content safety. |
+| [Controlled UI governance](conventions/frontend/ui-governance.md) | The shadcn/ui baseline, UI vocabulary, page grammar, Tailwind limits, source locks, companions, and evidence. |
 | [Data, forms, and state](conventions/frontend/data-and-state.md) | Typed API access, reads, mutations, forms, URL state, local state, and optional client caches. |
 | [Frontend testing](conventions/frontend/testing.md) | Vitest, Playwright, test placement, acceptance trace, and browser-risk boundaries. |
 
@@ -76,6 +77,7 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Upgrade to standards v1.6](guides/upgrade-v1.6.md) reflects enforced authentication in OpenAPI, adds the `implemented` status, and clarifies shadcn dependencies, numeric transport precision, and several frontend conventions.
 - [Upgrade to standards v1.7](guides/upgrade-v1.7.md) requires precise, complete OpenAPI schemas (enums, parameter constraints, control headers) and separates Worker dependency outages from message failures.
 - [Upgrade to standards v1.8](guides/upgrade-v1.8.md) reorganizes Domain into per-aggregate and per-concept folders and reserves exceptions for rule failures rather than events or business terms.
+- [Upgrade to standards v1.10](guides/upgrade-v1.10.md) migrates React web frontends to the controlled shadcn/ui baseline, UI vocabulary, page contracts, source locks, and UI evidence gates.
 - [V1 release scope](guides/v1-release-scope.md) states the complete baseline, conditional catalog, release contents, and exclusions.
 - [Model a domain module](guides/model-domain.md) turns known business language into aggregate, state, invariant, event, and use-case documentation.
 - [Document templates](../templates/docs/README.md) provide consumer starting points.
@@ -84,8 +86,12 @@ Read the [extension index](extensions/README.md) to select conditional standards
 - [Workflow template](../templates/docs/workflow.md) defines durable system-controlled progress.
 - [Domain Policy template](../templates/docs/domain-policy.md) records a domain rule that applies within one module or across multiple modules.
 - [Decision Evidence template](../templates/docs/decision-evidence.md) records evidence for a decision when the investigation needs its own document.
+- [UI override decision template](../templates/docs/ui-override-decision.md) records a reviewed React web visual-system, component-base, registry, or specialist-control override.
 - [Operating limits template](../templates/docs/operating-limits.md) records the supported envelope and recovery limits.
 - [Runbook template](../templates/docs/runbook.md) gives the required operational record shape.
-- [V2 roadmap](../ROADMAP.md) records evidence-gated candidates after v1 adoption.
 
-Schemas are not part of the human reading path. They validate the standards manifest, consumer `standards.project.json`, and kind-specific Specification Metadata defined by the Agentic Engineering System. Cross-file checks still resolve references and compare local extension applicability with the manifest and consumer selection.
+Schemas are not part of the human reading path. They validate the standards manifest, consumer
+`standards.project.json`, kind-specific Specification Metadata, UI vocabularies, UI page sidecars, and
+shadcn source locks. The reference validators resolve cross-file references, compare local extension
+applicability with the manifest and consumer selection, and check the opt-in UI source boundary without
+network access.

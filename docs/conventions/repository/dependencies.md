@@ -99,3 +99,19 @@ An Application query handler may inject `IQuerySession` because Marten is the se
 - Run architecture tests for forbidden references.
 - Confirm endpoint constructors expose no Infrastructure type.
 - Confirm shared frontend packages do not import application source.
+
+### Keep the approved web UI dependency boundary (DEP.FRONTEND.UI.001)
+
+React web frontends use the `uiBaseline` in `standards.manifest.json`: shadcn/ui with Tailwind CSS v4,
+Base UI, Lucide, and the pinned utility packages. The direct source imports of installed shadcn
+components must resolve to packages pinned by the manifest. A component that imports an unlisted package
+requires a decision and a manifest update before installation.
+
+Behavior-only packages such as TanStack Table, TanStack Virtual, form state, or data fetching may be
+added when a current use case activates them. Their rendered controls remain inside the shadcn/ui
+boundary. A second general purpose component library or a specialist visual package requires the UI
+companion exception and an explicit dependency review.
+
+Keep `@base-ui/react` as the new-frontend primitive dependency. `radix-ui` and individual Radix packages
+are compatibility dependencies for an existing Radix shadcn frontend only; they are not a reason to mix
+component bases in one application. React Native dependencies follow a separate platform profile.

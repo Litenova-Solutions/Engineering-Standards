@@ -34,6 +34,17 @@
 
 Describe multi-step behavior, URL state, focus, and navigation results.
 
+## UI Contract
+
+Create `__PAGE__.ui.json` beside this document from `ui-page.json`. Use the frontend vocabulary to
+select the profile, shell, patterns, components, and states. The sidecar must define:
+
+- ordered regions, content limits, overflow, compact and wide behavior;
+- initial scroll and active element for direct navigation;
+- focus order, dialog or menu return focus, and validation-error destination;
+- landmarks, heading hierarchy, labels, descriptions, and status announcements;
+- acceptance, browser, accessibility, visual, and manual evidence IDs.
+
 ## Folder mapping
 
 ```text
@@ -49,4 +60,5 @@ Record public title, description, canonical URL, and indexing behavior when appl
 
 ## Verification
 
-List component, route, accessibility, and Playwright checks.
+List component, route, keyboard, focus, accessibility, responsive, visual, and Playwright checks. Name
+the evidence IDs in the UI sidecar.
