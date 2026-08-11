@@ -22,9 +22,12 @@
     "paths": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["apiSolution", "domainDocs", "uiDocs", "frontends"],
+      "required": ["domainDocs", "uiDocs", "frontends"],
       "properties": {
-        "apiSolution": { "$ref": "#/$defs/projectPath" },
+        "apiSolution": {
+          "description": "Path to the API solution. Omitted only by a consumer that has no backend, which MUST record a SCOPE.OUTSIDE.001 decision.",
+          "$ref": "#/$defs/projectPath"
+        },
         "domainDocs": { "$ref": "#/$defs/projectPath" },
         "uiDocs": { "$ref": "#/$defs/projectPath" },
         "frontends": {

@@ -47,6 +47,10 @@ The consumer lists every selected extension in `selectedExtensions` in `standard
 
 Microservices, multiple bounded contexts, native clients, other backend platforms, other frontend frameworks, event sourcing, active-active regions, and large data pipelines require a separate profile or a project decision that defines the unsupported boundary.
 
+An application with no backend is one such boundary. A frontend and its build-time content can satisfy every repository, frontend, security, operations, continuous integration, and writing convention while having no API, no database, and no persistence layer. Such a consumer omits `paths.apiSolution` in `standards.project.json`, records the decision, and names every rule left without a surface. Adding a backend to obtain conformance contradicts CORE.COMPLEXITY.001, which forbids infrastructure that no current use case requires.
+
+The decision names the rules that no longer apply. CI.GATES.001 already permits skipping a gate whose surface does not exist when the skip is documented, so a missing backend gate is a recorded consequence rather than an unexplained absence.
+
 ## Conventions
 
 ### Keep the first deployment small
@@ -65,5 +69,6 @@ A publishing v1 may support author sign-in, draft creation, publication, and pub
 
 - Confirm the product brief names one primary release flow.
 - Confirm `standards.project.json` selects `dotnet-nextjs`.
+- Confirm a consumer that omits `paths.apiSolution` carries a decision recording the boundary and the rules left without a surface.
 - Confirm each active conditional concern appears in `selectedExtensions` and each local extension appears on its applicable specifications.
 - Confirm unsupported architecture choices have a project decision.
