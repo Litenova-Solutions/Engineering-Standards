@@ -1,5 +1,9 @@
 # V1 Release Scope
 
+This page records the historical v1 scope. Standards v1.10.0 adds reference validators and the
+controlled React web UI baseline; read [the v1.10 upgrade guide](upgrade-v1.10.md) for the current
+consumer contract.
+
 ## Purpose
 
 Standards v1 defines the Agentic Engineering System profile for one maintainer and collaborating agents building and operating one business web application. Litenova Solutions uses this standards repository as its engineering system for developing software. The model remains general enough for another technical team to adopt. It combines durable specifications, engineering rules, executable verification, and release records. It is a documentation and contract release, not generated application code.
@@ -55,5 +59,3 @@ Passing standards repository checks proves the standards package is internally c
 ## Outside v1
 
 V1 does not standardize microservices, multiple bounded contexts, event sourcing, native application architecture, non-.NET backends, non-Next.js frontends, active-active regions, large data pipelines, or a general platform engineering layer. A consumer may record a local decision for an unsupported boundary, but it cannot claim that boundary is covered by the v1 profile.
-
-V2 candidates are recorded in the [root roadmap](../../ROADMAP.md) and require adoption evidence before they become standards.

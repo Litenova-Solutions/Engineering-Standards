@@ -1,0 +1,38 @@
+{
+  "$schema": "../../standards/schemas/ui-source-lock.schema.json",
+  "schemaVersion": 1,
+  "generator": "shadcn/ui",
+  "cli": "4.16.2",
+  "preset": {
+    "code": "bIkf1RQ",
+    "fingerprint": "sha256:87311f8e21348d5c467843284cbf4bbb75a34d383c6ed900c0c8e5c2539eadb0",
+    "style": "vega",
+    "base": "base-ui",
+    "cssVariables": true,
+    "baseColor": "neutral",
+    "theme": "neutral",
+    "chartColor": "neutral",
+    "font": "geist",
+    "fontHeading": "inherit",
+    "icons": "lucide",
+    "radius": "default",
+    "menuAccent": "subtle",
+    "menuColor": "default",
+    "componentsStyle": "base-vega"
+  },
+  "registry": {
+    "name": "shadcn",
+    "url": "https://ui.shadcn.com"
+  },
+  "formatter": "pnpm exec prettier --write",
+  "components": [
+    {
+      "name": "button",
+      "address": "@shadcn/button",
+      "status": "baseline",
+      "paths": ["components/ui/button.tsx"],
+      "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "dependencies": ["@base-ui/react", "class-variance-authority"]
+    }
+  ]
+}

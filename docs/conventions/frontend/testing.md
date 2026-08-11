@@ -11,6 +11,9 @@ Frontend tests should prove use-case behavior at the cheapest boundary that repr
 - Keep acceptance IDs in tests that prove documented criteria.
 - Test loading, empty, error, forbidden, pending, and ready states that apply.
 - Mock the network boundary, not framework internals, in component tests.
+- Prove component keyboard, focus, labeling, responsive, and visual states for UI changes.
+- Test direct-navigation scroll and focus when a page or shell changes.
+- Declare the Playwright worker and fixture model; do not hide flaky isolation failures with retries.
 - Run tests for every changed frontend application.
 
 ## Standards
@@ -41,11 +44,38 @@ Component tests may replace the typed API operation or server action boundary. D
 
 ### Isolate browser tests (FTEST.ISOLATION.001)
 
-Each browser test creates or identifies its own data, authentication context, and expected state. Tests do not depend on execution order or mutable data left by another case.
+Each browser test creates or identifies its own data, authentication context, and expected state. Tests do
+not depend on execution order or mutable data left by another case. The project records whether a test
+uses one isolated worker, one fixture per test, a seeded read-only fixture, or a disposable browser
+context. A test that needs shared state names the owner, reset operation, and reason.
+
+The default is one independent browser context per test and a deterministic worker count in CI. A failed
+test is rerun only to diagnose the failure. Do not increase retries, serialize the suite, or share a
+mutable fixture as a way to make an unexplained failure pass.
 
 ### Run the changed application gates (FTEST.GATES.001)
 
 For each changed frontend run frozen installation, lint, type checking, Vitest, and production build. Run Playwright when a browser end-to-end flow, route, authentication, or browser integration changes.
+
+### Prove controlled UI changes (FTEST.UI.001)
+
+For a primitive, pattern, token, preset, source-lock, or page-contract change, select the affected
+states from the frontend UI vocabulary and run the narrowest evidence that represents the risk:
+
+- component tests for interaction, validation, pending, disabled, and error states;
+- keyboard and focus checks for every interactive path, including dialog or menu return focus;
+- accessible-name, label, role, status-announcement, and automated accessibility checks;
+- compact and wide browser checks for every responsive mode in the page contract;
+- direct-navigation checks for the declared initial scroll and active element;
+- visual comparisons in a declared browser, viewport, font-loading, and OS environment;
+- manual screen-reader, zoom, contrast, and reduced-motion checks for regulated or high-risk flows.
+
+Cover the minimum browser evidence set for the frontend's product profile, defined in
+[controlled UI governance](ui-governance.md), before its first release and again when its shell or preset
+changes.
+
+Do not update a visual baseline automatically after a failure. Review the rendered change, its source
+diff, and the affected vocabulary or page contract before accepting a new baseline.
 
 ## Conventions
 
@@ -72,3 +102,8 @@ Create render helpers for required providers and request mocks. Do not create a 
 - Search for implementation-only selectors and broad snapshots.
 - Run the complete gate set for every changed frontend.
 - Confirm browser tests are independent and repeatable.
+- Confirm each UI source digest, vocabulary item, and page sidecar is validated when the frontend UI
+  configuration is present.
+- Confirm the worker and fixture model is declared and failures are not masked by retries or ordering.
+- Confirm changed UI states have component, keyboard, accessibility, responsive, visual, or manual
+  evidence required by `UI.EVIDENCE.001`.

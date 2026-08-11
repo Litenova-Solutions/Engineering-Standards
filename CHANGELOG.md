@@ -1,15 +1,48 @@
 # Changelog
 
-## Unreleased
+## v1.10.0
 
-- Added `UI.GOVERNANCE.001`, a general frontend rule that requires each frontend surface to document
-  one primary UI system, keep vendor imports behind an approved public boundary, reuse existing
-  primitives before adding custom UI, and verify any new primitive with tokens, accessibility tests,
-  and responsive behavior. This rule is library-neutral and applies independently of the selected
-  platform profile.
-- Consumer action: record the primary UI system, public exports, token contract, and vendor-import
-  boundary in a decision. Add or update static checks and component evidence for new primitives before
-  adopting the next standards release.
+- Made `shadcn/ui` with Tailwind CSS v4 the default React web UI system for all product profiles:
+  `public-light`, `application-balanced`, and `admin-dense`.
+- Selected Base UI, Vega (`bIkf1RQ`), CSS variables, neutral semantic tokens, Geist, Lucide, the preset
+  radius, and the built-in shadcn registry as the pinned baseline. Added `@base-ui/react`,
+  `next-themes`, and `tw-animate-css`, and refreshed the shadcn, Lucide, Radix compatibility, and slot
+  package pins.
+- Amended `UI.GOVERNANCE.001` and `UI.SHADCN.001` and added `UI.TAILWIND.001`, `UI.FORKS.001`,
+  `UI.VOCABULARY.001`, `UI.PAGE.SPEC.001`, `UI.COMPANION.001`, `UI.EVIDENCE.001`,
+  `UI.AGENT.PROTOCOL.001`, and `FTEST.UI.001`.
+- Added UI vocabulary, page-contract, and shadcn source-lock schemas and templates. Source locks record
+  generated source digests and require a visible fork classification when source changes.
+- Added the accepted [controlled React web UI baseline decision](docs/reference/decisions/controlled-ui-baseline.md)
+  and a focused UI override decision template for alternate systems or specialist controls.
+- Added the deterministic `tools/validate-ui.mjs` reference validator and made
+  `tools/validate-consumer.mjs` invoke it when a consumer declares a React web platform, a UI
+  configuration, or a `UI.*` override. The validator reads Tailwind rules from extracted class strings
+  rather than whole files, allows Tailwind variant brackets while rejecting arbitrary utility values,
+  classifies top-level global CSS statements, and scans the workspace root and shared packages for a
+  second visual system.
+- Added `tools/validate-ui.cases.mjs` with reference passing and failing cases for every UI rule. Its
+  global CSS fixture is the entry the pinned CLI actually generates.
+- Required `reviewBy` on every `UI.*` entry in a consumer's `overrides`, and made an override fail once
+  its review date passes so a temporary visual system cannot become permanent by omission.
+- Added a vocabulary `runtimeStyles` record as the only route to an inline style for measured geometry, a
+  declared CSS custom property, or a rendering target with no class support such as a generated social
+  image.
+- Verified the baseline against the pinned CLI rather than a transcript: `shadcn@4.16.2 preset decode
+  bIkf1RQ` returns the ten recorded values, and a real `init` writes `base-vega`, `rtl: false`, the five
+  recorded aliases, an empty registry map, and exactly the recorded direct dependencies. Two rules were
+  wrong before that check and are now correct: the generated entry imports `tw-animate-css` and
+  `shadcn/tailwind.css` alongside `tailwindcss`, and it expresses its documented browser base rules with
+  `@apply` inside `@layer base`, so `@apply` is prohibited only outside that generated block.
+- Pinned `prettier` and `prettier-plugin-tailwindcss`. The source lock normalizes with the project
+  formatter before hashing, so an unpinned formatter would let two consumers compute different digests
+  for identical source.
+- Documented that vocabulary and source-lock paths are frontend-relative while `standards.project.json`
+  paths are consumer-root-relative.
+- Kept React Native outside the official web baseline and documented separate native platform decisions.
+- Consumer action: add frontend UI configuration, vocabulary, source locks, page sidecars, Tailwind
+  restrictions, and the evidence matrix. Existing Radix, Bootstrap, MUI, and other React consumers must
+  record an override and migration plan before moving to the default.
 
 ## v1.9.0
 

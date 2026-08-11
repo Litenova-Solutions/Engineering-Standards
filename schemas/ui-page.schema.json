@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/ui-page.schema.json",
+  "title": "Litenova UI Page Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "page",
+    "profile",
+    "shell",
+    "regions",
+    "states",
+    "initial",
+    "responsive",
+    "focus",
+    "accessibility",
+    "evidence"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "page": { "$ref": "#/$defs/pageIdentifier" },
+    "profile": { "$ref": "#/$defs/profile" },
+    "shell": { "type": "string", "minLength": 1 },
+    "regions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/region" }
+    },
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/state" }
+    },
+    "initial": { "$ref": "#/$defs/initial" },
+    "responsive": { "$ref": "#/$defs/responsive" },
+    "focus": { "$ref": "#/$defs/focus" },
+    "accessibility": { "$ref": "#/$defs/accessibility" },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(?:AC|E2E|UI)-[A-Z0-9-]+$"
+      }
+    }
+  },
+  "$defs": {
+    "pageIdentifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["public-light", "application-balanced", "admin-dense"]
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "pattern", "components", "order"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "pattern": { "type": "string", "minLength": 1 },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "order": { "type": "integer", "minimum": 1 },
+        "contentLimits": { "type": "string", "minLength": 1 },
+        "overflow": { "type": "string", "minLength": 1 }
+      }
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "loading",
+        "empty",
+        "error",
+        "forbidden",
+        "not-found",
+        "pending",
+        "disabled",
+        "offline",
+        "ready",
+        "validation-error",
+        "saving",
+        "saved"
+      ]
+    },
+    "initial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scroll", "focus"],
+      "properties": {
+        "scroll": { "enum": ["top", "restore", "anchor"] },
+        "focus": { "type": "string", "minLength": 1 },
+        "anchor": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "scroll": { "const": "anchor" } },
+            "required": ["scroll"]
+          },
+          "then": { "required": ["anchor"] }
+        }
+      ]
+    },
+    "responsive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["compact", "wide"],
+      "properties": {
+        "compact": { "type": "string", "minLength": 1 },
+        "medium": { "type": "string", "minLength": 1 },
+        "wide": { "type": "string", "minLength": 1 }
+      }
+    },
+    "focus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["order", "onOpen", "onClose", "onError"],
+      "properties": {
+        "order": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "onOpen": { "type": "string", "minLength": 1 },
+        "onClose": { "type": "string", "minLength": 1 },
+        "onError": { "type": "string", "minLength": 1 }
+      }
+    },
+    "accessibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["landmarks", "headings", "labels", "statusAnnouncements"],
+      "properties": {
+        "landmarks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "headings": { "type": "string", "minLength": 1 },
+        "labels": { "type": "string", "minLength": 1 },
+        "statusAnnouncements": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

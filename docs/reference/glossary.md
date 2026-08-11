@@ -122,7 +122,8 @@ A rule enforced by stored-data infrastructure, such as uniqueness, a required re
 
 ## Platform profile
 
-A supported combination of architecture, frameworks, project layout, and baseline conventions. Version 1 contains the `dotnet-nextjs` profile.
+A supported combination of architecture, frameworks, project layout, and baseline conventions. Standards
+v1.10.0 contains the `dotnet-nextjs` profile.
 
 ## Primary release flow
 

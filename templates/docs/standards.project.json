@@ -8,7 +8,22 @@
     "apiSolution": "__API_SOLUTION__",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
-    "frontends": []
+    "frontends": [
+      {
+        "name": "web",
+        "path": "apps/web",
+        "platform": "react-web",
+        "ui": {
+          "profile": "application-balanced",
+          "componentsJson": "apps/web/components.json",
+          "vocabulary": "docs/ui/web/vocabulary.json",
+          "sourceLock": "apps/web/ui-source-lock.json",
+          "globalCss": "apps/web/app/globals.css",
+          "primitives": "apps/web/components/ui",
+          "publicExports": ["@/components/ui"]
+        }
+      }
+    ]
   },
   "selectedExtensions": [],
   "overrides": []

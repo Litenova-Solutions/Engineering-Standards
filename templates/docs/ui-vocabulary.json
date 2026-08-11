@@ -1,0 +1,145 @@
+{
+  "$schema": "../../../standards/schemas/ui-vocabulary.schema.json",
+  "schemaVersion": 1,
+  "frontend": "web",
+  "profile": "application-balanced",
+  "baseline": {
+    "system": "shadcn/ui",
+    "styling": "tailwindcss-v4",
+    "base": "base-ui",
+    "style": "vega",
+    "presetCode": "bIkf1RQ",
+    "presetFingerprint": "sha256:87311f8e21348d5c467843284cbf4bbb75a34d383c6ed900c0c8e5c2539eadb0",
+    "cssVariables": true,
+    "baseColor": "neutral",
+    "theme": "neutral",
+    "chartColor": "neutral",
+    "font": "geist",
+    "fontHeading": "inherit",
+    "icons": "lucide",
+    "radius": "default",
+    "menuAccent": "subtle",
+    "menuColor": "default",
+    "componentsStyle": "base-vega"
+  },
+  "tokens": [
+    {
+      "name": "background",
+      "type": "color",
+      "light": "var(--background)",
+      "dark": "var(--background)",
+      "description": "Page background."
+    },
+    {
+      "name": "foreground",
+      "type": "color",
+      "light": "var(--foreground)",
+      "dark": "var(--foreground)",
+      "description": "Primary readable content."
+    }
+  ],
+  "states": [
+    {
+      "id": "loading",
+      "requiredEvidence": ["UI-STATE-LOADING"]
+    },
+    {
+      "id": "empty",
+      "requiredEvidence": ["UI-STATE-EMPTY"]
+    },
+    {
+      "id": "error",
+      "requiredEvidence": ["UI-STATE-ERROR"]
+    },
+    {
+      "id": "ready",
+      "requiredEvidence": ["UI-STATE-READY"]
+    },
+    {
+      "id": "disabled",
+      "requiredEvidence": ["UI-BUTTON"]
+    },
+    {
+      "id": "pending",
+      "requiredEvidence": ["UI-BUTTON"]
+    }
+  ],
+  "shells": [
+    {
+      "id": "application-shell/default",
+      "regions": ["skip-link", "header", "navigation", "main", "toasts"],
+      "responsiveModes": ["compact", "wide"]
+    }
+  ],
+  "patterns": [
+    {
+      "id": "page-header/default",
+      "components": ["button"],
+      "states": ["ready", "error"],
+      "evidence": ["UI-PAGE-HEADER"]
+    }
+  ],
+  "components": [
+    {
+      "id": "button",
+      "source": "components/ui/button.tsx",
+      "status": "baseline",
+      "variants": ["default", "secondary", "destructive", "outline", "ghost", "link"],
+      "states": ["ready", "disabled", "pending"],
+      "evidence": ["UI-BUTTON"]
+    }
+  ],
+  "forks": [],
+  "specialists": [],
+  "runtimeStyles": [],
+  "evidence": [
+    {
+      "id": "UI-BUTTON",
+      "kind": "component",
+      "environment": "__ENVIRONMENT__",
+      "result": "pass",
+      "reviewer": "__REVIEWER__",
+      "date": "2026-01-01"
+    },
+    {
+      "id": "UI-PAGE-HEADER",
+      "kind": "browser",
+      "environment": "__ENVIRONMENT__",
+      "result": "pass",
+      "reviewer": "__REVIEWER__",
+      "date": "2026-01-01"
+    },
+    {
+      "id": "UI-STATE-LOADING",
+      "kind": "component",
+      "environment": "__ENVIRONMENT__",
+      "result": "pass",
+      "reviewer": "__REVIEWER__",
+      "date": "2026-01-01"
+    },
+    {
+      "id": "UI-STATE-EMPTY",
+      "kind": "component",
+      "environment": "__ENVIRONMENT__",
+      "result": "pass",
+      "reviewer": "__REVIEWER__",
+      "date": "2026-01-01"
+    },
+    {
+      "id": "UI-STATE-ERROR",
+      "kind": "component",
+      "environment": "__ENVIRONMENT__",
+      "result": "pass",
+      "reviewer": "__REVIEWER__",
+      "date": "2026-01-01"
+    },
+    {
+      "id": "UI-STATE-READY",
+      "kind": "browser",
+      "environment": "__ENVIRONMENT__",
+      "result": "pass",
+      "reviewer": "__REVIEWER__",
+      "date": "2026-01-01"
+    }
+  ]
+}

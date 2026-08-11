@@ -38,37 +38,13 @@ Pass the values and callbacks a component needs rather than a broad service, com
 
 Props crossing a Server Component to Client Component boundary must be serializable.
 
-### Govern the UI system and primitive boundary (UI.GOVERNANCE.001)
+### Apply controlled UI governance
 
-Each frontend surface selects one primary UI component and styling system and records the choice in a
-decision. The decision names the approved package or source boundary, its theme-token contract, its
-supported platforms, and the public exports that feature code may use. A headless or unstyled library
-is allowed, but the frontend still owns a wrapper boundary and a visual-token contract. Platform-native
-controls and explicitly approved accessibility utilities may support the primary system; they do not
-create a second ungoverned visual system.
-
-Before writing a new control, an agent or contributor searches the approved primitive inventory and
-composes an existing public export. Do not add a local button, field, dialog, card, or icon wrapper just
-to change a color, spacing value, or interaction label. Vendor imports stay inside the owning UI package
-or primitive directory. Features and routes import only documented public exports, not vendor internals
-or package-internal paths.
-
-Add a new primitive only when the approved inventory cannot provide the required behavior. Place it in
-the owning UI boundary, give it a narrow typed API, express visual differences through declared theme
-tokens and variants, document its intended use, and test its keyboard, focus, labeling, state, and
-responsive behavior. A deliberate exception records the affected rule ID and rationale in a decision.
-
-For example, a form that needs a button composes the approved `Button` primitive and one of its declared
-variants; it does not add a second button with local padding and a local color. If the form needs a
-split-button interaction that the inventory cannot provide, the contributor adds that primitive to the
-approved UI boundary, documents its variants, and tests keyboard and screen-reader behavior before using
-it in the form.
-
-### Own shadcn/ui source per application (UI.SHADCN.001)
-
-Run shadcn/ui changes in the owning frontend. Review generated source as application code. Do not edit generated primitives indirectly through a shared package that hides their implementation.
-
-The manifest pins the primitive and icon dependencies that shadcn/ui source imports: the unified `radix-ui` package (current shadcn styles import primitives from this single package rather than individual `@radix-ui/react-*` packages) and the `lucide-react` icon library. Adding a component whose source imports a package the manifest does not pin requires pinning that package first, in the same standards or consumer-override change (`DEP.APPROVAL.001`). Either the shadcn CLI or hand-authored canonical source may create the owned primitive once its dependencies are pinned; both are reviewed as application code. Prefer the unified `radix-ui` package over reintroducing individual `@radix-ui/react-*` dependencies.
+The primary UI system, shadcn/ui baseline, source ownership, vocabulary, page grammar, Tailwind
+restrictions, source-lock lifecycle, companion policy, and evidence requirements are defined in the
+[controlled UI governance convention](ui-governance.md). Load it before creating or changing a
+frontend control. This document retains the ownership, props, accessibility, variant, state, content,
+and image rules that apply to every component regardless of the selected platform.
 
 ### Meet accessibility requirements (UI.ACCESSIBILITY.001)
 
