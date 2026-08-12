@@ -72,6 +72,8 @@ const IGNORED_DIRECTORIES = new Set([
   '.output',
   '.svelte-kit',
   'coverage',
+  'android',
+  'ios',
 ]);
 
 function walk(directory, predicate, result = []) {
@@ -80,7 +82,8 @@ function walk(directory, predicate, result = []) {
     // Build output is generated, not authored. Scanning it reports the
     // bundler's own CSS as a source violation, which no consumer can fix.
     // `out` is the Next.js static export directory; `.output` and `.svelte-kit`
-    // are the equivalents for other frameworks in the same family.
+    // are the equivalents for other frameworks in the same family. Native
+    // runtime directories contain copied web assets, not authored React source.
     if (IGNORED_DIRECTORIES.has(entry.name)) continue;
     const candidate = path.join(directory, entry.name);
     if (entry.isDirectory()) walk(candidate, predicate, result);

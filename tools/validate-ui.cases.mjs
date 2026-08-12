@@ -169,6 +169,14 @@ function cssCase(name, css, expectation) {
   fs.writeFileSync(globalCss, cleanCss);
 }
 
+function fileCase(name, relative, contents, expectation) {
+  const file = path.join(fixture, relative);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, contents);
+  report(name, expectation, run());
+  fs.rmSync(file);
+}
+
 function configCase(name, mutate, expectation) {
   const project = readJson(projectFile);
   const vocabulary = readJson(vocabularyFile);
@@ -193,6 +201,8 @@ sourceCase('class merge helper', 'import { cn } from "@/lib/utils";\nexport cons
 sourceCase('pinned icon family', 'import { Check } from "lucide-react";\nexport const C = () => <Check className="size-4" />;', null);
 sourceCase('javascript negation is not an important modifier', 'export const C = ({ o }: { o: boolean }) => {\n  const v = !o;\n  return v ? null : <div className="p-4" />;\n};', null);
 sourceCase('a class name inside a comment is prose', 'export const C = () => {\n  // never use bg-blue-500 or w-[37rem]\n  return <div className="p-4" />;\n};', null);
+fileCase('generated Android web asset is ignored', 'apps/web/android/app/src/main/assets/public/_next/static/css/generated.css', '.generated { color: red; }\n', null);
+fileCase('authored feature CSS is rejected', 'apps/web/features/generated.css', '.generated { color: red; }\n', 'CSS file is outside the designated global CSS entry');
 
 console.log('\nRestricted Tailwind use (UI.TAILWIND.001)');
 sourceCase('arbitrary length', 'export const C = () => <div className="w-[37rem]" />;', "arbitrary Tailwind value requires a semantic token or declared variant 'w-[37rem]'");
