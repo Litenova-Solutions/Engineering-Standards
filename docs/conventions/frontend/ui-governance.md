@@ -305,6 +305,8 @@ behavior. Review ordinary component updates quarterly; review security and acces
 - Scan class strings in feature and route code for arbitrary Tailwind values, arbitrary selector
   variants, raw palette values, important modifiers, undeclared inline styles, feature CSS, duplicate
   `cn` helpers, and custom primitive copies.
+- Exclude generated build output and web assets copied into native runtime directories from the source
+  scan, while still rejecting authored feature CSS.
 - Confirm every component digest matches its source lock or has a recorded fork.
 - Confirm page metadata has a matching UI sidecar and every page region names a vocabulary pattern.
 - Confirm tests are repeatable under the declared Playwright worker and fixture model.
