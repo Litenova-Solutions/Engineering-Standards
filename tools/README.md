@@ -49,6 +49,14 @@ The validator checks Specification Metadata, identifiers, file relationships, ex
 
 An optional argument selects another consumer root.
 
+Run its fixture suite after changing a consumer rule, a specification kind, or a tracked template:
+
+```bash
+node tools/validate-consumer.cases.mjs
+```
+
+The suite builds a throwaway consumer from the tracked templates, so a template that drifts from the metadata schema fails the baseline case.
+
 ## Validate Controlled UI
 
 Run the UI validator from an opted-in React web consumer:

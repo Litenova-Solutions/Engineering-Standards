@@ -98,8 +98,16 @@ const acDefs = new Map();  // id -> [rel]
 const e2eDefs = new Map(); // id -> [rel]
 let uiOutput = '';
 
+// Specification Metadata is a '---' delimited JSON block, per
+// WRITING.METADATA.002. A file that carries a metadata object in any other
+// wrapper is reported rather than skipped, because a silently skipped
+// specification is an unvalidated specification.
 function parseBlock(raw, rel) {
-  if (!raw.startsWith('---')) return null;
+  if (!raw.startsWith('---')) {
+    const fenced = raw.slice(0, 2000).match(/```[a-z]*\s*\n\s*\{[\s\S]{0,400}?"kind"\s*:/);
+    if (fenced) err(`${rel}: metadata block is not delimited by '---'`);
+    return null;
+  }
   const end = raw.indexOf('\n---', 3);
   if (end < 0) { err(`${rel}: unterminated metadata block`); return null; }
   try { return JSON.parse(raw.slice(3, end).trim()); }

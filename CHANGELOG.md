@@ -19,6 +19,9 @@
 - Stated the Specification Metadata carrier in `WRITING.METADATA.002`. The block opens and closes with a line containing only `---`. The extension index example now shows that form instead of a bare JSON object.
 - Added `templates/docs/aggregate.md` for the `aggregate` specification kind, which the metadata schema, `tools/validate-consumer.mjs`, and `AGENTIC.CONVENTION.002` already required, and listed it in the template index.
 - Removed an empty `Vocabulary` heading from the engineering system foundation.
+- Added `tools/validate-consumer.cases.mjs` and made it a required CI step. The reference consumer validator previously shipped with no fixture suite and never ran in this repository.
+- Built the consumer fixture from the tracked templates, so every shipped Markdown metadata block is now validated as part of the baseline case.
+- Made `tools/validate-consumer.mjs` report a metadata block that is not delimited by `---` instead of skipping the file. A silently skipped specification is an unvalidated specification.
 - Removed every version-specific upgrade guide and the requirement to publish future migration instructions. Consumers remain on pinned releases until they select another complete contract.
 - Replaced the version-specific adoption guide with `docs/guides/getting-started.md` and removed the duplicate v1 release-scope guide.
 - Replaced application-v1 readiness labels with version-neutral release evidence and release-record guidance.

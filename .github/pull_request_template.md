@@ -6,7 +6,8 @@ State the constraint, decision, or defect that requires the change.
 
 - [ ] `node tools/validate-standards.cases.mjs`
 - [ ] `node tools/validate-standards.mjs`
-- [ ] Applicable specialist validator cases
+- [ ] `node tools/validate-ui.cases.mjs`
+- [ ] `node tools/validate-consumer.cases.mjs`
 - [ ] `git diff --check`
 
 ## Authoring Review

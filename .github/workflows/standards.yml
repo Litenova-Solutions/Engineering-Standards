@@ -31,5 +31,8 @@ jobs:
       - name: Run UI validator cases
         run: node tools/validate-ui.cases.mjs
 
+      - name: Run consumer validator cases
+        run: node tools/validate-consumer.cases.mjs
+
       - name: Check whitespace errors
         run: git diff --check
