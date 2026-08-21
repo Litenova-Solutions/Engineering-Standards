@@ -8,110 +8,76 @@ Continuous integration proves that a pull request preserves the selected standar
 ## Agent Summary {#agent-summary}
 
 
-- Run applicable gates on every pull request. (CI.GATES.001)
-- Check code and documentation consistency. (CI.DOCS.001)
-- Keep generated contracts fresh. (CI.CONTRACTS.001)
-- Review schema artifacts. (CI.SCHEMA.001)
-- Scan dependencies and release artifacts. (CI.SUPPLY.001)
-- Promote verified artifacts. (CI.RELEASE.001)
-- Protect the default branch. (CI.PROTECTION.001)
-- Keep a canonical job graph. (CI.JOBS.001)
+- Pull requests run the gates their changed areas select. (CI.GATES.001)
+- A documentation job checks specification and code together. (CI.DOCS.001)
+- CI regenerates committed contracts and fails on drift. (CI.CONTRACTS.001)
+- Persistence changes publish a reviewed schema artifact. (CI.SCHEMA.001)
+- CI scans dependencies and pins every action. (CI.SUPPLY.001)
+- One immutable artifact is promoted through every environment. (CI.RELEASE.001)
+- The default branch requires checks and review. (CI.PROTECTION.001)
+- CI uses the declared stable job graph. (CI.JOBS.001)
 
 ## Standards
 
 
 ### Run applicable gates on every pull request (CI.GATES.001)
 
-**Requirement:** Consumer CI MUST run applicable gates on every pull request.
+**Requirement:** Every pull request MUST run the gates its changed areas select from the table in this section.
 
-**Rationale:** Every pull request runs the applicable gates from this table:
-
-| Area | Required gate |
-|:---|:---|
-| Backend | `dotnet build apps/api/{ProjectName}.slnx --configuration Release` |
-| Backend | `dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build` |
-| Frontend | `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm type-check`, `pnpm test`, and `pnpm build` |
-| Browser | Playwright end-to-end tests for browser end-to-end flows |
-| Documentation | Link, anchor, rule-ID, ASCII, Specification Metadata, code-document consistency, and `git diff --check` scans |
-| Contracts | OpenAPI freshness and typed consumer regeneration when committed |
-
-Skip a gate only when its surface does not exist. The implementation records the reason in the workflow or completion report.
+**Rationale:** A gate skipped because its surface did not change is recorded with that reason in the completion report.
 
 ### Check code and documentation consistency (CI.DOCS.001)
 
-**Requirement:** Consumer CI MUST check code and documentation consistency.
+**Requirement:** The documentation job MUST run on every pull request and check changed documentation against related code, tests, contracts, and operating records.
 
-**Rationale:** The documentation job runs on every pull request. It checks changed documentation with related code, tests, generated contracts, and operating records. When related surfaces exist, it performs these checks:
-
-- The implementation validates the structured metadata required by `WRITING.METADATA.002` and `WRITING.METADATA.003`.
-- Compare module and use-case names with source and test folders.
-- Confirm current documented names, routes, errors, operation IDs, and authorization boundaries exist in source or generated contracts.
-- Confirm acceptance IDs from verified Use cases appear in automated tests.
-- Detect duplicate application or transport contracts for one operation.
-- Report references to removed entry points, including controllers, namespaces, packages, and features.
-
-The job can use repository scripts, architecture tests, generated-contract checks, or review tooling. It reports exact checks and skipped surfaces. A passing Markdown link scan alone is not documentation consistency evidence.
+**Rationale:** A specification that drifts from its implementation is only detectable where both are visible in one check.
 
 ### Keep generated contracts fresh (CI.CONTRACTS.001)
 
-**Requirement:** Consumer CI MUST keep generated contracts fresh.
+**Requirement:** CI MUST regenerate committed OpenAPI and API types from source and fail on any difference.
 
-**Rationale:** When OpenAPI or generated API types are committed, CI regenerates them from source. A `git diff --exit-code` difference fails the check. The check also rejects unstable timestamps, machine paths, and ordering.
+**Rationale:** The check also rejects unstable timestamps, machine paths, and nondeterministic ordering, because those make every diff unreviewable.
 
 ### Review schema artifacts (CI.SCHEMA.001)
 
-**Requirement:** Consumer CI MUST review schema artifacts.
+**Requirement:** A persistence change MUST publish a reviewed schema artifact that CI rejects when it is missing or contains an unplanned destructive operation.
 
-**Rationale:** A persistence change publishes its reviewed artifact in CI. For Marten, the artifact is the schema plan and document-contract transformation. For EF Core, it is the generated migration and reviewed SQL. CI fails for a missing artifact or an unplanned destructive operation.
+**Rationale:** For Marten the artifact is the schema plan and document transformation. For EF Core it is the generated migration and reviewed SQL.
 
 ### Scan dependencies and release artifacts (CI.SUPPLY.001)
 
-**Requirement:** Consumer CI MUST scan dependencies and release artifacts.
+**Requirement:** CI MUST scan NuGet, npm, container images, and release artifacts for known vulnerabilities and pin every action to an immutable reference.
 
-**Rationale:** CI scans NuGet and npm dependencies, used container images, and release artifacts for known vulnerabilities. GitHub Actions use immutable commit references or a repository-approved pin. Each release publishes an SBOM or equivalent dependency inventory with its artifact.
+**Rationale:** Each release publishes an SBOM or equivalent inventory, so a later advisory can be matched against what shipped.
 
 ### Promote verified artifacts (CI.RELEASE.001)
 
-**Requirement:** Consumer CI MUST promote verified artifacts.
+**Requirement:** CI MUST build one immutable artifact and promote that same artifact through staging and production.
 
-**Rationale:** CI builds one immutable artifact and promotes it through staging and production. It waits for readiness and runs included end-to-end tests. The pipeline does not rebuild from a mutable branch between environments. The release record retains the artifact reference and rollback evidence.
+**Rationale:** Rebuilding from a mutable branch between environments means the tested artifact is not the deployed one.
 
 ### Protect the default branch (CI.PROTECTION.001)
 
-**Requirement:** Consumer CI MUST protect the default branch.
+**Requirement:** The default branch MUST require applicable CI checks, a reviewed pull request, and a clean merge state.
 
-**Rationale:** The default branch requires applicable CI checks, a reviewed pull request, and a clean merge state. Direct pushes and bypassed checks are prohibited except during a documented repository recovery action.
+**Rationale:** A direct push or bypassed check is permitted only during a documented repository recovery action.
 
 ### Keep a canonical job graph (CI.JOBS.001)
 
-**Requirement:** Consumer CI MUST keep a canonical job graph.
+**Requirement:** Consumer CI MUST use the stable job names and responsibilities declared in the table in this section.
 
-**Rationale:** Consumer CI uses stable jobs with these responsibilities:
-
-| Job | Triggered when | Required work |
-|:---|:---|:---|
-| `docs` | Every pull request | Validate selected JSON contracts, links, anchors, rule references, ASCII prose, Specification Metadata, code-document consistency, and diff whitespace |
-| `backend` | Backend, shared standards, or build configuration changes | Locked restore, Release build, tests without rebuild, coverage artifact, and dependency review |
-| `frontend-{app}` | That frontend or shared TypeScript changes | Frozen install, lint, type check, unit tests, and production build |
-| `contracts` | API source or generated consumer changes | Release OpenAPI generation, typed consumer generation, and clean-diff check |
-| `browser` | A browser end-to-end flow or its boundary changes | Playwright end-to-end tests against the built application and real API dependencies |
-| `schema` | Persistence contracts change | Reviewable Marten schema plan and transformations, or EF migration and SQL |
-| `release` | Versioned release | Immutable artifacts, inventory, deployment evidence, readiness, smoke test, and rollback reference |
-
-The implementation uses path filters only to skip a job whose complete input surface is known. Changes to shared configuration, lock files, standards selection, or generators trigger every dependent job.
+**Rationale:** The release record references those job names, so a renamed job breaks the evidence trail.
 
 ## Conventions
 
 
 ### Apply the documented defaults (CI.CONVENTION.001)
 
-**Default:** Apply the documented defaults.
+**Default:** Keep one workflow per repository responsibility and use job names that match the release record.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation keeps one workflow per repository responsibility when a single workflow would obscure ownership. The implementation uses stable job names that match the release record. The implementation runs containerized integration tests and Playwright in CI rather than pre-commit hooks.
-
-Backend CI restores the solution in locked mode, builds once in Release, then tests with `--no-build`. Frontend CI installs once with the frozen root lockfile and invokes root scripts scoped to the affected application. Contract CI starts from the same source commit as the build and rejects any generated difference. Release jobs consume artifacts produced by required jobs rather than rebuilding source.
+**Rationale:** Containerized integration tests and browser tests run in the jobs the release record will later cite.
 
 ## Reference example
 
@@ -124,12 +90,12 @@ A backend-only pull request runs the Release build, test, dependency scan, docum
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| CI.GATES.001 | inspection | Pull request review asserts `run applicable gates on every pull request` in the owning specification and source paths. |
-| CI.DOCS.001 | inspection | Pull request review asserts `check code and documentation consistency` in the owning specification and source paths. |
-| CI.CONTRACTS.001 | inspection | Pull request review asserts `keep generated contracts fresh` in the owning specification and source paths. |
-| CI.SCHEMA.001 | static | Repository static check asserts `review schema artifacts` for the owning paths. |
-| CI.SUPPLY.001 | inspection | Pull request review asserts `scan dependencies and release artifacts` in the owning specification and source paths. |
-| CI.RELEASE.001 | inspection | Pull request review asserts `promote verified artifacts` in the owning specification and source paths. |
-| CI.PROTECTION.001 | inspection | Pull request review asserts `protect the default branch` in the owning specification and source paths. |
-| CI.JOBS.001 | inspection | Pull request review asserts `keep a canonical job graph` in the owning specification and source paths. |
-| CI.CONVENTION.001 | inspection | Pull request review asserts `apply the documented defaults` in the owning specification and source paths. |
+| CI.GATES.001 | inspection | The CI workflow runs each area gate on pull request and fails on any non-zero exit. |
+| CI.DOCS.001 | inspection | The CI `docs` job runs `node standards/tools/validate-consumer.mjs` and fails on an unresolved reference. |
+| CI.CONTRACTS.001 | inspection | The CI contract job regenerates the artifacts and fails through `git diff --exit-code`. |
+| CI.SCHEMA.001 | static | The CI `schema` job publishes the artifact and fails when it is absent or contains an unplanned destructive operation. |
+| CI.SUPPLY.001 | inspection | The CI supply-chain job fails on an unpinned action reference or an unexcepted advisory. |
+| CI.RELEASE.001 | operation | The release record names one artifact reference across every promoted environment. |
+| CI.PROTECTION.001 | inspection | Branch protection settings require the CI checks and a review before merge. |
+| CI.JOBS.001 | inspection | The CI workflow declares each job name from the table and the release record cites the same names. |
+| CI.CONVENTION.001 | inspection | Workflow review confirms each job name matches the release record it feeds. |

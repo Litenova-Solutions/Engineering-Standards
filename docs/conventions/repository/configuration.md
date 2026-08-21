@@ -8,124 +8,113 @@ Repository configuration should make builds repeatable and fail before a deploym
 ## Agent Summary {#agent-summary}
 
 
-- Pin the SDK at the repository root. (CONFIG.SDK.001)
-- Centralize .NET build settings. (CONFIG.BUILD.001)
-- Centralize NuGet versions. (CONFIG.NUGET.001)
-- Commit the tool manifest. (CONFIG.TOOLS.001)
-- Validate backend options at startup. (CONFIG.OPTIONS.001)
-- Validate frontend environment access. (CONFIG.FRONTEND.001)
-- Keep secrets outside source control. (CONFIG.SECRETS.001)
-- Use one frontend dependency graph. (CONFIG.PNPM.001)
-- Pin the JavaScript toolchain. (CONFIG.NODE.001)
+- The SDK is pinned at the root with patch roll-forward only. (CONFIG.SDK.001)
+- One props file owns the .NET build settings. (CONFIG.BUILD.001)
+- NuGet versions live in one central props file. (CONFIG.NUGET.001)
+- Local .NET tools are pinned in the tool manifest. (CONFIG.TOOLS.001)
+- Configuration binds to validated options at startup. (CONFIG.OPTIONS.001)
+- Frontends read environment values through one validated module. (CONFIG.FRONTEND.001)
+- Tracked configuration carries placeholders only. (CONFIG.SECRETS.001)
+- One workspace owns the frontend dependency graph. (CONFIG.PNPM.001)
+- The JavaScript toolchain is pinned in the root manifest. (CONFIG.NODE.001)
 
 ## Standards
 
 
 ### Pin the SDK at the repository root (CONFIG.SDK.001)
 
-**Requirement:** Repositories MUST pin the SDK at the repository root.
+**Requirement:** Root `global.json` MUST pin the manifest SDK version and permit patch roll-forward only.
 
-**Rationale:** Root `global.json` uses the SDK version from `standards.manifest.json` and permits patch roll-forward only. `dotnet` from the repository root and `apps/api/` selects the same feature band.
+**Rationale:** `dotnet` invoked from the repository root and from `apps/api/` then selects the same feature band.
 
 ### Centralize .NET build settings (CONFIG.BUILD.001)
 
-**Requirement:** Repositories MUST centralize .NET build settings.
+**Requirement:** `apps/api/Directory.Build.props` MUST set the profile target framework and enable nullable types, implicit usings, and warnings as errors.
 
-**Rationale:** `apps/api/Directory.Build.props` sets the target framework from the profile and enables:
-
-- Nullable reference types.
-- Implicit usings.
-- Warnings as errors.
-- Build-time code-style enforcement.
-- Deterministic builds.
-- Continuous integration build metadata when CI is active.
-
-The implementation does not enable preview language features without a project decision.
+**Rationale:** One file then owns the settings that would otherwise drift between projects.
 
 ### Centralize NuGet versions (CONFIG.NUGET.001)
 
-**Requirement:** Repositories MUST centralize NuGet versions.
+**Requirement:** `apps/api/Directory.Packages.props` MUST enable central package management and carry the exact manifest pins.
 
-**Rationale:** `apps/api/Directory.Packages.props` enables central package management and copies exact NuGet pins from the manifest. Individual project files contain package names without version attributes.
-
-Enable NuGet lock files and commit the lock file for every project. CI restores with locked mode and fails when dependency resolution differs from the committed graph.
+**Rationale:** Individual project files then reference package names without versions, so no project can drift.
 
 ### Commit the tool manifest (CONFIG.TOOLS.001)
 
-**Requirement:** Repositories MUST commit the tool manifest.
+**Requirement:** Root `.config/dotnet-tools.json` MUST pin every required local .NET tool.
 
-**Rationale:** Root `.config/dotnet-tools.json` pins every required local .NET tool. A tool version that corresponds to a framework package uses the compatible manifest pin.
+**Rationale:** A tool matching a framework package uses the compatible manifest pin, so local and CI runs use one version.
 
 ### Validate backend options at startup (CONFIG.OPTIONS.001)
 
-**Requirement:** Repositories MUST validate backend options at startup.
+**Requirement:** A configuration section MUST bind to a named options class validated for required fields, ranges, and formats at startup.
 
-**Rationale:** Each configuration section binds to a named options class. The implementation validates required fields, ranges, and formats during startup. The implementation does not access required settings through `configuration["Key"]!` or defer discovery until the first request.
+**Rationale:** Reading a required setting through a raw configuration lookup defers the failure to the first request that needs it.
 
 ### Validate frontend environment access (CONFIG.FRONTEND.001)
 
-**Requirement:** Repositories MUST validate frontend environment access.
+**Requirement:** A frontend MUST read environment variables through `lib/env.ts` and separate server-only from browser-visible values.
 
-**Rationale:** Each frontend reads environment variables through `lib/env.ts` or an explicit project equivalent. The frontend separates server-only and browser-visible values. Browser-visible names use the framework's public prefix.
-
-Application modules do not read `process.env` directly.
+**Rationale:** Browser-visible names use the framework prefix, so an unprefixed value cannot reach the bundle by accident.
 
 ### Keep secrets outside source control (CONFIG.SECRETS.001)
 
-**Requirement:** Repositories MUST keep secrets outside source control.
+**Requirement:** A tracked configuration file MUST contain only safe defaults and placeholders.
 
-**Rationale:** Tracked configuration files contain safe defaults and placeholders only. Secrets come from user secrets for local development and from the deployment platform for hosted environments.
-
-The implementation does not place credentials in `.env.example`, test snapshots, logs, container layers, generated files, or pull request descriptions.
+**Rationale:** Local development uses user secrets and hosted environments use the deployment platform, so no real value needs to be tracked.
 
 ### Use one frontend dependency graph (CONFIG.PNPM.001)
 
-**Requirement:** Repositories MUST use one frontend dependency graph.
+**Requirement:** A TypeScript repository MUST use one root `package.json`, `pnpm-workspace.yaml`, and `pnpm-lock.yaml`.
 
-**Rationale:** Repositories with TypeScript use one root `package.json`, `pnpm-workspace.yaml`, and `pnpm-lock.yaml`. The implementation uses frozen installation in CI. The implementation does not commit nested lockfiles under applications.
+**Rationale:** A nested lockfile lets one application resolve a different version than the workspace CI installs.
 
 ### Pin the JavaScript toolchain (CONFIG.NODE.001)
 
-**Requirement:** Repositories MUST pin the JavaScript toolchain.
+**Requirement:** Root `package.json` MUST declare the manifest pnpm release in `packageManager` and a compatible Node.js engine.
 
-**Rationale:** The root `package.json` declares the exact pnpm release from the manifest in `packageManager` and a Node.js engine compatible with the manifest-pinned LTS release. CI provisions that Node.js release and invokes the declared pnpm release.
+**Rationale:** CI provisions that Node.js release and invokes the declared pnpm release, so local and CI resolve identically.
 
-The implementation does not rely on a developer's global Node.js or pnpm version. A repository may add `.node-version` or an equivalent version-manager file. That file matches the manifest.
+### Pin the React version in the ESLint flat config (CONFIG.ESLINT.001)
+
+**Requirement:** A Next.js ESLint flat config MUST set a concrete `settings.react.version` rather than leave it at `detect`.
+
+**Rationale:** Version detection calls context APIs that the pinned ESLint release removed, and a concrete version skips detection entirely.
 
 ## Conventions
 
 
 ### Keep environment examples beside applications (CONFIG.CONVENTION.001)
 
-**Default:** Keep environment examples beside applications.
+**Default:** Keep a `.env.example` beside each frontend and deployable host listing required names and safe values.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Each frontend and deployable host may own a `.env.example` or configuration reference listing required names, safe example values. The owning options or environment module.
+**Rationale:** The example sits next to the options module that reads those names, so both change together.
 
 ### Keep local overrides untracked (CONFIG.CONVENTION.002)
 
-**Default:** Keep local overrides untracked.
+**Default:** Keep developer overrides in ignored local files or a platform secret store.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation uses ignored local settings files or platform secret stores for developer values. The implementation does not add a second committed environment-specific source when the deployment platform owns the value.
+**Rationale:** A second committed environment-specific source competes with the deployment platform for the same value.
 
 ### Keep logging configuration provider-neutral (CONFIG.CONVENTION.003)
 
-**Default:** Keep logging configuration provider-neutral.
+**Default:** Emit structured logs through standard logging abstractions and keep exporter configuration in hosts.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Application code emits structured logs through standard logging abstractions. Exporter and sink configuration remains in hosts and deployment settings.
+**Rationale:** Application code then carries no provider choice, so an exporter change stays inside deployment settings.
 
 ### Keep documentation directories out of build-artifact ignore rules (CONFIG.CONVENTION.004)
 
-**Default:** Keep documentation directories out of build-artifact ignore rules.
+**Default:** Exclude `docs/releases/` from build-artifact ignore rules such as `[Rr]elease/`.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A platform `.gitignore` commonly ignores build output with case-insensitive patterns such as `[Rr]elease/` and `[Rr]eleases/`. These patterns also match the required `docs/releases/` documentation directory and silently exclude release records from source control. The implementation adds an explicit negation immediately after the build-output patterns so the documentation directory is tracked:
+**Rationale:** A platform `.gitignore` commonly matches that documentation directory by accident and silently untracks release records.
 
 **Example:**
 
@@ -149,16 +138,17 @@ This informative example demonstrates `CONFIG.OPTIONS.001` and `CONFIG.SECRETS.0
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| CONFIG.SDK.001 | static | Repository static check asserts `pin the SDK at the repository root` for the owning paths. |
-| CONFIG.BUILD.001 | static | Repository static check asserts `centralize .NET build settings` for the owning paths. |
-| CONFIG.NUGET.001 | inspection | Pull request review asserts `centralize NuGet versions` in the owning specification and source paths. |
-| CONFIG.TOOLS.001 | inspection | Pull request review asserts `commit the tool manifest` in the owning specification and source paths. |
-| CONFIG.OPTIONS.001 | static | Repository static check asserts `validate backend options at startup` for the owning paths. |
-| CONFIG.FRONTEND.001 | static | Repository static check asserts `validate frontend environment access` for the owning paths. |
-| CONFIG.SECRETS.001 | inspection | Pull request review asserts `keep secrets outside source control` in the owning specification and source paths. |
-| CONFIG.PNPM.001 | static | Repository static check asserts `use one frontend dependency graph` for the owning paths. |
-| CONFIG.NODE.001 | static | Repository static check asserts `pin the JavaScript toolchain` for the owning paths. |
-| CONFIG.CONVENTION.001 | inspection | Pull request review asserts `keep environment examples beside applications` in the owning specification and source paths. |
-| CONFIG.CONVENTION.002 | inspection | Pull request review asserts `keep local overrides untracked` in the owning specification and source paths. |
-| CONFIG.CONVENTION.003 | static | Repository static check asserts `keep logging configuration provider-neutral` for the owning paths. |
-| CONFIG.CONVENTION.004 | static | Repository static check asserts `keep documentation directories out of build-artifact ignore rules` for the owning paths. |
+| CONFIG.SDK.001 | static | `global.json` declares the manifest SDK version with patch-only roll-forward. |
+| CONFIG.BUILD.001 | static | `Directory.Build.props` declares the target framework and each required build setting. |
+| CONFIG.NUGET.001 | static | `Directory.Packages.props` enables central management and each project reference omits its version. |
+| CONFIG.TOOLS.001 | static | `.config/dotnet-tools.json` pins each required tool at its manifest-compatible version. |
+| CONFIG.OPTIONS.001 | static | `OptionsValidationTests` asserts startup fails when a required configuration value is absent or malformed. |
+| CONFIG.FRONTEND.001 | static | `node standards/tools/validate-ui.mjs` reports direct environment access outside the environment module. |
+| CONFIG.SECRETS.001 | static | The CI secret scan fails when a tracked file under `apps/` or the root carries a credential-shaped value. |
+| CONFIG.PNPM.001 | static | `pnpm install --frozen-lockfile` succeeds from the root and no nested lockfile is tracked. |
+| CONFIG.NODE.001 | static | Root `package.json` declares the manifest pnpm release and its Node.js engine range. |
+| CONFIG.ESLINT.001 | static | The flat config declares a concrete `settings.react.version` and `pnpm lint` runs without a detection error. |
+| CONFIG.CONVENTION.001 | inspection | Each frontend and host directory holds an environment example listing required names with safe values. |
+| CONFIG.CONVENTION.002 | inspection | The ignore rules cover local settings files and no second environment-specific source is tracked. |
+| CONFIG.CONVENTION.003 | static | Application source resolves only logging abstractions, and exporters appear in host registration. |
+| CONFIG.CONVENTION.004 | static | `git check-ignore docs/releases` reports no match. |

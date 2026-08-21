@@ -8,21 +8,21 @@ Project references and package ownership make the application boundary visible t
 ## Agent Summary {#agent-summary}
 
 
-- Use the project reference graph. (DEP.PROJECTS.001)
-- Keep Domain package-free. (DEP.DOMAIN.001)
-- Keep Application dependencies narrow. (DEP.APPLICATION.001)
-- Keep providers in Infrastructure. (DEP.INFRASTRUCTURE.001)
-- Pin every dependency centrally. (DEP.PINS.001)
-- Approve new packages explicitly. (DEP.APPROVAL.001)
-- Keep frontend applications isolated. (DEP.FRONTEND.001)
-- Keep the approved web UI dependency boundary. (DEP.FRONTEND.UI.001)
+- Project references match the declared graph. (DEP.PROJECTS.001)
+- Domain carries no package reference. (DEP.DOMAIN.001)
+- Application references only its permitted abstractions. (DEP.APPLICATION.001)
+- Provider packages live only in Infrastructure. (DEP.INFRASTRUCTURE.001)
+- Every dependency version comes from the manifest. (DEP.PINS.001)
+- A new package arrives with a decision and a manifest pin. (DEP.APPROVAL.001)
+- Frontends stay isolated from each other's source. (DEP.FRONTEND.001)
+- Web UI packages come from the manifest baseline. (DEP.FRONTEND.UI.001)
 
 ## Standards
 
 
 ### Use the project reference graph (DEP.PROJECTS.001)
 
-**Requirement:** Repositories MUST use the project reference graph.
+**Requirement:** A project reference MUST follow the graph in the table in this section and add no other edge.
 
 **Example:**
 
@@ -40,92 +40,76 @@ Project references and package ownership make the application boundary visible t
 
 ### Keep Domain package-free (DEP.DOMAIN.001)
 
-**Requirement:** Repositories MUST keep Domain package-free.
+**Requirement:** The Domain project MUST reference no package beyond the .NET base class library.
 
-**Rationale:** Domain uses the .NET base class library and project-owned types. It does not reference Marten, Entity Framework Core, LiteBus, ASP.NET Core, dependency injection, serialization packages, or logging packages.
+**Rationale:** Marten, EF Core, LiteBus, ASP.NET Core, injection, serialization, and logging packages all stay outside.
 
 ### Keep Application dependencies narrow (DEP.APPLICATION.001)
 
-**Requirement:** Repositories MUST keep Application dependencies narrow.
+**Requirement:** Application MUST reference only LiteBus command and query abstractions, required read abstractions, and Microsoft abstractions its ports need.
 
-**Rationale:** Application can reference LiteBus command and query abstractions. It can reference Marten query abstractions required by the selected read model. Public external ports can use required Microsoft abstraction packages.
-
-Application does not reference ASP.NET Core, provider SDKs, Infrastructure, or a full mediator metapackage.
+**Rationale:** A provider package in Application makes the coordination layer depend on the technology Infrastructure was meant to hide.
 
 ### Keep providers in Infrastructure (DEP.INFRASTRUCTURE.001)
 
-**Requirement:** Repositories MUST keep providers in Infrastructure.
+**Requirement:** A database provider, external SDK, resilience, discovery, or serialization adapter MUST live in Infrastructure.
 
-**Rationale:** Database providers, external SDKs, HTTP resilience, service discovery, serialization adapters, and provider-specific options live in Infrastructure.
+**Rationale:** Infrastructure is the only layer that a provider change is allowed to reach.
 
 ### Pin every dependency centrally (DEP.PINS.001)
 
-**Requirement:** Repositories MUST pin every dependency centrally.
+**Requirement:** A NuGet or npm version MUST match `standards.manifest.json` and resolve through central management or the committed lockfile.
 
-**Rationale:** NuGet and npm versions match `standards.manifest.json`. NuGet projects omit inline versions and use `Directory.Packages.props`. The workspace uses one committed `pnpm-lock.yaml` with exact resolved versions.
+**Rationale:** An inline version in a project file is invisible to the manifest that is supposed to own it.
 
 ### Approve new packages explicitly (DEP.APPROVAL.001)
 
-**Requirement:** Repositories MUST approve new packages explicitly.
+**Requirement:** A package absent from the manifest MUST have a decision naming its use case, alternatives, owning layer, operating cost, and removal condition.
 
-**Rationale:** A package absent from the manifest requires a decision that names the use case, reason, alternatives, owning layer, operational cost, and removal condition. The implementation updates the manifest in the same standards or consumer override change.
-
-Extensions may introduce only the packages listed in their dependency section and pinned by the manifest.
+**Rationale:** The manifest is then updated in the same change, so the pin and its justification arrive together.
 
 ### Keep frontend applications isolated (DEP.FRONTEND.001)
 
-**Requirement:** Repositories MUST keep frontend applications isolated.
+**Requirement:** A frontend MUST NOT import another application's source or another module's internal feature files.
 
-**Rationale:** A frontend cannot import another application's source or another module's internal feature files. Shared packages expose a documented public entry point and cannot depend on an application.
+**Rationale:** A shared package exposes a documented public entry point and depends on no application.
 
 ### Keep the approved web UI dependency boundary (DEP.FRONTEND.UI.001)
 
-**Requirement:** Repositories MUST keep the approved web UI dependency boundary.
+**Requirement:** A React web frontend MUST take its UI packages from the `uiBaseline` in `standards.manifest.json`.
 
-**Rationale:** React web frontends use the `uiBaseline` in `standards.manifest.json`: shadcn/ui with Tailwind CSS v4,
-Base UI, Lucide. The pinned utility packages. The direct source imports of installed shadcn
-components resolve to packages pinned by the manifest. A component that imports an unlisted package
-requires a decision and a manifest update before installation.
-
-Behavior-only packages such as TanStack Table, TanStack Virtual, form state, or data fetching may be
-added when a current use case activates them. Their rendered controls remain inside the shadcn/ui
-boundary. A second general purpose component library or a specialist visual package requires the UI
-companion exception and an explicit dependency review.
-
-The implementation keeps `@base-ui/react` as the new-frontend primitive dependency. `radix-ui` and individual Radix packages
-are compatibility dependencies for an existing Radix shadcn frontend only. They are not a reason to mix
-component bases in one application. React Native dependencies follow a separate platform profile.
+**Rationale:** That baseline pins shadcn/ui, Tailwind CSS v4, Base UI, Lucide, and the utility packages that the installed source imports directly.
 
 ## Conventions
 
 
 ### Reference only the LiteBus module required (DEP.CONVENTION.001)
 
-**Default:** Reference only the LiteBus module required.
+**Default:** Reference the LiteBus command, query, or event module that the code actually uses.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation uses command abstractions for commands, query abstractions for queries, and event abstractions for event reaction handlers. The implementation does not add a unified application bus or a broad package when the layer needs one module.
+**Rationale:** A unified application bus package pulls in contracts that the layer never dispatches.
 
 ### Keep generated packages dependency-light (DEP.CONVENTION.002)
 
-**Default:** Keep generated packages dependency-light.
+**Default:** Keep generated API types free of dependencies and limit the shared client to `openapi-fetch` and those types.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Generated API types contain types only. The shared API client may depend on `openapi-fetch` and the generated types. It does not own product state, UI behavior, or authentication policy.
+**Rationale:** A generated package that owns state, UI behavior, or authentication policy stops being regenerable.
 
 ### Keep test dependencies in test projects (DEP.CONVENTION.003)
 
-**Default:** Keep test dependencies in test projects.
+**Default:** Keep assertion, substitution, host, container, and architecture-test packages inside test projects.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Assertion, substitution, test host, container, and architecture-test packages do not enter production projects.
+**Rationale:** A test package referenced by a production project ships to production.
 
 ### Use this baseline package ownership (DEP.CONVENTION.004)
 
-**Default:** Use this baseline package ownership.
+**Default:** Assign each baseline package to the owning layer named in the table in this section.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -157,15 +141,15 @@ An Application query handler may inject `IQuerySession` because Marten is the se
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| DEP.PROJECTS.001 | inspection | Pull request review asserts `use the project reference graph` in the owning specification and source paths. |
-| DEP.DOMAIN.001 | inspection | Pull request review asserts `keep Domain package-free` in the owning specification and source paths. |
-| DEP.APPLICATION.001 | inspection | Pull request review asserts `keep Application dependencies narrow` in the owning specification and source paths. |
-| DEP.INFRASTRUCTURE.001 | inspection | Pull request review asserts `keep providers in Infrastructure` in the owning specification and source paths. |
-| DEP.PINS.001 | static | Repository static check asserts `pin every dependency centrally` for the owning paths. |
-| DEP.APPROVAL.001 | inspection | Pull request review asserts `approve new packages explicitly` in the owning specification and source paths. |
-| DEP.FRONTEND.001 | inspection | Pull request review asserts `keep frontend applications isolated` in the owning specification and source paths. |
-| DEP.FRONTEND.UI.001 | static | Repository static check asserts `keep the approved web UI dependency boundary` for the owning paths. |
-| DEP.CONVENTION.001 | inspection | Pull request review asserts `reference only the LiteBus module required` in the owning specification and source paths. |
-| DEP.CONVENTION.002 | static | Repository static check asserts `keep generated packages dependency-light` for the owning paths. |
-| DEP.CONVENTION.003 | test | An automated test citing `DEP.CONVENTION.003` asserts `keep test dependencies in test projects` at the affected boundary. |
-| DEP.CONVENTION.004 | inspection | Pull request review asserts `use this baseline package ownership` in the owning specification and source paths. |
+| DEP.PROJECTS.001 | inspection | `ArchitectureTests` asserts the project reference set matches the declared graph exactly. |
+| DEP.DOMAIN.001 | inspection | `ArchitectureTests` asserts the Domain project declares no package reference. |
+| DEP.APPLICATION.001 | inspection | `ArchitectureTests` asserts the Application package set matches the permitted list. |
+| DEP.INFRASTRUCTURE.001 | inspection | `ArchitectureTests` asserts each provider package is referenced only by Infrastructure. |
+| DEP.PINS.001 | static | The CI dependency check compares each resolved NuGet and npm version against `standards.manifest.json`. |
+| DEP.APPROVAL.001 | inspection | The decision record names the five fields and the manifest entry lands in the same pull request. |
+| DEP.FRONTEND.001 | inspection | `ImportBoundaryTests` asserts no cross-application or internal-feature import exists. |
+| DEP.FRONTEND.UI.001 | static | `node standards/tools/validate-ui.mjs` reports a UI package outside the manifest baseline. |
+| DEP.CONVENTION.001 | inspection | Project files reference only the LiteBus modules the code dispatches. |
+| DEP.CONVENTION.002 | static | The generated types package declares no dependency and the client declares only `openapi-fetch`. |
+| DEP.CONVENTION.003 | test | No production project references an assertion, substitution, host, container, or architecture-test package. |
+| DEP.CONVENTION.004 | inspection | Each baseline package appears in the layer that the ownership table assigns. |
