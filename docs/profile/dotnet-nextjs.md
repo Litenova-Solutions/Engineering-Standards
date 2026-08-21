@@ -37,12 +37,12 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 ## Composition
 
-### Repository
+### Workspace
 
-- [Repository structure](../conventions/repository/structure.md)
-- [Naming and code style](../conventions/repository/naming.md)
-- [Dependencies](../conventions/repository/dependencies.md)
-- [Configuration](../conventions/repository/configuration.md)
+- [Workspace structure](../conventions/workspace/structure.md)
+- [Naming and code style](../conventions/workspace/naming.md)
+- [Dependencies](../conventions/workspace/dependencies.md)
+- [Configuration](../conventions/workspace/configuration.md)
 - [Authoring standard](../foundations/authoring-standard.md)
 
 ### Backend

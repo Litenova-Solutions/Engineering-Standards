@@ -21,11 +21,11 @@ Repository configuration should make builds repeatable and fail before a deploym
 ## Standards
 
 
-### Pin the SDK at the repository root (CONFIG.SDK.001)
+### Pin the SDK at the workspace root (CONFIG.SDK.001)
 
 **Requirement:** Root `global.json` MUST pin the manifest SDK version and permit patch roll-forward only.
 
-**Rationale:** `dotnet` invoked from the repository root and from `apps/api/` then selects the same feature band.
+**Rationale:** `dotnet` invoked from the workspace root and from `apps/api/` then selects the same feature band.
 
 ### Centralize .NET build settings (CONFIG.BUILD.001)
 
@@ -65,7 +65,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 ### Use one frontend dependency graph (CONFIG.PNPM.001)
 
-**Requirement:** A TypeScript repository MUST use one root `package.json`, `pnpm-workspace.yaml`, and `pnpm-lock.yaml`.
+**Requirement:** A TypeScript workspace MUST use one root `package.json`, `pnpm-workspace.yaml`, and `pnpm-lock.yaml`.
 
 **Rationale:** A nested lockfile lets one application resolve a different version than the workspace CI installs.
 
@@ -131,7 +131,7 @@ Confirm with `git check-ignore docs/releases/<file>.md` that no release record i
 
 This informative example demonstrates `CONFIG.OPTIONS.001` and `CONFIG.SECRETS.001`.
 
-`EmailOptions` binds the `Email` section, validates its endpoint and sender during startup, and is injected through `IOptions<EmailOptions>`. The consumer repository's secret store supplies the credential.
+`EmailOptions` binds the `Email` section, validates its endpoint and sender during startup, and is injected through `IOptions<EmailOptions>`. The consumer workspace secret store supplies the credential.
 
 ## Verification
 

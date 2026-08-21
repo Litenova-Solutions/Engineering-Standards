@@ -133,7 +133,7 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Including `src` or `apps` in a namespace couples the type name to a repository layout decision.
+**Rationale:** Including `src` or `apps` in a namespace couples the type name to a workspace layout decision.
 
 ### Avoid generic type names (NAME.CONVENTION.003)
 

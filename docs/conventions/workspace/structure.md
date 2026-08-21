@@ -1,4 +1,4 @@
-# Repository Structure
+# Workspace Structure
 
 ## Intent
 
@@ -20,9 +20,9 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
 
 ### Use the canonical root tree (REPO.STRUCTURE.001)
 
-**Requirement:** A consumer repository MUST use the canonical root tree declared in this section.
+**Requirement:** A consumer workspace MUST use the canonical root tree declared in this section.
 
-**Example:** Consumer repositories use this shape:
+**Example:** Consumer workspaces use this shape:
 
 ```text
 {repo}/
@@ -63,7 +63,7 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
   standards.project.json
 ```
 
-The example does not place the .NET solution or a frontend application at the repository root.
+The example does not place the .NET solution or a frontend application at the workspace root.
 
 ### Keep .NET production and test projects separate (REPO.DOTNET.001)
 
@@ -156,7 +156,7 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| REPO.STRUCTURE.001 | inspection | Root tree review compares the repository against the layout in this section. |
+| REPO.STRUCTURE.001 | inspection | Root tree review compares the workspace against the layout in this section. |
 | REPO.DOTNET.001 | test | `SolutionStructureTests` asserts each project resolves under its declared source or test root. |
 | REPO.APPS.001 | inspection | Root tree review confirms each runnable application sits under `apps/` and each library under `packages/`. |
 | REPO.PACKAGES.001 | inspection | Package review records the two consumers or the generated-output purpose for each shared package. |

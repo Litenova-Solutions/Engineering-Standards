@@ -183,9 +183,9 @@ The extension adds no application package and replaces no baseline rule.
 
 **Rationale:** The Dockerfile stays near the project that defines its runtime output.
 
-### Build from the repository root (EXT.CONTAINERS.CONVENTION.002)
+### Build from the workspace root (EXT.CONTAINERS.CONVENTION.002)
 
-**Default:** Build images from the repository root when shared project or package files are required.
+**Default:** Build images from the workspace root when shared project or package files are required.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 

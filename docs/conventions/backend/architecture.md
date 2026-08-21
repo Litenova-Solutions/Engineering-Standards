@@ -43,7 +43,7 @@ apps/api/src/{ProjectName}.WebApi/
 
 **Requirement:** A project reference MUST point inward, so Domain references no outer layer and WebApi composes the process.
 
-**Rationale:** Application coordinates Domain, and Infrastructure implements the boundaries both declare. The reference matrix in [Dependencies](../repository/dependencies.md) applies exactly.
+**Rationale:** Application coordinates Domain, and Infrastructure implements the boundaries both declare. The reference matrix in [Dependencies](../workspace/dependencies.md) applies exactly.
 
 ### Own each layer's contract types (ARCH.CONTRACTS.001)
 

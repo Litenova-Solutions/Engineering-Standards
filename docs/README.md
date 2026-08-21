@@ -19,12 +19,12 @@ Use this index to load the canonical foundation, profile, convention, extension,
 
 The profile selects every baseline convention. Exact versions and composition remain in `standards.manifest.json`.
 
-## Repository Conventions
+## Workspace Conventions
 
-- [Repository structure](conventions/repository/structure.md)
-- [Naming](conventions/repository/naming.md)
-- [Dependencies](conventions/repository/dependencies.md)
-- [Configuration](conventions/repository/configuration.md)
+- [Workspace structure](conventions/workspace/structure.md)
+- [Naming](conventions/workspace/naming.md)
+- [Dependencies](conventions/workspace/dependencies.md)
+- [Configuration](conventions/workspace/configuration.md)
 
 ## Backend Conventions
 

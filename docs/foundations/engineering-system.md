@@ -25,7 +25,7 @@ Agent-led execution increases the need for explicit technical concepts. Agents d
 
 ### Why the system exists
 
-Without a shared engineering system, two capable contributors or agents can implement the same request with different boundaries, names, transaction behavior, and verification. Each local result may compile while the repository loses a coherent model.
+Without a shared engineering system, two capable contributors or agents can implement the same request with different boundaries, names, transaction behavior, and verification. Each local result may compile while the workspace loses a coherent model.
 
 The system addresses five recurring problems:
 
@@ -47,7 +47,7 @@ The system contains one delivery approach and one operating model:
 | Specification-Driven Delivery | Approved specifications select work and define completion. | `orders.cancel-order` defines behavior before its Command, endpoint, and tests are accepted. |
 | Agent-Driven Engineering | Agents perform substantial engineering execution within approved scope and report decisions they cannot make. | An agent loads the cancellation specification, implements it, runs its checks, and reports an unknown refund policy. |
 
-`Specification` means an approved, versioned statement of required behavior or constraint. `Driven` means engineering work starts from that statement and completion is judged against it. A specification is more than a prompt because it remains in the repository after one agent session ends.
+`Specification` means an approved, versioned statement of required behavior or constraint. `Driven` means engineering work starts from that statement and completion is judged against it. A specification is more than a prompt because it remains in the workspace after one agent session ends.
 
 `Agent` means a software system that can inspect context, reason about a bounded task, change repository artifacts, and run verification under delegated authority. `Agent-driven` describes who performs much of the execution. It does not transfer business decision authority to the agent.
 

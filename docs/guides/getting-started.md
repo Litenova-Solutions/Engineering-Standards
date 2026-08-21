@@ -16,18 +16,18 @@ Each step links the standard that governs it. Read that page before running the 
 
 ### Pin
 
-1. Add this repository as a submodule or another pinned dependency, following [repository structure](../conventions/repository/structure.md).
+1. Add this repository as a submodule or another pinned dependency, following [workspace structure](../conventions/workspace/structure.md).
 2. Copy `standards.project.json` and `project-agents.md` from the [template index](../../templates/docs/README.md), then fill every placeholder.
 
 ### Configure
 
-3. Create toolchain, package, and build configuration from the manifest pins, following [configuration](../conventions/repository/configuration.md).
-4. Add only the packages the manifest already pins, following [dependencies](../conventions/repository/dependencies.md).
+3. Create toolchain, package, and build configuration from the manifest pins, following [configuration](../conventions/workspace/configuration.md).
+4. Add only the packages the manifest already pins, following [dependencies](../conventions/workspace/dependencies.md).
 
 ### Structure
 
 5. Create the API solution, the four application projects, AppHost, ServiceDefaults, and the baseline test projects, following [architecture](../conventions/backend/architecture.md) and [backend testing](../conventions/quality/backend-testing.md).
-6. Apply the file, type, and folder names in [naming](../conventions/repository/naming.md).
+6. Apply the file, type, and folder names in [naming](../conventions/workspace/naming.md).
 
 ### Specify
 
