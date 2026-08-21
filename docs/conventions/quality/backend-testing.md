@@ -186,7 +186,7 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 | BTEST.COVERAGE.001 | operation | The CI test job publishes coverage as a review artifact and gates on no percentage threshold. |
 | BTEST.GENERATED.001 | test | The CI contract job regenerates `apps/api/openapi/` and typed clients, then fails on any tree difference. |
 | BTEST.HARNESS.001 | test | `IntegrationTests` resolves its container fixture, `ApiFactory`, and `DatabaseReset` from one shared harness. |
-| BTEST.CONVENTION.001 | test | Folder review compares each test tree against its production module list, or records a named local replacement. |
+| BTEST.CONVENTION.001 | inspection | Folder review compares each test tree against its production module list, or records a named local replacement. |
 | BTEST.CONVENTION.002 | test | `TestNamingTests` asserts each test class name matches a production type and each method carries the three-part form. |
-| BTEST.CONVENTION.003 | test | Builder review confirms each builder produces a valid aggregate by default through its domain factory. |
-| BTEST.CONVENTION.004 | test | Assertion review confirms each test asserts its named outcome rather than a whole-object snapshot. |
+| BTEST.CONVENTION.003 | inspection | Builder review confirms each builder produces a valid aggregate by default through its domain factory. |
+| BTEST.CONVENTION.004 | inspection | Assertion review confirms each test asserts its named outcome rather than a whole-object snapshot. |

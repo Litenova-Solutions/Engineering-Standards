@@ -111,7 +111,7 @@
 ## v1.7.0
 
 - Added `API.OPENAPI.003`, which requires the generated contract to publish precise, complete schemas: a closed-set field or parameter declares its values as an `enum` (a response field projected from a Domain state hierarchy or discriminated union publishes its allowed values as a typed union rather than an open `string`, with the `enum` living only at the transport boundary per `DOMAIN.CLOSEDSET.001`); a parameter declares its real bounds, format, allowed values, and a description for a non-obvious business limit; and an operation that requires a control header declares it as a required parameter.
-- Extended `EXT.IDEMPOTENCY.OUTCOME.001` guidance so the `Idempotency-Key` header is declared as a required parameter on every operation that requires it, matching `API.OPENAPI.003`, instead of surfacing on only some operations.
+- Extended `EXT.CONCURRENCY.IDEMPOTENTOUT.001` guidance so the `Idempotency-Key` header is declared as a required parameter on every operation that requires it, matching `API.OPENAPI.003`, instead of surfacing on only some operations.
 - Added `EXT.OUTBOX.READINESS.001`, which separates a dependency outage from a message failure: a Worker that cannot reach its store or finds no schema (cold start or pre-migration) backs off and rate-limits its logging rather than emitting a per-iteration exception storm, and gates its dispatch loop on readiness where the host exposes it. Added a matching cross-reference to `EXT.JOBS.RETRY.001`.
 - Bumped the manifest version to 1.7.0 and added the v1.7 consumer upgrade guide.
 

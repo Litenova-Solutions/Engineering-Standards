@@ -174,7 +174,7 @@ An extension therefore outranks a baseline it can no longer meaningfully replace
 |:---|:---|:---|:---|
 | `UI.*` | `frontend/components.md` and `frontend/ui-governance.md` | Two pages, one prefix | `components.md` takes `COMPONENT.*`. `ui-governance.md` keeps `UI.*`. |
 | `FRONTEND.*` | `frontend/rendering.md` and `frontend/structure.md` | Two pages, one prefix | `rendering.md` takes `RENDER.*`. `structure.md` keeps `FRONTEND.*`. |
-| `DATA.*`, `STATE.*`, `FORM.*` | `frontend/data-and-state.md` alone | Three prefixes, one page. Only `DATA.CONVENTION.*` exists, so `STATE.*` and `FORM.*` have no convention namespace. | Unify under `DATA.*`: `STATE.OWNER.001` to `DATA.OWNER.001`, `FORM.CONTRACT.001` to `DATA.FORM.001`, `STATE.OPTIMISTIC.001` to `DATA.OPTIMISTIC.001`. |
+| `DATA.*`, `STATE.*`, `FORM.*` | `frontend/data-and-state.md` alone | Three prefixes, one page. Only `DATA.CONVENTION.*` exists, so `STATE.*` and `FORM.*` have no convention namespace. | Unify under `DATA.*`: `DATA.OWNER.001` to `DATA.OWNER.001`, `DATA.FORM.001` to `DATA.FORM.001`, `DATA.OPTIMISTIC.001` to `DATA.OPTIMISTIC.001`. |
 | `PERSIST.CONVENTION.*` | `backend/persistence-marten.md`, whose Standards are `PERSIST.*` | Breaks the rule that a convention ID matches `<OWNING-SCOPE>.CONVENTION.<NNN>` | `PERSIST.CONVENTION.001` through `006` become `PERSIST.CONVENTION.001` through `006`. |
 | `EXT.*` | All 15 extension pages | None. Disambiguated by a second segment. | No change. This is the pattern the others should follow. |
 
@@ -399,7 +399,7 @@ Across `docs/` and the root Markdown files, the bare phrase "the repository" occ
 
 **Observation.** All 705 IDs are unique, and 39 of 41 pages hold one Standards prefix, so this is a residue rather than a systemic failure. The extension pages show the pattern that works: one shared `EXT.` root disambiguated by a second segment.
 
-**Impact.** A reader or agent given `UI.STATES.001` or `FRONTEND.CACHE.001` cannot tell which page owns it without a search. The `PERSIST.CONVENTION.*` case is a live rule violation the validator does not detect.
+**Impact.** A reader or agent given `COMPONENT.STATES.001` or `RENDER.CACHE.001` cannot tell which page owns it without a search. The `PERSIST.CONVENTION.*` case is a live rule violation the validator does not detect.
 
 **Recommendation.** Apply the reassignments in section 4 during the AUD-001 repair, while each page is already open. Add rule `ID_PREFIX_OWNERSHIP` asserting one Standards prefix per page, no prefix on two pages, and convention prefixes matching their page's Standards prefix.
 

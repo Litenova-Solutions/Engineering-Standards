@@ -8,30 +8,28 @@ Frontend tests should prove use-case behavior at the cheapest boundary that repr
 ## Agent Summary {#agent-summary}
 
 
-- Match test level to risk. (FTEST.LEVEL.001)
-- Trace acceptance behavior. (FTEST.TRACE.001)
-- Test observable states. (FTEST.STATES.001)
-- Keep mocks at owned boundaries. (FTEST.MOCKS.001)
-- Isolate browser tests. (FTEST.ISOLATION.001)
-- Run the changed application gates. (FTEST.GATES.001)
-- Prove controlled UI changes. (FTEST.UI.001)
+- Test level matches the risk it covers. (FTEST.LEVEL.001)
+- Tests proving acceptance criteria cite their identifier. (FTEST.TRACE.001)
+- Tests assert observable behavior in every applicable state. (FTEST.STATES.001)
+- Mocks stay at owned contract boundaries. (FTEST.MOCKS.001)
+- Browser tests own their data and context. (FTEST.ISOLATION.001)
+- A changed frontend runs its five gate commands. (FTEST.GATES.001)
+- UI changes run the evidence their vocabulary declares. (FTEST.UI.001)
 
 ## Standards
 
 
 ### Match test level to risk (FTEST.LEVEL.001)
 
-**Requirement:** Frontend tests MUST match test level to risk.
+**Requirement:** A frontend MUST use unit tests for pure logic, component tests for single-component interaction, and Playwright for navigation and integration.
 
-**Rationale:** The implementation uses unit tests for pure formatting, mapping, validation, and state transitions. The implementation uses component tests for user interaction inside one component boundary. The implementation uses Playwright for navigation, authentication, browser integration, and end-to-end tests.
-
-The implementation does not add a browser test for every static route or a snapshot in place of behavior assertions.
+**Rationale:** Matching level to risk keeps the fast tests fast and reserves browser runs for behavior only a browser proves.
 
 ### Trace acceptance behavior (FTEST.TRACE.001)
 
-**Requirement:** Frontend tests MUST trace acceptance behavior.
+**Requirement:** A frontend test proving an acceptance criterion MUST include that criterion identifier in its title or metadata.
 
-**Rationale:** When a frontend test proves an acceptance criterion from a verified Use case, include its exact ID in the test title or metadata.
+**Rationale:** The identifier connects browser evidence to the approved behavior it proves.
 
 **Example:**
 
@@ -43,79 +41,60 @@ test('[AC-POSTS-CREATE-DRAFT-01] creates a draft', async ({ page }) => {
 
 ### Test observable states (FTEST.STATES.001)
 
-**Requirement:** Frontend tests MUST test observable states.
+**Requirement:** A frontend test MUST assert observable behavior across loading, empty, error, forbidden, not-found, pending, validation, and success states.
 
-**Rationale:** Tests cover applicable loading, empty, error, forbidden, not-found, pending mutation, validation, and success behavior. Assertions use behavior that a user can observe and operate.
+**Rationale:** An assertion on internal state passes while the rendered page stays broken.
 
 ### Keep mocks at owned boundaries (FTEST.MOCKS.001)
 
-**Requirement:** Frontend tests MUST keep mocks at owned boundaries.
+**Requirement:** A frontend test MUST NOT mock React, framework rendering internals, generated types, or implementation-private functions.
 
-**Rationale:** Component tests may replace the typed API operation or server action boundary. The implementation does not mock React, Next.js rendering internals, generated types, or implementation-private functions.
+**Rationale:** A component test may still replace the typed API operation or server action boundary, because those are owned contracts.
 
 ### Isolate browser tests (FTEST.ISOLATION.001)
 
-**Requirement:** Frontend tests MUST isolate browser tests.
+**Requirement:** A browser test MUST create or identify its own data, authentication context, and expected state.
 
-**Rationale:** Each browser test creates or identifies its own data, authentication context, and expected state. Tests do
-not depend on execution order or mutable data left by another case. The project records whether a test
-uses one isolated worker, one fixture per test, a seeded read-only fixture, or a disposable browser
-context. A test that needs shared state names the owner, reset operation, and reason.
-
-The default is one independent browser context per test and a deterministic worker count in CI. A failed
-test is rerun only to diagnose the failure. The implementation does not increase retries, serialize the suite, or share a
-mutable fixture as a way to make an unexplained failure pass.
+**Rationale:** A test depending on execution order or leftover data fails for reasons unrelated to the change under review.
 
 ### Run the changed application gates (FTEST.GATES.001)
 
-**Requirement:** Frontend tests MUST run the changed application gates.
+**Requirement:** A changed frontend MUST run frozen installation, lint, type checking, Vitest, and a production build.
 
-**Rationale:** Each changed frontend runs frozen installation, lint, type checking, Vitest, and production build. The implementation runs Playwright when a browser end-to-end flow, route, authentication, or browser integration changes.
+**Rationale:** Playwright runs additionally when a browser flow, route, authentication, or browser integration changes.
 
 ### Prove controlled UI changes (FTEST.UI.001)
 
-**Requirement:** Frontend tests MUST prove controlled UI changes.
+**Requirement:** A primitive, pattern, token, preset, source-lock, or page-contract change MUST run the narrowest evidence its risk requires.
 
-**Rationale:** For a primitive, pattern, token, preset, source-lock, or page-contract change, select affected states from the frontend UI vocabulary. The implementation runs the narrowest evidence that represents the risk:
-
-- component tests for interaction, validation, pending, disabled, and error states;
-- keyboard and focus checks for every interactive path, including dialog or menu return focus;
-- accessible-name, label, role, status-announcement, and automated accessibility checks;
-- compact and wide browser checks for every responsive mode in the page contract;
-- direct-navigation checks for the declared initial scroll and active element;
-- visual comparisons in a declared browser, viewport, font-loading, and OS environment;
-- manual screen-reader, zoom, contrast, and reduced-motion checks for regulated or high-risk flows.
-
-Before first release, the product profile has the minimum browser evidence in [controlled UI governance](ui-governance.md). The implementation repeats it when the shell or preset changes.
-
-The implementation does not update a visual baseline automatically after a failure. Baseline review covers the rendered change, source diff, and affected vocabulary or page contract.
+**Rationale:** The affected states come from the frontend UI vocabulary, so evidence follows the change rather than a fixed suite.
 
 ## Conventions
 
 
 ### Keep focused tests beside source (FTEST.CONVENTION.001)
 
-**Default:** Keep focused tests beside source.
+**Default:** Name focused tests `*.test.ts` or `*.test.tsx` beside their module, and keep Playwright cases under one `tests/e2e/` root.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation uses `*.test.ts` or `*.test.tsx` beside the tested module. The implementation keeps Playwright cases under one application-owned `tests/e2e/` root with page objects or fixtures under `tests/support/` only when reused.
+**Rationale:** Support fixtures and page objects then sit under one `tests/support/` folder rather than beside features.
 
 ### Query by accessible behavior (FTEST.CONVENTION.002)
 
-**Default:** Query by accessible behavior.
+**Default:** Query elements by role, label, name, or visible text before reaching for a test identifier.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation prefers roles, labels, names, and visible text. The implementation uses test IDs only when no stable user-facing selector represents the element.
+**Rationale:** A query by accessible name fails when the accessible name breaks, which is the behavior worth protecting.
 
 ### Keep test support narrow (FTEST.CONVENTION.003)
 
-**Default:** Keep test support narrow.
+**Default:** Limit test support to render helpers for required providers and request mocks.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation creates render helpers for required providers and request mocks. The implementation does not create a second application framework inside test support.
+**Rationale:** Support code that grows into a second application framework becomes its own untested surface.
 
 ## Reference example
 
@@ -128,13 +107,13 @@ This informative example demonstrates `FTEST.STATES.001`, `FTEST.MOCKS.001`, and
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| FTEST.LEVEL.001 | test | An automated test citing `FTEST.LEVEL.001` asserts `match test level to risk` at the affected boundary. |
-| FTEST.TRACE.001 | test | An automated test citing `FTEST.TRACE.001` asserts `trace acceptance behavior` at the affected boundary. |
-| FTEST.STATES.001 | test | An automated test citing `FTEST.STATES.001` asserts `test observable states` at the affected boundary. |
-| FTEST.MOCKS.001 | test | An automated test citing `FTEST.MOCKS.001` asserts `keep mocks at owned boundaries` at the affected boundary. |
-| FTEST.ISOLATION.001 | test | An automated test citing `FTEST.ISOLATION.001` asserts `isolate browser tests` at the affected boundary. |
-| FTEST.GATES.001 | test | An automated test citing `FTEST.GATES.001` asserts `run the changed application gates` at the affected boundary. |
-| FTEST.UI.001 | test | An automated test citing `FTEST.UI.001` asserts `prove controlled UI changes` at the affected boundary. |
-| FTEST.CONVENTION.001 | test | An automated test citing `FTEST.CONVENTION.001` asserts `keep focused tests beside source` at the affected boundary. |
-| FTEST.CONVENTION.002 | test | An automated test citing `FTEST.CONVENTION.002` asserts `query by accessible behavior` at the affected boundary. |
-| FTEST.CONVENTION.003 | test | An automated test citing `FTEST.CONVENTION.003` asserts `keep test support narrow` at the affected boundary. |
+| FTEST.LEVEL.001 | inspection | Test review compares each new test against the level its risk requires. |
+| FTEST.TRACE.001 | test | `node standards/tools/validate-consumer.mjs` resolves each cited acceptance identifier to its use case. |
+| FTEST.STATES.001 | test | `ComponentStateTests` asserts each applicable state through user-observable output. |
+| FTEST.MOCKS.001 | test | `TestBoundaryTests` asserts no test replaces a framework internal or private function. |
+| FTEST.ISOLATION.001 | test | `node standards/tools/validate-ui.mjs` and a randomized Playwright order confirm no case depends on another. |
+| FTEST.GATES.001 | test | The CI frontend job runs `pnpm lint`, `type-check`, `test`, and `build`, failing on any non-zero exit. |
+| FTEST.UI.001 | test | `node standards/tools/validate-ui.mjs` resolves each changed surface to the evidence its vocabulary declares. |
+| FTEST.CONVENTION.001 | inspection | Test layout review confirms the two roots and the beside-source naming. |
+| FTEST.CONVENTION.002 | inspection | Test review confirms each test identifier query has no stable user-facing alternative. |
+| FTEST.CONVENTION.003 | inspection | Test support review confirms helpers stay limited to providers and request mocks. |
