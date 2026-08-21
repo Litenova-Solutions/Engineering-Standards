@@ -184,6 +184,12 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** `Use a hyphen.` is ASCII text; a typographic dash is not.
 
+### Exclude declared content paths from the ASCII check (WRITING.ASCII.002)
+
+**Requirement:** An ASCII check MUST exclude only the natural-language content paths that the project record declares.
+
+**Rationale:** A product whose subject is another language carries that language in its content files, where a diacritic is part of a word. Every document about that content stays in scope.
+
 ### Use one normative vocabulary (WRITING.NORMATIVE.002)
 
 **Requirement:** A Standards provision MUST use exactly one approved uppercase modal and no other uppercase normative term.
@@ -373,6 +379,7 @@ This informative example demonstrates `WRITING.REQUIREMENT.001`, `WRITING.EXAMPL
 | ID | Method | Evidence |
 |:---|:---|:---|
 | WRITING.ASCII.001 | static | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
+| WRITING.ASCII.002 | inspection | The project record lists each excluded content path, and review confirms documents about that content stay in scope. |
 | WRITING.NORMATIVE.002 | inspection | The provision parser reports one approved modal, and review confirms its intended force. |
 | WRITING.PROSE.001 | static | `WritingProseTests` asserts the prose scanner reports no length, contraction, or banned-term diagnostic. |
 | WRITING.VOICE.001 | inspection | The pull request checklist records actor, voice, procedure, and list review. |

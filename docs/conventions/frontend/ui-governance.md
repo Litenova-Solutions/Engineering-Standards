@@ -54,7 +54,7 @@ a native mobile system. A native frontend selects its own platform system throug
 
 **Requirement:** A Tailwind class MUST use a semantic token rather than an arbitrary value, raw palette value, or important modifier.
 
-**Rationale:** The default CSS surface is one global entry holding the Tailwind import, tokens, fonts, and documented resets.
+**Rationale:** The default CSS surface is one global entry holding the Tailwind import, tokens, fonts, and documented resets. The source scan skips generated build output and native runtime asset directories, and still rejects authored feature CSS.
 
 ### Track source changes (UI.FORKS.001)
 

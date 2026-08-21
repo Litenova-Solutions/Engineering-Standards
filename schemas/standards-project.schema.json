@@ -27,9 +27,12 @@
     "paths": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["apiSolution", "domainDocs", "uiDocs", "frontends"],
+      "required": ["domainDocs", "uiDocs", "frontends"],
       "properties": {
-        "apiSolution": { "$ref": "#/$defs/projectPath" },
+        "apiSolution": {
+          "description": "Path to the API solution. A consumer with no backend omits it and records a SCOPE.BACKEND.001 decision.",
+          "$ref": "#/$defs/projectPath"
+        },
         "domainDocs": { "$ref": "#/$defs/projectPath" },
         "uiDocs": { "$ref": "#/$defs/projectPath" },
         "frontends": {

@@ -63,10 +63,17 @@ function within(rootPath, candidate) {
   return path.resolve(candidate).startsWith(base);
 }
 
+const IGNORED_DIRECTORIES = new Set([
+  'node_modules', '.next', 'out', 'dist', 'build', '.output', '.svelte-kit', 'coverage', 'android', 'ios',
+]);
+
 function walk(directory, predicate, result = []) {
   if (!fs.existsSync(directory)) return result;
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-    if (entry.name === 'node_modules' || entry.name === '.next' || entry.name === 'dist' || entry.name === 'build') continue;
+    // Build output is generated, not authored. Scanning it reports the bundler's
+    // own CSS as a source violation, which no consumer can fix. Native runtime
+    // directories hold copied web assets rather than authored source.
+    if (IGNORED_DIRECTORIES.has(entry.name)) continue;
     const candidate = path.join(directory, entry.name);
     if (entry.isDirectory()) walk(candidate, predicate, result);
     else if (predicate(candidate)) result.push(candidate);
