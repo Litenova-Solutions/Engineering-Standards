@@ -12,6 +12,7 @@ Applications outside this boundary can use individual ideas but do not claim sel
 - Keep one business context and deployment boundary. (SCOPE.CONTEXT.001)
 - Select conditional extensions only when criteria apply. (SCOPE.EXTENSIONS.001)
 - Record unsupported architecture decisions explicitly. (SCOPE.OUTSIDE.001)
+- Declare a consumer that ships no backend. (SCOPE.BACKEND.001)
 
 ## Standards
 
@@ -42,6 +43,14 @@ Applications outside this boundary can use individual ideas but do not claim sel
 **Requirement:** A consumer MUST list every selected extension in `selectedExtensions` in `standards.project.json`.
 
 **Rationale:** The project record determines which extension boundaries apply to its work.
+
+### Declare a consumer that has no backend (SCOPE.BACKEND.001)
+
+**Requirement:** A consumer with no backend MUST omit `paths.apiSolution` and record a decision naming every baseline rule left without a surface.
+
+**Rationale:** A frontend and its build-time content can satisfy the workspace, frontend, security, operations, and continuous integration conventions with no API, database, or persistence layer. Adding a backend to obtain conformance contradicts `CORE.COMPLEXITY.001`.
+
+**Example:** `CI.GATES.001` already permits skipping a gate whose surface does not exist, so a missing backend gate is a recorded consequence rather than an unexplained absence.
 
 ### Record unsupported scope decisions (SCOPE.OUTSIDE.001)
 
@@ -81,6 +90,7 @@ A publishing product can support sign-in, draft creation, publication, and publi
 | SCOPE.CONTEXT.001 | inspection | Architecture review identifies one business language and deployment boundary. |
 | SCOPE.EXTENSIONS.001 | inspection | Every selected extension cites its activation condition. |
 | SCOPE.EXTENSIONS.002 | static | `ScopeExtensionsTests` asserts project schema validation resolves each selected extension. |
+| SCOPE.BACKEND.001 | static | `node standards/tools/validate-consumer.mjs` accepts an absent `paths.apiSolution` only alongside its recorded decision. |
 | SCOPE.OUTSIDE.001 | inspection | Unsupported architecture work cites a separate profile or project decision. |
 | SCOPE.CONVENTION.001 | inspection | Baseline topology uses one API and database or records a replacement. |
 | SCOPE.CONVENTION.002 | inspection | Capacity decision records load, target latency, and observed constraint. |
