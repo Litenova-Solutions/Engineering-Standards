@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.13.0
+
+- Added the `dotnet-blazor` platform profile for a product that runs entirely in the browser. It composes the workspace, application core, quality, and operations conventions, replaces the Next.js frontend set with six client conventions, and names every excluded baseline with its reason.
+- Added the client conventions under `docs/conventions/frontend-blazor/`: structure, rendering and routes, components, data and state, browser persistence, and testing. Each page owns one identifier prefix and states its obligations in the current provision form.
+- Added four client load plans to `standards.manifest.json` so an agent can route a task on the Blazor profile.
+- Added `SCOPE.BACKEND.001`. A consumer with no backend omits `paths.apiSolution` and records a decision naming every baseline rule left without a surface. Adding a backend to obtain conformance would contradict `CORE.COMPLEXITY.001`.
+- Made `paths.apiSolution` optional in `schemas/standards-project.schema.json` for that case.
+- Added `WRITING.ASCII.002`. An ASCII check excludes only the natural-language content paths that the project record declares, and every document about that content stays in scope.
+- Made `tools/validate-ui.mjs` skip generated build output and native runtime asset directories. Scanning them reported the bundler's own CSS as a source violation that no consumer could fix. Authored feature CSS is still rejected.
+
 ## v1.12.0
 
 - Repaired every baseline provision whose Requirement or Default only restated its own heading. The v1.11.0 conversion had moved each real obligation into `Rationale`, which the authoring standard declares informative, leaving the baseline formally non-normative. All 289 provisions across the 19 conventions, the platform profile, and the engineering system foundation now state their obligation in the normative block.
