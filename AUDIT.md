@@ -175,7 +175,7 @@ An extension therefore outranks a baseline it can no longer meaningfully replace
 | `UI.*` | `frontend/components.md` and `frontend/ui-governance.md` | Two pages, one prefix | `components.md` takes `COMPONENT.*`. `ui-governance.md` keeps `UI.*`. |
 | `FRONTEND.*` | `frontend/rendering.md` and `frontend/structure.md` | Two pages, one prefix | `rendering.md` takes `RENDER.*`. `structure.md` keeps `FRONTEND.*`. |
 | `DATA.*`, `STATE.*`, `FORM.*` | `frontend/data-and-state.md` alone | Three prefixes, one page. Only `DATA.CONVENTION.*` exists, so `STATE.*` and `FORM.*` have no convention namespace. | Unify under `DATA.*`: `STATE.OWNER.001` to `DATA.OWNER.001`, `FORM.CONTRACT.001` to `DATA.FORM.001`, `STATE.OPTIMISTIC.001` to `DATA.OPTIMISTIC.001`. |
-| `MARTEN.CONVENTION.*` | `backend/persistence-marten.md`, whose Standards are `PERSIST.*` | Breaks the rule that a convention ID matches `<OWNING-SCOPE>.CONVENTION.<NNN>` | `MARTEN.CONVENTION.001` through `006` become `PERSIST.CONVENTION.001` through `006`. |
+| `PERSIST.CONVENTION.*` | `backend/persistence-marten.md`, whose Standards are `PERSIST.*` | Breaks the rule that a convention ID matches `<OWNING-SCOPE>.CONVENTION.<NNN>` | `PERSIST.CONVENTION.001` through `006` become `PERSIST.CONVENTION.001` through `006`. |
 | `EXT.*` | All 15 extension pages | None. Disambiguated by a second segment. | No change. This is the pattern the others should follow. |
 
 These renames are free. The repository does not do backward compatibility, so a prefix change costs nothing to a consumer pinned to an earlier release, and nothing in the tooling reads a previous release. Apply them in the same pass as the AUD-001 repair, while every affected page is already open. See D2 and D7 in section 10 for why the repair itself should not also bump every suffix.
@@ -395,11 +395,11 @@ Across `docs/` and the root Markdown files, the bare phrase "the repository" occ
 
 **Evidence.** `UI.*` is split across `frontend/components.md`, 7 provisions, and `frontend/ui-governance.md`, 9. `FRONTEND.*` is split across `frontend/rendering.md`, 8, and `frontend/structure.md`, 6. `frontend/data-and-state.md` carries three Standards prefixes, `DATA.*`, `STATE.*`, and `FORM.*`, but only `DATA.CONVENTION.*`, so two of its scopes have no convention namespace.
 
-`backend/persistence-marten.md` carries `PERSIST.*` Standards and `MARTEN.CONVENTION.001` through `006`, against the authoring standard's own rule that "Every actionable convention has an ID matching `<OWNING-SCOPE>.CONVENTION.<NNN>`."
+`backend/persistence-marten.md` carries `PERSIST.*` Standards and `PERSIST.CONVENTION.001` through `006`, against the authoring standard's own rule that "Every actionable convention has an ID matching `<OWNING-SCOPE>.CONVENTION.<NNN>`."
 
 **Observation.** All 705 IDs are unique, and 39 of 41 pages hold one Standards prefix, so this is a residue rather than a systemic failure. The extension pages show the pattern that works: one shared `EXT.` root disambiguated by a second segment.
 
-**Impact.** A reader or agent given `UI.STATES.001` or `FRONTEND.CACHE.001` cannot tell which page owns it without a search. The `MARTEN.CONVENTION.*` case is a live rule violation the validator does not detect.
+**Impact.** A reader or agent given `UI.STATES.001` or `FRONTEND.CACHE.001` cannot tell which page owns it without a search. The `PERSIST.CONVENTION.*` case is a live rule violation the validator does not detect.
 
 **Recommendation.** Apply the reassignments in section 4 during the AUD-001 repair, while each page is already open. Add rule `ID_PREFIX_OWNERSHIP` asserting one Standards prefix per page, no prefix on two pages, and convention prefixes matching their page's Standards prefix.
 
@@ -565,7 +565,7 @@ Engineering-Standards/
         structure.md  naming.md  dependencies.md  configuration.md
       backend/
         architecture.md  domain.md  application.md
-        persistence-marten.md        MARTEN.CONVENTION.* becomes PERSIST.CONVENTION.*  AUD-012
+        persistence-marten.md        PERSIST.CONVENTION.* becomes PERSIST.CONVENTION.*  AUD-012
         api.md
       frontend/
         structure.md                 keeps FRONTEND.*
@@ -652,7 +652,7 @@ Every file below carries 100 percent tautological provisions and, except the two
 |:---|---:|---:|:---|:---|
 | `conventions/backend/domain.md` | 30 | 30 | Largest page, 944 lines. Highest security and correctness weight. | 001 003 |
 | `conventions/quality/security.md` | 19 | 18 | Sequence first with `api.md`. Highest-risk displaced obligations. | 001 003 |
-| `conventions/backend/persistence-marten.md` | 18 | 17 | `MARTEN.CONVENTION.*` becomes `PERSIST.CONVENTION.*`. | 001 003 012 |
+| `conventions/backend/persistence-marten.md` | 18 | 17 | `PERSIST.CONVENTION.*` becomes `PERSIST.CONVENTION.*`. | 001 003 012 |
 | `conventions/backend/api.md` | 17 | 17 | Contains `API.ACTOR.001` and `API.ERRORS.001`. Sequence first. | 001 003 |
 | `conventions/backend/application.md` | 17 | 17 | | 001 003 |
 | `conventions/backend/architecture.md` | 14 | 13 | | 001 003 |
@@ -792,7 +792,7 @@ Applying that principle strikes out any argument that weighs cost to a consumer 
 |:---|:---|:---|:---|:---|
 | `PROVISION_RESTATES_HEADING` | A `Requirement:` or `Default:` line, with actor and modal removed, is not equal to its heading and adds at least one content word absent from it. | "Use one endpoint per operation (X.Y.001)" plus "Web APIs MUST use one endpoint per operation." | Same heading plus a Requirement naming the interface, dispatch, and mapping. | 001 |
 | `VERIFY_TEMPLATED_EVIDENCE` | An evidence cell does not contain its own provision's heading text, and for `static` or `test` methods names at least one backticked command, path, or identifier. Replaces the blocklist at line 13. | "Pull request review asserts `use one endpoint per operation` in the owning specification and source paths." | "`EndpointMappingTests.NoDuplicateRoutes` fails on a duplicate method and route pair." | 003 |
-| `ID_PREFIX_OWNERSHIP` | One Standards prefix per page, no prefix on two pages, convention IDs matching their page's Standards prefix. | A page with `PERSIST.*` Standards and `MARTEN.CONVENTION.001`. | The same page with `PERSIST.CONVENTION.001`. | 012 |
+| `ID_PREFIX_OWNERSHIP` | One Standards prefix per page, no prefix on two pages, convention IDs matching their page's Standards prefix. | A page with `PERSIST.*` Standards and `PERSIST.CONVENTION.001`. | The same page with `PERSIST.CONVENTION.001`. | 012 |
 | `SUMMARY_RESTATES_REQUIREMENT` | A summary bullet is materially shorter than its cited provision and introduces no content word absent from it. Subsumes `PROJECTION_UNSOURCED_TERM` and extends `checkAgentProjection` to `AGENTS.md`. | A bullet reading "abstract state and sealed state records" against a provision saying only "state records". | A bullet that is a strict subset. | 004 005 |
 | `TERM_DUAL_DEFINITION` | A term with a glossary heading is not independently defined elsewhere in a "`Term` means" or "`Term` is" construction. | "`Aggregate` means" on a foundation page while the glossary defines Aggregate. | The same sentence replaced by a glossary link. | 010 |
 | `HEADING_EMPTY_BODY` | Every heading has body content or a lower-level sub-heading before the next same-or-higher heading, unless it is a required empty section reading `None.` | A level-3 "Vocabulary" followed immediately by a level-3 "Product". | The same heading with a lead paragraph, or promoted to level 2. | 018 |
