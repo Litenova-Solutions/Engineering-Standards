@@ -53,9 +53,9 @@ These principles resolve choices not covered by narrower conventions. They favor
 
 ### Separate authority from implementation (CORE.DOCUMENTS.003)
 
-**Requirement:** A behavior specification MUST use `planned` or `verified` implementation status separately from specification authority.
+**Requirement:** A behavior specification MUST declare an implementation status in addition to its specification authority status.
 
-**Rationale:** An approved planned target is not an implemented behavior claim.
+**Rationale:** An approved planned target is not an implemented behavior claim. `AGENTIC.METADATA.001` and `schemas/specification-metadata.schema.json` own the permitted values for both fields.
 
 ### Retire public behavior deliberately (CORE.DOCUMENTS.004)
 
@@ -141,7 +141,7 @@ This informative example demonstrates `CORE.CONVENTION.001` and `CORE.CONVENTION
 | CORE.SOURCE.004 | static | Test scan resolves cited acceptance criteria to owned use-case specifications. |
 | CORE.DOCUMENTS.001 | static | Consumer validator validates required metadata fields for each specification kind. |
 | CORE.DOCUMENTS.002 | static | Metadata validator accepts only declared authority-status values. |
-| CORE.DOCUMENTS.003 | static | Behavior specification metadata separates authority and implementation status. |
+| CORE.DOCUMENTS.003 | static | `node tools/validate-consumer.mjs` resolves both status fields against the metadata schema. |
 | CORE.DOCUMENTS.004 | inspection | Retirement review identifies removed public entry points. |
 | CORE.SLICE.001 | inspection | Use-case review links Domain, persistence, entry points, tests, and operations. |
 | CORE.ENFORCE.001 | test | Architecture, lint, or behavior evidence proves each enforceable boundary. |

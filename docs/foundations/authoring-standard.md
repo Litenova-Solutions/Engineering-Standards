@@ -13,7 +13,6 @@ The standards use one document grammar and one controlled technical prose profil
 - Keep summaries informative and cite every projected provision. (WRITING.SUMMARY.001)
 - Map every provision to exact verification evidence. (WRITING.VERIFICATION.001)
 - Validate only current standards material. (WRITING.SNAPSHOT.001, WRITING.SNAPSHOT.002)
-- Publish complete releases and no cross-release compatibility work. (WRITING.SNAPSHOT.003, WRITING.SNAPSHOT.004, WRITING.SNAPSHOT.005)
 - Run the dependency-free authoring checks before review. (WRITING.VALIDATION.001)
 
 ## Concepts
@@ -262,9 +261,29 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ### Declare structured specification metadata (WRITING.METADATA.002)
 
-**Requirement:** A structured consumer specification MUST start with one JSON block satisfying `schemas/specification-metadata.schema.json` for its declared kind.
+**Requirement:** A structured consumer specification MUST open with a `---` delimited JSON block satisfying `schemas/specification-metadata.schema.json` for its declared kind.
 
-**Example:** A use case declares kind, ID, authority status, implementation status, owner, review date, operation data, risks, and extensions.
+**Rationale:** The opening and closing delimiters are each a line containing only `---`, and the block between them is one JSON object.
+
+**Example:** A use-case specification opens with this carrier.
+
+```markdown
+---
+{
+  "kind": "use-case",
+  "id": "orders.cancel-order",
+  "specStatus": "approved",
+  "implementationStatus": "planned",
+  "owner": "__OWNER__",
+  "lastReviewed": "YYYY-MM-DD",
+  "operationType": "command",
+  "actors": ["buyer"],
+  "entryPoints": [],
+  "risks": [],
+  "applicableExtensions": []
+}
+---
+```
 
 ### Use one metadata carrier (WRITING.METADATA.003)
 

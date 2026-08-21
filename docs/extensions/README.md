@@ -54,7 +54,8 @@ The project selects both `localization` and `outbox-worker`:
 
 `localization` applies across the project. Only the Use cases and Workflows that require durable delivery list `outbox-worker`. For example:
 
-```json
+```markdown
+---
 {
   "kind": "workflow",
   "id": "order-fulfillment",
@@ -65,4 +66,5 @@ The project selects both `localization` and `outbox-worker`:
   "participatingModules": ["orders", "tickets"],
   "applicableExtensions": ["outbox-worker"]
 }
+---
 ```

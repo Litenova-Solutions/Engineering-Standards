@@ -22,6 +22,7 @@ Read [Get started](../../docs/guides/getting-started.md) before creating a consu
 | Template | Typical target | Trigger |
 |:---|:---|:---|
 | `module.md` | `docs/domain/modules/{module}/README.md` | The first use case for a module is approved. |
+| `aggregate.md` | `docs/domain/modules/{module}/{aggregates}/README.md` | A module groups use cases under an aggregate-root subdirectory. |
 | `use-case.md` | `docs/domain/modules/{module}/{use-case}.md` | One Command or Query goal is approved. |
 | `end-to-end-flow.md` | `docs/product/flows/{flow}.md` | Use cases connect to one product outcome. |
 | `workflow.md` | `docs/domain/workflows/{workflow}.md` | System progress crosses a transaction or time boundary. |

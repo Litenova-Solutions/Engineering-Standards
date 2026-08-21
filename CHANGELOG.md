@@ -15,6 +15,10 @@
 - Scoped that release model to the standards repository. Consumer product API compatibility, schema migration, deprecation, and rollback provisions are unchanged, including the `api-compatibility` and `persistence-ef-core` extensions.
 - Moved the release model and version-number meaning from `CONTRIBUTING.md` into the authoring standard as the canonical `Release model` concept. `CONTRIBUTING.md` now projects that model with citations instead of restating it.
 - Added the `Standards release` glossary term.
+- Corrected `CORE.DOCUMENTS.003`, which named only `planned` and `verified` while the metadata schema, `AGENTIC.METADATA.001`, and `tools/validate-consumer.mjs` all accept `implemented`. The provision now requires an implementation status and cites the schema as the owner of the permitted values.
+- Stated the Specification Metadata carrier in `WRITING.METADATA.002`. The block opens and closes with a line containing only `---`. The extension index example now shows that form instead of a bare JSON object.
+- Added `templates/docs/aggregate.md` for the `aggregate` specification kind, which the metadata schema, `tools/validate-consumer.mjs`, and `AGENTIC.CONVENTION.002` already required, and listed it in the template index.
+- Removed an empty `Vocabulary` heading from the engineering system foundation.
 - Removed every version-specific upgrade guide and the requirement to publish future migration instructions. Consumers remain on pinned releases until they select another complete contract.
 - Replaced the version-specific adoption guide with `docs/guides/getting-started.md` and removed the duplicate v1 release-scope guide.
 - Replaced application-v1 readiness labels with version-neutral release evidence and release-record guidance.
@@ -36,8 +40,7 @@
   `UI.AGENT.PROTOCOL.001`, and `FTEST.UI.001`.
 - Added UI vocabulary, page-contract, and shadcn source-lock schemas and templates. Source locks record
   generated source digests and require a visible fork classification when source changes.
-- Added the controlled React web UI baseline decision.
-  and a focused UI override decision template for alternate systems or specialist controls.
+- Added the controlled React web UI baseline decision and a focused UI override decision template for alternate systems or specialist controls.
 - Added the deterministic `tools/validate-ui.mjs` reference validator and made
   `tools/validate-consumer.mjs` invoke it when a consumer declares a React web platform, a UI
   configuration, or a `UI.*` override. The validator reads Tailwind rules from extracted class strings

@@ -142,8 +142,6 @@ Query
   reads a Read Model
 ```
 
-### Vocabulary
-
 ### Product and end-to-end flow
 
 `Product` means the software capability offered to users together with its supported operating boundary. A product specification names users, problems, outcomes, exclusions, commercial constraints, and operating context. It is not a synonym for the frontend application.
