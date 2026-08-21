@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.11.1
+## v1.12.0
 
 - Repaired every baseline provision whose Requirement or Default only restated its own heading. The v1.11.0 conversion had moved each real obligation into `Rationale`, which the authoring standard declares informative, leaving the baseline formally non-normative. All 289 provisions across the 19 conventions, the platform profile, and the engineering system foundation now state their obligation in the normative block.
 - Rewrote every templated evidence row. A verification row now names the command, path, test, or assertion that produces the result instead of repeating its provision heading.
@@ -12,6 +12,9 @@
 - Linked every step of `docs/guides/getting-started.md` to the standard that governs it and grouped the steps into pin, configure, structure, specify, implement, and operate stages.
 - Replaced the duplicated consumer gate commands in `AGENTS.md` with a citation to `CI.GATES.001`, which owns them.
 - Added the `Standard` and `Workspace` glossary terms and renamed the `Repository` entry to `Repository (Domain port)`, so the Git sense and the Domain port sense no longer share one term.
+- Renamed `docs/conventions/repository/` to `docs/conventions/workspace/` and retitled its structure page. The directory was named for the Git sense of `repository` while the glossary defined only the Domain port sense.
+- Normalized Git-sense prose to `workspace`, so `repository` in a provision now means the Domain port unless it is qualified.
+- Made `docs/reference/glossary.md` the single definition site. The engineering system Concepts section defined sixteen terms that the glossary also defined; it now carries only the relationships, distinctions, and worked examples that a one-sentence entry cannot hold.
 - Promoted every authoring rule to an error. `WARNING_DIAGNOSTIC_CODES` is now empty, so a provision that restates its heading, an evidence row that names no artifact, a summary that repeats its provision, or a page with two identifier prefixes fails the build.
 
 ## v1.11.0

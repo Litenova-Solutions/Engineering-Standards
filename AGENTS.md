@@ -2,7 +2,7 @@
 
 Read this file before changing this repository or a consumer application. (AGENT.LOAD.001)
 
-Standards v1.11.1 covers one bounded-context business application. The baseline uses ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends. (SCOPE.APPLICATION.001, SCOPE.CONTEXT.001)
+Standards v1.12.0 covers one bounded-context business application. The baseline uses ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends. (SCOPE.APPLICATION.001, SCOPE.CONTEXT.001)
 
 The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PROFILE.VERSIONS.001, AGENT.LOAD.001)
 

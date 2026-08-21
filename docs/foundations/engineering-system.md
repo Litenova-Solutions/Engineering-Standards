@@ -47,9 +47,9 @@ The system contains one delivery approach and one operating model:
 | Specification-Driven Delivery | Approved specifications select work and define completion. | `orders.cancel-order` defines behavior before its Command, endpoint, and tests are accepted. |
 | Agent-Driven Engineering | Agents perform substantial engineering execution within approved scope and report decisions they cannot make. | An agent loads the cancellation specification, implements it, runs its checks, and reports an unknown refund policy. |
 
-`Specification` means an approved, versioned statement of required behavior or constraint. `Driven` means engineering work starts from that statement and completion is judged against it. A specification is more than a prompt because it remains in the workspace after one agent session ends.
+`Driven` means engineering work starts from an approved specification and completion is judged against it. A specification is more than a prompt because it remains in the workspace after one agent session ends.
 
-`Agent` means a software system that can inspect context, reason about a bounded task, change repository artifacts, and run verification under delegated authority. `Agent-driven` describes who performs much of the execution. It does not transfer business decision authority to the agent.
+`Agent-driven` describes who performs much of the execution. It does not transfer business decision authority to the agent.
 
 ## Agent Summary {#agent-summary}
 
@@ -142,23 +142,23 @@ Query
   reads a Read Model
 ```
 
+The [glossary](../reference/glossary.md) defines each term below. This section records the relationships and distinctions that a one-sentence definition cannot carry.
+
 ### Product and end-to-end flow
 
-`Product` means the software capability offered to users together with its supported operating boundary. A product specification names users, problems, outcomes, exclusions, commercial constraints, and operating context. It is not a synonym for the frontend application.
+A product specification names users, problems, outcomes, exclusions, commercial constraints, and operating context. It is not a synonym for the frontend application.
 
-`End-to-end flow` connects use cases from a starting condition to an observable product outcome. A flow can contain ordered steps, branches, waiting, failure, and recovery.
+An end-to-end flow begins at an accepted starting condition, crosses every required system boundary, and ends at one observable product outcome. It does not mean every possible product feature. The record may include actor decisions, branches, waiting periods, failures, and recovery.
 
-For an event platform, `event-sales` can be an end-to-end flow. Event cancellation and payment reconciliation can be separate flows.
+A flow links existing use-case specifications instead of repeating their inputs and rules. For an event platform, `event-sales` can connect ticket reservation, guest order creation, payment confirmation, and ticket issue. Event cancellation and payment reconciliation are separate flows.
 
 ### Domain and module
 
-`Domain` means the area of real-world knowledge and rules that the software models. Orders, refunds, ticket admission, money, and cancellation policy are domain concepts. HTTP, JSON serialization, database sessions, and queue clients are technical mechanisms.
+Orders, refunds, ticket admission, money, and cancellation policy are domain concepts. HTTP, JSON serialization, database sessions, and queue clients are technical mechanisms.
 
 The capitalized `Domain` project is the code layer that implements domain types and behavior. The business domain exists independently of that project. A domain policy may be enforced by Domain or Application code when its facts cross aggregate or module boundaries.
 
-`Module` means a cohesive area of the domain used to organize language, specifications, code, and ownership. `Orders module` is natural in product discussion and maps to `Domain/Orders`, `Application/Orders`, endpoint groups, frontend features, and tests.
-
-A module is not automatically:
+`Orders module` is natural in product discussion and maps to `Domain/Orders`, `Application/Orders`, endpoint groups, frontend features, and tests. A module is not automatically:
 
 - An assembly or deployment unit.
 - A transaction boundary.
@@ -167,45 +167,35 @@ A module is not automatically:
 
 A module may contain no aggregate, one aggregate, or multiple related aggregates. Independent language, responsibility, or change reasons indicate separate modules.
 
-### End-to-end flow
-
-`End-to-end` means the path begins at an accepted starting condition, crosses every required system boundary, and ends at an observable product outcome. It does not mean every possible product feature.
-
-`Flow` means the record may include actor decisions, system steps, branches, waiting periods, failures, and recovery. An end-to-end flow connects existing use-case specifications instead of repeating their inputs and rules.
-
-For example, `event-sales` can connect ticket reservation, guest order creation, payment confirmation, ticket issue, and delivery. Its end-to-end test calls the deployed public boundary and observes the completed sale.
-
 ### Use case, Command, and Query
 
-`Use case` means one independently testable goal for an actor or system. It owns its trigger, input, authorization, result, rules, failures, acceptance criteria, entry points, implementation impact, and operating impact.
+A use case owns its trigger, input, authorization, result, rules, failures, acceptance criteria, entry points, implementation impact, and operating impact.
 
-A `Command` is an Application message that may change business state. One top-level Command owns one command pipeline and one transaction commit. A `Query` reads a Read Model without changing business state.
+One top-level Command owns one command pipeline and one transaction commit. A Query reads a Read Model without changing business state.
 
-`orders.cancel-order` is a use case. `CancelOrderCommand` is its Application message. `Order.Cancel` is its aggregate action. These names remain aligned without treating the use case, Command, and aggregate as the same boundary.
+`orders.cancel-order` is a use case. `CancelOrderCommand` is its Application message. `Order.Cancel` is its aggregate action. These names stay aligned without treating the use case, Command, and aggregate as one boundary.
 
 ### Workflow and workflow orchestrator
 
-`Workflow` means system-controlled progress that crosses a transaction or time boundary. It exists when the system remembers progress, awaits an event or time, retries work, handles duplicate delivery, compensates, or exposes operator recovery.
+A workflow exists when the system remembers progress, awaits an event or time, retries work, handles duplicate delivery, compensates, or exposes operator recovery.
 
-`Workflow Orchestrator` names the component that owns durable workflow progress. `Orchestrator` means it selects and schedules the next action. It does not perform every action itself. It receives facts, updates workflow state, issues the next Command, records retries and timeouts, and exposes failures that require an operator.
+`Orchestrator` means the component selects and schedules the next action. It does not perform every action itself. It receives facts, updates workflow state, issues the next Command, records retries and timeouts, and exposes failures needing an operator.
 
 Process Manager and orchestration-based Saga are industry mappings for this pattern. The system uses `Workflow Orchestrator` because the name identifies both the business record and its technical responsibility.
 
 ### Aggregate, root, state, and invariant
 
-`Aggregate` means a cluster of domain objects changed as one transactional consistency boundary. `Aggregate` does not mean every entity in a module.
+An aggregate is not every entity in a module. `Root` identifies the mutation entry point, not an inheritance hierarchy for every domain object.
 
-`Aggregate root` means the only object through which external code may change the aggregate. `Root` identifies the mutation entry point, not an inheritance hierarchy for every domain object.
+Every aggregate uses one abstract `{Aggregate}State` record and one or more sealed state records, including an aggregate with one current state.
 
-`Aggregate state` means the complete lifecycle condition of the aggregate. Every aggregate uses one abstract `{Aggregate}State` record and one or more sealed state records, including an aggregate with one current state.
-
-`Aggregate invariant` means a rule remaining true after every transaction that changes the aggregate. `Invariant` means the rule cannot be temporarily false after commit. `INV-INVENTORY-01`, for example, limits confirmed and reserved quantities to capacity.
+An invariant cannot be temporarily false after commit. `INV-INVENTORY-01`, for example, limits confirmed and reserved quantities to capacity.
 
 ### Domain policy and other rule types
 
-`Policy` means an approved rule that selects, permits, limits, or requires behavior from known facts. `Domain Policy` means the policy belongs to the business domain but is not owned by one aggregate invariant. It may apply within one module or across modules.
+A domain policy belongs to the business domain but is not owned by one aggregate invariant. It may apply within one module or across modules.
 
-For example, a refund limit based on provider-confirmed captured money may require facts from Orders, Payments, and Refunds. The policy names its owner, consistency requirement, enforcement point, failure behavior, and verification.
+A refund limit based on provider-confirmed captured money may require facts from Orders, Payments, and Refunds. The policy names its owner, consistency requirement, enforcement point, failure behavior, and verification.
 
 The system classifies rules by where they are enforced:
 
@@ -220,19 +210,13 @@ The system classifies rules by where they are enforced:
 
 ### Event and event reaction
 
-`Event` means an immutable statement that a relevant fact completed. Event names use past-tense forms such as `OrderConfirmed` and `TicketIssued`.
+Event names use past-tense forms such as `OrderConfirmed` and `TicketIssued`. `Reaction` states the causal relationship without prescribing the implementation.
 
-`Event Reaction` means behavior caused by an event. `Reaction` states the causal relationship without prescribing the implementation. A reaction may map to an event handler, workflow orchestrator, projection, or scheduled job.
-
-For example, `OrderConfirmed` may cause the reaction `Issue tickets`. The implementation may be a durable workflow rather than a class named `IssueTicketsReaction`.
+A reaction may map to an event handler, workflow orchestrator, projection, or scheduled job. `OrderConfirmed` may cause the reaction `Issue tickets`, implemented as a durable workflow rather than a class named `IssueTicketsReaction`.
 
 ### Acceptance and end-to-end verification
 
-`Acceptance Criterion` means one observable condition required for a use case to be accepted. Criteria use stable `AC-{MODULE}-{USE-CASE}-{NN}` IDs.
-
-`Acceptance Test` means automated executable evidence for one or more acceptance criteria. A test cites the exact criterion ID. The test name remains free to describe its specific case.
-
-`End-to-End Test` means an automated test that verifies a complete end-to-end flow through deployed public boundaries and real required infrastructure. End-to-end test IDs use `E2E-{FLOW}-{NN}`.
+An acceptance test cites the exact criterion identifier. The test name remains free to describe its specific case.
 
 Acceptance tests prove use-case behavior. End-to-end tests prove that connected use cases produce the release outcome.
 
