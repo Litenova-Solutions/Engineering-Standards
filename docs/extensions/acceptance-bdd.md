@@ -141,14 +141,14 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 | EXT.BDD.ADOPT.001 | inspection | Selected scenarios explain their shared cross-layer business example in the owning specification. |
 | EXT.BDD.ADOPT.002 | inspection | Scenario review distinguishes selected behavior from unit and validation coverage. |
 | EXT.BDD.TRACE.001 | static | Scenario tag scan resolves every `@AC-...` tag to a declared acceptance criterion. |
-| EXT.BDD.BOUNDARY.001 | test | Acceptance tests call the declared HTTP or other public boundary. |
-| EXT.BDD.BOUNDARY.002 | test | Scenario assertions cover a declared observable result. |
+| EXT.BDD.BOUNDARY.001 | test | `BddBoundaryTests` call the declared HTTP or other public boundary. |
+| EXT.BDD.BOUNDARY.002 | test | `BddBoundaryTests` cover a declared observable result. |
 | EXT.BDD.BOUNDARY.003 | inspection | Any direct database assertion names its documented durable boundary. |
-| EXT.BDD.STATE.001 | test | Parallel and isolated runs use scenario-owned identifiers and actor state. |
-| EXT.BDD.STATE.002 | test | Randomized scenario order passes after database reset. |
+| EXT.BDD.STATE.001 | test | `BddStateTests` use scenario-owned identifiers and actor state. |
+| EXT.BDD.STATE.002 | test | `BddStateTests` asserts randomized scenario order passes after database reset. |
 | EXT.BDD.STEPS.001 | inspection | Step definitions delegate business phrases to typed test-driver calls. |
-| EXT.BDD.STEPS.002 | static | Acceptance test projects contain no repository, handler, session, or service-provider resolution. |
-| EXT.BDD.STEPS.003 | test | Failing scenario fixtures retain the original failure after hook cleanup. |
+| EXT.BDD.STEPS.002 | static | `BddStepsTests` projects contain no repository, handler, session, or service-provider resolution. |
+| EXT.BDD.STEPS.003 | test | `BddStepsTests` retain the original failure after hook cleanup. |
 | EXT.BDD.CONVENTION.001 | inspection | Feature file locations follow the module convention or record a local replacement. |
 | EXT.BDD.CONVENTION.002 | inspection | Step review identifies one business vocabulary for each reusable step set. |
 | EXT.BDD.CONVENTION.003 | inspection | Scenario context review confirms no service registration or resolution behavior. |

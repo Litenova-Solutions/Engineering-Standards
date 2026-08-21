@@ -30,5 +30,5 @@ State the page scope and the boundary it owns.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| {SCOPE.TOPIC.001} | static | Name the exact command, artifact, or assertion. |
+| {SCOPE.TOPIC.001} | static | `{Topic}Tests` asserts the exact command, artifact, or result this provision requires. |
 | {SCOPE}.CONVENTION.001 | inspection | Inspect the default or its named local replacement. |

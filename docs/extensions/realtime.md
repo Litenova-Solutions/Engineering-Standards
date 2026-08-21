@@ -121,14 +121,14 @@ This extension replaces no baseline rule. SignalR browser clients add pinned `@m
 |:---|:---|:---|
 | EXT.REALTIME.ADOPT.001 | inspection | Use-case documentation records polling, cost, target latency, connections, and recovery. |
 | EXT.REALTIME.ADOPT.002 | inspection | Realtime decision cites a measurable update requirement. |
-| EXT.REALTIME.TRANSPORT.001 | test | One-way notification tests use the server-sent events boundary. |
-| EXT.REALTIME.TRANSPORT.002 | test | Interactive transport tests use SignalR capabilities. |
+| EXT.REALTIME.TRANSPORT.001 | test | `RealtimeTransportTests` use the server-sent events boundary. |
+| EXT.REALTIME.TRANSPORT.002 | test | `RealtimeTransportTests` use SignalR capabilities. |
 | EXT.REALTIME.TRANSPORT.003 | inspection | Realtime specification records chosen transport and hosting support. |
-| EXT.REALTIME.AUTH.001 | test | Subscription tests cover anonymous, unrelated, owner, and tenant-scoped connections. |
-| EXT.REALTIME.AUTH.002 | test | Long-lived connection tests revalidate expired session or token access. |
-| EXT.REALTIME.RECOVERY.001 | test | Disconnect tests use bounded reconnect and authoritative refresh. |
-| EXT.REALTIME.RECOVERY.002 | test | Duplicate and reordered notifications leave the client state correct. |
+| EXT.REALTIME.AUTH.001 | test | `RealtimeAuthTests` cover anonymous, unrelated, owner, and tenant-scoped connections. |
+| EXT.REALTIME.AUTH.002 | test | `RealtimeAuthTests` revalidate expired session or token access. |
+| EXT.REALTIME.RECOVERY.001 | test | `RealtimeRecoveryTests` use bounded reconnect and authoritative refresh. |
+| EXT.REALTIME.RECOVERY.002 | test | `RealtimeRecoveryTests` asserts duplicate and reordered notifications leave the client state correct. |
 | EXT.REALTIME.CAPACITY.001 | operation | Deployment configuration declares every required connection and message limit. |
-| EXT.REALTIME.CAPACITY.002 | test | Slow-client tests show bounded buffering and controlled backpressure behavior. |
+| EXT.REALTIME.CAPACITY.002 | test | `RealtimeCapacityTests` show bounded buffering and controlled backpressure behavior. |
 | EXT.REALTIME.CONVENTION.001 | inspection | Source review locates realtime transport code at the documented boundaries. |
 | EXT.REALTIME.CONVENTION.002 | inspection | Feature review identifies operation-specific subscription functions. |

@@ -236,32 +236,32 @@ No additional package is required by the baseline implementation.
 |:---|:---|:---|
 | EXT.CONCURRENCY.ADOPT.001 | inspection | The use-case specification names conflicts, invalid state, winner behavior, and caller response. |
 | EXT.CONCURRENCY.ADOPT.002 | inspection | Every version check links to a documented conflicting-write case. |
-| EXT.CONCURRENCY.VERSION.001 | test | PostgreSQL integration tests race conflicting aggregate writes with expected versions. |
-| EXT.CONCURRENCY.VERSION.002 | test | A failed expected version returns 409 Problem Details with its stable code. |
-| EXT.CONCURRENCY.VERSION.003 | test | Conflicting accepted writes preserve the winner without silent replacement. |
-| EXT.CONCURRENCY.VERSION.004 | test | Conditional HTTP tests require and validate a strong persistence-derived ETag. |
+| EXT.CONCURRENCY.VERSION.001 | test | `ConcurrencyVersionTests` race conflicting aggregate writes with expected versions. |
+| EXT.CONCURRENCY.VERSION.002 | test | `ConcurrencyVersionTests` asserts a failed expected version returns 409 Problem Details with its stable code. |
+| EXT.CONCURRENCY.VERSION.003 | test | `ConcurrencyVersionTests` asserts conflicting accepted writes preserve the winner without silent replacement. |
+| EXT.CONCURRENCY.VERSION.004 | test | `ConcurrencyVersionTests` require and validate a strong persistence-derived ETag. |
 | EXT.CONCURRENCY.VERSION.005 | test | Missing and stale `If-Match` tests return the documented status and code. |
-| EXT.CONCURRENCY.VERSION.006 | static | Public transport models expose no provider-specific version field. |
-| EXT.IDEMPOTENCY.KEY.001 | test | Same keys from different actors or operations do not replay each other. |
-| EXT.IDEMPOTENCY.KEY.002 | test | Transaction tests commit replay state with the accepted business change. |
-| EXT.IDEMPOTENCY.KEY.003 | test | Reused keys with changed input return the documented rejection. |
-| EXT.IDEMPOTENCY.KEY.004 | test | Concurrent inserts prove the actor-operation-key uniqueness constraint. |
-| EXT.IDEMPOTENCY.KEY.005 | test | Equivalent mapped requests produce one fingerprint without credentials or client key. |
+| EXT.CONCURRENCY.VERSION.006 | static | `ConcurrencyVersionTests` asserts public transport models expose no provider-specific version field. |
+| EXT.IDEMPOTENCY.KEY.001 | test | `IdempotencyKeyTests` asserts same keys from different actors or operations do not replay each other. |
+| EXT.IDEMPOTENCY.KEY.002 | test | `IdempotencyKeyTests` commit replay state with the accepted business change. |
+| EXT.IDEMPOTENCY.KEY.003 | test | `IdempotencyKeyTests` asserts reused keys with changed input return the documented rejection. |
+| EXT.IDEMPOTENCY.KEY.004 | test | `IdempotencyKeyTests` asserts concurrent inserts prove the actor-operation-key uniqueness constraint. |
+| EXT.IDEMPOTENCY.KEY.005 | test | `IdempotencyKeyTests` asserts equivalent mapped requests produce one fingerprint without credentials or client key. |
 | EXT.IDEMPOTENCY.KEY.006 | inspection | Stored fingerprint review confirms sensitive source data is hashed when not required. |
-| EXT.IDEMPOTENCY.REPLAY.001 | test | Lost-response retry tests return the original accepted status and body. |
-| EXT.IDEMPOTENCY.REPLAY.002 | test | Concurrent retry tests prove the documented wait, in-progress, or conflict behavior. |
-| EXT.IDEMPOTENCY.REPLAY.003 | test | Transaction failure tests leave no completed replay record without its business change. |
-| EXT.IDEMPOTENCY.REPLAY.004 | test | Concurrent loser tests reload and replay the matching winner record. |
-| EXT.IDEMPOTENCY.REPLAY.005 | test | Pre-commit failure tests leave no business change or completed replay state. |
+| EXT.IDEMPOTENCY.REPLAY.001 | test | `IdempotencyReplayTests` return the original accepted status and body. |
+| EXT.IDEMPOTENCY.REPLAY.002 | test | `IdempotencyReplayTests` prove the documented wait, in-progress, or conflict behavior. |
+| EXT.IDEMPOTENCY.REPLAY.003 | test | `IdempotencyReplayTests` leave no completed replay record without its business change. |
+| EXT.IDEMPOTENCY.REPLAY.004 | test | `IdempotencyReplayTests` reload and replay the matching winner record. |
+| EXT.IDEMPOTENCY.REPLAY.005 | test | `IdempotencyReplayTests` leave no business change or completed replay state. |
 | EXT.IDEMPOTENCY.REPLAY.006 | inspection | Integration review shows irreversible provider calls occur after commit. |
 | EXT.IDEMPOTENCY.REPLAY.007 | inspection | Required effects select an outbox or documented provider idempotency contract. |
 | EXT.IDEMPOTENCY.RETENTION.001 | inspection | The use case records retry window, risk, and retention duration. |
-| EXT.IDEMPOTENCY.RETENTION.002 | test | Maintenance tests show bounded deletion of expired idempotency records. |
-| EXT.IDEMPOTENCY.RETENTION.003 | test | Retry-window tests reject expiration before the documented safe retry time. |
+| EXT.IDEMPOTENCY.RETENTION.002 | test | `IdempotencyRetentionTests` show bounded deletion of expired idempotency records. |
+| EXT.IDEMPOTENCY.RETENTION.003 | test | `IdempotencyRetentionTests` reject expiration before the documented safe retry time. |
 | EXT.IDEMPOTENCY.OUTCOME.001 | inspection | The use case lists replayed statuses and headers. |
 | EXT.IDEMPOTENCY.OUTCOME.002 | inspection | Stored replay records contain only fields required for accepted-result reproduction. |
-| EXT.IDEMPOTENCY.OUTCOME.003 | test | Replay tests exclude authentication, transient failures, cookies, hop-by-hop headers, tokens, and secrets. |
+| EXT.IDEMPOTENCY.OUTCOME.003 | test | `IdempotencyOutcomeTests` exclude authentication, transient failures, cookies, hop-by-hop headers, tokens, and secrets. |
 | EXT.CONCURRENCY.CONVENTION.001 | inspection | HTTP contract review uses `Idempotency-Key` or records a local replacement. |
 | EXT.CONCURRENCY.CONVENTION.002 | inspection | Source review locates idempotency transaction work in Infrastructure. |
 | EXT.CONCURRENCY.CONVENTION.003 | inspection | Source review locates replay HTTP mapping at the API boundary. |
-| EXT.CONCURRENCY.CONVENTION.004 | static | Generated OpenAPI declares the header for every applicable operation. |
+| EXT.CONCURRENCY.CONVENTION.004 | static | `ConcurrencyTests` asserts generated OpenAPI declares the header for every applicable operation. |

@@ -160,20 +160,20 @@ None.
 | ID | Method | Evidence |
 |:---|:---|:---|
 | EXT.DATA.ADOPT.001 | inspection | Lifecycle documentation names every required lifecycle field and owner. |
-| EXT.DATA.DELETE.001 | test | Tests prove hard deletion when no retention or restore requirement applies. |
-| EXT.DATA.DELETE.002 | test | Aggregate tests prove documented soft-delete or archive transitions. |
+| EXT.DATA.DELETE.001 | test | `DataDeleteTests` asserts tests prove hard deletion when no retention or restore requirement applies. |
+| EXT.DATA.DELETE.002 | test | `DataDeleteTests` prove documented soft-delete or archive transitions. |
 | EXT.DATA.DELETE.003 | inspection | Lifecycle review identifies aggregate behavior beyond a hidden boolean. |
-| EXT.DATA.BEHAVIOR.001 | test | Aggregate tests exercise each applicable delete, archive, and restore behavior. |
-| EXT.DATA.BEHAVIOR.002 | test | Lifecycle tests prove documented authorization and audit evidence. |
+| EXT.DATA.BEHAVIOR.001 | test | `DataBehaviorTests` exercise each applicable delete, archive, and restore behavior. |
+| EXT.DATA.BEHAVIOR.002 | test | `DataBehaviorTests` prove documented authorization and audit evidence. |
 | EXT.DATA.BEHAVIOR.003 | inspection | Source review finds no lifecycle rule implemented only by storage behavior. |
-| EXT.DATA.READ.001 | test | Normal query tests exclude deleted and archived records. |
-| EXT.DATA.READ.002 | test | Administrative and restore query tests require named authorized access. |
+| EXT.DATA.READ.001 | test | `DataReadTests` exclude deleted and archived records. |
+| EXT.DATA.READ.002 | test | `DataReadTests` require named authorized access. |
 | EXT.DATA.READ.003 | inspection | Specifications define references, export, and uniqueness behavior after deletion. |
-| EXT.DATA.STORAGE.001 | test | Marten integration tests cover declared document lifecycle behavior. |
-| EXT.DATA.STORAGE.002 | test | EF Core integration tests cover declared relational lifecycle behavior. |
-| EXT.DATA.STORAGE.003 | test | Provider tests cover active, deleted, archived, administrative, and restore queries. |
-| EXT.DATA.PURGE.001 | test | Purge tests cover batching, cancellation, resume, and observable progress. |
-| EXT.DATA.PURGE.002 | test | Legal-hold fixtures remain retained during scheduled lifecycle work. |
+| EXT.DATA.STORAGE.001 | test | `DataStorageTests` cover declared document lifecycle behavior. |
+| EXT.DATA.STORAGE.002 | test | `DataStorageTests` cover declared relational lifecycle behavior. |
+| EXT.DATA.STORAGE.003 | test | `DataStorageTests` cover active, deleted, archived, administrative, and restore queries. |
+| EXT.DATA.PURGE.001 | test | `DataPurgeTests` cover batching, cancellation, resume, and observable progress. |
+| EXT.DATA.PURGE.002 | test | `DataPurgeTests` remain retained during scheduled lifecycle work. |
 | EXT.DATA.PURGE.003 | operation | Backup and replica records show the documented deletion guarantee. |
 | EXT.DATA.CONVENTION.001 | inspection | Soft-delete timestamp names use the default or record a local replacement. |
 | EXT.DATA.CONVENTION.002 | inspection | Archive source paths remain within the owning module or record a replacement. |

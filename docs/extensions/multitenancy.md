@@ -129,15 +129,15 @@ Marten tenancy support is part of the baseline persistence package. Another isol
 |:---|:---|:---|
 | EXT.TENANCY.ADOPT.001 | inspection | Tenant decision records model, isolation guarantee, and operating trade-off. |
 | EXT.TENANCY.ADOPT.002 | inspection | Any mixed isolation model records decision and data evolution plan. |
-| EXT.TENANCY.RESOLVE.001 | test | Authentication fixtures resolve tenant identity from each trusted source. |
-| EXT.TENANCY.RESOLVE.002 | test | Request tenant-ID tampering cannot select a tenant boundary. |
-| EXT.TENANCY.AUTHZ.001 | test | Cross-tenant actor and resource fixtures reject mismatched scope. |
-| EXT.TENANCY.AUTHZ.002 | test | Administrative cross-tenant fixtures require policy, permission, and audit evidence. |
-| EXT.TENANCY.STORAGE.001 | test | Persistence tests exercise selected provider tenancy behavior. |
-| EXT.TENANCY.STORAGE.002 | static, test | Storage and background fixtures include tenant scope at every listed boundary. |
-| EXT.TENANCY.DISCLOSURE.001 | test | Cross-tenant request fixtures return the documented not-found or forbidden response. |
-| EXT.TENANCY.DISCLOSURE.002 | test | Diagnostic fixtures exclude foreign tenant identifiers and data. |
+| EXT.TENANCY.RESOLVE.001 | test | `TenancyResolveTests` resolve tenant identity from each trusted source. |
+| EXT.TENANCY.RESOLVE.002 | test | `TenancyResolveTests` asserts request tenant-ID tampering cannot select a tenant boundary. |
+| EXT.TENANCY.AUTHZ.001 | test | `TenancyAuthzTests` reject mismatched scope. |
+| EXT.TENANCY.AUTHZ.002 | test | `TenancyAuthzTests` require policy, permission, and audit evidence. |
+| EXT.TENANCY.STORAGE.001 | test | `TenancyStorageTests` exercise selected provider tenancy behavior. |
+| EXT.TENANCY.STORAGE.002 | static, test | `TenancyStorageTests` include tenant scope at every listed boundary. |
+| EXT.TENANCY.DISCLOSURE.001 | test | `TenancyDisclosureTests` return the documented not-found or forbidden response. |
+| EXT.TENANCY.DISCLOSURE.002 | test | `TenancyDisclosureTests` exclude foreign tenant identifiers and data. |
 | EXT.TENANCY.OPERATIONS.001 | inspection | Operating procedures declare one-tenant or all-tenant scope. |
 | EXT.TENANCY.CONVENTION.001 | static | Tenant references use `TenantId` or a documented local replacement. |
 | EXT.TENANCY.CONVENTION.002 | inspection | Host code has one trusted current-tenant accessor. |
-| EXT.TENANCY.CONVENTION.003 | static | Domain code reads no ambient tenant request state. |
+| EXT.TENANCY.CONVENTION.003 | static | `TenancyTests` asserts domain code reads no ambient tenant request state. |

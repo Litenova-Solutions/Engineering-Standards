@@ -203,28 +203,28 @@ No additional baseline package is required. Schedule state uses selected persist
 | ID | Method | Evidence |
 |:---|:---|:---|
 | EXT.JOBS.ADOPT.001 | inspection | Job documentation records each required schedule and operating field. |
-| EXT.JOBS.WORKER.001 | test | Scheduled job integration tests run through Worker rather than WebApi. |
-| EXT.JOBS.WORKER.002 | test | Shutdown tests stop new job work and honor cancellation and duration bounds. |
-| EXT.JOBS.LEASE.001 | test | PostgreSQL fixtures store owner, expiry, and fencing value. |
-| EXT.JOBS.LEASE.002 | test | Lease renewal tests stop the worker after ownership loss. |
-| EXT.JOBS.LEASE.003 | test | Replica race tests produce one completed occurrence. |
-| EXT.JOBS.COMMAND.001 | static | Job source dispatches an Application Command or approved port. |
-| EXT.JOBS.COMMAND.002 | static | Job source contains no direct session, DbContext, Domain bypass, or WebApi call. |
-| EXT.JOBS.RETRY.001 | test | Failure fixtures exercise attempt bounds, backoff, cancellation, and poison state. |
-| EXT.JOBS.RETRY.002 | test | Duplicate execution fixtures leave correct command and side-effect outcomes. |
-| EXT.JOBS.RETRY.003 | test | Scheduler-store outage fixtures use backed-off, rate-limited logging. |
-| EXT.JOBS.RECOVERY.001 | test | Restart fixtures retain scheduled, started, and completed occurrence times. |
-| EXT.JOBS.RECOVERY.002 | test | Misfire fixtures follow the documented skip or replay policy. |
+| EXT.JOBS.WORKER.001 | test | `JobsWorkerTests` run through Worker rather than WebApi. |
+| EXT.JOBS.WORKER.002 | test | `JobsWorkerTests` stop new job work and honor cancellation and duration bounds. |
+| EXT.JOBS.LEASE.001 | test | `JobsLeaseTests` store owner, expiry, and fencing value. |
+| EXT.JOBS.LEASE.002 | test | `JobsLeaseTests` stop the worker after ownership loss. |
+| EXT.JOBS.LEASE.003 | test | `JobsLeaseTests` produce one completed occurrence. |
+| EXT.JOBS.COMMAND.001 | static | `JobsCommandTests` asserts job source dispatches an Application Command or approved port. |
+| EXT.JOBS.COMMAND.002 | static | `JobsCommandTests` asserts job source contains no direct session, DbContext, Domain bypass, or WebApi call. |
+| EXT.JOBS.RETRY.001 | test | `JobsRetryTests` exercise attempt bounds, backoff, cancellation, and poison state. |
+| EXT.JOBS.RETRY.002 | test | `JobsRetryTests` leave correct command and side-effect outcomes. |
+| EXT.JOBS.RETRY.003 | test | `JobsRetryTests` use backed-off, rate-limited logging. |
+| EXT.JOBS.RECOVERY.001 | test | `JobsRecoveryTests` retain scheduled, started, and completed occurrence times. |
+| EXT.JOBS.RECOVERY.002 | test | `JobsRecoveryTests` follow the documented skip or replay policy. |
 | EXT.JOBS.RECOVERY.003 | operation | Runbooks provide inspection, manual replay, and disable procedures. |
-| EXT.JOBS.OCCURRENCE.001 | test | Occurrence fixtures derive stable IDs from schedule ID and instant. |
-| EXT.JOBS.OCCURRENCE.002 | test | Store fixtures persist all declared occurrence lifecycle states. |
-| EXT.JOBS.OCCURRENCE.003 | test | Duplicate occurrence commands use one idempotency scope. |
-| EXT.JOBS.OCCURRENCE.004 | test | Stale fencing fixtures cannot mark an occurrence complete. |
-| EXT.JOBS.OCCURRENCE.005 | test | Manual replay records a new audited attempt under the same identity. |
+| EXT.JOBS.OCCURRENCE.001 | test | `JobsOccurrenceTests` derive stable IDs from schedule ID and instant. |
+| EXT.JOBS.OCCURRENCE.002 | test | `JobsOccurrenceTests` persist all declared occurrence lifecycle states. |
+| EXT.JOBS.OCCURRENCE.003 | test | `JobsOccurrenceTests` asserts duplicate occurrence commands use one idempotency scope. |
+| EXT.JOBS.OCCURRENCE.004 | test | `JobsOccurrenceTests` cannot mark an occurrence complete. |
+| EXT.JOBS.OCCURRENCE.005 | test | `JobsOccurrenceTests` asserts manual replay records a new audited attempt under the same identity. |
 | EXT.JOBS.TIME.001 | inspection | Schedule review records UTC or a documented business-local deviation. |
-| EXT.JOBS.TIME.002 | test | Local-time fixtures cover the named IANA zone's skipped and repeated times. |
-| EXT.JOBS.TIME.003 | test | Schedule tests inject time and execute representative clock transitions. |
-| EXT.JOBS.TIME.004 | static | Job source reads no machine-local clock. |
+| EXT.JOBS.TIME.002 | test | `JobsTimeTests` cover the named IANA zone's skipped and repeated times. |
+| EXT.JOBS.TIME.003 | test | `JobsTimeTests` inject time and execute representative clock transitions. |
+| EXT.JOBS.TIME.004 | static | `JobsTimeTests` asserts job source reads no machine-local clock. |
 | EXT.JOBS.CONVENTION.001 | inspection | Job handler location follows module ownership or records replacement. |
-| EXT.JOBS.CONVENTION.002 | test | Job execution tests create and dispose a scope per Command. |
+| EXT.JOBS.CONVENTION.002 | test | `JobsTests` create and dispose a scope per Command. |
 | EXT.JOBS.CONVENTION.003 | inspection | Schedule definition source remains separate from Command behavior. |

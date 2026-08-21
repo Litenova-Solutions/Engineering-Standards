@@ -204,17 +204,17 @@ An event-sales release includes verified inventory, order, payment, and ticket b
 | RELEASE.SLICE.002 | static | Incomplete behavior retains `implementationStatus: planned`. |
 | RELEASE.SLICE.003 | test | Deployed `E2E-*` test proves the selected connected flow. |
 | RELEASE.GATES.001 | inspection | Completion report maps each changed boundary to executed checks. |
-| RELEASE.GATES.002 | test | Backend release build and test commands exit successfully. |
-| RELEASE.GATES.003 | test | Frontend frozen install, lint, type, test, and build commands exit successfully. |
-| RELEASE.GATES.004 | test | Changed end-to-end flow tests pass against their declared boundary. |
-| RELEASE.GATES.005 | test | Reference consumer validator passes after product, domain, implementation, or API change. |
-| RELEASE.GATES.006 | test | Affected selected extensions report their stated verification evidence. |
-| RELEASE.DERIVED.001 | static | Generated OpenAPI and client diff matches changed source contract. |
-| RELEASE.DERIVED.002 | static | Generated-contract diff contains no timestamp, machine path, or unstable order. |
+| RELEASE.GATES.002 | test | `ReleaseGatesTests` commands exit successfully. |
+| RELEASE.GATES.003 | test | `ReleaseGatesTests` asserts frontend frozen install, lint, type, test, and build commands exit successfully. |
+| RELEASE.GATES.004 | test | `ReleaseGatesTests` pass against their declared boundary. |
+| RELEASE.GATES.005 | test | `ReleaseGatesTests` asserts reference consumer validator passes after product, domain, implementation, or API change. |
+| RELEASE.GATES.006 | test | `ReleaseGatesTests` asserts affected selected extensions report their stated verification evidence. |
+| RELEASE.DERIVED.001 | static | `ReleaseDerivedTests` asserts generated OpenAPI and client diff matches changed source contract. |
+| RELEASE.DERIVED.002 | static | `ReleaseDerivedTests` asserts generated-contract diff contains no timestamp, machine path, or unstable order. |
 | RELEASE.READINESS.001 | inspection | Release record identifies verified specifications and deployed end-to-end evidence. |
-| RELEASE.READINESS.002 | test | Restricted-resource tests prove authentication and target authorization. |
-| RELEASE.READINESS.003 | test | Schema and backup restore exercises pass from declared starting state. |
-| RELEASE.READINESS.004 | test | Deployment tests expose health and trace diagnostics without source-controlled secrets. |
+| RELEASE.READINESS.002 | test | `ReleaseReadinessTests` prove authentication and target authorization. |
+| RELEASE.READINESS.003 | test | `ReleaseReadinessTests` asserts schema and backup restore exercises pass from declared starting state. |
+| RELEASE.READINESS.004 | test | `ReleaseReadinessTests` expose health and trace diagnostics without source-controlled secrets. |
 | RELEASE.READINESS.005 | operation | CI, deployment, rollback, limits, and runbook records are current. |
 | RELEASE.READINESS.006 | operation | One release record identifies the immutable artifact. |
 | RELEASE.READINESS.007 | inspection | Release review resolves blockers or excludes behavior in all owning records. |

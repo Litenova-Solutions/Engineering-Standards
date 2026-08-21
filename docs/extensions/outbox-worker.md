@@ -297,41 +297,41 @@ No additional baseline package is required. Provider-specific dispatch dependenc
 |:---|:---|:---|
 | EXT.OUTBOX.ADOPT.001 | inspection | Durable-delivery specification records all declared guarantee and recovery fields. |
 | EXT.OUTBOX.ADOPT.002 | inspection | Selected outbox use cases exclude manually repeatable best-effort reactions. |
-| EXT.OUTBOX.ATOMIC.001 | test | Transaction tests stage message and business work in one Marten session. |
-| EXT.OUTBOX.ATOMIC.002 | test | Serialized pending message fixtures produce durable outbox records. |
-| EXT.OUTBOX.ATOMIC.003 | test | Command pipeline tests observe one post-handler commit. |
-| EXT.OUTBOX.ATOMIC.004 | test | Outbox record fixtures contain each required durable field. |
-| EXT.OUTBOX.ATOMIC.005 | test | Failure and completion fixtures retain error summary and completion time. |
-| EXT.OUTBOX.ATOMIC.006 | test | Message-kind fixtures distinguish integration, workflow, and provider effects. |
+| EXT.OUTBOX.ATOMIC.001 | test | `OutboxAtomicTests` stage message and business work in one Marten session. |
+| EXT.OUTBOX.ATOMIC.002 | test | `OutboxAtomicTests` produce durable outbox records. |
+| EXT.OUTBOX.ATOMIC.003 | test | `OutboxAtomicTests` observe one post-handler commit. |
+| EXT.OUTBOX.ATOMIC.004 | test | `OutboxAtomicTests` contain each required durable field. |
+| EXT.OUTBOX.ATOMIC.005 | test | `OutboxAtomicTests` retain error summary and completion time. |
+| EXT.OUTBOX.ATOMIC.006 | test | `OutboxAtomicTests` distinguish integration, workflow, and provider effects. |
 | EXT.OUTBOX.ATOMIC.007 | test | Repository and writer resolve the same scoped `IDocumentSession`. |
-| EXT.OUTBOX.ATOMIC.008 | static | Outbox writer source contains no independent connection or commit. |
-| EXT.OUTBOX.WORKER.001 | test | Worker integration tests claim bounded batches and record dispatch outcomes. |
-| EXT.OUTBOX.WORKER.002 | static | WebApi request paths contain no durable outbox dispatch. |
-| EXT.OUTBOX.WORKER.003 | test | Claim fixtures store unique owner, expiry, and fencing value. |
-| EXT.OUTBOX.WORKER.004 | test | Network-delay fixtures release claim transactions before provider calls. |
-| EXT.OUTBOX.WORKER.005 | test | Stale-lease fixtures cannot overwrite current Worker outcome. |
-| EXT.OUTBOX.WORKER.006 | test | Expired-lease fixtures become eligible for new claim. |
-| EXT.OUTBOX.IDEMPOTENCY.001 | test | Consumer duplicate fixtures leave one accepted target outcome. |
-| EXT.OUTBOX.IDEMPOTENCY.002 | test | Consumer fixtures use message ID or business idempotency key. |
-| EXT.OUTBOX.IDEMPOTENCY.003 | test | Target failure fixtures keep records uncompleted. |
-| EXT.OUTBOX.RETRY.001 | test | Retry fixtures use bounded exponential backoff with jitter. |
-| EXT.OUTBOX.RETRY.002 | test | Permanent failures dead-letter after limit with safe replay evidence. |
-| EXT.OUTBOX.READINESS.001 | test | Store-outage fixtures remain distinct from failed claimed-message fixtures. |
-| EXT.OUTBOX.READINESS.002 | test | Store-outage fixtures use bounded backoff and rate-limited logging. |
-| EXT.OUTBOX.READINESS.003 | test | Message retry tests run only after successful record claim. |
-| EXT.OUTBOX.READINESS.004 | test | Unready-store fixture gates dispatch and stops polling. |
-| EXT.OUTBOX.SCHEMA.001 | static | Message definitions provide stable type names and explicit schema versions. |
-| EXT.OUTBOX.SCHEMA.002 | test | Mixed-version fixtures dispatch every active producer message shape. |
+| EXT.OUTBOX.ATOMIC.008 | static | `OutboxAtomicTests` asserts outbox writer source contains no independent connection or commit. |
+| EXT.OUTBOX.WORKER.001 | test | `OutboxWorkerTests` claim bounded batches and record dispatch outcomes. |
+| EXT.OUTBOX.WORKER.002 | static | `OutboxWorkerTests` asserts webApi request paths contain no durable outbox dispatch. |
+| EXT.OUTBOX.WORKER.003 | test | `OutboxWorkerTests` store unique owner, expiry, and fencing value. |
+| EXT.OUTBOX.WORKER.004 | test | `OutboxWorkerTests` release claim transactions before provider calls. |
+| EXT.OUTBOX.WORKER.005 | test | `OutboxWorkerTests` cannot overwrite current Worker outcome. |
+| EXT.OUTBOX.WORKER.006 | test | `OutboxWorkerTests` become eligible for new claim. |
+| EXT.OUTBOX.IDEMPOTENCY.001 | test | `OutboxIdempotencyTests` leave one accepted target outcome. |
+| EXT.OUTBOX.IDEMPOTENCY.002 | test | `OutboxIdempotencyTests` use message ID or business idempotency key. |
+| EXT.OUTBOX.IDEMPOTENCY.003 | test | `OutboxIdempotencyTests` keep records uncompleted. |
+| EXT.OUTBOX.RETRY.001 | test | `OutboxRetryTests` use bounded exponential backoff with jitter. |
+| EXT.OUTBOX.RETRY.002 | test | `OutboxRetryTests` asserts permanent failures dead-letter after limit with safe replay evidence. |
+| EXT.OUTBOX.READINESS.001 | test | `OutboxReadinessTests` remain distinct from failed claimed-message fixtures. |
+| EXT.OUTBOX.READINESS.002 | test | `OutboxReadinessTests` use bounded backoff and rate-limited logging. |
+| EXT.OUTBOX.READINESS.003 | test | `OutboxReadinessTests` run only after successful record claim. |
+| EXT.OUTBOX.READINESS.004 | test | `OutboxReadinessTests` gates dispatch and stops polling. |
+| EXT.OUTBOX.SCHEMA.001 | static | `OutboxSchemaTests` asserts message definitions provide stable type names and explicit schema versions. |
+| EXT.OUTBOX.SCHEMA.002 | test | `OutboxSchemaTests` dispatch every active producer message shape. |
 | EXT.OUTBOX.OPERATIONS.001 | operation | Metrics backend receives each declared backlog indicator. |
 | EXT.OUTBOX.OPERATIONS.002 | operation | Alert configuration derives thresholds from the delivery target. |
-| EXT.OUTBOX.STATE.001 | test | Lifecycle fixtures permit only documented state transitions. |
-| EXT.OUTBOX.STATE.002 | test | Retry and replay fixtures retain one message ID. |
+| EXT.OUTBOX.STATE.001 | test | `OutboxStateTests` permit only documented state transitions. |
+| EXT.OUTBOX.STATE.002 | test | `OutboxStateTests` retain one message ID. |
 | EXT.OUTBOX.STATE.003 | operation | Replay audit record captures actor, reason, time, and previous failure. |
-| EXT.OUTBOX.ROLLOUT.001 | test | Mixed-version deployment tests reject unsupported writer message shapes. |
+| EXT.OUTBOX.ROLLOUT.001 | test | `OutboxRolloutTests` reject unsupported writer message shapes. |
 | EXT.OUTBOX.ROLLOUT.002 | operation | Release record deploys compatible readers before additive writers. |
 | EXT.OUTBOX.ROLLOUT.003 | inspection | Rollback plan identifies undispatched records from the new writer. |
 | EXT.OUTBOX.CONVENTION.001 | inspection | Outbox Infrastructure files use documented path or a local replacement. |
 | EXT.OUTBOX.CONVENTION.002 | inspection | Worker host remains a separate project or a local replacement. |
 | EXT.OUTBOX.CONVENTION.003 | inspection | Provider mapping remains with the owning external integration. |
-| EXT.OUTBOX.CONVENTION.004 | test | Workflow Command dispatch occurs through a fresh Worker scope. |
-| EXT.OUTBOX.CONVENTION.005 | test | Any durable package has a manifest pin and shared-transaction integration evidence. |
+| EXT.OUTBOX.CONVENTION.004 | test | `OutboxTests` asserts workflow Command dispatch occurs through a fresh Worker scope. |
+| EXT.OUTBOX.CONVENTION.005 | test | `OutboxTests` asserts any durable package has a manifest pin and shared-transaction integration evidence. |

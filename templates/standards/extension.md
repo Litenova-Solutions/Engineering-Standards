@@ -46,5 +46,5 @@ None.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| {EXT.TOPIC.001} | test | Name the exact extension test or assertion. |
+| {EXT.TOPIC.001} | test | `{Topic}Tests` asserts the exact extension behavior this provision requires. |
 | {EXT.TOPIC}.CONVENTION.001 | inspection | Inspect the default or its named local replacement. |

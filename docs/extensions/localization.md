@@ -147,17 +147,17 @@ No library is selected by this extension. A localization package needs a decisio
 |:---|:---|:---|
 | EXT.LOCALE.ADOPT.001 | inspection | Product brief or decision lists the required locale contract fields. |
 | EXT.LOCALE.ADOPT.002 | inspection | Locale support review cites the decision rather than catalog presence. |
-| EXT.LOCALE.ROUTES.001 | test | Route tests exercise the documented localized URL shape. |
-| EXT.LOCALE.ROUTES.002 | test | Unsupported and missing locale tests follow product fallback policy. |
-| EXT.LOCALE.ROUTES.003 | static | Crawl or route review identifies one indexable URL per localized content item. |
-| EXT.LOCALE.MESSAGES.001 | static | User-facing source scan resolves copy through locale catalogs. |
+| EXT.LOCALE.ROUTES.001 | test | `LocaleRoutesTests` exercise the documented localized URL shape. |
+| EXT.LOCALE.ROUTES.002 | test | `LocaleRoutesTests` follow product fallback policy. |
+| EXT.LOCALE.ROUTES.003 | static | `LocaleRoutesTests` asserts crawl or route review identifies one indexable URL per localized content item. |
+| EXT.LOCALE.MESSAGES.001 | static | `LocaleMessagesTests` resolves copy through locale catalogs. |
 | EXT.LOCALE.MESSAGES.002 | inspection | Catalog review identifies semantic message keys. |
-| EXT.LOCALE.MESSAGES.003 | test | Each supported locale resolves required keys or declared fallback. |
-| EXT.LOCALE.FORMAT.001 | test | Locale fixtures verify dates, numbers, currency, plurals, lists, and relative time. |
+| EXT.LOCALE.MESSAGES.003 | test | `LocaleMessagesTests` asserts each supported locale resolves required keys or declared fallback. |
+| EXT.LOCALE.FORMAT.001 | test | `LocaleFormatTests` verify dates, numbers, currency, plurals, lists, and relative time. |
 | EXT.LOCALE.FORMAT.002 | inspection | Domain and OpenAPI review confirms locale-neutral stored and wire values. |
-| EXT.LOCALE.CONTENT.001 | test | UI fixtures render metadata, labels, validation, and safe errors in active locale. |
-| EXT.LOCALE.CONTENT.002 | test | API error fixtures retain stable codes across locale selections. |
+| EXT.LOCALE.CONTENT.001 | test | `LocaleContentTests` render metadata, labels, validation, and safe errors in active locale. |
+| EXT.LOCALE.CONTENT.002 | test | `LocaleContentTests` retain stable codes across locale selections. |
 | EXT.LOCALE.CONVENTION.001 | inspection | Catalog paths use the owned root or record a local replacement. |
 | EXT.LOCALE.CONVENTION.002 | inspection | Module catalog splits record their size rationale. |
-| EXT.LOCALE.CONVENTION.003 | static | Locale identifier scan accepts BCP 47 values or a recorded replacement. |
-| EXT.LOCALE.CONVENTION.004 | test | Locale-selection tests use URL or documented session preference. |
+| EXT.LOCALE.CONVENTION.003 | static | `LocaleTests` accepts BCP 47 values or a recorded replacement. |
+| EXT.LOCALE.CONVENTION.004 | test | `LocaleTests` use URL or documented session preference. |

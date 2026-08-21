@@ -146,18 +146,18 @@ This extension adds pinned HTTP resilience and network simulation packages. It r
 | ID | Method | Evidence |
 |:---|:---|:---|
 | EXT.EXTERNAL.PORT.001 | inspection | Application source review identifies business-action provider ports. |
-| EXT.EXTERNAL.PORT.002 | static | Application assembly references no provider SDK or transport-model type. |
-| EXT.EXTERNAL.CLIENT.001 | test | Startup tests reject missing or invalid external client configuration. |
-| EXT.EXTERNAL.CLIENT.002 | static | HTTP integration registration uses the owned factory and declared discovery path. |
-| EXT.EXTERNAL.CLIENT.003 | static | Source scan reports no per-request HTTP client construction. |
-| EXT.EXTERNAL.RETRY.001 | test | Provider fixtures verify bounded jittered retry for transient failures. |
-| EXT.EXTERNAL.RETRY.002 | test | Non-idempotent fixture shows no retry without documented provider protection. |
-| EXT.EXTERNAL.FAILURE.001 | test | Provider failures map to project-owned outcomes and stable diagnostics. |
-| EXT.EXTERNAL.FAILURE.002 | test | API failure fixtures expose no provider body, credential, header, type, or account identifier. |
-| EXT.EXTERNAL.INBOUND.001 | test | Webhook fixtures reject invalid signatures, timestamps, content, size, schema, and identities. |
-| EXT.EXTERNAL.INBOUND.002 | test | Duplicate delivery fixtures leave one accepted external effect. |
-| EXT.EXTERNAL.TEST.001 | test | Integration suite runs each provider contract against a controllable local endpoint. |
-| EXT.EXTERNAL.TEST.002 | test | Provider test suite covers every declared failure mode. |
+| EXT.EXTERNAL.PORT.002 | static | `ExternalPortTests` asserts application assembly references no provider SDK or transport-model type. |
+| EXT.EXTERNAL.CLIENT.001 | test | `ExternalClientTests` reject missing or invalid external client configuration. |
+| EXT.EXTERNAL.CLIENT.002 | static | `ExternalClientTests` asserts hTTP integration registration uses the owned factory and declared discovery path. |
+| EXT.EXTERNAL.CLIENT.003 | static | `ExternalClientTests` reports no per-request HTTP client construction. |
+| EXT.EXTERNAL.RETRY.001 | test | `ExternalRetryTests` verify bounded jittered retry for transient failures. |
+| EXT.EXTERNAL.RETRY.002 | test | `ExternalRetryTests` shows no retry without documented provider protection. |
+| EXT.EXTERNAL.FAILURE.001 | test | `ExternalFailureTests` asserts provider failures map to project-owned outcomes and stable diagnostics. |
+| EXT.EXTERNAL.FAILURE.002 | test | `ExternalFailureTests` expose no provider body, credential, header, type, or account identifier. |
+| EXT.EXTERNAL.INBOUND.001 | test | `ExternalInboundTests` reject invalid signatures, timestamps, content, size, schema, and identities. |
+| EXT.EXTERNAL.INBOUND.002 | test | `ExternalInboundTests` leave one accepted external effect. |
+| EXT.EXTERNAL.TEST.001 | test | `ExternalTestTests` runs each provider contract against a controllable local endpoint. |
+| EXT.EXTERNAL.TEST.002 | test | `ExternalTestTests` suite covers every declared failure mode. |
 | EXT.EXTERNAL.CONVENTION.001 | inspection | Provider paths use the documented folder or record a local replacement. |
 | EXT.EXTERNAL.CONVENTION.002 | inspection | Provider folder review finds each documented component. |
 | EXT.EXTERNAL.CONVENTION.003 | inspection | Business-action ports remain near their owning Application use cases. |

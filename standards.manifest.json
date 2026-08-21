@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
   "schemaVersion": 3,
-  "version": "1.11.0",
+  "version": "1.11.1",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "defaultProfile": "dotnet-nextjs",

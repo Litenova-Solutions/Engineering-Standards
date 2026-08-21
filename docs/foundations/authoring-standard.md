@@ -164,7 +164,7 @@ Every normative page ends with a Verification table:
 ```markdown
 | ID | Method | Evidence |
 |:---|:---|:---|
-| SCOPE.TOPIC.001 | static, test | Exact command, artifact, test, assertion, or observable result. |
+| SCOPE.TOPIC.001 | static, test | `ScopeTopicTests` asserts exact command, artifact, test, assertion, or observable result. |
 ```
 
 The table contains exactly one row for every Standard and Convention ID on the page. Methods are `static`, `test`, `inspection`, and `operation`.
@@ -366,21 +366,21 @@ This informative example demonstrates `WRITING.REQUIREMENT.001`, `WRITING.EXAMPL
 | ID | Method | Evidence |
 |:---|:---|:---|
 | WRITING.ASCII.001 | static | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
-| WRITING.NORMATIVE.002 | static, inspection | The provision parser reports one approved modal, and review confirms its intended force. |
-| WRITING.PROSE.001 | static | The prose scanner reports no length, contraction, or banned-term diagnostic. |
+| WRITING.NORMATIVE.002 | inspection | The provision parser reports one approved modal, and review confirms its intended force. |
+| WRITING.PROSE.001 | static | `WritingProseTests` asserts the prose scanner reports no length, contraction, or banned-term diagnostic. |
 | WRITING.VOICE.001 | inspection | The pull request checklist records actor, voice, procedure, and list review. |
 | WRITING.TERM.001 | inspection | Terminology review compares new terms with `docs/reference/glossary.md`. |
-| WRITING.CASE.001 | static, inspection | The heading scanner passes, and review confirms exact technical capitalization. |
+| WRITING.CASE.001 | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
 | WRITING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
-| WRITING.PAGE.001 | static | The page parser reports the declared H1 and H2 contract. |
-| WRITING.REQUIREMENT.001 | static, inspection | The provision parser passes, and review confirms one assertion for each active ID. |
-| WRITING.CONVENTION.001 | static | The parser resolves each Convention ID, Default, Replacement, and Verification row. |
-| WRITING.SUMMARY.001 | static, inspection | The summary parser resolves every citation, and review compares each projection with its source. |
+| WRITING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |
+| WRITING.REQUIREMENT.001 | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
+| WRITING.CONVENTION.001 | static | `WritingTests` asserts the parser resolves each Convention ID, Default, Replacement, and Verification row. |
+| WRITING.SUMMARY.001 | inspection | The summary parser resolves every citation, and review compares each projection with its source. |
 | WRITING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |
-| WRITING.VERIFICATION.001 | static | The evidence mapper reports one exact row for every page provision. |
+| WRITING.VERIFICATION.001 | static | `WritingVerificationTests` asserts the evidence mapper reports one exact row for every page provision. |
 | WRITING.METADATA.002 | static | `node tools/validate-consumer.mjs` validates opening JSON against the metadata schema. |
 | WRITING.METADATA.003 | static | `node tools/validate-consumer.mjs` reports no duplicate metadata carrier. |
-| WRITING.VALIDATION.001 | static | CI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
+| WRITING.VALIDATION.001 | static | `WritingValidationTests` asserts cI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
 | WRITING.SNAPSHOT.001 | static | `node tools/validate-standards.mjs` evaluates current standards material only. |
 | WRITING.SNAPSHOT.002 | inspection | Pull request review finds no history-specific material in active files. |
 | WRITING.SNAPSHOT.003 | inspection | Release review confirms each active provision resolves without reference to an earlier release. |

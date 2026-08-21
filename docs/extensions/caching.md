@@ -113,12 +113,12 @@ No provider package is selected by this extension.
 |:---|:---|:---|
 | EXT.CACHE.ADOPT.001 | inspection | The owning use-case specification records the query, load, latency, cost, target, and staleness. |
 | EXT.CACHE.ADOPT.002 | inspection | Cache review records a removal decision when current measurements no longer justify operating cost. |
-| EXT.CACHE.KEY.001 | test | Cache tests distinguish version, result inputs, and tenant or actor partitions. |
-| EXT.CACHE.KEY.002 | static, inspection | Key construction excludes secrets and unbounded raw request values. |
-| EXT.CACHE.INVALIDATE.001 | test | Cache tests cover expiry, invalidation event, failed invalidation, and owner behavior. |
+| EXT.CACHE.KEY.001 | test | `CacheKeyTests` distinguish version, result inputs, and tenant or actor partitions. |
+| EXT.CACHE.KEY.002 | static, inspection | `CacheKeyTests` asserts key construction excludes secrets and unbounded raw request values. |
+| EXT.CACHE.INVALIDATE.001 | test | `CacheInvalidateTests` cover expiry, invalidation event, failed invalidation, and owner behavior. |
 | EXT.CACHE.INVALIDATE.002 | inspection | The cache decision records expiry length and measured invalidation cost. |
 | EXT.CACHE.FAILURE.001 | inspection | Source and cache design review identifies the authoritative business record. |
-| EXT.CACHE.FAILURE.002 | test | Provider outage tests prove source fallback or the documented degraded response. |
-| EXT.CACHE.REFRESH.001 | test | Concurrent-miss tests show bounded refresh work and source protection. |
-| EXT.CACHE.REFRESH.002 | test | High-cardinality key tests show lock state remains bounded. |
+| EXT.CACHE.FAILURE.002 | test | `CacheFailureTests` prove source fallback or the documented degraded response. |
+| EXT.CACHE.REFRESH.001 | test | `CacheRefreshTests` show bounded refresh work and source protection. |
+| EXT.CACHE.REFRESH.002 | test | `CacheRefreshTests` show lock state remains bounded. |
 | EXT.CACHE.CONVENTION.001 | inspection | Source review locates cache access outside Domain and records any local replacement. |

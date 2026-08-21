@@ -192,26 +192,26 @@ This extension adds pinned Auth.js and JOSE packages. It replaces no backend aut
 | ID | Method | Evidence |
 |:---|:---|:---|
 | EXT.AUTHJS.ADOPT.001 | inspection | Frontend authentication review identifies Auth.js ownership of login and sessions. |
-| EXT.AUTHJS.ADOPT.002 | test | WebApi token tests use standards-based tokens without Auth.js session types. |
-| EXT.AUTHJS.SESSION.001 | test | Cookie fixtures assert attributes, lifetime, and narrow path. |
-| EXT.AUTHJS.SESSION.002 | static | Client source and browser storage scans expose no provider refresh token. |
+| EXT.AUTHJS.ADOPT.002 | test | `AuthJsAdoptTests` use standards-based tokens without Auth.js session types. |
+| EXT.AUTHJS.SESSION.001 | test | `AuthJsSessionTests` assert attributes, lifetime, and narrow path. |
+| EXT.AUTHJS.SESSION.002 | static | `AuthJsSessionTests` asserts client source and browser storage scans expose no provider refresh token. |
 | EXT.AUTHJS.SESSION.003 | inspection | Adoption decision selects JWT or database sessions. |
 | EXT.AUTHJS.SESSION.004 | inspection | Adoption decision names secret owner and refresh behavior. |
 | EXT.AUTHJS.SESSION.005 | inspection | Session review identifies each stored claim and provider value. |
-| EXT.AUTHJS.SESSION.006 | test | WebApi rejects use of an Auth.js session cookie as bearer authentication. |
-| EXT.AUTHJS.API.001 | static | Protected API calls attach tokens only in server-owned files. |
-| EXT.AUTHJS.API.002 | test | Browser fixture calls same-origin boundary without provider token exposure. |
-| EXT.AUTHJS.CALLBACK.001 | test | Callback fixtures reject invalid state, nonce, issuer, audience, and destination. |
-| EXT.AUTHJS.CALLBACK.002 | test | Return-target fixtures reject external and protocol-relative destinations. |
-| EXT.AUTHJS.FAILURE.001 | test | Expired and revoked session fixtures yield safe login or unauthenticated outcomes. |
-| EXT.AUTHJS.FAILURE.002 | test | Frontend fixtures render authentication and authorization failures differently. |
-| EXT.AUTHJS.FAILURE.003 | test | 401 and 403 fixtures stop retry after the documented bounded behavior. |
+| EXT.AUTHJS.SESSION.006 | test | `AuthJsSessionTests` asserts webApi rejects use of an Auth.js session cookie as bearer authentication. |
+| EXT.AUTHJS.API.001 | static | `AuthJsApiTests` asserts protected API calls attach tokens only in server-owned files. |
+| EXT.AUTHJS.API.002 | test | `AuthJsApiTests` calls same-origin boundary without provider token exposure. |
+| EXT.AUTHJS.CALLBACK.001 | test | `AuthJsCallbackTests` reject invalid state, nonce, issuer, audience, and destination. |
+| EXT.AUTHJS.CALLBACK.002 | test | `AuthJsCallbackTests` reject external and protocol-relative destinations. |
+| EXT.AUTHJS.FAILURE.001 | test | `AuthJsFailureTests` yield safe login or unauthenticated outcomes. |
+| EXT.AUTHJS.FAILURE.002 | test | `AuthJsFailureTests` render authentication and authorization failures differently. |
+| EXT.AUTHJS.FAILURE.003 | test | `AuthJsFailureTests` asserts 401 and 403 fixtures stop retry after the documented bounded behavior. |
 | EXT.AUTHJS.AUTHZ.001 | inspection | UI guard review identifies its advisory navigation behavior. |
-| EXT.AUTHJS.AUTHZ.002 | test | Protected API tests enforce target-resource authorization. |
-| EXT.AUTHJS.CSRF.001 | test | Auth.js route fixtures verify request-integrity behavior. |
-| EXT.AUTHJS.CSRF.002 | test | Cookie-authenticated boundary fixtures reject missing origin or anti-forgery evidence. |
-| EXT.AUTHJS.CSRF.003 | test | Cross-site form fixtures reject unsafe non-POST state changes. |
+| EXT.AUTHJS.AUTHZ.002 | test | `AuthJsAuthzTests` enforce target-resource authorization. |
+| EXT.AUTHJS.CSRF.001 | test | `AuthJsCsrfTests` asserts auth.js route fixtures verify request-integrity behavior. |
+| EXT.AUTHJS.CSRF.002 | test | `AuthJsCsrfTests` reject missing origin or anti-forgery evidence. |
+| EXT.AUTHJS.CSRF.003 | test | `AuthJsCsrfTests` reject unsafe non-POST state changes. |
 | EXT.AUTHJS.CONVENTION.001 | inspection | Auth.js configuration has one server-owned module or a local replacement. |
 | EXT.AUTHJS.CONVENTION.002 | inspection | Provider claim mapping remains beside its Auth.js configuration. |
-| EXT.AUTHJS.CONVENTION.003 | static | Feature source references the owned session view rather than provider responses. |
+| EXT.AUTHJS.CONVENTION.003 | static | `AuthJsTests` asserts feature source references the owned session view rather than provider responses. |
 | EXT.AUTHJS.CONVENTION.004 | inspection | Authentication Route Handlers remain thin and server-only. |
