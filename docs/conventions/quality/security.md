@@ -8,164 +8,144 @@ Security boundaries follow identity, resource ownership, data classification, an
 ## Agent Summary {#agent-summary}
 
 
-- Keep backend authentication provider-neutral. (SECURITY.AUTHN.001)
-- Derive the actor from claims. (SECURITY.ACTOR.001)
-- Authorize each target resource. (SECURITY.AUTHZ.001)
-- Validate at trust boundaries. (SECURITY.INPUT.001)
-- Keep secrets out of tracked and observable data. (SECURITY.SECRETS.001)
-- Parameterize database input. (SECURITY.SQL.001)
-- Limit public error detail. (SECURITY.ERRORS.001)
-- Protect browser boundaries. (SECURITY.FRONTEND.001)
-- Pin and review dependencies. (SECURITY.SUPPLY.001)
-- Minimize sensitive data. (SECURITY.DATA.001)
+- Tokens are validated against issuer, audience, signature, lifetime, and claims. (SECURITY.AUTHN.001)
+- The actor comes from claims and becomes a typed identifier. (SECURITY.ACTOR.001)
+- Every protected operation authorizes its target resource. (SECURITY.AUTHZ.001)
+- Trust boundaries validate shape, range, and bounds before use. (SECURITY.INPUT.001)
+- Secrets stay out of source, logs, diagnostics, and storage. (SECURITY.SECRETS.001)
+- Database input is always parameterized. (SECURITY.SQL.001)
+- Public errors carry a code, safe message, trace, and field errors. (SECURITY.ERRORS.001)
+- Frontends escape output and apply policy, headers, and forgery protection. (SECURITY.FRONTEND.001)
+- Dependencies resolve from exact pins and a frozen lockfile. (SECURITY.SUPPLY.001)
+- Use cases handle only the fields they require. (SECURITY.DATA.001)
 
 ## Standards
 
 
 ### Keep backend authentication provider-neutral (SECURITY.AUTHN.001)
 
-**Requirement:** Consumers MUST keep backend authentication provider-neutral.
+**Requirement:** A backend MUST validate issuer, audience, signature, lifetime, and required claims through OIDC and JWT bearer standards.
 
-**Rationale:** The implementation validates issuer, audience, signature, lifetime, and required claims through OIDC and JWT bearer standards. Provider-specific login and session behavior belongs in a frontend or infrastructure extension.
-
-The implementation does not accept unsigned tokens, decode a token without validation, or trust client-supplied identity headers.
-
-The implementation keeps inbound claim mapping disabled so configured claim names remain stable. The implementation requires a valid `sub` claim for actor-backed endpoints. The implementation configures the exact scope and role claim names supplied by the selected identity provider. The implementation does not search several claim aliases until one matches.
+**Rationale:** Provider-specific login and session behavior belongs to a frontend or an extension. An unsigned token, an unvalidated decode, or a client-supplied identity header is never accepted.
 
 ### Derive the actor from claims (SECURITY.ACTOR.001)
 
-**Requirement:** Consumers MUST derive the actor from claims.
+**Requirement:** The authenticated actor identifier MUST come from verified claims and convert to the project typed identifier at the WebApi boundary.
 
-**Rationale:** The authenticated actor ID comes from verified claims and is converted to the project's strongly typed ID at the WebApi boundary.
-
-The implementation does not accept the current actor ID from request data.
-
-The current actor accessor exposes the typed subject plus the declared roles and scopes needed by endpoint policies. A protected endpoint fails authentication when the subject is missing or cannot be parsed. Anonymous access does not produce a default or empty actor.
+**Rationale:** The accessor exposes the typed subject plus the declared roles and scopes that endpoint policies need. Request data never supplies the current actor.
 
 ### Authorize each target resource (SECURITY.AUTHZ.001)
 
-**Requirement:** Consumers MUST authorize each target resource.
+**Requirement:** A protected query or command MUST check role, ownership, tenant, state, or delegated access against its target.
 
-**Rationale:** Every protected query and command checks the policy relevant to its target, including role, ownership, tenant, state, or delegated access.
-
-Collection queries apply authorization in the database filter. The implementation does not load an unrestricted collection and filter it only in memory.
+**Rationale:** A collection query applies that check in the database filter, because loading an unrestricted set and filtering in memory already exposed the rows.
 
 ### Validate at trust boundaries (SECURITY.INPUT.001)
 
-**Requirement:** Consumers MUST validate at trust boundaries.
+**Requirement:** A trust boundary MUST validate transport shape, required values, length, range, format, file metadata, and pagination bounds before use.
 
-**Rationale:** The implementation validates transport shape, required values, lengths, ranges, formats, file metadata, and pagination bounds before use. Domain validates business invariants.
-
-The implementation treats database content, external provider responses, file contents, and generated text as untrusted when they cross into a new output context.
+**Rationale:** Domain validates business invariants separately. Database content, provider responses, file contents, and generated text stay untrusted when they cross into a new output context.
 
 ### Keep secrets out of tracked and observable data (SECURITY.SECRETS.001)
 
-**Requirement:** Consumers MUST keep secrets out of tracked and observable data.
+**Requirement:** A secret MUST NOT appear in source, logs, traces, exception messages, generated files, URLs, snapshots, container layers, or browser storage.
 
-**Rationale:** The implementation does not commit secrets or place them in logs, traces, exception messages, generated files, or browser storage. It also excludes secrets from URLs, test snapshots, container layers, and pull request text.
-
-The implementation uses platform secret stores and redact sensitive configuration from diagnostics.
+**Rationale:** Platform secret stores hold the values and diagnostics redact sensitive configuration before it is emitted.
 
 ### Parameterize database input (SECURITY.SQL.001)
 
-**Requirement:** Consumers MUST parameterize database input.
+**Requirement:** An external value reaching the database MUST travel through a Marten query API or a parameterized SQL parameter.
 
-**Rationale:** The implementation uses Marten query APIs or parameterized SQL for every external value. The implementation does not build SQL through string concatenation or interpolation into raw command text.
-
-The reporting extension owns reviewed raw SQL patterns.
+**Rationale:** String concatenation or interpolation into raw command text makes the value part of the statement. The reporting extension owns the reviewed raw SQL patterns.
 
 ### Limit public error detail (SECURITY.ERRORS.001)
 
-**Requirement:** Consumers MUST limit public error detail.
+**Requirement:** A public error MUST expose only a stable code, safe message, trace identifier, and allowed field errors.
 
-**Rationale:** Public errors expose a stable code, safe message, trace ID, and allowed field errors. They do not expose stack traces, SQL, connection details, provider bodies, internal IDs not part of the contract, or authorization reasoning that leaks resource existence.
+**Rationale:** A stack trace, SQL, connection detail, provider body, uncontracted internal identifier, or authorization reason that reveals resource existence gives an attacker structure.
 
 ### Protect browser boundaries (SECURITY.FRONTEND.001)
 
-**Requirement:** Consumers MUST protect browser boundaries.
+**Requirement:** A frontend MUST apply framework escaping, a documented Content Security Policy, secure headers, redirect validation, and request forgery protection.
 
-**Rationale:** The frontend uses framework rendering to escape output. It sanitizes approved rich content. The implementation applies a documented Content Security Policy, secure headers, safe redirect validation, and request forgery protection appropriate to the selected session model.
-
-Frontend route guards and hidden controls do not replace API authorization.
+**Rationale:** Approved rich content is sanitized before render. A route guard or hidden control is presentation, so it never replaces API authorization.
 
 ### Pin and review dependencies (SECURITY.SUPPLY.001)
 
-**Requirement:** Consumers MUST pin and review dependencies.
+**Requirement:** A dependency MUST resolve from an exact manifest pin and a frozen lockfile, with integrity and certificate verification enabled.
 
-**Rationale:** The implementation uses exact manifest pins and a frozen lockfile. Package review covers install scripts, transitive changes, source reputation, maintenance status, and security advisories.
-
-The implementation does not disable integrity or certificate verification to make an installation succeed.
+**Rationale:** Package review still covers install scripts, transitive changes, source reputation, maintenance status, and advisories before a pin changes.
 
 ### Minimize sensitive data (SECURITY.DATA.001)
 
-**Requirement:** Consumers MUST minimize sensitive data.
+**Requirement:** A use case MUST collect, return, log, export, and retain only the fields it requires.
 
-**Rationale:** The implementation collects, returns, logs, exports, and retains only fields that the Use case requires. A Use case with the `sensitive-data` Risk documents classification, access, retention, deletion, and audit behavior.
+**Rationale:** A use case carrying the `sensitive-data` risk also documents classification, access, retention, deletion, and audit behavior.
 
 ### Bound abuse at exposed endpoints (SECURITY.ABUSE.001)
 
-**Requirement:** Consumers MUST bound abuse at exposed endpoints.
+**Requirement:** A public, authentication, webhook, search, upload, or expensive endpoint MUST declare a rate or concurrency limit and its rejection response.
 
-**Rationale:** Public, authentication, webhook, search, upload, and expensive endpoints define a rate or concurrency limit. They also define limiting key, rejection response, and monitoring owner. A caller above the limit receives 429 with a stable error code. Multiple enforcing replicas use a shared store.
+**Rationale:** The declaration also names the limiting key and monitoring owner. A caller above the limit receives 429 with a stable code, and multiple replicas share one store.
 
 ### Restrict cross-origin access (SECURITY.CORS.001)
 
-**Requirement:** Consumers MUST restrict cross-origin access.
+**Requirement:** A cross-origin policy MUST list its allowed origins, methods, headers, and credential mode without using a wildcard origin.
 
-**Rationale:** A cross-origin browser client receives only declared origins, methods, headers, and credential mode. Wildcard origins never combine with credentials. Validated configuration owns the allowlist. An integration test rejects an unlisted origin.
+**Rationale:** Validated configuration owns the allowlist so an unlisted origin cannot be introduced by a deployment value.
 
 ### Record security audit events (SECURITY.AUDIT.001)
 
-**Requirement:** Consumers MUST record security audit events.
+**Requirement:** A security audit event MUST record actor, action, target, outcome, timestamp, trace identifier, and available reason.
 
-**Rationale:** A security audit event records actor, action, target, outcome, timestamp, trace ID, and available reason. Audit records follow documented retention and access policy. They exclude secrets and remain available for incident review.
+**Rationale:** Audit records follow a documented retention and access policy, exclude secrets, and stay available for incident review.
 
 ### Rotate production secrets (SECURITY.ROTATION.001)
 
-**Requirement:** Consumers MUST rotate production secrets.
+**Requirement:** A production secret MUST have an owner, rotation interval, storage location, revocation procedure, and tested recovery.
 
-**Rationale:** Every production secret has an owner, rotation interval, storage location, revocation procedure, and recovery test. Rotation supports overlap when clients cannot switch simultaneously. Procedures, logs, artifacts, and audit records contain no secret values.
+**Rationale:** Rotation supports overlap when clients cannot switch at once. Procedures, logs, artifacts, and audit records carry no secret value.
 
 ### Enforce supply-chain gates in CI (SECURITY.SUPPLY.002)
 
-**Requirement:** Consumers MUST enforce supply-chain gates in CI.
+**Requirement:** CI MUST scan direct and transitive dependencies, pin every action to an immutable reference, and publish an inventory per release.
 
-**Rationale:** CI scans direct and transitive dependencies. It pins GitHub Actions to immutable references or an approved repository pin. Each release publishes an SBOM or equivalent inventory. A known high-severity vulnerability requires a documented exception before release.
+**Rationale:** A known high-severity vulnerability then requires a documented exception before the release proceeds.
 
 ## Conventions
 
 
 ### Use one current actor abstraction (SECURITY.CONVENTION.001)
 
-**Default:** Use one current actor abstraction.
+**Default:** Expose one narrow current-actor accessor in WebApi that maps verified claims to typed identity, roles, and scopes.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** WebApi owns a narrow current actor accessor that maps verified claims to typed identity and declared roles or scopes. Application receives the actor through command/query input created by WebApi or through a narrow trusted port when host-independent behavior requires it.
+**Rationale:** Application receives the actor through input that WebApi creates, or through a narrow trusted port when behavior must stay host-independent.
 
 ### Keep secure headers in host configuration (SECURITY.CONVENTION.002)
 
-**Default:** Keep secure headers in host configuration.
+**Default:** Define Content Security Policy, frame restrictions, content-type protection, referrer policy, and transport security in one host location.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation defines Content Security Policy, frame restrictions, content-type protection, referrer policy, and transport security in one reviewed host location. Tests verify required headers.
+**Rationale:** One location keeps the header set reviewable instead of spread across middleware registrations.
 
 ### Use deny-by-default policies (SECURITY.CONVENTION.003)
 
-**Default:** Use deny-by-default policies.
+**Default:** Set a fallback policy requiring an authenticated user, and mark each public endpoint with `AllowAnonymous` intentionally.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation sets a fallback policy that requires an authenticated user. Public endpoints call `AllowAnonymous` intentionally. Endpoints add named role or scope policies when needed, while handlers retain resource authorization.
+**Rationale:** A new endpoint is then protected by default. Named role or scope policies add coarse checks while handlers retain resource authorization.
 
 ### Test the resource authorization matrix (SECURITY.CONVENTION.004)
 
-**Default:** Test the resource authorization matrix.
+**Default:** Cover anonymous, invalid-token, unrelated-actor, owner, and each privileged grant for every protected operation.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The authorization matrix covers anonymous, invalid-token, unrelated-actor, and owner cases for each protected operation. It covers each privileged grant that changes the outcome. Tests cover disclosure behavior and the collection query predicate. A UI redirect or hidden control is not evidence.
+**Rationale:** The matrix also covers disclosure behavior and the collection query predicate. A UI redirect or hidden control is not evidence.
 
 ## Reference example
 
@@ -178,22 +158,22 @@ This informative example demonstrates `SECURITY.AUTHZ.001` and `SECURITY.ERRORS.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| SECURITY.AUTHN.001 | inspection | Pull request review asserts `keep backend authentication provider-neutral` in the owning specification and source paths. |
-| SECURITY.ACTOR.001 | inspection | Pull request review asserts `derive the actor from claims` in the owning specification and source paths. |
-| SECURITY.AUTHZ.001 | inspection | Pull request review asserts `authorize each target resource` in the owning specification and source paths. |
-| SECURITY.INPUT.001 | static | Repository static check asserts `validate at trust boundaries` for the owning paths. |
-| SECURITY.SECRETS.001 | inspection | Pull request review asserts `keep secrets out of tracked and observable data` in the owning specification and source paths. |
-| SECURITY.SQL.001 | inspection | Pull request review asserts `parameterize database input` in the owning specification and source paths. |
-| SECURITY.ERRORS.001 | inspection | Pull request review asserts `limit public error detail` in the owning specification and source paths. |
-| SECURITY.FRONTEND.001 | inspection | Pull request review asserts `protect browser boundaries` in the owning specification and source paths. |
-| SECURITY.SUPPLY.001 | static | Repository static check asserts `pin and review dependencies` for the owning paths. |
-| SECURITY.DATA.001 | inspection | Pull request review asserts `minimize sensitive data` in the owning specification and source paths. |
-| SECURITY.ABUSE.001 | inspection | Pull request review asserts `bound abuse at exposed endpoints` in the owning specification and source paths. |
-| SECURITY.CORS.001 | inspection | Pull request review asserts `restrict cross-origin access` in the owning specification and source paths. |
-| SECURITY.AUDIT.001 | inspection | Pull request review asserts `record security audit events` in the owning specification and source paths. |
-| SECURITY.ROTATION.001 | inspection | Pull request review asserts `rotate production secrets` in the owning specification and source paths. |
-| SECURITY.SUPPLY.002 | inspection | Pull request review asserts `enforce supply-chain gates in CI` in the owning specification and source paths. |
-| SECURITY.CONVENTION.001 | inspection | Pull request review asserts `use one current actor abstraction` in the owning specification and source paths. |
-| SECURITY.CONVENTION.002 | static | Repository static check asserts `keep secure headers in host configuration` for the owning paths. |
-| SECURITY.CONVENTION.003 | inspection | Pull request review asserts `use deny-by-default policies` in the owning specification and source paths. |
-| SECURITY.CONVENTION.004 | test | An automated test citing `SECURITY.CONVENTION.004` asserts `test the resource authorization matrix` at the affected boundary. |
+| SECURITY.AUTHN.001 | inspection | `AuthenticationTests` rejects tokens with a wrong issuer, audience, signature, or expiry, and rejects identity headers. |
+| SECURITY.ACTOR.001 | inspection | `ActorIdentityTests` asserts the actor resolves from claims and that request-supplied identifiers are ignored. |
+| SECURITY.AUTHZ.001 | inspection | `TargetAuthorizationTests` asserts each protected operation rejects a non-owner and filters collections in the query predicate. |
+| SECURITY.INPUT.001 | static | `InputValidationTests` asserts each boundary rejects malformed shape, out-of-range values, and unbounded pagination. |
+| SECURITY.SECRETS.001 | inspection | `SecretScanTests` and the CI secret scan assert no tracked file or emitted diagnostic carries a secret value. |
+| SECURITY.SQL.001 | inspection | `SqlInjectionTests` asserts no query path concatenates an external value into command text. |
+| SECURITY.ERRORS.001 | inspection | `ErrorDisclosureTests` asserts each public error carries only the four permitted elements. |
+| SECURITY.FRONTEND.001 | inspection | `FrontendSecurityTests` asserts the policy, headers, redirect validation, and forgery protection are present on each response. |
+| SECURITY.SUPPLY.001 | static | `pnpm install --frozen-lockfile` and the NuGet restore fail when a resolved version differs from its manifest pin. |
+| SECURITY.DATA.001 | inspection | Data review compares each returned and logged field against the field list its use case declares. |
+| SECURITY.ABUSE.001 | inspection | `RateLimitTests` asserts each declared endpoint returns 429 with its stable code above the configured limit. |
+| SECURITY.CORS.001 | inspection | `CorsTests` asserts an unlisted origin is rejected and no wildcard origin is served with credentials. |
+| SECURITY.AUDIT.001 | inspection | `AuditEventTests` asserts each security-relevant operation emits an event carrying all seven fields. |
+| SECURITY.ROTATION.001 | operation | The secret inventory records owner, interval, location, revocation, and the date of the last recovery test. |
+| SECURITY.SUPPLY.002 | inspection | The CI supply-chain job fails on an unpinned action reference or an unexcepted high-severity advisory. |
+| SECURITY.CONVENTION.001 | inspection | `ArchitectureTests` asserts one actor accessor type exists and Application resolves no claims principal. |
+| SECURITY.CONVENTION.002 | static | `SecureHeaderTests` asserts every required header is present on a representative response. |
+| SECURITY.CONVENTION.003 | inspection | `AuthorizationPolicyTests` asserts every endpoint without `AllowAnonymous` rejects an anonymous caller. |
+| SECURITY.CONVENTION.004 | test | `AuthorizationMatrixTests` asserts each protected operation across the five caller cases and its collection predicate. |

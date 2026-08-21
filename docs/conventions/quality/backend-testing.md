@@ -8,23 +8,23 @@ Backend tests prove domain behavior, use-case coordination, real persistence and
 ## Agent Summary {#agent-summary}
 
 
-- Use four baseline test projects. (BTEST.PROJECTS.001)
-- Test Domain in isolation. (BTEST.DOMAIN.001)
-- Test Application coordination. (BTEST.APPLICATION.001)
-- Test persistence and HTTP with PostgreSQL. (BTEST.INTEGRATION.001)
-- Isolate integration state. (BTEST.ISOLATION.001)
-- Enforce architecture rules. (BTEST.ARCHITECTURE.001)
-- Trace acceptance criteria. (BTEST.TRACE.001)
-- Use evidence rather than one coverage target. (BTEST.COVERAGE.001)
-- Verify generated contracts. (BTEST.GENERATED.001)
-- Use one production-faithful integration harness. (BTEST.HARNESS.001)
+- Four test projects match the four boundaries. (BTEST.PROJECTS.001)
+- Domain tests run on explicit inputs alone. (BTEST.DOMAIN.001)
+- Application tests substitute ports and assert coordination. (BTEST.APPLICATION.001)
+- Integration tests use real PostgreSQL and the real host. (BTEST.INTEGRATION.001)
+- Integration cases reset state and never depend on order. (BTEST.ISOLATION.001)
+- Architecture tests assert every compiler-invisible boundary. (BTEST.ARCHITECTURE.001)
+- Every acceptance criterion is cited by an automated test. (BTEST.TRACE.001)
+- Coverage informs review; it is not the sufficiency test. (BTEST.COVERAGE.001)
+- Verification regenerates contracts and fails on drift. (BTEST.GENERATED.001)
+- One shared harness owns the container, host factory, and reset. (BTEST.HARNESS.001)
 
 ## Standards
 
 
 ### Use four baseline test projects (BTEST.PROJECTS.001)
 
-**Requirement:** Backend tests MUST use four baseline test projects.
+**Requirement:** A backend solution MUST contain Domain, Application, Integration, and Architecture test projects and no other baseline test project.
 
 **Example:** A test suite can contain:
 
@@ -39,62 +39,39 @@ Acceptance.Tests appears only when the executable BDD extension activates.
 
 ### Test Domain in isolation (BTEST.DOMAIN.001)
 
-**Requirement:** Backend tests MUST test Domain in isolation.
+**Requirement:** A Domain test MUST use explicit inputs with no database, HTTP host, container, clock, or mock.
 
-**Rationale:** Domain tests cover factories, every supported lifecycle state, allowed and rejected transitions, aggregate invariants, value equality, collection behavior, money rules, exceptions, and raised events. They use explicit inputs and no database, HTTP host, dependency injection container, clock, or mocks.
-
-Each module invariant maps through its use-case specification to at least one cited acceptance ID. Domain tests may add narrower cases without an acceptance ID.
+**Rationale:** Domain tests cover factories, every lifecycle state, allowed and rejected transitions, invariants, value equality, collections, money rules, exceptions, and raised events.
 
 ### Test Application coordination (BTEST.APPLICATION.001)
 
-**Requirement:** Backend tests MUST test Application coordination.
+**Requirement:** An Application test MUST substitute repositories, clocks, actor accessors, and external ports, then assert the handler's coordination.
 
-**Rationale:** Application tests use substitutes for aggregate repositories, clocks, actor accessors, and external ports. They confirm that the handler loads the correct aggregate, calls intended domain behavior, stages the result, and returns the correct result.
-
-Validator tests cover every structural error and stable error code. The implementation does not mock Marten query internals.
+**Rationale:** The assertion covers which aggregate loaded, which domain behavior ran, what was staged, and what returned. Validator tests cover each structural rule separately.
 
 ### Test persistence and HTTP with PostgreSQL (BTEST.INTEGRATION.001)
 
-**Requirement:** Backend tests MUST test persistence and HTTP with PostgreSQL.
+**Requirement:** An integration test MUST run against Testcontainers PostgreSQL, the real Marten configuration, and `WebApplicationFactory`.
 
-**Rationale:** Integration.Tests use Testcontainers PostgreSQL, the real Marten configuration, and `WebApplicationFactory` for API behavior.
-
-Integration tests cover document mappings, repository loading and storage, query projections, commit behavior, Problem Details, authentication, resource authorization, OpenAPI, and extension-specific infrastructure.
-
-CI executes this suite against the container on every change. A suite that cannot execute fails the build. Missing containers, broken hosts, and authentication failures also fail the build. The suite never reports success through skipped cases or cases that never reach the host. A silent suite hides regressions until the boundary has drifted.
+**Rationale:** Coverage includes mappings, repository load and store, projections, commit behavior, Problem Details, authentication, and resource authorization.
 
 ### Isolate integration state (BTEST.ISOLATION.001)
 
-**Requirement:** Backend tests MUST isolate integration state.
+**Requirement:** An integration test MUST reset database state between cases through one documented strategy and depend on no test order.
 
-**Rationale:** Reset database state between cases using one documented strategy. Tests do not depend on order or share mutable business state.
-
-Container and application host fixtures may be shared for cost. Test data does not leak between test cases.
+**Rationale:** Container and host fixtures may still be shared for cost, because only mutable business state must not leak.
 
 ### Enforce architecture rules (BTEST.ARCHITECTURE.001)
 
-**Requirement:** Backend tests MUST enforce architecture rules.
+**Requirement:** An architecture test MUST assert reference direction, package restrictions, type visibility, module folders, and aggregate inheritance.
 
-**Rationale:** Architecture.Tests verify:
-
-- The implementation projects reference direction.
-- Domain package restrictions.
-- Application and Infrastructure dependency restrictions.
-- Internal sealed handlers, validators, endpoints, and persistence implementations.
-- Public visibility of ports implemented across project boundaries.
-- Endpoint isolation from repositories and sessions.
-- Module folder and naming conventions that static analysis can prove.
-- Full `Command` and `Query` role suffixes on Application results, query result items, handlers, and validators.
-- Concrete boundary-role names ending in `Model` for passive WebApi DTOs and `ApiMappings` for operation mappings.
-- Aggregate inheritance from `AggregateRoot<TId>` and the absence of lifecycle enums.
-- Absence of `IModule`, `ModuleRoot`, or another runtime module abstraction.
-- Extension-specific replacements.
+**Rationale:** These are the boundaries a compiler does not enforce, so a review miss otherwise lands in the main branch.
 
 ### Trace acceptance criteria (BTEST.TRACE.001)
 
-**Requirement:** Backend tests MUST trace acceptance criteria.
+**Requirement:** Every acceptance criterion of a verified use case MUST appear in at least one recognized automated test reference.
 
-**Rationale:** Every acceptance criterion from a verified Use case appears in at least one recognized test reference:
+**Rationale:** The citation connects executable evidence to approved behavior, so a verified claim is checkable rather than asserted.
 
 **Example:**
 
@@ -110,34 +87,28 @@ The trace is one-way. Internal implementation tests do not need an acceptance ID
 
 ### Use evidence rather than one coverage target (BTEST.COVERAGE.001)
 
-**Requirement:** Backend tests MUST use evidence rather than one coverage target.
+**Requirement:** A repository MUST NOT treat one coverage percentage as the definition of sufficient testing.
 
-**Rationale:** The implementation collects line and branch coverage for review. The implementation does not use one repository-wide percentage as the definition of sufficient testing.
-
-Verified acceptance trace, Domain negative cases, integration boundaries, security behavior, and architecture rules remain required regardless of the percentage.
+**Rationale:** Line and branch coverage is collected for review. Acceptance trace, Domain negative cases, integration boundaries, security behavior, and architecture rules remain the evidence.
 
 ### Verify generated contracts (BTEST.GENERATED.001)
 
-**Requirement:** Backend tests MUST verify generated contracts.
+**Requirement:** The verification flow MUST regenerate OpenAPI and downstream API types and fail when committed output differs.
 
-**Rationale:** The implementation generates OpenAPI and downstream API types during the verification flow. Verification fails when committed generated output differs.
+**Rationale:** A generated contract that drifts from its source silently gives consumers a false description.
 
 ### Use one production-faithful integration harness (BTEST.HARNESS.001)
 
-**Requirement:** Backend tests MUST use one production-faithful integration harness.
+**Requirement:** The integration project MUST own one PostgreSQL container fixture, one `ApiFactory`, and one `DatabaseReset` helper.
 
-**Rationale:** `Integration.Tests` owns a PostgreSQL container fixture, `ApiFactory`, and `DatabaseReset`. The fixture starts the manifest-pinned PostgreSQL major once for a test collection or assembly and supplies its connection string before the WebApi host builds. `ApiFactory` targets the real `public partial Program`, replaces only external boundaries declared by the test, and retains production Marten, LiteBus, exception, authentication, authorization, and endpoint registration.
-
-The test strategy resets every application schema object that affects behavior, including Marten documents, sequences, outbox records, idempotency records, and scheduled work. Tests sharing one database run serially, while parallel tests use isolated databases or schemas. Tests do not depend on execution order.
-
-Security integration tests use locally issued JWTs that exercise the configured bearer validation, including issuer, audience, signature, lifetime, subject, scope, and role claims. A test authentication handler may simplify unrelated endpoint cases. It is not evidence for authentication behavior.
+**Rationale:** The fixture starts the pinned PostgreSQL once per collection and supplies its connection string before the host builds, so every test sees the same configuration.
 
 ## Conventions
 
 
 ### Mirror production module names (BTEST.CONVENTION.001)
 
-**Default:** Mirror production module names.
+**Default:** Mirror the production module and aggregate folder names inside each test project.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -172,31 +143,27 @@ Security integration tests use locally issued JWTs that exercise the configured 
 
 ### Name tests by observable behavior (BTEST.CONVENTION.002)
 
-**Default:** Name tests by observable behavior.
+**Default:** Name a test `{MethodOrOperation}_{Condition}_{ExpectedResult}` and its class after the production type it covers.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation uses `{MethodOrOperation}_{Condition}_{ExpectedResult}` when it remains readable. A test class matches the production type it tests, such as `CreateDraftCommandHandlerTests` or `GetPostQueryHandlerTests`.
-
-The implementation avoids names such as `Test1`, `HappyPath`, or `Works`.
+**Rationale:** A name such as `Test1` or `HappyPath` describes the author's intent rather than the behavior that failed.
 
 ### Use builders for valid defaults (BTEST.CONVENTION.003)
 
-**Default:** Use builders for valid defaults.
+**Default:** Create a test data builder that produces valid state by default and exposes business-named customization.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation creates a test data builder when many tests need a valid aggregate with small variations. The builder produces valid state by default and exposes business-named customization.
-
-The implementation does not bypass domain methods to create impossible state unless a persistence compatibility test requires it.
+**Rationale:** Bypassing domain methods to construct impossible state is reserved for a persistence compatibility test.
 
 ### Keep assertions focused (BTEST.CONVENTION.004)
 
-**Default:** Keep assertions focused.
+**Default:** Assert only the state, event, call, response, or error that the test covers.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Focused assertions cover the state, event, call, response, or error relevant to the test. The implementation avoids broad object snapshots that fail for unrelated field additions.
+**Rationale:** A broad object snapshot fails for an unrelated field addition, which trains readers to update it without reading it.
 
 ## Reference example
 
@@ -209,17 +176,17 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BTEST.PROJECTS.001 | test | An automated test citing `BTEST.PROJECTS.001` asserts `use four baseline test projects` at the affected boundary. |
-| BTEST.DOMAIN.001 | test | An automated test citing `BTEST.DOMAIN.001` asserts `test Domain in isolation` at the affected boundary. |
-| BTEST.APPLICATION.001 | test | An automated test citing `BTEST.APPLICATION.001` asserts `test Application coordination` at the affected boundary. |
-| BTEST.INTEGRATION.001 | test | An automated test citing `BTEST.INTEGRATION.001` asserts `test persistence and HTTP with PostgreSQL` at the affected boundary. |
-| BTEST.ISOLATION.001 | test | An automated test citing `BTEST.ISOLATION.001` asserts `isolate integration state` at the affected boundary. |
-| BTEST.ARCHITECTURE.001 | test | An automated test citing `BTEST.ARCHITECTURE.001` asserts `enforce architecture rules` at the affected boundary. |
-| BTEST.TRACE.001 | test | An automated test citing `BTEST.TRACE.001` asserts `trace acceptance criteria` at the affected boundary. |
-| BTEST.COVERAGE.001 | test | An automated test citing `BTEST.COVERAGE.001` asserts `use evidence rather than one coverage target` at the affected boundary. |
-| BTEST.GENERATED.001 | test | An automated test citing `BTEST.GENERATED.001` asserts `verify generated contracts` at the affected boundary. |
-| BTEST.HARNESS.001 | test | An automated test citing `BTEST.HARNESS.001` asserts `use one production-faithful integration harness` at the affected boundary. |
-| BTEST.CONVENTION.001 | test | An automated test citing `BTEST.CONVENTION.001` asserts `mirror production module names` at the affected boundary. |
-| BTEST.CONVENTION.002 | test | An automated test citing `BTEST.CONVENTION.002` asserts `name tests by observable behavior` at the affected boundary. |
-| BTEST.CONVENTION.003 | test | An automated test citing `BTEST.CONVENTION.003` asserts `use builders for valid defaults` at the affected boundary. |
-| BTEST.CONVENTION.004 | test | An automated test citing `BTEST.CONVENTION.004` asserts `keep assertions focused` at the affected boundary. |
+| BTEST.PROJECTS.001 | test | `SolutionStructureTests` asserts the solution contains exactly the four baseline test projects. |
+| BTEST.DOMAIN.001 | test | `ArchitectureTests` asserts the Domain test project references no database, host, container, or mocking package. |
+| BTEST.APPLICATION.001 | test | `ApplicationHandlerTests` asserts the loaded aggregate, invoked behavior, staged change, and returned result for each handler. |
+| BTEST.INTEGRATION.001 | test | `IntegrationTests` starts the manifest-pinned PostgreSQL container and the real WebApi host for each covered boundary. |
+| BTEST.ISOLATION.001 | test | `DatabaseResetTests` asserts a randomized case order passes and no case observes another case's data. |
+| BTEST.ARCHITECTURE.001 | test | `ArchitectureTests` covers each listed structural boundary and runs in the Release test pass. |
+| BTEST.TRACE.001 | test | `node standards/tools/validate-consumer.mjs` resolves each acceptance identifier to a test source reference. |
+| BTEST.COVERAGE.001 | operation | The CI test job publishes coverage as a review artifact and gates on no percentage threshold. |
+| BTEST.GENERATED.001 | test | The CI contract job regenerates `apps/api/openapi/` and typed clients, then fails on any tree difference. |
+| BTEST.HARNESS.001 | test | `IntegrationTests` resolves its container fixture, `ApiFactory`, and `DatabaseReset` from one shared harness. |
+| BTEST.CONVENTION.001 | test | Folder review compares each test tree against its production module list, or records a named local replacement. |
+| BTEST.CONVENTION.002 | test | `TestNamingTests` asserts each test class name matches a production type and each method carries the three-part form. |
+| BTEST.CONVENTION.003 | test | Builder review confirms each builder produces a valid aggregate by default through its domain factory. |
+| BTEST.CONVENTION.004 | test | Assertion review confirms each test asserts its named outcome rather than a whole-object snapshot. |
