@@ -24,6 +24,8 @@
 - Made `tools/validate-consumer.mjs` report a metadata block that is not delimited by `---` instead of skipping the file. A silently skipped specification is an unvalidated specification.
 - Added seven authoring rules that detect provisions and evidence carrying no information: `PROVISION_RESTATES_HEADING`, `VERIFY_TEMPLATED_EVIDENCE`, `VERIFY_NO_ARTIFACT`, `SUMMARY_RESTATES_REQUIREMENT`, `ID_PREFIX_OWNERSHIP`, `HEADING_EMPTY_BODY`, and `INDEX_CONTAINS_PROCEDURE`.
 - Added a warning tier to `tools/validate-standards.mjs`. A code in `WARNING_DIAGNOSTIC_CODES` reports a defect under active repair and does not fail the build. `--warnings` lists every occurrence.
+- Repaired the baseline conventions so each Requirement and Default states its complete obligation, each evidence row names a real command, path, or test, and each Agent Summary bullet compresses its provision instead of repeating it. Repaired so far: `docs/conventions/backend/api.md`.
+- Split compound API provisions that carried two normative modals into separate identified assertions: `API.ENDPOINTS.002`, `API.BOUNDARY.002`, `API.ACTOR.002`, `API.ERRORS.002`, `API.STATUS.002`, `API.OPENAPI.004`, and `API.MODELS.002`.
 - Removed every version-specific upgrade guide and the requirement to publish future migration instructions. Consumers remain on pinned releases until they select another complete contract.
 - Replaced the version-specific adoption guide with `docs/guides/getting-started.md` and removed the duplicate v1 release-scope guide.
 - Replaced application-v1 readiness labels with version-neutral release evidence and release-record guidance.
