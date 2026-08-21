@@ -188,6 +188,10 @@ The delivery approach in which approved specifications select work, record behav
 
 A consumer replacement for one Standard, identified by its rule ID and an accepted project decision.
 
+## Standards release
+
+One published, pinned, complete standards contract that depends on no earlier release and carries no compatibility guarantee.
+
 ## Use case
 
 One independently testable actor or system goal implemented as one top-level Command or Query operation.

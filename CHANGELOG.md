@@ -11,6 +11,10 @@
 - Added `tools/validate-standards.mjs`, its dependency-free fixture suite, a pull request checklist, and a pinned GitHub Actions validation workflow.
 - Added authoring templates for normative topics, extensions, and guides under `templates/standards/`.
 - Removed the repository writing convention after moving its authority into the authoring foundation.
+- Made the standards release model normative. `WRITING.SNAPSHOT.003` requires each release to state its complete contract without depending on an earlier release. `WRITING.SNAPSHOT.004` prohibits a compatibility guarantee, migration path, deprecation period, replacement map, or identifier alias between standards releases. `WRITING.SNAPSHOT.005` records that a consumer keeps a pinned release for as long as that consumer chooses.
+- Scoped that release model to the standards repository. Consumer product API compatibility, schema migration, deprecation, and rollback provisions are unchanged, including the `api-compatibility` and `persistence-ef-core` extensions.
+- Moved the release model and version-number meaning from `CONTRIBUTING.md` into the authoring standard as the canonical `Release model` concept. `CONTRIBUTING.md` now projects that model with citations instead of restating it.
+- Added the `Standards release` glossary term.
 - Removed every version-specific upgrade guide and the requirement to publish future migration instructions. Consumers remain on pinned releases until they select another complete contract.
 - Replaced the version-specific adoption guide with `docs/guides/getting-started.md` and removed the duplicate v1 release-scope guide.
 - Replaced application-v1 readiness labels with version-neutral release evidence and release-record guidance.

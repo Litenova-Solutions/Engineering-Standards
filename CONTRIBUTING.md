@@ -57,17 +57,17 @@ The pull request checklist records the manual active-voice, terminology, atomici
 
 ## Release Numbering
 
-Version numbers identify complete pinned standards contracts. They do not claim Semantic Versioning compatibility.
+The [authoring standard](docs/foundations/authoring-standard.md) owns the release model, including the meaning of each version number. This section projects that model for contributors.
 
-- Patch releases correct or clarify a narrow contract area.
-- Minor releases make one coherent standards evolution.
-- Major releases replace supported scope, method, or platform profile.
+Each release states its complete contract without depending on an earlier release. (WRITING.SNAPSHOT.003)
 
-Release changes require no transition instructions, aliases, or compatibility layers.
+Do not add a compatibility guarantee, migration path, deprecation period, replacement map, or identifier alias between standards releases. (WRITING.SNAPSHOT.004)
 
-Consumers can remain on a pinned release. They can select another release when they choose to adopt its complete contract.
+A consumer keeps a pinned release for as long as that consumer chooses, and absorbs every difference when adopting a later release. (WRITING.SNAPSHOT.005)
 
-`CHANGELOG.md` is the repository release note. It describes the current contract without prescribing a transition path.
+`WRITING.SNAPSHOT.004` covers standards releases only. A consumer product is a running service, and its own API compatibility, migration, deprecation, and rollback provisions still apply.
+
+`CHANGELOG.md` is the repository release note. The changelog describes the current contract without prescribing a transition path. (WRITING.SNAPSHOT.001)
 
 ## Maintainer Review
 

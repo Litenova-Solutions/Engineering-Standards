@@ -18,6 +18,12 @@ Treat active standards as a complete current snapshot. (WRITING.SNAPSHOT.001)
 
 Do not retain history-specific paths, IDs, aliases, maps, standards-release migration material, compatibility rules, or transition checks. (WRITING.SNAPSHOT.002)
 
+Each standards release states its complete contract. Do not add compatibility, migration, deprecation, or alias work between standards releases. (WRITING.SNAPSHOT.003, WRITING.SNAPSHOT.004)
+
+A consumer keeps a pinned release for as long as that consumer chooses. (WRITING.SNAPSHOT.005)
+
+`WRITING.SNAPSHOT.004` covers standards releases only. Consumer product API compatibility, migration, and rollback provisions still apply. (WRITING.SNAPSHOT.004)
+
 ## Context Loading
 
 1. Read the consumer `AGENTS.md` and `standards.project.json`. (AGENT.LOAD.002)

@@ -13,6 +13,7 @@ The standards use one document grammar and one controlled technical prose profil
 - Keep summaries informative and cite every projected provision. (WRITING.SUMMARY.001)
 - Map every provision to exact verification evidence. (WRITING.VERIFICATION.001)
 - Validate only current standards material. (WRITING.SNAPSHOT.001, WRITING.SNAPSHOT.002)
+- Publish complete releases and no cross-release compatibility work. (WRITING.SNAPSHOT.003, WRITING.SNAPSHOT.004, WRITING.SNAPSHOT.005)
 - Run the dependency-free authoring checks before review. (WRITING.VALIDATION.001)
 
 ## Concepts
@@ -68,9 +69,21 @@ Standards define required boundaries. Conventions define replaceable defaults. I
 
 `CONTRIBUTING.md` owns contribution workflow and review. `CHANGELOG.md` is the only repository release note.
 
-Version numbers identify complete pinned contracts without claiming Semantic Versioning compatibility. Consumers can keep any pinned release and adopt another release on their schedule.
-
 Current standards material is the published snapshot. The validator evaluates current material, not release history.
+
+### Release model
+
+Each standards release is a complete contract. A release states every active provision without depending on an earlier release.
+
+The repository publishes no compatibility guarantee between its own releases. The repository publishes no migration path, deprecation period, replacement map, or identifier alias.
+
+A consumer pins one release and keeps that release for as long as the consumer chooses. A consumer adopts a later release by accepting that release's complete contract, and absorbs every difference at that moment.
+
+`CHANGELOG.md` records what changed between releases. The changelog describes the current contract and prescribes no transition path.
+
+Version numbers identify complete pinned contracts. They do not claim Semantic Versioning compatibility. A patch release corrects a narrow contract area. A minor release makes one coherent standards evolution. A major release replaces supported scope, method, or platform profile.
+
+This release model governs the standards repository. A consumer product is a running service with its own users. Consumer API compatibility, schema migration, deprecation, and rollback stay required wherever their owning provisions and extensions apply.
 
 ### Page contracts
 
@@ -277,6 +290,24 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** The published snapshot states its own contract without carrying previous releases forward.
 
+### Publish each release as a complete contract (WRITING.SNAPSHOT.003)
+
+**Requirement:** A standards release MUST state every active provision without depending on an earlier release.
+
+**Rationale:** A consumer reads one pinned snapshot and needs no other release to determine its obligations.
+
+### Exclude cross-release compatibility work (WRITING.SNAPSHOT.004)
+
+**Requirement:** The standards repository MUST NOT publish a compatibility guarantee, migration path, deprecation period, or identifier alias between its own releases.
+
+**Rationale:** The standards are a pinned contract rather than a running service. A consumer product keeps its own API compatibility, migration, deprecation, and rollback provisions.
+
+### Keep a pinned release for as long as it serves (WRITING.SNAPSHOT.005)
+
+**Requirement:** A consumer MAY keep any published standards release for as long as that consumer chooses.
+
+**Rationale:** Adoption is a consumer decision, and no repository change obliges a consumer to move to a later release.
+
 ## Conventions
 
 ### Prefer direct action headings (WRITING.HEADING.CONVENTION.001)
@@ -333,6 +364,9 @@ This informative example demonstrates `WRITING.REQUIREMENT.001`, `WRITING.EXAMPL
 | WRITING.VALIDATION.001 | static | CI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
 | WRITING.SNAPSHOT.001 | static | `node tools/validate-standards.mjs` evaluates current standards material only. |
 | WRITING.SNAPSHOT.002 | inspection | Pull request review finds no history-specific material in active files. |
+| WRITING.SNAPSHOT.003 | inspection | Release review confirms each active provision resolves without reference to an earlier release. |
+| WRITING.SNAPSHOT.004 | inspection | Pull request review finds no cross-release compatibility, migration, deprecation, or alias material. |
+| WRITING.SNAPSHOT.005 | inspection | Review confirms no active provision requires a consumer to adopt a later standards release. |
 | WRITING.HEADING.CONVENTION.001 | inspection | Review records the action verb used by every changed provision heading. |
 | WRITING.INSTRUCTION.CONVENTION.001 | inspection | Review identifies the unsafe boundary behind every retained negative instruction. |
 | WRITING.TABLE.CONVENTION.001 | inspection | Review confirms that each changed table represents an exact mapping or comparison. |
