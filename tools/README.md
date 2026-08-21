@@ -1,30 +1,68 @@
 # Standards Tools
 
-Reference tooling for consumers of the Agentic Engineering System. These are reference implementations. A consumer may extend or replace them, but the checks match the Verification lists in the foundation standards.
+## Intent
 
-## validate-consumer.mjs
+The repository ships dependency-free Node validators for standards authors and consumer repositories.
 
-A dependency-free Node validator for a consumer repository. It validates every structured Specification Metadata block against the kind-discriminated schema and runs the cross-file checks that JSON Schema cannot prove.
+## Validate Standards
+
+Run the standards repository validator from its root:
 
 ```bash
-# from the consumer repository root (must contain standards.project.json)
-node standards/tools/validate-consumer.mjs
-
-# or point at another consumer root
-node standards/tools/validate-consumer.mjs /path/to/consumer
+node tools/validate-standards.mjs
 ```
 
-Checks performed:
+An optional argument selects another repository root:
 
-- Metadata block parses, has the required fields for its `kind`, and carries no unknown field.
-- `id`, `specStatus`, `implementationStatus`, `operationType`, `releaseRole`, `risks`, and identifier arrays match the schema patterns and enums.
-- Exactly one `product` specification and exactly one `primary` release flow exist.
-- Every end-to-end flow `useCases` entry resolves to a module use-case file.
-- Every workflow `participatingModules` and domain-policy `appliesToModules` entry resolves to a module directory.
-- Each use-case `id` matches its file path under `modules/{module}/{use-case}.md`.
-- Acceptance `AC-*` and end-to-end `E2E-*` definitions are unique.
-- Local `applicableExtensions` are selected in `standards.project.json`, are not project-scoped, and are allowed for the specification kind (when the standards manifest is reachable).
-- Relative Markdown links resolve.
-- Structured specifications under `docs/research/` (for example decision-evidence records) are validated; research prose without a metadata block is skipped and not link-gated.
+```bash
+node tools/validate-standards.mjs /path/to/standards
+```
 
-Exit code is `0` on pass and non-zero on failure. It does not run backend, frontend, or extension verification; those remain in the release gates.
+The validator checks:
+
+- Page contracts and section order.
+- Atomic Standards and Convention blocks.
+- Provision IDs, summaries, and evidence rows.
+- Controlled prose limits and ASCII text.
+- Internal links, anchors, and manifest paths.
+- Extension declarations and profile composition.
+- The two tracked schema consumers.
+- Current standards material.
+
+Exit code `0` means pass. Code `1` means validation failed. Code `2` means the input or command usage is invalid.
+
+Run its fixture suite after changing authoring rules or validator behavior:
+
+```bash
+node tools/validate-standards.cases.mjs
+```
+
+## Validate a Consumer
+
+Run the consumer validator from a repository containing `standards.project.json`:
+
+```bash
+node standards/tools/validate-consumer.mjs
+```
+
+The validator checks Specification Metadata, identifiers, file relationships, extension scope, links, and acceptance trace uniqueness.
+
+An optional argument selects another consumer root.
+
+## Validate Controlled UI
+
+Run the UI validator from an opted-in React web consumer:
+
+```bash
+node standards/tools/validate-ui.mjs
+```
+
+The validator checks UI configuration, vocabulary, page contracts, source locks, CSS boundaries, and visual-system ownership.
+
+Run its fixture suite after changing a UI rule, schema, template, or validator:
+
+```bash
+node tools/validate-ui.cases.mjs
+```
+
+Reference validators do not run application builds, browser tests, deployment checks, or operating evidence gates.
