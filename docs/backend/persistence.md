@@ -18,7 +18,7 @@ One scoped document session and one LiteBus command post-handler own the transac
 - Document aliases and identifier mappings are declared explicitly. (BACKEND.PERSISTENCE.MAPPING.001)
 - Infrastructure owns the stored JSON contract, not Domain. (BACKEND.PERSISTENCE.SERIALIZATION.001)
 - Stored contract changes carry a reviewed transformation. (BACKEND.PERSISTENCE.EVOLUTION.001)
-- Aggregate documents carry no unbounded collection. (BACKEND.PERSISTENCE.DOCUMENT.001)
+- Aggregate documents carry no unbounded collection. (BACKEND.PERSISTENCE.GROWTH.001)
 - Database identifiers use snake case. (BACKEND.PERSISTENCE.NAMING.001)
 
 ## Standards
@@ -72,7 +72,7 @@ One scoped document session and one LiteBus command post-handler own the transac
 
 **Rationale:** JSON member names, required values, and discriminator values are database schema. An additive member still defines its behavior for documents written earlier.
 
-### Bound aggregate document growth (BACKEND.PERSISTENCE.DOCUMENT.001)
+### Bound aggregate document growth (BACKEND.PERSISTENCE.GROWTH.001)
 
 **Requirement:** An aggregate document MUST NOT embed a collection that has no accepted business bound.
 
@@ -235,7 +235,7 @@ internal sealed class PostRepository(
 | BACKEND.PERSISTENCE.MAPPING.001 | inspection | `MartenMappingTests` asserts each stored aggregate declares an explicit alias and identifier mapping. |
 | BACKEND.PERSISTENCE.SERIALIZATION.001 | inspection | `SerializationTests` asserts every stored polymorphic subtype round-trips under the configured contract. |
 | BACKEND.PERSISTENCE.EVOLUTION.001 | inspection | `DocumentEvolutionTests` reads a document written in the previous shape and asserts the declared transformation result. |
-| BACKEND.PERSISTENCE.DOCUMENT.001 | inspection | `DocumentSizeTests` asserts each embedded collection has a declared maximum from its use case. |
+| BACKEND.PERSISTENCE.GROWTH.001 | inspection | `DocumentSizeTests` asserts each embedded collection has a declared maximum from its use case. |
 | BACKEND.PERSISTENCE.NAMING.001 | inspection | `SchemaNamingTests` asserts every generated database identifier is snake case. |
 | BACKEND.PERSISTENCE.SCHEMA.001 | inspection | Deployment review confirms the schema step runs before traffic shifts and startup applies no schema change. |
 | BACKEND.PERSISTENCE.TEST.001 | test | `PersistenceIntegrationTests` runs against the manifest-pinned PostgreSQL image through Testcontainers. |

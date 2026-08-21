@@ -42,7 +42,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 ### Apply guidance precedence (CORE.AGENT.PRECEDENCE.001)
 
-**Requirement:** An agent MUST apply consumer overrides, applicable extensions, selected profile conventions, and foundation standards in that order.
+**Requirement:** An agent MUST apply consumer overrides, applicable extensions, selected profile conventions, and core standards in that order.
 
 **Rationale:** The order resolves a more local approved replacement before a broader baseline.
 

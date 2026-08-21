@@ -36,13 +36,13 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 | Excluded document | Reason |
 |:---|:---|
-| `conventions/backend/persistence-marten.md` | No database. Replaced by browser persistence. |
-| `conventions/backend/api.md` | No HTTP surface, actor claims, Problem Details, paging, or OpenAPI. |
-| `conventions/frontend/structure.md` | Next.js application tree. Replaced by client structure. |
-| `conventions/frontend/rendering.md` | Next.js routing and render modes. Replaced by client rendering. |
-| `conventions/frontend/components.md` | React and shadcn/ui components. Replaced by client components. |
-| `conventions/frontend/data-and-state.md` | Server functions and fetch data access. Replaced by client data and state. |
-| `conventions/frontend/testing.md` | Vitest and React Testing Library. Replaced by client testing. |
+| `backend/persistence.md` | No database. Replaced by browser persistence. |
+| `backend/api.md` | No HTTP surface, actor claims, Problem Details, paging, or OpenAPI. |
+| `frontend/structure.md` | Next.js application tree. Replaced by Blazor structure. |
+| `frontend/rendering.md` | Next.js routing and render modes. Replaced by Blazor rendering. |
+| `frontend/components.md` | React and shadcn/ui components. Replaced by Blazor components. |
+| `frontend/data.md` | Server functions and fetch data access. Replaced by Blazor data and state. |
+| `frontend/testing.md` | Vitest and React Testing Library. Replaced by Blazor testing. |
 
 Backend architecture, domain, and application conventions are not excluded, because a client application still has both layers. Operations conventions apply in reduced form: health endpoints, schema review, backup, and restore have no target, while diagnostics, bounded metrics, and Operating Limits still apply.
 
@@ -80,7 +80,7 @@ Backend architecture, domain, and application conventions are not excluded, beca
 - [Domain](../backend/domain.md)
 - [Application](../backend/application.md)
 
-### Client
+### Blazor
 
 - [Blazor structure](../blazor/structure.md)
 - [Blazor rendering and routes](../blazor/rendering.md)

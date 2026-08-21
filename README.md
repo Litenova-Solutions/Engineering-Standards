@@ -31,7 +31,7 @@ The baseline profile applies first. An extension or consumer decision names each
 
 - [Hosted documentation](https://www.litenova.solutions/Standards)
 - [Repository documentation index](docs/README.md)
-- [Agentic Engineering System foundation](docs/core/system.md)
+- [Agentic Engineering System](docs/core/system.md)
 - [Authoring standard](docs/core/authoring.md)
 - [Get started](docs/guide/getting-started.md)
 

@@ -13,7 +13,7 @@ Application coordinates use cases. It translates a command or query into domain 
 - Messages are public when hosts need them; handlers stay internal. (BACKEND.APPLICATION.CONTRACTS.001)
 - Validators check input shape; Domain decides state permission. (BACKEND.APPLICATION.VALIDATION.001)
 - Expected failures throw typed Application exceptions with stable codes. (BACKEND.APPLICATION.FAILURE.001)
-- Handlers authorize against the target data they load. (BACKEND.APPLICATION.AUTHORIZATION.001)
+- Handlers authorize against the target data they load. (BACKEND.APPLICATION.AUTHZ.001)
 - Command handlers load, call Domain, stage, and return. (BACKEND.APPLICATION.COMMAND.001)
 - Queries project through the read session, never through aggregates. (BACKEND.APPLICATION.QUERY.001)
 - Results mirror the Domain closed set rather than flattening it. (BACKEND.APPLICATION.CLOSEDSET.001)
@@ -52,7 +52,7 @@ Application coordinates use cases. It translates a command or query into domain 
 
 **Rationale:** One public abstract `UseCaseException` has sealed `ResourceNotFoundException`, `UseCaseForbiddenException`, and `UseCaseConflictException` subclasses. They carry no HTTP result, provider exception, or stack detail, and handlers do not catch them.
 
-### Enforce target authorization in the use case (BACKEND.APPLICATION.AUTHORIZATION.001)
+### Enforce target authorization in the use case (BACKEND.APPLICATION.AUTHZ.001)
 
 **Requirement:** A protected handler MUST verify ownership, tenant, role, state, or delegated access against the target data it loads.
 
@@ -291,7 +291,7 @@ Infrastructure stages Workflow state and the outgoing Command in the same sessio
 | BACKEND.APPLICATION.CONTRACTS.001 | inspection | `ArchitectureTests` asserts handler and validator types are internal and sealed while messages and results carry their role suffix. |
 | BACKEND.APPLICATION.VALIDATION.001 | inspection | `ValidationTests` asserts each validator rejects structural input and defers state decisions to the aggregate. |
 | BACKEND.APPLICATION.FAILURE.001 | inspection | `UseCaseFailureTests` asserts each expected failure surfaces its stable code with no transport or provider detail attached. |
-| BACKEND.APPLICATION.AUTHORIZATION.001 | inspection | `TargetAuthorizationTests` asserts each protected handler rejects a caller lacking the target grant it loads. |
+| BACKEND.APPLICATION.AUTHZ.001 | inspection | `TargetAuthorizationTests` asserts each protected handler rejects a caller lacking the target grant it loads. |
 | BACKEND.APPLICATION.COMMAND.001 | inspection | `ArchitectureTests` asserts no command handler commits a session, catches a domain exception, or references an HTTP type. |
 | BACKEND.APPLICATION.QUERY.001 | inspection | `ArchitectureTests` asserts no query handler resolves a repository or returns an aggregate type. |
 | BACKEND.APPLICATION.CLOSEDSET.001 | inspection | `ResultContractTests` asserts each result union carries one record per Domain case and exposes no Domain type. |

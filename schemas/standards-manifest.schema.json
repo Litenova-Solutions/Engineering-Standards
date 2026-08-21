@@ -77,10 +77,10 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["entry", "documents"],
+        "required": ["entry", "pages"],
         "properties": {
           "entry": { "$ref": "#/$defs/repositoryPath" },
-          "documents": {
+          "pages": {
             "type": "array",
             "minItems": 1,
             "uniqueItems": true,

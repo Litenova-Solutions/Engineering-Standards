@@ -15,7 +15,7 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 - Collection reads carry deterministic ordering and a bounded limit. (BACKEND.API.PAGING.001)
 - OpenAPI is generated during the Release build and committed when consumed. (BACKEND.API.OPENAPI.001)
 - The contract declares the authentication that endpoints enforce. (BACKEND.API.OPENAPI.002)
-- Transport models mirror the shape of the Domain closed set they carry. (BACKEND.API.MODELS.001, BACKEND.API.MODELS.002)
+- Transport models mirror the shape of the Domain closed set they carry. (BACKEND.API.MODEL.001, BACKEND.API.MODEL.002)
 
 ## Standards
 
@@ -200,11 +200,11 @@ When TypeScript consumes the API, the pinned `openapi-typescript` executable rea
 
 **Rationale:** A caller learns an operation's limits from the document instead of discovering them through a runtime rejection.
 
-**Example:** A label-only set publishes its values as an OpenAPI `enum`. A data-bearing set publishes a polymorphic `oneOf` model with a discriminator per `BACKEND.API.MODELS.001`. A named boundary enum carries `[JsonConverter(typeof(JsonStringEnumConverter<T>))]` on its type, so every serializer honors the contract, including a test client using default options. Host-only conversion breaks readers that do not share host configuration.
+**Example:** A label-only set publishes its values as an OpenAPI `enum`. A data-bearing set publishes a polymorphic `oneOf` model with a discriminator per `BACKEND.API.MODEL.001`. A named boundary enum carries `[JsonConverter(typeof(JsonStringEnumConverter<T>))]` on its type, so every serializer honors the contract, including a test client using default options. Host-only conversion breaks readers that do not share host configuration.
 
 An operation requiring a control header declares it as a required parameter, for example `Idempotency-Key` or `If-Match`. The implementation prefers typed results, typed boundary enums, and parameter metadata over handwritten schemas that drift from code.
 
-### Mirror a Domain closed set as a transport model of the same shape (BACKEND.API.MODELS.001)
+### Mirror a Domain closed set as a transport model of the same shape (BACKEND.API.MODEL.001)
 
 **Requirement:** A WebApi transport model for a Domain closed set MUST preserve the shape of that set.
 
@@ -221,7 +221,7 @@ An operation requiring a control header declares it as a required parameter, for
 
 Discriminator strings are contract values that an identifier rename cannot change. Never use integer discriminators or mix discriminator forms. Narrowing a set requires a decision and an updated specification. A document or schema transformer completes discriminator metadata that the generator omits, and the source change regenerates the document and typed consumers per `BACKEND.API.OPENAPI.001`.
 
-### Reject a collapsed or borrowed wire contract (BACKEND.API.MODELS.002)
+### Reject a collapsed or borrowed wire contract (BACKEND.API.MODEL.002)
 
 **Requirement:** A WebApi transport model MUST NOT collapse a data-bearing set into an `enum` or reuse a Domain or Application type as the wire contract.
 
@@ -319,7 +319,7 @@ GET    /api/posts?after={cursor}&limit=20
 
 ## Reference example
 
-This informative example demonstrates `BACKEND.API.BOUNDARY.001` and `BACKEND.API.MODELS.001`.
+This informative example demonstrates `BACKEND.API.BOUNDARY.001` and `BACKEND.API.MODEL.001`.
 
 A create endpoint reads the author from claims. It maps `CreateDraftRequestModel` to `CreateDraftCommand` through `CreateDraftApiMappings`. It sends the command through `ICommandMediator`. It maps `CreateDraftCommandResult` to `CreateDraftResponseModel` with the new post location. A read endpoint maps `GetPostQueryResult` through `GetPostApiMappings`. Neither endpoint calls `Post.CreateDraft` or `IPostRepository`.
 
@@ -346,8 +346,8 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 | BACKEND.API.OPENAPI.004 | static | The committed `apps/api/openapi/` artifact exists for each consumer-read contract and CI fails on a difference. |
 | BACKEND.API.OPENAPI.002 | test | `OpenApiSecurityTests` asserts every operation with an authorization policy declares a matching security entry. |
 | BACKEND.API.OPENAPI.003 | test | `OpenApiSchemaTests` asserts closed-set fields publish an enum or oneOf and control headers are required. |
-| BACKEND.API.MODELS.001 | test | `PolymorphicContractTests` round-trips every union case and asserts the discriminator equals its Domain case code. |
-| BACKEND.API.MODELS.002 | test | `PolymorphicContractTests` asserts no data-bearing set serializes as an enum and no inner-layer type reaches the wire. |
+| BACKEND.API.MODEL.001 | test | `PolymorphicContractTests` round-trips every union case and asserts the discriminator equals its Domain case code. |
+| BACKEND.API.MODEL.002 | test | `PolymorphicContractTests` asserts no data-bearing set serializes as an enum and no inner-layer type reaches the wire. |
 | BACKEND.API.CONVENTION.001 | inspection | Endpoint folder review locates each operation under its module and aggregate, or records a named local replacement. |
 | BACKEND.API.CONVENTION.002 | static | `TransportNamingTests` asserts each transport type ends in RequestModel, ResponseModel, Model, or ApiMappings. |
 | BACKEND.API.CONVENTION.003 | static | `RouteShapeTests` reports each action segment for review against its resource alternatives. |

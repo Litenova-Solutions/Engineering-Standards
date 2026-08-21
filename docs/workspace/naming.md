@@ -76,7 +76,7 @@ The example does not shorten an Application type to `{UseCase}Result`, `{UseCase
 
 The example does not shorten an HTTP transport type to `{UseCase}Request` or `{UseCase}Response`. `Model` marks the type as passive boundary data rather than an operation or rich business object. Other project-owned, passive HTTP DTOs also name their concrete role and end in `Model`, such as `ListPostsResponseItemModel` or `PaginationModel`. The example uses `ApiMappings` instead of the context-dependent `Mappings` suffix.
 
-A polymorphic transport model mirrors a Domain discriminated union (`BACKEND.API.MODELS.001`). Its abstract base names the concept. Each sealed case names its case. Both end in `Model`, such as `RefundOutcomeModel` and `RefundSucceededOutcomeModel`.
+A polymorphic transport model mirrors a Domain discriminated union (`BACKEND.API.MODEL.001`). Its abstract base names the concept. Each sealed case names its case. Both end in `Model`, such as `RefundOutcomeModel` and `RefundSucceededOutcomeModel`.
 
 The transport name drops the Domain union's aggregate prefix, such as `PaymentRefundOutcome`. Its discriminator string keeps the Domain union's stable case code unchanged.
 

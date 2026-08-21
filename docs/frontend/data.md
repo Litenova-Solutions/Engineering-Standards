@@ -13,7 +13,7 @@ Frontend data flow should preserve the API contract, keep secrets on the server,
 - Initial data loads on the server. (FRONTEND.DATA.READ.001)
 - Mutations run through a declared server or browser boundary. (FRONTEND.DATA.MUTATIONS.001)
 - Problem Details map to one frontend error shape. (FRONTEND.DATA.ERROR.001)
-- State sits with its narrowest owner. (FRONTEND.DATA.OWNER.001)
+- State sits with its narrowest owner. (FRONTEND.DATA.OWNERSHIP.001)
 - Forms match their use-case input and map field errors. (FRONTEND.DATA.FORM.001)
 - Secrets never reach browser storage. (FRONTEND.DATA.SECRETS.001)
 - Optimistic updates declare rollback and reconciliation. (FRONTEND.DATA.OPTIMISTIC.001)
@@ -71,7 +71,7 @@ type ApiError = {
 
 Unknown or malformed responses become a safe `unexpected_error` value. The frontend preserves the trace ID for support but does not use the safe message as a discriminator.
 
-### Assign state to the narrowest owner (FRONTEND.DATA.OWNER.001)
+### Assign state to the narrowest owner (FRONTEND.DATA.OWNERSHIP.001)
 
 **Requirement:** State MUST sit with its narrowest owner, preferring server data, then URL state, then form state, then local component state.
 
@@ -159,7 +159,7 @@ The example moves the generated types and client to workspace packages only when
 
 ## Reference example
 
-This informative example demonstrates `FRONTEND.DATA.READ.001`, `FRONTEND.DATA.OWNER.001`, and `FRONTEND.DATA.MUTATIONS.001`.
+This informative example demonstrates `FRONTEND.DATA.READ.001`, `FRONTEND.DATA.OWNERSHIP.001`, and `FRONTEND.DATA.MUTATIONS.001`.
 
 A posts list reads on the server from the typed API client. Its search and cursor live in the URL. `CreateDraftForm` submits through a Server Action, maps Problem Details field errors, and refreshes the posts route after success.
 
@@ -173,7 +173,7 @@ A posts list reads on the server from the typed API client. Its search and curso
 | FRONTEND.DATA.READ.001 | inspection | `DataBoundaryTests` asserts no initial route read runs in a client component. |
 | FRONTEND.DATA.MUTATIONS.001 | inspection | `MutationBoundaryTests` asserts each mutation routes through its declared boundary. |
 | FRONTEND.DATA.ERROR.001 | inspection | `ErrorMappingTests` asserts each API failure produces the single frontend error shape. |
-| FRONTEND.DATA.OWNER.001 | inspection | State review compares each stored value against the ownership order in this section. |
+| FRONTEND.DATA.OWNERSHIP.001 | inspection | State review compares each stored value against the ownership order in this section. |
 | FRONTEND.DATA.FORM.001 | inspection | `FormContractTests` asserts each form field matches its contract and each field error maps to its input. |
 | FRONTEND.DATA.SECRETS.001 | inspection | `node standards/tools/validate-ui.mjs` reports a secret written to browser storage or a public variable. |
 | FRONTEND.DATA.OPTIMISTIC.001 | inspection | `OptimisticUpdateTests` asserts each optimistic path rolls back and reconciles on failure. |

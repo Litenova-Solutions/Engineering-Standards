@@ -8,12 +8,12 @@ import { buildProvisionIndex, headingSlug, INDEX_PATH } from './provisions.mjs';
 
 // Every provision identifier is AREA.PAGE.TOPIC.NNN. AREA and PAGE come from the
 // manifest id registry, TOPIC names the assertion, and NNN is a three-digit sequence.
-const ID_SOURCE = '[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}';
-const RULE_ID = new RegExp(`^${ID_SOURCE}$`);
-const RULE_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${ID_SOURCE})\\)\\s*$`);
+const PROVISION_ID_SOURCE = '[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}';
+const PROVISION_ID = new RegExp(`^${PROVISION_ID_SOURCE}$`);
+const PROVISION_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${PROVISION_ID_SOURCE})\\)\\s*$`);
 // A looser shape still catches a stale identifier so it reports as an unknown reference
 // instead of passing unnoticed.
-const ID_LOOSE = '[A-Z][A-Z0-9]*(?:\\.[A-Z0-9]+){1,}\\.\\d{3}';
+const CITATION_SOURCE = '[A-Z][A-Z0-9]*(?:\\.[A-Z0-9]+){1,}\\.\\d{3}';
 const METHODS = new Set(['static', 'test', 'inspection', 'operation']);
 const MODALS = /\b(?:MUST NOT|SHOULD NOT|MUST|SHOULD|MAY)\b/g;
 const OTHER_NORMATIVE = /\b(?:REQUIRED|FORBIDDEN|SHALL)\b/;
@@ -77,6 +77,7 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'ID_PAGE_FILENAME',
   'ID_SCOPE_MISMATCH',
   'ID_TOPIC_DUPLICATE',
+  'ID_TOPIC_REPEATS_PAGE',
   'ID_TOPIC_UNKNOWN',
   'ID_TOPIC_UNUSED',
   'ID_UNKNOWN_REFERENCE',
@@ -272,7 +273,7 @@ function checkAgentProjection(relative, raw, add) {
   const flush = () => {
     if (!paragraph.length) return;
     const text = paragraph.map((item) => item.line).join(' ');
-    if (!new RegExp(`\\b${ID_LOOSE}\\b`).test(text)) {
+    if (!new RegExp(`\\b${CITATION_SOURCE}\\b`).test(text)) {
       add(relative, paragraph[0].number, 'AGENT_PROJECTION_ID', 'agent projection contains no canonical provision citation');
     }
     paragraph = [];
@@ -300,7 +301,7 @@ function anchorsFor(raw) {
 
 const PAGE_CLASS_AREA = { ext: 'extension', profile: 'profile', guide: 'guide' };
 
-function documentClass(relative) {
+function pageClass(relative) {
   if (relative === INDEX_PATH) return 'index';
   if (relative === 'docs/reference/glossary.md') return 'glossary';
   if (relative.endsWith('/README.md') || relative === 'README.md') return 'index';
@@ -433,8 +434,8 @@ function checkProse(relative, raw, kind, add) {
   flushList();
 }
 
-function parseDocument(relative, raw, add, globalIds, virtual = false) {
-  const kind = documentClass(relative);
+function parsePage(relative, raw, add, globalIds, virtual = false) {
+  const kind = pageClass(relative);
   const lines = raw.split(/\r?\n/);
   const clean = stripFences(lines);
   const headings = [];
@@ -475,7 +476,7 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
     const heading = line.match(/^###\s+(.+)$/);
     if (heading) {
       headings.push({ text: heading[1], section: currentH2, line: index + 1 });
-      const rule = line.match(RULE_HEADING);
+      const rule = line.match(PROVISION_HEADING);
       if ((currentH2 === 'Standards' || currentH2 === 'Conventions') && !rule) {
         add(relative, index + 1, 'ID_MISSING', `provision heading '${heading[1]}' has no valid ID`);
         continue;
@@ -537,7 +538,7 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
   if (kind === 'topic' && sections.some((section) => section.name === 'Reference example')) {
     const example = sectionBody(lines, 'Reference example');
     const firstLine = stripFences(example.split(/\r?\n/)).find((item) => item.line.trim())?.line.trim() ?? '';
-    const ids = [...example.matchAll(new RegExp(`\\b${ID_LOOSE}\\b`, 'g'))];
+    const ids = [...example.matchAll(new RegExp(`\\b${CITATION_SOURCE}\\b`, 'g'))];
     if (!firstLine.startsWith('This informative example demonstrates ') || !ids.length) {
       const section = sections.find((item) => item.name === 'Reference example');
       add(relative, section?.line ?? 1, 'REFERENCE_EXAMPLE_DECLARATION', 'Reference example must begin with an informative declaration and provision IDs');
@@ -640,9 +641,9 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
     for (const bullet of bullets) {
       const text = visibleText(bullet.line);
       if ((text.match(MODALS) ?? []).length || OTHER_NORMATIVE.test(text)) add(relative, bullet.number, 'SUMMARY_NORMATIVE', 'Agent Summary contains normative vocabulary');
-      const ids = [...bullet.line.matchAll(new RegExp(`\\b${ID_LOOSE}\\b`, 'g'))].map((match) => match[0]);
+      const ids = [...bullet.line.matchAll(new RegExp(`\\b${CITATION_SOURCE}\\b`, 'g'))].map((match) => match[0]);
       if (!ids.length) add(relative, bullet.number, 'SUMMARY_MISSING_ID', 'Agent Summary bullet cites no provision ID');
-      if (!new RegExp(`\\((${ID_LOOSE})(?:,\\s*${ID_LOOSE})*\\)\\s*$`).test(bullet.line)) {
+      if (!new RegExp(`\\((${CITATION_SOURCE})(?:,\\s*${CITATION_SOURCE})*\\)\\s*$`).test(bullet.line)) {
         add(relative, bullet.number, 'SUMMARY_ID_POSITION', 'Agent Summary bullet must end with its provision citations');
       }
       const bulletClaim = claim(text.replace(/\([^)]*\)\s*$/, ''));
@@ -685,7 +686,7 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
   const verification = sections.find((section) => section.name === 'Verification');
   if (verification) {
     for (let index = verification.line; index < clean.length; index += 1) {
-      const match = clean[index].line.match(new RegExp(`^\\|\\s*(${ID_LOOSE})\\s*\\|\\s*([^|]+?)\\s*\\|\\s*([^|]+?)\\s*\\|\\s*$`));
+      const match = clean[index].line.match(new RegExp(`^\\|\\s*(${CITATION_SOURCE})\\s*\\|\\s*([^|]+?)\\s*\\|\\s*([^|]+?)\\s*\\|\\s*$`));
       if (!match) continue;
       const methods = match[2].split(',').map((item) => item.trim()).filter(Boolean);
       for (const method of methods) if (!METHODS.has(method)) add(relative, index + 1, 'VERIFY_METHOD', `unknown verification method '${method}'`);
@@ -856,8 +857,8 @@ function checkManifest(root, add) {
   }
   const references = [manifest.agentsEntry];
   for (const profile of Object.values(manifest.profiles ?? {})) {
-    references.push(profile.entry, ...(profile.documents ?? []));
-    if (new Set(profile.documents ?? []).size !== (profile.documents ?? []).length) add('standards.manifest.json', 1, 'MANIFEST_DUPLICATE_PATH', `profile '${profile.entry}' contains a duplicate document path`);
+    references.push(profile.entry, ...(profile.pages ?? []));
+    if (new Set(profile.pages ?? []).size !== (profile.pages ?? []).length) add('standards.manifest.json', 1, 'MANIFEST_DUPLICATE_PATH', `profile '${profile.entry}' contains a duplicate page path`);
   }
   for (const extension of Object.values(manifest.extensions ?? {})) references.push(extension.path);
   for (const plan of Object.values(manifest.loadPlans ?? {})) references.push(...(plan.tier0 ?? []), ...(plan.tier1 ?? []), ...(plan.tier2 ?? []));
@@ -876,9 +877,9 @@ function checkManifest(root, add) {
     const raw = fs.readFileSync(entry, 'utf8');
     const composition = sectionBody(raw.split(/\r?\n/), 'Composition');
     const actual = new Set([...composition.matchAll(/\[[^\]]+\]\(([^)#]+)(?:#[^)]+)?\)/g)].map((match) => slash(path.relative(root, path.resolve(path.dirname(entry), decodeURIComponent(match[1]))))));
-    const expected = new Set(profile.documents ?? []);
-    for (const document of expected) if (!actual.has(document)) add(profile.entry, 1, 'PROFILE_COMPOSITION_MISSING', `profile '${id}' Composition omits '${document}'`);
-    for (const document of actual) if (!expected.has(document)) add(profile.entry, 1, 'PROFILE_COMPOSITION_EXTRA', `profile '${id}' Composition adds '${document}' outside the manifest`);
+    const expected = new Set(profile.pages ?? []);
+    for (const page of expected) if (!actual.has(page)) add(profile.entry, 1, 'PROFILE_COMPOSITION_MISSING', `profile '${id}' Composition omits '${page}'`);
+    for (const page of actual) if (!expected.has(page)) add(profile.entry, 1, 'PROFILE_COMPOSITION_EXTRA', `profile '${id}' Composition adds '${page}' outside the manifest`);
   }
   for (const [id, extension] of Object.entries(manifest.extensions ?? {})) {
     const file = path.join(root, extension.path);
@@ -903,7 +904,7 @@ function checkManifest(root, add) {
   const writingPlan = manifest.loadPlans?.['core.authoring'];
   if (!writingPlan || !(writingPlan.tier1 ?? []).includes('docs/core/authoring.md#agent-summary')
     || !(writingPlan.tier2 ?? []).includes('docs/core/authoring.md') || !(writingPlan.tier2 ?? []).includes('CONTRIBUTING.md')) {
-    add('standards.manifest.json', 1, 'MANIFEST_LOAD_PLAN', 'core.authoring must load the authoring summary, foundation, and CONTRIBUTING.md');
+    add('standards.manifest.json', 1, 'MANIFEST_LOAD_PLAN', 'core.authoring must load the authoring summary, page, and CONTRIBUTING.md');
   }
 }
 
@@ -954,7 +955,7 @@ export function validateRepository(rootInput = '.') {
   }
   const currentMarkdown = markdown.filter((file) => isCurrentStandardsMaterial(slash(path.relative(root, file))));
   const globalIds = new Map();
-  const parsedDocuments = [];
+  const parsedPages = [];
   for (const file of currentMarkdown) {
     const relative = slash(path.relative(root, file));
     if (/^templates\/standard\//.test(relative)) continue;
@@ -962,7 +963,7 @@ export function validateRepository(rootInput = '.') {
     const prose = stripFences(raw.split(/\r?\n/)).map((item) => item.line).join('\n');
     const nonAscii = prose.match(/[^\x00-\x7F]/);
     if (nonAscii) add(relative, lineNumber(prose, nonAscii.index), 'PROSE_NON_ASCII', `non-ASCII character U+${nonAscii[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
-    parsedDocuments.push({ relative, raw, parsed: parseDocument(relative, raw, add, globalIds) });
+    parsedPages.push({ relative, raw, parsed: parsePage(relative, raw, add, globalIds) });
     if (relative === 'AGENTS.md' || relative.endsWith('/project-agents.md')) checkAgentProjection(relative, raw, add);
   }
 
@@ -971,47 +972,53 @@ export function validateRepository(rootInput = '.') {
   // forbids a duplicate stem inside one directory. Only the word lists are declared.
   const registry = manifestRegistry(root);
   const usedTopics = new Set();
-  for (const document of registry.present ? parsedDocuments : []) {
-    const provisions = document.parsed.provisions ?? [];
+  for (const page of registry.present ? parsedPages : []) {
+    const provisions = page.parsed.provisions ?? [];
     if (!provisions.length) continue;
-    const parts = document.relative.match(/^docs\/([a-z][a-z0-9]*)\/([a-z][a-z0-9]*)\.md$/);
+    const parts = page.relative.match(/^docs\/([a-z][a-z0-9]*)\/([a-z][a-z0-9]*)\.md$/);
     if (!parts) {
-      add(document.relative, 1, 'ID_PAGE_FILENAME', `page owns ${provisions.length} provisions, so its path must be docs/<area>/<page>.md with one lowercase word in each position`);
+      add(page.relative, 1, 'ID_PAGE_FILENAME', `page owns ${provisions.length} provisions, so its path must be docs/<area>/<page>.md with one lowercase word in each position`);
       continue;
     }
     const [, areaDir, stem] = parts;
     const scope = `${areaDir.toUpperCase()}.${stem.toUpperCase()}`;
     if (!registry.areas.has(areaDir.toUpperCase())) {
-      add(document.relative, 1, 'ID_AREA_UNKNOWN', `directory '${areaDir}' is not a registered provisionRegistry area`);
+      add(page.relative, 1, 'ID_AREA_UNKNOWN', `directory '${areaDir}' is not a registered provisionRegistry area`);
     }
     for (const provision of provisions) {
       if (!provision.id.startsWith(`${scope}.`)) {
-        add(document.relative, provision.line, 'ID_SCOPE_MISMATCH', `provision '${provision.id}' does not use the page scope '${scope}' its path derives`);
+        add(page.relative, provision.line, 'ID_SCOPE_MISMATCH', `provision '${provision.id}' does not use the page scope '${scope}' its path derives`);
       }
       const topic = provision.id.split('.')[2];
       usedTopics.add(topic);
+      if (topic === stem.toUpperCase()) {
+        add(page.relative, provision.line, 'ID_TOPIC_REPEATS_PAGE', `provision '${provision.id}' repeats its page name as its topic, so the topic names nothing`);
+      }
       if (!registry.topics.has(topic)) {
-        add(document.relative, provision.line, 'ID_TOPIC_UNKNOWN', `topic '${topic}' is not a registered provisionRegistry topic`);
+        add(page.relative, provision.line, 'ID_TOPIC_UNKNOWN', `topic '${topic}' is not a registered provisionRegistry topic`);
       }
     }
   }
+  // One concept, one spelling. Regular and -ies plurals both count as the same word.
+  const singular = (topic) => (topic.endsWith('IES') ? `${topic.slice(0, -3)}Y` : topic.endsWith('SES') ? topic.slice(0, -2) : topic.endsWith('S') ? topic.slice(0, -1) : null);
   for (const topic of registry.present ? registry.topics : []) {
-    if (topic.endsWith('S') && registry.topics.has(topic.slice(0, -1))) {
-      add('standards.manifest.json', 1, 'ID_TOPIC_DUPLICATE', `topics '${topic.slice(0, -1)}' and '${topic}' name one concept in two forms`);
+    const other = singular(topic);
+    if (other && registry.topics.has(other)) {
+      add('standards.manifest.json', 1, 'ID_TOPIC_DUPLICATE', `topics '${other}' and '${topic}' name one concept in two forms`);
     }
     if (!usedTopics.has(topic)) add('standards.manifest.json', 1, 'ID_TOPIC_UNUSED', `provisionRegistry registers topic '${topic}', which no provision uses`);
   }
 
   const activeIds = new Set(globalIds.keys());
-  for (const document of parsedDocuments) {
-    for (const reference of document.parsed.summaryReferences) {
-      if (!activeIds.has(reference.id)) add(document.relative, reference.line, 'SUMMARY_UNKNOWN_ID', `Agent Summary cites unknown provision '${reference.id}'`);
+  for (const page of parsedPages) {
+    for (const reference of page.parsed.summaryReferences) {
+      if (!activeIds.has(reference.id)) add(page.relative, reference.line, 'SUMMARY_UNKNOWN_ID', `Agent Summary cites unknown provision '${reference.id}'`);
     }
-    const prose = stripFences(document.raw.split(/\r?\n/)).map((item) => item.line).join('\n');
-    for (const match of prose.matchAll(new RegExp(`\\b${ID_LOOSE}\\b`, 'g'))) {
+    const prose = stripFences(page.raw.split(/\r?\n/)).map((item) => item.line).join('\n');
+    for (const match of prose.matchAll(new RegExp(`\\b${CITATION_SOURCE}\\b`, 'g'))) {
       const id = match[0];
       const line = lineNumber(prose, match.index);
-      if (!activeIds.has(id)) add(document.relative, line, 'ID_UNKNOWN_REFERENCE', `active content references unknown provision '${id}'`);
+      if (!activeIds.has(id)) add(page.relative, line, 'ID_UNKNOWN_REFERENCE', `active content references unknown provision '${id}'`);
     }
   }
 
@@ -1025,8 +1032,8 @@ export function validateRepository(rootInput = '.') {
     const normalized = normalizeTemplate(relative, fs.readFileSync(file, 'utf8'));
     const nonAscii = stripFences(normalized.split(/\r?\n/)).map((item) => item.line).join('\n').match(/[^\x00-\x7F]/);
     if (nonAscii) add(relative, 1, 'PROSE_NON_ASCII', `authoring template contains non-ASCII character U+${nonAscii[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
-    parseDocument(virtualRelative, normalized, add, globalIds, true);
-    checkProse(relative, normalized, documentClass(virtualRelative), add);
+    parsePage(virtualRelative, normalized, add, globalIds, true);
+    checkProse(relative, normalized, pageClass(virtualRelative), add);
   }
 
   checkLinks(root, currentMarkdown, add);

@@ -6,6 +6,8 @@ Standards v1.14.0 covers one bounded-context business application. The `dotnet-n
 
 The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PROFILE.NEXTJS.VERSION.001, PROFILE.BLAZOR.VERSION.001, CORE.AGENT.LOAD.001)
 
+A provision ID states its own page: `AREA.PAGE.TOPIC.NNN` resolves to `docs/<area>/<page>.md`, so `FRONTEND.COMPONENTS.OWNERSHIP.001` is in `docs/frontend/components.md`. `docs/reference/provisions.md` lists every identifier with its heading. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.INDEX.001)
+
 ## Writing
 
 Read the [authoring standard](docs/core/authoring.md) before authoring standards or technical prose. Run its validation gates. (CORE.AUTHORING.PAGE.001, CORE.AUTHORING.VALIDATION.001)
@@ -40,7 +42,7 @@ Do not load unrelated conventions or inactive extensions. (CORE.AGENT.LOAD.003, 
 
 ## Source Precedence
 
-Apply guidance in this order: consumer override, baseline-replacing extension, selected profile, then foundation. (CORE.AGENT.PRECEDENCE.001)
+Apply guidance in this order: consumer override, baseline-replacing extension, selected profile, then core page. (CORE.AGENT.PRECEDENCE.001)
 
 A named local convention can replace a baseline convention. Stop when requirements conflict without declared precedence. (CORE.AGENT.PRECEDENCE.001, CORE.AGENT.CONFLICT.001)
 

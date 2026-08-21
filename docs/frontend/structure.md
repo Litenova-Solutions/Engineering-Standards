@@ -8,9 +8,9 @@ Each frontend is an independent Next.js application organized around the same bu
 ## Agent Summary {#agent-summary}
 
 
-- Frontends share one application tree. (FRONTEND.STRUCTURE.STRUCTURE.001)
+- Frontends share one application tree. (FRONTEND.STRUCTURE.TREE.001)
 - Features sit under their module and use-case names. (FRONTEND.STRUCTURE.FEATURES.001)
-- Modules never reach into another module's internals. (FRONTEND.STRUCTURE.BOUNDARIES.001)
+- Modules never reach into another module's internals. (FRONTEND.STRUCTURE.BOUNDARY.001)
 - Applications never import each other's source. (FRONTEND.STRUCTURE.APPS.001)
 - Shared packages carry no application-specific code. (FRONTEND.STRUCTURE.PACKAGES.001)
 - Imports flow from routes inward, never outward. (FRONTEND.STRUCTURE.IMPORTS.001)
@@ -18,7 +18,7 @@ Each frontend is an independent Next.js application organized around the same bu
 ## Standards
 
 
-### Use the frontend application tree (FRONTEND.STRUCTURE.STRUCTURE.001)
+### Use the frontend application tree (FRONTEND.STRUCTURE.TREE.001)
 
 **Requirement:** A frontend MUST use the declared application tree for routes, features, components, library code, and tests.
 
@@ -48,7 +48,7 @@ Framework-generated cache and build folders remain untracked.
 
 **Rationale:** The frontend tree then matches the specification tree and the backend Application folders.
 
-### Isolate module internals (FRONTEND.STRUCTURE.BOUNDARIES.001)
+### Isolate module internals (FRONTEND.STRUCTURE.BOUNDARY.001)
 
 **Requirement:** A module MUST NOT import another module's internal feature path.
 
@@ -124,7 +124,7 @@ The example creates a module-local `shared/` folder only for code used by two us
 
 ## Reference example
 
-This informative example demonstrates `FRONTEND.STRUCTURE.STRUCTURE.001` and `FRONTEND.STRUCTURE.BOUNDARIES.001`.
+This informative example demonstrates `FRONTEND.STRUCTURE.TREE.001` and `FRONTEND.STRUCTURE.BOUNDARY.001`.
 
 `app/(author)/posts/new/page.tsx` may import `CreateDraftForm` from `features/posts/create-draft/`. It cannot contain the form validation schema or post-creation business decision itself.
 
@@ -133,9 +133,9 @@ This informative example demonstrates `FRONTEND.STRUCTURE.STRUCTURE.001` and `FR
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| FRONTEND.STRUCTURE.STRUCTURE.001 | inspection | Folder review compares each frontend tree against the layout in this section. |
+| FRONTEND.STRUCTURE.TREE.001 | inspection | Folder review compares each frontend tree against the layout in this section. |
 | FRONTEND.STRUCTURE.FEATURES.001 | static | `FeaturePlacementTests` asserts each feature path resolves to a declared module and use case. |
-| FRONTEND.STRUCTURE.BOUNDARIES.001 | inspection | `ImportBoundaryTests` asserts no cross-module import resolves an internal feature path. |
+| FRONTEND.STRUCTURE.BOUNDARY.001 | inspection | `ImportBoundaryTests` asserts no cross-module import resolves an internal feature path. |
 | FRONTEND.STRUCTURE.APPS.001 | inspection | `ImportBoundaryTests` asserts no application imports a path inside another application. |
 | FRONTEND.STRUCTURE.PACKAGES.001 | inspection | `ImportBoundaryTests` asserts no shared package exports a page, feature state, or application component. |
 | FRONTEND.STRUCTURE.IMPORTS.001 | inspection | `ImportBoundaryTests` asserts no shared or feature module imports a route path. |

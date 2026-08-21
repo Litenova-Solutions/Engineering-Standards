@@ -38,9 +38,9 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | `runbook.md` | `docs/runbooks/{runbook}.md` | An operator needs a repeatable recovery or operating procedure. |
 | `release-record.md` | `docs/releases/{release}.md` | One immutable release artifact is evaluated. |
 
-A template `id` is not always the filename. The operating-limits record lives at `docs/operations/limits.md` but keeps the fixed metadata `id` of `operating-limits`. The record kind, not the filename, sets the id. Use-case, module, flow, workflow, and policy ids follow their own kind rules in the engineering system foundation.
+A template `id` is not always the filename. The operating-limits record lives at `docs/operations/limits.md` but keeps the fixed metadata `id` of `operating-limits`. The record kind, not the filename, sets the id. Use-case, module, flow, workflow, and policy ids follow their own kind rules in the Agentic Engineering System page.
 
-Markdown specification templates begin with Specification Metadata validated by [the schema](../../schemas/specification-metadata.schema.json). The engineering system foundation defines semantic relationships that JSON Schema cannot prove across files.
+Markdown specification templates begin with Specification Metadata validated by [the schema](../../schemas/specification-metadata.schema.json). The Agentic Engineering System page defines semantic relationships that JSON Schema cannot prove across files.
 
 React web consumers also validate UI configuration and sidecar contracts with
 `schemas/ui-vocabulary.schema.json`, `schemas/ui-page.schema.json`, and

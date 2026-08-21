@@ -6,15 +6,15 @@ The client is one Blazor WebAssembly application organized around the same busin
 
 ## Agent Summary {#agent-summary}
 
-- The solution holds four production projects and no server project. (BLAZOR.STRUCTURE.STRUCTURE.001)
+- The solution holds four production projects and no server project. (BLAZOR.STRUCTURE.TREE.001)
 - Features sit under their module and use-case names. (BLAZOR.STRUCTURE.FEATURES.001)
-- A module never reaches into another module's feature internals. (BLAZOR.STRUCTURE.BOUNDARIES.001)
+- A module never reaches into another module's feature internals. (BLAZOR.STRUCTURE.BOUNDARY.001)
 - Imports run from pages inward, never outward. (BLAZOR.STRUCTURE.IMPORTS.001)
 - Domain and Application carry no browser type. (BLAZOR.STRUCTURE.DOMAIN.001)
 
 ## Standards
 
-### Use the client solution tree (BLAZOR.STRUCTURE.STRUCTURE.001)
+### Use the client solution tree (BLAZOR.STRUCTURE.TREE.001)
 
 **Requirement:** A client solution MUST contain Domain, Application, Infrastructure, and Web production projects and no server project.
 
@@ -50,7 +50,7 @@ Framework-generated `bin`, `obj`, and publish folders remain untracked.
 
 **Rationale:** The client tree then matches the specification tree and the Application folders.
 
-### Isolate module internals (BLAZOR.STRUCTURE.BOUNDARIES.001)
+### Isolate module internals (BLAZOR.STRUCTURE.BOUNDARY.001)
 
 **Requirement:** A module MUST NOT reference another module's internal feature types.
 
@@ -97,9 +97,9 @@ Infrastructure -> Application and Domain
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BLAZOR.STRUCTURE.STRUCTURE.001 | test | `ClientSolutionTests` asserts four production projects exist and no server project is present. |
+| BLAZOR.STRUCTURE.TREE.001 | test | `ClientSolutionTests` asserts four production projects exist and no server project is present. |
 | BLAZOR.STRUCTURE.FEATURES.001 | test | `ClientArchitectureTests` asserts each feature path resolves to a declared module and use case. |
-| BLAZOR.STRUCTURE.BOUNDARIES.001 | test | `ClientArchitectureTests` asserts no cross-module reference resolves an internal feature type. |
+| BLAZOR.STRUCTURE.BOUNDARY.001 | test | `ClientArchitectureTests` asserts no cross-module reference resolves an internal feature type. |
 | BLAZOR.STRUCTURE.IMPORTS.001 | test | `ClientArchitectureTests` asserts the project reference graph matches the declared direction. |
 | BLAZOR.STRUCTURE.DOMAIN.001 | test | `ClientArchitectureTests` asserts Domain and Application reference no browser or interop type. |
 | BLAZOR.STRUCTURE.CONVENTION.001 | inspection | Interop review locates each adapter and its matching script, or records a named local replacement. |

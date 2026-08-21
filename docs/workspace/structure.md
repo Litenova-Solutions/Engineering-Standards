@@ -8,7 +8,7 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
 ## Agent Summary {#agent-summary}
 
 
-- Consumers share one canonical root tree. (WORKSPACE.STRUCTURE.STRUCTURE.001)
+- Consumers share one canonical root tree. (WORKSPACE.STRUCTURE.TREE.001)
 - Production and test projects sit in separate roots. (WORKSPACE.STRUCTURE.DOTNET.001)
 - Runnable applications live under apps. (WORKSPACE.STRUCTURE.APPS.001)
 - Shared packages have two consumers or hold generated output. (WORKSPACE.STRUCTURE.PACKAGES.001)
@@ -18,7 +18,7 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
 ## Standards
 
 
-### Use the canonical root tree (WORKSPACE.STRUCTURE.STRUCTURE.001)
+### Use the canonical root tree (WORKSPACE.STRUCTURE.TREE.001)
 
 **Requirement:** A consumer workspace MUST use the canonical root tree declared in this section.
 
@@ -147,7 +147,7 @@ Worker and Acceptance.Tests are conditional projects introduced by extensions.
 
 ## Reference example
 
-This informative example demonstrates `WORKSPACE.STRUCTURE.STRUCTURE.001` and `WORKSPACE.STRUCTURE.PACKAGES.001`.
+This informative example demonstrates `WORKSPACE.STRUCTURE.TREE.001` and `WORKSPACE.STRUCTURE.PACKAGES.001`.
 
 An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/admin/`. Both frontends may import generated transport types from `packages/api-types/`. Neither imports the other frontend's feature code.
 
@@ -156,7 +156,7 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| WORKSPACE.STRUCTURE.STRUCTURE.001 | inspection | Root tree review compares the workspace against the layout in this section. |
+| WORKSPACE.STRUCTURE.TREE.001 | inspection | Root tree review compares the workspace against the layout in this section. |
 | WORKSPACE.STRUCTURE.DOTNET.001 | test | `SolutionStructureTests` asserts each project resolves under its declared source or test root. |
 | WORKSPACE.STRUCTURE.APPS.001 | inspection | Root tree review confirms each runnable application sits under `apps/` and each library under `packages/`. |
 | WORKSPACE.STRUCTURE.PACKAGES.001 | inspection | Package review records the two consumers or the generated-output purpose for each shared package. |

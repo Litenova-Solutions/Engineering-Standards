@@ -5,7 +5,7 @@
 // kind-discriminated schema and runs the cross-file checks that JSON Schema
 // cannot prove. This is a reference implementation. A consumer may replace or
 // extend it, but the checks below mirror the Verification lists in the
-// foundation standards.
+// core standards.
 //
 // Usage:
 //   node tools/validate-consumer.mjs [consumerRoot]
@@ -130,7 +130,7 @@ function parseBlock(raw, rel) {
 
 // A use-case file lives directly in its module directory, or in a single
 // aggregate-root subdirectory of that module. See the module use-case
-// grouping rule in the engineering-system foundation.
+// grouping rule in the Agentic Engineering System page.
 function useCaseFile(mod, name) {
   const flat = path.join(domainDocs, 'modules', mod, `${name}.md`);
   if (fs.existsSync(flat)) return flat;

@@ -20,7 +20,7 @@ This extension replaces no baseline rule. SignalR browser clients add pinned `@m
 
 - Record polling cost and recovery behavior. (EXT.REALTIME.ADOPT.001)
 - Select server-sent events or SignalR by need. (EXT.REALTIME.TRANSPORT.001, EXT.REALTIME.TRANSPORT.002)
-- Authenticate connections and authorize scoped subscriptions. (EXT.REALTIME.AUTH.001)
+- Authenticate connections and authorize scoped subscriptions. (EXT.REALTIME.ACCESS.001)
 - Refresh authoritative state after disconnect. (EXT.REALTIME.RECOVERY.001)
 - Bound connection and message resources. (EXT.REALTIME.CAPACITY.001)
 - Keep transport code at outer boundaries. (EXT.REALTIME.CONVENTION.001)
@@ -57,13 +57,13 @@ This extension replaces no baseline rule. SignalR browser clients add pinned `@m
 
 **Rationale:** Hosted-platform connection behavior can constrain the selected transport.
 
-### Authenticate and authorize subscriptions (EXT.REALTIME.AUTH.001)
+### Authenticate and authorize subscriptions (EXT.REALTIME.ACCESS.001)
 
 **Requirement:** A realtime server MUST authenticate each connection and authorize every user-, tenant-, or resource-scoped subscription.
 
 **Rationale:** A valid connection does not grant access to arbitrary user, tenant, or resource data.
 
-### Revalidate long-lived access (EXT.REALTIME.AUTH.002)
+### Revalidate long-lived access (EXT.REALTIME.ACCESS.002)
 
 **Requirement:** A realtime server MUST revalidate long-lived access according to token and session lifetime.
 
@@ -124,8 +124,8 @@ This extension replaces no baseline rule. SignalR browser clients add pinned `@m
 | EXT.REALTIME.TRANSPORT.001 | test | `RealtimeTransportTests` use the server-sent events boundary. |
 | EXT.REALTIME.TRANSPORT.002 | test | `RealtimeTransportTests` use SignalR capabilities. |
 | EXT.REALTIME.TRANSPORT.003 | inspection | Realtime specification records chosen transport and hosting support. |
-| EXT.REALTIME.AUTH.001 | test | `RealtimeAuthTests` cover anonymous, unrelated, owner, and tenant-scoped connections. |
-| EXT.REALTIME.AUTH.002 | test | `RealtimeAuthTests` revalidate expired session or token access. |
+| EXT.REALTIME.ACCESS.001 | test | `RealtimeAuthTests` cover anonymous, unrelated, owner, and tenant-scoped connections. |
+| EXT.REALTIME.ACCESS.002 | test | `RealtimeAuthTests` revalidate expired session or token access. |
 | EXT.REALTIME.RECOVERY.001 | test | `RealtimeRecoveryTests` use bounded reconnect and authoritative refresh. |
 | EXT.REALTIME.RECOVERY.002 | test | `RealtimeRecoveryTests` asserts duplicate and reordered notifications leave the client state correct. |
 | EXT.REALTIME.CAPACITY.001 | operation | Deployment configuration declares every required connection and message limit. |

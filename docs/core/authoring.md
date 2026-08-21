@@ -2,7 +2,7 @@
 
 ## Intent
 
-The standards use one document grammar and one controlled technical prose profile. This foundation is the canonical source for standards authoring.
+The standards use one page grammar and one controlled technical prose profile. This page is the canonical source for standards authoring.
 
 ## Agent Summary {#agent-summary}
 
@@ -62,7 +62,7 @@ Every review applies four quality tests:
 | Clarity | Does the text state actor, condition, action, boundary, and evidence? |
 | Humanity | Does the text use a professional voice, useful rationale, and realistic examples? |
 
-### Document authority
+### Page authority
 
 Standards define required boundaries. Conventions define replaceable defaults. Intent, rationale, examples, summaries, guides, and indexes are informative.
 
@@ -97,6 +97,8 @@ This release model governs the standards repository. A consumer product is a run
 | Index | Intent, then navigation groups |
 | Glossary | Alphabetical term headings with one-sentence definitions and optional examples |
 
+- A page that owns provisions lives at `docs/<area>/<page>.md`, with one lowercase word in each position.
+- A guide or reference page uses a descriptive file name, because no identifier derives from it.
 - A normative page has one H1 with a Title Case title.
 - A provision heading uses sentence case, starts with an action verb, and ends with its ID.
 - A required empty section contains only `None.`
@@ -166,6 +168,8 @@ Two pages cannot share a scope. The directory gives the area, and one directory 
 `CONVENTION` is a reserved `TOPIC` value. A replaceable default uses it and a Standards provision does not, so the ID states normative force. An `EXT` area marks a provision that applies only when its extension is active.
 
 The topic vocabulary is closed. A topic names a concept rather than a count, so one concept never carries both a singular and a plural form. Adding a word means registering it, which keeps two pages from naming one concept differently.
+
+A topic never repeats its page name. A second `STRUCTURE` segment on the workspace structure page would name nothing new, so the assertion about the root tree is `WORKSPACE.STRUCTURE.TREE.001`.
 
 An active provision ID identifies its current assertion. A changed, split, merged, or newly normative provision receives a new ID.
 
@@ -238,7 +242,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ### Use controlled capitalization (CORE.AUTHORING.CASE.001)
 
-**Requirement:** Authored prose MUST use Title Case for document titles and sentence case for provision headings and body text.
+**Requirement:** Authored prose MUST use Title Case for page titles and sentence case for provision headings and body text.
 
 **Rationale:** Exact code names, layer names, product names, and sentence starts retain their normal capitalization.
 
@@ -256,7 +260,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ### Write atomic Standards provisions (CORE.AUTHORING.REQUIREMENT.001)
 
-**Requirement:** A Standards provision MUST follow the Standards provision contract and provision identity policy defined by this foundation.
+**Requirement:** A Standards provision MUST follow the Standards provision contract and provision identity policy defined by this page.
 
 **Rationale:** One identified assertion has one authority and one verification mapping.
 
@@ -288,7 +292,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ### Identify actionable conventions (CORE.AUTHORING.DEFAULTS.001)
 
-**Requirement:** An actionable Convention provision MUST follow the Convention provision contract defined by this foundation.
+**Requirement:** An actionable Convention provision MUST follow the Convention provision contract defined by this page.
 
 **Rationale:** A distinct ID makes each replaceable default traceable without turning it into a Standards override.
 
@@ -316,7 +320,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** One generated page resolves every ID to its heading and owning page, so a reader follows a citation in one step instead of searching.
 
-**Example:** The page lists `FRONTEND.COMPONENTS.OWNERSHIP.001` with its heading and a link into `conventions/frontend/components.md`.
+**Example:** The page lists `FRONTEND.COMPONENTS.OWNERSHIP.001` with its heading and a link into `frontend/components.md`.
 
 ### Declare structured specification metadata (CORE.AUTHORING.METADATA.002)
 
@@ -444,7 +448,7 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.REQUIREMENT.001 | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
 | CORE.AUTHORING.IDENTIFIER.001 | static | `node tools/validate-standards.mjs` emits no `ID_SCOPE_MISMATCH`, `ID_PAGE_FILENAME`, or `ID_AREA_UNKNOWN` diagnostic. |
 | CORE.AUTHORING.IDENTIFIER.002 | static | `node tools/validate-standards.cases.mjs` asserts the parser rejects a Standard whose ID ends in a `CONVENTION` segment. |
-| CORE.AUTHORING.IDENTIFIER.003 | static | `node tools/validate-standards.mjs` emits no `ID_TOPIC_UNKNOWN`, `ID_TOPIC_DUPLICATE`, or `ID_TOPIC_UNUSED` diagnostic. |
+| CORE.AUTHORING.IDENTIFIER.003 | static | `node tools/validate-standards.mjs` emits no `ID_TOPIC_UNKNOWN`, `ID_TOPIC_DUPLICATE`, `ID_TOPIC_UNUSED`, or `ID_TOPIC_REPEATS_PAGE` diagnostic. |
 | CORE.AUTHORING.DEFAULTS.001 | static | `WritingTests` asserts the parser resolves each Convention ID, Default, Replacement, and Verification row. |
 | CORE.AUTHORING.SUMMARY.001 | inspection | The summary parser resolves every citation, and review compares each projection with its source. |
 | CORE.AUTHORING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |

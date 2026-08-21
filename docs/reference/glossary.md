@@ -132,6 +132,14 @@ Required for a conforming consumer through an identified Standards provision.
 
 An enforced, tested, supported, or alerting boundary for system operation.
 
+## Page
+
+One authored Markdown file under `docs/`, carrying the section contract of its page class.
+
+## Page class
+
+One of `topic`, `profile`, `extension`, `guide`, `index`, or `glossary`, which selects the required section order for a page.
+
 ## Page scope
 
 The `AREA.PAGE` prefix that `standards.manifest.json` declares for one normative page, such as `FRONTEND.COMPONENTS`.
@@ -142,7 +150,7 @@ A rule enforced by durable storage, such as uniqueness, a required relationship,
 
 ## Platform profile
 
-A supported composition of architecture, frameworks, project layout, and baseline conventions.
+A supported composition of architecture, frameworks, project layout, and baseline pages.
 
 ## Product
 

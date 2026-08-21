@@ -118,7 +118,7 @@ var next = outcome switch
 
 The example uses a typed value object for a closed set represented by one scalar (`BACKEND.DOMAIN.VALUE.001`). It can own validation, normalization, or formatting without per-case data or behavior. The example does not use an enum as its backing field.
 
-The example does not represent a Domain closed set with an enum, scalar discriminator, or boolean flags. This rule is scoped to Domain. Application mirrors the union shape (`BACKEND.APPLICATION.CLOSEDSET.001`). Transport also mirrors it (`BACKEND.API.MODELS.001`).
+The example does not represent a Domain closed set with an enum, scalar discriminator, or boolean flags. This rule is scoped to Domain. Application mirrors the union shape (`BACKEND.APPLICATION.CLOSEDSET.001`). Transport also mirrors it (`BACKEND.API.MODEL.001`).
 
 A data-bearing transport set uses a polymorphic `oneOf` model. Only label-only sets or decision-backed narrowing use a string enum. A boundary enum or string is not the default for data-bearing cases. Infrastructure persists each union with stable discriminators, like a state hierarchy. It never stores a raw enum value absent from Domain.
 
@@ -240,7 +240,7 @@ Application validators handle malformed caller input through validation errors. 
 
 **Rationale:** Application obtains the value through an owned port and passes it in, so a Domain test supplies an explicit value and stays deterministic.
 
-### Document every public Domain contract (BACKEND.DOMAIN.DOCUMENTATION.001)
+### Document every public Domain contract (BACKEND.DOMAIN.DOCS.001)
 
 **Requirement:** Every public Domain type and member MUST carry XML documentation stating the business constraint, result, or failure it represents.
 
@@ -255,7 +255,7 @@ Application validators handle malformed caller input through validation errors. 
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Consumer files still apply `BACKEND.DOMAIN.DOCUMENTATION.001` to their complete public contracts.
+**Rationale:** Consumer files still apply `BACKEND.DOMAIN.DOCS.001` to their complete public contracts.
 
 ### Organize a module by aggregate and concept (BACKEND.DOMAIN.CONVENTION.002)
 
@@ -786,7 +786,7 @@ The event payload captures the publication fact without carrying the mutable `Po
 | BACKEND.DOMAIN.ERROR.001 | inspection | `DomainExceptionTests` asserts each rejection throws its own type with a stable code and no transport detail. |
 | BACKEND.DOMAIN.REFERENCE.001 | inspection | `ArchitectureTests` asserts no aggregate declares a field or property typed as another aggregate root. |
 | BACKEND.DOMAIN.TIME.001 | inspection | `ArchitectureTests` asserts no Domain type reads system time or generates a random business value. |
-| BACKEND.DOMAIN.DOCUMENTATION.001 | static | The Release build fails on a missing XML comment through the `1591` documentation warning promoted to an error. |
+| BACKEND.DOMAIN.DOCS.001 | static | The Release build fails on a missing XML comment through the `1591` documentation warning promoted to an error. |
 | BACKEND.DOMAIN.CONVENTION.001 | inspection | Review confirms each consumer file carries the full contract that its example omits. |
 | BACKEND.DOMAIN.CONVENTION.002 | inspection | Folder review compares each Domain module tree against its aggregate roster, or records a named local replacement. |
 | BACKEND.DOMAIN.CONVENTION.003 | inspection | Naming review compares each new Domain type against the tables in this section. |
