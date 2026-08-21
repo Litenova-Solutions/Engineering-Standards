@@ -21,10 +21,10 @@ This extension adds no baseline project and replaces no baseline rule.
 - Document the conflicting writes and protected invariant. (EXT.CONCURRENCY.ADOPT.001)
 - Use expected versions for documented write conflicts. (EXT.CONCURRENCY.VERSION.001)
 - Return stable precondition and version-conflict responses. (EXT.CONCURRENCY.VERSION.002, EXT.CONCURRENCY.VERSION.004)
-- Scope and fingerprint idempotency keys. (EXT.IDEMPOTENCY.KEY.001, EXT.IDEMPOTENCY.KEY.004)
-- Commit replay records with business changes. (EXT.IDEMPOTENCY.REPLAY.003)
-- Keep external effects outside uncommitted work. (EXT.IDEMPOTENCY.REPLAY.006)
-- Retain keys through safe retry windows. (EXT.IDEMPOTENCY.RETENTION.001, EXT.IDEMPOTENCY.RETENTION.003)
+- Scope and fingerprint idempotency keys. (EXT.CONCURRENCY.IDEMPOTENTKEY.001, EXT.CONCURRENCY.IDEMPOTENTKEY.004)
+- Commit replay records with business changes. (EXT.CONCURRENCY.IDEMPOTENTREP.003)
+- Keep external effects outside uncommitted work. (EXT.CONCURRENCY.IDEMPOTENTREP.006)
+- Retain keys through safe retry windows. (EXT.CONCURRENCY.IDEMPOTENTRET.001, EXT.CONCURRENCY.IDEMPOTENTRET.003)
 
 ## Standards
 
@@ -78,115 +78,115 @@ This extension adds no baseline project and replaces no baseline rule.
 
 **Rationale:** The ETag is the contract boundary for persistence-version coordination.
 
-### Scope client keys (EXT.IDEMPOTENCY.KEY.001)
+### Scope client keys (EXT.CONCURRENCY.IDEMPOTENTKEY.001)
 
 **Requirement:** An idempotent operation MUST scope its client key to the authenticated actor and operation.
 
 **Rationale:** Actor and operation scope prevents one caller's key from replaying another operation.
 
-### Store idempotency state atomically (EXT.IDEMPOTENCY.KEY.002)
+### Store idempotency state atomically (EXT.CONCURRENCY.IDEMPOTENTKEY.002)
 
 **Requirement:** An idempotent operation MUST store its fingerprint, state, response status, response body, and expiry with its business change.
 
 **Rationale:** One transaction connects the accepted change to the result that later calls replay.
 
-### Reject conflicting key reuse (EXT.IDEMPOTENCY.KEY.003)
+### Reject conflicting key reuse (EXT.CONCURRENCY.IDEMPOTENTKEY.003)
 
 **Requirement:** An idempotent operation MUST reject reuse of one key with a different request fingerprint.
 
 **Rationale:** One client key can represent only one accepted request intent.
 
-### Enforce key uniqueness (EXT.IDEMPOTENCY.KEY.004)
+### Enforce key uniqueness (EXT.CONCURRENCY.IDEMPOTENTKEY.004)
 
 **Requirement:** An idempotency store MUST enforce a unique constraint on actor, operation, and client key.
 
 **Rationale:** The constraint selects one accepted winner when concurrent requests use the same key.
 
-### Canonicalize request fingerprints (EXT.IDEMPOTENCY.KEY.005)
+### Canonicalize request fingerprints (EXT.CONCURRENCY.IDEMPOTENTKEY.005)
 
 **Requirement:** An idempotency implementation MUST derive its fingerprint from canonical mapped command input and route identity, excluding credentials and the client key.
 
 **Rationale:** Equivalent requests produce one comparison value without embedding authentication material.
 
-### Protect fingerprint source data (EXT.IDEMPOTENCY.KEY.006)
+### Protect fingerprint source data (EXT.CONCURRENCY.IDEMPOTENTKEY.006)
 
 **Requirement:** An idempotency implementation MUST store a cryptographic hash when support does not require original sensitive request content.
 
 **Rationale:** A hash preserves comparison behavior while reducing retained sensitive data.
 
-### Replay completed results (EXT.IDEMPOTENCY.REPLAY.001)
+### Replay completed results (EXT.CONCURRENCY.IDEMPOTENTREP.001)
 
 **Requirement:** A completed idempotent retry MUST return the original response status and body.
 
 **Rationale:** A retry receives the accepted result rather than repeating its state change.
 
-### Define concurrent retry behavior (EXT.IDEMPOTENCY.REPLAY.002)
+### Define concurrent retry behavior (EXT.CONCURRENCY.IDEMPOTENTREP.002)
 
 **Requirement:** An idempotent use case MUST define whether a concurrent request waits, reports in-progress, or returns a stable conflict.
 
 **Rationale:** Callers need one documented result while an identical request is still active.
 
-### Commit replay records with changes (EXT.IDEMPOTENCY.REPLAY.003)
+### Commit replay records with changes (EXT.CONCURRENCY.IDEMPOTENTREP.003)
 
 **Requirement:** An idempotent implementation MUST stage the completed replay record and business change in one provider transaction.
 
 **Rationale:** The transaction prevents a completed record without its change or a change without its replay record.
 
-### Reload concurrent winners (EXT.IDEMPOTENCY.REPLAY.004)
+### Reload concurrent winners (EXT.CONCURRENCY.IDEMPOTENTREP.004)
 
 **Requirement:** A losing concurrent idempotency request MUST reload and replay the winning record when its fingerprint matches.
 
 **Rationale:** The unique-key winner provides the accepted result for all matching retries.
 
-### Discard failed replay state (EXT.IDEMPOTENCY.REPLAY.005)
+### Discard failed replay state (EXT.CONCURRENCY.IDEMPOTENTREP.005)
 
 **Requirement:** A failed pre-commit idempotent request MUST leave neither the business change nor a completed replay record.
 
 **Rationale:** A later retry can safely perform the previously uncommitted operation.
 
-### Delay irreversible provider calls (EXT.IDEMPOTENCY.REPLAY.006)
+### Delay irreversible provider calls (EXT.CONCURRENCY.IDEMPOTENTREP.006)
 
 **Requirement:** An idempotent operation MUST NOT perform an irreversible provider call before its business transaction commits.
 
 **Rationale:** An uncommitted operation cannot safely claim an irreversible external effect.
 
-### Route required external effects durably (EXT.IDEMPOTENCY.REPLAY.007)
+### Route required external effects durably (EXT.CONCURRENCY.IDEMPOTENTREP.007)
 
 **Requirement:** An idempotent operation MUST use the outbox extension or a documented provider idempotency contract for required external effects.
 
 **Rationale:** Durable routing or provider replay protection aligns external effects with retries.
 
-### Set key retention (EXT.IDEMPOTENCY.RETENTION.001)
+### Set key retention (EXT.CONCURRENCY.IDEMPOTENTRET.001)
 
 **Requirement:** An idempotency owner MUST set key retention from the caller retry window and business risk.
 
 **Rationale:** Retention lasts through the period in which callers can safely retry.
 
-### Bound expired-record cleanup (EXT.IDEMPOTENCY.RETENTION.002)
+### Bound expired-record cleanup (EXT.CONCURRENCY.IDEMPOTENTRET.002)
 
 **Requirement:** An idempotency owner MUST remove expired records through a bounded maintenance process.
 
 **Rationale:** Bounded maintenance prevents cleanup from overwhelming normal application work.
 
-### Retain safe retry keys (EXT.IDEMPOTENCY.RETENTION.003)
+### Retain safe retry keys (EXT.CONCURRENCY.IDEMPOTENTRET.003)
 
 **Requirement:** An idempotency owner MUST NOT expire a key before callers can safely retry.
 
 **Rationale:** Early expiration can turn a retry into duplicate business work.
 
-### Declare replayed transport outcomes (EXT.IDEMPOTENCY.OUTCOME.001)
+### Declare replayed transport outcomes (EXT.CONCURRENCY.IDEMPOTENTOUT.001)
 
 **Requirement:** An idempotent use case MUST list the statuses and headers stored for replay.
 
 **Rationale:** The list defines the transport result that a completed retry can reproduce.
 
-### Restrict replay data (EXT.IDEMPOTENCY.OUTCOME.002)
+### Restrict replay data (EXT.CONCURRENCY.IDEMPOTENTOUT.002)
 
 **Requirement:** An idempotent implementation MUST store only safe response fields required to reproduce an accepted result.
 
 **Rationale:** Replay data needs enough information for callers without retaining unnecessary sensitive content.
 
-### Exclude unsafe replay outcomes (EXT.IDEMPOTENCY.OUTCOME.003)
+### Exclude unsafe replay outcomes (EXT.CONCURRENCY.IDEMPOTENTOUT.003)
 
 **Requirement:** An idempotent implementation MUST NOT replay authentication failures, transient server failures, `Set-Cookie`, hop-by-hop headers, tokens, or secrets.
 
@@ -236,32 +236,32 @@ No additional package is required by the baseline implementation.
 |:---|:---|:---|
 | EXT.CONCURRENCY.ADOPT.001 | inspection | The use-case specification names conflicts, invalid state, winner behavior, and caller response. |
 | EXT.CONCURRENCY.ADOPT.002 | inspection | Every version check links to a documented conflicting-write case. |
-| EXT.CONCURRENCY.VERSION.001 | test | PostgreSQL integration tests race conflicting aggregate writes with expected versions. |
-| EXT.CONCURRENCY.VERSION.002 | test | A failed expected version returns 409 Problem Details with its stable code. |
-| EXT.CONCURRENCY.VERSION.003 | test | Conflicting accepted writes preserve the winner without silent replacement. |
-| EXT.CONCURRENCY.VERSION.004 | test | Conditional HTTP tests require and validate a strong persistence-derived ETag. |
+| EXT.CONCURRENCY.VERSION.001 | test | `ConcurrencyVersionTests` race conflicting aggregate writes with expected versions. |
+| EXT.CONCURRENCY.VERSION.002 | test | `ConcurrencyVersionTests` asserts a failed expected version returns 409 Problem Details with its stable code. |
+| EXT.CONCURRENCY.VERSION.003 | test | `ConcurrencyVersionTests` asserts conflicting accepted writes preserve the winner without silent replacement. |
+| EXT.CONCURRENCY.VERSION.004 | test | `ConcurrencyVersionTests` require and validate a strong persistence-derived ETag. |
 | EXT.CONCURRENCY.VERSION.005 | test | Missing and stale `If-Match` tests return the documented status and code. |
-| EXT.CONCURRENCY.VERSION.006 | static | Public transport models expose no provider-specific version field. |
-| EXT.IDEMPOTENCY.KEY.001 | test | Same keys from different actors or operations do not replay each other. |
-| EXT.IDEMPOTENCY.KEY.002 | test | Transaction tests commit replay state with the accepted business change. |
-| EXT.IDEMPOTENCY.KEY.003 | test | Reused keys with changed input return the documented rejection. |
-| EXT.IDEMPOTENCY.KEY.004 | test | Concurrent inserts prove the actor-operation-key uniqueness constraint. |
-| EXT.IDEMPOTENCY.KEY.005 | test | Equivalent mapped requests produce one fingerprint without credentials or client key. |
-| EXT.IDEMPOTENCY.KEY.006 | inspection | Stored fingerprint review confirms sensitive source data is hashed when not required. |
-| EXT.IDEMPOTENCY.REPLAY.001 | test | Lost-response retry tests return the original accepted status and body. |
-| EXT.IDEMPOTENCY.REPLAY.002 | test | Concurrent retry tests prove the documented wait, in-progress, or conflict behavior. |
-| EXT.IDEMPOTENCY.REPLAY.003 | test | Transaction failure tests leave no completed replay record without its business change. |
-| EXT.IDEMPOTENCY.REPLAY.004 | test | Concurrent loser tests reload and replay the matching winner record. |
-| EXT.IDEMPOTENCY.REPLAY.005 | test | Pre-commit failure tests leave no business change or completed replay state. |
-| EXT.IDEMPOTENCY.REPLAY.006 | inspection | Integration review shows irreversible provider calls occur after commit. |
-| EXT.IDEMPOTENCY.REPLAY.007 | inspection | Required effects select an outbox or documented provider idempotency contract. |
-| EXT.IDEMPOTENCY.RETENTION.001 | inspection | The use case records retry window, risk, and retention duration. |
-| EXT.IDEMPOTENCY.RETENTION.002 | test | Maintenance tests show bounded deletion of expired idempotency records. |
-| EXT.IDEMPOTENCY.RETENTION.003 | test | Retry-window tests reject expiration before the documented safe retry time. |
-| EXT.IDEMPOTENCY.OUTCOME.001 | inspection | The use case lists replayed statuses and headers. |
-| EXT.IDEMPOTENCY.OUTCOME.002 | inspection | Stored replay records contain only fields required for accepted-result reproduction. |
-| EXT.IDEMPOTENCY.OUTCOME.003 | test | Replay tests exclude authentication, transient failures, cookies, hop-by-hop headers, tokens, and secrets. |
+| EXT.CONCURRENCY.VERSION.006 | static | `ConcurrencyVersionTests` asserts public transport models expose no provider-specific version field. |
+| EXT.CONCURRENCY.IDEMPOTENTKEY.001 | test | `IdempotencyKeyTests` asserts same keys from different actors or operations do not replay each other. |
+| EXT.CONCURRENCY.IDEMPOTENTKEY.002 | test | `IdempotencyKeyTests` commit replay state with the accepted business change. |
+| EXT.CONCURRENCY.IDEMPOTENTKEY.003 | test | `IdempotencyKeyTests` asserts reused keys with changed input return the documented rejection. |
+| EXT.CONCURRENCY.IDEMPOTENTKEY.004 | test | `IdempotencyKeyTests` asserts concurrent inserts prove the actor-operation-key uniqueness constraint. |
+| EXT.CONCURRENCY.IDEMPOTENTKEY.005 | test | `IdempotencyKeyTests` asserts equivalent mapped requests produce one fingerprint without credentials or client key. |
+| EXT.CONCURRENCY.IDEMPOTENTKEY.006 | inspection | Stored fingerprint review confirms sensitive source data is hashed when not required. |
+| EXT.CONCURRENCY.IDEMPOTENTREP.001 | test | `IdempotencyReplayTests` return the original accepted status and body. |
+| EXT.CONCURRENCY.IDEMPOTENTREP.002 | test | `IdempotencyReplayTests` prove the documented wait, in-progress, or conflict behavior. |
+| EXT.CONCURRENCY.IDEMPOTENTREP.003 | test | `IdempotencyReplayTests` leave no completed replay record without its business change. |
+| EXT.CONCURRENCY.IDEMPOTENTREP.004 | test | `IdempotencyReplayTests` reload and replay the matching winner record. |
+| EXT.CONCURRENCY.IDEMPOTENTREP.005 | test | `IdempotencyReplayTests` leave no business change or completed replay state. |
+| EXT.CONCURRENCY.IDEMPOTENTREP.006 | inspection | Integration review shows irreversible provider calls occur after commit. |
+| EXT.CONCURRENCY.IDEMPOTENTREP.007 | inspection | Required effects select an outbox or documented provider idempotency contract. |
+| EXT.CONCURRENCY.IDEMPOTENTRET.001 | inspection | The use case records retry window, risk, and retention duration. |
+| EXT.CONCURRENCY.IDEMPOTENTRET.002 | test | `IdempotencyRetentionTests` show bounded deletion of expired idempotency records. |
+| EXT.CONCURRENCY.IDEMPOTENTRET.003 | test | `IdempotencyRetentionTests` reject expiration before the documented safe retry time. |
+| EXT.CONCURRENCY.IDEMPOTENTOUT.001 | inspection | The use case lists replayed statuses and headers. |
+| EXT.CONCURRENCY.IDEMPOTENTOUT.002 | inspection | Stored replay records contain only fields required for accepted-result reproduction. |
+| EXT.CONCURRENCY.IDEMPOTENTOUT.003 | test | `IdempotencyOutcomeTests` exclude authentication, transient failures, cookies, hop-by-hop headers, tokens, and secrets. |
 | EXT.CONCURRENCY.CONVENTION.001 | inspection | HTTP contract review uses `Idempotency-Key` or records a local replacement. |
 | EXT.CONCURRENCY.CONVENTION.002 | inspection | Source review locates idempotency transaction work in Infrastructure. |
 | EXT.CONCURRENCY.CONVENTION.003 | inspection | Source review locates replay HTTP mapping at the API boundary. |
-| EXT.CONCURRENCY.CONVENTION.004 | static | Generated OpenAPI declares the header for every applicable operation. |
+| EXT.CONCURRENCY.CONVENTION.004 | static | `ConcurrencyTests` asserts generated OpenAPI declares the header for every applicable operation. |

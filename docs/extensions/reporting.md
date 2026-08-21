@@ -135,16 +135,16 @@ No report or object-storage package is selected by default. Each provider needs 
 |:---|:---|:---|
 | EXT.REPORT.ADOPT.001 | inspection | Report specification records each required cost and ownership field. |
 | EXT.REPORT.ADOPT.002 | inspection | Reporting decision names an accepted current query or export need. |
-| EXT.REPORT.SQL.001 | test | Integration tests bind actor, tenant, filter, range, sort, and pagination values. |
+| EXT.REPORT.SQL.001 | test | `ReportSqlTests` bind actor, tenant, filter, range, sort, and pagination values. |
 | EXT.REPORT.SQL.002 | inspection | Source review locates raw report SQL and connection handling in Infrastructure. |
 | EXT.REPORT.SQL.003 | operation | Review record includes plans and indexes for representative report data. |
-| EXT.REPORT.AUTHZ.001 | test | Report authorization tests cover actor, role, owner, tenant, and sensitive fields. |
-| EXT.REPORT.EXPORT.001 | test | Budget-exceeding export tests queue work through Worker. |
-| EXT.REPORT.EXPORT.002 | test | Export download tests require owner authorization and honor expiry. |
+| EXT.REPORT.AUTHZ.001 | test | `ReportAuthzTests` cover actor, role, owner, tenant, and sensitive fields. |
+| EXT.REPORT.EXPORT.001 | test | `ReportExportTests` queue work through Worker. |
+| EXT.REPORT.EXPORT.002 | test | `ReportExportTests` require owner authorization and honor expiry. |
 | EXT.REPORT.LIMITS.001 | inspection | Report specification declares each report cost and storage limit. |
-| EXT.REPORT.LIMITS.002 | test | Cancellation and expiry tests stop work and remove expired output. |
-| EXT.REPORT.CONTENT.001 | test | Formula-leading export values are escaped except reviewed formula fields. |
-| EXT.REPORT.CONTENT.002 | test | Export fixtures assert explicit encoding and stable column order. |
+| EXT.REPORT.LIMITS.002 | test | `ReportLimitsTests` stop work and remove expired output. |
+| EXT.REPORT.CONTENT.001 | test | `ReportContentTests` asserts formula-leading export values are escaped except reviewed formula fields. |
+| EXT.REPORT.CONTENT.002 | test | `ReportContentTests` assert explicit encoding and stable column order. |
 | EXT.REPORT.CONVENTION.001 | inspection | Report definitions remain module-owned in Application or record a replacement. |
 | EXT.REPORT.CONVENTION.002 | inspection | SQL and storage code remain in Infrastructure or record a replacement. |
 | EXT.REPORT.CONVENTION.003 | inspection | Worker code does not contain report business rule ownership. |

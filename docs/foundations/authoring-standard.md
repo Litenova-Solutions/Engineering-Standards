@@ -13,6 +13,7 @@ The standards use one document grammar and one controlled technical prose profil
 - Keep summaries informative and cite every projected provision. (WRITING.SUMMARY.001)
 - Map every provision to exact verification evidence. (WRITING.VERIFICATION.001)
 - Validate only current standards material. (WRITING.SNAPSHOT.001, WRITING.SNAPSHOT.002)
+- Publish complete releases and record the one a consumer reviewed. (WRITING.SNAPSHOT.003, WRITING.SNAPSHOT.004, WRITING.SNAPSHOT.005, WRITING.SNAPSHOT.006)
 - Run the dependency-free authoring checks before review. (WRITING.VALIDATION.001)
 
 ## Concepts
@@ -164,7 +165,7 @@ Every normative page ends with a Verification table:
 ```markdown
 | ID | Method | Evidence |
 |:---|:---|:---|
-| SCOPE.TOPIC.001 | static, test | Exact command, artifact, test, assertion, or observable result. |
+| SCOPE.TOPIC.001 | static, test | `ScopeTopicTests` asserts exact command, artifact, test, assertion, or observable result. |
 ```
 
 The table contains exactly one row for every Standard and Convention ID on the page. Methods are `static`, `test`, `inspection`, and `operation`.
@@ -327,6 +328,12 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** Adoption is a consumer decision, and no repository change obliges a consumer to move to a later release.
 
+### Record the reviewed standards release (WRITING.SNAPSHOT.006)
+
+**Requirement:** A consumer MUST record the standards release it last reviewed in `reviewedStandardsVersion` within `standards.project.json`.
+
+**Rationale:** A provision can gain force while keeping its identifier, so an override written against an earlier release would otherwise apply to a rule nobody reread. The recorded release makes adoption an explicit act.
+
 ## Conventions
 
 ### Prefer direct action headings (WRITING.HEADING.CONVENTION.001)
@@ -366,26 +373,27 @@ This informative example demonstrates `WRITING.REQUIREMENT.001`, `WRITING.EXAMPL
 | ID | Method | Evidence |
 |:---|:---|:---|
 | WRITING.ASCII.001 | static | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
-| WRITING.NORMATIVE.002 | static, inspection | The provision parser reports one approved modal, and review confirms its intended force. |
-| WRITING.PROSE.001 | static | The prose scanner reports no length, contraction, or banned-term diagnostic. |
+| WRITING.NORMATIVE.002 | inspection | The provision parser reports one approved modal, and review confirms its intended force. |
+| WRITING.PROSE.001 | static | `WritingProseTests` asserts the prose scanner reports no length, contraction, or banned-term diagnostic. |
 | WRITING.VOICE.001 | inspection | The pull request checklist records actor, voice, procedure, and list review. |
 | WRITING.TERM.001 | inspection | Terminology review compares new terms with `docs/reference/glossary.md`. |
-| WRITING.CASE.001 | static, inspection | The heading scanner passes, and review confirms exact technical capitalization. |
+| WRITING.CASE.001 | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
 | WRITING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
-| WRITING.PAGE.001 | static | The page parser reports the declared H1 and H2 contract. |
-| WRITING.REQUIREMENT.001 | static, inspection | The provision parser passes, and review confirms one assertion for each active ID. |
-| WRITING.CONVENTION.001 | static | The parser resolves each Convention ID, Default, Replacement, and Verification row. |
-| WRITING.SUMMARY.001 | static, inspection | The summary parser resolves every citation, and review compares each projection with its source. |
+| WRITING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |
+| WRITING.REQUIREMENT.001 | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
+| WRITING.CONVENTION.001 | static | `WritingTests` asserts the parser resolves each Convention ID, Default, Replacement, and Verification row. |
+| WRITING.SUMMARY.001 | inspection | The summary parser resolves every citation, and review compares each projection with its source. |
 | WRITING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |
-| WRITING.VERIFICATION.001 | static | The evidence mapper reports one exact row for every page provision. |
+| WRITING.VERIFICATION.001 | static | `WritingVerificationTests` asserts the evidence mapper reports one exact row for every page provision. |
 | WRITING.METADATA.002 | static | `node tools/validate-consumer.mjs` validates opening JSON against the metadata schema. |
 | WRITING.METADATA.003 | static | `node tools/validate-consumer.mjs` reports no duplicate metadata carrier. |
-| WRITING.VALIDATION.001 | static | CI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
+| WRITING.VALIDATION.001 | static | `WritingValidationTests` asserts cI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
 | WRITING.SNAPSHOT.001 | static | `node tools/validate-standards.mjs` evaluates current standards material only. |
 | WRITING.SNAPSHOT.002 | inspection | Pull request review finds no history-specific material in active files. |
 | WRITING.SNAPSHOT.003 | inspection | Release review confirms each active provision resolves without reference to an earlier release. |
 | WRITING.SNAPSHOT.004 | inspection | Pull request review finds no cross-release compatibility, migration, deprecation, or alias material. |
 | WRITING.SNAPSHOT.005 | inspection | Review confirms no active provision requires a consumer to adopt a later standards release. |
+| WRITING.SNAPSHOT.006 | static | `node standards/tools/validate-consumer.mjs` fails when `reviewedStandardsVersion` differs from the pinned manifest version. |
 | WRITING.HEADING.CONVENTION.001 | inspection | Review records the action verb used by every changed provision heading. |
 | WRITING.INSTRUCTION.CONVENTION.001 | inspection | Review identifies the unsafe boundary behind every retained negative instruction. |
 | WRITING.TABLE.CONVENTION.001 | inspection | Review confirms that each changed table represents an exact mapping or comparison. |

@@ -80,7 +80,7 @@ A publishing product can support sign-in, draft creation, publication, and publi
 | SCOPE.APPLICATION.001 | inspection | Consumer profile and project structure match the supported application definition. |
 | SCOPE.CONTEXT.001 | inspection | Architecture review identifies one business language and deployment boundary. |
 | SCOPE.EXTENSIONS.001 | inspection | Every selected extension cites its activation condition. |
-| SCOPE.EXTENSIONS.002 | static | Project schema validation resolves each selected extension. |
+| SCOPE.EXTENSIONS.002 | static | `ScopeExtensionsTests` asserts project schema validation resolves each selected extension. |
 | SCOPE.OUTSIDE.001 | inspection | Unsupported architecture work cites a separate profile or project decision. |
 | SCOPE.CONVENTION.001 | inspection | Baseline topology uses one API and database or records a replacement. |
 | SCOPE.CONVENTION.002 | inspection | Capacity decision records load, target latency, and observed constraint. |

@@ -8,145 +8,106 @@ A released application is observable, deployable, recoverable, and supportable b
 ## Agent Summary {#agent-summary}
 
 
-- Use Aspire for local orchestration. (OPS.LOCAL.001)
-- Emit correlated diagnostics. (OPS.OBSERVABILITY.001)
-- Separate liveness and readiness. (OPS.HEALTH.001)
-- Apply schema changes outside request startup. (OPS.SCHEMA.001)
-- Define backup and restore behavior. (OPS.DATA.001)
-- Use a repeatable deployment. (OPS.DEPLOY.001)
-- Keep rollback executable. (OPS.ROLLBACK.001)
-- Operate background work independently. (OPS.WORKER.001)
-- Bound external calls. (OPS.DEPENDENCIES.001)
-- Define actionable baseline alerts. (OPS.ALERTS.001)
+- AppHost starts every baseline local resource. (OPS.LOCAL.001)
+- Diagnostics carry correlation identifiers and stable names. (OPS.OBSERVABILITY.001)
+- Liveness and readiness are separate endpoints. (OPS.HEALTH.001)
+- Schema changes run as a release step before traffic. (OPS.SCHEMA.001)
+- Backups declare their owner, retention, and tested restore. (OPS.DATA.001)
+- Deployments promote versioned artifacts with declared evidence. (OPS.DEPLOY.001)
+- Rollback is documented and rehearsed before release. (OPS.ROLLBACK.001)
+- Workers publish their own health and backlog signals. (OPS.WORKER.001)
+- External calls declare timeouts, cancellation, and bounded retries. (OPS.DEPENDENCIES.001)
+- Every baseline alert declares owner, threshold, and runbook. (OPS.ALERTS.001)
 
 ## Standards
 
 
 ### Use Aspire for local orchestration (OPS.LOCAL.001)
 
-**Requirement:** Applications MUST use Aspire for local orchestration.
+**Requirement:** `AppHost` MUST start WebApi, PostgreSQL, configured frontends, and enabled Workers for local development.
 
-**Rationale:** `{ProjectName}.AppHost` starts WebApi, PostgreSQL, configured frontend applications, and enabled Worker projects for local development. `{ProjectName}.ServiceDefaults` provides shared service discovery, health, resilience defaults, and OpenTelemetry registration.
-
-Local orchestration does not define hosted deployment architecture.
-
-ServiceDefaults contains registration and instrumentation plumbing only. It does not own application configuration, authentication, authorization, persistence mappings, provider ports, or business metrics. Each host calls it explicitly and retains control of endpoint mapping and host-specific checks.
+**Rationale:** `ServiceDefaults` supplies the shared discovery, health, resilience, and telemetry defaults those resources rely on.
 
 ### Emit correlated diagnostics (OPS.OBSERVABILITY.001)
 
-**Requirement:** Applications MUST emit correlated diagnostics.
+**Requirement:** A host MUST emit structured logs, traces, and metrics carrying timestamp, level, service, environment, trace identifier, and span identifier.
 
-**Rationale:** Hosts emit structured logs, traces, and metrics through OpenTelemetry-compatible instrumentation. Logs include timestamp, level, message, service, environment, trace ID, and span ID where available.
-
-The implementation uses stable event names or IDs for operationally relevant failures. The implementation does not log complete request bodies or tokens.
-
-The implementation uses W3C trace context on inbound HTTP, outbound `HttpClient`, and asynchronous message boundaries. Worker transitions preserve trace relationships without propagating authentication tokens or sensitive baggage. The implementation records exceptions on the owning span and returns the trace ID in public Problem Details.
-
-Metric names and attributes remain stable across releases. Attributes use bounded values such as service, environment, operation, outcome, and error code. The implementation does not use actor IDs, aggregate IDs, email addresses, raw URLs, exception messages, idempotency keys, or other unbounded values as metric attributes.
+**Rationale:** Correlated identifiers let one request be followed across hosts. Stable event names keep dashboards working across releases.
 
 ### Separate liveness and readiness (OPS.HEALTH.001)
 
-**Requirement:** Applications MUST separate liveness and readiness.
+**Requirement:** A host MUST expose `/health/live` without dependency checks and `/health/ready` including its critical dependencies.
 
-**Rationale:** The application exposes:
-
-- `/health/live` for process liveness without external dependency checks.
-- `/health/ready` for readiness to receive traffic, including critical dependencies.
-
-Readiness fails when the application cannot safely serve its included end-to-end flows. Health responses do not reveal connection strings or internal exception details.
-
-Process-only checks carry the liveness tag, while critical dependencies carry the readiness tag. The implementation maps each path with an explicit health-check predicate. Tests cover PostgreSQL readiness failure and recovery.
+**Rationale:** Readiness fails when the application cannot safely serve traffic, while liveness stays true so the orchestrator does not restart a healthy process.
 
 ### Apply schema changes outside request startup (OPS.SCHEMA.001)
 
-**Requirement:** Applications MUST apply schema changes outside request startup.
+**Requirement:** A hosted schema change MUST run as a dedicated release step before traffic shifts, not during replica startup.
 
-**Rationale:** Hosted schema changes run as a dedicated release step before traffic shifts. Release review covers both new and rollback application versions.
-
-WebApi and Worker replicas do not race to apply production schema changes during startup.
+**Rationale:** Release review covers both the new and rollback application versions against that schema.
 
 ### Define backup and restore behavior (OPS.DATA.001)
 
-**Requirement:** Applications MUST define backup and restore behavior.
+**Requirement:** A release MUST document backup owner, schedule, retention, encryption, location, restore command, and recovery objectives.
 
-**Rationale:** The implementation documents backup owner, schedule, retention, encryption, storage location, restore command, and recovery objectives. Restore tests use representative data before production releases and after material schema changes.
-
-A backup without a verified restore does not satisfy the release standard.
+**Rationale:** Restore tests run on representative data before production releases and after material schema changes. A backup without a tested restore is not a backup.
 
 ### Use a repeatable deployment (OPS.DEPLOY.001)
 
-**Requirement:** Applications MUST use a repeatable deployment.
+**Requirement:** A deployment MUST use versioned artifacts, declared configuration, a schema step, readiness checks, and declared end-to-end evidence.
 
-**Rationale:** Deployment uses versioned artifacts, declared configuration, a schema step, readiness checks, and declared end-to-end evidence. The implementation does not deploy from an uncommitted working tree or mutable branch reference.
-
-The container deployment extension adds image-specific requirements.
+**Rationale:** Deploying from an uncommitted tree or a mutable branch reference makes the deployed content unknowable afterwards.
 
 ### Keep rollback executable (OPS.ROLLBACK.001)
 
-**Requirement:** Applications MUST keep rollback executable.
+**Requirement:** A release MUST document the previous artifact reference, rollback command, configuration and schema compatibility, and data recovery condition.
 
-**Rationale:** The implementation documents the previous artifact reference, rollback command, configuration compatibility, schema compatibility, and data recovery condition. Rollback tests run before production releases.
-
-Destructive schema work requires an expand-and-contract sequence or an explicit recovery decision.
+**Rationale:** Rollback tests run before production releases. Destructive schema work requires an expand-and-contract sequence so the previous version still reads the data.
 
 ### Operate background work independently (OPS.WORKER.001)
 
-**Requirement:** Applications MUST operate background work independently.
+**Requirement:** A Worker MUST publish its own liveness, readiness, processing rate, failure count, retry count, oldest pending age, and shutdown behavior.
 
-**Rationale:** When Worker exists, it publishes liveness, readiness, processing rate, failure count, retry count, oldest pending age, and shutdown behavior independently of WebApi.
-
-WebApi readiness does not hide a failed durable-delivery Worker. The extension defines the business impact and alert threshold.
+**Rationale:** WebApi readiness otherwise hides a failed durable-delivery Worker while the queue grows unobserved.
 
 ### Bound external calls (OPS.DEPENDENCIES.001)
 
-**Requirement:** Applications MUST bound external calls.
+**Requirement:** Every network call MUST declare an explicit timeout and cancellation path, and retry only safe operations within bounded attempts.
 
-**Rationale:** Every network call has an explicit timeout and cancellation path. Retries apply only to safe operations and use bounded attempts. The external integrations extension defines provider-specific recovery and test requirements.
+**Rationale:** An unbounded call holds a request thread until an unrelated system recovers.
 
 ### Define actionable baseline alerts (OPS.ALERTS.001)
 
-**Requirement:** Applications MUST define actionable baseline alerts.
+**Requirement:** A baseline alert MUST declare owner, threshold, evaluation window, severity, and runbook before a production release.
 
-**Rationale:** Before production releases, each baseline alert has an owner, threshold, evaluation window, severity, and runbook. Baseline alerts cover sustained readiness failures, unexpected HTTP errors, release-flow latency, PostgreSQL outages, failed deployed tests, and stale backups. Worker-enabled applications also cover delivery or schedule thresholds named by their extension.
-
-Alerts focus on user or recovery impact, not every logged exception. Routing tests use a synthetic or controlled alert before release.
+**Rationale:** Coverage includes sustained readiness failures, unexpected HTTP errors, release-flow latency, PostgreSQL outages, and failed deployments.
 
 ## Conventions
 
 
 ### Use one local start command (OPS.CONVENTION.001)
 
-**Default:** Use one local start command.
+**Default:** Name one AppHost command in the consumer `AGENTS.md` that starts every baseline local dependency.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The consumer `AGENTS.md` names the AppHost command that starts all baseline local dependencies. A developer should not need to start PostgreSQL and WebApi through unrelated manual steps.
-
-AppHost names the PostgreSQL server `postgres` and its application database `database`. It names the API `api`, which references and waits for the database.
-
-The implementation adds each frontend through `AddJavaScriptApp` from `Aspire.Hosting.JavaScript`. It selects pnpm with `WithPnpm`, references the API, and injects its service URL through a server-only environment value. The implementation does not hard-code an allocated local port.
-
-The implementation runs the root frozen pnpm installation before AppHost so the workspace dependency graph is ready. Aspire runs the application's declared `dev` script. The root `package.json` remains the owner of toolchain versions and workspace scripts.
+**Rationale:** A developer starting PostgreSQL and WebApi through unrelated manual steps will eventually run a different combination than CI.
 
 ### Use stable service names (OPS.CONVENTION.002)
 
-**Default:** Use stable service names.
+**Default:** Keep service, resource, meter, and trace-source names identical across environments.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Service, resource, meter, and trace-source names remain stable across environments so dashboards and alerts do not depend on a deployment-generated identifier.
+**Rationale:** A deployment-generated identifier breaks every dashboard and alert that referenced the previous name.
 
 ### Keep runbooks near project documentation (OPS.CONVENTION.003)
 
-**Default:** Keep runbooks near project documentation.
+**Default:** Place runbooks under `docs/runbooks/`, each stating trigger, impact, prerequisites, steps, and verification.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation uses `docs/runbooks/` for backup restore, deployment rollback, failed schema application, leaked secret response, critical dependency outage, and selected-extension recovery procedures. Each runbook states trigger, impact, prerequisites, exact commands or platform actions, verification, recovery or stop condition, owner, last-tested date, and next review date.
-
-The implementation keeps Operating Limits at `docs/operations/limits.md`. Each value is classified as enforced, tested, supported, or an alert threshold. The implementation does not treat a tested value as an enforced or supported commitment without a separate classification.
-
-The implementation keeps a release record from the template. It links the artifact, schema plan, automated gates, restore exercise, and deployment result. It also links flow, rollback, and alert evidence, operating conditions, and skipped checks.
+**Rationale:** Coverage includes backup restore, rollback, failed schema application, leaked secret response, dependency outage, and extension recovery.
 
 ## Reference example
 
@@ -159,16 +120,16 @@ A release applies a reviewed Marten schema plan and deploys the versioned API ar
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| OPS.LOCAL.001 | inspection | Pull request review asserts `use Aspire for local orchestration` in the owning specification and source paths. |
-| OPS.OBSERVABILITY.001 | inspection | Pull request review asserts `emit correlated diagnostics` in the owning specification and source paths. |
-| OPS.HEALTH.001 | inspection | Pull request review asserts `separate liveness and readiness` in the owning specification and source paths. |
-| OPS.SCHEMA.001 | static | Repository static check asserts `apply schema changes outside request startup` for the owning paths. |
-| OPS.DATA.001 | operation | The release record captures the observed `define backup and restore behavior` result and owning operation. |
-| OPS.DEPLOY.001 | inspection | Pull request review asserts `use a repeatable deployment` in the owning specification and source paths. |
-| OPS.ROLLBACK.001 | inspection | Pull request review asserts `keep rollback executable` in the owning specification and source paths. |
-| OPS.WORKER.001 | inspection | Pull request review asserts `operate background work independently` in the owning specification and source paths. |
-| OPS.DEPENDENCIES.001 | inspection | Pull request review asserts `bound external calls` in the owning specification and source paths. |
-| OPS.ALERTS.001 | inspection | Pull request review asserts `define actionable baseline alerts` in the owning specification and source paths. |
-| OPS.CONVENTION.001 | inspection | Pull request review asserts `use one local start command` in the owning specification and source paths. |
-| OPS.CONVENTION.002 | inspection | Pull request review asserts `use stable service names` in the owning specification and source paths. |
-| OPS.CONVENTION.003 | inspection | Pull request review asserts `keep runbooks near project documentation` in the owning specification and source paths. |
+| OPS.LOCAL.001 | inspection | `AppHostTests` asserts the orchestration graph starts each baseline resource the solution declares. |
+| OPS.OBSERVABILITY.001 | inspection | `TelemetryTests` asserts each emitted log and span carries the correlation fields. |
+| OPS.HEALTH.001 | inspection | `HealthEndpointTests` asserts liveness ignores dependencies and readiness fails when a critical dependency is down. |
+| OPS.SCHEMA.001 | inspection | Deployment review confirms the schema step precedes traffic and no replica applies schema at startup. |
+| OPS.DATA.001 | operation | The release record names the restore test date and its representative data set. |
+| OPS.DEPLOY.001 | operation | The release record names the immutable artifact reference the deployment promoted. |
+| OPS.ROLLBACK.001 | operation | The release record names the rollback rehearsal result and the previous artifact reference. |
+| OPS.WORKER.001 | inspection | `WorkerHealthTests` asserts the Worker publishes each signal independently of WebApi readiness. |
+| OPS.DEPENDENCIES.001 | inspection | `ResilienceTests` asserts each outbound call declares a timeout and bounded retry policy. |
+| OPS.ALERTS.001 | operation | The alert inventory records owner, threshold, window, severity, and runbook for each baseline alert. |
+| OPS.CONVENTION.001 | inspection | Consumer `AGENTS.md` review confirms one start command covers the baseline dependencies. |
+| OPS.CONVENTION.002 | inspection | Telemetry review confirms each emitted name is environment-independent. |
+| OPS.CONVENTION.003 | inspection | Runbook review confirms each procedure states its trigger, steps, and verification. |

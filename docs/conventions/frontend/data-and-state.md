@@ -8,60 +8,48 @@ Frontend data flow should preserve the API contract, keep secrets on the server,
 ## Agent Summary {#agent-summary}
 
 
-- Generate transport types. (DATA.TYPES.001)
-- Use one typed API client. (DATA.CLIENT.001)
-- Read initial data on the server. (DATA.READS.001)
-- Keep mutations at a declared boundary. (DATA.MUTATIONS.001)
-- Parse errors consistently. (DATA.ERRORS.001)
-- Assign state to the narrowest owner. (STATE.OWNER.001)
-- Keep forms aligned with use cases. (FORM.CONTRACT.001)
-- Keep secrets out of browser storage. (DATA.SECRETS.001)
-- Make optimistic behavior recoverable. (STATE.OPTIMISTIC.001)
+- API types are generated from the committed contract. (DATA.TYPES.001)
+- One typed client per API boundary owns cross-cutting behavior. (DATA.CLIENT.001)
+- Initial data loads on the server. (DATA.READS.001)
+- Mutations run through a declared server or browser boundary. (DATA.MUTATIONS.001)
+- Problem Details map to one frontend error shape. (DATA.ERRORS.001)
+- State sits with its narrowest owner. (DATA.OWNER.001)
+- Forms match their use-case input and map field errors. (DATA.FORM.001)
+- Secrets never reach browser storage. (DATA.SECRETS.001)
+- Optimistic updates declare rollback and reconciliation. (DATA.OPTIMISTIC.001)
 
 ## Standards
 
 
 ### Generate transport types (DATA.TYPES.001)
 
-**Requirement:** Frontends MUST generate transport types.
+**Requirement:** A frontend MUST generate its TypeScript API types from the committed OpenAPI contract with the pinned generator.
 
-**Rationale:** The implementation generates TypeScript API types from the committed OpenAPI contract with the pinned generator. The implementation does not handwrite copies of API request, response, enum, or Problem Details types.
-
-A presentation view model may transform a generated transport type when the UI needs a different shape.
-
-Coerce a generated field typed as a `number | string` union at the read or view-model boundary before arithmetic or formatting. This union correctly represents values that can exceed a JavaScript consumer's safe integer range, such as `int64`. The coercion belongs on the consumer side. For a small integer or decimal, fix an unnecessary string union at the source (`API.OPENAPI.002`).
+**Rationale:** A handwritten copy of a request, response, enum, or Problem Details type drifts from the contract silently.
 
 ### Use one typed API client (DATA.CLIENT.001)
 
-**Requirement:** Frontends MUST use one typed API client.
+**Requirement:** A frontend MUST create one `openapi-fetch` client per API boundary owning base URL, headers, authentication, correlation, and error parsing.
 
-**Rationale:** The implementation creates one `openapi-fetch` client per API boundary. It owns the base URL, standard headers, authentication integration, request correlation, and Problem Details parsing.
-
-Feature modules call the client through operation-specific functions. They do not create ad hoc fetch wrappers.
+**Rationale:** Feature modules call that client instead of constructing their own requests, so the cross-cutting behavior applies once.
 
 ### Read initial data on the server (DATA.READS.001)
 
-**Requirement:** Frontends MUST read initial data on the server.
+**Requirement:** Initial route data MUST load through a Server Component or a server-owned feature function.
 
-**Rationale:** The implementation uses Server Components or server-owned feature functions for initial route data. The implementation keeps server credentials and actor-specific token handling outside browser bundles.
-
-The implementation uses client-side reads only when the use case requires browser-driven refresh, polling, or interaction that cannot remain server-owned.
+**Rationale:** Server credentials and actor-specific token handling then stay outside browser bundles.
 
 ### Keep mutations at a declared boundary (DATA.MUTATIONS.001)
 
-**Requirement:** Frontends MUST keep mutations at a declared boundary.
+**Requirement:** A mutation MUST run through a Server Action or a typed browser request declared by its feature.
 
-**Rationale:** The implementation uses Server Actions for forms and mutations naturally owned by a Next.js server boundary. The implementation uses a typed browser request for client-only interactions that require immediate browser coordination.
-
-Both paths use the generated API contract, return stable errors, and refresh or reconcile affected reads explicitly.
+**Rationale:** Server Actions suit forms owned by a Next.js boundary. A typed browser request suits interactions needing immediate browser context.
 
 ### Parse errors consistently (DATA.ERRORS.001)
 
-**Requirement:** Frontends MUST parse errors consistently.
+**Requirement:** A frontend MUST map API Problem Details into one error shape carrying status, stable code, trace identifier, field errors, and a safe fallback message.
 
-**Rationale:** The implementation maps API Problem Details into one frontend error shape containing status, stable code, trace ID, field errors. A safe fallback message.
-
-The implementation does not display raw response bodies, exception details, or unknown provider messages.
+**Rationale:** Displaying a raw response body leaks whatever the API included and gives the reader no consistent recovery path.
 
 **Example:** Normalize the generated API error at the client boundary into this project-owned shape:
 
@@ -83,28 +71,17 @@ type ApiError = {
 
 Unknown or malformed responses become a safe `unexpected_error` value. The frontend preserves the trace ID for support but does not use the safe message as a discriminator.
 
-### Assign state to the narrowest owner (STATE.OWNER.001)
+### Assign state to the narrowest owner (DATA.OWNER.001)
 
-**Requirement:** Frontends MUST assign state to the narrowest owner.
+**Requirement:** State MUST sit with its narrowest owner, preferring server data, then URL state, then form state, then local component state.
 
-**Rationale:** State ownership follows this order:
+**Rationale:** A global store placed above that order makes unrelated components re-render and hides where a value changes.
 
-1. Server data owned by the API and rendered on the server.
-2. URL state for shareable filters, sorting, selection, and pagination.
-3. Form state for submitted input and validation.
-4. Component state for local interaction.
-5. Client server-state cache after repeated browser reads require it.
-6. Shared client state after unrelated branches coordinates non-server state.
+### Keep forms aligned with use cases (DATA.FORM.001)
 
-The implementation does not copy server data into a shared client store as the default.
+**Requirement:** A form MUST match the use-case input and OpenAPI contract and map stable field error codes back to their fields.
 
-### Keep forms aligned with use cases (FORM.CONTRACT.001)
-
-**Requirement:** Frontends MUST keep forms aligned with use cases.
-
-**Rationale:** Form fields and structural validation match the use-case input and OpenAPI contract. Domain invariants remain enforced by the API and Domain even when the browser provides earlier feedback.
-
-The form maps stable field errors to their controls and preserves user input after recoverable failure.
+**Rationale:** Domain invariants stay enforced by the API even when the browser gives earlier feedback.
 
 **Example:** Server Actions return one serializable discriminated result rather than a `Response`, thrown provider value, or generated client object:
 
@@ -120,24 +97,22 @@ The example uses `updateTag` when a Server Action needs read-your-writes. The ex
 
 ### Keep secrets out of browser storage (DATA.SECRETS.001)
 
-**Requirement:** Frontends MUST keep secrets out of browser storage.
+**Requirement:** A frontend MUST NOT store a refresh token, provider secret, or privileged credential in browser storage or a browser-visible variable.
 
-**Rationale:** The implementation does not store refresh tokens, provider secrets, or privileged service credentials in local storage, session storage, IndexedDB, or browser-visible environment variables.
+**Rationale:** Local storage, session storage, IndexedDB, and public environment variables are all readable by any script on the page.
 
-The implementation uses the frontend authentication extension when Next.js owns interactive login and session cookies.
+### Make optimistic behavior recoverable (DATA.OPTIMISTIC.001)
 
-### Make optimistic behavior recoverable (STATE.OPTIMISTIC.001)
+**Requirement:** An optimistic update MUST declare its stable client identity, conflict behavior, failure rollback, and reconciliation path.
 
-**Requirement:** Frontends MUST make optimistic behavior recoverable.
-
-**Rationale:** The implementation uses optimistic updates only when the operation has a stable client identity, conflict behavior, failure rollback, and reconciliation path. Money, irreversible actions, and uncertain authorization require server confirmation before presenting success.
+**Rationale:** Money, irreversible actions, and uncertain authorization wait for the server result instead.
 
 ## Conventions
 
 
 ### Use this API layout for one frontend (DATA.CONVENTION.001)
 
-**Default:** Use this API layout for one frontend.
+**Default:** Place the generated types, typed client, and error mapping under one API folder per frontend.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -160,31 +135,31 @@ The example moves the generated types and client to workspace packages only when
 
 ### Keep schemas operation-specific (DATA.CONVENTION.002)
 
-**Default:** Keep schemas operation-specific.
+**Default:** Keep a form or view schema in its owning use-case folder until a second use case needs it.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation places a form or view schema in the owning use-case folder. The implementation moves it to module shared code only after another use case uses the same contract.
+**Rationale:** Moving a schema early creates a shared contract before its second consumer defines what it must satisfy.
 
 ### Use native and framework form support first (DATA.CONVENTION.003)
 
-**Default:** Use native and framework form support first.
+**Default:** Use native form semantics, React action state, and small project-owned validation before adding a form package.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation uses native form semantics, React action state, and small project-owned validation before adding a form package. A complex repeated form requirement may justify an approved dependency and local convention.
+**Rationale:** A complex repeated requirement may still justify an approved dependency and a local convention.
 
 ### Keep cache invalidation close to mutations (DATA.CONVENTION.004)
 
-**Default:** Keep cache invalidation close to mutations.
+**Default:** Name the route, tag, or query data that a mutation invalidates inside the mutation function.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The mutation function names the route, tag, or query data it invalidates. The implementation does not scatter invalidation across unrelated components.
+**Rationale:** Invalidation scattered across components leaves no single place to read what a mutation affects.
 
 ## Reference example
 
-This informative example demonstrates `DATA.READS.001`, `STATE.OWNER.001`, and `DATA.MUTATIONS.001`.
+This informative example demonstrates `DATA.READS.001`, `DATA.OWNER.001`, and `DATA.MUTATIONS.001`.
 
 A posts list reads on the server from the typed API client. Its search and cursor live in the URL. `CreateDraftForm` submits through a Server Action, maps Problem Details field errors, and refreshes the posts route after success.
 
@@ -193,16 +168,16 @@ A posts list reads on the server from the typed API client. Its search and curso
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| DATA.TYPES.001 | static | Repository static check asserts `generate transport types` for the owning paths. |
-| DATA.CLIENT.001 | inspection | Pull request review asserts `use one typed API client` in the owning specification and source paths. |
-| DATA.READS.001 | inspection | Pull request review asserts `read initial data on the server` in the owning specification and source paths. |
-| DATA.MUTATIONS.001 | inspection | Pull request review asserts `keep mutations at a declared boundary` in the owning specification and source paths. |
-| DATA.ERRORS.001 | inspection | Pull request review asserts `parse errors consistently` in the owning specification and source paths. |
-| STATE.OWNER.001 | inspection | Pull request review asserts `assign state to the narrowest owner` in the owning specification and source paths. |
-| FORM.CONTRACT.001 | inspection | Pull request review asserts `keep forms aligned with use cases` in the owning specification and source paths. |
-| DATA.SECRETS.001 | inspection | Pull request review asserts `keep secrets out of browser storage` in the owning specification and source paths. |
-| STATE.OPTIMISTIC.001 | inspection | Pull request review asserts `make optimistic behavior recoverable` in the owning specification and source paths. |
-| DATA.CONVENTION.001 | inspection | Pull request review asserts `use this API layout for one frontend` in the owning specification and source paths. |
-| DATA.CONVENTION.002 | operation | The release record captures the observed `keep schemas operation-specific` result and owning operation. |
-| DATA.CONVENTION.003 | inspection | Pull request review asserts `use native and framework form support first` in the owning specification and source paths. |
-| DATA.CONVENTION.004 | inspection | Pull request review asserts `keep cache invalidation close to mutations` in the owning specification and source paths. |
+| DATA.TYPES.001 | static | The CI contract job reruns `openapi-typescript` and fails when the committed output differs. |
+| DATA.CLIENT.001 | inspection | `ApiClientTests` asserts every API call routes through the single typed client per boundary. |
+| DATA.READS.001 | inspection | `DataBoundaryTests` asserts no initial route read runs in a client component. |
+| DATA.MUTATIONS.001 | inspection | `MutationBoundaryTests` asserts each mutation routes through its declared boundary. |
+| DATA.ERRORS.001 | inspection | `ErrorMappingTests` asserts each API failure produces the single frontend error shape. |
+| DATA.OWNER.001 | inspection | State review compares each stored value against the ownership order in this section. |
+| DATA.FORM.001 | inspection | `FormContractTests` asserts each form field matches its contract and each field error maps to its input. |
+| DATA.SECRETS.001 | inspection | `node standards/tools/validate-ui.mjs` reports a secret written to browser storage or a public variable. |
+| DATA.OPTIMISTIC.001 | inspection | `OptimisticUpdateTests` asserts each optimistic path rolls back and reconciles on failure. |
+| DATA.CONVENTION.001 | inspection | Folder review compares each frontend API folder against the layout in this section. |
+| DATA.CONVENTION.002 | operation | Schema review confirms each shared schema has two real consumers. |
+| DATA.CONVENTION.003 | inspection | Dependency review records the repeated requirement behind any added form package. |
+| DATA.CONVENTION.004 | inspection | Mutation review confirms each function names the cache entries it invalidates. |

@@ -2,7 +2,7 @@
 
 Read this file before changing this repository or a consumer application. (AGENT.LOAD.001)
 
-Standards v1.11.0 covers one bounded-context business application. The baseline uses ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends. (SCOPE.APPLICATION.001, SCOPE.CONTEXT.001)
+Standards v1.12.0 covers one bounded-context business application. The baseline uses ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends. (SCOPE.APPLICATION.001, SCOPE.CONTEXT.001)
 
 The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PROFILE.VERSIONS.001, AGENT.LOAD.001)
 
@@ -21,6 +21,8 @@ Do not retain history-specific paths, IDs, aliases, maps, standards-release migr
 Each standards release states its complete contract. Do not add compatibility, migration, deprecation, or alias work between standards releases. (WRITING.SNAPSHOT.003, WRITING.SNAPSHOT.004)
 
 A consumer keeps a pinned release for as long as that consumer chooses. (WRITING.SNAPSHOT.005)
+
+A consumer records the release it reviewed in `reviewedStandardsVersion`. (WRITING.SNAPSHOT.006)
 
 `WRITING.SNAPSHOT.004` covers standards releases only. Consumer product API compatibility, migration, and rollback provisions still apply. (WRITING.SNAPSHOT.004)
 
@@ -60,7 +62,7 @@ Do not add an unauthorized package, schema migration, authentication change, pub
 - Use Domain, Application, Infrastructure, and WebApi as the application projects. (ARCH.PROJECTS.001)
 - Keep Domain independent from persistence, web, mediator, logging, and dependency injection. (ARCH.DEPENDENCIES.001)
 - Model aggregate lifecycles with an abstract state and sealed state records. (DOMAIN.STATE.001)
-- Model Domain closed sets with records or typed value objects, never enums. (DOMAIN.CLOSEDSET.001)
+- Model Domain closed sets as record hierarchies, never enums. (DOMAIN.CLOSEDSET.001)
 - Give each layer ownership of its messages, results, and transport models. (ARCH.CONTRACTS.001)
 - Give each rejected Domain rule its own exception type and stable failure code. (DOMAIN.ERROR.001)
 - Organize each layer by the same modules, aggregates, and use cases. (ARCH.MODULES.001)
@@ -88,31 +90,14 @@ Run extension-specific checks when their rules, schemas, templates, or validator
 
 ## Consumer Verification
 
-Replace `{ProjectName}` with the consumer solution name. (RELEASE.GATES.001)
+`CI.GATES.001` in [continuous integration](docs/conventions/quality/ci.md) owns the exact consumer gate commands. Run the gates its table selects for each changed area. (RELEASE.GATES.001, CI.GATES.001)
 
-```bash
-dotnet build apps/api/{ProjectName}.slnx --configuration Release
-dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
-```
-
-For each changed frontend, run its complete gate. (RELEASE.GATES.001)
-
-```bash
-pnpm install --frozen-lockfile
-pnpm lint
-pnpm type-check
-pnpm test
-pnpm build
-```
-
-Run the reference validators from the consumer root. (RELEASE.GATES.001)
+Run the reference validators from the consumer root, then Playwright for affected browser flows and every applicable extension check. (RELEASE.GATES.001)
 
 ```bash
 node standards/tools/validate-consumer.mjs
 node standards/tools/validate-ui.mjs
 ```
-
-Run Playwright for affected browser flows. Run every applicable extension check. (RELEASE.GATES.001)
 
 ## Completion
 

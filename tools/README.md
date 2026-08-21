@@ -37,7 +37,7 @@ Some rules report a defect the repository is still burning down. Those rules pri
 node tools/validate-standards.mjs --warnings
 ```
 
-`WARNING_DIAGNOSTIC_CODES` in the validator lists them. Move a code out of that list once its count reaches zero.
+`WARNING_DIAGNOSTIC_CODES` in the validator lists them. It is currently empty, because every rule is an error.
 
 Run its fixture suite after changing authoring rules or validator behavior:
 

@@ -199,25 +199,25 @@ The extension adds no required package. An introduced OpenAPI diff tool needs a 
 | EXT.API.COMPATIBILITY.001 | inspection | Pull request review classifies each independent-consumer API contract change. |
 | EXT.API.COMPATIBILITY.002 | inspection | Review marks each removed, renamed, narrowed, retyped, or authentication change as breaking. |
 | EXT.API.COMPATIBILITY.003 | inspection | Review records why each optional addition preserves existing consumer behavior. |
-| EXT.API.COMPATIBILITY.004 | test, inspection | Generated-client tests and review cover added enum values and discriminator cases. |
-| EXT.API.COMPATIBILITY.005 | static | Error-contract comparison rejects removed or reassigned stable Problem Details codes. |
+| EXT.API.COMPATIBILITY.004 | test, inspection | `ApiCompatibilityTests` and review cover added enum values and discriminator cases. |
+| EXT.API.COMPATIBILITY.005 | static | `ApiCompatibilityTests` rejects removed or reassigned stable Problem Details codes. |
 | EXT.API.COMPATIBILITY.006 | inspection | Unclear compatibility classifications record breaking treatment and consumer review. |
 | EXT.API.DIFF.001 | operation | Release artifacts retain the generated OpenAPI baseline for each supported version. |
-| EXT.API.DIFF.002 | test | Local and continuous integration execute the selected baseline diff command. |
-| EXT.API.DIFF.003 | test, inspection | Breaking-diff failure requires a version boundary or approved consumer decision. |
+| EXT.API.DIFF.002 | test | `ApiDiffTests` asserts local and continuous integration execute the selected baseline diff command. |
+| EXT.API.DIFF.003 | test, inspection | `ApiDiffTests` asserts breaking-diff failure requires a version boundary or approved consumer decision. |
 | EXT.API.OPERATION.001 | static | OpenAPI validation reports a deliberate `operationId` for each independent-consumer operation. |
-| EXT.API.OPERATION.002 | test | Baseline comparison reports unchanged IDs for compatible operations. |
+| EXT.API.OPERATION.002 | test | `ApiOperationTests` reports unchanged IDs for compatible operations. |
 | EXT.API.OPERATION.003 | inspection | Versioned operation review records each deliberately changed operation ID. |
 | EXT.API.VERSION.001 | inspection | Breaking contract review identifies its new route or media-type version. |
 | EXT.API.VERSION.002 | operation | Release records show prior-version availability through the declared support window. |
 | EXT.API.VERSION.003 | inspection | The versioning decision names consumer owner, deadline, and removal condition. |
-| EXT.API.DEPRECATION.001 | test | Contract tests assert the documented deprecation signal for planned removal. |
+| EXT.API.DEPRECATION.001 | test | `ApiDeprecationTests` assert the documented deprecation signal for planned removal. |
 | EXT.API.DEPRECATION.002 | inspection | Consumer `CHANGELOG.md` names each operation scheduled for removal. |
 | EXT.API.DEPRECATION.003 | inspection | The deprecation decision records the sunset date and replacement operation. |
-| EXT.API.ERRORS.001 | static, inspection | OpenAPI and error-contract review include type, code, field codes, and statuses. |
-| EXT.API.ERRORS.002 | test | Existing consumer fixtures safely handle each added unknown error code. |
-| EXT.API.ERRORS.003 | test | Representative generated clients compile and exercise the changed contract. |
-| EXT.API.CONVENTION.001 | static | Generated OpenAPI exists at the documented source path or recorded local replacement. |
+| EXT.API.ERRORS.001 | inspection | OpenAPI and error-contract review include type, code, field codes, and statuses. |
+| EXT.API.ERRORS.002 | test | `ApiErrorsTests` safely handle each added unknown error code. |
+| EXT.API.ERRORS.003 | test | `ApiErrorsTests` asserts representative generated clients compile and exercise the changed contract. |
+| EXT.API.CONVENTION.001 | static | `ApiTests` asserts generated OpenAPI exists at the documented source path or recorded local replacement. |
 | EXT.API.CONVENTION.002 | inspection | Baseline storage review confirms immutable retained references. |
-| EXT.API.CONVENTION.003 | test | Local and continuous integration invoke the same diff tool. |
-| EXT.API.CONVENTION.004 | test | Contract comparison reports stable Problem Details error codes across compatible versions. |
+| EXT.API.CONVENTION.003 | test | `ApiTests` asserts local and continuous integration invoke the same diff tool. |
+| EXT.API.CONVENTION.004 | test | `ApiTests` reports stable Problem Details error codes across compatible versions. |

@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.12.0
+
+- Repaired every baseline provision whose Requirement or Default only restated its own heading. The v1.11.0 conversion had moved each real obligation into `Rationale`, which the authoring standard declares informative, leaving the baseline formally non-normative. All 289 provisions across the 19 conventions, the platform profile, and the engineering system foundation now state their obligation in the normative block.
+- Rewrote every templated evidence row. A verification row now names the command, path, test, or assertion that produces the result instead of repeating its provision heading.
+- Rewrote every Agent Summary bullet that repeated its provision verbatim, so Tier 1 compresses Tier 2 again rather than duplicating it.
+- Split compound provisions that carried two normative modals into separate identified assertions, including `API.ENDPOINTS.002`, `API.BOUNDARY.002`, `API.ACTOR.002`, `API.ERRORS.002`, `API.STATUS.002`, `API.OPENAPI.004`, `API.MODELS.002`, and `AGENTIC.EXTENSIONS.002`.
+- Gave each page one Standards identifier prefix. `MARTEN.CONVENTION.*` became `PERSIST.CONVENTION.*`, component provisions became `COMPONENT.*`, rendering provisions became `RENDER.*`, `STATE.*` and `FORM.*` merged into `DATA.*`, and idempotency provisions moved under `EXT.CONCURRENCY.*`.
+- Replaced the expiring ESLint note in the platform profile with `CONFIG.ESLINT.001`, which requires a concrete `settings.react.version` in the flat config.
+- Reduced the extension index to a selection table and cited pointers. Its numbered activation procedure and uncited prohibitions duplicated `SCOPE.EXTENSIONS.001`, `CORE.COMPLEXITY.002`, and `AGENTIC.EXTENSIONS.001`.
+- Linked every step of `docs/guides/getting-started.md` to the standard that governs it and grouped the steps into pin, configure, structure, specify, implement, and operate stages.
+- Replaced the duplicated consumer gate commands in `AGENTS.md` with a citation to `CI.GATES.001`, which owns them.
+- Added the `Standard` and `Workspace` glossary terms and renamed the `Repository` entry to `Repository (Domain port)`, so the Git sense and the Domain port sense no longer share one term.
+- Renamed `docs/conventions/repository/` to `docs/conventions/workspace/` and retitled its structure page. The directory was named for the Git sense of `repository` while the glossary defined only the Domain port sense.
+- Normalized Git-sense prose to `workspace`, so `repository` in a provision now means the Domain port unless it is qualified.
+- Made `docs/reference/glossary.md` the single definition site. The engineering system Concepts section defined sixteen terms that the glossary also defined; it now carries only the relationships, distinctions, and worked examples that a one-sentence entry cannot hold.
+- Added `WRITING.SNAPSHOT.006` and the `reviewedStandardsVersion` field in `standards.project.json`. `node standards/tools/validate-consumer.mjs` now fails when that value differs from the pinned manifest version, so adopting a release is an explicit act rather than a silent one. A provision can gain force while keeping its identifier, and 654 of the 709 identifiers on the previous release kept their string through this one.
+- Promoted every authoring rule to an error. `WARNING_DIAGNOSTIC_CODES` is now empty, so a provision that restates its heading, an evidence row that names no artifact, a summary that repeats its provision, or a page with two identifier prefixes fails the build.
+
 ## v1.11.0
 
 - Added `docs/foundations/authoring-standard.md` as the canonical contract for controlled technical prose, page structure, provisions, summaries, examples, and evidence mappings.
@@ -106,7 +124,7 @@
 ## v1.7.0
 
 - Added `API.OPENAPI.003`, which requires the generated contract to publish precise, complete schemas: a closed-set field or parameter declares its values as an `enum` (a response field projected from a Domain state hierarchy or discriminated union publishes its allowed values as a typed union rather than an open `string`, with the `enum` living only at the transport boundary per `DOMAIN.CLOSEDSET.001`); a parameter declares its real bounds, format, allowed values, and a description for a non-obvious business limit; and an operation that requires a control header declares it as a required parameter.
-- Extended `EXT.IDEMPOTENCY.OUTCOME.001` guidance so the `Idempotency-Key` header is declared as a required parameter on every operation that requires it, matching `API.OPENAPI.003`, instead of surfacing on only some operations.
+- Extended `EXT.CONCURRENCY.IDEMPOTENTOUT.001` guidance so the `Idempotency-Key` header is declared as a required parameter on every operation that requires it, matching `API.OPENAPI.003`, instead of surfacing on only some operations.
 - Added `EXT.OUTBOX.READINESS.001`, which separates a dependency outage from a message failure: a Worker that cannot reach its store or finds no schema (cold start or pre-migration) backs off and rate-limits its logging rather than emitting a per-iteration exception storm, and gates its dispatch loop on readiness where the host exposes it. Added a matching cross-reference to `EXT.JOBS.RETRY.001`.
 - Bumped the manifest version to 1.7.0 and added the v1.7 consumer upgrade guide.
 

@@ -4,7 +4,7 @@
   "title": "Litenova Standards Consumer Project",
   "type": "object",
   "additionalProperties": false,
-  "required": ["project", "profile", "paths", "selectedExtensions", "overrides"],
+  "required": ["project", "profile", "reviewedStandardsVersion", "paths", "selectedExtensions", "overrides"],
   "properties": {
     "$schema": { "type": "string" },
     "project": {
@@ -18,6 +18,11 @@
     "profile": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "reviewedStandardsVersion": {
+      "description": "The standards release whose complete contract this project last reviewed.",
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "paths": {
       "type": "object",

@@ -136,18 +136,18 @@ This informative example demonstrates `CORE.CONVENTION.001` and `CORE.CONVENTION
 | ID | Method | Evidence |
 |:---|:---|:---|
 | CORE.SOURCE.001 | inspection | Review identifies one canonical authored source for each changed fact. |
-| CORE.SOURCE.002 | static | Dependency review resolves each selected version from the manifest. |
-| CORE.SOURCE.003 | static | Consumer validator resolves specification and implementation status from metadata. |
-| CORE.SOURCE.004 | static | Test scan resolves cited acceptance criteria to owned use-case specifications. |
-| CORE.DOCUMENTS.001 | static | Consumer validator validates required metadata fields for each specification kind. |
-| CORE.DOCUMENTS.002 | static | Metadata validator accepts only declared authority-status values. |
+| CORE.SOURCE.002 | static | `CoreSourceTests` asserts dependency review resolves each selected version from the manifest. |
+| CORE.SOURCE.003 | static | `CoreSourceTests` asserts consumer validator resolves specification and implementation status from metadata. |
+| CORE.SOURCE.004 | static | `CoreSourceTests` resolves cited acceptance criteria to owned use-case specifications. |
+| CORE.DOCUMENTS.001 | static | `CoreDocumentsTests` asserts consumer validator validates required metadata fields for each specification kind. |
+| CORE.DOCUMENTS.002 | static | `CoreDocumentsTests` asserts metadata validator accepts only declared authority-status values. |
 | CORE.DOCUMENTS.003 | static | `node tools/validate-consumer.mjs` resolves both status fields against the metadata schema. |
 | CORE.DOCUMENTS.004 | inspection | Retirement review identifies removed public entry points. |
 | CORE.SLICE.001 | inspection | Use-case review links Domain, persistence, entry points, tests, and operations. |
-| CORE.ENFORCE.001 | test | Architecture, lint, or behavior evidence proves each enforceable boundary. |
+| CORE.ENFORCE.001 | test | `CoreEnforceTests` asserts architecture, lint, or behavior evidence proves each enforceable boundary. |
 | CORE.COMPLEXITY.001 | inspection | Added complexity cites its current use case, Workflow, or project requirement. |
 | CORE.COMPLEXITY.002 | inspection | Selected extension record cites its activation criteria. |
 | CORE.NAMING.001 | inspection | Boundary review identifies specific business names. |
-| CORE.NAMING.002 | static | Naming scan flags generic boundary names lacking a narrower replacement. |
+| CORE.NAMING.002 | static | `CoreNamingTests` flags generic boundary names lacking a narrower replacement. |
 | CORE.CONVENTION.001 | inspection | Dependency review identifies owned framework types or explicit abstractions. |
 | CORE.CONVENTION.002 | inspection | Shared-code review records two real consumers and a precise shared name. |

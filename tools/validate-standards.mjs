@@ -25,18 +25,10 @@ const VAGUE_TERMS = [
   ['very', /\bvery\b/i],
   ['really', /\breally\b/i],
 ];
-// Rules landed as warnings report a defect that the repository is still burning
-// down. A warning does not fail the build. Promote a code to an error by
-// removing it from this set once its count reaches zero.
-export const WARNING_DIAGNOSTIC_CODES = Object.freeze([
-  'HEADING_EMPTY_BODY',
-  'ID_PREFIX_OWNERSHIP',
-  'INDEX_CONTAINS_PROCEDURE',
-  'PROVISION_RESTATES_HEADING',
-  'SUMMARY_RESTATES_REQUIREMENT',
-  'VERIFY_NO_ARTIFACT',
-  'VERIFY_TEMPLATED_EVIDENCE',
-]);
+// Every authoring rule is an error. This set stays empty unless a new rule is
+// landed against existing content, in which case it holds that rule only while
+// its count is burned down.
+export const WARNING_DIAGNOSTIC_CODES = Object.freeze([]);
 
 // A claim is the comparable core of a heading, a Requirement, a Default, or a
 // summary bullet: lowercase words with punctuation, code marks, and any leading
@@ -159,7 +151,6 @@ function walk(directory, predicate, result = []) {
 
 function isCurrentStandardsMaterial(relative) {
   return relative !== 'CHANGELOG.md'
-    && relative !== 'AUDIT.md'
     && relative !== 'LICENSE.md';
 }
 

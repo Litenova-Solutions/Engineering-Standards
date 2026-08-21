@@ -43,6 +43,17 @@ for (const rel of ['standards/standards.manifest.json', '../standards.manifest.j
   const p = path.join(root, rel);
   if (fs.existsSync(p)) { manifest = readJson(p); break; }
 }
+// Adopting a release means accepting its complete contract, so the project
+// records the release it reviewed. A mismatch means the pinned standards moved
+// without anyone re-reading the overrides and provisions that now apply.
+if (manifest?.version) {
+  const reviewed = project.reviewedStandardsVersion;
+  if (!reviewed) err(`standards.project.json: missing 'reviewedStandardsVersion'; the pinned standards are ${manifest.version}`);
+  else if (reviewed !== manifest.version) {
+    err(`standards.project.json: reviewedStandardsVersion '${reviewed}' does not match the pinned standards ${manifest.version}; re-review the contract and its overrides`);
+  }
+}
+
 const extScope = new Map();       // id -> activationScope
 const extKinds = new Map();       // id -> Set(applicableKinds)
 if (manifest?.extensions) {

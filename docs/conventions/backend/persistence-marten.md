@@ -10,140 +10,98 @@ One scoped document session and one LiteBus command post-handler own the transac
 ## Agent Summary {#agent-summary}
 
 
-- Stage aggregate writes through repositories. (PERSIST.WRITE.001)
-- Query through IQuerySession. (PERSIST.READ.001)
-- Commit once in the command pipeline. (PERSIST.COMMIT.001)
-- Collect events without a public unit of work. (PERSIST.EVENTS.001)
-- Stage Workflow progress with outgoing work. (PERSIST.WORKFLOW.001)
-- Keep mappings and aliases explicit. (PERSIST.MAPPING.001)
-- Keep serialization behavior out of Domain. (PERSIST.SERIALIZATION.001)
-- Evolve stored document contracts explicitly. (PERSIST.EVOLUTION.001)
-- Bound aggregate document growth. (PERSIST.DOCUMENT.001)
-- Use database naming conventions. (PERSIST.NAMING.001)
+- Commands write through repositories, never the session directly. (PERSIST.WRITE.001)
+- Queries project through the read session with scope and limits applied. (PERSIST.READ.001)
+- One post-handler commits each command; nothing else calls save. (PERSIST.COMMIT.001)
+- Repositories buffer events for the post-handler to drain. (PERSIST.EVENTS.001)
+- Workflow progress and outgoing work commit in one transaction. (PERSIST.WORKFLOW.001)
+- Document aliases and identifier mappings are declared explicitly. (PERSIST.MAPPING.001)
+- Infrastructure owns the stored JSON contract, not Domain. (PERSIST.SERIALIZATION.001)
+- Stored contract changes carry a reviewed transformation. (PERSIST.EVOLUTION.001)
+- Aggregate documents carry no unbounded collection. (PERSIST.DOCUMENT.001)
+- Database identifiers use snake case. (PERSIST.NAMING.001)
 
 ## Standards
 
 
 ### Stage aggregate writes through repositories (PERSIST.WRITE.001)
 
-**Requirement:** Consumers MUST stage aggregate writes through repositories.
+**Requirement:** A command handler MUST reach persistence only through a Domain repository, never through `IDocumentSession`.
 
-**Rationale:** Infrastructure implements each Domain repository with the scoped `IDocumentSession`. A repository loads and stores one aggregate type and any owned document records required by that aggregate boundary.
-
-Repositories do not expose sessions, generic query methods, or `SaveChangesAsync`. Command handlers do not inject `IDocumentSession`.
+**Rationale:** Infrastructure implements each repository with the scoped session. A repository loads one aggregate type and exposes no session, generic query, or save operation.
 
 ### Query through IQuerySession (PERSIST.READ.001)
 
-**Requirement:** Consumers MUST query through IQuerySession.
+**Requirement:** A query handler MUST project through `IQuerySession`, applying filter, scope, ordering, and limit before materialization.
 
-**Rationale:** Application query handlers inject `IQuerySession` and project directly to result records. The implementation applies filters, authorization scope, ordering, and limits before materialization.
-
-The implementation does not add `IDatabaseContext`, `IReadDatabase`, callback wrappers, generic read repositories, or one read-store interface per aggregate.
+**Rationale:** A read-store interface per aggregate, a generic read repository, or a callback wrapper adds a layer that the session already provides.
 
 ### Commit once in the command pipeline (PERSIST.COMMIT.001)
 
-**Requirement:** Consumers MUST commit once in the command pipeline.
+**Requirement:** Exactly one global command post-handler MUST call `SaveChangesAsync` for a command pipeline.
 
-**Rationale:** A global LiteBus command post-handler calls `IDocumentSession.SaveChangesAsync` once after the command handler succeeds. A failed command leaves the scoped session uncommitted.
-
-Handlers, repositories, validators, event reaction implementations, workflow orchestrators, and endpoints do not call `SaveChangesAsync`.
+**Rationale:** A failed command then leaves the scoped session uncommitted. Handlers, repositories, validators, reactions, orchestrators, and endpoints never commit.
 
 ### Collect events without a public unit of work (PERSIST.EVENTS.001)
 
-**Requirement:** Consumers MUST collect events without a public unit of work.
+**Requirement:** A repository MUST register each touched aggregate with the internal scoped event buffer that the post-handler drains.
 
-**Rationale:** Infrastructure repositories register touched aggregates with an internal scoped event buffer. The command post-handler collects their pending events before committing.
-
-For `best-effort-optional` in-process delivery:
-
-1. The implementation stages aggregate changes.
-2. The implementation collects pending domain events.
-3. The implementation commits the Marten session.
-4. The implementation publishes collected events through LiteBus.
-5. Clear events after successful publication or according to the documented retry behavior.
-
-A publication failure occurs after the business commit. The implementation uses this path only when loss is explicitly accepted. The `outbox-worker` extension supplies required durable delivery. The implementation uses an atomic or rebuildable projection path for required Read Models.
+**Rationale:** The post-handler collects pending events before committing, so no public unit-of-work type is needed. Best-effort delivery publishes after the commit succeeds.
 
 ### Stage Workflow progress with outgoing work (PERSIST.WORKFLOW.001)
 
-**Requirement:** Consumers MUST stage Workflow progress with outgoing work.
+**Requirement:** A durable workflow advancement MUST stage its workflow state and outgoing command envelope in the same scoped session.
 
-**Rationale:** A durable Workflow advancement stages its Workflow state and outgoing Command envelope in the same scoped `IDocumentSession`. The command post-handler commits both once. The Worker dispatches the outgoing Command only after that commit.
-
-The Workflow Orchestrator, its handler, and its stores do not call `SaveChangesAsync`. A failure before commit advances neither progress nor outgoing work. At-least-once dispatch requires the issued Command to handle duplicate delivery safely.
+**Rationale:** The post-handler commits both once and the Worker dispatches only after that commit. A failure before commit advances neither progress nor outgoing work.
 
 ### Keep mappings and aliases explicit (PERSIST.MAPPING.001)
 
-**Requirement:** Consumers MUST keep mappings and aliases explicit.
+**Requirement:** Each stored aggregate MUST declare a stable document alias, typed-identifier mapping, and the indexes its accepted queries need.
 
-**Rationale:** Infrastructure owns Marten store configuration. Each stored aggregate declares a stable document alias, typed-ID mapping, and indexes required by accepted queries.
-
-The implementation does not rely on a CLR rename to preserve a document type or collection name.
+**Rationale:** A CLR rename then cannot change a document type or collection name. Infrastructure owns the store configuration.
 
 ### Keep serialization behavior out of Domain (PERSIST.SERIALIZATION.001)
 
-**Requirement:** Consumers MUST keep serialization behavior out of Domain.
+**Requirement:** Infrastructure MUST own the JSON contract for stored documents, including member names, constructors, converters, and polymorphic registration.
 
-**Rationale:** Infrastructure owns the JSON contract for stored documents. The implementation configures private-state access, member names, constructors, converters, and polymorphic hierarchies through its selected JSON contract.
-
-The selected contract uses `System.Text.Json` or an approved serializer adapter dependency.
-
-The implementation registers every concrete type that may appear behind a base class or interface property, collection element, or nested value. The implementation uses stable string discriminators that do not depend on CLR type names, namespaces, or assembly-qualified names. The implementation rejects unknown discriminators instead of materializing incomplete state. The implementation sets `AllowOutOfOrderMetadataProperties` for `System.Text.Json` polymorphic documents because PostgreSQL `jsonb` does not preserve property order.
-
-Domain types do not use `JsonInclude`, `JsonDerivedType`, `JsonPolymorphic`, Marten attributes, provider base classes, or other serialization behavior. If Infrastructure configuration cannot round-trip an aggregate without weakening its encapsulation, persist an Infrastructure-owned document type and map it to the Domain aggregate.
-
-Every Aggregate `State` property is one persisted polymorphic value. Infrastructure registers the abstract `{Aggregate}State` base and every sealed state record with stable string discriminators. It does not persist a second enum, status string, boolean flag, or nullable timestamp on the Domain Aggregate.
+**Rationale:** Domain stays free of serialization attributes. Every concrete type behind a base or interface is registered, because an unregistered subtype fails at read time.
 
 ### Evolve stored document contracts explicitly (PERSIST.EVOLUTION.001)
 
-**Requirement:** Consumers MUST evolve stored document contracts explicitly.
+**Requirement:** A rename, removal, type change, member move, or discriminator change MUST have a reviewed data transformation or an expand-and-contract rollout.
 
-**Rationale:** The implementation treats JSON member names, required values, discriminator property names, and discriminator values as database schema. An additive member defines behavior for documents written before that member existed.
-
-A rename, removal, type change, member move, collection-shape change, or discriminator change requires a reviewed data transformation. Alternatively, use an expand-and-contract rollout that reads every stored shape during deployment and rollback. The implementation names the transformation order, mixed-version behavior, rollback condition, and representative production volume. The implementation does not assume a Marten schema patch transforms existing document payloads.
-
-Old contract readers remain until no stored document or supported rollback artifact can produce or require the old shape.
+**Rationale:** JSON member names, required values, and discriminator values are database schema. An additive member still defines its behavior for documents written earlier.
 
 ### Bound aggregate document growth (PERSIST.DOCUMENT.001)
 
-**Requirement:** Consumers MUST bound aggregate document growth.
+**Requirement:** An aggregate document MUST NOT embed a collection that has no accepted business bound.
 
-**Rationale:** The implementation stores state required by the aggregate's transactional invariants in its document. The implementation does not embed a collection with no accepted business bound. The implementation uses one of these patterns when growth does not belong inside the aggregate boundary:
-
-- Another aggregate for an independent consistency boundary.
-- An owned document record committed in the same Marten transaction.
-- A read-side projection for query-shaped history or detail.
-
-For aggregates with nested collections or large values, record representative serialized size and test load and write behavior at that size. When accepted writes can overlap, activate `concurrency-idempotency` and test conflicts with representative document sizes.
+**Rationale:** Unbounded growth belongs in another aggregate, an owned document record, or a separate query-shaped document, depending on the consistency boundary it needs.
 
 ### Use database naming conventions (PERSIST.NAMING.001)
 
-**Requirement:** Consumers MUST use database naming conventions.
+**Requirement:** A PostgreSQL schema, table, column, index, constraint, document alias, or SQL identifier MUST use `snake_case`.
 
-**Rationale:** PostgreSQL schemas, tables, columns, indexes, constraints, document aliases, and custom SQL identifiers use `snake_case`. .NET types retain normal C# naming.
+**Rationale:** .NET types keep normal C# naming, so the mapping layer performs the conversion once.
 
 ### Control production schema changes (PERSIST.SCHEMA.001)
 
-**Requirement:** Consumers MUST control production schema changes.
+**Requirement:** A hosted environment MUST apply schema changes through a reviewed step before traffic shifts, not from a starting replica.
 
-**Rationale:** Development and disposable integration databases may use automatic schema application. Hosted environments use a reviewed schema application step before traffic shifts.
-
-WebApi replicas do not compete to alter the schema during startup.
+**Rationale:** Development and disposable integration databases may still apply schema automatically. Replicas competing to alter a schema during startup produce nondeterministic results.
 
 ### Test persistence against PostgreSQL (PERSIST.TEST.001)
 
-**Requirement:** Consumers MUST test persistence against PostgreSQL.
+**Requirement:** Repository behavior, projections, mappings, correctness indexes, commit behavior, and schema application MUST run against the pinned PostgreSQL through Testcontainers.
 
-**Rationale:** Repository behavior, query projections, mappings, indexes required for correctness, commit behavior, and schema application run against the pinned PostgreSQL version through Testcontainers.
-
-In-memory substitutes cannot prove persistence behavior.
+**Rationale:** An in-memory substitute cannot prove persistence behavior, because it does not run the query planner or the constraints.
 
 ## Conventions
 
 
-### Use this Infrastructure layout (MARTEN.CONVENTION.001)
+### Use this Infrastructure layout (PERSIST.CONVENTION.001)
 
-**Default:** Use this Infrastructure layout.
+**Default:** Place Marten configuration, repositories, commit behavior, and serialization under one Infrastructure persistence folder.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -178,41 +136,41 @@ The module folders follow `ARCH.MODULES.001`. A single-aggregate module stays fl
 
 This also applies to modules with multiple aggregates. The example keeps aggregate-specific configuration beside the aggregate. The example keeps session and commit plumbing under the Marten root.
 
-### Register one scoped session (MARTEN.CONVENTION.002)
+### Register one scoped session (PERSIST.CONVENTION.002)
 
-**Default:** Register one scoped session.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** The implementation uses the WebApi request or Worker operation scope as the session lifetime. Repositories and the commit handler in one command resolve the same scoped `IDocumentSession`.
-
-### Make ordering explicit (MARTEN.CONVENTION.003)
-
-**Default:** Make ordering explicit.
+**Default:** Register `IDocumentSession` with the WebApi request or Worker operation scope.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Every query returning more than one item specifies deterministic ordering and a maximum result size. Pagination includes a stable tie-breaker.
+**Rationale:** Repositories and the commit handler in one command then resolve the same session instance.
 
-### Review query plans for new indexes (MARTEN.CONVENTION.004)
+### Make ordering explicit (PERSIST.CONVENTION.003)
 
-**Default:** Review query plans for new indexes.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** The implementation adds an index from an accepted query or measured operating need. The implementation records representative data and inspect the PostgreSQL plan for complex or high-volume queries.
-
-### Add read documents for query-shaped data (MARTEN.CONVENTION.005)
-
-**Default:** Add read documents for query-shaped data.
+**Default:** Give every multi-item query deterministic ordering, a maximum result size, and a stable pagination tie-breaker.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Stored aggregate documents serve accepted simple reads directly. The implementation adds a module-owned read document or projection for repeated cross-aggregate composition. The same choice applies to deep polymorphic traversal or an index shape that would distort the aggregate. The implementation defines its consistency and rebuild behavior with the use case.
+**Rationale:** Without a tie-breaker, two pages can repeat or skip a row when sort values collide.
 
-### Persist one explicit state object (MARTEN.CONVENTION.006)
+### Review query plans for new indexes (PERSIST.CONVENTION.004)
 
-**Default:** Persist one explicit state object.
+**Default:** Add an index only from an accepted query or a measured operating need, and inspect its plan on representative data.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** An index added without a plan reading costs write throughput for a read that may never run.
+
+### Add read documents for query-shaped data (PERSIST.CONVENTION.005)
+
+**Default:** Add a module-owned read document for repeated cross-aggregate composition, deep traversal, or a distorting index shape.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Stored aggregate documents already serve accepted simple reads. The use case defines the read document's consistency and rebuild behavior.
+
+### Persist one explicit state object (PERSIST.CONVENTION.006)
+
+**Default:** Persist the aggregate state record itself rather than a flattened projection of its fields.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -233,7 +191,7 @@ Adding a state discriminator can break an older application version during a mix
 
 ## Reference example
 
-This informative example demonstrates `PERSIST.SERIALIZATION.001` and `MARTEN.CONVENTION.001`.
+This informative example demonstrates `PERSIST.SERIALIZATION.001` and `PERSIST.CONVENTION.001`.
 
 An `Order` document may contain a `PaymentMethod` collection with `CardPayment` and `BankTransfer` values. Infrastructure registers stable `card` and `bank_transfer` discriminators through the JSON contract resolver. The Domain hierarchy carries no JSON attributes.
 
@@ -269,21 +227,21 @@ internal sealed class PostRepository(
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| PERSIST.WRITE.001 | inspection | Pull request review asserts `stage aggregate writes through repositories` in the owning specification and source paths. |
-| PERSIST.READ.001 | inspection | Pull request review asserts `query through IQuerySession` in the owning specification and source paths. |
-| PERSIST.COMMIT.001 | inspection | Pull request review asserts `commit once in the command pipeline` in the owning specification and source paths. |
-| PERSIST.EVENTS.001 | inspection | Pull request review asserts `collect events without a public unit of work` in the owning specification and source paths. |
-| PERSIST.WORKFLOW.001 | inspection | Pull request review asserts `stage Workflow progress with outgoing work` in the owning specification and source paths. |
-| PERSIST.MAPPING.001 | inspection | Pull request review asserts `keep mappings and aliases explicit` in the owning specification and source paths. |
-| PERSIST.SERIALIZATION.001 | inspection | Pull request review asserts `keep serialization behavior out of Domain` in the owning specification and source paths. |
-| PERSIST.EVOLUTION.001 | inspection | Pull request review asserts `evolve stored document contracts explicitly` in the owning specification and source paths. |
-| PERSIST.DOCUMENT.001 | inspection | Pull request review asserts `bound aggregate document growth` in the owning specification and source paths. |
-| PERSIST.NAMING.001 | inspection | Pull request review asserts `use database naming conventions` in the owning specification and source paths. |
-| PERSIST.SCHEMA.001 | static | Repository static check asserts `control production schema changes` for the owning paths. |
-| PERSIST.TEST.001 | test | An automated test citing `PERSIST.TEST.001` asserts `test persistence against PostgreSQL` at the affected boundary. |
-| MARTEN.CONVENTION.001 | inspection | Pull request review asserts `use this Infrastructure layout` in the owning specification and source paths. |
-| MARTEN.CONVENTION.002 | inspection | Pull request review asserts `register one scoped session` in the owning specification and source paths. |
-| MARTEN.CONVENTION.003 | inspection | Pull request review asserts `make ordering explicit` in the owning specification and source paths. |
-| MARTEN.CONVENTION.004 | inspection | Pull request review asserts `review query plans for new indexes` in the owning specification and source paths. |
-| MARTEN.CONVENTION.005 | inspection | Pull request review asserts `add read documents for query-shaped data` in the owning specification and source paths. |
-| MARTEN.CONVENTION.006 | inspection | Pull request review asserts `persist one explicit state object` in the owning specification and source paths. |
+| PERSIST.WRITE.001 | inspection | `ArchitectureTests` asserts no command handler resolves `IDocumentSession` and no repository exposes it. |
+| PERSIST.READ.001 | inspection | `ArchitectureTests` asserts each query handler resolves `IQuerySession` and no read-store abstraction exists. |
+| PERSIST.COMMIT.001 | inspection | `ArchitectureTests` asserts `SaveChangesAsync` appears only in the command post-handler. |
+| PERSIST.EVENTS.001 | inspection | `PersistenceCommitTests` asserts pending events are collected before commit and published only after it succeeds. |
+| PERSIST.WORKFLOW.001 | inspection | `WorkflowPersistenceTests` asserts progress and the outgoing envelope commit together or not at all. |
+| PERSIST.MAPPING.001 | inspection | `MartenMappingTests` asserts each stored aggregate declares an explicit alias and identifier mapping. |
+| PERSIST.SERIALIZATION.001 | inspection | `SerializationTests` asserts every stored polymorphic subtype round-trips under the configured contract. |
+| PERSIST.EVOLUTION.001 | inspection | `DocumentEvolutionTests` reads a document written in the previous shape and asserts the declared transformation result. |
+| PERSIST.DOCUMENT.001 | inspection | `DocumentSizeTests` asserts each embedded collection has a declared maximum from its use case. |
+| PERSIST.NAMING.001 | inspection | `SchemaNamingTests` asserts every generated database identifier is snake case. |
+| PERSIST.SCHEMA.001 | inspection | Deployment review confirms the schema step runs before traffic shifts and startup applies no schema change. |
+| PERSIST.TEST.001 | test | `PersistenceIntegrationTests` runs against the manifest-pinned PostgreSQL image through Testcontainers. |
+| PERSIST.CONVENTION.001 | inspection | Folder review locates store configuration, repositories, and commit behavior under the persistence folder, or records a named local replacement. |
+| PERSIST.CONVENTION.002 | inspection | `SessionLifetimeTests` asserts repositories and the commit handler resolve one session per operation. |
+| PERSIST.CONVENTION.003 | inspection | `QueryOrderingTests` asserts each multi-item query declares ordering, a bound, and a tie-breaker. |
+| PERSIST.CONVENTION.004 | inspection | Index review records the accepted query and the PostgreSQL plan that justified it. |
+| PERSIST.CONVENTION.005 | inspection | Read-document review records its consistency and rebuild behavior alongside its owning use case. |
+| PERSIST.CONVENTION.006 | inspection | `SerializationTests` asserts each persisted aggregate round-trips its state record type. |

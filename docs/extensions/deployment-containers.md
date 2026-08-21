@@ -183,9 +183,9 @@ The extension adds no application package and replaces no baseline rule.
 
 **Rationale:** The Dockerfile stays near the project that defines its runtime output.
 
-### Build from the repository root (EXT.CONTAINERS.CONVENTION.002)
+### Build from the workspace root (EXT.CONTAINERS.CONVENTION.002)
 
-**Default:** Build images from the repository root when shared project or package files are required.
+**Default:** Build images from the workspace root when shared project or package files are required.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -199,29 +199,29 @@ No application package is required.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| EXT.CONTAINERS.IMAGE.001 | static | Dockerfile review shows multi-stage builds and digest-pinned release bases. |
-| EXT.CONTAINERS.IMAGE.002 | test | The built image runs with its declared non-root runtime user. |
+| EXT.CONTAINERS.IMAGE.001 | static | `ContainersImageTests` asserts dockerfile review shows multi-stage builds and digest-pinned release bases. |
+| EXT.CONTAINERS.IMAGE.002 | test | `ContainersImageTests` with its declared non-root runtime user. |
 | EXT.CONTAINERS.IMAGE.003 | inspection | Image file listing contains only declared runtime outputs. |
-| EXT.CONTAINERS.IMAGE.004 | static | Image history and file scan contain no build-only files, credentials, or local configuration. |
+| EXT.CONTAINERS.IMAGE.004 | static | `ContainersImageTests` contain no build-only files, credentials, or local configuration. |
 | EXT.CONTAINERS.CONFIG.001 | operation | Deployment configuration supplies declared runtime values outside the image. |
-| EXT.CONTAINERS.CONFIG.002 | static | Image file scan contains no environment-specific configuration. |
+| EXT.CONTAINERS.CONFIG.002 | static | `ContainersConfigTests` contains no environment-specific configuration. |
 | EXT.CONTAINERS.SCHEMA.001 | operation | Release record places the reviewed schema job before traffic shift. |
-| EXT.CONTAINERS.SCHEMA.002 | test | Replica startup tests perform no production schema mutation. |
+| EXT.CONTAINERS.SCHEMA.002 | test | `ContainersSchemaTests` perform no production schema mutation. |
 | EXT.CONTAINERS.TRAFFIC.001 | operation | Deployment event log records readiness before traffic shift. |
-| EXT.CONTAINERS.TRAFFIC.003 | test | Included end-to-end tests pass after new-version traffic shift. |
+| EXT.CONTAINERS.TRAFFIC.003 | test | `ContainersTrafficTests` pass after new-version traffic shift. |
 | EXT.CONTAINERS.ROLLBACK.001 | operation | Release record stores the previous digest and tested rollback command. |
-| EXT.CONTAINERS.ROLLBACK.002 | test | Rollback rehearsal proves prior application schema and configuration compatibility. |
-| EXT.CONTAINERS.SECURITY.001 | static | Deployment manifest defines read-only filesystem and capability restrictions. |
+| EXT.CONTAINERS.ROLLBACK.002 | test | `ContainersRollbackTests` proves prior application schema and configuration compatibility. |
+| EXT.CONTAINERS.SECURITY.001 | static | `ContainersSecurityTests` asserts deployment manifest defines read-only filesystem and capability restrictions. |
 | EXT.CONTAINERS.SECURITY.002 | operation | Deployment manifest records writable paths and measured resource limits. |
-| EXT.CONTAINERS.PROCESS.001 | test | Termination test confirms the application receives the container stop signal. |
-| EXT.CONTAINERS.PROCESS.002 | test | In-flight work stops within the declared grace period. |
-| EXT.CONTAINERS.PROCESS.003 | test | Container logs appear on standard output or standard error. |
+| EXT.CONTAINERS.PROCESS.001 | test | `ContainersProcessTests` confirms the application receives the container stop signal. |
+| EXT.CONTAINERS.PROCESS.002 | test | `ContainersProcessTests` asserts in-flight work stops within the declared grace period. |
+| EXT.CONTAINERS.PROCESS.003 | test | `ContainersProcessTests` asserts container logs appear on standard output or standard error. |
 | EXT.CONTAINERS.PROCESS.004 | inspection | Runtime design identifies no required mutable container filesystem state. |
-| EXT.CONTAINERS.METADATA.001 | static | Built image inspection reports the four required OCI labels. |
+| EXT.CONTAINERS.METADATA.001 | static | `ContainersMetadataTests` asserts built image inspection reports the four required OCI labels. |
 | EXT.CONTAINERS.METADATA.002 | operation | Release record identifies the deployed artifact by immutable digest. |
-| EXT.CONTAINERS.METADATA.003 | static | Generated-contract diff contains no build timestamp. |
+| EXT.CONTAINERS.METADATA.003 | static | `ContainersMetadataTests` asserts generated-contract diff contains no build timestamp. |
 | EXT.CONTAINERS.METADATA.004 | inspection | Frontend build review separates public configuration from server-only secrets. |
 | EXT.CONTAINERS.METADATA.005 | inspection | Frontend build review identifies secret mounts or runtime injection. |
 | EXT.CONTAINERS.METADATA.006 | static | Dockerfile scan rejects `ARG`, copied environment files, and secret-bearing layers. |
 | EXT.CONTAINERS.CONVENTION.001 | inspection | Each deployable has a colocated Dockerfile or a recorded local replacement. |
-| EXT.CONTAINERS.CONVENTION.002 | test | Image builds access declared shared inputs from repository-root context. |
+| EXT.CONTAINERS.CONVENTION.002 | test | `ContainersTests` asserts image builds access declared shared inputs from repository-root context. |

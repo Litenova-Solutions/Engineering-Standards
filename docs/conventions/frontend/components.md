@@ -12,20 +12,20 @@ drift without these project-owned constraints.
 ## Agent Summary {#agent-summary}
 
 
-- Use the component ownership levels. (UI.OWNERSHIP.001)
-- Keep props narrow. (UI.PROPS.001)
-- Meet accessibility requirements. (UI.ACCESSIBILITY.001)
-- Use declared visual variants. (UI.VARIANTS.001)
-- Render complete states. (UI.STATES.001)
-- Protect rich content boundaries. (UI.CONTENT.001)
-- Use the framework image component for content images. (UI.IMAGE.001)
+- Components sit at the ownership level their reuse justifies. (COMPONENT.OWNERSHIP.001)
+- Props carry values and callbacks, not services or stores. (COMPONENT.PROPS.001)
+- Interactive UI supports keyboard, focus, labels, and announcements. (COMPONENT.ACCESSIBILITY.001)
+- Variants use theme tokens through the variant helper. (COMPONENT.VARIANTS.001)
+- Data-aware components render every applicable state. (COMPONENT.STATES.001)
+- Untrusted content never reaches raw HTML rendering. (COMPONENT.CONTENT.001)
+- Content images use the framework image component. (COMPONENT.IMAGE.001)
 
 ## Standards
 
 
-### Use the component ownership levels (UI.OWNERSHIP.001)
+### Use the component ownership levels (COMPONENT.OWNERSHIP.001)
 
-**Requirement:** Frontends MUST use the component ownership levels.
+**Requirement:** A component MUST sit at the ownership level its reuse justifies: primitive, shared, module feature, or route composition.
 
 **Example:**
 
@@ -38,94 +38,88 @@ drift without these project-owned constraints.
 
 The example does not place business operations inside `components/ui/`.
 
-### Keep props narrow (UI.PROPS.001)
+### Keep props narrow (COMPONENT.PROPS.001)
 
-**Requirement:** Frontends MUST keep props narrow.
+**Requirement:** A component MUST receive the values and callbacks it needs, not a service, API client, mutable store, or aggregate-shaped object.
 
-**Rationale:** The implementation passes the values and callbacks a component needs rather than a broad service, complete API client, mutable store, or unrelated aggregate-shaped object.
+**Rationale:** Props crossing a Server to Client boundary must also serialize, so a broad object fails at that boundary.
 
-Props crossing a Server Component to Client Component boundary are serializable.
+### Meet accessibility requirements (COMPONENT.ACCESSIBILITY.001)
 
-### Meet accessibility requirements (UI.ACCESSIBILITY.001)
+**Requirement:** Interactive UI MUST support keyboard operation, visible focus, semantic elements, programmatic labels, and asynchronous status announcements.
 
-**Requirement:** Frontends MUST meet accessibility requirements.
+**Rationale:** A clickable `div` loses all five at once, so a native element is the starting point.
 
-**Rationale:** Interactive UI supports keyboard operation, visible focus, semantic elements, programmatic labels, associated validation messages, and appropriate announcements for asynchronous status.
+### Use declared visual variants (COMPONENT.VARIANTS.001)
 
-The implementation does not use a clickable `div` when a button or link provides the required semantics.
+**Requirement:** A repeated component variant MUST use Tailwind theme tokens through `class-variance-authority` rather than repeated literal values.
 
-### Use declared visual variants (UI.VARIANTS.001)
+**Rationale:** Repeated pixel values, colors, or long conditional class strings drift apart once more than one feature edits them.
 
-**Requirement:** Frontends MUST use declared visual variants.
+### Render complete states (COMPONENT.STATES.001)
 
-**Rationale:** The implementation uses Tailwind theme tokens and `class-variance-authority` for repeated component variants. The implementation does not repeat unexplained pixel values, colors, or long conditional class strings across features.
+**Requirement:** A data or permission-aware component MUST render its loading, empty, error, forbidden, disabled, pending, and ready states.
 
-### Render complete states (UI.STATES.001)
+**Rationale:** A mutation control also prevents duplicate submission and keeps an error recovery path usable.
 
-**Requirement:** Frontends MUST render complete states.
+### Protect rich content boundaries (COMPONENT.CONTENT.001)
 
-**Rationale:** Data and permission-aware components render every applicable state: loading, empty, error, forbidden, disabled, pending mutation, and ready.
+**Requirement:** A component MUST NOT pass untrusted content to `dangerouslySetInnerHTML`.
 
-Mutation controls prevent accidental duplicate submission and preserve a usable error recovery path.
+**Rationale:** Stored rich content requires a project decision naming the sanitizer, allowed elements and attributes, link policy, and test cases.
 
-### Protect rich content boundaries (UI.CONTENT.001)
+### Use the framework image component for content images (COMPONENT.IMAGE.001)
 
-**Requirement:** Frontends MUST protect rich content boundaries.
+**Requirement:** A content image MUST render through the Next.js image component when sizing, responsive delivery, or remote policy applies.
 
-**Rationale:** The implementation does not use `dangerouslySetInnerHTML` for untrusted content. A product requirement for stored rich content names the sanitizer, allowed elements and attributes, link policy, and test cases in a project decision.
-
-### Use the framework image component for content images (UI.IMAGE.001)
-
-**Requirement:** Frontends MUST use the framework image component for content images.
-
-**Rationale:** The implementation uses the Next.js image component when sizing, responsive delivery, or remote image policy applies. Informative images have meaningful alternative text, while decorative images have empty alternative text.
+**Rationale:** An informative image carries meaningful alternative text and a decorative image carries empty alternative text.
 
 ## Conventions
 
 
-### Name components for their role (UI.COMPONENT.CONVENTION.001)
+### Name components for their role (COMPONENT.CONVENTION.001)
 
-**Default:** Name components for their role.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** The implementation uses `CreateDraftForm`, `PostStatusBadge`, and `PostListEmptyState`. The implementation avoids `PostComponent`, `GenericModal`, or `CommonForm`.
-
-### Give card and section titles heading semantics (UI.COMPONENT.CONVENTION.002)
-
-**Default:** Give card and section titles heading semantics.
+**Default:** Name a component for the role it plays, such as `CreateDraftForm` or `PostStatusBadge`.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A visible card, panel, or section title carries a heading element at the correct level, not a styled `div`. Some primitive sources (for example a shadcn `CardTitle`) default to a non-heading element. Heading semantics let assistive technology and accessible-name queries reach the title (`UI.ACCESSIBILITY.001`). The implementation prefers a heading role over a test id when asserting a title in a test.
+**Rationale:** A name such as `PostComponent` or `GenericModal` describes its file type rather than its job.
 
-### Keep domain values typed until display (UI.COMPONENT.CONVENTION.003)
+### Give card and section titles heading semantics (COMPONENT.CONVENTION.002)
 
-**Default:** Keep domain values typed until display.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** Transport and view mappings may retain branded or generated ID types. Convert dates, money, and status to display strings at the presentation boundary with explicit locale behavior.
-
-### Use `cn` for class composition (UI.COMPONENT.CONVENTION.004)
-
-**Default:** Use `cn` for class composition.
+**Default:** Render a visible card, panel, or section title as a heading element at its correct level.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Each frontend owns one `lib/utils.ts` `cn` function combining `clsx` and `tailwind-merge`. The implementation does not create multiple class-merging helpers.
+**Rationale:** Some primitive sources default a title to a non-heading element, which removes it from the document outline.
 
-### Keep error boundaries scoped (UI.COMPONENT.CONVENTION.005)
+### Keep domain values typed until display (COMPONENT.CONVENTION.003)
 
-**Default:** Keep error boundaries scoped.
+**Default:** Keep branded and generated identifier types until the presentation boundary converts them.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The implementation uses a route error boundary for route failure. A feature uses an error boundary only when it can recover without discarding the surrounding page.
+**Rationale:** Dates, money, and status convert to display strings there with explicit locale behavior.
+
+### Use `cn` for class composition (COMPONENT.CONVENTION.004)
+
+**Default:** Compose class names through one `cn` function per frontend that combines `clsx` and `tailwind-merge`.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** A second merging helper produces different conflict resolution for the same class pair.
+
+### Keep error boundaries scoped (COMPONENT.CONVENTION.005)
+
+**Default:** Use a route error boundary for route failure, and a feature boundary only where recovery keeps the page usable.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** A feature boundary that cannot recover hides the failure while leaving the page broken.
 
 ## Reference example
 
-This informative example demonstrates `UI.OWNERSHIP.001` and `UI.PROPS.001`.
+This informative example demonstrates `COMPONENT.OWNERSHIP.001` and `COMPONENT.PROPS.001`.
 
 `CreateDraftForm` owns form interaction for one use case. It composes `Button`, `Input`, and `FieldError` primitives, accepts a server action or narrow submission callback, and renders pending and validation states. The primitive `Button` does not know about posts.
 
@@ -134,15 +128,15 @@ This informative example demonstrates `UI.OWNERSHIP.001` and `UI.PROPS.001`.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| UI.OWNERSHIP.001 | inspection | Pull request review asserts `use the component ownership levels` in the owning specification and source paths. |
-| UI.PROPS.001 | inspection | Pull request review asserts `keep props narrow` in the owning specification and source paths. |
-| UI.ACCESSIBILITY.001 | inspection | Pull request review asserts `meet accessibility requirements` in the owning specification and source paths. |
-| UI.VARIANTS.001 | inspection | Pull request review asserts `use declared visual variants` in the owning specification and source paths. |
-| UI.STATES.001 | inspection | Pull request review asserts `render complete states` in the owning specification and source paths. |
-| UI.CONTENT.001 | inspection | Pull request review asserts `protect rich content boundaries` in the owning specification and source paths. |
-| UI.IMAGE.001 | inspection | Pull request review asserts `use the framework image component for content images` in the owning specification and source paths. |
-| UI.COMPONENT.CONVENTION.001 | static | Repository static check asserts `name components for their role` for the owning paths. |
-| UI.COMPONENT.CONVENTION.002 | inspection | Pull request review asserts `give card and section titles heading semantics` in the owning specification and source paths. |
-| UI.COMPONENT.CONVENTION.003 | inspection | Pull request review asserts `keep domain values typed until display` in the owning specification and source paths. |
-| UI.COMPONENT.CONVENTION.004 | inspection | Pull request review asserts `use `cn` for class composition` in the owning specification and source paths. |
-| UI.COMPONENT.CONVENTION.005 | inspection | Pull request review asserts `keep error boundaries scoped` in the owning specification and source paths. |
+| COMPONENT.OWNERSHIP.001 | inspection | `ComponentPlacementTests` asserts each component path matches the ownership level its imports imply. |
+| COMPONENT.PROPS.001 | inspection | `ComponentPropsTests` asserts no component prop type resolves a client, store, or service instance. |
+| COMPONENT.ACCESSIBILITY.001 | inspection | `AccessibilityTests` asserts keyboard operation, focus visibility, labels, and status announcements for each interactive component. |
+| COMPONENT.VARIANTS.001 | inspection | `node standards/tools/validate-ui.mjs` rejects a literal value where a theme token exists. |
+| COMPONENT.STATES.001 | inspection | `ComponentStateTests` asserts each applicable state renders for a data-aware component. |
+| COMPONENT.CONTENT.001 | inspection | `node standards/tools/validate-ui.mjs` reports each `dangerouslySetInnerHTML` use for review against its decision. |
+| COMPONENT.IMAGE.001 | inspection | `ImageTests` asserts content images use the framework component and carry the correct alternative text. |
+| COMPONENT.CONVENTION.001 | inspection | Naming review compares each new component name against its rendered role. |
+| COMPONENT.CONVENTION.002 | inspection | `AccessibilityTests` asserts each visible section title renders a heading element. |
+| COMPONENT.CONVENTION.003 | inspection | `ViewMappingTests` asserts conversion to display strings happens at the presentation boundary. |
+| COMPONENT.CONVENTION.004 | inspection | `node standards/tools/validate-ui.mjs` asserts one class-merge helper exists per frontend. |
+| COMPONENT.CONVENTION.005 | inspection | Error boundary review confirms each boundary has a recovery path that keeps its surroundings usable. |

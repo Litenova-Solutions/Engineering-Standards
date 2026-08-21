@@ -281,39 +281,39 @@ When `outbox-worker` applies to an EF Core-owned command, this extension also re
 |:---|:---|:---|
 | EXT.EFCORE.ADOPT.001 | inspection | EF Core decision records all required replacement and rollback fields. |
 | EXT.EFCORE.ADOPT.002 | inspection | Nonselected aggregate paths retain baseline persistence documentation and code. |
-| EXT.EFCORE.TRANSACTION.001 | test | Command integration tests stage aggregate work through one selected provider. |
-| EXT.EFCORE.TRANSACTION.002 | static | Command handlers contain no mixed Marten and EF Core aggregate repository writes. |
+| EXT.EFCORE.TRANSACTION.001 | test | `EfCoreTransactionTests` stage aggregate work through one selected provider. |
+| EXT.EFCORE.TRANSACTION.002 | static | `EfCoreTransactionTests` asserts command handlers contain no mixed Marten and EF Core aggregate repository writes. |
 | EXT.EFCORE.TRANSACTION.003 | inspection | Adoption decision records Command provider selection and architecture-test evidence. |
-| EXT.EFCORE.TRANSACTION.004 | test | Command registration resolves only its selected provider post-handler. |
+| EXT.EFCORE.TRANSACTION.004 | test | `EfCoreTransactionTests` asserts command registration resolves only its selected provider post-handler. |
 | EXT.EFCORE.TRANSACTION.005 | inspection | Cross-provider invariant review selects one provider or shared transaction evidence. |
-| EXT.EFCORE.WRITE.001 | test | Repository tests stage changes through scoped DbContext. |
+| EXT.EFCORE.WRITE.001 | test | `EfCoreWriteTests` stage changes through scoped DbContext. |
 | EXT.EFCORE.WRITE.002 | static | Command handlers contain no DbContext injection or `SaveChangesAsync` call. |
 | EXT.EFCORE.READ.001 | static | Application exposes one owned `IApplicationDbContext` query interface. |
-| EXT.EFCORE.READ.002 | static | Infrastructure DbContext implements the owned query interface. |
+| EXT.EFCORE.READ.002 | static | `EfCoreReadTests` asserts infrastructure DbContext implements the owned query interface. |
 | EXT.EFCORE.READ.003 | static | Marten query handlers retain `IQuerySession`. |
-| EXT.EFCORE.READ.004 | test | Query tests use no tracking, authorized filters, deterministic limits, and projections. |
-| EXT.EFCORE.READ.005 | static | EF Core query source contains no per-aggregate read-store interface pattern. |
+| EXT.EFCORE.READ.004 | test | `EfCoreReadTests` use no tracking, authorized filters, deterministic limits, and projections. |
+| EXT.EFCORE.READ.005 | static | `EfCoreReadTests` asserts eF Core query source contains no per-aggregate read-store interface pattern. |
 | EXT.EFCORE.COMMIT.001 | test | EF Core Command tests observe one post-handler `SaveChangesAsync` call. |
-| EXT.EFCORE.COMMIT.002 | test | Changed aggregate fixtures classify and stage Domain Events correctly. |
-| EXT.EFCORE.COMMIT.003 | static | EF Core durable Commands commit no Marten session. |
-| EXT.EFCORE.OUTBOX.001 | test | EF Core outbox tests stage message and business work through one DbContext. |
-| EXT.EFCORE.OUTBOX.002 | test | EF Core outbox tests observe one commit for aggregate and message. |
-| EXT.EFCORE.OUTBOX.003 | static | EF Core Command source writes no required outbox record through Marten. |
-| EXT.EFCORE.MAPPING.001 | static | EF Core mappings use Infrastructure-owned configuration classes. |
+| EXT.EFCORE.COMMIT.002 | test | `EfCoreCommitTests` classify and stage Domain Events correctly. |
+| EXT.EFCORE.COMMIT.003 | static | `EfCoreCommitTests` asserts eF Core durable Commands commit no Marten session. |
+| EXT.EFCORE.OUTBOX.001 | test | `EfCoreOutboxTests` stage message and business work through one DbContext. |
+| EXT.EFCORE.OUTBOX.002 | test | `EfCoreOutboxTests` observe one commit for aggregate and message. |
+| EXT.EFCORE.OUTBOX.003 | static | `EfCoreOutboxTests` asserts eF Core Command source writes no required outbox record through Marten. |
+| EXT.EFCORE.MAPPING.001 | static | `EfCoreMappingTests` asserts eF Core mappings use Infrastructure-owned configuration classes. |
 | EXT.EFCORE.MAPPING.002 | inspection | Mapping review records every declared relational configuration category. |
-| EXT.EFCORE.STATE.001 | test | EF Core round-trip fixtures retain the aggregate's one Domain state value. |
-| EXT.EFCORE.STATE.002 | static | Domain source contains no relational lifecycle flags or duplicate nullable state values. |
-| EXT.EFCORE.STATE.003 | test | Direct mapping fixtures materialize, track, and round-trip every state case. |
-| EXT.EFCORE.STATE.004 | test | Persistence row fixtures map valid discriminator values to Domain states. |
-| EXT.EFCORE.STATE.005 | inspection, test | New state review and integration fixture cover migration, mixed versions, and rollback. |
-| EXT.EFCORE.MIGRATIONS.001 | static | EF Core schema diffs include a generated migration. |
+| EXT.EFCORE.STATE.001 | test | `EfCoreStateTests` retain the aggregate's one Domain state value. |
+| EXT.EFCORE.STATE.002 | static | `EfCoreStateTests` asserts domain source contains no relational lifecycle flags or duplicate nullable state values. |
+| EXT.EFCORE.STATE.003 | test | `EfCoreStateTests` materialize, track, and round-trip every state case. |
+| EXT.EFCORE.STATE.004 | test | `EfCoreStateTests` map valid discriminator values to Domain states. |
+| EXT.EFCORE.STATE.005 | inspection | New state review and integration fixture cover migration, mixed versions, and rollback. |
+| EXT.EFCORE.MIGRATIONS.001 | static | `EfCoreMigrationsTests` asserts eF Core schema diffs include a generated migration. |
 | EXT.EFCORE.MIGRATIONS.002 | inspection | Migration review covers each declared storage and rollback effect. |
 | EXT.EFCORE.MIGRATIONS.003 | operation | Release record applies migration before replica startup. |
-| EXT.EFCORE.MIGRATIONS.004 | static | Migration commit contains migration, snapshot, and reviewed SQL artifacts. |
-| EXT.EFCORE.MIGRATIONS.005 | test | Migration fixtures run from empty and previous-release databases. |
-| EXT.EFCORE.MIGRATIONS.006 | static | Production and staging startup source calls none of the prohibited schema APIs. |
-| EXT.EFCORE.CONCURRENCY.001 | test | Concurrency fixtures carry expected version and use configured EF Core token. |
-| EXT.EFCORE.CONCURRENCY.002 | test | EF Core conflict fixture maps provider exception to Application contract. |
-| EXT.EFCORE.CONCURRENCY.003 | test | Conflict fixture proves no complete Command automatic retry. |
+| EXT.EFCORE.MIGRATIONS.004 | static | `EfCoreMigrationsTests` asserts migration commit contains migration, snapshot, and reviewed SQL artifacts. |
+| EXT.EFCORE.MIGRATIONS.005 | test | `EfCoreMigrationsTests` run from empty and previous-release databases. |
+| EXT.EFCORE.MIGRATIONS.006 | static | `EfCoreMigrationsTests` asserts production and staging startup source calls none of the prohibited schema APIs. |
+| EXT.EFCORE.CONCURRENCY.001 | test | `EfCoreConcurrencyTests` carry expected version and use configured EF Core token. |
+| EXT.EFCORE.CONCURRENCY.002 | test | `EfCoreConcurrencyTests` maps provider exception to Application contract. |
+| EXT.EFCORE.CONCURRENCY.003 | test | `EfCoreConcurrencyTests` proves no complete Command automatic retry. |
 | EXT.EFCORE.CONVENTION.001 | inspection | EF Core Infrastructure paths use the default layout or a local replacement. |
-| EXT.EFCORE.CONVENTION.002 | test | Generated migrations contain verified snake-case database names. |
+| EXT.EFCORE.CONVENTION.002 | test | `EfCoreTests` asserts generated migrations contain verified snake-case database names. |
