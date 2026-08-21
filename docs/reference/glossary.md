@@ -2,67 +2,79 @@
 
 ## Acceptance criterion
 
-One observable condition owned by a use-case specification. Its stable ID uses `AC-{MODULE}-{USE-CASE}-{NN}`. A criterion describes required behavior; it is not the test implementation.
+One observable condition owned by a use-case specification and identified as `AC-{MODULE}-{USE-CASE}-{NN}`.
 
 ## Acceptance test
 
-Automated executable evidence for one or more acceptance criteria. The test cites each exact acceptance ID it proves.
+Automated executable evidence that cites and proves one or more acceptance criteria.
 
 ## Agent
 
-A software system that can inspect repository context, reason about a bounded task, change authorized artifacts, and run verification. An agent executes within delegated authority and does not own unresolved product or risk decisions.
-
-## Agent-Driven Engineering
-
-The operating model within the Agentic Engineering System in which agents perform substantial engineering execution from approved specifications. People retain decision authority and review responsibility.
+A software system that can inspect context, reason about bounded work, change authorized artifacts, and run verification within delegated authority.
 
 ## Agent Summary
 
-The anchored short section agents load as Tier 1 context for a task. The full document remains the source when a summary is insufficient.
+The anchored Tier 1 projection that gives agents short task context while the full document remains canonical.
+
+## Agent-Driven Engineering
+
+The operating model in which agents perform substantial engineering execution while people retain decision authority and review responsibility.
 
 ## Agentic Engineering System
 
-A general system for specifying, building, verifying, releasing, and operating software with agents as active engineering participants. Litenova Solutions authors and uses the standards in this repository as its implementation of the system. It uses Specification-Driven Delivery and Agent-Driven Engineering.
+A system for specifying, building, verifying, releasing, and operating software with agents as active engineering participants.
 
 ## Aggregate
 
-A cluster of domain objects changed as one transactional consistency boundary. An aggregate protects every invariant that must hold when its transaction commits.
+A cluster of Domain objects changed as one transaction and protected through one external mutation entry point.
 
 ## Aggregate invariant
 
-A rule that must remain true after every transaction that changes one aggregate. `Invariant` means the rule cannot remain temporarily false after commit. IDs use `INV-{MODULE}-{NN}`.
+A rule that remains true after every transaction changing its owning aggregate and uses an `INV-{MODULE}-{NN}` identifier.
 
 ## Aggregate root
 
-The only external mutation entry point for an aggregate. `Root` identifies the object through which the aggregate is changed; it does not mean every domain type inherits from it.
+The only external mutation entry point for an aggregate.
 
 ## Aggregate state
 
-The complete lifecycle condition of an aggregate. The engineering system represents it with one abstract `{Aggregate}State` record and one or more sealed state records.
+The complete lifecycle condition represented by one abstract `{Aggregate}State` record and one or more sealed state records.
 
 ## Authorization policy
 
-A policy that decides whether an identified actor may perform an operation on a specific target. Authentication proves identity; authorization decides permitted behavior.
+A policy deciding whether an identified actor can perform an operation on a specific target.
 
 ## Command
 
-An Application message that may change business state. One top-level Command owns one command pipeline and one transaction commit.
+An Application message that can change business state through one top-level command pipeline and transaction commit.
+
+## Controlled technical prose
+
+The repository-owned English profile defining fixed structures, bounded prose, exact terms, and testable provisions.
 
 ## Convention
 
-A default name, location, file shape, or implementation pattern. A consumer may replace a convention through one explicit local convention.
+A replaceable default for a name, location, file shape, or implementation pattern.
+
+## Convention ID
+
+A canonical uppercase dotted identifier containing `CONVENTION`, such as `API.CONVENTION.001`.
+
+## Current standards material
+
+Published standards pages, templates, instructions, and validators that define the pinned release without transition or release-history material.
 
 ## Decision Evidence
 
-An optional research record used when provider approval, legal review, security analysis, financial assumptions, or other external facts affect a decision. Normal evidence remains inside the decision record; create a separate record only when the investigation needs its own owner and lifecycle.
+An optional research record for external facts that need an owner and lifecycle beyond their owning decision.
 
 ## Derived artifact
 
-A committed application file produced deterministically from an authored source. OpenAPI and generated TypeScript API types are derived artifacts.
+A committed application file produced deterministically from an authored source, such as OpenAPI or generated TypeScript types.
 
 ## Domain
 
-The area of real-world knowledge, language, rules, state, and behavior modeled by the software. Orders and refund policy belong to the domain; HTTP routing and database sessions are technical mechanisms. The capitalized `Domain` project is the code layer that implements domain types.
+The real-world knowledge, language, rules, state, and behavior modeled by the software.
 
 ## Domain event
 
@@ -70,35 +82,35 @@ An immutable, package-free Domain record describing a completed fact inside the 
 
 ## Domain policy
 
-An accepted business rule that is not owned by one aggregate invariant. `Domain` places the policy in business behavior. `Policy` means the rule selects, permits, limits, or requires behavior from known facts. IDs use `POL-{POLICY}-{NN}`.
+An accepted business rule outside one aggregate invariant and identified as `POL-{POLICY}-{NN}`.
 
 ## End-to-end flow
 
-A connection of use cases from an accepted starting condition to one observable product outcome across every required system boundary. It may include actor choices, system work, waiting, failures, and recovery.
+A connection of use cases from an accepted starting condition to one observable product outcome across required system boundaries.
 
 ## End-to-end test
 
-An automated test that verifies one complete end-to-end flow through deployed public boundaries and required infrastructure. IDs use `E2E-{FLOW}-{NN}`.
+An automated test identified as `E2E-{FLOW}-{NN}` that verifies one complete flow through deployed public boundaries and required infrastructure.
 
 ## Engineering system
 
-A connected set of decisions, specifications, standards, implementation conventions, verification, operating controls, and release practices. `System` describes how the parts constrain and support one another; it is not a runtime framework.
+A connected set of decisions, specifications, standards, implementation conventions, verification, operating controls, and release practices.
 
 ## Entry point
 
-A path through which an actor or system invokes or observes a use case, such as an HTTP API, web application, webhook, Worker trigger, or administrative interface.
+A path through which an actor or system invokes or observes a use case.
 
 ## Event
 
-An immutable statement that a relevant fact completed. Event names use past tense, such as `OrderConfirmed`.
+An immutable statement that a relevant fact completed, named in past tense.
 
 ## Event reaction
 
-Behavior caused by an event. A reaction may be implemented by an event handler, workflow orchestrator, projection, or scheduled job. The term describes causality without prescribing a class suffix.
+Behavior caused by an event without prescribing a handler, orchestrator, projection, or scheduled-job implementation.
 
 ## Extension
 
-A conditional standards bundle selected in `standards.project.json`. Project-scoped extensions apply when selected. Local extensions apply only to allowed specification kinds that list them.
+A conditional standards bundle selected by a project or an allowed local specification.
 
 ## Integration event
 
@@ -106,36 +118,35 @@ A versioned message contract delivered outside the bounded context.
 
 ## Module
 
-A cohesive area of the domain used to organize language, use cases, aggregates, code, and ownership. A module is not automatically an assembly, deployment unit, transaction boundary, or aggregate.
+A cohesive Domain area organizing language, use cases, aggregates, code, and ownership without implying a deployment or transaction boundary.
 
 ## Normative
 
-Required for a conforming consumer. Content under a `Standards` section is normative.
+Required for a conforming consumer through an identified Standards provision.
 
 ## Operating limit
 
-An enforced, tested, or supported operating boundary, or an alert threshold that requires operator action.
+An enforced, tested, supported, or alerting boundary for system operation.
 
 ## Persistence constraint
 
-A rule enforced by stored-data infrastructure, such as uniqueness, a required relationship, or a bounded value. Persistence means durable storage; constraint means the store rejects an invalid representation.
+A rule enforced by durable storage, such as uniqueness, a required relationship, or a bounded value.
 
 ## Platform profile
 
-A supported combination of architecture, frameworks, project layout, and baseline conventions. Standards
-v1.10.0 contains the `dotnet-nextjs` profile.
-
-## Primary release flow
-
-The end-to-end flow selected as the first deployed product outcome that gates application v1. `Primary` identifies priority. `Release` means the flow must work for the immutable artifact being evaluated.
+A supported composition of architecture, frameworks, project layout, and baseline conventions.
 
 ## Product
 
-The software capability offered to users together with its supported operating boundary, outcomes, exclusions, and external commitments. Product does not mean only the frontend application.
+The software capability offered to users with its supported outcomes, operating boundary, exclusions, and external commitments.
 
 ## Projection
 
-A process that derives a Read Model from authoritative facts. Its delivery is atomic, durable, or rebuildable when the Read Model is required behavior.
+A process deriving a Read Model from authoritative facts with the delivery guarantee required by its owning behavior.
+
+## Provision
+
+One identified Standard or Convention block with one Requirement or replaceable Default and one evidence mapping.
 
 ## Query
 
@@ -143,39 +154,39 @@ An Application message that reads a Read Model without changing business state.
 
 ## Read Model
 
-Data shaped for a Query without requiring aggregate loading or mutation.
+Data shaped for a Query without aggregate loading or mutation.
 
 ## Release Record
 
-The immutable record for one release artifact. It captures build, test, deployment, restore, rollback, diagnostics, smoke-test, operating-limit, and runbook evidence.
+The immutable evidence record for one release artifact, including build, tests, deployment, recovery, diagnostics, operating limits, and runbooks.
 
 ## Repository
 
-A Domain-owned port that loads and stages complete aggregates. It does not expose general queries or commit a transaction.
+A Domain-owned port that loads and stages complete aggregates without exposing general queries or committing transactions.
 
 ## Risk
 
-A use-case metadata value that adds specification and verification for authorization, money, sensitive data, irreversible behavior, concurrency, durable delivery, or availability.
+A use-case metadata value that activates additional specification and verification for a named area of potential harm or failure.
 
 ## Rule ID
 
-A canonical uppercase dotted identifier such as `APP.COMMAND.001` used by standards overrides, extensions, decisions, conflict reports, and review within one standards release.
+A canonical uppercase dotted identifier, such as `APP.COMMAND.001`, that identifies one Standard and can appear in a consumer override.
 
 ## Specification
 
-An approved, versioned statement of required behavior or constraint. A specification remains in the repository after one prompt, agent session, or implementation task ends.
-
-## Specification-Driven Delivery
-
-The delivery approach within the Agentic Engineering System in which approved specifications select work and define completion. Prompts and tickets may initiate work, but the owning specification records approved behavior.
+An approved, versioned statement of required behavior or constraint that persists beyond one task or agent session.
 
 ## Specification Metadata
 
-The JSON block at the start of a structured specification. It identifies the document kind, ID, authority, owner, review date, and kind-specific implementation data.
+The opening JSON block identifying a structured document's kind, ID, authority, owner, review date, and implementation data.
+
+## Specification-Driven Delivery
+
+The delivery approach in which approved specifications select work, record behavior, and define completion.
 
 ## Standards override
 
-A consumer replacement for a normative rule. It names the rule ID and an accepted project decision in `standards.project.json`.
+A consumer replacement for one Standard, identified by its rule ID and an accepted project decision.
 
 ## Use case
 
@@ -183,20 +194,20 @@ One independently testable actor or system goal implemented as one top-level Com
 
 ## Validation rule
 
-A rule that checks the shape, format, or bounded value of a Command or Query before business behavior runs.
+A rule checking a Command or Query's shape, format, or bounded value before business behavior runs.
 
 ## Value Object
 
-An immutable Domain type defined by its values and rules rather than an independent identity.
+An immutable Domain type defined by its values and rules instead of an independent identity.
 
 ## Workflow
 
-System-controlled progress across a transaction or time boundary. A workflow records durable state, awaited events, issued Commands, retry or idempotency behavior, and recovery when those concerns apply.
+System-controlled progress across a transaction or time boundary with durable coordination and recovery behavior.
 
 ## Workflow orchestrator
 
-The component that persists and advances a durable workflow. `Orchestrator` means it selects the next action rather than performing every action itself. Industry mappings include Process Manager and orchestration-based Saga.
+The component that persists workflow progress and selects its next action.
 
 ## Workflow rule
 
-A rule that controls when a workflow advances, waits, retries, compensates, fails, completes, or requires operator action.
+A rule controlling when a workflow advances, waits, retries, compensates, fails, completes, or requires operator action.

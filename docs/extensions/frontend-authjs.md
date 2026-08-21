@@ -2,62 +2,185 @@
 
 ## Intent
 
-This extension defines interactive login and server-owned session handling when a Next.js frontend uses Auth.js. Backend token validation remains provider-neutral and continues to authorize every target resource.
+This extension defines interactive login and server-owned session handling when a Next.js frontend uses Auth.js. Backend token validation remains provider-neutral and authorizes each target resource.
 
 ## Activation
 
-**Activation scope:** `project`. It applies to all project work whenever selected in `selectedExtensions`.
+Activation scope: `project`.
 
-Enable `frontend-authjs` when Next.js owns interactive login, callback handling, and session cookies for a browser application.
+Applicable specification kinds: None.
 
-The extension adds the pinned Auth.js and JOSE packages. It replaces no backend authentication rule.
+The consumer enables `frontend-authjs` when Next.js owns interactive login, callback handling, and session cookies for a browser application.
+
+## Baseline relationship
+
+This extension adds pinned Auth.js and JOSE packages. It replaces no backend authentication rule.
 
 ## Agent Summary {#agent-summary}
 
-- Keep session cookies and provider tokens server-side.
-- Configure secure cookie attributes and trusted callback URLs.
-- Call protected APIs through a server boundary when tokens are required.
-- Distinguish expired authentication from forbidden authorization.
-- Validate redirects and callback state.
-- Test login, callback, logout, expiry, refresh failure, and protected API access.
+- Keep Auth.js frontend-specific. (EXT.AUTHJS.ADOPT.001, EXT.AUTHJS.ADOPT.002)
+- Keep provider tokens and refresh server-side. (EXT.AUTHJS.SESSION.001, EXT.AUTHJS.SESSION.002)
+- Define selected session strategy and secret ownership. (EXT.AUTHJS.SESSION.004)
+- Call protected APIs through a server boundary. (EXT.AUTHJS.API.001)
+- Verify callbacks and safe return destinations. (EXT.AUTHJS.CALLBACK.001, EXT.AUTHJS.CALLBACK.002)
+- Handle failed sessions and authorization separately. (EXT.AUTHJS.FAILURE.001, EXT.AUTHJS.FAILURE.002)
+- Protect cookie-authenticated state changes. (EXT.AUTHJS.CSRF.002, EXT.AUTHJS.CSRF.003)
 
 ## Standards
 
-### Keep provider behavior in the extension (EXT.AUTHJS.ADOPT.001)
+### Keep Auth.js frontend-specific (EXT.AUTHJS.ADOPT.001)
 
-Auth.js owns frontend login and session concerns. WebApi validates standards-based access tokens and does not depend on Auth.js session types.
+**Requirement:** A Next.js frontend using Auth.js MUST own interactive login and session behavior through Auth.js.
 
-### Keep session processing server-side (EXT.AUTHJS.SESSION.001)
+**Rationale:** Auth.js provides the browser-facing login and session boundary for the selected frontend.
 
-Store session cookies with `HttpOnly`, `Secure` outside local HTTP development, an explicit `SameSite` policy, bounded lifetime, and a narrow path. Read and refresh provider tokens on the server.
+### Keep WebApi provider-neutral (EXT.AUTHJS.ADOPT.002)
 
-Do not expose refresh tokens to Client Components or browser storage.
+**Requirement:** WebApi MUST validate standards-based access tokens without depending on Auth.js session types.
 
-The adoption decision selects a JWT or database session strategy, names the encryption and signing secret owner, and defines access-token refresh behavior. Store only the claims and provider values required by the application. A session cookie is not used as a bearer token for WebApi.
+**Rationale:** Backend authorization remains independent of the frontend session implementation.
 
-### Call protected APIs through a server boundary (EXT.AUTHJS.API.001)
+### Protect session cookies (EXT.AUTHJS.SESSION.001)
 
-Use Server Components, Server Actions, or Route Handlers to attach access tokens server-side. A browser request may use a same-origin server boundary without receiving the provider token.
+**Requirement:** A session cookie MUST use `HttpOnly`, `Secure` outside local HTTP development, explicit `SameSite`, bounded lifetime, and a narrow path.
 
-### Validate callbacks and redirects (EXT.AUTHJS.CALLBACK.001)
+**Rationale:** Cookie attributes constrain browser exposure, cross-site use, lifetime, and delivery path.
 
-Validate callback state, nonce where applicable, issuer, audience, and allowed redirect destinations. Reject external or protocol-relative return targets that are not explicitly allowed.
+### Keep provider tokens server-side (EXT.AUTHJS.SESSION.002)
 
-### Handle session failure explicitly (EXT.AUTHJS.FAILURE.001)
+**Requirement:** A frontend server MUST read and refresh provider tokens without exposing refresh tokens to Client Components or browser storage.
 
-Expired or revoked sessions redirect to a safe login route or return a stable unauthenticated state. Keep authentication failures distinct from resource authorization failures. Do not retry 401 or 403 indefinitely.
+**Rationale:** Provider refresh tokens grant access beyond the browser's safe presentation boundary.
+
+### Select a session strategy (EXT.AUTHJS.SESSION.003)
+
+**Requirement:** An Auth.js adoption decision MUST select a JWT or database session strategy.
+
+**Rationale:** The strategy defines session storage, invalidation, and operational behavior.
+
+### Record session secret ownership (EXT.AUTHJS.SESSION.004)
+
+**Requirement:** An Auth.js adoption decision MUST name encryption and signing secret ownership and access-token refresh behavior.
+
+**Rationale:** Named ownership defines who rotates secrets and how sessions obtain refreshed provider access.
+
+### Minimize session content (EXT.AUTHJS.SESSION.005)
+
+**Requirement:** A session implementation MUST store only claims and provider values required by the application.
+
+**Rationale:** Smaller session content reduces retained data and unintended browser exposure.
+
+### Separate sessions from API bearer tokens (EXT.AUTHJS.SESSION.006)
+
+**Requirement:** A frontend MUST NOT use its Auth.js session cookie as a WebApi bearer token.
+
+**Rationale:** A session cookie and backend bearer token have different trust and transport boundaries.
+
+### Use a server API boundary (EXT.AUTHJS.API.001)
+
+**Requirement:** A frontend MUST use Server Components, Server Actions, or Route Handlers to attach protected API tokens server-side.
+
+**Rationale:** Server ownership keeps provider tokens outside browser bundles and browser storage.
+
+### Keep browser token access absent (EXT.AUTHJS.API.002)
+
+**Requirement:** A browser request MAY call a same-origin server boundary without receiving the provider token.
+
+**Rationale:** The server boundary can attach the token after the browser request reaches trusted code.
+
+### Validate provider callback values (EXT.AUTHJS.CALLBACK.001)
+
+**Requirement:** An Auth.js callback handler MUST validate state, applicable nonce, issuer, audience, and allowed redirect destinations.
+
+**Rationale:** Callback validation binds the provider response to the expected login request and application.
+
+### Reject unsafe return targets (EXT.AUTHJS.CALLBACK.002)
+
+**Requirement:** An Auth.js callback handler MUST reject unapproved external or protocol-relative return targets.
+
+**Rationale:** Restricted return targets prevent an authentication flow from becoming an open redirect.
+
+### Handle invalid sessions explicitly (EXT.AUTHJS.FAILURE.001)
+
+**Requirement:** A frontend MUST redirect an expired or revoked session to a safe login route or return stable unauthenticated state.
+
+**Rationale:** An explicit outcome lets the interface recover safely when a session is unusable.
+
+### Separate authentication from authorization failure (EXT.AUTHJS.FAILURE.002)
+
+**Requirement:** A frontend MUST keep authentication failures distinct from resource authorization failures.
+
+**Rationale:** A missing or expired identity has different caller action and disclosure behavior than denied access.
+
+### Avoid endless access retries (EXT.AUTHJS.FAILURE.003)
+
+**Requirement:** A frontend MUST NOT retry 401 or 403 responses indefinitely.
+
+**Rationale:** Repeated failures do not restore an expired session or insufficient authorization.
 
 ### Keep frontend guards advisory (EXT.AUTHJS.AUTHZ.001)
 
-Frontend session checks may hide controls or redirect users. WebApi remains responsible for resource authorization on every protected operation.
+**Requirement:** A frontend session check MAY hide controls or redirect a user without replacing backend resource authorization.
 
-### Protect state-changing server boundaries (EXT.AUTHJS.CSRF.001)
+**Rationale:** Browser checks improve navigation but cannot establish a trusted resource decision.
 
-Use Auth.js request verification for its authentication routes and validate origin or an approved anti-forgery token on project-owned cookie-authenticated Route Handlers and Server Actions that cross a browser trust boundary. Use `POST` for state changes and reject cross-site form submissions that the selected SameSite policy does not already prevent.
+### Authorize protected resources in WebApi (EXT.AUTHJS.AUTHZ.002)
+
+**Requirement:** WebApi MUST authorize every protected target resource.
+
+**Rationale:** The backend remains the trusted owner of resource access decisions.
+
+### Verify Auth.js authentication requests (EXT.AUTHJS.CSRF.001)
+
+**Requirement:** Auth.js authentication routes MUST use Auth.js request verification.
+
+**Rationale:** Auth.js owns the request-integrity mechanism for its authentication endpoints.
+
+### Verify state-changing browser requests (EXT.AUTHJS.CSRF.002)
+
+**Requirement:** A cookie-authenticated server boundary MUST validate origin or an approved anti-forgery token before state change.
+
+**Rationale:** Project-owned Route Handlers and Server Actions cross the browser trust boundary.
+
+### Use POST for browser state changes (EXT.AUTHJS.CSRF.003)
+
+**Requirement:** A cookie-authenticated state change MUST use `POST` and reject cross-site forms not blocked by selected `SameSite` policy.
+
+**Rationale:** A state-changing request needs method and cross-site protections that a safe read does not need.
 
 ## Conventions
 
-Keep Auth.js configuration under one server-owned module such as `lib/auth.ts`. Keep provider-specific claim mapping near that configuration. Feature code consumes a project-owned session view rather than provider response objects. Keep authentication Route Handlers thin and server-only.
+### Keep Auth.js configuration server-owned (EXT.AUTHJS.CONVENTION.001)
+
+**Default:** Keep Auth.js configuration in one server-owned module such as `lib/auth.ts`.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** One server module identifies the frontend's authentication configuration boundary.
+
+### Keep provider claims nearby (EXT.AUTHJS.CONVENTION.002)
+
+**Default:** Keep provider-specific claim mapping near Auth.js configuration.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Provider claim mapping changes with the provider configuration it interprets.
+
+### Expose a project-owned session view (EXT.AUTHJS.CONVENTION.003)
+
+**Default:** Let feature code use a project-owned session view rather than provider response objects.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Feature code consumes application concepts rather than provider response shape.
+
+### Keep authentication handlers thin (EXT.AUTHJS.CONVENTION.004)
+
+**Default:** Keep authentication Route Handlers thin and server-only.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Authentication route composition does not own provider configuration or feature behavior.
 
 ## Dependencies
 
@@ -66,8 +189,29 @@ Keep Auth.js configuration under one server-owned module such as `lib/auth.ts`. 
 
 ## Verification
 
-- Test login, callback validation, safe return paths, logout, expiry, and refresh failure.
-- Test authenticated API calls and forbidden target access.
-- Test cross-site state-changing requests and invalid origins.
-- Inspect browser storage and bundles for provider tokens.
-- Verify cookie attributes in hosted configuration.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| EXT.AUTHJS.ADOPT.001 | inspection | Frontend authentication review identifies Auth.js ownership of login and sessions. |
+| EXT.AUTHJS.ADOPT.002 | test | WebApi token tests use standards-based tokens without Auth.js session types. |
+| EXT.AUTHJS.SESSION.001 | test | Cookie fixtures assert attributes, lifetime, and narrow path. |
+| EXT.AUTHJS.SESSION.002 | static | Client source and browser storage scans expose no provider refresh token. |
+| EXT.AUTHJS.SESSION.003 | inspection | Adoption decision selects JWT or database sessions. |
+| EXT.AUTHJS.SESSION.004 | inspection | Adoption decision names secret owner and refresh behavior. |
+| EXT.AUTHJS.SESSION.005 | inspection | Session review identifies each stored claim and provider value. |
+| EXT.AUTHJS.SESSION.006 | test | WebApi rejects use of an Auth.js session cookie as bearer authentication. |
+| EXT.AUTHJS.API.001 | static | Protected API calls attach tokens only in server-owned files. |
+| EXT.AUTHJS.API.002 | test | Browser fixture calls same-origin boundary without provider token exposure. |
+| EXT.AUTHJS.CALLBACK.001 | test | Callback fixtures reject invalid state, nonce, issuer, audience, and destination. |
+| EXT.AUTHJS.CALLBACK.002 | test | Return-target fixtures reject external and protocol-relative destinations. |
+| EXT.AUTHJS.FAILURE.001 | test | Expired and revoked session fixtures yield safe login or unauthenticated outcomes. |
+| EXT.AUTHJS.FAILURE.002 | test | Frontend fixtures render authentication and authorization failures differently. |
+| EXT.AUTHJS.FAILURE.003 | test | 401 and 403 fixtures stop retry after the documented bounded behavior. |
+| EXT.AUTHJS.AUTHZ.001 | inspection | UI guard review identifies its advisory navigation behavior. |
+| EXT.AUTHJS.AUTHZ.002 | test | Protected API tests enforce target-resource authorization. |
+| EXT.AUTHJS.CSRF.001 | test | Auth.js route fixtures verify request-integrity behavior. |
+| EXT.AUTHJS.CSRF.002 | test | Cookie-authenticated boundary fixtures reject missing origin or anti-forgery evidence. |
+| EXT.AUTHJS.CSRF.003 | test | Cross-site form fixtures reject unsafe non-POST state changes. |
+| EXT.AUTHJS.CONVENTION.001 | inspection | Auth.js configuration has one server-owned module or a local replacement. |
+| EXT.AUTHJS.CONVENTION.002 | inspection | Provider claim mapping remains beside its Auth.js configuration. |
+| EXT.AUTHJS.CONVENTION.003 | static | Feature source references the owned session view rather than provider responses. |
+| EXT.AUTHJS.CONVENTION.004 | inspection | Authentication Route Handlers remain thin and server-only. |

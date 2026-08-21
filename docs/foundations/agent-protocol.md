@@ -2,80 +2,140 @@
 
 ## Intent
 
-This protocol controls how AI agents select context, resolve standards, preserve user work, and report completion. It keeps detailed conventions available without loading the entire repository for every task.
+This protocol controls how agents select context, resolve standards, preserve user work, and report completion. It keeps detailed conventions available without loading every document.
 
 ## Agent Summary {#agent-summary}
 
-- Load the consumer configuration, active use case, and task-specific summaries.
-- Read full topic documents when editing that area or when a summary is insufficient.
-- Apply consumer overrides before extensions, profile conventions, and foundations.
-- Stop on unresolved conflicts.
-- Preserve unrelated work and verify behavior before reporting completion.
+- Select the narrowest applicable task context. (AGENT.LOAD.001, AGENT.LOAD.002)
+- Read active use cases before behavior changes. (AGENT.LOAD.003)
+- Apply declared guidance precedence. (AGENT.PRECEDENCE.001)
+- Stop and quote unresolved conflicts. (AGENT.CONFLICT.001)
+- Preserve unrelated work and side-effect boundaries. (AGENT.EDIT.001, AGENT.EDIT.002)
+- Update behavior records with implementation. (AGENT.SYNC.001)
+- Report exact verification evidence. (AGENT.COMPLETE.001)
 
 ## Standards
 
-### Load context by task (AGENT.LOAD.001)
+### Select task context (AGENT.LOAD.001)
 
-Start with Tier 0, then select the active task from `loadPlans` in `standards.manifest.json`.
+**Requirement:** An agent MUST select the active task from `loadPlans` in `standards.manifest.json` before editing.
 
-- Tier 0 contains repository agent instructions.
-- Tier 1 contains short `Agent Summary` sections.
-- Tier 2 contains complete topic documents.
-- Project-scoped extensions load when selected. Local extensions load when selected and applicable to the active specification kind.
+**Rationale:** The selected task identifies the smallest standards context that covers the request.
 
-Read the active use-case specification before changing observable application behavior.
+### Load context by tier (AGENT.LOAD.002)
 
-### Apply explicit precedence (AGENT.PRECEDENCE.001)
+**Requirement:** An agent MUST load Tier 0, then Tier 1, and Tier 2 when the selected task requires full guidance.
 
-Apply applicable guidance in this order:
+**Rationale:** Tier 0 carries repository instructions, Tier 1 carries summaries, and Tier 2 carries full topic documents.
 
-1. Consumer override backed by a decision and named rule ID.
-2. Applicable extension that declares a baseline replacement.
-3. Selected platform profile and its conventions.
-4. Foundation standards.
+### Load applicable extensions (AGENT.LOAD.003)
 
-A local convention may replace a baseline convention when the consumer documentation states the replacement directly.
+**Requirement:** An agent MUST load selected project extensions and selected applicable local extensions before their boundaries affect work.
 
-### Stop on unresolved conflicts (AGENT.CONFLICT.001)
+**Rationale:** The implementation projects extensions apply when selected; local extensions also require the active specification kind.
 
-When two applicable requirements disagree without declared precedence, quote both rule IDs and paths. Do not invent a compromise.
+### Read active behavior specifications (AGENT.LOAD.004)
 
-### Protect work outside the task (AGENT.EDIT.001)
+**Requirement:** An agent MUST read the active use-case specification before changing observable application behavior.
 
-Read `git status` before editing. Preserve user changes, untracked files, and unrelated generated output. Make the smallest coherent change that satisfies the request.
+**Rationale:** The specification defines accepted behavior, risks, rules, and verification context.
 
-Do not add packages, migrations, authentication model changes, public API breaks, or external side effects unless the request or an accepted decision authorizes them.
+### Apply guidance precedence (AGENT.PRECEDENCE.001)
 
-### Keep specifications and code synchronized (AGENT.SYNC.001)
+**Requirement:** An agent MUST apply consumer overrides, applicable extensions, selected profile conventions, and foundation standards in that order.
 
-Update affected product, domain, page, decision, API, test, and generated artifacts in the same change as observable behavior.
+**Rationale:** The order resolves a more local approved replacement before a broader baseline.
 
-### Prove completion (AGENT.COMPLETE.001)
+### Replace only declared conventions (AGENT.PRECEDENCE.002)
 
-Run every applicable check, inspect generated differences, compare the result with the active use case, and report exact commands and results. A narrow passing test does not prove repository-wide completion.
+**Requirement:** An agent MAY apply a local convention replacement only when consumer documentation states that replacement directly.
+
+**Rationale:** An undocumented local preference does not replace a baseline default.
+
+### Stop on unresolved conflict (AGENT.CONFLICT.001)
+
+**Requirement:** An agent MUST stop when applicable requirements disagree without declared precedence and quote both rule IDs and paths.
+
+**Rationale:** A named conflict needs a decision rather than an invented compromise.
+
+### Inspect existing work before editing (AGENT.EDIT.001)
+
+**Requirement:** An agent MUST read `git status` before editing and preserve user changes, untracked files, and unrelated generated output.
+
+**Rationale:** The task can share a working tree with work outside its requested scope.
+
+### Restrict unapproved side effects (AGENT.EDIT.002)
+
+**Requirement:** An agent MUST NOT add packages, migrations, authentication changes, public API breaks, or external side effects without authorization.
+
+**Rationale:** These changes alter project boundaries beyond an ordinary implementation edit.
+
+### Make coherent scoped changes (AGENT.EDIT.003)
+
+**Requirement:** An agent MUST make the smallest coherent change that satisfies the authorized request.
+
+**Rationale:** A coherent change includes its required specification, code, test, and operating evidence.
+
+### Update behavior records with code (AGENT.SYNC.001)
+
+**Requirement:** An agent MUST update affected product, domain, page, decision, API, test, and generated artifacts with observable behavior changes.
+
+**Rationale:** One behavior change needs current records at every affected boundary.
+
+### Run and report verification (AGENT.COMPLETE.001)
+
+**Requirement:** An agent MUST run applicable checks, inspect generated differences, compare results with the active use case, and report exact evidence.
+
+**Rationale:** A narrow passing test does not establish repository-wide completion.
 
 ## Conventions
 
-### Use one task label
+### Select one task label (AGENT.CONVENTION.001)
 
-Select the narrowest manifest task that covers the edit. Load a second task only when the change crosses that boundary.
+**Default:** Select the narrowest manifest task that covers the edit.
 
-### Escalate from summary to full document
+**Replacement:** A consumer can replace this default with an explicit local convention.
 
-Read Tier 2 before generating a new file, changing a public boundary, or choosing between two patterns. A small edit that matches an existing local pattern may remain at Tier 1.
+**Rationale:** A second task loads only when the edit crosses its boundary.
 
-### Prefer local examples after standards
+### Escalate from summary to full document (AGENT.CONVENTION.002)
 
-After loading the applicable standard, inspect neighboring consumer files. Match local names and shapes when they comply with the selected standard.
+**Default:** Read Tier 2 before generating a file, changing a public boundary, or choosing between patterns.
 
-## Examples
+**Replacement:** A consumer can replace this default with an explicit local convention.
 
-A Command-handler change loads `backend.application`, the active Use case, selected project extensions, and locally applicable extensions. It does not load frontend rendering or container deployment guidance unless the requested behavior crosses those areas.
+**Rationale:** A small edit matching an existing local pattern can remain at Tier 1.
+
+### Inspect local examples after standards (AGENT.CONVENTION.003)
+
+**Default:** Inspect neighboring consumer files after loading applicable standards.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Compliant local names and shapes provide the best implementation starting point.
+
+## Reference example
+
+This informative example demonstrates `AGENT.LOAD.001`, `AGENT.LOAD.004`, and `AGENT.LOAD.003`.
+
+A Command-handler change selects `backend.application`, reads its active use case, and loads selected applicable extensions. It excludes unrelated frontend and container guidance.
 
 ## Verification
 
-- Confirm the selected task exists in the manifest.
-- Confirm the active Use case and applicable extensions were read.
-- Confirm precedence was applied to every local override.
-- Confirm unrelated working-tree changes remain intact.
-- Confirm the completion report names skipped checks and reasons.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| AGENT.LOAD.001 | inspection | Change review identifies the selected manifest task before editing. |
+| AGENT.LOAD.002 | inspection | Agent report lists required Tier 0, Tier 1, and Tier 2 documents. |
+| AGENT.LOAD.003 | inspection | Agent report lists selected project and applicable local extensions. |
+| AGENT.LOAD.004 | inspection | Behavior-change report cites the active use-case specification. |
+| AGENT.PRECEDENCE.001 | inspection | Design review applies sources in declared precedence order. |
+| AGENT.PRECEDENCE.002 | inspection | Consumer documentation records each local convention replacement. |
+| AGENT.CONFLICT.001 | inspection | Unresolved conflict report quotes both rule IDs and paths. |
+| AGENT.EDIT.001 | inspection | Change report records initial status and preserved unrelated work. |
+| AGENT.EDIT.002 | inspection | Review identifies authorization for each listed boundary-changing side effect. |
+| AGENT.EDIT.003 | inspection | Diff review connects each changed artifact to the authorized request. |
+| AGENT.SYNC.001 | inspection | Behavior review links changed implementation to affected current records. |
+| AGENT.COMPLETE.001 | inspection | Completion report lists commands, outcomes, evidence scope, and skipped checks. |
+| AGENT.CONVENTION.001 | inspection | Agent report selects one narrowest task or names an additional crossed boundary. |
+| AGENT.CONVENTION.002 | inspection | File-generation and public-boundary reports cite loaded Tier 2 guidance. |
+| AGENT.CONVENTION.003 | inspection | Change review identifies neighboring compliant consumer patterns. |

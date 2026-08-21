@@ -2,22 +2,27 @@
 
 ## Intent
 
+
 One canonical monorepo tree lets agents locate applications, shared packages, documentation, and tests without searching for a project-specific interpretation. The structure supports an API-only application, one frontend, or multiple frontends while retaining one bounded context.
 
 ## Agent Summary {#agent-summary}
 
-- Place every deployable under `apps/`.
-- Place the .NET solution under `apps/api/`, production projects under `src/`, and test projects under `tests/`.
-- Place each frontend under `apps/{name}/`.
-- Keep shared TypeScript code under `packages/` only when two applications consume it.
-- Keep product and domain documentation under root `docs/`.
-- Keep the standards submodule at root `standards/`.
+
+- Use the canonical root tree. (REPO.STRUCTURE.001)
+- Keep .NET production and test projects separate. (REPO.DOTNET.001)
+- Keep runnable applications under apps. (REPO.APPS.001)
+- Limit shared TypeScript packages. (REPO.PACKAGES.001)
+- Keep consumer documentation at the root. (REPO.DOCS.001)
+- Keep orientation documents separate from canonical records. (REPO.DOCS.002)
 
 ## Standards
 
+
 ### Use the canonical root tree (REPO.STRUCTURE.001)
 
-Consumer repositories use this shape:
+**Requirement:** Repositories MUST use the canonical root tree.
+
+**Example:** Consumer repositories use this shape:
 
 ```text
 {repo}/
@@ -58,13 +63,15 @@ Consumer repositories use this shape:
   standards.project.json
 ```
 
-Do not place the .NET solution or a frontend application at the repository root.
+The example does not place the .NET solution or a frontend application at the repository root.
 
 ### Keep .NET production and test projects separate (REPO.DOTNET.001)
 
-Production projects live under `apps/api/src/`. Test projects live under `apps/api/tests/`. The solution file lives directly under `apps/api/`.
+**Requirement:** Repositories MUST keep .NET production and test projects separate.
 
-The baseline tree is:
+**Rationale:** Production projects live under `apps/api/src/`. Test projects live under `apps/api/tests/`. The solution file lives directly under `apps/api/`.
+
+**Example:** The baseline tree is:
 
 ```text
 apps/api/
@@ -89,48 +96,76 @@ Worker and Acceptance.Tests are conditional projects introduced by extensions.
 
 ### Keep runnable applications under apps (REPO.APPS.001)
 
-Each independently runnable frontend, API, or separately deployed host lives under `apps/{name}/`. Do not place reusable packages under `apps/` or deployable code under `packages/`.
+**Requirement:** Repositories MUST keep runnable applications under apps.
+
+**Rationale:** Each independently runnable frontend, API, or separately deployed host lives under `apps/{name}/`. The implementation does not place reusable packages under `apps/` or deployable code under `packages/`.
 
 ### Limit shared TypeScript packages (REPO.PACKAGES.001)
 
-The baseline permits shared configuration, generated API types, a thin API client, and CSS theme tokens under `packages/`. Each package must have at least two consumers or serve generated output shared by API consumers.
+**Requirement:** Repositories MUST limit shared TypeScript packages.
+
+**Rationale:** The baseline permits shared configuration, generated API types, a thin API client, and CSS theme tokens under `packages/`. Each package has at least two consumers or serves generated output shared by API consumers.
 
 A shared React component library requires a project decision. Each frontend owns its shadcn/ui source by default.
 
 ### Keep consumer documentation at the root (REPO.DOCS.001)
 
-Product, domain, UI, and decision documentation lives under root `docs/`, not inside the standards submodule or .NET solution tree.
+**Requirement:** Repositories MUST keep consumer documentation at the root.
+
+**Rationale:** Product, domain, UI, and decision documentation lives under root `docs/`, not inside the standards submodule or .NET solution tree.
 
 Application-specific README files may live beside their application for run commands and environment variables. They do not replace domain specifications.
 
 ### Keep orientation documents separate from canonical records (REPO.DOCS.002)
 
-Root and application README files MAY summarize product or architecture decisions, but they MUST link to the authoritative `specStatus: approved` documents under `docs/` and MUST NOT become a second authored source for the same fact. When a product, domain, or architecture decision changes, update the owning specification and reduce the README to a link or approved summary in the same change.
+**Requirement:** Repositories MUST keep orientation documents separate from canonical records.
+
+**Rationale:** Root and application README files can summarize product or architecture decisions. They link to the authoritative `specStatus: approved` documents under `docs/`. They do not become a second authored source for the same fact. When a decision changes, update the owning specification. Reduce the README to a link or approved summary in the same change.
 
 ## Conventions
 
-### Name frontends by audience
 
-Use short lowercase names such as `web`, `admin`, `portal`, or `docs`. Do not name a frontend `frontend`, `client`, or `app` when a user-facing role is known.
+### Name frontends by audience (REPO.CONVENTION.001)
 
-### Keep scripts at the root
+**Default:** Name frontends by audience.
 
-Consumer bootstrap, release, and CI helper scripts live under root `scripts/`. An application-specific script may remain inside that application when no other workspace uses it.
+**Replacement:** A consumer can replace this default with an explicit local convention.
 
-### Keep generated API contracts in packages
+**Rationale:** The implementation uses short lowercase names such as `web`, `admin`, `portal`, or `docs`. The implementation does not name a frontend `frontend`, `client`, or `app` when a user-facing role is known.
 
-Use `packages/api-types/` for generated OpenAPI types and `packages/api-client/` for a thin typed client when more than one frontend consumes the API. A single frontend may own both under its `lib/api/` folder.
+### Keep scripts at the root (REPO.CONVENTION.002)
 
-## Examples
+**Default:** Keep scripts at the root.
 
-An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/admin/`. Both frontends may import generated transport types from `packages/api-types/`; neither imports the other frontend's feature code.
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Consumer bootstrap, release. CI helper scripts live under root `scripts/`. An application-specific script may remain inside that application when no other workspace uses it.
+
+### Keep generated API contracts in packages (REPO.CONVENTION.003)
+
+**Default:** Keep generated API contracts in packages.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** The implementation uses `packages/api-types/` for generated OpenAPI types and `packages/api-client/` for a thin typed client when more than one frontend consumes the API. A single frontend may own both under its `lib/api/` folder.
+
+## Reference example
+
+This informative example demonstrates `REPO.STRUCTURE.001` and `REPO.PACKAGES.001`.
+
+An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/admin/`. Both frontends may import generated transport types from `packages/api-types/`. Neither imports the other frontend's feature code.
 
 ## Verification
 
-- Confirm the solution is `apps/api/{ProjectName}.slnx`.
-- Confirm production projects are under `apps/api/src/` and tests under `apps/api/tests/`.
-- Confirm every deployable is under `apps/`.
-- Confirm every shared package has a named consumer.
-- Confirm module documentation is under `docs/domain/modules/`, end-to-end flows are under `docs/product/flows/`, workflows are under `docs/domain/workflows/`, and domain policies are under `docs/domain/policies/`.
-- Confirm Operating Limits are under `docs/operations/` and release records are under `docs/releases/`.
-- Confirm optional directories contain real artifacts and no placeholder files.
+
+| ID | Method | Evidence |
+|:---|:---|:---|
+| REPO.STRUCTURE.001 | inspection | Pull request review asserts `use the canonical root tree` in the owning specification and source paths. |
+| REPO.DOTNET.001 | test | An automated test citing `REPO.DOTNET.001` asserts `keep .NET production and test projects separate` at the affected boundary. |
+| REPO.APPS.001 | inspection | Pull request review asserts `keep runnable applications under apps` in the owning specification and source paths. |
+| REPO.PACKAGES.001 | inspection | Pull request review asserts `limit shared TypeScript packages` in the owning specification and source paths. |
+| REPO.DOCS.001 | inspection | Pull request review asserts `keep consumer documentation at the root` in the owning specification and source paths. |
+| REPO.DOCS.002 | inspection | Pull request review asserts `keep orientation documents separate from canonical records` in the owning specification and source paths. |
+| REPO.CONVENTION.001 | static | Repository static check asserts `name frontends by audience` for the owning paths. |
+| REPO.CONVENTION.002 | inspection | Pull request review asserts `keep scripts at the root` in the owning specification and source paths. |
+| REPO.CONVENTION.003 | inspection | Pull request review asserts `keep generated API contracts in packages` in the owning specification and source paths. |

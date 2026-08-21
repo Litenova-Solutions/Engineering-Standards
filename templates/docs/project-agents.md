@@ -1,24 +1,34 @@
 # __PROJECT__ Agent Context
 
-Read `standards/AGENTS.md`, then `standards.project.json`, before changing the project.
+Read `standards/AGENTS.md`, then `standards.project.json`, before changing the project. (AGENT.LOAD.001)
 
-Read the matching `loadPlans` entry in `standards/standards.manifest.json`, then load the active Use case and applicable extensions. Start with each Tier 1 `Agent Summary`; read the Tier 2 document before generating files or changing a public boundary.
+Select the matching `loadPlans` entry, active Use case, and applicable extensions. (AGENT.LOAD.001, AGENTIC.EXTENSIONS.001)
 
-Project decisions under `docs/decisions/` override a standard only when `standards.project.json` names the rule ID and decision path. Explicit project conventions may replace baseline conventions when the project documents the replacement.
+Start with Tier 1 Agent Summaries. Read Tier 2 before generating files or changing public boundaries. (AGENT.LOAD.001)
 
-## Project commands
+Project decisions override a Standard only when `standards.project.json` names its rule ID and decision path. (AGENT.PRECEDENCE.001)
+
+An explicit project convention can replace a baseline Convention when local documentation cites its ID. (AGENT.PRECEDENCE.001, WRITING.CONVENTION.001)
+
+## Project Commands
+
+Run the backend gates for every changed API boundary. (RELEASE.GATES.001)
 
 ```bash
 dotnet build __API_SOLUTION__ --configuration Release
 dotnet test __API_SOLUTION__ --configuration Release --no-build
 ```
 
-Run the root pnpm gates for every changed frontend listed in `standards.project.json`.
+Run the root pnpm gates for every changed frontend in `standards.project.json`. (RELEASE.GATES.001)
 
-Run documentation metadata and code-document consistency checks for every changed product, domain, implementation, test, or generated-contract file. Report skipped checks with reasons.
+Run metadata and code-document checks for each changed specification, source, test, or generated contract. (AGENT.SYNC.001, WRITING.METADATA.002)
 
-For each React web frontend, load `docs/conventions/frontend/ui-governance.md` before changing a
-control or route composition. Follow Use, Compose, Constrain, and Prove. Search the frontend UI
-vocabulary and installed primitives before adding source. Run `node standards/tools/validate-ui.mjs`
-when the frontend UI configuration, vocabulary, page sidecar, source lock, CSS entry, or primitive
-source changes. Record an override decision before selecting another visual system or component base.
+Report every skipped check with its reason. (AGENT.COMPLETE.001)
+
+Load controlled UI governance before changing a React control or route composition. (UI.AGENT.PROTOCOL.001)
+
+Follow Use, Compose, Constrain, and Prove. Search approved vocabulary and installed primitives before adding source. (UI.AGENT.PROTOCOL.001)
+
+Run `node standards/tools/validate-ui.mjs` after changing UI configuration, vocabulary, page sidecars, source locks, CSS, or primitives. (UI.EVIDENCE.001)
+
+Record an override decision before selecting another visual system or component base. (UI.GOVERNANCE.001)

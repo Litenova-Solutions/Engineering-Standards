@@ -1,139 +1,94 @@
 # Litenova Engineering Standards Agent Protocol
 
-Read this file before changing this repository or a consumer application.
+Read this file before changing this repository or a consumer application. (AGENT.LOAD.001)
 
-Standards v1.10.0 covers one bounded-context business application built with ASP.NET Core, PostgreSQL,
-Marten, and optional Next.js frontends. React web frontends use the controlled shadcn/ui and Tailwind
-CSS baseline; native frontends require a separate platform decision. The canonical human index is
-`docs/README.md`. Exact versions, profile composition, extensions, and task load plans live in
-`standards.manifest.json`.
+Standards v1.11.0 covers one bounded-context business application. The baseline uses ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends. (SCOPE.APPLICATION.001, SCOPE.CONTEXT.001)
 
-## Writing Style (documentation and prose)
+The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PROFILE.VERSIONS.001, AGENT.LOAD.001)
 
-Write for experienced software engineers and agent authors who understand DDD, CQS, HTTP APIs, persistence, testing, and software operations.
+## Writing
 
-- Use plain ASCII punctuation. Do not use em dashes, smart quotes, emoji, or decorative symbols.
-- Lead with the exact rule or capability, then a concrete example, then constraints and explanation. Keep reference pages dense and precise.
-- Prefer nouns and verbs over slogans or taglines. Headings name the concept or boundary.
-- Do not use sales cadence, rhetorical fragments, filler jargon, or unsupported superlatives.
-- Use established engineering terms for their technical meaning. Do not present DDD, CQS, workflow, aggregate, invariant, or agent concepts as branding.
-- Define a repository-specific term in one plain sentence on first use. Explain each part of a compound term when the combination is not self-evident.
-- Use Title Case for the root README and consumer-facing navigation. Use sentence case for normative rule headings and body text.
-- Use exact, sourced numbers. Label illustrative examples as illustrative and do not present them as measurements.
-- State limitations, excluded scope, and opt-in extension boundaries beside the related rule.
-- Keep the root README short. Put detailed standards, adoption steps, and migration instructions in the hosted documentation and canonical repository documents.
+Read the [authoring standard](docs/foundations/authoring-standard.md) before authoring standards or technical prose. Run its validation gates. (WRITING.PAGE.001, WRITING.VALIDATION.001)
 
-## Documentation model
+Agent Summary sections and this file are informative projections. Follow the cited canonical provision when a projection omits detail. (WRITING.SUMMARY.001, CORE.SOURCE.001)
 
-Each topic document separates:
+## Current Snapshot
 
-- `Intent`: nonnormative explanation.
-- `Agent Summary`: Tier 1 task context.
-- `Standards`: required boundaries. Deviation requires a named override and decision.
-- `Conventions`: default names, locations, and implementation patterns. A consumer may replace one with an explicit local convention.
-- `Verification`: required evidence.
+Treat active standards as a complete current snapshot. (WRITING.SNAPSHOT.001)
 
-Canonical rule IDs appear in parentheses after human titles.
+Do not retain history-specific paths, IDs, aliases, maps, standards-release migration material, compatibility rules, or transition checks. (WRITING.SNAPSHOT.002)
 
-## Standards evolution
+## Context Loading
 
-Treat this repository as an authored specification, not a runtime compatibility surface. Prefer the clearest current rule, vocabulary, template, and repository structure even when the edit requires consumer migration.
+1. Read the consumer `AGENTS.md` and `standards.project.json`. (AGENT.LOAD.002)
+2. Read the active use-case specification before changing observable behavior. (AGENT.LOAD.004)
+3. Select the narrowest task under `loadPlans` in the manifest. (AGENT.LOAD.001)
+4. Read its Tier 1 Agent Summary sections. (AGENT.LOAD.002)
+5. Read Tier 2 before generating files or changing public boundaries. (AGENT.CONVENTION.002)
+6. Read selected project extensions and locally applicable extensions. (AGENT.LOAD.003, AGENTIC.EXTENSIONS.001)
+7. Inspect neighboring consumer files after loading the applicable standard. (AGENT.CONVENTION.003)
 
-Do not preserve obsolete rule IDs, document paths, templates, aliases, or terminology solely for backward compatibility. Rename or remove them in the same change, update every current standards reference, and record required consumer work in the changelog and an upgrade guide. Historical changelogs, upgrade guides, and accepted decisions may name the removed contract. Version numbers identify standards releases; they do not promise backward compatibility.
+Do not load unrelated conventions or inactive extensions. (AGENT.LOAD.003, AGENTIC.EXTENSIONS.001)
 
-## Context loading
+## Source Precedence
 
-1. Read the consumer root `AGENTS.md` and `standards.project.json`.
-2. Read the active use-case specification before changing observable behavior.
-3. Select the narrowest task under `loadPlans` in `standards.manifest.json`.
-4. Read the listed Tier 1 `Agent Summary` sections.
-5. Read Tier 2 before generating a file, changing a public boundary, or choosing between patterns.
-6. Read every project-scoped extension selected by the consumer and every local extension applicable to the active specification.
-7. Inspect neighboring consumer files after loading the applicable standard.
+Apply guidance in this order: consumer override, baseline-replacing extension, selected profile, then foundation. (AGENT.PRECEDENCE.001)
 
-Do not load unrelated conventions or inactive extensions.
+A named local convention can replace a baseline convention. Stop when requirements conflict without declared precedence. (AGENT.PRECEDENCE.001, AGENT.CONFLICT.001)
 
-## Source precedence
+Quote both conflicting IDs and paths when requesting a decision. (AGENT.CONFLICT.001)
 
-Apply applicable guidance in this order:
+## Editing Protocol
 
-1. Consumer override backed by a decision and named rule ID.
-2. Applicable extension that names a baseline replacement.
-3. Selected platform profile and its conventions.
-4. Foundation standards.
+1. Confirm the requested scope and affected repositories. (AGENT.EDIT.003)
+2. Read `git status` and preserve unrelated work. (AGENT.EDIT.001)
+3. Load the active specification and applicable extensions. (AGENT.LOAD.003, AGENT.LOAD.004)
+4. Check the manifest before changing dependencies. (DEP.PINS.001, DEP.APPROVAL.001)
+5. Match compliant neighboring patterns. (AGENT.CONVENTION.003)
+6. Change documentation, code, tests, contracts, and operations as one unit. (AGENT.SYNC.001)
 
-An explicit consumer convention may replace a baseline convention. Stop when applicable requirements conflict without declared precedence. Quote both rule IDs and paths before requesting a decision.
+Do not add an unauthorized package, schema migration, authentication change, public break, or external side effect. (AGENT.EDIT.001)
 
-## Before editing
+## High-Risk Boundaries
 
-1. Confirm the requested scope and affected repositories.
-2. Read `git status` and preserve unrelated work.
-3. Load the task context, active Use case, selected project extensions, and locally applicable extensions.
-4. Check the manifest before changing dependencies.
-5. Match compliant local patterns.
-6. Plan documentation, code, tests, generated contracts, and operating impact as one unit.
+- Use Domain, Application, Infrastructure, and WebApi as the application projects. (ARCH.PROJECTS.001)
+- Keep Domain independent from persistence, web, mediator, logging, and dependency injection. (ARCH.DEPENDENCIES.001)
+- Model aggregate lifecycles with an abstract state and sealed state records. (DOMAIN.STATE.001)
+- Model Domain closed sets with records or typed value objects, never enums. (DOMAIN.CLOSEDSET.001)
+- Give each layer ownership of its messages, results, and transport models. (ARCH.CONTRACTS.001)
+- Give each rejected Domain rule its own exception type and stable failure code. (DOMAIN.ERROR.001)
+- Organize each layer by the same modules, aggregates, and use cases. (ARCH.MODULES.001)
+- Write commands through repositories and commit through the command pipeline. (APP.COMMAND.001, PERSIST.COMMIT.001)
+- Derive authenticated actors from verified claims and authorize target resources. (API.ACTOR.001, API.AUTHZ.001)
+- Use the controlled shadcn/ui baseline for React web frontends. (UI.GOVERNANCE.001, UI.SHADCN.001)
 
-Do not add a package, migration, authentication model change, public API break, or external side effect unless the request or an accepted decision authorizes it.
+Read the full cited provisions before applying these boundaries. (AGENT.LOAD.001)
 
-## Baseline boundaries
+## Repository Verification
 
-- Use `apps/api/{ProjectName}.slnx`, production projects under `apps/api/src/`, and tests under `apps/api/tests/`.
-- Use Domain, Application, Infrastructure, and WebApi as the four application projects.
-- Keep Domain free of persistence, web, mediator, logging, and dependency injection packages.
-- Give every Aggregate an abstract state base and at least one sealed state record; do not use lifecycle enums, status strings, or status flags.
-- Model every closed set of Domain values as a discriminated union of records or a typed value object; declare no `enum` in Domain.
-- Mirror a Domain closed set in each outer layer with a type of the same shape: an Application result union and a transport `oneOf` polymorphic model with a discriminator; reduce a set to an `enum` only when it is label-only or a decision narrows it. Do not collapse a data-bearing union to an `enum` or serialize a Domain type directly as the wire contract.
-- Own each layer's contract types: an Application message or result exposes no Domain aggregate, closed set, or result record, and a WebApi transport model reuses no Application or Domain type. Mirror the shape per layer; Shared-kernel typed IDs and value objects are the one sanctioned crossing, and the wire contract reduces even those to primitives.
-- Give each rejected Domain rule its own exception type that owns its stable failure code and message; do not pass code or message strings into a shared exception.
-- Place one primary top-level type per C# file; do not bundle types by kind in `*Enums.cs` or `*ValueObjects.cs` files.
-- Organize every layer by the same domain modules and use cases.
-- Name Application handlers, validators, results, and query result items with explicit `Command` or `Query` role suffixes.
-- Name HTTP transport DTOs with a concrete boundary role ending in `Model`, including `RequestModel` and `ResponseModel`; name operation mappings with `ApiMappings`.
-- Keep handlers, validators, endpoints, and persistence implementations internal sealed.
-- Write commands through aggregate repositories and read queries through `IQuerySession`.
-- Do not call `SaveChangesAsync` from handlers, repositories, endpoints, event reaction implementations, or workflow orchestrators.
-- Commit once through the LiteBus command post-handler.
-- Use Minimal API `IEndpoint`; MVC controllers are outside the profile.
-- Derive authenticated actor IDs from verified claims and authorize the target resource.
-- Keep frontend module internals isolated and route files focused on composition.
-- Use the manifest-pinned shadcn/ui with Tailwind CSS v4 baseline for React web UI, and load the
-  controlled UI governance convention before changing a frontend surface.
-- Validate backend options and frontend environment access through owned modules.
-- Cite every acceptance-criterion ID from verified Use cases in automated tests.
-- Regenerate OpenAPI and typed consumers with their sources.
+Run these checks for the standards repository. (WRITING.VALIDATION.001)
 
-Read the full task conventions before applying any boundary from this summary.
+```bash
+node tools/validate-standards.cases.mjs
+node tools/validate-standards.mjs
+node tools/validate-ui.cases.mjs
+git diff --check
+```
 
-## Repository verification
+The standards validator checks current schemas, manifest references, provision IDs, page contracts, links, prose, summaries, and evidence mappings. (WRITING.VALIDATION.001, WRITING.SNAPSHOT.001)
 
-For this standards repository:
+Run extension-specific checks when their rules, schemas, templates, or validators change. (RELEASE.GATES.001)
 
-- Validate the two tracked schema consumers.
-- Check manifest paths and `#agent-summary` anchors.
-- Check rule-ID uniqueness and extension references.
-- Check internal links, ASCII writing rules, Specification Metadata, code-document consistency, and stale terminology.
-- Confirm removed terminology, rule IDs, templates, and aliases have no current standards references.
-- Run `node tools/validate-ui.cases.mjs` after changing a UI rule, schema, template, or the UI validator.
-- Run `git diff --check`.
+## Consumer Verification
 
-The repository ships reference validators at `tools/validate-consumer.mjs` and `tools/validate-ui.mjs`,
-and reference passing and failing cases for the UI rules at `tools/validate-ui.cases.mjs`. The consumer validator validates Specification Metadata against the schema and
-runs cross-file checks for flow use-case references, module and use-case path alignment, acceptance and
-end-to-end ID uniqueness, domain-policy and workflow references, and local extension scope. The UI
-validator checks the opt-in React web configuration, vocabulary, page sidecars, source locks, and source
-boundaries without network access. The repository has no generated index or application scaffold. JSON
-schemas define machine-readable file shape; consumer CI may extend the reference checks.
-
-## Consumer verification
-
-Replace `{ProjectName}` with the consumer solution name:
+Replace `{ProjectName}` with the consumer solution name. (RELEASE.GATES.001)
 
 ```bash
 dotnet build apps/api/{ProjectName}.slnx --configuration Release
 dotnet test apps/api/{ProjectName}.slnx --configuration Release --no-build
 ```
 
-For every changed frontend:
+For each changed frontend, run its complete gate. (RELEASE.GATES.001)
 
 ```bash
 pnpm install --frozen-lockfile
@@ -143,19 +98,19 @@ pnpm test
 pnpm build
 ```
 
-Run the reference consumer validator from the consumer root:
+Run the reference validators from the consumer root. (RELEASE.GATES.001)
 
 ```bash
 node standards/tools/validate-consumer.mjs
 node standards/tools/validate-ui.mjs
 ```
 
-Run Playwright for affected browser end-to-end flows and extension-specific verification for every applicable extension affected by the change.
+Run Playwright for affected browser flows. Run every applicable extension check. (RELEASE.GATES.001)
 
 ## Completion
 
-- Run every applicable check.
-- Confirm the use-case specification matches observable behavior.
-- Inspect generated application differences.
-- Report exact commands, outcomes, and skipped checks.
-- Leave no placeholder implementation, `TODO`, or untracked generated output.
+Run every applicable check and compare observable behavior with the active use case. (AGENT.COMPLETE.001)
+
+Inspect generated differences and report exact commands, results, evidence scope, and skipped checks. (AGENT.COMPLETE.001, RELEASE.REPORT.001)
+
+Leave no placeholder implementation, `TODO`, or untracked generated output. (RELEASE.SLICE.001, RELEASE.DERIVED.001)

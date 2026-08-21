@@ -37,7 +37,7 @@ Describe multi-step behavior, URL state, focus, and navigation results.
 ## UI Contract
 
 Create `__PAGE__.ui.json` beside this document from `ui-page.json`. Use the frontend vocabulary to
-select the profile, shell, patterns, components, and states. The sidecar must define:
+select the profile, shell, patterns, components, and states. The sidecar defines:
 
 - ordered regions, content limits, overflow, compact and wide behavior;
 - initial scroll and active element for direct navigation;

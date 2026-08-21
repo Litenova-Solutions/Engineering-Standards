@@ -2,63 +2,142 @@
 
 ## Intent
 
-Multi-tenancy makes tenant identity part of authorization, persistence, caches, jobs, exports, diagnostics, and operating recovery. Adding a tenant ID column without those boundaries does not provide isolation.
+Multi-tenancy makes tenant identity part of authorization, persistence, caches, jobs, exports, diagnostics, and recovery. A tenant ID column alone does not provide isolation.
 
 ## Activation
 
-**Activation scope:** `project`. It applies to all project work whenever selected in `selectedExtensions`.
+Activation scope: `project`.
 
-Enable `multitenancy` only when independent customer organizations share one deployment and require isolated data or policy.
+Applicable specification kinds: None.
 
-Record the tenant resolution source, storage model, isolation guarantee, administrative access model, and migration path before implementation. This extension replaces no baseline rule.
+The consumer enables `multitenancy` only when independent customer organizations share one deployment and require isolated data or policy.
+
+## Baseline relationship
+
+The adoption decision records tenant source, storage model, isolation guarantee, administrative access model, and data evolution path. This extension replaces no baseline rule.
 
 ## Agent Summary {#agent-summary}
 
-- Resolve tenant identity from verified context.
-- Verify actor membership and target-resource tenant.
-- Apply tenant scope in every persistence and derived-data path.
-- Partition unique constraints, caches, outbox records, jobs, exports, and diagnostics.
-- Separate administrative cross-tenant operations and audit them.
-- Test negative cross-tenant behavior at every boundary.
+- Define tenancy storage and isolation guarantees. (EXT.TENANCY.ADOPT.001)
+- Resolve tenant identity from trusted context. (EXT.TENANCY.RESOLVE.001)
+- Match actor and resource tenants. (EXT.TENANCY.AUTHZ.001)
+- Scope every tenant-owned persistence boundary. (EXT.TENANCY.STORAGE.002)
+- Prevent cross-tenant disclosure in responses and diagnostics. (EXT.TENANCY.DISCLOSURE.001, EXT.TENANCY.DISCLOSURE.002)
+- Declare tenant scope for operational work. (EXT.TENANCY.OPERATIONS.001)
 
 ## Standards
 
-### Treat tenancy as a data boundary (EXT.TENANCY.ADOPT.001)
+### Define tenant isolation (EXT.TENANCY.ADOPT.001)
 
-Define whether isolation uses shared tables, database schemas, or databases. State the guarantee and operating trade-off. Do not mix models without a decision and migration plan.
+**Requirement:** A multi-tenant decision MUST define shared-table, schema, or database isolation and state its guarantee and operating trade-off.
 
-### Resolve tenant from trusted context (EXT.TENANCY.RESOLVE.001)
+**Rationale:** The selected storage model determines data isolation, operational complexity, and scaling behavior.
 
-Resolve the tenant from verified claims, host mapping, or another authenticated source. Do not accept an unrestricted tenant ID from request data.
+### Avoid unplanned isolation models (EXT.TENANCY.ADOPT.002)
 
-### Verify membership and resource tenant (EXT.TENANCY.AUTHZ.001)
+**Requirement:** A multi-tenant system MUST NOT mix isolation models without a decision and data evolution plan.
 
-Confirm the actor belongs to the resolved tenant and the target resource belongs to the same tenant. Administrative cross-tenant operations use a distinct policy, actor permission, and audit trail.
+**Rationale:** Mixed models create unclear guarantees and operational recovery behavior.
 
-### Apply tenant scope in persistence (EXT.TENANCY.STORAGE.001)
+### Resolve tenant identity from trusted context (EXT.TENANCY.RESOLVE.001)
 
-Use Marten tenancy support or the selected persistence extension's tested mechanism. Every tenant-owned document, query, unique constraint, cache key, outbox record, job, export, and object-storage path includes tenant scope.
+**Requirement:** A trusted host boundary MUST resolve tenant identity from verified claims, host mapping, or another authenticated source.
 
-### Prevent tenant disclosure (EXT.TENANCY.DISCLOSURE.001)
+**Rationale:** Trusted resolution prevents callers from selecting a tenant outside their authenticated context.
 
-Use the documented not-found or forbidden policy for cross-tenant resources. Errors, logs, metrics, and traces do not reveal another tenant's business identifiers or data.
+### Reject unrestricted tenant input (EXT.TENANCY.RESOLVE.002)
 
-### Keep operations tenant-aware (EXT.TENANCY.OPERATIONS.001)
+**Requirement:** A tenant resolver MUST NOT accept an unrestricted tenant ID from request data.
 
-Backup, restore, replay, deletion, export, support access, and incident investigation document whether they operate on one tenant or all tenants.
+**Rationale:** Client-controlled identity can select another tenant's data boundary.
+
+### Verify actor and target tenancy (EXT.TENANCY.AUTHZ.001)
+
+**Requirement:** A protected multi-tenant operation MUST confirm that the actor and target resource belong to the resolved tenant.
+
+**Rationale:** Both the caller and requested resource need the same authorized tenant scope.
+
+### Isolate administrative cross-tenant access (EXT.TENANCY.AUTHZ.002)
+
+**Requirement:** An administrative cross-tenant operation MUST use a distinct policy, actor permission, and audit trail.
+
+**Rationale:** Exceptional access needs stronger visibility than normal tenant-scoped behavior.
+
+### Use selected tenant storage support (EXT.TENANCY.STORAGE.001)
+
+**Requirement:** A multi-tenant persistence implementation MUST use Marten tenancy support or a tested selected-provider mechanism.
+
+**Rationale:** Provider-supported tenancy gives queries and storage a consistent isolation mechanism.
+
+### Scope tenant-owned records (EXT.TENANCY.STORAGE.002)
+
+**Requirement:** Every tenant-owned document, query, unique constraint, cache key, outbox record, job, export, and object-storage path MUST include tenant scope.
+
+**Rationale:** Omitting scope from one storage or background boundary can disclose or mix tenant data.
+
+### Apply cross-tenant disclosure policy (EXT.TENANCY.DISCLOSURE.001)
+
+**Requirement:** A cross-tenant resource response MUST use the documented not-found or forbidden policy.
+
+**Rationale:** The product chooses one disclosure outcome for unauthorized resource existence.
+
+### Protect tenant diagnostics (EXT.TENANCY.DISCLOSURE.002)
+
+**Requirement:** Errors, logs, metrics, and traces MUST NOT reveal another tenant's business identifiers or data.
+
+**Rationale:** Diagnostics can bypass an API response's normal resource-disclosure boundary.
+
+### Scope tenant operations (EXT.TENANCY.OPERATIONS.001)
+
+**Requirement:** Backup, restore, replay, deletion, export, support access, and incident investigation MUST document one-tenant or all-tenant scope.
+
+**Rationale:** Operating work can cause a broader data effect than one normal request.
 
 ## Conventions
 
-Represent tenant identity with a strongly typed `TenantId`. Use one current tenant accessor at the trusted host boundary. Pass tenant scope explicitly into Application messages or trusted ports rather than reading ambient request state inside Domain.
+### Use typed tenant identities (EXT.TENANCY.CONVENTION.001)
+
+**Default:** Represent tenant identity with a strongly typed `TenantId`.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** A typed identity prevents accidental confusion with actor, aggregate, or string identifiers.
+
+### Use one tenant accessor (EXT.TENANCY.CONVENTION.002)
+
+**Default:** Use one current-tenant accessor at the trusted host boundary.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** One accessor centralizes trusted tenant resolution.
+
+### Pass tenant scope explicitly (EXT.TENANCY.CONVENTION.003)
+
+**Default:** Pass tenant scope through Application messages or trusted ports rather than ambient Domain request state.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Explicit scope preserves Domain independence from host request state.
 
 ## Dependencies
 
-Marten tenancy support is part of the baseline persistence package. Another isolation provider requires a decision and manifest pin.
+Marten tenancy support is part of the baseline persistence package. Another isolation provider needs a decision and manifest pin.
 
 ## Verification
 
-- Attempt cross-tenant reads, writes, deletes, cache access, background dispatch, and exports.
-- Test unique constraints and idempotency keys across tenants.
-- Test administrative access and audit records.
-- Inspect diagnostics and errors for tenant data leakage.
-- Test tenant-aware backup, restore, deletion, and replay.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| EXT.TENANCY.ADOPT.001 | inspection | Tenant decision records model, isolation guarantee, and operating trade-off. |
+| EXT.TENANCY.ADOPT.002 | inspection | Any mixed isolation model records decision and data evolution plan. |
+| EXT.TENANCY.RESOLVE.001 | test | Authentication fixtures resolve tenant identity from each trusted source. |
+| EXT.TENANCY.RESOLVE.002 | test | Request tenant-ID tampering cannot select a tenant boundary. |
+| EXT.TENANCY.AUTHZ.001 | test | Cross-tenant actor and resource fixtures reject mismatched scope. |
+| EXT.TENANCY.AUTHZ.002 | test | Administrative cross-tenant fixtures require policy, permission, and audit evidence. |
+| EXT.TENANCY.STORAGE.001 | test | Persistence tests exercise selected provider tenancy behavior. |
+| EXT.TENANCY.STORAGE.002 | static, test | Storage and background fixtures include tenant scope at every listed boundary. |
+| EXT.TENANCY.DISCLOSURE.001 | test | Cross-tenant request fixtures return the documented not-found or forbidden response. |
+| EXT.TENANCY.DISCLOSURE.002 | test | Diagnostic fixtures exclude foreign tenant identifiers and data. |
+| EXT.TENANCY.OPERATIONS.001 | inspection | Operating procedures declare one-tenant or all-tenant scope. |
+| EXT.TENANCY.CONVENTION.001 | static | Tenant references use `TenantId` or a documented local replacement. |
+| EXT.TENANCY.CONVENTION.002 | inspection | Host code has one trusted current-tenant accessor. |
+| EXT.TENANCY.CONVENTION.003 | static | Domain code reads no ambient tenant request state. |

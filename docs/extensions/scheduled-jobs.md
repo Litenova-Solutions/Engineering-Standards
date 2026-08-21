@@ -2,73 +2,229 @@
 
 ## Intent
 
-Scheduled work runs independently of HTTP requests and must remain safe when replicas restart, overlap, or lose connectivity. This extension covers recurring and delayed jobs, not durable event dispatch, which remains in `outbox-worker`.
+Scheduled work runs independently of HTTP requests and remains safe when replicas restart, overlap, or lose connectivity. This extension covers recurring and delayed jobs, not durable event dispatch.
 
 ## Activation
 
-**Activation scope:** `local`. Applicable specification kinds: Use case, Workflow. List it in `applicableExtensions` only on those kinds.
+Activation scope: `local`.
 
-Enable `scheduled-jobs` when a use case requires recurring, delayed, or calendar-based work. Add the Worker project permitted by `ARCH.WORKER.001`.
+Applicable specification kinds: `use-case`, `workflow`.
+
+The consumer enables `scheduled-jobs` for recurring, delayed, or calendar-based work. It adds the Worker project permitted by `ARCH.WORKER.001`.
+
+## Baseline relationship
 
 This extension replaces no baseline rule.
 
 ## Agent Summary {#agent-summary}
 
-- Define schedule owner, time zone, misfire policy, and completion target.
-- Stop jobs on cancellation and graceful shutdown.
-- Lease work through PostgreSQL so replicas do not overlap one execution.
-- Dispatch Application commands instead of mutating persistence directly.
-- Make executions idempotent and bound retries.
-- Record missed, running, failed, and completed schedule state.
+- Record timing, overlap, retry, and owner behavior. (EXT.JOBS.ADOPT.001)
+- Run jobs in Worker with bounded execution. (EXT.JOBS.WORKER.001, EXT.JOBS.WORKER.002)
+- Lease an occurrence across replicas. (EXT.JOBS.LEASE.001)
+- Dispatch Application commands without direct storage mutation. (EXT.JOBS.COMMAND.001, EXT.JOBS.COMMAND.002)
+- Bound retry and support duplicate execution. (EXT.JOBS.RETRY.001, EXT.JOBS.RETRY.002)
+- Define missed-occurrence and manual-replay behavior. (EXT.JOBS.RECOVERY.001, EXT.JOBS.RECOVERY.002)
+- Use schedule-derived occurrence identities. (EXT.JOBS.OCCURRENCE.001)
 
 ## Standards
 
-### Record the schedule contract (EXT.JOBS.ADOPT.001)
+### Record schedule behavior (EXT.JOBS.ADOPT.001)
 
-The use case or decision MUST name the schedule, time zone, allowed delay, overlap behavior, misfire policy, idempotency key, retry horizon, and operating owner.
+**Requirement:** A scheduled-job use case or decision MUST name schedule, time zone, delay, overlap, misfire, idempotency, retry, and operating owner.
+
+**Rationale:** The contract describes when work may run and how it recovers from normal scheduling faults.
 
 ### Run jobs in Worker (EXT.JOBS.WORKER.001)
 
-Scheduled jobs MUST run in the Worker process, not inside WebApi request handling. Each execution observes cancellation, has a bounded duration, and stops accepting new work during graceful shutdown.
+**Requirement:** A scheduled job MUST run in Worker outside WebApi request handling.
 
-### Lease executions across replicas (EXT.JOBS.LEASE.001)
+**Rationale:** Worker execution permits independent scheduling and controlled replica shutdown.
 
-Store a lease or claim in PostgreSQL with an owner, expiry, and fencing value. A replica MUST renew only its own active lease and MUST stop when renewal fails. The lease prevents two replicas from treating one schedule occurrence as successful.
+### Bound job execution (EXT.JOBS.WORKER.002)
 
-### Dispatch commands through Application (EXT.JOBS.COMMAND.001)
+**Requirement:** A scheduled job MUST observe cancellation, have bounded duration, and stop accepting new work during graceful shutdown.
 
-A job dispatches an Application command or an approved Application port. It MUST NOT mutate a Marten session or DbContext directly, bypass Domain behavior, or call WebApi endpoints.
+**Rationale:** Bounded work lets a Worker stop without abandoning uncontrolled execution.
 
-### Bound retries and require idempotency (EXT.JOBS.RETRY.001)
+### Store execution leases (EXT.JOBS.LEASE.001)
 
-Executions MUST use bounded attempts, cancellation-aware backoff, and a poison state for permanent failure. The command and side effects MUST tolerate duplicate execution after a lease or process failure. Treat an unavailable scheduler store or dependency as a transient outage with backed-off, rate-limited logging rather than a per-iteration exception storm, as in `EXT.OUTBOX.READINESS.001`.
+**Requirement:** A scheduled-job store MUST record lease owner, expiry, and fencing value in PostgreSQL.
 
-### Recover missed occurrences (EXT.JOBS.RECOVERY.001)
+**Rationale:** The lease identifies the replica that can complete one planned occurrence.
 
-Persist the last scheduled, started, and completed occurrence. Define whether a missed occurrence is skipped, replayed once, or replayed for every interval. Provide inspection, manual replay, and disable procedures.
+### Renew only owned leases (EXT.JOBS.LEASE.002)
 
-### Identify each occurrence (EXT.JOBS.OCCURRENCE.001)
+**Requirement:** A Worker replica MUST renew only its active lease and stop when renewal fails.
 
-Give each planned occurrence a stable identity derived from the schedule ID and scheduled instant. Persist `scheduled`, `processing`, `completed`, and `dead_letter` state with attempt, lease, start, completion, and safe error data. Use the occurrence identity as the command idempotency scope.
+**Rationale:** Losing the lease ends authority to complete the scheduled occurrence.
 
-A worker may mark completion only while its fencing value remains current. Manual replay creates an audited new attempt for the same occurrence identity rather than inventing a second scheduled instant.
+### Prevent duplicate completion (EXT.JOBS.LEASE.003)
 
-### Make time behavior deterministic (EXT.JOBS.TIME.001)
+**Requirement:** A scheduled-job lease MUST prevent two replicas from completing the same occurrence.
 
-Prefer UTC schedules. A business-local schedule records an IANA time-zone identifier and defines behavior for skipped and repeated local times during clock changes. Tests use an injected clock and representative time-zone transitions; production code does not depend on machine-local time.
+**Rationale:** One occurrence needs one logical completion even when replicas overlap.
+
+### Dispatch Application behavior (EXT.JOBS.COMMAND.001)
+
+**Requirement:** A scheduled job MUST dispatch an Application Command or approved Application port.
+
+**Rationale:** Application owns the use-case boundary that the schedule triggers.
+
+### Exclude direct storage and HTTP execution (EXT.JOBS.COMMAND.002)
+
+**Requirement:** A scheduled job MUST NOT mutate a Marten session or DbContext directly, bypass Domain behavior, or call WebApi endpoints.
+
+**Rationale:** Direct storage and HTTP calls bypass the command boundary and its authorization, transaction, and validation behavior.
+
+### Bound job retries (EXT.JOBS.RETRY.001)
+
+**Requirement:** A scheduled job MUST use bounded attempts, cancellation-aware backoff, and a poison state for permanent failure.
+
+**Rationale:** Bounded retries prevent one failed occurrence from consuming Worker capacity indefinitely.
+
+### Tolerate duplicate execution (EXT.JOBS.RETRY.002)
+
+**Requirement:** A scheduled job Command and side effect MUST tolerate duplicate execution after lease or process failure.
+
+**Rationale:** A failed process can leave uncertain completion before its lease expires.
+
+### Treat unavailable schedule stores as outages (EXT.JOBS.RETRY.003)
+
+**Requirement:** A Worker MUST treat an unavailable scheduler store as a transient dependency outage with backed-off, rate-limited logging.
+
+**Rationale:** The implementation stores availability differs from a claimed occurrence's retry or poison outcome.
+
+### Persist occurrence recovery points (EXT.JOBS.RECOVERY.001)
+
+**Requirement:** A scheduled-job store MUST persist each occurrence's last scheduled, started, and completed time.
+
+**Rationale:** Persisted points identify missed work and completed work after restart.
+
+### Define misfire recovery (EXT.JOBS.RECOVERY.002)
+
+**Requirement:** A scheduled-job specification MUST define skipped, once-replayed, or interval-replayed behavior for missed occurrences.
+
+**Rationale:** The selected policy controls the business effect of downtime and delay.
+
+### Provide operational recovery procedures (EXT.JOBS.RECOVERY.003)
+
+**Requirement:** A scheduled-job owner MUST provide inspection, manual replay, and disable procedures.
+
+**Rationale:** Operators need controlled actions for stalled, failed, or unsafe schedules.
+
+### Derive stable occurrence identity (EXT.JOBS.OCCURRENCE.001)
+
+**Requirement:** A scheduled-job store MUST derive each occurrence identity from its schedule ID and scheduled instant.
+
+**Rationale:** One planned time receives one stable identity across retries and Worker replicas.
+
+### Persist occurrence state (EXT.JOBS.OCCURRENCE.002)
+
+**Requirement:** A scheduled-job store MUST persist scheduled, processing, completed, and dead-letter state with safe execution details.
+
+**Rationale:** State records include attempt, lease, start, completion, and safe error data.
+
+### Scope command idempotency by occurrence (EXT.JOBS.OCCURRENCE.003)
+
+**Requirement:** A scheduled job MUST use its occurrence identity as the command idempotency scope.
+
+**Rationale:** Retries of one occurrence remain tied to the same scheduled business action.
+
+### Restrict completion by fencing value (EXT.JOBS.OCCURRENCE.004)
+
+**Requirement:** A Worker MUST mark completion only while its fencing value remains current.
+
+**Rationale:** A stale worker does not complete work after another replica owns the occurrence.
+
+### Audit manual replay (EXT.JOBS.OCCURRENCE.005)
+
+**Requirement:** A manual replay MUST create an audited new attempt for the same occurrence identity.
+
+**Rationale:** Replay preserves the original scheduled instant and its history.
+
+### Prefer UTC schedules (EXT.JOBS.TIME.001)
+
+**Requirement:** A scheduled job SHOULD use a UTC schedule.
+
+**Deviation:** A documented business-local time requirement permits an IANA time-zone schedule.
+
+**Rationale:** UTC avoids local clock ambiguity for most recurring work.
+
+### Define business-local clock behavior (EXT.JOBS.TIME.002)
+
+**Requirement:** A business-local schedule MUST record an IANA time-zone identifier and define skipped and repeated local-time behavior.
+
+**Rationale:** Clock transitions can omit or repeat a local wall-clock time.
+
+### Test time transitions (EXT.JOBS.TIME.003)
+
+**Requirement:** A scheduled-job test MUST use an injected clock and representative time-zone transitions.
+
+**Rationale:** A controllable clock exercises delayed and daylight-saving behavior deterministically.
+
+### Exclude machine-local time (EXT.JOBS.TIME.004)
+
+**Requirement:** Scheduled-job production code MUST NOT depend on machine-local time.
+
+**Rationale:** Host-local configuration makes schedule behavior differ between environments.
 
 ## Conventions
 
-Create one handler per job under the module that owns the behavior. Resolve scoped dependencies inside an execution scope and dispose the scope after the command completes. Keep schedule definitions separate from command behavior.
+### Place handlers with owned behavior (EXT.JOBS.CONVENTION.001)
+
+**Default:** Create one job handler under the module that owns its behavior.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** The module owns the business action and its schedule meaning.
+
+### Use execution scopes (EXT.JOBS.CONVENTION.002)
+
+**Default:** Resolve scoped dependencies inside an execution scope and dispose the scope after the Command completes.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** One scope isolates a job occurrence's dependencies and disposal.
+
+### Separate schedule definitions (EXT.JOBS.CONVENTION.003)
+
+**Default:** Keep schedule definitions separate from Command behavior.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Timing policy and business behavior change for different reasons.
 
 ## Dependencies
 
-No additional baseline package is required. Use Marten or the selected persistence extension for schedule state and PostgreSQL for leases.
+No additional baseline package is required. Schedule state uses selected persistence and PostgreSQL leases.
 
 ## Verification
 
-- Run two Worker replicas and verify one lease owner per occurrence.
-- Test cancellation, shutdown, lease expiry, renewal failure, and restart.
-- Test duplicate execution, retry exhaustion, poison handling, and manual replay.
-- Verify schedule state, metrics, alerts, and time-zone behavior.
-- Verify fencing prevents a stale execution from recording completion.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| EXT.JOBS.ADOPT.001 | inspection | Job documentation records each required schedule and operating field. |
+| EXT.JOBS.WORKER.001 | test | Scheduled job integration tests run through Worker rather than WebApi. |
+| EXT.JOBS.WORKER.002 | test | Shutdown tests stop new job work and honor cancellation and duration bounds. |
+| EXT.JOBS.LEASE.001 | test | PostgreSQL fixtures store owner, expiry, and fencing value. |
+| EXT.JOBS.LEASE.002 | test | Lease renewal tests stop the worker after ownership loss. |
+| EXT.JOBS.LEASE.003 | test | Replica race tests produce one completed occurrence. |
+| EXT.JOBS.COMMAND.001 | static | Job source dispatches an Application Command or approved port. |
+| EXT.JOBS.COMMAND.002 | static | Job source contains no direct session, DbContext, Domain bypass, or WebApi call. |
+| EXT.JOBS.RETRY.001 | test | Failure fixtures exercise attempt bounds, backoff, cancellation, and poison state. |
+| EXT.JOBS.RETRY.002 | test | Duplicate execution fixtures leave correct command and side-effect outcomes. |
+| EXT.JOBS.RETRY.003 | test | Scheduler-store outage fixtures use backed-off, rate-limited logging. |
+| EXT.JOBS.RECOVERY.001 | test | Restart fixtures retain scheduled, started, and completed occurrence times. |
+| EXT.JOBS.RECOVERY.002 | test | Misfire fixtures follow the documented skip or replay policy. |
+| EXT.JOBS.RECOVERY.003 | operation | Runbooks provide inspection, manual replay, and disable procedures. |
+| EXT.JOBS.OCCURRENCE.001 | test | Occurrence fixtures derive stable IDs from schedule ID and instant. |
+| EXT.JOBS.OCCURRENCE.002 | test | Store fixtures persist all declared occurrence lifecycle states. |
+| EXT.JOBS.OCCURRENCE.003 | test | Duplicate occurrence commands use one idempotency scope. |
+| EXT.JOBS.OCCURRENCE.004 | test | Stale fencing fixtures cannot mark an occurrence complete. |
+| EXT.JOBS.OCCURRENCE.005 | test | Manual replay records a new audited attempt under the same identity. |
+| EXT.JOBS.TIME.001 | inspection | Schedule review records UTC or a documented business-local deviation. |
+| EXT.JOBS.TIME.002 | test | Local-time fixtures cover the named IANA zone's skipped and repeated times. |
+| EXT.JOBS.TIME.003 | test | Schedule tests inject time and execute representative clock transitions. |
+| EXT.JOBS.TIME.004 | static | Job source reads no machine-local clock. |
+| EXT.JOBS.CONVENTION.001 | inspection | Job handler location follows module ownership or records replacement. |
+| EXT.JOBS.CONVENTION.002 | test | Job execution tests create and dispose a scope per Command. |
+| EXT.JOBS.CONVENTION.003 | inspection | Schedule definition source remains separate from Command behavior. |

@@ -2,54 +2,114 @@
 
 ## Intent
 
-Realtime transport reduces visible update delay when polling cannot meet an accepted user requirement. Messages remain hints to refresh authoritative server data unless the use case explicitly defines durable ordered delivery.
+Realtime transport reduces visible update delay when polling cannot meet an accepted user requirement. Messages remain refresh hints unless a use case defines durable ordered delivery.
 
 ## Activation
 
-**Activation scope:** `local`. Applicable specification kinds: Use case, End-to-End Flow. List it in `applicableExtensions` only on those kinds.
+Activation scope: `local`.
 
-Enable `realtime` after measuring the polling interval, user-visible delay, request cost, and required update target. Name acceptable disconnect and missed-message recovery.
+Applicable specification kinds: `use-case`, `end-to-end-flow`.
 
-This extension replaces no baseline rule. SignalR browser clients add the pinned `@microsoft/signalr` package; server-sent events use platform capabilities.
+The consumer enables `realtime` after measuring polling interval, visible delay, request cost, and required update target. It names acceptable disconnect and missed-message recovery.
+
+## Baseline relationship
+
+This extension replaces no baseline rule. SignalR browser clients add pinned `@microsoft/signalr`; server-sent events use platform capabilities.
 
 ## Agent Summary {#agent-summary}
 
-- Record the update latency target and polling limit.
-- Choose server-sent events for one-way updates and SignalR for bidirectional or grouped interaction.
-- Authenticate connections and authorize each subscription target.
-- Treat messages as refresh hints unless durable ordering is specified.
-- Reconnect with bounded backoff and refresh after a gap.
-- Test connection, authorization, duplicate, stale, reconnect, and missed-message behavior.
+- Record polling cost and recovery behavior. (EXT.REALTIME.ADOPT.001)
+- Select server-sent events or SignalR by need. (EXT.REALTIME.TRANSPORT.001, EXT.REALTIME.TRANSPORT.002)
+- Authenticate connections and authorize scoped subscriptions. (EXT.REALTIME.AUTH.001)
+- Refresh authoritative state after disconnect. (EXT.REALTIME.RECOVERY.001)
+- Bound connection and message resources. (EXT.REALTIME.CAPACITY.001)
+- Keep transport code at outer boundaries. (EXT.REALTIME.CONVENTION.001)
 
 ## Standards
 
-### Record latency and polling limits (EXT.REALTIME.ADOPT.001)
+### Record realtime need (EXT.REALTIME.ADOPT.001)
 
-Document current polling behavior, measured cost, required update latency, expected connection count, and recovery behavior. Do not activate realtime only to make an interface feel immediate.
+**Requirement:** A realtime use case MUST document polling behavior, measured cost, update latency, expected connections, and recovery behavior.
 
-### Select transport by interaction (EXT.REALTIME.TRANSPORT.001)
+**Rationale:** The record compares realtime cost with an accepted user-visible update target.
 
-Use server-sent events for one-way server notifications. Use SignalR when clients require bidirectional messages, server groups, or transport fallback.
+### Reject cosmetic realtime adoption (EXT.REALTIME.ADOPT.002)
 
-Record the choice and expected hosted-platform support.
+**Requirement:** A product MUST NOT activate realtime only to make an interface feel immediate.
 
-### Authorize subscriptions (EXT.REALTIME.AUTH.001)
+**Rationale:** Realtime transport needs a measurable update requirement beyond visual preference.
 
-Authenticate each connection and authorize every user-, tenant-, or resource-scoped subscription. A valid connection cannot subscribe to arbitrary resource IDs.
+### Use server-sent events for notifications (EXT.REALTIME.TRANSPORT.001)
 
-Revalidate long-lived access according to token and session lifetime.
+**Requirement:** A one-way server notification use case MUST use server-sent events.
 
-### Recover after disconnect (EXT.REALTIME.RECOVERY.001)
+**Rationale:** Server-sent events provide an HTTP-based direction from server to browser.
 
-Clients reconnect with bounded backoff and refresh authoritative state after a connection gap. Handle duplicate and out-of-order notifications safely.
+### Use SignalR for interactive messaging (EXT.REALTIME.TRANSPORT.002)
 
-### Bound connection resources (EXT.REALTIME.CAPACITY.001)
+**Requirement:** A use case requiring bidirectional messages, server groups, or transport fallback MUST use SignalR.
 
-Set connection, message, group, payload, and backpressure limits. Do not buffer an unbounded stream for a slow client.
+**Rationale:** SignalR supplies the interaction and fallback capabilities that one-way events lack.
+
+### Record transport support (EXT.REALTIME.TRANSPORT.003)
+
+**Requirement:** A realtime use case MUST record its transport choice and expected hosted-platform support.
+
+**Rationale:** Hosted-platform connection behavior can constrain the selected transport.
+
+### Authenticate and authorize subscriptions (EXT.REALTIME.AUTH.001)
+
+**Requirement:** A realtime server MUST authenticate each connection and authorize every user-, tenant-, or resource-scoped subscription.
+
+**Rationale:** A valid connection does not grant access to arbitrary user, tenant, or resource data.
+
+### Revalidate long-lived access (EXT.REALTIME.AUTH.002)
+
+**Requirement:** A realtime server MUST revalidate long-lived access according to token and session lifetime.
+
+**Rationale:** Connection authorization can become stale after a token, role, or session change.
+
+### Reconnect and refresh authoritative state (EXT.REALTIME.RECOVERY.001)
+
+**Requirement:** A realtime client MUST reconnect with bounded backoff and refresh authoritative state after a connection gap.
+
+**Rationale:** A refresh restores server truth after disconnect or missed notifications.
+
+### Tolerate notification ordering differences (EXT.REALTIME.RECOVERY.002)
+
+**Requirement:** A realtime client MUST safely handle duplicate and out-of-order notifications.
+
+**Rationale:** Transport delivery does not guarantee one ordered notification for each observed change.
+
+### Bound realtime resources (EXT.REALTIME.CAPACITY.001)
+
+**Requirement:** A realtime deployment MUST set connection, message, group, payload, and backpressure limits.
+
+**Rationale:** Explicit limits protect server memory, CPU, and connection capacity.
+
+### Reject unbounded slow-client buffering (EXT.REALTIME.CAPACITY.002)
+
+**Requirement:** A realtime server MUST NOT buffer an unbounded stream for a slow client.
+
+**Rationale:** Slow-client buffers can exhaust resources and delay other subscribers.
 
 ## Conventions
 
-Keep transport hubs or endpoints in WebApi, publication adapters in Infrastructure, and browser connection code in one frontend `lib/realtime/` boundary. Feature modules subscribe through narrow operation-specific functions.
+### Place realtime code at outer boundaries (EXT.REALTIME.CONVENTION.001)
+
+**Default:** Keep hubs or endpoints in WebApi, publication adapters in Infrastructure, and browser connections under `lib/realtime/`.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Transport and provider details remain outside business feature ownership.
+
+### Subscribe through narrow functions (EXT.REALTIME.CONVENTION.002)
+
+**Default:** Let feature modules subscribe through narrow operation-specific functions.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Operation-level functions keep subscription inputs and effects visible to the owning feature.
 
 ## Dependencies
 
@@ -57,7 +117,18 @@ Keep transport hubs or endpoints in WebApi, publication adapters in Infrastructu
 
 ## Verification
 
-- Test connection, unauthenticated access, forbidden subscription, reconnect, duplicate, stale, and missed-message refresh.
-- Test token expiry and access revocation on a long-lived connection.
-- Test slow clients, payload limits, and connection shutdown.
-- Measure update latency and connection resource use against activation targets.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| EXT.REALTIME.ADOPT.001 | inspection | Use-case documentation records polling, cost, target latency, connections, and recovery. |
+| EXT.REALTIME.ADOPT.002 | inspection | Realtime decision cites a measurable update requirement. |
+| EXT.REALTIME.TRANSPORT.001 | test | One-way notification tests use the server-sent events boundary. |
+| EXT.REALTIME.TRANSPORT.002 | test | Interactive transport tests use SignalR capabilities. |
+| EXT.REALTIME.TRANSPORT.003 | inspection | Realtime specification records chosen transport and hosting support. |
+| EXT.REALTIME.AUTH.001 | test | Subscription tests cover anonymous, unrelated, owner, and tenant-scoped connections. |
+| EXT.REALTIME.AUTH.002 | test | Long-lived connection tests revalidate expired session or token access. |
+| EXT.REALTIME.RECOVERY.001 | test | Disconnect tests use bounded reconnect and authoritative refresh. |
+| EXT.REALTIME.RECOVERY.002 | test | Duplicate and reordered notifications leave the client state correct. |
+| EXT.REALTIME.CAPACITY.001 | operation | Deployment configuration declares every required connection and message limit. |
+| EXT.REALTIME.CAPACITY.002 | test | Slow-client tests show bounded buffering and controlled backpressure behavior. |
+| EXT.REALTIME.CONVENTION.001 | inspection | Source review locates realtime transport code at the documented boundaries. |
+| EXT.REALTIME.CONVENTION.002 | inspection | Feature review identifies operation-specific subscription functions. |

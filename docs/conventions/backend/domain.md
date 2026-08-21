@@ -2,54 +2,61 @@
 
 ## Intent
 
+
 Domain contains the business model and protects aggregate invariants without persistence, HTTP, mediator, dependency injection, or provider concepts. Its types use the language from the product glossary, module specifications, and use-case specifications.
 
-The profile gives every Aggregate an explicit state record hierarchy from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home and avoids replacing an enum, status string, or flag-based lifecycle model as the application grows.
+The profile gives every Aggregate an explicit state record hierarchy from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home. It avoids later replacement of an enum, status string, or flag-based lifecycle.
 
 ## Agent Summary {#agent-summary}
 
-- Organize Domain by module and use the documented domain language.
-- Give each aggregate its own folder when a module holds more than one, and group each closed set's base and cases in a folder named for the concept.
-- Name every aggregate-owned type with the aggregate root's full name first: events, state cases, union bases and cases, aggregate value objects, child entities, and exceptions. Leave only Shared kernel types unprefixed.
-- Model each transactional consistency boundary as an aggregate.
-- Derive every aggregate root from the project-owned `AggregateRoot<TId>` base.
-- Give every Aggregate a sealed state record hierarchy. Do not use lifecycle enums, status strings, or boolean status flags.
-- Model every closed set of domain values with a discriminated union of records or a typed value object. Declare no `enum` anywhere in Domain.
-- Create aggregates through named factories and mutate them through business methods.
-- Use immutable value objects and typed IDs backed by `Guid.CreateVersion7()`.
-- Keep repository interfaces in Domain and implementations in Infrastructure.
-- Raise package-free `IDomainEvent` records named `{Aggregate}{PastFact}Event` in past tense.
-- Keep domain services stateless and use them only for business rules with no natural aggregate owner.
-- Reject each violated business rule with its own specific Domain exception that owns its stable failure code and message; do not pass code or message strings into a shared exception.
-- Document every public Domain type and member with XML comments that state its business constraint, result, or failure.
+
+- Keep Domain free of outer-layer concerns. (DOMAIN.PURITY.001)
+- Use one ubiquitous language. (DOMAIN.LANGUAGE.001)
+- Treat aggregates as consistency boundaries. (DOMAIN.AGGREGATE.001)
+- Use the project aggregate root contract. (DOMAIN.BASE.001)
+- Model every Aggregate lifecycle with state records. (DOMAIN.STATE.001)
+- Model every closed set of domain values without enums. (DOMAIN.CLOSEDSET.001)
+- Create valid aggregates through named factories. (DOMAIN.FACTORY.001)
+- Express transitions through business methods. (DOMAIN.BEHAVIOR.001)
+- Keep child entities inside the aggregate boundary. (DOMAIN.ENTITY.001)
+- Use strongly typed version 7 identifiers. (DOMAIN.ID.001)
 
 ## Standards
 
+
 ### Keep Domain free of outer-layer concerns (DOMAIN.PURITY.001)
 
-Domain references only the .NET base class library and project-owned Domain types. It references no persistence, web, mediator, logging, configuration, dependency injection, serialization, or provider package.
+**Requirement:** Domain models MUST keep Domain free of outer-layer concerns.
 
-Do not add ORM attributes, JSON attributes, HTTP models, Application messages, or service-registration code to Domain. For example, `PostState` has no `JsonDerivedType` attribute; Infrastructure registers its persisted discriminator.
+**Rationale:** Domain references only the .NET base class library and project-owned Domain types. It references no persistence, web, mediator, logging, configuration, dependency injection, serialization, or provider package.
+
+The implementation does not add ORM attributes, JSON attributes, HTTP models, Application messages, or service-registration code to Domain. For example, `PostState` has no `JsonDerivedType` attribute; Infrastructure registers its persisted discriminator.
 
 ### Use one ubiquitous language (DOMAIN.LANGUAGE.001)
 
-Type, property, method, exception, and event names match the terms in `docs/domain/glossary.md`, the module specification, and the approved use-case specification.
+**Requirement:** Domain models MUST use one ubiquitous language.
 
-If the business action is "publish a post," name the method `Publish`. Do not use `SetStatus`, `UpdateEntity`, or another technical synonym. Record rejected synonyms in the module specification when agents or contributors could plausibly reintroduce them.
+**Rationale:** Type, property, method, exception, and event names match the terms in `docs/domain/glossary.md`, the module specification. The approved use-case specification.
+
+If the business action is "publish a post," name the method `Publish`. The implementation does not use `SetStatus`, `UpdateEntity`, or another technical synonym. The implementation records rejected synonyms in the module specification when agents or contributors could plausibly reintroduce them.
 
 ### Treat aggregates as consistency boundaries (DOMAIN.AGGREGATE.001)
 
-An aggregate protects every invariant that must hold in one command transaction. The aggregate root is the only public mutation entry point. External code does not set properties, mutate collections, or call mutation methods on child entities.
+**Requirement:** Domain models MUST treat aggregates as consistency boundaries.
 
-A command normally changes one aggregate. A use-case specification or decision must name the invariant and transaction behavior before one command changes multiple aggregates.
+**Rationale:** An aggregate protects every invariant holding in one command transaction. The aggregate root is the only public mutation entry point. External code does not set properties, mutate collections, or call mutation methods on child entities.
 
-Do not place an entity inside an aggregate only to make navigation convenient. For example, an `Order` may own its bounded `OrderLine` collection, but it references a `Customer` aggregate by `CustomerId`.
+A command normally changes one aggregate. A use-case specification or decision names the invariant and transaction behavior before one command changes multiple aggregates.
+
+The implementation does not place an entity inside an aggregate only to make navigation convenient. For example, an `Order` may own its bounded `OrderLine` collection. It references a `Customer` aggregate by `CustomerId`.
 
 ### Use the project aggregate root contract (DOMAIN.BASE.001)
 
-Every aggregate root derives from the project-owned `AggregateRoot<TId>` type and implements its identity and domain-event mechanics through that base. Do not duplicate event lists in concrete aggregates or add a second aggregate base.
+**Requirement:** Domain models MUST use the project aggregate root contract.
 
-A module may contain no aggregate, one aggregate, or multiple related aggregates. Module organizes documentation and code across layers. Aggregate root defines one Domain consistency and mutation boundary. Do not create `IModule`, `ModuleRoot<TId>`, or another runtime module contract.
+**Rationale:** Every aggregate root derives from the project-owned `AggregateRoot<TId>` type and implements its identity and domain-event mechanics through that base. The implementation does not duplicate event lists in concrete aggregates or add a second aggregate base.
+
+A module may contain no aggregate, one aggregate, or multiple related aggregates. Module organizes documentation and code across layers. Aggregate root defines one Domain consistency and mutation boundary. The implementation does not create `IModule`, `ModuleRoot<TId>`, or another runtime module contract.
 
 The base owns only:
 
@@ -62,9 +69,11 @@ The base does not own timestamps, auditing, tenant identity, lifecycle transitio
 
 ### Model every Aggregate lifecycle with state records (DOMAIN.STATE.001)
 
-Every Aggregate defines an abstract `{Aggregate}State` record and one or more sealed state records. The Aggregate exposes one `State` property whose runtime type represents its complete lifecycle state.
+**Requirement:** Domain models MUST model every Aggregate lifecycle with state records.
 
-Do not model Aggregate lifecycle with:
+**Rationale:** Every Aggregate defines an abstract `{Aggregate}State` record and one or more sealed state records. The Aggregate exposes one `State` property whose runtime type represents its complete lifecycle state.
+
+The implementation does not model Aggregate lifecycle with:
 
 - An enum such as `PostStatus`.
 - A string discriminator such as `StateType`.
@@ -72,9 +81,11 @@ Do not model Aggregate lifecycle with:
 - Parallel nullable lifecycle fields such as `PublishedAt` and `ArchivedAt` on the Aggregate.
 - A computed state inferred from timestamps or flags.
 
-State-specific data belongs on the corresponding state record. State records are immutable data. Aggregate methods own transition rules and replace the current state; state records do not receive injected services or own transition methods.
+State-specific data belongs on the corresponding state record. State records are immutable data. Aggregate methods own transition rules and replace the current state. State records do not receive injected services or own transition methods.
 
 State case names lead with the aggregate root per `NAME.AGGREGATE.001`: the case is `PostDraftState`, not `DraftPostState`.
+
+**Example:**
 
 ```csharp
 public abstract record PostState;
@@ -95,11 +106,19 @@ public sealed record ProfileActiveState : ProfileState;
 
 ### Model every closed set of domain values without enums (DOMAIN.CLOSEDSET.001)
 
-Domain declares no `enum`. `DOMAIN.STATE.001` already removes the enum from Aggregate lifecycle; this rule extends the same reasoning to every other closed set of domain values: an incident status, a refund outcome, a per-line status, a permission role, a category, or a severity.
+**Requirement:** Domain models MUST model every closed set of domain values without enums.
 
-A C# `enum` is a named integer. It carries no data, admits no exhaustiveness guarantee, silently accepts undefined values through a cast, and forces every new case that needs its own data into a parallel field elsewhere. When the set later grows a case that owns data, or a rule that applies to only some cases, the enum must be removed and every persisted value migrated. Modeling the set as a closed type hierarchy from the first case avoids that migration and lets the compiler and `switch` expression check exhaustiveness.
+**Rationale:** Domain declares no `enum`. `DOMAIN.STATE.001` already removes enums from Aggregate lifecycles. This rule applies the same reasoning to every closed set of Domain values. Examples include incident statuses, refund outcomes, line statuses, permission roles, categories, and severities.
 
-Model a closed set as a discriminated union: one abstract record base named for the aggregate and concept, and one sealed record per case. Base and cases lead with the aggregate root per `NAME.AGGREGATE.001`, and each case ends with the concept: the base is `RefundOutcome` and a case is `RefundSucceededOutcome`. This is the same shape as a state hierarchy, applied to a value that is not an Aggregate lifecycle.
+A C# `enum` is a named integer. It carries no case data or exhaustiveness guarantee. A cast can admit undefined values. New case-specific data requires parallel fields.
+
+Later case data or case-specific rules force enum removal and stored-value transformation. A closed type hierarchy avoids that change. It also lets the compiler and `switch` expressions check exhaustiveness.
+
+A discriminated union models a closed set. The implementation uses one abstract record base named for the aggregate and concept. The implementation uses one sealed record per case. Base and cases lead with the aggregate root (`NAME.AGGREGATE.001`).
+
+Each case ends with its concept. For example, `RefundOutcome` has a `RefundSucceededOutcome` case. This shape matches a state hierarchy but represents a value outside the Aggregate lifecycle.
+
+**Example:**
 
 ```csharp
 public abstract record RefundOutcome;
@@ -113,7 +132,7 @@ public sealed record RefundFailedOutcome(string Classification) : RefundOutcome;
 public sealed record RefundReversedOutcome(DateTimeOffset ProviderTime) : RefundOutcome;
 ```
 
-A case that owns no data is still a sealed record, so the set can grow case data later without a breaking change:
+A case that owns no data is still a sealed record. The set can grow case data later without a breaking change:
 
 ```csharp
 public abstract record OrganizationRole;
@@ -123,7 +142,7 @@ public sealed record OrganizationOwnerRole : OrganizationRole;
 public sealed record OrganizationScannerRole : OrganizationRole;
 ```
 
-Callers branch with a `switch` expression on the case type. A `switch` that omits a case surfaces at review as a missing arm rather than a silent default, and a case that carries data exposes it directly instead of through a separate nullable field:
+Callers branch with a `switch` expression on the case type. A `switch` that omits a case surfaces at review as a missing arm rather than a silent default. A case that carries data exposes it directly instead of through a separate nullable field:
 
 ```csharp
 var next = outcome switch
@@ -136,15 +155,19 @@ var next = outcome switch
 };
 ```
 
-When the closed set is a single scalar with validation, normalization, or formatting and no per-case data or behavior, a typed value object under `DOMAIN.VALUE.001` is the correct model instead of a union. Do not reintroduce the enum as the value object's backing field.
+The example uses a typed value object for a closed set represented by one scalar (`DOMAIN.VALUE.001`). It can own validation, normalization, or formatting without per-case data or behavior. The example does not use an enum as its backing field.
 
-Do not use a C# `enum`, an `int` or `string` discriminator, or a set of boolean flags to represent a closed set of domain values. This rule is scoped to the Domain layer, and the outer layers mirror the union rather than flatten it: an Application result carries the same shape (`APP.CLOSEDSET.001`) and a transport model carries the same shape (`API.MODELS.001`), a `oneOf` polymorphic model for a data-bearing set and a string `enum` only for a label-only set or a deliberate narrowing. An `enum` or a string at a boundary is therefore the narrowed representation of a label-only set, not the default for a set whose cases carry data. Infrastructure persists each union with stable discriminators exactly as it persists a state hierarchy, and never stores a raw enum value that Domain no longer defines.
+The example does not represent a Domain closed set with an enum, scalar discriminator, or boolean flags. This rule is scoped to Domain. Application mirrors the union shape (`APP.CLOSEDSET.001`). Transport also mirrors it (`API.MODELS.001`).
 
-Each union exposes one stable code or label member, and its `FromCode` factory round-trips with it: `FromCode(case.Name)` returns the same case for every case. A boundary that projects the union to a transport value maps through that member, never the record's default `ToString()`, which leaks the concrete type name (`OrganizationOwnerRole { Name = owner }`) instead of the code (`owner`). Add a test that round-trips every case, so a code that a rename altered, or a label left off a new case, is caught rather than shipped.
+A data-bearing transport set uses a polymorphic `oneOf` model. Only label-only sets or decision-backed narrowing use a string enum. A boundary enum or string is not the default for data-bearing cases. Infrastructure persists each union with stable discriminators, like a state hierarchy. It never stores a raw enum value absent from Domain.
+
+Each union exposes one stable code or label. Its `FromCode` factory round-trips every case. A boundary projects through that member, never the record's default `ToString()`. The default can leak a concrete type name instead of `owner`. Round-trip tests cover every case. The tests catch renamed codes and missing labels.
 
 ### Create valid aggregates through named factories (DOMAIN.FACTORY.001)
 
-Aggregate roots have no public constructors. Each creation path uses a static factory named for the business action, such as `Post.CreateDraft` or `Order.Place`.
+**Requirement:** Domain models MUST create valid aggregates through named factories.
+
+**Rationale:** Aggregate roots have no public constructors. Each creation path uses a static factory named for the business action, such as `Post.CreateDraft` or `Order.Place`.
 
 A factory:
 
@@ -158,45 +181,57 @@ Persistence-only construction behavior stays private and is configured by Infras
 
 ### Express transitions through business methods (DOMAIN.BEHAVIOR.001)
 
-Every public aggregate mutation method represents a business action from the ubiquitous language. The method checks the current state, protects invariants, replaces state or owned data, and records domain events.
+**Requirement:** Domain models MUST express transitions through business methods.
+
+**Rationale:** Every public aggregate mutation method represents a business action from the ubiquitous language. The method checks the current state, protects invariants, replaces state or owned data, and records domain events.
 
 Command handlers coordinate the use case. They do not reproduce state checks or set aggregate properties. For example, a handler calls `post.Publish(utcNow)` and does not test whether `post.State` is draft before calling it.
 
-Queries and convenience methods may expose domain facts without mutation. Avoid public `Set`, `Update`, `Process`, and `Handle` methods when a domain verb names the operation.
+Queries and convenience methods may expose domain facts without mutation. The implementation avoids public `Set`, `Update`, `Process`, and `Handle` methods when a domain verb names the operation.
 
 ### Keep child entities inside the aggregate boundary (DOMAIN.ENTITY.001)
 
-A child entity has identity and continuity inside one aggregate. Its mutable state is inaccessible outside the aggregate root. The root creates, finds, and changes children through business methods.
+**Requirement:** Domain models MUST keep child entities inside the aggregate boundary.
+
+**Rationale:** A child entity has identity and continuity inside one aggregate. Its mutable state is inaccessible outside the aggregate root. The root creates, finds, and changes children through business methods.
 
 Child entities use typed identity when their identity participates in domain behavior. Their equality is identity-based. If a child has lifecycle states, model them with the same sealed state record pattern and no enum.
 
-Expose child collections as read-only views. For example, `Order.Lines` may return `IReadOnlyList<OrderLine>`, while `Order.AddLine` remains the only public addition path.
+The implementation exposes child collections as read-only views. For example, `Order.Lines` may return `IReadOnlyList<OrderLine>`, while `Order.AddLine` remains the only public addition path.
 
 ### Use strongly typed version 7 identifiers (DOMAIN.ID.001)
 
-Every aggregate identity is a public `readonly record struct` named `{Aggregate}Id`. It wraps one `Guid`, implements the project `IStronglyTypedId` marker and `IParsable<TId>`, and creates new values with `Guid.CreateVersion7()`.
+**Requirement:** Domain models MUST use strongly typed version 7 identifiers.
+
+**Rationale:** Every aggregate identity is a public `readonly record struct` named `{Aggregate}Id`. It wraps one `Guid`, implements the project `IStronglyTypedId` marker and `IParsable<TId>`, and creates new values with `Guid.CreateVersion7()`.
 
 A child entity that carries typed identity uses the same mechanics with a `{Aggregate}{Part}Id` name anchored on its aggregate per `NAME.AGGREGATE.001`, such as `OrderLineId`. It rejects `Guid.Empty` and creates values with `Guid.CreateVersion7()` exactly as an aggregate identity does.
 
 Typed IDs reject `Guid.Empty` at creation and parsing boundaries. Because every struct still has a default value, each aggregate factory also rejects a default ID.
 
-Do not pass raw `Guid`, `long`, or `string` values across Domain and Application when the business identity is known. Do not add implicit conversions that silently erase the ID type.
+The implementation does not pass raw `Guid`, `long`, or `string` values across Domain and Application when the business identity is known. The implementation does not add implicit conversions that silently erase the ID type.
 
 Transport, OpenAPI, frontend, and persistence boundaries represent the ID as a UUID string or native UUID column through boundary-owned converters. Domain carries no converter attributes.
 
 ### Use immutable value objects for domain concepts (DOMAIN.VALUE.001)
 
-Represent a named domain concept with a value object when the value has validation, normalization, equality, units, formatting, or likely rule growth. Examples include `PostTitle`, `Slug`, `EmailAddress`, `Money`, `Currency`, and `DateRange`.
+**Requirement:** Domain models MUST use immutable value objects for domain concepts.
 
-Value objects are immutable and compare by their complete value. They use static creation methods when construction can fail. They expose no setters and define no implicit conversion operators in either direction. An implicit primitive-to-value conversion hides the validating factory and lets a cast throw, which the .NET conversion guidelines prohibit; an implicit value-to-primitive conversion erases the domain type and invites overload ambiguity, the same way an implicit typed-id conversion would (`DOMAIN.ID.001`). Construct through the named factory (`Create`, `From`), and read the underlying value through a named member (`Value`, `ToString`). Define an `explicit` operator only when a specific boundary genuinely needs a cast; the default is a named member, not an operator. This applies to Shared kernel value objects as much as to aggregate-owned ones, because a globally used value object erases its type in more places, not fewer.
+**Rationale:** A value object represents a named domain concept when the value has validation, normalization, equality, units, formatting, or likely rule growth. Examples include `PostTitle`, `Slug`, `EmailAddress`, `Money`, `Currency`, and `DateRange`.
+
+Value objects are immutable and compare by their complete value. The implementation uses static creation methods when construction can fail. The implementation exposes no setters or implicit conversions.
+
+A primitive-to-value conversion hides validation and can throw during a cast. A value-to-primitive conversion erases the domain type. Construct through `Create` or `From`. The implementation reads through `Value` or `ToString`. The implementation uses an explicit operator only for a named boundary need.
 
 Application validators represent caller-correctable structural input failures as validation errors before the handler runs. A value object repeats its own invariant and throws a specific Domain exception when another caller bypasses that boundary. Domain never references an Application validation type.
 
-Raw primitives remain acceptable for local calculations and mechanical values with no domain meaning. A method parameter named `title` uses `PostTitle`; a loop index remains `int`.
+Raw primitives remain acceptable for local calculations and mechanical values with no domain meaning. A method parameter named `title` uses `PostTitle`. A loop index remains `int`.
 
 ### Define collection value semantics explicitly (DOMAIN.COLLECTION.001)
 
-Aggregate and value-object constructors copy incoming mutable collections. Public members return read-only views. Domain methods own additions, removals, and replacements.
+**Requirement:** Domain models MUST define collection value semantics explicitly.
+
+**Rationale:** Aggregate and value-object constructors copy incoming mutable collections. Public members return read-only views. Domain methods own additions, removals, and replacements.
 
 Default record equality does not compare `List<T>` or `IReadOnlyList<T>` contents. A value object containing a collection implements content equality and a matching order-sensitive or order-insensitive hash according to the domain rule.
 
@@ -204,7 +239,9 @@ For example, `PostTags` may treat tag order as irrelevant, while `RouteStops` tr
 
 ### Make money and decimal rules explicit (DOMAIN.MONEY.001)
 
-Monetary amounts use `decimal` and a `Money` value object that includes currency. Domain code does not use `double` or `float` for money.
+**Requirement:** Domain models MUST make money and decimal rules explicit.
+
+**Rationale:** Monetary amounts use `decimal` and a `Money` value object that includes currency. Domain code does not use `double` or `float` for money.
 
 The module specification or glossary defines:
 
@@ -217,7 +254,9 @@ Infrastructure maps the documented precision explicitly. For example, a product 
 
 ### Use stateless domain services for ownerless rules (DOMAIN.SERVICE.001)
 
-Use a domain service only when a business calculation or decision spans domain concepts and has no natural aggregate or value-object owner. Name it for the business concept, such as `OrderPricingDomainService`.
+**Requirement:** Domain models MUST use stateless domain services for ownerless rules.
+
+**Rationale:** The implementation uses a domain service only when a business calculation or decision spans domain concepts and has no natural aggregate or value-object owner. The implementation names it for the business concept, such as `OrderPricingDomainService`.
 
 A domain service:
 
@@ -230,33 +269,45 @@ Application loads any required aggregates, calls the domain service, passes its 
 
 ### Keep repository interfaces in Domain (DOMAIN.REPOSITORY.001)
 
-Domain owns one repository interface per aggregate that must be loaded for commands. Infrastructure implements it. The interface uses only aggregate and Domain types and exposes the minimum load and store operations required by accepted commands.
+**Requirement:** Domain models MUST keep repository interfaces in Domain.
 
-A required load uses `GetByIdAsync`, which returns the aggregate and throws the aggregate's own `{Aggregate}NotFoundException` when no aggregate has that identity. The Infrastructure implementation throws it, so a command handler receives a loaded aggregate and never repeats a null check or constructs a not-found failure with a hard-coded code and message at the call site. The `{Aggregate}NotFoundException` is a `DomainException` that owns its stable code and message per `DOMAIN.ERROR.001`, and the host maps that code to `404`. Reserve a nullable `FindBy...Async` for a genuinely optional lookup, such as a deduplication-key or provider-reference probe, where absence is a normal result rather than a failure.
+**Rationale:** Domain owns one repository interface per aggregate loaded for commands. Infrastructure implements it. The interface uses only aggregate and Domain types and exposes minimum load and store operations for accepted commands.
+
+A required load uses `GetByIdAsync`. It returns the aggregate or throws its own `{Aggregate}NotFoundException`. Infrastructure throws this exception when no aggregate has that identity. A command handler receives a loaded aggregate. It does not repeat null checks or build hard-coded not-found failures.
+
+The exception owns its stable code and message (`DOMAIN.ERROR.001`). The host maps that code to `404`. Reserve nullable `FindBy...Async` methods for optional lookups. Examples include deduplication-key and provider-reference probes where absence is normal.
 
 Repositories do not expose `IQueryable`, sessions, tracking controls, provider options, query projections, generic CRUD methods, or `SaveChangesAsync`. Query handlers use the selected read boundary instead of aggregate repositories.
 
-Do not introduce `IRepository<T>` as a substitute for aggregate-specific contracts.
+The implementation does not introduce `IRepository<T>` as a substitute for aggregate-specific contracts.
 
 ### Raise immutable domain facts (DOMAIN.EVENT.001)
 
-Every domain event is a public immutable record implementing the project-owned public `IDomainEvent` marker. Event names are `{Aggregate}{PastFact}Event`, leading with the aggregate root per `NAME.AGGREGATE.001` and ending with the `Event` suffix, such as `PostPublishedEvent` or `OrderPlacedEvent`. The name states which aggregate raised the fact without opening the file: an event named `MemberAccessChangedEvent` hides its owner, while `OrganizationMemberAccessChangedEvent` names it.
+**Requirement:** Domain models MUST raise immutable domain facts.
 
-An event contains enough immutable business data for its intended reactions to understand the fact. "Minimal" does not mean "identity only" when a reaction needs values from the moment of the transition. Do not include aggregate, entity, repository, session, service, or mutable collection references.
+**Rationale:** Every domain event is a public immutable record implementing the project-owned public `IDomainEvent` marker. Event names are `{Aggregate}{PastFact}Event`, leading with the aggregate root per `NAME.AGGREGATE.001` and ending with the `Event` suffix, such as `PostPublishedEvent` or `OrderPlacedEvent`. The name states which aggregate raised the fact without opening the file: an event named `MemberAccessChangedEvent` hides its owner, while `OrganizationMemberAccessChangedEvent` names it.
 
-An event carries no exception. Do not add an `Exception`, `DomainException`, or other error object as event data, and do not name the event after the language error type. An event records a business fact that happened, while an exception rejects an attempted transition; the two never travel together. When a failure is itself the recorded fact, such as a provider declining a charge or a batch line that could not be refunded, model that fact as immutable domain data, a value object or a discriminated-union case under `DOMAIN.CLOSEDSET.001`, and carry that data on the event. A domain business concept that means a manual-handling case or an anomaly uses a domain word for that concept, not `Exception`; see `NAME.EXCEPTION.001`.
+An event contains enough immutable business data for its intended reactions to understand the fact. "Minimal" does not mean "identity only" when a reaction needs values from the moment of the transition. The implementation does not include aggregate, entity, repository, session, service, or mutable collection references.
+
+An event carries no exception. The implementation does not add an error object as event data or name an event after the language error type. An event records a completed fact. An exception rejects an attempted transition.
+
+A recorded failure uses immutable domain data under `DOMAIN.CLOSEDSET.001`. The event carries that data. The implementation uses a domain term for manual handling or anomalies. See `NAME.EXCEPTION.001`.
 
 `IDomainEvent` has no LiteBus or provider base interface. Domain events are internal business facts, not integration events or public API contracts. An Application or Infrastructure event reaction implementation may translate a domain event into an integration event when an external contract requires one.
 
-Record the event inside the aggregate method that completes the transition. Pass occurrence time into the method when time is part of the fact.
+The implementation records the event inside the aggregate method that completes the transition. The implementation passes occurrence time into the method when time is part of the fact.
 
 ### Reject business violations with Domain exceptions (DOMAIN.ERROR.001)
 
-Domain defines a project `DomainException` base and specific subclasses named `{DomainType}{Reason}Exception`. `DomainType` is the aggregate root, or an aggregate-anchored type it owns whose own name already leads with the aggregate per `NAME.AGGREGATE.001`, so the exception name always leads with the aggregate root. A rejected transition throws the exception that names the failed rule, such as `PostAlreadyPublishedException`. A rule with no owning value object anchors directly on the aggregate: an `Event` finance-assurance rule is `EventFinanceAssuranceMislabeledException`, not `FinanceAssuranceMislabeledException`.
+**Requirement:** Domain models MUST reject business violations with Domain exceptions.
 
-Do not throw `InvalidOperationException`, `ArgumentException`, Application validation exceptions, HTTP exceptions, or provider exceptions for a business rejection. Domain exceptions contain safe business context and no transport status code.
+**Rationale:** Domain defines a project `DomainException` base and specific subclasses named `{DomainType}{Reason}Exception`. `DomainType` is the aggregate root, or an aggregate-anchored type it owns whose own name already leads with the aggregate per `NAME.AGGREGATE.001`. The exception name always leads with the aggregate root. A rejected transition throws the exception that names the failed rule, such as `PostAlreadyPublishedException`. A rule with no owning value object anchors directly on the aggregate: an `Event` finance-assurance rule is `EventFinanceAssuranceMislabeledException`, not `FinanceAssuranceMislabeledException`.
 
-Each distinct violated rule has its own exception type, and that type owns its stable failure code and its message. The exception constructor accepts only the domain values that describe the specific failure. It does not accept a `code` or `message` string from the throwing aggregate. A shared exception that is constructed with a hard-coded failure code and message string at the call site is prohibited, because it moves the rule identity out of the type system and into duplicated string literals inside aggregate behavior.
+The implementation does not throw `InvalidOperationException`, `ArgumentException`, Application validation exceptions, HTTP exceptions, or provider exceptions for a business rejection. Domain exceptions contain safe business context and no transport status code.
+
+Each distinct violated rule has its own exception type. That type owns its stable failure code and message. Its constructor accepts only Domain values describing the failure. It does not accept code or message strings from the throwing aggregate. A shared exception with call-site code and message strings is prohibited. Such strings move rule identity from the type system into duplicated aggregate behavior.
+
+**Example:**
 
 ```csharp
 // Prohibited: the aggregate carries the code and message, and one type covers unrelated rules.
@@ -292,47 +343,74 @@ public sealed class RefundAllocationRequiredException()
 
 Two rules that share a caller-visible failure code because a boundary maps them to one response still get two exception types. The shared code lives in the two types, not in a string passed by the aggregate. Reuse a single exception type only when one rule can fail from more than one input and the differing values are carried as constructor parameters.
 
-Application validators handle malformed caller input through validation errors. Aggregate and value-object exceptions remain the last defense when direct Domain use violates a rule. Command handlers do not catch expected Domain exceptions; the host maps them through the documented error boundary.
+Application validators handle malformed caller input through validation errors. Aggregate and value-object exceptions remain the last defense when direct Domain use violates a rule. Command handlers do not catch expected Domain exceptions. The host maps them through the documented error boundary.
 
 ### Reference other aggregates by ID (DOMAIN.REFERENCE.001)
 
-An aggregate stores another aggregate's typed ID rather than an object reference. An `Order` stores `CustomerId`; it does not store `Customer`.
+**Requirement:** Domain models MUST reference other aggregates by ID.
+
+**Rationale:** An aggregate stores another aggregate's typed ID rather than an object reference. An `Order` stores `CustomerId`. It does not store `Customer`.
 
 When a command coordinates multiple aggregates, Application loads each aggregate through its repository. The active use-case specification names any immediate cross-aggregate invariant and transaction requirement.
 
 ### Pass nondeterministic values into Domain (DOMAIN.TIME.001)
 
-Domain does not read system time, generate random business values, or call an external source from inside behavior. Application obtains such values through an owned port and passes them into the factory or method.
+**Requirement:** Domain models MUST pass nondeterministic values into Domain.
+
+**Rationale:** Domain does not read system time, generate random business values, or call an external source from inside behavior. Application obtains such values through an owned port and passes them into the factory or method.
 
 For example, a handler obtains `clock.UtcNow` and calls `post.Publish(clock.UtcNow)`. Domain tests pass an explicit `DateTimeOffset`.
 
 ### Document every public Domain contract (DOMAIN.DOCUMENTATION.001)
 
-Every public Domain type and every public member on it has XML documentation. This covers Aggregates and their mutation methods, child entities, state bases and cases, union bases and cases, Value Objects and their factories, typed IDs, domain services, repositories, Events, and exceptions. The `<summary>` states the business constraint, result, or failure that the member enforces or represents, not a restatement of its name.
+**Requirement:** Domain models MUST document every public Domain contract.
 
-- A mutation method identifies its allowed source states, its resulting state, the invariant it protects, and the Event it records. `Publish` documentation names the allowed source states, the resulting `PostPublishedState`, and `PostPublishedEvent`. The text `Publishes the post` alone is insufficient.
+**Rationale:** Every public Domain type and member has XML documentation. This includes Aggregates, children, states, unions, values, IDs, services, repositories, Events, and exceptions. The `<summary>` states the represented or enforced business constraint, result, or failure. It does not restate the member name.
+
+- A mutation method identifies source states, resulting state, protected invariant, and recorded Event. `Publish` names `PostPublishedState` and `PostPublishedEvent`. `Publishes the post` is insufficient.
 - A factory states the creation rules it enforces and the initial state it selects.
 - A property that carries a business fact states what the fact means and when it is set, using `<summary>`. A property whose meaning is fully evident from a well-named type (for example `PostId Id`) needs no restatement.
-- A state or union case, and each of its data members, states what the case represents and what its data means. Use `<param>` on positional record members.
+- A state or union case describes its meaning. Each data member describes its value. The implementation uses `<param>` for positional record members.
 - An Event states the transition it records. An exception states the exact rule that was violated and its stable failure code.
 
-Prose repeats a constraint that lives in an approved specification; it does not invent a new rule. Keep the text in the repository writing style: plain ASCII, lead with the constraint, no filler.
+Prose repeats constraints from approved specifications. It does not invent a new rule. The implementation applies the authoring standard, including `WRITING.ASCII.001` and `WRITING.PROSE.001`.
 
 ## Conventions
 
-The code blocks in this section focus on the named design rule and omit namespaces and unrelated XML declarations. Consumer files still apply `DOMAIN.DOCUMENTATION.001` to their complete public contracts.
 
-### Organize a module by aggregate and concept
+### Apply the documented defaults (DOMAIN.CONVENTION.001)
 
-A module folder holds one or more aggregates and the closed sets, value objects, events, and exceptions that belong to them. Two folder rules keep a growing module navigable.
+**Default:** Apply the documented defaults.
 
-Aggregate folders decide the top level. A module with one aggregate keeps that aggregate and its members directly in the module folder only when the aggregate root's plural name equals the module name; when the single aggregate's name differs from the module name, that aggregate takes its own plural folder. A module with more than one aggregate gives each aggregate its own plural folder, with no flat exception for a namesake aggregate, and each aggregate folder owns its own `Events/`, `States/`, `Exceptions/`, and concept folders. One aggregate's lifecycle, events, and rejections stay separate from another's rather than mixing in one shared `States/` or `Events/` folder.
+**Replacement:** A consumer can replace this default with an explicit local convention.
 
-Name each aggregate folder with the plural of the aggregate root, so the folder adds a proper namespace segment (`NAME.CSHARP.001`) that never collides with the singular aggregate type. `Audience/BuyerAccounts/BuyerAccount.cs` is `Entro.Domain.Audience.BuyerAccounts`, and `Audience/BuyerAccounts/States/BuyerAccountClaimedState.cs` is `Entro.Domain.Audience.BuyerAccounts.States`. A singular folder named exactly for the aggregate would put the `BuyerAccount` type in a namespace of the same name and trip the type-name-as-namespace warning (CA1724); the plural avoids that. When a module has more than one aggregate, every aggregate takes its own plural folder, with no flat exception for a namesake: an `Inventory` module with `Capacity` and `VariantStock` uses `Inventory/Capacities/` and `Inventory/VariantStocks/`.
+**Rationale:** The code blocks in this section focus on the named design rule and omit namespaces and unrelated XML declarations. Consumer files still apply `DOMAIN.DOCUMENTATION.001` to their complete public contracts.
 
-A single-aggregate module whose own name equals its aggregate hits the same collision. Name the module folder with the plural of the aggregate (a `Catalog` aggregate lives in a `Catalogs` module folder, namespace `Entro.Domain.Catalogs`), so the type never sits in a namespace segment of its own name. Do not pad the type name to dodge the warning: a `Catalog` concept is the aggregate `Catalog` in a `Catalogs` folder, not an aggregate `SalesCatalog`. Pluralizing the folder is the fix; renaming the type is not.
+### Organize a module by aggregate and concept (DOMAIN.CONVENTION.002)
 
-Concept folders group a closed set. A discriminated union places its abstract base and every sealed case in one folder named for the concept, such as `ScanResults/` for `ScanResult` and its cases, and the aggregate state hierarchy uses a `States/` folder the same way. A concept folder holds exactly one concept's related types. It is not a grouping by technical kind: do not create an `Entities/`, `ValueObjects/`, or `Services/` folder that collects unrelated types, and do not leave an empty folder. Group a closed set into a concept folder once the set has its base and cases; a single loose value object stays in the module or aggregate folder until it grows a hierarchy.
+**Default:** Organize a module by aggregate and concept.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** A module folder holds one or more aggregates and the closed sets, value objects, events, and exceptions that belong to them. Two folder rules keep a growing module navigable.
+
+Aggregate folders decide the top level. A single aggregate stays flat when its plural root name equals the module name. Otherwise, that aggregate takes its own plural folder. A module with multiple aggregates gives each aggregate a plural folder.
+
+Each aggregate folder owns its `Events/`, `States/`, `Exceptions/`, and concept folders. Separate aggregates never share lifecycle, event, or rejection folders.
+
+The implementation names each aggregate folder with the aggregate root's plural form. The folder creates a namespace segment that cannot collide with the singular type (`NAME.CSHARP.001`). `Audience/BuyerAccounts/BuyerAccount.cs` uses namespace `Entro.Domain.Audience.BuyerAccounts`. Its `States/BuyerAccountClaimedState.cs` uses `Entro.Domain.Audience.BuyerAccounts.States`.
+
+A singular `BuyerAccount/` folder creates a type-name-as-namespace warning (CA1724). The plural form avoids that warning. Every aggregate in a multi-aggregate module gets a plural folder. For example, `Inventory` uses `Capacities/` and `VariantStocks/`.
+
+A single-aggregate module whose own name equals its aggregate hits the same collision. The implementation names the module folder with the aggregate's plural form. A `Catalog` aggregate lives in `Catalogs`, under `Entro.Domain.Catalogs`.
+
+The type never sits in a namespace segment of its own name. A `Catalog` concept stays `Catalog` in a `Catalogs` folder. Pluralizing the folder resolves the warning without renaming the type.
+
+Concept folders group a closed set. The implementation puts a union base and every sealed case in one plural concept folder. Aggregate state records use `States/`. A concept folder holds one concept's related types.
+
+The implementation does not create `Entities/`, `ValueObjects/`, or `Services/` kind folders. The implementation does not leave empty folders. The implementation keeps one loose value object in its module or aggregate folder.
+
+**Example:**
 
 ```text
 {ProjectName}.Domain/
@@ -396,9 +474,15 @@ Concept folders group a closed set. A discriminated union places its abstract ba
         ConsentGrantedEvent.cs
 ```
 
-Each aggregate-specific repository interface stays with the aggregate it loads. The other layers mirror this organization: Application, Infrastructure, and WebApi use the same module and per-aggregate folder names, per `ARCH.MODULES.001`.
+Each aggregate-specific repository interface stays with the aggregate it loads. The other layers mirror this organization: Application, Infrastructure. WebApi use the same module and per-aggregate folder names, per `ARCH.MODULES.001`.
 
-### Use these Domain names
+### Use these Domain names (DOMAIN.CONVENTION.003)
+
+**Default:** Use these Domain names.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Example:**
 
 | Domain role | Pattern | Example |
 |:---|:---|:---|
@@ -416,9 +500,17 @@ Each aggregate-specific repository interface stays with the aggregate it loads. 
 | Domain event | `{Aggregate}{PastFact}Event` | `PostPublishedEvent` |
 | Domain exception | `{DomainType}{Reason}Exception` | `PostAlreadyPublishedException` |
 
-Every aggregate-owned type leads with the aggregate root's full name, never an abbreviation, per `NAME.AGGREGATE.001`: an aggregate named `SalesCatalog` anchors `SalesCatalogPublishedEvent`, not `SalesPublishedEvent` or `CatalogPublishedEvent`. `Term` is the exact glossary term represented by the value object; a value object used by one aggregate leads with that aggregate (`OrganizationLegalProfile`), while a Shared kernel value object used across aggregates keeps its bare name (`Money`). `BusinessRule` names the calculation or policy owned by the domain service. `DomainType` is the aggregate root or an aggregate-anchored type it owns, so an exception name leads with the aggregate root. A union base ends with the concept (`RefundOutcome`, `OrganizationRole`) and each case leads with the aggregate and ends with the concept (`RefundSucceededOutcome`, `OrganizationScannerRole`). Each union base and each union case is one file named after the type, grouped in a folder named for the concept within its owning module or aggregate.
+Every aggregate-owned type starts with the aggregate root's full name (`NAME.AGGREGATE.001`). `SalesCatalog` anchors `SalesCatalogPublishedEvent`. The example does not abbreviate the anchor. `Term` is the glossary term represented by a value object.
 
-### Define the shared Domain contracts once
+An aggregate value object uses its aggregate prefix. A Shared kernel value object keeps its bare name. `BusinessRule` names a domain service policy. `DomainType` names the aggregate-owned type. Union bases and cases end with their concept. The example stores each type in its own file.
+
+### Define the shared Domain contracts once (DOMAIN.CONVENTION.004)
+
+**Default:** Define the shared Domain contracts once.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Example:**
 
 ```csharp
 public interface IDomainEvent;
@@ -468,7 +560,13 @@ public abstract class AggregateRoot<TId> : IAggregateRoot
 
 Concrete aggregates validate that `id.Value` is not `Guid.Empty` before calling or while calling the base constructor. The base remains free of aggregate-specific exceptions.
 
-### Define typed IDs without primitive escape hatches
+### Define typed IDs without primitive escape hatches (DOMAIN.CONVENTION.005)
+
+**Default:** Define typed IDs without primitive escape hatches.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Example:**
 
 ```csharp
 public readonly record struct PostId : IStronglyTypedId, IParsable<PostId>
@@ -516,7 +614,13 @@ public readonly record struct PostId : IStronglyTypedId, IParsable<PostId>
 
 The `IParsable<TId>` implementation supports Minimal API route and query binding. `Parse` follows the .NET parsing contract for malformed text; `From` applies the domain empty-identity rule.
 
-### Keep ID representations aligned at every boundary
+### Keep ID representations aligned at every boundary (DOMAIN.CONVENTION.006)
+
+**Default:** Keep ID representations aligned at every boundary.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Example:**
 
 | Boundary | Representation | Owner |
 |:---|:---|:---|
@@ -528,7 +632,7 @@ The `IParsable<TId>` implementation supports Minimal API route and query binding
 | EF Core extension | Explicit value converter to UUID | Infrastructure |
 | Generated TypeScript | `string` from OpenAPI | Generated client |
 
-For multiple IDs, WebApi uses one converter factory restricted to `IStronglyTypedId` implementations. The OpenAPI transformer applies the same restriction. It must not convert every `IParsable<T>` type into a UUID schema.
+For multiple IDs, WebApi uses one converter factory restricted to `IStronglyTypedId` implementations. The OpenAPI transformer applies the same restriction. The factory does not convert every `IParsable<T>` type into a UUID schema.
 
 ```csharp
 if (typeof(IStronglyTypedId).IsAssignableFrom(context.JsonTypeInfo.Type))
@@ -539,7 +643,13 @@ if (typeof(IStronglyTypedId).IsAssignableFrom(context.JsonTypeInfo.Type))
 }
 ```
 
-### Keep state records as the only Aggregate lifecycle representation
+### Keep state records as the only Aggregate lifecycle representation (DOMAIN.CONVENTION.007)
+
+**Default:** Keep state records as the only Aggregate lifecycle representation.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Example:**
 
 ```csharp
 public abstract record PostState;
@@ -566,7 +676,13 @@ public sealed record ProfileActiveState : ProfileState;
 
 Infrastructure persists each state hierarchy with stable discriminators. It does not add a lifecycle enum or shadow state fields back into Domain or infer a different state after loading.
 
-### Keep value creation and equality explicit
+### Keep value creation and equality explicit (DOMAIN.CONVENTION.008)
+
+**Default:** Keep value creation and equality explicit.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Example:**
 
 ```csharp
 public sealed record PostTitle
@@ -632,7 +748,13 @@ public sealed record PostTags
 
 The example treats tag order as meaningful. If order is irrelevant, creation normalizes to the documented comparison order before storing values.
 
-### Keep domain services pure
+### Keep domain services pure (DOMAIN.CONVENTION.009)
+
+**Default:** Keep domain services pure.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Example:**
 
 ```csharp
 public sealed class OrderPricingDomainService
@@ -650,7 +772,13 @@ public sealed class OrderPricingDomainService
 
 Application supplies the lines and passes the returned `Money` to `Order.ConfirmPrice`. The service has no repository, clock, logger, or provider client.
 
-### Keep repository contracts aggregate-specific
+### Keep repository contracts aggregate-specific (DOMAIN.CONVENTION.010)
+
+**Default:** Keep repository contracts aggregate-specific.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Example:**
 
 ```csharp
 public interface IPostRepository
@@ -663,7 +791,7 @@ public interface IPostRepository
 }
 ```
 
-`GetByIdAsync` returns a loaded `Post` and throws `PostNotFoundException` when the identity has no aggregate; the Infrastructure implementation owns that throw. The command pipeline owns the commit. `Store` stages the aggregate through the selected provider implementation.
+`GetByIdAsync` returns a loaded `Post` and throws `PostNotFoundException` when the identity has no aggregate. The Infrastructure implementation owns that throw. The command pipeline owns the commit. `Store` stages the aggregate through the selected provider implementation.
 
 ```csharp
 // Infrastructure implementation throws the aggregate's own not-found exception.
@@ -674,7 +802,9 @@ public async Task<Post> GetByIdAsync(PostId id, CancellationToken cancellationTo
 }
 ```
 
-## Complete Aggregate example using typed states
+## Reference example
+
+This informative example demonstrates `DOMAIN.BASE.001`, `DOMAIN.STATE.001`, and `DOMAIN.FACTORY.001`.
 
 ```csharp
 public sealed class Post : AggregateRoot<PostId>
@@ -779,27 +909,36 @@ The event payload captures the publication fact without carrying the mutable `Po
 
 ## Verification
 
-- Inspect Domain package and project references for outer-layer dependencies.
-- Compare Domain names with the glossary, module specification, and approved use-case specification.
-- Confirm every documented aggregate derives from `AggregateRoot<TId>` and appears in its module ownership table.
-- Confirm every documented Aggregate has exactly one abstract state base and at least one sealed state record.
-- Confirm no runtime module interface or base class exists.
-- Search Domain for any `enum` declaration, lifecycle or discriminator strings, status booleans, and duplicated nullable state fields; confirm every closed set is a state hierarchy, a domain union, or a typed value object.
-- Confirm every closed-set union exposes a stable code or label whose `FromCode` round-trips for every case, and that no boundary projects a union through its default `ToString()`.
-- Confirm each violated rule throws its own exception type that owns its code and message, and that no aggregate constructs a shared exception with a hard-coded code or message string.
-- Confirm every public Domain type and member carries XML documentation that states a constraint, result, or failure rather than restating the name.
-- Confirm a module with more than one aggregate gives each aggregate its own folder, and each closed set's base and cases sit in a concept folder rather than loose in the module or in a technical-kind bucket.
-- Confirm every event, state case, union base and case, aggregate value object, child entity, and exception name leads with its aggregate root's full name, and that only Shared kernel types are unprefixed.
-- Confirm every file under Domain declares one primary public type.
-- Confirm aggregate constructors are not public and every mutation uses a business method.
-- Confirm handlers do not reproduce state checks or set aggregate properties.
-- Confirm typed IDs use `Guid.CreateVersion7()`, reject empty values, and retain one UUID representation across boundaries.
-- Test value-object validation, normalization, scalar equality, collection equality, money precision, and currency rules.
-- Confirm repositories expose aggregate operations rather than generic CRUD or query behavior.
-- Confirm domain services are stateless and contain no outer-layer dependency.
-- Confirm events are past-tense `IDomainEvent` records with no aggregate or provider reference, carry no exception or error object, and are not named after the language error type.
-- Search value objects for `implicit operator` and confirm none remain in either direction; construction goes through a named factory and the primitive is read through a named member.
-- Search for business types, events, and states whose names contain `Exception` (for example `*ExceptionRaisedEvent`, `*ExceptionsPendingState`) and confirm `Exception` names only `{DomainType}{Reason}Exception` failure types, never a business fact or state.
-- Round-trip every concrete Aggregate state record through the persistence provider.
-- Test every factory, allowed transition, rejected transition, aggregate invariant, state-specific value, and emitted event.
-- Confirm aggregate invariant IDs and state transitions map to verified use cases and acceptance criteria.
+
+| ID | Method | Evidence |
+|:---|:---|:---|
+| DOMAIN.PURITY.001 | inspection | Pull request review asserts `keep Domain free of outer-layer concerns` in the owning specification and source paths. |
+| DOMAIN.LANGUAGE.001 | inspection | Pull request review asserts `use one ubiquitous language` in the owning specification and source paths. |
+| DOMAIN.AGGREGATE.001 | inspection | Pull request review asserts `treat aggregates as consistency boundaries` in the owning specification and source paths. |
+| DOMAIN.BASE.001 | inspection | Pull request review asserts `use the project aggregate root contract` in the owning specification and source paths. |
+| DOMAIN.STATE.001 | inspection | Pull request review asserts `model every Aggregate lifecycle with state records` in the owning specification and source paths. |
+| DOMAIN.CLOSEDSET.001 | inspection | Pull request review asserts `model every closed set of domain values without enums` in the owning specification and source paths. |
+| DOMAIN.FACTORY.001 | inspection | Pull request review asserts `create valid aggregates through named factories` in the owning specification and source paths. |
+| DOMAIN.BEHAVIOR.001 | inspection | Pull request review asserts `express transitions through business methods` in the owning specification and source paths. |
+| DOMAIN.ENTITY.001 | inspection | Pull request review asserts `keep child entities inside the aggregate boundary` in the owning specification and source paths. |
+| DOMAIN.ID.001 | inspection | Pull request review asserts `use strongly typed version 7 identifiers` in the owning specification and source paths. |
+| DOMAIN.VALUE.001 | inspection | Pull request review asserts `use immutable value objects for domain concepts` in the owning specification and source paths. |
+| DOMAIN.COLLECTION.001 | inspection | Pull request review asserts `define collection value semantics explicitly` in the owning specification and source paths. |
+| DOMAIN.MONEY.001 | inspection | Pull request review asserts `make money and decimal rules explicit` in the owning specification and source paths. |
+| DOMAIN.SERVICE.001 | inspection | Pull request review asserts `use stateless domain services for ownerless rules` in the owning specification and source paths. |
+| DOMAIN.REPOSITORY.001 | inspection | Pull request review asserts `keep repository interfaces in Domain` in the owning specification and source paths. |
+| DOMAIN.EVENT.001 | inspection | Pull request review asserts `raise immutable domain facts` in the owning specification and source paths. |
+| DOMAIN.ERROR.001 | inspection | Pull request review asserts `reject business violations with Domain exceptions` in the owning specification and source paths. |
+| DOMAIN.REFERENCE.001 | inspection | Pull request review asserts `reference other aggregates by ID` in the owning specification and source paths. |
+| DOMAIN.TIME.001 | inspection | Pull request review asserts `pass nondeterministic values into Domain` in the owning specification and source paths. |
+| DOMAIN.DOCUMENTATION.001 | inspection | Pull request review asserts `document every public Domain contract` in the owning specification and source paths. |
+| DOMAIN.CONVENTION.001 | inspection | Pull request review asserts `apply the documented defaults` in the owning specification and source paths. |
+| DOMAIN.CONVENTION.002 | static | Repository static check asserts `organize a module by aggregate and concept` for the owning paths. |
+| DOMAIN.CONVENTION.003 | inspection | Pull request review asserts `use these Domain names` in the owning specification and source paths. |
+| DOMAIN.CONVENTION.004 | inspection | Pull request review asserts `define the shared Domain contracts once` in the owning specification and source paths. |
+| DOMAIN.CONVENTION.005 | inspection | Pull request review asserts `define typed IDs without primitive escape hatches` in the owning specification and source paths. |
+| DOMAIN.CONVENTION.006 | inspection | Pull request review asserts `keep ID representations aligned at every boundary` in the owning specification and source paths. |
+| DOMAIN.CONVENTION.007 | inspection | Pull request review asserts `keep state records as the only Aggregate lifecycle representation` in the owning specification and source paths. |
+| DOMAIN.CONVENTION.008 | inspection | Pull request review asserts `keep value creation and equality explicit` in the owning specification and source paths. |
+| DOMAIN.CONVENTION.009 | inspection | Pull request review asserts `keep domain services pure` in the owning specification and source paths. |
+| DOMAIN.CONVENTION.010 | inspection | Pull request review asserts `keep repository contracts aggregate-specific` in the owning specification and source paths. |

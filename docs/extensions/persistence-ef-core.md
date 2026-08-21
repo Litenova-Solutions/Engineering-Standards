@@ -2,120 +2,272 @@
 
 ## Intent
 
-This extension replaces Marten persistence for aggregates whose accepted requirements depend on relational navigation mapping, relational change tracking, or a provider Marten does not support.
+This extension replaces Marten persistence for aggregates with accepted relational navigation, change-tracking, or provider requirements that Marten cannot satisfy.
 
 ## Activation
 
-**Activation scope:** `local`. Applicable specification kinds: Module, Use case. List it in `applicableExtensions` only on those kinds.
+Activation scope: `local`.
 
-Enable `persistence-ef-core` only after a decision records the aggregate scope, relational requirement, migration effect, and reason the Marten baseline does not meet it.
+Applicable specification kinds: `module`, `use-case`.
 
-Do not use Marten and EF Core for the same aggregate. For EF Core-owned aggregate paths, this extension replaces:
+The consumer enables `persistence-ef-core` only after a decision records aggregate scope, relational requirement, data evolution effect, and the Marten baseline gap.
 
-- `DEP.APPLICATION.001` for EF Core-owned query paths
-- `ARCH.CQRS.001` for the baseline `IQuerySession` read boundary on EF Core-owned query paths
-- `PERSIST.WRITE.001`
-- `PERSIST.READ.001`
-- `PERSIST.COMMIT.001`
-- `PERSIST.EVENTS.001`
-- `PERSIST.MAPPING.001`
-- `PERSIST.SERIALIZATION.001`
-- `PERSIST.EVOLUTION.001`
-- `PERSIST.DOCUMENT.001`
+## Baseline relationship
 
-When `outbox-worker` is also enabled for an EF Core-owned command, this extension replaces `EXT.OUTBOX.ATOMIC.001` for that command.
+For EF Core-owned aggregate paths, this extension replaces `DEP.APPLICATION.001`, `ARCH.CQRS.001`, `PERSIST.WRITE.001`, `PERSIST.READ.001`, `PERSIST.COMMIT.001`, `PERSIST.EVENTS.001`, `PERSIST.MAPPING.001`, `PERSIST.SERIALIZATION.001`, `PERSIST.EVOLUTION.001`, and `PERSIST.DOCUMENT.001`.
+
+When `outbox-worker` applies to an EF Core-owned command, this extension also replaces `EXT.OUTBOX.ATOMIC.001` for that command.
 
 ## Agent Summary {#agent-summary}
 
-- Keep Domain repository interfaces and Infrastructure implementations.
-- Give Application one narrow `IApplicationDbContext` query boundary.
-- Use `AsNoTracking` and project query results.
-- Commit once in the provider-specific LiteBus command post-handler.
-- Register only the post-handler for the command's selected write provider.
-- Keep every command and its outbox record on one write provider.
-- Collect domain events from changed aggregates.
-- Generate and review every migration.
-- Apply migrations as a release step.
+- Record affected aggregates and persistence effects. (EXT.EFCORE.ADOPT.001)
+- Stage each Command through one write provider. (EXT.EFCORE.TRANSACTION.001, EXT.EFCORE.TRANSACTION.002)
+- Keep EF Core writes behind repositories. (EXT.EFCORE.WRITE.001, EXT.EFCORE.WRITE.002)
+- Query EF Core through `IApplicationDbContext`. (EXT.EFCORE.READ.001, EXT.EFCORE.READ.003)
+- Commit EF Core changes through its LiteBus post-handler. (EXT.EFCORE.COMMIT.001)
+- Stage EF Core outbox records with EF Core business work. (EXT.EFCORE.OUTBOX.001)
+- Configure relational mappings in Infrastructure. (EXT.EFCORE.MAPPING.001)
+- Preserve Domain state records and lifecycle boundaries. (EXT.EFCORE.STATE.001, EXT.EFCORE.STATE.002)
+- Review and release migrations explicitly. (EXT.EFCORE.MIGRATIONS.001, EXT.EFCORE.MIGRATIONS.003)
+- Map EF Core concurrency failures to Application outcomes. (EXT.EFCORE.CONCURRENCY.002)
 
 ## Standards
 
-### Record the persistence replacement (EXT.EFCORE.ADOPT.001)
+### Record EF Core replacement scope (EXT.EFCORE.ADOPT.001)
 
-The decision names affected aggregates, data migration, transaction requirements, query impact, package changes, and rollback plan. Unaffected aggregates retain the baseline persistence rules.
+**Requirement:** An EF Core adoption decision MUST name affected aggregates, data evolution, transaction requirements, query impact, package changes, and rollback plan.
 
-### Keep each command on one write provider (EXT.EFCORE.TRANSACTION.001)
+**Rationale:** The decision describes the complete persistence replacement for its selected aggregates.
 
-Each command stages writes through either Marten-backed repositories or EF Core-backed repositories, never both. The adoption decision names how command ownership selects one provider-specific commit behavior and how an architecture test enforces that selection. Register only that provider's post-handler for the command; a Marten post-handler must not commit an EF Core-owned command.
+### Retain unaffected baseline persistence (EXT.EFCORE.ADOPT.002)
 
-If one accepted invariant requires atomic writes to aggregates assigned to different providers, move those aggregates to one provider or accept a decision that defines and verifies one shared transaction mechanism before implementation. Do not coordinate a local invariant through two independent commits.
+**Requirement:** An unaffected aggregate MUST retain baseline persistence rules.
 
-### Keep writes behind repositories (EXT.EFCORE.WRITE.001)
+**Rationale:** Local EF Core adoption does not change ownership of other aggregate paths.
 
-Infrastructure repositories use a scoped `DbContext` and stage aggregate changes. Handlers do not inject DbContext or call `SaveChangesAsync`.
+### Use one write provider (EXT.EFCORE.TRANSACTION.001)
 
-### Query through IApplicationDbContext (EXT.EFCORE.READ.001)
+**Requirement:** An EF Core-owned Command MUST stage aggregate writes through exactly one selected write provider.
 
-Application owns one public `IApplicationDbContext` exposing the generic set or named query roots required by EF Core-owned query handlers. Infrastructure implements it with the application DbContext. Marten-owned query paths retain the baseline `IQuerySession` boundary.
+**Rationale:** One provider gives the Command one atomic commit boundary.
 
-Query handlers use `AsNoTracking`, filter before materialization, apply deterministic ordering and limits, and project directly to result records. Do not add one read-store interface per aggregate.
+### Reject mixed provider writes (EXT.EFCORE.TRANSACTION.002)
 
-### Commit through the LiteBus pipeline (EXT.EFCORE.COMMIT.001)
+**Requirement:** A Command MUST NOT stage aggregate writes through both Marten-backed and EF Core-backed repositories.
 
-For an EF Core-owned Command, the provider-specific LiteBus post-handler calls `SaveChangesAsync` once. It collects Domain Events from changed Aggregates and follows the documented delivery classification. It uses the outbox extension for required durable delivery and does not commit a Marten session.
+**Rationale:** Independent provider commits cannot preserve one local aggregate invariant.
 
-### Store an EF Core outbox with EF Core writes (EXT.EFCORE.OUTBOX.001)
+### Record provider selection (EXT.EFCORE.TRANSACTION.003)
 
-When `outbox-worker` is active for an EF Core-owned Command, map and stage its outbox records through the same DbContext as the Aggregate changes or Workflow progress. Commit both through one `SaveChangesAsync` call. The Worker dispatch, idempotency, retry, compatibility, and operating rules from `outbox-worker` remain active.
+**Requirement:** An EF Core adoption decision MUST name Command provider selection and its architecture-test evidence.
 
-Do not store an EF Core aggregate change in one transaction and its required outbox record through a Marten session in another transaction.
+**Rationale:** The decision makes provider ownership reviewable for each selected Command path.
 
-### Configure mappings explicitly (EXT.EFCORE.MAPPING.001)
+### Register one Command post-handler (EXT.EFCORE.TRANSACTION.004)
 
-Infrastructure owns `IEntityTypeConfiguration<T>` classes. Configure typed IDs, owned values, backing fields, indexes, constraints, precision, delete behavior, concurrency tokens, and database names explicitly.
+**Requirement:** An EF Core-owned Command MUST register only its selected provider's LiteBus post-handler.
 
-### Preserve the Domain state hierarchy (EXT.EFCORE.STATE.001)
+**Rationale:** A Marten post-handler cannot commit EF Core-owned work.
 
-EF Core persistence retains the Domain Aggregate's single `{Aggregate}State` value. Infrastructure maps a stable discriminator and every state-specific value without adding a lifecycle enum, status string, boolean flag, or duplicate nullable state property to Domain.
+### Resolve cross-provider invariants (EXT.EFCORE.TRANSACTION.005)
 
-Use direct owned or JSON mapping only when the pinned EF Core and provider versions can materialize, track, and round-trip every sealed state record. Otherwise, store an Infrastructure-owned persistence type with discriminator and state-specific columns, then map it to and from the Domain state hierarchy inside the repository.
+**Requirement:** An accepted atomic cross-provider invariant MUST move its aggregates to one provider or use a reviewed shared transaction mechanism.
 
-The persistence model may contain relational discriminator columns. Those columns are Infrastructure details and do not become Domain properties. A new state requires a reviewed migration, mixed-version behavior, rollback behavior, and an integration fixture for each stored state.
+**Rationale:** One local invariant requires one verified atomic persistence boundary.
 
-### Treat migrations as reviewed artifacts (EXT.EFCORE.MIGRATIONS.001)
+### Stage aggregate writes in repositories (EXT.EFCORE.WRITE.001)
 
-Generate a migration for every schema change. Review tables, columns, indexes, constraints, data movement, destructive operations, and rollback compatibility.
+**Requirement:** An EF Core Infrastructure repository MUST use its scoped `DbContext` to stage aggregate changes.
 
-Run migrations as a release step. WebApi replicas do not migrate the hosted database during startup.
+**Rationale:** Repository staging keeps write persistence outside Application handlers.
 
-Commit the migration, model snapshot, and reviewed SQL together. Apply from an empty database and from the previous release database. Production and staging startup MUST NOT call `EnsureCreated`, `EnsureDeleted`, or `Migrate`.
+### Exclude direct handler commits (EXT.EFCORE.WRITE.002)
 
-### Map optimistic concurrency explicitly (EXT.EFCORE.CONCURRENCY.001)
+**Requirement:** An EF Core Command handler MUST NOT inject `DbContext` or call `SaveChangesAsync`.
 
-When `concurrency-idempotency` is active for an EF Core aggregate, configure a provider-backed concurrency token and carry the expected version through the command. The commit post-handler translates `DbUpdateConcurrencyException` into the Application conflict contract. It does not retry the complete command automatically.
+**Rationale:** The selected post-handler owns the one Command commit.
+
+### Define EF Core query roots (EXT.EFCORE.READ.001)
+
+**Requirement:** Application MUST own one public `IApplicationDbContext` exposing required generic sets or named query roots.
+
+**Rationale:** The interface defines the EF Core query boundary without exposing the Infrastructure DbContext.
+
+### Implement query roots in Infrastructure (EXT.EFCORE.READ.002)
+
+**Requirement:** Infrastructure MUST implement `IApplicationDbContext` with the application DbContext.
+
+**Rationale:** The provider implementation remains behind Application's query interface.
+
+### Retain Marten query boundary (EXT.EFCORE.READ.003)
+
+**Requirement:** A Marten-owned query path MUST retain the baseline `IQuerySession` boundary.
+
+**Rationale:** EF Core adoption does not alter read ownership for Marten-backed aggregates.
+
+### Project EF Core queries directly (EXT.EFCORE.READ.004)
+
+**Requirement:** An EF Core query handler MUST use `AsNoTracking`, filter before materialization, apply deterministic ordering and limits, and project result records.
+
+**Rationale:** The implementation reads handlers return shaped results without loading mutable aggregate state.
+
+### Avoid per-aggregate read stores (EXT.EFCORE.READ.005)
+
+**Requirement:** An EF Core query implementation MUST NOT add one read-store interface per aggregate.
+
+**Rationale:** `IApplicationDbContext` supplies the selected EF Core query boundary.
+
+### Commit EF Core Command work once (EXT.EFCORE.COMMIT.001)
+
+**Requirement:** An EF Core LiteBus post-handler MUST call `SaveChangesAsync` once for its owned Command.
+
+**Rationale:** One post-handler commit preserves the Command's provider transaction boundary.
+
+### Process changed aggregate events (EXT.EFCORE.COMMIT.002)
+
+**Requirement:** An EF Core post-handler MUST collect Domain Events from changed aggregates and follow their documented delivery classification.
+
+**Rationale:** Event delivery follows the same aggregate changes that the handler commits.
+
+### Use durable outbox delivery (EXT.EFCORE.COMMIT.003)
+
+**Requirement:** An EF Core Command requiring durable delivery MUST use the outbox extension without committing a Marten session.
+
+**Rationale:** EF Core-owned durable work remains in the selected provider transaction.
+
+### Stage EF Core outbox records together (EXT.EFCORE.OUTBOX.001)
+
+**Requirement:** An EF Core-owned Command MUST map and stage outbox records with aggregate changes or Workflow progress through the same DbContext.
+
+**Rationale:** The DbContext transaction makes the outbox record and business work durable together.
+
+### Commit EF Core outbox records once (EXT.EFCORE.OUTBOX.002)
+
+**Requirement:** An EF Core outbox Command MUST commit its aggregate and outbox changes through one `SaveChangesAsync` call.
+
+**Rationale:** One call prevents separate durable outcomes for the business change and message.
+
+### Reject cross-provider outbox storage (EXT.EFCORE.OUTBOX.003)
+
+**Requirement:** An EF Core-owned Command MUST NOT store its required outbox record through a Marten session.
+
+**Rationale:** A Marten outbox transaction cannot atomically commit an EF Core aggregate change.
+
+### Configure EF Core mappings in Infrastructure (EXT.EFCORE.MAPPING.001)
+
+**Requirement:** Infrastructure MUST own `IEntityTypeConfiguration<T>` classes for EF Core persistence mappings.
+
+**Rationale:** Relational mapping behavior belongs to the provider-owning layer.
+
+### Configure relational details explicitly (EXT.EFCORE.MAPPING.002)
+
+**Requirement:** An EF Core mapping MUST explicitly configure typed IDs, owned values, fields, indexes, constraints, precision, deletes, concurrency tokens, and database names.
+
+**Rationale:** Explicit configuration makes storage contract changes visible in code review and migrations.
+
+### Retain Domain state values (EXT.EFCORE.STATE.001)
+
+**Requirement:** EF Core persistence MUST retain the Domain aggregate's single `{Aggregate}State` value.
+
+**Rationale:** The aggregate remains the owner of lifecycle state and state-specific business facts.
+
+### Map stable relational state shape (EXT.EFCORE.STATE.002)
+
+**Requirement:** Infrastructure MUST map a stable discriminator and every state-specific value without adding Domain lifecycle flags or duplicate nullable state properties.
+
+**Rationale:** Relational storage can use columns while Domain retains its state-record hierarchy.
+
+### Use direct state mapping only when supported (EXT.EFCORE.STATE.003)
+
+**Requirement:** An EF Core mapping MAY use direct owned or JSON state mapping only when pinned versions materialize, track, and round-trip each state record.
+
+**Rationale:** A direct mapping needs complete provider behavior for every sealed state case.
+
+### Map unsupported state shapes in Infrastructure (EXT.EFCORE.STATE.004)
+
+**Requirement:** An unsupported direct state mapping MUST use an Infrastructure persistence type with discriminator and state-specific columns.
+
+**Rationale:** The repository maps the persistence type to and from the Domain hierarchy.
+
+### Review new persisted states (EXT.EFCORE.STATE.005)
+
+**Requirement:** A new persisted state MUST include reviewed migration, mixed-version behavior, rollback behavior, and an integration fixture.
+
+**Rationale:** New state values affect stored rows and application versions that read them.
+
+**Example:** `PostRow` maps `state_type`, `published_at`, and `archived_at` to one `PostState` record.
+
+### Generate migrations for schema changes (EXT.EFCORE.MIGRATIONS.001)
+
+**Requirement:** An EF Core schema change MUST generate a migration.
+
+**Rationale:** The migration is the explicit reviewed description of relational schema evolution.
+
+### Review migration effects (EXT.EFCORE.MIGRATIONS.002)
+
+**Requirement:** A migration review MUST cover tables, columns, indexes, constraints, data movement, destructive operations, and rollback compatibility.
+
+**Rationale:** Each item can affect deployment safety or data recovery.
+
+### Apply migrations as release work (EXT.EFCORE.MIGRATIONS.003)
+
+**Requirement:** A release process MUST apply EF Core migrations before application startup.
+
+**Rationale:** Release-owned execution controls ordering and evidence for schema work.
+
+### Keep migration files together (EXT.EFCORE.MIGRATIONS.004)
+
+**Requirement:** An EF Core schema change MUST commit migration, model snapshot, and reviewed SQL together.
+
+**Rationale:** The three artifacts show intended migration source and resulting relational change.
+
+### Test migration starting states (EXT.EFCORE.MIGRATIONS.005)
+
+**Requirement:** An EF Core migration MUST apply successfully from an empty database and previous release database.
+
+**Rationale:** Both initial setup and upgrade paths need tested relational evolution.
+
+### Reject startup schema mutation (EXT.EFCORE.MIGRATIONS.006)
+
+**Requirement:** Production and staging startup MUST NOT call `EnsureCreated`, `EnsureDeleted`, or `Migrate`.
+
+**Rationale:** Replica startup does not own hosted database schema change.
+
+### Configure optimistic tokens (EXT.EFCORE.CONCURRENCY.001)
+
+**Requirement:** An EF Core aggregate using concurrency-idempotency MUST configure a provider-backed token and carry expected version through its Command.
+
+**Rationale:** The token connects a caller's expected aggregate version to EF Core write detection.
+
+### Map EF Core concurrency conflict (EXT.EFCORE.CONCURRENCY.002)
+
+**Requirement:** An EF Core post-handler MUST translate `DbUpdateConcurrencyException` into the Application conflict contract.
+
+**Rationale:** Application exposes a project-owned conflict rather than an EF Core exception type.
+
+### Reject automatic command retry (EXT.EFCORE.CONCURRENCY.003)
+
+**Requirement:** An EF Core post-handler MUST NOT retry the complete Command automatically after a concurrency exception.
+
+**Rationale:** A retry can rerun Domain behavior against state that the caller did not approve.
 
 ## Conventions
 
-Use:
+### Use the EF Core Infrastructure layout (EXT.EFCORE.CONVENTION.001)
 
-```text
-Infrastructure/
-  Persistence/
-    EfCore/
-      ApplicationDbContext.cs
-      DesignTimeDbContextFactory.cs
-      SaveChangesCommandPostHandler.cs
-      Configurations/
-      Migrations/
-      Repositories/
-```
+**Default:** Use `Infrastructure/Persistence/EfCore/` for `ApplicationDbContext`, factory, post-handler, configurations, migrations, and repositories.
 
-Use `snake_case` through the pinned naming conventions package and verify generated names in each migration.
+**Replacement:** A consumer can replace this default with an explicit local convention.
 
-## Examples
+**Example:** `Infrastructure/Persistence/EfCore/Configurations/` holds entity mapping classes.
 
-`PublishPost` may write a Marten-backed `Post`, while `RecordInvoicePayment` may write an EF Core-backed `Invoice`. One command cannot update both aggregates. When `RecordInvoicePayment` requires durable delivery, its `InvoicePaymentRecorded` outbox record is staged and committed through the invoice DbContext.
+### Use snake-case relational names (EXT.EFCORE.CONVENTION.002)
 
-An EF Core-backed `Post` may use an Infrastructure `PostRow` with `state_type`, `published_at`, and `archived_at` columns. `PostRepository` maps one valid column combination to one `PostState` record. The Domain `Post` still exposes only `PostState` and carries no relational discriminator fields.
+**Default:** Use `snake_case` through the pinned naming-conventions package and verify generated names in each migration.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** The migration shows the exact names that reach the database.
 
 ## Dependencies
 
@@ -125,14 +277,43 @@ An EF Core-backed `Post` may use an Infrastructure `PostRow` with `state_type`, 
 
 ## Verification
 
-- Confirm EF Core-owned commands and queries do not inject Marten sessions or depend on Marten query abstractions. The application may retain Marten packages for unaffected aggregate paths.
-- Apply migrations to PostgreSQL from an empty database and the previous release schema.
-- Confirm production and staging processes never apply or create schemas during startup.
-- Run command, query, concurrency, and API integration tests.
-- Confirm each command resolves repositories and commit behavior for one write provider.
-- Round-trip every Aggregate state record and reject unknown or invalid discriminator and value combinations.
-- When `outbox-worker` is enabled, stop after the EF Core commit and verify the Worker later dispatches the atomically stored record.
-- Review SQL and query plans for accepted queries.
-- Run architecture tests for repository, context, and commit boundaries.
-- Test rollback compatibility or the documented recovery plan.
-- When concurrency is active, test two real DbContext instances updating the same aggregate.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| EXT.EFCORE.ADOPT.001 | inspection | EF Core decision records all required replacement and rollback fields. |
+| EXT.EFCORE.ADOPT.002 | inspection | Nonselected aggregate paths retain baseline persistence documentation and code. |
+| EXT.EFCORE.TRANSACTION.001 | test | Command integration tests stage aggregate work through one selected provider. |
+| EXT.EFCORE.TRANSACTION.002 | static | Command handlers contain no mixed Marten and EF Core aggregate repository writes. |
+| EXT.EFCORE.TRANSACTION.003 | inspection | Adoption decision records Command provider selection and architecture-test evidence. |
+| EXT.EFCORE.TRANSACTION.004 | test | Command registration resolves only its selected provider post-handler. |
+| EXT.EFCORE.TRANSACTION.005 | inspection | Cross-provider invariant review selects one provider or shared transaction evidence. |
+| EXT.EFCORE.WRITE.001 | test | Repository tests stage changes through scoped DbContext. |
+| EXT.EFCORE.WRITE.002 | static | Command handlers contain no DbContext injection or `SaveChangesAsync` call. |
+| EXT.EFCORE.READ.001 | static | Application exposes one owned `IApplicationDbContext` query interface. |
+| EXT.EFCORE.READ.002 | static | Infrastructure DbContext implements the owned query interface. |
+| EXT.EFCORE.READ.003 | static | Marten query handlers retain `IQuerySession`. |
+| EXT.EFCORE.READ.004 | test | Query tests use no tracking, authorized filters, deterministic limits, and projections. |
+| EXT.EFCORE.READ.005 | static | EF Core query source contains no per-aggregate read-store interface pattern. |
+| EXT.EFCORE.COMMIT.001 | test | EF Core Command tests observe one post-handler `SaveChangesAsync` call. |
+| EXT.EFCORE.COMMIT.002 | test | Changed aggregate fixtures classify and stage Domain Events correctly. |
+| EXT.EFCORE.COMMIT.003 | static | EF Core durable Commands commit no Marten session. |
+| EXT.EFCORE.OUTBOX.001 | test | EF Core outbox tests stage message and business work through one DbContext. |
+| EXT.EFCORE.OUTBOX.002 | test | EF Core outbox tests observe one commit for aggregate and message. |
+| EXT.EFCORE.OUTBOX.003 | static | EF Core Command source writes no required outbox record through Marten. |
+| EXT.EFCORE.MAPPING.001 | static | EF Core mappings use Infrastructure-owned configuration classes. |
+| EXT.EFCORE.MAPPING.002 | inspection | Mapping review records every declared relational configuration category. |
+| EXT.EFCORE.STATE.001 | test | EF Core round-trip fixtures retain the aggregate's one Domain state value. |
+| EXT.EFCORE.STATE.002 | static | Domain source contains no relational lifecycle flags or duplicate nullable state values. |
+| EXT.EFCORE.STATE.003 | test | Direct mapping fixtures materialize, track, and round-trip every state case. |
+| EXT.EFCORE.STATE.004 | test | Persistence row fixtures map valid discriminator values to Domain states. |
+| EXT.EFCORE.STATE.005 | inspection, test | New state review and integration fixture cover migration, mixed versions, and rollback. |
+| EXT.EFCORE.MIGRATIONS.001 | static | EF Core schema diffs include a generated migration. |
+| EXT.EFCORE.MIGRATIONS.002 | inspection | Migration review covers each declared storage and rollback effect. |
+| EXT.EFCORE.MIGRATIONS.003 | operation | Release record applies migration before replica startup. |
+| EXT.EFCORE.MIGRATIONS.004 | static | Migration commit contains migration, snapshot, and reviewed SQL artifacts. |
+| EXT.EFCORE.MIGRATIONS.005 | test | Migration fixtures run from empty and previous-release databases. |
+| EXT.EFCORE.MIGRATIONS.006 | static | Production and staging startup source calls none of the prohibited schema APIs. |
+| EXT.EFCORE.CONCURRENCY.001 | test | Concurrency fixtures carry expected version and use configured EF Core token. |
+| EXT.EFCORE.CONCURRENCY.002 | test | EF Core conflict fixture maps provider exception to Application contract. |
+| EXT.EFCORE.CONCURRENCY.003 | test | Conflict fixture proves no complete Command automatic retry. |
+| EXT.EFCORE.CONVENTION.001 | inspection | EF Core Infrastructure paths use the default layout or a local replacement. |
+| EXT.EFCORE.CONVENTION.002 | test | Generated migrations contain verified snake-case database names. |
