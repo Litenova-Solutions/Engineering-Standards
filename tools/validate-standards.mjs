@@ -127,6 +127,7 @@ function walk(directory, predicate, result = []) {
 
 function isCurrentStandardsMaterial(relative) {
   return relative !== 'CHANGELOG.md'
+    && relative !== 'AUDIT.md'
     && relative !== 'LICENSE.md';
 }
 
