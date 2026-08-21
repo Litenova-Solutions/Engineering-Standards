@@ -13,9 +13,10 @@ Use this index to load the canonical foundation, profile, convention, extension,
 - [Release standard](foundations/release-standard.md)
 - [Authoring standard](foundations/authoring-standard.md)
 
-## Platform Profile
+## Platform Profiles
 
 - [ASP.NET Core and Next.js profile](profile/dotnet-nextjs.md)
+- [.NET and Blazor client profile](profile/dotnet-blazor.md)
 
 The profile selects every baseline convention. Exact versions and composition remain in `standards.manifest.json`.
 
@@ -42,6 +43,15 @@ The profile selects every baseline convention. Exact versions and composition re
 - [Controlled UI governance](conventions/frontend/ui-governance.md)
 - [Data and state](conventions/frontend/data-and-state.md)
 - [Frontend testing](conventions/frontend/testing.md)
+
+## Blazor Client Conventions
+
+- [Client structure](conventions/frontend-blazor/structure.md)
+- [Client rendering and routes](conventions/frontend-blazor/rendering.md)
+- [Client components](conventions/frontend-blazor/components.md)
+- [Client data and state](conventions/frontend-blazor/data-and-state.md)
+- [Browser persistence](conventions/frontend-blazor/persistence-browser.md)
+- [Client testing](conventions/frontend-blazor/testing.md)
 
 ## Quality and Operations
 

@@ -35,6 +35,28 @@
         "docs/conventions/quality/operations.md",
         "docs/conventions/quality/ci.md"
       ]
+    },
+    "dotnet-blazor": {
+      "entry": "docs/profile/dotnet-blazor.md",
+      "documents": [
+        "docs/conventions/workspace/structure.md",
+        "docs/conventions/workspace/naming.md",
+        "docs/conventions/workspace/dependencies.md",
+        "docs/conventions/workspace/configuration.md",
+        "docs/foundations/authoring-standard.md",
+        "docs/conventions/backend/architecture.md",
+        "docs/conventions/backend/domain.md",
+        "docs/conventions/backend/application.md",
+        "docs/conventions/frontend-blazor/structure.md",
+        "docs/conventions/frontend-blazor/rendering.md",
+        "docs/conventions/frontend-blazor/components.md",
+        "docs/conventions/frontend-blazor/data-and-state.md",
+        "docs/conventions/frontend-blazor/persistence-browser.md",
+        "docs/conventions/frontend-blazor/testing.md",
+        "docs/conventions/quality/security.md",
+        "docs/conventions/quality/operations.md",
+        "docs/conventions/quality/ci.md"
+      ]
     }
   },
   "extensions": {
@@ -544,6 +566,58 @@
         "docs/conventions/quality/security.md",
         "docs/conventions/quality/operations.md",
         "docs/conventions/quality/ci.md"
+      ]
+    },
+    "client.structure": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/conventions/frontend-blazor/structure.md#agent-summary",
+        "docs/conventions/workspace/naming.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/frontend-blazor/structure.md",
+        "docs/conventions/workspace/naming.md"
+      ]
+    },
+    "client.rendering": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/conventions/frontend-blazor/rendering.md#agent-summary",
+        "docs/conventions/frontend-blazor/components.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/frontend-blazor/rendering.md",
+        "docs/conventions/frontend-blazor/components.md"
+      ]
+    },
+    "client.data": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/conventions/frontend-blazor/data-and-state.md#agent-summary",
+        "docs/conventions/frontend-blazor/persistence-browser.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/frontend-blazor/data-and-state.md",
+        "docs/conventions/frontend-blazor/persistence-browser.md"
+      ]
+    },
+    "client.testing": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/conventions/frontend-blazor/testing.md#agent-summary",
+        "docs/foundations/release-standard.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/conventions/frontend-blazor/testing.md",
+        "docs/foundations/release-standard.md"
       ]
     }
   }
