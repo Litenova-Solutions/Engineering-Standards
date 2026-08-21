@@ -7,9 +7,9 @@ Browser storage is the only durable store in a client-only product. It is small,
 ## Agent Summary {#agent-summary}
 
 - Storage is reached only through an Infrastructure adapter. (BLAZOR.BROWSER.PERSISTENCE.001)
-- Every key is a declared constant carrying product, area, and version. (BLAZOR.BROWSER.KEYS.001)
+- Every key is a declared constant carrying product, area, and version. (BLAZOR.BROWSER.KEY.001)
 - A changed shape ships a migration that reads every released version. (BLAZOR.BROWSER.MIGRATION.001)
-- A read returns a typed result covering unavailable, absent, corrupt, and present. (BLAZOR.BROWSER.READS.001)
+- A read returns a typed result covering unavailable, absent, corrupt, and present. (BLAZOR.BROWSER.READ.001)
 - A growing collection declares its bound and eviction rule. (BLAZOR.BROWSER.LIMITS.001)
 - Durable state exports to one file and imports from it. (BLAZOR.BROWSER.PORTABILITY.001)
 
@@ -21,7 +21,7 @@ Browser storage is the only durable store in a client-only product. It is small,
 
 **Rationale:** No Domain type, component, or page touches storage, so a test substitutes an in-memory implementation of the same interface.
 
-### Version and scope every storage key (BLAZOR.BROWSER.KEYS.001)
+### Version and scope every storage key (BLAZOR.BROWSER.KEY.001)
 
 **Requirement:** A storage key MUST use the form `{product}.{area}.v{n}` and be declared once as a constant beside its adapter.
 
@@ -35,7 +35,7 @@ Browser storage is the only durable store in a client-only product. It is small,
 
 **Rationale:** The migration runs at startup before the store reports ready. Data it cannot interpret is preserved under a quarantine key and reported, because deleting unreadable user data is not a recovery.
 
-### Treat reads as fallible (BLAZOR.BROWSER.READS.001)
+### Treat reads as fallible (BLAZOR.BROWSER.READ.001)
 
 **Requirement:** A storage adapter MUST return a typed result covering unavailable, absent, corrupt, and present.
 
@@ -84,9 +84,9 @@ Browser storage is the only durable store in a client-only product. It is small,
 | ID | Method | Evidence |
 |:---|:---|:---|
 | BLAZOR.BROWSER.PERSISTENCE.001 | test | `ClientArchitectureTests` asserts every storage call resolves the Application interface. |
-| BLAZOR.BROWSER.KEYS.001 | test | `StorageKeyTests` asserts each key is a declared constant matching the naming form. |
+| BLAZOR.BROWSER.KEY.001 | test | `StorageKeyTests` asserts each key is a declared constant matching the naming form. |
 | BLAZOR.BROWSER.MIGRATION.001 | test | `StorageMigrationTests` reads a record written in each released version and asserts the current shape. |
-| BLAZOR.BROWSER.READS.001 | test | `StorageAdapterTests` covers the unavailable, absent, corrupt, and present outcomes. |
+| BLAZOR.BROWSER.READ.001 | test | `StorageAdapterTests` covers the unavailable, absent, corrupt, and present outcomes. |
 | BLAZOR.BROWSER.LIMITS.001 | inspection | Each persisting specification names its collection bound and eviction rule. |
 | BLAZOR.BROWSER.PORTABILITY.001 | test | `PortabilityTests` asserts an export reimports to identical durable state. |
 | BLAZOR.BROWSER.CONVENTION.001 | inspection | Storage review matches each persisted shape to its declared mechanism. |

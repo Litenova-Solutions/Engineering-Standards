@@ -12,12 +12,12 @@ Application coordinates use cases. It translates a command or query into domain 
 - Commands and queries dispatch through their own mediator. (BACKEND.APPLICATION.MEDIATOR.001)
 - Messages are public when hosts need them; handlers stay internal. (BACKEND.APPLICATION.CONTRACTS.001)
 - Validators check input shape; Domain decides state permission. (BACKEND.APPLICATION.VALIDATION.001)
-- Expected failures throw typed Application exceptions with stable codes. (BACKEND.APPLICATION.FAILURES.001)
+- Expected failures throw typed Application exceptions with stable codes. (BACKEND.APPLICATION.FAILURE.001)
 - Handlers authorize against the target data they load. (BACKEND.APPLICATION.AUTHORIZATION.001)
 - Command handlers load, call Domain, stage, and return. (BACKEND.APPLICATION.COMMAND.001)
 - Queries project through the read session, never through aggregates. (BACKEND.APPLICATION.QUERY.001)
 - Results mirror the Domain closed set rather than flattening it. (BACKEND.APPLICATION.CLOSEDSET.001)
-- Ports name the business action and own their request and result types. (BACKEND.APPLICATION.PORTS.001)
+- Ports name the business action and own their request and result types. (BACKEND.APPLICATION.PORT.001)
 
 ## Standards
 
@@ -46,7 +46,7 @@ Application coordinates use cases. It translates a command or query into domain 
 
 **Rationale:** Domain owns state permission. A validator rejects an empty title, malformed identifier, or invalid page size. `ValidationError` carries exactly `Field`, `Code`, and `Message`, and validation exceptions expose no HTTP status.
 
-### Model expected use-case failures explicitly (BACKEND.APPLICATION.FAILURES.001)
+### Model expected use-case failures explicitly (BACKEND.APPLICATION.FAILURE.001)
 
 **Requirement:** An expected use-case failure MUST throw a transport-neutral Application exception carrying a stable code and a safe message.
 
@@ -76,7 +76,7 @@ Application coordinates use cases. It translates a command or query into domain 
 
 **Rationale:** The set's information then survives to the caller and the layers stay aligned. Application exposes no Domain union type and never flattens case data into an enum with nullable fields. Narrowing requires a decision and an updated specification.
 
-### Define narrow external ports (BACKEND.APPLICATION.PORTS.001)
+### Define narrow external ports (BACKEND.APPLICATION.PORT.001)
 
 **Requirement:** Application MUST declare a public port interface named for its business action, with a narrow surface and project-owned types.
 
@@ -163,7 +163,7 @@ Application coordinates use cases. It translates a command or query into domain 
       AdvancePublicationDeliveryWorkflowCommandHandler.cs
 ```
 
-The folder hierarchy follows `BACKEND.ARCHITECTURE.MODULES.001`: module, then aggregate, then operation. A single-aggregate module places its operation folders directly under the module only when the aggregate root's plural name equals the module name. Otherwise, and for any module with more than one aggregate, operation folders nest under the aggregate the use case targets. The example creates `Shared` children only for types used by multiple modules.
+The folder hierarchy follows `BACKEND.ARCHITECTURE.MODULE.001`: module, then aggregate, then operation. A single-aggregate module places its operation folders directly under the module only when the aggregate root's plural name equals the module name. Otherwise, and for any module with more than one aggregate, operation folders nest under the aggregate the use case targets. The example creates `Shared` children only for types used by multiple modules.
 
 ### Keep messages immutable (BACKEND.APPLICATION.CONVENTION.002)
 
@@ -290,12 +290,12 @@ Infrastructure stages Workflow state and the outgoing Command in the same sessio
 | BACKEND.APPLICATION.MEDIATOR.001 | inspection | `ArchitectureTests` asserts no dispatch path resolves a shared bus abstraction over the two pinned mediators. |
 | BACKEND.APPLICATION.CONTRACTS.001 | inspection | `ArchitectureTests` asserts handler and validator types are internal and sealed while messages and results carry their role suffix. |
 | BACKEND.APPLICATION.VALIDATION.001 | inspection | `ValidationTests` asserts each validator rejects structural input and defers state decisions to the aggregate. |
-| BACKEND.APPLICATION.FAILURES.001 | inspection | `UseCaseFailureTests` asserts each expected failure surfaces its stable code with no transport or provider detail attached. |
+| BACKEND.APPLICATION.FAILURE.001 | inspection | `UseCaseFailureTests` asserts each expected failure surfaces its stable code with no transport or provider detail attached. |
 | BACKEND.APPLICATION.AUTHORIZATION.001 | inspection | `TargetAuthorizationTests` asserts each protected handler rejects a caller lacking the target grant it loads. |
 | BACKEND.APPLICATION.COMMAND.001 | inspection | `ArchitectureTests` asserts no command handler commits a session, catches a domain exception, or references an HTTP type. |
 | BACKEND.APPLICATION.QUERY.001 | inspection | `ArchitectureTests` asserts no query handler resolves a repository or returns an aggregate type. |
 | BACKEND.APPLICATION.CLOSEDSET.001 | inspection | `ResultContractTests` asserts each result union carries one record per Domain case and exposes no Domain type. |
-| BACKEND.APPLICATION.PORTS.001 | inspection | `ArchitectureTests` asserts no Application port signature names a provider type or transport model. |
+| BACKEND.APPLICATION.PORT.001 | inspection | `ArchitectureTests` asserts no Application port signature names a provider type or transport model. |
 | BACKEND.APPLICATION.REACTION.001 | inspection | `ReactionTests` asserts each reaction runs under the delivery classification its specification declares. |
 | BACKEND.APPLICATION.ORCHESTRATION.001 | inspection | `ArchitectureTests` asserts no command handler resolves or calls the command mediator. |
 | BACKEND.APPLICATION.WORKFLOW.001 | inspection | `WorkflowOrchestrationTests` asserts the orchestrator stages progress and its outgoing command in one transaction. |

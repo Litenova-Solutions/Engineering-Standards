@@ -24,7 +24,7 @@ This extension replaces no baseline rule.
 - Keep operation IDs during compatible changes. (EXT.COMPAT.OPERATION.002)
 - Version and support breaking contracts. (EXT.COMPAT.VERSION.001, EXT.COMPAT.VERSION.002)
 - Deprecate public removals before sunset. (EXT.COMPAT.DEPRECATION.001, EXT.COMPAT.DEPRECATION.002)
-- Preserve error-contract compatibility. (EXT.COMPAT.ERRORS.001, EXT.COMPAT.ERRORS.002)
+- Preserve error-contract compatibility. (EXT.COMPAT.ERROR.001, EXT.COMPAT.ERROR.002)
 
 ## Standards
 
@@ -136,19 +136,19 @@ This extension replaces no baseline rule.
 
 **Rationale:** Consumers need a fixed end date and a named supported alternative.
 
-### Treat errors as contracts (EXT.COMPAT.ERRORS.001)
+### Treat errors as contracts (EXT.COMPAT.ERROR.001)
 
 **Requirement:** An API owner MUST treat Problem Details type, code, field-error codes, and documented statuses as versioned contract elements.
 
 **Rationale:** Consumers can branch on error structures as well as successful response structures.
 
-### Gate new error outcomes (EXT.COMPAT.ERRORS.002)
+### Gate new error outcomes (EXT.COMPAT.ERROR.002)
 
 **Requirement:** An API owner MAY add an error outcome only when existing consumers safely handle an unknown code.
 
 **Rationale:** Safe fallback behavior avoids consumer failure on a previously unseen outcome.
 
-### Exercise generated consumers (EXT.COMPAT.ERRORS.003)
+### Exercise generated consumers (EXT.COMPAT.ERROR.003)
 
 **Requirement:** An API owner MUST test representative generated clients against the changed OpenAPI document.
 
@@ -214,9 +214,9 @@ The extension adds no required package. An introduced OpenAPI diff tool needs a 
 | EXT.COMPAT.DEPRECATION.001 | test | `ApiDeprecationTests` assert the documented deprecation signal for planned removal. |
 | EXT.COMPAT.DEPRECATION.002 | inspection | Consumer `CHANGELOG.md` names each operation scheduled for removal. |
 | EXT.COMPAT.DEPRECATION.003 | inspection | The deprecation decision records the sunset date and replacement operation. |
-| EXT.COMPAT.ERRORS.001 | inspection | OpenAPI and error-contract review include type, code, field codes, and statuses. |
-| EXT.COMPAT.ERRORS.002 | test | `ApiErrorsTests` safely handle each added unknown error code. |
-| EXT.COMPAT.ERRORS.003 | test | `ApiErrorsTests` asserts representative generated clients compile and exercise the changed contract. |
+| EXT.COMPAT.ERROR.001 | inspection | OpenAPI and error-contract review include type, code, field codes, and statuses. |
+| EXT.COMPAT.ERROR.002 | test | `ApiErrorsTests` safely handle each added unknown error code. |
+| EXT.COMPAT.ERROR.003 | test | `ApiErrorsTests` asserts representative generated clients compile and exercise the changed contract. |
 | EXT.COMPAT.CONVENTION.001 | static | `ApiTests` asserts generated OpenAPI exists at the documented source path or recorded local replacement. |
 | EXT.COMPAT.CONVENTION.002 | inspection | Baseline storage review confirms immutable retained references. |
 | EXT.COMPAT.CONVENTION.003 | test | `ApiTests` asserts local and continuous integration invoke the same diff tool. |

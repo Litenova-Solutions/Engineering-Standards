@@ -16,7 +16,7 @@ The use case carries `durable-delivery` Risk, or the Workflow selects the extens
 
 ## Baseline relationship
 
-This extension replaces `BACKEND.PERSISTENCE.EVENTS.001`.
+This extension replaces `BACKEND.PERSISTENCE.EVENT.001`.
 
 ## Agent Summary {#agent-summary}
 
@@ -27,7 +27,7 @@ This extension replaces `BACKEND.PERSISTENCE.EVENTS.001`.
 - Bound retry and retain poison evidence. (EXT.OUTBOX.RETRY.001)
 - Distinguish store outage from claimed-message failure. (EXT.OUTBOX.READINESS.001, EXT.OUTBOX.READINESS.002)
 - Version message types for active Worker compatibility. (EXT.OUTBOX.SCHEMA.001, EXT.OUTBOX.SCHEMA.002)
-- Publish backlog health and delivery targets. (EXT.OUTBOX.OPERATIONS.001, EXT.OUTBOX.OPERATIONS.002)
+- Publish backlog health and delivery targets. (EXT.OUTBOX.OBSERVABILITY.001, EXT.OUTBOX.OBSERVABILITY.002)
 - Preserve state and message identity during replay. (EXT.OUTBOX.STATE.001, EXT.OUTBOX.STATE.002)
 - Deploy readers before compatible writers. (EXT.OUTBOX.ROLLOUT.001, EXT.OUTBOX.ROLLOUT.002)
 
@@ -195,13 +195,13 @@ This extension replaces `BACKEND.PERSISTENCE.EVENTS.001`.
 
 **Rationale:** Active deployment versions can place different valid message shapes in one store.
 
-### Publish backlog indicators (EXT.OUTBOX.OPERATIONS.001)
+### Publish backlog indicators (EXT.OUTBOX.OBSERVABILITY.001)
 
 **Requirement:** An outbox deployment MUST publish pending count, failed count, oldest pending age, attempts, dispatch duration, and success rate.
 
 **Rationale:** These indicators make backlog growth and dispatch quality observable.
 
-### Set delivery alerts (EXT.OUTBOX.OPERATIONS.002)
+### Set delivery alerts (EXT.OUTBOX.OBSERVABILITY.002)
 
 **Requirement:** An outbox deployment MUST set alert thresholds from its use-case delivery target.
 
@@ -322,8 +322,8 @@ No additional baseline package is required. Provider-specific dispatch dependenc
 | EXT.OUTBOX.READINESS.004 | test | `OutboxReadinessTests` gates dispatch and stops polling. |
 | EXT.OUTBOX.SCHEMA.001 | static | `OutboxSchemaTests` asserts message definitions provide stable type names and explicit schema versions. |
 | EXT.OUTBOX.SCHEMA.002 | test | `OutboxSchemaTests` dispatch every active producer message shape. |
-| EXT.OUTBOX.OPERATIONS.001 | operation | Metrics backend receives each declared backlog indicator. |
-| EXT.OUTBOX.OPERATIONS.002 | operation | Alert configuration derives thresholds from the delivery target. |
+| EXT.OUTBOX.OBSERVABILITY.001 | operation | Metrics backend receives each declared backlog indicator. |
+| EXT.OUTBOX.OBSERVABILITY.002 | operation | Alert configuration derives thresholds from the delivery target. |
 | EXT.OUTBOX.STATE.001 | test | `OutboxStateTests` permit only documented state transitions. |
 | EXT.OUTBOX.STATE.002 | test | `OutboxStateTests` retain one message ID. |
 | EXT.OUTBOX.STATE.003 | operation | Replay audit record captures actor, reason, time, and previous failure. |

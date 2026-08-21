@@ -8,7 +8,7 @@ The standards use one document grammar and one controlled technical prose profil
 
 - Use controlled technical prose with repository terminology. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.TERM.001)
 - Write one testable obligation in each Standards provision. (CORE.AUTHORING.NORMATIVE.002, CORE.AUTHORING.REQUIREMENT.001)
-- Name the declared page scope in every provision ID. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002)
+- Name the declared page scope and a registered topic in each ID. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002, CORE.AUTHORING.IDENTIFIER.003)
 - Give each actionable default a distinct convention ID. (CORE.AUTHORING.DEFAULTS.001)
 - Apply the declared contract for each page class. (CORE.AUTHORING.PAGE.001)
 - Keep summaries informative and cite every projected provision. (CORE.AUTHORING.SUMMARY.001)
@@ -154,7 +154,7 @@ Every provision ID uses four uppercase segments: `AREA.PAGE.TOPIC.NNN`.
 |:---|:---|:---|
 | `AREA` | `idRegistry.areas` in the manifest | Names the subject area a reader loads |
 | `PAGE` | `idRegistry.pages` in the manifest | Names the one page that owns the assertion |
-| `TOPIC` | The authoring page | Names the assertion inside that page |
+| `TOPIC` | `idRegistry.topics` in the manifest | Names the assertion inside that page |
 | `NNN` | The authoring page | Orders assertions that share one topic |
 
 The eight areas are `CORE`, `PLATFORM`, `WORKSPACE`, `BACKEND`, `FRONTEND`, `BLAZOR`, `QUALITY`, and `EXT`.
@@ -162,6 +162,8 @@ The eight areas are `CORE`, `PLATFORM`, `WORKSPACE`, `BACKEND`, `FRONTEND`, `BLA
 `AREA.PAGE` is the page scope. The manifest declares one scope for each normative page, and no two pages share a scope. A citation therefore names the page a reader must open, so `FRONTEND.COMPONENTS.OWNERSHIP.001` resolves without a lookup step.
 
 `CONVENTION` is a reserved `TOPIC` value. A replaceable default uses it and a Standards provision does not, so the ID states normative force. An `EXT` area marks a provision that applies only when its extension is active.
+
+The topic vocabulary is closed. A topic names a concept rather than a count, so one concept never carries both a singular and a plural form. Adding a word means registering it, which keeps two pages from naming one concept differently.
 
 An active provision ID identifies its current assertion. A changed, split, merged, or newly normative provision receives a new ID.
 
@@ -265,6 +267,14 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 **Rationale:** A declared scope makes each citation resolve to one page without a lookup, and it stops two pages from claiming one namespace.
 
 **Example:** `FRONTEND.COMPONENTS.OWNERSHIP.001` names the frontend area, the components page, the ownership topic, and the first assertion.
+
+### Use a registered topic segment (CORE.AUTHORING.IDENTIFIER.003)
+
+**Requirement:** A provision ID topic MUST appear in `idRegistry.topics` within `standards.manifest.json`.
+
+**Rationale:** A closed vocabulary stops two pages from naming one concept differently, and registering a word makes the addition visible in review.
+
+**Example:** `STATE` is registered, so `BACKEND.DOMAIN.STATE.001` and `FRONTEND.RENDERING.STATE.001` name one concept.
 
 ### Restrict the CONVENTION segment to replaceable defaults (CORE.AUTHORING.IDENTIFIER.002)
 
@@ -432,6 +442,7 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.REQUIREMENT.001 | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
 | CORE.AUTHORING.IDENTIFIER.001 | static | `node tools/validate-standards.mjs` emits no `ID_PREFIX_OWNERSHIP`, `ID_PAGE_UNREGISTERED`, or `ID_AREA_UNKNOWN` diagnostic. |
 | CORE.AUTHORING.IDENTIFIER.002 | static | `node tools/validate-standards.cases.mjs` asserts the parser rejects a Standard whose ID ends in a `CONVENTION` segment. |
+| CORE.AUTHORING.IDENTIFIER.003 | static | `node tools/validate-standards.mjs` emits no `ID_TOPIC_UNKNOWN` or `ID_TOPIC_DUPLICATE` diagnostic. |
 | CORE.AUTHORING.DEFAULTS.001 | static | `WritingTests` asserts the parser resolves each Convention ID, Default, Replacement, and Verification row. |
 | CORE.AUTHORING.SUMMARY.001 | inspection | The summary parser resolves every citation, and review compares each projection with its source. |
 | CORE.AUTHORING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |

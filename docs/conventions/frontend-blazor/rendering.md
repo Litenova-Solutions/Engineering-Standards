@@ -8,7 +8,7 @@ The client renders entirely in the browser. Routes declare their own templates a
 
 - Rendering runs in the browser with no server round trip. (BLAZOR.RENDERING.MODE.001)
 - A routable component declares its own template under `Pages/`. (BLAZOR.RENDERING.ROUTES.001)
-- Each route defines loading, empty, error, and content behavior. (BLAZOR.RENDERING.STATES.001)
+- Each route defines loading, empty, error, and content behavior. (BLAZOR.RENDERING.STATE.001)
 - Pages a first-time visitor reads download no runtime. (BLAZOR.RENDERING.ACQUISITION.001)
 - The application starts and navigates offline after first load. (BLAZOR.RENDERING.OFFLINE.001)
 
@@ -26,7 +26,7 @@ The client renders entirely in the browser. Routes declare their own templates a
 
 **Rationale:** Feature components stay unroutable. An unparsable parameter renders the not-found state rather than throwing.
 
-### Give every route explicit states (BLAZOR.RENDERING.STATES.001)
+### Give every route explicit states (BLAZOR.RENDERING.STATE.001)
 
 **Requirement:** A route MUST define its loading, empty, error, and content behavior.
 
@@ -68,7 +68,7 @@ The client renders entirely in the browser. Routes declare their own templates a
 |:---|:---|:---|
 | BLAZOR.RENDERING.MODE.001 | test | `PublishOutputTests` asserts the output declares no render mode requiring a server. |
 | BLAZOR.RENDERING.ROUTES.001 | test | `RouteContractTests` asserts each routable component declares one template with typed parameters. |
-| BLAZOR.RENDERING.STATES.001 | test | `RouteStateTests` asserts each route renders its loading, empty, error, and content states. |
+| BLAZOR.RENDERING.STATE.001 | test | `RouteStateTests` asserts each route renders its loading, empty, error, and content states. |
 | BLAZOR.RENDERING.ACQUISITION.001 | test | `AcquisitionTests` asserts a landing page loads without fetching the framework payload. |
 | BLAZOR.RENDERING.OFFLINE.001 | test | `OfflineStartupTests` starts the application with the network disabled after a first load. |
 | BLAZOR.RENDERING.CONVENTION.001 | inspection | Route review compares each template against its documented use-case name. |

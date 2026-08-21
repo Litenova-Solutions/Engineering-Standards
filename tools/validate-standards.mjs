@@ -81,6 +81,8 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'ID_PAGE_UNREGISTERED',
   'ID_PREFIX_OWNERSHIP',
   'ID_REGISTRY_STALE',
+  'ID_TOPIC_DUPLICATE',
+  'ID_TOPIC_UNKNOWN',
   'ID_LOCATION',
   'ID_MISSING',
   'ID_UNKNOWN_REFERENCE',
@@ -906,13 +908,13 @@ function checkManifest(root, add) {
 }
 
 function manifestRegistry(root) {
-  const absent = { present: false, areas: new Set(), pages: {} };
+  const absent = { present: false, areas: new Set(), pages: {}, topics: new Set() };
   const file = path.join(root, 'standards.manifest.json');
   if (!fs.existsSync(file)) return absent;
   try {
     const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
     const registry = manifest.idRegistry ?? {};
-    return { present: true, areas: new Set(registry.areas ?? []), pages: registry.pages ?? {} };
+    return { present: true, areas: new Set(registry.areas ?? []), pages: registry.pages ?? {}, topics: new Set(registry.topics ?? []) };
   } catch {
     return absent;
   }
@@ -969,6 +971,7 @@ export function validateRepository(rootInput = '.') {
   // carries that scope. A page outside the registry cannot own provisions.
   const registry = manifestRegistry(root);
   const scopeOwners = new Map();
+  const usedTopics = new Set();
   for (const document of registry.present ? parsedDocuments : []) {
     const provisions = document.parsed.provisions ?? [];
     if (!provisions.length) continue;
@@ -987,7 +990,18 @@ export function validateRepository(rootInput = '.') {
       if (!provision.id.startsWith(`${declared}.`)) {
         add(document.relative, provision.line, 'ID_PREFIX_OWNERSHIP', `provision '${provision.id}' does not use the declared page scope '${declared}'`);
       }
+      const topic = provision.id.split('.')[2];
+      usedTopics.add(topic);
+      if (!registry.topics.has(topic)) {
+        add(document.relative, provision.line, 'ID_TOPIC_UNKNOWN', `topic '${topic}' is not registered in the manifest idRegistry topics`);
+      }
     }
+  }
+  for (const topic of registry.present ? registry.topics : []) {
+    if (topic.endsWith('S') && registry.topics.has(topic.slice(0, -1))) {
+      add('standards.manifest.json', 1, 'ID_TOPIC_DUPLICATE', `topics '${topic.slice(0, -1)}' and '${topic}' name one concept in two forms`);
+    }
+    if (!usedTopics.has(topic)) add('standards.manifest.json', 1, 'ID_REGISTRY_STALE', `idRegistry registers topic '${topic}', which no provision uses`);
   }
   for (const [relative, scope] of registry.present ? Object.entries(registry.pages) : []) {
     if (!scopeOwners.has(scope)) add('standards.manifest.json', 1, 'ID_REGISTRY_STALE', `idRegistry declares '${scope}' for '${relative}', which owns no provision`);

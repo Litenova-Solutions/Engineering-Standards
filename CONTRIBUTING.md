@@ -31,6 +31,8 @@ A provision ID uses `AREA.PAGE.TOPIC.NNN`. Reserve the `CONVENTION` topic for re
 
 Register a new page in `idRegistry` before adding its first provision. (CORE.AUTHORING.IDENTIFIER.001)
 
+Register a new topic word in `idRegistry.topics`. Reuse the existing word when one already names the concept. (CORE.AUTHORING.IDENTIFIER.003)
+
 Do not add aliases, replacement maps, alternate paths, compatibility terms, or transition material. (CORE.AUTHORING.SNAPSHOT.002)
 
 An actionable Convention includes one convention ID, Default statement, Replacement statement, and Verification row.

@@ -12,7 +12,7 @@ Next.js route files should expose server-first page composition and make browser
 - Every client directive names the capability requiring it. (FRONTEND.RENDERING.CLIENT.001)
 - Request and route APIs are awaited. (FRONTEND.RENDERING.ASYNC.001)
 - Route files compose; features hold the logic. (FRONTEND.RENDERING.ROUTES.001)
-- Data-driven routes define every applicable state. (FRONTEND.RENDERING.STATES.001)
+- Data-driven routes define every applicable state. (FRONTEND.RENDERING.STATE.001)
 - Caching actor-specific data requires a declared key and owner. (FRONTEND.RENDERING.CACHE.001)
 - Edge proxy rules stay coarse and never authorize resources. (FRONTEND.RENDERING.PROXY.001)
 - Routes declare metadata, and private routes block indexing. (FRONTEND.RENDERING.METADATA.001)
@@ -53,7 +53,7 @@ A generic comment such as `Client component` does not satisfy the convention.
 
 **Rationale:** Validation, mutation logic, and view mapping stay in feature or shared modules where another route can reach them.
 
-### Represent route states (FRONTEND.RENDERING.STATES.001)
+### Represent route states (FRONTEND.RENDERING.STATE.001)
 
 **Requirement:** A data-driven route MUST define its loading, empty, error, forbidden, not-found, and ready behavior.
 
@@ -132,7 +132,7 @@ The route resolves input and composes the feature. `getPost` owns typed API acce
 | FRONTEND.RENDERING.CLIENT.001 | inspection | `node standards/tools/validate-ui.mjs` reports a `'use client'` directive with no adjacent capability comment. |
 | FRONTEND.RENDERING.ASYNC.001 | inspection | `RenderBoundaryTests` asserts each request API access is awaited. |
 | FRONTEND.RENDERING.ROUTES.001 | static | `RouteCompositionTests` asserts no route file declares validation, mutation, or mapping logic. |
-| FRONTEND.RENDERING.STATES.001 | static | `RouteStateTests` asserts each data-driven route renders every applicable state. |
+| FRONTEND.RENDERING.STATE.001 | static | `RouteStateTests` asserts each data-driven route renders every applicable state. |
 | FRONTEND.RENDERING.CACHE.001 | inspection | `CacheBoundaryTests` asserts no actor-specific read shares a cache entry across actors. |
 | FRONTEND.RENDERING.PROXY.001 | inspection | `ProxyTests` asserts no proxy rule performs a resource ownership or authorization decision. |
 | FRONTEND.RENDERING.METADATA.001 | static | `MetadataTests` asserts public routes declare the four values and private routes prevent indexing. |

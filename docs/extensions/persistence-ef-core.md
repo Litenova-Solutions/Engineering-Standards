@@ -14,7 +14,7 @@ The consumer enables `persistence-ef-core` only after a decision records aggrega
 
 ## Baseline relationship
 
-For EF Core-owned aggregate paths, this extension replaces `WORKSPACE.DEPENDENCIES.APPLICATION.001`, `BACKEND.ARCHITECTURE.CQRS.001`, `BACKEND.PERSISTENCE.WRITE.001`, `BACKEND.PERSISTENCE.READ.001`, `BACKEND.PERSISTENCE.COMMIT.001`, `BACKEND.PERSISTENCE.EVENTS.001`, `BACKEND.PERSISTENCE.MAPPING.001`, `BACKEND.PERSISTENCE.SERIALIZATION.001`, `BACKEND.PERSISTENCE.EVOLUTION.001`, and `BACKEND.PERSISTENCE.DOCUMENT.001`.
+For EF Core-owned aggregate paths, this extension replaces `WORKSPACE.DEPENDENCIES.APPLICATION.001`, `BACKEND.ARCHITECTURE.CQRS.001`, `BACKEND.PERSISTENCE.WRITE.001`, `BACKEND.PERSISTENCE.READ.001`, `BACKEND.PERSISTENCE.COMMIT.001`, `BACKEND.PERSISTENCE.EVENT.001`, `BACKEND.PERSISTENCE.MAPPING.001`, `BACKEND.PERSISTENCE.SERIALIZATION.001`, `BACKEND.PERSISTENCE.EVOLUTION.001`, and `BACKEND.PERSISTENCE.DOCUMENT.001`.
 
 When `outbox-worker` applies to an EF Core-owned command, this extension also replaces `EXT.OUTBOX.ATOMIC.001` for that command.
 
@@ -28,7 +28,7 @@ When `outbox-worker` applies to an EF Core-owned command, this extension also re
 - Stage EF Core outbox records with EF Core business work. (EXT.EFCORE.OUTBOX.001)
 - Configure relational mappings in Infrastructure. (EXT.EFCORE.MAPPING.001)
 - Preserve Domain state records and lifecycle boundaries. (EXT.EFCORE.STATE.001, EXT.EFCORE.STATE.002)
-- Review and release migrations explicitly. (EXT.EFCORE.MIGRATIONS.001, EXT.EFCORE.MIGRATIONS.003)
+- Review and release migrations explicitly. (EXT.EFCORE.MIGRATION.001, EXT.EFCORE.MIGRATION.003)
 - Map EF Core concurrency failures to Application outcomes. (EXT.EFCORE.CONCURRENCY.002)
 
 ## Standards
@@ -197,37 +197,37 @@ When `outbox-worker` applies to an EF Core-owned command, this extension also re
 
 **Example:** `PostRow` maps `state_type`, `published_at`, and `archived_at` to one `PostState` record.
 
-### Generate migrations for schema changes (EXT.EFCORE.MIGRATIONS.001)
+### Generate migrations for schema changes (EXT.EFCORE.MIGRATION.001)
 
 **Requirement:** An EF Core schema change MUST generate a migration.
 
 **Rationale:** The migration is the explicit reviewed description of relational schema evolution.
 
-### Review migration effects (EXT.EFCORE.MIGRATIONS.002)
+### Review migration effects (EXT.EFCORE.MIGRATION.002)
 
 **Requirement:** A migration review MUST cover tables, columns, indexes, constraints, data movement, destructive operations, and rollback compatibility.
 
 **Rationale:** Each item can affect deployment safety or data recovery.
 
-### Apply migrations as release work (EXT.EFCORE.MIGRATIONS.003)
+### Apply migrations as release work (EXT.EFCORE.MIGRATION.003)
 
 **Requirement:** A release process MUST apply EF Core migrations before application startup.
 
 **Rationale:** Release-owned execution controls ordering and evidence for schema work.
 
-### Keep migration files together (EXT.EFCORE.MIGRATIONS.004)
+### Keep migration files together (EXT.EFCORE.MIGRATION.004)
 
 **Requirement:** An EF Core schema change MUST commit migration, model snapshot, and reviewed SQL together.
 
 **Rationale:** The three artifacts show intended migration source and resulting relational change.
 
-### Test migration starting states (EXT.EFCORE.MIGRATIONS.005)
+### Test migration starting states (EXT.EFCORE.MIGRATION.005)
 
 **Requirement:** An EF Core migration MUST apply successfully from an empty database and previous release database.
 
 **Rationale:** Both initial setup and upgrade paths need tested relational evolution.
 
-### Reject startup schema mutation (EXT.EFCORE.MIGRATIONS.006)
+### Reject startup schema mutation (EXT.EFCORE.MIGRATION.006)
 
 **Requirement:** Production and staging startup MUST NOT call `EnsureCreated`, `EnsureDeleted`, or `Migrate`.
 
@@ -306,12 +306,12 @@ When `outbox-worker` applies to an EF Core-owned command, this extension also re
 | EXT.EFCORE.STATE.003 | test | `EfCoreStateTests` materialize, track, and round-trip every state case. |
 | EXT.EFCORE.STATE.004 | test | `EfCoreStateTests` map valid discriminator values to Domain states. |
 | EXT.EFCORE.STATE.005 | inspection | New state review and integration fixture cover migration, mixed versions, and rollback. |
-| EXT.EFCORE.MIGRATIONS.001 | static | `EfCoreMigrationsTests` asserts eF Core schema diffs include a generated migration. |
-| EXT.EFCORE.MIGRATIONS.002 | inspection | Migration review covers each declared storage and rollback effect. |
-| EXT.EFCORE.MIGRATIONS.003 | operation | Release record applies migration before replica startup. |
-| EXT.EFCORE.MIGRATIONS.004 | static | `EfCoreMigrationsTests` asserts migration commit contains migration, snapshot, and reviewed SQL artifacts. |
-| EXT.EFCORE.MIGRATIONS.005 | test | `EfCoreMigrationsTests` run from empty and previous-release databases. |
-| EXT.EFCORE.MIGRATIONS.006 | static | `EfCoreMigrationsTests` asserts production and staging startup source calls none of the prohibited schema APIs. |
+| EXT.EFCORE.MIGRATION.001 | static | `EfCoreMigrationsTests` asserts eF Core schema diffs include a generated migration. |
+| EXT.EFCORE.MIGRATION.002 | inspection | Migration review covers each declared storage and rollback effect. |
+| EXT.EFCORE.MIGRATION.003 | operation | Release record applies migration before replica startup. |
+| EXT.EFCORE.MIGRATION.004 | static | `EfCoreMigrationsTests` asserts migration commit contains migration, snapshot, and reviewed SQL artifacts. |
+| EXT.EFCORE.MIGRATION.005 | test | `EfCoreMigrationsTests` run from empty and previous-release databases. |
+| EXT.EFCORE.MIGRATION.006 | static | `EfCoreMigrationsTests` asserts production and staging startup source calls none of the prohibited schema APIs. |
 | EXT.EFCORE.CONCURRENCY.001 | test | `EfCoreConcurrencyTests` carry expected version and use configured EF Core token. |
 | EXT.EFCORE.CONCURRENCY.002 | test | `EfCoreConcurrencyTests` maps provider exception to Application contract. |
 | EXT.EFCORE.CONCURRENCY.003 | test | `EfCoreConcurrencyTests` proves no complete Command automatic retry. |

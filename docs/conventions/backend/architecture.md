@@ -14,7 +14,7 @@ CQRS separates write and read behavior inside one Application project. Modules a
 - Project references point inward and never outward. (BACKEND.ARCHITECTURE.DEPENDENCIES.001)
 - Each layer defines its own messages, results, and transport models. (BACKEND.ARCHITECTURE.CONTRACTS.001)
 - One Application project holds every message, handler, and port. (BACKEND.ARCHITECTURE.APPLICATION.001)
-- Every layer repeats the same module and aggregate folder order. (BACKEND.ARCHITECTURE.MODULES.001)
+- Every layer repeats the same module and aggregate folder order. (BACKEND.ARCHITECTURE.MODULE.001)
 - Handlers, validators, and implementations stay internal and sealed. (BACKEND.ARCHITECTURE.VISIBILITY.001)
 - Aggregates own invariants; handlers only coordinate. (BACKEND.ARCHITECTURE.DOMAIN.001)
 - Commands write through repositories; queries read projections. (BACKEND.ARCHITECTURE.CQRS.001)
@@ -57,7 +57,7 @@ apps/api/src/{ProjectName}.WebApi/
 
 **Rationale:** Separate Write, Read, Contracts, and event-handler assemblies are outside this profile.
 
-### Organize every layer by module and use case (BACKEND.ARCHITECTURE.MODULES.001)
+### Organize every layer by module and use case (BACKEND.ARCHITECTURE.MODULE.001)
 
 **Requirement:** Every layer MUST use the same module names and order its folders as module, then aggregate, then layer detail.
 
@@ -182,7 +182,7 @@ Publishing a post follows this direction:
 | BACKEND.ARCHITECTURE.DEPENDENCIES.001 | inspection | `ArchitectureTests` asserts the project reference graph matches the inward matrix in the dependencies convention. |
 | BACKEND.ARCHITECTURE.CONTRACTS.001 | inspection | `ArchitectureTests` asserts no Application result or WebApi model exposes a Domain type across the layer boundary. |
 | BACKEND.ARCHITECTURE.APPLICATION.001 | inspection | `SolutionStructureTests` asserts one Application project holds every command, query, handler, and port type. |
-| BACKEND.ARCHITECTURE.MODULES.001 | static | `ArchitectureTests` asserts each layer folder path resolves to a declared module and aggregate, with no project-wide type folders. |
+| BACKEND.ARCHITECTURE.MODULE.001 | static | `ArchitectureTests` asserts each layer folder path resolves to a declared module and aggregate, with no project-wide type folders. |
 | BACKEND.ARCHITECTURE.VISIBILITY.001 | inspection | `ArchitectureTests` asserts every handler, validator, repository implementation, and endpoint type is internal and sealed. |
 | BACKEND.ARCHITECTURE.DOMAIN.001 | inspection | `ArchitectureTests` asserts no command handler references an invariant identifier that its aggregate already enforces. |
 | BACKEND.ARCHITECTURE.CQRS.001 | inspection | `ArchitectureTests` asserts no query handler resolves a repository and no command handler resolves a read session. |

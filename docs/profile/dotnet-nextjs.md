@@ -11,7 +11,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 
 - Selecting the profile applies every convention it composes. (PLATFORM.NEXTJS.COMPOSITION.001)
-- Every version resolves from the manifest. (PLATFORM.NEXTJS.VERSIONS.001)
+- Every version resolves from the manifest. (PLATFORM.NEXTJS.VERSION.001)
 - A replacement names every rule identifier it replaces. (PLATFORM.NEXTJS.REPLACEMENT.001)
 
 ## Standards
@@ -23,7 +23,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 **Rationale:** A consumer cannot claim the profile while silently omitting an applicable standard, because the profile is the unit of conformance.
 
-### Use manifest version pins (PLATFORM.NEXTJS.VERSIONS.001)
+### Use manifest version pins (PLATFORM.NEXTJS.VERSION.001)
 
 **Requirement:** A consumer MUST resolve every SDK, framework, NuGet, and npm version from `standards.manifest.json`.
 
@@ -86,6 +86,6 @@ Exact framework and package versions live only in `standards.manifest.json`.
 | ID | Method | Evidence |
 |:---|:---|:---|
 | PLATFORM.NEXTJS.COMPOSITION.001 | inspection | `node tools/validate-standards.mjs` asserts the composition list matches the manifest profile documents. |
-| PLATFORM.NEXTJS.VERSIONS.001 | inspection | The CI dependency check compares each resolved version against its manifest pin. |
+| PLATFORM.NEXTJS.VERSION.001 | inspection | The CI dependency check compares each resolved version against its manifest pin. |
 | PLATFORM.NEXTJS.REPLACEMENT.001 | inspection | `node tools/validate-standards.mjs` resolves each declared replacement identifier to an active provision. |
 | PLATFORM.NEXTJS.CONVENTION.001 | inspection | `standards.project.json` names the profile and the root `AGENTS.md` names the solution, frontends, and commands. |

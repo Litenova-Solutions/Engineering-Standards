@@ -27,7 +27,7 @@ The validator checks:
 - Internal links, anchors, and manifest paths.
 - Extension declarations and profile composition.
 - The two tracked schema consumers.
-- The declared provision identity registry.
+- The declared provision identity registry and topic vocabulary.
 - The generated provision index.
 - Current standards material.
 

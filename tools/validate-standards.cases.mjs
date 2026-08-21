@@ -316,8 +316,10 @@ const fixturePages = {
   'docs/profile/sample.md': 'FIXTURE.PROFILE',
 };
 
-function registryManifest(pages, areas = ['EXT', 'FIXTURE', 'OTHER']) {
-  return JSON.stringify({ idRegistry: { areas, pages } });
+const fixtureTopics = ['ADOPT', 'BOUNDARY', 'COMPOSITION', 'CONVENTION'];
+
+function registryManifest(pages, areas = ['EXT', 'FIXTURE', 'OTHER'], topics = fixtureTopics) {
+  return JSON.stringify({ idRegistry: { areas, pages, topics } });
 }
 
 const rescoped = foundation
@@ -343,6 +345,15 @@ run('id scope outside the declared areas', (root) => {
 run('registry entry that owns no provision', (root) => {
   write(root, 'standards.manifest.json', registryManifest({ ...fixturePages, 'docs/guides/sample.md': 'FIXTURE.GUIDE' }));
 }, ['ID_REGISTRY_STALE']);
+run('registered topic that no provision uses', (root) => {
+  write(root, 'standards.manifest.json', registryManifest(fixturePages, undefined, [...fixtureTopics, 'UNUSED']));
+}, ['ID_REGISTRY_STALE']);
+run('topic outside the registered vocabulary', (root) => {
+  write(root, 'standards.manifest.json', registryManifest(fixturePages, undefined, ['ADOPT', 'COMPOSITION', 'CONVENTION']));
+}, ['ID_TOPIC_UNKNOWN']);
+run('one concept registered in two forms', (root) => {
+  write(root, 'standards.manifest.json', registryManifest(fixturePages, undefined, [...fixtureTopics, 'BOUNDARYS']));
+}, ['ID_TOPIC_DUPLICATE']);
 run('heading with no body', (root) => write(root, 'docs/foundations/topic.md', foundation.replace(
   '## Standards',
   ['## Concepts', '', '### Empty concept', '', '### Second concept', '', 'This concept has a body.', '', '## Standards'].join('\n'),

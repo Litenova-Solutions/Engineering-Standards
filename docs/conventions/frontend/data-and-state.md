@@ -10,9 +10,9 @@ Frontend data flow should preserve the API contract, keep secrets on the server,
 
 - API types are generated from the committed contract. (FRONTEND.DATA.TYPES.001)
 - One typed client per API boundary owns cross-cutting behavior. (FRONTEND.DATA.CLIENT.001)
-- Initial data loads on the server. (FRONTEND.DATA.READS.001)
+- Initial data loads on the server. (FRONTEND.DATA.READ.001)
 - Mutations run through a declared server or browser boundary. (FRONTEND.DATA.MUTATIONS.001)
-- Problem Details map to one frontend error shape. (FRONTEND.DATA.ERRORS.001)
+- Problem Details map to one frontend error shape. (FRONTEND.DATA.ERROR.001)
 - State sits with its narrowest owner. (FRONTEND.DATA.OWNER.001)
 - Forms match their use-case input and map field errors. (FRONTEND.DATA.FORM.001)
 - Secrets never reach browser storage. (FRONTEND.DATA.SECRETS.001)
@@ -33,7 +33,7 @@ Frontend data flow should preserve the API contract, keep secrets on the server,
 
 **Rationale:** Feature modules call that client instead of constructing their own requests, so the cross-cutting behavior applies once.
 
-### Read initial data on the server (FRONTEND.DATA.READS.001)
+### Read initial data on the server (FRONTEND.DATA.READ.001)
 
 **Requirement:** Initial route data MUST load through a Server Component or a server-owned feature function.
 
@@ -45,7 +45,7 @@ Frontend data flow should preserve the API contract, keep secrets on the server,
 
 **Rationale:** Server Actions suit forms owned by a Next.js boundary. A typed browser request suits interactions needing immediate browser context.
 
-### Parse errors consistently (FRONTEND.DATA.ERRORS.001)
+### Parse errors consistently (FRONTEND.DATA.ERROR.001)
 
 **Requirement:** A frontend MUST map API Problem Details into one error shape carrying status, stable code, trace identifier, field errors, and a safe fallback message.
 
@@ -159,7 +159,7 @@ The example moves the generated types and client to workspace packages only when
 
 ## Reference example
 
-This informative example demonstrates `FRONTEND.DATA.READS.001`, `FRONTEND.DATA.OWNER.001`, and `FRONTEND.DATA.MUTATIONS.001`.
+This informative example demonstrates `FRONTEND.DATA.READ.001`, `FRONTEND.DATA.OWNER.001`, and `FRONTEND.DATA.MUTATIONS.001`.
 
 A posts list reads on the server from the typed API client. Its search and cursor live in the URL. `CreateDraftForm` submits through a Server Action, maps Problem Details field errors, and refreshes the posts route after success.
 
@@ -170,9 +170,9 @@ A posts list reads on the server from the typed API client. Its search and curso
 |:---|:---|:---|
 | FRONTEND.DATA.TYPES.001 | static | The CI contract job reruns `openapi-typescript` and fails when the committed output differs. |
 | FRONTEND.DATA.CLIENT.001 | inspection | `ApiClientTests` asserts every API call routes through the single typed client per boundary. |
-| FRONTEND.DATA.READS.001 | inspection | `DataBoundaryTests` asserts no initial route read runs in a client component. |
+| FRONTEND.DATA.READ.001 | inspection | `DataBoundaryTests` asserts no initial route read runs in a client component. |
 | FRONTEND.DATA.MUTATIONS.001 | inspection | `MutationBoundaryTests` asserts each mutation routes through its declared boundary. |
-| FRONTEND.DATA.ERRORS.001 | inspection | `ErrorMappingTests` asserts each API failure produces the single frontend error shape. |
+| FRONTEND.DATA.ERROR.001 | inspection | `ErrorMappingTests` asserts each API failure produces the single frontend error shape. |
 | FRONTEND.DATA.OWNER.001 | inspection | State review compares each stored value against the ownership order in this section. |
 | FRONTEND.DATA.FORM.001 | inspection | `FormContractTests` asserts each form field matches its contract and each field error maps to its input. |
 | FRONTEND.DATA.SECRETS.001 | inspection | `node standards/tools/validate-ui.mjs` reports a secret written to browser storage or a public variable. |

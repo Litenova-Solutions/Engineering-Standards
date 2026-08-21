@@ -13,7 +13,7 @@ One scoped document session and one LiteBus command post-handler own the transac
 - Commands write through repositories, never the session directly. (BACKEND.PERSISTENCE.WRITE.001)
 - Queries project through the read session with scope and limits applied. (BACKEND.PERSISTENCE.READ.001)
 - One post-handler commits each command; nothing else calls save. (BACKEND.PERSISTENCE.COMMIT.001)
-- Repositories buffer events for the post-handler to drain. (BACKEND.PERSISTENCE.EVENTS.001)
+- Repositories buffer events for the post-handler to drain. (BACKEND.PERSISTENCE.EVENT.001)
 - Workflow progress and outgoing work commit in one transaction. (BACKEND.PERSISTENCE.WORKFLOW.001)
 - Document aliases and identifier mappings are declared explicitly. (BACKEND.PERSISTENCE.MAPPING.001)
 - Infrastructure owns the stored JSON contract, not Domain. (BACKEND.PERSISTENCE.SERIALIZATION.001)
@@ -42,7 +42,7 @@ One scoped document session and one LiteBus command post-handler own the transac
 
 **Rationale:** A failed command then leaves the scoped session uncommitted. Handlers, repositories, validators, reactions, orchestrators, and endpoints never commit.
 
-### Collect events without a public unit of work (BACKEND.PERSISTENCE.EVENTS.001)
+### Collect events without a public unit of work (BACKEND.PERSISTENCE.EVENT.001)
 
 **Requirement:** A repository MUST register each touched aggregate with the internal scoped event buffer that the post-handler drains.
 
@@ -132,7 +132,7 @@ One scoped document session and one LiteBus command post-handler own the transac
         WorkflowCommandOutbox.cs
 ```
 
-The module folders follow `BACKEND.ARCHITECTURE.MODULES.001`. A single-aggregate module stays flat when its aggregate root's plural name equals the module name. For example, `Post` stays flat under `Posts`. Otherwise, each aggregate takes its own folder.
+The module folders follow `BACKEND.ARCHITECTURE.MODULE.001`. A single-aggregate module stays flat when its aggregate root's plural name equals the module name. For example, `Post` stays flat under `Posts`. Otherwise, each aggregate takes its own folder.
 
 This also applies to modules with multiple aggregates. The example keeps aggregate-specific configuration beside the aggregate. The example keeps session and commit plumbing under the Marten root.
 
@@ -230,7 +230,7 @@ internal sealed class PostRepository(
 | BACKEND.PERSISTENCE.WRITE.001 | inspection | `ArchitectureTests` asserts no command handler resolves `IDocumentSession` and no repository exposes it. |
 | BACKEND.PERSISTENCE.READ.001 | inspection | `ArchitectureTests` asserts each query handler resolves `IQuerySession` and no read-store abstraction exists. |
 | BACKEND.PERSISTENCE.COMMIT.001 | inspection | `ArchitectureTests` asserts `SaveChangesAsync` appears only in the command post-handler. |
-| BACKEND.PERSISTENCE.EVENTS.001 | inspection | `PersistenceCommitTests` asserts pending events are collected before commit and published only after it succeeds. |
+| BACKEND.PERSISTENCE.EVENT.001 | inspection | `PersistenceCommitTests` asserts pending events are collected before commit and published only after it succeeds. |
 | BACKEND.PERSISTENCE.WORKFLOW.001 | inspection | `WorkflowPersistenceTests` asserts progress and the outgoing envelope commit together or not at all. |
 | BACKEND.PERSISTENCE.MAPPING.001 | inspection | `MartenMappingTests` asserts each stored aggregate declares an explicit alias and identifier mapping. |
 | BACKEND.PERSISTENCE.SERIALIZATION.001 | inspection | `SerializationTests` asserts every stored polymorphic subtype round-trips under the configured contract. |

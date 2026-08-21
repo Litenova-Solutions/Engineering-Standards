@@ -4,7 +4,7 @@ Read this file before changing this repository or a consumer application. (CORE.
 
 Standards v1.14.0 covers one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. (CORE.SCOPE.APPLICATION.001, CORE.SCOPE.CONTEXT.001)
 
-The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PLATFORM.NEXTJS.VERSIONS.001, PLATFORM.BLAZOR.VERSIONS.001, CORE.AGENT.LOAD.001)
+The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PLATFORM.NEXTJS.VERSION.001, PLATFORM.BLAZOR.VERSION.001, CORE.AGENT.LOAD.001)
 
 ## Writing
 
@@ -65,7 +65,7 @@ Do not add an unauthorized package, schema migration, authentication change, pub
 - Model Domain closed sets as record hierarchies, never enums. (BACKEND.DOMAIN.CLOSEDSET.001)
 - Give each layer ownership of its messages, results, and transport models. (BACKEND.ARCHITECTURE.CONTRACTS.001)
 - Give each rejected Domain rule its own exception type and stable failure code. (BACKEND.DOMAIN.ERROR.001)
-- Organize each layer by the same modules, aggregates, and use cases. (BACKEND.ARCHITECTURE.MODULES.001)
+- Organize each layer by the same modules, aggregates, and use cases. (BACKEND.ARCHITECTURE.MODULE.001)
 - Write commands through repositories and commit through the command pipeline. (BACKEND.APPLICATION.COMMAND.001, BACKEND.PERSISTENCE.COMMIT.001)
 - Derive authenticated actors from verified claims and authorize target resources. (BACKEND.API.ACTOR.001, BACKEND.API.AUTHZ.001)
 - Use the controlled shadcn/ui baseline for React web frontends. (FRONTEND.UI.GOVERNANCE.001, FRONTEND.UI.SHADCN.001)

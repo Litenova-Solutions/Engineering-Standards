@@ -16,7 +16,7 @@ a native mobile system. A native frontend selects its own platform system throug
 - One recorded visual system per React web frontend. (FRONTEND.UI.GOVERNANCE.001)
 - New frontends install and commit the pinned shadcn baseline. (FRONTEND.UI.SHADCN.001)
 - Each frontend declares a schema-valid UI vocabulary. (FRONTEND.UI.VOCABULARY.001)
-- Non-trivial pages carry a schema-valid sidecar contract. (FRONTEND.UI.PAGES.001)
+- Non-trivial pages carry a schema-valid sidecar contract. (FRONTEND.UI.PAGE.001)
 - Tailwind use stays within semantic tokens and approved utilities. (FRONTEND.UI.TAILWIND.001)
 - A source lock records every installed component and its digest. (FRONTEND.UI.FORKS.001)
 - Behavior packages are approved by capability and render through the baseline. (FRONTEND.UI.COMPANION.001)
@@ -44,7 +44,7 @@ a native mobile system. A native frontend selects its own platform system throug
 
 **Rationale:** A page can then be reviewed without reconstructing the CLI command that produced its components.
 
-### Specify pages before composition (FRONTEND.UI.PAGES.001)
+### Specify pages before composition (FRONTEND.UI.PAGE.001)
 
 **Requirement:** A non-trivial React web page MUST carry `kind: page` metadata and a sidecar validating against `schemas/ui-page.schema.json`.
 
@@ -107,7 +107,7 @@ a native mobile system. A native frontend selects its own platform system throug
 | FRONTEND.UI.GOVERNANCE.001 | inspection | `node standards/tools/validate-ui.mjs` reports a frontend with no recorded visual system or a second system in the workspace. |
 | FRONTEND.UI.SHADCN.001 | inspection | `node standards/tools/validate-ui.mjs` compares the committed configuration against the manifest `uiBaseline` fields. |
 | FRONTEND.UI.VOCABULARY.001 | inspection | `node standards/tools/validate-ui.mjs` validates the vocabulary against its schema and its recorded preset. |
-| FRONTEND.UI.PAGES.001 | inspection | `node standards/tools/validate-ui.mjs` reports a page specification with no sidecar or an unlisted shell or pattern. |
+| FRONTEND.UI.PAGE.001 | inspection | `node standards/tools/validate-ui.mjs` reports a page specification with no sidecar or an unlisted shell or pattern. |
 | FRONTEND.UI.TAILWIND.001 | inspection | `node standards/tools/validate-ui.mjs` rejects an arbitrary value, raw palette value, important modifier, or unapproved global import. |
 | FRONTEND.UI.FORKS.001 | inspection | `node standards/tools/validate-ui.mjs` recomputes each digest and reports changed baseline source with no fork record. |
 | FRONTEND.UI.COMPANION.001 | inspection | `node standards/tools/validate-ui.mjs` reports a specialist control rendering outside the baseline component and token set. |

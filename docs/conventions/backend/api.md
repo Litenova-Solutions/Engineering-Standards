@@ -10,8 +10,8 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 - Endpoints receive mediators and HTTP-boundary services only. (BACKEND.API.BOUNDARY.001)
 - Actor identity comes from verified claims, never from the request. (BACKEND.API.ACTOR.001, BACKEND.API.ACTOR.002)
 - Authorization checks the target resource, not only authentication. (BACKEND.API.AUTHZ.001)
-- Errors return Problem Details with a stable code and trace identifier. (BACKEND.API.ERRORS.001)
-- Error responses carry no exception, stack, SQL, provider, or secret text. (BACKEND.API.ERRORS.002)
+- Errors return Problem Details with a stable code and trace identifier. (BACKEND.API.ERROR.001)
+- Error responses carry no exception, stack, SQL, provider, or secret text. (BACKEND.API.ERROR.002)
 - Collection reads carry deterministic ordering and a bounded limit. (BACKEND.API.PAGING.001)
 - OpenAPI is generated during the Release build and committed when consumed. (BACKEND.API.OPENAPI.001)
 - The contract declares the authentication that endpoints enforce. (BACKEND.API.OPENAPI.002)
@@ -76,7 +76,7 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 **Example:** An operation applies a stable forbidden or not-found policy when revealing that a resource exists would leak information.
 
-### Return stable Problem Details (BACKEND.API.ERRORS.001)
+### Return stable Problem Details (BACKEND.API.ERROR.001)
 
 **Requirement:** An error response MUST use RFC Problem Details carrying a stable application `code`, the current `traceId`, and an `errors` entry for each field failure.
 
@@ -107,7 +107,7 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. It maps validation exceptions to 400, missing targets through the operation's 404 policy, and forbidden failures to 403 or the declared 404 disclosure policy. It maps conflicts and state rejections to 409, and unexpected exceptions to 500 with code `internal_error`. It maps known Domain exception types individually. It does not report cancellation from a disconnected request as an application error.
 
-### Keep error responses free of internal detail (BACKEND.API.ERRORS.002)
+### Keep error responses free of internal detail (BACKEND.API.ERROR.002)
 
 **Requirement:** An error response MUST NOT contain an exception message, a stack trace, SQL, a provider response body, or a secret.
 
@@ -231,7 +231,7 @@ Discriminator strings are contract values that an identifier rename cannot chang
 
 ### Use this endpoint layout (BACKEND.API.CONVENTION.001)
 
-**Default:** Group endpoint folders by module, then aggregate, then use case, following `BACKEND.ARCHITECTURE.MODULES.001`.
+**Default:** Group endpoint folders by module, then aggregate, then use case, following `BACKEND.ARCHITECTURE.MODULE.001`.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -336,8 +336,8 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 | BACKEND.API.ACTOR.001 | test | `ActorIdentityTests` asserts each protected operation resolves its actor from the request claims principal. |
 | BACKEND.API.ACTOR.002 | test | `ActorIdentityTests` posts a body, query, and header actor identifier and asserts each one is ignored. |
 | BACKEND.API.AUTHZ.001 | test | `TargetAuthorizationTests` calls each protected operation as a non-owner and asserts 403 or the declared 404. |
-| BACKEND.API.ERRORS.001 | test | `ProblemDetailsContractTests` asserts code, traceId, and errors on a validation failure response. |
-| BACKEND.API.ERRORS.002 | test | `ErrorDisclosureTests` asserts no error body contains an exception message, stack frame, SQL, or configured secret. |
+| BACKEND.API.ERROR.001 | test | `ProblemDetailsContractTests` asserts code, traceId, and errors on a validation failure response. |
+| BACKEND.API.ERROR.002 | test | `ErrorDisclosureTests` asserts no error body contains an exception message, stack frame, SQL, or configured secret. |
 | BACKEND.API.STATUS.001 | test | `StatusContractTests` asserts the outcome-table status code for each documented result. |
 | BACKEND.API.STATUS.002 | test | `StatusContractTests` asserts every documented error path returns its declared non-success status. |
 | BACKEND.API.ROUTES.001 | static | `RouteShapeTests` asserts lowercase plural segments, kebab-case subresources, and identity outside the body. |

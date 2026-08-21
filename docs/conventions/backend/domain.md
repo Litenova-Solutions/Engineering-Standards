@@ -329,7 +329,7 @@ Application validators handle malformed caller input through validation errors. 
         ConsentGrantedEvent.cs
 ```
 
-Each aggregate-specific repository interface stays with the aggregate it loads. The other layers mirror this organization: Application, Infrastructure. WebApi use the same module and per-aggregate folder names, per `BACKEND.ARCHITECTURE.MODULES.001`.
+Each aggregate-specific repository interface stays with the aggregate it loads. The other layers mirror this organization: Application, Infrastructure. WebApi use the same module and per-aggregate folder names, per `BACKEND.ARCHITECTURE.MODULE.001`.
 
 ### Use these Domain names (BACKEND.DOMAIN.CONVENTION.003)
 

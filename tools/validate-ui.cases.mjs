@@ -261,7 +261,7 @@ configCase('page contract state outside the vocabulary', (project, vocabulary) =
   vocabulary.states = vocabulary.states.filter((state) => state.id !== 'empty');
 }, "unknown state 'empty'");
 
-console.log('\nPage contracts (FRONTEND.UI.PAGES.001)');
+console.log('\nPage contracts (FRONTEND.UI.PAGE.001)');
 const sidecar = path.join(fixture, 'docs/ui/web/page.ui.json');
 const sidecarContract = readJson(sidecar);
 fs.rmSync(sidecar);

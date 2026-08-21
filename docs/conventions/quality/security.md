@@ -14,7 +14,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 - Trust boundaries validate shape, range, and bounds before use. (QUALITY.SECURITY.INPUT.001)
 - Secrets stay out of source, logs, diagnostics, and storage. (QUALITY.SECURITY.SECRETS.001)
 - Database input is always parameterized. (QUALITY.SECURITY.SQL.001)
-- Public errors carry a code, safe message, trace, and field errors. (QUALITY.SECURITY.ERRORS.001)
+- Public errors carry a code, safe message, trace, and field errors. (QUALITY.SECURITY.ERROR.001)
 - Frontends escape output and apply policy, headers, and forgery protection. (QUALITY.SECURITY.FRONTEND.001)
 - Dependencies resolve from exact pins and a frozen lockfile. (QUALITY.SECURITY.SUPPLY.001)
 - Use cases handle only the fields they require. (QUALITY.SECURITY.DATA.001)
@@ -58,7 +58,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 **Rationale:** String concatenation or interpolation into raw command text makes the value part of the statement. The reporting extension owns the reviewed raw SQL patterns.
 
-### Limit public error detail (QUALITY.SECURITY.ERRORS.001)
+### Limit public error detail (QUALITY.SECURITY.ERROR.001)
 
 **Requirement:** A public error MUST expose only a stable code, safe message, trace identifier, and allowed field errors.
 
@@ -149,7 +149,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ## Reference example
 
-This informative example demonstrates `QUALITY.SECURITY.AUTHZ.001` and `QUALITY.SECURITY.ERRORS.001`.
+This informative example demonstrates `QUALITY.SECURITY.AUTHZ.001` and `QUALITY.SECURITY.ERROR.001`.
 
 `GET /api/posts/{id}` for a private draft filters by both post ID and the author ID derived from claims. A different author receives the documented not-found or forbidden response without learning protected fields.
 
@@ -164,7 +164,7 @@ This informative example demonstrates `QUALITY.SECURITY.AUTHZ.001` and `QUALITY.
 | QUALITY.SECURITY.INPUT.001 | static | `InputValidationTests` asserts each boundary rejects malformed shape, out-of-range values, and unbounded pagination. |
 | QUALITY.SECURITY.SECRETS.001 | inspection | `SecretScanTests` and the CI secret scan assert no tracked file or emitted diagnostic carries a secret value. |
 | QUALITY.SECURITY.SQL.001 | inspection | `SqlInjectionTests` asserts no query path concatenates an external value into command text. |
-| QUALITY.SECURITY.ERRORS.001 | inspection | `ErrorDisclosureTests` asserts each public error carries only the four permitted elements. |
+| QUALITY.SECURITY.ERROR.001 | inspection | `ErrorDisclosureTests` asserts each public error carries only the four permitted elements. |
 | QUALITY.SECURITY.FRONTEND.001 | inspection | `FrontendSecurityTests` asserts the policy, headers, redirect validation, and forgery protection are present on each response. |
 | QUALITY.SECURITY.SUPPLY.001 | static | `pnpm install --frozen-lockfile` and the NuGet restore fail when a resolved version differs from its manifest pin. |
 | QUALITY.SECURITY.DATA.001 | inspection | Data review compares each returned and logged field against the field list its use case declares. |

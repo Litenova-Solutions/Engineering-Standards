@@ -43,7 +43,7 @@
     "idRegistry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["areas", "pages"],
+      "required": ["areas", "pages", "topics"],
       "properties": {
         "areas": {
           "type": "array",
@@ -55,6 +55,12 @@
           "type": "object",
           "minProperties": 1,
           "additionalProperties": { "$ref": "#/$defs/idScope" }
+        },
+        "topics": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/idArea" }
         }
       }
     },

@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 778 provisions across 8 areas.
+The active release states 779 provisions across 8 areas.
 
 ## BACKEND
 
@@ -24,8 +24,8 @@ The active release states 778 provisions across 8 areas.
 | BACKEND.API.CONVENTION.005 | [Keep Program.cs as composition](../conventions/backend/api.md#keep-programcs-as-composition-backendapiconvention005) | `conventions/backend/api.md` |
 | BACKEND.API.ENDPOINTS.001 | [Use one endpoint per operation](../conventions/backend/api.md#use-one-endpoint-per-operation-backendapiendpoints001) | `conventions/backend/api.md` |
 | BACKEND.API.ENDPOINTS.002 | [Exclude MVC controllers from the profile](../conventions/backend/api.md#exclude-mvc-controllers-from-the-profile-backendapiendpoints002) | `conventions/backend/api.md` |
-| BACKEND.API.ERRORS.001 | [Return stable Problem Details](../conventions/backend/api.md#return-stable-problem-details-backendapierrors001) | `conventions/backend/api.md` |
-| BACKEND.API.ERRORS.002 | [Keep error responses free of internal detail](../conventions/backend/api.md#keep-error-responses-free-of-internal-detail-backendapierrors002) | `conventions/backend/api.md` |
+| BACKEND.API.ERROR.001 | [Return stable Problem Details](../conventions/backend/api.md#return-stable-problem-details-backendapierror001) | `conventions/backend/api.md` |
+| BACKEND.API.ERROR.002 | [Keep error responses free of internal detail](../conventions/backend/api.md#keep-error-responses-free-of-internal-detail-backendapierror002) | `conventions/backend/api.md` |
 | BACKEND.API.MODELS.001 | [Mirror a Domain closed set as a transport model of the same shape](../conventions/backend/api.md#mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape-backendapimodels001) | `conventions/backend/api.md` |
 | BACKEND.API.MODELS.002 | [Reject a collapsed or borrowed wire contract](../conventions/backend/api.md#reject-a-collapsed-or-borrowed-wire-contract-backendapimodels002) | `conventions/backend/api.md` |
 | BACKEND.API.OPENAPI.001 | [Treat OpenAPI as a generated contract](../conventions/backend/api.md#treat-openapi-as-a-generated-contract-backendapiopenapi001) | `conventions/backend/api.md` |
@@ -44,10 +44,10 @@ The active release states 778 provisions across 8 areas.
 | BACKEND.APPLICATION.CONVENTION.002 | [Keep messages immutable](../conventions/backend/application.md#keep-messages-immutable-backendapplicationconvention002) | `conventions/backend/application.md` |
 | BACKEND.APPLICATION.CONVENTION.003 | [Return use-case results](../conventions/backend/application.md#return-use-case-results-backendapplicationconvention003) | `conventions/backend/application.md` |
 | BACKEND.APPLICATION.CONVENTION.004 | [Keep mappings at the owning boundary](../conventions/backend/application.md#keep-mappings-at-the-owning-boundary-backendapplicationconvention004) | `conventions/backend/application.md` |
-| BACKEND.APPLICATION.FAILURES.001 | [Model expected use-case failures explicitly](../conventions/backend/application.md#model-expected-use-case-failures-explicitly-backendapplicationfailures001) | `conventions/backend/application.md` |
+| BACKEND.APPLICATION.FAILURE.001 | [Model expected use-case failures explicitly](../conventions/backend/application.md#model-expected-use-case-failures-explicitly-backendapplicationfailure001) | `conventions/backend/application.md` |
 | BACKEND.APPLICATION.MEDIATOR.001 | [Use specific LiteBus entry points](../conventions/backend/application.md#use-specific-litebus-entry-points-backendapplicationmediator001) | `conventions/backend/application.md` |
 | BACKEND.APPLICATION.ORCHESTRATION.001 | [Keep one state-changing Use case in one Command pipeline](../conventions/backend/application.md#keep-one-state-changing-use-case-in-one-command-pipeline-backendapplicationorchestration001) | `conventions/backend/application.md` |
-| BACKEND.APPLICATION.PORTS.001 | [Define narrow external ports](../conventions/backend/application.md#define-narrow-external-ports-backendapplicationports001) | `conventions/backend/application.md` |
+| BACKEND.APPLICATION.PORT.001 | [Define narrow external ports](../conventions/backend/application.md#define-narrow-external-ports-backendapplicationport001) | `conventions/backend/application.md` |
 | BACKEND.APPLICATION.QUERY.001 | [Project queries directly](../conventions/backend/application.md#project-queries-directly-backendapplicationquery001) | `conventions/backend/application.md` |
 | BACKEND.APPLICATION.REACTION.001 | [Keep event reaction implementations explicit](../conventions/backend/application.md#keep-event-reaction-implementations-explicit-backendapplicationreaction001) | `conventions/backend/application.md` |
 | BACKEND.APPLICATION.STRUCTURE.001 | [Organize Application by operation](../conventions/backend/application.md#organize-application-by-operation-backendapplicationstructure001) | `conventions/backend/application.md` |
@@ -63,7 +63,7 @@ The active release states 778 provisions across 8 areas.
 | BACKEND.ARCHITECTURE.DEPENDENCIES.001 | [Point dependencies inward](../conventions/backend/architecture.md#point-dependencies-inward-backendarchitecturedependencies001) | `conventions/backend/architecture.md` |
 | BACKEND.ARCHITECTURE.DOMAIN.001 | [Keep business invariants in Domain](../conventions/backend/architecture.md#keep-business-invariants-in-domain-backendarchitecturedomain001) | `conventions/backend/architecture.md` |
 | BACKEND.ARCHITECTURE.ENFORCEMENT.001 | [Test structural boundaries](../conventions/backend/architecture.md#test-structural-boundaries-backendarchitectureenforcement001) | `conventions/backend/architecture.md` |
-| BACKEND.ARCHITECTURE.MODULES.001 | [Organize every layer by module and use case](../conventions/backend/architecture.md#organize-every-layer-by-module-and-use-case-backendarchitecturemodules001) | `conventions/backend/architecture.md` |
+| BACKEND.ARCHITECTURE.MODULE.001 | [Organize every layer by module and use case](../conventions/backend/architecture.md#organize-every-layer-by-module-and-use-case-backendarchitecturemodule001) | `conventions/backend/architecture.md` |
 | BACKEND.ARCHITECTURE.PROJECTS.001 | [Use four application projects](../conventions/backend/architecture.md#use-four-application-projects-backendarchitectureprojects001) | `conventions/backend/architecture.md` |
 | BACKEND.ARCHITECTURE.VISIBILITY.001 | [Keep implementation types internal](../conventions/backend/architecture.md#keep-implementation-types-internal-backendarchitecturevisibility001) | `conventions/backend/architecture.md` |
 | BACKEND.ARCHITECTURE.WORKER.001 | [Add Worker only for an independent process boundary](../conventions/backend/architecture.md#add-worker-only-for-an-independent-process-boundary-backendarchitectureworker001) | `conventions/backend/architecture.md` |
@@ -105,7 +105,7 @@ The active release states 778 provisions across 8 areas.
 | BACKEND.PERSISTENCE.CONVENTION.005 | [Add read documents for query-shaped data](../conventions/backend/persistence-marten.md#add-read-documents-for-query-shaped-data-backendpersistenceconvention005) | `conventions/backend/persistence-marten.md` |
 | BACKEND.PERSISTENCE.CONVENTION.006 | [Persist one explicit state object](../conventions/backend/persistence-marten.md#persist-one-explicit-state-object-backendpersistenceconvention006) | `conventions/backend/persistence-marten.md` |
 | BACKEND.PERSISTENCE.DOCUMENT.001 | [Bound aggregate document growth](../conventions/backend/persistence-marten.md#bound-aggregate-document-growth-backendpersistencedocument001) | `conventions/backend/persistence-marten.md` |
-| BACKEND.PERSISTENCE.EVENTS.001 | [Collect events without a public unit of work](../conventions/backend/persistence-marten.md#collect-events-without-a-public-unit-of-work-backendpersistenceevents001) | `conventions/backend/persistence-marten.md` |
+| BACKEND.PERSISTENCE.EVENT.001 | [Collect events without a public unit of work](../conventions/backend/persistence-marten.md#collect-events-without-a-public-unit-of-work-backendpersistenceevent001) | `conventions/backend/persistence-marten.md` |
 | BACKEND.PERSISTENCE.EVOLUTION.001 | [Evolve stored document contracts explicitly](../conventions/backend/persistence-marten.md#evolve-stored-document-contracts-explicitly-backendpersistenceevolution001) | `conventions/backend/persistence-marten.md` |
 | BACKEND.PERSISTENCE.MAPPING.001 | [Keep mappings and aliases explicit](../conventions/backend/persistence-marten.md#keep-mappings-and-aliases-explicit-backendpersistencemapping001) | `conventions/backend/persistence-marten.md` |
 | BACKEND.PERSISTENCE.NAMING.001 | [Use database naming conventions](../conventions/backend/persistence-marten.md#use-database-naming-conventions-backendpersistencenaming001) | `conventions/backend/persistence-marten.md` |
@@ -137,17 +137,17 @@ The active release states 778 provisions across 8 areas.
 | BLAZOR.BROWSER.CONVENTION.001 | [Select the storage mechanism per shape](../conventions/frontend-blazor/persistence-browser.md#select-the-storage-mechanism-per-shape-blazorbrowserconvention001) | `conventions/frontend-blazor/persistence-browser.md` |
 | BLAZOR.BROWSER.CONVENTION.002 | [Keep a stable serialization contract](../conventions/frontend-blazor/persistence-browser.md#keep-a-stable-serialization-contract-blazorbrowserconvention002) | `conventions/frontend-blazor/persistence-browser.md` |
 | BLAZOR.BROWSER.CONVENTION.003 | [Record the classification](../conventions/frontend-blazor/persistence-browser.md#record-the-classification-blazorbrowserconvention003) | `conventions/frontend-blazor/persistence-browser.md` |
-| BLAZOR.BROWSER.KEYS.001 | [Version and scope every storage key](../conventions/frontend-blazor/persistence-browser.md#version-and-scope-every-storage-key-blazorbrowserkeys001) | `conventions/frontend-blazor/persistence-browser.md` |
+| BLAZOR.BROWSER.KEY.001 | [Version and scope every storage key](../conventions/frontend-blazor/persistence-browser.md#version-and-scope-every-storage-key-blazorbrowserkey001) | `conventions/frontend-blazor/persistence-browser.md` |
 | BLAZOR.BROWSER.LIMITS.001 | [Bound what is stored](../conventions/frontend-blazor/persistence-browser.md#bound-what-is-stored-blazorbrowserlimits001) | `conventions/frontend-blazor/persistence-browser.md` |
 | BLAZOR.BROWSER.MIGRATION.001 | [Provide a migration for every changed shape](../conventions/frontend-blazor/persistence-browser.md#provide-a-migration-for-every-changed-shape-blazorbrowsermigration001) | `conventions/frontend-blazor/persistence-browser.md` |
 | BLAZOR.BROWSER.PERSISTENCE.001 | [Own storage in Infrastructure](../conventions/frontend-blazor/persistence-browser.md#own-storage-in-infrastructure-blazorbrowserpersistence001) | `conventions/frontend-blazor/persistence-browser.md` |
 | BLAZOR.BROWSER.PORTABILITY.001 | [Provide export and import](../conventions/frontend-blazor/persistence-browser.md#provide-export-and-import-blazorbrowserportability001) | `conventions/frontend-blazor/persistence-browser.md` |
-| BLAZOR.BROWSER.READS.001 | [Treat reads as fallible](../conventions/frontend-blazor/persistence-browser.md#treat-reads-as-fallible-blazorbrowserreads001) | `conventions/frontend-blazor/persistence-browser.md` |
+| BLAZOR.BROWSER.READ.001 | [Treat reads as fallible](../conventions/frontend-blazor/persistence-browser.md#treat-reads-as-fallible-blazorbrowserread001) | `conventions/frontend-blazor/persistence-browser.md` |
 | BLAZOR.COMPONENTS.CONVENTION.001 | [Name for the boundary role](../conventions/frontend-blazor/components.md#name-for-the-boundary-role-blazorcomponentsconvention001) | `conventions/frontend-blazor/components.md` |
 | BLAZOR.COMPONENTS.CONVENTION.002 | [Apply one styling system](../conventions/frontend-blazor/components.md#apply-one-styling-system-blazorcomponentsconvention002) | `conventions/frontend-blazor/components.md` |
 | BLAZOR.COMPONENTS.CONVENTION.003 | [Keep accessibility in the component](../conventions/frontend-blazor/components.md#keep-accessibility-in-the-component-blazorcomponentsconvention003) | `conventions/frontend-blazor/components.md` |
-| BLAZOR.COMPONENTS.EVENTS.001 | [Raise events rather than mutating](../conventions/frontend-blazor/components.md#raise-events-rather-than-mutating-blazorcomponentsevents001) | `conventions/frontend-blazor/components.md` |
-| BLAZOR.COMPONENTS.FILES.001 | [Place one component per file](../conventions/frontend-blazor/components.md#place-one-component-per-file-blazorcomponentsfiles001) | `conventions/frontend-blazor/components.md` |
+| BLAZOR.COMPONENTS.EVENT.001 | [Raise events rather than mutating](../conventions/frontend-blazor/components.md#raise-events-rather-than-mutating-blazorcomponentsevent001) | `conventions/frontend-blazor/components.md` |
+| BLAZOR.COMPONENTS.FILE.001 | [Place one component per file](../conventions/frontend-blazor/components.md#place-one-component-per-file-blazorcomponentsfile001) | `conventions/frontend-blazor/components.md` |
 | BLAZOR.COMPONENTS.INTEROP.001 | [Resolve browser behavior through an interface](../conventions/frontend-blazor/components.md#resolve-browser-behavior-through-an-interface-blazorcomponentsinterop001) | `conventions/frontend-blazor/components.md` |
 | BLAZOR.COMPONENTS.PARAMETERS.001 | [Declare every parameter type](../conventions/frontend-blazor/components.md#declare-every-parameter-type-blazorcomponentsparameters001) | `conventions/frontend-blazor/components.md` |
 | BLAZOR.COMPONENTS.PRESENTATION.001 | [Keep components presentational](../conventions/frontend-blazor/components.md#keep-components-presentational-blazorcomponentspresentation001) | `conventions/frontend-blazor/components.md` |
@@ -166,7 +166,7 @@ The active release states 778 provisions across 8 areas.
 | BLAZOR.RENDERING.MODE.001 | [Render on the client only](../conventions/frontend-blazor/rendering.md#render-on-the-client-only-blazorrenderingmode001) | `conventions/frontend-blazor/rendering.md` |
 | BLAZOR.RENDERING.OFFLINE.001 | [Operate offline after first load](../conventions/frontend-blazor/rendering.md#operate-offline-after-first-load-blazorrenderingoffline001) | `conventions/frontend-blazor/rendering.md` |
 | BLAZOR.RENDERING.ROUTES.001 | [Declare routes on pages](../conventions/frontend-blazor/rendering.md#declare-routes-on-pages-blazorrenderingroutes001) | `conventions/frontend-blazor/rendering.md` |
-| BLAZOR.RENDERING.STATES.001 | [Give every route explicit states](../conventions/frontend-blazor/rendering.md#give-every-route-explicit-states-blazorrenderingstates001) | `conventions/frontend-blazor/rendering.md` |
+| BLAZOR.RENDERING.STATE.001 | [Give every route explicit states](../conventions/frontend-blazor/rendering.md#give-every-route-explicit-states-blazorrenderingstate001) | `conventions/frontend-blazor/rendering.md` |
 | BLAZOR.STRUCTURE.BOUNDARIES.001 | [Isolate module internals](../conventions/frontend-blazor/structure.md#isolate-module-internals-blazorstructureboundaries001) | `conventions/frontend-blazor/structure.md` |
 | BLAZOR.STRUCTURE.CONVENTION.001 | [Place interop adapters together](../conventions/frontend-blazor/structure.md#place-interop-adapters-together-blazorstructureconvention001) | `conventions/frontend-blazor/structure.md` |
 | BLAZOR.STRUCTURE.CONVENTION.002 | [Keep static content out of the assembly](../conventions/frontend-blazor/structure.md#keep-static-content-out-of-the-assembly-blazorstructureconvention002) | `conventions/frontend-blazor/structure.md` |
@@ -212,6 +212,7 @@ The active release states 778 provisions across 8 areas.
 | CORE.AUTHORING.EXAMPLE.001 | [Attach examples to their provisions](../foundations/authoring-standard.md#attach-examples-to-their-provisions-coreauthoringexample001) | `foundations/authoring-standard.md` |
 | CORE.AUTHORING.IDENTIFIER.001 | [Use the declared identifier grammar](../foundations/authoring-standard.md#use-the-declared-identifier-grammar-coreauthoringidentifier001) | `foundations/authoring-standard.md` |
 | CORE.AUTHORING.IDENTIFIER.002 | [Restrict the CONVENTION segment to replaceable defaults](../foundations/authoring-standard.md#restrict-the-convention-segment-to-replaceable-defaults-coreauthoringidentifier002) | `foundations/authoring-standard.md` |
+| CORE.AUTHORING.IDENTIFIER.003 | [Use a registered topic segment](../foundations/authoring-standard.md#use-a-registered-topic-segment-coreauthoringidentifier003) | `foundations/authoring-standard.md` |
 | CORE.AUTHORING.INDEX.001 | [Regenerate the provision index](../foundations/authoring-standard.md#regenerate-the-provision-index-coreauthoringindex001) | `foundations/authoring-standard.md` |
 | CORE.AUTHORING.METADATA.002 | [Declare structured specification metadata](../foundations/authoring-standard.md#declare-structured-specification-metadata-coreauthoringmetadata002) | `foundations/authoring-standard.md` |
 | CORE.AUTHORING.METADATA.003 | [Use one metadata carrier](../foundations/authoring-standard.md#use-one-metadata-carrier-coreauthoringmetadata003) | `foundations/authoring-standard.md` |
@@ -235,10 +236,10 @@ The active release states 778 provisions across 8 areas.
 | CORE.PRINCIPLES.COMPLEXITY.002 | [Select extensions by criteria](../foundations/principles.md#select-extensions-by-criteria-coreprinciplescomplexity002) | `foundations/principles.md` |
 | CORE.PRINCIPLES.CONVENTION.001 | [Prefer direct owned dependencies](../foundations/principles.md#prefer-direct-owned-dependencies-coreprinciplesconvention001) | `foundations/principles.md` |
 | CORE.PRINCIPLES.CONVENTION.002 | [Prefer local code until reuse is real](../foundations/principles.md#prefer-local-code-until-reuse-is-real-coreprinciplesconvention002) | `foundations/principles.md` |
-| CORE.PRINCIPLES.DOCUMENTS.001 | [Declare specification ownership](../foundations/principles.md#declare-specification-ownership-coreprinciplesdocuments001) | `foundations/principles.md` |
-| CORE.PRINCIPLES.DOCUMENTS.002 | [Classify specification authority](../foundations/principles.md#classify-specification-authority-coreprinciplesdocuments002) | `foundations/principles.md` |
-| CORE.PRINCIPLES.DOCUMENTS.003 | [Separate authority from implementation](../foundations/principles.md#separate-authority-from-implementation-coreprinciplesdocuments003) | `foundations/principles.md` |
-| CORE.PRINCIPLES.DOCUMENTS.004 | [Retire public behavior deliberately](../foundations/principles.md#retire-public-behavior-deliberately-coreprinciplesdocuments004) | `foundations/principles.md` |
+| CORE.PRINCIPLES.DOCUMENT.001 | [Declare specification ownership](../foundations/principles.md#declare-specification-ownership-coreprinciplesdocument001) | `foundations/principles.md` |
+| CORE.PRINCIPLES.DOCUMENT.002 | [Classify specification authority](../foundations/principles.md#classify-specification-authority-coreprinciplesdocument002) | `foundations/principles.md` |
+| CORE.PRINCIPLES.DOCUMENT.003 | [Separate authority from implementation](../foundations/principles.md#separate-authority-from-implementation-coreprinciplesdocument003) | `foundations/principles.md` |
+| CORE.PRINCIPLES.DOCUMENT.004 | [Retire public behavior deliberately](../foundations/principles.md#retire-public-behavior-deliberately-coreprinciplesdocument004) | `foundations/principles.md` |
 | CORE.PRINCIPLES.ENFORCE.001 | [Prove enforceable boundaries mechanically](../foundations/principles.md#prove-enforceable-boundaries-mechanically-coreprinciplesenforce001) | `foundations/principles.md` |
 | CORE.PRINCIPLES.NAMING.001 | [Name boundary intent](../foundations/principles.md#name-boundary-intent-coreprinciplesnaming001) | `foundations/principles.md` |
 | CORE.PRINCIPLES.NAMING.002 | [Avoid generic boundary names](../foundations/principles.md#avoid-generic-boundary-names-coreprinciplesnaming002) | `foundations/principles.md` |
@@ -375,9 +376,9 @@ The active release states 778 provisions across 8 areas.
 | EXT.COMPAT.DIFF.001 | [Retain release baselines](../extensions/api-compatibility.md#retain-release-baselines-extcompatdiff001) | `extensions/api-compatibility.md` |
 | EXT.COMPAT.DIFF.002 | [Diff release contracts](../extensions/api-compatibility.md#diff-release-contracts-extcompatdiff002) | `extensions/api-compatibility.md` |
 | EXT.COMPAT.DIFF.003 | [Reject unapproved breaking diffs](../extensions/api-compatibility.md#reject-unapproved-breaking-diffs-extcompatdiff003) | `extensions/api-compatibility.md` |
-| EXT.COMPAT.ERRORS.001 | [Treat errors as contracts](../extensions/api-compatibility.md#treat-errors-as-contracts-extcompaterrors001) | `extensions/api-compatibility.md` |
-| EXT.COMPAT.ERRORS.002 | [Gate new error outcomes](../extensions/api-compatibility.md#gate-new-error-outcomes-extcompaterrors002) | `extensions/api-compatibility.md` |
-| EXT.COMPAT.ERRORS.003 | [Exercise generated consumers](../extensions/api-compatibility.md#exercise-generated-consumers-extcompaterrors003) | `extensions/api-compatibility.md` |
+| EXT.COMPAT.ERROR.001 | [Treat errors as contracts](../extensions/api-compatibility.md#treat-errors-as-contracts-extcompaterror001) | `extensions/api-compatibility.md` |
+| EXT.COMPAT.ERROR.002 | [Gate new error outcomes](../extensions/api-compatibility.md#gate-new-error-outcomes-extcompaterror002) | `extensions/api-compatibility.md` |
+| EXT.COMPAT.ERROR.003 | [Exercise generated consumers](../extensions/api-compatibility.md#exercise-generated-consumers-extcompaterror003) | `extensions/api-compatibility.md` |
 | EXT.COMPAT.OPERATION.001 | [Assign operation IDs](../extensions/api-compatibility.md#assign-operation-ids-extcompatoperation001) | `extensions/api-compatibility.md` |
 | EXT.COMPAT.OPERATION.002 | [Retain compatible operation IDs](../extensions/api-compatibility.md#retain-compatible-operation-ids-extcompatoperation002) | `extensions/api-compatibility.md` |
 | EXT.COMPAT.OPERATION.003 | [Assign versioned operation IDs](../extensions/api-compatibility.md#assign-versioned-operation-ids-extcompatoperation003) | `extensions/api-compatibility.md` |
@@ -453,12 +454,12 @@ The active release states 778 provisions across 8 areas.
 | EXT.EFCORE.CONVENTION.002 | [Use snake-case relational names](../extensions/persistence-ef-core.md#use-snake-case-relational-names-extefcoreconvention002) | `extensions/persistence-ef-core.md` |
 | EXT.EFCORE.MAPPING.001 | [Configure EF Core mappings in Infrastructure](../extensions/persistence-ef-core.md#configure-ef-core-mappings-in-infrastructure-extefcoremapping001) | `extensions/persistence-ef-core.md` |
 | EXT.EFCORE.MAPPING.002 | [Configure relational details explicitly](../extensions/persistence-ef-core.md#configure-relational-details-explicitly-extefcoremapping002) | `extensions/persistence-ef-core.md` |
-| EXT.EFCORE.MIGRATIONS.001 | [Generate migrations for schema changes](../extensions/persistence-ef-core.md#generate-migrations-for-schema-changes-extefcoremigrations001) | `extensions/persistence-ef-core.md` |
-| EXT.EFCORE.MIGRATIONS.002 | [Review migration effects](../extensions/persistence-ef-core.md#review-migration-effects-extefcoremigrations002) | `extensions/persistence-ef-core.md` |
-| EXT.EFCORE.MIGRATIONS.003 | [Apply migrations as release work](../extensions/persistence-ef-core.md#apply-migrations-as-release-work-extefcoremigrations003) | `extensions/persistence-ef-core.md` |
-| EXT.EFCORE.MIGRATIONS.004 | [Keep migration files together](../extensions/persistence-ef-core.md#keep-migration-files-together-extefcoremigrations004) | `extensions/persistence-ef-core.md` |
-| EXT.EFCORE.MIGRATIONS.005 | [Test migration starting states](../extensions/persistence-ef-core.md#test-migration-starting-states-extefcoremigrations005) | `extensions/persistence-ef-core.md` |
-| EXT.EFCORE.MIGRATIONS.006 | [Reject startup schema mutation](../extensions/persistence-ef-core.md#reject-startup-schema-mutation-extefcoremigrations006) | `extensions/persistence-ef-core.md` |
+| EXT.EFCORE.MIGRATION.001 | [Generate migrations for schema changes](../extensions/persistence-ef-core.md#generate-migrations-for-schema-changes-extefcoremigration001) | `extensions/persistence-ef-core.md` |
+| EXT.EFCORE.MIGRATION.002 | [Review migration effects](../extensions/persistence-ef-core.md#review-migration-effects-extefcoremigration002) | `extensions/persistence-ef-core.md` |
+| EXT.EFCORE.MIGRATION.003 | [Apply migrations as release work](../extensions/persistence-ef-core.md#apply-migrations-as-release-work-extefcoremigration003) | `extensions/persistence-ef-core.md` |
+| EXT.EFCORE.MIGRATION.004 | [Keep migration files together](../extensions/persistence-ef-core.md#keep-migration-files-together-extefcoremigration004) | `extensions/persistence-ef-core.md` |
+| EXT.EFCORE.MIGRATION.005 | [Test migration starting states](../extensions/persistence-ef-core.md#test-migration-starting-states-extefcoremigration005) | `extensions/persistence-ef-core.md` |
+| EXT.EFCORE.MIGRATION.006 | [Reject startup schema mutation](../extensions/persistence-ef-core.md#reject-startup-schema-mutation-extefcoremigration006) | `extensions/persistence-ef-core.md` |
 | EXT.EFCORE.OUTBOX.001 | [Stage EF Core outbox records together](../extensions/persistence-ef-core.md#stage-ef-core-outbox-records-together-extefcoreoutbox001) | `extensions/persistence-ef-core.md` |
 | EXT.EFCORE.OUTBOX.002 | [Commit EF Core outbox records once](../extensions/persistence-ef-core.md#commit-ef-core-outbox-records-once-extefcoreoutbox002) | `extensions/persistence-ef-core.md` |
 | EXT.EFCORE.OUTBOX.003 | [Reject cross-provider outbox storage](../extensions/persistence-ef-core.md#reject-cross-provider-outbox-storage-extefcoreoutbox003) | `extensions/persistence-ef-core.md` |
@@ -574,8 +575,8 @@ The active release states 778 provisions across 8 areas.
 | EXT.OUTBOX.IDEMPOTENCY.001 | [Accept repeated delivery](../extensions/outbox-worker.md#accept-repeated-delivery-extoutboxidempotency001) | `extensions/outbox-worker.md` |
 | EXT.OUTBOX.IDEMPOTENCY.002 | [Identify repeated delivery](../extensions/outbox-worker.md#identify-repeated-delivery-extoutboxidempotency002) | `extensions/outbox-worker.md` |
 | EXT.OUTBOX.IDEMPOTENCY.003 | [Await target acceptance](../extensions/outbox-worker.md#await-target-acceptance-extoutboxidempotency003) | `extensions/outbox-worker.md` |
-| EXT.OUTBOX.OPERATIONS.001 | [Publish backlog indicators](../extensions/outbox-worker.md#publish-backlog-indicators-extoutboxoperations001) | `extensions/outbox-worker.md` |
-| EXT.OUTBOX.OPERATIONS.002 | [Set delivery alerts](../extensions/outbox-worker.md#set-delivery-alerts-extoutboxoperations002) | `extensions/outbox-worker.md` |
+| EXT.OUTBOX.OBSERVABILITY.001 | [Publish backlog indicators](../extensions/outbox-worker.md#publish-backlog-indicators-extoutboxobservability001) | `extensions/outbox-worker.md` |
+| EXT.OUTBOX.OBSERVABILITY.002 | [Set delivery alerts](../extensions/outbox-worker.md#set-delivery-alerts-extoutboxobservability002) | `extensions/outbox-worker.md` |
 | EXT.OUTBOX.READINESS.001 | [Distinguish dependency outage](../extensions/outbox-worker.md#distinguish-dependency-outage-extoutboxreadiness001) | `extensions/outbox-worker.md` |
 | EXT.OUTBOX.READINESS.002 | [Back off unavailable-store polling](../extensions/outbox-worker.md#back-off-unavailable-store-polling-extoutboxreadiness002) | `extensions/outbox-worker.md` |
 | EXT.OUTBOX.READINESS.003 | [Restrict message retry to claimed records](../extensions/outbox-worker.md#restrict-message-retry-to-claimed-records-extoutboxreadiness003) | `extensions/outbox-worker.md` |
@@ -633,7 +634,7 @@ The active release states 778 provisions across 8 areas.
 | EXT.TENANCY.CONVENTION.003 | [Pass tenant scope explicitly](../extensions/multitenancy.md#pass-tenant-scope-explicitly-exttenancyconvention003) | `extensions/multitenancy.md` |
 | EXT.TENANCY.DISCLOSURE.001 | [Apply cross-tenant disclosure policy](../extensions/multitenancy.md#apply-cross-tenant-disclosure-policy-exttenancydisclosure001) | `extensions/multitenancy.md` |
 | EXT.TENANCY.DISCLOSURE.002 | [Protect tenant diagnostics](../extensions/multitenancy.md#protect-tenant-diagnostics-exttenancydisclosure002) | `extensions/multitenancy.md` |
-| EXT.TENANCY.OPERATIONS.001 | [Scope tenant operations](../extensions/multitenancy.md#scope-tenant-operations-exttenancyoperations001) | `extensions/multitenancy.md` |
+| EXT.TENANCY.OPERATION.001 | [Scope tenant operations](../extensions/multitenancy.md#scope-tenant-operations-exttenancyoperation001) | `extensions/multitenancy.md` |
 | EXT.TENANCY.RESOLVE.001 | [Resolve tenant identity from trusted context](../extensions/multitenancy.md#resolve-tenant-identity-from-trusted-context-exttenancyresolve001) | `extensions/multitenancy.md` |
 | EXT.TENANCY.RESOLVE.002 | [Reject unrestricted tenant input](../extensions/multitenancy.md#reject-unrestricted-tenant-input-exttenancyresolve002) | `extensions/multitenancy.md` |
 | EXT.TENANCY.STORAGE.001 | [Use selected tenant storage support](../extensions/multitenancy.md#use-selected-tenant-storage-support-exttenancystorage001) | `extensions/multitenancy.md` |
@@ -653,19 +654,19 @@ The active release states 778 provisions across 8 areas.
 | FRONTEND.COMPONENTS.IMAGE.001 | [Use the framework image component for content images](../conventions/frontend/components.md#use-the-framework-image-component-for-content-images-frontendcomponentsimage001) | `conventions/frontend/components.md` |
 | FRONTEND.COMPONENTS.OWNERSHIP.001 | [Use the component ownership levels](../conventions/frontend/components.md#use-the-component-ownership-levels-frontendcomponentsownership001) | `conventions/frontend/components.md` |
 | FRONTEND.COMPONENTS.PROPS.001 | [Keep props narrow](../conventions/frontend/components.md#keep-props-narrow-frontendcomponentsprops001) | `conventions/frontend/components.md` |
-| FRONTEND.COMPONENTS.STATES.001 | [Render complete states](../conventions/frontend/components.md#render-complete-states-frontendcomponentsstates001) | `conventions/frontend/components.md` |
+| FRONTEND.COMPONENTS.STATE.001 | [Render complete states](../conventions/frontend/components.md#render-complete-states-frontendcomponentsstate001) | `conventions/frontend/components.md` |
 | FRONTEND.COMPONENTS.VARIANTS.001 | [Use declared visual variants](../conventions/frontend/components.md#use-declared-visual-variants-frontendcomponentsvariants001) | `conventions/frontend/components.md` |
 | FRONTEND.DATA.CLIENT.001 | [Use one typed API client](../conventions/frontend/data-and-state.md#use-one-typed-api-client-frontenddataclient001) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.CONVENTION.001 | [Use this API layout for one frontend](../conventions/frontend/data-and-state.md#use-this-api-layout-for-one-frontend-frontenddataconvention001) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.CONVENTION.002 | [Keep schemas operation-specific](../conventions/frontend/data-and-state.md#keep-schemas-operation-specific-frontenddataconvention002) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.CONVENTION.003 | [Use native and framework form support first](../conventions/frontend/data-and-state.md#use-native-and-framework-form-support-first-frontenddataconvention003) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.CONVENTION.004 | [Keep cache invalidation close to mutations](../conventions/frontend/data-and-state.md#keep-cache-invalidation-close-to-mutations-frontenddataconvention004) | `conventions/frontend/data-and-state.md` |
-| FRONTEND.DATA.ERRORS.001 | [Parse errors consistently](../conventions/frontend/data-and-state.md#parse-errors-consistently-frontenddataerrors001) | `conventions/frontend/data-and-state.md` |
+| FRONTEND.DATA.ERROR.001 | [Parse errors consistently](../conventions/frontend/data-and-state.md#parse-errors-consistently-frontenddataerror001) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.FORM.001 | [Keep forms aligned with use cases](../conventions/frontend/data-and-state.md#keep-forms-aligned-with-use-cases-frontenddataform001) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.MUTATIONS.001 | [Keep mutations at a declared boundary](../conventions/frontend/data-and-state.md#keep-mutations-at-a-declared-boundary-frontenddatamutations001) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.OPTIMISTIC.001 | [Make optimistic behavior recoverable](../conventions/frontend/data-and-state.md#make-optimistic-behavior-recoverable-frontenddataoptimistic001) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.OWNER.001 | [Assign state to the narrowest owner](../conventions/frontend/data-and-state.md#assign-state-to-the-narrowest-owner-frontenddataowner001) | `conventions/frontend/data-and-state.md` |
-| FRONTEND.DATA.READS.001 | [Read initial data on the server](../conventions/frontend/data-and-state.md#read-initial-data-on-the-server-frontenddatareads001) | `conventions/frontend/data-and-state.md` |
+| FRONTEND.DATA.READ.001 | [Read initial data on the server](../conventions/frontend/data-and-state.md#read-initial-data-on-the-server-frontenddataread001) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.SECRETS.001 | [Keep secrets out of browser storage](../conventions/frontend/data-and-state.md#keep-secrets-out-of-browser-storage-frontenddatasecrets001) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.DATA.TYPES.001 | [Generate transport types](../conventions/frontend/data-and-state.md#generate-transport-types-frontenddatatypes001) | `conventions/frontend/data-and-state.md` |
 | FRONTEND.RENDERING.ASYNC.001 | [Await Next.js request APIs](../conventions/frontend/rendering.md#await-nextjs-request-apis-frontendrenderingasync001) | `conventions/frontend/rendering.md` |
@@ -678,7 +679,7 @@ The active release states 778 provisions across 8 areas.
 | FRONTEND.RENDERING.PROXY.001 | [Keep proxy behavior at the edge](../conventions/frontend/rendering.md#keep-proxy-behavior-at-the-edge-frontendrenderingproxy001) | `conventions/frontend/rendering.md` |
 | FRONTEND.RENDERING.ROUTES.001 | [Keep route files as composition boundaries](../conventions/frontend/rendering.md#keep-route-files-as-composition-boundaries-frontendrenderingroutes001) | `conventions/frontend/rendering.md` |
 | FRONTEND.RENDERING.SERVER.001 | [Prefer server execution](../conventions/frontend/rendering.md#prefer-server-execution-frontendrenderingserver001) | `conventions/frontend/rendering.md` |
-| FRONTEND.RENDERING.STATES.001 | [Represent route states](../conventions/frontend/rendering.md#represent-route-states-frontendrenderingstates001) | `conventions/frontend/rendering.md` |
+| FRONTEND.RENDERING.STATE.001 | [Represent route states](../conventions/frontend/rendering.md#represent-route-states-frontendrenderingstate001) | `conventions/frontend/rendering.md` |
 | FRONTEND.STRUCTURE.APPS.001 | [Keep applications independent](../conventions/frontend/structure.md#keep-applications-independent-frontendstructureapps001) | `conventions/frontend/structure.md` |
 | FRONTEND.STRUCTURE.BOUNDARIES.001 | [Isolate module internals](../conventions/frontend/structure.md#isolate-module-internals-frontendstructureboundaries001) | `conventions/frontend/structure.md` |
 | FRONTEND.STRUCTURE.CONVENTION.001 | [Use this feature layout](../conventions/frontend/structure.md#use-this-feature-layout-frontendstructureconvention001) | `conventions/frontend/structure.md` |
@@ -695,7 +696,7 @@ The active release states 778 provisions across 8 areas.
 | FRONTEND.TESTING.ISOLATION.001 | [Isolate browser tests](../conventions/frontend/testing.md#isolate-browser-tests-frontendtestingisolation001) | `conventions/frontend/testing.md` |
 | FRONTEND.TESTING.LEVEL.001 | [Match test level to risk](../conventions/frontend/testing.md#match-test-level-to-risk-frontendtestinglevel001) | `conventions/frontend/testing.md` |
 | FRONTEND.TESTING.MOCKS.001 | [Keep mocks at owned boundaries](../conventions/frontend/testing.md#keep-mocks-at-owned-boundaries-frontendtestingmocks001) | `conventions/frontend/testing.md` |
-| FRONTEND.TESTING.STATES.001 | [Test observable states](../conventions/frontend/testing.md#test-observable-states-frontendtestingstates001) | `conventions/frontend/testing.md` |
+| FRONTEND.TESTING.STATE.001 | [Test observable states](../conventions/frontend/testing.md#test-observable-states-frontendtestingstate001) | `conventions/frontend/testing.md` |
 | FRONTEND.TESTING.TRACE.001 | [Trace acceptance behavior](../conventions/frontend/testing.md#trace-acceptance-behavior-frontendtestingtrace001) | `conventions/frontend/testing.md` |
 | FRONTEND.TESTING.UI.001 | [Prove controlled UI changes](../conventions/frontend/testing.md#prove-controlled-ui-changes-frontendtestingui001) | `conventions/frontend/testing.md` |
 | FRONTEND.UI.COMPANION.001 | [Govern behavior companions and specialist controls](../conventions/frontend/ui-governance.md#govern-behavior-companions-and-specialist-controls-frontenduicompanion001) | `conventions/frontend/ui-governance.md` |
@@ -704,7 +705,7 @@ The active release states 778 provisions across 8 areas.
 | FRONTEND.UI.EVIDENCE.001 | [Prove UI behavior and appearance](../conventions/frontend/ui-governance.md#prove-ui-behavior-and-appearance-frontenduievidence001) | `conventions/frontend/ui-governance.md` |
 | FRONTEND.UI.FORKS.001 | [Track source changes](../conventions/frontend/ui-governance.md#track-source-changes-frontenduiforks001) | `conventions/frontend/ui-governance.md` |
 | FRONTEND.UI.GOVERNANCE.001 | [Select one visual authority](../conventions/frontend/ui-governance.md#select-one-visual-authority-frontenduigovernance001) | `conventions/frontend/ui-governance.md` |
-| FRONTEND.UI.PAGES.001 | [Specify pages before composition](../conventions/frontend/ui-governance.md#specify-pages-before-composition-frontenduipages001) | `conventions/frontend/ui-governance.md` |
+| FRONTEND.UI.PAGE.001 | [Specify pages before composition](../conventions/frontend/ui-governance.md#specify-pages-before-composition-frontenduipage001) | `conventions/frontend/ui-governance.md` |
 | FRONTEND.UI.PROTOCOL.001 | [Follow the agent UI protocol](../conventions/frontend/ui-governance.md#follow-the-agent-ui-protocol-frontenduiprotocol001) | `conventions/frontend/ui-governance.md` |
 | FRONTEND.UI.SHADCN.001 | [Use the pinned shadcn/ui baseline](../conventions/frontend/ui-governance.md#use-the-pinned-shadcnui-baseline-frontenduishadcn001) | `conventions/frontend/ui-governance.md` |
 | FRONTEND.UI.TAILWIND.001 | [Restrict CSS decisions](../conventions/frontend/ui-governance.md#restrict-css-decisions-frontenduitailwind001) | `conventions/frontend/ui-governance.md` |
@@ -721,11 +722,11 @@ The active release states 778 provisions across 8 areas.
 | PLATFORM.BLAZOR.RENDERING.001 | [Publish static WebAssembly output](../profile/dotnet-blazor.md#publish-static-webassembly-output-platformblazorrendering001) | `profile/dotnet-blazor.md` |
 | PLATFORM.BLAZOR.REPLACEMENT.001 | [Declare replacements](../profile/dotnet-blazor.md#declare-replacements-platformblazorreplacement001) | `profile/dotnet-blazor.md` |
 | PLATFORM.BLAZOR.SCOPE.001 | [List excluded baselines](../profile/dotnet-blazor.md#list-excluded-baselines-platformblazorscope001) | `profile/dotnet-blazor.md` |
-| PLATFORM.BLAZOR.VERSIONS.001 | [Use manifest version pins](../profile/dotnet-blazor.md#use-manifest-version-pins-platformblazorversions001) | `profile/dotnet-blazor.md` |
+| PLATFORM.BLAZOR.VERSION.001 | [Use manifest version pins](../profile/dotnet-blazor.md#use-manifest-version-pins-platformblazorversion001) | `profile/dotnet-blazor.md` |
 | PLATFORM.NEXTJS.COMPOSITION.001 | [Apply the complete profile](../profile/dotnet-nextjs.md#apply-the-complete-profile-platformnextjscomposition001) | `profile/dotnet-nextjs.md` |
 | PLATFORM.NEXTJS.CONVENTION.001 | [Keep the platform profile visible](../profile/dotnet-nextjs.md#keep-the-platform-profile-visible-platformnextjsconvention001) | `profile/dotnet-nextjs.md` |
 | PLATFORM.NEXTJS.REPLACEMENT.001 | [Declare replacements](../profile/dotnet-nextjs.md#declare-replacements-platformnextjsreplacement001) | `profile/dotnet-nextjs.md` |
-| PLATFORM.NEXTJS.VERSIONS.001 | [Use manifest version pins](../profile/dotnet-nextjs.md#use-manifest-version-pins-platformnextjsversions001) | `profile/dotnet-nextjs.md` |
+| PLATFORM.NEXTJS.VERSION.001 | [Use manifest version pins](../profile/dotnet-nextjs.md#use-manifest-version-pins-platformnextjsversion001) | `profile/dotnet-nextjs.md` |
 
 ## QUALITY
 
@@ -764,7 +765,7 @@ The active release states 778 provisions across 8 areas.
 | QUALITY.SECURITY.CONVENTION.004 | [Test the resource authorization matrix](../conventions/quality/security.md#test-the-resource-authorization-matrix-qualitysecurityconvention004) | `conventions/quality/security.md` |
 | QUALITY.SECURITY.CORS.001 | [Restrict cross-origin access](../conventions/quality/security.md#restrict-cross-origin-access-qualitysecuritycors001) | `conventions/quality/security.md` |
 | QUALITY.SECURITY.DATA.001 | [Minimize sensitive data](../conventions/quality/security.md#minimize-sensitive-data-qualitysecuritydata001) | `conventions/quality/security.md` |
-| QUALITY.SECURITY.ERRORS.001 | [Limit public error detail](../conventions/quality/security.md#limit-public-error-detail-qualitysecurityerrors001) | `conventions/quality/security.md` |
+| QUALITY.SECURITY.ERROR.001 | [Limit public error detail](../conventions/quality/security.md#limit-public-error-detail-qualitysecurityerror001) | `conventions/quality/security.md` |
 | QUALITY.SECURITY.FRONTEND.001 | [Protect browser boundaries](../conventions/quality/security.md#protect-browser-boundaries-qualitysecurityfrontend001) | `conventions/quality/security.md` |
 | QUALITY.SECURITY.INPUT.001 | [Validate at trust boundaries](../conventions/quality/security.md#validate-at-trust-boundaries-qualitysecurityinput001) | `conventions/quality/security.md` |
 | QUALITY.SECURITY.ROTATION.001 | [Rotate production secrets](../conventions/quality/security.md#rotate-production-secrets-qualitysecurityrotation001) | `conventions/quality/security.md` |

@@ -23,7 +23,7 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 - Match actor and resource tenants. (EXT.TENANCY.AUTHZ.001)
 - Scope every tenant-owned persistence boundary. (EXT.TENANCY.STORAGE.002)
 - Prevent cross-tenant disclosure in responses and diagnostics. (EXT.TENANCY.DISCLOSURE.001, EXT.TENANCY.DISCLOSURE.002)
-- Declare tenant scope for operational work. (EXT.TENANCY.OPERATIONS.001)
+- Declare tenant scope for operational work. (EXT.TENANCY.OPERATION.001)
 
 ## Standards
 
@@ -87,7 +87,7 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 
 **Rationale:** Diagnostics can bypass an API response's normal resource-disclosure boundary.
 
-### Scope tenant operations (EXT.TENANCY.OPERATIONS.001)
+### Scope tenant operations (EXT.TENANCY.OPERATION.001)
 
 **Requirement:** Backup, restore, replay, deletion, export, support access, and incident investigation MUST document one-tenant or all-tenant scope.
 
@@ -137,7 +137,7 @@ Marten tenancy support is part of the baseline persistence package. Another isol
 | EXT.TENANCY.STORAGE.002 | static, test | `TenancyStorageTests` include tenant scope at every listed boundary. |
 | EXT.TENANCY.DISCLOSURE.001 | test | `TenancyDisclosureTests` return the documented not-found or forbidden response. |
 | EXT.TENANCY.DISCLOSURE.002 | test | `TenancyDisclosureTests` exclude foreign tenant identifiers and data. |
-| EXT.TENANCY.OPERATIONS.001 | inspection | Operating procedures declare one-tenant or all-tenant scope. |
+| EXT.TENANCY.OPERATION.001 | inspection | Operating procedures declare one-tenant or all-tenant scope. |
 | EXT.TENANCY.CONVENTION.001 | static | Tenant references use `TenantId` or a documented local replacement. |
 | EXT.TENANCY.CONVENTION.002 | inspection | Host code has one trusted current-tenant accessor. |
 | EXT.TENANCY.CONVENTION.003 | static | `TenancyTests` asserts domain code reads no ambient tenant request state. |

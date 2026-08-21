@@ -10,7 +10,7 @@ Frontend tests should prove use-case behavior at the cheapest boundary that repr
 
 - Test level matches the risk it covers. (FRONTEND.TESTING.LEVEL.001)
 - Tests proving acceptance criteria cite their identifier. (FRONTEND.TESTING.TRACE.001)
-- Tests assert observable behavior in every applicable state. (FRONTEND.TESTING.STATES.001)
+- Tests assert observable behavior in every applicable state. (FRONTEND.TESTING.STATE.001)
 - Mocks stay at owned contract boundaries. (FRONTEND.TESTING.MOCKS.001)
 - Browser tests own their data and context. (FRONTEND.TESTING.ISOLATION.001)
 - A changed frontend runs its five gate commands. (FRONTEND.TESTING.GATES.001)
@@ -39,7 +39,7 @@ test('[AC-POSTS-CREATE-DRAFT-01] creates a draft', async ({ page }) => {
 })
 ```
 
-### Test observable states (FRONTEND.TESTING.STATES.001)
+### Test observable states (FRONTEND.TESTING.STATE.001)
 
 **Requirement:** A frontend test MUST assert observable behavior across loading, empty, error, forbidden, not-found, pending, validation, and success states.
 
@@ -98,7 +98,7 @@ test('[AC-POSTS-CREATE-DRAFT-01] creates a draft', async ({ page }) => {
 
 ## Reference example
 
-This informative example demonstrates `FRONTEND.TESTING.STATES.001`, `FRONTEND.TESTING.MOCKS.001`, and `FRONTEND.TESTING.ISOLATION.001`.
+This informative example demonstrates `FRONTEND.TESTING.STATE.001`, `FRONTEND.TESTING.MOCKS.001`, and `FRONTEND.TESTING.ISOLATION.001`.
 
 `CreateDraftForm.test.tsx` proves field errors, pending state, and successful submission through a mocked action. `create-draft.spec.ts` proves authenticated navigation, API integration. The acceptance criterion through the browser.
 
@@ -109,7 +109,7 @@ This informative example demonstrates `FRONTEND.TESTING.STATES.001`, `FRONTEND.T
 |:---|:---|:---|
 | FRONTEND.TESTING.LEVEL.001 | inspection | Test review compares each new test against the level its risk requires. |
 | FRONTEND.TESTING.TRACE.001 | test | `node standards/tools/validate-consumer.mjs` resolves each cited acceptance identifier to its use case. |
-| FRONTEND.TESTING.STATES.001 | test | `ComponentStateTests` asserts each applicable state through user-observable output. |
+| FRONTEND.TESTING.STATE.001 | test | `ComponentStateTests` asserts each applicable state through user-observable output. |
 | FRONTEND.TESTING.MOCKS.001 | test | `TestBoundaryTests` asserts no test replaces a framework internal or private function. |
 | FRONTEND.TESTING.ISOLATION.001 | test | `node standards/tools/validate-ui.mjs` and a randomized Playwright order confirm no case depends on another. |
 | FRONTEND.TESTING.GATES.001 | test | The CI frontend job runs `pnpm lint`, `type-check`, `test`, and `build`, failing on any non-zero exit. |

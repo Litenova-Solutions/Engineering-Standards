@@ -16,7 +16,7 @@ drift without these project-owned constraints.
 - Props carry values and callbacks, not services or stores. (FRONTEND.COMPONENTS.PROPS.001)
 - Interactive UI supports keyboard, focus, labels, and announcements. (FRONTEND.COMPONENTS.ACCESSIBILITY.001)
 - Variants use theme tokens through the variant helper. (FRONTEND.COMPONENTS.VARIANTS.001)
-- Data-aware components render every applicable state. (FRONTEND.COMPONENTS.STATES.001)
+- Data-aware components render every applicable state. (FRONTEND.COMPONENTS.STATE.001)
 - Untrusted content never reaches raw HTML rendering. (FRONTEND.COMPONENTS.CONTENT.001)
 - Content images use the framework image component. (FRONTEND.COMPONENTS.IMAGE.001)
 
@@ -56,7 +56,7 @@ The example does not place business operations inside `components/ui/`.
 
 **Rationale:** Repeated pixel values, colors, or long conditional class strings drift apart once more than one feature edits them.
 
-### Render complete states (FRONTEND.COMPONENTS.STATES.001)
+### Render complete states (FRONTEND.COMPONENTS.STATE.001)
 
 **Requirement:** A data or permission-aware component MUST render its loading, empty, error, forbidden, disabled, pending, and ready states.
 
@@ -132,7 +132,7 @@ This informative example demonstrates `FRONTEND.COMPONENTS.OWNERSHIP.001` and `F
 | FRONTEND.COMPONENTS.PROPS.001 | inspection | `ComponentPropsTests` asserts no component prop type resolves a client, store, or service instance. |
 | FRONTEND.COMPONENTS.ACCESSIBILITY.001 | inspection | `AccessibilityTests` asserts keyboard operation, focus visibility, labels, and status announcements for each interactive component. |
 | FRONTEND.COMPONENTS.VARIANTS.001 | inspection | `node standards/tools/validate-ui.mjs` rejects a literal value where a theme token exists. |
-| FRONTEND.COMPONENTS.STATES.001 | inspection | `ComponentStateTests` asserts each applicable state renders for a data-aware component. |
+| FRONTEND.COMPONENTS.STATE.001 | inspection | `ComponentStateTests` asserts each applicable state renders for a data-aware component. |
 | FRONTEND.COMPONENTS.CONTENT.001 | inspection | `node standards/tools/validate-ui.mjs` reports each `dangerouslySetInnerHTML` use for review against its decision. |
 | FRONTEND.COMPONENTS.IMAGE.001 | inspection | `ImageTests` asserts content images use the framework component and carry the correct alternative text. |
 | FRONTEND.COMPONENTS.CONVENTION.001 | inspection | Naming review compares each new component name against its rendered role. |

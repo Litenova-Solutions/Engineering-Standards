@@ -13,7 +13,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 - Selecting the profile activates every composed convention. (PLATFORM.BLAZOR.COMPOSITION.001)
 - Each excluded baseline is named with its reason. (PLATFORM.BLAZOR.SCOPE.001)
 - The client publishes as static WebAssembly with no server render mode. (PLATFORM.BLAZOR.RENDERING.001)
-- Versions resolve from the manifest. (PLATFORM.BLAZOR.VERSIONS.001)
+- Versions resolve from the manifest. (PLATFORM.BLAZOR.VERSION.001)
 - A replacement names every rule identifier it replaces. (PLATFORM.BLAZOR.REPLACEMENT.001)
 - Verification runs through the .NET toolchain. (PLATFORM.BLAZOR.CONVENTION.002)
 - Operating Limits records a first-load budget. (PLATFORM.BLAZOR.CONVENTION.003)
@@ -52,7 +52,7 @@ Backend architecture, domain, and application conventions are not excluded, beca
 
 **Rationale:** Blazor Server, interactive server rendering, and prerendering each remove offline operation and reintroduce a server, so all three are outside this profile.
 
-### Use manifest version pins (PLATFORM.BLAZOR.VERSIONS.001)
+### Use manifest version pins (PLATFORM.BLAZOR.VERSION.001)
 
 **Requirement:** A consumer MUST resolve every SDK, framework, and NuGet version from `standards.manifest.json`.
 
@@ -135,7 +135,7 @@ dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 | PLATFORM.BLAZOR.COMPOSITION.001 | static | `node tools/validate-standards.mjs` asserts the composition list matches the manifest profile documents. |
 | PLATFORM.BLAZOR.SCOPE.001 | inspection | The excluded-baseline table names every omitted document and its reason. |
 | PLATFORM.BLAZOR.RENDERING.001 | test | `PublishOutputTests` asserts the published output contains no server assembly or server render mode. |
-| PLATFORM.BLAZOR.VERSIONS.001 | static | The CI dependency check compares each resolved version against its pin in `standards.manifest.json`. |
+| PLATFORM.BLAZOR.VERSION.001 | static | The CI dependency check compares each resolved version against its pin in `standards.manifest.json`. |
 | PLATFORM.BLAZOR.REPLACEMENT.001 | static | `node tools/validate-standards.mjs` resolves each declared replacement identifier to an active provision. |
 | PLATFORM.BLAZOR.CONVENTION.001 | inspection | `standards.project.json` names the profile and the root `AGENTS.md` names the solution and commands. |
 | PLATFORM.BLAZOR.CONVENTION.002 | test | The CI client job runs `dotnet build` and `dotnet test` against the client solution. |

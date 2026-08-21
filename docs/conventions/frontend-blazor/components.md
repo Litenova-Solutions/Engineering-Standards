@@ -8,10 +8,10 @@ A client component renders what it is given and reports what the user did. Busin
 
 - A component renders from parameters and raises events. (BLAZOR.COMPONENTS.PRESENTATION.001)
 - Every parameter carries a concrete feature-owned type. (BLAZOR.COMPONENTS.PARAMETERS.001)
-- A child reports upward through a callback. (BLAZOR.COMPONENTS.EVENTS.001)
+- A child reports upward through a callback. (BLAZOR.COMPONENTS.EVENT.001)
 - A view model exposes no Domain or Application type. (BLAZOR.COMPONENTS.VIEWMODELS.001)
 - Browser access runs through an Application interface. (BLAZOR.COMPONENTS.INTEROP.001)
-- One component per file, named for what it renders. (BLAZOR.COMPONENTS.FILES.001)
+- One component per file, named for what it renders. (BLAZOR.COMPONENTS.FILE.001)
 
 ## Standards
 
@@ -27,7 +27,7 @@ A client component renders what it is given and reports what the user did. Busin
 
 **Rationale:** A loosely typed bag of values hides the contract, and a Domain aggregate crossing into a component couples rendering to the core model.
 
-### Raise events rather than mutating (BLAZOR.COMPONENTS.EVENTS.001)
+### Raise events rather than mutating (BLAZOR.COMPONENTS.EVENT.001)
 
 **Requirement:** A child component MUST report upward through `EventCallback` rather than mutate a parent-owned object.
 
@@ -45,7 +45,7 @@ A client component renders what it is given and reports what the user did. Busin
 
 **Rationale:** The component then renders in a test with no JavaScript host.
 
-### Place one component per file (BLAZOR.COMPONENTS.FILES.001)
+### Place one component per file (BLAZOR.COMPONENTS.FILE.001)
 
 **Requirement:** A `.razor` file MUST declare one routable or reusable component named for what it renders.
 
@@ -83,10 +83,10 @@ A client component renders what it is given and reports what the user did. Busin
 |:---|:---|:---|
 | BLAZOR.COMPONENTS.PRESENTATION.001 | test | `ClientArchitectureTests` asserts no component resolves storage, interop, or a Domain service. |
 | BLAZOR.COMPONENTS.PARAMETERS.001 | test | `ComponentContractTests` asserts each parameter declares a feature-owned concrete type. |
-| BLAZOR.COMPONENTS.EVENTS.001 | test | `ComponentContractTests` asserts each child reports upward through a callback parameter. |
+| BLAZOR.COMPONENTS.EVENT.001 | test | `ComponentContractTests` asserts each child reports upward through a callback parameter. |
 | BLAZOR.COMPONENTS.VIEWMODELS.001 | test | `ClientArchitectureTests` asserts no view model exposes a Domain or Application type. |
 | BLAZOR.COMPONENTS.INTEROP.001 | test | `ClientArchitectureTests` asserts no component injects the interop runtime directly. |
-| BLAZOR.COMPONENTS.FILES.001 | test | `ComponentContractTests` asserts each component file declares one primary component. |
+| BLAZOR.COMPONENTS.FILE.001 | test | `ComponentContractTests` asserts each component file declares one primary component. |
 | BLAZOR.COMPONENTS.CONVENTION.001 | inspection | Naming review compares each feature component against its rendered role. |
 | BLAZOR.COMPONENTS.CONVENTION.002 | inspection | Style review locates each color, spacing, and font value in the token set. |
 | BLAZOR.COMPONENTS.CONVENTION.003 | test | `ComponentAccessibilityTests` covers keyboard paths and announcements for each interactive component. |
