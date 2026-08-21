@@ -11,7 +11,7 @@
     "agentsEntry",
     "defaultProfile",
     "paths",
-    "idRegistry",
+    "provisionRegistry",
     "profiles",
     "extensions",
     "stack",
@@ -33,28 +33,23 @@
     "paths": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["docs", "templates", "extensions"],
+      "required": ["docs", "template", "extension"],
       "properties": {
         "docs": { "$ref": "#/$defs/repositoryPath" },
-        "templates": { "$ref": "#/$defs/repositoryPath" },
-        "extensions": { "$ref": "#/$defs/repositoryPath" }
+        "template": { "$ref": "#/$defs/repositoryPath" },
+        "extension": { "$ref": "#/$defs/repositoryPath" }
       }
     },
-    "idRegistry": {
+    "provisionRegistry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["areas", "pages", "topics"],
+      "required": ["areas", "topics"],
       "properties": {
         "areas": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/idArea" }
-        },
-        "pages": {
-          "type": "object",
-          "minProperties": 1,
-          "additionalProperties": { "$ref": "#/$defs/idScope" }
         },
         "topics": {
           "type": "array",

@@ -2,93 +2,95 @@
 
 ## Intent
 
-Use this index to load the canonical foundation, profile, convention, extension, guide, or reference page for current work.
+Use this index to load the canonical page for current work.
 
-## Foundations
+Each directory under `docs/` is one provision area. A page path states the scope its provisions carry, so `frontend/components.md` owns `FRONTEND.COMPONENTS`. The [provision index](reference/provisions.md) resolves any identifier to its page.
 
-- [Scope](foundations/scope.md)
-- [Principles](foundations/principles.md)
-- [Agentic Engineering System](foundations/engineering-system.md)
-- [Agent protocol](foundations/agent-protocol.md)
-- [Release standard](foundations/release-standard.md)
-- [Authoring standard](foundations/authoring-standard.md)
+## Core
 
-## Platform Profiles
+- [Scope](core/scope.md)
+- [Principles](core/principles.md)
+- [Agentic Engineering System](core/system.md)
+- [Agent protocol](core/agent.md)
+- [Release standard](core/release.md)
+- [Authoring standard](core/authoring.md)
 
-- [ASP.NET Core and Next.js profile](profile/dotnet-nextjs.md)
-- [.NET and Blazor client profile](profile/dotnet-blazor.md)
+## Profile
 
-The profile selects every baseline convention. Exact versions and composition remain in `standards.manifest.json`.
+- [.NET and Next.js platform profile](profile/nextjs.md)
+- [.NET and Blazor platform profile](profile/blazor.md)
 
-## Workspace Conventions
+The profile selects every baseline page. Exact versions and composition remain in `standards.manifest.json`.
 
-- [Workspace structure](conventions/workspace/structure.md)
-- [Naming](conventions/workspace/naming.md)
-- [Dependencies](conventions/workspace/dependencies.md)
-- [Configuration](conventions/workspace/configuration.md)
+## Workspace
 
-## Backend Conventions
+- [Workspace structure](workspace/structure.md)
+- [Naming](workspace/naming.md)
+- [Dependencies](workspace/dependencies.md)
+- [Configuration](workspace/config.md)
 
-- [Architecture](conventions/backend/architecture.md)
-- [Domain](conventions/backend/domain.md)
-- [Application](conventions/backend/application.md)
-- [Marten persistence](conventions/backend/persistence-marten.md)
-- [HTTP API](conventions/backend/api.md)
-- [Backend testing](conventions/backend/testing.md)
+## Backend
 
-## Frontend Conventions
+- [Architecture](backend/architecture.md)
+- [Domain](backend/domain.md)
+- [Application](backend/application.md)
+- [Marten persistence](backend/persistence.md)
+- [HTTP API](backend/api.md)
+- [Backend testing](backend/testing.md)
 
-- [Frontend structure](conventions/frontend/structure.md)
-- [Rendering](conventions/frontend/rendering.md)
-- [Components](conventions/frontend/components.md)
-- [Controlled UI governance](conventions/frontend/ui-governance.md)
-- [Data and state](conventions/frontend/data-and-state.md)
-- [Frontend testing](conventions/frontend/testing.md)
+## Frontend
 
-## Blazor Client Conventions
+- [Frontend structure](frontend/structure.md)
+- [Frontend rendering and routes](frontend/rendering.md)
+- [Frontend components](frontend/components.md)
+- [Controlled UI governance](frontend/ui.md)
+- [Frontend data and state](frontend/data.md)
+- [Frontend testing](frontend/testing.md)
 
-- [Client structure](conventions/frontend-blazor/structure.md)
-- [Client rendering and routes](conventions/frontend-blazor/rendering.md)
-- [Client components](conventions/frontend-blazor/components.md)
-- [Client data and state](conventions/frontend-blazor/data-and-state.md)
-- [Browser persistence](conventions/frontend-blazor/persistence-browser.md)
-- [Client testing](conventions/frontend-blazor/testing.md)
+## Blazor
 
-## Quality and Operations
+- [Blazor structure](blazor/structure.md)
+- [Blazor rendering and routes](blazor/rendering.md)
+- [Blazor components](blazor/components.md)
+- [Blazor data and state](blazor/data.md)
+- [Browser persistence](blazor/browser.md)
+- [Blazor testing](blazor/testing.md)
 
-- [Security](conventions/quality/security.md)
-- [Operations](conventions/quality/operations.md)
-- [Continuous integration](conventions/quality/ci.md)
+## Quality
 
-## Extensions
+- [Security](quality/security.md)
+- [Operations](quality/operations.md)
+- [Continuous integration](quality/ci.md)
 
-- [Extension catalog and selection](extensions/README.md)
-- [Executable acceptance BDD](extensions/acceptance-bdd.md)
-- [API compatibility](extensions/api-compatibility.md)
-- [Caching](extensions/caching.md)
-- [Concurrency and idempotency](extensions/concurrency-idempotency.md)
-- [Data lifecycle](extensions/data-lifecycle.md)
-- [Container deployment](extensions/deployment-containers.md)
-- [External integrations](extensions/external-integrations.md)
-- [Auth.js frontend authentication](extensions/frontend-authjs.md)
-- [Localization](extensions/localization.md)
-- [Multitenancy](extensions/multitenancy.md)
-- [Outbox worker](extensions/outbox-worker.md)
-- [EF Core persistence](extensions/persistence-ef-core.md)
-- [Realtime updates](extensions/realtime.md)
-- [Reporting](extensions/reporting.md)
-- [Scheduled jobs](extensions/scheduled-jobs.md)
+## Ext
 
-## Guides
+- [Extension catalog and selection](ext/README.md)
+- [Executable acceptance BDD](ext/bdd.md)
+- [API compatibility](ext/compat.md)
+- [Caching](ext/cache.md)
+- [Concurrency and idempotency](ext/concurrency.md)
+- [Data lifecycle](ext/lifecycle.md)
+- [Container deployment](ext/containers.md)
+- [External integrations](ext/integrations.md)
+- [Auth.js frontend authentication](ext/authjs.md)
+- [Localization](ext/locale.md)
+- [Multitenancy](ext/tenancy.md)
+- [Outbox worker](ext/outbox.md)
+- [EF Core persistence](ext/efcore.md)
+- [Realtime updates](ext/realtime.md)
+- [Reporting](ext/report.md)
+- [Scheduled jobs](ext/jobs.md)
 
-- [Get started](guides/getting-started.md)
-- [Model a domain](guides/model-domain.md)
+## Guide
 
-## Reference and Templates
+- [Get started](guide/getting-started.md)
+- [Model a domain](guide/model-domain.md)
+
+## Reference
 
 - [Glossary](reference/glossary.md)
 - [Provision index](reference/provisions.md)
-- [Consumer templates](../templates/docs/README.md)
+- [Consumer templates](../templates/consumer/README.md)
 - [Reference validators](../tools/README.md)
 
 Consumers pin a complete release. `CHANGELOG.md` is the only repository release note.

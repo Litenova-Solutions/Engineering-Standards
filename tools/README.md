@@ -55,13 +55,13 @@ node tools/validate-standards.cases.mjs
 node tools/generate-provisions.mjs
 ```
 
-Pass `--check` to compare without writing. The command exits `1` when the page and the active standards disagree, and the repository validator reports the same defect as `INDEX_PROVISIONS_STALE`.
+Pass `--check` to compare without writing. The command exits `1` when the page and the active standards disagree, and the repository validator reports the same defect as `PROVISIONS_STALE`.
 
 ```bash
 node tools/generate-provisions.mjs --check
 ```
 
-`tools/provision-index.mjs` builds the page content. The generator and the validator both call it, so the checked-in page and its gate cannot disagree.
+`tools/provisions.mjs` builds the page content. The generator and the validator both call it, so the checked-in page and its gate cannot disagree.
 
 ## Validate a Consumer
 

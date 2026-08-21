@@ -31,9 +31,9 @@ The baseline profile applies first. An extension or consumer decision names each
 
 - [Hosted documentation](https://www.litenova.solutions/Standards)
 - [Repository documentation index](docs/README.md)
-- [Agentic Engineering System foundation](docs/foundations/engineering-system.md)
-- [Authoring standard](docs/foundations/authoring-standard.md)
-- [Get started](docs/guides/getting-started.md)
+- [Agentic Engineering System foundation](docs/core/system.md)
+- [Authoring standard](docs/core/authoring.md)
+- [Get started](docs/guide/getting-started.md)
 
 ## Use the Standards
 
@@ -46,17 +46,17 @@ git -C standards checkout --detach <approved-tag-or-commit>
 
 Add `standards.project.json`, a short root `AGENTS.md`, and the product and domain specifications required by current work.
 
-Follow [Get started](docs/guides/getting-started.md) when creating a consumer repository.
+Follow [Get started](docs/guide/getting-started.md) when creating a consumer repository.
 
-The [template index](templates/docs/README.md) lists each consumer template and its target path.
+The [template index](templates/consumer/README.md) lists each consumer template and its target path.
 
 ## Repository Structure
 
 ```text
-docs/                    Authored standards, extensions, guides, and reference material
+docs/                    One directory per provision area, plus guides and reference material
 schemas/                 JSON contracts for standards and consumer configuration
-templates/docs/          Consumer specification templates
-templates/standards/     Standards authoring templates
+templates/consumer/      Consumer specification templates
+templates/standard/      Standards authoring templates
 tools/                   Dependency-free reference validators and fixture suites
 standards.manifest.json  Versions, profiles, extensions, and agent load plans
 ```

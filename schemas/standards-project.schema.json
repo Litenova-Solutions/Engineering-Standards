@@ -80,9 +80,9 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["ruleId", "decision"],
+        "required": ["provisionId", "decision"],
         "properties": {
-          "ruleId": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}$" },
+          "provisionId": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}$" },
           "decision": { "$ref": "#/$defs/projectPath" },
           "reviewBy": {
             "type": "string",
@@ -92,8 +92,8 @@
         "allOf": [
           {
             "if": {
-              "properties": { "ruleId": { "pattern": "^FRONTEND\\.UI\\." } },
-              "required": ["ruleId"]
+              "properties": { "provisionId": { "pattern": "^FRONTEND\\.UI\\." } },
+              "required": ["provisionId"]
             },
             "then": { "required": ["reviewBy"] }
           }

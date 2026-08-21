@@ -7,70 +7,20 @@
   "defaultProfile": "dotnet-nextjs",
   "paths": {
     "docs": "docs",
-    "templates": "templates",
-    "extensions": "docs/extensions"
+    "template": "templates",
+    "extension": "docs/ext"
   },
-  "idRegistry": {
+  "provisionRegistry": {
     "areas": [
       "BACKEND",
       "BLAZOR",
       "CORE",
       "EXT",
       "FRONTEND",
-      "PLATFORM",
+      "PROFILE",
       "QUALITY",
       "WORKSPACE"
     ],
-    "pages": {
-      "docs/conventions/backend/api.md": "BACKEND.API",
-      "docs/conventions/backend/application.md": "BACKEND.APPLICATION",
-      "docs/conventions/backend/architecture.md": "BACKEND.ARCHITECTURE",
-      "docs/conventions/backend/domain.md": "BACKEND.DOMAIN",
-      "docs/conventions/backend/persistence-marten.md": "BACKEND.PERSISTENCE",
-      "docs/conventions/frontend-blazor/components.md": "BLAZOR.COMPONENTS",
-      "docs/conventions/frontend-blazor/data-and-state.md": "BLAZOR.DATA",
-      "docs/conventions/frontend-blazor/persistence-browser.md": "BLAZOR.BROWSER",
-      "docs/conventions/frontend-blazor/rendering.md": "BLAZOR.RENDERING",
-      "docs/conventions/frontend-blazor/structure.md": "BLAZOR.STRUCTURE",
-      "docs/conventions/frontend-blazor/testing.md": "BLAZOR.TESTING",
-      "docs/conventions/frontend/components.md": "FRONTEND.COMPONENTS",
-      "docs/conventions/frontend/data-and-state.md": "FRONTEND.DATA",
-      "docs/conventions/frontend/rendering.md": "FRONTEND.RENDERING",
-      "docs/conventions/frontend/structure.md": "FRONTEND.STRUCTURE",
-      "docs/conventions/frontend/testing.md": "FRONTEND.TESTING",
-      "docs/conventions/frontend/ui-governance.md": "FRONTEND.UI",
-      "docs/conventions/backend/testing.md": "BACKEND.TESTING",
-      "docs/conventions/quality/ci.md": "QUALITY.CI",
-      "docs/conventions/quality/operations.md": "QUALITY.OPERATIONS",
-      "docs/conventions/quality/security.md": "QUALITY.SECURITY",
-      "docs/conventions/workspace/configuration.md": "WORKSPACE.CONFIG",
-      "docs/conventions/workspace/dependencies.md": "WORKSPACE.DEPENDENCIES",
-      "docs/conventions/workspace/naming.md": "WORKSPACE.NAMING",
-      "docs/conventions/workspace/structure.md": "WORKSPACE.STRUCTURE",
-      "docs/extensions/acceptance-bdd.md": "EXT.BDD",
-      "docs/extensions/api-compatibility.md": "EXT.COMPAT",
-      "docs/extensions/caching.md": "EXT.CACHE",
-      "docs/extensions/concurrency-idempotency.md": "EXT.CONCURRENCY",
-      "docs/extensions/data-lifecycle.md": "EXT.LIFECYCLE",
-      "docs/extensions/deployment-containers.md": "EXT.CONTAINERS",
-      "docs/extensions/external-integrations.md": "EXT.INTEGRATIONS",
-      "docs/extensions/frontend-authjs.md": "EXT.AUTHJS",
-      "docs/extensions/localization.md": "EXT.LOCALE",
-      "docs/extensions/multitenancy.md": "EXT.TENANCY",
-      "docs/extensions/outbox-worker.md": "EXT.OUTBOX",
-      "docs/extensions/persistence-ef-core.md": "EXT.EFCORE",
-      "docs/extensions/realtime.md": "EXT.REALTIME",
-      "docs/extensions/reporting.md": "EXT.REPORT",
-      "docs/extensions/scheduled-jobs.md": "EXT.JOBS",
-      "docs/foundations/agent-protocol.md": "CORE.AGENT",
-      "docs/foundations/authoring-standard.md": "CORE.AUTHORING",
-      "docs/foundations/engineering-system.md": "CORE.SYSTEM",
-      "docs/foundations/principles.md": "CORE.PRINCIPLES",
-      "docs/foundations/release-standard.md": "CORE.RELEASE",
-      "docs/foundations/scope.md": "CORE.SCOPE",
-      "docs/profile/dotnet-blazor.md": "PLATFORM.BLAZOR",
-      "docs/profile/dotnet-nextjs.md": "PLATFORM.NEXTJS"
-    },
     "topics": [
       "ABUSE",
       "ACCEPTANCE",
@@ -321,83 +271,83 @@
   },
   "profiles": {
     "dotnet-nextjs": {
-      "entry": "docs/profile/dotnet-nextjs.md",
+      "entry": "docs/profile/nextjs.md",
       "documents": [
-        "docs/conventions/workspace/structure.md",
-        "docs/conventions/workspace/naming.md",
-        "docs/conventions/workspace/dependencies.md",
-        "docs/conventions/workspace/configuration.md",
-        "docs/foundations/authoring-standard.md",
-        "docs/conventions/backend/architecture.md",
-        "docs/conventions/backend/domain.md",
-        "docs/conventions/backend/application.md",
-        "docs/conventions/backend/persistence-marten.md",
-        "docs/conventions/backend/api.md",
-        "docs/conventions/backend/testing.md",
-        "docs/conventions/frontend/structure.md",
-        "docs/conventions/frontend/rendering.md",
-        "docs/conventions/frontend/components.md",
-        "docs/conventions/frontend/ui-governance.md",
-        "docs/conventions/frontend/data-and-state.md",
-        "docs/conventions/frontend/testing.md",
-        "docs/conventions/quality/security.md",
-        "docs/conventions/quality/operations.md",
-        "docs/conventions/quality/ci.md"
+        "docs/workspace/structure.md",
+        "docs/workspace/naming.md",
+        "docs/workspace/dependencies.md",
+        "docs/workspace/config.md",
+        "docs/core/authoring.md",
+        "docs/backend/architecture.md",
+        "docs/backend/domain.md",
+        "docs/backend/application.md",
+        "docs/backend/persistence.md",
+        "docs/backend/api.md",
+        "docs/backend/testing.md",
+        "docs/frontend/structure.md",
+        "docs/frontend/rendering.md",
+        "docs/frontend/components.md",
+        "docs/frontend/ui.md",
+        "docs/frontend/data.md",
+        "docs/frontend/testing.md",
+        "docs/quality/security.md",
+        "docs/quality/operations.md",
+        "docs/quality/ci.md"
       ]
     },
     "dotnet-blazor": {
-      "entry": "docs/profile/dotnet-blazor.md",
+      "entry": "docs/profile/blazor.md",
       "documents": [
-        "docs/conventions/workspace/structure.md",
-        "docs/conventions/workspace/naming.md",
-        "docs/conventions/workspace/dependencies.md",
-        "docs/conventions/workspace/configuration.md",
-        "docs/foundations/authoring-standard.md",
-        "docs/conventions/backend/architecture.md",
-        "docs/conventions/backend/domain.md",
-        "docs/conventions/backend/application.md",
-        "docs/conventions/frontend-blazor/structure.md",
-        "docs/conventions/frontend-blazor/rendering.md",
-        "docs/conventions/frontend-blazor/components.md",
-        "docs/conventions/frontend-blazor/data-and-state.md",
-        "docs/conventions/frontend-blazor/persistence-browser.md",
-        "docs/conventions/frontend-blazor/testing.md",
-        "docs/conventions/quality/security.md",
-        "docs/conventions/quality/operations.md",
-        "docs/conventions/quality/ci.md"
+        "docs/workspace/structure.md",
+        "docs/workspace/naming.md",
+        "docs/workspace/dependencies.md",
+        "docs/workspace/config.md",
+        "docs/core/authoring.md",
+        "docs/backend/architecture.md",
+        "docs/backend/domain.md",
+        "docs/backend/application.md",
+        "docs/blazor/structure.md",
+        "docs/blazor/rendering.md",
+        "docs/blazor/components.md",
+        "docs/blazor/data.md",
+        "docs/blazor/browser.md",
+        "docs/blazor/testing.md",
+        "docs/quality/security.md",
+        "docs/quality/operations.md",
+        "docs/quality/ci.md"
       ]
     }
   },
   "extensions": {
-    "acceptance-bdd": {
-      "path": "docs/extensions/acceptance-bdd.md",
+    "bdd": {
+      "path": "docs/ext/bdd.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
         "end-to-end-flow"
       ]
     },
-    "api-compatibility": {
-      "path": "docs/extensions/api-compatibility.md",
+    "compat": {
+      "path": "docs/ext/compat.md",
       "activationScope": "project"
     },
-    "caching": {
-      "path": "docs/extensions/caching.md",
+    "cache": {
+      "path": "docs/ext/cache.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case"
       ]
     },
-    "concurrency-idempotency": {
-      "path": "docs/extensions/concurrency-idempotency.md",
+    "concurrency": {
+      "path": "docs/ext/concurrency.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
         "workflow"
       ]
     },
-    "data-lifecycle": {
-      "path": "docs/extensions/data-lifecycle.md",
+    "lifecycle": {
+      "path": "docs/ext/lifecycle.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
@@ -405,40 +355,40 @@
         "domain-policy"
       ]
     },
-    "deployment-containers": {
-      "path": "docs/extensions/deployment-containers.md",
+    "containers": {
+      "path": "docs/ext/containers.md",
       "activationScope": "project"
     },
-    "external-integrations": {
-      "path": "docs/extensions/external-integrations.md",
+    "integrations": {
+      "path": "docs/ext/integrations.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
         "workflow"
       ]
     },
-    "frontend-authjs": {
-      "path": "docs/extensions/frontend-authjs.md",
+    "authjs": {
+      "path": "docs/ext/authjs.md",
       "activationScope": "project"
     },
-    "localization": {
-      "path": "docs/extensions/localization.md",
+    "locale": {
+      "path": "docs/ext/locale.md",
       "activationScope": "project"
     },
-    "multitenancy": {
-      "path": "docs/extensions/multitenancy.md",
+    "tenancy": {
+      "path": "docs/ext/tenancy.md",
       "activationScope": "project"
     },
-    "outbox-worker": {
-      "path": "docs/extensions/outbox-worker.md",
+    "outbox": {
+      "path": "docs/ext/outbox.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
         "workflow"
       ]
     },
-    "persistence-ef-core": {
-      "path": "docs/extensions/persistence-ef-core.md",
+    "efcore": {
+      "path": "docs/ext/efcore.md",
       "activationScope": "local",
       "applicableKinds": [
         "module",
@@ -446,22 +396,22 @@
       ]
     },
     "realtime": {
-      "path": "docs/extensions/realtime.md",
+      "path": "docs/ext/realtime.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
         "end-to-end-flow"
       ]
     },
-    "reporting": {
-      "path": "docs/extensions/reporting.md",
+    "report": {
+      "path": "docs/ext/report.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case"
       ]
     },
-    "scheduled-jobs": {
-      "path": "docs/extensions/scheduled-jobs.md",
+    "jobs": {
+      "path": "docs/ext/jobs.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
@@ -612,14 +562,14 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/backend/api.md#agent-summary",
-        "docs/conventions/quality/security.md#agent-summary",
-        "docs/conventions/workspace/naming.md#agent-summary"
+        "docs/backend/api.md#agent-summary",
+        "docs/quality/security.md#agent-summary",
+        "docs/workspace/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/backend/api.md",
-        "docs/conventions/quality/security.md",
-        "docs/conventions/workspace/naming.md"
+        "docs/backend/api.md",
+        "docs/quality/security.md",
+        "docs/workspace/naming.md"
       ]
     },
     "backend.application": {
@@ -627,16 +577,16 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/backend/architecture.md#agent-summary",
-        "docs/conventions/backend/application.md#agent-summary",
-        "docs/conventions/backend/persistence-marten.md#agent-summary",
-        "docs/conventions/workspace/naming.md#agent-summary"
+        "docs/backend/architecture.md#agent-summary",
+        "docs/backend/application.md#agent-summary",
+        "docs/backend/persistence.md#agent-summary",
+        "docs/workspace/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/backend/architecture.md",
-        "docs/conventions/backend/application.md",
-        "docs/conventions/backend/persistence-marten.md",
-        "docs/conventions/workspace/naming.md"
+        "docs/backend/architecture.md",
+        "docs/backend/application.md",
+        "docs/backend/persistence.md",
+        "docs/workspace/naming.md"
       ]
     },
     "backend.domain": {
@@ -644,14 +594,14 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/backend/architecture.md#agent-summary",
-        "docs/conventions/backend/domain.md#agent-summary",
-        "docs/conventions/workspace/naming.md#agent-summary"
+        "docs/backend/architecture.md#agent-summary",
+        "docs/backend/domain.md#agent-summary",
+        "docs/workspace/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/backend/architecture.md",
-        "docs/conventions/backend/domain.md",
-        "docs/conventions/workspace/naming.md"
+        "docs/backend/architecture.md",
+        "docs/backend/domain.md",
+        "docs/workspace/naming.md"
       ]
     },
     "backend.infrastructure": {
@@ -659,16 +609,16 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/backend/architecture.md#agent-summary",
-        "docs/conventions/backend/persistence-marten.md#agent-summary",
-        "docs/conventions/workspace/dependencies.md#agent-summary",
-        "docs/conventions/quality/operations.md#agent-summary"
+        "docs/backend/architecture.md#agent-summary",
+        "docs/backend/persistence.md#agent-summary",
+        "docs/workspace/dependencies.md#agent-summary",
+        "docs/quality/operations.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/backend/architecture.md",
-        "docs/conventions/backend/persistence-marten.md",
-        "docs/conventions/workspace/dependencies.md",
-        "docs/conventions/quality/operations.md"
+        "docs/backend/architecture.md",
+        "docs/backend/persistence.md",
+        "docs/workspace/dependencies.md",
+        "docs/quality/operations.md"
       ]
     },
     "backend.testing": {
@@ -676,12 +626,12 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/backend/testing.md#agent-summary",
-        "docs/foundations/release-standard.md#agent-summary"
+        "docs/backend/testing.md#agent-summary",
+        "docs/core/release.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/backend/testing.md",
-        "docs/foundations/release-standard.md"
+        "docs/backend/testing.md",
+        "docs/core/release.md"
       ]
     },
     "blazor.browser": {
@@ -689,13 +639,13 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend-blazor/persistence-browser.md#agent-summary",
-        "docs/conventions/quality/security.md#agent-summary"
+        "docs/blazor/browser.md#agent-summary",
+        "docs/quality/security.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend-blazor/persistence-browser.md",
-        "docs/conventions/frontend-blazor/data-and-state.md",
-        "docs/conventions/quality/security.md"
+        "docs/blazor/browser.md",
+        "docs/blazor/data.md",
+        "docs/quality/security.md"
       ]
     },
     "blazor.components": {
@@ -703,13 +653,13 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend-blazor/components.md#agent-summary",
-        "docs/conventions/workspace/naming.md#agent-summary"
+        "docs/blazor/components.md#agent-summary",
+        "docs/workspace/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend-blazor/components.md",
-        "docs/conventions/frontend-blazor/structure.md",
-        "docs/conventions/workspace/naming.md"
+        "docs/blazor/components.md",
+        "docs/blazor/structure.md",
+        "docs/workspace/naming.md"
       ]
     },
     "blazor.data": {
@@ -717,12 +667,12 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend-blazor/data-and-state.md#agent-summary",
-        "docs/conventions/frontend-blazor/persistence-browser.md#agent-summary"
+        "docs/blazor/data.md#agent-summary",
+        "docs/blazor/browser.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend-blazor/data-and-state.md",
-        "docs/conventions/frontend-blazor/persistence-browser.md"
+        "docs/blazor/data.md",
+        "docs/blazor/browser.md"
       ]
     },
     "blazor.rendering": {
@@ -730,12 +680,12 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend-blazor/rendering.md#agent-summary",
-        "docs/conventions/frontend-blazor/components.md#agent-summary"
+        "docs/blazor/rendering.md#agent-summary",
+        "docs/blazor/components.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend-blazor/rendering.md",
-        "docs/conventions/frontend-blazor/components.md"
+        "docs/blazor/rendering.md",
+        "docs/blazor/components.md"
       ]
     },
     "blazor.structure": {
@@ -743,12 +693,12 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend-blazor/structure.md#agent-summary",
-        "docs/conventions/workspace/naming.md#agent-summary"
+        "docs/blazor/structure.md#agent-summary",
+        "docs/workspace/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend-blazor/structure.md",
-        "docs/conventions/workspace/naming.md"
+        "docs/blazor/structure.md",
+        "docs/workspace/naming.md"
       ]
     },
     "blazor.testing": {
@@ -756,12 +706,12 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend-blazor/testing.md#agent-summary",
-        "docs/foundations/release-standard.md#agent-summary"
+        "docs/blazor/testing.md#agent-summary",
+        "docs/core/release.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend-blazor/testing.md",
-        "docs/foundations/release-standard.md"
+        "docs/blazor/testing.md",
+        "docs/core/release.md"
       ]
     },
     "core.authoring": {
@@ -769,10 +719,10 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/foundations/authoring-standard.md#agent-summary"
+        "docs/core/authoring.md#agent-summary"
       ],
       "tier2": [
-        "docs/foundations/authoring-standard.md",
+        "docs/core/authoring.md",
         "CONTRIBUTING.md"
       ]
     },
@@ -781,16 +731,16 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/foundations/release-standard.md#agent-summary",
-        "docs/conventions/quality/security.md#agent-summary",
-        "docs/conventions/quality/operations.md#agent-summary",
-        "docs/conventions/quality/ci.md#agent-summary"
+        "docs/core/release.md#agent-summary",
+        "docs/quality/security.md#agent-summary",
+        "docs/quality/operations.md#agent-summary",
+        "docs/quality/ci.md#agent-summary"
       ],
       "tier2": [
-        "docs/foundations/release-standard.md",
-        "docs/conventions/quality/security.md",
-        "docs/conventions/quality/operations.md",
-        "docs/conventions/quality/ci.md"
+        "docs/core/release.md",
+        "docs/quality/security.md",
+        "docs/quality/operations.md",
+        "docs/quality/ci.md"
       ]
     },
     "core.usecase": {
@@ -798,12 +748,12 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/foundations/engineering-system.md#agent-summary",
-        "docs/foundations/release-standard.md#agent-summary"
+        "docs/core/system.md#agent-summary",
+        "docs/core/release.md#agent-summary"
       ],
       "tier2": [
-        "docs/foundations/engineering-system.md",
-        "docs/foundations/release-standard.md"
+        "docs/core/system.md",
+        "docs/core/release.md"
       ]
     },
     "frontend.components": {
@@ -811,16 +761,16 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend/components.md#agent-summary",
-        "docs/conventions/frontend/ui-governance.md#agent-summary",
-        "docs/conventions/frontend/rendering.md#agent-summary",
-        "docs/conventions/frontend/testing.md#agent-summary"
+        "docs/frontend/components.md#agent-summary",
+        "docs/frontend/ui.md#agent-summary",
+        "docs/frontend/rendering.md#agent-summary",
+        "docs/frontend/testing.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend/components.md",
-        "docs/conventions/frontend/ui-governance.md",
-        "docs/conventions/frontend/rendering.md",
-        "docs/conventions/frontend/testing.md"
+        "docs/frontend/components.md",
+        "docs/frontend/ui.md",
+        "docs/frontend/rendering.md",
+        "docs/frontend/testing.md"
       ]
     },
     "frontend.data": {
@@ -828,14 +778,14 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend/data-and-state.md#agent-summary",
-        "docs/conventions/workspace/configuration.md#agent-summary",
-        "docs/conventions/quality/security.md#agent-summary"
+        "docs/frontend/data.md#agent-summary",
+        "docs/workspace/config.md#agent-summary",
+        "docs/quality/security.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend/data-and-state.md",
-        "docs/conventions/workspace/configuration.md",
-        "docs/conventions/quality/security.md"
+        "docs/frontend/data.md",
+        "docs/workspace/config.md",
+        "docs/quality/security.md"
       ]
     },
     "frontend.rendering": {
@@ -843,16 +793,16 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend/rendering.md#agent-summary",
-        "docs/conventions/frontend/components.md#agent-summary",
-        "docs/conventions/frontend/ui-governance.md#agent-summary",
-        "docs/conventions/quality/security.md#agent-summary"
+        "docs/frontend/rendering.md#agent-summary",
+        "docs/frontend/components.md#agent-summary",
+        "docs/frontend/ui.md#agent-summary",
+        "docs/quality/security.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend/rendering.md",
-        "docs/conventions/frontend/components.md",
-        "docs/conventions/frontend/ui-governance.md",
-        "docs/conventions/quality/security.md"
+        "docs/frontend/rendering.md",
+        "docs/frontend/components.md",
+        "docs/frontend/ui.md",
+        "docs/quality/security.md"
       ]
     },
     "frontend.structure": {
@@ -860,14 +810,14 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend/structure.md#agent-summary",
-        "docs/conventions/frontend/ui-governance.md#agent-summary",
-        "docs/conventions/workspace/naming.md#agent-summary"
+        "docs/frontend/structure.md#agent-summary",
+        "docs/frontend/ui.md#agent-summary",
+        "docs/workspace/naming.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend/structure.md",
-        "docs/conventions/frontend/ui-governance.md",
-        "docs/conventions/workspace/naming.md"
+        "docs/frontend/structure.md",
+        "docs/frontend/ui.md",
+        "docs/workspace/naming.md"
       ]
     },
     "frontend.testing": {
@@ -875,12 +825,12 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend/testing.md#agent-summary",
-        "docs/foundations/release-standard.md#agent-summary"
+        "docs/frontend/testing.md#agent-summary",
+        "docs/core/release.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend/testing.md",
-        "docs/foundations/release-standard.md"
+        "docs/frontend/testing.md",
+        "docs/core/release.md"
       ]
     },
     "frontend.ui": {
@@ -888,16 +838,16 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/frontend/ui-governance.md#agent-summary",
-        "docs/conventions/frontend/components.md#agent-summary",
-        "docs/conventions/frontend/testing.md#agent-summary",
-        "docs/conventions/workspace/dependencies.md#agent-summary"
+        "docs/frontend/ui.md#agent-summary",
+        "docs/frontend/components.md#agent-summary",
+        "docs/frontend/testing.md#agent-summary",
+        "docs/workspace/dependencies.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/frontend/ui-governance.md",
-        "docs/conventions/frontend/components.md",
-        "docs/conventions/frontend/testing.md",
-        "docs/conventions/workspace/dependencies.md"
+        "docs/frontend/ui.md",
+        "docs/frontend/components.md",
+        "docs/frontend/testing.md",
+        "docs/workspace/dependencies.md"
       ]
     },
     "quality.operations": {
@@ -905,16 +855,16 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/quality/operations.md#agent-summary",
-        "docs/conventions/quality/ci.md#agent-summary",
-        "docs/conventions/workspace/configuration.md#agent-summary",
-        "docs/foundations/release-standard.md#agent-summary"
+        "docs/quality/operations.md#agent-summary",
+        "docs/quality/ci.md#agent-summary",
+        "docs/workspace/config.md#agent-summary",
+        "docs/core/release.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/quality/operations.md",
-        "docs/conventions/quality/ci.md",
-        "docs/conventions/workspace/configuration.md",
-        "docs/foundations/release-standard.md"
+        "docs/quality/operations.md",
+        "docs/quality/ci.md",
+        "docs/workspace/config.md",
+        "docs/core/release.md"
       ]
     },
     "quality.security": {
@@ -922,12 +872,12 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/quality/security.md#agent-summary",
-        "docs/conventions/quality/operations.md#agent-summary"
+        "docs/quality/security.md#agent-summary",
+        "docs/quality/operations.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/quality/security.md",
-        "docs/conventions/quality/operations.md"
+        "docs/quality/security.md",
+        "docs/quality/operations.md"
       ]
     },
     "workspace.dependencies": {
@@ -935,14 +885,14 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/foundations/principles.md#agent-summary",
-        "docs/conventions/workspace/dependencies.md#agent-summary",
-        "docs/conventions/workspace/configuration.md#agent-summary"
+        "docs/core/principles.md#agent-summary",
+        "docs/workspace/dependencies.md#agent-summary",
+        "docs/workspace/config.md#agent-summary"
       ],
       "tier2": [
-        "docs/foundations/principles.md",
-        "docs/conventions/workspace/dependencies.md",
-        "docs/conventions/workspace/configuration.md"
+        "docs/core/principles.md",
+        "docs/workspace/dependencies.md",
+        "docs/workspace/config.md"
       ]
     },
     "workspace.structure": {
@@ -950,16 +900,16 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/workspace/structure.md#agent-summary",
-        "docs/conventions/workspace/naming.md#agent-summary",
-        "docs/conventions/workspace/configuration.md#agent-summary",
-        "docs/foundations/authoring-standard.md#agent-summary"
+        "docs/workspace/structure.md#agent-summary",
+        "docs/workspace/naming.md#agent-summary",
+        "docs/workspace/config.md#agent-summary",
+        "docs/core/authoring.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/workspace/structure.md",
-        "docs/conventions/workspace/naming.md",
-        "docs/conventions/workspace/configuration.md",
-        "docs/foundations/authoring-standard.md"
+        "docs/workspace/structure.md",
+        "docs/workspace/naming.md",
+        "docs/workspace/config.md",
+        "docs/core/authoring.md"
       ]
     }
   }

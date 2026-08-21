@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { buildProvisionIndex, headingSlug, INDEX_PATH } from './provision-index.mjs';
+import { buildProvisionIndex, headingSlug, INDEX_PATH } from './provisions.mjs';
 
 // Every provision identifier is AREA.PAGE.TOPIC.NNN. AREA and PAGE come from the
 // manifest id registry, TOPIC names the assertion, and NNN is a three-digit sequence.
@@ -56,17 +56,11 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'AGENT_PROJECTION_ID',
   'ANCHOR_BROKEN',
   'CONVENTION_DEFAULT_SENTENCE',
-  'CONVENTION_ID',
+  'CONVENTION_ID_SEGMENT',
   'CONVENTION_MISSING_DEFAULT',
   'CONVENTION_MISSING_REPLACEMENT',
   'CONVENTION_NORMATIVE',
   'CONVENTION_REPLACEMENT_SENTENCE',
-  'DOC_H1_CASE',
-  'DOC_H1_COUNT',
-  'DOC_EMPTY_SECTION',
-  'DOC_MISSING_SECTION',
-  'DOC_SECTION_ORDER',
-  'DOC_UNKNOWN_SECTION',
   'EXTENSION_ACTIVATION',
   'EXTENSION_BASELINE',
   'EXTENSION_DEPENDENCIES',
@@ -76,26 +70,32 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'GLOSSARY_ORDER',
   'HEADING_ACTION',
   'HEADING_EMPTY_BODY',
-  'ID_DUPLICATE',
   'ID_AREA_UNKNOWN',
-  'ID_PAGE_UNREGISTERED',
-  'ID_PREFIX_OWNERSHIP',
-  'ID_REGISTRY_STALE',
-  'ID_TOPIC_DUPLICATE',
-  'ID_TOPIC_UNKNOWN',
+  'ID_DUPLICATE',
   'ID_LOCATION',
   'ID_MISSING',
+  'ID_PAGE_FILENAME',
+  'ID_SCOPE_MISMATCH',
+  'ID_TOPIC_DUPLICATE',
+  'ID_TOPIC_UNKNOWN',
+  'ID_TOPIC_UNUSED',
   'ID_UNKNOWN_REFERENCE',
   'INDEX_CONTAINS_PROCEDURE',
   'INDEX_INTENT',
-  'INDEX_PROVISIONS_STALE',
   'LINK_BROKEN',
   'MANIFEST_ANCHOR',
   'MANIFEST_DUPLICATE_PATH',
   'MANIFEST_JSON',
+  'MANIFEST_LOAD_PLAN',
   'MANIFEST_PATH',
   'OVERRIDE_CONVENTION_ID',
   'OVERRIDE_UNKNOWN_ID',
+  'PAGE_EMPTY_SECTION',
+  'PAGE_MISSING_SECTION',
+  'PAGE_SECTION_ORDER',
+  'PAGE_TITLE_CASE',
+  'PAGE_TITLE_COUNT',
+  'PAGE_UNKNOWN_SECTION',
   'PROFILE_COMPOSITION_EXTRA',
   'PROFILE_COMPOSITION_MISSING',
   'PROSE_AND_OR',
@@ -107,25 +107,27 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'PROSE_SENTENCE_LENGTH',
   'PROSE_TABLE_CELL_LENGTH',
   'PROSE_VAGUE_TERM',
+  'PROVISIONS_STALE',
   'PROVISION_RESTATES_HEADING',
   'REFERENCE_EXAMPLE_DECLARATION',
-  'RULE_DEVIATION_SENTENCE',
-  'RULE_EXAMPLE_LABEL',
-  'RULE_INFORMATIVE_NORMATIVE',
-  'RULE_LABEL_DUPLICATE',
-  'RULE_LABEL_INVALID',
-  'RULE_LABEL_ORDER',
-  'RULE_MISSING_DEVIATION',
-  'RULE_MISSING_REQUIREMENT',
-  'RULE_MODAL_COUNT',
-  'RULE_MODAL_VOCABULARY',
-  'RULE_REQUIREMENT_COUNT',
-  'RULE_SENTENCE_COUNT',
-  'RULE_UNEXPECTED_DEVIATION',
-  'RULE_UNLABELED_CONTENT',
   'SCHEMA_INVALID',
   'SCHEMA_JSON',
   'SCHEMA_UNSUPPORTED_KEYWORD',
+  'STANDARD_DEVIATION_SENTENCE',
+  'STANDARD_EXAMPLE_LABEL',
+  'STANDARD_ID_SEGMENT',
+  'STANDARD_INFORMATIVE_NORMATIVE',
+  'STANDARD_LABEL_DUPLICATE',
+  'STANDARD_LABEL_INVALID',
+  'STANDARD_LABEL_ORDER',
+  'STANDARD_MISSING_DEVIATION',
+  'STANDARD_MISSING_REQUIREMENT',
+  'STANDARD_MODAL_COUNT',
+  'STANDARD_MODAL_VOCABULARY',
+  'STANDARD_REQUIREMENT_COUNT',
+  'STANDARD_SENTENCE_COUNT',
+  'STANDARD_UNEXPECTED_DEVIATION',
+  'STANDARD_UNLABELED_CONTENT',
   'SUMMARY_COUNT',
   'SUMMARY_ID_POSITION',
   'SUMMARY_MISSING_ID',
@@ -135,12 +137,11 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'VERIFY_DUPLICATE_ID',
   'VERIFY_DUPLICATE_METHOD',
   'VERIFY_GENERIC_EVIDENCE',
-  'VERIFY_NO_ARTIFACT',
-  'VERIFY_TEMPLATED_EVIDENCE',
   'VERIFY_METHOD',
   'VERIFY_MISSING_ID',
+  'VERIFY_NO_ARTIFACT',
+  'VERIFY_TEMPLATED_EVIDENCE',
   'VERIFY_UNKNOWN_ID',
-  'WRITING_LOAD_PLAN',
 ]);
 const SCHEMA_KEYWORDS = new Set([
   '$schema', '$id', '$ref', '$defs', 'title', 'description', 'type', 'const', 'enum', 'pattern',
@@ -297,20 +298,19 @@ function anchorsFor(raw) {
   return anchors;
 }
 
+const PAGE_CLASS_AREA = { ext: 'extension', profile: 'profile', guide: 'guide' };
+
 function documentClass(relative) {
-  if (/^docs\/foundations\/[^/]+\.md$/.test(relative)) return 'foundation';
-  if (/^docs\/conventions\/[^/]+\/[^/]+\.md$/.test(relative)) return 'convention';
-  if (/^docs\/profile\/[^/]+\.md$/.test(relative)) return 'profile';
-  if (/^docs\/extensions\/[^/]+\.md$/.test(relative) && !relative.endsWith('/README.md')) return 'extension';
-  if (/^docs\/guides\/[^/]+\.md$/.test(relative)) return 'guide';
   if (relative === INDEX_PATH) return 'index';
   if (relative === 'docs/reference/glossary.md') return 'glossary';
   if (relative.endsWith('/README.md') || relative === 'README.md') return 'index';
-  return null;
+  const area = relative.match(/^docs\/([a-z][a-z0-9]*)\/[a-z][a-z0-9]*\.md$/)?.[1];
+  if (!area || area === 'reference') return null;
+  return PAGE_CLASS_AREA[area] ?? 'topic';
 }
 
 function expectedSections(kind) {
-  if (kind === 'foundation' || kind === 'convention') {
+  if (kind === 'topic') {
     return { required: ['Intent', 'Agent Summary', 'Standards', 'Conventions', 'Verification'], optional: ['Concepts', 'Reference example'] };
   }
   if (kind === 'profile') {
@@ -328,13 +328,13 @@ function checkSectionOrder(relative, kind, sections, add) {
   if (!contract) return;
   const names = sections.map((section) => section.name);
   for (const required of contract.required) {
-    if (!names.includes(required)) add(relative, 1, 'DOC_MISSING_SECTION', `missing required H2 '${required}'`);
+    if (!names.includes(required)) add(relative, 1, 'PAGE_MISSING_SECTION', `missing required H2 '${required}'`);
   }
   const allowed = new Set([...contract.required, ...contract.optional]);
   for (const section of sections) {
-    if (!allowed.has(section.name)) add(relative, section.line, 'DOC_UNKNOWN_SECTION', `H2 '${section.name}' is not valid for ${kind} pages`);
+    if (!allowed.has(section.name)) add(relative, section.line, 'PAGE_UNKNOWN_SECTION', `H2 '${section.name}' is not valid for ${kind} pages`);
   }
-  const canonical = kind === 'foundation' || kind === 'convention'
+  const canonical = kind === 'topic'
     ? ['Intent', 'Agent Summary', 'Concepts', 'Standards', 'Conventions', 'Reference example', 'Verification']
     : kind === 'guide'
       ? ['Purpose', 'Prerequisites', 'Procedure', 'Verification']
@@ -343,7 +343,7 @@ function checkSectionOrder(relative, kind, sections, add) {
   for (const section of sections) {
     const position = canonical.indexOf(section.name);
     if (position < previous) {
-      add(relative, section.line, 'DOC_SECTION_ORDER', `H2 '${section.name}' is out of order`);
+      add(relative, section.line, 'PAGE_SECTION_ORDER', `H2 '${section.name}' is out of order`);
       break;
     }
     previous = position;
@@ -523,18 +523,18 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
     if (step) add(relative, step.number, 'INDEX_CONTAINS_PROCEDURE', 'an index must not contain a numbered procedure');
   }
 
-  if (kind && kind !== 'index' && h1Count !== 1) add(relative, 1, 'DOC_H1_COUNT', `expected one H1, found ${h1Count}`);
-  if (kind && kind !== 'index' && h1Count === 1 && !titleCase(h1Title)) add(relative, h1Line, 'DOC_H1_CASE', `H1 '${h1Title}' must use Title Case`);
+  if (kind && kind !== 'index' && h1Count !== 1) add(relative, 1, 'PAGE_TITLE_COUNT', `expected one H1, found ${h1Count}`);
+  if (kind && kind !== 'index' && h1Count === 1 && !titleCase(h1Title)) add(relative, h1Line, 'PAGE_TITLE_CASE', `H1 '${h1Title}' must use Title Case`);
   checkSectionOrder(relative, kind, sections, add);
   checkIndexAndGlossary(relative, kind, raw, sections, add);
   const sectionContract = expectedSections(kind);
   if (sectionContract) {
     for (const section of sections) {
       if ([...sectionContract.required, ...sectionContract.optional].includes(section.name)
-        && !sectionBody(lines, section.name)) add(relative, section.line, 'DOC_EMPTY_SECTION', `H2 '${section.name}' must contain content or 'None.'`);
+        && !sectionBody(lines, section.name)) add(relative, section.line, 'PAGE_EMPTY_SECTION', `H2 '${section.name}' must contain content or 'None.'`);
     }
   }
-  if ((kind === 'foundation' || kind === 'convention') && sections.some((section) => section.name === 'Reference example')) {
+  if (kind === 'topic' && sections.some((section) => section.name === 'Reference example')) {
     const example = sectionBody(lines, 'Reference example');
     const firstLine = stripFences(example.split(/\r?\n/)).find((item) => item.line.trim())?.line.trim() ?? '';
     const ids = [...example.matchAll(new RegExp(`\\b${ID_LOOSE}\\b`, 'g'))];
@@ -557,42 +557,42 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
       if (label) {
         labels.push({ name: label, line: item.number });
         activeLabel = label;
-        if (!allowedLabels.includes(label)) add(relative, item.number, 'RULE_LABEL_INVALID', `label '${label}' is invalid in ${provision.section}`);
+        if (!allowedLabels.includes(label)) add(relative, item.number, 'STANDARD_LABEL_INVALID', `label '${label}' is invalid in ${provision.section}`);
         if (label === 'Rationale' || label === 'Example') {
           const informative = visibleText(item.line);
           if ((informative.match(MODALS) ?? []).length || OTHER_NORMATIVE.test(informative)) {
-            add(relative, item.number, 'RULE_INFORMATIVE_NORMATIVE', `informative content in '${provision.id}' contains normative vocabulary`);
+            add(relative, item.number, 'STANDARD_INFORMATIVE_NORMATIVE', `informative content in '${provision.id}' contains normative vocabulary`);
           }
         }
         continue;
       }
       if (item.fenced) {
         if (activeLabel !== 'Example' && !fenceReported) {
-          add(relative, item.number, 'RULE_EXAMPLE_LABEL', `fenced example in '${provision.id}' must follow an Example label`);
+          add(relative, item.number, 'STANDARD_EXAMPLE_LABEL', `fenced example in '${provision.id}' must follow an Example label`);
           fenceReported = true;
         }
         continue;
       }
       if (!item.line.trim()) continue;
       if (!activeLabel || ['Requirement', 'Deviation', 'Default', 'Replacement'].includes(activeLabel)) {
-        add(relative, item.number, 'RULE_UNLABELED_CONTENT', `content in '${provision.id}' must follow a Rationale or Example label`);
+        add(relative, item.number, 'STANDARD_UNLABELED_CONTENT', `content in '${provision.id}' must follow a Rationale or Example label`);
       }
       if (activeLabel === 'Rationale' || activeLabel === 'Example') {
         const informative = visibleText(item.line);
         if ((informative.match(MODALS) ?? []).length || OTHER_NORMATIVE.test(informative)) {
-          add(relative, item.number, 'RULE_INFORMATIVE_NORMATIVE', `informative content in '${provision.id}' contains normative vocabulary`);
+          add(relative, item.number, 'STANDARD_INFORMATIVE_NORMATIVE', `informative content in '${provision.id}' contains normative vocabulary`);
         }
       }
     }
     for (const label of new Set(labels.map((item) => item.name))) {
       const count = labels.filter((item) => item.name === label).length;
-      if (count > 1) add(relative, labels.find((item) => item.name === label).line, 'RULE_LABEL_DUPLICATE', `provision '${provision.id}' has ${count} ${label} labels`);
+      if (count > 1) add(relative, labels.find((item) => item.name === label).line, 'STANDARD_LABEL_DUPLICATE', `provision '${provision.id}' has ${count} ${label} labels`);
     }
     let previousLabel = -1;
     for (const label of labels) {
       const position = allowedLabels.indexOf(label.name);
       if (position >= 0 && position < previousLabel) {
-        add(relative, label.line, 'RULE_LABEL_ORDER', `label '${label.name}' is out of order in '${provision.id}'`);
+        add(relative, label.line, 'STANDARD_LABEL_ORDER', `label '${label.name}' is out of order in '${provision.id}'`);
         break;
       }
       if (position >= 0) previousLabel = position;
@@ -601,28 +601,28 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
     if (provision.section === 'Standards') {
       // CONVENTION is the only force signal inside an identifier, so a Standard
       // cannot borrow it. (CORE.AUTHORING.IDENTIFIER.002)
-      if (/\.CONVENTION\.\d+$/.test(provision.id)) add(relative, provision.line, 'CONVENTION_ID', `Standard '${provision.id}' reserves the CONVENTION segment for a replaceable default`);
+      if (/\.CONVENTION\.\d+$/.test(provision.id)) add(relative, provision.line, 'STANDARD_ID_SEGMENT', `Standard '${provision.id}' reserves the CONVENTION segment for a replaceable default`);
       const requirements = nonblank.filter((item) => item.line.startsWith('**Requirement:**'));
       if (requirements.length === 0) {
-        add(relative, provision.line, 'RULE_MISSING_REQUIREMENT', `Standard '${provision.id}' has no Requirement statement`);
+        add(relative, provision.line, 'STANDARD_MISSING_REQUIREMENT', `Standard '${provision.id}' has no Requirement statement`);
         continue;
       }
-      if (requirements.length > 1) add(relative, provision.line, 'RULE_REQUIREMENT_COUNT', `Standard '${provision.id}' has ${requirements.length} Requirement statements`);
+      if (requirements.length > 1) add(relative, provision.line, 'STANDARD_REQUIREMENT_COUNT', `Standard '${provision.id}' has ${requirements.length} Requirement statements`);
       const requirement = requirements[0];
       const statement = requirement.line.slice('**Requirement:**'.length).trim();
       const modalCount = (visibleText(statement).match(MODALS) ?? []).length;
-      if (modalCount !== 1) add(relative, requirement.number, 'RULE_MODAL_COUNT', `Requirement for '${provision.id}' has ${modalCount} normative modals`);
-      if (OTHER_NORMATIVE.test(visibleText(statement))) add(relative, requirement.number, 'RULE_MODAL_VOCABULARY', `Requirement for '${provision.id}' uses an unsupported normative term`);
-      if (sentences(statement).length !== 1) add(relative, requirement.number, 'RULE_SENTENCE_COUNT', `Requirement for '${provision.id}' must contain one sentence`);
+      if (modalCount !== 1) add(relative, requirement.number, 'STANDARD_MODAL_COUNT', `Requirement for '${provision.id}' has ${modalCount} normative modals`);
+      if (OTHER_NORMATIVE.test(visibleText(statement))) add(relative, requirement.number, 'STANDARD_MODAL_VOCABULARY', `Requirement for '${provision.id}' uses an unsupported normative term`);
+      if (sentences(statement).length !== 1) add(relative, requirement.number, 'STANDARD_SENTENCE_COUNT', `Requirement for '${provision.id}' must contain one sentence`);
       const should = /\bSHOULD(?: NOT)?\b/.test(visibleText(statement));
       const deviations = nonblank.filter((item) => item.line.startsWith('**Deviation:**'));
-      if (should && deviations.length === 0) add(relative, provision.line, 'RULE_MISSING_DEVIATION', `recommendation '${provision.id}' has no Deviation statement`);
-      if (!should && deviations.length) add(relative, deviations[0].number, 'RULE_UNEXPECTED_DEVIATION', `non-recommendation '${provision.id}' cannot contain a Deviation statement`);
+      if (should && deviations.length === 0) add(relative, provision.line, 'STANDARD_MISSING_DEVIATION', `recommendation '${provision.id}' has no Deviation statement`);
+      if (!should && deviations.length) add(relative, deviations[0].number, 'STANDARD_UNEXPECTED_DEVIATION', `non-recommendation '${provision.id}' cannot contain a Deviation statement`);
       if (deviations[0] && sentences(deviations[0].line.slice('**Deviation:**'.length).trim()).length !== 1) {
-        add(relative, deviations[0].number, 'RULE_DEVIATION_SENTENCE', `Deviation for '${provision.id}' must contain one sentence`);
+        add(relative, deviations[0].number, 'STANDARD_DEVIATION_SENTENCE', `Deviation for '${provision.id}' must contain one sentence`);
       }
     } else {
-      if (!/\.CONVENTION\.\d+$/.test(provision.id)) add(relative, provision.line, 'CONVENTION_ID', `convention ID '${provision.id}' must contain the CONVENTION segment`);
+      if (!/\.CONVENTION\.\d+$/.test(provision.id)) add(relative, provision.line, 'CONVENTION_ID_SEGMENT', `convention ID '${provision.id}' must use the CONVENTION topic segment`);
       const defaults = nonblank.filter((item) => item.line.startsWith('**Default:**'));
       const replacements = nonblank.filter((item) => item.line.startsWith('**Replacement:**'));
       if (!defaults.length) add(relative, provision.line, 'CONVENTION_MISSING_DEFAULT', `convention '${provision.id}' has no Default statement`);
@@ -901,20 +901,20 @@ function checkManifest(root, add) {
     if (!dependencies) add(extension.path, 1, 'EXTENSION_DEPENDENCIES', `extension '${id}' has an empty Dependencies section`);
   }
   const writingPlan = manifest.loadPlans?.['core.authoring'];
-  if (!writingPlan || !(writingPlan.tier1 ?? []).includes('docs/foundations/authoring-standard.md#agent-summary')
-    || !(writingPlan.tier2 ?? []).includes('docs/foundations/authoring-standard.md') || !(writingPlan.tier2 ?? []).includes('CONTRIBUTING.md')) {
-    add('standards.manifest.json', 1, 'WRITING_LOAD_PLAN', 'core.authoring must load the authoring summary, foundation, and CONTRIBUTING.md');
+  if (!writingPlan || !(writingPlan.tier1 ?? []).includes('docs/core/authoring.md#agent-summary')
+    || !(writingPlan.tier2 ?? []).includes('docs/core/authoring.md') || !(writingPlan.tier2 ?? []).includes('CONTRIBUTING.md')) {
+    add('standards.manifest.json', 1, 'MANIFEST_LOAD_PLAN', 'core.authoring must load the authoring summary, foundation, and CONTRIBUTING.md');
   }
 }
 
 function manifestRegistry(root) {
-  const absent = { present: false, areas: new Set(), pages: {}, topics: new Set() };
+  const absent = { present: false, areas: new Set(), topics: new Set() };
   const file = path.join(root, 'standards.manifest.json');
   if (!fs.existsSync(file)) return absent;
   try {
     const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
-    const registry = manifest.idRegistry ?? {};
-    return { present: true, areas: new Set(registry.areas ?? []), pages: registry.pages ?? {}, topics: new Set(registry.topics ?? []) };
+    const registry = manifest.provisionRegistry ?? {};
+    return { present: true, areas: new Set(registry.areas ?? []), topics: new Set(registry.topics ?? []) };
   } catch {
     return absent;
   }
@@ -957,7 +957,7 @@ export function validateRepository(rootInput = '.') {
   const parsedDocuments = [];
   for (const file of currentMarkdown) {
     const relative = slash(path.relative(root, file));
-    if (/^templates\/standards\//.test(relative)) continue;
+    if (/^templates\/standard\//.test(relative)) continue;
     const raw = fs.readFileSync(file, 'utf8');
     const prose = stripFences(raw.split(/\r?\n/)).map((item) => item.line).join('\n');
     const nonAscii = prose.match(/[^\x00-\x7F]/);
@@ -966,34 +966,32 @@ export function validateRepository(rootInput = '.') {
     if (relative === 'AGENTS.md' || relative.endsWith('/project-agents.md')) checkAgentProjection(relative, raw, add);
   }
 
-  // Provision identity is declared, not inferred. The manifest id registry names the
-  // AREA.PAGE scope that owns each normative page, and every provision on that page
-  // carries that scope. A page outside the registry cannot own provisions.
+  // Provision identity comes from the path. The directory names the area and the file
+  // stem names the page, so two pages cannot share a scope: the filesystem already
+  // forbids a duplicate stem inside one directory. Only the word lists are declared.
   const registry = manifestRegistry(root);
-  const scopeOwners = new Map();
   const usedTopics = new Set();
   for (const document of registry.present ? parsedDocuments : []) {
     const provisions = document.parsed.provisions ?? [];
     if (!provisions.length) continue;
-    const declared = registry.pages[document.relative];
-    if (!declared) {
-      add(document.relative, 1, 'ID_PAGE_UNREGISTERED', `page owns ${provisions.length} provisions but standards.manifest.json declares no idRegistry scope`);
+    const parts = document.relative.match(/^docs\/([a-z][a-z0-9]*)\/([a-z][a-z0-9]*)\.md$/);
+    if (!parts) {
+      add(document.relative, 1, 'ID_PAGE_FILENAME', `page owns ${provisions.length} provisions, so its path must be docs/<area>/<page>.md with one lowercase word in each position`);
       continue;
     }
-    const owner = scopeOwners.get(declared);
-    if (owner && owner !== document.relative) add(document.relative, 1, 'ID_PREFIX_OWNERSHIP', `id scope '${declared}' is also declared for ${owner}`);
-    else scopeOwners.set(declared, document.relative);
-    if (!registry.areas.has(declared.split('.')[0])) {
-      add(document.relative, 1, 'ID_AREA_UNKNOWN', `id scope '${declared}' uses an area outside the manifest idRegistry areas`);
+    const [, areaDir, stem] = parts;
+    const scope = `${areaDir.toUpperCase()}.${stem.toUpperCase()}`;
+    if (!registry.areas.has(areaDir.toUpperCase())) {
+      add(document.relative, 1, 'ID_AREA_UNKNOWN', `directory '${areaDir}' is not a registered provisionRegistry area`);
     }
     for (const provision of provisions) {
-      if (!provision.id.startsWith(`${declared}.`)) {
-        add(document.relative, provision.line, 'ID_PREFIX_OWNERSHIP', `provision '${provision.id}' does not use the declared page scope '${declared}'`);
+      if (!provision.id.startsWith(`${scope}.`)) {
+        add(document.relative, provision.line, 'ID_SCOPE_MISMATCH', `provision '${provision.id}' does not use the page scope '${scope}' its path derives`);
       }
       const topic = provision.id.split('.')[2];
       usedTopics.add(topic);
       if (!registry.topics.has(topic)) {
-        add(document.relative, provision.line, 'ID_TOPIC_UNKNOWN', `topic '${topic}' is not registered in the manifest idRegistry topics`);
+        add(document.relative, provision.line, 'ID_TOPIC_UNKNOWN', `topic '${topic}' is not a registered provisionRegistry topic`);
       }
     }
   }
@@ -1001,10 +999,7 @@ export function validateRepository(rootInput = '.') {
     if (topic.endsWith('S') && registry.topics.has(topic.slice(0, -1))) {
       add('standards.manifest.json', 1, 'ID_TOPIC_DUPLICATE', `topics '${topic.slice(0, -1)}' and '${topic}' name one concept in two forms`);
     }
-    if (!usedTopics.has(topic)) add('standards.manifest.json', 1, 'ID_REGISTRY_STALE', `idRegistry registers topic '${topic}', which no provision uses`);
-  }
-  for (const [relative, scope] of registry.present ? Object.entries(registry.pages) : []) {
-    if (!scopeOwners.has(scope)) add('standards.manifest.json', 1, 'ID_REGISTRY_STALE', `idRegistry declares '${scope}' for '${relative}', which owns no provision`);
+    if (!usedTopics.has(topic)) add('standards.manifest.json', 1, 'ID_TOPIC_UNUSED', `provisionRegistry registers topic '${topic}', which no provision uses`);
   }
 
   const activeIds = new Set(globalIds.keys());
@@ -1020,13 +1015,13 @@ export function validateRepository(rootInput = '.') {
     }
   }
 
-  const templateRoot = path.join(root, 'templates', 'standards');
+  const templateRoot = path.join(root, 'templates', 'standard');
   for (const file of walk(templateRoot, (candidate) => candidate.endsWith('.md'))) {
     const relative = slash(path.relative(root, file));
     const name = path.basename(file);
-    const virtualRelative = name === 'extension.md' ? 'docs/extensions/template.md'
-      : name === 'guide.md' ? 'docs/guides/template.md'
-        : 'docs/foundations/template.md';
+    const virtualRelative = name === 'extension.md' ? 'docs/ext/template.md'
+      : name === 'guide.md' ? 'docs/guide/template.md'
+        : 'docs/core/template.md';
     const normalized = normalizeTemplate(relative, fs.readFileSync(file, 'utf8'));
     const nonAscii = stripFences(normalized.split(/\r?\n/)).map((item) => item.line).join('\n').match(/[^\x00-\x7F]/);
     if (nonAscii) add(relative, 1, 'PROSE_NON_ASCII', `authoring template contains non-ASCII character U+${nonAscii[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
@@ -1044,20 +1039,20 @@ export function validateRepository(rootInput = '.') {
   if (fs.existsSync(indexFile)) {
     const expected = `${buildProvisionIndex(root)}\n`;
     const actual = fs.readFileSync(indexFile, 'utf8').replace(/\r\n/g, '\n');
-    if (actual !== expected) add(INDEX_PATH, 1, 'INDEX_PROVISIONS_STALE', 'generated provision index differs from the active standards; run node tools/generate-provisions.mjs');
+    if (actual !== expected) add(INDEX_PATH, 1, 'PROVISIONS_STALE', 'generated provision index differs from the active standards; run node tools/generate-provisions.mjs');
   } else if (fs.existsSync(path.join(root, 'docs', 'reference'))) {
-    add(INDEX_PATH, 1, 'INDEX_PROVISIONS_STALE', 'generated provision index is missing; run node tools/generate-provisions.mjs');
+    add(INDEX_PATH, 1, 'PROVISIONS_STALE', 'generated provision index is missing; run node tools/generate-provisions.mjs');
   }
   validateSchemaConsumer(root, 'schemas/standards-manifest.schema.json', 'standards.manifest.json', add);
-  validateSchemaConsumer(root, 'schemas/standards-project.schema.json', 'templates/docs/standards.project.json', add);
+  validateSchemaConsumer(root, 'schemas/standards-project.schema.json', 'templates/consumer/standards.project.json', add);
 
-  const projectTemplate = path.join(root, 'templates', 'docs', 'standards.project.json');
+  const projectTemplate = path.join(root, 'templates', 'consumer', 'standards.project.json');
   if (fs.existsSync(projectTemplate)) {
     try {
       const project = JSON.parse(fs.readFileSync(projectTemplate, 'utf8'));
       for (const override of project.overrides ?? []) {
-        if (!activeIds.has(override.ruleId)) add('templates/docs/standards.project.json', 1, 'OVERRIDE_UNKNOWN_ID', `override references unknown Standard '${override.ruleId}'`);
-        else if (/\.CONVENTION\.\d+$/.test(override.ruleId)) add('templates/docs/standards.project.json', 1, 'OVERRIDE_CONVENTION_ID', `override cannot reference Convention '${override.ruleId}'`);
+        if (!activeIds.has(override.provisionId)) add('templates/consumer/standards.project.json', 1, 'OVERRIDE_UNKNOWN_ID', `override references unknown Standard '${override.provisionId}'`);
+        else if (/\.CONVENTION\.\d+$/.test(override.provisionId)) add('templates/consumer/standards.project.json', 1, 'OVERRIDE_CONVENTION_ID', `override cannot reference Convention '${override.provisionId}'`);
       }
     } catch {
       // Schema diagnostics report invalid JSON.

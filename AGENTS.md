@@ -4,11 +4,11 @@ Read this file before changing this repository or a consumer application. (CORE.
 
 Standards v1.14.0 covers one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. (CORE.SCOPE.APPLICATION.001, CORE.SCOPE.CONTEXT.001)
 
-The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PLATFORM.NEXTJS.VERSION.001, PLATFORM.BLAZOR.VERSION.001, CORE.AGENT.LOAD.001)
+The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PROFILE.NEXTJS.VERSION.001, PROFILE.BLAZOR.VERSION.001, CORE.AGENT.LOAD.001)
 
 ## Writing
 
-Read the [authoring standard](docs/foundations/authoring-standard.md) before authoring standards or technical prose. Run its validation gates. (CORE.AUTHORING.PAGE.001, CORE.AUTHORING.VALIDATION.001)
+Read the [authoring standard](docs/core/authoring.md) before authoring standards or technical prose. Run its validation gates. (CORE.AUTHORING.PAGE.001, CORE.AUTHORING.VALIDATION.001)
 
 Agent Summary sections and this file are informative projections. Follow the cited canonical provision when a projection omits detail. (CORE.AUTHORING.SUMMARY.001, CORE.PRINCIPLES.SOURCE.001)
 
@@ -91,7 +91,7 @@ Run extension-specific checks when their rules, schemas, templates, or validator
 
 ## Consumer Verification
 
-`QUALITY.CI.GATES.001` in [continuous integration](docs/conventions/quality/ci.md) owns the exact consumer gate commands. Run the gates its table selects for each changed area. (CORE.RELEASE.GATES.001, QUALITY.CI.GATES.001)
+`QUALITY.CI.GATES.001` in [continuous integration](docs/quality/ci.md) owns the exact consumer gate commands. Run the gates its table selects for each changed area. (CORE.RELEASE.GATES.001, QUALITY.CI.GATES.001)
 
 Run the reference validators from the consumer root, then Playwright for affected browser flows and every applicable extension check. (CORE.RELEASE.GATES.001)
 

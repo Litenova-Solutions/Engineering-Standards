@@ -84,6 +84,10 @@ An immutable, package-free Domain record describing a completed fact inside the 
 
 An accepted business rule outside one aggregate invariant and identified as `POL-{POLICY}-{NN}`.
 
+## Domain rule ID
+
+A consumer domain rule identifier such as `INV-ORDERS-01`, whose prefix names its enforcement classification.
+
 ## End-to-end flow
 
 A connection of use cases from an accepted starting condition to one observable product outcome across required system boundaries.
@@ -176,10 +180,6 @@ A Domain-owned port that loads and stages complete aggregates without exposing g
 
 A use-case metadata value that activates additional specification and verification for a named area of potential harm or failure.
 
-## Rule ID
-
-A provision ID that identifies one Standard, such as `BACKEND.APPLICATION.COMMAND.001`, and can appear in a consumer override.
-
 ## Specification
 
 An approved, versioned statement of required behavior or constraint that persists beyond one task or agent session.
@@ -198,7 +198,7 @@ One identified Standards provision stating a required boundary for a conforming 
 
 ## Standards override
 
-A consumer replacement for one Standard, identified by its rule ID and an accepted project decision.
+A consumer replacement for one Standard, identified by its provision ID and an accepted project decision.
 
 ## Standards release
 

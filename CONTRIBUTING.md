@@ -4,7 +4,7 @@ Submit changes through a branch and pull request against `main`. Direct pushes t
 
 ## Authoring Contract
 
-Follow the [authoring standard](docs/foundations/authoring-standard.md) for every active standards page, template, instruction, and release note.
+Follow the [authoring standard](docs/core/authoring.md) for every active standards page, template, instruction, and release note.
 
 Keep one canonical source for each provision, version, extension, and technical fact. Link to that source instead of copying it. (CORE.PRINCIPLES.SOURCE.001)
 
@@ -20,7 +20,7 @@ Keep release context in `CHANGELOG.md` and Git history. The repository validator
 
 A new or changed Standard includes:
 
-- One atomic Requirement with one rule ID under the page scope the manifest declares. (CORE.AUTHORING.IDENTIFIER.001)
+- One atomic Requirement with one provision ID under the page scope the manifest declares. (CORE.AUTHORING.IDENTIFIER.001)
 - An informative example when `CORE.AUTHORING.EXAMPLE.001` requires one.
 - One exact Verification row.
 - A current changelog entry.
@@ -29,9 +29,9 @@ Assign a new ID to each changed Standard assertion. (CORE.AUTHORING.REQUIREMENT.
 
 A provision ID uses `AREA.PAGE.TOPIC.NNN`. Reserve the `CONVENTION` topic for replaceable defaults. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002)
 
-Register a new page in `idRegistry` before adding its first provision. (CORE.AUTHORING.IDENTIFIER.001)
+Place a new page at `docs/<area>/<page>.md`, where each part is one lowercase word. The path states the provision scope. (CORE.AUTHORING.IDENTIFIER.001)
 
-Register a new topic word in `idRegistry.topics`. Reuse the existing word when one already names the concept. (CORE.AUTHORING.IDENTIFIER.003)
+Register a new topic word in `provisionRegistry.topics`. Reuse the existing word when one already names the concept. (CORE.AUTHORING.IDENTIFIER.003)
 
 Do not add aliases, replacement maps, alternate paths, compatibility terms, or transition material. (CORE.AUTHORING.SNAPSHOT.002)
 
@@ -66,7 +66,7 @@ The pull request checklist records the manual active-voice, terminology, atomici
 
 ## Release Numbering
 
-The [authoring standard](docs/foundations/authoring-standard.md) owns the release model, including the meaning of each version number. This section projects that model for contributors.
+The [authoring standard](docs/core/authoring.md) owns the release model, including the meaning of each version number. This section projects that model for contributors.
 
 Each release states its complete contract without depending on an earlier release. (CORE.AUTHORING.SNAPSHOT.003)
 

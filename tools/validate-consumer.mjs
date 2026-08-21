@@ -231,7 +231,7 @@ for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end
 // frontend platform declaration or UI block. A recorded UI rule override must
 // carry a live review date.
 const uiActivated = (project.paths?.frontends ?? []).some((frontend) => frontend.ui || frontend.platform === 'react-web')
-  || (project.overrides ?? []).some((override) => uiOverrideScopes.some((scope) => String(override?.ruleId ?? '').startsWith(`${scope}.`)));
+  || (project.overrides ?? []).some((override) => uiOverrideScopes.some((scope) => String(override?.provisionId ?? '').startsWith(`${scope}.`)));
 if (uiActivated) {
   // Resolve the sibling validator from this file so a consumer may pin the
   // standards repository at a path other than 'standards/'.

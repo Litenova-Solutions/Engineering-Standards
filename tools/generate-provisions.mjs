@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildProvisionIndex, INDEX_PATH } from './provision-index.mjs';
+import { buildProvisionIndex, INDEX_PATH } from './provisions.mjs';
 
 const args = process.argv.slice(2);
 const check = args.includes('--check');

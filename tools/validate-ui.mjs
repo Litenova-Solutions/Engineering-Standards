@@ -642,10 +642,10 @@ const today = new Date().toISOString().slice(0, 10);
 // The manifest names the id scopes whose overrides expire. The policy is declared
 // data, so renaming a scope never silently drops the review requirement.
 const reviewScopes = manifest?.overridePolicy?.requiresReviewBy ?? [];
-const expires = (ruleId) => reviewScopes.some((scope) => String(ruleId ?? '').startsWith(`${scope}.`));
+const expires = (provisionId) => reviewScopes.some((scope) => String(provisionId ?? '').startsWith(`${scope}.`));
 for (const override of project?.overrides ?? []) {
-  if (!expires(override?.ruleId)) continue;
-  const label = `override '${override.ruleId}'`;
+  if (!expires(override?.provisionId)) continue;
+  const label = `override '${override.provisionId}'`;
   if (!override.reviewBy) {
     error(`[FRONTEND.UI.GOVERNANCE.001] ${label}: a UI rule override requires 'reviewBy' with the review or removal date`);
     continue;
