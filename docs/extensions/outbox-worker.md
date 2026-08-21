@@ -12,11 +12,11 @@ Applicable specification kinds: `use-case`, `workflow`.
 
 The consumer enables `outbox-worker` when a committed change requires durable delivery after process failure. Delivery can carry an Integration Event, provider side effect, or Workflow Command.
 
-The use case carries `durable-delivery` Risk, or the Workflow selects the extension for durable Commands. The extension activates `ARCH.WORKER.001` and adds `apps/api/src/{ProjectName}.Worker/`.
+The use case carries `durable-delivery` Risk, or the Workflow selects the extension for durable Commands. The extension activates `BACKEND.ARCHITECTURE.WORKER.001` and adds `apps/api/src/{ProjectName}.Worker/`.
 
 ## Baseline relationship
 
-This extension replaces `PERSIST.EVENTS.001`.
+This extension replaces `BACKEND.PERSISTENCE.EVENTS.001`.
 
 ## Agent Summary {#agent-summary}
 

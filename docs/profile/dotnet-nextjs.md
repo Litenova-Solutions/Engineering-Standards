@@ -10,26 +10,26 @@ Exact framework and package versions live only in `standards.manifest.json`.
 ## Agent Summary {#agent-summary}
 
 
-- Selecting the profile applies every convention it composes. (PROFILE.COMPOSITION.001)
-- Every version resolves from the manifest. (PROFILE.VERSIONS.001)
-- A replacement names every rule identifier it replaces. (PROFILE.REPLACEMENT.001)
+- Selecting the profile applies every convention it composes. (PLATFORM.NEXTJS.COMPOSITION.001)
+- Every version resolves from the manifest. (PLATFORM.NEXTJS.VERSIONS.001)
+- A replacement names every rule identifier it replaces. (PLATFORM.NEXTJS.REPLACEMENT.001)
 
 ## Standards
 
 
-### Apply the complete profile (PROFILE.COMPOSITION.001)
+### Apply the complete profile (PLATFORM.NEXTJS.COMPOSITION.001)
 
 **Requirement:** A consumer selecting `dotnet-nextjs` MUST apply every convention this profile composes.
 
 **Rationale:** A consumer cannot claim the profile while silently omitting an applicable standard, because the profile is the unit of conformance.
 
-### Use manifest version pins (PROFILE.VERSIONS.001)
+### Use manifest version pins (PLATFORM.NEXTJS.VERSIONS.001)
 
 **Requirement:** A consumer MUST resolve every SDK, framework, NuGet, and npm version from `standards.manifest.json`.
 
 **Rationale:** A version copied from prose, an example, a package search, or agent memory drifts from the pin that the manifest owns.
 
-### Declare replacements (PROFILE.REPLACEMENT.001)
+### Declare replacements (PLATFORM.NEXTJS.REPLACEMENT.001)
 
 **Requirement:** An extension or consumer override MUST name every baseline rule identifier it replaces.
 
@@ -64,7 +64,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 ### Quality and operations
 
-- [Backend testing](../conventions/quality/backend-testing.md)
+- [Backend testing](../conventions/backend/testing.md)
 - [Security](../conventions/quality/security.md)
 - [Operations](../conventions/quality/operations.md)
 - [Continuous integration](../conventions/quality/ci.md)
@@ -72,7 +72,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 ## Conventions
 
 
-### Keep the platform profile visible (PROFILE.CONVENTION.001)
+### Keep the platform profile visible (PLATFORM.NEXTJS.CONVENTION.001)
 
 **Default:** Name the selected profile in `standards.project.json` and the solution, frontends, and commands in the root `AGENTS.md`.
 
@@ -85,7 +85,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| PROFILE.COMPOSITION.001 | inspection | `node tools/validate-standards.mjs` asserts the composition list matches the manifest profile documents. |
-| PROFILE.VERSIONS.001 | inspection | The CI dependency check compares each resolved version against its manifest pin. |
-| PROFILE.REPLACEMENT.001 | inspection | `node tools/validate-standards.mjs` resolves each declared replacement identifier to an active provision. |
-| PROFILE.CONVENTION.001 | inspection | `standards.project.json` names the profile and the root `AGENTS.md` names the solution, frontends, and commands. |
+| PLATFORM.NEXTJS.COMPOSITION.001 | inspection | `node tools/validate-standards.mjs` asserts the composition list matches the manifest profile documents. |
+| PLATFORM.NEXTJS.VERSIONS.001 | inspection | The CI dependency check compares each resolved version against its manifest pin. |
+| PLATFORM.NEXTJS.REPLACEMENT.001 | inspection | `node tools/validate-standards.mjs` resolves each declared replacement identifier to an active provision. |
+| PLATFORM.NEXTJS.CONVENTION.001 | inspection | `standards.project.json` names the profile and the root `AGENTS.md` names the solution, frontends, and commands. |

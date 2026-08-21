@@ -10,45 +10,45 @@ The profile gives every Aggregate an explicit state record hierarchy from its fi
 ## Agent Summary {#agent-summary}
 
 
-- Domain references only the base class library and its own types. (DOMAIN.PURITY.001)
-- Domain names match the approved glossary term. (DOMAIN.LANGUAGE.001)
-- The aggregate root is the only public mutation entry point. (DOMAIN.AGGREGATE.001)
-- Every aggregate root derives from the one project base. (DOMAIN.BASE.001)
-- Lifecycle uses an abstract state base with sealed case records. (DOMAIN.STATE.001)
-- Closed sets are record hierarchies, never enums. (DOMAIN.CLOSEDSET.001)
-- Aggregates are created through named static factories only. (DOMAIN.FACTORY.001)
-- Mutation methods check state, protect invariants, and record events. (DOMAIN.BEHAVIOR.001)
-- Children change only through their root, and collections are read-only. (DOMAIN.ENTITY.001)
-- Identifiers are typed record structs over version 7 GUIDs. (DOMAIN.ID.001)
+- Domain references only the base class library and its own types. (BACKEND.DOMAIN.PURITY.001)
+- Domain names match the approved glossary term. (BACKEND.DOMAIN.LANGUAGE.001)
+- The aggregate root is the only public mutation entry point. (BACKEND.DOMAIN.AGGREGATE.001)
+- Every aggregate root derives from the one project base. (BACKEND.DOMAIN.BASE.001)
+- Lifecycle uses an abstract state base with sealed case records. (BACKEND.DOMAIN.STATE.001)
+- Closed sets are record hierarchies, never enums. (BACKEND.DOMAIN.CLOSEDSET.001)
+- Aggregates are created through named static factories only. (BACKEND.DOMAIN.FACTORY.001)
+- Mutation methods check state, protect invariants, and record events. (BACKEND.DOMAIN.BEHAVIOR.001)
+- Children change only through their root, and collections are read-only. (BACKEND.DOMAIN.ENTITY.001)
+- Identifiers are typed record structs over version 7 GUIDs. (BACKEND.DOMAIN.ID.001)
 
 ## Standards
 
 
-### Keep Domain free of outer-layer concerns (DOMAIN.PURITY.001)
+### Keep Domain free of outer-layer concerns (BACKEND.DOMAIN.PURITY.001)
 
 **Requirement:** The Domain project MUST reference only the .NET base class library and project-owned Domain types.
 
 **Rationale:** No persistence, web, mediator, logging, configuration, injection, serialization, or provider package enters Domain. Infrastructure registers a persisted discriminator rather than Domain carrying a serialization attribute.
 
-### Use one ubiquitous language (DOMAIN.LANGUAGE.001)
+### Use one ubiquitous language (BACKEND.DOMAIN.LANGUAGE.001)
 
 **Requirement:** A Domain type, property, method, exception, or event name MUST match the term its module glossary approves.
 
 **Rationale:** A business action named `Publish` in the glossary is not `SetStatus` in code. The module specification records rejected synonyms that could plausibly return.
 
-### Treat aggregates as consistency boundaries (DOMAIN.AGGREGATE.001)
+### Treat aggregates as consistency boundaries (BACKEND.DOMAIN.AGGREGATE.001)
 
 **Requirement:** An aggregate root MUST be the only public mutation entry point for every invariant its transaction protects.
 
 **Rationale:** External code sets no property and calls no child mutation method. A command normally changes one aggregate, and an approved record names the invariant before one command changes several.
 
-### Use the project aggregate root contract (DOMAIN.BASE.001)
+### Use the project aggregate root contract (BACKEND.DOMAIN.BASE.001)
 
 **Requirement:** An aggregate root MUST derive from the project-owned `AggregateRoot<TId>` and take identity and event mechanics from that base.
 
 **Rationale:** The base owns the typed identity, the pending event collection, protected recording, and clearing. It owns no timestamp, audit, tenant, lifecycle, or persistence behavior.
 
-### Model every Aggregate lifecycle with state records (DOMAIN.STATE.001)
+### Model every Aggregate lifecycle with state records (BACKEND.DOMAIN.STATE.001)
 
 **Requirement:** An aggregate MUST expose one `State` property backed by an abstract `{Aggregate}State` record and sealed per-state records.
 
@@ -73,7 +73,7 @@ public abstract record ProfileState;
 public sealed record ProfileActiveState : ProfileState;
 ```
 
-### Model every closed set of domain values without enums (DOMAIN.CLOSEDSET.001)
+### Model every closed set of domain values without enums (BACKEND.DOMAIN.CLOSEDSET.001)
 
 **Requirement:** The Domain project MUST model every closed set as an abstract record base with sealed cases rather than an `enum`.
 
@@ -116,75 +116,75 @@ var next = outcome switch
 };
 ```
 
-The example uses a typed value object for a closed set represented by one scalar (`DOMAIN.VALUE.001`). It can own validation, normalization, or formatting without per-case data or behavior. The example does not use an enum as its backing field.
+The example uses a typed value object for a closed set represented by one scalar (`BACKEND.DOMAIN.VALUE.001`). It can own validation, normalization, or formatting without per-case data or behavior. The example does not use an enum as its backing field.
 
-The example does not represent a Domain closed set with an enum, scalar discriminator, or boolean flags. This rule is scoped to Domain. Application mirrors the union shape (`APP.CLOSEDSET.001`). Transport also mirrors it (`API.MODELS.001`).
+The example does not represent a Domain closed set with an enum, scalar discriminator, or boolean flags. This rule is scoped to Domain. Application mirrors the union shape (`BACKEND.APPLICATION.CLOSEDSET.001`). Transport also mirrors it (`BACKEND.API.MODELS.001`).
 
 A data-bearing transport set uses a polymorphic `oneOf` model. Only label-only sets or decision-backed narrowing use a string enum. A boundary enum or string is not the default for data-bearing cases. Infrastructure persists each union with stable discriminators, like a state hierarchy. It never stores a raw enum value absent from Domain.
 
 Each union exposes one stable code or label. Its `FromCode` factory round-trips every case. A boundary projects through that member, never the record's default `ToString()`. The default can leak a concrete type name instead of `owner`. Round-trip tests cover every case. The tests catch renamed codes and missing labels.
 
-### Create valid aggregates through named factories (DOMAIN.FACTORY.001)
+### Create valid aggregates through named factories (BACKEND.DOMAIN.FACTORY.001)
 
 **Requirement:** An aggregate root MUST create instances only through a static factory named for its business action.
 
 **Rationale:** The factory accepts typed identifiers, rejects empty identity and violated creation rules, selects the initial state, records required events, and returns a complete aggregate.
 
-### Express transitions through business methods (DOMAIN.BEHAVIOR.001)
+### Express transitions through business methods (BACKEND.DOMAIN.BEHAVIOR.001)
 
 **Requirement:** A public aggregate mutation method MUST check current state, protect its invariants, replace state, and record its domain events.
 
 **Rationale:** A handler then calls `post.Publish(utcNow)` without testing the state first. A generic `Set`, `Update`, `Process`, or `Handle` name hides which business action ran.
 
-### Keep child entities inside the aggregate boundary (DOMAIN.ENTITY.001)
+### Keep child entities inside the aggregate boundary (BACKEND.DOMAIN.ENTITY.001)
 
 **Requirement:** A child entity MUST expose no mutable state outside its aggregate root, surfacing its collection as a read-only view.
 
 **Rationale:** The root creates, finds, and changes children through business methods. A child with lifecycle states uses the same sealed state records and no enum.
 
-### Use strongly typed version 7 identifiers (DOMAIN.ID.001)
+### Use strongly typed version 7 identifiers (BACKEND.DOMAIN.ID.001)
 
 **Requirement:** An aggregate identity MUST be a `readonly record struct` wrapping one `Guid` created with `Guid.CreateVersion7()`.
 
 **Rationale:** It implements the project `IStronglyTypedId` marker and `IParsable<TId>`, rejects `Guid.Empty`, and each factory also rejects the struct default. No implicit conversion erases the type.
 
-### Use immutable value objects for domain concepts (DOMAIN.VALUE.001)
+### Use immutable value objects for domain concepts (BACKEND.DOMAIN.VALUE.001)
 
 **Requirement:** A value object MUST be immutable, compare by its complete value, and expose creation through a static method rather than a constructor.
 
 **Rationale:** It exposes no setter and no implicit conversion, because a primitive conversion hides validation and a value conversion erases the domain type. Reading uses `Value` or `ToString`.
 
-### Define collection value semantics explicitly (DOMAIN.COLLECTION.001)
+### Define collection value semantics explicitly (BACKEND.DOMAIN.COLLECTION.001)
 
 **Requirement:** A value object containing a collection MUST implement content equality and a matching hash for its declared ordering rule.
 
 **Rationale:** Default record equality compares collection references, not contents. Constructors copy incoming mutable collections and members return read-only views. The module terms state whether order is part of the value.
 
-### Make money and decimal rules explicit (DOMAIN.MONEY.001)
+### Make money and decimal rules explicit (BACKEND.DOMAIN.MONEY.001)
 
 **Requirement:** A monetary amount MUST use `decimal` inside a `Money` value object that carries its currency.
 
 **Rationale:** Domain uses no `double` or `float` for money. The module specification defines supported currencies, scale, rounding, sign rules, and cross-currency arithmetic, and Infrastructure maps that precision explicitly.
 
-### Use stateless domain services for ownerless rules (DOMAIN.SERVICE.001)
+### Use stateless domain services for ownerless rules (BACKEND.DOMAIN.SERVICE.001)
 
 **Requirement:** A domain service MUST be stateless, accept and return Domain values, and perform no persistence, messaging, clock, or provider call.
 
 **Rationale:** It exists only when a calculation spans concepts with no natural aggregate owner. Application loads the aggregates, calls the service, and passes its result into aggregate behavior.
 
-### Keep repository interfaces in Domain (DOMAIN.REPOSITORY.001)
+### Keep repository interfaces in Domain (BACKEND.DOMAIN.REPOSITORY.001)
 
 **Requirement:** A repository interface MUST expose only aggregate and Domain types, without `IQueryable`, a session, or a generic CRUD surface.
 
 **Rationale:** A required load uses `GetByIdAsync` and throws `{Aggregate}NotFoundException`, so a handler repeats no null check. A nullable `FindBy...Async` is reserved for lookups where absence is normal.
 
-### Raise immutable domain facts (DOMAIN.EVENT.001)
+### Raise immutable domain facts (BACKEND.DOMAIN.EVENT.001)
 
 **Requirement:** A domain event MUST be a public immutable record named `{Aggregate}{PastFact}Event` implementing `IDomainEvent`.
 
 **Rationale:** The name states which aggregate raised the fact without opening the file. The event carries the business data its reactions need, and no aggregate, session, service, mutable collection, or exception.
 
-### Reject business violations with Domain exceptions (DOMAIN.ERROR.001)
+### Reject business violations with Domain exceptions (BACKEND.DOMAIN.ERROR.001)
 
 **Requirement:** A rejected business rule MUST throw a `DomainException` subclass named `{DomainType}{Reason}Exception` carrying a stable code.
 
@@ -228,19 +228,19 @@ Two rules that share a caller-visible failure code because a boundary maps them 
 
 Application validators handle malformed caller input through validation errors. Aggregate and value-object exceptions remain the last defense when direct Domain use violates a rule. Command handlers do not catch expected Domain exceptions. The host maps them through the documented error boundary.
 
-### Reference other aggregates by ID (DOMAIN.REFERENCE.001)
+### Reference other aggregates by ID (BACKEND.DOMAIN.REFERENCE.001)
 
 **Requirement:** An aggregate MUST store another aggregate's typed identifier rather than an object reference.
 
 **Rationale:** Application loads each aggregate through its repository when a command coordinates several. The use-case specification names any immediate cross-aggregate invariant.
 
-### Pass nondeterministic values into Domain (DOMAIN.TIME.001)
+### Pass nondeterministic values into Domain (BACKEND.DOMAIN.TIME.001)
 
 **Requirement:** Domain behavior MUST receive time, randomness, and external values as parameters rather than read them.
 
 **Rationale:** Application obtains the value through an owned port and passes it in, so a Domain test supplies an explicit value and stays deterministic.
 
-### Document every public Domain contract (DOMAIN.DOCUMENTATION.001)
+### Document every public Domain contract (BACKEND.DOMAIN.DOCUMENTATION.001)
 
 **Requirement:** Every public Domain type and member MUST carry XML documentation stating the business constraint, result, or failure it represents.
 
@@ -249,15 +249,15 @@ Application validators handle malformed caller input through validation errors. 
 ## Conventions
 
 
-### Apply the documented defaults (DOMAIN.CONVENTION.001)
+### Apply the documented defaults (BACKEND.DOMAIN.CONVENTION.001)
 
 **Default:** Read each code block in this section as the named design rule only, without its namespace and unrelated declarations.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Consumer files still apply `DOMAIN.DOCUMENTATION.001` to their complete public contracts.
+**Rationale:** Consumer files still apply `BACKEND.DOMAIN.DOCUMENTATION.001` to their complete public contracts.
 
-### Organize a module by aggregate and concept (DOMAIN.CONVENTION.002)
+### Organize a module by aggregate and concept (BACKEND.DOMAIN.CONVENTION.002)
 
 **Default:** Give each aggregate a folder named with its plural root name, holding its own states, events, exceptions, and concepts.
 
@@ -329,9 +329,9 @@ Application validators handle malformed caller input through validation errors. 
         ConsentGrantedEvent.cs
 ```
 
-Each aggregate-specific repository interface stays with the aggregate it loads. The other layers mirror this organization: Application, Infrastructure. WebApi use the same module and per-aggregate folder names, per `ARCH.MODULES.001`.
+Each aggregate-specific repository interface stays with the aggregate it loads. The other layers mirror this organization: Application, Infrastructure. WebApi use the same module and per-aggregate folder names, per `BACKEND.ARCHITECTURE.MODULES.001`.
 
-### Use these Domain names (DOMAIN.CONVENTION.003)
+### Use these Domain names (BACKEND.DOMAIN.CONVENTION.003)
 
 **Default:** Name each Domain type from the aggregate root it belongs to, following the tables in this section.
 
@@ -355,11 +355,11 @@ Each aggregate-specific repository interface stays with the aggregate it loads. 
 | Domain event | `{Aggregate}{PastFact}Event` | `PostPublishedEvent` |
 | Domain exception | `{DomainType}{Reason}Exception` | `PostAlreadyPublishedException` |
 
-Every aggregate-owned type starts with the aggregate root's full name (`NAME.AGGREGATE.001`). `SalesCatalog` anchors `SalesCatalogPublishedEvent`. The example does not abbreviate the anchor. `Term` is the glossary term represented by a value object.
+Every aggregate-owned type starts with the aggregate root's full name (`WORKSPACE.NAMING.AGGREGATE.001`). `SalesCatalog` anchors `SalesCatalogPublishedEvent`. The example does not abbreviate the anchor. `Term` is the glossary term represented by a value object.
 
 An aggregate value object uses its aggregate prefix. A Shared kernel value object keeps its bare name. `BusinessRule` names a domain service policy. `DomainType` names the aggregate-owned type. Union bases and cases end with their concept. The example stores each type in its own file.
 
-### Define the shared Domain contracts once (DOMAIN.CONVENTION.004)
+### Define the shared Domain contracts once (BACKEND.DOMAIN.CONVENTION.004)
 
 **Default:** Declare the shared Domain contracts once in the Domain project and reuse them across every module.
 
@@ -415,7 +415,7 @@ public abstract class AggregateRoot<TId> : IAggregateRoot
 
 Concrete aggregates validate that `id.Value` is not `Guid.Empty` before calling or while calling the base constructor. The base remains free of aggregate-specific exceptions.
 
-### Define typed IDs without primitive escape hatches (DOMAIN.CONVENTION.005)
+### Define typed IDs without primitive escape hatches (BACKEND.DOMAIN.CONVENTION.005)
 
 **Default:** Give a typed identifier no implicit conversion, no primitive property alias, and no parameterless public creation path.
 
@@ -469,7 +469,7 @@ public readonly record struct PostId : IStronglyTypedId, IParsable<PostId>
 
 The `IParsable<TId>` implementation supports Minimal API route and query binding. `Parse` follows the .NET parsing contract for malformed text; `From` applies the domain empty-identity rule.
 
-### Keep ID representations aligned at every boundary (DOMAIN.CONVENTION.006)
+### Keep ID representations aligned at every boundary (BACKEND.DOMAIN.CONVENTION.006)
 
 **Default:** Represent an identifier the same way in Domain, persistence, transport, and generated clients.
 
@@ -498,7 +498,7 @@ if (typeof(IStronglyTypedId).IsAssignableFrom(context.JsonTypeInfo.Type))
 }
 ```
 
-### Keep state records as the only Aggregate lifecycle representation (DOMAIN.CONVENTION.007)
+### Keep state records as the only Aggregate lifecycle representation (BACKEND.DOMAIN.CONVENTION.007)
 
 **Default:** Read aggregate lifecycle only through the `State` property and its record type.
 
@@ -531,7 +531,7 @@ public sealed record ProfileActiveState : ProfileState;
 
 Infrastructure persists each state hierarchy with stable discriminators. It does not add a lifecycle enum or shadow state fields back into Domain or infer a different state after loading.
 
-### Keep value creation and equality explicit (DOMAIN.CONVENTION.008)
+### Keep value creation and equality explicit (BACKEND.DOMAIN.CONVENTION.008)
 
 **Default:** Create every value object through a named static method and declare its equality explicitly.
 
@@ -603,7 +603,7 @@ public sealed record PostTags
 
 The example treats tag order as meaningful. If order is irrelevant, creation normalizes to the documented comparison order before storing values.
 
-### Keep domain services pure (DOMAIN.CONVENTION.009)
+### Keep domain services pure (BACKEND.DOMAIN.CONVENTION.009)
 
 **Default:** Keep a domain service free of persistence, messaging, logging, clock, authorization, and provider calls.
 
@@ -627,7 +627,7 @@ public sealed class OrderPricingDomainService
 
 Application supplies the lines and passes the returned `Money` to `Order.ConfirmPrice`. The service has no repository, clock, logger, or provider client.
 
-### Keep repository contracts aggregate-specific (DOMAIN.CONVENTION.010)
+### Keep repository contracts aggregate-specific (BACKEND.DOMAIN.CONVENTION.010)
 
 **Default:** Declare one repository interface per aggregate rather than a shared generic contract.
 
@@ -659,7 +659,7 @@ public async Task<Post> GetByIdAsync(PostId id, CancellationToken cancellationTo
 
 ## Reference example
 
-This informative example demonstrates `DOMAIN.BASE.001`, `DOMAIN.STATE.001`, and `DOMAIN.FACTORY.001`.
+This informative example demonstrates `BACKEND.DOMAIN.BASE.001`, `BACKEND.DOMAIN.STATE.001`, and `BACKEND.DOMAIN.FACTORY.001`.
 
 ```csharp
 public sealed class Post : AggregateRoot<PostId>
@@ -767,33 +767,33 @@ The event payload captures the publication fact without carrying the mutable `Po
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| DOMAIN.PURITY.001 | inspection | `ArchitectureTests` asserts the Domain assembly references no package outside the base class library. |
-| DOMAIN.LANGUAGE.001 | inspection | Terminology review compares each new Domain name against `docs/domain/glossary.md` and the module terms table. |
-| DOMAIN.AGGREGATE.001 | inspection | `ArchitectureTests` asserts no child entity exposes a public setter or mutation method outside its root. |
-| DOMAIN.BASE.001 | inspection | `ArchitectureTests` asserts every aggregate root derives from the single project base and declares no second event list. |
-| DOMAIN.STATE.001 | inspection | `ArchitectureTests` asserts each aggregate exposes one abstract state base with sealed cases and no lifecycle flag or enum. |
-| DOMAIN.CLOSEDSET.001 | inspection | `ArchitectureTests` asserts the Domain assembly declares no enum type and each closed set exposes sealed case records. |
-| DOMAIN.FACTORY.001 | inspection | `ArchitectureTests` asserts no aggregate root declares a public constructor and each creation path is a named static factory. |
-| DOMAIN.BEHAVIOR.001 | inspection | `DomainBehaviorTests` asserts each mutation method rejects its disallowed source states and records its declared event. |
-| DOMAIN.ENTITY.001 | inspection | `ArchitectureTests` asserts each child collection property returns a read-only interface and exposes no mutation path. |
-| DOMAIN.ID.001 | inspection | `TypedIdTests` asserts each identifier rejects an empty and default value and declares no implicit primitive conversion. |
-| DOMAIN.VALUE.001 | inspection | `ValueObjectTests` asserts each value type is immutable, compares by value, and rejects invalid input at creation. |
-| DOMAIN.COLLECTION.001 | inspection | `ValueObjectTests` asserts each collection value compares by contents under its declared ordering rule. |
-| DOMAIN.MONEY.001 | inspection | `MoneyTests` asserts arithmetic honors the declared scale, rounding, and cross-currency rules. |
-| DOMAIN.SERVICE.001 | inspection | `ArchitectureTests` asserts no domain service holds state or resolves a persistence, clock, or provider dependency. |
-| DOMAIN.REPOSITORY.001 | inspection | `ArchitectureTests` asserts each repository signature names only Domain types and exposes no queryable or session. |
-| DOMAIN.EVENT.001 | inspection | `DomainEventTests` asserts each event is an immutable record whose name leads with its aggregate root. |
-| DOMAIN.ERROR.001 | inspection | `DomainExceptionTests` asserts each rejection throws its own type with a stable code and no transport detail. |
-| DOMAIN.REFERENCE.001 | inspection | `ArchitectureTests` asserts no aggregate declares a field or property typed as another aggregate root. |
-| DOMAIN.TIME.001 | inspection | `ArchitectureTests` asserts no Domain type reads system time or generates a random business value. |
-| DOMAIN.DOCUMENTATION.001 | static | The Release build fails on a missing XML comment through the `1591` documentation warning promoted to an error. |
-| DOMAIN.CONVENTION.001 | inspection | Review confirms each consumer file carries the full contract that its example omits. |
-| DOMAIN.CONVENTION.002 | inspection | Folder review compares each Domain module tree against its aggregate roster, or records a named local replacement. |
-| DOMAIN.CONVENTION.003 | inspection | Naming review compares each new Domain type against the tables in this section. |
-| DOMAIN.CONVENTION.004 | inspection | `ArchitectureTests` asserts one declaration exists for each shared Domain marker and base contract. |
-| DOMAIN.CONVENTION.005 | inspection | `TypedIdTests` asserts no identifier declares an implicit conversion or public parameterless creation path. |
-| DOMAIN.CONVENTION.006 | inspection | `TypedIdTests` asserts the persisted and serialized forms match the Domain representation for each identifier. |
-| DOMAIN.CONVENTION.007 | inspection | `ArchitectureTests` asserts no aggregate exposes a lifecycle flag, status string, or computed state alongside its state record. |
-| DOMAIN.CONVENTION.008 | inspection | `ValueObjectTests` asserts each value type creates through a named method and declares its equality members. |
-| DOMAIN.CONVENTION.009 | inspection | `ArchitectureTests` asserts no domain service resolves an outer-layer dependency. |
-| DOMAIN.CONVENTION.010 | inspection | `ArchitectureTests` asserts each repository interface names exactly one aggregate root. |
+| BACKEND.DOMAIN.PURITY.001 | inspection | `ArchitectureTests` asserts the Domain assembly references no package outside the base class library. |
+| BACKEND.DOMAIN.LANGUAGE.001 | inspection | Terminology review compares each new Domain name against `docs/domain/glossary.md` and the module terms table. |
+| BACKEND.DOMAIN.AGGREGATE.001 | inspection | `ArchitectureTests` asserts no child entity exposes a public setter or mutation method outside its root. |
+| BACKEND.DOMAIN.BASE.001 | inspection | `ArchitectureTests` asserts every aggregate root derives from the single project base and declares no second event list. |
+| BACKEND.DOMAIN.STATE.001 | inspection | `ArchitectureTests` asserts each aggregate exposes one abstract state base with sealed cases and no lifecycle flag or enum. |
+| BACKEND.DOMAIN.CLOSEDSET.001 | inspection | `ArchitectureTests` asserts the Domain assembly declares no enum type and each closed set exposes sealed case records. |
+| BACKEND.DOMAIN.FACTORY.001 | inspection | `ArchitectureTests` asserts no aggregate root declares a public constructor and each creation path is a named static factory. |
+| BACKEND.DOMAIN.BEHAVIOR.001 | inspection | `DomainBehaviorTests` asserts each mutation method rejects its disallowed source states and records its declared event. |
+| BACKEND.DOMAIN.ENTITY.001 | inspection | `ArchitectureTests` asserts each child collection property returns a read-only interface and exposes no mutation path. |
+| BACKEND.DOMAIN.ID.001 | inspection | `TypedIdTests` asserts each identifier rejects an empty and default value and declares no implicit primitive conversion. |
+| BACKEND.DOMAIN.VALUE.001 | inspection | `ValueObjectTests` asserts each value type is immutable, compares by value, and rejects invalid input at creation. |
+| BACKEND.DOMAIN.COLLECTION.001 | inspection | `ValueObjectTests` asserts each collection value compares by contents under its declared ordering rule. |
+| BACKEND.DOMAIN.MONEY.001 | inspection | `MoneyTests` asserts arithmetic honors the declared scale, rounding, and cross-currency rules. |
+| BACKEND.DOMAIN.SERVICE.001 | inspection | `ArchitectureTests` asserts no domain service holds state or resolves a persistence, clock, or provider dependency. |
+| BACKEND.DOMAIN.REPOSITORY.001 | inspection | `ArchitectureTests` asserts each repository signature names only Domain types and exposes no queryable or session. |
+| BACKEND.DOMAIN.EVENT.001 | inspection | `DomainEventTests` asserts each event is an immutable record whose name leads with its aggregate root. |
+| BACKEND.DOMAIN.ERROR.001 | inspection | `DomainExceptionTests` asserts each rejection throws its own type with a stable code and no transport detail. |
+| BACKEND.DOMAIN.REFERENCE.001 | inspection | `ArchitectureTests` asserts no aggregate declares a field or property typed as another aggregate root. |
+| BACKEND.DOMAIN.TIME.001 | inspection | `ArchitectureTests` asserts no Domain type reads system time or generates a random business value. |
+| BACKEND.DOMAIN.DOCUMENTATION.001 | static | The Release build fails on a missing XML comment through the `1591` documentation warning promoted to an error. |
+| BACKEND.DOMAIN.CONVENTION.001 | inspection | Review confirms each consumer file carries the full contract that its example omits. |
+| BACKEND.DOMAIN.CONVENTION.002 | inspection | Folder review compares each Domain module tree against its aggregate roster, or records a named local replacement. |
+| BACKEND.DOMAIN.CONVENTION.003 | inspection | Naming review compares each new Domain type against the tables in this section. |
+| BACKEND.DOMAIN.CONVENTION.004 | inspection | `ArchitectureTests` asserts one declaration exists for each shared Domain marker and base contract. |
+| BACKEND.DOMAIN.CONVENTION.005 | inspection | `TypedIdTests` asserts no identifier declares an implicit conversion or public parameterless creation path. |
+| BACKEND.DOMAIN.CONVENTION.006 | inspection | `TypedIdTests` asserts the persisted and serialized forms match the Domain representation for each identifier. |
+| BACKEND.DOMAIN.CONVENTION.007 | inspection | `ArchitectureTests` asserts no aggregate exposes a lifecycle flag, status string, or computed state alongside its state record. |
+| BACKEND.DOMAIN.CONVENTION.008 | inspection | `ValueObjectTests` asserts each value type creates through a named method and declares its equality members. |
+| BACKEND.DOMAIN.CONVENTION.009 | inspection | `ArchitectureTests` asserts no domain service resolves an outer-layer dependency. |
+| BACKEND.DOMAIN.CONVENTION.010 | inspection | `ArchitectureTests` asserts each repository interface names exactly one aggregate root. |

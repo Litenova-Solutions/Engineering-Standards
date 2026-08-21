@@ -14,7 +14,7 @@ The consumer enables `reporting` for a documented query or export with complex r
 
 ## Baseline relationship
 
-This extension does not replace the baseline rule for ordinary queries. Long-running exports activate Worker under `ARCH.WORKER.001`.
+This extension does not replace the baseline rule for ordinary queries. Long-running exports activate Worker under `BACKEND.ARCHITECTURE.WORKER.001`.
 
 ## Agent Summary {#agent-summary}
 

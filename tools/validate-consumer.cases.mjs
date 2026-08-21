@@ -190,7 +190,7 @@ fileCase('duplicate acceptance id', 'docs/domain/modules/orders/second.md', `---
 fileCase('second product specification', 'docs/product/second.md', `---\n${JSON.stringify({ kind: 'product', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second product\n`, 'Expected exactly one product specification, found 2');
 fileCase('broken internal link', 'docs/domain/modules/orders/linking.md', '# Linking\n\nSee the [absent record](./absent.md).\n', 'broken link');
 
-console.log('\nUse-case directory grammar (AGENTIC.CONVENTION.002)');
+console.log('\nUse-case directory grammar (CORE.SYSTEM.CONVENTION.002)');
 report('flat single-aggregate module resolves', null, run());
 fileCase(
   'nested aggregate subdirectory resolves',
@@ -205,7 +205,7 @@ fileCase(
   'does not match its path',
 );
 
-console.log('\nExtension scope (AGENTIC.EXTENSIONS.001)');
+console.log('\nExtension scope (CORE.SYSTEM.EXTENSIONS.001)');
 metaCase('local extension that the project did not select', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.applicableExtensions = ['caching']; }, "'caching' is not in selectedExtensions");
 projectCase('selected local extension on an allowed kind', (p) => { p.selectedExtensions = ['caching']; }, null);
 
@@ -223,12 +223,12 @@ projectCase('selected local extension on an allowed kind', (p) => { p.selectedEx
   writeFile('standards.project.json', originalProject);
 }
 
-console.log('\nAdoption gate (WRITING.SNAPSHOT.006)');
+console.log('\nAdoption gate (CORE.AUTHORING.SNAPSHOT.006)');
 projectCase('reviewed release matches the pinned release', () => {}, null);
 projectCase('reviewed release is behind the pinned release', (p) => { p.reviewedStandardsVersion = '1.11.0'; }, 'does not match the pinned standards');
 projectCase('reviewed release is absent', (p) => { delete p.reviewedStandardsVersion; }, "missing 'reviewedStandardsVersion'");
 
-console.log('\nMetadata carrier (WRITING.METADATA.002)');
+console.log('\nMetadata carrier (CORE.AUTHORING.METADATA.002)');
 fileCase(
   'metadata in a fenced block instead of the carrier',
   'docs/domain/modules/orders/fenced.md',

@@ -10,23 +10,23 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 ## Agent Summary {#agent-summary}
 
-- Selecting the profile activates every composed convention. (BLAZOR.COMPOSITION.001)
-- Each excluded baseline is named with its reason. (BLAZOR.SCOPE.001)
-- The client publishes as static WebAssembly with no server render mode. (BLAZOR.RENDERING.001)
-- Versions resolve from the manifest. (BLAZOR.VERSIONS.001)
-- A replacement names every rule identifier it replaces. (BLAZOR.REPLACEMENT.001)
-- Verification runs through the .NET toolchain. (BLAZOR.CONVENTION.002)
-- Operating Limits records a first-load budget. (BLAZOR.CONVENTION.003)
+- Selecting the profile activates every composed convention. (PLATFORM.BLAZOR.COMPOSITION.001)
+- Each excluded baseline is named with its reason. (PLATFORM.BLAZOR.SCOPE.001)
+- The client publishes as static WebAssembly with no server render mode. (PLATFORM.BLAZOR.RENDERING.001)
+- Versions resolve from the manifest. (PLATFORM.BLAZOR.VERSIONS.001)
+- A replacement names every rule identifier it replaces. (PLATFORM.BLAZOR.REPLACEMENT.001)
+- Verification runs through the .NET toolchain. (PLATFORM.BLAZOR.CONVENTION.002)
+- Operating Limits records a first-load budget. (PLATFORM.BLAZOR.CONVENTION.003)
 
 ## Standards
 
-### Apply the complete profile (BLAZOR.COMPOSITION.001)
+### Apply the complete profile (PLATFORM.BLAZOR.COMPOSITION.001)
 
 **Requirement:** A consumer selecting `dotnet-blazor` MUST apply every convention this profile composes.
 
 **Rationale:** The profile is the unit of conformance, so a consumer cannot claim it while omitting an applicable standard.
 
-### List excluded baselines (BLAZOR.SCOPE.001)
+### List excluded baselines (PLATFORM.BLAZOR.SCOPE.001)
 
 **Requirement:** This profile MUST name each excluded baseline document and the reason it does not apply.
 
@@ -46,19 +46,19 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 Backend architecture, domain, and application conventions are not excluded, because a client application still has both layers. Operations conventions apply in reduced form: health endpoints, schema review, backup, and restore have no target, while diagnostics, bounded metrics, and Operating Limits still apply.
 
-### Publish static WebAssembly output (BLAZOR.RENDERING.001)
+### Publish static WebAssembly output (PLATFORM.BLAZOR.RENDERING.001)
 
 **Requirement:** A consumer MUST publish a standalone Blazor WebAssembly application to static files.
 
 **Rationale:** Blazor Server, interactive server rendering, and prerendering each remove offline operation and reintroduce a server, so all three are outside this profile.
 
-### Use manifest version pins (BLAZOR.VERSIONS.001)
+### Use manifest version pins (PLATFORM.BLAZOR.VERSIONS.001)
 
 **Requirement:** A consumer MUST resolve every SDK, framework, and NuGet version from `standards.manifest.json`.
 
 **Rationale:** A version copied from prose, an example, a package search, or agent memory drifts from the pin that the manifest owns.
 
-### Declare replacements (BLAZOR.REPLACEMENT.001)
+### Declare replacements (PLATFORM.BLAZOR.REPLACEMENT.001)
 
 **Requirement:** An extension or consumer override MUST name every baseline rule identifier it replaces.
 
@@ -97,7 +97,7 @@ Backend architecture, domain, and application conventions are not excluded, beca
 
 ## Conventions
 
-### Keep the platform profile visible (BLAZOR.CONVENTION.001)
+### Keep the platform profile visible (PLATFORM.BLAZOR.CONVENTION.001)
 
 **Default:** Name `dotnet-blazor` in `standards.project.json` and the solution, client application, and commands in the root `AGENTS.md`.
 
@@ -105,7 +105,7 @@ Backend architecture, domain, and application conventions are not excluded, beca
 
 **Rationale:** An agent then resolves the project placeholders without inferring them from the directory tree.
 
-### Verify with the .NET toolchain (BLAZOR.CONVENTION.002)
+### Verify with the .NET toolchain (PLATFORM.BLAZOR.CONVENTION.002)
 
 **Default:** Run client verification through `dotnet` rather than a Node package manager.
 
@@ -120,7 +120,7 @@ dotnet build apps/web/{ProjectName}.slnx --configuration Release
 dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 ```
 
-### Record a first-load budget (BLAZOR.CONVENTION.003)
+### Record a first-load budget (PLATFORM.BLAZOR.CONVENTION.003)
 
 **Default:** Record the compressed transfer size of the framework payload as a first-load budget in Operating Limits.
 
@@ -132,11 +132,11 @@ dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BLAZOR.COMPOSITION.001 | static | `node tools/validate-standards.mjs` asserts the composition list matches the manifest profile documents. |
-| BLAZOR.SCOPE.001 | inspection | The excluded-baseline table names every omitted document and its reason. |
-| BLAZOR.RENDERING.001 | test | `PublishOutputTests` asserts the published output contains no server assembly or server render mode. |
-| BLAZOR.VERSIONS.001 | static | The CI dependency check compares each resolved version against its pin in `standards.manifest.json`. |
-| BLAZOR.REPLACEMENT.001 | static | `node tools/validate-standards.mjs` resolves each declared replacement identifier to an active provision. |
-| BLAZOR.CONVENTION.001 | inspection | `standards.project.json` names the profile and the root `AGENTS.md` names the solution and commands. |
-| BLAZOR.CONVENTION.002 | test | The CI client job runs `dotnet build` and `dotnet test` against the client solution. |
-| BLAZOR.CONVENTION.003 | operation | Operating Limits records the budget and CI compares published transfer size against it. |
+| PLATFORM.BLAZOR.COMPOSITION.001 | static | `node tools/validate-standards.mjs` asserts the composition list matches the manifest profile documents. |
+| PLATFORM.BLAZOR.SCOPE.001 | inspection | The excluded-baseline table names every omitted document and its reason. |
+| PLATFORM.BLAZOR.RENDERING.001 | test | `PublishOutputTests` asserts the published output contains no server assembly or server render mode. |
+| PLATFORM.BLAZOR.VERSIONS.001 | static | The CI dependency check compares each resolved version against its pin in `standards.manifest.json`. |
+| PLATFORM.BLAZOR.REPLACEMENT.001 | static | `node tools/validate-standards.mjs` resolves each declared replacement identifier to an active provision. |
+| PLATFORM.BLAZOR.CONVENTION.001 | inspection | `standards.project.json` names the profile and the root `AGENTS.md` names the solution and commands. |
+| PLATFORM.BLAZOR.CONVENTION.002 | test | The CI client job runs `dotnet build` and `dotnet test` against the client solution. |
+| PLATFORM.BLAZOR.CONVENTION.003 | operation | Operating Limits records the budget and CI compares published transfer size against it. |

@@ -10,7 +10,7 @@ Activation scope: `local`.
 
 Applicable specification kinds: `use-case`, `workflow`.
 
-The consumer enables `scheduled-jobs` for recurring, delayed, or calendar-based work. It adds the Worker project permitted by `ARCH.WORKER.001`.
+The consumer enables `scheduled-jobs` for recurring, delayed, or calendar-based work. It adds the Worker project permitted by `BACKEND.ARCHITECTURE.WORKER.001`.
 
 ## Baseline relationship
 

@@ -54,16 +54,16 @@ The system contains one delivery approach and one operating model:
 ## Agent Summary {#agent-summary}
 
 
-- Agents stop and ask when a decision belongs to a person. (AGENTIC.AUTHORITY.001)
-- Approved specifications, not prompts, define the work. (AGENTIC.SPECIFICATION.001)
-- Flows link their use cases rather than restate them. (AGENTIC.FLOW.001)
-- One module name is used across every layer. (AGENTIC.MODULE.001)
-- Module specifications map aggregates to state, invariants, and commands. (AGENTIC.AGGREGATE.001)
-- One use case is one Command or Query, verified only when complete. (AGENTIC.USECASE.001)
-- Workflow specifications name state, triggers, recovery, and owner. (AGENTIC.WORKFLOW.001)
-- Every event reaction declares its delivery classification. (AGENTIC.REACTION.001)
-- Rule identifiers encode their enforcement classification. (AGENTIC.RULES.001)
-- Specifications map each business state to a state record. (AGENTIC.STATE.001)
+- Agents stop and ask when a decision belongs to a person. (CORE.SYSTEM.AUTHORITY.001)
+- Approved specifications, not prompts, define the work. (CORE.SYSTEM.SPECIFICATION.001)
+- Flows link their use cases rather than restate them. (CORE.SYSTEM.FLOW.001)
+- One module name is used across every layer. (CORE.SYSTEM.MODULE.001)
+- Module specifications map aggregates to state, invariants, and commands. (CORE.SYSTEM.AGGREGATE.001)
+- One use case is one Command or Query, verified only when complete. (CORE.SYSTEM.USECASE.001)
+- Workflow specifications name state, triggers, recovery, and owner. (CORE.SYSTEM.WORKFLOW.001)
+- Every event reaction declares its delivery classification. (CORE.SYSTEM.REACTION.001)
+- Rule identifiers encode their enforcement classification. (CORE.SYSTEM.RULES.001)
+- Specifications map each business state to a state record. (CORE.SYSTEM.STATE.001)
 
 ## Concepts
 
@@ -223,37 +223,37 @@ Acceptance tests prove use-case behavior. End-to-end tests prove that connected 
 ## Standards
 
 
-### Keep decision authority with accountable people (AGENTIC.AUTHORITY.001)
+### Keep decision authority with accountable people (CORE.SYSTEM.AUTHORITY.001)
 
 **Requirement:** An agent MUST stop affected work and record the question when an unknown fact changes behavior, authorization, money movement, data handling, or recovery.
 
 **Rationale:** Decision owners approve outcomes, terms, policies, criteria, commitments, and risk. An agent contribution stays a proposal until an accountable person accepts it.
 
-### Drive work from approved specifications (AGENTIC.SPECIFICATION.001)
+### Drive work from approved specifications (CORE.SYSTEM.SPECIFICATION.001)
 
 **Requirement:** An agent MUST start behavior work from the approved product, flow, module, and use-case specifications rather than from a prompt alone.
 
 **Rationale:** A prompt, ticket, chat message, or code comment can initiate work. The owning specification records the approved behavior, and code does not silently replace it.
 
-### Connect one product outcome through an end-to-end flow (AGENTIC.FLOW.001)
+### Connect one product outcome through an end-to-end flow (CORE.SYSTEM.FLOW.001)
 
 **Requirement:** An end-to-end flow MUST link its use-case specifications without repeating their inputs, rules, failures, or acceptance criteria.
 
 **Rationale:** A flow can cross modules and include branches, waiting, failure, and recovery. Its tests use `E2E-{FLOW}-{NN}`, and a verified flow has at least one passing deployed test.
 
-### Group language and use cases by module (AGENTIC.MODULE.001)
+### Group language and use cases by module (CORE.SYSTEM.MODULE.001)
 
 **Requirement:** A module name MUST be identical across documentation, Domain and Application folders, endpoint groups, frontend features, tests, and acceptance identifiers.
 
 **Rationale:** A module is a navigation and ownership boundary. It defines no transaction boundary and needs no runtime `Module` or `IModule` type.
 
-### Make aggregate ownership explicit (AGENTIC.AGGREGATE.001)
+### Make aggregate ownership explicit (CORE.SYSTEM.AGGREGATE.001)
 
 **Requirement:** A module specification MUST map each aggregate to the state it owns, its invariants, and the commands that change it.
 
 **Rationale:** A command normally changes one aggregate. Changing several atomically requires an approved record naming the invariant or domain policy that demands it.
 
-### Deliver one complete use case (AGENTIC.USECASE.001)
+### Deliver one complete use case (CORE.SYSTEM.USECASE.001)
 
 **Requirement:** A use case MUST map to one top-level Command or Query and reach `verified` only when every layer and its evidence are complete.
 
@@ -275,49 +275,49 @@ Acceptance ID:  AC-ORDERS-CANCEL-ORDER-01
 
 A use case reaches `verified` only after Domain behavior, coordination, persistence, entry points, evidence, and operating impact are complete. Placeholder work leaves the use case `planned`.
 
-### Specify autonomous progress as a workflow (AGENTIC.WORKFLOW.001)
+### Specify autonomous progress as a workflow (CORE.SYSTEM.WORKFLOW.001)
 
 **Requirement:** A workflow specification MUST name its owner, participating modules, starting fact, completion and failure conditions, durable state, commands, awaited events, retries, and operator actions.
 
 **Rationale:** System-controlled progress crossing a transaction or time boundary needs each of these. Branches inside one atomic command stay in the use-case handler.
 
-### Record events and event reactions separately (AGENTIC.REACTION.001)
+### Record events and event reactions separately (CORE.SYSTEM.REACTION.001)
 
 **Requirement:** An event reaction MUST declare one delivery classification of `atomic`, `durable`, `rebuildable`, or `best-effort-optional`.
 
 **Rationale:** A required projection refresh is never `best-effort-optional`. Domain events are internal facts, and integration events are versioned contracts leaving the context.
 
-### Classify rules by enforcement boundary (AGENTIC.RULES.001)
+### Classify rules by enforcement boundary (CORE.SYSTEM.RULES.001)
 
 **Requirement:** A rule MUST carry the identifier prefix of its enforcement classification, keeping that number for the life of the rule.
 
 **Rationale:** The classifications are aggregate invariant, domain policy, validation rule, authorization policy, persistence constraint, and workflow rule. A failure code is not a rule identifier.
 
-### Model every aggregate lifecycle with state records (AGENTIC.STATE.001)
+### Model every aggregate lifecycle with state records (CORE.SYSTEM.STATE.001)
 
 **Requirement:** An aggregate specification MUST map every business state to a sealed state record under one abstract `{Aggregate}State` base.
 
 **Rationale:** This holds from the first implementation, including an aggregate with one current state. An enum, status string, boolean flag, or computed discriminator cannot carry state-specific facts.
 
-### Declare Specification Metadata (AGENTIC.METADATA.001)
+### Declare Specification Metadata (CORE.SYSTEM.METADATA.001)
 
 **Requirement:** A structured specification MUST open with one JSON metadata block declaring at least `kind`, `id`, `specStatus`, `owner`, and `lastReviewed`.
 
 **Rationale:** A behavior specification also declares `implementationStatus`. An index, decision, evidence, limits, or policy record declares none, because it claims no implemented behavior.
 
-### Select extensions before applying them (AGENTIC.EXTENSIONS.001)
+### Select extensions before applying them (CORE.SYSTEM.EXTENSIONS.001)
 
 **Requirement:** A local extension MUST appear in `applicableExtensions` only on a specification kind that its manifest entry allows.
 
 **Rationale:** `selectedExtensions` in `standards.project.json` is the project allow-list, and selection alone permits dependencies and structure.
 
-### Exclude a project-scoped extension from local metadata (AGENTIC.EXTENSIONS.002)
+### Exclude a project-scoped extension from local metadata (CORE.SYSTEM.EXTENSIONS.002)
 
 **Requirement:** A project-scoped extension MUST NOT appear in the `applicableExtensions` list of any specification.
 
 **Rationale:** Selection in `standards.project.json` already applies it everywhere, so a local listing implies a scope it does not have.
 
-### Give acceptance criteria stable ownership (AGENTIC.ACCEPTANCE.001)
+### Give acceptance criteria stable ownership (CORE.SYSTEM.ACCEPTANCE.001)
 
 **Requirement:** An acceptance criterion identifier MUST use `AC-{MODULE}-{USE-CASE}-{NN}` with segments matching its owning use-case identifier.
 
@@ -331,7 +331,7 @@ A use case reaches `verified` only after Domain behavior, coordination, persiste
 
 Acceptance tests reference the ID without redefining its text. A static documentation check proves that the reference exists. A passing test provides execution evidence.
 
-### Update specifications with behavior (AGENTIC.SYNC.001)
+### Update specifications with behavior (CORE.SYSTEM.SYNC.001)
 
 **Requirement:** An observable behavior change MUST update its use-case specification, implementation, tests, generated contracts, affected flow, workflow, and operating records together.
 
@@ -340,7 +340,7 @@ Acceptance tests reference the ID without redefining its text. A static document
 ## Conventions
 
 
-### Use this consumer documentation layout (AGENTIC.CONVENTION.001)
+### Use this consumer documentation layout (CORE.SYSTEM.CONVENTION.001)
 
 **Default:** Use the consumer documentation layout in this section, creating a directory only when its first real artifact exists.
 
@@ -383,7 +383,7 @@ docs/
 
 The example creates an optional directory only when its first real artifact is added. The example does not create empty directories or placeholder records during inception.
 
-### Group module use-case files by aggregate root (AGENTIC.CONVENTION.002)
+### Group module use-case files by aggregate root (CORE.SYSTEM.CONVENTION.002)
 
 **Default:** Group module use-case files under a plural kebab-case aggregate subdirectory, each holding one `kind: aggregate` README.
 
@@ -391,7 +391,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** A single-aggregate module stays flat only when its plural name matches the directory. The use-case identifier stays `{module}.{name}`, so only the directory changes.
 
-### Keep operational and security references under operations (AGENTIC.CONVENTION.003)
+### Keep operational and security references under operations (CORE.SYSTEM.CONVENTION.003)
 
 **Default:** Keep operating and security reference prose under `docs/operations/`, with `limits.md` as its only structured record.
 
@@ -399,7 +399,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Enforceable security and privacy rules still belong to their owning use-case authorization sections and domain policies.
 
-### Use established technical terms (AGENTIC.CONVENTION.004)
+### Use established technical terms (CORE.SYSTEM.CONVENTION.004)
 
 **Default:** Use aggregate, invariant, Command, Query, repository, projection, outbox, idempotency, transaction, and orchestrator with their accepted technical meanings.
 
@@ -407,7 +407,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Replacing a precise term with a softer synonym hides the established pattern. Explain the term and give an example instead.
 
-### Use ordinary capitalization in prose (AGENTIC.CONVENTION.005)
+### Use ordinary capitalization in prose (CORE.SYSTEM.CONVENTION.005)
 
 **Default:** Write module, use case, workflow, aggregate, invariant, event, and policy as ordinary nouns in prose.
 
@@ -415,7 +415,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Exact schema kinds and code types keep their declared capitalization, so the distinction stays meaningful.
 
-### Keep specifications readable without tooling (AGENTIC.CONVENTION.006)
+### Keep specifications readable without tooling (CORE.SYSTEM.CONVENTION.006)
 
 **Default:** Use JSON only for the metadata block, and write outcomes, rules, failures, examples, and mappings in Markdown.
 
@@ -425,7 +425,7 @@ The example creates an optional directory only when its first real artifact is a
 
 ## Reference example
 
-This informative example demonstrates `AGENTIC.FLOW.001`, `AGENTIC.WORKFLOW.001`, and `AGENTIC.REACTION.001`.
+This informative example demonstrates `CORE.SYSTEM.FLOW.001`, `CORE.SYSTEM.WORKFLOW.001`, and `CORE.SYSTEM.REACTION.001`.
 
 The `event-sales` end-to-end flow links `inventory.reserve-tickets`, `orders.create-guest-order`, `payments.start-payment`, and `tickets.issue-ticket`. The `payment-fulfillment` workflow begins with provider confirmation, issues one inventory confirmation Command, awaits its event, and then issues the ticket Command. Each Command owns one transaction. `E2E-EVENT-SALES-01` verifies the connected outcome through the deployed API.
 
@@ -438,24 +438,24 @@ The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` chang
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| AGENTIC.AUTHORITY.001 | inspection | The change report names the recorded question and the accountable person for each unresolved decision. |
-| AGENTIC.SPECIFICATION.001 | inspection | The change report cites the approved specification that authorized each behavior change. |
-| AGENTIC.FLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each flow use case to its file and rejects a duplicate end-to-end identifier. |
-| AGENTIC.MODULE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each module reference to one declared module directory. |
-| AGENTIC.AGGREGATE.001 | inspection | The module specification carries an aggregate table naming owned state, invariant identifiers, and commands. |
-| AGENTIC.USECASE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
-| AGENTIC.WORKFLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each workflow module reference and the template requires the named sections. |
-| AGENTIC.REACTION.001 | inspection | The owning specification records one delivery classification for each event reaction. |
-| AGENTIC.RULES.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a rule identifier whose prefix does not match its declared classification. |
-| AGENTIC.STATE.001 | inspection | The aggregate specification carries a state mapping table, and `ArchitectureTests` asserts the code matches it. |
-| AGENTIC.METADATA.001 | inspection | `node standards/tools/validate-consumer.mjs` validates each metadata block against `schemas/specification-metadata.schema.json`. |
-| AGENTIC.EXTENSIONS.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension in local metadata and a local extension on an excluded kind. |
-| AGENTIC.EXTENSIONS.002 | static | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension listed in local metadata. |
-| AGENTIC.ACCEPTANCE.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a duplicate acceptance identifier and one whose segments miss its use case. |
-| AGENTIC.SYNC.001 | inspection | The change report links each changed implementation surface to the records updated in the same change. |
-| AGENTIC.CONVENTION.001 | inspection | Documentation tree review compares the consumer layout against this section, or records a named local replacement. |
-| AGENTIC.CONVENTION.002 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use case in its module or one aggregate subdirectory. |
-| AGENTIC.CONVENTION.003 | inspection | Documentation review confirms operating and security prose resolves under `docs/operations/`. |
-| AGENTIC.CONVENTION.004 | inspection | Terminology review compares each new term against the glossary and this list. |
-| AGENTIC.CONVENTION.005 | inspection | Prose review confirms ordinary nouns outside sentence starts, titles, and exact identifiers. |
-| AGENTIC.CONVENTION.006 | inspection | Specification review confirms JSON appears only in the opening metadata block. |
+| CORE.SYSTEM.AUTHORITY.001 | inspection | The change report names the recorded question and the accountable person for each unresolved decision. |
+| CORE.SYSTEM.SPECIFICATION.001 | inspection | The change report cites the approved specification that authorized each behavior change. |
+| CORE.SYSTEM.FLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each flow use case to its file and rejects a duplicate end-to-end identifier. |
+| CORE.SYSTEM.MODULE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each module reference to one declared module directory. |
+| CORE.SYSTEM.AGGREGATE.001 | inspection | The module specification carries an aggregate table naming owned state, invariant identifiers, and commands. |
+| CORE.SYSTEM.USECASE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
+| CORE.SYSTEM.WORKFLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each workflow module reference and the template requires the named sections. |
+| CORE.SYSTEM.REACTION.001 | inspection | The owning specification records one delivery classification for each event reaction. |
+| CORE.SYSTEM.RULES.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a rule identifier whose prefix does not match its declared classification. |
+| CORE.SYSTEM.STATE.001 | inspection | The aggregate specification carries a state mapping table, and `ArchitectureTests` asserts the code matches it. |
+| CORE.SYSTEM.METADATA.001 | inspection | `node standards/tools/validate-consumer.mjs` validates each metadata block against `schemas/specification-metadata.schema.json`. |
+| CORE.SYSTEM.EXTENSIONS.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension in local metadata and a local extension on an excluded kind. |
+| CORE.SYSTEM.EXTENSIONS.002 | static | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension listed in local metadata. |
+| CORE.SYSTEM.ACCEPTANCE.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a duplicate acceptance identifier and one whose segments miss its use case. |
+| CORE.SYSTEM.SYNC.001 | inspection | The change report links each changed implementation surface to the records updated in the same change. |
+| CORE.SYSTEM.CONVENTION.001 | inspection | Documentation tree review compares the consumer layout against this section, or records a named local replacement. |
+| CORE.SYSTEM.CONVENTION.002 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use case in its module or one aggregate subdirectory. |
+| CORE.SYSTEM.CONVENTION.003 | inspection | Documentation review confirms operating and security prose resolves under `docs/operations/`. |
+| CORE.SYSTEM.CONVENTION.004 | inspection | Terminology review compares each new term against the glossary and this list. |
+| CORE.SYSTEM.CONVENTION.005 | inspection | Prose review confirms ordinary nouns outside sentence starts, titles, and exact identifiers. |
+| CORE.SYSTEM.CONVENTION.006 | inspection | Specification review confirms JSON appears only in the opening metadata block. |

@@ -4,8 +4,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const RULE_ID = /^[A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,}$/;
-const RULE_HEADING = /^###\s+(.+?)\s+\(([A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,})\)\s*$/;
+// Every provision identifier is AREA.PAGE.TOPIC.NNN. AREA and PAGE come from the
+// manifest id registry, TOPIC names the assertion, and NNN is a three-digit sequence.
+const ID_SOURCE = '[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}';
+const RULE_ID = new RegExp(`^${ID_SOURCE}$`);
+const RULE_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${ID_SOURCE})\\)\\s*$`);
+// A looser shape still catches a stale identifier so it reports as an unknown reference
+// instead of passing unnoticed.
+const ID_LOOSE = '[A-Z][A-Z0-9]*(?:\\.[A-Z0-9]+){2,}';
 const METHODS = new Set(['static', 'test', 'inspection', 'operation']);
 const MODALS = /\b(?:MUST NOT|SHOULD NOT|MUST|SHOULD|MAY)\b/g;
 const OTHER_NORMATIVE = /\b(?:REQUIRED|FORBIDDEN|SHALL)\b/;
@@ -69,7 +75,10 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'HEADING_ACTION',
   'HEADING_EMPTY_BODY',
   'ID_DUPLICATE',
+  'ID_AREA_UNKNOWN',
+  'ID_PAGE_UNREGISTERED',
   'ID_PREFIX_OWNERSHIP',
+  'ID_REGISTRY_STALE',
   'ID_LOCATION',
   'ID_MISSING',
   'ID_UNKNOWN_REFERENCE',
@@ -893,19 +902,32 @@ function checkManifest(root, add) {
     if (!baseline) add(extension.path, 1, 'EXTENSION_BASELINE', `extension '${id}' has an empty Baseline relationship`);
     if (!dependencies) add(extension.path, 1, 'EXTENSION_DEPENDENCIES', `extension '${id}' has an empty Dependencies section`);
   }
-  const writingPlan = manifest.loadPlans?.['repository.writing'];
+  const writingPlan = manifest.loadPlans?.['core.authoring'];
   if (!writingPlan || !(writingPlan.tier1 ?? []).includes('docs/foundations/authoring-standard.md#agent-summary')
     || !(writingPlan.tier2 ?? []).includes('docs/foundations/authoring-standard.md') || !(writingPlan.tier2 ?? []).includes('CONTRIBUTING.md')) {
-    add('standards.manifest.json', 1, 'WRITING_LOAD_PLAN', 'repository.writing must load the authoring summary, foundation, and CONTRIBUTING.md');
+    add('standards.manifest.json', 1, 'WRITING_LOAD_PLAN', 'core.authoring must load the authoring summary, foundation, and CONTRIBUTING.md');
+  }
+}
+
+function manifestRegistry(root) {
+  const absent = { present: false, areas: new Set(), pages: {} };
+  const file = path.join(root, 'standards.manifest.json');
+  if (!fs.existsSync(file)) return absent;
+  try {
+    const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const registry = manifest.idRegistry ?? {};
+    return { present: true, areas: new Set(registry.areas ?? []), pages: registry.pages ?? {} };
+  } catch {
+    return absent;
   }
 }
 
 function normalizeTemplate(relative, raw) {
   return raw
-    .replaceAll('{SCOPE.TOPIC.001}', 'TEMPLATE.TOPIC.001')
-    .replaceAll('{SCOPE}.CONVENTION.001', 'TEMPLATE.CONVENTION.001')
-    .replaceAll('{EXT.TOPIC.001}', 'EXT.TEMPLATE.001')
-    .replaceAll('{EXT.TOPIC}.CONVENTION.001', 'EXT.TEMPLATE.CONVENTION.001')
+    .replaceAll('{AREA.PAGE.TOPIC.001}', 'TEMPLATE.PAGE.TOPIC.001')
+    .replaceAll('{AREA.PAGE}.CONVENTION.001', 'TEMPLATE.PAGE.CONVENTION.001')
+    .replaceAll('{EXT.NAME.TOPIC.001}', 'EXT.TEMPLATE.TOPIC.001')
+    .replaceAll('{EXT.NAME}.CONVENTION.001', 'EXT.TEMPLATE.CONVENTION.001')
     .replaceAll('{Topic Title}', 'Topic Title')
     .replaceAll('{Extension Title}', 'Extension Title')
     .replaceAll('{Guide Title}', 'Guide Title');
@@ -946,33 +968,33 @@ export function validateRepository(rootInput = '.') {
     if (relative === 'AGENTS.md' || relative.endsWith('/project-agents.md')) checkAgentProjection(relative, raw, add);
   }
 
-  // A provision ID should name its owning page. One Standards prefix per page,
-  // no prefix shared by two pages, and convention IDs under that same prefix.
-  const prefixOwners = new Map();
-  for (const document of parsedDocuments) {
-    const standards = new Set();
-    const conventions = new Set();
-    for (const provision of document.parsed.provisions ?? []) {
-      const width = document.parsed.kind === 'extension' ? 2 : 1;
-      if (/\.CONVENTION\.\d+$/.test(provision.id)) conventions.add(provision.id.replace(/\.CONVENTION\.\d+$/, ''));
-      else standards.add(provision.id.split('.').slice(0, width).join('.'));
+  // Provision identity is declared, not inferred. The manifest id registry names the
+  // AREA.PAGE scope that owns each normative page, and every provision on that page
+  // carries that scope. A page outside the registry cannot own provisions.
+  const registry = manifestRegistry(root);
+  const scopeOwners = new Map();
+  for (const document of registry.present ? parsedDocuments : []) {
+    const provisions = document.parsed.provisions ?? [];
+    if (!provisions.length) continue;
+    const declared = registry.pages[document.relative];
+    if (!declared) {
+      add(document.relative, 1, 'ID_PAGE_UNREGISTERED', `page owns ${provisions.length} provisions but standards.manifest.json declares no idRegistry scope`);
+      continue;
     }
-    if (standards.size > 1) {
-      add(document.relative, 1, 'ID_PREFIX_OWNERSHIP', `page declares ${standards.size} Standards prefixes: ${[...standards].sort().join(', ')}`);
+    const owner = scopeOwners.get(declared);
+    if (owner && owner !== document.relative) add(document.relative, 1, 'ID_PREFIX_OWNERSHIP', `id scope '${declared}' is also declared for ${owner}`);
+    else scopeOwners.set(declared, document.relative);
+    if (!registry.areas.has(declared.split('.')[0])) {
+      add(document.relative, 1, 'ID_AREA_UNKNOWN', `id scope '${declared}' uses an area outside the manifest idRegistry areas`);
     }
-    for (const prefix of standards) {
-      if (prefixOwners.has(prefix) && prefixOwners.get(prefix) !== document.relative) {
-        add(document.relative, 1, 'ID_PREFIX_OWNERSHIP', `Standards prefix '${prefix}' is also owned by ${prefixOwners.get(prefix)}`);
-      } else prefixOwners.set(prefix, document.relative);
-    }
-    const owner = standards.size === 1 ? [...standards][0] : null;
-    if (owner) {
-      for (const scope of conventions) {
-        if (scope !== owner && !scope.startsWith(`${owner}.`)) {
-          add(document.relative, 1, 'ID_PREFIX_OWNERSHIP', `convention scope '${scope}' does not match the page Standards prefix '${owner}'`);
-        }
+    for (const provision of provisions) {
+      if (!provision.id.startsWith(`${declared}.`)) {
+        add(document.relative, provision.line, 'ID_PREFIX_OWNERSHIP', `provision '${provision.id}' does not use the declared page scope '${declared}'`);
       }
     }
+  }
+  for (const [relative, scope] of registry.present ? Object.entries(registry.pages) : []) {
+    if (!scopeOwners.has(scope)) add('standards.manifest.json', 1, 'ID_REGISTRY_STALE', `idRegistry declares '${scope}' for '${relative}', which owns no provision`);
   }
 
   const activeIds = new Set(globalIds.keys());

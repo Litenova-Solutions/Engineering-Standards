@@ -219,12 +219,12 @@ function validateComponentsJson(file, ui) {
   const label = relativeToRoot(file);
   const config = readJson(file, label);
   if (!config) return;
-  if (ui.componentsStyle && config.style !== ui.componentsStyle) error(`[UI.SHADCN.001] ${label}: style must be '${ui.componentsStyle}'`);
-  if (config.iconLibrary !== ui.icons) error(`[UI.SHADCN.001] ${label}: iconLibrary must be '${ui.icons}'`);
-  if (config.tailwind?.baseColor !== ui.baseColor) error(`[UI.SHADCN.001] ${label}: tailwind.baseColor must be '${ui.baseColor}'`);
-  if (config.tailwind?.cssVariables !== ui.cssVariables) error(`[UI.SHADCN.001] ${label}: tailwind.cssVariables must be ${ui.cssVariables}`);
-  if (config.menuColor !== ui.menuColor) error(`[UI.SHADCN.001] ${label}: menuColor must be '${ui.menuColor}'`);
-  if (config.menuAccent !== ui.menuAccent) error(`[UI.SHADCN.001] ${label}: menuAccent must be '${ui.menuAccent}'`);
+  if (ui.componentsStyle && config.style !== ui.componentsStyle) error(`[FRONTEND.UI.SHADCN.001] ${label}: style must be '${ui.componentsStyle}'`);
+  if (config.iconLibrary !== ui.icons) error(`[FRONTEND.UI.SHADCN.001] ${label}: iconLibrary must be '${ui.icons}'`);
+  if (config.tailwind?.baseColor !== ui.baseColor) error(`[FRONTEND.UI.SHADCN.001] ${label}: tailwind.baseColor must be '${ui.baseColor}'`);
+  if (config.tailwind?.cssVariables !== ui.cssVariables) error(`[FRONTEND.UI.SHADCN.001] ${label}: tailwind.cssVariables must be ${ui.cssVariables}`);
+  if (config.menuColor !== ui.menuColor) error(`[FRONTEND.UI.SHADCN.001] ${label}: menuColor must be '${ui.menuColor}'`);
+  if (config.menuAccent !== ui.menuAccent) error(`[FRONTEND.UI.SHADCN.001] ${label}: menuAccent must be '${ui.menuAccent}'`);
   const expectedAliases = {
     components: '@/components',
     utils: '@/lib/utils',
@@ -232,9 +232,9 @@ function validateComponentsJson(file, ui) {
     lib: '@/lib',
     hooks: '@/hooks',
   };
-  for (const [alias, value] of Object.entries(expectedAliases)) if (config.aliases?.[alias] !== value) error(`[UI.SHADCN.001] ${label}: aliases.${alias} must be '${value}'`);
-  if (config.rtl !== false) error(`[UI.SHADCN.001] ${label}: rtl must be false in the default baseline`);
-  if (config.registries && Object.keys(config.registries).length > 0) error(`[UI.SHADCN.001] ${label}: additional registries require an override decision`);
+  for (const [alias, value] of Object.entries(expectedAliases)) if (config.aliases?.[alias] !== value) error(`[FRONTEND.UI.SHADCN.001] ${label}: aliases.${alias} must be '${value}'`);
+  if (config.rtl !== false) error(`[FRONTEND.UI.SHADCN.001] ${label}: rtl must be false in the default baseline`);
+  if (config.registries && Object.keys(config.registries).length > 0) error(`[FRONTEND.UI.SHADCN.001] ${label}: additional registries require an override decision`);
 }
 
 function validateVocabulary(file, ui, frontendName, frontendRoot, manifest) {
@@ -312,7 +312,7 @@ function validateVocabulary(file, ui, frontendName, frontendRoot, manifest) {
     if (!['baseline', 'extended', 'forked', 'specialist'].includes(component?.status)) error(`${componentLabel}: invalid status`);
     if (component?.source) {
       const source = path.resolve(frontendRoot, component.source);
-      if (!within(frontendRoot, source) || !fs.existsSync(source)) error(`[UI.VOCABULARY.001] ${componentLabel}: source file does not exist '${component.source}'`);
+      if (!within(frontendRoot, source) || !fs.existsSync(source)) error(`[FRONTEND.UI.VOCABULARY.001] ${componentLabel}: source file does not exist '${component.source}'`);
     }
     for (const state of array(component, 'states', componentLabel)) if (!stateIds.has(state)) error(`${componentLabel}: unknown state '${state}'`);
     for (const evidenceId of array(component, 'evidence', componentLabel)) if (!evidenceIds.has(evidenceId)) error(`${componentLabel}: unknown evidence '${evidenceId}'`);
@@ -321,13 +321,13 @@ function validateVocabulary(file, ui, frontendName, frontendRoot, manifest) {
     const forkLabel = `${label}.fork.${fork?.component ?? 'unknown'}`;
     if (fork?.status !== 'forked') error(`${forkLabel}: status must be forked`);
     if (!componentIds.has(fork?.component)) error(`${forkLabel}: component is not in the vocabulary`);
-    for (const scope of array(fork, 'scope', forkLabel)) if (!fs.existsSync(path.resolve(frontendRoot, scope))) error(`[UI.FORKS.001] ${forkLabel}: fork scope does not exist '${scope}'`);
+    for (const scope of array(fork, 'scope', forkLabel)) if (!fs.existsSync(path.resolve(frontendRoot, scope))) error(`[FRONTEND.UI.FORKS.001] ${forkLabel}: fork scope does not exist '${scope}'`);
     for (const evidenceId of array(fork, 'evidence', forkLabel)) if (!evidenceIds.has(evidenceId)) error(`${forkLabel}: unknown evidence '${evidenceId}'`);
   }
   for (const specialist of specialists) {
     const specialistLabel = `${label}.specialist.${specialist?.id ?? 'unknown'}`;
     required(specialist, 'package', specialistLabel);
-    if (specialist?.package && !Object.prototype.hasOwnProperty.call(manifest?.packages?.npm ?? {}, specialist.package)) error(`[UI.COMPANION.001] ${specialistLabel}: package '${specialist.package}' is not pinned in the standards manifest`);
+    if (specialist?.package && !Object.prototype.hasOwnProperty.call(manifest?.packages?.npm ?? {}, specialist.package)) error(`[FRONTEND.UI.COMPANION.001] ${specialistLabel}: package '${specialist.package}' is not pinned in the standards manifest`);
     for (const evidenceId of array(specialist, 'evidence', specialistLabel)) if (!evidenceIds.has(evidenceId)) error(`${specialistLabel}: unknown evidence '${evidenceId}'`);
   }
   for (const record of array(vocabulary, 'runtimeStyles', label)) {
@@ -335,10 +335,10 @@ function validateVocabulary(file, ui, frontendName, frontendRoot, manifest) {
     required(record, 'reason', runtimeLabel);
     for (const scope of array(record, 'scope', runtimeLabel)) {
       const candidate = path.resolve(frontendRoot, scope);
-      if (!within(frontendRoot, candidate) || !fs.existsSync(candidate)) error(`[UI.TAILWIND.001] ${runtimeLabel}: runtime style scope does not exist '${scope}'`);
+      if (!within(frontendRoot, candidate) || !fs.existsSync(candidate)) error(`[FRONTEND.UI.TAILWIND.001] ${runtimeLabel}: runtime style scope does not exist '${scope}'`);
     }
     for (const property of array(record, 'properties', runtimeLabel)) {
-      if (typeof property !== 'string' || !property.startsWith('--')) error(`[UI.TAILWIND.001] ${runtimeLabel}: runtime style property '${property}' must be a CSS custom property`);
+      if (typeof property !== 'string' || !property.startsWith('--')) error(`[FRONTEND.UI.TAILWIND.001] ${runtimeLabel}: runtime style property '${property}' must be a CSS custom property`);
     }
     for (const evidenceId of array(record, 'evidence', runtimeLabel)) if (!evidenceIds.has(evidenceId)) error(`${runtimeLabel}: unknown evidence '${evidenceId}'`);
   }
@@ -371,7 +371,7 @@ function validateSourceLock(file, ui, frontendRoot, vocabularyInfo, manifest) {
     if (expected !== undefined && actual !== expected) error(`${label}: preset.${key} does not match frontend UI configuration`);
   }
   const expectedFingerprint = presetFingerprint(ui);
-  if (lock.preset?.fingerprint !== expectedFingerprint) error(`[UI.FORKS.001] ${label}: preset fingerprint does not match decoded preset values`);
+  if (lock.preset?.fingerprint !== expectedFingerprint) error(`[FRONTEND.UI.FORKS.001] ${label}: preset fingerprint does not match decoded preset values`);
 
   const lockComponents = array(lock, 'components', label);
   unique(lockComponents.map((item) => item?.name), `${label}.components`);
@@ -396,7 +396,7 @@ function validateSourceLock(file, ui, frontendRoot, vocabularyInfo, manifest) {
         continue;
       }
       if (digest(candidate) !== item.digest && item.status === 'baseline') {
-        error(`[UI.FORKS.001] ${itemLabel}: '${relative}' no longer matches the baseline digest; record it as extended or forked`);
+        error(`[FRONTEND.UI.FORKS.001] ${itemLabel}: '${relative}' no longer matches the baseline digest; record it as extended or forked`);
       }
     }
   }
@@ -437,7 +437,7 @@ function validateDependencyBoundary(frontendRoot, ui) {
       ...(packageJson.devDependencies ?? {}),
       ...(packageJson.peerDependencies ?? {}),
     };
-    for (const name of visualPackages) if (dependencies[name]) error(`[UI.GOVERNANCE.001] ${label}: second general-purpose visual dependency '${name}' requires an override`);
+    for (const name of visualPackages) if (dependencies[name]) error(`[FRONTEND.UI.GOVERNANCE.001] ${label}: second general-purpose visual dependency '${name}' requires an override`);
   }
 }
 
@@ -460,11 +460,11 @@ function validateGlobalCss(file) {
     if (inComment) continue;
     if (text[index] === '{') depth += 1;
     if (text[index] === '}') depth -= 1;
-    if (depth < 0) error(`[UI.TAILWIND.001] ${label}: closing brace has no matching opening brace`);
+    if (depth < 0) error(`[FRONTEND.UI.TAILWIND.001] ${label}: closing brace has no matching opening brace`);
   }
-  if (inComment || depth !== 0) error(`[UI.TAILWIND.001] ${label}: global CSS has unbalanced comments or braces`);
+  if (inComment || depth !== 0) error(`[FRONTEND.UI.TAILWIND.001] ${label}: global CSS has unbalanced comments or braces`);
   for (const match of text.matchAll(/@import\s+(["'])([^"']+)\1/g)) {
-    if (!allowedGlobalImports.has(match[2]) && !match[2].startsWith('./')) error(`[UI.TAILWIND.001] ${label}: import '${match[2]}' is outside the approved global CSS surface`);
+    if (!allowedGlobalImports.has(match[2]) && !match[2].startsWith('./')) error(`[FRONTEND.UI.TAILWIND.001] ${label}: import '${match[2]}' is outside the approved global CSS surface`);
   }
   classifyGlobalCss(label, text);
 }
@@ -519,7 +519,7 @@ function classifyGlobalCss(label, text) {
       statement = '';
     }
   }
-  if (applyOutsideBase) error(`[UI.TAILWIND.001] ${label}: '@apply' outside the generated '@layer base' block hides an unreviewed utility group`);
+  if (applyOutsideBase) error(`[FRONTEND.UI.TAILWIND.001] ${label}: '@apply' outside the generated '@layer base' block hides an unreviewed utility group`);
 }
 
 function reportGlobalStatement(label, statement) {
@@ -527,7 +527,7 @@ function reportGlobalStatement(label, statement) {
   if (!value) return;
   if (value.startsWith('@')) {
     const name = value.slice(1).split(/[\s(;]/)[0];
-    if (!allowedGlobalAtRules.has(name)) error(`[UI.TAILWIND.001] ${label}: at-rule '@${name}' is outside the approved global CSS surface`);
+    if (!allowedGlobalAtRules.has(name)) error(`[FRONTEND.UI.TAILWIND.001] ${label}: at-rule '@${name}' is outside the approved global CSS surface`);
     return;
   }
   // The generated theme entry declares the color-scheme class itself.
@@ -536,7 +536,7 @@ function reportGlobalStatement(label, statement) {
     const trimmed = selector.trim();
     if (allowedClassSelectors.has(trimmed)) continue;
     if (trimmed.startsWith('.') || trimmed.startsWith('#')) {
-      error(`[UI.TAILWIND.001] ${label}: selector '${trimmed}' is a feature style; use a component variant or semantic token`);
+      error(`[FRONTEND.UI.TAILWIND.001] ${label}: selector '${trimmed}' is a feature style; use a component variant or semantic token`);
     }
   }
 }
@@ -596,28 +596,28 @@ function validatePageSidecars(project, frontend, ui, vocabularyInfo) {
     const relative = relativeToRoot(source);
     const text = fs.readFileSync(source, 'utf8');
     if (source.endsWith('.css')) {
-      if (path.resolve(source) !== path.resolve(globalCss)) error(`[UI.TAILWIND.001] ${relative}: CSS file is outside the designated global CSS entry`);
+      if (path.resolve(source) !== path.resolve(globalCss)) error(`[FRONTEND.UI.TAILWIND.001] ${relative}: CSS file is outside the designated global CSS entry`);
       continue;
     }
     for (const match of text.matchAll(/(?:from\s+|import\s*\()(['"])([^'"]+\.css)\1/g)) {
       const imported = path.resolve(path.dirname(source), match[2]);
-      if (imported !== globalCss) error(`[UI.TAILWIND.001] ${relative}: CSS import '${match[2]}' is outside the approved global entry`);
+      if (imported !== globalCss) error(`[FRONTEND.UI.TAILWIND.001] ${relative}: CSS import '${match[2]}' is outside the approved global entry`);
     }
     const inPrimitives = within(path.resolve(root, ui.primitives), source);
     const inTests = /(?:^|[\\/])(?:tests?|__tests__)(?:[\\/])/.test(source) || /\.(?:test|spec)\.[^.]+$/.test(source);
     if (inPrimitives || inTests) continue;
-    if (vendorImport.test(text)) error(`[UI.GOVERNANCE.001] ${relative}: direct UI vendor import is outside the primitive boundary`);
+    if (vendorImport.test(text)) error(`[FRONTEND.UI.GOVERNANCE.001] ${relative}: direct UI vendor import is outside the primitive boundary`);
     const reported = new Set();
     for (const value of classStrings(text)) {
       inspectClassString(value, (kind, token) => {
         const key = `${kind}:${token}`;
         if (reported.has(key)) return;
         reported.add(key);
-        error(`[UI.TAILWIND.001] ${relative}: ${utilityMessages[kind]} '${token}'`);
+        error(`[FRONTEND.UI.TAILWIND.001] ${relative}: ${utilityMessages[kind]} '${token}'`);
       });
     }
     if (/style=\{\{/.test(text) && !runtimeStyleFiles.has(path.resolve(source))) {
-      error(`[UI.TAILWIND.001] ${relative}: inline style requires a vocabulary runtimeStyles record for this file`);
+      error(`[FRONTEND.UI.TAILWIND.001] ${relative}: inline style requires a vocabulary runtimeStyles record for this file`);
     }
   }
 }
@@ -639,20 +639,24 @@ let configured = 0;
 // and stops being valid once that date passes. This check is time dependent by
 // design; every other check in this validator depends only on repository files.
 const today = new Date().toISOString().slice(0, 10);
+// The manifest names the id scopes whose overrides expire. The policy is declared
+// data, so renaming a scope never silently drops the review requirement.
+const reviewScopes = manifest?.overridePolicy?.requiresReviewBy ?? [];
+const expires = (ruleId) => reviewScopes.some((scope) => String(ruleId ?? '').startsWith(`${scope}.`));
 for (const override of project?.overrides ?? []) {
-  if (!/^UI\./.test(override?.ruleId ?? '')) continue;
+  if (!expires(override?.ruleId)) continue;
   const label = `override '${override.ruleId}'`;
   if (!override.reviewBy) {
-    error(`[UI.GOVERNANCE.001] ${label}: a UI rule override requires 'reviewBy' with the review or removal date`);
+    error(`[FRONTEND.UI.GOVERNANCE.001] ${label}: a UI rule override requires 'reviewBy' with the review or removal date`);
     continue;
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(override.reviewBy)) error(`${label}: reviewBy must be YYYY-MM-DD`);
-  else if (override.reviewBy < today) error(`[UI.GOVERNANCE.001] ${label}: review date ${override.reviewBy} has passed; renew the decision or complete the migration`);
+  else if (override.reviewBy < today) error(`[FRONTEND.UI.GOVERNANCE.001] ${label}: review date ${override.reviewBy} has passed; renew the decision or complete the migration`);
   if (override.decision && !fs.existsSync(filePath(override.decision))) error(`${label}: decision does not exist '${override.decision}'`);
 }
 
 for (const frontend of frontends) {
-  if (frontend.platform === 'react-web' && !frontend.ui) error(`[UI.GOVERNANCE.001] frontend '${frontend.name}': react-web frontends require a UI configuration`);
+  if (frontend.platform === 'react-web' && !frontend.ui) error(`[FRONTEND.UI.GOVERNANCE.001] frontend '${frontend.name}': react-web frontends require a UI configuration`);
   if (!frontend.ui) continue;
   configured += 1;
   const label = `frontend '${frontend.name}'`;
@@ -670,7 +674,7 @@ for (const frontend of frontends) {
   // than having one guessed from its package name.
   if (ui.base === 'base-ui' && !ui.componentsStyle) effectiveUi.componentsStyle = `base-${effectiveUi.style}`;
   if (ui.base && ui.base !== 'base-ui' && !ui.componentsStyle) {
-    error(`[UI.SHADCN.001] ${label}: a non-default component base must state componentsStyle as the pinned CLI writes it`);
+    error(`[FRONTEND.UI.SHADCN.001] ${label}: a non-default component base must state componentsStyle as the pinned CLI writes it`);
     effectiveUi.componentsStyle = null;
   }
   const selectedSystem = ui.system ?? manifest?.uiBaseline?.system ?? 'shadcn/ui';
@@ -685,7 +689,7 @@ for (const frontend of frontends) {
     if (mismatches.length && (!ui.overrideDecision || !ui.reviewBy)) error(`${label}: UI baseline mismatch (${mismatches.join(', ')}) requires overrideDecision and reviewBy`);
     const decodedOverride = ['style', 'baseColor', 'theme', 'chartColor', 'font', 'fontHeading', 'icons', 'radius', 'menuAccent', 'menuColor'].some((key) => Object.prototype.hasOwnProperty.call(ui, key) && baseline && ui[key] !== baseline[key]);
     if (decodedOverride && (!ui.presetCode || !ui.presetFingerprint)) error(`${label}: a preset override requires presetCode and presetFingerprint`);
-    if (effectiveUi.presetFingerprint !== presetFingerprint(effectiveUi)) error(`[UI.SHADCN.001] ${label}: presetFingerprint does not match the decoded preset fields`);
+    if (effectiveUi.presetFingerprint !== presetFingerprint(effectiveUi)) error(`[FRONTEND.UI.SHADCN.001] ${label}: presetFingerprint does not match the decoded preset fields`);
   } else if (!ui.overrideDecision || !ui.reviewBy) {
     error(`${label}: non-default UI system requires overrideDecision and reviewBy`);
   }

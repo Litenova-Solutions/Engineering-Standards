@@ -6,20 +6,20 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 
 ## Agent Summary {#agent-summary}
 
-- One class per operation implements `IEndpoint` and dispatches through its mediator. (API.ENDPOINTS.001)
-- Endpoints receive mediators and HTTP-boundary services only. (API.BOUNDARY.001)
-- Actor identity comes from verified claims, never from the request. (API.ACTOR.001, API.ACTOR.002)
-- Authorization checks the target resource, not only authentication. (API.AUTHZ.001)
-- Errors return Problem Details with a stable code and trace identifier. (API.ERRORS.001)
-- Error responses carry no exception, stack, SQL, provider, or secret text. (API.ERRORS.002)
-- Collection reads carry deterministic ordering and a bounded limit. (API.PAGING.001)
-- OpenAPI is generated during the Release build and committed when consumed. (API.OPENAPI.001)
-- The contract declares the authentication that endpoints enforce. (API.OPENAPI.002)
-- Transport models mirror the shape of the Domain closed set they carry. (API.MODELS.001, API.MODELS.002)
+- One class per operation implements `IEndpoint` and dispatches through its mediator. (BACKEND.API.ENDPOINTS.001)
+- Endpoints receive mediators and HTTP-boundary services only. (BACKEND.API.BOUNDARY.001)
+- Actor identity comes from verified claims, never from the request. (BACKEND.API.ACTOR.001, BACKEND.API.ACTOR.002)
+- Authorization checks the target resource, not only authentication. (BACKEND.API.AUTHZ.001)
+- Errors return Problem Details with a stable code and trace identifier. (BACKEND.API.ERRORS.001)
+- Error responses carry no exception, stack, SQL, provider, or secret text. (BACKEND.API.ERRORS.002)
+- Collection reads carry deterministic ordering and a bounded limit. (BACKEND.API.PAGING.001)
+- OpenAPI is generated during the Release build and committed when consumed. (BACKEND.API.OPENAPI.001)
+- The contract declares the authentication that endpoints enforce. (BACKEND.API.OPENAPI.002)
+- Transport models mirror the shape of the Domain closed set they carry. (BACKEND.API.MODELS.001, BACKEND.API.MODELS.002)
 
 ## Standards
 
-### Use one endpoint per operation (API.ENDPOINTS.001)
+### Use one endpoint per operation (BACKEND.API.ENDPOINTS.001)
 
 **Requirement:** A WebApi endpoint MUST implement `IEndpoint`, map one route operation, convert input to an Application message, dispatch through its mediator, and map the result.
 
@@ -36,25 +36,25 @@ internal interface IEndpoint
 
 At startup, WebApi discovers non-abstract `IEndpoint` implementations in its assembly. It registers each implementation once as an `IEndpoint` singleton. It calls `MapEndpoint` in deterministic type-name order. The discovery code uses framework reflection and dependency injection. It does not require another scanning package.
 
-### Exclude MVC controllers from the profile (API.ENDPOINTS.002)
+### Exclude MVC controllers from the profile (BACKEND.API.ENDPOINTS.002)
 
 **Requirement:** A WebApi project MUST NOT route requests through MVC controllers or `ControllerBase`.
 
 **Rationale:** A second transport pattern splits routing, filters, and error mapping across two models that behave differently.
 
-### Keep endpoint dependencies transport-focused (API.BOUNDARY.001)
+### Keep endpoint dependencies transport-focused (BACKEND.API.BOUNDARY.001)
 
 **Requirement:** An endpoint route handler MUST NOT receive an aggregate repository, a Marten session, a `DbContext`, a provider SDK, or a broad application service.
 
 **Rationale:** Endpoint classes are mapped from the root application at startup, so they hold no scoped dependency. Route-handler parameters may still receive mediators and HTTP-boundary services such as an actor accessor.
 
-### Defer error mapping to the global handler (API.BOUNDARY.002)
+### Defer error mapping to the global handler (BACKEND.API.BOUNDARY.002)
 
 **Requirement:** An endpoint MUST NOT catch a known application exception.
 
 **Rationale:** One global handler produces every error response, so a caught exception at the endpoint creates a second, divergent mapping.
 
-### Derive authenticated identity from claims (API.ACTOR.001)
+### Derive authenticated identity from claims (BACKEND.API.ACTOR.001)
 
 **Requirement:** A WebApi endpoint MUST read the authenticated actor identifier from verified claims.
 
@@ -62,13 +62,13 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 **Example:** An administrator acting on another resource passes a separate target identifier and satisfies its authorization policy. The administrator identity still comes from claims.
 
-### Reject a client-supplied actor identifier (API.ACTOR.002)
+### Reject a client-supplied actor identifier (BACKEND.API.ACTOR.002)
 
 **Requirement:** A WebApi endpoint MUST NOT read the authenticated actor identifier from the body, form, route, query, or a client-controlled header.
 
 **Rationale:** Any request-controlled source lets a caller act as another actor.
 
-### Authorize the target resource (API.AUTHZ.001)
+### Authorize the target resource (BACKEND.API.AUTHZ.001)
 
 **Requirement:** A WebApi endpoint MUST verify role, ownership, tenant, state, or policy against the target resource before it returns protected data or changes state.
 
@@ -76,7 +76,7 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 **Example:** An operation applies a stable forbidden or not-found policy when revealing that a resource exists would leak information.
 
-### Return stable Problem Details (API.ERRORS.001)
+### Return stable Problem Details (BACKEND.API.ERRORS.001)
 
 **Requirement:** An error response MUST use RFC Problem Details carrying a stable application `code`, the current `traceId`, and an `errors` entry for each field failure.
 
@@ -107,13 +107,13 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. It maps validation exceptions to 400, missing targets through the operation's 404 policy, and forbidden failures to 403 or the declared 404 disclosure policy. It maps conflicts and state rejections to 409, and unexpected exceptions to 500 with code `internal_error`. It maps known Domain exception types individually. It does not report cancellation from a disconnected request as an application error.
 
-### Keep error responses free of internal detail (API.ERRORS.002)
+### Keep error responses free of internal detail (BACKEND.API.ERRORS.002)
 
 **Requirement:** An error response MUST NOT contain an exception message, a stack trace, SQL, a provider response body, or a secret.
 
 **Rationale:** Error paths are the most common accidental disclosure route, because internal text reaches them without passing a response model.
 
-### Use consistent status codes (API.STATUS.001)
+### Use consistent status codes (BACKEND.API.STATUS.001)
 
 **Requirement:** A WebApi operation MUST return the status code that its outcome table assigns.
 
@@ -133,13 +133,13 @@ The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. I
 | State, version, or idempotency conflict | 409 |
 | Accepted background operation | 202 with status location |
 
-### Reject a success status for a failed outcome (API.STATUS.002)
+### Reject a success status for a failed outcome (BACKEND.API.STATUS.002)
 
 **Requirement:** A WebApi operation MUST NOT return 200 for a documented error.
 
 **Rationale:** A success status with an error body forces every client to parse the body before it knows the outcome.
 
-### Keep routes resource-oriented (API.ROUTES.001)
+### Keep routes resource-oriented (BACKEND.API.ROUTES.001)
 
 **Requirement:** A route MUST use lowercase plural resource segments, kebab-case subresources, route parameters for identity, query parameters for filtering, and the body for command data.
 
@@ -147,7 +147,7 @@ The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. I
 
 **Example:** A route carries the authenticated actor identifier only when that actor is intentionally addressing another actor as a resource.
 
-### Bound collection queries (API.PAGING.001)
+### Bound collection queries (BACKEND.API.PAGING.001)
 
 **Requirement:** A collection endpoint MUST apply deterministic ordering, a default limit of 20, and a declared maximum limit of 100 or lower.
 
@@ -168,7 +168,7 @@ The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. I
 
 The cursor contains a version and the last stable sort values, including a unique tie-breaker. The example treats it as untrusted input and returns 400 with code `invalid_cursor` when it is malformed or unsupported. It places no sensitive value in a readable cursor. An implementation may use an offset for a proven bounded dataset. The public profile contract remains opaque unless a consumer convention replaces this rule across its API.
 
-### Treat OpenAPI as a generated contract (API.OPENAPI.001)
+### Treat OpenAPI as a generated contract (BACKEND.API.OPENAPI.001)
 
 **Requirement:** A WebApi project MUST generate its OpenAPI document during the Release build.
 
@@ -180,13 +180,13 @@ Every operation sets a stable name through `WithName`, which becomes `operationI
 
 When TypeScript consumes the API, the pinned `openapi-typescript` executable reads the source artifact. A single frontend writes generated types under `apps/{frontend}/lib/api/generated/`. Multiple consumers use `packages/api-types/src/`. Scalar may expose API documentation in Development, and hosted environments do not expose development tooling by default.
 
-### Commit the generated contract its consumers read (API.OPENAPI.004)
+### Commit the generated contract its consumers read (BACKEND.API.OPENAPI.004)
 
 **Requirement:** A WebApi project MUST commit its generated OpenAPI artifact when a frontend or external consumer reads it.
 
 **Rationale:** A committed artifact makes every contract change visible in review and lets CI fail on an unregenerated document.
 
-### Reflect enforced authentication in the contract (API.OPENAPI.002)
+### Reflect enforced authentication in the contract (BACKEND.API.OPENAPI.002)
 
 **Requirement:** A generated OpenAPI document MUST declare the security scheme and per-operation security requirement for every endpoint that enforces authentication.
 
@@ -194,17 +194,17 @@ When TypeScript consumes the API, the pinned `openapi-typescript` executable rea
 
 **Example:** The implementation registers a document transformer that reads registered authentication schemes through `IAuthenticationSchemeProvider` and adds the matching `securitySchemes` and `security` entries. Handwritten security metadata drifts from registered schemes. An intentionally anonymous operation declares no security requirement.
 
-### Publish precise, complete schemas (API.OPENAPI.003)
+### Publish precise, complete schemas (BACKEND.API.OPENAPI.003)
 
 **Requirement:** A generated schema MUST declare the closed value set, bounds, format, and required control headers of each field and parameter it describes.
 
 **Rationale:** A caller learns an operation's limits from the document instead of discovering them through a runtime rejection.
 
-**Example:** A label-only set publishes its values as an OpenAPI `enum`. A data-bearing set publishes a polymorphic `oneOf` model with a discriminator per `API.MODELS.001`. A named boundary enum carries `[JsonConverter(typeof(JsonStringEnumConverter<T>))]` on its type, so every serializer honors the contract, including a test client using default options. Host-only conversion breaks readers that do not share host configuration.
+**Example:** A label-only set publishes its values as an OpenAPI `enum`. A data-bearing set publishes a polymorphic `oneOf` model with a discriminator per `BACKEND.API.MODELS.001`. A named boundary enum carries `[JsonConverter(typeof(JsonStringEnumConverter<T>))]` on its type, so every serializer honors the contract, including a test client using default options. Host-only conversion breaks readers that do not share host configuration.
 
 An operation requiring a control header declares it as a required parameter, for example `Idempotency-Key` or `If-Match`. The implementation prefers typed results, typed boundary enums, and parameter metadata over handwritten schemas that drift from code.
 
-### Mirror a Domain closed set as a transport model of the same shape (API.MODELS.001)
+### Mirror a Domain closed set as a transport model of the same shape (BACKEND.API.MODELS.001)
 
 **Requirement:** A WebApi transport model for a Domain closed set MUST preserve the shape of that set.
 
@@ -219,19 +219,19 @@ An operation requiring a control header declares it as a required parameter, for
 - Name the discriminator through `[JsonPolymorphic(TypeDiscriminatorPropertyName = "...")]`, using a name such as `type` or `outcome`.
 - Opt derived types in explicitly, so an unregistered runtime subtype fails serialization.
 
-Discriminator strings are contract values that an identifier rename cannot change. Never use integer discriminators or mix discriminator forms. Narrowing a set requires a decision and an updated specification. A document or schema transformer completes discriminator metadata that the generator omits, and the source change regenerates the document and typed consumers per `API.OPENAPI.001`.
+Discriminator strings are contract values that an identifier rename cannot change. Never use integer discriminators or mix discriminator forms. Narrowing a set requires a decision and an updated specification. A document or schema transformer completes discriminator metadata that the generator omits, and the source change regenerates the document and typed consumers per `BACKEND.API.OPENAPI.001`.
 
-### Reject a collapsed or borrowed wire contract (API.MODELS.002)
+### Reject a collapsed or borrowed wire contract (BACKEND.API.MODELS.002)
 
 **Requirement:** A WebApi transport model MUST NOT collapse a data-bearing set into an `enum` or reuse a Domain or Application type as the wire contract.
 
-**Rationale:** Each layer owns its own contract type per `ARCH.CONTRACTS.001`. Narrowing a set requires a decision and an updated specification.
+**Rationale:** Each layer owns its own contract type per `BACKEND.ARCHITECTURE.CONTRACTS.001`. Narrowing a set requires a decision and an updated specification.
 
 ## Conventions
 
-### Use this endpoint layout (API.CONVENTION.001)
+### Use this endpoint layout (BACKEND.API.CONVENTION.001)
 
-**Default:** Group endpoint folders by module, then aggregate, then use case, following `ARCH.MODULES.001`.
+**Default:** Group endpoint folders by module, then aggregate, then use case, following `BACKEND.ARCHITECTURE.MODULES.001`.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -274,7 +274,7 @@ Discriminator strings are contract values that an identifier rename cannot chang
 
 A single-aggregate module nests use-case folders directly under the module only when the aggregate root's plural name equals the module name. Otherwise, and for any module with more than one aggregate, use-case folders nest under the aggregate.
 
-### Keep transport models independent (API.CONVENTION.002)
+### Keep transport models independent (BACKEND.API.CONVENTION.002)
 
 **Default:** Name request and response models `{UseCase}RequestModel` and `{UseCase}ResponseModel`, a collection item `{UseCase}ResponseItemModel`, pagination metadata `PaginationModel`, and an operation mapping class `{UseCase}ApiMappings`.
 
@@ -284,7 +284,7 @@ A single-aggregate module nests use-case folders directly under the module only 
 
 **Example:** Another passive HTTP DTO names its boundary role and ends in `Model`.
 
-### Name routes from resources (API.CONVENTION.003)
+### Name routes from resources (BACKEND.API.CONVENTION.003)
 
 **Default:** Derive each route from its resource and subresource, and use an action segment only when the operation maps to neither.
 
@@ -299,7 +299,7 @@ POST   /api/posts/{postId}/publication
 GET    /api/posts?after={cursor}&limit=20
 ```
 
-### Keep numeric transport types precise (API.CONVENTION.004)
+### Keep numeric transport types precise (BACKEND.API.CONVENTION.004)
 
 **Default:** Emit a plain numeric schema for an `int32` or `double` field, and reserve a string-or-number union for `int64` values beyond the JavaScript safe integer range.
 
@@ -307,7 +307,7 @@ GET    /api/posts?after={cursor}&limit=20
 
 **Rationale:** An over-broad union forces every consumer to coerce values that were never strings.
 
-### Keep Program.cs as composition (API.CONVENTION.005)
+### Keep Program.cs as composition (BACKEND.API.CONVENTION.005)
 
 **Default:** Keep `Program.cs` to module registration, middleware order, endpoint discovery, health endpoints, OpenAPI, and host startup.
 
@@ -319,37 +319,37 @@ GET    /api/posts?after={cursor}&limit=20
 
 ## Reference example
 
-This informative example demonstrates `API.BOUNDARY.001` and `API.MODELS.001`.
+This informative example demonstrates `BACKEND.API.BOUNDARY.001` and `BACKEND.API.MODELS.001`.
 
 A create endpoint reads the author from claims. It maps `CreateDraftRequestModel` to `CreateDraftCommand` through `CreateDraftApiMappings`. It sends the command through `ICommandMediator`. It maps `CreateDraftCommandResult` to `CreateDraftResponseModel` with the new post location. A read endpoint maps `GetPostQueryResult` through `GetPostApiMappings`. Neither endpoint calls `Post.CreateDraft` or `IPostRepository`.
 
-A refund outcome is a closed set whose cases carry different data. Domain models it once. Application mirrors it per `APP.CLOSEDSET.001`, and WebApi mirrors it again as a polymorphic transport model rather than serializing either inner type.
+A refund outcome is a closed set whose cases carry different data. Domain models it once. Application mirrors it per `BACKEND.APPLICATION.CLOSEDSET.001`, and WebApi mirrors it again as a polymorphic transport model rather than serializing either inner type.
 
 ## Verification
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| API.ENDPOINTS.001 | test | `EndpointDiscoveryTests` asserts every mapped route resolves to one endpoint type and one mediator dispatch. |
-| API.ENDPOINTS.002 | static | `WebApiArchitectureTests` asserts the assembly declares no type deriving from ControllerBase. |
-| API.BOUNDARY.001 | test | `WebApiArchitectureTests` asserts no endpoint parameter resolves a repository, session, context, or provider client. |
-| API.BOUNDARY.002 | static | `WebApiArchitectureTests` asserts no endpoint type catches an application or Domain exception. |
-| API.ACTOR.001 | test | `ActorIdentityTests` asserts each protected operation resolves its actor from the request claims principal. |
-| API.ACTOR.002 | test | `ActorIdentityTests` posts a body, query, and header actor identifier and asserts each one is ignored. |
-| API.AUTHZ.001 | test | `TargetAuthorizationTests` calls each protected operation as a non-owner and asserts 403 or the declared 404. |
-| API.ERRORS.001 | test | `ProblemDetailsContractTests` asserts code, traceId, and errors on a validation failure response. |
-| API.ERRORS.002 | test | `ErrorDisclosureTests` asserts no error body contains an exception message, stack frame, SQL, or configured secret. |
-| API.STATUS.001 | test | `StatusContractTests` asserts the outcome-table status code for each documented result. |
-| API.STATUS.002 | test | `StatusContractTests` asserts every documented error path returns its declared non-success status. |
-| API.ROUTES.001 | static | `RouteShapeTests` asserts lowercase plural segments, kebab-case subresources, and identity outside the body. |
-| API.PAGING.001 | test | `CollectionPagingTests` asserts deterministic ordering, the default limit, and rejection above the maximum. |
-| API.OPENAPI.001 | static | A Release build regenerates `apps/api/openapi/` and CI fails when regeneration changes the tree. |
-| API.OPENAPI.004 | static | The committed `apps/api/openapi/` artifact exists for each consumer-read contract and CI fails on a difference. |
-| API.OPENAPI.002 | test | `OpenApiSecurityTests` asserts every operation with an authorization policy declares a matching security entry. |
-| API.OPENAPI.003 | test | `OpenApiSchemaTests` asserts closed-set fields publish an enum or oneOf and control headers are required. |
-| API.MODELS.001 | test | `PolymorphicContractTests` round-trips every union case and asserts the discriminator equals its Domain case code. |
-| API.MODELS.002 | test | `PolymorphicContractTests` asserts no data-bearing set serializes as an enum and no inner-layer type reaches the wire. |
-| API.CONVENTION.001 | inspection | Endpoint folder review locates each operation under its module and aggregate, or records a named local replacement. |
-| API.CONVENTION.002 | static | `TransportNamingTests` asserts each transport type ends in RequestModel, ResponseModel, Model, or ApiMappings. |
-| API.CONVENTION.003 | static | `RouteShapeTests` reports each action segment for review against its resource alternatives. |
-| API.CONVENTION.004 | test | `OpenApiSchemaTests` asserts each int32 and double field publishes a plain numeric schema. |
-| API.CONVENTION.005 | inspection | `Program.cs` review confirms the recorded middleware order and locates registration in layer-owned extension methods. |
+| BACKEND.API.ENDPOINTS.001 | test | `EndpointDiscoveryTests` asserts every mapped route resolves to one endpoint type and one mediator dispatch. |
+| BACKEND.API.ENDPOINTS.002 | static | `WebApiArchitectureTests` asserts the assembly declares no type deriving from ControllerBase. |
+| BACKEND.API.BOUNDARY.001 | test | `WebApiArchitectureTests` asserts no endpoint parameter resolves a repository, session, context, or provider client. |
+| BACKEND.API.BOUNDARY.002 | static | `WebApiArchitectureTests` asserts no endpoint type catches an application or Domain exception. |
+| BACKEND.API.ACTOR.001 | test | `ActorIdentityTests` asserts each protected operation resolves its actor from the request claims principal. |
+| BACKEND.API.ACTOR.002 | test | `ActorIdentityTests` posts a body, query, and header actor identifier and asserts each one is ignored. |
+| BACKEND.API.AUTHZ.001 | test | `TargetAuthorizationTests` calls each protected operation as a non-owner and asserts 403 or the declared 404. |
+| BACKEND.API.ERRORS.001 | test | `ProblemDetailsContractTests` asserts code, traceId, and errors on a validation failure response. |
+| BACKEND.API.ERRORS.002 | test | `ErrorDisclosureTests` asserts no error body contains an exception message, stack frame, SQL, or configured secret. |
+| BACKEND.API.STATUS.001 | test | `StatusContractTests` asserts the outcome-table status code for each documented result. |
+| BACKEND.API.STATUS.002 | test | `StatusContractTests` asserts every documented error path returns its declared non-success status. |
+| BACKEND.API.ROUTES.001 | static | `RouteShapeTests` asserts lowercase plural segments, kebab-case subresources, and identity outside the body. |
+| BACKEND.API.PAGING.001 | test | `CollectionPagingTests` asserts deterministic ordering, the default limit, and rejection above the maximum. |
+| BACKEND.API.OPENAPI.001 | static | A Release build regenerates `apps/api/openapi/` and CI fails when regeneration changes the tree. |
+| BACKEND.API.OPENAPI.004 | static | The committed `apps/api/openapi/` artifact exists for each consumer-read contract and CI fails on a difference. |
+| BACKEND.API.OPENAPI.002 | test | `OpenApiSecurityTests` asserts every operation with an authorization policy declares a matching security entry. |
+| BACKEND.API.OPENAPI.003 | test | `OpenApiSchemaTests` asserts closed-set fields publish an enum or oneOf and control headers are required. |
+| BACKEND.API.MODELS.001 | test | `PolymorphicContractTests` round-trips every union case and asserts the discriminator equals its Domain case code. |
+| BACKEND.API.MODELS.002 | test | `PolymorphicContractTests` asserts no data-bearing set serializes as an enum and no inner-layer type reaches the wire. |
+| BACKEND.API.CONVENTION.001 | inspection | Endpoint folder review locates each operation under its module and aggregate, or records a named local replacement. |
+| BACKEND.API.CONVENTION.002 | static | `TransportNamingTests` asserts each transport type ends in RequestModel, ResponseModel, Model, or ApiMappings. |
+| BACKEND.API.CONVENTION.003 | static | `RouteShapeTests` reports each action segment for review against its resource alternatives. |
+| BACKEND.API.CONVENTION.004 | test | `OpenApiSchemaTests` asserts each int32 and double field publishes a plain numeric schema. |
+| BACKEND.API.CONVENTION.005 | inspection | `Program.cs` review confirms the recorded middleware order and locates registration in layer-owned extension methods. |

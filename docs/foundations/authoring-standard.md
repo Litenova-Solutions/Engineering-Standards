@@ -6,15 +6,15 @@ The standards use one document grammar and one controlled technical prose profil
 
 ## Agent Summary {#agent-summary}
 
-- Use controlled technical prose with repository terminology. (WRITING.PROSE.001, WRITING.TERM.001)
-- Write one testable obligation in each Standards provision. (WRITING.NORMATIVE.002, WRITING.REQUIREMENT.001)
-- Give each actionable default a distinct convention ID. (WRITING.CONVENTION.001)
-- Apply the declared contract for each page class. (WRITING.PAGE.001)
-- Keep summaries informative and cite every projected provision. (WRITING.SUMMARY.001)
-- Map every provision to exact verification evidence. (WRITING.VERIFICATION.001)
-- Validate only current standards material. (WRITING.SNAPSHOT.001, WRITING.SNAPSHOT.002)
-- Publish complete releases and record the one a consumer reviewed. (WRITING.SNAPSHOT.003, WRITING.SNAPSHOT.004, WRITING.SNAPSHOT.005, WRITING.SNAPSHOT.006)
-- Run the dependency-free authoring checks before review. (WRITING.VALIDATION.001)
+- Use controlled technical prose with repository terminology. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.TERM.001)
+- Write one testable obligation in each Standards provision. (CORE.AUTHORING.NORMATIVE.002, CORE.AUTHORING.REQUIREMENT.001)
+- Give each actionable default a distinct convention ID. (CORE.AUTHORING.DEFAULTS.001)
+- Apply the declared contract for each page class. (CORE.AUTHORING.PAGE.001)
+- Keep summaries informative and cite every projected provision. (CORE.AUTHORING.SUMMARY.001)
+- Map every provision to exact verification evidence. (CORE.AUTHORING.VERIFICATION.001)
+- Validate only current standards material. (CORE.AUTHORING.SNAPSHOT.001, CORE.AUTHORING.SNAPSHOT.002)
+- Publish complete releases and record the one a consumer reviewed. (CORE.AUTHORING.SNAPSHOT.003, CORE.AUTHORING.SNAPSHOT.004, CORE.AUTHORING.SNAPSHOT.005, CORE.AUTHORING.SNAPSHOT.006)
+- Run the dependency-free authoring checks before review. (CORE.AUTHORING.VALIDATION.001)
 
 ## Concepts
 
@@ -130,7 +130,7 @@ The uppercase normative vocabulary is `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`
 ### Convention provision contract
 
 ```markdown
-### Use the default name (SCOPE.CONVENTION.001)
+### Use the default name (CORE.SCOPE.CONVENTION.001)
 
 **Default:** Use the stated default for this boundary.
 
@@ -176,7 +176,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ## Standards
 
-### Keep authored prose ASCII-safe (WRITING.ASCII.001)
+### Keep authored prose ASCII-safe (CORE.AUTHORING.ASCII.001)
 
 **Requirement:** Authored prose MUST contain only ASCII unless required code, data, or mathematical content uses another character.
 
@@ -184,31 +184,31 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** `Use a hyphen.` is ASCII text; a typographic dash is not.
 
-### Exclude declared content paths from the ASCII check (WRITING.ASCII.002)
+### Exclude declared content paths from the ASCII check (CORE.AUTHORING.ASCII.002)
 
 **Requirement:** An ASCII check MUST exclude only the natural-language content paths that the project record declares.
 
 **Rationale:** A product whose subject is another language carries that language in its content files, where a diacritic is part of a word. Every document about that content stays in scope.
 
-### Use one normative vocabulary (WRITING.NORMATIVE.002)
+### Use one normative vocabulary (CORE.AUTHORING.NORMATIVE.002)
 
 **Requirement:** A Standards provision MUST use exactly one approved uppercase modal and no other uppercase normative term.
 
 **Rationale:** The Standards provision contract defines the approved modal set and its RFC interpretation.
 
-### Apply controlled prose measures (WRITING.PROSE.001)
+### Apply controlled prose measures (CORE.AUTHORING.PROSE.001)
 
 **Requirement:** Authored prose MUST satisfy the prose measures and omit contractions, idioms, fragments, unexplained pronouns, `and/or`, and banned vague terms.
 
 **Rationale:** Bounded, direct prose reduces interpretation differences without weakening technical meaning.
 
-### Use active and explicit sentences (WRITING.VOICE.001)
+### Use active and explicit sentences (CORE.AUTHORING.VOICE.001)
 
 **Requirement:** Authored prose MUST use active voice, explicit actors, imperative procedure steps, parallel lists, and passive voice only when actors are irrelevant.
 
 **Rationale:** Explicit actors and parallel actions make ownership and execution boundaries visible.
 
-### Use one term for one concept (WRITING.TERM.001)
+### Use one term for one concept (CORE.AUTHORING.TERM.001)
 
 **Requirement:** Authored prose MUST use one glossary term per concept without copying ASD-STE100 vocabulary or claiming ASD-STE100 compliance.
 
@@ -216,57 +216,57 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** The validator reports `Standards authoring checks passed.`, not `This document is ASD-STE100 compliant.`
 
-### Use controlled capitalization (WRITING.CASE.001)
+### Use controlled capitalization (CORE.AUTHORING.CASE.001)
 
 **Requirement:** Authored prose MUST use Title Case for document titles and sentence case for provision headings and body text.
 
 **Rationale:** Exact code names, layer names, product names, and sentence starts retain their normal capitalization.
 
-### Apply the four quality tests (WRITING.QUALITY.001)
+### Apply the four quality tests (CORE.AUTHORING.QUALITY.001)
 
 **Requirement:** A reviewer MUST assess authored prose for simplicity, brevity, clarity, and humanity before approval.
 
 **Rationale:** Human review covers meaning and tone that deterministic checks cannot prove.
 
-### Use the declared page contract (WRITING.PAGE.001)
+### Use the declared page contract (CORE.AUTHORING.PAGE.001)
 
 **Requirement:** An authored page MUST use the required structure and heading rules for its page class.
 
 **Rationale:** Stable page classes let readers find authority, context, defaults, and evidence predictably.
 
-### Write atomic Standards provisions (WRITING.REQUIREMENT.001)
+### Write atomic Standards provisions (CORE.AUTHORING.REQUIREMENT.001)
 
 **Requirement:** A Standards provision MUST follow the Standards provision contract and provision identity policy defined by this foundation.
 
 **Rationale:** One identified assertion has one authority and one verification mapping.
 
-**Example:** `### Keep Domain package-free (ARCH.DOMAIN.001)` owns one Domain dependency assertion.
+**Example:** `### Keep Domain package-free (BACKEND.ARCHITECTURE.DOMAIN.001)` owns one Domain dependency assertion.
 
-### Identify actionable conventions (WRITING.CONVENTION.001)
+### Identify actionable conventions (CORE.AUTHORING.DEFAULTS.001)
 
 **Requirement:** An actionable Convention provision MUST follow the Convention provision contract defined by this foundation.
 
 **Rationale:** A distinct ID makes each replaceable default traceable without turning it into a Standards override.
 
-### Keep Agent Summaries informative (WRITING.SUMMARY.001)
+### Keep Agent Summaries informative (CORE.AUTHORING.SUMMARY.001)
 
 **Requirement:** An Agent Summary MUST follow the summary contract without adding authority to its cited projections.
 
 **Rationale:** Tier 1 context stays short while the full provision remains canonical.
 
-### Attach examples to their provisions (WRITING.EXAMPLE.001)
+### Attach examples to their provisions (CORE.AUTHORING.EXAMPLE.001)
 
 **Requirement:** An informative example MUST belong to its provision or a Reference example that lists every demonstrated provision.
 
 **Rationale:** Readers can distinguish an illustration from an independent obligation.
 
-### Map provisions to evidence (WRITING.VERIFICATION.001)
+### Map provisions to evidence (CORE.AUTHORING.VERIFICATION.001)
 
 **Requirement:** A normative page MUST map every Standard and Convention ID through the verification contract.
 
 **Rationale:** Exact evidence makes each provision reviewable by humans and tools.
 
-### Declare structured specification metadata (WRITING.METADATA.002)
+### Declare structured specification metadata (CORE.AUTHORING.METADATA.002)
 
 **Requirement:** A structured consumer specification MUST open with a `---` delimited JSON block satisfying `schemas/specification-metadata.schema.json` for its declared kind.
 
@@ -292,49 +292,49 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 ---
 ```
 
-### Use one metadata carrier (WRITING.METADATA.003)
+### Use one metadata carrier (CORE.AUTHORING.METADATA.003)
 
 **Requirement:** A structured consumer specification MUST use its opening JSON block as its only metadata carrier.
 
 **Rationale:** Source links, implementation paths, and verification evidence belong in relevant body sections.
 
-### Run repeatable authoring checks (WRITING.VALIDATION.001)
+### Run repeatable authoring checks (CORE.AUTHORING.VALIDATION.001)
 
 **Requirement:** A standards change MUST pass the authoring fixture suite, repository validator, applicable specialist validators, and `git diff --check`.
 
 **Rationale:** Every skipped check appears with its exact reason in the change report.
 
-### Validate current standards material (WRITING.SNAPSHOT.001)
+### Validate current standards material (CORE.AUTHORING.SNAPSHOT.001)
 
 **Requirement:** The standards validator MUST evaluate only current standards material.
 
 **Rationale:** Each pinned release is a complete snapshot. Changelog and Git history provide release context outside validation.
 
-### Exclude historical transition material (WRITING.SNAPSHOT.002)
+### Exclude historical transition material (CORE.AUTHORING.SNAPSHOT.002)
 
 **Requirement:** Current standards material MUST NOT contain history-specific paths, IDs, terminology, aliases, replacement maps, standards-release migration material, compatibility rules, or transition checks.
 
 **Rationale:** The published snapshot states its own contract without carrying previous releases forward.
 
-### Publish each release as a complete contract (WRITING.SNAPSHOT.003)
+### Publish each release as a complete contract (CORE.AUTHORING.SNAPSHOT.003)
 
 **Requirement:** A standards release MUST state every active provision without depending on an earlier release.
 
 **Rationale:** A consumer reads one pinned snapshot and needs no other release to determine its obligations.
 
-### Exclude cross-release compatibility work (WRITING.SNAPSHOT.004)
+### Exclude cross-release compatibility work (CORE.AUTHORING.SNAPSHOT.004)
 
 **Requirement:** The standards repository MUST NOT publish a compatibility guarantee, migration path, deprecation period, or identifier alias between its own releases.
 
 **Rationale:** The standards are a pinned contract rather than a running service. A consumer product keeps its own API compatibility, migration, deprecation, and rollback provisions.
 
-### Keep a pinned release for as long as it serves (WRITING.SNAPSHOT.005)
+### Keep a pinned release for as long as it serves (CORE.AUTHORING.SNAPSHOT.005)
 
 **Requirement:** A consumer MAY keep any published standards release for as long as that consumer chooses.
 
 **Rationale:** Adoption is a consumer decision, and no repository change obliges a consumer to move to a later release.
 
-### Record the reviewed standards release (WRITING.SNAPSHOT.006)
+### Record the reviewed standards release (CORE.AUTHORING.SNAPSHOT.006)
 
 **Requirement:** A consumer MUST record the standards release it last reviewed in `reviewedStandardsVersion` within `standards.project.json`.
 
@@ -342,19 +342,19 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ## Conventions
 
-### Prefer direct action headings (WRITING.HEADING.CONVENTION.001)
+### Prefer direct action headings (CORE.AUTHORING.CONVENTION.001)
 
 **Default:** Start a provision heading with a concrete action verb.
 
 **Replacement:** Use a concept heading only for informative definitions and indexes.
 
-### Prefer positive instructions (WRITING.INSTRUCTION.CONVENTION.001)
+### Prefer positive instructions (CORE.AUTHORING.CONVENTION.002)
 
 **Default:** State the required action positively when the positive form defines the complete boundary.
 
 **Replacement:** Use a prohibition when unsafe or invalid behavior needs an explicit boundary.
 
-### Use tables for exact mappings (WRITING.TABLE.CONVENTION.001)
+### Use tables for exact mappings (CORE.AUTHORING.CONVENTION.003)
 
 **Default:** Use a table for repeated fields, fixed comparisons, or exact evidence mappings.
 
@@ -362,10 +362,10 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ## Reference example
 
-This informative example demonstrates `WRITING.REQUIREMENT.001`, `WRITING.EXAMPLE.001`, and `WRITING.VERIFICATION.001`.
+This informative example demonstrates `CORE.AUTHORING.REQUIREMENT.001`, `CORE.AUTHORING.EXAMPLE.001`, and `CORE.AUTHORING.VERIFICATION.001`.
 
 ```markdown
-### Keep Domain package-free (ARCH.DOMAIN.001)
+### Keep Domain package-free (BACKEND.ARCHITECTURE.DOMAIN.001)
 
 **Requirement:** The Domain project MUST contain no persistence, web, mediator, logging, or dependency-injection package reference.
 
@@ -378,29 +378,29 @@ This informative example demonstrates `WRITING.REQUIREMENT.001`, `WRITING.EXAMPL
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| WRITING.ASCII.001 | static | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
-| WRITING.ASCII.002 | inspection | The project record lists each excluded content path, and review confirms documents about that content stay in scope. |
-| WRITING.NORMATIVE.002 | inspection | The provision parser reports one approved modal, and review confirms its intended force. |
-| WRITING.PROSE.001 | static | `WritingProseTests` asserts the prose scanner reports no length, contraction, or banned-term diagnostic. |
-| WRITING.VOICE.001 | inspection | The pull request checklist records actor, voice, procedure, and list review. |
-| WRITING.TERM.001 | inspection | Terminology review compares new terms with `docs/reference/glossary.md`. |
-| WRITING.CASE.001 | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
-| WRITING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
-| WRITING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |
-| WRITING.REQUIREMENT.001 | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
-| WRITING.CONVENTION.001 | static | `WritingTests` asserts the parser resolves each Convention ID, Default, Replacement, and Verification row. |
-| WRITING.SUMMARY.001 | inspection | The summary parser resolves every citation, and review compares each projection with its source. |
-| WRITING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |
-| WRITING.VERIFICATION.001 | static | `WritingVerificationTests` asserts the evidence mapper reports one exact row for every page provision. |
-| WRITING.METADATA.002 | static | `node tools/validate-consumer.mjs` validates opening JSON against the metadata schema. |
-| WRITING.METADATA.003 | static | `node tools/validate-consumer.mjs` reports no duplicate metadata carrier. |
-| WRITING.VALIDATION.001 | static | `WritingValidationTests` asserts cI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
-| WRITING.SNAPSHOT.001 | static | `node tools/validate-standards.mjs` evaluates current standards material only. |
-| WRITING.SNAPSHOT.002 | inspection | Pull request review finds no history-specific material in active files. |
-| WRITING.SNAPSHOT.003 | inspection | Release review confirms each active provision resolves without reference to an earlier release. |
-| WRITING.SNAPSHOT.004 | inspection | Pull request review finds no cross-release compatibility, migration, deprecation, or alias material. |
-| WRITING.SNAPSHOT.005 | inspection | Review confirms no active provision requires a consumer to adopt a later standards release. |
-| WRITING.SNAPSHOT.006 | static | `node standards/tools/validate-consumer.mjs` fails when `reviewedStandardsVersion` differs from the pinned manifest version. |
-| WRITING.HEADING.CONVENTION.001 | inspection | Review records the action verb used by every changed provision heading. |
-| WRITING.INSTRUCTION.CONVENTION.001 | inspection | Review identifies the unsafe boundary behind every retained negative instruction. |
-| WRITING.TABLE.CONVENTION.001 | inspection | Review confirms that each changed table represents an exact mapping or comparison. |
+| CORE.AUTHORING.ASCII.001 | static | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
+| CORE.AUTHORING.ASCII.002 | inspection | The project record lists each excluded content path, and review confirms documents about that content stay in scope. |
+| CORE.AUTHORING.NORMATIVE.002 | inspection | The provision parser reports one approved modal, and review confirms its intended force. |
+| CORE.AUTHORING.PROSE.001 | static | `WritingProseTests` asserts the prose scanner reports no length, contraction, or banned-term diagnostic. |
+| CORE.AUTHORING.VOICE.001 | inspection | The pull request checklist records actor, voice, procedure, and list review. |
+| CORE.AUTHORING.TERM.001 | inspection | Terminology review compares new terms with `docs/reference/glossary.md`. |
+| CORE.AUTHORING.CASE.001 | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
+| CORE.AUTHORING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
+| CORE.AUTHORING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |
+| CORE.AUTHORING.REQUIREMENT.001 | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
+| CORE.AUTHORING.DEFAULTS.001 | static | `WritingTests` asserts the parser resolves each Convention ID, Default, Replacement, and Verification row. |
+| CORE.AUTHORING.SUMMARY.001 | inspection | The summary parser resolves every citation, and review compares each projection with its source. |
+| CORE.AUTHORING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |
+| CORE.AUTHORING.VERIFICATION.001 | static | `WritingVerificationTests` asserts the evidence mapper reports one exact row for every page provision. |
+| CORE.AUTHORING.METADATA.002 | static | `node tools/validate-consumer.mjs` validates opening JSON against the metadata schema. |
+| CORE.AUTHORING.METADATA.003 | static | `node tools/validate-consumer.mjs` reports no duplicate metadata carrier. |
+| CORE.AUTHORING.VALIDATION.001 | static | `WritingValidationTests` asserts cI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
+| CORE.AUTHORING.SNAPSHOT.001 | static | `node tools/validate-standards.mjs` evaluates current standards material only. |
+| CORE.AUTHORING.SNAPSHOT.002 | inspection | Pull request review finds no history-specific material in active files. |
+| CORE.AUTHORING.SNAPSHOT.003 | inspection | Release review confirms each active provision resolves without reference to an earlier release. |
+| CORE.AUTHORING.SNAPSHOT.004 | inspection | Pull request review finds no cross-release compatibility, migration, deprecation, or alias material. |
+| CORE.AUTHORING.SNAPSHOT.005 | inspection | Review confirms no active provision requires a consumer to adopt a later standards release. |
+| CORE.AUTHORING.SNAPSHOT.006 | static | `node standards/tools/validate-consumer.mjs` fails when `reviewedStandardsVersion` differs from the pinned manifest version. |
+| CORE.AUTHORING.CONVENTION.001 | inspection | Review records the action verb used by every changed provision heading. |
+| CORE.AUTHORING.CONVENTION.002 | inspection | Review identifies the unsafe boundary behind every retained negative instruction. |
+| CORE.AUTHORING.CONVENTION.003 | inspection | Review confirms that each changed table represents an exact mapping or comparison. |

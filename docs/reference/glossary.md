@@ -58,7 +58,7 @@ A replaceable default for a name, location, file shape, or implementation patter
 
 ## Convention ID
 
-A canonical uppercase dotted identifier containing `CONVENTION`, such as `API.CONVENTION.001`.
+A canonical uppercase dotted identifier containing `CONVENTION`, such as `BACKEND.API.CONVENTION.001`.
 
 ## Current standards material
 
@@ -170,7 +170,7 @@ A use-case metadata value that activates additional specification and verificati
 
 ## Rule ID
 
-A canonical uppercase dotted identifier, such as `APP.COMMAND.001`, that identifies one Standard and can appear in a consumer override.
+A canonical uppercase dotted identifier, such as `BACKEND.APPLICATION.COMMAND.001`, that identifies one Standard and can appear in a consumer override.
 
 ## Specification
 

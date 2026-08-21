@@ -43,6 +43,9 @@ for (const rel of ['standards/standards.manifest.json', '../standards.manifest.j
   const p = path.join(root, rel);
   if (fs.existsSync(p)) { manifest = readJson(p); break; }
 }
+// The manifest names the id scopes whose overrides expire. A recorded override in
+// one of those scopes activates the controlled UI validator.
+const uiOverrideScopes = manifest?.overridePolicy?.requiresReviewBy ?? [];
 // Adopting a release means accepting its complete contract, so the project
 // records the release it reviewed. A mismatch means the pinned standards moved
 // without anyone re-reading the overrides and provisions that now apply.
@@ -110,7 +113,7 @@ const e2eDefs = new Map(); // id -> [rel]
 let uiOutput = '';
 
 // Specification Metadata is a '---' delimited JSON block, per
-// WRITING.METADATA.002. A file that carries a metadata object in any other
+// CORE.AUTHORING.METADATA.002. A file that carries a metadata object in any other
 // wrapper is reported rather than skipped, because a silently skipped
 // specification is an unvalidated specification.
 function parseBlock(raw, rel) {
@@ -228,7 +231,7 @@ for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end
 // frontend platform declaration or UI block. A recorded UI rule override must
 // carry a live review date.
 const uiActivated = (project.paths?.frontends ?? []).some((frontend) => frontend.ui || frontend.platform === 'react-web')
-  || (project.overrides ?? []).some((override) => /^UI\./.test(override?.ruleId ?? ''));
+  || (project.overrides ?? []).some((override) => uiOverrideScopes.some((scope) => String(override?.ruleId ?? '').startsWith(`${scope}.`)));
 if (uiActivated) {
   // Resolve the sibling validator from this file so a consumer may pin the
   // standards repository at a path other than 'standards/'.

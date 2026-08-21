@@ -18,11 +18,11 @@ This extension replaces no baseline provision.
 
 ## Agent Summary {#agent-summary}
 
-- State one high-risk projection and cite its canonical provision. ({EXT.TOPIC.001})
+- State one high-risk projection and cite its canonical provision. ({EXT.NAME.TOPIC.001})
 
 ## Standards
 
-### State one extension action ({EXT.TOPIC.001})
+### State one extension action ({EXT.NAME.TOPIC.001})
 
 **Requirement:** The activated extension MUST perform one testable action.
 
@@ -32,7 +32,7 @@ This extension replaces no baseline provision.
 
 ## Conventions
 
-### Use one extension default ({EXT.TOPIC}.CONVENTION.001)
+### Use one extension default ({EXT.NAME}.CONVENTION.001)
 
 **Default:** State one replaceable extension default.
 
@@ -46,5 +46,5 @@ None.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| {EXT.TOPIC.001} | test | `{Topic}Tests` asserts the exact extension behavior this provision requires. |
-| {EXT.TOPIC}.CONVENTION.001 | inspection | Inspect the default or its named local replacement. |
+| {EXT.NAME.TOPIC.001} | test | `{Topic}Tests` asserts the exact extension behavior this provision requires. |
+| {EXT.NAME}.CONVENTION.001 | inspection | Inspect the default or its named local replacement. |

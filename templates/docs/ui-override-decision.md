@@ -31,7 +31,7 @@ visual systems on one route.
 
 ## Standards impact
 
-- Replaced rule IDs: `UI.GOVERNANCE.001`, `UI.SHADCN.001`, or `UI.COMPANION.001` as applicable.
+- Replaced rule IDs: `FRONTEND.UI.GOVERNANCE.001`, `FRONTEND.UI.SHADCN.001`, or `FRONTEND.UI.COMPANION.001` as applicable.
 - Registry or package provenance: `__PROVENANCE__`.
 - License and security review: `__REVIEW_RECORD__`.
 - Migration trigger: `__MIGRATION_TRIGGER__`.

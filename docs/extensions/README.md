@@ -30,7 +30,7 @@ The manifest is the machine-readable source for `activationScope` and `applicabl
 
 ## Activation
 
-`SCOPE.EXTENSIONS.001` and `CORE.COMPLEXITY.002` decide when an extension activates. `AGENTIC.EXTENSIONS.001` and `AGENTIC.EXTENSIONS.002` decide where it is listed. `SCOPE.EXTENSIONS.002` requires the project record.
+`CORE.SCOPE.EXTENSIONS.001` and `CORE.PRINCIPLES.COMPLEXITY.002` decide when an extension activates. `CORE.SYSTEM.EXTENSIONS.001` and `CORE.SYSTEM.EXTENSIONS.002` decide where it is listed. `CORE.SCOPE.EXTENSIONS.002` requires the project record.
 
 The [agent protocol](../foundations/agent-protocol.md) carries the ordered steps an agent follows.
 

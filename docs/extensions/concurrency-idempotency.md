@@ -224,7 +224,7 @@ This extension adds no baseline project and replaces no baseline rule.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Generated API contracts expose the requirement through `API.OPENAPI.003`.
+**Rationale:** Generated API contracts expose the requirement through `BACKEND.API.OPENAPI.003`.
 
 ## Dependencies
 

@@ -10,21 +10,21 @@ CQRS separates write and read behavior inside one Application project. Modules a
 ## Agent Summary {#agent-summary}
 
 
-- Domain, Application, Infrastructure, and WebApi are the four baseline projects. (ARCH.PROJECTS.001)
-- Project references point inward and never outward. (ARCH.DEPENDENCIES.001)
-- Each layer defines its own messages, results, and transport models. (ARCH.CONTRACTS.001)
-- One Application project holds every message, handler, and port. (ARCH.APPLICATION.001)
-- Every layer repeats the same module and aggregate folder order. (ARCH.MODULES.001)
-- Handlers, validators, and implementations stay internal and sealed. (ARCH.VISIBILITY.001)
-- Aggregates own invariants; handlers only coordinate. (ARCH.DOMAIN.001)
-- Commands write through repositories; queries read projections. (ARCH.CQRS.001)
-- A Worker exists only for work that outlives a request. (ARCH.WORKER.001)
-- Architecture tests prove every structural boundary. (ARCH.ENFORCEMENT.001)
+- Domain, Application, Infrastructure, and WebApi are the four baseline projects. (BACKEND.ARCHITECTURE.PROJECTS.001)
+- Project references point inward and never outward. (BACKEND.ARCHITECTURE.DEPENDENCIES.001)
+- Each layer defines its own messages, results, and transport models. (BACKEND.ARCHITECTURE.CONTRACTS.001)
+- One Application project holds every message, handler, and port. (BACKEND.ARCHITECTURE.APPLICATION.001)
+- Every layer repeats the same module and aggregate folder order. (BACKEND.ARCHITECTURE.MODULES.001)
+- Handlers, validators, and implementations stay internal and sealed. (BACKEND.ARCHITECTURE.VISIBILITY.001)
+- Aggregates own invariants; handlers only coordinate. (BACKEND.ARCHITECTURE.DOMAIN.001)
+- Commands write through repositories; queries read projections. (BACKEND.ARCHITECTURE.CQRS.001)
+- A Worker exists only for work that outlives a request. (BACKEND.ARCHITECTURE.WORKER.001)
+- Architecture tests prove every structural boundary. (BACKEND.ARCHITECTURE.ENFORCEMENT.001)
 
 ## Standards
 
 
-### Use four application projects (ARCH.PROJECTS.001)
+### Use four application projects (BACKEND.ARCHITECTURE.PROJECTS.001)
 
 **Requirement:** An application MUST use Domain, Application, Infrastructure, and WebApi as its four baseline projects.
 
@@ -39,61 +39,61 @@ apps/api/src/{ProjectName}.WebApi/
 
 `AppHost` and `ServiceDefaults` support local hosting and diagnostics. They are hosts, not application layers.
 
-### Point dependencies inward (ARCH.DEPENDENCIES.001)
+### Point dependencies inward (BACKEND.ARCHITECTURE.DEPENDENCIES.001)
 
 **Requirement:** A project reference MUST point inward, so Domain references no outer layer and WebApi composes the process.
 
 **Rationale:** Application coordinates Domain, and Infrastructure implements the boundaries both declare. The reference matrix in [Dependencies](../workspace/dependencies.md) applies exactly.
 
-### Own each layer's contract types (ARCH.CONTRACTS.001)
+### Own each layer's contract types (BACKEND.ARCHITECTURE.CONTRACTS.001)
 
 **Requirement:** A layer MUST define its own messages, results, and transport models rather than reuse an inner layer's type as its outward contract.
 
 **Rationale:** A change to an inner shape then stops rippling through every outer layer. The Shared kernel is the one sanctioned exception.
 
-### Keep one Application assembly (ARCH.APPLICATION.001)
+### Keep one Application assembly (BACKEND.ARCHITECTURE.APPLICATION.001)
 
 **Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, orchestrators, and ports in one Application project.
 
 **Rationale:** Separate Write, Read, Contracts, and event-handler assemblies are outside this profile.
 
-### Organize every layer by module and use case (ARCH.MODULES.001)
+### Organize every layer by module and use case (BACKEND.ARCHITECTURE.MODULES.001)
 
 **Requirement:** Every layer MUST use the same module names and order its folders as module, then aggregate, then layer detail.
 
 **Rationale:** An aggregate stays flat only when its plural name equals the single module name. Module is an organization term, not a runtime base type, so no `IModule` or `ModuleRoot` contract exists.
 
-### Keep implementation types internal (ARCH.VISIBILITY.001)
+### Keep implementation types internal (BACKEND.ARCHITECTURE.VISIBILITY.001)
 
 **Requirement:** A handler, validator, persistence implementation, or endpoint implementation MUST be declared `internal sealed`.
 
 **Rationale:** Messages, results, assembly markers, and ports stay public only when another project uses them. Assembly scanning is not a reason to widen visibility.
 
-### Keep business invariants in Domain (ARCH.DOMAIN.001)
+### Keep business invariants in Domain (BACKEND.ARCHITECTURE.DOMAIN.001)
 
 **Requirement:** An aggregate or value object MUST be the only place that enforces a state transition or invariant.
 
 **Rationale:** A rule duplicated in a handler drifts from the aggregate that owns it.
 
-### Separate command and query behavior (ARCH.CQRS.001)
+### Separate command and query behavior (BACKEND.ARCHITECTURE.CQRS.001)
 
 **Requirement:** A command MUST mutate aggregates through repositories while a query projects read results without loading one.
 
 **Rationale:** An enabled persistence extension may replace the read boundary for named aggregate paths. A command still never enforces an invariant from a read projection.
 
-### Add Worker only for an independent process boundary (ARCH.WORKER.001)
+### Add Worker only for an independent process boundary (BACKEND.ARCHITECTURE.WORKER.001)
 
 **Requirement:** An application MUST create a Worker project only for durable dispatch, queue consumption, workflow advancement, or scheduled work that outlives a request.
 
 **Rationale:** An optional best-effort reaction may stay inside WebApi when its loss is accepted.
 
-### Test structural boundaries (ARCH.ENFORCEMENT.001)
+### Test structural boundaries (BACKEND.ARCHITECTURE.ENFORCEMENT.001)
 
 **Requirement:** An application MUST prove project references, package boundaries, visibility, module folders, and aggregate inheritance with architecture tests.
 
 **Rationale:** A structural rule that only a reviewer checks stops holding as soon as review misses one file.
 
-### Compose each process explicitly (ARCH.COMPOSITION.001)
+### Compose each process explicitly (BACKEND.ARCHITECTURE.COMPOSITION.001)
 
 **Requirement:** A host MUST register its own transport services and call the Infrastructure entry point without building a second provider.
 
@@ -102,7 +102,7 @@ apps/api/src/{ProjectName}.WebApi/
 ## Conventions
 
 
-### Use mirrored module folders (ARCH.CONVENTION.001)
+### Use mirrored module folders (BACKEND.ARCHITECTURE.CONVENTION.001)
 
 **Default:** Mirror the module, aggregate, and layer-detail folder order in every layer.
 
@@ -136,7 +136,7 @@ Infrastructure/Workflows/PublicationDelivery/
 
 The mirrored folder names identify one domain module even though each layer owns different responsibilities. A documented workflow that coordinates modules uses the separate `Workflows/{Workflow}` path.
 
-### Keep composition in hosts (ARCH.CONVENTION.002)
+### Keep composition in hosts (BACKEND.ARCHITECTURE.CONVENTION.002)
 
 **Default:** Keep service registration in `Program.cs` and host registration modules.
 
@@ -153,7 +153,7 @@ WebApiServiceRegistration.AddWebApi(...)
 
 `AddInfrastructure` receives configuration and host environment values needed to bind and validate provider options. `AddWebApi` owns Problem Details, authentication, authorization, endpoint discovery, and OpenAPI. `Program.cs` keeps their call order visible.
 
-### Use one public assembly marker per scanned project (ARCH.CONVENTION.003)
+### Use one public assembly marker per scanned project (BACKEND.ARCHITECTURE.CONVENTION.003)
 
 **Default:** Expose one `public static` assembly marker in each project that an approved scanner reads.
 
@@ -163,7 +163,7 @@ WebApiServiceRegistration.AddWebApi(...)
 
 ## Reference example
 
-This informative example demonstrates `ARCH.DEPENDENCIES.001` and `ARCH.CQRS.001`.
+This informative example demonstrates `BACKEND.ARCHITECTURE.DEPENDENCIES.001` and `BACKEND.ARCHITECTURE.CQRS.001`.
 
 Publishing a post follows this direction:
 
@@ -178,17 +178,17 @@ Publishing a post follows this direction:
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| ARCH.PROJECTS.001 | inspection | `SolutionStructureTests` asserts the solution contains the four baseline projects and no additional layer project. |
-| ARCH.DEPENDENCIES.001 | inspection | `ArchitectureTests` asserts the project reference graph matches the inward matrix in the dependencies convention. |
-| ARCH.CONTRACTS.001 | inspection | `ArchitectureTests` asserts no Application result or WebApi model exposes a Domain type across the layer boundary. |
-| ARCH.APPLICATION.001 | inspection | `SolutionStructureTests` asserts one Application project holds every command, query, handler, and port type. |
-| ARCH.MODULES.001 | static | `ArchitectureTests` asserts each layer folder path resolves to a declared module and aggregate, with no project-wide type folders. |
-| ARCH.VISIBILITY.001 | inspection | `ArchitectureTests` asserts every handler, validator, repository implementation, and endpoint type is internal and sealed. |
-| ARCH.DOMAIN.001 | inspection | `ArchitectureTests` asserts no command handler references an invariant identifier that its aggregate already enforces. |
-| ARCH.CQRS.001 | inspection | `ArchitectureTests` asserts no query handler resolves a repository and no command handler resolves a read session. |
-| ARCH.WORKER.001 | inspection | The Worker project decision record names the durable or scheduled boundary that requires an independent process. |
-| ARCH.ENFORCEMENT.001 | test | `ArchitectureTests` runs in the Release test pass and covers each declared structural boundary. |
-| ARCH.COMPOSITION.001 | inspection | `CompositionTests` asserts no registration path builds a second provider or resolves a service locator. |
-| ARCH.CONVENTION.001 | inspection | Folder review compares each layer tree against its module list, or records a named local replacement. |
-| ARCH.CONVENTION.002 | inspection | `ArchitectureTests` asserts no Domain or Application type calls a service-registration method. |
-| ARCH.CONVENTION.003 | inspection | `ArchitectureTests` asserts each scanned project exposes exactly one public assembly marker type. |
+| BACKEND.ARCHITECTURE.PROJECTS.001 | inspection | `SolutionStructureTests` asserts the solution contains the four baseline projects and no additional layer project. |
+| BACKEND.ARCHITECTURE.DEPENDENCIES.001 | inspection | `ArchitectureTests` asserts the project reference graph matches the inward matrix in the dependencies convention. |
+| BACKEND.ARCHITECTURE.CONTRACTS.001 | inspection | `ArchitectureTests` asserts no Application result or WebApi model exposes a Domain type across the layer boundary. |
+| BACKEND.ARCHITECTURE.APPLICATION.001 | inspection | `SolutionStructureTests` asserts one Application project holds every command, query, handler, and port type. |
+| BACKEND.ARCHITECTURE.MODULES.001 | static | `ArchitectureTests` asserts each layer folder path resolves to a declared module and aggregate, with no project-wide type folders. |
+| BACKEND.ARCHITECTURE.VISIBILITY.001 | inspection | `ArchitectureTests` asserts every handler, validator, repository implementation, and endpoint type is internal and sealed. |
+| BACKEND.ARCHITECTURE.DOMAIN.001 | inspection | `ArchitectureTests` asserts no command handler references an invariant identifier that its aggregate already enforces. |
+| BACKEND.ARCHITECTURE.CQRS.001 | inspection | `ArchitectureTests` asserts no query handler resolves a repository and no command handler resolves a read session. |
+| BACKEND.ARCHITECTURE.WORKER.001 | inspection | The Worker project decision record names the durable or scheduled boundary that requires an independent process. |
+| BACKEND.ARCHITECTURE.ENFORCEMENT.001 | test | `ArchitectureTests` runs in the Release test pass and covers each declared structural boundary. |
+| BACKEND.ARCHITECTURE.COMPOSITION.001 | inspection | `CompositionTests` asserts no registration path builds a second provider or resolves a service locator. |
+| BACKEND.ARCHITECTURE.CONVENTION.001 | inspection | Folder review compares each layer tree against its module list, or records a named local replacement. |
+| BACKEND.ARCHITECTURE.CONVENTION.002 | inspection | `ArchitectureTests` asserts no Domain or Application type calls a service-registration method. |
+| BACKEND.ARCHITECTURE.CONVENTION.003 | inspection | `ArchitectureTests` asserts each scanned project exposes exactly one public assembly marker type. |
