@@ -2,8 +2,17 @@
 
 ## v1.11.1
 
-- Repaired the baseline conventions so each Requirement and Default states its complete obligation, each evidence row names a real command, path, or test, and each Agent Summary bullet compresses its provision instead of repeating it. Repaired so far: `docs/conventions/backend/api.md`.
-- Split compound API provisions that carried two normative modals into separate identified assertions: `API.ENDPOINTS.002`, `API.BOUNDARY.002`, `API.ACTOR.002`, `API.ERRORS.002`, `API.STATUS.002`, `API.OPENAPI.004`, and `API.MODELS.002`.
+- Repaired every baseline provision whose Requirement or Default only restated its own heading. The v1.11.0 conversion had moved each real obligation into `Rationale`, which the authoring standard declares informative, leaving the baseline formally non-normative. All 289 provisions across the 19 conventions, the platform profile, and the engineering system foundation now state their obligation in the normative block.
+- Rewrote every templated evidence row. A verification row now names the command, path, test, or assertion that produces the result instead of repeating its provision heading.
+- Rewrote every Agent Summary bullet that repeated its provision verbatim, so Tier 1 compresses Tier 2 again rather than duplicating it.
+- Split compound provisions that carried two normative modals into separate identified assertions, including `API.ENDPOINTS.002`, `API.BOUNDARY.002`, `API.ACTOR.002`, `API.ERRORS.002`, `API.STATUS.002`, `API.OPENAPI.004`, `API.MODELS.002`, and `AGENTIC.EXTENSIONS.002`.
+- Gave each page one Standards identifier prefix. `MARTEN.CONVENTION.*` became `PERSIST.CONVENTION.*`, component provisions became `COMPONENT.*`, rendering provisions became `RENDER.*`, `STATE.*` and `FORM.*` merged into `DATA.*`, and idempotency provisions moved under `EXT.CONCURRENCY.*`.
+- Replaced the expiring ESLint note in the platform profile with `CONFIG.ESLINT.001`, which requires a concrete `settings.react.version` in the flat config.
+- Reduced the extension index to a selection table and cited pointers. Its numbered activation procedure and uncited prohibitions duplicated `SCOPE.EXTENSIONS.001`, `CORE.COMPLEXITY.002`, and `AGENTIC.EXTENSIONS.001`.
+- Linked every step of `docs/guides/getting-started.md` to the standard that governs it and grouped the steps into pin, configure, structure, specify, implement, and operate stages.
+- Replaced the duplicated consumer gate commands in `AGENTS.md` with a citation to `CI.GATES.001`, which owns them.
+- Added the `Standard` and `Workspace` glossary terms and renamed the `Repository` entry to `Repository (Domain port)`, so the Git sense and the Domain port sense no longer share one term.
+- Promoted every authoring rule to an error. `WARNING_DIAGNOSTIC_CODES` is now empty, so a provision that restates its heading, an evidence row that names no artifact, a summary that repeats its provision, or a page with two identifier prefixes fails the build.
 
 ## v1.11.0
 
