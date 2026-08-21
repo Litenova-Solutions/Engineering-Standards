@@ -5,6 +5,7 @@ State the constraint, decision, or defect that requires the change.
 ## Verification
 
 - [ ] `node tools/validate-standards.cases.mjs`
+- [ ] `node tools/generate-provisions.mjs`
 - [ ] `node tools/validate-standards.mjs`
 - [ ] `node tools/validate-ui.cases.mjs`
 - [ ] `node tools/validate-consumer.cases.mjs`
@@ -13,6 +14,8 @@ State the constraint, decision, or defect that requires the change.
 ## Authoring Review
 
 - [ ] Each active ID identifies one current assertion.
+- [ ] Each new ID uses the declared page scope and a registered topic.
+- [ ] The regenerated provision index is committed.
 - [ ] Each provision uses active voice and names its actor.
 - [ ] Each provision contains one testable meaning.
 - [ ] Terminology matches the glossary.

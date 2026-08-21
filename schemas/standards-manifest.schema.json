@@ -11,16 +11,18 @@
     "agentsEntry",
     "defaultProfile",
     "paths",
+    "provisionRegistry",
     "profiles",
     "extensions",
     "stack",
     "packages",
     "uiBaseline",
+    "overridePolicy",
     "loadPlans"
   ],
   "properties": {
     "$schema": { "type": "string" },
-    "schemaVersion": { "const": 3 },
+    "schemaVersion": { "const": 4 },
     "version": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"
@@ -31,11 +33,42 @@
     "paths": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["docs", "templates", "extensions"],
+      "required": ["docs", "template", "extension"],
       "properties": {
         "docs": { "$ref": "#/$defs/repositoryPath" },
-        "templates": { "$ref": "#/$defs/repositoryPath" },
-        "extensions": { "$ref": "#/$defs/repositoryPath" }
+        "template": { "$ref": "#/$defs/repositoryPath" },
+        "extension": { "$ref": "#/$defs/repositoryPath" }
+      }
+    },
+    "provisionRegistry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["areas", "topics"],
+      "properties": {
+        "areas": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/idArea" }
+        },
+        "topics": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/idArea" }
+        }
+      }
+    },
+    "overridePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requiresReviewBy"],
+      "properties": {
+        "requiresReviewBy": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/idScope" }
+        }
       }
     },
     "profiles": {
@@ -44,10 +77,10 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["entry", "documents"],
+        "required": ["entry", "pages"],
         "properties": {
           "entry": { "$ref": "#/$defs/repositoryPath" },
-          "documents": {
+          "pages": {
             "type": "array",
             "minItems": 1,
             "uniqueItems": true,
@@ -157,6 +190,14 @@
     "identifier": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "idArea": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*$"
+    },
+    "idScope": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*$"
     },
     "repositoryPath": {
       "type": "string",

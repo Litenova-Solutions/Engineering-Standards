@@ -88,9 +88,9 @@ function build() {
   for (const schema of fs.readdirSync(path.join(repository, 'schemas'))) {
     fs.copyFileSync(path.join(repository, 'schemas', schema), path.join(fixture, 'standards/schemas', schema));
   }
-  writeJson(projectFile, resolvePlaceholders(readJson(path.join(repository, 'templates/docs/standards.project.json'))));
-  fs.copyFileSync(path.join(repository, 'templates/docs/ui-vocabulary.json'), vocabularyFile);
-  fs.copyFileSync(path.join(repository, 'templates/docs/ui-page.json'), path.join(fixture, 'docs/ui/web/page.ui.json'));
+  writeJson(projectFile, resolvePlaceholders(readJson(path.join(repository, 'templates/consumer/standards.project.json'))));
+  fs.copyFileSync(path.join(repository, 'templates/consumer/ui-vocabulary.json'), vocabularyFile);
+  fs.copyFileSync(path.join(repository, 'templates/consumer/ui-page.json'), path.join(fixture, 'docs/ui/web/page.ui.json'));
   // The sidecar is only reachable through a page specification, so the fixture
   // carries the matching page document.
   fs.writeFileSync(
@@ -111,7 +111,7 @@ function build() {
       2,
     )}\n---\n\n# Fixture page\n`,
   );
-  fs.copyFileSync(path.join(repository, 'templates/docs/ui-source-lock.json'), path.join(fixture, 'apps/web/ui-source-lock.json'));
+  fs.copyFileSync(path.join(repository, 'templates/consumer/ui-source-lock.json'), path.join(fixture, 'apps/web/ui-source-lock.json'));
   fs.writeFileSync(path.join(fixture, 'apps/web/components/ui/button.tsx'), 'export function Button() {\n  return null;\n}\n');
   fs.writeFileSync(globalCss, cleanCss);
   fs.writeFileSync(path.join(fixture, 'docs/decisions/ui-override.md'), '# Override\n');
@@ -184,8 +184,8 @@ function configCase(name, mutate, expectation) {
   writeJson(projectFile, project);
   writeJson(vocabularyFile, vocabulary);
   report(name, expectation, run());
-  writeJson(projectFile, resolvePlaceholders(readJson(path.join(repository, 'templates/docs/standards.project.json'))));
-  fs.copyFileSync(path.join(repository, 'templates/docs/ui-vocabulary.json'), vocabularyFile);
+  writeJson(projectFile, resolvePlaceholders(readJson(path.join(repository, 'templates/consumer/standards.project.json'))));
+  fs.copyFileSync(path.join(repository, 'templates/consumer/ui-vocabulary.json'), vocabularyFile);
 }
 
 build();
@@ -204,7 +204,7 @@ sourceCase('a class name inside a comment is prose', 'export const C = () => {\n
 pathCase('generated native web asset is ignored', 'apps/web/android/app/src/main/assets/public/_next/static/css/generated.css', '.generated { color: red; }\n', null);
 pathCase('authored feature CSS is rejected', 'apps/web/features/generated.css', '.generated { color: red; }\n', 'CSS file is outside the designated global CSS entry');
 
-console.log('\nRestricted Tailwind use (UI.TAILWIND.001)');
+console.log('\nRestricted Tailwind use (FRONTEND.UI.TAILWIND.001)');
 sourceCase('arbitrary length', 'export const C = () => <div className="w-[37rem]" />;', "arbitrary Tailwind value requires a semantic token or declared variant 'w-[37rem]'");
 sourceCase('arbitrary radius', 'export const C = () => <div className="rounded-[11px]" />;', "'rounded-[11px]'");
 sourceCase('arbitrary color', 'export const C = () => <div className="bg-[#19324a]" />;', "'bg-[#19324a]'");
@@ -221,23 +221,23 @@ cssCase('feature selector in the global entry', `${cleanCss}.promo-card{color:re
 cssCase('apply directive outside the generated base layer', `${cleanCss}@layer components {\n  .btn { @apply px-4 py-2; }\n}\n`, "'@apply' outside the generated '@layer base' block");
 cssCase('unapproved global import', `${cleanCss}@import "bootstrap/dist/css/bootstrap.css";\n`, "import 'bootstrap/dist/css/bootstrap.css' is outside the approved global CSS surface");
 
-console.log('\nSource boundary (UI.GOVERNANCE.001)');
+console.log('\nSource boundary (FRONTEND.UI.GOVERNANCE.001)');
 sourceCase('primitive vendor import in feature code', 'import { Dialog } from "@base-ui/react";\nexport const C = () => <Dialog />;', 'direct UI vendor import is outside the primitive boundary');
 configCase('second visual system in the workspace root', () => {
   writeJson(path.join(fixture, 'package.json'), { name: 'fixture', dependencies: { '@mui/material': '7.0.0' } });
 }, "second general-purpose visual dependency '@mui/material' requires an override");
 fs.rmSync(path.join(fixture, 'package.json'), { force: true });
 configCase('UI override without a review date', (project) => {
-  project.overrides = [{ ruleId: 'UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md' }];
+  project.overrides = [{ provisionId: 'FRONTEND.UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md' }];
 }, "a UI rule override requires 'reviewBy'");
 configCase('UI override with an expired review date', (project) => {
-  project.overrides = [{ ruleId: 'UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md', reviewBy: '2020-01-01' }];
+  project.overrides = [{ provisionId: 'FRONTEND.UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md', reviewBy: '2020-01-01' }];
 }, 'has passed; renew the decision or complete the migration');
 configCase('UI override with a live review date', (project) => {
-  project.overrides = [{ ruleId: 'UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
+  project.overrides = [{ provisionId: 'FRONTEND.UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
 }, null);
 
-console.log('\nBaseline configuration (UI.SHADCN.001, UI.VOCABULARY.001, UI.FORKS.001)');
+console.log('\nBaseline configuration (FRONTEND.UI.SHADCN.001, FRONTEND.UI.VOCABULARY.001, FRONTEND.UI.FORKS.001)');
 configCase('compatibility base without a stated components style', (project, vocabulary) => {
   project.paths.frontends[0].ui.base = 'radix-ui';
   project.paths.frontends[0].ui.overrideDecision = 'docs/decisions/ui-override.md';
@@ -261,7 +261,7 @@ configCase('page contract state outside the vocabulary', (project, vocabulary) =
   vocabulary.states = vocabulary.states.filter((state) => state.id !== 'empty');
 }, "unknown state 'empty'");
 
-console.log('\nPage contracts (UI.PAGE.SPEC.001)');
+console.log('\nPage contracts (FRONTEND.UI.PAGE.001)');
 const sidecar = path.join(fixture, 'docs/ui/web/page.ui.json');
 const sidecarContract = readJson(sidecar);
 fs.rmSync(sidecar);
@@ -270,9 +270,9 @@ writeJson(sidecar, { ...sidecarContract, shell: 'invented-shell/default' });
 report('page contract naming an unlisted shell', "unknown shell 'invented-shell/default'", run());
 writeJson(sidecar, { ...sidecarContract, regions: [{ ...sidecarContract.regions[0], pattern: 'invented-pattern/default' }] });
 report('page contract naming an unlisted pattern', "unknown pattern 'invented-pattern/default'", run());
-fs.copyFileSync(path.join(repository, 'templates/docs/ui-page.json'), sidecar);
+fs.copyFileSync(path.join(repository, 'templates/consumer/ui-page.json'), sidecar);
 
-console.log('\nSource lock (UI.FORKS.001)');
+console.log('\nSource lock (FRONTEND.UI.FORKS.001)');
 fs.appendFileSync(path.join(fixture, 'apps/web/components/ui/button.tsx'), '// local change\n');
 report('changed baseline source without a fork record', 'no longer matches the baseline digest', run());
 fs.writeFileSync(path.join(fixture, 'apps/web/components/ui/button.tsx'), 'export function Button() {\n  return null;\n}\n');

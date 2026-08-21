@@ -25,6 +25,9 @@ jobs:
       - name: Run standards validator cases
         run: node tools/validate-standards.cases.mjs
 
+      - name: Check the generated provision index
+        run: node tools/generate-provisions.mjs --check
+
       - name: Validate standards
         run: node tools/validate-standards.mjs
 

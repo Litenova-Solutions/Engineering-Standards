@@ -58,7 +58,7 @@ A replaceable default for a name, location, file shape, or implementation patter
 
 ## Convention ID
 
-A canonical uppercase dotted identifier containing `CONVENTION`, such as `API.CONVENTION.001`.
+A provision ID whose topic segment is `CONVENTION`, such as `BACKEND.API.CONVENTION.001`, which marks a replaceable default.
 
 ## Current standards material
 
@@ -83,6 +83,10 @@ An immutable, package-free Domain record describing a completed fact inside the 
 ## Domain policy
 
 An accepted business rule outside one aggregate invariant and identified as `POL-{POLICY}-{NN}`.
+
+## Domain rule ID
+
+A consumer domain rule identifier such as `INV-ORDERS-01`, whose prefix names its enforcement classification.
 
 ## End-to-end flow
 
@@ -128,13 +132,25 @@ Required for a conforming consumer through an identified Standards provision.
 
 An enforced, tested, supported, or alerting boundary for system operation.
 
+## Page
+
+One authored Markdown file under `docs/`, carrying the section contract of its page class.
+
+## Page class
+
+One of `topic`, `profile`, `extension`, `guide`, `index`, or `glossary`, which selects the required section order for a page.
+
+## Page scope
+
+The `AREA.PAGE` prefix that `standards.manifest.json` declares for one normative page, such as `FRONTEND.COMPONENTS`.
+
 ## Persistence constraint
 
 A rule enforced by durable storage, such as uniqueness, a required relationship, or a bounded value.
 
 ## Platform profile
 
-A supported composition of architecture, frameworks, project layout, and baseline conventions.
+A supported composition of architecture, frameworks, project layout, and baseline pages.
 
 ## Product
 
@@ -147,6 +163,10 @@ A process deriving a Read Model from authoritative facts with the delivery guara
 ## Provision
 
 One identified Standard or Convention block with one Requirement or replaceable Default and one evidence mapping.
+
+## Provision ID
+
+The four-segment `AREA.PAGE.TOPIC.NNN` identifier of one provision, such as `FRONTEND.COMPONENTS.OWNERSHIP.001`.
 
 ## Query
 
@@ -168,10 +188,6 @@ A Domain-owned port that loads and stages complete aggregates without exposing g
 
 A use-case metadata value that activates additional specification and verification for a named area of potential harm or failure.
 
-## Rule ID
-
-A canonical uppercase dotted identifier, such as `APP.COMMAND.001`, that identifies one Standard and can appear in a consumer override.
-
 ## Specification
 
 An approved, versioned statement of required behavior or constraint that persists beyond one task or agent session.
@@ -190,7 +206,7 @@ One identified Standards provision stating a required boundary for a conforming 
 
 ## Standards override
 
-A consumer replacement for one Standard, identified by its rule ID and an accepted project decision.
+A consumer replacement for one Standard, identified by its provision ID and an accepted project decision.
 
 ## Standards release
 

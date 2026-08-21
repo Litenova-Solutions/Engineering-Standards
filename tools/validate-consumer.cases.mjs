@@ -2,7 +2,7 @@
 // Reference passing and failing cases for the consumer validator.
 //
 // The fixture is a throwaway consumer built from the tracked templates in
-// templates/docs/, with placeholders resolved to values that satisfy the
+// templates/consumer/, with placeholders resolved to values that satisfy the
 // directory grammar. Every case mutates one file, runs
 // tools/validate-consumer.mjs against the fixture, and asserts that the rule
 // fires or stays silent. A rule without a case here is unverified, so add both
@@ -60,7 +60,7 @@ const LAYOUT = [
   ['end-to-end-flow.md', 'docs/product/flows/event-sales.md'],
   ['domain-index.md', 'docs/domain/README.md'],
   ['glossary.md', 'docs/domain/glossary.md'],
-  ['modules-index.md', 'docs/domain/modules/README.md'],
+  ['module-index.md', 'docs/domain/modules/README.md'],
   ['module.md', 'docs/domain/modules/orders/README.md'],
   ['use-case.md', 'docs/domain/modules/orders/cancel-order.md'],
   ['aggregate.md', 'docs/domain/modules/orders/order-claims/README.md'],
@@ -105,13 +105,13 @@ function joinMeta(meta, body) {
 function build() {
   // The project file drives path resolution. The fixture declares no frontend,
   // so the controlled UI validator stays out of these cases.
-  const project = JSON.parse(resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/docs/standards.project.json'), 'utf8')));
+  const project = JSON.parse(resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/consumer/standards.project.json'), 'utf8')));
   project.paths.frontends = [];
   writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
   fs.mkdirSync(path.join(fixture, 'standards'), { recursive: true });
   fs.copyFileSync(path.join(repository, 'standards.manifest.json'), path.join(fixture, 'standards/standards.manifest.json'));
   for (const [template, target] of LAYOUT) {
-    writeFile(target, resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/docs', template), 'utf8')));
+    writeFile(target, resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/consumer', template), 'utf8')));
   }
 }
 
@@ -190,7 +190,7 @@ fileCase('duplicate acceptance id', 'docs/domain/modules/orders/second.md', `---
 fileCase('second product specification', 'docs/product/second.md', `---\n${JSON.stringify({ kind: 'product', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second product\n`, 'Expected exactly one product specification, found 2');
 fileCase('broken internal link', 'docs/domain/modules/orders/linking.md', '# Linking\n\nSee the [absent record](./absent.md).\n', 'broken link');
 
-console.log('\nUse-case directory grammar (AGENTIC.CONVENTION.002)');
+console.log('\nUse-case directory grammar (CORE.SYSTEM.CONVENTION.002)');
 report('flat single-aggregate module resolves', null, run());
 fileCase(
   'nested aggregate subdirectory resolves',
@@ -205,9 +205,9 @@ fileCase(
   'does not match its path',
 );
 
-console.log('\nExtension scope (AGENTIC.EXTENSIONS.001)');
-metaCase('local extension that the project did not select', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.applicableExtensions = ['caching']; }, "'caching' is not in selectedExtensions");
-projectCase('selected local extension on an allowed kind', (p) => { p.selectedExtensions = ['caching']; }, null);
+console.log('\nExtension scope (CORE.SYSTEM.EXTENSIONS.001)');
+metaCase('local extension that the project did not select', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.applicableExtensions = ['cache']; }, "'cache' is not in selectedExtensions");
+projectCase('selected local extension on an allowed kind', (p) => { p.selectedExtensions = ['cache']; }, null);
 
 {
   // A selected local extension is valid on an allowed kind and invalid on a
@@ -215,20 +215,20 @@ projectCase('selected local extension on an allowed kind', (p) => { p.selectedEx
   // valid in local metadata.
   const originalProject = readFixture('standards.project.json');
   const project = JSON.parse(originalProject);
-  project.selectedExtensions = ['caching', 'localization'];
+  project.selectedExtensions = ['cache', 'locale'];
   writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
-  metaCase('selected local extension on its allowed kind', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.applicableExtensions = ['caching']; }, null);
-  metaCase('local extension on an excluded kind', 'docs/domain/modules/orders/README.md', (m) => { m.applicableExtensions = ['caching']; }, "is not applicable to kind 'module'");
-  metaCase('project-scoped extension in local metadata', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.applicableExtensions = ['localization']; }, 'must not be listed in local metadata');
+  metaCase('selected local extension on its allowed kind', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.applicableExtensions = ['cache']; }, null);
+  metaCase('local extension on an excluded kind', 'docs/domain/modules/orders/README.md', (m) => { m.applicableExtensions = ['cache']; }, "is not applicable to kind 'module'");
+  metaCase('project-scoped extension in local metadata', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.applicableExtensions = ['locale']; }, 'must not be listed in local metadata');
   writeFile('standards.project.json', originalProject);
 }
 
-console.log('\nAdoption gate (WRITING.SNAPSHOT.006)');
+console.log('\nAdoption gate (CORE.AUTHORING.SNAPSHOT.006)');
 projectCase('reviewed release matches the pinned release', () => {}, null);
 projectCase('reviewed release is behind the pinned release', (p) => { p.reviewedStandardsVersion = '1.11.0'; }, 'does not match the pinned standards');
 projectCase('reviewed release is absent', (p) => { delete p.reviewedStandardsVersion; }, "missing 'reviewedStandardsVersion'");
 
-console.log('\nMetadata carrier (WRITING.METADATA.002)');
+console.log('\nMetadata carrier (CORE.AUTHORING.METADATA.002)');
 fileCase(
   'metadata in a fenced block instead of the carrier',
   'docs/domain/modules/orders/fenced.md',

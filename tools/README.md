@@ -27,6 +27,8 @@ The validator checks:
 - Internal links, anchors, and manifest paths.
 - Extension declarations and profile composition.
 - The two tracked schema consumers.
+- The declared provision identity registry and topic vocabulary.
+- The generated provision index.
 - Current standards material.
 
 Exit code `0` means pass. Code `1` means validation failed. Code `2` means the input or command usage is invalid.
@@ -44,6 +46,22 @@ Run its fixture suite after changing authoring rules or validator behavior:
 ```bash
 node tools/validate-standards.cases.mjs
 ```
+
+## Generate the Provision Index
+
+`docs/reference/provisions.md` resolves every provision ID to its heading and owning page. It is derived, so regenerate it after any provision change:
+
+```bash
+node tools/generate-provisions.mjs
+```
+
+Pass `--check` to compare without writing. The command exits `1` when the page and the active standards disagree, and the repository validator reports the same defect as `PROVISIONS_STALE`.
+
+```bash
+node tools/generate-provisions.mjs --check
+```
+
+`tools/provisions.mjs` builds the page content. The generator and the validator both call it, so the checked-in page and its gate cannot disagree.
 
 ## Validate a Consumer
 

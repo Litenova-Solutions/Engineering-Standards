@@ -4,30 +4,36 @@ Submit changes through a branch and pull request against `main`. Direct pushes t
 
 ## Authoring Contract
 
-Follow the [authoring standard](docs/foundations/authoring-standard.md) for every active standards page, template, instruction, and release note.
+Follow the [authoring standard](docs/core/authoring.md) for every active standards page, template, instruction, and release note.
 
-Keep one canonical source for each provision, version, extension, and technical fact. Link to that source instead of copying it. (CORE.SOURCE.001)
+Keep one canonical source for each provision, version, extension, and technical fact. Link to that source instead of copying it. (CORE.PRINCIPLES.SOURCE.001)
 
 ## Current Snapshot
 
-Treat active standards as the complete current contract. (WRITING.SNAPSHOT.001)
+Treat active standards as the complete current contract. (CORE.AUTHORING.SNAPSHOT.001)
 
-Do not retain history-specific paths, IDs, terminology, aliases, maps, standards-release migration material, compatibility rules, or transition checks. (WRITING.SNAPSHOT.002)
+Do not retain history-specific paths, IDs, terminology, aliases, maps, standards-release migration material, compatibility rules, or transition checks. (CORE.AUTHORING.SNAPSHOT.002)
 
-Keep release context in `CHANGELOG.md` and Git history. The repository validator evaluates current material only. (WRITING.SNAPSHOT.001)
+Keep release context in `CHANGELOG.md` and Git history. The repository validator evaluates current material only. (CORE.AUTHORING.SNAPSHOT.001)
 
 ## Provision Changes
 
 A new or changed Standard includes:
 
-- One atomic Requirement with one rule ID.
-- An informative example when `WRITING.EXAMPLE.001` requires one.
+- One atomic Requirement with one provision ID under the page scope the manifest declares. (CORE.AUTHORING.IDENTIFIER.001)
+- An informative example when `CORE.AUTHORING.EXAMPLE.001` requires one.
 - One exact Verification row.
 - A current changelog entry.
 
-Assign a new ID to each changed Standard assertion. (WRITING.REQUIREMENT.001)
+Assign a new ID to each changed Standard assertion. (CORE.AUTHORING.REQUIREMENT.001)
 
-Do not add aliases, replacement maps, alternate paths, compatibility terms, or transition material. (WRITING.SNAPSHOT.002)
+A provision ID uses `AREA.PAGE.TOPIC.NNN`. Reserve the `CONVENTION` topic for replaceable defaults. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002)
+
+Place a new page at `docs/<area>/<page>.md`, where each part is one lowercase word. The path states the provision scope. (CORE.AUTHORING.IDENTIFIER.001)
+
+Register a new topic word in `provisionRegistry.topics`. Reuse the existing word when one already names the concept. (CORE.AUTHORING.IDENTIFIER.003)
+
+Do not add aliases, replacement maps, alternate paths, compatibility terms, or transition material. (CORE.AUTHORING.SNAPSHOT.002)
 
 An actionable Convention includes one convention ID, Default statement, Replacement statement, and Verification row.
 
@@ -48,6 +54,7 @@ Before review:
 - Confirm extension declarations match the manifest.
 - Validate the two tracked schema consumers.
 - Update affected templates and validator cases.
+- Run `node tools/generate-provisions.mjs` and commit the regenerated index. (CORE.AUTHORING.INDEX.001)
 - Update the changelog.
 - Run `git diff --check`.
 
@@ -59,19 +66,19 @@ The pull request checklist records the manual active-voice, terminology, atomici
 
 ## Release Numbering
 
-The [authoring standard](docs/foundations/authoring-standard.md) owns the release model, including the meaning of each version number. This section projects that model for contributors.
+The [authoring standard](docs/core/authoring.md) owns the release model, including the meaning of each version number. This section projects that model for contributors.
 
-Each release states its complete contract without depending on an earlier release. (WRITING.SNAPSHOT.003)
+Each release states its complete contract without depending on an earlier release. (CORE.AUTHORING.SNAPSHOT.003)
 
-Do not add a compatibility guarantee, migration path, deprecation period, replacement map, or identifier alias between standards releases. (WRITING.SNAPSHOT.004)
+Do not add a compatibility guarantee, migration path, deprecation period, replacement map, or identifier alias between standards releases. (CORE.AUTHORING.SNAPSHOT.004)
 
-A consumer keeps a pinned release for as long as that consumer chooses, and absorbs every difference when adopting a later release. (WRITING.SNAPSHOT.005)
+A consumer keeps a pinned release for as long as that consumer chooses, and absorbs every difference when adopting a later release. (CORE.AUTHORING.SNAPSHOT.005)
 
-A consumer records the release it reviewed in `reviewedStandardsVersion`, so adopting a later release is an explicit act. (WRITING.SNAPSHOT.006)
+A consumer records the release it reviewed in `reviewedStandardsVersion`, so adopting a later release is an explicit act. (CORE.AUTHORING.SNAPSHOT.006)
 
-`WRITING.SNAPSHOT.004` covers standards releases only. A consumer product is a running service, and its own API compatibility, migration, deprecation, and rollback provisions still apply.
+`CORE.AUTHORING.SNAPSHOT.004` covers standards releases only. A consumer product is a running service, and its own API compatibility, migration, deprecation, and rollback provisions still apply.
 
-`CHANGELOG.md` is the repository release note. The changelog describes the current contract without prescribing a transition path. (WRITING.SNAPSHOT.001)
+`CHANGELOG.md` is the repository release note. The changelog describes the current contract without prescribing a transition path. (CORE.AUTHORING.SNAPSHOT.001)
 
 ## Maintainer Review
 
