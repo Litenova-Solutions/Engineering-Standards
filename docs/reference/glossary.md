@@ -58,7 +58,7 @@ A replaceable default for a name, location, file shape, or implementation patter
 
 ## Convention ID
 
-A canonical uppercase dotted identifier containing `CONVENTION`, such as `BACKEND.API.CONVENTION.001`.
+A provision ID whose topic segment is `CONVENTION`, such as `BACKEND.API.CONVENTION.001`, which marks a replaceable default.
 
 ## Current standards material
 
@@ -128,6 +128,10 @@ Required for a conforming consumer through an identified Standards provision.
 
 An enforced, tested, supported, or alerting boundary for system operation.
 
+## Page scope
+
+The `AREA.PAGE` prefix that `standards.manifest.json` declares for one normative page, such as `FRONTEND.COMPONENTS`.
+
 ## Persistence constraint
 
 A rule enforced by durable storage, such as uniqueness, a required relationship, or a bounded value.
@@ -147,6 +151,10 @@ A process deriving a Read Model from authoritative facts with the delivery guara
 ## Provision
 
 One identified Standard or Convention block with one Requirement or replaceable Default and one evidence mapping.
+
+## Provision ID
+
+The four-segment `AREA.PAGE.TOPIC.NNN` identifier of one provision, such as `FRONTEND.COMPONENTS.OWNERSHIP.001`.
 
 ## Query
 
@@ -170,7 +178,7 @@ A use-case metadata value that activates additional specification and verificati
 
 ## Rule ID
 
-A canonical uppercase dotted identifier, such as `BACKEND.APPLICATION.COMMAND.001`, that identifies one Standard and can appear in a consumer override.
+A provision ID that identifies one Standard, such as `BACKEND.APPLICATION.COMMAND.001`, and can appear in a consumer override.
 
 ## Specification
 

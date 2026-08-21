@@ -221,6 +221,10 @@ run('uncited agent projection', (root) => write(root, 'AGENTS.md', '# Agent Cont
 run('missing provision ID', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('### Keep the topic bounded (FIXTURE.TOPIC.BOUNDARY.001)', '### Keep the topic bounded')), ['ID_MISSING']);
 run('misplaced provision ID', (root) => write(root, 'docs/guides/sample.md', guide.replace('## Procedure', '## Procedure\n\n### Keep extra work bounded (FIXTURE.TOPIC.EXTRA.001)\n\nRecord one informative note.')), ['ID_LOCATION']);
 run('unknown active ID', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites FIXTURE.UNKNOWN.RULE.001.\n'), ['ID_UNKNOWN_REFERENCE']);
+// A stale three-part identifier must still surface. Only grammar notation with no
+// three-digit tail is exempt from the citation scan.
+run('stale three-part citation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites TOPIC.BOUNDARY.001.\n'), ['ID_UNKNOWN_REFERENCE']);
+run('grammar notation is not a citation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nAn identifier uses AREA.PAGE.TOPIC.NNN as its grammar.\n'), []);
 
 run('unsupported modal vocabulary', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('Consumers MUST keep the topic inside its declared boundary.', 'Consumers MUST keep the topic bounded and SHALL record its owner.')), ['RULE_MODAL_VOCABULARY']);
 run('multiple requirement sentences', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('Consumers MUST keep the topic inside its declared boundary.', 'Consumers MUST keep the topic inside its boundary. Reviewers inspect the result.')), ['RULE_SENTENCE_COUNT']);
@@ -235,6 +239,7 @@ run('label order', (root) => write(root, 'docs/foundations/topic.md', foundation
 run('unlabeled provision content', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('**Rationale:** The boundary gives reviewers one testable result.', 'Additional constraint.\n\n**Rationale:** The boundary gives reviewers one testable result.')), ['RULE_UNLABELED_CONTENT']);
 
 run('invalid convention ID', (root) => write(root, 'docs/foundations/topic.md', foundation.replaceAll('FIXTURE.TOPIC.CONVENTION.001', 'FIXTURE.TOPIC.DEFAULT.001')), ['CONVENTION_ID']);
+run('Standard reserving the CONVENTION segment', (root) => write(root, 'docs/foundations/topic.md', foundation.replaceAll('FIXTURE.TOPIC.BOUNDARY.001', 'FIXTURE.TOPIC.CONVENTION.002')), ['CONVENTION_ID']);
 run('missing convention replacement', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('**Replacement:** A consumer can name another location through an explicit local convention.\n', '')), ['CONVENTION_MISSING_REPLACEMENT']);
 run('default sentence count', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('Store the topic in its owning documentation area.', 'Store the topic in its owning documentation area. Record the path.')), ['CONVENTION_DEFAULT_SENTENCE']);
 run('replacement sentence count', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('A consumer can name another location through an explicit local convention.', 'A consumer can name another location. The local convention records it.')), ['CONVENTION_REPLACEMENT_SENTENCE']);

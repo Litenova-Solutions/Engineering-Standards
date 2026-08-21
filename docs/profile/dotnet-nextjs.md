@@ -52,6 +52,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 - [Application](../conventions/backend/application.md)
 - [Marten persistence](../conventions/backend/persistence-marten.md)
 - [HTTP API](../conventions/backend/api.md)
+- [Backend testing](../conventions/backend/testing.md)
 
 ### Frontend
 
@@ -64,7 +65,6 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 ### Quality and operations
 
-- [Backend testing](../conventions/backend/testing.md)
 - [Security](../conventions/quality/security.md)
 - [Operations](../conventions/quality/operations.md)
 - [Continuous integration](../conventions/quality/ci.md)

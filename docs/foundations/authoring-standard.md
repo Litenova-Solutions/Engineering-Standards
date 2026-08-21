@@ -8,6 +8,7 @@ The standards use one document grammar and one controlled technical prose profil
 
 - Use controlled technical prose with repository terminology. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.TERM.001)
 - Write one testable obligation in each Standards provision. (CORE.AUTHORING.NORMATIVE.002, CORE.AUTHORING.REQUIREMENT.001)
+- Name the declared page scope in every provision ID. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002)
 - Give each actionable default a distinct convention ID. (CORE.AUTHORING.DEFAULTS.001)
 - Apply the declared contract for each page class. (CORE.AUTHORING.PAGE.001)
 - Keep summaries informative and cite every projected provision. (CORE.AUTHORING.SUMMARY.001)
@@ -106,7 +107,7 @@ This release model governs the standards repository. A consumer product is a run
 ### Standards provision contract
 
 ```markdown
-### State one action (SCOPE.TOPIC.001)
+### State one action (AREA.PAGE.TOPIC.001)
 
 **Requirement:** The named actor MUST perform one testable action.
 
@@ -130,7 +131,7 @@ The uppercase normative vocabulary is `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`
 ### Convention provision contract
 
 ```markdown
-### Use the default name (CORE.SCOPE.CONVENTION.001)
+### Use the default name (AREA.PAGE.CONVENTION.001)
 
 **Default:** Use the stated default for this boundary.
 
@@ -141,11 +142,26 @@ The uppercase normative vocabulary is `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`
 **Example:** Optional informative example.
 ```
 
-Every actionable convention has an ID matching `<OWNING-SCOPE>.CONVENTION.<NNN>`. Convention blocks contain no uppercase normative modal.
+Every actionable convention has an ID matching `AREA.PAGE.CONVENTION.NNN`. Convention blocks contain no uppercase normative modal.
 
 The `overrides[].ruleId` field accepts only Standards IDs. A local convention cites its convention ID in owning local documentation.
 
 ### Provision identity
+
+Every provision ID uses four uppercase segments: `AREA.PAGE.TOPIC.NNN`.
+
+| Segment | Source | Purpose |
+|:---|:---|:---|
+| `AREA` | `idRegistry.areas` in the manifest | Names the subject area a reader loads |
+| `PAGE` | `idRegistry.pages` in the manifest | Names the one page that owns the assertion |
+| `TOPIC` | The authoring page | Names the assertion inside that page |
+| `NNN` | The authoring page | Orders assertions that share one topic |
+
+The eight areas are `CORE`, `PLATFORM`, `WORKSPACE`, `BACKEND`, `FRONTEND`, `BLAZOR`, `QUALITY`, and `EXT`.
+
+`AREA.PAGE` is the page scope. The manifest declares one scope for each normative page, and no two pages share a scope. A citation therefore names the page a reader must open, so `FRONTEND.COMPONENTS.OWNERSHIP.001` resolves without a lookup step.
+
+`CONVENTION` is a reserved `TOPIC` value. A replaceable default uses it and a Standards provision does not, so the ID states normative force. An `EXT` area marks a provision that applies only when its extension is active.
 
 An active provision ID identifies its current assertion. A changed, split, merged, or newly normative provision receives a new ID.
 
@@ -165,7 +181,7 @@ Every normative page ends with a Verification table:
 ```markdown
 | ID | Method | Evidence |
 |:---|:---|:---|
-| SCOPE.TOPIC.001 | static, test | `ScopeTopicTests` asserts exact command, artifact, test, assertion, or observable result. |
+| AREA.PAGE.TOPIC.001 | static, test | `AreaPageTopicTests` asserts exact command, artifact, test, assertion, or observable result. |
 ```
 
 The table contains exactly one row for every Standard and Convention ID on the page. Methods are `static`, `test`, `inspection`, and `operation`.
@@ -240,7 +256,23 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** One identified assertion has one authority and one verification mapping.
 
-**Example:** `### Keep Domain package-free (BACKEND.ARCHITECTURE.DOMAIN.001)` owns one Domain dependency assertion.
+**Example:** `### Keep business invariants in Domain (BACKEND.ARCHITECTURE.DOMAIN.001)` owns one invariant-enforcement assertion.
+
+### Use the declared identifier grammar (CORE.AUTHORING.IDENTIFIER.001)
+
+**Requirement:** A provision ID MUST use four uppercase segments whose first two segments are the page scope that `standards.manifest.json` declares in `idRegistry`.
+
+**Rationale:** A declared scope makes each citation resolve to one page without a lookup, and it stops two pages from claiming one namespace.
+
+**Example:** `FRONTEND.COMPONENTS.OWNERSHIP.001` names the frontend area, the components page, the ownership topic, and the first assertion.
+
+### Restrict the CONVENTION segment to replaceable defaults (CORE.AUTHORING.IDENTIFIER.002)
+
+**Requirement:** A Standards provision ID MUST NOT contain the `CONVENTION` segment.
+
+**Rationale:** The segment is the only signal of normative force inside an identifier, so a Standard that borrows it reads as a replaceable default.
+
+**Example:** `CORE.AUTHORING.DEFAULTS.001` states a required obligation, and `CORE.AUTHORING.CONVENTION.001` states a default a project can replace.
 
 ### Identify actionable conventions (CORE.AUTHORING.DEFAULTS.001)
 
@@ -365,14 +397,16 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 This informative example demonstrates `CORE.AUTHORING.REQUIREMENT.001`, `CORE.AUTHORING.EXAMPLE.001`, and `CORE.AUTHORING.VERIFICATION.001`.
 
 ```markdown
-### Keep Domain package-free (BACKEND.ARCHITECTURE.DOMAIN.001)
+### Keep the layer package-free (AREA.PAGE.PACKAGES.001)
 
-**Requirement:** The Domain project MUST contain no persistence, web, mediator, logging, or dependency-injection package reference.
+**Requirement:** The named project MUST contain no persistence, web, mediator, logging, or dependency-injection package reference.
 
-**Rationale:** Domain rules remain independent from hosting and storage choices.
+**Rationale:** The layer stays independent from hosting and storage choices.
 
 **Example:** `Example.Domain.csproj` references no Marten or ASP.NET Core package.
 ```
+
+The identifier above is a grammar placeholder. A real page uses the scope that the manifest declares for it.
 
 ## Verification
 
@@ -388,6 +422,8 @@ This informative example demonstrates `CORE.AUTHORING.REQUIREMENT.001`, `CORE.AU
 | CORE.AUTHORING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
 | CORE.AUTHORING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |
 | CORE.AUTHORING.REQUIREMENT.001 | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
+| CORE.AUTHORING.IDENTIFIER.001 | static | `node tools/validate-standards.mjs` emits no `ID_PREFIX_OWNERSHIP`, `ID_PAGE_UNREGISTERED`, or `ID_AREA_UNKNOWN` diagnostic. |
+| CORE.AUTHORING.IDENTIFIER.002 | static | `node tools/validate-standards.cases.mjs` asserts the parser rejects a Standard whose ID ends in a `CONVENTION` segment. |
 | CORE.AUTHORING.DEFAULTS.001 | static | `WritingTests` asserts the parser resolves each Convention ID, Default, Replacement, and Verification row. |
 | CORE.AUTHORING.SUMMARY.001 | inspection | The summary parser resolves every citation, and review compares each projection with its source. |
 | CORE.AUTHORING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |

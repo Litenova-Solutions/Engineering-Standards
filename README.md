@@ -14,7 +14,7 @@
 
 The Agentic Engineering System is the standards contract Litenova Solutions uses for software work by humans and AI agents.
 
-Standards v1.14.0 targets one bounded-context business application. The baseline uses ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends.
+Standards v1.14.0 targets one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. The `dotnet-blazor` profile replaces the frontend with a .NET WebAssembly client.
 
 ## What It Defines
 

@@ -11,7 +11,7 @@ const RULE_ID = new RegExp(`^${ID_SOURCE}$`);
 const RULE_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${ID_SOURCE})\\)\\s*$`);
 // A looser shape still catches a stale identifier so it reports as an unknown reference
 // instead of passing unnoticed.
-const ID_LOOSE = '[A-Z][A-Z0-9]*(?:\\.[A-Z0-9]+){2,}';
+const ID_LOOSE = '[A-Z][A-Z0-9]*(?:\\.[A-Z0-9]+){1,}\\.\\d{3}';
 const METHODS = new Set(['static', 'test', 'inspection', 'operation']);
 const MODALS = /\b(?:MUST NOT|SHOULD NOT|MUST|SHOULD|MAY)\b/g;
 const OTHER_NORMATIVE = /\b(?:REQUIRED|FORBIDDEN|SHALL)\b/;
@@ -277,7 +277,7 @@ function checkAgentProjection(relative, raw, add) {
   const flush = () => {
     if (!paragraph.length) return;
     const text = paragraph.map((item) => item.line).join(' ');
-    if (!/\b[A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,}\b/.test(text)) {
+    if (!new RegExp(`\\b${ID_LOOSE}\\b`).test(text)) {
       add(relative, paragraph[0].number, 'AGENT_PROJECTION_ID', 'agent projection contains no canonical provision citation');
     }
     paragraph = [];
@@ -522,7 +522,7 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
   }
 
   // An index navigates. A numbered procedure inside one duplicates a canonical
-  // provision without citing it. (WRITING.PAGE.001)
+  // provision without citing it. (CORE.AUTHORING.PAGE.001)
   if (kind === 'index') {
     const step = clean.find((item) => /^\s*\d+\.\s+\S/.test(item.line));
     if (step) add(relative, step.number, 'INDEX_CONTAINS_PROCEDURE', 'an index must not contain a numbered procedure');
@@ -542,7 +542,7 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
   if ((kind === 'foundation' || kind === 'convention') && sections.some((section) => section.name === 'Reference example')) {
     const example = sectionBody(lines, 'Reference example');
     const firstLine = stripFences(example.split(/\r?\n/)).find((item) => item.line.trim())?.line.trim() ?? '';
-    const ids = [...example.matchAll(/\b[A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,}\b/g)];
+    const ids = [...example.matchAll(new RegExp(`\\b${ID_LOOSE}\\b`, 'g'))];
     if (!firstLine.startsWith('This informative example demonstrates ') || !ids.length) {
       const section = sections.find((item) => item.name === 'Reference example');
       add(relative, section?.line ?? 1, 'REFERENCE_EXAMPLE_DECLARATION', 'Reference example must begin with an informative declaration and provision IDs');
@@ -604,6 +604,9 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
     }
 
     if (provision.section === 'Standards') {
+      // CONVENTION is the only force signal inside an identifier, so a Standard
+      // cannot borrow it. (CORE.AUTHORING.IDENTIFIER.002)
+      if (/\.CONVENTION\.\d+$/.test(provision.id)) add(relative, provision.line, 'CONVENTION_ID', `Standard '${provision.id}' reserves the CONVENTION segment for a replaceable default`);
       const requirements = nonblank.filter((item) => item.line.startsWith('**Requirement:**'));
       if (requirements.length === 0) {
         add(relative, provision.line, 'RULE_MISSING_REQUIREMENT', `Standard '${provision.id}' has no Requirement statement`);
@@ -642,9 +645,9 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
     for (const bullet of bullets) {
       const text = visibleText(bullet.line);
       if ((text.match(MODALS) ?? []).length || OTHER_NORMATIVE.test(text)) add(relative, bullet.number, 'SUMMARY_NORMATIVE', 'Agent Summary contains normative vocabulary');
-      const ids = [...bullet.line.matchAll(/\b[A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,}\b/g)].map((match) => match[0]);
+      const ids = [...bullet.line.matchAll(new RegExp(`\\b${ID_LOOSE}\\b`, 'g'))].map((match) => match[0]);
       if (!ids.length) add(relative, bullet.number, 'SUMMARY_MISSING_ID', 'Agent Summary bullet cites no provision ID');
-      if (!/\([A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,}(?:,\s*[A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,})*\)\s*$/.test(bullet.line)) {
+      if (!new RegExp(`\\((${ID_LOOSE})(?:,\\s*${ID_LOOSE})*\\)\\s*$`).test(bullet.line)) {
         add(relative, bullet.number, 'SUMMARY_ID_POSITION', 'Agent Summary bullet must end with its provision citations');
       }
       const bulletClaim = claim(text.replace(/\([^)]*\)\s*$/, ''));
@@ -654,7 +657,7 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
 
   // A provision whose Requirement or Default only repeats its own heading
   // states no obligation. The heading is a label; the assertion belongs in the
-  // labeled block. (WRITING.REQUIREMENT.001, WRITING.CONVENTION.001)
+  // labeled block. (CORE.AUTHORING.REQUIREMENT.001, CORE.AUTHORING.DEFAULTS.001)
   for (const provision of provisions) {
     const label = provision.section === 'Standards' ? 'Requirement' : 'Default';
     const assertion = provision.body.find((item) => item.line.startsWith(`**${label}:**`));
@@ -666,7 +669,7 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
   }
 
   // Tier 1 exists to compress Tier 2. A bullet identical to its provision adds
-  // no context and makes the escalation pointless. (WRITING.SUMMARY.001)
+  // no context and makes the escalation pointless. (CORE.AUTHORING.SUMMARY.001)
   for (const reference of summaryReferences) {
     const provision = provisions.find((item) => item.id === reference.id);
     if (provision?.claim && reference.claim && provision.claim === reference.claim) {
@@ -687,7 +690,7 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
   const verification = sections.find((section) => section.name === 'Verification');
   if (verification) {
     for (let index = verification.line; index < clean.length; index += 1) {
-      const match = clean[index].line.match(/^\|\s*([A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,})\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/);
+      const match = clean[index].line.match(new RegExp(`^\\|\\s*(${ID_LOOSE})\\s*\\|\\s*([^|]+?)\\s*\\|\\s*([^|]+?)\\s*\\|\\s*$`));
       if (!match) continue;
       const methods = match[2].split(',').map((item) => item.trim()).filter(Boolean);
       for (const method of methods) if (!METHODS.has(method)) add(relative, index + 1, 'VERIFY_METHOD', `unknown verification method '${method}'`);
@@ -1003,7 +1006,7 @@ export function validateRepository(rootInput = '.') {
       if (!activeIds.has(reference.id)) add(document.relative, reference.line, 'SUMMARY_UNKNOWN_ID', `Agent Summary cites unknown provision '${reference.id}'`);
     }
     const prose = stripFences(document.raw.split(/\r?\n/)).map((item) => item.line).join('\n');
-    for (const match of prose.matchAll(/\b[A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,}\b/g)) {
+    for (const match of prose.matchAll(new RegExp(`\\b${ID_LOOSE}\\b`, 'g'))) {
       const id = match[0];
       const line = lineNumber(prose, match.index);
       if (!activeIds.has(id)) add(document.relative, line, 'ID_UNKNOWN_REFERENCE', `active content references unknown provision '${id}'`);

@@ -34,6 +34,7 @@ The profile selects every baseline convention. Exact versions and composition re
 - [Application](conventions/backend/application.md)
 - [Marten persistence](conventions/backend/persistence-marten.md)
 - [HTTP API](conventions/backend/api.md)
+- [Backend testing](conventions/backend/testing.md)
 
 ## Frontend Conventions
 
@@ -55,7 +56,6 @@ The profile selects every baseline convention. Exact versions and composition re
 
 ## Quality and Operations
 
-- [Backend testing](conventions/backend/testing.md)
 - [Security](conventions/quality/security.md)
 - [Operations](conventions/quality/operations.md)
 - [Continuous integration](conventions/quality/ci.md)
