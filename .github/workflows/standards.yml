@@ -1,0 +1,38 @@
+name: Standards
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Configure Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.16.0
+          package-manager-cache: false
+
+      - name: Run standards validator cases
+        run: node tools/validate-standards.cases.mjs
+
+      - name: Validate standards
+        run: node tools/validate-standards.mjs
+
+      - name: Run UI validator cases
+        run: node tools/validate-ui.cases.mjs
+
+      - name: Run consumer validator cases
+        run: node tools/validate-consumer.cases.mjs
+
+      - name: Check whitespace errors
+        run: git diff --check

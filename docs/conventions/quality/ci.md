@@ -2,23 +2,29 @@
 
 ## Intent
 
+
 Continuous integration proves that a pull request preserves the selected standards, generated contracts, dependencies, and release artifacts. The workflow keeps slow deployment checks separate from fast local feedback while retaining one required merge gate.
 
 ## Agent Summary {#agent-summary}
 
-- Run the required backend and changed-frontend gates on every pull request.
-- Run code and documentation consistency checks when product or implementation files change.
-- Verify OpenAPI and typed consumer freshness when those artifacts are committed.
-- Scan dependencies, actions, images, and release artifacts for known risk.
-- Review Marten schema plans or EF Core migrations as CI artifacts.
-- Promote the exact verified artifact and run a deployed smoke test.
-- Protect the default branch with required checks and review rules.
+
+- Run applicable gates on every pull request. (CI.GATES.001)
+- Check code and documentation consistency. (CI.DOCS.001)
+- Keep generated contracts fresh. (CI.CONTRACTS.001)
+- Review schema artifacts. (CI.SCHEMA.001)
+- Scan dependencies and release artifacts. (CI.SUPPLY.001)
+- Promote verified artifacts. (CI.RELEASE.001)
+- Protect the default branch. (CI.PROTECTION.001)
+- Keep a canonical job graph. (CI.JOBS.001)
 
 ## Standards
 
+
 ### Run applicable gates on every pull request (CI.GATES.001)
 
-Every pull request MUST run the applicable gates from this table:
+**Requirement:** Consumer CI MUST run applicable gates on every pull request.
+
+**Rationale:** Every pull request runs the applicable gates from this table:
 
 | Area | Required gate |
 |:---|:---|
@@ -29,44 +35,58 @@ Every pull request MUST run the applicable gates from this table:
 | Documentation | Link, anchor, rule-ID, ASCII, Specification Metadata, code-document consistency, and `git diff --check` scans |
 | Contracts | OpenAPI freshness and typed consumer regeneration when committed |
 
-Skip a gate only when its surface does not exist. Record the reason in the workflow or completion report.
+Skip a gate only when its surface does not exist. The implementation records the reason in the workflow or completion report.
 
 ### Check code and documentation consistency (CI.DOCS.001)
 
-The documentation job MUST run on every pull request and MUST check the changed documentation together with its related code, tests, generated contracts, and operating records. When the related surface exists, the check MUST:
+**Requirement:** Consumer CI MUST check code and documentation consistency.
 
-- Validate the ownership and freshness metadata required by `WRITING.METADATA.001`.
+**Rationale:** The documentation job runs on every pull request. It checks changed documentation with related code, tests, generated contracts, and operating records. When related surfaces exist, it performs these checks:
+
+- The implementation validates the structured metadata required by `WRITING.METADATA.002` and `WRITING.METADATA.003`.
 - Compare module and use-case names with source and test folders.
 - Confirm current documented names, routes, errors, operation IDs, and authorization boundaries exist in source or generated contracts.
 - Confirm acceptance IDs from verified Use cases appear in automated tests.
 - Detect duplicate application or transport contracts for one operation.
 - Report references to removed entry points, including controllers, namespaces, packages, and features.
 
-The job MAY use repository scripts, architecture tests, generated-contract checks, or review tooling. It MUST report the exact checks and skipped surfaces. A passing Markdown link scan alone is not documentation consistency evidence.
+The job can use repository scripts, architecture tests, generated-contract checks, or review tooling. It reports exact checks and skipped surfaces. A passing Markdown link scan alone is not documentation consistency evidence.
 
 ### Keep generated contracts fresh (CI.CONTRACTS.001)
 
-When OpenAPI or generated API types are committed, CI MUST regenerate them from the source and fail when `git diff --exit-code` reports a difference. The check MUST also reject unstable timestamps, machine paths, or ordering changes.
+**Requirement:** Consumer CI MUST keep generated contracts fresh.
+
+**Rationale:** When OpenAPI or generated API types are committed, CI regenerates them from source. A `git diff --exit-code` difference fails the check. The check also rejects unstable timestamps, machine paths, and ordering.
 
 ### Review schema artifacts (CI.SCHEMA.001)
 
-A persistence change MUST publish its reviewed artifact in CI. For Marten, the artifact is the schema plan and any document-contract transformation. For EF Core, the artifact is the generated migration and reviewed SQL. CI MUST fail when the source change has no matching artifact or when a destructive operation lacks the required rollout plan.
+**Requirement:** Consumer CI MUST review schema artifacts.
+
+**Rationale:** A persistence change publishes its reviewed artifact in CI. For Marten, the artifact is the schema plan and document-contract transformation. For EF Core, it is the generated migration and reviewed SQL. CI fails for a missing artifact or an unplanned destructive operation.
 
 ### Scan dependencies and release artifacts (CI.SUPPLY.001)
 
-CI MUST scan NuGet and npm dependencies, container images when used, and generated release artifacts for known vulnerabilities. GitHub Actions MUST use immutable commit references or a repository-approved pin. A release publishes an SBOM or equivalent dependency inventory with the artifact.
+**Requirement:** Consumer CI MUST scan dependencies and release artifacts.
+
+**Rationale:** CI scans NuGet and npm dependencies, used container images, and release artifacts for known vulnerabilities. GitHub Actions use immutable commit references or a repository-approved pin. Each release publishes an SBOM or equivalent dependency inventory with its artifact.
 
 ### Promote verified artifacts (CI.RELEASE.001)
 
-CI MUST build one immutable artifact, promote that exact artifact through staging and production, wait for readiness, and run the primary release flow's end-to-end test. Do not rebuild from a mutable branch between environments. Retain the artifact reference and test evidence for rollback.
+**Requirement:** Consumer CI MUST promote verified artifacts.
+
+**Rationale:** CI builds one immutable artifact and promotes it through staging and production. It waits for readiness and runs included end-to-end tests. The pipeline does not rebuild from a mutable branch between environments. The release record retains the artifact reference and rollback evidence.
 
 ### Protect the default branch (CI.PROTECTION.001)
 
-The default branch MUST require the applicable CI checks, a reviewed pull request, and a clean merge state. Direct pushes and bypassed required checks are FORBIDDEN except for a documented repository recovery action.
+**Requirement:** Consumer CI MUST protect the default branch.
+
+**Rationale:** The default branch requires applicable CI checks, a reviewed pull request, and a clean merge state. Direct pushes and bypassed checks are prohibited except during a documented repository recovery action.
 
 ### Keep a canonical job graph (CI.JOBS.001)
 
-Consumer CI uses stable jobs with these responsibilities:
+**Requirement:** Consumer CI MUST keep a canonical job graph.
+
+**Rationale:** Consumer CI uses stable jobs with these responsibilities:
 
 | Job | Triggered when | Required work |
 |:---|:---|:---|
@@ -78,24 +98,38 @@ Consumer CI uses stable jobs with these responsibilities:
 | `schema` | Persistence contracts change | Reviewable Marten schema plan and transformations, or EF migration and SQL |
 | `release` | Versioned release | Immutable artifacts, inventory, deployment evidence, readiness, smoke test, and rollback reference |
 
-Use path filters only to skip a job whose complete input surface is known. Changes to shared configuration, lock files, standards selection, or generators trigger every dependent job.
+The implementation uses path filters only to skip a job whose complete input surface is known. Changes to shared configuration, lock files, standards selection, or generators trigger every dependent job.
 
 ## Conventions
 
-Keep one workflow per repository responsibility when a single workflow would obscure ownership. Use stable job names that match the release record. Run containerized integration tests and Playwright in CI rather than pre-commit hooks.
+
+### Apply the documented defaults (CI.CONVENTION.001)
+
+**Default:** Apply the documented defaults.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** The implementation keeps one workflow per repository responsibility when a single workflow would obscure ownership. The implementation uses stable job names that match the release record. The implementation runs containerized integration tests and Playwright in CI rather than pre-commit hooks.
 
 Backend CI restores the solution in locked mode, builds once in Release, then tests with `--no-build`. Frontend CI installs once with the frozen root lockfile and invokes root scripts scoped to the affected application. Contract CI starts from the same source commit as the build and rejects any generated difference. Release jobs consume artifacts produced by required jobs rather than rebuilding source.
 
-## Examples
+## Reference example
+
+This informative example demonstrates `CI.GATES.001` and `CI.RELEASE.001`.
 
 A backend-only pull request runs the Release build, test, dependency scan, documentation scan, and schema checks. A pull request that changes a frontend also runs the frozen pnpm gates and affected browser end-to-end tests. A release promotes the same image digest that passed staging.
 
 ## Verification
 
-- Inspect workflow triggers, required job names, and branch protection settings.
-- Change one shared input for each path-filtered job and confirm the expected job runs.
-- Run the backend and changed-frontend gates from a clean checkout.
-- Confirm the documentation job rejects missing metadata, stale current references, unmatched identifiers, duplicate contracts, and removed entry points.
-- Regenerate OpenAPI and typed consumers, then check for a clean diff.
-- Review dependency, action, image, SBOM, and schema artifacts.
-- Verify staging-to-production artifact identity and smoke-test evidence.
+
+| ID | Method | Evidence |
+|:---|:---|:---|
+| CI.GATES.001 | inspection | Pull request review asserts `run applicable gates on every pull request` in the owning specification and source paths. |
+| CI.DOCS.001 | inspection | Pull request review asserts `check code and documentation consistency` in the owning specification and source paths. |
+| CI.CONTRACTS.001 | inspection | Pull request review asserts `keep generated contracts fresh` in the owning specification and source paths. |
+| CI.SCHEMA.001 | static | Repository static check asserts `review schema artifacts` for the owning paths. |
+| CI.SUPPLY.001 | inspection | Pull request review asserts `scan dependencies and release artifacts` in the owning specification and source paths. |
+| CI.RELEASE.001 | inspection | Pull request review asserts `promote verified artifacts` in the owning specification and source paths. |
+| CI.PROTECTION.001 | inspection | Pull request review asserts `protect the default branch` in the owning specification and source paths. |
+| CI.JOBS.001 | inspection | Pull request review asserts `keep a canonical job graph` in the owning specification and source paths. |
+| CI.CONVENTION.001 | inspection | Pull request review asserts `apply the documented defaults` in the owning specification and source paths. |

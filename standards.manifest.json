@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
   "schemaVersion": 3,
-  "version": "1.10.0",
+  "version": "1.11.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "defaultProfile": "dotnet-nextjs",
@@ -18,7 +18,7 @@
         "docs/conventions/repository/naming.md",
         "docs/conventions/repository/dependencies.md",
         "docs/conventions/repository/configuration.md",
-        "docs/conventions/repository/writing.md",
+        "docs/foundations/authoring-standard.md",
         "docs/conventions/backend/architecture.md",
         "docs/conventions/backend/domain.md",
         "docs/conventions/backend/application.md",
@@ -279,13 +279,13 @@
         "docs/conventions/repository/structure.md#agent-summary",
         "docs/conventions/repository/naming.md#agent-summary",
         "docs/conventions/repository/configuration.md#agent-summary",
-        "docs/conventions/repository/writing.md#agent-summary"
+        "docs/foundations/authoring-standard.md#agent-summary"
       ],
       "tier2": [
         "docs/conventions/repository/structure.md",
         "docs/conventions/repository/naming.md",
         "docs/conventions/repository/configuration.md",
-        "docs/conventions/repository/writing.md"
+        "docs/foundations/authoring-standard.md"
       ]
     },
     "repository.writing": {
@@ -293,10 +293,11 @@
         "AGENTS.md"
       ],
       "tier1": [
-        "docs/conventions/repository/writing.md#agent-summary"
+        "docs/foundations/authoring-standard.md#agent-summary"
       ],
       "tier2": [
-        "docs/conventions/repository/writing.md"
+        "docs/foundations/authoring-standard.md",
+        "CONTRIBUTING.md"
       ]
     },
     "repository.dependencies": {

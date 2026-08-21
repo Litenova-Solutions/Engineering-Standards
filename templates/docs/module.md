@@ -12,7 +12,7 @@
 
 ## Purpose
 
-State the domain area, its language, and the outcomes its use cases support. A module organizes specifications and code; it is not a transaction or deployment boundary.
+State the domain area, its language, and the outcomes its use cases support. A module organizes specifications and code. It is not a transaction or deployment boundary.
 
 ## Actors
 
@@ -22,7 +22,7 @@ State the domain area, its language, and the outcomes its use cases support. A m
 
 | Term | Definition | Rejected synonyms |
 |:---|:---|:---|
-| `__TERM__` | Define the term in business language. | List words that must not replace it. |
+| `__TERM__` | Define the term in business language. | List words that do not replace it. |
 
 ## Aggregate ownership
 

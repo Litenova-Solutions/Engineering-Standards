@@ -25,7 +25,7 @@ State the selected behavior. Change `specStatus` to `approved` when accepted.
 
 | Condition | Required claims or evidence | Owner | Status |
 |:---|:---|:---|:---|
-| State what must be true before activation. | Link Decision Evidence, a test, provider statement, policy, or review. | `__OWNER__` | `pending`, `met`, or `rejected` |
+| State the condition before activation. | Link Decision Evidence, a test, provider statement, policy, or review. | `__OWNER__` | `pending`, `met`, or `rejected` |
 
 Remove this section when the decision applies immediately without a gate.
 

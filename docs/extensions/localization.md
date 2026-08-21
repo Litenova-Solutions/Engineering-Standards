@@ -2,58 +2,162 @@
 
 ## Intent
 
-Localization makes routes, messages, formatting, metadata, and tests locale-aware while keeping stored domain values locale-neutral.
+Localization makes routes, messages, formatting, metadata, and tests locale-aware while stored Domain values remain locale-neutral.
 
 ## Activation
 
-**Activation scope:** `project`. It applies to all project work whenever selected in `selectedExtensions`.
+Activation scope: `project`.
 
-Enable `localization` when the product commits to supporting more than one locale. A possible future translation does not activate it.
+Applicable specification kinds: None.
 
-The product brief or a decision records supported locales, default locale, fallback behavior, and URL strategy. This extension replaces no baseline rule.
+The consumer enables `localization` when the product supports more than one locale. A possible future translation does not activate it.
+
+## Baseline relationship
+
+The product brief or decision records locales, default locale, fallback behavior, and URL strategy. This extension replaces no baseline rule.
 
 ## Agent Summary {#agent-summary}
 
-- Declare supported, default, and fallback locales.
-- Use one canonical locale route strategy.
-- Store user-facing copy in locale catalogs with stable semantic keys.
-- Format dates, numbers, money, plural forms, and relative time by active locale.
-- Keep domain and database values locale-neutral.
-- Test fallback and the primary release flow in every supported locale.
+- Record supported locale behavior. (EXT.LOCALE.ADOPT.001)
+- Keep localized routes canonical. (EXT.LOCALE.ROUTES.001, EXT.LOCALE.ROUTES.003)
+- Store copy under stable semantic keys. (EXT.LOCALE.MESSAGES.001, EXT.LOCALE.MESSAGES.002)
+- Format user-facing values by locale. (EXT.LOCALE.FORMAT.001)
+- Keep Domain and API values locale-neutral. (EXT.LOCALE.FORMAT.002)
+- Localize safe public content without changing error codes. (EXT.LOCALE.CONTENT.001, EXT.LOCALE.CONTENT.002)
 
 ## Standards
 
-### Define supported locales (EXT.LOCALE.ADOPT.001)
+### Record supported locale behavior (EXT.LOCALE.ADOPT.001)
 
-List supported locale identifiers, default locale, fallback chain, user selection behavior, and browser-detection behavior. Do not infer support from catalog files alone.
+**Requirement:** A localization decision MUST list supported locale identifiers, default locale, fallback chain, user selection, and browser-detection behavior.
 
-### Keep locale routing canonical (EXT.LOCALE.ROUTES.001)
+**Rationale:** One decision defines the product's locale contract before catalogs and routes appear.
 
-Use one documented route shape. Redirect unsupported or missing locale segments according to the product policy. Avoid multiple indexable URLs for the same localized content.
+### Avoid catalog-only locale claims (EXT.LOCALE.ADOPT.002)
 
-### Keep message keys stable (EXT.LOCALE.MESSAGES.001)
+**Requirement:** A product MUST NOT infer supported locales from catalog files alone.
 
-Store user-facing copy in locale catalogs. Use semantic keys based on meaning, not the source-language sentence. Every supported locale contains the required keys or follows the declared fallback.
+**Rationale:** Catalog presence cannot define routing, fallback, selection, or browser-detection behavior.
 
-### Format by active locale (EXT.LOCALE.FORMAT.001)
+### Define one locale route shape (EXT.LOCALE.ROUTES.001)
 
-Use locale-aware date, time, number, currency, plural, list, and relative-time formatting. Keep domain values and API contracts locale-neutral unless the use case explicitly exchanges localized content.
+**Requirement:** A localized application MUST define one documented locale route shape.
 
-### Localize metadata and errors safely (EXT.LOCALE.CONTENT.001)
+**Rationale:** One shape gives users, crawlers, and links a predictable localized address.
 
-Public metadata, form labels, validation messages, and user-safe errors follow the active locale. Stable API error codes do not change by locale.
+**Example:** `/nl-NL/orders/42` places the locale in the documented path segment.
+
+### Handle unavailable locale segments (EXT.LOCALE.ROUTES.002)
+
+**Requirement:** A localized application MUST redirect unsupported or missing locale segments according to product policy.
+
+**Rationale:** The policy identifies the fallback or error behavior for an unavailable route locale.
+
+### Avoid duplicate localized URLs (EXT.LOCALE.ROUTES.003)
+
+**Requirement:** A localized application MUST NOT publish multiple indexable URLs for the same localized content.
+
+**Rationale:** Duplicate indexable locations split search and canonical-link behavior.
+
+### Store user-facing copy in catalogs (EXT.LOCALE.MESSAGES.001)
+
+**Requirement:** A localized application MUST store user-facing copy in locale catalogs.
+
+**Rationale:** Catalogs separate translated wording from application behavior and source code.
+
+### Name messages by meaning (EXT.LOCALE.MESSAGES.002)
+
+**Requirement:** A locale catalog MUST use semantic keys rather than source-language sentences.
+
+**Rationale:** A meaning-based key remains stable when one language changes wording.
+
+**Example:** `orders.cancel.confirmation` identifies intent without copying the English sentence.
+
+### Complete or fall back catalog values (EXT.LOCALE.MESSAGES.003)
+
+**Requirement:** Each supported locale MUST contain required keys or use its declared fallback.
+
+**Rationale:** A declared fallback prevents missing copy from becoming an unreviewed runtime behavior.
+
+### Format values with active locale (EXT.LOCALE.FORMAT.001)
+
+**Requirement:** A localized interface MUST format dates, times, numbers, currency, plurals, lists, and relative time by active locale.
+
+**Rationale:** User-facing formatted values need the selected locale's conventions.
+
+### Preserve locale-neutral business data (EXT.LOCALE.FORMAT.002)
+
+**Requirement:** Domain values and API contracts MUST remain locale-neutral unless a use case explicitly exchanges localized content.
+
+**Rationale:** Stable business values and wire contracts do not change with interface language.
+
+### Localize public presentation content (EXT.LOCALE.CONTENT.001)
+
+**Requirement:** Public metadata, form labels, validation messages, and user-safe errors MUST follow the active locale.
+
+**Rationale:** Visible content needs the same locale behavior as the page that presents it.
+
+### Keep stable error codes locale-neutral (EXT.LOCALE.CONTENT.002)
+
+**Requirement:** A stable API error code MUST NOT change by locale.
+
+**Rationale:** Programmatic consumers need one code regardless of the caller's presentation locale.
 
 ## Conventions
 
-Keep catalogs under one application-owned locale root and split by module only when catalog size requires it. Use BCP 47 locale identifiers. Keep locale selection in URL or documented session preference, not an implicit global variable.
+### Use one catalog root (EXT.LOCALE.CONVENTION.001)
+
+**Default:** Keep catalogs under one application-owned locale root.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** One root makes ownership and catalog discovery predictable.
+
+### Split catalogs by module when needed (EXT.LOCALE.CONVENTION.002)
+
+**Default:** Split catalogs by module only when catalog size requires it.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Module splitting follows a measured size boundary instead of early fragmentation.
+
+### Use BCP 47 identifiers (EXT.LOCALE.CONVENTION.003)
+
+**Default:** Use BCP 47 locale identifiers.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** BCP 47 gives routes, catalogs, and selection one familiar identifier form.
+
+### Keep locale selection explicit (EXT.LOCALE.CONVENTION.004)
+
+**Default:** Keep locale selection in the URL or documented session preference.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Explicit selection avoids an implicit global locale that callers cannot inspect.
 
 ## Dependencies
 
-No library is selected by this extension. A localization package requires a decision and manifest pin.
+No library is selected by this extension. A localization package needs a decision and manifest pin.
 
 ## Verification
 
-- Test locale detection, explicit selection, canonical routing, and fallback.
-- Detect missing and unused catalog keys.
-- Test dates, numbers, money, plural forms, metadata, and validation messages.
-- Run the primary release flow in every supported locale.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| EXT.LOCALE.ADOPT.001 | inspection | Product brief or decision lists the required locale contract fields. |
+| EXT.LOCALE.ADOPT.002 | inspection | Locale support review cites the decision rather than catalog presence. |
+| EXT.LOCALE.ROUTES.001 | test | Route tests exercise the documented localized URL shape. |
+| EXT.LOCALE.ROUTES.002 | test | Unsupported and missing locale tests follow product fallback policy. |
+| EXT.LOCALE.ROUTES.003 | static | Crawl or route review identifies one indexable URL per localized content item. |
+| EXT.LOCALE.MESSAGES.001 | static | User-facing source scan resolves copy through locale catalogs. |
+| EXT.LOCALE.MESSAGES.002 | inspection | Catalog review identifies semantic message keys. |
+| EXT.LOCALE.MESSAGES.003 | test | Each supported locale resolves required keys or declared fallback. |
+| EXT.LOCALE.FORMAT.001 | test | Locale fixtures verify dates, numbers, currency, plurals, lists, and relative time. |
+| EXT.LOCALE.FORMAT.002 | inspection | Domain and OpenAPI review confirms locale-neutral stored and wire values. |
+| EXT.LOCALE.CONTENT.001 | test | UI fixtures render metadata, labels, validation, and safe errors in active locale. |
+| EXT.LOCALE.CONTENT.002 | test | API error fixtures retain stable codes across locale selections. |
+| EXT.LOCALE.CONVENTION.001 | inspection | Catalog paths use the owned root or record a local replacement. |
+| EXT.LOCALE.CONVENTION.002 | inspection | Module catalog splits record their size rationale. |
+| EXT.LOCALE.CONVENTION.003 | static | Locale identifier scan accepts BCP 47 values or a recorded replacement. |
+| EXT.LOCALE.CONVENTION.004 | test | Locale-selection tests use URL or documented session preference. |

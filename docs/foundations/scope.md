@@ -2,68 +2,85 @@
 
 ## Intent
 
-Standards v1.10.0 supports one application class so agents can make concrete decisions without inventing an
-architecture for every task. The profile covers a small business web application that one maintainer can
-build and operate with extensive AI assistance.
+The selected profile supports one application class so agents can make concrete decisions without inventing architecture for every task. The profile fits a business web application.
 
-The boundary is deliberate. Applications outside it may still use individual ideas from this repository,
-but they do not claim conformance with the v1.10.0 profile.
+Applications outside this boundary can use individual ideas but do not claim selected-profile conformance.
 
 ## Agent Summary {#agent-summary}
 
-- Apply v1.10.0 to one bounded-context business application.
-- Use the selected ASP.NET Core, PostgreSQL, Marten, and optional Next.js profile.
-- Deliver one release-ready primary release flow before secondary product outcomes.
-- Activate conditional behavior through named extensions.
-- Record a decision before departing from a required standard.
+- Use the supported ASP.NET Core and PostgreSQL profile. (SCOPE.APPLICATION.001)
+- Keep one business context and deployment boundary. (SCOPE.CONTEXT.001)
+- Select conditional extensions only when criteria apply. (SCOPE.EXTENSIONS.001)
+- Record unsupported architecture decisions explicitly. (SCOPE.OUTSIDE.001)
 
 ## Standards
 
 ### Use the supported application profile (SCOPE.APPLICATION.001)
 
-The application is a business web system with an ASP.NET Core API, PostgreSQL, Marten document persistence, and zero or more Next.js frontends in one repository.
+**Requirement:** A `dotnet-nextjs` profile consumer MUST use one business web system with ASP.NET Core API, PostgreSQL, Marten, and zero or more Next.js frontends.
 
-An API-only catalog fits. A native mobile application without the supported API and web profile does not.
+**Rationale:** The supported profile gives one repository, backend, persistence model, and optional web interface boundary.
+
+**Example:** An API-only catalog fits; a native-only mobile application does not.
 
 ### Keep one bounded context (SCOPE.CONTEXT.001)
 
-The application has one business language and one deployment boundary. Modules group cohesive domain language, models, use cases, and code inside that context. They do not become independent services or bounded contexts.
+**Requirement:** A `dotnet-nextjs` profile consumer MUST keep one business language and deployment boundary.
 
-Posts, Authors, and Comments may be separate modules in one publishing context.
+**Rationale:** Modules organize related language, models, use cases, and code without becoming independent services or bounded contexts.
 
-### Deliver a release-ready primary release flow (SCOPE.V1.001)
+**Example:** Posts, Authors, and Comments can be modules in one publishing context.
 
-Application v1 includes one deployed primary release flow plus its required security, persistence, diagnostics, automated evidence, backup, deployment, rollback, and operating instructions.
+### Select conditional extensions explicitly (SCOPE.EXTENSIONS.001)
 
-V1 does not require speculative scale, multi-region operation, or optional product areas.
+**Requirement:** A consumer MUST select caching, durable messaging, BDD, realtime, multi-tenancy, reporting, deployment, or alternate persistence only when their extension criteria apply.
 
-### Activate conditional behavior explicitly (SCOPE.EXTENSIONS.001)
+**Rationale:** Conditional capabilities stay inactive until a documented product or engineering condition requires them.
 
-Caching, durable messaging, executable BDD, realtime updates, multi-tenancy, reporting, provider-specific deployment, alternative persistence, and other conditional concerns remain inactive until their extension criteria apply.
+### Record selected extensions (SCOPE.EXTENSIONS.002)
 
-The consumer lists every selected extension in `selectedExtensions` in `standards.project.json`.
+**Requirement:** A consumer MUST list every selected extension in `selectedExtensions` in `standards.project.json`.
 
-### Record work outside the profile (SCOPE.OUTSIDE.001)
+**Rationale:** The project record determines which extension boundaries apply to its work.
 
-Microservices, multiple bounded contexts, native clients, other backend platforms, other frontend frameworks, event sourcing, active-active regions, and large data pipelines require a separate profile or a project decision that defines the unsupported boundary.
+### Record unsupported scope decisions (SCOPE.OUTSIDE.001)
+
+**Requirement:** A consumer MUST record a separate profile or project decision for microservices, multiple contexts, native clients, other platforms, event sourcing, active-active regions, or large pipelines.
+
+**Rationale:** These architectures change the supported profile's assumptions and require their own boundaries.
 
 ## Conventions
 
-### Keep the first deployment small
+### Start with one API and database (SCOPE.CONVENTION.001)
 
-Use one API deployable and one database by default. Add a Worker only for a process that must continue independently of an HTTP request.
+**Default:** Use one API deployable and one database for the baseline profile.
 
-### Defer capacity work until measured
+**Replacement:** A consumer can replace this default with an explicit local convention.
 
-Record the current load, latency target, and observed constraint before introducing caches, replicas, queues, or partitioning.
+**Rationale:** A Worker appears only when a process continues independently of an HTTP request.
 
-## Examples
+### Measure capacity before expansion (SCOPE.CONVENTION.002)
 
-A publishing v1 may support author sign-in, draft creation, publication, and public reading. Multi-tenant publications, live collaborative editing, and bulk analytics remain outside the primary release flow unless the product brief makes one of them essential.
+**Default:** Record current load, latency target, and observed constraint before adding caches, replicas, queues, or partitioning.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Measured evidence establishes which capacity change addresses the observed limitation.
+
+## Reference example
+
+This informative example demonstrates `SCOPE.APPLICATION.001` and `SCOPE.EXTENSIONS.001`.
+
+A publishing product can support sign-in, draft creation, publication, and public reading. Multi-tenant publication, live editing, and bulk analytics require their selected extension boundaries.
 
 ## Verification
 
-- Confirm the product brief names one primary release flow.
-- Confirm `standards.project.json` selects `dotnet-nextjs`.
-- Confirm each active conditional concern appears in `selectedExtensions` and each local extension appears on its applicable specifications.
-- Confirm unsupported architecture choices have a project decision.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| SCOPE.APPLICATION.001 | inspection | Consumer profile and project structure match the supported application definition. |
+| SCOPE.CONTEXT.001 | inspection | Architecture review identifies one business language and deployment boundary. |
+| SCOPE.EXTENSIONS.001 | inspection | Every selected extension cites its activation condition. |
+| SCOPE.EXTENSIONS.002 | static | Project schema validation resolves each selected extension. |
+| SCOPE.OUTSIDE.001 | inspection | Unsupported architecture work cites a separate profile or project decision. |
+| SCOPE.CONVENTION.001 | inspection | Baseline topology uses one API and database or records a replacement. |
+| SCOPE.CONVENTION.002 | inspection | Capacity decision records load, target latency, and observed constraint. |

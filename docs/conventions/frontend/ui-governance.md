@@ -1,55 +1,57 @@
-# Controlled UI governance
+# Controlled UI Governance
 
 ## Intent
 
+
 This convention turns the selected UI library into a constrained construction language. The library
 provides component source and baseline interaction behavior. Product specifications provide meaning,
-composition, states, content limits, responsive behavior, and evidence. Agents must use both sources.
+composition, states, content limits, responsive behavior, and evidence. Agents use both sources.
 
 The baseline applies to React web frontends. It does not pretend that official shadcn/ui components are
 a native mobile system. A native frontend selects its own platform system through a separate decision.
 
 ## Agent Summary {#agent-summary}
 
-- Use shadcn/ui with Tailwind CSS v4 for every new React web frontend.
-- Use Base UI, Vega, CSS variables, neutral tokens, Geist, Lucide, and the pinned manifest versions.
-- Keep one primary visual system per frontend. Behavior-only packages may support it; a second general
-  purpose visual system requires an override.
-- Copy shadcn source into the owning frontend and track it with `ui-source-lock.json`.
-- Select `public-light`, `application-balanced`, or `admin-dense` before writing page UI.
-- Record shells, patterns, components, states, tokens, forks, specialists, and evidence in the frontend
-  UI vocabulary.
-- Use semantic Tailwind utilities and the approved global CSS surface. Treat utility strings as CSS.
-- Create a page contract before implementing a non-trivial route. Include initial scroll and focus.
-- Follow Use, Compose, Constrain, and Prove in every UI task.
+
+- Select one visual authority. (UI.GOVERNANCE.001)
+- Use the pinned shadcn/ui baseline. (UI.SHADCN.001)
+- Declare the UI vocabulary. (UI.VOCABULARY.001)
+- Specify pages before composition. (UI.PAGE.SPEC.001)
+- Restrict CSS decisions. (UI.TAILWIND.001)
+- Track source changes. (UI.FORKS.001)
+- Govern behavior companions and specialist controls. (UI.COMPANION.001)
+- Prove UI behavior and appearance. (UI.EVIDENCE.001)
+- Follow the agent UI protocol. (UI.AGENT.PROTOCOL.001)
 
 ## Standards
 
+
 ### Select one visual authority (UI.GOVERNANCE.001)
 
-Every React web frontend selects one primary visual system in its frontend entry in
-`standards.project.json`. The v1.10.0 default is `shadcn/ui` with Tailwind CSS v4. The frontend entry
-records its profile and public exports; a default shadcn entry also records its owned file paths.
-Baseline values resolve from `standards.manifest.json` so the project file does not repeat them. A frontend using
-Bootstrap, MUI, another shadcn base, or another general purpose system requires an override decision
-that names the affected rule IDs, migration or review date, and owner.
+**Requirement:** Frontends MUST select one visual authority.
+
+**Rationale:** Every React web frontend selects one primary visual system. Its frontend entry in `standards.project.json` records that selection. The v1.11.0 default is `shadcn/ui` with Tailwind CSS v4. The entry records its profile and public exports. A default shadcn entry also records its owned file paths.
+
+Baseline values resolve from `standards.manifest.json`, so the project file does not repeat them. Another general-purpose system requires an override decision. Examples include Bootstrap, MUI, or another shadcn base. The decision names affected rule IDs, its review date, and its owner.
 
 One visual system means one authority for rendered controls, tokens, component geometry, interaction
-states, icons, and layout language. It does not prohibit dependencies that provide behavior without
-owning appearance. TanStack Table, TanStack Virtual, a form state library, and a data-fetching library
-may support shadcn/ui when their output is rendered through the approved components and tokens.
+states, icons, and layout language. It does not prohibit behavior-only dependencies. TanStack Table,
+TanStack Virtual, form-state libraries, and data-fetching libraries can support shadcn/ui when their
+output uses approved components and tokens.
 
-Do not render controls from two general purpose visual systems on one route. A specialist surface such
+The implementation does not render controls from two general purpose visual systems on one route. A specialist surface such
 as a code editor, map, scheduler, or enterprise grid is allowed only under `UI.COMPANION.001`.
 
 An override of a `UI.*` rule is temporary. Its `overrides` entry in `standards.project.json` carries
-`reviewBy` with the review or removal date, and the override stops being valid on that date. Renew the
-decision or complete the migration before it passes. A second general purpose visual system is detected
-in the workspace root, shared packages, and the frontend itself, because a workspace hoists dependencies.
+`reviewBy` with the review or removal date. The override stops being valid on that date. Its owner
+renews the decision or completes the migration before that date. A second general-purpose visual system
+is detectable in the workspace root, shared packages, or the frontend because a workspace hoists dependencies.
 
 ### Use the pinned shadcn/ui baseline (UI.SHADCN.001)
 
-New React web frontends use the `uiBaseline` object in `standards.manifest.json` and commit these
+**Requirement:** Frontends MUST use the pinned shadcn/ui baseline.
+
+**Rationale:** New React web frontends use the `uiBaseline` object in `standards.manifest.json` and commit these
 project-owned files:
 
 - `components.json` generated by the pinned shadcn CLI;
@@ -79,30 +81,30 @@ The baseline values are:
 | Direction | `rtl: false` in the generated `components.json` |
 | Registry | The built-in `https://ui.shadcn.com` registry, with an empty `registries` map |
 
-The component base is encoded in the generated style name. `base-ui` produces `base-vega`. A frontend on
-the Radix compatibility base states the `componentsStyle` its pinned CLI writes rather than leaving it to
-be derived, because only the default base has a verified mapping.
+The generated style name encodes the component base. `base-ui` produces `base-vega`. A frontend using the Radix compatibility base records its pinned CLI's `componentsStyle`. Only the default base has a verified derived mapping.
 
-Use the manifest-pinned CLI. Never use `@latest` in setup, CI, or update instructions. Do not add a
-registry item without an approved decision. Do not run `shadcn eject` in the baseline because it turns
+The implementation uses the manifest-pinned CLI. Setup, CI, and update instructions never use `@latest`. The implementation does not add a
+registry item without an approved decision. The implementation does not run `shadcn eject` in the baseline because it turns
 the generated CSS into a permanent local fork.
 
-The installed source is application code. Review it, test it, and update it deliberately. Do not hide
+The installed source is application code. Installed source receives deliberate review, testing, and updates. The implementation does not hide
 the source behind a central runtime component package. Shared semantic tokens may live in a package only
 when they have two real consumers and do not become a second component source.
 
-Existing shadcn frontends using Radix may remain on Radix during a recorded migration window. They must
-select `radix-ui` in their vocabulary, name the override decision, and keep all primitives on that base.
-Do not mix Base UI, Radix, and React Aria implementations in one frontend. Move one component family at
-a time and prove keyboard, focus, state, and visual behavior before removing the old base.
+Existing shadcn frontends using Radix may remain on Radix during a recorded migration window. Their
+vocabulary selects `radix-ui`, names the override decision, and keeps all primitives on that base.
+The implementation does not mix Base UI, Radix, and React Aria implementations in one frontend. The implementation moves one component family at
+a time and proves keyboard, focus, state, and visual behavior before removing the old base.
 
 The official web system is not a React Native system. A native frontend follows a native platform
-profile and decision; it may reuse semantic requirements and token names but does not install these web
+profile and decision. It may reuse semantic requirements and token names but does not install these web
 components.
 
 ### Declare the UI vocabulary (UI.VOCABULARY.001)
 
-Each React web frontend has a JSON vocabulary that validates against
+**Requirement:** Frontends MUST declare the UI vocabulary.
+
+**Rationale:** Each React web frontend has a JSON vocabulary that validates against
 `schemas/ui-vocabulary.schema.json`. Its `baseline` repeats the selected preset so a page can be
 reviewed without reconstructing the CLI command. The vocabulary is the closed list available to agents:
 
@@ -115,18 +117,20 @@ reviewed without reconstructing the CLI command. The vocabulary is the closed li
 - approved runtime style records for measured geometry and declared custom properties;
 - evidence records for the listed components and patterns.
 
-IDs are lowercase and stable. Add a vocabulary item before using it in a page contract. Remove an item
+IDs are lowercase and stable. The implementation adds a vocabulary item before using it in a page contract. The implementation removes an item
 only after no page, component, test, or source-lock entry references it. A product may add a named
-pattern or token through a normal review; it may not create an unlisted one-off synonym in feature code.
+pattern or token through a normal review. It may not create an unlisted one-off synonym in feature code.
 
 Paths inside the vocabulary and the source lock are relative to the owning frontend, matching the paths
 the CLI writes. Paths in `standards.project.json` are relative to the consumer root. A component
-`source`, a fork `scope`, a specialist `scope`, and a runtime style `scope` all use the frontend-relative
+`source`, a fork `scope`, a specialist `scope`. A runtime style `scope` all use the frontend-relative
 form.
 
 ### Specify pages before composition (UI.PAGE.SPEC.001)
 
-Every non-trivial React web page has the normal `kind: page` Specification Metadata and a sidecar JSON
+**Requirement:** Frontends MUST specify pages before composition.
+
+**Rationale:** Every non-trivial React web page has the normal `kind: page` Specification Metadata and a sidecar JSON
 contract validated by `schemas/ui-page.schema.json`. The sidecar is stored beside the page document or
 at the `uiDocs` path using the page id as its filename. It declares:
 
@@ -140,25 +144,18 @@ at the `uiDocs` path using the page id as its filename. It declares:
 - landmarks, heading hierarchy, labels, descriptions, and status announcements;
 - acceptance, browser, accessibility, visual, or manual evidence IDs.
 
-Use semantic HTML for content. Use a shadcn component or an approved pattern for interactive controls.
+The implementation uses semantic HTML for content. The implementation uses a shadcn component or an approved pattern for interactive controls.
 A screenshot can support visual evidence but cannot replace the contract for behavior or state.
 
-A frontend on an override system keeps the page contract. Its shell, pattern, and component names are
-validated for shape and for agreement with the page specification, but not against a shadcn vocabulary,
-because the override decision owns that inventory until the migration completes. The override decision
-names where those identifiers are defined.
+A frontend on an override system keeps the page contract. Its shell, pattern, and component names receive shape validation. They also receive agreement checks against the page specification. The shadcn vocabulary check does not apply while the override remains active. The override decision owns that inventory and names its location.
 
 ### Restrict CSS decisions (UI.TAILWIND.001)
 
-Tailwind class strings are CSS decisions. The default CSS surface is one global entry containing the
-Tailwind import, semantic token declarations, approved font declarations, and documented global reset or
-media rules. The global entry declares no class or id selector of its own except the color-scheme class,
-and it does not use `@apply`, which hides an unreviewed utility group inside a stylesheet. Feature CSS
-files, route CSS files, CSS modules, Sass, styled-components, and emotion are prohibited unless a
-decision names the exception.
+**Requirement:** Frontends MUST restrict CSS decisions.
 
-Feature and route code may use the Tailwind theme scale, semantic color names, named typography, named
-radius, named shadow, responsive modifiers, state modifiers, and accessibility modifiers. It may not use:
+**Rationale:** Tailwind class strings are CSS decisions. The default CSS surface is one global entry. It contains the Tailwind import, semantic tokens, approved fonts, and documented global reset or media rules. The entry declares no class or ID selector except the color-scheme class. It does not use `@apply`, which hides an unreviewed utility group. Feature CSS, route CSS, CSS modules, Sass, styled-components, and emotion require a named exception decision.
+
+Feature and route code can use the Tailwind theme scale, semantic colors, named typography, radius, and shadow. It can also use responsive, state, and accessibility modifiers. It cannot use:
 
 - arbitrary bracket values for color, spacing, typography, radius, shadow, z-index, or breakpoints;
 - raw palette values such as `text-red-500` when a semantic token exists;
@@ -173,29 +170,27 @@ approved composition. A bracket in the utility itself is an arbitrary value and 
 `lg:w-[37rem]`, and `[--panel-gap:13px]` require a token or declared variant. An arbitrary selector
 variant such as `[&>svg]:size-4` belongs to generated primitive source, not to feature code.
 
-An inline style is allowed only for measured runtime geometry, a CSS custom property, or a rendering
-target with no class support, and only when the vocabulary carries a `runtimeStyles` record naming the
-owning files, the custom properties, the reason, and the evidence. A generated-image module such as a
-Next.js `ImageResponse` route is the third case: it emits an image rather than DOM and its renderer
-accepts no class names, so it records an entry with an empty property list and a reason. Lucide icon imports are allowed in feature code because the icon family is pinned by
-the manifest and the baseline installs no icon wrapper; a component primitive package is a visual
-authority and stays inside the primitive boundary.
+An inline style is allowed for measured runtime geometry, a CSS custom property, or a target without class support. The vocabulary then carries a `runtimeStyles` record. That record names owning files, custom properties, reason, and evidence.
 
-Generated shadcn source may contain upstream utility classes; those classes are accepted baseline source.
+A Next.js `ImageResponse` route is a target without class support. It emits an image instead of DOM. Its record has an empty property list and a reason. Feature code can import Lucide icons because the manifest pins that family. The baseline installs no icon wrapper. A component primitive package is a visual authority and stays inside the primitive boundary.
+
+Generated shadcn source may contain upstream utility classes. Those classes are accepted baseline source.
 A modified generated file is an `extended` or `forked` component and follows `UI.FORKS.001`.
 
-Use `class-variance-authority` for repeated semantic variants and `cn` for conditional class merging.
-Do not place a feature-specific color or spacing branch in every consumer of a primitive.
+The implementation uses `class-variance-authority` for repeated semantic variants and `cn` for conditional class merging.
+The implementation does not place a feature-specific color or spacing branch in every consumer of a primitive.
 
 ### Track source changes (UI.FORKS.001)
 
-`ui-source-lock.json` records the pinned CLI, preset fingerprint, registry item address, installed paths,
-normalized file digest, and direct dependencies for every installed component. Normalize with the project
-formatter before hashing. The preset fingerprint is the SHA-256 of the decoded preset JSON with sorted
-keys and no whitespace; the component digest is the SHA-256 of formatter-normalized source. Validation
+**Requirement:** Frontends MUST track source changes.
+
+**Rationale:** `ui-source-lock.json` records the pinned CLI, preset fingerprint, registry item address, installed paths,
+normalized file digest, and direct dependencies for every installed component. The project formatter
+normalizes source before hashing. The preset fingerprint is the SHA-256 of the decoded preset JSON with sorted
+keys and no whitespace. The component digest is the SHA-256 of formatter-normalized source. Validation
 never fetches the registry.
 
-Classify source as:
+Source classification uses:
 
 | Status | Rule |
 |:---|:---|
@@ -204,32 +199,33 @@ Classify source as:
 | `forked` | Markup, behavior, API, or visual classes differ from the accepted source. |
 | `specialist` | A bounded external control is integrated under an approved exception. |
 
-A digest change cannot remain `baseline`. It must be reviewed as `extended` or `forked`, with reason,
-scope, owner, review trigger, and evidence. Prefer composition, then a named variant, before editing
-installed source. Do not overwrite a fork with an unattended CLI command.
+A digest change cannot remain `baseline`. A changed digest is reviewed as `extended` or `forked`, with reason,
+scope, owner, review trigger, and evidence. The implementation prefers composition, then a named variant, before editing
+installed source. The implementation does not overwrite a fork with an unattended CLI command.
 
 ### Govern behavior companions and specialist controls (UI.COMPANION.001)
 
-Approve behavior packages by the capability they supply, not by their visual catalog. Render behavior
+**Requirement:** Frontends MUST govern behavior companions and specialist controls.
+
+**Rationale:** Behavior package approval follows the capability it supplies, not its visual catalog. The implementation renders behavior
 through shadcn components and Litenova tokens whenever possible. The standard compositions are:
 
 | Capability | Default composition |
 |:---|:---|
 | Sort, filter, pagination, selection, column state | TanStack Table plus shadcn table, inputs, menus, and status |
 | Row virtualization | TanStack Virtual only after measured row volume requires it |
-| Forms and validation | Native form semantics, shadcn Field and controls, and the chosen behavior boundary |
+| Forms and validation | Native form semantics, shadcn Field and controls. The chosen behavior boundary |
 | Charts | The shadcn chart composition and its pinned chart dependency |
 | Date selection | shadcn Calendar and Date Picker composition |
 | Maps, media, schedulers, code editors, enterprise grids | A specialist surface with an exception |
 
-A specialist record names the package, exact scope, reason the approved composition is insufficient,
-fallback behavior, visual integration, focus model, reduced-motion behavior, accessibility evidence,
-and removal or review trigger. A second general purpose button, form, modal, or icon catalog is not a
-specialist exception.
+A specialist record names the package, exact scope, and reason approved composition is insufficient. It also names fallback behavior, visual integration, focus model, reduced-motion behavior, accessibility evidence, and review trigger. A second general-purpose button, form, modal, or icon catalog is not a specialist exception.
 
 ### Prove UI behavior and appearance (UI.EVIDENCE.001)
 
-Every new primitive, pattern, token change, source update, page contract, fork, and specialist surface
+**Requirement:** Frontends MUST prove UI behavior and appearance.
+
+**Rationale:** Every new primitive, pattern, token change, source update, page contract, fork, and specialist surface
 names evidence. The minimum evidence matrix is:
 
 | Change | Required evidence |
@@ -251,30 +247,33 @@ routes and states before its first release, and again when its shell or preset c
 
 Visual comparison runs in a declared browser, viewport, font-loading, and OS environment. A failed
 comparison cannot be resolved by updating the baseline without review. Accessibility automation is a
-floor; keyboard and screen-reader behavior remain required evidence where the interaction matters.
+floor. Keyboard and screen-reader behavior remain required evidence where the interaction matters.
 
 ### Follow the agent UI protocol (UI.AGENT.PROTOCOL.001)
 
-An agent performs these steps in order:
+**Requirement:** Frontends MUST follow the agent UI protocol.
 
-1. **Use:** search the vocabulary and installed primitives; identify the smallest approved component or
+**Rationale:** An agent performs these steps in order:
+
+1. **Use:** search the vocabulary and installed primitives. Identify the smallest approved component or
    pattern that satisfies the requirement.
-2. **Compose:** read the page contract, then assemble named regions and patterns. Add a vocabulary item
+2. **Compose:** read the page contract, then assemble named regions and patterns. The implementation adds a vocabulary item
    only when the existing language cannot express the requirement.
-3. **Constrain:** use the pinned preset, semantic tokens, approved Tailwind utilities, and the owning
-   frontend boundary. Do not invent local CSS or an unrecorded wrapper.
-4. **Prove:** run static checks, component states, keyboard and focus checks, accessibility checks,
-   compact and wide browser checks, and the named user-task evidence.
+3. **Constrain:** use the pinned preset, semantic tokens, and approved Tailwind utilities. The implementation applies them within the owning frontend boundary. The implementation does not invent local CSS or an unrecorded wrapper.
+4. **Prove:** run named user-task evidence. The implementation includes static, component-state, keyboard, focus, accessibility, compact-browser, and wide-browser checks.
 
-If the agent cannot satisfy the requirement within the vocabulary, it stops before inventing a visual
-decision and reports the missing behavior, candidate existing primitives, proposed vocabulary addition,
-cost, and evidence plan.
+If the vocabulary cannot satisfy the requirement, the agent stops before inventing a visual decision. It reports missing behavior and candidate existing primitives. It also reports the proposed vocabulary addition, cost, and evidence plan.
 
 ## Conventions
 
-### Use the product profiles
 
-All profiles use the same baseline. They limit composition and evidence, not colors or component bases.
+### Use the product profiles (UI.GOVERNANCE.CONVENTION.001)
+
+**Default:** Use the product profiles.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** All profiles use the same baseline. They limit composition and evidence, not colors or component bases.
 
 | Profile | Default shell and patterns | Density |
 |:---|:---|:---|
@@ -285,28 +284,29 @@ All profiles use the same baseline. They limit composition and evidence, not col
 An application with public and administration routes selects one primary profile and names any secondary
 shell in its vocabulary. It does not install a second visual system for administration.
 
-### Use the source update procedure
+### Use the source update procedure (UI.GOVERNANCE.CONVENTION.002)
 
-Pin the CLI, create a clean update branch, run `view`, `--dry-run`, and `--diff`, review generated and
-local files separately, update baseline source only after tests, merge forks manually, run the affected
-evidence matrix, update `ui-source-lock.json`, and commit the source update separately from product
-behavior. Review ordinary component updates quarterly; review security and accessibility fixes at once.
+**Default:** Use the source update procedure.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** The update branch pins the CLI and begins from a clean working tree. The implementation runs `view`, `--dry-run`, and `--diff`. Generated and local files receive separate review. The implementation updates baseline source only after tests.
+
+Forks merge manually and run the affected evidence matrix. The implementation updates `ui-source-lock.json`. The implementation commits the source update separately from product behavior. Ordinary component updates receive quarterly review. Security and accessibility fixes receive immediate review.
 
 ## Verification
 
-- Validate `standards.manifest.json` against `schemas/standards-manifest.schema.json`.
-- Validate each frontend UI entry, vocabulary, page sidecar, and source lock with
-  `node standards/tools/validate-ui.mjs` from the consumer root.
-- Confirm every web frontend uses the manifest baseline or has an override decision with a review date
-  that has not passed.
-- Confirm one primary visual system and one component base per frontend.
-- Confirm vendor imports stay inside the owning UI boundary and no package-internal path is used.
-- Confirm the workspace root and shared packages declare no second general purpose visual dependency.
-- Scan class strings in feature and route code for arbitrary Tailwind values, arbitrary selector
-  variants, raw palette values, important modifiers, undeclared inline styles, feature CSS, duplicate
-  `cn` helpers, and custom primitive copies.
-- Confirm every component digest matches its source lock or has a recorded fork.
-- Confirm page metadata has a matching UI sidecar and every page region names a vocabulary pattern.
-- Confirm tests are repeatable under the declared Playwright worker and fixture model.
-- Run the frontend lint, type, component, browser, accessibility, visual, and build gates affected by
-  the change.
+
+| ID | Method | Evidence |
+|:---|:---|:---|
+| UI.GOVERNANCE.001 | inspection | Pull request review asserts `select one visual authority` in the owning specification and source paths. |
+| UI.SHADCN.001 | inspection | Pull request review asserts `use the pinned shadcn/ui baseline` in the owning specification and source paths. |
+| UI.VOCABULARY.001 | inspection | Pull request review asserts `declare the UI vocabulary` in the owning specification and source paths. |
+| UI.PAGE.SPEC.001 | inspection | Pull request review asserts `specify pages before composition` in the owning specification and source paths. |
+| UI.TAILWIND.001 | inspection | Pull request review asserts `restrict CSS decisions` in the owning specification and source paths. |
+| UI.FORKS.001 | inspection | Pull request review asserts `track source changes` in the owning specification and source paths. |
+| UI.COMPANION.001 | inspection | Pull request review asserts `govern behavior companions and specialist controls` in the owning specification and source paths. |
+| UI.EVIDENCE.001 | test | An automated test citing `UI.EVIDENCE.001` asserts `prove UI behavior and appearance` at the affected boundary. |
+| UI.AGENT.PROTOCOL.001 | inspection | Pull request review asserts `follow the agent UI protocol` in the owning specification and source paths. |
+| UI.GOVERNANCE.CONVENTION.001 | inspection | Pull request review asserts `use the product profiles` in the owning specification and source paths. |
+| UI.GOVERNANCE.CONVENTION.002 | inspection | Pull request review asserts `use the source update procedure` in the owning specification and source paths. |

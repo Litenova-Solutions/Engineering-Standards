@@ -2,83 +2,152 @@
 
 ## Intent
 
-These principles resolve choices that a narrower convention does not cover. They favor explicit intent, complete use cases, and evidence over speculative abstractions or large inventories of partially implemented code.
+These principles resolve choices not covered by narrower conventions. They favor explicit intent, complete use cases, and evidence over speculative abstractions.
 
 ## Agent Summary {#agent-summary}
 
-- Keep one authored source for each fact.
-- Give each structured specification kind-specific authority, ownership, and review metadata.
-- Keep code and documentation names and behavior synchronized.
-- Complete one vertical use case before starting secondary work.
-- Encode structural boundaries in compiler, architecture, and test checks.
-- Add complexity only when a current requirement activates it.
-- Prefer business names and narrow dependencies over generic abstractions.
+- Keep one authored source for every fact. (CORE.SOURCE.001)
+- Record specification ownership and status separately. (CORE.DOCUMENTS.001, CORE.DOCUMENTS.003)
+- Deliver complete vertical use cases. (CORE.SLICE.001)
+- Mechanically prove enforceable boundaries. (CORE.ENFORCE.001)
+- Add complexity only after an activation criterion applies. (CORE.COMPLEXITY.001)
+- Name intent at public and architectural boundaries. (CORE.NAMING.001)
 
 ## Standards
 
-### Keep one authored source for each fact (CORE.SOURCE.001)
+### Keep one authored source (CORE.SOURCE.001)
 
-Write each rule, package version, status, route, and acceptance criterion once. Other documents link to that source. Generated application artifacts may derive from authored sources.
+**Requirement:** A consumer MUST author each rule, package version, status, route, and acceptance criterion in one canonical source.
 
-Package versions belong in `standards.manifest.json`. Use-case specification and implementation status belong in Specification Metadata. Tests cite the acceptance IDs they prove.
+**Rationale:** Other documents link to the source, and generated application artifacts can derive from it.
 
-### Assign document ownership and freshness (CORE.DOCUMENTS.001)
+### Locate package versions in the manifest (CORE.SOURCE.002)
 
-Structured consumer specifications MUST declare `kind`, `id`, `specStatus`, `owner`, and `lastReviewed` plus fields required for that kind. The [repository writing convention](../conventions/repository/writing.md) defines the metadata block.
+**Requirement:** A consumer MUST store package versions in `standards.manifest.json`.
 
-`specStatus` is `draft`, `approved`, or `retired`:
+**Rationale:** One manifest provides the selected profile's version authority.
 
-- `draft` is under review and is not authoritative.
-- `approved` is authoritative for the documented scope.
-- `retired` preserves history after the contract no longer applies.
+### Locate specification status in metadata (CORE.SOURCE.003)
 
-Behavior specifications also use `implementationStatus: planned` or `implementationStatus: verified`. An approved specification with planned implementation can describe a required target without claiming that code exists. A verified specification MUST name code, test, generated-contract, and operating evidence in its relevant sections. Retire the specification after supported public entry points are removed.
+**Requirement:** A consumer MUST store use-case specification and implementation status in Specification Metadata.
 
-Do not encode specification authority and implementation state in one field.
+**Rationale:** Structured metadata exposes status to repository tools and reviewers.
 
-### Deliver vertical use cases (CORE.SLICE.001)
+### Cite proved acceptance criteria (CORE.SOURCE.004)
 
-Implement the smallest complete path from domain behavior through persistence, API, optional UI, automated evidence, and operating impact.
+**Requirement:** An automated test MUST cite every acceptance criterion that it proves.
 
-Finish `posts.create-draft` across its required layers before creating an inventory of unfinished Post operations.
+**Rationale:** A stable criterion citation connects executable evidence to approved behavior.
+
+### Declare specification ownership (CORE.DOCUMENTS.001)
+
+**Requirement:** A structured consumer specification MUST declare kind, ID, authority status, owner, review date, and required kind fields.
+
+**Rationale:** The [authoring standard](authoring-standard.md) defines the opening metadata block and schema requirements.
+
+### Classify specification authority (CORE.DOCUMENTS.002)
+
+**Requirement:** A specification status MUST use `draft`, `approved`, or `retired` with its declared authority meaning.
+
+**Rationale:** Draft records are under review, approved records are authoritative, and retired records preserve prior scope.
+
+### Separate authority from implementation (CORE.DOCUMENTS.003)
+
+**Requirement:** A behavior specification MUST declare an implementation status in addition to its specification authority status.
+
+**Rationale:** An approved planned target is not an implemented behavior claim. `AGENTIC.METADATA.001` and `schemas/specification-metadata.schema.json` own the permitted values for both fields.
+
+### Retire public behavior deliberately (CORE.DOCUMENTS.004)
+
+**Requirement:** A retired specification MUST remove supported public entry points before retirement.
+
+**Rationale:** A retired record cannot remain the owner of a still-supported public behavior.
+
+### Deliver complete use-case slices (CORE.SLICE.001)
+
+**Requirement:** A consumer MUST implement each selected use case as the smallest complete path through Domain, persistence, entry points, evidence, and operating impact.
+
+**Rationale:** A vertical slice provides usable behavior rather than an inventory of disconnected inner-layer work.
+
+**Example:** `posts.create-draft` completes required layers before another unfinished Post operation starts.
 
 ### Prove enforceable boundaries mechanically (CORE.ENFORCE.001)
 
-Use project references, compiler visibility, architecture tests, lint rules, and behavior tests for boundaries a tool can prove. Use prose for intent and decisions that require judgment.
+**Requirement:** A consumer MUST use project references, compiler visibility, architecture tests, lint rules, or behavior tests for enforceable boundaries.
 
-A project-reference test can prove Domain does not reference Infrastructure. A use-case specification explains why only the owning author may publish a post.
+**Rationale:** Tools prove structural constraints, while specifications explain decisions that require judgment.
 
-### Require an activation criterion for added complexity (CORE.COMPLEXITY.001)
+**Example:** A project-reference test proves Domain has no Infrastructure reference.
 
-Do not add a package, project, wrapper, background process, cache, queue, or distributed pattern without a current Use case, Workflow, or project requirement that needs it.
+### Require current complexity activation (CORE.COMPLEXITY.001)
 
-Enable an extension when its activation criteria apply. A preference or possible future need is not an activation criterion.
+**Requirement:** A consumer MUST add packages, projects, wrappers, background processes, caches, queues, or distributed patterns only for a current documented requirement.
 
-### Name intent at boundaries (CORE.NAMING.001)
+**Rationale:** A current use case, Workflow, or project need supplies an activation criterion for added complexity.
 
-Use business operation names, specific command and query mediators, and business-action-specific external ports. Avoid generic bus, manager, helper, processor, and service names when a narrower name is available.
+### Select extensions by criteria (CORE.COMPLEXITY.002)
 
-`IPostPublicationNotifier` communicates one business action. `IExternalService` does not.
+**Requirement:** A consumer MUST enable an extension when its activation criteria apply.
+
+**Rationale:** Preference and possible future need do not establish an activation criterion.
+
+### Name boundary intent (CORE.NAMING.001)
+
+**Requirement:** A consumer MUST use business operation names, specific command and query mediators, and business-action external ports at boundaries.
+
+**Rationale:** Specific names reveal purpose and ownership at the point where components interact.
+
+### Avoid generic boundary names (CORE.NAMING.002)
+
+**Requirement:** A consumer MUST NOT use generic bus, manager, helper, processor, or service names when a narrower name exists.
+
+**Rationale:** Generic names obscure the business action and invite unrelated responsibility.
+
+**Example:** `IPostPublicationNotifier` names an action; `IExternalService` does not.
 
 ## Conventions
 
-### Prefer direct dependencies until a boundary exists
+### Prefer direct owned dependencies (CORE.CONVENTION.001)
 
-Use the selected framework type directly inside the layer that owns it. Introduce a project-owned abstraction only for an architectural boundary, provider replacement, test boundary, or stable domain concept.
+**Default:** Use a selected framework type directly inside the layer that owns it until an architectural boundary exists.
 
-### Prefer local clarity over speculative reuse
+**Replacement:** A consumer can replace this default with an explicit local convention.
 
-Keep operation-specific code in its operation folder. Move code to a shared location after two real consumers need the same behavior and the shared name remains precise.
+**Rationale:** A project-owned abstraction exists for provider replacement, test boundary, stable domain concept, or architecture boundary.
 
-## Examples
+### Prefer local code until reuse is real (CORE.CONVENTION.002)
 
-- Application query handlers use `IQuerySession` directly because Marten is part of the selected profile.
-- Domain repository interfaces remain project-owned because persistence must not enter Domain.
-- A two-line mapping used once stays beside its endpoint rather than becoming a generic mapper.
+**Default:** Keep operation-specific code in its operation folder until two real consumers need the same precise behavior.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Shared code requires a name and responsibility that remain accurate for both consumers.
+
+## Reference example
+
+This informative example demonstrates `CORE.CONVENTION.001` and `CORE.CONVENTION.002`.
+
+- Application query handlers use `IQuerySession` because Marten is part of the selected profile.
+- Domain repository interfaces remain project-owned because persistence cannot enter Domain.
+- A two-line mapping used once stays beside its endpoint.
 
 ## Verification
 
-- Search for generic abstractions added without a named consumer.
-- Confirm every new package, project, or process has a current Use case, Workflow, project requirement, or applicable extension.
-- Confirm shared code has at least two concrete consumers.
-- Confirm generated artifacts identify their authored source.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| CORE.SOURCE.001 | inspection | Review identifies one canonical authored source for each changed fact. |
+| CORE.SOURCE.002 | static | Dependency review resolves each selected version from the manifest. |
+| CORE.SOURCE.003 | static | Consumer validator resolves specification and implementation status from metadata. |
+| CORE.SOURCE.004 | static | Test scan resolves cited acceptance criteria to owned use-case specifications. |
+| CORE.DOCUMENTS.001 | static | Consumer validator validates required metadata fields for each specification kind. |
+| CORE.DOCUMENTS.002 | static | Metadata validator accepts only declared authority-status values. |
+| CORE.DOCUMENTS.003 | static | `node tools/validate-consumer.mjs` resolves both status fields against the metadata schema. |
+| CORE.DOCUMENTS.004 | inspection | Retirement review identifies removed public entry points. |
+| CORE.SLICE.001 | inspection | Use-case review links Domain, persistence, entry points, tests, and operations. |
+| CORE.ENFORCE.001 | test | Architecture, lint, or behavior evidence proves each enforceable boundary. |
+| CORE.COMPLEXITY.001 | inspection | Added complexity cites its current use case, Workflow, or project requirement. |
+| CORE.COMPLEXITY.002 | inspection | Selected extension record cites its activation criteria. |
+| CORE.NAMING.001 | inspection | Boundary review identifies specific business names. |
+| CORE.NAMING.002 | static | Naming scan flags generic boundary names lacking a narrower replacement. |
+| CORE.CONVENTION.001 | inspection | Dependency review identifies owned framework types or explicit abstractions. |
+| CORE.CONVENTION.002 | inspection | Shared-code review records two real consumers and a precise shared name. |

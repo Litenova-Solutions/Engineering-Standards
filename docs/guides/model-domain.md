@@ -1,12 +1,10 @@
 # Model a Domain Module
 
-Use this guide after discovery has established the business language and rules for a module. It converts those findings into a module specification, use-case specifications, aggregate boundaries, domain policies, and domain code.
+## Purpose
 
-In `domain module`, domain means the business area whose facts and rules the software represents. Module means one named responsibility boundary inside that area. For example, an event product may have Orders, Tickets, and Communications modules. These names describe business responsibilities, not .NET projects or deployable services.
+Produce a domain model that connects business language, aggregate behavior, use cases, and verification evidence.
 
-This guide does not replace interviews, Event Storming, policy review, or another discovery method. An agent may expose a missing definition or conflicting rule. It must not invent the business answer.
-
-## Required inputs
+## Prerequisites
 
 Start with:
 
@@ -20,7 +18,9 @@ An end-to-end flow connects use cases that produce one observable product outcom
 
 If a command depends on an unknown policy, record it under `Open modeling questions` and stop that use case. Other use cases with complete rules may continue.
 
-## Name the module language
+## Procedure
+
+### Name the module language
 
 Record each module term with one definition and rejected synonyms. Use the same term in documentation, domain types, application operations, API descriptions, and frontend features.
 
@@ -34,7 +34,7 @@ For the Orders module:
 
 Rejected synonyms prevent later contributors from creating `PurchaseRecord` beside `Order`. They also tell an agent which plausible names are wrong for this domain.
 
-## Draw aggregate boundaries from aggregate invariants
+### Draw aggregate boundaries from aggregate invariants
 
 An aggregate is a consistency boundary. It groups state that must remain valid together in one command transaction. The aggregate root is the object through which callers request every change inside that boundary.
 
@@ -68,7 +68,7 @@ Record the result in the module specification:
 | `Order` | Lines, totals, and lifecycle | `INV-ORDERS-01` | `orders.create-order`, `orders.cancel-order` |
 | `OrderClaim` | Guest claim lifecycle | `INV-ORDERS-04` | `orders.claim-guest-order` |
 
-## Define every aggregate state
+### Define every aggregate state
 
 Aggregate state is a business-valid condition with its required data and permitted behavior. A state object represents that condition as a type. It does more than label the aggregate.
 
@@ -97,7 +97,7 @@ public sealed record PostArchivedState(
 
 Put state-specific data on the state record. Do not duplicate `PublishedAt` or `ArchivedAt` on the aggregate. Do not add `PostStatus`, `IsPublished`, or a state string.
 
-An enum can name a fixed list of labels, but it cannot require the data and behavior associated with each condition. Adding more lifecycle behavior later then forces replacement of the enum and every switch built around it. State types make that extension boundary explicit from the first version.
+An enum can name a fixed list of labels. It cannot require the data and behavior associated with each condition. Adding more lifecycle behavior later forces replacement of the enum and every switch built around it. State types make that extension boundary explicit from the initial implementation.
 
 A one-state aggregate still defines the extension point:
 
@@ -116,7 +116,7 @@ For each state, answer:
 
 An unanswered question belongs in the module specification. It does not receive a guessed default.
 
-## Write transition rules
+### Write transition rules
 
 A transition is a business action that replaces one valid state with another. Record its source state, target state, aggregate invariant IDs, event, and owning use case.
 
@@ -143,7 +143,7 @@ public void Publish(DateTimeOffset publishedAt)
 
 Document rejected source states in the use-case failure table and acceptance criteria. A transition with no owning use case cannot be delivered or tested.
 
-## Give invariants and policies stable identities
+### Give invariants and policies stable identities
 
 An aggregate invariant uses `INV-{MODULE}-{NN}`:
 
@@ -164,18 +164,18 @@ This retention rule is a domain policy because one aggregate cannot enforce dele
 
 Do not renumber or reuse an approved rule ID. Link affected acceptance criteria.
 
-## Select entities and value objects
+### Select entities and value objects
 
 Use a child entity when identity and continuity matter inside the aggregate. Use a value object when its complete value defines equality.
 
 - `OrderLineId` identifies one line through quantity changes, so `OrderLine` is an entity.
-- `PostTitle` is replaced as a complete value, so it is a value object.
-- `Money` combines amount and currency and defines arithmetic rules, so it is a value object.
-- `PostTags` defines collection equality and normalization, so it is a collection value object.
+- `PostTitle` is replaced as a complete value. It is a value object.
+- `Money` combines amount and currency and defines arithmetic rules. It is a value object.
+- `PostTags` defines collection equality and normalization. It is a collection value object.
 
 Give each aggregate a typed version 7 ID. Use typed IDs for identities that participate in domain behavior.
 
-## Separate validation rules from aggregate invariants
+### Separate validation rules from aggregate invariants
 
 A validation rule rejects caller-correctable input before a command handler starts domain work. An aggregate invariant protects business consistency regardless of which caller invokes the domain object.
 
@@ -187,7 +187,7 @@ For `PostTitle`:
 
 Current aggregate state decides whether behavior is allowed. That check does not move into an application validator. For example, `title is required` is a validation rule, while `only a draft Post can be published` is an aggregate invariant.
 
-## Identify domain services
+### Identify domain services
 
 Place a rule on the aggregate or value object that owns it. Use a stateless domain service only when no object is a natural owner.
 
@@ -207,7 +207,7 @@ public sealed class OrderPricingDomainService
 
 Application obtains required aggregates and external facts before calling the service.
 
-## Record events and event reactions
+### Record events and event reactions
 
 An event is an immutable record of a completed fact. An event reaction is work triggered because that fact occurred. Event identifies the input fact. Reaction identifies the resulting action and does not imply that the work is secondary or optional.
 
@@ -221,7 +221,7 @@ A domain event remains an internal domain contract. Translate it to an integrati
 
 An event may have no event reaction. Do not create an event only because every method is expected to emit one.
 
-## Separate atomic work from a durable workflow
+### Separate atomic work from a durable workflow
 
 One top-level command handler may coordinate multiple aggregates in one transaction when the use case names the rule requiring atomic consistency. It stages every changed aggregate and lets the command post-handler commit once.
 
@@ -241,7 +241,7 @@ PaymentConfirmed
 
 Each issued command owns one transaction. The workflow orchestrator records progress and the outgoing command durably without mutating the participating aggregates.
 
-## Map the model to use cases
+### Map the model to use cases
 
 Each command use-case specification names:
 
@@ -255,7 +255,7 @@ Each command use-case specification names:
 
 Each query states `No domain transition` and names its read model. It does not load an aggregate for presentation.
 
-## Use a matching folder shape
+### Use a matching folder shape
 
 ```text
 apps/api/src/Shop.Domain/
@@ -298,7 +298,7 @@ The Orders folder represents the Orders module in every layer. It is not a runti
 
 Create subfolders only when real types require them.
 
-## Completion check
+## Verification
 
 - The module uses one term for each concept and records rejected synonyms.
 - Every aggregate boundary names owned children, referenced aggregate IDs, and protected `INV-*` invariants.

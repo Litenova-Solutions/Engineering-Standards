@@ -2,7 +2,7 @@
 
 ## Intent
 
-Extensions add conditional standards to the baseline profile. They remain inactive until a current product, risk, integration, or operating requirement meets their activation criteria and the consumer lists the extension ID in `selectedExtensions` in `standards.project.json`.
+Extensions add conditional standards to the baseline profile. An extension remains inactive until a current requirement meets its activation criteria. The consumer also lists its ID in `selectedExtensions` within `standards.project.json`.
 
 An extension may add requirements, packages, projects, and verification. It may replace a baseline rule only when its document names that rule ID.
 
@@ -54,7 +54,8 @@ The project selects both `localization` and `outbox-worker`:
 
 `localization` applies across the project. Only the Use cases and Workflows that require durable delivery list `outbox-worker`. For example:
 
-```json
+```markdown
+---
 {
   "kind": "workflow",
   "id": "order-fulfillment",
@@ -65,4 +66,5 @@ The project selects both `localization` and `outbox-worker`:
   "participatingModules": ["orders", "tickets"],
   "applicableExtensions": ["outbox-worker"]
 }
+---
 ```

@@ -62,14 +62,14 @@ const RISK = ['authorization', 'money', 'sensitive-data', 'irreversible', 'concu
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const base = { kind: 1, id: 1, specStatus: 1, owner: 1, lastReviewed: 1 };
 const KINDS = {
-  product: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'primaryReleaseFlow'], props: { ...base, primaryReleaseFlow: 1 }, id: ID },
+  product: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   'domain-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   glossary: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   'modules-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
   aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: UC },
   'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: UC },
-  'end-to-end-flow': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'releaseRole', 'useCases'], props: { ...base, implementationStatus: 1, releaseRole: 1, useCases: 1, applicableExtensions: 1 }, id: ID },
+  'end-to-end-flow': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'useCases'], props: { ...base, implementationStatus: 1, useCases: 1, applicableExtensions: 1 }, id: ID },
   workflow: { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'participatingModules', 'applicableExtensions'], props: { ...base, implementationStatus: 1, participatingModules: 1, applicableExtensions: 1 }, id: ID },
   'domain-policy': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'appliesToModules'], props: { ...base, appliesToModules: 1, applicableExtensions: 1 }, id: ID },
   'decision-evidence': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
@@ -93,13 +93,21 @@ const files = [];
 })(docsRoot);
 
 const metas = []; // {rel, meta, file}
-let products = 0, primaryFlows = 0;
+let products = 0;
 const acDefs = new Map();  // id -> [rel]
 const e2eDefs = new Map(); // id -> [rel]
 let uiOutput = '';
 
+// Specification Metadata is a '---' delimited JSON block, per
+// WRITING.METADATA.002. A file that carries a metadata object in any other
+// wrapper is reported rather than skipped, because a silently skipped
+// specification is an unvalidated specification.
 function parseBlock(raw, rel) {
-  if (!raw.startsWith('---')) return null;
+  if (!raw.startsWith('---')) {
+    const fenced = raw.slice(0, 2000).match(/```[a-z]*\s*\n\s*\{[\s\S]{0,400}?"kind"\s*:/);
+    if (fenced) err(`${rel}: metadata block is not delimited by '---'`);
+    return null;
+  }
   const end = raw.indexOf('\n---', 3);
   if (end < 0) { err(`${rel}: unterminated metadata block`); return null; }
   try { return JSON.parse(raw.slice(3, end).trim()); }
@@ -161,15 +169,13 @@ for (const f of files) {
   if (meta.implementationStatus !== undefined && !IMPL.includes(meta.implementationStatus)) err(`${rel}: bad implementationStatus`);
   if (meta.lastReviewed !== undefined && !DATE.test(meta.lastReviewed)) err(`${rel}: bad lastReviewed '${meta.lastReviewed}'`);
   if (meta.operationType !== undefined && !['command', 'query'].includes(meta.operationType)) err(`${rel}: bad operationType`);
-  if (meta.releaseRole !== undefined && !['primary', 'supporting'].includes(meta.releaseRole)) err(`${rel}: bad releaseRole`);
   if (Array.isArray(meta.risks)) for (const r of meta.risks) if (!RISK.includes(r)) err(`${rel}: bad risk '${r}'`);
   for (const a of ['actors', 'entryPoints', 'applicableExtensions']) if (Array.isArray(meta[a])) for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'`);
   for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
   for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
 
-  if (meta.kind === 'product') { products++; if (!fs.existsSync(path.join(docsRoot, 'product', 'flows', `${meta.primaryReleaseFlow}.md`))) err(`${rel}: primaryReleaseFlow '${meta.primaryReleaseFlow}' has no flow file`); }
+  if (meta.kind === 'product') products++;
   if (meta.kind === 'end-to-end-flow') {
-    if (meta.releaseRole === 'primary') primaryFlows++;
     for (const uc of meta.useCases ?? []) { const [mod, name] = uc.split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
   }
   if (meta.kind === 'workflow') for (const mod of meta.participatingModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: participatingModule '${mod}' has no module dir`);
@@ -204,14 +210,12 @@ for (const f of files) {
 
 // ---- aggregate cross-file checks -------------------------------------------
 if (products !== 1) err(`Expected exactly one product specification, found ${products}`);
-if (primaryFlows !== 1) err(`Expected exactly one primary release flow, found ${primaryFlows}`);
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
 
 // A React web consumer opts into the deterministic UI validator through its
-// frontend platform declaration or UI block. Existing consumers can migrate in
-// stages while their frontend entries remain platform-neutral, but a recorded UI
-// rule override still has to carry a live review date.
+// frontend platform declaration or UI block. A recorded UI rule override must
+// carry a live review date.
 const uiActivated = (project.paths?.frontends ?? []).some((frontend) => frontend.ui || frontend.platform === 'react-web')
   || (project.overrides ?? []).some((override) => /^UI\./.test(override?.ruleId ?? ''));
 if (uiActivated) {

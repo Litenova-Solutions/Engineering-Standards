@@ -1,70 +1,78 @@
 # Contributing
 
-Changes use a branch and pull request against `main`. Direct pushes to `main` are outside the release process.
+Submit changes through a branch and pull request against `main`. Direct pushes to `main` are outside the release process.
 
-## Documentation contract
+## Authoring Contract
 
-Each topic document begins with `Intent` and separates required `Standards` from replaceable `Conventions`. Actionable standards use a unique canonical rule ID with the human title first.
+Follow the [authoring standard](docs/foundations/authoring-standard.md) for every active standards page, template, instruction, and release note.
 
-Keep one canonical source for each rule, package version, extension, and upgrade requirement. Link instead of copying.
+Keep one canonical source for each provision, version, extension, and technical fact. Link to that source instead of copying it. (CORE.SOURCE.001)
 
-## Required review
+## Current Snapshot
 
-Before requesting review:
+Treat active standards as the complete current contract. (WRITING.SNAPSHOT.001)
 
-- Inspect changed links and rule IDs.
-- Confirm manifest paths and `#agent-summary` anchors exist.
-- Confirm extension names match the manifest and consumer template.
-- Validate `standards.manifest.json` and `templates/docs/standards.project.json` against their schemas.
+Do not retain history-specific paths, IDs, terminology, aliases, maps, standards-release migration material, compatibility rules, or transition checks. (WRITING.SNAPSHOT.002)
+
+Keep release context in `CHANGELOG.md` and Git history. The repository validator evaluates current material only. (WRITING.SNAPSHOT.001)
+
+## Provision Changes
+
+A new or changed Standard includes:
+
+- One atomic Requirement with one rule ID.
+- An informative example when `WRITING.EXAMPLE.001` requires one.
+- One exact Verification row.
+- A current changelog entry.
+
+Assign a new ID to each changed Standard assertion. (WRITING.REQUIREMENT.001)
+
+Do not add aliases, replacement maps, alternate paths, compatibility terms, or transition material. (WRITING.SNAPSHOT.002)
+
+An actionable Convention includes one convention ID, Default statement, Replacement statement, and Verification row.
+
+## Extension Changes
+
+An extension page declares Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, and Verification.
+
+The extension document names each baseline provision it replaces. The manifest records its path, activation scope, and applicable specification kinds.
+
+Do not create a separate extension descriptor. The Markdown page and manifest entry form the extension contract.
+
+## Required Review
+
+Before review:
+
+- Inspect changed links, anchors, provision IDs, and evidence rows.
+- Confirm manifest paths and `#agent-summary` anchors.
+- Confirm extension declarations match the manifest.
+- Validate the two tracked schema consumers.
+- Update affected templates and validator cases.
 - Update the changelog.
-- Add an upgrade guide when an existing compliant consumer must change in a post-v1.10.0 release.
-- Update document templates when Specification Metadata or required sections change.
 - Run `git diff --check`.
 
-The repository ships reference validators for Specification Metadata and controlled React web UI. It has
-no generated catalog or application scaffold. Validate JSON shape with the tracked schemas and run both
-validators through consumer CI or review tooling.
+A changed validator rule includes one passing case and one failing case. A rule without both cases is unverified.
 
-A change to a UI rule, schema, template, or the UI validator adds or updates a case in
-`tools/validate-ui.cases.mjs` in the same change, and `node tools/validate-ui.cases.mjs` passes. A rule
-without a passing and a failing case is unverified.
+A rule in `WARNING_DIAGNOSTIC_CODES` reports a defect under active repair. Do not add a new occurrence of a warning that already has a count. Move the code out of that list when its count reaches zero.
 
-## Normative changes
+The pull request checklist records the manual active-voice, terminology, atomicity, example, and quality review.
 
-A new or changed standard includes:
+## Release Numbering
 
-- One canonical rule ID.
-- Intent and at least one concrete example.
-- Verification that can be performed by an agent, reviewer, compiler, test, or operating check.
-- A changelog entry.
-- An upgrade note when an existing compliant consumer must change.
+The [authoring standard](docs/foundations/authoring-standard.md) owns the release model, including the meaning of each version number. This section projects that model for contributors.
 
-A convention states how a consumer may document a local replacement. Do not use a convention to weaken a security, data, or architectural standard.
+Each release states its complete contract without depending on an earlier release. (WRITING.SNAPSHOT.003)
 
-## Extensions
+Do not add a compatibility guarantee, migration path, deprecation period, replacement map, or identifier alias between standards releases. (WRITING.SNAPSHOT.004)
 
-An extension document contains activation criteria, baseline relationship, agent summary, standards, conventions, dependencies, and verification. It names every baseline rule it replaces.
+A consumer keeps a pinned release for as long as that consumer chooses, and absorbs every difference when adopting a later release. (WRITING.SNAPSHOT.005)
 
-Do not add a separate extension descriptor or schema. The extension Markdown file is the contract, and the manifest maps its ID to its path, activation scope, and allowed local specification kinds.
+`WRITING.SNAPSHOT.004` covers standards releases only. A consumer product is a running service, and its own API compatibility, migration, deprecation, and rollback provisions still apply.
 
-## Solo-maintainer review
+`CHANGELOG.md` is the repository release note. The changelog describes the current contract without prescribing a transition path. (WRITING.SNAPSHOT.001)
 
-The maintainer may merge their own pull request after all required checks pass and an AI review examines the complete diff. A second human approval is encouraged when another maintainer is available, but it is not a merge requirement.
+## Maintainer Review
 
-Resolve every actionable review comment before merge. Use squash merge unless preserving separate migration commits materially helps review.
+The maintainer can merge their own pull request after every required check passes and an AI reviewer examines the complete diff.
 
-## Versioning
-
-- Patch releases make narrow corrections or clarifications.
-- Minor releases make a coherent standards evolution, including changes that require consumer migration.
-- Major releases replace a substantial part of the supported scope, method, or platform profile.
-
-No release category promises backward compatibility. Prefer one clear current contract over deprecated aliases or retained vocabulary. The changelog and upgrade guide state required consumer work.
-
-Accepted decision records are historical. Add a replacement decision and mark the old record superseded rather than rewriting its outcome.
-
-## Consumer upgrades
-
-For standards releases after v1.10.0, consumers update the pinned standards commit in a dedicated pull
-request, read the changelog and applicable upgrade guide, apply required work, and run the complete
-application gate set.
+Resolve each actionable review comment before merge. Use squash merge unless separate commits preserve necessary review evidence.

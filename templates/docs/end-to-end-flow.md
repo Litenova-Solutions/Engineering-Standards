@@ -6,7 +6,6 @@
   "implementationStatus": "planned",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD",
-  "releaseRole": "primary",
   "useCases": ["__MODULE__.__USE_CASE__"],
   "applicableExtensions": []
 }
@@ -53,7 +52,3 @@ Link Use-case specifications. Do not copy their inputs, rules, failures, or acce
 ## End-to-end tests
 
 - [E2E-__FLOW_ID__-01] Replace with one complete outcome verified through a deployed public boundary.
-
-## Release scope
-
-State what the primary or supporting flow includes, which other flows it requires, and what remains excluded.

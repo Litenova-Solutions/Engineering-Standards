@@ -2,63 +2,149 @@
 
 ## Intent
 
-Reporting separates complex joins, aggregate analysis, and large exports from normal request projections when their cost or duration exceeds the baseline read path.
+Reporting separates complex joins, aggregate analysis, and large exports from normal request projections when cost or duration exceeds the baseline read path.
 
 ## Activation
 
-**Activation scope:** `local`. Applicable specification kinds: Use case. List it in `applicableExtensions` only on those kinds.
+Activation scope: `local`.
 
-Enable `reporting` for a documented query or export that requires complex relational SQL, large result sets, long processing, object storage, or a latency budget outside normal requests.
+Applicable specification kinds: `use-case`.
 
-The extension replaces no baseline read rule for ordinary queries. Long-running exports activate Worker under `ARCH.WORKER.001`.
+The consumer enables `reporting` for a documented query or export with complex relational SQL, large results, long processing, object storage, or exceptional latency budget.
+
+## Baseline relationship
+
+This extension does not replace the baseline rule for ordinary queries. Long-running exports activate Worker under `ARCH.WORKER.001`.
 
 ## Agent Summary {#agent-summary}
 
-- Keep normal request reads in `IQuerySession`.
-- Own raw SQL and provider access in Infrastructure.
-- Parameterize every external value.
-- Apply the same actor, tenant, and sensitive-field authorization as item reads.
-- Move long exports to Worker and issue short-lived authorized downloads.
-- Bound ranges, rows, execution time, storage lifetime, and cancellation.
-- Test query plans with representative data.
+- Record cost before adding reporting infrastructure. (EXT.REPORT.ADOPT.001)
+- Keep raw SQL parameterized in Infrastructure. (EXT.REPORT.SQL.001, EXT.REPORT.SQL.002)
+- Apply item-read authorization to report data. (EXT.REPORT.AUTHZ.001)
+- Run budget-exceeding exports in Worker. (EXT.REPORT.EXPORT.001)
+- Bound report work and output retention. (EXT.REPORT.LIMITS.001)
+- Escape spreadsheet formula-leading values. (EXT.REPORT.CONTENT.001)
 
 ## Standards
 
-### Separate reporting after a real query requires it (EXT.REPORT.ADOPT.001)
+### Record reporting need (EXT.REPORT.ADOPT.001)
 
-Record the accepted report, representative data volume, current plan or limitation, latency target, maximum result, and operating owner. Do not create a reporting subsystem for possible future analytics.
+**Requirement:** A reporting proposal MUST record the report, representative data volume, plan or limitation, latency target, maximum result, and operating owner.
 
-### Keep SQL parameterized and reviewed (EXT.REPORT.SQL.001)
+**Rationale:** The record establishes why a normal request projection cannot meet the documented boundary.
 
-Infrastructure owns raw SQL and connection handling. Parameterize every actor, tenant, filter, range, sort, and pagination value. Review query plans and indexes using representative data.
+### Avoid speculative reporting systems (EXT.REPORT.ADOPT.002)
 
-### Apply the same data authorization (EXT.REPORT.AUTHZ.001)
+**Requirement:** A project MUST NOT create reporting infrastructure for possible future analytics.
 
-Reports and exports enforce actor, role, ownership, tenant, and sensitive-field rules. A bulk endpoint cannot bypass checks applied to item reads.
+**Rationale:** Reporting infrastructure needs an accepted query or export with a present cost boundary.
 
-### Move long work outside the request (EXT.REPORT.EXPORT.001)
+### Parameterize report SQL (EXT.REPORT.SQL.001)
 
-Run work exceeding the request budget through Worker. Store output in approved object storage, record owner and expiry, and issue a short-lived authorized download.
+**Requirement:** A reporting query MUST parameterize every actor, tenant, filter, range, sort, and pagination value.
 
-### Bound report cost (EXT.REPORT.LIMITS.001)
+**Rationale:** Parameters preserve data isolation and protect raw SQL from injection.
 
-Define maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime. Support cancellation and remove expired outputs.
+### Keep raw SQL in Infrastructure (EXT.REPORT.SQL.002)
 
-### Protect spreadsheet output (EXT.REPORT.CONTENT.001)
+**Requirement:** Infrastructure MUST own raw reporting SQL and connection handling.
 
-Escape formula-leading values in CSV or spreadsheet exports unless the field intentionally contains a reviewed formula. Use an explicit character encoding and stable column contract.
+**Rationale:** Provider-specific query and connection behavior stays outside Application and Domain.
+
+### Review report plans (EXT.REPORT.SQL.003)
+
+**Requirement:** A report owner MUST review query plans and indexes with representative data.
+
+**Rationale:** Representative volumes reveal cost that small local datasets can hide.
+
+### Apply item-read authorization (EXT.REPORT.AUTHZ.001)
+
+**Requirement:** A report or export MUST enforce actor, role, ownership, tenant, and sensitive-field rules that apply to item reads.
+
+**Rationale:** A bulk interface cannot bypass data access checks applied to individual resources.
+
+### Run budget-exceeding exports in Worker (EXT.REPORT.EXPORT.001)
+
+**Requirement:** An export exceeding its request budget MUST run through Worker.
+
+**Rationale:** Worker execution frees the HTTP request from long-running report work.
+
+### Protect export output (EXT.REPORT.EXPORT.002)
+
+**Requirement:** An export worker MUST store output in approved object storage with an owner, expiry, and short-lived authorized download.
+
+**Rationale:** Export files can contain sensitive data and need controlled access and retention.
+
+### Define report limits (EXT.REPORT.LIMITS.001)
+
+**Requirement:** A report specification MUST define maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime.
+
+**Rationale:** Explicit limits bound database, Worker, and object-storage cost.
+
+### Support report cancellation (EXT.REPORT.LIMITS.002)
+
+**Requirement:** A report implementation MUST support cancellation and remove expired outputs.
+
+**Rationale:** Cancellation and expiry prevent abandoned work and files from consuming resources indefinitely.
+
+### Escape formula-leading export values (EXT.REPORT.CONTENT.001)
+
+**Requirement:** A CSV or spreadsheet export MUST escape formula-leading values unless a reviewed field intentionally contains a formula.
+
+**Rationale:** Spreadsheet applications can interpret unescaped values as executable formulas.
+
+### Define export encoding and columns (EXT.REPORT.CONTENT.002)
+
+**Requirement:** An export format MUST use explicit character encoding and a stable column contract.
+
+**Rationale:** Stable output lets consumers parse data without locale or implementation assumptions.
 
 ## Conventions
 
-Keep report definitions in Application under their business module. Keep SQL, row mappings, and storage providers in Infrastructure. Keep Worker orchestration separate from report business rules.
+### Keep report definitions in Application (EXT.REPORT.CONVENTION.001)
+
+**Default:** Keep report definitions in Application under their business module.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Business meaning and authorization belong with the module that owns the report.
+
+### Keep report providers in Infrastructure (EXT.REPORT.CONVENTION.002)
+
+**Default:** Keep SQL, row mappings, and storage providers in Infrastructure.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Query and storage implementation details are provider boundaries.
+
+### Separate Worker orchestration (EXT.REPORT.CONVENTION.003)
+
+**Default:** Keep Worker orchestration separate from report business rules.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Worker scheduling and execution do not define report authorization or meaning.
 
 ## Dependencies
 
-No report or object-storage package is selected by default. Each provider requires a decision and manifest pin.
+No report or object-storage package is selected by default. Each provider needs a decision and manifest pin.
 
 ## Verification
 
-- Test results, authorization, tenant scope, cancellation, timeout, range, rows, and output expiry.
-- Review the PostgreSQL plan with recorded representative data volume.
-- Test spreadsheet formula injection and encoding.
-- Test Worker restart, duplicate job execution, download authorization, and cleanup.
+| ID | Method | Evidence |
+|:---|:---|:---|
+| EXT.REPORT.ADOPT.001 | inspection | Report specification records each required cost and ownership field. |
+| EXT.REPORT.ADOPT.002 | inspection | Reporting decision names an accepted current query or export need. |
+| EXT.REPORT.SQL.001 | test | Integration tests bind actor, tenant, filter, range, sort, and pagination values. |
+| EXT.REPORT.SQL.002 | inspection | Source review locates raw report SQL and connection handling in Infrastructure. |
+| EXT.REPORT.SQL.003 | operation | Review record includes plans and indexes for representative report data. |
+| EXT.REPORT.AUTHZ.001 | test | Report authorization tests cover actor, role, owner, tenant, and sensitive fields. |
+| EXT.REPORT.EXPORT.001 | test | Budget-exceeding export tests queue work through Worker. |
+| EXT.REPORT.EXPORT.002 | test | Export download tests require owner authorization and honor expiry. |
+| EXT.REPORT.LIMITS.001 | inspection | Report specification declares each report cost and storage limit. |
+| EXT.REPORT.LIMITS.002 | test | Cancellation and expiry tests stop work and remove expired output. |
+| EXT.REPORT.CONTENT.001 | test | Formula-leading export values are escaped except reviewed formula fields. |
+| EXT.REPORT.CONTENT.002 | test | Export fixtures assert explicit encoding and stable column order. |
+| EXT.REPORT.CONVENTION.001 | inspection | Report definitions remain module-owned in Application or record a replacement. |
+| EXT.REPORT.CONVENTION.002 | inspection | SQL and storage code remain in Infrastructure or record a replacement. |
+| EXT.REPORT.CONVENTION.003 | inspection | Worker code does not contain report business rule ownership. |

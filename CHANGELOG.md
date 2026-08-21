@@ -1,5 +1,37 @@
 # Changelog
 
+## v1.11.0
+
+- Added `docs/foundations/authoring-standard.md` as the canonical contract for controlled technical prose, page structure, provisions, summaries, examples, and evidence mappings.
+- Adopted an STE-inspired repository profile with 20-word procedure sentences, 25-word descriptive sentences, six-sentence paragraphs, ASCII prose, active voice, and controlled terminology. The profile does not claim ASD-STE100 conformance or reproduce its dictionary.
+- Limited normative vocabulary to uppercase `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`, and `MAY` under the RFC 2119 and RFC 8174 interpretation.
+- Rewrote every active foundation, profile, convention, and extension page with explicit Requirement, Default, Replacement, Agent Summary, and Verification structures.
+- Added canonical IDs to actionable conventions while retaining distinct replacement authority from Standards overrides.
+- Replaced duplicated policy prose in `AGENTS.md` and `CONTRIBUTING.md` with concise projections that cite canonical provisions.
+- Added `tools/validate-standards.mjs`, its dependency-free fixture suite, a pull request checklist, and a pinned GitHub Actions validation workflow.
+- Added authoring templates for normative topics, extensions, and guides under `templates/standards/`.
+- Removed the repository writing convention after moving its authority into the authoring foundation.
+- Made the standards release model normative. `WRITING.SNAPSHOT.003` requires each release to state its complete contract without depending on an earlier release. `WRITING.SNAPSHOT.004` prohibits a compatibility guarantee, migration path, deprecation period, replacement map, or identifier alias between standards releases. `WRITING.SNAPSHOT.005` records that a consumer keeps a pinned release for as long as that consumer chooses.
+- Scoped that release model to the standards repository. Consumer product API compatibility, schema migration, deprecation, and rollback provisions are unchanged, including the `api-compatibility` and `persistence-ef-core` extensions.
+- Moved the release model and version-number meaning from `CONTRIBUTING.md` into the authoring standard as the canonical `Release model` concept. `CONTRIBUTING.md` now projects that model with citations instead of restating it.
+- Added the `Standards release` glossary term.
+- Corrected `CORE.DOCUMENTS.003`, which named only `planned` and `verified` while the metadata schema, `AGENTIC.METADATA.001`, and `tools/validate-consumer.mjs` all accept `implemented`. The provision now requires an implementation status and cites the schema as the owner of the permitted values.
+- Stated the Specification Metadata carrier in `WRITING.METADATA.002`. The block opens and closes with a line containing only `---`. The extension index example now shows that form instead of a bare JSON object.
+- Added `templates/docs/aggregate.md` for the `aggregate` specification kind, which the metadata schema, `tools/validate-consumer.mjs`, and `AGENTIC.CONVENTION.002` already required, and listed it in the template index.
+- Removed an empty `Vocabulary` heading from the engineering system foundation.
+- Added `tools/validate-consumer.cases.mjs` and made it a required CI step. The reference consumer validator previously shipped with no fixture suite and never ran in this repository.
+- Built the consumer fixture from the tracked templates, so every shipped Markdown metadata block is now validated as part of the baseline case.
+- Made `tools/validate-consumer.mjs` report a metadata block that is not delimited by `---` instead of skipping the file. A silently skipped specification is an unvalidated specification.
+- Added seven authoring rules that detect provisions and evidence carrying no information: `PROVISION_RESTATES_HEADING`, `VERIFY_TEMPLATED_EVIDENCE`, `VERIFY_NO_ARTIFACT`, `SUMMARY_RESTATES_REQUIREMENT`, `ID_PREFIX_OWNERSHIP`, `HEADING_EMPTY_BODY`, and `INDEX_CONTAINS_PROCEDURE`.
+- Added a warning tier to `tools/validate-standards.mjs`. A code in `WARNING_DIAGNOSTIC_CODES` reports a defect under active repair and does not fail the build. `--warnings` lists every occurrence.
+- Removed every version-specific upgrade guide and the requirement to publish future migration instructions. Consumers remain on pinned releases until they select another complete contract.
+- Replaced the version-specific adoption guide with `docs/guides/getting-started.md` and removed the duplicate v1 release-scope guide.
+- Replaced application-v1 readiness labels with version-neutral release evidence and release-record guidance.
+- Removed primary-flow metadata requirements from consumer specifications and the reference consumer validator.
+- Removed history-specific authoring checks. The validator evaluates the current standards snapshot.
+- Removed archived decision pages and their active navigation. Changelog and Git history retain release context.
+- Set the standards manifest version to 1.11.0 without changing schema version 3.
+
 ## v1.10.0
 
 - Made `shadcn/ui` with Tailwind CSS v4 the default React web UI system for all product profiles:
@@ -13,8 +45,7 @@
   `UI.AGENT.PROTOCOL.001`, and `FTEST.UI.001`.
 - Added UI vocabulary, page-contract, and shadcn source-lock schemas and templates. Source locks record
   generated source digests and require a visible fork classification when source changes.
-- Added the accepted [controlled React web UI baseline decision](docs/reference/decisions/controlled-ui-baseline.md)
-  and a focused UI override decision template for alternate systems or specialist controls.
+- Added the controlled React web UI baseline decision and a focused UI override decision template for alternate systems or specialist controls.
 - Added the deterministic `tools/validate-ui.mjs` reference validator and made
   `tools/validate-consumer.mjs` invoke it when a consumer declares a React web platform, a UI
   configuration, or a `UI.*` override. The validator reads Tailwind rules from extracted class strings
