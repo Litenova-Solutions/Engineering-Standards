@@ -67,6 +67,8 @@ Do not add a compatibility guarantee, migration path, deprecation period, replac
 
 A consumer keeps a pinned release for as long as that consumer chooses, and absorbs every difference when adopting a later release. (WRITING.SNAPSHOT.005)
 
+A consumer records the release it reviewed in `reviewedStandardsVersion`, so adopting a later release is an explicit act. (WRITING.SNAPSHOT.006)
+
 `WRITING.SNAPSHOT.004` covers standards releases only. A consumer product is a running service, and its own API compatibility, migration, deprecation, and rollback provisions still apply.
 
 `CHANGELOG.md` is the repository release note. The changelog describes the current contract without prescribing a transition path. (WRITING.SNAPSHOT.001)

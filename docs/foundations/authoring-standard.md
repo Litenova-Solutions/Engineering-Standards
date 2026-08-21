@@ -13,6 +13,7 @@ The standards use one document grammar and one controlled technical prose profil
 - Keep summaries informative and cite every projected provision. (WRITING.SUMMARY.001)
 - Map every provision to exact verification evidence. (WRITING.VERIFICATION.001)
 - Validate only current standards material. (WRITING.SNAPSHOT.001, WRITING.SNAPSHOT.002)
+- Publish complete releases and record the one a consumer reviewed. (WRITING.SNAPSHOT.003, WRITING.SNAPSHOT.004, WRITING.SNAPSHOT.005, WRITING.SNAPSHOT.006)
 - Run the dependency-free authoring checks before review. (WRITING.VALIDATION.001)
 
 ## Concepts
@@ -327,6 +328,12 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** Adoption is a consumer decision, and no repository change obliges a consumer to move to a later release.
 
+### Record the reviewed standards release (WRITING.SNAPSHOT.006)
+
+**Requirement:** A consumer MUST record the standards release it last reviewed in `reviewedStandardsVersion` within `standards.project.json`.
+
+**Rationale:** A provision can gain force while keeping its identifier, so an override written against an earlier release would otherwise apply to a rule nobody reread. The recorded release makes adoption an explicit act.
+
 ## Conventions
 
 ### Prefer direct action headings (WRITING.HEADING.CONVENTION.001)
@@ -386,6 +393,7 @@ This informative example demonstrates `WRITING.REQUIREMENT.001`, `WRITING.EXAMPL
 | WRITING.SNAPSHOT.003 | inspection | Release review confirms each active provision resolves without reference to an earlier release. |
 | WRITING.SNAPSHOT.004 | inspection | Pull request review finds no cross-release compatibility, migration, deprecation, or alias material. |
 | WRITING.SNAPSHOT.005 | inspection | Review confirms no active provision requires a consumer to adopt a later standards release. |
+| WRITING.SNAPSHOT.006 | static | `node standards/tools/validate-consumer.mjs` fails when `reviewedStandardsVersion` differs from the pinned manifest version. |
 | WRITING.HEADING.CONVENTION.001 | inspection | Review records the action verb used by every changed provision heading. |
 | WRITING.INSTRUCTION.CONVENTION.001 | inspection | Review identifies the unsafe boundary behind every retained negative instruction. |
 | WRITING.TABLE.CONVENTION.001 | inspection | Review confirms that each changed table represents an exact mapping or comparison. |

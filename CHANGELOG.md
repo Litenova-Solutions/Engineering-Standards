@@ -15,6 +15,7 @@
 - Renamed `docs/conventions/repository/` to `docs/conventions/workspace/` and retitled its structure page. The directory was named for the Git sense of `repository` while the glossary defined only the Domain port sense.
 - Normalized Git-sense prose to `workspace`, so `repository` in a provision now means the Domain port unless it is qualified.
 - Made `docs/reference/glossary.md` the single definition site. The engineering system Concepts section defined sixteen terms that the glossary also defined; it now carries only the relationships, distinctions, and worked examples that a one-sentence entry cannot hold.
+- Added `WRITING.SNAPSHOT.006` and the `reviewedStandardsVersion` field in `standards.project.json`. `node standards/tools/validate-consumer.mjs` now fails when that value differs from the pinned manifest version, so adopting a release is an explicit act rather than a silent one. A provision can gain force while keeping its identifier, and 654 of the 709 identifiers on the previous release kept their string through this one.
 - Promoted every authoring rule to an error. `WARNING_DIAGNOSTIC_CODES` is now empty, so a provision that restates its heading, an evidence row that names no artifact, a summary that repeats its provision, or a page with two identifier prefixes fails the build.
 
 ## v1.11.0

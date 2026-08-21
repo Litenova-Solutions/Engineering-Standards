@@ -17,7 +17,7 @@ Each step links the standard that governs it. Read that page before running the 
 ### Pin
 
 1. Add this repository as a submodule or another pinned dependency, following [workspace structure](../conventions/workspace/structure.md).
-2. Copy `standards.project.json` and `project-agents.md` from the [template index](../../templates/docs/README.md), then fill every placeholder.
+2. Copy `standards.project.json` and `project-agents.md` from the [template index](../../templates/docs/README.md), then fill every placeholder and set `reviewedStandardsVersion` to the pinned release.
 
 ### Configure
 

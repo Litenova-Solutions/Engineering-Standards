@@ -223,6 +223,11 @@ projectCase('selected local extension on an allowed kind', (p) => { p.selectedEx
   writeFile('standards.project.json', originalProject);
 }
 
+console.log('\nAdoption gate (WRITING.SNAPSHOT.006)');
+projectCase('reviewed release matches the pinned release', () => {}, null);
+projectCase('reviewed release is behind the pinned release', (p) => { p.reviewedStandardsVersion = '1.11.0'; }, 'does not match the pinned standards');
+projectCase('reviewed release is absent', (p) => { delete p.reviewedStandardsVersion; }, "missing 'reviewedStandardsVersion'");
+
 console.log('\nMetadata carrier (WRITING.METADATA.002)');
 fileCase(
   'metadata in a fenced block instead of the carrier',

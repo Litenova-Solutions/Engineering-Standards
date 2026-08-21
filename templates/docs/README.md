@@ -10,7 +10,7 @@ Read [Get started](../../docs/guides/getting-started.md) before creating a consu
 
 | Template | Target | Purpose |
 |:---|:---|:---|
-| `standards.project.json` | `standards.project.json` | Selects the profile, paths, extensions allowed by the project, and standards overrides. |
+| `standards.project.json` | `standards.project.json` | Selects the profile, reviewed standards release, paths, allowed extensions, and standards overrides. |
 | `project-agents.md` | `AGENTS.md` | Provides the short consumer agent entry point. |
 | `product-brief.md` | `docs/product/brief.md` | Defines the product boundary and linked end-to-end flows. |
 | `domain-index.md` | `docs/domain/README.md` | Lists modules, workflows, and domain policies. |

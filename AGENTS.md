@@ -22,6 +22,8 @@ Each standards release states its complete contract. Do not add compatibility, m
 
 A consumer keeps a pinned release for as long as that consumer chooses. (WRITING.SNAPSHOT.005)
 
+A consumer records the release it reviewed in `reviewedStandardsVersion`. (WRITING.SNAPSHOT.006)
+
 `WRITING.SNAPSHOT.004` covers standards releases only. Consumer product API compatibility, migration, and rollback provisions still apply. (WRITING.SNAPSHOT.004)
 
 ## Context Loading

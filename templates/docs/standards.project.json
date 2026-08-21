@@ -4,6 +4,7 @@
     "name": "__PROJECT__"
   },
   "profile": "dotnet-nextjs",
+  "reviewedStandardsVersion": "1.12.0",
   "paths": {
     "apiSolution": "__API_SOLUTION__",
     "domainDocs": "docs/domain",
