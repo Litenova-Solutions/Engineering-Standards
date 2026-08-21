@@ -22,6 +22,8 @@
 - Added `tools/validate-consumer.cases.mjs` and made it a required CI step. The reference consumer validator previously shipped with no fixture suite and never ran in this repository.
 - Built the consumer fixture from the tracked templates, so every shipped Markdown metadata block is now validated as part of the baseline case.
 - Made `tools/validate-consumer.mjs` report a metadata block that is not delimited by `---` instead of skipping the file. A silently skipped specification is an unvalidated specification.
+- Added seven authoring rules that detect provisions and evidence carrying no information: `PROVISION_RESTATES_HEADING`, `VERIFY_TEMPLATED_EVIDENCE`, `VERIFY_NO_ARTIFACT`, `SUMMARY_RESTATES_REQUIREMENT`, `ID_PREFIX_OWNERSHIP`, `HEADING_EMPTY_BODY`, and `INDEX_CONTAINS_PROCEDURE`.
+- Added a warning tier to `tools/validate-standards.mjs`. A code in `WARNING_DIAGNOSTIC_CODES` reports a defect under active repair and does not fail the build. `--warnings` lists every occurrence.
 - Removed every version-specific upgrade guide and the requirement to publish future migration instructions. Consumers remain on pinned releases until they select another complete contract.
 - Replaced the version-specific adoption guide with `docs/guides/getting-started.md` and removed the duplicate v1 release-scope guide.
 - Replaced application-v1 readiness labels with version-neutral release evidence and release-record guidance.

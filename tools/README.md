@@ -31,6 +31,14 @@ The validator checks:
 
 Exit code `0` means pass. Code `1` means validation failed. Code `2` means the input or command usage is invalid.
 
+Some rules report a defect the repository is still burning down. Those rules print as warnings and do not fail the build:
+
+```bash
+node tools/validate-standards.mjs --warnings
+```
+
+`WARNING_DIAGNOSTIC_CODES` in the validator lists them. Move a code out of that list once its count reaches zero.
+
 Run its fixture suite after changing authoring rules or validator behavior:
 
 ```bash

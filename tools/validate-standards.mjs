@@ -25,6 +25,31 @@ const VAGUE_TERMS = [
   ['very', /\bvery\b/i],
   ['really', /\breally\b/i],
 ];
+// Rules landed as warnings report a defect that the repository is still burning
+// down. A warning does not fail the build. Promote a code to an error by
+// removing it from this set once its count reaches zero.
+export const WARNING_DIAGNOSTIC_CODES = Object.freeze([
+  'HEADING_EMPTY_BODY',
+  'ID_PREFIX_OWNERSHIP',
+  'INDEX_CONTAINS_PROCEDURE',
+  'PROVISION_RESTATES_HEADING',
+  'SUMMARY_RESTATES_REQUIREMENT',
+  'VERIFY_NO_ARTIFACT',
+  'VERIFY_TEMPLATED_EVIDENCE',
+]);
+
+// A claim is the comparable core of a heading, a Requirement, a Default, or a
+// summary bullet: lowercase words with punctuation, code marks, and any leading
+// actor and normative modal removed.
+function claim(text) {
+  const words = String(text)
+    .toLowerCase()
+    .replace(/`/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+  return words.replace(/^.*?\b(must not|must|should not|should|may)\b\s*/, '').trim();
+}
+
 const CONTRACTIONS = /\b(?:ain't|aren't|can't|couldn't|didn't|doesn't|don't|hadn't|hasn't|haven't|he'd|he'll|he's|how'd|how'll|how's|i'd|i'll|i'm|i've|isn't|it'd|it'll|it's|let's|mightn't|mustn't|shan't|she'd|she'll|she's|shouldn't|that's|there'd|there'll|there's|they'd|they'll|they're|they've|wasn't|we'd|we'll|we're|we've|weren't|what'd|what'll|what're|what's|what've|where'd|where'll|where's|who'd|who'll|who's|won't|wouldn't|you'd|you'll|you're|you've)\b/i;
 const AND_OR = /\band\/or\b/i;
 export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
@@ -50,10 +75,13 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'GLOSSARY_DEFINITION',
   'GLOSSARY_ORDER',
   'HEADING_ACTION',
+  'HEADING_EMPTY_BODY',
   'ID_DUPLICATE',
+  'ID_PREFIX_OWNERSHIP',
   'ID_LOCATION',
   'ID_MISSING',
   'ID_UNKNOWN_REFERENCE',
+  'INDEX_CONTAINS_PROCEDURE',
   'INDEX_INTENT',
   'LINK_BROKEN',
   'MANIFEST_ANCHOR',
@@ -73,6 +101,7 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'PROSE_SENTENCE_LENGTH',
   'PROSE_TABLE_CELL_LENGTH',
   'PROSE_VAGUE_TERM',
+  'PROVISION_RESTATES_HEADING',
   'REFERENCE_EXAMPLE_DECLARATION',
   'RULE_DEVIATION_SENTENCE',
   'RULE_EXAMPLE_LABEL',
@@ -95,10 +124,13 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'SUMMARY_ID_POSITION',
   'SUMMARY_MISSING_ID',
   'SUMMARY_NORMATIVE',
+  'SUMMARY_RESTATES_REQUIREMENT',
   'SUMMARY_UNKNOWN_ID',
   'VERIFY_DUPLICATE_ID',
   'VERIFY_DUPLICATE_METHOD',
   'VERIFY_GENERIC_EVIDENCE',
+  'VERIFY_NO_ARTIFACT',
+  'VERIFY_TEMPLATED_EVIDENCE',
   'VERIFY_METHOD',
   'VERIFY_MISSING_ID',
   'VERIFY_UNKNOWN_ID',
@@ -470,6 +502,32 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
     }
   }
 
+  // A heading with no body and no lower-level heading beneath it groups
+  // nothing. It becomes a dead entry in any generated table of contents.
+  for (let index = 0; index < clean.length; index += 1) {
+    const heading = clean[index].line.match(/^(#{2,4})\s+(.+?)\s*$/);
+    if (!heading) continue;
+    const level = heading[1].length;
+    let body = false;
+    for (let cursor = index + 1; cursor < clean.length; cursor += 1) {
+      const next = clean[cursor].line.match(/^(#{1,6})\s+/);
+      if (next) {
+        if (next[1].length <= level) break;
+        body = true;
+        break;
+      }
+      if (clean[cursor].line.trim() || clean[cursor].fenced) { body = true; break; }
+    }
+    if (!body) add(relative, index + 1, 'HEADING_EMPTY_BODY', `heading '${heading[2]}' has no body and no nested heading`);
+  }
+
+  // An index navigates. A numbered procedure inside one duplicates a canonical
+  // provision without citing it. (WRITING.PAGE.001)
+  if (kind === 'index') {
+    const step = clean.find((item) => /^\s*\d+\.\s+\S/.test(item.line));
+    if (step) add(relative, step.number, 'INDEX_CONTAINS_PROCEDURE', 'an index must not contain a numbered procedure');
+  }
+
   if (kind && kind !== 'index' && h1Count !== 1) add(relative, 1, 'DOC_H1_COUNT', `expected one H1, found ${h1Count}`);
   if (kind && kind !== 'index' && h1Count === 1 && !titleCase(h1Title)) add(relative, h1Line, 'DOC_H1_CASE', `H1 '${h1Title}' must use Title Case`);
   checkSectionOrder(relative, kind, sections, add);
@@ -589,7 +647,30 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
       if (!/\([A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,}(?:,\s*[A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,})*\)\s*$/.test(bullet.line)) {
         add(relative, bullet.number, 'SUMMARY_ID_POSITION', 'Agent Summary bullet must end with its provision citations');
       }
-      for (const id of ids) summaryReferences.push({ id, line: bullet.number });
+      const bulletClaim = claim(text.replace(/\([^)]*\)\s*$/, ''));
+      for (const id of ids) summaryReferences.push({ id, line: bullet.number, claim: bulletClaim });
+    }
+  }
+
+  // A provision whose Requirement or Default only repeats its own heading
+  // states no obligation. The heading is a label; the assertion belongs in the
+  // labeled block. (WRITING.REQUIREMENT.001, WRITING.CONVENTION.001)
+  for (const provision of provisions) {
+    const label = provision.section === 'Standards' ? 'Requirement' : 'Default';
+    const assertion = provision.body.find((item) => item.line.startsWith(`**${label}:**`));
+    if (!assertion) continue;
+    provision.claim = claim(assertion.line.replace(`**${label}:**`, ''));
+    if (provision.claim && provision.claim === claim(provision.title)) {
+      add(relative, provision.line, 'PROVISION_RESTATES_HEADING', `${label} for '${provision.id}' only restates its heading`);
+    }
+  }
+
+  // Tier 1 exists to compress Tier 2. A bullet identical to its provision adds
+  // no context and makes the escalation pointless. (WRITING.SUMMARY.001)
+  for (const reference of summaryReferences) {
+    const provision = provisions.find((item) => item.id === reference.id);
+    if (provision?.claim && reference.claim && provision.claim === reference.claim) {
+      add(relative, reference.line, 'SUMMARY_RESTATES_REQUIREMENT', `Agent Summary bullet for '${reference.id}' repeats its provision verbatim`);
     }
   }
 
@@ -613,6 +694,18 @@ function parseDocument(relative, raw, add, globalIds, virtual = false) {
       if (new Set(methods).size !== methods.length) add(relative, index + 1, 'VERIFY_DUPLICATE_METHOD', `Verification repeats a method for '${match[1]}'`);
       const evidence = match[3].trim();
       if (GENERIC_EVIDENCE.test(visibleText(evidence))) add(relative, index + 1, 'VERIFY_GENERIC_EVIDENCE', `Verification for '${match[1]}' uses generic evidence`);
+      // Evidence that echoes its own provision heading names no artifact. It
+      // tells a reviewer to confirm that a rule says what it says.
+      const owner = provisions.find((provision) => provision.id === match[1]);
+      const ownerClaim = owner ? claim(owner.title) : '';
+      if (ownerClaim && claim(evidence).includes(ownerClaim)) {
+        add(relative, index + 1, 'VERIFY_TEMPLATED_EVIDENCE', `Verification for '${match[1]}' repeats its provision heading instead of naming evidence`);
+      }
+      // A static or test claim is checkable only when it names the command,
+      // path, identifier, or assertion that produces the result.
+      if (methods.some((method) => method === 'static' || method === 'test') && !/`[^`]+`/.test(evidence)) {
+        add(relative, index + 1, 'VERIFY_NO_ARTIFACT', `Verification for '${match[1]}' claims a ${methods.join(' and ')} method but names no artifact`);
+      }
       verificationRows.push({ id: match[1], line: index + 1, evidence });
     }
     const rowIds = verificationRows.map((row) => row.id);
@@ -862,6 +955,35 @@ export function validateRepository(rootInput = '.') {
     if (relative === 'AGENTS.md' || relative.endsWith('/project-agents.md')) checkAgentProjection(relative, raw, add);
   }
 
+  // A provision ID should name its owning page. One Standards prefix per page,
+  // no prefix shared by two pages, and convention IDs under that same prefix.
+  const prefixOwners = new Map();
+  for (const document of parsedDocuments) {
+    const standards = new Set();
+    const conventions = new Set();
+    for (const provision of document.parsed.provisions ?? []) {
+      const width = document.parsed.kind === 'extension' ? 2 : 1;
+      if (/\.CONVENTION\.\d+$/.test(provision.id)) conventions.add(provision.id.replace(/\.CONVENTION\.\d+$/, ''));
+      else standards.add(provision.id.split('.').slice(0, width).join('.'));
+    }
+    if (standards.size > 1) {
+      add(document.relative, 1, 'ID_PREFIX_OWNERSHIP', `page declares ${standards.size} Standards prefixes: ${[...standards].sort().join(', ')}`);
+    }
+    for (const prefix of standards) {
+      if (prefixOwners.has(prefix) && prefixOwners.get(prefix) !== document.relative) {
+        add(document.relative, 1, 'ID_PREFIX_OWNERSHIP', `Standards prefix '${prefix}' is also owned by ${prefixOwners.get(prefix)}`);
+      } else prefixOwners.set(prefix, document.relative);
+    }
+    const owner = standards.size === 1 ? [...standards][0] : null;
+    if (owner) {
+      for (const scope of conventions) {
+        if (scope !== owner && !scope.startsWith(`${owner}.`)) {
+          add(document.relative, 1, 'ID_PREFIX_OWNERSHIP', `convention scope '${scope}' does not match the page Standards prefix '${owner}'`);
+        }
+      }
+    }
+  }
+
   const activeIds = new Set(globalIds.keys());
   for (const document of parsedDocuments) {
     for (const reference of document.parsed.summaryReferences) {
@@ -912,18 +1034,32 @@ export function validateRepository(rootInput = '.') {
 }
 
 function runCli() {
-  if (process.argv.length > 3) {
-    console.error('Usage: node tools/validate-standards.mjs [repositoryRoot]');
+  const args = process.argv.slice(2).filter((value) => value !== '--warnings');
+  if (args.length > 1) {
+    console.error('Usage: node tools/validate-standards.mjs [repositoryRoot] [--warnings]');
     process.exit(2);
   }
-  const result = validateRepository(process.argv[2] ?? '.');
+  const result = validateRepository(args[0] ?? '.');
   if (result.usageError) {
     console.error(result.usageError);
     process.exit(2);
   }
-  if (result.diagnostics.length) {
-    for (const diagnostic of result.diagnostics) console.error(`${diagnostic.relative}:${diagnostic.line} [${diagnostic.code}] ${diagnostic.message}`);
-    console.error(`Standards authoring checks failed with ${result.diagnostics.length} error(s).`);
+  const warningCodes = new Set(WARNING_DIAGNOSTIC_CODES);
+  const errors = result.diagnostics.filter((diagnostic) => !warningCodes.has(diagnostic.code));
+  const warnings = result.diagnostics.filter((diagnostic) => warningCodes.has(diagnostic.code));
+  for (const diagnostic of errors) console.error(`${diagnostic.relative}:${diagnostic.line} [${diagnostic.code}] ${diagnostic.message}`);
+  if (warnings.length) {
+    const counts = new Map();
+    for (const diagnostic of warnings) counts.set(diagnostic.code, (counts.get(diagnostic.code) ?? 0) + 1);
+    console.error(`\nStandards authoring warnings (${warnings.length}). These do not fail the build:`);
+    for (const code of [...counts.keys()].sort()) console.error(`  ${String(counts.get(code)).padStart(4)}  ${code}`);
+    console.error('  Run with --warnings to list every occurrence.');
+    if (process.argv.includes('--warnings')) {
+      for (const diagnostic of warnings) console.error(`  ${diagnostic.relative}:${diagnostic.line} [${diagnostic.code}] ${diagnostic.message}`);
+    }
+  }
+  if (errors.length) {
+    console.error(`Standards authoring checks failed with ${errors.length} error(s).`);
     process.exit(1);
   }
   console.log('Standards authoring checks passed.');

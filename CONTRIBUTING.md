@@ -53,6 +53,8 @@ Before review:
 
 A changed validator rule includes one passing case and one failing case. A rule without both cases is unverified.
 
+A rule in `WARNING_DIAGNOSTIC_CODES` reports a defect under active repair. Do not add a new occurrence of a warning that already has a count. Move the code out of that list when its count reaches zero.
+
 The pull request checklist records the manual active-voice, terminology, atomicity, example, and quality review.
 
 ## Release Numbering

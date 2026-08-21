@@ -43,7 +43,7 @@ This page defines one repository topic.
 | ID | Method | Evidence |
 |:---|:---|:---|
 | TOPIC.BOUNDARY.001 | inspection | Inspect the declared topic boundary. |
-| TOPIC.CONVENTION.001 | static | Inspect the topic document location. |
+| TOPIC.CONVENTION.001 | static | \`node tools/validate-standards.mjs\` resolves the topic document location. |
 `;
 
 const extension = `# Sample Extension
@@ -86,7 +86,7 @@ None.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| EXT.SAMPLE.ADOPT.001 | static | Inspect applicable specification metadata. |
+| EXT.SAMPLE.ADOPT.001 | static | \`node tools/validate-consumer.mjs\` resolves applicable specification metadata. |
 `;
 
 const profile = `# Sample Profile
@@ -117,7 +117,7 @@ None.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| PROFILE.SAMPLE.001 | static | Compare the profile with its manifest entry. |
+| PROFILE.SAMPLE.001 | static | \`node tools/validate-standards.mjs\` compares the profile with its manifest entry. |
 `;
 
 const guide = `# Sample Guide
@@ -247,11 +247,11 @@ run('summary ID position', (root) => write(root, 'docs/foundations/topic.md', fo
 run('normative summary', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('- Keep the topic bounded. (TOPIC.BOUNDARY.001)', '- Consumers MUST keep the topic bounded. (TOPIC.BOUNDARY.001)')), ['SUMMARY_NORMATIVE']);
 run('unknown summary ID', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('TOPIC.BOUNDARY.001)', 'UNKNOWN.SUMMARY.001)')), ['SUMMARY_UNKNOWN_ID']);
 
-run('duplicate verification row', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('| TOPIC.CONVENTION.001 | static | Inspect the topic document location. |', '| TOPIC.BOUNDARY.001 | inspection | Inspect the declared topic boundary. |\n| TOPIC.CONVENTION.001 | static | Inspect the topic document location. |')), ['VERIFY_DUPLICATE_ID']);
+run('duplicate verification row', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('| TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |', '| TOPIC.BOUNDARY.001 | inspection | Inspect the declared topic boundary. |\n| TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |')), ['VERIFY_DUPLICATE_ID']);
 run('duplicate verification method', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('| TOPIC.CONVENTION.001 | static |', '| TOPIC.CONVENTION.001 | static, static |')), ['VERIFY_DUPLICATE_METHOD']);
 run('generic verification evidence', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('Inspect the declared topic boundary.', 'Inspect evidence for the topic boundary.')), ['VERIFY_GENERIC_EVIDENCE']);
 run('invalid verification method', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('| TOPIC.CONVENTION.001 | static |', '| TOPIC.CONVENTION.001 | manual |')), ['VERIFY_METHOD']);
-run('unknown verification row', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('| TOPIC.CONVENTION.001 | static | Inspect the topic document location. |', '| TOPIC.CONVENTION.001 | static | Inspect the topic document location. |\n| TOPIC.UNKNOWN.001 | static | Static assertion for the unknown row. |')), ['VERIFY_UNKNOWN_ID']);
+run('unknown verification row', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('| TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |', '| TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |\n| TOPIC.UNKNOWN.001 | static | `node tools/validate-standards.mjs` asserts the unknown row. |')), ['VERIFY_UNKNOWN_ID']);
 
 run('contraction', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('This page defines one repository topic.', "This page isn't a second repository topic.")), ['PROSE_CONTRACTION']);
 run('and-or', (root) => write(root, 'docs/foundations/topic.md', foundation.replace('one repository topic', 'one repository and/or consumer topic')), ['PROSE_AND_OR']);
@@ -284,6 +284,39 @@ run('empty extension dependencies', (root) => {
 run('missing writing load plan', (root) => write(root, 'standards.manifest.json', '{}'), ['WRITING_LOAD_PLAN']);
 
 run('invalid override IDs', (root) => write(root, 'templates/docs/standards.project.json', JSON.stringify({ overrides: [{ ruleId: 'TOPIC.CONVENTION.001' }, { ruleId: 'UNKNOWN.OVERRIDE.001' }] })), ['OVERRIDE_CONVENTION_ID', 'OVERRIDE_UNKNOWN_ID']);
+run('provision restates its heading', (root) => write(root, 'docs/foundations/topic.md', foundation.replace(
+  '**Requirement:** Consumers MUST keep the topic inside its declared boundary.',
+  '**Requirement:** Consumers MUST keep the topic bounded.',
+)), ['PROVISION_RESTATES_HEADING']);
+run('summary bullet repeats its provision', (root) => write(root, 'docs/foundations/topic.md', foundation.replace(
+  '- Keep the topic bounded. (TOPIC.BOUNDARY.001)',
+  '- Keep the topic inside its declared boundary. (TOPIC.BOUNDARY.001)',
+)), ['SUMMARY_RESTATES_REQUIREMENT']);
+run('evidence repeats its provision heading', (root) => write(root, 'docs/foundations/topic.md', foundation.replace(
+  '| TOPIC.BOUNDARY.001 | inspection | Inspect the declared topic boundary. |',
+  '| TOPIC.BOUNDARY.001 | inspection | Pull request review asserts `keep the topic bounded` in the owning specification. |',
+)), ['VERIFY_TEMPLATED_EVIDENCE']);
+run('static evidence names no artifact', (root) => write(root, 'docs/foundations/topic.md', foundation.replace(
+  '| TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |',
+  '| TOPIC.CONVENTION.001 | static | The reviewer resolves the topic document location. |',
+)), ['VERIFY_NO_ARTIFACT']);
+run('second Standards prefix on one page', (root) => write(root, 'docs/foundations/topic.md', foundation.replace(
+  '### Keep the topic bounded (TOPIC.BOUNDARY.001)',
+  '### Keep the topic bounded (OTHER.BOUNDARY.001)',
+).replace(
+  '- Keep the topic bounded. (TOPIC.BOUNDARY.001)',
+  '- Keep the topic bounded. (OTHER.BOUNDARY.001)',
+).replace(
+  '| TOPIC.BOUNDARY.001 | inspection |',
+  '| OTHER.BOUNDARY.001 | inspection |',
+)), ['ID_PREFIX_OWNERSHIP']);
+run('heading with no body', (root) => write(root, 'docs/foundations/topic.md', foundation.replace(
+  '## Standards',
+  ['## Concepts', '', '### Empty concept', '', '### Second concept', '', 'This concept has a body.', '', '## Standards'].join('\n'),
+)), ['HEADING_EMPTY_BODY']);
+run('numbered procedure inside an index', (root) => write(root, 'docs/README.md',
+  ['# Documentation', '', '## Intent', '', 'Use this page to find repository documentation.', '', '## Activation', '', '1. Select the applicable document.', ''].join('\n'),
+), ['INDEX_CONTAINS_PROCEDURE']);
 run('schema JSON', (root) => {
   write(root, 'schemas/standards-manifest.schema.json', '{');
   write(root, 'standards.manifest.json', '{}');

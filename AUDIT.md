@@ -718,10 +718,29 @@ Six units. Each ends green. Not executed as part of this audit.
 |---:|:---|:---|:---|:---|
 | 1 | Fix the contradictions and gaps that need no rewrite. Retire `CORE.DOCUMENTS.003` and replace it. State the metadata carrier in `WRITING.METADATA.002` and fix the extensions-README example. Add `templates/docs/aggregate.md`. Join the changelog fragment. Delete the empty heading. | none | All four gates. | Owner confirms the three-value status vocabulary. |
 | 2 | Close the validation gaps before changing content. Add `validate-consumer.cases.mjs` with the template-derived fixture and a case per rule. Add the CI step. Make the missing-carrier case a reported diagnostic. | 1 | Five gates, including the new suite. | Review confirms every `KINDS` rule has both cases. |
-| 3 | Add the rules that detect the defect. Implement `PROVISION_RESTATES_HEADING`, `VERIFY_TEMPLATED_EVIDENCE`, `ID_PREFIX_OWNERSHIP`, `SUMMARY_RESTATES_REQUIREMENT`, `HEADING_EMPTY_BODY`, plus cases. Land them as warnings, not errors. | 2 | Gates pass. The new rules report 289 provision and 259 evidence warnings. | The warning count is the baseline the rewrite burns down. Confirm it matches this report. |
+| 3 | Add the rules that detect the defect. Implement `PROVISION_RESTATES_HEADING`, `VERIFY_TEMPLATED_EVIDENCE`, `VERIFY_NO_ARTIFACT`, `SUMMARY_RESTATES_REQUIREMENT`, `ID_PREFIX_OWNERSHIP`, `HEADING_EMPTY_BODY`, and `INDEX_CONTAINS_PROCEDURE`, plus cases. Land them as warnings, not errors. | 2 | Gates pass. The rules report the burn-down baseline recorded below. | Done. The measured baseline is the target the rewrite drives to zero. |
 | 4 | Rewrite the baseline, highest risk first. Order: `api.md`, `security.md`, `domain.md`, `architecture.md`, `application.md`, `persistence-marten.md`, then frontend, then quality, then workspace, then the profile page, then `engineering-system.md`. One page per pull request: rewrite provisions, apply the prefix reassignment, keep suffixes stable, write real evidence, retrim the Agent Summary, update every inbound cross-reference. | 3 | Gates after every page. The unit closes when the Unit-3 warning count reaches zero. | Per-page review against the four quality tests. Extension replacement clauses re-checked after each renumber. |
 | 5 | Consolidate authority. Move the workspace directory and update the manifest, index, and profile composition. Make the glossary the sole definition site and reduce the Concepts section. Trim the `AGENTS.md` bullets and replace the command blocks. Strip the extensions-README procedure. Split `AGENTIC.CONVENTION.002`. | 4 | Gates. The link and anchor check must stay at zero broken. | Confirm the glossary lost no meaning in consolidation. |
 | 6 | Promote the rules and close. Turn the Unit-3 warnings into errors. Rewrite `getting-started.md` with staged, linked steps. Update `CONTRIBUTING.md`, the PR template, and `tools/README.md`. Write the v1.12.0 changelog entry and tag. | 5 | Full gate set with all rules at error severity. | Walk the six journeys in section 12 end to end before tagging. |
+
+### Burn-down baseline
+
+Measured by `node tools/validate-standards.mjs --warnings` after Unit 3 landed. Unit 4 closes when every count reaches zero.
+
+| Diagnostic | Baseline | Finding |
+|:---|---:|:---|
+| `PROVISION_RESTATES_HEADING` | 289 | AUD-001 |
+| `VERIFY_TEMPLATED_EVIDENCE` | 289 | AUD-003 |
+| `VERIFY_NO_ARTIFACT` | 234 | AUD-003 |
+| `SUMMARY_RESTATES_REQUIREMENT` | 179 | AUD-005 |
+| `ID_PREFIX_OWNERSHIP` | 5 | AUD-012 |
+| `INDEX_CONTAINS_PROCEDURE` | 1 | AUD-013 |
+| `HEADING_EMPTY_BODY` | 0 | AUD-018, closed in Unit 1 |
+| **Total** | **997** | |
+
+Two numbers differ from the estimates in section 5, both because the rule is stricter than the pattern match used during the audit. `VERIFY_TEMPLATED_EVIDENCE` reports 289 rather than 259, because it catches any evidence string containing its own provision heading rather than only the three exact sentence templates. That count now matches `PROVISION_RESTATES_HEADING` exactly, which confirms the two defects have identical scope. `SUMMARY_RESTATES_REQUIREMENT` reports 179 rather than 180, because it requires exact equality rather than containment.
+
+`ID_PREFIX_OWNERSHIP` surfaced one case the audit missed: `docs/extensions/concurrency-idempotency.md` carries both `EXT.CONCURRENCY.*` and `EXT.IDEMPOTENCY.*`. Section 4 lists four prefix defects; this is a fifth. It needs an owner decision, because the page covers two related concepts by design.
 
 Unit 3 before Unit 4 is the load-bearing ordering choice. Landing detection first turns a 289-provision rewrite from a judgement exercise into a measurable burn-down, and it means the last page repaired is verified by the same rule as the first.
 
