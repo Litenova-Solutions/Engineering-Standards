@@ -15,7 +15,7 @@ The standards use one document grammar and one controlled technical prose profil
 - Map every provision to exact verification evidence. (CORE.AUTHORING.VERIFICATION.001)
 - Validate only current standards material. (CORE.AUTHORING.SNAPSHOT.001, CORE.AUTHORING.SNAPSHOT.002)
 - Publish complete releases and record the one a consumer reviewed. (CORE.AUTHORING.SNAPSHOT.003, CORE.AUTHORING.SNAPSHOT.004, CORE.AUTHORING.SNAPSHOT.005, CORE.AUTHORING.SNAPSHOT.006)
-- Run the dependency-free authoring checks before review. (CORE.AUTHORING.VALIDATION.001)
+- Run the authoring checks and regenerate the provision index. (CORE.AUTHORING.VALIDATION.001, CORE.AUTHORING.INDEX.001)
 
 ## Concepts
 
@@ -298,6 +298,14 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** Exact evidence makes each provision reviewable by humans and tools.
 
+### Regenerate the provision index (CORE.AUTHORING.INDEX.001)
+
+**Requirement:** A standards change MUST leave `docs/reference/provisions.md` equal to the output of `node tools/generate-provisions.mjs`.
+
+**Rationale:** One generated page resolves every ID to its heading and owning page, so a reader follows a citation in one step instead of searching.
+
+**Example:** The page lists `FRONTEND.COMPONENTS.OWNERSHIP.001` with its heading and a link into `conventions/frontend/components.md`.
+
 ### Declare structured specification metadata (CORE.AUTHORING.METADATA.002)
 
 **Requirement:** A structured consumer specification MUST open with a `---` delimited JSON block satisfying `schemas/specification-metadata.schema.json` for its declared kind.
@@ -428,6 +436,7 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.SUMMARY.001 | inspection | The summary parser resolves every citation, and review compares each projection with its source. |
 | CORE.AUTHORING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |
 | CORE.AUTHORING.VERIFICATION.001 | static | `WritingVerificationTests` asserts the evidence mapper reports one exact row for every page provision. |
+| CORE.AUTHORING.INDEX.001 | static | `node tools/generate-provisions.mjs --check` exits zero, and the repository validator emits no `INDEX_PROVISIONS_STALE` diagnostic. |
 | CORE.AUTHORING.METADATA.002 | static | `node tools/validate-consumer.mjs` validates opening JSON against the metadata schema. |
 | CORE.AUTHORING.METADATA.003 | static | `node tools/validate-consumer.mjs` reports no duplicate metadata carrier. |
 | CORE.AUTHORING.VALIDATION.001 | static | `WritingValidationTests` asserts cI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |

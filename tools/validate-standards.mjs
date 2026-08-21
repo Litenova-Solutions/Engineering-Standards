@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { buildProvisionIndex, headingSlug, INDEX_PATH } from './provision-index.mjs';
+
 // Every provision identifier is AREA.PAGE.TOPIC.NNN. AREA and PAGE come from the
 // manifest id registry, TOPIC names the assertion, and NNN is a three-digit sequence.
 const ID_SOURCE = '[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}';
@@ -84,6 +86,7 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'ID_UNKNOWN_REFERENCE',
   'INDEX_CONTAINS_PROCEDURE',
   'INDEX_INTENT',
+  'INDEX_PROVISIONS_STALE',
   'LINK_BROKEN',
   'MANIFEST_ANCHOR',
   'MANIFEST_DUPLICATE_PATH',
@@ -214,17 +217,6 @@ function sentences(value) {
   return found.map((item) => item.trim()).filter(Boolean);
 }
 
-function headingSlug(value) {
-  return value
-    .replace(/\s+\{#[^}]+\}\s*$/, '')
-    .toLowerCase()
-    .replace(/`/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-}
-
 function titleCase(value) {
   const small = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'with']);
   const tokens = value.match(/[A-Za-z0-9][A-Za-z0-9./+-]*/g) ?? [];
@@ -309,6 +301,7 @@ function documentClass(relative) {
   if (/^docs\/profile\/[^/]+\.md$/.test(relative)) return 'profile';
   if (/^docs\/extensions\/[^/]+\.md$/.test(relative) && !relative.endsWith('/README.md')) return 'extension';
   if (/^docs\/guides\/[^/]+\.md$/.test(relative)) return 'guide';
+  if (relative === INDEX_PATH) return 'index';
   if (relative === 'docs/reference/glossary.md') return 'glossary';
   if (relative.endsWith('/README.md') || relative === 'README.md') return 'index';
   return null;
@@ -1029,6 +1022,18 @@ export function validateRepository(rootInput = '.') {
 
   checkLinks(root, currentMarkdown, add);
   checkManifest(root, add);
+
+  // The provision index is derived. A stale page would send a reader to the wrong
+  // heading, so the gate compares it with the active standards.
+  // (CORE.AUTHORING.INDEX.001)
+  const indexFile = path.join(root, INDEX_PATH);
+  if (fs.existsSync(indexFile)) {
+    const expected = `${buildProvisionIndex(root)}\n`;
+    const actual = fs.readFileSync(indexFile, 'utf8').replace(/\r\n/g, '\n');
+    if (actual !== expected) add(INDEX_PATH, 1, 'INDEX_PROVISIONS_STALE', 'generated provision index differs from the active standards; run node tools/generate-provisions.mjs');
+  } else if (fs.existsSync(path.join(root, 'docs', 'reference'))) {
+    add(INDEX_PATH, 1, 'INDEX_PROVISIONS_STALE', 'generated provision index is missing; run node tools/generate-provisions.mjs');
+  }
   validateSchemaConsumer(root, 'schemas/standards-manifest.schema.json', 'standards.manifest.json', add);
   validateSchemaConsumer(root, 'schemas/standards-project.schema.json', 'templates/docs/standards.project.json', add);
 

@@ -6,6 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { STABLE_DIAGNOSTIC_CODES, validateRepository } from './validate-standards.mjs';
+import { buildProvisionIndex, INDEX_PATH } from './provision-index.mjs';
 
 const script = path.join(path.dirname(fileURLToPath(import.meta.url)), 'validate-standards.mjs');
 const failures = [];
@@ -153,6 +154,8 @@ function base(root) {
   write(root, 'docs/guides/sample.md', guide);
   write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nUse this page to find repository documentation.\n');
   write(root, 'docs/reference/glossary.md', '# Glossary\n\n## Topic\n\nA bounded standards subject.\n');
+  // The provision index is derived, so the fixture repository carries a current one.
+  write(root, INDEX_PATH, `${buildProvisionIndex(root)}\n`);
 }
 
 function run(name, mutate, expected, forbidden = []) {
@@ -173,6 +176,8 @@ function run(name, mutate, expected, forbidden = []) {
 }
 
 run('all page classes pass', null, []);
+run('stale provision index', (root) => write(root, INDEX_PATH, '# Provision Index\n\n## Intent\n\nThis page is out of date.\n'), ['INDEX_PROVISIONS_STALE']);
+run('missing provision index', (root) => fs.rmSync(path.join(root, INDEX_PATH)), ['INDEX_PROVISIONS_STALE']);
 run('declared prose exclusions pass', (root) => write(root, 'templates/docs/exclusions.md', `# Exclusion Fixture
 
 \`\`\`json

@@ -78,6 +78,7 @@ Run these checks for the standards repository. (CORE.AUTHORING.VALIDATION.001)
 
 ```bash
 node tools/validate-standards.cases.mjs
+node tools/generate-provisions.mjs
 node tools/validate-standards.mjs
 node tools/validate-ui.cases.mjs
 node tools/validate-consumer.cases.mjs

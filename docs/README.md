@@ -87,6 +87,7 @@ The profile selects every baseline convention. Exact versions and composition re
 ## Reference and Templates
 
 - [Glossary](reference/glossary.md)
+- [Provision index](reference/provisions.md)
 - [Consumer templates](../templates/docs/README.md)
 - [Reference validators](../tools/README.md)
 

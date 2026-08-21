@@ -20,12 +20,16 @@ Keep release context in `CHANGELOG.md` and Git history. The repository validator
 
 A new or changed Standard includes:
 
-- One atomic Requirement with one rule ID.
+- One atomic Requirement with one rule ID under the page scope the manifest declares. (CORE.AUTHORING.IDENTIFIER.001)
 - An informative example when `CORE.AUTHORING.EXAMPLE.001` requires one.
 - One exact Verification row.
 - A current changelog entry.
 
 Assign a new ID to each changed Standard assertion. (CORE.AUTHORING.REQUIREMENT.001)
+
+A provision ID uses `AREA.PAGE.TOPIC.NNN`. Reserve the `CONVENTION` topic for replaceable defaults. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002)
+
+Register a new page in `idRegistry` before adding its first provision. (CORE.AUTHORING.IDENTIFIER.001)
 
 Do not add aliases, replacement maps, alternate paths, compatibility terms, or transition material. (CORE.AUTHORING.SNAPSHOT.002)
 
@@ -48,6 +52,7 @@ Before review:
 - Confirm extension declarations match the manifest.
 - Validate the two tracked schema consumers.
 - Update affected templates and validator cases.
+- Run `node tools/generate-provisions.mjs` and commit the regenerated index. (CORE.AUTHORING.INDEX.001)
 - Update the changelog.
 - Run `git diff --check`.
 
