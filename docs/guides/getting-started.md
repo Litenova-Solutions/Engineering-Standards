@@ -7,22 +7,46 @@ Create a consumer repository with one selected profile, current specifications, 
 ## Prerequisites
 
 - Pin the selected standards release before copying profile-specific configuration.
-- Read the profile, agent protocol, authoring standard, and applicable extension criteria.
+- Read the [platform profile](../profile/dotnet-nextjs.md), the [agent protocol](../foundations/agent-protocol.md), and the [authoring standard](../foundations/authoring-standard.md).
+- Read the [extension catalog](../extensions/README.md) to learn which capabilities stay inactive at the start.
 
 ## Procedure
 
-1. Add the standards repository as a submodule or another pinned repository dependency.
-2. Copy `standards.project.json` and `project-agents.md`, then fill every project placeholder.
-3. Create toolchain, package, and build configuration from manifest version pins.
-4. Create the API solution, four application projects, AppHost, ServiceDefaults, and baseline test projects.
-5. Create product, domain, glossary, module, use-case, and flow records from the templates.
-6. Select extensions only after their activation criteria have current evidence.
-7. Configure PostgreSQL, Marten, LiteBus, diagnostics, HTTP boundaries, and deterministic OpenAPI generation.
-8. Declare every React frontend and install its manifest-pinned UI baseline.
-9. Create UI vocabulary and page sidecars for each non-trivial visible route.
-10. Implement one complete slice with source, tests, contracts, and operating evidence.
-11. Add deployment, backup, restore, rollback, limits, and runbooks before production use.
-12. Run profile, extension, schema, and consumer validation before claiming a verified slice.
+Each step links the standard that governs it. Read that page before running the step.
+
+### Pin
+
+1. Add this repository as a submodule or another pinned dependency, following [repository structure](../conventions/repository/structure.md).
+2. Copy `standards.project.json` and `project-agents.md` from the [template index](../../templates/docs/README.md), then fill every placeholder.
+
+### Configure
+
+3. Create toolchain, package, and build configuration from the manifest pins, following [configuration](../conventions/repository/configuration.md).
+4. Add only the packages the manifest already pins, following [dependencies](../conventions/repository/dependencies.md).
+
+### Structure
+
+5. Create the API solution, the four application projects, AppHost, ServiceDefaults, and the baseline test projects, following [architecture](../conventions/backend/architecture.md) and [backend testing](../conventions/quality/backend-testing.md).
+6. Apply the file, type, and folder names in [naming](../conventions/repository/naming.md).
+
+### Specify
+
+7. Create product, domain, glossary, module, use-case, and flow records from the templates, following the [engineering system](../foundations/engineering-system.md).
+8. Select an extension only when its activation criteria already hold, following [scope](../foundations/scope.md).
+
+### Implement
+
+9. Model the domain with [domain](../conventions/backend/domain.md), using [model a domain](model-domain.md) as the worked procedure.
+10. Coordinate use cases with [application](../conventions/backend/application.md) and store them with [Marten persistence](../conventions/backend/persistence-marten.md).
+11. Expose operations with [HTTP API](../conventions/backend/api.md) and secure them with [security](../conventions/quality/security.md).
+12. Declare each React frontend and install its pinned UI baseline, following [frontend structure](../conventions/frontend/structure.md) and [controlled UI governance](../conventions/frontend/ui-governance.md).
+13. Create UI vocabulary and page sidecars for each non-trivial visible route, following [controlled UI governance](../conventions/frontend/ui-governance.md).
+14. Deliver one complete slice with source, tests, contracts, and operating evidence, following the [release standard](../foundations/release-standard.md).
+
+### Operate
+
+15. Add deployment, backup, restore, rollback, limits, and runbooks before production use, following [operations](../conventions/quality/operations.md).
+16. Configure the pipeline gates in [continuous integration](../conventions/quality/ci.md).
 
 ## Verification
 

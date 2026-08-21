@@ -160,7 +160,7 @@ Data shaped for a Query without aggregate loading or mutation.
 
 The immutable evidence record for one release artifact, including build, tests, deployment, recovery, diagnostics, operating limits, and runbooks.
 
-## Repository
+## Repository (Domain port)
 
 A Domain-owned port that loads and stages complete aggregates without exposing general queries or committing transactions.
 
@@ -183,6 +183,10 @@ The opening JSON block identifying a structured document's kind, ID, authority, 
 ## Specification-Driven Delivery
 
 The delivery approach in which approved specifications select work, record behavior, and define completion.
+
+## Standard
+
+One identified Standards provision stating a required boundary for a conforming consumer.
 
 ## Standards override
 
@@ -215,3 +219,7 @@ The component that persists workflow progress and selects its next action.
 ## Workflow rule
 
 A rule controlling when a workflow advances, waits, retries, compensates, fails, completes, or requires operator action.
+
+## Workspace
+
+The Git repository that holds a consumer application or these standards, as distinct from a Domain repository port.
