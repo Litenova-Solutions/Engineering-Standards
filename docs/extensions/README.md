@@ -28,19 +28,11 @@ An extension may add requirements, packages, projects, and verification. It may 
 
 The manifest is the machine-readable source for `activationScope` and `applicableKinds`. This table explains the selection decision.
 
-## Activation process
+## Activation
 
-1. Name the current requirement and the criterion that activates the extension.
-2. Add the extension ID to `selectedExtensions` in consumer `standards.project.json`.
-3. For a project-scoped extension, apply it to all affected project work.
-4. For a local extension, list it in `applicableExtensions` on each allowed specification where it applies.
-5. Add any required Risk to the Use-case specification.
-6. Read the extension before implementation.
-7. Apply named baseline replacements and retain unrelated baseline rules.
-8. Add manifest-pinned dependencies and conditional projects when named.
-9. Run baseline and extension verification.
+`SCOPE.EXTENSIONS.001` and `CORE.COMPLEXITY.002` decide when an extension activates. `AGENTIC.EXTENSIONS.001` and `AGENTIC.EXTENSIONS.002` decide where it is listed. `SCOPE.EXTENSIONS.002` requires the project record.
 
-Do not select an extension as a preference or for possible future work. Do not list a project-scoped extension in local Specification Metadata.
+The [agent protocol](../foundations/agent-protocol.md) carries the ordered steps an agent follows.
 
 ## Example
 

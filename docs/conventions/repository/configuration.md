@@ -150,5 +150,5 @@ This informative example demonstrates `CONFIG.OPTIONS.001` and `CONFIG.SECRETS.0
 | CONFIG.ESLINT.001 | static | The flat config declares a concrete `settings.react.version` and `pnpm lint` runs without a detection error. |
 | CONFIG.CONVENTION.001 | inspection | Each frontend and host directory holds an environment example listing required names with safe values. |
 | CONFIG.CONVENTION.002 | inspection | The ignore rules cover local settings files and no second environment-specific source is tracked. |
-| CONFIG.CONVENTION.003 | static | Application source resolves only logging abstractions, and exporters appear in host registration. |
+| CONFIG.CONVENTION.003 | inspection | Application source resolves only logging abstractions, and exporters appear in host registration. |
 | CONFIG.CONVENTION.004 | static | `git check-ignore docs/releases` reports no match. |

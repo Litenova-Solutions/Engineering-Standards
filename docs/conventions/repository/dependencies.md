@@ -151,5 +151,5 @@ An Application query handler may inject `IQuerySession` because Marten is the se
 | DEP.FRONTEND.UI.001 | static | `node standards/tools/validate-ui.mjs` reports a UI package outside the manifest baseline. |
 | DEP.CONVENTION.001 | inspection | Project files reference only the LiteBus modules the code dispatches. |
 | DEP.CONVENTION.002 | static | The generated types package declares no dependency and the client declares only `openapi-fetch`. |
-| DEP.CONVENTION.003 | test | No production project references an assertion, substitution, host, container, or architecture-test package. |
+| DEP.CONVENTION.003 | inspection | No production project references an assertion, substitution, host, container, or architecture-test package. |
 | DEP.CONVENTION.004 | inspection | Each baseline package appears in the layer that the ownership table assigns. |
