@@ -1,5 +1,24 @@
 # Changelog
 
+## v1.11.0
+
+- Added `docs/foundations/authoring-standard.md` as the canonical contract for controlled technical prose, page structure, provisions, summaries, examples, and evidence mappings.
+- Adopted an STE-inspired repository profile with 20-word procedure sentences, 25-word descriptive sentences, six-sentence paragraphs, ASCII prose, active voice, and controlled terminology. The profile does not claim ASD-STE100 conformance or reproduce its dictionary.
+- Limited normative vocabulary to uppercase `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`, and `MAY` under the RFC 2119 and RFC 8174 interpretation.
+- Rewrote every active foundation, profile, convention, and extension page with explicit Requirement, Default, Replacement, Agent Summary, and Verification structures.
+- Added canonical IDs to actionable conventions while retaining distinct replacement authority from Standards overrides.
+- Replaced duplicated policy prose in `AGENTS.md` and `CONTRIBUTING.md` with concise projections that cite canonical provisions.
+- Added `tools/validate-standards.mjs`, its dependency-free fixture suite, a pull request checklist, and a pinned GitHub Actions validation workflow.
+- Added authoring templates for normative topics, extensions, and guides under `templates/standards/`.
+- Removed the repository writing convention after moving its authority into the authoring foundation.
+- Removed every version-specific upgrade guide and the requirement to publish future migration instructions. Consumers remain on pinned releases until they select another complete contract.
+- Replaced the version-specific adoption guide with `docs/guides/getting-started.md` and removed the duplicate v1 release-scope guide.
+- Replaced application-v1 readiness labels with version-neutral release evidence and release-record guidance.
+- Removed primary-flow metadata requirements from consumer specifications and the reference consumer validator.
+- Removed history-specific authoring checks. The validator evaluates the current standards snapshot.
+- Removed archived decision pages and their active navigation. Changelog and Git history retain release context.
+- Set the standards manifest version to 1.11.0 without changing schema version 3.
+
 ## v1.10.0
 
 - Made `shadcn/ui` with Tailwind CSS v4 the default React web UI system for all product profiles:
@@ -13,7 +32,7 @@
   `UI.AGENT.PROTOCOL.001`, and `FTEST.UI.001`.
 - Added UI vocabulary, page-contract, and shadcn source-lock schemas and templates. Source locks record
   generated source digests and require a visible fork classification when source changes.
-- Added the accepted [controlled React web UI baseline decision](docs/reference/decisions/controlled-ui-baseline.md)
+- Added the controlled React web UI baseline decision.
   and a focused UI override decision template for alternate systems or specialist controls.
 - Added the deterministic `tools/validate-ui.mjs` reference validator and made
   `tools/validate-consumer.mjs` invoke it when a consumer declares a React web platform, a UI

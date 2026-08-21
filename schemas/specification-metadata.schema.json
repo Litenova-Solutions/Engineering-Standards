@@ -89,14 +89,13 @@
     "product": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "id", "specStatus", "owner", "lastReviewed", "primaryReleaseFlow"],
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "product" },
         "id": { "$ref": "#/$defs/identifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
-        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
-        "primaryReleaseFlow": { "$ref": "#/$defs/identifier" }
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
       }
     },
     "domainIndex": {
@@ -204,7 +203,6 @@
         "implementationStatus",
         "owner",
         "lastReviewed",
-        "releaseRole",
         "useCases"
       ],
       "properties": {
@@ -214,10 +212,6 @@
         "implementationStatus": { "$ref": "#/$defs/implementationStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
-        "releaseRole": {
-          "type": "string",
-          "enum": ["primary", "supporting"]
-        },
         "useCases": { "$ref": "#/$defs/useCaseArray" },
         "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
       }

@@ -10,34 +10,30 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/Litenova-Solutions/Engineering-Standards" alt="MIT license"></a>
 </p>
 
-The Agentic Engineering System is the open-source set of standards Litenova Solutions
-uses to develop software with human contributors and AI agents. It defines product and
-domain specifications, architecture boundaries, implementation conventions, verification,
-operations, and release evidence as one connected system.
+## Intent
 
-The v1.10.0 baseline targets one bounded-context business application built with ASP.NET Core,
-PostgreSQL, Marten, and optional Next.js frontends.
+The Agentic Engineering System is the standards contract Litenova Solutions uses for software work by humans and AI agents.
+
+Standards v1.11.0 targets one bounded-context business application. The baseline uses ASP.NET Core, PostgreSQL, Marten, and optional Next.js frontends.
 
 ## What It Defines
 
-- Specification-Driven Delivery for turning approved intent into verified software.
-- Agent-Driven Engineering with explicit human decision authority and bounded agent work.
-- Domain, Application, Infrastructure, and WebApi boundaries organized by module and use case.
-- Required testing, security, operating, documentation, and release evidence.
-- Conditional extensions for concerns such as durable delivery, EF Core, caching, and localization.
+- Product and domain specifications that own approved intent.
+- Domain, Application, Infrastructure, and WebApi boundaries.
+- Implementation conventions for backend and frontend work.
+- Verification, security, operations, and release evidence.
+- Conditional extensions for capabilities outside the baseline.
+- Controlled technical prose for standards and agent instructions.
 
-The baseline profile applies first. An extension may replace only the rule IDs it names.
-A consumer override must name the affected rule and link to a project decision.
+The baseline profile applies first. An extension or consumer decision names each Standard that it replaces.
 
 ## Documentation
 
 - [Hosted documentation](https://www.litenova.solutions/Standards)
 - [Repository documentation index](docs/README.md)
-- [Agentic Engineering System](docs/foundations/engineering-system.md)
-- [V1 release scope](docs/guides/v1-release-scope.md)
-- [Adoption guide](docs/guides/adopt-v1.md)
-- [V1.8 upgrade guide](docs/guides/upgrade-v1.8.md)
-- [V1.10 upgrade guide](docs/guides/upgrade-v1.10.md)
+- [Agentic Engineering System foundation](docs/foundations/engineering-system.md)
+- [Authoring standard](docs/foundations/authoring-standard.md)
+- [Get started](docs/guides/getting-started.md)
 
 ## Use the Standards
 
@@ -48,17 +44,21 @@ git submodule add https://github.com/Litenova-Solutions/Engineering-Standards.gi
 git -C standards checkout --detach <approved-tag-or-commit>
 ```
 
-Add `standards.project.json`, a short root `AGENTS.md`, and the product and domain
-specifications required by the current work. The [template index](templates/docs/README.md)
-lists each starting point and its target path.
+Add `standards.project.json`, a short root `AGENTS.md`, and the product and domain specifications required by current work.
+
+Follow [Get started](docs/guides/getting-started.md) when creating a consumer repository.
+
+The [template index](templates/docs/README.md) lists each consumer template and its target path.
 
 ## Repository Structure
 
 ```text
-docs/               Authored standards, extensions, guides, and reference material
-schemas/            JSON contracts for standards and consumer configuration
-templates/docs/     Consumer specification templates
-standards.manifest.json  Version pins, profiles, extensions, and agent load plans
+docs/                    Authored standards, extensions, guides, and reference material
+schemas/                 JSON contracts for standards and consumer configuration
+templates/docs/          Consumer specification templates
+templates/standards/     Standards authoring templates
+tools/                   Dependency-free reference validators and fixture suites
+standards.manifest.json  Versions, profiles, extensions, and agent load plans
 ```
 
 ## Project

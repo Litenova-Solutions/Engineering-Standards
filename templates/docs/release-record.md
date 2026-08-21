@@ -14,16 +14,15 @@
 - Source commit: `__COMMIT__`.
 - Immutable artifact: `__ARTIFACT_REFERENCE__`.
 
-## Scope
+## Included Behavior
 
-- Primary release flow: `__PRIMARY_RELEASE_FLOW__`.
-- Supporting end-to-end flows: `__SUPPORTING_FLOWS__`.
+- Included end-to-end flows: `__FLOW_IDS__`.
 - Included use cases: `__USE_CASE_IDS__`.
 - Included workflows: `__WORKFLOW_IDS__`.
 - Selected extensions: `__EXTENSIONS__`.
-- Excluded paths and known limitations: `__LIMITATIONS__`.
+- Known operational conditions: `__LIMITATIONS__`.
 
-All included use cases and workflows must have `implementationStatus: verified`. A blocking external claim must be resolved or excluded from this release scope.
+All included use cases and workflows have `implementationStatus: verified`. A blocking external claim is resolved or its affected behavior is absent from every owning record.
 
 ## Automated gates
 
@@ -46,7 +45,7 @@ All included use cases and workflows must have `implementationStatus: verified`.
 
 - Environment and deployed artifact: `__RESULT__`.
 - Readiness result: `__RESULT__`.
-- Primary release flow smoke test: `__RESULT__`.
+- Included end-to-end smoke tests: `__RESULT__`.
 - Rollback exercise and retained artifact: `__RESULT__`.
 - Diagnostics and alert routing exercise: `__RESULT__`.
 

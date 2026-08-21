@@ -4,8 +4,7 @@
   "id": "__PROJECT_ID__",
   "specStatus": "approved",
   "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD",
-  "primaryReleaseFlow": "__PRIMARY_RELEASE_FLOW__"
+  "lastReviewed": "YYYY-MM-DD"
 }
 ---
 # __PROJECT__ Product Brief
@@ -20,7 +19,7 @@ State the current user problem without describing the implementation.
 
 ## Product outcome
 
-State the first observable product outcome. Link `docs/product/flows/__PRIMARY_RELEASE_FLOW__.md` as the primary release flow.
+State the observable product outcome. Link every related `docs/product/flows/` record.
 
 ## Success measure
 
@@ -33,11 +32,11 @@ Name an observable product or operating result.
 - External systems: providers, their responsibilities, and which system owns each fact.
 - Money movement and Risk: custody, settlement, payout, refund, reserve, chargeback, fraud, or `None`.
 - Audit and support: required records, retention, support owner, and recovery obligations.
-- Current versus planned: label future assumptions as planned behavior.
+- Known facts and decisions: distinguish verified facts from unresolved decisions.
 
 ## Non-goals
 
-- List behavior that will not enter v1.
+- List behavior excluded from the current product boundary.
 
 ## Operating target
 
@@ -45,7 +44,7 @@ Name the deployment environment, availability expectation, and support owner.
 
 ## Data classification
 
-List public, internal, personal, sensitive, and regulated data handled by v1.
+List public, internal, personal, sensitive, and regulated data handled by the product.
 
 ## Constraints
 
