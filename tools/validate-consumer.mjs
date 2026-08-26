@@ -237,6 +237,21 @@ if (products !== 1) err(`Expected exactly one product specification, found ${pro
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
 
+// Every frontend declares its platform. Without the field a React web frontend
+// silently skips the whole FRONTEND.UI contract, and the omission is
+// indistinguishable from a considered decision. A consumer that is not ready for
+// the contract declares 'other-web' or records an override, which is a visible
+// statement. (FRONTEND.UI.GOVERNANCE.001)
+const PLATFORMS = ['react-web', 'react-native', 'other-web'];
+for (const frontend of project.paths?.frontends ?? []) {
+  const name = frontend?.name ?? '(unnamed)';
+  if (!frontend?.platform) {
+    err(`standards.project.json: frontend '${name}' declares no 'platform'; one of ${PLATFORMS.join(', ')} is required`);
+  } else if (!PLATFORMS.includes(frontend.platform)) {
+    err(`standards.project.json: frontend '${name}' has unknown platform '${frontend.platform}'; expected one of ${PLATFORMS.join(', ')}`);
+  }
+}
+
 // A React web consumer opts into the deterministic UI validator through its
 // frontend platform declaration or UI block. A recorded UI rule override must
 // carry a live review date.

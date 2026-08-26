@@ -730,7 +730,13 @@ if (errors.length) {
   process.exit(1);
 }
 if (!configured) {
+  // A silent skip reads as conformance. Naming the frontends and the platform
+  // each one declared makes the skipped scope visible in the output that a
+  // reviewer reads. (FRONTEND.UI.GOVERNANCE.001)
+  const skipped = frontends.map((frontend) => `${frontend.name} (platform: ${frontend.platform ?? 'undeclared'})`);
   console.log('PASS: no React web UI configuration is present; standards migration has not been activated.');
+  if (skipped.length) console.log(`Skipped frontends: ${skipped.join(', ')}`);
+  else console.log('Skipped frontends: none; the project declares no frontend.');
   process.exit(0);
 }
 console.log('\nPASS: UI configuration, vocabulary, source locks, page contracts, and source boundaries are valid.');

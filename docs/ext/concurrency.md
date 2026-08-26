@@ -8,7 +8,7 @@ Concurrency control protects invariants when accepted writes overlap. Idempotenc
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `workflow`.
+Applicable specification kinds: `module`, `aggregate`, `use-case`, `workflow`.
 
 The consumer enables `concurrency` when accepted writes can conflict or retries can duplicate irreversible or externally visible effects. A use case with `concurrency` Risk activates it.
 

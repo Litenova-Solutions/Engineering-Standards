@@ -40,11 +40,12 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["name", "path"],
+            "required": ["name", "path", "platform"],
             "properties": {
               "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
               "path": { "$ref": "#/$defs/projectPath" },
               "platform": {
+                "description": "The frontend platform. Required on every entry, so a frontend outside the controlled UI contract declares that position instead of omitting the field.",
                 "type": "string",
                 "enum": ["react-web", "react-native", "other-web"]
               },

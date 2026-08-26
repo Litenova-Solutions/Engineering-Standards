@@ -183,6 +183,11 @@ console.log('\nExtension selection');
 projectCase('selected extension absent from the manifest', (p) => { p.selectedExtensions = ['outbox-worker']; }, "selectedExtensions 'outbox-worker' is not an extension");
 projectCase('selected extension present in the manifest', (p) => { p.selectedExtensions = ['outbox']; }, null);
 
+console.log('\nFrontend platform declaration');
+projectCase('frontend omits its platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin' }]; }, "declares no 'platform'");
+projectCase('frontend declares an unknown platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'web' }]; }, "unknown platform 'web'");
+projectCase('frontend outside the UI contract declares other-web', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'other-web' }]; }, null);
+
 console.log('\nCross-file references');
 metaCase('flow names a use case with no file', 'docs/product/flows/event-sales.md', (m) => { m.useCases = ['orders.no-such-case']; }, "useCase 'orders.no-such-case' has no file");
 metaCase('flow with an empty use-case list', 'docs/product/flows/event-sales.md', (m) => { m.useCases = []; }, 'useCases empty');
