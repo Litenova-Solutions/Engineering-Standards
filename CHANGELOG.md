@@ -2,6 +2,9 @@
 
 ## v1.15.0
 
+- Extended `selectedExtensions` to accept `{ id, criterion, reviewBy }` beside a bare id. `CORE.SCOPE.EXTENSIONS.001` requires selecting an extension only when its criteria apply, and nothing recorded which criterion was met. `tools/validate-consumer.mjs` reports a selection whose `reviewBy` has passed, so a selection that costs nothing to keep expires instead of accumulating.
+- Implemented `oneOf` in the schema validator inside `tools/validate-standards.mjs`. The keyword had been rejected as unsupported, and adding it to the allowed list without the branch check would have skipped validation silently.
+
 - Added the `section-index` kind for a directory index that claims no implemented behavior and owns no aggregate, use case, or policy. A frontend architecture index and an evidence register had no kind that fit, so one was carrying `domain-index`, which the validator accepted. Unlike the other index kinds it may repeat, and `templates/consumer/section-index.md` is its template.
 - Enforced at most one `domain-index`, `glossary`, and `modules-index` in `tools/validate-consumer.mjs`. Only `product` had been counted, so a second authority for any of the other three boundaries validated cleanly.
 

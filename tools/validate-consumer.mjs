@@ -35,7 +35,13 @@ if (!fs.existsSync(projectFile)) {
 const project = readJson(projectFile);
 const docsRoot = path.join(root, 'docs');
 const domainDocs = path.join(root, (project.paths?.domainDocs ?? 'docs/domain'));
-const selected = new Set(project.selectedExtensions ?? []);
+// A selection is either a bare id or an object recording the criterion that was
+// met and the date it is next reviewed. Both forms resolve to one id here.
+// (CORE.SCOPE.EXTENSIONS.001, CORE.SCOPE.EXTENSIONS.002)
+const selections = (project.selectedExtensions ?? []).map((entry) => (
+  typeof entry === 'string' ? { id: entry } : entry ?? {}
+));
+const selected = new Set(selections.map((entry) => entry.id));
 
 // ---- optional manifest (for extension scope checks) ------------------------
 let manifest = null;
@@ -73,6 +79,17 @@ if (manifest?.extensions) {
     if (!extScope.has(id)) {
       err(`standards.project.json: selectedExtensions '${id}' is not an extension in the pinned standards; known ids are ${known.join(', ')}`);
     }
+  }
+}
+
+// An extension selected without a surface costs nothing to keep, so nobody
+// removes it. A recorded review date makes the selection expire rather than
+// accumulate. (CORE.PRINCIPLES.COMPLEXITY.002)
+const today = new Date().toISOString().slice(0, 10);
+for (const entry of selections) {
+  if (!entry.reviewBy) continue;
+  if (entry.reviewBy < today) {
+    err(`standards.project.json: selectedExtensions '${entry.id}' was due for review on ${entry.reviewBy}; confirm the criterion still applies or remove the selection`);
   }
 }
 

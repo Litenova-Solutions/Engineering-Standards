@@ -182,6 +182,9 @@ metaCase('bad actor identifier', 'docs/domain/modules/orders/cancel-order.md', (
 console.log('\nExtension selection');
 projectCase('selected extension absent from the manifest', (p) => { p.selectedExtensions = ['outbox-worker']; }, "selectedExtensions 'outbox-worker' is not an extension");
 projectCase('selected extension present in the manifest', (p) => { p.selectedExtensions = ['outbox']; }, null);
+projectCase('selection object records its criterion', (p) => { p.selectedExtensions = [{ id: 'outbox', criterion: 'Ticket issue cannot lose a delivery.', reviewBy: '2099-01-01' }]; }, null);
+projectCase('selection object with an unknown id', (p) => { p.selectedExtensions = [{ id: 'outbox-worker', criterion: 'Durable delivery.', reviewBy: '2099-01-01' }]; }, "selectedExtensions 'outbox-worker' is not an extension");
+projectCase('selection review date has passed', (p) => { p.selectedExtensions = [{ id: 'outbox', criterion: 'Export was planned.', reviewBy: '2020-01-01' }]; }, 'was due for review on 2020-01-01');
 
 console.log('\nFrontend platform declaration');
 projectCase('frontend omits its platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin' }]; }, "declares no 'platform'");

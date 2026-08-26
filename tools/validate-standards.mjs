@@ -149,7 +149,7 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
 const SCHEMA_KEYWORDS = new Set([
   '$schema', '$id', '$ref', '$defs', 'title', 'description', 'type', 'const', 'enum', 'pattern',
   'minLength', 'minItems', 'minProperties', 'uniqueItems', 'required', 'properties', 'items',
-  'additionalProperties', 'allOf', 'if', 'then', 'else', 'not', 'default', 'examples',
+  'additionalProperties', 'allOf', 'oneOf', 'if', 'then', 'else', 'not', 'default', 'examples',
 ]);
 
 function slash(value) {
@@ -729,7 +729,7 @@ function unsupportedSchemaKeywords(schema, relative, pointer, add) {
   for (const key of Object.keys(schema)) {
     if (!SCHEMA_KEYWORDS.has(key)) add(relative, 1, 'SCHEMA_UNSUPPORTED_KEYWORD', `unsupported JSON Schema keyword '${key}' at '${pointer}'`);
   }
-  for (const key of ['allOf']) for (const item of schema[key] ?? []) unsupportedSchemaKeywords(item, relative, `${pointer}/${key}`, add);
+  for (const key of ['allOf', 'oneOf']) for (const item of schema[key] ?? []) unsupportedSchemaKeywords(item, relative, `${pointer}/${key}`, add);
   for (const key of ['items', 'additionalProperties', 'if', 'then', 'else', 'not']) {
     if (schema[key] && typeof schema[key] === 'object') unsupportedSchemaKeywords(schema[key], relative, `${pointer}/${key}`, add);
   }
@@ -754,6 +754,16 @@ function validateSchemaValue(value, schema, root, location, errors) {
     else validateSchemaValue(value, target, root, location, errors);
   }
   for (const branch of schema.allOf ?? []) validateSchemaValue(value, branch, root, location, errors);
+  // Exactly one branch accepts the value. Reporting the branch errors would name
+  // every shape the value is not, so the message names the count instead.
+  if (schema.oneOf) {
+    const matched = schema.oneOf.filter((branch) => {
+      const branchErrors = [];
+      validateSchemaValue(value, branch, root, location, branchErrors);
+      return branchErrors.length === 0;
+    }).length;
+    if (matched !== 1) errors.push(`${location}: value matches ${matched} of ${schema.oneOf.length} allowed shapes, expected exactly 1`);
+  }
   if (schema.if) {
     const conditionErrors = [];
     validateSchemaValue(value, schema.if, root, location, conditionErrors);

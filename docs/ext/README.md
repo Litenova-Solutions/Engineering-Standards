@@ -53,6 +53,19 @@ The project selects both `locale` and `outbox`:
 }
 ```
 
+A selection can instead record the criterion it met and the date it is next reviewed:
+
+```json
+{
+  "selectedExtensions": [
+    "locale",
+    { "id": "outbox", "criterion": "Ticket issue cannot lose a delivery.", "reviewBy": "2027-03-01" }
+  ]
+}
+```
+
+`CORE.SCOPE.EXTENSIONS.001` requires that an extension is selected only when its criteria apply, and the object form records which criterion that was. The consumer validator reports a selection whose `reviewBy` has passed. A selection that costs nothing to keep is a selection nobody removes.
+
 `locale` applies across the project. Only the Use cases and Workflows that require durable delivery list `outbox`. For example:
 
 ```markdown
