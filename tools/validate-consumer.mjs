@@ -85,11 +85,17 @@ const IMPL = ['planned', 'implemented', 'verified'];
 const RISK = ['authorization', 'money', 'sensitive-data', 'irreversible', 'concurrency', 'durable-delivery', 'availability'];
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const base = { kind: 1, id: 1, specStatus: 1, owner: 1, lastReviewed: 1 };
+// One record owns each of these boundaries. A directory index that owns no
+// boundary uses 'section-index', which may repeat.
+const SINGLETON_KINDS = new Set(['product', 'domain-index', 'glossary', 'modules-index']);
 const KINDS = {
   product: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   'domain-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   glossary: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   'modules-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
+  // A directory index that claims no implemented behavior and owns no aggregate,
+  // use case, or policy. It carries the base fields and nothing else.
+  'section-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
   aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: UC },
   'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: UC },
@@ -117,7 +123,7 @@ const files = [];
 })(docsRoot);
 
 const metas = []; // {rel, meta, file}
-let products = 0;
+const singletons = new Map();     // kind -> [paths]
 const acDefs = new Map();  // id -> [rel]
 const e2eDefs = new Map(); // id -> [rel]
 let uiOutput = '';
@@ -198,7 +204,10 @@ for (const f of files) {
   for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
   for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
 
-  if (meta.kind === 'product') products++;
+  if (SINGLETON_KINDS.has(meta.kind)) {
+    if (!singletons.has(meta.kind)) singletons.set(meta.kind, []);
+    singletons.get(meta.kind).push(rel);
+  }
   if (meta.kind === 'end-to-end-flow') {
     for (const uc of meta.useCases ?? []) { const [mod, name] = uc.split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
   }
@@ -233,7 +242,18 @@ for (const f of files) {
 }
 
 // ---- aggregate cross-file checks -------------------------------------------
-if (products !== 1) err(`Expected exactly one product specification, found ${products}`);
+// A second domain index, glossary, or modules index is a duplicate authority
+// for one boundary. Only product had been counted, so the other three could be
+// repeated or misapplied to an unrelated directory. (CORE.PRINCIPLES.SOURCE.001)
+for (const kind of SINGLETON_KINDS) {
+  const found = singletons.get(kind) ?? [];
+  if (found.length === 1) continue;
+  if (!found.length) {
+    if (kind === 'product') err(`Expected exactly one ${kind} specification, found 0`);
+    continue;
+  }
+  err(`Expected at most one ${kind} specification, found ${found.length}: ${found.join(', ')}`);
+}
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
 

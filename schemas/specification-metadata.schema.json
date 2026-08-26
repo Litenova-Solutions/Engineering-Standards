@@ -8,6 +8,7 @@
     { "$ref": "#/$defs/domainIndex" },
     { "$ref": "#/$defs/glossary" },
     { "$ref": "#/$defs/modulesIndex" },
+    { "$ref": "#/$defs/sectionIndex" },
     { "$ref": "#/$defs/module" },
     { "$ref": "#/$defs/aggregate" },
     { "$ref": "#/$defs/useCase" },
@@ -128,6 +129,19 @@
       "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "modules-index" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "sectionIndex": {
+      "description": "A directory index that claims no implemented behavior and owns no aggregate, use case, or policy. Unlike the other index kinds it may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "section-index" },
         "id": { "$ref": "#/$defs/identifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },

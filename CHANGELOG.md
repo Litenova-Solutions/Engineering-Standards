@@ -2,6 +2,9 @@
 
 ## v1.15.0
 
+- Added the `section-index` kind for a directory index that claims no implemented behavior and owns no aggregate, use case, or policy. A frontend architecture index and an evidence register had no kind that fit, so one was carrying `domain-index`, which the validator accepted. Unlike the other index kinds it may repeat, and `templates/consumer/section-index.md` is its template.
+- Enforced at most one `domain-index`, `glossary`, and `modules-index` in `tools/validate-consumer.mjs`. Only `product` had been counted, so a second authority for any of the other three boundaries validated cleanly.
+
 - Added `CORE.SYSTEM.USECASE.002`, which defines `implemented`. The schema accepted `planned`, `implemented`, and `verified`, and `CORE.SYSTEM.USECASE.001` defined only the two ends. Working code whose acceptance criteria are not yet proven is the ordinary middle state, and leaving it undefined made the value a matter of taste.
 - Removed the flat allowance from `CORE.SYSTEM.CONVENTION.002`. A module README carries `kind: module` and one file cannot carry two kinds, so a flat single-aggregate module had nowhere to put the aggregate specification that `CORE.SYSTEM.STATE.001` requires. Every module now groups its use cases under an aggregate subdirectory, which costs one repeated path segment where the names coincide.
 
