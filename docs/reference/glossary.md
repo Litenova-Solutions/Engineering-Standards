@@ -40,6 +40,14 @@ The only external mutation entry point for an aggregate.
 
 The complete lifecycle condition represented by one abstract `{Aggregate}State` record and one or more sealed state records.
 
+## Audit record
+
+One entry in the audit trail, stating the actor, action, target, outcome, time, origin, and reason for one attempted action.
+
+## Audit trail
+
+The append-only evidence store that establishes accountability for attempted actions, separate from the diagnostic log and the domain event stream.
+
 ## Authorization policy
 
 A policy deciding whether an identified actor can perform an operation on a specific target.

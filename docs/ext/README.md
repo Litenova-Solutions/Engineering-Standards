@@ -17,6 +17,7 @@ An extension may add requirements, packages, projects, and verification. It may 
 | [lifecycle](lifecycle.md) | `local` | Use case, Workflow, Domain Policy | Deletion, retention, archival, restore, or legal hold behavior applies. |
 | [containers](containers.md) | `project` | None | A hosted environment deploys container images. |
 | [integrations](integrations.md) | `local` | Use case, Workflow | Behavior calls or receives data from an external system. |
+| [audit](audit.md) | `project` | None | A reviewer must establish who acted inside data another party owns. |
 | [authjs](authjs.md) | `project` | None | Next.js owns interactive login and session cookies. |
 | [locale](locale.md) | `project` | None | The product commits to more than one locale. |
 | [tenancy](tenancy.md) | `project` | None | Independent customer organizations share one deployment. |

@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
   "schemaVersion": 4,
-  "version": "1.14.0",
+  "version": "1.15.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "defaultProfile": "dotnet-nextjs",
@@ -362,6 +362,10 @@
         "use-case",
         "workflow"
       ]
+    },
+    "audit": {
+      "path": "docs/ext/audit.md",
+      "activationScope": "project"
     },
     "authjs": {
       "path": "docs/ext/authjs.md",

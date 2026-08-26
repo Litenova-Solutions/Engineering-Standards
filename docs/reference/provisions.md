@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 779 provisions across 8 areas.
+The active release states 821 provisions across 8 areas.
 
 ## BACKEND
 
@@ -310,6 +310,48 @@ The active release states 779 provisions across 8 areas.
 
 | ID | Provision | Page |
 |:---|:---|:---|
+| EXT.AUDIT.ACCESS.001 | [Give the trail a read path](../ext/audit.md#give-the-trail-a-read-path-extauditaccess001) | `ext/audit.md` |
+| EXT.AUDIT.ACCESS.002 | [Audit reads of the trail](../ext/audit.md#audit-reads-of-the-trail-extauditaccess002) | `ext/audit.md` |
+| EXT.AUDIT.ACTOR.001 | [Use a closed actor set](../ext/audit.md#use-a-closed-actor-set-extauditactor001) | `ext/audit.md` |
+| EXT.AUDIT.ACTOR.002 | [Record delegated administrative access](../ext/audit.md#record-delegated-administrative-access-extauditactor002) | `ext/audit.md` |
+| EXT.AUDIT.ADOPT.001 | [Record the audit adoption decision](../ext/audit.md#record-the-audit-adoption-decision-extauditadopt001) | `ext/audit.md` |
+| EXT.AUDIT.ADOPT.002 | [Declare audit selection on every Command](../ext/audit.md#declare-audit-selection-on-every-command-extauditadopt002) | `ext/audit.md` |
+| EXT.AUDIT.ATOMIC.001 | [Commit a success record with its business change](../ext/audit.md#commit-a-success-record-with-its-business-change-extauditatomic001) | `ext/audit.md` |
+| EXT.AUDIT.ATOMIC.002 | [Write an unsuccessful record outside the failed transaction](../ext/audit.md#write-an-unsuccessful-record-outside-the-failed-transaction-extauditatomic002) | `ext/audit.md` |
+| EXT.AUDIT.ATOMIC.003 | [Stage the audit write before the business commit](../ext/audit.md#stage-the-audit-write-before-the-business-commit-extauditatomic003) | `ext/audit.md` |
+| EXT.AUDIT.ATOMIC.004 | [Publish unsuccessful write failures](../ext/audit.md#publish-unsuccessful-write-failures-extauditatomic004) | `ext/audit.md` |
+| EXT.AUDIT.BOUNDARY.001 | [Emit audit records at the mediation boundary](../ext/audit.md#emit-audit-records-at-the-mediation-boundary-extauditboundary001) | `ext/audit.md` |
+| EXT.AUDIT.BOUNDARY.002 | [Restrict handler contribution to determined values](../ext/audit.md#restrict-handler-contribution-to-determined-values-extauditboundary002) | `ext/audit.md` |
+| EXT.AUDIT.BOUNDARY.003 | [Exclude derived audit trails](../ext/audit.md#exclude-derived-audit-trails-extauditboundary003) | `ext/audit.md` |
+| EXT.AUDIT.CLASSIFICATION.001 | [Exclude secrets and payment data](../ext/audit.md#exclude-secrets-and-payment-data-extauditclassification001) | `ext/audit.md` |
+| EXT.AUDIT.CLASSIFICATION.002 | [Exclude personal data beyond actor identity](../ext/audit.md#exclude-personal-data-beyond-actor-identity-extauditclassification002) | `ext/audit.md` |
+| EXT.AUDIT.CLASSIFICATION.003 | [Exclude state snapshots](../ext/audit.md#exclude-state-snapshots-extauditclassification003) | `ext/audit.md` |
+| EXT.AUDIT.CONTEXT.001 | [Record the request origin](../ext/audit.md#record-the-request-origin-extauditcontext001) | `ext/audit.md` |
+| EXT.AUDIT.CONTEXT.002 | [Record the operation trace identity](../ext/audit.md#record-the-operation-trace-identity-extauditcontext002) | `ext/audit.md` |
+| EXT.AUDIT.CONVENTION.001 | [Keep audit infrastructure in one location](../ext/audit.md#keep-audit-infrastructure-in-one-location-extauditconvention001) | `ext/audit.md` |
+| EXT.AUDIT.CONVENTION.002 | [Declare audit selection beside the Command](../ext/audit.md#declare-audit-selection-beside-the-command-extauditconvention002) | `ext/audit.md` |
+| EXT.AUDIT.CONVENTION.003 | [Use a fixed category vocabulary](../ext/audit.md#use-a-fixed-category-vocabulary-extauditconvention003) | `ext/audit.md` |
+| EXT.AUDIT.CONVENTION.004 | [Store the trail beside the business data](../ext/audit.md#store-the-trail-beside-the-business-data-extauditconvention004) | `ext/audit.md` |
+| EXT.AUDIT.CONVENTION.005 | [Publish a copy to the security platform](../ext/audit.md#publish-a-copy-to-the-security-platform-extauditconvention005) | `ext/audit.md` |
+| EXT.AUDIT.COVERAGE.001 | [Cover the required audit categories](../ext/audit.md#cover-the-required-audit-categories-extauditcoverage001) | `ext/audit.md` |
+| EXT.AUDIT.COVERAGE.002 | [Exclude indiscriminate auditing](../ext/audit.md#exclude-indiscriminate-auditing-extauditcoverage002) | `ext/audit.md` |
+| EXT.AUDIT.ENFORCEMENT.001 | [Reject an undeclared Command](../ext/audit.md#reject-an-undeclared-command-extauditenforcement001) | `ext/audit.md` |
+| EXT.AUDIT.EXPORT.001 | [Record bulk export](../ext/audit.md#record-bulk-export-extauditexport001) | `ext/audit.md` |
+| EXT.AUDIT.ISOLATION.001 | [Scope every record to its tenant](../ext/audit.md#scope-every-record-to-its-tenant-extauditisolation001) | `ext/audit.md` |
+| EXT.AUDIT.PROTECTION.001 | [Enforce append-only through storage privilege](../ext/audit.md#enforce-append-only-through-storage-privilege-extauditprotection001) | `ext/audit.md` |
+| EXT.AUDIT.PROTECTION.002 | [Provide tamper evidence](../ext/audit.md#provide-tamper-evidence-extauditprotection002) | `ext/audit.md` |
+| EXT.AUDIT.PROTECTION.003 | [Verify the integrity chain on a schedule](../ext/audit.md#verify-the-integrity-chain-on-a-schedule-extauditprotection003) | `ext/audit.md` |
+| EXT.AUDIT.PROTECTION.004 | [Add a correcting record](../ext/audit.md#add-a-correcting-record-extauditprotection004) | `ext/audit.md` |
+| EXT.AUDIT.PURGE.001 | [Retain each category for its declared period](../ext/audit.md#retain-each-category-for-its-declared-period-extauditpurge001) | `ext/audit.md` |
+| EXT.AUDIT.PURGE.002 | [Remove the identity mapping on erasure](../ext/audit.md#remove-the-identity-mapping-on-erasure-extauditpurge002) | `ext/audit.md` |
+| EXT.AUDIT.READ.001 | [Record personal-data reads](../ext/audit.md#record-personal-data-reads-extauditread001) | `ext/audit.md` |
+| EXT.AUDIT.RECORD.001 | [Record the required audit fields](../ext/audit.md#record-the-required-audit-fields-extauditrecord001) | `ext/audit.md` |
+| EXT.AUDIT.RECORD.002 | [State the action as use-case identity](../ext/audit.md#state-the-action-as-use-case-identity-extauditrecord002) | `ext/audit.md` |
+| EXT.AUDIT.RECORD.003 | [Record the failure code on an unsuccessful attempt](../ext/audit.md#record-the-failure-code-on-an-unsuccessful-attempt-extauditrecord003) | `ext/audit.md` |
+| EXT.AUDIT.SCHEMA.001 | [Version the audit record shape](../ext/audit.md#version-the-audit-record-shape-extauditschema001) | `ext/audit.md` |
+| EXT.AUDIT.STATUS.001 | [Record every attempt outcome](../ext/audit.md#record-every-attempt-outcome-extauditstatus001) | `ext/audit.md` |
+| EXT.AUDIT.STATUS.002 | [Record refused authorization](../ext/audit.md#record-refused-authorization-extauditstatus002) | `ext/audit.md` |
+| EXT.AUDIT.STATUS.003 | [Record failed audited attempts](../ext/audit.md#record-failed-audited-attempts-extauditstatus003) | `ext/audit.md` |
 | EXT.AUTHJS.ADOPT.001 | [Keep Auth.js frontend-specific](../ext/authjs.md#keep-authjs-frontend-specific-extauthjsadopt001) | `ext/authjs.md` |
 | EXT.AUTHJS.ADOPT.002 | [Keep WebApi provider-neutral](../ext/authjs.md#keep-webapi-provider-neutral-extauthjsadopt002) | `ext/authjs.md` |
 | EXT.AUTHJS.API.001 | [Use a server API boundary](../ext/authjs.md#use-a-server-api-boundary-extauthjsapi001) | `ext/authjs.md` |
