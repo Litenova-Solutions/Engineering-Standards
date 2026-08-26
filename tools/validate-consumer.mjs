@@ -64,6 +64,16 @@ if (manifest?.extensions) {
     extScope.set(id, def.activationScope);
     if (def.applicableKinds) extKinds.set(id, new Set(def.applicableKinds));
   }
+  // A selection is checked against the manifest, not only against itself.
+  // applicableExtensions is compared to selectedExtensions further down, so two
+  // consistent lists of ids that no longer exist would otherwise validate
+  // cleanly through a release that renamed them. (CORE.SCOPE.EXTENSIONS.002)
+  const known = [...extScope.keys()].sort();
+  for (const id of selected) {
+    if (!extScope.has(id)) {
+      err(`standards.project.json: selectedExtensions '${id}' is not an extension in the pinned standards; known ids are ${known.join(', ')}`);
+    }
+  }
 }
 
 // ---- schema-equivalent kind rules ------------------------------------------

@@ -143,6 +143,8 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'VERIFY_NO_ARTIFACT',
   'VERIFY_TEMPLATED_EVIDENCE',
   'VERIFY_UNKNOWN_ID',
+
+  'TEMPLATE_INDEX_PATH',
 ]);
 const SCHEMA_KEYWORDS = new Set([
   '$schema', '$id', '$ref', '$defs', 'title', 'description', 'type', 'const', 'enum', 'pattern',
@@ -1066,8 +1068,40 @@ export function validateRepository(rootInput = '.') {
     }
   }
 
+  // The template index is the only map from a template file to the consumer path
+  // it targets. A renamed template leaves a row pointing at nothing, and that row
+  // reads exactly like a correct one. (CORE.PRINCIPLES.SOURCE.001)
+  checkTemplateIndex(root, add);
+
   diagnostics.sort((left, right) => left.relative.localeCompare(right.relative) || left.line - right.line || left.code.localeCompare(right.code));
   return { diagnostics };
+}
+
+function checkTemplateIndex(root, add) {
+  const relative = 'templates/consumer/README.md';
+  const indexFile = path.join(root, relative);
+  if (!fs.existsSync(indexFile)) return;
+  const lines = fs.readFileSync(indexFile, 'utf8').split(/\r?\n/);
+  for (let index = 0; index < lines.length; index += 1) {
+    const row = lines[index].match(/^\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|/);
+    if (!row) continue;
+    const [, template] = row;
+    if (!fs.existsSync(path.join(root, 'templates', 'consumer', template))) {
+      add(relative, index + 1, 'TEMPLATE_INDEX_PATH', `template '${template}' named in the index does not exist`);
+    }
+  }
+  // Every tracked template appears in the index. A shipped template that no row
+  // names is a template a consumer cannot find.
+  const named = new Set(lines.flatMap((line) => {
+    const row = line.match(/^\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|/);
+    return row ? [row[1]] : [];
+  }));
+  const directory = path.join(root, 'templates', 'consumer');
+  if (!fs.existsSync(directory)) return;
+  for (const entry of fs.readdirSync(directory)) {
+    if (entry === 'README.md' || named.has(entry)) continue;
+    add(relative, 1, 'TEMPLATE_INDEX_PATH', `template '${entry}' is tracked but no index row names it`);
+  }
 }
 
 function runCli() {

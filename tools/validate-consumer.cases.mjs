@@ -60,7 +60,7 @@ const LAYOUT = [
   ['end-to-end-flow.md', 'docs/product/flows/event-sales.md'],
   ['domain-index.md', 'docs/domain/README.md'],
   ['glossary.md', 'docs/domain/glossary.md'],
-  ['module-index.md', 'docs/domain/modules/README.md'],
+  ['modules-index.md', 'docs/domain/modules/README.md'],
   ['module.md', 'docs/domain/modules/orders/README.md'],
   ['use-case.md', 'docs/domain/modules/orders/cancel-order.md'],
   ['aggregate.md', 'docs/domain/modules/orders/order-claims/README.md'],
@@ -178,6 +178,10 @@ metaCase('bad operationType', 'docs/domain/modules/orders/cancel-order.md', (m) 
 metaCase('bad risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['danger']; }, "bad risk 'danger'");
 metaCase('accepted risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['authorization']; }, null);
 metaCase('bad actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['Buyer Account']; }, 'bad actors id');
+
+console.log('\nExtension selection');
+projectCase('selected extension absent from the manifest', (p) => { p.selectedExtensions = ['outbox-worker']; }, "selectedExtensions 'outbox-worker' is not an extension");
+projectCase('selected extension present in the manifest', (p) => { p.selectedExtensions = ['outbox']; }, null);
 
 console.log('\nCross-file references');
 metaCase('flow names a use case with no file', 'docs/product/flows/event-sales.md', (m) => { m.useCases = ['orders.no-such-case']; }, "useCase 'orders.no-such-case' has no file");
