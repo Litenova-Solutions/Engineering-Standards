@@ -35,7 +35,13 @@ if (!fs.existsSync(projectFile)) {
 const project = readJson(projectFile);
 const docsRoot = path.join(root, 'docs');
 const domainDocs = path.join(root, (project.paths?.domainDocs ?? 'docs/domain'));
-const selected = new Set(project.selectedExtensions ?? []);
+// A selection is either a bare id or an object recording the criterion that was
+// met and the date it is next reviewed. Both forms resolve to one id here.
+// (CORE.SCOPE.EXTENSIONS.001, CORE.SCOPE.EXTENSIONS.002)
+const selections = (project.selectedExtensions ?? []).map((entry) => (
+  typeof entry === 'string' ? { id: entry } : entry ?? {}
+));
+const selected = new Set(selections.map((entry) => entry.id));
 
 // ---- optional manifest (for extension scope checks) ------------------------
 let manifest = null;
@@ -64,6 +70,27 @@ if (manifest?.extensions) {
     extScope.set(id, def.activationScope);
     if (def.applicableKinds) extKinds.set(id, new Set(def.applicableKinds));
   }
+  // A selection is checked against the manifest, not only against itself.
+  // applicableExtensions is compared to selectedExtensions further down, so two
+  // consistent lists of ids that no longer exist would otherwise validate
+  // cleanly through a release that renamed them. (CORE.SCOPE.EXTENSIONS.002)
+  const known = [...extScope.keys()].sort();
+  for (const id of selected) {
+    if (!extScope.has(id)) {
+      err(`standards.project.json: selectedExtensions '${id}' is not an extension in the pinned standards; known ids are ${known.join(', ')}`);
+    }
+  }
+}
+
+// An extension selected without a surface costs nothing to keep, so nobody
+// removes it. A recorded review date makes the selection expire rather than
+// accumulate. (CORE.PRINCIPLES.COMPLEXITY.002)
+const today = new Date().toISOString().slice(0, 10);
+for (const entry of selections) {
+  if (!entry.reviewBy) continue;
+  if (entry.reviewBy < today) {
+    err(`standards.project.json: selectedExtensions '${entry.id}' was due for review on ${entry.reviewBy}; confirm the criterion still applies or remove the selection`);
+  }
 }
 
 // ---- schema-equivalent kind rules ------------------------------------------
@@ -75,11 +102,17 @@ const IMPL = ['planned', 'implemented', 'verified'];
 const RISK = ['authorization', 'money', 'sensitive-data', 'irreversible', 'concurrency', 'durable-delivery', 'availability'];
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const base = { kind: 1, id: 1, specStatus: 1, owner: 1, lastReviewed: 1 };
+// One record owns each of these boundaries. A directory index that owns no
+// boundary uses 'section-index', which may repeat.
+const SINGLETON_KINDS = new Set(['product', 'domain-index', 'glossary', 'modules-index']);
 const KINDS = {
   product: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   'domain-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   glossary: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   'modules-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
+  // A directory index that claims no implemented behavior and owns no aggregate,
+  // use case, or policy. It carries the base fields and nothing else.
+  'section-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
   aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: UC },
   'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: UC },
@@ -107,7 +140,7 @@ const files = [];
 })(docsRoot);
 
 const metas = []; // {rel, meta, file}
-let products = 0;
+const singletons = new Map();     // kind -> [paths]
 const acDefs = new Map();  // id -> [rel]
 const e2eDefs = new Map(); // id -> [rel]
 let uiOutput = '';
@@ -188,7 +221,10 @@ for (const f of files) {
   for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
   for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
 
-  if (meta.kind === 'product') products++;
+  if (SINGLETON_KINDS.has(meta.kind)) {
+    if (!singletons.has(meta.kind)) singletons.set(meta.kind, []);
+    singletons.get(meta.kind).push(rel);
+  }
   if (meta.kind === 'end-to-end-flow') {
     for (const uc of meta.useCases ?? []) { const [mod, name] = uc.split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
   }
@@ -223,9 +259,35 @@ for (const f of files) {
 }
 
 // ---- aggregate cross-file checks -------------------------------------------
-if (products !== 1) err(`Expected exactly one product specification, found ${products}`);
+// A second domain index, glossary, or modules index is a duplicate authority
+// for one boundary. Only product had been counted, so the other three could be
+// repeated or misapplied to an unrelated directory. (CORE.PRINCIPLES.SOURCE.001)
+for (const kind of SINGLETON_KINDS) {
+  const found = singletons.get(kind) ?? [];
+  if (found.length === 1) continue;
+  if (!found.length) {
+    if (kind === 'product') err(`Expected exactly one ${kind} specification, found 0`);
+    continue;
+  }
+  err(`Expected at most one ${kind} specification, found ${found.length}: ${found.join(', ')}`);
+}
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
+
+// Every frontend declares its platform. Without the field a React web frontend
+// silently skips the whole FRONTEND.UI contract, and the omission is
+// indistinguishable from a considered decision. A consumer that is not ready for
+// the contract declares 'other-web' or records an override, which is a visible
+// statement. (FRONTEND.UI.GOVERNANCE.001)
+const PLATFORMS = ['react-web', 'react-native', 'other-web'];
+for (const frontend of project.paths?.frontends ?? []) {
+  const name = frontend?.name ?? '(unnamed)';
+  if (!frontend?.platform) {
+    err(`standards.project.json: frontend '${name}' declares no 'platform'; one of ${PLATFORMS.join(', ')} is required`);
+  } else if (!PLATFORMS.includes(frontend.platform)) {
+    err(`standards.project.json: frontend '${name}' has unknown platform '${frontend.platform}'; expected one of ${PLATFORMS.join(', ')}`);
+  }
+}
 
 // A React web consumer opts into the deterministic UI validator through its
 // frontend platform declaration or UI block. A recorded UI rule override must

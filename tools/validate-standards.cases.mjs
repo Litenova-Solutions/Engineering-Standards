@@ -294,6 +294,48 @@ run('empty extension dependencies', (root) => {
 run('missing writing load plan', (root) => write(root, 'standards.manifest.json', '{}'), ['MANIFEST_LOAD_PLAN']);
 
 run('invalid override IDs', (root) => write(root, 'templates/consumer/standards.project.json', JSON.stringify({ overrides: [{ provisionId: 'CORE.TOPIC.CONVENTION.001' }, { provisionId: 'CORE.UNKNOWN.OVERRIDE.001' }] })), ['OVERRIDE_CONVENTION_ID', 'OVERRIDE_UNKNOWN_ID']);
+
+// oneOf is enforced rather than allowed and skipped. Without the branch check a
+// value matching none of the shapes would validate cleanly.
+const oneOfSchema = JSON.stringify({
+  $schema: 'https://json-schema.org/draft/2020-12/schema',
+  type: 'object',
+  properties: {
+    selectedExtensions: {
+      type: 'array',
+      items: {
+        oneOf: [
+          { type: 'string', pattern: '^[a-z][a-z0-9-]*$' },
+          { type: 'object', additionalProperties: false, required: ['id', 'criterion', 'reviewBy'], properties: { id: { type: 'string' }, criterion: { type: 'string' }, reviewBy: { type: 'string' } } },
+        ],
+      },
+    },
+  },
+});
+run('value matches no oneOf branch', (root) => {
+  write(root, 'schemas/standards-project.schema.json', oneOfSchema);
+  write(root, 'templates/consumer/standards.project.json', JSON.stringify({ selectedExtensions: [{ id: 'outbox', criterion: 'Durable delivery.' }] }));
+}, ['SCHEMA_INVALID']);
+run('value matches exactly one oneOf branch', (root) => {
+  write(root, 'schemas/standards-project.schema.json', oneOfSchema);
+  write(root, 'templates/consumer/standards.project.json', JSON.stringify({ selectedExtensions: ['outbox', { id: 'jobs', criterion: 'Holds expire on a timer.', reviewBy: '2099-01-01' }] }));
+}, [], ['SCHEMA_INVALID']);
+
+// The index is the only map from a template to the consumer path it targets, so
+// a renamed template and an unlisted template are both invisible without it.
+run('template index names a missing file', (root) => {
+  write(root, 'templates/consumer/sample.md', '# Sample\n');
+  write(root, 'templates/consumer/README.md', '# Templates\n\n## Intent\n\nUse these starting points.\n\n| Template | Target | Purpose |\n|:---|:---|:---|\n| `sample.md` | `docs/sample.md` | Present. |\n| `absent.md` | `docs/absent.md` | Renamed away. |\n');
+}, ['TEMPLATE_INDEX_PATH']);
+run('template index omits a tracked template', (root) => {
+  write(root, 'templates/consumer/sample.md', '# Sample\n');
+  write(root, 'templates/consumer/unlisted.md', '# Unlisted\n');
+  write(root, 'templates/consumer/README.md', '# Templates\n\n## Intent\n\nUse these starting points.\n\n| Template | Target | Purpose |\n|:---|:---|:---|\n| `sample.md` | `docs/sample.md` | Present. |\n');
+}, ['TEMPLATE_INDEX_PATH']);
+run('template index resolves every row', (root) => {
+  write(root, 'templates/consumer/sample.md', '# Sample\n');
+  write(root, 'templates/consumer/README.md', '# Templates\n\n## Intent\n\nUse these starting points.\n\n| Template | Target | Purpose |\n|:---|:---|:---|\n| `sample.md` | `docs/sample.md` | Present. |\n');
+}, [], ['TEMPLATE_INDEX_PATH']);
 run('provision restates its heading', (root) => write(root, 'docs/core/topic.md', topicPage.replace(
   '**Requirement:** Consumers MUST keep the topic inside its declared boundary.',
   '**Requirement:** Consumers MUST keep the topic bounded.',

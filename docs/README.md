@@ -72,6 +72,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Data lifecycle](ext/lifecycle.md)
 - [Container deployment](ext/containers.md)
 - [External integrations](ext/integrations.md)
+- [Audit trail](ext/audit.md)
 - [Auth.js frontend authentication](ext/authjs.md)
 - [Localization](ext/locale.md)
 - [Multitenancy](ext/tenancy.md)
@@ -85,11 +86,13 @@ The profile selects every baseline page. Exact versions and composition remain i
 
 - [Get started](guide/getting-started.md)
 - [Model a domain](guide/model-domain.md)
+- [Build an audit trail](guide/audit-trail.md)
 
 ## Reference
 
 - [Glossary](reference/glossary.md)
 - [Provision index](reference/provisions.md)
+- [Audit obligations](reference/audit-obligations.md)
 - [Consumer templates](../templates/consumer/README.md)
 - [Reference validators](../tools/README.md)
 

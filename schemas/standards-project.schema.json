@@ -40,11 +40,12 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["name", "path"],
+            "required": ["name", "path", "platform"],
             "properties": {
               "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
               "path": { "$ref": "#/$defs/projectPath" },
               "platform": {
+                "description": "The frontend platform. Required on every entry, so a frontend outside the controlled UI contract declares that position instead of omitting the field.",
                 "type": "string",
                 "enum": ["react-web", "react-native", "other-web"]
               },
@@ -71,9 +72,24 @@
       }
     },
     "selectedExtensions": {
+      "description": "Extensions active for this project. A bare string selects the extension. An object also records the criterion that was met and the date the selection is next reviewed, so a selection that costs nothing to keep still expires.",
       "type": "array",
       "uniqueItems": true,
-      "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+      "items": {
+        "oneOf": [
+          { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "criterion", "reviewBy"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "criterion": { "type": "string", "minLength": 1 },
+              "reviewBy": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+            }
+          }
+        ]
+      }
     },
     "overrides": {
       "type": "array",

@@ -29,6 +29,7 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | `domain-policy.md` | `docs/domain/policies/{policy}.md` | A business rule is not owned by one aggregate invariant. |
 | `decision-evidence.md` | `docs/research/{record}.md` | A large external investigation needs its own owner and lifecycle. |
 | `operating-limits.md` | `docs/operations/limits.md` | A pilot or release has enforced, tested, supported, or alert values. |
+| `section-index.md` | `docs/{section}/README.md` | A directory needs an index and owns no aggregate, use case, or policy. |
 | `page.md` | `docs/ui/{app}/{page}.md` | A page composes non-trivial use cases or interaction states. |
 | `ui-page.json` | `docs/ui/{app}/{page}.ui.json` | Declares the page shell, regions, states, responsive modes, focus, and evidence. |
 | `ui-vocabulary.json` | `docs/ui/{app}/vocabulary.json` | Closes the shells, patterns, components, tokens, states, forks, and evidence available to agents. |

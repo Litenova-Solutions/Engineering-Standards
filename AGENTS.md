@@ -2,7 +2,7 @@
 
 Read this file before changing this repository or a consumer application. (CORE.AGENT.LOAD.001)
 
-Standards v1.14.0 covers one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. (CORE.SCOPE.APPLICATION.001, CORE.SCOPE.CONTEXT.001)
+Standards v1.15.0 covers one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. (CORE.SCOPE.APPLICATION.001, CORE.SCOPE.CONTEXT.001)
 
 The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PROFILE.NEXTJS.VERSION.001, PROFILE.BLAZOR.VERSION.001, CORE.AGENT.LOAD.001)
 

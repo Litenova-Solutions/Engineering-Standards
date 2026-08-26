@@ -1,0 +1,64 @@
+name: Proposal
+description: A change to what the standards require, permit, or generate.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when the contract is internally consistent and you want it
+        to say something else. A proposal states the constraint first and the
+        change second, so the decision can reject the change and keep the
+        constraint.
+
+  - type: textarea
+    id: constraint
+    attributes:
+      label: Constraint
+      description: State what is hard, unstated, or unenforceable today. Give the case that produced it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change
+      description: State the change as an obligation, a permission, or a generated artifact. Name the files it touches.
+    validations:
+      required: true
+
+  - type: input
+    id: provisions
+    attributes:
+      label: Provisions affected
+      description: Each provision ID this adds, replaces, or contradicts. Write `None` when the change is tooling only.
+      placeholder: CORE.AUTHORING.SNAPSHOT.002
+    validations:
+      required: true
+
+  - type: dropdown
+    id: conflict
+    attributes:
+      label: Conflict with an active provision
+      description: A proposal that contradicts an active provision needs that provision amended first.
+      options:
+        - "No. The change fills a gap."
+        - "Yes. The change requires amending an active provision."
+    validations:
+      required: true
+
+  - type: textarea
+    id: rejected
+    attributes:
+      label: Rejected alternatives
+      description: State each alternative considered and why it was not taken. Write `None.` when no alternative applies.
+    validations:
+      required: true
+
+  - type: input
+    id: release
+    attributes:
+      label: Release
+      description: The standards release this was raised against.
+      placeholder: v1.15.0
+    validations:
+      required: true

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Contribution workflow
+    url: https://github.com/Litenova-Solutions/Engineering-Standards/blob/main/CONTRIBUTING.md
+    about: Read the branch, review, and release rules before opening a pull request.
+  - name: Provision index
+    url: https://github.com/Litenova-Solutions/Engineering-Standards/blob/main/docs/reference/provisions.md
+    about: Resolve a provision ID to its heading and owning page before citing it.

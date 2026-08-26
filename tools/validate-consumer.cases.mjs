@@ -60,7 +60,7 @@ const LAYOUT = [
   ['end-to-end-flow.md', 'docs/product/flows/event-sales.md'],
   ['domain-index.md', 'docs/domain/README.md'],
   ['glossary.md', 'docs/domain/glossary.md'],
-  ['module-index.md', 'docs/domain/modules/README.md'],
+  ['modules-index.md', 'docs/domain/modules/README.md'],
   ['module.md', 'docs/domain/modules/orders/README.md'],
   ['use-case.md', 'docs/domain/modules/orders/cancel-order.md'],
   ['aggregate.md', 'docs/domain/modules/orders/order-claims/README.md'],
@@ -179,6 +179,18 @@ metaCase('bad risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => 
 metaCase('accepted risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['authorization']; }, null);
 metaCase('bad actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['Buyer Account']; }, 'bad actors id');
 
+console.log('\nExtension selection');
+projectCase('selected extension absent from the manifest', (p) => { p.selectedExtensions = ['outbox-worker']; }, "selectedExtensions 'outbox-worker' is not an extension");
+projectCase('selected extension present in the manifest', (p) => { p.selectedExtensions = ['outbox']; }, null);
+projectCase('selection object records its criterion', (p) => { p.selectedExtensions = [{ id: 'outbox', criterion: 'Ticket issue cannot lose a delivery.', reviewBy: '2099-01-01' }]; }, null);
+projectCase('selection object with an unknown id', (p) => { p.selectedExtensions = [{ id: 'outbox-worker', criterion: 'Durable delivery.', reviewBy: '2099-01-01' }]; }, "selectedExtensions 'outbox-worker' is not an extension");
+projectCase('selection review date has passed', (p) => { p.selectedExtensions = [{ id: 'outbox', criterion: 'Export was planned.', reviewBy: '2020-01-01' }]; }, 'was due for review on 2020-01-01');
+
+console.log('\nFrontend platform declaration');
+projectCase('frontend omits its platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin' }]; }, "declares no 'platform'");
+projectCase('frontend declares an unknown platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'web' }]; }, "unknown platform 'web'");
+projectCase('frontend outside the UI contract declares other-web', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'other-web' }]; }, null);
+
 console.log('\nCross-file references');
 metaCase('flow names a use case with no file', 'docs/product/flows/event-sales.md', (m) => { m.useCases = ['orders.no-such-case']; }, "useCase 'orders.no-such-case' has no file");
 metaCase('flow with an empty use-case list', 'docs/product/flows/event-sales.md', (m) => { m.useCases = []; }, 'useCases empty');
@@ -187,7 +199,11 @@ metaCase('policy names an absent module', 'docs/domain/policies/refund-limit.md'
 metaCase('use-case id does not match its path', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'orders.other-case'; }, 'does not match its path');
 metaCase('aggregate id does not match its path', 'docs/domain/modules/orders/order-claims/README.md', (m) => { m.id = 'orders.other-aggregate'; }, 'does not match its path');
 fileCase('duplicate acceptance id', 'docs/domain/modules/orders/second.md', `---\n${JSON.stringify({ kind: 'use-case', id: 'orders.second', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Second\n\n[AC-ORDERS-CANCEL-ORDER-01] Duplicate of the template criterion.\n`, 'Duplicate acceptance id AC-ORDERS-CANCEL-ORDER-01');
-fileCase('second product specification', 'docs/product/second.md', `---\n${JSON.stringify({ kind: 'product', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second product\n`, 'Expected exactly one product specification, found 2');
+fileCase('second product specification', 'docs/product/second.md', `---\n${JSON.stringify({ kind: 'product', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second product\n`, 'Expected at most one product specification, found 2');
+fileCase('second glossary specification', 'docs/domain/second-glossary.md', `---\n${JSON.stringify({ kind: 'glossary', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second glossary\n`, 'Expected at most one glossary specification, found 2');
+fileCase('second modules index', 'docs/domain/modules/second.md', `---\n${JSON.stringify({ kind: 'modules-index', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second modules index\n`, 'Expected at most one modules-index specification, found 2');
+fileCase('section index for a directory that owns no boundary', 'docs/ui/README.md', `---\n${JSON.stringify({ kind: 'section-index', id: 'ui', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# UI architecture\n`, null);
+fileCase('a second section index is permitted', 'docs/research/README.md', `---\n${JSON.stringify({ kind: 'section-index', id: 'research', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Research register\n`, null);
 fileCase('broken internal link', 'docs/domain/modules/orders/linking.md', '# Linking\n\nSee the [absent record](./absent.md).\n', 'broken link');
 
 console.log('\nUse-case directory grammar (CORE.SYSTEM.CONVENTION.002)');

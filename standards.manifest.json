@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
   "schemaVersion": 4,
-  "version": "1.14.0",
+  "version": "1.15.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "defaultProfile": "dotnet-nextjs",
@@ -338,6 +338,8 @@
       "path": "docs/ext/concurrency.md",
       "activationScope": "local",
       "applicableKinds": [
+        "module",
+        "aggregate",
         "use-case",
         "workflow"
       ]
@@ -360,8 +362,14 @@
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
-        "workflow"
+        "workflow",
+        "domain-policy",
+        "end-to-end-flow"
       ]
+    },
+    "audit": {
+      "path": "docs/ext/audit.md",
+      "activationScope": "project"
     },
     "authjs": {
       "path": "docs/ext/authjs.md",
@@ -380,7 +388,8 @@
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
-        "workflow"
+        "workflow",
+        "end-to-end-flow"
       ]
     },
     "efcore": {
@@ -411,7 +420,8 @@
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
-        "workflow"
+        "workflow",
+        "end-to-end-flow"
       ]
     }
   },

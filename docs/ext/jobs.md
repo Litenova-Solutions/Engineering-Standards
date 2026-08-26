@@ -8,7 +8,7 @@ Scheduled work runs independently of HTTP requests and remains safe when replica
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `workflow`.
+Applicable specification kinds: `use-case`, `workflow`, `end-to-end-flow`.
 
 The consumer enables `jobs` for recurring, delayed, or calendar-based work. It adds the Worker project permitted by `BACKEND.ARCHITECTURE.WORKER.001`.
 

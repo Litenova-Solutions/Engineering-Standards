@@ -8,7 +8,7 @@ The outbox makes a business or Workflow commit and its required outgoing message
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `workflow`.
+Applicable specification kinds: `use-case`, `workflow`, `end-to-end-flow`.
 
 The consumer enables `outbox` when a committed change requires durable delivery after process failure. Delivery can carry an Integration Event, provider side effect, or Workflow Command.
 

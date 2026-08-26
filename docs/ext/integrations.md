@@ -8,7 +8,7 @@ External systems are unreliable and outside application change control. This ext
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `workflow`.
+Applicable specification kinds: `use-case`, `workflow`, `domain-policy`, `end-to-end-flow`.
 
 The consumer enables `integrations` for each use case that calls or publishes to an external service, receives a webhook, or uses a provider SDK.
 

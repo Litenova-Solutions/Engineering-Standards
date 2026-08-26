@@ -59,7 +59,7 @@ The system contains one delivery approach and one operating model:
 - Flows link their use cases rather than restate them. (CORE.SYSTEM.FLOW.001)
 - One module name is used across every layer. (CORE.SYSTEM.MODULE.001)
 - Module specifications map aggregates to state, invariants, and commands. (CORE.SYSTEM.AGGREGATE.001)
-- One use case is one Command or Query, verified only when complete. (CORE.SYSTEM.USECASE.001)
+- One use case is one Command or Query, with a defined status at each stage. (CORE.SYSTEM.USECASE.001, CORE.SYSTEM.USECASE.002)
 - Workflow specifications name state, triggers, recovery, and owner. (CORE.SYSTEM.WORKFLOW.001)
 - Every event reaction declares its delivery classification. (CORE.SYSTEM.REACTION.001)
 - Domain rule IDs encode their enforcement classification. (CORE.SYSTEM.RULES.001)
@@ -259,6 +259,14 @@ Acceptance tests prove use-case behavior. End-to-end tests prove that connected 
 
 **Rationale:** Multi-step product outcomes belong to an end-to-end flow, and autonomous multi-transaction progress belongs to a workflow. Placeholder work leaves the use case `planned`.
 
+**Example:** A use case whose handler throws `NotImplementedException` stays `planned`.
+
+### State implemented before acceptance evidence exists (CORE.SYSTEM.USECASE.002)
+
+**Requirement:** A use case whose Domain behavior, coordination, persistence, and entry point all exist without proving acceptance criteria MUST carry `implemented`.
+
+**Rationale:** `planned` and `verified` describe the two ends. Working code with unproven acceptance criteria is the ordinary middle state, and leaving it undefined makes the value a matter of taste.
+
 **Example:** Aligned identifiers and implementation names have this shape:
 
 ```text
@@ -385,11 +393,11 @@ The example creates an optional directory only when its first real artifact is a
 
 ### Group module use-case files by aggregate root (CORE.SYSTEM.CONVENTION.002)
 
-**Default:** Group module use-case files under a plural kebab-case aggregate subdirectory, each holding one `kind: aggregate` README.
+**Default:** Group module use-case files under a plural kebab-case aggregate subdirectory, each holding one `kind: aggregate` README, including a module with one aggregate root.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A single-aggregate module stays flat only when its plural name matches the directory. The use-case identifier stays `{module}.{name}`, so only the directory changes.
+**Rationale:** A module README carries `kind: module`, and one file cannot carry two kinds. A flat module therefore has nowhere to put the aggregate specification that `CORE.SYSTEM.STATE.001` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `{module}.{name}`, so only the directory changes.
 
 ### Keep operational and security references under operations (CORE.SYSTEM.CONVENTION.003)
 
@@ -444,6 +452,7 @@ The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` chang
 | CORE.SYSTEM.MODULE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each module reference to one declared module directory. |
 | CORE.SYSTEM.AGGREGATE.001 | inspection | The module specification carries an aggregate table naming owned state, invariant identifiers, and commands. |
 | CORE.SYSTEM.USECASE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
+| CORE.SYSTEM.USECASE.002 | inspection | Each `implemented` use case resolves to existing Domain, Application, persistence, and entry-point code with no acceptance test. |
 | CORE.SYSTEM.WORKFLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each workflow module reference and the template requires the named sections. |
 | CORE.SYSTEM.REACTION.001 | inspection | The owning specification records one delivery classification for each event reaction. |
 | CORE.SYSTEM.RULES.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a domain rule ID whose prefix does not match its declared classification. |

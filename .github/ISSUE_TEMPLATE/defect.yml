@@ -1,0 +1,52 @@
+name: Defect
+description: A page, schema, template, or validator does not do what the contract states.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when the standards contradict themselves, or when a tool
+        reports a pass that its own rules do not support. Use `Proposal` when
+        the contract is consistent and you want it changed.
+
+  - type: input
+    id: scope
+    attributes:
+      label: Scope
+      description: The provision ID, page path, schema, template, or tool that holds the defect.
+      placeholder: CORE.AUTHORING.INDEX.001, or tools/validate-consumer.mjs
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+      description: State what happens now. Name the command and paste its exact output where a tool is involved.
+    validations:
+      required: true
+
+  - type: textarea
+    id: required
+    attributes:
+      label: Required behavior
+      description: State what the contract requires instead, and cite the provision that requires it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: cost
+    attributes:
+      label: Cost of leaving it
+      description: State what a consumer or an agent gets wrong while this stands.
+    validations:
+      required: true
+
+  - type: input
+    id: release
+    attributes:
+      label: Release
+      description: The standards release this was found against.
+      placeholder: v1.15.0
+    validations:
+      required: true
