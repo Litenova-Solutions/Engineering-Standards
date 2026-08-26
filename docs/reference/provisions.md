@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 821 provisions across 8 areas.
+The active release states 822 provisions across 8 areas.
 
 ## BACKEND
 
@@ -304,6 +304,7 @@ The active release states 821 provisions across 8 areas.
 | CORE.SYSTEM.STATE.001 | [Model every aggregate lifecycle with state records](../core/system.md#model-every-aggregate-lifecycle-with-state-records-coresystemstate001) | `core/system.md` |
 | CORE.SYSTEM.SYNC.001 | [Update specifications with behavior](../core/system.md#update-specifications-with-behavior-coresystemsync001) | `core/system.md` |
 | CORE.SYSTEM.USECASE.001 | [Deliver one complete use case](../core/system.md#deliver-one-complete-use-case-coresystemusecase001) | `core/system.md` |
+| CORE.SYSTEM.USECASE.002 | [State implemented before acceptance evidence exists](../core/system.md#state-implemented-before-acceptance-evidence-exists-coresystemusecase002) | `core/system.md` |
 | CORE.SYSTEM.WORKFLOW.001 | [Specify autonomous progress as a workflow](../core/system.md#specify-autonomous-progress-as-a-workflow-coresystemworkflow001) | `core/system.md` |
 
 ## EXT

@@ -2,6 +2,9 @@
 
 ## v1.15.0
 
+- Added `CORE.SYSTEM.USECASE.002`, which defines `implemented`. The schema accepted `planned`, `implemented`, and `verified`, and `CORE.SYSTEM.USECASE.001` defined only the two ends. Working code whose acceptance criteria are not yet proven is the ordinary middle state, and leaving it undefined made the value a matter of taste.
+- Removed the flat allowance from `CORE.SYSTEM.CONVENTION.002`. A module README carries `kind: module` and one file cannot carry two kinds, so a flat single-aggregate module had nowhere to put the aggregate specification that `CORE.SYSTEM.STATE.001` requires. Every module now groups its use cases under an aggregate subdirectory, which costs one repeated path segment where the names coincide.
+
 - Required `platform` on every `paths.frontends` entry, in the schema and in `tools/validate-consumer.mjs`. The field had been optional on its own, so a Next.js frontend with shadcn/ui installed could omit it, skip every `FRONTEND.UI` provision, and receive a PASS. A frontend outside the controlled UI contract now declares `other-web` or records an override, which is a visible statement rather than an omission. `tools/validate-ui.mjs` also names the frontends it skipped instead of reporting only a count.
 - Widened `applicableKinds` for four extensions to the kinds where each concern is specified rather than implemented. `concurrency` gains `module` and `aggregate`, because the aggregate specification owns the state mapping and the transitions. `integrations` gains `domain-policy` and `end-to-end-flow`. `outbox` and `jobs` gain `end-to-end-flow`, which is where a reader learns that a step is idempotent, that another runs off durable delivery, and that a hold expires on a timer. `docs/ext/README.md` states the rule that produced the sets.
 
