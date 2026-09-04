@@ -13,8 +13,8 @@ The standards use one page grammar and one controlled technical prose profile. T
 - Apply the declared contract for each page class. (CORE.AUTHORING.PAGE.001)
 - Keep summaries informative and cite every projected provision. (CORE.AUTHORING.SUMMARY.001)
 - Map every provision to exact verification evidence. (CORE.AUTHORING.VERIFICATION.001)
-- Validate only current standards material. (CORE.AUTHORING.SNAPSHOT.001, CORE.AUTHORING.SNAPSHOT.002)
-- Publish complete releases and record the one a consumer reviewed. (CORE.AUTHORING.SNAPSHOT.003, CORE.AUTHORING.SNAPSHOT.004, CORE.AUTHORING.SNAPSHOT.005, CORE.AUTHORING.SNAPSHOT.006)
+- Validate current material and publish complete releases. (CORE.AUTHORING.SNAPSHOT.001, CORE.AUTHORING.SNAPSHOT.002, CORE.AUTHORING.SNAPSHOT.003, CORE.AUTHORING.SNAPSHOT.004, CORE.AUTHORING.SNAPSHOT.005, CORE.AUTHORING.SNAPSHOT.006)
+- Classify every specification file and derive every computed fact. (CORE.AUTHORING.METADATA.004, CORE.AUTHORING.DERIVED.001)
 - Run the authoring checks and regenerate the provision index. (CORE.AUTHORING.VALIDATION.001, CORE.AUTHORING.INDEX.001)
 
 ## Concepts
@@ -354,6 +354,40 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** Source links, implementation paths, and verification evidence belong in relevant body sections.
 
+### Classify every specification file (CORE.AUTHORING.METADATA.004)
+
+**Requirement:** Every Markdown file under the consumer documentation root MUST open with a Specification Metadata block or sit under a declared unstructured path.
+
+**Rationale:** A file the validator cannot classify is skipped, and a skipped file is reported as sound. A directory index owning no aggregate, use case, or policy carries `section-index`.
+
+**Example:** A navigation index declares its kind rather than omitting the block.
+
+```markdown
+---
+{
+  "kind": "section-index",
+  "id": "policies",
+  "specStatus": "approved",
+  "owner": "platform",
+  "lastReviewed": "2026-01-01"
+}
+---
+```
+
+### Derive a computed fact instead of restating it (CORE.AUTHORING.DERIVED.001)
+
+**Requirement:** A specification MUST name the source or the command that produces any count, census, or membership list computed from code.
+
+**Rationale:** A restated fact is accurate until the next unrelated commit, and nothing reports when it stops. A reader trusts a stale number as much as a fresh one.
+
+**Example:** A page states the rule and the command rather than the total.
+
+```markdown
+Every command declares an audit position. To count the declarations:
+
+    grep -rl "Audited(" src/Application --include=*.cs | wc -l
+```
+
 ### Run repeatable authoring checks (CORE.AUTHORING.VALIDATION.001)
 
 **Requirement:** A standards change MUST pass the authoring fixture suite, repository validator, applicable specialist validators, and `git diff --check`.
@@ -456,6 +490,8 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.INDEX.001 | static | `node tools/generate-provisions.mjs --check` exits zero, and the repository validator emits no `PROVISIONS_STALE` diagnostic. |
 | CORE.AUTHORING.METADATA.002 | static | `node tools/validate-consumer.mjs` validates opening JSON against the metadata schema. |
 | CORE.AUTHORING.METADATA.003 | static | `node tools/validate-consumer.mjs` reports no duplicate metadata carrier. |
+| CORE.AUTHORING.METADATA.004 | static | `node tools/validate-consumer.mjs` fails on a Markdown file with no metadata block outside a declared unstructured path. |
+| CORE.AUTHORING.DERIVED.001 | inspection | Review confirms each count, census, and membership list names its source or its command. |
 | CORE.AUTHORING.VALIDATION.001 | static | `WritingValidationTests` asserts cI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
 | CORE.AUTHORING.SNAPSHOT.001 | static | `node tools/validate-standards.mjs` evaluates current standards material only. |
 | CORE.AUTHORING.SNAPSHOT.002 | inspection | Pull request review finds no history-specific material in active files. |

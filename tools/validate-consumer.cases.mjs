@@ -108,6 +108,11 @@ function build() {
   const project = JSON.parse(resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/consumer/standards.project.json'), 'utf8')));
   project.paths.frontends = [];
   writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  // The configured-path checks resolve against the fixture, so the fixture
+  // holds what the project file and the frontend cases declare. Without them a
+  // path error fires in every case and hides the rule under test.
+  writeFile('apps/api/Fixture.slnx', '');
+  fs.mkdirSync(path.join(fixture, 'apps/admin'), { recursive: true });
   fs.mkdirSync(path.join(fixture, 'standards'), { recursive: true });
   fs.copyFileSync(path.join(repository, 'standards.manifest.json'), path.join(fixture, 'standards/standards.manifest.json'));
   for (const [template, target] of LAYOUT) {
@@ -165,19 +170,60 @@ build();
 console.log('Baseline');
 report('tracked templates validate as shipped', null, run());
 
+console.log('\nDocumentation root');
+projectCase('documentation root that is on disk', (p) => { p.paths.docs = 'docs'; }, null);
+projectCase('documentation root that is not on disk', (p) => { p.paths.docs = 'documentation'; }, "paths.docs 'documentation' does not exist");
+projectCase('documentation root that holds no Markdown', (p) => { p.paths.docs = 'standards'; }, 'Scanned no Markdown files');
+fileCase(
+  'page under the documentation root is scanned',
+  'docs/domain/modules/orders/unscanned.md',
+  `---\n${JSON.stringify({ kind: 'invented', id: 'unscanned', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Unscanned\n`,
+  "unknown kind 'invented'",
+);
+
+{
+  // The scan follows the configured root rather than a hard-coded docs/, so the
+  // same page outside that root is not scanned at all.
+  const originalProject = readFixture('standards.project.json');
+  const project = JSON.parse(originalProject);
+  project.paths.docs = 'docs/product';
+  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  fileCase(
+    'page outside the configured documentation root is not scanned',
+    'docs/domain/modules/orders/unscanned.md',
+    `---\n${JSON.stringify({ kind: 'invented', id: 'unscanned', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Unscanned\n`,
+    null,
+  );
+  writeFile('standards.project.json', originalProject);
+}
+
+console.log('\nConfigured paths');
+projectCase('domainDocs that is on disk', (p) => { p.paths.domainDocs = 'docs/domain'; }, null);
+projectCase('domainDocs that is not on disk', (p) => { p.paths.domainDocs = 'docs/domains'; }, "paths.domainDocs 'docs/domains' does not exist");
+projectCase('uiDocs that is on disk', (p) => { p.paths.uiDocs = 'docs/ui'; }, null);
+projectCase('uiDocs that is not on disk', (p) => { p.paths.uiDocs = 'docs/interface'; }, "paths.uiDocs 'docs/interface' does not exist");
+projectCase('apiSolution that is on disk', (p) => { p.paths.apiSolution = 'apps/api/Fixture.slnx'; }, null);
+projectCase('apiSolution that is not on disk', (p) => { p.paths.apiSolution = 'apps/api/Missing.slnx'; }, "paths.apiSolution 'apps/api/Missing.slnx' does not exist");
+projectCase('frontend path that is not on disk', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/missing', platform: 'other-web' }]; }, "frontend 'admin' path 'apps/missing' does not exist");
+
 console.log('\nMetadata field rules');
 metaCase('missing required field', 'docs/domain/modules/orders/cancel-order.md', (m) => { delete m.operationType; }, "missing required 'operationType'");
 metaCase('unknown property', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.unexpected = 1; }, "unknown property 'unexpected'");
-metaCase('id fails its kind pattern', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'Orders.CancelOrder'; }, 'fails pattern');
-metaCase('unknown kind', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.kind = 'invented'; }, "unknown kind 'invented'");
-metaCase('bad specStatus', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.specStatus = 'final'; }, "bad specStatus 'final'");
-metaCase('bad implementationStatus', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.implementationStatus = 'done'; }, 'bad implementationStatus');
+metaCase('id fails its kind pattern', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'Orders.CancelOrder'; }, "fails pattern; expected '<module>.<name>' in lower kebab-case");
+metaCase('accepted use-case id', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'orders.cancel-order'; }, null);
+// A closed-set error names the values the author may use, so each expectation
+// covers the list and not only the value that was rejected.
+metaCase('unknown kind', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.kind = 'invented'; }, "unknown kind 'invented'; expected one of product, domain-index, glossary");
+metaCase('bad specStatus', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.specStatus = 'final'; }, "bad specStatus 'final'; expected one of draft, approved, retired");
+metaCase('bad implementationStatus', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.implementationStatus = 'done'; }, "bad implementationStatus 'done'; expected one of planned, implemented, verified");
 metaCase('accepted implementationStatus value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.implementationStatus = 'implemented'; }, null);
-metaCase('bad lastReviewed', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.lastReviewed = '01-01-2026'; }, 'bad lastReviewed');
-metaCase('bad operationType', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.operationType = 'mutation'; }, 'bad operationType');
-metaCase('bad risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['danger']; }, "bad risk 'danger'");
+metaCase('bad lastReviewed', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.lastReviewed = '01-01-2026'; }, "bad lastReviewed '01-01-2026'; expected YYYY-MM-DD");
+metaCase('accepted lastReviewed', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.lastReviewed = '2026-02-01'; }, null);
+metaCase('bad operationType', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.operationType = 'mutation'; }, "bad operationType 'mutation'; expected one of command, query");
+metaCase('bad risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['danger']; }, "bad risk 'danger'; expected one of authorization, money, sensitive-data, irreversible, concurrency, durable-delivery, availability");
 metaCase('accepted risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['authorization']; }, null);
-metaCase('bad actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['Buyer Account']; }, 'bad actors id');
+metaCase('bad actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['Buyer Account']; }, "bad actors id 'Buyer Account'; expected lower kebab-case");
+metaCase('accepted actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['buyer-account']; }, null);
 
 console.log('\nExtension selection');
 projectCase('selected extension absent from the manifest', (p) => { p.selectedExtensions = ['outbox-worker']; }, "selectedExtensions 'outbox-worker' is not an extension");
@@ -244,6 +290,12 @@ projectCase('reviewed release matches the pinned release', () => {}, null);
 projectCase('reviewed release is behind the pinned release', (p) => { p.reviewedStandardsVersion = '1.11.0'; }, 'does not match the pinned standards');
 projectCase('reviewed release is absent', (p) => { delete p.reviewedStandardsVersion; }, "missing 'reviewedStandardsVersion'");
 
+console.log('\nProhibited kinds');
+projectCase('specification declares a prohibited kind', (p) => { p.prohibitedKinds = ['workflow']; }, "kind 'workflow' is prohibited by this consumer");
+projectCase('prohibited kind that no specification declares', (p) => { p.prohibitedKinds = ['section-index']; }, null);
+projectCase('prohibited kind the validator does not know', (p) => { p.prohibitedKinds = ['workflows']; }, "prohibitedKinds 'workflows' is not a specification kind");
+projectCase('prohibitedKinds outside an array', (p) => { p.prohibitedKinds = 'workflow'; }, 'prohibitedKinds must be an array');
+
 console.log('\nMetadata carrier (CORE.AUTHORING.METADATA.002)');
 fileCase(
   'metadata in a fenced block instead of the carrier',
@@ -253,7 +305,25 @@ fileCase(
 );
 fileCase('unterminated metadata block', 'docs/domain/modules/orders/open.md', '---\n{\n  "kind": "use-case"\n}\n', 'unterminated metadata block');
 fileCase('invalid JSON in the carrier', 'docs/domain/modules/orders/broken.md', '---\n{\n  "kind": use-case\n}\n---\n\n# Broken\n', 'JSON parse error');
-fileCase('prose page with no metadata is not a specification', 'docs/operations/security-and-privacy.md', '# Security and privacy\n\nCross-cutting reference prose with no structured kind.\n', null);
+fileCase('prose page with no metadata block', 'docs/operations/security-and-privacy.md', '# Security and privacy\n\nCross-cutting reference prose with no structured kind.\n', 'no metadata block');
+
+console.log('\nUnstructured documentation (CORE.AUTHORING.METADATA.004)');
+projectCase('unstructuredDocs outside an array', (p) => { p.paths.unstructuredDocs = 'docs/operations'; }, 'paths.unstructuredDocs must be an array');
+projectCase('unstructured path that is not on disk', (p) => { p.paths.unstructuredDocs = ['docs/nowhere']; }, "paths.unstructuredDocs 'docs/nowhere' does not exist");
+projectCase('unstructured path that is on disk', (p) => { p.paths.unstructuredDocs = ['docs/operations']; }, null);
+
+{
+  // A declared prefix exempts the prose beneath it and nothing else. The
+  // second case is the same page one directory away: outside every declared
+  // prefix it is reported, which is what keeps the exemption narrow.
+  const originalProject = readFixture('standards.project.json');
+  const project = JSON.parse(originalProject);
+  project.paths.unstructuredDocs = ['docs/operations'];
+  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  fileCase('prose under a declared unstructured path', 'docs/operations/security-and-privacy.md', '# Security and privacy\n\nCross-cutting reference prose with no structured kind.\n', null);
+  fileCase('prose outside every declared unstructured path', 'docs/domain/policies/README.md', '# Policies\n\nDirectory index prose with no structured kind.\n', 'no metadata block');
+  writeFile('standards.project.json', originalProject);
+}
 
 console.log('\nResearch exclusion');
 fileCase('research prose without metadata is skipped', 'docs/research/notes.md', '# Notes\n\nUnstructured research prose.\n', null);

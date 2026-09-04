@@ -33,6 +33,18 @@
           "description": "Path to the API solution. A consumer with no backend omits it and records a SCOPE.BACKEND.001 decision.",
           "$ref": "#/$defs/projectPath"
         },
+        "docs": {
+          "description": "Root of the specification tree. Every Markdown file under it carries a metadata block unless the path is listed in unstructuredDocs.",
+          "$ref": "#/$defs/projectPath"
+        },
+        "unstructuredDocs": {
+          "description": "Paths whose Markdown is navigation or prose rather than specification.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/projectPath"
+          }
+        },
         "domainDocs": { "$ref": "#/$defs/projectPath" },
         "uiDocs": { "$ref": "#/$defs/projectPath" },
         "frontends": {
@@ -67,6 +79,44 @@
                 "then": { "required": ["ui"] }
               }
             ]
+          }
+        }
+      }
+    },
+    "prohibitedKinds": {
+      "description": "Specification kinds this consumer does not use. A specification declaring one is refused.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      }
+    },
+    "parity": {
+      "description": "Configuration for the specification and use-case parity check. Every field is optional and every default is empty.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "applicationProject": {
+          "description": "The Application project directory, when discovery by convention cannot resolve exactly one.",
+          "$ref": "#/$defs/projectPath"
+        },
+        "ignoreHandlers": {
+          "description": "Glob patterns for handlers that carry no use-case specification.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ignoreUseCases": {
+          "description": "Use-case specification ids that resolve to no handler.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
           }
         }
       }

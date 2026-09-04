@@ -33,8 +33,42 @@ if (!fs.existsSync(projectFile)) {
   process.exit(2);
 }
 const project = readJson(projectFile);
-const docsRoot = path.join(root, 'docs');
+// The documentation root is configuration, not a constant. A hard-coded docs/
+// scans nothing in a consumer that keeps its pages elsewhere, and a scan of
+// nothing reports PASS. 'docs' stays the default because that is the layout the
+// standards describe. (CORE.AUTHORING.METADATA.004)
+const docsPath = project.paths?.docs ?? 'docs';
+const docsRoot = path.join(root, docsPath);
 const domainDocs = path.join(root, (project.paths?.domainDocs ?? 'docs/domain'));
+// A configured path that does not resolve disables the checks that read it and
+// leaves the run reporting PASS, so each message names the check that goes
+// quiet. A typo in domainDocs is the expensive one.
+const configuredPaths = [
+  ['paths.docs', project.paths?.docs, 'the Markdown scan finds no specification to check'],
+  ['paths.domainDocs', project.paths?.domainDocs, 'the use-case, workflow, and policy cross-file checks resolve nothing'],
+  ['paths.uiDocs', project.paths?.uiDocs, 'the controlled UI page checks resolve nothing'],
+  ['paths.apiSolution', project.paths?.apiSolution, 'the backend checks have no solution to read'],
+];
+for (const [field, value, consequence] of configuredPaths) {
+  if (value === undefined) continue;
+  if (typeof value !== 'string' || !value.trim()) { err(`standards.project.json: ${field} '${value}' is not a path`); continue; }
+  if (!fs.existsSync(path.join(root, value))) err(`standards.project.json: ${field} '${value}' does not exist; ${consequence}`);
+}
+// Navigation and prose pages carry no structured metadata, so the project names
+// the path prefixes that hold them. A declared prefix is a decision a reviewer
+// can see and count; an undeclared page with no metadata block is a file nobody
+// knows went unchecked. (CORE.AUTHORING.METADATA.004)
+const declaredUnstructured = project.paths?.unstructuredDocs;
+if (declaredUnstructured !== undefined && !Array.isArray(declaredUnstructured)) {
+  err('standards.project.json: paths.unstructuredDocs must be an array of repository-relative paths');
+}
+const unstructuredDocs = [];
+for (const entry of Array.isArray(declaredUnstructured) ? declaredUnstructured : []) {
+  if (typeof entry !== 'string' || !entry.trim()) { err(`standards.project.json: paths.unstructuredDocs '${entry}' is not a path`); continue; }
+  if (path.isAbsolute(entry) || entry.includes('..')) { err(`standards.project.json: paths.unstructuredDocs '${entry}' must be a repository-relative path`); continue; }
+  if (!fs.existsSync(path.join(root, entry))) { err(`standards.project.json: paths.unstructuredDocs '${entry}' does not exist; correct the path or remove the exemption`); continue; }
+  unstructuredDocs.push(entry.replace(/\\/g, '/').replace(/\/+$/, ''));
+}
 // A selection is either a bare id or an object recording the criterion that was
 // met and the date it is next reviewed. Both forms resolve to one id here.
 // (CORE.SCOPE.EXTENSIONS.001, CORE.SCOPE.EXTENSIONS.002)
@@ -97,10 +131,19 @@ for (const entry of selections) {
 const ID = /^[a-z][a-z0-9-]*$/;
 const REC = /^[a-z0-9][a-z0-9-]*$/;
 const UC = /^[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$/;
+// Each pattern carries its shape in words. Regex source names character classes
+// and not the convention, so an author who is shown one still guesses.
+const FORM = new Map([
+  [ID, "lower kebab-case, for example 'orders'"],
+  [REC, "lower kebab-case with a letter or digit first, for example '0001-cancel-order'"],
+  [UC, "'<module>.<name>' in lower kebab-case, for example 'orders.cancel-order'"],
+]);
 const SPEC = ['draft', 'approved', 'retired'];
 const IMPL = ['planned', 'implemented', 'verified'];
 const RISK = ['authorization', 'money', 'sensitive-data', 'irreversible', 'concurrency', 'durable-delivery', 'availability'];
+const OPERATION_TYPES = ['command', 'query'];
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
+const DATE_FORM = 'YYYY-MM-DD';
 const base = { kind: 1, id: 1, specStatus: 1, owner: 1, lastReviewed: 1 };
 // One record owns each of these boundaries. A directory index that owns no
 // boundary uses 'section-index', which may repeat.
@@ -126,6 +169,21 @@ const KINDS = {
   runbook: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   'release-record': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'release'], props: { ...base, release: 1 }, id: REC },
 };
+const KIND_NAMES = Object.keys(KINDS);
+
+// A consumer that rules a kind out in its own instructions still gets a clean
+// PASS from the agent that writes one anyway, so the prohibition is advice. The
+// declared list makes it a check. Each entry names a kind this file knows,
+// because a misspelled entry prohibits nothing and reads as if it did.
+const declaredProhibited = project.prohibitedKinds;
+if (declaredProhibited !== undefined && !Array.isArray(declaredProhibited)) {
+  err('standards.project.json: prohibitedKinds must be an array of specification kinds');
+}
+const prohibitedKinds = new Set();
+for (const entry of Array.isArray(declaredProhibited) ? declaredProhibited : []) {
+  if (typeof entry !== 'string' || !(entry in KINDS)) { err(`standards.project.json: prohibitedKinds '${entry}' is not a specification kind; expected one of ${KIND_NAMES.join(', ')}`); continue; }
+  prohibitedKinds.add(entry);
+}
 
 // ---- collect files ---------------------------------------------------------
 const files = [];
@@ -138,6 +196,10 @@ const files = [];
     else if (e.name.endsWith('.md')) files.push(p);
   }
 })(docsRoot);
+// Every check below reads this list, so an empty list agrees with everything. A
+// consumer with no specification page does not exist; a root that resolves to
+// nothing does.
+if (!files.length) err(`Scanned no Markdown files under '${docsPath}'; check paths.docs, because a consumer with no specification is a misconfigured scan`);
 
 const metas = []; // {rel, meta, file}
 const singletons = new Map();     // kind -> [paths]
@@ -147,12 +209,15 @@ let uiOutput = '';
 
 // Specification Metadata is a '---' delimited JSON block, per
 // CORE.AUTHORING.METADATA.002. A file that carries a metadata object in any other
-// wrapper is reported rather than skipped, because a silently skipped
-// specification is an unvalidated specification.
+// wrapper, or carries none at all, is reported rather than skipped, because a
+// silently skipped specification is an unvalidated specification: the run passes
+// while that page sits unchecked beside every page that was checked.
+// (CORE.AUTHORING.METADATA.004)
 function parseBlock(raw, rel) {
   if (!raw.startsWith('---')) {
     const fenced = raw.slice(0, 2000).match(/```[a-z]*\s*\n\s*\{[\s\S]{0,400}?"kind"\s*:/);
     if (fenced) err(`${rel}: metadata block is not delimited by '---'`);
+    else err(`${rel}: no metadata block; add one (a directory index that owns no aggregate, use case, or policy declares kind 'section-index') or declare the path in paths.unstructuredDocs`);
     return null;
   }
   const end = raw.indexOf('\n---', 3);
@@ -203,23 +268,32 @@ for (const f of files) {
     if (!fs.existsSync(path.resolve(dir, href))) err(`${rel}: broken link -> ${m[1]}`);
   }
 
+  // A declared unstructured path holds navigation or prose rather than a
+  // specification, so the metadata block rule does not reach it. Its links are
+  // still resolved above: a directory index is where a broken link costs most.
+  if (!hasMeta && unstructuredDocs.some((prefix) => rel === prefix || rel.startsWith(`${prefix}/`))) continue;
+
   const meta = parseBlock(raw, rel);
   if (!meta) continue;
   metas.push({ rel, meta, file: f });
 
   const spec = KINDS[meta.kind];
-  if (!spec) { err(`${rel}: unknown kind '${meta.kind}'`); continue; }
+  if (!spec) { err(`${rel}: unknown kind '${meta.kind}'; expected one of ${KIND_NAMES.join(', ')}`); continue; }
+  if (prohibitedKinds.has(meta.kind)) err(`${rel}: kind '${meta.kind}' is prohibited by this consumer; standards.project.json lists it in prohibitedKinds`);
   for (const r of spec.req) if (!(r in meta)) err(`${rel}: missing required '${r}'`);
   for (const k of Object.keys(meta)) if (!(k in spec.props)) err(`${rel}: unknown property '${k}'`);
-  if (meta.id !== undefined && !spec.id.test(meta.id)) err(`${rel}: id '${meta.id}' fails pattern`);
-  if (meta.specStatus !== undefined && !SPEC.includes(meta.specStatus)) err(`${rel}: bad specStatus '${meta.specStatus}'`);
-  if (meta.implementationStatus !== undefined && !IMPL.includes(meta.implementationStatus)) err(`${rel}: bad implementationStatus`);
-  if (meta.lastReviewed !== undefined && !DATE.test(meta.lastReviewed)) err(`${rel}: bad lastReviewed '${meta.lastReviewed}'`);
-  if (meta.operationType !== undefined && !['command', 'query'].includes(meta.operationType)) err(`${rel}: bad operationType`);
-  if (Array.isArray(meta.risks)) for (const r of meta.risks) if (!RISK.includes(r)) err(`${rel}: bad risk '${r}'`);
-  for (const a of ['actors', 'entryPoints', 'applicableExtensions']) if (Array.isArray(meta[a])) for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'`);
-  for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
-  for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
+  if (meta.id !== undefined && !spec.id.test(meta.id)) err(`${rel}: id '${meta.id}' fails pattern; expected ${FORM.get(spec.id)}`);
+  // A closed set names its members in the error. The vocabulary exists only in
+  // this file, so an author told that a value is wrong and not which values are
+  // right invents a plausible one, and the next author inherits it.
+  if (meta.specStatus !== undefined && !SPEC.includes(meta.specStatus)) err(`${rel}: bad specStatus '${meta.specStatus}'; expected one of ${SPEC.join(', ')}`);
+  if (meta.implementationStatus !== undefined && !IMPL.includes(meta.implementationStatus)) err(`${rel}: bad implementationStatus '${meta.implementationStatus}'; expected one of ${IMPL.join(', ')}`);
+  if (meta.lastReviewed !== undefined && !DATE.test(meta.lastReviewed)) err(`${rel}: bad lastReviewed '${meta.lastReviewed}'; expected ${DATE_FORM}`);
+  if (meta.operationType !== undefined && !OPERATION_TYPES.includes(meta.operationType)) err(`${rel}: bad operationType '${meta.operationType}'; expected one of ${OPERATION_TYPES.join(', ')}`);
+  if (Array.isArray(meta.risks)) for (const r of meta.risks) if (!RISK.includes(r)) err(`${rel}: bad risk '${r}'; expected one of ${RISK.join(', ')}`);
+  for (const a of ['actors', 'entryPoints', 'applicableExtensions']) if (Array.isArray(meta[a])) for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`);
+  for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(UC)}`); }
+  for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`); }
 
   if (SINGLETON_KINDS.has(meta.kind)) {
     if (!singletons.has(meta.kind)) singletons.set(meta.kind, []);
@@ -282,6 +356,11 @@ for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end
 const PLATFORMS = ['react-web', 'react-native', 'other-web'];
 for (const frontend of project.paths?.frontends ?? []) {
   const name = frontend?.name ?? '(unnamed)';
+  // A declared frontend whose directory is absent reads as a frontend with no
+  // code, and every UI check for it passes by having nothing to read.
+  if (frontend?.path !== undefined && !fs.existsSync(path.join(root, frontend.path))) {
+    err(`standards.project.json: frontend '${name}' path '${frontend.path}' does not exist; the controlled UI checks for that frontend read nothing`);
+  }
   if (!frontend?.platform) {
     err(`standards.project.json: frontend '${name}' declares no 'platform'; one of ${PLATFORMS.join(', ')} is required`);
   } else if (!PLATFORMS.includes(frontend.platform)) {
@@ -309,7 +388,7 @@ if (uiActivated) {
 
 // ---- report ----------------------------------------------------------------
 console.log(`Consumer: ${root}`);
-console.log(`Files scanned: ${files.length}, metadata blocks: ${metas.length}`);
+console.log(`Files scanned: ${files.length} under ${docsPath}, metadata blocks: ${metas.length}`);
 console.log(`Acceptance ids: ${acDefs.size}, end-to-end test ids: ${e2eDefs.size}`);
 if (uiOutput) console.log(`\n${uiOutput}`);
 if (errors.length) {

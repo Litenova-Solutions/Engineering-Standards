@@ -99,4 +99,32 @@ Run its fixture suite after changing a UI rule, schema, template, or validator:
 node tools/validate-ui.cases.mjs
 ```
 
+## Validate Use-Case Parity
+
+Run the parity validator from a consumer whose project declares `paths.apiSolution`:
+
+```bash
+node standards/tools/validate-parity.mjs
+```
+
+The validator compares Application operation folders with use-case specifications in both directions. It reports a handler that no page covers, and an implemented page that no handler covers. A consumer with no `paths.apiSolution` skips the check and exits `0`.
+
+An optional argument selects another consumer root. `--report` prints the same findings and exits `0`, for a consumer burning down an existing gap:
+
+```bash
+node standards/tools/validate-parity.mjs /path/to/consumer --report
+```
+
+Optional configuration is the `parity` block of `standards.project.json`. Every field is optional and every default is empty:
+
+- `applicationProject` names the Application project directory when discovery cannot choose one.
+- `ignoreHandlers` holds consumer-root-relative glob patterns for handlers that carry no specification by decision.
+- `ignoreUseCases` holds specification ids implemented outside the Application project.
+
+Run its fixture suite after changing a parity rule or the identifier derivation:
+
+```bash
+node tools/validate-parity.cases.mjs
+```
+
 Reference validators do not run application builds, browser tests, deployment checks, or operating evidence gates.

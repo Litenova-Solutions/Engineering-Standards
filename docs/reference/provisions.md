@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 822 provisions across 8 areas.
+The active release states 825 provisions across 8 areas.
 
 ## BACKEND
 
@@ -209,6 +209,7 @@ The active release states 822 provisions across 8 areas.
 | CORE.AUTHORING.CONVENTION.002 | [Prefer positive instructions](../core/authoring.md#prefer-positive-instructions-coreauthoringconvention002) | `core/authoring.md` |
 | CORE.AUTHORING.CONVENTION.003 | [Use tables for exact mappings](../core/authoring.md#use-tables-for-exact-mappings-coreauthoringconvention003) | `core/authoring.md` |
 | CORE.AUTHORING.DEFAULTS.001 | [Identify actionable conventions](../core/authoring.md#identify-actionable-conventions-coreauthoringdefaults001) | `core/authoring.md` |
+| CORE.AUTHORING.DERIVED.001 | [Derive a computed fact instead of restating it](../core/authoring.md#derive-a-computed-fact-instead-of-restating-it-coreauthoringderived001) | `core/authoring.md` |
 | CORE.AUTHORING.EXAMPLE.001 | [Attach examples to their provisions](../core/authoring.md#attach-examples-to-their-provisions-coreauthoringexample001) | `core/authoring.md` |
 | CORE.AUTHORING.IDENTIFIER.001 | [Use the declared identifier grammar](../core/authoring.md#use-the-declared-identifier-grammar-coreauthoringidentifier001) | `core/authoring.md` |
 | CORE.AUTHORING.IDENTIFIER.002 | [Restrict the CONVENTION segment to replaceable defaults](../core/authoring.md#restrict-the-convention-segment-to-replaceable-defaults-coreauthoringidentifier002) | `core/authoring.md` |
@@ -216,6 +217,7 @@ The active release states 822 provisions across 8 areas.
 | CORE.AUTHORING.INDEX.001 | [Regenerate the provision index](../core/authoring.md#regenerate-the-provision-index-coreauthoringindex001) | `core/authoring.md` |
 | CORE.AUTHORING.METADATA.002 | [Declare structured specification metadata](../core/authoring.md#declare-structured-specification-metadata-coreauthoringmetadata002) | `core/authoring.md` |
 | CORE.AUTHORING.METADATA.003 | [Use one metadata carrier](../core/authoring.md#use-one-metadata-carrier-coreauthoringmetadata003) | `core/authoring.md` |
+| CORE.AUTHORING.METADATA.004 | [Classify every specification file](../core/authoring.md#classify-every-specification-file-coreauthoringmetadata004) | `core/authoring.md` |
 | CORE.AUTHORING.NORMATIVE.002 | [Use one normative vocabulary](../core/authoring.md#use-one-normative-vocabulary-coreauthoringnormative002) | `core/authoring.md` |
 | CORE.AUTHORING.PAGE.001 | [Use the declared page contract](../core/authoring.md#use-the-declared-page-contract-coreauthoringpage001) | `core/authoring.md` |
 | CORE.AUTHORING.PROSE.001 | [Apply controlled prose measures](../core/authoring.md#apply-controlled-prose-measures-coreauthoringprose001) | `core/authoring.md` |
@@ -293,6 +295,7 @@ The active release states 822 provisions across 8 areas.
 | CORE.SYSTEM.CONVENTION.004 | [Use established technical terms](../core/system.md#use-established-technical-terms-coresystemconvention004) | `core/system.md` |
 | CORE.SYSTEM.CONVENTION.005 | [Use ordinary capitalization in prose](../core/system.md#use-ordinary-capitalization-in-prose-coresystemconvention005) | `core/system.md` |
 | CORE.SYSTEM.CONVENTION.006 | [Keep specifications readable without tooling](../core/system.md#keep-specifications-readable-without-tooling-coresystemconvention006) | `core/system.md` |
+| CORE.SYSTEM.COVERAGE.001 | [Keep specifications and use cases in one-to-one correspondence](../core/system.md#keep-specifications-and-use-cases-in-one-to-one-correspondence-coresystemcoverage001) | `core/system.md` |
 | CORE.SYSTEM.EXTENSIONS.001 | [Select extensions before applying them](../core/system.md#select-extensions-before-applying-them-coresystemextensions001) | `core/system.md` |
 | CORE.SYSTEM.EXTENSIONS.002 | [Exclude a project-scoped extension from local metadata](../core/system.md#exclude-a-project-scoped-extension-from-local-metadata-coresystemextensions002) | `core/system.md` |
 | CORE.SYSTEM.FLOW.001 | [Connect one product outcome through an end-to-end flow](../core/system.md#connect-one-product-outcome-through-an-end-to-end-flow-coresystemflow001) | `core/system.md` |

@@ -4,11 +4,13 @@
     "name": "__PROJECT__"
   },
   "profile": "dotnet-nextjs",
-  "reviewedStandardsVersion": "1.15.0",
+  "reviewedStandardsVersion": "1.16.0",
   "paths": {
     "apiSolution": "__API_SOLUTION__",
+    "docs": "docs",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
+    "unstructuredDocs": [],
     "frontends": [
       {
         "name": "web",
@@ -27,5 +29,10 @@
     ]
   },
   "selectedExtensions": [],
-  "overrides": []
+  "prohibitedKinds": [],
+  "overrides": [],
+  "parity": {
+    "ignoreHandlers": [],
+    "ignoreUseCases": []
+  }
 }

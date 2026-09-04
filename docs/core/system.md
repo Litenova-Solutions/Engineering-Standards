@@ -59,7 +59,7 @@ The system contains one delivery approach and one operating model:
 - Flows link their use cases rather than restate them. (CORE.SYSTEM.FLOW.001)
 - One module name is used across every layer. (CORE.SYSTEM.MODULE.001)
 - Module specifications map aggregates to state, invariants, and commands. (CORE.SYSTEM.AGGREGATE.001)
-- One use case is one Command or Query, with a defined status at each stage. (CORE.SYSTEM.USECASE.001, CORE.SYSTEM.USECASE.002)
+- One use case is one Command or Query, with a status and one specification. (CORE.SYSTEM.USECASE.001, CORE.SYSTEM.USECASE.002, CORE.SYSTEM.COVERAGE.001)
 - Workflow specifications name state, triggers, recovery, and owner. (CORE.SYSTEM.WORKFLOW.001)
 - Every event reaction declares its delivery classification. (CORE.SYSTEM.REACTION.001)
 - Domain rule IDs encode their enforcement classification. (CORE.SYSTEM.RULES.001)
@@ -283,6 +283,20 @@ Acceptance ID:  AC-ORDERS-CANCEL-ORDER-01
 
 A use case reaches `verified` only after Domain behavior, coordination, persistence, entry points, evidence, and operating impact are complete. Placeholder work leaves the use case `planned`.
 
+### Keep specifications and use cases in one-to-one correspondence (CORE.SYSTEM.COVERAGE.001)
+
+**Requirement:** Every implemented use case MUST resolve to exactly one use-case specification that resolves back to it.
+
+**Rationale:** Neither direction is visible without the check. Code with no specification reads as a reviewed feature and is not one. A specification with no code states a plan in the present tense.
+
+**Example:** `node standards/tools/validate-parity.mjs` reports both directions.
+
+```text
+FAIL (2 problem(s)):
+  - handler with no specification: Application/Sales/Vouchers/RedeemVoucher -> sales.redeem-voucher
+  - specification with no handler: docs/domain/modules/sales/vouchers/void-voucher.md
+```
+
 ### Specify autonomous progress as a workflow (CORE.SYSTEM.WORKFLOW.001)
 
 **Requirement:** A workflow specification MUST name its owner, participating modules, starting fact, completion and failure conditions, durable state, commands, awaited events, retries, and operator actions.
@@ -453,6 +467,7 @@ The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` chang
 | CORE.SYSTEM.AGGREGATE.001 | inspection | The module specification carries an aggregate table naming owned state, invariant identifiers, and commands. |
 | CORE.SYSTEM.USECASE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
 | CORE.SYSTEM.USECASE.002 | inspection | Each `implemented` use case resolves to existing Domain, Application, persistence, and entry-point code with no acceptance test. |
+| CORE.SYSTEM.COVERAGE.001 | static | `node standards/tools/validate-parity.mjs` reports no handler without a specification and no specification without a handler. |
 | CORE.SYSTEM.WORKFLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each workflow module reference and the template requires the named sections. |
 | CORE.SYSTEM.REACTION.001 | inspection | The owning specification records one delivery classification for each event reaction. |
 | CORE.SYSTEM.RULES.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a domain rule ID whose prefix does not match its declared classification. |
