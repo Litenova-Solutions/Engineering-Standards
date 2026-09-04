@@ -8,7 +8,7 @@ Application coordinates use cases. It translates a command or query into domain 
 ## Agent Summary {#agent-summary}
 
 
-- One folder per operation holds its message, result, validator, and handler. (BACKEND.APPLICATION.STRUCTURE.001)
+- One folder per operation holds its message, definition, result, validator, and handler. (BACKEND.APPLICATION.STRUCTURE.001)
 - Commands and queries dispatch through their own mediator. (BACKEND.APPLICATION.MEDIATOR.001)
 - Messages are public when hosts need them; handlers stay internal. (BACKEND.APPLICATION.CONTRACTS.001)
 - Validators check input shape; Domain decides state permission. (BACKEND.APPLICATION.VALIDATION.001)
@@ -24,9 +24,9 @@ Application coordinates use cases. It translates a command or query into domain 
 
 ### Organize Application by operation (BACKEND.APPLICATION.STRUCTURE.001)
 
-**Requirement:** Each command or query MUST own one operation folder under its module holding its message, result, validator, handler, and mapping.
+**Requirement:** Each command or query MUST own one operation folder under its module holding its message, result, validator, handler, and mapping. A message that declares a value the pipeline reads MUST declare it through `IMessageDefinition<TMessage>.Describe` in a `{UseCase}Definition` in the same folder, or as an attribute on the message itself where the value is a constant and the position is an exemption.
 
-**Rationale:** Grouping by technical type scatters one operation across the project. Type names share the use-case prefix and end in the `Command` or `Query` role.
+**Rationale:** Grouping by technical type scatters one operation across the project. Type names share the use-case prefix and end in the `Command` or `Query` role. A definition keeps what the pipeline needs to know about an operation beside the operation rather than in a registry the reader has to go find.
 
 ### Use specific LiteBus entry points (BACKEND.APPLICATION.MEDIATOR.001)
 
@@ -36,15 +36,15 @@ Application coordinates use cases. It translates a command or query into domain 
 
 ### Co-locate contracts and implementations (BACKEND.APPLICATION.CONTRACTS.001)
 
-**Requirement:** A handler or validator MUST be `internal sealed`, and a message or result becomes public only when a host uses it.
+**Requirement:** A handler, validator, or definition MUST be `internal sealed`, and a message or result becomes public only when a host uses it.
 
-**Rationale:** A collection query names each row `{UseCase}QueryResultItem` rather than a repository-wide summary type. One Application-owned `ValidationError` model serves command and query input errors.
+**Rationale:** A collection query names each row `{UseCase}QueryResultItem` rather than a repository-wide summary type. Input errors are reported through the pipeline's own `ValidationFailure`, so command and query failures reach a host in one shape.
 
 ### Separate input validation from invariants (BACKEND.APPLICATION.VALIDATION.001)
 
 **Requirement:** A validator MUST limit its checks to structural input, leaving aggregate state decisions to Domain.
 
-**Rationale:** Domain owns state permission. A validator rejects an empty title, malformed identifier, or invalid page size. `ValidationError` carries exactly `Field`, `Code`, and `Message`, and validation exceptions expose no HTTP status.
+**Rationale:** Domain owns state permission. A validator rejects an empty title, malformed identifier, or invalid page size. It reports what it finds as a `Validity` rather than throwing, so every validator for a message runs and the caller is told about the whole form in one answer. `ValidationFailure` carries exactly a member, a code, and a message, and carries no HTTP status.
 
 ### Model expected use-case failures explicitly (BACKEND.APPLICATION.FAILURE.001)
 
@@ -52,11 +52,11 @@ Application coordinates use cases. It translates a command or query into domain 
 
 **Rationale:** One public abstract `UseCaseException` has sealed `ResourceNotFoundException`, `UseCaseForbiddenException`, and `UseCaseConflictException` subclasses. They carry no HTTP result, provider exception, or stack detail, and handlers do not catch them.
 
-### Enforce target authorization in the use case (BACKEND.APPLICATION.AUTHZ.001)
+### Enforce target authorization in the pipeline (BACKEND.APPLICATION.AUTHZ.001)
 
-**Requirement:** A protected handler MUST verify ownership, tenant, role, state, or delegated access against the target data it loads.
+**Requirement:** A message an account can take MUST declare the action and the resource it requires, and the decision MUST be made by the authorization guard rather than inside the handler. Ownership, tenant, role, state or delegated access is resolved against the target data through an `IScopeOwnerLookup` for the record the message names.
 
-**Rationale:** WebApi may enforce coarse authenticated, role, or scope policies first. It cannot replace an authorization decision that depends on business data. A collection query carries its authorized scope in the database predicate.
+**Rationale:** WebApi may enforce coarse authenticated, role, or scope policies first. It cannot replace an authorization decision that depends on business data. Making the decision once, from a declaration, is what stops two messages about the same record asking different questions, and what lets composition refuse to start when a message states no position at all. A refusal is reported as a denial rather than raised, so a refused attempt reaches the audit trail beside the ones that succeeded. A collection query carries its authorized scope in the database predicate.
 
 ### Keep command handlers narrow (BACKEND.APPLICATION.COMMAND.001)
 
@@ -286,13 +286,13 @@ Infrastructure stages Workflow state and the outgoing Command in the same sessio
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BACKEND.APPLICATION.STRUCTURE.001 | static | `ArchitectureTests` asserts each operation folder holds one message and its matching result, validator, and handler. |
+| BACKEND.APPLICATION.STRUCTURE.001 | static | `ArchitectureTests` asserts each operation folder holds one message and its matching result, validator, and handler; composition refuses to start when a message declares no position on a value the pipeline requires, and `docs/operations/audit-catalogue.md` is regenerated from those declarations rather than maintained. |
 | BACKEND.APPLICATION.MEDIATOR.001 | inspection | `ArchitectureTests` asserts no dispatch path resolves a shared bus abstraction over the two pinned mediators. |
 | BACKEND.APPLICATION.CONTRACTS.001 | inspection | `ArchitectureTests` asserts handler and validator types are internal and sealed while messages and results carry their role suffix. |
 | BACKEND.APPLICATION.VALIDATION.001 | inspection | `ValidationTests` asserts each validator rejects structural input and defers state decisions to the aggregate. |
 | BACKEND.APPLICATION.FAILURE.001 | inspection | `UseCaseFailureTests` asserts each expected failure surfaces its stable code with no transport or provider detail attached. |
-| BACKEND.APPLICATION.AUTHZ.001 | inspection | `TargetAuthorizationTests` asserts each protected handler rejects a caller lacking the target grant it loads. |
-| BACKEND.APPLICATION.COMMAND.001 | inspection | `ArchitectureTests` asserts no command handler commits a session, catches a domain exception, or references an HTTP type. |
+| BACKEND.APPLICATION.AUTHZ.001 | static | Composition requires every command and query an account can take to declare a `RequiredAuthorization` or record an exemption from it; `PipelineStageTests` asserts no handler resolves the authorizer for itself, and `PipelineCompositionTests` asserts the guards cover exactly the messages intended. |
+| BACKEND.APPLICATION.COMMAND.001 | static | `PipelineStageTests` asserts no command handler commits a session, writes the audit trail, or authorizes for itself; `ArchitectureTests` asserts none catches a domain exception or references an HTTP type. |
 | BACKEND.APPLICATION.QUERY.001 | inspection | `ArchitectureTests` asserts no query handler resolves a repository or returns an aggregate type. |
 | BACKEND.APPLICATION.CLOSEDSET.001 | inspection | `ResultContractTests` asserts each result union carries one record per Domain case and exposes no Domain type. |
 | BACKEND.APPLICATION.PORT.001 | inspection | `ArchitectureTests` asserts no Application port signature names a provider type or transport model. |
