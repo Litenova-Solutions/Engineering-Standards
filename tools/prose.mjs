@@ -303,3 +303,72 @@ export function checkLanguage(relative, raw, compiled, add) {
     }
   }
 }
+
+// Reports the same two problems in a surface that is not Markdown: source, an
+// interface dictionary, a feature file. Three differences from `checkLanguage`
+// matter.
+//
+// The Markdown exemptions do not apply, because there is no fenced block to
+// exempt and no rejection column to protect. A source file is scanned whole.
+//
+// An identifier carries the word without spaces around it, so `SellerOrderId`
+// has to report `seller` while the prose pattern requires a word boundary. Each
+// line is therefore scanned twice: once as written, which catches a phrase such
+// as `load-bearing` in a comment, and once with the identifier boundaries
+// opened out, which catches the word inside a name. A hit reported by both
+// passes is reported once.
+//
+// Line numbers come from the line index rather than from an offset, because
+// opening out an identifier changes the length of the text the offset points
+// into.
+export function checkLanguageInSource(relative, raw, compiled, add) {
+  if (!compiled) return;
+  const lines = raw.split('\n');
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const opened = openIdentifiers(line);
+    const seen = new Set();
+
+    const scan = (text) => {
+      for (const entry of compiled.mannered) {
+        entry.pattern.lastIndex = 0;
+        let match;
+        while ((match = entry.pattern.exec(text)) !== null) {
+          const key = `m:${match[0].toLowerCase()}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          add(relative, index + 1, 'LANGUAGE_MANNERED_TERM',
+            `'${match[0]}' is mannered prose; state it literally, such as '${entry.instead}'`);
+        }
+      }
+      for (const entry of compiled.rejected) {
+        if (entry.scope && !entry.scope.test(relative)) continue;
+        entry.pattern.lastIndex = 0;
+        let match;
+        while ((match = entry.pattern.exec(text)) !== null) {
+          const key = `r:${entry.term}:${match[0].toLowerCase()}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          const because = entry.reason ? `; ${entry.reason}` : '';
+          add(relative, index + 1, 'LANGUAGE_REJECTED_SYNONYM',
+            `'${match[0]}' is a rejected synonym here; the term is '${entry.term}'${because}`);
+        }
+      }
+    };
+
+    scan(line);
+    if (opened !== line) scan(opened);
+  }
+}
+
+// Turns `SellerOrderId`, `seller_order_id` and `seller-order-id` into separate
+// words so a whole-word pattern reaches the word inside a name. Run as the
+// second of two passes, never the only one, because it also separates the two
+// halves of a hyphenated phrase the first pass needs intact.
+function openIdentifiers(line) {
+  return line
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .replace(/[_./]/g, ' ');
+}

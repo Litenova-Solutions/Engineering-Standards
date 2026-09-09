@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { checkProseMeasures, checkLanguage, compileLanguage } from './prose.mjs';
+import { checkProseMeasures, checkLanguage, checkLanguageInSource, compileLanguage } from './prose.mjs';
 
 // The root is the first argument that is not a flag, so an option can be passed
 // without being read as the consumer directory.
@@ -514,6 +514,42 @@ let languageSummary = '';
     if (count) proseCounts.set(rel, count);
   }
 
+  // The documentation tree is one of the surfaces a word reaches, and usually
+  // the smallest. A project's source, its interface copy, its API contract and
+  // its acceptance tests carry the same vocabulary to a developer, a buyer and
+  // a reviewer, and a check that reads only Markdown holds the vocabulary where
+  // nobody reads it. `paths.languageScan` names those surfaces.
+  // (CORE.AUTHORING.TERM.004)
+  //
+  // A scope in the language record is written against the documentation root
+  // for a page under it, and against the repository root for one of these
+  // files, because there is no other root the two have in common.
+  let scannedSurfaces = 0;
+  for (const pattern of project.paths?.languageScan ?? []) {
+    let matched;
+    try {
+      matched = fs.globSync(pattern, { cwd: root }).sort();
+    } catch (e) {
+      err(`standards.project.json: paths.languageScan '${pattern}' could not be read (${e.message})`);
+      continue;
+    }
+    // A pattern that matches nothing switches a surface off in silence, which
+    // is the shape this validator refuses everywhere else.
+    if (!matched.length) {
+      err(`standards.project.json: paths.languageScan '${pattern}' matches no file; the vocabulary check over that surface did not run`);
+      continue;
+    }
+    for (const relativePath of matched) {
+      const absolute = path.join(root, relativePath);
+      if (!fs.statSync(absolute).isFile()) continue;
+      const rel = relativePath.replace(/\\/g, '/');
+      scannedSurfaces += 1;
+      checkLanguageInSource(rel, fs.readFileSync(absolute, 'utf8'), compiled, (_r, line, code, message) => {
+        languageFindings.push(`${rel}:${line}: ${code} ${message}`);
+      });
+    }
+  }
+
   // Every language finding is an error. The vocabulary is the project's own, so
   // a term it rejects is a term it chose to reject.
   for (const finding of languageFindings) err(finding);
@@ -535,8 +571,11 @@ let languageSummary = '';
   }
   const manneredCount = languageFindings.filter((f) => f.includes('LANGUAGE_MANNERED_TERM')).length;
   const rejectedCount = languageFindings.length - manneredCount;
+  const surfaceNote = scannedSurfaces
+    ? `, ${scannedSurfaces} non-Markdown surface(s) scanned`
+    : ', documentation only';
   languageSummary = compiled
-    ? `Language: ${manneredCount} mannered term(s), ${rejectedCount} rejected synonym(s); prose baseline covers ${accepted} page(s)`
+    ? `Language: ${manneredCount} mannered term(s), ${rejectedCount} rejected synonym(s)${surfaceNote}; prose baseline covers ${accepted} page(s)`
     : `Language: no language record found; the vocabulary and mannered-term checks did not run`;
 
   // --prose lists the measures behind the counts, which is what a person needs

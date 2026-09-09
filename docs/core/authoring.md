@@ -6,7 +6,7 @@ The standards use one page grammar and one controlled technical prose profile. T
 
 ## Agent Summary {#agent-summary}
 
-- Use literal controlled prose, repository terminology, and a recorded vocabulary. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003, CORE.AUTHORING.VOICE.002, CORE.AUTHORING.TERM.001, CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003)
+- Use literal controlled prose, repository terminology, and a recorded vocabulary. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003, CORE.AUTHORING.VOICE.002, CORE.AUTHORING.TERM.001, CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.TERM.004)
 - Write one testable obligation in each Standards provision. (CORE.AUTHORING.NORMATIVE.002, CORE.AUTHORING.REQUIREMENT.001)
 - Name the declared page scope and a registered topic in each ID. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002, CORE.AUTHORING.IDENTIFIER.003)
 - Give each actionable default a distinct convention ID. (CORE.AUTHORING.DEFAULTS.001)
@@ -285,6 +285,18 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** Terminology drift is invisible one page at a time and plain across a module. The expensive case is a synonym that is a defined term elsewhere. The same word then names two parties, and no reader can tell which one is meant.
 
+### Check the vocabulary on every surface a reader meets (CORE.AUTHORING.TERM.004)
+
+**Requirement:** A consumer MUST name every non-Markdown surface its vocabulary reaches in `paths.languageScan`, including source, interface copy, the API contract, and acceptance tests.
+
+**Rationale:** Documentation is usually the smallest of those surfaces, and the only one a Markdown scan reads. A vocabulary then holds where nobody reads it and drifts where everybody does. One consumer of 459 pages passed the check while its source, its 3,458 interface strings and its 34 feature files went unread. Every collision that consumer had lived in the unread half. A rejection also has to reach a name, which carries the word with no space around it. `SellerOrderId` breaches a rejection of `seller` exactly as a sentence does.
+
+**Example:** A pattern matching no file is an error. A surface switched off in silence reports the same pass as a surface that is clean.
+
+```json
+{ "paths": { "languageScan": ["apps/*/lib/i18n/dictionaries/*.json", "apps/api/tests/**/*.feature"] } }
+```
+
 ### Use controlled capitalization (CORE.AUTHORING.CASE.001)
 
 **Requirement:** Authored prose MUST use Title Case for page titles and sentence case for provision headings and body text.
@@ -526,6 +538,7 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.TERM.001 | inspection | Terminology review compares new terms with `docs/reference/glossary.md`. |
 | CORE.AUTHORING.TERM.002 | static | `node tools/validate-consumer.mjs` validates the language record and names the checks a missing record switches off. |
 | CORE.AUTHORING.TERM.003 | static | `node tools/validate-consumer.mjs` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
+| CORE.AUTHORING.TERM.004 | static | `node tools/validate-consumer.mjs` reports the non-Markdown surfaces scanned, and fails a pattern matching no file. |
 | CORE.AUTHORING.CASE.001 | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
 | CORE.AUTHORING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
 | CORE.AUTHORING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |

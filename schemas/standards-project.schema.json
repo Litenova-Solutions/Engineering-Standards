@@ -41,6 +41,15 @@
           "description": "The project language record, validated against schemas/language.schema.json. Defaults to language.json under the documentation root.",
           "$ref": "#/$defs/projectPath"
         },
+        "languageScan": {
+          "description": "Glob patterns naming the non-Markdown surfaces the vocabulary is checked over: source, interface copy, the API contract, acceptance tests. Repository-relative. A scope in the language record is matched against the repository-relative path for these files. Each pattern must match at least one file.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
         "unstructuredDocs": {
           "description": "Paths whose Markdown is navigation or prose rather than specification.",
           "type": "array",

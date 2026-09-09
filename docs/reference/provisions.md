@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 836 provisions across 8 areas.
+The active release states 837 provisions across 8 areas.
 
 ## BACKEND
 
@@ -237,6 +237,7 @@ The active release states 836 provisions across 8 areas.
 | CORE.AUTHORING.TERM.001 | [Use one term for one concept](../core/authoring.md#use-one-term-for-one-concept-coreauthoringterm001) | `core/authoring.md` |
 | CORE.AUTHORING.TERM.002 | [Record the project vocabulary as data](../core/authoring.md#record-the-project-vocabulary-as-data-coreauthoringterm002) | `core/authoring.md` |
 | CORE.AUTHORING.TERM.003 | [Reject a recorded synonym inside its scope](../core/authoring.md#reject-a-recorded-synonym-inside-its-scope-coreauthoringterm003) | `core/authoring.md` |
+| CORE.AUTHORING.TERM.004 | [Check the vocabulary on every surface a reader meets](../core/authoring.md#check-the-vocabulary-on-every-surface-a-reader-meets-coreauthoringterm004) | `core/authoring.md` |
 | CORE.AUTHORING.VALIDATION.001 | [Run repeatable authoring checks](../core/authoring.md#run-repeatable-authoring-checks-coreauthoringvalidation001) | `core/authoring.md` |
 | CORE.AUTHORING.VERIFICATION.001 | [Map provisions to evidence](../core/authoring.md#map-provisions-to-evidence-coreauthoringverification001) | `core/authoring.md` |
 | CORE.AUTHORING.VOICE.001 | [Use active and explicit sentences](../core/authoring.md#use-active-and-explicit-sentences-coreauthoringvoice001) | `core/authoring.md` |

@@ -484,6 +484,67 @@ console.log('\nProject language (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.00
   report('no language record present', null, run());
 }
 
+console.log('\nVocabulary over non-Markdown surfaces (CORE.AUTHORING.TERM.004)');
+{
+  const languageFile = 'docs/language.json';
+  const originalProject = readFixture('standards.project.json');
+  // The fixture declares its own mannered term rather than borrowing one from
+  // the case above, so the phrase under test is hyphenated and belongs to this
+  // block alone.
+  const record = {
+    schemaVersion: 1,
+    terms: [{ term: 'holder', rejected: ['seller'], scope: '^apps/', reason: 'seller names the organizer' }],
+    mannered: [{ term: 'best-of-breed', instead: 'the strongest option' }],
+  };
+  writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
+
+  const declareScan = (patterns) => {
+    const project = JSON.parse(originalProject);
+    project.paths.languageScan = patterns;
+    writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  };
+
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The organizer keeps the ticket."\n}\n');
+  declareScan(['apps/admin/*.json']);
+  report('declared surface with no violation present', null, run());
+
+  // The point of the provision: a rejected word in a surface a Markdown scan
+  // never reads.
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The seller keeps the ticket."\n}\n');
+  report('rejected synonym in an interface dictionary', 'LANGUAGE_REJECTED_SYNONYM', run());
+
+  // An identifier carries the word with no space around it, so the scan has to
+  // open the name out before matching.
+  writeFile('apps/admin/copy.json', '{\n  "sellerName": "Harbour Events"\n}\n');
+  report('rejected synonym inside an identifier', 'LANGUAGE_REJECTED_SYNONYM', run());
+
+  // Opening a name out must not separate the halves of a hyphenated phrase, so
+  // the scan reads each line as written as well.
+  writeFile('apps/admin/copy.json', '{\n  "note": "That answer is best-of-breed."\n}\n');
+  report('mannered term in a declared surface', 'LANGUAGE_MANNERED_TERM', run());
+
+  // A word is still matched on its own, so a longer word containing it passes.
+  writeFile('apps/admin/copy.json', '{\n  "note": "The sellerships remain open."\n}\n');
+  report('rejected synonym as part of a longer word in a surface', { absent: 'LANGUAGE_REJECTED_SYNONYM' }, run());
+
+  // A scope is written against the repository root for these files, because a
+  // file outside the documentation tree shares no other root with a page.
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The seller keeps the ticket."\n}\n');
+  writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'holder', rejected: ['seller'], scope: '^docs/' }] }, null, 2)}\n`);
+  report('rejected synonym outside its scope in a surface', { absent: 'LANGUAGE_REJECTED_SYNONYM' }, run());
+  writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
+
+  // A pattern matching nothing switches a surface off in silence.
+  declareScan(['apps/admin/*.yaml']);
+  report('declared surface matching no file', 'matches no file', run());
+
+  declareScan([]);
+  report('no declared surface', null, run());
+  writeFile('standards.project.json', originalProject);
+  fs.rmSync(path.join(fixture, 'apps/admin/copy.json'));
+  fs.rmSync(path.join(fixture, languageFile));
+}
+
 console.log('\nControlled prose in consumer documentation (CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003)');
 {
   const page = 'docs/domain/modules/orders/README.md';

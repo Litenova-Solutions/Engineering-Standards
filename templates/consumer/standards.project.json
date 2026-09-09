@@ -4,13 +4,14 @@
     "name": "__PROJECT__"
   },
   "profile": "dotnet-nextjs",
-  "reviewedStandardsVersion": "1.17.0",
+  "reviewedStandardsVersion": "1.18.0",
   "paths": {
     "apiSolution": "__API_SOLUTION__",
     "docs": "docs",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
     "unstructuredDocs": [],
+    "languageScan": [],
     "frontends": [
       {
         "name": "web",
