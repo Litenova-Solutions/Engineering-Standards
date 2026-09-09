@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 825 provisions across 8 areas.
+The active release states 836 provisions across 8 areas.
 
 ## BACKEND
 
@@ -36,7 +36,7 @@ The active release states 825 provisions across 8 areas.
 | BACKEND.API.ROUTES.001 | [Keep routes resource-oriented](../backend/api.md#keep-routes-resource-oriented-backendapiroutes001) | `backend/api.md` |
 | BACKEND.API.STATUS.001 | [Use consistent status codes](../backend/api.md#use-consistent-status-codes-backendapistatus001) | `backend/api.md` |
 | BACKEND.API.STATUS.002 | [Reject a success status for a failed outcome](../backend/api.md#reject-a-success-status-for-a-failed-outcome-backendapistatus002) | `backend/api.md` |
-| BACKEND.APPLICATION.AUTHZ.001 | [Enforce target authorization in the use case](../backend/application.md#enforce-target-authorization-in-the-use-case-backendapplicationauthz001) | `backend/application.md` |
+| BACKEND.APPLICATION.AUTHZ.001 | [Enforce target authorization in the pipeline](../backend/application.md#enforce-target-authorization-in-the-pipeline-backendapplicationauthz001) | `backend/application.md` |
 | BACKEND.APPLICATION.CLOSEDSET.001 | [Mirror a Domain closed set in the result](../backend/application.md#mirror-a-domain-closed-set-in-the-result-backendapplicationclosedset001) | `backend/application.md` |
 | BACKEND.APPLICATION.COMMAND.001 | [Keep command handlers narrow](../backend/application.md#keep-command-handlers-narrow-backendapplicationcommand001) | `backend/application.md` |
 | BACKEND.APPLICATION.CONTRACTS.001 | [Co-locate contracts and implementations](../backend/application.md#co-locate-contracts-and-implementations-backendapplicationcontracts001) | `backend/application.md` |
@@ -48,6 +48,7 @@ The active release states 825 provisions across 8 areas.
 | BACKEND.APPLICATION.MEDIATOR.001 | [Use specific LiteBus entry points](../backend/application.md#use-specific-litebus-entry-points-backendapplicationmediator001) | `backend/application.md` |
 | BACKEND.APPLICATION.ORCHESTRATION.001 | [Keep one state-changing Use case in one Command pipeline](../backend/application.md#keep-one-state-changing-use-case-in-one-command-pipeline-backendapplicationorchestration001) | `backend/application.md` |
 | BACKEND.APPLICATION.PORT.001 | [Define narrow external ports](../backend/application.md#define-narrow-external-ports-backendapplicationport001) | `backend/application.md` |
+| BACKEND.APPLICATION.PORT.002 | [Declare a port where its consumers meet](../backend/application.md#declare-a-port-where-its-consumers-meet-backendapplicationport002) | `backend/application.md` |
 | BACKEND.APPLICATION.QUERY.001 | [Project queries directly](../backend/application.md#project-queries-directly-backendapplicationquery001) | `backend/application.md` |
 | BACKEND.APPLICATION.REACTION.001 | [Keep event reaction implementations explicit](../backend/application.md#keep-event-reaction-implementations-explicit-backendapplicationreaction001) | `backend/application.md` |
 | BACKEND.APPLICATION.STRUCTURE.001 | [Organize Application by operation](../backend/application.md#organize-application-by-operation-backendapplicationstructure001) | `backend/application.md` |
@@ -64,7 +65,8 @@ The active release states 825 provisions across 8 areas.
 | BACKEND.ARCHITECTURE.DOMAIN.001 | [Keep business invariants in Domain](../backend/architecture.md#keep-business-invariants-in-domain-backendarchitecturedomain001) | `backend/architecture.md` |
 | BACKEND.ARCHITECTURE.ENFORCEMENT.001 | [Test structural boundaries](../backend/architecture.md#test-structural-boundaries-backendarchitectureenforcement001) | `backend/architecture.md` |
 | BACKEND.ARCHITECTURE.MODULE.001 | [Organize every layer by module and use case](../backend/architecture.md#organize-every-layer-by-module-and-use-case-backendarchitecturemodule001) | `backend/architecture.md` |
-| BACKEND.ARCHITECTURE.PROJECTS.001 | [Use four application projects](../backend/architecture.md#use-four-application-projects-backendarchitectureprojects001) | `backend/architecture.md` |
+| BACKEND.ARCHITECTURE.PLACEMENT.001 | [Place a type at the lowest folder that holds its consumers](../backend/architecture.md#place-a-type-at-the-lowest-folder-that-holds-its-consumers-backendarchitectureplacement001) | `backend/architecture.md` |
+| BACKEND.ARCHITECTURE.PROJECTS.001 | [Use five application projects](../backend/architecture.md#use-five-application-projects-backendarchitectureprojects001) | `backend/architecture.md` |
 | BACKEND.ARCHITECTURE.VISIBILITY.001 | [Keep implementation types internal](../backend/architecture.md#keep-implementation-types-internal-backendarchitecturevisibility001) | `backend/architecture.md` |
 | BACKEND.ARCHITECTURE.WORKER.001 | [Add Worker only for an independent process boundary](../backend/architecture.md#add-worker-only-for-an-independent-process-boundary-backendarchitectureworker001) | `backend/architecture.md` |
 | BACKEND.DOMAIN.AGGREGATE.001 | [Treat aggregates as consistency boundaries](../backend/domain.md#treat-aggregates-as-consistency-boundaries-backenddomainaggregate001) | `backend/domain.md` |
@@ -221,6 +223,8 @@ The active release states 825 provisions across 8 areas.
 | CORE.AUTHORING.NORMATIVE.002 | [Use one normative vocabulary](../core/authoring.md#use-one-normative-vocabulary-coreauthoringnormative002) | `core/authoring.md` |
 | CORE.AUTHORING.PAGE.001 | [Use the declared page contract](../core/authoring.md#use-the-declared-page-contract-coreauthoringpage001) | `core/authoring.md` |
 | CORE.AUTHORING.PROSE.001 | [Apply controlled prose measures](../core/authoring.md#apply-controlled-prose-measures-coreauthoringprose001) | `core/authoring.md` |
+| CORE.AUTHORING.PROSE.002 | [Apply the prose measures to consumer documentation](../core/authoring.md#apply-the-prose-measures-to-consumer-documentation-coreauthoringprose002) | `core/authoring.md` |
+| CORE.AUTHORING.PROSE.003 | [Remove a reread page from the prose baseline](../core/authoring.md#remove-a-reread-page-from-the-prose-baseline-coreauthoringprose003) | `core/authoring.md` |
 | CORE.AUTHORING.QUALITY.001 | [Apply the four quality tests](../core/authoring.md#apply-the-four-quality-tests-coreauthoringquality001) | `core/authoring.md` |
 | CORE.AUTHORING.REQUIREMENT.001 | [Write atomic Standards provisions](../core/authoring.md#write-atomic-standards-provisions-coreauthoringrequirement001) | `core/authoring.md` |
 | CORE.AUTHORING.SNAPSHOT.001 | [Validate current standards material](../core/authoring.md#validate-current-standards-material-coreauthoringsnapshot001) | `core/authoring.md` |
@@ -231,9 +235,12 @@ The active release states 825 provisions across 8 areas.
 | CORE.AUTHORING.SNAPSHOT.006 | [Record the reviewed standards release](../core/authoring.md#record-the-reviewed-standards-release-coreauthoringsnapshot006) | `core/authoring.md` |
 | CORE.AUTHORING.SUMMARY.001 | [Keep Agent Summaries informative](../core/authoring.md#keep-agent-summaries-informative-coreauthoringsummary001) | `core/authoring.md` |
 | CORE.AUTHORING.TERM.001 | [Use one term for one concept](../core/authoring.md#use-one-term-for-one-concept-coreauthoringterm001) | `core/authoring.md` |
+| CORE.AUTHORING.TERM.002 | [Record the project vocabulary as data](../core/authoring.md#record-the-project-vocabulary-as-data-coreauthoringterm002) | `core/authoring.md` |
+| CORE.AUTHORING.TERM.003 | [Reject a recorded synonym inside its scope](../core/authoring.md#reject-a-recorded-synonym-inside-its-scope-coreauthoringterm003) | `core/authoring.md` |
 | CORE.AUTHORING.VALIDATION.001 | [Run repeatable authoring checks](../core/authoring.md#run-repeatable-authoring-checks-coreauthoringvalidation001) | `core/authoring.md` |
 | CORE.AUTHORING.VERIFICATION.001 | [Map provisions to evidence](../core/authoring.md#map-provisions-to-evidence-coreauthoringverification001) | `core/authoring.md` |
 | CORE.AUTHORING.VOICE.001 | [Use active and explicit sentences](../core/authoring.md#use-active-and-explicit-sentences-coreauthoringvoice001) | `core/authoring.md` |
+| CORE.AUTHORING.VOICE.002 | [State meaning literally](../core/authoring.md#state-meaning-literally-coreauthoringvoice002) | `core/authoring.md` |
 | CORE.PRINCIPLES.COMPLEXITY.001 | [Require current complexity activation](../core/principles.md#require-current-complexity-activation-coreprinciplescomplexity001) | `core/principles.md` |
 | CORE.PRINCIPLES.COMPLEXITY.002 | [Select extensions by criteria](../core/principles.md#select-extensions-by-criteria-coreprinciplescomplexity002) | `core/principles.md` |
 | CORE.PRINCIPLES.CONVENTION.001 | [Prefer direct owned dependencies](../core/principles.md#prefer-direct-owned-dependencies-coreprinciplesconvention001) | `core/principles.md` |
@@ -295,6 +302,7 @@ The active release states 825 provisions across 8 areas.
 | CORE.SYSTEM.CONVENTION.004 | [Use established technical terms](../core/system.md#use-established-technical-terms-coresystemconvention004) | `core/system.md` |
 | CORE.SYSTEM.CONVENTION.005 | [Use ordinary capitalization in prose](../core/system.md#use-ordinary-capitalization-in-prose-coresystemconvention005) | `core/system.md` |
 | CORE.SYSTEM.CONVENTION.006 | [Keep specifications readable without tooling](../core/system.md#keep-specifications-readable-without-tooling-coresystemconvention006) | `core/system.md` |
+| CORE.SYSTEM.CONVENTION.007 | [Bound a scenario to one paragraph](../core/system.md#bound-a-scenario-to-one-paragraph-coresystemconvention007) | `core/system.md` |
 | CORE.SYSTEM.COVERAGE.001 | [Keep specifications and use cases in one-to-one correspondence](../core/system.md#keep-specifications-and-use-cases-in-one-to-one-correspondence-coresystemcoverage001) | `core/system.md` |
 | CORE.SYSTEM.EXTENSIONS.001 | [Select extensions before applying them](../core/system.md#select-extensions-before-applying-them-coresystemextensions001) | `core/system.md` |
 | CORE.SYSTEM.EXTENSIONS.002 | [Exclude a project-scoped extension from local metadata](../core/system.md#exclude-a-project-scoped-extension-from-local-metadata-coresystemextensions002) | `core/system.md` |
@@ -303,6 +311,9 @@ The active release states 825 provisions across 8 areas.
 | CORE.SYSTEM.MODULE.001 | [Group language and use cases by module](../core/system.md#group-language-and-use-cases-by-module-coresystemmodule001) | `core/system.md` |
 | CORE.SYSTEM.REACTION.001 | [Record events and event reactions separately](../core/system.md#record-events-and-event-reactions-separately-coresystemreaction001) | `core/system.md` |
 | CORE.SYSTEM.RULES.001 | [Classify domain rules by enforcement boundary](../core/system.md#classify-domain-rules-by-enforcement-boundary-coresystemrules001) | `core/system.md` |
+| CORE.SYSTEM.SCENARIO.001 | [State one occasion for every behavior specification](../core/system.md#state-one-occasion-for-every-behavior-specification-coresystemscenario001) | `core/system.md` |
+| CORE.SYSTEM.SCENARIO.002 | [Keep a scenario informative](../core/system.md#keep-a-scenario-informative-coresystemscenario002) | `core/system.md` |
+| CORE.SYSTEM.SCENARIO.003 | [Derive every scenario from one reference cast](../core/system.md#derive-every-scenario-from-one-reference-cast-coresystemscenario003) | `core/system.md` |
 | CORE.SYSTEM.SPECIFICATION.001 | [Drive work from approved specifications](../core/system.md#drive-work-from-approved-specifications-coresystemspecification001) | `core/system.md` |
 | CORE.SYSTEM.STATE.001 | [Model every aggregate lifecycle with state records](../core/system.md#model-every-aggregate-lifecycle-with-state-records-coresystemstate001) | `core/system.md` |
 | CORE.SYSTEM.SYNC.001 | [Update specifications with behavior](../core/system.md#update-specifications-with-behavior-coresystemsync001) | `core/system.md` |

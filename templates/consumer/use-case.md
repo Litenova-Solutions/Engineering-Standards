@@ -19,6 +19,10 @@
 
 State the actor or system goal and its observable result.
 
+## Scenario
+
+Situate this operation in one concrete occasion: name the person, state what surrounds them, and state what they would do instead without this operation. Draw the people, place, dates, and amounts from the reference cast record. This section is informative. It defines no rule, term, state, or actor, and it carries no rule or acceptance identifier.
+
 ## Trigger
 
 State the actor action, event, schedule, or system condition that starts this use case.

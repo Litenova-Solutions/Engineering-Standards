@@ -37,6 +37,10 @@
           "description": "Root of the specification tree. Every Markdown file under it carries a metadata block unless the path is listed in unstructuredDocs.",
           "$ref": "#/$defs/projectPath"
         },
+        "language": {
+          "description": "The project language record, validated against schemas/language.schema.json. Defaults to language.json under the documentation root.",
+          "$ref": "#/$defs/projectPath"
+        },
         "unstructuredDocs": {
           "description": "Paths whose Markdown is navigation or prose rather than specification.",
           "type": "array",
@@ -80,6 +84,21 @@
               }
             ]
           }
+        }
+      }
+    },
+    "scenarioWordLimit": {
+      "description": "The word bound a Scenario section stays within. Omitted, the recorded default of 120 applies, and the validator refuses a value below 40.",
+      "type": "integer"
+    },
+    "prose": {
+      "description": "Where the controlled-prose baseline lives. The baseline records the debt a page carried when the measures were first applied to it, and a page whose lastReviewed date moves leaves the baseline.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "baseline": {
+          "description": "Defaults to prose-baseline.json under the documentation root.",
+          "$ref": "#/$defs/projectPath"
         }
       }
     },

@@ -3,18 +3,18 @@
 ## Intent
 
 
-The backend is a four-project modular monolith. Project boundaries separate business rules, use-case coordination, technical adapters, and HTTP hosting without splitting each concern into a separate assembly.
+The backend is a five-project modular monolith. Project boundaries separate business rules, the contracts every layer names, use-case coordination, technical adapters, and HTTP hosting without splitting each concern into a separate assembly.
 
 CQRS separates write and read behavior inside one Application project. Modules and use cases provide the internal navigation boundary.
 
 ## Agent Summary {#agent-summary}
 
 
-- Domain, Application, Infrastructure, and WebApi are the four baseline projects. (BACKEND.ARCHITECTURE.PROJECTS.001)
+- Domain, Application.Abstractions, Application, Infrastructure, and WebApi are the five baseline projects. (BACKEND.ARCHITECTURE.PROJECTS.001)
 - Project references point inward and never outward. (BACKEND.ARCHITECTURE.DEPENDENCIES.001)
 - Each layer defines its own messages, results, and transport models. (BACKEND.ARCHITECTURE.CONTRACTS.001)
-- One Application project holds every message, handler, and port. (BACKEND.ARCHITECTURE.APPLICATION.001)
-- Every layer repeats the same module and aggregate folder order. (BACKEND.ARCHITECTURE.MODULE.001)
+- One Application project holds every message, handler, and module-owned port. (BACKEND.ARCHITECTURE.APPLICATION.001)
+- A type lives at the lowest folder holding its consumers, and every layer repeats the same module and aggregate order. (BACKEND.ARCHITECTURE.PLACEMENT.001, BACKEND.ARCHITECTURE.MODULE.001)
 - Handlers, validators, and implementations stay internal and sealed. (BACKEND.ARCHITECTURE.VISIBILITY.001)
 - Aggregates own invariants; handlers only coordinate. (BACKEND.ARCHITECTURE.DOMAIN.001)
 - Commands write through repositories; queries read projections. (BACKEND.ARCHITECTURE.CQRS.001)
@@ -24,18 +24,23 @@ CQRS separates write and read behavior inside one Application project. Modules a
 ## Standards
 
 
-### Use four application projects (BACKEND.ARCHITECTURE.PROJECTS.001)
+### Use five application projects (BACKEND.ARCHITECTURE.PROJECTS.001)
 
-**Requirement:** An application MUST use Domain, Application, Infrastructure, and WebApi as its four baseline projects.
+**Requirement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline projects.
 
 **Example:** An application layout can contain:
 
 ```text
 apps/api/src/{ProjectName}.Domain/
+apps/api/src/{ProjectName}.Application.Abstractions/
 apps/api/src/{ProjectName}.Application/
 apps/api/src/{ProjectName}.Infrastructure/
 apps/api/src/{ProjectName}.WebApi/
 ```
+
+`Application.Abstractions` holds the contracts more than one module names: the pipeline's own positions, the cross-module ports, the transport-neutral failures, and the published integration events. It references Domain and nothing else, so no type in it can name a use case, a handler, or a module. That refusal is the reason it is a project rather than a folder. A folder inside Application cannot decline what a developer puts in it, and the folder that tries becomes the place every unplaced type goes.
+
+An implementation never belongs there. The project name states the test, and a type that cannot pass it belongs to a module under `BACKEND.ARCHITECTURE.PLACEMENT.001`.
 
 `AppHost` and `ServiceDefaults` support local hosting and diagnostics. They are hosts, not application layers.
 
@@ -62,6 +67,18 @@ apps/api/src/{ProjectName}.WebApi/
 **Requirement:** Every layer MUST use the same module names and order its folders as module, then aggregate, then layer detail.
 
 **Rationale:** An aggregate stays flat only when its plural name equals the single module name. Module is an organization term, not a runtime base type, so no `IModule` or `ModuleRoot` contract exists.
+
+### Place a type at the lowest folder that holds its consumers (BACKEND.ARCHITECTURE.PLACEMENT.001)
+
+**Requirement:** A type MUST live at the lowest folder containing every consumer that names it.
+
+**Rationale:** The lowest folder is the use-case folder when one use case names the type. It is the aggregate folder when several use cases of one aggregate name it. It is the module folder when several aggregates of one module name it. It is `Application.Abstractions` when more than one module names the type, or when two layers name it with no module between them. A type only Infrastructure names is an Infrastructure type.
+
+Two kinds of type travel with something else rather than by their own consumer count. A type that exists only to shape one contract's input or output stays with that contract, and a closed enumerated set stays whole.
+
+The rule is mechanical, so placement is counted rather than judged. The contracts project is what remains after the count rather than a destination anyone chooses. A folder named for the absence of a reason (`Shared`, `Common`, `Util`, `Helpers`) can refuse nothing. Such a folder accumulates until a tenth of the layer sits outside the module tree, unreviewed, and named for no aggregate.
+
+Domain's shared kernel is the one folder of that name a solution keeps. Its membership is closed by `BACKEND.ARCHITECTURE.CONTRACTS.001` rather than open to whatever needs a home. A service that coordinates several aggregates lives in the module that owns the aggregates it reads and writes, not with whichever module calls it first.
 
 ### Keep implementation types internal (BACKEND.ARCHITECTURE.VISIBILITY.001)
 
@@ -178,7 +195,8 @@ Publishing a post follows this direction:
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BACKEND.ARCHITECTURE.PROJECTS.001 | inspection | `SolutionStructureTests` asserts the solution contains the four baseline projects and no additional layer project. |
+| BACKEND.ARCHITECTURE.PROJECTS.001 | inspection | `SolutionStructureTests` asserts the solution contains the five baseline projects and no other layer project, and that contracts references Domain alone. |
+| BACKEND.ARCHITECTURE.PLACEMENT.001 | static | `ArchitectureTests` asserts no Application or WebApi folder takes a `Shared, Common, Util, Helpers`, or module name, and every contracts type has cross-module consumers. |
 | BACKEND.ARCHITECTURE.DEPENDENCIES.001 | inspection | `ArchitectureTests` asserts the project reference graph matches the inward matrix in the dependencies convention. |
 | BACKEND.ARCHITECTURE.CONTRACTS.001 | inspection | `ArchitectureTests` asserts no Application result or WebApi model exposes a Domain type across the layer boundary. |
 | BACKEND.ARCHITECTURE.APPLICATION.001 | inspection | `SolutionStructureTests` asserts one Application project holds every command, query, handler, and port type. |

@@ -26,7 +26,7 @@ Each step links the standard that governs it. Read that page before running the 
 
 ### Structure
 
-5. Create the API solution, the four application projects, AppHost, ServiceDefaults, and the baseline test projects, following [architecture](../backend/architecture.md) and [backend testing](../backend/testing.md).
+5. Create the API solution, the five application projects, AppHost, ServiceDefaults, and the baseline test projects, following [architecture](../backend/architecture.md) and [backend testing](../backend/testing.md).
 6. Apply the file, type, and folder names in [naming](../workspace/naming.md).
 
 ### Specify

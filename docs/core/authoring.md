@@ -6,7 +6,7 @@ The standards use one page grammar and one controlled technical prose profile. T
 
 ## Agent Summary {#agent-summary}
 
-- Use controlled technical prose with repository terminology. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.TERM.001)
+- Use literal controlled prose, repository terminology, and a recorded vocabulary. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003, CORE.AUTHORING.VOICE.002, CORE.AUTHORING.TERM.001, CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003)
 - Write one testable obligation in each Standards provision. (CORE.AUTHORING.NORMATIVE.002, CORE.AUTHORING.REQUIREMENT.001)
 - Name the declared page scope and a registered topic in each ID. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002, CORE.AUTHORING.IDENTIFIER.003)
 - Give each actionable default a distinct convention ID. (CORE.AUTHORING.DEFAULTS.001)
@@ -226,11 +226,37 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** Bounded, direct prose reduces interpretation differences without weakening technical meaning.
 
+### Apply the prose measures to consumer documentation (CORE.AUTHORING.PROSE.002)
+
+**Requirement:** A consumer specification page MUST satisfy the prose measures unless the project prose baseline records that page.
+
+**Rationale:** The profile applied only to this repository, so a consumer inherited the rule and no check. One consumer of 459 pages carried 5694 measure violations under a passing validator, because the run that reported the pass never looked.
+
+**Example:** The baseline records the count and the review date a page's debt was accepted at.
+
+```json
+{ "pages": { "docs/domain/modules/sales/README.md": { "count": 58, "lastReviewed": "2026-08-25" } } }
+```
+
+### Remove a reread page from the prose baseline (CORE.AUTHORING.PROSE.003)
+
+**Requirement:** A change that advances a page's `lastReviewed` date MUST remove that page from the prose baseline.
+
+**Rationale:** A baseline with no exit is a permanent exemption. `lastReviewed` already means a human read the page against the code. That reading is when the prose is in front of somebody, so the debt retires against work the project already performs.
+
 ### Use active and explicit sentences (CORE.AUTHORING.VOICE.001)
 
 **Requirement:** Authored prose MUST use active voice, explicit actors, imperative procedure steps, parallel lists, and passive voice only when actors are irrelevant.
 
 **Rationale:** Explicit actors and parallel actions make ownership and execution boundaries visible.
+
+### State meaning literally (CORE.AUTHORING.VOICE.002)
+
+**Requirement:** Authored prose MUST NOT substitute metaphor or flourish for direct statement where a literal phrase carries the same meaning.
+
+**Rationale:** A metaphor carries connotations its author did not choose. It also defeats terminology review, because a reader cannot tell whether a figure of speech names a defined concept or decorates one. A settlement route described as a rung on a ladder asserts an ordering that the three routes do not have.
+
+**Example:** Write `a parameter worth varying`, not `a dial worth turning`. Write `this point still matters`, not `this point earns its keep`.
 
 ### Use one term for one concept (CORE.AUTHORING.TERM.001)
 
@@ -239,6 +265,25 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 **Rationale:** Repository terminology stays stable while exact code and product terms remain available.
 
 **Example:** The validator reports `Standards authoring checks passed.`, not `This document is ASD-STE100 compliant.`
+
+### Record the project vocabulary as data (CORE.AUTHORING.TERM.002)
+
+**Requirement:** A consumer MUST record each term, its rejected synonyms, the scope of each rejection, and its mannered terms in a language record satisfying `schemas/language.schema.json`.
+
+**Rationale:** A glossary column headed `Avoid` states the rule to a reader and to nothing else. Prose cannot be checked against prose, so the same rule has to exist twice: once for the reader and once for the validator.
+
+**Example:** A rejection carries the scope that binds it, because a word correct in one module is wrong in another.
+
+```json
+{ "term": "holder", "rejected": ["seller", "owner"], "scope": "^domain/modules/sales/ticket-resales/",
+  "reason": "seller is the organizer in its disclosure role, so it names the other party here" }
+```
+
+### Reject a recorded synonym inside its scope (CORE.AUTHORING.TERM.003)
+
+**Requirement:** Authored prose MUST NOT use a synonym that the project language record rejects for the scope the page sits in.
+
+**Rationale:** Terminology drift is invisible one page at a time and plain across a module. The expensive case is a synonym that is a defined term elsewhere. The same word then names two parties, and no reader can tell which one is meant.
 
 ### Use controlled capitalization (CORE.AUTHORING.CASE.001)
 
@@ -474,8 +519,13 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.ASCII.002 | inspection | The project record lists each excluded content path, and review confirms documents about that content stay in scope. |
 | CORE.AUTHORING.NORMATIVE.002 | inspection | The provision parser reports one approved modal, and review confirms its intended force. |
 | CORE.AUTHORING.PROSE.001 | static | `WritingProseTests` asserts the prose scanner reports no length, contraction, or banned-term diagnostic. |
+| CORE.AUTHORING.PROSE.002 | static | `node tools/validate-consumer.mjs` reports a page carrying a measure violation that the prose baseline does not record. |
+| CORE.AUTHORING.PROSE.003 | static | `node tools/validate-consumer.mjs` fails when a baselined page's `lastReviewed` is later than the date its baseline entry records. |
 | CORE.AUTHORING.VOICE.001 | inspection | The pull request checklist records actor, voice, procedure, and list review. |
+| CORE.AUTHORING.VOICE.002 | static, inspection | `node tools/validate-consumer.mjs` emits no `LANGUAGE_MANNERED_TERM` diagnostic, and review confirms each new figure of speech is literal or defined. |
 | CORE.AUTHORING.TERM.001 | inspection | Terminology review compares new terms with `docs/reference/glossary.md`. |
+| CORE.AUTHORING.TERM.002 | static | `node tools/validate-consumer.mjs` validates the language record and names the checks a missing record switches off. |
+| CORE.AUTHORING.TERM.003 | static | `node tools/validate-consumer.mjs` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
 | CORE.AUTHORING.CASE.001 | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
 | CORE.AUTHORING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
 | CORE.AUTHORING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |

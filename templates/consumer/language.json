@@ -1,0 +1,18 @@
+{
+  "$schema": "../../schemas/language.schema.json",
+  "schemaVersion": 1,
+  "terms": [
+    {
+      "term": "__TERM__",
+      "rejected": ["__REJECTED_SYNONYM__"],
+      "scope": "^domain/modules/__MODULE__/",
+      "reason": "__WHY_THE_SYNONYM_IS_WRONG_HERE__"
+    }
+  ],
+  "mannered": [
+    { "term": "load-bearing", "instead": "required" },
+    { "term": "one-way door", "instead": "irreversible" },
+    { "term": "earns its keep", "instead": "still matters" },
+    { "term": "a dial worth turning", "instead": "a parameter worth varying" }
+  ]
+}

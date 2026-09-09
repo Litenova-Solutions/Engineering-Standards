@@ -29,10 +29,11 @@ Project references and package ownership make the application boundary visible t
 | Project | May reference |
 |:---|:---|
 | Domain | No application project |
-| Application | Domain |
-| Infrastructure | Domain, Application |
-| WebApi | Application, Infrastructure |
-| Worker | Application, Infrastructure |
+| Application.Abstractions | Domain |
+| Application | Domain, Application.Abstractions |
+| Infrastructure | Domain, Application.Abstractions, Application |
+| WebApi | Application.Abstractions, Application, Infrastructure |
+| Worker | Application.Abstractions, Application, Infrastructure |
 | AppHost | Deployable host projects through Aspire resource references |
 | Test projects | Only production projects and test support needed by their test category |
 
@@ -118,6 +119,7 @@ Project references and package ownership make the application boundary visible t
 | Project | Direct package groups |
 |:---|:---|
 | Domain | None |
+| Application.Abstractions | Required LiteBus module abstractions only |
 | Application | Required LiteBus module abstractions; `Marten` for the selected `IQuerySession` read boundary; Microsoft abstractions used by public ports |
 | Infrastructure | `Marten`; LiteBus registration modules. Provider, resilience, service-discovery, and configuration packages required by implemented adapters |
 | WebApi | JWT bearer authentication, ASP.NET Core OpenAPI, build-time OpenAPI generation, Scalar, and required LiteBus mediator abstractions |

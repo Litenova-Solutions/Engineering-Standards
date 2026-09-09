@@ -34,6 +34,16 @@ For the Orders module:
 
 Rejected synonyms prevent later contributors from creating `PurchaseRecord` beside `Order`. They also tell an agent which plausible names are wrong for this domain.
 
+### Write the occasion before the rules
+
+Name one occasion the module exists for, and write it down before the first table. State who acts, what surrounds them, what they are under pressure from, and what they use today instead.
+
+For the Orders module, an onsale opens at nine on a Tuesday. Four hundred people reach the storefront inside a minute, and the last twelve places go to whoever commits first. Without an order record, the promoter reconstructs who bought what from a payment export and a group chat.
+
+Record that occasion in the module specification's `Scenario` section, and reuse its people and amounts in every aggregate and use-case scenario beneath it. One reference cast in `docs/domain/scenarios.md` holds the names, the place, the dates, and the figures, so two pages read in sequence describe one occasion.
+
+A scenario carries no rule identifier. It illustrates the page and never governs it.
+
 ### Draw aggregate boundaries from aggregate invariants
 
 An aggregate is a consistency boundary. It groups state that must remain valid together in one command transaction. The aggregate root is the object through which callers request every change inside that boundary.
@@ -301,6 +311,7 @@ Create subfolders only when real types require them.
 ## Verification
 
 - The module uses one term for each concept and records rejected synonyms.
+- Every module, aggregate, use-case, and domain-policy specification carries a scenario drawn from the reference cast.
 - Every aggregate boundary names owned children, referenced aggregate IDs, and protected `INV-*` invariants.
 - Every aggregate has one abstract state base and at least one sealed state record.
 - Every transition maps to an aggregate method and command use case.

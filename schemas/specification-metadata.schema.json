@@ -9,6 +9,7 @@
     { "$ref": "#/$defs/glossary" },
     { "$ref": "#/$defs/modulesIndex" },
     { "$ref": "#/$defs/sectionIndex" },
+    { "$ref": "#/$defs/scenarioCast" },
     { "$ref": "#/$defs/module" },
     { "$ref": "#/$defs/aggregate" },
     { "$ref": "#/$defs/useCase" },
@@ -129,6 +130,19 @@
       "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "modules-index" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "scenarioCast": {
+      "description": "The one reference cast every Scenario section draws its people, place, dates, and amounts from. It is informative, defines no rule, and appears exactly once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "scenario-cast" },
         "id": { "$ref": "#/$defs/identifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },

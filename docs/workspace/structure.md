@@ -80,6 +80,7 @@ apps/api/
   Directory.Packages.props
   src/
     {ProjectName}.Domain/
+    {ProjectName}.Application.Abstractions/
     {ProjectName}.Application/
     {ProjectName}.Infrastructure/
     {ProjectName}.WebApi/

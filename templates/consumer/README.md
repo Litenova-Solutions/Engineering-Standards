@@ -15,6 +15,8 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | `product-brief.md` | `docs/product/brief.md` | Defines the product boundary and linked end-to-end flows. |
 | `domain-index.md` | `docs/domain/README.md` | Lists modules, workflows, and domain policies. |
 | `glossary.md` | `docs/domain/glossary.md` | Defines shared domain language. |
+| `language.json` | `docs/language.json` | Closes the vocabulary prose is checked against: terms, rejected synonyms, each rejection's scope, and the mannered terms. |
+| `scenario-cast.md` | `docs/domain/scenarios.md` | Fixes the people, place, dates, and amounts every `Scenario` section draws from. |
 | `modules-index.md` | `docs/domain/modules/README.md` | Defines the module documentation boundary. |
 
 ## Add when required

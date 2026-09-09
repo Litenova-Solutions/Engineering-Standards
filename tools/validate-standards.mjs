@@ -5,6 +5,16 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { buildProvisionIndex, headingSlug, INDEX_PATH } from './provisions.mjs';
+import {
+  AND_OR,
+  CONTRACTIONS,
+  VAGUE_TERMS,
+  checkProseMeasures,
+  sentences,
+  stripFences,
+  visibleText,
+  words,
+} from './prose.mjs';
 
 // Every provision identifier is AREA.PAGE.TOPIC.NNN. AREA and PAGE come from the
 // manifest id registry, TOPIC names the assertion, and NNN is a three-digit sequence.
@@ -20,19 +30,6 @@ const OTHER_NORMATIVE = /\b(?:REQUIRED|FORBIDDEN|SHALL)\b/;
 const PROVISION_LABEL = /^\*\*(Requirement|Deviation|Rationale|Example|Default|Replacement):\*\*/;
 const GENERIC_EVIDENCE = /\b(?:verify compliance|check compliance|inspect evidence|verify evidence)\b/i;
 const ACTION_VERBS = new Set(`Accept Activate Add Advance Align Anchor Apply Approve Assert Assign Attach Audit Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify Co-locate Collect Commit Compare Complete Compose Configure Connect Control Copy Cover Create Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document Drive Emit Enforce Escalate Escape Evolve Exclude Exercise Expose Express Finish Follow Format Gate Generate Give Govern Group Handle Hide Identify Implement Inject Inspect Isolate Keep Lease Limit List Load Localize Locate Make Map Mark Match Measure Meet Minimize Mirror Model Move Name Note Operate Organize Own Parameterize Parse Pass Persist Pin Place Plan Point Prefer Preserve Prevent Process Project Promote Protect Prove Provide Publish Purge Query Raise Read Reconnect Record Recover Reference Reflect Regenerate Register Reject Reload Release Remove Render Replay Replace Report Represent Require Renew Requeue Resolve Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tag Test Tolerate Trace Track Translate Treat Update Use Validate Verify Version Wait Write`.split(' '));
-const VAGUE_TERMS = [
-  ['etc.', /\betc\./i],
-  ['and so on', /\band so on\b/i],
-  ['as appropriate', /\bas appropriate\b/i],
-  ['as needed', /\bas needed\b/i],
-  ['simply', /\bsimply\b/i],
-  ['just', /\bjust\b/i],
-  ['basically', /\bbasically\b/i],
-  ['obvious', /\bobvious(?:ly)?\b/i],
-  ['clearly', /\bclearly\b/i],
-  ['very', /\bvery\b/i],
-  ['really', /\breally\b/i],
-];
 // Every authoring rule is an error. This set stays empty unless a new rule is
 // landed against existing content, in which case it holds that rule only while
 // its count is burned down.
@@ -50,8 +47,6 @@ function claim(text) {
   return words.replace(/^.*?\b(must not|must|should not|should|may)\b\s*/, '').trim();
 }
 
-const CONTRACTIONS = /\b(?:ain't|aren't|can't|couldn't|didn't|doesn't|don't|hadn't|hasn't|haven't|he'd|he'll|he's|how'd|how'll|how's|i'd|i'll|i'm|i've|isn't|it'd|it'll|it's|let's|mightn't|mustn't|shan't|she'd|she'll|she's|shouldn't|that's|there'd|there'll|there's|they'd|they'll|they're|they've|wasn't|we'd|we'll|we're|we've|weren't|what'd|what'll|what're|what's|what've|where'd|where'll|where's|who'd|who'll|who's|won't|wouldn't|you'd|you'll|you're|you've)\b/i;
-const AND_OR = /\band\/or\b/i;
 export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'AGENT_PROJECTION_ID',
   'ANCHOR_BROKEN',
@@ -176,52 +171,9 @@ function lineNumber(text, offset) {
   return text.slice(0, offset).split('\n').length;
 }
 
-function stripFences(lines) {
-  const result = [];
-  let fence = false;
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index];
-    const fenceMarkers = line.match(/```/g)?.length ?? 0;
-    if (fenceMarkers) {
-      if (fenceMarkers % 2 === 1) fence = !fence;
-      result.push({ line: '', number: index + 1, fenced: true });
-      continue;
-    }
-    result.push({ line: fence ? '' : line, number: index + 1, fenced: fence });
-  }
-  return result;
-}
 
-function visibleText(value) {
-  return value
-    .replace(/^\s*\*\*(?:Requirement|Deviation|Rationale|Example|Default|Replacement):\*\*\s*/i, '')
-    .replace(/`[^`]*`/g, ' TOKEN ')
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    .replace(/<https?:[^>]+>/g, ' URL ')
-    .replace(/https?:\/\/\S+/g, ' URL ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/[*_~]/g, '')
-    .replace(/\{#[^}]+\}/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
-function words(value) {
-  return visibleText(value).match(/[A-Za-z0-9][A-Za-z0-9@#%+&'./:-]*/g) ?? [];
-}
 
-function sentences(value) {
-  const text = visibleText(value)
-    .replace(/\b(?:Mr|Mrs|Ms|Dr|vs)\./g, (match) => match.replace('.', ''))
-    .replace(/\b[A-Z]\./g, (match) => match.replace('.', ''))
-    .replace(/\.(?=[A-Za-z0-9])/g, '')
-    .replace(/(?<=[A-Za-z0-9])\.(?=[A-Za-z0-9])/g, '')
-    .trim();
-  if (!text) return [];
-  const found = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) ?? [];
-  return found.map((item) => item.trim()).filter(Boolean);
-}
 
 function titleCase(value) {
   const small = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'with']);
@@ -354,86 +306,10 @@ function checkSectionOrder(relative, kind, sections, add) {
 }
 
 function checkProse(relative, raw, kind, add) {
+  // A recorded decision quotes external material verbatim, so the measures
+  // would report the quotation rather than the authoring.
   if (/(^|\/)reference\/decisions\//.test(relative)) return;
-  const lines = stripFences(raw.split(/\r?\n/));
-  let paragraph = [];
-  let list = [];
-
-  const scanTerms = (value, number) => {
-    const visible = visibleText(value);
-    for (const [term, pattern] of VAGUE_TERMS) {
-      if (pattern.test(visible)) add(relative, number, 'PROSE_VAGUE_TERM', `replace vague term '${term}'`);
-    }
-    const contraction = visible.match(CONTRACTIONS);
-    if (contraction) add(relative, number, 'PROSE_CONTRACTION', `replace contraction '${contraction[0]}' with its full form`);
-    if (AND_OR.test(visible)) add(relative, number, 'PROSE_AND_OR', "replace 'and/or' with an exact relationship");
-  };
-
-  const flushParagraph = () => {
-    if (!paragraph.length) return;
-    const number = paragraph[0].number;
-    const value = paragraph.map((item) => item.line).join(' ');
-    const found = sentences(value);
-    if (found.length > 6) add(relative, number, 'PROSE_PARAGRAPH_LENGTH', `paragraph has ${found.length} sentences; maximum is 6`);
-    for (const sentence of found) {
-      const count = words(sentence).length;
-      if (count > 25) add(relative, number, 'PROSE_SENTENCE_LENGTH', `sentence has ${count} words; maximum is 25: '${visibleText(sentence).slice(0, 120)}'`);
-    }
-    scanTerms(value, number);
-    paragraph = [];
-  };
-
-  const flushList = () => {
-    if (!list.length) return;
-    const number = list[0].number;
-    const value = list.map((item) => item.line).join(' ');
-    const content = value.replace(/^\s*(?:[-*+] |\d+\.\s+)/, '');
-    for (const sentence of sentences(content)) {
-      const count = words(sentence).length;
-      if (count > 20) add(relative, number, 'PROSE_LIST_LENGTH', `list sentence has ${count} words; maximum is 20: '${visibleText(sentence).slice(0, 120)}'`);
-    }
-    scanTerms(value, number);
-    list = [];
-  };
-
-  for (const item of lines) {
-    const line = item.line;
-    if (!line.trim()) {
-      flushParagraph();
-      flushList();
-      continue;
-    }
-    if (/^\s*(?:[-*+] |\d+\.\s+)/.test(line)) {
-      flushParagraph();
-      flushList();
-      list.push(item);
-      continue;
-    }
-    if (list.length && /^\s{2,}\S/.test(line)) {
-      list.push(item);
-      continue;
-    }
-    flushList();
-    if (/^#{1,6}\s/.test(line) || /^\s*</.test(line) || /^\s*---\s*$/.test(line)) {
-      flushParagraph();
-      continue;
-    }
-    if (/^\s*\|/.test(line)) {
-      flushParagraph();
-      if (!/^\s*\|?\s*:?-+/.test(line)) {
-        const cells = line.split('|').slice(1, -1);
-        for (const cell of cells) {
-          const count = words(cell).length;
-          if (count > 20) add(relative, item.number, 'PROSE_TABLE_CELL_LENGTH', `table cell has ${count} words; maximum is 20: '${visibleText(cell).slice(0, 120)}'`);
-          scanTerms(cell, item.number);
-        }
-      }
-      continue;
-    }
-    paragraph.push(item);
-  }
-  flushParagraph();
-  flushList();
+  checkProseMeasures(relative, raw, add);
 }
 
 function parsePage(relative, raw, add, globalIds, virtual = false) {

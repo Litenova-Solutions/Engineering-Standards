@@ -17,8 +17,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { checkProseMeasures, checkLanguage, compileLanguage } from './prose.mjs';
 
-const root = path.resolve(process.argv[2] ?? '.');
+// The root is the first argument that is not a flag, so an option can be passed
+// without being read as the consumer directory.
+const root = path.resolve(process.argv.slice(2).find((a) => !a.startsWith('--')) ?? '.');
 const errors = [];
 const err = (m) => errors.push(m);
 
@@ -147,7 +150,26 @@ const DATE_FORM = 'YYYY-MM-DD';
 const base = { kind: 1, id: 1, specStatus: 1, owner: 1, lastReviewed: 1 };
 // One record owns each of these boundaries. A directory index that owns no
 // boundary uses 'section-index', which may repeat.
-const SINGLETON_KINDS = new Set(['product', 'domain-index', 'glossary', 'modules-index']);
+const SINGLETON_KINDS = new Set(['product', 'domain-index', 'glossary', 'modules-index', 'scenario-cast']);
+// A kind whose absence is a finding rather than a stage the consumer has not
+// reached. Every Scenario section draws from one cast, so a documentation set
+// with scenarios and no cast has as many reference worlds as it has pages.
+// (CORE.SYSTEM.SCENARIO.003)
+const REQUIRED_SINGLETON_KINDS = new Set(['product', 'scenario-cast']);
+// The kinds whose subject is behavior a person experiences, and therefore the
+// kinds a reader cannot place without one concrete occasion.
+// (CORE.SYSTEM.SCENARIO.001)
+const SCENARIO_KINDS = new Set(['module', 'aggregate', 'use-case', 'domain-policy', 'end-to-end-flow']);
+// A scenario illustrates its page and never governs it. An identifier inside one
+// reads as a second definition of the rule it names, and two definitions drift.
+// (CORE.SYSTEM.SCENARIO.002)
+const RULE_ID = /\b(?:INV|POL|VAL|AC|E2E)-[A-Z0-9][A-Z0-9-]*\b/;
+const SCENARIO_WORD_DEFAULT = 120;
+const declaredWordLimit = project.scenarioWordLimit;
+if (declaredWordLimit !== undefined && (!Number.isInteger(declaredWordLimit) || declaredWordLimit < 40)) {
+  err('standards.project.json: scenarioWordLimit must be an integer of at least 40');
+}
+const scenarioWordLimit = Number.isInteger(declaredWordLimit) && declaredWordLimit >= 40 ? declaredWordLimit : SCENARIO_WORD_DEFAULT;
 const KINDS = {
   product: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   'domain-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
@@ -156,6 +178,9 @@ const KINDS = {
   // A directory index that claims no implemented behavior and owns no aggregate,
   // use case, or policy. It carries the base fields and nothing else.
   'section-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
+  // The one reference cast every Scenario section draws from. It is informative,
+  // owns no rule, and carries the base fields and nothing else.
+  'scenario-cast': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
   aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: UC },
   'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: UC },
@@ -224,6 +249,21 @@ function parseBlock(raw, rel) {
   if (end < 0) { err(`${rel}: unterminated metadata block`); return null; }
   try { return JSON.parse(raw.slice(3, end).trim()); }
   catch (e) { err(`${rel}: JSON parse error: ${e.message}`); return null; }
+}
+
+// A section body is the text between its own H2 and the next one. A check that
+// read the whole page instead would find, in the rules table, exactly the
+// identifiers the Scenario section is not allowed to carry.
+function sectionBody(raw, name) {
+  const lines = raw.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === `## ${name}`);
+  if (start < 0) return null;
+  const body = [];
+  for (let i = start + 1; i < lines.length; i += 1) {
+    if (/^##\s/.test(lines[i])) break;
+    body.push(lines[i]);
+  }
+  return body.join('\n');
 }
 
 // A use-case file lives directly in its module directory, or in a single
@@ -321,6 +361,23 @@ for (const f of files) {
     const ok = parts.length === 3 && parts[0] === mod && parts[1] === agg && parts[2] === 'README.md';
     if (!ok) err(`${rel}: aggregate id '${meta.id}' does not match its path`);
   }
+  // Every other section on these pages states a rule, a state, or a mapping,
+  // and none of them says when the behavior happens or who is under pressure
+  // while it does. (CORE.SYSTEM.SCENARIO.001, CORE.SYSTEM.SCENARIO.002,
+  // CORE.SYSTEM.CONVENTION.007)
+  if (SCENARIO_KINDS.has(meta.kind)) {
+    const scenario = sectionBody(raw, 'Scenario');
+    if (scenario === null) {
+      err(`${rel}: no 'Scenario' section; kind '${meta.kind}' states one concrete occasion for its subject`);
+    } else {
+      const words = scenario.trim().split(/\s+/).filter(Boolean);
+      if (!words.length) err(`${rel}: 'Scenario' section is empty`);
+      else if (words.length > scenarioWordLimit) err(`${rel}: 'Scenario' section runs to ${words.length} words; the bound is ${scenarioWordLimit}, because a scenario that grows past a paragraph becomes the page a reader reads instead of the tables`);
+      const cited = scenario.match(RULE_ID);
+      if (cited) err(`${rel}: 'Scenario' section names ${cited[0]}; a scenario illustrates its page and carries no rule, acceptance, or end-to-end identifier`);
+    }
+  }
+
   // extension scope checks
   if (Array.isArray(meta.applicableExtensions) && extScope.size) {
     for (const id of meta.applicableExtensions) {
@@ -340,7 +397,7 @@ for (const kind of SINGLETON_KINDS) {
   const found = singletons.get(kind) ?? [];
   if (found.length === 1) continue;
   if (!found.length) {
-    if (kind === 'product') err(`Expected exactly one ${kind} specification, found 0`);
+    if (REQUIRED_SINGLETON_KINDS.has(kind)) err(`Expected exactly one ${kind} specification, found 0`);
     continue;
   }
   err(`Expected at most one ${kind} specification, found ${found.length}: ${found.join(', ')}`);
@@ -386,9 +443,119 @@ if (uiActivated) {
   }
 }
 
+// ---- language and controlled prose -----------------------------------------
+// The language record closes the project's vocabulary and its mannered terms.
+// (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.VOICE.002)
+// The prose measures are the profile in docs/core/authoring.md, applied to the
+// consumer tree rather than only to the standards repository.
+// (CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003)
+let languageSummary = '';
+{
+  const languagePath = project.paths?.language;
+  const languageFile = languagePath ? path.join(root, languagePath) : path.join(docsRoot, 'language.json');
+  let compiled = null;
+  if (fs.existsSync(languageFile)) {
+    let record;
+    try { record = readJson(languageFile); } catch (e) { err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: not valid JSON (${e.message})`); }
+    if (record) {
+      if (record.schemaVersion !== 1) err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: schemaVersion must be 1`);
+      if (!Array.isArray(record.terms) || !Array.isArray(record.mannered)) {
+        err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: 'terms' and 'mannered' must both be arrays`);
+      } else {
+        let usable = true;
+        for (const entry of record.terms) {
+          if (!entry.term || !Array.isArray(entry.rejected) || !entry.rejected.length) { err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: every term needs 'term' and a non-empty 'rejected'`); usable = false; continue; }
+          // A scope that does not compile silently rejects nothing, which is the
+          // fail-open shape this validator exists to refuse. The record is not
+          // compiled afterwards, because compiling it would throw the same error
+          // as an unhandled crash and print no diagnostic at all.
+          if (entry.scope) { try { new RegExp(entry.scope); } catch { err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: term '${entry.term}' has a scope that is not a regular expression: '${entry.scope}'`); usable = false; } }
+        }
+        if (usable) compiled = compileLanguage(record);
+      }
+    }
+  } else if (languagePath) {
+    err(`standards.project.json: paths.language '${languagePath}' does not exist; the vocabulary and mannered-term checks resolve nothing`);
+  }
+
+  // A page carries accepted prose debt only while nobody has re-read it. The
+  // baseline records the count and the lastReviewed date it was accepted at, so
+  // a page whose date moves has been read against the code and leaves the
+  // baseline in the same change. (CORE.AUTHORING.PROSE.003)
+  const baselinePath = project.prose?.baseline;
+  const baselineFile = baselinePath ? path.join(root, baselinePath) : path.join(docsRoot, 'prose-baseline.json');
+  let baseline = {};
+  if (fs.existsSync(baselineFile)) {
+    try { baseline = readJson(baselineFile).pages ?? {}; } catch (e) { err(`${path.relative(root, baselineFile).replace(/\\/g, '/')}: not valid JSON (${e.message})`); }
+  }
+  const reviewedOf = new Map(metas.map((m) => [m.rel, m.meta.lastReviewed]));
+
+  // AGENTS.md is scanned for language even though it carries no metadata and
+  // sits outside the documentation root. It is the first file an agent reads,
+  // so its register is the register that gets copied into every page written
+  // afterwards, and a rule the exemplar breaks is a rule that does not hold.
+  const agentsFile = path.join(root, 'AGENTS.md');
+  const languageFiles = fs.existsSync(agentsFile) ? [...files, agentsFile] : files;
+
+  const languageFindings = [];
+  const proseCounts = new Map();
+  for (const f of languageFiles) {
+    const rel = path.relative(root, f).replace(/\\/g, '/');
+    const raw = fs.readFileSync(f, 'utf8');
+    // A scope is written against the documentation root. AGENTS.md sits above
+    // it, so it matches no scoped rule and is checked by the mannered list.
+    const scopeRel = f === agentsFile ? rel : path.relative(docsRoot, f).replace(/\\/g, '/');
+    checkLanguage(scopeRel, raw, compiled, (_r, line, code, message) => {
+      languageFindings.push(`${rel}:${line}: ${code} ${message}`);
+    });
+    if (f === agentsFile) continue;
+    let count = 0;
+    checkProseMeasures(rel, raw, () => { count += 1; });
+    if (count) proseCounts.set(rel, count);
+  }
+
+  // Every language finding is an error. The vocabulary is the project's own, so
+  // a term it rejects is a term it chose to reject.
+  for (const finding of languageFindings) err(finding);
+
+  let accepted = 0;
+  for (const [rel, count] of proseCounts) {
+    const entry = baseline[rel];
+    if (!entry) { err(`${rel}: ${count} controlled-prose problem(s) and no prose baseline entry; run 'node standards/tools/validate-consumer.mjs --prose' to list them`); continue; }
+    if (count > entry.count) { err(`${rel}: controlled-prose problems grew from ${entry.count} to ${count}; the baseline records accepted debt and does not absorb new debt`); continue; }
+    const reviewed = reviewedOf.get(rel);
+    if (reviewed && entry.lastReviewed && reviewed > entry.lastReviewed) {
+      err(`${rel}: lastReviewed moved to ${reviewed} while ${count} controlled-prose problem(s) remain; a page read against the code leaves the prose baseline in the same change`);
+      continue;
+    }
+    accepted += 1;
+  }
+  for (const rel of Object.keys(baseline)) {
+    if (!proseCounts.has(rel)) err(`${rel}: listed in the prose baseline and now clean; remove the entry so the baseline states real debt`);
+  }
+  const manneredCount = languageFindings.filter((f) => f.includes('LANGUAGE_MANNERED_TERM')).length;
+  const rejectedCount = languageFindings.length - manneredCount;
+  languageSummary = compiled
+    ? `Language: ${manneredCount} mannered term(s), ${rejectedCount} rejected synonym(s); prose baseline covers ${accepted} page(s)`
+    : `Language: no language record found; the vocabulary and mannered-term checks did not run`;
+
+  // --prose lists the measures behind the counts, which is what a person needs
+  // to burn a page down. The check itself stays on by default.
+  if (process.argv.includes('--prose')) {
+    const detail = [];
+    for (const f of files) {
+      const rel = path.relative(root, f).replace(/\\/g, '/');
+      checkProseMeasures(rel, fs.readFileSync(f, 'utf8'), (r, line, code, message) => detail.push(`${r}:${line}: ${code} ${message}`));
+    }
+    console.log(`\nControlled prose (${detail.length}):`);
+    for (const d of detail) console.log(`  - ${d}`);
+  }
+}
+
 // ---- report ----------------------------------------------------------------
 console.log(`Consumer: ${root}`);
 console.log(`Files scanned: ${files.length} under ${docsPath}, metadata blocks: ${metas.length}`);
+console.log(languageSummary);
 console.log(`Acceptance ids: ${acDefs.size}, end-to-end test ids: ${e2eDefs.size}`);
 if (uiOutput) console.log(`\n${uiOutput}`);
 if (errors.length) {

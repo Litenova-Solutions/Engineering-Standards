@@ -51,6 +51,12 @@ const VALUES = {
   __RELEASE_RECORD_ID__: '2026-01-01-fixture',
   __VERSION__: '1.0.0',
   __RUNBOOK_ID__: 'restore-database',
+  __CAST__: 'scenarios',
+  __CAST_TITLE__: 'The Reference Cast',
+  __ORGANIZATION__: 'Fixture Promotions',
+  __PERSON__: 'Sanne',
+  __AMOUNT__: 'ticket price',
+  __SITUATION__: 'The onsale minute',
   'YYYY-MM-DD': '2026-01-01',
 };
 
@@ -60,6 +66,7 @@ const LAYOUT = [
   ['end-to-end-flow.md', 'docs/product/flows/event-sales.md'],
   ['domain-index.md', 'docs/domain/README.md'],
   ['glossary.md', 'docs/domain/glossary.md'],
+  ['scenario-cast.md', 'docs/domain/scenarios.md'],
   ['modules-index.md', 'docs/domain/modules/README.md'],
   ['module.md', 'docs/domain/modules/orders/README.md'],
   ['use-case.md', 'docs/domain/modules/orders/cancel-order.md'],
@@ -127,14 +134,25 @@ function run() {
 
 function report(name, expectation, output) {
   const problems = output.split('\n').filter((line) => line.startsWith('  - ')).map((line) => line.slice(4));
-  const matched = expectation === null ? problems.length === 0 : problems.some((problem) => problem.includes(expectation));
+  // Three expectation forms: null for a clean run, a string the output must
+  // carry, and { absent } for a diagnostic the output must not carry. The third
+  // exists because a case that narrows one setting can make an unrelated rule
+  // fire, and 'no problems at all' would then assert the wrong thing.
+  const matched = expectation === null
+    ? problems.length === 0
+    : typeof expectation === 'object'
+      ? !problems.some((problem) => problem.includes(expectation.absent))
+      : problems.some((problem) => problem.includes(expectation));
   if (matched) {
     console.log(`  pass  ${name}`);
     return;
   }
   failures += 1;
   console.log(`  FAIL  ${name}`);
-  console.log(`        expected: ${expectation === null ? 'no problems' : expectation}`);
+  const wanted = expectation === null
+    ? 'no problems'
+    : typeof expectation === 'object' ? `no problem naming ${expectation.absent}` : expectation;
+  console.log(`        expected: ${wanted}`);
   for (const problem of problems) console.log(`        actual:   ${problem}`);
 }
 
@@ -153,6 +171,14 @@ function fileCase(name, relative, contents, expectation) {
   writeFile(relative, contents);
   report(name, expectation, run());
   fs.rmSync(path.join(fixture, relative));
+}
+
+// Replace text in one specification's body, assert the outcome, then restore it.
+function bodyCase(name, relative, transform, expectation) {
+  const original = readFixture(relative);
+  writeFile(relative, transform(original));
+  report(name, expectation, run());
+  writeFile(relative, original);
 }
 
 // Mutate standards.project.json, assert the outcome, then restore it.
@@ -192,7 +218,7 @@ fileCase(
     'page outside the configured documentation root is not scanned',
     'docs/domain/modules/orders/unscanned.md',
     `---\n${JSON.stringify({ kind: 'invented', id: 'unscanned', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Unscanned\n`,
-    null,
+    { absent: "unknown kind 'invented'" },
   );
   writeFile('standards.project.json', originalProject);
 }
@@ -257,7 +283,7 @@ report('flat single-aggregate module resolves', null, run());
 fileCase(
   'nested aggregate subdirectory resolves',
   'docs/domain/modules/orders/order-claims/claim-guest-order.md',
-  `---\n${JSON.stringify({ kind: 'use-case', id: 'orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n`,
+  `---\n${JSON.stringify({ kind: 'use-case', id: 'orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n\n## Scenario\n\nSanne claims the order she placed as a guest on the morning after the show.\n`,
   null,
 );
 fileCase(
@@ -333,6 +359,162 @@ fileCase(
   `---\n${JSON.stringify({ kind: 'decision-evidence', id: 'bad-record', specStatus: 'final', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Bad record\n`,
   "bad specStatus 'final'",
 );
+
+console.log('\nScenario sections (CORE.SYSTEM.SCENARIO.001, CORE.SYSTEM.SCENARIO.002, CORE.SYSTEM.SCENARIO.003, CORE.SYSTEM.CONVENTION.007)');
+bodyCase(
+  'behavior specification with no Scenario section',
+  'docs/domain/modules/orders/cancel-order.md',
+  (raw) => raw.replace(/## Scenario[\s\S]*?(?=## Trigger)/, ''),
+  "no 'Scenario' section",
+);
+bodyCase(
+  'Scenario section with no prose',
+  'docs/domain/modules/orders/cancel-order.md',
+  (raw) => raw.replace(/## Scenario[\s\S]*?(?=## Trigger)/, '## Scenario\r\n\r\n'),
+  "'Scenario' section is empty",
+);
+bodyCase(
+  'Scenario section naming an aggregate invariant',
+  'docs/domain/modules/orders/order-claims/README.md',
+  (raw) => raw.replace(/## Scenario(\r?\n){2}/, '## Scenario\r\n\r\nSanne cancels the order, which INV-ORDERS-01 permits.\r\n\r\n'),
+  'names INV-ORDERS-01',
+);
+bodyCase(
+  'Scenario section past the word bound',
+  'docs/domain/modules/orders/README.md',
+  (raw) => raw.replace(/## Scenario(\r?\n){2}/, `## Scenario\r\n\r\n${'word '.repeat(200)}\r\n\r\n`),
+  'the bound is 120',
+);
+projectCase('scenarioWordLimit below the accepted floor', (p) => { p.scenarioWordLimit = 10; }, 'scenarioWordLimit must be an integer of at least 40');
+{
+  // A consumer that raises the bound has the raised value applied, so the
+  // convention is replaceable in fact and not only in its wording.
+  const originalProject = readFixture('standards.project.json');
+  const project = JSON.parse(originalProject);
+  project.scenarioWordLimit = 400;
+  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  // 200 words: over the 120 default and under the raised 400, so the case
+  // proves the raise applied. They are shaped as 4-word sentences in 5-sentence
+  // paragraphs because the controlled prose measures also read this page, and
+  // one 200-word run would report a sentence-length problem rather than the
+  // scenario bound this case is about.
+  const scenarioBody = Array.from({ length: 10 }, () => 'word word word word. '.repeat(5).trim()).join('\r\n\r\n');
+  bodyCase(
+    'Scenario section within a raised word bound',
+    'docs/domain/modules/orders/README.md',
+    (raw) => raw.replace(/## Scenario(\r?\n){2}/, `## Scenario\r\n\r\n${scenarioBody}\r\n\r\n`),
+    null,
+  );
+  writeFile('standards.project.json', originalProject);
+}
+fileCase(
+  'second reference cast',
+  'docs/domain/other-scenarios.md',
+  `---\n${JSON.stringify({ kind: 'scenario-cast', id: 'other-scenarios', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Other scenarios\n`,
+  'found 2',
+);
+{
+  // The cast is the one record every Scenario section draws from, so its
+  // absence is a finding rather than a stage the consumer has not reached.
+  const original = readFixture('docs/domain/scenarios.md');
+  fs.rmSync(path.join(fixture, 'docs/domain/scenarios.md'));
+  report('documentation set with no reference cast', 'Expected exactly one scenario-cast specification, found 0', run());
+  writeFile('docs/domain/scenarios.md', original);
+}
+
+console.log('\nProject language (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.VOICE.002)');
+{
+  const languageFile = 'docs/language.json';
+  const record = {
+    schemaVersion: 1,
+    terms: [{ term: 'holder', rejected: ['seller'], scope: '^domain/modules/orders/', reason: 'seller names the organizer' }],
+    mannered: [{ term: 'load-bearing', instead: 'required' }],
+  };
+  writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
+
+  report('language record with no violation present', null, run());
+
+  bodyCase(
+    'rejected synonym inside its scope',
+    'docs/domain/modules/orders/README.md',
+    (raw) => `${raw}\nThe seller keeps the ticket.\n`,
+    'LANGUAGE_REJECTED_SYNONYM',
+  );
+
+  // The same word outside the scope is correct, so the scope has to be the
+  // thing that decides rather than the word.
+  bodyCase(
+    'rejected synonym outside its scope',
+    'docs/domain/glossary.md',
+    (raw) => `${raw}\nThe seller keeps the ticket.\n`,
+    { absent: 'LANGUAGE_REJECTED_SYNONYM' },
+  );
+
+  bodyCase(
+    'mannered term anywhere',
+    'docs/domain/glossary.md',
+    (raw) => `${raw}\nThat rule is load-bearing.\n`,
+    'LANGUAGE_MANNERED_TERM',
+  );
+
+  // A word is matched on its own, so a rejection of 'seller' leaves a longer
+  // word containing it alone.
+  bodyCase(
+    'rejected synonym as part of a longer word',
+    'docs/domain/modules/orders/README.md',
+    (raw) => `${raw}\nThe sellerships remain open.\n`,
+    { absent: 'LANGUAGE_REJECTED_SYNONYM' },
+  );
+
+  // A fenced block is code, and code carries the rejected name because the
+  // identifier is what it is called.
+  bodyCase(
+    'rejected synonym inside a fenced block',
+    'docs/domain/modules/orders/README.md',
+    (raw) => `${raw}\n\`\`\`text\nseller\n\`\`\`\n`,
+    { absent: 'LANGUAGE_REJECTED_SYNONYM' },
+  );
+
+  // A scope that does not compile would reject nothing while reporting a pass,
+  // which is the fail-open shape the validator refuses elsewhere.
+  writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'holder', rejected: ['seller'], scope: '^domain/[' }] }, null, 2)}\n`);
+  report('language scope that is not a regular expression', 'is not a regular expression', run());
+
+  fs.rmSync(path.join(fixture, languageFile));
+  report('no language record present', null, run());
+}
+
+console.log('\nControlled prose in consumer documentation (CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003)');
+{
+  const page = 'docs/domain/modules/orders/README.md';
+  const original = readFixture(page);
+  const longSentence = `\n${'word '.repeat(30).trim()}.\n`;
+  writeFile(page, `${original}${longSentence}`);
+  report('measure violation with no baseline entry', 'controlled-prose problem(s) and no prose baseline entry', run());
+
+  const reviewed = splitMeta(original).meta.lastReviewed;
+  writeFile('docs/prose-baseline.json', `${JSON.stringify({ pages: { [page]: { count: 1, lastReviewed: reviewed } } }, null, 2)}\n`);
+  report('measure violation recorded in the baseline', null, run());
+
+  // Debt is accepted at a count. A page that grows past it is reported even
+  // though the page is listed, because a baseline that absorbs new debt is an
+  // exemption rather than a record.
+  writeFile(page, `${original}${longSentence}${longSentence}`);
+  report('baselined page whose debt grew', 'controlled-prose problems grew from 1 to 2', run());
+
+  // A page read against the code leaves the baseline in the same change.
+  writeFile(page, `${original}${longSentence}`);
+  const advanced = splitMeta(original);
+  advanced.meta.lastReviewed = '2099-01-01';
+  writeFile(page, `${joinMeta(advanced.meta, advanced.body)}${longSentence}`);
+  report('baselined page whose lastReviewed advanced', 'leaves the prose baseline in the same change', run());
+
+  writeFile(page, original);
+  report('baseline entry for a page that is now clean', 'listed in the prose baseline and now clean', run());
+
+  fs.rmSync(path.join(fixture, 'docs/prose-baseline.json'));
+  writeFile(page, original);
+}
 
 fs.rmSync(fixture, { recursive: true, force: true });
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);

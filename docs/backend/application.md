@@ -5,6 +5,8 @@
 
 Application coordinates use cases. It translates a command or query into domain and persistence work, applies structural input validation, and returns a transport-neutral result. It does not contain HTTP behavior or provider implementations.
 
+Every folder in the project is a module, an aggregate, or a use case. The contracts more than one module names live in the sibling `Application.Abstractions` project, and the pipeline's own machinery lives in one folder named for it.
+
 ## Agent Summary {#agent-summary}
 
 
@@ -17,16 +19,16 @@ Application coordinates use cases. It translates a command or query into domain 
 - Command handlers load, call Domain, stage, and return. (BACKEND.APPLICATION.COMMAND.001)
 - Queries project through the read session, never through aggregates. (BACKEND.APPLICATION.QUERY.001)
 - Results mirror the Domain closed set rather than flattening it. (BACKEND.APPLICATION.CLOSEDSET.001)
-- Ports name the business action and own their request and result types. (BACKEND.APPLICATION.PORT.001)
+- Ports name the business action, own their types, and sit with the module that owns their aggregates. (BACKEND.APPLICATION.PORT.001, BACKEND.APPLICATION.PORT.002)
 
 ## Standards
 
 
 ### Organize Application by operation (BACKEND.APPLICATION.STRUCTURE.001)
 
-**Requirement:** Each command or query MUST own one operation folder under its module holding its message, result, validator, handler, and mapping. A message that declares a value the pipeline reads MUST declare it through `IMessageDefinition<TMessage>.Describe` in a `{UseCase}Definition` in the same folder, or as an attribute on the message itself where the value is a constant and the position is an exemption.
+**Requirement:** Each command or query MUST own one operation folder under its module holding its message, result, validator, handler, mapping, and definition of pipeline-read values.
 
-**Rationale:** Grouping by technical type scatters one operation across the project. Type names share the use-case prefix and end in the `Command` or `Query` role. A definition keeps what the pipeline needs to know about an operation beside the operation rather than in a registry the reader has to go find.
+**Rationale:** Grouping by technical type scatters one operation across the project. Type names share the use-case prefix and end in the `Command` or `Query` role. A message declares a value the pipeline reads through `IMessageDefinition<TMessage>.Describe` in a `{UseCase}Definition` in the same folder. An attribute on the message itself carries the value instead, where the value is a constant and the position is an exemption. A definition keeps what the pipeline needs to know beside the operation, rather than in a registry the reader has to find.
 
 ### Use specific LiteBus entry points (BACKEND.APPLICATION.MEDIATOR.001)
 
@@ -44,7 +46,7 @@ Application coordinates use cases. It translates a command or query into domain 
 
 **Requirement:** A validator MUST limit its checks to structural input, leaving aggregate state decisions to Domain.
 
-**Rationale:** Domain owns state permission. A validator rejects an empty title, malformed identifier, or invalid page size. It reports what it finds as a `Validity` rather than throwing, so every validator for a message runs and the caller is told about the whole form in one answer. `ValidationFailure` carries exactly a member, a code, and a message, and carries no HTTP status.
+**Rationale:** Domain owns state permission. A validator rejects an empty title, malformed identifier, or invalid page size. It reports what it finds as a `Validity` rather than throwing. Every validator for a message therefore runs, and the caller is told about the whole form in one answer. `ValidationFailure` carries exactly a member, a code, and a message, and carries no HTTP status.
 
 ### Model expected use-case failures explicitly (BACKEND.APPLICATION.FAILURE.001)
 
@@ -54,9 +56,11 @@ Application coordinates use cases. It translates a command or query into domain 
 
 ### Enforce target authorization in the pipeline (BACKEND.APPLICATION.AUTHZ.001)
 
-**Requirement:** A message an account can take MUST declare the action and the resource it requires, and the decision MUST be made by the authorization guard rather than inside the handler. Ownership, tenant, role, state or delegated access is resolved against the target data through an `IScopeOwnerLookup` for the record the message names.
+**Requirement:** The authorization guard, not the handler, MUST authorize every message an account can take, from the action and resource that message declares.
 
-**Rationale:** WebApi may enforce coarse authenticated, role, or scope policies first. It cannot replace an authorization decision that depends on business data. Making the decision once, from a declaration, is what stops two messages about the same record asking different questions, and what lets composition refuse to start when a message states no position at all. A refusal is reported as a denial rather than raised, so a refused attempt reaches the audit trail beside the ones that succeeded. A collection query carries its authorized scope in the database predicate.
+**Rationale:** Ownership, tenant, role, state or delegated access is resolved against the target data through an `IScopeOwnerLookup` for the record the message names. WebApi may enforce coarse authenticated, role, or scope policies first. It cannot replace an authorization decision that depends on business data.
+
+Making the decision once, from a declaration, stops two messages about the same record asking different questions. It also lets composition refuse to start when a message states no position at all. A refusal is reported as a denial rather than raised, so a refused attempt reaches the audit trail beside the ones that succeeded. A collection query carries its authorized scope in the database predicate.
 
 ### Keep command handlers narrow (BACKEND.APPLICATION.COMMAND.001)
 
@@ -81,6 +85,14 @@ Application coordinates use cases. It translates a command or query into domain 
 **Requirement:** Application MUST declare a public port interface named for its business action, with a narrow surface and project-owned types.
 
 **Rationale:** Provider names and transport models stay in Infrastructure, so a provider change does not reach Application.
+
+### Declare a port where its consumers meet (BACKEND.APPLICATION.PORT.002)
+
+**Requirement:** A port MUST be declared at the lowest folder holding every consumer that names it, following `BACKEND.ARCHITECTURE.PLACEMENT.001`.
+
+**Rationale:** A port whose consumers sit in one module is declared in that module beside the aggregate it serves. Only a port more than one module names is declared in `Application.Abstractions`. Collecting every port in one folder because they share the word "port" is grouping by technical type. `BACKEND.APPLICATION.STRUCTURE.001` rejects that grouping one level down for the same reason.
+
+A port declared beside its aggregate is reviewed with that aggregate's specification; a port in a project-wide folder is reviewed by nobody. Where a port serves aggregates in one module but is called from another, the declaring module is the one that owns the aggregates. That module is the one whose rules change when the port changes.
 
 ### Keep event reaction implementations explicit (BACKEND.APPLICATION.REACTION.001)
 
@@ -112,19 +124,21 @@ Application coordinates use cases. It translates a command or query into domain 
 **Example:**
 
 ```text
+{ProjectName}.Application.Abstractions/     contracts more than one module names
+  Clock/
+    IClock.cs
+  Failures/
+    ResourceNotFoundException.cs
+    UseCaseForbiddenException.cs
+    UseCaseConflictException.cs
+  Validation/
+    ValidationErrors.cs
 {ProjectName}.Application/
-  Shared/
-    Clock/
-      IClock.cs
-    Validation/
-      ValidationError.cs
-      CommandValidationException.cs
-      QueryValidationException.cs
-    Failures/
-      ResourceNotFoundException.cs
-      UseCaseForbiddenException.cs
-      UseCaseConflictException.cs
+  Pipeline/                         the pipeline's own stages, and nothing else
+    ApplicationPipeline.cs
+    AuthorizationGuard.cs
   Posts/                            single aggregate whose name matches the module: operations sit directly under the module
+    IPostArchive.cs                 a port several Posts use cases name
     CreateDraft/
       CreateDraftCommand.cs
       CreateDraftCommandResult.cs
@@ -141,12 +155,12 @@ Application coordinates use cases. It translates a command or query into domain 
       ListPostsQueryResultItem.cs
       ListPostsQueryValidator.cs
       ListPostsQueryHandler.cs
-    FollowUps/
-      OnPostPublished/
-        NotifySubscribersOnPostPublishedHandler.cs
-        IPostPublicationNotifier.cs
+    OnPostPublished/
+      NotifySubscribersOnPostPublishedHandler.cs
+      IPostPublicationNotifier.cs   a port one use case names
   Audience/                         two aggregates: operations nest under each aggregate
     BuyerAccounts/
+      BuyerAccountScopeLookup.cs    aggregate-owned, so it sits with the aggregate
       RestrictAccount/
         RestrictAccountCommand.cs
         RestrictAccountCommandHandler.cs
@@ -154,16 +168,11 @@ Application coordinates use cases. It translates a command or query into domain 
       GrantConsent/
         GrantConsentCommand.cs
         GrantConsentCommandHandler.cs
-  Workflows/
-    PublicationDelivery/
-      PublicationDeliveryWorkflow.cs
-      PublicationDeliveryWorkflowState.cs
-      PublicationDeliveryWorkflowOrchestrator.cs
-      AdvancePublicationDeliveryWorkflowCommand.cs
-      AdvancePublicationDeliveryWorkflowCommandHandler.cs
 ```
 
-The folder hierarchy follows `BACKEND.ARCHITECTURE.MODULE.001`: module, then aggregate, then operation. A single-aggregate module places its operation folders directly under the module only when the aggregate root's plural name equals the module name. Otherwise, and for any module with more than one aggregate, operation folders nest under the aggregate the use case targets. The example creates `Shared` children only for types used by multiple modules.
+The folder hierarchy follows `BACKEND.ARCHITECTURE.MODULE.001`: module, then aggregate, then operation. A single-aggregate module places its operation folders directly under the module only when the aggregate root's plural name equals the module name. Otherwise, and for any module with more than one aggregate, operation folders nest under the aggregate the use case targets.
+
+Only a use case gets a folder. A type that is not a use case sits flat in the folder that owns it, chosen by `BACKEND.ARCHITECTURE.PLACEMENT.001`. A reader can then take every folder name below a module as the name of one operation. A folder named for a service, a technical kind, or a caller breaks that reading and is drift rather than a second convention.
 
 ### Keep messages immutable (BACKEND.APPLICATION.CONVENTION.002)
 
@@ -286,16 +295,17 @@ Infrastructure stages Workflow state and the outgoing Command in the same sessio
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BACKEND.APPLICATION.STRUCTURE.001 | static | `ArchitectureTests` asserts each operation folder holds one message and its matching result, validator, and handler; composition refuses to start when a message declares no position on a value the pipeline requires, and `docs/operations/audit-catalogue.md` is regenerated from those declarations rather than maintained. |
+| BACKEND.APPLICATION.STRUCTURE.001 | static | `ArchitectureTests` asserts each operation folder holds one message, result, validator, handler, and definition, and composition refuses undeclared pipeline values. |
 | BACKEND.APPLICATION.MEDIATOR.001 | inspection | `ArchitectureTests` asserts no dispatch path resolves a shared bus abstraction over the two pinned mediators. |
 | BACKEND.APPLICATION.CONTRACTS.001 | inspection | `ArchitectureTests` asserts handler and validator types are internal and sealed while messages and results carry their role suffix. |
 | BACKEND.APPLICATION.VALIDATION.001 | inspection | `ValidationTests` asserts each validator rejects structural input and defers state decisions to the aggregate. |
 | BACKEND.APPLICATION.FAILURE.001 | inspection | `UseCaseFailureTests` asserts each expected failure surfaces its stable code with no transport or provider detail attached. |
-| BACKEND.APPLICATION.AUTHZ.001 | static | Composition requires every command and query an account can take to declare a `RequiredAuthorization` or record an exemption from it; `PipelineStageTests` asserts no handler resolves the authorizer for itself, and `PipelineCompositionTests` asserts the guards cover exactly the messages intended. |
-| BACKEND.APPLICATION.COMMAND.001 | static | `PipelineStageTests` asserts no command handler commits a session, writes the audit trail, or authorizes for itself; `ArchitectureTests` asserts none catches a domain exception or references an HTTP type. |
+| BACKEND.APPLICATION.AUTHZ.001 | static | Composition requires a `RequiredAuthorization` or an exemption per message; `PipelineStageTests` asserts no handler authorizes itself, and `PipelineCompositionTests` asserts guard coverage. |
+| BACKEND.APPLICATION.COMMAND.001 | static | `PipelineStageTests` asserts no command handler commits, audits, or authorizes; `ArchitectureTests` asserts none catches domain exceptions or references HTTP types. |
 | BACKEND.APPLICATION.QUERY.001 | inspection | `ArchitectureTests` asserts no query handler resolves a repository or returns an aggregate type. |
 | BACKEND.APPLICATION.CLOSEDSET.001 | inspection | `ResultContractTests` asserts each result union carries one record per Domain case and exposes no Domain type. |
 | BACKEND.APPLICATION.PORT.001 | inspection | `ArchitectureTests` asserts no Application port signature names a provider type or transport model. |
+| BACKEND.APPLICATION.PORT.002 | static | `ArchitectureTests` asserts every contracts-project port is named by more than one module; no module-owned port sits outside its aggregates' module. |
 | BACKEND.APPLICATION.REACTION.001 | inspection | `ReactionTests` asserts each reaction runs under the delivery classification its specification declares. |
 | BACKEND.APPLICATION.ORCHESTRATION.001 | inspection | `ArchitectureTests` asserts no command handler resolves or calls the command mediator. |
 | BACKEND.APPLICATION.WORKFLOW.001 | inspection | `WorkflowOrchestrationTests` asserts the orchestrator stages progress and its outgoing command in one transaction. |

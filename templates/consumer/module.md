@@ -14,6 +14,10 @@
 
 State the domain area, its language, and the outcomes its use cases support. A module organizes specifications and code. It is not a transaction or deployment boundary.
 
+## Scenario
+
+State the occasion this module exists for: what its actors are doing, when it happens in the subject's life, and what they use today instead. Draw the people, place, dates, and amounts from the reference cast record. This section is informative. It defines no term, rule, or state.
+
 ## Actors
 
 - Name each actor and responsibility in this module.

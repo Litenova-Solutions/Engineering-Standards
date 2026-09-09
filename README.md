@@ -19,7 +19,7 @@ Standards v1.15.0 targets one bounded-context business application. The `dotnet-
 ## What It Defines
 
 - Product and domain specifications that own approved intent.
-- Domain, Application, Infrastructure, and WebApi boundaries.
+- Domain, Application.Abstractions, Application, Infrastructure, and WebApi boundaries.
 - Implementation conventions for backend and frontend work.
 - Verification, security, operations, and release evidence.
 - Conditional extensions for capabilities outside the baseline.
