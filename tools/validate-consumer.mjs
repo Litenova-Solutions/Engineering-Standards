@@ -181,10 +181,13 @@ const KINDS = {
   // The one reference cast every Scenario section draws from. It is informative,
   // owns no rule, and carries the base fields and nothing else.
   'scenario-cast': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
-  // Three documentation kinds. None describes behavior a person experiences, so
-  // none carries a Scenario, and none is a singleton. Each declares the H2 order
-  // its class answers at, because a command page that omits Underneath hides the
-  // mechanism it wraps. (CORE.AUTHORING.DISCLOSURE.002, CORE.AUTHORING.DISCLOSURE.003)
+  // Five documentation kinds, one per layer a reader arrives at. None describes
+  // behavior a person experiences, so none carries a Scenario, and none is a
+  // singleton. Each declares the H2 order its class answers at, because a command
+  // page that omits Underneath hides the mechanism it wraps.
+  // (CORE.AUTHORING.DISCLOSURE.002, CORE.AUTHORING.DISCLOSURE.003)
+  tutorial: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Purpose', 'Prerequisites', 'Lesson', 'What you built'] },
+  'how-to': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Purpose', 'Procedure', 'Verification'] },
   reference: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Reference'] },
   command: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'] },
   configuration: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Settings', 'Precedence'] },

@@ -10,6 +10,8 @@
     { "$ref": "#/$defs/modulesIndex" },
     { "$ref": "#/$defs/sectionIndex" },
     { "$ref": "#/$defs/scenarioCast" },
+    { "$ref": "#/$defs/tutorial" },
+    { "$ref": "#/$defs/howTo" },
     { "$ref": "#/$defs/reference" },
     { "$ref": "#/$defs/command" },
     { "$ref": "#/$defs/configuration" },
@@ -159,6 +161,32 @@
       "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "section-index" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "tutorial": {
+      "description": "One path to a first working result, with no option, no alternative, and no branch. It may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "tutorial" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "howTo": {
+      "description": "One stated goal for a reader who already has a working result. It may branch, and it may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "how-to" },
         "id": { "$ref": "#/$defs/identifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },

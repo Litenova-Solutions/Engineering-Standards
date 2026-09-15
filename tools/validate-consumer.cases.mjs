@@ -51,6 +51,10 @@ const VALUES = {
   __RELEASE_RECORD_ID__: '2026-01-01-fixture',
   __VERSION__: '1.0.0',
   __RUNBOOK_ID__: 'restore-database',
+  __TUTORIAL_ID__: 'first-run',
+  __TUTORIAL_TITLE__: 'Run It For The First Time',
+  __HOW_TO_ID__: 'add-a-pack',
+  __HOW_TO_TITLE__: 'Add A Seed Pack',
   __COMMAND_ID__: 'fixture-up',
   __COMMAND_TITLE__: 'Fixture Up',
   __COMMAND__: 'fixture up',
@@ -93,6 +97,8 @@ const LAYOUT = [
   ['runbook.md', 'docs/runbooks/restore-database.md'],
   ['release-record.md', 'docs/releases/2026-01-01-fixture.md'],
   ['decision-evidence.md', 'docs/research/fixture-evidence.md'],
+  ['tutorial.md', 'docs/guide/first-run.md'],
+  ['how-to.md', 'docs/guide/add-a-pack.md'],
   ['command.md', 'docs/tools/fixture-up.md'],
   ['reference.md', 'docs/reference/ports.md'],
   ['configuration.md', 'docs/tools/configuration.md'],
@@ -217,6 +223,10 @@ console.log('\nDocumentation kinds');
 metaCase('command page kind is accepted', 'docs/tools/fixture-up.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
 metaCase('reference page kind is accepted', 'docs/reference/ports.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
 metaCase('configuration page kind is accepted', 'docs/tools/configuration.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('tutorial kind is accepted', 'docs/guide/first-run.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('how-to kind is accepted', 'docs/guide/add-a-pack.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+bodyCase('tutorial that omits what the reader built', 'docs/guide/first-run.md', (raw) => raw.replace('## What you built', '## Verification'), "requires an H2 'What you built'");
+bodyCase('how-to with no verification', 'docs/guide/add-a-pack.md', (raw) => raw.replace('## Verification', '## Notes'), "requires an H2 'Verification'");
 metaCase('misspelled documentation kind', 'docs/tools/fixture-up.md', (m) => { m.kind = 'commands'; }, "unknown kind 'commands'");
 metaCase('command id fails its pattern', 'docs/tools/fixture-up.md', (m) => { m.id = 'Fixture Up'; }, 'fails pattern');
 metaCase('documentation kind carrying an unknown property', 'docs/reference/ports.md', (m) => { m.operationType = 'command'; }, "unknown property 'operationType'");

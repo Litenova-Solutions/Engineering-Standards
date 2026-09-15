@@ -40,6 +40,8 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | `ui-override-decision.md` | `docs/decisions/{id}.md` | A React web visual-system, component-base, registry, or specialist-control override is required. |
 | `runbook.md` | `docs/runbooks/{runbook}.md` | An operator needs a repeatable recovery or operating procedure. |
 | `release-record.md` | `docs/releases/{release}.md` | One immutable release artifact is evaluated. |
+| `tutorial.md` | `docs/guide/{tutorial}.md` | A newcomer needs one path to a first working result. |
+| `how-to.md` | `docs/guide/{how-to}.md` | A reader who is already running needs one stated goal solved. |
 | `command.md` | `docs/tools/{command}.md` | The repository ships a command a reader runs. |
 | `reference.md` | `docs/reference/{record}.md` | A reader looks up exact values rather than reading a procedure. |
 | `configuration.md` | `docs/tools/configuration.md` | A setting a reader can change needs its default, scope, and precedence. |
