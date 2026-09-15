@@ -6,15 +6,15 @@ The standards use one page grammar and one controlled technical prose profile. T
 
 ## Agent Summary {#agent-summary}
 
-- Use controlled technical prose with repository terminology. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.TERM.001)
+- Use literal controlled prose, repository terminology, and a recorded vocabulary. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003, CORE.AUTHORING.VOICE.002, CORE.AUTHORING.TERM.001, CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.TERM.004)
 - Write one testable obligation in each Standards provision. (CORE.AUTHORING.NORMATIVE.002, CORE.AUTHORING.REQUIREMENT.001)
 - Name the declared page scope and a registered topic in each ID. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002, CORE.AUTHORING.IDENTIFIER.003)
 - Give each actionable default a distinct convention ID. (CORE.AUTHORING.DEFAULTS.001)
-- Apply the declared contract for each page class. (CORE.AUTHORING.PAGE.001)
+- Route the reader, apply each page contract, and state one layer per page. (CORE.AUTHORING.PAGE.001, CORE.AUTHORING.INDEX.002, CORE.AUTHORING.DISCLOSURE.001, CORE.AUTHORING.DISCLOSURE.002, CORE.AUTHORING.DISCLOSURE.003, CORE.AUTHORING.CONFIG.001)
 - Keep summaries informative and cite every projected provision. (CORE.AUTHORING.SUMMARY.001)
 - Map every provision to exact verification evidence. (CORE.AUTHORING.VERIFICATION.001)
-- Validate only current standards material. (CORE.AUTHORING.SNAPSHOT.001, CORE.AUTHORING.SNAPSHOT.002)
-- Publish complete releases and record the one a consumer reviewed. (CORE.AUTHORING.SNAPSHOT.003, CORE.AUTHORING.SNAPSHOT.004, CORE.AUTHORING.SNAPSHOT.005, CORE.AUTHORING.SNAPSHOT.006)
+- Validate current material and publish complete releases. (CORE.AUTHORING.SNAPSHOT.001, CORE.AUTHORING.SNAPSHOT.002, CORE.AUTHORING.SNAPSHOT.003, CORE.AUTHORING.SNAPSHOT.004, CORE.AUTHORING.SNAPSHOT.005, CORE.AUTHORING.SNAPSHOT.006)
+- Classify every specification file and derive every computed fact. (CORE.AUTHORING.METADATA.004, CORE.AUTHORING.DERIVED.001)
 - Run the authoring checks and regenerate the provision index. (CORE.AUTHORING.VALIDATION.001, CORE.AUTHORING.INDEX.001)
 
 ## Concepts
@@ -86,25 +86,46 @@ Version numbers identify complete pinned contracts. They do not claim Semantic V
 
 This release model governs the standards repository. A consumer product is a running service with its own users. Consumer API compatibility, schema migration, deprecation, and rollback stay required wherever their owning provisions and extensions apply.
 
+### Documentation layers
+
+A reader arrives at one of four layers, and each layer answers a different question. A page states one layer, so a reader who opened it for one question does not read another reader's answer.
+
+| Layer | Page class | The question it answers |
+|:---|:---|:---|
+| 1 | Tutorial | How do I get a first working result? |
+| 2 | How-to | How do I reach this one stated goal? |
+| 3 | Reference, Command, Configuration | What are the exact values, options, and defaults? |
+| 4 | Underneath | What does the command run, and how do I run it myself? |
+
+The order is a reading order rather than an authoring order. A page links down to the next layer and never up. A reader who wants more detail always has one step available, and never has to take it.
+
+Layer 4 has no page class of its own. It is the `Underneath` section of a command page, which is the one place a command page states its own mechanism. A wrapper with no way through it cannot be debugged when it fails.
+
 ### Page contracts
 
-| Page class | Required H2 order |
-|:---|:---|
-| Topic | Intent, Agent Summary, optional Concepts, Standards, Conventions, optional Reference example, Verification |
-| Profile | Intent, Agent Summary, Standards, Composition, Conventions, Verification |
-| Extension | Intent, Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, Verification |
-| Guide | Purpose, optional Prerequisites, Procedure, Verification |
-| Index | Intent, then navigation groups |
-| Glossary | Alphabetical term headings with one-sentence definitions and optional examples |
+A directory names the class of every page inside it, and the class states the contract.
+
+| Page class | Directory | Required H2 order |
+|:---|:---|:---|
+| Topic | `docs/<area>/` | Intent, Agent Summary, optional Concepts, Standards, Conventions, optional Reference example, Verification |
+| Profile | `docs/profile/` | Intent, Agent Summary, Standards, Composition, Conventions, Verification |
+| Extension | `docs/ext/` | Intent, Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, Verification |
+| Tutorial | `docs/tutorial/` | Purpose, Prerequisites, Lesson, What you built |
+| How-to | `docs/guide/` | Purpose, optional Prerequisites, Procedure, Verification |
+| Reference | `docs/reference/` | Intent, Reference, optional Notes |
+| Command | `docs/tools/` | Name, Synopsis, Description, Arguments, Options, Exit codes, Examples, Underneath |
+| Index | any `README.md` | Intent, then navigation groups |
+| Glossary | `docs/reference/glossary.md` | Alphabetical term headings with one-sentence definitions and optional examples |
 
 - A page that owns provisions lives at `docs/<area>/<page>.md`, with one lowercase word in each position.
-- A guide or reference page uses a descriptive file name, because no identifier derives from it.
+- A tutorial, how-to, reference, or command page uses a descriptive file name, because no identifier derives from it.
 - A normative page has one H1 with a Title Case title.
 - A provision heading uses sentence case, starts with an action verb, and ends with its ID.
 - A required empty section contains only `None.`
 - A Reference example is informative and lists every provision it demonstrates.
 - Provision or Reference example blocks contain examples. A standalone Examples section is invalid.
-- Guides and indexes contain no normative provisions.
+- A tutorial, how-to, reference, command, or index page contains no normative provisions.
+- A tutorial states one path. An option, an alternative, or a branch belongs on a how-to page.
 
 ### Standards provision contract
 
@@ -226,11 +247,37 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** Bounded, direct prose reduces interpretation differences without weakening technical meaning.
 
+### Apply the prose measures to consumer documentation (CORE.AUTHORING.PROSE.002)
+
+**Requirement:** A consumer specification page MUST satisfy the prose measures unless the project prose baseline records that page.
+
+**Rationale:** The profile applied only to this repository, so a consumer inherited the rule and no check. One consumer of 459 pages carried 5694 measure violations under a passing validator, because the run that reported the pass never looked.
+
+**Example:** The baseline records the count and the review date a page's debt was accepted at.
+
+```json
+{ "pages": { "docs/domain/modules/sales/README.md": { "count": 58, "lastReviewed": "2026-08-25" } } }
+```
+
+### Remove a reread page from the prose baseline (CORE.AUTHORING.PROSE.003)
+
+**Requirement:** A change that advances a page's `lastReviewed` date MUST remove that page from the prose baseline.
+
+**Rationale:** A baseline with no exit is a permanent exemption. `lastReviewed` already means a human read the page against the code. That reading is when the prose is in front of somebody, so the debt retires against work the project already performs.
+
 ### Use active and explicit sentences (CORE.AUTHORING.VOICE.001)
 
 **Requirement:** Authored prose MUST use active voice, explicit actors, imperative procedure steps, parallel lists, and passive voice only when actors are irrelevant.
 
 **Rationale:** Explicit actors and parallel actions make ownership and execution boundaries visible.
+
+### State meaning literally (CORE.AUTHORING.VOICE.002)
+
+**Requirement:** Authored prose MUST NOT substitute metaphor or flourish for direct statement where a literal phrase carries the same meaning.
+
+**Rationale:** A metaphor carries connotations its author did not choose. It also defeats terminology review, because a reader cannot tell whether a figure of speech names a defined concept or decorates one. A settlement route described as a rung on a ladder asserts an ordering that the three routes do not have.
+
+**Example:** Write `a parameter worth varying`, not `a dial worth turning`. Write `this point still matters`, not `this point earns its keep`.
 
 ### Use one term for one concept (CORE.AUTHORING.TERM.001)
 
@@ -239,6 +286,37 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 **Rationale:** Repository terminology stays stable while exact code and product terms remain available.
 
 **Example:** The validator reports `Standards authoring checks passed.`, not `This document is ASD-STE100 compliant.`
+
+### Record the project vocabulary as data (CORE.AUTHORING.TERM.002)
+
+**Requirement:** A consumer MUST record each term, its rejected synonyms, the scope of each rejection, and its mannered terms in a language record satisfying `schemas/language.schema.json`.
+
+**Rationale:** A glossary column headed `Avoid` states the rule to a reader and to nothing else. Prose cannot be checked against prose, so the same rule has to exist twice: once for the reader and once for the validator.
+
+**Example:** A rejection carries the scope that binds it, because a word correct in one module is wrong in another.
+
+```json
+{ "term": "holder", "rejected": ["seller", "owner"], "scope": "^domain/modules/sales/ticket-resales/",
+  "reason": "seller is the organizer in its disclosure role, so it names the other party here" }
+```
+
+### Reject a recorded synonym inside its scope (CORE.AUTHORING.TERM.003)
+
+**Requirement:** Authored prose MUST NOT use a synonym that the project language record rejects for the scope the page sits in.
+
+**Rationale:** Terminology drift is invisible one page at a time and plain across a module. The expensive case is a synonym that is a defined term elsewhere. The same word then names two parties, and no reader can tell which one is meant.
+
+### Check the vocabulary on every surface a reader meets (CORE.AUTHORING.TERM.004)
+
+**Requirement:** A consumer MUST name every non-Markdown surface its vocabulary reaches in `paths.languageScan`, including source, interface copy, the API contract, and acceptance tests.
+
+**Rationale:** Documentation is usually the smallest of those surfaces, and the only one a Markdown scan reads. A vocabulary then holds where nobody reads it and drifts where everybody does. One consumer of 459 pages passed the check while its source, its 3,458 interface strings and its 34 feature files went unread. Every collision that consumer had lived in the unread half. A rejection also has to reach a name, which carries the word with no space around it. `SellerOrderId` breaches a rejection of `seller` exactly as a sentence does.
+
+**Example:** A pattern matching no file is an error. A surface switched off in silence reports the same pass as a surface that is clean.
+
+```json
+{ "paths": { "languageScan": ["apps/*/lib/i18n/dictionaries/*.json", "apps/api/tests/**/*.feature"] } }
+```
 
 ### Use controlled capitalization (CORE.AUTHORING.CASE.001)
 
@@ -257,6 +335,34 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 **Requirement:** An authored page MUST use the required structure and heading rules for its page class.
 
 **Rationale:** Stable page classes let readers find authority, context, defaults, and evidence predictably.
+
+### Name the tool rather than the mechanism (CORE.AUTHORING.DISCLOSURE.001)
+
+**Requirement:** A tutorial step or how-to step MUST name the repository command that performs that step, where one exists.
+
+**Rationale:** A procedure that lists what a command already does becomes a second copy of that command, and the copy is the part that drifts.
+
+**Example:** A step reads `Run \`entro up\`` rather than listing the compose start, the readiness wait, and each process launch.
+
+### State one layer per page (CORE.AUTHORING.DISCLOSURE.002)
+
+**Requirement:** A page MUST NOT describe both a command and the mechanism that command runs, outside an `Underneath` section.
+
+**Rationale:** A reader who wanted the command reads the mechanism as noise, and a reader who wanted the mechanism reads the command as an obstacle.
+
+### Name the escape from every abstraction (CORE.AUTHORING.DISCLOSURE.003)
+
+**Requirement:** A command page MUST state under `Underneath` what the command runs, or state that nothing beneath it is separately runnable.
+
+**Rationale:** A wrapper nobody can see through is a wrapper nobody can debug, and it fails on somebody's machine eventually.
+
+**Example:** A command with no separately runnable mechanism writes `None.` under `Underneath`.
+
+### Record a setting as reference (CORE.AUTHORING.CONFIG.001)
+
+**Requirement:** A configuration setting a reader can change MUST appear on a configuration page with its default, its scope, and what overrides it.
+
+**Rationale:** A setting introduced inside a procedure is findable only by the reader who already knows which procedure mentioned it.
 
 ### Write atomic Standards provisions (CORE.AUTHORING.REQUIREMENT.001)
 
@@ -322,6 +428,14 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** The page lists `FRONTEND.COMPONENTS.OWNERSHIP.001` with its heading and a link into `frontend/components.md`.
 
+### Route the reader before listing pages (CORE.AUTHORING.INDEX.002)
+
+**Requirement:** A documentation root index MUST state which page class answers which reader question before its first navigation group.
+
+**Rationale:** A reader who cannot tell a tutorial from a reference opens both and trusts neither.
+
+**Example:** A `Which page do you want` section names each class in the reader's terms, one sentence for each.
+
 ### Declare structured specification metadata (CORE.AUTHORING.METADATA.002)
 
 **Requirement:** A structured consumer specification MUST open with a `---` delimited JSON block satisfying `schemas/specification-metadata.schema.json` for its declared kind.
@@ -353,6 +467,40 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 **Requirement:** A structured consumer specification MUST use its opening JSON block as its only metadata carrier.
 
 **Rationale:** Source links, implementation paths, and verification evidence belong in relevant body sections.
+
+### Classify every specification file (CORE.AUTHORING.METADATA.004)
+
+**Requirement:** Every Markdown file under the consumer documentation root MUST open with a Specification Metadata block or sit under a declared unstructured path.
+
+**Rationale:** A file the validator cannot classify is skipped, and a skipped file is reported as sound. A directory index owning no aggregate, use case, or policy carries `section-index`.
+
+**Example:** A navigation index declares its kind rather than omitting the block.
+
+```markdown
+---
+{
+  "kind": "section-index",
+  "id": "policies",
+  "specStatus": "approved",
+  "owner": "platform",
+  "lastReviewed": "2026-01-01"
+}
+---
+```
+
+### Derive a computed fact instead of restating it (CORE.AUTHORING.DERIVED.001)
+
+**Requirement:** A specification MUST name the source or the command that produces any count, census, or membership list computed from code.
+
+**Rationale:** A restated fact is accurate until the next unrelated commit, and nothing reports when it stops. A reader trusts a stale number as much as a fresh one.
+
+**Example:** A page states the rule and the command rather than the total.
+
+```markdown
+Every command declares an audit position. To count the declarations:
+
+    grep -rl "Audited(" src/Application --include=*.cs | wc -l
+```
 
 ### Run repeatable authoring checks (CORE.AUTHORING.VALIDATION.001)
 
@@ -440,11 +588,21 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.ASCII.002 | inspection | The project record lists each excluded content path, and review confirms documents about that content stay in scope. |
 | CORE.AUTHORING.NORMATIVE.002 | inspection | The provision parser reports one approved modal, and review confirms its intended force. |
 | CORE.AUTHORING.PROSE.001 | static | `WritingProseTests` asserts the prose scanner reports no length, contraction, or banned-term diagnostic. |
+| CORE.AUTHORING.PROSE.002 | static | `node tools/validate-consumer.mjs` reports a page carrying a measure violation that the prose baseline does not record. |
+| CORE.AUTHORING.PROSE.003 | static | `node tools/validate-consumer.mjs` fails when a baselined page's `lastReviewed` is later than the date its baseline entry records. |
 | CORE.AUTHORING.VOICE.001 | inspection | The pull request checklist records actor, voice, procedure, and list review. |
+| CORE.AUTHORING.VOICE.002 | static, inspection | `node tools/validate-consumer.mjs` emits no `LANGUAGE_MANNERED_TERM` diagnostic, and review confirms each new figure of speech is literal or defined. |
 | CORE.AUTHORING.TERM.001 | inspection | Terminology review compares new terms with `docs/reference/glossary.md`. |
+| CORE.AUTHORING.TERM.002 | static | `node tools/validate-consumer.mjs` validates the language record and names the checks a missing record switches off. |
+| CORE.AUTHORING.TERM.003 | static | `node tools/validate-consumer.mjs` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
+| CORE.AUTHORING.TERM.004 | static | `node tools/validate-consumer.mjs` reports the non-Markdown surfaces scanned, and fails a pattern matching no file. |
 | CORE.AUTHORING.CASE.001 | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
 | CORE.AUTHORING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
 | CORE.AUTHORING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |
+| CORE.AUTHORING.DISCLOSURE.001 | inspection | Page review confirms each step names a shipped command where one performs that step. |
+| CORE.AUTHORING.DISCLOSURE.002 | inspection | Page review confirms mechanism detail appears only under an `Underneath` section. |
+| CORE.AUTHORING.DISCLOSURE.003 | static | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic for the required `Underneath` section of a command page. |
+| CORE.AUTHORING.CONFIG.001 | inspection | Review confirms every setting named in a procedure resolves to a row on a configuration page. |
 | CORE.AUTHORING.REQUIREMENT.001 | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
 | CORE.AUTHORING.IDENTIFIER.001 | static | `node tools/validate-standards.mjs` emits no `ID_SCOPE_MISMATCH`, `ID_PAGE_FILENAME`, or `ID_AREA_UNKNOWN` diagnostic. |
 | CORE.AUTHORING.IDENTIFIER.002 | static | `node tools/validate-standards.cases.mjs` asserts the parser rejects a Standard whose ID ends in a `CONVENTION` segment. |
@@ -454,8 +612,11 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |
 | CORE.AUTHORING.VERIFICATION.001 | static | `WritingVerificationTests` asserts the evidence mapper reports one exact row for every page provision. |
 | CORE.AUTHORING.INDEX.001 | static | `node tools/generate-provisions.mjs --check` exits zero, and the repository validator emits no `PROVISIONS_STALE` diagnostic. |
+| CORE.AUTHORING.INDEX.002 | static | `node tools/validate-standards.mjs` emits no `INDEX_MISSING_ROUTING` diagnostic for `docs/README.md`. |
 | CORE.AUTHORING.METADATA.002 | static | `node tools/validate-consumer.mjs` validates opening JSON against the metadata schema. |
 | CORE.AUTHORING.METADATA.003 | static | `node tools/validate-consumer.mjs` reports no duplicate metadata carrier. |
+| CORE.AUTHORING.METADATA.004 | static | `node tools/validate-consumer.mjs` fails on a Markdown file with no metadata block outside a declared unstructured path. |
+| CORE.AUTHORING.DERIVED.001 | inspection | Review confirms each count, census, and membership list names its source or its command. |
 | CORE.AUTHORING.VALIDATION.001 | static | `WritingValidationTests` asserts cI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
 | CORE.AUTHORING.SNAPSHOT.001 | static | `node tools/validate-standards.mjs` evaluates current standards material only. |
 | CORE.AUTHORING.SNAPSHOT.002 | inspection | Pull request review finds no history-specific material in active files. |

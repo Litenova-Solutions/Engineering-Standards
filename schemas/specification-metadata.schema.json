@@ -9,6 +9,12 @@
     { "$ref": "#/$defs/glossary" },
     { "$ref": "#/$defs/modulesIndex" },
     { "$ref": "#/$defs/sectionIndex" },
+    { "$ref": "#/$defs/scenarioCast" },
+    { "$ref": "#/$defs/tutorial" },
+    { "$ref": "#/$defs/howTo" },
+    { "$ref": "#/$defs/reference" },
+    { "$ref": "#/$defs/command" },
+    { "$ref": "#/$defs/configuration" },
     { "$ref": "#/$defs/module" },
     { "$ref": "#/$defs/aggregate" },
     { "$ref": "#/$defs/useCase" },
@@ -135,6 +141,19 @@
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
       }
     },
+    "scenarioCast": {
+      "description": "The one reference cast every Scenario section draws its people, place, dates, and amounts from. It is informative, defines no rule, and appears exactly once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "scenario-cast" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
     "sectionIndex": {
       "description": "A directory index that claims no implemented behavior and owns no aggregate, use case, or policy. Unlike the other index kinds it may appear more than once.",
       "type": "object",
@@ -142,6 +161,71 @@
       "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "section-index" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "tutorial": {
+      "description": "One path to a first working result, with no option, no alternative, and no branch. It may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "tutorial" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "howTo": {
+      "description": "One stated goal for a reader who already has a working result. It may branch, and it may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "how-to" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "reference": {
+      "description": "A page of exact values a reader looks up rather than reads end to end. It owns no behavior and may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "reference" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "command": {
+      "description": "One shipped command: its arguments, its options, its exit codes, and what it runs underneath. It may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "command" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "configuration": {
+      "description": "The settings a reader can change, each with its default, its scope, and what overrides it. It may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "configuration" },
         "id": { "$ref": "#/$defs/identifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },

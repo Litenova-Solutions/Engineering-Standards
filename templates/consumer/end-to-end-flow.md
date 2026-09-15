@@ -16,6 +16,10 @@
 
 State one observable product outcome.
 
+## Scenario
+
+State the outcome above as one dated occasion: the people, the place, the amounts, and the day it happens. Every step below continues that same occasion. Draw each name and figure from the reference cast record. This section is informative.
+
 ## Starting and completion conditions
 
 - Starting condition: State what allows the end-to-end flow to begin.

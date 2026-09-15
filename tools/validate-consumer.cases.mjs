@@ -51,6 +51,30 @@ const VALUES = {
   __RELEASE_RECORD_ID__: '2026-01-01-fixture',
   __VERSION__: '1.0.0',
   __RUNBOOK_ID__: 'restore-database',
+  __TUTORIAL_ID__: 'first-run',
+  __TUTORIAL_TITLE__: 'Run It For The First Time',
+  __HOW_TO_ID__: 'add-a-pack',
+  __HOW_TO_TITLE__: 'Add A Seed Pack',
+  __COMMAND_ID__: 'fixture-up',
+  __COMMAND_TITLE__: 'Fixture Up',
+  __COMMAND__: 'fixture up',
+  __ARGUMENT__: 'target',
+  __OPTION__: 'detach',
+  __DEFAULT__: 'off',
+  __REFERENCE_ID__: 'ports',
+  __REFERENCE_TITLE__: 'Allocated Ports',
+  __NAME__: 'api',
+  __VALUE__: '5080',
+  __CONFIGURATION_ID__: 'configuration',
+  __CONFIGURATION_TITLE__: 'Fixture Settings',
+  __SETTING__: 'seedPack',
+  __SCOPE__: 'project',
+  __CAST__: 'scenarios',
+  __CAST_TITLE__: 'The Reference Cast',
+  __ORGANIZATION__: 'Fixture Promotions',
+  __PERSON__: 'Sanne',
+  __AMOUNT__: 'ticket price',
+  __SITUATION__: 'The onsale minute',
   'YYYY-MM-DD': '2026-01-01',
 };
 
@@ -60,6 +84,7 @@ const LAYOUT = [
   ['end-to-end-flow.md', 'docs/product/flows/event-sales.md'],
   ['domain-index.md', 'docs/domain/README.md'],
   ['glossary.md', 'docs/domain/glossary.md'],
+  ['scenario-cast.md', 'docs/domain/scenarios.md'],
   ['modules-index.md', 'docs/domain/modules/README.md'],
   ['module.md', 'docs/domain/modules/orders/README.md'],
   ['use-case.md', 'docs/domain/modules/orders/cancel-order.md'],
@@ -72,6 +97,11 @@ const LAYOUT = [
   ['runbook.md', 'docs/runbooks/restore-database.md'],
   ['release-record.md', 'docs/releases/2026-01-01-fixture.md'],
   ['decision-evidence.md', 'docs/research/fixture-evidence.md'],
+  ['tutorial.md', 'docs/guide/first-run.md'],
+  ['how-to.md', 'docs/guide/add-a-pack.md'],
+  ['command.md', 'docs/tools/fixture-up.md'],
+  ['reference.md', 'docs/reference/ports.md'],
+  ['configuration.md', 'docs/tools/configuration.md'],
 ];
 
 let failures = 0;
@@ -108,6 +138,11 @@ function build() {
   const project = JSON.parse(resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/consumer/standards.project.json'), 'utf8')));
   project.paths.frontends = [];
   writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  // The configured-path checks resolve against the fixture, so the fixture
+  // holds what the project file and the frontend cases declare. Without them a
+  // path error fires in every case and hides the rule under test.
+  writeFile('apps/api/Fixture.slnx', '');
+  fs.mkdirSync(path.join(fixture, 'apps/admin'), { recursive: true });
   fs.mkdirSync(path.join(fixture, 'standards'), { recursive: true });
   fs.copyFileSync(path.join(repository, 'standards.manifest.json'), path.join(fixture, 'standards/standards.manifest.json'));
   for (const [template, target] of LAYOUT) {
@@ -122,14 +157,25 @@ function run() {
 
 function report(name, expectation, output) {
   const problems = output.split('\n').filter((line) => line.startsWith('  - ')).map((line) => line.slice(4));
-  const matched = expectation === null ? problems.length === 0 : problems.some((problem) => problem.includes(expectation));
+  // Three expectation forms: null for a clean run, a string the output must
+  // carry, and { absent } for a diagnostic the output must not carry. The third
+  // exists because a case that narrows one setting can make an unrelated rule
+  // fire, and 'no problems at all' would then assert the wrong thing.
+  const matched = expectation === null
+    ? problems.length === 0
+    : typeof expectation === 'object'
+      ? !problems.some((problem) => problem.includes(expectation.absent))
+      : problems.some((problem) => problem.includes(expectation));
   if (matched) {
     console.log(`  pass  ${name}`);
     return;
   }
   failures += 1;
   console.log(`  FAIL  ${name}`);
-  console.log(`        expected: ${expectation === null ? 'no problems' : expectation}`);
+  const wanted = expectation === null
+    ? 'no problems'
+    : typeof expectation === 'object' ? `no problem naming ${expectation.absent}` : expectation;
+  console.log(`        expected: ${wanted}`);
   for (const problem of problems) console.log(`        actual:   ${problem}`);
 }
 
@@ -150,6 +196,14 @@ function fileCase(name, relative, contents, expectation) {
   fs.rmSync(path.join(fixture, relative));
 }
 
+// Replace text in one specification's body, assert the outcome, then restore it.
+function bodyCase(name, relative, transform, expectation) {
+  const original = readFixture(relative);
+  writeFile(relative, transform(original));
+  report(name, expectation, run());
+  writeFile(relative, original);
+}
+
 // Mutate standards.project.json, assert the outcome, then restore it.
 function projectCase(name, mutate, expectation) {
   const original = readFixture('standards.project.json');
@@ -165,19 +219,75 @@ build();
 console.log('Baseline');
 report('tracked templates validate as shipped', null, run());
 
+console.log('\nDocumentation kinds');
+metaCase('command page kind is accepted', 'docs/tools/fixture-up.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('reference page kind is accepted', 'docs/reference/ports.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('configuration page kind is accepted', 'docs/tools/configuration.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('tutorial kind is accepted', 'docs/guide/first-run.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('how-to kind is accepted', 'docs/guide/add-a-pack.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+bodyCase('tutorial that omits what the reader built', 'docs/guide/first-run.md', (raw) => raw.replace('## What you built', '## Verification'), "requires an H2 'What you built'");
+bodyCase('how-to with no verification', 'docs/guide/add-a-pack.md', (raw) => raw.replace('## Verification', '## Notes'), "requires an H2 'Verification'");
+metaCase('misspelled documentation kind', 'docs/tools/fixture-up.md', (m) => { m.kind = 'commands'; }, "unknown kind 'commands'");
+metaCase('command id fails its pattern', 'docs/tools/fixture-up.md', (m) => { m.id = 'Fixture Up'; }, 'fails pattern');
+metaCase('documentation kind carrying an unknown property', 'docs/reference/ports.md', (m) => { m.operationType = 'command'; }, "unknown property 'operationType'");
+bodyCase('command page hiding its mechanism', 'docs/tools/fixture-up.md', (raw) => raw.split('## Underneath')[0], "requires an H2 'Underneath'");
+bodyCase('reference page with no reference section', 'docs/reference/ports.md', (raw) => raw.replace('## Reference', '## Procedure'), "requires an H2 'Reference'");
+bodyCase('configuration page with no precedence', 'docs/tools/configuration.md', (raw) => raw.replace('## Precedence', '## Notes'), "requires an H2 'Precedence'");
+
+console.log('\nDocumentation root');
+projectCase('documentation root that is on disk', (p) => { p.paths.docs = 'docs'; }, null);
+projectCase('documentation root that is not on disk', (p) => { p.paths.docs = 'documentation'; }, "paths.docs 'documentation' does not exist");
+projectCase('documentation root that holds no Markdown', (p) => { p.paths.docs = 'standards'; }, 'Scanned no Markdown files');
+fileCase(
+  'page under the documentation root is scanned',
+  'docs/domain/modules/orders/unscanned.md',
+  `---\n${JSON.stringify({ kind: 'invented', id: 'unscanned', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Unscanned\n`,
+  "unknown kind 'invented'",
+);
+
+{
+  // The scan follows the configured root rather than a hard-coded docs/, so the
+  // same page outside that root is not scanned at all.
+  const originalProject = readFixture('standards.project.json');
+  const project = JSON.parse(originalProject);
+  project.paths.docs = 'docs/product';
+  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  fileCase(
+    'page outside the configured documentation root is not scanned',
+    'docs/domain/modules/orders/unscanned.md',
+    `---\n${JSON.stringify({ kind: 'invented', id: 'unscanned', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Unscanned\n`,
+    { absent: "unknown kind 'invented'" },
+  );
+  writeFile('standards.project.json', originalProject);
+}
+
+console.log('\nConfigured paths');
+projectCase('domainDocs that is on disk', (p) => { p.paths.domainDocs = 'docs/domain'; }, null);
+projectCase('domainDocs that is not on disk', (p) => { p.paths.domainDocs = 'docs/domains'; }, "paths.domainDocs 'docs/domains' does not exist");
+projectCase('uiDocs that is on disk', (p) => { p.paths.uiDocs = 'docs/ui'; }, null);
+projectCase('uiDocs that is not on disk', (p) => { p.paths.uiDocs = 'docs/interface'; }, "paths.uiDocs 'docs/interface' does not exist");
+projectCase('apiSolution that is on disk', (p) => { p.paths.apiSolution = 'apps/api/Fixture.slnx'; }, null);
+projectCase('apiSolution that is not on disk', (p) => { p.paths.apiSolution = 'apps/api/Missing.slnx'; }, "paths.apiSolution 'apps/api/Missing.slnx' does not exist");
+projectCase('frontend path that is not on disk', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/missing', platform: 'other-web' }]; }, "frontend 'admin' path 'apps/missing' does not exist");
+
 console.log('\nMetadata field rules');
 metaCase('missing required field', 'docs/domain/modules/orders/cancel-order.md', (m) => { delete m.operationType; }, "missing required 'operationType'");
 metaCase('unknown property', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.unexpected = 1; }, "unknown property 'unexpected'");
-metaCase('id fails its kind pattern', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'Orders.CancelOrder'; }, 'fails pattern');
-metaCase('unknown kind', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.kind = 'invented'; }, "unknown kind 'invented'");
-metaCase('bad specStatus', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.specStatus = 'final'; }, "bad specStatus 'final'");
-metaCase('bad implementationStatus', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.implementationStatus = 'done'; }, 'bad implementationStatus');
+metaCase('id fails its kind pattern', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'Orders.CancelOrder'; }, "fails pattern; expected '<module>.<name>' in lower kebab-case");
+metaCase('accepted use-case id', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'orders.cancel-order'; }, null);
+// A closed-set error names the values the author may use, so each expectation
+// covers the list and not only the value that was rejected.
+metaCase('unknown kind', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.kind = 'invented'; }, "unknown kind 'invented'; expected one of product, domain-index, glossary");
+metaCase('bad specStatus', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.specStatus = 'final'; }, "bad specStatus 'final'; expected one of draft, approved, retired");
+metaCase('bad implementationStatus', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.implementationStatus = 'done'; }, "bad implementationStatus 'done'; expected one of planned, implemented, verified");
 metaCase('accepted implementationStatus value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.implementationStatus = 'implemented'; }, null);
-metaCase('bad lastReviewed', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.lastReviewed = '01-01-2026'; }, 'bad lastReviewed');
-metaCase('bad operationType', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.operationType = 'mutation'; }, 'bad operationType');
-metaCase('bad risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['danger']; }, "bad risk 'danger'");
+metaCase('bad lastReviewed', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.lastReviewed = '01-01-2026'; }, "bad lastReviewed '01-01-2026'; expected YYYY-MM-DD");
+metaCase('accepted lastReviewed', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.lastReviewed = '2026-02-01'; }, null);
+metaCase('bad operationType', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.operationType = 'mutation'; }, "bad operationType 'mutation'; expected one of command, query");
+metaCase('bad risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['danger']; }, "bad risk 'danger'; expected one of authorization, money, sensitive-data, irreversible, concurrency, durable-delivery, availability");
 metaCase('accepted risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['authorization']; }, null);
-metaCase('bad actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['Buyer Account']; }, 'bad actors id');
+metaCase('bad actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['Buyer Account']; }, "bad actors id 'Buyer Account'; expected lower kebab-case");
+metaCase('accepted actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['buyer-account']; }, null);
 
 console.log('\nExtension selection');
 projectCase('selected extension absent from the manifest', (p) => { p.selectedExtensions = ['outbox-worker']; }, "selectedExtensions 'outbox-worker' is not an extension");
@@ -211,7 +321,7 @@ report('flat single-aggregate module resolves', null, run());
 fileCase(
   'nested aggregate subdirectory resolves',
   'docs/domain/modules/orders/order-claims/claim-guest-order.md',
-  `---\n${JSON.stringify({ kind: 'use-case', id: 'orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n`,
+  `---\n${JSON.stringify({ kind: 'use-case', id: 'orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n\n## Scenario\n\nSanne claims the order she placed as a guest on the morning after the show.\n`,
   null,
 );
 fileCase(
@@ -244,6 +354,12 @@ projectCase('reviewed release matches the pinned release', () => {}, null);
 projectCase('reviewed release is behind the pinned release', (p) => { p.reviewedStandardsVersion = '1.11.0'; }, 'does not match the pinned standards');
 projectCase('reviewed release is absent', (p) => { delete p.reviewedStandardsVersion; }, "missing 'reviewedStandardsVersion'");
 
+console.log('\nProhibited kinds');
+projectCase('specification declares a prohibited kind', (p) => { p.prohibitedKinds = ['workflow']; }, "kind 'workflow' is prohibited by this consumer");
+projectCase('prohibited kind that no specification declares', (p) => { p.prohibitedKinds = ['section-index']; }, null);
+projectCase('prohibited kind the validator does not know', (p) => { p.prohibitedKinds = ['workflows']; }, "prohibitedKinds 'workflows' is not a specification kind");
+projectCase('prohibitedKinds outside an array', (p) => { p.prohibitedKinds = 'workflow'; }, 'prohibitedKinds must be an array');
+
 console.log('\nMetadata carrier (CORE.AUTHORING.METADATA.002)');
 fileCase(
   'metadata in a fenced block instead of the carrier',
@@ -253,7 +369,25 @@ fileCase(
 );
 fileCase('unterminated metadata block', 'docs/domain/modules/orders/open.md', '---\n{\n  "kind": "use-case"\n}\n', 'unterminated metadata block');
 fileCase('invalid JSON in the carrier', 'docs/domain/modules/orders/broken.md', '---\n{\n  "kind": use-case\n}\n---\n\n# Broken\n', 'JSON parse error');
-fileCase('prose page with no metadata is not a specification', 'docs/operations/security-and-privacy.md', '# Security and privacy\n\nCross-cutting reference prose with no structured kind.\n', null);
+fileCase('prose page with no metadata block', 'docs/operations/security-and-privacy.md', '# Security and privacy\n\nCross-cutting reference prose with no structured kind.\n', 'no metadata block');
+
+console.log('\nUnstructured documentation (CORE.AUTHORING.METADATA.004)');
+projectCase('unstructuredDocs outside an array', (p) => { p.paths.unstructuredDocs = 'docs/operations'; }, 'paths.unstructuredDocs must be an array');
+projectCase('unstructured path that is not on disk', (p) => { p.paths.unstructuredDocs = ['docs/nowhere']; }, "paths.unstructuredDocs 'docs/nowhere' does not exist");
+projectCase('unstructured path that is on disk', (p) => { p.paths.unstructuredDocs = ['docs/operations']; }, null);
+
+{
+  // A declared prefix exempts the prose beneath it and nothing else. The
+  // second case is the same page one directory away: outside every declared
+  // prefix it is reported, which is what keeps the exemption narrow.
+  const originalProject = readFixture('standards.project.json');
+  const project = JSON.parse(originalProject);
+  project.paths.unstructuredDocs = ['docs/operations'];
+  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  fileCase('prose under a declared unstructured path', 'docs/operations/security-and-privacy.md', '# Security and privacy\n\nCross-cutting reference prose with no structured kind.\n', null);
+  fileCase('prose outside every declared unstructured path', 'docs/domain/policies/README.md', '# Policies\n\nDirectory index prose with no structured kind.\n', 'no metadata block');
+  writeFile('standards.project.json', originalProject);
+}
 
 console.log('\nResearch exclusion');
 fileCase('research prose without metadata is skipped', 'docs/research/notes.md', '# Notes\n\nUnstructured research prose.\n', null);
@@ -263,6 +397,223 @@ fileCase(
   `---\n${JSON.stringify({ kind: 'decision-evidence', id: 'bad-record', specStatus: 'final', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Bad record\n`,
   "bad specStatus 'final'",
 );
+
+console.log('\nScenario sections (CORE.SYSTEM.SCENARIO.001, CORE.SYSTEM.SCENARIO.002, CORE.SYSTEM.SCENARIO.003, CORE.SYSTEM.CONVENTION.007)');
+bodyCase(
+  'behavior specification with no Scenario section',
+  'docs/domain/modules/orders/cancel-order.md',
+  (raw) => raw.replace(/## Scenario[\s\S]*?(?=## Trigger)/, ''),
+  "no 'Scenario' section",
+);
+bodyCase(
+  'Scenario section with no prose',
+  'docs/domain/modules/orders/cancel-order.md',
+  (raw) => raw.replace(/## Scenario[\s\S]*?(?=## Trigger)/, '## Scenario\r\n\r\n'),
+  "'Scenario' section is empty",
+);
+bodyCase(
+  'Scenario section naming an aggregate invariant',
+  'docs/domain/modules/orders/order-claims/README.md',
+  (raw) => raw.replace(/## Scenario(\r?\n){2}/, '## Scenario\r\n\r\nSanne cancels the order, which INV-ORDERS-01 permits.\r\n\r\n'),
+  'names INV-ORDERS-01',
+);
+bodyCase(
+  'Scenario section past the word bound',
+  'docs/domain/modules/orders/README.md',
+  (raw) => raw.replace(/## Scenario(\r?\n){2}/, `## Scenario\r\n\r\n${'word '.repeat(200)}\r\n\r\n`),
+  'the bound is 120',
+);
+projectCase('scenarioWordLimit below the accepted floor', (p) => { p.scenarioWordLimit = 10; }, 'scenarioWordLimit must be an integer of at least 40');
+{
+  // A consumer that raises the bound has the raised value applied, so the
+  // convention is replaceable in fact and not only in its wording.
+  const originalProject = readFixture('standards.project.json');
+  const project = JSON.parse(originalProject);
+  project.scenarioWordLimit = 400;
+  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  // 200 words: over the 120 default and under the raised 400, so the case
+  // proves the raise applied. They are shaped as 4-word sentences in 5-sentence
+  // paragraphs because the controlled prose measures also read this page, and
+  // one 200-word run would report a sentence-length problem rather than the
+  // scenario bound this case is about.
+  const scenarioBody = Array.from({ length: 10 }, () => 'word word word word. '.repeat(5).trim()).join('\r\n\r\n');
+  bodyCase(
+    'Scenario section within a raised word bound',
+    'docs/domain/modules/orders/README.md',
+    (raw) => raw.replace(/## Scenario(\r?\n){2}/, `## Scenario\r\n\r\n${scenarioBody}\r\n\r\n`),
+    null,
+  );
+  writeFile('standards.project.json', originalProject);
+}
+fileCase(
+  'second reference cast',
+  'docs/domain/other-scenarios.md',
+  `---\n${JSON.stringify({ kind: 'scenario-cast', id: 'other-scenarios', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Other scenarios\n`,
+  'found 2',
+);
+{
+  // The cast is the one record every Scenario section draws from, so its
+  // absence is a finding rather than a stage the consumer has not reached.
+  const original = readFixture('docs/domain/scenarios.md');
+  fs.rmSync(path.join(fixture, 'docs/domain/scenarios.md'));
+  report('documentation set with no reference cast', 'Expected exactly one scenario-cast specification, found 0', run());
+  writeFile('docs/domain/scenarios.md', original);
+}
+
+console.log('\nProject language (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.VOICE.002)');
+{
+  const languageFile = 'docs/language.json';
+  const record = {
+    schemaVersion: 1,
+    terms: [{ term: 'holder', rejected: ['seller'], scope: '^domain/modules/orders/', reason: 'seller names the organizer' }],
+    mannered: [{ term: 'load-bearing', instead: 'required' }],
+  };
+  writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
+
+  report('language record with no violation present', null, run());
+
+  bodyCase(
+    'rejected synonym inside its scope',
+    'docs/domain/modules/orders/README.md',
+    (raw) => `${raw}\nThe seller keeps the ticket.\n`,
+    'LANGUAGE_REJECTED_SYNONYM',
+  );
+
+  // The same word outside the scope is correct, so the scope has to be the
+  // thing that decides rather than the word.
+  bodyCase(
+    'rejected synonym outside its scope',
+    'docs/domain/glossary.md',
+    (raw) => `${raw}\nThe seller keeps the ticket.\n`,
+    { absent: 'LANGUAGE_REJECTED_SYNONYM' },
+  );
+
+  bodyCase(
+    'mannered term anywhere',
+    'docs/domain/glossary.md',
+    (raw) => `${raw}\nThat rule is load-bearing.\n`,
+    'LANGUAGE_MANNERED_TERM',
+  );
+
+  // A word is matched on its own, so a rejection of 'seller' leaves a longer
+  // word containing it alone.
+  bodyCase(
+    'rejected synonym as part of a longer word',
+    'docs/domain/modules/orders/README.md',
+    (raw) => `${raw}\nThe sellerships remain open.\n`,
+    { absent: 'LANGUAGE_REJECTED_SYNONYM' },
+  );
+
+  // A fenced block is code, and code carries the rejected name because the
+  // identifier is what it is called.
+  bodyCase(
+    'rejected synonym inside a fenced block',
+    'docs/domain/modules/orders/README.md',
+    (raw) => `${raw}\n\`\`\`text\nseller\n\`\`\`\n`,
+    { absent: 'LANGUAGE_REJECTED_SYNONYM' },
+  );
+
+  // A scope that does not compile would reject nothing while reporting a pass,
+  // which is the fail-open shape the validator refuses elsewhere.
+  writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'holder', rejected: ['seller'], scope: '^domain/[' }] }, null, 2)}\n`);
+  report('language scope that is not a regular expression', 'is not a regular expression', run());
+
+  fs.rmSync(path.join(fixture, languageFile));
+  report('no language record present', null, run());
+}
+
+console.log('\nVocabulary over non-Markdown surfaces (CORE.AUTHORING.TERM.004)');
+{
+  const languageFile = 'docs/language.json';
+  const originalProject = readFixture('standards.project.json');
+  // The fixture declares its own mannered term rather than borrowing one from
+  // the case above, so the phrase under test is hyphenated and belongs to this
+  // block alone.
+  const record = {
+    schemaVersion: 1,
+    terms: [{ term: 'holder', rejected: ['seller'], scope: '^apps/', reason: 'seller names the organizer' }],
+    mannered: [{ term: 'best-of-breed', instead: 'the strongest option' }],
+  };
+  writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
+
+  const declareScan = (patterns) => {
+    const project = JSON.parse(originalProject);
+    project.paths.languageScan = patterns;
+    writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  };
+
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The organizer keeps the ticket."\n}\n');
+  declareScan(['apps/admin/*.json']);
+  report('declared surface with no violation present', null, run());
+
+  // The point of the provision: a rejected word in a surface a Markdown scan
+  // never reads.
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The seller keeps the ticket."\n}\n');
+  report('rejected synonym in an interface dictionary', 'LANGUAGE_REJECTED_SYNONYM', run());
+
+  // An identifier carries the word with no space around it, so the scan has to
+  // open the name out before matching.
+  writeFile('apps/admin/copy.json', '{\n  "sellerName": "Harbour Events"\n}\n');
+  report('rejected synonym inside an identifier', 'LANGUAGE_REJECTED_SYNONYM', run());
+
+  // Opening a name out must not separate the halves of a hyphenated phrase, so
+  // the scan reads each line as written as well.
+  writeFile('apps/admin/copy.json', '{\n  "note": "That answer is best-of-breed."\n}\n');
+  report('mannered term in a declared surface', 'LANGUAGE_MANNERED_TERM', run());
+
+  // A word is still matched on its own, so a longer word containing it passes.
+  writeFile('apps/admin/copy.json', '{\n  "note": "The sellerships remain open."\n}\n');
+  report('rejected synonym as part of a longer word in a surface', { absent: 'LANGUAGE_REJECTED_SYNONYM' }, run());
+
+  // A scope is written against the repository root for these files, because a
+  // file outside the documentation tree shares no other root with a page.
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The seller keeps the ticket."\n}\n');
+  writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'holder', rejected: ['seller'], scope: '^docs/' }] }, null, 2)}\n`);
+  report('rejected synonym outside its scope in a surface', { absent: 'LANGUAGE_REJECTED_SYNONYM' }, run());
+  writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
+
+  // A pattern matching nothing switches a surface off in silence.
+  declareScan(['apps/admin/*.yaml']);
+  report('declared surface matching no file', 'matches no file', run());
+
+  declareScan([]);
+  report('no declared surface', null, run());
+  writeFile('standards.project.json', originalProject);
+  fs.rmSync(path.join(fixture, 'apps/admin/copy.json'));
+  fs.rmSync(path.join(fixture, languageFile));
+}
+
+console.log('\nControlled prose in consumer documentation (CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003)');
+{
+  const page = 'docs/domain/modules/orders/README.md';
+  const original = readFixture(page);
+  const longSentence = `\n${'word '.repeat(30).trim()}.\n`;
+  writeFile(page, `${original}${longSentence}`);
+  report('measure violation with no baseline entry', 'controlled-prose problem(s) and no prose baseline entry', run());
+
+  const reviewed = splitMeta(original).meta.lastReviewed;
+  writeFile('docs/prose-baseline.json', `${JSON.stringify({ pages: { [page]: { count: 1, lastReviewed: reviewed } } }, null, 2)}\n`);
+  report('measure violation recorded in the baseline', null, run());
+
+  // Debt is accepted at a count. A page that grows past it is reported even
+  // though the page is listed, because a baseline that absorbs new debt is an
+  // exemption rather than a record.
+  writeFile(page, `${original}${longSentence}${longSentence}`);
+  report('baselined page whose debt grew', 'controlled-prose problems grew from 1 to 2', run());
+
+  // A page read against the code leaves the baseline in the same change.
+  writeFile(page, `${original}${longSentence}`);
+  const advanced = splitMeta(original);
+  advanced.meta.lastReviewed = '2099-01-01';
+  writeFile(page, `${joinMeta(advanced.meta, advanced.body)}${longSentence}`);
+  report('baselined page whose lastReviewed advanced', 'leaves the prose baseline in the same change', run());
+
+  writeFile(page, original);
+  report('baseline entry for a page that is now clean', 'listed in the prose baseline and now clean', run());
+
+  fs.rmSync(path.join(fixture, 'docs/prose-baseline.json'));
+  writeFile(page, original);
+}
 
 fs.rmSync(fixture, { recursive: true, force: true });
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);

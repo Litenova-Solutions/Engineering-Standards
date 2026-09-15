@@ -2,7 +2,7 @@
 
 Read this file before changing this repository or a consumer application. (CORE.AGENT.LOAD.001)
 
-Standards v1.15.0 covers one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. (CORE.SCOPE.APPLICATION.001, CORE.SCOPE.CONTEXT.001)
+Standards v1.16.0 covers one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. (CORE.SCOPE.APPLICATION.001, CORE.SCOPE.CONTEXT.001)
 
 The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (PROFILE.NEXTJS.VERSION.001, PROFILE.BLAZOR.VERSION.001, CORE.AGENT.LOAD.001)
 
@@ -61,7 +61,8 @@ Do not add an unauthorized package, schema migration, authentication change, pub
 
 ## High-Risk Boundaries
 
-- Use Domain, Application, Infrastructure, and WebApi as the application projects. (BACKEND.ARCHITECTURE.PROJECTS.001)
+- Use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as the application projects. (BACKEND.ARCHITECTURE.PROJECTS.001)
+- Place a type at the lowest folder holding every consumer that names it. (BACKEND.ARCHITECTURE.PLACEMENT.001)
 - Keep Domain independent from persistence, web, mediator, logging, and dependency injection. (BACKEND.ARCHITECTURE.DEPENDENCIES.001)
 - Model aggregate lifecycles with an abstract state and sealed state records. (BACKEND.DOMAIN.STATE.001)
 - Model Domain closed sets as record hierarchies, never enums. (BACKEND.DOMAIN.CLOSEDSET.001)

@@ -14,12 +14,12 @@
 
 The Agentic Engineering System is the standards contract Litenova Solutions uses for software work by humans and AI agents.
 
-Standards v1.15.0 targets one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. The `dotnet-blazor` profile replaces the frontend with a .NET WebAssembly client.
+Standards v1.16.0 targets one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. The `dotnet-blazor` profile replaces the frontend with a .NET WebAssembly client.
 
 ## What It Defines
 
 - Product and domain specifications that own approved intent.
-- Domain, Application, Infrastructure, and WebApi boundaries.
+- Domain, Application.Abstractions, Application, Infrastructure, and WebApi boundaries.
 - Implementation conventions for backend and frontend work.
 - Verification, security, operations, and release evidence.
 - Conditional extensions for capabilities outside the baseline.
@@ -34,6 +34,7 @@ The baseline profile applies first. An extension or consumer decision names each
 - [Agentic Engineering System](docs/core/system.md)
 - [Authoring standard](docs/core/authoring.md)
 - [Get started](docs/guide/getting-started.md)
+- [Command index](docs/tools/README.md)
 
 ## Use the Standards
 
@@ -53,11 +54,11 @@ The [template index](templates/consumer/README.md) lists each consumer template 
 ## Repository Structure
 
 ```text
-docs/                    One directory per provision area, plus guides and reference material
+docs/                    One directory per provision area, plus guides, commands, and reference material
 schemas/                 JSON contracts for standards and consumer configuration
 templates/consumer/      Consumer specification templates
 templates/standard/      Standards authoring templates
-tools/                   Dependency-free reference validators and fixture suites
+tools/                   Dependency-free reference validators and fixture suites, documented under docs/tools/
 standards.manifest.json  Versions, profiles, extensions, and agent load plans
 ```
 

@@ -17,6 +17,10 @@ A domain policy is a business rule not owned by one aggregate invariant. `Domain
 
 State the rule in business language.
 
+## Scenario
+
+State one case where this rule decides the outcome: the situation, the decision the rule forces, and the result the business rejects without it. Draw the people, place, dates, and amounts from the reference cast record. This section is informative and carries no rule identifier.
+
 ## Rules
 
 | ID | Required behavior | Applies to | Failure result |

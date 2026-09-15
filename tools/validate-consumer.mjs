@@ -17,8 +17,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { checkProseMeasures, checkLanguage, checkLanguageInSource, compileLanguage } from './prose.mjs';
 
-const root = path.resolve(process.argv[2] ?? '.');
+// The root is the first argument that is not a flag, so an option can be passed
+// without being read as the consumer directory.
+const root = path.resolve(process.argv.slice(2).find((a) => !a.startsWith('--')) ?? '.');
 const errors = [];
 const err = (m) => errors.push(m);
 
@@ -33,8 +36,42 @@ if (!fs.existsSync(projectFile)) {
   process.exit(2);
 }
 const project = readJson(projectFile);
-const docsRoot = path.join(root, 'docs');
+// The documentation root is configuration, not a constant. A hard-coded docs/
+// scans nothing in a consumer that keeps its pages elsewhere, and a scan of
+// nothing reports PASS. 'docs' stays the default because that is the layout the
+// standards describe. (CORE.AUTHORING.METADATA.004)
+const docsPath = project.paths?.docs ?? 'docs';
+const docsRoot = path.join(root, docsPath);
 const domainDocs = path.join(root, (project.paths?.domainDocs ?? 'docs/domain'));
+// A configured path that does not resolve disables the checks that read it and
+// leaves the run reporting PASS, so each message names the check that goes
+// quiet. A typo in domainDocs is the expensive one.
+const configuredPaths = [
+  ['paths.docs', project.paths?.docs, 'the Markdown scan finds no specification to check'],
+  ['paths.domainDocs', project.paths?.domainDocs, 'the use-case, workflow, and policy cross-file checks resolve nothing'],
+  ['paths.uiDocs', project.paths?.uiDocs, 'the controlled UI page checks resolve nothing'],
+  ['paths.apiSolution', project.paths?.apiSolution, 'the backend checks have no solution to read'],
+];
+for (const [field, value, consequence] of configuredPaths) {
+  if (value === undefined) continue;
+  if (typeof value !== 'string' || !value.trim()) { err(`standards.project.json: ${field} '${value}' is not a path`); continue; }
+  if (!fs.existsSync(path.join(root, value))) err(`standards.project.json: ${field} '${value}' does not exist; ${consequence}`);
+}
+// Navigation and prose pages carry no structured metadata, so the project names
+// the path prefixes that hold them. A declared prefix is a decision a reviewer
+// can see and count; an undeclared page with no metadata block is a file nobody
+// knows went unchecked. (CORE.AUTHORING.METADATA.004)
+const declaredUnstructured = project.paths?.unstructuredDocs;
+if (declaredUnstructured !== undefined && !Array.isArray(declaredUnstructured)) {
+  err('standards.project.json: paths.unstructuredDocs must be an array of repository-relative paths');
+}
+const unstructuredDocs = [];
+for (const entry of Array.isArray(declaredUnstructured) ? declaredUnstructured : []) {
+  if (typeof entry !== 'string' || !entry.trim()) { err(`standards.project.json: paths.unstructuredDocs '${entry}' is not a path`); continue; }
+  if (path.isAbsolute(entry) || entry.includes('..')) { err(`standards.project.json: paths.unstructuredDocs '${entry}' must be a repository-relative path`); continue; }
+  if (!fs.existsSync(path.join(root, entry))) { err(`standards.project.json: paths.unstructuredDocs '${entry}' does not exist; correct the path or remove the exemption`); continue; }
+  unstructuredDocs.push(entry.replace(/\\/g, '/').replace(/\/+$/, ''));
+}
 // A selection is either a bare id or an object recording the criterion that was
 // met and the date it is next reviewed. Both forms resolve to one id here.
 // (CORE.SCOPE.EXTENSIONS.001, CORE.SCOPE.EXTENSIONS.002)
@@ -97,14 +134,42 @@ for (const entry of selections) {
 const ID = /^[a-z][a-z0-9-]*$/;
 const REC = /^[a-z0-9][a-z0-9-]*$/;
 const UC = /^[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$/;
+// Each pattern carries its shape in words. Regex source names character classes
+// and not the convention, so an author who is shown one still guesses.
+const FORM = new Map([
+  [ID, "lower kebab-case, for example 'orders'"],
+  [REC, "lower kebab-case with a letter or digit first, for example '0001-cancel-order'"],
+  [UC, "'<module>.<name>' in lower kebab-case, for example 'orders.cancel-order'"],
+]);
 const SPEC = ['draft', 'approved', 'retired'];
 const IMPL = ['planned', 'implemented', 'verified'];
 const RISK = ['authorization', 'money', 'sensitive-data', 'irreversible', 'concurrency', 'durable-delivery', 'availability'];
+const OPERATION_TYPES = ['command', 'query'];
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
+const DATE_FORM = 'YYYY-MM-DD';
 const base = { kind: 1, id: 1, specStatus: 1, owner: 1, lastReviewed: 1 };
 // One record owns each of these boundaries. A directory index that owns no
 // boundary uses 'section-index', which may repeat.
-const SINGLETON_KINDS = new Set(['product', 'domain-index', 'glossary', 'modules-index']);
+const SINGLETON_KINDS = new Set(['product', 'domain-index', 'glossary', 'modules-index', 'scenario-cast']);
+// A kind whose absence is a finding rather than a stage the consumer has not
+// reached. Every Scenario section draws from one cast, so a documentation set
+// with scenarios and no cast has as many reference worlds as it has pages.
+// (CORE.SYSTEM.SCENARIO.003)
+const REQUIRED_SINGLETON_KINDS = new Set(['product', 'scenario-cast']);
+// The kinds whose subject is behavior a person experiences, and therefore the
+// kinds a reader cannot place without one concrete occasion.
+// (CORE.SYSTEM.SCENARIO.001)
+const SCENARIO_KINDS = new Set(['module', 'aggregate', 'use-case', 'domain-policy', 'end-to-end-flow']);
+// A scenario illustrates its page and never governs it. An identifier inside one
+// reads as a second definition of the rule it names, and two definitions drift.
+// (CORE.SYSTEM.SCENARIO.002)
+const RULE_ID = /\b(?:INV|POL|VAL|AC|E2E)-[A-Z0-9][A-Z0-9-]*\b/;
+const SCENARIO_WORD_DEFAULT = 120;
+const declaredWordLimit = project.scenarioWordLimit;
+if (declaredWordLimit !== undefined && (!Number.isInteger(declaredWordLimit) || declaredWordLimit < 40)) {
+  err('standards.project.json: scenarioWordLimit must be an integer of at least 40');
+}
+const scenarioWordLimit = Number.isInteger(declaredWordLimit) && declaredWordLimit >= 40 ? declaredWordLimit : SCENARIO_WORD_DEFAULT;
 const KINDS = {
   product: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
   'domain-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
@@ -113,6 +178,19 @@ const KINDS = {
   // A directory index that claims no implemented behavior and owns no aggregate,
   // use case, or policy. It carries the base fields and nothing else.
   'section-index': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
+  // The one reference cast every Scenario section draws from. It is informative,
+  // owns no rule, and carries the base fields and nothing else.
+  'scenario-cast': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
+  // Five documentation kinds, one per layer a reader arrives at. None describes
+  // behavior a person experiences, so none carries a Scenario, and none is a
+  // singleton. Each declares the H2 order its class answers at, because a command
+  // page that omits Underneath hides the mechanism it wraps.
+  // (CORE.AUTHORING.DISCLOSURE.002, CORE.AUTHORING.DISCLOSURE.003)
+  tutorial: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Purpose', 'Prerequisites', 'Lesson', 'What you built'] },
+  'how-to': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Purpose', 'Procedure', 'Verification'] },
+  reference: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Reference'] },
+  command: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'] },
+  configuration: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Settings', 'Precedence'] },
   module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
   aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: UC },
   'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: UC },
@@ -126,6 +204,21 @@ const KINDS = {
   runbook: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   'release-record': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'release'], props: { ...base, release: 1 }, id: REC },
 };
+const KIND_NAMES = Object.keys(KINDS);
+
+// A consumer that rules a kind out in its own instructions still gets a clean
+// PASS from the agent that writes one anyway, so the prohibition is advice. The
+// declared list makes it a check. Each entry names a kind this file knows,
+// because a misspelled entry prohibits nothing and reads as if it did.
+const declaredProhibited = project.prohibitedKinds;
+if (declaredProhibited !== undefined && !Array.isArray(declaredProhibited)) {
+  err('standards.project.json: prohibitedKinds must be an array of specification kinds');
+}
+const prohibitedKinds = new Set();
+for (const entry of Array.isArray(declaredProhibited) ? declaredProhibited : []) {
+  if (typeof entry !== 'string' || !(entry in KINDS)) { err(`standards.project.json: prohibitedKinds '${entry}' is not a specification kind; expected one of ${KIND_NAMES.join(', ')}`); continue; }
+  prohibitedKinds.add(entry);
+}
 
 // ---- collect files ---------------------------------------------------------
 const files = [];
@@ -138,6 +231,10 @@ const files = [];
     else if (e.name.endsWith('.md')) files.push(p);
   }
 })(docsRoot);
+// Every check below reads this list, so an empty list agrees with everything. A
+// consumer with no specification page does not exist; a root that resolves to
+// nothing does.
+if (!files.length) err(`Scanned no Markdown files under '${docsPath}'; check paths.docs, because a consumer with no specification is a misconfigured scan`);
 
 const metas = []; // {rel, meta, file}
 const singletons = new Map();     // kind -> [paths]
@@ -147,18 +244,36 @@ let uiOutput = '';
 
 // Specification Metadata is a '---' delimited JSON block, per
 // CORE.AUTHORING.METADATA.002. A file that carries a metadata object in any other
-// wrapper is reported rather than skipped, because a silently skipped
-// specification is an unvalidated specification.
+// wrapper, or carries none at all, is reported rather than skipped, because a
+// silently skipped specification is an unvalidated specification: the run passes
+// while that page sits unchecked beside every page that was checked.
+// (CORE.AUTHORING.METADATA.004)
 function parseBlock(raw, rel) {
   if (!raw.startsWith('---')) {
     const fenced = raw.slice(0, 2000).match(/```[a-z]*\s*\n\s*\{[\s\S]{0,400}?"kind"\s*:/);
     if (fenced) err(`${rel}: metadata block is not delimited by '---'`);
+    else err(`${rel}: no metadata block; add one (a directory index that owns no aggregate, use case, or policy declares kind 'section-index') or declare the path in paths.unstructuredDocs`);
     return null;
   }
   const end = raw.indexOf('\n---', 3);
   if (end < 0) { err(`${rel}: unterminated metadata block`); return null; }
   try { return JSON.parse(raw.slice(3, end).trim()); }
   catch (e) { err(`${rel}: JSON parse error: ${e.message}`); return null; }
+}
+
+// A section body is the text between its own H2 and the next one. A check that
+// read the whole page instead would find, in the rules table, exactly the
+// identifiers the Scenario section is not allowed to carry.
+function sectionBody(raw, name) {
+  const lines = raw.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === `## ${name}`);
+  if (start < 0) return null;
+  const body = [];
+  for (let i = start + 1; i < lines.length; i += 1) {
+    if (/^##\s/.test(lines[i])) break;
+    body.push(lines[i]);
+  }
+  return body.join('\n');
 }
 
 // A use-case file lives directly in its module directory, or in a single
@@ -203,23 +318,39 @@ for (const f of files) {
     if (!fs.existsSync(path.resolve(dir, href))) err(`${rel}: broken link -> ${m[1]}`);
   }
 
+  // A declared unstructured path holds navigation or prose rather than a
+  // specification, so the metadata block rule does not reach it. Its links are
+  // still resolved above: a directory index is where a broken link costs most.
+  if (!hasMeta && unstructuredDocs.some((prefix) => rel === prefix || rel.startsWith(`${prefix}/`))) continue;
+
   const meta = parseBlock(raw, rel);
   if (!meta) continue;
   metas.push({ rel, meta, file: f });
 
   const spec = KINDS[meta.kind];
-  if (!spec) { err(`${rel}: unknown kind '${meta.kind}'`); continue; }
+  if (!spec) { err(`${rel}: unknown kind '${meta.kind}'; expected one of ${KIND_NAMES.join(', ')}`); continue; }
+  if (prohibitedKinds.has(meta.kind)) err(`${rel}: kind '${meta.kind}' is prohibited by this consumer; standards.project.json lists it in prohibitedKinds`);
   for (const r of spec.req) if (!(r in meta)) err(`${rel}: missing required '${r}'`);
   for (const k of Object.keys(meta)) if (!(k in spec.props)) err(`${rel}: unknown property '${k}'`);
-  if (meta.id !== undefined && !spec.id.test(meta.id)) err(`${rel}: id '${meta.id}' fails pattern`);
-  if (meta.specStatus !== undefined && !SPEC.includes(meta.specStatus)) err(`${rel}: bad specStatus '${meta.specStatus}'`);
-  if (meta.implementationStatus !== undefined && !IMPL.includes(meta.implementationStatus)) err(`${rel}: bad implementationStatus`);
-  if (meta.lastReviewed !== undefined && !DATE.test(meta.lastReviewed)) err(`${rel}: bad lastReviewed '${meta.lastReviewed}'`);
-  if (meta.operationType !== undefined && !['command', 'query'].includes(meta.operationType)) err(`${rel}: bad operationType`);
-  if (Array.isArray(meta.risks)) for (const r of meta.risks) if (!RISK.includes(r)) err(`${rel}: bad risk '${r}'`);
-  for (const a of ['actors', 'entryPoints', 'applicableExtensions']) if (Array.isArray(meta[a])) for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'`);
-  for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
-  for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'`); }
+  if (meta.id !== undefined && !spec.id.test(meta.id)) err(`${rel}: id '${meta.id}' fails pattern; expected ${FORM.get(spec.id)}`);
+  // A closed set names its members in the error. The vocabulary exists only in
+  // this file, so an author told that a value is wrong and not which values are
+  // right invents a plausible one, and the next author inherits it.
+  if (meta.specStatus !== undefined && !SPEC.includes(meta.specStatus)) err(`${rel}: bad specStatus '${meta.specStatus}'; expected one of ${SPEC.join(', ')}`);
+  if (meta.implementationStatus !== undefined && !IMPL.includes(meta.implementationStatus)) err(`${rel}: bad implementationStatus '${meta.implementationStatus}'; expected one of ${IMPL.join(', ')}`);
+  if (meta.lastReviewed !== undefined && !DATE.test(meta.lastReviewed)) err(`${rel}: bad lastReviewed '${meta.lastReviewed}'; expected ${DATE_FORM}`);
+  if (meta.operationType !== undefined && !OPERATION_TYPES.includes(meta.operationType)) err(`${rel}: bad operationType '${meta.operationType}'; expected one of ${OPERATION_TYPES.join(', ')}`);
+  if (Array.isArray(meta.risks)) for (const r of meta.risks) if (!RISK.includes(r)) err(`${rel}: bad risk '${r}'; expected one of ${RISK.join(', ')}`);
+  for (const a of ['actors', 'entryPoints', 'applicableExtensions']) if (Array.isArray(meta[a])) for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`);
+  for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(UC)}`); }
+  for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`); }
+
+  // A documentation kind declares the sections its reader expects to find. An
+  // absent section is a question the page never answered, which reads exactly
+  // like a question with no answer. (CORE.AUTHORING.PAGE.001)
+  for (const name of spec.sections ?? []) {
+    if (sectionBody(raw, name) === null) err(`${rel}: kind '${meta.kind}' requires an H2 '${name}'; a section with nothing to say contains only 'None.'`);
+  }
 
   if (SINGLETON_KINDS.has(meta.kind)) {
     if (!singletons.has(meta.kind)) singletons.set(meta.kind, []);
@@ -247,6 +378,23 @@ for (const f of files) {
     const ok = parts.length === 3 && parts[0] === mod && parts[1] === agg && parts[2] === 'README.md';
     if (!ok) err(`${rel}: aggregate id '${meta.id}' does not match its path`);
   }
+  // Every other section on these pages states a rule, a state, or a mapping,
+  // and none of them says when the behavior happens or who is under pressure
+  // while it does. (CORE.SYSTEM.SCENARIO.001, CORE.SYSTEM.SCENARIO.002,
+  // CORE.SYSTEM.CONVENTION.007)
+  if (SCENARIO_KINDS.has(meta.kind)) {
+    const scenario = sectionBody(raw, 'Scenario');
+    if (scenario === null) {
+      err(`${rel}: no 'Scenario' section; kind '${meta.kind}' states one concrete occasion for its subject`);
+    } else {
+      const words = scenario.trim().split(/\s+/).filter(Boolean);
+      if (!words.length) err(`${rel}: 'Scenario' section is empty`);
+      else if (words.length > scenarioWordLimit) err(`${rel}: 'Scenario' section runs to ${words.length} words; the bound is ${scenarioWordLimit}, because a scenario that grows past a paragraph becomes the page a reader reads instead of the tables`);
+      const cited = scenario.match(RULE_ID);
+      if (cited) err(`${rel}: 'Scenario' section names ${cited[0]}; a scenario illustrates its page and carries no rule, acceptance, or end-to-end identifier`);
+    }
+  }
+
   // extension scope checks
   if (Array.isArray(meta.applicableExtensions) && extScope.size) {
     for (const id of meta.applicableExtensions) {
@@ -266,7 +414,7 @@ for (const kind of SINGLETON_KINDS) {
   const found = singletons.get(kind) ?? [];
   if (found.length === 1) continue;
   if (!found.length) {
-    if (kind === 'product') err(`Expected exactly one ${kind} specification, found 0`);
+    if (REQUIRED_SINGLETON_KINDS.has(kind)) err(`Expected exactly one ${kind} specification, found 0`);
     continue;
   }
   err(`Expected at most one ${kind} specification, found ${found.length}: ${found.join(', ')}`);
@@ -282,6 +430,11 @@ for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end
 const PLATFORMS = ['react-web', 'react-native', 'other-web'];
 for (const frontend of project.paths?.frontends ?? []) {
   const name = frontend?.name ?? '(unnamed)';
+  // A declared frontend whose directory is absent reads as a frontend with no
+  // code, and every UI check for it passes by having nothing to read.
+  if (frontend?.path !== undefined && !fs.existsSync(path.join(root, frontend.path))) {
+    err(`standards.project.json: frontend '${name}' path '${frontend.path}' does not exist; the controlled UI checks for that frontend read nothing`);
+  }
   if (!frontend?.platform) {
     err(`standards.project.json: frontend '${name}' declares no 'platform'; one of ${PLATFORMS.join(', ')} is required`);
   } else if (!PLATFORMS.includes(frontend.platform)) {
@@ -307,9 +460,158 @@ if (uiActivated) {
   }
 }
 
+// ---- language and controlled prose -----------------------------------------
+// The language record closes the project's vocabulary and its mannered terms.
+// (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.VOICE.002)
+// The prose measures are the profile in docs/core/authoring.md, applied to the
+// consumer tree rather than only to the standards repository.
+// (CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003)
+let languageSummary = '';
+{
+  const languagePath = project.paths?.language;
+  const languageFile = languagePath ? path.join(root, languagePath) : path.join(docsRoot, 'language.json');
+  let compiled = null;
+  if (fs.existsSync(languageFile)) {
+    let record;
+    try { record = readJson(languageFile); } catch (e) { err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: not valid JSON (${e.message})`); }
+    if (record) {
+      if (record.schemaVersion !== 1) err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: schemaVersion must be 1`);
+      if (!Array.isArray(record.terms) || !Array.isArray(record.mannered)) {
+        err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: 'terms' and 'mannered' must both be arrays`);
+      } else {
+        let usable = true;
+        for (const entry of record.terms) {
+          if (!entry.term || !Array.isArray(entry.rejected) || !entry.rejected.length) { err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: every term needs 'term' and a non-empty 'rejected'`); usable = false; continue; }
+          // A scope that does not compile silently rejects nothing, which is the
+          // fail-open shape this validator exists to refuse. The record is not
+          // compiled afterwards, because compiling it would throw the same error
+          // as an unhandled crash and print no diagnostic at all.
+          if (entry.scope) { try { new RegExp(entry.scope); } catch { err(`${path.relative(root, languageFile).replace(/\\/g, '/')}: term '${entry.term}' has a scope that is not a regular expression: '${entry.scope}'`); usable = false; } }
+        }
+        if (usable) compiled = compileLanguage(record);
+      }
+    }
+  } else if (languagePath) {
+    err(`standards.project.json: paths.language '${languagePath}' does not exist; the vocabulary and mannered-term checks resolve nothing`);
+  }
+
+  // A page carries accepted prose debt only while nobody has re-read it. The
+  // baseline records the count and the lastReviewed date it was accepted at, so
+  // a page whose date moves has been read against the code and leaves the
+  // baseline in the same change. (CORE.AUTHORING.PROSE.003)
+  const baselinePath = project.prose?.baseline;
+  const baselineFile = baselinePath ? path.join(root, baselinePath) : path.join(docsRoot, 'prose-baseline.json');
+  let baseline = {};
+  if (fs.existsSync(baselineFile)) {
+    try { baseline = readJson(baselineFile).pages ?? {}; } catch (e) { err(`${path.relative(root, baselineFile).replace(/\\/g, '/')}: not valid JSON (${e.message})`); }
+  }
+  const reviewedOf = new Map(metas.map((m) => [m.rel, m.meta.lastReviewed]));
+
+  // AGENTS.md is scanned for language even though it carries no metadata and
+  // sits outside the documentation root. It is the first file an agent reads,
+  // so its register is the register that gets copied into every page written
+  // afterwards, and a rule the exemplar breaks is a rule that does not hold.
+  const agentsFile = path.join(root, 'AGENTS.md');
+  const languageFiles = fs.existsSync(agentsFile) ? [...files, agentsFile] : files;
+
+  const languageFindings = [];
+  const proseCounts = new Map();
+  for (const f of languageFiles) {
+    const rel = path.relative(root, f).replace(/\\/g, '/');
+    const raw = fs.readFileSync(f, 'utf8');
+    // A scope is written against the documentation root. AGENTS.md sits above
+    // it, so it matches no scoped rule and is checked by the mannered list.
+    const scopeRel = f === agentsFile ? rel : path.relative(docsRoot, f).replace(/\\/g, '/');
+    checkLanguage(scopeRel, raw, compiled, (_r, line, code, message) => {
+      languageFindings.push(`${rel}:${line}: ${code} ${message}`);
+    });
+    if (f === agentsFile) continue;
+    let count = 0;
+    checkProseMeasures(rel, raw, () => { count += 1; });
+    if (count) proseCounts.set(rel, count);
+  }
+
+  // The documentation tree is one of the surfaces a word reaches, and usually
+  // the smallest. A project's source, its interface copy, its API contract and
+  // its acceptance tests carry the same vocabulary to a developer, a buyer and
+  // a reviewer, and a check that reads only Markdown holds the vocabulary where
+  // nobody reads it. `paths.languageScan` names those surfaces.
+  // (CORE.AUTHORING.TERM.004)
+  //
+  // A scope in the language record is written against the documentation root
+  // for a page under it, and against the repository root for one of these
+  // files, because there is no other root the two have in common.
+  let scannedSurfaces = 0;
+  for (const pattern of project.paths?.languageScan ?? []) {
+    let matched;
+    try {
+      matched = fs.globSync(pattern, { cwd: root }).sort();
+    } catch (e) {
+      err(`standards.project.json: paths.languageScan '${pattern}' could not be read (${e.message})`);
+      continue;
+    }
+    // A pattern that matches nothing switches a surface off in silence, which
+    // is the shape this validator refuses everywhere else.
+    if (!matched.length) {
+      err(`standards.project.json: paths.languageScan '${pattern}' matches no file; the vocabulary check over that surface did not run`);
+      continue;
+    }
+    for (const relativePath of matched) {
+      const absolute = path.join(root, relativePath);
+      if (!fs.statSync(absolute).isFile()) continue;
+      const rel = relativePath.replace(/\\/g, '/');
+      scannedSurfaces += 1;
+      checkLanguageInSource(rel, fs.readFileSync(absolute, 'utf8'), compiled, (_r, line, code, message) => {
+        languageFindings.push(`${rel}:${line}: ${code} ${message}`);
+      });
+    }
+  }
+
+  // Every language finding is an error. The vocabulary is the project's own, so
+  // a term it rejects is a term it chose to reject.
+  for (const finding of languageFindings) err(finding);
+
+  let accepted = 0;
+  for (const [rel, count] of proseCounts) {
+    const entry = baseline[rel];
+    if (!entry) { err(`${rel}: ${count} controlled-prose problem(s) and no prose baseline entry; run 'node standards/tools/validate-consumer.mjs --prose' to list them`); continue; }
+    if (count > entry.count) { err(`${rel}: controlled-prose problems grew from ${entry.count} to ${count}; the baseline records accepted debt and does not absorb new debt`); continue; }
+    const reviewed = reviewedOf.get(rel);
+    if (reviewed && entry.lastReviewed && reviewed > entry.lastReviewed) {
+      err(`${rel}: lastReviewed moved to ${reviewed} while ${count} controlled-prose problem(s) remain; a page read against the code leaves the prose baseline in the same change`);
+      continue;
+    }
+    accepted += 1;
+  }
+  for (const rel of Object.keys(baseline)) {
+    if (!proseCounts.has(rel)) err(`${rel}: listed in the prose baseline and now clean; remove the entry so the baseline states real debt`);
+  }
+  const manneredCount = languageFindings.filter((f) => f.includes('LANGUAGE_MANNERED_TERM')).length;
+  const rejectedCount = languageFindings.length - manneredCount;
+  const surfaceNote = scannedSurfaces
+    ? `, ${scannedSurfaces} non-Markdown surface(s) scanned`
+    : ', documentation only';
+  languageSummary = compiled
+    ? `Language: ${manneredCount} mannered term(s), ${rejectedCount} rejected synonym(s)${surfaceNote}; prose baseline covers ${accepted} page(s)`
+    : `Language: no language record found; the vocabulary and mannered-term checks did not run`;
+
+  // --prose lists the measures behind the counts, which is what a person needs
+  // to burn a page down. The check itself stays on by default.
+  if (process.argv.includes('--prose')) {
+    const detail = [];
+    for (const f of files) {
+      const rel = path.relative(root, f).replace(/\\/g, '/');
+      checkProseMeasures(rel, fs.readFileSync(f, 'utf8'), (r, line, code, message) => detail.push(`${r}:${line}: ${code} ${message}`));
+    }
+    console.log(`\nControlled prose (${detail.length}):`);
+    for (const d of detail) console.log(`  - ${d}`);
+  }
+}
+
 // ---- report ----------------------------------------------------------------
 console.log(`Consumer: ${root}`);
-console.log(`Files scanned: ${files.length}, metadata blocks: ${metas.length}`);
+console.log(`Files scanned: ${files.length} under ${docsPath}, metadata blocks: ${metas.length}`);
+console.log(languageSummary);
 console.log(`Acceptance ids: ${acDefs.size}, end-to-end test ids: ${e2eDefs.size}`);
 if (uiOutput) console.log(`\n${uiOutput}`);
 if (errors.length) {

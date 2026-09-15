@@ -55,11 +55,11 @@ The system contains one delivery approach and one operating model:
 
 
 - Agents stop and ask when a decision belongs to a person. (CORE.SYSTEM.AUTHORITY.001)
-- Approved specifications, not prompts, define the work. (CORE.SYSTEM.SPECIFICATION.001)
+- Approved specifications define the work, and each one situates its subject. (CORE.SYSTEM.SPECIFICATION.001, CORE.SYSTEM.SCENARIO.001)
 - Flows link their use cases rather than restate them. (CORE.SYSTEM.FLOW.001)
 - One module name is used across every layer. (CORE.SYSTEM.MODULE.001)
 - Module specifications map aggregates to state, invariants, and commands. (CORE.SYSTEM.AGGREGATE.001)
-- One use case is one Command or Query, with a defined status at each stage. (CORE.SYSTEM.USECASE.001, CORE.SYSTEM.USECASE.002)
+- One use case is one Command or Query, with a status and one specification. (CORE.SYSTEM.USECASE.001, CORE.SYSTEM.USECASE.002, CORE.SYSTEM.COVERAGE.001)
 - Workflow specifications name state, triggers, recovery, and owner. (CORE.SYSTEM.WORKFLOW.001)
 - Every event reaction declares its delivery classification. (CORE.SYSTEM.REACTION.001)
 - Domain rule IDs encode their enforcement classification. (CORE.SYSTEM.RULES.001)
@@ -220,6 +220,14 @@ An acceptance test cites the exact criterion identifier. The test name remains f
 
 Acceptance tests prove use-case behavior. End-to-end tests prove that connected use cases produce the release outcome.
 
+### Scenario and reference cast
+
+A scenario is one concrete occasion for the subject of a specification: who acts, what surrounds them, and what they would do instead. It answers when the behavior happens, which no rule, state, or mapping table states.
+
+A reference cast is the one record every scenario draws its people, place, dates, and amounts from. Independent scenarios invent an organization and a buyer for each page, so nothing carries between two pages read in sequence.
+
+Both are informative. A scenario illustrates its page and never governs it. A scenario that disagrees with the page it sits on is the part that is wrong.
+
 ## Standards
 
 
@@ -283,6 +291,20 @@ Acceptance ID:  AC-ORDERS-CANCEL-ORDER-01
 
 A use case reaches `verified` only after Domain behavior, coordination, persistence, entry points, evidence, and operating impact are complete. Placeholder work leaves the use case `planned`.
 
+### Keep specifications and use cases in one-to-one correspondence (CORE.SYSTEM.COVERAGE.001)
+
+**Requirement:** Every implemented use case MUST resolve to exactly one use-case specification that resolves back to it.
+
+**Rationale:** Neither direction is visible without the check. Code with no specification reads as a reviewed feature and is not one. A specification with no code states a plan in the present tense.
+
+**Example:** `node standards/tools/validate-parity.mjs` reports both directions.
+
+```text
+FAIL (2 problem(s)):
+  - handler with no specification: Application/Sales/Vouchers/RedeemVoucher -> sales.redeem-voucher
+  - specification with no handler: docs/domain/modules/sales/vouchers/void-voucher.md
+```
+
 ### Specify autonomous progress as a workflow (CORE.SYSTEM.WORKFLOW.001)
 
 **Requirement:** A workflow specification MUST name its owner, participating modules, starting fact, completion and failure conditions, durable state, commands, awaited events, retries, and operator actions.
@@ -306,6 +328,30 @@ A use case reaches `verified` only after Domain behavior, coordination, persiste
 **Requirement:** An aggregate specification MUST map every business state to a sealed state record under one abstract `{Aggregate}State` base.
 
 **Rationale:** This holds from the first implementation, including an aggregate with one current state. An enum, status string, boolean flag, or computed discriminator cannot carry state-specific facts.
+
+### State one occasion for every behavior specification (CORE.SYSTEM.SCENARIO.001)
+
+**Requirement:** A module, aggregate, use-case, domain-policy, or end-to-end-flow specification MUST carry a `Scenario` section stating one concrete occasion for its subject.
+
+**Rationale:** Every other section states a rule, a state, or a mapping. None of them says when the behavior happens, or who is under pressure while it does. A reader who cannot place an operation in the world reads its rules as arbitrary constraints. An agent writing against it cannot tell an ordinary case from an exceptional one.
+
+**Example:** A door specification states the hour, the queue, and the scanner that lost signal before it states its failure codes.
+
+### Keep a scenario informative (CORE.SYSTEM.SCENARIO.002)
+
+**Requirement:** A `Scenario` section MUST NOT contain a domain rule, acceptance, or end-to-end identifier.
+
+**Rationale:** An identifier inside a scenario reads as a second definition of the rule it names, and two definitions drift. The section illustrates the page, so a scenario that contradicts the page's own tables is the part that is wrong.
+
+**Example:** A scenario says the buyer is refused because the last place went to somebody else, and the rules table says `INV-INVENTORY-01`.
+
+### Derive every scenario from one reference cast (CORE.SYSTEM.SCENARIO.003)
+
+**Requirement:** A consumer MUST record one `scenario-cast` specification and draw the people, place, dates, and amounts of every `Scenario` section from it.
+
+**Rationale:** One cast makes a sequence of pages describe one occasion rather than many unrelated illustrations. The reader carries context from each page to the next. The cast costs nothing to maintain because it names no code, and its figures come from the specifications.
+
+**Example:** The buyer who places the order in one specification is the person at the gate in another.
 
 ### Declare Specification Metadata (CORE.SYSTEM.METADATA.001)
 
@@ -365,6 +411,7 @@ docs/
   domain/
     README.md
     glossary.md
+    scenarios.md
     modules/
       README.md
       orders/
@@ -380,6 +427,12 @@ docs/
       order-fulfillment.md
     policies/
       refund-limit.md
+  tools/
+    README.md
+    configuration.md
+    project-up.md
+  reference/
+  guide/
   decisions/
   operations/
     limits.md
@@ -388,6 +441,8 @@ docs/
   releases/
   research/
 ```
+
+`tools/` holds one command page for each command the repository ships, beside the configuration page that owns every setting a reader can change. `reference/` holds the pages a reader looks up rather than reads. `guide/` holds the tutorial and the how-to pages, which name those commands rather than the mechanism beneath them.
 
 The example creates an optional directory only when its first real artifact is added. The example does not create empty directories or placeholder records during inception.
 
@@ -431,6 +486,14 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** A specification that needs tooling to read stops being reviewable by the person who owns its decisions.
 
+### Bound a scenario to one paragraph (CORE.SYSTEM.CONVENTION.007)
+
+**Default:** Keep a `Scenario` section within 120 words.
+
+**Replacement:** A consumer can raise or lower the bound in `scenarioWordLimit` within `standards.project.json`.
+
+**Rationale:** A scenario that grows past a paragraph becomes the page a reader reads instead of the tables, and it acquires detail that nothing verifies.
+
 ## Reference example
 
 This informative example demonstrates `CORE.SYSTEM.FLOW.001`, `CORE.SYSTEM.WORKFLOW.001`, and `CORE.SYSTEM.REACTION.001`.
@@ -453,10 +516,14 @@ The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` chang
 | CORE.SYSTEM.AGGREGATE.001 | inspection | The module specification carries an aggregate table naming owned state, invariant identifiers, and commands. |
 | CORE.SYSTEM.USECASE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
 | CORE.SYSTEM.USECASE.002 | inspection | Each `implemented` use case resolves to existing Domain, Application, persistence, and entry-point code with no acceptance test. |
+| CORE.SYSTEM.COVERAGE.001 | static | `node standards/tools/validate-parity.mjs` reports no handler without a specification and no specification without a handler. |
 | CORE.SYSTEM.WORKFLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each workflow module reference and the template requires the named sections. |
 | CORE.SYSTEM.REACTION.001 | inspection | The owning specification records one delivery classification for each event reaction. |
 | CORE.SYSTEM.RULES.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a domain rule ID whose prefix does not match its declared classification. |
 | CORE.SYSTEM.STATE.001 | inspection | The aggregate specification carries a state mapping table, and `ArchitectureTests` asserts the code matches it. |
+| CORE.SYSTEM.SCENARIO.001 | static | `node standards/tools/validate-consumer.mjs` fails a module, aggregate, use-case, domain-policy, or end-to-end-flow page carrying no `Scenario` section. |
+| CORE.SYSTEM.SCENARIO.002 | static | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section containing an `INV-`, `POL-`, `VAL-`, `AC-`, or `E2E-` identifier. |
+| CORE.SYSTEM.SCENARIO.003 | static | `node standards/tools/validate-consumer.mjs` fails a documentation set holding no `scenario-cast` specification or more than one. |
 | CORE.SYSTEM.METADATA.001 | inspection | `node standards/tools/validate-consumer.mjs` validates each metadata block against `schemas/specification-metadata.schema.json`. |
 | CORE.SYSTEM.EXTENSIONS.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension in local metadata and a local extension on an excluded kind. |
 | CORE.SYSTEM.EXTENSIONS.002 | static | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension listed in local metadata. |
@@ -468,3 +535,4 @@ The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` chang
 | CORE.SYSTEM.CONVENTION.004 | inspection | Terminology review compares each new term against the glossary and this list. |
 | CORE.SYSTEM.CONVENTION.005 | inspection | Prose review confirms ordinary nouns outside sentence starts, titles, and exact identifiers. |
 | CORE.SYSTEM.CONVENTION.006 | inspection | Specification review confirms JSON appears only in the opening metadata block. |
+| CORE.SYSTEM.CONVENTION.007 | static | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |

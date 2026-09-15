@@ -15,6 +15,8 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | `product-brief.md` | `docs/product/brief.md` | Defines the product boundary and linked end-to-end flows. |
 | `domain-index.md` | `docs/domain/README.md` | Lists modules, workflows, and domain policies. |
 | `glossary.md` | `docs/domain/glossary.md` | Defines shared domain language. |
+| `language.json` | `docs/language.json` | Closes the vocabulary prose is checked against: terms, rejected synonyms, each rejection's scope, and the mannered terms. |
+| `scenario-cast.md` | `docs/domain/scenarios.md` | Fixes the people, place, dates, and amounts every `Scenario` section draws from. |
 | `modules-index.md` | `docs/domain/modules/README.md` | Defines the module documentation boundary. |
 
 ## Add when required
@@ -38,19 +40,18 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | `ui-override-decision.md` | `docs/decisions/{id}.md` | A React web visual-system, component-base, registry, or specialist-control override is required. |
 | `runbook.md` | `docs/runbooks/{runbook}.md` | An operator needs a repeatable recovery or operating procedure. |
 | `release-record.md` | `docs/releases/{release}.md` | One immutable release artifact is evaluated. |
+| `tutorial.md` | `docs/guide/{tutorial}.md` | A newcomer needs one path to a first working result. |
+| `how-to.md` | `docs/guide/{how-to}.md` | A reader who is already running needs one stated goal solved. |
+| `command.md` | `docs/tools/{command}.md` | The repository ships a command a reader runs. |
+| `reference.md` | `docs/reference/{record}.md` | A reader looks up exact values rather than reading a procedure. |
+| `configuration.md` | `docs/tools/configuration.md` | A setting a reader can change needs its default, scope, and precedence. |
 
 A template `id` is not always the filename. The operating-limits record lives at `docs/operations/limits.md` but keeps the fixed metadata `id` of `operating-limits`. The record kind, not the filename, sets the id. Use-case, module, flow, workflow, and policy ids follow their own kind rules in the Agentic Engineering System page.
 
 Markdown specification templates begin with Specification Metadata validated by [the schema](../../schemas/specification-metadata.schema.json). The Agentic Engineering System page defines semantic relationships that JSON Schema cannot prove across files.
 
-React web consumers also validate UI configuration and sidecar contracts with
-`schemas/ui-vocabulary.schema.json`, `schemas/ui-page.schema.json`, and
-`schemas/ui-source-lock.schema.json`. Run `node standards/tools/validate-ui.mjs` from the consumer root
-after adding or changing these files.
+React web consumers also validate UI configuration and sidecar contracts with `schemas/ui-vocabulary.schema.json`, `schemas/ui-page.schema.json`, and `schemas/ui-source-lock.schema.json`. Run `node standards/tools/validate-ui.mjs` from the consumer root after adding or changing these files.
 
-The three UI templates are a coherent set for a frontend named `web`: the vocabulary, the page sidecar,
-and the source lock reference each other. Rename the frontend, page id, and component entries together.
-Replace the placeholder digest in `ui-source-lock.json` with the digest of the formatted installed source
-before validating.
+The three UI templates are a coherent set for a frontend named `web`: the vocabulary, the page sidecar, and the source lock reference each other. Rename the frontend, page id, and component entries together. Replace the placeholder digest in `ui-source-lock.json` with the digest of the formatted installed source before validating.
 
 The standards do not generate application code. Agents load the active specification, selected profile, task conventions, and applicable extensions before implementing one complete slice.

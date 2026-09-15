@@ -14,6 +14,10 @@
 
 State what this aggregate root protects and the business decisions it owns. An aggregate is one transaction boundary. It is not the same boundary as its module.
 
+## Scenario
+
+Follow one instance of this root through the states below: what brings it into existence, what happens to it next, and where it ends. Use the people, dates, and amounts from the reference cast record, and name a person rather than a role. This section is informative. The tables below stay authoritative for states, transitions, and invariants.
+
 ## Ownership
 
 | Owns | References by ID | Owning module |
