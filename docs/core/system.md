@@ -427,6 +427,12 @@ docs/
       order-fulfillment.md
     policies/
       refund-limit.md
+  tools/
+    README.md
+    configuration.md
+    project-up.md
+  reference/
+  guide/
   decisions/
   operations/
     limits.md
@@ -435,6 +441,8 @@ docs/
   releases/
   research/
 ```
+
+`tools/` holds one command page for each command the repository ships, beside the configuration page that owns every setting a reader can change. `reference/` holds the pages a reader looks up rather than reads. `guide/` holds the tutorial and the how-to pages, which name those commands rather than the mechanism beneath them.
 
 The example creates an optional directory only when its first real artifact is added. The example does not create empty directories or placeholder records during inception.
 

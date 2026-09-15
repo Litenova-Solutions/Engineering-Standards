@@ -51,6 +51,20 @@ const VALUES = {
   __RELEASE_RECORD_ID__: '2026-01-01-fixture',
   __VERSION__: '1.0.0',
   __RUNBOOK_ID__: 'restore-database',
+  __COMMAND_ID__: 'fixture-up',
+  __COMMAND_TITLE__: 'Fixture Up',
+  __COMMAND__: 'fixture up',
+  __ARGUMENT__: 'target',
+  __OPTION__: 'detach',
+  __DEFAULT__: 'off',
+  __REFERENCE_ID__: 'ports',
+  __REFERENCE_TITLE__: 'Allocated Ports',
+  __NAME__: 'api',
+  __VALUE__: '5080',
+  __CONFIGURATION_ID__: 'configuration',
+  __CONFIGURATION_TITLE__: 'Fixture Settings',
+  __SETTING__: 'seedPack',
+  __SCOPE__: 'project',
   __CAST__: 'scenarios',
   __CAST_TITLE__: 'The Reference Cast',
   __ORGANIZATION__: 'Fixture Promotions',
@@ -79,6 +93,9 @@ const LAYOUT = [
   ['runbook.md', 'docs/runbooks/restore-database.md'],
   ['release-record.md', 'docs/releases/2026-01-01-fixture.md'],
   ['decision-evidence.md', 'docs/research/fixture-evidence.md'],
+  ['command.md', 'docs/tools/fixture-up.md'],
+  ['reference.md', 'docs/reference/ports.md'],
+  ['configuration.md', 'docs/tools/configuration.md'],
 ];
 
 let failures = 0;
@@ -195,6 +212,17 @@ build();
 
 console.log('Baseline');
 report('tracked templates validate as shipped', null, run());
+
+console.log('\nDocumentation kinds');
+metaCase('command page kind is accepted', 'docs/tools/fixture-up.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('reference page kind is accepted', 'docs/reference/ports.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('configuration page kind is accepted', 'docs/tools/configuration.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('misspelled documentation kind', 'docs/tools/fixture-up.md', (m) => { m.kind = 'commands'; }, "unknown kind 'commands'");
+metaCase('command id fails its pattern', 'docs/tools/fixture-up.md', (m) => { m.id = 'Fixture Up'; }, 'fails pattern');
+metaCase('documentation kind carrying an unknown property', 'docs/reference/ports.md', (m) => { m.operationType = 'command'; }, "unknown property 'operationType'");
+bodyCase('command page hiding its mechanism', 'docs/tools/fixture-up.md', (raw) => raw.split('## Underneath')[0], "requires an H2 'Underneath'");
+bodyCase('reference page with no reference section', 'docs/reference/ports.md', (raw) => raw.replace('## Reference', '## Procedure'), "requires an H2 'Reference'");
+bodyCase('configuration page with no precedence', 'docs/tools/configuration.md', (raw) => raw.replace('## Precedence', '## Notes'), "requires an H2 'Precedence'");
 
 console.log('\nDocumentation root');
 projectCase('documentation root that is on disk', (p) => { p.paths.docs = 'docs'; }, null);

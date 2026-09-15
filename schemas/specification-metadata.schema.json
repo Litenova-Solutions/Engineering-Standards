@@ -10,6 +10,9 @@
     { "$ref": "#/$defs/modulesIndex" },
     { "$ref": "#/$defs/sectionIndex" },
     { "$ref": "#/$defs/scenarioCast" },
+    { "$ref": "#/$defs/reference" },
+    { "$ref": "#/$defs/command" },
+    { "$ref": "#/$defs/configuration" },
     { "$ref": "#/$defs/module" },
     { "$ref": "#/$defs/aggregate" },
     { "$ref": "#/$defs/useCase" },
@@ -156,6 +159,45 @@
       "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "section-index" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "reference": {
+      "description": "A page of exact values a reader looks up rather than reads end to end. It owns no behavior and may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "reference" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "command": {
+      "description": "One shipped command: its arguments, its options, its exit codes, and what it runs underneath. It may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "command" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "configuration": {
+      "description": "The settings a reader can change, each with its default, its scope, and what overrides it. It may appear more than once.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
+      "properties": {
+        "kind": { "const": "configuration" },
         "id": { "$ref": "#/$defs/identifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },

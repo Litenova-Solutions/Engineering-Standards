@@ -181,6 +181,13 @@ const KINDS = {
   // The one reference cast every Scenario section draws from. It is informative,
   // owns no rule, and carries the base fields and nothing else.
   'scenario-cast': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID },
+  // Three documentation kinds. None describes behavior a person experiences, so
+  // none carries a Scenario, and none is a singleton. Each declares the H2 order
+  // its class answers at, because a command page that omits Underneath hides the
+  // mechanism it wraps. (CORE.AUTHORING.DISCLOSURE.002, CORE.AUTHORING.DISCLOSURE.003)
+  reference: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Reference'] },
+  command: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'] },
+  configuration: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Settings', 'Precedence'] },
   module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
   aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: UC },
   'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: UC },
@@ -334,6 +341,13 @@ for (const f of files) {
   for (const a of ['actors', 'entryPoints', 'applicableExtensions']) if (Array.isArray(meta[a])) for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`);
   for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(UC)}`); }
   for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`); }
+
+  // A documentation kind declares the sections its reader expects to find. An
+  // absent section is a question the page never answered, which reads exactly
+  // like a question with no answer. (CORE.AUTHORING.PAGE.001)
+  for (const name of spec.sections ?? []) {
+    if (sectionBody(raw, name) === null) err(`${rel}: kind '${meta.kind}' requires an H2 '${name}'; a section with nothing to say contains only 'None.'`);
+  }
 
   if (SINGLETON_KINDS.has(meta.kind)) {
     if (!singletons.has(meta.kind)) singletons.set(meta.kind, []);

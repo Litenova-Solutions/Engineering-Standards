@@ -140,6 +140,8 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'VERIFY_UNKNOWN_ID',
 
   'TEMPLATE_INDEX_PATH',
+
+  'INDEX_MISSING_ROUTING',
 ]);
 const SCHEMA_KEYWORDS = new Set([
   '$schema', '$id', '$ref', '$defs', 'title', 'description', 'type', 'const', 'enum', 'pattern',
@@ -253,14 +255,36 @@ function anchorsFor(raw) {
   return anchors;
 }
 
-const PAGE_CLASS_AREA = { ext: 'extension', profile: 'profile', guide: 'guide' };
+// A directory names the class of every page inside it. Four of these hold pages a
+// reader follows or looks up rather than pages that own provisions, and each one
+// answers a question at a single layer. (CORE.AUTHORING.DISCLOSURE.002)
+const PAGE_CLASS_AREA = {
+  ext: 'extension',
+  profile: 'profile',
+  guide: 'how-to',
+  tutorial: 'tutorial',
+  reference: 'reference',
+  tools: 'command',
+};
+
+// A standards template seeds one page class, so it is parsed as the page it
+// produces and held to that page's contract.
+const TEMPLATE_VIRTUAL_PATH = {
+  'extension.md': 'docs/ext/template.md',
+  'how-to.md': 'docs/guide/template.md',
+  'tutorial.md': 'docs/tutorial/template.md',
+  'command.md': 'docs/tools/template.md',
+};
 
 function pageClass(relative) {
   if (relative === INDEX_PATH) return 'index';
   if (relative === 'docs/reference/glossary.md') return 'glossary';
   if (relative.endsWith('/README.md') || relative === 'README.md') return 'index';
-  const area = relative.match(/^docs\/([a-z][a-z0-9]*)\/[a-z][a-z0-9]*\.md$/)?.[1];
-  if (!area || area === 'reference') return null;
+  // A page owning no provision derives no identifier from its stem, so it carries
+  // a descriptive hyphenated name. A stem pattern refusing the hyphen returned no
+  // class for every such page, and a page with no class is held to no contract.
+  const area = relative.match(/^docs\/([a-z][a-z0-9]*)\/[a-z][a-z0-9-]*\.md$/)?.[1];
+  if (!area) return null;
   return PAGE_CLASS_AREA[area] ?? 'topic';
 }
 
@@ -274,7 +298,17 @@ function expectedSections(kind) {
   if (kind === 'extension') {
     return { required: ['Intent', 'Activation', 'Baseline relationship', 'Agent Summary', 'Standards', 'Conventions', 'Dependencies', 'Verification'], optional: [] };
   }
-  if (kind === 'guide') return { required: ['Purpose', 'Procedure', 'Verification'], optional: ['Prerequisites'] };
+  if (kind === 'how-to') return { required: ['Purpose', 'Procedure', 'Verification'], optional: ['Prerequisites'] };
+  // A tutorial closes on what the reader now has. Verification asks whether a
+  // procedure worked, which is a different question asked by a different reader.
+  if (kind === 'tutorial') return { required: ['Purpose', 'Prerequisites', 'Lesson', 'What you built'], optional: [] };
+  if (kind === 'reference') return { required: ['Intent', 'Reference'], optional: ['Notes'] };
+  // Underneath is required rather than optional, so a command page that hides its
+  // mechanism fails rather than passing in silence. A command with nothing
+  // separately runnable writes 'None.' (CORE.AUTHORING.DISCLOSURE.003)
+  if (kind === 'command') {
+    return { required: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'], optional: [] };
+  }
   return null;
 }
 
@@ -291,9 +325,11 @@ function checkSectionOrder(relative, kind, sections, add) {
   }
   const canonical = kind === 'topic'
     ? ['Intent', 'Agent Summary', 'Concepts', 'Standards', 'Conventions', 'Reference example', 'Verification']
-    : kind === 'guide'
+    : kind === 'how-to'
       ? ['Purpose', 'Prerequisites', 'Procedure', 'Verification']
-      : contract.required;
+      : kind === 'reference'
+        ? ['Intent', 'Reference', 'Notes']
+        : contract.required;
   let previous = -1;
   for (const section of sections) {
     const position = canonical.indexOf(section.name);
@@ -817,7 +853,9 @@ function normalizeTemplate(relative, raw) {
     .replaceAll('{EXT.NAME}.CONVENTION.001', 'EXT.TEMPLATE.CONVENTION.001')
     .replaceAll('{Topic Title}', 'Topic Title')
     .replaceAll('{Extension Title}', 'Extension Title')
-    .replaceAll('{Guide Title}', 'Guide Title');
+    .replaceAll('{How-To Title}', 'How-To Title')
+    .replaceAll('{Tutorial Title}', 'Tutorial Title')
+    .replaceAll('{Command Title}', 'Command Title');
 }
 
 export function validateRepository(rootInput = '.') {
@@ -914,9 +952,7 @@ export function validateRepository(rootInput = '.') {
   for (const file of walk(templateRoot, (candidate) => candidate.endsWith('.md'))) {
     const relative = slash(path.relative(root, file));
     const name = path.basename(file);
-    const virtualRelative = name === 'extension.md' ? 'docs/ext/template.md'
-      : name === 'guide.md' ? 'docs/guide/template.md'
-        : 'docs/core/template.md';
+    const virtualRelative = TEMPLATE_VIRTUAL_PATH[name] ?? 'docs/core/template.md';
     const normalized = normalizeTemplate(relative, fs.readFileSync(file, 'utf8'));
     const nonAscii = stripFences(normalized.split(/\r?\n/)).map((item) => item.line).join('\n').match(/[^\x00-\x7F]/);
     if (nonAscii) add(relative, 1, 'PROSE_NON_ASCII', `authoring template contains non-ASCII character U+${nonAscii[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
@@ -959,8 +995,45 @@ export function validateRepository(rootInput = '.') {
   // reads exactly like a correct one. (CORE.PRINCIPLES.SOURCE.001)
   checkTemplateIndex(root, add);
 
+  // A reader who cannot tell a tutorial from a reference opens both and trusts
+  // neither, so the documentation root names each class before it links to one.
+  // (CORE.AUTHORING.INDEX.002)
+  checkRootIndexRouting(root, add);
+
   diagnostics.sort((left, right) => left.relative.localeCompare(right.relative) || left.line - right.line || left.code.localeCompare(right.code));
   return { diagnostics };
+}
+
+const ROUTING_HEADING = 'Which page do you want';
+
+function checkRootIndexRouting(root, add) {
+  const relative = 'docs/README.md';
+  const file = path.join(root, relative);
+  if (!fs.existsSync(file)) return;
+  const lines = fs.readFileSync(file, 'utf8').split(/\r?\n/);
+  let routingLine = -1;
+  let firstGroupLine = -1;
+  let currentHeading = '';
+  for (let index = 0; index < lines.length; index += 1) {
+    const heading = lines[index].match(/^##\s+(.+?)\s*$/);
+    if (heading) {
+      currentHeading = heading[1];
+      if (currentHeading === ROUTING_HEADING && routingLine < 0) routingLine = index + 1;
+      continue;
+    }
+    // A navigation group is a section whose body lists links. Intent introduces
+    // the page and names no destination, so a link inside it starts no group.
+    if (firstGroupLine < 0 && currentHeading && currentHeading !== 'Intent' && currentHeading !== ROUTING_HEADING && /^-\s+\[/.test(lines[index])) {
+      firstGroupLine = index + 1;
+    }
+  }
+  if (routingLine < 0) {
+    add(relative, 1, 'INDEX_MISSING_ROUTING', `documentation root index has no '${ROUTING_HEADING}' section, so a reader cannot tell which page class answers their question`);
+    return;
+  }
+  if (firstGroupLine >= 0 && routingLine > firstGroupLine) {
+    add(relative, routingLine, 'INDEX_MISSING_ROUTING', `'${ROUTING_HEADING}' appears after the first navigation group at line ${firstGroupLine}`);
+  }
 }
 
 function checkTemplateIndex(root, add) {

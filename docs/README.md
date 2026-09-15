@@ -6,6 +6,14 @@ Use this index to load the canonical page for current work.
 
 Each directory under `docs/` is one provision area. A page path states the scope its provisions carry, so `frontend/components.md` owns `FRONTEND.COMPONENTS`. The [provision index](reference/provisions.md) resolves any identifier to its page.
 
+## Which page do you want
+
+A **tutorial** takes you through a first working result, one step at a time.
+A **how-to** solves one stated problem for a reader who already has it running.
+A **reference** states exact values, options, and defaults, and is read by looking up.
+A **command** page documents one command: its options, its exit codes, and what it runs underneath.
+A **topic**, **profile**, or **extension** page owns the provisions a reader cites.
+
 ## Core
 
 - [Scope](core/scope.md)
@@ -82,6 +90,15 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Reporting](ext/report.md)
 - [Scheduled jobs](ext/jobs.md)
 
+## Tools
+
+- [Command index](tools/README.md)
+- [Validate Standards](tools/validate-standards.md)
+- [Generate Provisions](tools/generate-provisions.md)
+- [Validate Consumer](tools/validate-consumer.md)
+- [Validate Controlled UI](tools/validate-ui.md)
+- [Validate Use-Case Parity](tools/validate-parity.md)
+
 ## Guide
 
 - [Get started](guide/getting-started.md)
@@ -94,6 +111,5 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Provision index](reference/provisions.md)
 - [Audit obligations](reference/audit-obligations.md)
 - [Consumer templates](../templates/consumer/README.md)
-- [Reference validators](../tools/README.md)
 
 Consumers pin a complete release. `CHANGELOG.md` is the only repository release note.

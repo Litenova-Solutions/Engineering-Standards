@@ -10,7 +10,7 @@ The standards use one page grammar and one controlled technical prose profile. T
 - Write one testable obligation in each Standards provision. (CORE.AUTHORING.NORMATIVE.002, CORE.AUTHORING.REQUIREMENT.001)
 - Name the declared page scope and a registered topic in each ID. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002, CORE.AUTHORING.IDENTIFIER.003)
 - Give each actionable default a distinct convention ID. (CORE.AUTHORING.DEFAULTS.001)
-- Apply the declared contract for each page class. (CORE.AUTHORING.PAGE.001)
+- Route the reader, apply each page contract, and state one layer per page. (CORE.AUTHORING.PAGE.001, CORE.AUTHORING.INDEX.002, CORE.AUTHORING.DISCLOSURE.001, CORE.AUTHORING.DISCLOSURE.002, CORE.AUTHORING.DISCLOSURE.003, CORE.AUTHORING.CONFIG.001)
 - Keep summaries informative and cite every projected provision. (CORE.AUTHORING.SUMMARY.001)
 - Map every provision to exact verification evidence. (CORE.AUTHORING.VERIFICATION.001)
 - Validate current material and publish complete releases. (CORE.AUTHORING.SNAPSHOT.001, CORE.AUTHORING.SNAPSHOT.002, CORE.AUTHORING.SNAPSHOT.003, CORE.AUTHORING.SNAPSHOT.004, CORE.AUTHORING.SNAPSHOT.005, CORE.AUTHORING.SNAPSHOT.006)
@@ -86,25 +86,46 @@ Version numbers identify complete pinned contracts. They do not claim Semantic V
 
 This release model governs the standards repository. A consumer product is a running service with its own users. Consumer API compatibility, schema migration, deprecation, and rollback stay required wherever their owning provisions and extensions apply.
 
+### Documentation layers
+
+A reader arrives at one of four layers, and each layer answers a different question. A page states one layer, so a reader who opened it for one question does not read another reader's answer.
+
+| Layer | Page class | The question it answers |
+|:---|:---|:---|
+| 1 | Tutorial | How do I get a first working result? |
+| 2 | How-to | How do I reach this one stated goal? |
+| 3 | Reference, Command, Configuration | What are the exact values, options, and defaults? |
+| 4 | Underneath | What does the command run, and how do I run it myself? |
+
+The order is a reading order rather than an authoring order. A page links down to the next layer and never up. A reader who wants more detail always has one step available, and never has to take it.
+
+Layer 4 has no page class of its own. It is the `Underneath` section of a command page, which is the one place a command page states its own mechanism. A wrapper with no way through it cannot be debugged when it fails.
+
 ### Page contracts
 
-| Page class | Required H2 order |
-|:---|:---|
-| Topic | Intent, Agent Summary, optional Concepts, Standards, Conventions, optional Reference example, Verification |
-| Profile | Intent, Agent Summary, Standards, Composition, Conventions, Verification |
-| Extension | Intent, Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, Verification |
-| Guide | Purpose, optional Prerequisites, Procedure, Verification |
-| Index | Intent, then navigation groups |
-| Glossary | Alphabetical term headings with one-sentence definitions and optional examples |
+A directory names the class of every page inside it, and the class states the contract.
+
+| Page class | Directory | Required H2 order |
+|:---|:---|:---|
+| Topic | `docs/<area>/` | Intent, Agent Summary, optional Concepts, Standards, Conventions, optional Reference example, Verification |
+| Profile | `docs/profile/` | Intent, Agent Summary, Standards, Composition, Conventions, Verification |
+| Extension | `docs/ext/` | Intent, Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, Verification |
+| Tutorial | `docs/tutorial/` | Purpose, Prerequisites, Lesson, What you built |
+| How-to | `docs/guide/` | Purpose, optional Prerequisites, Procedure, Verification |
+| Reference | `docs/reference/` | Intent, Reference, optional Notes |
+| Command | `docs/tools/` | Name, Synopsis, Description, Arguments, Options, Exit codes, Examples, Underneath |
+| Index | any `README.md` | Intent, then navigation groups |
+| Glossary | `docs/reference/glossary.md` | Alphabetical term headings with one-sentence definitions and optional examples |
 
 - A page that owns provisions lives at `docs/<area>/<page>.md`, with one lowercase word in each position.
-- A guide or reference page uses a descriptive file name, because no identifier derives from it.
+- A tutorial, how-to, reference, or command page uses a descriptive file name, because no identifier derives from it.
 - A normative page has one H1 with a Title Case title.
 - A provision heading uses sentence case, starts with an action verb, and ends with its ID.
 - A required empty section contains only `None.`
 - A Reference example is informative and lists every provision it demonstrates.
 - Provision or Reference example blocks contain examples. A standalone Examples section is invalid.
-- Guides and indexes contain no normative provisions.
+- A tutorial, how-to, reference, command, or index page contains no normative provisions.
+- A tutorial states one path. An option, an alternative, or a branch belongs on a how-to page.
 
 ### Standards provision contract
 
@@ -315,6 +336,34 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** Stable page classes let readers find authority, context, defaults, and evidence predictably.
 
+### Name the tool rather than the mechanism (CORE.AUTHORING.DISCLOSURE.001)
+
+**Requirement:** A tutorial step or how-to step MUST name the repository command that performs that step, where one exists.
+
+**Rationale:** A procedure that lists what a command already does becomes a second copy of that command, and the copy is the part that drifts.
+
+**Example:** A step reads `Run \`entro up\`` rather than listing the compose start, the readiness wait, and each process launch.
+
+### State one layer per page (CORE.AUTHORING.DISCLOSURE.002)
+
+**Requirement:** A page MUST NOT describe both a command and the mechanism that command runs, outside an `Underneath` section.
+
+**Rationale:** A reader who wanted the command reads the mechanism as noise, and a reader who wanted the mechanism reads the command as an obstacle.
+
+### Name the escape from every abstraction (CORE.AUTHORING.DISCLOSURE.003)
+
+**Requirement:** A command page MUST state under `Underneath` what the command runs, or state that nothing beneath it is separately runnable.
+
+**Rationale:** A wrapper nobody can see through is a wrapper nobody can debug, and it fails on somebody's machine eventually.
+
+**Example:** A command with no separately runnable mechanism writes `None.` under `Underneath`.
+
+### Record a setting as reference (CORE.AUTHORING.CONFIG.001)
+
+**Requirement:** A configuration setting a reader can change MUST appear on a configuration page with its default, its scope, and what overrides it.
+
+**Rationale:** A setting introduced inside a procedure is findable only by the reader who already knows which procedure mentioned it.
+
 ### Write atomic Standards provisions (CORE.AUTHORING.REQUIREMENT.001)
 
 **Requirement:** A Standards provision MUST follow the Standards provision contract and provision identity policy defined by this page.
@@ -378,6 +427,14 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 **Rationale:** One generated page resolves every ID to its heading and owning page, so a reader follows a citation in one step instead of searching.
 
 **Example:** The page lists `FRONTEND.COMPONENTS.OWNERSHIP.001` with its heading and a link into `frontend/components.md`.
+
+### Route the reader before listing pages (CORE.AUTHORING.INDEX.002)
+
+**Requirement:** A documentation root index MUST state which page class answers which reader question before its first navigation group.
+
+**Rationale:** A reader who cannot tell a tutorial from a reference opens both and trusts neither.
+
+**Example:** A `Which page do you want` section names each class in the reader's terms, one sentence for each.
 
 ### Declare structured specification metadata (CORE.AUTHORING.METADATA.002)
 
@@ -542,6 +599,10 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.CASE.001 | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
 | CORE.AUTHORING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
 | CORE.AUTHORING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |
+| CORE.AUTHORING.DISCLOSURE.001 | inspection | Page review confirms each step names a shipped command where one performs that step. |
+| CORE.AUTHORING.DISCLOSURE.002 | inspection | Page review confirms mechanism detail appears only under an `Underneath` section. |
+| CORE.AUTHORING.DISCLOSURE.003 | static | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic for the required `Underneath` section of a command page. |
+| CORE.AUTHORING.CONFIG.001 | inspection | Review confirms every setting named in a procedure resolves to a row on a configuration page. |
 | CORE.AUTHORING.REQUIREMENT.001 | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
 | CORE.AUTHORING.IDENTIFIER.001 | static | `node tools/validate-standards.mjs` emits no `ID_SCOPE_MISMATCH`, `ID_PAGE_FILENAME`, or `ID_AREA_UNKNOWN` diagnostic. |
 | CORE.AUTHORING.IDENTIFIER.002 | static | `node tools/validate-standards.cases.mjs` asserts the parser rejects a Standard whose ID ends in a `CONVENTION` segment. |
@@ -551,6 +612,7 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.EXAMPLE.001 | inspection | Review links each required example to its owning provision or Reference example. |
 | CORE.AUTHORING.VERIFICATION.001 | static | `WritingVerificationTests` asserts the evidence mapper reports one exact row for every page provision. |
 | CORE.AUTHORING.INDEX.001 | static | `node tools/generate-provisions.mjs --check` exits zero, and the repository validator emits no `PROVISIONS_STALE` diagnostic. |
+| CORE.AUTHORING.INDEX.002 | static | `node tools/validate-standards.mjs` emits no `INDEX_MISSING_ROUTING` diagnostic for `docs/README.md`. |
 | CORE.AUTHORING.METADATA.002 | static | `node tools/validate-consumer.mjs` validates opening JSON against the metadata schema. |
 | CORE.AUTHORING.METADATA.003 | static | `node tools/validate-consumer.mjs` reports no duplicate metadata carrier. |
 | CORE.AUTHORING.METADATA.004 | static | `node tools/validate-consumer.mjs` fails on a Markdown file with no metadata block outside a declared unstructured path. |

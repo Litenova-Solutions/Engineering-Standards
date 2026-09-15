@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 837 provisions across 8 areas.
+The active release states 842 provisions across 8 areas.
 
 ## BACKEND
 
@@ -207,16 +207,21 @@ The active release states 837 provisions across 8 areas.
 | CORE.AUTHORING.ASCII.001 | [Keep authored prose ASCII-safe](../core/authoring.md#keep-authored-prose-ascii-safe-coreauthoringascii001) | `core/authoring.md` |
 | CORE.AUTHORING.ASCII.002 | [Exclude declared content paths from the ASCII check](../core/authoring.md#exclude-declared-content-paths-from-the-ascii-check-coreauthoringascii002) | `core/authoring.md` |
 | CORE.AUTHORING.CASE.001 | [Use controlled capitalization](../core/authoring.md#use-controlled-capitalization-coreauthoringcase001) | `core/authoring.md` |
+| CORE.AUTHORING.CONFIG.001 | [Record a setting as reference](../core/authoring.md#record-a-setting-as-reference-coreauthoringconfig001) | `core/authoring.md` |
 | CORE.AUTHORING.CONVENTION.001 | [Prefer direct action headings](../core/authoring.md#prefer-direct-action-headings-coreauthoringconvention001) | `core/authoring.md` |
 | CORE.AUTHORING.CONVENTION.002 | [Prefer positive instructions](../core/authoring.md#prefer-positive-instructions-coreauthoringconvention002) | `core/authoring.md` |
 | CORE.AUTHORING.CONVENTION.003 | [Use tables for exact mappings](../core/authoring.md#use-tables-for-exact-mappings-coreauthoringconvention003) | `core/authoring.md` |
 | CORE.AUTHORING.DEFAULTS.001 | [Identify actionable conventions](../core/authoring.md#identify-actionable-conventions-coreauthoringdefaults001) | `core/authoring.md` |
 | CORE.AUTHORING.DERIVED.001 | [Derive a computed fact instead of restating it](../core/authoring.md#derive-a-computed-fact-instead-of-restating-it-coreauthoringderived001) | `core/authoring.md` |
+| CORE.AUTHORING.DISCLOSURE.001 | [Name the tool rather than the mechanism](../core/authoring.md#name-the-tool-rather-than-the-mechanism-coreauthoringdisclosure001) | `core/authoring.md` |
+| CORE.AUTHORING.DISCLOSURE.002 | [State one layer per page](../core/authoring.md#state-one-layer-per-page-coreauthoringdisclosure002) | `core/authoring.md` |
+| CORE.AUTHORING.DISCLOSURE.003 | [Name the escape from every abstraction](../core/authoring.md#name-the-escape-from-every-abstraction-coreauthoringdisclosure003) | `core/authoring.md` |
 | CORE.AUTHORING.EXAMPLE.001 | [Attach examples to their provisions](../core/authoring.md#attach-examples-to-their-provisions-coreauthoringexample001) | `core/authoring.md` |
 | CORE.AUTHORING.IDENTIFIER.001 | [Use the declared identifier grammar](../core/authoring.md#use-the-declared-identifier-grammar-coreauthoringidentifier001) | `core/authoring.md` |
 | CORE.AUTHORING.IDENTIFIER.002 | [Restrict the CONVENTION segment to replaceable defaults](../core/authoring.md#restrict-the-convention-segment-to-replaceable-defaults-coreauthoringidentifier002) | `core/authoring.md` |
 | CORE.AUTHORING.IDENTIFIER.003 | [Use a registered topic segment](../core/authoring.md#use-a-registered-topic-segment-coreauthoringidentifier003) | `core/authoring.md` |
 | CORE.AUTHORING.INDEX.001 | [Regenerate the provision index](../core/authoring.md#regenerate-the-provision-index-coreauthoringindex001) | `core/authoring.md` |
+| CORE.AUTHORING.INDEX.002 | [Route the reader before listing pages](../core/authoring.md#route-the-reader-before-listing-pages-coreauthoringindex002) | `core/authoring.md` |
 | CORE.AUTHORING.METADATA.002 | [Declare structured specification metadata](../core/authoring.md#declare-structured-specification-metadata-coreauthoringmetadata002) | `core/authoring.md` |
 | CORE.AUTHORING.METADATA.003 | [Use one metadata carrier](../core/authoring.md#use-one-metadata-carrier-coreauthoringmetadata003) | `core/authoring.md` |
 | CORE.AUTHORING.METADATA.004 | [Classify every specification file](../core/authoring.md#classify-every-specification-file-coreauthoringmetadata004) | `core/authoring.md` |

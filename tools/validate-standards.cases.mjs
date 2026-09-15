@@ -141,18 +141,107 @@ Create one verified standards artifact.
 - Confirm that the validator exits with code zero.
 `;
 
+
+const tutorial = `# Sample Tutorial
+
+## Purpose
+
+Produce one working standards artifact.
+
+## Prerequisites
+
+- Install the repository validator.
+
+## Lesson
+
+1. Create the artifact in its owning directory.
+2. Run the repository validator.
+
+## What you built
+
+- Confirm that one validated artifact sits in its owning directory.
+`;
+
+const reference = `# Sample Reference
+
+## Intent
+
+State the exact values that this repository publishes.
+
+## Reference
+
+| Name | Value |
+|:---|:---|
+| Sample | One published value. |
+
+## Notes
+
+The values above come from the repository manifest.
+`;
+
+const command = `# Sample Command
+
+## Name
+
+\`node tools/sample.mjs\` runs one sample check.
+
+## Synopsis
+
+\`\`\`bash
+node tools/sample.mjs [root]
+\`\`\`
+
+## Description
+
+Run this command after changing the sample material.
+
+## Arguments
+
+| Argument | Required | Effect |
+|:---|:---|:---|
+| \`root\` | no | Selects the repository to read. |
+
+## Options
+
+None.
+
+## Exit codes
+
+| Code | Meaning |
+|:---|:---|
+| \`0\` | The check passed. |
+| \`1\` | The check reported a defect. |
+
+## Examples
+
+\`\`\`bash
+node tools/sample.mjs
+\`\`\`
+
+## Underneath
+
+None.
+`;
+
 function write(root, relative, contents) {
   const file = path.join(root, relative);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, contents, 'utf8');
 }
 
+// A documentation root index names each page class before it links to one.
+// (CORE.AUTHORING.INDEX.002)
+const INDEX_ROUTING = '## Which page do you want\n\nA tutorial takes you through a first working result, one step at a time.\nA how-to solves one stated problem for a reader who already has it running.\nA reference states exact values, options, and defaults.\nA command page documents one command and what it runs underneath.\n';
+
 function base(root) {
   write(root, 'docs/core/topic.md', topicPage);
   write(root, 'docs/ext/sample.md', extension);
   write(root, 'docs/profile/sample.md', profile);
   write(root, 'docs/guide/sample.md', guide);
-  write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nUse this page to find repository documentation.\n');
+  write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nUse this page to find repository documentation.\n\n' + INDEX_ROUTING);
+  write(root, 'docs/tutorial/sample.md', tutorial);
+  write(root, 'docs/reference/sample.md', reference);
+  write(root, 'docs/tools/sample.md', command);
   write(root, 'docs/reference/glossary.md', '# Glossary\n\n## Topic\n\nA bounded standards subject.\n');
   // The provision index is derived, so the fixture repository carries a current one.
   write(root, INDEX_PATH, `${buildProvisionIndex(root)}\n`);
@@ -176,6 +265,14 @@ function run(name, mutate, expected, forbidden = []) {
 }
 
 run('all page classes pass', null, []);
+run('tutorial that omits what the reader built', (root) => write(root, 'docs/tutorial/sample.md', tutorial.replace('## What you built', '## Verification')), ['PAGE_MISSING_SECTION', 'PAGE_UNKNOWN_SECTION']);
+run('reference page carrying an unknown section', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', '## Procedure')), ['PAGE_UNKNOWN_SECTION']);
+run('reference page out of order', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Intent\n\nState the exact values that this repository publishes.\n\n', '')
+  .replace('The values above come from the repository manifest.', 'State the exact values that this repository publishes.\n\n## Intent\n\nThe values above come from the repository manifest.')), ['PAGE_SECTION_ORDER']);
+run('command page hiding its mechanism', (root) => write(root, 'docs/tools/sample.md', command.replace('## Underneath\n\nNone.\n', '')), ['PAGE_MISSING_SECTION']);
+run('command page without exit codes', (root) => write(root, 'docs/tools/sample.md', command.replace('## Exit codes', '## Results')), ['PAGE_MISSING_SECTION', 'PAGE_UNKNOWN_SECTION']);
+run('index without a routing block', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nUse this page to find repository documentation.\n'), ['INDEX_MISSING_ROUTING']);
+run('routing block after the first navigation group', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nUse this page to find repository documentation.\n\n## Core\n\n- [Topic](core/topic.md)\n\n' + INDEX_ROUTING), ['INDEX_MISSING_ROUTING']);
 run('stale provision index', (root) => write(root, INDEX_PATH, '# Provision Index\n\n## Intent\n\nThis page is out of date.\n'), ['PROVISIONS_STALE']);
 run('missing provision index', (root) => fs.rmSync(path.join(root, INDEX_PATH)), ['PROVISIONS_STALE']);
 run('declared prose exclusions pass', (root) => write(root, 'templates/consumer/exclusions.md', `# Exclusion Fixture
@@ -229,7 +326,7 @@ run('unknown active ID', (root) => write(root, 'docs/README.md', '# Documentatio
 // A stale three-part identifier must still surface. Only grammar notation with no
 // three-digit tail is exempt from the citation scan.
 run('stale three-part citation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites TOPIC.BOUNDARY.001.\n'), ['ID_UNKNOWN_REFERENCE']);
-run('grammar notation is not a citation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nAn identifier uses AREA.PAGE.TOPIC.NNN as its grammar.\n'), []);
+run('grammar notation is not a citation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nAn identifier uses AREA.PAGE.TOPIC.NNN as its grammar.\n\n' + INDEX_ROUTING), []);
 
 run('unsupported modal vocabulary', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Consumers MUST keep the topic inside its declared boundary.', 'Consumers MUST keep the topic bounded and SHALL record its owner.')), ['STANDARD_MODAL_VOCABULARY']);
 run('multiple requirement sentences', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Consumers MUST keep the topic inside its declared boundary.', 'Consumers MUST keep the topic inside its boundary. Reviewers inspect the result.')), ['STANDARD_SENTENCE_COUNT']);

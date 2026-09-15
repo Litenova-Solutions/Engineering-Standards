@@ -1,14 +1,18 @@
 # Audit Obligations
 
+## Intent
+
 This page records the external obligations that the [audit extension](../ext/audit.md) satisfies. It is informative. The extension page owns every provision.
 
 `EXT.AUDIT.ADOPT.001` requires an adoption decision. `EXT.AUDIT.COVERAGE.001` requires a stated selection of audited categories. Both ask a project to say why it audits what it audits. This page is the source those answers draw on, so a project records a decision rather than a survey.
 
-## The frameworks
+## Reference
+
+### The frameworks
 
 Four bodies of guidance apply to a business application that holds personal data or touches payments. They agree far more than they differ. An implementation built to their union satisfies each one without a separate programme.
 
-### NIST SP 800-53, AU family
+#### NIST SP 800-53, AU family
 
 The AU controls split auditing into six questions. They are the most complete public statement of the problem.
 
@@ -23,11 +27,11 @@ The AU controls split auditing into six questions. They are the most complete pu
 
 AU-3 is the field list that the other frameworks restate. AU-2 is the control most projects skip, because an implicit selection needs no document.
 
-### ISO/IEC 27001:2022, Annex A 8.15
+#### ISO/IEC 27001:2022, Annex A 8.15
 
 Control A.8.15 requires logs of user activities, exceptions, faults, and security events. It requires protection from tampering and unauthorized access. It also requires analysis, which makes an unread trail a finding rather than a control.
 
-### PCI DSS 4.0, Requirement 10
+#### PCI DSS 4.0, Requirement 10
 
 Requirement 10.2.2 names the fields for each event. They are user identification, event type, date and time, success or failure indication, origination, and affected resource identity.
 
@@ -35,13 +39,13 @@ Requirement 10.2.1 names the events. It includes individual access to cardholder
 
 The success-or-failure field and the invalid-attempt event are the two obligations that a success-only trail fails.
 
-### OWASP Logging Cheat Sheet
+#### OWASP Logging Cheat Sheet
 
 The OWASP guidance adds the developer-facing half. Record authentication successes and failures, authorization failures, higher-risk actions, sensitive data access, and data import or export.
 
 It also states the exclusions. Never record passwords, session identifiers, access tokens, encryption keys, database connection strings, payment card data, or sensitive personal data.
 
-## GDPR
+### GDPR
 
 The General Data Protection Regulation pulls in two directions at once. Reading it as only a constraint produces a thin trail. Reading it as only a mandate produces an erasure problem.
 
@@ -59,7 +63,7 @@ The resolution is the record shape. A trail retained on a legal-obligation or le
 
 Two consequences follow for a project. Record the lawful basis and the retention period of each audited category in the adoption decision. Include the trail in the records of processing activities, because it is itself a processing activity.
 
-## Schema alignment
+### Schema alignment
 
 The record shape follows a model that three sources describe in the same terms. An initiator performs an action on a target, producing an outcome, observed at a time and from a place.
 
@@ -71,7 +75,7 @@ The record shape follows a model that three sources describe in the same terms. 
 
 Building to that model costs nothing at design time. It lets a project map the trail onto a security platform later without remodelling the store.
 
-## Obligation to provision map
+### Obligation to provision map
 
 | Obligation | Source | Provision |
 |:---|:---|:---|
@@ -93,7 +97,9 @@ Building to that model costs nothing at design time. It lets a project map the t
 | Satisfy erasure without destroying evidence | GDPR Art. 17 | `EXT.AUDIT.PURGE.002` |
 | Review and analyze the records | AU-6, ISO 8.15 | `EXT.AUDIT.ACCESS.001` |
 
-## Sources
+## Notes
+
+The sources behind every table above:
 
 - [NIST SP 800-53 Rev. 5, AU family](https://csf.tools/reference/nist-sp-800-53/r5/au/)
 - [ISO/IEC 27001:2022 Annex A 8.15 implementation guidance](https://www.isms.online/iso-27001/annex-a-2022/how-to-implement-iso-27001-2022-annex-a-control-8-15-logging/)

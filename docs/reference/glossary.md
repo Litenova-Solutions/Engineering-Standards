@@ -56,6 +56,14 @@ A policy deciding whether an identified actor can perform an operation on a spec
 
 An Application message that can change business state through one top-level command pipeline and transaction commit.
 
+## Command page
+
+A page documenting one shipped command: its arguments, its options, its exit codes, and what it runs underneath.
+
+## Configuration page
+
+A page holding every setting a reader can change, each with its default, its scope, and what overrides it.
+
 ## Controlled technical prose
 
 The repository-owned English profile defining fixed structures, bounded prose, exact terms, and testable provisions.
@@ -124,9 +132,17 @@ Behavior caused by an event without prescribing a handler, orchestrator, project
 
 A conditional standards bundle selected by a project or an allowed local specification.
 
+## How-to page
+
+A page solving one stated problem for a reader who already has a working result, which may branch.
+
 ## Integration event
 
 A versioned message contract delivered outside the bounded context.
+
+## Layer
+
+One of the four depths a documentation page answers at, from a first working result down to the mechanism a command runs.
 
 ## Module
 
@@ -146,7 +162,7 @@ One authored Markdown file under `docs/`, carrying the section contract of its p
 
 ## Page class
 
-One of `topic`, `profile`, `extension`, `guide`, `index`, or `glossary`, which selects the required section order for a page.
+One of `topic`, `profile`, `extension`, `tutorial`, `how-to`, `reference`, `command`, `index`, or `glossary`, which selects the required section order for a page.
 
 ## Page scope
 
@@ -184,6 +200,10 @@ An Application message that reads a Read Model without changing business state.
 
 Data shaped for a Query without aggregate loading or mutation.
 
+## Reference page
+
+A page of exact values a reader looks up rather than reads end to end.
+
 ## Release Record
 
 The immutable evidence record for one release artifact, including build, tests, deployment, recovery, diagnostics, operating limits, and runbooks.
@@ -219,6 +239,14 @@ A consumer replacement for one Standard, identified by its provision ID and an a
 ## Standards release
 
 One published, pinned, complete standards contract that depends on no earlier release and carries no compatibility guarantee.
+
+## Tutorial
+
+A page taking a reader through one first working result, with no option, no alternative, and no branch.
+
+## Underneath
+
+The section of a command page that states what the command runs on the reader's behalf, and how to run those steps directly.
 
 ## Use case
 
