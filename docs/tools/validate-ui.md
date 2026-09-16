@@ -24,7 +24,10 @@ A consumer with no React web UI configuration passes, and the output names every
 
 ## Options
 
-None.
+| Option | Default | Effect |
+|:---|:---|:---|
+| `--format=json` | off | Writes one JSON object on standard output, with the problems as an array. |
+| `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 
 ## Exit codes
 

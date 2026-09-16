@@ -19,14 +19,89 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checkProseMeasures, checkLanguage, checkLanguageInSource, compileLanguage } from './prose.mjs';
 
+const USAGE = `Usage: node tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
+
+Validates the consumer specification set at consumerRoot, which defaults to the
+current directory. The consumer must contain standards.project.json.
+
+  --prose         List every controlled-prose measure behind the reported counts.
+  --format=json   Write one JSON object on stdout instead of human-readable lines.
+  --help          Print this text and exit.
+
+Exit codes: 0 no problem, 1 at least one problem, 2 usage error.`;
+
+const flags = process.argv.slice(2).filter((a) => a.startsWith('-'));
+if (flags.includes('--help') || flags.includes('-h')) {
+  console.log(USAGE);
+  process.exit(0);
+}
+const unknownFlags = flags.filter((a) => a !== '--prose' && a !== '--format=json');
+if (unknownFlags.length) {
+  console.error(`Unknown option ${unknownFlags.join(', ')}`);
+  console.error(USAGE);
+  process.exit(2);
+}
+const jsonOutput = flags.includes('--format=json');
 // The root is the first argument that is not a flag, so an option can be passed
 // without being read as the consumer directory.
-const root = path.resolve(process.argv.slice(2).find((a) => !a.startsWith('--')) ?? '.');
+const root = path.resolve(process.argv.slice(2).find((a) => !a.startsWith('-')) ?? '.');
 const errors = [];
 const err = (m) => errors.push(m);
 
 function readJson(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
+}
+
+// `fs.globSync` arrived in Node 22 and is still marked experimental, so calling
+// it puts a runtime floor on every consumer of this repository without the
+// repository stating one. The walker below reads the same patterns through
+// `fs.readdirSync`, which every maintained Node release has. It returns files
+// only, so a caller needs no second filesystem call per match.
+const GLOB_IGNORED = new Set(['node_modules', '.git', 'bin', 'obj', '.next', 'dist', 'build', 'out', 'coverage']);
+
+function globSegment(segment) {
+  let expression = '';
+  for (const character of segment) {
+    if (character === '*') expression += '[^/]*';
+    else if (character === '?') expression += '[^/]';
+    else expression += character.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  }
+  return new RegExp(`^${expression}$`);
+}
+
+function globFiles(from, pattern) {
+  const segments = pattern.split('/').filter((segment) => segment.length && segment !== '.');
+  const results = new Set();
+  const visit = (directory, index, prefix) => {
+    if (index >= segments.length) return;
+    let entries;
+    try {
+      entries = fs.readdirSync(directory, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    const segment = segments[index];
+    const last = index === segments.length - 1;
+    // '**' matches zero or more directories. The rest of the pattern is tried
+    // at this level first, then inside every subdirectory.
+    if (segment === '**') {
+      visit(directory, index + 1, prefix);
+      for (const entry of entries) {
+        if (!entry.isDirectory() || GLOB_IGNORED.has(entry.name)) continue;
+        visit(path.join(directory, entry.name), index, prefix ? `${prefix}/${entry.name}` : entry.name);
+      }
+      return;
+    }
+    const matcher = globSegment(segment);
+    for (const entry of entries) {
+      if (!matcher.test(entry.name)) continue;
+      const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (last && entry.isFile()) results.add(relative);
+      else if (!last && entry.isDirectory() && !GLOB_IGNORED.has(entry.name)) visit(path.join(directory, entry.name), index + 1, relative);
+    }
+  };
+  visit(from, 0, '');
+  return [...results].sort();
 }
 
 // ---- locate consumer paths -------------------------------------------------
@@ -454,7 +529,15 @@ if (uiActivated) {
   if (fs.existsSync(uiValidator)) {
     const result = spawnSync(process.execPath, [uiValidator, root], { encoding: 'utf8' });
     uiOutput = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim();
-    if (result.status !== 0) err('controlled UI validation failed; see the UI validator output above');
+    if (result.status !== 0) {
+      // Each UI problem is carried into this validator's own list rather than
+      // left in a block of text. A caller reading the structured output has no
+      // 'above' to look at, and a caller reading the human output sees the same
+      // problems either way.
+      const lifted = uiOutput.split('\n').filter((line) => line.startsWith('  - ')).map((line) => `controlled UI: ${line.slice(4)}`);
+      if (lifted.length) for (const item of lifted) err(item);
+      else err(`controlled UI validation failed with exit code ${result.status}`);
+    }
   } else {
     err(`controlled UI configuration is present but the UI validator is missing at ${uiValidator}`);
   }
@@ -545,7 +628,7 @@ let languageSummary = '';
   for (const pattern of project.paths?.languageScan ?? []) {
     let matched;
     try {
-      matched = fs.globSync(pattern, { cwd: root }).sort();
+      matched = globFiles(root, pattern);
     } catch (e) {
       err(`standards.project.json: paths.languageScan '${pattern}' could not be read (${e.message})`);
       continue;
@@ -558,7 +641,6 @@ let languageSummary = '';
     }
     for (const relativePath of matched) {
       const absolute = path.join(root, relativePath);
-      if (!fs.statSync(absolute).isFile()) continue;
       const rel = relativePath.replace(/\\/g, '/');
       scannedSurfaces += 1;
       checkLanguageInSource(rel, fs.readFileSync(absolute, 'utf8'), compiled, (_r, line, code, message) => {
@@ -609,6 +691,20 @@ let languageSummary = '';
 }
 
 // ---- report ----------------------------------------------------------------
+// A machine reader gets the problems as an array and the counts as fields, so
+// nothing has to be recovered by parsing the human lines back apart.
+if (jsonOutput) {
+  console.log(JSON.stringify({
+    tool: 'validate-consumer',
+    consumer: root,
+    ok: errors.length === 0,
+    scanned: { documentationRoot: docsPath, files: files.length, metadataBlocks: metas.length },
+    acceptanceIds: acDefs.size,
+    endToEndIds: e2eDefs.size,
+    problems: errors,
+  }, null, 2));
+  process.exit(errors.length ? 1 : 0);
+}
 console.log(`Consumer: ${root}`);
 console.log(`Files scanned: ${files.length} under ${docsPath}, metadata blocks: ${metas.length}`);
 console.log(languageSummary);

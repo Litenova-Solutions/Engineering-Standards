@@ -29,7 +29,7 @@ const MODALS = /\b(?:MUST NOT|SHOULD NOT|MUST|SHOULD|MAY)\b/g;
 const OTHER_NORMATIVE = /\b(?:REQUIRED|FORBIDDEN|SHALL)\b/;
 const PROVISION_LABEL = /^\*\*(Requirement|Deviation|Rationale|Example|Default|Replacement):\*\*/;
 const GENERIC_EVIDENCE = /\b(?:verify compliance|check compliance|inspect evidence|verify evidence)\b/i;
-const ACTION_VERBS = new Set(`Accept Activate Add Advance Align Anchor Apply Approve Assert Assign Attach Audit Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify Co-locate Collect Commit Compare Complete Compose Configure Connect Control Copy Cover Create Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document Drive Emit Enforce Escalate Escape Evolve Exclude Exercise Expose Express Finish Follow Format Gate Generate Give Govern Group Handle Hide Identify Implement Inject Inspect Isolate Keep Lease Limit List Load Localize Locate Make Map Mark Match Measure Meet Minimize Mirror Model Move Name Note Operate Organize Own Parameterize Parse Pass Persist Pin Place Plan Point Prefer Preserve Prevent Process Project Promote Protect Prove Provide Publish Purge Query Raise Read Reconnect Record Recover Reference Reflect Regenerate Register Reject Reload Release Remove Render Replay Replace Report Represent Require Renew Requeue Resolve Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tag Test Tolerate Trace Track Translate Treat Update Use Validate Verify Version Wait Write`.split(' '));
+const ACTION_VERBS = new Set(`Accept Activate Add Advance Align Anchor Announce Apply Approve Assert Assign Attach Audit Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify Co-locate Collect Commit Compare Complete Compose Configure Connect Control Copy Cover Create Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document Drive Emit Enforce Escalate Escape Evolve Exclude Exercise Expose Express Finish Follow Format Gate Generate Give Govern Group Handle Hide Identify Implement Inject Inspect Isolate Keep Lease Limit List Load Localize Locate Make Map Mark Match Measure Meet Minimize Mirror Model Move Name Note Operate Organize Own Parameterize Parse Pass Persist Pin Place Plan Point Prefer Preserve Prevent Process Project Promote Protect Prove Provide Publish Purge Query Raise Read Reconnect Record Recover Reference Reflect Regenerate Register Reject Reload Release Remove Render Replay Replace Report Represent Require Renew Requeue Resolve Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tag Test Tolerate Trace Track Translate Treat Update Use Validate Verify Version Wait Write`.split(' '));
 // Every authoring rule is an error. This set stays empty unless a new rule is
 // landed against existing content, in which case it holds that rule only while
 // its count is burned down.
@@ -143,11 +143,55 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
 
   'INDEX_MISSING_ROUTING',
 ]);
+// The keyword set and the evaluator below are one unit. A keyword listed here
+// without an implementation would be read as an annotation and assert nothing,
+// so every assertive name in this set has a branch in `validateSchemaValue`, and
+// every name outside it fails the schema rather than passing unread. That is why
+// the repository ships no schema library: the gate is what makes a local
+// evaluator safe, and a library that accepts every keyword removes it.
+const SCHEMA_ANNOTATIONS = new Set(['$schema', '$id', '$defs', '$comment', 'title', 'description', 'default', 'examples', 'deprecated']);
 const SCHEMA_KEYWORDS = new Set([
-  '$schema', '$id', '$ref', '$defs', 'title', 'description', 'type', 'const', 'enum', 'pattern',
-  'minLength', 'minItems', 'minProperties', 'uniqueItems', 'required', 'properties', 'items',
-  'additionalProperties', 'allOf', 'oneOf', 'if', 'then', 'else', 'not', 'default', 'examples',
+  ...SCHEMA_ANNOTATIONS,
+  '$ref', 'type', 'const', 'enum', 'pattern', 'minLength', 'maxLength',
+  'minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum', 'multipleOf',
+  'minItems', 'maxItems', 'uniqueItems', 'items', 'prefixItems', 'contains',
+  'minProperties', 'maxProperties', 'required', 'dependentRequired',
+  'properties', 'patternProperties', 'propertyNames', 'additionalProperties',
+  'allOf', 'anyOf', 'oneOf', 'if', 'then', 'else', 'not',
 ]);
+
+// Every position a subschema can occupy, so the gate reaches each one. A keyword
+// the gate never descends into hides its whole subtree from the check.
+const SCHEMA_CHILD_LISTS = ['allOf', 'anyOf', 'oneOf', 'prefixItems'];
+const SCHEMA_CHILD_MAPS = ['properties', 'patternProperties', '$defs'];
+const SCHEMA_CHILD_VALUES = ['items', 'contains', 'propertyNames', 'additionalProperties', 'if', 'then', 'else', 'not'];
+
+// Naming the codepoint tells an author which character to hunt for. Naming the
+// ASCII form tells them what to type instead, which is the action the rule
+// actually asks for. These are the characters an editor substitution or a paste
+// from a word processor introduces; anything else reports its codepoint alone.
+// The keys are codepoints rather than characters, because this file is itself
+// under the ASCII rule.
+const ASCII_REPLACEMENTS = new Map([
+  ['00A0', 'a plain space'],
+  ['00B7', 'a hyphen'],
+  ['00D7', 'the letter x'],
+  ['2013', 'a hyphen'],
+  ['2014', 'a hyphen'],
+  ['2018', 'a straight apostrophe'],
+  ['2019', 'a straight apostrophe'],
+  ['201C', 'a straight quotation mark'],
+  ['201D', 'a straight quotation mark'],
+  ['2022', 'a Markdown list marker'],
+  ['2026', 'three full stops'],
+  ['2192', 'the word to'],
+]);
+
+function nonAsciiMessage(character, prefix) {
+  const codepoint = character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
+  const replacement = ASCII_REPLACEMENTS.get(codepoint);
+  return `${prefix}U+${codepoint}${replacement ? `; write ${replacement}` : ''}`;
+}
 
 function slash(value) {
   return value.replace(/\\/g, '/');
@@ -269,12 +313,19 @@ const PAGE_CLASS_AREA = {
 
 // A standards template seeds one page class, so it is parsed as the page it
 // produces and held to that page's contract.
+// An authoring template is parsed as the page class it produces, so its
+// placeholder identifiers are normalized into valid ones and its virtual path
+// stands in for a real page path. Both live in the same namespace as real pages,
+// which is what makes the parse meaningful and also what makes the stem
+// reserved. A real page at one of these paths would share a scope with a
+// template and report as a duplicate of a file nobody wrote.
 const TEMPLATE_VIRTUAL_PATH = {
   'extension.md': 'docs/ext/template.md',
   'how-to.md': 'docs/guide/template.md',
   'tutorial.md': 'docs/tutorial/template.md',
   'command.md': 'docs/tools/template.md',
 };
+const RESERVED_TEMPLATE_STEMS = new Set([...Object.values(TEMPLATE_VIRTUAL_PATH), 'docs/core/template.md']);
 
 function pageClass(relative) {
   if (relative === INDEX_PATH) return 'index';
@@ -641,12 +692,17 @@ function unsupportedSchemaKeywords(schema, relative, pointer, add) {
   for (const key of Object.keys(schema)) {
     if (!SCHEMA_KEYWORDS.has(key)) add(relative, 1, 'SCHEMA_UNSUPPORTED_KEYWORD', `unsupported JSON Schema keyword '${key}' at '${pointer}'`);
   }
-  for (const key of ['allOf', 'oneOf']) for (const item of schema[key] ?? []) unsupportedSchemaKeywords(item, relative, `${pointer}/${key}`, add);
-  for (const key of ['items', 'additionalProperties', 'if', 'then', 'else', 'not']) {
+  for (const key of SCHEMA_CHILD_LISTS) {
+    const children = schema[key];
+    if (!Array.isArray(children)) continue;
+    for (let index = 0; index < children.length; index += 1) unsupportedSchemaKeywords(children[index], relative, `${pointer}/${key}/${index}`, add);
+  }
+  for (const key of SCHEMA_CHILD_MAPS) {
+    for (const [name, child] of Object.entries(schema[key] ?? {})) unsupportedSchemaKeywords(child, relative, `${pointer}/${key}/${name}`, add);
+  }
+  for (const key of SCHEMA_CHILD_VALUES) {
     if (schema[key] && typeof schema[key] === 'object') unsupportedSchemaKeywords(schema[key], relative, `${pointer}/${key}`, add);
   }
-  for (const [name, child] of Object.entries(schema.properties ?? {})) unsupportedSchemaKeywords(child, relative, `${pointer}/properties/${name}`, add);
-  for (const [name, child] of Object.entries(schema.$defs ?? {})) unsupportedSchemaKeywords(child, relative, `${pointer}/$defs/${name}`, add);
 }
 
 function resolveSchemaRef(root, reference) {
@@ -666,15 +722,33 @@ function validateSchemaValue(value, schema, root, location, errors) {
     else validateSchemaValue(value, target, root, location, errors);
   }
   for (const branch of schema.allOf ?? []) validateSchemaValue(value, branch, root, location, errors);
-  // Exactly one branch accepts the value. Reporting the branch errors would name
-  // every shape the value is not, so the message names the count instead.
+  // Exactly one branch accepts the value. The count alone tells an author that
+  // the value fits no shape without telling them why any shape refused it, so
+  // the message carries the first reason from each branch that rejected.
   if (schema.oneOf) {
-    const matched = schema.oneOf.filter((branch) => {
+    const rejections = [];
+    let matched = 0;
+    for (let index = 0; index < schema.oneOf.length; index += 1) {
+      const branchErrors = [];
+      validateSchemaValue(value, schema.oneOf[index], root, location, branchErrors);
+      if (branchErrors.length === 0) matched += 1;
+      else rejections.push(`shape ${index + 1}: ${branchErrors[0].replace(`${location}: `, '')}`);
+    }
+    if (matched !== 1) {
+      const because = matched === 0 && rejections.length ? ` (${rejections.join('; ')})` : '';
+      errors.push(`${location}: value matches ${matched} of ${schema.oneOf.length} allowed shapes, expected exactly 1${because}`);
+    }
+  }
+  if (schema.anyOf) {
+    const rejections = [];
+    const accepted = schema.anyOf.some((branch, index) => {
       const branchErrors = [];
       validateSchemaValue(value, branch, root, location, branchErrors);
-      return branchErrors.length === 0;
-    }).length;
-    if (matched !== 1) errors.push(`${location}: value matches ${matched} of ${schema.oneOf.length} allowed shapes, expected exactly 1`);
+      if (branchErrors.length === 0) return true;
+      rejections.push(`shape ${index + 1}: ${branchErrors[0].replace(`${location}: `, '')}`);
+      return false;
+    });
+    if (!accepted) errors.push(`${location}: value matches none of the ${schema.anyOf.length} allowed shapes (${rejections.join('; ')})`);
   }
   if (schema.if) {
     const conditionErrors = [];
@@ -704,20 +778,62 @@ function validateSchemaValue(value, schema, root, location, errors) {
   if (schema.enum && !schema.enum.some((item) => jsonEqual(item, value))) errors.push(`${location}: value is outside the allowed enum`);
   if (typeof value === 'string') {
     if (schema.minLength !== undefined && value.length < schema.minLength) errors.push(`${location}: string is shorter than ${schema.minLength}`);
+    if (schema.maxLength !== undefined && value.length > schema.maxLength) errors.push(`${location}: string is longer than ${schema.maxLength}`);
     if (schema.pattern && !new RegExp(schema.pattern).test(value)) errors.push(`${location}: string does not match ${schema.pattern}`);
+  }
+  if (typeof value === 'number') {
+    if (schema.minimum !== undefined && value < schema.minimum) errors.push(`${location}: number is below ${schema.minimum}`);
+    if (schema.maximum !== undefined && value > schema.maximum) errors.push(`${location}: number is above ${schema.maximum}`);
+    if (schema.exclusiveMinimum !== undefined && value <= schema.exclusiveMinimum) errors.push(`${location}: number is not above ${schema.exclusiveMinimum}`);
+    if (schema.exclusiveMaximum !== undefined && value >= schema.exclusiveMaximum) errors.push(`${location}: number is not below ${schema.exclusiveMaximum}`);
+    // Floating-point remainders drift, so the test rounds to the nearest
+    // multiple and compares against a tolerance derived from the divisor.
+    if (schema.multipleOf !== undefined) {
+      const quotient = value / schema.multipleOf;
+      if (Math.abs(quotient - Math.round(quotient)) > 1e-9) errors.push(`${location}: number is not a multiple of ${schema.multipleOf}`);
+    }
   }
   if (Array.isArray(value)) {
     if (schema.minItems !== undefined && value.length < schema.minItems) errors.push(`${location}: array has fewer than ${schema.minItems} items`);
+    if (schema.maxItems !== undefined && value.length > schema.maxItems) errors.push(`${location}: array has more than ${schema.maxItems} items`);
     if (schema.uniqueItems && new Set(value.map((item) => JSON.stringify(item))).size !== value.length) errors.push(`${location}: array items are not unique`);
-    for (let index = 0; index < value.length; index += 1) validateSchemaValue(value[index], schema.items, root, `${location}/${index}`, errors);
+    const prefix = Array.isArray(schema.prefixItems) ? schema.prefixItems : [];
+    for (let index = 0; index < prefix.length && index < value.length; index += 1) validateSchemaValue(value[index], prefix[index], root, `${location}/${index}`, errors);
+    for (let index = prefix.length; index < value.length; index += 1) validateSchemaValue(value[index], schema.items, root, `${location}/${index}`, errors);
+    if (schema.contains) {
+      const holds = value.some((item) => {
+        const itemErrors = [];
+        validateSchemaValue(item, schema.contains, root, location, itemErrors);
+        return itemErrors.length === 0;
+      });
+      if (!holds) errors.push(`${location}: array contains no item matching the required shape`);
+    }
   }
   if (value && typeof value === 'object' && !Array.isArray(value)) {
-    if (schema.minProperties !== undefined && Object.keys(value).length < schema.minProperties) errors.push(`${location}: object has fewer than ${schema.minProperties} properties`);
+    const keys = Object.keys(value);
+    if (schema.minProperties !== undefined && keys.length < schema.minProperties) errors.push(`${location}: object has fewer than ${schema.minProperties} properties`);
+    if (schema.maxProperties !== undefined && keys.length > schema.maxProperties) errors.push(`${location}: object has more than ${schema.maxProperties} properties`);
     for (const required of schema.required ?? []) if (!(required in value)) errors.push(`${location}: missing required property '${required}'`);
+    for (const [trigger, dependents] of Object.entries(schema.dependentRequired ?? {})) {
+      if (!(trigger in value)) continue;
+      for (const dependent of dependents) if (!(dependent in value)) errors.push(`${location}: property '${trigger}' requires '${dependent}'`);
+    }
+    if (schema.propertyNames) for (const key of keys) validateSchemaValue(key, schema.propertyNames, root, `${location}/${key}`, errors);
     const declared = schema.properties ?? {};
+    const patterns = Object.entries(schema.patternProperties ?? {});
     for (const [key, child] of Object.entries(value)) {
-      if (key in declared) validateSchemaValue(child, declared[key], root, `${location}/${key}`, errors);
-      else if (schema.additionalProperties === false) errors.push(`${location}: unknown property '${key}'`);
+      let evaluated = false;
+      if (key in declared) {
+        validateSchemaValue(child, declared[key], root, `${location}/${key}`, errors);
+        evaluated = true;
+      }
+      for (const [expression, subschema] of patterns) {
+        if (!new RegExp(expression).test(key)) continue;
+        validateSchemaValue(child, subschema, root, `${location}/${key}`, errors);
+        evaluated = true;
+      }
+      if (evaluated) continue;
+      if (schema.additionalProperties === false) errors.push(`${location}: unknown property '${key}'`);
       else if (schema.additionalProperties && typeof schema.additionalProperties === 'object') validateSchemaValue(child, schema.additionalProperties, root, `${location}/${key}`, errors);
     }
   }
@@ -799,6 +915,9 @@ function checkManifest(root, add) {
     const entry = path.join(root, profile.entry);
     if (!fs.existsSync(entry)) continue;
     const raw = fs.readFileSync(entry, 'utf8');
+    // The Composition section is the profile's list, so only that section is
+    // compared with the manifest. A link in Intent or Conventions is prose
+    // pointing at a page, not a claim that the profile composes it.
     const composition = sectionBody(raw.split(/\r?\n/), 'Composition');
     const actual = new Set([...composition.matchAll(/\[[^\]]+\]\(([^)#]+)(?:#[^)]+)?\)/g)].map((match) => slash(path.relative(root, path.resolve(path.dirname(entry), decodeURIComponent(match[1]))))));
     const expected = new Set(profile.pages ?? []);
@@ -885,10 +1004,14 @@ export function validateRepository(rootInput = '.') {
   for (const file of currentMarkdown) {
     const relative = slash(path.relative(root, file));
     if (/^templates\/standard\//.test(relative)) continue;
+    if (RESERVED_TEMPLATE_STEMS.has(relative)) {
+      add(relative, 1, 'ID_PAGE_FILENAME', `'${relative}' is the virtual path an authoring template parses as; rename the page so its scope is its own`);
+      continue;
+    }
     const raw = fs.readFileSync(file, 'utf8');
     const prose = stripFences(raw.split(/\r?\n/)).map((item) => item.line).join('\n');
     const nonAscii = prose.match(/[^\x00-\x7F]/);
-    if (nonAscii) add(relative, lineNumber(prose, nonAscii.index), 'PROSE_NON_ASCII', `non-ASCII character U+${nonAscii[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
+    if (nonAscii) add(relative, lineNumber(prose, nonAscii.index), 'PROSE_NON_ASCII', nonAsciiMessage(nonAscii[0], 'non-ASCII character '));
     parsedPages.push({ relative, raw, parsed: parsePage(relative, raw, add, globalIds) });
     if (relative === 'AGENTS.md' || relative.endsWith('/project-agents.md')) checkAgentProjection(relative, raw, add);
   }
@@ -955,7 +1078,7 @@ export function validateRepository(rootInput = '.') {
     const virtualRelative = TEMPLATE_VIRTUAL_PATH[name] ?? 'docs/core/template.md';
     const normalized = normalizeTemplate(relative, fs.readFileSync(file, 'utf8'));
     const nonAscii = stripFences(normalized.split(/\r?\n/)).map((item) => item.line).join('\n').match(/[^\x00-\x7F]/);
-    if (nonAscii) add(relative, 1, 'PROSE_NON_ASCII', `authoring template contains non-ASCII character U+${nonAscii[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
+    if (nonAscii) add(relative, 1, 'PROSE_NON_ASCII', nonAsciiMessage(nonAscii[0], 'authoring template contains non-ASCII character '));
     parsePage(virtualRelative, normalized, add, globalIds, true);
     checkProse(relative, normalized, pageClass(virtualRelative), add);
   }
@@ -1063,10 +1186,33 @@ function checkTemplateIndex(root, add) {
   }
 }
 
+const USAGE = `Usage: node tools/validate-standards.mjs [repositoryRoot] [--warnings] [--format=json] [--help]
+
+Validates the authoring contract over the standards repository at repositoryRoot,
+which defaults to the current directory.
+
+  --warnings      List every warning occurrence instead of a count per code.
+  --format=json   Write one JSON object on stdout instead of human-readable lines.
+  --help          Print this text and exit.
+
+Exit codes: 0 no error, 1 at least one error, 2 usage error.`;
+
 function runCli() {
-  const args = process.argv.slice(2).filter((value) => value !== '--warnings');
+  const flags = process.argv.slice(2).filter((value) => value.startsWith('-'));
+  if (flags.includes('--help') || flags.includes('-h')) {
+    console.log(USAGE);
+    process.exit(0);
+  }
+  const json = flags.includes('--format=json');
+  const unknown = flags.filter((value) => value !== '--warnings' && value !== '--format=json');
+  if (unknown.length) {
+    console.error(`Unknown option ${unknown.join(', ')}`);
+    console.error(USAGE);
+    process.exit(2);
+  }
+  const args = process.argv.slice(2).filter((value) => !value.startsWith('-'));
   if (args.length > 1) {
-    console.error('Usage: node tools/validate-standards.mjs [repositoryRoot] [--warnings]');
+    console.error(USAGE);
     process.exit(2);
   }
   const result = validateRepository(args[0] ?? '.');
@@ -1077,6 +1223,19 @@ function runCli() {
   const warningCodes = new Set(WARNING_DIAGNOSTIC_CODES);
   const errors = result.diagnostics.filter((diagnostic) => !warningCodes.has(diagnostic.code));
   const warnings = result.diagnostics.filter((diagnostic) => warningCodes.has(diagnostic.code));
+  // A machine reader needs the file, the line, and the stable code as fields. A
+  // reader that has to parse the human lines back apart breaks the first time a
+  // message is reworded, so the tool emits the structure it already holds.
+  if (json) {
+    console.log(JSON.stringify({
+      tool: 'validate-standards',
+      root: path.resolve(args[0] ?? '.'),
+      ok: errors.length === 0,
+      errors: errors.map(({ relative, line, code, message }) => ({ file: relative, line, code, message })),
+      warnings: warnings.map(({ relative, line, code, message }) => ({ file: relative, line, code, message })),
+    }, null, 2));
+    process.exit(errors.length ? 1 : 0);
+  }
   for (const diagnostic of errors) console.error(`${diagnostic.relative}:${diagnostic.line} [${diagnostic.code}] ${diagnostic.message}`);
   if (warnings.length) {
     const counts = new Map();

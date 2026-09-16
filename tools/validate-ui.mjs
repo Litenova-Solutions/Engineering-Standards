@@ -13,7 +13,29 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = path.resolve(process.argv[2] ?? '.');
+const USAGE = `Usage: node tools/validate-ui.mjs [consumerRoot] [--format=json] [--help]
+
+Validates the controlled React web UI contract for the consumer at consumerRoot,
+which defaults to the current directory.
+
+  --format=json   Write one JSON object on stdout instead of human-readable lines.
+  --help          Print this text and exit.
+
+Exit codes: 0 no problem, 1 at least one problem, 2 usage error.`;
+
+const flags = process.argv.slice(2).filter((value) => value.startsWith('-'));
+if (flags.includes('--help') || flags.includes('-h')) {
+  console.log(USAGE);
+  process.exit(0);
+}
+const unknownFlags = flags.filter((value) => value !== '--format=json');
+if (unknownFlags.length) {
+  console.error(`Unknown option ${unknownFlags.join(', ')}`);
+  console.error(USAGE);
+  process.exit(2);
+}
+const jsonOutput = flags.includes('--format=json');
+const root = path.resolve(process.argv.slice(2).find((value) => !value.startsWith('-')) ?? '.');
 const errors = [];
 const error = (message) => errors.push(message);
 
@@ -85,8 +107,18 @@ function normalizeSource(contents) {
   return contents.replace(/\r\n?/g, '\n').replace(/[ \t]+$/gm, '').trimEnd() + '\n';
 }
 
+// A source lock names one file in several component entries, and the walk that
+// collects source files reads each one again. Hashing is the expensive step, so
+// the digest is computed once per absolute path.
+const digests = new Map();
+
 function digest(file) {
-  return `sha256:${crypto.createHash('sha256').update(normalizeSource(fs.readFileSync(file, 'utf8'))).digest('hex')}`;
+  const key = path.resolve(file);
+  const cached = digests.get(key);
+  if (cached) return cached;
+  const value = `sha256:${crypto.createHash('sha256').update(normalizeSource(fs.readFileSync(key, 'utf8'))).digest('hex')}`;
+  digests.set(key, value);
+  return value;
 }
 
 function presetFingerprint(preset) {
@@ -124,9 +156,39 @@ function balanced(text, start, open, close) {
   return null;
 }
 
+// A character class cannot see an escaped delimiter, so `"px-2 \" px-3"` ends at
+// the middle quote and every later token in the file parses against the wrong
+// boundary. The scanner honours the backslash escape the language defines, and
+// treats an unterminated quote as no literal rather than as one that runs to the
+// end of the file. A single quote inside a comment is therefore skipped instead
+// of swallowing the next real class string.
+function readLiteral(text, start) {
+  const quote = text[start];
+  let value = '';
+  for (let index = start + 1; index < text.length; index += 1) {
+    const character = text[index];
+    if (character === '\\') {
+      value += text[index + 1] ?? '';
+      index += 1;
+      continue;
+    }
+    if (character === quote) return { value, end: index };
+    if (character === '\n' && quote !== '`') return null;
+    value += character;
+  }
+  return null;
+}
+
 function literals(region) {
   const found = [];
-  for (const match of region.matchAll(/"([^"]*)"|'([^']*)'|`([^`]*)`/g)) found.push(match[1] ?? match[2] ?? match[3] ?? '');
+  for (let index = 0; index < region.length; index += 1) {
+    const character = region[index];
+    if (character !== '"' && character !== "'" && character !== '`') continue;
+    const literal = readLiteral(region, index);
+    if (!literal) continue;
+    found.push(literal.value);
+    index = literal.end;
+  }
   return found;
 }
 
@@ -136,8 +198,8 @@ function classStrings(text) {
     const start = match.index + match[0].length;
     const opener = text[start];
     if (opener === '"' || opener === "'" || opener === '`') {
-      const end = text.indexOf(opener, start + 1);
-      if (end > start) found.push(text.slice(start + 1, end));
+      const literal = readLiteral(text, start);
+      if (literal) found.push(literal.value);
       continue;
     }
     if (opener === '{') {
@@ -145,6 +207,8 @@ function classStrings(text) {
       if (region !== null) found.push(...literals(region));
     }
   }
+  // Every call expression matches first and the helper set filters the rest. A
+  // call the set does not name contributes no class string.
   for (const match of text.matchAll(/\b([A-Za-z_$][\w$]*)\s*\(/g)) {
     if (!classHelpers.has(match[1])) continue;
     const region = balanced(text, match.index + match[0].length - 1, '(', ')');
@@ -156,7 +220,15 @@ function classStrings(text) {
 // A bracket in a variant segment is Tailwind variant syntax, which the
 // convention allows. A bracket in the final utility segment is an arbitrary
 // value, which it does not.
-const allowedBracketVariant = /^(?:group|peer|has|not|in|data|aria|supports|min|max|nth|nth-last|nth-of-type|nth-last-of-type)-\[/;
+//
+// The names below are the functional variants of the Tailwind release that
+// `standards.manifest.json` pins under `packages.npm.tailwindcss`. They compose,
+// so `group-data-[open]` and `not-has-[a]` are one variant each. A Tailwind
+// release that adds a functional variant needs this list and a fixture case;
+// until it has both, the new variant reports as an arbitrary selector rather
+// than passing unread.
+const bracketVariant = '(?:aria|data|group|has|in|max|min|not|nth|nth-last|nth-of-type|nth-last-of-type|peer|supports)';
+const allowedBracketVariant = new RegExp(`^${bracketVariant}(?:-${bracketVariant})*-\\[`);
 const palette = '(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)';
 const rawPalette = new RegExp(`^-?(?:text|bg|border|ring|ring-offset|outline|fill|stroke|from|via|to|divide|decoration|accent|caret|shadow|placeholder)-${palette}-\\d{2,3}(?:/\\d{1,3})?$`);
 
@@ -359,8 +431,9 @@ function validateSourceLock(file, ui, frontendRoot, vocabularyInfo, manifest) {
   if (lock.schemaVersion !== 1) error(`${label}: schemaVersion must be 1`);
   if (lock.generator !== 'shadcn/ui') error(`${label}: generator must be shadcn/ui`);
   const expectedCli = manifest?.packages?.npm?.shadcn;
+  // The pinned-version test already rejects `latest` and every other range, so
+  // no separate branch for the word is reachable.
   if (!/^\d+\.\d+\.\d+$/.test(lock.cli ?? '')) error(`${label}: cli must be a pinned semantic version`);
-  if (lock.cli === 'latest') error(`${label}: cli may not be latest`);
   if (expectedCli && lock.cli !== expectedCli) error(`${label}: cli must match manifest shadcn pin '${expectedCli}'`);
   if (!/^sha256:[a-f0-9]{64}$/.test(lock.preset?.fingerprint ?? '')) error(`${label}: preset fingerprint must be a sha256 digest`);
   if (lock.registry?.name !== 'shadcn' || lock.registry?.url !== 'https://ui.shadcn.com') error(`${label}: only the built-in shadcn registry is allowed`);
@@ -369,6 +442,15 @@ function validateSourceLock(file, ui, frontendRoot, vocabularyInfo, manifest) {
     const expected = key === 'code' ? ui.presetCode : key === 'fingerprint' ? ui.presetFingerprint : ui[key];
     const actual = key === 'code' ? lock.preset?.code : lock.preset?.[key];
     if (expected !== undefined && actual !== expected) error(`${label}: preset.${key} does not match frontend UI configuration`);
+  }
+  // Two separate claims. The lock has to be internally consistent, so its stored
+  // fingerprint covers the preset fields written beside it. The lock also has to
+  // agree with the consumer configuration, so the same digest covers the decoded
+  // `ui` block. Checking only the second one lets a lock carry a preset nobody
+  // hashed; checking only the first lets a self-consistent lock describe a
+  // different preset from the one the frontend declares.
+  if (lock.preset && presetFingerprint(lock.preset) !== lock.preset.fingerprint) {
+    error(`[FRONTEND.UI.FORKS.001] ${label}: preset fingerprint does not match the preset fields recorded beside it`);
   }
   const expectedFingerprint = presetFingerprint(ui);
   if (lock.preset?.fingerprint !== expectedFingerprint) error(`[FRONTEND.UI.FORKS.001] ${label}: preset fingerprint does not match decoded preset values`);
@@ -432,41 +514,99 @@ function validateDependencyBoundary(frontendRoot, ui) {
     const label = relativeToRoot(file);
     const packageJson = readJson(file, label);
     if (!packageJson || ui.system !== 'shadcn/ui') continue;
+    // An `optionalDependencies` entry installs when the platform allows it, and
+    // an `overrides`, `pnpm.overrides`, or `resolutions` entry pins a version of
+    // a package the tree resolves. Each one puts the named package in
+    // `node_modules` where a component can import it, so each one is a declared
+    // visual dependency for this boundary.
     const dependencies = {
       ...(packageJson.dependencies ?? {}),
       ...(packageJson.devDependencies ?? {}),
       ...(packageJson.peerDependencies ?? {}),
+      ...(packageJson.optionalDependencies ?? {}),
+      ...(packageJson.overrides ?? {}),
+      ...(packageJson.pnpm?.overrides ?? {}),
+      ...(packageJson.resolutions ?? {}),
     };
     for (const name of visualPackages) if (dependencies[name]) error(`[FRONTEND.UI.GOVERNANCE.001] ${label}: second general-purpose visual dependency '${name}' requires an override`);
   }
 }
 
+// A CSS string can carry a brace, a semicolon, or a comment opener, so counting
+// those characters without tracking the string that holds them misreads
+// `[data-state="{"]` as a block and `[data-kind="a,b"]` as two selectors. The
+// scanner removes comments and empties every string body, which leaves the
+// structure the brace check and the statement classifier read while keeping each
+// selector's shape intact.
+function readCssString(text, start) {
+  const quote = text[start];
+  for (let index = start + 1; index < text.length; index += 1) {
+    const character = text[index];
+    if (character === '\\') {
+      index += 1;
+      continue;
+    }
+    if (character === quote) return index;
+    if (character === '\n') return -1;
+  }
+  return -1;
+}
+
+function cssStructure(text, report) {
+  let output = '';
+  let index = 0;
+  while (index < text.length) {
+    const character = text[index];
+    if (character === '/' && text[index + 1] === '*') {
+      const end = text.indexOf('*/', index + 2);
+      if (end < 0) {
+        report('an unterminated comment');
+        return output;
+      }
+      index = end + 2;
+      continue;
+    }
+    if (character === '"' || character === "'") {
+      const end = readCssString(text, index);
+      if (end < 0) {
+        report('an unterminated string');
+        return output;
+      }
+      output += `${character}${character}`;
+      index = end + 1;
+      continue;
+    }
+    output += character;
+    index += 1;
+  }
+  return output;
+}
+
 function validateGlobalCss(file) {
   const label = relativeToRoot(file);
   const text = fs.readFileSync(file, 'utf8');
+  let malformed = false;
+  const structure = cssStructure(text, (reason) => {
+    malformed = true;
+    error(`[FRONTEND.UI.TAILWIND.001] ${label}: global CSS has ${reason}`);
+  });
   let depth = 0;
-  let inComment = false;
-  for (let index = 0; index < text.length; index += 1) {
-    if (!inComment && text[index] === '/' && text[index + 1] === '*') {
-      inComment = true;
-      index += 1;
-      continue;
+  for (const character of structure) {
+    if (character === '{') depth += 1;
+    if (character === '}') {
+      depth -= 1;
+      if (depth < 0) {
+        error(`[FRONTEND.UI.TAILWIND.001] ${label}: closing brace has no matching opening brace`);
+        malformed = true;
+        break;
+      }
     }
-    if (inComment && text[index] === '*' && text[index + 1] === '/') {
-      inComment = false;
-      index += 1;
-      continue;
-    }
-    if (inComment) continue;
-    if (text[index] === '{') depth += 1;
-    if (text[index] === '}') depth -= 1;
-    if (depth < 0) error(`[FRONTEND.UI.TAILWIND.001] ${label}: closing brace has no matching opening brace`);
   }
-  if (inComment || depth !== 0) error(`[FRONTEND.UI.TAILWIND.001] ${label}: global CSS has unbalanced comments or braces`);
+  if (!malformed && depth !== 0) error(`[FRONTEND.UI.TAILWIND.001] ${label}: global CSS has an unclosed block`);
   for (const match of text.matchAll(/@import\s+(["'])([^"']+)\1/g)) {
     if (!allowedGlobalImports.has(match[2]) && !match[2].startsWith('./')) error(`[FRONTEND.UI.TAILWIND.001] ${label}: import '${match[2]}' is outside the approved global CSS surface`);
   }
-  classifyGlobalCss(label, text);
+  classifyGlobalCss(label, structure);
 }
 
 // The generated entry imports Tailwind, the shadcn Tailwind layer, and the
@@ -482,8 +622,7 @@ const allowedGlobalAtRules = new Set([
   'keyframes', 'font-face', 'media', 'supports', 'container', 'property', 'charset', 'page',
 ]);
 
-function classifyGlobalCss(label, text) {
-  const stripped = text.replace(/\/\*[\s\S]*?\*\//g, '');
+function classifyGlobalCss(label, stripped) {
   let depth = 0;
   let statement = '';
   // The generated entry expresses its documented browser base rules with
@@ -541,6 +680,31 @@ function reportGlobalStatement(label, statement) {
   }
 }
 
+// One pass over every page sidecar declaration, before any frontend is read.
+// The per-frontend pass below selects the pages whose `app` names that frontend,
+// so a page naming a frontend nobody declared is selected by no pass and reports
+// nothing. Two pages sharing a route are each valid alone and only collide as a
+// pair, which no single-page check sees either.
+function validatePageRegistry(project, frontends) {
+  const uiDocs = filePath(project.paths?.uiDocs ?? 'docs/ui');
+  const declared = new Set(frontends.map((frontend) => frontend.name));
+  const routes = new Map();
+  for (const pageFile of walk(uiDocs, (file) => file.endsWith('.md'))) {
+    const metadata = parseMetadata(pageFile);
+    if (!metadata || metadata.kind !== 'page') continue;
+    const label = relativeToRoot(pageFile);
+    if (!declared.has(metadata.app)) {
+      error(`[FRONTEND.UI.GOVERNANCE.001] ${label}: page declares app '${metadata.app}', which no frontend in standards.project.json declares`);
+      continue;
+    }
+    if (!metadata.route) continue;
+    const key = `${metadata.app} ${metadata.route}`;
+    const owner = routes.get(key);
+    if (owner) error(`[FRONTEND.UI.GOVERNANCE.001] ${label}: route '${metadata.route}' in '${metadata.app}' is already declared by '${owner}'`);
+    else routes.set(key, label);
+  }
+}
+
 function validatePageSidecars(project, frontend, ui, vocabularyInfo) {
   const uiDocs = filePath(project.paths?.uiDocs ?? 'docs/ui');
   const frontendRoot = filePath(frontend.path);
@@ -571,6 +735,11 @@ function validatePageSidecars(project, frontend, ui, vocabularyInfo) {
       for (const component of array(region, 'components', regionLabel)) if (!vocabularyInfo.componentIds.has(component)) error(`${regionLabel}: unknown component '${component}'`);
     }
     for (const state of array(contract, 'states', label)) if (!vocabularyInfo.stateIds.has(state)) error(`${label}: unknown state '${state}'`);
+    // An evidence array holds two kinds of identifier from two registers. A
+    // `UI-` id is owned by this frontend's vocabulary and is resolved here. An
+    // `AC-` or `E2E-` id is owned by the consumer specifications and is resolved
+    // by `validate-consumer.mjs`, which reads the acceptance and end-to-end
+    // registers this validator never loads.
     for (const evidenceId of array(contract, 'evidence', label)) if (evidenceId.startsWith('UI-') && !vocabularyInfo.evidenceIds.has(evidenceId)) error(`${label}: unknown UI evidence '${evidenceId}'`);
   }
 
@@ -655,6 +824,8 @@ for (const override of project?.overrides ?? []) {
   if (override.decision && !fs.existsSync(filePath(override.decision))) error(`${label}: decision does not exist '${override.decision}'`);
 }
 
+if (project) validatePageRegistry(project, frontends);
+
 for (const frontend of frontends) {
   if (frontend.platform === 'react-web' && !frontend.ui) error(`[FRONTEND.UI.GOVERNANCE.001] frontend '${frontend.name}': react-web frontends require a UI configuration`);
   if (!frontend.ui) continue;
@@ -722,6 +893,17 @@ for (const frontend of frontends) {
   }
 }
 
+if (jsonOutput) {
+  console.log(JSON.stringify({
+    tool: 'validate-ui',
+    consumer: root,
+    ok: errors.length === 0,
+    configuredFrontends: configured,
+    skippedFrontends: configured ? [] : frontends.map((frontend) => ({ name: frontend.name, platform: frontend.platform ?? null })),
+    problems: errors,
+  }, null, 2));
+  process.exit(errors.length ? 1 : 0);
+}
 console.log(`Consumer: ${root}`);
 console.log(`UI-configured frontends: ${configured}`);
 if (errors.length) {

@@ -44,13 +44,29 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+const USAGE = `Usage: node tools/validate-parity.mjs [consumerRoot] [--report] [--format=json] [--help]
+
+Compares Application use-case handlers with use-case specifications for the
+consumer at consumerRoot, which defaults to the current directory.
+
+  --report        List findings and exit 0 instead of failing on them.
+  --format=json   Write one JSON object on stdout instead of human-readable lines.
+  --help          Print this text and exit.
+
+Exit codes: 0 no finding or --report, 1 at least one finding, 2 usage error.`;
+
 const args = process.argv.slice(2);
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(USAGE);
+  process.exit(0);
+}
 const reportOnly = args.includes('--report');
+const jsonOutput = args.includes('--format=json');
 const positional = args.filter((value) => !value.startsWith('-'));
-const unknown = args.filter((value) => value.startsWith('-') && value !== '--report');
+const unknown = args.filter((value) => value.startsWith('-') && value !== '--report' && value !== '--format=json');
 if (unknown.length) {
   console.error(`Unknown option ${unknown.join(', ')}`);
-  console.error('Usage: node validate-parity.mjs [consumerRoot] [--report]');
+  console.error(USAGE);
   process.exit(2);
 }
 
@@ -87,6 +103,10 @@ const ignoredUseCases = new Set(Array.isArray(parity.ignoreUseCases) ? parity.ig
 // compare then, so the run states the skipped scope rather than passing
 // silently. (CORE.SCOPE.BACKEND.001)
 if (!project.paths?.apiSolution) {
+  if (jsonOutput) {
+    console.log(JSON.stringify({ tool: 'validate-parity', consumer: root, ok: true, activated: false, reason: "the project declares no 'paths.apiSolution'", findings: [] }, null, 2));
+    process.exit(0);
+  }
   console.log(`Consumer: ${root}`);
   console.log("PASS: the project declares no 'paths.apiSolution'; use-case parity checking is not activated.");
   process.exit(0);
@@ -216,10 +236,12 @@ const handlerFiles = walk(applicationProject, (file) => {
 const derived = new Map(); // id -> [handler file]
 for (const file of handlerFiles) {
   const segments = slash(path.relative(applicationProject, file)).split('/');
-  if (segments.length < 3) {
-    // The operation folder is what names the use case. A handler sitting
-    // directly in a module or aggregate directory names nothing, and skipping it
-    // would hide it from both directions of this check.
+  // The path is module, aggregate, operation, file: four segments. The operation
+  // folder is what names the use case. A handler sitting directly in a module or
+  // an aggregate directory names nothing, and a depth test that accepted three
+  // segments would read the aggregate folder as the operation and derive an id
+  // that no specification can ever match.
+  if (segments.length < 4) {
     finding(`handler outside an operation folder: ${relativeToRoot(file)}`);
     continue;
   }
@@ -281,6 +303,23 @@ for (const [id, spec] of specifications) {
 }
 
 // ---- report -----------------------------------------------------------------
+// A machine reader gets the findings as an array and the counts as fields, so
+// nothing has to be recovered by parsing the human lines back apart.
+if (jsonOutput) {
+  console.log(JSON.stringify({
+    tool: 'validate-parity',
+    consumer: root,
+    ok: findings.length === 0 || reportOnly,
+    activated: true,
+    applicationProject: relativeToRoot(applicationProject),
+    handlers: handlerFiles.length,
+    specifications: specifications.size,
+    notImplemented: planned,
+    reportOnly,
+    findings,
+  }, null, 2));
+  process.exit(findings.length && !reportOnly ? 1 : 0);
+}
 console.log(`Consumer: ${root}`);
 console.log(`Application project: ${relativeToRoot(applicationProject)}`);
 console.log(`Handlers: ${handlerFiles.length}, use-case specifications: ${specifications.size}`);

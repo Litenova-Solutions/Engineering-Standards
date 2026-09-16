@@ -75,6 +75,54 @@ const VALUES = {
   __PERSON__: 'Sanne',
   __AMOUNT__: 'ticket price',
   __SITUATION__: 'The onsale minute',
+  // Domain shape. The aggregate name is the PascalCase form of __AGGREGATE_ID__,
+  // so the type names the templates build stay consistent with the file path.
+  __TERM__: 'Order claim',
+  __AGGREGATE__: 'OrderClaim',
+  __STATE__: 'Draft',
+  __FROM_STATE__: 'Draft',
+  __TO_STATE__: 'Cancelled',
+  __SOURCE_STATE__: 'Draft',
+  __TARGET_STATE__: 'Cancelled',
+  __NEXT_STATE__: 'Settled',
+  __ACTION__: 'Cancel',
+  __EVENT__: 'order-claimed',
+  __PAST_TENSE_EVENT__: 'order-cancelled',
+  __PAST_TENSE_EVENT_TYPE__: 'OrderCancelled',
+  __FIELD__: 'orderId',
+  __MAPPING__: 'OrderClaim.Cancel',
+  __ERROR_CODE__: 'ORDERS-CANCEL-REFUSED',
+  __ACTOR_OR_TRIGGER__: 'buyer',
+  __FLOW_TITLE__: 'Event Sales',
+  __WORKFLOW_TITLE__: 'Order Fulfillment',
+  __WORKFLOW_PASCAL__: 'OrderFulfillment',
+  __START__: 'orders.order-claimed',
+  __POLICY_ID__: 'REFUND-LIMIT',
+  __POLICY_TITLE__: 'Refund Limit',
+  __LIMITS_TITLE__: 'Operating Limits',
+  __LIMIT__: 'Concurrent checkouts',
+  __SIGNAL__: 'checkout queue depth',
+  __WINDOW__: 'one minute',
+  __COMPONENT__: 'CancelOrderForm',
+  __ROUTE_FOLDER__: 'app/cancel',
+  __REVIEW_OR_EXPIRY_DATE__: '2027-01-01',
+  __COMPENSATING_CONTROL__: 'a nightly reconciliation report',
+  __SECURITY_APPROVAL__: 'fixture',
+  __REMOVAL_CONDITION__: 'the queue extension is selected',
+  __EXACT_COMMAND_OR_PLATFORM_ACTION__: 'fixture up',
+  __DATE__: '2026-01-01',
+  __COMMIT__: '0000000000000000000000000000000000000000',
+  __ARTIFACT_REFERENCE__: 'fixture:1.0.0',
+  __FLOW_IDS__: 'event-sales',
+  __USE_CASE_IDS__: 'orders.cancel-order',
+  __WORKFLOW_IDS__: 'order-fulfillment',
+  __EXTENSIONS__: 'none',
+  __LIMITATIONS__: 'none',
+  __RESULT__: 'pass',
+  __LINK_OR_ARTIFACT__: 'docs/research/fixture-evidence.md',
+  __EVIDENCE__: 'docs/research/fixture-evidence.md',
+  __EVIDENCE_TITLE__: 'Fixture Evidence',
+  __REFERENCE__: 'docs/reference/ports.md',
   'YYYY-MM-DD': '2026-01-01',
 };
 
@@ -146,17 +194,40 @@ function build() {
   fs.mkdirSync(path.join(fixture, 'standards'), { recursive: true });
   fs.copyFileSync(path.join(repository, 'standards.manifest.json'), path.join(fixture, 'standards/standards.manifest.json'));
   for (const [template, target] of LAYOUT) {
-    writeFile(target, resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/consumer', template), 'utf8')));
+    const resolved = resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/consumer', template), 'utf8'));
+    // A template placeholder the value table does not name reaches the fixture
+    // unresolved. The run still passes, because a literal '__OWNER__' satisfies
+    // every rule that only asks for a non-empty string, so the case suite then
+    // proves the template against a value no consumer would write.
+    const unresolved = [...new Set(resolved.match(/__[A-Z][A-Z0-9_]*__/g) ?? [])];
+    if (unresolved.length) {
+      failures += 1;
+      console.log(`  FAIL  ${template}: unresolved placeholder(s) ${unresolved.join(', ')}; add each one to VALUES`);
+    }
+    writeFile(target, resolved);
   }
 }
 
+let lastStatus = 0;
+
 function run() {
   const result = spawnSync(process.execPath, [validator, fixture], { encoding: 'utf8' });
+  lastStatus = result.status;
   return `${result.stdout ?? ''}${result.stderr ?? ''}`;
 }
 
 function report(name, expectation, output) {
+  const status = lastStatus;
   const problems = output.split('\n').filter((line) => line.startsWith('  - ')).map((line) => line.slice(4));
+  // The exit code is what CI reads, so it is asserted beside the message. A run
+  // that prints a problem and exits 0 passes every gate that matters.
+  const expectedStatus = expectation === null ? 0 : problems.length ? 1 : 0;
+  if (status !== expectedStatus) {
+    failures += 1;
+    console.log(`  FAIL  ${name}`);
+    console.log(`        expected exit ${expectedStatus}, got ${status}`);
+    return;
+  }
   // Three expectation forms: null for a clean run, a string the output must
   // carry, and { absent } for a diagnostic the output must not carry. The third
   // exists because a case that narrows one setting can make an unrelated rule

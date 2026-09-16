@@ -195,6 +195,14 @@ fileCase(
   null,
 );
 fs.rmSync(path.join(fixture, 'docs/domain/modules/sales/vouchers/read-csv-import.md'));
+// Two spellings of one acronym reduce to one identifier. That is the intended
+// behaviour, so both spellings carry a case rather than one standing for both.
+fileCase(
+  'a title-cased acronym derives the same identifier as an upper-cased one',
+  `${applicationProject}/Sales/Vouchers/ReadCsvImport/ReadCsvImportQueryHandler.cs`,
+  'internal sealed class Handler;\n',
+  '-> sales.read-csv-import',
+);
 
 console.log('\nOperation folder shape (BACKEND.APPLICATION.STRUCTURE.001)');
 fileCase(
@@ -202,6 +210,15 @@ fileCase(
   `${applicationProject}/Sales/ArchiveVoucherCommandHandler.cs`,
   'internal sealed class Handler;\n',
   `handler outside an operation folder: ${applicationProject}/Sales/ArchiveVoucherCommandHandler.cs`,
+);
+// Three segments look like a path but name no operation. Reading the aggregate
+// folder as the operation would derive 'sales.vouchers', which no specification
+// can ever carry.
+fileCase(
+  'handler sitting directly in its aggregate directory',
+  `${applicationProject}/Sales/Vouchers/ArchiveVoucherCommandHandler.cs`,
+  'internal sealed class Handler;\n',
+  `handler outside an operation folder: ${applicationProject}/Sales/Vouchers/ArchiveVoucherCommandHandler.cs`,
 );
 fileCase(
   'two aggregates naming the same operation',
@@ -236,6 +253,11 @@ handler(uncovered);
 report('the default run fails on an open finding', 'handler with no specification', run(), 1);
 report("'--report' lists the same finding and exits 0", 'handler with no specification', run('--report'), 0);
 configCase('an ignoreHandlers pattern covering the folder', { ignoreHandlers: [`${applicationProject}/Sales/Vouchers/VoidVoucher/**`] }, null);
+// A trailing '/**' matches the folder's own direct children, so an exclusion
+// does not depend on how deeply the excluded tree happens to nest. A '**' in the
+// middle of a pattern matches zero or more directories for the same reason.
+configCase('a mid-path wildcard spanning zero directories', { ignoreHandlers: [`${applicationProject}/Sales/**/VoidVoucherCommandHandler.cs`] }, null);
+configCase('a single-segment wildcard does not cross a separator', { ignoreHandlers: [`${applicationProject}/Sales/*/VoidVoucherCommandHandler.cs`] }, 'handler with no specification', { status: 1 });
 configCase('an ignoreUseCases entry naming the id', { ignoreUseCases: ['sales.void-voucher'] }, null);
 configCase('an empty parity block changes nothing', {}, 'handler with no specification', { status: 1 });
 fs.rmSync(path.join(fixture, uncovered));
@@ -246,6 +268,8 @@ reportLine('an applicationProject that does not exist', "parity.applicationProje
 writeJson(projectFile, baseProject());
 
 reportLine('an unknown option is a usage error', 'Unknown option --strict', run('--strict'), 2);
+reportLine('--help states the synopsis and exits 0', 'Usage: node tools/validate-parity.mjs', run('--help'), 0);
+reportLine('--format=json writes one machine-readable object', '"tool": "validate-parity"', run('--format=json'), 0);
 
 const project = readJson(projectFile);
 delete project.paths.apiSolution;

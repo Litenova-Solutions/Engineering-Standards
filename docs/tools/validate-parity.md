@@ -7,7 +7,7 @@
 ## Synopsis
 
 ```bash
-node standards/tools/validate-parity.mjs [consumerRoot] [--report]
+node standards/tools/validate-parity.mjs [consumerRoot] [--report] [--format=json] [--help]
 ```
 
 ## Description
@@ -27,6 +27,8 @@ A consumer whose project declares no `paths.apiSolution` skips the check and pas
 | Option | Default | Effect |
 |:---|:---|:---|
 | `--report` | off | Prints the same findings and exits zero, for a consumer burning down a backlog. |
+| `--format=json` | off | Writes one JSON object on standard output, with the findings as an array. |
+| `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 
 ## Exit codes
 
@@ -48,6 +50,12 @@ List the gap without failing:
 
 ```bash
 node standards/tools/validate-parity.mjs /path/to/consumer --report
+```
+
+Read the findings from another program:
+
+```bash
+node standards/tools/validate-parity.mjs --format=json
 ```
 
 ## Underneath

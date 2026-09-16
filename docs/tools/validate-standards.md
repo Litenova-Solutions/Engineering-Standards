@@ -27,6 +27,8 @@ Run it after changing any page, any template, or any authoring rule.
 | Option | Default | Effect |
 |:---|:---|:---|
 | `--warnings` | off | Lists every occurrence of a rule the repository is still burning down. |
+| `--format=json` | off | Writes one JSON object on standard output, with the errors and warnings as arrays. |
+| `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 
 ## Exit codes
 

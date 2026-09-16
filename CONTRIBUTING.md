@@ -37,6 +37,21 @@ Do not add aliases, replacement maps, alternate paths, compatibility terms, or t
 
 An actionable Convention includes one convention ID, Default statement, Replacement statement, and Verification row.
 
+### Amend an active provision
+
+An active provision ID identifies its current assertion, so amending the assertion is not an edit in place. (CORE.AUTHORING.REQUIREMENT.001)
+
+Amend a Standard in this order:
+
+1. Decide whether the assertion changes. A reworded Requirement that obliges the same action keeps its ID. A Requirement that obliges a different action, a wider scope, or a different actor takes a new ID.
+2. Write the new provision with the next free number under its topic. Do not reuse the retired number.
+3. Delete the retired provision, its Agent Summary citation, and its Verification row. Leave no alias, no replacement map, and no note that the number moved. (CORE.AUTHORING.SNAPSHOT.002)
+4. Update each page that cited the retired ID. `docs/reference/provisions.md` resolves every citation to its page, and the repository validator reports a citation with no owner.
+5. Update the validator case that covers the rule, in both directions.
+6. Record the change in `CHANGELOG.md` as the current contract, without a transition path.
+
+A consumer that pinned the earlier release keeps that release and its own overrides. Adopting this release means re-reading the amended provision and any override that named the retired ID. (CORE.AUTHORING.SNAPSHOT.005, CORE.AUTHORING.SNAPSHOT.006)
+
 ## Extension Changes
 
 An extension page declares Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, and Verification.
@@ -54,6 +69,7 @@ Before review:
 - Confirm extension declarations match the manifest.
 - Validate the two tracked schema consumers.
 - Update affected templates and validator cases.
+- Run every fixture suite: the standards, UI, consumer, and parity cases.
 - Run `node tools/generate-provisions.mjs` and commit the regenerated index. (CORE.AUTHORING.INDEX.001)
 - Update the changelog.
 - Run `git diff --check`.

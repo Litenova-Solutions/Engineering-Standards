@@ -177,6 +177,41 @@ function pathCase(name, relative, contents, expectation) {
   fs.rmSync(file);
 }
 
+// A page case writes a second page specification beside the tracked one, so the
+// checks that compare pages with each other have two pages to compare.
+function pageCase(name, metadata, expectation) {
+  const file = path.join(fixture, `docs/ui/web/${metadata.id.split('.').pop()}.md`);
+  const block = {
+    kind: 'page',
+    specStatus: 'approved',
+    implementationStatus: 'planned',
+    owner: 'fixture',
+    lastReviewed: '2026-01-01',
+    useCases: ['fixture.view'],
+    ...metadata,
+  };
+  fs.writeFileSync(file, `---\n${JSON.stringify(block, null, 2)}\n---\n\n# Fixture page\n`);
+  report(name, expectation, run());
+  fs.rmSync(file);
+}
+
+function lockCase(name, mutate, expectation) {
+  const lockFile = path.join(fixture, 'apps/web/ui-source-lock.json');
+  const original = fs.readFileSync(lockFile, 'utf8');
+  const lock = readJson(lockFile);
+  mutate(lock);
+  writeJson(lockFile, lock);
+  report(name, expectation, run());
+  fs.writeFileSync(lockFile, original);
+}
+
+function manifestCase(name, packageJson, expectation) {
+  const file = path.join(fixture, 'package.json');
+  writeJson(file, { name: 'fixture', ...packageJson });
+  report(name, expectation, run());
+  fs.rmSync(file, { force: true });
+}
+
 function configCase(name, mutate, expectation) {
   const project = readJson(projectFile);
   const vocabulary = readJson(vocabularyFile);
@@ -201,7 +236,10 @@ sourceCase('class merge helper', 'import { cn } from "@/lib/utils";\nexport cons
 sourceCase('pinned icon family', 'import { Check } from "lucide-react";\nexport const C = () => <Check className="size-4" />;', null);
 sourceCase('javascript negation is not an important modifier', 'export const C = ({ o }: { o: boolean }) => {\n  const v = !o;\n  return v ? null : <div className="p-4" />;\n};', null);
 sourceCase('a class name inside a comment is prose', 'export const C = () => {\n  // never use bg-blue-500 or w-[37rem]\n  return <div className="p-4" />;\n};', null);
+sourceCase('a call the helper set does not name carries no class string', 'import { t } from "@/lib/i18n";\nexport const C = () => <div title={t("bg-red-500")} className="p-4" />;', null);
+sourceCase('composed functional variants', 'export const C = () => <div className="group-data-[state=open]:rotate-180 not-has-[input]:opacity-50 peer-aria-[expanded=true]:block" />;', null);
 pathCase('generated native web asset is ignored', 'apps/web/android/app/src/main/assets/public/_next/static/css/generated.css', '.generated { color: red; }\n', null);
+pathCase('a file under tests is outside the controlled surface', 'apps/web/tests/case.test.tsx', 'export const C = () => <div className="bg-red-500" />;\n', null);
 pathCase('authored feature CSS is rejected', 'apps/web/features/generated.css', '.generated { color: red; }\n', 'CSS file is outside the designated global CSS entry');
 
 console.log('\nRestricted Tailwind use (FRONTEND.UI.TAILWIND.001)');
@@ -217,16 +255,20 @@ sourceCase('important modifier prefix', 'export const C = () => <div className="
 sourceCase('important modifier suffix', 'export const C = () => <div className="mt-0!" />;', "important modifier requires a declared variant 'mt-0!'");
 sourceCase('arbitrary selector variant', 'export const C = () => <div className="[&>svg]:size-4" />;', "arbitrary selector variant requires a declared variant '[&>svg]:size-4'");
 sourceCase('undeclared inline style', 'export const C = () => <div style={{ width: 120 }} />;', 'inline style requires a vocabulary runtimeStyles record');
+sourceCase('an escaped quote keeps the following literal readable', 'import { cn } from "@/lib/utils";\nexport const C = () => <div className={cn("a \\" b", "text-red-500")} />;', "'text-red-500'");
 cssCase('feature selector in the global entry', `${cleanCss}.promo-card{color:red}\n`, "selector '.promo-card' is a feature style");
+cssCase('a comma inside a quoted attribute value is not a selector list', `${cleanCss}[data-token=",.promo"]{color:red}\n`, null);
+cssCase('a brace inside a quoted attribute value is not a block', `${cleanCss}[data-token="{"]{color:red}\n`, null);
+cssCase('an unterminated string is reported once', `${cleanCss}[data-token="promo]{color:red}\n`, 'global CSS has an unterminated string');
 cssCase('apply directive outside the generated base layer', `${cleanCss}@layer components {\n  .btn { @apply px-4 py-2; }\n}\n`, "'@apply' outside the generated '@layer base' block");
 cssCase('unapproved global import', `${cleanCss}@import "bootstrap/dist/css/bootstrap.css";\n`, "import 'bootstrap/dist/css/bootstrap.css' is outside the approved global CSS surface");
 
 console.log('\nSource boundary (FRONTEND.UI.GOVERNANCE.001)');
 sourceCase('primitive vendor import in feature code', 'import { Dialog } from "@base-ui/react";\nexport const C = () => <Dialog />;', 'direct UI vendor import is outside the primitive boundary');
-configCase('second visual system in the workspace root', () => {
-  writeJson(path.join(fixture, 'package.json'), { name: 'fixture', dependencies: { '@mui/material': '7.0.0' } });
-}, "second general-purpose visual dependency '@mui/material' requires an override");
-fs.rmSync(path.join(fixture, 'package.json'), { force: true });
+manifestCase('second visual system in the workspace root', { dependencies: { '@mui/material': '7.0.0' } }, "second general-purpose visual dependency '@mui/material' requires an override");
+manifestCase('second visual system in optionalDependencies', { optionalDependencies: { bootstrap: '5.3.3' } }, "second general-purpose visual dependency 'bootstrap' requires an override");
+manifestCase('second visual system pinned through pnpm overrides', { pnpm: { overrides: { '@mantine/core': '8.0.0' } } }, "second general-purpose visual dependency '@mantine/core' requires an override");
+manifestCase('second visual system pinned through resolutions', { resolutions: { antd: '5.0.0' } }, "second general-purpose visual dependency 'antd' requires an override");
 configCase('UI override without a review date', (project) => {
   project.overrides = [{ provisionId: 'FRONTEND.UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md' }];
 }, "a UI rule override requires 'reviewBy'");
@@ -272,10 +314,18 @@ writeJson(sidecar, { ...sidecarContract, regions: [{ ...sidecarContract.regions[
 report('page contract naming an unlisted pattern', "unknown pattern 'invented-pattern/default'", run());
 fs.copyFileSync(path.join(repository, 'templates/consumer/ui-page.json'), sidecar);
 
+console.log('\nPage registry (FRONTEND.UI.GOVERNANCE.001)');
+pageCase('two pages declaring one route', { id: 'web.duplicate', app: 'web', route: '/' }, "route '/' in 'web' is already declared by");
+pageCase('two pages on one route in different frontends', { id: 'web.elsewhere', app: 'admin', route: '/' }, "page declares app 'admin', which no frontend");
+pageCase('a distinct route is accepted', { id: 'web.second', app: 'web', route: '/second' }, 'missing UI sidecar');
+
 console.log('\nSource lock (FRONTEND.UI.FORKS.001)');
 fs.appendFileSync(path.join(fixture, 'apps/web/components/ui/button.tsx'), '// local change\n');
 report('changed baseline source without a fork record', 'no longer matches the baseline digest', run());
 fs.writeFileSync(path.join(fixture, 'apps/web/components/ui/button.tsx'), 'export function Button() {\n  return null;\n}\n');
+lockCase('preset fields that the recorded fingerprint does not cover', (lock) => {
+  lock.preset.theme = 'fixture-theme';
+}, 'preset fingerprint does not match the preset fields recorded beside it');
 
 fs.rmSync(fixture, { recursive: true, force: true });
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);

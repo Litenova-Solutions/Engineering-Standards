@@ -114,6 +114,9 @@ export function checkProseMeasures(relative, raw, add) {
   const lines = stripFences(raw.split(/\r?\n/));
   let paragraph = [];
   let list = [];
+  // The exempt columns are a property of one table, so the set resets when a
+  // table ends.
+  let tableHeader = null;
 
   const scanTerms = (value, number) => {
     const visible = visibleText(value);
@@ -176,6 +179,7 @@ export function checkProseMeasures(relative, raw, add) {
       continue;
     }
     flushList();
+    if (!/^\s*\|/.test(line)) tableHeader = null;
     if (/^#{1,6}\s/.test(line) || /^\s*</.test(line) || /^\s*---\s*$/.test(line)) {
       flushParagraph();
       continue;
@@ -184,7 +188,23 @@ export function checkProseMeasures(relative, raw, add) {
       flushParagraph();
       if (!/^\s*\|?\s*:?-+/.test(line)) {
         const cells = line.split('|').slice(1, -1);
-        for (const cell of cells) {
+        // A table that lists refused words carries two columns the measure does
+        // not bound. The refused word itself is the row's subject, and the
+        // reason states the collision that produced it, which is longer than a
+        // cell otherwise gets. Both stay readable because the rest of the row
+        // is short. Every other table is measured as before.
+        if (tableHeader === null) {
+          tableHeader = new Set();
+          const reasons = new Set();
+          for (let index = 0; index < cells.length; index += 1) {
+            if (REJECTION_COLUMN.test(cells[index])) tableHeader.add(index);
+            else if (REJECTION_REASON_COLUMN.test(cells[index])) reasons.add(index);
+          }
+          if (tableHeader.size) for (const index of reasons) tableHeader.add(index);
+        }
+        for (let index = 0; index < cells.length; index += 1) {
+          if (tableHeader.has(index)) continue;
+          const cell = cells[index];
           const count = words(cell).length;
           if (count > PROSE_LIMITS.tableCell) {
             add(relative, item.number, 'PROSE_TABLE_CELL_LENGTH', `table cell has ${count} words; maximum is ${PROSE_LIMITS.tableCell}: '${visibleText(cell).slice(0, 120)}'`);
@@ -213,7 +233,14 @@ function termPattern(term) {
 // A column that exists to list rejected words has to be able to contain them.
 // A glossary states `Avoid` beside each term and a module states
 // `Rejected synonyms`, so those cells are the rule rather than a breach of it.
-const REJECTION_COLUMN = /^\s*(?:avoid|rejected|rejected names?|rejected synonyms?)\s*$/i;
+const REJECTION_COLUMN = /^\s*(?:avoid|rejected|rejected names?|rejected synonyms?|mannered|mannered terms?)\s*$/i;
+
+// The column that explains a rejection has to be able to name the word it
+// explains, for the same reason. It is exempt only inside a table that already
+// carries a rejection column, so an ordinary `Reason` column elsewhere stays in
+// scope. Its length is exempt too: a reason states the collision that produced
+// the rejection, and that is longer than a table cell otherwise gets.
+const REJECTION_REASON_COLUMN = /^\s*(?:reason|reasons|why|rationale)\s*$/i;
 
 // Blanks the cells that sit under a rejection column, keeping every other
 // character in place so a reported offset still maps to its own line.
@@ -227,7 +254,12 @@ function blankRejectionColumns(text) {
     if (/^\s*\|?[\s:|-]+$/.test(line)) continue;
     if (columns === null) {
       columns = new Set();
-      for (let cell = 0; cell < cells.length; cell += 1) if (REJECTION_COLUMN.test(cells[cell])) columns.add(cell);
+      const reasons = new Set();
+      for (let cell = 0; cell < cells.length; cell += 1) {
+        if (REJECTION_COLUMN.test(cells[cell])) columns.add(cell);
+        else if (REJECTION_REASON_COLUMN.test(cells[cell])) reasons.add(cell);
+      }
+      if (columns.size) for (const cell of reasons) columns.add(cell);
       continue;
     }
     if (!columns.size) continue;

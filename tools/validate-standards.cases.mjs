@@ -296,6 +296,21 @@ run('missing evidence row', (root) => write(root, 'docs/core/topic.md', topicPag
 run('long sentence', (root) => write(root, 'docs/core/topic.md', topicPage.replace('This page defines one repository topic.', 'This sentence contains more than twenty five visible words because the fixture must prove that descriptive prose cannot exceed the fixed controlled technical prose sentence limit in active documentation.')), ['PROSE_SENTENCE_LENGTH']);
 run('long list item', (root) => write(root, 'docs/guide/sample.md', guide.replace('- Read the applicable canonical provision.', '- Read the applicable canonical provision and every related document before you create any artifact or run any verification command for this repository task.')), ['PROSE_LIST_LENGTH']);
 run('non-ASCII prose', (root) => write(root, 'docs/core/topic.md', topicPage.replace('one repository topic', 'one repository topic - with an em dash -').replace('- with an em dash -', '\u2014 with an em dash')), ['PROSE_NON_ASCII']);
+// One character proved the check fires. The characters below are the ones an
+// editor substitution or a word-processor paste actually introduces, and each
+// reports the ASCII form an author writes instead.
+for (const [codepoint, hint] of [
+  ['00A0', 'a plain space'],
+  ['2018', 'a straight apostrophe'],
+  ['2019', 'a straight apostrophe'],
+  ['201C', 'a straight quotation mark'],
+  ['201D', 'a straight quotation mark'],
+  ['2013', 'a hyphen'],
+  ['2026', 'three full stops'],
+  ['00B7', 'a hyphen'],
+]) {
+  run(`non-ASCII prose U+${codepoint} (${hint})`, (root) => write(root, 'docs/core/topic.md', topicPage.replace('one repository topic', `one repository${String.fromCodePoint(Number.parseInt(codepoint, 16))}topic`)), ['PROSE_NON_ASCII']);
+}
 run('vague term', (root) => write(root, 'docs/core/topic.md', topicPage.replace('one repository topic', 'one obvious repository topic')), ['PROSE_VAGUE_TERM']);
 run('section order', (root) => write(root, 'docs/core/topic.md', topicPage.replace('## Standards', '## TEMP').replace('## Conventions', '## Standards').replace('## TEMP', '## Conventions')), ['PAGE_SECTION_ORDER']);
 run('broken link', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nRead the [missing page](missing.md).\n'), ['LINK_BROKEN']);
@@ -307,6 +322,41 @@ run('unsupported schema keyword', (root) => {
   write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', format: 'custom' }));
   write(root, 'standards.manifest.json', '{}');
 }, ['SCHEMA_UNSUPPORTED_KEYWORD']);
+// The keyword gate is what makes a local evaluator safe, so it has to reach
+// every position a subschema occupies. A gate that stops at one nesting level
+// passes the subtree below it unread.
+run('unsupported schema keyword inside a branch', (root) => {
+  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', anyOf: [{ type: 'object', properties: { version: { contentEncoding: 'base64' } } }] }));
+  write(root, 'standards.manifest.json', '{}');
+}, ['SCHEMA_UNSUPPORTED_KEYWORD']);
+run('unsupported schema keyword inside propertyNames', (root) => {
+  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', propertyNames: { type: 'string', contentMediaType: 'text/plain' } }));
+  write(root, 'standards.manifest.json', '{}');
+}, ['SCHEMA_UNSUPPORTED_KEYWORD']);
+run('schema upper bound', (root) => {
+  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', properties: { version: { type: 'string', maxLength: 3 } } }));
+  write(root, 'standards.manifest.json', JSON.stringify({ version: '1.16.0' }));
+}, ['SCHEMA_INVALID']);
+run('schema anyOf branch', (root) => {
+  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', properties: { version: { anyOf: [{ type: 'integer' }, { type: 'boolean' }] } } }));
+  write(root, 'standards.manifest.json', JSON.stringify({ version: '1.16.0' }));
+}, ['SCHEMA_INVALID']);
+run('schema dependent property', (root) => {
+  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', dependentRequired: { version: ['name'] } }));
+  write(root, 'standards.manifest.json', JSON.stringify({ version: '1.16.0' }));
+}, ['SCHEMA_INVALID']);
+run('schema property name shape', (root) => {
+  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', propertyNames: { pattern: '^[a-z]+$' } }));
+  write(root, 'standards.manifest.json', JSON.stringify({ Version: '1.16.0' }));
+}, ['SCHEMA_INVALID']);
+run('schema pattern properties', (root) => {
+  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', patternProperties: { '^v': { type: 'integer' } }, additionalProperties: false }));
+  write(root, 'standards.manifest.json', JSON.stringify({ version: '1.16.0' }));
+}, ['SCHEMA_INVALID']);
+run('schema array bounds', (root) => {
+  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', properties: { areas: { type: 'array', maxItems: 1 } } }));
+  write(root, 'standards.manifest.json', JSON.stringify({ areas: ['CORE', 'EXT'] }));
+}, ['SCHEMA_INVALID']);
 
 run('missing H1', (root) => write(root, 'docs/core/topic.md', topicPage.replace('# Topic Standard\n\n', '')), ['PAGE_TITLE_COUNT']);
 run('H1 case', (root) => write(root, 'docs/core/topic.md', topicPage.replace('# Topic Standard', '# Topic standard')), ['PAGE_TITLE_CASE']);
@@ -363,6 +413,13 @@ run('unknown verification row', (root) => write(root, 'docs/core/topic.md', topi
 run('contraction', (root) => write(root, 'docs/core/topic.md', topicPage.replace('This page defines one repository topic.', "This page isn't a second repository topic.")), ['PROSE_CONTRACTION']);
 run('and-or', (root) => write(root, 'docs/core/topic.md', topicPage.replace('one repository topic', 'one repository and/or consumer topic')), ['PROSE_AND_OR']);
 run('long paragraph', (root) => write(root, 'docs/core/topic.md', topicPage.replace('This page defines one repository topic.', 'One sentence. Two sentences. Three sentences. Four sentences. Five sentences. Six sentences. Seven sentences.')), ['PROSE_PARAGRAPH_LENGTH']);
+// A table listing refused words exempts two columns: the refused word, and the
+// reason that has to be able to name it. Every other column is measured, and a
+// reason column in a table with no rejection column is measured too.
+const rejectionTable = '\n\n| Rejected | Use instead | Reason |\n|:---|:---|:---|\n| seat | position | The glossary defines seat as a numbered place in a seating plan, which a general-admission event does not have at all. |\n';
+run('rejection table exempts its refused word and its reason', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes${rejectionTable}`)), []);
+run('an ordinary reason column is still measured', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes\n\n| Step | Reason |\n|:---|:---|\n| Publish | The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result. |\n`)), ['PROSE_TABLE_CELL_LENGTH']);
+run('a long cell beside a rejection column is still measured', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes\n\n| Rejected | Use instead | Reason |\n|:---|:---|:---|\n| seat | The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result. | Short. |\n`)), ['PROSE_TABLE_CELL_LENGTH']);
 run('long table cell', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Inspect the declared topic boundary.', 'The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result.')), ['PROSE_TABLE_CELL_LENGTH']);
 run('normative guide prose', (root) => write(root, 'docs/guide/sample.md', guide.replace('Create one verified standards artifact.', 'Consumers MUST create one verified standards artifact.')), ['PROSE_NORMATIVE_LOCATION']);
 
