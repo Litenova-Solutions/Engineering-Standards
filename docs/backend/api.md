@@ -42,6 +42,8 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 **Rationale:** A second transport pattern splits routing, filters, and error mapping across two models that behave differently.
 
+An application arriving with controllers converts them rather than keeping both. Each action becomes one endpoint under `BACKEND.API.CONVENTION.001`. An action filter becomes an endpoint filter or a pipeline stage. Model-state validation becomes the Application validator that `BACKEND.APPLICATION.VALIDATION.001` already requires. A conversion that cannot finish in one change records a decision naming this provision and the date the last controller leaves.
+
 ### Keep endpoint dependencies transport-focused (BACKEND.API.BOUNDARY.001)
 
 **Requirement:** An endpoint route handler MUST NOT receive an aggregate repository, a Marten session, a `DbContext`, a provider SDK, or a broad application service.
@@ -76,11 +78,13 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 **Example:** An operation applies a stable forbidden or not-found policy when revealing that a resource exists would leak information.
 
+A collection endpoint has no single target resource. Its authorization is the database predicate that `QUALITY.SECURITY.AUTHZ.001` requires. The predicate applies before paging, so no page is assembled from rows the caller may not read.
+
 ### Return stable Problem Details (BACKEND.API.ERROR.001)
 
-**Requirement:** An error response MUST use RFC Problem Details carrying a stable application `code`, the current `traceId`, and an `errors` entry for each field failure.
+**Requirement:** An error response MUST use [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457) Problem Details carrying a stable application `code`, the current `traceId`, and an `errors` entry for each field failure.
 
-**Rationale:** A stable machine-readable code lets a client branch on the failure, and the trace identifier connects the response to its diagnostics.
+**Rationale:** A stable machine-readable code lets a client branch on the failure, and the trace identifier connects the response to its diagnostics. RFC 9457 obsoletes RFC 7807 and now defines the media type. The contract cites the document a client implementer reads today.
 
 **Example:** The serialized contract is:
 
@@ -103,7 +107,7 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 }
 ```
 
-`type` is a stable absolute URI owned by the consumer. `errors` appears only when field or message validation entries exist. WebApi maps Application member names to their public JSON field names. `traceId` uses the current W3C trace identifier, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
+`type` is a stable absolute URI owned by the consumer. `errors` appears only when field or message validation entries exist. WebApi maps Application member names to their public JSON field names. `traceId` carries the trace identifier from the current [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent`, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
 
 The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. It maps validation exceptions to 400, missing targets through the operation's 404 policy, and forbidden failures to 403 or the declared 404 disclosure policy. It maps conflicts and state rejections to 409, and unexpected exceptions to 500 with code `internal_error`. It maps known Domain exception types individually. It does not report cancellation from a disconnected request as an application error.
 
@@ -174,7 +178,16 @@ The cursor contains a version and the last stable sort values, including a uniqu
 
 **Rationale:** A handwritten contract drifts from the code it describes.
 
-**Example:** The API source artifact is `apps/api/openapi/{ProjectName}.json`. WebApi references `Microsoft.AspNetCore.OpenApi` and `Microsoft.Extensions.ApiDescription.Server`, enables `OpenApiGenerateDocuments`, sets `OpenApiDocumentsDirectory` to that directory, and passes `--file-name {ProjectName}` through `OpenApiGenerateDocumentsOptions`. Build-time generation starts the entry point without contacting hosted dependencies or running schema changes.
+**Example:** The API source artifact is `apps/api/openapi/{ProjectName}.json`. WebApi references `Microsoft.AspNetCore.OpenApi` and `Microsoft.Extensions.ApiDescription.Server`, enables `OpenApiGenerateDocuments`, sets `OpenApiDocumentsDirectory` to that directory, and passes `--file-name {ProjectName}` through `OpenApiGenerateDocumentsOptions`.
+
+Build-time generation boots the host, which is [what Microsoft's own guidance does](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/overview). A boot reaches every startup guard. A project whose composition refuses to start without a secret, a certificate, or a reachable dependency cannot generate its contract from a clean checkout. Two answers are valid, and the project records which one it uses.
+
+| Answer | What the project does | What it costs |
+|:---|:---|:---|
+| Generation environment | Set an environment for the generation run whose composition wires no hosted dependency. | The generated document reflects that environment's endpoint set. |
+| Deferred guard | Move each startup refusal from composition to first use. | A misconfiguration surfaces on the first request instead of at boot. |
+
+The generation run contacts no hosted dependency and runs no schema change under either answer.
 
 Every operation sets a stable name through `WithName`, which becomes `operationId`, and declares authorization, request, success, and Problem Details response metadata. The implementation uses typed results or `Produces` metadata so the generated document contains every documented status. It adds explicit summaries and descriptions, or enables XML documentation on named handler methods. Comments on route lambdas are not contract documentation.
 

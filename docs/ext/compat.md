@@ -88,6 +88,8 @@ This extension replaces no baseline rule.
 
 **Rationale:** Generated clients and tools use the identifier as an operation-level contract name.
 
+An endpoint whose shape a specification outside this project fixes is out of scope for this rule. An OAuth redirect endpoint, an OIDC discovery document, a provider webhook receiver, and a well-known resource each carry a shape the other party defines. Naming them deliberately changes nothing a consumer reads, because no consumer generates a client from them.
+
 ### Retain compatible operation IDs (EXT.COMPAT.OPERATION.002)
 
 **Requirement:** A compatible API change MUST retain the existing `operationId`.

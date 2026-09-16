@@ -34,9 +34,11 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 ### Select conditional extensions explicitly (CORE.SCOPE.EXTENSIONS.001)
 
-**Requirement:** A consumer MUST select caching, durable messaging, BDD, realtime, multitenancy, reporting, deployment, or alternate persistence only when their extension criteria apply.
+**Requirement:** A consumer MUST select an extension declared in `extensions` within `standards.manifest.json` only when that extension's stated activation criteria apply.
 
-**Rationale:** Conditional capabilities stay inactive until a documented product or engineering condition requires them.
+**Rationale:** Conditional capabilities stay inactive until a documented product or engineering condition requires them. The manifest is the authoritative list, so a release that adds an extension does not leave this rule naming a shorter set. A rule that enumerated capabilities instead would name seven of the sixteen the release ships.
+
+**Example:** Caching, durable messaging, executable BDD, realtime delivery, multitenancy, reporting, and alternate persistence are extensions. [The extension index](../ext/README.md) groups every shipped extension by the capability it adds.
 
 ### Record selected extensions (CORE.SCOPE.EXTENSIONS.002)
 

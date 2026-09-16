@@ -24,15 +24,25 @@ A released application is observable, deployable, recoverable, and supportable b
 
 ### Use Aspire for local orchestration (QUALITY.OPERATIONS.LOCAL.001)
 
-**Requirement:** `AppHost` MUST start WebApi, PostgreSQL, configured frontends, and enabled Workers for local development.
+**Requirement:** A workspace MUST start WebApi, PostgreSQL, configured frontends, and its background execution host with one local command.
 
-**Rationale:** `ServiceDefaults` supplies the shared discovery, health, resilience, and telemetry defaults those resources rely on.
+**Rationale:** The baseline command is Aspire's `AppHost`, and `ServiceDefaults` supplies the shared discovery, health, resilience, and telemetry defaults its resources rely on. A workspace that orchestrates the same set another way satisfies this rule with its own command. The obligation is that one command brings the stack up, not that one tool does.
 
 ### Emit correlated diagnostics (QUALITY.OPERATIONS.OBSERVABILITY.001)
 
 **Requirement:** A host MUST emit structured logs, traces, and metrics carrying timestamp, level, service, environment, trace identifier, and span identifier.
 
 **Rationale:** Correlated identifiers let one request be followed across hosts. Stable event names keep dashboards working across releases.
+
+### Pass trace context in the W3C format (QUALITY.OPERATIONS.TRACE.001)
+
+**Requirement:** A host MUST read and write trace context as the [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent` and `tracestate` headers, using one configured propagator.
+
+**Rationale:** An identifier that each host formats its own way correlates nothing across the boundary between them. `traceparent` is the format OpenTelemetry implements and every managed backend accepts. A trace then crosses a frontend, an API, a background host, and a provider without translation.
+
+One propagator is the part that matters. Two configured propagators produce two identifiers for one request, and the trace splits at whichever hop reads the other one.
+
+**Example:** The trace identifier in a Problem Details response is the trace-id field of the current `traceparent`, which is what `BACKEND.API.ERROR.001` returns.
 
 ### Separate liveness and readiness (QUALITY.OPERATIONS.HEALTH.001)
 
@@ -82,6 +92,14 @@ A released application is observable, deployable, recoverable, and supportable b
 
 **Rationale:** Coverage includes sustained readiness failures, unexpected HTTP errors, release-flow latency, PostgreSQL outages, and failed deployments.
 
+### Route each severity to a declared destination (QUALITY.OPERATIONS.ALERTS.002)
+
+**Requirement:** An alert inventory MUST state, for each severity it uses, the destination that receives the alert and the response time expected of it.
+
+**Rationale:** A declared severity with no destination is a label. Every alert then arrives in the same place, and the page that wakes somebody is read beside the one that does not need to. [Prometheus alerting practice](https://prometheus.io/docs/practices/alerting/) states the same separation between a page and a ticket.
+
+**Example:** A two-severity inventory routes `page` to the on-call destination with a stated response time, and `ticket` to the queue reviewed each working day.
+
 ## Conventions
 
 
@@ -129,7 +147,9 @@ A release applies a reviewed Marten schema plan and deploys the versioned API ar
 | QUALITY.OPERATIONS.ROLLBACK.001 | operation | The release record names the rollback rehearsal result and the previous artifact reference. |
 | QUALITY.OPERATIONS.WORKER.001 | inspection | `WorkerHealthTests` asserts the Worker publishes each signal independently of WebApi readiness. |
 | QUALITY.OPERATIONS.DEPENDENCIES.001 | inspection | `ResilienceTests` asserts each outbound call declares a timeout and bounded retry policy. |
+| QUALITY.OPERATIONS.TRACE.001 | test | `TracePropagationTests` asserts an inbound `traceparent` reaches the outbound call unchanged in its trace-id, through one registered propagator. |
 | QUALITY.OPERATIONS.ALERTS.001 | operation | The alert inventory records owner, threshold, window, severity, and runbook for each baseline alert. |
+| QUALITY.OPERATIONS.ALERTS.002 | operation | The alert inventory records a destination and an expected response time for each severity it uses. |
 | QUALITY.OPERATIONS.CONVENTION.001 | inspection | Consumer `AGENTS.md` review confirms one start command covers the baseline dependencies. |
 | QUALITY.OPERATIONS.CONVENTION.002 | inspection | Telemetry review confirms each emitted name is environment-independent. |
 | QUALITY.OPERATIONS.CONVENTION.003 | inspection | Runbook review confirms each procedure states its trigger, steps, and verification. |

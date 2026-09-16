@@ -18,7 +18,7 @@ CQRS separates write and read behavior inside one Application project. Modules a
 - Handlers, validators, and implementations stay internal and sealed. (BACKEND.ARCHITECTURE.VISIBILITY.001)
 - Aggregates own invariants; handlers only coordinate. (BACKEND.ARCHITECTURE.DOMAIN.001)
 - Commands write through repositories; queries read projections. (BACKEND.ARCHITECTURE.CQRS.001)
-- A Worker exists only for work that outlives a request. (BACKEND.ARCHITECTURE.WORKER.001)
+- Background work names its execution host, and a Worker project is one option. (BACKEND.ARCHITECTURE.WORKER.002, BACKEND.ARCHITECTURE.WORKER.003)
 - Architecture tests prove every structural boundary. (BACKEND.ARCHITECTURE.ENFORCEMENT.001)
 
 ## Standards
@@ -60,13 +60,27 @@ An implementation never belongs there. The project name states the test, and a t
 
 **Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, orchestrators, and ports in one Application project.
 
-**Rationale:** Separate Write, Read, Contracts, and event-handler assemblies are outside this profile.
+**Rationale:** Separate Write, Read, Contracts, and event-handler assemblies are outside this profile. The separation this profile keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the assemblies holding them. Splitting assemblies buys a deployment boundary the profile does not use, and costs a project reference that every use case has to cross.
 
 ### Organize every layer by module and use case (BACKEND.ARCHITECTURE.MODULE.001)
 
 **Requirement:** Every layer MUST use the same module names and order its folders as module, then aggregate, then layer detail.
 
 **Rationale:** An aggregate stays flat only when its plural name equals the single module name. Module is an organization term, not a runtime base type, so no `IModule` or `ModuleRoot` contract exists.
+
+A folder named for a technical grouping rather than a module defeats the rule, because the next unrelated type fits it. `Shared`, `Common`, `Util`, `Helpers`, `Core`, and `Misc` inside a layer are the names that do this.
+
+**Example:** The architecture test asserts the folder names directly, because a rule only a reviewer checks stops holding at the first missed file.
+
+```csharp
+Types.InAssembly(ApplicationAssemblyMarker.Assembly)
+    .Should()
+    .NotResideInNamespaceContaining("Shared")
+    .And().NotResideInNamespaceContaining("Common")
+    .And().NotResideInNamespaceContaining("Helpers")
+    .GetResult()
+    .IsSuccessful.Should().BeTrue();
+```
 
 ### Place a type at the lowest folder that holds its consumers (BACKEND.ARCHITECTURE.PLACEMENT.001)
 
@@ -98,11 +112,23 @@ Domain's shared kernel is the one folder of that name a solution keeps. Its memb
 
 **Rationale:** An enabled persistence extension may replace the read boundary for named aggregate paths. A command still never enforces an invariant from a read projection.
 
-### Add Worker only for an independent process boundary (BACKEND.ARCHITECTURE.WORKER.001)
+### Declare the execution host for work that outlives a request (BACKEND.ARCHITECTURE.WORKER.002)
 
-**Requirement:** An application MUST create a Worker project only for durable dispatch, queue consumption, workflow advancement, or scheduled work that outlives a request.
+**Requirement:** An application MUST declare the execution host that runs its durable dispatch, queue consumption, workflow advancement, and scheduled work.
 
-**Rationale:** An optional best-effort reaction may stay inside WebApi when its loss is accepted.
+**Rationale:** The declared host is either the WebApi process or a Worker project. A rule that only restricts when a Worker project may exist never says where the work runs without one. A project can then host four background services inside WebApi, deviate from no rule it can name, and record no decision. Naming the host makes the choice visible whichever way it goes.
+
+The host is a composition decision, not a code-placement decision. The background service classes live in Infrastructure either way, because they hold provider and scheduling concerns. The host registers them.
+
+**Example:** A project record naming WebApi as the execution host states that durable dispatch shares the request process, and states what an unavailable process costs.
+
+### Create a Worker project when background work needs its own process (BACKEND.ARCHITECTURE.WORKER.003)
+
+**Requirement:** An application MUST create a Worker project when background work needs independent scaling, independent deployment, or isolation from request-path resource limits.
+
+**Rationale:** A shared process couples the three. A restart to deploy an endpoint change interrupts a dispatch loop. Request load and dispatch load compete for one thread pool, and neither scales alone. A product with one deployable unit and modest background load accepts that coupling deliberately, which is why the choice is declared rather than assumed.
+
+**Example:** An application with an outbox dispatching a few messages each minute can run it in WebApi. An application dispatching continuously, or one whose dispatch must survive an endpoint deployment, creates the Worker project.
 
 ### Test structural boundaries (BACKEND.ARCHITECTURE.ENFORCEMENT.001)
 
@@ -152,6 +178,8 @@ Infrastructure/Workflows/PublicationDelivery/
 ```
 
 The mirrored folder names identify one domain module even though each layer owns different responsibilities. A documented workflow that coordinates modules uses the separate `Workflows/{Workflow}` path.
+
+That path exists only where a workflow does. A consumer listing `workflow` in `prohibitedKinds` has no workflow specification and therefore no `Workflows/` folder, so the two settings agree rather than conflict. A `Workflows/` folder in a consumer that prohibits the kind is a folder with no specification behind it.
 
 ### Keep composition in hosts (BACKEND.ARCHITECTURE.CONVENTION.002)
 
@@ -204,7 +232,8 @@ Publishing a post follows this direction:
 | BACKEND.ARCHITECTURE.VISIBILITY.001 | inspection | `ArchitectureTests` asserts every handler, validator, repository implementation, and endpoint type is internal and sealed. |
 | BACKEND.ARCHITECTURE.DOMAIN.001 | inspection | `ArchitectureTests` asserts no command handler references an invariant identifier that its aggregate already enforces. |
 | BACKEND.ARCHITECTURE.CQRS.001 | inspection | `ArchitectureTests` asserts no query handler resolves a repository and no command handler resolves a read session. |
-| BACKEND.ARCHITECTURE.WORKER.001 | inspection | The Worker project decision record names the durable or scheduled boundary that requires an independent process. |
+| BACKEND.ARCHITECTURE.WORKER.002 | inspection | The project record or a decision names the execution host for durable dispatch, queue consumption, workflow advancement, and scheduled work. |
+| BACKEND.ARCHITECTURE.WORKER.003 | inspection | The Worker project decision record names the scaling, deployment, or isolation boundary that requires an independent process. |
 | BACKEND.ARCHITECTURE.ENFORCEMENT.001 | test | `ArchitectureTests` runs in the Release test pass and covers each declared structural boundary. |
 | BACKEND.ARCHITECTURE.COMPOSITION.001 | inspection | `CompositionTests` asserts no registration path builds a second provider or resolves a service locator. |
 | BACKEND.ARCHITECTURE.CONVENTION.001 | inspection | Folder review compares each layer tree against its module list, or records a named local replacement. |

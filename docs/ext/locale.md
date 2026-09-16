@@ -43,9 +43,9 @@ The product brief or decision records locales, default locale, fallback behavior
 
 **Requirement:** A localized application MUST define one documented locale route shape.
 
-**Rationale:** One shape gives users, crawlers, and links a predictable localized address.
+**Rationale:** One shape gives users, crawlers, and links a predictable localized address. A path segment is the baseline shape. It makes every localized page a distinct address that a link, a crawler, and a cache entry can each name. A cookie or header shape serves several locales from one address, so a shared cache and a search index see one of them. An application with no public pages, whose locale is a property of the signed-in account, documents one of those shapes instead.
 
-**Example:** `/nl-NL/orders/42` places the locale in the documented path segment.
+**Example:** `/nl-NL/orders/42` places the locale in the documented path segment, which is [the default the pinned framework documents](https://nextjs.org/docs/app/building-your-application/routing/internationalization).
 
 ### Handle unavailable locale segments (EXT.LOCALE.ROUTES.002)
 
@@ -79,11 +79,19 @@ The product brief or decision records locales, default locale, fallback behavior
 
 **Rationale:** A declared fallback prevents missing copy from becoming an unreviewed runtime behavior.
 
+The declaration states the fallback locale and what a missing key does at build time. A key missing from the default locale fails the build, because no fallback exists for it and the interface would render its identifier. A key missing from a non-default locale reports a warning and falls back. Shipping one untranslated string costs less than blocking a release on it.
+
+**Example:** A catalog check runs in the frontend lint gate, so the two outcomes are visible before review rather than in a browser.
+
 ### Format values with active locale (EXT.LOCALE.FORMAT.001)
 
 **Requirement:** A localized interface MUST format dates, times, numbers, currency, plurals, lists, and relative time by active locale.
 
 **Rationale:** User-facing formatted values need the selected locale's conventions.
+
+The platform supplies every one of them. [The `Intl` namespace](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) has `DateTimeFormat`, `NumberFormat`, `PluralRules`, `ListFormat`, and `RelativeTimeFormat`, and each one carries the locale data the browser already ships. A project-written formatter for any of these is a second locale database that nobody updates. Its plural rules are wrong for the first language with more than two forms.
+
+**Example:** A formatter instance is created once per locale and reused, because construction is the expensive part.
 
 ### Preserve locale-neutral business data (EXT.LOCALE.FORMAT.002)
 

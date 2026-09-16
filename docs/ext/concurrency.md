@@ -104,9 +104,11 @@ This extension adds no baseline project and replaces no baseline rule.
 
 ### Canonicalize request fingerprints (EXT.CONCURRENCY.IDEMPOTENTKEY.005)
 
-**Requirement:** An idempotency implementation MUST derive its fingerprint from canonical mapped command input and route identity, excluding credentials and the client key.
+**Requirement:** An idempotency implementation MUST derive its fingerprint from canonical mapped command input, route identity, and the authenticated actor identifier, excluding credentials and the client key.
 
 **Rationale:** Equivalent requests produce one comparison value without embedding authentication material.
+
+The actor identifier is in the fingerprint and the credential that proved it is not. Two actors can present the same client key, so a fingerprint without the actor lets one actor's replay return another actor's stored response. A bearer token, a cookie, and a signature are the credential, and each one changes between two requests the rule has to treat as equal.
 
 ### Protect fingerprint source data (EXT.CONCURRENCY.IDEMPOTENTKEY.006)
 
@@ -188,19 +190,19 @@ This extension adds no baseline project and replaces no baseline rule.
 
 ### Exclude unsafe replay outcomes (EXT.CONCURRENCY.IDEMPOTENTOUT.003)
 
-**Requirement:** An idempotent implementation MUST NOT replay authentication failures, transient server failures, `Set-Cookie`, hop-by-hop headers, tokens, or secrets.
+**Requirement:** An idempotent implementation MUST NOT replay authentication failures, transient server failures, `Set-Cookie`, `Cache-Control`, `Vary`, `Expires`, `Age`, hop-by-hop headers, tokens, or secrets.
 
-**Rationale:** These values are unsafe, transient, or unrelated to the accepted operation result.
+**Rationale:** These values are unsafe, transient, or unrelated to the accepted operation result. The caching headers are computed for the response that produced them, so replaying them hands a later caller freshness instructions from an earlier moment. [RFC 9111](https://datatracker.ietf.org/doc/html/rfc9111) makes each one a property of the exchange rather than of the result, and the replayed response computes its own.
 
 ## Conventions
 
 ### Use the standard idempotency header (EXT.CONCURRENCY.CONVENTION.001)
 
-**Default:** Use `Idempotency-Key` for HTTP commands that accept client keys.
+**Default:** Use `Idempotency-Key` for HTTP commands that accept client keys, bounded to 255 characters of visible ASCII.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The standard header makes client-key behavior recognizable at the HTTP boundary.
+**Rationale:** The standard header makes client-key behavior recognizable at the HTTP boundary. [The IETF draft](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/) leaves the value opaque, which leaves a server storing whatever a client sends as a key. A bound stops an unbounded key from becoming an unbounded store entry. A character set stops a key from carrying a control character into a log line.
 
 ### Keep idempotency persistence in Infrastructure (EXT.CONCURRENCY.CONVENTION.002)
 

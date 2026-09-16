@@ -10,7 +10,7 @@ Activation scope: `local`.
 
 Applicable specification kinds: `use-case`, `workflow`, `end-to-end-flow`.
 
-The consumer enables `jobs` for recurring, delayed, or calendar-based work. It adds the Worker project permitted by `BACKEND.ARCHITECTURE.WORKER.001`.
+The consumer enables `jobs` for recurring, delayed, or calendar-based work. It activates `BACKEND.ARCHITECTURE.WORKER.002`, so the project declares the execution host that runs the scheduler.
 
 ## Baseline relationship
 
@@ -112,11 +112,19 @@ This extension replaces no baseline rule.
 
 **Rationale:** Operators need controlled actions for stalled, failed, or unsafe schedules.
 
+Each procedure names the interface that performs it. A procedure that reads "disable the schedule" with no command, endpoint, or configuration value behind it is discovered during the incident it was written for. An interface that writes to the schedule store directly is the one to avoid, because it bypasses the occurrence identity `EXT.JOBS.OCCURRENCE.001` depends on.
+
+**Example:** A disable procedure names the configuration value or the administrative endpoint that stops the schedule, and states what happens to an occurrence already claimed.
+
 ### Derive stable occurrence identity (EXT.JOBS.OCCURRENCE.001)
 
 **Requirement:** A scheduled-job store MUST derive each occurrence identity from its schedule ID and scheduled instant.
 
-**Rationale:** One planned time receives one stable identity across retries and Worker replicas.
+**Rationale:** One planned time receives one stable identity across retries and replicas.
+
+The key space grows with the schedule's frequency and its retention, so a per-second schedule kept for a year is over thirty million rows. A schedule therefore declares how long its occurrences are retained, and the store removes the rest. [Quartz states the same practice](https://quartz-scheduler.net/documentation/best-practices.html) for a persistent job store.
+
+**Example:** A daily schedule retaining occurrences for ninety days holds ninety rows. A minute schedule at the same retention holds over a hundred thousand, which is a different storage decision.
 
 ### Persist occurrence state (EXT.JOBS.OCCURRENCE.002)
 
@@ -144,11 +152,9 @@ This extension replaces no baseline rule.
 
 ### Prefer UTC schedules (EXT.JOBS.TIME.001)
 
-**Requirement:** A scheduled job SHOULD use a UTC schedule.
+**Requirement:** A scheduled job MUST use a UTC schedule unless its specification names a business-local time requirement and its IANA time zone.
 
-**Deviation:** A documented business-local time requirement permits an IANA time-zone schedule.
-
-**Rationale:** UTC avoids local clock ambiguity for most recurring work.
+**Rationale:** A local schedule runs twice on one date each year and skips an hour on another. That is what a daylight-saving transition does to a wall clock. That behaviour is correct for a job whose meaning is local, such as a nightly statement at nine in the morning for a reader. It is a defect for every other job, and the earlier recommendation left the difference to a preference. Naming the time zone in the specification is what makes the transition behaviour reviewable.
 
 ### Define business-local clock behavior (EXT.JOBS.TIME.002)
 

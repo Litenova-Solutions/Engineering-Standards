@@ -1,11 +1,11 @@
-# Marten Persistence
+# Persistence
 
 ## Intent
 
 
-Marten is the baseline persistence model. Commands load and stage aggregates through Domain-owned repositories. Queries use Marten directly in Application because the selected profile treats document queries as an explicit read-side dependency.
+This page states how the backend stores and reads aggregates. Commands load and stage aggregates through Domain-owned repositories. Queries read through the session directly in Application, because the selected profile treats document queries as an explicit read-side dependency.
 
-One scoped document session and one LiteBus command post-handler own the transaction boundary.
+One scoped session and one command post-handler own the transaction boundary. Marten is the baseline provider, and the `efcore` extension replaces the provider-specific rules named below.
 
 ## Agent Summary {#agent-summary}
 
@@ -20,6 +20,23 @@ One scoped document session and one LiteBus command post-handler own the transac
 - Stored contract changes carry a reviewed transformation. (BACKEND.PERSISTENCE.EVOLUTION.001)
 - Aggregate documents carry no unbounded collection. (BACKEND.PERSISTENCE.GROWTH.001)
 - Database identifiers use snake case. (BACKEND.PERSISTENCE.NAMING.001)
+
+## Concepts
+
+### Provider-neutral and provider-specific rules
+
+The provisions on this page divide into two groups. A reader replacing the provider needs to know which group moves.
+
+| Group | What it fixes | Provisions |
+|:---|:---|:---|
+| Provider-neutral | The boundary, the transaction shape, and the obligations on stored data. | `WRITE.001`, `COMMIT.001`, `EVENT.001`, `WORKFLOW.001`, `EVOLUTION.001`, `GROWTH.001`, `NAMING.001`, `SCHEMA.001`, `TEST.001` |
+| Provider-specific | The member names and configuration surface the pinned provider supplies. | `READ.001`, `MAPPING.001`, `SERIALIZATION.001` |
+
+The provider-neutral group states one obligation each, and the member named in its text is the baseline binding rather than the obligation. `BACKEND.PERSISTENCE.COMMIT.001` requires exactly one commit for a command pipeline; `SaveChangesAsync` is the call that performs it under the baseline provider.
+
+The provider-specific group is replaced by [the EF Core extension](../ext/efcore.md) when a consumer selects it. No consumer runs both providers over one aggregate.
+
+The manifest pins both providers' packages, because the extension is part of this release. A pinned package is an available choice rather than an active one, and `standards.project.json` records which choices a consumer made.
 
 ## Standards
 
@@ -41,6 +58,8 @@ One scoped document session and one LiteBus command post-handler own the transac
 **Requirement:** Exactly one global command post-handler MUST call `SaveChangesAsync` for a command pipeline.
 
 **Rationale:** A failed command then leaves the scoped session uncommitted. Handlers, repositories, validators, reactions, orchestrators, and endpoints never commit.
+
+The obligation is one commit for one pipeline, not one named method. Under the baseline provider that commit is `IDocumentSession.SaveChangesAsync`. Under the `efcore` extension it is `DbContext.SaveChangesAsync`, wrapped in an explicit transaction when the pipeline writes through more than one context.
 
 ### Collect events without a public unit of work (BACKEND.PERSISTENCE.EVENT.001)
 
@@ -66,11 +85,15 @@ One scoped document session and one LiteBus command post-handler own the transac
 
 **Rationale:** Domain stays free of serialization attributes. Every concrete type behind a base or interface is registered, because an unregistered subtype fails at read time.
 
+Registration covers the types this store actually persists. A union referenced from another aggregate is registered by the store that writes it, once, rather than by every store that names the referencing type. A type reachable only through an identifier is not persisted here and needs no registration.
+
 ### Evolve stored document contracts explicitly (BACKEND.PERSISTENCE.EVOLUTION.001)
 
 **Requirement:** A rename, removal, type change, member move, or discriminator change MUST have a reviewed data transformation or an expand-and-contract rollout.
 
 **Rationale:** JSON member names, required values, and discriminator values are database schema. An additive member still defines its behavior for documents written earlier.
+
+An additive change is the only kind that needs no transformation, and it is additive only when every earlier document stays valid. A new member with a defined absent-value behavior qualifies. A new required member, a narrowed type, and a new discriminator value that an earlier reader rejects do not.
 
 ### Bound aggregate document growth (BACKEND.PERSISTENCE.GROWTH.001)
 
@@ -82,13 +105,15 @@ One scoped document session and one LiteBus command post-handler own the transac
 
 **Requirement:** A PostgreSQL schema, table, column, index, constraint, document alias, or SQL identifier MUST use `snake_case`.
 
-**Rationale:** .NET types keep normal C# naming, so the mapping layer performs the conversion once.
+**Rationale:** .NET types keep normal C# naming, so the mapping layer performs the conversion once. Under the baseline provider the store configuration sets the casing. Under the `efcore` extension the pinned `EFCore.NamingConventions` package applies it, so no configuration repeats the rule per entity.
 
 ### Control production schema changes (BACKEND.PERSISTENCE.SCHEMA.001)
 
 **Requirement:** A hosted environment MUST apply schema changes through a reviewed step before traffic shifts, not from a starting replica.
 
 **Rationale:** Development and disposable integration databases may still apply schema automatically. Replicas competing to alter a schema during startup produce nondeterministic results.
+
+A reviewed step is one that produces an artifact a person approved before it ran. Under the baseline provider that is a generated patch from `martendb` schema migration, applied by a deployment step. Under the `efcore` extension it is a generated migration, applied by `dotnet ef database update` or an idempotent script. A tool that alters the schema from application startup is not a reviewed step whichever provider runs it.
 
 ### Test persistence against PostgreSQL (BACKEND.PERSISTENCE.TEST.001)
 

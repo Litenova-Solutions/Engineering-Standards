@@ -43,7 +43,7 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 
 **Requirement:** Every BDD scenario MUST include one or more `@AC-MODULE-USE-CASE-NN` tags.
 
-**Rationale:** The owning use-case specification contains the acceptance criterion text and examples.
+**Rationale:** The owning use-case specification contains the acceptance criterion text and examples. The tag is the criterion identifier with one `@` in front, which is the same identifier `FRONTEND.TESTING.TRACE.001` and `BACKEND.TESTING.TRACE.001` cite from their own test attributes. One identifier reaches a feature file as a tag, a C# test as a trait, and a browser test as an annotation. The three forms differ only in what their tool requires.
 
 **Example:** `@AC-ORDERS-CANCEL-ORDER-01` traces a cancellation scenario to its accepted criterion.
 
@@ -127,7 +127,7 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The tag selects fast feedback without altering acceptance-criterion traceability.
+**Rationale:** The tag selects fast feedback without altering acceptance-criterion traceability. `@critical` names the scenarios whose failure stops a release, and the project records which ones those are. A tag that every scenario carries selects nothing, so the subset has a stated size bound and an owner who keeps it there.
 
 ## Dependencies
 

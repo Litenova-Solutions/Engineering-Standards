@@ -87,6 +87,8 @@ This extension replaces no baseline rule. SignalR browser clients add pinned `@m
 
 **Rationale:** Explicit limits protect server memory, CPU, and connection capacity.
 
+Each limit is set rather than inherited. A transport ships defaults that suit a sample application, and the value a deployment needs comes from its own connection count and message size. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the knobs. They are the maximum concurrent connections per host, the maximum receive message size, the maximum parallel invocations per connection, and the client timeout. A deployment records the value it set for each, and the observation that produced it.
+
 ### Reject unbounded slow-client buffering (EXT.REALTIME.CAPACITY.002)
 
 **Requirement:** A realtime server MUST NOT buffer an unbounded stream for a slow client.

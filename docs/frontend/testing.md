@@ -63,6 +63,8 @@ test('[AC-POSTS-CREATE-DRAFT-01] creates a draft', async ({ page }) => {
 
 **Rationale:** Playwright runs additionally when a browser flow, route, authentication, or browser integration changes.
 
+The dependency audit is not on this list because it belongs to a different trigger. A source change runs these five; a manifest or lockfile change runs the audit that `QUALITY.SECURITY.SUPPLY.001` requires, through the gate table in `QUALITY.CI.GATES.001`. Running the audit on every source change reports the same advisories until somebody changes a dependency.
+
 ### Prove controlled UI changes (FRONTEND.TESTING.UI.001)
 
 **Requirement:** A primitive, pattern, token, preset, source-lock, or page-contract change MUST run the narrowest evidence its risk requires.

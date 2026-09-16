@@ -49,15 +49,25 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 
 ### Exclude unsafe cache key material (EXT.CACHE.KEY.002)
 
-**Requirement:** A cache key MUST NOT contain a secret or unbounded raw input.
+**Requirement:** A cache key MUST NOT contain a secret, unbounded raw input, or personal data that is not already a hash.
 
-**Rationale:** Keys can appear in diagnostics, metrics, and provider administration tools.
+**Rationale:** Keys appear in diagnostics, metrics, and provider administration tools, which is a copy of the value in a store nobody classified. An email address in a key is a personal-data record in the cache provider's key space. It sits outside every retention and erasure path the project defined. [Data minimisation](https://gdpr-info.eu/art-5-gdpr/) applies to an identifier as much as to a field.
+
+**Example:** A per-account cache key carries the account's opaque identifier. A key that carried the address instead is replaced by a hash of it, and the entry is bound to the account that owns it.
 
 ### Define cache invalidation (EXT.CACHE.INVALIDATE.001)
 
 **Requirement:** A cached value MUST define expiry, invalidating write events, an invalidation owner, and behavior after invalidation failure.
 
 **Rationale:** An explicit contract makes stale data behavior visible before implementation.
+
+### Record a manual cache invalidation (EXT.CACHE.INVALIDATE.003)
+
+**Requirement:** An invalidation an operator triggers by hand MUST produce a record naming the actor, the scope cleared, and the reason.
+
+**Rationale:** A manual clear changes what every later reader sees and leaves no trace in the data itself. Investigating a stale-read report afterwards means knowing whether somebody already cleared the entry. [Article 30 of the GDPR](https://gdpr-info.eu/art-30-gdpr/) treats an administrative action over personal data as processing that has a record.
+
+**Example:** A command that clears one tenant's cached price list records the tenant, the operator, and the incident it was run for.
 
 ### Prefer bounded staleness (EXT.CACHE.INVALIDATE.002)
 
@@ -78,6 +88,14 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 **Requirement:** A cache outage MUST use the source when capacity permits or return a documented degraded response.
 
 **Rationale:** Callers need predictable behavior when cache infrastructure is unavailable.
+
+### Emit a signal for each degraded cache path (EXT.CACHE.FAILURE.003)
+
+**Requirement:** A cache path MUST emit a metric distinguishing a cache miss, a cache error, and a degraded response.
+
+**Rationale:** A fallback that works is invisible, so an outage runs until somebody notices the source load instead. The three cases need different responses: a miss is normal, an error is an infrastructure fault, and a degraded response is a product behavior change. One counter for all three answers none of them.
+
+**Example:** The metric carries the cache name and the outcome, following [the OpenTelemetry semantic conventions](https://opentelemetry.io/docs/specs/semconv/) for the client it wraps.
 
 ### Bound cache refresh work (EXT.CACHE.REFRESH.001)
 
@@ -117,8 +135,10 @@ No provider package is selected by this extension.
 | EXT.CACHE.KEY.002 | static, inspection | `CacheKeyTests` asserts key construction excludes secrets and unbounded raw request values. |
 | EXT.CACHE.INVALIDATE.001 | test | `CacheInvalidateTests` cover expiry, invalidation event, failed invalidation, and owner behavior. |
 | EXT.CACHE.INVALIDATE.002 | inspection | The cache decision records expiry length and measured invalidation cost. |
+| EXT.CACHE.INVALIDATE.003 | test | `CacheInvalidateTests` assert a manual clear writes a record naming the actor, the scope, and the reason. |
 | EXT.CACHE.FAILURE.001 | inspection | Source and cache design review identifies the authoritative business record. |
 | EXT.CACHE.FAILURE.002 | test | `CacheFailureTests` prove source fallback or the documented degraded response. |
+| EXT.CACHE.FAILURE.003 | test | `CacheFailureTests` assert a miss, a provider error, and a degraded response each increment their own metric outcome. |
 | EXT.CACHE.REFRESH.001 | test | `CacheRefreshTests` show bounded refresh work and source protection. |
 | EXT.CACHE.REFRESH.002 | test | `CacheRefreshTests` show lock state remains bounded. |
 | EXT.CACHE.CONVENTION.001 | inspection | Source review locates cache access outside Domain and records any local replacement. |

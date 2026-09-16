@@ -118,11 +118,33 @@ var next = outcome switch
 
 The example uses a typed value object for a closed set represented by one scalar (`BACKEND.DOMAIN.VALUE.001`). It can own validation, normalization, or formatting without per-case data or behavior. The example does not use an enum as its backing field.
 
-The example does not represent a Domain closed set with an enum, scalar discriminator, or boolean flags. This rule is scoped to Domain. Application mirrors the union shape (`BACKEND.APPLICATION.CLOSEDSET.001`). Transport also mirrors it (`BACKEND.API.MODEL.001`).
+The example does not represent a Domain closed set with an enum, scalar discriminator, or boolean flags.
 
-A data-bearing transport set uses a polymorphic `oneOf` model. Only label-only sets or decision-backed narrowing use a string enum. A boundary enum or string is not the default for data-bearing cases. Infrastructure persists each union with stable discriminators, like a state hierarchy. It never stores a raw enum value absent from Domain.
+This rule binds the Domain project. A C# `enum` declaration in Domain is invalid under every reading of it. The same set appears at three other layers, and each layer has exactly one permitted form:
 
-Each union exposes one stable code or label. Its `FromCode` factory round-trips every case. A boundary projects through that member, never the record's default `ToString()`. The default can leak a concrete type name instead of `owner`. Round-trip tests cover every case. The tests catch renamed codes and missing labels.
+| Layer | Form of a closed set | Owning provision |
+|:---|:---|:---|
+| Domain | Abstract record base with sealed cases. | `BACKEND.DOMAIN.CLOSEDSET.001` |
+| Application | The same union shape, mirrored. | `BACKEND.APPLICATION.CLOSEDSET.001` |
+| Transport | Polymorphic `oneOf` model, or string `enum` for a label-only set. | `BACKEND.API.MODEL.001` |
+| Persistence | One stable string discriminator for each case. | `BACKEND.PERSISTENCE.SERIALIZATION.001` |
+
+A transport `enum` is permitted in one situation: every case of the set carries no data, and the labels are the complete contract. A set where any case carries data crosses the boundary as a polymorphic model instead.
+
+A transport enum never re-enters Domain. The Application layer converts the label to its record case before it calls a Domain method. An unrecognized label is a validation failure rather than a default case. Without that conversion rule, the boundary exception readmits the integer the Domain rule removed.
+
+Each union exposes one stable code or label. Its `FromCode` factory round-trips every case. A boundary projects through that member, never the record's default `ToString()`. The default can leak a concrete type name instead of `owner`.
+
+Round-trip tests cover every case, which catches a renamed code and a missing label:
+
+```csharp
+[Theory]
+[MemberData(nameof(AllCases))]
+public void FromCode_round_trips_every_case(RefundOutcome outcome)
+{
+    RefundOutcome.FromCode(outcome.Code).Should().Be(outcome);
+}
+```
 
 ### Create valid aggregates through named factories (BACKEND.DOMAIN.FACTORY.001)
 
@@ -130,11 +152,32 @@ Each union exposes one stable code or label. Its `FromCode` factory round-trips 
 
 **Rationale:** The factory accepts typed identifiers, rejects empty identity and violated creation rules, selects the initial state, records required events, and returns a complete aggregate.
 
+A root created with its children composes them inside the same factory call. The children are built from typed values the caller supplies. A caller never hands in an already constructed child, because a caller holding that reference can mutate it after the invariant was checked.
+
+**Example:**
+
+```csharp
+public sealed class Order : AggregateRoot<OrderId>
+{
+    public static Order Place(OrderId id, BuyerId buyer, IReadOnlyList<OrderLineDraft> lines, DateTimeOffset placedAt)
+    {
+        if (lines.Count == 0) throw new OrderEmptyException();
+
+        var order = new Order(id, buyer, OrderState.AwaitingPayment.Instance);
+        foreach (var line in lines) order.AddLine(OrderLine.Create(id, line.Ticket, line.Quantity, line.Price));
+        order.Record(new OrderPlacedEvent(id, buyer, placedAt));
+        return order;
+    }
+}
+```
+
 ### Express transitions through business methods (BACKEND.DOMAIN.BEHAVIOR.001)
 
 **Requirement:** A public aggregate mutation method MUST check current state, protect its invariants, replace state, and record its domain events.
 
 **Rationale:** A handler then calls `post.Publish(utcNow)` without testing the state first. A generic `Set`, `Update`, `Process`, or `Handle` name hides which business action ran.
+
+The four steps run in that order. A method that replaces state before checking an invariant leaves a rejected aggregate holding the new state. A method that records an event before replacing state can record a fact the next check refuses. A method that throws after recording an event loses the whole call, because the aggregate is never persisted.
 
 ### Keep child entities inside the aggregate boundary (BACKEND.DOMAIN.ENTITY.001)
 
@@ -147,6 +190,10 @@ Each union exposes one stable code or label. Its `FromCode` factory round-trips 
 **Requirement:** An aggregate identity MUST be a `readonly record struct` wrapping one `Guid` created with `Guid.CreateVersion7()`.
 
 **Rationale:** It implements the project `IStronglyTypedId` marker and `IParsable<TId>`, rejects `Guid.Empty`, and each factory also rejects the struct default. No implicit conversion erases the type.
+
+Version 7 embeds a millisecond timestamp, so the identity factory reads a clock. That read is the one exception to `BACKEND.DOMAIN.TIME.001`. It observes no business time and decides nothing. A test that needs a fixed identity passes one in rather than freezing a clock.
+
+**Example:** [RFC 9562](https://www.rfc-editor.org/info/rfc9562) defines version 7 as a timestamp followed by at least 74 random bits. The Domain writes no collision handling for that space. Persistence rejects a duplicate key and the operation fails, which is the same path as any other write conflict.
 
 ### Use immutable value objects for domain concepts (BACKEND.DOMAIN.VALUE.001)
 
@@ -164,7 +211,15 @@ Each union exposes one stable code or label. Its `FromCode` factory round-trips 
 
 **Requirement:** A monetary amount MUST use `decimal` inside a `Money` value object that carries its currency.
 
-**Rationale:** Domain uses no `double` or `float` for money. The module specification defines supported currencies, scale, rounding, sign rules, and cross-currency arithmetic, and Infrastructure maps that precision explicitly.
+**Rationale:** The module specification defines supported currencies, scale, rounding, sign rules, and cross-currency arithmetic, and Infrastructure maps that precision explicitly.
+
+### Keep binary floating point out of exact quantities (BACKEND.DOMAIN.MONEY.002)
+
+**Requirement:** A Domain type MUST NOT use `double` or `float` for a monetary amount, a rate applied to one, or a quantity compared for exact equality.
+
+**Rationale:** Binary floating point cannot represent most decimal fractions, so two amounts that a person reads as equal compare as different. The prohibition belonged in a rationale, where it obliged nobody.
+
+**Example:** A tax rate multiplied into a `Money` amount is a `decimal`. A measured latency in a diagnostic record is not a domain quantity and is outside this rule.
 
 ### Use stateless domain services for ownerless rules (BACKEND.DOMAIN.SERVICE.001)
 
@@ -172,11 +227,15 @@ Each union exposes one stable code or label. Its `FromCode` factory round-trips 
 
 **Rationale:** It exists only when a calculation spans concepts with no natural aggregate owner. Application loads the aggregates, calls the service, and passes its result into aggregate behavior.
 
+A domain service is stateless and takes no port, so its tests are Domain tests. They sit beside the aggregate tests in the Domain test project, with no harness, no substitute, and no fixture.
+
 ### Keep repository interfaces in Domain (BACKEND.DOMAIN.REPOSITORY.001)
 
 **Requirement:** A repository interface MUST expose only aggregate and Domain types, without `IQueryable`, a session, or a generic CRUD surface.
 
 **Rationale:** A required load uses `GetByIdAsync` and throws `{Aggregate}NotFoundException`, so a handler repeats no null check. A nullable `FindBy...Async` is reserved for lookups where absence is normal.
+
+This interface is the write side only. Reading for a Query uses a Read Model owned by Application and shaped by Infrastructure, and that path declares no Domain interface. A repository that gained a projection method would put query shapes in the Domain, which is the coupling this layer exists to prevent.
 
 ### Raise immutable domain facts (BACKEND.DOMAIN.EVENT.001)
 
@@ -347,7 +406,8 @@ Each aggregate-specific repository interface stays with the aggregate it loads. 
 | Shared kernel value object | `{Term}` | `Money`, `EmailAddress` |
 | Strongly typed ID | `{Aggregate}Id` | `PostId` |
 | Typed state base | `{Aggregate}State` | `PostState` |
-| Typed state case | `{Aggregate}{State}State` | `PostPublishedState` |
+| Typed state case, flat | `{Aggregate}{State}State` | `PostPublishedState` |
+| Typed state case, nested | `{Aggregate}State.{State}` | `PostState.Published` |
 | Domain union base | `{Aggregate}{Concept}` | `RefundOutcome` |
 | Domain union case | `{Aggregate}{Case}{Concept}` | `RefundSucceededOutcome`, `OrganizationScannerRole` |
 | Repository | `I{Aggregate}Repository` | `IPostRepository` |
@@ -358,6 +418,10 @@ Each aggregate-specific repository interface stays with the aggregate it loads. 
 Every aggregate-owned type starts with the aggregate root's full name (`WORKSPACE.NAMING.AGGREGATE.001`). `SalesCatalog` anchors `SalesCatalogPublishedEvent`. The example does not abbreviate the anchor. `Term` is the glossary term represented by a value object.
 
 An aggregate value object uses its aggregate prefix. A Shared kernel value object keeps its bare name. `BusinessRule` names a domain service policy. `DomainType` names the aggregate-owned type. Union bases and cases end with their concept. The example stores each type in its own file.
+
+A state case takes one of two forms, and a project picks one and keeps it. The flat form declares each case as a top-level record carrying the aggregate prefix. The nested form declares each case inside its `{Aggregate}State` base, which already carries that prefix. `PostState.Published` therefore reads as its full name at every call site. A nested case never repeats the prefix its parent supplies.
+
+The nested form keeps the cases and the base in one file. The flat form keeps one type per file. Both satisfy `WORKSPACE.NAMING.AGGREGATE.001`, because the qualified name still leads with the aggregate root.
 
 ### Define the shared Domain contracts once (BACKEND.DOMAIN.CONVENTION.004)
 
@@ -780,6 +844,7 @@ The event payload captures the publication fact without carrying the mutable `Po
 | BACKEND.DOMAIN.VALUE.001 | inspection | `ValueObjectTests` asserts each value type is immutable, compares by value, and rejects invalid input at creation. |
 | BACKEND.DOMAIN.COLLECTION.001 | inspection | `ValueObjectTests` asserts each collection value compares by contents under its declared ordering rule. |
 | BACKEND.DOMAIN.MONEY.001 | inspection | `MoneyTests` asserts arithmetic honors the declared scale, rounding, and cross-currency rules. |
+| BACKEND.DOMAIN.MONEY.002 | test | `DomainArchitectureTests` asserts no Domain member declares a `double` or `float` parameter, property, or return type. |
 | BACKEND.DOMAIN.SERVICE.001 | inspection | `ArchitectureTests` asserts no domain service holds state or resolves a persistence, clock, or provider dependency. |
 | BACKEND.DOMAIN.REPOSITORY.001 | inspection | `ArchitectureTests` asserts each repository signature names only Domain types and exposes no queryable or session. |
 | BACKEND.DOMAIN.EVENT.001 | inspection | `DomainEventTests` asserts each event is an immutable record whose name leads with its aggregate root. |

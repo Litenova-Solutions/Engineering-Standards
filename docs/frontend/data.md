@@ -101,11 +101,21 @@ The example uses `updateTag` when a Server Action needs read-your-writes. The ex
 
 **Rationale:** Local storage, session storage, IndexedDB, and public environment variables are all readable by any script on the page.
 
+A variable is browser-visible when the framework inlines it into the client bundle, which the `NEXT_PUBLIC_` prefix does. Edge middleware and proxy code run on the server, so a server variable read there stays out of the bundle. A value that middleware passes to a client component leaves the server boundary. A header, a cookie, and a prop all cross it, so this rule applies to the value again.
+
 ### Make optimistic behavior recoverable (FRONTEND.DATA.OPTIMISTIC.001)
 
 **Requirement:** An optimistic update MUST declare its stable client identity, conflict behavior, failure rollback, and reconciliation path.
 
 **Rationale:** Money, irreversible actions, and uncertain authorization wait for the server result instead.
+
+### Announce the outcome of an optimistic update (FRONTEND.DATA.OPTIMISTIC.002)
+
+**Requirement:** An optimistic update MUST announce its reconciled outcome through a live region when the server result differs from the value shown.
+
+**Rationale:** A rollback is a silent visual change. A reader using a screen reader saw the optimistic value announced, and nothing tells them it was withdrawn. [The ARIA live-region technique](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19) is the mechanism, and the page sidecar's `statusAnnouncements` field is where the route records it.
+
+**Example:** A row reordered optimistically and rejected by the server announces that the order was restored, and names the reason the server gave.
 
 ## Conventions
 
@@ -157,6 +167,16 @@ The example moves the generated types and client to workspace packages only when
 
 **Rationale:** Invalidation scattered across components leaves no single place to read what a mutation affects.
 
+### Generate mutable response types (FRONTEND.DATA.CONVENTION.005)
+
+**Default:** Run the pinned `openapi-typescript` generator without `--immutable`, so a response array reaches feature code as a plain array.
+
+**Replacement:** A consumer can generate immutable types and convert each response collection at the client boundary, recorded as an explicit local convention.
+
+**Rationale:** The pinned `openapi-fetch` release wraps an immutable array in a `Readable` type that carries no array methods, so `.map` on a response collection stops compiling. [The defect is open upstream](https://github.com/openapi-ts/openapi-typescript/issues/2615). The generator flag is the setting that reaches it, so the default names the flag rather than leaving each frontend to discover the interaction.
+
+**Example:** A consumer that wants immutable types converts once, inside the typed client, rather than writing `Array.from` at each call site.
+
 ## Reference example
 
 This informative example demonstrates `FRONTEND.DATA.READ.001`, `FRONTEND.DATA.OWNERSHIP.001`, and `FRONTEND.DATA.MUTATIONS.001`.
@@ -177,7 +197,9 @@ A posts list reads on the server from the typed API client. Its search and curso
 | FRONTEND.DATA.FORM.001 | inspection | `FormContractTests` asserts each form field matches its contract and each field error maps to its input. |
 | FRONTEND.DATA.SECRETS.001 | inspection | `node standards/tools/validate-ui.mjs` reports a secret written to browser storage or a public variable. |
 | FRONTEND.DATA.OPTIMISTIC.001 | inspection | `OptimisticUpdateTests` asserts each optimistic path rolls back and reconciles on failure. |
+| FRONTEND.DATA.OPTIMISTIC.002 | test | `OptimisticUpdateTests` asserts a rejected optimistic update writes its reconciled outcome to the live region. |
 | FRONTEND.DATA.CONVENTION.001 | inspection | Folder review compares each frontend API folder against the layout in this section. |
 | FRONTEND.DATA.CONVENTION.002 | operation | Schema review confirms each shared schema has two real consumers. |
 | FRONTEND.DATA.CONVENTION.003 | inspection | Dependency review records the repeated requirement behind any added form package. |
 | FRONTEND.DATA.CONVENTION.004 | inspection | Mutation review confirms each function names the cache entries it invalidates. |
+| FRONTEND.DATA.CONVENTION.005 | static | `pnpm type-check` compiles a `.map` call over a generated response collection without a conversion. |

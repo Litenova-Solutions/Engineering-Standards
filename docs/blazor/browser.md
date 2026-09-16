@@ -53,6 +53,8 @@ Browser storage is the only durable store in a client-only product. It is small,
 
 **Rationale:** This is the only recovery path in a product with no server, so it is required rather than optional. Device-local state is excluded from the export.
 
+The file carries its own schema version, and the import path states what it does with each one it can meet. The same version imports. An older version imports through a stated transformation. A newer version is refused, with a message naming the application version that wrote it. A partial import of an unknown shape loses data silently.
+
 ## Conventions
 
 ### Select the storage mechanism per shape (BLAZOR.BROWSER.CONVENTION.001)

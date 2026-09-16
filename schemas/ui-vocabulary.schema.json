@@ -21,7 +21,10 @@
   ],
   "properties": {
     "$schema": { "type": "string" },
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": {
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See CORE.AUTHORING.SNAPSHOT.003 and CORE.AUTHORING.SNAPSHOT.004.",
+      "const": 1
+    },
     "frontend": { "$ref": "#/$defs/identifier" },
     "profile": { "$ref": "#/$defs/profile" },
     "baseline": { "$ref": "#/$defs/baseline" },
@@ -87,28 +90,39 @@
     "baseline": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "system",
-        "styling",
-        "base",
-        "style",
-        "presetCode",
-        "presetFingerprint",
-        "cssVariables",
-        "baseColor",
-        "theme",
-        "chartColor",
-        "font",
-        "fontHeading",
-        "icons",
-        "radius",
-        "menuAccent",
-        "menuColor",
-        "componentsStyle"
+      "required": ["system", "styling"],
+      "allOf": [
+        {
+          "$comment": "The preset fields describe the shadcn generator. A frontend on an alternate visual system records its own baseline and carries an override decision, so only the default system requires them. See FRONTEND.UI.GOVERNANCE.001 and FRONTEND.UI.SHADCN.001.",
+          "if": {
+            "required": ["system"],
+            "properties": { "system": { "const": "shadcn/ui" } }
+          },
+          "then": {
+            "required": [
+              "base",
+              "style",
+              "presetCode",
+              "presetFingerprint",
+              "cssVariables",
+              "baseColor",
+              "theme",
+              "chartColor",
+              "font",
+              "fontHeading",
+              "icons",
+              "radius",
+              "menuAccent",
+              "menuColor",
+              "componentsStyle"
+            ],
+            "properties": { "styling": { "const": "tailwindcss-v4" } }
+          }
+        }
       ],
       "properties": {
-        "system": { "const": "shadcn/ui" },
-        "styling": { "const": "tailwindcss-v4" },
+        "system": { "enum": ["shadcn/ui", "bootstrap", "mui", "other"] },
+        "styling": { "type": "string", "minLength": 1 },
         "base": { "enum": ["base-ui", "radix-ui"] },
         "style": { "type": "string", "minLength": 1 },
         "presetCode": { "type": "string", "minLength": 1 },

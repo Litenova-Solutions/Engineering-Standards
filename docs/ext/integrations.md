@@ -80,6 +80,10 @@ This extension adds pinned HTTP resilience and network simulation packages. It r
 
 **Rationale:** Project-owned outcomes remain stable when provider responses or SDK types change.
 
+The stable codes come from the project's own error catalog, which is the same register `BACKEND.API.ERROR.001` returns a code from. An integration that invents a code per provider produces one code space per provider. A client branching on failure then has to learn all of them. [A provider's own error taxonomy](https://stripe.com/docs/api/errors) is the input to the mapping rather than its output.
+
+**Example:** A declined card and a declined direct debit both map to the project's payment-refused code, and the provider's own code travels in diagnostics.
+
 ### Exclude provider internals (EXT.INTEGRATIONS.FAILURE.002)
 
 **Requirement:** An API MUST NOT expose provider bodies, credentials, headers, exception types, or internal account identifiers.
@@ -91,6 +95,10 @@ This extension adds pinned HTTP resilience and network simulation packages. It r
 **Requirement:** An inbound provider handler MUST verify signature, timestamp tolerance, replay protection, content type, size, schema, and event identity before processing.
 
 **Rationale:** Each check protects a different part of the trust boundary for a provider message.
+
+The order is not free. The signature is verified first, over the raw body, before the body is parsed or any other check reads it. A parser that runs first is attacker-reachable code behind no authentication, and a body already deserialized is no longer the bytes the signature covered. [Stripe's signature guidance](https://stripe.com/docs/webhooks/signatures) states the same requirement.
+
+**Example:** A failed signature returns its status with no body, because a message explaining which check failed tells an unauthenticated caller how to pass it.
 
 ### Process duplicate messages safely (EXT.INTEGRATIONS.INBOUND.002)
 
@@ -106,9 +114,11 @@ This extension adds pinned HTTP resilience and network simulation packages. It r
 
 ### Cover provider failure modes (EXT.INTEGRATIONS.TEST.002)
 
-**Requirement:** An integration test MUST cover timeout, connection failure, transient response, permanent response, malformed payload, rate limit, and duplicate delivery.
+**Requirement:** An integration test MUST cover timeout, connection failure, transient response, permanent response, malformed payload, rate limit, duplicate delivery, and unexpected response shape.
 
 **Rationale:** Each failure mode can affect retry, mapping, or idempotency behavior.
+
+An unexpected response shape is the mode a provider produces without failing. A well-formed response can carry a field that moved, a type that changed, or a value nobody planned for. It parses and then behaves wrongly. Every other listed mode would have caught that as an error. [A provider that versions its API](https://stripe.com/docs/api/versioning) changes shape on a schedule, and a pinned version still changes on the day it is raised.
 
 ## Conventions
 

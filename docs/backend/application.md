@@ -11,7 +11,7 @@ Every folder in the project is a module, an aggregate, or a use case. The contra
 
 
 - One folder per operation holds its message, definition, result, validator, and handler. (BACKEND.APPLICATION.STRUCTURE.001)
-- Commands and queries dispatch through their own mediator. (BACKEND.APPLICATION.MEDIATOR.001)
+- Commands and queries dispatch through separate entry points. (BACKEND.APPLICATION.MEDIATOR.002)
 - Messages are public when hosts need them; handlers stay internal. (BACKEND.APPLICATION.CONTRACTS.001)
 - Validators check input shape; Domain decides state permission. (BACKEND.APPLICATION.VALIDATION.001)
 - Expected failures throw typed Application exceptions with stable codes. (BACKEND.APPLICATION.FAILURE.001)
@@ -30,11 +30,13 @@ Every folder in the project is a module, an aggregate, or a use case. The contra
 
 **Rationale:** Grouping by technical type scatters one operation across the project. Type names share the use-case prefix and end in the `Command` or `Query` role. A message declares a value the pipeline reads through `IMessageDefinition<TMessage>.Describe` in a `{UseCase}Definition` in the same folder. An attribute on the message itself carries the value instead, where the value is a constant and the position is an exemption. A definition keeps what the pipeline needs to know beside the operation, rather than in a registry the reader has to find.
 
-### Use specific LiteBus entry points (BACKEND.APPLICATION.MEDIATOR.001)
+### Dispatch commands and queries through separate entry points (BACKEND.APPLICATION.MEDIATOR.002)
 
-**Requirement:** A command MUST dispatch through `ICommandMediator.SendAsync` and a query through `IQueryMediator.QueryAsync`.
+**Requirement:** An application MUST dispatch a command and a query through two separate Application-facing entry points rather than one message bus abstraction.
 
-**Rationale:** Two specific entry points keep write and read paths distinguishable. A unified message bus abstraction hides that difference.
+**Rationale:** Two entry points keep the write and read paths distinguishable at every call site, and let the pipeline compose different stages for each. A unified bus hides that difference behind one method, and the difference is the one this profile's whole command and query split depends on.
+
+The rule states the property rather than the package. The profile pins one library that supplies it, named in `BACKEND.APPLICATION.CONVENTION.005`. A consumer replacing that library replaces a convention rather than overriding a Standard.
 
 ### Co-locate contracts and implementations (BACKEND.APPLICATION.CONTRACTS.001)
 
@@ -54,13 +56,17 @@ Every folder in the project is a module, an aggregate, or a use case. The contra
 
 **Rationale:** One public abstract `UseCaseException` has sealed `ResourceNotFoundException`, `UseCaseForbiddenException`, and `UseCaseConflictException` subclasses. They carry no HTTP result, provider exception, or stack detail, and handlers do not catch them.
 
+Those three are permanent: the same input fails the same way on every attempt. A failure that a later attempt can pass is transient and belongs to the caller's retry decision rather than to this hierarchy. The `integrations` extension owns the transient case, because a transient failure always comes from an outbound dependency.
+
 ### Enforce target authorization in the pipeline (BACKEND.APPLICATION.AUTHZ.001)
 
 **Requirement:** The authorization guard, not the handler, MUST authorize every message an account can take, from the action and resource that message declares.
 
 **Rationale:** Ownership, tenant, role, state or delegated access is resolved against the target data through an `IScopeOwnerLookup` for the record the message names. WebApi may enforce coarse authenticated, role, or scope policies first. It cannot replace an authorization decision that depends on business data.
 
-Making the decision once, from a declaration, stops two messages about the same record asking different questions. It also lets composition refuse to start when a message states no position at all. A refusal is reported as a denial rather than raised, so a refused attempt reaches the audit trail beside the ones that succeeded. A collection query carries its authorized scope in the database predicate.
+Making the decision once, from a declaration, stops two messages about the same record asking different questions. It also lets composition refuse to start when a message states no position at all. A refusal is reported as a denial rather than raised, so a refused attempt reaches the audit trail beside the ones that succeeded.
+
+A collection query has no single target record, so `IScopeOwnerLookup` has nothing to resolve. Its authorized scope is a predicate the database applies, stated by `QUALITY.SECURITY.AUTHZ.001`. Filtering a loaded collection in memory satisfies neither rule, and is the shape [OWASP names as broken object level authorization](https://owasp.org/www-project-top-ten/2021/A01_2021-Broken_Access_Control/).
 
 ### Keep command handlers narrow (BACKEND.APPLICATION.COMMAND.001)
 
@@ -105,6 +111,8 @@ A port declared beside its aggregate is reviewed with that aggregate's specifica
 **Requirement:** A command handler MUST NOT dispatch another command through `ICommandMediator`.
 
 **Rationale:** Nested dispatch can run the commit post-handler before the top-level use case finishes. A top-level handler may still coordinate several aggregates when an approved record names the invariant requiring one transaction.
+
+A second command that has to run is staged for durable delivery instead, which is what a workflow orchestrator does under `BACKEND.APPLICATION.WORKFLOW.001`. That path is not an exemption from this rule. The staged command enters its own pipeline and owns its own transaction, so no nesting occurs.
 
 ### Advance durable Workflows through separate Commands (BACKEND.APPLICATION.WORKFLOW.001)
 
@@ -197,6 +205,14 @@ Only a use case gets a folder. A type that is not a use case sits flat in the fo
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
 **Rationale:** Each mapping then changes with the boundary that defines its shape.
+
+### Use the pinned mediator entry points (BACKEND.APPLICATION.CONVENTION.005)
+
+**Default:** Dispatch a command through `ICommandMediator.SendAsync` and a query through `IQueryMediator.QueryAsync`, from the LiteBus version the manifest pins.
+
+**Replacement:** A consumer can replace this default with another library that supplies two separate entry points, recorded as a local convention.
+
+**Rationale:** The profile pins one library so every project reads the same call at every dispatch site. The obligation that the two paths stay separate belongs to `BACKEND.APPLICATION.MEDIATOR.002` and survives the replacement.
 
 ## Reference example
 
@@ -296,7 +312,7 @@ Infrastructure stages Workflow state and the outgoing Command in the same sessio
 | ID | Method | Evidence |
 |:---|:---|:---|
 | BACKEND.APPLICATION.STRUCTURE.001 | static | `ArchitectureTests` asserts each operation folder holds one message, result, validator, handler, and definition, and composition refuses undeclared pipeline values. |
-| BACKEND.APPLICATION.MEDIATOR.001 | inspection | `ArchitectureTests` asserts no dispatch path resolves a shared bus abstraction over the two pinned mediators. |
+| BACKEND.APPLICATION.MEDIATOR.002 | inspection | `ArchitectureTests` asserts no dispatch path resolves a shared bus abstraction over the two separate entry points. |
 | BACKEND.APPLICATION.CONTRACTS.001 | inspection | `ArchitectureTests` asserts handler and validator types are internal and sealed while messages and results carry their role suffix. |
 | BACKEND.APPLICATION.VALIDATION.001 | inspection | `ValidationTests` asserts each validator rejects structural input and defers state decisions to the aggregate. |
 | BACKEND.APPLICATION.FAILURE.001 | inspection | `UseCaseFailureTests` asserts each expected failure surfaces its stable code with no transport or provider detail attached. |
@@ -313,3 +329,4 @@ Infrastructure stages Workflow state and the outgoing Command in the same sessio
 | BACKEND.APPLICATION.CONVENTION.002 | inspection | `ArchitectureTests` asserts each message and result is a record exposing no aggregate or Domain union type. |
 | BACKEND.APPLICATION.CONVENTION.003 | inspection | `ArchitectureTests` asserts no Application result exposes an aggregate, session, provider, or HTTP type. |
 | BACKEND.APPLICATION.CONVENTION.004 | inspection | Mapping review locates each conversion in the layer that owns its output shape. |
+| BACKEND.APPLICATION.CONVENTION.005 | static | `ArchitectureTests` asserts each dispatch site calls `ICommandMediator.SendAsync` or `IQueryMediator.QueryAsync`. |

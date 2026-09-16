@@ -5,9 +5,7 @@
 
 Components should have one clear ownership level and expose accessible behavior without leaking application state across boundaries. Each frontend owns its component source so shadcn/ui updates and product-specific composition remain local.
 
-The governance boundary limits agent-generated UI drift by making the approved primitive inventory,
-theme tokens, public imports, and automated checks the default choices. No library is assumed to prevent
-drift without these project-owned constraints.
+The governance boundary limits agent-generated UI drift by making the approved primitive inventory, theme tokens, public imports, and automated checks the default choices. No library is assumed to prevent drift without these project-owned constraints.
 
 ## Agent Summary {#agent-summary}
 
@@ -50,6 +48,22 @@ The example does not place business operations inside `components/ui/`.
 
 **Rationale:** A clickable `div` loses all five at once, so a native element is the starting point.
 
+The five are the ones a component can get wrong on its own. [WCAG 2.2](https://www.w3.org/TR/WCAG22/) adds nine criteria that a component cannot satisfy by itself, because each one is a property of a flow or a page:
+
+| Criterion | Level | What the UI has to do |
+|:---|:---|:---|
+| 2.4.11 Focus Not Obscured (Minimum) | AA | Keep a focused control at least partly visible under a sticky header, bar, or panel. |
+| 2.4.12 Focus Not Obscured (Enhanced) | AAA | Keep a focused control fully visible. |
+| 2.4.13 Focus Appearance | AAA | Give the focus indicator the stated minimum area and contrast. |
+| 2.5.7 Dragging Movements | AA | Offer a single-pointer alternative to every drag action. |
+| 2.5.8 Target Size (Minimum) | AA | Give a pointer target at least 24 by 24 pixels, or the stated spacing. |
+| 3.2.6 Consistent Help | A | Put a help mechanism in the same relative order on every page that has one. |
+| 3.3.7 Redundant Entry | A | Do not ask again for information already given in the same process. |
+| 3.3.8 Accessible Authentication (Minimum) | AA | Offer a sign-in path with no cognitive function test. |
+| 3.3.9 Accessible Authentication (Enhanced) | AAA | Offer that path with no object recognition or personal content test either. |
+
+The AA criteria bind a project targeting AA. The three AAA rows are listed so a project selecting them knows what it selected. The page sidecar records target size, focus order, and status announcements per route, which is where the flow-level criteria are checked.
+
 ### Use declared visual variants (FRONTEND.COMPONENTS.VARIANTS.001)
 
 **Requirement:** A repeated component variant MUST use Tailwind theme tokens through `class-variance-authority` rather than repeated literal values.
@@ -61,6 +75,8 @@ The example does not place business operations inside `components/ui/`.
 **Requirement:** A data or permission-aware component MUST render its loading, empty, error, forbidden, disabled, pending, and ready states.
 
 **Rationale:** A mutation control also prevents duplicate submission and keeps an error recovery path usable.
+
+These seven are the states a component has. `disabled` and `pending` describe a control and have no route equivalent. A route adds `not-found` under `FRONTEND.RENDERING.STATE.001`, because a missing target resolves at the route rather than inside a component. The two lists differ by design, and `schemas/ui-page.schema.json` holds the complete set a page sidecar can declare.
 
 ### Protect rich content boundaries (FRONTEND.COMPONENTS.CONTENT.001)
 

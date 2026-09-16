@@ -44,6 +44,8 @@ The client renders entirely in the browser. Routes declare their own templates a
 
 **Rationale:** The application then starts and navigates with no network. A feature that cannot work offline states that in its page specification and degrades to an explicit offline state.
 
+The rule covers the online case as much as the offline one. A cached shell serves the version it cached, so a visitor who never goes offline still receives yesterday's payload until the worker updates. The worker therefore declares its update strategy and what a visitor sees while a new version installs.
+
 ## Conventions
 
 ### Name routes for the reader (BLAZOR.RENDERING.CONVENTION.001)

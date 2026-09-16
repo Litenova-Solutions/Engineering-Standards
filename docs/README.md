@@ -42,7 +42,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Architecture](backend/architecture.md)
 - [Domain](backend/domain.md)
 - [Application](backend/application.md)
-- [Marten persistence](backend/persistence.md)
+- [Persistence](backend/persistence.md)
 - [HTTP API](backend/api.md)
 - [Backend testing](backend/testing.md)
 
@@ -110,6 +110,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Glossary](reference/glossary.md)
 - [Provision index](reference/provisions.md)
 - [Audit obligations](reference/audit-obligations.md)
+- [Decision records](reference/decision-records.md)
 - [Consumer templates](../templates/consumer/README.md)
 
 Consumers pin a complete release. `CHANGELOG.md` is the only repository release note.

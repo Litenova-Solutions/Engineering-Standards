@@ -50,7 +50,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 - [Architecture](../backend/architecture.md)
 - [Domain](../backend/domain.md)
 - [Application](../backend/application.md)
-- [Marten persistence](../backend/persistence.md)
+- [Persistence](../backend/persistence.md)
 - [HTTP API](../backend/api.md)
 - [Backend testing](../backend/testing.md)
 

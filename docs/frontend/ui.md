@@ -3,12 +3,9 @@
 ## Intent
 
 
-This convention turns the selected UI library into a constrained construction language. The library
-provides component source and baseline interaction behavior. Product specifications provide meaning,
-composition, states, content limits, responsive behavior, and evidence. Agents use both sources.
+This convention turns the selected UI library into a constrained construction language. The library provides component source and baseline interaction behavior. Product specifications provide meaning, composition, states, content limits, responsive behavior, and evidence. Agents use both sources.
 
-The baseline applies to React web frontends. It does not pretend that official shadcn/ui components are
-a native mobile system. A native frontend selects its own platform system through a separate decision.
+The baseline applies to React web frontends. It does not pretend that official shadcn/ui components are a native mobile system. A native frontend selects its own platform system through a separate decision.
 
 ## Agent Summary {#agent-summary}
 
@@ -32,6 +29,8 @@ a native mobile system. A native frontend selects its own platform system throug
 
 **Rationale:** A second general-purpose visual system in one workspace makes every component choice ambiguous. An override carries a review date so it cannot become permanent by omission.
 
+The profile is chosen per frontend rather than per workspace, because density is a property of the audience. `public-light` suits a surface a visitor meets once. `application-balanced` suits a surface a signed-in user works in. `admin-dense` suits a surface an operator reads all day. A workspace with four frontends normally carries more than one profile, and two frontends sharing an audience share a profile.
+
 ### Use the pinned shadcn/ui baseline (FRONTEND.UI.SHADCN.001)
 
 **Requirement:** A new React web frontend MUST install the `uiBaseline` from `standards.manifest.json` and commit its generated configuration and source.
@@ -42,7 +41,7 @@ a native mobile system. A native frontend selects its own platform system throug
 
 **Requirement:** Each React web frontend MUST declare a vocabulary validating against `schemas/ui-vocabulary.schema.json` and repeating its selected preset.
 
-**Rationale:** A page can then be reviewed without reconstructing the CLI command that produced its components.
+**Rationale:** A page can then be reviewed without reconstructing the CLI command that produced its components. `schemas/ui-vocabulary.schema.json` is the shape, and `node standards/tools/validate-ui.mjs` is what reads the file against it. The schema requires the full preset only for the default visual system. A frontend on an alternate system records its own baseline and carries the override decision `FRONTEND.UI.GOVERNANCE.001` requires.
 
 ### Specify pages before composition (FRONTEND.UI.PAGE.001)
 

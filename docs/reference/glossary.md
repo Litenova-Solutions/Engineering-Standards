@@ -40,6 +40,10 @@ The only external mutation entry point for an aggregate.
 
 The complete lifecycle condition represented by one abstract `{Aggregate}State` record and one or more sealed state records.
 
+## Architecture layer
+
+One project boundary in the backend solution: Domain, Application, Infrastructure, or WebApi.
+
 ## Audit record
 
 One entry in the audit trail, stating the actor, action, target, outcome, time, origin, and reason for one attempted action.
@@ -142,7 +146,7 @@ A versioned message contract delivered outside the bounded context.
 
 ## Layer
 
-One of the four depths a documentation page answers at, from a first working result down to the mechanism a command runs.
+One of the four depths a documentation page answers at, named by number, and distinct from an architecture layer.
 
 ## Module
 
@@ -200,6 +204,10 @@ An Application message that reads a Read Model without changing business state.
 
 Data shaped for a Query without aggregate loading or mutation.
 
+## Reference cast
+
+The one specification every scenario draws its people, place, dates, and amounts from.
+
 ## Reference page
 
 A page of exact values a reader looks up rather than reads end to end.
@@ -215,6 +223,10 @@ A Domain-owned port that loads and stages complete aggregates without exposing g
 ## Risk
 
 A use-case metadata value that activates additional specification and verification for a named area of potential harm or failure.
+
+## Scenario
+
+One concrete occasion for a specification's subject, stating who acts, what surrounds them, and what they would do instead.
 
 ## Specification
 

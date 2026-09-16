@@ -39,6 +39,8 @@ A client component renders what it is given and reports what the user did. Busin
 
 **Rationale:** Each layer mirrors the shape it needs, as the baseline layer ownership rule requires. Shared-kernel typed identifiers and value objects are the one sanctioned crossing.
 
+This rule and `BLAZOR.STRUCTURE.DOMAIN.001` guard the same boundary from opposite sides. That rule keeps browser types out of Domain. This rule keeps Domain types out of the view. Neither implies the other, because a view model can name an aggregate without Domain naming a component.
+
 ### Resolve browser behavior through an interface (BLAZOR.COMPONENTS.INTEROP.001)
 
 **Requirement:** A component MUST resolve browser behavior through an Application-owned interface rather than inject the interop runtime.

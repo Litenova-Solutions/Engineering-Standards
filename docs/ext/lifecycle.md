@@ -119,6 +119,14 @@ This extension replaces no baseline rule.
 
 **Rationale:** A legal hold overrides scheduled deletion until its documented release.
 
+### Record the release of a legal hold (EXT.LIFECYCLE.PURGE.004)
+
+**Requirement:** The release of a legal hold MUST produce a record naming the actor, the data covered, the reason, and the retention that resumes.
+
+**Rationale:** A hold suspends an erasure obligation, so its release is the moment that obligation resumes. Without a record, nothing states when the suspension ended, and a subject's [erasure request](https://gdpr-info.eu/art-17-gdpr/) cannot be answered with a date. The release is also the point where data becomes deletable again, so the next retention run needs it to be unambiguous.
+
+**Example:** A release record names the hold, the release date, and the retention date the covered data now carries.
+
 ### Align backup deletion behavior (EXT.LIFECYCLE.PURGE.003)
 
 **Requirement:** Backup and replica operations MUST follow the documented deletion guarantee.
@@ -175,6 +183,7 @@ None.
 | EXT.LIFECYCLE.PURGE.001 | test | `DataPurgeTests` cover batching, cancellation, resume, and observable progress. |
 | EXT.LIFECYCLE.PURGE.002 | test | `DataPurgeTests` remain retained during scheduled lifecycle work. |
 | EXT.LIFECYCLE.PURGE.003 | operation | Backup and replica records show the documented deletion guarantee. |
+| EXT.LIFECYCLE.PURGE.004 | test | `DataPurgeTests` assert a hold release writes its record, and the next run deletes the released data. |
 | EXT.LIFECYCLE.CONVENTION.001 | inspection | Soft-delete timestamp names use the default or record a local replacement. |
 | EXT.LIFECYCLE.CONVENTION.002 | inspection | Archive source paths remain within the owning module or record a replacement. |
 | EXT.LIFECYCLE.CONVENTION.003 | inspection | Query-shaped archive history uses a read model or records a replacement. |

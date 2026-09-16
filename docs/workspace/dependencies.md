@@ -59,15 +59,19 @@ Project references and package ownership make the application boundary visible t
 
 ### Pin every dependency centrally (WORKSPACE.DEPENDENCIES.PINS.001)
 
-**Requirement:** A NuGet or npm version MUST match `standards.manifest.json` and resolve through central management or the committed lockfile.
+**Requirement:** Every NuGet and npm version MUST resolve through central management or the committed lockfile, at the pin `standards.manifest.json` states where it states one.
 
 **Rationale:** An inline version in a project file is invisible to the manifest that is supposed to own it.
+
+The manifest pins the baseline stack, which is the set these standards name. A consumer also carries packages for its own product, and it cannot add those to a manifest it does not own. Those versions live in the consumer's own central file under `WORKSPACE.CONFIG.NUGET.001` or its lockfile, and `WORKSPACE.DEPENDENCIES.APPROVAL.001` is what admits them.
+
+**Example:** A consumer generating invoices pins its PDF library in `Directory.Packages.props` with a decision record. The manifest never names it, and the pin is still central.
 
 ### Approve new packages explicitly (WORKSPACE.DEPENDENCIES.APPROVAL.001)
 
 **Requirement:** A package absent from the manifest MUST have a decision naming its use case, alternatives, owning layer, operating cost, and removal condition.
 
-**Rationale:** The manifest is then updated in the same change, so the pin and its justification arrive together.
+**Rationale:** A package arrives with a cost nobody revisits, so the decision names the removal condition while the alternatives are still fresh. A baseline package lands in the manifest in the same change as its decision. A consumer-owned package lands in the consumer's central file instead, because the manifest belongs to the standards release rather than to the consumer.
 
 ### Keep frontend applications isolated (WORKSPACE.DEPENDENCIES.FRONTEND.001)
 

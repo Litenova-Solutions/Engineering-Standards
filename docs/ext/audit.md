@@ -175,6 +175,10 @@ This extension replaces `QUALITY.SECURITY.AUDIT.001`. The baseline states the re
 
 **Rationale:** A record holding a name, an address, or a message body turns retention into an erasure conflict. An identifier keeps the record meaningful and erasable.
 
+A pseudonymous identifier is still personal data where the party holding it can reverse it. That is the position [the EDPB states](https://edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-012020-processing-personal-data-context-art-6-1). The identifier is therefore safe inside the tenant that owns the mapping, and is a disclosure when it leaves that tenant.
+
+**Example:** An audit export crossing a tenant boundary replaces each identifier with one derived for that export. The receiving party then cannot join the records back to a subject.
+
 ### Exclude state snapshots (EXT.AUDIT.CLASSIFICATION.003)
 
 **Requirement:** An audit record MUST NOT contain a copy of the state before or after the audited change.
@@ -221,9 +225,23 @@ This extension replaces `QUALITY.SECURITY.AUDIT.001`. The baseline states the re
 
 ### Provide tamper evidence (EXT.AUDIT.PROTECTION.002)
 
-**Requirement:** An audit store MUST chain each record to its predecessor with a hash over the canonical record content.
+**Requirement:** An audit store MUST chain each record to its predecessor with a SHA-256 hash over a canonical serialization of both.
 
 **Rationale:** A chain detects an edit and a removal, because a changed or missing record breaks every following value. Detection is the obligation, and prevention at a higher cost is not.
+
+The algorithm is named because two implementations that each chose their own cannot verify each other. A verifier written later cannot recompute a chain whose algorithm nobody recorded. Canonical serialization is named for the same reason: a hash over a serialization that reorders fields verifies nothing.
+
+**Example:** The chain value is `SHA-256(previousHash || canonical(record))`, where `canonical` sorts object members and uses one fixed encoding for every timestamp and number.
+
+### Anchor the audit chain outside its own store (EXT.AUDIT.PROTECTION.005)
+
+**Requirement:** An audit store SHOULD publish a periodic checkpoint of its chain head to a destination that the store's own operators cannot rewrite.
+
+**Deviation:** A store whose recorded threat model excludes its own operators publishes no checkpoint.
+
+**Rationale:** A chain proves that records are consistent with each other. It does not prove that the whole chain was not recomputed, which anyone holding the store can do. A checkpoint somebody else holds fixes the chain as it stood at that moment, so a later recomputation disagrees with it.
+
+**Example:** The checkpoint is the chain head and its record count, published at a stated interval. A separate append-only destination, a timestamping authority, and a transparency log each qualify.
 
 ### Verify the integrity chain on a schedule (EXT.AUDIT.PROTECTION.003)
 
@@ -266,6 +284,14 @@ This extension replaces `QUALITY.SECURITY.AUDIT.001`. The baseline states the re
 **Requirement:** A query that returns personal data across a tenant or account boundary MUST produce an audit record.
 
 **Rationale:** A read leaves no state change and therefore no other trace. Disclosure without a record cannot be investigated.
+
+### Record a bulk read inside its own boundary (EXT.AUDIT.READ.002)
+
+**Requirement:** A query returning personal data for more subjects than its declared threshold MUST produce an audit record, inside one tenant or account boundary as well.
+
+**Rationale:** The cross-boundary rule catches a disclosure to the wrong party. It does not catch an export of every record a party may read one at a time. That is the shape a copied dataset has. [Article 30 of the GDPR](https://gdpr-info.eu/art-30-gdpr/) asks what categories of data were processed and by whom, and an unrecorded bulk read cannot answer either.
+
+**Example:** A project records the threshold beside its audit obligations. A list endpoint whose page size can exceed it audits the read with the subject count rather than the subjects.
 
 ### Record bulk export (EXT.AUDIT.EXPORT.001)
 
@@ -361,11 +387,13 @@ No additional baseline package is required. The `tenancy` extension owns tenant 
 | EXT.AUDIT.PROTECTION.002 | test | `AuditProtectionTests` detect a modified record through a broken chain value. |
 | EXT.AUDIT.PROTECTION.003 | operation | Scheduled verification job publishes its result and raises an alert on a break. |
 | EXT.AUDIT.PROTECTION.004 | test | `AuditProtectionTests` append a correcting record that references the original. |
+| EXT.AUDIT.PROTECTION.005 | operation | The published checkpoint records the chain head and count, and a recomputed chain disagreeing with it raises an alert. |
 | EXT.AUDIT.PURGE.001 | test | `AuditPurgeTests` remove records past the declared retention of their category. |
 | EXT.AUDIT.PURGE.002 | test | `AuditPurgeTests` retain records and resolve no person after identity removal. |
 | EXT.AUDIT.ACCESS.001 | test | `AuditAccessTests` return records filtered by each declared filter and reject an unpermitted caller. |
 | EXT.AUDIT.ACCESS.002 | test | `AuditAccessTests` produce one record for a completed trail read. |
 | EXT.AUDIT.READ.001 | test | `AuditReadTests` produce a record for a cross-boundary personal-data query. |
+| EXT.AUDIT.READ.002 | test | `AuditReadTests` produce a record, carrying the subject count, for a query above the declared threshold. |
 | EXT.AUDIT.EXPORT.001 | test | `AuditExportTests` produce a record naming the requested export scope. |
 | EXT.AUDIT.ENFORCEMENT.001 | static | `AuditSelectionTests` fails the build for a Command with no declaration. |
 | EXT.AUDIT.CONVENTION.001 | inspection | Audit Infrastructure files use the documented path or a local replacement. |

@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 842 provisions across 8 areas.
+The active release states 861 provisions across 8 areas.
 
 ## BACKEND
 
@@ -44,8 +44,9 @@ The active release states 842 provisions across 8 areas.
 | BACKEND.APPLICATION.CONVENTION.002 | [Keep messages immutable](../backend/application.md#keep-messages-immutable-backendapplicationconvention002) | `backend/application.md` |
 | BACKEND.APPLICATION.CONVENTION.003 | [Return use-case results](../backend/application.md#return-use-case-results-backendapplicationconvention003) | `backend/application.md` |
 | BACKEND.APPLICATION.CONVENTION.004 | [Keep mappings at the owning boundary](../backend/application.md#keep-mappings-at-the-owning-boundary-backendapplicationconvention004) | `backend/application.md` |
+| BACKEND.APPLICATION.CONVENTION.005 | [Use the pinned mediator entry points](../backend/application.md#use-the-pinned-mediator-entry-points-backendapplicationconvention005) | `backend/application.md` |
 | BACKEND.APPLICATION.FAILURE.001 | [Model expected use-case failures explicitly](../backend/application.md#model-expected-use-case-failures-explicitly-backendapplicationfailure001) | `backend/application.md` |
-| BACKEND.APPLICATION.MEDIATOR.001 | [Use specific LiteBus entry points](../backend/application.md#use-specific-litebus-entry-points-backendapplicationmediator001) | `backend/application.md` |
+| BACKEND.APPLICATION.MEDIATOR.002 | [Dispatch commands and queries through separate entry points](../backend/application.md#dispatch-commands-and-queries-through-separate-entry-points-backendapplicationmediator002) | `backend/application.md` |
 | BACKEND.APPLICATION.ORCHESTRATION.001 | [Keep one state-changing Use case in one Command pipeline](../backend/application.md#keep-one-state-changing-use-case-in-one-command-pipeline-backendapplicationorchestration001) | `backend/application.md` |
 | BACKEND.APPLICATION.PORT.001 | [Define narrow external ports](../backend/application.md#define-narrow-external-ports-backendapplicationport001) | `backend/application.md` |
 | BACKEND.APPLICATION.PORT.002 | [Declare a port where its consumers meet](../backend/application.md#declare-a-port-where-its-consumers-meet-backendapplicationport002) | `backend/application.md` |
@@ -68,7 +69,8 @@ The active release states 842 provisions across 8 areas.
 | BACKEND.ARCHITECTURE.PLACEMENT.001 | [Place a type at the lowest folder that holds its consumers](../backend/architecture.md#place-a-type-at-the-lowest-folder-that-holds-its-consumers-backendarchitectureplacement001) | `backend/architecture.md` |
 | BACKEND.ARCHITECTURE.PROJECTS.001 | [Use five application projects](../backend/architecture.md#use-five-application-projects-backendarchitectureprojects001) | `backend/architecture.md` |
 | BACKEND.ARCHITECTURE.VISIBILITY.001 | [Keep implementation types internal](../backend/architecture.md#keep-implementation-types-internal-backendarchitecturevisibility001) | `backend/architecture.md` |
-| BACKEND.ARCHITECTURE.WORKER.001 | [Add Worker only for an independent process boundary](../backend/architecture.md#add-worker-only-for-an-independent-process-boundary-backendarchitectureworker001) | `backend/architecture.md` |
+| BACKEND.ARCHITECTURE.WORKER.002 | [Declare the execution host for work that outlives a request](../backend/architecture.md#declare-the-execution-host-for-work-that-outlives-a-request-backendarchitectureworker002) | `backend/architecture.md` |
+| BACKEND.ARCHITECTURE.WORKER.003 | [Create a Worker project when background work needs its own process](../backend/architecture.md#create-a-worker-project-when-background-work-needs-its-own-process-backendarchitectureworker003) | `backend/architecture.md` |
 | BACKEND.DOMAIN.AGGREGATE.001 | [Treat aggregates as consistency boundaries](../backend/domain.md#treat-aggregates-as-consistency-boundaries-backenddomainaggregate001) | `backend/domain.md` |
 | BACKEND.DOMAIN.BASE.001 | [Use the project aggregate root contract](../backend/domain.md#use-the-project-aggregate-root-contract-backenddomainbase001) | `backend/domain.md` |
 | BACKEND.DOMAIN.BEHAVIOR.001 | [Express transitions through business methods](../backend/domain.md#express-transitions-through-business-methods-backenddomainbehavior001) | `backend/domain.md` |
@@ -92,6 +94,7 @@ The active release states 842 provisions across 8 areas.
 | BACKEND.DOMAIN.ID.001 | [Use strongly typed version 7 identifiers](../backend/domain.md#use-strongly-typed-version-7-identifiers-backenddomainid001) | `backend/domain.md` |
 | BACKEND.DOMAIN.LANGUAGE.001 | [Use one ubiquitous language](../backend/domain.md#use-one-ubiquitous-language-backenddomainlanguage001) | `backend/domain.md` |
 | BACKEND.DOMAIN.MONEY.001 | [Make money and decimal rules explicit](../backend/domain.md#make-money-and-decimal-rules-explicit-backenddomainmoney001) | `backend/domain.md` |
+| BACKEND.DOMAIN.MONEY.002 | [Keep binary floating point out of exact quantities](../backend/domain.md#keep-binary-floating-point-out-of-exact-quantities-backenddomainmoney002) | `backend/domain.md` |
 | BACKEND.DOMAIN.PURITY.001 | [Keep Domain free of outer-layer concerns](../backend/domain.md#keep-domain-free-of-outer-layer-concerns-backenddomainpurity001) | `backend/domain.md` |
 | BACKEND.DOMAIN.REFERENCE.001 | [Reference other aggregates by ID](../backend/domain.md#reference-other-aggregates-by-id-backenddomainreference001) | `backend/domain.md` |
 | BACKEND.DOMAIN.REPOSITORY.001 | [Keep repository interfaces in Domain](../backend/domain.md#keep-repository-interfaces-in-domain-backenddomainrepository001) | `backend/domain.md` |
@@ -363,9 +366,11 @@ The active release states 842 provisions across 8 areas.
 | EXT.AUDIT.PROTECTION.002 | [Provide tamper evidence](../ext/audit.md#provide-tamper-evidence-extauditprotection002) | `ext/audit.md` |
 | EXT.AUDIT.PROTECTION.003 | [Verify the integrity chain on a schedule](../ext/audit.md#verify-the-integrity-chain-on-a-schedule-extauditprotection003) | `ext/audit.md` |
 | EXT.AUDIT.PROTECTION.004 | [Add a correcting record](../ext/audit.md#add-a-correcting-record-extauditprotection004) | `ext/audit.md` |
+| EXT.AUDIT.PROTECTION.005 | [Anchor the audit chain outside its own store](../ext/audit.md#anchor-the-audit-chain-outside-its-own-store-extauditprotection005) | `ext/audit.md` |
 | EXT.AUDIT.PURGE.001 | [Retain each category for its declared period](../ext/audit.md#retain-each-category-for-its-declared-period-extauditpurge001) | `ext/audit.md` |
 | EXT.AUDIT.PURGE.002 | [Remove the identity mapping on erasure](../ext/audit.md#remove-the-identity-mapping-on-erasure-extauditpurge002) | `ext/audit.md` |
 | EXT.AUDIT.READ.001 | [Record personal-data reads](../ext/audit.md#record-personal-data-reads-extauditread001) | `ext/audit.md` |
+| EXT.AUDIT.READ.002 | [Record a bulk read inside its own boundary](../ext/audit.md#record-a-bulk-read-inside-its-own-boundary-extauditread002) | `ext/audit.md` |
 | EXT.AUDIT.RECORD.001 | [Record the required audit fields](../ext/audit.md#record-the-required-audit-fields-extauditrecord001) | `ext/audit.md` |
 | EXT.AUDIT.RECORD.002 | [State the action as use-case identity](../ext/audit.md#state-the-action-as-use-case-identity-extauditrecord002) | `ext/audit.md` |
 | EXT.AUDIT.RECORD.003 | [Record the failure code on an unsuccessful attempt](../ext/audit.md#record-the-failure-code-on-an-unsuccessful-attempt-extauditrecord003) | `ext/audit.md` |
@@ -417,8 +422,10 @@ The active release states 842 provisions across 8 areas.
 | EXT.CACHE.CONVENTION.001 | [Place cache access at an outer boundary](../ext/cache.md#place-cache-access-at-an-outer-boundary-extcacheconvention001) | `ext/cache.md` |
 | EXT.CACHE.FAILURE.001 | [Keep source data authoritative](../ext/cache.md#keep-source-data-authoritative-extcachefailure001) | `ext/cache.md` |
 | EXT.CACHE.FAILURE.002 | [Define cache outage behavior](../ext/cache.md#define-cache-outage-behavior-extcachefailure002) | `ext/cache.md` |
+| EXT.CACHE.FAILURE.003 | [Emit a signal for each degraded cache path](../ext/cache.md#emit-a-signal-for-each-degraded-cache-path-extcachefailure003) | `ext/cache.md` |
 | EXT.CACHE.INVALIDATE.001 | [Define cache invalidation](../ext/cache.md#define-cache-invalidation-extcacheinvalidate001) | `ext/cache.md` |
 | EXT.CACHE.INVALIDATE.002 | [Prefer bounded staleness](../ext/cache.md#prefer-bounded-staleness-extcacheinvalidate002) | `ext/cache.md` |
+| EXT.CACHE.INVALIDATE.003 | [Record a manual cache invalidation](../ext/cache.md#record-a-manual-cache-invalidation-extcacheinvalidate003) | `ext/cache.md` |
 | EXT.CACHE.KEY.001 | [Compose cache keys from result inputs](../ext/cache.md#compose-cache-keys-from-result-inputs-extcachekey001) | `ext/cache.md` |
 | EXT.CACHE.KEY.002 | [Exclude unsafe cache key material](../ext/cache.md#exclude-unsafe-cache-key-material-extcachekey002) | `ext/cache.md` |
 | EXT.CACHE.REFRESH.001 | [Bound cache refresh work](../ext/cache.md#bound-cache-refresh-work-extcacherefresh001) | `ext/cache.md` |
@@ -598,6 +605,7 @@ The active release states 842 provisions across 8 areas.
 | EXT.LIFECYCLE.PURGE.001 | [Bound purge and archive work](../ext/lifecycle.md#bound-purge-and-archive-work-extlifecyclepurge001) | `ext/lifecycle.md` |
 | EXT.LIFECYCLE.PURGE.002 | [Preserve legal-hold data](../ext/lifecycle.md#preserve-legal-hold-data-extlifecyclepurge002) | `ext/lifecycle.md` |
 | EXT.LIFECYCLE.PURGE.003 | [Align backup deletion behavior](../ext/lifecycle.md#align-backup-deletion-behavior-extlifecyclepurge003) | `ext/lifecycle.md` |
+| EXT.LIFECYCLE.PURGE.004 | [Record the release of a legal hold](../ext/lifecycle.md#record-the-release-of-a-legal-hold-extlifecyclepurge004) | `ext/lifecycle.md` |
 | EXT.LIFECYCLE.READ.001 | [Exclude inactive records from normal reads](../ext/lifecycle.md#exclude-inactive-records-from-normal-reads-extlifecycleread001) | `ext/lifecycle.md` |
 | EXT.LIFECYCLE.READ.002 | [Authorize lifecycle access paths](../ext/lifecycle.md#authorize-lifecycle-access-paths-extlifecycleread002) | `ext/lifecycle.md` |
 | EXT.LIFECYCLE.READ.003 | [Define post-deletion references](../ext/lifecycle.md#define-post-deletion-references-extlifecycleread003) | `ext/lifecycle.md` |
@@ -678,6 +686,7 @@ The active release states 842 provisions across 8 areas.
 | EXT.REPORT.AUTHZ.001 | [Apply item-read authorization](../ext/report.md#apply-item-read-authorization-extreportauthz001) | `ext/report.md` |
 | EXT.REPORT.CONTENT.001 | [Escape formula-leading export values](../ext/report.md#escape-formula-leading-export-values-extreportcontent001) | `ext/report.md` |
 | EXT.REPORT.CONTENT.002 | [Define export encoding and columns](../ext/report.md#define-export-encoding-and-columns-extreportcontent002) | `ext/report.md` |
+| EXT.REPORT.CONTENT.003 | [Reject formula-leading import values](../ext/report.md#reject-formula-leading-import-values-extreportcontent003) | `ext/report.md` |
 | EXT.REPORT.CONVENTION.001 | [Keep report definitions in Application](../ext/report.md#keep-report-definitions-in-application-extreportconvention001) | `ext/report.md` |
 | EXT.REPORT.CONVENTION.002 | [Keep report providers in Infrastructure](../ext/report.md#keep-report-providers-in-infrastructure-extreportconvention002) | `ext/report.md` |
 | EXT.REPORT.CONVENTION.003 | [Separate Worker orchestration](../ext/report.md#separate-worker-orchestration-extreportconvention003) | `ext/report.md` |
@@ -698,6 +707,7 @@ The active release states 842 provisions across 8 areas.
 | EXT.TENANCY.DISCLOSURE.001 | [Apply cross-tenant disclosure policy](../ext/tenancy.md#apply-cross-tenant-disclosure-policy-exttenancydisclosure001) | `ext/tenancy.md` |
 | EXT.TENANCY.DISCLOSURE.002 | [Protect tenant diagnostics](../ext/tenancy.md#protect-tenant-diagnostics-exttenancydisclosure002) | `ext/tenancy.md` |
 | EXT.TENANCY.OPERATION.001 | [Scope tenant operations](../ext/tenancy.md#scope-tenant-operations-exttenancyoperation001) | `ext/tenancy.md` |
+| EXT.TENANCY.OPERATION.002 | [Record an all-tenant operation](../ext/tenancy.md#record-an-all-tenant-operation-exttenancyoperation002) | `ext/tenancy.md` |
 | EXT.TENANCY.RESOLVE.001 | [Resolve tenant identity from trusted context](../ext/tenancy.md#resolve-tenant-identity-from-trusted-context-exttenancyresolve001) | `ext/tenancy.md` |
 | EXT.TENANCY.RESOLVE.002 | [Reject unrestricted tenant input](../ext/tenancy.md#reject-unrestricted-tenant-input-exttenancyresolve002) | `ext/tenancy.md` |
 | EXT.TENANCY.STORAGE.001 | [Use selected tenant storage support](../ext/tenancy.md#use-selected-tenant-storage-support-exttenancystorage001) | `ext/tenancy.md` |
@@ -724,10 +734,12 @@ The active release states 842 provisions across 8 areas.
 | FRONTEND.DATA.CONVENTION.002 | [Keep schemas operation-specific](../frontend/data.md#keep-schemas-operation-specific-frontenddataconvention002) | `frontend/data.md` |
 | FRONTEND.DATA.CONVENTION.003 | [Use native and framework form support first](../frontend/data.md#use-native-and-framework-form-support-first-frontenddataconvention003) | `frontend/data.md` |
 | FRONTEND.DATA.CONVENTION.004 | [Keep cache invalidation close to mutations](../frontend/data.md#keep-cache-invalidation-close-to-mutations-frontenddataconvention004) | `frontend/data.md` |
+| FRONTEND.DATA.CONVENTION.005 | [Generate mutable response types](../frontend/data.md#generate-mutable-response-types-frontenddataconvention005) | `frontend/data.md` |
 | FRONTEND.DATA.ERROR.001 | [Parse errors consistently](../frontend/data.md#parse-errors-consistently-frontenddataerror001) | `frontend/data.md` |
 | FRONTEND.DATA.FORM.001 | [Keep forms aligned with use cases](../frontend/data.md#keep-forms-aligned-with-use-cases-frontenddataform001) | `frontend/data.md` |
 | FRONTEND.DATA.MUTATIONS.001 | [Keep mutations at a declared boundary](../frontend/data.md#keep-mutations-at-a-declared-boundary-frontenddatamutations001) | `frontend/data.md` |
 | FRONTEND.DATA.OPTIMISTIC.001 | [Make optimistic behavior recoverable](../frontend/data.md#make-optimistic-behavior-recoverable-frontenddataoptimistic001) | `frontend/data.md` |
+| FRONTEND.DATA.OPTIMISTIC.002 | [Announce the outcome of an optimistic update](../frontend/data.md#announce-the-outcome-of-an-optimistic-update-frontenddataoptimistic002) | `frontend/data.md` |
 | FRONTEND.DATA.OWNERSHIP.001 | [Assign state to the narrowest owner](../frontend/data.md#assign-state-to-the-narrowest-owner-frontenddataownership001) | `frontend/data.md` |
 | FRONTEND.DATA.READ.001 | [Read initial data on the server](../frontend/data.md#read-initial-data-on-the-server-frontenddataread001) | `frontend/data.md` |
 | FRONTEND.DATA.SECRETS.001 | [Keep secrets out of browser storage](../frontend/data.md#keep-secrets-out-of-browser-storage-frontenddatasecrets001) | `frontend/data.md` |
@@ -801,10 +813,13 @@ The active release states 842 provisions across 8 areas.
 | QUALITY.CI.GATES.001 | [Run applicable gates on every pull request](../quality/ci.md#run-applicable-gates-on-every-pull-request-qualitycigates001) | `quality/ci.md` |
 | QUALITY.CI.JOBS.001 | [Keep a canonical job graph](../quality/ci.md#keep-a-canonical-job-graph-qualitycijobs001) | `quality/ci.md` |
 | QUALITY.CI.PROTECTION.001 | [Protect the default branch](../quality/ci.md#protect-the-default-branch-qualityciprotection001) | `quality/ci.md` |
+| QUALITY.CI.PROTECTION.002 | [Record every branch protection bypass](../quality/ci.md#record-every-branch-protection-bypass-qualityciprotection002) | `quality/ci.md` |
 | QUALITY.CI.RELEASE.001 | [Promote verified artifacts](../quality/ci.md#promote-verified-artifacts-qualitycirelease001) | `quality/ci.md` |
+| QUALITY.CI.RELEASE.002 | [Publish a component inventory with each artifact](../quality/ci.md#publish-a-component-inventory-with-each-artifact-qualitycirelease002) | `quality/ci.md` |
 | QUALITY.CI.SCHEMA.001 | [Review schema artifacts](../quality/ci.md#review-schema-artifacts-qualitycischema001) | `quality/ci.md` |
 | QUALITY.CI.SUPPLY.001 | [Scan dependencies and release artifacts](../quality/ci.md#scan-dependencies-and-release-artifacts-qualitycisupply001) | `quality/ci.md` |
 | QUALITY.OPERATIONS.ALERTS.001 | [Define actionable baseline alerts](../quality/operations.md#define-actionable-baseline-alerts-qualityoperationsalerts001) | `quality/operations.md` |
+| QUALITY.OPERATIONS.ALERTS.002 | [Route each severity to a declared destination](../quality/operations.md#route-each-severity-to-a-declared-destination-qualityoperationsalerts002) | `quality/operations.md` |
 | QUALITY.OPERATIONS.CONVENTION.001 | [Use one local start command](../quality/operations.md#use-one-local-start-command-qualityoperationsconvention001) | `quality/operations.md` |
 | QUALITY.OPERATIONS.CONVENTION.002 | [Use stable service names](../quality/operations.md#use-stable-service-names-qualityoperationsconvention002) | `quality/operations.md` |
 | QUALITY.OPERATIONS.CONVENTION.003 | [Keep runbooks near project documentation](../quality/operations.md#keep-runbooks-near-project-documentation-qualityoperationsconvention003) | `quality/operations.md` |
@@ -816,12 +831,15 @@ The active release states 842 provisions across 8 areas.
 | QUALITY.OPERATIONS.OBSERVABILITY.001 | [Emit correlated diagnostics](../quality/operations.md#emit-correlated-diagnostics-qualityoperationsobservability001) | `quality/operations.md` |
 | QUALITY.OPERATIONS.ROLLBACK.001 | [Keep rollback executable](../quality/operations.md#keep-rollback-executable-qualityoperationsrollback001) | `quality/operations.md` |
 | QUALITY.OPERATIONS.SCHEMA.001 | [Apply schema changes outside request startup](../quality/operations.md#apply-schema-changes-outside-request-startup-qualityoperationsschema001) | `quality/operations.md` |
+| QUALITY.OPERATIONS.TRACE.001 | [Pass trace context in the W3C format](../quality/operations.md#pass-trace-context-in-the-w3c-format-qualityoperationstrace001) | `quality/operations.md` |
 | QUALITY.OPERATIONS.WORKER.001 | [Operate background work independently](../quality/operations.md#operate-background-work-independently-qualityoperationsworker001) | `quality/operations.md` |
 | QUALITY.SECURITY.ABUSE.001 | [Bound abuse at exposed endpoints](../quality/security.md#bound-abuse-at-exposed-endpoints-qualitysecurityabuse001) | `quality/security.md` |
+| QUALITY.SECURITY.ABUSE.002 | [Keep one limit store across replicas](../quality/security.md#keep-one-limit-store-across-replicas-qualitysecurityabuse002) | `quality/security.md` |
 | QUALITY.SECURITY.ACTOR.001 | [Derive the actor from claims](../quality/security.md#derive-the-actor-from-claims-qualitysecurityactor001) | `quality/security.md` |
 | QUALITY.SECURITY.AUDIT.001 | [Record security audit events](../quality/security.md#record-security-audit-events-qualitysecurityaudit001) | `quality/security.md` |
 | QUALITY.SECURITY.AUTHN.001 | [Keep backend authentication provider-neutral](../quality/security.md#keep-backend-authentication-provider-neutral-qualitysecurityauthn001) | `quality/security.md` |
 | QUALITY.SECURITY.AUTHZ.001 | [Authorize each target resource](../quality/security.md#authorize-each-target-resource-qualitysecurityauthz001) | `quality/security.md` |
+| QUALITY.SECURITY.AUTHZ.002 | [Restrict a protected collection in the database](../quality/security.md#restrict-a-protected-collection-in-the-database-qualitysecurityauthz002) | `quality/security.md` |
 | QUALITY.SECURITY.CONVENTION.001 | [Use one current actor abstraction](../quality/security.md#use-one-current-actor-abstraction-qualitysecurityconvention001) | `quality/security.md` |
 | QUALITY.SECURITY.CONVENTION.002 | [Keep secure headers in host configuration](../quality/security.md#keep-secure-headers-in-host-configuration-qualitysecurityconvention002) | `quality/security.md` |
 | QUALITY.SECURITY.CONVENTION.003 | [Use deny-by-default policies](../quality/security.md#use-deny-by-default-policies-qualitysecurityconvention003) | `quality/security.md` |
@@ -887,6 +905,7 @@ The active release states 842 provisions across 8 areas.
 | WORKSPACE.STRUCTURE.DOCS.001 | [Keep consumer documentation at the root](../workspace/structure.md#keep-consumer-documentation-at-the-root-workspacestructuredocs001) | `workspace/structure.md` |
 | WORKSPACE.STRUCTURE.DOCS.002 | [Keep orientation documents separate from canonical records](../workspace/structure.md#keep-orientation-documents-separate-from-canonical-records-workspacestructuredocs002) | `workspace/structure.md` |
 | WORKSPACE.STRUCTURE.DOTNET.001 | [Keep .NET production and test projects separate](../workspace/structure.md#keep-net-production-and-test-projects-separate-workspacestructuredotnet001) | `workspace/structure.md` |
+| WORKSPACE.STRUCTURE.DOTNET.002 | [Keep one workspace solution beside the API solution](../workspace/structure.md#keep-one-workspace-solution-beside-the-api-solution-workspacestructuredotnet002) | `workspace/structure.md` |
 | WORKSPACE.STRUCTURE.PACKAGES.001 | [Limit shared TypeScript packages](../workspace/structure.md#limit-shared-typescript-packages-workspacestructurepackages001) | `workspace/structure.md` |
 | WORKSPACE.STRUCTURE.TREE.001 | [Use the canonical root tree](../workspace/structure.md#use-the-canonical-root-tree-workspacestructuretree001) | `workspace/structure.md` |
 

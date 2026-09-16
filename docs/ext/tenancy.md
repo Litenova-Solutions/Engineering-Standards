@@ -65,9 +65,9 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 
 ### Use selected tenant storage support (EXT.TENANCY.STORAGE.001)
 
-**Requirement:** A multi-tenant persistence implementation MUST use Marten tenancy support or a tested selected-provider mechanism.
+**Requirement:** A multi-tenant persistence implementation MUST resolve its tenant when the session is created, through the selected provider's own tenancy support.
 
-**Rationale:** Provider-supported tenancy gives queries and storage a consistent isolation mechanism.
+**Rationale:** Provider-supported tenancy gives queries and storage a consistent isolation mechanism. Session creation is the point that matters. A session opened without a tenant has an unscoped next query. Adding the filter per query instead leaves every new query one omission away from reading across tenants. The baseline provider resolves it from the registered tenancy at session creation, so no query carries the concern.
 
 ### Scope tenant-owned records (EXT.TENANCY.STORAGE.002)
 
@@ -92,6 +92,14 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 **Requirement:** Backup, restore, replay, deletion, export, support access, and incident investigation MUST document one-tenant or all-tenant scope.
 
 **Rationale:** Operating work can cause a broader data effect than one normal request.
+
+### Record an all-tenant operation (EXT.TENANCY.OPERATION.002)
+
+**Requirement:** An operation running at all-tenant scope MUST produce a record naming the actor, the operation, the tenants reached, and the reason.
+
+**Rationale:** A documented scope states what an operation is allowed to touch. It does not state what one run touched, which is the question a tenant asks after an incident. An all-tenant run is also the one case where no tenant's own audit trail holds the whole event. [The OWASP logging guidance](https://owasp.org/www-project-cheat-sheets/cheatsheets/Logging_Cheat_Sheet) treats an administrative action over many subjects as one event to record.
+
+**Example:** A support export covering every tenant records the operator, the export, the tenant count, and the incident it was run for.
 
 ## Conventions
 
@@ -138,6 +146,7 @@ Marten tenancy support is part of the baseline persistence package. Another isol
 | EXT.TENANCY.DISCLOSURE.001 | test | `TenancyDisclosureTests` return the documented not-found or forbidden response. |
 | EXT.TENANCY.DISCLOSURE.002 | test | `TenancyDisclosureTests` exclude foreign tenant identifiers and data. |
 | EXT.TENANCY.OPERATION.001 | inspection | Operating procedures declare one-tenant or all-tenant scope. |
+| EXT.TENANCY.OPERATION.002 | test | `TenancyOperationTests` assert an all-tenant run writes a record naming the actor, the operation, and the tenants reached. |
 | EXT.TENANCY.CONVENTION.001 | static | Tenant references use `TenantId` or a documented local replacement. |
 | EXT.TENANCY.CONVENTION.002 | inspection | Host code has one trusted current-tenant accessor. |
 | EXT.TENANCY.CONVENTION.003 | static | `TenancyTests` asserts domain code reads no ambient tenant request state. |

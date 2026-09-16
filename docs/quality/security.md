@@ -38,7 +38,15 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 **Requirement:** A protected query or command MUST check role, ownership, tenant, state, or delegated access against its target.
 
-**Rationale:** A collection query applies that check in the database filter, because loading an unrestricted set and filtering in memory already exposed the rows.
+**Rationale:** A single-target operation resolves its target and checks the caller against it.
+
+### Restrict a protected collection in the database (QUALITY.SECURITY.AUTHZ.002)
+
+**Requirement:** A protected collection query MUST apply its authorization scope as a database predicate, before paging, rather than filter a materialized result.
+
+**Rationale:** A collection has no single target, so the check that `QUALITY.SECURITY.AUTHZ.001` states has nothing to resolve against. Reading the unrestricted set already exposed the rows to the process. A page assembled from them leaks the total count even when every row is dropped. [OWASP lists this as broken object level authorization](https://owasp.org/www-project-top-ten/2021/A01_2021-Broken_Access_Control/).
+
+**Example:** A query for an organization's orders adds the organization predicate to the database query. It does not load every order and drop the ones the caller may not read.
 
 ### Validate at trust boundaries (QUALITY.SECURITY.INPUT.001)
 
@@ -54,9 +62,9 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ### Parameterize database input (QUALITY.SECURITY.SQL.001)
 
-**Requirement:** An external value reaching the database MUST travel through a Marten query API or a parameterized SQL parameter.
+**Requirement:** An external value reaching the database MUST travel through a provider query API or a parameterized SQL parameter.
 
-**Rationale:** String concatenation or interpolation into raw command text makes the value part of the statement. The reporting extension owns the reviewed raw SQL patterns.
+**Rationale:** String concatenation or interpolation into raw command text makes the value part of the statement. The provider query API is Marten's under the baseline and EF Core's under its extension, and both parameterize. The reporting extension owns the reviewed raw SQL patterns.
 
 ### Limit public error detail (QUALITY.SECURITY.ERROR.001)
 
@@ -86,7 +94,13 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 **Requirement:** A public, authentication, webhook, search, upload, or expensive endpoint MUST declare a rate or concurrency limit and its rejection response.
 
-**Rationale:** The declaration also names the limiting key and monitoring owner. A caller above the limit receives 429 with a stable code, and multiple replicas share one store.
+**Rationale:** The declaration also names the limiting key and monitoring owner. A caller above the limit receives 429 with a stable code.
+
+### Keep one limit store across replicas (QUALITY.SECURITY.ABUSE.002)
+
+**Requirement:** A deployment running more than one replica MUST hold its rate and concurrency counters in one store that every replica reads.
+
+**Rationale:** A per-process counter multiplies the declared limit by the replica count, so the limit a specification states is not the limit the system applies. The multiplier also changes when the deployment scales, which makes the effective limit unstated. This was a rationale sentence, where it obliged nobody.
 
 ### Restrict cross-origin access (QUALITY.SECURITY.CORS.001)
 
@@ -98,7 +112,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 **Requirement:** A security audit event MUST record actor, action, target, outcome, timestamp, trace identifier, and available reason.
 
-**Rationale:** Audit records follow a documented retention and access policy, exclude secrets, and stay available for incident review.
+**Rationale:** Audit records follow a documented retention and access policy, exclude secrets, and stay available for incident review. A consumer that activates the audit extension records the event through that extension instead. The extension states a wider field set, a classification rule, and a tamper-evidence rule.
 
 ### Rotate production secrets (QUALITY.SECURITY.ROTATION.001)
 
@@ -160,7 +174,8 @@ This informative example demonstrates `QUALITY.SECURITY.AUTHZ.001` and `QUALITY.
 |:---|:---|:---|
 | QUALITY.SECURITY.AUTHN.001 | inspection | `AuthenticationTests` rejects tokens with a wrong issuer, audience, signature, or expiry, and rejects identity headers. |
 | QUALITY.SECURITY.ACTOR.001 | inspection | `ActorIdentityTests` asserts the actor resolves from claims and that request-supplied identifiers are ignored. |
-| QUALITY.SECURITY.AUTHZ.001 | inspection | `TargetAuthorizationTests` asserts each protected operation rejects a non-owner and filters collections in the query predicate. |
+| QUALITY.SECURITY.AUTHZ.001 | inspection | `TargetAuthorizationTests` asserts each protected single-target operation rejects a non-owner. |
+| QUALITY.SECURITY.AUTHZ.002 | test | `TargetAuthorizationTests` asserts each protected collection query emits its scope predicate in the captured SQL, before the paging clause. |
 | QUALITY.SECURITY.INPUT.001 | static | `InputValidationTests` asserts each boundary rejects malformed shape, out-of-range values, and unbounded pagination. |
 | QUALITY.SECURITY.SECRETS.001 | inspection | `SecretScanTests` and the CI secret scan assert no tracked file or emitted diagnostic carries a secret value. |
 | QUALITY.SECURITY.SQL.001 | inspection | `SqlInjectionTests` asserts no query path concatenates an external value into command text. |
@@ -169,6 +184,7 @@ This informative example demonstrates `QUALITY.SECURITY.AUTHZ.001` and `QUALITY.
 | QUALITY.SECURITY.SUPPLY.001 | static | `pnpm install --frozen-lockfile` and the NuGet restore fail when a resolved version differs from its manifest pin. |
 | QUALITY.SECURITY.DATA.001 | inspection | Data review compares each returned and logged field against the field list its use case declares. |
 | QUALITY.SECURITY.ABUSE.001 | inspection | `RateLimitTests` asserts each declared endpoint returns 429 with its stable code above the configured limit. |
+| QUALITY.SECURITY.ABUSE.002 | inspection | Deployment review confirms the limiter resolves a shared store wherever the replica count is above one. |
 | QUALITY.SECURITY.CORS.001 | inspection | `CorsTests` asserts an unlisted origin is rejected and no wildcard origin is served with credentials. |
 | QUALITY.SECURITY.AUDIT.001 | inspection | `AuditEventTests` asserts each security-relevant operation emits an event carrying all seven fields. |
 | QUALITY.SECURITY.ROTATION.001 | operation | The secret inventory records owner, interval, location, revocation, and the date of the last recovery test. |

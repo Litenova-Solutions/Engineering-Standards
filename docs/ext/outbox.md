@@ -12,7 +12,7 @@ Applicable specification kinds: `use-case`, `workflow`, `end-to-end-flow`.
 
 The consumer enables `outbox` when a committed change requires durable delivery after process failure. Delivery can carry an Integration Event, provider side effect, or Workflow Command.
 
-The use case carries `durable-delivery` Risk, or the Workflow selects the extension for durable Commands. The extension activates `BACKEND.ARCHITECTURE.WORKER.001` and adds `apps/api/src/{ProjectName}.Worker/`.
+The use case carries `durable-delivery` Risk, or the Workflow selects the extension for durable Commands. The extension activates `BACKEND.ARCHITECTURE.WORKER.002`, so the project declares the execution host that runs the dispatcher.
 
 ## Baseline relationship
 
@@ -41,9 +41,9 @@ This extension replaces `BACKEND.PERSISTENCE.EVENT.001`.
 
 ### Exclude manually repeatable reactions (EXT.OUTBOX.ADOPT.002)
 
-**Requirement:** A project MUST NOT activate outbox for a `best-effort-optional` reaction that operators can repeat manually.
+**Requirement:** A project MUST NOT activate outbox for a reaction whose delivery guarantee is best-effort and which operators can repeat manually.
 
-**Rationale:** Outbox storage and Worker operation are unnecessary when loss is an accepted recoverable outcome.
+**Rationale:** Outbox storage and dispatcher operation are unnecessary when loss is an accepted recoverable outcome. The delivery guarantee comes from the reaction's own declaration, and the module specification records it with the vocabulary its event table already uses.
 
 ### Stage messages with business work (EXT.OUTBOX.ATOMIC.001)
 
@@ -161,9 +161,11 @@ This extension replaces `BACKEND.PERSISTENCE.EVENT.001`.
 
 ### Distinguish dependency outage (EXT.OUTBOX.READINESS.001)
 
-**Requirement:** A Worker MUST distinguish an unavailable outbox store from a failed claimed message.
+**Requirement:** A dispatcher MUST distinguish an unavailable outbox store from a failed claimed message.
 
-**Rationale:** The implementation stores availability and a claimed record's target result require different recovery paths.
+**Rationale:** Store availability and a claimed record's target result require different recovery paths.
+
+Each one has its own signal. The store's availability is a gauge the readiness endpoint reads. A claimed message's outcome is a counter carrying the result, following [the OpenTelemetry metrics specification](https://opentelemetry.io/docs/specs/otel/metrics/). A single error counter cannot tell an operator whether to restore a database or investigate one destination.
 
 ### Back off unavailable-store polling (EXT.OUTBOX.READINESS.002)
 
@@ -191,9 +193,11 @@ This extension replaces `BACKEND.PERSISTENCE.EVENT.001`.
 
 ### Support coexisting message producers (EXT.OUTBOX.SCHEMA.002)
 
-**Requirement:** A deployed Worker MUST process records from every application version that can coexist during rollout or rollback.
+**Requirement:** A deployed dispatcher MUST process records from every application version that can coexist during rollout or rollback.
 
 **Rationale:** Active deployment versions can place different valid message shapes in one store.
+
+A message record therefore carries its own shape version, and the dispatcher selects a reader from that value. Adding an optional member with a defined absent-value behavior needs no new version. Removing a member, renaming one, narrowing a type, or changing a discriminator does, and the older reader stays until no record carries the older version.
 
 ### Publish backlog indicators (EXT.OUTBOX.OBSERVABILITY.001)
 
@@ -209,11 +213,11 @@ This extension replaces `BACKEND.PERSISTENCE.EVENT.001`.
 
 ### Model outbox lifecycle states (EXT.OUTBOX.STATE.001)
 
-**Requirement:** An outbox record MUST use pending, processing, dispatched, and dead-letter states with the declared transition boundaries.
+**Requirement:** An outbox record MUST model its lifecycle as an abstract state base with one sealed record for each of pending, processing, dispatched, and dead-letter.
 
-**Rationale:** `pending` becomes `processing`; processing becomes dispatched, pending, or dead-letter; audited replay moves dead-letter to pending.
+**Rationale:** `pending` becomes `processing`; processing becomes dispatched, pending, or dead-letter; audited replay moves dead-letter to pending. Three of the four carry data the others do not. `processing` holds a lease expiry. `dispatched` holds a dispatch time. `dead-letter` holds a failure reason and an attempt count. A four-value label forces those onto nullable columns that are meaningful in one state each, which is the shape `BACKEND.DOMAIN.CLOSEDSET.001` removes everywhere else.
 
-**Example:** `processing` has one unexpired lease before a Worker records `dispatched` or retry state.
+**Example:** `OutboxState.Processing` carries one unexpired lease before a dispatcher records `OutboxState.Dispatched` or a retry state.
 
 ### Preserve message identity during retry (EXT.OUTBOX.STATE.002)
 

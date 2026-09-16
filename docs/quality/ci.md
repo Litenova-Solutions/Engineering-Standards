@@ -24,7 +24,7 @@ Continuous integration proves that a pull request preserves the selected standar
 
 **Requirement:** Every pull request MUST run the gates its changed areas select from the table in this section.
 
-**Rationale:** A gate skipped because its surface did not change is recorded with that reason in the completion report.
+**Rationale:** A gate skipped because its surface did not change is recorded with that reason in the completion report. The dependency audit that `QUALITY.SECURITY.SUPPLY.001` requires is one of these gates, selected by a change to a manifest or a lockfile.
 
 ### Check code and documentation consistency (QUALITY.CI.DOCS.001)
 
@@ -56,11 +56,27 @@ Continuous integration proves that a pull request preserves the selected standar
 
 **Rationale:** Rebuilding from a mutable branch between environments means the tested artifact is not the deployed one.
 
+### Publish a component inventory with each artifact (QUALITY.CI.RELEASE.002)
+
+**Requirement:** CI MUST publish a software bill of materials beside each promoted artifact, listing its resolved direct and transitive components with versions.
+
+**Rationale:** An advisory names a component and a version range. Without an inventory, answering whether a running release contains it means rebuilding the dependency graph of a commit somebody has to find first. [NIST SP 800-218](https://csrc.nist.gov/publications/detail/sp/800-218/final) states the practice, and the lockfile this repository already requires is what the inventory is generated from.
+
+**Example:** The build job that produces the artifact generates the inventory from the same frozen lockfile. It stores the inventory beside the artifact, under the release version.
+
 ### Protect the default branch (QUALITY.CI.PROTECTION.001)
 
 **Requirement:** The default branch MUST require applicable CI checks, a reviewed pull request, and a clean merge state.
 
 **Rationale:** A direct push or bypassed check is permitted only during a documented repository recovery action.
+
+### Record every branch protection bypass (QUALITY.CI.PROTECTION.002)
+
+**Requirement:** A direct push or bypassed check on the default branch MUST produce a record naming the actor, the reason, and the change it admitted.
+
+**Rationale:** The permission exists for recovery, and a recovery nobody wrote down is indistinguishable from a habit. The record is what makes the next reviewer able to tell which commits on the branch were reviewed. [NIST SP 800-218](https://csrc.nist.gov/publications/detail/sp/800-218/final) treats the same bypass as an event that has to be attributable.
+
+**Example:** The record is the recovery decision itself where one exists. A bypass smaller than a decision takes a dated entry in the repository's operations log.
 
 ### Keep a canonical job graph (QUALITY.CI.JOBS.001)
 
@@ -96,6 +112,8 @@ A backend-only pull request runs the Release build, test, dependency scan, docum
 | QUALITY.CI.SCHEMA.001 | static | The CI `schema` job publishes the artifact and fails when it is absent or contains an unplanned destructive operation. |
 | QUALITY.CI.SUPPLY.001 | inspection | The CI supply-chain job fails on an unpinned action reference or an unexcepted advisory. |
 | QUALITY.CI.RELEASE.001 | operation | The release record names one artifact reference across every promoted environment. |
+| QUALITY.CI.RELEASE.002 | static | The `release` job fails when the published `sbom` artifact is absent or lists no component. |
 | QUALITY.CI.PROTECTION.001 | inspection | Branch protection settings require the CI checks and a review before merge. |
+| QUALITY.CI.PROTECTION.002 | inspection | Each default-branch commit with no passing required check resolves to a recovery record naming its actor and reason. |
 | QUALITY.CI.JOBS.001 | inspection | The CI workflow declares each job name from the table and the release record cites the same names. |
 | QUALITY.CI.CONVENTION.001 | inspection | Workflow review confirms each job name matches the release record it feeds. |

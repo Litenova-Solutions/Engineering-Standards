@@ -47,6 +47,8 @@ A generic comment such as `Client component` does not satisfy the convention.
 
 **Rationale:** These APIs are asynchronous in the pinned Next.js release, so synchronous access relies on removed compatibility behavior.
 
+`generateStaticParams` is the counterpart and runs the other way. It receives no request, returns the parameter values to prerender, and is the one route export that reads no `params`. A route with a dynamic segment declares it or accepts that the segment renders on demand.
+
 ### Keep route files as composition boundaries (FRONTEND.RENDERING.ROUTES.001)
 
 **Requirement:** A page or layout MUST select shells, read route input, invoke feature functions, and compose UI without holding reusable logic.
@@ -59,6 +61,8 @@ A generic comment such as `Client component` does not satisfy the convention.
 
 **Rationale:** A blank region while a request is pending or failed gives the reader no signal at all. Framework state files carry these.
 
+These six are the states a route has. A component has `disabled` and `pending` as well, under `FRONTEND.COMPONENTS.STATE.001`, because both describe a control rather than a page. A route has `not-found`, which a component does not, because a missing target resolves at the route. `schemas/ui-page.schema.json` holds the complete set a page sidecar can declare, including the form states `validation-error`, `saving`, and `saved`.
+
 ### Keep authenticated caching explicit (FRONTEND.RENDERING.CACHE.001)
 
 **Requirement:** Actor-specific or authorization-filtered data MUST declare a cache key, partition boundary, invalidation owner, and security review before it is cached.
@@ -69,7 +73,9 @@ A generic comment such as `Client component` does not satisfy the convention.
 
 **Requirement:** A `proxy.ts` rule MUST handle only coarse routing such as session presence, locale, or redirects.
 
-**Rationale:** It runs before the request reaches the API, so it cannot see the target resource that authorization depends on.
+**Rationale:** It runs before the request reaches the API, so it cannot see the target resource that authorization depends on. [The pinned Next.js release names this file `proxy.ts`](https://nextjs.org/blog/next-16). A project carrying the earlier `middleware.ts` name runs a file the pinned release no longer routes through.
+
+The file runs on the server. A server environment variable read there stays out of the client bundle, and `FRONTEND.DATA.SECRETS.001` states what happens to a value it passes onward.
 
 ### Define route metadata deliberately (FRONTEND.RENDERING.METADATA.001)
 

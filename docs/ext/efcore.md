@@ -171,6 +171,8 @@ When `outbox` applies to an EF Core-owned command, this extension also replaces 
 
 **Rationale:** The aggregate remains the owner of lifecycle state and state-specific business facts.
 
+A relational column holds the active state record and its discriminator, which is the same contract the baseline provider stores in its document. The column never holds an enumerated integer, because that discards the state-specific facts the record carries and reintroduces the shape `BACKEND.DOMAIN.CLOSEDSET.001` removes. A state case with its own fields maps to an owned type or to its own table. The discriminator selects which one a read materializes.
+
 ### Map stable relational state shape (EXT.EFCORE.STATE.002)
 
 **Requirement:** Infrastructure MUST map a stable discriminator and every state-specific value without adding Domain lifecycle flags or duplicate nullable state properties.
@@ -226,6 +228,8 @@ When `outbox` applies to an EF Core-owned command, this extension also replaces 
 **Requirement:** An EF Core migration MUST apply successfully from an empty database and previous release database.
 
 **Rationale:** Both initial setup and upgrade paths need tested relational evolution.
+
+The previous release database is the schema of the last released artifact, not the schema of the previous commit. The test builds it by applying that artifact's migrations to an empty database, then applies the current ones on top. A test that starts from the current migrations minus one proves that the last migration applies, which is the case least likely to be broken.
 
 ### Reject startup schema mutation (EXT.EFCORE.MIGRATION.006)
 

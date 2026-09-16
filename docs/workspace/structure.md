@@ -84,8 +84,8 @@ apps/api/
     {ProjectName}.Application/
     {ProjectName}.Infrastructure/
     {ProjectName}.WebApi/
-    {ProjectName}.AppHost/
-    {ProjectName}.ServiceDefaults/
+    {ProjectName}.AppHost/          when a local orchestration host is used
+    {ProjectName}.ServiceDefaults/  when a local orchestration host is used
   tests/
     {ProjectName}.Domain.Tests/
     {ProjectName}.Application.Tests/
@@ -93,7 +93,15 @@ apps/api/
     {ProjectName}.Architecture.Tests/
 ```
 
-Worker and Acceptance.Tests are conditional projects introduced by extensions.
+Worker and Acceptance.Tests are conditional projects introduced by extensions. `AppHost` and `ServiceDefaults` are local hosting and diagnostics projects rather than application layers. An application that orchestrates its local dependencies another way ships neither, and records no override for their absence.
+
+### Keep one workspace solution beside the API solution (WORKSPACE.STRUCTURE.DOTNET.002)
+
+**Requirement:** A workspace MAY carry one additional solution at its root that lists the .NET projects of more than one deployable unit.
+
+**Rationale:** The API solution stays at `apps/api/` and remains the one a build, a test run, and `paths.apiSolution` name. A workspace holding a second .NET deployable, such as a command-line tool, otherwise has no single file an editor can open across both. Two solution files listing overlapping projects is a supported MSBuild arrangement, and the projects themselves stay where `WORKSPACE.STRUCTURE.DOTNET.001` puts them.
+
+**Example:** A workspace with an API and a command-line tool carries `apps/api/{ProjectName}.slnx`, `apps/cli/{ProjectName}.Cli.slnx` where one exists, and a root `{ProjectName}.slnx` listing both sets.
 
 ### Keep runnable applications under apps (WORKSPACE.STRUCTURE.APPS.001)
 
@@ -159,6 +167,7 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 |:---|:---|:---|
 | WORKSPACE.STRUCTURE.TREE.001 | inspection | Root tree review compares the workspace against the layout in this section. |
 | WORKSPACE.STRUCTURE.DOTNET.001 | test | `SolutionStructureTests` asserts each project resolves under its declared source or test root. |
+| WORKSPACE.STRUCTURE.DOTNET.002 | static | `node standards/tools/validate-consumer.mjs` resolves `paths.apiSolution` to the solution under `apps/api/`, whether or not a root solution exists. |
 | WORKSPACE.STRUCTURE.APPS.001 | inspection | Root tree review confirms each runnable application sits under `apps/` and each library under `packages/`. |
 | WORKSPACE.STRUCTURE.PACKAGES.001 | inspection | Package review records the two consumers or the generated-output purpose for each shared package. |
 | WORKSPACE.STRUCTURE.DOCS.001 | inspection | Root tree review confirms every structured specification resolves under root `docs/`. |

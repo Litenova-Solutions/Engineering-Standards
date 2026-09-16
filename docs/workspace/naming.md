@@ -29,9 +29,11 @@ Names should expose business intent and architectural role without requiring a r
 
 ### Anchor aggregate-owned types on the aggregate root (WORKSPACE.NAMING.AGGREGATE.001)
 
-**Requirement:** An aggregate-owned type MUST start with its aggregate root's full name.
+**Requirement:** An aggregate-owned type's qualified name MUST start with its aggregate root's full name.
 
-**Rationale:** The name then reveals its owner without folder context. This covers events, states, child entities, values, and discriminated unions.
+**Rationale:** The name then reveals its owner without folder context. This covers events, states, child entities, values, and discriminated unions. A type nested inside a declaring type inherits that type's prefix through its qualified name. `PostState.Published` therefore satisfies this rule, and `PostStatePublishedState` repeats the anchor twice.
+
+**Example:** `PostPublishedEvent` and `PostState.Published` both lead with `Post`. `PublishedState` declared at namespace level does not.
 
 ### Use architectural suffixes (WORKSPACE.NAMING.SUFFIX.001)
 
@@ -50,6 +52,9 @@ Names should expose business intent and architectural role without requiring a r
 | Query result item | `{UseCase}QueryResultItem` | `ListPostsQueryResultItem` |
 | Query handler | `{UseCase}QueryHandler` | `GetPostQueryHandler` |
 | Query validator | `{UseCase}QueryValidator` | `GetPostQueryValidator` |
+| Aggregate state base | `{Aggregate}State` | `PostState` |
+| Aggregate state case, flat | `{Aggregate}{State}State` | `PostPublishedState` |
+| Aggregate state case, nested | `{Aggregate}State.{State}` | `PostState.Published` |
 | Domain event | `{Aggregate}{PastFact}Event` | `PostPublishedEvent` |
 | Event handler | `{Action}On{PastFact}Handler` | `NotifySubscribersOnPostPublishedHandler` |
 | Workflow | `{BusinessPurpose}Workflow` | `OrderFulfillmentWorkflow` |
@@ -133,15 +138,15 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Including `src` or `apps` in a namespace couples the type name to a workspace layout decision.
+**Rationale:** Including `src` or `apps` in a namespace couples the type name to a workspace layout decision. The project root is the directory holding the project file, so every folder above it is outside the namespace.
 
 ### Avoid generic type names (WORKSPACE.NAMING.CONVENTION.003)
 
-**Default:** Avoid `Manager`, `Helper`, `Processor`, `Common`, `Utility`, `BaseService`, `DataService`, and `MessageBus` when a narrower name exists.
+**Default:** Avoid `Manager`, `Helper`, `Processor`, `Common`, `Utility`, `BaseService`, `DataService`, `MessageBus`, `Engine`, `Facade`, `Wrapper`, and `Factory` when a narrower name exists.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A generic name invites unrelated responsibility, because nothing in it excludes the next addition.
+**Rationale:** A generic name invites unrelated responsibility, because nothing in it excludes the next addition. `Factory` is generic on a class and exact on a named static aggregate factory method, so the default names the class and not the method.
 
 ### Derive boundary names from the ubiquitous term (WORKSPACE.NAMING.CONVENTION.004)
 

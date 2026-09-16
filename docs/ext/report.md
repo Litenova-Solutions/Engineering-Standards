@@ -14,7 +14,7 @@ The consumer enables `report` for a documented query or export with complex rela
 
 ## Baseline relationship
 
-This extension does not replace the baseline rule for ordinary queries. Long-running exports activate Worker under `BACKEND.ARCHITECTURE.WORKER.001`.
+This extension does not replace the baseline rule for ordinary queries. Long-running exports activate `BACKEND.ARCHITECTURE.WORKER.002`, so the project declares the execution host that runs them.
 
 ## Agent Summary {#agent-summary}
 
@@ -93,6 +93,14 @@ This extension does not replace the baseline rule for ordinary queries. Long-run
 
 **Rationale:** Spreadsheet applications can interpret unescaped values as executable formulas.
 
+### Reject formula-leading import values (EXT.REPORT.CONTENT.003)
+
+**Requirement:** A CSV or spreadsheet import MUST reject or neutralize a value that begins with a formula-leading character.
+
+**Rationale:** The formula-leading characters are the equals sign, the plus sign, the minus sign, the at sign, the tab, and the carriage return. Escaping on the way out protects the reader of this export. It does not protect the reader of the next one. An imported value stored unchanged is re-exported by a different report that may not escape it. [CSV injection](https://owasp.org/www-community/attacks/CSV_Injection) travels through the store, so the boundary that admits the value is where it stops.
+
+**Example:** An import that rejects the value reports the row and the field. An import that neutralizes it records what it changed, because a silently altered value is a data defect the owner cannot see.
+
 ### Define export encoding and columns (EXT.REPORT.CONTENT.002)
 
 **Requirement:** An export format MUST use explicit character encoding and a stable column contract.
@@ -145,6 +153,7 @@ No report or object-storage package is selected by default. Each provider needs 
 | EXT.REPORT.LIMITS.002 | test | `ReportLimitsTests` stop work and remove expired output. |
 | EXT.REPORT.CONTENT.001 | test | `ReportContentTests` asserts formula-leading export values are escaped except reviewed formula fields. |
 | EXT.REPORT.CONTENT.002 | test | `ReportContentTests` assert explicit encoding and stable column order. |
+| EXT.REPORT.CONTENT.003 | test | `ReportContentTests` assert an imported formula-leading value is rejected or recorded as neutralized. |
 | EXT.REPORT.CONVENTION.001 | inspection | Report definitions remain module-owned in Application or record a replacement. |
 | EXT.REPORT.CONVENTION.002 | inspection | SQL and storage code remain in Infrastructure or record a replacement. |
 | EXT.REPORT.CONVENTION.003 | inspection | Worker code does not contain report business rule ownership. |

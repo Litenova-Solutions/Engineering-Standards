@@ -37,7 +37,7 @@ Each step links the standard that governs it. Read that page before running the 
 ### Implement
 
 9. Model the domain with [domain](../backend/domain.md), using [model a domain](model-domain.md) as the worked procedure.
-10. Coordinate use cases with [application](../backend/application.md) and store them with [Marten persistence](../backend/persistence.md).
+10. Coordinate use cases with [application](../backend/application.md) and store them through [persistence](../backend/persistence.md).
 11. Expose operations with [HTTP API](../backend/api.md) and secure them with [security](../quality/security.md).
 12. Declare each React frontend and install its pinned UI baseline, following [frontend structure](../frontend/structure.md) and [controlled UI governance](../frontend/ui.md).
 13. Create UI vocabulary and page sidecars for each non-trivial visible route, following [controlled UI governance](../frontend/ui.md).

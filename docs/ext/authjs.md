@@ -44,7 +44,7 @@ This extension adds pinned Auth.js and JOSE packages. It replaces no backend aut
 
 **Requirement:** A session cookie MUST use `HttpOnly`, `Secure` outside local HTTP development, explicit `SameSite`, bounded lifetime, and a narrow path.
 
-**Rationale:** Cookie attributes constrain browser exposure, cross-site use, lifetime, and delivery path.
+**Rationale:** Cookie attributes constrain browser exposure, cross-site use, lifetime, and delivery path. `SameSite=Lax` is the baseline, because it blocks the cross-site POST that request forgery relies on and still allows the top-level navigation a sign-in redirect needs. `SameSite=Strict` is the value for a cookie that authorizes a change with no safe reversal, and it breaks every inbound link into an authenticated page. `SameSite=None` requires `Secure` and a recorded decision naming the cross-site flow that needs it. [The OWASP session management guidance](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html) states the same split.
 
 ### Keep provider tokens server-side (EXT.AUTHJS.SESSION.002)
 
@@ -78,9 +78,11 @@ This extension adds pinned Auth.js and JOSE packages. It replaces no backend aut
 
 ### Use a server API boundary (EXT.AUTHJS.API.001)
 
-**Requirement:** A frontend MUST use Server Components, Server Actions, or Route Handlers to attach protected API tokens server-side.
+**Requirement:** A frontend MUST use Server Components, Server Actions, Route Handlers, or the edge proxy to attach protected API tokens server-side.
 
 **Rationale:** Server ownership keeps provider tokens outside browser bundles and browser storage.
+
+The edge proxy is a server boundary and belongs in that list. It runs before the request reaches a route and reads a server environment variable without inlining it into the client bundle. It is where a session cookie becomes a header. `FRONTEND.RENDERING.PROXY.001` still bounds what it may decide, so it attaches a token and never authorizes a resource.
 
 ### Keep browser token access absent (EXT.AUTHJS.API.002)
 
@@ -141,6 +143,8 @@ This extension adds pinned Auth.js and JOSE packages. It replaces no backend aut
 **Requirement:** A cookie-authenticated server boundary MUST validate origin or an approved anti-forgery token before state change.
 
 **Rationale:** Project-owned Route Handlers and Server Actions cross the browser trust boundary.
+
+The allowed origins come from validated configuration, which is the same source `QUALITY.SECURITY.CORS.001` requires for the cross-origin allowlist. A wildcard, a suffix match, and a request header are not sources: each one accepts an origin the project never listed. A missing `Origin` header on a state-changing request is a rejection rather than a pass. [The OWASP request forgery guidance](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html) states the same.
 
 ### Use POST for browser state changes (EXT.AUTHJS.CSRF.003)
 

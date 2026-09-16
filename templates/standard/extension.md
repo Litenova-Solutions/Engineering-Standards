@@ -14,7 +14,7 @@ Activate this extension when one exact current condition applies.
 
 ## Baseline relationship
 
-This extension replaces no baseline provision.
+This extension replaces `{AREA.PAGE.TOPIC.001}`, or states that it replaces no baseline provision.
 
 ## Agent Summary {#agent-summary}
 

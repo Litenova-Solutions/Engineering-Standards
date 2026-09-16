@@ -8,7 +8,10 @@
   "required": ["schemaVersion", "terms", "mannered"],
   "properties": {
     "$schema": { "type": "string" },
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": {
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See CORE.AUTHORING.SNAPSHOT.003 and CORE.AUTHORING.SNAPSHOT.004.",
+      "const": 1
+    },
     "terms": {
       "description": "One entry per concept. The glossary defines the meaning; this record is what the validator reads.",
       "type": "array",

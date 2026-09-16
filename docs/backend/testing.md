@@ -35,7 +35,7 @@ apps/api/tests/{ProjectName}.Integration.Tests/
 apps/api/tests/{ProjectName}.Architecture.Tests/
 ```
 
-Acceptance.Tests appears only when the executable BDD extension activates.
+Acceptance.Tests appears only when the executable BDD extension activates. A solution that ships a project of that name without selecting `bdd` has an unnamed fifth baseline project, which this rule refuses. Select the extension, or name the project for what it actually is.
 
 ### Test Domain in isolation (BACKEND.TESTING.DOMAIN.001)
 
@@ -102,6 +102,8 @@ The trace is one-way. Internal implementation tests do not need an acceptance ID
 **Requirement:** The integration project MUST own one PostgreSQL container fixture, one `ApiFactory`, and one `DatabaseReset` helper.
 
 **Rationale:** The fixture starts the pinned PostgreSQL once per collection and supplies its connection string before the host builds, so every test sees the same configuration.
+
+"One harness" binds the integration project. An activated BDD extension brings its own host for the acceptance project, because the two projects run different lifetimes. That second host reuses this fixture's container and reset helper rather than starting another database.
 
 ## Conventions
 

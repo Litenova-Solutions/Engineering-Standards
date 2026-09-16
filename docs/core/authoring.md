@@ -94,8 +94,12 @@ A reader arrives at one of four layers, and each layer answers a different quest
 |:---|:---|:---|
 | 1 | Tutorial | How do I get a first working result? |
 | 2 | How-to | How do I reach this one stated goal? |
-| 3 | Reference, Command, Configuration | What are the exact values, options, and defaults? |
+| 3 | Topic, Profile, Extension, Reference, Command, Configuration | What are the exact values, options, and defaults? |
 | 4 | Underneath | What does the command run, and how do I run it myself? |
+
+A topic, profile, and extension page each state exact obligations for a reader who already has the system running. Each one therefore sits at layer 3, beside the other exact-value pages.
+
+An index and the glossary carry no layer. An index routes a reader to a page, and the glossary resolves one term. Neither answers a question about the subject itself.
 
 The order is a reading order rather than an authoring order. A page links down to the next layer and never up. A reader who wants more detail always has one step available, and never has to take it.
 
@@ -518,7 +522,9 @@ Every command declares an audit position. To count the declarations:
 
 **Requirement:** Current standards material MUST NOT contain history-specific paths, IDs, terminology, aliases, replacement maps, standards-release migration material, compatibility rules, or transition checks.
 
-**Rationale:** The published snapshot states its own contract without carrying previous releases forward.
+**Rationale:** The published snapshot states its own contract without carrying previous releases forward. The prohibited material is the kind that relates one release to another. An extension page's `Baseline relationship` section names a provision the extension replaces inside this release. A profile page's `Composition` section lists the pages this release composes. Neither section is history.
+
+**Example:** An extension page naming the baseline provision it replaces states a relationship inside the current contract. A page recording that a provision carried another identifier in an earlier release states a relationship between releases, and is invalid.
 
 ### Publish each release as a complete contract (CORE.AUTHORING.SNAPSHOT.003)
 

@@ -61,6 +61,8 @@ tests/
 
 **Rationale:** Directory size does not describe what a visitor waits for, so the measurement uses transfer size.
 
+The measurement names the tool that produced it and the compression it applied. Two tools reporting different numbers for one payload make a budget unreviewable. A published size-limit tool holding the budget in its configuration is the baseline. A project-owned script recording the same two facts is equally valid.
+
 ## Conventions
 
 ### Keep browser-capability tests honest (BLAZOR.TESTING.CONVENTION.001)
