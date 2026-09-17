@@ -83,6 +83,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Audit trail](ext/audit.md)
 - [Auth.js frontend authentication](ext/authjs.md)
 - [Localization](ext/locale.md)
+- [Model Context Protocol](ext/mcp.md)
 - [Multitenancy](ext/tenancy.md)
 - [Outbox worker](ext/outbox.md)
 - [EF Core persistence](ext/efcore.md)

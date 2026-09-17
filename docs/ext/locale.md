@@ -21,6 +21,7 @@ The product brief or decision records locales, default locale, fallback behavior
 - Record supported locale behavior. (EXT.LOCALE.ADOPT.001)
 - Keep localized routes canonical. (EXT.LOCALE.ROUTES.001, EXT.LOCALE.ROUTES.003)
 - Store copy under stable semantic keys. (EXT.LOCALE.MESSAGES.001, EXT.LOCALE.MESSAGES.002)
+- Write validation copy by the grammar and humanize every shown identifier. (EXT.LOCALE.MESSAGES.004, EXT.LOCALE.MESSAGES.005)
 - Format user-facing values by locale. (EXT.LOCALE.FORMAT.001)
 - Keep Domain and API values locale-neutral. (EXT.LOCALE.FORMAT.002)
 - Localize safe public content without changing error codes. (EXT.LOCALE.CONTENT.001, EXT.LOCALE.CONTENT.002)
@@ -82,6 +83,22 @@ The product brief or decision records locales, default locale, fallback behavior
 The declaration states the fallback locale and what a missing key does at build time. A key missing from the default locale fails the build, because no fallback exists for it and the interface would render its identifier. A key missing from a non-default locale reports a warning and falls back. Shipping one untranslated string costs less than blocking a release on it.
 
 **Example:** A catalog check runs in the frontend lint gate, so the two outcomes are visible before review rather than in a browser.
+
+### Follow the validation message grammar (EXT.LOCALE.MESSAGES.004)
+
+**Requirement:** A validation catalog MUST write empty-field errors as field-naming imperatives and format or length errors with the concrete bound, without `please`.
+
+**Rationale:** [The GOV.UK Design System](https://design-system.service.gov.uk/components/error-message/) separates the two forms because each answers a different failure. An imperative tells the reader what to do next, and a bound tells the reader what the limit is rather than that one exists.
+
+**Example:** The empty case is "Enter your email address". The format case is "Enter an email address in the correct format, like name@example.com". A length case carries the count: "Name must be 200 characters or less".
+
+### Resolve every shown identifier (EXT.LOCALE.MESSAGES.005)
+
+**Requirement:** A screen MUST resolve every machine identifier it renders to a humanized catalog label and never render the raw identifier.
+
+**Rationale:** The identifier is a contract value and the label is copy. A resolution value, a refusal ground, a role code, or a billing state carries its label beside the rest of the screen's copy.
+
+**Example:** An oversell resolution row shows "Stock returned" from the catalog rather than `inventory-reacquired`.
 
 ### Format values with active locale (EXT.LOCALE.FORMAT.001)
 
@@ -161,6 +178,8 @@ No library is selected by this extension. A localization package needs a decisio
 | EXT.LOCALE.MESSAGES.001 | static | `LocaleMessagesTests` resolves copy through locale catalogs. |
 | EXT.LOCALE.MESSAGES.002 | inspection | Catalog review identifies semantic message keys. |
 | EXT.LOCALE.MESSAGES.003 | test | `LocaleMessagesTests` asserts each supported locale resolves required keys or declared fallback. |
+| EXT.LOCALE.MESSAGES.004 | inspection | Catalog review asserts each empty-field message is imperative and each bound message states the count. |
+| EXT.LOCALE.MESSAGES.005 | inspection | Screen review finds no raw kebab-case or dotted identifier rendered without a catalog label. |
 | EXT.LOCALE.FORMAT.001 | test | `LocaleFormatTests` verify dates, numbers, currency, plurals, lists, and relative time. |
 | EXT.LOCALE.FORMAT.002 | inspection | Domain and OpenAPI review confirms locale-neutral stored and wire values. |
 | EXT.LOCALE.CONTENT.001 | test | `LocaleContentTests` render metadata, labels, validation, and safe errors in active locale. |

@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 869 provisions across 8 areas.
+The active release states 879 provisions across 8 areas.
 
 ## BACKEND
 
@@ -22,10 +22,14 @@ The active release states 869 provisions across 8 areas.
 | BACKEND.API.CONVENTION.003 | [Name routes from resources](../backend/api.md#name-routes-from-resources-backendapiconvention003) | `backend/api.md` |
 | BACKEND.API.CONVENTION.004 | [Keep numeric transport types precise](../backend/api.md#keep-numeric-transport-types-precise-backendapiconvention004) | `backend/api.md` |
 | BACKEND.API.CONVENTION.005 | [Keep Program.cs as composition](../backend/api.md#keep-programcs-as-composition-backendapiconvention005) | `backend/api.md` |
+| BACKEND.API.CONVENTION.006 | [Model a monetary value as one object](../backend/api.md#model-a-monetary-value-as-one-object-backendapiconvention006) | `backend/api.md` |
+| BACKEND.API.CONVENTION.007 | [Name transport fields by one rule set](../backend/api.md#name-transport-fields-by-one-rule-set-backendapiconvention007) | `backend/api.md` |
 | BACKEND.API.ENDPOINTS.001 | [Use one endpoint per operation](../backend/api.md#use-one-endpoint-per-operation-backendapiendpoints001) | `backend/api.md` |
 | BACKEND.API.ENDPOINTS.002 | [Exclude MVC controllers from the profile](../backend/api.md#exclude-mvc-controllers-from-the-profile-backendapiendpoints002) | `backend/api.md` |
 | BACKEND.API.ERROR.001 | [Return stable Problem Details](../backend/api.md#return-stable-problem-details-backendapierror001) | `backend/api.md` |
 | BACKEND.API.ERROR.002 | [Keep error responses free of internal detail](../backend/api.md#keep-error-responses-free-of-internal-detail-backendapierror002) | `backend/api.md` |
+| BACKEND.API.METHODS.001 | [Apply PATCH to a partial update](../backend/api.md#apply-patch-to-a-partial-update-backendapimethods001) | `backend/api.md` |
+| BACKEND.API.METHODS.002 | [Use PUT for a whole replacement](../backend/api.md#use-put-for-a-whole-replacement-backendapimethods002) | `backend/api.md` |
 | BACKEND.API.MODEL.001 | [Mirror a Domain closed set as a transport model of the same shape](../backend/api.md#mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape-backendapimodel001) | `backend/api.md` |
 | BACKEND.API.MODEL.002 | [Reject a collapsed or borrowed wire contract](../backend/api.md#reject-a-collapsed-or-borrowed-wire-contract-backendapimodel002) | `backend/api.md` |
 | BACKEND.API.OPENAPI.001 | [Treat OpenAPI as a generated contract](../backend/api.md#treat-openapi-as-a-generated-contract-backendapiopenapi001) | `backend/api.md` |
@@ -34,6 +38,7 @@ The active release states 869 provisions across 8 areas.
 | BACKEND.API.OPENAPI.004 | [Commit the generated contract its consumers read](../backend/api.md#commit-the-generated-contract-its-consumers-read-backendapiopenapi004) | `backend/api.md` |
 | BACKEND.API.PAGING.001 | [Bound collection queries](../backend/api.md#bound-collection-queries-backendapipaging001) | `backend/api.md` |
 | BACKEND.API.ROUTES.001 | [Keep routes resource-oriented](../backend/api.md#keep-routes-resource-oriented-backendapiroutes001) | `backend/api.md` |
+| BACKEND.API.ROUTES.002 | [State an unexpressible transition as a custom method](../backend/api.md#state-an-unexpressible-transition-as-a-custom-method-backendapiroutes002) | `backend/api.md` |
 | BACKEND.API.STATUS.001 | [Use consistent status codes](../backend/api.md#use-consistent-status-codes-backendapistatus001) | `backend/api.md` |
 | BACKEND.API.STATUS.002 | [Reject a success status for a failed outcome](../backend/api.md#reject-a-success-status-for-a-failed-outcome-backendapistatus002) | `backend/api.md` |
 | BACKEND.APPLICATION.AUTHZ.001 | [Enforce target authorization in the pipeline](../backend/application.md#enforce-target-authorization-in-the-pipeline-backendapplicationauthz001) | `backend/application.md` |
@@ -625,9 +630,14 @@ The active release states 869 provisions across 8 areas.
 | EXT.LOCALE.MESSAGES.001 | [Store user-facing copy in catalogs](../ext/locale.md#store-user-facing-copy-in-catalogs-extlocalemessages001) | `ext/locale.md` |
 | EXT.LOCALE.MESSAGES.002 | [Name messages by meaning](../ext/locale.md#name-messages-by-meaning-extlocalemessages002) | `ext/locale.md` |
 | EXT.LOCALE.MESSAGES.003 | [Complete or fall back catalog values](../ext/locale.md#complete-or-fall-back-catalog-values-extlocalemessages003) | `ext/locale.md` |
+| EXT.LOCALE.MESSAGES.004 | [Follow the validation message grammar](../ext/locale.md#follow-the-validation-message-grammar-extlocalemessages004) | `ext/locale.md` |
+| EXT.LOCALE.MESSAGES.005 | [Resolve every shown identifier](../ext/locale.md#resolve-every-shown-identifier-extlocalemessages005) | `ext/locale.md` |
 | EXT.LOCALE.ROUTES.001 | [Define one locale route shape](../ext/locale.md#define-one-locale-route-shape-extlocaleroutes001) | `ext/locale.md` |
 | EXT.LOCALE.ROUTES.002 | [Handle unavailable locale segments](../ext/locale.md#handle-unavailable-locale-segments-extlocaleroutes002) | `ext/locale.md` |
 | EXT.LOCALE.ROUTES.003 | [Avoid duplicate localized URLs](../ext/locale.md#avoid-duplicate-localized-urls-extlocaleroutes003) | `ext/locale.md` |
+| EXT.MCP.CONVENTION.001 | [State the refusing side on each refusal](../ext/mcp.md#state-the-refusing-side-on-each-refusal-extmcpconvention001) | `ext/mcp.md` |
+| EXT.MCP.SERVER.001 | [Pass server instructions at initialize](../ext/mcp.md#pass-server-instructions-at-initialize-extmcpserver001) | `ext/mcp.md` |
+| EXT.MCP.TOOLS.001 | [Write one tool description for one decision](../ext/mcp.md#write-one-tool-description-for-one-decision-extmcptools001) | `ext/mcp.md` |
 | EXT.OUTBOX.ADOPT.001 | [Record durable delivery behavior](../ext/outbox.md#record-durable-delivery-behavior-extoutboxadopt001) | `ext/outbox.md` |
 | EXT.OUTBOX.ADOPT.002 | [Exclude manually repeatable reactions](../ext/outbox.md#exclude-manually-repeatable-reactions-extoutboxadopt002) | `ext/outbox.md` |
 | EXT.OUTBOX.ATOMIC.001 | [Stage messages with business work](../ext/outbox.md#stage-messages-with-business-work-extoutboxatomic001) | `ext/outbox.md` |

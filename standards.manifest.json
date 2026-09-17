@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
   "schemaVersion": 4,
-  "version": "1.17.0",
+  "version": "1.18.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "defaultProfile": "dotnet-nextjs",
@@ -148,6 +148,7 @@
       "LOCAL",
       "MAPPING",
       "MEDIATOR",
+      "METHODS",
       "MESSAGES",
       "METADATA",
       "MIGRATION",
@@ -380,6 +381,10 @@
     },
     "locale": {
       "path": "docs/ext/locale.md",
+      "activationScope": "project"
+    },
+    "mcp": {
+      "path": "docs/ext/mcp.md",
       "activationScope": "project"
     },
     "tenancy": {

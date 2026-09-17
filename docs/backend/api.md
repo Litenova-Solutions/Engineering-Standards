@@ -13,8 +13,8 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 - Errors return Problem Details with a stable code and trace identifier. (BACKEND.API.ERROR.001)
 - Error responses carry no exception, stack, SQL, provider, or secret text. (BACKEND.API.ERROR.002)
 - Collection reads carry deterministic ordering and a bounded limit. (BACKEND.API.PAGING.001)
-- OpenAPI is generated during the Release build and committed when consumed. (BACKEND.API.OPENAPI.001)
-- The contract declares the authentication that endpoints enforce. (BACKEND.API.OPENAPI.002)
+- Custom methods carry transitions, and naming rules bind money and fields. (BACKEND.API.ROUTES.002, BACKEND.API.METHODS.001, BACKEND.API.CONVENTION.006, BACKEND.API.CONVENTION.007)
+- The contract is generated, committed, and declares authentication. (BACKEND.API.OPENAPI.001, BACKEND.API.OPENAPI.002)
 - Transport models mirror the shape of the Domain closed set they carry. (BACKEND.API.MODEL.001, BACKEND.API.MODEL.002)
 
 ## Standards
@@ -107,7 +107,7 @@ A collection endpoint has no single target resource. Its authorization is the da
 }
 ```
 
-`type` is a stable absolute URI owned by the consumer. `errors` appears only when field or message validation entries exist. WebApi maps Application member names to their public JSON field names. `traceId` carries the trace identifier from the current [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent`, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
+`type` is a stable absolute URI owned by the consumer. `errors` appears only when field or message validation entries exist. `code` carries the categorised failure class, and `detail` carries the free-form prose explanation; a request body names the same pair `code` and `reason` under `BACKEND.API.CONVENTION.007`. WebApi maps Application member names to their public JSON field names. `traceId` carries the trace identifier from the current [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent`, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
 
 The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. It maps validation exceptions to 400, missing targets through the operation's 404 policy, and forbidden failures to 403 or the declared 404 disclosure policy. It maps conflicts and state rejections to 409, and unexpected exceptions to 500 with code `internal_error`. It maps known Domain exception types individually. It does not report cancellation from a disconnected request as an application error.
 
@@ -150,6 +150,38 @@ The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. I
 **Rationale:** A predictable route shape lets a caller derive an unfamiliar operation from a familiar one.
 
 **Example:** A route carries the authenticated actor identifier only when that actor is intentionally addressing another actor as a resource.
+
+### State an unexpressible transition as a custom method (BACKEND.API.ROUTES.002)
+
+**Requirement:** A WebApi route MUST express a state transition the five HTTP verbs cannot carry as a POST custom method ending in a colon-suffixed verb.
+
+**Rationale:** [AIP-136](https://google.aip.dev/136) defines the custom-method form for actions outside the five standard methods. A path segment names a resource. A state-noun segment such as `/closure` and a bare verb segment such as `/abandon` both encode the action, so neither predicts the other. The colon marks the final segment as a command rather than a nested resource.
+
+**Example:**
+
+```text
+POST /api/events/{eventId}:cancel
+POST /api/organizations/{organizerId}:close
+POST /api/orders/{orderId}/refund-requests/{refundId}:decide
+```
+
+The operationId keeps its verb-noun form, so `CancelEvent` names the same transition the path states.
+
+### Apply PATCH to a partial update (BACKEND.API.METHODS.001)
+
+**Requirement:** A WebApi operation MUST apply a partial update with PATCH and the `application/merge-patch+json` media type.
+
+**Rationale:** [RFC 5789](https://datatracker.ietf.org/doc/html/rfc5789) defines PATCH and [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386) defines the merge-patch media type. A PUT body for a partial change either repeats fields the caller does not change or invents merge semantics per field.
+
+**Example:** A partial update sends only the changed members with `Content-Type: application/merge-patch+json`, and the endpoint reads the body as a sparse patch. A PUT keeps replacing the whole resource, and DELETE stays a hard-state transition.
+
+### Use PUT for a whole replacement (BACKEND.API.METHODS.002)
+
+**Requirement:** A PUT operation MUST replace the whole resource or sub-resource its path names.
+
+**Rationale:** A PUT body that carries a subset forces the server to choose between dropping omitted members and inventing per-field merges. The partial path is PATCH under `BACKEND.API.METHODS.001`.
+
+**Example:** A whole replacement sends every editable member, and an omitted member removes its value rather than keeping the stored one.
 
 ### Bound collection queries (BACKEND.API.PAGING.001)
 
@@ -330,6 +362,28 @@ GET    /api/posts?after={cursor}&limit=20
 
 **Example:** The visible order is trusted forwarded headers, exception handling, transport security, authentication, authorization, endpoints, then health. Forwarded headers appear only when the deployment boundary requires trusted proxies. OpenAPI and Scalar map only in Development. `Program.cs` ends with an empty `public partial class Program` so the integration test host can target the real entry point.
 
+### Model a monetary value as one object (BACKEND.API.CONVENTION.006)
+
+**Default:** Carry every monetary value as one `Money` transport object holding `amount` and an ISO 4217 `currency`.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Split sibling fields pair by a server invariant the schema cannot see, so a report reads the two independently. `BACKEND.DOMAIN.MONEY.001` already carries the same shape in the Domain, and the transport model mirrors it.
+
+**Example:** `unitPrice` and `currencyCode` become `price` of type `Money`. An amount that mirrors an order's currency carries it explicitly rather than by adjacency.
+
+### Name transport fields by one rule set (BACKEND.API.CONVENTION.007)
+
+**Default:** Name transport fields with positive booleans, one `At` time suffix, standard vocabulary names, `code` beside `reason`, per-resource path parameters, and no noise word.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** A type prefix repeats what the schema already declares. A mixed suffix set hides which shape a field carries, and a noise word names nothing an integrator can act on.
+
+**Example:** `isBuyable` becomes `buyable`, `placedAt` becomes `createdAt`, `defaultLocaleTag` becomes `defaultLanguageTag`, `keyName` becomes `displayName`, and `/details` takes the aggregate name.
+
+The rule set names the standard behind each clause. The boolean and noise-word clauses trace to the Azure naming conventions and the Microsoft Style Guide. The `At` suffix traces to [AIP-142](https://google.aip.dev/142), the boolean form to [AIP-140](https://google.aip.dev/140), and `languageTag` to [RFC 5646](https://datatracker.ietf.org/doc/html/rfc5646).
+
 ## Reference example
 
 This informative example demonstrates `BACKEND.API.BOUNDARY.001` and `BACKEND.API.MODEL.001`.
@@ -354,12 +408,17 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 | BACKEND.API.STATUS.001 | test | `StatusContractTests` asserts the outcome-table status code for each documented result. |
 | BACKEND.API.STATUS.002 | test | `StatusContractTests` asserts every documented error path returns its declared non-success status. |
 | BACKEND.API.ROUTES.001 | static | `RouteShapeTests` asserts lowercase plural segments, kebab-case subresources, and identity outside the body. |
+| BACKEND.API.ROUTES.002 | static | `apps/api/openapi/Entro.json` states each unexpressible transition as POST with a colon-suffixed final path segment. |
+| BACKEND.API.METHODS.001 | static | `apps/api/openapi/Entro.json` declares `application/merge-patch+json` on each partial update and PUT on no partial update. |
+| BACKEND.API.METHODS.002 | static | `apps/api/openapi/Entro.json` declares PUT on whole-replacement operations only. |
 | BACKEND.API.PAGING.001 | test | `CollectionPagingTests` asserts deterministic ordering, the default limit, and rejection above the maximum. |
 | BACKEND.API.OPENAPI.001 | static | A Release build regenerates `apps/api/openapi/` and CI fails when regeneration changes the tree. |
 | BACKEND.API.OPENAPI.004 | static | The committed `apps/api/openapi/` artifact exists for each consumer-read contract and CI fails on a difference. |
 | BACKEND.API.OPENAPI.002 | test | `OpenApiSecurityTests` asserts every operation with an authorization policy declares a matching security entry. |
 | BACKEND.API.OPENAPI.003 | test | `OpenApiSchemaTests` asserts closed-set fields publish an enum or oneOf and control headers are required. |
 | BACKEND.API.MODEL.001 | test | `PolymorphicContractTests` round-trips every union case and asserts the discriminator equals its Domain case code. |
+| BACKEND.API.CONVENTION.006 | static | `apps/api/openapi/Entro.json` carries a `Money` schema and every monetary field references it. |
+| BACKEND.API.CONVENTION.007 | inspection | A schema review of `apps/api/openapi/Entro.json` finds no banned prefix, no banned noise word, and one suffix per time shape. |
 | BACKEND.API.MODEL.002 | test | `PolymorphicContractTests` asserts no data-bearing set serializes as an enum and no inner-layer type reaches the wire. |
 | BACKEND.API.CONVENTION.001 | inspection | Endpoint folder review locates each operation under its module and aggregate, or records a named local replacement. |
 | BACKEND.API.CONVENTION.002 | static | `TransportNamingTests` asserts each transport type ends in RequestModel, ResponseModel, Model, or ApiMappings. |

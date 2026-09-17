@@ -20,6 +20,7 @@ An extension may add requirements, packages, projects, and verification. It may 
 | [audit](audit.md) | `project` | None | A reviewer must establish who acted inside data another party owns. |
 | [authjs](authjs.md) | `project` | None | Next.js owns interactive login and session cookies. |
 | [locale](locale.md) | `project` | None | The product commits to more than one locale. |
+| [mcp](mcp.md) | `project` | None | The product ships a Model Context Protocol server an LLM client starts on a user's own machine. |
 | [tenancy](tenancy.md) | `project` | None | Independent customer organizations share one deployment. |
 | [outbox](outbox.md) | `local` | Use case, Workflow, End-to-End Flow | A committed change requires delivery that cannot be lost. |
 | [efcore](efcore.md) | `local` | Module, Use case | Selected aggregates require relational persistence instead of Marten. |
