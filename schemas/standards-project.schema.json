@@ -59,6 +59,12 @@
           }
         },
         "domainDocs": { "$ref": "#/$defs/projectPath" },
+        "testRoots": {
+          "description": "Directories holding automated test source. An acceptance criterion is cited from one of these, as a scenario tag, a C# AcceptanceCriterion trait, or a bracketed browser-test title.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        },
         "surfaces": {
           "description": "The surfaces outside paths.frontends that invoke a use case: a command-line tool, a distributed server, a background host, an event reaction. Each frontend is already a surface under its own name. A Consumers row names one of these.",
           "type": "array",

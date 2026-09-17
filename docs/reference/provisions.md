@@ -138,7 +138,7 @@ The active release states 883 provisions across 8 areas.
 | BACKEND.TESTING.INTEGRATION.001 | [Test persistence and HTTP with PostgreSQL](../backend/testing.md#test-persistence-and-http-with-postgresql-backendtestingintegration001) | `backend/testing.md` |
 | BACKEND.TESTING.ISOLATION.001 | [Isolate integration state](../backend/testing.md#isolate-integration-state-backendtestingisolation001) | `backend/testing.md` |
 | BACKEND.TESTING.PROJECTS.001 | [Use four baseline test projects](../backend/testing.md#use-four-baseline-test-projects-backendtestingprojects001) | `backend/testing.md` |
-| BACKEND.TESTING.TRACE.001 | [Trace acceptance criteria](../backend/testing.md#trace-acceptance-criteria-backendtestingtrace001) | `backend/testing.md` |
+| BACKEND.TESTING.TRACE.002 | [Cite an acceptance criterion in one exact form](../backend/testing.md#cite-an-acceptance-criterion-in-one-exact-form-backendtestingtrace002) | `backend/testing.md` |
 
 ## BLAZOR
 
@@ -786,7 +786,7 @@ The active release states 883 provisions across 8 areas.
 | FRONTEND.TESTING.LEVEL.001 | [Match test level to risk](../frontend/testing.md#match-test-level-to-risk-frontendtestinglevel001) | `frontend/testing.md` |
 | FRONTEND.TESTING.MOCKS.001 | [Keep mocks at owned boundaries](../frontend/testing.md#keep-mocks-at-owned-boundaries-frontendtestingmocks001) | `frontend/testing.md` |
 | FRONTEND.TESTING.STATE.001 | [Test observable states](../frontend/testing.md#test-observable-states-frontendtestingstate001) | `frontend/testing.md` |
-| FRONTEND.TESTING.TRACE.001 | [Trace acceptance behavior](../frontend/testing.md#trace-acceptance-behavior-frontendtestingtrace001) | `frontend/testing.md` |
+| FRONTEND.TESTING.TRACE.002 | [Start a proving test title with its criterion](../frontend/testing.md#start-a-proving-test-title-with-its-criterion-frontendtestingtrace002) | `frontend/testing.md` |
 | FRONTEND.TESTING.UI.001 | [Prove controlled UI changes](../frontend/testing.md#prove-controlled-ui-changes-frontendtestingui001) | `frontend/testing.md` |
 | FRONTEND.UI.ACCEPTANCE.001 | [Resolve every acceptance identifier](../frontend/ui.md#resolve-every-acceptance-identifier-frontenduiacceptance001) | `frontend/ui.md` |
 | FRONTEND.UI.COMPANION.001 | [Govern behavior companions and specialist controls](../frontend/ui.md#govern-behavior-companions-and-specialist-controls-frontenduicompanion001) | `frontend/ui.md` |

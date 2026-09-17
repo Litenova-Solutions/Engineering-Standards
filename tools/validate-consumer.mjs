@@ -571,6 +571,79 @@ for (const screen of screenPages) {
   }
 }
 
+// ---- acceptance citation ---------------------------------------------------
+// The trace rules named a form each and nothing read the test source, so a page
+// could claim 'verified' while no test carried its identifier. Each form is read
+// where its tool puts it: a tag line in a feature file, one trait key in C#, and
+// the opening of a browser-test title. A bare identifier in a comment or a
+// variable name cites nothing. (BACKEND.TESTING.TRACE.002,
+// FRONTEND.TESTING.TRACE.002, EXT.BDD.TRACE.001)
+const testRoots = Array.isArray(project.paths?.testRoots) ? project.paths.testRoots : [];
+const GHERKIN_TAG_LINE = /^[ \t]*@[^\n]*$/;
+const TAG = /@(AC-[A-Z0-9-]+)/g;
+const TRAIT = /\[\s*Trait\s*\(\s*"AcceptanceCriterion"\s*,\s*"(AC-[A-Z0-9-]+)"\s*\)\s*\]/g;
+const TITLE = /['"`]\s*\[(AC-[A-Z0-9-]+)\]/g;
+const TEST_SOURCE = /\.(cs|feature|ts|tsx|js|jsx|mjs)$/;
+
+const citations = new Map(); // acceptance id -> [file]
+let testFiles = 0;
+
+function citationsIn(file, text) {
+  const found = [];
+  if (file.endsWith('.feature')) {
+    for (const line of text.split(/\r?\n/)) {
+      if (!GHERKIN_TAG_LINE.test(line)) continue;
+      for (const match of line.matchAll(TAG)) found.push(match[1]);
+    }
+    return found;
+  }
+  if (file.endsWith('.cs')) {
+    for (const match of text.matchAll(TRAIT)) found.push(match[1]);
+    return found;
+  }
+  for (const match of text.matchAll(TITLE)) found.push(match[1]);
+  return found;
+}
+
+for (const relative of testRoots) {
+  const rootDirectory = path.resolve(root, relative);
+  if (!fs.existsSync(rootDirectory)) {
+    err(`standards.project.json: paths.testRoots names a directory that does not exist '${relative}'`);
+    continue;
+  }
+  const stack = [rootDirectory];
+  while (stack.length) {
+    const current = stack.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      if (entry.name.startsWith('.') || entry.name === 'bin' || entry.name === 'obj' || entry.name === 'node_modules') continue;
+      const candidate = path.join(current, entry.name);
+      if (entry.isDirectory()) { stack.push(candidate); continue; }
+      if (!TEST_SOURCE.test(entry.name)) continue;
+      testFiles += 1;
+      const rel = path.relative(root, candidate).replace(/\\/g, '/');
+      for (const id of citationsIn(entry.name, fs.readFileSync(candidate, 'utf8'))) {
+        if (!citations.has(id)) citations.set(id, []);
+        citations.get(id).push(rel);
+      }
+    }
+  }
+}
+
+for (const [id, locs] of citations) {
+  if (acDefs.has(id)) continue;
+  err(`${locs[0]}: cites ${id}, which no specification declares`);
+}
+
+// A page reaches 'verified' only when its evidence is complete, and the
+// criterion citation is that evidence. (CORE.SYSTEM.USECASE.001)
+for (const [id, page] of useCasePages) {
+  if (page.implementationStatus !== 'verified') continue;
+  const declared = [...acDefs].filter(([, locs]) => locs.includes(page.rel)).map(([acId]) => acId);
+  if (!declared.length) { err(`${page.rel}: 'verified' and declares no acceptance criterion`); continue; }
+  const uncited = declared.filter((acId) => !citations.has(acId));
+  if (uncited.length) err(`${page.rel}: 'verified' while ${uncited.length} criterion(s) no test cites: ${uncited.slice(0, 3).join(', ')}${uncited.length > 3 ? ', ...' : ''}`);
+}
+
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
 
@@ -777,6 +850,8 @@ if (jsonOutput) {
     ok: errors.length === 0,
     scanned: { documentationRoot: docsPath, files: files.length, metadataBlocks: metas.length },
     acceptanceIds: acDefs.size,
+    acceptanceCitations: citations.size,
+    testFiles,
     endToEndIds: e2eDefs.size,
     problems: errors,
   }, null, 2));
@@ -786,6 +861,7 @@ console.log(`Consumer: ${root}`);
 console.log(`Files scanned: ${files.length} under ${docsPath}, metadata blocks: ${metas.length}`);
 console.log(languageSummary);
 console.log(`Acceptance ids: ${acDefs.size}, end-to-end test ids: ${e2eDefs.size}`);
+if (testRoots.length) console.log(`Acceptance citations: ${citations.size} of ${acDefs.size} criteria cited across ${testFiles} test source file(s)`);
 if (uiOutput) console.log(`\n${uiOutput}`);
 if (errors.length) {
   console.log(`\nFAIL (${errors.length} problem(s)):`);

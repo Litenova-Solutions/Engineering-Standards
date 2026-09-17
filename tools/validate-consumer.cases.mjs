@@ -192,11 +192,15 @@ function build() {
   // calls it. Declaring it as a plain surface keeps that row resolvable without
   // activating the UI pass. (CORE.SYSTEM.CONSUMERS.001)
   project.paths.surfaces = [{ name: 'web', description: 'the fixture frontend' }];
+  // The citation pass reads only what the project declares, so the fixture
+  // declares one root and the cases write test files into it.
+  project.paths.testRoots = ['tests'];
   writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
   // The configured-path checks resolve against the fixture, so the fixture
   // holds what the project file and the frontend cases declare. Without them a
   // path error fires in every case and hides the rule under test.
   writeFile('apps/api/Fixture.slnx', '');
+  fs.mkdirSync(path.join(fixture, 'tests'), { recursive: true });
   fs.mkdirSync(path.join(fixture, 'apps/admin'), { recursive: true });
   fs.mkdirSync(path.join(fixture, 'standards'), { recursive: true });
   fs.copyFileSync(path.join(repository, 'standards.manifest.json'), path.join(fixture, 'standards/standards.manifest.json'));
@@ -756,6 +760,77 @@ consumersCase(
   'a row linking the page relatively',
   '\n| Surface | Consumer |\n|:---|:---|\n| web | [Cancel](../../../ui/web/cancel.md) |\n',
   null,
+);
+
+console.log('\nAcceptance citation (BACKEND.TESTING.TRACE.002, FRONTEND.TESTING.TRACE.002, EXT.BDD.TRACE.001)');
+// The template use case declares AC-ORDERS-CANCEL-ORDER-01, so each case cites
+// that identifier or a neighbouring one that no page declares.
+const DECLARED = 'AC-ORDERS-CANCEL-ORDER-01';
+const UNDECLARED = 'AC-ORDERS-CANCEL-ORDER-99';
+
+fileCase(
+  'a scenario tag naming a declared criterion',
+  'tests/cancel-order.feature',
+  `Feature: Cancel\n\n  @${DECLARED}\n  Scenario: Cancel\n    Given a draft\n`,
+  null,
+);
+fileCase(
+  'a scenario tag naming a criterion no page declares',
+  'tests/cancel-order.feature',
+  `Feature: Cancel\n\n  @${UNDECLARED}\n  Scenario: Cancel\n    Given a draft\n`,
+  `cites ${UNDECLARED}`,
+);
+fileCase(
+  'a C# trait naming a declared criterion',
+  'tests/CancelOrderTests.cs',
+  `[Trait("AcceptanceCriterion", "${DECLARED}")]\npublic class CancelOrderTests;\n`,
+  null,
+);
+fileCase(
+  'a C# trait naming a criterion no page declares',
+  'tests/CancelOrderTests.cs',
+  `[Trait("AcceptanceCriterion", "${UNDECLARED}")]\npublic class CancelOrderTests;\n`,
+  `cites ${UNDECLARED}`,
+);
+// The identifier in a comment or a variable name proves nothing, so it is not a
+// citation and not a finding either.
+fileCase(
+  'the identifier in a C# comment is not a citation',
+  'tests/CancelOrderTests.cs',
+  `// covers ${UNDECLARED}\npublic class CancelOrderTests;\n`,
+  null,
+);
+fileCase(
+  'a browser test title naming a declared criterion',
+  'tests/cancel-order.spec.ts',
+  `test('[${DECLARED}] cancels', async () => {})\n`,
+  null,
+);
+fileCase(
+  'a browser test title naming a criterion no page declares',
+  'tests/cancel-order.spec.ts',
+  `test('[${UNDECLARED}] cancels', async () => {})\n`,
+  `cites ${UNDECLARED}`,
+);
+
+// A page reaches 'verified' only when a test cites each of its criteria.
+(function verifiedNeedsCitations() {
+  const original = readFixture(useCasePath);
+  const { meta, body } = splitMeta(original);
+  meta.implementationStatus = 'verified';
+  writeFile(useCasePath, joinMeta(meta, body));
+  report(`a verified use case whose criterion no test cites`, `'verified' while 1 criterion(s) no test cites`, run());
+  writeFile('tests/CancelOrderTests.cs', `[Trait("AcceptanceCriterion", "${DECLARED}")]\npublic class CancelOrderTests;\n`);
+  writeFile(useCasePath, joinMeta(meta, body));
+  report('a verified use case whose criterion a test cites', { absent: 'no test cites' }, run());
+  fs.rmSync(path.join(fixture, 'tests/CancelOrderTests.cs'));
+  writeFile(useCasePath, original);
+})();
+
+projectCase(
+  'a testRoots entry that does not exist',
+  (project) => { project.paths.testRoots = ['tests/missing']; },
+  "paths.testRoots names a directory that does not exist 'tests/missing'",
 );
 
 if (!process.env.KEEP_FIXTURE) fs.rmSync(fixture, { recursive: true, force: true }); else console.log(`fixture: ${fixture}`);

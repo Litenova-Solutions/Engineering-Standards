@@ -9,7 +9,7 @@ Frontend tests should prove use-case behavior at the cheapest boundary that repr
 
 
 - Test level matches the risk it covers. (FRONTEND.TESTING.LEVEL.001)
-- Tests proving acceptance criteria cite their identifier. (FRONTEND.TESTING.TRACE.001)
+- Tests proving acceptance criteria start their title with the identifier. (FRONTEND.TESTING.TRACE.002)
 - Tests assert observable behavior in every applicable state. (FRONTEND.TESTING.STATE.001)
 - Mocks stay at owned contract boundaries. (FRONTEND.TESTING.MOCKS.001)
 - Browser tests own their data and context. (FRONTEND.TESTING.ISOLATION.001)
@@ -25,13 +25,13 @@ Frontend tests should prove use-case behavior at the cheapest boundary that repr
 
 **Rationale:** Matching level to risk keeps the fast tests fast and reserves browser runs for behavior only a browser proves.
 
-### Trace acceptance behavior (FRONTEND.TESTING.TRACE.001)
+### Start a proving test title with its criterion (FRONTEND.TESTING.TRACE.002)
 
-**Requirement:** A frontend test proving an acceptance criterion MUST include that criterion identifier in its title or metadata.
+**Requirement:** A frontend test proving an acceptance criterion MUST begin its title with that identifier in square brackets.
 
-**Rationale:** The identifier connects browser evidence to the approved behavior it proves.
+**Rationale:** The earlier rule accepted the identifier in a title or in metadata, which is two places and no stated form. A runner reports the title, so a reader watching a failure sees the criterion without opening the file. A scan reads one position rather than every string.
 
-**Example:**
+**Example:** A browser test opens its title with the criterion it proves.
 
 ```typescript
 test('[AC-POSTS-CREATE-DRAFT-01] creates a draft', async ({ page }) => {
@@ -110,7 +110,7 @@ This informative example demonstrates `FRONTEND.TESTING.STATE.001`, `FRONTEND.TE
 | ID | Method | Evidence |
 |:---|:---|:---|
 | FRONTEND.TESTING.LEVEL.001 | inspection | Test review compares each new test against the level its risk requires. |
-| FRONTEND.TESTING.TRACE.001 | test | `node standards/tools/validate-consumer.mjs` resolves each cited acceptance identifier to its use case. |
+| FRONTEND.TESTING.TRACE.002 | static | `node standards/tools/validate-consumer.mjs` resolves each bracketed title citation under the declared test roots to a declared criterion. |
 | FRONTEND.TESTING.STATE.001 | test | `ComponentStateTests` asserts each applicable state through user-observable output. |
 | FRONTEND.TESTING.MOCKS.001 | test | `TestBoundaryTests` asserts no test replaces a framework internal or private function. |
 | FRONTEND.TESTING.ISOLATION.001 | test | `node standards/tools/validate-ui.mjs` and a randomized Playwright order confirm no case depends on another. |

@@ -12,6 +12,7 @@
     "uiDocs": "docs/ui",
     "unstructuredDocs": [],
     "surfaces": [],
+    "testRoots": [],
     "languageScan": [],
     "frontends": [
       {

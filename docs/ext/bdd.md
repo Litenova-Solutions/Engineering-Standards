@@ -43,7 +43,7 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 
 **Requirement:** Every BDD scenario MUST include one or more `@AC-MODULE-USE-CASE-NN` tags.
 
-**Rationale:** The owning use-case specification contains the acceptance criterion text and examples. The tag is the criterion identifier with one `@` in front, which is the same identifier `FRONTEND.TESTING.TRACE.001` and `BACKEND.TESTING.TRACE.001` cite from their own test attributes. One identifier reaches a feature file as a tag, a C# test as a trait, and a browser test as an annotation. The three forms differ only in what their tool requires.
+**Rationale:** The owning use-case specification contains the acceptance criterion text and examples. The tag is the criterion identifier with one `@` in front, which is the same identifier `FRONTEND.TESTING.TRACE.002` and `BACKEND.TESTING.TRACE.002` cite from their own test attributes. One identifier reaches a feature file as a tag, a C# test as a trait, and a browser test as the opening of its title. The three forms differ only in what their tool requires.
 
 **Example:** `@AC-ORDERS-CANCEL-ORDER-01` traces a cancellation scenario to its accepted criterion.
 
@@ -140,7 +140,7 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 |:---|:---|:---|
 | EXT.BDD.ADOPT.001 | inspection | Selected scenarios explain their shared cross-layer business example in the owning specification. |
 | EXT.BDD.ADOPT.002 | inspection | Scenario review distinguishes selected behavior from unit and validation coverage. |
-| EXT.BDD.TRACE.001 | static | Scenario tag scan resolves every `@AC-...` tag to a declared acceptance criterion. |
+| EXT.BDD.TRACE.001 | static | `node standards/tools/validate-consumer.mjs` resolves every `@AC-...` scenario tag to a declared acceptance criterion. |
 | EXT.BDD.BOUNDARY.001 | test | `BddBoundaryTests` call the declared HTTP or other public boundary. |
 | EXT.BDD.BOUNDARY.002 | test | `BddBoundaryTests` cover a declared observable result. |
 | EXT.BDD.BOUNDARY.003 | inspection | Any direct database assertion names its documented durable boundary. |

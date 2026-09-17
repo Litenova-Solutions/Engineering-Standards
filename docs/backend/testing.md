@@ -14,7 +14,7 @@ Backend tests prove domain behavior, use-case coordination, real persistence and
 - Integration tests use real PostgreSQL and the real host. (BACKEND.TESTING.INTEGRATION.001)
 - Integration cases reset state and never depend on order. (BACKEND.TESTING.ISOLATION.001)
 - Architecture tests assert every compiler-invisible boundary. (BACKEND.TESTING.ARCHITECTURE.001)
-- Every acceptance criterion is cited by an automated test. (BACKEND.TESTING.TRACE.001)
+- Every acceptance criterion is cited by an automated test, in one exact form. (BACKEND.TESTING.TRACE.002)
 - Coverage informs review; it is not the sufficiency test. (BACKEND.TESTING.COVERAGE.001)
 - Verification regenerates contracts and fails on drift. (BACKEND.TESTING.GENERATED.001)
 - One shared harness owns the container, host factory, and reset. (BACKEND.TESTING.HARNESS.001)
@@ -67,23 +67,25 @@ Acceptance.Tests appears only when the executable BDD extension activates. A sol
 
 **Rationale:** These are the boundaries a compiler does not enforce, so a review miss otherwise lands in the main branch.
 
-### Trace acceptance criteria (BACKEND.TESTING.TRACE.001)
+### Cite an acceptance criterion in one exact form (BACKEND.TESTING.TRACE.002)
 
-**Requirement:** Every acceptance criterion of a verified use case MUST appear in at least one recognized automated test reference.
+**Requirement:** Every acceptance criterion of a verified use case MUST be cited by a C# test carrying `[Trait("AcceptanceCriterion", "<identifier>")]` or by a scenario tag.
 
-**Rationale:** The citation connects executable evidence to approved behavior, so a verified claim is checkable rather than asserted.
+**Rationale:** The earlier rule asked for a recognized reference and named no form. A scan then had to guess which string in a test file was a citation. A comment, a variable name, and a skipped test all carried the identifier and none of them proved anything. One trait key and one value make the scan exact, and the identifier is the same one a feature file carries as a tag.
 
-**Example:**
+**Example:** A C# test states the criterion it proves as a trait.
 
 ```csharp
+[Fact]
 [Trait("AcceptanceCriterion", "AC-POSTS-CREATE-DRAFT-01")]
+public void Draft_is_created_with_no_title() { }
 ```
 
 ```gherkin
 @AC-POSTS-CREATE-DRAFT-01
 ```
 
-The trace is one-way. Internal implementation tests do not need an acceptance ID.
+The trace is one-way. Internal implementation tests carry no acceptance identifier.
 
 ### Use evidence rather than one coverage target (BACKEND.TESTING.COVERAGE.001)
 
@@ -184,7 +186,7 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 | BACKEND.TESTING.INTEGRATION.001 | test | `IntegrationTests` starts the manifest-pinned PostgreSQL container and the real WebApi host for each covered boundary. |
 | BACKEND.TESTING.ISOLATION.001 | test | `DatabaseResetTests` asserts a randomized case order passes and no case observes another case's data. |
 | BACKEND.TESTING.ARCHITECTURE.001 | test | `ArchitectureTests` covers each listed structural boundary and runs in the Release test pass. |
-| BACKEND.TESTING.TRACE.001 | test | `node standards/tools/validate-consumer.mjs` resolves each acceptance identifier to a test source reference. |
+| BACKEND.TESTING.TRACE.002 | static | `node standards/tools/validate-consumer.mjs` reads the declared test roots, and reports a citation naming no criterion. |
 | BACKEND.TESTING.COVERAGE.001 | operation | The CI test job publishes coverage as a review artifact and gates on no percentage threshold. |
 | BACKEND.TESTING.GENERATED.001 | test | The CI contract job regenerates `apps/api/openapi/` and typed clients, then fails on any tree difference. |
 | BACKEND.TESTING.HARNESS.001 | test | `IntegrationTests` resolves its container fixture, `ApiFactory`, and `DatabaseReset` from one shared harness. |
