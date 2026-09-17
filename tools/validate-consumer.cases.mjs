@@ -30,6 +30,7 @@ const VALUES = {
   __PROJECT__: 'fixture',
   __PROJECT_ID__: 'fixture',
   __TEST_PROJECT__: 'Fixture.Integration.Tests',
+  __UI_DOCS__: 'docs/ui',
   __API_SOLUTION__: 'apps/api/Fixture.slnx',
   __OWNER__: 'fixture',
   '__TITLE__': 'Fixture',
@@ -186,6 +187,11 @@ function build() {
   // so the controlled UI validator stays out of these cases.
   const project = JSON.parse(resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/consumer/standards.project.json'), 'utf8')));
   project.paths.frontends = [];
+  // The frontend list is blanked so the controlled UI validator stays out of
+  // these cases, and the use-case template still names 'web' as the surface that
+  // calls it. Declaring it as a plain surface keeps that row resolvable without
+  // activating the UI pass. (CORE.SYSTEM.CONSUMERS.001)
+  project.paths.surfaces = [{ name: 'web', description: 'the fixture frontend' }];
   writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
   // The configured-path checks resolve against the fixture, so the fixture
   // holds what the project file and the frontend cases declare. Without them a
@@ -687,6 +693,71 @@ console.log('\nControlled prose in consumer documentation (CORE.AUTHORING.PROSE.
   writeFile(page, original);
 }
 
-fs.rmSync(fixture, { recursive: true, force: true });
+console.log('\nConsumer linkage (CORE.SYSTEM.CONSUMERS.001, CORE.SYSTEM.CONSUMERS.002)');
+const useCasePath = 'docs/domain/modules/orders/cancel-order.md';
+const screenPath = 'docs/ui/web/cancel.md';
+
+// The rule binds an implemented use case, and the template ships 'planned', so
+// each case sets the status and replaces the whole Consumers section.
+function consumersCase(name, section, expectation) {
+  bodyCase(name, useCasePath, (raw) => {
+    const replaced = raw.replace(/## Consumers\n[\s\S]*?(?=\n## )/, section === null ? '' : `## Consumers\n${section}\n`);
+    const { meta, body } = splitMeta(replaced);
+    meta.implementationStatus = 'implemented';
+    return joinMeta(meta, body);
+  }, expectation);
+}
+
+consumersCase(
+  'a section naming a declared surface and the page that calls it',
+  '\n| Surface | Consumer |\n|:---|:---|\n| web | `docs/ui/web/cancel.md` |\n',
+  null,
+);
+consumersCase(
+  'a section naming a surface the project never declared',
+  '\n| Surface | Consumer |\n|:---|:---|\n| kiosk | `docs/ui/web/cancel.md` |\n',
+  "names surface 'kiosk'",
+);
+consumersCase(
+  'a section that writes None while a page declares the use case',
+  '\nNone. No surface calls this use case; a nightly run is its only caller.\n',
+  "does not name docs/ui/web/cancel.md",
+);
+consumersCase(
+  'a section that writes None with no reason',
+  '\nNone.\n',
+  "writes 'None.' with no reason",
+);
+consumersCase(
+  'a section with neither a row nor None',
+  '\nThis operation is called from several places.\n',
+  'names no surface and does not write',
+);
+consumersCase(
+  'a section that writes None with its reason',
+  '\nNone. A nightly recurring command is the only caller of this operation.\n',
+  { absent: "writes 'None.' with no reason" },
+);
+consumersCase(
+  'an implemented use case with no Consumers section',
+  null,
+  "no 'Consumers' section",
+);
+// A planned use case describes work nobody built, so no surface can call it yet.
+bodyCase(
+  'a planned use case needs no Consumers section',
+  useCasePath,
+  (raw) => raw.replace(/## Consumers\n[\s\S]*?(?=\n## )/, ''),
+  null,
+);
+// The reverse edge resolves on the page file name, so a Consumers row that
+// carries a relative link rather than a repository path still closes it.
+consumersCase(
+  'a row linking the page relatively',
+  '\n| Surface | Consumer |\n|:---|:---|\n| web | [Cancel](../../../ui/web/cancel.md) |\n',
+  null,
+);
+
+if (!process.env.KEEP_FIXTURE) fs.rmSync(fixture, { recursive: true, force: true }); else console.log(`fixture: ${fixture}`);
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);
 process.exit(failures ? 1 : 0);

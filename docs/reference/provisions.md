@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 881 provisions across 8 areas.
+The active release states 883 provisions across 8 areas.
 
 ## BACKEND
 
@@ -310,6 +310,8 @@ The active release states 881 provisions across 8 areas.
 | CORE.SYSTEM.ACCEPTANCE.001 | [Give acceptance criteria stable ownership](../core/system.md#give-acceptance-criteria-stable-ownership-coresystemacceptance001) | `core/system.md` |
 | CORE.SYSTEM.AGGREGATE.001 | [Make aggregate ownership explicit](../core/system.md#make-aggregate-ownership-explicit-coresystemaggregate001) | `core/system.md` |
 | CORE.SYSTEM.AUTHORITY.001 | [Keep decision authority with accountable people](../core/system.md#keep-decision-authority-with-accountable-people-coresystemauthority001) | `core/system.md` |
+| CORE.SYSTEM.CONSUMERS.001 | [Name what calls a use case](../core/system.md#name-what-calls-a-use-case-coresystemconsumers001) | `core/system.md` |
+| CORE.SYSTEM.CONSUMERS.002 | [Match a page's declared use case back to that page](../core/system.md#match-a-pages-declared-use-case-back-to-that-page-coresystemconsumers002) | `core/system.md` |
 | CORE.SYSTEM.CONVENTION.001 | [Use this consumer documentation layout](../core/system.md#use-this-consumer-documentation-layout-coresystemconvention001) | `core/system.md` |
 | CORE.SYSTEM.CONVENTION.002 | [Group module use-case files by aggregate root](../core/system.md#group-module-use-case-files-by-aggregate-root-coresystemconvention002) | `core/system.md` |
 | CORE.SYSTEM.CONVENTION.003 | [Keep operational and security references under operations](../core/system.md#keep-operational-and-security-references-under-operations-coresystemconvention003) | `core/system.md` |

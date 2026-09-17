@@ -295,6 +295,13 @@ for (const entry of Array.isArray(declaredProhibited) ? declaredProhibited : [])
   prohibitedKinds.add(entry);
 }
 
+// A use case records what invokes it, and a page records what it invokes. The
+// two populations are compared after the loop, because either direction can name
+// a file the loop has not reached yet. (CORE.SYSTEM.CONSUMERS.001,
+// CORE.SYSTEM.CONSUMERS.002)
+const useCasePages = new Map(); // use-case id -> {rel, file, implementationStatus, consumers}
+const screenPages = []; // {rel, file, app, useCases}
+
 // ---- collect files ---------------------------------------------------------
 const files = [];
 (function walk(d) {
@@ -434,9 +441,11 @@ for (const f of files) {
   if (meta.kind === 'end-to-end-flow') {
     for (const uc of meta.useCases ?? []) { const [mod, name] = uc.split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
   }
+  if (meta.kind === 'page') screenPages.push({ rel, file: f, app: meta.app, useCases: Array.isArray(meta.useCases) ? meta.useCases : [] });
   if (meta.kind === 'workflow') for (const mod of meta.participatingModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: participatingModule '${mod}' has no module dir`);
   if (meta.kind === 'domain-policy') for (const mod of meta.appliesToModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: appliesToModule '${mod}' has no module dir`);
   if (meta.kind === 'use-case') {
+    useCasePages.set(String(meta.id), { rel, file: f, implementationStatus: meta.implementationStatus, consumers: sectionBody(raw, 'Consumers') });
     const [mod, name] = String(meta.id).split('.');
     // A use-case file sits directly in its module directory, or in one
     // aggregate-root subdirectory of that module.
@@ -494,6 +503,74 @@ for (const kind of SINGLETON_KINDS) {
   }
   err(`Expected at most one ${kind} specification, found ${found.length}: ${found.join(', ')}`);
 }
+// ---- consumer linkage ------------------------------------------------------
+// A page declares the use cases it calls, so the edge ran one way and nothing
+// answered the question asked before a change: who breaks if this operation
+// moves. The reverse obligation is a Consumers section on the use case, checked
+// against the surfaces the project declared and against the pages that claim it.
+// (CORE.SYSTEM.CONSUMERS.001, CORE.SYSTEM.CONSUMERS.002)
+const declaredSurfaces = new Set([
+  ...(project.paths?.frontends ?? []).map((frontend) => frontend.name).filter(Boolean),
+  ...(project.paths?.surfaces ?? []).map((surface) => surface?.name).filter(Boolean),
+]);
+
+// A row is '| surface | consumer |'. The header and the alignment row carry no
+// consumer, so they are skipped by shape rather than by position: a table that
+// starts one line later still reads correctly.
+function consumerRows(body) {
+  const rows = [];
+  for (const line of body.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('|')) continue;
+    const cells = trimmed.replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim());
+    if (cells.length < 2) continue;
+    if (/^:?-{2,}:?$/.test(cells[0])) continue;
+    const surface = cells[0].replace(/`/g, '').trim();
+    if (!surface || surface.toLowerCase() === 'surface') continue;
+    rows.push({ surface, consumer: cells.slice(1).join(' | ') });
+  }
+  return rows;
+}
+
+const STATES_NONE = /^\s*(?:`?None`?\.?)/i;
+
+for (const [id, page] of useCasePages) {
+  if (page.implementationStatus === 'planned') continue;
+  if (page.consumers === null) {
+    err(`${page.rel}: no 'Consumers' section; an implemented use case names every surface that invokes it, or writes 'None.' with the reason`);
+    continue;
+  }
+  const body = page.consumers.trim();
+  const rows = consumerRows(body);
+  if (!rows.length) {
+    if (!STATES_NONE.test(body)) {
+      err(`${page.rel}: 'Consumers' section names no surface and does not write 'None.'`);
+    } else if (body.replace(STATES_NONE, '').trim().split(/\s+/).filter(Boolean).length < 4) {
+      // 'None.' alone is the same sentence a page nobody wired up would carry.
+      err(`${page.rel}: 'Consumers' writes 'None.' with no reason; state why no surface invokes this use case`);
+    }
+    continue;
+  }
+  for (const row of rows) {
+    if (!declaredSurfaces.has(row.surface)) {
+      err(`${page.rel}: 'Consumers' names surface '${row.surface}'; declare it in standards.project.json 'paths.frontends' or 'paths.surfaces'`);
+    }
+  }
+}
+
+for (const screen of screenPages) {
+  for (const id of screen.useCases) {
+    const page = useCasePages.get(id);
+    if (!page) continue; // the metadata pass already reported a useCase with no file
+    if (page.consumers === null) continue; // already reported above
+    const target = path.relative(path.dirname(page.file), screen.file).replace(/\\/g, '/');
+    const named = page.consumers.includes(target)
+      || page.consumers.includes(path.relative(root, screen.file).replace(/\\/g, '/'))
+      || page.consumers.includes(path.basename(screen.file));
+    if (!named) err(`${page.rel}: 'Consumers' does not name ${path.relative(root, screen.file).replace(/\\/g, '/')}, which declares this use case`);
+  }
+}
+
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
 

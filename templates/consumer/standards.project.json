@@ -11,6 +11,7 @@
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
     "unstructuredDocs": [],
+    "surfaces": [],
     "languageScan": [],
     "frontends": [
       {

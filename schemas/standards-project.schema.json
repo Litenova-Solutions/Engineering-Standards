@@ -59,6 +59,21 @@
           }
         },
         "domainDocs": { "$ref": "#/$defs/projectPath" },
+        "surfaces": {
+          "description": "The surfaces outside paths.frontends that invoke a use case: a command-line tool, a distributed server, a background host, an event reaction. Each frontend is already a surface under its own name. A Consumers row names one of these.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "description"],
+            "properties": {
+              "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "description": { "type": "string", "minLength": 1 },
+              "path": { "$ref": "#/$defs/projectPath" }
+            }
+          }
+        },
         "uiDocs": { "$ref": "#/$defs/projectPath" },
         "uiCompositions": {
           "description": "Root of the composition catalog. Each recipe is a Markdown page beside a sidecar validated against schemas/composition-recipe.schema.json. Defaults to 'compositions' under the UI documentation root.",

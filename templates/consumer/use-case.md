@@ -102,6 +102,14 @@ Add this section when implementation begins. Do not use it as the source for bus
 
 State every name in a code span. Each one resolves to a declared type, a member written as `Type.Member`, a project, or a repository path. A route carries a path rather than an identifier, so the entry-point checks resolve it. A row that names no artifact writes `None`. An `implemented` or `verified` use case names the handler its operation folder declares. (`CORE.SYSTEM.MAPPING.001`, `CORE.SYSTEM.MAPPING.002`)
 
+## Consumers
+
+Name every declared surface that invokes this use case, one per row. A surface is a frontend the project declares or a `paths.surfaces` entry. Write `None.` with the reason when a schedule, a reaction, or another use case is the only caller. A page declaring this use case in its `useCases` metadata is named here by its path. (`CORE.SYSTEM.CONSUMERS.001`, `CORE.SYSTEM.CONSUMERS.002`)
+
+| Surface | Consumer |
+|:---|:---|
+| `__APP__` | `__UI_DOCS__/__APP__/__PAGE__.md` |
+
 ## Risk and assurance
 
 Add only sections required by `risks`: authorization, money, sensitive data, irreversible behavior, concurrency, durable delivery, or availability.
