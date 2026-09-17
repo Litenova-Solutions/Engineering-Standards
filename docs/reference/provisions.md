@@ -775,9 +775,9 @@ The active release states 869 provisions across 8 areas.
 | FRONTEND.TESTING.TRACE.001 | [Trace acceptance behavior](../frontend/testing.md#trace-acceptance-behavior-frontendtestingtrace001) | `frontend/testing.md` |
 | FRONTEND.TESTING.UI.001 | [Prove controlled UI changes](../frontend/testing.md#prove-controlled-ui-changes-frontendtestingui001) | `frontend/testing.md` |
 | FRONTEND.UI.ACCEPTANCE.001 | [Resolve every acceptance identifier](../frontend/ui.md#resolve-every-acceptance-identifier-frontenduiacceptance001) | `frontend/ui.md` |
-| FRONTEND.UI.CATALOG.001 | [Publish a composition catalog](../frontend/ui.md#publish-a-composition-catalog-frontenduicatalog001) | `frontend/ui.md` |
 | FRONTEND.UI.COMPANION.001 | [Govern behavior companions and specialist controls](../frontend/ui.md#govern-behavior-companions-and-specialist-controls-frontenduicompanion001) | `frontend/ui.md` |
 | FRONTEND.UI.COMPOSITION.001 | [Compose from a catalog recipe](../frontend/ui.md#compose-from-a-catalog-recipe-frontenduicomposition001) | `frontend/ui.md` |
+| FRONTEND.UI.COMPOSITION.002 | [Publish each recipe as a page and a sidecar](../frontend/ui.md#publish-each-recipe-as-a-page-and-a-sidecar-frontenduicomposition002) | `frontend/ui.md` |
 | FRONTEND.UI.CONVENTION.001 | [Use the product profiles](../frontend/ui.md#use-the-product-profiles-frontenduiconvention001) | `frontend/ui.md` |
 | FRONTEND.UI.CONVENTION.002 | [Use the source update procedure](../frontend/ui.md#use-the-source-update-procedure-frontenduiconvention002) | `frontend/ui.md` |
 | FRONTEND.UI.CONVENTION.003 | [Promote a recipe on its second consumer](../frontend/ui.md#promote-a-recipe-on-its-second-consumer-frontenduiconvention003) | `frontend/ui.md` |

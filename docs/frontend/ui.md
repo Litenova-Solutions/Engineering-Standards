@@ -12,7 +12,7 @@ The baseline applies to React web frontends. It does not pretend that official s
 
 - One recorded visual system per React web frontend. (FRONTEND.UI.GOVERNANCE.001, FRONTEND.UI.SHADCN.001)
 - Each frontend declares a schema-valid UI vocabulary and a root design contract. (FRONTEND.UI.VOCABULARY.001, FRONTEND.UI.DESIGN.001)
-- Recipes live in a catalog, and a page region names one. (FRONTEND.UI.CATALOG.001, FRONTEND.UI.COMPOSITION.001)
+- Recipes live in one catalog, and a page region names one. (FRONTEND.UI.COMPOSITION.001, FRONTEND.UI.COMPOSITION.002)
 - Every registered route carries a schema-valid sidecar. (FRONTEND.UI.PAGE.001)
 - A sidecar names a component for every state it declares. (FRONTEND.UI.STATE.001)
 - An implementation renders no region its frozen sidecar omits. (FRONTEND.UI.GATES.001)
@@ -102,7 +102,7 @@ The profile is chosen per frontend rather than per workspace, because density is
 }
 ```
 
-### Publish a composition catalog (FRONTEND.UI.CATALOG.001)
+### Publish each recipe as a page and a sidecar (FRONTEND.UI.COMPOSITION.002)
 
 **Requirement:** A composition catalog entry MUST carry a Markdown recipe and a sidecar satisfying `schemas/composition-recipe.schema.json`.
 
@@ -219,7 +219,7 @@ The profile is chosen per frontend rather than per workspace, because density is
 | FRONTEND.UI.SHADCN.001 | inspection | `node standards/tools/validate-ui.mjs` compares the committed configuration against the manifest `uiBaseline` fields. |
 | FRONTEND.UI.VOCABULARY.001 | inspection | `node standards/tools/validate-ui.mjs` validates the vocabulary against its schema and its recorded preset. |
 | FRONTEND.UI.DESIGN.001 | static | `node standards/tools/validate-ui.mjs` reports a frontend whose `DESIGN.md` is missing, fails the schema, or omits a required section. |
-| FRONTEND.UI.CATALOG.001 | static | `node standards/tools/validate-ui.mjs` reports a catalog recipe with no sidecar and a sidecar failing `schemas/composition-recipe.schema.json`. |
+| FRONTEND.UI.COMPOSITION.002 | static | `node standards/tools/validate-ui.mjs` reports a catalog recipe with no sidecar and a sidecar failing `schemas/composition-recipe.schema.json`. |
 | FRONTEND.UI.COMPOSITION.001 | static | `node standards/tools/validate-ui.mjs` reports a region pattern that the catalog or the vocabulary does not declare. |
 | FRONTEND.UI.PAGE.001 | inspection | `node standards/tools/validate-ui.mjs` reports a page specification with no sidecar or an unlisted shell, layout, or pattern. |
 | FRONTEND.UI.STATE.001 | static | `node standards/tools/validate-ui.mjs` reports a declared state that no component named by a region carries. |

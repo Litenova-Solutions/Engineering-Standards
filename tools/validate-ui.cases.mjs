@@ -361,7 +361,7 @@ report('design contract whose profile contradicts the project record', 'profile 
 fs.writeFileSync(designFile, designContract);
 report('the shipped design contract is accepted', null, run());
 
-console.log('\nComposition catalog (FRONTEND.UI.CATALOG.001, FRONTEND.UI.COMPOSITION.001)');
+console.log('\nComposition catalog (FRONTEND.UI.COMPOSITION.002, FRONTEND.UI.COMPOSITION.001)');
 const recipeFile = path.join(fixture, 'docs/ui/compositions/record-list.recipe.json');
 const recipeSidecar = readJson(recipeFile);
 fs.rmSync(recipeFile);

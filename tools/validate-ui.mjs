@@ -354,7 +354,7 @@ function readCompositionCatalog(project) {
   if (!fs.existsSync(catalogRoot)) {
     // A consumer with no page sidecar needs no catalog. The per-region check
     // reports the absence where it matters, naming the region that wanted one.
-    if (declared) error(`[FRONTEND.UI.CATALOG.001] ${relativeToRoot(catalogRoot)}: declared composition catalog does not exist`);
+    if (declared) error(`[FRONTEND.UI.COMPOSITION.002] ${relativeToRoot(catalogRoot)}: declared composition catalog does not exist`);
     return recipes;
   }
   for (const file of walk(catalogRoot, (candidate) => candidate.endsWith('.md'))) {
@@ -363,14 +363,14 @@ function readCompositionCatalog(project) {
     const sidecar = path.join(path.dirname(file), `${name}.recipe.json`);
     const label = relativeToRoot(sidecar);
     if (!fs.existsSync(sidecar)) {
-      error(`[FRONTEND.UI.CATALOG.001] ${relativeToRoot(file)}: recipe has no sidecar at '${label}'`);
+      error(`[FRONTEND.UI.COMPOSITION.002] ${relativeToRoot(file)}: recipe has no sidecar at '${label}'`);
       continue;
     }
     const recipe = readJson(sidecar, label);
     if (!recipe) continue;
-    if (!schemaCheck('composition-recipe.schema.json', recipe, label, 'FRONTEND.UI.CATALOG.001')) continue;
+    if (!schemaCheck('composition-recipe.schema.json', recipe, label, 'FRONTEND.UI.COMPOSITION.002')) continue;
     if (recipe.recipe !== name) {
-      error(`[FRONTEND.UI.CATALOG.001] ${label}: recipe must be '${name}', which is the name of the page beside it`);
+      error(`[FRONTEND.UI.COMPOSITION.002] ${label}: recipe must be '${name}', which is the name of the page beside it`);
       continue;
     }
     recipes.set(name, { ...recipe, label, consumers: new Set() });
@@ -378,7 +378,7 @@ function readCompositionCatalog(project) {
   for (const file of walk(catalogRoot, (candidate) => candidate.endsWith('.recipe.json'))) {
     const name = path.basename(file, '.recipe.json');
     if (recipes.has(name)) continue;
-    error(`[FRONTEND.UI.CATALOG.001] ${relativeToRoot(file)}: recipe sidecar has no Markdown page beside it`);
+    error(`[FRONTEND.UI.COMPOSITION.002] ${relativeToRoot(file)}: recipe sidecar has no Markdown page beside it`);
   }
   return recipes;
 }
@@ -401,6 +401,28 @@ function routeSegment(folder) {
 }
 
 const ROUTE_FILE = /^page\.(?:tsx|ts|jsx|js)$/;
+
+// Three states are owned by a file beside the route rather than by a component
+// inside it. The router renders the segment's own file, or the nearest one above
+// it, so a page declaring one of these states is answered by a file it inherits.
+const SEGMENT_STATE_FILE = { loading: 'loading', 'not-found': 'not-found', error: 'error' };
+
+function segmentStates(routeFile, frontendRoot) {
+  const found = new Set();
+  const appRoot = path.join(frontendRoot, 'app');
+  let directory = path.dirname(routeFile);
+  while (within(appRoot, directory) || path.resolve(directory) === path.resolve(appRoot)) {
+    for (const [state, stem] of Object.entries(SEGMENT_STATE_FILE)) {
+      for (const extension of SOURCE_EXTENSIONS) {
+        if (fs.existsSync(path.join(directory, `${stem}${extension}`))) found.add(state);
+      }
+    }
+    const parent = path.dirname(directory);
+    if (parent === directory) break;
+    directory = parent;
+  }
+  return found;
+}
 
 // Every route the application tree declares, in the notation a page
 // specification writes. A localized tree carries one leading parameter that
@@ -1009,19 +1031,23 @@ function validatePageSidecars(project, frontend, ui, vocabularyInfo, recipes) {
         carried.add(component);
       }
     }
+    const routeFile = routes.get(metadata.route);
+    const inherited = routeFile ? segmentStates(routeFile, frontendRoot) : new Set();
     for (const state of array(contract, 'states', label)) {
       if (!vocabularyInfo.stateIds.has(state)) {
         error(`${label}: unknown state '${state}'`);
         continue;
       }
+      if (inherited.has(state)) continue;
       const carriers = stateComponents.get(state);
       if (!carriers || ![...carriers].some((component) => carried.has(component))) {
-        error(`[FRONTEND.UI.STATE.001] ${label}: state '${state}' is declared, and no component any region names carries it`);
+        const owner = SEGMENT_STATE_FILE[state];
+        const answer = owner ? `, and no '${owner}' file sits above its route` : '';
+        error(`[FRONTEND.UI.STATE.001] ${label}: state '${state}' is declared, and no component any region names carries it${answer}`);
       }
     }
     // The frozen plan is the sidecar. A region in the source that the sidecar
     // does not name is the section an implementation added after gate B.
-    const routeFile = routes.get(metadata.route);
     if (routeFile) {
       for (const region of regionsRendered(routeFile, frontendRoot)) {
         if (named.has(region) || shellRegions.has(region)) continue;
