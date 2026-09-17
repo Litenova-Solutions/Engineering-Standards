@@ -150,6 +150,12 @@
             "type": "string",
             "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
           }
+        },
+        "sourceRoots": {
+          "description": "Directories an Implementation mapping name resolves a declaration, project, or path in. Defaults to the directory holding the solution.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
         }
       }
     },

@@ -53,11 +53,19 @@ function write(relative, contents) {
   return file;
 }
 
-// A handler file's content is never read. The operation folder above it names the
-// use case, so the fixture writes the shortest file that carries the name.
+// The operation folder above a handler names the use case, and the file stem
+// names the type its Implementation mapping has to cite, so the fixture writes
+// the shortest file that declares that type. The mapping pass reads declarations
+// out of the source, which is why the body is a declaration rather than a
+// placeholder.
 function handler(relative) {
-  return write(relative, 'internal sealed class Handler;\n');
+  return write(relative, `internal sealed class ${path.basename(relative, '.cs')};\n`);
 }
+
+// A case that writes a handler passes this marker rather than a body, because
+// the body has to declare the type the file stem names and only fileCase knows
+// the path.
+const HANDLER = Symbol('handler source');
 
 function specificationText(id, overrides = {}) {
   const meta = {
@@ -74,7 +82,21 @@ function specificationText(id, overrides = {}) {
     applicableExtensions: [],
     ...overrides,
   };
-  return `---\n${JSON.stringify(meta, null, 2)}\n---\n\n# ${id}\n`;
+  const mapping = overrides.mapping === undefined ? defaultMapping(id) : overrides.mapping;
+  delete meta.mapping;
+  const body = mapping === null ? '' : `\n## Implementation mapping\n\n| Role | Name or path |\n|:---|:---|\n${mapping}\n\n## Verification\n\n- None.\n`;
+  return `---\n${JSON.stringify(meta, null, 2)}\n---\n\n# ${id}\n${body}`;
+}
+
+// A page states the handler its operation folder declares. The fixture derives
+// that name the way a consumer author would: from the use-case id.
+function pascal(value) {
+  return value.split('-').map((word) => word[0].toUpperCase() + word.slice(1)).join('');
+}
+
+function defaultMapping(id) {
+  const [, useCase] = id.split('.');
+  return `| Handler | \`${pascal(useCase)}CommandHandler\` |`;
 }
 
 function specification(relative, id, overrides = {}) {
@@ -125,7 +147,7 @@ function reportLine(name, snippet, result, expectedStatus) {
 // A file case adds one file, runs, and removes it, so every case starts from the
 // same baseline consumer.
 function fileCase(name, relative, contents, expectation, options = {}) {
-  const file = write(relative, contents);
+  const file = write(relative, contents === HANDLER ? `internal sealed class ${path.basename(relative, '.cs')};\n` : contents);
   report(name, expectation, run(...(options.args ?? [])), options.status);
   fs.rmSync(file);
 }
@@ -148,13 +170,13 @@ console.log('\nHandler with no specification (CORE.SYSTEM.COVERAGE.001)');
 fileCase(
   'operation folder that no page covers',
   `${applicationProject}/Sales/Vouchers/VoidVoucher/VoidVoucherCommandHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   `handler with no specification: ${applicationProject}/Sales/Vouchers/VoidVoucher/VoidVoucherCommandHandler.cs -> sales.void-voucher`,
 );
 fileCase(
   'operation folder under a second aggregate that no page covers',
   `${applicationProject}/Sales/Discounts/ApplyDiscount/ApplyDiscountCommandHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   'sales.apply-discount',
 );
 
@@ -177,21 +199,21 @@ specification('docs/domain/modules/event-operations/event-tasks/update-event-tas
 fileCase(
   'a multi-word module folder resolves to its kebab-case module id',
   `${applicationProject}/EventOperations/EventTasks/UpdateEventTask/UpdateEventTaskCommandHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   null,
 );
 fs.rmSync(path.join(fixture, 'docs/domain/modules/event-operations/event-tasks/update-event-task.md'));
 fileCase(
   'an acronym run stays one identifier segment',
   `${applicationProject}/Sales/Vouchers/ReadCSVImport/ReadCSVImportQueryHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   '-> sales.read-csv-import',
 );
-specification('docs/domain/modules/sales/vouchers/read-csv-import.md', 'sales.read-csv-import');
+specification('docs/domain/modules/sales/vouchers/read-csv-import.md', 'sales.read-csv-import', { mapping: '| Handler | `ReadCSVImportQueryHandler` |' });
 fileCase(
   'the derived acronym id resolves to its page',
   `${applicationProject}/Sales/Vouchers/ReadCSVImport/ReadCSVImportQueryHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   null,
 );
 fs.rmSync(path.join(fixture, 'docs/domain/modules/sales/vouchers/read-csv-import.md'));
@@ -200,7 +222,7 @@ fs.rmSync(path.join(fixture, 'docs/domain/modules/sales/vouchers/read-csv-import
 fileCase(
   'a title-cased acronym derives the same identifier as an upper-cased one',
   `${applicationProject}/Sales/Vouchers/ReadCsvImport/ReadCsvImportQueryHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   '-> sales.read-csv-import',
 );
 
@@ -208,7 +230,7 @@ console.log('\nOperation folder shape (BACKEND.APPLICATION.STRUCTURE.001)');
 fileCase(
   'handler sitting directly in its module directory',
   `${applicationProject}/Sales/ArchiveVoucherCommandHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   `handler outside an operation folder: ${applicationProject}/Sales/ArchiveVoucherCommandHandler.cs`,
 );
 // Three segments look like a path but name no operation. Reading the aggregate
@@ -217,13 +239,13 @@ fileCase(
 fileCase(
   'handler sitting directly in its aggregate directory',
   `${applicationProject}/Sales/Vouchers/ArchiveVoucherCommandHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   `handler outside an operation folder: ${applicationProject}/Sales/Vouchers/ArchiveVoucherCommandHandler.cs`,
 );
 fileCase(
   'two aggregates naming the same operation',
   `${applicationProject}/Sales/Discounts/RedeemVoucher/RedeemVoucherCommandHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   "duplicate specification id 'sales.redeem-voucher'",
 );
 
@@ -231,20 +253,104 @@ console.log('\nEvent reactions (CORE.SYSTEM.REACTION.001)');
 fileCase(
   'a reaction carries no use-case specification',
   `${applicationProject}/Sales/Vouchers/IssueVoucherOnOrderConfirmed/IssueVoucherOnOrderConfirmedReaction.cs`,
-  'internal sealed class Reaction;\n',
+  HANDLER,
   null,
 );
 fileCase(
   'a reaction named as a handler is still a reaction',
   `${applicationProject}/Sales/Vouchers/IssueVoucherOnOrderConfirmed/IssueVoucherOnOrderConfirmedReactionHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   null,
 );
 fileCase(
   'the same operation folder holding a command handler is a use case',
   `${applicationProject}/Sales/Vouchers/IssueVoucherOnOrderConfirmed/IssueVoucherOnOrderConfirmedCommandHandler.cs`,
-  'internal sealed class Handler;\n',
+  HANDLER,
   'sales.issue-voucher-on-order-confirmed',
+);
+
+console.log('\nImplementation mapping resolution (CORE.SYSTEM.MAPPING.001)');
+// The baseline page already names its handler, so each case here replaces the
+// mapping of that one page and restores it afterwards.
+const mappedPage = 'docs/domain/modules/sales/vouchers/redeem-voucher.md';
+function mappingCase(name, mapping, expectation, options = {}) {
+  specification(mappedPage, 'sales.redeem-voucher', { mapping });
+  report(name, expectation, run(...(options.args ?? [])), options.status);
+  specification(mappedPage, 'sales.redeem-voucher');
+}
+
+mappingCase(
+  'a row naming a declared type',
+  '| Handler | `RedeemVoucherCommandHandler` |',
+  null,
+);
+mappingCase(
+  'a row naming a type nothing declares',
+  '| Handler | `RedeemVoucherCommandHandler` |\n| Command | `RedeemVoucherCommand` |',
+  "nothing declares 'RedeemVoucherCommand'",
+);
+mappingCase(
+  'a row naming a member of a declared type',
+  '| Handler | `RedeemVoucherCommandHandler` |\n| Aggregate method | `RedeemVoucherCommandHandler.Handle` |',
+  "'RedeemVoucherCommandHandler' declares no 'Handle'",
+);
+mappingCase(
+  'a row naming a project',
+  '| Handler | `RedeemVoucherCommandHandler` |\n| Automated tests | `Acme.Application` |',
+  null,
+);
+mappingCase(
+  'a row naming a path that exists',
+  '| Handler | `RedeemVoucherCommandHandler` |\n| Entry Point | `apps/api/src/Acme.Application/Acme.Application.csproj` |',
+  null,
+);
+mappingCase(
+  'a row naming a path that does not exist',
+  '| Handler | `RedeemVoucherCommandHandler` |\n| Entry Point | `apps/api/src/Acme.WebApi/RedeemVoucherEndpoint.cs` |',
+  "path does not exist 'apps/api/src/Acme.WebApi/RedeemVoucherEndpoint.cs'",
+);
+// A route is a path a caller uses rather than a declaration, and the entry-point
+// checks own it. A phrase and a lower-case identifier are the specification's
+// own vocabulary.
+mappingCase(
+  'a row naming a route',
+  '| Handler | `RedeemVoucherCommandHandler` |\n| Entry Point | `POST /api/vouchers/{voucherId}:redeem` |',
+  null,
+);
+mappingCase(
+  'a row naming a lower-case identifier the specification owns',
+  '| Handler | `RedeemVoucherCommandHandler` |\n| Uniqueness | scope `voucher-code` |',
+  null,
+);
+mappingCase(
+  'a row writing None',
+  '| Handler | `RedeemVoucherCommandHandler` |\n| Read Model | `None` |',
+  null,
+);
+
+console.log('\nImplementation mapping completeness (CORE.SYSTEM.MAPPING.002)');
+mappingCase(
+  'a mapping that omits its derived handler',
+  '| Command | `RedeemVoucherCommandHandler2` |',
+  "does not name 'RedeemVoucherCommandHandler'",
+);
+mappingCase(
+  'an implemented page with no mapping section',
+  null,
+  "is 'implemented' and states no mapping",
+);
+fileCase(
+  'a planned page needs no mapping section',
+  'docs/domain/modules/sales/vouchers/plan-voucher-batch.md',
+  specificationText('sales.plan-voucher-batch', { implementationStatus: 'planned', mapping: null }),
+  null,
+);
+// The handler name inside a longer span still counts, because a page states the
+// endpoint and the handler in one cell more often than in two rows.
+mappingCase(
+  'a handler named inside a longer span',
+  '| Handler | `Acme.Application.RedeemVoucherCommandHandler` |',
+  null,
 );
 
 console.log('\nConsumer configuration');

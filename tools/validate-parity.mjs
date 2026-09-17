@@ -31,15 +31,18 @@
 //   "parity": {
 //     "applicationProject": "apps/api/src/Acme.Application",
 //     "ignoreHandlers": ["apps/api/src/Acme.Application/Shared/**"],
-//     "ignoreUseCases": ["sales.import-legacy-orders"]
+//     "ignoreUseCases": ["sales.import-legacy-orders"],
+//     "sourceRoots": ["apps/api/src", "apps/cli"]
 //   }
 //
 // 'applicationProject' names the Application project directory when discovery
 // cannot choose one. 'ignoreHandlers' holds consumer-root-relative glob patterns
 // for handler files that carry no use-case specification by decision.
 // 'ignoreUseCases' holds specification ids implemented outside the Application
-// project. Each entry is consumer-specific, which is why it lives in the
-// consumer's own configuration rather than in this tool.
+// project. 'sourceRoots' names the directories an Implementation mapping may
+// resolve a declaration in, defaulting to the directory holding the solution.
+// Each entry is consumer-specific, which is why it lives in the consumer's own
+// configuration rather than in this tool.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -97,6 +100,7 @@ const project = readJson(projectFile, 'standards.project.json');
 const parity = project.parity ?? {};
 const ignoredHandlerPatterns = Array.isArray(parity.ignoreHandlers) ? parity.ignoreHandlers : [];
 const ignoredUseCases = new Set(Array.isArray(parity.ignoreUseCases) ? parity.ignoreUseCases : []);
+const configuredSourceRoots = Array.isArray(parity.sourceRoots) ? parity.sourceRoots : [];
 
 // A consumer with no backend omits the solution path and records the decision
 // that names the baseline rules left without a surface. Parity has nothing to
@@ -275,11 +279,11 @@ function metadata(file) {
 }
 
 const domainDocs = path.join(root, project.paths?.domainDocs ?? 'docs/domain');
-const specifications = new Map(); // id -> {file, implementationStatus}
+const specifications = new Map(); // id -> {file, implementationStatus, text}
 for (const file of walk(domainDocs, (candidate) => candidate.endsWith('.md'))) {
   const meta = metadata(file);
   if (meta?.kind !== 'use-case' || typeof meta.id !== 'string') continue;
-  specifications.set(meta.id, { file, implementationStatus: meta.implementationStatus });
+  specifications.set(meta.id, { file, implementationStatus: meta.implementationStatus, text: fs.readFileSync(file, 'utf8') });
 }
 
 // ---- compare both directions ------------------------------------------------
@@ -302,6 +306,134 @@ for (const [id, spec] of specifications) {
   finding(`specification with no handler: ${relativeToRoot(spec.file)}`);
 }
 
+// ---- Implementation mapping resolution --------------------------------------
+// The mapping is the only part of a specification that points at code, and
+// nothing else in the page fails when the code moves. A renamed handler leaves a
+// page that reads correctly and names an artifact that no longer exists. This
+// pass reads every code span in the mapping table and resolves it against the
+// declarations, projects, and paths the repository actually holds.
+// (CORE.SYSTEM.MAPPING.001, CORE.SYSTEM.MAPPING.002)
+
+// The scan reads text and never loads a compiler, so a declaration is what the
+// declaring keyword introduces rather than what a binder resolves. That is the
+// same posture as every other check here: local, deterministic, no build.
+const DECLARATION = /\b(?:class|record|struct|interface|enum|delegate)\s+(?:class\s+|struct\s+)?([A-Za-z_][A-Za-z0-9_]*)/g;
+const IDENTIFIER_TOKEN = /[A-Za-z_][A-Za-z0-9_]*/g;
+const DOTTED = /^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$/;
+
+// A row that names no artifact writes one of these rather than leaving the cell
+// empty, because an empty cell and an unwritten mapping read the same.
+const SENTINELS = new Set(['none', 'not applicable', 'no domain transition']);
+
+function sourceRoots() {
+  if (configuredSourceRoots.length) {
+    return configuredSourceRoots.map((relative) => {
+      const resolved = path.resolve(root, relative);
+      if (!fs.existsSync(resolved)) {
+        console.error(`standards.project.json: parity.sourceRoots names a directory that does not exist '${relative}'`);
+        process.exit(2);
+      }
+      return resolved;
+    });
+  }
+  const solution = path.resolve(root, project.paths.apiSolution);
+  const solutionRoot = fs.existsSync(solution) && fs.statSync(solution).isDirectory() ? solution : path.dirname(solution);
+  return [solutionRoot];
+}
+
+// One pass over the source builds three indexes: the type names that are
+// declared, the identifier tokens each declaring file holds, and the project
+// names. A member reference resolves when its declaring type's own file carries
+// the member name as a whole identifier, which fails on a rename and passes on a
+// move.
+const declaringFiles = new Map(); // type name -> [file]
+const fileTokens = new Map(); // file -> Set of identifier tokens
+const projectNames = new Set();
+let sourceFiles = 0;
+
+for (const sourceRoot of sourceRoots()) {
+  for (const file of walk(sourceRoot, (candidate) => /\.(cs|csproj|esproj|fsproj|vbproj)$/.test(candidate))) {
+    if (/\.(csproj|esproj|fsproj|vbproj)$/.test(file)) {
+      projectNames.add(path.basename(file).replace(/\.[a-z]+proj$/, ''));
+      continue;
+    }
+    sourceFiles += 1;
+    const text = fs.readFileSync(file, 'utf8');
+    fileTokens.set(file, new Set(text.match(IDENTIFIER_TOKEN) ?? []));
+    for (const match of text.matchAll(DECLARATION)) {
+      const name = match[1];
+      if (!declaringFiles.has(name)) declaringFiles.set(name, []);
+      declaringFiles.get(name).push(file);
+    }
+  }
+}
+
+// A span is examined only when it names something a reader could look up. A span
+// carrying whitespace is a route or a phrase, a span carrying a separator is a
+// path, and a span starting lower-case is a field, a code, or an identifier the
+// specification itself owns. None of those is a declaration.
+function resolveSpan(span) {
+  const value = span.trim().replace(/\(\)$/, '');
+  if (!value || SENTINELS.has(value.toLowerCase())) return null;
+  if (/\s/.test(value)) return null;
+  if (value.includes('/')) {
+    return fs.existsSync(path.resolve(root, value)) ? null : `path does not exist '${value}'`;
+  }
+  if (!DOTTED.test(value) || !/^[A-Z]/.test(value)) return null;
+  const segments = value.split('.');
+  if (projectNames.has(value)) return null;
+  if (declaringFiles.has(value)) return null;
+  if (segments.length === 1) return `nothing declares '${value}'`;
+  const last = segments[segments.length - 1];
+  const owner = segments[segments.length - 2];
+  if (declaringFiles.has(last)) return null;
+  const files = declaringFiles.get(owner) ?? declaringFiles.get(segments[0]);
+  if (!files) return `nothing declares '${owner}' in '${value}'`;
+  if (files.some((file) => fileTokens.get(file)?.has(last))) return null;
+  return `'${owner}' declares no '${last}'`;
+}
+
+// The mapping table is read from the section heading to the next heading, so a
+// code span elsewhere on the page stays outside this rule. A page may carry the
+// heading in either ordinary or title capitalization.
+function mappingSection(text) {
+  const heading = /^##[ \t]+Implementation [Mm]apping[ \t]*$/m.exec(text);
+  if (!heading) return null;
+  const after = text.slice(heading.index + heading[0].length);
+  const next = /^#{1,6}[ \t]/m.exec(after);
+  return next ? after.slice(0, next.index) : after;
+}
+
+const CODE_SPAN = /`([^`\n]+)`/g;
+
+let mappingsRead = 0;
+for (const [id, spec] of specifications) {
+  if (spec.implementationStatus === 'planned' || ignoredUseCases.has(id)) continue;
+  const relative = relativeToRoot(spec.file);
+  const section = mappingSection(spec.text);
+  if (!section) {
+    finding(`no Implementation mapping: ${relative} is '${spec.implementationStatus}' and states no mapping`);
+    continue;
+  }
+  mappingsRead += 1;
+  const spans = [...section.matchAll(CODE_SPAN)].map((match) => match[1]);
+  const reported = new Set();
+  for (const span of spans) {
+    const problem = resolveSpan(span);
+    if (!problem || reported.has(problem)) continue;
+    reported.add(problem);
+    finding(`Implementation mapping does not resolve: ${relative}: ${problem}`);
+  }
+  // The derived handler is what parity already proved exists for this page. A
+  // mapping that omits it points at code somebody split, renamed, or replaced.
+  const handlers = derived.get(id);
+  if (!handlers || handlers.length !== 1) continue;
+  const declared = path.basename(handlers[0], '.cs');
+  if (!spans.some((span) => span.split(/[^A-Za-z0-9_]+/).includes(declared))) {
+    finding(`Implementation mapping omits its handler: ${relative} does not name '${declared}'`);
+  }
+}
+
 // ---- report -----------------------------------------------------------------
 // A machine reader gets the findings as an array and the counts as fields, so
 // nothing has to be recovered by parsing the human lines back apart.
@@ -315,6 +447,9 @@ if (jsonOutput) {
     handlers: handlerFiles.length,
     specifications: specifications.size,
     notImplemented: planned,
+    sourceFiles,
+    declaredTypes: declaringFiles.size,
+    mappingsRead,
     reportOnly,
     findings,
   }, null, 2));
@@ -323,6 +458,7 @@ if (jsonOutput) {
 console.log(`Consumer: ${root}`);
 console.log(`Application project: ${relativeToRoot(applicationProject)}`);
 console.log(`Handlers: ${handlerFiles.length}, use-case specifications: ${specifications.size}`);
+console.log(`Implementation mappings read: ${mappingsRead}, resolved against ${declaringFiles.size} declared type(s) in ${sourceFiles} source file(s)`);
 // A skipped population reads as a conforming one unless the run names it.
 if (planned) console.log(`Specifications not yet implemented: ${planned}`);
 if (ignoredHandlerPatterns.length || ignoredUseCases.size) {
@@ -339,4 +475,4 @@ if (findings.length) {
   for (const item of findings) console.log(`  - ${item}`);
   process.exit(1);
 }
-console.log('\nPASS: every Application use case has a specification and every implemented specification has a handler.');
+console.log('\nPASS: every Application use case has a specification, every implemented specification has a handler, and every Implementation mapping name resolves.');

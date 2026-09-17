@@ -94,11 +94,13 @@ Then `__ERROR_CODE__` is returned without a state change
 |:---|:---|
 | Command or Query | `__USE_CASE__Command` or `__USE_CASE__Query` |
 | Handler | `__USE_CASE__CommandHandler` or `__USE_CASE__QueryHandler` |
-| Aggregate method or Read Model | `__MAPPING__` |
-| Entry Point | `__MAPPING__` |
-| Automated tests | `__MAPPING__` |
+| Aggregate method or Read Model | `__AGGREGATE__.__ACTION__` |
+| Entry Point | `POST __ROUTE__` (`__USE_CASE__Endpoint`) |
+| Automated tests | `__TEST_PROJECT__` |
 
 Add this section when implementation begins. Do not use it as the source for business behavior.
+
+State every name in a code span. Each one resolves to a declared type, a member written as `Type.Member`, a project, or a repository path. A route carries a path rather than an identifier, so the entry-point checks resolve it. A row that names no artifact writes `None`. An `implemented` or `verified` use case names the handler its operation folder declares. (`CORE.SYSTEM.MAPPING.001`, `CORE.SYSTEM.MAPPING.002`)
 
 ## Risk and assurance
 

@@ -59,7 +59,7 @@ The system contains one delivery approach and one operating model:
 - Flows link their use cases rather than restate them. (CORE.SYSTEM.FLOW.001)
 - One module name is used across every layer. (CORE.SYSTEM.MODULE.001)
 - Module specifications map aggregates to state, invariants, and commands. (CORE.SYSTEM.AGGREGATE.001)
-- One use case is one Command or Query, with a status and one specification. (CORE.SYSTEM.USECASE.001, CORE.SYSTEM.USECASE.002, CORE.SYSTEM.COVERAGE.001)
+- One use case is one Command or Query, with a status, one specification, and a mapping that resolves. (CORE.SYSTEM.USECASE.001, CORE.SYSTEM.USECASE.002, CORE.SYSTEM.COVERAGE.001, CORE.SYSTEM.MAPPING.001, CORE.SYSTEM.MAPPING.002)
 - Workflow specifications name state, triggers, recovery, and owner. (CORE.SYSTEM.WORKFLOW.001)
 - Every event reaction declares its delivery classification. (CORE.SYSTEM.REACTION.001)
 - Domain rule IDs encode their enforcement classification. (CORE.SYSTEM.RULES.001)
@@ -177,7 +177,7 @@ One top-level Command owns one command pipeline and one transaction commit. A Qu
 
 ### Workflow and workflow orchestrator
 
-A workflow exists when the system remembers progress, awaits an event or time, retries work, handles duplicate delivery, compensates, or exposes operator recovery.
+A workflow exists when the system stores progress, awaits an event or time, retries work, handles duplicate delivery, compensates, or exposes operator recovery.
 
 `Orchestrator` means the component selects and schedules the next action. It does not perform every action itself. It receives facts, updates workflow state, issues the next Command, records retries and timeouts, and exposes failures needing an operator.
 
@@ -304,6 +304,31 @@ FAIL (2 problem(s)):
   - handler with no specification: Application/Sales/Vouchers/RedeemVoucher -> sales.redeem-voucher
   - specification with no handler: docs/domain/modules/sales/vouchers/void-voucher.md
 ```
+
+### Resolve every Implementation mapping name (CORE.SYSTEM.MAPPING.001)
+
+**Requirement:** Every code name an Implementation mapping states MUST resolve to a declared type, a member of one, a project, or an existing path.
+
+**Rationale:** The mapping is the only part of a specification that points at code, and nothing else in the page fails when the code moves. A renamed handler leaves a page that reads correctly and names an artifact that no longer exists. That is worse than a page with no mapping. A row that names no artifact writes `None`.
+
+**Example:** A mapping row states its target in a code span, and each span resolves.
+
+```text
+| Handler | `CancelOrderCommandHandler` |
+| Aggregate method | `Order.Cancel` |
+| Entry Point | `POST /api/orders/{orderId}:cancel` (`CancelOrderEndpoint`) |
+| Automated tests | `Acme.Integration.Tests` |
+```
+
+`CancelOrderCommandHandler` resolves as a declared type, `Order.Cancel` as a member of one, `CancelOrderEndpoint` as a declared type, and `Acme.Integration.Tests` as a project. The route carries a path rather than an identifier. It is read as a route and resolved by the entry-point checks.
+
+### Name the handler an implemented use case owns (CORE.SYSTEM.MAPPING.002)
+
+**Requirement:** The Implementation mapping of an `implemented` or `verified` use case MUST name the handler its operation folder declares.
+
+**Rationale:** `CORE.SYSTEM.COVERAGE.001` proves that a handler and a page exist for each other. It does not prove that the page names that handler. A page can satisfy parity while its mapping points at the handler of a use case somebody split in two. Naming the derived handler is what makes the mapping fail on the rename rather than after it.
+
+**Example:** `apps/api/src/Acme.Application/Orders/Orders/CancelOrder/CancelOrderCommandHandler.cs` obliges `docs/domain/modules/orders/orders/cancel-order.md` to state `CancelOrderCommandHandler` in its Implementation mapping.
 
 ### Specify autonomous progress as a workflow (CORE.SYSTEM.WORKFLOW.001)
 
@@ -517,6 +542,8 @@ The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` chang
 | CORE.SYSTEM.USECASE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
 | CORE.SYSTEM.USECASE.002 | inspection | Each `implemented` use case resolves to existing Domain, Application, persistence, and entry-point code with no acceptance test. |
 | CORE.SYSTEM.COVERAGE.001 | static | `node standards/tools/validate-parity.mjs` reports no handler without a specification and no specification without a handler. |
+| CORE.SYSTEM.MAPPING.001 | static | `node standards/tools/validate-parity.mjs` reports each Implementation mapping name that resolves to no declaration, member, project, or path. |
+| CORE.SYSTEM.MAPPING.002 | static | `node standards/tools/validate-parity.mjs` reports each implemented use case whose Implementation mapping omits its derived handler. |
 | CORE.SYSTEM.WORKFLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each workflow module reference and the template requires the named sections. |
 | CORE.SYSTEM.REACTION.001 | inspection | The owning specification records one delivery classification for each event reaction. |
 | CORE.SYSTEM.RULES.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a domain rule ID whose prefix does not match its declared classification. |

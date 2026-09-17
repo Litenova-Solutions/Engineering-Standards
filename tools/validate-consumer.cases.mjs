@@ -29,6 +29,7 @@ const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'litenova-consumer-cases-'
 const VALUES = {
   __PROJECT__: 'fixture',
   __PROJECT_ID__: 'fixture',
+  __TEST_PROJECT__: 'Fixture.Integration.Tests',
   __API_SOLUTION__: 'apps/api/Fixture.slnx',
   __OWNER__: 'fixture',
   '__TITLE__': 'Fixture',

@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 879 provisions across 8 areas.
+The active release states 881 provisions across 8 areas.
 
 ## BACKEND
 
@@ -321,6 +321,8 @@ The active release states 879 provisions across 8 areas.
 | CORE.SYSTEM.EXTENSIONS.001 | [Select extensions before applying them](../core/system.md#select-extensions-before-applying-them-coresystemextensions001) | `core/system.md` |
 | CORE.SYSTEM.EXTENSIONS.002 | [Exclude a project-scoped extension from local metadata](../core/system.md#exclude-a-project-scoped-extension-from-local-metadata-coresystemextensions002) | `core/system.md` |
 | CORE.SYSTEM.FLOW.001 | [Connect one product outcome through an end-to-end flow](../core/system.md#connect-one-product-outcome-through-an-end-to-end-flow-coresystemflow001) | `core/system.md` |
+| CORE.SYSTEM.MAPPING.001 | [Resolve every Implementation mapping name](../core/system.md#resolve-every-implementation-mapping-name-coresystemmapping001) | `core/system.md` |
+| CORE.SYSTEM.MAPPING.002 | [Name the handler an implemented use case owns](../core/system.md#name-the-handler-an-implemented-use-case-owns-coresystemmapping002) | `core/system.md` |
 | CORE.SYSTEM.METADATA.001 | [Declare Specification Metadata](../core/system.md#declare-specification-metadata-coresystemmetadata001) | `core/system.md` |
 | CORE.SYSTEM.MODULE.001 | [Group language and use cases by module](../core/system.md#group-language-and-use-cases-by-module-coresystemmodule001) | `core/system.md` |
 | CORE.SYSTEM.REACTION.001 | [Record events and event reactions separately](../core/system.md#record-events-and-event-reactions-separately-coresystemreaction001) | `core/system.md` |
