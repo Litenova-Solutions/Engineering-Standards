@@ -77,6 +77,12 @@
       "components": ["button"],
       "states": ["ready", "error"],
       "evidence": ["UI-PAGE-HEADER"]
+    },
+    {
+      "id": "record-list/default",
+      "components": ["button", "skeleton", "empty-state", "error-state"],
+      "states": ["loading", "empty", "error", "ready"],
+      "evidence": ["UI-PAGE-HEADER"]
     }
   ],
   "components": [
@@ -87,6 +93,27 @@
       "variants": ["default", "secondary", "destructive", "outline", "ghost", "link"],
       "states": ["ready", "disabled", "pending"],
       "evidence": ["UI-BUTTON"]
+    },
+    {
+      "id": "skeleton",
+      "source": "components/ui/skeleton.tsx",
+      "status": "baseline",
+      "states": ["loading"],
+      "evidence": ["UI-STATE-LOADING"]
+    },
+    {
+      "id": "empty-state",
+      "source": "components/common/empty-state.tsx",
+      "status": "extended",
+      "states": ["empty"],
+      "evidence": ["UI-STATE-EMPTY"]
+    },
+    {
+      "id": "error-state",
+      "source": "components/common/error-state.tsx",
+      "status": "extended",
+      "states": ["error"],
+      "evidence": ["UI-STATE-ERROR"]
     }
   ],
   "forks": [],

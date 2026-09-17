@@ -33,7 +33,11 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | `operating-limits.md` | `docs/operations/limits.md` | A pilot or release has enforced, tested, supported, or alert values. |
 | `section-index.md` | `docs/{section}/README.md` | A directory needs an index and owns no aggregate, use case, or policy. |
 | `page.md` | `docs/ui/{app}/{page}.md` | A page composes non-trivial use cases or interaction states. |
-| `ui-page.json` | `docs/ui/{app}/{page}.ui.json` | Declares the page shell, regions, states, responsive modes, focus, and evidence. |
+| `ui-page.json` | `docs/ui/{app}/{page}.ui.json` | Declares the page layout, shell, regions, states, responsive modes, focus, and evidence. |
+| `design-contract.md` | `apps/{app}/DESIGN.md` | States the brand, tokens, vocabulary, patterns, do list, refusals, motion, and voice one frontend composes from. |
+| `composition.md` | `docs/ui/compositions/{recipe}.md` | Argues one repeated page shape: why the shape is the shape, and which pages reach for it. |
+| `composition-recipe.json` | `docs/ui/compositions/{recipe}.recipe.json` | Declares one recipe's scope, slots, states, and rules. |
+| `acceptance-criteria.json` | `apps/{app}/app/{route}/evidence/acceptance.json` | Records each acceptance identifier the sidecar names, with its precondition, steps, assertions, and file. |
 | `ui-vocabulary.json` | `docs/ui/{app}/vocabulary.json` | Closes the shells, patterns, components, tokens, states, forks, and evidence available to agents. |
 | `ui-source-lock.json` | `apps/{app}/ui-source-lock.json` | Records generated shadcn source, preset, registry addresses, digests, and dependencies. |
 | `decision.md` | `docs/decisions/{id}.md` | A standards override or expensive-to-reverse choice is required. |

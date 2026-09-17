@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/design-contract.schema.json",
+  "title": "Litenova Frontend Design Contract",
+  "description": "The metadata block opening the DESIGN.md at a React web frontend root. The block carries what a validator resolves; the sections under it carry what a reader and an agent compose from.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "schemaVersion",
+    "frontend",
+    "profile",
+    "shell",
+    "patterns"
+  ],
+  "properties": {
+    "kind": { "const": "design-contract" },
+    "schemaVersion": {
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See CORE.AUTHORING.SNAPSHOT.003 and CORE.AUTHORING.SNAPSHOT.004.",
+      "const": 1
+    },
+    "frontend": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["public-light", "application-balanced", "admin-dense"]
+    },
+    "shell": { "type": "string", "minLength": 1 },
+    "patterns": {
+      "$comment": "The composition recipes this frontend reaches for, by catalog identifier. A page sidecar names a region pattern from this list and no other.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      }
+    }
+  }
+}

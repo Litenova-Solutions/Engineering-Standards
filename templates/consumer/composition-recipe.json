@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../standards/schemas/composition-recipe.schema.json",
+  "schemaVersion": 1,
+  "recipe": "record-list",
+  "scope": "page",
+  "summary": "A list of records, each with one value and one way into it.",
+  "slots": [
+    { "id": "row", "holds": "One record, naming what it is and who it belongs to.", "required": true },
+    { "id": "value", "holds": "The one figure the reader came to compare.", "required": true },
+    { "id": "row-action", "holds": "The control that opens the record.", "required": false }
+  ],
+  "states": ["loading", "empty", "error", "ready"],
+  "rules": [
+    "The order is an argument. A list sorted by identifier is a table.",
+    "An empty list says what is absent and what the reader can do next.",
+    "Every list states how many rows the read returned."
+  ]
+}

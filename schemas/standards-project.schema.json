@@ -60,6 +60,10 @@
         },
         "domainDocs": { "$ref": "#/$defs/projectPath" },
         "uiDocs": { "$ref": "#/$defs/projectPath" },
+        "uiCompositions": {
+          "description": "Root of the composition catalog. Each recipe is a Markdown page beside a sidecar validated against schemas/composition-recipe.schema.json. Defaults to 'compositions' under the UI documentation root.",
+          "$ref": "#/$defs/projectPath"
+        },
         "frontends": {
           "type": "array",
           "items": {

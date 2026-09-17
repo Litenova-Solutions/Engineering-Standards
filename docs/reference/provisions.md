@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 861 provisions across 8 areas.
+The active release states 869 provisions across 8 areas.
 
 ## BACKEND
 
@@ -774,15 +774,23 @@ The active release states 861 provisions across 8 areas.
 | FRONTEND.TESTING.STATE.001 | [Test observable states](../frontend/testing.md#test-observable-states-frontendtestingstate001) | `frontend/testing.md` |
 | FRONTEND.TESTING.TRACE.001 | [Trace acceptance behavior](../frontend/testing.md#trace-acceptance-behavior-frontendtestingtrace001) | `frontend/testing.md` |
 | FRONTEND.TESTING.UI.001 | [Prove controlled UI changes](../frontend/testing.md#prove-controlled-ui-changes-frontendtestingui001) | `frontend/testing.md` |
+| FRONTEND.UI.ACCEPTANCE.001 | [Resolve every acceptance identifier](../frontend/ui.md#resolve-every-acceptance-identifier-frontenduiacceptance001) | `frontend/ui.md` |
+| FRONTEND.UI.CATALOG.001 | [Publish a composition catalog](../frontend/ui.md#publish-a-composition-catalog-frontenduicatalog001) | `frontend/ui.md` |
 | FRONTEND.UI.COMPANION.001 | [Govern behavior companions and specialist controls](../frontend/ui.md#govern-behavior-companions-and-specialist-controls-frontenduicompanion001) | `frontend/ui.md` |
+| FRONTEND.UI.COMPOSITION.001 | [Compose from a catalog recipe](../frontend/ui.md#compose-from-a-catalog-recipe-frontenduicomposition001) | `frontend/ui.md` |
 | FRONTEND.UI.CONVENTION.001 | [Use the product profiles](../frontend/ui.md#use-the-product-profiles-frontenduiconvention001) | `frontend/ui.md` |
 | FRONTEND.UI.CONVENTION.002 | [Use the source update procedure](../frontend/ui.md#use-the-source-update-procedure-frontenduiconvention002) | `frontend/ui.md` |
+| FRONTEND.UI.CONVENTION.003 | [Promote a recipe on its second consumer](../frontend/ui.md#promote-a-recipe-on-its-second-consumer-frontenduiconvention003) | `frontend/ui.md` |
+| FRONTEND.UI.DESIGN.001 | [Publish a design contract](../frontend/ui.md#publish-a-design-contract-frontenduidesign001) | `frontend/ui.md` |
 | FRONTEND.UI.EVIDENCE.001 | [Prove UI behavior and appearance](../frontend/ui.md#prove-ui-behavior-and-appearance-frontenduievidence001) | `frontend/ui.md` |
 | FRONTEND.UI.FORKS.001 | [Track source changes](../frontend/ui.md#track-source-changes-frontenduiforks001) | `frontend/ui.md` |
+| FRONTEND.UI.GATES.001 | [Keep the implementation inside the frozen plan](../frontend/ui.md#keep-the-implementation-inside-the-frozen-plan-frontenduigates001) | `frontend/ui.md` |
 | FRONTEND.UI.GOVERNANCE.001 | [Select one visual authority](../frontend/ui.md#select-one-visual-authority-frontenduigovernance001) | `frontend/ui.md` |
 | FRONTEND.UI.PAGE.001 | [Specify pages before composition](../frontend/ui.md#specify-pages-before-composition-frontenduipage001) | `frontend/ui.md` |
+| FRONTEND.UI.PLACEMENT.001 | [Place acceptance beside the route](../frontend/ui.md#place-acceptance-beside-the-route-frontenduiplacement001) | `frontend/ui.md` |
 | FRONTEND.UI.PROTOCOL.001 | [Follow the agent UI protocol](../frontend/ui.md#follow-the-agent-ui-protocol-frontenduiprotocol001) | `frontend/ui.md` |
 | FRONTEND.UI.SHADCN.001 | [Use the pinned shadcn/ui baseline](../frontend/ui.md#use-the-pinned-shadcnui-baseline-frontenduishadcn001) | `frontend/ui.md` |
+| FRONTEND.UI.STATE.001 | [Render every declared state](../frontend/ui.md#render-every-declared-state-frontenduistate001) | `frontend/ui.md` |
 | FRONTEND.UI.TAILWIND.001 | [Restrict CSS decisions](../frontend/ui.md#restrict-css-decisions-frontenduitailwind001) | `frontend/ui.md` |
 | FRONTEND.UI.VOCABULARY.001 | [Declare the UI vocabulary](../frontend/ui.md#declare-the-ui-vocabulary-frontenduivocabulary001) | `frontend/ui.md` |
 

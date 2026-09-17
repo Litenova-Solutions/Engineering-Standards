@@ -12,6 +12,13 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { unsupportedSchemaKeywords, validateSchemaValue } from './schema.mjs';
+
+// The schemas ship beside this file rather than under the consumer, so a
+// consumer that vendors the standards at any depth resolves the same shapes.
+const schemaRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'schemas');
 
 const USAGE = `Usage: node tools/validate-ui.mjs [consumerRoot] [--format=json] [--help]
 
@@ -269,6 +276,209 @@ function inspectClassString(value, report) {
     if (utility.includes('[')) report('arbitrary', token);
     if (rawPalette.test(utility)) report('palette', token);
   }
+}
+
+// A value read against one of the shipped schemas. The keyword gate runs first,
+// so a schema carrying a keyword this evaluator does not implement fails rather
+// than passing unread.
+function schemaCheck(schemaName, value, label, provisionId) {
+  const file = path.join(schemaRoot, schemaName);
+  if (!fs.existsSync(file)) {
+    error(`${label}: schema '${schemaName}' is missing from the standards release`);
+    return false;
+  }
+  const schema = readJson(file, schemaName);
+  if (!schema) return false;
+  const problems = [];
+  unsupportedSchemaKeywords(schema, schemaName, '#', (_relative, _line, _code, message) => problems.push(message));
+  try {
+    validateSchemaValue(value, schema, schema, label, problems);
+  } catch (cause) {
+    problems.push(`${label}: ${cause.message}`);
+  }
+  for (const problem of problems) error(`[${provisionId}] ${problem}`);
+  return problems.length === 0;
+}
+
+// The H2 names a Markdown page carries, in the order they appear.
+function sectionNames(raw) {
+  return [...raw.matchAll(/^##\s+(.+?)\s*$/gm)].map((match) => match[1].trim());
+}
+
+// ---- design contract -------------------------------------------------------
+
+const DESIGN_SECTIONS = ['Brand', 'Tokens', 'Vocabulary', 'Patterns', 'Do', 'Do not', 'Motion', 'Voice'];
+
+function validateDesignContract(frontend, ui, frontendRoot, vocabularyInfo, recipes) {
+  const file = path.join(frontendRoot, 'DESIGN.md');
+  const label = relativeToRoot(file);
+  if (!fs.existsSync(file)) {
+    error(`[FRONTEND.UI.DESIGN.001] frontend '${frontend.name}': no design contract at '${relativeToRoot(file)}'`);
+    return null;
+  }
+  const metadata = parseMetadata(file);
+  if (!metadata) {
+    error(`[FRONTEND.UI.DESIGN.001] ${label}: design contract has no metadata block`);
+    return null;
+  }
+  schemaCheck('design-contract.schema.json', metadata, label, 'FRONTEND.UI.DESIGN.001');
+  if (metadata.frontend !== frontend.name) error(`[FRONTEND.UI.DESIGN.001] ${label}: frontend must be '${frontend.name}'`);
+  if (metadata.profile !== ui.profile) error(`[FRONTEND.UI.DESIGN.001] ${label}: profile must match frontend UI configuration`);
+  if (vocabularyInfo && metadata.shell && !vocabularyInfo.shellIds.has(metadata.shell)) {
+    error(`[FRONTEND.UI.DESIGN.001] ${label}: unknown shell '${metadata.shell}'`);
+  }
+  const raw = fs.readFileSync(file, 'utf8');
+  const present = new Set(sectionNames(raw));
+  for (const section of DESIGN_SECTIONS) {
+    if (!present.has(section)) error(`[FRONTEND.UI.DESIGN.001] ${label}: missing required section '${section}'`);
+  }
+  const bound = new Set([...(vocabularyInfo?.patternIds ?? [])].map(recipeName));
+  for (const pattern of metadata.patterns ?? []) {
+    if (vocabularyInfo && !bound.has(pattern)) error(`[FRONTEND.UI.DESIGN.001] ${label}: pattern '${pattern}' is not in the frontend vocabulary`);
+    if (recipes.size && !recipes.has(recipeName(pattern))) error(`[FRONTEND.UI.COMPOSITION.001] ${label}: pattern '${pattern}' has no recipe in the composition catalog`);
+  }
+  return metadata;
+}
+
+// ---- composition catalog ---------------------------------------------------
+
+// One pass over the catalog, before any frontend is read. A recipe is a Markdown
+// page that argues the shape and a sidecar that states it, so a page with no
+// sidecar is a shape nothing resolves and a sidecar with no page is a shape
+// nobody argued.
+function readCompositionCatalog(project) {
+  const recipes = new Map();
+  const declared = project?.paths?.uiCompositions;
+  const uiDocs = project?.paths?.uiDocs ?? 'docs/ui';
+  const catalogRoot = filePath(declared ?? path.posix.join(uiDocs, 'compositions'));
+  if (!fs.existsSync(catalogRoot)) {
+    // A consumer with no page sidecar needs no catalog. The per-region check
+    // reports the absence where it matters, naming the region that wanted one.
+    if (declared) error(`[FRONTEND.UI.CATALOG.001] ${relativeToRoot(catalogRoot)}: declared composition catalog does not exist`);
+    return recipes;
+  }
+  for (const file of walk(catalogRoot, (candidate) => candidate.endsWith('.md'))) {
+    const name = path.basename(file, '.md');
+    if (name === 'README') continue;
+    const sidecar = path.join(path.dirname(file), `${name}.recipe.json`);
+    const label = relativeToRoot(sidecar);
+    if (!fs.existsSync(sidecar)) {
+      error(`[FRONTEND.UI.CATALOG.001] ${relativeToRoot(file)}: recipe has no sidecar at '${label}'`);
+      continue;
+    }
+    const recipe = readJson(sidecar, label);
+    if (!recipe) continue;
+    if (!schemaCheck('composition-recipe.schema.json', recipe, label, 'FRONTEND.UI.CATALOG.001')) continue;
+    if (recipe.recipe !== name) {
+      error(`[FRONTEND.UI.CATALOG.001] ${label}: recipe must be '${name}', which is the name of the page beside it`);
+      continue;
+    }
+    recipes.set(name, { ...recipe, label, consumers: new Set() });
+  }
+  for (const file of walk(catalogRoot, (candidate) => candidate.endsWith('.recipe.json'))) {
+    const name = path.basename(file, '.recipe.json');
+    if (recipes.has(name)) continue;
+    error(`[FRONTEND.UI.CATALOG.001] ${relativeToRoot(file)}: recipe sidecar has no Markdown page beside it`);
+  }
+  return recipes;
+}
+
+// A vocabulary pattern can carry a variant after a slash, so `record-list/dense`
+// and `record-list/default` are two bindings of one recipe. The name before the
+// slash is the recipe the catalog holds.
+function recipeName(pattern) {
+  return String(pattern ?? '').split('/')[0];
+}
+
+// ---- route resolution ------------------------------------------------------
+
+// A folder that contributes no URL segment: `(group)` organizes, `@slot` is a
+// parallel route, and `_private` is excluded from routing.
+function routeSegment(folder) {
+  if (folder.startsWith('(') || folder.startsWith('@') || folder.startsWith('_')) return null;
+  const dynamic = folder.match(/^\[+\.{0,3}(.+?)\]+$/);
+  return dynamic ? `{${dynamic[1]}}` : folder;
+}
+
+const ROUTE_FILE = /^page\.(?:tsx|ts|jsx|js)$/;
+
+// Every route the application tree declares, in the notation a page
+// specification writes. A localized tree carries one leading parameter that
+// distinguishes no route from another, so each route is also registered without
+// its first parameter segment.
+function readRoutes(frontendRoot) {
+  const routes = new Map();
+  const appRoot = path.join(frontendRoot, 'app');
+  if (!fs.existsSync(appRoot)) return routes;
+  const register = (route, file) => {
+    if (!routes.has(route)) routes.set(route, file);
+  };
+  const walkRoutes = (directory, segments) => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      if (IGNORED_DIRECTORIES.has(entry.name)) continue;
+      const candidate = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        const segment = routeSegment(entry.name);
+        walkRoutes(candidate, segment === null ? segments : [...segments, segment]);
+        continue;
+      }
+      if (!ROUTE_FILE.test(entry.name)) continue;
+      const route = `/${segments.join('/')}`;
+      register(route === '/' ? '/' : route, candidate);
+      if (segments.length && /^\{.+\}$/.test(segments[0])) {
+        const shortened = `/${segments.slice(1).join('/')}`;
+        register(shortened === '/' ? '/' : shortened, candidate);
+      }
+    }
+  };
+  walkRoutes(appRoot, []);
+  return routes;
+}
+
+// ---- region scan -----------------------------------------------------------
+
+const SOURCE_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js'];
+
+function resolveImport(specifier, fromFile, frontendRoot) {
+  let base;
+  if (specifier.startsWith('.')) base = path.resolve(path.dirname(fromFile), specifier);
+  else if (specifier.startsWith('@/')) base = path.resolve(frontendRoot, specifier.slice(2));
+  else return null;
+  if (!within(frontendRoot, base) && path.resolve(base) !== path.resolve(frontendRoot)) return null;
+  for (const extension of ['', ...SOURCE_EXTENSIONS]) {
+    const candidate = `${base}${extension}`;
+    if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) return candidate;
+  }
+  for (const extension of SOURCE_EXTENSIONS) {
+    const candidate = path.join(base, `index${extension}`);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+// Every `data-region` value the route renders, following its own imports inside
+// the frontend. A region marked in a shared feature component belongs to every
+// page that reaches it, which is what makes an unnamed region reportable.
+function regionsRendered(routeFile, frontendRoot) {
+  const found = new Set();
+  const seen = new Set();
+  const queue = [routeFile];
+  while (queue.length) {
+    const file = queue.pop();
+    const key = path.resolve(file);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    if (!fs.existsSync(key)) continue;
+    const text = fs.readFileSync(key, 'utf8');
+    for (const match of text.matchAll(/data-region=(?:"([a-z][a-z0-9-]*)"|\{"([a-z][a-z0-9-]*)"\}|'([a-z][a-z0-9-]*)')/g)) {
+      found.add(match[1] ?? match[2] ?? match[3]);
+    }
+    for (const match of text.matchAll(/(?:from\s+|import\s*\(\s*)(['"])([^'"]+)\1/g)) {
+      const target = resolveImport(match[2], key, frontendRoot);
+      if (target) queue.push(target);
+    }
+  }
+  return found;
 }
 
 function parseMetadata(file) {
@@ -705,9 +915,59 @@ function validatePageRegistry(project, frontends) {
   }
 }
 
-function validatePageSidecars(project, frontend, ui, vocabularyInfo) {
+// ---- acceptance ------------------------------------------------------------
+
+// Every acceptance identifier a sidecar names, resolved to the record beside its
+// route and to the file that runs. An identifier with no file is a claim the
+// project cannot make, and a file no sidecar names is a run nothing reports.
+function validateAcceptance(contract, metadata, frontendRoot, routes, label) {
+  const claimed = array(contract, 'evidence', label).filter((id) => typeof id === 'string' && id.startsWith('AC-'));
+  const routeFile = routes.get(metadata.route);
+  if (!routeFile) {
+    if (claimed.length) error(`[FRONTEND.UI.ACCEPTANCE.001] ${label}: names acceptance identifiers, and route '${metadata.route}' has no page file`);
+    return;
+  }
+  const evidenceDirectory = path.join(path.dirname(routeFile), 'evidence');
+  const record = path.join(evidenceDirectory, 'acceptance.json');
+  const recordLabel = relativeToRoot(record);
+  if (!claimed.length) return;
+  if (!fs.existsSync(record)) {
+    error(`[FRONTEND.UI.PLACEMENT.001] ${label}: no acceptance record at '${recordLabel}'`);
+    return;
+  }
+  const acceptance = readJson(record, recordLabel);
+  if (!acceptance) return;
+  if (!schemaCheck('acceptance-criteria.schema.json', acceptance, recordLabel, 'FRONTEND.UI.ACCEPTANCE.001')) return;
+  if (acceptance.page !== contract.page) error(`[FRONTEND.UI.ACCEPTANCE.001] ${recordLabel}: page must be '${contract.page}'`);
+  const criteria = new Map((acceptance.criteria ?? []).map((item) => [item.id, item]));
+  for (const id of claimed) {
+    const criterion = criteria.get(id);
+    if (!criterion) {
+      error(`[FRONTEND.UI.ACCEPTANCE.001] ${recordLabel}: '${label}' names '${id}', which the record does not state`);
+      continue;
+    }
+    const spec = path.join(evidenceDirectory, criterion.spec);
+    if (!fs.existsSync(spec)) error(`[FRONTEND.UI.ACCEPTANCE.001] ${recordLabel}: '${id}' names '${criterion.spec}', which does not exist`);
+  }
+  for (const id of criteria.keys()) {
+    if (!claimed.includes(id)) error(`[FRONTEND.UI.ACCEPTANCE.001] ${recordLabel}: states '${id}', which '${label}' does not name`);
+  }
+}
+
+function validatePageSidecars(project, frontend, ui, vocabularyInfo, recipes) {
   const uiDocs = filePath(project.paths?.uiDocs ?? 'docs/ui');
   const frontendRoot = filePath(frontend.path);
+  const routes = readRoutes(frontendRoot);
+  const stateComponents = new Map();
+  for (const component of vocabularyInfo?.vocabulary.components ?? []) {
+    for (const state of component.states ?? []) {
+      if (!stateComponents.has(state)) stateComponents.set(state, new Set());
+      stateComponents.get(state).add(component.id);
+    }
+  }
+  const shellRegions = new Set(
+    (vocabularyInfo?.vocabulary.shells ?? []).flatMap((shell) => shell.regions ?? []),
+  );
   const pageFiles = walk(uiDocs, (file) => file.endsWith('.md'));
   for (const pageFile of pageFiles) {
     const metadata = parseMetadata(pageFile);
@@ -723,18 +983,51 @@ function validatePageSidecars(project, frontend, ui, vocabularyInfo) {
     const label = relativeToRoot(sidecar);
     const contract = readJson(sidecar, label);
     if (!contract) continue;
-    for (const key of ['schemaVersion', 'page', 'profile', 'shell', 'regions', 'states', 'initial', 'responsive', 'focus', 'accessibility', 'evidence']) required(contract, key, label);
-    if (contract.schemaVersion !== 1) error(`${label}: schemaVersion must be 1`);
+    // The schema owns the shape: which keys are required, which values are
+    // closed sets, and which strings match a pattern. The checks below are the
+    // ones that read a second file, which is what a schema cannot do.
+    schemaCheck('ui-page.schema.json', contract, label, 'FRONTEND.UI.PAGE.001');
     if (contract.page !== metadata.id) error(`${label}: page must match '${metadata.id}'`);
     if (contract.profile !== ui.profile) error(`${label}: profile must match frontend UI configuration`);
+    validateAcceptance(contract, metadata, frontendRoot, routes, label);
     if (!vocabularyInfo) continue;
     if (!vocabularyInfo.shellIds.has(contract.shell)) error(`${label}: unknown shell '${contract.shell}'`);
+    const named = new Set();
+    const carried = new Set();
     for (const region of array(contract, 'regions', label)) {
       const regionLabel = `${label}.${region?.id ?? 'region'}`;
+      if (region?.id) named.add(region.id);
       if (!vocabularyInfo.patternIds.has(region?.pattern)) error(`${regionLabel}: unknown pattern '${region?.pattern}'`);
-      for (const component of array(region, 'components', regionLabel)) if (!vocabularyInfo.componentIds.has(component)) error(`${regionLabel}: unknown component '${component}'`);
+      else if (recipes.size) {
+        const recipe = recipes.get(recipeName(region.pattern));
+        if (!recipe) error(`[FRONTEND.UI.COMPOSITION.001] ${regionLabel}: pattern '${region.pattern}' has no recipe in the composition catalog`);
+        else if (recipe.scope !== 'page') error(`[FRONTEND.UI.COMPOSITION.001] ${regionLabel}: recipe '${region.pattern}' is a shell recipe, which a page region does not name`);
+        else recipe.consumers.add(contract.page);
+      }
+      for (const component of array(region, 'components', regionLabel)) {
+        if (!vocabularyInfo.componentIds.has(component)) error(`${regionLabel}: unknown component '${component}'`);
+        carried.add(component);
+      }
     }
-    for (const state of array(contract, 'states', label)) if (!vocabularyInfo.stateIds.has(state)) error(`${label}: unknown state '${state}'`);
+    for (const state of array(contract, 'states', label)) {
+      if (!vocabularyInfo.stateIds.has(state)) {
+        error(`${label}: unknown state '${state}'`);
+        continue;
+      }
+      const carriers = stateComponents.get(state);
+      if (!carriers || ![...carriers].some((component) => carried.has(component))) {
+        error(`[FRONTEND.UI.STATE.001] ${label}: state '${state}' is declared, and no component any region names carries it`);
+      }
+    }
+    // The frozen plan is the sidecar. A region in the source that the sidecar
+    // does not name is the section an implementation added after gate B.
+    const routeFile = routes.get(metadata.route);
+    if (routeFile) {
+      for (const region of regionsRendered(routeFile, frontendRoot)) {
+        if (named.has(region) || shellRegions.has(region)) continue;
+        error(`[FRONTEND.UI.GATES.001] ${relativeToRoot(routeFile)}: renders region '${region}', which '${label}' does not name`);
+      }
+    }
     // An evidence array holds two kinds of identifier from two registers. A
     // `UI-` id is owned by this frontend's vocabulary and is resolved here. An
     // `AC-` or `E2E-` id is owned by the consumer specifications and is resolved
@@ -825,6 +1118,7 @@ for (const override of project?.overrides ?? []) {
 }
 
 if (project) validatePageRegistry(project, frontends);
+const recipes = project ? readCompositionCatalog(project) : new Map();
 
 for (const frontend of frontends) {
   if (frontend.platform === 'react-web' && !frontend.ui) error(`[FRONTEND.UI.GOVERNANCE.001] frontend '${frontend.name}': react-web frontends require a UI configuration`);
@@ -887,11 +1181,19 @@ for (const frontend of frontends) {
     if (sourceLockFile && fs.existsSync(sourceLockFile)) validateSourceLock(sourceLockFile, effectiveUi, frontendRoot, vocabularyInfo, manifest);
     if (ui.globalCss && fs.existsSync(filePath(ui.globalCss))) validateGlobalCss(filePath(ui.globalCss));
     validateDependencyBoundary(frontendRoot, effectiveUi);
-    validatePageSidecars(project, frontend, ui, vocabularyInfo);
+    validateDesignContract(frontend, ui, frontendRoot, vocabularyInfo, recipes);
+    validatePageSidecars(project, frontend, ui, vocabularyInfo, recipes);
   } else {
-    validatePageSidecars(project, frontend, ui, null);
+    validateDesignContract(frontend, ui, frontendRoot, null, recipes);
+    validatePageSidecars(project, frontend, ui, null, recipes);
   }
 }
+
+// A recipe nobody reaches for is a shape the catalog carries and no page reads.
+// The count is reported rather than refused, because the promotion path in
+// FRONTEND.UI.CONVENTION.003 is a default a consumer can replace.
+const unusedRecipes = [...recipes.values()].filter((recipe) => recipe.scope === 'page' && recipe.consumers.size === 0).map((recipe) => recipe.recipe);
+const singleUseRecipes = [...recipes.values()].filter((recipe) => recipe.scope === 'page' && recipe.consumers.size === 1).map((recipe) => recipe.recipe);
 
 if (jsonOutput) {
   console.log(JSON.stringify({
@@ -900,12 +1202,18 @@ if (jsonOutput) {
     ok: errors.length === 0,
     configuredFrontends: configured,
     skippedFrontends: configured ? [] : frontends.map((frontend) => ({ name: frontend.name, platform: frontend.platform ?? null })),
+    recipes: recipes.size,
+    unusedRecipes,
+    singleUseRecipes,
     problems: errors,
   }, null, 2));
   process.exit(errors.length ? 1 : 0);
 }
 console.log(`Consumer: ${root}`);
 console.log(`UI-configured frontends: ${configured}`);
+console.log(`Composition recipes: ${recipes.size}`);
+if (unusedRecipes.length) console.log(`Recipes no page names: ${unusedRecipes.join(', ')}`);
+if (singleUseRecipes.length) console.log(`Recipes one page names: ${singleUseRecipes.join(', ')}`);
 if (errors.length) {
   console.log(`\nFAIL (${errors.length} problem(s)):`);
   for (const item of errors) console.log(`  - ${item}`);

@@ -8,6 +8,7 @@
     "schemaVersion",
     "page",
     "profile",
+    "layout",
     "shell",
     "regions",
     "states",
@@ -25,6 +26,7 @@
     },
     "page": { "$ref": "#/$defs/pageIdentifier" },
     "profile": { "$ref": "#/$defs/profile" },
+    "layout": { "$ref": "#/$defs/layout" },
     "shell": { "type": "string", "minLength": 1 },
     "regions": {
       "type": "array",
@@ -61,6 +63,11 @@
       "type": "string",
       "enum": ["public-light", "application-balanced", "admin-dense"]
     },
+    "layout": {
+      "$comment": "A closed set, so a page that fits none of the five is a schema change and a decision rather than a sixth shape one page invented. A work page leads with a queue of work. An entity page answers what one record is. A list page presents a collection. A form page asks for input and submits it. An outcome page reports one answer the reader acts on.",
+      "type": "string",
+      "enum": ["work-page", "entity-page", "list-page", "form-page", "outcome-page"]
+    },
     "region": {
       "type": "object",
       "additionalProperties": false,
@@ -71,6 +78,7 @@
           "pattern": "^[a-z][a-z0-9-]*$"
         },
         "pattern": { "type": "string", "minLength": 1 },
+        "hiddenWhen": { "type": "string", "minLength": 1 },
         "components": {
           "type": "array",
           "minItems": 1,
@@ -83,6 +91,7 @@
       }
     },
     "state": {
+      "$comment": "The complete set a page composition can name. 'saving' and 'saved' are the submit states of any form, so no second pair names them. 'row-expanded' is the one state a collapsed row does not have, and a collapsed row is 'ready'.",
       "type": "string",
       "enum": [
         "loading",
@@ -94,6 +103,7 @@
         "disabled",
         "offline",
         "ready",
+        "row-expanded",
         "validation-error",
         "saving",
         "saved"

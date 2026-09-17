@@ -3,6 +3,7 @@
   "schemaVersion": 1,
   "page": "web.page",
   "profile": "application-balanced",
+  "layout": "list-page",
   "shell": "application-shell/default",
   "regions": [
     {
@@ -12,6 +13,14 @@
       "order": 1,
       "contentLimits": "One title and one supporting description.",
       "overflow": "Wrap actions below the title at compact width."
+    },
+    {
+      "id": "content",
+      "pattern": "record-list/default",
+      "components": ["button", "skeleton", "empty-state", "error-state"],
+      "order": 2,
+      "contentLimits": "Twenty rows visible, one hundred fetched.",
+      "overflow": "The table scrolls sideways below the wide breakpoint."
     }
   ],
   "states": ["loading", "empty", "error", "ready"],
