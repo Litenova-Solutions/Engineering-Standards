@@ -388,6 +388,21 @@ writeJson(catalogSidecar, {
 });
 report('declared state that no named component carries', "state 'loading' is declared, and no component any region names carries it", run());
 writeJson(catalogSidecar, catalogContract);
+configCase('a state the shell itself carries needs no page region', (project, vocabulary) => {
+  // `toasts` is a region of the fixture shell. A component of that name is what
+  // fills it, so a state it carries is a state every page under the shell has.
+  vocabulary.components.push({
+    id: 'toasts',
+    source: 'components/ui/button.tsx',
+    status: 'extended',
+    states: ['saved'],
+    evidence: ['UI-BUTTON'],
+  });
+  vocabulary.states.push({ id: 'saved', requiredEvidence: ['UI-BUTTON'] });
+  const sidecar = readJson(catalogSidecar);
+  writeJson(catalogSidecar, { ...sidecar, states: [...sidecar.states, 'saved'] });
+}, null);
+writeJson(catalogSidecar, catalogContract);
 
 console.log('\nFrozen plan (FRONTEND.UI.GATES.001)');
 const routeFile = path.join(fixture, 'apps/web/app/page.tsx');

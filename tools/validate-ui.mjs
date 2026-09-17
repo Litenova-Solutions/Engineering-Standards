@@ -990,6 +990,14 @@ function validatePageSidecars(project, frontend, ui, vocabularyInfo, recipes) {
   const shellRegions = new Set(
     (vocabularyInfo?.vocabulary.shells ?? []).flatMap((shell) => shell.regions ?? []),
   );
+  // A shell renders around every page, so a state one of its own components
+  // carries is a state every page under it has. The join is the identifier: a
+  // shell region and the component that fills it share one name.
+  const shellStates = new Set(
+    (vocabularyInfo?.vocabulary.components ?? [])
+      .filter((component) => shellRegions.has(component.id))
+      .flatMap((component) => component.states ?? []),
+  );
   const pageFiles = walk(uiDocs, (file) => file.endsWith('.md'));
   for (const pageFile of pageFiles) {
     const metadata = parseMetadata(pageFile);
@@ -1038,7 +1046,7 @@ function validatePageSidecars(project, frontend, ui, vocabularyInfo, recipes) {
         error(`${label}: unknown state '${state}'`);
         continue;
       }
-      if (inherited.has(state)) continue;
+      if (inherited.has(state) || shellStates.has(state)) continue;
       const carriers = stateComponents.get(state);
       if (!carriers || ![...carriers].some((component) => carried.has(component))) {
         const owner = SEGMENT_STATE_FILE[state];
