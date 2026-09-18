@@ -2,7 +2,7 @@
 
 Read this file before changing this repository or a consumer application. (standards/rule/core-agent.select-task-context)
 
-Standards v1.17.0 covers one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. (standards/rule/core-scope.use-the-supported-application-profile, standards/rule/core-scope.keep-one-bounded-context)
+Standards v2.0.0 covers one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. (standards/rule/core-scope.use-the-supported-application-profile, standards/rule/core-scope.keep-one-bounded-context)
 
 The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (standards/rule/profile-nextjs.use-manifest-version-pins, standards/rule/profile-blazor.use-manifest-version-pins, standards/rule/core-agent.select-task-context)
 
