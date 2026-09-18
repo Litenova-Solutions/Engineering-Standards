@@ -10,26 +10,26 @@ Exact framework and package versions live only in `standards.manifest.json`.
 ## Agent Summary {#agent-summary}
 
 
-- Selecting the profile applies every convention it composes. (PROFILE.NEXTJS.COMPOSITION.001)
-- Every version resolves from the manifest. (PROFILE.NEXTJS.VERSION.001)
-- A replacement names every provision ID it replaces. (PROFILE.NEXTJS.REPLACEMENT.001)
+- Selecting the profile applies every convention it composes. (standards/rule/profile-nextjs.apply-the-complete-profile)
+- Every version resolves from the manifest. (standards/rule/profile-nextjs.use-manifest-version-pins)
+- A replacement names every provision ID it replaces. (standards/rule/profile-nextjs.declare-replacements)
 
 ## Standards
 
 
-### Apply the complete profile (PROFILE.NEXTJS.COMPOSITION.001)
+### Apply the complete profile (standards/rule/profile-nextjs.apply-the-complete-profile)
 
 **Requirement:** A consumer selecting `dotnet-nextjs` MUST apply every convention this profile composes.
 
 **Rationale:** A consumer cannot claim the profile while silently omitting an applicable standard, because the profile is the unit of conformance.
 
-### Use manifest version pins (PROFILE.NEXTJS.VERSION.001)
+### Use manifest version pins (standards/rule/profile-nextjs.use-manifest-version-pins)
 
 **Requirement:** A consumer MUST resolve every SDK, framework, NuGet, and npm version from `standards.manifest.json`.
 
 **Rationale:** A version copied from prose, an example, a package search, or agent memory drifts from the pin that the manifest owns.
 
-### Declare replacements (PROFILE.NEXTJS.REPLACEMENT.001)
+### Declare replacements (standards/rule/profile-nextjs.declare-replacements)
 
 **Requirement:** An extension or consumer override MUST name every baseline provision ID it replaces.
 
@@ -72,7 +72,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 ## Conventions
 
 
-### Keep the platform profile visible (PROFILE.NEXTJS.CONVENTION.001)
+### Keep the platform profile visible (standards/rule/profile-nextjs.keep-the-platform-profile-visible)
 
 **Default:** Name the selected profile in `standards.project.json` and the solution, frontends, and commands in the root `AGENTS.md`.
 
@@ -85,7 +85,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| PROFILE.NEXTJS.COMPOSITION.001 | inspection | `node tools/validate-standards.mjs` asserts the composition list matches the manifest profile documents. |
-| PROFILE.NEXTJS.VERSION.001 | inspection | The CI dependency check compares each resolved version against its manifest pin. |
-| PROFILE.NEXTJS.REPLACEMENT.001 | inspection | `node tools/validate-standards.mjs` resolves each declared replacement identifier to an active provision. |
-| PROFILE.NEXTJS.CONVENTION.001 | inspection | `standards.project.json` names the profile and the root `AGENTS.md` names the solution, frontends, and commands. |
+| standards/rule/profile-nextjs.apply-the-complete-profile | inspection | `node tools/validate-standards.mjs` asserts the composition list matches the manifest profile documents. |
+| standards/rule/profile-nextjs.use-manifest-version-pins | inspection | The CI dependency check compares each resolved version against its manifest pin. |
+| standards/rule/profile-nextjs.declare-replacements | inspection | `node tools/validate-standards.mjs` resolves each declared replacement identifier to an active provision. |
+| standards/rule/profile-nextjs.keep-the-platform-profile-visible | inspection | `standards.project.json` names the profile and the root `AGENTS.md` names the solution, frontends, and commands. |

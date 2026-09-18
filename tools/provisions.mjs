@@ -2,13 +2,29 @@
 
 // Shared builder for docs/reference/provisions.md. The validator and the
 // generator both call buildProvisionIndex, so the checked-in page and its
-// freshness gate cannot disagree. (CORE.AUTHORING.INDEX.001)
+// freshness gate cannot disagree. (standards/rule/core-authoring.generate-the-provision-index)
 
 import fs from 'node:fs';
 import path from 'node:path';
 
 const INDEX_PATH = 'docs/reference/provisions.md';
-const RULE_HEADING = /^###\s+(.+?)\s+\(([A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d{3})\)\s*$/;
+
+// Every provision identifier is standards/<kind>/<page>.<heading-slug>. The kind
+// names the assertion class, the page names the owning page, and the heading slug
+// names the assertion. No segment carries a sequence number.
+// (standards/rule/core-authoring.identifier-must-follow-format)
+export const PROVISION_KINDS = Object.freeze([
+  'acceptance-criterion',
+  'authorization',
+  'invariant',
+  'policy',
+  'rule',
+  'validation',
+]);
+const KIND_ALTERNATION = PROVISION_KINDS.join('|');
+export const PROVISION_ID_SOURCE = `standards\\/(?:${KIND_ALTERNATION})\\/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*`;
+const PROVISION_ID = new RegExp(`^${PROVISION_ID_SOURCE}$`);
+const RULE_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${PROVISION_ID_SOURCE})\\)\\s*$`);
 
 export function headingSlug(value) {
   return value
@@ -19,6 +35,18 @@ export function headingSlug(value) {
     .trim()
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
+}
+
+// The page segment is <area>-<stem>, so two pages named structure.md in two
+// areas stay distinct. (standards/rule/core-authoring.identifier-must-name-its-page)
+export function parseProvisionId(id) {
+  const match = String(id).match(/^standards\/([a-z-]+)\/([a-z][a-z0-9-]*)\.([a-z0-9][a-z0-9-]*)$/);
+  if (!match) return null;
+  return { kind: match[1], page: match[2], slug: match[3] };
+}
+
+export function isProvisionId(id) {
+  return PROVISION_ID.test(String(id));
 }
 
 function slash(value) {
@@ -56,7 +84,16 @@ export function collectProvisions(root) {
       if (h2) section = h2[1].trim();
       if (section !== 'Standards' && section !== 'Conventions') continue;
       const rule = line.match(RULE_HEADING);
-      if (rule) rows.push({ id: rule[2], heading: rule[1], page: relative, anchor: headingSlug(`${rule[1]} (${rule[2]})`) });
+      if (rule) {
+        const parsed = parseProvisionId(rule[2]);
+        rows.push({
+          id: rule[2],
+          heading: rule[1],
+          page: relative,
+          anchor: headingSlug(`${rule[1]} (${rule[2]})`),
+          kind: parsed?.kind ?? '',
+        });
+      }
     }
   }
   return rows.sort((left, right) => left.id.localeCompare(right.id, 'en'));
@@ -64,11 +101,10 @@ export function collectProvisions(root) {
 
 export function buildProvisionIndex(root) {
   const rows = collectProvisions(root);
-  const areas = new Map();
+  const kinds = new Map();
   for (const row of rows) {
-    const area = row.id.split('.')[0];
-    if (!areas.has(area)) areas.set(area, []);
-    areas.get(area).push(row);
+    if (!kinds.has(row.kind)) kinds.set(row.kind, []);
+    kinds.get(row.kind).push(row);
   }
   const lines = [
     '# Provisions',
@@ -79,13 +115,13 @@ export function buildProvisionIndex(root) {
     '',
     'Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.',
     '',
-    `The active release states ${rows.length} provisions across ${areas.size} areas.`,
+    `The active release states ${rows.length} provisions across ${kinds.size} kinds.`,
     '',
   ];
-  for (const area of [...areas.keys()].sort()) {
-    lines.push(`## ${area}`, '');
+  for (const kind of [...kinds.keys()].sort()) {
+    lines.push(`## ${kind}`, '');
     lines.push('| ID | Provision | Page |', '|:---|:---|:---|');
-    for (const row of areas.get(area)) {
+    for (const row of kinds.get(kind)) {
       const href = slash(path.relative(path.dirname(INDEX_PATH), row.page));
       const page = row.page.replace(/^docs\//, '');
       lines.push(`| ${row.id} | [${row.heading}](${href}#${row.anchor}) | \`${page}\` |`);

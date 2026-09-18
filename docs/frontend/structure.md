@@ -8,17 +8,17 @@ Each frontend is an independent Next.js application organized around the same bu
 ## Agent Summary {#agent-summary}
 
 
-- Frontends share one application tree. (FRONTEND.STRUCTURE.TREE.001)
-- Features sit under their module and use-case names. (FRONTEND.STRUCTURE.FEATURES.001)
-- Modules never reach into another module's internals. (FRONTEND.STRUCTURE.BOUNDARY.001)
-- Applications never import each other's source. (FRONTEND.STRUCTURE.APPS.001)
-- Shared packages carry no application-specific code. (FRONTEND.STRUCTURE.PACKAGES.001)
-- Imports flow from routes inward, never outward. (FRONTEND.STRUCTURE.IMPORTS.001)
+- Frontends share one application tree. (standards/rule/frontend-structure.use-the-frontend-application-tree)
+- Features sit under their module and use-case names. (standards/rule/frontend-structure.organize-features-by-module-and-use-case)
+- Modules never reach into another module's internals. (standards/rule/frontend-structure.isolate-module-internals)
+- Applications never import each other's source. (standards/rule/frontend-structure.keep-applications-independent)
+- Shared packages carry no application-specific code. (standards/rule/frontend-structure.keep-shared-packages-non-application-specific)
+- Imports flow from routes inward, never outward. (standards/rule/frontend-structure.keep-imports-directional)
 
 ## Standards
 
 
-### Use the frontend application tree (FRONTEND.STRUCTURE.TREE.001)
+### Use the frontend application tree (standards/rule/frontend-structure.use-the-frontend-application-tree)
 
 **Requirement:** A frontend MUST use the declared application tree for routes, features, components, library code, and tests.
 
@@ -42,31 +42,31 @@ apps/{frontend}/
 
 Framework-generated cache and build folders remain untracked.
 
-### Organize features by module and use case (FRONTEND.STRUCTURE.FEATURES.001)
+### Organize features by module and use case (standards/rule/frontend-structure.organize-features-by-module-and-use-case)
 
 **Requirement:** A feature MUST live under `features/{module}/{use-case}/` using the module and use-case names its specification declares.
 
 **Rationale:** The frontend tree then matches the specification tree and the backend Application folders.
 
-### Isolate module internals (FRONTEND.STRUCTURE.BOUNDARY.001)
+### Isolate module internals (standards/rule/frontend-structure.isolate-module-internals)
 
 **Requirement:** A module MUST NOT import another module's internal feature path.
 
 **Rationale:** Route composition may still render public components from several modules when a page specification requires it. Shared code moves to `components/` or `lib/`.
 
-### Keep applications independent (FRONTEND.STRUCTURE.APPS.001)
+### Keep applications independent (standards/rule/frontend-structure.keep-applications-independent)
 
 **Requirement:** A frontend MUST NOT import source from another frontend.
 
 **Rationale:** Each application owns its routing, environment, authentication, components, source lock, Tailwind entry, tests, and deployment configuration.
 
-### Keep shared packages non-application-specific (FRONTEND.STRUCTURE.PACKAGES.001)
+### Keep shared packages non-application-specific (standards/rule/frontend-structure.keep-shared-packages-non-application-specific)
 
 **Requirement:** A shared package MUST NOT contain page composition, feature state, authentication policy, or application-specific components.
 
 **Rationale:** It may still contain generated API types, a thin typed client, configuration, and CSS theme tokens.
 
-### Keep imports directional (FRONTEND.STRUCTURE.IMPORTS.001)
+### Keep imports directional (standards/rule/frontend-structure.keep-imports-directional)
 
 **Requirement:** An import MUST point from route to feature to shared code, never in the reverse direction.
 
@@ -81,7 +81,7 @@ app -> features -> components/ui and lib -> external packages
 ## Conventions
 
 
-### Use this feature layout (FRONTEND.STRUCTURE.CONVENTION.001)
+### Use this feature layout (standards/rule/frontend-structure.use-this-feature-layout)
 
 **Default:** Place operation components, server functions, schemas, hooks, and view mappings inside their use-case folder.
 
@@ -106,7 +106,7 @@ features/
 
 The example creates a module-local `shared/` folder only for code used by two use cases in that module. Cross-module primitives belong outside `features/`.
 
-### Use explicit public entry points for workspace packages (FRONTEND.STRUCTURE.CONVENTION.002)
+### Use explicit public entry points for workspace packages (standards/rule/frontend-structure.use-explicit-public-entry-points-for-workspace-packages)
 
 **Default:** Export a workspace package only through its documented package root.
 
@@ -114,7 +114,7 @@ The example creates a module-local `shared/` folder only for code used by two us
 
 **Rationale:** An application importing an internal `src/` path couples itself to a layout the package may change.
 
-### Keep tests near their ownership boundary (FRONTEND.STRUCTURE.CONVENTION.003)
+### Keep tests near their ownership boundary (standards/rule/frontend-structure.keep-tests-near-their-ownership-boundary)
 
 **Default:** Keep unit and component tests beside their module, and browser tests under one documented Playwright root.
 
@@ -124,7 +124,7 @@ The example creates a module-local `shared/` folder only for code used by two us
 
 ## Reference example
 
-This informative example demonstrates `FRONTEND.STRUCTURE.TREE.001` and `FRONTEND.STRUCTURE.BOUNDARY.001`.
+This informative example demonstrates `standards/rule/frontend-structure.use-the-frontend-application-tree` and `standards/rule/frontend-structure.isolate-module-internals`.
 
 `app/(author)/posts/new/page.tsx` may import `CreateDraftForm` from `features/posts/create-draft/`. It cannot contain the form validation schema or post-creation business decision itself.
 
@@ -133,12 +133,12 @@ This informative example demonstrates `FRONTEND.STRUCTURE.TREE.001` and `FRONTEN
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| FRONTEND.STRUCTURE.TREE.001 | inspection | Folder review compares each frontend tree against the layout in this section. |
-| FRONTEND.STRUCTURE.FEATURES.001 | static | `FeaturePlacementTests` asserts each feature path resolves to a declared module and use case. |
-| FRONTEND.STRUCTURE.BOUNDARY.001 | inspection | `ImportBoundaryTests` asserts no cross-module import resolves an internal feature path. |
-| FRONTEND.STRUCTURE.APPS.001 | inspection | `ImportBoundaryTests` asserts no application imports a path inside another application. |
-| FRONTEND.STRUCTURE.PACKAGES.001 | inspection | `ImportBoundaryTests` asserts no shared package exports a page, feature state, or application component. |
-| FRONTEND.STRUCTURE.IMPORTS.001 | inspection | `ImportBoundaryTests` asserts no shared or feature module imports a route path. |
-| FRONTEND.STRUCTURE.CONVENTION.001 | inspection | Folder review compares each feature folder against the layout in this section. |
-| FRONTEND.STRUCTURE.CONVENTION.002 | inspection | `ImportBoundaryTests` asserts no application imports a package internal path. |
-| FRONTEND.STRUCTURE.CONVENTION.003 | inspection | Test layout review confirms focused tests sit beside their module and browser tests share one root. |
+| standards/rule/frontend-structure.use-the-frontend-application-tree | inspection | Folder review compares each frontend tree against the layout in this section. |
+| standards/rule/frontend-structure.organize-features-by-module-and-use-case | static | `FeaturePlacementTests` asserts each feature path resolves to a declared module and use case. |
+| standards/rule/frontend-structure.isolate-module-internals | inspection | `ImportBoundaryTests` asserts no cross-module import resolves an internal feature path. |
+| standards/rule/frontend-structure.keep-applications-independent | inspection | `ImportBoundaryTests` asserts no application imports a path inside another application. |
+| standards/rule/frontend-structure.keep-shared-packages-non-application-specific | inspection | `ImportBoundaryTests` asserts no shared package exports a page, feature state, or application component. |
+| standards/rule/frontend-structure.keep-imports-directional | inspection | `ImportBoundaryTests` asserts no shared or feature module imports a route path. |
+| standards/rule/frontend-structure.use-this-feature-layout | inspection | Folder review compares each feature folder against the layout in this section. |
+| standards/rule/frontend-structure.use-explicit-public-entry-points-for-workspace-packages | inspection | `ImportBoundaryTests` asserts no application imports a package internal path. |
+| standards/rule/frontend-structure.keep-tests-near-their-ownership-boundary | inspection | Test layout review confirms focused tests sit beside their module and browser tests share one root. |

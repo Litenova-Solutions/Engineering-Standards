@@ -16,7 +16,7 @@ This command reads the UI configuration each frontend declares. It then checks v
 
 A consumer with no React web UI configuration passes, and the output names every frontend the run skipped together with the platform each one declared.
 
-The run also reports how many composition recipes the catalog holds, which of them no page names, and which one page names. A recipe with one consumer is reported rather than refused, because `FRONTEND.UI.CONVENTION.003` states a default a consumer can replace.
+The run also reports how many composition recipes the catalog holds, which of them no page names, and which one page names. A recipe with one consumer is reported rather than refused, because `standards/rule/frontend-ui.promote-a-recipe-on-its-second-consumer` states a default a consumer can replace.
 
 Three checks read the application source rather than the specification tree. The frozen-plan check resolves each route from the tree under `app`. It follows the imports that route makes inside its own frontend. It reports every `data-region` value the sidecar does not name. The acceptance check reads the record in the `evidence` directory beside that route. The state check resolves each declared state to a component the vocabulary maps it to.
 

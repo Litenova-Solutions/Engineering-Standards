@@ -8,15 +8,15 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 ## Agent Summary {#agent-summary}
 
-- Use the supported ASP.NET Core and PostgreSQL profile. (CORE.SCOPE.APPLICATION.001)
-- Keep one business context and deployment boundary. (CORE.SCOPE.CONTEXT.001)
-- Select conditional extensions only when criteria apply. (CORE.SCOPE.EXTENSIONS.001)
-- Record unsupported architecture decisions explicitly. (CORE.SCOPE.OUTSIDE.001)
-- Declare a consumer that ships no backend. (CORE.SCOPE.BACKEND.001)
+- Use the supported ASP.NET Core and PostgreSQL profile. (standards/rule/core-scope.use-the-supported-application-profile)
+- Keep one business context and deployment boundary. (standards/rule/core-scope.keep-one-bounded-context)
+- Select conditional extensions only when criteria apply. (standards/rule/core-scope.select-conditional-extensions-explicitly)
+- Record unsupported architecture decisions explicitly. (standards/rule/core-scope.record-unsupported-scope-decisions)
+- Declare a consumer that ships no backend. (standards/rule/core-scope.declare-a-consumer-that-has-no-backend)
 
 ## Standards
 
-### Use the supported application profile (CORE.SCOPE.APPLICATION.001)
+### Use the supported application profile (standards/rule/core-scope.use-the-supported-application-profile)
 
 **Requirement:** A `dotnet-nextjs` profile consumer MUST use one business web system with ASP.NET Core API, PostgreSQL, Marten, and zero or more Next.js frontends.
 
@@ -24,7 +24,7 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 **Example:** An API-only catalog fits; a native-only mobile application does not.
 
-### Keep one bounded context (CORE.SCOPE.CONTEXT.001)
+### Keep one bounded context (standards/rule/core-scope.keep-one-bounded-context)
 
 **Requirement:** A `dotnet-nextjs` profile consumer MUST keep one business language and deployment boundary.
 
@@ -32,7 +32,7 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 **Example:** Posts, Authors, and Comments can be modules in one publishing context.
 
-### Select conditional extensions explicitly (CORE.SCOPE.EXTENSIONS.001)
+### Select conditional extensions explicitly (standards/rule/core-scope.select-conditional-extensions-explicitly)
 
 **Requirement:** A consumer MUST select an extension declared in `extensions` within `standards.manifest.json` only when that extension's stated activation criteria apply.
 
@@ -40,21 +40,21 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 **Example:** Caching, durable messaging, executable BDD, realtime delivery, multitenancy, reporting, and alternate persistence are extensions. [The extension index](../ext/README.md) groups every shipped extension by the capability it adds.
 
-### Record selected extensions (CORE.SCOPE.EXTENSIONS.002)
+### Record selected extensions (standards/rule/core-scope.record-selected-extensions)
 
 **Requirement:** A consumer MUST list every selected extension in `selectedExtensions` in `standards.project.json`.
 
 **Rationale:** The project record determines which extension boundaries apply to its work.
 
-### Declare a consumer that has no backend (CORE.SCOPE.BACKEND.001)
+### Declare a consumer that has no backend (standards/rule/core-scope.declare-a-consumer-that-has-no-backend)
 
 **Requirement:** A consumer with no backend MUST omit `paths.apiSolution` and record a decision naming every baseline rule left without a surface.
 
-**Rationale:** A frontend and its build-time content can satisfy the workspace, frontend, security, operations, and continuous integration conventions with no API, database, or persistence layer. Adding a backend to obtain conformance contradicts `CORE.PRINCIPLES.COMPLEXITY.001`.
+**Rationale:** A frontend and its build-time content can satisfy the workspace, frontend, security, operations, and continuous integration conventions with no API, database, or persistence layer. Adding a backend to obtain conformance contradicts `standards/rule/core-principles.require-current-complexity-activation`.
 
-**Example:** `QUALITY.CI.GATES.001` already permits skipping a gate whose surface does not exist, so a missing backend gate is a recorded consequence rather than an unexplained absence.
+**Example:** `standards/rule/quality-ci.run-applicable-gates-on-every-pull-request` already permits skipping a gate whose surface does not exist, so a missing backend gate is a recorded consequence rather than an unexplained absence.
 
-### Record unsupported scope decisions (CORE.SCOPE.OUTSIDE.001)
+### Record unsupported scope decisions (standards/rule/core-scope.record-unsupported-scope-decisions)
 
 **Requirement:** A consumer MUST record a separate profile or project decision for microservices, multiple contexts, native clients, other platforms, event sourcing, active-active regions, or large pipelines.
 
@@ -62,7 +62,7 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 ## Conventions
 
-### Start with one API and database (CORE.SCOPE.CONVENTION.001)
+### Start with one API and database (standards/rule/core-scope.start-with-one-api-and-database)
 
 **Default:** Use one API deployable and one database for the baseline profile.
 
@@ -70,7 +70,7 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 **Rationale:** A Worker appears only when a process continues independently of an HTTP request.
 
-### Measure capacity before expansion (CORE.SCOPE.CONVENTION.002)
+### Measure capacity before expansion (standards/rule/core-scope.measure-capacity-before-expansion)
 
 **Default:** Record current load, latency target, and observed constraint before adding caches, replicas, queues, or partitioning.
 
@@ -80,7 +80,7 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 ## Reference example
 
-This informative example demonstrates `CORE.SCOPE.APPLICATION.001` and `CORE.SCOPE.EXTENSIONS.001`.
+This informative example demonstrates `standards/rule/core-scope.use-the-supported-application-profile` and `standards/rule/core-scope.select-conditional-extensions-explicitly`.
 
 A publishing product can support sign-in, draft creation, publication, and public reading. Multi-tenant publication, live editing, and bulk analytics require their selected extension boundaries.
 
@@ -88,11 +88,11 @@ A publishing product can support sign-in, draft creation, publication, and publi
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| CORE.SCOPE.APPLICATION.001 | inspection | Consumer profile and project structure match the supported application definition. |
-| CORE.SCOPE.CONTEXT.001 | inspection | Architecture review identifies one business language and deployment boundary. |
-| CORE.SCOPE.EXTENSIONS.001 | inspection | Every selected extension cites its activation condition. |
-| CORE.SCOPE.EXTENSIONS.002 | static | `ScopeExtensionsTests` asserts project schema validation resolves each selected extension. |
-| CORE.SCOPE.BACKEND.001 | static | `node standards/tools/validate-consumer.mjs` accepts an absent `paths.apiSolution` only alongside its recorded decision. |
-| CORE.SCOPE.OUTSIDE.001 | inspection | Unsupported architecture work cites a separate profile or project decision. |
-| CORE.SCOPE.CONVENTION.001 | inspection | Baseline topology uses one API and database or records a replacement. |
-| CORE.SCOPE.CONVENTION.002 | inspection | Capacity decision records load, target latency, and observed constraint. |
+| standards/rule/core-scope.use-the-supported-application-profile | inspection | Consumer profile and project structure match the supported application definition. |
+| standards/rule/core-scope.keep-one-bounded-context | inspection | Architecture review identifies one business language and deployment boundary. |
+| standards/rule/core-scope.select-conditional-extensions-explicitly | inspection | Every selected extension cites its activation condition. |
+| standards/rule/core-scope.record-selected-extensions | static | `ScopeExtensionsTests` asserts project schema validation resolves each selected extension. |
+| standards/rule/core-scope.declare-a-consumer-that-has-no-backend | static | `node standards/tools/validate-consumer.mjs` accepts an absent `paths.apiSolution` only alongside its recorded decision. |
+| standards/rule/core-scope.record-unsupported-scope-decisions | inspection | Unsupported architecture work cites a separate profile or project decision. |
+| standards/rule/core-scope.start-with-one-api-and-database | inspection | Baseline topology uses one API and database or records a replacement. |
+| standards/rule/core-scope.measure-capacity-before-expansion | inspection | Capacity decision records load, target latency, and observed constraint. |

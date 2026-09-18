@@ -190,7 +190,7 @@ function build() {
   // The frontend list is blanked so the controlled UI validator stays out of
   // these cases, and the use-case template still names 'web' as the surface that
   // calls it. Declaring it as a plain surface keeps that row resolvable without
-  // activating the UI pass. (CORE.SYSTEM.CONSUMERS.001)
+  // activating the UI pass. (standards/rule/core-system.name-what-calls-a-use-case)
   project.paths.surfaces = [{ name: 'web', description: 'the fixture frontend' }];
   // The citation pass reads only what the project declares, so the fixture
   // declares one root and the cases write test files into it.
@@ -398,7 +398,7 @@ fileCase('section index for a directory that owns no boundary', 'docs/ui/README.
 fileCase('a second section index is permitted', 'docs/research/README.md', `---\n${JSON.stringify({ kind: 'section-index', id: 'research', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Research register\n`, null);
 fileCase('broken internal link', 'docs/domain/modules/orders/linking.md', '# Linking\n\nSee the [absent record](./absent.md).\n', 'broken link');
 
-console.log('\nUse-case directory grammar (CORE.SYSTEM.CONVENTION.002)');
+console.log('\nUse-case directory grammar (standards/rule/core-system.group-module-use-case-files-by-aggregate-root)');
 report('flat single-aggregate module resolves', null, run());
 fileCase(
   'nested aggregate subdirectory resolves',
@@ -413,7 +413,7 @@ fileCase(
   'does not match its path',
 );
 
-console.log('\nExtension scope (CORE.SYSTEM.EXTENSIONS.001)');
+console.log('\nExtension scope (standards/rule/core-system.select-extensions-before-applying-them)');
 metaCase('local extension that the project did not select', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.applicableExtensions = ['cache']; }, "'cache' is not in selectedExtensions");
 projectCase('selected local extension on an allowed kind', (p) => { p.selectedExtensions = ['cache']; }, null);
 
@@ -431,7 +431,7 @@ projectCase('selected local extension on an allowed kind', (p) => { p.selectedEx
   writeFile('standards.project.json', originalProject);
 }
 
-console.log('\nAdoption gate (CORE.AUTHORING.SNAPSHOT.006)');
+console.log('\nAdoption gate (standards/rule/core-authoring.record-the-reviewed-standards-release)');
 projectCase('reviewed release matches the pinned release', () => {}, null);
 projectCase('reviewed release is behind the pinned release', (p) => { p.reviewedStandardsVersion = '1.11.0'; }, 'does not match the pinned standards');
 projectCase('reviewed release is absent', (p) => { delete p.reviewedStandardsVersion; }, "missing 'reviewedStandardsVersion'");
@@ -442,7 +442,7 @@ projectCase('prohibited kind that no specification declares', (p) => { p.prohibi
 projectCase('prohibited kind the validator does not know', (p) => { p.prohibitedKinds = ['workflows']; }, "prohibitedKinds 'workflows' is not a specification kind");
 projectCase('prohibitedKinds outside an array', (p) => { p.prohibitedKinds = 'workflow'; }, 'prohibitedKinds must be an array');
 
-console.log('\nMetadata carrier (CORE.AUTHORING.METADATA.002)');
+console.log('\nMetadata carrier (standards/rule/core-authoring.declare-structured-specification-metadata)');
 fileCase(
   'metadata in a fenced block instead of the carrier',
   'docs/domain/modules/orders/fenced.md',
@@ -453,7 +453,7 @@ fileCase('unterminated metadata block', 'docs/domain/modules/orders/open.md', '-
 fileCase('invalid JSON in the carrier', 'docs/domain/modules/orders/broken.md', '---\n{\n  "kind": use-case\n}\n---\n\n# Broken\n', 'JSON parse error');
 fileCase('prose page with no metadata block', 'docs/operations/security-and-privacy.md', '# Security and privacy\n\nCross-cutting reference prose with no structured kind.\n', 'no metadata block');
 
-console.log('\nUnstructured documentation (CORE.AUTHORING.METADATA.004)');
+console.log('\nUnstructured documentation (standards/rule/core-authoring.classify-every-specification-file)');
 projectCase('unstructuredDocs outside an array', (p) => { p.paths.unstructuredDocs = 'docs/operations'; }, 'paths.unstructuredDocs must be an array');
 projectCase('unstructured path that is not on disk', (p) => { p.paths.unstructuredDocs = ['docs/nowhere']; }, "paths.unstructuredDocs 'docs/nowhere' does not exist");
 projectCase('unstructured path that is on disk', (p) => { p.paths.unstructuredDocs = ['docs/operations']; }, null);
@@ -480,7 +480,7 @@ fileCase(
   "bad specStatus 'final'",
 );
 
-console.log('\nScenario sections (CORE.SYSTEM.SCENARIO.001, CORE.SYSTEM.SCENARIO.002, CORE.SYSTEM.SCENARIO.003, CORE.SYSTEM.CONVENTION.007)');
+console.log('\nScenario sections (standards/rule/core-system.state-one-occasion-for-every-behavior-specification, standards/rule/core-system.keep-a-scenario-informative, standards/rule/core-system.derive-every-scenario-from-one-reference-cast, standards/rule/core-system.bound-a-scenario-to-one-paragraph)');
 bodyCase(
   'behavior specification with no Scenario section',
   'docs/domain/modules/orders/cancel-order.md',
@@ -542,7 +542,7 @@ fileCase(
   writeFile('docs/domain/scenarios.md', original);
 }
 
-console.log('\nProject language (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.VOICE.002)');
+console.log('\nProject language (standards/rule/core-authoring.record-the-project-vocabulary-as-data, standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope, standards/rule/core-authoring.state-meaning-literally)');
 {
   const languageFile = 'docs/language.json';
   const record = {
@@ -636,7 +636,7 @@ console.log('\nProject language (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.00
   report('no language record present', null, run());
 }
 
-console.log('\nVocabulary over non-Markdown surfaces (CORE.AUTHORING.TERM.004)');
+console.log('\nVocabulary over non-Markdown surfaces (standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets)');
 {
   const languageFile = 'docs/language.json';
   const originalProject = readFixture('standards.project.json');
@@ -709,7 +709,7 @@ console.log('\nVocabulary over non-Markdown surfaces (CORE.AUTHORING.TERM.004)')
   fs.rmSync(path.join(fixture, languageFile));
 }
 
-console.log('\nControlled prose in consumer documentation (CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003)');
+console.log('\nControlled prose in consumer documentation (standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation, standards/rule/core-authoring.remove-a-reread-page-from-the-prose-baseline)');
 {
   const page = 'docs/domain/modules/orders/README.md';
   const original = readFixture(page);
@@ -741,7 +741,7 @@ console.log('\nControlled prose in consumer documentation (CORE.AUTHORING.PROSE.
   writeFile(page, original);
 }
 
-console.log('\nConsumer linkage (CORE.SYSTEM.CONSUMERS.001, CORE.SYSTEM.CONSUMERS.002)');
+console.log('\nConsumer linkage (standards/rule/core-system.name-what-calls-a-use-case, standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)');
 const useCasePath = 'docs/domain/modules/orders/cancel-order.md';
 const screenPath = 'docs/ui/web/cancel.md';
 
@@ -806,7 +806,7 @@ consumersCase(
   null,
 );
 
-console.log('\nAcceptance citation (BACKEND.TESTING.TRACE.002, FRONTEND.TESTING.TRACE.002, EXT.BDD.TRACE.001)');
+console.log('\nAcceptance citation (standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form, standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion, standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)');
 // The template use case declares AC-ORDERS-CANCEL-ORDER-01, so each case cites
 // that identifier or a neighbouring one that no page declares.
 const DECLARED = 'AC-ORDERS-CANCEL-ORDER-01';

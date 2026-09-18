@@ -6,39 +6,39 @@ The client renders entirely in the browser. Routes declare their own templates a
 
 ## Agent Summary {#agent-summary}
 
-- Rendering runs in the browser with no server round trip. (BLAZOR.RENDERING.MODE.001)
-- A routable component declares its own template under `Pages/`. (BLAZOR.RENDERING.ROUTES.001)
-- Each route defines loading, empty, error, and content behavior. (BLAZOR.RENDERING.STATE.001)
-- Pages a first-time visitor reads download no runtime. (BLAZOR.RENDERING.ACQUISITION.001)
-- The application starts and navigates offline after first load. (BLAZOR.RENDERING.OFFLINE.001)
+- Rendering runs in the browser with no server round trip. (standards/rule/blazor-rendering.render-on-the-client-only)
+- A routable component declares its own template under `Pages/`. (standards/rule/blazor-rendering.declare-routes-on-pages)
+- Each route defines loading, empty, error, and content behavior. (standards/rule/blazor-rendering.give-every-route-explicit-states)
+- Pages a first-time visitor reads download no runtime. (standards/rule/blazor-rendering.keep-the-acquisition-surface-static)
+- The application starts and navigates offline after first load. (standards/rule/blazor-rendering.operate-offline-after-first-load)
 
 ## Standards
 
-### Render on the client only (BLAZOR.RENDERING.MODE.001)
+### Render on the client only (standards/rule/blazor-rendering.render-on-the-client-only)
 
 **Requirement:** A page MUST render without server-side execution at first paint.
 
 **Rationale:** Interactive server rendering, automatic render mode, and prerendering each require a live server connection, so all three are outside this profile.
 
-### Declare routes on pages (BLAZOR.RENDERING.ROUTES.001)
+### Declare routes on pages (standards/rule/blazor-rendering.declare-routes-on-pages)
 
 **Requirement:** A routable component MUST live under `Pages/`, declare one `@page` template, and type every route parameter.
 
 **Rationale:** Feature components stay unroutable. An unparsable parameter renders the not-found state rather than throwing.
 
-### Give every route explicit states (BLAZOR.RENDERING.STATE.001)
+### Give every route explicit states (standards/rule/blazor-rendering.give-every-route-explicit-states)
 
 **Requirement:** A route MUST define its loading, empty, error, and content behavior.
 
 **Rationale:** A route reading persisted state renders its loading state until the read completes, so it never shows content from an unloaded store.
 
-### Keep the acquisition surface static (BLAZOR.RENDERING.ACQUISITION.001)
+### Keep the acquisition surface static (standards/rule/blazor-rendering.keep-the-acquisition-surface-static)
 
 **Requirement:** A marketing, search-landing, or informational page MUST be served as a static document outside the WebAssembly application.
 
 **Rationale:** A first-time visitor then downloads no runtime. The application boundary begins where a visitor starts using the product.
 
-### Operate offline after first load (BLAZOR.RENDERING.OFFLINE.001)
+### Operate offline after first load (standards/rule/blazor-rendering.operate-offline-after-first-load)
 
 **Requirement:** A client MUST register a service worker that caches the application shell and framework payload.
 
@@ -48,7 +48,7 @@ The rule covers the online case as much as the offline one. A cached shell serve
 
 ## Conventions
 
-### Name routes for the reader (BLAZOR.RENDERING.CONVENTION.001)
+### Name routes for the reader (standards/rule/blazor-rendering.name-routes-for-the-reader)
 
 **Default:** Use lowercase hyphen-separated route segments that match the documented use case or page name.
 
@@ -56,7 +56,7 @@ The rule covers the online case as much as the offline one. A cached shell serve
 
 **Rationale:** A route that encodes a storage key, internal identifier, or layer name exposes an implementation choice to the address bar.
 
-### Keep navigation state in the URL (BLAZOR.RENDERING.CONVENTION.002)
+### Keep navigation state in the URL (standards/rule/blazor-rendering.keep-navigation-state-in-the-url)
 
 **Default:** Place filters, selected tabs, and pagination in the route or query string.
 
@@ -68,10 +68,10 @@ The rule covers the online case as much as the offline one. A cached shell serve
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BLAZOR.RENDERING.MODE.001 | test | `PublishOutputTests` asserts the output declares no render mode requiring a server. |
-| BLAZOR.RENDERING.ROUTES.001 | test | `RouteContractTests` asserts each routable component declares one template with typed parameters. |
-| BLAZOR.RENDERING.STATE.001 | test | `RouteStateTests` asserts each route renders its loading, empty, error, and content states. |
-| BLAZOR.RENDERING.ACQUISITION.001 | test | `AcquisitionTests` asserts a landing page loads without fetching the framework payload. |
-| BLAZOR.RENDERING.OFFLINE.001 | test | `OfflineStartupTests` starts the application with the network disabled after a first load. |
-| BLAZOR.RENDERING.CONVENTION.001 | inspection | Route review compares each template against its documented use-case name. |
-| BLAZOR.RENDERING.CONVENTION.002 | inspection | Navigation review confirms refresh-surviving state appears in the route or query string. |
+| standards/rule/blazor-rendering.render-on-the-client-only | test | `PublishOutputTests` asserts the output declares no render mode requiring a server. |
+| standards/rule/blazor-rendering.declare-routes-on-pages | test | `RouteContractTests` asserts each routable component declares one template with typed parameters. |
+| standards/rule/blazor-rendering.give-every-route-explicit-states | test | `RouteStateTests` asserts each route renders its loading, empty, error, and content states. |
+| standards/rule/blazor-rendering.keep-the-acquisition-surface-static | test | `AcquisitionTests` asserts a landing page loads without fetching the framework payload. |
+| standards/rule/blazor-rendering.operate-offline-after-first-load | test | `OfflineStartupTests` starts the application with the network disabled after a first load. |
+| standards/rule/blazor-rendering.name-routes-for-the-reader | inspection | Route review compares each template against its documented use-case name. |
+| standards/rule/blazor-rendering.keep-navigation-state-in-the-url | inspection | Navigation review confirms refresh-surviving state appears in the route or query string. |

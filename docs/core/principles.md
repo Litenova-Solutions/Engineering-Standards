@@ -6,64 +6,64 @@ These principles resolve choices not covered by narrower conventions. They favor
 
 ## Agent Summary {#agent-summary}
 
-- Keep one authored source for every fact. (CORE.PRINCIPLES.SOURCE.001)
-- Record specification ownership and status separately. (CORE.PRINCIPLES.SPECIFICATION.001, CORE.PRINCIPLES.SPECIFICATION.003)
-- Deliver complete vertical use cases. (CORE.PRINCIPLES.SLICE.001)
-- Mechanically prove enforceable boundaries. (CORE.PRINCIPLES.ENFORCEMENT.001)
-- Add complexity only after an activation criterion applies. (CORE.PRINCIPLES.COMPLEXITY.001)
-- Name intent at public and architectural boundaries. (CORE.PRINCIPLES.NAMING.001)
+- Keep one authored source for every fact. (standards/rule/core-principles.keep-one-authored-source)
+- Record specification ownership and status separately. (standards/rule/core-principles.declare-specification-ownership, standards/rule/core-principles.separate-authority-from-implementation)
+- Deliver complete vertical use cases. (standards/rule/core-principles.deliver-complete-use-case-slices)
+- Mechanically prove enforceable boundaries. (standards/rule/core-principles.prove-enforceable-boundaries-mechanically)
+- Add complexity only after an activation criterion applies. (standards/rule/core-principles.require-current-complexity-activation)
+- Name intent at public and architectural boundaries. (standards/rule/core-principles.name-boundary-intent)
 
 ## Standards
 
-### Keep one authored source (CORE.PRINCIPLES.SOURCE.001)
+### Keep one authored source (standards/rule/core-principles.keep-one-authored-source)
 
 **Requirement:** A consumer MUST author each rule, package version, status, route, and acceptance criterion in one canonical source.
 
 **Rationale:** Other documents link to the source, and generated application artifacts can derive from it.
 
-### Locate package versions in the manifest (CORE.PRINCIPLES.SOURCE.002)
+### Locate package versions in the manifest (standards/rule/core-principles.locate-package-versions-in-the-manifest)
 
 **Requirement:** A consumer MUST store package versions in `standards.manifest.json`.
 
 **Rationale:** One manifest provides the selected profile's version authority.
 
-### Locate specification status in metadata (CORE.PRINCIPLES.SOURCE.003)
+### Locate specification status in metadata (standards/rule/core-principles.locate-specification-status-in-metadata)
 
 **Requirement:** A consumer MUST store use-case specification and implementation status in Specification Metadata.
 
 **Rationale:** Structured metadata exposes status to repository tools and reviewers.
 
-### Cite proved acceptance criteria (CORE.PRINCIPLES.SOURCE.004)
+### Cite proved acceptance criteria (standards/rule/core-principles.cite-proved-acceptance-criteria)
 
 **Requirement:** An automated test MUST cite every acceptance criterion that it proves.
 
 **Rationale:** A stable criterion citation connects executable evidence to approved behavior.
 
-### Declare specification ownership (CORE.PRINCIPLES.SPECIFICATION.001)
+### Declare specification ownership (standards/rule/core-principles.declare-specification-ownership)
 
 **Requirement:** A structured consumer specification MUST declare kind, ID, authority status, owner, review date, and required kind fields.
 
 **Rationale:** The [authoring standard](authoring.md) defines the opening metadata block and schema requirements.
 
-### Classify specification authority (CORE.PRINCIPLES.SPECIFICATION.002)
+### Classify specification authority (standards/rule/core-principles.classify-specification-authority)
 
 **Requirement:** A specification status MUST use `draft`, `approved`, or `retired` with its declared authority meaning.
 
 **Rationale:** Draft records are under review, approved records are authoritative, and retired records preserve prior scope.
 
-### Separate authority from implementation (CORE.PRINCIPLES.SPECIFICATION.003)
+### Separate authority from implementation (standards/rule/core-principles.separate-authority-from-implementation)
 
 **Requirement:** A behavior specification MUST declare an implementation status in addition to its specification authority status.
 
-**Rationale:** An approved planned target is not an implemented behavior claim. `CORE.SYSTEM.METADATA.001` and `schemas/specification-metadata.schema.json` own the permitted values for both fields.
+**Rationale:** An approved planned target is not an implemented behavior claim. `standards/rule/core-system.declare-specification-metadata` and `schemas/specification-metadata.schema.json` own the permitted values for both fields.
 
-### Retire public behavior deliberately (CORE.PRINCIPLES.SPECIFICATION.004)
+### Retire public behavior deliberately (standards/rule/core-principles.retire-public-behavior-deliberately)
 
 **Requirement:** A retired specification MUST remove supported public entry points before retirement.
 
 **Rationale:** A retired record cannot remain the owner of a still-supported public behavior.
 
-### Deliver complete use-case slices (CORE.PRINCIPLES.SLICE.001)
+### Deliver complete use-case slices (standards/rule/core-principles.deliver-complete-use-case-slices)
 
 **Requirement:** A consumer MUST implement each selected use case as the smallest complete path through Domain, persistence, entry points, evidence, and operating impact.
 
@@ -71,7 +71,7 @@ These principles resolve choices not covered by narrower conventions. They favor
 
 **Example:** `posts.create-draft` completes required layers before another unfinished Post operation starts.
 
-### Prove enforceable boundaries mechanically (CORE.PRINCIPLES.ENFORCEMENT.001)
+### Prove enforceable boundaries mechanically (standards/rule/core-principles.prove-enforceable-boundaries-mechanically)
 
 **Requirement:** A consumer MUST use project references, compiler visibility, architecture tests, lint rules, or behavior tests for enforceable boundaries.
 
@@ -79,25 +79,25 @@ These principles resolve choices not covered by narrower conventions. They favor
 
 **Example:** A project-reference test proves Domain has no Infrastructure reference.
 
-### Require current complexity activation (CORE.PRINCIPLES.COMPLEXITY.001)
+### Require current complexity activation (standards/rule/core-principles.require-current-complexity-activation)
 
 **Requirement:** A consumer MUST add packages, projects, wrappers, background processes, caches, queues, or distributed patterns only for a current documented requirement.
 
 **Rationale:** A current use case, Workflow, or project need supplies an activation criterion for added complexity.
 
-### Select extensions by criteria (CORE.PRINCIPLES.COMPLEXITY.002)
+### Select extensions by criteria (standards/rule/core-principles.select-extensions-by-criteria)
 
 **Requirement:** A consumer MUST enable an extension when its activation criteria apply.
 
 **Rationale:** Preference and possible future need do not establish an activation criterion.
 
-### Name boundary intent (CORE.PRINCIPLES.NAMING.001)
+### Name boundary intent (standards/rule/core-principles.name-boundary-intent)
 
 **Requirement:** A consumer MUST use business operation names, specific command and query mediators, and business-action external ports at boundaries.
 
 **Rationale:** Specific names reveal purpose and ownership at the point where components interact.
 
-### Avoid generic boundary names (CORE.PRINCIPLES.NAMING.002)
+### Avoid generic boundary names (standards/rule/core-principles.avoid-generic-boundary-names)
 
 **Requirement:** A consumer MUST NOT use generic bus, manager, helper, processor, or service names when a narrower name exists.
 
@@ -107,7 +107,7 @@ These principles resolve choices not covered by narrower conventions. They favor
 
 ## Conventions
 
-### Prefer direct owned dependencies (CORE.PRINCIPLES.CONVENTION.001)
+### Prefer direct owned dependencies (standards/rule/core-principles.prefer-direct-owned-dependencies)
 
 **Default:** Use a selected framework type directly inside the layer that owns it until an architectural boundary exists.
 
@@ -115,7 +115,7 @@ These principles resolve choices not covered by narrower conventions. They favor
 
 **Rationale:** A project-owned abstraction exists for provider replacement, test boundary, stable domain concept, or architecture boundary.
 
-### Prefer local code until reuse is real (CORE.PRINCIPLES.CONVENTION.002)
+### Prefer local code until reuse is real (standards/rule/core-principles.prefer-local-code-until-reuse-is-real)
 
 **Default:** Keep operation-specific code in its operation folder until two real consumers need the same precise behavior.
 
@@ -125,7 +125,7 @@ These principles resolve choices not covered by narrower conventions. They favor
 
 ## Reference example
 
-This informative example demonstrates `CORE.PRINCIPLES.CONVENTION.001` and `CORE.PRINCIPLES.CONVENTION.002`.
+This informative example demonstrates `standards/rule/core-principles.prefer-direct-owned-dependencies` and `standards/rule/core-principles.prefer-local-code-until-reuse-is-real`.
 
 - Application query handlers use `IQuerySession` because Marten is part of the selected profile.
 - Domain repository interfaces remain project-owned because persistence cannot enter Domain.
@@ -135,19 +135,19 @@ This informative example demonstrates `CORE.PRINCIPLES.CONVENTION.001` and `CORE
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| CORE.PRINCIPLES.SOURCE.001 | inspection | Review identifies one canonical authored source for each changed fact. |
-| CORE.PRINCIPLES.SOURCE.002 | static | `CoreSourceTests` asserts dependency review resolves each selected version from the manifest. |
-| CORE.PRINCIPLES.SOURCE.003 | static | `CoreSourceTests` asserts consumer validator resolves specification and implementation status from metadata. |
-| CORE.PRINCIPLES.SOURCE.004 | static | `CoreSourceTests` resolves cited acceptance criteria to owned use-case specifications. |
-| CORE.PRINCIPLES.SPECIFICATION.001 | static | `CoreDocumentsTests` asserts consumer validator validates required metadata fields for each specification kind. |
-| CORE.PRINCIPLES.SPECIFICATION.002 | static | `CoreDocumentsTests` asserts metadata validator accepts only declared authority-status values. |
-| CORE.PRINCIPLES.SPECIFICATION.003 | static | `node tools/validate-consumer.mjs` resolves both status fields against the metadata schema. |
-| CORE.PRINCIPLES.SPECIFICATION.004 | inspection | Retirement review identifies removed public entry points. |
-| CORE.PRINCIPLES.SLICE.001 | inspection | Use-case review links Domain, persistence, entry points, tests, and operations. |
-| CORE.PRINCIPLES.ENFORCEMENT.001 | test | `CoreEnforceTests` asserts architecture, lint, or behavior evidence proves each enforceable boundary. |
-| CORE.PRINCIPLES.COMPLEXITY.001 | inspection | Added complexity cites its current use case, Workflow, or project requirement. |
-| CORE.PRINCIPLES.COMPLEXITY.002 | inspection | Selected extension record cites its activation criteria. |
-| CORE.PRINCIPLES.NAMING.001 | inspection | Boundary review identifies specific business names. |
-| CORE.PRINCIPLES.NAMING.002 | static | `CoreNamingTests` flags generic boundary names lacking a narrower replacement. |
-| CORE.PRINCIPLES.CONVENTION.001 | inspection | Dependency review identifies owned framework types or explicit abstractions. |
-| CORE.PRINCIPLES.CONVENTION.002 | inspection | Shared-code review records two real consumers and a precise shared name. |
+| standards/rule/core-principles.keep-one-authored-source | inspection | Review identifies one canonical authored source for each changed fact. |
+| standards/rule/core-principles.locate-package-versions-in-the-manifest | static | `CoreSourceTests` asserts dependency review resolves each selected version from the manifest. |
+| standards/rule/core-principles.locate-specification-status-in-metadata | static | `CoreSourceTests` asserts consumer validator resolves specification and implementation status from metadata. |
+| standards/rule/core-principles.cite-proved-acceptance-criteria | static | `CoreSourceTests` resolves cited acceptance criteria to owned use-case specifications. |
+| standards/rule/core-principles.declare-specification-ownership | static | `CoreDocumentsTests` asserts consumer validator validates required metadata fields for each specification kind. |
+| standards/rule/core-principles.classify-specification-authority | static | `CoreDocumentsTests` asserts metadata validator accepts only declared authority-status values. |
+| standards/rule/core-principles.separate-authority-from-implementation | static | `node tools/validate-consumer.mjs` resolves both status fields against the metadata schema. |
+| standards/rule/core-principles.retire-public-behavior-deliberately | inspection | Retirement review identifies removed public entry points. |
+| standards/rule/core-principles.deliver-complete-use-case-slices | inspection | Use-case review links Domain, persistence, entry points, tests, and operations. |
+| standards/rule/core-principles.prove-enforceable-boundaries-mechanically | test | `CoreEnforceTests` asserts architecture, lint, or behavior evidence proves each enforceable boundary. |
+| standards/rule/core-principles.require-current-complexity-activation | inspection | Added complexity cites its current use case, Workflow, or project requirement. |
+| standards/rule/core-principles.select-extensions-by-criteria | inspection | Selected extension record cites its activation criteria. |
+| standards/rule/core-principles.name-boundary-intent | inspection | Boundary review identifies specific business names. |
+| standards/rule/core-principles.avoid-generic-boundary-names | static | `CoreNamingTests` flags generic boundary names lacking a narrower replacement. |
+| standards/rule/core-principles.prefer-direct-owned-dependencies | inspection | Dependency review identifies owned framework types or explicit abstractions. |
+| standards/rule/core-principles.prefer-local-code-until-reuse-is-real | inspection | Shared-code review records two real consumers and a precise shared name. |

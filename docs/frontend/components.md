@@ -10,18 +10,18 @@ The governance boundary limits agent-generated UI drift by making the approved p
 ## Agent Summary {#agent-summary}
 
 
-- Components sit at the ownership level their reuse justifies. (FRONTEND.COMPONENTS.OWNERSHIP.001)
-- Props carry values and callbacks, not services or stores. (FRONTEND.COMPONENTS.PROPS.001)
-- Interactive UI supports keyboard, focus, labels, and announcements. (FRONTEND.COMPONENTS.ACCESSIBILITY.001)
-- Variants use theme tokens through the variant helper. (FRONTEND.COMPONENTS.VARIANTS.001)
-- Data-aware components render every applicable state. (FRONTEND.COMPONENTS.STATE.001)
-- Untrusted content never reaches raw HTML rendering. (FRONTEND.COMPONENTS.CONTENT.001)
-- Content images use the framework image component. (FRONTEND.COMPONENTS.IMAGE.001)
+- Components sit at the ownership level their reuse justifies. (standards/rule/frontend-components.use-the-component-ownership-levels)
+- Props carry values and callbacks, not services or stores. (standards/rule/frontend-components.keep-props-narrow)
+- Interactive UI supports keyboard, focus, labels, and announcements. (standards/rule/frontend-components.meet-accessibility-requirements)
+- Variants use theme tokens through the variant helper. (standards/rule/frontend-components.use-declared-visual-variants)
+- Data-aware components render every applicable state. (standards/rule/frontend-components.render-complete-states)
+- Untrusted content never reaches raw HTML rendering. (standards/rule/frontend-components.protect-rich-content-boundaries)
+- Content images use the framework image component. (standards/rule/frontend-components.use-the-framework-image-component-for-content-images)
 
 ## Standards
 
 
-### Use the component ownership levels (FRONTEND.COMPONENTS.OWNERSHIP.001)
+### Use the component ownership levels (standards/rule/frontend-components.use-the-component-ownership-levels)
 
 **Requirement:** A component MUST sit at the ownership level its reuse justifies: primitive, shared, module feature, or route composition.
 
@@ -36,13 +36,13 @@ The governance boundary limits agent-generated UI drift by making the approved p
 
 The example does not place business operations inside `components/ui/`.
 
-### Keep props narrow (FRONTEND.COMPONENTS.PROPS.001)
+### Keep props narrow (standards/rule/frontend-components.keep-props-narrow)
 
 **Requirement:** A component MUST receive the values and callbacks it needs, not a service, API client, mutable store, or aggregate-shaped object.
 
 **Rationale:** Props crossing a Server to Client boundary must also serialize, so a broad object fails at that boundary.
 
-### Meet accessibility requirements (FRONTEND.COMPONENTS.ACCESSIBILITY.001)
+### Meet accessibility requirements (standards/rule/frontend-components.meet-accessibility-requirements)
 
 **Requirement:** Interactive UI MUST support keyboard operation, visible focus, semantic elements, programmatic labels, and asynchronous status announcements.
 
@@ -64,27 +64,27 @@ The five are the ones a component can get wrong on its own. [WCAG 2.2](https://w
 
 The AA criteria bind a project targeting AA. The three AAA rows are listed so a project selecting them knows what it selected. The page sidecar records target size, focus order, and status announcements per route, which is where the flow-level criteria are checked.
 
-### Use declared visual variants (FRONTEND.COMPONENTS.VARIANTS.001)
+### Use declared visual variants (standards/rule/frontend-components.use-declared-visual-variants)
 
 **Requirement:** A repeated component variant MUST use Tailwind theme tokens through `class-variance-authority` rather than repeated literal values.
 
 **Rationale:** Repeated pixel values, colors, or long conditional class strings drift apart once more than one feature edits them.
 
-### Render complete states (FRONTEND.COMPONENTS.STATE.001)
+### Render complete states (standards/rule/frontend-components.render-complete-states)
 
 **Requirement:** A data or permission-aware component MUST render its loading, empty, error, forbidden, disabled, pending, and ready states.
 
 **Rationale:** A mutation control also prevents duplicate submission and keeps an error recovery path usable.
 
-These seven are the states a component has. `disabled` and `pending` describe a control and have no route equivalent. A route adds `not-found` under `FRONTEND.RENDERING.STATE.001`, because a missing target resolves at the route rather than inside a component. The two lists differ by design, and `schemas/ui-page.schema.json` holds the complete set a page sidecar can declare.
+These seven are the states a component has. `disabled` and `pending` describe a control and have no route equivalent. A route adds `not-found` under `standards/rule/frontend-rendering.represent-route-states`, because a missing target resolves at the route rather than inside a component. The two lists differ by design, and `schemas/ui-page.schema.json` holds the complete set a page sidecar can declare.
 
-### Protect rich content boundaries (FRONTEND.COMPONENTS.CONTENT.001)
+### Protect rich content boundaries (standards/rule/frontend-components.protect-rich-content-boundaries)
 
 **Requirement:** A component MUST NOT pass untrusted content to `dangerouslySetInnerHTML`.
 
 **Rationale:** Stored rich content requires a project decision naming the sanitizer, allowed elements and attributes, link policy, and test cases.
 
-### Use the framework image component for content images (FRONTEND.COMPONENTS.IMAGE.001)
+### Use the framework image component for content images (standards/rule/frontend-components.use-the-framework-image-component-for-content-images)
 
 **Requirement:** A content image MUST render through the Next.js image component when sizing, responsive delivery, or remote policy applies.
 
@@ -93,7 +93,7 @@ These seven are the states a component has. `disabled` and `pending` describe a 
 ## Conventions
 
 
-### Name components for their role (FRONTEND.COMPONENTS.CONVENTION.001)
+### Name components for their role (standards/rule/frontend-components.name-components-for-their-role)
 
 **Default:** Name a component for the role it plays, such as `CreateDraftForm` or `PostStatusBadge`.
 
@@ -101,7 +101,7 @@ These seven are the states a component has. `disabled` and `pending` describe a 
 
 **Rationale:** A name such as `PostComponent` or `GenericModal` describes its file type rather than its job.
 
-### Give card and section titles heading semantics (FRONTEND.COMPONENTS.CONVENTION.002)
+### Give card and section titles heading semantics (standards/rule/frontend-components.give-card-and-section-titles-heading-semantics)
 
 **Default:** Render a visible card, panel, or section title as a heading element at its correct level.
 
@@ -109,7 +109,7 @@ These seven are the states a component has. `disabled` and `pending` describe a 
 
 **Rationale:** Some primitive sources default a title to a non-heading element, which removes it from the document outline.
 
-### Keep domain values typed until display (FRONTEND.COMPONENTS.CONVENTION.003)
+### Keep domain values typed until display (standards/rule/frontend-components.keep-domain-values-typed-until-display)
 
 **Default:** Keep branded and generated identifier types until the presentation boundary converts them.
 
@@ -117,7 +117,7 @@ These seven are the states a component has. `disabled` and `pending` describe a 
 
 **Rationale:** Dates, money, and status convert to display strings there with explicit locale behavior.
 
-### Use `cn` for class composition (FRONTEND.COMPONENTS.CONVENTION.004)
+### Use `cn` for class composition (standards/rule/frontend-components.use-cn-for-class-composition)
 
 **Default:** Compose class names through one `cn` function per frontend that combines `clsx` and `tailwind-merge`.
 
@@ -125,7 +125,7 @@ These seven are the states a component has. `disabled` and `pending` describe a 
 
 **Rationale:** A second merging helper produces different conflict resolution for the same class pair.
 
-### Keep error boundaries scoped (FRONTEND.COMPONENTS.CONVENTION.005)
+### Keep error boundaries scoped (standards/rule/frontend-components.keep-error-boundaries-scoped)
 
 **Default:** Use a route error boundary for route failure, and a feature boundary only where recovery keeps the page usable.
 
@@ -135,7 +135,7 @@ These seven are the states a component has. `disabled` and `pending` describe a 
 
 ## Reference example
 
-This informative example demonstrates `FRONTEND.COMPONENTS.OWNERSHIP.001` and `FRONTEND.COMPONENTS.PROPS.001`.
+This informative example demonstrates `standards/rule/frontend-components.use-the-component-ownership-levels` and `standards/rule/frontend-components.keep-props-narrow`.
 
 `CreateDraftForm` owns form interaction for one use case. It composes `Button`, `Input`, and `FieldError` primitives, accepts a server action or narrow submission callback, and renders pending and validation states. The primitive `Button` does not know about posts.
 
@@ -144,15 +144,15 @@ This informative example demonstrates `FRONTEND.COMPONENTS.OWNERSHIP.001` and `F
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| FRONTEND.COMPONENTS.OWNERSHIP.001 | inspection | `ComponentPlacementTests` asserts each component path matches the ownership level its imports imply. |
-| FRONTEND.COMPONENTS.PROPS.001 | inspection | `ComponentPropsTests` asserts no component prop type resolves a client, store, or service instance. |
-| FRONTEND.COMPONENTS.ACCESSIBILITY.001 | inspection | `AccessibilityTests` asserts keyboard operation, focus visibility, labels, and status announcements for each interactive component. |
-| FRONTEND.COMPONENTS.VARIANTS.001 | inspection | `node standards/tools/validate-ui.mjs` rejects a literal value where a theme token exists. |
-| FRONTEND.COMPONENTS.STATE.001 | inspection | `ComponentStateTests` asserts each applicable state renders for a data-aware component. |
-| FRONTEND.COMPONENTS.CONTENT.001 | inspection | `node standards/tools/validate-ui.mjs` reports each `dangerouslySetInnerHTML` use for review against its decision. |
-| FRONTEND.COMPONENTS.IMAGE.001 | inspection | `ImageTests` asserts content images use the framework component and carry the correct alternative text. |
-| FRONTEND.COMPONENTS.CONVENTION.001 | inspection | Naming review compares each new component name against its rendered role. |
-| FRONTEND.COMPONENTS.CONVENTION.002 | inspection | `AccessibilityTests` asserts each visible section title renders a heading element. |
-| FRONTEND.COMPONENTS.CONVENTION.003 | inspection | `ViewMappingTests` asserts conversion to display strings happens at the presentation boundary. |
-| FRONTEND.COMPONENTS.CONVENTION.004 | inspection | `node standards/tools/validate-ui.mjs` asserts one class-merge helper exists per frontend. |
-| FRONTEND.COMPONENTS.CONVENTION.005 | inspection | Error boundary review confirms each boundary has a recovery path that keeps its surroundings usable. |
+| standards/rule/frontend-components.use-the-component-ownership-levels | inspection | `ComponentPlacementTests` asserts each component path matches the ownership level its imports imply. |
+| standards/rule/frontend-components.keep-props-narrow | inspection | `ComponentPropsTests` asserts no component prop type resolves a client, store, or service instance. |
+| standards/rule/frontend-components.meet-accessibility-requirements | inspection | `AccessibilityTests` asserts keyboard operation, focus visibility, labels, and status announcements for each interactive component. |
+| standards/rule/frontend-components.use-declared-visual-variants | inspection | `node standards/tools/validate-ui.mjs` rejects a literal value where a theme token exists. |
+| standards/rule/frontend-components.render-complete-states | inspection | `ComponentStateTests` asserts each applicable state renders for a data-aware component. |
+| standards/rule/frontend-components.protect-rich-content-boundaries | inspection | `node standards/tools/validate-ui.mjs` reports each `dangerouslySetInnerHTML` use for review against its decision. |
+| standards/rule/frontend-components.use-the-framework-image-component-for-content-images | inspection | `ImageTests` asserts content images use the framework component and carry the correct alternative text. |
+| standards/rule/frontend-components.name-components-for-their-role | inspection | Naming review compares each new component name against its rendered role. |
+| standards/rule/frontend-components.give-card-and-section-titles-heading-semantics | inspection | `AccessibilityTests` asserts each visible section title renders a heading element. |
+| standards/rule/frontend-components.keep-domain-values-typed-until-display | inspection | `ViewMappingTests` asserts conversion to display strings happens at the presentation boundary. |
+| standards/rule/frontend-components.use-cn-for-class-composition | inspection | `node standards/tools/validate-ui.mjs` asserts one class-merge helper exists per frontend. |
+| standards/rule/frontend-components.keep-error-boundaries-scoped | inspection | Error boundary review confirms each boundary has a recovery path that keeps its surroundings usable. |

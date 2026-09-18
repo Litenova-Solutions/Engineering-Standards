@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { buildProvisionIndex, headingSlug, INDEX_PATH } from './provisions.mjs';
+import { buildProvisionIndex, headingSlug, INDEX_PATH, PROVISION_ID_SOURCE, parseProvisionId } from './provisions.mjs';
 import {
   AND_OR,
   CONTRACTIONS,
@@ -17,14 +17,12 @@ import {
 } from './prose.mjs';
 import { unsupportedSchemaKeywords, validateSchemaValue } from './schema.mjs';
 
-// Every provision identifier is AREA.PAGE.TOPIC.NNN. AREA and PAGE come from the
-// manifest id registry, TOPIC names the assertion, and NNN is a three-digit sequence.
-const PROVISION_ID_SOURCE = '[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}';
-const PROVISION_ID = new RegExp(`^${PROVISION_ID_SOURCE}$`);
+// Every provision identifier is standards/<kind>/<page>.<heading-slug>. The
+// grammar lives in provisions.mjs, so the validator, the generator, and the
+// parsed heading cannot report three different formats.
+// (standards/rule/core-authoring.identifier-must-follow-format)
 const PROVISION_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${PROVISION_ID_SOURCE})\\)\\s*$`);
-// A looser shape still catches a stale identifier so it reports as an unknown reference
-// instead of passing unnoticed.
-const CITATION_SOURCE = '[A-Z][A-Z0-9]*(?:\\.[A-Z0-9]+){1,}\\.\\d{3}';
+const CITATION_SOURCE = PROVISION_ID_SOURCE;
 const METHODS = new Set(['static', 'test', 'inspection', 'operation']);
 const MODALS = /\b(?:MUST NOT|SHOULD NOT|MUST|SHOULD|MAY)\b/g;
 const OTHER_NORMATIVE = /\b(?:REQUIRED|FORBIDDEN|SHALL)\b/;
@@ -52,7 +50,6 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'AGENT_PROJECTION_ID',
   'ANCHOR_BROKEN',
   'CONVENTION_DEFAULT_SENTENCE',
-  'CONVENTION_ID_SEGMENT',
   'CONVENTION_MISSING_DEFAULT',
   'CONVENTION_MISSING_REPLACEMENT',
   'CONVENTION_NORMATIVE',
@@ -72,10 +69,7 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'ID_MISSING',
   'ID_PAGE_FILENAME',
   'ID_SCOPE_MISMATCH',
-  'ID_TOPIC_DUPLICATE',
-  'ID_TOPIC_REPEATS_PAGE',
-  'ID_TOPIC_UNKNOWN',
-  'ID_TOPIC_UNUSED',
+  'ID_SLUG_MISMATCH',
   'ID_UNKNOWN_REFERENCE',
   'INDEX_CONTAINS_PROCEDURE',
   'INDEX_INTENT',
@@ -85,7 +79,6 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'MANIFEST_JSON',
   'MANIFEST_LOAD_PLAN',
   'MANIFEST_PATH',
-  'OVERRIDE_CONVENTION_ID',
   'OVERRIDE_UNKNOWN_ID',
   'PAGE_EMPTY_SECTION',
   'PAGE_MISSING_SECTION',
@@ -112,7 +105,6 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'SCHEMA_UNSUPPORTED_KEYWORD',
   'STANDARD_DEVIATION_SENTENCE',
   'STANDARD_EXAMPLE_LABEL',
-  'STANDARD_ID_SEGMENT',
   'STANDARD_INFORMATIVE_NORMATIVE',
   'STANDARD_LABEL_DUPLICATE',
   'STANDARD_LABEL_INVALID',
@@ -179,7 +171,7 @@ function slash(value) {
 function walk(directory, predicate, result = []) {
   if (!fs.existsSync(directory)) return result;
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-    if (entry.name === '.git' || entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'build') continue;
+    if (entry.name === '.git' || entry.name === '.opencode' || entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'build') continue;
     const candidate = path.join(directory, entry.name);
     if (entry.isDirectory()) walk(candidate, predicate, result);
     else if (predicate(candidate)) result.push(candidate);
@@ -280,7 +272,7 @@ function anchorsFor(raw) {
 
 // A directory names the class of every page inside it. Four of these hold pages a
 // reader follows or looks up rather than pages that own provisions, and each one
-// answers a question at a single layer. (CORE.AUTHORING.DISCLOSURE.002)
+// answers a question at a single layer. (standards/rule/core-authoring.state-one-layer-per-page)
 const PAGE_CLASS_AREA = {
   ext: 'extension',
   profile: 'profile',
@@ -335,7 +327,7 @@ function expectedSections(kind) {
   if (kind === 'reference') return { required: ['Intent', 'Reference'], optional: ['Notes'] };
   // Underneath is required rather than optional, so a command page that hides its
   // mechanism fails rather than passing in silence. A command with nothing
-  // separately runnable writes 'None.' (CORE.AUTHORING.DISCLOSURE.003)
+  // separately runnable writes 'None.' (standards/rule/core-authoring.name-the-escape-from-every-abstraction)
   if (kind === 'command') {
     return { required: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'], optional: [] };
   }
@@ -462,7 +454,7 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
   }
 
   // An index navigates. A numbered procedure inside one duplicates a canonical
-  // provision without citing it. (CORE.AUTHORING.PAGE.001)
+  // provision without citing it. (standards/rule/core-authoring.use-the-declared-page-contract)
   if (kind === 'index') {
     const step = clean.find((item) => /^\s*\d+\.\s+\S/.test(item.line));
     if (step) add(relative, step.number, 'INDEX_CONTAINS_PROCEDURE', 'an index must not contain a numbered procedure');
@@ -544,9 +536,6 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
     }
 
     if (provision.section === 'Standards') {
-      // CONVENTION is the only force signal inside an identifier, so a Standard
-      // cannot borrow it. (CORE.AUTHORING.IDENTIFIER.002)
-      if (/\.CONVENTION\.\d+$/.test(provision.id)) add(relative, provision.line, 'STANDARD_ID_SEGMENT', `Standard '${provision.id}' reserves the CONVENTION segment for a replaceable default`);
       const requirements = nonblank.filter((item) => item.line.startsWith('**Requirement:**'));
       if (requirements.length === 0) {
         add(relative, provision.line, 'STANDARD_MISSING_REQUIREMENT', `Standard '${provision.id}' has no Requirement statement`);
@@ -567,7 +556,6 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
         add(relative, deviations[0].number, 'STANDARD_DEVIATION_SENTENCE', `Deviation for '${provision.id}' must contain one sentence`);
       }
     } else {
-      if (!/\.CONVENTION\.\d+$/.test(provision.id)) add(relative, provision.line, 'CONVENTION_ID_SEGMENT', `convention ID '${provision.id}' must use the CONVENTION topic segment`);
       const defaults = nonblank.filter((item) => item.line.startsWith('**Default:**'));
       const replacements = nonblank.filter((item) => item.line.startsWith('**Replacement:**'));
       if (!defaults.length) add(relative, provision.line, 'CONVENTION_MISSING_DEFAULT', `convention '${provision.id}' has no Default statement`);
@@ -597,7 +585,7 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
 
   // A provision whose Requirement or Default only repeats its own heading
   // states no obligation. The heading is a label; the assertion belongs in the
-  // labeled block. (CORE.AUTHORING.REQUIREMENT.001, CORE.AUTHORING.DEFAULTS.001)
+  // labeled block. (standards/rule/core-authoring.write-atomic-standards-provisions, standards/rule/core-authoring.identify-actionable-conventions)
   for (const provision of provisions) {
     const label = provision.section === 'Standards' ? 'Requirement' : 'Default';
     const assertion = provision.body.find((item) => item.line.startsWith(`**${label}:**`));
@@ -609,7 +597,7 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
   }
 
   // Tier 1 exists to compress Tier 2. A bullet identical to its provision adds
-  // no context and makes the escalation pointless. (CORE.AUTHORING.SUMMARY.001)
+  // no context and makes the escalation pointless. (standards/rule/core-authoring.keep-agent-summaries-informative)
   for (const reference of summaryReferences) {
     const provision = provisions.find((item) => item.id === reference.id);
     if (provision?.claim && reference.claim && provision.claim === reference.claim) {
@@ -780,13 +768,13 @@ function checkManifest(root, add) {
 }
 
 function manifestRegistry(root) {
-  const absent = { present: false, areas: new Set(), topics: new Set() };
+  const absent = { present: false, areas: new Set() };
   const file = path.join(root, 'standards.manifest.json');
   if (!fs.existsSync(file)) return absent;
   try {
     const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
     const registry = manifest.provisionRegistry ?? {};
-    return { present: true, areas: new Set(registry.areas ?? []), topics: new Set(registry.topics ?? []) };
+    return { present: true, areas: new Set(registry.areas ?? []) };
   } catch {
     return absent;
   }
@@ -794,10 +782,10 @@ function manifestRegistry(root) {
 
 function normalizeTemplate(relative, raw) {
   return raw
-    .replaceAll('{AREA.PAGE.TOPIC.001}', 'TEMPLATE.PAGE.TOPIC.001')
-    .replaceAll('{AREA.PAGE}.CONVENTION.001', 'TEMPLATE.PAGE.CONVENTION.001')
-    .replaceAll('{EXT.NAME.TOPIC.001}', 'EXT.TEMPLATE.TOPIC.001')
-    .replaceAll('{EXT.NAME}.CONVENTION.001', 'EXT.TEMPLATE.CONVENTION.001')
+    .replaceAll('{standards/rule/page.state-one-action}', 'standards/rule/template.state-one-action')
+    .replaceAll('{standards/rule/page.use-one-default}', 'standards/rule/template.use-one-default')
+    .replaceAll('{standards/rule/page.state-one-extension-action}', 'standards/rule/template.state-one-extension-action')
+    .replaceAll('{standards/rule/page.use-one-extension-default}', 'standards/rule/template.use-one-extension-default')
     .replaceAll('{Topic Title}', 'Topic Title')
     .replaceAll('{Extension Title}', 'Extension Title')
     .replaceAll('{How-To Title}', 'How-To Title')
@@ -844,11 +832,11 @@ export function validateRepository(rootInput = '.') {
     if (relative === 'AGENTS.md' || relative.endsWith('/project-agents.md')) checkAgentProjection(relative, raw, add);
   }
 
-  // Provision identity comes from the path. The directory names the area and the file
-  // stem names the page, so two pages cannot share a scope: the filesystem already
-  // forbids a duplicate stem inside one directory. Only the word lists are declared.
+  // Provision identity comes from the path and the heading. The page segment is
+  // <area>-<stem>, so it names the page without a lookup, and the slug is the
+  // heading slug, so the identifier and the heading cannot drift apart.
+  // (standards/rule/core-authoring.identifier-must-follow-format)
   const registry = manifestRegistry(root);
-  const usedTopics = new Set();
   for (const page of registry.present ? parsedPages : []) {
     const provisions = page.parsed.provisions ?? [];
     if (!provisions.length) continue;
@@ -858,32 +846,20 @@ export function validateRepository(rootInput = '.') {
       continue;
     }
     const [, areaDir, stem] = parts;
-    const scope = `${areaDir.toUpperCase()}.${stem.toUpperCase()}`;
+    const pageSegment = `${areaDir}-${stem}`;
     if (!registry.areas.has(areaDir.toUpperCase())) {
       add(page.relative, 1, 'ID_AREA_UNKNOWN', `directory '${areaDir}' is not a registered provisionRegistry area`);
     }
     for (const provision of provisions) {
-      if (!provision.id.startsWith(`${scope}.`)) {
-        add(page.relative, provision.line, 'ID_SCOPE_MISMATCH', `provision '${provision.id}' does not use the page scope '${scope}' its path derives`);
+      const parsed = parseProvisionId(provision.id);
+      if (!parsed) continue;
+      if (parsed.page !== pageSegment) {
+        add(page.relative, provision.line, 'ID_SCOPE_MISMATCH', `provision '${provision.id}' does not name the page '${pageSegment}' its path derives`);
       }
-      const topic = provision.id.split('.')[2];
-      usedTopics.add(topic);
-      if (topic === stem.toUpperCase()) {
-        add(page.relative, provision.line, 'ID_TOPIC_REPEATS_PAGE', `provision '${provision.id}' repeats its page name as its topic, so the topic names nothing`);
-      }
-      if (!registry.topics.has(topic)) {
-        add(page.relative, provision.line, 'ID_TOPIC_UNKNOWN', `topic '${topic}' is not a registered provisionRegistry topic`);
+      if (parsed.slug !== headingSlug(provision.title)) {
+        add(page.relative, provision.line, 'ID_SLUG_MISMATCH', `provision '${provision.id}' slug does not match its heading`);
       }
     }
-  }
-  // One concept, one spelling. Regular and -ies plurals both count as the same word.
-  const singular = (topic) => (topic.endsWith('IES') ? `${topic.slice(0, -3)}Y` : topic.endsWith('SES') ? topic.slice(0, -2) : topic.endsWith('S') ? topic.slice(0, -1) : null);
-  for (const topic of registry.present ? registry.topics : []) {
-    const other = singular(topic);
-    if (other && registry.topics.has(other)) {
-      add('standards.manifest.json', 1, 'ID_TOPIC_DUPLICATE', `topics '${other}' and '${topic}' name one concept in two forms`);
-    }
-    if (!usedTopics.has(topic)) add('standards.manifest.json', 1, 'ID_TOPIC_UNUSED', `provisionRegistry registers topic '${topic}', which no provision uses`);
   }
 
   const activeIds = new Set(globalIds.keys());
@@ -916,7 +892,7 @@ export function validateRepository(rootInput = '.') {
 
   // The provision index is derived. A stale page would send a reader to the wrong
   // heading, so the gate compares it with the active standards.
-  // (CORE.AUTHORING.INDEX.001)
+  // (standards/rule/core-authoring.regenerate-the-provision-index)
   const indexFile = path.join(root, INDEX_PATH);
   if (fs.existsSync(indexFile)) {
     const expected = `${buildProvisionIndex(root)}\n`;
@@ -934,7 +910,6 @@ export function validateRepository(rootInput = '.') {
       const project = JSON.parse(fs.readFileSync(projectTemplate, 'utf8'));
       for (const override of project.overrides ?? []) {
         if (!activeIds.has(override.provisionId)) add('templates/consumer/standards.project.json', 1, 'OVERRIDE_UNKNOWN_ID', `override references unknown Standard '${override.provisionId}'`);
-        else if (/\.CONVENTION\.\d+$/.test(override.provisionId)) add('templates/consumer/standards.project.json', 1, 'OVERRIDE_CONVENTION_ID', `override cannot reference Convention '${override.provisionId}'`);
       }
     } catch {
       // Schema diagnostics report invalid JSON.
@@ -943,12 +918,12 @@ export function validateRepository(rootInput = '.') {
 
   // The template index is the only map from a template file to the consumer path
   // it targets. A renamed template leaves a row pointing at nothing, and that row
-  // reads exactly like a correct one. (CORE.PRINCIPLES.SOURCE.001)
+  // reads exactly like a correct one. (standards/rule/core-principles.keep-one-authored-source)
   checkTemplateIndex(root, add);
 
   // A reader who cannot tell a tutorial from a reference opens both and trusts
   // neither, so the documentation root names each class before it links to one.
-  // (CORE.AUTHORING.INDEX.002)
+  // (standards/rule/core-authoring.route-the-reader-before-listing-pages)
   checkRootIndexRouting(root, add);
 
   diagnostics.sort((left, right) => left.relative.localeCompare(right.relative) || left.line - right.line || left.code.localeCompare(right.code));

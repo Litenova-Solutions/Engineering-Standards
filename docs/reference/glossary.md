@@ -78,7 +78,7 @@ A replaceable default for a name, location, file shape, or implementation patter
 
 ## Convention ID
 
-A provision ID whose topic segment is `CONVENTION`, such as `BACKEND.API.CONVENTION.001`, which marks a replaceable default.
+A provision ID whose topic segment is `CONVENTION`, such as `standards/rule/backend-api.use-this-endpoint-layout`, which marks a replaceable default.
 
 ## Current standards material
 
@@ -168,9 +168,9 @@ One authored Markdown file under `docs/`, carrying the section contract of its p
 
 One of `topic`, `profile`, `extension`, `tutorial`, `how-to`, `reference`, `command`, `index`, or `glossary`, which selects the required section order for a page.
 
-## Page scope
+## Page segment
 
-The `AREA.PAGE` prefix that `standards.manifest.json` declares for one normative page, such as `FRONTEND.COMPONENTS`.
+The `<area>-<stem>` segment of a provision ID that names its owning page, such as `frontend-components`.
 
 ## Persistence constraint
 
@@ -194,7 +194,7 @@ One identified Standard or Convention block with one Requirement or replaceable 
 
 ## Provision ID
 
-The four-segment `AREA.PAGE.TOPIC.NNN` identifier of one provision, such as `FRONTEND.COMPONENTS.OWNERSHIP.001`.
+The `standards/<kind>/<page>.<heading-slug>` identifier of one provision, such as `standards/rule/frontend-components.use-the-component-ownership-levels`.
 
 ## Query
 

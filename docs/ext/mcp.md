@@ -18,14 +18,14 @@ The API provisions own the behavior the server calls, and the frontend provision
 
 ## Agent Summary {#agent-summary}
 
-- Pass server instructions at initialize. (EXT.MCP.SERVER.001)
-- Title each tool imperatively and describe it declaratively. (EXT.MCP.TOOLS.001)
-- State parameter polarity and side effects in descriptions. (EXT.MCP.TOOLS.001)
-- State the refusing side on each refusal. (EXT.MCP.CONVENTION.001)
+- Pass server instructions at initialize. (standards/rule/ext-mcp.pass-server-instructions-at-initialize)
+- Title each tool imperatively and describe it declaratively. (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
+- State parameter polarity and side effects in descriptions. (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
+- State the refusing side on each refusal. (standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal)
 
 ## Standards
 
-### Pass server instructions at initialize (EXT.MCP.SERVER.001)
+### Pass server instructions at initialize (standards/rule/ext-mcp.pass-server-instructions-at-initialize)
 
 **Requirement:** An MCP server MUST pass an `instructions` value at initialize stating its transport, its audience, its write surface, and its refusal behavior.
 
@@ -33,7 +33,7 @@ The API provisions own the behavior the server calls, and the frontend provision
 
 **Example:** "Runs over stdio, one organizer per process, against the hosted API. Reads cover the organizer's own data, and three tools create or change records. A policy refusal returns the problem code, and a write needing a person's confirmation refuses until they give it."
 
-### Write one tool description for one decision (EXT.MCP.TOOLS.001)
+### Write one tool description for one decision (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
 
 **Requirement:** An MCP tool MUST title its action imperatively, describe its behavior declaratively, use positive parameter polarity, and state its side effects.
 
@@ -56,7 +56,7 @@ The API provisions own the behavior the server calls, and the frontend provision
 
 ## Conventions
 
-### State the refusing side on each refusal (EXT.MCP.CONVENTION.001)
+### State the refusing side on each refusal (standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal)
 
 **Default:** Prefix an input-shape refusal with `Needs:`, a human-confirmation refusal with `Needs confirmation:`, and a server-side refusal with `Refused:`.
 
@@ -72,6 +72,6 @@ No library is selected by this extension. An MCP SDK needs a decision and a mani
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| EXT.MCP.SERVER.001 | static | The server construction passes a non-empty `instructions` value to the MCP server. |
-| EXT.MCP.TOOLS.001 | static | `apps/mcp/src/tools/` review finds imperative titles, declarative descriptions, positive booleans, and stated side effects. |
-| EXT.MCP.CONVENTION.001 | inspection | Refusal strings carry the three prefixes or record a local replacement. |
+| standards/rule/ext-mcp.pass-server-instructions-at-initialize | static | The server construction passes a non-empty `instructions` value to the MCP server. |
+| standards/rule/ext-mcp.write-one-tool-description-for-one-decision | static | `apps/mcp/src/tools/` review finds imperative titles, declarative descriptions, positive booleans, and stated side effects. |
+| standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal | inspection | Refusal strings carry the three prefixes or record a local replacement. |

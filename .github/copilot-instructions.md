@@ -4,7 +4,7 @@ Read `AGENTS.md` as the canonical agent protocol. In a consumer repository, read
 
 ## Working in this repository
 
-Every provision ID is `AREA.PAGE.TOPIC.NNN`, and the first two segments are the page path. `FRONTEND.COMPONENTS.OWNERSHIP.001` lives in `docs/frontend/components.md`, so a citation needs no lookup step.
+Every provision ID is `standards/<kind>/<page>.<heading-slug>`, and the page segment names the page path. `standards/rule/frontend-components.use-the-component-ownership-levels` lives in `docs/frontend/components.md`, so a citation needs no lookup step.
 
 A changed assertion takes a new ID. Do not edit an active Requirement in place, and do not add an alias or a replacement map. `CONTRIBUTING.md` states the amendment order.
 

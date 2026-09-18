@@ -22,7 +22,7 @@
   "properties": {
     "$schema": { "type": "string" },
     "schemaVersion": {
-      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See CORE.AUTHORING.SNAPSHOT.003 and CORE.AUTHORING.SNAPSHOT.004.",
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See standards/rule/core-authoring.publish-each-release-as-a-complete-contract and standards/rule/core-authoring.exclude-cross-release-compatibility-work.",
       "const": 1
     },
     "frontend": { "$ref": "#/$defs/identifier" },
@@ -93,7 +93,7 @@
       "required": ["system", "styling"],
       "allOf": [
         {
-          "$comment": "The preset fields describe the shadcn generator. A frontend on an alternate visual system records its own baseline and carries an override decision, so only the default system requires them. See FRONTEND.UI.GOVERNANCE.001 and FRONTEND.UI.SHADCN.001.",
+          "$comment": "The preset fields describe the shadcn generator. A frontend on an alternate visual system records its own baseline and carries an override decision, so only the default system requires them. See standards/rule/frontend-ui.select-one-visual-authority and standards/rule/frontend-ui.use-the-pinned-shadcnui-baseline.",
           "if": {
             "required": ["system"],
             "properties": { "system": { "const": "shadcn/ui" } }

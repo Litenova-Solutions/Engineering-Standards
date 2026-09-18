@@ -114,7 +114,7 @@ const project = readJson(projectFile);
 // The documentation root is configuration, not a constant. A hard-coded docs/
 // scans nothing in a consumer that keeps its pages elsewhere, and a scan of
 // nothing reports PASS. 'docs' stays the default because that is the layout the
-// standards describe. (CORE.AUTHORING.METADATA.004)
+// standards describe. (standards/rule/core-authoring.classify-every-specification-file)
 const docsPath = project.paths?.docs ?? 'docs';
 const docsRoot = path.join(root, docsPath);
 const domainDocs = path.join(root, (project.paths?.domainDocs ?? 'docs/domain'));
@@ -135,7 +135,7 @@ for (const [field, value, consequence] of configuredPaths) {
 // Navigation and prose pages carry no structured metadata, so the project names
 // the path prefixes that hold them. A declared prefix is a decision a reviewer
 // can see and count; an undeclared page with no metadata block is a file nobody
-// knows went unchecked. (CORE.AUTHORING.METADATA.004)
+// knows went unchecked. (standards/rule/core-authoring.classify-every-specification-file)
 const declaredUnstructured = project.paths?.unstructuredDocs;
 if (declaredUnstructured !== undefined && !Array.isArray(declaredUnstructured)) {
   err('standards.project.json: paths.unstructuredDocs must be an array of repository-relative paths');
@@ -149,7 +149,7 @@ for (const entry of Array.isArray(declaredUnstructured) ? declaredUnstructured :
 }
 // A selection is either a bare id or an object recording the criterion that was
 // met and the date it is next reviewed. Both forms resolve to one id here.
-// (CORE.SCOPE.EXTENSIONS.001, CORE.SCOPE.EXTENSIONS.002)
+// (standards/rule/core-scope.select-conditional-extensions-explicitly, standards/rule/core-scope.record-selected-extensions)
 const selections = (project.selectedExtensions ?? []).map((entry) => (
   typeof entry === 'string' ? { id: entry } : entry ?? {}
 ));
@@ -185,7 +185,7 @@ if (manifest?.extensions) {
   // A selection is checked against the manifest, not only against itself.
   // applicableExtensions is compared to selectedExtensions further down, so two
   // consistent lists of ids that no longer exist would otherwise validate
-  // cleanly through a release that renamed them. (CORE.SCOPE.EXTENSIONS.002)
+  // cleanly through a release that renamed them. (standards/rule/core-scope.record-selected-extensions)
   const known = [...extScope.keys()].sort();
   for (const id of selected) {
     if (!extScope.has(id)) {
@@ -196,7 +196,7 @@ if (manifest?.extensions) {
 
 // An extension selected without a surface costs nothing to keep, so nobody
 // removes it. A recorded review date makes the selection expire rather than
-// accumulate. (CORE.PRINCIPLES.COMPLEXITY.002)
+// accumulate. (standards/rule/core-principles.select-extensions-by-criteria)
 const today = new Date().toISOString().slice(0, 10);
 for (const entry of selections) {
   if (!entry.reviewBy) continue;
@@ -229,15 +229,15 @@ const SINGLETON_KINDS = new Set(['product', 'domain-index', 'glossary', 'modules
 // A kind whose absence is a finding rather than a stage the consumer has not
 // reached. Every Scenario section draws from one cast, so a documentation set
 // with scenarios and no cast has as many reference worlds as it has pages.
-// (CORE.SYSTEM.SCENARIO.003)
+// (standards/rule/core-system.derive-every-scenario-from-one-reference-cast)
 const REQUIRED_SINGLETON_KINDS = new Set(['product', 'scenario-cast']);
 // The kinds whose subject is behavior a person experiences, and therefore the
 // kinds a reader cannot place without one concrete occasion.
-// (CORE.SYSTEM.SCENARIO.001)
+// (standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
 const SCENARIO_KINDS = new Set(['module', 'aggregate', 'use-case', 'domain-policy', 'end-to-end-flow']);
 // A scenario illustrates its page and never governs it. An identifier inside one
 // reads as a second definition of the rule it names, and two definitions drift.
-// (CORE.SYSTEM.SCENARIO.002)
+// (standards/rule/core-system.keep-a-scenario-informative)
 const RULE_ID = /\b(?:INV|POL|VAL|AC|E2E)-[A-Z0-9][A-Z0-9-]*\b/;
 const SCENARIO_WORD_DEFAULT = 120;
 const declaredWordLimit = project.scenarioWordLimit;
@@ -260,7 +260,7 @@ const KINDS = {
   // behavior a person experiences, so none carries a Scenario, and none is a
   // singleton. Each declares the H2 order its class answers at, because a command
   // page that omits Underneath hides the mechanism it wraps.
-  // (CORE.AUTHORING.DISCLOSURE.002, CORE.AUTHORING.DISCLOSURE.003)
+  // (standards/rule/core-authoring.state-one-layer-per-page, standards/rule/core-authoring.name-the-escape-from-every-abstraction)
   tutorial: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Purpose', 'Prerequisites', 'Lesson', 'What you built'] },
   'how-to': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Purpose', 'Procedure', 'Verification'] },
   reference: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Reference'] },
@@ -297,8 +297,8 @@ for (const entry of Array.isArray(declaredProhibited) ? declaredProhibited : [])
 
 // A use case records what invokes it, and a page records what it invokes. The
 // two populations are compared after the loop, because either direction can name
-// a file the loop has not reached yet. (CORE.SYSTEM.CONSUMERS.001,
-// CORE.SYSTEM.CONSUMERS.002)
+// a file the loop has not reached yet. (standards/rule/core-system.name-what-calls-a-use-case,
+// standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)
 const useCasePages = new Map(); // use-case id -> {rel, file, implementationStatus, consumers}
 const screenPages = []; // {rel, file, app, useCases}
 
@@ -325,11 +325,11 @@ const e2eDefs = new Map(); // id -> [rel]
 let uiOutput = '';
 
 // Specification Metadata is a '---' delimited JSON block, per
-// CORE.AUTHORING.METADATA.002. A file that carries a metadata object in any other
+// standards/rule/core-authoring.declare-structured-specification-metadata. A file that carries a metadata object in any other
 // wrapper, or carries none at all, is reported rather than skipped, because a
 // silently skipped specification is an unvalidated specification: the run passes
 // while that page sits unchecked beside every page that was checked.
-// (CORE.AUTHORING.METADATA.004)
+// (standards/rule/core-authoring.classify-every-specification-file)
 function parseBlock(raw, rel) {
   if (!raw.startsWith('---')) {
     const fenced = raw.slice(0, 2000).match(/```[a-z]*\s*\n\s*\{[\s\S]{0,400}?"kind"\s*:/);
@@ -429,7 +429,7 @@ for (const f of files) {
 
   // A documentation kind declares the sections its reader expects to find. An
   // absent section is a question the page never answered, which reads exactly
-  // like a question with no answer. (CORE.AUTHORING.PAGE.001)
+  // like a question with no answer. (standards/rule/core-authoring.use-the-declared-page-contract)
   for (const name of spec.sections ?? []) {
     if (sectionBody(raw, name) === null) err(`${rel}: kind '${meta.kind}' requires an H2 '${name}'; a section with nothing to say contains only 'None.'`);
   }
@@ -464,8 +464,8 @@ for (const f of files) {
   }
   // Every other section on these pages states a rule, a state, or a mapping,
   // and none of them says when the behavior happens or who is under pressure
-  // while it does. (CORE.SYSTEM.SCENARIO.001, CORE.SYSTEM.SCENARIO.002,
-  // CORE.SYSTEM.CONVENTION.007)
+  // while it does. (standards/rule/core-system.state-one-occasion-for-every-behavior-specification, standards/rule/core-system.keep-a-scenario-informative,
+  // standards/rule/core-system.bound-a-scenario-to-one-paragraph)
   if (SCENARIO_KINDS.has(meta.kind)) {
     const scenario = sectionBody(raw, 'Scenario');
     if (scenario === null) {
@@ -493,7 +493,7 @@ for (const f of files) {
 // ---- aggregate cross-file checks -------------------------------------------
 // A second domain index, glossary, or modules index is a duplicate authority
 // for one boundary. Only product had been counted, so the other three could be
-// repeated or misapplied to an unrelated directory. (CORE.PRINCIPLES.SOURCE.001)
+// repeated or misapplied to an unrelated directory. (standards/rule/core-principles.keep-one-authored-source)
 for (const kind of SINGLETON_KINDS) {
   const found = singletons.get(kind) ?? [];
   if (found.length === 1) continue;
@@ -508,7 +508,7 @@ for (const kind of SINGLETON_KINDS) {
 // answered the question asked before a change: who breaks if this operation
 // moves. The reverse obligation is a Consumers section on the use case, checked
 // against the surfaces the project declared and against the pages that claim it.
-// (CORE.SYSTEM.CONSUMERS.001, CORE.SYSTEM.CONSUMERS.002)
+// (standards/rule/core-system.name-what-calls-a-use-case, standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)
 const declaredSurfaces = new Set([
   ...(project.paths?.frontends ?? []).map((frontend) => frontend.name).filter(Boolean),
   ...(project.paths?.surfaces ?? []).map((surface) => surface?.name).filter(Boolean),
@@ -576,8 +576,8 @@ for (const screen of screenPages) {
 // could claim 'verified' while no test carried its identifier. Each form is read
 // where its tool puts it: a tag line in a feature file, one trait key in C#, and
 // the opening of a browser-test title. A bare identifier in a comment or a
-// variable name cites nothing. (BACKEND.TESTING.TRACE.002,
-// FRONTEND.TESTING.TRACE.002, EXT.BDD.TRACE.001)
+// variable name cites nothing. (standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form,
+// standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion, standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)
 const testRoots = Array.isArray(project.paths?.testRoots) ? project.paths.testRoots : [];
 const GHERKIN_TAG_LINE = /^[ \t]*@[^\n]*$/;
 const TAG = /@(AC-[A-Z0-9-]+)/g;
@@ -635,7 +635,7 @@ for (const [id, locs] of citations) {
 }
 
 // A page reaches 'verified' only when its evidence is complete, and the
-// criterion citation is that evidence. (CORE.SYSTEM.USECASE.001)
+// criterion citation is that evidence. (standards/rule/core-system.deliver-one-complete-use-case)
 for (const [id, page] of useCasePages) {
   if (page.implementationStatus !== 'verified') continue;
   const declared = [...acDefs].filter(([, locs]) => locs.includes(page.rel)).map(([acId]) => acId);
@@ -651,7 +651,7 @@ for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end
 // silently skips the whole FRONTEND.UI contract, and the omission is
 // indistinguishable from a considered decision. A consumer that is not ready for
 // the contract declares 'other-web' or records an override, which is a visible
-// statement. (FRONTEND.UI.GOVERNANCE.001)
+// statement. (standards/rule/frontend-ui.select-one-visual-authority)
 const PLATFORMS = ['react-web', 'react-native', 'other-web'];
 for (const frontend of project.paths?.frontends ?? []) {
   const name = frontend?.name ?? '(unnamed)';
@@ -695,10 +695,10 @@ if (uiActivated) {
 
 // ---- language and controlled prose -----------------------------------------
 // The language record closes the project's vocabulary and its mannered terms.
-// (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.VOICE.002)
+// (standards/rule/core-authoring.record-the-project-vocabulary-as-data, standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope, standards/rule/core-authoring.state-meaning-literally)
 // The prose measures are the profile in docs/core/authoring.md, applied to the
 // consumer tree rather than only to the standards repository.
-// (CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003)
+// (standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation, standards/rule/core-authoring.remove-a-reread-page-from-the-prose-baseline)
 let languageSummary = '';
 {
   const languagePath = project.paths?.language;
@@ -731,7 +731,7 @@ let languageSummary = '';
   // A page carries accepted prose debt only while nobody has re-read it. The
   // baseline records the count and the lastReviewed date it was accepted at, so
   // a page whose date moves has been read against the code and leaves the
-  // baseline in the same change. (CORE.AUTHORING.PROSE.003)
+  // baseline in the same change. (standards/rule/core-authoring.remove-a-reread-page-from-the-prose-baseline)
   const baselinePath = project.prose?.baseline;
   const baselineFile = baselinePath ? path.join(root, baselinePath) : path.join(docsRoot, 'prose-baseline.json');
   let baseline = {};
@@ -769,7 +769,7 @@ let languageSummary = '';
   // its acceptance tests carry the same vocabulary to a developer, a buyer and
   // a reviewer, and a check that reads only Markdown holds the vocabulary where
   // nobody reads it. `paths.languageScan` names those surfaces.
-  // (CORE.AUTHORING.TERM.004)
+  // (standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets)
   //
   // A scope in the language record is written against the documentation root
   // for a page under it, and against the repository root for one of these

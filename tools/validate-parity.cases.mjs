@@ -166,7 +166,7 @@ build();
 console.log('Baseline');
 report('a handler and its specification are in parity', null, run());
 
-console.log('\nHandler with no specification (CORE.SYSTEM.COVERAGE.001)');
+console.log('\nHandler with no specification (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)');
 fileCase(
   'operation folder that no page covers',
   `${applicationProject}/Sales/Vouchers/VoidVoucher/VoidVoucherCommandHandler.cs`,
@@ -180,7 +180,7 @@ fileCase(
   'sales.apply-discount',
 );
 
-console.log('\nSpecification with no handler (CORE.SYSTEM.COVERAGE.001)');
+console.log('\nSpecification with no handler (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)');
 fileCase(
   'implemented page that no operation folder covers',
   'docs/domain/modules/sales/vouchers/void-voucher.md',
@@ -194,7 +194,7 @@ fileCase(
   null,
 );
 
-console.log('\nName derivation (BACKEND.APPLICATION.CONVENTION.001)');
+console.log('\nName derivation (standards/rule/backend-application.use-this-operation-layout)');
 specification('docs/domain/modules/event-operations/event-tasks/update-event-task.md', 'event-operations.update-event-task');
 fileCase(
   'a multi-word module folder resolves to its kebab-case module id',
@@ -226,7 +226,7 @@ fileCase(
   '-> sales.read-csv-import',
 );
 
-console.log('\nOperation folder shape (BACKEND.APPLICATION.STRUCTURE.001)');
+console.log('\nOperation folder shape (standards/rule/backend-application.organize-application-by-operation)');
 fileCase(
   'handler sitting directly in its module directory',
   `${applicationProject}/Sales/ArchiveVoucherCommandHandler.cs`,
@@ -249,7 +249,7 @@ fileCase(
   "duplicate specification id 'sales.redeem-voucher'",
 );
 
-console.log('\nEvent reactions (CORE.SYSTEM.REACTION.001)');
+console.log('\nEvent reactions (standards/rule/core-system.record-events-and-event-reactions-separately)');
 fileCase(
   'a reaction carries no use-case specification',
   `${applicationProject}/Sales/Vouchers/IssueVoucherOnOrderConfirmed/IssueVoucherOnOrderConfirmedReaction.cs`,
@@ -269,7 +269,7 @@ fileCase(
   'sales.issue-voucher-on-order-confirmed',
 );
 
-console.log('\nImplementation mapping resolution (CORE.SYSTEM.MAPPING.001)');
+console.log('\nImplementation mapping resolution (standards/rule/core-system.resolve-every-implementation-mapping-name)');
 // The baseline page already names its handler, so each case here replaces the
 // mapping of that one page and restores it afterwards.
 const mappedPage = 'docs/domain/modules/sales/vouchers/redeem-voucher.md';
@@ -328,7 +328,7 @@ mappingCase(
   null,
 );
 
-console.log('\nImplementation mapping completeness (CORE.SYSTEM.MAPPING.002)');
+console.log('\nImplementation mapping completeness (standards/rule/core-system.name-the-handler-an-implemented-use-case-owns)');
 mappingCase(
   'a mapping that omits its derived handler',
   '| Command | `RedeemVoucherCommandHandler2` |',

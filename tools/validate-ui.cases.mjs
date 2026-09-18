@@ -270,7 +270,7 @@ pathCase('generated native web asset is ignored', 'apps/web/android/app/src/main
 pathCase('a file under tests is outside the controlled surface', 'apps/web/tests/case.test.tsx', 'export const C = () => <div className="bg-red-500" />;\n', null);
 pathCase('authored feature CSS is rejected', 'apps/web/features/generated.css', '.generated { color: red; }\n', 'CSS file is outside the designated global CSS entry');
 
-console.log('\nRestricted Tailwind use (FRONTEND.UI.TAILWIND.001)');
+console.log('\nRestricted Tailwind use (standards/rule/frontend-ui.restrict-css-decisions)');
 sourceCase('arbitrary length', 'export const C = () => <div className="w-[37rem]" />;', "arbitrary Tailwind value requires a semantic token or declared variant 'w-[37rem]'");
 sourceCase('arbitrary radius', 'export const C = () => <div className="rounded-[11px]" />;', "'rounded-[11px]'");
 sourceCase('arbitrary color', 'export const C = () => <div className="bg-[#19324a]" />;', "'bg-[#19324a]'");
@@ -291,23 +291,23 @@ cssCase('an unterminated string is reported once', `${cleanCss}[data-token="prom
 cssCase('apply directive outside the generated base layer', `${cleanCss}@layer components {\n  .btn { @apply px-4 py-2; }\n}\n`, "'@apply' outside the generated '@layer base' block");
 cssCase('unapproved global import', `${cleanCss}@import "bootstrap/dist/css/bootstrap.css";\n`, "import 'bootstrap/dist/css/bootstrap.css' is outside the approved global CSS surface");
 
-console.log('\nSource boundary (FRONTEND.UI.GOVERNANCE.001)');
+console.log('\nSource boundary (standards/rule/frontend-ui.select-one-visual-authority)');
 sourceCase('primitive vendor import in feature code', 'import { Dialog } from "@base-ui/react";\nexport const C = () => <Dialog />;', 'direct UI vendor import is outside the primitive boundary');
 manifestCase('second visual system in the workspace root', { dependencies: { '@mui/material': '7.0.0' } }, "second general-purpose visual dependency '@mui/material' requires an override");
 manifestCase('second visual system in optionalDependencies', { optionalDependencies: { bootstrap: '5.3.3' } }, "second general-purpose visual dependency 'bootstrap' requires an override");
 manifestCase('second visual system pinned through pnpm overrides', { pnpm: { overrides: { '@mantine/core': '8.0.0' } } }, "second general-purpose visual dependency '@mantine/core' requires an override");
 manifestCase('second visual system pinned through resolutions', { resolutions: { antd: '5.0.0' } }, "second general-purpose visual dependency 'antd' requires an override");
 configCase('UI override without a review date', (project) => {
-  project.overrides = [{ provisionId: 'FRONTEND.UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md' }];
+  project.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md' }];
 }, "a UI rule override requires 'reviewBy'");
 configCase('UI override with an expired review date', (project) => {
-  project.overrides = [{ provisionId: 'FRONTEND.UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md', reviewBy: '2020-01-01' }];
+  project.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md', reviewBy: '2020-01-01' }];
 }, 'has passed; renew the decision or complete the migration');
 configCase('UI override with a live review date', (project) => {
-  project.overrides = [{ provisionId: 'FRONTEND.UI.GOVERNANCE.001', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
+  project.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
 }, null);
 
-console.log('\nBaseline configuration (FRONTEND.UI.SHADCN.001, FRONTEND.UI.VOCABULARY.001, FRONTEND.UI.FORKS.001)');
+console.log('\nBaseline configuration (standards/rule/frontend-ui.use-the-pinned-shadcnui-baseline, standards/rule/frontend-ui.declare-the-ui-vocabulary, standards/rule/frontend-ui.track-source-changes)');
 configCase('compatibility base without a stated components style', (project, vocabulary) => {
   project.paths.frontends[0].ui.base = 'radix-ui';
   project.paths.frontends[0].ui.overrideDecision = 'docs/decisions/ui-override.md';
@@ -331,7 +331,7 @@ configCase('page contract state outside the vocabulary', (project, vocabulary) =
   vocabulary.states = vocabulary.states.filter((state) => state.id !== 'empty');
 }, "unknown state 'empty'");
 
-console.log('\nPage contracts (FRONTEND.UI.PAGE.001)');
+console.log('\nPage contracts (standards/rule/frontend-ui.specify-pages-before-composition)');
 const sidecar = path.join(fixture, 'docs/ui/web/page.ui.json');
 const sidecarContract = readJson(sidecar);
 fs.rmSync(sidecar);
@@ -342,12 +342,12 @@ writeJson(sidecar, { ...sidecarContract, regions: [{ ...sidecarContract.regions[
 report('page contract naming an unlisted pattern', "unknown pattern 'invented-pattern/default'", run());
 fs.copyFileSync(path.join(repository, 'templates/consumer/ui-page.json'), sidecar);
 
-console.log('\nPage registry (FRONTEND.UI.GOVERNANCE.001)');
+console.log('\nPage registry (standards/rule/frontend-ui.select-one-visual-authority)');
 pageCase('two pages declaring one route', { id: 'web.duplicate', app: 'web', route: '/' }, "route '/' in 'web' is already declared by");
 pageCase('two pages on one route in different frontends', { id: 'web.elsewhere', app: 'admin', route: '/' }, "page declares app 'admin', which no frontend");
 pageCase('a distinct route is accepted', { id: 'web.second', app: 'web', route: '/second' }, 'missing UI sidecar');
 
-console.log('\nDesign contract (FRONTEND.UI.DESIGN.001)');
+console.log('\nDesign contract (standards/rule/frontend-ui.publish-a-design-contract)');
 const designFile = path.join(fixture, 'apps/web/DESIGN.md');
 const designContract = fs.readFileSync(designFile, 'utf8');
 fs.rmSync(designFile);
@@ -361,7 +361,7 @@ report('design contract whose profile contradicts the project record', 'profile 
 fs.writeFileSync(designFile, designContract);
 report('the shipped design contract is accepted', null, run());
 
-console.log('\nComposition catalog (FRONTEND.UI.COMPOSITION.002, FRONTEND.UI.COMPOSITION.001)');
+console.log('\nComposition catalog (standards/rule/frontend-ui.publish-each-recipe-as-a-page-and-a-sidecar, standards/rule/frontend-ui.compose-from-a-catalog-recipe)');
 const recipeFile = path.join(fixture, 'docs/ui/compositions/record-list.recipe.json');
 const recipeSidecar = readJson(recipeFile);
 fs.rmSync(recipeFile);
@@ -381,7 +381,7 @@ writeJson(catalogSidecar, {
 report('two regions may bind one recipe', null, run());
 writeJson(catalogSidecar, catalogContract);
 
-console.log('\nDeclared states (FRONTEND.UI.STATE.001)');
+console.log('\nDeclared states (standards/rule/frontend-ui.render-every-declared-state)');
 writeJson(catalogSidecar, {
   ...catalogContract,
   regions: catalogContract.regions.map((region) => (region.id === 'content' ? { ...region, components: ['button'] } : region)),
@@ -404,7 +404,7 @@ configCase('a state the shell itself carries needs no page region', (project, vo
 }, null);
 writeJson(catalogSidecar, catalogContract);
 
-console.log('\nFrozen plan (FRONTEND.UI.GATES.001)');
+console.log('\nFrozen plan (standards/rule/frontend-ui.keep-the-implementation-inside-the-frozen-plan)');
 const routeFile = path.join(fixture, 'apps/web/app/page.tsx');
 fs.writeFileSync(routeFile, routeSource.replace('data-region="content"', 'data-region="late-addition"'));
 report('route rendering a region the sidecar does not name', "renders region 'late-addition', which 'docs/ui/web/page.ui.json' does not name", run());
@@ -415,7 +415,7 @@ fs.rmSync(path.join(fixture, 'apps/web/components/common/late.tsx'));
 fs.writeFileSync(routeFile, routeSource);
 report('a route inside its frozen plan is accepted', null, run());
 
-console.log('\nAcceptance (FRONTEND.UI.PLACEMENT.001, FRONTEND.UI.ACCEPTANCE.001)');
+console.log('\nAcceptance (standards/rule/frontend-ui.place-acceptance-beside-the-route, standards/rule/frontend-ui.resolve-every-acceptance-identifier)');
 const acceptanceFile = path.join(fixture, 'apps/web/app/evidence/acceptance.json');
 const acceptanceRecord = readJson(acceptanceFile);
 const specFile = path.join(fixture, 'apps/web/app/evidence/AC-PAGE-01.spec.ts');
@@ -432,7 +432,7 @@ report('page naming acceptance identifiers with no record beside its route', 'no
 writeJson(acceptanceFile, acceptanceRecord);
 report('the shipped acceptance record is accepted', null, run());
 
-console.log('\nSource lock (FRONTEND.UI.FORKS.001)');
+console.log('\nSource lock (standards/rule/frontend-ui.track-source-changes)');
 fs.appendFileSync(path.join(fixture, 'apps/web/components/ui/button.tsx'), '// local change\n');
 report('changed baseline source without a fork record', 'no longer matches the baseline digest', run());
 fs.writeFileSync(path.join(fixture, 'apps/web/components/ui/button.tsx'), 'export function Button() {\n  return null;\n}\n');

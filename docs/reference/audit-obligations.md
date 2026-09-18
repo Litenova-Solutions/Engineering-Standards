@@ -4,7 +4,7 @@
 
 This page records the external obligations that the [audit extension](../ext/audit.md) satisfies. It is informative. The extension page owns every provision.
 
-`EXT.AUDIT.ADOPT.001` requires an adoption decision. `EXT.AUDIT.COVERAGE.001` requires a stated selection of audited categories. Both ask a project to say why it audits what it audits. This page is the source those answers draw on, so a project records a decision rather than a survey.
+`standards/rule/ext-audit.record-the-audit-adoption-decision` requires an adoption decision. `standards/rule/ext-audit.cover-the-required-audit-categories` requires a stated selection of audited categories. Both ask a project to say why it audits what it audits. This page is the source those answers draw on, so a project records a decision rather than a survey.
 
 ## Reference
 
@@ -59,7 +59,7 @@ The General Data Protection Regulation pulls in two directions at once. Reading 
 
 The resolution is the record shape. A trail retained on a legal-obligation or legitimate-interest basis stays lawful, and a supervisory authority accepts it. A trail that copies names, addresses, message bodies, or state snapshots into an append-only store conflicts with Article 17. No retention policy resolves that conflict.
 
-`EXT.AUDIT.CLASSIFICATION.002` and `EXT.AUDIT.CLASSIFICATION.003` prevent that conflict at design time. `EXT.AUDIT.PURGE.002` then satisfies an erasure request by removing the mapping from actor identifier to person. The record keeps its evidential value and the person stops being identifiable from it.
+`standards/rule/ext-audit.exclude-personal-data-beyond-actor-identity` and `standards/rule/ext-audit.exclude-state-snapshots` prevent that conflict at design time. `standards/rule/ext-audit.remove-the-identity-mapping-on-erasure` then satisfies an erasure request by removing the mapping from actor identifier to person. The record keeps its evidential value and the person stops being identifiable from it.
 
 Two consequences follow for a project. Record the lawful basis and the retention period of each audited category in the adoption decision. Include the trail in the records of processing activities, because it is itself a processing activity.
 
@@ -79,23 +79,23 @@ Building to that model costs nothing at design time. It lets a project map the t
 
 | Obligation | Source | Provision |
 |:---|:---|:---|
-| Select audited events and record the rationale | AU-2 | `EXT.AUDIT.ADOPT.001`, `EXT.AUDIT.ADOPT.002` |
-| Cover the required event categories | AU-2, PCI 10.2.1, ISO 8.15 | `EXT.AUDIT.COVERAGE.001` |
-| Generate records across every component | AU-12 | `EXT.AUDIT.BOUNDARY.001` |
-| State the required record content | AU-3, PCI 10.2.2 | `EXT.AUDIT.RECORD.001` |
-| Identify the affected resource | AU-3, PCI 10.2.2 | `EXT.AUDIT.RECORD.001` |
-| Indicate success or failure | AU-3, PCI 10.2.2 | `EXT.AUDIT.STATUS.001` |
-| Record invalid access attempts | PCI 10.2.1.4, OWASP | `EXT.AUDIT.STATUS.002` |
-| Record the origination of the event | AU-3, PCI 10.2.2, ISO 8.15 | `EXT.AUDIT.CONTEXT.001` |
-| Record credential and privilege change | PCI 10.2.1.5, ISO 8.15 | `EXT.AUDIT.COVERAGE.001` |
-| Record access to the audit records | PCI 10.2.1.3 | `EXT.AUDIT.ACCESS.002` |
-| Record sensitive data access and export | OWASP, GDPR Art. 30 | `EXT.AUDIT.READ.001`, `EXT.AUDIT.EXPORT.001` |
-| Exclude secrets and payment data | OWASP, PCI | `EXT.AUDIT.CLASSIFICATION.001` |
-| Exclude sensitive personal data | OWASP, GDPR Art. 17 | `EXT.AUDIT.CLASSIFICATION.002` |
-| Protect records from change and deletion | AU-9, ISO 8.15, GDPR Art. 32 | `EXT.AUDIT.PROTECTION.001`, `EXT.AUDIT.PROTECTION.002` |
-| Retain for a defined period | AU-11 | `EXT.AUDIT.PURGE.001` |
-| Satisfy erasure without destroying evidence | GDPR Art. 17 | `EXT.AUDIT.PURGE.002` |
-| Review and analyze the records | AU-6, ISO 8.15 | `EXT.AUDIT.ACCESS.001` |
+| Select audited events and record the rationale | AU-2 | `standards/rule/ext-audit.record-the-audit-adoption-decision`, `standards/rule/ext-audit.declare-audit-selection-on-every-command` |
+| Cover the required event categories | AU-2, PCI 10.2.1, ISO 8.15 | `standards/rule/ext-audit.cover-the-required-audit-categories` |
+| Generate records across every component | AU-12 | `standards/rule/ext-audit.emit-audit-records-at-the-mediation-boundary` |
+| State the required record content | AU-3, PCI 10.2.2 | `standards/rule/ext-audit.record-the-required-audit-fields` |
+| Identify the affected resource | AU-3, PCI 10.2.2 | `standards/rule/ext-audit.record-the-required-audit-fields` |
+| Indicate success or failure | AU-3, PCI 10.2.2 | `standards/rule/ext-audit.record-every-attempt-outcome` |
+| Record invalid access attempts | PCI 10.2.1.4, OWASP | `standards/rule/ext-audit.record-refused-authorization` |
+| Record the origination of the event | AU-3, PCI 10.2.2, ISO 8.15 | `standards/rule/ext-audit.record-the-request-origin` |
+| Record credential and privilege change | PCI 10.2.1.5, ISO 8.15 | `standards/rule/ext-audit.cover-the-required-audit-categories` |
+| Record access to the audit records | PCI 10.2.1.3 | `standards/rule/ext-audit.audit-reads-of-the-trail` |
+| Record sensitive data access and export | OWASP, GDPR Art. 30 | `standards/rule/ext-audit.record-personal-data-reads`, `standards/rule/ext-audit.record-bulk-export` |
+| Exclude secrets and payment data | OWASP, PCI | `standards/rule/ext-audit.exclude-secrets-and-payment-data` |
+| Exclude sensitive personal data | OWASP, GDPR Art. 17 | `standards/rule/ext-audit.exclude-personal-data-beyond-actor-identity` |
+| Protect records from change and deletion | AU-9, ISO 8.15, GDPR Art. 32 | `standards/rule/ext-audit.enforce-append-only-through-storage-privilege`, `standards/rule/ext-audit.provide-tamper-evidence` |
+| Retain for a defined period | AU-11 | `standards/rule/ext-audit.retain-each-category-for-its-declared-period` |
+| Satisfy erasure without destroying evidence | GDPR Art. 17 | `standards/rule/ext-audit.remove-the-identity-mapping-on-erasure` |
+| Review and analyze the records | AU-6, ISO 8.15 | `standards/rule/ext-audit.give-the-trail-a-read-path` |
 
 ## Notes
 

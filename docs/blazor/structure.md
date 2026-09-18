@@ -6,15 +6,15 @@ The client is one Blazor WebAssembly application organized around the same busin
 
 ## Agent Summary {#agent-summary}
 
-- The solution holds four production projects and no server project. (BLAZOR.STRUCTURE.TREE.001)
-- Features sit under their module and use-case names. (BLAZOR.STRUCTURE.FEATURES.001)
-- A module never reaches into another module's feature internals. (BLAZOR.STRUCTURE.BOUNDARY.001)
-- Imports run from pages inward, never outward. (BLAZOR.STRUCTURE.IMPORTS.001)
-- Domain and Application carry no browser type. (BLAZOR.STRUCTURE.DOMAIN.001)
+- The solution holds four production projects and no server project. (standards/rule/blazor-structure.use-the-client-solution-tree)
+- Features sit under their module and use-case names. (standards/rule/blazor-structure.organize-features-by-module-and-use-case)
+- A module never reaches into another module's feature internals. (standards/rule/blazor-structure.isolate-module-internals)
+- Imports run from pages inward, never outward. (standards/rule/blazor-structure.keep-imports-directional)
+- Domain and Application carry no browser type. (standards/rule/blazor-structure.keep-domain-free-of-browser-concerns)
 
 ## Standards
 
-### Use the client solution tree (BLAZOR.STRUCTURE.TREE.001)
+### Use the client solution tree (standards/rule/blazor-structure.use-the-client-solution-tree)
 
 **Requirement:** A client solution MUST contain Domain, Application, Infrastructure, and Web production projects and no server project.
 
@@ -44,19 +44,19 @@ apps/web/
 
 Framework-generated `bin`, `obj`, and publish folders remain untracked.
 
-### Organize features by module and use case (BLAZOR.STRUCTURE.FEATURES.001)
+### Organize features by module and use case (standards/rule/blazor-structure.organize-features-by-module-and-use-case)
 
 **Requirement:** A feature MUST live under `Features/{Module}/{UseCase}/` using the module and use-case names its specification declares.
 
 **Rationale:** The client tree then matches the specification tree and the Application folders.
 
-### Isolate module internals (BLAZOR.STRUCTURE.BOUNDARY.001)
+### Isolate module internals (standards/rule/blazor-structure.isolate-module-internals)
 
 **Requirement:** A module MUST NOT reference another module's internal feature types.
 
 **Rationale:** Page composition may still render public components from several modules when a page specification requires it. Shared code moves to `Components/` only after two real consumers need the same responsibility.
 
-### Keep imports directional (BLAZOR.STRUCTURE.IMPORTS.001)
+### Keep imports directional (standards/rule/blazor-structure.keep-imports-directional)
 
 **Requirement:** A reference MUST point from pages to features to components and Application, and from Infrastructure inward.
 
@@ -69,7 +69,7 @@ Pages -> Features -> Components and Application -> Domain
 Infrastructure -> Application and Domain
 ```
 
-### Keep Domain free of browser concerns (BLAZOR.STRUCTURE.DOMAIN.001)
+### Keep Domain free of browser concerns (standards/rule/blazor-structure.keep-domain-free-of-browser-concerns)
 
 **Requirement:** Domain and Application MUST contain no interop, component, HTTP, browser storage, render-loop timer, or document object model type.
 
@@ -77,7 +77,7 @@ Infrastructure -> Application and Domain
 
 ## Conventions
 
-### Place interop adapters together (BLAZOR.STRUCTURE.CONVENTION.001)
+### Place interop adapters together (standards/rule/blazor-structure.place-interop-adapters-together)
 
 **Default:** Place browser API wrappers in `{ProjectName}.Infrastructure/Interop/`, one type per API surface.
 
@@ -85,7 +85,7 @@ Infrastructure -> Application and Domain
 
 **Rationale:** Each wrapper implements an interface declared in Application. The static scripts they call live in `{ProjectName}.Web/wwwroot/interop/` with matching names.
 
-### Keep static content out of the assembly (BLAZOR.STRUCTURE.CONVENTION.002)
+### Keep static content out of the assembly (standards/rule/blazor-structure.keep-static-content-out-of-the-assembly)
 
 **Default:** Serve generated runtime content from `wwwroot/` and fetch it rather than embedding it as a resource.
 
@@ -97,10 +97,10 @@ Infrastructure -> Application and Domain
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BLAZOR.STRUCTURE.TREE.001 | test | `ClientSolutionTests` asserts four production projects exist and no server project is present. |
-| BLAZOR.STRUCTURE.FEATURES.001 | test | `ClientArchitectureTests` asserts each feature path resolves to a declared module and use case. |
-| BLAZOR.STRUCTURE.BOUNDARY.001 | test | `ClientArchitectureTests` asserts no cross-module reference resolves an internal feature type. |
-| BLAZOR.STRUCTURE.IMPORTS.001 | test | `ClientArchitectureTests` asserts the project reference graph matches the declared direction. |
-| BLAZOR.STRUCTURE.DOMAIN.001 | test | `ClientArchitectureTests` asserts Domain and Application reference no browser or interop type. |
-| BLAZOR.STRUCTURE.CONVENTION.001 | inspection | Interop review locates each adapter and its matching script, or records a named local replacement. |
-| BLAZOR.STRUCTURE.CONVENTION.002 | inspection | Published output serves runtime content from `wwwroot/` rather than an embedded resource. |
+| standards/rule/blazor-structure.use-the-client-solution-tree | test | `ClientSolutionTests` asserts four production projects exist and no server project is present. |
+| standards/rule/blazor-structure.organize-features-by-module-and-use-case | test | `ClientArchitectureTests` asserts each feature path resolves to a declared module and use case. |
+| standards/rule/blazor-structure.isolate-module-internals | test | `ClientArchitectureTests` asserts no cross-module reference resolves an internal feature type. |
+| standards/rule/blazor-structure.keep-imports-directional | test | `ClientArchitectureTests` asserts the project reference graph matches the declared direction. |
+| standards/rule/blazor-structure.keep-domain-free-of-browser-concerns | test | `ClientArchitectureTests` asserts Domain and Application reference no browser or interop type. |
+| standards/rule/blazor-structure.place-interop-adapters-together | inspection | Interop review locates each adapter and its matching script, or records a named local replacement. |
+| standards/rule/blazor-structure.keep-static-content-out-of-the-assembly | inspection | Published output serves runtime content from `wwwroot/` rather than an embedded resource. |

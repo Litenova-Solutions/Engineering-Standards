@@ -31,7 +31,7 @@ body:
     attributes:
       label: Provisions affected
       description: Each provision ID this adds, replaces, or contradicts. Write `None` when the change is tooling only.
-      placeholder: CORE.AUTHORING.SNAPSHOT.002
+      placeholder: standards/rule/core-authoring.exclude-historical-transition-material
     validations:
       required: true
 
@@ -51,7 +51,7 @@ body:
     attributes:
       label: Conflicting provision
       description: Each provision ID this proposal contradicts. Write `None` when the answer above is no. A conflict named as a yes and nowhere else cannot be reviewed.
-      placeholder: BACKEND.DOMAIN.CLOSEDSET.001
+      placeholder: standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums
     validations:
       required: true
 

@@ -100,11 +100,11 @@ Then `__ERROR_CODE__` is returned without a state change
 
 Add this section when implementation begins. Do not use it as the source for business behavior.
 
-State every name in a code span. Each one resolves to a declared type, a member written as `Type.Member`, a project, or a repository path. A route carries a path rather than an identifier, so the entry-point checks resolve it. A row that names no artifact writes `None`. An `implemented` or `verified` use case names the handler its operation folder declares. (`CORE.SYSTEM.MAPPING.001`, `CORE.SYSTEM.MAPPING.002`)
+State every name in a code span. Each one resolves to a declared type, a member written as `Type.Member`, a project, or a repository path. A route carries a path rather than an identifier, so the entry-point checks resolve it. A row that names no artifact writes `None`. An `implemented` or `verified` use case names the handler its operation folder declares. (`standards/rule/core-system.resolve-every-implementation-mapping-name`, `standards/rule/core-system.name-the-handler-an-implemented-use-case-owns`)
 
 ## Consumers
 
-Name every declared surface that invokes this use case, one per row. A surface is a frontend the project declares or a `paths.surfaces` entry. Write `None.` with the reason when a schedule, a reaction, or another use case is the only caller. A page declaring this use case in its `useCases` metadata is named here by its path. (`CORE.SYSTEM.CONSUMERS.001`, `CORE.SYSTEM.CONSUMERS.002`)
+Name every declared surface that invokes this use case, one per row. A surface is a frontend the project declares or a `paths.surfaces` entry. Write `None.` with the reason when a schedule, a reaction, or another use case is the only caller. A page declaring this use case in its `useCases` metadata is named here by its path. (`standards/rule/core-system.name-what-calls-a-use-case`, `standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page`)
 
 | Surface | Consumer |
 |:---|:---|

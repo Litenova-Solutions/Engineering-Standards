@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Writes docs/reference/provisions.md from the active standards. Pass --check to
-// compare without writing. (CORE.AUTHORING.INDEX.001)
+// compare without writing. (standards/rule/core-authoring.regenerate-the-provision-index)
 
 import fs from 'node:fs';
 import path from 'node:path';

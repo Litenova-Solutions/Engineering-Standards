@@ -18,28 +18,28 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 
 ## Agent Summary {#agent-summary}
 
-- Record measurement before adding a cache. (EXT.CACHE.ADOPT.001)
-- Remove caches that measurements no longer justify. (EXT.CACHE.ADOPT.002)
-- Partition and version each cache key. (EXT.CACHE.KEY.001)
-- Define expiry and invalidation before caching. (EXT.CACHE.INVALIDATE.001)
-- Keep source data authoritative during failure. (EXT.CACHE.FAILURE.001, EXT.CACHE.FAILURE.002)
-- Bound concurrent refresh work. (EXT.CACHE.REFRESH.001, EXT.CACHE.REFRESH.002)
+- Record measurement before adding a cache. (standards/rule/ext-cache.record-measured-cache-need)
+- Remove caches that measurements no longer justify. (standards/rule/ext-cache.remove-unjustified-caches)
+- Partition and version each cache key. (standards/rule/ext-cache.compose-cache-keys-from-result-inputs)
+- Define expiry and invalidation before caching. (standards/rule/ext-cache.define-cache-invalidation)
+- Keep source data authoritative during failure. (standards/rule/ext-cache.keep-source-data-authoritative, standards/rule/ext-cache.define-cache-outage-behavior)
+- Bound concurrent refresh work. (standards/rule/ext-cache.bound-cache-refresh-work, standards/rule/ext-cache.avoid-unbounded-key-locks)
 
 ## Standards
 
-### Record measured cache need (EXT.CACHE.ADOPT.001)
+### Record measured cache need (standards/rule/ext-cache.record-measured-cache-need)
 
 **Requirement:** A cache proposal MUST record its observed query, representative load, latency, source cost, target, and accepted staleness.
 
 **Rationale:** The record makes the cache's freshness and operating-cost trade-off reviewable.
 
-### Remove unjustified caches (EXT.CACHE.ADOPT.002)
+### Remove unjustified caches (standards/rule/ext-cache.remove-unjustified-caches)
 
 **Requirement:** A cache owner MUST remove a cache when measurements no longer justify its operating cost.
 
 **Rationale:** A cache creates invalidation, capacity, and recovery work that needs continuing value.
 
-### Compose cache keys from result inputs (EXT.CACHE.KEY.001)
+### Compose cache keys from result inputs (standards/rule/ext-cache.compose-cache-keys-from-result-inputs)
 
 **Requirement:** A cache key MUST include its data-shape version, every result-affecting input, and applicable tenant or actor partition.
 
@@ -47,7 +47,7 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 
 **Example:** `post-summary:v2:tenant-42:post-17` identifies a versioned, tenant-scoped result.
 
-### Exclude unsafe cache key material (EXT.CACHE.KEY.002)
+### Exclude unsafe cache key material (standards/rule/ext-cache.exclude-unsafe-cache-key-material)
 
 **Requirement:** A cache key MUST NOT contain a secret, unbounded raw input, or personal data that is not already a hash.
 
@@ -55,13 +55,13 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 
 **Example:** A per-account cache key carries the account's opaque identifier. A key that carried the address instead is replaced by a hash of it, and the entry is bound to the account that owns it.
 
-### Define cache invalidation (EXT.CACHE.INVALIDATE.001)
+### Define cache invalidation (standards/rule/ext-cache.define-cache-invalidation)
 
 **Requirement:** A cached value MUST define expiry, invalidating write events, an invalidation owner, and behavior after invalidation failure.
 
 **Rationale:** An explicit contract makes stale data behavior visible before implementation.
 
-### Record a manual cache invalidation (EXT.CACHE.INVALIDATE.003)
+### Record a manual cache invalidation (standards/rule/ext-cache.record-a-manual-cache-invalidation)
 
 **Requirement:** An invalidation an operator triggers by hand MUST produce a record naming the actor, the scope cleared, and the reason.
 
@@ -69,7 +69,7 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 
 **Example:** A command that clears one tenant's cached price list records the tenant, the operator, and the incident it was run for.
 
-### Prefer bounded staleness (EXT.CACHE.INVALIDATE.002)
+### Prefer bounded staleness (standards/rule/ext-cache.prefer-bounded-staleness)
 
 **Requirement:** A cache owner SHOULD use a short expiry when precise invalidation costs more than recomputation.
 
@@ -77,19 +77,19 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 
 **Rationale:** Short expiry limits stale data when invalidation precision is not economical.
 
-### Keep source data authoritative (EXT.CACHE.FAILURE.001)
+### Keep source data authoritative (standards/rule/ext-cache.keep-source-data-authoritative)
 
 **Requirement:** A cache implementation MUST keep required business data authoritative in its source of record.
 
 **Rationale:** A cache stores a derived copy rather than the sole required business record.
 
-### Define cache outage behavior (EXT.CACHE.FAILURE.002)
+### Define cache outage behavior (standards/rule/ext-cache.define-cache-outage-behavior)
 
 **Requirement:** A cache outage MUST use the source when capacity permits or return a documented degraded response.
 
 **Rationale:** Callers need predictable behavior when cache infrastructure is unavailable.
 
-### Emit a signal for each degraded cache path (EXT.CACHE.FAILURE.003)
+### Emit a signal for each degraded cache path (standards/rule/ext-cache.emit-a-signal-for-each-degraded-cache-path)
 
 **Requirement:** A cache path MUST emit a metric distinguishing a cache miss, a cache error, and a degraded response.
 
@@ -97,7 +97,7 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 
 **Example:** The metric carries the cache name and the outcome, following [the OpenTelemetry semantic conventions](https://opentelemetry.io/docs/specs/semconv/) for the client it wraps.
 
-### Bound cache refresh work (EXT.CACHE.REFRESH.001)
+### Bound cache refresh work (standards/rule/ext-cache.bound-cache-refresh-work)
 
 **Requirement:** A cache implementation MUST bound simultaneous refresh work when concurrent misses could overload its source.
 
@@ -105,7 +105,7 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 
 **Example:** One request refreshes a key while concurrent callers await the same bounded work.
 
-### Avoid unbounded key locks (EXT.CACHE.REFRESH.002)
+### Avoid unbounded key locks (standards/rule/ext-cache.avoid-unbounded-key-locks)
 
 **Requirement:** A cache implementation MUST NOT create an unbounded per-key lock inventory.
 
@@ -113,7 +113,7 @@ The extension selects no cache provider and replaces no baseline rule. A provide
 
 ## Conventions
 
-### Place cache access at an outer boundary (EXT.CACHE.CONVENTION.001)
+### Place cache access at an outer boundary (standards/rule/ext-cache.place-cache-access-at-an-outer-boundary)
 
 **Default:** Place cache access in Infrastructure or a frontend data boundary.
 
@@ -129,16 +129,16 @@ No provider package is selected by this extension.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| EXT.CACHE.ADOPT.001 | inspection | The owning use-case specification records the query, load, latency, cost, target, and staleness. |
-| EXT.CACHE.ADOPT.002 | inspection | Cache review records a removal decision when current measurements no longer justify operating cost. |
-| EXT.CACHE.KEY.001 | test | `CacheKeyTests` distinguish version, result inputs, and tenant or actor partitions. |
-| EXT.CACHE.KEY.002 | static, inspection | `CacheKeyTests` asserts key construction excludes secrets and unbounded raw request values. |
-| EXT.CACHE.INVALIDATE.001 | test | `CacheInvalidateTests` cover expiry, invalidation event, failed invalidation, and owner behavior. |
-| EXT.CACHE.INVALIDATE.002 | inspection | The cache decision records expiry length and measured invalidation cost. |
-| EXT.CACHE.INVALIDATE.003 | test | `CacheInvalidateTests` assert a manual clear writes a record naming the actor, the scope, and the reason. |
-| EXT.CACHE.FAILURE.001 | inspection | Source and cache design review identifies the authoritative business record. |
-| EXT.CACHE.FAILURE.002 | test | `CacheFailureTests` prove source fallback or the documented degraded response. |
-| EXT.CACHE.FAILURE.003 | test | `CacheFailureTests` assert a miss, a provider error, and a degraded response each increment their own metric outcome. |
-| EXT.CACHE.REFRESH.001 | test | `CacheRefreshTests` show bounded refresh work and source protection. |
-| EXT.CACHE.REFRESH.002 | test | `CacheRefreshTests` show lock state remains bounded. |
-| EXT.CACHE.CONVENTION.001 | inspection | Source review locates cache access outside Domain and records any local replacement. |
+| standards/rule/ext-cache.record-measured-cache-need | inspection | The owning use-case specification records the query, load, latency, cost, target, and staleness. |
+| standards/rule/ext-cache.remove-unjustified-caches | inspection | Cache review records a removal decision when current measurements no longer justify operating cost. |
+| standards/rule/ext-cache.compose-cache-keys-from-result-inputs | test | `CacheKeyTests` distinguish version, result inputs, and tenant or actor partitions. |
+| standards/rule/ext-cache.exclude-unsafe-cache-key-material | static, inspection | `CacheKeyTests` asserts key construction excludes secrets and unbounded raw request values. |
+| standards/rule/ext-cache.define-cache-invalidation | test | `CacheInvalidateTests` cover expiry, invalidation event, failed invalidation, and owner behavior. |
+| standards/rule/ext-cache.prefer-bounded-staleness | inspection | The cache decision records expiry length and measured invalidation cost. |
+| standards/rule/ext-cache.record-a-manual-cache-invalidation | test | `CacheInvalidateTests` assert a manual clear writes a record naming the actor, the scope, and the reason. |
+| standards/rule/ext-cache.keep-source-data-authoritative | inspection | Source and cache design review identifies the authoritative business record. |
+| standards/rule/ext-cache.define-cache-outage-behavior | test | `CacheFailureTests` prove source fallback or the documented degraded response. |
+| standards/rule/ext-cache.emit-a-signal-for-each-degraded-cache-path | test | `CacheFailureTests` assert a miss, a provider error, and a degraded response each increment their own metric outcome. |
+| standards/rule/ext-cache.bound-cache-refresh-work | test | `CacheRefreshTests` show bounded refresh work and source protection. |
+| standards/rule/ext-cache.avoid-unbounded-key-locks | test | `CacheRefreshTests` show lock state remains bounded. |
+| standards/rule/ext-cache.place-cache-access-at-an-outer-boundary | inspection | Source review locates cache access outside Domain and records any local replacement. |

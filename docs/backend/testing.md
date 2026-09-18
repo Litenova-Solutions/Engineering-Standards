@@ -8,21 +8,21 @@ Backend tests prove domain behavior, use-case coordination, real persistence and
 ## Agent Summary {#agent-summary}
 
 
-- Four test projects match the four boundaries. (BACKEND.TESTING.PROJECTS.001)
-- Domain tests run on explicit inputs alone. (BACKEND.TESTING.DOMAIN.001)
-- Application tests substitute ports and assert coordination. (BACKEND.TESTING.APPLICATION.001)
-- Integration tests use real PostgreSQL and the real host. (BACKEND.TESTING.INTEGRATION.001)
-- Integration cases reset state and never depend on order. (BACKEND.TESTING.ISOLATION.001)
-- Architecture tests assert every compiler-invisible boundary. (BACKEND.TESTING.ARCHITECTURE.001)
-- Every acceptance criterion is cited by an automated test, in one exact form. (BACKEND.TESTING.TRACE.002)
-- Coverage informs review; it is not the sufficiency test. (BACKEND.TESTING.COVERAGE.001)
-- Verification regenerates contracts and fails on drift. (BACKEND.TESTING.GENERATED.001)
-- One shared harness owns the container, host factory, and reset. (BACKEND.TESTING.HARNESS.001)
+- Four test projects match the four boundaries. (standards/rule/backend-testing.use-four-baseline-test-projects)
+- Domain tests run on explicit inputs alone. (standards/rule/backend-testing.test-domain-in-isolation)
+- Application tests substitute ports and assert coordination. (standards/rule/backend-testing.test-application-coordination)
+- Integration tests use real PostgreSQL and the real host. (standards/rule/backend-testing.test-persistence-and-http-with-postgresql)
+- Integration cases reset state and never depend on order. (standards/rule/backend-testing.isolate-integration-state)
+- Architecture tests assert every compiler-invisible boundary. (standards/rule/backend-testing.enforce-architecture-rules)
+- Every acceptance criterion is cited by an automated test, in one exact form. (standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form)
+- Coverage informs review; it is not the sufficiency test. (standards/rule/backend-testing.use-evidence-rather-than-one-coverage-target)
+- Verification regenerates contracts and fails on drift. (standards/rule/backend-testing.verify-generated-contracts)
+- One shared harness owns the container, host factory, and reset. (standards/rule/backend-testing.use-one-production-faithful-integration-harness)
 
 ## Standards
 
 
-### Use four baseline test projects (BACKEND.TESTING.PROJECTS.001)
+### Use four baseline test projects (standards/rule/backend-testing.use-four-baseline-test-projects)
 
 **Requirement:** A backend solution MUST contain Domain, Application, Integration, and Architecture test projects and no other baseline test project.
 
@@ -37,37 +37,37 @@ apps/api/tests/{ProjectName}.Architecture.Tests/
 
 Acceptance.Tests appears only when the executable BDD extension activates. A solution that ships a project of that name without selecting `bdd` has an unnamed fifth baseline project, which this rule refuses. Select the extension, or name the project for what it actually is.
 
-### Test Domain in isolation (BACKEND.TESTING.DOMAIN.001)
+### Test Domain in isolation (standards/rule/backend-testing.test-domain-in-isolation)
 
 **Requirement:** A Domain test MUST use explicit inputs with no database, HTTP host, container, clock, or mock.
 
 **Rationale:** Domain tests cover factories, every lifecycle state, allowed and rejected transitions, invariants, value equality, collections, money rules, exceptions, and raised events.
 
-### Test Application coordination (BACKEND.TESTING.APPLICATION.001)
+### Test Application coordination (standards/rule/backend-testing.test-application-coordination)
 
 **Requirement:** An Application test MUST substitute repositories, clocks, actor accessors, and external ports, then assert the handler's coordination.
 
 **Rationale:** The assertion covers which aggregate loaded, which domain behavior ran, what was staged, and what returned. Validator tests cover each structural rule separately.
 
-### Test persistence and HTTP with PostgreSQL (BACKEND.TESTING.INTEGRATION.001)
+### Test persistence and HTTP with PostgreSQL (standards/rule/backend-testing.test-persistence-and-http-with-postgresql)
 
 **Requirement:** An integration test MUST run against Testcontainers PostgreSQL, the real Marten configuration, and `WebApplicationFactory`.
 
 **Rationale:** Coverage includes mappings, repository load and store, projections, commit behavior, Problem Details, authentication, and resource authorization.
 
-### Isolate integration state (BACKEND.TESTING.ISOLATION.001)
+### Isolate integration state (standards/rule/backend-testing.isolate-integration-state)
 
 **Requirement:** An integration test MUST reset database state between cases through one documented strategy and depend on no test order.
 
 **Rationale:** Container and host fixtures may still be shared for cost, because only mutable business state must not leak.
 
-### Enforce architecture rules (BACKEND.TESTING.ARCHITECTURE.001)
+### Enforce architecture rules (standards/rule/backend-testing.enforce-architecture-rules)
 
 **Requirement:** An architecture test MUST assert reference direction, package restrictions, type visibility, module folders, and aggregate inheritance.
 
 **Rationale:** These are the boundaries a compiler does not enforce, so a review miss otherwise lands in the main branch.
 
-### Cite an acceptance criterion in one exact form (BACKEND.TESTING.TRACE.002)
+### Cite an acceptance criterion in one exact form (standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form)
 
 **Requirement:** Every acceptance criterion of a verified use case MUST be cited by a C# test carrying `[Trait("AcceptanceCriterion", "<identifier>")]` or by a scenario tag.
 
@@ -87,19 +87,19 @@ public void Draft_is_created_with_no_title() { }
 
 The trace is one-way. Internal implementation tests carry no acceptance identifier.
 
-### Use evidence rather than one coverage target (BACKEND.TESTING.COVERAGE.001)
+### Use evidence rather than one coverage target (standards/rule/backend-testing.use-evidence-rather-than-one-coverage-target)
 
 **Requirement:** A repository MUST NOT treat one coverage percentage as the definition of sufficient testing.
 
 **Rationale:** Line and branch coverage is collected for review. Acceptance trace, Domain negative cases, integration boundaries, security behavior, and architecture rules remain the evidence.
 
-### Verify generated contracts (BACKEND.TESTING.GENERATED.001)
+### Verify generated contracts (standards/rule/backend-testing.verify-generated-contracts)
 
 **Requirement:** The verification flow MUST regenerate OpenAPI and downstream API types and fail when committed output differs.
 
 **Rationale:** A generated contract that drifts from its source silently gives consumers a false description.
 
-### Use one production-faithful integration harness (BACKEND.TESTING.HARNESS.001)
+### Use one production-faithful integration harness (standards/rule/backend-testing.use-one-production-faithful-integration-harness)
 
 **Requirement:** The integration project MUST own one PostgreSQL container fixture, one `ApiFactory`, and one `DatabaseReset` helper.
 
@@ -110,7 +110,7 @@ The trace is one-way. Internal implementation tests carry no acceptance identifi
 ## Conventions
 
 
-### Mirror production module names (BACKEND.TESTING.CONVENTION.001)
+### Mirror production module names (standards/rule/backend-testing.mirror-production-module-names)
 
 **Default:** Mirror the production module and aggregate folder names inside each test project.
 
@@ -145,7 +145,7 @@ The trace is one-way. Internal implementation tests carry no acceptance identifi
   EndpointBoundaryTests.cs
 ```
 
-### Name tests by observable behavior (BACKEND.TESTING.CONVENTION.002)
+### Name tests by observable behavior (standards/rule/backend-testing.name-tests-by-observable-behavior)
 
 **Default:** Name a test `{MethodOrOperation}_{Condition}_{ExpectedResult}` and its class after the production type it covers.
 
@@ -153,7 +153,7 @@ The trace is one-way. Internal implementation tests carry no acceptance identifi
 
 **Rationale:** A name such as `Test1` or `HappyPath` describes the author's intent rather than the behavior that failed.
 
-### Use builders for valid defaults (BACKEND.TESTING.CONVENTION.003)
+### Use builders for valid defaults (standards/rule/backend-testing.use-builders-for-valid-defaults)
 
 **Default:** Create a test data builder that produces valid state by default and exposes business-named customization.
 
@@ -161,7 +161,7 @@ The trace is one-way. Internal implementation tests carry no acceptance identifi
 
 **Rationale:** Bypassing domain methods to construct impossible state is reserved for a persistence compatibility test.
 
-### Keep assertions focused (BACKEND.TESTING.CONVENTION.004)
+### Keep assertions focused (standards/rule/backend-testing.keep-assertions-focused)
 
 **Default:** Assert only the state, event, call, response, or error that the test covers.
 
@@ -171,7 +171,7 @@ The trace is one-way. Internal implementation tests carry no acceptance identifi
 
 ## Reference example
 
-This informative example demonstrates `BACKEND.TESTING.DOMAIN.001`, `BACKEND.TESTING.APPLICATION.001`, and `BACKEND.TESTING.INTEGRATION.001`.
+This informative example demonstrates `standards/rule/backend-testing.test-domain-in-isolation`, `standards/rule/backend-testing.test-application-coordination`, and `standards/rule/backend-testing.test-persistence-and-http-with-postgresql`.
 
 A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mocks. `CreateDraftCommandHandlerTests.HandleAsync_WhenValid_StoresCreatedPost` substitutes `IPostRepository` and `IClock`. `CreateDraftEndpointTests` uses the real API host and PostgreSQL.
 
@@ -180,17 +180,17 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BACKEND.TESTING.PROJECTS.001 | test | `SolutionStructureTests` asserts the solution contains exactly the four baseline test projects. |
-| BACKEND.TESTING.DOMAIN.001 | test | `ArchitectureTests` asserts the Domain test project references no database, host, container, or mocking package. |
-| BACKEND.TESTING.APPLICATION.001 | test | `ApplicationHandlerTests` asserts the loaded aggregate, invoked behavior, staged change, and returned result for each handler. |
-| BACKEND.TESTING.INTEGRATION.001 | test | `IntegrationTests` starts the manifest-pinned PostgreSQL container and the real WebApi host for each covered boundary. |
-| BACKEND.TESTING.ISOLATION.001 | test | `DatabaseResetTests` asserts a randomized case order passes and no case observes another case's data. |
-| BACKEND.TESTING.ARCHITECTURE.001 | test | `ArchitectureTests` covers each listed structural boundary and runs in the Release test pass. |
-| BACKEND.TESTING.TRACE.002 | static | `node standards/tools/validate-consumer.mjs` reads the declared test roots, and reports a citation naming no criterion. |
-| BACKEND.TESTING.COVERAGE.001 | operation | The CI test job publishes coverage as a review artifact and gates on no percentage threshold. |
-| BACKEND.TESTING.GENERATED.001 | test | The CI contract job regenerates `apps/api/openapi/` and typed clients, then fails on any tree difference. |
-| BACKEND.TESTING.HARNESS.001 | test | `IntegrationTests` resolves its container fixture, `ApiFactory`, and `DatabaseReset` from one shared harness. |
-| BACKEND.TESTING.CONVENTION.001 | inspection | Folder review compares each test tree against its production module list, or records a named local replacement. |
-| BACKEND.TESTING.CONVENTION.002 | test | `TestNamingTests` asserts each test class name matches a production type and each method carries the three-part form. |
-| BACKEND.TESTING.CONVENTION.003 | inspection | Builder review confirms each builder produces a valid aggregate by default through its domain factory. |
-| BACKEND.TESTING.CONVENTION.004 | inspection | Assertion review confirms each test asserts its named outcome rather than a whole-object snapshot. |
+| standards/rule/backend-testing.use-four-baseline-test-projects | test | `SolutionStructureTests` asserts the solution contains exactly the four baseline test projects. |
+| standards/rule/backend-testing.test-domain-in-isolation | test | `ArchitectureTests` asserts the Domain test project references no database, host, container, or mocking package. |
+| standards/rule/backend-testing.test-application-coordination | test | `ApplicationHandlerTests` asserts the loaded aggregate, invoked behavior, staged change, and returned result for each handler. |
+| standards/rule/backend-testing.test-persistence-and-http-with-postgresql | test | `IntegrationTests` starts the manifest-pinned PostgreSQL container and the real WebApi host for each covered boundary. |
+| standards/rule/backend-testing.isolate-integration-state | test | `DatabaseResetTests` asserts a randomized case order passes and no case observes another case's data. |
+| standards/rule/backend-testing.enforce-architecture-rules | test | `ArchitectureTests` covers each listed structural boundary and runs in the Release test pass. |
+| standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form | static | `node standards/tools/validate-consumer.mjs` reads the declared test roots, and reports a citation naming no criterion. |
+| standards/rule/backend-testing.use-evidence-rather-than-one-coverage-target | operation | The CI test job publishes coverage as a review artifact and gates on no percentage threshold. |
+| standards/rule/backend-testing.verify-generated-contracts | test | The CI contract job regenerates `apps/api/openapi/` and typed clients, then fails on any tree difference. |
+| standards/rule/backend-testing.use-one-production-faithful-integration-harness | test | `IntegrationTests` resolves its container fixture, `ApiFactory`, and `DatabaseReset` from one shared harness. |
+| standards/rule/backend-testing.mirror-production-module-names | inspection | Folder review compares each test tree against its production module list, or records a named local replacement. |
+| standards/rule/backend-testing.name-tests-by-observable-behavior | test | `TestNamingTests` asserts each test class name matches a production type and each method carries the three-part form. |
+| standards/rule/backend-testing.use-builders-for-valid-defaults | inspection | Builder review confirms each builder produces a valid aggregate by default through its domain factory. |
+| standards/rule/backend-testing.keep-assertions-focused | inspection | Assertion review confirms each test asserts its named outcome rather than a whole-object snapshot. |

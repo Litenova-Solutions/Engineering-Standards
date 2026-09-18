@@ -8,25 +8,25 @@ Next.js route files should expose server-first page composition and make browser
 ## Agent Summary {#agent-summary}
 
 
-- Server Components render unless a browser capability requires otherwise. (FRONTEND.RENDERING.SERVER.001)
-- Every client directive names the capability requiring it. (FRONTEND.RENDERING.CLIENT.001)
-- Request and route APIs are awaited. (FRONTEND.RENDERING.ASYNC.001)
-- Route files compose; features hold the logic. (FRONTEND.RENDERING.ROUTES.001)
-- Data-driven routes define every applicable state. (FRONTEND.RENDERING.STATE.001)
-- Caching actor-specific data requires a declared key and owner. (FRONTEND.RENDERING.CACHE.001)
-- Edge proxy rules stay coarse and never authorize resources. (FRONTEND.RENDERING.PROXY.001)
-- Routes declare metadata, and private routes block indexing. (FRONTEND.RENDERING.METADATA.001)
+- Server Components render unless a browser capability requires otherwise. (standards/rule/frontend-rendering.prefer-server-execution)
+- Every client directive names the capability requiring it. (standards/rule/frontend-rendering.document-client-boundaries)
+- Request and route APIs are awaited. (standards/rule/frontend-rendering.await-nextjs-request-apis)
+- Route files compose; features hold the logic. (standards/rule/frontend-rendering.keep-route-files-as-composition-boundaries)
+- Data-driven routes define every applicable state. (standards/rule/frontend-rendering.represent-route-states)
+- Caching actor-specific data requires a declared key and owner. (standards/rule/frontend-rendering.keep-authenticated-caching-explicit)
+- Edge proxy rules stay coarse and never authorize resources. (standards/rule/frontend-rendering.keep-proxy-behavior-at-the-edge)
+- Routes declare metadata, and private routes block indexing. (standards/rule/frontend-rendering.define-route-metadata-deliberately)
 
 ## Standards
 
 
-### Prefer server execution (FRONTEND.RENDERING.SERVER.001)
+### Prefer server execution (standards/rule/frontend-rendering.prefer-server-execution)
 
 **Requirement:** A page or subtree MUST run as a Server Component unless a named browser capability requires client execution.
 
 **Rationale:** Server execution keeps initial data, server-only tokens, and authorization-aware composition off the browser.
 
-### Document client boundaries (FRONTEND.RENDERING.CLIENT.001)
+### Document client boundaries (standards/rule/frontend-rendering.document-client-boundaries)
 
 **Requirement:** A `'use client'` directive MUST carry an adjacent comment naming the browser capability that requires it.
 
@@ -41,7 +41,7 @@ Next.js route files should expose server-first page composition and make browser
 
 A generic comment such as `Client component` does not satisfy the convention.
 
-### Await Next.js request APIs (FRONTEND.RENDERING.ASYNC.001)
+### Await Next.js request APIs (standards/rule/frontend-rendering.await-nextjs-request-apis)
 
 **Requirement:** A route MUST await `params`, `searchParams`, `cookies`, and `headers` rather than read them synchronously.
 
@@ -49,35 +49,35 @@ A generic comment such as `Client component` does not satisfy the convention.
 
 `generateStaticParams` is the counterpart and runs the other way. It receives no request, returns the parameter values to prerender, and is the one route export that reads no `params`. A route with a dynamic segment declares it or accepts that the segment renders on demand.
 
-### Keep route files as composition boundaries (FRONTEND.RENDERING.ROUTES.001)
+### Keep route files as composition boundaries (standards/rule/frontend-rendering.keep-route-files-as-composition-boundaries)
 
 **Requirement:** A page or layout MUST select shells, read route input, invoke feature functions, and compose UI without holding reusable logic.
 
 **Rationale:** Validation, mutation logic, and view mapping stay in feature or shared modules where another route can reach them.
 
-### Represent route states (FRONTEND.RENDERING.STATE.001)
+### Represent route states (standards/rule/frontend-rendering.represent-route-states)
 
 **Requirement:** A data-driven route MUST define its loading, empty, error, forbidden, not-found, and ready behavior.
 
 **Rationale:** A blank region while a request is pending or failed gives the reader no signal at all. Framework state files carry these.
 
-These six are the states a route has. A component has `disabled` and `pending` as well, under `FRONTEND.COMPONENTS.STATE.001`, because both describe a control rather than a page. A route has `not-found`, which a component does not, because a missing target resolves at the route. `schemas/ui-page.schema.json` holds the complete set a page sidecar can declare, including the form states `validation-error`, `saving`, and `saved`.
+These six are the states a route has. A component has `disabled` and `pending` as well, under `standards/rule/frontend-components.render-complete-states`, because both describe a control rather than a page. A route has `not-found`, which a component does not, because a missing target resolves at the route. `schemas/ui-page.schema.json` holds the complete set a page sidecar can declare, including the form states `validation-error`, `saving`, and `saved`.
 
-### Keep authenticated caching explicit (FRONTEND.RENDERING.CACHE.001)
+### Keep authenticated caching explicit (standards/rule/frontend-rendering.keep-authenticated-caching-explicit)
 
 **Requirement:** Actor-specific or authorization-filtered data MUST declare a cache key, partition boundary, invalidation owner, and security review before it is cached.
 
 **Rationale:** Shared route, fetch, or `use cache` behavior otherwise serves one actor's data to another. An uncached server read is the safe default.
 
-### Keep proxy behavior at the edge (FRONTEND.RENDERING.PROXY.001)
+### Keep proxy behavior at the edge (standards/rule/frontend-rendering.keep-proxy-behavior-at-the-edge)
 
 **Requirement:** A `proxy.ts` rule MUST handle only coarse routing such as session presence, locale, or redirects.
 
 **Rationale:** It runs before the request reaches the API, so it cannot see the target resource that authorization depends on. [The pinned Next.js release names this file `proxy.ts`](https://nextjs.org/blog/next-16). A project carrying the earlier `middleware.ts` name runs a file the pinned release no longer routes through.
 
-The file runs on the server. A server environment variable read there stays out of the client bundle, and `FRONTEND.DATA.SECRETS.001` states what happens to a value it passes onward.
+The file runs on the server. A server environment variable read there stays out of the client bundle, and `standards/rule/frontend-data.keep-secrets-out-of-browser-storage` states what happens to a value it passes onward.
 
-### Define route metadata deliberately (FRONTEND.RENDERING.METADATA.001)
+### Define route metadata deliberately (standards/rule/frontend-rendering.define-route-metadata-deliberately)
 
 **Requirement:** A public route MUST define title, description, canonical behavior, and indexing policy, while a private route prevents indexing.
 
@@ -86,7 +86,7 @@ The file runs on the server. A server environment variable read there stays out 
 ## Conventions
 
 
-### Use route groups for shells (FRONTEND.RENDERING.CONVENTION.001)
+### Use route groups for shells (standards/rule/frontend-rendering.use-route-groups-for-shells)
 
 **Default:** Group routes that share a layout, navigation, or access composition under a named route group.
 
@@ -94,7 +94,7 @@ The file runs on the server. A server environment variable read there stays out 
 
 **Rationale:** A group name describes audience or shell, such as `(public)` or `(admin)`, rather than a technical detail.
 
-### Keep layouts stable (FRONTEND.RENDERING.CONVENTION.002)
+### Keep layouts stable (standards/rule/frontend-rendering.keep-layouts-stable)
 
 **Default:** Keep layouts to persistent shell UI and providers that every child route needs.
 
@@ -102,7 +102,7 @@ The file runs on the server. A server environment variable read there stays out 
 
 **Rationale:** A feature-specific provider wrapping the whole application forces unrelated routes to carry its cost.
 
-### Keep server-only code identifiable (FRONTEND.RENDERING.CONVENTION.003)
+### Keep server-only code identifiable (standards/rule/frontend-rendering.keep-server-only-code-identifiable)
 
 **Default:** Mark a module that reads secrets, server tokens, request headers, or privileged clients as server-owned.
 
@@ -112,7 +112,7 @@ The file runs on the server. A server environment variable read there stays out 
 
 ## Reference example
 
-This informative example demonstrates `FRONTEND.RENDERING.SERVER.001`, `FRONTEND.RENDERING.ASYNC.001`, and `FRONTEND.RENDERING.ROUTES.001`.
+This informative example demonstrates `standards/rule/frontend-rendering.prefer-server-execution`, `standards/rule/frontend-rendering.await-nextjs-request-apis`, and `standards/rule/frontend-rendering.keep-route-files-as-composition-boundaries`.
 
 ```tsx
 export default async function PostPage({
@@ -134,14 +134,14 @@ The route resolves input and composes the feature. `getPost` owns typed API acce
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| FRONTEND.RENDERING.SERVER.001 | inspection | `RenderBoundaryTests` asserts no page or large subtree is client-side without a named browser capability. |
-| FRONTEND.RENDERING.CLIENT.001 | inspection | `node standards/tools/validate-ui.mjs` reports a `'use client'` directive with no adjacent capability comment. |
-| FRONTEND.RENDERING.ASYNC.001 | inspection | `RenderBoundaryTests` asserts each request API access is awaited. |
-| FRONTEND.RENDERING.ROUTES.001 | static | `RouteCompositionTests` asserts no route file declares validation, mutation, or mapping logic. |
-| FRONTEND.RENDERING.STATE.001 | static | `RouteStateTests` asserts each data-driven route renders every applicable state. |
-| FRONTEND.RENDERING.CACHE.001 | inspection | `CacheBoundaryTests` asserts no actor-specific read shares a cache entry across actors. |
-| FRONTEND.RENDERING.PROXY.001 | inspection | `ProxyTests` asserts no proxy rule performs a resource ownership or authorization decision. |
-| FRONTEND.RENDERING.METADATA.001 | static | `MetadataTests` asserts public routes declare the four values and private routes prevent indexing. |
-| FRONTEND.RENDERING.CONVENTION.001 | inspection | Route review confirms each shared shell has a route group named for its audience. |
-| FRONTEND.RENDERING.CONVENTION.002 | inspection | Layout review confirms each provider is required by every child route. |
-| FRONTEND.RENDERING.CONVENTION.003 | inspection | `node standards/tools/validate-ui.mjs` reports a client module importing a server-owned path. |
+| standards/rule/frontend-rendering.prefer-server-execution | inspection | `RenderBoundaryTests` asserts no page or large subtree is client-side without a named browser capability. |
+| standards/rule/frontend-rendering.document-client-boundaries | inspection | `node standards/tools/validate-ui.mjs` reports a `'use client'` directive with no adjacent capability comment. |
+| standards/rule/frontend-rendering.await-nextjs-request-apis | inspection | `RenderBoundaryTests` asserts each request API access is awaited. |
+| standards/rule/frontend-rendering.keep-route-files-as-composition-boundaries | static | `RouteCompositionTests` asserts no route file declares validation, mutation, or mapping logic. |
+| standards/rule/frontend-rendering.represent-route-states | static | `RouteStateTests` asserts each data-driven route renders every applicable state. |
+| standards/rule/frontend-rendering.keep-authenticated-caching-explicit | inspection | `CacheBoundaryTests` asserts no actor-specific read shares a cache entry across actors. |
+| standards/rule/frontend-rendering.keep-proxy-behavior-at-the-edge | inspection | `ProxyTests` asserts no proxy rule performs a resource ownership or authorization decision. |
+| standards/rule/frontend-rendering.define-route-metadata-deliberately | static | `MetadataTests` asserts public routes declare the four values and private routes prevent indexing. |
+| standards/rule/frontend-rendering.use-route-groups-for-shells | inspection | Route review confirms each shared shell has a route group named for its audience. |
+| standards/rule/frontend-rendering.keep-layouts-stable | inspection | Layout review confirms each provider is required by every child route. |
+| standards/rule/frontend-rendering.keep-server-only-code-identifiable | inspection | `node standards/tools/validate-ui.mjs` reports a client module importing a server-owned path. |

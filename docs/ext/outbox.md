@@ -12,154 +12,154 @@ Applicable specification kinds: `use-case`, `workflow`, `end-to-end-flow`.
 
 The consumer enables `outbox` when a committed change requires durable delivery after process failure. Delivery can carry an Integration Event, provider side effect, or Workflow Command.
 
-The use case carries `durable-delivery` Risk, or the Workflow selects the extension for durable Commands. The extension activates `BACKEND.ARCHITECTURE.WORKER.002`, so the project declares the execution host that runs the dispatcher.
+The use case carries `durable-delivery` Risk, or the Workflow selects the extension for durable Commands. The extension activates `standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request`, so the project declares the execution host that runs the dispatcher.
 
 ## Baseline relationship
 
-This extension replaces `BACKEND.PERSISTENCE.EVENT.001`.
+This extension replaces `standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work`.
 
 ## Agent Summary {#agent-summary}
 
-- Record delivery guarantee, retry, and recovery ownership. (EXT.OUTBOX.ADOPT.001)
-- Stage outbox messages with committed business work. (EXT.OUTBOX.ATOMIC.001, EXT.OUTBOX.ATOMIC.004)
-- Claim and dispatch records only from Worker. (EXT.OUTBOX.WORKER.001, EXT.OUTBOX.WORKER.002)
-- Treat delivery as at-least-once. (EXT.OUTBOX.IDEMPOTENCY.001, EXT.OUTBOX.IDEMPOTENCY.002)
-- Bound retry and retain poison evidence. (EXT.OUTBOX.RETRY.001)
-- Distinguish store outage from claimed-message failure. (EXT.OUTBOX.READINESS.001, EXT.OUTBOX.READINESS.002)
-- Version message types for active Worker compatibility. (EXT.OUTBOX.SCHEMA.001, EXT.OUTBOX.SCHEMA.002)
-- Publish backlog health and delivery targets. (EXT.OUTBOX.OBSERVABILITY.001, EXT.OUTBOX.OBSERVABILITY.002)
-- Preserve state and message identity during replay. (EXT.OUTBOX.STATE.001, EXT.OUTBOX.STATE.002)
-- Deploy readers before compatible writers. (EXT.OUTBOX.ROLLOUT.001, EXT.OUTBOX.ROLLOUT.002)
+- Record delivery guarantee, retry, and recovery ownership. (standards/rule/ext-outbox.record-durable-delivery-behavior)
+- Stage outbox messages with committed business work. (standards/rule/ext-outbox.stage-messages-with-business-work, standards/rule/ext-outbox.store-required-message-fields)
+- Claim and dispatch records only from Worker. (standards/rule/ext-outbox.dispatch-claimed-records-in-worker, standards/rule/ext-outbox.exclude-request-transaction-dispatch)
+- Treat delivery as at-least-once. (standards/rule/ext-outbox.accept-repeated-delivery, standards/rule/ext-outbox.identify-repeated-delivery)
+- Bound retry and retain poison evidence. (standards/rule/ext-outbox.bound-delivery-retries)
+- Distinguish store outage from claimed-message failure. (standards/rule/ext-outbox.distinguish-dependency-outage, standards/rule/ext-outbox.back-off-unavailable-store-polling)
+- Version message types for active Worker compatibility. (standards/rule/ext-outbox.version-message-types, standards/rule/ext-outbox.support-coexisting-message-producers)
+- Publish backlog health and delivery targets. (standards/rule/ext-outbox.publish-backlog-indicators, standards/rule/ext-outbox.set-delivery-alerts)
+- Preserve state and message identity during replay. (standards/rule/ext-outbox.model-outbox-lifecycle-states, standards/rule/ext-outbox.preserve-message-identity-during-retry)
+- Deploy readers before compatible writers. (standards/rule/ext-outbox.protect-active-worker-compatibility, standards/rule/ext-outbox.deploy-readers-before-writers)
 
 ## Standards
 
-### Record durable delivery behavior (EXT.OUTBOX.ADOPT.001)
+### Record durable delivery behavior (standards/rule/ext-outbox.record-durable-delivery-behavior)
 
 **Requirement:** A durable-delivery specification MUST document delivery guarantee, downstream boundary, duplicate behavior, retry horizon, and recovery owner.
 
 **Rationale:** The specification defines the expected delivery behavior before a message record exists.
 
-### Exclude manually repeatable reactions (EXT.OUTBOX.ADOPT.002)
+### Exclude manually repeatable reactions (standards/rule/ext-outbox.exclude-manually-repeatable-reactions)
 
 **Requirement:** A project MUST NOT activate outbox for a reaction whose delivery guarantee is best-effort and which operators can repeat manually.
 
 **Rationale:** Outbox storage and dispatcher operation are unnecessary when loss is an accepted recoverable outcome. The delivery guarantee comes from the reaction's own declaration, and the module specification records it with the vocabulary its event table already uses.
 
-### Stage messages with business work (EXT.OUTBOX.ATOMIC.001)
+### Stage messages with business work (standards/rule/ext-outbox.stage-messages-with-business-work)
 
 **Requirement:** A command post-handler MUST stage pending durable messages in the same Marten session as aggregate changes or Workflow progress.
 
 **Rationale:** One session makes the business commit and outgoing message durable together.
 
-### Serialize durable messages (EXT.OUTBOX.ATOMIC.002)
+### Serialize durable messages (standards/rule/ext-outbox.serialize-durable-messages)
 
 **Requirement:** An outbox writer MUST serialize each pending durable message into an outbox record.
 
 **Rationale:** A durable record holds the dispatch input after the command scope completes.
 
-### Commit staged work once (EXT.OUTBOX.ATOMIC.003)
+### Commit staged work once (standards/rule/ext-outbox.commit-staged-work-once)
 
 **Requirement:** An outbox command pipeline MUST call `SaveChangesAsync` once after staging business and outbox work.
 
 **Rationale:** One commit preserves atomic outcome between the accepted change and durable message.
 
-### Store required message fields (EXT.OUTBOX.ATOMIC.004)
+### Store required message fields (standards/rule/ext-outbox.store-required-message-fields)
 
 **Requirement:** An outbox record MUST contain message identity, kind, stable type, schema version, time, payload, tenant, state, attempt, and next-attempt data.
 
 **Rationale:** The implementation dispatches and recovery need one complete durable description of the message.
 
-### Store failure and completion evidence (EXT.OUTBOX.ATOMIC.005)
+### Store failure and completion evidence (standards/rule/ext-outbox.store-failure-and-completion-evidence)
 
 **Requirement:** An outbox record MUST retain its last error summary and completion time.
 
 **Rationale:** Operators need failure and completion evidence for backlog review and replay.
 
-### Classify message kinds (EXT.OUTBOX.ATOMIC.006)
+### Classify message kinds (standards/rule/ext-outbox.classify-message-kinds)
 
 **Requirement:** An outbox `messageKind` MUST distinguish integration event, workflow command, and provider-specific side effect.
 
 **Rationale:** The implementation dispatches ownership and transport behavior can differ by logical message kind.
 
-### Use the scoped business session (EXT.OUTBOX.ATOMIC.007)
+### Use the scoped business session (standards/rule/ext-outbox.use-the-scoped-business-session)
 
 **Requirement:** An outbox writer MUST use the same scoped `IDocumentSession` as its aggregate repository.
 
 **Rationale:** A separate connection cannot provide the required atomic business and message commit.
 
-### Reject independent outbox commits (EXT.OUTBOX.ATOMIC.008)
+### Reject independent outbox commits (standards/rule/ext-outbox.reject-independent-outbox-commits)
 
 **Requirement:** An outbox writer MUST NOT use another connection or independent commit for required durable delivery.
 
 **Rationale:** A shared PostgreSQL database does not make separate transactions atomic together.
 
-### Dispatch claimed records in Worker (EXT.OUTBOX.WORKER.001)
+### Dispatch claimed records in Worker (standards/rule/ext-outbox.dispatch-claimed-records-in-worker)
 
 **Requirement:** A Worker MUST claim pending outbox records, dispatch a bounded batch, and record success or retry information.
 
 **Rationale:** Worker ownership separates durable dispatch from the request transaction.
 
-### Exclude request-transaction dispatch (EXT.OUTBOX.WORKER.002)
+### Exclude request-transaction dispatch (standards/rule/ext-outbox.exclude-request-transaction-dispatch)
 
 **Requirement:** WebApi MUST NOT dispatch a durable message inside the request transaction.
 
 **Rationale:** The request commit only makes the message eligible for later Worker dispatch.
 
-### Define claim ownership (EXT.OUTBOX.WORKER.003)
+### Define claim ownership (standards/rule/ext-outbox.define-claim-ownership)
 
 **Requirement:** An outbox claim MUST use a short transaction with unique lease owner, lease expiry, and fencing value.
 
 **Rationale:** Claim fields establish which Worker owns one dispatch attempt.
 
-### Release claim transactions before calls (EXT.OUTBOX.WORKER.004)
+### Release claim transactions before calls (standards/rule/ext-outbox.release-claim-transactions-before-calls)
 
 **Requirement:** A Worker MUST NOT hold an outbox claim transaction open during a network call.
 
 **Rationale:** Network delay does not retain database locks or transaction resources.
 
-### Restrict completion to current lease owners (EXT.OUTBOX.WORKER.005)
+### Restrict completion to current lease owners (standards/rule/ext-outbox.restrict-completion-to-current-lease-owners)
 
 **Requirement:** A Worker MUST update an outbox record only while it owns the matching lease and fencing value.
 
 **Rationale:** A stale Worker does not overwrite a newer owner's dispatch result.
 
-### Requeue expired claims (EXT.OUTBOX.WORKER.006)
+### Requeue expired claims (standards/rule/ext-outbox.requeue-expired-claims)
 
 **Requirement:** An outbox store MUST return expired claims to eligible work.
 
 **Rationale:** A crashed Worker cannot permanently strand a pending message.
 
-### Accept repeated delivery (EXT.OUTBOX.IDEMPOTENCY.001)
+### Accept repeated delivery (standards/rule/ext-outbox.accept-repeated-delivery)
 
 **Requirement:** An outbox consumer MUST handle the same message more than once.
 
 **Rationale:** A crash after external acceptance can cause one message to be delivered again.
 
-### Identify repeated delivery (EXT.OUTBOX.IDEMPOTENCY.002)
+### Identify repeated delivery (standards/rule/ext-outbox.identify-repeated-delivery)
 
 **Requirement:** An outbox consumer MUST use message ID or a business idempotency key at its Command or side-effect boundary.
 
 **Rationale:** One stable identity lets the target suppress a repeated delivery.
 
-### Await target acceptance (EXT.OUTBOX.IDEMPOTENCY.003)
+### Await target acceptance (standards/rule/ext-outbox.await-target-acceptance)
 
 **Requirement:** A Worker MUST NOT mark an outbox record complete before the target boundary accepts it.
 
 **Rationale:** Completed state claims delivery that has not yet reached the required target.
 
-### Bound delivery retries (EXT.OUTBOX.RETRY.001)
+### Bound delivery retries (standards/rule/ext-outbox.bound-delivery-retries)
 
 **Requirement:** An outbox dispatcher MUST use bounded exponential backoff with jitter.
 
 **Rationale:** Bounded jitter reduces repeated load during a transient target failure.
 
-### Classify permanent delivery failure (EXT.OUTBOX.RETRY.002)
+### Classify permanent delivery failure (standards/rule/ext-outbox.classify-permanent-delivery-failure)
 
 **Requirement:** An outbox dispatcher MUST classify permanent failures, stop automatic retry at its configured limit, and retain safe investigation and replay data.
 
 **Rationale:** A dead-letter outcome preserves evidence after automatic recovery is no longer safe.
 
-### Distinguish dependency outage (EXT.OUTBOX.READINESS.001)
+### Distinguish dependency outage (standards/rule/ext-outbox.distinguish-dependency-outage)
 
 **Requirement:** A dispatcher MUST distinguish an unavailable outbox store from a failed claimed message.
 
@@ -167,31 +167,31 @@ This extension replaces `BACKEND.PERSISTENCE.EVENT.001`.
 
 Each one has its own signal. The store's availability is a gauge the readiness endpoint reads. A claimed message's outcome is a counter carrying the result, following [the OpenTelemetry metrics specification](https://opentelemetry.io/docs/specs/otel/metrics/). A single error counter cannot tell an operator whether to restore a database or investigate one destination.
 
-### Back off unavailable-store polling (EXT.OUTBOX.READINESS.002)
+### Back off unavailable-store polling (standards/rule/ext-outbox.back-off-unavailable-store-polling)
 
 **Requirement:** A Worker MUST apply bounded backoff and rate-limited logging when its outbox store is unavailable.
 
 **Rationale:** Cold start before schema application and store outage do not justify one exception per loop.
 
-### Restrict message retry to claimed records (EXT.OUTBOX.READINESS.003)
+### Restrict message retry to claimed records (standards/rule/ext-outbox.restrict-message-retry-to-claimed-records)
 
 **Requirement:** A Worker MUST apply message retry and poison handling only to claimed outbox records.
 
 **Rationale:** An unavailable store has no claimed message eligible for delivery retry.
 
-### Gate dispatch on readiness (EXT.OUTBOX.READINESS.004)
+### Gate dispatch on readiness (standards/rule/ext-outbox.gate-dispatch-on-readiness)
 
 **Requirement:** A Worker host exposing readiness MUST gate dispatch and stop polling stores that cannot serve requests.
 
 **Rationale:** Readiness prevents avoidable work against unavailable storage dependencies.
 
-### Version message types (EXT.OUTBOX.SCHEMA.001)
+### Version message types (standards/rule/ext-outbox.version-message-types)
 
 **Requirement:** An outbox message MUST use a stable type name and explicit schema version.
 
 **Rationale:** The pair defines a durable contract for Worker deserialization and dispatch.
 
-### Support coexisting message producers (EXT.OUTBOX.SCHEMA.002)
+### Support coexisting message producers (standards/rule/ext-outbox.support-coexisting-message-producers)
 
 **Requirement:** A deployed dispatcher MUST process records from every application version that can coexist during rollout or rollback.
 
@@ -199,51 +199,51 @@ Each one has its own signal. The store's availability is a gauge the readiness e
 
 A message record therefore carries its own shape version, and the dispatcher selects a reader from that value. Adding an optional member with a defined absent-value behavior needs no new version. Removing a member, renaming one, narrowing a type, or changing a discriminator does, and the older reader stays until no record carries the older version.
 
-### Publish backlog indicators (EXT.OUTBOX.OBSERVABILITY.001)
+### Publish backlog indicators (standards/rule/ext-outbox.publish-backlog-indicators)
 
 **Requirement:** An outbox deployment MUST publish pending count, failed count, oldest pending age, attempts, dispatch duration, and success rate.
 
 **Rationale:** These indicators make backlog growth and dispatch quality observable.
 
-### Set delivery alerts (EXT.OUTBOX.OBSERVABILITY.002)
+### Set delivery alerts (standards/rule/ext-outbox.set-delivery-alerts)
 
 **Requirement:** An outbox deployment MUST set alert thresholds from its use-case delivery target.
 
 **Rationale:** Alert urgency follows the business consequence of delayed delivery.
 
-### Model outbox lifecycle states (EXT.OUTBOX.STATE.001)
+### Model outbox lifecycle states (standards/rule/ext-outbox.model-outbox-lifecycle-states)
 
 **Requirement:** An outbox record MUST model its lifecycle as an abstract state base with one sealed record for each of pending, processing, dispatched, and dead-letter.
 
-**Rationale:** `pending` becomes `processing`; processing becomes dispatched, pending, or dead-letter; audited replay moves dead-letter to pending. Three of the four carry data the others do not. `processing` holds a lease expiry. `dispatched` holds a dispatch time. `dead-letter` holds a failure reason and an attempt count. A four-value label forces those onto nullable columns that are meaningful in one state each, which is the shape `BACKEND.DOMAIN.CLOSEDSET.001` removes everywhere else.
+**Rationale:** `pending` becomes `processing`; processing becomes dispatched, pending, or dead-letter; audited replay moves dead-letter to pending. Three of the four carry data the others do not. `processing` holds a lease expiry. `dispatched` holds a dispatch time. `dead-letter` holds a failure reason and an attempt count. A four-value label forces those onto nullable columns that are meaningful in one state each, which is the shape `standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums` removes everywhere else.
 
 **Example:** `OutboxState.Processing` carries one unexpired lease before a dispatcher records `OutboxState.Dispatched` or a retry state.
 
-### Preserve message identity during retry (EXT.OUTBOX.STATE.002)
+### Preserve message identity during retry (standards/rule/ext-outbox.preserve-message-identity-during-retry)
 
 **Requirement:** An outbox dispatcher MUST preserve message ID across retry and replay.
 
 **Rationale:** Stable identity lets target idempotency suppress delivery after a crash before dispatch completion.
 
-### Audit outbox replay (EXT.OUTBOX.STATE.003)
+### Audit outbox replay (standards/rule/ext-outbox.audit-outbox-replay)
 
 **Requirement:** An outbox replay MUST record actor, reason, time, and previous failure without editing the original payload.
 
 **Rationale:** Replay history preserves message evidence and explains a renewed dispatch attempt.
 
-### Protect active Worker compatibility (EXT.OUTBOX.ROLLOUT.001)
+### Protect active Worker compatibility (standards/rule/ext-outbox.protect-active-worker-compatibility)
 
 **Requirement:** New WebApi code MUST emit a message only after every active Worker can read its type and schema version.
 
 **Rationale:** A writer does not create a message shape that a running dispatcher cannot understand.
 
-### Deploy readers before writers (EXT.OUTBOX.ROLLOUT.002)
+### Deploy readers before writers (standards/rule/ext-outbox.deploy-readers-before-writers)
 
 **Requirement:** A release MUST deploy compatible readers before writers for additive event versions.
 
 **Rationale:** Reader-first deployment preserves dispatch during a mixed-version rollout.
 
-### Plan undispatched rollback records (EXT.OUTBOX.ROLLOUT.003)
+### Plan undispatched rollback records (standards/rule/ext-outbox.plan-undispatched-rollback-records)
 
 **Requirement:** A rollback plan MUST include records created by the new writer but not yet dispatched.
 
@@ -251,7 +251,7 @@ A message record therefore carries its own shape version, and the dispatcher sel
 
 ## Conventions
 
-### Group outbox infrastructure (EXT.OUTBOX.CONVENTION.001)
+### Group outbox infrastructure (standards/rule/ext-outbox.group-outbox-infrastructure)
 
 **Default:** Keep outbox record, storage, claim, and dispatch infrastructure under `Infrastructure/Messaging/Outbox/`.
 
@@ -259,7 +259,7 @@ A message record therefore carries its own shape version, and the dispatcher sel
 
 **Rationale:** One Infrastructure location contains the persistent dispatch mechanism.
 
-### Isolate the Worker host (EXT.OUTBOX.CONVENTION.002)
+### Isolate the Worker host (standards/rule/ext-outbox.isolate-the-worker-host)
 
 **Default:** Keep the outbox Worker host in its own project.
 
@@ -267,7 +267,7 @@ A message record therefore carries its own shape version, and the dispatcher sel
 
 **Rationale:** The Worker has independent process lifetime and operating configuration.
 
-### Keep provider mapping with integration (EXT.OUTBOX.CONVENTION.003)
+### Keep provider mapping with integration (standards/rule/ext-outbox.keep-provider-mapping-with-integration)
 
 **Default:** Keep Integration Event-to-provider mapping in the integration that owns the side effect.
 
@@ -275,7 +275,7 @@ A message record therefore carries its own shape version, and the dispatcher sel
 
 **Rationale:** A provider integration owns its transport mapping and external delivery behavior.
 
-### Dispatch Workflow Commands in a new scope (EXT.OUTBOX.CONVENTION.004)
+### Dispatch Workflow Commands in a new scope (standards/rule/ext-outbox.dispatch-workflow-commands-in-a-new-scope)
 
 **Default:** Dispatch a Workflow Command through `ICommandMediator` in a fresh Worker scope.
 
@@ -283,7 +283,7 @@ A message record therefore carries its own shape version, and the dispatcher sel
 
 **Rationale:** The Command enters its own application pipeline and transaction.
 
-### Avoid automatic durable-bus adoption (EXT.OUTBOX.CONVENTION.005)
+### Avoid automatic durable-bus adoption (standards/rule/ext-outbox.avoid-automatic-durable-bus-adoption)
 
 **Default:** Use project-owned Marten records and Worker dispatch unless a manifest-pinned durable package passes a shared-transaction integration test.
 
@@ -299,43 +299,43 @@ No additional baseline package is required. Provider-specific dispatch dependenc
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| EXT.OUTBOX.ADOPT.001 | inspection | Durable-delivery specification records all declared guarantee and recovery fields. |
-| EXT.OUTBOX.ADOPT.002 | inspection | Selected outbox use cases exclude manually repeatable best-effort reactions. |
-| EXT.OUTBOX.ATOMIC.001 | test | `OutboxAtomicTests` stage message and business work in one Marten session. |
-| EXT.OUTBOX.ATOMIC.002 | test | `OutboxAtomicTests` produce durable outbox records. |
-| EXT.OUTBOX.ATOMIC.003 | test | `OutboxAtomicTests` observe one post-handler commit. |
-| EXT.OUTBOX.ATOMIC.004 | test | `OutboxAtomicTests` contain each required durable field. |
-| EXT.OUTBOX.ATOMIC.005 | test | `OutboxAtomicTests` retain error summary and completion time. |
-| EXT.OUTBOX.ATOMIC.006 | test | `OutboxAtomicTests` distinguish integration, workflow, and provider effects. |
-| EXT.OUTBOX.ATOMIC.007 | test | Repository and writer resolve the same scoped `IDocumentSession`. |
-| EXT.OUTBOX.ATOMIC.008 | static | `OutboxAtomicTests` asserts outbox writer source contains no independent connection or commit. |
-| EXT.OUTBOX.WORKER.001 | test | `OutboxWorkerTests` claim bounded batches and record dispatch outcomes. |
-| EXT.OUTBOX.WORKER.002 | static | `OutboxWorkerTests` asserts webApi request paths contain no durable outbox dispatch. |
-| EXT.OUTBOX.WORKER.003 | test | `OutboxWorkerTests` store unique owner, expiry, and fencing value. |
-| EXT.OUTBOX.WORKER.004 | test | `OutboxWorkerTests` release claim transactions before provider calls. |
-| EXT.OUTBOX.WORKER.005 | test | `OutboxWorkerTests` cannot overwrite current Worker outcome. |
-| EXT.OUTBOX.WORKER.006 | test | `OutboxWorkerTests` become eligible for new claim. |
-| EXT.OUTBOX.IDEMPOTENCY.001 | test | `OutboxIdempotencyTests` leave one accepted target outcome. |
-| EXT.OUTBOX.IDEMPOTENCY.002 | test | `OutboxIdempotencyTests` use message ID or business idempotency key. |
-| EXT.OUTBOX.IDEMPOTENCY.003 | test | `OutboxIdempotencyTests` keep records uncompleted. |
-| EXT.OUTBOX.RETRY.001 | test | `OutboxRetryTests` use bounded exponential backoff with jitter. |
-| EXT.OUTBOX.RETRY.002 | test | `OutboxRetryTests` asserts permanent failures dead-letter after limit with safe replay evidence. |
-| EXT.OUTBOX.READINESS.001 | test | `OutboxReadinessTests` remain distinct from failed claimed-message fixtures. |
-| EXT.OUTBOX.READINESS.002 | test | `OutboxReadinessTests` use bounded backoff and rate-limited logging. |
-| EXT.OUTBOX.READINESS.003 | test | `OutboxReadinessTests` run only after successful record claim. |
-| EXT.OUTBOX.READINESS.004 | test | `OutboxReadinessTests` gates dispatch and stops polling. |
-| EXT.OUTBOX.SCHEMA.001 | static | `OutboxSchemaTests` asserts message definitions provide stable type names and explicit schema versions. |
-| EXT.OUTBOX.SCHEMA.002 | test | `OutboxSchemaTests` dispatch every active producer message shape. |
-| EXT.OUTBOX.OBSERVABILITY.001 | operation | Metrics backend receives each declared backlog indicator. |
-| EXT.OUTBOX.OBSERVABILITY.002 | operation | Alert configuration derives thresholds from the delivery target. |
-| EXT.OUTBOX.STATE.001 | test | `OutboxStateTests` permit only documented state transitions. |
-| EXT.OUTBOX.STATE.002 | test | `OutboxStateTests` retain one message ID. |
-| EXT.OUTBOX.STATE.003 | operation | Replay audit record captures actor, reason, time, and previous failure. |
-| EXT.OUTBOX.ROLLOUT.001 | test | `OutboxRolloutTests` reject unsupported writer message shapes. |
-| EXT.OUTBOX.ROLLOUT.002 | operation | Release record deploys compatible readers before additive writers. |
-| EXT.OUTBOX.ROLLOUT.003 | inspection | Rollback plan identifies undispatched records from the new writer. |
-| EXT.OUTBOX.CONVENTION.001 | inspection | Outbox Infrastructure files use documented path or a local replacement. |
-| EXT.OUTBOX.CONVENTION.002 | inspection | Worker host remains a separate project or a local replacement. |
-| EXT.OUTBOX.CONVENTION.003 | inspection | Provider mapping remains with the owning external integration. |
-| EXT.OUTBOX.CONVENTION.004 | test | `OutboxTests` asserts workflow Command dispatch occurs through a fresh Worker scope. |
-| EXT.OUTBOX.CONVENTION.005 | test | `OutboxTests` asserts any durable package has a manifest pin and shared-transaction integration evidence. |
+| standards/rule/ext-outbox.record-durable-delivery-behavior | inspection | Durable-delivery specification records all declared guarantee and recovery fields. |
+| standards/rule/ext-outbox.exclude-manually-repeatable-reactions | inspection | Selected outbox use cases exclude manually repeatable best-effort reactions. |
+| standards/rule/ext-outbox.stage-messages-with-business-work | test | `OutboxAtomicTests` stage message and business work in one Marten session. |
+| standards/rule/ext-outbox.serialize-durable-messages | test | `OutboxAtomicTests` produce durable outbox records. |
+| standards/rule/ext-outbox.commit-staged-work-once | test | `OutboxAtomicTests` observe one post-handler commit. |
+| standards/rule/ext-outbox.store-required-message-fields | test | `OutboxAtomicTests` contain each required durable field. |
+| standards/rule/ext-outbox.store-failure-and-completion-evidence | test | `OutboxAtomicTests` retain error summary and completion time. |
+| standards/rule/ext-outbox.classify-message-kinds | test | `OutboxAtomicTests` distinguish integration, workflow, and provider effects. |
+| standards/rule/ext-outbox.use-the-scoped-business-session | test | Repository and writer resolve the same scoped `IDocumentSession`. |
+| standards/rule/ext-outbox.reject-independent-outbox-commits | static | `OutboxAtomicTests` asserts outbox writer source contains no independent connection or commit. |
+| standards/rule/ext-outbox.dispatch-claimed-records-in-worker | test | `OutboxWorkerTests` claim bounded batches and record dispatch outcomes. |
+| standards/rule/ext-outbox.exclude-request-transaction-dispatch | static | `OutboxWorkerTests` asserts webApi request paths contain no durable outbox dispatch. |
+| standards/rule/ext-outbox.define-claim-ownership | test | `OutboxWorkerTests` store unique owner, expiry, and fencing value. |
+| standards/rule/ext-outbox.release-claim-transactions-before-calls | test | `OutboxWorkerTests` release claim transactions before provider calls. |
+| standards/rule/ext-outbox.restrict-completion-to-current-lease-owners | test | `OutboxWorkerTests` cannot overwrite current Worker outcome. |
+| standards/rule/ext-outbox.requeue-expired-claims | test | `OutboxWorkerTests` become eligible for new claim. |
+| standards/rule/ext-outbox.accept-repeated-delivery | test | `OutboxIdempotencyTests` leave one accepted target outcome. |
+| standards/rule/ext-outbox.identify-repeated-delivery | test | `OutboxIdempotencyTests` use message ID or business idempotency key. |
+| standards/rule/ext-outbox.await-target-acceptance | test | `OutboxIdempotencyTests` keep records uncompleted. |
+| standards/rule/ext-outbox.bound-delivery-retries | test | `OutboxRetryTests` use bounded exponential backoff with jitter. |
+| standards/rule/ext-outbox.classify-permanent-delivery-failure | test | `OutboxRetryTests` asserts permanent failures dead-letter after limit with safe replay evidence. |
+| standards/rule/ext-outbox.distinguish-dependency-outage | test | `OutboxReadinessTests` remain distinct from failed claimed-message fixtures. |
+| standards/rule/ext-outbox.back-off-unavailable-store-polling | test | `OutboxReadinessTests` use bounded backoff and rate-limited logging. |
+| standards/rule/ext-outbox.restrict-message-retry-to-claimed-records | test | `OutboxReadinessTests` run only after successful record claim. |
+| standards/rule/ext-outbox.gate-dispatch-on-readiness | test | `OutboxReadinessTests` gates dispatch and stops polling. |
+| standards/rule/ext-outbox.version-message-types | static | `OutboxSchemaTests` asserts message definitions provide stable type names and explicit schema versions. |
+| standards/rule/ext-outbox.support-coexisting-message-producers | test | `OutboxSchemaTests` dispatch every active producer message shape. |
+| standards/rule/ext-outbox.publish-backlog-indicators | operation | Metrics backend receives each declared backlog indicator. |
+| standards/rule/ext-outbox.set-delivery-alerts | operation | Alert configuration derives thresholds from the delivery target. |
+| standards/rule/ext-outbox.model-outbox-lifecycle-states | test | `OutboxStateTests` permit only documented state transitions. |
+| standards/rule/ext-outbox.preserve-message-identity-during-retry | test | `OutboxStateTests` retain one message ID. |
+| standards/rule/ext-outbox.audit-outbox-replay | operation | Replay audit record captures actor, reason, time, and previous failure. |
+| standards/rule/ext-outbox.protect-active-worker-compatibility | test | `OutboxRolloutTests` reject unsupported writer message shapes. |
+| standards/rule/ext-outbox.deploy-readers-before-writers | operation | Release record deploys compatible readers before additive writers. |
+| standards/rule/ext-outbox.plan-undispatched-rollback-records | inspection | Rollback plan identifies undispatched records from the new writer. |
+| standards/rule/ext-outbox.group-outbox-infrastructure | inspection | Outbox Infrastructure files use documented path or a local replacement. |
+| standards/rule/ext-outbox.isolate-the-worker-host | inspection | Worker host remains a separate project or a local replacement. |
+| standards/rule/ext-outbox.keep-provider-mapping-with-integration | inspection | Provider mapping remains with the owning external integration. |
+| standards/rule/ext-outbox.dispatch-workflow-commands-in-a-new-scope | test | `OutboxTests` asserts workflow Command dispatch occurs through a fresh Worker scope. |
+| standards/rule/ext-outbox.avoid-automatic-durable-bus-adoption | test | `OutboxTests` asserts any durable package has a manifest pin and shared-transaction integration evidence. |

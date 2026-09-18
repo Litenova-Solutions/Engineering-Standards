@@ -8,26 +8,26 @@ Names should expose business intent and architectural role without requiring a r
 ## Agent Summary {#agent-summary}
 
 
-- One primary type per C# file, named for the file. (WORKSPACE.NAMING.FILE.001)
-- Aggregate-owned types lead with their aggregate root name. (WORKSPACE.NAMING.AGGREGATE.001)
-- Architectural roles carry their declared suffix. (WORKSPACE.NAMING.SUFFIX.001)
-- Async methods end in Async and take the token last. (WORKSPACE.NAMING.ASYNC.001)
-- Exception names state the failed rule and its owner. (WORKSPACE.NAMING.EXCEPTION.001)
-- Boolean names read as conditions. (WORKSPACE.NAMING.BOOLEAN.001)
-- Production C# follows the declared style rules. (WORKSPACE.NAMING.CSHARP.001)
-- Code uses the pinned language version's current constructs. (WORKSPACE.NAMING.CSHARP.002)
-- Frontend names follow one predictable case mapping. (WORKSPACE.NAMING.FRONTEND.001)
+- One primary type per C# file, named for the file. (standards/rule/workspace-naming.match-c-files-and-primary-types)
+- Aggregate-owned types lead with their aggregate root name. (standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root)
+- Architectural roles carry their declared suffix. (standards/rule/workspace-naming.use-architectural-suffixes)
+- Async methods end in Async and take the token last. (standards/rule/workspace-naming.name-asynchronous-methods-completely)
+- Exception names state the failed rule and its owner. (standards/rule/workspace-naming.name-exceptions-by-failed-rule)
+- Boolean names read as conditions. (standards/rule/workspace-naming.use-intent-revealing-boolean-names)
+- Production C# follows the declared style rules. (standards/rule/workspace-naming.keep-implementation-style-consistent)
+- Code uses the pinned language version's current constructs. (standards/rule/workspace-naming.use-current-language-features)
+- Frontend names follow one predictable case mapping. (standards/rule/workspace-naming.use-predictable-frontend-names)
 
 ## Standards
 
 
-### Match C# files and primary types (WORKSPACE.NAMING.FILE.001)
+### Match C# files and primary types (standards/rule/workspace-naming.match-c-files-and-primary-types)
 
 **Requirement:** A C# file MUST contain one primary top-level type and take that type's exact name.
 
 **Rationale:** Only a small private or file-scoped nested type stays with its owner. Two public or internal top-level types belong in two files.
 
-### Anchor aggregate-owned types on the aggregate root (WORKSPACE.NAMING.AGGREGATE.001)
+### Anchor aggregate-owned types on the aggregate root (standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root)
 
 **Requirement:** An aggregate-owned type's qualified name MUST start with its aggregate root's full name.
 
@@ -35,7 +35,7 @@ Names should expose business intent and architectural role without requiring a r
 
 **Example:** `PostPublishedEvent` and `PostState.Published` both lead with `Post`. `PublishedState` declared at namespace level does not.
 
-### Use architectural suffixes (WORKSPACE.NAMING.SUFFIX.001)
+### Use architectural suffixes (standards/rule/workspace-naming.use-architectural-suffixes)
 
 **Requirement:** An architectural type MUST carry the suffix its role assigns in the table in this section.
 
@@ -75,47 +75,47 @@ Names should expose business intent and architectural role without requiring a r
 | Registration class | `{Layer}ServiceRegistration` | `InfrastructureServiceRegistration` |
 | Assembly marker | `{Layer}AssemblyMarker` | `ApplicationAssemblyMarker` |
 
-An event-reaction folder names the business fact after an `On` prefix. It omits the `Event` suffix. For example, `OnPostPublished` contains `NotifySubscribersOnPostPublishedHandler` for `PostPublishedEvent`. The `On` prefix already marks the reaction. Folder names carry no technical suffix, so `OnPostPublishedEvent` is wrong. The event type keeps its `Event` suffix (`WORKSPACE.NAMING.AGGREGATE.001`).
+An event-reaction folder names the business fact after an `On` prefix. It omits the `Event` suffix. For example, `OnPostPublished` contains `NotifySubscribersOnPostPublishedHandler` for `PostPublishedEvent`. The `On` prefix already marks the reaction. Folder names carry no technical suffix, so `OnPostPublishedEvent` is wrong. The event type keeps its `Event` suffix (`standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root`).
 
 The example does not shorten an Application type to `{UseCase}Result`, `{UseCase}Handler`, or `{UseCase}Validator`. The example does not use an unowned name such as `PostSummary` for a query-specific result item. The full role suffix distinguishes command coordination from query projection without opening the file.
 
 The example does not shorten an HTTP transport type to `{UseCase}Request` or `{UseCase}Response`. `Model` marks the type as passive boundary data rather than an operation or rich business object. Other project-owned, passive HTTP DTOs also name their concrete role and end in `Model`, such as `ListPostsResponseItemModel` or `PaginationModel`. The example uses `ApiMappings` instead of the context-dependent `Mappings` suffix.
 
-A polymorphic transport model mirrors a Domain discriminated union (`BACKEND.API.MODEL.001`). Its abstract base names the concept. Each sealed case names its case. Both end in `Model`, such as `RefundOutcomeModel` and `RefundSucceededOutcomeModel`.
+A polymorphic transport model mirrors a Domain discriminated union (`standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape`). Its abstract base names the concept. Each sealed case names its case. Both end in `Model`, such as `RefundOutcomeModel` and `RefundSucceededOutcomeModel`.
 
 The transport name drops the Domain union's aggregate prefix, such as `PaymentRefundOutcome`. Its discriminator string keeps the Domain union's stable case code unchanged.
 
-### Name asynchronous methods completely (WORKSPACE.NAMING.ASYNC.001)
+### Name asynchronous methods completely (standards/rule/workspace-naming.name-asynchronous-methods-completely)
 
 **Requirement:** A method returning `Task` or `ValueTask` MUST end in `Async` and take `CancellationToken cancellationToken` last when cancellable.
 
 **Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature.
 
-### Name exceptions by failed rule (WORKSPACE.NAMING.EXCEPTION.001)
+### Name exceptions by failed rule (standards/rule/workspace-naming.name-exceptions-by-failed-rule)
 
 **Requirement:** An exception name MUST state the rule that failed, using `{DomainType}{Reason}Exception` for a Domain rejection.
 
 **Rationale:** `DomainType` is the aggregate root or an anchored owned type, so the name always starts with the aggregate root.
 
-### Use intent-revealing boolean names (WORKSPACE.NAMING.BOOLEAN.001)
+### Use intent-revealing boolean names (standards/rule/workspace-naming.use-intent-revealing-boolean-names)
 
 **Requirement:** A boolean property or method MUST use `Is`, `Has`, `Can`, or a precise verb.
 
 **Rationale:** `HasLines` and `CanPublish` state a condition. `LinesPresent` and `CheckPublish` state neither a question nor an answer.
 
-### Keep implementation style consistent (WORKSPACE.NAMING.CSHARP.001)
+### Keep implementation style consistent (standards/rule/workspace-naming.keep-implementation-style-consistent)
 
 **Requirement:** Production C# MUST use file-scoped namespaces, braces on every body, explicit access modifiers, and sealed concrete classes.
 
 **Rationale:** These are the style decisions that change diff readability rather than behavior, so one setting removes the debate.
 
-### Use current language features (WORKSPACE.NAMING.CSHARP.002)
+### Use current language features (standards/rule/workspace-naming.use-current-language-features)
 
 **Requirement:** Production code MUST target the pinned language version and use its current construct over an older equivalent.
 
 **Rationale:** Collection expressions, pattern matching, and primary constructors express the same intent with less incidental code.
 
-### Use predictable frontend names (WORKSPACE.NAMING.FRONTEND.001)
+### Use predictable frontend names (standards/rule/workspace-naming.use-predictable-frontend-names)
 
 **Requirement:** A frontend folder MUST use kebab-case, a component file and export PascalCase, and a hook file `use-{name}`.
 
@@ -124,7 +124,7 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 ## Conventions
 
 
-### Align business names across layers (WORKSPACE.NAMING.CONVENTION.001)
+### Align business names across layers (standards/rule/workspace-naming.align-business-names-across-layers)
 
 **Default:** Use one business name for a module across Domain, Application, endpoints, features, and documentation.
 
@@ -132,7 +132,7 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 **Rationale:** The Posts module maps to `Domain/Posts`, `features/posts`, and `docs/domain/modules/posts` without translation.
 
-### Keep namespaces aligned with folders (WORKSPACE.NAMING.CONVENTION.002)
+### Keep namespaces aligned with folders (standards/rule/workspace-naming.keep-namespaces-aligned-with-folders)
 
 **Default:** Start a namespace with the project name and follow the folders beneath the project root.
 
@@ -140,7 +140,7 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 **Rationale:** Including `src` or `apps` in a namespace couples the type name to a workspace layout decision. The project root is the directory holding the project file, so every folder above it is outside the namespace.
 
-### Avoid generic type names (WORKSPACE.NAMING.CONVENTION.003)
+### Avoid generic type names (standards/rule/workspace-naming.avoid-generic-type-names)
 
 **Default:** Avoid `Manager`, `Helper`, `Processor`, `Common`, `Utility`, `BaseService`, `DataService`, `MessageBus`, `Engine`, `Facade`, `Wrapper`, and `Factory` when a narrower name exists.
 
@@ -148,7 +148,7 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 **Rationale:** A generic name invites unrelated responsibility, because nothing in it excludes the next addition. `Factory` is generic on a class and exact on a named static aggregate factory method, so the default names the class and not the method.
 
-### Derive boundary names from the ubiquitous term (WORKSPACE.NAMING.CONVENTION.004)
+### Derive boundary names from the ubiquitous term (standards/rule/workspace-naming.derive-boundary-names-from-the-ubiquitous-term)
 
 **Default:** Derive route segments and JSON field names from the current aggregate or ubiquitous term.
 
@@ -158,7 +158,7 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 ## Reference example
 
-This informative example demonstrates `WORKSPACE.NAMING.FILE.001`, `WORKSPACE.NAMING.SUFFIX.001`, and `WORKSPACE.NAMING.CONVENTION.002`.
+This informative example demonstrates `standards/rule/workspace-naming.match-c-files-and-primary-types`, `standards/rule/workspace-naming.use-architectural-suffixes`, and `standards/rule/workspace-naming.keep-namespaces-aligned-with-folders`.
 
 ```csharp
 namespace Example.Application.Posts.CreateDraft;
@@ -181,16 +181,16 @@ internal sealed class CreateDraftCommandHandler(
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| WORKSPACE.NAMING.FILE.001 | inspection | `NamingTests` asserts each C# file declares one primary top-level type matching its file name. |
-| WORKSPACE.NAMING.AGGREGATE.001 | inspection | `NamingTests` asserts each aggregate-owned type name begins with its aggregate root name. |
-| WORKSPACE.NAMING.SUFFIX.001 | inspection | `NamingTests` asserts each architectural type carries the suffix its role requires. |
-| WORKSPACE.NAMING.ASYNC.001 | static | `NamingTests` asserts each task-returning method ends in `Async` with the cancellation token last. |
-| WORKSPACE.NAMING.EXCEPTION.001 | static | `NamingTests` asserts each Domain exception name leads with its aggregate root and names its reason. |
-| WORKSPACE.NAMING.BOOLEAN.001 | inspection | `NamingTests` asserts each boolean member uses an intent-revealing prefix or verb. |
-| WORKSPACE.NAMING.CSHARP.001 | inspection | The Release build enforces the style rules through analyzer warnings promoted to errors. |
-| WORKSPACE.NAMING.CSHARP.002 | inspection | The Release build enforces the language version and modern-construct analyzers as errors. |
-| WORKSPACE.NAMING.FRONTEND.001 | inspection | `node standards/tools/validate-ui.mjs` reports a frontend path or export that breaks the naming form. |
-| WORKSPACE.NAMING.CONVENTION.001 | inspection | Module review compares each layer folder name against the module identifier. |
-| WORKSPACE.NAMING.CONVENTION.002 | inspection | `NamingTests` asserts each namespace matches its folder path beneath the project root. |
-| WORKSPACE.NAMING.CONVENTION.003 | inspection | `NamingTests` reports each generic boundary name for review against a narrower alternative. |
-| WORKSPACE.NAMING.CONVENTION.004 | inspection | Boundary review compares each route segment and field name against its current ubiquitous term. |
+| standards/rule/workspace-naming.match-c-files-and-primary-types | inspection | `NamingTests` asserts each C# file declares one primary top-level type matching its file name. |
+| standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root | inspection | `NamingTests` asserts each aggregate-owned type name begins with its aggregate root name. |
+| standards/rule/workspace-naming.use-architectural-suffixes | inspection | `NamingTests` asserts each architectural type carries the suffix its role requires. |
+| standards/rule/workspace-naming.name-asynchronous-methods-completely | static | `NamingTests` asserts each task-returning method ends in `Async` with the cancellation token last. |
+| standards/rule/workspace-naming.name-exceptions-by-failed-rule | static | `NamingTests` asserts each Domain exception name leads with its aggregate root and names its reason. |
+| standards/rule/workspace-naming.use-intent-revealing-boolean-names | inspection | `NamingTests` asserts each boolean member uses an intent-revealing prefix or verb. |
+| standards/rule/workspace-naming.keep-implementation-style-consistent | inspection | The Release build enforces the style rules through analyzer warnings promoted to errors. |
+| standards/rule/workspace-naming.use-current-language-features | inspection | The Release build enforces the language version and modern-construct analyzers as errors. |
+| standards/rule/workspace-naming.use-predictable-frontend-names | inspection | `node standards/tools/validate-ui.mjs` reports a frontend path or export that breaks the naming form. |
+| standards/rule/workspace-naming.align-business-names-across-layers | inspection | Module review compares each layer folder name against the module identifier. |
+| standards/rule/workspace-naming.keep-namespaces-aligned-with-folders | inspection | `NamingTests` asserts each namespace matches its folder path beneath the project root. |
+| standards/rule/workspace-naming.avoid-generic-type-names | inspection | `NamingTests` reports each generic boundary name for review against a narrower alternative. |
+| standards/rule/workspace-naming.derive-boundary-names-from-the-ubiquitous-term | inspection | Boundary review compares each route segment and field name against its current ubiquitous term. |

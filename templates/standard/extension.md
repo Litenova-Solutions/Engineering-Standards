@@ -14,15 +14,15 @@ Activate this extension when one exact current condition applies.
 
 ## Baseline relationship
 
-This extension replaces `{AREA.PAGE.TOPIC.001}`, or states that it replaces no baseline provision.
+This extension replaces `{standards/rule/page.state-one-action}`, or states that it replaces no baseline provision.
 
 ## Agent Summary {#agent-summary}
 
-- State one high-risk projection and cite its canonical provision. ({EXT.NAME.TOPIC.001})
+- State one high-risk projection and cite its canonical provision. ({standards/rule/page.state-one-extension-action})
 
 ## Standards
 
-### State one extension action ({EXT.NAME.TOPIC.001})
+### State one extension action ({standards/rule/page.state-one-extension-action})
 
 **Requirement:** The activated extension MUST perform one testable action.
 
@@ -32,7 +32,7 @@ This extension replaces `{AREA.PAGE.TOPIC.001}`, or states that it replaces no b
 
 ## Conventions
 
-### Use one extension default ({EXT.NAME}.CONVENTION.001)
+### Use one extension default ({standards/rule/page.use-one-extension-default})
 
 **Default:** State one replaceable extension default.
 
@@ -46,5 +46,5 @@ None.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| {EXT.NAME.TOPIC.001} | test | `{Topic}Tests` asserts the exact extension behavior this provision requires. |
-| {EXT.NAME}.CONVENTION.001 | inspection | Inspect the default or its named local replacement. |
+| {standards/rule/page.state-one-extension-action} | test | `{Topic}Tests` asserts the exact extension behavior this provision requires. |
+| {standards/rule/page.use-one-extension-default} | inspection | Inspect the default or its named local replacement. |

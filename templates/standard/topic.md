@@ -6,11 +6,11 @@ State the page scope and the boundary it owns.
 
 ## Agent Summary {#agent-summary}
 
-- State one high-risk projection and cite its canonical provision. ({AREA.PAGE.TOPIC.001})
+- State one high-risk projection and cite its canonical provision. ({standards/rule/page.state-one-action})
 
 ## Standards
 
-### State one action ({AREA.PAGE.TOPIC.001})
+### State one action ({standards/rule/page.state-one-action})
 
 **Requirement:** The named actor MUST perform one testable action.
 
@@ -20,7 +20,7 @@ State the page scope and the boundary it owns.
 
 ## Conventions
 
-### Use one default ({AREA.PAGE}.CONVENTION.001)
+### Use one default ({standards/rule/page.use-one-default})
 
 **Default:** State one replaceable default.
 
@@ -30,5 +30,5 @@ State the page scope and the boundary it owns.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| {AREA.PAGE.TOPIC.001} | static | `{Topic}Tests` asserts the exact command, artifact, or result this provision requires. |
-| {AREA.PAGE}.CONVENTION.001 | inspection | Inspect the default or its named local replacement. |
+| {standards/rule/page.state-one-action} | static | `{Topic}Tests` asserts the exact command, artifact, or result this provision requires. |
+| {standards/rule/page.use-one-default} | inspection | Inspect the default or its named local replacement. |

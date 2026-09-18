@@ -6,16 +6,16 @@ The client has four test projects matching its four boundaries. Core tests run w
 
 ## Agent Summary {#agent-summary}
 
-- Four test projects match the four client boundaries. (BLAZOR.TESTING.PROJECTS.001)
-- Every acceptance criterion of a verified use case is cited by a test. (BLAZOR.TESTING.ACCEPTANCE.001)
-- Domain and Application tests run with no browser or storage. (BLAZOR.TESTING.CORE.001)
-- Component tests substitute every Application interface. (BLAZOR.TESTING.COMPONENTS.001)
-- A browser suite covers the primary flow, storage loss, offline, and portability. (BLAZOR.TESTING.E2E.001)
-- CI fails when the first-load payload exceeds its budget. (BLAZOR.TESTING.BUDGET.001)
+- Four test projects match the four client boundaries. (standards/rule/blazor-testing.use-the-four-client-test-projects)
+- Every acceptance criterion of a verified use case is cited by a test. (standards/rule/blazor-testing.cite-acceptance-criteria)
+- Domain and Application tests run with no browser or storage. (standards/rule/blazor-testing.test-the-core-without-a-browser)
+- Component tests substitute every Application interface. (standards/rule/blazor-testing.replace-interop-in-component-tests)
+- A browser suite covers the primary flow, storage loss, offline, and portability. (standards/rule/blazor-testing.verify-real-browser-behavior-end-to-end)
+- CI fails when the first-load payload exceeds its budget. (standards/rule/blazor-testing.enforce-the-first-load-budget)
 
 ## Standards
 
-### Use the four client test projects (BLAZOR.TESTING.PROJECTS.001)
+### Use the four client test projects (standards/rule/blazor-testing.use-the-four-client-test-projects)
 
 **Requirement:** A client solution MUST contain Domain, Application, Web, and end-to-end test projects and no other baseline test project.
 
@@ -31,31 +31,31 @@ tests/
   {ProjectName}.EndToEnd.Tests/        real browser flows
 ```
 
-### Cite acceptance criteria (BLAZOR.TESTING.ACCEPTANCE.001)
+### Cite acceptance criteria (standards/rule/blazor-testing.cite-acceptance-criteria)
 
 **Requirement:** Every acceptance criterion of a verified use case MUST appear in at least one automated test.
 
 **Rationale:** A use case is not verified until its identifiers appear in tests, matching the baseline rule.
 
-### Test the core without a browser (BLAZOR.TESTING.CORE.001)
+### Test the core without a browser (standards/rule/blazor-testing.test-the-core-without-a-browser)
 
 **Requirement:** A Domain or Application test MUST run with no browser, JavaScript host, or storage.
 
 **Rationale:** A core test needing an interop substitute indicates a layering defect, so the fix belongs in the layering rather than the test.
 
-### Replace interop in component tests (BLAZOR.TESTING.COMPONENTS.001)
+### Replace interop in component tests (standards/rule/blazor-testing.replace-interop-in-component-tests)
 
 **Requirement:** A component test MUST inject a test double for every Application interface, including interop.
 
 **Rationale:** Coverage includes keyboard interaction and the loading, empty, and error states each route declares. A component test starts no browser and asserts on user-visible output rather than markup structure.
 
-### Verify real browser behavior end to end (BLAZOR.TESTING.E2E.001)
+### Verify real browser behavior end to end (standards/rule/blazor-testing.verify-real-browser-behavior-end-to-end)
 
 **Requirement:** A browser suite MUST cover the primary release flow, startup with storage unavailable, offline startup, and export followed by import.
 
 **Rationale:** These four are the paths where a client-only product loses user work, and none of them can be proved without a real browser.
 
-### Enforce the first-load budget (BLAZOR.TESTING.BUDGET.001)
+### Enforce the first-load budget (standards/rule/blazor-testing.enforce-the-first-load-budget)
 
 **Requirement:** CI MUST measure the compressed transfer size of the published framework payload and fail above the recorded budget.
 
@@ -65,7 +65,7 @@ The measurement names the tool that produced it and the compression it applied. 
 
 ## Conventions
 
-### Keep browser-capability tests honest (BLAZOR.TESTING.CONVENTION.001)
+### Keep browser-capability tests honest (standards/rule/blazor-testing.keep-browser-capability-tests-honest)
 
 **Default:** Test both the supported and unsupported path of any feature depending on a browser capability.
 
@@ -73,7 +73,7 @@ The measurement names the tool that produced it and the compression it applied. 
 
 **Rationale:** The unsupported path asserts the user-facing guidance rather than a silent absence of behavior.
 
-### Keep end-to-end tests few (BLAZOR.TESTING.CONVENTION.002)
+### Keep end-to-end tests few (standards/rule/blazor-testing.keep-end-to-end-tests-few)
 
 **Default:** Limit the browser suite to the required flows and specification-named interactions.
 
@@ -85,11 +85,11 @@ The measurement names the tool that produced it and the compression it applied. 
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| BLAZOR.TESTING.PROJECTS.001 | test | `ClientSolutionTests` asserts the four test projects exist and run in CI. |
-| BLAZOR.TESTING.ACCEPTANCE.001 | static | `node standards/tools/validate-consumer.mjs` resolves each acceptance identifier to a test reference. |
-| BLAZOR.TESTING.CORE.001 | test | `ClientArchitectureTests` asserts no core test project references a browser or interop type. |
-| BLAZOR.TESTING.COMPONENTS.001 | test | `ComponentContractTests` asserts each render substitutes every Application interface. |
-| BLAZOR.TESTING.E2E.001 | test | `EndToEndTests` covers the primary flow, storage loss, offline startup, and export with import. |
-| BLAZOR.TESTING.BUDGET.001 | operation | The CI budget job compares published transfer size against the Operating Limits value. |
-| BLAZOR.TESTING.CONVENTION.001 | test | `CapabilityTests` covers the supported and unsupported path of each capability-dependent feature. |
-| BLAZOR.TESTING.CONVENTION.002 | inspection | Browser suite review confirms each case maps to a required flow or a named interaction. |
+| standards/rule/blazor-testing.use-the-four-client-test-projects | test | `ClientSolutionTests` asserts the four test projects exist and run in CI. |
+| standards/rule/blazor-testing.cite-acceptance-criteria | static | `node standards/tools/validate-consumer.mjs` resolves each acceptance identifier to a test reference. |
+| standards/rule/blazor-testing.test-the-core-without-a-browser | test | `ClientArchitectureTests` asserts no core test project references a browser or interop type. |
+| standards/rule/blazor-testing.replace-interop-in-component-tests | test | `ComponentContractTests` asserts each render substitutes every Application interface. |
+| standards/rule/blazor-testing.verify-real-browser-behavior-end-to-end | test | `EndToEndTests` covers the primary flow, storage loss, offline startup, and export with import. |
+| standards/rule/blazor-testing.enforce-the-first-load-budget | operation | The CI budget job compares published transfer size against the Operating Limits value. |
+| standards/rule/blazor-testing.keep-browser-capability-tests-honest | test | `CapabilityTests` covers the supported and unsupported path of each capability-dependent feature. |
+| standards/rule/blazor-testing.keep-end-to-end-tests-few | inspection | Browser suite review confirms each case maps to a required flow or a named interaction. |

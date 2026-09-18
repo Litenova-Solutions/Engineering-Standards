@@ -18,71 +18,71 @@ This extension replaces no baseline rule.
 
 ## Agent Summary {#agent-summary}
 
-- Classify every independent-consumer contract change. (EXT.COMPAT.COMPATIBILITY.001)
-- Treat removals and narrowed contracts as breaking. (EXT.COMPAT.COMPATIBILITY.002)
-- Diff current OpenAPI against a retained baseline. (EXT.COMPAT.DIFF.002)
-- Keep operation IDs during compatible changes. (EXT.COMPAT.OPERATION.002)
-- Version and support breaking contracts. (EXT.COMPAT.VERSION.001, EXT.COMPAT.VERSION.002)
-- Deprecate public removals before sunset. (EXT.COMPAT.DEPRECATION.001, EXT.COMPAT.DEPRECATION.002)
-- Preserve error-contract compatibility. (EXT.COMPAT.ERROR.001, EXT.COMPAT.ERROR.002)
+- Classify every independent-consumer contract change. (standards/rule/ext-compat.classify-independent-consumer-changes)
+- Treat removals and narrowed contracts as breaking. (standards/rule/ext-compat.classify-breaking-contract-changes)
+- Diff current OpenAPI against a retained baseline. (standards/rule/ext-compat.diff-release-contracts)
+- Keep operation IDs during compatible changes. (standards/rule/ext-compat.retain-compatible-operation-ids)
+- Version and support breaking contracts. (standards/rule/ext-compat.version-breaking-contracts, standards/rule/ext-compat.retain-supported-versions)
+- Deprecate public removals before sunset. (standards/rule/ext-compat.signal-planned-public-removal, standards/rule/ext-compat.publish-deprecation-context)
+- Preserve error-contract compatibility. (standards/rule/ext-compat.treat-errors-as-contracts, standards/rule/ext-compat.gate-new-error-outcomes)
 
 ## Standards
 
-### Classify independent-consumer changes (EXT.COMPAT.COMPATIBILITY.001)
+### Classify independent-consumer changes (standards/rule/ext-compat.classify-independent-consumer-changes)
 
 **Requirement:** An API change reviewer MUST classify each contract change that affects an independently deployed consumer.
 
 **Rationale:** Classification determines whether consumers need a new contract version, review, or no action.
 
-### Classify breaking contract changes (EXT.COMPAT.COMPATIBILITY.002)
+### Classify breaking contract changes (standards/rule/ext-compat.classify-breaking-contract-changes)
 
 **Requirement:** An API change reviewer MUST classify removal, rename, required input, narrowed value, response, status, or authentication changes as breaking.
 
 **Rationale:** Existing consumers can depend on every removed, renamed, narrowed, or retyped contract element.
 
-### Classify compatible additions (EXT.COMPAT.COMPATIBILITY.003)
+### Classify compatible additions (standards/rule/ext-compat.classify-compatible-additions)
 
 **Requirement:** An API change reviewer MAY classify an optional field, endpoint, or query parameter as compatible when existing clients retain behavior.
 
 **Rationale:** Optional additions do not require existing callers to send or interpret new values.
 
-### Review exhaustive consumer changes (EXT.COMPAT.COMPATIBILITY.004)
+### Review exhaustive consumer changes (standards/rule/ext-compat.review-exhaustive-consumer-changes)
 
 **Requirement:** An API change reviewer MUST require consumer review for an added enum value or polymorphic subtype.
 
 **Rationale:** Generated exhaustive clients can reject a newly valid enum value or discriminator case.
 
-### Preserve stable error codes (EXT.COMPAT.COMPATIBILITY.005)
+### Preserve stable error codes (standards/rule/ext-compat.preserve-stable-error-codes)
 
 **Requirement:** An API change reviewer MUST classify removal or reassignment of a stable Problem Details code as breaking.
 
 **Rationale:** A consumer can branch on a stable code even when the HTTP status remains unchanged.
 
-### Resolve uncertain classifications safely (EXT.COMPAT.COMPATIBILITY.006)
+### Resolve uncertain classifications safely (standards/rule/ext-compat.resolve-uncertain-classifications-safely)
 
 **Requirement:** An API change reviewer MUST classify an unclear contract change as breaking and require consumer review.
 
 **Rationale:** A conservative outcome protects consumers when a structural diff cannot prove compatibility.
 
-### Retain release baselines (EXT.COMPAT.DIFF.001)
+### Retain release baselines (standards/rule/ext-compat.retain-release-baselines)
 
 **Requirement:** An API owner MUST store each release OpenAPI document as a retained baseline artifact.
 
 **Rationale:** A retained document gives later changes an immutable comparison target.
 
-### Diff release contracts (EXT.COMPAT.DIFF.002)
+### Diff release contracts (standards/rule/ext-compat.diff-release-contracts)
 
 **Requirement:** Continuous integration MUST compare the current OpenAPI document with the selected supported baseline.
 
 **Rationale:** The same diff detects structural compatibility changes locally and during continuous integration.
 
-### Reject unapproved breaking diffs (EXT.COMPAT.DIFF.003)
+### Reject unapproved breaking diffs (standards/rule/ext-compat.reject-unapproved-breaking-diffs)
 
 **Requirement:** Continuous integration MUST fail a breaking diff unless a new API version or approved consumer decision authorizes it.
 
 **Rationale:** The failure makes a compatibility decision explicit before release.
 
-### Assign operation IDs (EXT.COMPAT.OPERATION.001)
+### Assign operation IDs (standards/rule/ext-compat.assign-operation-ids)
 
 **Requirement:** Every operation exposed to an independent consumer MUST have a deliberate `operationId`.
 
@@ -90,67 +90,67 @@ This extension replaces no baseline rule.
 
 An endpoint whose shape a specification outside this project fixes is out of scope for this rule. An OAuth redirect endpoint, an OIDC discovery document, a provider webhook receiver, and a well-known resource each carry a shape the other party defines. Naming them deliberately changes nothing a consumer reads, because no consumer generates a client from them.
 
-### Retain compatible operation IDs (EXT.COMPAT.OPERATION.002)
+### Retain compatible operation IDs (standards/rule/ext-compat.retain-compatible-operation-ids)
 
 **Requirement:** A compatible API change MUST retain the existing `operationId`.
 
 **Rationale:** A changed identifier can break generated client names and operation references.
 
-### Assign versioned operation IDs (EXT.COMPAT.OPERATION.003)
+### Assign versioned operation IDs (standards/rule/ext-compat.assign-versioned-operation-ids)
 
 **Requirement:** A new API version MAY assign a new operation ID when its operation contract changes.
 
 **Rationale:** A new version can own a contract name without mutating the retained version.
 
-### Version breaking contracts (EXT.COMPAT.VERSION.001)
+### Version breaking contracts (standards/rule/ext-compat.version-breaking-contracts)
 
 **Requirement:** An API owner MUST use a new route or documented media-type version for a breaking contract.
 
 **Rationale:** A version boundary lets existing and changed contracts coexist.
 
-### Retain supported versions (EXT.COMPAT.VERSION.002)
+### Retain supported versions (standards/rule/ext-compat.retain-supported-versions)
 
 **Requirement:** An API owner MUST keep the previous version available for its declared support window.
 
 **Rationale:** Independently deployed consumers need the published support interval to adopt a changed contract.
 
-### Record version retirement (EXT.COMPAT.VERSION.003)
+### Record version retirement (standards/rule/ext-compat.record-version-retirement)
 
 **Requirement:** A versioning decision MUST name the consumer owner, deadline, and removal condition.
 
 **Rationale:** Named ownership makes a future removal reviewable rather than implicit.
 
-### Signal planned public removal (EXT.COMPAT.DEPRECATION.001)
+### Signal planned public removal (standards/rule/ext-compat.signal-planned-public-removal)
 
 **Requirement:** A public operation scheduled for removal MUST expose a documented deprecation signal.
 
 **Rationale:** `Deprecation` and `Sunset` headers are examples of observable deprecation signals.
 
-### Publish deprecation context (EXT.COMPAT.DEPRECATION.002)
+### Publish deprecation context (standards/rule/ext-compat.publish-deprecation-context)
 
 **Requirement:** A public operation scheduled for removal MUST appear in the consumer `CHANGELOG.md`.
 
 **Rationale:** The changelog gives consumers one release-note location for planned removal.
 
-### Record deprecation conditions (EXT.COMPAT.DEPRECATION.003)
+### Record deprecation conditions (standards/rule/ext-compat.record-deprecation-conditions)
 
 **Requirement:** A deprecation decision MUST record the sunset date and replacement operation.
 
 **Rationale:** Consumers need a fixed end date and a named supported alternative.
 
-### Treat errors as contracts (EXT.COMPAT.ERROR.001)
+### Treat errors as contracts (standards/rule/ext-compat.treat-errors-as-contracts)
 
 **Requirement:** An API owner MUST treat Problem Details type, code, field-error codes, and documented statuses as versioned contract elements.
 
 **Rationale:** Consumers can branch on error structures as well as successful response structures.
 
-### Gate new error outcomes (EXT.COMPAT.ERROR.002)
+### Gate new error outcomes (standards/rule/ext-compat.gate-new-error-outcomes)
 
 **Requirement:** An API owner MAY add an error outcome only when existing consumers safely handle an unknown code.
 
 **Rationale:** Safe fallback behavior avoids consumer failure on a previously unseen outcome.
 
-### Exercise generated consumers (EXT.COMPAT.ERROR.003)
+### Exercise generated consumers (standards/rule/ext-compat.exercise-generated-consumers)
 
 **Requirement:** An API owner MUST test representative generated clients against the changed OpenAPI document.
 
@@ -158,7 +158,7 @@ An endpoint whose shape a specification outside this project fixes is out of sco
 
 ## Conventions
 
-### Store current OpenAPI source (EXT.COMPAT.CONVENTION.001)
+### Store current OpenAPI source (standards/rule/ext-compat.store-current-openapi-source)
 
 **Default:** Store the current source artifact at `apps/api/openapi/{ProjectName}.json`.
 
@@ -166,7 +166,7 @@ An endpoint whose shape a specification outside this project fixes is out of sco
 
 **Rationale:** The path gives source generation and contract review one predictable location.
 
-### Keep baseline references immutable (EXT.COMPAT.CONVENTION.002)
+### Keep baseline references immutable (standards/rule/ext-compat.keep-baseline-references-immutable)
 
 **Default:** Store each supported baseline beside its contract owner or under an immutable retained-release reference.
 
@@ -174,7 +174,7 @@ An endpoint whose shape a specification outside this project fixes is out of sco
 
 **Rationale:** Immutable baseline references prevent a diff from comparing against a mutable artifact.
 
-### Use one diff tool (EXT.COMPAT.CONVENTION.003)
+### Use one diff tool (standards/rule/ext-compat.use-one-diff-tool)
 
 **Default:** Use the same OpenAPI diff tool in local verification and continuous integration.
 
@@ -182,7 +182,7 @@ An endpoint whose shape a specification outside this project fixes is out of sco
 
 **Rationale:** One classifier avoids differences between local and continuous integration outcomes.
 
-### Keep Problem Details codes stable (EXT.COMPAT.CONVENTION.004)
+### Keep Problem Details codes stable (standards/rule/ext-compat.keep-problem-details-codes-stable)
 
 **Default:** Keep Problem Details error codes stable across compatible versions.
 
@@ -198,28 +198,28 @@ The extension adds no required package. An introduced OpenAPI diff tool needs a 
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| EXT.COMPAT.COMPATIBILITY.001 | inspection | Pull request review classifies each independent-consumer API contract change. |
-| EXT.COMPAT.COMPATIBILITY.002 | inspection | Review marks each removed, renamed, narrowed, retyped, or authentication change as breaking. |
-| EXT.COMPAT.COMPATIBILITY.003 | inspection | Review records why each optional addition preserves existing consumer behavior. |
-| EXT.COMPAT.COMPATIBILITY.004 | test, inspection | `ApiCompatibilityTests` and review cover added enum values and discriminator cases. |
-| EXT.COMPAT.COMPATIBILITY.005 | static | `ApiCompatibilityTests` rejects removed or reassigned stable Problem Details codes. |
-| EXT.COMPAT.COMPATIBILITY.006 | inspection | Unclear compatibility classifications record breaking treatment and consumer review. |
-| EXT.COMPAT.DIFF.001 | operation | Release artifacts retain the generated OpenAPI baseline for each supported version. |
-| EXT.COMPAT.DIFF.002 | test | `ApiDiffTests` asserts local and continuous integration execute the selected baseline diff command. |
-| EXT.COMPAT.DIFF.003 | test, inspection | `ApiDiffTests` asserts breaking-diff failure requires a version boundary or approved consumer decision. |
-| EXT.COMPAT.OPERATION.001 | static | OpenAPI validation reports a deliberate `operationId` for each independent-consumer operation. |
-| EXT.COMPAT.OPERATION.002 | test | `ApiOperationTests` reports unchanged IDs for compatible operations. |
-| EXT.COMPAT.OPERATION.003 | inspection | Versioned operation review records each deliberately changed operation ID. |
-| EXT.COMPAT.VERSION.001 | inspection | Breaking contract review identifies its new route or media-type version. |
-| EXT.COMPAT.VERSION.002 | operation | Release records show prior-version availability through the declared support window. |
-| EXT.COMPAT.VERSION.003 | inspection | The versioning decision names consumer owner, deadline, and removal condition. |
-| EXT.COMPAT.DEPRECATION.001 | test | `ApiDeprecationTests` assert the documented deprecation signal for planned removal. |
-| EXT.COMPAT.DEPRECATION.002 | inspection | Consumer `CHANGELOG.md` names each operation scheduled for removal. |
-| EXT.COMPAT.DEPRECATION.003 | inspection | The deprecation decision records the sunset date and replacement operation. |
-| EXT.COMPAT.ERROR.001 | inspection | OpenAPI and error-contract review include type, code, field codes, and statuses. |
-| EXT.COMPAT.ERROR.002 | test | `ApiErrorsTests` safely handle each added unknown error code. |
-| EXT.COMPAT.ERROR.003 | test | `ApiErrorsTests` asserts representative generated clients compile and exercise the changed contract. |
-| EXT.COMPAT.CONVENTION.001 | static | `ApiTests` asserts generated OpenAPI exists at the documented source path or recorded local replacement. |
-| EXT.COMPAT.CONVENTION.002 | inspection | Baseline storage review confirms immutable retained references. |
-| EXT.COMPAT.CONVENTION.003 | test | `ApiTests` asserts local and continuous integration invoke the same diff tool. |
-| EXT.COMPAT.CONVENTION.004 | test | `ApiTests` reports stable Problem Details error codes across compatible versions. |
+| standards/rule/ext-compat.classify-independent-consumer-changes | inspection | Pull request review classifies each independent-consumer API contract change. |
+| standards/rule/ext-compat.classify-breaking-contract-changes | inspection | Review marks each removed, renamed, narrowed, retyped, or authentication change as breaking. |
+| standards/rule/ext-compat.classify-compatible-additions | inspection | Review records why each optional addition preserves existing consumer behavior. |
+| standards/rule/ext-compat.review-exhaustive-consumer-changes | test, inspection | `ApiCompatibilityTests` and review cover added enum values and discriminator cases. |
+| standards/rule/ext-compat.preserve-stable-error-codes | static | `ApiCompatibilityTests` rejects removed or reassigned stable Problem Details codes. |
+| standards/rule/ext-compat.resolve-uncertain-classifications-safely | inspection | Unclear compatibility classifications record breaking treatment and consumer review. |
+| standards/rule/ext-compat.retain-release-baselines | operation | Release artifacts retain the generated OpenAPI baseline for each supported version. |
+| standards/rule/ext-compat.diff-release-contracts | test | `ApiDiffTests` asserts local and continuous integration execute the selected baseline diff command. |
+| standards/rule/ext-compat.reject-unapproved-breaking-diffs | test, inspection | `ApiDiffTests` asserts breaking-diff failure requires a version boundary or approved consumer decision. |
+| standards/rule/ext-compat.assign-operation-ids | static | OpenAPI validation reports a deliberate `operationId` for each independent-consumer operation. |
+| standards/rule/ext-compat.retain-compatible-operation-ids | test | `ApiOperationTests` reports unchanged IDs for compatible operations. |
+| standards/rule/ext-compat.assign-versioned-operation-ids | inspection | Versioned operation review records each deliberately changed operation ID. |
+| standards/rule/ext-compat.version-breaking-contracts | inspection | Breaking contract review identifies its new route or media-type version. |
+| standards/rule/ext-compat.retain-supported-versions | operation | Release records show prior-version availability through the declared support window. |
+| standards/rule/ext-compat.record-version-retirement | inspection | The versioning decision names consumer owner, deadline, and removal condition. |
+| standards/rule/ext-compat.signal-planned-public-removal | test | `ApiDeprecationTests` assert the documented deprecation signal for planned removal. |
+| standards/rule/ext-compat.publish-deprecation-context | inspection | Consumer `CHANGELOG.md` names each operation scheduled for removal. |
+| standards/rule/ext-compat.record-deprecation-conditions | inspection | The deprecation decision records the sunset date and replacement operation. |
+| standards/rule/ext-compat.treat-errors-as-contracts | inspection | OpenAPI and error-contract review include type, code, field codes, and statuses. |
+| standards/rule/ext-compat.gate-new-error-outcomes | test | `ApiErrorsTests` safely handle each added unknown error code. |
+| standards/rule/ext-compat.exercise-generated-consumers | test | `ApiErrorsTests` asserts representative generated clients compile and exercise the changed contract. |
+| standards/rule/ext-compat.store-current-openapi-source | static | `ApiTests` asserts generated OpenAPI exists at the documented source path or recorded local replacement. |
+| standards/rule/ext-compat.keep-baseline-references-immutable | inspection | Baseline storage review confirms immutable retained references. |
+| standards/rule/ext-compat.use-one-diff-tool | test | `ApiTests` asserts local and continuous integration invoke the same diff tool. |
+| standards/rule/ext-compat.keep-problem-details-codes-stable | test | `ApiTests` reports stable Problem Details error codes across compatible versions. |

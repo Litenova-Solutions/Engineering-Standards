@@ -21,11 +21,11 @@ This page defines one repository topic.
 
 ## Agent Summary {#agent-summary}
 
-- Keep the topic bounded. (CORE.TOPIC.BOUNDARY.001)
+- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)
 
 ## Standards
 
-### Keep the topic bounded (CORE.TOPIC.BOUNDARY.001)
+### Keep the topic bounded (standards/rule/core-topic.keep-the-topic-bounded)
 
 **Requirement:** Consumers MUST keep the topic inside its declared boundary.
 
@@ -33,7 +33,7 @@ This page defines one repository topic.
 
 ## Conventions
 
-### Use the default location (CORE.TOPIC.CONVENTION.001)
+### Use the default location (standards/rule/core-topic.use-the-default-location)
 
 **Default:** Store the topic in its owning documentation area.
 
@@ -43,8 +43,8 @@ This page defines one repository topic.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| CORE.TOPIC.BOUNDARY.001 | inspection | Inspect the declared topic boundary. |
-| CORE.TOPIC.CONVENTION.001 | static | \`node tools/validate-standards.mjs\` resolves the topic document location. |
+| standards/rule/core-topic.keep-the-topic-bounded | inspection | Inspect the declared topic boundary. |
+| standards/rule/core-topic.use-the-default-location | static | \`node tools/validate-standards.mjs\` resolves the topic document location. |
 `;
 
 const extension = `# Sample Extension
@@ -67,11 +67,11 @@ This extension replaces no baseline provision.
 
 ## Agent Summary {#agent-summary}
 
-- Record extension activation. (EXT.SAMPLE.ADOPT.001)
+- Record extension activation. (standards/rule/ext-sample.record-extension-activation)
 
 ## Standards
 
-### Record extension activation (EXT.SAMPLE.ADOPT.001)
+### Record extension activation (standards/rule/ext-sample.record-extension-activation)
 
 **Requirement:** Consumers MUST record activation on each applicable specification.
 
@@ -87,7 +87,7 @@ None.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| EXT.SAMPLE.ADOPT.001 | static | \`node tools/validate-consumer.mjs\` resolves applicable specification metadata. |
+| standards/rule/ext-sample.record-extension-activation | static | \`node tools/validate-consumer.mjs\` resolves applicable specification metadata. |
 `;
 
 const profile = `# Sample Profile
@@ -98,11 +98,11 @@ This profile selects one standards composition.
 
 ## Agent Summary {#agent-summary}
 
-- Apply the complete profile. (PROFILE.SAMPLE.COMPOSITION.001)
+- Apply the complete profile. (standards/rule/profile-sample.apply-the-complete-profile)
 
 ## Standards
 
-### Apply the complete profile (PROFILE.SAMPLE.COMPOSITION.001)
+### Apply the complete profile (standards/rule/profile-sample.apply-the-complete-profile)
 
 **Requirement:** Consumers MUST apply every document in the selected profile composition.
 
@@ -118,7 +118,7 @@ None.
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| PROFILE.SAMPLE.COMPOSITION.001 | static | \`node tools/validate-standards.mjs\` compares the profile with its manifest entry. |
+| standards/rule/profile-sample.apply-the-complete-profile | static | \`node tools/validate-standards.mjs\` compares the profile with its manifest entry. |
 `;
 
 const guide = `# Sample Guide
@@ -230,7 +230,7 @@ function write(root, relative, contents) {
 }
 
 // A documentation root index names each page class before it links to one.
-// (CORE.AUTHORING.INDEX.002)
+// (standards/rule/core-authoring.route-the-reader-before-listing-pages)
 const INDEX_ROUTING = '## Which page do you want\n\nA tutorial takes you through a first working result, one step at a time.\nA how-to solves one stated problem for a reader who already has it running.\nA reference states exact values, options, and defaults.\nA command page documents one command and what it runs underneath.\n';
 
 function base(root) {
@@ -291,8 +291,8 @@ run('multiple modals', (root) => write(root, 'docs/core/topic.md', topicPage.rep
 run('missing deviation', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Consumers MUST keep', 'Consumers SHOULD keep')), ['STANDARD_MISSING_DEVIATION']);
 run('missing convention default', (root) => write(root, 'docs/core/topic.md', topicPage.replace('**Default:** Store the topic in its owning documentation area.\n\n', '')), ['CONVENTION_MISSING_DEFAULT']);
 run('normative convention', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Store the topic in its owning documentation area.', 'Consumers MUST store the topic in its owning documentation area.')), ['CONVENTION_NORMATIVE']);
-run('summary without ID', (root) => write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (CORE.TOPIC.BOUNDARY.001)', '- Keep the topic bounded.')), ['SUMMARY_MISSING_ID']);
-run('missing evidence row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| CORE.TOPIC.BOUNDARY.001 | inspection | Inspect the declared topic boundary. |\n', '')), ['VERIFY_MISSING_ID']);
+run('summary without ID', (root) => write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)', '- Keep the topic bounded.')), ['SUMMARY_MISSING_ID']);
+run('missing evidence row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.keep-the-topic-bounded | inspection | Inspect the declared topic boundary. |\n', '')), ['VERIFY_MISSING_ID']);
 run('long sentence', (root) => write(root, 'docs/core/topic.md', topicPage.replace('This page defines one repository topic.', 'This sentence contains more than twenty five visible words because the fixture must prove that descriptive prose cannot exceed the fixed controlled technical prose sentence limit in active documentation.')), ['PROSE_SENTENCE_LENGTH']);
 run('long list item', (root) => write(root, 'docs/guide/sample.md', guide.replace('- Read the applicable canonical provision.', '- Read the applicable canonical provision and every related document before you create any artifact or run any verification command for this repository task.')), ['PROSE_LIST_LENGTH']);
 run('non-ASCII prose', (root) => write(root, 'docs/core/topic.md', topicPage.replace('one repository topic', 'one repository topic - with an em dash -').replace('- with an em dash -', '\u2014 with an em dash')), ['PROSE_NON_ASCII']);
@@ -370,13 +370,13 @@ run('glossary definition', (root) => write(root, 'docs/reference/glossary.md', '
 run('non-action heading', (root) => write(root, 'docs/core/topic.md', topicPage.replace('### Keep the topic bounded', '### Topic boundary')), ['HEADING_ACTION']);
 run('uncited agent projection', (root) => write(root, 'AGENTS.md', '# Agent Context\n\nRead the standards before changing code.\n'), ['AGENT_PROJECTION_ID']);
 
-run('missing provision ID', (root) => write(root, 'docs/core/topic.md', topicPage.replace('### Keep the topic bounded (CORE.TOPIC.BOUNDARY.001)', '### Keep the topic bounded')), ['ID_MISSING']);
-run('misplaced provision ID', (root) => write(root, 'docs/guide/sample.md', guide.replace('## Procedure', '## Procedure\n\n### Keep extra work bounded (CORE.TOPIC.EXTRA.001)\n\nRecord one informative note.')), ['ID_LOCATION']);
-run('unknown active ID', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites CORE.UNKNOWN.RULE.001.\n'), ['ID_UNKNOWN_REFERENCE']);
-// A stale three-part identifier must still surface. Only grammar notation with no
-// three-digit tail is exempt from the citation scan.
-run('stale three-part citation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites TOPIC.BOUNDARY.001.\n'), ['ID_UNKNOWN_REFERENCE']);
-run('grammar notation is not a citation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nAn identifier uses AREA.PAGE.TOPIC.NNN as its grammar.\n\n' + INDEX_ROUTING), []);
+run('missing provision ID', (root) => write(root, 'docs/core/topic.md', topicPage.replace('### Keep the topic bounded (standards/rule/core-topic.keep-the-topic-bounded)', '### Keep the topic bounded')), ['ID_MISSING']);
+run('misplaced provision ID', (root) => write(root, 'docs/guide/sample.md', guide.replace('## Procedure', '## Procedure\n\n### Keep extra work bounded (standards/rule/guide-sample.keep-extra-work-bounded)\n\nRecord one informative note.')), ['ID_LOCATION']);
+run('unknown active ID', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites standards/rule/core-topic.unknown-rule.\n'), ['ID_UNKNOWN_REFERENCE']);
+// A stale identifier that keeps the grammar must still surface. Only grammar
+// notation with an unfilled segment is exempt from the citation scan.
+run('stale citation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites standards/rule/core-topic.keep-the-topic-bounded-elsewhere.\n'), ['ID_UNKNOWN_REFERENCE']);
+run('grammar notation is not a citation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nAn identifier uses standards/<kind>/<page>.<heading-slug> as its grammar.\n\n' + INDEX_ROUTING), []);
 
 run('unsupported modal vocabulary', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Consumers MUST keep the topic inside its declared boundary.', 'Consumers MUST keep the topic bounded and SHALL record its owner.')), ['STANDARD_MODAL_VOCABULARY']);
 run('multiple requirement sentences', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Consumers MUST keep the topic inside its declared boundary.', 'Consumers MUST keep the topic inside its boundary. Reviewers inspect the result.')), ['STANDARD_SENTENCE_COUNT']);
@@ -390,25 +390,23 @@ run('invalid label', (root) => write(root, 'docs/core/topic.md', topicPage.repla
 run('label order', (root) => write(root, 'docs/core/topic.md', topicPage.replace('**Rationale:** The boundary gives reviewers one testable result.', '**Example:** One example.\n\n**Rationale:** The boundary gives reviewers one testable result.')), ['STANDARD_LABEL_ORDER']);
 run('unlabeled provision content', (root) => write(root, 'docs/core/topic.md', topicPage.replace('**Rationale:** The boundary gives reviewers one testable result.', 'Additional constraint.\n\n**Rationale:** The boundary gives reviewers one testable result.')), ['STANDARD_UNLABELED_CONTENT']);
 
-run('invalid convention ID', (root) => write(root, 'docs/core/topic.md', topicPage.replaceAll('CORE.TOPIC.CONVENTION.001', 'CORE.TOPIC.DEFAULT.001')), ['CONVENTION_ID_SEGMENT']);
-run('Standard reserving the CONVENTION segment', (root) => write(root, 'docs/core/topic.md', topicPage.replaceAll('CORE.TOPIC.BOUNDARY.001', 'CORE.TOPIC.CONVENTION.002')), ['STANDARD_ID_SEGMENT']);
 run('missing convention replacement', (root) => write(root, 'docs/core/topic.md', topicPage.replace('**Replacement:** A consumer can name another location through an explicit local convention.\n', '')), ['CONVENTION_MISSING_REPLACEMENT']);
 run('default sentence count', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Store the topic in its owning documentation area.', 'Store the topic in its owning documentation area. Record the path.')), ['CONVENTION_DEFAULT_SENTENCE']);
 run('replacement sentence count', (root) => write(root, 'docs/core/topic.md', topicPage.replace('A consumer can name another location through an explicit local convention.', 'A consumer can name another location. The local convention records it.')), ['CONVENTION_REPLACEMENT_SENTENCE']);
 
 run('summary count', (root) => {
-  const bullets = Array.from({ length: 11 }, () => '- Keep the topic bounded. (CORE.TOPIC.BOUNDARY.001)').join('\n');
-  write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (CORE.TOPIC.BOUNDARY.001)', bullets));
+  const bullets = Array.from({ length: 11 }, () => '- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)').join('\n');
+  write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)', bullets));
 }, ['SUMMARY_COUNT']);
-run('summary ID position', (root) => write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (CORE.TOPIC.BOUNDARY.001)', '- Keep the topic bounded. (CORE.TOPIC.BOUNDARY.001) Extra text.')), ['SUMMARY_ID_POSITION']);
-run('normative summary', (root) => write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (CORE.TOPIC.BOUNDARY.001)', '- Consumers MUST keep the topic bounded. (CORE.TOPIC.BOUNDARY.001)')), ['SUMMARY_NORMATIVE']);
-run('unknown summary ID', (root) => write(root, 'docs/core/topic.md', topicPage.replace('CORE.TOPIC.BOUNDARY.001)', 'CORE.UNKNOWN.SUMMARY.001)')), ['SUMMARY_UNKNOWN_ID']);
+run('summary ID position', (root) => write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)', '- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded) Extra text.')), ['SUMMARY_ID_POSITION']);
+run('normative summary', (root) => write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)', '- Consumers MUST keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)')), ['SUMMARY_NORMATIVE']);
+run('unknown summary ID', (root) => write(root, 'docs/core/topic.md', topicPage.replace('standards/rule/core-topic.keep-the-topic-bounded)', 'standards/rule/core-topic.unknown-summary)')), ['SUMMARY_UNKNOWN_ID']);
 
-run('duplicate verification row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| CORE.TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |', '| CORE.TOPIC.BOUNDARY.001 | inspection | Inspect the declared topic boundary. |\n| CORE.TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |')), ['VERIFY_DUPLICATE_ID']);
-run('duplicate verification method', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| CORE.TOPIC.CONVENTION.001 | static |', '| CORE.TOPIC.CONVENTION.001 | static, static |')), ['VERIFY_DUPLICATE_METHOD']);
+run('duplicate verification row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |', '| standards/rule/core-topic.keep-the-topic-bounded | inspection | Inspect the declared topic boundary. |\n| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |')), ['VERIFY_DUPLICATE_ID']);
+run('duplicate verification method', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.use-the-default-location | static |', '| standards/rule/core-topic.use-the-default-location | static, static |')), ['VERIFY_DUPLICATE_METHOD']);
 run('generic verification evidence', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Inspect the declared topic boundary.', 'Inspect evidence for the topic boundary.')), ['VERIFY_GENERIC_EVIDENCE']);
-run('invalid verification method', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| CORE.TOPIC.CONVENTION.001 | static |', '| CORE.TOPIC.CONVENTION.001 | manual |')), ['VERIFY_METHOD']);
-run('unknown verification row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| CORE.TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |', '| CORE.TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |\n| CORE.TOPIC.UNKNOWN.001 | static | `node tools/validate-standards.mjs` asserts the unknown row. |')), ['VERIFY_UNKNOWN_ID']);
+run('invalid verification method', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.use-the-default-location | static |', '| standards/rule/core-topic.use-the-default-location | manual |')), ['VERIFY_METHOD']);
+run('unknown verification row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |', '| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |\n| standards/rule/core-topic.unknown-verification | static | `node tools/validate-standards.mjs` asserts the unknown row. |')), ['VERIFY_UNKNOWN_ID']);
 
 run('contraction', (root) => write(root, 'docs/core/topic.md', topicPage.replace('This page defines one repository topic.', "This page isn't a second repository topic.")), ['PROSE_CONTRACTION']);
 run('and-or', (root) => write(root, 'docs/core/topic.md', topicPage.replace('one repository topic', 'one repository and/or consumer topic')), ['PROSE_AND_OR']);
@@ -447,7 +445,7 @@ run('empty extension dependencies', (root) => {
 }, ['EXTENSION_DEPENDENCIES']);
 run('missing writing load plan', (root) => write(root, 'standards.manifest.json', '{}'), ['MANIFEST_LOAD_PLAN']);
 
-run('invalid override IDs', (root) => write(root, 'templates/consumer/standards.project.json', JSON.stringify({ overrides: [{ provisionId: 'CORE.TOPIC.CONVENTION.001' }, { provisionId: 'CORE.UNKNOWN.OVERRIDE.001' }] })), ['OVERRIDE_CONVENTION_ID', 'OVERRIDE_UNKNOWN_ID']);
+run('invalid override IDs', (root) => write(root, 'templates/consumer/standards.project.json', JSON.stringify({ overrides: [{ provisionId: 'standards/rule/core-topic.unknown-override' }] })), ['OVERRIDE_UNKNOWN_ID']);
 
 // oneOf is enforced rather than allowed and skipped. Without the branch check a
 // value matching none of the shapes would validate cleanly.
@@ -495,49 +493,39 @@ run('provision restates its heading', (root) => write(root, 'docs/core/topic.md'
   '**Requirement:** Consumers MUST keep the topic bounded.',
 )), ['PROVISION_RESTATES_HEADING']);
 run('summary bullet repeats its provision', (root) => write(root, 'docs/core/topic.md', topicPage.replace(
-  '- Keep the topic bounded. (CORE.TOPIC.BOUNDARY.001)',
-  '- Keep the topic inside its declared boundary. (CORE.TOPIC.BOUNDARY.001)',
+  '- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)',
+  '- Keep the topic inside its declared boundary. (standards/rule/core-topic.keep-the-topic-bounded)',
 )), ['SUMMARY_RESTATES_REQUIREMENT']);
 run('evidence repeats its provision heading', (root) => write(root, 'docs/core/topic.md', topicPage.replace(
-  '| CORE.TOPIC.BOUNDARY.001 | inspection | Inspect the declared topic boundary. |',
-  '| CORE.TOPIC.BOUNDARY.001 | inspection | Pull request review asserts `keep the topic bounded` in the owning specification. |',
+  '| standards/rule/core-topic.keep-the-topic-bounded | inspection | Inspect the declared topic boundary. |',
+  '| standards/rule/core-topic.keep-the-topic-bounded | inspection | Pull request review asserts `keep the topic bounded` in the owning specification. |',
 )), ['VERIFY_TEMPLATED_EVIDENCE']);
 run('static evidence names no artifact', (root) => write(root, 'docs/core/topic.md', topicPage.replace(
-  '| CORE.TOPIC.CONVENTION.001 | static | `node tools/validate-standards.mjs` resolves the topic document location. |',
-  '| CORE.TOPIC.CONVENTION.001 | static | The reviewer resolves the topic document location. |',
+  '| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |',
+  '| standards/rule/core-topic.use-the-default-location | static | The reviewer resolves the topic document location. |',
 )), ['VERIFY_NO_ARTIFACT']);
-const fixtureTopics = ['ADOPT', 'BOUNDARY', 'COMPOSITION', 'CONVENTION'];
 const fixtureAreas = ['CORE', 'EXT', 'PROFILE'];
 
-function registryManifest(areas = fixtureAreas, topics = fixtureTopics) {
-  return JSON.stringify({ provisionRegistry: { areas, topics } });
+function registryManifest(areas = fixtureAreas) {
+  return JSON.stringify({ provisionRegistry: { areas } });
 }
 
-run('provision outside the scope its path derives', (root) => {
-  write(root, 'docs/core/topic.md', topicPage.replaceAll('CORE.TOPIC.', 'CORE.OTHER.'));
+run('provision that does not name its page', (root) => {
+  write(root, 'docs/core/topic.md', topicPage.replaceAll('standards/rule/core-topic.', 'standards/rule/core-other.'));
   write(root, 'standards.manifest.json', registryManifest());
 }, ['ID_SCOPE_MISMATCH']);
 run('provisions under an unregistered area directory', (root) => {
-  write(root, 'docs/other/topic.md', topicPage.replaceAll('CORE.TOPIC.', 'OTHER.TOPIC.'));
+  write(root, 'docs/other/topic.md', topicPage.replaceAll('standards/rule/core-topic.', 'standards/rule/other-topic.'));
   write(root, 'standards.manifest.json', registryManifest());
 }, ['ID_AREA_UNKNOWN']);
 run('page file name that is not one lowercase word', (root) => {
-  write(root, 'docs/core/two-words.md', topicPage.replaceAll('CORE.TOPIC.', 'CORE.TWOWORDS.'));
+  write(root, 'docs/core/two-words.md', topicPage.replaceAll('standards/rule/core-topic.', 'standards/rule/core-two-words.'));
   write(root, 'standards.manifest.json', registryManifest());
 }, ['ID_PAGE_FILENAME']);
-run('registered topic that no provision uses', (root) => {
-  write(root, 'standards.manifest.json', registryManifest(undefined, [...fixtureTopics, 'UNUSED']));
-}, ['ID_TOPIC_UNUSED']);
-run('topic outside the registered vocabulary', (root) => {
-  write(root, 'standards.manifest.json', registryManifest(undefined, ['ADOPT', 'COMPOSITION', 'CONVENTION']));
-}, ['ID_TOPIC_UNKNOWN']);
-run('topic that repeats its page name', (root) => {
-  write(root, 'docs/core/topic.md', topicPage.replaceAll('CORE.TOPIC.BOUNDARY.', 'CORE.TOPIC.TOPIC.'));
-  write(root, 'standards.manifest.json', registryManifest(undefined, [...fixtureTopics, 'TOPIC']));
-}, ['ID_TOPIC_REPEATS_PAGE']);
-run('one concept registered in two forms', (root) => {
-  write(root, 'standards.manifest.json', registryManifest(undefined, [...fixtureTopics, 'BOUNDARYS']));
-}, ['ID_TOPIC_DUPLICATE']);
+run('provision slug that does not match its heading', (root) => {
+  write(root, 'docs/core/topic.md', topicPage.replace('### Keep the topic bounded', '### Keep the topic bounded tightly'));
+  write(root, 'standards.manifest.json', registryManifest());
+}, ['ID_SLUG_MISMATCH']);
 run('heading with no body', (root) => write(root, 'docs/core/topic.md', topicPage.replace(
   '## Standards',
   ['## Concepts', '', '### Empty concept', '', '### Second concept', '', 'This concept has a body.', '', '## Standards'].join('\n'),

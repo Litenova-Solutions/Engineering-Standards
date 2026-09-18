@@ -54,16 +54,16 @@ The system contains one delivery approach and one operating model:
 ## Agent Summary {#agent-summary}
 
 
-- Agents stop and ask when a decision belongs to a person. (CORE.SYSTEM.AUTHORITY.001)
-- Approved specifications define the work, and each one situates its subject. (CORE.SYSTEM.SPECIFICATION.001, CORE.SYSTEM.SCENARIO.001)
-- Flows link their use cases rather than restate them, and every use case names what calls it. (CORE.SYSTEM.FLOW.001, CORE.SYSTEM.CONSUMERS.001, CORE.SYSTEM.CONSUMERS.002)
-- One module name is used across every layer. (CORE.SYSTEM.MODULE.001)
-- Module specifications map aggregates to state, invariants, and commands. (CORE.SYSTEM.AGGREGATE.001)
-- One use case is one Command or Query, with a status, one specification, and a mapping that resolves. (CORE.SYSTEM.USECASE.001, CORE.SYSTEM.USECASE.002, CORE.SYSTEM.COVERAGE.001, CORE.SYSTEM.MAPPING.001, CORE.SYSTEM.MAPPING.002)
-- Workflow specifications name state, triggers, recovery, and owner. (CORE.SYSTEM.WORKFLOW.001)
-- Every event reaction declares its delivery classification. (CORE.SYSTEM.REACTION.001)
-- Domain rule IDs encode their enforcement classification. (CORE.SYSTEM.RULES.001)
-- Specifications map each business state to a state record. (CORE.SYSTEM.STATE.001)
+- Agents stop and ask when a decision belongs to a person. (standards/rule/core-system.keep-decision-authority-with-accountable-people)
+- Approved specifications define the work, and each one situates its subject. (standards/rule/core-system.drive-work-from-approved-specifications, standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
+- Flows link their use cases rather than restate them, and every use case names what calls it. (standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow, standards/rule/core-system.name-what-calls-a-use-case, standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)
+- One module name is used across every layer. (standards/rule/core-system.group-language-and-use-cases-by-module)
+- Module specifications map aggregates to state, invariants, and commands. (standards/rule/core-system.make-aggregate-ownership-explicit)
+- One use case is one Command or Query, with a status, one specification, and a mapping that resolves. (standards/rule/core-system.deliver-one-complete-use-case, standards/rule/core-system.state-implemented-before-acceptance-evidence-exists, standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence, standards/rule/core-system.resolve-every-implementation-mapping-name, standards/rule/core-system.name-the-handler-an-implemented-use-case-owns)
+- Workflow specifications name state, triggers, recovery, and owner. (standards/rule/core-system.specify-autonomous-progress-as-a-workflow)
+- Every event reaction declares its delivery classification. (standards/rule/core-system.record-events-and-event-reactions-separately)
+- Domain rule IDs encode their enforcement classification. (standards/rule/core-system.classify-domain-rules-by-enforcement-boundary)
+- Specifications map each business state to a state record. (standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records)
 
 ## Concepts
 
@@ -231,37 +231,37 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 ## Standards
 
 
-### Keep decision authority with accountable people (CORE.SYSTEM.AUTHORITY.001)
+### Keep decision authority with accountable people (standards/rule/core-system.keep-decision-authority-with-accountable-people)
 
 **Requirement:** An agent MUST stop affected work and record the question when an unknown fact changes behavior, authorization, money movement, data handling, or recovery.
 
 **Rationale:** Decision owners approve outcomes, terms, policies, criteria, commitments, and risk. An agent contribution stays a proposal until an accountable person accepts it.
 
-### Drive work from approved specifications (CORE.SYSTEM.SPECIFICATION.001)
+### Drive work from approved specifications (standards/rule/core-system.drive-work-from-approved-specifications)
 
 **Requirement:** An agent MUST start behavior work from the approved product, flow, module, and use-case specifications rather than from a prompt alone.
 
 **Rationale:** A prompt, ticket, chat message, or code comment can initiate work. The owning specification records the approved behavior, and code does not silently replace it.
 
-### Connect one product outcome through an end-to-end flow (CORE.SYSTEM.FLOW.001)
+### Connect one product outcome through an end-to-end flow (standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow)
 
 **Requirement:** An end-to-end flow MUST link its use-case specifications without repeating their inputs, rules, failures, or acceptance criteria.
 
 **Rationale:** A flow can cross modules and include branches, waiting, failure, and recovery. Its tests use `E2E-{FLOW}-{NN}`, and a verified flow has at least one passing deployed test.
 
-### Group language and use cases by module (CORE.SYSTEM.MODULE.001)
+### Group language and use cases by module (standards/rule/core-system.group-language-and-use-cases-by-module)
 
 **Requirement:** A module name MUST be identical across documentation, Domain and Application folders, endpoint groups, frontend features, tests, and acceptance identifiers.
 
 **Rationale:** A module is a navigation and ownership boundary. It defines no transaction boundary and needs no runtime `Module` or `IModule` type.
 
-### Make aggregate ownership explicit (CORE.SYSTEM.AGGREGATE.001)
+### Make aggregate ownership explicit (standards/rule/core-system.make-aggregate-ownership-explicit)
 
 **Requirement:** A module specification MUST map each aggregate to the state it owns, its invariants, and the commands that change it.
 
 **Rationale:** A command normally changes one aggregate. Changing several atomically requires an approved record naming the invariant or domain policy that demands it.
 
-### Deliver one complete use case (CORE.SYSTEM.USECASE.001)
+### Deliver one complete use case (standards/rule/core-system.deliver-one-complete-use-case)
 
 **Requirement:** A use case MUST map to one top-level Command or Query and reach `verified` only when every layer and its evidence are complete.
 
@@ -269,7 +269,7 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 **Example:** A use case whose handler throws `NotImplementedException` stays `planned`.
 
-### State implemented before acceptance evidence exists (CORE.SYSTEM.USECASE.002)
+### State implemented before acceptance evidence exists (standards/rule/core-system.state-implemented-before-acceptance-evidence-exists)
 
 **Requirement:** A use case whose Domain behavior, coordination, persistence, and entry point all exist without proving acceptance criteria MUST carry `implemented`.
 
@@ -291,7 +291,7 @@ Acceptance ID:  AC-ORDERS-CANCEL-ORDER-01
 
 A use case reaches `verified` only after Domain behavior, coordination, persistence, entry points, evidence, and operating impact are complete. Placeholder work leaves the use case `planned`.
 
-### Keep specifications and use cases in one-to-one correspondence (CORE.SYSTEM.COVERAGE.001)
+### Keep specifications and use cases in one-to-one correspondence (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)
 
 **Requirement:** Every implemented use case MUST resolve to exactly one use-case specification that resolves back to it.
 
@@ -305,7 +305,7 @@ FAIL (2 problem(s)):
   - specification with no handler: docs/domain/modules/sales/vouchers/void-voucher.md
 ```
 
-### Name what calls a use case (CORE.SYSTEM.CONSUMERS.001)
+### Name what calls a use case (standards/rule/core-system.name-what-calls-a-use-case)
 
 **Requirement:** An `implemented` or `verified` use-case specification MUST name every declared surface that invokes it, or state `None` with the reason no surface does.
 
@@ -322,7 +322,7 @@ FAIL (2 problem(s)):
 | cli | `acme orders cancel` |
 ```
 
-### Match a page's declared use case back to that page (CORE.SYSTEM.CONSUMERS.002)
+### Match a page's declared use case back to that page (standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)
 
 **Requirement:** A use case a page specification declares MUST name that page among its consumers.
 
@@ -330,7 +330,7 @@ FAIL (2 problem(s)):
 
 **Example:** `docs/ui/web/cancel-order.md` declaring `"useCases": ["orders.cancel-order"]` obliges `docs/domain/modules/orders/orders/cancel-order.md` to link back to it.
 
-### Resolve every Implementation mapping name (CORE.SYSTEM.MAPPING.001)
+### Resolve every Implementation mapping name (standards/rule/core-system.resolve-every-implementation-mapping-name)
 
 **Requirement:** Every code name an Implementation mapping states MUST resolve to a declared type, a member of one, a project, or an existing path.
 
@@ -347,39 +347,39 @@ FAIL (2 problem(s)):
 
 `CancelOrderCommandHandler` resolves as a declared type, `Order.Cancel` as a member of one, `CancelOrderEndpoint` as a declared type, and `Acme.Integration.Tests` as a project. The route carries a path rather than an identifier. It is read as a route and resolved by the entry-point checks.
 
-### Name the handler an implemented use case owns (CORE.SYSTEM.MAPPING.002)
+### Name the handler an implemented use case owns (standards/rule/core-system.name-the-handler-an-implemented-use-case-owns)
 
 **Requirement:** The Implementation mapping of an `implemented` or `verified` use case MUST name the handler its operation folder declares.
 
-**Rationale:** `CORE.SYSTEM.COVERAGE.001` proves that a handler and a page exist for each other. It does not prove that the page names that handler. A page can satisfy parity while its mapping points at the handler of a use case somebody split in two. Naming the derived handler is what makes the mapping fail on the rename rather than after it.
+**Rationale:** `standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence` proves that a handler and a page exist for each other. It does not prove that the page names that handler. A page can satisfy parity while its mapping points at the handler of a use case somebody split in two. Naming the derived handler is what makes the mapping fail on the rename rather than after it.
 
 **Example:** `apps/api/src/Acme.Application/Orders/Orders/CancelOrder/CancelOrderCommandHandler.cs` obliges `docs/domain/modules/orders/orders/cancel-order.md` to state `CancelOrderCommandHandler` in its Implementation mapping.
 
-### Specify autonomous progress as a workflow (CORE.SYSTEM.WORKFLOW.001)
+### Specify autonomous progress as a workflow (standards/rule/core-system.specify-autonomous-progress-as-a-workflow)
 
 **Requirement:** A workflow specification MUST name its owner, participating modules, starting fact, completion and failure conditions, durable state, commands, awaited events, retries, and operator actions.
 
 **Rationale:** System-controlled progress crossing a transaction or time boundary needs each of these. Branches inside one atomic command stay in the use-case handler.
 
-### Record events and event reactions separately (CORE.SYSTEM.REACTION.001)
+### Record events and event reactions separately (standards/rule/core-system.record-events-and-event-reactions-separately)
 
 **Requirement:** An event reaction MUST declare one delivery classification of `atomic`, `durable`, `rebuildable`, or `best-effort-optional`.
 
 **Rationale:** A required projection refresh is never `best-effort-optional`. Domain events are internal facts, and integration events are versioned contracts leaving the context.
 
-### Classify domain rules by enforcement boundary (CORE.SYSTEM.RULES.001)
+### Classify domain rules by enforcement boundary (standards/rule/core-system.classify-domain-rules-by-enforcement-boundary)
 
 **Requirement:** A domain rule ID MUST carry the prefix of its enforcement classification, keeping that number for the life of the rule.
 
 **Rationale:** The classifications are aggregate invariant, domain policy, validation rule, authorization policy, persistence constraint, and workflow rule. A failure code is not a domain rule ID.
 
-### Model every aggregate lifecycle with state records (CORE.SYSTEM.STATE.001)
+### Model every aggregate lifecycle with state records (standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records)
 
 **Requirement:** An aggregate specification MUST map every business state to a sealed state record under one abstract `{Aggregate}State` base.
 
 **Rationale:** This holds from the first implementation, including an aggregate with one current state. An enum, status string, boolean flag, or computed discriminator cannot carry state-specific facts.
 
-### State one occasion for every behavior specification (CORE.SYSTEM.SCENARIO.001)
+### State one occasion for every behavior specification (standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
 
 **Requirement:** A module, aggregate, use-case, domain-policy, or end-to-end-flow specification MUST carry a `Scenario` section stating one concrete occasion for its subject.
 
@@ -387,7 +387,7 @@ FAIL (2 problem(s)):
 
 **Example:** A door specification states the hour, the queue, and the scanner that lost signal before it states its failure codes.
 
-### Keep a scenario informative (CORE.SYSTEM.SCENARIO.002)
+### Keep a scenario informative (standards/rule/core-system.keep-a-scenario-informative)
 
 **Requirement:** A `Scenario` section MUST NOT contain a domain rule, acceptance, or end-to-end identifier.
 
@@ -395,7 +395,7 @@ FAIL (2 problem(s)):
 
 **Example:** A scenario says the buyer is refused because the last place went to somebody else, and the rules table says `INV-INVENTORY-01`.
 
-### Derive every scenario from one reference cast (CORE.SYSTEM.SCENARIO.003)
+### Derive every scenario from one reference cast (standards/rule/core-system.derive-every-scenario-from-one-reference-cast)
 
 **Requirement:** A consumer MUST record one `scenario-cast` specification and draw the people, place, dates, and amounts of every `Scenario` section from it.
 
@@ -403,25 +403,25 @@ FAIL (2 problem(s)):
 
 **Example:** The buyer who places the order in one specification is the person at the gate in another.
 
-### Declare Specification Metadata (CORE.SYSTEM.METADATA.001)
+### Declare Specification Metadata (standards/rule/core-system.declare-specification-metadata)
 
 **Requirement:** A structured specification MUST open with one JSON metadata block declaring at least `kind`, `id`, `specStatus`, `owner`, and `lastReviewed`.
 
 **Rationale:** A behavior specification also declares `implementationStatus`. An index, decision, evidence, limits, or policy record declares none, because it claims no implemented behavior.
 
-### Select extensions before applying them (CORE.SYSTEM.EXTENSIONS.001)
+### Select extensions before applying them (standards/rule/core-system.select-extensions-before-applying-them)
 
 **Requirement:** A local extension MUST appear in `applicableExtensions` only on a specification kind that its manifest entry allows.
 
 **Rationale:** `selectedExtensions` in `standards.project.json` is the project allow-list, and selection alone permits dependencies and structure.
 
-### Exclude a project-scoped extension from local metadata (CORE.SYSTEM.EXTENSIONS.002)
+### Exclude a project-scoped extension from local metadata (standards/rule/core-system.exclude-a-project-scoped-extension-from-local-metadata)
 
 **Requirement:** A project-scoped extension MUST NOT appear in the `applicableExtensions` list of any specification.
 
 **Rationale:** Selection in `standards.project.json` already applies it everywhere, so a local listing implies a scope it does not have.
 
-### Give acceptance criteria stable ownership (CORE.SYSTEM.ACCEPTANCE.001)
+### Give acceptance criteria stable ownership (standards/rule/core-system.give-acceptance-criteria-stable-ownership)
 
 **Requirement:** An acceptance criterion identifier MUST use `AC-{MODULE}-{USE-CASE}-{NN}` with segments matching its owning use-case identifier.
 
@@ -435,7 +435,7 @@ FAIL (2 problem(s)):
 
 Acceptance tests reference the ID without redefining its text. A static documentation check proves that the reference exists. A passing test provides execution evidence.
 
-### Update specifications with behavior (CORE.SYSTEM.SYNC.001)
+### Update specifications with behavior (standards/rule/core-system.update-specifications-with-behavior)
 
 **Requirement:** An observable behavior change MUST update its use-case specification, implementation, tests, generated contracts, affected flow, workflow, and operating records together.
 
@@ -444,7 +444,7 @@ Acceptance tests reference the ID without redefining its text. A static document
 ## Conventions
 
 
-### Use this consumer documentation layout (CORE.SYSTEM.CONVENTION.001)
+### Use this consumer documentation layout (standards/rule/core-system.use-this-consumer-documentation-layout)
 
 **Default:** Use the consumer documentation layout in this section, creating a directory only when its first real artifact exists.
 
@@ -496,15 +496,15 @@ docs/
 
 The example creates an optional directory only when its first real artifact is added. The example does not create empty directories or placeholder records during inception.
 
-### Group module use-case files by aggregate root (CORE.SYSTEM.CONVENTION.002)
+### Group module use-case files by aggregate root (standards/rule/core-system.group-module-use-case-files-by-aggregate-root)
 
 **Default:** Group module use-case files under a plural kebab-case aggregate subdirectory, each holding one `kind: aggregate` README, including a module with one aggregate root.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A module README carries `kind: module`, and one file cannot carry two kinds. A flat module therefore has nowhere to put the aggregate specification that `CORE.SYSTEM.STATE.001` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `{module}.{name}`, so only the directory changes.
+**Rationale:** A module README carries `kind: module`, and one file cannot carry two kinds. A flat module therefore has nowhere to put the aggregate specification that `standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `{module}.{name}`, so only the directory changes.
 
-### Keep operational and security references under operations (CORE.SYSTEM.CONVENTION.003)
+### Keep operational and security references under operations (standards/rule/core-system.keep-operational-and-security-references-under-operations)
 
 **Default:** Keep operating and security reference prose under `docs/operations/`, with `limits.md` as its only structured record.
 
@@ -512,7 +512,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Enforceable security and privacy rules still belong to their owning use-case authorization sections and domain policies.
 
-### Use established technical terms (CORE.SYSTEM.CONVENTION.004)
+### Use established technical terms (standards/rule/core-system.use-established-technical-terms)
 
 **Default:** Use aggregate, invariant, Command, Query, repository, projection, outbox, idempotency, transaction, and orchestrator with their accepted technical meanings.
 
@@ -520,7 +520,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Replacing a precise term with a softer synonym hides the established pattern. Explain the term and give an example instead.
 
-### Use ordinary capitalization in prose (CORE.SYSTEM.CONVENTION.005)
+### Use ordinary capitalization in prose (standards/rule/core-system.use-ordinary-capitalization-in-prose)
 
 **Default:** Write module, use case, workflow, aggregate, invariant, event, and policy as ordinary nouns in prose.
 
@@ -528,7 +528,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Exact schema kinds and code types keep their declared capitalization, so the distinction stays meaningful.
 
-### Keep specifications readable without tooling (CORE.SYSTEM.CONVENTION.006)
+### Keep specifications readable without tooling (standards/rule/core-system.keep-specifications-readable-without-tooling)
 
 **Default:** Use JSON only for the metadata block, and write outcomes, rules, failures, examples, and mappings in Markdown.
 
@@ -536,7 +536,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** A specification that needs tooling to read stops being reviewable by the person who owns its decisions.
 
-### Bound a scenario to one paragraph (CORE.SYSTEM.CONVENTION.007)
+### Bound a scenario to one paragraph (standards/rule/core-system.bound-a-scenario-to-one-paragraph)
 
 **Default:** Keep a `Scenario` section within 120 words.
 
@@ -546,7 +546,7 @@ The example creates an optional directory only when its first real artifact is a
 
 ## Reference example
 
-This informative example demonstrates `CORE.SYSTEM.FLOW.001`, `CORE.SYSTEM.WORKFLOW.001`, and `CORE.SYSTEM.REACTION.001`.
+This informative example demonstrates `standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow`, `standards/rule/core-system.specify-autonomous-progress-as-a-workflow`, and `standards/rule/core-system.record-events-and-event-reactions-separately`.
 
 The `event-sales` end-to-end flow links `inventory.reserve-tickets`, `orders.create-guest-order`, `payments.start-payment`, and `tickets.issue-ticket`. The `payment-fulfillment` workflow begins with provider confirmation, issues one inventory confirmation Command, awaits its event, and then issues the ticket Command. Each Command owns one transaction. `E2E-EVENT-SALES-01` verifies the connected outcome through the deployed API.
 
@@ -559,34 +559,34 @@ The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` chang
 
 | ID | Method | Evidence |
 |:---|:---|:---|
-| CORE.SYSTEM.AUTHORITY.001 | inspection | The change report names the recorded question and the accountable person for each unresolved decision. |
-| CORE.SYSTEM.SPECIFICATION.001 | inspection | The change report cites the approved specification that authorized each behavior change. |
-| CORE.SYSTEM.FLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each flow use case to its file and rejects a duplicate end-to-end identifier. |
-| CORE.SYSTEM.MODULE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each module reference to one declared module directory. |
-| CORE.SYSTEM.AGGREGATE.001 | inspection | The module specification carries an aggregate table naming owned state, invariant identifiers, and commands. |
-| CORE.SYSTEM.USECASE.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
-| CORE.SYSTEM.USECASE.002 | inspection | Each `implemented` use case resolves to existing Domain, Application, persistence, and entry-point code with no acceptance test. |
-| CORE.SYSTEM.CONSUMERS.001 | static | `node standards/tools/validate-consumer.mjs` reports an implemented use case with no Consumers section, an unexplained `None`, or an undeclared surface. |
-| CORE.SYSTEM.CONSUMERS.002 | static | `node standards/tools/validate-consumer.mjs` reports each page whose declared use case does not link back to it. |
-| CORE.SYSTEM.COVERAGE.001 | static | `node standards/tools/validate-parity.mjs` reports no handler without a specification and no specification without a handler. |
-| CORE.SYSTEM.MAPPING.001 | static | `node standards/tools/validate-parity.mjs` reports each Implementation mapping name that resolves to no declaration, member, project, or path. |
-| CORE.SYSTEM.MAPPING.002 | static | `node standards/tools/validate-parity.mjs` reports each implemented use case whose Implementation mapping omits its derived handler. |
-| CORE.SYSTEM.WORKFLOW.001 | inspection | `node standards/tools/validate-consumer.mjs` resolves each workflow module reference and the template requires the named sections. |
-| CORE.SYSTEM.REACTION.001 | inspection | The owning specification records one delivery classification for each event reaction. |
-| CORE.SYSTEM.RULES.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a domain rule ID whose prefix does not match its declared classification. |
-| CORE.SYSTEM.STATE.001 | inspection | The aggregate specification carries a state mapping table, and `ArchitectureTests` asserts the code matches it. |
-| CORE.SYSTEM.SCENARIO.001 | static | `node standards/tools/validate-consumer.mjs` fails a module, aggregate, use-case, domain-policy, or end-to-end-flow page carrying no `Scenario` section. |
-| CORE.SYSTEM.SCENARIO.002 | static | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section containing an `INV-`, `POL-`, `VAL-`, `AC-`, or `E2E-` identifier. |
-| CORE.SYSTEM.SCENARIO.003 | static | `node standards/tools/validate-consumer.mjs` fails a documentation set holding no `scenario-cast` specification or more than one. |
-| CORE.SYSTEM.METADATA.001 | inspection | `node standards/tools/validate-consumer.mjs` validates each metadata block against `schemas/specification-metadata.schema.json`. |
-| CORE.SYSTEM.EXTENSIONS.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension in local metadata and a local extension on an excluded kind. |
-| CORE.SYSTEM.EXTENSIONS.002 | static | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension listed in local metadata. |
-| CORE.SYSTEM.ACCEPTANCE.001 | inspection | `node standards/tools/validate-consumer.mjs` rejects a duplicate acceptance identifier and one whose segments miss its use case. |
-| CORE.SYSTEM.SYNC.001 | inspection | The change report links each changed implementation surface to the records updated in the same change. |
-| CORE.SYSTEM.CONVENTION.001 | inspection | Documentation tree review compares the consumer layout against this section, or records a named local replacement. |
-| CORE.SYSTEM.CONVENTION.002 | inspection | `node standards/tools/validate-consumer.mjs` resolves each use case in its module or one aggregate subdirectory. |
-| CORE.SYSTEM.CONVENTION.003 | inspection | Documentation review confirms operating and security prose resolves under `docs/operations/`. |
-| CORE.SYSTEM.CONVENTION.004 | inspection | Terminology review compares each new term against the glossary and this list. |
-| CORE.SYSTEM.CONVENTION.005 | inspection | Prose review confirms ordinary nouns outside sentence starts, titles, and exact identifiers. |
-| CORE.SYSTEM.CONVENTION.006 | inspection | Specification review confirms JSON appears only in the opening metadata block. |
-| CORE.SYSTEM.CONVENTION.007 | static | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |
+| standards/rule/core-system.keep-decision-authority-with-accountable-people | inspection | The change report names the recorded question and the accountable person for each unresolved decision. |
+| standards/rule/core-system.drive-work-from-approved-specifications | inspection | The change report cites the approved specification that authorized each behavior change. |
+| standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow | inspection | `node standards/tools/validate-consumer.mjs` resolves each flow use case to its file and rejects a duplicate end-to-end identifier. |
+| standards/rule/core-system.group-language-and-use-cases-by-module | inspection | `node standards/tools/validate-consumer.mjs` resolves each module reference to one declared module directory. |
+| standards/rule/core-system.make-aggregate-ownership-explicit | inspection | The module specification carries an aggregate table naming owned state, invariant identifiers, and commands. |
+| standards/rule/core-system.deliver-one-complete-use-case | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
+| standards/rule/core-system.state-implemented-before-acceptance-evidence-exists | inspection | Each `implemented` use case resolves to existing Domain, Application, persistence, and entry-point code with no acceptance test. |
+| standards/rule/core-system.name-what-calls-a-use-case | static | `node standards/tools/validate-consumer.mjs` reports an implemented use case with no Consumers section, an unexplained `None`, or an undeclared surface. |
+| standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page | static | `node standards/tools/validate-consumer.mjs` reports each page whose declared use case does not link back to it. |
+| standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence | static | `node standards/tools/validate-parity.mjs` reports no handler without a specification and no specification without a handler. |
+| standards/rule/core-system.resolve-every-implementation-mapping-name | static | `node standards/tools/validate-parity.mjs` reports each Implementation mapping name that resolves to no declaration, member, project, or path. |
+| standards/rule/core-system.name-the-handler-an-implemented-use-case-owns | static | `node standards/tools/validate-parity.mjs` reports each implemented use case whose Implementation mapping omits its derived handler. |
+| standards/rule/core-system.specify-autonomous-progress-as-a-workflow | inspection | `node standards/tools/validate-consumer.mjs` resolves each workflow module reference and the template requires the named sections. |
+| standards/rule/core-system.record-events-and-event-reactions-separately | inspection | The owning specification records one delivery classification for each event reaction. |
+| standards/rule/core-system.classify-domain-rules-by-enforcement-boundary | inspection | `node standards/tools/validate-consumer.mjs` rejects a domain rule ID whose prefix does not match its declared classification. |
+| standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records | inspection | The aggregate specification carries a state mapping table, and `ArchitectureTests` asserts the code matches it. |
+| standards/rule/core-system.state-one-occasion-for-every-behavior-specification | static | `node standards/tools/validate-consumer.mjs` fails a module, aggregate, use-case, domain-policy, or end-to-end-flow page carrying no `Scenario` section. |
+| standards/rule/core-system.keep-a-scenario-informative | static | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section containing an `INV-`, `POL-`, `VAL-`, `AC-`, or `E2E-` identifier. |
+| standards/rule/core-system.derive-every-scenario-from-one-reference-cast | static | `node standards/tools/validate-consumer.mjs` fails a documentation set holding no `scenario-cast` specification or more than one. |
+| standards/rule/core-system.declare-specification-metadata | inspection | `node standards/tools/validate-consumer.mjs` validates each metadata block against `schemas/specification-metadata.schema.json`. |
+| standards/rule/core-system.select-extensions-before-applying-them | inspection | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension in local metadata and a local extension on an excluded kind. |
+| standards/rule/core-system.exclude-a-project-scoped-extension-from-local-metadata | static | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension listed in local metadata. |
+| standards/rule/core-system.give-acceptance-criteria-stable-ownership | inspection | `node standards/tools/validate-consumer.mjs` rejects a duplicate acceptance identifier and one whose segments miss its use case. |
+| standards/rule/core-system.update-specifications-with-behavior | inspection | The change report links each changed implementation surface to the records updated in the same change. |
+| standards/rule/core-system.use-this-consumer-documentation-layout | inspection | Documentation tree review compares the consumer layout against this section, or records a named local replacement. |
+| standards/rule/core-system.group-module-use-case-files-by-aggregate-root | inspection | `node standards/tools/validate-consumer.mjs` resolves each use case in its module or one aggregate subdirectory. |
+| standards/rule/core-system.keep-operational-and-security-references-under-operations | inspection | Documentation review confirms operating and security prose resolves under `docs/operations/`. |
+| standards/rule/core-system.use-established-technical-terms | inspection | Terminology review compares each new term against the glossary and this list. |
+| standards/rule/core-system.use-ordinary-capitalization-in-prose | inspection | Prose review confirms ordinary nouns outside sentence starts, titles, and exact identifiers. |
+| standards/rule/core-system.keep-specifications-readable-without-tooling | inspection | Specification review confirms JSON appears only in the opening metadata block. |
+| standards/rule/core-system.bound-a-scenario-to-one-paragraph | static | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |

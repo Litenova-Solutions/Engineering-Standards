@@ -6,7 +6,7 @@
 // drift apart without any check noticing: a handler nobody specified reads as a
 // reviewed feature and is not one, and a specification nobody implemented states
 // a plan in the present tense. This validator compares both populations in both
-// directions. (CORE.SYSTEM.COVERAGE.001)
+// directions. (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)
 //
 // The validator is local and deterministic. It reads the consumer configuration,
 // the Application project tree, and the
@@ -109,7 +109,7 @@ const foreignNames = new Set(Array.isArray(parity.foreignNames) ? parity.foreign
 // A consumer with no backend omits the solution path and records the decision
 // that names the baseline rules left without a surface. Parity has nothing to
 // compare then, so the run states the skipped scope rather than passing
-// silently. (CORE.SCOPE.BACKEND.001)
+// silently. (standards/rule/core-scope.declare-a-consumer-that-has-no-backend)
 if (!project.paths?.apiSolution) {
   if (jsonOutput) {
     console.log(JSON.stringify({ tool: 'validate-parity', consumer: root, ok: true, activated: false, reason: "the project declares no 'paths.apiSolution'", findings: [] }, null, 2));
@@ -139,7 +139,7 @@ function directories(from, depth, result = []) {
 // unrelated formats, and neither one records which project holds the use cases.
 // The directory that actually holds the handlers is the thing being scanned, so
 // locating it directly also survives a project entry the solution never updated.
-// (BACKEND.ARCHITECTURE.MODULE.001)
+// (standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case)
 function locateApplicationProject() {
   if (parity.applicationProject) {
     const configured = path.resolve(root, parity.applicationProject);
@@ -227,7 +227,7 @@ function walk(directory, predicate, result = []) {
 
 // A reaction runs after a fact another use case already recorded. It is recorded
 // separately from the use case that raised the event, so it carries no use-case
-// specification of its own and is not counted here. (CORE.SYSTEM.REACTION.001)
+// specification of its own and is not counted here. (standards/rule/core-system.record-events-and-event-reactions-separately)
 const isReaction = (name) => /Reaction(Handler)?\.cs$/.test(name);
 
 const handlerFiles = walk(applicationProject, (file) => {
@@ -240,7 +240,7 @@ const handlerFiles = walk(applicationProject, (file) => {
 // specification id is '<module>.<use-case>': the aggregate segment groups
 // operations in code but does not appear in the id, because a use case that
 // reads across roots belongs to a module rather than to one root.
-// (BACKEND.APPLICATION.STRUCTURE.001, BACKEND.APPLICATION.CONVENTION.001)
+// (standards/rule/backend-application.organize-application-by-operation, standards/rule/backend-application.use-this-operation-layout)
 const derived = new Map(); // id -> [handler file]
 for (const file of handlerFiles) {
   const segments = slash(path.relative(applicationProject, file)).split('/');
@@ -261,14 +261,14 @@ for (const file of handlerFiles) {
 // One specification cannot resolve back to two handlers, so two operation
 // folders that reduce to the same id are reported rather than counted as
 // covered. This happens when two aggregates in one module name an operation
-// identically. (CORE.SYSTEM.COVERAGE.001)
+// identically. (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)
 for (const [id, files] of derived) {
   if (files.length > 1) finding(`duplicate specification id '${id}' derived from: ${files.map(relativeToRoot).join(', ')}`);
 }
 
 // ---- collect use-case specifications ---------------------------------------
 // Specification Metadata is a '---' delimited JSON block, per
-// CORE.AUTHORING.METADATA.002. A page whose block does not parse is reported by
+// standards/rule/core-authoring.declare-structured-specification-metadata. A page whose block does not parse is reported by
 // the consumer validator, so it is skipped here rather than reported twice.
 function metadata(file) {
   const raw = fs.readFileSync(file, 'utf8');
@@ -299,7 +299,7 @@ for (const [id, files] of derived) {
 // Parity binds an implemented use case. A 'planned' specification describes work
 // that has not been built, so it is expected to have no handler and reporting it
 // would turn correct authoring into a finding.
-// (CORE.SYSTEM.COVERAGE.001, CORE.SYSTEM.USECASE.002)
+// (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence, standards/rule/core-system.state-implemented-before-acceptance-evidence-exists)
 let planned = 0;
 for (const [id, spec] of specifications) {
   if (spec.implementationStatus === 'planned') {
@@ -316,7 +316,7 @@ for (const [id, spec] of specifications) {
 // page that reads correctly and names an artifact that no longer exists. This
 // pass reads every code span in the mapping table and resolves it against the
 // declarations, projects, and paths the repository actually holds.
-// (CORE.SYSTEM.MAPPING.001, CORE.SYSTEM.MAPPING.002)
+// (standards/rule/core-system.resolve-every-implementation-mapping-name, standards/rule/core-system.name-the-handler-an-implemented-use-case-owns)
 
 // The scan reads text and never loads a compiler, so a declaration is what the
 // declaring keyword introduces rather than what a binder resolves. That is the

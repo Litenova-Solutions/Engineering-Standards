@@ -21,7 +21,7 @@
   "properties": {
     "$schema": { "type": "string" },
     "schemaVersion": {
-      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See CORE.AUTHORING.SNAPSHOT.003 and CORE.AUTHORING.SNAPSHOT.004.",
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See standards/rule/core-authoring.publish-each-release-as-a-complete-contract and standards/rule/core-authoring.exclude-cross-release-compatibility-work.",
       "const": 1
     },
     "page": { "$ref": "#/$defs/pageIdentifier" },
