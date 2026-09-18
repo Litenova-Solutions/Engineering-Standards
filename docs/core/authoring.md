@@ -6,7 +6,7 @@ The standards use one page grammar and one controlled technical prose profile. T
 
 ## Agent Summary {#agent-summary}
 
-- Use literal controlled prose, repository terminology, and a recorded vocabulary. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003, CORE.AUTHORING.VOICE.002, CORE.AUTHORING.TERM.001, CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.TERM.004)
+- Use literal controlled prose, repository terminology, and a recorded vocabulary. (CORE.AUTHORING.PROSE.001, CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003, CORE.AUTHORING.VOICE.002, CORE.AUTHORING.TERM.001, CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.TERM.004, CORE.AUTHORING.TERM.005)
 - Write one testable obligation in each Standards provision. (CORE.AUTHORING.NORMATIVE.002, CORE.AUTHORING.REQUIREMENT.001)
 - Name the declared page scope and a registered topic in each ID. (CORE.AUTHORING.IDENTIFIER.001, CORE.AUTHORING.IDENTIFIER.002, CORE.AUTHORING.IDENTIFIER.003)
 - Give each actionable default a distinct convention ID. (CORE.AUTHORING.DEFAULTS.001)
@@ -322,6 +322,19 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 { "paths": { "languageScan": ["apps/*/lib/i18n/dictionaries/*.json", "apps/api/tests/**/*.feature"] } }
 ```
 
+### Exclude the compound that names another concept (CORE.AUTHORING.TERM.005)
+
+**Requirement:** A language record MUST list, in `except`, every compound in which a rejected word names a concept other than the one the rejection is about.
+
+**Rationale:** A rejection matches a word, and a word belongs to more than one term. One consumer rejected `reservation` across its inventory module, where the term is `checkout hold`. The module also documents a `uniqueness reservation`, which is a row in a registry and has no lifetime at all. Five pages reported a breach no edit could remove. Renaming the compound in one module would give one concept two names across the repository. That is the shape of a check somebody turns off.
+
+**Example:** The exemption covers the compound and nothing else, so the bare word stays rejected in the same sentence.
+
+```json
+{ "term": "checkout hold", "rejected": ["reservation"], "scope": "^domain/modules/inventory/",
+  "except": ["uniqueness reservation"], "reason": "one word for two rules with different lifetimes" }
+```
+
 ### Use controlled capitalization (CORE.AUTHORING.CASE.001)
 
 **Requirement:** Authored prose MUST use Title Case for page titles and sentence case for provision headings and body text.
@@ -602,6 +615,7 @@ The identifier above is a grammar placeholder. A real page uses the scope that t
 | CORE.AUTHORING.TERM.002 | static | `node tools/validate-consumer.mjs` validates the language record and names the checks a missing record switches off. |
 | CORE.AUTHORING.TERM.003 | static | `node tools/validate-consumer.mjs` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
 | CORE.AUTHORING.TERM.004 | static | `node tools/validate-consumer.mjs` reports the non-Markdown surfaces scanned, and fails a pattern matching no file. |
+| CORE.AUTHORING.TERM.005 | static | `node tools/validate-consumer.mjs` reports no `LANGUAGE_REJECTED_SYNONYM` diagnostic for a word inside a compound the record exempts. |
 | CORE.AUTHORING.CASE.001 | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
 | CORE.AUTHORING.QUALITY.001 | inspection | The pull request checklist records all four quality-test results. |
 | CORE.AUTHORING.PAGE.001 | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |

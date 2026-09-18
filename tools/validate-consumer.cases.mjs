@@ -595,6 +595,38 @@ console.log('\nProject language (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.00
     { absent: 'LANGUAGE_REJECTED_SYNONYM' },
   );
 
+  // A rejected word is exempt inside a compound naming another concept. The
+  // record has to say so, because the scan cannot tell one use from the other.
+  const exempting = {
+    ...record,
+    terms: [{
+      term: 'holder',
+      rejected: ['seller'],
+      scope: '^domain/modules/orders/',
+      except: ['seller of record'],
+      reason: 'seller names the organizer',
+    }],
+  };
+  writeFile(languageFile, `${JSON.stringify(exempting, null, 2)}\n`);
+
+  bodyCase(
+    'rejected synonym inside an exempt compound',
+    'docs/domain/modules/orders/README.md',
+    (raw) => `${raw}\nThe seller of record keeps the ticket.\n`,
+    { absent: 'LANGUAGE_REJECTED_SYNONYM' },
+  );
+
+  // The exemption covers the compound and nothing else, so the bare word in the
+  // same scope is still a breach.
+  bodyCase(
+    'rejected synonym beside an exempt compound',
+    'docs/domain/modules/orders/README.md',
+    (raw) => `${raw}\nThe seller of record keeps it and the seller does not.\n`,
+    'LANGUAGE_REJECTED_SYNONYM',
+  );
+
+  writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
+
   // A scope that does not compile would reject nothing while reporting a pass,
   // which is the fail-open shape the validator refuses elsewhere.
   writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'holder', rejected: ['seller'], scope: '^domain/[' }] }, null, 2)}\n`);
@@ -653,6 +685,18 @@ console.log('\nVocabulary over non-Markdown surfaces (CORE.AUTHORING.TERM.004)')
   writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'holder', rejected: ['seller'], scope: '^docs/' }] }, null, 2)}\n`);
   report('rejected synonym outside its scope in a surface', { absent: 'LANGUAGE_REJECTED_SYNONYM' }, run());
   writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
+
+  // The exemption reaches a surface too, and reaches the compound inside a name,
+  // because the scan opens an identifier out before matching.
+  writeFile(languageFile, `${JSON.stringify({
+    ...record,
+    terms: [{ term: 'holder', rejected: ['seller'], scope: '^apps/', except: ['seller of record'] }],
+  }, null, 2)}\n`);
+  writeFile('apps/admin/copy.json', '{\n  "sellerOfRecordName": "Harbour Events"\n}\n');
+  report('exempt compound inside an identifier in a surface', { absent: 'LANGUAGE_REJECTED_SYNONYM' }, run());
+
+  writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The seller keeps the ticket."\n}\n');
 
   // A pattern matching nothing switches a surface off in silence.
   declareScan(['apps/admin/*.yaml']);

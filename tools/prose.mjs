@@ -305,17 +305,48 @@ export function compileLanguage(language) {
   }));
   const rejected = [];
   for (const entry of language.terms ?? []) {
+    // Compiled once per term rather than once per synonym, because every
+    // synonym of one term is exempt in the same compounds.
+    const except = (entry.except ?? []).map(termPattern);
+
     for (const synonym of entry.rejected ?? []) {
       rejected.push({
         term: entry.term,
         synonym,
         scope: entry.scope ? new RegExp(entry.scope) : null,
         reason: entry.reason,
+        except,
         pattern: termPattern(synonym),
       });
     }
   }
   return { mannered, rejected };
+}
+
+// Locates every compound in which a rejected word names a different concept.
+// `uniqueness reservation` is a row in a registry and a `reservation` is a
+// checkout hold, so the word inside the compound is not the word the rejection
+// is about. Returns the span each compound occupies, which is what the caller
+// tests a match against.
+function exemptSpans(text, patterns) {
+  const spans = [];
+
+  for (const pattern of patterns) {
+    pattern.lastIndex = 0;
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      spans.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  return spans;
+}
+
+// True when a match sits wholly inside one exempt compound. Containment rather
+// than overlap, because a compound that merely touches the match is a different
+// phrase that happens to end where this one starts.
+function insideExempt(spans, start, end) {
+  return spans.some(([from, to]) => start >= from && end <= to);
 }
 
 // Reports every mannered term and every rejected synonym inside its scope.
@@ -336,9 +367,12 @@ export function checkLanguage(relative, raw, compiled, add) {
 
   for (const entry of compiled.rejected) {
     if (entry.scope && !entry.scope.test(relative)) continue;
+    const exempt = entry.except.length > 0 ? exemptSpans(prose, entry.except) : null;
     entry.pattern.lastIndex = 0;
     let match;
     while ((match = entry.pattern.exec(prose)) !== null) {
+      if (exempt && insideExempt(exempt, match.index, match.index + match[0].length)) continue;
+
       const because = entry.reason ? `; ${entry.reason}` : '';
       add(relative, lineOf(prose, match.index), 'LANGUAGE_REJECTED_SYNONYM',
         `'${match[0]}' is a rejected synonym here; the term is '${entry.term}'${because}`);
@@ -386,9 +420,12 @@ export function checkLanguageInSource(relative, raw, compiled, add) {
       }
       for (const entry of compiled.rejected) {
         if (entry.scope && !entry.scope.test(relative)) continue;
+        const exempt = entry.except.length > 0 ? exemptSpans(text, entry.except) : null;
         entry.pattern.lastIndex = 0;
         let match;
         while ((match = entry.pattern.exec(text)) !== null) {
+          if (exempt && insideExempt(exempt, match.index, match.index + match[0].length)) continue;
+
           const key = `r:${entry.term}:${match[0].toLowerCase()}`;
           if (seen.has(key)) continue;
           seen.add(key);
