@@ -28,6 +28,9 @@ const CONTRACTIONS = /\b(?:ain't|aren't|can't|couldn't|didn't|doesn't|don't|hadn
 
 const AND_OR = /\band\/or\b/i;
 
+// The page's metadata block: three dashes, one JSON object, three dashes.
+const METADATA_BLOCK = /^---\r?\n\{[\s\S]*?\r?\n\}\r?\n---\r?\n/;
+
 export const PROSE_LIMITS = Object.freeze({
   sentence: 25,
   listSentence: 20,
@@ -53,6 +56,14 @@ export const LANGUAGE_DIAGNOSTIC_CODES = Object.freeze([
 export { VAGUE_TERMS, CONTRACTIONS, AND_OR };
 
 // ---- text reduction --------------------------------------------------------
+
+// A metadata block is machine content. Its field names and its owner string are
+// measured as a sentence otherwise, so every page carrying one reports a problem
+// nobody can edit away. The block is blanked rather than dropped, which keeps
+// every reported line number equal to the line number in the file.
+export function blankMetadata(raw) {
+  return raw.replace(METADATA_BLOCK, (match) => match.replace(/[^\n]/g, ' '));
+}
 
 // A fenced block is literal content, so the measures do not reach inside one.
 // The line is replaced rather than dropped, which keeps every reported line
@@ -111,7 +122,7 @@ export function sentences(value) {
 // Walks a Markdown page and reports every controlled-prose measure it breaks.
 // `add(relative, line, code, message)` receives each finding.
 export function checkProseMeasures(relative, raw, add) {
-  const lines = stripFences(raw.split(/\r?\n/));
+  const lines = stripFences(blankMetadata(raw).split(/\r?\n/));
   let paragraph = [];
   let list = [];
   // The exempt columns are a property of one table, so the set resets when a
@@ -273,8 +284,7 @@ function blankRejectionColumns(text) {
 // scan starts after the block. A fenced block is code, and a link destination
 // is a path rather than a sentence.
 function scannableProse(raw) {
-  return blankRejectionColumns(raw
-    .replace(/^---\r?\n\{[\s\S]*?\r?\n\}\r?\n---\r?\n/, (match) => match.replace(/[^\n]/g, ' '))
+  return blankRejectionColumns(blankMetadata(raw)
     .replace(/```[\s\S]*?```/g, (match) => match.replace(/[^\n]/g, ' '))
     .replace(/`[^`\n]*`/g, (match) => ' '.repeat(match.length))
     .replace(/\]\([^)\n]*\)/g, (match) => ' '.repeat(match.length)));
