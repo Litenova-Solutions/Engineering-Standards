@@ -37,6 +37,7 @@
   "parity": {
     "ignoreHandlers": [],
     "ignoreUseCases": [],
-    "sourceRoots": []
+    "sourceRoots": [],
+    "foreignNames": []
   }
 }

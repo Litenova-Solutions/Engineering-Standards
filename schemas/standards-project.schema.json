@@ -177,6 +177,12 @@
           "type": "array",
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "foreignNames": {
+          "description": "Names an Implementation mapping states that a package declares rather than this repository, which no local scan can find.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
         }
       }
     },

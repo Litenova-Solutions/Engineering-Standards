@@ -32,7 +32,8 @@
 //     "applicationProject": "apps/api/src/Acme.Application",
 //     "ignoreHandlers": ["apps/api/src/Acme.Application/Shared/**"],
 //     "ignoreUseCases": ["sales.import-legacy-orders"],
-//     "sourceRoots": ["apps/api/src", "apps/cli"]
+//     "sourceRoots": ["apps/api/src", "apps/cli"],
+//     "foreignNames": ["IOutboxManager"]
 //   }
 //
 // 'applicationProject' names the Application project directory when discovery
@@ -41,6 +42,8 @@
 // 'ignoreUseCases' holds specification ids implemented outside the Application
 // project. 'sourceRoots' names the directories an Implementation mapping may
 // resolve a declaration in, defaulting to the directory holding the solution.
+// 'foreignNames' holds the names a mapping states that a package declares rather
+// than the consumer, which no local scan can ever find.
 // Each entry is consumer-specific, which is why it lives in the consumer's own
 // configuration rather than in this tool.
 
@@ -101,6 +104,7 @@ const parity = project.parity ?? {};
 const ignoredHandlerPatterns = Array.isArray(parity.ignoreHandlers) ? parity.ignoreHandlers : [];
 const ignoredUseCases = new Set(Array.isArray(parity.ignoreUseCases) ? parity.ignoreUseCases : []);
 const configuredSourceRoots = Array.isArray(parity.sourceRoots) ? parity.sourceRoots : [];
+const foreignNames = new Set(Array.isArray(parity.foreignNames) ? parity.foreignNames : []);
 
 // A consumer with no backend omits the solution path and records the decision
 // that names the baseline rules left without a surface. Parity has nothing to
@@ -320,6 +324,9 @@ for (const [id, spec] of specifications) {
 const DECLARATION = /\b(?:class|record|struct|interface|enum|delegate)\s+(?:class\s+|struct\s+)?([A-Za-z_][A-Za-z0-9_]*)/g;
 const IDENTIFIER_TOKEN = /[A-Za-z_][A-Za-z0-9_]*/g;
 const DOTTED = /^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$/;
+const MEMBER = /\b(?:public|internal|protected|private)\s+(?:const\s+|static\s+|async\s+|virtual\s+|override\s+|sealed\s+|abstract\s+|required\s+|readonly\s+|partial\s+|new\s+)*[A-Za-z_][\w<>,.?\[\] ]*?\s([A-Z][A-Za-z0-9_]*)\s*(?:\(|\{|=>|=)/g;
+// A mapping row may name a file rather than a declaration: a feature file, a page, a script.
+const FILE_SUFFIX = /\.(feature|cs|md|json|mjs|ts|tsx|yml|yaml|ps1|sh|slnx|sln|props|targets)$/;
 
 // A row that names no artifact writes one of these rather than leaving the cell
 // empty, because an empty cell and an unwritten mapping read the same.
@@ -349,14 +356,20 @@ function sourceRoots() {
 const declaringFiles = new Map(); // type name -> [file]
 const fileTokens = new Map(); // file -> Set of identifier tokens
 const projectNames = new Set();
+const memberNames = new Set(); // every method, property, and factory a type declares
+const fileNames = new Set(); // every file name, for a mapping row that names a feature file
+const namespaceDirectories = new Set(); // every directory, for a row that names a namespace
 let sourceFiles = 0;
 
 for (const sourceRoot of sourceRoots()) {
-  for (const file of walk(sourceRoot, (candidate) => /\.(cs|csproj|esproj|fsproj|vbproj)$/.test(candidate))) {
+  for (const file of walk(sourceRoot, () => true)) {
+    fileNames.add(path.basename(file));
+    namespaceDirectories.add(slash(path.relative(root, path.dirname(file))));
     if (/\.(csproj|esproj|fsproj|vbproj)$/.test(file)) {
       projectNames.add(path.basename(file).replace(/\.[a-z]+proj$/, ''));
       continue;
     }
+    if (!file.endsWith('.cs')) continue;
     sourceFiles += 1;
     const text = fs.readFileSync(file, 'utf8');
     fileTokens.set(file, new Set(text.match(IDENTIFIER_TOKEN) ?? []));
@@ -365,6 +378,10 @@ for (const sourceRoot of sourceRoots()) {
       if (!declaringFiles.has(name)) declaringFiles.set(name, []);
       declaringFiles.get(name).push(file);
     }
+    // A member is what follows a return type in a declaration: a method with its parameter list, a
+    // property with its accessor block, or an expression-bodied member. A mapping row names one
+    // without its type more often than a reader would guess, because the type is on the row above.
+    for (const match of text.matchAll(MEMBER)) memberNames.add(match[1]);
   }
 }
 
@@ -374,16 +391,36 @@ for (const sourceRoot of sourceRoots()) {
 // specification itself owns. None of those is a declaration.
 function resolveSpan(span) {
   const value = span.trim().replace(/\(\)$/, '');
-  if (!value || SENTINELS.has(value.toLowerCase())) return null;
+  if (!value || SENTINELS.has(value.toLowerCase()) || foreignNames.has(value)) return null;
   if (/\s/.test(value)) return null;
   if (value.includes('/')) {
     return fs.existsSync(path.resolve(root, value)) ? null : `path does not exist '${value}'`;
+  }
+  // A file name is a file rather than a declaration, whatever its shape looks like.
+  if (FILE_SUFFIX.test(value)) {
+    return fileNames.has(value) ? null : `no file is called '${value}'`;
   }
   if (!DOTTED.test(value) || !/^[A-Z]/.test(value)) return null;
   const segments = value.split('.');
   if (projectNames.has(value)) return null;
   if (declaringFiles.has(value)) return null;
-  if (segments.length === 1) return `nothing declares '${value}'`;
+  // A namespace is a directory, so a row naming one resolves against the tree. A namespace opening
+  // with a project name is the same directory under a name carrying its own dots.
+  if (segments.length > 1) {
+    const tails = [segments.join('/')];
+    for (let taken = 1; taken < segments.length; taken += 1) {
+      const head = segments.slice(0, taken).join('.');
+      if (projectNames.has(head)) tails.push(`${head}/${segments.slice(taken).join('/')}`);
+    }
+    if (tails.some((tail) => namespaceDirectories.has(tail)
+                             || [...namespaceDirectories].some((directory) => directory.endsWith(`/${tail}`)))) {
+      return null;
+    }
+  }
+  if (segments.length === 1) {
+    if (memberNames.has(value) || declaringFiles.has(`${value}Attribute`)) return null;
+    return `nothing declares '${value}'`;
+  }
   const last = segments[segments.length - 1];
   const owner = segments[segments.length - 2];
   if (declaringFiles.has(last)) return null;

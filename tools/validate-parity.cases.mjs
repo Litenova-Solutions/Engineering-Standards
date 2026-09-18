@@ -368,6 +368,13 @@ configCase('an ignoreUseCases entry naming the id', { ignoreUseCases: ['sales.vo
 configCase('an empty parity block changes nothing', {}, 'handler with no specification', { status: 1 });
 fs.rmSync(path.join(fixture, uncovered));
 
+// A mapping may name a type a package declares, which no local scan can find. The
+// consumer names those rather than the tool guessing which unresolved name is one.
+specification(mappedPage, 'sales.redeem-voucher', { mapping: '| Handler | `RedeemVoucherCommandHandler` |\n| Audit | `Audited` |' });
+report('a name a package declares and this repository does not', "nothing declares 'Audited'", run(), 1);
+configCase('a foreignNames entry naming it', { foreignNames: ['Audited'] }, null);
+specification(mappedPage, 'sales.redeem-voucher');
+
 configCase('an applicationProject that names the real project', { applicationProject }, null);
 writeJson(projectFile, { ...baseProject(), parity: { applicationProject: 'apps/api/src/Missing.Application' } });
 reportLine('an applicationProject that does not exist', "parity.applicationProject does not exist 'apps/api/src/Missing.Application'", run(), 2);
