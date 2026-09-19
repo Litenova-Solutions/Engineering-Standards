@@ -247,13 +247,18 @@ export function MultiFormScan({ sourceFiles, docText, context, err }) {
   const aggregateAnchors = context?.aggregateAnchors ?? new Set();
   const eventFiles = [];
   for (const file of sourceFiles) {
-    if (!/\bIDomainEvent\b/.test(file.raw)) continue;
+    // A generic type parameter's `where` clause can name IDomainEvent, which is
+    // the constraint rather than the event's base type. Drop the clause before
+    // reading declarations so a pre-handler generic over IDomainEvent is not
+    // mistaken for the fact it handles.
+    const constraintFree = file.raw.replace(/\bwhere\s+\w+\s*:[^{;]+/g, ' ');
+    if (!/\bIDomainEvent\b/.test(constraintFree)) continue;
     // A raised event implements IDomainEvent directly. A handler that is
     // generic over IDomainEvent names it inside another type, so an exact base
     // name is what separates the fact from the code that reacts to it.
     const declarations = [];
     const decl = /(?:^|\n)\s*(?:(?:public|internal|sealed|abstract|partial|static)\s+)*(record|class)\s+(\w+)(?:<[^>]*>)?\s*(?:\([^;{)]*\))?\s*:\s*([^{;]+)/g;
-    for (const match of file.raw.matchAll(decl)) {
+    for (const match of constraintFree.matchAll(decl)) {
       const bases = match[3].split(/[,\s]+/).filter(Boolean);
       if (bases.includes('IDomainEvent')) declarations.push({ keyword: match[1], name: match[2] });
     }

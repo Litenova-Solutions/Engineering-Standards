@@ -950,12 +950,18 @@ fileCase('rule 10 passes when a retired identifier is absent', 'docs/domain/iden
   const noClassification = `${causation}public sealed record OrderCancelledEvent : IDomainEvent\n{\n}\n`;
   const noCausation = `public sealed record OrderCancelledEvent : IDomainEvent\n{\n${classification}}\n`;
   const undocumented = `${causation}public sealed record OrderCancelledEvent : IDomainEvent\n{\n    public const string Classification = "event/order-claim.never-documented";\n}\n`;
+  const genericOverEvent = `${causation}public sealed class OrderCancelledPreHandler<TEvent>(ICausationScope scope) : IEventPreHandler<TEvent>\n    where TEvent : IDomainEvent\n{\n    public void Handle(ICausationScope scope) { }\n}\n`;
 
   fileCase('rule 6 passes when an event carries all four attributes', eventFile, passing, { absent: IDENTIFIER_RULE.attributes });
   fileCase('rule 6 fails when an event is a class', eventFile, asClass, IDENTIFIER_RULE.attributes);
   fileCase('rule 6 fails when an event has no classification', eventFile, noClassification, IDENTIFIER_RULE.attributes);
   fileCase('rule 6 fails when no causation carrier exists', eventFile, noCausation, IDENTIFIER_RULE.attributes);
   fileCase('rule 6 fails when the classification names no page', eventFile, undocumented, IDENTIFIER_RULE.attributes);
+  fileCase(
+           'rule 6 ignores a generic type whose where clause names IDomainEvent',
+           'apps/api/src/OrderCancelledPreHandler.cs',
+           genericOverEvent,
+           { absent: IDENTIFIER_RULE.attributes });
 
   writeFile('standards.project.json', originalProject);
 }
