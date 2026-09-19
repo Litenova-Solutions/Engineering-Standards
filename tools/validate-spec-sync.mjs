@@ -293,8 +293,11 @@ function stripFences(text) {
 }
 
 for (const file of walk(domainDocs, (candidate) => candidate.endsWith('.md'))) {
-  specPages.push(file);
   const meta = metadata(file);
+  // A reference page records identifiers, it does not declare obligations, so
+  // its table of old and new names is not a set of specs to reconcile.
+  if (meta && meta.kind === 'reference') continue;
+  specPages.push(file);
   if (meta && typeof meta.id === 'string') {
     const id = bareIdentifier(meta.id);
     if (id) {
