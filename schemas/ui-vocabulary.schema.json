@@ -344,7 +344,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^(?:AC|E2E|UI)-[A-Z0-9-]+$"
+          "pattern": "^(?:UI-[A-Z0-9-]+|acceptance-criterion/[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)+)$"
         },
         "kind": {
           "type": "string",

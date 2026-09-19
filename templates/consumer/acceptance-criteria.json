@@ -4,12 +4,12 @@
   "page": "web.page",
   "criteria": [
     {
-      "id": "AC-PAGE-01",
+      "id": "acceptance-criterion/web.page.region-sidecar-names-attached-page-heading",
       "proves": "The page renders every region its sidecar names.",
       "precondition": "A deployment answering on the address the run opens.",
       "steps": ["Open the route.", "Wait for the page header."],
       "assertions": ["Every region the sidecar names is attached.", "The page has one h1."],
-      "spec": "AC-PAGE-01.spec.ts"
+      "spec": "web.page.region-sidecar-names-attached-page-heading.spec.ts"
     }
   ]
 }

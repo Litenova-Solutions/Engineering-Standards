@@ -39,7 +39,11 @@
     },
     "useCaseIdentifier": {
       "type": "string",
-      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+      "pattern": "^use-case/[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+    },
+    "aggregateIdentifier": {
+      "type": "string",
+      "pattern": "^aggregate/[a-z][a-z0-9-]*$"
     },
     "pageIdentifier": {
       "type": "string",
@@ -251,7 +255,7 @@
       "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "aggregate" },
-        "id": { "$ref": "#/$defs/useCaseIdentifier" },
+        "id": { "$ref": "#/$defs/aggregateIdentifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },

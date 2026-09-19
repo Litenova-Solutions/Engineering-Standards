@@ -6,7 +6,7 @@
   "implementationStatus": "planned",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD",
-  "useCases": ["__MODULE__.__USE_CASE__"],
+  "useCases": ["use-case/__MODULE__.__USE_CASE__"],
   "applicableExtensions": []
 }
 ---

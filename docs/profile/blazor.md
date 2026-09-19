@@ -79,6 +79,7 @@ Backend architecture, domain, and application conventions are not excluded, beca
 - [Architecture](../backend/architecture.md)
 - [Domain](../backend/domain.md)
 - [Application](../backend/application.md)
+- [Identifiers](../backend/identifiers.md)
 
 ### Blazor
 

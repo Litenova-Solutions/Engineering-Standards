@@ -208,6 +208,10 @@ for (const entry of selections) {
 // ---- schema-equivalent kind rules ------------------------------------------
 const ID = /^[a-z][a-z0-9-]*$/;
 const REC = /^[a-z0-9][a-z0-9-]*$/;
+// A use case and an aggregate carry their kind as a first segment, so the
+// identifier states what it names without a lookup. (standards/rule/backend-identifiers.state-the-identifier-grammar)
+const USE_CASE = /^use-case\/[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$/;
+const AGGREGATE = /^aggregate\/[a-z][a-z0-9-]*$/;
 const UC = /^[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$/;
 // Each pattern carries its shape in words. Regex source names character classes
 // and not the convention, so an author who is shown one still guesses.
@@ -215,6 +219,8 @@ const FORM = new Map([
   [ID, "lower kebab-case, for example 'orders'"],
   [REC, "lower kebab-case with a letter or digit first, for example '0001-cancel-order'"],
   [UC, "'<module>.<name>' in lower kebab-case, for example 'orders.cancel-order'"],
+  [USE_CASE, "'use-case/<module>.<name>' in lower kebab-case, for example 'use-case/orders.cancel-order'"],
+  [AGGREGATE, "'aggregate/<root>' in lower kebab-case, for example 'aggregate/order'"],
 ]);
 const SPEC = ['draft', 'approved', 'retired'];
 const IMPL = ['planned', 'implemented', 'verified'];
@@ -238,7 +244,7 @@ const SCENARIO_KINDS = new Set(['module', 'aggregate', 'use-case', 'domain-polic
 // A scenario illustrates its page and never governs it. An identifier inside one
 // reads as a second definition of the rule it names, and two definitions drift.
 // (standards/rule/core-system.keep-a-scenario-informative)
-const RULE_ID = /\b(?:INV|POL|VAL|AC|E2E)-[A-Z0-9][A-Z0-9-]*\b/;
+const RULE_ID = /\b(?:invariant|policy|validation|acceptance-criterion)\/[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+\b|\bE2E-[A-Z0-9][A-Z0-9-]*\b/;
 const SCENARIO_WORD_DEFAULT = 120;
 const declaredWordLimit = project.scenarioWordLimit;
 if (declaredWordLimit !== undefined && (!Number.isInteger(declaredWordLimit) || declaredWordLimit < 40)) {
@@ -267,8 +273,8 @@ const KINDS = {
   command: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'] },
   configuration: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Settings', 'Precedence'] },
   module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
-  aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: UC },
-  'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: UC },
+  aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: AGGREGATE },
+  'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: USE_CASE },
   'end-to-end-flow': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'useCases'], props: { ...base, implementationStatus: 1, useCases: 1, applicableExtensions: 1 }, id: ID },
   workflow: { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'participatingModules', 'applicableExtensions'], props: { ...base, implementationStatus: 1, participatingModules: 1, applicableExtensions: 1 }, id: ID },
   'domain-policy': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'appliesToModules'], props: { ...base, appliesToModules: 1, applicableExtensions: 1 }, id: ID },
@@ -387,7 +393,7 @@ for (const f of files) {
   if (/(^|\/)research\//.test(rel) && !hasMeta) continue;
 
   // acceptance and end-to-end id definitions (bracket form)
-  for (const m of raw.matchAll(/\[(AC-[A-Z0-9-]+)\]/g)) (acDefs.get(m[1]) ?? acDefs.set(m[1], []).get(m[1])).push(rel);
+  for (const m of raw.matchAll(/\[(acceptance-criterion\/[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+)\]/g)) (acDefs.get(m[1]) ?? acDefs.set(m[1], []).get(m[1])).push(rel);
   for (const m of raw.matchAll(/\[(E2E-[A-Z0-9-]+)\]/g)) (e2eDefs.get(m[1]) ?? e2eDefs.set(m[1], []).get(m[1])).push(rel);
 
   // internal link resolution
@@ -424,7 +430,7 @@ for (const f of files) {
   if (meta.operationType !== undefined && !OPERATION_TYPES.includes(meta.operationType)) err(`${rel}: bad operationType '${meta.operationType}'; expected one of ${OPERATION_TYPES.join(', ')}`);
   if (Array.isArray(meta.risks)) for (const r of meta.risks) if (!RISK.includes(r)) err(`${rel}: bad risk '${r}'; expected one of ${RISK.join(', ')}`);
   for (const a of ['actors', 'entryPoints', 'applicableExtensions']) if (Array.isArray(meta[a])) for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`);
-  for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(UC)}`); }
+  for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!USE_CASE.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(USE_CASE)}`); }
   for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`); }
 
   // A documentation kind declares the sections its reader expects to find. An
@@ -439,14 +445,14 @@ for (const f of files) {
     singletons.get(meta.kind).push(rel);
   }
   if (meta.kind === 'end-to-end-flow') {
-    for (const uc of meta.useCases ?? []) { const [mod, name] = uc.split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
+    for (const uc of meta.useCases ?? []) { const [mod, name] = uc.replace(/^use-case\//, '').split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
   }
   if (meta.kind === 'page') screenPages.push({ rel, file: f, app: meta.app, useCases: Array.isArray(meta.useCases) ? meta.useCases : [] });
   if (meta.kind === 'workflow') for (const mod of meta.participatingModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: participatingModule '${mod}' has no module dir`);
   if (meta.kind === 'domain-policy') for (const mod of meta.appliesToModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: appliesToModule '${mod}' has no module dir`);
   if (meta.kind === 'use-case') {
     useCasePages.set(String(meta.id), { rel, file: f, implementationStatus: meta.implementationStatus, consumers: sectionBody(raw, 'Consumers') });
-    const [mod, name] = String(meta.id).split('.');
+    const [mod, name] = String(meta.id).replace(/^use-case\//, '').split('.');
     // A use-case file sits directly in its module directory, or in one
     // aggregate-root subdirectory of that module.
     const parts = path.relative(path.join(domainDocs, 'modules'), f).replace(/\\/g, '/').split('/');
@@ -455,11 +461,12 @@ for (const f of files) {
     if (!okFlat && !okNested) err(`${rel}: use-case id '${meta.id}' does not match its path`);
   }
   if (meta.kind === 'aggregate') {
-    const [mod, agg] = String(meta.id).split('.');
     // An aggregate README is the README.md of an aggregate-root subdirectory:
-    // modules/<module>/<aggregate-plural>/README.md, id '<module>.<aggregate-plural>'.
+    // modules/<module>/<aggregate-plural>/README.md. The id's anchor is the
+    // singular root type, which only the source can confirm, so this checks the
+    // path and leaves the anchor-to-root match to validate-spec-sync.
     const parts = path.relative(path.join(domainDocs, 'modules'), f).replace(/\\/g, '/').split('/');
-    const ok = parts.length === 3 && parts[0] === mod && parts[1] === agg && parts[2] === 'README.md';
+    const ok = parts.length === 3 && parts[2] === 'README.md' && fs.existsSync(path.join(domainDocs, 'modules', parts[0]));
     if (!ok) err(`${rel}: aggregate id '${meta.id}' does not match its path`);
   }
   // Every other section on these pages states a rule, a state, or a mapping,
@@ -580,9 +587,10 @@ for (const screen of screenPages) {
 // standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion, standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)
 const testRoots = Array.isArray(project.paths?.testRoots) ? project.paths.testRoots : [];
 const GHERKIN_TAG_LINE = /^[ \t]*@[^\n]*$/;
-const TAG = /@(AC-[A-Z0-9-]+)/g;
-const TRAIT = /\[\s*Trait\s*\(\s*"AcceptanceCriterion"\s*,\s*"(AC-[A-Z0-9-]+)"\s*\)\s*\]/g;
-const TITLE = /['"`]\s*\[(AC-[A-Z0-9-]+)\]/g;
+const ACCEPTANCE = 'acceptance-criterion\\/[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)+';
+const TAG = new RegExp(`@(${ACCEPTANCE})`, 'g');
+const TRAIT = new RegExp(`\\[\\s*Trait\\s*\\(\\s*"AcceptanceCriterion"\\s*,\\s*"(${ACCEPTANCE})"\\s*\\)\\s*\\]`, 'g');
+const TITLE = new RegExp(`['"\`]\\s*\\[(${ACCEPTANCE})\\]`, 'g');
 const TEST_SOURCE = /\.(cs|feature|ts|tsx|js|jsx|mjs)$/;
 
 const citations = new Map(); // acceptance id -> [file]

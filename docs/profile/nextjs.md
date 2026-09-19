@@ -53,6 +53,7 @@ Exact framework and package versions live only in `standards.manifest.json`.
 - [Persistence](../backend/persistence.md)
 - [HTTP API](../backend/api.md)
 - [Backend testing](../backend/testing.md)
+- [Identifiers](../backend/identifiers.md)
 
 ### Frontend
 

@@ -39,6 +39,7 @@ const VALUES = {
   __USE_CASE__: 'cancel-order',
   __USE_CASE_ID__: 'CANCEL-ORDER',
   __AGGREGATE_ID__: 'order-claims',
+  __AGGREGATE_ANCHOR__: 'order-claim',
   __OPERATION_TYPE__: 'command',
   __ACTOR__: 'buyer',
   __FLOW__: 'event-sales',
@@ -93,7 +94,7 @@ const VALUES = {
   __PAST_TENSE_EVENT_TYPE__: 'OrderCancelled',
   __FIELD__: 'orderId',
   __MAPPING__: 'OrderClaim.Cancel',
-  __ERROR_CODE__: 'ORDERS-CANCEL-REFUSED',
+  __ERROR_CODE__: 'failure/orders.cancel_refused',
   __ACTOR_OR_TRIGGER__: 'buyer',
   __FLOW_TITLE__: 'Event Sales',
   __WORKFLOW_TITLE__: 'Order Fulfillment',
@@ -117,6 +118,7 @@ const VALUES = {
   __ARTIFACT_REFERENCE__: 'fixture:1.0.0',
   __FLOW_IDS__: 'event-sales',
   __USE_CASE_IDS__: 'orders.cancel-order',
+  __CRITERION_TOPIC__: 'cancel-removes-the-order',
   __WORKFLOW_IDS__: 'order-fulfillment',
   __EXTENSIONS__: 'none',
   __LIMITATIONS__: 'none',
@@ -355,8 +357,8 @@ projectCase('frontend path that is not on disk', (p) => { p.paths.frontends = [{
 console.log('\nMetadata field rules');
 metaCase('missing required field', 'docs/domain/modules/orders/cancel-order.md', (m) => { delete m.operationType; }, "missing required 'operationType'");
 metaCase('unknown property', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.unexpected = 1; }, "unknown property 'unexpected'");
-metaCase('id fails its kind pattern', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'Orders.CancelOrder'; }, "fails pattern; expected '<module>.<name>' in lower kebab-case");
-metaCase('accepted use-case id', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'orders.cancel-order'; }, null);
+metaCase('id fails its kind pattern', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'Orders.CancelOrder'; }, "fails pattern; expected 'use-case/<module>.<name>' in lower kebab-case");
+metaCase('accepted use-case id', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'use-case/orders.cancel-order'; }, null);
 // A closed-set error names the values the author may use, so each expectation
 // covers the list and not only the value that was rejected.
 metaCase('unknown kind', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.kind = 'invented'; }, "unknown kind 'invented'; expected one of product, domain-index, glossary");
@@ -384,13 +386,13 @@ projectCase('frontend declares an unknown platform', (p) => { p.paths.frontends 
 projectCase('frontend outside the UI contract declares other-web', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'other-web' }]; }, null);
 
 console.log('\nCross-file references');
-metaCase('flow names a use case with no file', 'docs/product/flows/event-sales.md', (m) => { m.useCases = ['orders.no-such-case']; }, "useCase 'orders.no-such-case' has no file");
+metaCase('flow names a use case with no file', 'docs/product/flows/event-sales.md', (m) => { m.useCases = ['use-case/orders.no-such-case']; }, "useCase 'use-case/orders.no-such-case' has no file");
 metaCase('flow with an empty use-case list', 'docs/product/flows/event-sales.md', (m) => { m.useCases = []; }, 'useCases empty');
 metaCase('workflow names an absent module', 'docs/domain/workflows/order-fulfillment.md', (m) => { m.participatingModules = ['billing']; }, "participatingModule 'billing' has no module dir");
 metaCase('policy names an absent module', 'docs/domain/policies/refund-limit.md', (m) => { m.appliesToModules = ['billing']; }, "appliesToModule 'billing' has no module dir");
-metaCase('use-case id does not match its path', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'orders.other-case'; }, 'does not match its path');
-metaCase('aggregate id does not match its path', 'docs/domain/modules/orders/order-claims/README.md', (m) => { m.id = 'orders.other-aggregate'; }, 'does not match its path');
-fileCase('duplicate acceptance id', 'docs/domain/modules/orders/second.md', `---\n${JSON.stringify({ kind: 'use-case', id: 'orders.second', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Second\n\n[AC-ORDERS-CANCEL-ORDER-01] Duplicate of the template criterion.\n`, 'Duplicate acceptance id AC-ORDERS-CANCEL-ORDER-01');
+metaCase('use-case id does not match its path', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'use-case/orders.other-case'; }, 'does not match its path');
+metaCase('aggregate id outside an aggregate directory', 'docs/domain/modules/orders/README.md', (m) => { m.kind = 'aggregate'; m.id = 'aggregate/order'; }, 'does not match its path');
+fileCase('duplicate acceptance id', 'docs/domain/modules/orders/second.md', `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.second', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Second\n\n[acceptance-criterion/orders.cancel-order.cancel-removes-the-order] Duplicate of the template criterion.\n`, 'Duplicate acceptance id acceptance-criterion/orders.cancel-order.cancel-removes-the-order');
 fileCase('second product specification', 'docs/product/second.md', `---\n${JSON.stringify({ kind: 'product', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second product\n`, 'Expected at most one product specification, found 2');
 fileCase('second glossary specification', 'docs/domain/second-glossary.md', `---\n${JSON.stringify({ kind: 'glossary', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second glossary\n`, 'Expected at most one glossary specification, found 2');
 fileCase('second modules index', 'docs/domain/modules/second.md', `---\n${JSON.stringify({ kind: 'modules-index', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second modules index\n`, 'Expected at most one modules-index specification, found 2');
@@ -403,13 +405,13 @@ report('flat single-aggregate module resolves', null, run());
 fileCase(
   'nested aggregate subdirectory resolves',
   'docs/domain/modules/orders/order-claims/claim-guest-order.md',
-  `---\n${JSON.stringify({ kind: 'use-case', id: 'orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n\n## Scenario\n\nSanne claims the order she placed as a guest on the morning after the show.\n`,
+  `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n\n## Scenario\n\nSanne claims the order she placed as a guest on the morning after the show.\n`,
   null,
 );
 fileCase(
   'use case two directories below its module fails',
   'docs/domain/modules/orders/order-claims/deep/too-deep.md',
-  `---\n${JSON.stringify({ kind: 'use-case', id: 'orders.too-deep', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Too deep\n`,
+  `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.too-deep', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Too deep\n`,
   'does not match its path',
 );
 
@@ -496,8 +498,8 @@ bodyCase(
 bodyCase(
   'Scenario section naming an aggregate invariant',
   'docs/domain/modules/orders/order-claims/README.md',
-  (raw) => raw.replace(/## Scenario(\r?\n){2}/, '## Scenario\r\n\r\nSanne cancels the order, which INV-ORDERS-01 permits.\r\n\r\n'),
-  'names INV-ORDERS-01',
+  (raw) => raw.replace(/## Scenario(\r?\n){2}/, '## Scenario\r\n\r\nSanne cancels the order, which invariant/order-claim.state-allows-the-action permits.\r\n\r\n'),
+  'names invariant/order-claim.state-allows-the-action',
 );
 bodyCase(
   'Scenario section past the word bound',
@@ -807,10 +809,10 @@ consumersCase(
 );
 
 console.log('\nAcceptance citation (standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form, standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion, standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)');
-// The template use case declares AC-ORDERS-CANCEL-ORDER-01, so each case cites
-// that identifier or a neighbouring one that no page declares.
-const DECLARED = 'AC-ORDERS-CANCEL-ORDER-01';
-const UNDECLARED = 'AC-ORDERS-CANCEL-ORDER-99';
+// The template use case declares acceptance-criterion/orders.cancel-order.cancel-removes-the-order,
+// so each case cites that identifier or a neighbouring one that no page declares.
+const DECLARED = 'acceptance-criterion/orders.cancel-order.cancel-removes-the-order';
+const UNDECLARED = 'acceptance-criterion/orders.cancel-order.no-page-declares-this';
 
 fileCase(
   'a scenario tag naming a declared criterion',

@@ -108,7 +108,7 @@ function build() {
   write(`${applicationProject}/Acme.Application.csproj`, '<Project Sdk="Microsoft.NET.Sdk" />\n');
   writeJson(projectFile, baseProject());
   handler(`${applicationProject}/Sales/Vouchers/RedeemVoucher/RedeemVoucherCommandHandler.cs`);
-  specification('docs/domain/modules/sales/vouchers/redeem-voucher.md', 'sales.redeem-voucher');
+  specification('docs/domain/modules/sales/vouchers/redeem-voucher.md', 'use-case/sales.redeem-voucher');
 }
 
 function run(...args) {
@@ -171,7 +171,7 @@ fileCase(
   'operation folder that no page covers',
   `${applicationProject}/Sales/Vouchers/VoidVoucher/VoidVoucherCommandHandler.cs`,
   HANDLER,
-  `handler with no specification: ${applicationProject}/Sales/Vouchers/VoidVoucher/VoidVoucherCommandHandler.cs -> sales.void-voucher`,
+  `handler with no specification: ${applicationProject}/Sales/Vouchers/VoidVoucher/VoidVoucherCommandHandler.cs -> use-case/sales.void-voucher`,
 );
 fileCase(
   'operation folder under a second aggregate that no page covers',
@@ -184,18 +184,18 @@ console.log('\nSpecification with no handler (standards/rule/core-system.keep-sp
 fileCase(
   'implemented page that no operation folder covers',
   'docs/domain/modules/sales/vouchers/void-voucher.md',
-  specificationText('sales.void-voucher'),
+  specificationText('use-case/sales.void-voucher'),
   'specification with no handler: docs/domain/modules/sales/vouchers/void-voucher.md',
 );
 fileCase(
   'planned page that no operation folder covers',
   'docs/domain/modules/sales/vouchers/plan-voucher-campaign.md',
-  specificationText('sales.plan-voucher-campaign', { implementationStatus: 'planned' }),
+  specificationText('use-case/sales.plan-voucher-campaign', { implementationStatus: 'planned' }),
   null,
 );
 
 console.log('\nName derivation (standards/rule/backend-application.use-this-operation-layout)');
-specification('docs/domain/modules/event-operations/event-tasks/update-event-task.md', 'event-operations.update-event-task');
+specification('docs/domain/modules/event-operations/event-tasks/update-event-task.md', 'use-case/event-operations.update-event-task');
 fileCase(
   'a multi-word module folder resolves to its kebab-case module id',
   `${applicationProject}/EventOperations/EventTasks/UpdateEventTask/UpdateEventTaskCommandHandler.cs`,
@@ -207,9 +207,9 @@ fileCase(
   'an acronym run stays one identifier segment',
   `${applicationProject}/Sales/Vouchers/ReadCSVImport/ReadCSVImportQueryHandler.cs`,
   HANDLER,
-  '-> sales.read-csv-import',
+  '-> use-case/sales.read-csv-import',
 );
-specification('docs/domain/modules/sales/vouchers/read-csv-import.md', 'sales.read-csv-import', { mapping: '| Handler | `ReadCSVImportQueryHandler` |' });
+specification('docs/domain/modules/sales/vouchers/read-csv-import.md', 'use-case/sales.read-csv-import', { mapping: '| Handler | `ReadCSVImportQueryHandler` |' });
 fileCase(
   'the derived acronym id resolves to its page',
   `${applicationProject}/Sales/Vouchers/ReadCSVImport/ReadCSVImportQueryHandler.cs`,
@@ -223,7 +223,7 @@ fileCase(
   'a title-cased acronym derives the same identifier as an upper-cased one',
   `${applicationProject}/Sales/Vouchers/ReadCsvImport/ReadCsvImportQueryHandler.cs`,
   HANDLER,
-  '-> sales.read-csv-import',
+  '-> use-case/sales.read-csv-import',
 );
 
 console.log('\nOperation folder shape (standards/rule/backend-application.organize-application-by-operation)');
@@ -246,7 +246,7 @@ fileCase(
   'two aggregates naming the same operation',
   `${applicationProject}/Sales/Discounts/RedeemVoucher/RedeemVoucherCommandHandler.cs`,
   HANDLER,
-  "duplicate specification id 'sales.redeem-voucher'",
+  "duplicate specification id 'use-case/sales.redeem-voucher'",
 );
 
 console.log('\nEvent reactions (standards/rule/core-system.record-events-and-event-reactions-separately)');
@@ -274,9 +274,9 @@ console.log('\nImplementation mapping resolution (standards/rule/core-system.res
 // mapping of that one page and restores it afterwards.
 const mappedPage = 'docs/domain/modules/sales/vouchers/redeem-voucher.md';
 function mappingCase(name, mapping, expectation, options = {}) {
-  specification(mappedPage, 'sales.redeem-voucher', { mapping });
+  specification(mappedPage, 'use-case/sales.redeem-voucher', { mapping });
   report(name, expectation, run(...(options.args ?? [])), options.status);
-  specification(mappedPage, 'sales.redeem-voucher');
+  specification(mappedPage, 'use-case/sales.redeem-voucher');
 }
 
 mappingCase(
@@ -342,7 +342,7 @@ mappingCase(
 fileCase(
   'a planned page needs no mapping section',
   'docs/domain/modules/sales/vouchers/plan-voucher-batch.md',
-  specificationText('sales.plan-voucher-batch', { implementationStatus: 'planned', mapping: null }),
+  specificationText('use-case/sales.plan-voucher-batch', { implementationStatus: 'planned', mapping: null }),
   null,
 );
 // The handler name inside a longer span still counts, because a page states the
@@ -364,16 +364,16 @@ configCase('an ignoreHandlers pattern covering the folder', { ignoreHandlers: [`
 // middle of a pattern matches zero or more directories for the same reason.
 configCase('a mid-path wildcard spanning zero directories', { ignoreHandlers: [`${applicationProject}/Sales/**/VoidVoucherCommandHandler.cs`] }, null);
 configCase('a single-segment wildcard does not cross a separator', { ignoreHandlers: [`${applicationProject}/Sales/*/VoidVoucherCommandHandler.cs`] }, 'handler with no specification', { status: 1 });
-configCase('an ignoreUseCases entry naming the id', { ignoreUseCases: ['sales.void-voucher'] }, null);
+configCase('an ignoreUseCases entry naming the id', { ignoreUseCases: ['use-case/sales.void-voucher'] }, null);
 configCase('an empty parity block changes nothing', {}, 'handler with no specification', { status: 1 });
 fs.rmSync(path.join(fixture, uncovered));
 
 // A mapping may name a type a package declares, which no local scan can find. The
 // consumer names those rather than the tool guessing which unresolved name is one.
-specification(mappedPage, 'sales.redeem-voucher', { mapping: '| Handler | `RedeemVoucherCommandHandler` |\n| Audit | `Audited` |' });
+specification(mappedPage, 'use-case/sales.redeem-voucher', { mapping: '| Handler | `RedeemVoucherCommandHandler` |\n| Audit | `Audited` |' });
 report('a name a package declares and this repository does not', "nothing declares 'Audited'", run(), 1);
 configCase('a foreignNames entry naming it', { foreignNames: ['Audited'] }, null);
-specification(mappedPage, 'sales.redeem-voucher');
+specification(mappedPage, 'use-case/sales.redeem-voucher');
 
 configCase('an applicationProject that names the real project', { applicationProject }, null);
 writeJson(projectFile, { ...baseProject(), parity: { applicationProject: 'apps/api/src/Missing.Application' } });

@@ -25,7 +25,7 @@ State one case where this rule decides the outcome: the situation, the decision 
 
 | ID | Required behavior | Applies to | Failure result |
 |:---|:---|:---|:---|
-| `POL-__POLICY_ID__-01` | State one domain policy. | List module IDs. | State the observable result. |
+| `policy/__POLICY__.refund-within-the-window` | State one domain policy. | List module IDs. | State the observable result. |
 
 ## Ownership and consistency
 
@@ -42,7 +42,7 @@ State which module owns each fact and which Commands, Queries, or events cross t
 
 | Policy ID | Acceptance criteria or end-to-end tests | Automated or operating evidence |
 |:---|:---|:---|
-| `POL-__POLICY_ID__-01` | List IDs. | Link tests, alerts, or exercises. |
+| `policy/__POLICY__.refund-within-the-window` | List IDs. | Link tests, alerts, or exercises. |
 
 ## Related decisions
 

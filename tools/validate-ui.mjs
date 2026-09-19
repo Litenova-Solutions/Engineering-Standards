@@ -648,7 +648,7 @@ function validateVocabulary(file, ui, frontendName, frontendRoot, manifest) {
   }
   for (const record of evidence) {
     const recordLabel = `${label}.evidence.${record?.id ?? 'unknown'}`;
-    if (!/^(?:AC|E2E|UI)-[A-Z0-9-]+$/.test(record?.id ?? '')) error(`${recordLabel}: invalid evidence id`);
+    if (!/^(?:UI-[A-Z0-9-]+|acceptance-criterion\/[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+)$/.test(record?.id ?? '')) error(`${recordLabel}: invalid evidence id`);
     if (!['component', 'browser', 'accessibility', 'visual', 'manual'].includes(record?.kind)) error(`${recordLabel}: invalid evidence kind`);
     if (!['pass', 'fail', 'waived'].includes(record?.result)) error(`${recordLabel}: invalid evidence result`);
   }
@@ -943,7 +943,7 @@ function validatePageRegistry(project, frontends) {
 // route and to the file that runs. An identifier with no file is a claim the
 // project cannot make, and a file no sidecar names is a run nothing reports.
 function validateAcceptance(contract, metadata, frontendRoot, routes, label) {
-  const claimed = array(contract, 'evidence', label).filter((id) => typeof id === 'string' && id.startsWith('AC-'));
+  const claimed = array(contract, 'evidence', label).filter((id) => typeof id === 'string' && id.startsWith('acceptance-criterion/'));
   const routeFile = routes.get(metadata.route);
   if (!routeFile) {
     if (claimed.length) error(`[standards/rule/frontend-ui.resolve-every-acceptance-identifier] ${label}: names acceptance identifiers, and route '${metadata.route}' has no page file`);

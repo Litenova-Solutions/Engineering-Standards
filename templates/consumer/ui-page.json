@@ -44,5 +44,5 @@
     "labels": "Every control has a visible or programmatic label and associated description.",
     "statusAnnouncements": "Loading, save, and error results use the appropriate status channel."
   },
-  "evidence": ["AC-PAGE-01", "E2E-PAGE-01"]
+  "evidence": ["acceptance-criterion/web.page.region-sidecar-names-attached-page-heading"]
 }

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/acceptance-criteria.schema.json",
   "title": "Litenova Page Acceptance Criteria",
-  "description": "The acceptance record beside one page. Every AC identifier a page sidecar names has one entry here and one runnable file the entry points at.",
+  "description": "The acceptance record beside one page. Every acceptance-criterion identifier a page sidecar names has one entry here and one runnable file the entry points at.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "page", "criteria"],
@@ -31,7 +31,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^AC-[A-Z0-9-]+$"
+          "pattern": "^acceptance-criterion/[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)+$"
         },
         "proves": { "type": "string", "minLength": 1 },
         "precondition": { "type": "string", "minLength": 1 },
@@ -48,7 +48,7 @@
         "spec": {
           "$comment": "A path relative to this record, so the file that proves the criterion sits beside the page it proves.",
           "type": "string",
-          "pattern": "^AC-[A-Z0-9-]+\\.spec\\.ts$"
+          "pattern": "^[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*\\.spec\\.ts$"
         }
       }
     }

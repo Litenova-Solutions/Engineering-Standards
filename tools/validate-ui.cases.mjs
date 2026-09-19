@@ -140,7 +140,7 @@ function build() {
     writeJson(path.join(fixture, `docs/ui/compositions/${recipe}.recipe.json`), { ...sidecar, recipe });
   }
   writeJson(path.join(fixture, 'apps/web/app/evidence/acceptance.json'), readJson(path.join(repository, 'templates/consumer/acceptance-criteria.json')));
-  fs.writeFileSync(path.join(fixture, 'apps/web/app/evidence/AC-PAGE-01.spec.ts'), 'export const criterion = "AC-PAGE-01";\n');
+  fs.writeFileSync(path.join(fixture, 'apps/web/app/evidence/web.page.region-sidecar-names-attached-page-heading.spec.ts'), 'export const criterion = "acceptance-criterion/web.page.region-sidecar-names-attached-page-heading";\n');
   fs.writeFileSync(globalCss, cleanCss);
   fs.writeFileSync(path.join(fixture, 'docs/decisions/ui-override.md'), '# Override\n');
   writeJson(path.join(fixture, 'apps/web/components.json'), {
@@ -418,12 +418,12 @@ report('a route inside its frozen plan is accepted', null, run());
 console.log('\nAcceptance (standards/rule/frontend-ui.place-acceptance-beside-the-route, standards/rule/frontend-ui.resolve-every-acceptance-identifier)');
 const acceptanceFile = path.join(fixture, 'apps/web/app/evidence/acceptance.json');
 const acceptanceRecord = readJson(acceptanceFile);
-const specFile = path.join(fixture, 'apps/web/app/evidence/AC-PAGE-01.spec.ts');
+const specFile = path.join(fixture, 'apps/web/app/evidence/web.page.region-sidecar-names-attached-page-heading.spec.ts');
 fs.rmSync(specFile);
-report('acceptance identifier with no file', "'AC-PAGE-01' names 'AC-PAGE-01.spec.ts', which does not exist", run());
-fs.writeFileSync(specFile, 'export const criterion = "AC-PAGE-01";\n');
-writeJson(acceptanceFile, { ...acceptanceRecord, criteria: [{ ...acceptanceRecord.criteria[0], id: 'AC-PAGE-02', spec: 'AC-PAGE-02.spec.ts' }] });
-report('acceptance record stating an identifier no sidecar names', "states 'AC-PAGE-02', which 'docs/ui/web/page.ui.json' does not name", run());
+report('acceptance identifier with no file', "'acceptance-criterion/web.page.region-sidecar-names-attached-page-heading' names 'web.page.region-sidecar-names-attached-page-heading.spec.ts', which does not exist", run());
+fs.writeFileSync(specFile, 'export const criterion = "acceptance-criterion/web.page.region-sidecar-names-attached-page-heading";\n');
+writeJson(acceptanceFile, { ...acceptanceRecord, criteria: [{ ...acceptanceRecord.criteria[0], id: 'acceptance-criterion/web.page.landmarks-sidecar-claims-rendered-control-carries-name', spec: 'web.page.landmarks-sidecar-claims-rendered-control-carries-name.spec.ts' }] });
+report('acceptance record stating an identifier no sidecar names', "states 'acceptance-criterion/web.page.landmarks-sidecar-claims-rendered-control-carries-name', which 'docs/ui/web/page.ui.json' does not name", run());
 writeJson(acceptanceFile, { ...acceptanceRecord, criteria: [{ ...acceptanceRecord.criteria[0], steps: [] }] });
 report('criterion with no step', 'array has fewer than 1 items', run());
 writeJson(acceptanceFile, acceptanceRecord);

@@ -1,7 +1,7 @@
 ---
 {
   "kind": "aggregate",
-  "id": "__MODULE__.__AGGREGATE_ID__",
+  "id": "aggregate/__AGGREGATE_ANCHOR__",
   "specStatus": "approved",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD",
@@ -46,15 +46,15 @@ Define this mapping before the first Command implementation. Do not use an enum,
 
 | From state | Business action | To state | Aggregate Invariants | Use case |
 |:---|:---|:---|:---|:---|
-| `__FROM_STATE__` | `__ACTION__` | `__TO_STATE__` | `INV-__MODULE_ID__-01` | Link the Command specification. |
+| `__FROM_STATE__` | `__ACTION__` | `__TO_STATE__` | `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Link the Command specification. |
 
 ## Aggregate invariants
 
 | ID | Rule | Protected by | Failure |
 |:---|:---|:---|:---|
-| `INV-__MODULE_ID__-01` | Reference the rule defined in the module specification. | Name the aggregate or Value Object. | Name the rejected outcome. |
+| `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Reference the rule defined in the module specification. | Name the aggregate or Value Object. | Name the rejected outcome. |
 
-Invariant IDs stay module-scoped. The module specification defines each rule once. This page references it.
+An invariant identifier anchors on its aggregate root. Define the rule once and reference it here.
 
 ## Events
 

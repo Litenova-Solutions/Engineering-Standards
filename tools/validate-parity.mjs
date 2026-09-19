@@ -237,9 +237,9 @@ const handlerFiles = walk(applicationProject, (file) => {
 
 // Each operation owns one folder under its module, and the module and aggregate
 // directories above it carry the same names as the specification tree. The
-// specification id is '<module>.<use-case>': the aggregate segment groups
-// operations in code but does not appear in the id, because a use case that
-// reads across roots belongs to a module rather than to one root.
+// specification id is 'use-case/<module>.<use-case>': the aggregate segment
+// groups operations in code but does not appear in the id, because a use case
+// that reads across roots belongs to a module rather than to one root.
 // (standards/rule/backend-application.organize-application-by-operation, standards/rule/backend-application.use-this-operation-layout)
 const derived = new Map(); // id -> [handler file]
 for (const file of handlerFiles) {
@@ -253,7 +253,7 @@ for (const file of handlerFiles) {
     finding(`handler outside an operation folder: ${relativeToRoot(file)}`);
     continue;
   }
-  const id = `${kebab(segments[0])}.${kebab(segments[segments.length - 2])}`;
+  const id = `use-case/${kebab(segments[0])}.${kebab(segments[segments.length - 2])}`;
   if (!derived.has(id)) derived.set(id, []);
   derived.get(id).push(file);
 }
@@ -327,6 +327,10 @@ const DOTTED = /^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$/;
 const MEMBER = /\b(?:public|internal|protected|private)\s+(?:const\s+|static\s+|async\s+|virtual\s+|override\s+|sealed\s+|abstract\s+|required\s+|readonly\s+|partial\s+|new\s+)*[A-Za-z_][\w<>,.?\[\] ]*?\s([A-Z][A-Za-z0-9_]*)\s*(?:\(|\{|=>|=)/g;
 // A mapping row may name a file rather than a declaration: a feature file, a page, a script.
 const FILE_SUFFIX = /\.(feature|cs|md|json|mjs|ts|tsx|yml|yaml|ps1|sh|slnx|sln|props|targets)$/;
+// A mapping row may cite an identifier rather than an artifact. An identifier
+// opens with its kind, so the slash reads as a kind boundary and not a path
+// separator. (standards/rule/backend-identifiers.state-the-identifier-grammar)
+const IDENTIFIER = /^(?:aggregate|event|exception|failure|use-case|path|invariant|validation|authorization|acceptance-criterion|policy|rule)\/[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*$/;
 
 // A row that names no artifact writes one of these rather than leaving the cell
 // empty, because an empty cell and an unwritten mapping read the same.
@@ -393,6 +397,7 @@ function resolveSpan(span) {
   const value = span.trim().replace(/\(\)$/, '');
   if (!value || SENTINELS.has(value.toLowerCase()) || foreignNames.has(value)) return null;
   if (/\s/.test(value)) return null;
+  if (IDENTIFIER.test(value)) return null;
   if (value.includes('/')) {
     return fs.existsSync(path.resolve(root, value)) ? null : `path does not exist '${value}'`;
   }
