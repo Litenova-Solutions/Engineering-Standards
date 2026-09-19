@@ -31,13 +31,20 @@
 //   "specSync": {
 //     "codeRoots": ["apps/api/src", "apps/api/tests"],
 //     "markedRoots": ["apps/api/src/Entro.Domain", "apps/api/src/Entro.Application", "apps/api/src/Entro.WebApi", "apps/api/tests"],
-//     "featureRoots": ["apps/api/tests/Entro.Acceptance.Tests/Features"]
+//     "featureRoots": ["apps/api/tests/Entro.Acceptance.Tests/Features"],
+//     "evidenceRoots": ["apps/admin", "apps/storefront", "apps/scanner", "apps/control-panel"]
 //   }
 //
 // 'codeRoots' names the directories whose C# files are read for markup tags.
 // 'markedRoots' names the directories whose type-declaring files must carry one,
 // defaulting to the domain, application, and API projects plus every test root.
 // 'featureRoots' names the directories holding Reqnroll feature files.
+// 'evidenceRoots' names the frontend directories whose test files are read for
+// acceptance-criterion citations, defaulting to every path in
+// project.paths.frontends. A browser test cites a criterion the same way a
+// <covers> tag or an '@implements_' tag does, so a UI criterion resolves when a
+// frontend test names it. Only test files under those roots are read, because a
+// criterion recorded in an acceptance record is a plan rather than a test.
 //
 // The marking grammar this validator enforces is one identifier per XML doc tag:
 //
@@ -242,6 +249,13 @@ const configuredMarkedRoots = Array.isArray(specSync.markedRoots) && specSync.ma
 const configuredFeatureRoots = Array.isArray(specSync.featureRoots) && specSync.featureRoots.length
   ? specSync.featureRoots
   : ['apps/api/tests/Entro.Acceptance.Tests/Features'];
+// A frontend citation lives in the browser test that proves the criterion, so
+// the default is every frontend the consumer declares rather than a fixed path.
+// The roots read only test files, because a criterion recorded in an acceptance
+// record beside a route is a plan, not a test.
+const configuredEvidenceRoots = Array.isArray(specSync.evidenceRoots) && specSync.evidenceRoots.length
+  ? specSync.evidenceRoots
+  : (Array.isArray(project.paths?.frontends) ? project.paths.frontends.map((frontend) => frontend?.path).filter(Boolean) : []);
 
 const markedRoots = configuredMarkedRoots.map((value) => slash(value).replace(/\/+$/, ''));
 const isMarked = (relative) => markedRoots.some((prefix) => relative === prefix || relative.startsWith(`${prefix}/`));
@@ -463,6 +477,37 @@ for (const file of featureFiles) {
   }
 }
 
+// ---- collect frontend test citations ---------------------------------------
+// A UI page declares acceptance criteria under the frontend's own anchor, which
+// no C# or feature file cites. The browser test that proves one names it in its
+// title, in the citation form the other two carriers use:
+//
+//   test("[acceptance-criterion/storefront.ticket.region-sidecar-names-attached-page-heading] ...")
+//
+// Only test files are read. An acceptance record beside a route names its
+// criterion and the test file that proves it, but the record is a plan, so a
+// criterion it lists is cited only once that test file names it.
+const FRONTEND_TEST_FILE = /\.(?:spec|test)\.[cm]?[jt]sx?$/i;
+const frontendFiles = [];
+for (const configured of configuredEvidenceRoots) {
+  for (const file of walk(path.join(root, configured), (candidate) => FRONTEND_TEST_FILE.test(path.basename(candidate)))) {
+    frontendFiles.push(file);
+  }
+}
+frontendFiles.sort();
+
+for (const file of frontendFiles) {
+  const rel = relativeToRoot(file);
+  const text = fs.readFileSync(file, 'utf8');
+  let carriesCitation = false;
+  for (const id of scanIdentifiers(text)) {
+    if (!id.startsWith('acceptance-criterion/')) continue;
+    testCitedIds.add(id);
+    carriesCitation = true;
+  }
+  if (carriesCitation) testFiles.add(rel);
+}
+
 // A test that covers an acceptance criterion proves the use case the criterion is
 // anchored on. A path on that use case, and an invariant enforced by it, are then
 // proven too.
@@ -529,6 +574,7 @@ if (jsonOutput) {
     specificationPages: specPages.length,
     csharpFiles: codeFiles.length,
     featureFiles: featureFiles.length,
+    frontendFiles: frontendFiles.length,
     testCitations: testCitedIds.size,
     reportOnly,
     findings,
@@ -540,7 +586,7 @@ console.log(`Consumer: ${root}`);
 if (scheme.source) console.log(`Identifier grammar: ${scheme.kinds.length} kind(s) read from ${scheme.source}`);
 else console.log('Identifier grammar: built-in kind list (the standards page was not found)');
 console.log(`Specification identifiers: ${specIds.size}, code identifiers: ${codeIds.size}`);
-console.log(`Scanned ${specPages.length} specification page(s), ${codeFiles.length} C# file(s), ${featureFiles.length} feature file(s); ${testFiles.size} file(s) carry a test citation`);
+console.log(`Scanned ${specPages.length} specification page(s), ${codeFiles.length} C# file(s), ${featureFiles.length} feature file(s), ${frontendFiles.length} frontend test file(s); ${testFiles.size} file(s) carry a test citation`);
 if (findings.length && reportOnly) {
   console.log(`\nREPORT (${findings.length} finding(s)):`);
   for (const item of findings) console.log(`  - ${item}`);

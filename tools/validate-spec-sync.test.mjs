@@ -23,13 +23,17 @@ const projectFile = path.join(fixture, 'standards.project.json');
 
 const PAGE = 'docs/domain/modules/sales/vouchers/redeem-voucher.md';
 const VOID_PAGE = 'docs/domain/modules/sales/vouchers/void-voucher.md';
+const UI_PAGE = 'docs/domain/modules/sales/vouchers/ui-evidence.md';
 const DOMAIN = 'apps/api/src/Entro.Domain/Sales/Vouchers';
 const APPLICATION = 'apps/api/src/Entro.Application/Sales/Vouchers/RedeemVoucher';
 const TESTS = 'apps/api/tests/Acceptance';
 const FEATURES = `${TESTS}/Features`;
+const FRONTEND_EVIDENCE = 'apps/admin/app/evidence';
 
 const CRITERION = 'acceptance-criterion/sales.redeem-voucher.redeems';
 const FEATURE_TAG = '@implements_entro_acceptance-criterion_sales.redeem-voucher.redeems';
+const UI_CRITERION = 'acceptance-criterion/admin.dashboard.region-sidecar-names-attached-page-heading';
+const UI_ORPHAN = 'acceptance-criterion/admin.dashboard.orphan-criterion';
 
 let failures = 0;
 
@@ -74,7 +78,7 @@ function baseProject() {
     project: { name: 'fixture' },
     profile: 'dotnet-nextjs',
     reviewedStandardsVersion: '2.0.0',
-    paths: { domainDocs: 'docs/domain', testRoots: ['apps/api/tests'] },
+    paths: { domainDocs: 'docs/domain', testRoots: ['apps/api/tests'], frontends: [{ name: 'admin', path: 'apps/admin' }] },
     specSync: {
       codeRoots: ['apps/api/src', 'apps/api/tests'],
       markedRoots: [
@@ -84,6 +88,7 @@ function baseProject() {
         'apps/api/tests',
       ],
       featureRoots: [FEATURES],
+      evidenceRoots: ['apps/admin'],
     },
   };
 }
@@ -237,6 +242,28 @@ fileCase(
   + `  ${FEATURE_TAG}\n`
   + '  Scenario: Voids a voucher\n    Given a voucher exists\n',
   'malformed implementation tag:',
+);
+
+console.log('\nFrontend evidence (standards/rule/frontend-ui.resolve-every-acceptance-identifier)');
+{
+  const uiPage = `# UI evidence\n\nThe page cites \`${UI_CRITERION}\`.\n`;
+  const specFile = `import { test, expect } from '@playwright/test';\n\n`
+    + `test("[${UI_CRITERION}] renders every region its contract names", async ({ page }) => {\n`
+    + '  expect(page).toBeTruthy();\n});\n';
+  withFiles(
+    [
+      [UI_PAGE, uiPage],
+      [`${FRONTEND_EVIDENCE}/${UI_CRITERION.slice('acceptance-criterion/'.length)}.spec.ts`, specFile],
+    ],
+    'a UI criterion a frontend test cites resolves',
+    null,
+  );
+}
+fileCase(
+  'a UI criterion no frontend test cites is still reported',
+  UI_PAGE,
+  `# UI evidence\n\nThe page cites \`${UI_ORPHAN}\`.\n`,
+  `spec identifier with no code element: ${UI_ORPHAN}`,
 );
 
 console.log('\nForeign sources and generated files');
