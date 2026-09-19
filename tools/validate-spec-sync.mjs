@@ -79,6 +79,12 @@
 // declare none of those, so the validator does not ask them for a tag. A test is
 // asked only when it cites an identifier a specification page resolves, because
 // a pure unit test proves nothing a page depends on.
+//
+// An API endpoint mapped with '.ExcludeFromDescription()' is the one endpoint the
+// validator does not ask for a tag. That call keeps the route out of the published
+// contract, so no use-case page can be its specification and no identifier it
+// might carry could resolve. Development-only tooling uses the marker for exactly
+// that reason. Every endpoint without it is still asked for a tag.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -293,11 +299,8 @@ function stripFences(text) {
 }
 
 for (const file of walk(domainDocs, (candidate) => candidate.endsWith('.md'))) {
-  const meta = metadata(file);
-  // A reference page records identifiers, it does not declare obligations, so
-  // its table of old and new names is not a set of specs to reconcile.
-  if (meta && meta.kind === 'reference') continue;
   specPages.push(file);
+  const meta = metadata(file);
   if (meta && typeof meta.id === 'string') {
     const id = bareIdentifier(meta.id);
     if (id) {
@@ -344,6 +347,16 @@ const ABSTRACT_RECORD = /\babstract\s+(?:sealed\s+)?record\s+([A-Z][A-Za-z0-9_]*
 // IQueryHandler, which is what separates it from those. A domain exception
 // derives from DomainException, so an operational exception in the Application
 // or WebApi layer is not one. (standards/rule/core-system.documentation-and-code-change-together)
+//
+// An endpoint mapped with '.ExcludeFromDescription()' is the exception to the
+// endpoint rule, and only to the endpoint rule. The call keeps the route out of
+// the published API document, which is how a development-only deployment tool
+// stays off every generated client and out of the buyer-facing contract. Nothing
+// the contract does not carry can be named by a use-case page, so an identifier
+// there would resolve to nothing. The marker exempts a file only when it covers
+// every endpoint the file declares, so a second, published endpoint in the same
+// file is still asked for a tag.
+const EXCLUDE_BY_DECLARATION = /\.ExcludeFromDescription\s*\(\s*\)/g;
 const CONCRETE_DECLARATION = /\b(?:class|record(?:\s+(?:class|struct))?|struct)\s+([A-Z][A-Za-z0-9_]*)/g;
 const AGGREGATE_ROOT_DECLARATION = /:\s*AggregateRoot\s*</;
 const DOMAIN_EXCEPTION_BASE = /:\s*DomainException\b/;
@@ -354,6 +367,17 @@ function declaredTypeNames(text) {
   const names = [];
   for (const match of text.matchAll(CONCRETE_DECLARATION)) names.push(match[1]);
   return names;
+}
+
+// A file is exempt from the endpoint rule when '.ExcludeFromDescription()' covers
+// every endpoint it declares. Counting rather than a bare presence test keeps a
+// published endpoint markable when it shares a file with an excluded one, because
+// that endpoint is still owed a tag.
+function everyEndpointIsExcluded(text, names) {
+  const endpoints = names.filter((name) => /(?:Endpoint|Endpoints)$/.test(name));
+  if (!endpoints.length) return false;
+  const markers = text.match(EXCLUDE_BY_DECLARATION) ?? [];
+  return markers.length >= endpoints.length;
 }
 
 // A test is part of the marking system only when it proves something, which is
@@ -380,7 +404,7 @@ function isMarkableElement(text) {
   if (names.some((name) => /(?:Command|Query)$/.test(name))) return true;
   if (names.some((name) => /Validator$/.test(name))) return true;
   if (names.some((name) => /Authorizer$/.test(name))) return true;
-  if (names.some((name) => /(?:Endpoint|Endpoints)$/.test(name))) return true;
+  if (names.some((name) => /(?:Endpoint|Endpoints)$/.test(name)) && !everyEndpointIsExcluded(text, names)) return true;
   if (names.some((name) => /Event$/.test(name)) && /IDomainEvent\b/.test(text)) return true;
   if (names.some((name) => /Handler$/.test(name)) && USE_CASE_HANDLER_BASE.test(text)) return true;
   if (names.some((name) => /Exception$/.test(name)) && DOMAIN_EXCEPTION_BASE.test(text)) return true;
