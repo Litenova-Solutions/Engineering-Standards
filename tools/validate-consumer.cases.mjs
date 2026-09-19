@@ -879,6 +879,87 @@ projectCase(
   "paths.testRoots names a directory that does not exist 'tests/missing'",
 );
 
+console.log('\nClassification identifiers (standards/rule/backend-identifiers.*)');
+// One page carries the valid tokens, so a passing case is the same shape as its
+// failing case with the one fault removed. The rule id at the end of every
+// finding is the assertion, so a case names the rule it proves.
+const identifierPage = 'docs/domain/modules/orders/README.md';
+const appendLine = (text) => (raw) => `${raw}\n${text}\n`;
+const IDENTIFIER_RULE = {
+  grammar: 'standards/rule/backend-identifiers.state-the-identifier-grammar',
+  kind: 'standards/rule/backend-identifiers.name-the-kind-with-a-full-english-word',
+  anchor: 'standards/rule/backend-identifiers.anchor-the-identifier-on-its-natural-home',
+  forms: 'standards/rule/backend-identifiers.state-the-per-kind-identifier-forms',
+  trigger: 'standards/rule/backend-identifiers.use-a-trigger-form-only-for-invariants',
+  attributes: 'standards/rule/backend-identifiers.attach-four-identifying-attributes-to-every-cross-boundary-element',
+  source: 'standards/rule/backend-identifiers.cite-across-sources-with-the-source-prefix-form',
+  digits: 'standards/rule/backend-identifiers.exclude-digits-from-every-identifier',
+  unique: 'standards/rule/backend-identifiers.keep-identifiers-unique-within-their-anchor',
+  tombstone: 'standards/rule/backend-identifiers.retire-identifiers-through-the-tombstone-list',
+};
+
+// Rule 1, the grammar. An upper-case segment is not lower kebab-case.
+bodyCase('rule 1 fails on an upper-case segment', identifierPage, appendLine('The event `event/order-claim.Cancelled` is recorded.'), IDENTIFIER_RULE.grammar);
+bodyCase('rule 1 passes on a lower-case identifier', identifierPage, appendLine('The event `event/order-claim.cancelled` is recorded.'), { absent: IDENTIFIER_RULE.grammar });
+// Rule 2, the kind is one full English word.
+bodyCase('rule 2 fails on an abbreviated kind', identifierPage, appendLine('The event `evt/order-claim.cancelled` is recorded.'), IDENTIFIER_RULE.kind);
+bodyCase('rule 2 passes on a full kind word', identifierPage, appendLine('The event `event/order-claim.cancelled` is recorded.'), { absent: IDENTIFIER_RULE.kind });
+// Rule 3, the anchor is the kind's natural home.
+bodyCase('rule 3 fails on an unknown aggregate anchor', identifierPage, appendLine('The event `event/nonexistent-order.cancelled` is recorded.'), IDENTIFIER_RULE.anchor);
+bodyCase('rule 3 passes on a known aggregate anchor', identifierPage, appendLine('The event `event/order-claim.cancelled` is recorded.'), { absent: IDENTIFIER_RULE.anchor });
+// Rule 4, the per-kind form.
+bodyCase('rule 4 fails on an event with no topic', identifierPage, appendLine('The event `event/order-claim` is recorded.'), IDENTIFIER_RULE.forms);
+bodyCase('rule 4 passes on an event with a topic', identifierPage, appendLine('The event `event/order-claim.cancelled` is recorded.'), { absent: IDENTIFIER_RULE.forms });
+// Rule 5, the trigger form belongs to an invariant only. The first part is an
+// aggregate anchor and the kind is a rule kind other than invariant.
+bodyCase('rule 5 fails on a non-invariant trigger form', identifierPage, appendLine('The rule `validation/order-claim.cancel-order.reject-nothing` applies.'), IDENTIFIER_RULE.trigger);
+bodyCase('rule 5 passes on an invariant trigger form', identifierPage, appendLine('The rule `invariant/order-claim.cancel-order.state-allows-the-action` applies.'), { absent: IDENTIFIER_RULE.trigger });
+// Rule 7, the cross-source prefix names a known source.
+bodyCase('rule 7 fails on an unknown source prefix', identifierPage, appendLine('The rule `thirdparty/invariant/order-claim.state-allows-the-action` applies.'), IDENTIFIER_RULE.source);
+bodyCase('rule 7 passes on a known source prefix', identifierPage, appendLine('The rule `entro/invariant/order-claim.state-allows-the-action` applies.'), { absent: IDENTIFIER_RULE.source });
+// Rule 8, no segment carries a digit.
+bodyCase('rule 8 fails on a digit in the topic', identifierPage, appendLine('The event `event/order-claim.cancelled-v2` is recorded.'), IDENTIFIER_RULE.digits);
+bodyCase('rule 8 passes without a digit', identifierPage, appendLine('The event `event/order-claim.cancelled` is recorded.'), { absent: IDENTIFIER_RULE.digits });
+
+// Rule 9, an active identifier is unique within its anchor. A second use-case
+// page declaring the same id is the duplicate; the passing case declares its
+// own id at a path its metadata matches.
+const duplicateUseCase = (id) => `---\n${JSON.stringify({ kind: 'use-case', id, specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Cancel order\n\n## Scenario\n\nSanne cancels the duplicate order she placed on the Friday before the show.\n`;
+fileCase('rule 9 fails on a duplicated anchor identifier', 'docs/domain/modules/orders/order-claims/cancel-order.md', duplicateUseCase('use-case/orders.cancel-order'), IDENTIFIER_RULE.unique);
+fileCase('rule 9 passes on a unique anchor identifier', 'docs/domain/modules/orders/order-claims/repeat-cancel.md', duplicateUseCase('use-case/orders.repeat-cancel'), { absent: IDENTIFIER_RULE.unique });
+
+// Rule 10, a retired identifier is never reused. The tombstone file is read by
+// name, and its own rows are not part of the active set.
+const tombstonePage = (row) => `---\n${JSON.stringify({ kind: 'reference', id: 'identifiers-tombstones', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Retired identifiers\n\n## Intent\n\nThe list resolves a citation that outlives the element it names.\n\n## Reference\n\n${row}\n`;
+fileCase('rule 10 fails when an active identifier is retired', 'docs/domain/identifiers-tombstones.md', tombstonePage('- `use-case/orders.cancel-order` -> none (withdrawn)'), IDENTIFIER_RULE.tombstone);
+fileCase('rule 10 passes when a retired identifier is absent', 'docs/domain/identifiers-tombstones.md', tombstonePage('- `use-case/orders.removed-case` -> none (withdrawn)'), { absent: IDENTIFIER_RULE.tombstone });
+
+// Rule 6, the four identifying attributes. The event scan reads the project's
+// parity roots, so the fixture declares one and the cases write an event there.
+{
+  const originalProject = readFixture('standards.project.json');
+  const project = JSON.parse(originalProject);
+  project.parity.sourceRoots = ['apps/api/src'];
+  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+
+  const eventFile = 'apps/api/src/OrderCancelledEvent.cs';
+  const causation = 'public interface ICausationScope\n{\n    string CausationId { get; }\n}\n\n';
+  const classification = '    public const string Classification = "event/order-claim.order-cancelled";\n';
+  const passing = `${causation}public sealed record OrderCancelledEvent : IDomainEvent\n{\n${classification}}\n`;
+  const asClass = `${causation}public sealed class OrderCancelledEvent : IDomainEvent\n{\n${classification}}\n`;
+  const noClassification = `${causation}public sealed record OrderCancelledEvent : IDomainEvent\n{\n}\n`;
+  const noCausation = `public sealed record OrderCancelledEvent : IDomainEvent\n{\n${classification}}\n`;
+  const undocumented = `${causation}public sealed record OrderCancelledEvent : IDomainEvent\n{\n    public const string Classification = "event/order-claim.never-documented";\n}\n`;
+
+  fileCase('rule 6 passes when an event carries all four attributes', eventFile, passing, { absent: IDENTIFIER_RULE.attributes });
+  fileCase('rule 6 fails when an event is a class', eventFile, asClass, IDENTIFIER_RULE.attributes);
+  fileCase('rule 6 fails when an event has no classification', eventFile, noClassification, IDENTIFIER_RULE.attributes);
+  fileCase('rule 6 fails when no causation carrier exists', eventFile, noCausation, IDENTIFIER_RULE.attributes);
+  fileCase('rule 6 fails when the classification names no page', eventFile, undocumented, IDENTIFIER_RULE.attributes);
+
+  writeFile('standards.project.json', originalProject);
+}
+
 if (!process.env.KEEP_FIXTURE) fs.rmSync(fixture, { recursive: true, force: true }); else console.log(`fixture: ${fixture}`);
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);
 process.exit(failures ? 1 : 0);

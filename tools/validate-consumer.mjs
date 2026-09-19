@@ -18,6 +18,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checkProseMeasures, checkLanguage, checkLanguageInSource, compileLanguage } from './prose.mjs';
+import { RuleIdentifierScan, MultiFormScan, DEFAULT_SOURCES } from './identifiers.mjs';
 
 const USAGE = `Usage: node tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
 
@@ -848,6 +849,76 @@ let languageSummary = '';
   }
 }
 
+// ---- identifier shape and the four attributes ------------------------------
+// A classification identifier is a contract between the pages that define it,
+// the code that raises it, and the tests that select it. Every rule on
+// standards/docs/backend/identifiers.md is checked here, because a page that
+// states a rule and nothing reads it states an intention.
+// (standards/rule/backend-identifiers.state-the-identifier-grammar through
+//  standards/rule/backend-identifiers.retire-identifiers-through-the-tombstone-list)
+const identifierContext = {
+  aggregateAnchors: new Set(),
+  moduleAnchors: new Set(),
+  useCaseAnchors: new Set(),
+  useCaseNames: new Set(),
+  policyAnchors: new Set(),
+  sources: new Set(DEFAULT_SOURCES),
+  definitions: [],
+  tombstones: new Map(),
+  tombstoneRel: undefined,
+};
+for (const { meta } of metas) {
+  if (!meta) continue;
+  if (meta.kind === 'aggregate' && typeof meta.id === 'string') identifierContext.aggregateAnchors.add(String(meta.id).replace(/^aggregate\//, ''));
+  if (meta.kind === 'module' && typeof meta.id === 'string') identifierContext.moduleAnchors.add(String(meta.id));
+  if (meta.kind === 'domain-policy' && typeof meta.id === 'string') identifierContext.policyAnchors.add(String(meta.id));
+  if (meta.kind === 'use-case' && typeof meta.id === 'string') {
+    const full = String(meta.id).replace(/^use-case\//, '');
+    identifierContext.useCaseAnchors.add(full);
+    identifierContext.useCaseNames.add(full.split('.').slice(1).join('.'));
+  }
+}
+// The module folder is the module anchor, so a module whose page the scan has
+// not reached still resolves its use cases.
+const modulesRoot = path.join(domainDocs, 'modules');
+if (fs.existsSync(modulesRoot)) {
+  for (const entry of fs.readdirSync(modulesRoot, { withFileTypes: true })) {
+    if (entry.isDirectory() && !entry.name.startsWith('.')) identifierContext.moduleAnchors.add(entry.name);
+  }
+}
+
+// The definitions are the active set rules 9 and 10 read: every classification a
+// specification declares in its metadata, and every event classification a type
+// declares in the source. Acceptance criteria are excluded because the duplicate
+// check above already reads them.
+const scanDocs = files.map((f) => ({ rel: path.relative(root, f).replace(/\\/g, '/'), raw: fs.readFileSync(f, 'utf8') }));
+const docText = scanDocs.map((d) => d.raw).join('\n');
+for (const { rel, meta } of metas) {
+  if (meta && typeof meta.id === 'string' && /^[a-z][a-z0-9-]*\//.test(meta.id)) identifierContext.definitions.push({ id: meta.id, rel });
+}
+for (const f of files) {
+  if (path.basename(f) !== 'identifiers-tombstones.md') continue;
+  identifierContext.tombstoneRel = path.relative(root, f).replace(/\\/g, '/');
+  for (const m of fs.readFileSync(f, 'utf8').matchAll(/^-\s+`([^`]+)`\s*->\s*`?([^`\s]+)`?/gm)) identifierContext.tombstones.set(m[1], m[2]);
+}
+
+// The source the four-attribute scan reads is the project's own parity roots. A
+// project that names none has no raised event in this tree to check, and the
+// scan reports nothing rather than a pass over an empty set.
+const sourceFiles = [];
+for (const sourceRoot of Array.isArray(project.parity?.sourceRoots) ? project.parity.sourceRoots : []) {
+  let matched;
+  try { matched = globFiles(root, `${String(sourceRoot).replace(/\/+$/, '')}/**/*.cs`); }
+  catch (e) { err(`standards.project.json: parity.sourceRoots '${sourceRoot}' could not be read (${e.message})`); continue; }
+  for (const relative of matched) sourceFiles.push({ rel: relative, raw: fs.readFileSync(path.join(root, relative), 'utf8') });
+}
+for (const file of sourceFiles) {
+  for (const m of file.raw.matchAll(/Classification\s*=\s*"([^"]*)"/g)) identifierContext.definitions.push({ id: m[1], rel: file.rel });
+}
+const identifiersRead = RuleIdentifierScan({ files: scanDocs, context: identifierContext, err });
+const eventsRead = MultiFormScan({ sourceFiles, docText, context: identifierContext, err });
+const identifierSummary = `Identifiers: ${identifiersRead} classification identifier(s) read; event attributes: ${eventsRead} event type(s) read across ${sourceFiles.length} source file(s)`;
+
 // ---- report ----------------------------------------------------------------
 // A machine reader gets the problems as an array and the counts as fields, so
 // nothing has to be recovered by parsing the human lines back apart.
@@ -868,6 +939,7 @@ if (jsonOutput) {
 console.log(`Consumer: ${root}`);
 console.log(`Files scanned: ${files.length} under ${docsPath}, metadata blocks: ${metas.length}`);
 console.log(languageSummary);
+console.log(identifierSummary);
 console.log(`Acceptance ids: ${acDefs.size}, end-to-end test ids: ${e2eDefs.size}`);
 if (testRoots.length) console.log(`Acceptance citations: ${citations.size} of ${acDefs.size} criteria cited across ${testFiles} test source file(s)`);
 if (uiOutput) console.log(`\n${uiOutput}`);

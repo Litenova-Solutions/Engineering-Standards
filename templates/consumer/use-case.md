@@ -58,7 +58,7 @@ For a Command, list every aggregate changed. For a Query, write `No Domain trans
 
 | Aggregate | Source state | Business action | Target state | Rules | Event references |
 |:---|:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | `event/__AGGREGATE_ANCHOR__.____PAST_TENSE_EVENT__` |
+| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | `event/__AGGREGATE_ANCHOR__.__PAST_TENSE_EVENT__` |
 
 When more than one aggregate appears, state the invariant or domain policy that requires one transaction.
 
