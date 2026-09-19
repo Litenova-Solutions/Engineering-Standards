@@ -373,6 +373,21 @@ fileCase(
   'internal sealed class ProbeVoucherEndpoint : IEndpoint;\n',
   'code element with no identifier tag:',
 );
+fileCase(
+  'an endpoint excluded from the published document is not a markable element',
+  'apps/api/src/Entro.WebApi/Platform/Deployment/ProbeDevelopmentEndpoint.cs',
+  'internal sealed class ProbeDevelopmentEndpoint : IEndpoint\n{\n'
+  + '    public void MapEndpoint(IEndpointRouteBuilder endpoints) => endpoints\n'
+  + '        .MapPost("/api/development/probe", () => { })\n'
+  + '        .ExcludeFromDescription();\n}\n',
+  null,
+);
+fileCase(
+  'an endpoint without the exclusion marker is still reported',
+  'apps/api/src/Entro.WebApi/Platform/Deployment/ProbePublishedEndpoint.cs',
+  'internal sealed class ProbePublishedEndpoint : IEndpoint;\n',
+  'code element with no identifier tag:',
+);
 
 console.log('\nConsumer configuration');
 {
