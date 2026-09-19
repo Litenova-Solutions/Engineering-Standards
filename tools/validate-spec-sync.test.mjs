@@ -288,6 +288,92 @@ fileCase(
   null,
 );
 
+console.log('\nMarkable declarations (standards/rule/core-system.documentation-and-code-change-together)');
+fileCase(
+  'a port that ends in a markable word is not a markable element',
+  `${APPLICATION}/IVoucherValidator.cs`,
+  'public interface IVoucherValidator;\n',
+  null,
+);
+fileCase(
+  'a pipeline stage is not a markable element',
+  'apps/api/src/Entro.Application/Pipeline/CausationScopeCommandPreHandler.cs',
+  'internal sealed class CausationScopeCommandPreHandler<TCommand>\n'
+  + '    : ICommandPreHandler<TCommand>\n'
+  + '    where TCommand : ICommand;\n',
+  null,
+);
+fileCase(
+  'an authentication scheme handler is not a markable element',
+  'apps/api/src/Entro.WebApi/Hosting/Security/ProbeAuthenticationHandler.cs',
+  'internal sealed class ProbeAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>;\n',
+  null,
+);
+fileCase(
+  'an operational exception that is not a domain exception is not a markable element',
+  'apps/api/src/Entro.Application/Platform/Deployment/UnknownOperationalSignalException.cs',
+  'public sealed class UnknownOperationalSignalException : Exception;\n',
+  null,
+);
+fileCase(
+  'a unit test that proves nothing is not a markable element',
+  `${TESTS}/ProbeValueTests.cs`,
+  'public sealed class ProbeValueTests\n{\n    [Fact]\n    public void Rounds() { }\n}\n',
+  null,
+);
+fileCase(
+  'a test that cites an acceptance criterion without a tag is reported',
+  `${TESTS}/ProbeCitationTests.cs`,
+  'public sealed class ProbeCitationTests\n{\n'
+  + `    [Trait("AcceptanceCriterion", "${CRITERION}")]\n`
+  + '    [Fact]\n    public void Proves() { }\n}\n',
+  'code element with no identifier tag:',
+);
+fileCase(
+  'a command with no tag is reported',
+  `${APPLICATION}/ProbeCommand.cs`,
+  'public sealed record ProbeCommand;\n',
+  'code element with no identifier tag:',
+);
+fileCase(
+  'a use-case handler with no tag is reported',
+  `${APPLICATION}/ProbeCommandHandler.cs`,
+  'internal sealed class ProbeCommandHandler : ICommandHandler<ProbeCommand>;\n',
+  'code element with no identifier tag:',
+);
+fileCase(
+  'a read-model record that ends in Event is not a domain event',
+  'apps/api/src/Entro.Application/Operations/ProcessorEvents/AppliedProcessorEvent.cs',
+  'public sealed record AppliedProcessorEvent;\n',
+  null,
+);
+fileCase(
+  'a test that only asserts a failure code is not a markable element',
+  `${TESTS}/ProbeFailureTests.cs`,
+  'public sealed class ProbeFailureTests\n{\n'
+  + '    [Fact]\n    public void Refuses() { }\n'
+  + '    private const string Code = "failure/sales.not_found";\n}\n',
+  null,
+);
+fileCase(
+  'a domain event with no tag is reported',
+  `${DOMAIN}/Events/ProbeEvent.cs`,
+  'public sealed record ProbeEvent : IDomainEvent;\n',
+  'code element with no identifier tag:',
+);
+fileCase(
+  'a domain exception with no tag is reported',
+  `${DOMAIN}/Exceptions/UntaggedVoucherException.cs`,
+  'public sealed class UntaggedVoucherException : DomainException;\n',
+  'code element with no identifier tag:',
+);
+fileCase(
+  'an endpoint with no tag is reported',
+  'apps/api/src/Entro.WebApi/Sales/Vouchers/ProbeVoucherEndpoint.cs',
+  'internal sealed class ProbeVoucherEndpoint : IEndpoint;\n',
+  'code element with no identifier tag:',
+);
+
 console.log('\nConsumer configuration');
 {
   const project = baseProject();

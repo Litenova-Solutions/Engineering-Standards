@@ -74,9 +74,11 @@
 //
 // A file must carry a tag when it declares an element the marking convention
 // names: a command, query, handler, validator, authorizer, domain event, domain
-// exception, aggregate root, API endpoint, or a test method. A port, an option,
-// and a shared value object declare none of those, so the validator does not ask
-// them for a tag.
+// exception, aggregate root, or API endpoint. The declaration is matched by its
+// type name. A port, an option, a shared value object, and the host's wiring
+// declare none of those, so the validator does not ask them for a tag. A test is
+// asked only when it cites an identifier a specification page resolves, because
+// a pure unit test proves nothing a page depends on.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -325,18 +327,61 @@ const ABSTRACT_RECORD = /\babstract\s+(?:sealed\s+)?record\s+([A-Z][A-Za-z0-9_]*
 
 // A file must carry a tag when it declares an element the marking convention
 // names: a command, query, handler, validator, authorizer, domain event, domain
-// exception, aggregate root, API endpoint, or a test method. A port, an option,
-// a shared value object, and the host's wiring declare none of those, so
-// requiring a tag on them would report a correct file and leave no exit.
-// (standards/rule/core-system.documentation-and-code-change-together)
-const MARKABLE_NAME = /(?:Handler|Command|Query|Validator|Authorizer|Event|Exception|Endpoints?)\.cs$/;
+// exception, aggregate root, or API endpoint. The declaration is matched by the
+// type name it declares rather than by the filename, so a file whose name ends
+// in one of those words is not asked for a tag when it declares something else,
+// and a file whose name does not is asked when it declares one.
+//
+// A port declares no operation. An interface is never markable, whatever its
+// name, because the marking convention names the implementation of an operation
+// rather than the contract for one. The host's own wiring declares no operation
+// a page or an identifier names: a pipeline stage, an exception boundary, and an
+// authentication scheme carry an infrastructure interface, not the use-case
+// interface a handler carries. A use-case handler implements ICommandHandler or
+// IQueryHandler, which is what separates it from those. A domain exception
+// derives from DomainException, so an operational exception in the Application
+// or WebApi layer is not one. (standards/rule/core-system.documentation-and-code-change-together)
+const CONCRETE_DECLARATION = /\b(?:class|record(?:\s+(?:class|struct))?|struct)\s+([A-Z][A-Za-z0-9_]*)/g;
 const AGGREGATE_ROOT_DECLARATION = /:\s*AggregateRoot\s*</;
+const DOMAIN_EXCEPTION_BASE = /:\s*DomainException\b/;
+const USE_CASE_HANDLER_BASE = /I(?:Command|Query)Handler\s*</;
 const TEST_MARKER = /\[\s*(?:Fact|Theory|Scenario|Given|When|Then|StepDefinition)\b/;
 
-function isMarkableElement(relative, text) {
-  if (MARKABLE_NAME.test(relative)) return true;
+function declaredTypeNames(text) {
+  const names = [];
+  for (const match of text.matchAll(CONCRETE_DECLARATION)) names.push(match[1]);
+  return names;
+}
+
+// A test is part of the marking system only when it proves something, which is
+// when it cites an identifier a specification page declares or cites, of a kind
+// a test can prove. A pure unit test (a value object, a pipeline stage, an
+// architecture rule) cites nothing that resolves, so no page depends on it and
+// no tag is owed. A test that asserts a failure code cites a value, not a
+// proof, so it is not asked for a tag either. A test that cites a criterion
+// without one is a gap and is still reported.
+// (standards/rule/core-system.documentation-and-code-change-together)
+const PROVABLE_KINDS = new Set(['use-case', 'acceptance-criterion', 'path', 'invariant']);
+
+function citesProvableIdentifier(text) {
+  return scanIdentifiers(text).some((id) => {
+    const parsed = parseCitation(id);
+    return parsed !== null && PROVABLE_KINDS.has(parsed.kind) && specIds.has(id);
+  });
+}
+
+function isMarkableElement(text) {
+  if (TEST_MARKER.test(text)) return citesProvableIdentifier(text);
+  const names = declaredTypeNames(text);
+  if (!names.length) return false;
+  if (names.some((name) => /(?:Command|Query)$/.test(name))) return true;
+  if (names.some((name) => /Validator$/.test(name))) return true;
+  if (names.some((name) => /Authorizer$/.test(name))) return true;
+  if (names.some((name) => /(?:Endpoint|Endpoints)$/.test(name))) return true;
+  if (names.some((name) => /Event$/.test(name)) && /IDomainEvent\b/.test(text)) return true;
+  if (names.some((name) => /Handler$/.test(name)) && USE_CASE_HANDLER_BASE.test(text)) return true;
+  if (names.some((name) => /Exception$/.test(name)) && DOMAIN_EXCEPTION_BASE.test(text)) return true;
   if (AGGREGATE_ROOT_DECLARATION.test(text)) return true;
-  if (TEST_MARKER.test(text)) return true;
   return false;
 }
 
@@ -399,7 +444,7 @@ for (const file of codeFiles) {
     for (const useCase of useCases) enforcedBy.get(invariant).add(useCase);
   }
 
-  if (isMarked(rel) && isMarkableElement(rel, text) && !fileHasTag) {
+  if (isMarked(rel) && isMarkableElement(text) && !fileHasTag) {
     finding(`code element with no identifier tag: ${rel}`);
   }
 

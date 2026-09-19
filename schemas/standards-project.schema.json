@@ -186,6 +186,37 @@
         }
       }
     },
+    "specSync": {
+      "description": "Configuration for the specification-sync validator. Every field is optional, and each default is derived from paths.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "codeRoots": {
+          "description": "Directories whose C# files are read for marking tags. Defaults to apps/api/src and apps/api/tests.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "markedRoots": {
+          "description": "Directories whose type-declaring files must carry a tag. Defaults to the Domain, Application, and WebApi projects plus every test root.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "featureRoots": {
+          "description": "Directories holding Reqnroll feature files. Defaults to apps/api/tests/Entro.Acceptance.Tests/Features.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "evidenceRoots": {
+          "description": "Frontend directories whose test files are read for acceptance-criterion citations. Defaults to every path in paths.frontends.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        }
+      }
+    },
     "selectedExtensions": {
       "description": "Extensions active for this project. A bare string selects the extension. An object also records the criterion that was met and the date the selection is next reviewed, so a selection that costs nothing to keep still expires.",
       "type": "array",
