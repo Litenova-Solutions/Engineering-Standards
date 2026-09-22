@@ -15,6 +15,17 @@
 ---
 # __TITLE__
 
+## Business impact
+
+- Risk: Lift the risks from the metadata block.
+- Refusals: Lift the refusal codes from the Failures table.
+- Authorized for: Lift the actors from the metadata block.
+- Reached from: Lift the entry points from the metadata block and the Consumers table.
+
+## Terms used
+
+- Lift each canonical term the body uses, linked to its glossary heading.
+
 ## Goal
 
 State the actor or system goal and its observable result.

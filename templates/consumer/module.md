@@ -10,6 +10,16 @@
 ---
 # __TITLE__
 
+## Module map
+
+- Authority level: Lift the level and its position from the authority hierarchy.
+- Aggregates: Lift each root with its invariant, state, and use-case counts.
+- Use cases: Lift the total and the planned count from the Use cases table.
+- Events raised: Lift the events from the Events and event reactions table.
+- Reacts to: Lift the reactions from the Events and event reactions table.
+- Terms: Lift the terms this module defines.
+- Policies: Lift the policy identifiers this module links.
+
 ## Purpose
 
 State the domain area, its language, and the outcomes its use cases support. A module organizes specifications and code. It is not a transaction or deployment boundary.

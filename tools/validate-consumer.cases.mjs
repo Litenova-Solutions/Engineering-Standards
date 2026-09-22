@@ -318,6 +318,24 @@ bodyCase('command page hiding its mechanism', 'docs/tools/fixture-up.md', (raw) 
 bodyCase('reference page with no reference section', 'docs/reference/ports.md', (raw) => raw.replace('## Reference', '## Procedure'), "requires an H2 'Reference'");
 bodyCase('configuration page with no precedence', 'docs/tools/configuration.md', (raw) => raw.replace('## Precedence', '## Notes'), "requires an H2 'Precedence'");
 
+console.log('\nSpecification cards (standards/rule/core-authoring.use-the-declared-page-contract)');
+bodyCase('module page with no module map', 'docs/domain/modules/orders/README.md', (raw) => raw.replace('## Module map', '## Notes'), "requires an H2 'Module map'");
+bodyCase('aggregate page with no at-a-glance card', 'docs/domain/modules/orders/order-claims/README.md', (raw) => raw.replace('## At a glance', '## Notes'), "requires an H2 'At a glance'");
+bodyCase('use-case page with no business impact callout', 'docs/domain/modules/orders/cancel-order.md', (raw) => raw.replace('## Business impact', '## Notes'), "requires an H2 'Business impact'");
+bodyCase(
+  'aggregate card below the section it introduces',
+  'docs/domain/modules/orders/order-claims/README.md',
+  (raw) => raw.replace(/## At a glance[\s\S]*?(?=## Terms used)/, '').replace('## Scenario', '## At a glance\n\nThe card lifts from the sections below.\n\n## Scenario'),
+  "requires an H2 'At a glance' as the first section, before 'Purpose'",
+);
+bodyCase(
+  'use-case terms callout below the goal it precedes',
+  'docs/domain/modules/orders/cancel-order.md',
+  (raw) => raw.replace(/## Terms used[\s\S]*?(?=## Goal)/, '').replace('## Scenario', '## Terms used\n\nThe card lifts from the sections below.\n\n## Scenario'),
+  "requires an H2 'Terms used' after 'Business impact' and before 'Goal'",
+);
+bodyCase('aggregate page carrying its card in position', 'docs/domain/modules/orders/order-claims/README.md', (raw) => raw.replace('## Terms used', 'The card lifts from the sections below.\n\n## Terms used'), null);
+
 console.log('\nDocumentation root');
 projectCase('documentation root that is on disk', (p) => { p.paths.docs = 'docs'; }, null);
 projectCase('documentation root that is not on disk', (p) => { p.paths.docs = 'documentation'; }, "paths.docs 'documentation' does not exist");
@@ -405,7 +423,7 @@ report('flat single-aggregate module resolves', null, run());
 fileCase(
   'nested aggregate subdirectory resolves',
   'docs/domain/modules/orders/order-claims/claim-guest-order.md',
-  `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n\n## Scenario\n\nSanne claims the order she placed as a guest on the morning after the show.\n`,
+  `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n\n## Business impact\n\n- Risk: none.\n\n## Terms used\n\n- order\n\n## Scenario\n\nSanne claims the order she placed as a guest on the morning after the show.\n`,
   null,
 );
 fileCase(

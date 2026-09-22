@@ -81,6 +81,10 @@ A consumer template's `reviewedStandardsVersion` field is set to the latest rele
 
 Read the full cited provisions before applying these boundaries. (standards/rule/core-agent.select-task-context)
 
+## Specification Cards
+
+An aggregate, module, or use-case specification carries a card under its title, before its first section. The card is `At a glance` on an aggregate, `Module map` on a module, and `Business impact` on a use case. An aggregate or use-case page also carries `Terms used`, and a card lifts from the page and invents nothing. The reference consumer validator requires the callouts and their position. (standards/rule/core-authoring.use-the-declared-page-contract)
+
 ## Repository Verification
 
 Run these checks for the standards repository. (standards/rule/core-authoring.run-repeatable-authoring-checks)

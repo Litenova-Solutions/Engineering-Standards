@@ -273,9 +273,13 @@ const KINDS = {
   reference: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Reference'] },
   command: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'] },
   configuration: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Settings', 'Precedence'] },
-  module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
-  aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: AGGREGATE },
-  'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: USE_CASE },
+  // The three behavior kinds open with a card that lifts from the sections
+  // below it. Only the card sections are listed: a module that owns no
+  // aggregate drops the aggregate tables, so a full list would report a correct
+  // page. (standards/rule/core-authoring.use-the-declared-page-contract)
+  module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID, sections: ['Module map'] },
+  aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: AGGREGATE, sections: ['At a glance', 'Terms used'] },
+  'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: USE_CASE, sections: ['Business impact', 'Terms used'] },
   'end-to-end-flow': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'useCases'], props: { ...base, implementationStatus: 1, useCases: 1, applicableExtensions: 1 }, id: ID },
   workflow: { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'participatingModules', 'applicableExtensions'], props: { ...base, implementationStatus: 1, participatingModules: 1, applicableExtensions: 1 }, id: ID },
   'domain-policy': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'appliesToModules'], props: { ...base, appliesToModules: 1, applicableExtensions: 1 }, id: ID },
@@ -287,6 +291,14 @@ const KINDS = {
   'release-record': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'release'], props: { ...base, release: 1 }, id: REC },
 };
 const KIND_NAMES = Object.keys(KINDS);
+// The leading callout of a behavior kind, and the section that states the
+// subject it precedes. The terms callout sits between the two.
+// (standards/rule/core-authoring.use-the-declared-page-contract)
+const LEAD_CALLOUTS = {
+  module: { lead: 'Module map', anchor: 'Purpose' },
+  aggregate: { lead: 'At a glance', anchor: 'Purpose', terms: 'Terms used' },
+  'use-case': { lead: 'Business impact', anchor: 'Goal', terms: 'Terms used' },
+};
 
 // A consumer that rules a kind out in its own instructions still gets a clean
 // PASS from the agent that writes one anyway, so the prohibition is advice. The
@@ -439,6 +451,22 @@ for (const f of files) {
   // like a question with no answer. (standards/rule/core-authoring.use-the-declared-page-contract)
   for (const name of spec.sections ?? []) {
     if (sectionBody(raw, name) === null) err(`${rel}: kind '${meta.kind}' requires an H2 '${name}'; a section with nothing to say contains only 'None.'`);
+  }
+
+  // The section loop above proves a callout exists; a callout at the foot of a
+  // page exists and reaches no reader. The first H2 after the metadata block is
+  // the leading callout, and the terms callout sits between it and the section
+  // that states the subject. (standards/rule/core-authoring.use-the-declared-page-contract)
+  const callout = LEAD_CALLOUTS[meta.kind];
+  if (callout) {
+    const headings = [...raw.slice(raw.indexOf('\n---', 3)).matchAll(/^## (.+)$/gm)].map((match) => match[1].trim());
+    const lead = headings.indexOf(callout.lead);
+    if (lead > 0) err(`${rel}: kind '${meta.kind}' requires an H2 '${callout.lead}' as the first section, before '${callout.anchor}'`);
+    if (callout.terms && lead === 0) {
+      const terms = headings.indexOf(callout.terms);
+      const anchor = headings.indexOf(callout.anchor);
+      if (terms >= 0 && anchor >= 0 && terms > anchor) err(`${rel}: kind '${meta.kind}' requires an H2 '${callout.terms}' after '${callout.lead}' and before '${callout.anchor}'`);
+    }
   }
 
   if (SINGLETON_KINDS.has(meta.kind)) {

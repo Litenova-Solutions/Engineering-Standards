@@ -10,6 +10,18 @@
 ---
 # __TITLE__
 
+## At a glance
+
+- Owns: Lift one line from the Ownership table.
+- Business states: Lift the state names from the Business states table.
+- Invariants: Lift the first three rules from the Aggregate invariants table.
+- References by ID: Lift the identities from the Ownership table.
+- Referenced by: Lift the aggregate roots and modules that name this one.
+
+## Terms used
+
+- Lift each canonical term the body uses, linked to its glossary heading.
+
 ## Purpose
 
 State what this aggregate root protects and the business decisions it owns. An aggregate is one transaction boundary. It is not the same boundary as its module.
