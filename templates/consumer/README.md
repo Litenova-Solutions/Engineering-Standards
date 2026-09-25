@@ -32,12 +32,7 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | `decision-evidence.md` | `docs/research/{record}.md` | A large external investigation needs its own owner and lifecycle. |
 | `operating-limits.md` | `docs/operations/limits.md` | A pilot or release has enforced, tested, supported, or alert values. |
 | `section-index.md` | `docs/{section}/README.md` | A directory needs an index and owns no aggregate, use case, or policy. |
-| `page.md` | `docs/ui/{app}/{page}.md` | A page composes non-trivial use cases or interaction states. |
-| `ui-page.json` | `docs/ui/{app}/{page}.ui.json` | Declares the page layout, shell, regions, states, responsive modes, focus, and evidence. |
 | `design-contract.md` | `apps/{app}/DESIGN.md` | States the brand, tokens, vocabulary, patterns, do list, refusals, motion, and voice one frontend composes from. |
-| `composition.md` | `docs/ui/compositions/{recipe}.md` | Argues one repeated page shape: why the shape is the shape, and which pages reach for it. |
-| `composition-recipe.json` | `docs/ui/compositions/{recipe}.recipe.json` | Declares one recipe's scope, slots, states, and rules. |
-| `acceptance-criteria.json` | `apps/{app}/app/{route}/evidence/acceptance.json` | Records each acceptance identifier the sidecar names, with its precondition, steps, assertions, and file. |
 | `ui-vocabulary.json` | `docs/ui/{app}/vocabulary.json` | Closes the shells, patterns, components, tokens, states, forks, and evidence available to agents. |
 | `ui-source-lock.json` | `apps/{app}/ui-source-lock.json` | Records generated shadcn source, preset, registry addresses, digests, and dependencies. |
 | `decision.md` | `docs/decisions/{id}.md` | A standards override or expensive-to-reverse choice is required. |
@@ -54,8 +49,8 @@ A template `id` is not always the filename. The operating-limits record lives at
 
 Markdown specification templates begin with Specification Metadata validated by [the schema](../../schemas/specification-metadata.schema.json). The Agentic Engineering System page defines semantic relationships that JSON Schema cannot prove across files.
 
-React web consumers also validate UI configuration and sidecar contracts with `schemas/ui-vocabulary.schema.json`, `schemas/ui-page.schema.json`, and `schemas/ui-source-lock.schema.json`. Run `node standards/tools/validate-ui.mjs` from the consumer root after adding or changing these files.
+React web consumers also validate UI configuration with `schemas/ui-vocabulary.schema.json`, `schemas/design-contract.schema.json`, and `schemas/ui-source-lock.schema.json`. Run `node standards/tools/validate-ui.mjs` from the consumer root after adding or changing these files.
 
-The three UI templates are a coherent set for a frontend named `web`: the vocabulary, the page sidecar, and the source lock reference each other. Rename the frontend, page id, and component entries together. Replace the placeholder digest in `ui-source-lock.json` with the digest of the formatted installed source before validating.
+The three UI templates are a coherent set for a frontend named `web`: the vocabulary, the design contract, and the source lock reference each other. Rename the frontend, floorplan, and component entries together. Replace the placeholder digest in `ui-source-lock.json` with the digest of the formatted installed source before validating.
 
 The standards do not generate application code. Agents load the active specification, selected profile, task conventions, and applicable extensions before implementing one complete slice.

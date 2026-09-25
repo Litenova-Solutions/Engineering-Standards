@@ -73,15 +73,15 @@
   ],
   "patterns": [
     {
-      "id": "page-header/default",
-      "components": ["button"],
-      "states": ["ready", "error"],
+      "id": "list-page/default",
+      "components": ["button", "skeleton", "empty-state", "error-state"],
+      "states": ["loading", "empty", "error", "ready"],
       "evidence": ["UI-PAGE-HEADER"]
     },
     {
-      "id": "record-list/default",
-      "components": ["button", "skeleton", "empty-state", "error-state"],
-      "states": ["loading", "empty", "error", "ready"],
+      "id": "entity-page/default",
+      "components": ["button", "error-state"],
+      "states": ["ready", "error"],
       "evidence": ["UI-PAGE-HEADER"]
     }
   ],

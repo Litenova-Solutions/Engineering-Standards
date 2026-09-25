@@ -208,6 +208,7 @@
       }
     },
     "pattern": {
+      "$comment": "One floorplan this frontend provides. The identifier before an optional slash variant is the floorplan the design contract names.",
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "components", "states", "evidence"],

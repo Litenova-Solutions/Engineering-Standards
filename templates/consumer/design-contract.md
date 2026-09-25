@@ -5,7 +5,7 @@
   "frontend": "__FRONTEND__",
   "profile": "application-balanced",
   "shell": "application-shell/default",
-  "patterns": ["page-header", "record-list"]
+  "patterns": ["list-page", "entity-page"]
 }
 ---
 
@@ -42,7 +42,12 @@ The primitives this frontend composes from, listed in its `ui-vocabulary.json`. 
 
 ## Patterns
 
-The recipes in the composition catalog this frontend reaches for. A page reaches for one rather than inventing a layout. The sidecar beside each page specification names which, and in which order.
+The floorplans this frontend provides. A route composes exactly one of them, or names the decision behind a freestyle layout.
+
+| Floorplan | Component | Use it when the reader |
+|:---|:---|:---|
+| `list-page` | `ListPage` | Finds one record among many. The page shows the result count. |
+| `entity-page` | `EntityPage` | Acts on one record: its facts, its state, and the actions that state permits. |
 
 ## Do
 

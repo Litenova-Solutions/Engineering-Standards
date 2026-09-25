@@ -61,7 +61,7 @@ A generic comment such as `Client component` does not satisfy the convention.
 
 **Rationale:** A blank region while a request is pending or failed gives the reader no signal at all. Framework state files carry these.
 
-These six are the states a route has. A component has `disabled` and `pending` as well, under `standards/rule/frontend-components.render-complete-states`, because both describe a control rather than a page. A route has `not-found`, which a component does not, because a missing target resolves at the route. `schemas/ui-page.schema.json` holds the complete set a page sidecar can declare, including the form states `validation-error`, `saving`, and `saved`.
+These six are the states a route has. A component has `disabled` and `pending` as well, under `standards/rule/frontend-components.render-complete-states`, because both describe a control rather than a page. A route has `not-found`, which a component does not, because a missing target resolves at the route. The frontend vocabulary `states` list holds the complete set a frontend declares, including form states such as `validation-error`, `saving`, and `saved`.
 
 ### Keep authenticated caching explicit (standards/rule/frontend-rendering.keep-authenticated-caching-explicit)
 
@@ -81,7 +81,7 @@ The file runs on the server. A server environment variable read there stays out 
 
 **Requirement:** A public route MUST define title, description, canonical behavior, and indexing policy, while a private route prevents indexing.
 
-**Rationale:** A route that composes non-trivial use cases also carries a page specification.
+**Rationale:** The metadata is what a search result and a shared link show for the route, and an indexed private route exposes its address.
 
 ## Conventions
 

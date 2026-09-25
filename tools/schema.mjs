@@ -2,7 +2,7 @@
 //
 // Three validators read this module. `validate-standards.mjs` applies it to the
 // repository's own schemas and manifest, `validate-ui.mjs` applies it to a
-// consumer's design contracts, page sidecars, and composition recipes, and the
+// consumer's design contracts and the
 // case suites apply it to their fixtures. A second copy of the evaluator would
 // drift from the first, and the drift would be invisible: each validator would
 // keep reporting a pass against its own idea of JSON Schema.

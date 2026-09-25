@@ -63,15 +63,12 @@ const cleanCss = `@import "tailwindcss";
 }
 `;
 
-// The route the fixture page specification names. Both regions the sidecar
-// declares are marked, so the frozen-plan scan has something to resolve.
-const routeSource = `export default function Page() {
-  return (
-    <main>
-      <div data-region="page-header" />
-      <div data-region="content" />
-    </main>
-  );
+// The fixture route composes one floorplan and carries no layout class. The
+// source scan reads it like any other authored file.
+const routeSource = `import { ListPage } from "@/components/floorplans/list-page";
+
+export default function Page() {
+  return <ListPage title="Orders" count={0} rows={null} />;
 }
 `;
 
@@ -93,7 +90,7 @@ function resolvePlaceholders(value) {
 }
 
 function build() {
-  for (const directory of ['apps/web/app', 'apps/web/app/evidence', 'apps/web/components/ui', 'apps/web/components/common', 'apps/web/lib', 'docs/ui/web', 'docs/ui/compositions', 'docs/decisions', 'standards/tools', 'standards/schemas']) {
+  for (const directory of ['apps/web/app', 'apps/web/components/ui', 'apps/web/components/common', 'apps/web/components/floorplans', 'apps/web/lib', 'docs/ui/web', 'docs/decisions', 'standards/tools', 'standards/schemas']) {
     fs.mkdirSync(path.join(fixture, directory), { recursive: true });
   }
   fs.copyFileSync(path.join(repository, 'standards.manifest.json'), path.join(fixture, 'standards/standards.manifest.json'));
@@ -102,45 +99,17 @@ function build() {
   }
   writeJson(projectFile, resolvePlaceholders(readJson(path.join(repository, 'templates/consumer/standards.project.json'))));
   fs.copyFileSync(path.join(repository, 'templates/consumer/ui-vocabulary.json'), vocabularyFile);
-  fs.copyFileSync(path.join(repository, 'templates/consumer/ui-page.json'), path.join(fixture, 'docs/ui/web/page.ui.json'));
-  // The sidecar is only reachable through a page specification, so the fixture
-  // carries the matching page document.
-  fs.writeFileSync(
-    path.join(fixture, 'docs/ui/web/page.md'),
-    `---\n${JSON.stringify(
-      {
-        kind: 'page',
-        id: 'web.page',
-        specStatus: 'approved',
-        implementationStatus: 'planned',
-        owner: 'fixture',
-        lastReviewed: '2026-01-01',
-        app: 'web',
-        route: '/',
-        useCases: ['fixture.view'],
-      },
-      null,
-      2,
-    )}\n---\n\n# Fixture page\n`,
-  );
   fs.copyFileSync(path.join(repository, 'templates/consumer/ui-source-lock.json'), path.join(fixture, 'apps/web/ui-source-lock.json'));
   fs.writeFileSync(path.join(fixture, 'apps/web/components/ui/button.tsx'), 'export function Button() {\n  return null;\n}\n');
   fs.writeFileSync(path.join(fixture, 'apps/web/components/ui/skeleton.tsx'), 'export function Skeleton() {\n  return null;\n}\n');
   fs.writeFileSync(path.join(fixture, 'apps/web/components/common/empty-state.tsx'), 'export function EmptyState() {\n  return null;\n}\n');
   fs.writeFileSync(path.join(fixture, 'apps/web/components/common/error-state.tsx'), 'export function ErrorState() {\n  return null;\n}\n');
-  // The route the sidecar describes. The region scan starts here, the acceptance
-  // record sits beside it, and the design contract is read from the frontend root.
+  fs.writeFileSync(path.join(fixture, 'apps/web/components/floorplans/list-page.tsx'), 'export function ListPage() {\n  return <main className="grid gap-6" />;\n}\n');
+  // The route composes the floorplan, and the design contract is read from the
+  // frontend root.
   fs.writeFileSync(path.join(fixture, 'apps/web/app/page.tsx'), routeSource);
   const contract = fs.readFileSync(path.join(repository, 'templates/consumer/design-contract.md'), 'utf8');
   fs.writeFileSync(path.join(fixture, 'apps/web/DESIGN.md'), contract.replace(/__FRONTEND__/g, 'web'));
-  for (const recipe of ['page-header', 'record-list']) {
-    const page = fs.readFileSync(path.join(repository, 'templates/consumer/composition.md'), 'utf8');
-    fs.writeFileSync(path.join(fixture, `docs/ui/compositions/${recipe}.md`), page.replace('composition-record-list', `composition-${recipe}`));
-    const sidecar = readJson(path.join(repository, 'templates/consumer/composition-recipe.json'));
-    writeJson(path.join(fixture, `docs/ui/compositions/${recipe}.recipe.json`), { ...sidecar, recipe });
-  }
-  writeJson(path.join(fixture, 'apps/web/app/evidence/acceptance.json'), readJson(path.join(repository, 'templates/consumer/acceptance-criteria.json')));
-  fs.writeFileSync(path.join(fixture, 'apps/web/app/evidence/web.page.region-sidecar-names-attached-page-heading.spec.ts'), 'export const criterion = "acceptance-criterion/web.page.region-sidecar-names-attached-page-heading";\n');
   fs.writeFileSync(globalCss, cleanCss);
   fs.writeFileSync(path.join(fixture, 'docs/decisions/ui-override.md'), '# Override\n');
   writeJson(path.join(fixture, 'apps/web/components.json'), {
@@ -201,24 +170,6 @@ function pathCase(name, relative, contents, expectation) {
   const file = path.join(fixture, relative);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, contents);
-  report(name, expectation, run());
-  fs.rmSync(file);
-}
-
-// A page case writes a second page specification beside the tracked one, so the
-// checks that compare pages with each other have two pages to compare.
-function pageCase(name, metadata, expectation) {
-  const file = path.join(fixture, `docs/ui/web/${metadata.id.split('.').pop()}.md`);
-  const block = {
-    kind: 'page',
-    specStatus: 'approved',
-    implementationStatus: 'planned',
-    owner: 'fixture',
-    lastReviewed: '2026-01-01',
-    useCases: ['fixture.view'],
-    ...metadata,
-  };
-  fs.writeFileSync(file, `---\n${JSON.stringify(block, null, 2)}\n---\n\n# Fixture page\n`);
   report(name, expectation, run());
   fs.rmSync(file);
 }
@@ -327,110 +278,49 @@ configCase('shadcn frontend missing an owned path', (project) => {
 configCase('vocabulary state that no evidence record covers', (project, vocabulary) => {
   vocabulary.states.push({ id: 'offline', requiredEvidence: ['UI-MISSING'] });
 }, "unknown evidence 'UI-MISSING'");
-configCase('page contract state outside the vocabulary', (project, vocabulary) => {
+configCase('vocabulary pattern naming a state the vocabulary omits', (project, vocabulary) => {
   vocabulary.states = vocabulary.states.filter((state) => state.id !== 'empty');
 }, "unknown state 'empty'");
+configCase('vocabulary component whose source file is missing', (project, vocabulary) => {
+  vocabulary.components[0].source = 'components/ui/missing.tsx';
+}, "source file does not exist 'components/ui/missing.tsx'");
+{
+  const componentsFile = path.join(fixture, 'apps/web/components.json');
+  const original = fs.readFileSync(componentsFile, 'utf8');
+  writeJson(componentsFile, { ...JSON.parse(original), iconLibrary: 'heroicons' });
+  report('components.json naming an icon library the baseline does not pin', "iconLibrary must be 'lucide'", run());
+  fs.writeFileSync(componentsFile, original);
+}
 
-console.log('\nPage contracts (standards/rule/frontend-ui.specify-pages-before-composition)');
-const sidecar = path.join(fixture, 'docs/ui/web/page.ui.json');
-const sidecarContract = readJson(sidecar);
-fs.rmSync(sidecar);
-report('page specification without a UI sidecar', 'missing UI sidecar', run());
-writeJson(sidecar, { ...sidecarContract, shell: 'invented-shell/default' });
-report('page contract naming an unlisted shell', "unknown shell 'invented-shell/default'", run());
-writeJson(sidecar, { ...sidecarContract, regions: [{ ...sidecarContract.regions[0], pattern: 'invented-pattern/default' }] });
-report('page contract naming an unlisted pattern', "unknown pattern 'invented-pattern/default'", run());
-fs.copyFileSync(path.join(repository, 'templates/consumer/ui-page.json'), sidecar);
+console.log('\nNo page document (standards/rule/frontend-ui.compose-each-route-from-one-floorplan)');
+pathCase(
+  'a page document is not read',
+  'docs/ui/web/page.md',
+  `---\n${JSON.stringify({ kind: 'page', id: 'web.page', app: 'web', route: '/' }, null, 2)}\n---\n\n# Fixture page\n`,
+  null,
+);
+pathCase(
+  'a route rendering a data-region attribute is not compared with any page document',
+  'apps/web/app/other/page.tsx',
+  'export default function Other() {\n  return <main data-region="late-addition" />;\n}\n',
+  null,
+);
 
-console.log('\nPage registry (standards/rule/frontend-ui.select-one-visual-authority)');
-pageCase('two pages declaring one route', { id: 'web.duplicate', app: 'web', route: '/' }, "route '/' in 'web' is already declared by");
-pageCase('two pages on one route in different frontends', { id: 'web.elsewhere', app: 'admin', route: '/' }, "page declares app 'admin', which no frontend");
-pageCase('a distinct route is accepted', { id: 'web.second', app: 'web', route: '/second' }, 'missing UI sidecar');
-
-console.log('\nDesign contract (standards/rule/frontend-ui.publish-a-design-contract)');
+console.log('\nDesign contract (standards/rule/frontend-ui.publish-a-design-contract, standards/rule/frontend-ui.declare-a-closed-floorplan-set)');
 const designFile = path.join(fixture, 'apps/web/DESIGN.md');
 const designContract = fs.readFileSync(designFile, 'utf8');
 fs.rmSync(designFile);
 report('frontend with no design contract', 'no design contract at', run());
 fs.writeFileSync(designFile, designContract.replace('## Motion', '## Movement'));
 report('design contract missing a required section', "missing required section 'Motion'", run());
-fs.writeFileSync(designFile, designContract.replace('"patterns": ["page-header", "record-list"]', '"patterns": ["invented-pattern"]'));
-report('design contract naming a pattern no vocabulary binds', "pattern 'invented-pattern' is not in the frontend vocabulary", run());
+fs.writeFileSync(designFile, designContract.replace('"patterns": ["list-page", "entity-page"]', '"patterns": ["invented-page"]'));
+report('design contract naming a floorplan no vocabulary binds', "floorplan 'invented-page' is not in the frontend vocabulary", run());
+fs.writeFileSync(designFile, designContract.replace('"patterns": ["list-page", "entity-page"]', '"patterns": []'));
+report('design contract naming no floorplan', 'array has fewer than 1 items', run());
 fs.writeFileSync(designFile, designContract.replace('"profile": "application-balanced"', '"profile": "admin-dense"'));
 report('design contract whose profile contradicts the project record', 'profile must match frontend UI configuration', run());
 fs.writeFileSync(designFile, designContract);
 report('the shipped design contract is accepted', null, run());
-
-console.log('\nComposition catalog (standards/rule/frontend-ui.publish-each-recipe-as-a-page-and-a-sidecar, standards/rule/frontend-ui.compose-from-a-catalog-recipe)');
-const recipeFile = path.join(fixture, 'docs/ui/compositions/record-list.recipe.json');
-const recipeSidecar = readJson(recipeFile);
-fs.rmSync(recipeFile);
-report('catalog page with no recipe sidecar', 'recipe has no sidecar at', run());
-writeJson(recipeFile, { ...recipeSidecar, scope: 'shell' });
-report('page region naming a shell recipe', 'is a shell recipe, which a page region does not name', run());
-writeJson(recipeFile, { ...recipeSidecar, slots: [] });
-report('recipe with no slot', 'array has fewer than 1 items', run());
-writeJson(recipeFile, recipeSidecar);
-pathCase('recipe sidecar with no page beside it', 'docs/ui/compositions/orphan.recipe.json', `${JSON.stringify({ ...recipeSidecar, recipe: 'orphan' }, null, 2)}\n`, 'recipe sidecar has no Markdown page beside it');
-const catalogSidecar = path.join(fixture, 'docs/ui/web/page.ui.json');
-const catalogContract = readJson(catalogSidecar);
-writeJson(catalogSidecar, {
-  ...catalogContract,
-  regions: catalogContract.regions.map((region) => (region.id === 'content' ? { ...region, pattern: 'page-header/default' } : region)),
-});
-report('two regions may bind one recipe', null, run());
-writeJson(catalogSidecar, catalogContract);
-
-console.log('\nDeclared states (standards/rule/frontend-ui.render-every-declared-state)');
-writeJson(catalogSidecar, {
-  ...catalogContract,
-  regions: catalogContract.regions.map((region) => (region.id === 'content' ? { ...region, components: ['button'] } : region)),
-});
-report('declared state that no named component carries', "state 'loading' is declared, and no component any region names carries it", run());
-writeJson(catalogSidecar, catalogContract);
-configCase('a state the shell itself carries needs no page region', (project, vocabulary) => {
-  // `toasts` is a region of the fixture shell. A component of that name is what
-  // fills it, so a state it carries is a state every page under the shell has.
-  vocabulary.components.push({
-    id: 'toasts',
-    source: 'components/ui/button.tsx',
-    status: 'extended',
-    states: ['saved'],
-    evidence: ['UI-BUTTON'],
-  });
-  vocabulary.states.push({ id: 'saved', requiredEvidence: ['UI-BUTTON'] });
-  const sidecar = readJson(catalogSidecar);
-  writeJson(catalogSidecar, { ...sidecar, states: [...sidecar.states, 'saved'] });
-}, null);
-writeJson(catalogSidecar, catalogContract);
-
-console.log('\nFrozen plan (standards/rule/frontend-ui.keep-the-implementation-inside-the-frozen-plan)');
-const routeFile = path.join(fixture, 'apps/web/app/page.tsx');
-fs.writeFileSync(routeFile, routeSource.replace('data-region="content"', 'data-region="late-addition"'));
-report('route rendering a region the sidecar does not name', "renders region 'late-addition', which 'docs/ui/web/page.ui.json' does not name", run());
-fs.writeFileSync(path.join(fixture, 'apps/web/components/common/late.tsx'), 'export const Late = () => <div data-region="imported-addition" />;\n');
-fs.writeFileSync(routeFile, `import { Late } from "@/components/common/late";\n${routeSource.replace('<div data-region="content" />', '<Late />')}`);
-report('region reached through an import the route follows', "renders region 'imported-addition'", run());
-fs.rmSync(path.join(fixture, 'apps/web/components/common/late.tsx'));
-fs.writeFileSync(routeFile, routeSource);
-report('a route inside its frozen plan is accepted', null, run());
-
-console.log('\nAcceptance (standards/rule/frontend-ui.place-acceptance-beside-the-route, standards/rule/frontend-ui.resolve-every-acceptance-identifier)');
-const acceptanceFile = path.join(fixture, 'apps/web/app/evidence/acceptance.json');
-const acceptanceRecord = readJson(acceptanceFile);
-const specFile = path.join(fixture, 'apps/web/app/evidence/web.page.region-sidecar-names-attached-page-heading.spec.ts');
-fs.rmSync(specFile);
-report('acceptance identifier with no file', "'acceptance-criterion/web.page.region-sidecar-names-attached-page-heading' names 'web.page.region-sidecar-names-attached-page-heading.spec.ts', which does not exist", run());
-fs.writeFileSync(specFile, 'export const criterion = "acceptance-criterion/web.page.region-sidecar-names-attached-page-heading";\n');
-writeJson(acceptanceFile, { ...acceptanceRecord, criteria: [{ ...acceptanceRecord.criteria[0], id: 'acceptance-criterion/web.page.landmarks-sidecar-claims-rendered-control-carries-name', spec: 'web.page.landmarks-sidecar-claims-rendered-control-carries-name.spec.ts' }] });
-report('acceptance record stating an identifier no sidecar names', "states 'acceptance-criterion/web.page.landmarks-sidecar-claims-rendered-control-carries-name', which 'docs/ui/web/page.ui.json' does not name", run());
-writeJson(acceptanceFile, { ...acceptanceRecord, criteria: [{ ...acceptanceRecord.criteria[0], steps: [] }] });
-report('criterion with no step', 'array has fewer than 1 items', run());
-writeJson(acceptanceFile, acceptanceRecord);
-fs.rmSync(acceptanceFile);
-report('page naming acceptance identifiers with no record beside its route', 'no acceptance record at', run());
-writeJson(acceptanceFile, acceptanceRecord);
-report('the shipped acceptance record is accepted', null, run());
 
 console.log('\nSource lock (standards/rule/frontend-ui.track-source-changes)');
 fs.appendFileSync(path.join(fixture, 'apps/web/components/ui/button.tsx'), '// local change\n');

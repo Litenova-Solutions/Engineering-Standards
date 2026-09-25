@@ -83,6 +83,19 @@ failure       = failure/<module>.<lowercase_snake>
 
 Slash separates the kind from the anchor. Dot separates the anchor from the topic, and dot separates topic words. Lowercase throughout. No digits in any segment.
 
+### Criterion-to-path form
+
+An acceptance criterion can name the path it proves. The path identifier follows the criterion identifier in parentheses, and the criterion text follows the path.
+
+```text
+- [acceptance-criterion/<id>] (path/<id>) <text>
+- [acceptance-criterion/orders.pay.moves-placed-to-paid] (path/orders.pay.success) A paid order moves to paid.
+```
+
+The named path belongs to the use case the criterion is anchored on. A success that branches into outcomes a caller renders differently carries one path per outcome, and each of those paths has the failure code `None`.
+
+A path is proven when a test cites it directly, or when a test covers a criterion that names it. A use case whose criteria name no path keeps use-case-level proof: a test on any of its criteria proves every path. `node standards/tools/validate-spec-sync.mjs` reports each use case that relies on that proof.
+
 ### Multi-form identifiers
 
 Every domain element carries four identifying attributes. Each attribute serves a different consumer.
@@ -237,6 +250,20 @@ anchor        = docs/domain/modules/events/events/start-event.md
 
 **Rationale:** A citation can outlive the element it names. The tombstone is the only place a reader can resolve a citation to its retired meaning. Reusing a retired identifier re-points every outstanding citation to the new element.
 
+### Name a path of the criterion's own use case (standards/rule/backend-identifiers.name-a-path-of-the-criterions-own-use-case)
+
+**Requirement:** An acceptance criterion that names a path MUST name one path of its own use case in the criterion-to-path form.
+
+**Rationale:** A criterion that names a path of another use case claims proof for an outcome its test never reaches. The form keeps the path in a fixed position, so a scan reads it without parsing the criterion text.
+
+**Example:** `- [acceptance-criterion/orders.pay.refuses-zero-amount] (path/orders.pay.zero-amount) A zero amount is refused.`
+
+### Prove each named path through a test (standards/rule/backend-identifiers.prove-each-named-path-through-a-test)
+
+**Requirement:** A path of a use case whose criteria name paths MUST be cited by a test or named by a criterion a test covers.
+
+**Rationale:** Use-case-level proof treats a test on one criterion as proof of every path, so a refusal no test provokes still reads as tested. Once the criteria name their paths, each path carries its own proof. A use case whose criteria name no path keeps use-case-level proof, and the validator reports it rather than refusing it.
+
 ## Conventions
 
 None.
@@ -325,7 +352,7 @@ acceptance-criterion/orders.pay.refuses-zero-amount
 
 ### Step eight, paths through the use cases
 
-Each use case has a path per outcome. Each path maps to one failure code and one scenario.
+Each use case has a path per outcome. Each path maps to one failure code and one scenario. A criterion names the path it proves in the criterion-to-path form.
 
 ```text
 path/orders.place.success                # order moves to placed, no failure code
@@ -391,3 +418,5 @@ A reader who wants every invariant on `Order` greps `^invariant/order\.` and get
 | standards/rule/backend-identifiers.exclude-digits-from-every-identifier | static | `RuleIdentifierScan` rejects any segment matching `\\d`. |
 | standards/rule/backend-identifiers.keep-identifiers-unique-within-their-anchor | inspection | `RuleIdentifierScan` reports duplicates within each anchor scope. |
 | standards/rule/backend-identifiers.retire-identifiers-through-the-tombstone-list | inspection | `RuleIdentifierScan` finds every retired identifier in the tombstone list and asserts none appears in the active set. |
+| standards/rule/backend-identifiers.name-a-path-of-the-criterions-own-use-case | static | `node standards/tools/validate-spec-sync.mjs` reports a criterion naming a path of another use case. |
+| standards/rule/backend-identifiers.prove-each-named-path-through-a-test | static | `node standards/tools/validate-spec-sync.mjs` reports each path without a test, and lists use cases relying on use-case-level proof. |

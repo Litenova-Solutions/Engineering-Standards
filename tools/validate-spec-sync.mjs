@@ -40,11 +40,11 @@
 // defaulting to the domain, application, and API projects plus every test root.
 // 'featureRoots' names the directories holding Reqnroll feature files.
 // 'evidenceRoots' names the frontend directories whose test files are read for
-// acceptance-criterion citations, defaulting to every path in
+// acceptance-criterion and path citations, defaulting to every path in
 // project.paths.frontends. A browser test cites a criterion the same way a
 // <covers> tag or an '@implements_' tag does, so a UI criterion resolves when a
-// frontend test names it. Only test files under those roots are read, because a
-// criterion recorded in an acceptance record is a plan rather than a test.
+// frontend test names it. A browser test cites a path by opening its title with
+// '[path/<id>]'. Only test files under those roots are read.
 //
 // The marking grammar this validator enforces is one identifier per XML doc tag:
 //
@@ -68,9 +68,18 @@
 //
 // A test proves the use case its 'covers' identifier names. An acceptance
 // criterion names '<module>.<use-case>.<topic>', so a test that covers one proves
-// that use case. A path '<module>.<use-case>.<outcome>' and an invariant enforced
-// by that use case are then proven. That chain is what lets the validator report
-// an invariant or a path with no test from the tags alone.
+// that use case, and an invariant enforced by that use case is then proven.
+//
+// A path is proven per path when the use case's criteria name paths. A criterion
+// names the path it proves in the form
+//
+//   - [acceptance-criterion/<id>] (path/<id>) <text>
+//
+// and a path is then proven when a test cites it directly, or when a test covers
+// a criterion that names it. A use case whose criteria name no path keeps
+// use-case-level proof: a test on any criterion proves every path. The run
+// reports each use case relying on that proof rather than refusing it.
+// (standards/rule/backend-identifiers.prove-each-named-path-through-a-test)
 //
 // A file must carry a tag when it declares an element the marking convention
 // names: a command, query, handler, validator, authorizer, domain event, domain
@@ -299,7 +308,10 @@ function stripFences(text) {
 }
 
 for (const file of walk(domainDocs, (candidate) => candidate.endsWith('.md'))) {
-  specPages.push(file);
+  const rel = relativeToRoot(file);
+  if (path.basename(file) === 'identifiers-tombstones.md') continue;
+  const isMapping = rel === 'docs/domain/identifiers-mapping.md';
+  if (!isMapping) specPages.push(file);
   const meta = metadata(file);
   if (meta && typeof meta.id === 'string') {
     const id = bareIdentifier(meta.id);
@@ -308,10 +320,54 @@ for (const file of walk(domainDocs, (candidate) => candidate.endsWith('.md'))) {
       declaredMeta.set(id, meta);
     }
   }
-  for (const id of scanIdentifiers(stripFences(fs.readFileSync(file, 'utf8')))) citedIds.add(id);
+  const identifiers = scanIdentifiers(stripFences(fs.readFileSync(file, 'utf8')));
+  for (const id of identifiers) {
+    // The mapping is a generated migration index. Its current exception
+    // identifiers are declarations; its historical acceptance and invariant
+    // rows are not active specifications.
+    if (!isMapping || id.startsWith('exception/') || id.startsWith('event/')) citedIds.add(id);
+  }
 }
 
-const specIds = new Set([...declaredIds, ...citedIds]);
+const retiredIds = new Set();
+const tombstoneFile = path.join(domainDocs, 'identifiers-tombstones.md');
+if (fs.existsSync(tombstoneFile)) {
+  for (const match of fs.readFileSync(tombstoneFile, 'utf8').matchAll(/^-\s*`([^`]+)`\s*->/gm)) retiredIds.add(match[1]);
+}
+const specIds = new Set([...declaredIds, ...citedIds].filter((id) => !retiredIds.has(id)));
+
+// ---- criterion-to-path form ------------------------------------------------
+// A criterion line names the path it proves in parentheses after its own
+// identifier. The path belongs to the criterion's use case, so a path of another
+// use case is reported rather than counted as proof.
+// (standards/rule/backend-identifiers.name-a-path-of-the-criterions-own-use-case)
+const CRITERION_PATH = new RegExp(`^\\s*[-*]\\s+\\[(${IDENT_EXPRESSION})\\]\\s*\\((${IDENT_EXPRESSION})\\)`);
+const criterionPaths = new Map();     // acceptance-criterion id -> path id
+const pathNamingUseCases = new Set(); // '<module>.<use-case>' whose criteria name a path
+
+function useCaseOf(id) {
+  const parsed = parseCitation(id);
+  if (!parsed) return null;
+  const segments = parsed.body.split('.');
+  return segments.length >= 2 ? `${segments[0]}.${segments[1]}` : null;
+}
+
+for (const file of specPages) {
+  const rel = relativeToRoot(file);
+  for (const line of stripFences(fs.readFileSync(file, 'utf8')).split('\n')) {
+    const match = line.match(CRITERION_PATH);
+    if (!match) continue;
+    const criterion = bareIdentifier(match[1]);
+    const named = bareIdentifier(match[2]);
+    if (!criterion || !named || !criterion.startsWith('acceptance-criterion/') || !named.startsWith('path/')) continue;
+    if (useCaseOf(criterion) !== useCaseOf(named)) {
+      finding(`criterion names a path of another use case: ${rel}: ${criterion} names ${named}`);
+      continue;
+    }
+    criterionPaths.set(criterion, named);
+    pathNamingUseCases.add(useCaseOf(criterion));
+  }
+}
 
 // ---- collect code markings -------------------------------------------------
 const codeFiles = [];
@@ -550,16 +606,17 @@ for (const file of featureFiles) {
 }
 
 // ---- collect frontend test citations ---------------------------------------
-// A UI page declares acceptance criteria under the frontend's own anchor, which
-// no C# or feature file cites. The browser test that proves one names it in its
+// A browser test names the criterion or the path it proves at the start of its
 // title, in the citation form the other two carriers use:
 //
-//   test("[acceptance-criterion/storefront.ticket.region-sidecar-names-attached-page-heading] ...")
+//   test("[acceptance-criterion/storefront.ticket.shows-the-ticket-code] ...")
+//   test("[path/orders.place-order.expected-total-mismatch] ...")
 //
-// Only test files are read. An acceptance record beside a route names its
-// criterion and the test file that proves it, but the record is a plan, so a
-// criterion it lists is cited only once that test file names it.
+// A criterion is read anywhere in a test file. A path is read only from the
+// opening of a title, because the word 'path' followed by a slash is common in
+// route and file names. (standards/rule/frontend-ui.map-every-use-case-path)
 const FRONTEND_TEST_FILE = /\.(?:spec|test)\.[cm]?[jt]sx?$/i;
+const PATH_TITLE = new RegExp(`['"\`]\\s*\\[((?:${SOURCE_SEGMENT}\\/)?path\\/${IDENT_BODY})\\]`, 'g');
 const frontendFiles = [];
 for (const configured of configuredEvidenceRoots) {
   for (const file of walk(path.join(root, configured), (candidate) => FRONTEND_TEST_FILE.test(path.basename(candidate)))) {
@@ -577,12 +634,17 @@ for (const file of frontendFiles) {
     testCitedIds.add(id);
     carriesCitation = true;
   }
+  for (const match of text.matchAll(PATH_TITLE)) {
+    const id = bareIdentifier(match[1]);
+    if (!id) continue;
+    testCitedIds.add(id);
+    carriesCitation = true;
+  }
   if (carriesCitation) testFiles.add(rel);
 }
 
 // A test that covers an acceptance criterion proves the use case the criterion is
-// anchored on. A path on that use case, and an invariant enforced by it, are then
-// proven too.
+// anchored on, and an invariant enforced by it is then proven too.
 const testedUseCases = new Set();
 for (const id of testCitedIds) {
   const parsed = parseCitation(id);
@@ -608,6 +670,7 @@ for (const id of [...specIds].sort()) {
 }
 
 for (const id of [...codeIds].sort()) {
+  if (retiredIds.has(id)) continue;
   const parsed = parseCitation(id);
   if (!parsed || parsed.kind === 'value') continue;
   if (specIds.has(id)) continue;
@@ -623,14 +686,24 @@ for (const id of [...specIds].sort()) {
   finding(`invariant without a test: ${id}`);
 }
 
+// A path is proven by its own citation, or by a covered criterion that names
+// it. A use case whose criteria name no path falls back to use-case-level proof,
+// and the fallback is reported so the remaining gap stays visible.
+const provenByCriterion = new Set();
+for (const [criterion, named] of criterionPaths) if (testCitedIds.has(criterion)) provenByCriterion.add(named);
+const useCaseLevelProof = new Set();
 for (const id of [...specIds].sort()) {
   const parsed = parseCitation(id);
   if (!parsed || parsed.kind !== 'path') continue;
-  if (testCitedIds.has(id)) continue;
-  const segments = parsed.body.split('.');
-  if (segments.length >= 3 && testedUseCases.has(`${segments[0]}.${segments[1]}`)) continue;
+  if (testCitedIds.has(id) || provenByCriterion.has(id)) continue;
+  const useCase = parsed.body.split('.').length >= 3 ? useCaseOf(id) : null;
+  if (useCase && !pathNamingUseCases.has(useCase) && testedUseCases.has(useCase)) {
+    useCaseLevelProof.add(useCase);
+    continue;
+  }
   finding(`path without a test: ${id}`);
 }
+const useCaseLevel = [...useCaseLevelProof].sort();
 
 // ---- report ----------------------------------------------------------------
 if (jsonOutput) {
@@ -648,6 +721,8 @@ if (jsonOutput) {
     featureFiles: featureFiles.length,
     frontendFiles: frontendFiles.length,
     testCitations: testCitedIds.size,
+    criteriaNamingPaths: criterionPaths.size,
+    useCaseLevelProof: useCaseLevel,
     reportOnly,
     findings,
   }, null, 2));
@@ -659,6 +734,8 @@ if (scheme.source) console.log(`Identifier grammar: ${scheme.kinds.length} kind(
 else console.log('Identifier grammar: built-in kind list (the standards page was not found)');
 console.log(`Specification identifiers: ${specIds.size}, code identifiers: ${codeIds.size}`);
 console.log(`Scanned ${specPages.length} specification page(s), ${codeFiles.length} C# file(s), ${featureFiles.length} feature file(s), ${frontendFiles.length} frontend test file(s); ${testFiles.size} file(s) carry a test citation`);
+console.log(`Path proof: ${criterionPaths.size} criterion(s) name a path; ${useCaseLevel.length} use case(s) prove their paths at use-case level because no criterion names a path`);
+if (useCaseLevel.length) console.log(`Use-case-level path proof: ${useCaseLevel.join(', ')}`);
 if (findings.length && reportOnly) {
   console.log(`\nREPORT (${findings.length} finding(s)):`);
   for (const item of findings) console.log(`  - ${item}`);

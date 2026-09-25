@@ -32,7 +32,8 @@ const FRONTEND_EVIDENCE = 'apps/admin/app/evidence';
 
 const CRITERION = 'acceptance-criterion/sales.redeem-voucher.redeems';
 const FEATURE_TAG = '@implements_entro_acceptance-criterion_sales.redeem-voucher.redeems';
-const UI_CRITERION = 'acceptance-criterion/admin.dashboard.region-sidecar-names-attached-page-heading';
+const UI_CRITERION = 'acceptance-criterion/admin.dashboard.shows-the-dashboard-heading';
+const CRITERIA_PAGE = 'docs/domain/modules/sales/vouchers/criteria.md';
 const UI_ORPHAN = 'acceptance-criterion/admin.dashboard.orphan-criterion';
 
 let failures = 0;
@@ -244,7 +245,7 @@ fileCase(
   'malformed implementation tag:',
 );
 
-console.log('\nFrontend evidence (standards/rule/frontend-ui.resolve-every-acceptance-identifier)');
+console.log('\nFrontend evidence (standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion)');
 {
   const uiPage = `# UI evidence\n\nThe page cites \`${UI_CRITERION}\`.\n`;
   const specFile = `import { test, expect } from '@playwright/test';\n\n`
@@ -266,6 +267,53 @@ fileCase(
   `spec identifier with no code element: ${UI_ORPHAN}`,
 );
 
+console.log('\nPath citations (standards/rule/frontend-ui.map-every-use-case-path, standards/rule/backend-identifiers.prove-each-named-path-through-a-test)');
+{
+  const voidPage = [VOID_PAGE, pageText(['use-case/sales.void-voucher', 'path/sales.void-voucher.success'])];
+  const voidCommand = [`${APPLICATION}/VoidVoucherCommand.cs`, VOID_COMMAND];
+  withFiles(
+    [voidPage, voidCommand, [`${FRONTEND_EVIDENCE}/void-voucher.spec.ts`, "test('[path/sales.void-voucher.success] voids the voucher', async () => {});\n"]],
+    'a browser test title citing a path proves that path',
+    null,
+  );
+  withFiles(
+    [voidPage, voidCommand, [`${FRONTEND_EVIDENCE}/void-voucher.spec.ts`, "const route = 'path/sales.void-voucher.success';\ntest('voids the voucher', async () => {});\n"]],
+    'a path outside the opening of a test title is not a citation',
+    'path without a test: path/sales.void-voucher.success',
+  );
+  withFiles(
+    [voidPage, voidCommand, [`${TESTS}/VoidVoucherTests.cs`, '/// <covers>entro/path/sales.void-voucher.success</covers>\npublic sealed class VoidVoucherTests\n{\n    [Fact]\n    public void Voids() { }\n}\n']],
+    'a covers tag citing a path proves that path',
+    null,
+  );
+}
+const namedSuccess = `- [${CRITERION}] (path/sales.redeem-voucher.success) Redeeming a voucher marks it redeemed.\n`;
+fileCase(
+  'a covered criterion that names a path proves that path',
+  CRITERIA_PAGE,
+  `# Criteria\n\n${namedSuccess}`,
+  null,
+);
+fileCase(
+  'a path of a use case whose criteria name paths needs its own proof',
+  CRITERIA_PAGE,
+  `# Criteria\n\n${namedSuccess}\nThe use case also has 'path/sales.redeem-voucher.expired'.\n`,
+  'path without a test: path/sales.redeem-voucher.expired',
+);
+fileCase(
+  'a criterion naming a path of another use case is reported',
+  CRITERIA_PAGE,
+  `# Criteria\n\n- [${CRITERION}] (path/sales.void-voucher.success) Redeeming a voucher marks it redeemed.\n`,
+  'criterion names a path of another use case:',
+);
+{
+  const file = write(CRITERIA_PAGE, "# Criteria\n\nThe use case also has 'path/sales.redeem-voucher.expired'.\n");
+  const result = run();
+  report('a use case whose criteria name no path keeps use-case-level proof', null, result);
+  reportLine('the use-case-level proof is reported', 'Use-case-level path proof: sales.redeem-voucher', result, 0);
+  fs.rmSync(file);
+}
+
 console.log('\nForeign sources and generated files');
 fileCase(
   'a page citing an identifier another source owns',
@@ -285,6 +333,12 @@ fileCase(
   'a planned page with no code element',
   'docs/domain/modules/sales/vouchers/plan-voucher.md',
   '---\n{\n  "kind": "use-case",\n  "id": "use-case/sales.plan-voucher",\n  "specStatus": "approved",\n  "implementationStatus": "planned"\n}\n---\n\n# Plan voucher\n',
+  null,
+);
+fileCase(
+  'a retired identifier is not a specification finding',
+  'docs/domain/identifiers-tombstones.md',
+  '# Retired identifiers\n\n- `exception/retired.exception` -> none (retired)\n',
   null,
 );
 

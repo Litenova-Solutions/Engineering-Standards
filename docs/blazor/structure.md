@@ -54,7 +54,7 @@ Framework-generated `bin`, `obj`, and publish folders remain untracked.
 
 **Requirement:** A module MUST NOT reference another module's internal feature types.
 
-**Rationale:** Page composition may still render public components from several modules when a page specification requires it. Shared code moves to `Components/` only after two real consumers need the same responsibility.
+**Rationale:** Page composition may still render public components from several modules when the page needs them. Shared code moves to `Components/` only after two real consumers need the same responsibility.
 
 ### Keep imports directional (standards/rule/blazor-structure.keep-imports-directional)
 

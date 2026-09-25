@@ -56,7 +56,7 @@ The system contains one delivery approach and one operating model:
 
 - Agents stop and ask when a decision belongs to a person. (standards/rule/core-system.keep-decision-authority-with-accountable-people)
 - Approved specifications define the work, and each one situates its subject. (standards/rule/core-system.drive-work-from-approved-specifications, standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
-- Flows link their use cases rather than restate them, and every use case names what calls it. (standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow, standards/rule/core-system.name-what-calls-a-use-case, standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)
+- Flows link their use cases rather than restate them, and every use case names what calls it. (standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow, standards/rule/core-system.name-what-calls-a-use-case)
 - One module name is used across every layer. (standards/rule/core-system.group-language-and-use-cases-by-module)
 - Module specifications map aggregates to state, invariants, and commands. (standards/rule/core-system.make-aggregate-ownership-explicit)
 - One use case is one Command or Query, with a status, one specification, and a mapping that resolves. (standards/rule/core-system.deliver-one-complete-use-case, standards/rule/core-system.state-implemented-before-acceptance-evidence-exists, standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence, standards/rule/core-system.resolve-every-implementation-mapping-name, standards/rule/core-system.name-the-handler-an-implemented-use-case-owns)
@@ -309,7 +309,7 @@ FAIL (2 problem(s)):
 
 **Requirement:** An `implemented` or `verified` use-case specification MUST name every declared surface that invokes it, or state `None` with the reason no surface does.
 
-**Rationale:** A page declares the use cases it calls, so the edge runs one way. Nothing answers the question asked before a change: who breaks if this operation moves. A use case reached only by a schedule or a reaction has a real answer. Writing it down separates it from one nobody wired up.
+**Rationale:** A route calls use cases from its code, so the edge runs one way. Nothing answers the question asked before a change: who breaks if this operation moves. A use case reached only by a schedule or a reaction has a real answer. Writing it down separates it from one nobody wired up.
 
 **Example:** A Consumers section names one surface per row, and a surface is one the project declared.
 
@@ -318,17 +318,9 @@ FAIL (2 problem(s)):
 
 | Surface | Consumer |
 |:---|:---|
-| web | `docs/ui/web/cancel-order.md` |
+| web | `apps/web/app/orders/[orderId]/page.tsx` |
 | cli | `acme orders cancel` |
 ```
-
-### Match a page's declared use case back to that page (standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)
-
-**Requirement:** A use case a page specification declares MUST name that page among its consumers.
-
-**Rationale:** The forward edge is metadata a validator already reads, and the reverse edge is prose nothing compared against it. A page that stops calling an operation leaves a Consumers row that still claims it. That is the stale link traceability research names as its central failure.
-
-**Example:** `docs/ui/web/cancel-order.md` declaring `"useCases": ["orders.cancel-order"]` obliges `docs/domain/modules/orders/orders/cancel-order.md` to link back to it.
 
 ### Resolve every Implementation mapping name (standards/rule/core-system.resolve-every-implementation-mapping-name)
 
@@ -567,7 +559,6 @@ The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` chang
 | standards/rule/core-system.deliver-one-complete-use-case | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
 | standards/rule/core-system.state-implemented-before-acceptance-evidence-exists | inspection | Each `implemented` use case resolves to existing Domain, Application, persistence, and entry-point code with no acceptance test. |
 | standards/rule/core-system.name-what-calls-a-use-case | static | `node standards/tools/validate-consumer.mjs` reports an implemented use case with no Consumers section, an unexplained `None`, or an undeclared surface. |
-| standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page | static | `node standards/tools/validate-consumer.mjs` reports each page whose declared use case does not link back to it. |
 | standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence | static | `node standards/tools/validate-parity.mjs` reports no handler without a specification and no specification without a handler. |
 | standards/rule/core-system.resolve-every-implementation-mapping-name | static | `node standards/tools/validate-parity.mjs` reports each Implementation mapping name that resolves to no declaration, member, project, or path. |
 | standards/rule/core-system.name-the-handler-an-implemented-use-case-owns | static | `node standards/tools/validate-parity.mjs` reports each implemented use case whose Implementation mapping omits its derived handler. |

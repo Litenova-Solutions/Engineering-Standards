@@ -115,11 +115,11 @@ State every name in a code span. Each one resolves to a declared type, a member 
 
 ## Consumers
 
-Name every declared surface that invokes this use case, one per row. A surface is a frontend the project declares or a `paths.surfaces` entry. Write `None.` with the reason when a schedule, a reaction, or another use case is the only caller. A page declaring this use case in its `useCases` metadata is named here by its path. (`standards/rule/core-system.name-what-calls-a-use-case`, `standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page`)
+Name every declared surface that invokes this use case, one per row. A surface is a frontend the project declares or a `paths.surfaces` entry. Write `None.` with the reason when a schedule, a reaction, or another use case is the only caller. A route that calls this use case is named here by its route file. (`standards/rule/core-system.name-what-calls-a-use-case`)
 
 | Surface | Consumer |
 |:---|:---|
-| `__APP__` | `__UI_DOCS__/__APP__/__PAGE__.md` |
+| `__APP__` | `apps/__APP__/__ROUTE_FOLDER__/page.tsx` |
 
 ## Risk and assurance
 

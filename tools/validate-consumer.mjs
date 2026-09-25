@@ -125,7 +125,7 @@ const domainDocs = path.join(root, (project.paths?.domainDocs ?? 'docs/domain'))
 const configuredPaths = [
   ['paths.docs', project.paths?.docs, 'the Markdown scan finds no specification to check'],
   ['paths.domainDocs', project.paths?.domainDocs, 'the use-case, workflow, and policy cross-file checks resolve nothing'],
-  ['paths.uiDocs', project.paths?.uiDocs, 'the controlled UI page checks resolve nothing'],
+  ['paths.uiDocs', project.paths?.uiDocs, 'the UI documentation root it names is missing'],
   ['paths.apiSolution', project.paths?.apiSolution, 'the backend checks have no solution to read'],
 ];
 for (const [field, value, consequence] of configuredPaths) {
@@ -285,7 +285,7 @@ const KINDS = {
   'domain-policy': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'appliesToModules'], props: { ...base, appliesToModules: 1, applicableExtensions: 1 }, id: ID },
   'decision-evidence': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   'operating-limits': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
-  page: { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'app', 'route', 'useCases'], props: { ...base, implementationStatus: 1, app: 1, route: 1, useCases: 1, applicableExtensions: 1 }, id: UC },
+  // The route code is the page contract. No page record describes a route in prose.
   decision: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   runbook: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   'release-record': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'release'], props: { ...base, release: 1 }, id: REC },
@@ -314,12 +314,10 @@ for (const entry of Array.isArray(declaredProhibited) ? declaredProhibited : [])
   prohibitedKinds.add(entry);
 }
 
-// A use case records what invokes it, and a page records what it invokes. The
-// two populations are compared after the loop, because either direction can name
-// a file the loop has not reached yet. (standards/rule/core-system.name-what-calls-a-use-case,
-// standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)
+// A use case records what invokes it. The Consumers sections are checked after
+// the loop, against the surfaces the project declares.
+// (standards/rule/core-system.name-what-calls-a-use-case)
 const useCasePages = new Map(); // use-case id -> {rel, file, implementationStatus, consumers}
-const screenPages = []; // {rel, file, app, useCases}
 
 // ---- collect files ---------------------------------------------------------
 const files = [];
@@ -341,6 +339,7 @@ const metas = []; // {rel, meta, file}
 const singletons = new Map();     // kind -> [paths]
 const acDefs = new Map();  // id -> [rel]
 const e2eDefs = new Map(); // id -> [rel]
+const pathDefs = new Set(); // path ids any specification names
 let uiOutput = '';
 
 // Specification Metadata is a '---' delimited JSON block, per
@@ -408,6 +407,9 @@ for (const f of files) {
   // acceptance and end-to-end id definitions (bracket form)
   for (const m of raw.matchAll(/\[(acceptance-criterion\/[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+)\]/g)) (acDefs.get(m[1]) ?? acDefs.set(m[1], []).get(m[1])).push(rel);
   for (const m of raw.matchAll(/\[(E2E-[A-Z0-9-]+)\]/g)) (e2eDefs.get(m[1]) ?? e2eDefs.set(m[1], []).get(m[1])).push(rel);
+  // A path is declared wherever a specification names it, normally in the Paths
+  // table of its use case. A browser-test title resolves against this set.
+  for (const m of raw.matchAll(/(?<![A-Za-z0-9_/.-])(path\/[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*){2,})(?![A-Za-z0-9_/-])/g)) pathDefs.add(m[1]);
 
   // internal link resolution
   const dir = path.dirname(f);
@@ -476,7 +478,6 @@ for (const f of files) {
   if (meta.kind === 'end-to-end-flow') {
     for (const uc of meta.useCases ?? []) { const [mod, name] = uc.replace(/^use-case\//, '').split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
   }
-  if (meta.kind === 'page') screenPages.push({ rel, file: f, app: meta.app, useCases: Array.isArray(meta.useCases) ? meta.useCases : [] });
   if (meta.kind === 'workflow') for (const mod of meta.participatingModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: participatingModule '${mod}' has no module dir`);
   if (meta.kind === 'domain-policy') for (const mod of meta.appliesToModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: appliesToModule '${mod}' has no module dir`);
   if (meta.kind === 'use-case') {
@@ -540,11 +541,10 @@ for (const kind of SINGLETON_KINDS) {
   err(`Expected at most one ${kind} specification, found ${found.length}: ${found.join(', ')}`);
 }
 // ---- consumer linkage ------------------------------------------------------
-// A page declares the use cases it calls, so the edge ran one way and nothing
-// answered the question asked before a change: who breaks if this operation
+// A route calls use cases from its code, so the edge runs one way and nothing
+// answers the question asked before a change: who breaks if this operation
 // moves. The reverse obligation is a Consumers section on the use case, checked
-// against the surfaces the project declared and against the pages that claim it.
-// (standards/rule/core-system.name-what-calls-a-use-case, standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)
+// against the surfaces the project declared. (standards/rule/core-system.name-what-calls-a-use-case)
 const declaredSurfaces = new Set([
   ...(project.paths?.frontends ?? []).map((frontend) => frontend.name).filter(Boolean),
   ...(project.paths?.surfaces ?? []).map((surface) => surface?.name).filter(Boolean),
@@ -594,32 +594,23 @@ for (const [id, page] of useCasePages) {
   }
 }
 
-for (const screen of screenPages) {
-  for (const id of screen.useCases) {
-    const page = useCasePages.get(id);
-    if (!page) continue; // the metadata pass already reported a useCase with no file
-    if (page.consumers === null) continue; // already reported above
-    const target = path.relative(path.dirname(page.file), screen.file).replace(/\\/g, '/');
-    const named = page.consumers.includes(target)
-      || page.consumers.includes(path.relative(root, screen.file).replace(/\\/g, '/'))
-      || page.consumers.includes(path.basename(screen.file));
-    if (!named) err(`${page.rel}: 'Consumers' does not name ${path.relative(root, screen.file).replace(/\\/g, '/')}, which declares this use case`);
-  }
-}
-
 // ---- acceptance citation ---------------------------------------------------
 // The trace rules named a form each and nothing read the test source, so a page
 // could claim 'verified' while no test carried its identifier. Each form is read
 // where its tool puts it: a tag line in a feature file, one trait key in C#, and
 // the opening of a browser-test title. A bare identifier in a comment or a
-// variable name cites nothing. (standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form,
-// standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion, standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)
+// variable name cites nothing. A browser-test title also cites a path, which a
+// specification names in the Paths table of its use case.
+// (standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form,
+// standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion, standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria,
+// standards/rule/frontend-ui.map-every-use-case-path)
 const testRoots = Array.isArray(project.paths?.testRoots) ? project.paths.testRoots : [];
 const GHERKIN_TAG_LINE = /^[ \t]*@[^\n]*$/;
 const ACCEPTANCE = 'acceptance-criterion\\/[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)+';
 const TAG = new RegExp(`@(${ACCEPTANCE})`, 'g');
 const TRAIT = new RegExp(`\\[\\s*Trait\\s*\\(\\s*"AcceptanceCriterion"\\s*,\\s*"(${ACCEPTANCE})"\\s*\\)\\s*\\]`, 'g');
-const TITLE = new RegExp(`['"\`]\\s*\\[(${ACCEPTANCE})\\]`, 'g');
+const PATH_ID = 'path\\/[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*){2,}';
+const TITLE = new RegExp(`['"\`]\\s*\\[(${ACCEPTANCE}|${PATH_ID})\\]`, 'g');
 const TEST_SOURCE = /\.(cs|feature|ts|tsx|js|jsx|mjs)$/;
 
 const citations = new Map(); // acceptance id -> [file]
@@ -667,7 +658,7 @@ for (const relative of testRoots) {
 }
 
 for (const [id, locs] of citations) {
-  if (acDefs.has(id)) continue;
+  if (acDefs.has(id) || pathDefs.has(id)) continue;
   err(`${locs[0]}: cites ${id}, which no specification declares`);
 }
 

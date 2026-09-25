@@ -113,7 +113,7 @@ A variable is browser-visible when the framework inlines it into the client bund
 
 **Requirement:** An optimistic update MUST announce its reconciled outcome through a live region when the server result differs from the value shown.
 
-**Rationale:** A rollback is a silent visual change. A reader using a screen reader saw the optimistic value announced, and nothing tells them it was withdrawn. [The ARIA live-region technique](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19) is the mechanism, and the page sidecar's `statusAnnouncements` field is where the route records it.
+**Rationale:** A rollback is a silent visual change. A reader using a screen reader saw the optimistic value announced, and nothing tells them it was withdrawn. [The ARIA live-region technique](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19) is the mechanism, and a test of the route asserts the announcement.
 
 **Example:** A row reordered optimistically and rejected by the server announces that the order was restored, and names the reason the server gave.
 

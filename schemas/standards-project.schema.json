@@ -81,10 +81,6 @@
           }
         },
         "uiDocs": { "$ref": "#/$defs/projectPath" },
-        "uiCompositions": {
-          "description": "Root of the composition catalog. Each recipe is a Markdown page beside a sidecar validated against schemas/composition-recipe.schema.json. Defaults to 'compositions' under the UI documentation root.",
-          "$ref": "#/$defs/projectPath"
-        },
         "frontends": {
           "type": "array",
           "items": {
@@ -244,7 +240,7 @@
         "additionalProperties": false,
         "required": ["provisionId", "decision"],
         "properties": {
-          "provisionId": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}$" },
+          "provisionId": { "type": "string", "pattern": "^standards/rule/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$" },
           "decision": { "$ref": "#/$defs/projectPath" },
           "reviewBy": {
             "type": "string",
@@ -254,7 +250,7 @@
         "allOf": [
           {
             "if": {
-              "properties": { "provisionId": { "pattern": "^FRONTEND\\.UI\\." } },
+              "properties": { "provisionId": { "pattern": "^standards/rule/frontend-ui\\." } },
               "required": ["provisionId"]
             },
             "then": { "required": ["reviewBy"] }

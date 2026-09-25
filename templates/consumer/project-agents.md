@@ -25,10 +25,10 @@ Run metadata and code-document checks for each changed specification, source, te
 
 Report every skipped check with its reason. (standards/rule/core-agent.run-and-report-verification)
 
-Load controlled UI governance before changing a React control or route composition. (standards/rule/frontend-ui.follow-the-agent-ui-protocol)
+Compose each route from one floorplan in the frontend `DESIGN.md`, or name the decision behind a freestyle route. (standards/rule/frontend-ui.compose-each-route-from-one-floorplan, standards/rule/frontend-ui.record-a-freestyle-route)
 
-Follow Use, Compose, Constrain, and Prove. Search approved vocabulary and installed primitives before adding source. (standards/rule/frontend-ui.follow-the-agent-ui-protocol)
+Cite every path of every use case a route calls in a test title, or record an exclusion with its reach. (standards/rule/frontend-ui.map-every-use-case-path)
 
-Run `node standards/tools/validate-ui.mjs` after changing UI configuration, vocabulary, page sidecars, source locks, CSS, or primitives. (standards/rule/frontend-ui.prove-ui-behavior-and-appearance)
+Run `node standards/tools/validate-ui.mjs` after changing UI configuration, vocabulary, the design contract, source locks, CSS, or primitives. Run the route suite after changing a route. (standards/rule/frontend-ui.prove-ui-behavior-and-appearance, standards/rule/frontend-ui.check-every-route-in-a-browser)
 
 Record an override decision before selecting another visual system or component base. (standards/rule/frontend-ui.select-one-visual-authority)

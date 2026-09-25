@@ -221,7 +221,7 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "enum": ["module", "aggregate", "use-case", "end-to-end-flow", "workflow", "domain-policy", "page"]
+            "enum": ["module", "aggregate", "use-case", "end-to-end-flow", "workflow", "domain-policy"]
           }
         }
       },

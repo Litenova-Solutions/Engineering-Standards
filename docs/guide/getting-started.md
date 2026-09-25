@@ -40,7 +40,7 @@ Each step links the standard that governs it. Read that page before running the 
 10. Coordinate use cases with [application](../backend/application.md) and store them through [persistence](../backend/persistence.md).
 11. Expose operations with [HTTP API](../backend/api.md) and secure them with [security](../quality/security.md).
 12. Declare each React frontend and install its pinned UI baseline, following [frontend structure](../frontend/structure.md) and [controlled UI governance](../frontend/ui.md).
-13. Create UI vocabulary and page sidecars for each non-trivial visible route, following [controlled UI governance](../frontend/ui.md).
+13. Declare the UI vocabulary and floorplans, then compose each route from one floorplan, following [controlled UI governance](../frontend/ui.md).
 14. Deliver one complete slice with source, tests, contracts, and operating evidence, following the [release standard](../core/release.md).
 
 ### Operate

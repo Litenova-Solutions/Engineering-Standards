@@ -62,7 +62,7 @@ The five are the ones a component can get wrong on its own. [WCAG 2.2](https://w
 | 3.3.8 Accessible Authentication (Minimum) | AA | Offer a sign-in path with no cognitive function test. |
 | 3.3.9 Accessible Authentication (Enhanced) | AAA | Offer that path with no object recognition or personal content test either. |
 
-The AA criteria bind a project targeting AA. The three AAA rows are listed so a project selecting them knows what it selected. The page sidecar records target size, focus order, and status announcements per route, which is where the flow-level criteria are checked.
+The AA criteria bind a project targeting AA. The three AAA rows are listed so a project selecting them knows what it selected. The route suite checks keyboard reach and visible focus on every route. The tests of a route assert target size and status announcements, which is where the flow-level criteria are checked.
 
 ### Use declared visual variants (standards/rule/frontend-components.use-declared-visual-variants)
 
@@ -76,7 +76,7 @@ The AA criteria bind a project targeting AA. The three AAA rows are listed so a 
 
 **Rationale:** A mutation control also prevents duplicate submission and keeps an error recovery path usable.
 
-These seven are the states a component has. `disabled` and `pending` describe a control and have no route equivalent. A route adds `not-found` under `standards/rule/frontend-rendering.represent-route-states`, because a missing target resolves at the route rather than inside a component. The two lists differ by design, and `schemas/ui-page.schema.json` holds the complete set a page sidecar can declare.
+These seven are the states a component has. `disabled` and `pending` describe a control and have no route equivalent. A route adds `not-found` under `standards/rule/frontend-rendering.represent-route-states`, because a missing target resolves at the route rather than inside a component. The two lists differ by design, and the frontend vocabulary `states` list holds the complete set a frontend declares.
 
 ### Protect rich content boundaries (standards/rule/frontend-components.protect-rich-content-boundaries)
 

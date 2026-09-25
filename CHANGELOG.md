@@ -13,13 +13,17 @@ Version 2.0 restates the whole contract. Every provision identifier changed, so 
 
 ### Frontend UI
 
-- Added seven provisions to `docs/frontend/ui.md` that turn the controlled UI contract into a pipeline a validator walks. A root `DESIGN.md` carries the brand and tokens. A repeated page shape is a catalog recipe with a schema-valid sidecar. A declared state must resolve to a component that renders it, and a page region must name a recipe. The implementation must render only the regions its frozen sidecar names, and an acceptance record and its files sit beside the route.
-- Rewrote `standards/rule/frontend-ui.follow-the-agent-ui-protocol` as four gates whose output is artifacts, and extended `standards/rule/frontend-ui.specify-pages-before-composition` to every route in the application tree.
-- Added the `design-contract`, `composition-recipe`, and `acceptance-criteria` schemas and their templates, and added `paths.uiCompositions` for the catalog root.
-- Read the shell when resolving a declared state, so a state the layout carries counts for every page under it.
+- Made the route code the page contract. `docs/frontend/ui.md` defines no page specification, page sidecar, composition catalog, or acceptance record.
+- Added floorplans. Each React web frontend lists a closed floorplan set in the `Patterns` section of its `DESIGN.md`, with a when-to-use rule per floorplan. The vocabulary `patterns` name the same floorplans.
+- Added `standards/rule/frontend-ui.declare-a-closed-floorplan-set`, `standards/rule/frontend-ui.compose-each-route-from-one-floorplan`, `standards/rule/frontend-ui.keep-layout-inside-floorplans`, and `standards/rule/frontend-ui.record-a-freestyle-route`.
+- Added `standards/rule/frontend-ui.check-every-route-in-a-browser`. One route suite per frontend runs axe WCAG 2.2 AA, a single `h1`, a `main` landmark, and a keyboard pass on every route. It also asserts no horizontal overflow at 320 CSS pixels, with and without the WCAG 1.4.12 text-spacing override.
+- Added `standards/rule/frontend-ui.map-every-use-case-path`. Every path of every use case a route calls has a `[path/<id>]` test title, or an exclusion with a reach of `tamper`, `defect`, or `excluded` and a reason.
+- Rewrote the evidence matrix of `standards/rule/frontend-ui.prove-ui-behavior-and-appearance`, so a route change runs the route suite and every test citing a path it calls.
+- Removed the page provisions, the page schema, and the page templates. `tools/validate-ui.mjs` reads no page file and runs its source scan once per frontend.
+- Added the `design-contract` schema and its template.
 - Enumerated the nine WCAG 2.2 criteria under `standards/rule/frontend-components.meet-accessibility-requirements`.
 - Added `standards/rule/frontend-data.announce-the-outcome-of-an-optimistic-update` and `standards/rule/frontend-data.generate-mutable-response-types`.
-- Stated why the route-state and component-state lists differ, with `schemas/ui-page.schema.json` as the complete set.
+- Stated why the route-state and component-state lists differ, with the frontend vocabulary `states` list as the complete set.
 
 ### Backend and API
 
@@ -44,7 +48,9 @@ Version 2.0 restates the whole contract. Every provision identifier changed, so 
 ### System linkage
 
 - Added `standards/rule/core-system.resolve-every-implementation-mapping-name` and `standards/rule/core-system.name-the-handler-an-implemented-use-case-owns`, so a page names the handler it points at.
-- Added `standards/rule/core-system.name-what-calls-a-use-case` and `standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page`, closing the edge between a use case and its callers.
+- Added `standards/rule/core-system.name-what-calls-a-use-case`, closing the edge between a use case and its callers.
+- Added the criterion-to-path form `- [acceptance-criterion/<id>] (path/<id>) <text>` to `docs/backend/identifiers.md`. `tools/validate-spec-sync.mjs` proves a path when a test cites it or a covered criterion names it. A use case whose criteria name no path keeps use-case-level proof, and the run reports it.
+- Accepted a `[path/<id>]` browser-test title in `tools/validate-consumer.mjs` and `tools/validate-spec-sync.mjs`.
 - Added `paths.surfaces`, `parity.foreignNames`, `parity.sourceRoots`, and `paths.testRoots` to `schemas/standards-project.schema.json`.
 - Replaced `BACKEND.TESTING.TRACE.001` and `FRONTEND.TESTING.TRACE.001` with one exact citation form each, and made the acceptance trace real in `tools/validate-consumer.mjs`.
 - Extended `tools/validate-parity.mjs` with the mapping pass.
@@ -53,7 +59,7 @@ Version 2.0 restates the whole contract. Every provision identifier changed, so 
 
 - Added `standards/rule/core-authoring.exclude-the-compound-that-names-another-concept` and the `except` field on a language-record term.
 - Moved the JSON Schema evaluator to `tools/schema.mjs` and closed its gaps, so the keyword gate reaches every position a subschema can occupy.
-- Replaced `fs.globSync` with a directory walker, fixed three parsing defects in `tools/validate-ui.mjs`, added a page registry pass, and raised the parity depth test to four path segments.
+- Replaced `fs.globSync` with a directory walker, fixed three parsing defects in `tools/validate-ui.mjs`, and raised the parity depth test to four path segments.
 - Gave every command `--help` and every validator `--format=json`.
 - Added exit-code assertions and filled template placeholders in the consumer case suite, and added a Node matrix, a nightly run, step timeouts, the parity suite, and a pull-request body check to the workflow.
 - Exempted a rejection table's reason column from the vocabulary scan, and moved the manifest pins to the versions the release runs.

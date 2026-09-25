@@ -30,7 +30,6 @@ const VALUES = {
   __PROJECT__: 'fixture',
   __PROJECT_ID__: 'fixture',
   __TEST_PROJECT__: 'Fixture.Integration.Tests',
-  __UI_DOCS__: 'docs/ui',
   __API_SOLUTION__: 'apps/api/Fixture.slnx',
   __OWNER__: 'fixture',
   '__TITLE__': 'Fixture',
@@ -47,7 +46,6 @@ const VALUES = {
   __WORKFLOW__: 'order-fulfillment',
   __POLICY__: 'refund-limit',
   __APP__: 'web',
-  __PAGE__: 'cancel',
   __ROUTE__: '/cancel',
   __DECISION_ID__: '0001-fixture',
   __EVIDENCE_RECORD__: 'fixture-evidence',
@@ -144,7 +142,6 @@ const LAYOUT = [
   ['workflow.md', 'docs/domain/workflows/order-fulfillment.md'],
   ['domain-policy.md', 'docs/domain/policies/refund-limit.md'],
   ['operating-limits.md', 'docs/operations/limits.md'],
-  ['page.md', 'docs/ui/web/cancel.md'],
   ['decision.md', 'docs/decisions/0001-fixture.md'],
   ['runbook.md', 'docs/runbooks/restore-database.md'],
   ['release-record.md', 'docs/releases/2026-01-01-fixture.md'],
@@ -204,6 +201,7 @@ function build() {
   writeFile('apps/api/Fixture.slnx', '');
   fs.mkdirSync(path.join(fixture, 'tests'), { recursive: true });
   fs.mkdirSync(path.join(fixture, 'apps/admin'), { recursive: true });
+  fs.mkdirSync(path.join(fixture, 'docs/ui'), { recursive: true });
   fs.mkdirSync(path.join(fixture, 'standards'), { recursive: true });
   fs.copyFileSync(path.join(repository, 'standards.manifest.json'), path.join(fixture, 'standards/standards.manifest.json'));
   for (const [template, target] of LAYOUT) {
@@ -305,6 +303,7 @@ report('tracked templates validate as shipped', null, run());
 
 console.log('\nDocumentation kinds');
 metaCase('command page kind is accepted', 'docs/tools/fixture-up.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
+metaCase('retired page kind is refused', 'docs/tools/fixture-up.md', (m) => { m.kind = 'page'; }, "unknown kind 'page'");
 metaCase('reference page kind is accepted', 'docs/reference/ports.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
 metaCase('configuration page kind is accepted', 'docs/tools/configuration.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
 metaCase('tutorial kind is accepted', 'docs/guide/first-run.md', (m) => { m.lastReviewed = '2026-02-02'; }, null);
@@ -761,9 +760,8 @@ console.log('\nControlled prose in consumer documentation (standards/rule/core-a
   writeFile(page, original);
 }
 
-console.log('\nConsumer linkage (standards/rule/core-system.name-what-calls-a-use-case, standards/rule/core-system.match-a-pages-declared-use-case-back-to-that-page)');
+console.log('\nConsumer linkage (standards/rule/core-system.name-what-calls-a-use-case)');
 const useCasePath = 'docs/domain/modules/orders/cancel-order.md';
-const screenPath = 'docs/ui/web/cancel.md';
 
 // The rule binds an implemented use case, and the template ships 'planned', so
 // each case sets the status and replaces the whole Consumers section.
@@ -777,19 +775,14 @@ function consumersCase(name, section, expectation) {
 }
 
 consumersCase(
-  'a section naming a declared surface and the page that calls it',
-  '\n| Surface | Consumer |\n|:---|:---|\n| web | `docs/ui/web/cancel.md` |\n',
+  'a section naming a declared surface and the route that calls it',
+  '\n| Surface | Consumer |\n|:---|:---|\n| web | `apps/web/app/cancel/page.tsx` |\n',
   null,
 );
 consumersCase(
   'a section naming a surface the project never declared',
-  '\n| Surface | Consumer |\n|:---|:---|\n| kiosk | `docs/ui/web/cancel.md` |\n',
+  '\n| Surface | Consumer |\n|:---|:---|\n| kiosk | `apps/web/app/cancel/page.tsx` |\n',
   "names surface 'kiosk'",
-);
-consumersCase(
-  'a section that writes None while a page declares the use case',
-  '\nNone. No surface calls this use case; a nightly run is its only caller.\n',
-  "does not name docs/ui/web/cancel.md",
 );
 consumersCase(
   'a section that writes None with no reason',
@@ -816,13 +809,6 @@ bodyCase(
   'a planned use case needs no Consumers section',
   useCasePath,
   (raw) => raw.replace(/## Consumers\n[\s\S]*?(?=\n## )/, ''),
-  null,
-);
-// The reverse edge resolves on the page file name, so a Consumers row that
-// carries a relative link rather than a repository path still closes it.
-consumersCase(
-  'a row linking the page relatively',
-  '\n| Surface | Consumer |\n|:---|:---|\n| web | [Cancel](../../../ui/web/cancel.md) |\n',
   null,
 );
 
@@ -875,6 +861,31 @@ fileCase(
   'tests/cancel-order.spec.ts',
   `test('[${UNDECLARED}] cancels', async () => {})\n`,
   `cites ${UNDECLARED}`,
+);
+
+// A path is declared where a specification names it, so the passing case adds
+// the path to the use case beside the test that cites it.
+// (standards/rule/frontend-ui.map-every-use-case-path)
+const DECLARED_PATH = 'path/orders.cancel-order.success';
+const UNDECLARED_PATH = 'path/orders.cancel-order.no-page-declares-this';
+(function pathTitles() {
+  writeFile('tests/cancel-order.spec.ts', `test('[${DECLARED_PATH}] cancels', async () => {})\n`);
+  bodyCase(
+    'a browser test title naming a declared path',
+    useCasePath,
+    (raw) => `${raw}\n| \`${DECLARED_PATH}\` | \`success\` | \`None\` |\n`,
+    null,
+  );
+  report('a browser test title naming a path no page declares', `cites ${DECLARED_PATH}`, run());
+  writeFile('tests/cancel-order.spec.ts', `const route = '${UNDECLARED_PATH}';\n`);
+  report('a path outside a browser test title is not a citation', null, run());
+  fs.rmSync(path.join(fixture, 'tests/cancel-order.spec.ts'));
+})();
+fileCase(
+  'a browser test title naming an undeclared path',
+  'tests/cancel-order.spec.ts',
+  `test('[${UNDECLARED_PATH}] cancels', async () => {})\n`,
+  `cites ${UNDECLARED_PATH}`,
 );
 
 // A page reaches 'verified' only when a test cites each of its criteria.

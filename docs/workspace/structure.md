@@ -53,7 +53,7 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
     runbooks/                create with the first runbook
     releases/                create with the first release record
     research/                create with the first research record
-    ui/                      create when a frontend needs page specifications
+    ui/                      create with the first UI decision or guide
   standards/
   AGENTS.md
   global.json

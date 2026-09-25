@@ -2,9 +2,12 @@
 // Reference validator for the controlled React web UI contract.
 //
 // The validator is deliberately local and deterministic. It reads the consumer
-// configuration, source locks, vocabulary, page sidecars, and source files. It
+// configuration, source locks, vocabulary, design contracts, and source files. It
 // never fetches a registry or a package. Consumers may add stricter AST rules,
 // but they should preserve these checks.
+//
+// It reads no page document. The route code is the page contract, and the route
+// suite proves each route in a browser. (standards/rule/frontend-ui.check-every-route-in-a-browser)
 //
 // Usage:
 //   node standards/tools/validate-ui.mjs [consumerRoot]
@@ -309,7 +312,7 @@ function sectionNames(raw) {
 
 const DESIGN_SECTIONS = ['Brand', 'Tokens', 'Vocabulary', 'Patterns', 'Do', 'Do not', 'Motion', 'Voice'];
 
-function validateDesignContract(frontend, ui, frontendRoot, vocabularyInfo, recipes) {
+function validateDesignContract(frontend, ui, frontendRoot, vocabularyInfo) {
   const file = path.join(frontendRoot, 'DESIGN.md');
   const label = relativeToRoot(file);
   if (!fs.existsSync(file)) {
@@ -332,175 +335,20 @@ function validateDesignContract(frontend, ui, frontendRoot, vocabularyInfo, reci
   for (const section of DESIGN_SECTIONS) {
     if (!present.has(section)) error(`[standards/rule/frontend-ui.publish-a-design-contract] ${label}: missing required section '${section}'`);
   }
-  const bound = new Set([...(vocabularyInfo?.patternIds ?? [])].map(recipeName));
+  // The metadata patterns are the floorplans this frontend provides, and the
+  // vocabulary binds each one to its components. (standards/rule/frontend-ui.declare-a-closed-floorplan-set)
+  const bound = new Set([...(vocabularyInfo?.patternIds ?? [])].map(floorplanName));
   for (const pattern of metadata.patterns ?? []) {
-    if (vocabularyInfo && !bound.has(pattern)) error(`[standards/rule/frontend-ui.publish-a-design-contract] ${label}: pattern '${pattern}' is not in the frontend vocabulary`);
-    if (recipes.size && !recipes.has(recipeName(pattern))) error(`[standards/rule/frontend-ui.compose-from-a-catalog-recipe] ${label}: pattern '${pattern}' has no recipe in the composition catalog`);
+    if (vocabularyInfo && !bound.has(pattern)) error(`[standards/rule/frontend-ui.declare-a-closed-floorplan-set] ${label}: floorplan '${pattern}' is not in the frontend vocabulary`);
   }
   return metadata;
 }
 
-// ---- composition catalog ---------------------------------------------------
-
-// One pass over the catalog, before any frontend is read. A recipe is a Markdown
-// page that argues the shape and a sidecar that states it, so a page with no
-// sidecar is a shape nothing resolves and a sidecar with no page is a shape
-// nobody argued.
-function readCompositionCatalog(project) {
-  const recipes = new Map();
-  const declared = project?.paths?.uiCompositions;
-  const uiDocs = project?.paths?.uiDocs ?? 'docs/ui';
-  const catalogRoot = filePath(declared ?? path.posix.join(uiDocs, 'compositions'));
-  if (!fs.existsSync(catalogRoot)) {
-    // A consumer with no page sidecar needs no catalog. The per-region check
-    // reports the absence where it matters, naming the region that wanted one.
-    if (declared) error(`[standards/rule/frontend-ui.publish-each-recipe-as-a-page-and-a-sidecar] ${relativeToRoot(catalogRoot)}: declared composition catalog does not exist`);
-    return recipes;
-  }
-  for (const file of walk(catalogRoot, (candidate) => candidate.endsWith('.md'))) {
-    const name = path.basename(file, '.md');
-    if (name === 'README') continue;
-    const sidecar = path.join(path.dirname(file), `${name}.recipe.json`);
-    const label = relativeToRoot(sidecar);
-    if (!fs.existsSync(sidecar)) {
-      error(`[standards/rule/frontend-ui.publish-each-recipe-as-a-page-and-a-sidecar] ${relativeToRoot(file)}: recipe has no sidecar at '${label}'`);
-      continue;
-    }
-    const recipe = readJson(sidecar, label);
-    if (!recipe) continue;
-    if (!schemaCheck('composition-recipe.schema.json', recipe, label, 'standards/rule/frontend-ui.publish-each-recipe-as-a-page-and-a-sidecar')) continue;
-    if (recipe.recipe !== name) {
-      error(`[standards/rule/frontend-ui.publish-each-recipe-as-a-page-and-a-sidecar] ${label}: recipe must be '${name}', which is the name of the page beside it`);
-      continue;
-    }
-    recipes.set(name, { ...recipe, label, consumers: new Set() });
-  }
-  for (const file of walk(catalogRoot, (candidate) => candidate.endsWith('.recipe.json'))) {
-    const name = path.basename(file, '.recipe.json');
-    if (recipes.has(name)) continue;
-    error(`[standards/rule/frontend-ui.publish-each-recipe-as-a-page-and-a-sidecar] ${relativeToRoot(file)}: recipe sidecar has no Markdown page beside it`);
-  }
-  return recipes;
-}
-
-// A vocabulary pattern can carry a variant after a slash, so `record-list/dense`
-// and `record-list/default` are two bindings of one recipe. The name before the
-// slash is the recipe the catalog holds.
-function recipeName(pattern) {
+// A vocabulary pattern can carry a variant after a slash, so `list-page/dense`
+// and `list-page/default` are two bindings of one floorplan. The name before the
+// slash is the floorplan the design contract names.
+function floorplanName(pattern) {
   return String(pattern ?? '').split('/')[0];
-}
-
-// ---- route resolution ------------------------------------------------------
-
-// A folder that contributes no URL segment: `(group)` organizes, `@slot` is a
-// parallel route, and `_private` is excluded from routing.
-function routeSegment(folder) {
-  if (folder.startsWith('(') || folder.startsWith('@') || folder.startsWith('_')) return null;
-  const dynamic = folder.match(/^\[+\.{0,3}(.+?)\]+$/);
-  return dynamic ? `{${dynamic[1]}}` : folder;
-}
-
-const ROUTE_FILE = /^page\.(?:tsx|ts|jsx|js)$/;
-
-// Three states are owned by a file beside the route rather than by a component
-// inside it. The router renders the segment's own file, or the nearest one above
-// it, so a page declaring one of these states is answered by a file it inherits.
-const SEGMENT_STATE_FILE = { loading: 'loading', 'not-found': 'not-found', error: 'error' };
-
-function segmentStates(routeFile, frontendRoot) {
-  const found = new Set();
-  const appRoot = path.join(frontendRoot, 'app');
-  let directory = path.dirname(routeFile);
-  while (within(appRoot, directory) || path.resolve(directory) === path.resolve(appRoot)) {
-    for (const [state, stem] of Object.entries(SEGMENT_STATE_FILE)) {
-      for (const extension of SOURCE_EXTENSIONS) {
-        if (fs.existsSync(path.join(directory, `${stem}${extension}`))) found.add(state);
-      }
-    }
-    const parent = path.dirname(directory);
-    if (parent === directory) break;
-    directory = parent;
-  }
-  return found;
-}
-
-// Every route the application tree declares, in the notation a page
-// specification writes. A localized tree carries one leading parameter that
-// distinguishes no route from another, so each route is also registered without
-// its first parameter segment.
-function readRoutes(frontendRoot) {
-  const routes = new Map();
-  const appRoot = path.join(frontendRoot, 'app');
-  if (!fs.existsSync(appRoot)) return routes;
-  const register = (route, file) => {
-    if (!routes.has(route)) routes.set(route, file);
-  };
-  const walkRoutes = (directory, segments) => {
-    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-      if (IGNORED_DIRECTORIES.has(entry.name)) continue;
-      const candidate = path.join(directory, entry.name);
-      if (entry.isDirectory()) {
-        const segment = routeSegment(entry.name);
-        walkRoutes(candidate, segment === null ? segments : [...segments, segment]);
-        continue;
-      }
-      if (!ROUTE_FILE.test(entry.name)) continue;
-      const route = `/${segments.join('/')}`;
-      register(route === '/' ? '/' : route, candidate);
-      if (segments.length && /^\{.+\}$/.test(segments[0])) {
-        const shortened = `/${segments.slice(1).join('/')}`;
-        register(shortened === '/' ? '/' : shortened, candidate);
-      }
-    }
-  };
-  walkRoutes(appRoot, []);
-  return routes;
-}
-
-// ---- region scan -----------------------------------------------------------
-
-const SOURCE_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js'];
-
-function resolveImport(specifier, fromFile, frontendRoot) {
-  let base;
-  if (specifier.startsWith('.')) base = path.resolve(path.dirname(fromFile), specifier);
-  else if (specifier.startsWith('@/')) base = path.resolve(frontendRoot, specifier.slice(2));
-  else return null;
-  if (!within(frontendRoot, base) && path.resolve(base) !== path.resolve(frontendRoot)) return null;
-  for (const extension of ['', ...SOURCE_EXTENSIONS]) {
-    const candidate = `${base}${extension}`;
-    if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) return candidate;
-  }
-  for (const extension of SOURCE_EXTENSIONS) {
-    const candidate = path.join(base, `index${extension}`);
-    if (fs.existsSync(candidate)) return candidate;
-  }
-  return null;
-}
-
-// Every `data-region` value the route renders, following its own imports inside
-// the frontend. A region marked in a shared feature component belongs to every
-// page that reaches it, which is what makes an unnamed region reportable.
-function regionsRendered(routeFile, frontendRoot) {
-  const found = new Set();
-  const seen = new Set();
-  const queue = [routeFile];
-  while (queue.length) {
-    const file = queue.pop();
-    const key = path.resolve(file);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    if (!fs.existsSync(key)) continue;
-    const text = fs.readFileSync(key, 'utf8');
-    for (const match of text.matchAll(/data-region=(?:"([a-z][a-z0-9-]*)"|\{"([a-z][a-z0-9-]*)"\}|'([a-z][a-z0-9-]*)')/g)) {
-      found.add(match[1] ?? match[2] ?? match[3]);
-    }
-    for (const match of text.matchAll(/(?:from\s+|import\s*\(\s*)(['"])([^'"]+)\1/g)) {
-      const target = resolveImport(match[2], key, frontendRoot);
-      if (target) queue.push(target);
-    }
-  }
-  return found;
 }
 
 function parseMetadata(file) {
@@ -912,168 +760,17 @@ function reportGlobalStatement(label, statement) {
   }
 }
 
-// One pass over every page sidecar declaration, before any frontend is read.
-// The per-frontend pass below selects the pages whose `app` names that frontend,
-// so a page naming a frontend nobody declared is selected by no pass and reports
-// nothing. Two pages sharing a route are each valid alone and only collide as a
-// pair, which no single-page check sees either.
-function validatePageRegistry(project, frontends) {
-  const uiDocs = filePath(project.paths?.uiDocs ?? 'docs/ui');
-  const declared = new Set(frontends.map((frontend) => frontend.name));
-  const routes = new Map();
-  for (const pageFile of walk(uiDocs, (file) => file.endsWith('.md'))) {
-    const metadata = parseMetadata(pageFile);
-    if (!metadata || metadata.kind !== 'page') continue;
-    const label = relativeToRoot(pageFile);
-    if (!declared.has(metadata.app)) {
-      error(`[standards/rule/frontend-ui.select-one-visual-authority] ${label}: page declares app '${metadata.app}', which no frontend in standards.project.json declares`);
-      continue;
-    }
-    if (!metadata.route) continue;
-    const key = `${metadata.app} ${metadata.route}`;
-    const owner = routes.get(key);
-    if (owner) error(`[standards/rule/frontend-ui.select-one-visual-authority] ${label}: route '${metadata.route}' in '${metadata.app}' is already declared by '${owner}'`);
-    else routes.set(key, label);
-  }
-}
+// ---- source scan -----------------------------------------------------------
 
-// ---- acceptance ------------------------------------------------------------
-
-// Every acceptance identifier a sidecar names, resolved to the record beside its
-// route and to the file that runs. An identifier with no file is a claim the
-// project cannot make, and a file no sidecar names is a run nothing reports.
-function validateAcceptance(contract, metadata, frontendRoot, routes, label) {
-  const claimed = array(contract, 'evidence', label).filter((id) => typeof id === 'string' && id.startsWith('acceptance-criterion/'));
-  const routeFile = routes.get(metadata.route);
-  if (!routeFile) {
-    if (claimed.length) error(`[standards/rule/frontend-ui.resolve-every-acceptance-identifier] ${label}: names acceptance identifiers, and route '${metadata.route}' has no page file`);
-    return;
-  }
-  const evidenceDirectory = path.join(path.dirname(routeFile), 'evidence');
-  const record = path.join(evidenceDirectory, 'acceptance.json');
-  const recordLabel = relativeToRoot(record);
-  if (!claimed.length) return;
-  if (!fs.existsSync(record)) {
-    error(`[standards/rule/frontend-ui.place-acceptance-beside-the-route] ${label}: no acceptance record at '${recordLabel}'`);
-    return;
-  }
-  const acceptance = readJson(record, recordLabel);
-  if (!acceptance) return;
-  if (!schemaCheck('acceptance-criteria.schema.json', acceptance, recordLabel, 'standards/rule/frontend-ui.resolve-every-acceptance-identifier')) return;
-  if (acceptance.page !== contract.page) error(`[standards/rule/frontend-ui.resolve-every-acceptance-identifier] ${recordLabel}: page must be '${contract.page}'`);
-  const criteria = new Map((acceptance.criteria ?? []).map((item) => [item.id, item]));
-  for (const id of claimed) {
-    const criterion = criteria.get(id);
-    if (!criterion) {
-      error(`[standards/rule/frontend-ui.resolve-every-acceptance-identifier] ${recordLabel}: '${label}' names '${id}', which the record does not state`);
-      continue;
-    }
-    const spec = path.join(evidenceDirectory, criterion.spec);
-    if (!fs.existsSync(spec)) error(`[standards/rule/frontend-ui.resolve-every-acceptance-identifier] ${recordLabel}: '${id}' names '${criterion.spec}', which does not exist`);
-  }
-  for (const id of criteria.keys()) {
-    if (!claimed.includes(id)) error(`[standards/rule/frontend-ui.resolve-every-acceptance-identifier] ${recordLabel}: states '${id}', which '${label}' does not name`);
-  }
-}
-
-function validatePageSidecars(project, frontend, ui, vocabularyInfo, recipes) {
-  const uiDocs = filePath(project.paths?.uiDocs ?? 'docs/ui');
+// One pass over the source of one frontend. The Tailwind, CSS, inline-style, and
+// vendor-import rules apply to every authored file outside the primitive
+// boundary and the tests. (standards/rule/frontend-ui.restrict-css-decisions,
+// standards/rule/frontend-ui.select-one-visual-authority)
+function validateSourceScan(frontend, ui, vocabularyInfo) {
   const frontendRoot = filePath(frontend.path);
-  const routes = readRoutes(frontendRoot);
-  const stateComponents = new Map();
-  for (const component of vocabularyInfo?.vocabulary.components ?? []) {
-    for (const state of component.states ?? []) {
-      if (!stateComponents.has(state)) stateComponents.set(state, new Set());
-      stateComponents.get(state).add(component.id);
-    }
-  }
-  const shellRegions = new Set(
-    (vocabularyInfo?.vocabulary.shells ?? []).flatMap((shell) => shell.regions ?? []),
-  );
-  // A shell renders around every page, so a state one of its own components
-  // carries is a state every page under it has. The join is the identifier: a
-  // shell region and the component that fills it share one name.
-  const shellStates = new Set(
-    (vocabularyInfo?.vocabulary.components ?? [])
-      .filter((component) => shellRegions.has(component.id))
-      .flatMap((component) => component.states ?? []),
-  );
-  const pageFiles = walk(uiDocs, (file) => file.endsWith('.md'));
-  for (const pageFile of pageFiles) {
-    const metadata = parseMetadata(pageFile);
-    if (!metadata || metadata.kind !== 'page' || metadata.app !== frontend.name) continue;
-    const adjacent = path.join(path.dirname(pageFile), `${path.basename(pageFile, '.md')}.ui.json`);
-    const idSidecar = path.join(uiDocs, `${metadata.id}.ui.json`);
-    const sidecar = fs.existsSync(adjacent) ? adjacent : idSidecar;
-    const pageLabel = relativeToRoot(pageFile);
-    if (!fs.existsSync(sidecar)) {
-      error(`${pageLabel}: missing UI sidecar (expected '${relativeToRoot(adjacent)}' or '${relativeToRoot(idSidecar)}')`);
-      continue;
-    }
-    const label = relativeToRoot(sidecar);
-    const contract = readJson(sidecar, label);
-    if (!contract) continue;
-    // The schema owns the shape: which keys are required, which values are
-    // closed sets, and which strings match a pattern. The checks below are the
-    // ones that read a second file, which is what a schema cannot do.
-    schemaCheck('ui-page.schema.json', contract, label, 'standards/rule/frontend-ui.specify-pages-before-composition');
-    if (contract.page !== metadata.id) error(`${label}: page must match '${metadata.id}'`);
-    if (contract.profile !== ui.profile) error(`${label}: profile must match frontend UI configuration`);
-    validateAcceptance(contract, metadata, frontendRoot, routes, label);
-    if (!vocabularyInfo) continue;
-    if (!vocabularyInfo.shellIds.has(contract.shell)) error(`${label}: unknown shell '${contract.shell}'`);
-    const named = new Set();
-    const carried = new Set();
-    for (const region of array(contract, 'regions', label)) {
-      const regionLabel = `${label}.${region?.id ?? 'region'}`;
-      if (region?.id) named.add(region.id);
-      if (!vocabularyInfo.patternIds.has(region?.pattern)) error(`${regionLabel}: unknown pattern '${region?.pattern}'`);
-      else if (recipes.size) {
-        const recipe = recipes.get(recipeName(region.pattern));
-        if (!recipe) error(`[standards/rule/frontend-ui.compose-from-a-catalog-recipe] ${regionLabel}: pattern '${region.pattern}' has no recipe in the composition catalog`);
-        else if (recipe.scope !== 'page') error(`[standards/rule/frontend-ui.compose-from-a-catalog-recipe] ${regionLabel}: recipe '${region.pattern}' is a shell recipe, which a page region does not name`);
-        else recipe.consumers.add(contract.page);
-      }
-      for (const component of array(region, 'components', regionLabel)) {
-        if (!vocabularyInfo.componentIds.has(component)) error(`${regionLabel}: unknown component '${component}'`);
-        carried.add(component);
-      }
-    }
-    const routeFile = routes.get(metadata.route);
-    const inherited = routeFile ? segmentStates(routeFile, frontendRoot) : new Set();
-    for (const state of array(contract, 'states', label)) {
-      if (!vocabularyInfo.stateIds.has(state)) {
-        error(`${label}: unknown state '${state}'`);
-        continue;
-      }
-      if (inherited.has(state) || shellStates.has(state)) continue;
-      const carriers = stateComponents.get(state);
-      if (!carriers || ![...carriers].some((component) => carried.has(component))) {
-        const owner = SEGMENT_STATE_FILE[state];
-        const answer = owner ? `, and no '${owner}' file sits above its route` : '';
-        error(`[standards/rule/frontend-ui.render-every-declared-state] ${label}: state '${state}' is declared, and no component any region names carries it${answer}`);
-      }
-    }
-    // The frozen plan is the sidecar. A region in the source that the sidecar
-    // does not name is the section an implementation added after gate B.
-    if (routeFile) {
-      for (const region of regionsRendered(routeFile, frontendRoot)) {
-        if (named.has(region) || shellRegions.has(region)) continue;
-        error(`[standards/rule/frontend-ui.keep-the-implementation-inside-the-frozen-plan] ${relativeToRoot(routeFile)}: renders region '${region}', which '${label}' does not name`);
-      }
-    }
-    // An evidence array holds two kinds of identifier from two registers. A
-    // `UI-` id is owned by this frontend's vocabulary and is resolved here. An
-    // `AC-` or `E2E-` id is owned by the consumer specifications and is resolved
-    // by `validate-consumer.mjs`, which reads the acceptance and end-to-end
-    // registers this validator never loads.
-    for (const evidenceId of array(contract, 'evidence', label)) if (evidenceId.startsWith('UI-') && !vocabularyInfo.evidenceIds.has(evidenceId)) error(`${label}: unknown UI evidence '${evidenceId}'`);
-  }
-
-  // Alternate visual systems retain page-contract validation, but their CSS,
-  // vendor, and source-lock rules are owned by the override decision. The
-  // shadcn source boundary below must not be applied to Bootstrap, MUI, or a
-  // bounded specialist system.
+  // An alternate visual system owns its CSS, vendor, and source-lock rules
+  // through its override decision. The shadcn source boundary below must not be
+  // applied to Bootstrap, MUI, or a bounded specialist system.
   if (ui.system && ui.system !== 'shadcn/ui') return;
   // The missing-key errors are already recorded; the source scan needs both
   // boundaries to say anything useful.
@@ -1151,9 +848,6 @@ for (const override of project?.overrides ?? []) {
   if (override.decision && !fs.existsSync(filePath(override.decision))) error(`${label}: decision does not exist '${override.decision}'`);
 }
 
-if (project) validatePageRegistry(project, frontends);
-const recipes = project ? readCompositionCatalog(project) : new Map();
-
 for (const frontend of frontends) {
   if (frontend.platform === 'react-web' && !frontend.ui) error(`[standards/rule/frontend-ui.select-one-visual-authority] frontend '${frontend.name}': react-web frontends require a UI configuration`);
   if (!frontend.ui) continue;
@@ -1215,19 +909,12 @@ for (const frontend of frontends) {
     if (sourceLockFile && fs.existsSync(sourceLockFile)) validateSourceLock(sourceLockFile, effectiveUi, frontendRoot, vocabularyInfo, manifest);
     if (ui.globalCss && fs.existsSync(filePath(ui.globalCss))) validateGlobalCss(filePath(ui.globalCss));
     validateDependencyBoundary(frontendRoot, effectiveUi);
-    validateDesignContract(frontend, ui, frontendRoot, vocabularyInfo, recipes);
-    validatePageSidecars(project, frontend, ui, vocabularyInfo, recipes);
+    validateDesignContract(frontend, ui, frontendRoot, vocabularyInfo);
+    validateSourceScan(frontend, ui, vocabularyInfo);
   } else {
-    validateDesignContract(frontend, ui, frontendRoot, null, recipes);
-    validatePageSidecars(project, frontend, ui, null, recipes);
+    validateDesignContract(frontend, ui, frontendRoot, null);
   }
 }
-
-// A recipe nobody reaches for is a shape the catalog carries and no page reads.
-// The count is reported rather than refused, because the promotion path in
-// standards/rule/frontend-ui.promote-a-recipe-on-its-second-consumer is a default a consumer can replace.
-const unusedRecipes = [...recipes.values()].filter((recipe) => recipe.scope === 'page' && recipe.consumers.size === 0).map((recipe) => recipe.recipe);
-const singleUseRecipes = [...recipes.values()].filter((recipe) => recipe.scope === 'page' && recipe.consumers.size === 1).map((recipe) => recipe.recipe);
 
 if (jsonOutput) {
   console.log(JSON.stringify({
@@ -1236,18 +923,12 @@ if (jsonOutput) {
     ok: errors.length === 0,
     configuredFrontends: configured,
     skippedFrontends: configured ? [] : frontends.map((frontend) => ({ name: frontend.name, platform: frontend.platform ?? null })),
-    recipes: recipes.size,
-    unusedRecipes,
-    singleUseRecipes,
     problems: errors,
   }, null, 2));
   process.exit(errors.length ? 1 : 0);
 }
 console.log(`Consumer: ${root}`);
 console.log(`UI-configured frontends: ${configured}`);
-console.log(`Composition recipes: ${recipes.size}`);
-if (unusedRecipes.length) console.log(`Recipes no page names: ${unusedRecipes.join(', ')}`);
-if (singleUseRecipes.length) console.log(`Recipes one page names: ${singleUseRecipes.join(', ')}`);
 if (errors.length) {
   console.log(`\nFAIL (${errors.length} problem(s)):`);
   for (const item of errors) console.log(`  - ${item}`);
@@ -1263,4 +944,4 @@ if (!configured) {
   else console.log('Skipped frontends: none; the project declares no frontend.');
   process.exit(0);
 }
-console.log('\nPASS: UI configuration, vocabulary, source locks, page contracts, and source boundaries are valid.');
+console.log('\nPASS: UI configuration, vocabulary, source locks, design contracts, and source boundaries are valid.');

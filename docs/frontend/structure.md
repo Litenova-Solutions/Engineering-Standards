@@ -52,7 +52,7 @@ Framework-generated cache and build folders remain untracked.
 
 **Requirement:** A module MUST NOT import another module's internal feature path.
 
-**Rationale:** Route composition may still render public components from several modules when a page specification requires it. Shared code moves to `components/` or `lib/`.
+**Rationale:** Route composition may still render public components from several modules when a floorplan slot needs them. Shared code moves to `components/` or `lib/`.
 
 ### Keep applications independent (standards/rule/frontend-structure.keep-applications-independent)
 
