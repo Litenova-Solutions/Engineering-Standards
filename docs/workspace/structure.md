@@ -11,6 +11,7 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
 - Consumers share one canonical root tree. (standards/rule/workspace-structure.use-the-canonical-root-tree)
 - Production and test projects sit in separate roots. (standards/rule/workspace-structure.keep-net-production-and-test-projects-separate)
 - Runnable applications live under apps. (standards/rule/workspace-structure.keep-runnable-applications-under-apps)
+- An AppHost that runs several applications sits beside them under apps. (standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs)
 - Shared packages have two consumers or hold generated output. (standards/rule/workspace-structure.limit-shared-typescript-packages)
 - Consumer documentation lives under the root docs directory. (standards/rule/workspace-structure.keep-consumer-documentation-at-the-root)
 - READMEs orient and link; they never restate records. (standards/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records)
@@ -36,6 +37,7 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
       src/
       tests/
     {frontend}/
+    apphost/                 when an AppHost runs more than one application
   packages/
   docs/
     product/
@@ -69,7 +71,7 @@ The example does not place the .NET solution or a frontend application at the wo
 
 **Requirement:** Production projects MUST live under `apps/api/src/` and test projects under `apps/api/tests/`, with the solution directly under `apps/api/`.
 
-**Rationale:** The split makes a test dependency reaching a production project visible in the path itself.
+**Rationale:** The split makes a test dependency reaching a production project visible in the path itself. A workspace AppHost is the one production project outside it, placed by `standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs`.
 
 **Example:** The baseline tree is:
 
@@ -84,7 +86,7 @@ apps/api/
     {ProjectName}.Application/
     {ProjectName}.Infrastructure/
     {ProjectName}.WebApi/
-    {ProjectName}.AppHost/          when a local orchestration host is used
+    {ProjectName}.AppHost/          when an orchestration host runs the API alone
     {ProjectName}.ServiceDefaults/  when a local orchestration host is used
   tests/
     {ProjectName}.Domain.Tests/
@@ -102,6 +104,30 @@ Worker and Acceptance.Tests are conditional projects introduced by extensions. `
 **Rationale:** The API solution stays at `apps/api/` and remains the one a build, a test run, and `paths.apiSolution` name. A workspace holding a second .NET deployable, such as a command-line tool, otherwise has no single file an editor can open across both. Two solution files listing overlapping projects is a supported MSBuild arrangement, and the projects themselves stay where `standards/rule/workspace-structure.keep-net-production-and-test-projects-separate` puts them.
 
 **Example:** A workspace with an API and a command-line tool carries `apps/api/{ProjectName}.slnx`, `apps/cli/{ProjectName}.Cli.slnx` where one exists, and a root `{ProjectName}.slnx` listing both sets.
+
+### Place a workspace AppHost beside the applications it runs (standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs)
+
+**Requirement:** An AppHost that runs more than one application under `apps/` MUST live at `apps/apphost/{ProjectName}.AppHost/` rather than under `apps/api/src/`.
+
+**Rationale:** An AppHost that runs the API and its dependencies alone stays under `apps/api/src/` with the projects it hosts. An AppHost that also runs the frontends orchestrates the workspace rather than the API. Under `apps/api/src/` it reads as one of the API's layers, and it reaches out of that tree for every frontend it starts. Beside the applications it runs, its path says what it serves. `ServiceDefaults` stays under `apps/api/src/`, because the API references it and the AppHost does not.
+
+**Example:** A workspace with an API and three frontends carries:
+
+```text
+apps/
+  api/
+    src/
+      {ProjectName}.WebApi/
+    tests/
+      {ProjectName}.Architecture.Tests/   references the AppHost for its model tests
+  apphost/
+    {ProjectName}.AppHost/
+      {ProjectName}.AppHost.csproj
+      Program.cs
+  {frontend}/
+```
+
+The workspace solution of `standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution` lists the AppHost, and the API solution lists it too when a test project references it.
 
 ### Keep runnable applications under apps (standards/rule/workspace-structure.keep-runnable-applications-under-apps)
 
@@ -168,6 +194,7 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 | standards/rule/workspace-structure.use-the-canonical-root-tree | inspection | Root tree review compares the workspace against the layout in this section. |
 | standards/rule/workspace-structure.keep-net-production-and-test-projects-separate | test | `SolutionStructureTests` asserts each project resolves under its declared source or test root. |
 | standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution | static | `node standards/tools/validate-consumer.mjs` resolves `paths.apiSolution` to the solution under `apps/api/`, whether or not a root solution exists. |
+| standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs | inspection | Root tree review confirms an AppHost running a frontend sits at `apps/apphost/`, and one running the API alone under `apps/api/src/`. |
 | standards/rule/workspace-structure.keep-runnable-applications-under-apps | inspection | Root tree review confirms each runnable application sits under `apps/` and each library under `packages/`. |
 | standards/rule/workspace-structure.limit-shared-typescript-packages | inspection | Package review records the two consumers or the generated-output purpose for each shared package. |
 | standards/rule/workspace-structure.keep-consumer-documentation-at-the-root | inspection | Root tree review confirms every structured specification resolves under root `docs/`. |

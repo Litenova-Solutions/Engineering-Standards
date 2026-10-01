@@ -36,6 +36,7 @@ Version 2.0 restates the whole contract. Every provision identifier changed, so 
 - Permitted the nested state-case form in `standards/rule/backend-domain.use-these-domain-names` and `standards/rule/workspace-naming.use-architectural-suffixes`.
 - Retitled `docs/backend/persistence.md` to `Persistence` and split its provisions into provider-neutral and provider-specific groups.
 - Added `standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution`.
+- Added `standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs`. An AppHost that runs more than one application lives at `apps/apphost/`, and one that runs the API alone stays under `apps/api/src/`.
 - Added `standards/rule/ext-locale.follow-the-validation-message-grammar` and `standards/rule/ext-locale.resolve-every-shown-identifier`.
 - Added the `mcp` extension with `standards/rule/ext-mcp.pass-server-instructions-at-initialize`, `standards/rule/ext-mcp.write-one-tool-description-for-one-decision`, and `standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal`.
 

@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 897 provisions across 1 kinds.
+The active release states 898 provisions across 1 kinds.
 
 ## rule
 
@@ -908,5 +908,6 @@ The active release states 897 provisions across 1 kinds.
 | standards/rule/workspace-structure.keep-scripts-at-the-root | [Keep scripts at the root](../workspace/structure.md#keep-scripts-at-the-root-standardsruleworkspace-structurekeep-scripts-at-the-root) | `workspace/structure.md` |
 | standards/rule/workspace-structure.limit-shared-typescript-packages | [Limit shared TypeScript packages](../workspace/structure.md#limit-shared-typescript-packages-standardsruleworkspace-structurelimit-shared-typescript-packages) | `workspace/structure.md` |
 | standards/rule/workspace-structure.name-frontends-by-audience | [Name frontends by audience](../workspace/structure.md#name-frontends-by-audience-standardsruleworkspace-structurename-frontends-by-audience) | `workspace/structure.md` |
+| standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs | [Place a workspace AppHost beside the applications it runs](../workspace/structure.md#place-a-workspace-apphost-beside-the-applications-it-runs-standardsruleworkspace-structureplace-a-workspace-apphost-beside-the-applications-it-runs) | `workspace/structure.md` |
 | standards/rule/workspace-structure.use-the-canonical-root-tree | [Use the canonical root tree](../workspace/structure.md#use-the-canonical-root-tree-standardsruleworkspace-structureuse-the-canonical-root-tree) | `workspace/structure.md` |
 
