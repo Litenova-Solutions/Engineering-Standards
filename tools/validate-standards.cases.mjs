@@ -316,7 +316,7 @@ run('section order', (root) => write(root, 'docs/core/topic.md', topicPage.repla
 run('broken link', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nRead the [missing page](missing.md).\n'), ['LINK_BROKEN']);
 run('invalid schema consumer', (root) => {
   write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', required: ['version'], properties: { version: { const: '1.0.0' } }, additionalProperties: false }));
-  write(root, 'standards.manifest.json', JSON.stringify({ version: '2.0.0' }));
+  write(root, 'standards.manifest.json', JSON.stringify({ version: '1.17.0' }));
 }, ['SCHEMA_INVALID']);
 run('unsupported schema keyword', (root) => {
   write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', format: 'custom' }));
@@ -414,10 +414,10 @@ run('long paragraph', (root) => write(root, 'docs/core/topic.md', topicPage.repl
 // A table listing refused words exempts two columns: the refused word, and the
 // reason that has to be able to name it. Every other column is measured, and a
 // reason column in a table with no rejection column is measured too.
-const rejectionTable = '\n\n| Rejected | Use instead | Reason |\n|:---|:---|:---|\n| seat | position | The glossary defines seat as a numbered place in a seating plan, which a general-admission event does not have at all. |\n';
+const rejectionTable = '\n\n| Rejected | Use instead | Reason |\n|:---|:---|:---|\n| client | customer | The glossary defines client as the program that calls the public API, which a person placing an order never is at all. |\n';
 run('rejection table exempts its refused word and its reason', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes${rejectionTable}`)), []);
 run('an ordinary reason column is still measured', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes\n\n| Step | Reason |\n|:---|:---|\n| Publish | The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result. |\n`)), ['PROSE_TABLE_CELL_LENGTH']);
-run('a long cell beside a rejection column is still measured', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes\n\n| Rejected | Use instead | Reason |\n|:---|:---|:---|\n| seat | The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result. | Short. |\n`)), ['PROSE_TABLE_CELL_LENGTH']);
+run('a long cell beside a rejection column is still measured', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes\n\n| Rejected | Use instead | Reason |\n|:---|:---|:---|\n| client | The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result. | Short. |\n`)), ['PROSE_TABLE_CELL_LENGTH']);
 run('long table cell', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Inspect the declared topic boundary.', 'The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result.')), ['PROSE_TABLE_CELL_LENGTH']);
 run('normative guide prose', (root) => write(root, 'docs/guide/sample.md', guide.replace('Create one verified standards artifact.', 'Consumers MUST create one verified standards artifact.')), ['PROSE_NORMATIVE_LOCATION']);
 

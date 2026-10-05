@@ -77,7 +77,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 ### Pin the React version in the ESLint flat config (standards/rule/workspace-config.pin-the-react-version-in-the-eslint-flat-config)
 
-**Requirement:** A Next.js ESLint flat config MUST set a concrete `settings.react.version` rather than leave it at `detect`.
+**Requirement:** A React ESLint flat config MUST set a concrete `settings.react.version` rather than leave it at `detect`.
 
 **Rationale:** Version detection calls context APIs that the pinned ESLint release removed, and a concrete version skips detection entirely.
 

@@ -31,7 +31,7 @@ The API provisions own the behavior the server calls, and the frontend provision
 
 **Rationale:** The MCP specification's initialize response carries server instructions, and a client loads them once per session while it loads each tool description per call. Scope and policy therefore belong at the server level, because they hold for every call. Tool mechanics stay in the tool descriptions, where the model reads them at the moment it chooses.
 
-**Example:** "Runs over stdio, one organizer per process, against the hosted API. Reads cover the organizer's own data, and three tools create or change records. A policy refusal returns the problem code, and a write needing a person's confirmation refuses until they give it."
+**Example:** "Runs over stdio, one merchant per process, against the hosted API. Reads cover the merchant's own data, and three tools create or change records. A policy refusal returns the problem code, and a write needing a person's confirmation refuses until they give it."
 
 ### Write one tool description for one decision (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
 

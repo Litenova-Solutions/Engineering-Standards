@@ -2,16 +2,16 @@
 {
   "kind": "design-contract",
   "schemaVersion": 1,
-  "frontend": "__FRONTEND__",
+  "package": "@__PROJECT__/ui",
   "profile": "application-balanced",
   "shell": "application-shell/default",
   "patterns": ["list-page", "entity-page"]
 }
 ---
 
-# __FRONTEND__ design contract
+# __PROJECT__ shared UI package design contract
 
-Read this before composing anything on this frontend. The vocabulary below is the whole of it. A screen that needs a pattern outside it needs a decision first.
+Read this before composing anything. The list below is the whole of it. A screen that needs a pattern outside it needs a decision first.
 
 ## Brand
 
@@ -34,15 +34,15 @@ Values live in the global CSS entry. Change them there. A colour written into a 
 
 ## Vocabulary
 
-The primitives this frontend composes from, listed in its `ui-vocabulary.json`. Name the ones a page reaches for directly, one sentence each.
+The composites applications compose from, listed by the entry point that exports each one. Name the ones a page reaches for, one sentence each.
 
-- `button` is the only clickable element. A `div` with an `onClick` is refused.
-- `badge` is a state in one word.
-- `card` is a grouped fact set, never a screen.
+- A `button` is the only clickable element. A `div` carrying an `onClick` is refused.
+- A `badge` is a state in one word, and its tone is one of five.
+- A `card` is a grouped fact set, never a screen.
 
 ## Patterns
 
-The floorplans this frontend provides. A route composes exactly one of them, or names the decision behind a freestyle layout.
+The floorplans this package provides. A route composes exactly one of them, or names the decision behind a freestyle layout.
 
 | Floorplan | Component | Use it when the reader |
 |:---|:---|:---|

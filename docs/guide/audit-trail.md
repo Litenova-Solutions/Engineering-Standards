@@ -56,8 +56,8 @@ The shape holds no name, no address, no message body, and no state snapshot. Tha
 Attach the constant half of the record to the Command type, following `standards/rule/ext-audit.declare-audit-selection-beside-the-command`.
 
 ```csharp
-[Audited("events.schedule-event", TargetKind = "event", Category = AuditCategory.Configuration)]
-public sealed record ScheduleEventCommand(...) : ICommand<ScheduleEventCommandResult>;
+[Audited("catalog.add-product", TargetKind = "product", Category = AuditCategory.Configuration)]
+public sealed record AddProductCommand(...) : ICommand<AddProductCommandResult>;
 
 [NotAudited("A public catalog read discloses no tenant-owned data.")]
 public sealed record BrowseStorefrontQuery(...) : IQuery<BrowseStorefrontQueryResult>;
@@ -98,9 +98,9 @@ internal sealed class OpenAuditScopePreHandler(IAuditScopeFactory factory) : ICo
 Let the handler contribute the values it alone determines, which is `standards/rule/ext-audit.restrict-handler-contribution-to-determined-values`. A generated identity and a composed reason are the usual two.
 
 ```csharp
-var occurrence = Event.Create(EventId.New(), ...);
-events.Store(occurrence);
-audit.Target(occurrence.Id);
+var product = Product.Create(ProductId.New(), ...);
+products.Store(product);
+audit.Target(product.Id);
 ```
 
 The handler sets no actor, action, timestamp, or outcome. The pipeline owns those.

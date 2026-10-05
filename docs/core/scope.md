@@ -18,7 +18,7 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 ### Use the supported application profile (standards/rule/core-scope.use-the-supported-application-profile)
 
-**Requirement:** A `dotnet-nextjs` profile consumer MUST use one business web system with ASP.NET Core API, PostgreSQL, Marten, and zero or more Next.js frontends.
+**Requirement:** A `dotnet-react` profile consumer MUST use one business web system with ASP.NET Core API, PostgreSQL, Marten, and zero or more React frontends.
 
 **Rationale:** The supported profile gives one repository, backend, persistence model, and optional web interface boundary.
 
@@ -26,7 +26,7 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 ### Keep one bounded context (standards/rule/core-scope.keep-one-bounded-context)
 
-**Requirement:** A `dotnet-nextjs` profile consumer MUST keep one business language and deployment boundary.
+**Requirement:** A `dotnet-react` profile consumer MUST keep one business language and deployment boundary.
 
 **Rationale:** Modules organize related language, models, use cases, and code without becoming independent services or bounded contexts.
 

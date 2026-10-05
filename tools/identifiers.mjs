@@ -27,9 +27,24 @@ export const KNOWN_KINDS = [
 // A kind shortened to two or three characters. Rule 2 rejects it.
 export const KIND_ABBREVIATIONS = ['agg', 'autz', 'ac', 'evt', 'exc', 'fail', 'inv', 'pol', 'uc', 'val'];
 
-// The sources a cross-source citation may name. The first segment of an
-// identifier is otherwise absent. (standards/rule/backend-identifiers.cite-across-sources-with-the-source-prefix-form)
-export const DEFAULT_SOURCES = ['entro', 'litepress', 'owasp', 'rfc', 'standards'];
+// The sources every project may cite. The first segment of an identifier is
+// otherwise absent. A project adds its own source and the sources it declares in
+// 'project.citedSources'. (standards/rule/backend-identifiers.cite-across-sources-with-the-source-prefix-form)
+export const DEFAULT_SOURCES = ['owasp', 'rfc', 'standards'];
+
+// The source segment a project's own identifiers carry: 'project.identifierSource'
+// when declared, otherwise the project name in lower kebab case.
+export function projectSource(project) {
+  const declared = project?.project?.identifierSource;
+  if (typeof declared === 'string' && declared) return declared;
+  return String(project?.project?.name ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+// Every source a citation in this project may name.
+export function projectSources(project) {
+  const cited = Array.isArray(project?.project?.citedSources) ? project.project.citedSources : [];
+  return new Set([...DEFAULT_SOURCES, projectSource(project), ...cited].filter(Boolean));
+}
 
 const RULE_KINDS = new Set(['invariant', 'validation', 'authorization', 'acceptance-criterion', 'policy', 'rule']);
 

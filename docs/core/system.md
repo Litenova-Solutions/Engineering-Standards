@@ -150,11 +150,11 @@ A product specification names users, problems, outcomes, exclusions, commercial 
 
 An end-to-end flow begins at an accepted starting condition, crosses every required system boundary, and ends at one observable product outcome. It does not mean every possible product feature. The record may include actor decisions, branches, waiting periods, failures, and recovery.
 
-A flow links existing use-case specifications instead of repeating their inputs and rules. For an event platform, `event-sales` can connect ticket reservation, guest order creation, payment confirmation, and ticket issue. Event cancellation and payment reconciliation are separate flows.
+A flow links existing use-case specifications instead of repeating their inputs and rules. For an online shop, `order-checkout` can connect stock reservation, order creation, payment start, and shipment dispatch. Order cancellation and payment reconciliation are separate flows.
 
 ### Domain and module
 
-Orders, refunds, ticket admission, money, and cancellation policy are domain concepts. HTTP, JSON serialization, database sessions, and queue clients are technical mechanisms.
+Orders, refunds, shipment delivery, money, and cancellation policy are domain concepts. HTTP, JSON serialization, database sessions, and queue clients are technical mechanisms.
 
 The capitalized `Domain` project is the code layer that implements domain types and behavior. The business domain exists independently of that project. A domain policy may be enforced by Domain or Application code when its facts cross aggregate or module boundaries.
 
@@ -210,9 +210,9 @@ The system classifies rules by where they are enforced:
 
 ### Event and event reaction
 
-Event names use past-tense forms such as `OrderConfirmed` and `TicketIssued`. `Reaction` states the causal relationship without prescribing the implementation.
+Event names use past-tense forms such as `OrderConfirmed` and `ShipmentDispatched`. `Reaction` states the causal relationship without prescribing the implementation.
 
-A reaction may map to an event handler, workflow orchestrator, projection, or scheduled job. `OrderConfirmed` may cause the reaction `Issue tickets`, implemented as a durable workflow rather than a class named `IssueTicketsReaction`.
+A reaction may map to an event handler, workflow orchestrator, projection, or scheduled job. `OrderConfirmed` may cause the reaction `Dispatch shipment`, implemented as a durable workflow rather than a class named `DispatchShipmentReaction`.
 
 ### Acceptance and end-to-end verification
 
@@ -224,7 +224,7 @@ Acceptance tests prove use-case behavior. End-to-end tests prove that connected 
 
 A scenario is one concrete occasion for the subject of a specification: who acts, what surrounds them, and what they would do instead. It answers when the behavior happens, which no rule, state, or mapping table states.
 
-A reference cast is the one record every scenario draws its people, place, dates, and amounts from. Independent scenarios invent an organization and a buyer for each page, so nothing carries between two pages read in sequence.
+A reference cast is the one record every scenario draws its people, place, dates, and amounts from. Independent scenarios invent a merchant and a customer for each page, so nothing carries between two pages read in sequence.
 
 Both are informative. A scenario illustrates its page and never governs it. A scenario that disagrees with the page it sits on is the part that is wrong.
 
@@ -377,7 +377,7 @@ FAIL (2 problem(s)):
 
 **Rationale:** Every other section states a rule, a state, or a mapping. None of them says when the behavior happens, or who is under pressure while it does. A reader who cannot place an operation in the world reads its rules as arbitrary constraints. An agent writing against it cannot tell an ordinary case from an exceptional one.
 
-**Example:** A door specification states the hour, the queue, and the scanner that lost signal before it states its failure codes.
+**Example:** A warehouse scan specification states the hour, the parcel queue, and the handheld that lost signal before it states its failure codes.
 
 ### Keep a scenario informative (standards/rule/core-system.keep-a-scenario-informative)
 
@@ -385,7 +385,7 @@ FAIL (2 problem(s)):
 
 **Rationale:** An identifier inside a scenario reads as a second definition of the rule it names, and two definitions drift. The section illustrates the page, so a scenario that contradicts the page's own tables is the part that is wrong.
 
-**Example:** A scenario says the buyer is refused because the last place went to somebody else, and the rules table says `INV-INVENTORY-01`.
+**Example:** A scenario says Alex is refused because the last unit went to somebody else, and the rules table says `INV-INVENTORY-01`.
 
 ### Derive every scenario from one reference cast (standards/rule/core-system.derive-every-scenario-from-one-reference-cast)
 
@@ -393,7 +393,7 @@ FAIL (2 problem(s)):
 
 **Rationale:** One cast makes a sequence of pages describe one occasion rather than many unrelated illustrations. The reader carries context from each page to the next. The cast costs nothing to maintain because it names no code, and its figures come from the specifications.
 
-**Example:** The buyer who places the order in one specification is the person at the gate in another.
+**Example:** Alex, the customer who places the order in one specification, is the person who receives the shipment in another.
 
 ### Declare Specification Metadata (standards/rule/core-system.declare-specification-metadata)
 
@@ -422,7 +422,7 @@ FAIL (2 problem(s)):
 **Example:** One owning use-case specification can define a criterion:
 
 ```text
-[AC-ORDERS-CANCEL-ORDER-01] An authorized buyer can cancel an unpaid order.
+[AC-ORDERS-CANCEL-ORDER-01] An authorized customer can cancel an unpaid order.
 ```
 
 Acceptance tests reference the ID without redefining its text. A static documentation check proves that the reference exists. A passing test provides execution evidence.
@@ -449,7 +449,7 @@ docs/
   product/
     brief.md
     flows/
-      event-sales.md
+      order-checkout.md
   domain/
     README.md
     glossary.md
@@ -459,9 +459,9 @@ docs/
       orders/
         README.md
         cancel-order.md
-      audience/
+      customers/
         README.md
-        buyer-accounts/
+        customer-accounts/
           claim-guest-order.md
         consents/
           grant-consent.md
@@ -540,11 +540,11 @@ The example creates an optional directory only when its first real artifact is a
 
 This informative example demonstrates `standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow`, `standards/rule/core-system.specify-autonomous-progress-as-a-workflow`, and `standards/rule/core-system.record-events-and-event-reactions-separately`.
 
-The `event-sales` end-to-end flow links `inventory.reserve-tickets`, `orders.create-guest-order`, `payments.start-payment`, and `tickets.issue-ticket`. The `payment-fulfillment` workflow begins with provider confirmation, issues one inventory confirmation Command, awaits its event, and then issues the ticket Command. Each Command owns one transaction. `E2E-EVENT-SALES-01` verifies the connected outcome through the deployed API.
+The `order-checkout` end-to-end flow links `catalog.reserve-stock`, `orders.create-order`, `payments.start-payment`, and `shipping.dispatch-shipment`. The `payment-fulfillment` workflow begins with provider confirmation, issues one stock confirmation Command, awaits its event, and then issues the shipment Command. Each Command owns one transaction. `E2E-ORDER-CHECKOUT-01` verifies the connected outcome through the deployed API.
 
 The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` changes `Order` and cites `INV-ORDERS-01`. `orders.claim-guest-order` changes `OrderClaim` and cites `INV-ORDERS-04`. Their shared module name does not merge their transaction boundaries.
 
-`OrderConfirmed` records a completed fact. `Issue tickets` is its event reaction. A durable `OrderFulfillmentWorkflowOrchestrator` may implement that reaction by issuing `IssueTicketCommand`. The specification does not require a class named `IssueTicketsReaction`.
+`OrderConfirmed` records a completed fact. `Dispatch shipment` is its event reaction. A durable `OrderFulfillmentWorkflowOrchestrator` may implement that reaction by issuing `DispatchShipmentCommand`. The specification does not require a class named `DispatchShipmentReaction`.
 
 ## Verification
 

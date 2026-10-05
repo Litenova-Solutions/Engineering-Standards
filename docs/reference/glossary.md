@@ -194,7 +194,7 @@ One identified Standard or Convention block with one Requirement or replaceable 
 
 ## Provision ID
 
-The `standards/<kind>/<page>.<heading-slug>` identifier of one provision, such as `standards/rule/frontend-components.use-the-component-ownership-levels`.
+The `standards/<kind>/<page>.<heading-slug>` identifier of one provision, such as `standards/rule/frontend-components.compose-composites-in-page-code`.
 
 ## Query
 

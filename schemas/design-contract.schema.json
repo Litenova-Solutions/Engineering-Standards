@@ -8,8 +8,7 @@
   "required": [
     "kind",
     "schemaVersion",
-    "frontend",
-    "profile",
+    "package",
     "shell",
     "patterns"
   ],
@@ -19,11 +18,13 @@
       "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See standards/rule/core-authoring.publish-each-release-as-a-complete-contract and standards/rule/core-authoring.exclude-cross-release-compatibility-work.",
       "const": 1
     },
-    "frontend": {
+    "package": {
+      "description": "The shared UI package this contract travels with.",
       "type": "string",
-      "pattern": "^[a-z][a-z0-9-]*$"
+      "minLength": 1
     },
     "profile": {
+      "description": "The density the contract's worked example is written at. A package serving several frontends states one.",
       "type": "string",
       "enum": ["public-light", "application-balanced", "admin-dense"]
     },

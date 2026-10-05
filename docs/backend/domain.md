@@ -96,11 +96,11 @@ public sealed record RefundReversedOutcome(DateTimeOffset ProviderTime) : Refund
 A case that owns no data is still a sealed record. The set can grow case data later without a breaking change:
 
 ```csharp
-public abstract record OrganizationRole;
+public abstract record MerchantRole;
 
-public sealed record OrganizationOwnerRole : OrganizationRole;
+public sealed record MerchantOwnerRole : MerchantRole;
 
-public sealed record OrganizationScannerRole : OrganizationRole;
+public sealed record MerchantWarehouseStaffRole : MerchantRole;
 ```
 
 Callers branch with a `switch` expression on the case type. A `switch` that omits a case surfaces at review as a missing arm rather than a silent default. A case that carries data exposes it directly instead of through a separate nullable field:
@@ -159,13 +159,13 @@ A root created with its children composes them inside the same factory call. The
 ```csharp
 public sealed class Order : AggregateRoot<OrderId>
 {
-    public static Order Place(OrderId id, BuyerId buyer, IReadOnlyList<OrderLineDraft> lines, DateTimeOffset placedAt)
+    public static Order Place(OrderId id, CustomerId customer, IReadOnlyList<OrderLineDraft> lines, DateTimeOffset placedAt)
     {
         if (lines.Count == 0) throw new OrderEmptyException();
 
-        var order = new Order(id, buyer, OrderState.AwaitingPayment.Instance);
-        foreach (var line in lines) order.AddLine(OrderLine.Create(id, line.Ticket, line.Quantity, line.Price));
-        order.Record(new OrderPlacedEvent(id, buyer, placedAt));
+        var order = new Order(id, customer, OrderState.AwaitingPayment.Instance);
+        foreach (var line in lines) order.AddLine(OrderLine.Create(id, line.Product, line.Quantity, line.Price));
+        order.Record(new OrderPlacedEvent(id, customer, placedAt));
         return order;
     }
 }
@@ -352,32 +352,34 @@ Application validators handle malformed caller input through validation errors. 
     Exceptions/
       PostIdentityRequiredException.cs
       PostAlreadyPublishedException.cs
-  Admission/                      one aggregate with a domain union in a concept folder
-    TicketAdmission.cs
-    TicketAdmissionId.cs
-    ITicketAdmissionRepository.cs
-    ScanResults/
-      TicketAdmissionScanResult.cs
-      TicketAdmissionAcceptedScanResult.cs
-      TicketAdmissionInvalidScanResult.cs
-      TicketAdmissionVoidScanResult.cs
-    States/
-      TicketAdmissionState.cs
-      TicketAdmissionPendingState.cs
-      TicketAdmissionAdmittedState.cs
-    Events/
-      TicketAdmissionScanRecordedEvent.cs
-  Audience/                       more than one aggregate: one plural folder per aggregate
-    BuyerAccounts/                  namespace Entro.Domain.Audience.BuyerAccounts
-      BuyerAccount.cs
-      BuyerAccountId.cs
-      IBuyerAccountRepository.cs
+  Shipping/                       one aggregate whose name differs from the module, with a domain union in a concept folder
+    Shipments/
+      Shipment.cs
+      ShipmentId.cs
+      IShipmentRepository.cs
+      Outcomes/
+        ShipmentOutcome.cs
+        ShipmentDeliveredOutcome.cs
+        ShipmentReturnedOutcome.cs
+        ShipmentLostOutcome.cs
       States/
-        BuyerAccountState.cs
-        BuyerAccountClaimedState.cs
+        ShipmentState.cs
+        ShipmentPendingState.cs
+        ShipmentDispatchedState.cs
+        ShipmentDeliveredState.cs
       Events/
-        BuyerAccountRestrictedEvent.cs
-    Consents/                       namespace Entro.Domain.Audience.Consents
+        ShipmentOutcomeRecordedEvent.cs
+  Customers/                      more than one aggregate: one plural folder per aggregate
+    CustomerAccounts/               namespace Shop.Domain.Customers.CustomerAccounts
+      CustomerAccount.cs
+      CustomerAccountId.cs
+      ICustomerAccountRepository.cs
+      States/
+        CustomerAccountState.cs
+        CustomerAccountClaimedState.cs
+      Events/
+        CustomerAccountRestrictedEvent.cs
+    Consents/                       namespace Shop.Domain.Customers.Consents
       Consent.cs
       ConsentId.cs
       IConsentRepository.cs
@@ -402,14 +404,14 @@ Each aggregate-specific repository interface stays with the aggregate it loads. 
 |:---|:---|:---|
 | Aggregate root | `{Aggregate}` | `Post` |
 | Child entity | `{Aggregate}{Part}` | `OrderLine` |
-| Aggregate value object | `{Aggregate}{Term}` | `OrganizationLegalProfile` |
+| Aggregate value object | `{Aggregate}{Term}` | `MerchantLegalProfile` |
 | Shared kernel value object | `{Term}` | `Money`, `EmailAddress` |
 | Strongly typed ID | `{Aggregate}Id` | `PostId` |
 | Typed state base | `{Aggregate}State` | `PostState` |
 | Typed state case, flat | `{Aggregate}{State}State` | `PostPublishedState` |
 | Typed state case, nested | `{Aggregate}State.{State}` | `PostState.Published` |
 | Domain union base | `{Aggregate}{Concept}` | `RefundOutcome` |
-| Domain union case | `{Aggregate}{Case}{Concept}` | `RefundSucceededOutcome`, `OrganizationScannerRole` |
+| Domain union case | `{Aggregate}{Case}{Concept}` | `RefundSucceededOutcome`, `MerchantWarehouseStaffRole` |
 | Repository | `I{Aggregate}Repository` | `IPostRepository` |
 | Domain service | `{BusinessRule}DomainService` | `OrderPricingDomainService` |
 | Domain event | `{Aggregate}{PastFact}Event` | `PostPublishedEvent` |

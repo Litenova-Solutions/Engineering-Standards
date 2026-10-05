@@ -18,7 +18,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checkProseMeasures, checkLanguage, checkLanguageInSource, compileLanguage } from './prose.mjs';
-import { RuleIdentifierScan, MultiFormScan, DEFAULT_SOURCES } from './identifiers.mjs';
+import { RuleIdentifierScan, MultiFormScan, projectSources } from './identifiers.mjs';
 
 const USAGE = `Usage: node tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
 
@@ -174,6 +174,12 @@ if (manifest?.version) {
   else if (reviewed !== manifest.version) {
     err(`standards.project.json: reviewedStandardsVersion '${reviewed}' does not match the pinned standards ${manifest.version}; re-review the contract and its overrides`);
   }
+}
+
+// A profile the pinned release does not ship selects no page, so every
+// profile-scoped provision would pass by applying to nothing.
+if (manifest?.profiles && project.profile && !Object.hasOwn(manifest.profiles, project.profile)) {
+  err(`standards.project.json: profile '${project.profile}' is not one the pinned standards ship (${Object.keys(manifest.profiles).join(', ')})`);
 }
 
 const extScope = new Map();       // id -> activationScope
@@ -681,6 +687,7 @@ for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end
 // the contract declares 'other-web' or records an override, which is a visible
 // statement. (standards/rule/frontend-ui.select-one-visual-authority)
 const PLATFORMS = ['react-web', 'react-native', 'other-web'];
+const controlledFrontends = [];
 for (const frontend of project.paths?.frontends ?? []) {
   const name = frontend?.name ?? '(unnamed)';
   // A declared frontend whose directory is absent reads as a frontend with no
@@ -692,13 +699,40 @@ for (const frontend of project.paths?.frontends ?? []) {
     err(`standards.project.json: frontend '${name}' declares no 'platform'; one of ${PLATFORMS.join(', ')} is required`);
   } else if (!PLATFORMS.includes(frontend.platform)) {
     err(`standards.project.json: frontend '${name}' has unknown platform '${frontend.platform}'; expected one of ${PLATFORMS.join(', ')}`);
+  } else if (frontend.platform === 'react-web') {
+    controlledFrontends.push(frontend);
+  }
+}
+
+// A controlled frontend composes the shared UI package, so the workspace declares
+// it once. The package travels with the workspace rather than with an
+// application, so one missing field is one missing file for every frontend
+// rather than a row per application.
+// (standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package,
+// standards/rule/frontend-ui.track-source-changes,
+// standards/rule/frontend-ui.publish-a-design-contract)
+const uiPackage = project.paths?.uiPackage ?? null;
+if (controlledFrontends.length && !uiPackage) {
+  err(`standards.project.json: ${controlledFrontends.length} controlled frontend(s) and no 'paths.uiPackage'; the shared UI package every React web frontend composes is undeclared`);
+} else if (uiPackage) {
+  const uiPackageLabel = `standards.project.json: paths.uiPackage '${uiPackage.name ?? '(unnamed)'}'`;
+  for (const key of ['path', 'componentsJson', 'primitives', 'tokens', 'sourceLock', 'designContract']) {
+    if (uiPackage[key] !== undefined && !fs.existsSync(path.join(root, uiPackage[key]))) {
+      err(`${uiPackageLabel}: ${key} path does not exist '${uiPackage[key]}'`);
+    }
+  }
+  for (const frontend of controlledFrontends) {
+    const stylesheet = frontend.ui?.globalCss;
+    if (stylesheet !== undefined && !fs.existsSync(path.join(root, stylesheet))) {
+      err(`standards.project.json: frontend '${frontend.name}' ui.globalCss path does not exist '${stylesheet}'`);
+    }
   }
 }
 
 // A React web consumer opts into the deterministic UI validator through its
 // frontend platform declaration or UI block. A recorded UI rule override must
 // carry a live review date.
-const uiActivated = (project.paths?.frontends ?? []).some((frontend) => frontend.ui || frontend.platform === 'react-web')
+const uiActivated = controlledFrontends.length > 0 || Boolean(uiPackage)
   || (project.overrides ?? []).some((override) => uiOverrideScopes.some((scope) => String(override?.provisionId ?? '').startsWith(`${scope}.`)));
 if (uiActivated) {
   // Resolve the sibling validator from this file so a consumer may pin the
@@ -794,7 +828,7 @@ let languageSummary = '';
 
   // The documentation tree is one of the surfaces a word reaches, and usually
   // the smallest. A project's source, its interface copy, its API contract and
-  // its acceptance tests carry the same vocabulary to a developer, a buyer and
+  // its acceptance tests carry the same vocabulary to a developer, a customer and
   // a reviewer, and a check that reads only Markdown holds the vocabulary where
   // nobody reads it. `paths.languageScan` names those surfaces.
   // (standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets)
@@ -881,7 +915,7 @@ const identifierContext = {
   useCaseAnchors: new Set(),
   useCaseNames: new Set(),
   policyAnchors: new Set(),
-  sources: new Set(DEFAULT_SOURCES),
+  sources: projectSources(project),
   definitions: [],
   tombstones: new Map(),
   tombstoneRel: undefined,

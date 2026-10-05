@@ -30,15 +30,17 @@
 //
 //   "specSync": {
 //     "codeRoots": ["apps/api/src", "apps/api/tests"],
-//     "markedRoots": ["apps/api/src/Entro.Domain", "apps/api/src/Entro.Application", "apps/api/src/Entro.WebApi", "apps/api/tests"],
-//     "featureRoots": ["apps/api/tests/Entro.Acceptance.Tests/Features"],
-//     "evidenceRoots": ["apps/admin", "apps/storefront", "apps/scanner", "apps/control-panel"]
+//     "markedRoots": ["apps/api/src/Shop.Domain", "apps/api/src/Shop.Application", "apps/api/src/Shop.WebApi", "apps/api/tests"],
+//     "featureRoots": ["apps/api/tests/Shop.Acceptance.Tests/Features"],
+//     "evidenceRoots": ["apps/admin", "apps/storefront"]
 //   }
 //
 // 'codeRoots' names the directories whose C# files are read for markup tags.
 // 'markedRoots' names the directories whose type-declaring files must carry one,
-// defaulting to the domain, application, and API projects plus every test root.
-// 'featureRoots' names the directories holding Reqnroll feature files.
+// defaulting to the {ProjectName}.Domain, {ProjectName}.Application, and
+// {ProjectName}.WebApi projects plus every test root, where {ProjectName} is
+// 'project.name'. 'featureRoots' names the directories holding Reqnroll feature
+// files, defaulting to {ProjectName}.Acceptance.Tests/Features.
 // 'evidenceRoots' names the frontend directories whose test files are read for
 // acceptance-criterion and path citations, defaulting to every path in
 // project.paths.frontends. A browser test cites a criterion the same way a
@@ -48,23 +50,24 @@
 //
 // The marking grammar this validator enforces is one identifier per XML doc tag:
 //
-//   /// <implements>entro/use-case/orders.place-order</implements>
-//   /// <emits>entro/event/order.placed</emits>
-//   /// <uses>entro/event/payment.taken</uses>
-//   /// <enforces>entro/invariant/order.placed-once</enforces>
-//   /// <covers>entro/acceptance-criterion/orders.place-order.places-the-order</covers>
+//   /// <implements>shop/use-case/orders.place-order</implements>
+//   /// <emits>shop/event/order.placed</emits>
+//   /// <uses>shop/event/payment.taken</uses>
+//   /// <enforces>shop/invariant/order.placed-once</enforces>
+//   /// <covers>shop/acceptance-criterion/orders.place-order.places-the-order</covers>
 //
 // A tag is a single-line XML doc comment. Its value is one identifier, or several
-// separated by whitespace. The identifier may carry the 'entro/' source prefix or
-// omit it, because a citation inside Entro's own source is a same-source citation.
-// A citation prefixed with any other source is foreign and is not Entro's to
-// reconcile. The kinds are the twelve in docs/backend/identifiers.md plus 'value',
+// separated by whitespace. The identifier may carry the project's own source
+// prefix or omit it, because a citation inside the project's own source is a
+// same-source citation. The own source is 'project.identifierSource', or the
+// project name in lower kebab case ('shop/' here). A citation prefixed with any
+// other source is foreign and is not this project's to reconcile. The kinds are the twelve in docs/backend/identifiers.md plus 'value',
 // the marking-only kind a closed-set value case carries.
 //
 // A Reqnroll scenario carries the same citation in a tag with '/' replaced by '_'
 // and the prefix 'implements_':
 //
-//   @implements_entro_acceptance-criterion_orders.place-order.places-the-order
+//   @implements_shop_acceptance-criterion_orders.place-order.places-the-order
 //
 // A test proves the use case its 'covers' identifier names. An acceptance
 // criterion names '<module>.<use-case>.<topic>', so a test that covers one proves
@@ -98,6 +101,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { projectSource } from './identifiers.mjs';
 
 const USAGE = `Usage: node standards/tools/validate-spec-sync.mjs [consumerRoot] [--report] [--format=json] [--help]
 
@@ -207,14 +211,14 @@ function parseCitation(token) {
   return null;
 }
 
-// A bare identifier is one Entro owns. A citation from Entro to Entro may carry
-// the 'entro/' source prefix or omit it. A citation from another source is not
+// A bare identifier is one this project owns. A citation from the project to
+// itself may carry its own source prefix or omit it. A citation from another source is not
 // this repository's to reconcile and resolves to null.
 // (standards/rule/backend-identifiers.cite-across-sources-with-the-source-prefix-form)
 function bareIdentifier(token) {
   const parsed = parseCitation(token);
   if (!parsed || !ALL_KIND_SET.has(parsed.kind)) return null;
-  if (parsed.source && parsed.source !== 'entro') return null;
+  if (parsed.source && parsed.source !== OWN_SOURCE) return null;
   return `${parsed.kind}/${parsed.body}`;
 }
 
@@ -235,6 +239,8 @@ if (!fs.existsSync(projectFile)) {
 }
 const project = readJson(projectFile, 'standards.project.json');
 const specSync = project.specSync ?? {};
+const OWN_SOURCE = projectSource(project);
+const PROJECT_NAME = project.project?.name ?? '';
 
 const IGNORED_DIRECTORIES = new Set(['bin', 'obj', 'node_modules', '.git', '.next', 'dist', 'build', 'out', 'coverage']);
 // A generated code-behind file beside a feature carries no authored class and no
@@ -262,10 +268,10 @@ const testRoots = Array.isArray(project.paths?.testRoots) && project.paths.testR
   : ['apps/api/tests'];
 const configuredMarkedRoots = Array.isArray(specSync.markedRoots) && specSync.markedRoots.length
   ? specSync.markedRoots
-  : ['apps/api/src/Entro.Domain', 'apps/api/src/Entro.Application', 'apps/api/src/Entro.WebApi', ...testRoots];
+  : [`apps/api/src/${PROJECT_NAME}.Domain`, `apps/api/src/${PROJECT_NAME}.Application`, `apps/api/src/${PROJECT_NAME}.WebApi`, ...testRoots];
 const configuredFeatureRoots = Array.isArray(specSync.featureRoots) && specSync.featureRoots.length
   ? specSync.featureRoots
-  : ['apps/api/tests/Entro.Acceptance.Tests/Features'];
+  : [`apps/api/tests/${PROJECT_NAME}.Acceptance.Tests/Features`];
 // A frontend citation lives in the browser test that proves the criterion, so
 // the default is every frontend the consumer declares rather than a fixed path.
 // The roots read only test files, because a criterion recorded in an acceptance
@@ -407,7 +413,7 @@ const ABSTRACT_RECORD = /\babstract\s+(?:sealed\s+)?record\s+([A-Z][A-Za-z0-9_]*
 // An endpoint mapped with '.ExcludeFromDescription()' is the exception to the
 // endpoint rule, and only to the endpoint rule. The call keeps the route out of
 // the published API document, which is how a development-only deployment tool
-// stays off every generated client and out of the buyer-facing contract. Nothing
+// stays off every generated client and out of the public contract. Nothing
 // the contract does not carry can be named by a use-case page, so an identifier
 // there would resolve to nothing. The marker exempts a file only when it covers
 // every endpoint the file declares, so a second, published endpoint in the same
@@ -609,7 +615,7 @@ for (const file of featureFiles) {
 // A browser test names the criterion or the path it proves at the start of its
 // title, in the citation form the other two carriers use:
 //
-//   test("[acceptance-criterion/storefront.ticket.shows-the-ticket-code] ...")
+//   test("[acceptance-criterion/orders.view-order.shows-the-order-total] ...")
 //   test("[path/orders.place-order.expected-total-mismatch] ...")
 //
 // A criterion is read anywhere in a test file. A path is read only from the

@@ -145,10 +145,10 @@ A reviewed step is one that produces an artifact a person approved before it ran
       Posts/                        single aggregate whose name matches the module: files directly under the module
         PostRepository.cs
         PostMartenConfiguration.cs
-      Audience/                     two aggregates: one folder per aggregate
-        BuyerAccounts/
-          BuyerAccountRepository.cs
-          BuyerAccountMartenConfiguration.cs
+      Customers/                    two aggregates: one folder per aggregate
+        CustomerAccounts/
+          CustomerAccountRepository.cs
+          CustomerAccountMartenConfiguration.cs
         Consents/
           ConsentRepository.cs
           ConsentMartenConfiguration.cs

@@ -61,7 +61,7 @@ failure       = failure/<module>.<lowercase_snake>
 
 `<rule-kind>` is one of `invariant`, `validation`, `authorization`, `acceptance-criterion`, `policy`, `rule`. The kind word is a full English word. No abbreviations.
 
-`<home>` is the natural anchor. For `invariant`, it is the aggregate root in singular kebab-case (`event`, `order`, `venue`). For `validation`, `authorization`, and `acceptance-criterion`, it is the use case in kebab-case (`start-event`, `cancel-order`). For `policy`, it is the policy page. For `rule`, it is the module.
+`<home>` is the natural anchor. For `invariant`, it is the aggregate root in singular kebab-case (`shipment`, `order`, `product`). For `validation`, `authorization`, and `acceptance-criterion`, it is the use case in kebab-case (`dispatch-shipment`, `cancel-order`). For `policy`, it is the policy page. For `rule`, it is the module.
 
 `<topic>` is one or more lowercase kebab-case words naming the rule's observable behavior. The topic carries no digit.
 
@@ -69,7 +69,7 @@ failure       = failure/<module>.<lowercase_snake>
 
 `<use-case>` is the kebab-case use case name.
 
-`<module>` is the plural kebab-case module name (`events`, `orders`, `integrations`).
+`<module>` is the plural kebab-case module name (`shipping`, `orders`, `integrations`).
 
 `<past-tense>` is one or more lowercase kebab-case words in past tense. The aggregate has already done the thing.
 
@@ -103,9 +103,9 @@ Every domain element carries four identifying attributes. Each attribute serves 
 | Attribute | Role | Form | Example |
 |:---|:---|:---|:---|
 | Identity | The unique handle for one occurrence | Opaque UUID | `01H8ZJ3K4X9Y7...` |
-| Classification | The semantic name a reader cites | Full identifier | `event/event.started` |
-| Causation | The use case or event that triggered this element | Identifier with module prefix | `use-case/events.start` |
-| Documentation anchor | The page a reader opens to learn the rule | Repository path | `docs/domain/.../start-event.md` |
+| Classification | The semantic name a reader cites | Full identifier | `event/shipment.dispatched` |
+| Causation | The use case or event that triggered this element | Identifier with module prefix | `use-case/shipping.dispatch` |
+| Documentation anchor | The page a reader opens to learn the rule | Repository path | `docs/domain/.../dispatch-shipment.md` |
 
 The identity is opaque because the UUID is what a database index uses. The classification is what a reader cites, what a test asserts, and what a documentation tool resolves. The causation is what links a child event to the operation that caused it. The documentation anchor is what a stable URI dereferences to in HTML.
 
@@ -115,13 +115,13 @@ A citation from one source to another prefixes the source segment. The source na
 
 ```text
 standards/rule/core-authoring.use-the-declared-identifier-grammar
-entro/invariant/event.only-scheduled-starts
-litepress/invariant/article.published-once-only
+shop/invariant/shipment.only-pending-dispatches
+billing/invariant/invoice.issued-once-only
 rfc/2119.must-keyword-is-uppercase
 owasp/asvs/2.1.1.password-length-policy
 ```
 
-Every identifier is self-identifying. A reader sees the first segment and knows where the rule lives. A grep `^entro/` finds every Entro rule. A grep `^litepress/` finds every LitePress rule.
+Every identifier is self-identifying. A reader sees the first segment and knows where the rule lives. A grep `^shop/` finds every Shop rule. A grep `^billing/` finds every Billing rule.
 
 ### Downstream utility
 
@@ -145,17 +145,17 @@ The kind-prefixed grammar makes every consumer's filter a one-character prefix. 
 **Example:**
 
 ```text
-invariant/event.only-scheduled-starts                # primary, on Event aggregate
-validation/start-event.event-id-required           # primary, on start-event use case
-authorization/start-event.manage-event-required     # primary, on start-event use case
-acceptance-criterion/start-event.moves-scheduled-to-in-progress
-policy/audit.append-only                            # primary, on audit policy page
-rule/integrations.key-scope-unwidenable             # primary, on integrations module
-event/event.started                                 # past-tense fact, Event aggregate
-exception/event.not-scheduled                       # rejection condition, Event aggregate
-use-case/events.start                               # command or query, events module
-path/events.start.success                           # outcome of start
-failure/events.not_scheduled                        # wire code, events module
+invariant/shipment.only-pending-dispatches                 # primary, on Shipment aggregate
+validation/dispatch-shipment.shipment-id-required          # primary, on dispatch-shipment use case
+authorization/dispatch-shipment.manage-shipment-required   # primary, on dispatch-shipment use case
+acceptance-criterion/dispatch-shipment.moves-pending-to-dispatched
+policy/audit.append-only                                   # primary, on audit policy page
+rule/integrations.key-scope-unwidenable                    # primary, on integrations module
+event/shipment.dispatched                                  # past-tense fact, Shipment aggregate
+exception/shipment.not-pending                             # rejection condition, Shipment aggregate
+use-case/shipping.dispatch                                 # command or query, shipping module
+path/shipping.dispatch.success                             # outcome of dispatch
+failure/shipping.not_pending                               # wire code, shipping module
 ```
 
 ### Name the kind with a full English word (standards/rule/backend-identifiers.name-the-kind-with-a-full-english-word)
@@ -170,7 +170,7 @@ failure/events.not_scheduled                        # wire code, events module
 
 **Rationale:** Anchoring on the owner of the element keeps the identifier correct when one module holds several aggregates. Anchoring on a module name hides the ownership of an aggregate-owned element.
 
-**Example:** `invariant/event.only-scheduled-starts` anchors the invariant on the Event aggregate rather than on the events module. `path/events.start.success` anchors the path on the events module because a path is module-scoped.
+**Example:** `invariant/shipment.only-pending-dispatches` anchors the invariant on the Shipment aggregate rather than on the shipping module. `path/shipping.dispatch.success` anchors the path on the shipping module because a path is module-scoped.
 
 ### State the per-kind identifier forms (standards/rule/backend-identifiers.state-the-per-kind-identifier-forms)
 
@@ -201,12 +201,12 @@ failure       = failure/<module>.<lowercase_snake>
 **Example:**
 
 ```text
-# invariant on Event aggregate, mutated by start-event and complete-event
-invariant/event.only-scheduled-starts
-invariant/event.only-in-progress-completes
+# invariant on Shipment aggregate, mutated by dispatch-shipment and deliver-shipment
+invariant/shipment.only-pending-dispatches
+invariant/shipment.only-dispatched-delivers
 
-invariant/event.start-event.only-scheduled-starts          # trigger from start-event
-invariant/event.complete-event.only-in-progress-completes  # trigger from complete-event
+invariant/shipment.dispatch-shipment.only-pending-dispatches   # trigger from dispatch-shipment
+invariant/shipment.deliver-shipment.only-dispatched-delivers   # trigger from deliver-shipment
 ```
 
 ### Attach four identifying attributes to every cross-boundary element (standards/rule/backend-identifiers.attach-four-identifying-attributes-to-every-cross-boundary-element)
@@ -215,13 +215,13 @@ invariant/event.complete-event.only-in-progress-completes  # trigger from comple
 
 **Rationale:** One identifier cannot serve every consumer. Documentation tools want a stable URI. Tracing tools want an opaque UUID. Tests want a semantic name. Reviewers want a path to the page. The four attributes are independent.
 
-**Example:** A raised `event/event.started` domain event carries:
+**Example:** A raised `event/shipment.dispatched` domain event carries:
 
 ```text
 id            = 01H8ZJ3K4X9Y7V2NBQ6P8MTDGW       # UUID, opaque, set by store
-classification = event/event.started               # semantic name, what is cited
-causation     = use-case/events.start              # what triggered it
-anchor        = docs/domain/modules/events/events/start-event.md
+classification = event/shipment.dispatched          # semantic name, what is cited
+causation     = use-case/shipping.dispatch         # what triggered it
+anchor        = docs/domain/modules/shipping/shipments/dispatch-shipment.md
 ```
 
 ### Cite across sources with the source-prefix form (standards/rule/backend-identifiers.cite-across-sources-with-the-source-prefix-form)
@@ -230,7 +230,7 @@ anchor        = docs/domain/modules/events/events/start-event.md
 
 **Rationale:** Every source is independent. The source-prefix form lets a reader see the source from the first segment without consulting context. A grep `^source/` finds every citation from one source. A grep `^sourceX/` finds every citation from one specific source.
 
-**Example:** A standards page citing an Entro rule writes `entro/invariant/event.only-scheduled-starts`. A LitePress example writes `litepress/invariant/article.published-once-only`. An RFC citation writes `rfc/2119.must-keyword-is-uppercase`.
+**Example:** A standards page citing a Shop rule writes `shop/invariant/shipment.only-pending-dispatches`. A Billing example writes `billing/invariant/invoice.issued-once-only`. An RFC citation writes `rfc/2119.must-keyword-is-uppercase`.
 
 ### Exclude digits from every identifier (standards/rule/backend-identifiers.exclude-digits-from-every-identifier)
 
@@ -331,12 +331,12 @@ use-case/orders.fulfill
 Single-form rules, one per use case.
 
 ```text
-validation/place.buyer-id-required
-authorization/place.buyer-manage-required
+validation/place.customer-id-required
+authorization/place.customer-manage-required
 validation/pay.amount-required
-authorization/pay.buyer-pay-required
+authorization/pay.customer-pay-required
 validation/cancel.reason-required
-authorization/cancel.buyer-cancel-required
+authorization/cancel.customer-cancel-required
 ```
 
 ### Step seven, acceptance criteria per use case
@@ -345,7 +345,7 @@ The observable results a test proves.
 
 ```text
 acceptance-criterion/orders.place.places-draft-order
-acceptance-criterion/orders.place.refuses-buyer-without-id
+acceptance-criterion/orders.place.refuses-customer-without-id
 acceptance-criterion/orders.pay.moves-placed-to-paid
 acceptance-criterion/orders.pay.refuses-zero-amount
 ```
@@ -395,7 +395,7 @@ invariant/order.placed-once-only
         # tested by one Reqnroll scenario, one xUnit Trait
         Scenario: refuses to pay an order that was not placed
           Given an order in draft state
-          When an authorized buyer tries to pay it
+          When an authorized customer tries to pay it
           Then failure/orders.not_in_placed is returned
           And the order stays in draft state
 ```

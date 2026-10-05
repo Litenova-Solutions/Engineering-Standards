@@ -163,14 +163,14 @@ Infrastructure/Posts/
 WebApi/Endpoints/Posts/CreateDraft/
 
 # multi-aggregate module: module, then plural aggregate folder, then operation, mirrored in every layer
-Domain/Audience/BuyerAccounts/
-Domain/Audience/Consents/
-Application/Audience/BuyerAccounts/RestrictAccount/
-Application/Audience/Consents/GrantConsent/
-Infrastructure/Audience/BuyerAccounts/
-Infrastructure/Audience/Consents/
-WebApi/Endpoints/Audience/BuyerAccounts/RestrictAccount/
-WebApi/Endpoints/Audience/Consents/GrantConsent/
+Domain/Customers/CustomerAccounts/
+Domain/Customers/Consents/
+Application/Customers/CustomerAccounts/RestrictAccount/
+Application/Customers/Consents/GrantConsent/
+Infrastructure/Customers/CustomerAccounts/
+Infrastructure/Customers/Consents/
+WebApi/Endpoints/Customers/CustomerAccounts/RestrictAccount/
+WebApi/Endpoints/Customers/Consents/GrantConsent/
 
 # a workflow that coordinates modules uses the separate Workflows path
 Application/Workflows/PublicationDelivery/

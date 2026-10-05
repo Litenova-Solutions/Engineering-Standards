@@ -40,9 +40,9 @@ const VALUES = {
   __AGGREGATE_ID__: 'order-claims',
   __AGGREGATE_ANCHOR__: 'order-claim',
   __OPERATION_TYPE__: 'command',
-  __ACTOR__: 'buyer',
-  __FLOW__: 'event-sales',
-  __FLOW_ID__: 'EVENT-SALES',
+  __ACTOR__: 'customer',
+  __FLOW__: 'order-checkout',
+  __FLOW_ID__: 'ORDER-CHECKOUT',
   __WORKFLOW__: 'order-fulfillment',
   __POLICY__: 'refund-limit',
   __APP__: 'web',
@@ -72,10 +72,10 @@ const VALUES = {
   __SCOPE__: 'project',
   __CAST__: 'scenarios',
   __CAST_TITLE__: 'The Reference Cast',
-  __ORGANIZATION__: 'Fixture Promotions',
-  __PERSON__: 'Sanne',
-  __AMOUNT__: 'ticket price',
-  __SITUATION__: 'The onsale minute',
+  __ORGANIZATION__: 'Northwind Traders',
+  __PERSON__: 'Alex',
+  __AMOUNT__: 'order total',
+  __SITUATION__: 'The flash-sale minute',
   // Domain shape. The aggregate name is the PascalCase form of __AGGREGATE_ID__,
   // so the type names the templates build stay consistent with the file path.
   __TERM__: 'Order claim',
@@ -93,8 +93,8 @@ const VALUES = {
   __FIELD__: 'orderId',
   __MAPPING__: 'OrderClaim.Cancel',
   __ERROR_CODE__: 'failure/orders.cancel_refused',
-  __ACTOR_OR_TRIGGER__: 'buyer',
-  __FLOW_TITLE__: 'Event Sales',
+  __ACTOR_OR_TRIGGER__: 'customer',
+  __FLOW_TITLE__: 'Order Checkout',
   __WORKFLOW_TITLE__: 'Order Fulfillment',
   __WORKFLOW_PASCAL__: 'OrderFulfillment',
   __START__: 'orders.order-claimed',
@@ -114,7 +114,7 @@ const VALUES = {
   __DATE__: '2026-01-01',
   __COMMIT__: '0000000000000000000000000000000000000000',
   __ARTIFACT_REFERENCE__: 'fixture:1.0.0',
-  __FLOW_IDS__: 'event-sales',
+  __FLOW_IDS__: 'order-checkout',
   __USE_CASE_IDS__: 'orders.cancel-order',
   __CRITERION_TOPIC__: 'cancel-removes-the-order',
   __WORKFLOW_IDS__: 'order-fulfillment',
@@ -131,7 +131,7 @@ const VALUES = {
 // Each tracked Markdown template and the fixture path its kind requires.
 const LAYOUT = [
   ['product-brief.md', 'docs/product/brief.md'],
-  ['end-to-end-flow.md', 'docs/product/flows/event-sales.md'],
+  ['end-to-end-flow.md', 'docs/product/flows/order-checkout.md'],
   ['domain-index.md', 'docs/domain/README.md'],
   ['glossary.md', 'docs/domain/glossary.md'],
   ['scenario-cast.md', 'docs/domain/scenarios.md'],
@@ -186,6 +186,10 @@ function build() {
   // so the controlled UI validator stays out of these cases.
   const project = JSON.parse(resolvePlaceholders(fs.readFileSync(path.join(repository, 'templates/consumer/standards.project.json'), 'utf8')));
   project.paths.frontends = [];
+  // The shared package is declared once for the workspace's controlled frontends.
+  // The fixture has none, so the package is dropped beside them and the
+  // controlled UI validator stays out of these cases.
+  delete project.paths.uiPackage;
   // The frontend list is blanked so the controlled UI validator stays out of
   // these cases, and the use-case template still names 'web' as the surface that
   // calls it. Declaring it as a plain surface keeps that row resolvable without
@@ -387,13 +391,13 @@ metaCase('accepted lastReviewed', 'docs/domain/modules/orders/cancel-order.md', 
 metaCase('bad operationType', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.operationType = 'mutation'; }, "bad operationType 'mutation'; expected one of command, query");
 metaCase('bad risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['danger']; }, "bad risk 'danger'; expected one of authorization, money, sensitive-data, irreversible, concurrency, durable-delivery, availability");
 metaCase('accepted risk value', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.risks = ['authorization']; }, null);
-metaCase('bad actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['Buyer Account']; }, "bad actors id 'Buyer Account'; expected lower kebab-case");
-metaCase('accepted actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['buyer-account']; }, null);
+metaCase('bad actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['Customer Account']; }, "bad actors id 'Customer Account'; expected lower kebab-case");
+metaCase('accepted actor identifier', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.actors = ['customer-account']; }, null);
 
 console.log('\nExtension selection');
 projectCase('selected extension absent from the manifest', (p) => { p.selectedExtensions = ['outbox-worker']; }, "selectedExtensions 'outbox-worker' is not an extension");
 projectCase('selected extension present in the manifest', (p) => { p.selectedExtensions = ['outbox']; }, null);
-projectCase('selection object records its criterion', (p) => { p.selectedExtensions = [{ id: 'outbox', criterion: 'Ticket issue cannot lose a delivery.', reviewBy: '2099-01-01' }]; }, null);
+projectCase('selection object records its criterion', (p) => { p.selectedExtensions = [{ id: 'outbox', criterion: 'Order confirmation cannot lose a delivery.', reviewBy: '2099-01-01' }]; }, null);
 projectCase('selection object with an unknown id', (p) => { p.selectedExtensions = [{ id: 'outbox-worker', criterion: 'Durable delivery.', reviewBy: '2099-01-01' }]; }, "selectedExtensions 'outbox-worker' is not an extension");
 projectCase('selection review date has passed', (p) => { p.selectedExtensions = [{ id: 'outbox', criterion: 'Export was planned.', reviewBy: '2020-01-01' }]; }, 'was due for review on 2020-01-01');
 
@@ -402,14 +406,28 @@ projectCase('frontend omits its platform', (p) => { p.paths.frontends = [{ name:
 projectCase('frontend declares an unknown platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'web' }]; }, "unknown platform 'web'");
 projectCase('frontend outside the UI contract declares other-web', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'other-web' }]; }, null);
 
+console.log('\nShared UI package (standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package)');
+projectCase('a controlled frontend with no shared package', (p) => {
+  p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'react-web', ui: { profile: 'application-balanced' } }];
+}, "and no paths.uiPackage");
+projectCase('a shared package with no controlled frontend', (p) => {
+  p.paths.uiPackage = { name: '@fixture/ui', path: 'packages/ui', componentsJson: 'packages/ui/components.json', primitives: 'packages/ui/src/components', tokens: 'packages/ui/src/styles/tokens.css', sourceLock: 'packages/ui/ui-source-lock.json', designContract: 'packages/ui/DESIGN.md', publicExports: ['@fixture/ui/floorplans'] };
+}, 'paths.uiPackage is declared but no frontend declares the platform react-web');
+projectCase('a shared package path that is not on disk', (p) => {
+  p.paths.uiPackage = { name: '@fixture/ui', path: 'packages/ui', componentsJson: 'packages/ui/components.json', primitives: 'packages/ui/src/components', tokens: 'packages/ui/src/styles/tokens.css', sourceLock: 'packages/ui/missing-lock.json', designContract: 'packages/ui/DESIGN.md', publicExports: ['@fixture/ui/floorplans'] };
+}, "sourceLock path does not exist 'packages/ui/missing-lock.json'");
+projectCase('a controlled frontend whose stylesheet is not on disk', (p) => {
+  p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'react-web', ui: { profile: 'application-balanced', globalCss: 'apps/admin/src/missing.css' } }];
+}, "globalCss path does not exist 'apps/admin/src/missing.css'");
+
 console.log('\nCross-file references');
-metaCase('flow names a use case with no file', 'docs/product/flows/event-sales.md', (m) => { m.useCases = ['use-case/orders.no-such-case']; }, "useCase 'use-case/orders.no-such-case' has no file");
-metaCase('flow with an empty use-case list', 'docs/product/flows/event-sales.md', (m) => { m.useCases = []; }, 'useCases empty');
+metaCase('flow names a use case with no file', 'docs/product/flows/order-checkout.md', (m) => { m.useCases = ['use-case/orders.no-such-case']; }, "useCase 'use-case/orders.no-such-case' has no file");
+metaCase('flow with an empty use-case list', 'docs/product/flows/order-checkout.md', (m) => { m.useCases = []; }, 'useCases empty');
 metaCase('workflow names an absent module', 'docs/domain/workflows/order-fulfillment.md', (m) => { m.participatingModules = ['billing']; }, "participatingModule 'billing' has no module dir");
 metaCase('policy names an absent module', 'docs/domain/policies/refund-limit.md', (m) => { m.appliesToModules = ['billing']; }, "appliesToModule 'billing' has no module dir");
 metaCase('use-case id does not match its path', 'docs/domain/modules/orders/cancel-order.md', (m) => { m.id = 'use-case/orders.other-case'; }, 'does not match its path');
 metaCase('aggregate id outside an aggregate directory', 'docs/domain/modules/orders/README.md', (m) => { m.kind = 'aggregate'; m.id = 'aggregate/order'; }, 'does not match its path');
-fileCase('duplicate acceptance id', 'docs/domain/modules/orders/second.md', `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.second', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Second\n\n[acceptance-criterion/orders.cancel-order.cancel-removes-the-order] Duplicate of the template criterion.\n`, 'Duplicate acceptance id acceptance-criterion/orders.cancel-order.cancel-removes-the-order');
+fileCase('duplicate acceptance id', 'docs/domain/modules/orders/second.md', `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.second', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['customer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Second\n\n[acceptance-criterion/orders.cancel-order.cancel-removes-the-order] Duplicate of the template criterion.\n`, 'Duplicate acceptance id acceptance-criterion/orders.cancel-order.cancel-removes-the-order');
 fileCase('second product specification', 'docs/product/second.md', `---\n${JSON.stringify({ kind: 'product', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second product\n`, 'Expected at most one product specification, found 2');
 fileCase('second glossary specification', 'docs/domain/second-glossary.md', `---\n${JSON.stringify({ kind: 'glossary', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second glossary\n`, 'Expected at most one glossary specification, found 2');
 fileCase('second modules index', 'docs/domain/modules/second.md', `---\n${JSON.stringify({ kind: 'modules-index', id: 'second', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# Second modules index\n`, 'Expected at most one modules-index specification, found 2');
@@ -422,13 +440,13 @@ report('flat single-aggregate module resolves', null, run());
 fileCase(
   'nested aggregate subdirectory resolves',
   'docs/domain/modules/orders/order-claims/claim-guest-order.md',
-  `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n\n## Business impact\n\n- Risk: none.\n\n## Terms used\n\n- order\n\n## Scenario\n\nSanne claims the order she placed as a guest on the morning after the show.\n`,
+  `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.claim-guest-order', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['customer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Claim guest order\n\n## Business impact\n\n- Risk: none.\n\n## Terms used\n\n- order\n\n## Scenario\n\nAlex claims the order they placed as a guest on the morning after delivery.\n`,
   null,
 );
 fileCase(
   'use case two directories below its module fails',
   'docs/domain/modules/orders/order-claims/deep/too-deep.md',
-  `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.too-deep', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Too deep\n`,
+  `---\n${JSON.stringify({ kind: 'use-case', id: 'use-case/orders.too-deep', specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['customer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Too deep\n`,
   'does not match its path',
 );
 
@@ -454,6 +472,8 @@ console.log('\nAdoption gate (standards/rule/core-authoring.record-the-reviewed-
 projectCase('reviewed release matches the pinned release', () => {}, null);
 projectCase('reviewed release is behind the pinned release', (p) => { p.reviewedStandardsVersion = '1.11.0'; }, 'does not match the pinned standards');
 projectCase('reviewed release is absent', (p) => { delete p.reviewedStandardsVersion; }, "missing 'reviewedStandardsVersion'");
+projectCase('profile the pinned release does not ship', (p) => { p.profile = 'dotnet-nextjs'; }, "profile 'dotnet-nextjs' is not one the pinned standards ship");
+projectCase('profile the pinned release ships', (p) => { p.profile = 'dotnet-react'; }, null);
 
 console.log('\nProhibited kinds');
 projectCase('specification declares a prohibited kind', (p) => { p.prohibitedKinds = ['workflow']; }, "kind 'workflow' is prohibited by this consumer");
@@ -515,7 +535,7 @@ bodyCase(
 bodyCase(
   'Scenario section naming an aggregate invariant',
   'docs/domain/modules/orders/order-claims/README.md',
-  (raw) => raw.replace(/## Scenario(\r?\n){2}/, '## Scenario\r\n\r\nSanne cancels the order, which invariant/order-claim.state-allows-the-action permits.\r\n\r\n'),
+  (raw) => raw.replace(/## Scenario(\r?\n){2}/, '## Scenario\r\n\r\nAlex cancels the order, which invariant/order-claim.state-allows-the-action permits.\r\n\r\n'),
   'names invariant/order-claim.state-allows-the-action',
 );
 bodyCase(
@@ -566,7 +586,7 @@ console.log('\nProject language (standards/rule/core-authoring.record-the-projec
   const languageFile = 'docs/language.json';
   const record = {
     schemaVersion: 1,
-    terms: [{ term: 'holder', rejected: ['seller'], scope: '^domain/modules/orders/', reason: 'seller names the organizer' }],
+    terms: [{ term: 'customer', rejected: ['client'], scope: '^domain/modules/orders/', reason: 'client names the API consumer' }],
     mannered: [{ term: 'load-bearing', instead: 'required' }],
   };
   writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
@@ -576,7 +596,7 @@ console.log('\nProject language (standards/rule/core-authoring.record-the-projec
   bodyCase(
     'rejected synonym inside its scope',
     'docs/domain/modules/orders/README.md',
-    (raw) => `${raw}\nThe seller keeps the ticket.\n`,
+    (raw) => `${raw}\nThe client keeps the receipt.\n`,
     'LANGUAGE_REJECTED_SYNONYM',
   );
 
@@ -585,7 +605,7 @@ console.log('\nProject language (standards/rule/core-authoring.record-the-projec
   bodyCase(
     'rejected synonym outside its scope',
     'docs/domain/glossary.md',
-    (raw) => `${raw}\nThe seller keeps the ticket.\n`,
+    (raw) => `${raw}\nThe client keeps the receipt.\n`,
     { absent: 'LANGUAGE_REJECTED_SYNONYM' },
   );
 
@@ -596,12 +616,12 @@ console.log('\nProject language (standards/rule/core-authoring.record-the-projec
     'LANGUAGE_MANNERED_TERM',
   );
 
-  // A word is matched on its own, so a rejection of 'seller' leaves a longer
+  // A word is matched on its own, so a rejection of 'client' leaves a longer
   // word containing it alone.
   bodyCase(
     'rejected synonym as part of a longer word',
     'docs/domain/modules/orders/README.md',
-    (raw) => `${raw}\nThe sellerships remain open.\n`,
+    (raw) => `${raw}\nThe clientele remain loyal.\n`,
     { absent: 'LANGUAGE_REJECTED_SYNONYM' },
   );
 
@@ -610,7 +630,7 @@ console.log('\nProject language (standards/rule/core-authoring.record-the-projec
   bodyCase(
     'rejected synonym inside a fenced block',
     'docs/domain/modules/orders/README.md',
-    (raw) => `${raw}\n\`\`\`text\nseller\n\`\`\`\n`,
+    (raw) => `${raw}\n\`\`\`text\nclient\n\`\`\`\n`,
     { absent: 'LANGUAGE_REJECTED_SYNONYM' },
   );
 
@@ -619,11 +639,11 @@ console.log('\nProject language (standards/rule/core-authoring.record-the-projec
   const exempting = {
     ...record,
     terms: [{
-      term: 'holder',
-      rejected: ['seller'],
+      term: 'customer',
+      rejected: ['client'],
       scope: '^domain/modules/orders/',
-      except: ['seller of record'],
-      reason: 'seller names the organizer',
+      except: ['client library'],
+      reason: 'client names the API consumer',
     }],
   };
   writeFile(languageFile, `${JSON.stringify(exempting, null, 2)}\n`);
@@ -631,7 +651,7 @@ console.log('\nProject language (standards/rule/core-authoring.record-the-projec
   bodyCase(
     'rejected synonym inside an exempt compound',
     'docs/domain/modules/orders/README.md',
-    (raw) => `${raw}\nThe seller of record keeps the ticket.\n`,
+    (raw) => `${raw}\nThe client library keeps the receipt.\n`,
     { absent: 'LANGUAGE_REJECTED_SYNONYM' },
   );
 
@@ -640,7 +660,7 @@ console.log('\nProject language (standards/rule/core-authoring.record-the-projec
   bodyCase(
     'rejected synonym beside an exempt compound',
     'docs/domain/modules/orders/README.md',
-    (raw) => `${raw}\nThe seller of record keeps it and the seller does not.\n`,
+    (raw) => `${raw}\nThe client library keeps it and the client does not.\n`,
     'LANGUAGE_REJECTED_SYNONYM',
   );
 
@@ -648,7 +668,7 @@ console.log('\nProject language (standards/rule/core-authoring.record-the-projec
 
   // A scope that does not compile would reject nothing while reporting a pass,
   // which is the fail-open shape the validator refuses elsewhere.
-  writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'holder', rejected: ['seller'], scope: '^domain/[' }] }, null, 2)}\n`);
+  writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'customer', rejected: ['client'], scope: '^domain/[' }] }, null, 2)}\n`);
   report('language scope that is not a regular expression', 'is not a regular expression', run());
 
   fs.rmSync(path.join(fixture, languageFile));
@@ -664,7 +684,7 @@ console.log('\nVocabulary over non-Markdown surfaces (standards/rule/core-author
   // block alone.
   const record = {
     schemaVersion: 1,
-    terms: [{ term: 'holder', rejected: ['seller'], scope: '^apps/', reason: 'seller names the organizer' }],
+    terms: [{ term: 'customer', rejected: ['client'], scope: '^apps/', reason: 'client names the API consumer' }],
     mannered: [{ term: 'best-of-breed', instead: 'the strongest option' }],
   };
   writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
@@ -675,18 +695,18 @@ console.log('\nVocabulary over non-Markdown surfaces (standards/rule/core-author
     writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
   };
 
-  writeFile('apps/admin/copy.json', '{\n  "sold": "The organizer keeps the ticket."\n}\n');
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The customer keeps the receipt."\n}\n');
   declareScan(['apps/admin/*.json']);
   report('declared surface with no violation present', null, run());
 
   // The point of the provision: a rejected word in a surface a Markdown scan
   // never reads.
-  writeFile('apps/admin/copy.json', '{\n  "sold": "The seller keeps the ticket."\n}\n');
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The client keeps the receipt."\n}\n');
   report('rejected synonym in an interface dictionary', 'LANGUAGE_REJECTED_SYNONYM', run());
 
   // An identifier carries the word with no space around it, so the scan has to
   // open the name out before matching.
-  writeFile('apps/admin/copy.json', '{\n  "sellerName": "Harbour Events"\n}\n');
+  writeFile('apps/admin/copy.json', '{\n  "clientName": "Northwind Traders"\n}\n');
   report('rejected synonym inside an identifier', 'LANGUAGE_REJECTED_SYNONYM', run());
 
   // Opening a name out must not separate the halves of a hyphenated phrase, so
@@ -695,13 +715,13 @@ console.log('\nVocabulary over non-Markdown surfaces (standards/rule/core-author
   report('mannered term in a declared surface', 'LANGUAGE_MANNERED_TERM', run());
 
   // A word is still matched on its own, so a longer word containing it passes.
-  writeFile('apps/admin/copy.json', '{\n  "note": "The sellerships remain open."\n}\n');
+  writeFile('apps/admin/copy.json', '{\n  "note": "The clientele remain loyal."\n}\n');
   report('rejected synonym as part of a longer word in a surface', { absent: 'LANGUAGE_REJECTED_SYNONYM' }, run());
 
   // A scope is written against the repository root for these files, because a
   // file outside the documentation tree shares no other root with a page.
-  writeFile('apps/admin/copy.json', '{\n  "sold": "The seller keeps the ticket."\n}\n');
-  writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'holder', rejected: ['seller'], scope: '^docs/' }] }, null, 2)}\n`);
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The client keeps the receipt."\n}\n');
+  writeFile(languageFile, `${JSON.stringify({ ...record, terms: [{ term: 'customer', rejected: ['client'], scope: '^docs/' }] }, null, 2)}\n`);
   report('rejected synonym outside its scope in a surface', { absent: 'LANGUAGE_REJECTED_SYNONYM' }, run());
   writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
 
@@ -709,13 +729,13 @@ console.log('\nVocabulary over non-Markdown surfaces (standards/rule/core-author
   // because the scan opens an identifier out before matching.
   writeFile(languageFile, `${JSON.stringify({
     ...record,
-    terms: [{ term: 'holder', rejected: ['seller'], scope: '^apps/', except: ['seller of record'] }],
+    terms: [{ term: 'customer', rejected: ['client'], scope: '^apps/', except: ['client library'] }],
   }, null, 2)}\n`);
-  writeFile('apps/admin/copy.json', '{\n  "sellerOfRecordName": "Harbour Events"\n}\n');
+  writeFile('apps/admin/copy.json', '{\n  "clientLibraryName": "Northwind Traders"\n}\n');
   report('exempt compound inside an identifier in a surface', { absent: 'LANGUAGE_REJECTED_SYNONYM' }, run());
 
   writeFile(languageFile, `${JSON.stringify(record, null, 2)}\n`);
-  writeFile('apps/admin/copy.json', '{\n  "sold": "The seller keeps the ticket."\n}\n');
+  writeFile('apps/admin/copy.json', '{\n  "sold": "The client keeps the receipt."\n}\n');
 
   // A pattern matching nothing switches a surface off in silence.
   declareScan(['apps/admin/*.yaml']);
@@ -945,7 +965,7 @@ bodyCase('rule 5 fails on a non-invariant trigger form', identifierPage, appendL
 bodyCase('rule 5 passes on an invariant trigger form', identifierPage, appendLine('The rule `invariant/order-claim.cancel-order.state-allows-the-action` applies.'), { absent: IDENTIFIER_RULE.trigger });
 // Rule 7, the cross-source prefix names a known source.
 bodyCase('rule 7 fails on an unknown source prefix', identifierPage, appendLine('The rule `thirdparty/invariant/order-claim.state-allows-the-action` applies.'), IDENTIFIER_RULE.source);
-bodyCase('rule 7 passes on a known source prefix', identifierPage, appendLine('The rule `entro/invariant/order-claim.state-allows-the-action` applies.'), { absent: IDENTIFIER_RULE.source });
+bodyCase('rule 7 passes on a known source prefix', identifierPage, appendLine('The rule `fixture/invariant/order-claim.state-allows-the-action` applies.'), { absent: IDENTIFIER_RULE.source });
 // Rule 8, no segment carries a digit.
 bodyCase('rule 8 fails on a digit in the topic', identifierPage, appendLine('The event `event/order-claim.cancelled-v2` is recorded.'), IDENTIFIER_RULE.digits);
 bodyCase('rule 8 passes without a digit', identifierPage, appendLine('The event `event/order-claim.cancelled` is recorded.'), { absent: IDENTIFIER_RULE.digits });
@@ -953,7 +973,7 @@ bodyCase('rule 8 passes without a digit', identifierPage, appendLine('The event 
 // Rule 9, an active identifier is unique within its anchor. A second use-case
 // page declaring the same id is the duplicate; the passing case declares its
 // own id at a path its metadata matches.
-const duplicateUseCase = (id) => `---\n${JSON.stringify({ kind: 'use-case', id, specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['buyer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Cancel order\n\n## Scenario\n\nSanne cancels the duplicate order she placed on the Friday before the show.\n`;
+const duplicateUseCase = (id) => `---\n${JSON.stringify({ kind: 'use-case', id, specStatus: 'approved', implementationStatus: 'planned', owner: 'fixture', lastReviewed: '2026-01-01', operationType: 'command', actors: ['customer'], entryPoints: [], risks: [], applicableExtensions: [] }, null, 2)}\n---\n\n# Cancel order\n\n## Scenario\n\nAlex cancels the duplicate order they placed on the Friday before delivery.\n`;
 fileCase('rule 9 fails on a duplicated anchor identifier', 'docs/domain/modules/orders/order-claims/cancel-order.md', duplicateUseCase('use-case/orders.cancel-order'), IDENTIFIER_RULE.unique);
 fileCase('rule 9 passes on a unique anchor identifier', 'docs/domain/modules/orders/order-claims/repeat-cancel.md', duplicateUseCase('use-case/orders.repeat-cancel'), { absent: IDENTIFIER_RULE.unique });
 

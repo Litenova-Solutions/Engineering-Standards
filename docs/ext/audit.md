@@ -103,7 +103,7 @@ This extension replaces `standards/rule/quality-security.record-security-audit-e
 
 **Rationale:** A reviewer resolves the record to the specification that defines the intended behavior. A separate vocabulary requires a mapping that drifts.
 
-**Example:** `events.schedule-event` names both the use case and the audited action.
+**Example:** `catalog.add-product` names both the use case and the audited action.
 
 ### Record the failure code on an unsuccessful attempt (standards/rule/ext-audit.record-the-failure-code-on-an-unsuccessful-attempt)
 
@@ -123,7 +123,7 @@ This extension replaces `standards/rule/quality-security.record-security-audit-e
 
 **Rationale:** An absent actor collapses three answers into one. A scheduled process acted, a device acted, or nobody recorded the actor, and only the third is a defect.
 
-**Example:** A door scanner records a device actor with the account that authorized the device.
+**Example:** A warehouse handheld records a device actor with the account that authorized the device.
 
 ### Record delegated administrative access (standards/rule/ext-audit.record-delegated-administrative-access)
 

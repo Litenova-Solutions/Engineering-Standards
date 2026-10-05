@@ -46,7 +46,7 @@ The product brief or decision records locales, default locale, fallback behavior
 
 **Rationale:** One shape gives users, crawlers, and links a predictable localized address. A path segment is the baseline shape. It makes every localized page a distinct address that a link, a crawler, and a cache entry can each name. A cookie or header shape serves several locales from one address, so a shared cache and a search index see one of them. An application with no public pages, whose locale is a property of the signed-in account, documents one of those shapes instead.
 
-**Example:** `/nl-NL/orders/42` places the locale in the documented path segment, which is [the default the pinned framework documents](https://nextjs.org/docs/app/building-your-application/routing/internationalization).
+**Example:** `/nl/orders/42` places the locale in the documented path segment, so a crawler and a shared cache each address one language.
 
 ### Handle unavailable locale segments (standards/rule/ext-locale.handle-unavailable-locale-segments)
 

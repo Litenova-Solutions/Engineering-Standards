@@ -186,7 +186,7 @@ Every provision ID follows `standards/<kind>/<page>.<heading-slug>`.
 
 The eight areas are `CORE`, `PROFILE`, `WORKSPACE`, `BACKEND`, `FRONTEND`, `BLAZOR`, `QUALITY`, and `EXT`. Each is one directory under `docs/`, and `provisionRegistry.areas` lists them.
 
-The page segment joins the directory to the file stem, so `docs/frontend/components.md` owns `frontend-components`. A citation therefore names the file a reader must open, so `standards/rule/frontend-components.use-the-component-ownership-levels` needs no lookup step.
+The page segment joins the directory to the file stem, so `docs/frontend/components.md` owns `frontend-components`. A citation therefore names the file a reader must open, so `standards/rule/frontend-components.compose-composites-in-page-code` needs no lookup step.
 
 Two pages cannot share an identifier. The page segment carries the area, so `docs/frontend/structure.md` and `docs/blazor/structure.md` stay distinct even when they state one rule.
 
@@ -253,7 +253,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Requirement:** A consumer specification page MUST satisfy the prose measures unless the project prose baseline records that page.
 
-**Rationale:** The profile applied only to this repository, so a consumer inherited the rule and no check. One consumer of 459 pages carried 5694 measure violations under a passing validator, because the run that reported the pass never looked.
+**Rationale:** The profile applied only to this repository, so a consumer inherited the rule and no check. One consumer carried thousands of measure violations under a passing validator, because the run that reported the pass never looked.
 
 **Example:** The baseline records the count and the review date a page's debt was accepted at.
 
@@ -298,8 +298,8 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 **Example:** A rejection carries the scope that binds it, because a word correct in one module is wrong in another.
 
 ```json
-{ "term": "holder", "rejected": ["seller", "owner"], "scope": "^domain/modules/sales/ticket-resales/",
-  "reason": "seller is the organizer in its disclosure role, so it names the other party here" }
+{ "term": "customer", "rejected": ["client"], "scope": "^domain/modules/orders/",
+  "reason": "client names the API consumer" }
 ```
 
 ### Reject a recorded synonym inside its scope (standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope)
@@ -312,7 +312,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Requirement:** A consumer MUST name every non-Markdown surface its vocabulary reaches in `paths.languageScan`, including source, interface copy, the API contract, and acceptance tests.
 
-**Rationale:** Documentation is usually the smallest of those surfaces, and the only one a Markdown scan reads. A vocabulary then holds where nobody reads it and drifts where everybody does. One consumer of 459 pages passed the check while its source, its 3,458 interface strings and its 34 feature files went unread. Every collision that consumer had lived in the unread half. A rejection also has to reach a name, which carries the word with no space around it. `SellerOrderId` breaches a rejection of `seller` exactly as a sentence does.
+**Rationale:** Documentation is usually the smallest of those surfaces, and the only one a Markdown scan reads. A vocabulary then holds where nobody reads it and drifts where everybody does. A project can pass the page check while its source, its interface strings and its feature files go unread. Its collisions then live in the unread half. A rejection also has to reach a name, which carries the word with no space around it. `ClientOrderId` breaches a rejection of `client` exactly as a sentence does.
 
 **Example:** A pattern matching no file is an error. A surface switched off in silence reports the same pass as a surface that is clean.
 
@@ -357,7 +357,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** A procedure that lists what a command already does becomes a second copy of that command, and the copy is the part that drifts.
 
-**Example:** A step reads `Run \`entro up\`` rather than listing the compose start, the readiness wait, and each process launch.
+**Example:** A step reads `Run \`./shop up\`` rather than listing the compose start, the readiness wait, and each process launch.
 
 ### State one layer per page (standards/rule/core-authoring.state-one-layer-per-page)
 
@@ -393,7 +393,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** The kind names the assertion class, the page names the file, and the slug names the assertion, so a citation resolves to one heading.
 
-**Example:** `standards/rule/frontend-components.use-the-component-ownership-levels` names a rule on the frontend components page, and its slug restates its heading.
+**Example:** `standards/rule/frontend-components.compose-composites-in-page-code` names a rule on the frontend components page, and its slug restates its heading.
 
 ### Name the owning page in the identifier (standards/rule/core-authoring.name-the-owning-page-in-the-identifier)
 
@@ -401,7 +401,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** The page segment names the file a reader opens, and the area keeps two pages with one stem distinct.
 
-**Example:** `standards/rule/frontend-structure.organize-features-by-module-and-use-case` and `standards/rule/blazor-structure.organize-features-by-module-and-use-case` name two pages.
+**Example:** `standards/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case` and `standards/rule/blazor-structure.organize-features-by-module-and-use-case` name two pages.
 
 ### Exclude a sequence number from the identifier (standards/rule/core-authoring.exclude-a-sequence-number-from-the-identifier)
 
@@ -441,7 +441,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** One generated page resolves every ID to its heading and owning page, so a reader follows a citation in one step instead of searching.
 
-**Example:** The page lists `standards/rule/frontend-components.use-the-component-ownership-levels` with its heading and a link into `frontend/components.md`.
+**Example:** The page lists `standards/rule/frontend-components.compose-composites-in-page-code` with its heading and a link into `frontend/components.md`.
 
 ### Route the reader before listing pages (standards/rule/core-authoring.route-the-reader-before-listing-pages)
 
@@ -469,7 +469,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD",
   "operationType": "command",
-  "actors": ["buyer"],
+  "actors": ["customer"],
   "entryPoints": [],
   "risks": [],
   "applicableExtensions": []

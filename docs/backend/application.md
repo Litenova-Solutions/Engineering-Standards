@@ -166,9 +166,9 @@ A second command that has to run is staged for durable delivery instead, which i
     OnPostPublished/
       NotifySubscribersOnPostPublishedHandler.cs
       IPostPublicationNotifier.cs   a port one use case names
-  Audience/                         two aggregates: operations nest under each aggregate
-    BuyerAccounts/
-      BuyerAccountScopeLookup.cs    aggregate-owned, so it sits with the aggregate
+  Customers/                        two aggregates: operations nest under each aggregate
+    CustomerAccounts/
+      CustomerAccountScopeLookup.cs aggregate-owned, so it sits with the aggregate
       RestrictAccount/
         RestrictAccountCommand.cs
         RestrictAccountCommandHandler.cs

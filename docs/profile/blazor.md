@@ -4,7 +4,7 @@
 
 This profile selects one supported platform for a product that has no server of its own. It combines a .NET client-side domain model, browser-local persistence, and a Blazor WebAssembly application compiled to static output.
 
-The `dotnet-nextjs` profile assumes a running ASP.NET Core application with PostgreSQL, Marten, and an HTTP API. A product whose whole behavior runs in the browser cannot satisfy those conventions. This profile names the excluded baselines and replaces them.
+The `dotnet-react` profile assumes a running ASP.NET Core application with PostgreSQL, Marten, and an HTTP API. A product whose whole behavior runs in the browser cannot satisfy those conventions. This profile names the excluded baselines and replaces them.
 
 Exact framework and package versions live only in `standards.manifest.json`.
 
@@ -30,19 +30,19 @@ Exact framework and package versions live only in `standards.manifest.json`.
 
 **Requirement:** This profile MUST name each excluded baseline document and the reason it does not apply.
 
-**Rationale:** A consumer inherits the exclusions by selecting the profile and restates none of them. Silent omission remains a violation. A consumer that later adds a server moves to `dotnet-nextjs` rather than re-including individual documents.
+**Rationale:** A consumer inherits the exclusions by selecting the profile and restates none of them. Silent omission remains a violation. A consumer that later adds a server moves to `dotnet-react` rather than re-including individual documents.
 
-**Example:** These `dotnet-nextjs` conventions do not apply, because each requires a server, a database, or an HTTP boundary.
+**Example:** These `dotnet-react` conventions do not apply, because each requires a server, a database, or an HTTP boundary.
 
 | Excluded document | Reason |
 |:---|:---|
 | `backend/persistence.md` | No database. Replaced by browser persistence. |
 | `backend/api.md` | No HTTP surface, actor claims, Problem Details, paging, or OpenAPI. |
-| `frontend/structure.md` | Next.js application tree. Replaced by Blazor structure. |
-| `frontend/rendering.md` | Next.js routing and render modes. Replaced by Blazor rendering. |
-| `frontend/components.md` | React and shadcn/ui components. Replaced by Blazor components. |
-| `frontend/data.md` | Server functions and fetch data access. Replaced by Blazor data and state. |
-| `frontend/testing.md` | Vitest and React Testing Library. Replaced by Blazor testing. |
+| `frontend/structure.md` | The React application tree and its backend module mirror. Replaced by Blazor structure. |
+| `frontend/rendering.md` | File-based routes, loaders, and render modes. Replaced by Blazor rendering. |
+| `frontend/components.md` | The shared React UI package and its composites. Replaced by Blazor components. |
+| `frontend/data.md` | A generated client, a query cache, and API-owned sessions. Replaced by Blazor data and state. |
+| `frontend/testing.md` | Vitest, the structure check, and Playwright. Replaced by Blazor testing. |
 
 Backend architecture, domain, and application conventions are not excluded, because a client application still has both layers. Operations conventions apply in reduced form: health endpoints, schema review, backup, and restore have no target, while diagnostics, bounded metrics, and Operating Limits still apply.
 

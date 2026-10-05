@@ -24,14 +24,14 @@ const projectFile = path.join(fixture, 'standards.project.json');
 const PAGE = 'docs/domain/modules/sales/vouchers/redeem-voucher.md';
 const VOID_PAGE = 'docs/domain/modules/sales/vouchers/void-voucher.md';
 const UI_PAGE = 'docs/domain/modules/sales/vouchers/ui-evidence.md';
-const DOMAIN = 'apps/api/src/Entro.Domain/Sales/Vouchers';
-const APPLICATION = 'apps/api/src/Entro.Application/Sales/Vouchers/RedeemVoucher';
+const DOMAIN = 'apps/api/src/Shop.Domain/Sales/Vouchers';
+const APPLICATION = 'apps/api/src/Shop.Application/Sales/Vouchers/RedeemVoucher';
 const TESTS = 'apps/api/tests/Acceptance';
 const FEATURES = `${TESTS}/Features`;
 const FRONTEND_EVIDENCE = 'apps/admin/app/evidence';
 
 const CRITERION = 'acceptance-criterion/sales.redeem-voucher.redeems';
-const FEATURE_TAG = '@implements_entro_acceptance-criterion_sales.redeem-voucher.redeems';
+const FEATURE_TAG = '@implements_shop_acceptance-criterion_sales.redeem-voucher.redeems';
 const UI_CRITERION = 'acceptance-criterion/admin.dashboard.shows-the-dashboard-heading';
 const CRITERIA_PAGE = 'docs/domain/modules/sales/vouchers/criteria.md';
 const UI_ORPHAN = 'acceptance-criterion/admin.dashboard.orphan-criterion';
@@ -76,16 +76,16 @@ function pageText(extra = []) {
 
 function baseProject() {
   return {
-    project: { name: 'fixture' },
-    profile: 'dotnet-nextjs',
-    reviewedStandardsVersion: '2.0.0',
+    project: { name: 'Shop' },
+    profile: 'dotnet-react',
+    reviewedStandardsVersion: '1.17.0',
     paths: { domainDocs: 'docs/domain', testRoots: ['apps/api/tests'], frontends: [{ name: 'admin', path: 'apps/admin' }] },
     specSync: {
       codeRoots: ['apps/api/src', 'apps/api/tests'],
       markedRoots: [
-        'apps/api/src/Entro.Domain',
-        'apps/api/src/Entro.Application',
-        'apps/api/src/Entro.WebApi',
+        'apps/api/src/Shop.Domain',
+        'apps/api/src/Shop.Application',
+        'apps/api/src/Shop.WebApi',
         'apps/api/tests',
       ],
       featureRoots: [FEATURES],
@@ -99,28 +99,28 @@ function build() {
 
   write(PAGE, pageText());
   write(`${DOMAIN}/Voucher.cs`,
-    '/// <implements>entro/aggregate/voucher</implements>\npublic sealed class Voucher : AggregateRoot<VoucherId>;\n');
+    '/// <implements>shop/aggregate/voucher</implements>\npublic sealed class Voucher : AggregateRoot<VoucherId>;\n');
   write(`${DOMAIN}/Events/VoucherRedeemedEvent.cs`,
-    '/// <implements>entro/event/voucher.redeemed</implements>\npublic sealed record VoucherRedeemedEvent;\n');
+    '/// <implements>shop/event/voucher.redeemed</implements>\npublic sealed record VoucherRedeemedEvent;\n');
   write(`${DOMAIN}/Exceptions/VoucherNotFoundException.cs`,
-    '/// <implements>entro/exception/voucher.not-found</implements>\npublic sealed class VoucherNotFoundException : Exception;\n');
+    '/// <implements>shop/exception/voucher.not-found</implements>\npublic sealed class VoucherNotFoundException : Exception;\n');
   write(`${DOMAIN}/VoucherState.cs`,
-    '/// <implements>entro/value/voucher.state.draft</implements>\npublic sealed record Draft : VoucherState;\npublic abstract record VoucherState;\n');
+    '/// <implements>shop/value/voucher.state.draft</implements>\npublic sealed record Draft : VoucherState;\npublic abstract record VoucherState;\n');
   write(`${APPLICATION}/RedeemVoucherCommand.cs`,
-    '/// <implements>entro/use-case/sales.redeem-voucher</implements>\npublic sealed record RedeemVoucherCommand;\n');
+    '/// <implements>shop/use-case/sales.redeem-voucher</implements>\npublic sealed record RedeemVoucherCommand;\n');
   write(`${APPLICATION}/RedeemVoucherCommandHandler.cs`,
-    '/// <implements>entro/use-case/sales.redeem-voucher</implements>\n'
-    + '/// <emits>entro/event/voucher.redeemed</emits>\n'
-    + '/// <enforces>entro/invariant/voucher.redeemed-once</enforces>\n'
+    '/// <implements>shop/use-case/sales.redeem-voucher</implements>\n'
+    + '/// <emits>shop/event/voucher.redeemed</emits>\n'
+    + '/// <enforces>shop/invariant/voucher.redeemed-once</enforces>\n'
     + 'public sealed class RedeemVoucherCommandHandler;\n');
   write(`${APPLICATION}/RedeemVoucherCommandValidator.cs`,
-    '/// <implements>entro/validation/redeem-voucher.code-required</implements>\npublic sealed class RedeemVoucherCommandValidator;\n');
+    '/// <implements>shop/validation/redeem-voucher.code-required</implements>\npublic sealed class RedeemVoucherCommandValidator;\n');
   write(`${APPLICATION}/RedeemVoucherAuthorizer.cs`,
-    '/// <implements>entro/authorization/redeem-voucher.actor-allowed</implements>\npublic sealed class RedeemVoucherAuthorizer;\n');
+    '/// <implements>shop/authorization/redeem-voucher.actor-allowed</implements>\npublic sealed class RedeemVoucherAuthorizer;\n');
   write(`${APPLICATION}/RedeemVoucherEndpoints.cs`,
-    '/// <implements>entro/use-case/sales.redeem-voucher</implements>\npublic static class RedeemVoucherEndpoints;\n');
+    '/// <implements>shop/use-case/sales.redeem-voucher</implements>\npublic static class RedeemVoucherEndpoints;\n');
   write(`${TESTS}/RedeemVoucherTests.cs`,
-    `/// <covers>entro/${CRITERION}</covers>\n`
+    `/// <covers>shop/${CRITERION}</covers>\n`
     + 'public sealed class RedeemVoucherTests\n{\n    [Fact]\n    public void Redeems() { }\n}\n');
   write(`${FEATURES}/RedeemVoucher.feature`,
     `Feature: Redeeming a voucher\n\n  ${FEATURE_TAG}\n  Scenario: Redeems a voucher\n    Given a voucher exists\n`);
@@ -175,10 +175,10 @@ function withFiles(entries, name, expectation, options = {}) {
   for (const file of files) fs.rmSync(file);
 }
 
-const VOID_HANDLER = `/// <implements>entro/use-case/sales.void-voucher</implements>\n`
-  + '/// <enforces>entro/invariant/voucher.never-refunded</enforces>\n'
+const VOID_HANDLER = `/// <implements>shop/use-case/sales.void-voucher</implements>\n`
+  + '/// <enforces>shop/invariant/voucher.never-refunded</enforces>\n'
   + 'public sealed class VoidVoucherCommandHandler;\n';
-const VOID_COMMAND = `/// <implements>entro/use-case/sales.void-voucher</implements>\npublic sealed record VoidVoucherCommand;\n`;
+const VOID_COMMAND = `/// <implements>shop/use-case/sales.void-voucher</implements>\npublic sealed record VoidVoucherCommand;\n`;
 
 build();
 
@@ -239,7 +239,7 @@ fileCase(
   'a feature tag that names no known kind',
   `${FEATURES}/VoidVoucher.feature`,
   'Feature: Voiding a voucher\n\n'
-  + '  @implements_entro_nonsense_foo\n'
+  + '  @implements_shop_nonsense_foo\n'
   + `  ${FEATURE_TAG}\n`
   + '  Scenario: Voids a voucher\n    Given a voucher exists\n',
   'malformed implementation tag:',
@@ -282,7 +282,7 @@ console.log('\nPath citations (standards/rule/frontend-ui.map-every-use-case-pat
     'path without a test: path/sales.void-voucher.success',
   );
   withFiles(
-    [voidPage, voidCommand, [`${TESTS}/VoidVoucherTests.cs`, '/// <covers>entro/path/sales.void-voucher.success</covers>\npublic sealed class VoidVoucherTests\n{\n    [Fact]\n    public void Voids() { }\n}\n']],
+    [voidPage, voidCommand, [`${TESTS}/VoidVoucherTests.cs`, '/// <covers>shop/path/sales.void-voucher.success</covers>\npublic sealed class VoidVoucherTests\n{\n    [Fact]\n    public void Voids() { }\n}\n']],
     'a covers tag citing a path proves that path',
     null,
   );
@@ -318,7 +318,7 @@ console.log('\nForeign sources and generated files');
 fileCase(
   'a page citing an identifier another source owns',
   'docs/domain/modules/sales/vouchers/foreign-note.md',
-  '# Note\n\nAnother source owns `litepress/invariant/article.published-once-only`.\n',
+  '# Note\n\nAnother source owns `billing/invariant/invoice.issued-once-only`.\n',
   null,
 );
 fileCase(
@@ -351,7 +351,7 @@ fileCase(
 );
 fileCase(
   'a pipeline stage is not a markable element',
-  'apps/api/src/Entro.Application/Pipeline/CausationScopeCommandPreHandler.cs',
+  'apps/api/src/Shop.Application/Pipeline/CausationScopeCommandPreHandler.cs',
   'internal sealed class CausationScopeCommandPreHandler<TCommand>\n'
   + '    : ICommandPreHandler<TCommand>\n'
   + '    where TCommand : ICommand;\n',
@@ -359,13 +359,13 @@ fileCase(
 );
 fileCase(
   'an authentication scheme handler is not a markable element',
-  'apps/api/src/Entro.WebApi/Hosting/Security/ProbeAuthenticationHandler.cs',
+  'apps/api/src/Shop.WebApi/Hosting/Security/ProbeAuthenticationHandler.cs',
   'internal sealed class ProbeAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>;\n',
   null,
 );
 fileCase(
   'an operational exception that is not a domain exception is not a markable element',
-  'apps/api/src/Entro.Application/Platform/Deployment/UnknownOperationalSignalException.cs',
+  'apps/api/src/Shop.Application/Platform/Deployment/UnknownOperationalSignalException.cs',
   'public sealed class UnknownOperationalSignalException : Exception;\n',
   null,
 );
@@ -397,7 +397,7 @@ fileCase(
 );
 fileCase(
   'a read-model record that ends in Event is not a domain event',
-  'apps/api/src/Entro.Application/Operations/ProcessorEvents/AppliedProcessorEvent.cs',
+  'apps/api/src/Shop.Application/Operations/ProcessorEvents/AppliedProcessorEvent.cs',
   'public sealed record AppliedProcessorEvent;\n',
   null,
 );
@@ -423,13 +423,13 @@ fileCase(
 );
 fileCase(
   'an endpoint with no tag is reported',
-  'apps/api/src/Entro.WebApi/Sales/Vouchers/ProbeVoucherEndpoint.cs',
+  'apps/api/src/Shop.WebApi/Sales/Vouchers/ProbeVoucherEndpoint.cs',
   'internal sealed class ProbeVoucherEndpoint : IEndpoint;\n',
   'code element with no identifier tag:',
 );
 fileCase(
   'an endpoint excluded from the published document is not a markable element',
-  'apps/api/src/Entro.WebApi/Platform/Deployment/ProbeDevelopmentEndpoint.cs',
+  'apps/api/src/Shop.WebApi/Platform/Deployment/ProbeDevelopmentEndpoint.cs',
   'internal sealed class ProbeDevelopmentEndpoint : IEndpoint\n{\n'
   + '    public void MapEndpoint(IEndpointRouteBuilder endpoints) => endpoints\n'
   + '        .MapPost("/api/development/probe", () => { })\n'
@@ -438,7 +438,7 @@ fileCase(
 );
 fileCase(
   'an endpoint without the exclusion marker is still reported',
-  'apps/api/src/Entro.WebApi/Platform/Deployment/ProbePublishedEndpoint.cs',
+  'apps/api/src/Shop.WebApi/Platform/Deployment/ProbePublishedEndpoint.cs',
   'internal sealed class ProbePublishedEndpoint : IEndpoint;\n',
   'code element with no identifier tag:',
 );

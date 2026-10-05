@@ -18,7 +18,6 @@ An extension may add requirements, packages, projects, and verification. It may 
 | [containers](containers.md) | `project` | None | A hosted environment deploys container images. |
 | [integrations](integrations.md) | `local` | Use case, Workflow, Domain Policy, End-to-End Flow | Behavior calls or receives data from an external system. |
 | [audit](audit.md) | `project` | None | A reviewer must establish who acted inside data another party owns. |
-| [authjs](authjs.md) | `project` | None | Next.js owns interactive login and session cookies. |
 | [locale](locale.md) | `project` | None | The product commits to more than one locale. |
 | [mcp](mcp.md) | `project` | None | The product ships a Model Context Protocol server an LLM client starts on a user's own machine. |
 | [tenancy](tenancy.md) | `project` | None | Independent customer organizations share one deployment. |
@@ -60,7 +59,7 @@ A selection can instead record the criterion it met and the date it is next revi
 {
   "selectedExtensions": [
     "locale",
-    { "id": "outbox", "criterion": "Ticket issue cannot lose a delivery.", "reviewBy": "2027-03-01" }
+    { "id": "outbox", "criterion": "Shipment dispatch cannot lose a delivery.", "reviewBy": "2027-03-01" }
   ]
 }
 ```
@@ -78,7 +77,7 @@ A selection can instead record the criterion it met and the date it is next revi
   "implementationStatus": "planned",
   "owner": "Product and engineering",
   "lastReviewed": "2026-07-21",
-  "participatingModules": ["orders", "tickets"],
+  "participatingModules": ["orders", "shipping"],
   "applicableExtensions": ["outbox"]
 }
 ---

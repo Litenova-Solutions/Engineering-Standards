@@ -2,11 +2,11 @@
 
 Read this file before changing this repository or a consumer application. (standards/rule/core-agent.select-task-context)
 
-Standards v2.0.0 covers one bounded-context business application. The `dotnet-nextjs` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more Next.js frontends. (standards/rule/core-scope.use-the-supported-application-profile, standards/rule/core-scope.keep-one-bounded-context)
+Standards v1.17.0 covers one bounded-context business application. The `dotnet-react` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more React frontends. (standards/rule/core-scope.use-the-supported-application-profile, standards/rule/core-scope.keep-one-bounded-context)
 
-The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (standards/rule/profile-nextjs.use-manifest-version-pins, standards/rule/profile-blazor.use-manifest-version-pins, standards/rule/core-agent.select-task-context)
+The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (standards/rule/profile-react.use-manifest-version-pins, standards/rule/profile-blazor.use-manifest-version-pins, standards/rule/core-agent.select-task-context)
 
-A provision ID states its own page: `standards/<kind>/<page>.<heading-slug>` names `docs/<area>/<page>.md`, so `standards/rule/frontend-components.use-the-component-ownership-levels` is in `docs/frontend/components.md`. `docs/reference/provisions.md` lists every identifier with its heading. (standards/rule/core-authoring.use-the-declared-identifier-grammar, standards/rule/core-authoring.regenerate-the-provision-index)
+A provision ID states its own page: `standards/<kind>/<page>.<heading-slug>` names `docs/<area>/<page>.md`, so `standards/rule/frontend-components.compose-composites-in-page-code` is in `docs/frontend/components.md`. `docs/reference/provisions.md` lists every identifier with its heading. (standards/rule/core-authoring.use-the-declared-identifier-grammar, standards/rule/core-authoring.regenerate-the-provision-index)
 
 ## Writing
 
@@ -77,7 +77,7 @@ A consumer template's `reviewedStandardsVersion` field is set to the latest rele
 - Organize each layer by the same modules, aggregates, and use cases. (standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case)
 - Write commands through repositories and commit through the command pipeline. (standards/rule/backend-application.keep-command-handlers-narrow, standards/rule/backend-persistence.commit-once-in-the-command-pipeline)
 - Derive authenticated actors from verified claims and authorize target resources. (standards/rule/backend-api.derive-authenticated-identity-from-claims, standards/rule/backend-api.authorize-the-target-resource)
-- Use the controlled shadcn/ui baseline for React web frontends. (standards/rule/frontend-ui.select-one-visual-authority, standards/rule/frontend-ui.use-the-pinned-shadcnui-baseline)
+- Use the controlled shadcn/ui baseline for React web frontends. (standards/rule/frontend-ui.select-one-visual-authority, standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)
 
 Read the full cited provisions before applying these boundaries. (standards/rule/core-agent.select-task-context)
 

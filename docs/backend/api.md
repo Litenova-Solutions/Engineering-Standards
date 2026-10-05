@@ -160,12 +160,12 @@ The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. I
 **Example:**
 
 ```text
-POST /api/events/{eventId}:cancel
-POST /api/organizations/{organizerId}:close
+POST /api/shipments/{shipmentId}:cancel
+POST /api/merchants/{merchantId}:close
 POST /api/orders/{orderId}/refund-requests/{refundId}:decide
 ```
 
-The operationId keeps its verb-noun form, so `CancelEvent` names the same transition the path states.
+The operationId keeps its verb-noun form, so `CancelShipment` names the same transition the path states.
 
 ### Apply PATCH to a partial update (standards/rule/backend-api.apply-patch-to-a-partial-update)
 
@@ -223,7 +223,7 @@ The generation run contacts no hosted dependency and runs no schema change under
 
 Every operation sets a stable name through `WithName`, which becomes `operationId`, and declares authorization, request, success, and Problem Details response metadata. The implementation uses typed results or `Produces` metadata so the generated document contains every documented status. It adds explicit summaries and descriptions, or enables XML documentation on named handler methods. Comments on route lambdas are not contract documentation.
 
-When TypeScript consumes the API, the pinned `openapi-typescript` executable reads the source artifact. A single frontend writes generated types under `apps/{frontend}/lib/api/generated/`. Multiple consumers use `packages/api-types/src/`. Scalar may expose API documentation in Development, and hosted environments do not expose development tooling by default.
+When TypeScript consumes the API, the pinned generator reads the source artifact. The generated client, its model types, its request schemas, and its query options are one workspace package, because every frontend and every command reads them. Scalar may expose API documentation in Development, and hosted environments do not expose development tooling by default.
 
 ### Commit the generated contract its consumers read (standards/rule/backend-api.commit-the-generated-contract-its-consumers-read)
 
@@ -297,8 +297,8 @@ Discriminator strings are contract values that an identifier rename cannot chang
         GetPostEndpoint.cs
         GetPostResponseModel.cs
         GetPostApiMappings.cs
-    Audience/                       two aggregates: operations nest under each aggregate
-      BuyerAccounts/
+    Customers/                      two aggregates: operations nest under each aggregate
+      CustomerAccounts/
         RestrictAccount/
           RestrictAccountEndpoint.cs
           RestrictAccountRequestModel.cs
@@ -408,17 +408,17 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 | standards/rule/backend-api.use-consistent-status-codes | test | `StatusContractTests` asserts the outcome-table status code for each documented result. |
 | standards/rule/backend-api.reject-a-success-status-for-a-failed-outcome | test | `StatusContractTests` asserts every documented error path returns its declared non-success status. |
 | standards/rule/backend-api.keep-routes-resource-oriented | static | `RouteShapeTests` asserts lowercase plural segments, kebab-case subresources, and identity outside the body. |
-| standards/rule/backend-api.state-an-unexpressible-transition-as-a-custom-method | static | `apps/api/openapi/Entro.json` states each unexpressible transition as POST with a colon-suffixed final path segment. |
-| standards/rule/backend-api.apply-patch-to-a-partial-update | static | `apps/api/openapi/Entro.json` declares `application/merge-patch+json` on each partial update and PUT on no partial update. |
-| standards/rule/backend-api.use-put-for-a-whole-replacement | static | `apps/api/openapi/Entro.json` declares PUT on whole-replacement operations only. |
+| standards/rule/backend-api.state-an-unexpressible-transition-as-a-custom-method | static | `apps/api/openapi/{ProjectName}.json` states each unexpressible transition as POST with a colon-suffixed final path segment. |
+| standards/rule/backend-api.apply-patch-to-a-partial-update | static | `apps/api/openapi/{ProjectName}.json` declares `application/merge-patch+json` on each partial update and PUT on no partial update. |
+| standards/rule/backend-api.use-put-for-a-whole-replacement | static | `apps/api/openapi/{ProjectName}.json` declares PUT on whole-replacement operations only. |
 | standards/rule/backend-api.bound-collection-queries | test | `CollectionPagingTests` asserts deterministic ordering, the default limit, and rejection above the maximum. |
 | standards/rule/backend-api.treat-openapi-as-a-generated-contract | static | A Release build regenerates `apps/api/openapi/` and CI fails when regeneration changes the tree. |
 | standards/rule/backend-api.commit-the-generated-contract-its-consumers-read | static | The committed `apps/api/openapi/` artifact exists for each consumer-read contract and CI fails on a difference. |
 | standards/rule/backend-api.reflect-enforced-authentication-in-the-contract | test | `OpenApiSecurityTests` asserts every operation with an authorization policy declares a matching security entry. |
 | standards/rule/backend-api.publish-precise-complete-schemas | test | `OpenApiSchemaTests` asserts closed-set fields publish an enum or oneOf and control headers are required. |
 | standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape | test | `PolymorphicContractTests` round-trips every union case and asserts the discriminator equals its Domain case code. |
-| standards/rule/backend-api.model-a-monetary-value-as-one-object | static | `apps/api/openapi/Entro.json` carries a `Money` schema and every monetary field references it. |
-| standards/rule/backend-api.name-transport-fields-by-one-rule-set | inspection | A schema review of `apps/api/openapi/Entro.json` finds no banned prefix, no banned noise word, and one suffix per time shape. |
+| standards/rule/backend-api.model-a-monetary-value-as-one-object | static | `apps/api/openapi/{ProjectName}.json` carries a `Money` schema and every monetary field references it. |
+| standards/rule/backend-api.name-transport-fields-by-one-rule-set | inspection | A schema review of `apps/api/openapi/{ProjectName}.json` finds no banned prefix, no banned noise word, and one suffix per time shape. |
 | standards/rule/backend-api.reject-a-collapsed-or-borrowed-wire-contract | test | `PolymorphicContractTests` asserts no data-bearing set serializes as an enum and no inner-layer type reaches the wire. |
 | standards/rule/backend-api.use-this-endpoint-layout | inspection | Endpoint folder review locates each operation under its module and aggregate, or records a named local replacement. |
 | standards/rule/backend-api.keep-transport-models-independent | static | `TransportNamingTests` asserts each transport type ends in RequestModel, ResponseModel, Model, or ApiMappings. |

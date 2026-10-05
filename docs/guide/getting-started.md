@@ -7,7 +7,7 @@ Create a consumer repository with one selected profile, current specifications, 
 ## Prerequisites
 
 - Pin the selected standards release before copying profile-specific configuration.
-- Read the [platform profile](../profile/nextjs.md), the [agent protocol](../core/agent.md), and the [authoring standard](../core/authoring.md).
+- Read the [platform profile](../profile/react.md), the [agent protocol](../core/agent.md), and the [authoring standard](../core/authoring.md).
 - Read the [extension catalog](../ext/README.md) to learn which capabilities stay inactive at the start.
 
 ## Procedure

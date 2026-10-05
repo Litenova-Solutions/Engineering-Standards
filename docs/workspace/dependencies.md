@@ -98,7 +98,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 ### Keep generated packages dependency-light (standards/rule/workspace-dependencies.keep-generated-packages-dependency-light)
 
-**Default:** Keep generated API types free of dependencies and limit the shared client to `openapi-fetch` and those types.
+**Default:** Keep generated API types free of dependencies and limit the shared client to the pinned generator's runtime, its query plugin, and those types.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -134,7 +134,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 | Integration.Tests | xUnit, assertions, test host, Testcontainers PostgreSQL, and coverage collector |
 | Architecture.Tests | xUnit, assertions, and NetArchTest |
 
-The example adds a package to the narrowest owning project. A central version entry does not authorize every project to reference that package. Conditional packages such as EF Core, Reqnroll, SignalR, WireMock, and Auth.js are referenced only after their extension activates.
+The example adds a package to the narrowest owning project. A central version entry does not authorize every project to reference that package. Conditional packages such as EF Core, Reqnroll, SignalR, and WireMock are referenced only after their extension activates.
 
 ## Reference example
 
@@ -156,6 +156,6 @@ An Application query handler may inject `IQuerySession` because Marten is the se
 | standards/rule/workspace-dependencies.keep-frontend-applications-isolated | inspection | `ImportBoundaryTests` asserts no cross-application or internal-feature import exists. |
 | standards/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary | static | `node standards/tools/validate-ui.mjs` reports a UI package outside the manifest baseline. |
 | standards/rule/workspace-dependencies.reference-only-the-litebus-module-required | inspection | Project files reference only the LiteBus modules the code dispatches. |
-| standards/rule/workspace-dependencies.keep-generated-packages-dependency-light | static | The generated types package declares no dependency and the client declares only `openapi-fetch`. |
+| standards/rule/workspace-dependencies.keep-generated-packages-dependency-light | static | `package.json` declares no dependency in the generated types package and only the generator's runtime in the client. |
 | standards/rule/workspace-dependencies.keep-test-dependencies-in-test-projects | inspection | No production project references an assertion, substitution, host, container, or architecture-test package. |
 | standards/rule/workspace-dependencies.use-this-baseline-package-ownership | inspection | Each baseline package appears in the layer that the ownership table assigns. |

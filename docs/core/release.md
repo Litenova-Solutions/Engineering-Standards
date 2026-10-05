@@ -194,7 +194,7 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 This informative example demonstrates `standards/rule/core-release.verify-connected-end-to-end-flows`, `standards/rule/core-release.identify-immutable-release-artifacts`, and `standards/rule/core-release.record-release-evidence`.
 
-An event-sales release includes verified inventory, order, payment, and ticket behaviors. `E2E-EVENT-SALES-01` passes against deployed API and PostgreSQL, and the record cites the image digest and release evidence.
+An order-checkout release includes verified stock, order, payment, and shipment behaviors. `E2E-ORDER-CHECKOUT-01` passes against deployed API and PostgreSQL, and the record cites the image digest and release evidence.
 
 ## Verification
 
