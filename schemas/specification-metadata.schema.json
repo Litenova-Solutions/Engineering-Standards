@@ -23,7 +23,6 @@
     { "$ref": "#/$defs/domainPolicy" },
     { "$ref": "#/$defs/decisionEvidence" },
     { "$ref": "#/$defs/operatingLimits" },
-    { "$ref": "#/$defs/page" },
     { "$ref": "#/$defs/decision" },
     { "$ref": "#/$defs/runbook" },
     { "$ref": "#/$defs/releaseRecord" }
@@ -39,11 +38,11 @@
     },
     "useCaseIdentifier": {
       "type": "string",
-      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+      "pattern": "^use-case/[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
     },
-    "pageIdentifier": {
+    "aggregateIdentifier": {
       "type": "string",
-      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+      "pattern": "^aggregate/[a-z][a-z0-9-]*$"
     },
     "specStatus": {
       "type": "string",
@@ -251,7 +250,7 @@
       "required": ["kind", "id", "specStatus", "owner", "lastReviewed"],
       "properties": {
         "kind": { "const": "aggregate" },
-        "id": { "$ref": "#/$defs/useCaseIdentifier" },
+        "id": { "$ref": "#/$defs/aggregateIdentifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
@@ -384,33 +383,6 @@
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
-      }
-    },
-    "page": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "kind",
-        "id",
-        "specStatus",
-        "implementationStatus",
-        "owner",
-        "lastReviewed",
-        "app",
-        "route",
-        "useCases"
-      ],
-      "properties": {
-        "kind": { "const": "page" },
-        "id": { "$ref": "#/$defs/pageIdentifier" },
-        "specStatus": { "$ref": "#/$defs/specStatus" },
-        "implementationStatus": { "$ref": "#/$defs/implementationStatus" },
-        "owner": { "$ref": "#/$defs/owner" },
-        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
-        "app": { "$ref": "#/$defs/identifier" },
-        "route": { "type": "string", "minLength": 1 },
-        "useCases": { "$ref": "#/$defs/useCaseArray" },
-        "applicableExtensions": { "$ref": "#/$defs/extensionArray" }
       }
     },
     "decision": {

@@ -10,6 +10,16 @@
 ---
 # __TITLE__
 
+## Module map
+
+- Authority level: Lift the level and its position from the authority hierarchy.
+- Aggregates: Lift each root with its invariant, state, and use-case counts.
+- Use cases: Lift the total and the planned count from the Use cases table.
+- Events raised: Lift the events from the Events and event reactions table.
+- Reacts to: Lift the reactions from the Events and event reactions table.
+- Terms: Lift the terms this module defines.
+- Policies: Lift the policy identifiers this module links.
+
 ## Purpose
 
 State the domain area, its language, and the outcomes its use cases support. A module organizes specifications and code. It is not a transaction or deployment boundary.
@@ -32,7 +42,7 @@ State the occasion this module exists for: what its actors are doing, when it ha
 
 | Aggregate | Owns | References by ID | Aggregate Invariants | Commands |
 |:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | List state changed atomically. | List other aggregate IDs. | `INV-__MODULE_ID__-01` | Link Command use cases. |
+| `__AGGREGATE__` | List state changed atomically. | List other aggregate IDs. | `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Link Command use cases. |
 
 Write `None` when the module has no aggregate. A module may contain multiple related aggregates. Each aggregate remains one transaction boundary.
 
@@ -56,15 +66,15 @@ Define this mapping before the first Command implementation. Do not use an enum,
 
 | Aggregate | From state | Business action | To state | Aggregate Invariants | Use case |
 |:---|:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__FROM_STATE__` | `__ACTION__` | `__TO_STATE__` | `INV-__MODULE_ID__-01` | Link the Command specification. |
+| `__AGGREGATE__` | `__FROM_STATE__` | `__ACTION__` | `__TO_STATE__` | `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Link the Command specification. |
 
 ## Aggregate invariants
 
 | ID | Rule | Protected by | Failure |
 |:---|:---|:---|:---|
-| `INV-__MODULE_ID__-01` | State one invariant. | Name the aggregate or Value Object. | Name the rejected outcome. |
+| `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | State one invariant. | Name the aggregate or Value Object. | Name the rejected outcome. |
 
-Do not renumber or reuse an approved aggregate invariant ID.
+Do not reuse an approved invariant identifier.
 
 ## Events and event reactions
 
@@ -82,7 +92,7 @@ Do not renumber or reuse an approved aggregate invariant ID.
 
 | Rule or transition | Use cases | Acceptance criteria |
 |:---|:---|:---|
-| `INV-__MODULE_ID__-01` | Link each owning use case. | List stable acceptance IDs. |
+| `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Link each owning use case. | List stable acceptance IDs. |
 
 ## Dependencies
 

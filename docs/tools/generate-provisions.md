@@ -27,6 +27,7 @@ Run it after adding, renaming, or removing a provision. A hand edit is overwritt
 | Option | Default | Effect |
 |:---|:---|:---|
 | `--check` | off | Compares the page with the active standards and writes nothing. |
+| `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 
 ## Exit codes
 

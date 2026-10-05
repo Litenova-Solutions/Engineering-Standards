@@ -18,8 +18,8 @@ An extension may add requirements, packages, projects, and verification. It may 
 | [containers](containers.md) | `project` | None | A hosted environment deploys container images. |
 | [integrations](integrations.md) | `local` | Use case, Workflow, Domain Policy, End-to-End Flow | Behavior calls or receives data from an external system. |
 | [audit](audit.md) | `project` | None | A reviewer must establish who acted inside data another party owns. |
-| [authjs](authjs.md) | `project` | None | Next.js owns interactive login and session cookies. |
 | [locale](locale.md) | `project` | None | The product commits to more than one locale. |
+| [mcp](mcp.md) | `project` | None | The product ships a Model Context Protocol server an LLM client starts on a user's own machine. |
 | [tenancy](tenancy.md) | `project` | None | Independent customer organizations share one deployment. |
 | [outbox](outbox.md) | `local` | Use case, Workflow, End-to-End Flow | A committed change requires delivery that cannot be lost. |
 | [efcore](efcore.md) | `local` | Module, Use case | Selected aggregates require relational persistence instead of Marten. |
@@ -33,13 +33,13 @@ The manifest is the machine-readable source for `activationScope` and `applicabl
 
 `applicableKinds` names the specification kinds that can carry an extension in `applicableExtensions`. The rule is that a kind qualifies when the extension is specified there, not when it is implemented there.
 
-An aggregate specification owns the state mapping and the transitions, so `concurrency` applies to it. A domain policy about an external system owns what that system decides, so `integrations` applies to it. An end-to-end flow states which of its steps is idempotent, which runs off durable delivery, and which expires on a timer. `concurrency`, `outbox`, and `jobs` therefore apply to it.
+An aggregate specification owns the state mapping and the transitions, so `concurrency` applies to it. A domain policy about an external system owns what that system returns, so `integrations` applies to it. An end-to-end flow states which of its steps is idempotent, which runs off durable delivery, and which expires on a timer. `concurrency`, `outbox`, and `jobs` therefore apply to it.
 
 A kind is excluded when the extension states nothing a reader of that kind needs. `cache` and `report` stay on the use case because both describe one read.
 
 ## Activation
 
-`CORE.SCOPE.EXTENSIONS.001` and `CORE.PRINCIPLES.COMPLEXITY.002` decide when an extension activates. `CORE.SYSTEM.EXTENSIONS.001` and `CORE.SYSTEM.EXTENSIONS.002` decide where it is listed. `CORE.SCOPE.EXTENSIONS.002` requires the project record.
+`standards/rule/core-scope.select-conditional-extensions-explicitly` and `standards/rule/core-principles.select-extensions-by-criteria` state when an extension activates. `standards/rule/core-system.select-extensions-before-applying-them` and `standards/rule/core-system.exclude-a-project-scoped-extension-from-local-metadata` state where it is listed. `standards/rule/core-scope.record-selected-extensions` requires the project record.
 
 The [agent protocol](../core/agent.md) carries the ordered steps an agent follows.
 
@@ -59,12 +59,12 @@ A selection can instead record the criterion it met and the date it is next revi
 {
   "selectedExtensions": [
     "locale",
-    { "id": "outbox", "criterion": "Ticket issue cannot lose a delivery.", "reviewBy": "2027-03-01" }
+    { "id": "outbox", "criterion": "Shipment dispatch cannot lose a delivery.", "reviewBy": "2027-03-01" }
   ]
 }
 ```
 
-`CORE.SCOPE.EXTENSIONS.001` requires that an extension is selected only when its criteria apply, and the object form records which criterion that was. The consumer validator reports a selection whose `reviewBy` has passed. A selection that costs nothing to keep is a selection nobody removes.
+`standards/rule/core-scope.select-conditional-extensions-explicitly` requires that an extension is selected only when its criteria apply, and the object form records which criterion that was. The consumer validator reports a selection whose `reviewBy` has passed. A selection that costs nothing to keep is a selection nobody removes.
 
 `locale` applies across the project. Only the Use cases and Workflows that require durable delivery list `outbox`. For example:
 
@@ -77,7 +77,7 @@ A selection can instead record the criterion it met and the date it is next revi
   "implementationStatus": "planned",
   "owner": "Product and engineering",
   "lastReviewed": "2026-07-21",
-  "participatingModules": ["orders", "tickets"],
+  "participatingModules": ["orders", "shipping"],
   "applicableExtensions": ["outbox"]
 }
 ---

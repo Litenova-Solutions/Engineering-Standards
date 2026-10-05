@@ -1,21 +1,24 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/ui-source-lock.schema.json",
-  "title": "Litenova shadcn/ui Source Lock",
+  "title": "Litenova Shared UI Package Source Lock",
+  "description": "The record beside the one copy of the registry source. It names the pinned CLI, the registry it came from, and the digest of every installed primitive, so a hand edit to copied source reports rather than passing unreviewed.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "generator", "cli", "preset", "registry", "formatter", "components"],
   "properties": {
     "$schema": { "type": "string" },
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": {
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See standards/rule/core-authoring.publish-each-release-as-a-complete-contract and standards/rule/core-authoring.exclude-cross-release-compatibility-work.",
+      "const": 1
+    },
     "generator": { "const": "shadcn/ui" },
     "cli": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
     "preset": {
+      "description": "The decoded preset the shared package installs. Every field matches the uiBaseline the standards manifest pins, so the lock and the manifest cannot describe two different presets.",
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "code",
-        "fingerprint",
         "style",
         "base",
         "cssVariables",
@@ -31,10 +34,8 @@
         "componentsStyle"
       ],
       "properties": {
-        "code": { "type": "string", "minLength": 1 },
-        "fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
         "style": { "type": "string", "minLength": 1 },
-        "base": { "enum": ["base-ui", "radix-ui"] },
+        "base": { "const": "base-ui" },
         "cssVariables": { "const": true },
         "baseColor": { "type": "string", "minLength": 1 },
         "theme": { "type": "string", "minLength": 1 },
@@ -75,6 +76,7 @@
             "enum": ["baseline", "extended", "forked", "specialist"]
           },
           "paths": {
+            "description": "Package-relative paths of the installed source. The validator resolves them against the shared package root, not against an application root.",
             "type": "array",
             "minItems": 1,
             "uniqueItems": true,

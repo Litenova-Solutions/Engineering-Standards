@@ -25,7 +25,7 @@ A **topic**, **profile**, or **extension** page owns the provisions a reader cit
 
 ## Profile
 
-- [.NET and Next.js platform profile](profile/nextjs.md)
+- [.NET and React platform profile](profile/react.md)
 - [.NET and Blazor platform profile](profile/blazor.md)
 
 The profile selects every baseline page. Exact versions and composition remain in `standards.manifest.json`.
@@ -42,7 +42,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Architecture](backend/architecture.md)
 - [Domain](backend/domain.md)
 - [Application](backend/application.md)
-- [Marten persistence](backend/persistence.md)
+- [Persistence](backend/persistence.md)
 - [HTTP API](backend/api.md)
 - [Backend testing](backend/testing.md)
 
@@ -81,8 +81,8 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Container deployment](ext/containers.md)
 - [External integrations](ext/integrations.md)
 - [Audit trail](ext/audit.md)
-- [Auth.js frontend authentication](ext/authjs.md)
 - [Localization](ext/locale.md)
+- [Model Context Protocol](ext/mcp.md)
 - [Multitenancy](ext/tenancy.md)
 - [Outbox worker](ext/outbox.md)
 - [EF Core persistence](ext/efcore.md)
@@ -110,6 +110,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Glossary](reference/glossary.md)
 - [Provision index](reference/provisions.md)
 - [Audit obligations](reference/audit-obligations.md)
+- [Decision records](reference/decision-records.md)
 - [Consumer templates](../templates/consumer/README.md)
 
 Consumers pin a complete release. `CHANGELOG.md` is the only repository release note.

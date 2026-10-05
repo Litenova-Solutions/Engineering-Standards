@@ -22,7 +22,10 @@
   ],
   "properties": {
     "$schema": { "type": "string" },
-    "schemaVersion": { "const": 4 },
+    "schemaVersion": {
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See standards/rule/core-authoring.publish-each-release-as-a-complete-contract and standards/rule/core-authoring.exclude-cross-release-compatibility-work.",
+      "const": 4
+    },
     "version": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"
@@ -43,15 +46,9 @@
     "provisionRegistry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["areas", "topics"],
+      "required": ["areas"],
       "properties": {
         "areas": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/idArea" }
-        },
-        "topics": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
@@ -115,8 +112,6 @@
         "styling",
         "base",
         "style",
-        "presetCode",
-        "presetFingerprint",
         "cssVariables",
         "baseColor",
         "theme",
@@ -139,8 +134,6 @@
         "styling": { "const": "tailwindcss-v4" },
         "base": { "const": "base-ui" },
         "style": { "type": "string", "minLength": 1 },
-        "presetCode": { "type": "string", "minLength": 1 },
-        "presetFingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
         "cssVariables": { "const": true },
         "baseColor": { "type": "string", "minLength": 1 },
         "theme": { "type": "string", "minLength": 1 },
@@ -152,7 +145,7 @@
         "menuAccent": { "enum": ["subtle", "bold"] },
         "menuColor": { "enum": ["default", "inverted", "default-translucent", "inverted-translucent"] },
         "componentsStyle": { "type": "string", "minLength": 1 },
-        "sourceModel": { "const": "per-frontend-owned-source" },
+        "sourceModel": { "const": "shared-ui-package" },
         "registry": {
           "type": "object",
           "additionalProperties": false,
@@ -172,12 +165,7 @@
             "enum": ["public-light", "application-balanced", "admin-dense"]
           }
         },
-        "nativeBoundary": { "const": "separate-platform-profile" },
-        "compatibilityBases": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "enum": ["radix-ui"] }
-        }
+        "nativeBoundary": { "const": "separate-platform-profile" }
       }
     },
     "loadPlans": {
@@ -197,7 +185,7 @@
     },
     "idScope": {
       "type": "string",
-      "pattern": "^[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*$"
+      "pattern": "^standards\\/(?:acceptance-criterion|authorization|invariant|policy|rule|validation)\\/[a-z][a-z0-9-]*$"
     },
     "repositoryPath": {
       "type": "string",
@@ -224,7 +212,7 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "enum": ["module", "aggregate", "use-case", "end-to-end-flow", "workflow", "domain-policy", "page"]
+            "enum": ["module", "aggregate", "use-case", "end-to-end-flow", "workflow", "domain-policy"]
           }
         }
       },

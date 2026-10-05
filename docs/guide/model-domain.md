@@ -14,7 +14,7 @@ Start with:
 - Known domain policies, examples, and failure cases.
 - Decisions that constrain identity, persistence, security, or external behavior.
 
-An end-to-end flow connects use cases that produce one observable product outcome. For example, `buyer-completes-purchase` may cross Orders, Payments, and Tickets. It provides delivery context, while each module retains responsibility for its own rules.
+An end-to-end flow connects use cases that produce one observable product outcome. For example, `customer-completes-purchase` may cross Orders, Payments, and Shipping. It provides delivery context, while each module retains responsibility for its own rules.
 
 If a command depends on an unknown policy, record it under `Open modeling questions` and stop that use case. Other use cases with complete rules may continue.
 
@@ -28,9 +28,9 @@ For the Orders module:
 
 | Term | Definition | Rejected synonyms |
 |:---|:---|:---|
-| Order | One buyer commitment to one seller in one currency. | Cart, purchase record |
+| Order | One customer commitment to one merchant in one currency. | Cart, purchase record |
 | Cancel | End an Order before fulfillment under the approved policy. | Delete, disable |
-| Claim | Attach an authenticated buyer to an existing guest Order. | Adopt, transfer |
+| Claim | Attach an authenticated customer to an existing guest Order. | Adopt, transfer |
 
 Rejected synonyms prevent later contributors from creating `PurchaseRecord` beside `Order`. They also tell an agent which plausible names are wrong for this domain.
 
@@ -38,7 +38,7 @@ Rejected synonyms prevent later contributors from creating `PurchaseRecord` besi
 
 Name one occasion the module exists for, and write it down before the first table. State who acts, what surrounds them, what they are under pressure from, and what they use today instead.
 
-For the Orders module, an onsale opens at nine on a Tuesday. Four hundred people reach the storefront inside a minute, and the last twelve places go to whoever commits first. Without an order record, the promoter reconstructs who bought what from a payment export and a group chat.
+For the Orders module, a flash sale opens at nine on a Tuesday. Four hundred people reach the storefront inside a minute, and the last twelve units go to whoever commits first. Without an order record, Northwind Traders reconstructs who bought what from a payment export and a group chat.
 
 Record that occasion in the module specification's `Scenario` section, and reuse its people and amounts in every aggregate and use-case scenario beneath it. One reference cast in `docs/domain/scenarios.md` holds the names, the place, the dates, and the figures, so two pages read in sequence describe one occasion.
 
@@ -56,20 +56,20 @@ A module may contain no aggregate, one aggregate, or multiple related aggregates
 Orders module
   Order aggregate
     root: Order
-    owns: lines, totals, seller, currency, lifecycle
-    references: BuyerId, PaymentId
+    owns: lines, totals, merchant, currency, lifecycle
+    references: CustomerAccountId, PaymentId
     protects: INV-ORDERS-01, INV-ORDERS-02
 
   OrderClaim aggregate
     root: OrderClaim
     owns: guest claim lifecycle and claim evidence
-    references: OrderId, BuyerId
+    references: OrderId, CustomerAccountId
     protects: INV-ORDERS-04
 ```
 
 An aggregate owns a child when the child has no independent consistency boundary and changes only through the root. Reference another aggregate by typed ID when it can change independently.
 
-Do not place `Buyer` inside `Order` for convenient navigation. Store `BuyerId` and use a read model for buyer presentation. Buyer and Order have separate consistency boundaries even if one page displays both.
+Do not place `CustomerAccount` inside `Order` for convenient navigation. Store `CustomerAccountId` and use a read model for customer presentation. CustomerAccount and Order have separate consistency boundaries even if one page displays both.
 
 Record the result in the module specification:
 
@@ -168,9 +168,9 @@ Use `POL-{POLICY}-{NN}` for a domain policy:
 
 | ID | Policy | Applies to modules | Consistency | Enforcement |
 |:---|:---|:---|:---|:---|
-| `POL-BUYER-DATA-RETENTION-01` | Buyer deletion completes within 24 hours unless legal hold applies. | Accounts, Orders | Eventual within 24 hours | Buyer deletion workflow |
+| `POL-CUSTOMER-DATA-RETENTION-01` | Customer deletion completes within 24 hours unless legal hold applies. | Customers, Orders | Eventual within 24 hours | Customer deletion workflow |
 
-This retention rule is a domain policy because one aggregate cannot enforce deletion across Accounts and Orders in one transaction. `Only a draft Post can be published` remains an aggregate invariant because `Post.Publish` can enforce it immediately.
+This retention rule is a domain policy because one aggregate cannot enforce deletion across Customers and Orders in one transaction. `Only a draft Post can be published` remains an aggregate invariant because `Post.Publish` can enforce it immediately.
 
 Do not renumber or reuse an approved domain rule ID. Link affected acceptance criteria.
 
@@ -223,8 +223,8 @@ An event is an immutable record of a completed fact. An event reaction is work t
 
 | Event reference | Code type | Business meaning | Event reaction | Owning module | Delivery |
 |:---|:---|:---|:---|:---|:---|
-| `orders.order-confirmed` | `OrderConfirmedEvent` | The paid Order is final. | Issue tickets. | Tickets | `durable` |
-| `tickets.ticket-issued` | `TicketIssued` | An admission entitlement exists. | Send it to the buyer. | Communications | `durable` |
+| `orders.order-confirmed` | `OrderConfirmedEvent` | The paid Order is final. | Dispatch shipment. | Shipping | `durable` |
+| `shipping.shipment-dispatched` | `ShipmentDispatched` | A parcel left the warehouse. | Send the tracking link to the customer. | Communications | `durable` |
 | `posts.post-published` | `PostPublishedEvent` | A Post became public. | Refresh the public catalog. | Posts | `rebuildable` |
 
 A domain event remains an internal domain contract. Translate it to an integration event when another system consumes a versioned external message.
@@ -242,10 +242,10 @@ Create a workflow when the system advances work across a transaction or time bou
 ```text
 PaymentConfirmed
   OrderFulfillmentWorkflow
-    issue inventory.confirm-reservation
+    issue catalog.confirm-reservation
     await ReservationConfirmed
-    issue tickets.issue-ticket
-    await TicketIssued
+    issue shipping.dispatch-shipment
+    await ShipmentDispatched
     complete
 ```
 

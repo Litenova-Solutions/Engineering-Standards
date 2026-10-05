@@ -3,15 +3,27 @@
   "project": {
     "name": "__PROJECT__"
   },
-  "profile": "dotnet-nextjs",
-  "reviewedStandardsVersion": "1.16.0",
+  "profile": "dotnet-react",
+  "reviewedStandardsVersion": "1.17.0",
   "paths": {
     "apiSolution": "__API_SOLUTION__",
     "docs": "docs",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
     "unstructuredDocs": [],
+    "surfaces": [],
+    "testRoots": [],
     "languageScan": [],
+    "uiPackage": {
+      "name": "@__PROJECT__/ui",
+      "path": "packages/ui",
+      "componentsJson": "packages/ui/components.json",
+      "primitives": "packages/ui/src/components",
+      "tokens": "packages/ui/src/styles/tokens.css",
+      "sourceLock": "packages/ui/ui-source-lock.json",
+      "designContract": "packages/ui/DESIGN.md",
+      "publicExports": ["@__PROJECT__/ui/floorplans", "@__PROJECT__/ui/display", "@__PROJECT__/ui/forms"]
+    },
     "frontends": [
       {
         "name": "web",
@@ -19,12 +31,7 @@
         "platform": "react-web",
         "ui": {
           "profile": "application-balanced",
-          "componentsJson": "apps/web/components.json",
-          "vocabulary": "docs/ui/web/vocabulary.json",
-          "sourceLock": "apps/web/ui-source-lock.json",
-          "globalCss": "apps/web/app/globals.css",
-          "primitives": "apps/web/components/ui",
-          "publicExports": ["@/components/ui"]
+          "globalCss": "apps/web/src/styles.css"
         }
       }
     ]
@@ -34,6 +41,8 @@
   "overrides": [],
   "parity": {
     "ignoreHandlers": [],
-    "ignoreUseCases": []
+    "ignoreUseCases": [],
+    "sourceRoots": [],
+    "foreignNames": []
   }
 }

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { buildProvisionIndex, headingSlug, INDEX_PATH } from './provisions.mjs';
+import { buildProvisionIndex, headingSlug, INDEX_PATH, PROVISION_ID_SOURCE, parseProvisionId } from './provisions.mjs';
 import {
   AND_OR,
   CONTRACTIONS,
@@ -15,21 +15,20 @@ import {
   visibleText,
   words,
 } from './prose.mjs';
+import { unsupportedSchemaKeywords, validateSchemaValue } from './schema.mjs';
 
-// Every provision identifier is AREA.PAGE.TOPIC.NNN. AREA and PAGE come from the
-// manifest id registry, TOPIC names the assertion, and NNN is a three-digit sequence.
-const PROVISION_ID_SOURCE = '[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}';
-const PROVISION_ID = new RegExp(`^${PROVISION_ID_SOURCE}$`);
+// Every provision identifier is standards/<kind>/<page>.<heading-slug>. The
+// grammar lives in provisions.mjs, so the validator, the generator, and the
+// parsed heading cannot report three different formats.
+// (standards/rule/core-authoring.identifier-must-follow-format)
 const PROVISION_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${PROVISION_ID_SOURCE})\\)\\s*$`);
-// A looser shape still catches a stale identifier so it reports as an unknown reference
-// instead of passing unnoticed.
-const CITATION_SOURCE = '[A-Z][A-Z0-9]*(?:\\.[A-Z0-9]+){1,}\\.\\d{3}';
+const CITATION_SOURCE = PROVISION_ID_SOURCE;
 const METHODS = new Set(['static', 'test', 'inspection', 'operation']);
 const MODALS = /\b(?:MUST NOT|SHOULD NOT|MUST|SHOULD|MAY)\b/g;
 const OTHER_NORMATIVE = /\b(?:REQUIRED|FORBIDDEN|SHALL)\b/;
 const PROVISION_LABEL = /^\*\*(Requirement|Deviation|Rationale|Example|Default|Replacement):\*\*/;
 const GENERIC_EVIDENCE = /\b(?:verify compliance|check compliance|inspect evidence|verify evidence)\b/i;
-const ACTION_VERBS = new Set(`Accept Activate Add Advance Align Anchor Apply Approve Assert Assign Attach Audit Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify Co-locate Collect Commit Compare Complete Compose Configure Connect Control Copy Cover Create Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document Drive Emit Enforce Escalate Escape Evolve Exclude Exercise Expose Express Finish Follow Format Gate Generate Give Govern Group Handle Hide Identify Implement Inject Inspect Isolate Keep Lease Limit List Load Localize Locate Make Map Mark Match Measure Meet Minimize Mirror Model Move Name Note Operate Organize Own Parameterize Parse Pass Persist Pin Place Plan Point Prefer Preserve Prevent Process Project Promote Protect Prove Provide Publish Purge Query Raise Read Reconnect Record Recover Reference Reflect Regenerate Register Reject Reload Release Remove Render Replay Replace Report Represent Require Renew Requeue Resolve Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tag Test Tolerate Trace Track Translate Treat Update Use Validate Verify Version Wait Write`.split(' '));
+const ACTION_VERBS = new Set(`Accept Activate Add Advance Align Anchor Announce Apply Approve Assert Assign Attach Audit Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify Co-locate Collect Commit Compare Complete Compose Configure Connect Control Copy Cover Create Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document Drive Emit Enforce Escalate Escape Evolve Exclude Exercise Expose Express Finish Follow Format Gate Generate Give Govern Group Handle Hide Identify Implement Inject Inspect Isolate Keep Lease Limit List Load Localize Locate Make Map Mark Match Measure Meet Minimize Mirror Model Move Name Note Operate Organize Own Parameterize Parse Pass Persist Pin Place Plan Point Prefer Preserve Prevent Process Project Promote Protect Prove Provide Publish Purge Query Raise Read Reconnect Record Recover Reference Reflect Regenerate Register Reject Reload Release Remove Render Replay Replace Report Represent Require Renew Requeue Resolve Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tag Test Tolerate Trace Track Translate Treat Update Use Validate Verify Version Wait Write`.split(' '));
 // Every authoring rule is an error. This set stays empty unless a new rule is
 // landed against existing content, in which case it holds that rule only while
 // its count is burned down.
@@ -51,7 +50,6 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'AGENT_PROJECTION_ID',
   'ANCHOR_BROKEN',
   'CONVENTION_DEFAULT_SENTENCE',
-  'CONVENTION_ID_SEGMENT',
   'CONVENTION_MISSING_DEFAULT',
   'CONVENTION_MISSING_REPLACEMENT',
   'CONVENTION_NORMATIVE',
@@ -71,10 +69,7 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'ID_MISSING',
   'ID_PAGE_FILENAME',
   'ID_SCOPE_MISMATCH',
-  'ID_TOPIC_DUPLICATE',
-  'ID_TOPIC_REPEATS_PAGE',
-  'ID_TOPIC_UNKNOWN',
-  'ID_TOPIC_UNUSED',
+  'ID_SLUG_MISMATCH',
   'ID_UNKNOWN_REFERENCE',
   'INDEX_CONTAINS_PROCEDURE',
   'INDEX_INTENT',
@@ -84,7 +79,6 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'MANIFEST_JSON',
   'MANIFEST_LOAD_PLAN',
   'MANIFEST_PATH',
-  'OVERRIDE_CONVENTION_ID',
   'OVERRIDE_UNKNOWN_ID',
   'PAGE_EMPTY_SECTION',
   'PAGE_MISSING_SECTION',
@@ -111,7 +105,6 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'SCHEMA_UNSUPPORTED_KEYWORD',
   'STANDARD_DEVIATION_SENTENCE',
   'STANDARD_EXAMPLE_LABEL',
-  'STANDARD_ID_SEGMENT',
   'STANDARD_INFORMATIVE_NORMATIVE',
   'STANDARD_LABEL_DUPLICATE',
   'STANDARD_LABEL_INVALID',
@@ -143,11 +136,33 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
 
   'INDEX_MISSING_ROUTING',
 ]);
-const SCHEMA_KEYWORDS = new Set([
-  '$schema', '$id', '$ref', '$defs', 'title', 'description', 'type', 'const', 'enum', 'pattern',
-  'minLength', 'minItems', 'minProperties', 'uniqueItems', 'required', 'properties', 'items',
-  'additionalProperties', 'allOf', 'oneOf', 'if', 'then', 'else', 'not', 'default', 'examples',
+
+// Naming the codepoint tells an author which character to hunt for. Naming the
+// ASCII form tells them what to type instead, which is the action the rule
+// actually asks for. These are the characters an editor substitution or a paste
+// from a word processor introduces; anything else reports its codepoint alone.
+// The keys are codepoints rather than characters, because this file is itself
+// under the ASCII rule.
+const ASCII_REPLACEMENTS = new Map([
+  ['00A0', 'a plain space'],
+  ['00B7', 'a hyphen'],
+  ['00D7', 'the letter x'],
+  ['2013', 'a hyphen'],
+  ['2014', 'a hyphen'],
+  ['2018', 'a straight apostrophe'],
+  ['2019', 'a straight apostrophe'],
+  ['201C', 'a straight quotation mark'],
+  ['201D', 'a straight quotation mark'],
+  ['2022', 'a Markdown list marker'],
+  ['2026', 'three full stops'],
+  ['2192', 'the word to'],
 ]);
+
+function nonAsciiMessage(character, prefix) {
+  const codepoint = character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
+  const replacement = ASCII_REPLACEMENTS.get(codepoint);
+  return `${prefix}U+${codepoint}${replacement ? `; write ${replacement}` : ''}`;
+}
 
 function slash(value) {
   return value.replace(/\\/g, '/');
@@ -156,7 +171,7 @@ function slash(value) {
 function walk(directory, predicate, result = []) {
   if (!fs.existsSync(directory)) return result;
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-    if (entry.name === '.git' || entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'build') continue;
+    if (entry.name === '.git' || entry.name === '.opencode' || entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'build') continue;
     const candidate = path.join(directory, entry.name);
     if (entry.isDirectory()) walk(candidate, predicate, result);
     else if (predicate(candidate)) result.push(candidate);
@@ -257,7 +272,7 @@ function anchorsFor(raw) {
 
 // A directory names the class of every page inside it. Four of these hold pages a
 // reader follows or looks up rather than pages that own provisions, and each one
-// answers a question at a single layer. (CORE.AUTHORING.DISCLOSURE.002)
+// answers a question at a single layer. (standards/rule/core-authoring.state-one-layer-per-page)
 const PAGE_CLASS_AREA = {
   ext: 'extension',
   profile: 'profile',
@@ -269,12 +284,19 @@ const PAGE_CLASS_AREA = {
 
 // A standards template seeds one page class, so it is parsed as the page it
 // produces and held to that page's contract.
+// An authoring template is parsed as the page class it produces, so its
+// placeholder identifiers are normalized into valid ones and its virtual path
+// stands in for a real page path. Both live in the same namespace as real pages,
+// which is what makes the parse meaningful and also what makes the stem
+// reserved. A real page at one of these paths would share a scope with a
+// template and report as a duplicate of a file nobody wrote.
 const TEMPLATE_VIRTUAL_PATH = {
   'extension.md': 'docs/ext/template.md',
   'how-to.md': 'docs/guide/template.md',
   'tutorial.md': 'docs/tutorial/template.md',
   'command.md': 'docs/tools/template.md',
 };
+const RESERVED_TEMPLATE_STEMS = new Set([...Object.values(TEMPLATE_VIRTUAL_PATH), 'docs/core/template.md']);
 
 function pageClass(relative) {
   if (relative === INDEX_PATH) return 'index';
@@ -305,7 +327,7 @@ function expectedSections(kind) {
   if (kind === 'reference') return { required: ['Intent', 'Reference'], optional: ['Notes'] };
   // Underneath is required rather than optional, so a command page that hides its
   // mechanism fails rather than passing in silence. A command with nothing
-  // separately runnable writes 'None.' (CORE.AUTHORING.DISCLOSURE.003)
+  // separately runnable writes 'None.' (standards/rule/core-authoring.name-the-escape-from-every-abstraction)
   if (kind === 'command') {
     return { required: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'], optional: [] };
   }
@@ -432,7 +454,7 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
   }
 
   // An index navigates. A numbered procedure inside one duplicates a canonical
-  // provision without citing it. (CORE.AUTHORING.PAGE.001)
+  // provision without citing it. (standards/rule/core-authoring.use-the-declared-page-contract)
   if (kind === 'index') {
     const step = clean.find((item) => /^\s*\d+\.\s+\S/.test(item.line));
     if (step) add(relative, step.number, 'INDEX_CONTAINS_PROCEDURE', 'an index must not contain a numbered procedure');
@@ -514,9 +536,6 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
     }
 
     if (provision.section === 'Standards') {
-      // CONVENTION is the only force signal inside an identifier, so a Standard
-      // cannot borrow it. (CORE.AUTHORING.IDENTIFIER.002)
-      if (/\.CONVENTION\.\d+$/.test(provision.id)) add(relative, provision.line, 'STANDARD_ID_SEGMENT', `Standard '${provision.id}' reserves the CONVENTION segment for a replaceable default`);
       const requirements = nonblank.filter((item) => item.line.startsWith('**Requirement:**'));
       if (requirements.length === 0) {
         add(relative, provision.line, 'STANDARD_MISSING_REQUIREMENT', `Standard '${provision.id}' has no Requirement statement`);
@@ -537,7 +556,6 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
         add(relative, deviations[0].number, 'STANDARD_DEVIATION_SENTENCE', `Deviation for '${provision.id}' must contain one sentence`);
       }
     } else {
-      if (!/\.CONVENTION\.\d+$/.test(provision.id)) add(relative, provision.line, 'CONVENTION_ID_SEGMENT', `convention ID '${provision.id}' must use the CONVENTION topic segment`);
       const defaults = nonblank.filter((item) => item.line.startsWith('**Default:**'));
       const replacements = nonblank.filter((item) => item.line.startsWith('**Replacement:**'));
       if (!defaults.length) add(relative, provision.line, 'CONVENTION_MISSING_DEFAULT', `convention '${provision.id}' has no Default statement`);
@@ -567,7 +585,7 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
 
   // A provision whose Requirement or Default only repeats its own heading
   // states no obligation. The heading is a label; the assertion belongs in the
-  // labeled block. (CORE.AUTHORING.REQUIREMENT.001, CORE.AUTHORING.DEFAULTS.001)
+  // labeled block. (standards/rule/core-authoring.write-atomic-standards-provisions, standards/rule/core-authoring.identify-actionable-conventions)
   for (const provision of provisions) {
     const label = provision.section === 'Standards' ? 'Requirement' : 'Default';
     const assertion = provision.body.find((item) => item.line.startsWith(`**${label}:**`));
@@ -579,7 +597,7 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
   }
 
   // Tier 1 exists to compress Tier 2. A bullet identical to its provision adds
-  // no context and makes the escalation pointless. (CORE.AUTHORING.SUMMARY.001)
+  // no context and makes the escalation pointless. (standards/rule/core-authoring.keep-agent-summaries-informative)
   for (const reference of summaryReferences) {
     const provision = provisions.find((item) => item.id === reference.id);
     if (provision?.claim && reference.claim && provision.claim === reference.claim) {
@@ -636,92 +654,6 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
   return { kind, provisions, headings, summaryReferences };
 }
 
-function unsupportedSchemaKeywords(schema, relative, pointer, add) {
-  if (!schema || typeof schema !== 'object' || Array.isArray(schema)) return;
-  for (const key of Object.keys(schema)) {
-    if (!SCHEMA_KEYWORDS.has(key)) add(relative, 1, 'SCHEMA_UNSUPPORTED_KEYWORD', `unsupported JSON Schema keyword '${key}' at '${pointer}'`);
-  }
-  for (const key of ['allOf', 'oneOf']) for (const item of schema[key] ?? []) unsupportedSchemaKeywords(item, relative, `${pointer}/${key}`, add);
-  for (const key of ['items', 'additionalProperties', 'if', 'then', 'else', 'not']) {
-    if (schema[key] && typeof schema[key] === 'object') unsupportedSchemaKeywords(schema[key], relative, `${pointer}/${key}`, add);
-  }
-  for (const [name, child] of Object.entries(schema.properties ?? {})) unsupportedSchemaKeywords(child, relative, `${pointer}/properties/${name}`, add);
-  for (const [name, child] of Object.entries(schema.$defs ?? {})) unsupportedSchemaKeywords(child, relative, `${pointer}/$defs/${name}`, add);
-}
-
-function resolveSchemaRef(root, reference) {
-  if (!reference.startsWith('#/')) throw new Error(`unsupported schema reference '${reference}'`);
-  return reference.slice(2).split('/').reduce((value, segment) => value?.[segment.replace(/~1/g, '/').replace(/~0/g, '~')], root);
-}
-
-function jsonEqual(left, right) {
-  return JSON.stringify(left) === JSON.stringify(right);
-}
-
-function validateSchemaValue(value, schema, root, location, errors) {
-  if (!schema || typeof schema !== 'object') return;
-  if (schema.$ref) {
-    const target = resolveSchemaRef(root, schema.$ref);
-    if (!target) errors.push(`${location}: unresolved schema reference '${schema.$ref}'`);
-    else validateSchemaValue(value, target, root, location, errors);
-  }
-  for (const branch of schema.allOf ?? []) validateSchemaValue(value, branch, root, location, errors);
-  // Exactly one branch accepts the value. Reporting the branch errors would name
-  // every shape the value is not, so the message names the count instead.
-  if (schema.oneOf) {
-    const matched = schema.oneOf.filter((branch) => {
-      const branchErrors = [];
-      validateSchemaValue(value, branch, root, location, branchErrors);
-      return branchErrors.length === 0;
-    }).length;
-    if (matched !== 1) errors.push(`${location}: value matches ${matched} of ${schema.oneOf.length} allowed shapes, expected exactly 1`);
-  }
-  if (schema.if) {
-    const conditionErrors = [];
-    validateSchemaValue(value, schema.if, root, location, conditionErrors);
-    validateSchemaValue(value, conditionErrors.length === 0 ? schema.then : schema.else, root, location, errors);
-  }
-  if (schema.not) {
-    const notErrors = [];
-    validateSchemaValue(value, schema.not, root, location, notErrors);
-    if (notErrors.length === 0) errors.push(`${location}: value matches prohibited schema`);
-  }
-  if (schema.type) {
-    const matches = schema.type === 'object' ? value !== null && typeof value === 'object' && !Array.isArray(value)
-      : schema.type === 'array' ? Array.isArray(value)
-        : schema.type === 'integer' ? Number.isInteger(value)
-          : schema.type === 'number' ? typeof value === 'number' && Number.isFinite(value)
-            : schema.type === 'string' ? typeof value === 'string'
-              : schema.type === 'boolean' ? typeof value === 'boolean'
-                : schema.type === 'null' ? value === null
-                  : true;
-    if (!matches) {
-      errors.push(`${location}: expected ${schema.type}`);
-      return;
-    }
-  }
-  if (schema.const !== undefined && !jsonEqual(value, schema.const)) errors.push(`${location}: expected constant ${JSON.stringify(schema.const)}`);
-  if (schema.enum && !schema.enum.some((item) => jsonEqual(item, value))) errors.push(`${location}: value is outside the allowed enum`);
-  if (typeof value === 'string') {
-    if (schema.minLength !== undefined && value.length < schema.minLength) errors.push(`${location}: string is shorter than ${schema.minLength}`);
-    if (schema.pattern && !new RegExp(schema.pattern).test(value)) errors.push(`${location}: string does not match ${schema.pattern}`);
-  }
-  if (Array.isArray(value)) {
-    if (schema.minItems !== undefined && value.length < schema.minItems) errors.push(`${location}: array has fewer than ${schema.minItems} items`);
-    if (schema.uniqueItems && new Set(value.map((item) => JSON.stringify(item))).size !== value.length) errors.push(`${location}: array items are not unique`);
-    for (let index = 0; index < value.length; index += 1) validateSchemaValue(value[index], schema.items, root, `${location}/${index}`, errors);
-  }
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    if (schema.minProperties !== undefined && Object.keys(value).length < schema.minProperties) errors.push(`${location}: object has fewer than ${schema.minProperties} properties`);
-    for (const required of schema.required ?? []) if (!(required in value)) errors.push(`${location}: missing required property '${required}'`);
-    const declared = schema.properties ?? {};
-    for (const [key, child] of Object.entries(value)) {
-      if (key in declared) validateSchemaValue(child, declared[key], root, `${location}/${key}`, errors);
-      else if (schema.additionalProperties === false) errors.push(`${location}: unknown property '${key}'`);
-      else if (schema.additionalProperties && typeof schema.additionalProperties === 'object') validateSchemaValue(child, schema.additionalProperties, root, `${location}/${key}`, errors);
-    }
-  }
-}
 
 function validateSchemaConsumer(root, schemaRelative, valueRelative, add) {
   const schemaFile = path.join(root, schemaRelative);
@@ -799,6 +731,9 @@ function checkManifest(root, add) {
     const entry = path.join(root, profile.entry);
     if (!fs.existsSync(entry)) continue;
     const raw = fs.readFileSync(entry, 'utf8');
+    // The Composition section is the profile's list, so only that section is
+    // compared with the manifest. A link in Intent or Conventions is prose
+    // pointing at a page, not a claim that the profile composes it.
     const composition = sectionBody(raw.split(/\r?\n/), 'Composition');
     const actual = new Set([...composition.matchAll(/\[[^\]]+\]\(([^)#]+)(?:#[^)]+)?\)/g)].map((match) => slash(path.relative(root, path.resolve(path.dirname(entry), decodeURIComponent(match[1]))))));
     const expected = new Set(profile.pages ?? []);
@@ -833,13 +768,13 @@ function checkManifest(root, add) {
 }
 
 function manifestRegistry(root) {
-  const absent = { present: false, areas: new Set(), topics: new Set() };
+  const absent = { present: false, areas: new Set() };
   const file = path.join(root, 'standards.manifest.json');
   if (!fs.existsSync(file)) return absent;
   try {
     const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
     const registry = manifest.provisionRegistry ?? {};
-    return { present: true, areas: new Set(registry.areas ?? []), topics: new Set(registry.topics ?? []) };
+    return { present: true, areas: new Set(registry.areas ?? []) };
   } catch {
     return absent;
   }
@@ -847,10 +782,10 @@ function manifestRegistry(root) {
 
 function normalizeTemplate(relative, raw) {
   return raw
-    .replaceAll('{AREA.PAGE.TOPIC.001}', 'TEMPLATE.PAGE.TOPIC.001')
-    .replaceAll('{AREA.PAGE}.CONVENTION.001', 'TEMPLATE.PAGE.CONVENTION.001')
-    .replaceAll('{EXT.NAME.TOPIC.001}', 'EXT.TEMPLATE.TOPIC.001')
-    .replaceAll('{EXT.NAME}.CONVENTION.001', 'EXT.TEMPLATE.CONVENTION.001')
+    .replaceAll('{standards/rule/page.state-one-action}', 'standards/rule/template.state-one-action')
+    .replaceAll('{standards/rule/page.use-one-default}', 'standards/rule/template.use-one-default')
+    .replaceAll('{standards/rule/page.state-one-extension-action}', 'standards/rule/template.state-one-extension-action')
+    .replaceAll('{standards/rule/page.use-one-extension-default}', 'standards/rule/template.use-one-extension-default')
     .replaceAll('{Topic Title}', 'Topic Title')
     .replaceAll('{Extension Title}', 'Extension Title')
     .replaceAll('{How-To Title}', 'How-To Title')
@@ -885,19 +820,23 @@ export function validateRepository(rootInput = '.') {
   for (const file of currentMarkdown) {
     const relative = slash(path.relative(root, file));
     if (/^templates\/standard\//.test(relative)) continue;
+    if (RESERVED_TEMPLATE_STEMS.has(relative)) {
+      add(relative, 1, 'ID_PAGE_FILENAME', `'${relative}' is the virtual path an authoring template parses as; rename the page so its scope is its own`);
+      continue;
+    }
     const raw = fs.readFileSync(file, 'utf8');
     const prose = stripFences(raw.split(/\r?\n/)).map((item) => item.line).join('\n');
     const nonAscii = prose.match(/[^\x00-\x7F]/);
-    if (nonAscii) add(relative, lineNumber(prose, nonAscii.index), 'PROSE_NON_ASCII', `non-ASCII character U+${nonAscii[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
+    if (nonAscii) add(relative, lineNumber(prose, nonAscii.index), 'PROSE_NON_ASCII', nonAsciiMessage(nonAscii[0], 'non-ASCII character '));
     parsedPages.push({ relative, raw, parsed: parsePage(relative, raw, add, globalIds) });
     if (relative === 'AGENTS.md' || relative.endsWith('/project-agents.md')) checkAgentProjection(relative, raw, add);
   }
 
-  // Provision identity comes from the path. The directory names the area and the file
-  // stem names the page, so two pages cannot share a scope: the filesystem already
-  // forbids a duplicate stem inside one directory. Only the word lists are declared.
+  // Provision identity comes from the path and the heading. The page segment is
+  // <area>-<stem>, so it names the page without a lookup, and the slug is the
+  // heading slug, so the identifier and the heading cannot drift apart.
+  // (standards/rule/core-authoring.identifier-must-follow-format)
   const registry = manifestRegistry(root);
-  const usedTopics = new Set();
   for (const page of registry.present ? parsedPages : []) {
     const provisions = page.parsed.provisions ?? [];
     if (!provisions.length) continue;
@@ -907,32 +846,20 @@ export function validateRepository(rootInput = '.') {
       continue;
     }
     const [, areaDir, stem] = parts;
-    const scope = `${areaDir.toUpperCase()}.${stem.toUpperCase()}`;
+    const pageSegment = `${areaDir}-${stem}`;
     if (!registry.areas.has(areaDir.toUpperCase())) {
       add(page.relative, 1, 'ID_AREA_UNKNOWN', `directory '${areaDir}' is not a registered provisionRegistry area`);
     }
     for (const provision of provisions) {
-      if (!provision.id.startsWith(`${scope}.`)) {
-        add(page.relative, provision.line, 'ID_SCOPE_MISMATCH', `provision '${provision.id}' does not use the page scope '${scope}' its path derives`);
+      const parsed = parseProvisionId(provision.id);
+      if (!parsed) continue;
+      if (parsed.page !== pageSegment) {
+        add(page.relative, provision.line, 'ID_SCOPE_MISMATCH', `provision '${provision.id}' does not name the page '${pageSegment}' its path derives`);
       }
-      const topic = provision.id.split('.')[2];
-      usedTopics.add(topic);
-      if (topic === stem.toUpperCase()) {
-        add(page.relative, provision.line, 'ID_TOPIC_REPEATS_PAGE', `provision '${provision.id}' repeats its page name as its topic, so the topic names nothing`);
-      }
-      if (!registry.topics.has(topic)) {
-        add(page.relative, provision.line, 'ID_TOPIC_UNKNOWN', `topic '${topic}' is not a registered provisionRegistry topic`);
+      if (parsed.slug !== headingSlug(provision.title)) {
+        add(page.relative, provision.line, 'ID_SLUG_MISMATCH', `provision '${provision.id}' slug does not match its heading`);
       }
     }
-  }
-  // One concept, one spelling. Regular and -ies plurals both count as the same word.
-  const singular = (topic) => (topic.endsWith('IES') ? `${topic.slice(0, -3)}Y` : topic.endsWith('SES') ? topic.slice(0, -2) : topic.endsWith('S') ? topic.slice(0, -1) : null);
-  for (const topic of registry.present ? registry.topics : []) {
-    const other = singular(topic);
-    if (other && registry.topics.has(other)) {
-      add('standards.manifest.json', 1, 'ID_TOPIC_DUPLICATE', `topics '${other}' and '${topic}' name one concept in two forms`);
-    }
-    if (!usedTopics.has(topic)) add('standards.manifest.json', 1, 'ID_TOPIC_UNUSED', `provisionRegistry registers topic '${topic}', which no provision uses`);
   }
 
   const activeIds = new Set(globalIds.keys());
@@ -955,7 +882,7 @@ export function validateRepository(rootInput = '.') {
     const virtualRelative = TEMPLATE_VIRTUAL_PATH[name] ?? 'docs/core/template.md';
     const normalized = normalizeTemplate(relative, fs.readFileSync(file, 'utf8'));
     const nonAscii = stripFences(normalized.split(/\r?\n/)).map((item) => item.line).join('\n').match(/[^\x00-\x7F]/);
-    if (nonAscii) add(relative, 1, 'PROSE_NON_ASCII', `authoring template contains non-ASCII character U+${nonAscii[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
+    if (nonAscii) add(relative, 1, 'PROSE_NON_ASCII', nonAsciiMessage(nonAscii[0], 'authoring template contains non-ASCII character '));
     parsePage(virtualRelative, normalized, add, globalIds, true);
     checkProse(relative, normalized, pageClass(virtualRelative), add);
   }
@@ -965,7 +892,7 @@ export function validateRepository(rootInput = '.') {
 
   // The provision index is derived. A stale page would send a reader to the wrong
   // heading, so the gate compares it with the active standards.
-  // (CORE.AUTHORING.INDEX.001)
+  // (standards/rule/core-authoring.regenerate-the-provision-index)
   const indexFile = path.join(root, INDEX_PATH);
   if (fs.existsSync(indexFile)) {
     const expected = `${buildProvisionIndex(root)}\n`;
@@ -983,7 +910,6 @@ export function validateRepository(rootInput = '.') {
       const project = JSON.parse(fs.readFileSync(projectTemplate, 'utf8'));
       for (const override of project.overrides ?? []) {
         if (!activeIds.has(override.provisionId)) add('templates/consumer/standards.project.json', 1, 'OVERRIDE_UNKNOWN_ID', `override references unknown Standard '${override.provisionId}'`);
-        else if (/\.CONVENTION\.\d+$/.test(override.provisionId)) add('templates/consumer/standards.project.json', 1, 'OVERRIDE_CONVENTION_ID', `override cannot reference Convention '${override.provisionId}'`);
       }
     } catch {
       // Schema diagnostics report invalid JSON.
@@ -992,12 +918,12 @@ export function validateRepository(rootInput = '.') {
 
   // The template index is the only map from a template file to the consumer path
   // it targets. A renamed template leaves a row pointing at nothing, and that row
-  // reads exactly like a correct one. (CORE.PRINCIPLES.SOURCE.001)
+  // reads exactly like a correct one. (standards/rule/core-principles.keep-one-authored-source)
   checkTemplateIndex(root, add);
 
   // A reader who cannot tell a tutorial from a reference opens both and trusts
   // neither, so the documentation root names each class before it links to one.
-  // (CORE.AUTHORING.INDEX.002)
+  // (standards/rule/core-authoring.route-the-reader-before-listing-pages)
   checkRootIndexRouting(root, add);
 
   diagnostics.sort((left, right) => left.relative.localeCompare(right.relative) || left.line - right.line || left.code.localeCompare(right.code));
@@ -1063,10 +989,33 @@ function checkTemplateIndex(root, add) {
   }
 }
 
+const USAGE = `Usage: node tools/validate-standards.mjs [repositoryRoot] [--warnings] [--format=json] [--help]
+
+Validates the authoring contract over the standards repository at repositoryRoot,
+which defaults to the current directory.
+
+  --warnings      List every warning occurrence instead of a count per code.
+  --format=json   Write one JSON object on stdout instead of human-readable lines.
+  --help          Print this text and exit.
+
+Exit codes: 0 no error, 1 at least one error, 2 usage error.`;
+
 function runCli() {
-  const args = process.argv.slice(2).filter((value) => value !== '--warnings');
+  const flags = process.argv.slice(2).filter((value) => value.startsWith('-'));
+  if (flags.includes('--help') || flags.includes('-h')) {
+    console.log(USAGE);
+    process.exit(0);
+  }
+  const json = flags.includes('--format=json');
+  const unknown = flags.filter((value) => value !== '--warnings' && value !== '--format=json');
+  if (unknown.length) {
+    console.error(`Unknown option ${unknown.join(', ')}`);
+    console.error(USAGE);
+    process.exit(2);
+  }
+  const args = process.argv.slice(2).filter((value) => !value.startsWith('-'));
   if (args.length > 1) {
-    console.error('Usage: node tools/validate-standards.mjs [repositoryRoot] [--warnings]');
+    console.error(USAGE);
     process.exit(2);
   }
   const result = validateRepository(args[0] ?? '.');
@@ -1077,6 +1026,19 @@ function runCli() {
   const warningCodes = new Set(WARNING_DIAGNOSTIC_CODES);
   const errors = result.diagnostics.filter((diagnostic) => !warningCodes.has(diagnostic.code));
   const warnings = result.diagnostics.filter((diagnostic) => warningCodes.has(diagnostic.code));
+  // A machine reader needs the file, the line, and the stable code as fields. A
+  // reader that has to parse the human lines back apart breaks the first time a
+  // message is reworded, so the tool emits the structure it already holds.
+  if (json) {
+    console.log(JSON.stringify({
+      tool: 'validate-standards',
+      root: path.resolve(args[0] ?? '.'),
+      ok: errors.length === 0,
+      errors: errors.map(({ relative, line, code, message }) => ({ file: relative, line, code, message })),
+      warnings: warnings.map(({ relative, line, code, message }) => ({ file: relative, line, code, message })),
+    }, null, 2));
+    process.exit(errors.length ? 1 : 0);
+  }
   for (const diagnostic of errors) console.error(`${diagnostic.relative}:${diagnostic.line} [${diagnostic.code}] ${diagnostic.message}`);
   if (warnings.length) {
     const counts = new Map();

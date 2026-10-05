@@ -40,6 +40,10 @@ The only external mutation entry point for an aggregate.
 
 The complete lifecycle condition represented by one abstract `{Aggregate}State` record and one or more sealed state records.
 
+## Architecture layer
+
+One project boundary in the backend solution: Domain, Application, Infrastructure, or WebApi.
+
 ## Audit record
 
 One entry in the audit trail, stating the actor, action, target, outcome, time, origin, and reason for one attempted action.
@@ -74,7 +78,7 @@ A replaceable default for a name, location, file shape, or implementation patter
 
 ## Convention ID
 
-A provision ID whose topic segment is `CONVENTION`, such as `BACKEND.API.CONVENTION.001`, which marks a replaceable default.
+A provision ID whose topic segment is `CONVENTION`, such as `standards/rule/backend-api.use-this-endpoint-layout`, which marks a replaceable default.
 
 ## Current standards material
 
@@ -142,7 +146,7 @@ A versioned message contract delivered outside the bounded context.
 
 ## Layer
 
-One of the four depths a documentation page answers at, from a first working result down to the mechanism a command runs.
+One of the four depths a documentation page answers at, named by number, and distinct from an architecture layer.
 
 ## Module
 
@@ -164,9 +168,9 @@ One authored Markdown file under `docs/`, carrying the section contract of its p
 
 One of `topic`, `profile`, `extension`, `tutorial`, `how-to`, `reference`, `command`, `index`, or `glossary`, which selects the required section order for a page.
 
-## Page scope
+## Page segment
 
-The `AREA.PAGE` prefix that `standards.manifest.json` declares for one normative page, such as `FRONTEND.COMPONENTS`.
+The `<area>-<stem>` segment of a provision ID that names its owning page, such as `frontend-components`.
 
 ## Persistence constraint
 
@@ -190,7 +194,7 @@ One identified Standard or Convention block with one Requirement or replaceable 
 
 ## Provision ID
 
-The four-segment `AREA.PAGE.TOPIC.NNN` identifier of one provision, such as `FRONTEND.COMPONENTS.OWNERSHIP.001`.
+The `standards/<kind>/<page>.<heading-slug>` identifier of one provision, such as `standards/rule/frontend-components.compose-composites-in-page-code`.
 
 ## Query
 
@@ -199,6 +203,10 @@ An Application message that reads a Read Model without changing business state.
 ## Read Model
 
 Data shaped for a Query without aggregate loading or mutation.
+
+## Reference cast
+
+The one specification every scenario draws its people, place, dates, and amounts from.
 
 ## Reference page
 
@@ -215,6 +223,10 @@ A Domain-owned port that loads and stages complete aggregates without exposing g
 ## Risk
 
 A use-case metadata value that activates additional specification and verification for a named area of potential harm or failure.
+
+## Scenario
+
+One concrete occasion for a specification's subject, stating who acts, what surrounds them, and what they would do instead.
 
 ## Specification
 

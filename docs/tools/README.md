@@ -4,7 +4,9 @@
 
 Each page here documents one command the repository ships: its arguments, its options, its exit codes, and what it runs underneath.
 
-Every command is dependency-free Node and runs with no install step.
+Every command is dependency-free Node and runs with no install step. The floor is Node 22. The workflow runs every fixture suite on Node 22 and on the pinned Node 24 release, so the floor is tested rather than asserted.
+
+Every command accepts `--help`, and every validator accepts `--format=json` for a caller that reads the result rather than the text.
 
 ## Standards repository
 

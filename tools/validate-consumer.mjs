@@ -18,15 +18,91 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checkProseMeasures, checkLanguage, checkLanguageInSource, compileLanguage } from './prose.mjs';
+import { RuleIdentifierScan, MultiFormScan, projectSources } from './identifiers.mjs';
 
+const USAGE = `Usage: node tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
+
+Validates the consumer specification set at consumerRoot, which defaults to the
+current directory. The consumer must contain standards.project.json.
+
+  --prose         List every controlled-prose measure behind the reported counts.
+  --format=json   Write one JSON object on stdout instead of human-readable lines.
+  --help          Print this text and exit.
+
+Exit codes: 0 no problem, 1 at least one problem, 2 usage error.`;
+
+const flags = process.argv.slice(2).filter((a) => a.startsWith('-'));
+if (flags.includes('--help') || flags.includes('-h')) {
+  console.log(USAGE);
+  process.exit(0);
+}
+const unknownFlags = flags.filter((a) => a !== '--prose' && a !== '--format=json');
+if (unknownFlags.length) {
+  console.error(`Unknown option ${unknownFlags.join(', ')}`);
+  console.error(USAGE);
+  process.exit(2);
+}
+const jsonOutput = flags.includes('--format=json');
 // The root is the first argument that is not a flag, so an option can be passed
 // without being read as the consumer directory.
-const root = path.resolve(process.argv.slice(2).find((a) => !a.startsWith('--')) ?? '.');
+const root = path.resolve(process.argv.slice(2).find((a) => !a.startsWith('-')) ?? '.');
 const errors = [];
 const err = (m) => errors.push(m);
 
 function readJson(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
+}
+
+// `fs.globSync` arrived in Node 22 and is still marked experimental, so calling
+// it puts a runtime floor on every consumer of this repository without the
+// repository stating one. The walker below reads the same patterns through
+// `fs.readdirSync`, which every maintained Node release has. It returns files
+// only, so a caller needs no second filesystem call per match.
+const GLOB_IGNORED = new Set(['node_modules', '.git', 'bin', 'obj', '.next', 'dist', 'build', 'out', 'coverage']);
+
+function globSegment(segment) {
+  let expression = '';
+  for (const character of segment) {
+    if (character === '*') expression += '[^/]*';
+    else if (character === '?') expression += '[^/]';
+    else expression += character.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  }
+  return new RegExp(`^${expression}$`);
+}
+
+function globFiles(from, pattern) {
+  const segments = pattern.split('/').filter((segment) => segment.length && segment !== '.');
+  const results = new Set();
+  const visit = (directory, index, prefix) => {
+    if (index >= segments.length) return;
+    let entries;
+    try {
+      entries = fs.readdirSync(directory, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    const segment = segments[index];
+    const last = index === segments.length - 1;
+    // '**' matches zero or more directories. The rest of the pattern is tried
+    // at this level first, then inside every subdirectory.
+    if (segment === '**') {
+      visit(directory, index + 1, prefix);
+      for (const entry of entries) {
+        if (!entry.isDirectory() || GLOB_IGNORED.has(entry.name)) continue;
+        visit(path.join(directory, entry.name), index, prefix ? `${prefix}/${entry.name}` : entry.name);
+      }
+      return;
+    }
+    const matcher = globSegment(segment);
+    for (const entry of entries) {
+      if (!matcher.test(entry.name)) continue;
+      const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (last && entry.isFile()) results.add(relative);
+      else if (!last && entry.isDirectory() && !GLOB_IGNORED.has(entry.name)) visit(path.join(directory, entry.name), index + 1, relative);
+    }
+  };
+  visit(from, 0, '');
+  return [...results].sort();
 }
 
 // ---- locate consumer paths -------------------------------------------------
@@ -39,7 +115,7 @@ const project = readJson(projectFile);
 // The documentation root is configuration, not a constant. A hard-coded docs/
 // scans nothing in a consumer that keeps its pages elsewhere, and a scan of
 // nothing reports PASS. 'docs' stays the default because that is the layout the
-// standards describe. (CORE.AUTHORING.METADATA.004)
+// standards describe. (standards/rule/core-authoring.classify-every-specification-file)
 const docsPath = project.paths?.docs ?? 'docs';
 const docsRoot = path.join(root, docsPath);
 const domainDocs = path.join(root, (project.paths?.domainDocs ?? 'docs/domain'));
@@ -49,7 +125,7 @@ const domainDocs = path.join(root, (project.paths?.domainDocs ?? 'docs/domain'))
 const configuredPaths = [
   ['paths.docs', project.paths?.docs, 'the Markdown scan finds no specification to check'],
   ['paths.domainDocs', project.paths?.domainDocs, 'the use-case, workflow, and policy cross-file checks resolve nothing'],
-  ['paths.uiDocs', project.paths?.uiDocs, 'the controlled UI page checks resolve nothing'],
+  ['paths.uiDocs', project.paths?.uiDocs, 'the UI documentation root it names is missing'],
   ['paths.apiSolution', project.paths?.apiSolution, 'the backend checks have no solution to read'],
 ];
 for (const [field, value, consequence] of configuredPaths) {
@@ -60,7 +136,7 @@ for (const [field, value, consequence] of configuredPaths) {
 // Navigation and prose pages carry no structured metadata, so the project names
 // the path prefixes that hold them. A declared prefix is a decision a reviewer
 // can see and count; an undeclared page with no metadata block is a file nobody
-// knows went unchecked. (CORE.AUTHORING.METADATA.004)
+// knows went unchecked. (standards/rule/core-authoring.classify-every-specification-file)
 const declaredUnstructured = project.paths?.unstructuredDocs;
 if (declaredUnstructured !== undefined && !Array.isArray(declaredUnstructured)) {
   err('standards.project.json: paths.unstructuredDocs must be an array of repository-relative paths');
@@ -74,7 +150,7 @@ for (const entry of Array.isArray(declaredUnstructured) ? declaredUnstructured :
 }
 // A selection is either a bare id or an object recording the criterion that was
 // met and the date it is next reviewed. Both forms resolve to one id here.
-// (CORE.SCOPE.EXTENSIONS.001, CORE.SCOPE.EXTENSIONS.002)
+// (standards/rule/core-scope.select-conditional-extensions-explicitly, standards/rule/core-scope.record-selected-extensions)
 const selections = (project.selectedExtensions ?? []).map((entry) => (
   typeof entry === 'string' ? { id: entry } : entry ?? {}
 ));
@@ -100,6 +176,12 @@ if (manifest?.version) {
   }
 }
 
+// A profile the pinned release does not ship selects no page, so every
+// profile-scoped provision would pass by applying to nothing.
+if (manifest?.profiles && project.profile && !Object.hasOwn(manifest.profiles, project.profile)) {
+  err(`standards.project.json: profile '${project.profile}' is not one the pinned standards ship (${Object.keys(manifest.profiles).join(', ')})`);
+}
+
 const extScope = new Map();       // id -> activationScope
 const extKinds = new Map();       // id -> Set(applicableKinds)
 if (manifest?.extensions) {
@@ -110,7 +192,7 @@ if (manifest?.extensions) {
   // A selection is checked against the manifest, not only against itself.
   // applicableExtensions is compared to selectedExtensions further down, so two
   // consistent lists of ids that no longer exist would otherwise validate
-  // cleanly through a release that renamed them. (CORE.SCOPE.EXTENSIONS.002)
+  // cleanly through a release that renamed them. (standards/rule/core-scope.record-selected-extensions)
   const known = [...extScope.keys()].sort();
   for (const id of selected) {
     if (!extScope.has(id)) {
@@ -121,7 +203,7 @@ if (manifest?.extensions) {
 
 // An extension selected without a surface costs nothing to keep, so nobody
 // removes it. A recorded review date makes the selection expire rather than
-// accumulate. (CORE.PRINCIPLES.COMPLEXITY.002)
+// accumulate. (standards/rule/core-principles.select-extensions-by-criteria)
 const today = new Date().toISOString().slice(0, 10);
 for (const entry of selections) {
   if (!entry.reviewBy) continue;
@@ -133,6 +215,10 @@ for (const entry of selections) {
 // ---- schema-equivalent kind rules ------------------------------------------
 const ID = /^[a-z][a-z0-9-]*$/;
 const REC = /^[a-z0-9][a-z0-9-]*$/;
+// A use case and an aggregate carry their kind as a first segment, so the
+// identifier states what it names without a lookup. (standards/rule/backend-identifiers.state-the-identifier-grammar)
+const USE_CASE = /^use-case\/[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$/;
+const AGGREGATE = /^aggregate\/[a-z][a-z0-9-]*$/;
 const UC = /^[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$/;
 // Each pattern carries its shape in words. Regex source names character classes
 // and not the convention, so an author who is shown one still guesses.
@@ -140,6 +226,8 @@ const FORM = new Map([
   [ID, "lower kebab-case, for example 'orders'"],
   [REC, "lower kebab-case with a letter or digit first, for example '0001-cancel-order'"],
   [UC, "'<module>.<name>' in lower kebab-case, for example 'orders.cancel-order'"],
+  [USE_CASE, "'use-case/<module>.<name>' in lower kebab-case, for example 'use-case/orders.cancel-order'"],
+  [AGGREGATE, "'aggregate/<root>' in lower kebab-case, for example 'aggregate/order'"],
 ]);
 const SPEC = ['draft', 'approved', 'retired'];
 const IMPL = ['planned', 'implemented', 'verified'];
@@ -154,16 +242,16 @@ const SINGLETON_KINDS = new Set(['product', 'domain-index', 'glossary', 'modules
 // A kind whose absence is a finding rather than a stage the consumer has not
 // reached. Every Scenario section draws from one cast, so a documentation set
 // with scenarios and no cast has as many reference worlds as it has pages.
-// (CORE.SYSTEM.SCENARIO.003)
+// (standards/rule/core-system.derive-every-scenario-from-one-reference-cast)
 const REQUIRED_SINGLETON_KINDS = new Set(['product', 'scenario-cast']);
 // The kinds whose subject is behavior a person experiences, and therefore the
 // kinds a reader cannot place without one concrete occasion.
-// (CORE.SYSTEM.SCENARIO.001)
+// (standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
 const SCENARIO_KINDS = new Set(['module', 'aggregate', 'use-case', 'domain-policy', 'end-to-end-flow']);
 // A scenario illustrates its page and never governs it. An identifier inside one
 // reads as a second definition of the rule it names, and two definitions drift.
-// (CORE.SYSTEM.SCENARIO.002)
-const RULE_ID = /\b(?:INV|POL|VAL|AC|E2E)-[A-Z0-9][A-Z0-9-]*\b/;
+// (standards/rule/core-system.keep-a-scenario-informative)
+const RULE_ID = /\b(?:invariant|policy|validation|acceptance-criterion)\/[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+\b|\bE2E-[A-Z0-9][A-Z0-9-]*\b/;
 const SCENARIO_WORD_DEFAULT = 120;
 const declaredWordLimit = project.scenarioWordLimit;
 if (declaredWordLimit !== undefined && (!Number.isInteger(declaredWordLimit) || declaredWordLimit < 40)) {
@@ -185,26 +273,38 @@ const KINDS = {
   // behavior a person experiences, so none carries a Scenario, and none is a
   // singleton. Each declares the H2 order its class answers at, because a command
   // page that omits Underneath hides the mechanism it wraps.
-  // (CORE.AUTHORING.DISCLOSURE.002, CORE.AUTHORING.DISCLOSURE.003)
+  // (standards/rule/core-authoring.state-one-layer-per-page, standards/rule/core-authoring.name-the-escape-from-every-abstraction)
   tutorial: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Purpose', 'Prerequisites', 'Lesson', 'What you built'] },
   'how-to': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Purpose', 'Procedure', 'Verification'] },
   reference: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Reference'] },
   command: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'] },
   configuration: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: ID, sections: ['Intent', 'Settings', 'Precedence'] },
-  module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID },
-  aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: UC },
-  'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: UC },
+  // The three behavior kinds open with a card that lifts from the sections
+  // below it. Only the card sections are listed: a module that owns no
+  // aggregate drops the aggregate tables, so a full list would report a correct
+  // page. (standards/rule/core-authoring.use-the-declared-page-contract)
+  module: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: ID, sections: ['Module map'] },
+  aggregate: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, applicableExtensions: 1 }, id: AGGREGATE, sections: ['At a glance', 'Terms used'] },
+  'use-case': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'operationType', 'actors', 'entryPoints', 'risks', 'applicableExtensions'], props: { ...base, implementationStatus: 1, operationType: 1, actors: 1, entryPoints: 1, risks: 1, applicableExtensions: 1 }, id: USE_CASE, sections: ['Business impact', 'Terms used'] },
   'end-to-end-flow': { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'useCases'], props: { ...base, implementationStatus: 1, useCases: 1, applicableExtensions: 1 }, id: ID },
   workflow: { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'participatingModules', 'applicableExtensions'], props: { ...base, implementationStatus: 1, participatingModules: 1, applicableExtensions: 1 }, id: ID },
   'domain-policy': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'appliesToModules'], props: { ...base, appliesToModules: 1, applicableExtensions: 1 }, id: ID },
   'decision-evidence': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   'operating-limits': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
-  page: { req: ['kind', 'id', 'specStatus', 'implementationStatus', 'owner', 'lastReviewed', 'app', 'route', 'useCases'], props: { ...base, implementationStatus: 1, app: 1, route: 1, useCases: 1, applicableExtensions: 1 }, id: UC },
+  // The route code is the page contract. No page record describes a route in prose.
   decision: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   runbook: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   'release-record': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'release'], props: { ...base, release: 1 }, id: REC },
 };
 const KIND_NAMES = Object.keys(KINDS);
+// The leading callout of a behavior kind, and the section that states the
+// subject it precedes. The terms callout sits between the two.
+// (standards/rule/core-authoring.use-the-declared-page-contract)
+const LEAD_CALLOUTS = {
+  module: { lead: 'Module map', anchor: 'Purpose' },
+  aggregate: { lead: 'At a glance', anchor: 'Purpose', terms: 'Terms used' },
+  'use-case': { lead: 'Business impact', anchor: 'Goal', terms: 'Terms used' },
+};
 
 // A consumer that rules a kind out in its own instructions still gets a clean
 // PASS from the agent that writes one anyway, so the prohibition is advice. The
@@ -219,6 +319,11 @@ for (const entry of Array.isArray(declaredProhibited) ? declaredProhibited : [])
   if (typeof entry !== 'string' || !(entry in KINDS)) { err(`standards.project.json: prohibitedKinds '${entry}' is not a specification kind; expected one of ${KIND_NAMES.join(', ')}`); continue; }
   prohibitedKinds.add(entry);
 }
+
+// A use case records what invokes it. The Consumers sections are checked after
+// the loop, against the surfaces the project declares.
+// (standards/rule/core-system.name-what-calls-a-use-case)
+const useCasePages = new Map(); // use-case id -> {rel, file, implementationStatus, consumers}
 
 // ---- collect files ---------------------------------------------------------
 const files = [];
@@ -240,14 +345,15 @@ const metas = []; // {rel, meta, file}
 const singletons = new Map();     // kind -> [paths]
 const acDefs = new Map();  // id -> [rel]
 const e2eDefs = new Map(); // id -> [rel]
+const pathDefs = new Set(); // path ids any specification names
 let uiOutput = '';
 
 // Specification Metadata is a '---' delimited JSON block, per
-// CORE.AUTHORING.METADATA.002. A file that carries a metadata object in any other
+// standards/rule/core-authoring.declare-structured-specification-metadata. A file that carries a metadata object in any other
 // wrapper, or carries none at all, is reported rather than skipped, because a
 // silently skipped specification is an unvalidated specification: the run passes
 // while that page sits unchecked beside every page that was checked.
-// (CORE.AUTHORING.METADATA.004)
+// (standards/rule/core-authoring.classify-every-specification-file)
 function parseBlock(raw, rel) {
   if (!raw.startsWith('---')) {
     const fenced = raw.slice(0, 2000).match(/```[a-z]*\s*\n\s*\{[\s\S]{0,400}?"kind"\s*:/);
@@ -305,8 +411,11 @@ for (const f of files) {
   if (/(^|\/)research\//.test(rel) && !hasMeta) continue;
 
   // acceptance and end-to-end id definitions (bracket form)
-  for (const m of raw.matchAll(/\[(AC-[A-Z0-9-]+)\]/g)) (acDefs.get(m[1]) ?? acDefs.set(m[1], []).get(m[1])).push(rel);
+  for (const m of raw.matchAll(/\[(acceptance-criterion\/[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+)\]/g)) (acDefs.get(m[1]) ?? acDefs.set(m[1], []).get(m[1])).push(rel);
   for (const m of raw.matchAll(/\[(E2E-[A-Z0-9-]+)\]/g)) (e2eDefs.get(m[1]) ?? e2eDefs.set(m[1], []).get(m[1])).push(rel);
+  // A path is declared wherever a specification names it, normally in the Paths
+  // table of its use case. A browser-test title resolves against this set.
+  for (const m of raw.matchAll(/(?<![A-Za-z0-9_/.-])(path\/[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*){2,})(?![A-Za-z0-9_/-])/g)) pathDefs.add(m[1]);
 
   // internal link resolution
   const dir = path.dirname(f);
@@ -342,14 +451,30 @@ for (const f of files) {
   if (meta.operationType !== undefined && !OPERATION_TYPES.includes(meta.operationType)) err(`${rel}: bad operationType '${meta.operationType}'; expected one of ${OPERATION_TYPES.join(', ')}`);
   if (Array.isArray(meta.risks)) for (const r of meta.risks) if (!RISK.includes(r)) err(`${rel}: bad risk '${r}'; expected one of ${RISK.join(', ')}`);
   for (const a of ['actors', 'entryPoints', 'applicableExtensions']) if (Array.isArray(meta[a])) for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`);
-  for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!UC.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(UC)}`); }
+  for (const a of ['useCases']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!USE_CASE.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(USE_CASE)}`); }
   for (const a of ['participatingModules', 'appliesToModules']) if (Array.isArray(meta[a])) { if (!meta[a].length) err(`${rel}: ${a} empty`); for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`); }
 
   // A documentation kind declares the sections its reader expects to find. An
   // absent section is a question the page never answered, which reads exactly
-  // like a question with no answer. (CORE.AUTHORING.PAGE.001)
+  // like a question with no answer. (standards/rule/core-authoring.use-the-declared-page-contract)
   for (const name of spec.sections ?? []) {
     if (sectionBody(raw, name) === null) err(`${rel}: kind '${meta.kind}' requires an H2 '${name}'; a section with nothing to say contains only 'None.'`);
+  }
+
+  // The section loop above proves a callout exists; a callout at the foot of a
+  // page exists and reaches no reader. The first H2 after the metadata block is
+  // the leading callout, and the terms callout sits between it and the section
+  // that states the subject. (standards/rule/core-authoring.use-the-declared-page-contract)
+  const callout = LEAD_CALLOUTS[meta.kind];
+  if (callout) {
+    const headings = [...raw.slice(raw.indexOf('\n---', 3)).matchAll(/^## (.+)$/gm)].map((match) => match[1].trim());
+    const lead = headings.indexOf(callout.lead);
+    if (lead > 0) err(`${rel}: kind '${meta.kind}' requires an H2 '${callout.lead}' as the first section, before '${callout.anchor}'`);
+    if (callout.terms && lead === 0) {
+      const terms = headings.indexOf(callout.terms);
+      const anchor = headings.indexOf(callout.anchor);
+      if (terms >= 0 && anchor >= 0 && terms > anchor) err(`${rel}: kind '${meta.kind}' requires an H2 '${callout.terms}' after '${callout.lead}' and before '${callout.anchor}'`);
+    }
   }
 
   if (SINGLETON_KINDS.has(meta.kind)) {
@@ -357,12 +482,13 @@ for (const f of files) {
     singletons.get(meta.kind).push(rel);
   }
   if (meta.kind === 'end-to-end-flow') {
-    for (const uc of meta.useCases ?? []) { const [mod, name] = uc.split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
+    for (const uc of meta.useCases ?? []) { const [mod, name] = uc.replace(/^use-case\//, '').split('.'); if (!useCaseFile(mod, name)) err(`${rel}: useCase '${uc}' has no file`); }
   }
   if (meta.kind === 'workflow') for (const mod of meta.participatingModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: participatingModule '${mod}' has no module dir`);
   if (meta.kind === 'domain-policy') for (const mod of meta.appliesToModules ?? []) if (!fs.existsSync(path.join(domainDocs, 'modules', mod))) err(`${rel}: appliesToModule '${mod}' has no module dir`);
   if (meta.kind === 'use-case') {
-    const [mod, name] = String(meta.id).split('.');
+    useCasePages.set(String(meta.id), { rel, file: f, implementationStatus: meta.implementationStatus, consumers: sectionBody(raw, 'Consumers') });
+    const [mod, name] = String(meta.id).replace(/^use-case\//, '').split('.');
     // A use-case file sits directly in its module directory, or in one
     // aggregate-root subdirectory of that module.
     const parts = path.relative(path.join(domainDocs, 'modules'), f).replace(/\\/g, '/').split('/');
@@ -371,17 +497,18 @@ for (const f of files) {
     if (!okFlat && !okNested) err(`${rel}: use-case id '${meta.id}' does not match its path`);
   }
   if (meta.kind === 'aggregate') {
-    const [mod, agg] = String(meta.id).split('.');
     // An aggregate README is the README.md of an aggregate-root subdirectory:
-    // modules/<module>/<aggregate-plural>/README.md, id '<module>.<aggregate-plural>'.
+    // modules/<module>/<aggregate-plural>/README.md. The id's anchor is the
+    // singular root type, which only the source can confirm, so this checks the
+    // path and leaves the anchor-to-root match to validate-spec-sync.
     const parts = path.relative(path.join(domainDocs, 'modules'), f).replace(/\\/g, '/').split('/');
-    const ok = parts.length === 3 && parts[0] === mod && parts[1] === agg && parts[2] === 'README.md';
+    const ok = parts.length === 3 && parts[2] === 'README.md' && fs.existsSync(path.join(domainDocs, 'modules', parts[0]));
     if (!ok) err(`${rel}: aggregate id '${meta.id}' does not match its path`);
   }
   // Every other section on these pages states a rule, a state, or a mapping,
   // and none of them says when the behavior happens or who is under pressure
-  // while it does. (CORE.SYSTEM.SCENARIO.001, CORE.SYSTEM.SCENARIO.002,
-  // CORE.SYSTEM.CONVENTION.007)
+  // while it does. (standards/rule/core-system.state-one-occasion-for-every-behavior-specification, standards/rule/core-system.keep-a-scenario-informative,
+  // standards/rule/core-system.bound-a-scenario-to-one-paragraph)
   if (SCENARIO_KINDS.has(meta.kind)) {
     const scenario = sectionBody(raw, 'Scenario');
     if (scenario === null) {
@@ -409,7 +536,7 @@ for (const f of files) {
 // ---- aggregate cross-file checks -------------------------------------------
 // A second domain index, glossary, or modules index is a duplicate authority
 // for one boundary. Only product had been counted, so the other three could be
-// repeated or misapplied to an unrelated directory. (CORE.PRINCIPLES.SOURCE.001)
+// repeated or misapplied to an unrelated directory. (standards/rule/core-principles.keep-one-authored-source)
 for (const kind of SINGLETON_KINDS) {
   const found = singletons.get(kind) ?? [];
   if (found.length === 1) continue;
@@ -419,6 +546,138 @@ for (const kind of SINGLETON_KINDS) {
   }
   err(`Expected at most one ${kind} specification, found ${found.length}: ${found.join(', ')}`);
 }
+// ---- consumer linkage ------------------------------------------------------
+// A route calls use cases from its code, so the edge runs one way and nothing
+// answers the question asked before a change: who breaks if this operation
+// moves. The reverse obligation is a Consumers section on the use case, checked
+// against the surfaces the project declared. (standards/rule/core-system.name-what-calls-a-use-case)
+const declaredSurfaces = new Set([
+  ...(project.paths?.frontends ?? []).map((frontend) => frontend.name).filter(Boolean),
+  ...(project.paths?.surfaces ?? []).map((surface) => surface?.name).filter(Boolean),
+]);
+
+// A row is '| surface | consumer |'. The header and the alignment row carry no
+// consumer, so they are skipped by shape rather than by position: a table that
+// starts one line later still reads correctly.
+function consumerRows(body) {
+  const rows = [];
+  for (const line of body.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('|')) continue;
+    const cells = trimmed.replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim());
+    if (cells.length < 2) continue;
+    if (/^:?-{2,}:?$/.test(cells[0])) continue;
+    const surface = cells[0].replace(/`/g, '').trim();
+    if (!surface || surface.toLowerCase() === 'surface') continue;
+    rows.push({ surface, consumer: cells.slice(1).join(' | ') });
+  }
+  return rows;
+}
+
+const STATES_NONE = /^\s*(?:`?None`?\.?)/i;
+
+for (const [id, page] of useCasePages) {
+  if (page.implementationStatus === 'planned') continue;
+  if (page.consumers === null) {
+    err(`${page.rel}: no 'Consumers' section; an implemented use case names every surface that invokes it, or writes 'None.' with the reason`);
+    continue;
+  }
+  const body = page.consumers.trim();
+  const rows = consumerRows(body);
+  if (!rows.length) {
+    if (!STATES_NONE.test(body)) {
+      err(`${page.rel}: 'Consumers' section names no surface and does not write 'None.'`);
+    } else if (body.replace(STATES_NONE, '').trim().split(/\s+/).filter(Boolean).length < 4) {
+      // 'None.' alone is the same sentence a page nobody wired up would carry.
+      err(`${page.rel}: 'Consumers' writes 'None.' with no reason; state why no surface invokes this use case`);
+    }
+    continue;
+  }
+  for (const row of rows) {
+    if (!declaredSurfaces.has(row.surface)) {
+      err(`${page.rel}: 'Consumers' names surface '${row.surface}'; declare it in standards.project.json 'paths.frontends' or 'paths.surfaces'`);
+    }
+  }
+}
+
+// ---- acceptance citation ---------------------------------------------------
+// The trace rules named a form each and nothing read the test source, so a page
+// could claim 'verified' while no test carried its identifier. Each form is read
+// where its tool puts it: a tag line in a feature file, one trait key in C#, and
+// the opening of a browser-test title. A bare identifier in a comment or a
+// variable name cites nothing. A browser-test title also cites a path, which a
+// specification names in the Paths table of its use case.
+// (standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form,
+// standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion, standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria,
+// standards/rule/frontend-ui.map-every-use-case-path)
+const testRoots = Array.isArray(project.paths?.testRoots) ? project.paths.testRoots : [];
+const GHERKIN_TAG_LINE = /^[ \t]*@[^\n]*$/;
+const ACCEPTANCE = 'acceptance-criterion\\/[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)+';
+const TAG = new RegExp(`@(${ACCEPTANCE})`, 'g');
+const TRAIT = new RegExp(`\\[\\s*Trait\\s*\\(\\s*"AcceptanceCriterion"\\s*,\\s*"(${ACCEPTANCE})"\\s*\\)\\s*\\]`, 'g');
+const PATH_ID = 'path\\/[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*){2,}';
+const TITLE = new RegExp(`['"\`]\\s*\\[(${ACCEPTANCE}|${PATH_ID})\\]`, 'g');
+const TEST_SOURCE = /\.(cs|feature|ts|tsx|js|jsx|mjs)$/;
+
+const citations = new Map(); // acceptance id -> [file]
+let testFiles = 0;
+
+function citationsIn(file, text) {
+  const found = [];
+  if (file.endsWith('.feature')) {
+    for (const line of text.split(/\r?\n/)) {
+      if (!GHERKIN_TAG_LINE.test(line)) continue;
+      for (const match of line.matchAll(TAG)) found.push(match[1]);
+    }
+    return found;
+  }
+  if (file.endsWith('.cs')) {
+    for (const match of text.matchAll(TRAIT)) found.push(match[1]);
+    return found;
+  }
+  for (const match of text.matchAll(TITLE)) found.push(match[1]);
+  return found;
+}
+
+for (const relative of testRoots) {
+  const rootDirectory = path.resolve(root, relative);
+  if (!fs.existsSync(rootDirectory)) {
+    err(`standards.project.json: paths.testRoots names a directory that does not exist '${relative}'`);
+    continue;
+  }
+  const stack = [rootDirectory];
+  while (stack.length) {
+    const current = stack.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      if (entry.name.startsWith('.') || entry.name === 'bin' || entry.name === 'obj' || entry.name === 'node_modules') continue;
+      const candidate = path.join(current, entry.name);
+      if (entry.isDirectory()) { stack.push(candidate); continue; }
+      if (!TEST_SOURCE.test(entry.name)) continue;
+      testFiles += 1;
+      const rel = path.relative(root, candidate).replace(/\\/g, '/');
+      for (const id of citationsIn(entry.name, fs.readFileSync(candidate, 'utf8'))) {
+        if (!citations.has(id)) citations.set(id, []);
+        citations.get(id).push(rel);
+      }
+    }
+  }
+}
+
+for (const [id, locs] of citations) {
+  if (acDefs.has(id) || pathDefs.has(id)) continue;
+  err(`${locs[0]}: cites ${id}, which no specification declares`);
+}
+
+// A page reaches 'verified' only when its evidence is complete, and the
+// criterion citation is that evidence. (standards/rule/core-system.deliver-one-complete-use-case)
+for (const [id, page] of useCasePages) {
+  if (page.implementationStatus !== 'verified') continue;
+  const declared = [...acDefs].filter(([, locs]) => locs.includes(page.rel)).map(([acId]) => acId);
+  if (!declared.length) { err(`${page.rel}: 'verified' and declares no acceptance criterion`); continue; }
+  const uncited = declared.filter((acId) => !citations.has(acId));
+  if (uncited.length) err(`${page.rel}: 'verified' while ${uncited.length} criterion(s) no test cites: ${uncited.slice(0, 3).join(', ')}${uncited.length > 3 ? ', ...' : ''}`);
+}
+
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
 
@@ -426,8 +685,9 @@ for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end
 // silently skips the whole FRONTEND.UI contract, and the omission is
 // indistinguishable from a considered decision. A consumer that is not ready for
 // the contract declares 'other-web' or records an override, which is a visible
-// statement. (FRONTEND.UI.GOVERNANCE.001)
+// statement. (standards/rule/frontend-ui.select-one-visual-authority)
 const PLATFORMS = ['react-web', 'react-native', 'other-web'];
+const controlledFrontends = [];
 for (const frontend of project.paths?.frontends ?? []) {
   const name = frontend?.name ?? '(unnamed)';
   // A declared frontend whose directory is absent reads as a frontend with no
@@ -439,13 +699,40 @@ for (const frontend of project.paths?.frontends ?? []) {
     err(`standards.project.json: frontend '${name}' declares no 'platform'; one of ${PLATFORMS.join(', ')} is required`);
   } else if (!PLATFORMS.includes(frontend.platform)) {
     err(`standards.project.json: frontend '${name}' has unknown platform '${frontend.platform}'; expected one of ${PLATFORMS.join(', ')}`);
+  } else if (frontend.platform === 'react-web') {
+    controlledFrontends.push(frontend);
+  }
+}
+
+// A controlled frontend composes the shared UI package, so the workspace declares
+// it once. The package travels with the workspace rather than with an
+// application, so one missing field is one missing file for every frontend
+// rather than a row per application.
+// (standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package,
+// standards/rule/frontend-ui.track-source-changes,
+// standards/rule/frontend-ui.publish-a-design-contract)
+const uiPackage = project.paths?.uiPackage ?? null;
+if (controlledFrontends.length && !uiPackage) {
+  err(`standards.project.json: ${controlledFrontends.length} controlled frontend(s) and no 'paths.uiPackage'; the shared UI package every React web frontend composes is undeclared`);
+} else if (uiPackage) {
+  const uiPackageLabel = `standards.project.json: paths.uiPackage '${uiPackage.name ?? '(unnamed)'}'`;
+  for (const key of ['path', 'componentsJson', 'primitives', 'tokens', 'sourceLock', 'designContract']) {
+    if (uiPackage[key] !== undefined && !fs.existsSync(path.join(root, uiPackage[key]))) {
+      err(`${uiPackageLabel}: ${key} path does not exist '${uiPackage[key]}'`);
+    }
+  }
+  for (const frontend of controlledFrontends) {
+    const stylesheet = frontend.ui?.globalCss;
+    if (stylesheet !== undefined && !fs.existsSync(path.join(root, stylesheet))) {
+      err(`standards.project.json: frontend '${frontend.name}' ui.globalCss path does not exist '${stylesheet}'`);
+    }
   }
 }
 
 // A React web consumer opts into the deterministic UI validator through its
 // frontend platform declaration or UI block. A recorded UI rule override must
 // carry a live review date.
-const uiActivated = (project.paths?.frontends ?? []).some((frontend) => frontend.ui || frontend.platform === 'react-web')
+const uiActivated = controlledFrontends.length > 0 || Boolean(uiPackage)
   || (project.overrides ?? []).some((override) => uiOverrideScopes.some((scope) => String(override?.provisionId ?? '').startsWith(`${scope}.`)));
 if (uiActivated) {
   // Resolve the sibling validator from this file so a consumer may pin the
@@ -454,7 +741,15 @@ if (uiActivated) {
   if (fs.existsSync(uiValidator)) {
     const result = spawnSync(process.execPath, [uiValidator, root], { encoding: 'utf8' });
     uiOutput = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim();
-    if (result.status !== 0) err('controlled UI validation failed; see the UI validator output above');
+    if (result.status !== 0) {
+      // Each UI problem is carried into this validator's own list rather than
+      // left in a block of text. A caller reading the structured output has no
+      // 'above' to look at, and a caller reading the human output sees the same
+      // problems either way.
+      const lifted = uiOutput.split('\n').filter((line) => line.startsWith('  - ')).map((line) => `controlled UI: ${line.slice(4)}`);
+      if (lifted.length) for (const item of lifted) err(item);
+      else err(`controlled UI validation failed with exit code ${result.status}`);
+    }
   } else {
     err(`controlled UI configuration is present but the UI validator is missing at ${uiValidator}`);
   }
@@ -462,10 +757,10 @@ if (uiActivated) {
 
 // ---- language and controlled prose -----------------------------------------
 // The language record closes the project's vocabulary and its mannered terms.
-// (CORE.AUTHORING.TERM.002, CORE.AUTHORING.TERM.003, CORE.AUTHORING.VOICE.002)
+// (standards/rule/core-authoring.record-the-project-vocabulary-as-data, standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope, standards/rule/core-authoring.state-meaning-literally)
 // The prose measures are the profile in docs/core/authoring.md, applied to the
 // consumer tree rather than only to the standards repository.
-// (CORE.AUTHORING.PROSE.002, CORE.AUTHORING.PROSE.003)
+// (standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation, standards/rule/core-authoring.remove-a-reread-page-from-the-prose-baseline)
 let languageSummary = '';
 {
   const languagePath = project.paths?.language;
@@ -498,7 +793,7 @@ let languageSummary = '';
   // A page carries accepted prose debt only while nobody has re-read it. The
   // baseline records the count and the lastReviewed date it was accepted at, so
   // a page whose date moves has been read against the code and leaves the
-  // baseline in the same change. (CORE.AUTHORING.PROSE.003)
+  // baseline in the same change. (standards/rule/core-authoring.remove-a-reread-page-from-the-prose-baseline)
   const baselinePath = project.prose?.baseline;
   const baselineFile = baselinePath ? path.join(root, baselinePath) : path.join(docsRoot, 'prose-baseline.json');
   let baseline = {};
@@ -533,10 +828,10 @@ let languageSummary = '';
 
   // The documentation tree is one of the surfaces a word reaches, and usually
   // the smallest. A project's source, its interface copy, its API contract and
-  // its acceptance tests carry the same vocabulary to a developer, a buyer and
+  // its acceptance tests carry the same vocabulary to a developer, a customer and
   // a reviewer, and a check that reads only Markdown holds the vocabulary where
   // nobody reads it. `paths.languageScan` names those surfaces.
-  // (CORE.AUTHORING.TERM.004)
+  // (standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets)
   //
   // A scope in the language record is written against the documentation root
   // for a page under it, and against the repository root for one of these
@@ -545,7 +840,7 @@ let languageSummary = '';
   for (const pattern of project.paths?.languageScan ?? []) {
     let matched;
     try {
-      matched = fs.globSync(pattern, { cwd: root }).sort();
+      matched = globFiles(root, pattern);
     } catch (e) {
       err(`standards.project.json: paths.languageScan '${pattern}' could not be read (${e.message})`);
       continue;
@@ -558,7 +853,6 @@ let languageSummary = '';
     }
     for (const relativePath of matched) {
       const absolute = path.join(root, relativePath);
-      if (!fs.statSync(absolute).isFile()) continue;
       const rel = relativePath.replace(/\\/g, '/');
       scannedSurfaces += 1;
       checkLanguageInSource(rel, fs.readFileSync(absolute, 'utf8'), compiled, (_r, line, code, message) => {
@@ -608,11 +902,99 @@ let languageSummary = '';
   }
 }
 
+// ---- identifier shape and the four attributes ------------------------------
+// A classification identifier is a contract between the pages that define it,
+// the code that raises it, and the tests that select it. Every rule on
+// standards/docs/backend/identifiers.md is checked here, because a page that
+// states a rule and nothing reads it states an intention.
+// (standards/rule/backend-identifiers.state-the-identifier-grammar through
+//  standards/rule/backend-identifiers.retire-identifiers-through-the-tombstone-list)
+const identifierContext = {
+  aggregateAnchors: new Set(),
+  moduleAnchors: new Set(),
+  useCaseAnchors: new Set(),
+  useCaseNames: new Set(),
+  policyAnchors: new Set(),
+  sources: projectSources(project),
+  definitions: [],
+  tombstones: new Map(),
+  tombstoneRel: undefined,
+};
+for (const { meta } of metas) {
+  if (!meta) continue;
+  if (meta.kind === 'aggregate' && typeof meta.id === 'string') identifierContext.aggregateAnchors.add(String(meta.id).replace(/^aggregate\//, ''));
+  if (meta.kind === 'module' && typeof meta.id === 'string') identifierContext.moduleAnchors.add(String(meta.id));
+  if (meta.kind === 'domain-policy' && typeof meta.id === 'string') identifierContext.policyAnchors.add(String(meta.id));
+  if (meta.kind === 'use-case' && typeof meta.id === 'string') {
+    const full = String(meta.id).replace(/^use-case\//, '');
+    identifierContext.useCaseAnchors.add(full);
+    identifierContext.useCaseNames.add(full.split('.').slice(1).join('.'));
+  }
+}
+// The module folder is the module anchor, so a module whose page the scan has
+// not reached still resolves its use cases.
+const modulesRoot = path.join(domainDocs, 'modules');
+if (fs.existsSync(modulesRoot)) {
+  for (const entry of fs.readdirSync(modulesRoot, { withFileTypes: true })) {
+    if (entry.isDirectory() && !entry.name.startsWith('.')) identifierContext.moduleAnchors.add(entry.name);
+  }
+}
+
+// The definitions are the active set rules 9 and 10 read: every classification a
+// specification declares in its metadata, and every event classification a type
+// declares in the source. Acceptance criteria are excluded because the duplicate
+// check above already reads them.
+const scanDocs = files.map((f) => ({ rel: path.relative(root, f).replace(/\\/g, '/'), raw: fs.readFileSync(f, 'utf8') }));
+const docText = scanDocs.map((d) => d.raw).join('\n');
+for (const { rel, meta } of metas) {
+  if (meta && typeof meta.id === 'string' && /^[a-z][a-z0-9-]*\//.test(meta.id)) identifierContext.definitions.push({ id: meta.id, rel });
+}
+for (const f of files) {
+  if (path.basename(f) !== 'identifiers-tombstones.md') continue;
+  identifierContext.tombstoneRel = path.relative(root, f).replace(/\\/g, '/');
+  for (const m of fs.readFileSync(f, 'utf8').matchAll(/^-\s+`([^`]+)`\s*->\s*`?([^`\s]+)`?/gm)) identifierContext.tombstones.set(m[1], m[2]);
+}
+
+// The source the four-attribute scan reads is the project's own parity roots. A
+// project that names none has no raised event in this tree to check, and the
+// scan reports nothing rather than a pass over an empty set.
+const sourceFiles = [];
+for (const sourceRoot of Array.isArray(project.parity?.sourceRoots) ? project.parity.sourceRoots : []) {
+  let matched;
+  try { matched = globFiles(root, `${String(sourceRoot).replace(/\/+$/, '')}/**/*.cs`); }
+  catch (e) { err(`standards.project.json: parity.sourceRoots '${sourceRoot}' could not be read (${e.message})`); continue; }
+  for (const relative of matched) sourceFiles.push({ rel: relative, raw: fs.readFileSync(path.join(root, relative), 'utf8') });
+}
+for (const file of sourceFiles) {
+  for (const m of file.raw.matchAll(/Classification\s*=\s*"([^"]*)"/g)) identifierContext.definitions.push({ id: m[1], rel: file.rel });
+}
+const identifiersRead = RuleIdentifierScan({ files: scanDocs, context: identifierContext, err });
+const eventsRead = MultiFormScan({ sourceFiles, docText, context: identifierContext, err });
+const identifierSummary = `Identifiers: ${identifiersRead} classification identifier(s) read; event attributes: ${eventsRead} event type(s) read across ${sourceFiles.length} source file(s)`;
+
 // ---- report ----------------------------------------------------------------
+// A machine reader gets the problems as an array and the counts as fields, so
+// nothing has to be recovered by parsing the human lines back apart.
+if (jsonOutput) {
+  console.log(JSON.stringify({
+    tool: 'validate-consumer',
+    consumer: root,
+    ok: errors.length === 0,
+    scanned: { documentationRoot: docsPath, files: files.length, metadataBlocks: metas.length },
+    acceptanceIds: acDefs.size,
+    acceptanceCitations: citations.size,
+    testFiles,
+    endToEndIds: e2eDefs.size,
+    problems: errors,
+  }, null, 2));
+  process.exit(errors.length ? 1 : 0);
+}
 console.log(`Consumer: ${root}`);
 console.log(`Files scanned: ${files.length} under ${docsPath}, metadata blocks: ${metas.length}`);
 console.log(languageSummary);
+console.log(identifierSummary);
 console.log(`Acceptance ids: ${acDefs.size}, end-to-end test ids: ${e2eDefs.size}`);
+if (testRoots.length) console.log(`Acceptance citations: ${citations.size} of ${acDefs.size} criteria cited across ${testFiles} test source file(s)`);
 if (uiOutput) console.log(`\n${uiOutput}`);
 if (errors.length) {
   console.log(`\nFAIL (${errors.length} problem(s)):`);

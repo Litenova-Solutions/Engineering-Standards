@@ -3,139 +3,177 @@
 ## Intent
 
 
-Next.js route files should expose server-first page composition and make browser-only boundaries explicit. The rendering choice follows data ownership and interaction needs rather than convenience.
+A route file answers three questions: what address is this, what data does it need, and which floorplan draws it. Everything else belongs in a module.
+
+The render boundary is chosen by the audience the route serves. A console is already open, so it renders in the browser from a cache its loader filled. A public page arrives from a link or a search result, so its first response carries its title, its description, and its links.
 
 ## Agent Summary {#agent-summary}
 
 
-- Server Components render unless a browser capability requires otherwise. (FRONTEND.RENDERING.SERVER.001)
-- Every client directive names the capability requiring it. (FRONTEND.RENDERING.CLIENT.001)
-- Request and route APIs are awaited. (FRONTEND.RENDERING.ASYNC.001)
-- Route files compose; features hold the logic. (FRONTEND.RENDERING.ROUTES.001)
-- Data-driven routes define every applicable state. (FRONTEND.RENDERING.STATE.001)
-- Caching actor-specific data requires a declared key and owner. (FRONTEND.RENDERING.CACHE.001)
-- Edge proxy rules stay coarse and never authorize resources. (FRONTEND.RENDERING.PROXY.001)
-- Routes declare metadata, and private routes block indexing. (FRONTEND.RENDERING.METADATA.001)
+- A loader fills the query cache before the component runs. (standards/rule/frontend-rendering.load-route-data-in-the-loader)
+- A component reads the key its loader filled. (standards/rule/frontend-rendering.read-route-data-with-a-suspense-query)
+- List state lives in the address, behind a schema. (standards/rule/frontend-rendering.keep-search-parameters-validated-by-a-schema)
+- Each route and each language is its own chunk. (standards/rule/frontend-rendering.split-one-chunk-per-route-and-per-language)
+- A route states loading, empty, error, and not-found. (standards/rule/frontend-rendering.represent-route-states)
+- A public route states its metadata, and a private route refuses indexing. (standards/rule/frontend-rendering.define-route-metadata-deliberately)
+- A server render builds its cache per request. (standards/rule/frontend-rendering.build-the-server-query-cache-per-request)
 
 ## Standards
 
 
-### Prefer server execution (FRONTEND.RENDERING.SERVER.001)
+### Load route data in the loader (standards/rule/frontend-rendering.load-route-data-in-the-loader)
 
-**Requirement:** A page or subtree MUST run as a Server Component unless a named browser capability requires client execution.
+**Requirement:** A route's loader MUST prefetch each read it needs through the query cache before the component runs.
 
-**Rationale:** Server execution keeps initial data, server-only tokens, and authorization-aware composition off the browser.
+**Rationale:** The page then renders with its data rather than showing a spinner after it has already appeared. The cache owns freshness, so the router never holds a second copy.
 
-### Document client boundaries (FRONTEND.RENDERING.CLIENT.001)
+**Example:** An entity route prefetches its record and every read the record's own sections need.
 
-**Requirement:** A `'use client'` directive MUST carry an adjacent comment naming the browser capability that requires it.
+```tsx
+loader: async ({ context, params }) => {
+  const order = await context.queryClient.ensureQueryData(orderQuery(params.orderId));
 
-**Rationale:** The comment makes the boundary reviewable, so an unnecessary client subtree is visible in the diff.
+  if (order.eventId !== null) {
+    await context.queryClient.ensureQueryData(eventQuery(order.eventId));
+  }
+}
+```
+
+### Read route data with a suspense query (standards/rule/frontend-rendering.read-route-data-with-a-suspense-query)
+
+**Requirement:** A component MUST read route data with a suspense query over the same cache key its loader filled.
+
+**Rationale:** A read naming another key issues a second request, and the two answers can disagree. A failed read reaches the route's error component, which draws the shared problem state.
 
 **Example:**
 
 ```tsx
-// Client boundary: the editor owns browser selection state.
-'use client'
+const { data: order } = useSuspenseQuery(orderQuery(orderId));
 ```
 
-A generic comment such as `Client component` does not satisfy the convention.
+### Keep search parameters validated by a schema (standards/rule/frontend-rendering.keep-search-parameters-validated-by-a-schema)
 
-### Await Next.js request APIs (FRONTEND.RENDERING.ASYNC.001)
+**Requirement:** A route MUST declare its search parameters in a validated schema, including its filters and its page.
 
-**Requirement:** A route MUST await `params`, `searchParams`, `cookies`, and `headers` rather than read them synchronously.
+**Rationale:** A filtered list is then a link somebody can share, bookmark, and reopen. A filter in component state reaches nobody and is lost on the first navigation away.
 
-**Rationale:** These APIs are asynchronous in the pinned Next.js release, so synchronous access relies on removed compatibility behavior.
+**Example:** The list schema declares its own text field and spreads the shared paging fields.
 
-### Keep route files as composition boundaries (FRONTEND.RENDERING.ROUTES.001)
+```tsx
+validateSearch: z.object({ q: z.string().trim().catch("").default(""), ...pagingSearch }),
+```
 
-**Requirement:** A page or layout MUST select shells, read route input, invoke feature functions, and compose UI without holding reusable logic.
+### Split one chunk per route and per language (standards/rule/frontend-rendering.split-one-chunk-per-route-and-per-language)
 
-**Rationale:** Validation, mutation logic, and view mapping stay in feature or shared modules where another route can reach them.
+**Requirement:** A frontend MUST load each route and each language as its own chunk, with no icon set or language imported whole.
 
-### Represent route states (FRONTEND.RENDERING.STATE.001)
+**Rationale:** A signed-in user opens one address and reads one language. A reader in Dutch who never leaves the dashboard should not download English.
+
+**Example:** `loadDictionary` returns a dynamic import of one language, and the router plugin splits each route file.
+
+### Load a route on intent (standards/rule/frontend-rendering.load-a-route-on-intent)
+
+**Requirement:** A frontend MUST prefetch the route a pointer is over, and never treat that prefetch as a cache beyond the query cache.
+
+**Rationale:** Most navigations then render from the cache the loaders already filled. A router caching a second time serves a stale answer beside a fresh one.
+
+### Represent route states (standards/rule/frontend-rendering.represent-route-states)
 
 **Requirement:** A data-driven route MUST define its loading, empty, error, forbidden, not-found, and ready behavior.
 
-**Rationale:** A blank region while a request is pending or failed gives the reader no signal at all. Framework state files carry these.
+**Rationale:** A blank region while a request is pending or failed gives the reader no signal at all. The root route's not-found component draws the shared outcome page.
 
-### Keep authenticated caching explicit (FRONTEND.RENDERING.CACHE.001)
+These six are the states a route has. A control adds `disabled` and `pending` under `standards/rule/frontend-components.render-complete-states`, because both describe a control rather than a page. A route adds `not-found`, which a control does not, because a missing target resolves at the route.
 
-**Requirement:** Actor-specific or authorization-filtered data MUST declare a cache key, partition boundary, invalidation owner, and security review before it is cached.
+### Define route metadata deliberately (standards/rule/frontend-rendering.define-route-metadata-deliberately)
 
-**Rationale:** Shared route, fetch, or `use cache` behavior otherwise serves one actor's data to another. An uncached server read is the safe default.
+**Requirement:** A public route MUST define its title, its description, its canonical address, and its indexing policy, while a private route refuses indexing.
 
-### Keep proxy behavior at the edge (FRONTEND.RENDERING.PROXY.001)
+**Rationale:** The metadata is what a search result and a shared link show. An indexed console exposes an address a signed-in user believes is private.
 
-**Requirement:** A `proxy.ts` rule MUST handle only coarse routing such as session presence, locale, or redirects.
+**Example:** A channel route states `og:*` tags and one alternate per language. A console route ships a `noindex` meta tag in its document.
 
-**Rationale:** It runs before the request reaches the API, so it cannot see the target resource that authorization depends on.
+### Keep authenticated caching explicit (standards/rule/frontend-rendering.keep-authenticated-caching-explicit)
 
-### Define route metadata deliberately (FRONTEND.RENDERING.METADATA.001)
+**Requirement:** Actor-specific data MUST declare its cache key, its partition boundary, its invalidation owner, and its security review before it is cached.
 
-**Requirement:** A public route MUST define title, description, canonical behavior, and indexing policy, while a private route prevents indexing.
+**Rationale:** Shared route or loader behaviour otherwise serves one actor's data to another. An uncached read is the safe default, and a cache partitioned per request is the safe server shape.
 
-**Rationale:** A route that composes non-trivial use cases also carries a page specification.
+### Keep proxy behavior at the edge (standards/rule/frontend-rendering.keep-proxy-behavior-at-the-edge)
+
+**Requirement:** A development or edge proxy rule MUST route only, and never decide who the actor is or what the actor may read.
+
+**Rationale:** The proxy runs before the request reaches the API, so it cannot see the resource authorization depends on. Forwarding the API's own paths gives the browser one origin, which is what makes an HTTP-only session cookie a first-party cookie of the page.
+
+**Example:** A development proxy forwards `/api` and `/auth` to the API and changes nothing else.
+
+### Build the server query cache per request (standards/rule/frontend-rendering.build-the-server-query-cache-per-request)
+
+**Requirement:** A server-rendered frontend MUST construct its router and its query cache inside each request.
+
+**Rationale:** Two readers served at the same time must not read each other's data. A cache outliving one request would serve the next reader the previous reader's answer.
 
 ## Conventions
 
 
-### Use route groups for shells (FRONTEND.RENDERING.CONVENTION.001)
+### Use a pathless layout route for a shell (standards/rule/frontend-rendering.use-a-pathless-layout-route-for-a-shell)
 
-**Default:** Group routes that share a layout, navigation, or access composition under a named route group.
+**Default:** Give a shell a layout route whose file name starts with an underscore, and let it hold the frame every child route shares.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A group name describes audience or shell, such as `(public)` or `(admin)`, rather than a technical detail.
+**Rationale:** A pathless layout adds no address segment, so the shell never appears in a link.
 
-### Keep layouts stable (FRONTEND.RENDERING.CONVENTION.002)
+### Keep layouts stable (standards/rule/frontend-rendering.keep-layouts-stable)
 
-**Default:** Keep layouts to persistent shell UI and providers that every child route needs.
+**Default:** Keep a layout to the frame and the providers every child route needs.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
 **Rationale:** A feature-specific provider wrapping the whole application forces unrelated routes to carry its cost.
 
-### Keep server-only code identifiable (FRONTEND.RENDERING.CONVENTION.003)
+### Keep server only code identifiable (standards/rule/frontend-rendering.keep-server-only-code-identifiable)
 
-**Default:** Mark a module that reads secrets, server tokens, request headers, or privileged clients as server-owned.
+**Default:** Keep a module reading a request header, a cookie, or a server secret in a file whose name and import show the server ownership.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Only server code imports it, and the optional `server-only` package turns an accidental client import into a build error.
+**Rationale:** The framework's server-only import turns an accidental browser import into a build error, and a file name carries the same fact to a reader.
 
 ## Reference example
 
-This informative example demonstrates `FRONTEND.RENDERING.SERVER.001`, `FRONTEND.RENDERING.ASYNC.001`, and `FRONTEND.RENDERING.ROUTES.001`.
+This informative example demonstrates `standards/rule/frontend-rendering.load-route-data-in-the-loader`, `standards/rule/frontend-rendering.keep-search-parameters-validated-by-a-schema`, and `standards/rule/frontend-rendering.read-route-data-with-a-suspense-query`.
 
 ```tsx
-export default async function PostPage({
-  params,
-}: {
-  params: Promise<{ postId: string }>
-}) {
-  const { postId } = await params
-  const post = await getPost(postId)
-
-  return <PostDetails post={post} />
-}
+/**
+ * Find any paid order, for any product, newest first.
+ *
+ * @useCase use-case/orders.search-merchant-orders
+ */
+export const Route = createFileRoute("/_console/orders/")({
+  validateSearch: z.object({ q: z.string().trim().catch("").default(""), ...pagingSearch }),
+  loaderDeps: ({ search }) => search,
+  loader: ({ context, deps }) => context.queryClient.ensureQueryData(merchantOrdersQuery(deps.q, deps.page)),
+  component: OrdersPage,
+});
 ```
 
-The route resolves input and composes the feature. `getPost` owns typed API access, while `PostDetails` owns presentation.
+The route resolves its input and composes the floorplan. The query wrapper owns the typed call, and the table owns the columns.
 
 ## Verification
 
-
 | ID | Method | Evidence |
 |:---|:---|:---|
-| FRONTEND.RENDERING.SERVER.001 | inspection | `RenderBoundaryTests` asserts no page or large subtree is client-side without a named browser capability. |
-| FRONTEND.RENDERING.CLIENT.001 | inspection | `node standards/tools/validate-ui.mjs` reports a `'use client'` directive with no adjacent capability comment. |
-| FRONTEND.RENDERING.ASYNC.001 | inspection | `RenderBoundaryTests` asserts each request API access is awaited. |
-| FRONTEND.RENDERING.ROUTES.001 | static | `RouteCompositionTests` asserts no route file declares validation, mutation, or mapping logic. |
-| FRONTEND.RENDERING.STATE.001 | static | `RouteStateTests` asserts each data-driven route renders every applicable state. |
-| FRONTEND.RENDERING.CACHE.001 | inspection | `CacheBoundaryTests` asserts no actor-specific read shares a cache entry across actors. |
-| FRONTEND.RENDERING.PROXY.001 | inspection | `ProxyTests` asserts no proxy rule performs a resource ownership or authorization decision. |
-| FRONTEND.RENDERING.METADATA.001 | static | `MetadataTests` asserts public routes declare the four values and private routes prevent indexing. |
-| FRONTEND.RENDERING.CONVENTION.001 | inspection | Route review confirms each shared shell has a route group named for its audience. |
-| FRONTEND.RENDERING.CONVENTION.002 | inspection | Layout review confirms each provider is required by every child route. |
-| FRONTEND.RENDERING.CONVENTION.003 | inspection | `node standards/tools/validate-ui.mjs` reports a client module importing a server-owned path. |
+| standards/rule/frontend-rendering.load-route-data-in-the-loader | inspection | Route review confirms each route that reads declares a loader that prefetches it. |
+| standards/rule/frontend-rendering.read-route-data-with-a-suspense-query | inspection | Route review confirms each read names the key its loader filled. |
+| standards/rule/frontend-rendering.keep-search-parameters-validated-by-a-schema | static | `pnpm type-check` fails on a route whose search field is absent from its schema. |
+| standards/rule/frontend-rendering.split-one-chunk-per-route-and-per-language | test | `pnpm build` reports one output chunk per route file and one per dictionary language. |
+| standards/rule/frontend-rendering.load-a-route-on-intent | inspection | Router configuration review confirms intent preloading and no second cache. |
+| standards/rule/frontend-rendering.represent-route-states | test | `tests/routes/every-route.spec.ts` renders an absent address and asserts the outcome page. |
+| standards/rule/frontend-rendering.define-route-metadata-deliberately | inspection | Document review confirms each public route states four values and each console refuses indexing. |
+| standards/rule/frontend-rendering.keep-authenticated-caching-explicit | inspection | Cache review confirms each server render builds its own cache and each mutation names what it invalidates. |
+| standards/rule/frontend-rendering.keep-proxy-behavior-at-the-edge | inspection | Proxy configuration review confirms no proxy rule reads a permission. |
+| standards/rule/frontend-rendering.build-the-server-query-cache-per-request | test | `grep -c createQueryClient src/router.tsx` finds one call inside the router factory. |
+| standards/rule/frontend-rendering.use-a-pathless-layout-route-for-a-shell | inspection | Route review confirms each shell sits in a layout route whose file name starts with an underscore. |
+| standards/rule/frontend-rendering.keep-layouts-stable | inspection | Layout review confirms each provider is required by every child route. |
+| standards/rule/frontend-rendering.keep-server-only-code-identifiable | inspection | Import review confirms each server-owned module sits in a file named for the server. |

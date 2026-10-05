@@ -27,6 +27,8 @@ Run it from the consumer root after changing a specification, a project path, or
 | Option | Default | Effect |
 |:---|:---|:---|
 | `--prose` | off | Lists the measure violations behind each page count, which is what burning a page down needs. |
+| `--format=json` | off | Writes one JSON object on standard output, with the problems as an array. |
+| `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 
 ## Exit codes
 

@@ -14,7 +14,7 @@ body:
     attributes:
       label: Scope
       description: The provision ID, page path, schema, template, or tool that holds the defect.
-      placeholder: CORE.AUTHORING.INDEX.001, or tools/validate-consumer.mjs
+      placeholder: standards/rule/core-authoring.regenerate-the-provision-index, or tools/validate-consumer.mjs
     validations:
       required: true
 

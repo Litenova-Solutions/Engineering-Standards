@@ -1,7 +1,7 @@
 ---
 {
   "kind": "use-case",
-  "id": "__MODULE__.__USE_CASE__",
+  "id": "use-case/__MODULE__.__USE_CASE__",
   "specStatus": "approved",
   "implementationStatus": "planned",
   "owner": "__OWNER__",
@@ -14,6 +14,17 @@
 }
 ---
 # __TITLE__
+
+## Business impact
+
+- Risk: Lift the risks from the metadata block.
+- Refusals: Lift the refusal codes from the Failures table.
+- Authorized for: Lift the actors from the metadata block.
+- Reached from: Lift the entry points from the metadata block and the Consumers table.
+
+## Terms used
+
+- Lift each canonical term the body uses, linked to its glossary heading.
 
 ## Goal
 
@@ -45,8 +56,8 @@ State the observable result without exposing persistence types.
 
 | Domain rule ID | Type | Required behavior |
 |:---|:---|:---|
-| `INV-__MODULE_ID__-01` | Aggregate Invariant | State how this use case applies the invariant. |
-| `POL-__POLICY_ID__-01` | Domain Policy | Remove when no domain policy applies. |
+| `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Aggregate Invariant | State how this use case applies the invariant. |
+| `policy/__POLICY__.refund-within-the-window` | Domain Policy | Remove when no domain policy applies. |
 
 ## Successful path
 
@@ -58,7 +69,7 @@ For a Command, list every aggregate changed. For a Query, write `No Domain trans
 
 | Aggregate | Source state | Business action | Target state | Rules | Event references |
 |:---|:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `INV-__MODULE_ID__-01` | `__MODULE__.__PAST_TENSE_EVENT__` |
+| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | `event/__AGGREGATE_ANCHOR__.__PAST_TENSE_EVENT__` |
 
 When more than one aggregate appears, state the invariant or domain policy that requires one transaction.
 
@@ -70,7 +81,7 @@ When more than one aggregate appears, state the invariant or domain policy that 
 
 ## Acceptance criteria
 
-- [AC-__MODULE_ID__-__USE_CASE_ID__-01] Replace with one observable criterion.
+- [acceptance-criterion/__MODULE__.__USE_CASE__.__CRITERION_TOPIC__] Replace with one observable criterion.
 
 A use case with `implementationStatus: planned` may have no test reference. A verified use case has at least one acceptance criterion, every acceptance ID appears in automated test source, and applicable test commands have passed.
 
@@ -84,7 +95,7 @@ Then the expected result is observable
 
 ### Rejected example
 
-Given a state that violates `INV-__MODULE_ID__-01`
+Given a state that violates `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action`
 When the actor performs the operation
 Then `__ERROR_CODE__` is returned without a state change
 
@@ -94,11 +105,21 @@ Then `__ERROR_CODE__` is returned without a state change
 |:---|:---|
 | Command or Query | `__USE_CASE__Command` or `__USE_CASE__Query` |
 | Handler | `__USE_CASE__CommandHandler` or `__USE_CASE__QueryHandler` |
-| Aggregate method or Read Model | `__MAPPING__` |
-| Entry Point | `__MAPPING__` |
-| Automated tests | `__MAPPING__` |
+| Aggregate method or Read Model | `__AGGREGATE__.__ACTION__` |
+| Entry Point | `POST __ROUTE__` (`__USE_CASE__Endpoint`) |
+| Automated tests | `__TEST_PROJECT__` |
 
 Add this section when implementation begins. Do not use it as the source for business behavior.
+
+State every name in a code span. Each one resolves to a declared type, a member written as `Type.Member`, a project, or a repository path. A route carries a path rather than an identifier, so the entry-point checks resolve it. A row that names no artifact writes `None`. An `implemented` or `verified` use case names the handler its operation folder declares. (`standards/rule/core-system.resolve-every-implementation-mapping-name`, `standards/rule/core-system.name-the-handler-an-implemented-use-case-owns`)
+
+## Consumers
+
+Name every declared surface that invokes this use case, one per row. A surface is a frontend the project declares or a `paths.surfaces` entry. Write `None.` with the reason when a schedule, a reaction, or another use case is the only caller. A route that calls this use case is named here by its route file. (`standards/rule/core-system.name-what-calls-a-use-case`)
+
+| Surface | Consumer |
+|:---|:---|
+| `__APP__` | `apps/__APP__/__ROUTE_FOLDER__/page.tsx` |
 
 ## Risk and assurance
 

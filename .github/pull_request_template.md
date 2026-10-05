@@ -9,6 +9,7 @@ State the constraint, decision, or defect that requires the change.
 - [ ] `node tools/validate-standards.mjs`
 - [ ] `node tools/validate-ui.cases.mjs`
 - [ ] `node tools/validate-consumer.cases.mjs`
+- [ ] `node tools/validate-parity.cases.mjs`
 - [ ] `git diff --check`
 
 ## Authoring Review

@@ -7,7 +7,7 @@ Create a consumer repository with one selected profile, current specifications, 
 ## Prerequisites
 
 - Pin the selected standards release before copying profile-specific configuration.
-- Read the [platform profile](../profile/nextjs.md), the [agent protocol](../core/agent.md), and the [authoring standard](../core/authoring.md).
+- Read the [platform profile](../profile/react.md), the [agent protocol](../core/agent.md), and the [authoring standard](../core/authoring.md).
 - Read the [extension catalog](../ext/README.md) to learn which capabilities stay inactive at the start.
 
 ## Procedure
@@ -37,10 +37,10 @@ Each step links the standard that governs it. Read that page before running the 
 ### Implement
 
 9. Model the domain with [domain](../backend/domain.md), using [model a domain](model-domain.md) as the worked procedure.
-10. Coordinate use cases with [application](../backend/application.md) and store them with [Marten persistence](../backend/persistence.md).
+10. Coordinate use cases with [application](../backend/application.md) and store them through [persistence](../backend/persistence.md).
 11. Expose operations with [HTTP API](../backend/api.md) and secure them with [security](../quality/security.md).
 12. Declare each React frontend and install its pinned UI baseline, following [frontend structure](../frontend/structure.md) and [controlled UI governance](../frontend/ui.md).
-13. Create UI vocabulary and page sidecars for each non-trivial visible route, following [controlled UI governance](../frontend/ui.md).
+13. Declare the UI vocabulary and floorplans, then compose each route from one floorplan, following [controlled UI governance](../frontend/ui.md).
 14. Deliver one complete slice with source, tests, contracts, and operating evidence, following the [release standard](../core/release.md).
 
 ### Operate

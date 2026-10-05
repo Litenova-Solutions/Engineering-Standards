@@ -28,6 +28,9 @@ const CONTRACTIONS = /\b(?:ain't|aren't|can't|couldn't|didn't|doesn't|don't|hadn
 
 const AND_OR = /\band\/or\b/i;
 
+// The page's metadata block: three dashes, one JSON object, three dashes.
+const METADATA_BLOCK = /^---\r?\n\{[\s\S]*?\r?\n\}\r?\n---\r?\n/;
+
 export const PROSE_LIMITS = Object.freeze({
   sentence: 25,
   listSentence: 20,
@@ -53,6 +56,14 @@ export const LANGUAGE_DIAGNOSTIC_CODES = Object.freeze([
 export { VAGUE_TERMS, CONTRACTIONS, AND_OR };
 
 // ---- text reduction --------------------------------------------------------
+
+// A metadata block is machine content. Its field names and its owner string are
+// measured as a sentence otherwise, so every page carrying one reports a problem
+// nobody can edit away. The block is blanked rather than dropped, which keeps
+// every reported line number equal to the line number in the file.
+export function blankMetadata(raw) {
+  return raw.replace(METADATA_BLOCK, (match) => match.replace(/[^\n]/g, ' '));
+}
 
 // A fenced block is literal content, so the measures do not reach inside one.
 // The line is replaced rather than dropped, which keeps every reported line
@@ -111,9 +122,12 @@ export function sentences(value) {
 // Walks a Markdown page and reports every controlled-prose measure it breaks.
 // `add(relative, line, code, message)` receives each finding.
 export function checkProseMeasures(relative, raw, add) {
-  const lines = stripFences(raw.split(/\r?\n/));
+  const lines = stripFences(blankMetadata(raw).split(/\r?\n/));
   let paragraph = [];
   let list = [];
+  // The exempt columns are a property of one table, so the set resets when a
+  // table ends.
+  let tableHeader = null;
 
   const scanTerms = (value, number) => {
     const visible = visibleText(value);
@@ -176,6 +190,7 @@ export function checkProseMeasures(relative, raw, add) {
       continue;
     }
     flushList();
+    if (!/^\s*\|/.test(line)) tableHeader = null;
     if (/^#{1,6}\s/.test(line) || /^\s*</.test(line) || /^\s*---\s*$/.test(line)) {
       flushParagraph();
       continue;
@@ -184,7 +199,23 @@ export function checkProseMeasures(relative, raw, add) {
       flushParagraph();
       if (!/^\s*\|?\s*:?-+/.test(line)) {
         const cells = line.split('|').slice(1, -1);
-        for (const cell of cells) {
+        // A table that lists refused words carries two columns the measure does
+        // not bound. The refused word itself is the row's subject, and the
+        // reason states the collision that produced it, which is longer than a
+        // cell otherwise gets. Both stay readable because the rest of the row
+        // is short. Every other table is measured as before.
+        if (tableHeader === null) {
+          tableHeader = new Set();
+          const reasons = new Set();
+          for (let index = 0; index < cells.length; index += 1) {
+            if (REJECTION_COLUMN.test(cells[index])) tableHeader.add(index);
+            else if (REJECTION_REASON_COLUMN.test(cells[index])) reasons.add(index);
+          }
+          if (tableHeader.size) for (const index of reasons) tableHeader.add(index);
+        }
+        for (let index = 0; index < cells.length; index += 1) {
+          if (tableHeader.has(index)) continue;
+          const cell = cells[index];
           const count = words(cell).length;
           if (count > PROSE_LIMITS.tableCell) {
             add(relative, item.number, 'PROSE_TABLE_CELL_LENGTH', `table cell has ${count} words; maximum is ${PROSE_LIMITS.tableCell}: '${visibleText(cell).slice(0, 120)}'`);
@@ -213,7 +244,14 @@ function termPattern(term) {
 // A column that exists to list rejected words has to be able to contain them.
 // A glossary states `Avoid` beside each term and a module states
 // `Rejected synonyms`, so those cells are the rule rather than a breach of it.
-const REJECTION_COLUMN = /^\s*(?:avoid|rejected|rejected names?|rejected synonyms?)\s*$/i;
+const REJECTION_COLUMN = /^\s*(?:avoid|rejected|rejected names?|rejected synonyms?|mannered|mannered terms?)\s*$/i;
+
+// The column that explains a rejection has to be able to name the word it
+// explains, for the same reason. It is exempt only inside a table that already
+// carries a rejection column, so an ordinary `Reason` column elsewhere stays in
+// scope. Its length is exempt too: a reason states the collision that produced
+// the rejection, and that is longer than a table cell otherwise gets.
+const REJECTION_REASON_COLUMN = /^\s*(?:reason|reasons|why|rationale)\s*$/i;
 
 // Blanks the cells that sit under a rejection column, keeping every other
 // character in place so a reported offset still maps to its own line.
@@ -227,7 +265,12 @@ function blankRejectionColumns(text) {
     if (/^\s*\|?[\s:|-]+$/.test(line)) continue;
     if (columns === null) {
       columns = new Set();
-      for (let cell = 0; cell < cells.length; cell += 1) if (REJECTION_COLUMN.test(cells[cell])) columns.add(cell);
+      const reasons = new Set();
+      for (let cell = 0; cell < cells.length; cell += 1) {
+        if (REJECTION_COLUMN.test(cells[cell])) columns.add(cell);
+        else if (REJECTION_REASON_COLUMN.test(cells[cell])) reasons.add(cell);
+      }
+      if (columns.size) for (const cell of reasons) columns.add(cell);
       continue;
     }
     if (!columns.size) continue;
@@ -241,8 +284,7 @@ function blankRejectionColumns(text) {
 // scan starts after the block. A fenced block is code, and a link destination
 // is a path rather than a sentence.
 function scannableProse(raw) {
-  return blankRejectionColumns(raw
-    .replace(/^---\r?\n\{[\s\S]*?\r?\n\}\r?\n---\r?\n/, (match) => match.replace(/[^\n]/g, ' '))
+  return blankRejectionColumns(blankMetadata(raw)
     .replace(/```[\s\S]*?```/g, (match) => match.replace(/[^\n]/g, ' '))
     .replace(/`[^`\n]*`/g, (match) => ' '.repeat(match.length))
     .replace(/\]\([^)\n]*\)/g, (match) => ' '.repeat(match.length)));
@@ -263,17 +305,48 @@ export function compileLanguage(language) {
   }));
   const rejected = [];
   for (const entry of language.terms ?? []) {
+    // Compiled once per term rather than once per synonym, because every
+    // synonym of one term is exempt in the same compounds.
+    const except = (entry.except ?? []).map(termPattern);
+
     for (const synonym of entry.rejected ?? []) {
       rejected.push({
         term: entry.term,
         synonym,
         scope: entry.scope ? new RegExp(entry.scope) : null,
         reason: entry.reason,
+        except,
         pattern: termPattern(synonym),
       });
     }
   }
   return { mannered, rejected };
+}
+
+// Locates every compound in which a rejected word names a different concept.
+// `uniqueness reservation` is a row in a registry and a `reservation` is a
+// checkout hold, so the word inside the compound is not the word the rejection
+// is about. Returns the span each compound occupies, which is what the caller
+// tests a match against.
+function exemptSpans(text, patterns) {
+  const spans = [];
+
+  for (const pattern of patterns) {
+    pattern.lastIndex = 0;
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      spans.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  return spans;
+}
+
+// True when a match sits wholly inside one exempt compound. Containment rather
+// than overlap, because a compound that merely touches the match is a different
+// phrase that happens to end where this one starts.
+function insideExempt(spans, start, end) {
+  return spans.some(([from, to]) => start >= from && end <= to);
 }
 
 // Reports every mannered term and every rejected synonym inside its scope.
@@ -294,9 +367,12 @@ export function checkLanguage(relative, raw, compiled, add) {
 
   for (const entry of compiled.rejected) {
     if (entry.scope && !entry.scope.test(relative)) continue;
+    const exempt = entry.except.length > 0 ? exemptSpans(prose, entry.except) : null;
     entry.pattern.lastIndex = 0;
     let match;
     while ((match = entry.pattern.exec(prose)) !== null) {
+      if (exempt && insideExempt(exempt, match.index, match.index + match[0].length)) continue;
+
       const because = entry.reason ? `; ${entry.reason}` : '';
       add(relative, lineOf(prose, match.index), 'LANGUAGE_REJECTED_SYNONYM',
         `'${match[0]}' is a rejected synonym here; the term is '${entry.term}'${because}`);
@@ -344,9 +420,12 @@ export function checkLanguageInSource(relative, raw, compiled, add) {
       }
       for (const entry of compiled.rejected) {
         if (entry.scope && !entry.scope.test(relative)) continue;
+        const exempt = entry.except.length > 0 ? exemptSpans(text, entry.except) : null;
         entry.pattern.lastIndex = 0;
         let match;
         while ((match = entry.pattern.exec(text)) !== null) {
+          if (exempt && insideExempt(exempt, match.index, match.index + match[0].length)) continue;
+
           const key = `r:${entry.term}:${match[0].toLowerCase()}`;
           if (seen.has(key)) continue;
           seen.add(key);

@@ -12,7 +12,18 @@
       "additionalProperties": false,
       "required": ["name"],
       "properties": {
-        "name": { "type": "string", "minLength": 1 }
+        "name": { "type": "string", "minLength": 1 },
+        "identifierSource": {
+          "description": "The source segment this project's own identifiers carry in a cross-source citation. Defaults to the project name in lower kebab case.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "citedSources": {
+          "description": "Other sources a citation in this project may name, beyond owasp, rfc, and standards.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+        }
       }
     },
     "profile": {
@@ -59,7 +70,32 @@
           }
         },
         "domainDocs": { "$ref": "#/$defs/projectPath" },
+        "testRoots": {
+          "description": "Directories holding automated test source. An acceptance criterion is cited from one of these, as a scenario tag, a C# AcceptanceCriterion trait, or a bracketed browser-test title.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "surfaces": {
+          "description": "The surfaces outside paths.frontends that invoke a use case: a command-line tool, a distributed server, a background host, an event reaction. Each frontend is already a surface under its own name. A Consumers row names one of these.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "description"],
+            "properties": {
+              "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "description": { "type": "string", "minLength": 1 },
+              "path": { "$ref": "#/$defs/projectPath" }
+            }
+          }
+        },
         "uiDocs": { "$ref": "#/$defs/projectPath" },
+        "uiPackage": {
+          "description": "The workspace's one shared UI package: the registry configuration, the copied primitive source, the token stylesheet, the source lock, and the design contract. A workspace with no controlled React web frontend omits it.",
+          "$ref": "#/$defs/uiPackage"
+        },
         "frontends": {
           "type": "array",
           "items": {
@@ -96,6 +132,23 @@
         }
       }
     },
+    "allOf": [
+      {
+        "$comment": "A controlled React web frontend composes the shared package, so declaring one makes the package required. A workspace whose frontends are all outside the contract declares no package.",
+        "if": {
+          "required": ["frontends"],
+          "properties": {
+            "frontends": {
+              "contains": {
+                "required": ["platform"],
+                "properties": { "platform": { "const": "react-web" } }
+              }
+            }
+          }
+        },
+        "then": { "required": ["uiPackage"] }
+      }
+    ],
     "scenarioWordLimit": {
       "description": "The word bound a Scenario section stays within. Omitted, the recorded default of 120 applies, and the validator refuses a value below 40.",
       "type": "integer"
@@ -146,6 +199,49 @@
             "type": "string",
             "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
           }
+        },
+        "sourceRoots": {
+          "description": "Directories an Implementation mapping name resolves a declaration, project, or path in. Defaults to the directory holding the solution.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "foreignNames": {
+          "description": "Names an Implementation mapping states that a package declares rather than this repository, which no local scan can find.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "specSync": {
+      "description": "Configuration for the specification-sync validator. Every field is optional, and each default is derived from paths.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "codeRoots": {
+          "description": "Directories whose C# files are read for marking tags. Defaults to apps/api/src and apps/api/tests.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "markedRoots": {
+          "description": "Directories whose type-declaring files must carry a tag. Defaults to the Domain, Application, and WebApi projects plus every test root.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "featureRoots": {
+          "description": "Directories holding Reqnroll feature files. Defaults to apps/api/tests/{ProjectName}.Acceptance.Tests/Features, where {ProjectName} is project.name.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "evidenceRoots": {
+          "description": "Frontend directories whose test files are read for acceptance-criterion citations. Defaults to every path in paths.frontends.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/projectPath" }
         }
       }
     },
@@ -176,7 +272,7 @@
         "additionalProperties": false,
         "required": ["provisionId", "decision"],
         "properties": {
-          "provisionId": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.[A-Z][A-Z0-9]*\\.\\d{3}$" },
+          "provisionId": { "type": "string", "pattern": "^standards/rule/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$" },
           "decision": { "$ref": "#/$defs/projectPath" },
           "reviewBy": {
             "type": "string",
@@ -186,7 +282,7 @@
         "allOf": [
           {
             "if": {
-              "properties": { "provisionId": { "pattern": "^FRONTEND\\.UI\\." } },
+              "properties": { "provisionId": { "pattern": "^standards/rule/frontend-ui\\." } },
               "required": ["provisionId"]
             },
             "then": { "required": ["reviewBy"] }
@@ -201,65 +297,45 @@
       "minLength": 1,
       "pattern": "^(?![A-Za-z]:)(?!/)(?!.*\\.\\.)[^\\\\]+$"
     },
-    "ui": {
+    "uiPackage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["profile", "publicExports"],
+      "required": ["name", "path", "componentsJson", "primitives", "tokens", "sourceLock", "designContract", "publicExports"],
       "properties": {
-        "profile": {
-          "type": "string",
-          "enum": ["public-light", "application-balanced", "admin-dense"]
-        },
-        "system": {
-          "type": "string",
-          "enum": ["shadcn/ui", "bootstrap", "mui", "other"]
-        },
-        "styling": { "type": "string", "minLength": 1 },
-        "base": { "enum": ["base-ui", "radix-ui"] },
-        "style": { "type": "string", "minLength": 1 },
-        "presetCode": { "type": "string", "minLength": 1 },
-        "presetFingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
-        "cssVariables": { "type": "boolean" },
-        "baseColor": { "type": "string", "minLength": 1 },
-        "theme": { "type": "string", "minLength": 1 },
-        "chartColor": { "type": "string", "minLength": 1 },
-        "font": { "type": "string", "minLength": 1 },
-        "fontHeading": { "type": "string", "minLength": 1 },
-        "icons": { "type": "string", "minLength": 1 },
-        "radius": { "type": "string", "minLength": 1 },
-        "menuAccent": { "enum": ["subtle", "bold"] },
-        "menuColor": { "enum": ["default", "inverted", "default-translucent", "inverted-translucent"] },
-        "componentsStyle": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "path": { "$ref": "#/$defs/projectPath" },
         "componentsJson": { "$ref": "#/$defs/projectPath" },
-        "vocabulary": { "$ref": "#/$defs/projectPath" },
+        "primitives": {
+          "description": "The directory holding the registry source the pinned CLI copied in.",
+          "$ref": "#/$defs/projectPath"
+        },
+        "tokens": { "$ref": "#/$defs/projectPath" },
         "sourceLock": { "$ref": "#/$defs/projectPath" },
-        "globalCss": { "$ref": "#/$defs/projectPath" },
-        "primitives": { "$ref": "#/$defs/projectPath" },
+        "designContract": { "$ref": "#/$defs/projectPath" },
         "publicExports": {
+          "description": "The entry points applications may import. A primitive the composites are built from is not one of them.",
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
           "items": { "type": "string", "minLength": 1 }
-        },
-        "overrideDecision": { "$ref": "#/$defs/projectPath" },
-        "reviewBy": {
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile"],
+      "properties": {
+        "profile": {
+          "description": "The density profile this frontend composes the shared package at.",
           "type": "string",
-          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          "enum": ["public-light", "application-balanced", "admin-dense"]
+        },
+        "globalCss": {
+          "description": "The one stylesheet this frontend declares, which imports the shared package's tokens.",
+          "$ref": "#/$defs/projectPath"
         }
-      },
-      "allOf": [
-        {
-          "if": {
-            "properties": { "system": { "const": "shadcn/ui" } }
-          },
-          "then": {
-            "required": ["componentsJson", "vocabulary", "sourceLock", "globalCss", "primitives"]
-          },
-          "else": {
-            "required": ["system", "overrideDecision", "reviewBy"]
-          }
-        }
-      ]
+      }
     }
   }
 }
