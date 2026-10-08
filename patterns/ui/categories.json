@@ -1,0 +1,52 @@
+[
+  {
+    "id": "page-frames",
+    "file": "01-page-frames",
+    "export": "CATEGORY_PAGE_FRAMES"
+  },
+  {
+    "id": "lists-and-tables",
+    "file": "02-lists-and-tables",
+    "export": "CATEGORY_LISTS_TABLES"
+  },
+  {
+    "id": "record-detail",
+    "file": "03-record-detail",
+    "export": "CATEGORY_RECORD_DETAIL"
+  },
+  {
+    "id": "forms-and-fields",
+    "file": "04-forms-and-fields",
+    "export": "CATEGORY_FORMS_FIELDS"
+  },
+  {
+    "id": "dialogs-and-overlays",
+    "file": "05-dialogs-and-overlays",
+    "export": "CATEGORY_DIALOGS"
+  },
+  {
+    "id": "create-edit-remove",
+    "file": "06-create-edit-remove",
+    "export": "CATEGORY_CREATE_EDIT_REMOVE"
+  },
+  {
+    "id": "feedback-and-states",
+    "file": "07-feedback-and-states",
+    "export": "CATEGORY_FEEDBACK_STATES"
+  },
+  {
+    "id": "navigation",
+    "file": "08-navigation-and-frame",
+    "export": "CATEGORY_NAVIGATION"
+  },
+  {
+    "id": "money-time-density",
+    "file": "09-money-time-density",
+    "export": "CATEGORY_MONEY_TIME_DENSITY"
+  },
+  {
+    "id": "admin-screens",
+    "file": "10-admin-screens",
+    "export": "CATEGORY_ADMIN_SCREENS"
+  }
+]

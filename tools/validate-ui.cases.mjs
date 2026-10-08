@@ -29,6 +29,8 @@ const projectFile = path.join(fixture, 'standards.project.json');
 const lockFile = path.join(packageRoot, 'ui-source-lock.json');
 const designFile = path.join(packageRoot, 'DESIGN.md');
 const catalogFile = path.join(fixture, 'docs/ui/pattern-catalog.json');
+const fixtureValidator = path.join(fixture, 'standards/tools', 'validate-ui.mjs');
+const fixtureLibrary = path.join(fixture, 'standards/patterns/ui/library.json');
 
 // The structure the pinned CLI actually generates: the three approved imports,
 // the dark variant, the theme mapping, both token blocks, and the documented
@@ -117,6 +119,7 @@ function build() {
     'docs/decisions',
     'standards/tools',
     'standards/schemas',
+    'standards/patterns/ui',
   ]) {
     fs.mkdirSync(path.join(fixture, directory), { recursive: true });
   }
@@ -124,6 +127,32 @@ function build() {
   for (const schema of fs.readdirSync(path.join(repository, 'schemas'))) {
     fs.copyFileSync(path.join(repository, 'schemas', schema), path.join(fixture, 'standards/schemas', schema));
   }
+  for (const tool of ['validate-ui.mjs', 'schema.mjs']) {
+    fs.copyFileSync(path.join(repository, 'tools', tool), path.join(fixture, 'standards/tools', tool));
+  }
+  // The library-citation cases run the validator copy above, so the library
+  // they read is this fixture rather than the release's own library.
+  writeJson(fixtureLibrary, {
+    $schema: '../../schemas/ui-pattern-library.schema.json',
+    kind: 'ui-pattern-library',
+    schemaVersion: 1,
+    breakpoints: { compact: 768 },
+    groups: [{ id: 'page-frames', title: 'Page frames', kind: 'page-frame' }],
+    patterns: [
+      {
+        id: 'record-list',
+        group: 'page-frames',
+        title: 'Record list',
+        question: 'How does a reader find one record among many?',
+        options: [
+          { id: 'filter-table', name: 'Filterable table', rationale: 'Rows scan fast and filters narrow the set.', cost: 'Needs a table composite with filters.' },
+          { id: 'search-cards', name: 'Searchable cards', rationale: 'Cards show each record with room for detail.', cost: 'Slow to scan past a few dozen records.' },
+        ],
+        recommended: 'filter-table',
+        compact: { breakpoint: 'compact', behaviour: 'Below 768 pixels the filters stack above the table.' },
+      },
+    ],
+  });
   writeJson(projectFile, resolvePlaceholders(readJson(path.join(repository, 'templates/consumer/standards.project.json'))));
   const project = readJson(projectFile);
   project.paths.uiPackage.name = '@fixture/ui';
@@ -175,8 +204,8 @@ function build() {
   seal();
 }
 
-function run() {
-  const result = spawnSync(process.execPath, [validator, fixture], { encoding: 'utf8' });
+function run(tool = validator) {
+  const result = spawnSync(process.execPath, [tool, fixture], { encoding: 'utf8' });
   return `${result.stdout ?? ''}${result.stderr ?? ''}`;
 }
 
@@ -242,6 +271,17 @@ function catalogCase(name, mutate, expectation) {
   mutate(catalog);
   writeJson(catalogFile, catalog);
   report(name, expectation, run());
+  fs.writeFileSync(catalogFile, original);
+}
+
+// A library-citation case runs the validator copy inside the fixture, so the
+// library it reads is the fixture library written by build().
+function libraryCatalogCase(name, mutate, expectation) {
+  const original = fs.readFileSync(catalogFile, 'utf8');
+  const catalog = readJson(catalogFile);
+  mutate(catalog);
+  writeJson(catalogFile, catalog);
+  report(name, expectation, run(fixtureValidator));
   fs.writeFileSync(catalogFile, original);
 }
 
@@ -459,6 +499,20 @@ catalogCase('two patterns sharing one id', (catalog) => {
 catalogCase('two options sharing one id', (catalog) => {
   catalog.patterns[0].options[1].id = catalog.patterns[0].options[0].id;
 }, "pattern 'orders-list-page' has a duplicate option id 'filter-table'");
+
+console.log('\nPattern library citations (standards/rule/frontend-patterns.keep-one-pattern-catalog)');
+report('the fixture validator accepts the shipped catalog', null, run(fixtureValidator));
+libraryCatalogCase('a pattern citing the library pattern it matches', (catalog) => {
+  catalog.patterns[0].library = 'record-list';
+  catalog.patterns[0].options.push({ id: 'fixture-only', name: 'Fixture only', rationale: 'A product-owned option beside the library ones.', cost: 'Maintained by the product.' });
+}, null);
+libraryCatalogCase('a pattern citing a library pattern the library does not hold', (catalog) => {
+  catalog.patterns[0].library = 'no-such-pattern';
+}, "pattern 'orders-list-page': library 'no-such-pattern' is not a pattern in the UI pattern library");
+libraryCatalogCase('a pattern renaming a library option', (catalog) => {
+  catalog.patterns[0].library = 'record-list';
+  catalog.patterns[0].options[0].name = 'Renamed table';
+}, "pattern 'orders-list-page': options[0].name 'Renamed table' does not match the UI pattern library option 'filter-table' name 'Filterable table'");
 
 fs.rmSync(fixture, { recursive: true, force: true });
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);

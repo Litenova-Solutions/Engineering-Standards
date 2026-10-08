@@ -40,7 +40,8 @@
       "properties": {
         "docs": { "$ref": "#/$defs/repositoryPath" },
         "template": { "$ref": "#/$defs/repositoryPath" },
-        "extension": { "$ref": "#/$defs/repositoryPath" }
+        "extension": { "$ref": "#/$defs/repositoryPath" },
+        "uiPatternLibrary": { "$ref": "#/$defs/repositoryPath" }
       }
     },
     "provisionRegistry": {

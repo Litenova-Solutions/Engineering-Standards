@@ -87,7 +87,7 @@ An aggregate, module, or use-case specification carries a card under its title, 
 
 ## Pattern feedback
 
-Agents building UI follow the chosen pattern from the catalog. An agent that sees how a pattern could improve finishes its task on the chosen pattern, then reports a proposal in its completion report. It never changes a decision on its own and never stops mid-task to ask. (standards/rule/frontend-patterns.report-pattern-feedback-after-the-work)
+Agents building UI follow the chosen pattern from the catalog. An agent that sees how a pattern could improve finishes its task on the chosen pattern, then reports a proposal in its completion report. It never changes a decision on its own and never stops mid-task to ask. A proposal that is not specific to one product goes to the pattern library after the owner accepts it. (standards/rule/frontend-patterns.report-pattern-feedback-after-the-work, standards/rule/frontend-patterns.promote-library-improvements)
 
 ## Repository Verification
 
@@ -99,6 +99,7 @@ node tools/generate-provisions.mjs
 node tools/validate-standards.mjs
 node tools/validate-ui.cases.mjs
 node tools/validate-consumer.cases.mjs
+node patterns/ui/library.mjs --check
 git diff --check
 ```
 

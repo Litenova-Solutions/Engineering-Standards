@@ -14,6 +14,7 @@ Every recurring interface question is decided once and recorded in one catalog. 
 - Catalog and code change together, or a record explains. (standards/rule/frontend-patterns.update-the-catalog-with-the-code, standards/rule/frontend-patterns.state-the-implementation-status)
 - Patterns name behaviour, never a component library. (standards/rule/frontend-patterns.keep-the-catalog-platform-neutral)
 - Agents build on the choice and report ideas after. (standards/rule/frontend-patterns.keep-a-visual-registry, standards/rule/frontend-patterns.report-pattern-feedback-after-the-work)
+- Start each entry from the library and propose generic improvements back. (standards/rule/frontend-patterns.start-from-the-pattern-library, standards/rule/frontend-patterns.promote-library-improvements)
 
 ## Concepts
 
@@ -42,8 +43,23 @@ The catalog is one file valid against `schemas/ui-pattern-catalog.schema.json`. 
 | `compact` | The breakpoint and the behaviour below it |
 | `extensions` | Further options a reader may switch to |
 | `implementations` | The status and source paths per platform |
+| `library` | The library pattern id the entry starts from, if any |
 
 The `breakpoints` map names viewport widths in CSS pixels, and `groups` collect related patterns. The optional `registry` field names the command or path rendering every option for review.
+
+### The pattern library
+
+The standards ship a UI pattern library at `patterns/ui`, holding every recurring screen, element, and scenario of a business application. Each library pattern carries several drawn options, a recommended option, and a compact-screen behaviour, in `patterns/ui/library.json`.
+
+The library mocks are plain HTML and CSS in semantic tokens, so a reader on any front-end profile reads them without running a profile toolchain. Every mock draws on one neutral cast, Acme Supply, a wholesale supplier back office, so a reader moving between options meets the same records.
+
+Browse the library in the viewer at `patterns/ui/dist/ui-patterns.html`, built by `node patterns/ui/build.mjs`. The viewer shows light and dark themes, viewports from 390 CSS pixels to full screen, a side-by-side comparison, and a slideshow. `node patterns/ui/serve.mjs` serves the viewer on localhost and writes reviewer choices to a choices file beside it.
+
+### Starting a catalog from the library
+
+A catalog entry may set `library` to one library pattern id to start from that pattern. The entry keeps the library option ids, so a choice stays comparable across products, and it may add options of its own.
+
+The owner then chooses among the combined options and records the source. The entry states the compact behaviour and the implementation status per platform, and the platform team implements the chosen option in its own components. A choice differing from the library recommendation records its reason in the entry.
 
 ### The decision lifecycle
 
@@ -161,11 +177,11 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ### Keep a visual registry (standards/rule/frontend-patterns.keep-a-visual-registry)
 
-**Default:** Render every option of every pattern in each theme at a compact and a wide width, for review before choosing.
+**Default:** Review library options in the shared library viewer, and draw only product-specific options in a product registry at two widths.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** An option seen beside its rivals is judged on appearance rather than description. The registry command or path lives in the catalog `registry` field.
+**Rationale:** An option seen beside its rivals is judged on appearance rather than description. The library viewer already renders every library option, so a product registry draws only the patterns and options the product added. The product registry command or path lives in the catalog `registry` field.
 
 ### Report pattern feedback after the work (standards/rule/frontend-patterns.report-pattern-feedback-after-the-work)
 
@@ -174,6 +190,22 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
 **Rationale:** An agent never changes a decision on its own and never stops mid-task to ask. The owner accepts, refuses, or defers the proposal, and an accepted proposal follows `standards/rule/frontend-patterns.update-the-catalog-with-the-code`.
+
+### Start from the pattern library (standards/rule/frontend-patterns.start-from-the-pattern-library)
+
+**Default:** Start each catalog entry from its library pattern, through `library`, and keep the library option ids and the recommended option.
+
+**Replacement:** A consumer can replace this default with a local catalog carrying its own reason.
+
+**Rationale:** A shared starting point keeps choices comparable across products and keeps the library recommendation visible. A product choosing a different option records its reason in the entry, so the departure stays reviewable.
+
+### Promote library improvements (standards/rule/frontend-patterns.promote-library-improvements)
+
+**Default:** Send an accepted proposal that is not specific to one product to the library, as a new option or a refined one.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** The library improves from use across products, while each product keeps its own choices. The proposal follows `standards/rule/frontend-patterns.report-pattern-feedback-after-the-work`, and it reaches the library after the owner accepts it.
 
 ## Verification
 
@@ -189,3 +221,5 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 | standards/rule/frontend-patterns.keep-the-catalog-platform-neutral | inspection | Review confirms no pattern names a component library outside `implementations`. |
 | standards/rule/frontend-patterns.keep-a-visual-registry | inspection | Review confirms the registry renders every option in each theme at both widths. |
 | standards/rule/frontend-patterns.report-pattern-feedback-after-the-work | inspection | Review confirms task reports carry proposals with pattern id, change, reason, and option. |
+| standards/rule/frontend-patterns.start-from-the-pattern-library | inspection | Review confirms each catalog entry sets `library` or records its own reason, and keeps library option ids. |
+| standards/rule/frontend-patterns.promote-library-improvements | inspection | Review confirms accepted generic proposals reached the library as a new or refined option. |

@@ -8,7 +8,8 @@
   "paths": {
     "docs": "docs",
     "template": "templates",
-    "extension": "docs/ext"
+    "extension": "docs/ext",
+    "uiPatternLibrary": "patterns/ui"
   },
   "provisionRegistry": {
     "areas": [

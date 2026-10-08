@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 914 provisions across 1 kinds.
+The active release states 916 provisions across 1 kinds.
 
 ## rule
 
@@ -747,9 +747,11 @@ The active release states 914 provisions across 1 kinds.
 | standards/rule/frontend-patterns.keep-a-visual-registry | [Keep a visual registry](../frontend/patterns.md#keep-a-visual-registry-standardsrulefrontend-patternskeep-a-visual-registry) | `frontend/patterns.md` |
 | standards/rule/frontend-patterns.keep-one-pattern-catalog | [Keep one pattern catalog](../frontend/patterns.md#keep-one-pattern-catalog-standardsrulefrontend-patternskeep-one-pattern-catalog) | `frontend/patterns.md` |
 | standards/rule/frontend-patterns.keep-the-catalog-platform-neutral | [Keep the catalog platform neutral](../frontend/patterns.md#keep-the-catalog-platform-neutral-standardsrulefrontend-patternskeep-the-catalog-platform-neutral) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.promote-library-improvements | [Promote library improvements](../frontend/patterns.md#promote-library-improvements-standardsrulefrontend-patternspromote-library-improvements) | `frontend/patterns.md` |
 | standards/rule/frontend-patterns.record-every-option-considered | [Record every option considered](../frontend/patterns.md#record-every-option-considered-standardsrulefrontend-patternsrecord-every-option-considered) | `frontend/patterns.md` |
 | standards/rule/frontend-patterns.record-who-chose | [Record who chose](../frontend/patterns.md#record-who-chose-standardsrulefrontend-patternsrecord-who-chose) | `frontend/patterns.md` |
 | standards/rule/frontend-patterns.report-pattern-feedback-after-the-work | [Report pattern feedback after the work](../frontend/patterns.md#report-pattern-feedback-after-the-work-standardsrulefrontend-patternsreport-pattern-feedback-after-the-work) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.start-from-the-pattern-library | [Start from the pattern library](../frontend/patterns.md#start-from-the-pattern-library-standardsrulefrontend-patternsstart-from-the-pattern-library) | `frontend/patterns.md` |
 | standards/rule/frontend-patterns.state-the-implementation-status | [State the implementation status](../frontend/patterns.md#state-the-implementation-status-standardsrulefrontend-patternsstate-the-implementation-status) | `frontend/patterns.md` |
 | standards/rule/frontend-patterns.update-the-catalog-with-the-code | [Update the catalog with the code](../frontend/patterns.md#update-the-catalog-with-the-code-standardsrulefrontend-patternsupdate-the-catalog-with-the-code) | `frontend/patterns.md` |
 | standards/rule/frontend-rendering.build-the-server-query-cache-per-request | [Build the server query cache per request](../frontend/rendering.md#build-the-server-query-cache-per-request-standardsrulefrontend-renderingbuild-the-server-query-cache-per-request) | `frontend/rendering.md` |

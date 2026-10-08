@@ -105,6 +105,11 @@
             }
           }
         },
+        "library": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "The id of the standards UI pattern library pattern this entry starts from. Its options keep the library's option ids, and the entry may add options of its own."
+        },
         "implementations": {
           "type": "object",
           "description": "Keyed by frontend platform, such as react-web or blazor-web.",

@@ -769,6 +769,24 @@ function validatePatternCatalog(relative) {
     : new Set();
   const groupIds = new Set(Array.isArray(catalog.groups) ? catalog.groups.map((group) => group?.id) : []);
   const patterns = Array.isArray(catalog.patterns) ? catalog.patterns : [];
+  // A pattern citing a library pattern starts from the library's entry. The
+  // library ships with the standards release the validator runs from, so it
+  // resolves beside this file rather than under the consumer root. A catalog
+  // that cites nothing reads nothing here.
+  const citesLibrary = patterns.some((pattern) => typeof pattern?.library === 'string' && pattern.library !== '');
+  let libraryById = null;
+  if (citesLibrary) {
+    const libraryFile = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'patterns', 'ui', 'library.json');
+    if (!fs.existsSync(libraryFile)) {
+      error(`${label}: the UI pattern library is missing from the standards release`);
+    } else {
+      const library = readJson(libraryFile, 'UI pattern library');
+      if (library) {
+        const entries = Array.isArray(library.patterns) ? library.patterns : [];
+        libraryById = new Map(entries.map((entry) => [entry?.id, entry]));
+      }
+    }
+  }
   const seenPatterns = new Set();
   for (const pattern of patterns) {
     const id = pattern?.id ?? '(unnamed)';
@@ -803,6 +821,26 @@ function validatePatternCatalog(relative) {
         error(`[standards/rule/frontend-patterns.record-every-option-considered] ${where}: extensions[${index}].option '${extension.option}' is not one of its options`);
       }
     });
+    // A citation names the library pattern the entry starts from. An option id
+    // the library does not have is the product's own option, which is allowed;
+    // an option id the library has keeps the library's name, because a renamed
+    // copy reads as the same option and is not.
+    if (typeof pattern?.library === 'string' && pattern.library !== '' && libraryById) {
+      const entry = libraryById.get(pattern.library);
+      if (entry === undefined) {
+        error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${where}: library '${pattern.library}' is not a pattern in the UI pattern library`);
+      } else {
+        const libraryOptions = Array.isArray(entry?.options) ? entry.options : [];
+        const libraryNames = new Map(libraryOptions.map((option) => [option?.id, option?.name]));
+        options.forEach((option, index) => {
+          if (option?.id === undefined || !libraryNames.has(option.id)) return;
+          const libraryName = libraryNames.get(option.id);
+          if (typeof libraryName === 'string' && option?.name !== undefined && option.name !== libraryName) {
+            error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${where}: options[${index}].name '${option.name}' does not match the UI pattern library option '${option.id}' name '${libraryName}'`);
+          }
+        });
+      }
+    }
     const implementations = pattern?.implementations && typeof pattern.implementations === 'object' && !Array.isArray(pattern.implementations)
       ? Object.entries(pattern.implementations)
       : [];
