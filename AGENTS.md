@@ -85,6 +85,10 @@ Read the full cited provisions before applying these boundaries. (standards/rule
 
 An aggregate, module, or use-case specification carries a card under its title, before its first section. The card is `At a glance` on an aggregate, `Module map` on a module, and `Business impact` on a use case. An aggregate or use-case page also carries `Terms used`, and a card lifts from the page and invents nothing. The reference consumer validator requires the callouts and their position. (standards/rule/core-authoring.use-the-declared-page-contract)
 
+## Pattern feedback
+
+Agents building UI follow the chosen pattern from the catalog. An agent that sees how a pattern could improve finishes its task on the chosen pattern, then reports a proposal in its completion report. It never changes a decision on its own and never stops mid-task to ask. (standards/rule/frontend-patterns.report-pattern-feedback-after-the-work)
+
 ## Repository Verification
 
 Run these checks for the standards repository. (standards/rule/core-authoring.run-repeatable-authoring-checks)

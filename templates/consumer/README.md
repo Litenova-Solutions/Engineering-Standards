@@ -34,6 +34,7 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | `section-index.md` | `docs/{section}/README.md` | A directory needs an index and owns no aggregate, use case, or policy. |
 | `design-contract.md` | `packages/ui/DESIGN.md` | States the brand, tokens, composites, floorplans, do list, refusals, motion, and voice every frontend composes from. |
 | `ui-source-lock.json` | `packages/ui/ui-source-lock.json` | Records the installed registry source, the decoded preset, the registry address, the digests, and the dependencies. |
+| `ui-pattern-catalog.json` | `docs/ui/pattern-catalog.json` | A controlled frontend records each recurring UI decision with its options, choice, compact behaviour, and implementation status. |
 | `decision.md` | `docs/decisions/{id}.md` | A standards override or expensive-to-reverse choice is required. |
 | `ui-override-decision.md` | `docs/decisions/{id}.md` | A shared UI package visual authority, registry, or specialist-control override is required. |
 | `runbook.md` | `docs/runbooks/{runbook}.md` | An operator needs a repeatable recovery or operating procedure. |

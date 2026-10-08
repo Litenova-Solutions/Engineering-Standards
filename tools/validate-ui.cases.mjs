@@ -28,6 +28,7 @@ const tokensCss = path.join(packageRoot, 'src/styles/tokens.css');
 const projectFile = path.join(fixture, 'standards.project.json');
 const lockFile = path.join(packageRoot, 'ui-source-lock.json');
 const designFile = path.join(packageRoot, 'DESIGN.md');
+const catalogFile = path.join(fixture, 'docs/ui/pattern-catalog.json');
 
 // The structure the pinned CLI actually generates: the three approved imports,
 // the dark variant, the theme mapping, both token blocks, and the documented
@@ -157,6 +158,20 @@ function build() {
   const contract = fs.readFileSync(path.join(repository, 'templates/consumer/design-contract.md'), 'utf8');
   fs.writeFileSync(designFile, contract.replace(/__PROJECT__/g, 'fixture'));
 
+  // The catalog travels with the consumer: the fixture copies the shipped
+  // template to the path the project file names, then creates every source
+  // path the catalog names, so the baseline proves the template as shipped.
+  writeJson(catalogFile, readJson(path.join(repository, 'templates/consumer/ui-pattern-catalog.json')));
+  for (const pattern of readJson(catalogFile).patterns) {
+    for (const implementation of Object.values(pattern.implementations ?? {})) {
+      for (const component of implementation.components ?? []) {
+        const target = path.join(fixture, component);
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        if (!fs.existsSync(target)) fs.writeFileSync(target, 'export function Stub() {\n  return null;\n}\n');
+      }
+    }
+  }
+
   seal();
 }
 
@@ -219,6 +234,15 @@ function lockCase(name, mutate, expectation) {
   writeJson(lockFile, lock);
   report(name, expectation, run());
   fs.writeFileSync(lockFile, original);
+}
+
+function catalogCase(name, mutate, expectation) {
+  const original = fs.readFileSync(catalogFile, 'utf8');
+  const catalog = readJson(catalogFile);
+  mutate(catalog);
+  writeJson(catalogFile, catalog);
+  report(name, expectation, run());
+  fs.writeFileSync(catalogFile, original);
 }
 
 function manifestCase(name, packageJson, expectation) {
@@ -387,6 +411,54 @@ fs.writeFileSync(designFile, contract.replace('"patterns": ["list-page", "entity
 report('design contract naming no floorplan', 'array has fewer than 1 items', run());
 fs.writeFileSync(designFile, contract);
 report('the shipped design contract is accepted', null, run());
+
+console.log('\nPattern catalog (standards/rule/frontend-patterns.keep-one-pattern-catalog, standards/rule/frontend-patterns.record-every-option-considered, standards/rule/frontend-patterns.declare-the-compact-behaviour, standards/rule/frontend-patterns.implement-a-chosen-pattern-once, standards/rule/frontend-patterns.state-the-implementation-status)');
+report('the shipped pattern catalog is accepted', null, run());
+configCase('a workspace with no pattern catalog', (project) => {
+  delete project.paths.uiPatterns;
+}, null);
+{
+  const original = fs.readFileSync(catalogFile, 'utf8');
+  fs.rmSync(catalogFile);
+  report('a declared pattern catalog that is missing', "no catalog at 'docs/ui/pattern-catalog.json'", run());
+  fs.writeFileSync(catalogFile, original);
+}
+catalogCase('a catalog that breaks the schema', (catalog) => {
+  catalog.patterns[0].options = [catalog.patterns[0].options[0]];
+}, 'array has fewer than 2 items');
+catalogCase('a decision naming no recorded option', (catalog) => {
+  catalog.patterns[0].decision.option = 'no-such-option';
+}, "pattern 'orders-list-page': decision.option 'no-such-option' is not one of its options");
+catalogCase('a compact variant naming no recorded option', (catalog) => {
+  catalog.patterns[1].compact.option = 'no-such-option';
+}, "pattern 'table-sorting': compact.option 'no-such-option' is not one of its options");
+catalogCase('an extension naming no recorded option', (catalog) => {
+  catalog.patterns[0].extensions[0].option = 'no-such-option';
+}, "pattern 'orders-list-page': extensions[0].option 'no-such-option' is not one of its options");
+catalogCase('a compact variant naming no breakpoint', (catalog) => {
+  catalog.patterns[0].compact.breakpoint = 'no-such-breakpoint';
+}, "pattern 'orders-list-page': compact.breakpoint 'no-such-breakpoint' is not a key of breakpoints");
+catalogCase('a pattern naming no catalog group', (catalog) => {
+  catalog.patterns[0].group = 'no-such-group';
+}, "pattern 'orders-list-page': group 'no-such-group' is not one of the catalog groups");
+catalogCase('a component path that does not exist', (catalog) => {
+  catalog.patterns[0].implementations['react-web'].components = ['packages/ui/src/floorplans/no-such.tsx'];
+}, "pattern 'orders-list-page': implementations.react-web.components[0] does not exist 'packages/ui/src/floorplans/no-such.tsx'");
+catalogCase('an adopted status with no components', (catalog) => {
+  delete catalog.patterns[0].implementations['react-web'].components;
+}, "pattern 'orders-list-page': implementations.react-web has status 'adopted' with no components");
+catalogCase('a partial status with no gap', (catalog) => {
+  catalog.patterns[0].implementations['react-web'] = { status: 'partial' };
+}, "pattern 'orders-list-page': implementations.react-web has status 'partial' with no gap");
+catalogCase('a pending status with no gap', (catalog) => {
+  catalog.patterns[0].implementations['react-web'] = { status: 'pending' };
+}, "pattern 'orders-list-page': implementations.react-web has status 'pending' with no gap");
+catalogCase('two patterns sharing one id', (catalog) => {
+  catalog.patterns[1].id = catalog.patterns[0].id;
+}, "duplicate pattern id 'orders-list-page'");
+catalogCase('two options sharing one id', (catalog) => {
+  catalog.patterns[0].options[1].id = catalog.patterns[0].options[0].id;
+}, "pattern 'orders-list-page' has a duplicate option id 'filter-table'");
 
 fs.rmSync(fixture, { recursive: true, force: true });
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);

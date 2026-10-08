@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 904 provisions across 1 kinds.
+The active release states 914 provisions across 1 kinds.
 
 ## rule
 
@@ -742,6 +742,16 @@ The active release states 904 provisions across 1 kinds.
 | standards/rule/frontend-data.update-the-cache-a-command-changed | [Update the cache a command changed](../frontend/data.md#update-the-cache-a-command-changed-standardsrulefrontend-dataupdate-the-cache-a-command-changed) | `frontend/data.md` |
 | standards/rule/frontend-data.use-one-configured-client-per-application | [Use one configured client per application](../frontend/data.md#use-one-configured-client-per-application-standardsrulefrontend-datause-one-configured-client-per-application) | `frontend/data.md` |
 | standards/rule/frontend-data.validate-a-form-with-the-generated-schema | [Validate a form with the generated schema](../frontend/data.md#validate-a-form-with-the-generated-schema-standardsrulefrontend-datavalidate-a-form-with-the-generated-schema) | `frontend/data.md` |
+| standards/rule/frontend-patterns.declare-the-compact-behaviour | [Declare the compact behaviour](../frontend/patterns.md#declare-the-compact-behaviour-standardsrulefrontend-patternsdeclare-the-compact-behaviour) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.implement-a-chosen-pattern-once | [Implement a chosen pattern once](../frontend/patterns.md#implement-a-chosen-pattern-once-standardsrulefrontend-patternsimplement-a-chosen-pattern-once) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.keep-a-visual-registry | [Keep a visual registry](../frontend/patterns.md#keep-a-visual-registry-standardsrulefrontend-patternskeep-a-visual-registry) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.keep-one-pattern-catalog | [Keep one pattern catalog](../frontend/patterns.md#keep-one-pattern-catalog-standardsrulefrontend-patternskeep-one-pattern-catalog) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.keep-the-catalog-platform-neutral | [Keep the catalog platform neutral](../frontend/patterns.md#keep-the-catalog-platform-neutral-standardsrulefrontend-patternskeep-the-catalog-platform-neutral) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.record-every-option-considered | [Record every option considered](../frontend/patterns.md#record-every-option-considered-standardsrulefrontend-patternsrecord-every-option-considered) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.record-who-chose | [Record who chose](../frontend/patterns.md#record-who-chose-standardsrulefrontend-patternsrecord-who-chose) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.report-pattern-feedback-after-the-work | [Report pattern feedback after the work](../frontend/patterns.md#report-pattern-feedback-after-the-work-standardsrulefrontend-patternsreport-pattern-feedback-after-the-work) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.state-the-implementation-status | [State the implementation status](../frontend/patterns.md#state-the-implementation-status-standardsrulefrontend-patternsstate-the-implementation-status) | `frontend/patterns.md` |
+| standards/rule/frontend-patterns.update-the-catalog-with-the-code | [Update the catalog with the code](../frontend/patterns.md#update-the-catalog-with-the-code-standardsrulefrontend-patternsupdate-the-catalog-with-the-code) | `frontend/patterns.md` |
 | standards/rule/frontend-rendering.build-the-server-query-cache-per-request | [Build the server query cache per request](../frontend/rendering.md#build-the-server-query-cache-per-request-standardsrulefrontend-renderingbuild-the-server-query-cache-per-request) | `frontend/rendering.md` |
 | standards/rule/frontend-rendering.define-route-metadata-deliberately | [Define route metadata deliberately](../frontend/rendering.md#define-route-metadata-deliberately-standardsrulefrontend-renderingdefine-route-metadata-deliberately) | `frontend/rendering.md` |
 | standards/rule/frontend-rendering.keep-authenticated-caching-explicit | [Keep authenticated caching explicit](../frontend/rendering.md#keep-authenticated-caching-explicit-standardsrulefrontend-renderingkeep-authenticated-caching-explicit) | `frontend/rendering.md` |

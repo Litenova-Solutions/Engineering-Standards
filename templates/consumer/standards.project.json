@@ -24,6 +24,7 @@
       "designContract": "packages/ui/DESIGN.md",
       "publicExports": ["@__PROJECT__/ui/floorplans", "@__PROJECT__/ui/display", "@__PROJECT__/ui/forms"]
     },
+    "uiPatterns": "docs/ui/pattern-catalog.json",
     "frontends": [
       {
         "name": "web",

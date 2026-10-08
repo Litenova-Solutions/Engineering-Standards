@@ -96,6 +96,10 @@
           "description": "The workspace's one shared UI package: the registry configuration, the copied primitive source, the token stylesheet, the source lock, and the design contract. A workspace with no controlled React web frontend omits it.",
           "$ref": "#/$defs/uiPackage"
         },
+        "uiPatterns": {
+          "description": "The workspace UI pattern catalog, validated against schemas/ui-pattern-catalog.schema.json. A workspace that records no pattern decisions omits it.",
+          "$ref": "#/$defs/projectPath"
+        },
         "frontends": {
           "type": "array",
           "items": {

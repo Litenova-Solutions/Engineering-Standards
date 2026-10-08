@@ -280,6 +280,7 @@
       "@tanstack/react-query-devtools": "5.104.1",
       "@tanstack/react-router": "1.170.41",
       "@tanstack/react-router-devtools": "1.167.2",
+      "@tanstack/react-table": "9.2.4",
       "@tanstack/react-start": "1.168.60",
       "@tanstack/router-cli": "1.167.40",
       "@tanstack/router-plugin": "1.168.42",
@@ -436,12 +437,14 @@
       ],
       "tier1": [
         "docs/blazor/browser.md#agent-summary",
-        "docs/quality/security.md#agent-summary"
+        "docs/quality/security.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/browser.md",
         "docs/blazor/data.md",
-        "docs/quality/security.md"
+        "docs/quality/security.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.components": {
@@ -450,12 +453,14 @@
       ],
       "tier1": [
         "docs/blazor/components.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary"
+        "docs/workspace/naming.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/components.md",
         "docs/blazor/structure.md",
-        "docs/workspace/naming.md"
+        "docs/workspace/naming.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.data": {
@@ -464,11 +469,13 @@
       ],
       "tier1": [
         "docs/blazor/data.md#agent-summary",
-        "docs/blazor/browser.md#agent-summary"
+        "docs/blazor/browser.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/data.md",
-        "docs/blazor/browser.md"
+        "docs/blazor/browser.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.rendering": {
@@ -477,11 +484,13 @@
       ],
       "tier1": [
         "docs/blazor/rendering.md#agent-summary",
-        "docs/blazor/components.md#agent-summary"
+        "docs/blazor/components.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/rendering.md",
-        "docs/blazor/components.md"
+        "docs/blazor/components.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.structure": {
@@ -490,11 +499,13 @@
       ],
       "tier1": [
         "docs/blazor/structure.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary"
+        "docs/workspace/naming.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/structure.md",
-        "docs/workspace/naming.md"
+        "docs/workspace/naming.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.testing": {
@@ -503,11 +514,13 @@
       ],
       "tier1": [
         "docs/blazor/testing.md#agent-summary",
-        "docs/core/release.md#agent-summary"
+        "docs/core/release.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/testing.md",
-        "docs/core/release.md"
+        "docs/core/release.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "core.authoring": {
@@ -560,13 +573,15 @@
         "docs/frontend/components.md#agent-summary",
         "docs/frontend/ui.md#agent-summary",
         "docs/frontend/rendering.md#agent-summary",
-        "docs/frontend/testing.md#agent-summary"
+        "docs/frontend/testing.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/components.md",
         "docs/frontend/ui.md",
         "docs/frontend/rendering.md",
-        "docs/frontend/testing.md"
+        "docs/frontend/testing.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.data": {
@@ -576,12 +591,14 @@
       "tier1": [
         "docs/frontend/data.md#agent-summary",
         "docs/workspace/config.md#agent-summary",
-        "docs/quality/security.md#agent-summary"
+        "docs/quality/security.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/data.md",
         "docs/workspace/config.md",
-        "docs/quality/security.md"
+        "docs/quality/security.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.rendering": {
@@ -593,13 +610,15 @@
         "docs/frontend/rendering.md#agent-summary",
         "docs/frontend/components.md#agent-summary",
         "docs/frontend/ui.md#agent-summary",
-        "docs/quality/security.md#agent-summary"
+        "docs/quality/security.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/rendering.md",
         "docs/frontend/components.md",
         "docs/frontend/ui.md",
-        "docs/quality/security.md"
+        "docs/quality/security.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.structure": {
@@ -609,12 +628,14 @@
       "tier1": [
         "docs/frontend/structure.md#agent-summary",
         "docs/frontend/ui.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary"
+        "docs/workspace/naming.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/structure.md",
         "docs/frontend/ui.md",
-        "docs/workspace/naming.md"
+        "docs/workspace/naming.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.testing": {
@@ -623,11 +644,13 @@
       ],
       "tier1": [
         "docs/frontend/testing.md#agent-summary",
-        "docs/core/release.md#agent-summary"
+        "docs/core/release.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/testing.md",
-        "docs/core/release.md"
+        "docs/core/release.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.ui": {
@@ -638,13 +661,15 @@
         "docs/frontend/ui.md#agent-summary",
         "docs/frontend/components.md#agent-summary",
         "docs/frontend/testing.md#agent-summary",
-        "docs/workspace/dependencies.md#agent-summary"
+        "docs/workspace/dependencies.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/ui.md",
         "docs/frontend/components.md",
         "docs/frontend/testing.md",
-        "docs/workspace/dependencies.md"
+        "docs/workspace/dependencies.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "quality.operations": {

@@ -1,0 +1,101 @@
+{
+  "$schema": "./standards/schemas/ui-pattern-catalog.schema.json",
+  "kind": "ui-pattern-catalog",
+  "schemaVersion": 1,
+  "breakpoints": {
+    "compact": 768
+  },
+  "groups": [
+    {
+      "id": "page-frames",
+      "title": "Page frames",
+      "kind": "page-frame"
+    },
+    {
+      "id": "elements",
+      "title": "Elements",
+      "kind": "element"
+    }
+  ],
+  "patterns": [
+    {
+      "id": "orders-list-page",
+      "group": "page-frames",
+      "title": "Orders list page",
+      "question": "How does a reader find one order among many?",
+      "options": [
+        {
+          "id": "filter-table",
+          "name": "Filterable table",
+          "rationale": "Rows scan fast and filters narrow the set without leaving the page.",
+          "cost": "Needs a table composite with filter controls."
+        },
+        {
+          "id": "search-cards",
+          "name": "Searchable cards",
+          "rationale": "Cards show each order with room for status and totals.",
+          "cost": "Slow to scan past a few dozen orders."
+        }
+      ],
+      "decision": {
+        "option": "filter-table",
+        "source": "recommended"
+      },
+      "compact": {
+        "breakpoint": "compact",
+        "behaviour": "Below 768 pixels the filters stack above the table and the table scrolls horizontally."
+      },
+      "extensions": [
+        {
+          "option": "search-cards",
+          "when": "The list holds few orders and the reader compares them visually."
+        }
+      ],
+      "implementations": {
+        "react-web": {
+          "status": "adopted",
+          "components": ["packages/ui/src/floorplans/list-page.tsx"]
+        }
+      }
+    },
+    {
+      "id": "table-sorting",
+      "group": "elements",
+      "title": "Table sorting",
+      "question": "How does a reader reorder the rows of a table?",
+      "options": [
+        {
+          "id": "column-header-sort",
+          "name": "Sort control in each column header",
+          "rationale": "The control sits where the reader looks when choosing a column.",
+          "cost": "Each sortable header carries a button and a direction label."
+        },
+        {
+          "id": "toolbar-sort",
+          "name": "One sort control above the table",
+          "rationale": "One control keeps narrow tables readable.",
+          "cost": "The reader maps the control back to its column."
+        }
+      ],
+      "decision": {
+        "option": "column-header-sort",
+        "source": "recommended"
+      },
+      "compact": {
+        "breakpoint": "compact",
+        "option": "toolbar-sort",
+        "behaviour": "Below 768 pixels headers lose their sort controls and one toolbar above the table sorts."
+      },
+      "implementations": {
+        "react-web": {
+          "status": "adopted",
+          "components": ["packages/ui/src/components/data-table.tsx"]
+        },
+        "blazor-web": {
+          "status": "pending",
+          "gap": "No Blazor frontend implements the table yet."
+        }
+      }
+    }
+  ]
+}

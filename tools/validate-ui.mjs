@@ -3,7 +3,8 @@
 //
 // The validator is deliberately local and deterministic. It reads the shared UI
 // package the consumer declares, its registry configuration, its source lock, its
-// design contract, and its stylesheets, then checks the boundary each frontend
+// design contract, its stylesheets, and the pattern catalog when the consumer
+// declares one, then checks the boundary each frontend
 // keeps. It never fetches a registry or a package. Consumers may add stricter AST
 // rules, but they should preserve these checks.
 //
@@ -744,6 +745,89 @@ function validateDependencyBoundary() {
   }
 }
 
+// ---- pattern catalog --------------------------------------------------------
+
+// The pattern catalog records one decision per recurring UI question: the
+// options considered, the option chosen, the compact behaviour, and the
+// implementation per platform. The schema proves the shape; the checks below
+// prove the references the schema cannot see across properties, so every named
+// option, breakpoint, group, and component path resolves.
+function validatePatternCatalog(relative) {
+  const file = filePath(relative);
+  const label = relativeToRoot(file);
+  if (!fs.existsSync(file)) {
+    error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] pattern catalog: no catalog at '${relative}'`);
+    return;
+  }
+  const catalog = readJson(file, label);
+  if (!catalog) return;
+  schemaCheck('ui-pattern-catalog.schema.json', catalog, label, 'standards/rule/frontend-patterns.keep-one-pattern-catalog');
+  // A catalog that breaks the schema still reads below, so each access guards
+  // its own shape rather than assuming the schema proved it.
+  const breakpoints = catalog.breakpoints && typeof catalog.breakpoints === 'object' && !Array.isArray(catalog.breakpoints)
+    ? new Set(Object.keys(catalog.breakpoints))
+    : new Set();
+  const groupIds = new Set(Array.isArray(catalog.groups) ? catalog.groups.map((group) => group?.id) : []);
+  const patterns = Array.isArray(catalog.patterns) ? catalog.patterns : [];
+  const seenPatterns = new Set();
+  for (const pattern of patterns) {
+    const id = pattern?.id ?? '(unnamed)';
+    if (pattern?.id !== undefined) {
+      if (seenPatterns.has(pattern.id)) error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${label}: duplicate pattern id '${pattern.id}'`);
+      seenPatterns.add(pattern.id);
+    }
+    const where = `${label}: pattern '${id}'`;
+    const options = Array.isArray(pattern?.options) ? pattern.options : [];
+    const optionIds = new Set(options.map((option) => option?.id));
+    const seenOptions = new Set();
+    for (const option of options) {
+      if (option?.id === undefined) continue;
+      if (seenOptions.has(option.id)) error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${where} has a duplicate option id '${option.id}'`);
+      seenOptions.add(option.id);
+    }
+    if (pattern?.group !== undefined && !groupIds.has(pattern.group)) {
+      error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${where}: group '${pattern.group}' is not one of the catalog groups`);
+    }
+    if (pattern?.decision?.option !== undefined && !optionIds.has(pattern.decision.option)) {
+      error(`[standards/rule/frontend-patterns.record-every-option-considered] ${where}: decision.option '${pattern.decision.option}' is not one of its options`);
+    }
+    if (pattern?.compact?.breakpoint !== undefined && !breakpoints.has(pattern.compact.breakpoint)) {
+      error(`[standards/rule/frontend-patterns.declare-the-compact-behaviour] ${where}: compact.breakpoint '${pattern.compact.breakpoint}' is not a key of breakpoints`);
+    }
+    if (pattern?.compact?.option !== undefined && !optionIds.has(pattern.compact.option)) {
+      error(`[standards/rule/frontend-patterns.declare-the-compact-behaviour] ${where}: compact.option '${pattern.compact.option}' is not one of its options`);
+    }
+    const extensions = Array.isArray(pattern?.extensions) ? pattern.extensions : [];
+    extensions.forEach((extension, index) => {
+      if (extension?.option !== undefined && !optionIds.has(extension.option)) {
+        error(`[standards/rule/frontend-patterns.record-every-option-considered] ${where}: extensions[${index}].option '${extension.option}' is not one of its options`);
+      }
+    });
+    const implementations = pattern?.implementations && typeof pattern.implementations === 'object' && !Array.isArray(pattern.implementations)
+      ? Object.entries(pattern.implementations)
+      : [];
+    for (const [platform, implementation] of implementations) {
+      const target = `${where}: implementations.${platform}`;
+      if (Array.isArray(implementation?.components)) {
+        implementation.components.forEach((component, index) => {
+          if (typeof component !== 'string' || !component) return;
+          if (!fs.existsSync(filePath(component))) {
+            error(`[standards/rule/frontend-patterns.implement-a-chosen-pattern-once] ${target}.components[${index}] does not exist '${component}'`);
+          }
+        });
+      }
+      const components = implementation?.components;
+      if (implementation?.status === 'adopted' && (components === undefined || (Array.isArray(components) && components.length === 0))) {
+        error(`[standards/rule/frontend-patterns.implement-a-chosen-pattern-once] ${target} has status 'adopted' with no components`);
+      }
+      const gap = implementation?.gap;
+      if ((implementation?.status === 'partial' || implementation?.status === 'pending') && (gap === undefined || gap === null || gap === '')) {
+        error(`[standards/rule/frontend-patterns.state-the-implementation-status] ${target} has status '${implementation.status}' with no gap`);
+      }
+    }
+  }
+}
+
 // ---- run --------------------------------------------------------------------
 
 const projectFile = path.join(root, 'standards.project.json');
@@ -893,6 +977,13 @@ for (const frontend of controlled) {
       }
     }
   }
+}
+
+// A workspace that records pattern decisions keeps one catalog beside its
+// design contract. A workspace without one reports nothing here.
+// (standards/rule/frontend-patterns.keep-one-pattern-catalog)
+if (project?.paths?.uiPatterns) {
+  validatePatternCatalog(project.paths.uiPatterns);
 }
 
 if (jsonOutput) {

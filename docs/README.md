@@ -52,6 +52,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Frontend rendering and routes](frontend/rendering.md)
 - [Frontend components](frontend/components.md)
 - [Controlled UI governance](frontend/ui.md)
+- [UI pattern decisions](frontend/patterns.md)
 - [Frontend data and state](frontend/data.md)
 - [Frontend testing](frontend/testing.md)
 

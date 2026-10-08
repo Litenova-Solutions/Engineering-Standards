@@ -24,7 +24,7 @@ The route code is the page contract. No page document restates it, because a sec
 
 ### The floorplan set
 
-A floorplan is a page component that fixes one page layout and exposes named slots. The shared package holds the closed set, and a route composes exactly one of them. A closed set lets an author choose a known shape by rule rather than invent a layout.
+A floorplan is a page component that fixes one page layout and exposes named slots. The shared package holds the closed set, and a route composes exactly one of them. A closed set lets an author choose a known shape by rule rather than invent a layout. Each floorplan implements the chosen option of one page-frame pattern from the pattern catalog ([UI pattern decisions](patterns.md)).
 
 These five floorplans are the reference set. A workspace declares the ones its routes need, and each carries the rule for choosing it.
 
@@ -275,6 +275,7 @@ test('[path/orders.place-order.expected-total-mismatch] shows the changed total 
 | Floorplan or display composite | The route suite on one route that composes it |
 | Token or global CSS | The route suite on one route in each profile |
 | Route | The route suite on that route, and every test citing a path it calls |
+| Pattern decision | The catalog entry changes with its implementation |
 | Fork | The source lock digest and the component test |
 | Specialist control | The accessibility check for the capability it supplies |
 
