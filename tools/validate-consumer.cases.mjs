@@ -406,7 +406,7 @@ projectCase('frontend omits its platform', (p) => { p.paths.frontends = [{ name:
 projectCase('frontend declares an unknown platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'web' }]; }, "unknown platform 'web'");
 projectCase('frontend outside the UI contract declares other-web', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'other-web' }]; }, null);
 
-console.log('\nShared UI package (standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package)');
+console.log('\nShared UI package (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
 projectCase('a controlled frontend with no shared package', (p) => {
   p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'react-web', ui: { profile: 'application-balanced' } }];
 }, "and no paths.uiPackage");

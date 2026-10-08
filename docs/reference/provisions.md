@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 900 provisions across 1 kinds.
+The active release states 904 provisions across 1 kinds.
 
 ## rule
 
@@ -785,14 +785,18 @@ The active release states 900 provisions across 1 kinds.
 | standards/rule/frontend-ui.check-every-route-in-a-browser | [Check every route in a browser](../frontend/ui.md#check-every-route-in-a-browser-standardsrulefrontend-uicheck-every-route-in-a-browser) | `frontend/ui.md` |
 | standards/rule/frontend-ui.compose-each-route-from-one-floorplan | [Compose each route from one floorplan](../frontend/ui.md#compose-each-route-from-one-floorplan-standardsrulefrontend-uicompose-each-route-from-one-floorplan) | `frontend/ui.md` |
 | standards/rule/frontend-ui.declare-a-closed-floorplan-set | [Declare a closed floorplan set](../frontend/ui.md#declare-a-closed-floorplan-set-standardsrulefrontend-uideclare-a-closed-floorplan-set) | `frontend/ui.md` |
+| standards/rule/frontend-ui.derive-each-page-type-from-a-named-reference | [Derive each page type from a named reference](../frontend/ui.md#derive-each-page-type-from-a-named-reference-standardsrulefrontend-uiderive-each-page-type-from-a-named-reference) | `frontend/ui.md` |
 | standards/rule/frontend-ui.govern-behavior-companions-and-specialist-controls | [Govern behavior companions and specialist controls](../frontend/ui.md#govern-behavior-companions-and-specialist-controls-standardsrulefrontend-uigovern-behavior-companions-and-specialist-controls) | `frontend/ui.md` |
+| standards/rule/frontend-ui.hold-the-declared-base-colour | [Hold the declared base colour](../frontend/ui.md#hold-the-declared-base-colour-standardsrulefrontend-uihold-the-declared-base-colour) | `frontend/ui.md` |
 | standards/rule/frontend-ui.keep-a-blocked-command-visible-with-its-reason | [Keep a blocked command visible with its reason](../frontend/ui.md#keep-a-blocked-command-visible-with-its-reason-standardsrulefrontend-uikeep-a-blocked-command-visible-with-its-reason) | `frontend/ui.md` |
 | standards/rule/frontend-ui.keep-layout-inside-floorplans | [Keep layout inside floorplans](../frontend/ui.md#keep-layout-inside-floorplans-standardsrulefrontend-uikeep-layout-inside-floorplans) | `frontend/ui.md` |
+| standards/rule/frontend-ui.keep-separators-at-the-subtle-step | [Keep separators at the subtle step](../frontend/ui.md#keep-separators-at-the-subtle-step-standardsrulefrontend-uikeep-separators-at-the-subtle-step) | `frontend/ui.md` |
 | standards/rule/frontend-ui.keep-tokens-in-one-stylesheet | [Keep tokens in one stylesheet](../frontend/ui.md#keep-tokens-in-one-stylesheet-standardsrulefrontend-uikeep-tokens-in-one-stylesheet) | `frontend/ui.md` |
 | standards/rule/frontend-ui.map-every-use-case-path | [Map every use case path](../frontend/ui.md#map-every-use-case-path-standardsrulefrontend-uimap-every-use-case-path) | `frontend/ui.md` |
 | standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package | [Pin the baseline in the shared package](../frontend/ui.md#pin-the-baseline-in-the-shared-package-standardsrulefrontend-uipin-the-baseline-in-the-shared-package) | `frontend/ui.md` |
 | standards/rule/frontend-ui.prove-ui-behavior-and-appearance | [Prove UI behavior and appearance](../frontend/ui.md#prove-ui-behavior-and-appearance-standardsrulefrontend-uiprove-ui-behavior-and-appearance) | `frontend/ui.md` |
 | standards/rule/frontend-ui.publish-a-design-contract | [Publish a design contract](../frontend/ui.md#publish-a-design-contract-standardsrulefrontend-uipublish-a-design-contract) | `frontend/ui.md` |
+| standards/rule/frontend-ui.publish-one-registry-item-per-floorplan | [Publish one registry item per floorplan](../frontend/ui.md#publish-one-registry-item-per-floorplan-standardsrulefrontend-uipublish-one-registry-item-per-floorplan) | `frontend/ui.md` |
 | standards/rule/frontend-ui.record-a-freestyle-route | [Record a freestyle route](../frontend/ui.md#record-a-freestyle-route-standardsrulefrontend-uirecord-a-freestyle-route) | `frontend/ui.md` |
 | standards/rule/frontend-ui.record-a-frontend-outside-the-controlled-contract | [Record a frontend outside the controlled contract](../frontend/ui.md#record-a-frontend-outside-the-controlled-contract-standardsrulefrontend-uirecord-a-frontend-outside-the-controlled-contract) | `frontend/ui.md` |
 | standards/rule/frontend-ui.restrict-css-decisions | [Restrict CSS decisions](../frontend/ui.md#restrict-css-decisions-standardsrulefrontend-uirestrict-css-decisions) | `frontend/ui.md` |

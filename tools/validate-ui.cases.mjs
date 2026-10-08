@@ -291,6 +291,11 @@ appStylesCase('an application stylesheet declaring a literal value', `${cleanApp
 appStylesCase('an application stylesheet importing nothing', '', 'imports no stylesheet');
 appStylesCase('an application stylesheet importing a third-party sheet', '@import "bootstrap/dist/css/bootstrap.css";\n', "import 'bootstrap/dist/css/bootstrap.css' is outside the shared package");
 
+console.log('\nShared stylesheets (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)');
+pathCase('a shared stylesheet written from tokens', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  background: radial-gradient(farthest-side, var(--scroll-shade), transparent);\n}\n', null);
+pathCase('a shared stylesheet carrying a literal colour', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  background: radial-gradient(farthest-side, oklch(0 0 0 / 0.16), transparent);\n}\n', "literal colour 'oklch(' belongs in the token stylesheet");
+pathCase('a shared stylesheet carrying a hex colour', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  color: #b9bbc6;\n}\n', "literal colour '#b9bbc6' belongs in the token stylesheet");
+
 console.log('\nSource boundary (standards/rule/frontend-ui.select-one-visual-authority)');
 manifestCase('second visual system in the workspace root', { dependencies: { '@mui/material': '7.0.0' } }, "second general-purpose visual dependency '@mui/material' requires an override");
 manifestCase('second visual system in optionalDependencies', { optionalDependencies: { bootstrap: '5.3.3' } }, "second general-purpose visual dependency 'bootstrap' requires an override");
@@ -306,7 +311,7 @@ configCase('UI override with a live review date', (project) => {
   project.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
 }, null);
 
-console.log('\nShared package (standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package)');
+console.log('\nShared package (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
 configCase('a controlled frontend with no shared package', (project) => {
   delete project.paths.uiPackage;
 }, 'and no paths.uiPackage');
@@ -333,6 +338,30 @@ configCase('a source lock outside the package root', (project) => {
   writeJson(lockFile, lock);
   report('source lock describing a preset the manifest does not pin', 'preset.style does not match the manifest baseline', run());
   fs.writeFileSync(lockFile, original);
+}
+
+console.log('\nAdditional registries (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
+{
+  const componentsFile = path.join(packageRoot, 'components.json');
+  const originalComponents = fs.readFileSync(componentsFile, 'utf8');
+  const originalLock = fs.readFileSync(lockFile, 'utf8');
+  const originalProject = fs.readFileSync(projectFile, 'utf8');
+  const components = JSON.parse(originalComponents);
+  components.registries = { '@fixture/blocks': 'https://blocks.fixture.test/r' };
+  fs.writeFileSync(componentsFile, JSON.stringify(components, null, 2));
+  const lock = JSON.parse(originalLock);
+  lock.registry = { name: 'fixture', url: 'https://blocks.fixture.test' };
+  fs.writeFileSync(lockFile, JSON.stringify(lock, null, 2));
+  const withOverride = JSON.parse(originalProject);
+  withOverride.overrides = [{ provisionId: 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
+  fs.writeFileSync(projectFile, JSON.stringify(withOverride, null, 2));
+  report('an additional registry with the override passes both gates', null, run());
+  fs.writeFileSync(projectFile, originalProject);
+  const output = run();
+  report('the configuration gate refuses without the override', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: an additional registry requires an override decision", output);
+  report('the source-lock gate refuses without the override', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: registry 'fixture' is not the built-in shadcn registry", output);
+  fs.writeFileSync(componentsFile, originalComponents);
+  fs.writeFileSync(lockFile, originalLock);
 }
 
 console.log('\nSource lock (standards/rule/frontend-ui.track-source-changes)');

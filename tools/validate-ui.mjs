@@ -304,7 +304,7 @@ function sectionNames(raw) {
 // The registry configuration the pinned CLI wrote. It is read against the
 // manifest baseline, so a package describing a preset the release does not pin
 // reports rather than passing unread.
-function validateComponentsJson(file, baseline) {
+function validateComponentsJson(file, baseline, baselineOverride) {
   const label = relativeToRoot(file);
   const config = readJson(file, label);
   if (!config) return;
@@ -316,19 +316,19 @@ function validateComponentsJson(file, baseline) {
     rtl: false,
   };
   for (const [key, value] of Object.entries(expected)) {
-    if (config[key] !== value) error(`[standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
+    if (config[key] !== value) error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
   }
-  if (config.tailwind?.baseColor !== baseline.baseColor) error(`[standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
-  if (config.tailwind?.cssVariables !== baseline.cssVariables) error(`[standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package] ${label}: tailwind.cssVariables must be ${baseline.cssVariables}`);
-  if (config.registries && Object.keys(config.registries).length > 0) {
-    error(`[standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package] ${label}: an additional registry requires an override decision`);
+  if (config.tailwind?.baseColor !== baseline.baseColor) error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
+  if (config.tailwind?.cssVariables !== baseline.cssVariables) error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: tailwind.cssVariables must be ${baseline.cssVariables}`);
+  if (config.registries && Object.keys(config.registries).length > 0 && !baselineOverride) {
+    error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: an additional registry requires an override decision`);
   }
 }
 
 // The source lock describes one copy of the registry source. Its paths resolve
 // against the package root rather than an application root, so a second
 // application cannot hold a copy the lock does not see.
-function validateSourceLock(file, baseline, packageRoot, manifest) {
+function validateSourceLock(file, baseline, packageRoot, manifest, baselineOverride) {
   const label = relativeToRoot(file);
   const lock = readJson(file, label);
   if (!lock) return;
@@ -339,10 +339,10 @@ function validateSourceLock(file, baseline, packageRoot, manifest) {
   // no separate branch for the word is reachable.
   if (!/^\d+\.\d+\.\d+$/.test(lock.cli ?? '')) error(`${label}: cli must be a pinned semantic version`);
   else if (expectedCli && lock.cli !== expectedCli) error(`${label}: cli must match manifest shadcn pin '${expectedCli}'`);
-  if (lock.registry?.name !== 'shadcn' || lock.registry?.url !== 'https://ui.shadcn.com') error(`${label}: only the built-in shadcn registry is allowed`);
+  if ((lock.registry?.name !== 'shadcn' || lock.registry?.url !== 'https://ui.shadcn.com') && !baselineOverride) error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: registry '${lock.registry?.name ?? '(unnamed)'}' is not the built-in shadcn registry; an additional registry requires an override decision`);
   for (const key of ['style', 'base', 'cssVariables', 'baseColor', 'theme', 'chartColor', 'font', 'fontHeading', 'icons', 'radius', 'menuAccent', 'menuColor', 'componentsStyle']) {
     if (baseline[key] !== undefined && lock.preset?.[key] !== baseline[key]) {
-      error(`[standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package] ${label}: preset.${key} does not match the manifest baseline`);
+      error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: preset.${key} does not match the manifest baseline`);
     }
   }
   const pinnedPackages = new Set(Object.keys(manifest?.packages?.npm ?? {}));
@@ -616,6 +616,28 @@ function validateFrontendStylesheet(file, packageRoot, pkg) {
 
 // ---- source scan ------------------------------------------------------------
 
+// A stylesheet the shared package ships beside the token sheet carries
+// utilities, device rules, and display helpers, written from tokens. A literal
+// colour here is a second token sheet beside the first, so every stylesheet but
+// the token sheet is held to the same rule as an application stylesheet.
+// (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)
+function validateSharedStylesheets(packageRoot, tokensFile) {
+  const tokenPath = path.resolve(tokensFile);
+  const files = walk(packageRoot, (candidate) => candidate.endsWith('.css'));
+  for (const file of files) {
+    if (path.resolve(file) === tokenPath) continue;
+    if (/(?:^|[\\/])(?:tests?|__tests__)(?:[\\/])/.test(file)) continue;
+    const label = relativeToRoot(file);
+    const structure = cssStructure(fs.readFileSync(file, 'utf8'), () => {});
+    const reported = new Set();
+    for (const match of structure.matchAll(/\b(?:oklch|rgba?|hsla?)\(|#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3,4}\b/g)) {
+      if (reported.has(match[0])) continue;
+      reported.add(match[0]);
+      error(`[standards/rule/frontend-ui.keep-tokens-in-one-stylesheet] ${label}: literal colour '${match[0]}' belongs in the token stylesheet`);
+    }
+  }
+}
+
 // One pass over the shared package. The Tailwind utility rules apply to every
 // authored file outside the copied primitive boundary and the tests. The shared
 // package owns the primitive library, so its composites import it deliberately;
@@ -763,6 +785,10 @@ for (const override of project?.overrides ?? []) {
 // A controlled frontend composes the shared package, so the workspace declares
 // it once. A frontend that composes no shared component carries no UI block.
 // (standards/rule/frontend-ui.select-one-visual-authority)
+// An additional registry passes both registry gates under an override decision
+// against the pinned baseline provision. The review date on that decision is
+// checked above; the gates below check its presence.
+const baselineOverride = (project?.overrides ?? []).some((override) => override?.provisionId === 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package');
 const pkg = project?.paths?.uiPackage ?? null;
 if (!controlled.length && pkg) {
   error('standards.project.json: paths.uiPackage is declared but no frontend declares the platform react-web');
@@ -801,10 +827,11 @@ if (pkg) {
       else if (!fs.existsSync(candidate)) error(`${label}: ${key} path does not exist '${pkg[key]}'`);
     }
     if (baseline) {
-      if (pkg.componentsJson && fs.existsSync(filePath(pkg.componentsJson))) validateComponentsJson(filePath(pkg.componentsJson), baseline);
-      if (pkg.sourceLock && fs.existsSync(filePath(pkg.sourceLock))) validateSourceLock(filePath(pkg.sourceLock), baseline, packageRoot, manifest);
+      if (pkg.componentsJson && fs.existsSync(filePath(pkg.componentsJson))) validateComponentsJson(filePath(pkg.componentsJson), baseline, baselineOverride);
+      if (pkg.sourceLock && fs.existsSync(filePath(pkg.sourceLock))) validateSourceLock(filePath(pkg.sourceLock), baseline, packageRoot, manifest, baselineOverride);
       if (pkg.designContract) validateDesignContract(pkg);
       if (pkg.tokens && fs.existsSync(filePath(pkg.tokens))) validateGlobalCss(filePath(pkg.tokens));
+      if (pkg.tokens) validateSharedStylesheets(packageRoot, filePath(pkg.tokens));
       validateSourceScan(packageRoot, pkg.primitives ? path.resolve(filePath(pkg.primitives)) : null);
     }
     packageSummary = { name: pkg.name, path: pkg.path, exports };

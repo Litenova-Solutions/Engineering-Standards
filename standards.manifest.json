@@ -338,7 +338,7 @@
     "registry": {
       "name": "shadcn",
       "url": "https://ui.shadcn.com",
-      "allowAdditional": false
+      "allowAdditional": true
     },
     "profiles": [
       "public-light",

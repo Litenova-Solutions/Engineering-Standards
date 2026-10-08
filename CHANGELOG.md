@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.18.0
+
+- Added `standards/rule/frontend-ui.hold-the-declared-base-colour` and `standards/rule/frontend-ui.keep-separators-at-the-subtle-step`. A token stylesheet carries the values the declared base colour publishes and no value outside them except under a named local extension or override, and a structural separator or input border stays at the border step. The evidence is a project check comparing the `:root` and dark blocks to the published base colour; `entro check tokens` is one such check.
+- Added `standards/rule/frontend-ui.derive-each-page-type-from-a-named-reference` and `standards/rule/frontend-ui.publish-one-registry-item-per-floorplan`. Every route tags the registry item its page type was built from, and the shared package publishes a registry listing one item per floorplan the design contract declares.
+- Routed the source-lock registry gate through the same override decision as the `components.json` gate. An additional registry passes both gates under an override against `standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package`, and both gates refuse with that provision identifier without it. `uiBaseline.registry.allowAdditional` is `true`, and the source-lock schema accepts a registry outside the built-in one.
+- Extended `standards/rule/frontend-ui.keep-tokens-in-one-stylesheet` to the stylesheets the shared package ships beside the token sheet: such a sheet declares no literal colour. `tools/validate-ui.mjs` reports `oklch(`, `rgb(`, `hsl(`, and `#` hex values there.
+- Documented shadcn's agent skill and MCP server in `docs/workspace/dependencies.md`, with the source pages and the date read.
+- Replaced the stale baseline-provision identifier the validators emitted with `frontend-ui.pin-the-baseline-in-the-shared-package`, the identifier the UI page defines.
+
 ## v1.17.0
 
 This release restates the whole contract. Every provision identifier changed, so no earlier release can be adopted incrementally.

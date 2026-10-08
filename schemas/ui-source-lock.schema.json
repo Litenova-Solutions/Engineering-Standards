@@ -50,12 +50,13 @@
       }
     },
     "registry": {
+      "description": "The registry the installed source came from. A registry outside the built-in shadcn registry requires an override decision against standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package.",
       "type": "object",
       "additionalProperties": false,
       "required": ["name", "url"],
       "properties": {
-        "name": { "const": "shadcn" },
-        "url": { "const": "https://ui.shadcn.com" }
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "minLength": 1 }
       }
     },
     "formatter": { "type": "string", "minLength": 1 },

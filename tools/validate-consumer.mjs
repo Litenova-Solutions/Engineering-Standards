@@ -708,7 +708,7 @@ for (const frontend of project.paths?.frontends ?? []) {
 // it once. The package travels with the workspace rather than with an
 // application, so one missing field is one missing file for every frontend
 // rather than a row per application.
-// (standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package,
+// (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package,
 // standards/rule/frontend-ui.track-source-changes,
 // standards/rule/frontend-ui.publish-a-design-contract)
 const uiPackage = project.paths?.uiPackage ?? null;

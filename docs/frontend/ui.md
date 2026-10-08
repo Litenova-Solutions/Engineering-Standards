@@ -114,7 +114,7 @@ The density is chosen per frontend rather than per workspace, because density is
 
 **Requirement:** A workspace MUST install the `uiBaseline` from `standards.manifest.json` once, into its shared UI package.
 
-**Rationale:** The committed files are the CLI's configuration, the registry source, the token stylesheet, and the source lock beside them. Installing per application is what made a fourth copy, where a fourth drift was invisible.
+**Rationale:** The committed files are the CLI's configuration, the registry source, the token stylesheet, and the source lock beside them. Installing per application is what made a fourth copy, where a fourth drift was invisible. An additional registry is permitted under an override decision recorded against this provision.
 
 ### Publish a design contract (standards/rule/frontend-ui.publish-a-design-contract)
 
@@ -153,6 +153,12 @@ The density is chosen per frontend rather than per workspace, because density is
 | `form-page` | `FormPage` | Supplies the input of one command, with one primary action. |
 ```
 
+### Publish one registry item per floorplan (standards/rule/frontend-ui.publish-one-registry-item-per-floorplan)
+
+**Requirement:** The shared package MUST publish a registry whose build exits zero and which lists one item per floorplan the design contract declares.
+
+**Rationale:** Without an installable page, an author invents one from primitives. One item per floorplan gives every page type a reference the author installs before writing.
+
 ### Compose each route from one floorplan (standards/rule/frontend-ui.compose-each-route-from-one-floorplan)
 
 **Requirement:** A route MUST render exactly one floorplan from the declared set, unless it is a recorded freestyle route.
@@ -183,6 +189,12 @@ The density is chosen per frontend rather than per workspace, because density is
 
 **Rationale:** A freestyle route is the first consumer of a new floorplan or a genuine one-off. A named decision makes either case reviewable, and it keeps the declared set closed. A second route of the same shape is the signal to add a floorplan.
 
+### Derive each page type from a named reference (standards/rule/frontend-ui.derive-each-page-type-from-a-named-reference)
+
+**Requirement:** Every route MUST carry a tag naming the published registry item its page type was built from.
+
+**Rationale:** An author with no named reference invents a page from primitives, and the next author invents another. A tag that resolves keeps every page of one type on one reference.
+
 ### Select a tone from the closed set (standards/rule/frontend-ui.select-a-tone-from-the-closed-set)
 
 **Requirement:** A state indicator MUST take one tone from the closed set, and each application declares its state-to-tone mapping once.
@@ -191,9 +203,21 @@ The density is chosen per frontend rather than per workspace, because density is
 
 ### Keep tokens in one stylesheet (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)
 
-**Requirement:** A workspace MUST declare its colour, spacing, radius, font, and motion tokens in the shared package's stylesheet.
+**Requirement:** A workspace MUST declare its colour, spacing, radius, font, and motion tokens in one shared token sheet, and no other stylesheet declares a literal colour.
 
-**Rationale:** One token sheet is what makes two applications look like one product. An application stylesheet imports it and declares no rule, so a second sheet never introduces a value the first has no opinion about.
+**Rationale:** One token sheet is what makes two applications look like one product. An application stylesheet imports it and declares no rule, so a second sheet never introduces a value the first has no opinion about. A stylesheet the shared package ships beside the token sheet declares no literal colour.
+
+### Hold the declared base colour (standards/rule/frontend-ui.hold-the-declared-base-colour)
+
+**Requirement:** A token stylesheet MUST carry the values the declared base colour publishes and no value outside them except under a named local extension or override.
+
+**Rationale:** A token value outside the published ramp is a second palette beside the declared one, and the next author copies it. A named extension or override keeps the deliberate departure visible in the design contract.
+
+### Keep separators at the subtle step (standards/rule/frontend-ui.keep-separators-at-the-subtle-step)
+
+**Requirement:** A structural separator or input border MUST NOT be darker than the border step the declared base colour publishes.
+
+**Rationale:** A heavier rule beside a lighter one reads as emphasis, so authors stop trusting the token. The border step keeps every separator at one weight.
 
 ### Select a command surface by size (standards/rule/frontend-ui.select-a-command-surface-by-size)
 
@@ -295,11 +319,15 @@ test('[path/orders.place-order.expected-total-mismatch] shows the changed total 
 | standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package | static | `node standards/tools/validate-ui.mjs` compares the committed configuration against the manifest `uiBaseline` fields. |
 | standards/rule/frontend-ui.publish-a-design-contract | static | `node standards/tools/validate-ui.mjs` reports a missing contract, a schema failure, or a missing section. |
 | standards/rule/frontend-ui.declare-a-closed-floorplan-set | static | Review confirms each floorplan in `DESIGN.md` carries a when-to-use rule in `## Patterns`. |
+| standards/rule/frontend-ui.publish-one-registry-item-per-floorplan | static | `shadcn build` exits zero and `registry.json` lists one item per floorplan the design contract declares. |
 | standards/rule/frontend-ui.compose-each-route-from-one-floorplan | test | `tests/routes/every-route.spec.ts` asserts `page.locator("[data-floorplan]")` has count 1. |
 | standards/rule/frontend-ui.keep-layout-inside-floorplans | static | `packages/*/eslint.config.js` refuses a layout utility in a route file. |
 | standards/rule/frontend-ui.record-a-freestyle-route | inspection | Route review confirms each freestyle route names a decision record. |
+| standards/rule/frontend-ui.derive-each-page-type-from-a-named-reference | static | A project check reads each route tag and resolves it against the registry the shared package publishes, such as `entro check pages`. |
 | standards/rule/frontend-ui.select-a-tone-from-the-closed-set | static | `pnpm type-check` fails on a state kind with no tone in `src/app/states.tsx`. |
-| standards/rule/frontend-ui.keep-tokens-in-one-stylesheet | static | `node standards/tools/validate-ui.mjs` reports an application stylesheet declaring a rule. |
+| standards/rule/frontend-ui.keep-tokens-in-one-stylesheet | static | `node standards/tools/validate-ui.mjs` reports an application stylesheet declaring a rule and a shared stylesheet declaring a literal colour. |
+| standards/rule/frontend-ui.hold-the-declared-base-colour | static | A project check compares the token stylesheet `:root` and dark blocks to the published base colour, such as `entro check tokens`. |
+| standards/rule/frontend-ui.keep-separators-at-the-subtle-step | static | A project check compares the token stylesheet `:root` and dark blocks to the published base colour, such as `entro check tokens`. |
 | standards/rule/frontend-ui.select-a-command-surface-by-size | inspection | Review confirms each command's surface matches the table in the Concepts section. |
 | standards/rule/frontend-ui.check-every-route-in-a-browser | test | `tests/routes/every-route.spec.ts` runs axe and the seven checks on each discovered route. |
 | standards/rule/frontend-ui.map-every-use-case-path | static | The consumer path check reports a path with no `[path/<id>]` title and no exclusion. |
