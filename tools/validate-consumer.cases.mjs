@@ -405,6 +405,7 @@ console.log('\nFrontend platform declaration');
 projectCase('frontend omits its platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin' }]; }, "declares no 'platform'");
 projectCase('frontend declares an unknown platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'web' }]; }, "unknown platform 'web'");
 projectCase('frontend outside the UI contract declares other-web', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'other-web' }]; }, null);
+projectCase('frontend declares the svelte platform', (p) => { p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'svelte', ui: { profile: 'application-balanced' } }]; }, "controlled frontend(s) and no 'paths.uiPackage'");
 
 console.log('\nShared UI package (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
 projectCase('a controlled frontend with no shared package', (p) => {
@@ -412,7 +413,7 @@ projectCase('a controlled frontend with no shared package', (p) => {
 }, "and no paths.uiPackage");
 projectCase('a shared package with no controlled frontend', (p) => {
   p.paths.uiPackage = { name: '@fixture/ui', path: 'packages/ui', componentsJson: 'packages/ui/components.json', primitives: 'packages/ui/src/components', tokens: 'packages/ui/src/styles/tokens.css', sourceLock: 'packages/ui/ui-source-lock.json', designContract: 'packages/ui/DESIGN.md', publicExports: ['@fixture/ui/floorplans'] };
-}, 'paths.uiPackage is declared but no frontend declares the platform react-web');
+}, 'paths.uiPackage is declared but no frontend declares a controlled platform (react-web, svelte)');
 projectCase('a shared package path that is not on disk', (p) => {
   p.paths.uiPackage = { name: '@fixture/ui', path: 'packages/ui', componentsJson: 'packages/ui/components.json', primitives: 'packages/ui/src/components', tokens: 'packages/ui/src/styles/tokens.css', sourceLock: 'packages/ui/missing-lock.json', designContract: 'packages/ui/DESIGN.md', publicExports: ['@fixture/ui/floorplans'] };
 }, "sourceLock path does not exist 'packages/ui/missing-lock.json'");
@@ -787,7 +788,11 @@ const useCasePath = 'docs/domain/modules/orders/cancel-order.md';
 // each case sets the status and replaces the whole Consumers section.
 function consumersCase(name, section, expectation) {
   bodyCase(name, useCasePath, (raw) => {
-    const replaced = raw.replace(/## Consumers\n[\s\S]*?(?=\n## )/, section === null ? '' : `## Consumers\n${section}\n`);
+    // The fixture page keeps the template's own line endings, so the section
+    // match tolerates a carriage return. Without it the replacement silently
+    // keeps the template section on a CRLF checkout and every error case passes
+    // a page that was never mutated.
+    const replaced = raw.replace(/## Consumers\r?\n[\s\S]*?(?=\r?\n## )/, section === null ? '' : `## Consumers\n${section}\n`);
     const { meta, body } = splitMeta(replaced);
     meta.implementationStatus = 'implemented';
     return joinMeta(meta, body);
@@ -879,6 +884,12 @@ fileCase(
 fileCase(
   'a browser test title naming a criterion no page declares',
   'tests/cancel-order.spec.ts',
+  `test('[${UNDECLARED}] cancels', async () => {})\n`,
+  `cites ${UNDECLARED}`,
+);
+fileCase(
+  'a svelte test title naming a criterion no page declares',
+  'tests/cancel-order.spec.svelte',
   `test('[${UNDECLARED}] cancels', async () => {})\n`,
   `cites ${UNDECLARED}`,
 );

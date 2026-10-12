@@ -617,7 +617,7 @@ const TAG = new RegExp(`@(${ACCEPTANCE})`, 'g');
 const TRAIT = new RegExp(`\\[\\s*Trait\\s*\\(\\s*"AcceptanceCriterion"\\s*,\\s*"(${ACCEPTANCE})"\\s*\\)\\s*\\]`, 'g');
 const PATH_ID = 'path\\/[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*){2,}';
 const TITLE = new RegExp(`['"\`]\\s*\\[(${ACCEPTANCE}|${PATH_ID})\\]`, 'g');
-const TEST_SOURCE = /\.(cs|feature|ts|tsx|js|jsx|mjs)$/;
+const TEST_SOURCE = /\.(cs|feature|ts|tsx|js|jsx|mjs|svelte)$/;
 
 const citations = new Map(); // acceptance id -> [file]
 let testFiles = 0;
@@ -681,12 +681,13 @@ for (const [id, page] of useCasePages) {
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
 
-// Every frontend declares its platform. Without the field a React web frontend
-// silently skips the whole FRONTEND.UI contract, and the omission is
+// Every frontend declares its platform. Without the field a controlled web
+// frontend silently skips the whole UI contract, and the omission is
 // indistinguishable from a considered decision. A consumer that is not ready for
 // the contract declares 'other-web' or records an override, which is a visible
 // statement. (standards/rule/frontend-ui.select-one-visual-authority)
-const PLATFORMS = ['react-web', 'react-native', 'other-web'];
+const PLATFORMS = ['react-web', 'react-native', 'svelte', 'other-web'];
+const CONTROLLED_PLATFORMS = ['react-web', 'svelte'];
 const controlledFrontends = [];
 for (const frontend of project.paths?.frontends ?? []) {
   const name = frontend?.name ?? '(unnamed)';
@@ -699,7 +700,7 @@ for (const frontend of project.paths?.frontends ?? []) {
     err(`standards.project.json: frontend '${name}' declares no 'platform'; one of ${PLATFORMS.join(', ')} is required`);
   } else if (!PLATFORMS.includes(frontend.platform)) {
     err(`standards.project.json: frontend '${name}' has unknown platform '${frontend.platform}'; expected one of ${PLATFORMS.join(', ')}`);
-  } else if (frontend.platform === 'react-web') {
+  } else if (CONTROLLED_PLATFORMS.includes(frontend.platform)) {
     controlledFrontends.push(frontend);
   }
 }
@@ -713,7 +714,7 @@ for (const frontend of project.paths?.frontends ?? []) {
 // standards/rule/frontend-ui.publish-a-design-contract)
 const uiPackage = project.paths?.uiPackage ?? null;
 if (controlledFrontends.length && !uiPackage) {
-  err(`standards.project.json: ${controlledFrontends.length} controlled frontend(s) and no 'paths.uiPackage'; the shared UI package every React web frontend composes is undeclared`);
+  err(`standards.project.json: ${controlledFrontends.length} controlled frontend(s) and no 'paths.uiPackage'; the shared UI package every controlled web frontend composes is undeclared`);
 } else if (uiPackage) {
   const uiPackageLabel = `standards.project.json: paths.uiPackage '${uiPackage.name ?? '(unnamed)'}'`;
   for (const key of ['path', 'componentsJson', 'primitives', 'tokens', 'sourceLock', 'designContract']) {
@@ -729,7 +730,7 @@ if (controlledFrontends.length && !uiPackage) {
   }
 }
 
-// A React web consumer opts into the deterministic UI validator through its
+// A controlled-web consumer opts into the deterministic UI validator through its
 // frontend platform declaration or UI block. A recorded UI rule override must
 // carry a live review date.
 const uiActivated = controlledFrontends.length > 0 || Boolean(uiPackage)

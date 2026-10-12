@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Reference validator for the controlled React web UI contract.
+// Reference validator for the controlled web UI contract.
 //
 // The validator is deliberately local and deterministic. It reads the shared UI
 // package the consumer declares, its registry configuration, its source lock, its
@@ -28,7 +28,7 @@ const schemaRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.
 
 const USAGE = `Usage: node tools/validate-ui.mjs [consumerRoot] [--format=json] [--help]
 
-Validates the controlled React web UI contract for the consumer at consumerRoot,
+Validates the controlled web UI contract for the consumer at consumerRoot,
 which defaults to the current directory.
 
   --format=json   Write one JSON object on stdout instead of human-readable lines.
@@ -203,6 +203,12 @@ function classStrings(text) {
       if (region !== null) found.push(...literals(region));
     }
   }
+  // A Svelte class directive toggles one class by name, so the name is read as
+  // a single token. A name the compiler rejects never reaches this check,
+  // because no committed file carries code that does not compile.
+  for (const match of text.matchAll(/\bclass:([^\s=/>]+)/g)) {
+    found.push(match[1]);
+  }
   // Every call expression matches first and the helper set filters the rest. A
   // call the set does not name contributes no class string.
   for (const match of text.matchAll(/\b([A-Za-z_$][\w$]*)\s*\(/g)) {
@@ -305,10 +311,25 @@ function sectionNames(raw) {
 // The registry configuration the pinned CLI wrote. It is read against the
 // manifest baseline, so a package describing a preset the release does not pin
 // reports rather than passing unread.
-function validateComponentsJson(file, baseline, baselineOverride) {
+function validateComponentsJson(file, baseline, baselineOverride, platform) {
   const label = relativeToRoot(file);
   const config = readJson(file, label);
   if (!config) return;
+  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  if (platform === 'svelte') {
+    // shadcn-svelte writes tailwind.baseColor with no cssVariables field, and
+    // its icon, menu, and registry fields are optional. An omitted field takes
+    // the CLI default the baseline records, so only a present field is
+    // compared. The style field is deprecated under Tailwind v4 and unread.
+    if (config.tailwind?.baseColor !== baseline.baseColor) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
+    for (const [key, value] of Object.entries({ iconLibrary: baseline.icons, menuColor: baseline.menuColor, menuAccent: baseline.menuAccent })) {
+      if (config[key] !== undefined && config[key] !== value) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
+    }
+    if (config.registry && config.registry !== baseline.registry?.url && !baselineOverride) {
+      error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${config.registry}' is not the built-in shadcn-svelte registry; an additional registry requires an override decision`);
+    }
+    return;
+  }
   const expected = {
     style: baseline.componentsStyle,
     iconLibrary: baseline.icons,
@@ -317,33 +338,35 @@ function validateComponentsJson(file, baseline, baselineOverride) {
     rtl: false,
   };
   for (const [key, value] of Object.entries(expected)) {
-    if (config[key] !== value) error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
+    if (config[key] !== value) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
   }
-  if (config.tailwind?.baseColor !== baseline.baseColor) error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
-  if (config.tailwind?.cssVariables !== baseline.cssVariables) error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: tailwind.cssVariables must be ${baseline.cssVariables}`);
+  if (config.tailwind?.baseColor !== baseline.baseColor) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
+  if (config.tailwind?.cssVariables !== baseline.cssVariables) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.cssVariables must be ${baseline.cssVariables}`);
   if (config.registries && Object.keys(config.registries).length > 0 && !baselineOverride) {
-    error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: an additional registry requires an override decision`);
+    error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: an additional registry requires an override decision`);
   }
 }
 
 // The source lock describes one copy of the registry source. Its paths resolve
 // against the package root rather than an application root, so a second
 // application cannot hold a copy the lock does not see.
-function validateSourceLock(file, baseline, packageRoot, manifest, baselineOverride) {
+function validateSourceLock(file, baseline, packageRoot, manifest, baselineOverride, platform) {
   const label = relativeToRoot(file);
   const lock = readJson(file, label);
   if (!lock) return;
+  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
   for (const key of ['schemaVersion', 'generator', 'cli', 'preset', 'registry', 'formatter', 'components']) required(lock, key, label);
-  schemaCheck('ui-source-lock.schema.json', lock, label, 'standards/rule/frontend-ui.track-source-changes');
-  const expectedCli = manifest?.packages?.npm?.shadcn;
+  schemaCheck('ui-source-lock.schema.json', lock, label, `standards/rule/${ui}.track-source-changes`);
+  const cliPackage = platform === 'svelte' ? 'shadcn-svelte' : 'shadcn';
+  const expectedCli = manifest?.packages?.npm?.[cliPackage];
   // The pinned-version test already rejects `latest` and every other range, so
   // no separate branch for the word is reachable.
   if (!/^\d+\.\d+\.\d+$/.test(lock.cli ?? '')) error(`${label}: cli must be a pinned semantic version`);
-  else if (expectedCli && lock.cli !== expectedCli) error(`${label}: cli must match manifest shadcn pin '${expectedCli}'`);
-  if ((lock.registry?.name !== 'shadcn' || lock.registry?.url !== 'https://ui.shadcn.com') && !baselineOverride) error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: registry '${lock.registry?.name ?? '(unnamed)'}' is not the built-in shadcn registry; an additional registry requires an override decision`);
+  else if (expectedCli && lock.cli !== expectedCli) error(`${label}: cli must match manifest ${cliPackage} pin '${expectedCli}'`);
+  if ((lock.registry?.name !== baseline.registry?.name || lock.registry?.url !== baseline.registry?.url) && !baselineOverride) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${lock.registry?.name ?? '(unnamed)'}' is not the built-in ${baseline.registry?.name ?? 'registry'} registry; an additional registry requires an override decision`);
   for (const key of ['style', 'base', 'cssVariables', 'baseColor', 'theme', 'chartColor', 'font', 'fontHeading', 'icons', 'radius', 'menuAccent', 'menuColor', 'componentsStyle']) {
     if (baseline[key] !== undefined && lock.preset?.[key] !== baseline[key]) {
-      error(`[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] ${label}: preset.${key} does not match the manifest baseline`);
+      error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: preset.${key} does not match the manifest baseline`);
     }
   }
   const pinnedPackages = new Set(Object.keys(manifest?.packages?.npm ?? {}));
@@ -353,7 +376,7 @@ function validateSourceLock(file, baseline, packageRoot, manifest, baselineOverr
     const itemLabel = `${label}.${item?.name ?? 'component'}`;
     for (const key of ['name', 'address', 'status', 'paths', 'digest', 'dependencies']) required(item, key, itemLabel);
     for (const dependency of array(item, 'dependencies', itemLabel)) {
-      if (!pinnedPackages.has(dependency)) error(`[standards/rule/frontend-ui.track-source-changes] ${itemLabel}: dependency '${dependency}' is not pinned in the standards manifest`);
+      if (!pinnedPackages.has(dependency)) error(`[standards/rule/${ui}.track-source-changes] ${itemLabel}: dependency '${dependency}' is not pinned in the standards manifest`);
     }
     for (const relative of array(item, 'paths', itemLabel)) {
       const candidate = path.resolve(packageRoot, relative);
@@ -379,25 +402,26 @@ const DESIGN_SECTIONS = ['Brand', 'Tokens', 'Vocabulary', 'Patterns', 'Do', 'Do 
 // closed set is a design decision, not a route-level choice.
 // (standards/rule/frontend-ui.publish-a-design-contract,
 // standards/rule/frontend-ui.declare-a-closed-floorplan-set)
-function validateDesignContract(pkg) {
+function validateDesignContract(pkg, platform) {
   const label = relativeToRoot(filePath(pkg.designContract));
   const file = filePath(pkg.designContract);
+  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
   if (!fs.existsSync(file)) {
-    error(`[standards/rule/frontend-ui.publish-a-design-contract] shared package '${pkg.name}': no design contract at '${pkg.designContract}'`);
+    error(`[standards/rule/${ui}.publish-a-design-contract] shared package '${pkg.name}': no design contract at '${pkg.designContract}'`);
     return null;
   }
   const metadata = parseMetadata(file);
   if (!metadata) {
-    error(`[standards/rule/frontend-ui.publish-a-design-contract] ${label}: design contract has no metadata block`);
+    error(`[standards/rule/${ui}.publish-a-design-contract] ${label}: design contract has no metadata block`);
     return null;
   }
-  schemaCheck('design-contract.schema.json', metadata, label, 'standards/rule/frontend-ui.publish-a-design-contract');
+  schemaCheck('design-contract.schema.json', metadata, label, `standards/rule/${ui}.publish-a-design-contract`);
   if (pkg.name && metadata.package !== pkg.name) {
-    error(`[standards/rule/frontend-ui.publish-a-design-contract] ${label}: package must be '${pkg.name}'`);
+    error(`[standards/rule/${ui}.publish-a-design-contract] ${label}: package must be '${pkg.name}'`);
   }
   const present = new Set(sectionNames(fs.readFileSync(file, 'utf8')));
   for (const section of DESIGN_SECTIONS) {
-    if (!present.has(section)) error(`[standards/rule/frontend-ui.publish-a-design-contract] ${label}: missing required section '${section}'`);
+    if (!present.has(section)) error(`[standards/rule/${ui}.publish-a-design-contract] ${label}: missing required section '${section}'`);
   }
   return metadata;
 }
@@ -470,13 +494,14 @@ function cssStructure(text, report) {
   return output;
 }
 
-function validateGlobalCss(file) {
+function validateGlobalCss(file, platform) {
   const label = relativeToRoot(file);
+  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
   const text = fs.readFileSync(file, 'utf8');
   let malformed = false;
   const structure = cssStructure(text, (reason) => {
     malformed = true;
-    error(`[standards/rule/frontend-ui.restrict-css-decisions] ${label}: global CSS has ${reason}`);
+    error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: global CSS has ${reason}`);
   });
   let depth = 0;
   for (const character of structure) {
@@ -484,13 +509,13 @@ function validateGlobalCss(file) {
     if (character === '}') {
       depth -= 1;
       if (depth < 0) {
-        error(`[standards/rule/frontend-ui.restrict-css-decisions] ${label}: closing brace has no matching opening brace`);
+        error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: closing brace has no matching opening brace`);
         malformed = true;
         break;
       }
     }
   }
-  if (!malformed && depth !== 0) error(`[standards/rule/frontend-ui.restrict-css-decisions] ${label}: global CSS has an unclosed block`);
+  if (!malformed && depth !== 0) error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: global CSS has an unclosed block`);
   // The packages the manifest already pins. A pinned font family is a token, so
   // importing one from the token sheet is the sheet doing its job rather than a
   // project reaching for a stylesheet the sheet cannot see.
@@ -502,10 +527,10 @@ function validateGlobalCss(file) {
     if (allowedGlobalImports.has(specifier) || specifier.startsWith('./')) continue;
     const packageName = specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0];
     if (!pinned.has(packageName)) {
-      error(`[standards/rule/frontend-ui.restrict-css-decisions] ${label}: import '${specifier}' is outside the approved global CSS surface`);
+      error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: import '${specifier}' is outside the approved global CSS surface`);
     }
   }
-  classifyGlobalCss(label, structure);
+  classifyGlobalCss(label, structure, ui);
 }
 
 // The shared package's entry imports Tailwind, its own token layer, and the
@@ -521,7 +546,7 @@ const allowedGlobalAtRules = new Set([
   'keyframes', 'font-face', 'media', 'supports', 'container', 'property', 'charset', 'page',
 ]);
 
-function classifyGlobalCss(label, stripped) {
+function classifyGlobalCss(label, stripped, ui) {
   let depth = 0;
   let statement = '';
   // The generated entry expresses its documented browser base rules with
@@ -534,7 +559,7 @@ function classifyGlobalCss(label, stripped) {
     if (character === '{') {
       if (depth === 0) {
         topLevelOpener = statement.trim();
-        reportGlobalStatement(label, statement);
+        reportGlobalStatement(label, statement, ui);
       }
       depth += 1;
       statement = '';
@@ -547,7 +572,7 @@ function classifyGlobalCss(label, stripped) {
       continue;
     }
     if (character === ';' && depth === 0) {
-      reportGlobalStatement(label, statement);
+      reportGlobalStatement(label, statement, ui);
       statement = '';
       continue;
     }
@@ -557,15 +582,15 @@ function classifyGlobalCss(label, stripped) {
       statement = '';
     }
   }
-  if (applyOutsideBase) error(`[standards/rule/frontend-ui.restrict-css-decisions] ${label}: '@apply' outside the generated '@layer base' block hides an unreviewed utility group`);
+  if (applyOutsideBase) error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: '@apply' outside the generated '@layer base' block hides an unreviewed utility group`);
 }
 
-function reportGlobalStatement(label, statement) {
+function reportGlobalStatement(label, statement, ui) {
   const value = statement.trim();
   if (!value) return;
   if (value.startsWith('@')) {
     const name = value.slice(1).split(/[\s(;]/)[0];
-    if (!allowedGlobalAtRules.has(name)) error(`[standards/rule/frontend-ui.restrict-css-decisions] ${label}: at-rule '@${name}' is outside the approved global CSS surface`);
+    if (!allowedGlobalAtRules.has(name)) error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: at-rule '@${name}' is outside the approved global CSS surface`);
     return;
   }
   // The generated theme entry declares the color-scheme class itself.
@@ -574,7 +599,7 @@ function reportGlobalStatement(label, statement) {
     const trimmed = selector.trim();
     if (allowedClassSelectors.has(trimmed)) continue;
     if (trimmed.startsWith('.') || trimmed.startsWith('#')) {
-      error(`[standards/rule/frontend-ui.restrict-css-decisions] ${label}: selector '${trimmed}' is a feature style; use a component variant or semantic token`);
+      error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: selector '${trimmed}' is a feature style; use a component variant or semantic token`);
     }
   }
 }
@@ -584,19 +609,20 @@ function reportGlobalStatement(label, statement) {
 // sheet beside the first, so every declaration is held to the custom-property
 // form. A frontend holding no shared composite still declares its focus ring and
 // its device rules here, from the same tokens.
-function validateFrontendStylesheet(file, packageRoot, pkg) {
+function validateFrontendStylesheet(file, packageRoot, pkg, platform) {
   const label = relativeToRoot(file);
+  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
   const text = fs.readFileSync(file, 'utf8');
   const structure = cssStructure(text, () => {});
   const imports = [...text.matchAll(/@import\s+(["'])([^"']+)\1/g)].map((match) => match[2]);
   if (!imports.length) {
-    error(`[standards/rule/frontend-ui.keep-tokens-in-one-stylesheet] ${label}: imports no stylesheet; an application stylesheet imports the shared package's token stylesheet`);
+    error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: imports no stylesheet; an application stylesheet imports the shared package's token stylesheet`);
     return;
   }
   for (const value of imports) {
     if (value.startsWith('./') || value.startsWith('../')) continue;
     if (!value.startsWith(`${pkg.name}/`)) {
-      error(`[standards/rule/frontend-ui.keep-tokens-in-one-stylesheet] ${label}: import '${value}' is outside the shared package '${pkg.name}'`);
+      error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: import '${value}' is outside the shared package '${pkg.name}'`);
     }
   }
   for (const match of structure.matchAll(/\{([^}]*)\}/g)) {
@@ -607,11 +633,11 @@ function validateFrontendStylesheet(file, packageRoot, pkg) {
       // that reads as a CSS property is a literal the token sheet owns.
       if (!property || property.startsWith('--') || property.startsWith('@')) continue;
       if (!/^-?[a-z][a-z0-9-]*$/i.test(property)) continue;
-      error(`[standards/rule/frontend-ui.keep-tokens-in-one-stylesheet] ${label}: declares '${property}'; a value written in an application belongs in the shared package's tokens`);
+      error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: declares '${property}'; a value written in an application belongs in the shared package's tokens`);
     }
   }
   if (!within(path.resolve(root), packageRoot)) {
-    error(`[standards/rule/frontend-ui.keep-tokens-in-one-stylesheet] ${label}: the shared package root '${pkg.path}' is outside the workspace`);
+    error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: the shared package root '${pkg.path}' is outside the workspace`);
   }
 }
 
@@ -622,8 +648,9 @@ function validateFrontendStylesheet(file, packageRoot, pkg) {
 // colour here is a second token sheet beside the first, so every stylesheet but
 // the token sheet is held to the same rule as an application stylesheet.
 // (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)
-function validateSharedStylesheets(packageRoot, tokensFile) {
+function validateSharedStylesheets(packageRoot, tokensFile, platform) {
   const tokenPath = path.resolve(tokensFile);
+  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
   const files = walk(packageRoot, (candidate) => candidate.endsWith('.css'));
   for (const file of files) {
     if (path.resolve(file) === tokenPath) continue;
@@ -634,7 +661,7 @@ function validateSharedStylesheets(packageRoot, tokensFile) {
     for (const match of structure.matchAll(/\b(?:oklch|rgba?|hsla?)\(|#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3,4}\b/g)) {
       if (reported.has(match[0])) continue;
       reported.add(match[0]);
-      error(`[standards/rule/frontend-ui.keep-tokens-in-one-stylesheet] ${label}: literal colour '${match[0]}' belongs in the token stylesheet`);
+      error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: literal colour '${match[0]}' belongs in the token stylesheet`);
     }
   }
 }
@@ -644,8 +671,9 @@ function validateSharedStylesheets(packageRoot, tokensFile) {
 // package owns the primitive library, so its composites import it deliberately;
 // an application does not, and `validateApplicationImports` refuses it there.
 // (standards/rule/frontend-ui.restrict-css-decisions)
-function validateSourceScan(target, primitives) {
-  const files = walk(target, (file) => /\.(?:ts|tsx|js|jsx)$/.test(file));
+function validateSourceScan(target, primitives, platform) {
+  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  const files = walk(target, (file) => /\.(?:ts|tsx|js|jsx|svelte)$/.test(file));
   for (const source of files) {
     const relative = relativeToRoot(source);
     const text = fs.readFileSync(source, 'utf8');
@@ -658,39 +686,47 @@ function validateSourceScan(target, primitives) {
         const key = `${kind}:${token}`;
         if (reported.has(key)) return;
         reported.add(key);
-        error(`[standards/rule/frontend-ui.restrict-css-decisions] ${relative}: ${utilityMessages[kind]} '${token}'`);
+        error(`[standards/rule/${ui}.restrict-css-decisions] ${relative}: ${utilityMessages[kind]} '${token}'`);
       }, { variants: false });
     }
     // A visual file is the one drawing no shared component makes, so it lays
     // itself out. The utility rules above still apply to it, so it stays on
     // semantic tokens.
-    if (/\.visual\.tsx?$/.test(source)) continue;
+    if (/\.visual\.(?:tsx?|svelte)$/.test(source)) continue;
   }
 }
 
 // An application composes the shared package's exported entry points. It reaches
 // no primitive library and no internal package path.
-const APPLICATION_IMPORT_BOUNDARIES = [
+const REACT_IMPORT_BOUNDARIES = [
   { pattern: /['"](@base-ui\/react|radix-ui|@radix-ui\/)/, message: 'imports the primitive library directly; import the shared package\'s component' },
   { pattern: /['"]@(?:[a-z0-9-]+\/)?ui\/(?:lib|hooks)\//, message: 'imports an internal shared package path; import a documented entry point' },
   { pattern: /['"]@tanstack\/react-table['"]/, message: "imports the table library directly; import the shared package's data table" },
 ];
 
-function validateApplicationImports(frontendRoot, pkg) {
-  const files = walk(frontendRoot, (file) => /\.(?:ts|tsx|js|jsx)$/.test(file));
+const SVELTE_IMPORT_BOUNDARIES = [
+  { pattern: /['"](bits-ui|@melt-ui\/svelte)['"]/, message: 'imports the primitive library directly; import the shared package\'s component' },
+  { pattern: /['"]@(?:[a-z0-9-]+\/)?ui\/(?:lib|hooks)\//, message: 'imports an internal shared package path; import a documented entry point' },
+  { pattern: /['"]@tanstack\/svelte-table['"]/, message: "imports the table library directly; import the shared package's data table" },
+];
+
+function validateApplicationImports(frontendRoot, pkg, platform) {
+  const components = platform === 'svelte' ? 'svelte-components' : 'frontend-components';
+  const boundaries = platform === 'svelte' ? SVELTE_IMPORT_BOUNDARIES : REACT_IMPORT_BOUNDARIES;
+  const files = walk(frontendRoot, (file) => /\.(?:ts|tsx|js|jsx|svelte)$/.test(file));
   for (const source of files) {
     const relative = relativeToRoot(source);
     if (/\.(?:test|spec)\.[^.]+$/.test(source)) continue;
     if (/(?:^|[\\/])(?:tests?|__tests__)(?:[\\/])/.test(source)) continue;
     const text = fs.readFileSync(source, 'utf8');
-    for (const boundary of APPLICATION_IMPORT_BOUNDARIES) {
+    for (const boundary of boundaries) {
       if (!boundary.pattern.test(text)) continue;
       // The scanner is a reference check, not a linter. A file that composes the
       // shared package's components may quote a library name in a doc comment, so
       // only a real import statement counts.
       const statements = [...text.matchAll(/(?:^|\n)\s*(?:import|export)[^;\n]*['"][^'"]+['"]/g)].map((match) => match[0]);
       if (!statements.some((statement) => boundary.pattern.test(statement))) continue;
-      error(`[standards/rule/frontend-components.compose-composites-in-page-code] ${relative}: ${boundary.message} from shared package '${pkg.name}'`);
+      error(`[standards/rule/${components}.compose-composites-in-page-code] ${relative}: ${boundary.message} from shared package '${pkg.name}'`);
     }
   }
 }
@@ -716,8 +752,11 @@ function validateDependencyBoundary() {
     '@mantine/core',
     '@mui/material',
     '@radix-ui/themes',
+    '@skeletonlabs/skeleton',
     'antd',
     'bootstrap',
+    'daisyui',
+    'flowbite-svelte',
     'material-ui',
     'react-bootstrap',
   ];
@@ -868,6 +907,8 @@ function validatePatternCatalog(relative) {
 
 // ---- run --------------------------------------------------------------------
 
+const CONTROLLED_PLATFORMS = ['react-web', 'svelte'];
+
 const projectFile = path.join(root, 'standards.project.json');
 if (!fs.existsSync(projectFile)) {
   console.error(`No standards.project.json at ${root}`);
@@ -878,11 +919,30 @@ const manifestFile = fs.existsSync(path.join(root, 'standards/standards.manifest
   ? path.join(root, 'standards/standards.manifest.json')
   : path.join(root, '../standards.manifest.json');
 const manifest = fs.existsSync(manifestFile) ? readJson(manifestFile, relativeToRoot(manifestFile)) : null;
-const baseline = manifest?.uiBaseline ?? null;
 const frontends = project?.paths?.frontends ?? [];
-const controlled = frontends.filter((frontend) => frontend?.platform === 'react-web');
-const skipped = frontends.filter((frontend) => frontend?.platform && frontend.platform !== 'react-web');
+const controlled = frontends.filter((frontend) => CONTROLLED_PLATFORMS.includes(frontend?.platform));
+const skipped = frontends.filter((frontend) => frontend?.platform && !CONTROLLED_PLATFORMS.includes(frontend.platform));
 let checked = 0;
+
+// The source lock declares which CLI installed the package, so the flavor is
+// read from the lock rather than inferred from the frontends. A workspace
+// mid-migration holds frontends on both platforms beside one lock, and the
+// package is validated against the baseline its own lock names. An unreadable
+// lock reports in its own gate; this read stays silent and assumes React.
+function lockPlatform() {
+  const sourceLock = project?.paths?.uiPackage?.sourceLock;
+  if (!sourceLock) return 'react-web';
+  try {
+    const lock = JSON.parse(fs.readFileSync(filePath(sourceLock), 'utf8'));
+    return lock?.generator === 'shadcn-svelte' ? 'svelte' : 'react-web';
+  } catch {
+    return 'react-web';
+  }
+}
+
+const packagePlatform = lockPlatform();
+const baseline = packagePlatform === 'svelte' ? (manifest?.uiBaselineSvelte ?? null) : (manifest?.uiBaseline ?? null);
+const baselineKey = packagePlatform === 'svelte' ? 'uiBaselineSvelte' : 'uiBaseline';
 
 // A UI rule override carries a review date and stops being valid once that date
 // passes. This check is time dependent by design; every other check in this
@@ -895,12 +955,13 @@ const expires = (provisionId) => reviewScopes.some((scope) => String(provisionId
 for (const override of project?.overrides ?? []) {
   if (!expires(override?.provisionId)) continue;
   const label = `override '${override.provisionId}'`;
+  const page = String(override?.provisionId ?? '').split('/')[2]?.split('.')[0] ?? 'frontend-ui';
   if (!override.reviewBy) {
-    error(`[standards/rule/frontend-ui.select-one-visual-authority] ${label}: a UI rule override requires 'reviewBy' with the review or removal date`);
+    error(`[standards/rule/${page}.select-one-visual-authority] ${label}: a UI rule override requires 'reviewBy' with the review or removal date`);
     continue;
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(override.reviewBy)) error(`${label}: reviewBy must be YYYY-MM-DD`);
-  else if (override.reviewBy < today) error(`[standards/rule/frontend-ui.select-one-visual-authority] ${label}: review date ${override.reviewBy} has passed; renew the decision`);
+  else if (override.reviewBy < today) error(`[standards/rule/${page}.select-one-visual-authority] ${label}: review date ${override.reviewBy} has passed; renew the decision`);
   if (override.decision && !fs.existsSync(filePath(override.decision))) error(`${label}: decision does not exist '${override.decision}'`);
 }
 
@@ -910,10 +971,10 @@ for (const override of project?.overrides ?? []) {
 // An additional registry passes both registry gates under an override decision
 // against the pinned baseline provision. The review date on that decision is
 // checked above; the gates below check its presence.
-const baselineOverride = (project?.overrides ?? []).some((override) => override?.provisionId === 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package');
+const baselineOverride = (project?.overrides ?? []).some((override) => override?.provisionId === 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package' || override?.provisionId === 'standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package');
 const pkg = project?.paths?.uiPackage ?? null;
 if (!controlled.length && pkg) {
-  error('standards.project.json: paths.uiPackage is declared but no frontend declares the platform react-web');
+  error('standards.project.json: paths.uiPackage is declared but no frontend declares a controlled platform (react-web, svelte)');
 }
 if (controlled.length && !pkg) {
   error(`standards/rule/frontend-ui.select-one-visual-authority standards.project.json: ${controlled.length} controlled frontend(s) and no paths.uiPackage`);
@@ -923,7 +984,7 @@ let packageSummary = null;
 
 if (pkg) {
   const label = `shared package '${pkg.name ?? '(unnamed)'}'`;
-  if (!baseline) error(`${label}: the standards manifest has no uiBaseline`);
+  if (!baseline) error(`${label}: the standards manifest has no ${baselineKey}`);
   for (const key of ['name', 'path', 'componentsJson', 'primitives', 'tokens', 'sourceLock', 'designContract']) required(pkg, key, label);
   const exports = array(pkg, 'publicExports', label);
   if (exports.length === 0) error(`${label}: publicExports must contain at least one entry point`);
@@ -949,12 +1010,12 @@ if (pkg) {
       else if (!fs.existsSync(candidate)) error(`${label}: ${key} path does not exist '${pkg[key]}'`);
     }
     if (baseline) {
-      if (pkg.componentsJson && fs.existsSync(filePath(pkg.componentsJson))) validateComponentsJson(filePath(pkg.componentsJson), baseline, baselineOverride);
-      if (pkg.sourceLock && fs.existsSync(filePath(pkg.sourceLock))) validateSourceLock(filePath(pkg.sourceLock), baseline, packageRoot, manifest, baselineOverride);
-      if (pkg.designContract) validateDesignContract(pkg);
-      if (pkg.tokens && fs.existsSync(filePath(pkg.tokens))) validateGlobalCss(filePath(pkg.tokens));
-      if (pkg.tokens) validateSharedStylesheets(packageRoot, filePath(pkg.tokens));
-      validateSourceScan(packageRoot, pkg.primitives ? path.resolve(filePath(pkg.primitives)) : null);
+      if (pkg.componentsJson && fs.existsSync(filePath(pkg.componentsJson))) validateComponentsJson(filePath(pkg.componentsJson), baseline, baselineOverride, packagePlatform);
+      if (pkg.sourceLock && fs.existsSync(filePath(pkg.sourceLock))) validateSourceLock(filePath(pkg.sourceLock), baseline, packageRoot, manifest, baselineOverride, packagePlatform);
+      if (pkg.designContract) validateDesignContract(pkg, packagePlatform);
+      if (pkg.tokens && fs.existsSync(filePath(pkg.tokens))) validateGlobalCss(filePath(pkg.tokens), packagePlatform);
+      if (pkg.tokens) validateSharedStylesheets(packageRoot, filePath(pkg.tokens), packagePlatform);
+      validateSourceScan(packageRoot, pkg.primitives ? path.resolve(filePath(pkg.primitives)) : null, packagePlatform);
     }
     packageSummary = { name: pkg.name, path: pkg.path, exports };
   }
@@ -963,8 +1024,9 @@ if (pkg) {
 
 for (const frontend of controlled) {
   const label = `frontend '${frontend.name}'`;
+  const ui = frontend.platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
   if (!frontend.ui) {
-    error(`${label}: a react-web frontend requires a 'ui' block declaring its density profile`);
+    error(`${label}: a controlled frontend requires a 'ui' block declaring its density profile`);
     continue;
   }
   required(frontend.ui, 'profile', label);
@@ -980,16 +1042,16 @@ for (const frontend of controlled) {
   if (frontend.ui.globalCss) {
     const stylesheet = filePath(frontend.ui.globalCss);
     if (!fs.existsSync(stylesheet)) error(`${label}: globalCss path does not exist '${frontend.ui.globalCss}'`);
-    else if (pkg) validateFrontendStylesheet(stylesheet, filePath(pkg.path), pkg);
+    else if (pkg) validateFrontendStylesheet(stylesheet, filePath(pkg.path), pkg, frontend.platform);
   }
   if (frontendRoot) {
-    validateApplicationImports(frontendRoot, pkg ?? { name: '(undeclared)' });
-    const sources = walk(frontendRoot, (file) => /\.(?:ts|tsx|js|jsx)$/.test(file));
+    validateApplicationImports(frontendRoot, pkg ?? { name: '(undeclared)' }, frontend.platform);
+    const sources = walk(frontendRoot, (file) => /\.(?:ts|tsx|js|jsx|svelte)$/.test(file));
     for (const source of sources) {
       const relative = relativeToRoot(source);
       if (/\.(?:test|spec)\.[^.]+$/.test(source)) continue;
       if (/(?:^|[\\/])(?:tests?|__tests__)(?:[\\/])/.test(source)) continue;
-      if (!/\.visual\.tsx?$/.test(source)) continue;
+      if (!/\.visual\.(?:tsx?|svelte)$/.test(source)) continue;
       // A visual file lays itself out, and it is the one place in an application
       // where class names belong. The utility rule still applies, so the drawing
       // stays on semantic tokens and on no raw palette value.
@@ -1000,7 +1062,7 @@ for (const frontend of controlled) {
           const key = `${kind}:${token}`;
           if (seen.has(key)) return;
           seen.add(key);
-          error(`[standards/rule/frontend-ui.restrict-css-decisions] ${relative}: ${utilityMessages[kind]} '${token}'`);
+          error(`[standards/rule/${ui}.restrict-css-decisions] ${relative}: ${utilityMessages[kind]} '${token}'`);
         });
       }
     }
@@ -1009,9 +1071,13 @@ for (const frontend of controlled) {
       if (/\.(?:test|spec)\.[^.]+$/.test(source)) continue;
       if (/(?:^|[\\/])(?:tests?|__tests__)(?:[\\/])/.test(source)) continue;
       // A visual file lays itself out. Its class names are read above.
-      if (/\.visual\.tsx?$/.test(source)) continue;
-      if (/style=\{\{/.test(fs.readFileSync(source, 'utf8'))) {
-        error(`[standards/rule/frontend-ui.restrict-css-decisions] ${relative}: an inline style belongs in a shared component`);
+      if (/\.visual\.(?:tsx?|svelte)$/.test(source)) continue;
+      // React writes an inline style as an object, Svelte as an attribute, an
+      // expression, or a style directive. A `<style>` block opening tag carries
+      // none of those after its name, so element styles never match this test.
+      const inline = source.endsWith('.svelte') ? /\sstyle(?::|=|\{)/ : /style=\{\{/;
+      if (inline.test(fs.readFileSync(source, 'utf8'))) {
+        error(`[standards/rule/${ui}.restrict-css-decisions] ${relative}: an inline style belongs in a shared component`);
       }
     }
   }
@@ -1050,7 +1116,7 @@ if (!pkg) {
   // each one declared makes the skipped scope visible in the output that a
   // reviewer reads. (standards/rule/frontend-ui.record-a-frontend-outside-the-controlled-contract)
   const declared = frontends.map((frontend) => `${frontend.name} (platform: ${frontend.platform ?? 'undeclared'})`);
-  console.log('PASS: no controlled React web frontend is present.');
+  console.log('PASS: no controlled web frontend is present.');
   if (declared.length) console.log(`Skipped frontends: ${declared.join(', ')}`);
   else console.log('Skipped frontends: none; the project declares no frontend.');
   process.exit(0);

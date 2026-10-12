@@ -11,6 +11,7 @@ Read [Get started](../../docs/guide/getting-started.md) before creating a consum
 | Template | Target | Purpose |
 |:---|:---|:---|
 | `standards.project.json` | `standards.project.json` | Selects the profile, reviewed standards release, paths, allowed extensions, and standards overrides. |
+| `standards.project.svelte.json` | `standards.project.json` | The same wiring for a `dotnet-svelte` consumer, with one Svelte frontend instead. |
 | `project-agents.md` | `AGENTS.md` | Provides the short consumer agent entry point. |
 | `product-brief.md` | `docs/product/brief.md` | Defines the product boundary and linked end-to-end flows. |
 | `domain-index.md` | `docs/domain/README.md` | Lists modules, workflows, and domain policies. |

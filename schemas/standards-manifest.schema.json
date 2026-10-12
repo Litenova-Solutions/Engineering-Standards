@@ -169,6 +169,71 @@
         "nativeBoundary": { "const": "separate-platform-profile" }
       }
     },
+    "uiBaselineSvelte": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "platform",
+        "system",
+        "styling",
+        "base",
+        "style",
+        "cssVariables",
+        "baseColor",
+        "theme",
+        "chartColor",
+        "font",
+        "fontHeading",
+        "icons",
+        "radius",
+        "menuAccent",
+        "menuColor",
+        "componentsStyle",
+        "sourceModel",
+        "registry",
+        "profiles",
+        "nativeBoundary"
+      ],
+      "properties": {
+        "platform": { "const": "svelte" },
+        "system": { "const": "shadcn-svelte" },
+        "styling": { "const": "tailwindcss-v4" },
+        "base": { "const": "bits-ui" },
+        "style": { "type": "string", "minLength": 1 },
+        "cssVariables": { "const": true },
+        "baseColor": { "type": "string", "minLength": 1 },
+        "theme": { "type": "string", "minLength": 1 },
+        "chartColor": { "type": "string", "minLength": 1 },
+        "font": { "type": "string", "minLength": 1 },
+        "fontHeading": { "type": "string", "minLength": 1 },
+        "icons": { "const": "lucide" },
+        "radius": { "type": "string", "minLength": 1 },
+        "menuAccent": { "enum": ["subtle", "bold"] },
+        "menuColor": { "enum": ["default", "inverted", "default-translucent", "inverted-translucent"] },
+        "componentsStyle": { "type": "string", "minLength": 1 },
+        "sourceModel": { "const": "shared-ui-package" },
+        "registry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "url", "allowAdditional"],
+          "properties": {
+            "name": { "const": "shadcn-svelte" },
+            "url": { "const": "https://shadcn-svelte.com/registry" },
+            "allowAdditional": { "type": "boolean" }
+          }
+        },
+        "profiles": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["public-light", "application-balanced", "admin-dense"]
+          }
+        },
+        "nativeBoundary": { "const": "separate-platform-profile" }
+      }
+    },
     "loadPlans": {
       "type": "object",
       "minProperties": 1,

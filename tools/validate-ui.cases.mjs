@@ -514,6 +514,101 @@ libraryCatalogCase('a pattern renaming a library option', (catalog) => {
   catalog.patterns[0].options[0].name = 'Renamed table';
 }, "pattern 'orders-list-page': options[0].name 'Renamed table' does not match the UI pattern library option 'filter-table' name 'Filterable table'");
 
+console.log('\nSvelte sources (standards/rule/frontend-ui.restrict-css-decisions)');
+pathCase('a svelte file is scanned for utility violations', 'packages/ui/src/floorplans/card.svelte', '<div class="text-red-500">Overdue</div>\n', "raw Tailwind palette value requires a semantic token 'text-red-500'");
+pathCase('a svelte visual file keeps its own layout', 'apps/web/src/modules/seat-map/seat-map.visual.svelte', '<div class="grid">Map</div>\n', null);
+pathCase('a svelte visual file is still held to the token rule', 'apps/web/src/modules/seat-map/other.visual.svelte', '<div class="bg-red-500">Map</div>\n', "raw Tailwind palette value requires a semantic token 'bg-red-500'");
+pathCase('a svelte class directive is read as one token', 'apps/web/src/modules/orders/toggle.svelte', '<button class:hidden={closed}>Hide</button>\n', null);
+pathCase('a svelte style attribute is an inline style', 'apps/web/src/modules/orders/styled.svelte', '<div style="color: red">Overdue</div>\n', 'an inline style belongs in a shared component');
+pathCase('a svelte style directive is an inline style', 'apps/web/src/modules/orders/styled-directive.svelte', '<div style:color={ink}>Overdue</div>\n', 'an inline style belongs in a shared component');
+pathCase('a svelte style block is not an inline style', 'apps/web/src/modules/orders/scoped.svelte', '<style>\n  .scoped {\n    color: red;\n  }\n</style>\n<div class="scoped">Overdue</div>\n', null);
+manifestCase('second svelte visual system in the workspace root', { dependencies: { 'flowbite-svelte': '1.33.1' } }, "second general-purpose visual dependency 'flowbite-svelte' requires an override");
+
+console.log('\nSvelte baseline (standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package, standards/rule/svelte-ui.track-source-changes, standards/rule/svelte-ui.select-one-visual-authority, standards/rule/svelte-components.compose-composites-in-page-code)');
+{
+  const componentsFile = path.join(packageRoot, 'components.json');
+  const originalComponents = fs.readFileSync(componentsFile, 'utf8');
+  const originalLock = fs.readFileSync(lockFile, 'utf8');
+  const originalProject = fs.readFileSync(projectFile, 'utf8');
+  const asSvelte = () => {
+    const project = JSON.parse(originalProject);
+    project.paths.frontends = [{ name: 'web', path: 'apps/web', platform: 'svelte', ui: { profile: 'application-balanced', globalCss: 'apps/web/src/styles.css' } }];
+    writeJson(projectFile, project);
+    const lock = JSON.parse(originalLock);
+    lock.generator = 'shadcn-svelte';
+    lock.cli = '1.7.0';
+    lock.preset.base = 'bits-ui';
+    lock.registry = { name: 'shadcn-svelte', url: 'https://shadcn-svelte.com/registry' };
+    lock.components[0].dependencies = ['bits-ui', 'class-variance-authority', 'cn'];
+    writeJson(lockFile, lock);
+    writeJson(componentsFile, {
+      $schema: 'https://shadcn-svelte.com/schema.json',
+      tailwind: { css: 'src/styles/tokens.css', baseColor: 'neutral' },
+      aliases: { components: '$lib/components', utils: '$lib/utils', ui: '$lib/components/ui', lib: '$lib', hooks: '$lib/hooks' },
+      typescript: true,
+      iconLibrary: 'lucide',
+      menuColor: 'default',
+      menuAccent: 'subtle',
+    });
+  };
+  asSvelte();
+  report('a svelte package validates against the svelte baseline', null, run());
+  pathCase('a svelte application importing the primitive library', 'apps/web/src/routes/bits.svelte', '<script>\nimport { Dialog } from "bits-ui";\n</script>\n<Dialog />\n', "[standards/rule/svelte-components.compose-composites-in-page-code] apps/web/src/routes/bits.svelte: imports the primitive library directly");
+  pathCase('a svelte application importing the react primitive library is outside its boundary', 'apps/web/src/routes/shim.svelte', '<script>\nimport { Dialog } from "@base-ui/react/dialog";\n</script>\n', null);
+  pathCase('a svelte application importing a table library', 'apps/web/src/routes/table.svelte', '<script>\nimport { flexRender } from "@tanstack/svelte-table";\n</script>\n', 'imports the table library directly');
+  pathCase('a svelte utility violation cites the svelte provision', 'packages/ui/src/floorplans/card.svelte', '<div class="text-red-500">Overdue</div>\n', "[standards/rule/svelte-ui.restrict-css-decisions] packages/ui/src/floorplans/card.svelte: raw Tailwind palette value requires a semantic token 'text-red-500'");
+  {
+    const lock = readJson(lockFile);
+    lock.preset.baseColor = 'slate';
+    writeJson(lockFile, lock);
+    report('a svelte source lock describing a preset the manifest does not pin', "[standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: preset.baseColor does not match the manifest baseline", run());
+    asSvelte();
+  }
+  {
+    const lock = readJson(lockFile);
+    lock.cli = '4.21.1';
+    writeJson(lockFile, lock);
+    report('a svelte source lock naming the react CLI pin', "cli must match manifest shadcn-svelte pin '1.7.0'", run());
+    asSvelte();
+  }
+  {
+    const lock = readJson(lockFile);
+    lock.registry = { name: 'fixture', url: 'https://blocks.fixture.test' };
+    writeJson(lockFile, lock);
+    report('a svelte source lock naming another registry', "registry 'fixture' is not the built-in shadcn-svelte registry", run());
+    asSvelte();
+  }
+  {
+    const components = readJson(componentsFile);
+    components.tailwind.baseColor = 'slate';
+    writeJson(componentsFile, components);
+    report('svelte components.json naming a base colour the baseline does not pin', "[standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: tailwind.baseColor must be 'neutral'", run());
+    asSvelte();
+  }
+  {
+    const components = readJson(componentsFile);
+    components.registry = 'https://blocks.fixture.test';
+    writeJson(componentsFile, components);
+    report('svelte components.json naming another registry', "registry 'https://blocks.fixture.test' is not the built-in shadcn-svelte registry", run());
+    const project = readJson(projectFile);
+    project.overrides = [{ provisionId: 'standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
+    writeJson(projectFile, project);
+    report('a svelte registry override carries the svelte provision', null, run());
+    asSvelte();
+  }
+  {
+    const project = readJson(projectFile);
+    project.overrides = [{ provisionId: 'standards/rule/svelte-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md' }];
+    writeJson(projectFile, project);
+    report('a svelte UI override without a review date', "[standards/rule/svelte-ui.select-one-visual-authority] override 'standards/rule/svelte-ui.select-one-visual-authority': a UI rule override requires 'reviewBy'", run());
+    asSvelte();
+  }
+  fs.writeFileSync(componentsFile, originalComponents);
+  fs.writeFileSync(lockFile, originalLock);
+  fs.writeFileSync(projectFile, originalProject);
+  report('the fixture is react again after the svelte block', null, run());
+}
+
 fs.rmSync(fixture, { recursive: true, force: true });
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);
 process.exit(failures ? 1 : 0);

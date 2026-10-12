@@ -14,7 +14,7 @@
 
 The Agentic Engineering System is the standards contract Litenova Solutions uses for software work by humans and AI agents.
 
-Standards v1.17.0 targets one bounded-context business application. The `dotnet-react` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more React frontends. The `dotnet-blazor` profile replaces the frontend with a .NET WebAssembly client.
+Standards v1.17.0 targets one bounded-context business application. The `dotnet-react` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more React frontends. The `dotnet-blazor` profile replaces the frontend with a .NET WebAssembly client. The `dotnet-svelte` profile replaces the frontend with Svelte applications on SvelteKit.
 
 ## What It Defines
 

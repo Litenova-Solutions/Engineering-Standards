@@ -326,7 +326,7 @@ const IDENTIFIER_TOKEN = /[A-Za-z_][A-Za-z0-9_]*/g;
 const DOTTED = /^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$/;
 const MEMBER = /\b(?:public|internal|protected|private)\s+(?:const\s+|static\s+|async\s+|virtual\s+|override\s+|sealed\s+|abstract\s+|required\s+|readonly\s+|partial\s+|new\s+)*[A-Za-z_][\w<>,.?\[\] ]*?\s([A-Z][A-Za-z0-9_]*)\s*(?:\(|\{|=>|=)/g;
 // A mapping row may name a file rather than a declaration: a feature file, a page, a script.
-const FILE_SUFFIX = /\.(feature|cs|md|json|mjs|ts|tsx|yml|yaml|ps1|sh|slnx|sln|props|targets)$/;
+const FILE_SUFFIX = /\.(feature|cs|md|json|mjs|ts|tsx|svelte|yml|yaml|ps1|sh|slnx|sln|props|targets)$/;
 // A mapping row may cite an identifier rather than an artifact. An identifier
 // opens with its kind, so the slash reads as a kind boundary and not a path
 // separator. (standards/rule/backend-identifiers.state-the-identifier-grammar)

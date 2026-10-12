@@ -112,7 +112,7 @@
         },
         "implementations": {
           "type": "object",
-          "description": "Keyed by frontend platform, such as react-web or blazor-web.",
+          "description": "Keyed by frontend platform, such as react-web, svelte, or blazor-web.",
           "additionalProperties": {
             "type": "object",
             "additionalProperties": false,

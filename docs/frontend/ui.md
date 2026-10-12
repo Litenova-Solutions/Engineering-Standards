@@ -324,11 +324,11 @@ test('[path/orders.place-order.expected-total-mismatch] shows the changed total 
 | standards/rule/frontend-ui.compose-each-route-from-one-floorplan | test | `tests/routes/every-route.spec.ts` asserts `page.locator("[data-floorplan]")` has count 1. |
 | standards/rule/frontend-ui.keep-layout-inside-floorplans | static | `packages/*/eslint.config.js` refuses a layout utility in a route file. |
 | standards/rule/frontend-ui.record-a-freestyle-route | inspection | Route review confirms each freestyle route names a decision record. |
-| standards/rule/frontend-ui.derive-each-page-type-from-a-named-reference | static | A project check reads each route tag and resolves it against the registry the shared package publishes, such as `entro check pages`. |
+| standards/rule/frontend-ui.derive-each-page-type-from-a-named-reference | static | A project check reads each route tag and resolves it against the registry the shared package publishes, such as `nighthall check pages`. |
 | standards/rule/frontend-ui.select-a-tone-from-the-closed-set | static | `pnpm type-check` fails on a state kind with no tone in `src/app/states.tsx`. |
 | standards/rule/frontend-ui.keep-tokens-in-one-stylesheet | static | `node standards/tools/validate-ui.mjs` reports an application stylesheet declaring a rule and a shared stylesheet declaring a literal colour. |
-| standards/rule/frontend-ui.hold-the-declared-base-colour | static | A project check compares the token stylesheet `:root` and dark blocks to the published base colour, such as `entro check tokens`. |
-| standards/rule/frontend-ui.keep-separators-at-the-subtle-step | static | A project check compares the token stylesheet `:root` and dark blocks to the published base colour, such as `entro check tokens`. |
+| standards/rule/frontend-ui.hold-the-declared-base-colour | static | A project check compares the token stylesheet `:root` and dark blocks to the published base colour, such as `nighthall check tokens`. |
+| standards/rule/frontend-ui.keep-separators-at-the-subtle-step | static | A project check compares the token stylesheet `:root` and dark blocks to the published base colour, such as `nighthall check tokens`. |
 | standards/rule/frontend-ui.select-a-command-surface-by-size | inspection | Review confirms each command's surface matches the table in the Concepts section. |
 | standards/rule/frontend-ui.check-every-route-in-a-browser | test | `tests/routes/every-route.spec.ts` runs axe and the seven checks on each discovered route. |
 | standards/rule/frontend-ui.map-every-use-case-path | static | The consumer path check reports a path with no `[path/<id>]` title and no exclusion. |

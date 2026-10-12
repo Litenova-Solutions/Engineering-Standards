@@ -27,6 +27,7 @@ A **topic**, **profile**, or **extension** page owns the provisions a reader cit
 
 - [.NET and React platform profile](profile/react.md)
 - [.NET and Blazor platform profile](profile/blazor.md)
+- [.NET and Svelte platform profile](profile/svelte.md)
 
 The profile selects every baseline page. Exact versions and composition remain in `standards.manifest.json`.
 
@@ -64,6 +65,15 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Blazor data and state](blazor/data.md)
 - [Browser persistence](blazor/browser.md)
 - [Blazor testing](blazor/testing.md)
+
+## Svelte
+
+- [Svelte structure](svelte/structure.md)
+- [Svelte rendering and routes](svelte/rendering.md)
+- [Svelte components](svelte/components.md)
+- [Svelte UI governance](svelte/ui.md)
+- [Svelte data and state](svelte/data.md)
+- [Svelte testing](svelte/testing.md)
 
 ## Quality
 

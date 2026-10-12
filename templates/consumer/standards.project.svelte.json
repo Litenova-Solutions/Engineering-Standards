@@ -1,0 +1,49 @@
+{
+  "$schema": "./standards/schemas/standards-project.schema.json",
+  "project": {
+    "name": "__PROJECT__"
+  },
+  "profile": "dotnet-svelte",
+  "reviewedStandardsVersion": "1.17.0",
+  "paths": {
+    "apiSolution": "__API_SOLUTION__",
+    "docs": "docs",
+    "domainDocs": "docs/domain",
+    "uiDocs": "docs/ui",
+    "unstructuredDocs": [],
+    "surfaces": [],
+    "testRoots": [],
+    "languageScan": [],
+    "uiPackage": {
+      "name": "@__PROJECT__/ui",
+      "path": "packages/ui",
+      "componentsJson": "packages/ui/components.json",
+      "primitives": "packages/ui/src/components",
+      "tokens": "packages/ui/src/styles/tokens.css",
+      "sourceLock": "packages/ui/ui-source-lock.json",
+      "designContract": "packages/ui/DESIGN.md",
+      "publicExports": ["@__PROJECT__/ui/floorplans", "@__PROJECT__/ui/display", "@__PROJECT__/ui/forms"]
+    },
+    "uiPatterns": "docs/ui/pattern-catalog.json",
+    "frontends": [
+      {
+        "name": "web",
+        "path": "apps/web",
+        "platform": "svelte",
+        "ui": {
+          "profile": "application-balanced",
+          "globalCss": "apps/web/src/app.css"
+        }
+      }
+    ]
+  },
+  "selectedExtensions": [],
+  "prohibitedKinds": [],
+  "overrides": [],
+  "parity": {
+    "ignoreHandlers": [],
+    "ignoreUseCases": [],
+    "sourceRoots": [],
+    "foreignNames": []
+  }
+}
