@@ -100,6 +100,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Realtime updates](ext/realtime.md)
 - [Reporting](ext/report.md)
 - [Scheduled jobs](ext/jobs.md)
+- [Static marketing site](ext/site.md)
 
 ## Tools
 

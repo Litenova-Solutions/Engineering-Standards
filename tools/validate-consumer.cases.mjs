@@ -421,6 +421,32 @@ projectCase('a controlled frontend whose stylesheet is not on disk', (p) => {
   p.paths.frontends = [{ name: 'admin', path: 'apps/admin', platform: 'react-web', ui: { profile: 'application-balanced', globalCss: 'apps/admin/src/missing.css' } }];
 }, "globalCss path does not exist 'apps/admin/src/missing.css'");
 
+console.log('\nStatic site (standards/rule/ext-site.declare-each-static-site-in-the-project-record)');
+{
+  const originalProject = readFixture('standards.project.json');
+  const withSite = (sites) => {
+    const project = JSON.parse(originalProject);
+    project.selectedExtensions = ['site'];
+    project.paths.sites = sites;
+    writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  };
+  writeFile('apps/site/astro.config.mjs', 'export default {};\n');
+  withSite([{ name: 'site', path: 'apps/site', generator: 'astro' }]);
+  report('a declared site holding its generator config', null, run());
+  fs.rmSync(path.join(fixture, 'apps/site/astro.config.mjs'));
+  report('a declared site with no generator config', 'holds no astro.config.mjs', run());
+  withSite([{ name: 'site', path: 'apps/missing', generator: 'astro' }]);
+  report('a declared site path that is not on disk', "site 'site' path 'apps/missing' does not exist", run());
+  withSite([]);
+  report('a selected site extension with no declared site', 'declares no site', run());
+  withSite([{ name: 'site', path: 'apps/site', generator: 'jekyll' }]);
+  report('a declared site with an unknown generator', "unknown generator 'jekyll'", run());
+  withSite([{ name: 'site', generator: 'astro' }]);
+  report('a declared site with no path', "declares no 'path'", run());
+  writeFile('standards.project.json', originalProject);
+  fs.rmSync(path.join(fixture, 'apps/site'), { recursive: true, force: true });
+}
+
 console.log('\nCross-file references');
 metaCase('flow names a use case with no file', 'docs/product/flows/order-checkout.md', (m) => { m.useCases = ['use-case/orders.no-such-case']; }, "useCase 'use-case/orders.no-such-case' has no file");
 metaCase('flow with an empty use-case list', 'docs/product/flows/order-checkout.md', (m) => { m.useCases = []; }, 'useCases empty');
