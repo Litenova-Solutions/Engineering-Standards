@@ -295,7 +295,7 @@ export default defineConfig({ output: 'static' });
 
 ## Dependencies
 
-This extension selects its generator stack through `standards.manifest.json`, which pins `astro` with `@astrojs/svelte` and `@astrojs/sitemap`. A consumer resolves those pins through its package manager.
+This extension selects its generator stack through `standards.manifest.json`, which pins `astro` with `@astrojs/svelte`. A consumer resolves those pins through its package manager.
 
 ## Verification
 

@@ -20,7 +20,7 @@
 - Added `templates/consumer/standards.project.svelte.json`, the project wiring for a `dotnet-svelte` consumer, with the profile, one Svelte frontend, and the shared package block. Linked the profile and its pages from `AGENTS.md`, `README.md`, and `docs/README.md`.
 - Fixed the consumer fixture: the Consumers-section replacement now tolerates CRLF templates, so the four error cases mutate the page they mean to mutate on a Windows checkout.
 - Added the `site` extension (`docs/ext/site.md`) with provisions under `standards/rule/ext-site.*`. A consumer shipping a public static website beside its application selects `site`, declares each site in `paths.sites` with its name, path, and generator, and prerenders every page to static files with no third-party loads, full search and language-model discovery files, JSON-LD structured data, single-sourced facts, visible placeholders that fail a release build, and prices read from consumer records. The conventions default to Astro with static output, server-rendered Astro or Svelte components, Tailwind styles, and a light scheme with a reader-chosen dark scheme.
-- Pinned the site generator stack in `standards.manifest.json`: `astro` 7.3.8, `@astrojs/svelte` 9.0.1, `@astrojs/sitemap` 3.7.4.
+- Pinned the site generator stack in `standards.manifest.json`: `astro` 7.3.8 and `@astrojs/svelte` 9.0.1.
 - Extended `schemas/standards-project.schema.json` with optional `paths.sites`, taught `tools/validate-consumer.mjs` to require a declared site path holding its generator config when `site` is selected, and added passing and failing cases.
 
 ## v1.17.0
