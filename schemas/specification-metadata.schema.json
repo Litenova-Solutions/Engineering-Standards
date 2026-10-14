@@ -5,6 +5,7 @@
   "description": "JSON metadata blocks embedded at the start of structured Agentic Engineering System specifications.",
   "oneOf": [
     { "$ref": "#/$defs/product" },
+    { "$ref": "#/$defs/productTopic" },
     { "$ref": "#/$defs/domainIndex" },
     { "$ref": "#/$defs/glossary" },
     { "$ref": "#/$defs/modulesIndex" },
@@ -102,6 +103,19 @@
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
         "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+      }
+    },
+    "productTopic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "specStatus", "owner", "lastReviewed", "reviewBy"],
+      "properties": {
+        "kind": { "const": "product-topic" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "specStatus": { "$ref": "#/$defs/specStatus" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "reviewBy": { "$ref": "#/$defs/lastReviewed" }
       }
     },
     "domainIndex": {
@@ -394,7 +408,22 @@
         "id": { "$ref": "#/$defs/recordIdentifier" },
         "specStatus": { "$ref": "#/$defs/specStatus" },
         "owner": { "$ref": "#/$defs/owner" },
-        "lastReviewed": { "$ref": "#/$defs/lastReviewed" }
+        "lastReviewed": { "$ref": "#/$defs/lastReviewed" },
+        "decidedBy": { "type": "string", "minLength": 1 },
+        "decided": { "$ref": "#/$defs/lastReviewed" },
+        "affects": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^product/.+\\.md$" }
+        },
+        "supersedes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/recordIdentifier" }
+        },
+        "supersededBy": { "$ref": "#/$defs/recordIdentifier" }
       }
     },
     "runbook": {

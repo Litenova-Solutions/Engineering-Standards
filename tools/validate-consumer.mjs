@@ -19,6 +19,10 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checkProseMeasures, checkLanguage, checkLanguageInSource, compileLanguage } from './prose.mjs';
 import { RuleIdentifierScan, MultiFormScan, projectSources } from './identifiers.mjs';
+import {
+  PRODUCT_RULE, PRODUCT_RULE_FORM, TOPIC_SECTIONS, PRODUCT_DECISION_SECTIONS,
+  collectProductRecords, decisionsAffecting, definedRules, linkedFiles, sectionBody as productSection, sectionEntries, statesNone,
+} from './product.mjs';
 
 const USAGE = `Usage: node tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
 
@@ -292,9 +296,15 @@ const KINDS = {
   'decision-evidence': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   'operating-limits': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   // The route code is the page contract. No page record describes a route in prose.
-  decision: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
+  // A decision that sets product pages names them in affects, and names the
+  // person who approved it. (standards/rule/core-product.record-each-product-choice-as-a-decision)
+  decision: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base, decidedBy: 1, decided: 1, affects: 1, supersedes: 1, supersededBy: 1 }, id: REC },
   runbook: { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed'], props: { ...base }, id: REC },
   'release-record': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'release'], props: { ...base, release: 1 }, id: REC },
+  // One page of business intent under product/. It is not a singleton: the brief
+  // states what the product is, and each topic page states one area the product
+  // owner decides. (standards/rule/core-product.state-each-topic-in-one-page-shape)
+  'product-topic': { req: ['kind', 'id', 'specStatus', 'owner', 'lastReviewed', 'reviewBy'], props: { ...base, reviewBy: 1 }, id: ID, sections: TOPIC_SECTIONS },
 };
 const KIND_NAMES = Object.keys(KINDS);
 // The leading callout of a behavior kind, and the section that states the
@@ -448,6 +458,7 @@ for (const f of files) {
   if (meta.specStatus !== undefined && !SPEC.includes(meta.specStatus)) err(`${rel}: bad specStatus '${meta.specStatus}'; expected one of ${SPEC.join(', ')}`);
   if (meta.implementationStatus !== undefined && !IMPL.includes(meta.implementationStatus)) err(`${rel}: bad implementationStatus '${meta.implementationStatus}'; expected one of ${IMPL.join(', ')}`);
   if (meta.lastReviewed !== undefined && !DATE.test(meta.lastReviewed)) err(`${rel}: bad lastReviewed '${meta.lastReviewed}'; expected ${DATE_FORM}`);
+  for (const field of ['reviewBy', 'decided']) if (meta[field] !== undefined && !DATE.test(meta[field])) err(`${rel}: bad ${field} '${meta[field]}'; expected ${DATE_FORM}`);
   if (meta.operationType !== undefined && !OPERATION_TYPES.includes(meta.operationType)) err(`${rel}: bad operationType '${meta.operationType}'; expected one of ${OPERATION_TYPES.join(', ')}`);
   if (Array.isArray(meta.risks)) for (const r of meta.risks) if (!RISK.includes(r)) err(`${rel}: bad risk '${r}'; expected one of ${RISK.join(', ')}`);
   for (const a of ['actors', 'entryPoints', 'applicableExtensions']) if (Array.isArray(meta[a])) for (const v of meta[a]) if (!ID.test(v)) err(`${rel}: bad ${a} id '${v}'; expected ${FORM.get(ID)}`);
@@ -545,6 +556,132 @@ for (const kind of SINGLETON_KINDS) {
     continue;
   }
   err(`Expected at most one ${kind} specification, found ${found.length}: ${found.join(', ')}`);
+}
+
+// ---- product records -------------------------------------------------------
+// Business intent is a set of topic pages under product/, each stating its
+// position as rules and naming the decision behind every choice. The decisions
+// carry the past; a topic page states the present and the next step, and its
+// History section is derived from the decisions rather than written.
+// (standards/rule/core-product.keep-business-intent-under-product,
+// standards/rule/core-product.trace-every-choice-to-a-decision,
+// standards/rule/core-product.derive-history-from-decisions,
+// standards/rule/core-product.supersede-a-decision-instead-of-editing-it)
+{
+  const { topics, decisions } = collectProductRecords(docsRoot);
+  const productRoot = path.join(docsRoot, 'product');
+  const relOf = (file) => path.relative(root, file).replace(/\\/g, '/');
+  const decisionByFile = new Map(decisions.map((decision) => [path.resolve(decision.file), decision]));
+  const decisionById = new Map();
+  for (const decision of decisions) {
+    const id = String(decision.meta.id);
+    if (decisionById.has(id)) err(`${relOf(decision.file)}: decision id '${id}' is also used by ${relOf(decisionById.get(id).file)}`);
+    else decisionById.set(id, decision);
+  }
+  const pageByDocsRel = new Map(topics.map((page) => [page.docsRel, page]));
+  const ruleOwners = new Map();
+  const topicIds = new Map();
+
+  for (const page of topics.filter((candidate) => candidate.meta.kind === 'product-topic')) {
+    const rel = relOf(page.file);
+    if (!path.resolve(page.file).startsWith(`${path.resolve(productRoot)}${path.sep}`)) {
+      err(`${rel}: kind 'product-topic' lives under '${docsPath}/product/'; business intent has one home`);
+    }
+    const id = String(page.meta.id);
+    if (topicIds.has(id)) err(`${rel}: product-topic id '${id}' is also used by ${topicIds.get(id)}; a rule identifier names its page by this id`);
+    else topicIds.set(id, rel);
+    if (typeof page.meta.reviewBy === 'string' && DATE.test(page.meta.reviewBy) && page.meta.reviewBy < today) {
+      err(`${rel}: reviewBy ${page.meta.reviewBy} has passed; reread the page against its decisions and evidence, then move reviewBy`);
+    }
+
+    // Rules: one identifier per entry, owned by this page.
+    const rulesBody = productSection(page.raw, 'Rules');
+    if (rulesBody !== null) {
+      const entries = sectionEntries(rulesBody);
+      const rules = definedRules(page);
+      if (!rules.length && !statesNone(rulesBody)) err(`${rel}: 'Rules' defines no product rule and does not write 'None.'`);
+      for (const entry of entries) {
+        if (!/^[-*]\s+`product\//.test(entry)) err(`${rel}: 'Rules' entry '${entry.slice(0, 60)}' does not open with a rule identifier; expected ${PRODUCT_RULE_FORM}`);
+      }
+      for (const rule of rules) {
+        const topic = rule.slice('product/'.length).split('.')[0];
+        if (topic !== id) err(`${rel}: rule '${rule}' names topic '${topic}'; a rule on this page is 'product/${id}.<rule>'`);
+        if (ruleOwners.has(rule)) err(`${rel}: rule '${rule}' is also defined in ${ruleOwners.get(rule)}`);
+        else ruleOwners.set(rule, rel);
+      }
+    }
+
+    // Position and Refusals: every entry names the decision that set it.
+    for (const name of ['Position', 'Refusals']) {
+      const body = productSection(page.raw, name);
+      if (body === null || statesNone(body)) continue;
+      const entries = sectionEntries(body);
+      if (!entries.length) err(`${rel}: '${name}' states no entry and does not write 'None.'`);
+      for (const entry of entries) {
+        const linked = linkedFiles(entry, page.file).map((file) => decisionByFile.get(path.resolve(file))).filter(Boolean);
+        if (!linked.length) { err(`${rel}: '${name}' entry '${entry.slice(0, 60)}' links no decision record`); continue; }
+        for (const decision of linked) {
+          if (decision.meta.specStatus === 'retired') err(`${rel}: '${name}' cites retired decision '${decision.meta.id}'${decision.meta.supersededBy ? `; cite its replacement '${decision.meta.supersededBy}'` : ''}`);
+          else if (page.meta.specStatus === 'approved' && decision.meta.specStatus !== 'approved') err(`${rel}: approved page cites decision '${decision.meta.id}' with status '${decision.meta.specStatus}'; a position is approved only on an approved decision`);
+        }
+      }
+    }
+
+    // History: exactly the decisions whose affects field names this page.
+    const historyBody = productSection(page.raw, 'History');
+    if (historyBody !== null) {
+      const expected = new Set(decisionsAffecting(decisions, page.docsRel).map((decision) => String(decision.meta.id)));
+      const listed = new Set(linkedFiles(historyBody, page.file).map((file) => decisionByFile.get(path.resolve(file))).filter(Boolean).map((decision) => String(decision.meta.id)));
+      const missing = [...expected].filter((decision) => !listed.has(decision));
+      const extra = [...listed].filter((decision) => !expected.has(decision));
+      if (missing.length || extra.length) {
+        err(`${rel}: 'History' does not match the decisions that affect this page${missing.length ? `; missing ${missing.join(', ')}` : ''}${extra.length ? `; lists ${extra.join(', ')}, which do not name this page` : ''}. Run node standards/tools/product-records.mjs --write`);
+      }
+    }
+  }
+
+  for (const decision of decisions) {
+    const rel = relOf(decision.file);
+    const meta = decision.meta;
+    const id = String(meta.id);
+    const product = Array.isArray(meta.affects);
+    for (const target of product ? meta.affects : []) {
+      const page = pageByDocsRel.get(target);
+      if (!page) err(`${rel}: affects '${target}', which is not a product or product-topic page under '${docsPath}/'`);
+    }
+    if (product) {
+      for (const name of PRODUCT_DECISION_SECTIONS) {
+        if (productSection(decision.raw, name) === null) err(`${rel}: a decision that affects product pages requires an H2 '${name}'`);
+      }
+      if (meta.specStatus === 'approved' && (!meta.decidedBy || !meta.decided)) {
+        err(`${rel}: approved product decision names no ${!meta.decidedBy ? 'decidedBy' : 'decided'}; an agent proposes and an accountable person approves`);
+      }
+    }
+    if (meta.supersededBy !== undefined) {
+      const replacement = decisionById.get(String(meta.supersededBy));
+      if (meta.specStatus !== 'retired') err(`${rel}: supersededBy '${meta.supersededBy}' requires specStatus 'retired'`);
+      if (!replacement) err(`${rel}: supersededBy '${meta.supersededBy}' names no decision record`);
+      else if (!(replacement.meta.supersedes ?? []).includes(id)) err(`${rel}: supersededBy '${meta.supersededBy}', but that record does not list '${id}' in supersedes`);
+    }
+    for (const previous of meta.supersedes ?? []) {
+      const record = decisionById.get(String(previous));
+      if (!record) { err(`${rel}: supersedes '${previous}', which names no decision record`); continue; }
+      if (meta.specStatus === 'approved' && (record.meta.specStatus !== 'retired' || record.meta.supersededBy !== meta.id)) {
+        err(`${rel}: supersedes '${previous}', which is not retired with supersededBy '${id}'; retire the replaced record in the same change`);
+      }
+    }
+  }
+
+  // A product rule cited anywhere in the documentation resolves to the page that
+  // defines it. (standards/rule/core-product.identify-every-product-rule)
+  for (const file of files) {
+    const raw = fs.readFileSync(file, 'utf8');
+    for (const match of raw.matchAll(PRODUCT_RULE)) {
+      const rule = match[1];
+      if (/\.md$/.test(rule)) continue;
+      if (!ruleOwners.has(rule)) err(`${relOf(file)}: cites product rule '${rule}', which no product-topic page defines`);
+    }
+  }
 }
 // ---- consumer linkage ------------------------------------------------------
 // A route calls use cases from its code, so the edge runs one way and nothing
