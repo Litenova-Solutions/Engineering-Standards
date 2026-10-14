@@ -35,7 +35,8 @@
           "globalCss": "apps/web/src/app.css"
         }
       }
-    ]
+    ],
+    "sites": []
   },
   "selectedExtensions": [],
   "prohibitedKinds": [],

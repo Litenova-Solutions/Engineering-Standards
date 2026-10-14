@@ -705,6 +705,38 @@ for (const frontend of project.paths?.frontends ?? []) {
   }
 }
 
+// A consumer selecting the site extension declares each static site with its
+// name, path, and generator. A declared path that is absent reads as a site
+// with no source, and every site check passes by having nothing to read.
+// (standards/rule/ext-site.declare-each-static-site-in-the-project-record)
+const SITE_GENERATOR_CONFIGS = { astro: ['astro.config.mjs', 'astro.config.ts'] };
+if (selected.has('site')) {
+  const sites = project.paths?.sites;
+  if (!Array.isArray(sites) || !sites.length) {
+    err(`standards.project.json: extension 'site' is selected and 'paths.sites' declares no site; declare each static site with its name, path, and generator`);
+  } else {
+    for (const site of sites) {
+      const name = site?.name ?? '(unnamed)';
+      if (typeof site?.path !== 'string' || !site.path.trim()) {
+        err(`standards.project.json: site '${name}' declares no 'path'; a site without a directory is a site no check reads`);
+        continue;
+      }
+      if (!fs.existsSync(path.join(root, site.path))) {
+        err(`standards.project.json: site '${name}' path '${site.path}' does not exist; the site checks for that site read nothing`);
+        continue;
+      }
+      const configs = SITE_GENERATOR_CONFIGS[site?.generator];
+      if (!configs) {
+        err(`standards.project.json: site '${name}' has unknown generator '${site?.generator}'; expected one of ${Object.keys(SITE_GENERATOR_CONFIGS).join(', ')}`);
+        continue;
+      }
+      if (!configs.some((file) => fs.existsSync(path.join(root, site.path, file)))) {
+        err(`standards.project.json: site '${name}' at '${site.path}' holds no ${configs.join(' or ')}; the '${site.generator}' generator is unrecognized there`);
+      }
+    }
+  }
+}
+
 // A controlled frontend composes the shared UI package, so the workspace declares
 // it once. The package travels with the workspace rather than with an
 // application, so one missing field is one missing file for every frontend

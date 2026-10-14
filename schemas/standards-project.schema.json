@@ -133,6 +133,25 @@
               }
             ]
           }
+        },
+        "sites": {
+          "description": "The static public websites this consumer ships beside its application. Each entry names the site, its directory, and the generator that builds it.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "path", "generator"],
+            "properties": {
+              "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "path": { "$ref": "#/$defs/projectPath" },
+              "generator": {
+                "description": "The static generator that builds the site.",
+                "type": "string",
+                "enum": ["astro"]
+              }
+            }
+          }
         }
       }
     },
