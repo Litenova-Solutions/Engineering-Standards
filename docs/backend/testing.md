@@ -61,6 +61,8 @@ Acceptance.Tests appears only when the executable BDD extension activates. A sol
 
 **Rationale:** Container and host fixtures may still be shared for cost, because only mutable business state must not leak.
 
+The default strategy is one database per test class, cloned from a migrated template. The harness applies the schema once per run to a template database. Each test class then receives `CREATE DATABASE ... TEMPLATE` of it and drops that database when the class finishes. A clone takes milliseconds, so every class starts from an empty migrated schema without a second container. A project that resets tables between cases instead records that strategy in its testing documentation.
+
 ### Enforce architecture rules (standards/rule/backend-testing.enforce-architecture-rules)
 
 **Requirement:** An architecture test MUST assert reference direction, package restrictions, type visibility, module folders, and aggregate inheritance.
@@ -101,9 +103,9 @@ The trace is one-way. Internal implementation tests carry no acceptance identifi
 
 ### Use one production-faithful integration harness (standards/rule/backend-testing.use-one-production-faithful-integration-harness)
 
-**Requirement:** The integration project MUST own one PostgreSQL container fixture, one `ApiFactory`, and one `DatabaseReset` helper.
+**Requirement:** The integration project MUST own one PostgreSQL container fixture, one `ApiFactory`, and one database isolation helper, either a `DatabaseReset` or a template database clone.
 
-**Rationale:** The fixture starts the pinned PostgreSQL once per collection and supplies its connection string before the host builds, so every test sees the same configuration.
+**Rationale:** The fixture starts the pinned PostgreSQL once per test run, as an xUnit v3 assembly fixture. It supplies each class its connection string before the host builds, so every test sees the same configuration. A container per test class multiplies the run time by the class count. It buys no isolation that a cloned database lacks.
 
 "One harness" binds the integration project. An activated BDD extension brings its own host for the acceptance project, because the two projects run different lifetimes. That second host reuses this fixture's container and reset helper rather than starting another database.
 
@@ -189,7 +191,7 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 | standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form | static | `node standards/tools/validate-consumer.mjs` reads the declared test roots, and reports a citation naming no criterion. |
 | standards/rule/backend-testing.use-evidence-rather-than-one-coverage-target | operation | The CI test job publishes coverage as a review artifact and gates on no percentage threshold. |
 | standards/rule/backend-testing.verify-generated-contracts | test | The CI contract job regenerates `apps/api/openapi/` and typed clients, then fails on any tree difference. |
-| standards/rule/backend-testing.use-one-production-faithful-integration-harness | test | `IntegrationTests` resolves its container fixture, `ApiFactory`, and `DatabaseReset` from one shared harness. |
+| standards/rule/backend-testing.use-one-production-faithful-integration-harness | test | `IntegrationTests` resolves its container fixture, `ApiFactory`, and database isolation helper from one shared harness. |
 | standards/rule/backend-testing.mirror-production-module-names | inspection | Folder review compares each test tree against its production module list, or records a named local replacement. |
 | standards/rule/backend-testing.name-tests-by-observable-behavior | test | `TestNamingTests` asserts each test class name matches a production type and each method carries the three-part form. |
 | standards/rule/backend-testing.use-builders-for-valid-defaults | inspection | Builder review confirms each builder produces a valid aggregate by default through its domain factory. |

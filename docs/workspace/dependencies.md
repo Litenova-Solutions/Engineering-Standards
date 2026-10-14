@@ -136,10 +136,12 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 | WebApi | JWT bearer authentication, ASP.NET Core OpenAPI, build-time OpenAPI generation, Scalar, and required LiteBus mediator abstractions |
 | ServiceDefaults | Health checks, service discovery, HTTP resilience, and OpenTelemetry registration and instrumentation |
 | AppHost | Aspire AppHost and resource hosting packages |
-| Domain.Tests | xUnit and assertions |
-| Application.Tests | xUnit, assertions, and NSubstitute |
-| Integration.Tests | xUnit, assertions, test host, Testcontainers PostgreSQL, and coverage collector |
-| Architecture.Tests | xUnit, assertions, and NetArchTest |
+| Domain.Tests | xUnit v3 and assertions |
+| Application.Tests | xUnit v3, assertions, and NSubstitute |
+| Integration.Tests | xUnit v3, assertions, test host, Testcontainers PostgreSQL, and the Microsoft.Testing.Platform report and coverage extensions |
+| Architecture.Tests | xUnit v3, assertions, and NetArchTest |
+
+Test projects reference xUnit v3 and run on Microsoft.Testing.Platform. The consumer `global.json` sets `"test": { "runner": "Microsoft.Testing.Platform" }`, because the .NET 10 `dotnet test` command refuses the VSTest mode for these projects.
 
 The example adds a package to the narrowest owning project. A central version entry does not authorize every project to reference that package. Conditional packages such as EF Core, Reqnroll, SignalR, and WireMock are referenced only after their extension activates.
 

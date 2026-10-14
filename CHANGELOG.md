@@ -12,6 +12,9 @@ This release gives a consumer's business intent one home and one shape. A consum
 - Added `tools/product-records.mjs` and its command page. It writes each History section from the decision records and, with `--coverage`, lists each product rule with the specifications that cite it. `tools/product.mjs` is the module both the command and the validator read through.
 - Added the `product-topic.md` and `product-decision.md` consumer templates, a Business intent section in the product brief template, and product lines in the project agent template.
 - Added the `core.product` load plan, the glossary terms Product decision, Product rule, Product topic, and Source material, and a product decisions section in `docs/reference/decision-records.md`. The consumer documentation layout in `docs/core/system.md` now shows the product areas and `docs/product/decisions/`.
+- Moved the test framework to xUnit v3 on Microsoft.Testing.Platform. `standards.manifest.json` pins `xunit.v3`, `Reqnroll.xunit.v3`, and the Microsoft.Testing.Platform report and coverage extensions in place of `xunit`, `Reqnroll.xUnit`, and `coverlet.collector`. `docs/workspace/dependencies.md` states the `global.json` runner setting the .NET 10 `dotnet test` command needs.
+- Changed `standards/rule/backend-testing.use-one-production-faithful-integration-harness` to start the pinned PostgreSQL once per test run as an assembly fixture. Its isolation helper is a `DatabaseReset` or a template database clone. `standards/rule/backend-testing.isolate-integration-state` names one database per test class, cloned from a migrated template, as the default strategy.
+- Raised the pinned stack and packages to the latest stable releases of 2026-10-14: .NET SDK 10.0.113 with ASP.NET Core 10.0.13, Marten 9.50.1, Aspire 13.6.1, OpenTelemetry 1.19, and Testcontainers 4.16.0. `Microsoft.OpenApi` stays on 2.12.2, because `Microsoft.AspNetCore.OpenApi` 10.0.13 requires a 2.x version.
 
 ## v1.18.0
 

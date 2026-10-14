@@ -132,7 +132,7 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 ## Dependencies
 
 - `Reqnroll`
-- `Reqnroll.xUnit`
+- `Reqnroll.xunit.v3`
 
 ## Verification
 
