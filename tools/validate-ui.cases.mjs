@@ -28,6 +28,9 @@ const tokensCss = path.join(packageRoot, 'src/styles/tokens.css');
 const projectFile = path.join(fixture, 'standards.project.json');
 const lockFile = path.join(packageRoot, 'ui-source-lock.json');
 const designFile = path.join(packageRoot, 'DESIGN.md');
+const catalogFile = path.join(fixture, 'docs/ui/pattern-catalog.json');
+const fixtureValidator = path.join(fixture, 'standards/tools', 'validate-ui.mjs');
+const fixtureLibrary = path.join(fixture, 'standards/patterns/ui/library.json');
 
 // The structure the pinned CLI actually generates: the three approved imports,
 // the dark variant, the theme mapping, both token blocks, and the documented
@@ -116,6 +119,7 @@ function build() {
     'docs/decisions',
     'standards/tools',
     'standards/schemas',
+    'standards/patterns/ui',
   ]) {
     fs.mkdirSync(path.join(fixture, directory), { recursive: true });
   }
@@ -123,6 +127,32 @@ function build() {
   for (const schema of fs.readdirSync(path.join(repository, 'schemas'))) {
     fs.copyFileSync(path.join(repository, 'schemas', schema), path.join(fixture, 'standards/schemas', schema));
   }
+  for (const tool of ['validate-ui.mjs', 'schema.mjs']) {
+    fs.copyFileSync(path.join(repository, 'tools', tool), path.join(fixture, 'standards/tools', tool));
+  }
+  // The library-citation cases run the validator copy above, so the library
+  // they read is this fixture rather than the release's own library.
+  writeJson(fixtureLibrary, {
+    $schema: '../../schemas/ui-pattern-library.schema.json',
+    kind: 'ui-pattern-library',
+    schemaVersion: 1,
+    breakpoints: { compact: 768 },
+    groups: [{ id: 'page-frames', title: 'Page frames', kind: 'page-frame' }],
+    patterns: [
+      {
+        id: 'record-list',
+        group: 'page-frames',
+        title: 'Record list',
+        question: 'How does a reader find one record among many?',
+        options: [
+          { id: 'filter-table', name: 'Filterable table', rationale: 'Rows scan fast and filters narrow the set.', cost: 'Needs a table composite with filters.' },
+          { id: 'search-cards', name: 'Searchable cards', rationale: 'Cards show each record with room for detail.', cost: 'Slow to scan past a few dozen records.' },
+        ],
+        recommended: 'filter-table',
+        compact: { breakpoint: 'compact', behaviour: 'Below 768 pixels the filters stack above the table.' },
+      },
+    ],
+  });
   writeJson(projectFile, resolvePlaceholders(readJson(path.join(repository, 'templates/consumer/standards.project.json'))));
   const project = readJson(projectFile);
   project.paths.uiPackage.name = '@fixture/ui';
@@ -157,11 +187,25 @@ function build() {
   const contract = fs.readFileSync(path.join(repository, 'templates/consumer/design-contract.md'), 'utf8');
   fs.writeFileSync(designFile, contract.replace(/__PROJECT__/g, 'fixture'));
 
+  // The catalog travels with the consumer: the fixture copies the shipped
+  // template to the path the project file names, then creates every source
+  // path the catalog names, so the baseline proves the template as shipped.
+  writeJson(catalogFile, readJson(path.join(repository, 'templates/consumer/ui-pattern-catalog.json')));
+  for (const pattern of readJson(catalogFile).patterns) {
+    for (const implementation of Object.values(pattern.implementations ?? {})) {
+      for (const component of implementation.components ?? []) {
+        const target = path.join(fixture, component);
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        if (!fs.existsSync(target)) fs.writeFileSync(target, 'export function Stub() {\n  return null;\n}\n');
+      }
+    }
+  }
+
   seal();
 }
 
-function run() {
-  const result = spawnSync(process.execPath, [validator, fixture], { encoding: 'utf8' });
+function run(tool = validator) {
+  const result = spawnSync(process.execPath, [tool, fixture], { encoding: 'utf8' });
   return `${result.stdout ?? ''}${result.stderr ?? ''}`;
 }
 
@@ -219,6 +263,26 @@ function lockCase(name, mutate, expectation) {
   writeJson(lockFile, lock);
   report(name, expectation, run());
   fs.writeFileSync(lockFile, original);
+}
+
+function catalogCase(name, mutate, expectation) {
+  const original = fs.readFileSync(catalogFile, 'utf8');
+  const catalog = readJson(catalogFile);
+  mutate(catalog);
+  writeJson(catalogFile, catalog);
+  report(name, expectation, run());
+  fs.writeFileSync(catalogFile, original);
+}
+
+// A library-citation case runs the validator copy inside the fixture, so the
+// library it reads is the fixture library written by build().
+function libraryCatalogCase(name, mutate, expectation) {
+  const original = fs.readFileSync(catalogFile, 'utf8');
+  const catalog = readJson(catalogFile);
+  mutate(catalog);
+  writeJson(catalogFile, catalog);
+  report(name, expectation, run(fixtureValidator));
+  fs.writeFileSync(catalogFile, original);
 }
 
 function manifestCase(name, packageJson, expectation) {
@@ -291,6 +355,11 @@ appStylesCase('an application stylesheet declaring a literal value', `${cleanApp
 appStylesCase('an application stylesheet importing nothing', '', 'imports no stylesheet');
 appStylesCase('an application stylesheet importing a third-party sheet', '@import "bootstrap/dist/css/bootstrap.css";\n', "import 'bootstrap/dist/css/bootstrap.css' is outside the shared package");
 
+console.log('\nShared stylesheets (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)');
+pathCase('a shared stylesheet written from tokens', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  background: radial-gradient(farthest-side, var(--scroll-shade), transparent);\n}\n', null);
+pathCase('a shared stylesheet carrying a literal colour', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  background: radial-gradient(farthest-side, oklch(0 0 0 / 0.16), transparent);\n}\n', "literal colour 'oklch(' belongs in the token stylesheet");
+pathCase('a shared stylesheet carrying a hex colour', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  color: #b9bbc6;\n}\n', "literal colour '#b9bbc6' belongs in the token stylesheet");
+
 console.log('\nSource boundary (standards/rule/frontend-ui.select-one-visual-authority)');
 manifestCase('second visual system in the workspace root', { dependencies: { '@mui/material': '7.0.0' } }, "second general-purpose visual dependency '@mui/material' requires an override");
 manifestCase('second visual system in optionalDependencies', { optionalDependencies: { bootstrap: '5.3.3' } }, "second general-purpose visual dependency 'bootstrap' requires an override");
@@ -306,7 +375,7 @@ configCase('UI override with a live review date', (project) => {
   project.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
 }, null);
 
-console.log('\nShared package (standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package)');
+console.log('\nShared package (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
 configCase('a controlled frontend with no shared package', (project) => {
   delete project.paths.uiPackage;
 }, 'and no paths.uiPackage');
@@ -335,6 +404,30 @@ configCase('a source lock outside the package root', (project) => {
   fs.writeFileSync(lockFile, original);
 }
 
+console.log('\nAdditional registries (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
+{
+  const componentsFile = path.join(packageRoot, 'components.json');
+  const originalComponents = fs.readFileSync(componentsFile, 'utf8');
+  const originalLock = fs.readFileSync(lockFile, 'utf8');
+  const originalProject = fs.readFileSync(projectFile, 'utf8');
+  const components = JSON.parse(originalComponents);
+  components.registries = { '@fixture/blocks': 'https://blocks.fixture.test/r' };
+  fs.writeFileSync(componentsFile, JSON.stringify(components, null, 2));
+  const lock = JSON.parse(originalLock);
+  lock.registry = { name: 'fixture', url: 'https://blocks.fixture.test' };
+  fs.writeFileSync(lockFile, JSON.stringify(lock, null, 2));
+  const withOverride = JSON.parse(originalProject);
+  withOverride.overrides = [{ provisionId: 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
+  fs.writeFileSync(projectFile, JSON.stringify(withOverride, null, 2));
+  report('an additional registry with the override passes both gates', null, run());
+  fs.writeFileSync(projectFile, originalProject);
+  const output = run();
+  report('the configuration gate refuses without the override', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: an additional registry requires an override decision", output);
+  report('the source-lock gate refuses without the override', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: registry 'fixture' is not the built-in shadcn registry", output);
+  fs.writeFileSync(componentsFile, originalComponents);
+  fs.writeFileSync(lockFile, originalLock);
+}
+
 console.log('\nSource lock (standards/rule/frontend-ui.track-source-changes)');
 fs.appendFileSync(path.join(packageRoot, 'src/components/button.tsx'), '// local change\n');
 report('changed copied source without a fork record', 'no longer matches the recorded digest', run());
@@ -358,6 +451,163 @@ fs.writeFileSync(designFile, contract.replace('"patterns": ["list-page", "entity
 report('design contract naming no floorplan', 'array has fewer than 1 items', run());
 fs.writeFileSync(designFile, contract);
 report('the shipped design contract is accepted', null, run());
+
+console.log('\nPattern catalog (standards/rule/frontend-patterns.keep-one-pattern-catalog, standards/rule/frontend-patterns.record-every-option-considered, standards/rule/frontend-patterns.declare-the-compact-behaviour, standards/rule/frontend-patterns.implement-a-chosen-pattern-once, standards/rule/frontend-patterns.state-the-implementation-status)');
+report('the shipped pattern catalog is accepted', null, run());
+configCase('a workspace with no pattern catalog', (project) => {
+  delete project.paths.uiPatterns;
+}, null);
+{
+  const original = fs.readFileSync(catalogFile, 'utf8');
+  fs.rmSync(catalogFile);
+  report('a declared pattern catalog that is missing', "no catalog at 'docs/ui/pattern-catalog.json'", run());
+  fs.writeFileSync(catalogFile, original);
+}
+catalogCase('a catalog that breaks the schema', (catalog) => {
+  catalog.patterns[0].options = [catalog.patterns[0].options[0]];
+}, 'array has fewer than 2 items');
+catalogCase('a decision naming no recorded option', (catalog) => {
+  catalog.patterns[0].decision.option = 'no-such-option';
+}, "pattern 'orders-list-page': decision.option 'no-such-option' is not one of its options");
+catalogCase('a compact variant naming no recorded option', (catalog) => {
+  catalog.patterns[1].compact.option = 'no-such-option';
+}, "pattern 'table-sorting': compact.option 'no-such-option' is not one of its options");
+catalogCase('an extension naming no recorded option', (catalog) => {
+  catalog.patterns[0].extensions[0].option = 'no-such-option';
+}, "pattern 'orders-list-page': extensions[0].option 'no-such-option' is not one of its options");
+catalogCase('a compact variant naming no breakpoint', (catalog) => {
+  catalog.patterns[0].compact.breakpoint = 'no-such-breakpoint';
+}, "pattern 'orders-list-page': compact.breakpoint 'no-such-breakpoint' is not a key of breakpoints");
+catalogCase('a pattern naming no catalog group', (catalog) => {
+  catalog.patterns[0].group = 'no-such-group';
+}, "pattern 'orders-list-page': group 'no-such-group' is not one of the catalog groups");
+catalogCase('a component path that does not exist', (catalog) => {
+  catalog.patterns[0].implementations['react-web'].components = ['packages/ui/src/floorplans/no-such.tsx'];
+}, "pattern 'orders-list-page': implementations.react-web.components[0] does not exist 'packages/ui/src/floorplans/no-such.tsx'");
+catalogCase('an adopted status with no components', (catalog) => {
+  delete catalog.patterns[0].implementations['react-web'].components;
+}, "pattern 'orders-list-page': implementations.react-web has status 'adopted' with no components");
+catalogCase('a partial status with no gap', (catalog) => {
+  catalog.patterns[0].implementations['react-web'] = { status: 'partial' };
+}, "pattern 'orders-list-page': implementations.react-web has status 'partial' with no gap");
+catalogCase('a pending status with no gap', (catalog) => {
+  catalog.patterns[0].implementations['react-web'] = { status: 'pending' };
+}, "pattern 'orders-list-page': implementations.react-web has status 'pending' with no gap");
+catalogCase('two patterns sharing one id', (catalog) => {
+  catalog.patterns[1].id = catalog.patterns[0].id;
+}, "duplicate pattern id 'orders-list-page'");
+catalogCase('two options sharing one id', (catalog) => {
+  catalog.patterns[0].options[1].id = catalog.patterns[0].options[0].id;
+}, "pattern 'orders-list-page' has a duplicate option id 'filter-table'");
+
+console.log('\nPattern library citations (standards/rule/frontend-patterns.keep-one-pattern-catalog)');
+report('the fixture validator accepts the shipped catalog', null, run(fixtureValidator));
+libraryCatalogCase('a pattern citing the library pattern it matches', (catalog) => {
+  catalog.patterns[0].library = 'record-list';
+  catalog.patterns[0].options.push({ id: 'fixture-only', name: 'Fixture only', rationale: 'A product-owned option beside the library ones.', cost: 'Maintained by the product.' });
+}, null);
+libraryCatalogCase('a pattern citing a library pattern the library does not hold', (catalog) => {
+  catalog.patterns[0].library = 'no-such-pattern';
+}, "pattern 'orders-list-page': library 'no-such-pattern' is not a pattern in the UI pattern library");
+libraryCatalogCase('a pattern renaming a library option', (catalog) => {
+  catalog.patterns[0].library = 'record-list';
+  catalog.patterns[0].options[0].name = 'Renamed table';
+}, "pattern 'orders-list-page': options[0].name 'Renamed table' does not match the UI pattern library option 'filter-table' name 'Filterable table'");
+
+console.log('\nSvelte sources (standards/rule/frontend-ui.restrict-css-decisions)');
+pathCase('a svelte file is scanned for utility violations', 'packages/ui/src/floorplans/card.svelte', '<div class="text-red-500">Overdue</div>\n', "raw Tailwind palette value requires a semantic token 'text-red-500'");
+pathCase('a svelte visual file keeps its own layout', 'apps/web/src/modules/seat-map/seat-map.visual.svelte', '<div class="grid">Map</div>\n', null);
+pathCase('a svelte visual file is still held to the token rule', 'apps/web/src/modules/seat-map/other.visual.svelte', '<div class="bg-red-500">Map</div>\n', "raw Tailwind palette value requires a semantic token 'bg-red-500'");
+pathCase('a svelte class directive is read as one token', 'apps/web/src/modules/orders/toggle.svelte', '<button class:hidden={closed}>Hide</button>\n', null);
+pathCase('a svelte style attribute is an inline style', 'apps/web/src/modules/orders/styled.svelte', '<div style="color: red">Overdue</div>\n', 'an inline style belongs in a shared component');
+pathCase('a svelte style directive is an inline style', 'apps/web/src/modules/orders/styled-directive.svelte', '<div style:color={ink}>Overdue</div>\n', 'an inline style belongs in a shared component');
+pathCase('a svelte style block is not an inline style', 'apps/web/src/modules/orders/scoped.svelte', '<style>\n  .scoped {\n    color: red;\n  }\n</style>\n<div class="scoped">Overdue</div>\n', null);
+manifestCase('second svelte visual system in the workspace root', { dependencies: { 'flowbite-svelte': '1.33.1' } }, "second general-purpose visual dependency 'flowbite-svelte' requires an override");
+
+console.log('\nSvelte baseline (standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package, standards/rule/svelte-ui.track-source-changes, standards/rule/svelte-ui.select-one-visual-authority, standards/rule/svelte-components.compose-composites-in-page-code)');
+{
+  const componentsFile = path.join(packageRoot, 'components.json');
+  const originalComponents = fs.readFileSync(componentsFile, 'utf8');
+  const originalLock = fs.readFileSync(lockFile, 'utf8');
+  const originalProject = fs.readFileSync(projectFile, 'utf8');
+  const asSvelte = () => {
+    const project = JSON.parse(originalProject);
+    project.paths.frontends = [{ name: 'web', path: 'apps/web', platform: 'svelte', ui: { profile: 'application-balanced', globalCss: 'apps/web/src/styles.css' } }];
+    writeJson(projectFile, project);
+    const lock = JSON.parse(originalLock);
+    lock.generator = 'shadcn-svelte';
+    lock.cli = '1.7.0';
+    lock.preset.base = 'bits-ui';
+    lock.registry = { name: 'shadcn-svelte', url: 'https://shadcn-svelte.com/registry' };
+    lock.components[0].dependencies = ['bits-ui', 'class-variance-authority', 'cn'];
+    writeJson(lockFile, lock);
+    writeJson(componentsFile, {
+      $schema: 'https://shadcn-svelte.com/schema.json',
+      tailwind: { css: 'src/styles/tokens.css', baseColor: 'neutral' },
+      aliases: { components: '$lib/components', utils: '$lib/utils', ui: '$lib/components/ui', lib: '$lib', hooks: '$lib/hooks' },
+      typescript: true,
+      iconLibrary: 'lucide',
+      menuColor: 'default',
+      menuAccent: 'subtle',
+    });
+  };
+  asSvelte();
+  report('a svelte package validates against the svelte baseline', null, run());
+  pathCase('a svelte application importing the primitive library', 'apps/web/src/routes/bits.svelte', '<script>\nimport { Dialog } from "bits-ui";\n</script>\n<Dialog />\n', "[standards/rule/svelte-components.compose-composites-in-page-code] apps/web/src/routes/bits.svelte: imports the primitive library directly");
+  pathCase('a svelte application importing the react primitive library is outside its boundary', 'apps/web/src/routes/shim.svelte', '<script>\nimport { Dialog } from "@base-ui/react/dialog";\n</script>\n', null);
+  pathCase('a svelte application importing a table library', 'apps/web/src/routes/table.svelte', '<script>\nimport { flexRender } from "@tanstack/svelte-table";\n</script>\n', 'imports the table library directly');
+  pathCase('a svelte utility violation cites the svelte provision', 'packages/ui/src/floorplans/card.svelte', '<div class="text-red-500">Overdue</div>\n', "[standards/rule/svelte-ui.restrict-css-decisions] packages/ui/src/floorplans/card.svelte: raw Tailwind palette value requires a semantic token 'text-red-500'");
+  {
+    const lock = readJson(lockFile);
+    lock.preset.baseColor = 'slate';
+    writeJson(lockFile, lock);
+    report('a svelte source lock describing a preset the manifest does not pin', "[standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: preset.baseColor does not match the manifest baseline", run());
+    asSvelte();
+  }
+  {
+    const lock = readJson(lockFile);
+    lock.cli = '4.21.1';
+    writeJson(lockFile, lock);
+    report('a svelte source lock naming the react CLI pin', "cli must match manifest shadcn-svelte pin '1.7.0'", run());
+    asSvelte();
+  }
+  {
+    const lock = readJson(lockFile);
+    lock.registry = { name: 'fixture', url: 'https://blocks.fixture.test' };
+    writeJson(lockFile, lock);
+    report('a svelte source lock naming another registry', "registry 'fixture' is not the built-in shadcn-svelte registry", run());
+    asSvelte();
+  }
+  {
+    const components = readJson(componentsFile);
+    components.tailwind.baseColor = 'slate';
+    writeJson(componentsFile, components);
+    report('svelte components.json naming a base colour the baseline does not pin', "[standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: tailwind.baseColor must be 'neutral'", run());
+    asSvelte();
+  }
+  {
+    const components = readJson(componentsFile);
+    components.registry = 'https://blocks.fixture.test';
+    writeJson(componentsFile, components);
+    report('svelte components.json naming another registry', "registry 'https://blocks.fixture.test' is not the built-in shadcn-svelte registry", run());
+    const project = readJson(projectFile);
+    project.overrides = [{ provisionId: 'standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
+    writeJson(projectFile, project);
+    report('a svelte registry override carries the svelte provision', null, run());
+    asSvelte();
+  }
+  {
+    const project = readJson(projectFile);
+    project.overrides = [{ provisionId: 'standards/rule/svelte-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md' }];
+    writeJson(projectFile, project);
+    report('a svelte UI override without a review date', "[standards/rule/svelte-ui.select-one-visual-authority] override 'standards/rule/svelte-ui.select-one-visual-authority': a UI rule override requires 'reviewBy'", run());
+    asSvelte();
+  }
+  fs.writeFileSync(componentsFile, originalComponents);
+  fs.writeFileSync(lockFile, originalLock);
+  fs.writeFileSync(projectFile, originalProject);
+  report('the fixture is react again after the svelte block', null, run());
+}
 
 fs.rmSync(fixture, { recursive: true, force: true });
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);

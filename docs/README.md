@@ -27,6 +27,7 @@ A **topic**, **profile**, or **extension** page owns the provisions a reader cit
 
 - [.NET and React platform profile](profile/react.md)
 - [.NET and Blazor platform profile](profile/blazor.md)
+- [.NET and Svelte platform profile](profile/svelte.md)
 
 The profile selects every baseline page. Exact versions and composition remain in `standards.manifest.json`.
 
@@ -52,6 +53,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Frontend rendering and routes](frontend/rendering.md)
 - [Frontend components](frontend/components.md)
 - [Controlled UI governance](frontend/ui.md)
+- [UI pattern decisions](frontend/patterns.md)
 - [Frontend data and state](frontend/data.md)
 - [Frontend testing](frontend/testing.md)
 
@@ -63,6 +65,15 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Blazor data and state](blazor/data.md)
 - [Browser persistence](blazor/browser.md)
 - [Blazor testing](blazor/testing.md)
+
+## Svelte
+
+- [Svelte structure](svelte/structure.md)
+- [Svelte rendering and routes](svelte/rendering.md)
+- [Svelte components](svelte/components.md)
+- [Svelte UI governance](svelte/ui.md)
+- [Svelte data and state](svelte/data.md)
+- [Svelte testing](svelte/testing.md)
 
 ## Quality
 
@@ -89,6 +100,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Realtime updates](ext/realtime.md)
 - [Reporting](ext/report.md)
 - [Scheduled jobs](ext/jobs.md)
+- [Static marketing site](ext/site.md)
 
 ## Tools
 

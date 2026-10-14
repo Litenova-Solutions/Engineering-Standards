@@ -93,8 +93,12 @@
         },
         "uiDocs": { "$ref": "#/$defs/projectPath" },
         "uiPackage": {
-          "description": "The workspace's one shared UI package: the registry configuration, the copied primitive source, the token stylesheet, the source lock, and the design contract. A workspace with no controlled React web frontend omits it.",
+          "description": "The workspace's one shared UI package: the registry configuration, the copied primitive source, the token stylesheet, the source lock, and the design contract. A workspace with no controlled web frontend omits it.",
           "$ref": "#/$defs/uiPackage"
+        },
+        "uiPatterns": {
+          "description": "The workspace UI pattern catalog, validated against schemas/ui-pattern-catalog.schema.json. A workspace that records no pattern decisions omits it.",
+          "$ref": "#/$defs/projectPath"
         },
         "frontends": {
           "type": "array",
@@ -108,7 +112,7 @@
               "platform": {
                 "description": "The frontend platform. Required on every entry, so a frontend outside the controlled UI contract declares that position instead of omitting the field.",
                 "type": "string",
-                "enum": ["react-web", "react-native", "other-web"]
+                "enum": ["react-web", "react-native", "svelte", "other-web"]
               },
               "ui": { "$ref": "#/$defs/ui" }
             },
@@ -117,31 +121,50 @@
                 "if": { "required": ["ui"] },
                 "then": {
                   "required": ["platform"],
-                  "properties": { "platform": { "const": "react-web" } }
+                  "properties": { "platform": { "enum": ["react-web", "svelte"] } }
                 }
               },
               {
                 "if": {
-                  "properties": { "platform": { "const": "react-web" } },
+                  "properties": { "platform": { "enum": ["react-web", "svelte"] } },
                   "required": ["platform"]
                 },
                 "then": { "required": ["ui"] }
               }
             ]
           }
+        },
+        "sites": {
+          "description": "The static public websites this consumer ships beside its application. Each entry names the site, its directory, and the generator that builds it.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "path", "generator"],
+            "properties": {
+              "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "path": { "$ref": "#/$defs/projectPath" },
+              "generator": {
+                "description": "The static generator that builds the site.",
+                "type": "string",
+                "enum": ["astro"]
+              }
+            }
+          }
         }
       }
     },
     "allOf": [
       {
-        "$comment": "A controlled React web frontend composes the shared package, so declaring one makes the package required. A workspace whose frontends are all outside the contract declares no package.",
+        "$comment": "A controlled web frontend composes the shared package, so declaring one makes the package required. A workspace whose frontends are all outside the contract declares no package.",
         "if": {
           "required": ["frontends"],
           "properties": {
             "frontends": {
               "contains": {
                 "required": ["platform"],
-                "properties": { "platform": { "const": "react-web" } }
+                "properties": { "platform": { "enum": ["react-web", "svelte"] } }
               }
             }
           }

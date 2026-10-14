@@ -1,14 +1,15 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
   "schemaVersion": 4,
-  "version": "1.17.0",
+  "version": "1.18.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "defaultProfile": "dotnet-react",
   "paths": {
     "docs": "docs",
     "template": "templates",
-    "extension": "docs/ext"
+    "extension": "docs/ext",
+    "uiPatternLibrary": "patterns/ui"
   },
   "provisionRegistry": {
     "areas": [
@@ -19,6 +20,7 @@
       "FRONTEND",
       "PROFILE",
       "QUALITY",
+      "SVELTE",
       "WORKSPACE"
     ]
   },
@@ -67,6 +69,32 @@
         "docs/blazor/data.md",
         "docs/blazor/browser.md",
         "docs/blazor/testing.md",
+        "docs/quality/security.md",
+        "docs/quality/operations.md",
+        "docs/quality/ci.md"
+      ]
+    },
+    "dotnet-svelte": {
+      "entry": "docs/profile/svelte.md",
+      "pages": [
+        "docs/workspace/structure.md",
+        "docs/workspace/naming.md",
+        "docs/workspace/dependencies.md",
+        "docs/workspace/config.md",
+        "docs/core/authoring.md",
+        "docs/backend/architecture.md",
+        "docs/backend/domain.md",
+        "docs/backend/application.md",
+        "docs/backend/persistence.md",
+        "docs/backend/api.md",
+        "docs/backend/testing.md",
+        "docs/backend/identifiers.md",
+        "docs/svelte/structure.md",
+        "docs/svelte/rendering.md",
+        "docs/svelte/components.md",
+        "docs/svelte/ui.md",
+        "docs/svelte/data.md",
+        "docs/svelte/testing.md",
         "docs/quality/security.md",
         "docs/quality/operations.md",
         "docs/quality/ci.md"
@@ -182,6 +210,10 @@
         "workflow",
         "end-to-end-flow"
       ]
+    },
+    "site": {
+      "path": "docs/ext/site.md",
+      "activationScope": "project"
     }
   },
   "stack": {
@@ -195,10 +227,15 @@
     "pnpm": "11.13.1",
     "vite": "8.3.2",
     "react": "19.3.0",
+    "svelte": "5.57.2",
+    "sveltekit": "3.0.1",
+    "bits-ui": "2.19.5",
     "typescript": "6.0.3",
     "tailwindcss": "4.3.3",
     "shadcn": "4.21.1",
-    "base-ui": "1.8.0"
+    "base-ui": "1.8.0",
+    "astro": "7.3.8",
+    "@astrojs/svelte": "9.0.1"
   },
   "packages": {
     "nuget": {
@@ -265,10 +302,16 @@
       "@base-ui/react": "1.8.0",
       "@eslint/js": "10.0.1",
       "@fontsource-variable/geist": "5.3.0",
+      "@fontsource-variable/inter": "5.3.0",
+      "@fontsource-variable/source-serif-4": "5.3.0",
       "@hey-api/openapi-ts": "0.99.0",
       "@modelcontextprotocol/server": "2.0.0",
       "@playwright/test": "1.63.0",
       "@preact/preset-vite": "2.10.6",
+      "@sveltejs/adapter-node": "6.0.0",
+      "@sveltejs/adapter-static": "4.0.0",
+      "@sveltejs/kit": "3.0.1",
+      "@sveltejs/vite-plugin-svelte": "7.3.1",
       "@tailwindcss/cli": "4.3.3",
       "@tailwindcss/vite": "4.3.3",
       "@tanstack/eslint-plugin-query": "5.104.1",
@@ -278,14 +321,21 @@
       "@tanstack/react-query-devtools": "5.104.1",
       "@tanstack/react-router": "1.170.41",
       "@tanstack/react-router-devtools": "1.167.2",
+      "@tanstack/react-table": "9.2.4",
       "@tanstack/react-start": "1.168.60",
       "@tanstack/router-cli": "1.167.40",
       "@tanstack/router-plugin": "1.168.42",
+      "@tanstack/svelte-form": "1.33.5",
+      "@tanstack/svelte-query": "6.3.1",
+      "@tanstack/svelte-query-devtools": "6.3.1",
+      "@tanstack/svelte-table": "9.2.8",
       "@testing-library/react": "16.3.3",
+      "@testing-library/svelte": "5.4.2",
       "@types/node": "26.6.4",
       "@types/react": "19.3.0",
       "@types/react-dom": "19.3.0",
       "@vitejs/plugin-react": "6.1.1",
+      "bits-ui": "2.19.5",
       "class-variance-authority": "0.7.1",
       "cmdk": "1.1.1",
       "cn": "0.4.0",
@@ -294,17 +344,24 @@
       "eslint-plugin-jsx-a11y": "6.10.2",
       "eslint-plugin-react": "7.37.5",
       "eslint-plugin-react-hooks": "7.1.1",
+      "eslint-plugin-svelte": "3.23.1",
       "globals": "17.13.0",
       "jsdom": "30.1.1",
       "jsqr": "1.4.0",
       "lucide-react": "1.31.0",
+      "lucide-svelte": "1.0.1",
+      "msw": "3.0.3",
       "preact": "11.0.0",
       "react": "19.3.0",
       "react-day-picker": "10.0.2",
       "react-dom": "19.3.0",
       "recharts": "3.10.1",
       "shadcn": "4.21.1",
+      "shadcn-svelte": "1.7.0",
       "sonner": "2.0.8",
+      "svelte": "5.57.2",
+      "svelte-check": "4.7.6",
+      "svelte-i18n": "4.0.1",
       "tailwindcss": "4.3.3",
       "tw-animate-css": "1.4.0",
       "typescript": "6.0.3",
@@ -336,7 +393,37 @@
     "registry": {
       "name": "shadcn",
       "url": "https://ui.shadcn.com",
-      "allowAdditional": false
+      "allowAdditional": true
+    },
+    "profiles": [
+      "public-light",
+      "application-balanced",
+      "admin-dense"
+    ],
+    "nativeBoundary": "separate-platform-profile"
+  },
+  "uiBaselineSvelte": {
+    "platform": "svelte",
+    "system": "shadcn-svelte",
+    "styling": "tailwindcss-v4",
+    "base": "bits-ui",
+    "style": "nova",
+    "cssVariables": true,
+    "baseColor": "neutral",
+    "theme": "neutral",
+    "chartColor": "neutral",
+    "font": "geist",
+    "fontHeading": "inherit",
+    "icons": "lucide",
+    "radius": "default",
+    "menuAccent": "subtle",
+    "menuColor": "default",
+    "componentsStyle": "base-nova",
+    "sourceModel": "shared-ui-package",
+    "registry": {
+      "name": "shadcn-svelte",
+      "url": "https://shadcn-svelte.com/registry",
+      "allowAdditional": true
     },
     "profiles": [
       "public-light",
@@ -347,7 +434,8 @@
   },
   "overridePolicy": {
     "requiresReviewBy": [
-      "standards/rule/frontend-ui"
+      "standards/rule/frontend-ui",
+      "standards/rule/svelte-ui"
     ]
   },
   "loadPlans": {
@@ -434,12 +522,14 @@
       ],
       "tier1": [
         "docs/blazor/browser.md#agent-summary",
-        "docs/quality/security.md#agent-summary"
+        "docs/quality/security.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/browser.md",
         "docs/blazor/data.md",
-        "docs/quality/security.md"
+        "docs/quality/security.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.components": {
@@ -448,12 +538,14 @@
       ],
       "tier1": [
         "docs/blazor/components.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary"
+        "docs/workspace/naming.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/components.md",
         "docs/blazor/structure.md",
-        "docs/workspace/naming.md"
+        "docs/workspace/naming.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.data": {
@@ -462,11 +554,13 @@
       ],
       "tier1": [
         "docs/blazor/data.md#agent-summary",
-        "docs/blazor/browser.md#agent-summary"
+        "docs/blazor/browser.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/data.md",
-        "docs/blazor/browser.md"
+        "docs/blazor/browser.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.rendering": {
@@ -475,11 +569,13 @@
       ],
       "tier1": [
         "docs/blazor/rendering.md#agent-summary",
-        "docs/blazor/components.md#agent-summary"
+        "docs/blazor/components.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/rendering.md",
-        "docs/blazor/components.md"
+        "docs/blazor/components.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.structure": {
@@ -488,11 +584,13 @@
       ],
       "tier1": [
         "docs/blazor/structure.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary"
+        "docs/workspace/naming.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/structure.md",
-        "docs/workspace/naming.md"
+        "docs/workspace/naming.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "blazor.testing": {
@@ -501,11 +599,13 @@
       ],
       "tier1": [
         "docs/blazor/testing.md#agent-summary",
-        "docs/core/release.md#agent-summary"
+        "docs/core/release.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/blazor/testing.md",
-        "docs/core/release.md"
+        "docs/core/release.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "core.authoring": {
@@ -558,13 +658,15 @@
         "docs/frontend/components.md#agent-summary",
         "docs/frontend/ui.md#agent-summary",
         "docs/frontend/rendering.md#agent-summary",
-        "docs/frontend/testing.md#agent-summary"
+        "docs/frontend/testing.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/components.md",
         "docs/frontend/ui.md",
         "docs/frontend/rendering.md",
-        "docs/frontend/testing.md"
+        "docs/frontend/testing.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.data": {
@@ -574,12 +676,14 @@
       "tier1": [
         "docs/frontend/data.md#agent-summary",
         "docs/workspace/config.md#agent-summary",
-        "docs/quality/security.md#agent-summary"
+        "docs/quality/security.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/data.md",
         "docs/workspace/config.md",
-        "docs/quality/security.md"
+        "docs/quality/security.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.rendering": {
@@ -591,13 +695,15 @@
         "docs/frontend/rendering.md#agent-summary",
         "docs/frontend/components.md#agent-summary",
         "docs/frontend/ui.md#agent-summary",
-        "docs/quality/security.md#agent-summary"
+        "docs/quality/security.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/rendering.md",
         "docs/frontend/components.md",
         "docs/frontend/ui.md",
-        "docs/quality/security.md"
+        "docs/quality/security.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.structure": {
@@ -607,12 +713,14 @@
       "tier1": [
         "docs/frontend/structure.md#agent-summary",
         "docs/frontend/ui.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary"
+        "docs/workspace/naming.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/structure.md",
         "docs/frontend/ui.md",
-        "docs/workspace/naming.md"
+        "docs/workspace/naming.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.testing": {
@@ -621,11 +729,13 @@
       ],
       "tier1": [
         "docs/frontend/testing.md#agent-summary",
-        "docs/core/release.md#agent-summary"
+        "docs/core/release.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/testing.md",
-        "docs/core/release.md"
+        "docs/core/release.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "frontend.ui": {
@@ -636,13 +746,15 @@
         "docs/frontend/ui.md#agent-summary",
         "docs/frontend/components.md#agent-summary",
         "docs/frontend/testing.md#agent-summary",
-        "docs/workspace/dependencies.md#agent-summary"
+        "docs/workspace/dependencies.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
       ],
       "tier2": [
         "docs/frontend/ui.md",
         "docs/frontend/components.md",
         "docs/frontend/testing.md",
-        "docs/workspace/dependencies.md"
+        "docs/workspace/dependencies.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "quality.operations": {
@@ -673,6 +785,113 @@
       "tier2": [
         "docs/quality/security.md",
         "docs/quality/operations.md"
+      ]
+    },
+    "svelte.components": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/svelte/components.md#agent-summary",
+        "docs/svelte/ui.md#agent-summary",
+        "docs/svelte/rendering.md#agent-summary",
+        "docs/svelte/testing.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/svelte/components.md",
+        "docs/svelte/ui.md",
+        "docs/svelte/rendering.md",
+        "docs/svelte/testing.md",
+        "docs/frontend/patterns.md"
+      ]
+    },
+    "svelte.data": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/svelte/data.md#agent-summary",
+        "docs/workspace/config.md#agent-summary",
+        "docs/quality/security.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/svelte/data.md",
+        "docs/workspace/config.md",
+        "docs/quality/security.md",
+        "docs/frontend/patterns.md"
+      ]
+    },
+    "svelte.rendering": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/profile/svelte.md#agent-summary",
+        "docs/svelte/rendering.md#agent-summary",
+        "docs/svelte/components.md#agent-summary",
+        "docs/svelte/ui.md#agent-summary",
+        "docs/quality/security.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/svelte/rendering.md",
+        "docs/svelte/components.md",
+        "docs/svelte/ui.md",
+        "docs/quality/security.md",
+        "docs/frontend/patterns.md"
+      ]
+    },
+    "svelte.structure": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/svelte/structure.md#agent-summary",
+        "docs/svelte/ui.md#agent-summary",
+        "docs/workspace/naming.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/svelte/structure.md",
+        "docs/svelte/ui.md",
+        "docs/workspace/naming.md",
+        "docs/frontend/patterns.md"
+      ]
+    },
+    "svelte.testing": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/svelte/testing.md#agent-summary",
+        "docs/core/release.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/svelte/testing.md",
+        "docs/core/release.md",
+        "docs/frontend/patterns.md"
+      ]
+    },
+    "svelte.ui": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/svelte/ui.md#agent-summary",
+        "docs/svelte/components.md#agent-summary",
+        "docs/svelte/testing.md#agent-summary",
+        "docs/workspace/dependencies.md#agent-summary",
+        "docs/frontend/patterns.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/svelte/ui.md",
+        "docs/svelte/components.md",
+        "docs/svelte/testing.md",
+        "docs/workspace/dependencies.md",
+        "docs/frontend/patterns.md"
       ]
     },
     "workspace.dependencies": {

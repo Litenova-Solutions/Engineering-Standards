@@ -2,9 +2,9 @@
 
 Read this file before changing this repository or a consumer application. (standards/rule/core-agent.select-task-context)
 
-Standards v1.17.0 covers one bounded-context business application. The `dotnet-react` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more React frontends. (standards/rule/core-scope.use-the-supported-application-profile, standards/rule/core-scope.keep-one-bounded-context)
+Standards v1.18.0 covers one bounded-context business application. The `dotnet-react` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more React frontends. (standards/rule/core-scope.use-the-supported-application-profile, standards/rule/core-scope.keep-one-bounded-context)
 
-The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (standards/rule/profile-react.use-manifest-version-pins, standards/rule/profile-blazor.use-manifest-version-pins, standards/rule/core-agent.select-task-context)
+The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (standards/rule/profile-react.use-manifest-version-pins, standards/rule/profile-blazor.use-manifest-version-pins, standards/rule/profile-svelte.use-manifest-version-pins, standards/rule/core-agent.select-task-context)
 
 A provision ID states its own page: `standards/<kind>/<page>.<heading-slug>` names `docs/<area>/<page>.md`, so `standards/rule/frontend-components.compose-composites-in-page-code` is in `docs/frontend/components.md`. `docs/reference/provisions.md` lists every identifier with its heading. (standards/rule/core-authoring.use-the-declared-identifier-grammar, standards/rule/core-authoring.regenerate-the-provision-index)
 
@@ -78,12 +78,17 @@ A consumer template's `reviewedStandardsVersion` field is set to the latest rele
 - Write commands through repositories and commit through the command pipeline. (standards/rule/backend-application.keep-command-handlers-narrow, standards/rule/backend-persistence.commit-once-in-the-command-pipeline)
 - Derive authenticated actors from verified claims and authorize target resources. (standards/rule/backend-api.derive-authenticated-identity-from-claims, standards/rule/backend-api.authorize-the-target-resource)
 - Use the controlled shadcn/ui baseline for React web frontends. (standards/rule/frontend-ui.select-one-visual-authority, standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)
+- Use the controlled shadcn-svelte baseline for Svelte frontends. (standards/rule/svelte-ui.select-one-visual-authority, standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package)
 
 Read the full cited provisions before applying these boundaries. (standards/rule/core-agent.select-task-context)
 
 ## Specification Cards
 
 An aggregate, module, or use-case specification carries a card under its title, before its first section. The card is `At a glance` on an aggregate, `Module map` on a module, and `Business impact` on a use case. An aggregate or use-case page also carries `Terms used`, and a card lifts from the page and invents nothing. The reference consumer validator requires the callouts and their position. (standards/rule/core-authoring.use-the-declared-page-contract)
+
+## Pattern feedback
+
+Agents building UI follow the chosen pattern from the catalog. An agent that sees how a pattern could improve finishes its task on the chosen pattern, then reports a proposal in its completion report. It never changes a decision on its own and never stops mid-task to ask. A proposal that is not specific to one product goes to the pattern library after the owner accepts it. (standards/rule/frontend-patterns.report-pattern-feedback-after-the-work, standards/rule/frontend-patterns.promote-library-improvements)
 
 ## Repository Verification
 
@@ -95,6 +100,7 @@ node tools/generate-provisions.mjs
 node tools/validate-standards.mjs
 node tools/validate-ui.cases.mjs
 node tools/validate-consumer.cases.mjs
+node patterns/ui/library.mjs --check
 git diff --check
 ```
 

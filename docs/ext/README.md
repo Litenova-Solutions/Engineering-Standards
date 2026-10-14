@@ -26,6 +26,7 @@ An extension may add requirements, packages, projects, and verification. It may 
 | [realtime](realtime.md) | `local` | Use case, End-to-End Flow | Polling cannot meet a measured update-latency requirement. |
 | [report](report.md) | `local` | Use case | Complex reports or large exports exceed normal request reads. |
 | [jobs](jobs.md) | `local` | Use case, Workflow, End-to-End Flow | Behavior requires recurring, delayed, or calendar-based Worker work. |
+| [site](site.md) | `project` | None | The product ships a public static website beside its application. |
 
 The manifest is the machine-readable source for `activationScope` and `applicableKinds`. This table explains the selection decision.
 

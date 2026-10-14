@@ -617,7 +617,7 @@ const TAG = new RegExp(`@(${ACCEPTANCE})`, 'g');
 const TRAIT = new RegExp(`\\[\\s*Trait\\s*\\(\\s*"AcceptanceCriterion"\\s*,\\s*"(${ACCEPTANCE})"\\s*\\)\\s*\\]`, 'g');
 const PATH_ID = 'path\\/[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*){2,}';
 const TITLE = new RegExp(`['"\`]\\s*\\[(${ACCEPTANCE}|${PATH_ID})\\]`, 'g');
-const TEST_SOURCE = /\.(cs|feature|ts|tsx|js|jsx|mjs)$/;
+const TEST_SOURCE = /\.(cs|feature|ts|tsx|js|jsx|mjs|svelte)$/;
 
 const citations = new Map(); // acceptance id -> [file]
 let testFiles = 0;
@@ -681,12 +681,13 @@ for (const [id, page] of useCasePages) {
 for (const [id, locs] of acDefs) if (locs.length > 1) err(`Duplicate acceptance id ${id} defined in: ${locs.join(', ')}`);
 for (const [id, locs] of e2eDefs) if (locs.length > 1) err(`Duplicate end-to-end test id ${id} defined in: ${locs.join(', ')}`);
 
-// Every frontend declares its platform. Without the field a React web frontend
-// silently skips the whole FRONTEND.UI contract, and the omission is
+// Every frontend declares its platform. Without the field a controlled web
+// frontend silently skips the whole UI contract, and the omission is
 // indistinguishable from a considered decision. A consumer that is not ready for
 // the contract declares 'other-web' or records an override, which is a visible
 // statement. (standards/rule/frontend-ui.select-one-visual-authority)
-const PLATFORMS = ['react-web', 'react-native', 'other-web'];
+const PLATFORMS = ['react-web', 'react-native', 'svelte', 'other-web'];
+const CONTROLLED_PLATFORMS = ['react-web', 'svelte'];
 const controlledFrontends = [];
 for (const frontend of project.paths?.frontends ?? []) {
   const name = frontend?.name ?? '(unnamed)';
@@ -699,8 +700,40 @@ for (const frontend of project.paths?.frontends ?? []) {
     err(`standards.project.json: frontend '${name}' declares no 'platform'; one of ${PLATFORMS.join(', ')} is required`);
   } else if (!PLATFORMS.includes(frontend.platform)) {
     err(`standards.project.json: frontend '${name}' has unknown platform '${frontend.platform}'; expected one of ${PLATFORMS.join(', ')}`);
-  } else if (frontend.platform === 'react-web') {
+  } else if (CONTROLLED_PLATFORMS.includes(frontend.platform)) {
     controlledFrontends.push(frontend);
+  }
+}
+
+// A consumer selecting the site extension declares each static site with its
+// name, path, and generator. A declared path that is absent reads as a site
+// with no source, and every site check passes by having nothing to read.
+// (standards/rule/ext-site.declare-each-static-site-in-the-project-record)
+const SITE_GENERATOR_CONFIGS = { astro: ['astro.config.mjs', 'astro.config.ts'] };
+if (selected.has('site')) {
+  const sites = project.paths?.sites;
+  if (!Array.isArray(sites) || !sites.length) {
+    err(`standards.project.json: extension 'site' is selected and 'paths.sites' declares no site; declare each static site with its name, path, and generator`);
+  } else {
+    for (const site of sites) {
+      const name = site?.name ?? '(unnamed)';
+      if (typeof site?.path !== 'string' || !site.path.trim()) {
+        err(`standards.project.json: site '${name}' declares no 'path'; a site without a directory is a site no check reads`);
+        continue;
+      }
+      if (!fs.existsSync(path.join(root, site.path))) {
+        err(`standards.project.json: site '${name}' path '${site.path}' does not exist; the site checks for that site read nothing`);
+        continue;
+      }
+      const configs = SITE_GENERATOR_CONFIGS[site?.generator];
+      if (!configs) {
+        err(`standards.project.json: site '${name}' has unknown generator '${site?.generator}'; expected one of ${Object.keys(SITE_GENERATOR_CONFIGS).join(', ')}`);
+        continue;
+      }
+      if (!configs.some((file) => fs.existsSync(path.join(root, site.path, file)))) {
+        err(`standards.project.json: site '${name}' at '${site.path}' holds no ${configs.join(' or ')}; the '${site.generator}' generator is unrecognized there`);
+      }
+    }
   }
 }
 
@@ -708,12 +741,12 @@ for (const frontend of project.paths?.frontends ?? []) {
 // it once. The package travels with the workspace rather than with an
 // application, so one missing field is one missing file for every frontend
 // rather than a row per application.
-// (standards/rule/frontend-ui.install-the-pinned-baseline-in-the-shared-package,
+// (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package,
 // standards/rule/frontend-ui.track-source-changes,
 // standards/rule/frontend-ui.publish-a-design-contract)
 const uiPackage = project.paths?.uiPackage ?? null;
 if (controlledFrontends.length && !uiPackage) {
-  err(`standards.project.json: ${controlledFrontends.length} controlled frontend(s) and no 'paths.uiPackage'; the shared UI package every React web frontend composes is undeclared`);
+  err(`standards.project.json: ${controlledFrontends.length} controlled frontend(s) and no 'paths.uiPackage'; the shared UI package every controlled web frontend composes is undeclared`);
 } else if (uiPackage) {
   const uiPackageLabel = `standards.project.json: paths.uiPackage '${uiPackage.name ?? '(unnamed)'}'`;
   for (const key of ['path', 'componentsJson', 'primitives', 'tokens', 'sourceLock', 'designContract']) {
@@ -729,7 +762,7 @@ if (controlledFrontends.length && !uiPackage) {
   }
 }
 
-// A React web consumer opts into the deterministic UI validator through its
+// A controlled-web consumer opts into the deterministic UI validator through its
 // frontend platform declaration or UI block. A recorded UI rule override must
 // carry a live review date.
 const uiActivated = controlledFrontends.length > 0 || Boolean(uiPackage)

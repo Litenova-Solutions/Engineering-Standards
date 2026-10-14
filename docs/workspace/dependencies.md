@@ -17,6 +17,13 @@ Project references and package ownership make the application boundary visible t
 - Frontends stay isolated from each other's source. (standards/rule/workspace-dependencies.keep-frontend-applications-isolated)
 - Web UI packages come from the manifest baseline. (standards/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary)
 
+## Concepts
+
+
+### Agent tooling for the baseline
+
+shadcn publishes an agent skill that activates on `components.json`, runs `shadcn info --json` to read the project setup, and looks a component up before generating code. A workspace installs it with `pnpm dlx skills add shadcn/ui`. shadcn also publishes a Model Context Protocol server for registry search, reading the registries the project's `components.json` declares. The skill is documented at [https://ui.shadcn.com/docs/skills](https://ui.shadcn.com/docs/skills) and the server at [https://ui.shadcn.com/docs/mcp](https://ui.shadcn.com/docs/mcp), both read 2026-10-08.
+
 ## Standards
 
 

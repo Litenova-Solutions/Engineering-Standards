@@ -4,7 +4,7 @@
     "name": "__PROJECT__"
   },
   "profile": "dotnet-react",
-  "reviewedStandardsVersion": "1.17.0",
+  "reviewedStandardsVersion": "1.18.0",
   "paths": {
     "apiSolution": "__API_SOLUTION__",
     "docs": "docs",
@@ -24,6 +24,7 @@
       "designContract": "packages/ui/DESIGN.md",
       "publicExports": ["@__PROJECT__/ui/floorplans", "@__PROJECT__/ui/display", "@__PROJECT__/ui/forms"]
     },
+    "uiPatterns": "docs/ui/pattern-catalog.json",
     "frontends": [
       {
         "name": "web",
@@ -34,7 +35,8 @@
           "globalCss": "apps/web/src/styles.css"
         }
       }
-    ]
+    ],
+    "sites": []
   },
   "selectedExtensions": [],
   "prohibitedKinds": [],

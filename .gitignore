@@ -9,3 +9,4 @@ artifacts/
 .fuse/
 mcps/
 .opencode/
+patterns/ui/dist/
