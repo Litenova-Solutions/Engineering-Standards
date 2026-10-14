@@ -2,6 +2,8 @@
 
 ## v1.18.0
 
+This release adds the `dotnet-svelte` profile, the UI pattern decision standard with its pattern library, and the `site` extension for a static public website. A consumer on v1.17.0 adopts it by reading the entries below and recording 1.18.0 in `reviewedStandardsVersion`.
+
 - Added `docs/frontend/patterns.md` with ten provisions under `standards/rule/frontend-patterns.*`. A workspace with a controlled frontend keeps one pattern catalog at `paths.uiPatterns`: each pattern records the options considered with rationale and cost, the chosen option, its source, the compact-screen behaviour, and the implementation per platform. Agents build from the chosen option and report improvement proposals after their work; the owner accepts, refuses, or defers.
 - Named each floorplan as the chosen option of one page-frame pattern in `docs/frontend/ui.md`, with a pattern-decision row in its evidence matrix. `AGENTS.md` gains a Pattern feedback section, and every `frontend.*` and `blazor.*` load plan loads the new page.
 - Added `standards/rule/frontend-ui.hold-the-declared-base-colour` and `standards/rule/frontend-ui.keep-separators-at-the-subtle-step`. A token stylesheet carries the values the declared base colour publishes and no value outside them except under a named local extension or override, and a structural separator or input border stays at the border step. The evidence is a project check comparing the `:root` and dark blocks to the published base colour; `nighthall check tokens` is one such check.
