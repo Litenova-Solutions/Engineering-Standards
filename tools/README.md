@@ -13,6 +13,7 @@ This directory holds the commands the repository ships. Each one is documented a
 | `validate-consumer.mjs` | [Validate Consumer](../docs/tools/validate-consumer.md) |
 | `validate-ui.mjs` | [Validate Controlled UI](../docs/tools/validate-ui.md) |
 | `validate-parity.mjs` | [Validate Use-Case Parity](../docs/tools/validate-parity.md) |
+| `product-records.mjs` | [Product Records](../docs/tools/product-records.md) |
 
 Every command is dependency-free Node with no install step, and the floor is Node 22. Nothing here reads a package manifest, a lockfile, or `node_modules`.
 
@@ -20,7 +21,7 @@ Every command accepts `--help`. Every validator accepts `--format=json`, which w
 
 ## Modules and fixtures
 
-`prose.mjs` and `provisions.mjs` are modules that the commands import. They have no entry point of their own.
+`prose.mjs`, `provisions.mjs`, and `product.mjs` are modules that the commands import. They have no entry point of their own.
 
 Each `*.cases.mjs` file is the fixture suite for the command beside it. Run the suite after changing the rule, schema, template, or validator behavior it covers.
 

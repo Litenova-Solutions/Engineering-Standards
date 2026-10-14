@@ -184,6 +184,18 @@ A supported composition of architecture, frameworks, project layout, and baselin
 
 The software capability offered to users with its supported outcomes, operating boundary, exclusions, and external commitments.
 
+## Product decision
+
+A decision record whose `affects` field names the product pages it sets, approved by a named accountable person.
+
+## Product rule
+
+One testable business commitment on a product topic page, identified as `product/<topic>.<rule>` and cited by specifications.
+
+## Product topic
+
+One page of business intent under `docs/product/`, stating its rules, position, refusals, open questions, next change, and derived history.
+
 ## Projection
 
 A process deriving a Read Model from authoritative facts with the delivery guarantee required by its owning behavior.
@@ -227,6 +239,10 @@ A use-case metadata value that activates additional specification and verificati
 ## Scenario
 
 One concrete occasion for a specification's subject, stating who acts, what surrounds them, and what they would do instead.
+
+## Source material
+
+Research, books, and digests kept outside `docs/`, often produced by agents, which carry no authority until a research claim or an approved decision states them.
 
 ## Specification
 

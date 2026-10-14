@@ -447,9 +447,16 @@ Acceptance tests reference the ID without redefining its text. A static document
 ```text
 docs/
   product/
+    README.md
     brief.md
     flows/
       order-checkout.md
+    business/
+      pricing.md
+    roadmap/
+      milestones.md
+    decisions/
+      0001-monthly-plan.md
   domain/
     README.md
     glossary.md
@@ -483,6 +490,8 @@ docs/
   releases/
   research/
 ```
+
+`product/` holds the brief, the end-to-end flows, and the business intent: one topic page per area and the product decisions behind them. The [product intent standard](product.md) owns its shape. `decisions/` at the root holds standards override decisions only.
 
 `tools/` holds one command page for each command the repository ships, beside the configuration page that owns every setting a reader can change. `reference/` holds the pages a reader looks up rather than reads. `guide/` holds the tutorial and the how-to pages, which name those commands rather than the mechanism beneath them.
 

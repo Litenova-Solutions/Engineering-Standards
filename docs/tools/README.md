@@ -18,5 +18,6 @@ Every command accepts `--help`, and every validator accepts `--format=json` for 
 - [Validate Consumer](validate-consumer.md)
 - [Validate Controlled UI](validate-ui.md)
 - [Validate Use-Case Parity](validate-parity.md)
+- [Product Records](product-records.md)
 
 A consumer runs its commands from the consumer root, where `standards.project.json` sits. The standards repository is a submodule at `standards/`, so the path carries that prefix.

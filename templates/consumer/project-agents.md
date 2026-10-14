@@ -10,6 +10,10 @@ Project decisions override a Standard only when `standards.project.json` names i
 
 An explicit project convention can replace a baseline Convention when local documentation cites its ID. (standards/rule/core-agent.apply-guidance-precedence, standards/rule/core-authoring.identify-actionable-conventions)
 
+Read `docs/product/brief.md` and the affected product topics before changing behavior that touches price, money, markets, buyers, or terms. (standards/rule/core-product.load-product-intent-before-commercial-work)
+
+Draft a product decision for any changed business choice, and leave its approval to the accountable person. Research outside `docs/` is source material, never authority. (standards/rule/core-product.name-the-person-who-approved-a-decision, standards/rule/core-product.treat-generated-research-as-source-material)
+
 ## Project Commands
 
 Run the backend gates for every changed API boundary. (standards/rule/core-release.run-boundary-selected-checks)
@@ -22,6 +26,8 @@ dotnet test __API_SOLUTION__ --configuration Release --no-build
 Run the root pnpm gates for every changed frontend in `standards.project.json`. (standards/rule/core-release.run-boundary-selected-checks)
 
 Run metadata and code-document checks for each changed specification, source, test, or generated contract. (standards/rule/core-agent.update-behavior-records-with-code, standards/rule/core-authoring.declare-structured-specification-metadata)
+
+Run `node standards/tools/product-records.mjs --write` after adding, approving, or retiring a product decision. (standards/rule/core-product.derive-history-from-decisions)
 
 Report every skipped check with its reason. (standards/rule/core-agent.run-and-report-verification)
 

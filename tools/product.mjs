@@ -62,8 +62,12 @@ export function replaceSection(raw, name, bodyLines) {
 export function sectionEntries(body) {
   const entries = [];
   let tableRow = 0;
+  let fenced = false;
   for (const line of body.split(/\r?\n/)) {
     const trimmed = line.trim();
+    // A fenced block shows an example of the shape and states no entry.
+    if (trimmed.startsWith('```')) { fenced = !fenced; tableRow = 0; continue; }
+    if (fenced) continue;
     if (trimmed.startsWith('|')) {
       tableRow += 1;
       if (tableRow === 1) continue;

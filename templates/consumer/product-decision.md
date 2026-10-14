@@ -1,11 +1,11 @@
 ---
 {
   "kind": "decision",
-  "id": "__DECISION_ID__",
+  "id": "__PRODUCT_DECISION_ID__",
   "specStatus": "draft",
   "owner": "__OWNER__",
   "lastReviewed": "YYYY-MM-DD",
-  "affects": ["product/__TOPIC_PAGE__.md"]
+  "affects": ["product/__PRODUCT_PAGE__.md"]
 }
 ---
 # __DECISION_TITLE__

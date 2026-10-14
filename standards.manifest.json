@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
   "schemaVersion": 4,
-  "version": "1.18.0",
+  "version": "1.19.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
   "defaultProfile": "dotnet-react",
@@ -635,6 +635,18 @@
         "docs/quality/security.md",
         "docs/quality/operations.md",
         "docs/quality/ci.md"
+      ]
+    },
+    "core.product": {
+      "tier0": [
+        "AGENTS.md"
+      ],
+      "tier1": [
+        "docs/core/product.md#agent-summary"
+      ],
+      "tier2": [
+        "docs/core/product.md",
+        "docs/reference/decision-records.md"
       ]
     },
     "core.usecase": {

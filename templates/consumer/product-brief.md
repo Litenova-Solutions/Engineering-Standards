@@ -34,6 +34,10 @@ Name an observable product or operating result.
 - Audit and support: required records, retention, support owner, and recovery obligations.
 - Known facts and decisions: distinguish verified facts from unresolved decisions.
 
+## Business intent
+
+Link each product topic page under `docs/product/`, one line per area, so a reader finds where each business question is answered.
+
 ## Non-goals
 
 - List behavior excluded from the current product boundary.

@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 1054 provisions across 1 kinds.
+The active release states 1070 provisions across 1 kinds.
 
 ## rule
 
@@ -279,6 +279,22 @@ The active release states 1054 provisions across 1 kinds.
 | standards/rule/core-principles.retire-public-behavior-deliberately | [Retire public behavior deliberately](../core/principles.md#retire-public-behavior-deliberately-standardsrulecore-principlesretire-public-behavior-deliberately) | `core/principles.md` |
 | standards/rule/core-principles.select-extensions-by-criteria | [Select extensions by criteria](../core/principles.md#select-extensions-by-criteria-standardsrulecore-principlesselect-extensions-by-criteria) | `core/principles.md` |
 | standards/rule/core-principles.separate-authority-from-implementation | [Separate authority from implementation](../core/principles.md#separate-authority-from-implementation-standardsrulecore-principlesseparate-authority-from-implementation) | `core/principles.md` |
+| standards/rule/core-product.cite-product-rules-from-domain-specifications | [Cite product rules from domain specifications](../core/product.md#cite-product-rules-from-domain-specifications-standardsrulecore-productcite-product-rules-from-domain-specifications) | `core/product.md` |
+| standards/rule/core-product.derive-history-from-decisions | [Derive history from decisions](../core/product.md#derive-history-from-decisions-standardsrulecore-productderive-history-from-decisions) | `core/product.md` |
+| standards/rule/core-product.group-product-topics-by-area | [Group product topics by area](../core/product.md#group-product-topics-by-area-standardsrulecore-productgroup-product-topics-by-area) | `core/product.md` |
+| standards/rule/core-product.identify-every-product-rule | [Identify every product rule](../core/product.md#identify-every-product-rule-standardsrulecore-productidentify-every-product-rule) | `core/product.md` |
+| standards/rule/core-product.keep-behavior-out-of-product-pages | [Keep behavior out of product pages](../core/product.md#keep-behavior-out-of-product-pages-standardsrulecore-productkeep-behavior-out-of-product-pages) | `core/product.md` |
+| standards/rule/core-product.keep-business-intent-under-product | [Keep business intent under product](../core/product.md#keep-business-intent-under-product-standardsrulecore-productkeep-business-intent-under-product) | `core/product.md` |
+| standards/rule/core-product.load-product-intent-before-commercial-work | [Load product intent before commercial work](../core/product.md#load-product-intent-before-commercial-work-standardsrulecore-productload-product-intent-before-commercial-work) | `core/product.md` |
+| standards/rule/core-product.name-product-decisions-in-one-numbered-sequence | [Name product decisions in one numbered sequence](../core/product.md#name-product-decisions-in-one-numbered-sequence-standardsrulecore-productname-product-decisions-in-one-numbered-sequence) | `core/product.md` |
+| standards/rule/core-product.name-the-person-who-approved-a-decision | [Name the person who approved a decision](../core/product.md#name-the-person-who-approved-a-decision-standardsrulecore-productname-the-person-who-approved-a-decision) | `core/product.md` |
+| standards/rule/core-product.record-each-product-choice-as-a-decision | [Record each product choice as a decision](../core/product.md#record-each-product-choice-as-a-decision-standardsrulecore-productrecord-each-product-choice-as-a-decision) | `core/product.md` |
+| standards/rule/core-product.replace-a-decision-with-a-new-record | [Replace a decision with a new record](../core/product.md#replace-a-decision-with-a-new-record-standardsrulecore-productreplace-a-decision-with-a-new-record) | `core/product.md` |
+| standards/rule/core-product.report-which-product-rules-are-carried | [Report which product rules are carried](../core/product.md#report-which-product-rules-are-carried-standardsrulecore-productreport-which-product-rules-are-carried) | `core/product.md` |
+| standards/rule/core-product.review-a-topic-by-its-date | [Review a topic by its date](../core/product.md#review-a-topic-by-its-date-standardsrulecore-productreview-a-topic-by-its-date) | `core/product.md` |
+| standards/rule/core-product.state-each-topic-in-one-page-shape | [State each topic in one page shape](../core/product.md#state-each-topic-in-one-page-shape-standardsrulecore-productstate-each-topic-in-one-page-shape) | `core/product.md` |
+| standards/rule/core-product.trace-every-choice-to-a-decision | [Trace every choice to a decision](../core/product.md#trace-every-choice-to-a-decision-standardsrulecore-producttrace-every-choice-to-a-decision) | `core/product.md` |
+| standards/rule/core-product.treat-generated-research-as-source-material | [Treat generated research as source material](../core/product.md#treat-generated-research-as-source-material-standardsrulecore-producttreat-generated-research-as-source-material) | `core/product.md` |
 | standards/rule/core-release.apply-release-access-controls | [Apply release access controls](../core/release.md#apply-release-access-controls-standardsrulecore-releaseapply-release-access-controls) | `core/release.md` |
 | standards/rule/core-release.avoid-overbroad-completion-claims | [Avoid overbroad completion claims](../core/release.md#avoid-overbroad-completion-claims-standardsrulecore-releaseavoid-overbroad-completion-claims) | `core/release.md` |
 | standards/rule/core-release.complete-observable-use-case-slices | [Complete observable use-case slices](../core/release.md#complete-observable-use-case-slices-standardsrulecore-releasecomplete-observable-use-case-slices) | `core/release.md` |

@@ -20,6 +20,7 @@ A **topic**, **profile**, or **extension** page owns the provisions a reader cit
 - [Principles](core/principles.md)
 - [Agentic Engineering System](core/system.md)
 - [Agent protocol](core/agent.md)
+- [Product intent](core/product.md)
 - [Release standard](core/release.md)
 - [Authoring standard](core/authoring.md)
 

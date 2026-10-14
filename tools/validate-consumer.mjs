@@ -566,7 +566,7 @@ for (const kind of SINGLETON_KINDS) {
 // (standards/rule/core-product.keep-business-intent-under-product,
 // standards/rule/core-product.trace-every-choice-to-a-decision,
 // standards/rule/core-product.derive-history-from-decisions,
-// standards/rule/core-product.supersede-a-decision-instead-of-editing-it)
+// standards/rule/core-product.replace-a-decision-with-a-new-record)
 {
   const { topics, decisions } = collectProductRecords(docsRoot);
   const productRoot = path.join(docsRoot, 'product');

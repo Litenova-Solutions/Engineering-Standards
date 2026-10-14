@@ -15,6 +15,7 @@ A decision record states one choice that is expensive to reverse, together with 
 | Path | `docs/decisions/{id}.md` in the consumer repository |
 | Template | [Decision](../../templates/consumer/decision.md) |
 | Override variant | [UI override decision](../../templates/consumer/ui-override-decision.md) |
+| Product variant | [Product decision](../../templates/consumer/product-decision.md), at `docs/product/decisions/{id}.md` |
 | Metadata kind | `decision` |
 | Schema | [Specification metadata](../../schemas/specification-metadata.schema.json) |
 
@@ -39,6 +40,18 @@ A decision record states one choice that is expensive to reverse, together with 
 | `overrides[].decision` | `standards.project.json` | The path of the record that carries the replacement. |
 | `overrides[].reviewBy` | `standards.project.json` | The date the override is reread or removed. |
 | `frontends[].ui.overrideDecision` | `standards.project.json` | The record that suspends part of the visual baseline. |
+
+### Product decisions
+
+A product decision sets business intent rather than replacing a provision. It names the product pages it sets in `affects`, and it carries the sections Context, Options considered, Decision, Evidence, Consequences, and What would change it. An approved product decision names its approver in `decidedBy` and the date in `decided`. A replaced product decision is retired with `supersededBy`, and its replacement lists it in `supersedes`. The [product intent standard](../core/product.md) owns these provisions.
+
+| Field | Meaning |
+|:---|:---|
+| `affects` | The product pages, relative to the documentation root, whose position the decision sets. |
+| `decidedBy` | The accountable person who approved the decision. |
+| `decided` | The approval date. |
+| `supersedes` | The decision records this one replaces. |
+| `supersededBy` | The decision record that replaces this one. |
 
 An override names one provision. A decision that deviates from four provisions is named by four override entries, because a reader resolving one identifier follows one citation.
 

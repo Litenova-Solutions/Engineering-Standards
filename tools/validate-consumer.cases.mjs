@@ -125,6 +125,12 @@ const VALUES = {
   __EVIDENCE__: 'docs/research/fixture-evidence.md',
   __EVIDENCE_TITLE__: 'Fixture Evidence',
   __REFERENCE__: 'docs/reference/ports.md',
+  __TOPIC__: 'pricing',
+  __TOPIC_TITLE__: 'Pricing',
+  __RULE__: 'monthly-plan-fee',
+  __PRODUCT_DECISION_ID__: '0003-monthly-plan',
+  __PRODUCT_PAGE__: 'brief',
+  __DECISION_TITLE__: 'Monthly Plan',
   'YYYY-MM-DD': '2026-01-01',
 };
 
@@ -151,6 +157,8 @@ const LAYOUT = [
   ['command.md', 'docs/tools/fixture-up.md'],
   ['reference.md', 'docs/reference/ports.md'],
   ['configuration.md', 'docs/tools/configuration.md'],
+  ['product-topic.md', 'docs/product/business/pricing.md'],
+  ['product-decision.md', 'docs/product/decisions/0003-monthly-plan.md'],
 ];
 
 let failures = 0;
@@ -221,6 +229,12 @@ function build() {
     }
     writeFile(target, resolved);
   }
+  // A product topic fails once its review date passes, so the fixture page is
+  // reviewed far in the future and every run of the suite starts clean.
+  // (standards/rule/core-product.review-a-topic-by-its-date)
+  const topic = splitMeta(readFixture('docs/product/business/pricing.md'));
+  topic.meta.reviewBy = '2999-01-01';
+  writeFile('docs/product/business/pricing.md', joinMeta(topic.meta, topic.body));
 }
 
 let lastStatus = 0;
@@ -1050,6 +1064,53 @@ fileCase('rule 10 passes when a retired identifier is absent', 'docs/domain/iden
            { absent: IDENTIFIER_RULE.attributes });
 
   writeFile('standards.project.json', originalProject);
+}
+
+console.log('\nProduct records (standards/rule/core-product.trace-every-choice-to-a-decision)');
+{
+  const topic = 'docs/product/business/pricing.md';
+  const decision = 'docs/product/decisions/0003-monthly-plan.md';
+  const row = '| Monthly fee | One price is easier to budget. | [0003-monthly-plan](../decisions/0003-monthly-plan.md) |';
+  const table = `| Choice | Reason | Decision |\n|:---|:---|:---|\n${row}\n`;
+  const withPosition = (raw, body) => raw.replace(/## Position\n\nNone\.\n/, `## Position\n\n${body}`);
+  const history = '- 2026-01-01: [0003-monthly-plan](../decisions/0003-monthly-plan.md) Monthly Plan. Status: draft.';
+
+  bodyCase('position row linking a draft decision on a draft page', topic, (raw) => withPosition(raw, table), null);
+  bodyCase('position row linking no decision', topic, (raw) => withPosition(raw, '| Choice | Reason | Decision |\n|:---|:---|:---|\n| Monthly fee | One price. | none |\n'), 'links no decision record');
+  metaCase('product topic missing its review date', topic, (m) => { delete m.reviewBy; }, "missing required 'reviewBy'");
+  metaCase('product topic past its review date', topic, (m) => { m.reviewBy = '2020-01-01'; }, 'reviewBy 2020-01-01 has passed');
+  fileCase('product topic outside product/', 'docs/reference/pricing-elsewhere.md', readFixture(topic).replace('"id": "pricing"', '"id": "pricing-elsewhere"').replace(/product\/pricing\./g, 'product/pricing-elsewhere.'), "lives under 'docs/product/'");
+  bodyCase('rule entry with no identifier', topic, (raw) => raw.replace('- `product/pricing.monthly-plan-fee`:', '- The monthly fee:'), 'does not open with a rule identifier');
+  bodyCase('rule naming another topic', topic, (raw) => raw.replace('product/pricing.monthly-plan-fee', 'product/billing.monthly-plan-fee'), "names topic 'billing'");
+  bodyCase('citation of an undefined product rule', 'docs/reference/ports.md', (raw) => `${raw}\nThis follows \`product/pricing.annual-plan-fee\`.\n`, "cites product rule 'product/pricing.annual-plan-fee'");
+  bodyCase('citation of a defined product rule', 'docs/reference/ports.md', (raw) => `${raw}\nThis follows \`product/pricing.monthly-plan-fee\`.\n`, null);
+
+  // The decision template affects the brief. Pointing it at the topic makes the
+  // topic's History stale until the command writes it.
+  const affectingTopic = (m) => { m.affects = ['product/business/pricing.md']; };
+  metaCase('history missing a decision that names the page', decision, affectingTopic, "'History' does not match");
+  {
+    const originalTopic = readFixture(topic);
+    writeFile(topic, originalTopic.replace('None. No decision record names this page in its affects field.', history));
+    metaCase('history listing exactly the decisions that name the page', decision, affectingTopic, null);
+    writeFile(topic, originalTopic);
+  }
+  bodyCase('history listing a decision that does not name the page', topic, (raw) => raw.replace('None. No decision record names this page in its affects field.', history), 'which do not name this page');
+
+  metaCase('approved product decision without an approver', decision, (m) => { m.specStatus = 'approved'; }, 'names no decidedBy');
+  metaCase('approved product decision with its approver', decision, (m) => { m.specStatus = 'approved'; m.decidedBy = 'fixture'; m.decided = '2026-01-02'; }, null);
+  metaCase('product decision affecting a page that is not product intent', decision, (m) => { m.affects = ['product/flows/order-checkout.md']; }, 'which is not a product or product-topic page');
+  bodyCase('product decision missing its options', decision, (raw) => raw.replace('## Options considered', '## Alternatives'), "requires an H2 'Options considered'");
+  metaCase('replaced decision that is not retired', decision, (m) => { m.supersededBy = '0001-fixture'; }, "requires specStatus 'retired'");
+  metaCase('replacement naming a record that does not exist', decision, (m) => { m.supersedes = ['0009-missing']; }, "supersedes '0009-missing', which names no decision record");
+  {
+    const originalTopic = readFixture(topic);
+    const { meta, body } = splitMeta(originalTopic);
+    meta.specStatus = 'approved';
+    writeFile(topic, withPosition(joinMeta(meta, body), table));
+    report('approved page citing a draft decision', 'a position is approved only on an approved decision', run());
+    writeFile(topic, originalTopic);
+  }
 }
 
 if (!process.env.KEEP_FIXTURE) fs.rmSync(fixture, { recursive: true, force: true }); else console.log(`fixture: ${fixture}`);

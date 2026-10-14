@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.19.0
+
+This release gives a consumer's business intent one home and one shape. A consumer on v1.18.0 adopts it by reading the entries below and recording 1.19.0 in `reviewedStandardsVersion`. Nothing in a consumer fails until it writes a `product-topic` page or a decision with `affects`.
+
+- Added `docs/core/product.md` with fifteen provisions under `standards/rule/core-product.*`. Business intent lives in the product brief and in `product-topic` pages under `docs/product/`. Each topic states numbered product rules, links the decision behind every choice and refusal, and carries a review date. Domain specifications cite product rules, and a product page describes no behavior.
+- Added the `product-topic` specification kind to `schemas/specification-metadata.schema.json` and `tools/validate-consumer.mjs`. It requires `reviewBy` and the sections Summary, Rules, Position, Refusals, Open questions, Next, History, and Evidence.
+- Extended the `decision` kind with `decidedBy`, `decided`, `affects`, `supersedes`, and `supersededBy`. A decision that names product pages in `affects` carries the product decision sections, and an approved one names its approver. A replaced decision is retired with `supersededBy`, and the pair must name each other.
+- Added product record checks to `tools/validate-consumer.mjs`. It fails a topic outside `docs/product/`, a passed review date, a Rules entry without an identifier `product/<topic>.<rule>`, a duplicate rule, and a citation of an undefined rule. It also fails a Position or Refusals entry that links no decision or a retired one, and a History section that differs from the decisions naming the page.
+- Added `tools/product-records.mjs` and its command page. It writes each History section from the decision records and, with `--coverage`, lists each product rule with the specifications that cite it. `tools/product.mjs` is the module both the command and the validator read through.
+- Added the `product-topic.md` and `product-decision.md` consumer templates, a Business intent section in the product brief template, and product lines in the project agent template.
+- Added the `core.product` load plan, the glossary terms Product decision, Product rule, Product topic, and Source material, and a product decisions section in `docs/reference/decision-records.md`. The consumer documentation layout in `docs/core/system.md` now shows the product areas and `docs/product/decisions/`.
+
 ## v1.18.0
 
 This release adds the `dotnet-svelte` profile, the UI pattern decision standard with its pattern library, and the `site` extension for a static public website. A consumer on v1.17.0 adopts it by reading the entries below and recording 1.18.0 in `reviewedStandardsVersion`.

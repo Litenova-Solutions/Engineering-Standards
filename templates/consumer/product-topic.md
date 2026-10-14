@@ -22,41 +22,39 @@ Each entry opens with one identifier of the form `product/<topic>.<rule>`, where
 
 ## Position
 
+None.
+
+Replace `None.` with one table row per choice the product owner made. Every row links the decision record that set it, and a row on an approved page links an approved decision.
+
+```text
 | Choice | Reason | Decision |
 |:---|:---|:---|
-| State one choice the product owner made. | State the reason in one sentence. | [__DECISION_ID__](decisions/__DECISION_ID__.md) |
+| Flat rate costs EUR 149 a month. | One price per month is easier to budget. | LINK |
+```
 
-Every row links the decision record that set it. A row on an approved page links an approved decision.
+`LINK` stands for a Markdown link to the decision record, such as `../decisions/0003-monthly-plan.md`.
 
 ## Refusals
 
-| Refused | Reason | Decision |
-|:---|:---|:---|
-| State one thing this topic rules out. | State the reason in one sentence. | [__DECISION_ID__](decisions/__DECISION_ID__.md) |
+None.
 
-Write `None.` when the topic refuses nothing.
+Replace `None.` with one table row per thing this topic rules out, in the Position table shape: Refused, Reason, Decision.
 
 ## Open questions
 
-| Question | Owner | What settles it |
-|:---|:---|:---|
-| State one undecided question. | `__OWNER__` | Name the evidence, the adviser, or the trigger. |
+None.
 
-Write `None.` when nothing on this topic is undecided.
+Replace `None.` with a table of Question, Owner, and What settles it, one row per undecided question.
 
 ## Next
 
-| Change | When |
-|:---|:---|
-| State one planned change to this position. | Name the milestone or the trigger. |
+None.
 
-Write `None.` when no change is planned.
+Replace `None.` with a table of Change and When, naming the milestone or the trigger for each planned change.
 
 ## History
 
 None. No decision record names this page in its affects field.
-
-`node standards/tools/product-records.mjs --write` writes this section from the decision records. Do not edit it by hand.
 
 ## Evidence
 
