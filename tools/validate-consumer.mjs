@@ -594,6 +594,20 @@ for (const kind of SINGLETON_KINDS) {
       err(`${rel}: reviewBy ${page.meta.reviewBy} has passed; reread the page against its decisions and evidence, then move reviewBy`);
     }
 
+    // The chapter is read before the commitments, and each half keeps its own
+    // order, so a reader finds every answer in the same place on every topic.
+    // Extra sections may sit inside the chapter. (standards/rule/core-product.place-the-story-before-the-commitments)
+    {
+      const headings = [...page.raw.matchAll(/^## (.+?)\s*$/gm)].map((match) => match[1]);
+      const positions = TOPIC_SECTIONS.map((name) => headings.indexOf(name)).filter((index) => index >= 0);
+      if (positions.some((value, index) => index > 0 && value < positions[index - 1])) {
+        err(`${rel}: sections are out of order; a product topic reads ${TOPIC_SECTIONS.join(', ')}`);
+      }
+      const firstCommitment = headings.indexOf('Rules');
+      const extra = headings.filter((name, index) => !TOPIC_SECTIONS.includes(name) && firstCommitment >= 0 && index > firstCommitment);
+      if (extra.length) err(`${rel}: section '${extra[0]}' sits among the commitments; place it in the chapter, before 'Rules'`);
+    }
+
     // Rules: one identifier per entry, owned by this page.
     const rulesBody = productSection(page.raw, 'Rules');
     if (rulesBody !== null) {

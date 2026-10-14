@@ -12,7 +12,33 @@
 
 ## Summary
 
-State the current position on this topic in at most three sentences. A reader who stops here knows what the product does and refuses on this topic.
+State the current position on this topic in one short paragraph. A reader who stops here knows what the product does on this topic and why.
+
+## The situation
+
+Tell what the customer faces on this topic, in their own words where a source quotes them. Give the numbers that size the problem, each with its source and date.
+
+> "Quote a customer, a market voice, or an authority in their own words, with the source after the quote."
+
+## What we do
+
+Explain the choice and how it works, as a person would explain it to a colleague. Link the decision records that set it, so the reasoning is one click away.
+
+## Why it is better
+
+Compare the choice with what the customer uses today and with the options weighed. Show the arithmetic where money is involved.
+
+## A worked example
+
+Follow one customer from the reference cast through this topic, with real figures.
+
+## Costs and risks
+
+State what the choice gives up, what it costs, and what could go wrong.
+
+## How sure we are
+
+State which facts are verified, which are inferred, and which wait on an adviser. Name what would change the position.
 
 ## Rules
 

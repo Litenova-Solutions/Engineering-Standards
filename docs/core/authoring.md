@@ -36,6 +36,7 @@ The glossary controls repository engineering terms. Code identifiers, product na
 - A prose paragraph has one topic and at most six sentences.
 - A table cell has at most 20 visible words.
 - Headings, fenced code, metadata, URLs, and link destinations do not count.
+- A quotation does not count: a blockquote that opens with a quotation mark holds a source's own words.
 - Inline code and literal identifiers each count as one word.
 - Hyphenated, dotted, and path-like tokens each count as one word.
 

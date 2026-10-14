@@ -172,13 +172,26 @@ export function checkProseMeasures(relative, raw, add) {
     list = [];
   };
 
+  // A blockquote that opens with a quotation mark holds somebody else's words,
+  // which a page reproduces rather than writes, so no measure reaches it. A
+  // blockquote in the page's own voice is measured like any paragraph.
+  let quoting = false;
+
   for (const item of lines) {
     const line = item.line;
     if (!line.trim()) {
       flushParagraph();
       flushList();
+      quoting = false;
       continue;
     }
+    if (/^\s*>/.test(line) && (quoting || /^\s*>\s*["“„«]/.test(line))) {
+      flushParagraph();
+      flushList();
+      quoting = true;
+      continue;
+    }
+    quoting = false;
     if (/^\s*(?:[-*+] |\d+\.\s+)/.test(line)) {
       flushParagraph();
       flushList();

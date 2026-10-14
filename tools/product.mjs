@@ -13,11 +13,17 @@ import path from 'node:path';
 export const PRODUCT_RULE = /`(product\/[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*)`/g;
 export const PRODUCT_RULE_FORM = "'product/<topic>.<rule>' in lower kebab-case, for example 'product/pricing.flat-rate-fee'";
 
-// The sections a product-topic page carries, in reading order. Summary orients a
-// person, Rules is what an agent applies, Position, Refusals, and Open questions
-// state the present, Next states the future, History states the past, and
-// Evidence states why it is believed. (standards/rule/core-product.state-each-topic-in-one-page-shape)
-export const TOPIC_SECTIONS = ['Summary', 'Rules', 'Position', 'Refusals', 'Open questions', 'Next', 'History', 'Evidence'];
+// The sections a product-topic page carries, in reading order. The chapter comes
+// first and is written for a person: the situation, what the product does, why it
+// is better, one worked example, what it costs, and how sure the reasoning is.
+// The commitments follow for specifications and agents: Rules is what an agent
+// applies, Position, Refusals, and Open questions state the present, Next states
+// the future, History states the past, and Evidence lists the sources.
+// (standards/rule/core-product.state-each-topic-in-one-page-shape,
+// standards/rule/core-product.place-the-story-before-the-commitments)
+export const CHAPTER_SECTIONS = ['Summary', 'The situation', 'What we do', 'Why it is better', 'A worked example', 'Costs and risks', 'How sure we are'];
+export const COMMITMENT_SECTIONS = ['Rules', 'Position', 'Refusals', 'Open questions', 'Next', 'History', 'Evidence'];
+export const TOPIC_SECTIONS = [...CHAPTER_SECTIONS, ...COMMITMENT_SECTIONS];
 
 // A decision that sets product pages argues a business choice, so it carries the
 // options it weighed and the condition that would reopen it rather than the

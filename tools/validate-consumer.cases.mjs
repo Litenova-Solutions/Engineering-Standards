@@ -1081,7 +1081,12 @@ console.log('\nProduct records (standards/rule/core-product.trace-every-choice-t
   metaCase('product topic past its review date', topic, (m) => { m.reviewBy = '2020-01-01'; }, 'reviewBy 2020-01-01 has passed');
   fileCase('product topic outside product/', 'docs/reference/pricing-elsewhere.md', readFixture(topic).replace('"id": "pricing"', '"id": "pricing-elsewhere"').replace(/product\/pricing\./g, 'product/pricing-elsewhere.'), "lives under 'docs/product/'");
   bodyCase('rule entry with no identifier', topic, (raw) => raw.replace('- `product/pricing.monthly-plan-fee`:', '- The monthly fee:'), 'does not open with a rule identifier');
-  bodyCase('rule naming another topic', topic, (raw) => raw.replace('product/pricing.monthly-plan-fee', 'product/billing.monthly-plan-fee'), "names topic 'billing'");
+  bodyCase('product topic with the commitments before the chapter', topic, (raw) => raw.replace('## A worked example', '## Moved').replace('## Evidence', '## Evidence\n\n## A worked example\n\nAlex sells one night.'), 'out of order');
+  bodyCase('product topic with an extra chapter section', topic, (raw) => raw.replace('## Costs and risks', '## How it works\n\nOne flow.\n\n## Costs and risks'), null);
+  bodyCase('product topic with a section among the commitments', topic, (raw) => raw.replace('## Next', '## Notes\n\nOne note.\n\n## Next'), "sits among the commitments");
+  bodyCase('quotation longer than a sentence may run', topic, (raw) => raw.replace('## The situation\n', `## The situation\n\n> "${'word '.repeat(40).trim()}."\n`), null);
+  bodyCase('own-voice blockquote longer than a sentence may run', topic, (raw) => raw.replace('## The situation\n', `## The situation\n\n> ${'word '.repeat(40).trim()}.\n`), 'controlled-prose problem(s)');
+  bodyCase('rule naming another topic', topic,(raw) => raw.replace('product/pricing.monthly-plan-fee', 'product/billing.monthly-plan-fee'), "names topic 'billing'");
   bodyCase('citation of an undefined product rule', 'docs/reference/ports.md', (raw) => `${raw}\nThis follows \`product/pricing.annual-plan-fee\`.\n`, "cites product rule 'product/pricing.annual-plan-fee'");
   bodyCase('citation of a defined product rule', 'docs/reference/ports.md', (raw) => `${raw}\nThis follows \`product/pricing.monthly-plan-fee\`.\n`, null);
 

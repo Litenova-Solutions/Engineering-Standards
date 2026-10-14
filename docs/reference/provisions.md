@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading and owning page
 
 Run `node tools/generate-provisions.mjs` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 1070 provisions across 1 kinds.
+The active release states 1071 provisions across 1 kinds.
 
 ## rule
 
@@ -288,6 +288,7 @@ The active release states 1070 provisions across 1 kinds.
 | standards/rule/core-product.load-product-intent-before-commercial-work | [Load product intent before commercial work](../core/product.md#load-product-intent-before-commercial-work-standardsrulecore-productload-product-intent-before-commercial-work) | `core/product.md` |
 | standards/rule/core-product.name-product-decisions-in-one-numbered-sequence | [Name product decisions in one numbered sequence](../core/product.md#name-product-decisions-in-one-numbered-sequence-standardsrulecore-productname-product-decisions-in-one-numbered-sequence) | `core/product.md` |
 | standards/rule/core-product.name-the-person-who-approved-a-decision | [Name the person who approved a decision](../core/product.md#name-the-person-who-approved-a-decision-standardsrulecore-productname-the-person-who-approved-a-decision) | `core/product.md` |
+| standards/rule/core-product.place-the-story-before-the-commitments | [Place the story before the commitments](../core/product.md#place-the-story-before-the-commitments-standardsrulecore-productplace-the-story-before-the-commitments) | `core/product.md` |
 | standards/rule/core-product.record-each-product-choice-as-a-decision | [Record each product choice as a decision](../core/product.md#record-each-product-choice-as-a-decision-standardsrulecore-productrecord-each-product-choice-as-a-decision) | `core/product.md` |
 | standards/rule/core-product.replace-a-decision-with-a-new-record | [Replace a decision with a new record](../core/product.md#replace-a-decision-with-a-new-record-standardsrulecore-productreplace-a-decision-with-a-new-record) | `core/product.md` |
 | standards/rule/core-product.report-which-product-rules-are-carried | [Report which product rules are carried](../core/product.md#report-which-product-rules-are-carried-standardsrulecore-productreport-which-product-rules-are-carried) | `core/product.md` |

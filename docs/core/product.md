@@ -11,6 +11,7 @@ Business intent has three parts that age differently. The present is the positio
 ## Agent Summary {#agent-summary}
 
 - Business intent lives in topic pages under `product/`, beside the brief. (standards/rule/core-product.keep-business-intent-under-product, standards/rule/core-product.state-each-topic-in-one-page-shape)
+- Each topic reads as a chapter for people first, with its commitments after. (standards/rule/core-product.place-the-story-before-the-commitments)
 - Each topic states numbered product rules that specifications and code cite, and no behavior. (standards/rule/core-product.identify-every-product-rule, standards/rule/core-product.cite-product-rules-from-domain-specifications, standards/rule/core-product.keep-behavior-out-of-product-pages)
 - Each choice and refusal links the decision record that set it. (standards/rule/core-product.trace-every-choice-to-a-decision, standards/rule/core-product.record-each-product-choice-as-a-decision)
 - A person approves a product decision; an agent drafts one. (standards/rule/core-product.name-the-person-who-approved-a-decision)
@@ -25,7 +26,7 @@ Business intent has three parts that age differently. The present is the positio
 | Term | Meaning |
 |:---|:---|
 | Product brief | The one page stating what the product is, for whom, and its boundary. It routes to every topic. |
-| Product topic | One page of business intent, such as pricing or one market, with kind `product-topic`. |
+| Product topic | One page of business intent, such as pricing or one market: a chapter for people, then the commitments. |
 | Product rule | One testable commitment on a topic page, identified as `product/<topic>.<rule>`. |
 | Product decision | A decision record whose `affects` field names the product pages it sets. |
 | Source material | Research, books, and digests produced outside `docs/`, often by agents, which carry no authority. |
@@ -49,9 +50,15 @@ A product decision sets the position. A topic page states it as rules. A domain 
 
 ### State each topic in one page shape (standards/rule/core-product.state-each-topic-in-one-page-shape)
 
-**Requirement:** A `product-topic` page MUST carry the H2 sections Summary, Rules, Position, Refusals, Open questions, Next, History, and Evidence, and the metadata field `reviewBy`.
+**Requirement:** A `product-topic` page MUST carry the chapter sections and the commitment sections of the product topic template, and the metadata field `reviewBy`.
 
-**Rationale:** The fixed shape puts the present, the future, and the past of one topic on one page. A reader learns where each answer sits once and finds it on every topic.
+**Rationale:** The fixed shape puts the present, the future, and the past of one topic on one page. The chapter sections are Summary, The situation, What we do, Why it is better, A worked example, Costs and risks, and How sure we are. The commitment sections are Rules, Position, Refusals, Open questions, Next, History, and Evidence. A reader learns where each answer sits once and finds it on every topic.
+
+### Place the story before the commitments (standards/rule/core-product.place-the-story-before-the-commitments)
+
+**Requirement:** A `product-topic` page MUST place its chapter for people before its commitments, with each claim in the chapter citing its source.
+
+**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so a person understands the choice before reading its rules. Sources keep the story checkable rather than a pitch.
 
 ### Identify every product rule (standards/rule/core-product.identify-every-product-rule)
 
@@ -178,6 +185,7 @@ A subscription business keeps `docs/product/business/pricing.md` with id `pricin
 |:---|:---|:---|
 | standards/rule/core-product.keep-business-intent-under-product | static | `node standards/tools/validate-consumer.mjs` fails a `product-topic` page outside `docs/product/`. |
 | standards/rule/core-product.state-each-topic-in-one-page-shape | static | `node standards/tools/validate-consumer.mjs` fails a `product-topic` page missing a required section or `reviewBy`. |
+| standards/rule/core-product.place-the-story-before-the-commitments | static | `node standards/tools/validate-consumer.mjs` fails a topic whose sections are out of order or that adds a section among the commitments. |
 | standards/rule/core-product.identify-every-product-rule | static | `node standards/tools/validate-consumer.mjs` fails a Rules entry without an identifier, a foreign topic segment, a duplicate, or an unresolved citation. |
 | standards/rule/core-product.cite-product-rules-from-domain-specifications | inspection | Specification review confirms that each use case cites the product rules it implements. |
 | standards/rule/core-product.keep-behavior-out-of-product-pages | inspection | Documentation review confirms that no product page names a state, entry point, failure code, or handler. |

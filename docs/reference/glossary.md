@@ -194,7 +194,7 @@ One testable business commitment on a product topic page, identified as `product
 
 ## Product topic
 
-One page of business intent under `docs/product/`, stating its rules, position, refusals, open questions, next change, and derived history.
+One page of business intent under `docs/product/`, written as a chapter for people and followed by its commitments.
 
 ## Projection
 
