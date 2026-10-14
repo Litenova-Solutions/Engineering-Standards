@@ -48,7 +48,7 @@ export async function load({ parent, params }) {
 **Example:**
 
 ```ts
-const order = createQuery(orderQuery(orderId));
+const order = createQuery(() => orderQuery(orderId));
 ```
 
 ### Keep page parameters validated by a schema (standards/rule/svelte-rendering.keep-page-parameters-validated-by-a-schema)
