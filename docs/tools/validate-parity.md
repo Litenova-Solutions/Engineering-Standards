@@ -14,7 +14,7 @@ node standards/tools/validate-parity.mjs [consumerRoot] [--report] [--format=jso
 
 This command reads both directions of the comparison. It reports a handler that no specification covers, and an implemented specification that no handler covers. A `planned` specification with no handler is correct and is not reported.
 
-A consumer whose project declares no `paths.apiSolution` skips the check and passes. The `parity` block of `standards.project.json` names the Application project and carries the two ignore lists.
+A consumer whose project declares no `paths.apiSolution` skips the check and passes. The `parity` block of `standards.project.json` names the Application project and carries the two ignore lists. The scan reads text and never loads a compiler. A declaration is what a declaring keyword introduces, so the word class inside a comment reads as a declaration. The parity block narrows the scan: sourceRoots bounds the directories, foreignNames names package declarations, and the ignore lists record the by-decision gaps.
 
 ## Arguments
 

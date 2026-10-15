@@ -211,6 +211,14 @@
         "end-to-end-flow"
       ]
     },
+    "stage": {
+      "path": "docs/ext/stage.md",
+      "activationScope": "project"
+    },
+    "delegation": {
+      "path": "docs/ext/delegation.md",
+      "activationScope": "project"
+    },
     "site": {
       "path": "docs/ext/site.md",
       "activationScope": "project"

@@ -10,12 +10,12 @@ Business intent has three parts that age differently. The present is the positio
 
 ## Agent Summary {#agent-summary}
 
-- Business intent lives in topic pages under `product/`, beside the brief. (standards/rule/core-product.keep-business-intent-under-product, standards/rule/core-product.state-each-topic-in-one-page-shape)
-- Each topic reads as a chapter for people first, with its commitments after. (standards/rule/core-product.place-the-story-before-the-commitments)
+- Business intent lives in one-shaped topic pages that read as chapters before commitments. (standards/rule/core-product.keep-business-intent-under-product, standards/rule/core-product.state-each-topic-in-one-page-shape, standards/rule/core-product.place-the-story-before-the-commitments)
 - Each topic states numbered product rules that specifications and code cite, and no behavior. (standards/rule/core-product.identify-every-product-rule, standards/rule/core-product.cite-product-rules-from-domain-specifications, standards/rule/core-product.keep-behavior-out-of-product-pages)
 - Each choice and refusal links the decision record that set it. (standards/rule/core-product.trace-every-choice-to-a-decision, standards/rule/core-product.record-each-product-choice-as-a-decision)
-- A person approves a product decision; an agent drafts one. (standards/rule/core-product.name-the-person-who-approved-a-decision)
-- A changed choice is a new decision that replaces the old record. (standards/rule/core-product.replace-a-decision-with-a-new-record)
+- A person approves a product decision, and an agent may build on a draft. (standards/rule/core-product.name-the-person-who-approved-a-decision, standards/rule/core-product.build-on-a-draft-decision-before-approval)
+- A changed choice is a new decision, recorded before its code. (standards/rule/core-product.replace-a-decision-with-a-new-record, standards/rule/core-product.record-a-decision-before-its-code)
+- Behavior work lands intent before code, and checks reject an uncarried rule. (standards/rule/core-product.build-intent-before-specification-before-code, standards/rule/core-product.reject-an-uncarried-product-rule)
 - The History section is written by a command from the decisions. (standards/rule/core-product.derive-history-from-decisions)
 - Generated research is source material until a person approves a decision drawn from it. (standards/rule/core-product.treat-generated-research-as-source-material)
 - Each topic carries a review date, and commercial work loads the product pages first. (standards/rule/core-product.review-a-topic-by-its-date, standards/rule/core-product.load-product-intent-before-commercial-work)
@@ -94,7 +94,7 @@ A product decision sets the position. A topic page states it as rules. A domain 
 
 **Requirement:** An `approved` product decision MUST carry `decidedBy` and `decided`, set by the accountable person and never by an agent.
 
-**Rationale:** Product, commercial, and legal choices belong to an accountable person, as `standards/rule/core-system.keep-decision-authority-with-accountable-people` states. The fields make that approval visible and checkable.
+**Rationale:** Product, commercial, and legal choices belong to an accountable person, as `standards/rule/core-system.keep-decision-authority-with-accountable-people` states. The fields make that approval visible and checkable. A draft decision supports building, while approval gates the release.
 
 ### Replace a decision with a new record (standards/rule/core-product.replace-a-decision-with-a-new-record)
 
@@ -131,6 +131,38 @@ A product decision sets the position. A topic page states it as rules. A domain 
 **Requirement:** A consumer MUST be able to list every product rule with the specifications that cite it, using `node standards/tools/product-records.mjs --coverage`.
 
 **Rationale:** A rule that no specification cites is intent the system does not carry yet. The list separates planned work from forgotten work.
+
+### Build intent before specification before code (standards/rule/core-product.build-intent-before-specification-before-code)
+
+**Requirement:** A behavior change MUST land its product rule and decision, then its research evidence, then its specification citation, then its code, in that order.
+
+**Rationale:** The order makes each layer checkable before the next one builds on it. A specification written before its decision argues from code, and a decision written after its code records what already shipped.
+
+**Example:** A price change lands decision `0011-raise-the-monthly-plan` and rule `product/pricing.monthly-plan-fee`, then its research note, then the billing citation, then the code.
+
+### Reject an uncarried product rule (standards/rule/core-product.reject-an-uncarried-product-rule)
+
+**Requirement:** A consumer MUST fail its checks on an uncarried product rule and on a rule-less aggregate, unless a trace baseline names each with a reason.
+
+**Rationale:** A list nobody clears separates planned work from nothing. The baseline reason states which of the two each entry is: work dated for later, or intent that never becomes code.
+
+**Example:** A reason opens with one fixed prefix, so a reader sees the kind of gap at once. The prefixes are Company practice, Refusal, Planned, Carried not yet cited, Missing, Engineering only, and Not yet cited.
+
+```json
+{ "rules": { "product/pricing.launch-discount": { "reason": "Planned: the launch discount ships with the spring release." } } }
+```
+
+### Build on a draft decision before approval (standards/rule/core-product.build-on-a-draft-decision-before-approval)
+
+**Requirement:** An agent MAY build on a `draft` decision while approval gates the release, not the code.
+
+**Rationale:** Approval before every edit stalls agent work on a queue of one person. The release still needs the approval, so nothing ships on a draft alone.
+
+### Record a decision before its code (standards/rule/core-product.record-a-decision-before-its-code)
+
+**Requirement:** A decision recorded after its code shipped is a defect, so an agent MUST record the decision before changing code.
+
+**Rationale:** A decision written after its code argues from what already shipped. The chain stays honest only when intent precedes the change it authorizes.
 
 ## Conventions
 
@@ -198,5 +230,9 @@ A subscription business keeps `docs/product/business/pricing.md` with id `pricin
 | standards/rule/core-product.review-a-topic-by-its-date | static | `node standards/tools/validate-consumer.mjs` fails a `product-topic` page whose `reviewBy` date has passed. |
 | standards/rule/core-product.load-product-intent-before-commercial-work | inspection | The change report for commercial behavior lists the product pages read before the change. |
 | standards/rule/core-product.report-which-product-rules-are-carried | static | `node standards/tools/product-records.mjs --coverage` lists each product rule with its citing pages. |
+| standards/rule/core-product.build-intent-before-specification-before-code | inspection | Change review confirms the product record, evidence, specification, and code landed in that order. |
+| standards/rule/core-product.reject-an-uncarried-product-rule | static | `node standards/tools/product-records.mjs --check` exits 1 on an unlisted gap or a stale baseline entry. |
+| standards/rule/core-product.build-on-a-draft-decision-before-approval | inspection | Change review confirms the release approval while the code cites a draft decision. |
+| standards/rule/core-product.record-a-decision-before-its-code | inspection | Change review confirms each decision date precedes its code change. |
 | standards/rule/core-product.group-product-topics-by-area | inspection | Documentation review compares `docs/product/` against the example layout or a named local replacement. |
 | standards/rule/core-product.name-product-decisions-in-one-numbered-sequence | inspection | Documentation review confirms each product decision file name matches its `id` and carries a four-digit number. |

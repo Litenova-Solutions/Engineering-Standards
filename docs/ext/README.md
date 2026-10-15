@@ -27,6 +27,8 @@ An extension may add requirements, packages, projects, and verification. It may 
 | [report](report.md) | `local` | Use case | Complex reports or large exports exceed normal request reads. |
 | [jobs](jobs.md) | `local` | Use case, Workflow, End-to-End Flow | Behavior requires recurring, delayed, or calendar-based Worker work. |
 | [site](site.md) | `project` | None | The product ships a public static website beside its application. |
+| [stage](stage.md) | `project` | None | The first deployment holds no customer data yet, or a past promotion goes on record. |
+| [delegation](delegation.md) | `project` | None | One agent starts another agent on the same tree. |
 
 The manifest is the machine-readable source for `activationScope` and `applicableKinds`. This table explains the selection decision.
 

@@ -13,6 +13,8 @@ This protocol controls how agents select context, resolve standards, preserve us
 - Preserve unrelated work and side-effect boundaries. (standards/rule/core-agent.inspect-existing-work-before-editing, standards/rule/core-agent.restrict-unapproved-side-effects)
 - Update behavior records with implementation. (standards/rule/core-agent.update-behavior-records-with-code)
 - Report exact verification evidence. (standards/rule/core-agent.run-and-report-verification)
+- Generated records stay source material until intent states them. (standards/rule/core-agent.treat-tracked-records-as-source-material)
+- Agent working files live under one ignored-and-tracked split. (standards/rule/core-agent.keep-agent-working-files-under-agents)
 
 ## Standards
 
@@ -88,6 +90,12 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 **Rationale:** A narrow passing test does not establish repository-wide completion.
 
+### Treat tracked records as source material (standards/rule/core-agent.treat-tracked-records-as-source-material)
+
+**Requirement:** An agent MUST treat a tracked record as source material until a product page or an approved decision states its claim.
+
+**Rationale:** A record written to survive a session reads as settled after a month. The rule keeps it readable without letting it answer what only intent or code answers.
+
 ## Conventions
 
 ### Select one task label (standards/rule/core-agent.select-one-task-label)
@@ -114,6 +122,24 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 **Rationale:** Compliant local names and shapes provide the best implementation starting point.
 
+### Keep agent working files under agents (standards/rule/core-agent.keep-agent-working-files-under-agents)
+
+**Default:** Keep agent working files under `.agents/`, with tracked `skills/` and `records/` folders and ignored scratch and delegate folders.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Generated work with no home lands beside authored records or vanishes with the session. The split keeps what survives apart from what never leaves the machine.
+
+**Example:**
+
+```text
+.agents/
+  skills/
+  records/
+  delegate/
+  scratch/
+```
+
 ## Reference example
 
 This informative example demonstrates `standards/rule/core-agent.select-task-context`, `standards/rule/core-agent.read-active-behavior-specifications`, and `standards/rule/core-agent.load-applicable-extensions`.
@@ -136,6 +162,8 @@ A Command-handler change selects `backend.application`, reads its active use cas
 | standards/rule/core-agent.make-coherent-scoped-changes | inspection | Diff review connects each changed artifact to the authorized request. |
 | standards/rule/core-agent.update-behavior-records-with-code | inspection | Behavior review links changed implementation to affected current records. |
 | standards/rule/core-agent.run-and-report-verification | inspection | Completion report lists commands, outcomes, evidence scope, and skipped checks. |
+| standards/rule/core-agent.treat-tracked-records-as-source-material | inspection | Change review traces each behavior claim to a product page or an approved decision. |
 | standards/rule/core-agent.select-one-task-label | inspection | Agent report selects one narrowest task or names an additional crossed boundary. |
 | standards/rule/core-agent.escalate-from-summary-to-full-document | inspection | File-generation and public-boundary reports cite loaded Tier 2 guidance. |
 | standards/rule/core-agent.inspect-local-examples-after-standards | inspection | Change review identifies neighboring compliant consumer patterns. |
+| standards/rule/core-agent.keep-agent-working-files-under-agents | inspection | Tree review finds working files under `.agents/` or a named local replacement. |

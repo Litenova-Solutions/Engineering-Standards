@@ -97,6 +97,14 @@
 // contract, so no use-case page can be its specification and no identifier it
 // might carry could resolve. Development-only tooling uses the marker for exactly
 // that reason. Every endpoint without it is still asked for a tag.
+//
+// Reading limits: the scan reads text and never loads a compiler. A marking tag
+// is a single-line XML doc comment, so a tag split across lines or inside a
+// block comment is missed. A file is markable by the type names its text
+// declares, so the word 'Command' inside a comment can ask a file for a tag it
+// owes nothing. Narrow the scan with the specSync block: 'codeRoots' bounds the
+// files read, 'markedRoots' bounds the files asked for a tag, and 'featureRoots'
+// and 'evidenceRoots' bound the test files read for citations.
 
 import fs from 'node:fs';
 import path from 'node:path';

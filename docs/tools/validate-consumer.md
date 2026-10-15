@@ -14,7 +14,7 @@ node standards/tools/validate-consumer.mjs [consumerRoot] [--prose]
 
 This command reads `standards.project.json` and every Markdown file under the declared documentation root. It checks Specification Metadata against the metadata schema, identifier grammar, file relationships, extension scope, link resolution, acceptance trace uniqueness, recorded vocabulary, and controlled prose.
 
-Run it from the consumer root after changing a specification, a project path, or a language record.
+Run it from the consumer root after changing a specification, a project path, or a language record. The default output names the worst prose files and their dominant measure.
 
 ## Arguments
 

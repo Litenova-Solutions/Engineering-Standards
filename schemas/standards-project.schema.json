@@ -30,6 +30,11 @@
       "type": "string",
       "pattern": "^[a-z][a-z0-9-]*$"
     },
+    "releaseStage": {
+      "description": "The release stage of this consumer: pre-production before the first deployment holds customer data, production after. See the stage extension.",
+      "type": "string",
+      "enum": ["pre-production", "production"]
+    },
     "reviewedStandardsVersion": {
       "description": "The standards release whose complete contract this project last reviewed.",
       "type": "string",

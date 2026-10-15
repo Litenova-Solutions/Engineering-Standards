@@ -995,6 +995,7 @@ let languageSummary = '';
 
   const languageFindings = [];
   const proseCounts = new Map();
+  const proseCodes = new Map();
   for (const f of languageFiles) {
     const rel = path.relative(root, f).replace(/\\/g, '/');
     const raw = fs.readFileSync(f, 'utf8');
@@ -1006,8 +1007,9 @@ let languageSummary = '';
     });
     if (f === agentsFile) continue;
     let count = 0;
-    checkProseMeasures(rel, raw, () => { count += 1; });
-    if (count) proseCounts.set(rel, count);
+    const codes = new Map();
+    checkProseMeasures(rel, raw, (_relative, _line, code) => { count += 1; codes.set(code, (codes.get(code) ?? 0) + 1); });
+    if (count) { proseCounts.set(rel, count); proseCodes.set(rel, codes); }
   }
 
   // The documentation tree is one of the surfaces a word reaches, and usually
@@ -1069,8 +1071,20 @@ let languageSummary = '';
   const surfaceNote = scannedSurfaces
     ? `, ${scannedSurfaces} non-Markdown surface(s) scanned`
     : ', documentation only';
+  // The default output names the worst files and their dominant measure, so a
+  // reader can act without a second flag. --prose still lists every measure.
+  const hotspot = [...proseCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([rel, count]) => {
+      const codes = proseCodes.get(rel) ?? new Map();
+      const top = [...codes.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'PROSE_SENTENCE_LENGTH';
+      return `${rel} (${count}, mostly ${top})`;
+    })
+    .join('; ');
+  const hotspotNote = hotspot ? `; worst prose: ${hotspot}; run with --prose to list every measure` : '';
   languageSummary = compiled
-    ? `Language: ${manneredCount} mannered term(s), ${rejectedCount} rejected synonym(s)${surfaceNote}; prose baseline covers ${accepted} page(s)`
+    ? `Language: ${manneredCount} mannered term(s), ${rejectedCount} rejected synonym(s)${surfaceNote}; prose baseline covers ${accepted} page(s)${hotspotNote}`
     : `Language: no language record found; the vocabulary and mannered-term checks did not run`;
 
   // --prose lists the measures behind the counts, which is what a person needs

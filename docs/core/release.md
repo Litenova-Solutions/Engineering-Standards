@@ -13,6 +13,8 @@ A release joins deployed product behavior with evidence that a maintainer can op
 - Meet every declared release readiness gate. (standards/rule/core-release.meet-release-readiness-gates)
 - Report exact verification scope and omissions. (standards/rule/core-release.report-verification-exactly)
 - Bind release evidence to one immutable artifact. (standards/rule/core-release.identify-immutable-release-artifacts)
+- Accepted debt lives in baselines that only shrink. (standards/rule/core-release.record-accepted-debt-as-a-shrinking-baseline)
+- A first release keeps a readiness record before its artifact. (standards/rule/core-release.keep-a-first-release-readiness-record)
 
 ## Standards
 
@@ -172,6 +174,20 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 **Rationale:** Specifications remain the canonical authority for behavior and criteria.
 
+### Record accepted debt as a shrinking baseline (standards/rule/core-release.record-accepted-debt-as-a-shrinking-baseline)
+
+**Requirement:** An owning check MUST refuse both an unlisted gap and a stale entry while accepted debt lives in a machine-readable baseline whose entries only shrink.
+
+**Rationale:** A baseline with no exit is a permanent exemption. A check that refuses only the missing half lets listed debt rot, because nobody removes an entry the suite never questions.
+
+**Example:** The prose baseline records one count per page, and its check refuses a missing page and a clean page still listed.
+
+### Keep a first-release readiness record (standards/rule/core-release.keep-a-first-release-readiness-record)
+
+**Requirement:** A consumer before its first production release MUST keep a readiness record naming its dated rehearsals, green gates, and backup owner.
+
+**Rationale:** A release record binds evidence to one artifact, so it has nothing to say before the first artifact exists. The readiness record states instead what proves the product may take data.
+
 ## Conventions
 
 ### Store release records together (standards/rule/core-release.store-release-records-together)
@@ -226,5 +242,7 @@ An order-checkout release includes verified stock, order, payment, and shipment 
 | standards/rule/core-release.record-release-evidence | operation | Release record stores each listed test and operational result. |
 | standards/rule/core-release.record-operating-readiness | operation | Release record includes current limits, alerts, runbooks, operating conditions, and omissions. |
 | standards/rule/core-release.keep-release-records-non-authoritative | inspection | Release-record review links specifications and criteria rather than duplicating them. |
+| standards/rule/core-release.record-accepted-debt-as-a-shrinking-baseline | inspection | Baseline review shows entries only shrink while the owning check refuses unlisted and stale entries. |
+| standards/rule/core-release.keep-a-first-release-readiness-record | inspection | Readiness review reads dated rehearsals, green gates, and the backup owner from one record. |
 | standards/rule/core-release.store-release-records-together | inspection | Release record path uses `docs/releases/` or a local replacement. |
 | standards/rule/core-release.treat-check-warnings-as-failures | inspection | Warning suppression record names its narrow reason. |

@@ -46,6 +46,15 @@
 // than the consumer, which no local scan can ever find.
 // Each entry is consumer-specific, which is why it lives in the consumer's own
 // configuration rather than in this tool.
+//
+// Reading limits: the scan reads text and never loads a compiler. A declaration
+// is what a declaring keyword introduces on a scanned line, so the word 'class'
+// inside a comment reads as a declaration and a type named only in a comment
+// reads as declared. A member resolves when the declaring file carries the name
+// as an identifier, so a member named only in a comment resolves too. Narrow the
+// scan with the parity block: 'sourceRoots' bounds the directories read,
+// 'foreignNames' names what a package declares rather than this repository, and
+// 'ignoreHandlers' and 'ignoreUseCases' record the gaps held by decision.
 
 import fs from 'node:fs';
 import path from 'node:path';

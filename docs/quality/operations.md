@@ -13,8 +13,8 @@ A released application is observable, deployable, recoverable, and supportable b
 - Liveness and readiness are separate endpoints. (standards/rule/quality-operations.separate-liveness-and-readiness)
 - Schema changes run as a release step before traffic. (standards/rule/quality-operations.apply-schema-changes-outside-request-startup)
 - Backups declare their owner, retention, and tested restore. (standards/rule/quality-operations.define-backup-and-restore-behavior)
-- Deployments promote versioned artifacts with declared evidence. (standards/rule/quality-operations.use-a-repeatable-deployment)
-- Rollback is documented and rehearsed before release. (standards/rule/quality-operations.keep-rollback-executable)
+- Deployments promote versioned artifacts from one deploy tree, and secrets stay out of the repository. (standards/rule/quality-operations.use-a-repeatable-deployment, standards/rule/quality-operations.keep-deployment-descriptors-together, standards/rule/quality-operations.keep-production-secrets-out-of-the-repository)
+- Rollback and each runbook are rehearsed before release. (standards/rule/quality-operations.keep-rollback-executable, standards/rule/quality-operations.exercise-every-runbook-before-release)
 - Workers publish their own health and backlog signals. (standards/rule/quality-operations.operate-background-work-independently)
 - External calls declare timeouts, cancellation, and bounded retries. (standards/rule/quality-operations.bound-external-calls)
 - Every baseline alert declares owner, threshold, and runbook. (standards/rule/quality-operations.define-actionable-baseline-alerts)
@@ -100,6 +100,18 @@ One propagator is the part that matters. Two configured propagators produce two 
 
 **Example:** A two-severity inventory routes `page` to the on-call destination with a stated response time, and `ticket` to the queue reviewed each working day.
 
+### Exercise every runbook before release (standards/rule/quality-operations.exercise-every-runbook-before-release)
+
+**Requirement:** Each required runbook MUST carry a dated rehearsal before a production release.
+
+**Rationale:** A runbook is a claim until somebody runs it. The tested-restore rule already proves the pattern for backups, and drills extend it to every procedure.
+
+### Keep production secrets out of the repository (standards/rule/quality-operations.keep-production-secrets-out-of-the-repository)
+
+**Requirement:** Production environment values MUST live on the host, never in the repository.
+
+**Rationale:** A secret committed once lives in history after deletion. The repository carries an example file with placeholders, and the host carries the values.
+
 ## Conventions
 
 
@@ -127,6 +139,14 @@ One propagator is the part that matters. Two configured propagators produce two 
 
 **Rationale:** Coverage includes backup restore, rollback, failed schema application, leaked secret response, dependency outage, and extension recovery.
 
+### Keep deployment descriptors together (standards/rule/quality-operations.keep-deployment-descriptors-together)
+
+**Default:** Keep compose files, proxy, environment example, database, observability, dns, alerts, host units, and bootstrap under one `deploy/` tree.
+
+**Replacement:** A consumer can replace this default with an explicit local convention.
+
+**Rationale:** Every consumer builds this tree, and each one asks which files it holds. One named tree answers before the questions start.
+
 ## Reference example
 
 This informative example demonstrates `standards/rule/quality-operations.use-a-repeatable-deployment` and `standards/rule/quality-operations.keep-rollback-executable`.
@@ -150,6 +170,9 @@ A release applies a reviewed Marten schema plan and deploys the versioned API ar
 | standards/rule/quality-operations.pass-trace-context-in-the-w3c-format | test | `TracePropagationTests` asserts an inbound `traceparent` reaches the outbound call unchanged in its trace-id, through one registered propagator. |
 | standards/rule/quality-operations.define-actionable-baseline-alerts | operation | The alert inventory records owner, threshold, window, severity, and runbook for each baseline alert. |
 | standards/rule/quality-operations.route-each-severity-to-a-declared-destination | operation | The alert inventory records a destination and an expected response time for each severity it uses. |
+| standards/rule/quality-operations.exercise-every-runbook-before-release | operation | The release record names each runbook rehearsal date before the production release. |
+| standards/rule/quality-operations.keep-production-secrets-out-of-the-repository | inspection | Repository review finds placeholders in the example file and no production value in source control. |
 | standards/rule/quality-operations.use-one-local-start-command | inspection | Consumer `AGENTS.md` review confirms one start command covers the baseline dependencies. |
 | standards/rule/quality-operations.use-stable-service-names | inspection | Telemetry review confirms each emitted name is environment-independent. |
 | standards/rule/quality-operations.keep-runbooks-near-project-documentation | inspection | Runbook review confirms each procedure states its trigger, steps, and verification. |
+| standards/rule/quality-operations.keep-deployment-descriptors-together | inspection | Tree review finds the deployment descriptors under `deploy/` or a named local replacement. |
