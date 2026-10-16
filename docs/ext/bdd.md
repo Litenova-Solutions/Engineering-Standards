@@ -16,8 +16,6 @@ The consumer enables `bdd` when a critical example needs business-language revie
 
 This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and the manifest-pinned packages of one runner. It replaces no baseline rule.
 
-## Runners
-
 A consumer selects one runner for the whole suite and keeps the provisions below with either.
 
 | Runner | A scenario is | It cites a criterion with | Its business-readable text is |
@@ -44,7 +42,7 @@ LightBDD moves the binding from text matching to the compiler. A step that no lo
 
 **Rationale:** A selected scenario gives product, domain, engineering, and testing discussions one executable example.
 
-### Avoid routine scenario duplication (standards/rule/ext-bdd.avoid-routine-gherkin-duplication)
+### Avoid routine Gherkin duplication (standards/rule/ext-bdd.avoid-routine-gherkin-duplication)
 
 **Requirement:** A test author MUST NOT duplicate every unit or validation case as a scenario.
 
@@ -52,7 +50,7 @@ LightBDD moves the binding from text matching to the compiler. A step that no lo
 
 ### Tag scenarios with acceptance criteria (standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)
 
-**Requirement:** Every BDD scenario MUST cite one or more acceptance criteria. A Reqnroll scenario carries `@AC-MODULE-USE-CASE-NN` tags, and a LightBDD scenario carries the trait a C# test carries.
+**Requirement:** Every BDD scenario MUST cite its acceptance criteria: a Reqnroll scenario by `@AC-MODULE-USE-CASE-NN` tags, a LightBDD scenario by the C# test trait.
 
 **Rationale:** The owning use-case specification contains the acceptance criterion text and examples. The tag is the criterion identifier with one `@` in front, which is the same identifier `standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion` and `standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form` cite from their own test attributes. One identifier reaches a feature file as a tag, a C# test as a trait, and a browser test as the opening of its title. The three forms differ only in what their tool requires.
 
@@ -143,7 +141,9 @@ LightBDD moves the binding from text matching to the compiler. A step that no lo
 ## Dependencies
 
 - `Reqnroll` and `Reqnroll.xunit.v3`, for Gherkin features
-- `LightBDD.XUnit3` with `xunit.v3.mtp-v2`, for C# feature classes. LightBDD 3.12 is built against xUnit v3 3.2, so its test project runs the 3.2 line while other test projects run the current one.
+- `LightBDD.XUnit3` with `xunit.v3.mtp-v2`, for C# feature classes
+
+LightBDD 3.12 is built against xUnit v3 3.2. Its test project therefore runs the 3.2 line, and other test projects run the current one.
 
 ## Verification
 
