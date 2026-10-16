@@ -260,7 +260,7 @@
           "items": { "$ref": "#/$defs/projectPath" }
         },
         "featureRoots": {
-          "description": "Directories holding Reqnroll feature files. Defaults to apps/api/tests/{ProjectName}.Acceptance.Tests/Features, where {ProjectName} is project.name.",
+          "description": "Directories holding Reqnroll feature files, for a consumer whose BDD runner is Reqnroll. Defaults to apps/api/tests/{ProjectName}.Acceptance.Tests/Features, where {ProjectName} is project.name. A LightBDD scenario is C# and is read from codeRoots.",
           "type": "array",
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/projectPath" }

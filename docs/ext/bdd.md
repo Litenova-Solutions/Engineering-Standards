@@ -2,7 +2,7 @@
 
 ## Intent
 
-This extension adds Reqnroll scenarios for critical cross-layer examples. The use-case specification remains the authored behavior source.
+This extension adds executable scenarios for critical cross-layer examples. A consumer writes them as Reqnroll Gherkin features or as LightBDD feature classes in C#. The use-case specification remains the authored behavior source.
 
 ## Activation
 
@@ -14,7 +14,18 @@ The consumer enables `bdd` when a critical example needs business-language revie
 
 ## Baseline relationship
 
-This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifest-pinned Reqnroll packages. It replaces no baseline rule.
+This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and the manifest-pinned packages of one runner. It replaces no baseline rule.
+
+## Runners
+
+A consumer selects one runner for the whole suite and keeps the provisions below with either.
+
+| Runner | A scenario is | It cites a criterion with | Its business-readable text is |
+|:---|:---|:---|:---|
+| Reqnroll | A Gherkin scenario in a `.feature` file, bound to step definitions | A `@` tag line | The feature file |
+| LightBDD | A C# method on a feature class, whose steps are calls to step methods | The trait form of `standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form` | The scenario method, the step method names, and the generated report |
+
+LightBDD moves the binding from text matching to the compiler. A step that no longer exists, or whose parameters changed, fails the build rather than the run. A consumer that generates its API client from the published contract extends the same property to every request a step sends.
 
 ## Agent Summary {#agent-summary}
 
@@ -33,15 +44,15 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 
 **Rationale:** A selected scenario gives product, domain, engineering, and testing discussions one executable example.
 
-### Avoid routine Gherkin duplication (standards/rule/ext-bdd.avoid-routine-gherkin-duplication)
+### Avoid routine scenario duplication (standards/rule/ext-bdd.avoid-routine-gherkin-duplication)
 
-**Requirement:** A test author MUST NOT duplicate every unit or validation case in Gherkin.
+**Requirement:** A test author MUST NOT duplicate every unit or validation case as a scenario.
 
 **Rationale:** Unit and validation tests retain their narrower feedback and failure location.
 
 ### Tag scenarios with acceptance criteria (standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)
 
-**Requirement:** Every BDD scenario MUST include one or more `@AC-MODULE-USE-CASE-NN` tags.
+**Requirement:** Every BDD scenario MUST cite one or more acceptance criteria. A Reqnroll scenario carries `@AC-MODULE-USE-CASE-NN` tags, and a LightBDD scenario carries the trait a C# test carries.
 
 **Rationale:** The owning use-case specification contains the acceptance criterion text and examples. The tag is the criterion identifier with one `@` in front, which is the same identifier `standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion` and `standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form` cite from their own test attributes. One identifier reaches a feature file as a tag, a C# test as a trait, and a browser test as the opening of its title. The three forms differ only in what their tool requires.
 
@@ -81,7 +92,7 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 
 **Requirement:** A BDD step definition MUST translate a business phrase into a typed test-driver call.
 
-**Rationale:** The feature file stays business-readable while the driver owns boundary mechanics.
+**Rationale:** The scenario stays business-readable while the driver owns boundary mechanics.
 
 ### Exclude production internals (standards/rule/ext-bdd.exclude-production-internals)
 
@@ -99,7 +110,7 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 
 ### Group feature files by module (standards/rule/ext-bdd.group-feature-files-by-module)
 
-**Default:** Group feature files under module folders in `Acceptance.Tests`.
+**Default:** Group feature files or feature classes under module folders in `Acceptance.Tests`.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -131,8 +142,8 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 
 ## Dependencies
 
-- `Reqnroll`
-- `Reqnroll.xunit.v3`
+- `Reqnroll` and `Reqnroll.xunit.v3`, for Gherkin features
+- `LightBDD.XUnit3` with `xunit.v3.mtp-v2`, for C# feature classes. LightBDD 3.12 is built against xUnit v3 3.2, so its test project runs the 3.2 line while other test projects run the current one.
 
 ## Verification
 
@@ -140,7 +151,7 @@ This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and manifes
 |:---|:---|:---|
 | standards/rule/ext-bdd.select-shared-critical-examples | inspection | Selected scenarios explain their shared cross-layer business example in the owning specification. |
 | standards/rule/ext-bdd.avoid-routine-gherkin-duplication | inspection | Scenario review distinguishes selected behavior from unit and validation coverage. |
-| standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria | static | `node standards/tools/validate-consumer.mjs` resolves every `@AC-...` scenario tag to a declared acceptance criterion. |
+| standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria | static | `node standards/tools/validate-consumer.mjs` resolves every `@AC-...` scenario tag and every scenario trait to a declared acceptance criterion. |
 | standards/rule/ext-bdd.drive-public-behavior | test | `BddBoundaryTests` call the declared HTTP or other public boundary. |
 | standards/rule/ext-bdd.assert-observable-outcomes | test | `BddBoundaryTests` cover a declared observable result. |
 | standards/rule/ext-bdd.limit-database-assertions | inspection | Any direct database assertion names its documented durable boundary. |

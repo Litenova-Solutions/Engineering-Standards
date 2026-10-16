@@ -13,7 +13,7 @@
 //
 // The validator is local and deterministic. It reads the consumer configuration,
 // the specification pages under 'paths.domainDocs', the C# source under the
-// configured code roots, and the Reqnroll feature files. It runs no build, loads
+// configured code roots, and any Reqnroll feature files. It runs no build, loads
 // no compiler, and fetches nothing.
 //
 // Usage:
@@ -64,7 +64,9 @@
 // other source is foreign and is not this project's to reconcile. The kinds are the twelve in docs/backend/identifiers.md plus 'value',
 // the marking-only kind a closed-set value case carries.
 //
-// A Reqnroll scenario carries the same citation in a tag with '/' replaced by '_'
+// A LightBDD scenario is a C# method marked [Scenario], and one whose documentation
+// carries no <covers> tag is a finding. A Reqnroll scenario carries the same
+// citation in a tag with '/' replaced by '_'
 // and the prefix 'implements_':
 //
 //   @implements_shop_acceptance-criterion_orders.place-order.places-the-order
@@ -543,6 +545,24 @@ for (const file of codeFiles) {
 
   if (isMarked(rel) && isMarkableElement(text) && !fileHasTag) {
     finding(`code element with no identifier tag: ${rel}`);
+  }
+
+  // A LightBDD scenario is a C# method marked [Scenario]. Like a Gherkin scenario without an
+  // implementation tag, one whose documentation carries no <covers> tag names no spec, so no gate can
+  // tell what it proves. The documentation block is the run of /// lines and attributes above it.
+  // (standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)
+  if (/^\s*\[Scenario\b/m.test(text)) {
+    const scenarioLines = text.split(/\r?\n/);
+    for (let index = 0; index < scenarioLines.length; index += 1) {
+      if (!/^\s*\[Scenario\b/.test(scenarioLines[index])) continue;
+      let above = index - 1;
+      let covered = false;
+      while (above >= 0 && /^\s*(?:\/\/\/|\[)/.test(scenarioLines[above])) {
+        if (/<covers>/.test(scenarioLines[above])) covered = true;
+        above -= 1;
+      }
+      if (!covered) finding(`scenario with no covers tag: ${rel}:${index + 1}`);
+    }
   }
 
   if (isMarked(rel) && !hasValueTag) {

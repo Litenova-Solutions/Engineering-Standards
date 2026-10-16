@@ -252,6 +252,7 @@
       "Aspire.Hosting.PostgreSQL": "13.6.1",
       "AwesomeAssertions": "9.6.0",
       "EFCore.NamingConventions": "10.0.1",
+      "LightBDD.XUnit3": "3.12.1",
       "LiteBus.Analyzers": "7.0.0-preview.5",
       "LiteBus.Commands": "7.0.0-preview.5",
       "LiteBus.Commands.Abstractions": "7.0.0-preview.5",
@@ -304,7 +305,8 @@
       "Testcontainers.PostgreSql": "4.16.0",
       "WireMock.Net": "2.19.0",
       "xunit.runner.visualstudio": "4.0.1",
-      "xunit.v3": "4.0.2"
+      "xunit.v3": "4.0.2",
+      "xunit.v3.mtp-v2": "3.2.2"
     },
     "npm": {
       "@axe-core/playwright": "4.13.0",
