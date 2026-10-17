@@ -52,6 +52,9 @@ const jsonOutput = flags.includes('--format=json');
 const root = path.resolve(process.argv.slice(2).find((a) => !a.startsWith('-')) ?? '.');
 const errors = [];
 const err = (m) => errors.push(m);
+// An advisory is printed and counted, and never fails the run.
+const advisories = [];
+const advise = (m) => advisories.push(m);
 
 function readJson(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -1047,24 +1050,33 @@ let languageSummary = '';
     }
   }
 
-  // Every language finding is an error. The vocabulary is the project's own, so
-  // a term it rejects is a term it chose to reject.
-  for (const finding of languageFindings) err(finding);
+  // A rejected synonym is always an error. The vocabulary is the project's own,
+  // so a term it rejects is a term it chose to reject. A consumer that sets
+  // `prose.enforcement` to `report` gets the prose measures, the baseline and
+  // the mannered terms as advisories instead: they are counted and printed, and
+  // they do not fail the run. That consumer names the overridden provisions in
+  // its `overrides`. (standards/rule/core-agent.apply-guidance-precedence)
+  const proseReportOnly = project.prose?.enforcement === 'report';
+  const proseErr = proseReportOnly ? advise : err;
+  for (const finding of languageFindings) {
+    if (finding.includes('LANGUAGE_MANNERED_TERM')) proseErr(finding);
+    else err(finding);
+  }
 
   let accepted = 0;
   for (const [rel, count] of proseCounts) {
     const entry = baseline[rel];
-    if (!entry) { err(`${rel}: ${count} controlled-prose problem(s) and no prose baseline entry; run 'node standards/tools/validate-consumer.mjs --prose' to list them`); continue; }
-    if (count > entry.count) { err(`${rel}: controlled-prose problems grew from ${entry.count} to ${count}; the baseline records accepted debt and does not absorb new debt`); continue; }
+    if (!entry) { proseErr(`${rel}: ${count} controlled-prose problem(s) and no prose baseline entry; run 'node standards/tools/validate-consumer.mjs --prose' to list them`); continue; }
+    if (count > entry.count) { proseErr(`${rel}: controlled-prose problems grew from ${entry.count} to ${count}; the baseline records accepted debt and does not absorb new debt`); continue; }
     const reviewed = reviewedOf.get(rel);
     if (reviewed && entry.lastReviewed && reviewed > entry.lastReviewed) {
-      err(`${rel}: lastReviewed moved to ${reviewed} while ${count} controlled-prose problem(s) remain; a page read against the code leaves the prose baseline in the same change`);
+      proseErr(`${rel}: lastReviewed moved to ${reviewed} while ${count} controlled-prose problem(s) remain; a page read against the code leaves the prose baseline in the same change`);
       continue;
     }
     accepted += 1;
   }
   for (const rel of Object.keys(baseline)) {
-    if (!proseCounts.has(rel)) err(`${rel}: listed in the prose baseline and now clean; remove the entry so the baseline states real debt`);
+    if (!proseCounts.has(rel)) proseErr(`${rel}: listed in the prose baseline and now clean; remove the entry so the baseline states real debt`);
   }
   const manneredCount = languageFindings.filter((f) => f.includes('LANGUAGE_MANNERED_TERM')).length;
   const rejectedCount = languageFindings.length - manneredCount;
@@ -1184,6 +1196,7 @@ if (jsonOutput) {
     testFiles,
     endToEndIds: e2eDefs.size,
     problems: errors,
+    advisories,
   }, null, 2));
   process.exit(errors.length ? 1 : 0);
 }
@@ -1194,6 +1207,11 @@ console.log(identifierSummary);
 console.log(`Acceptance ids: ${acDefs.size}, end-to-end test ids: ${e2eDefs.size}`);
 if (testRoots.length) console.log(`Acceptance citations: ${citations.size} of ${acDefs.size} criteria cited across ${testFiles} test source file(s)`);
 if (uiOutput) console.log(`\n${uiOutput}`);
+if (advisories.length) {
+  // The count and the worst pages are in the Language line; --prose lists every measure.
+  console.log(`\nADVISORY (${advisories.length} prose finding(s), reported because prose.enforcement is 'report')`);
+  if (process.argv.includes('--prose')) for (const a of advisories) console.log(`  - ${a}`);
+}
 if (errors.length) {
   console.log(`\nFAIL (${errors.length} problem(s)):`);
   for (const e of errors) console.log(`  - ${e}`);

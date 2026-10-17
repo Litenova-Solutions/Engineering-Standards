@@ -189,6 +189,10 @@
         "baseline": {
           "description": "Defaults to prose-baseline.json under the documentation root.",
           "$ref": "#/$defs/projectPath"
+        },
+        "enforcement": {
+          "description": "Whether the prose measures, the prose baseline and the mannered terms fail the consumer validator ('refuse', the default) or are reported as advisories ('report'). Rejected synonyms always fail. A consumer that reports names the overridden provisions in 'overrides'.",
+          "enum": ["refuse", "report"]
         }
       }
     },
