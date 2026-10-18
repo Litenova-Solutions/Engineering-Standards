@@ -8,13 +8,17 @@ Retention, deletion, archival, and restore behavior follows the business and leg
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `workflow`, `domain-policy`.
+Applicable specification kinds: `use-case`, `rule`.
 
 The consumer enables `lifecycle` when a use case requires deletion, retention, archival, restore, legal hold, subject-access export, or post-deletion uniqueness behavior.
 
-## Baseline relationship
+## Replaces
 
 This extension replaces no baseline rule.
+
+## Switches on
+
+This extension switches on the Limit record type.
 
 ## Agent Summary {#agent-summary}
 
@@ -29,7 +33,7 @@ This extension replaces no baseline rule.
 
 ### Record lifecycle scope (standards/rule/ext-lifecycle.record-lifecycle-scope)
 
-**Requirement:** A lifecycle use case or decision MUST name data classification, retention, deletion trigger, purge owner, hold, export, restore, and backup behavior.
+**Requirement:** A lifecycle use case or decision MUST name data classification, retention, deletion trigger, purge owner, hold, export, restore, and backup behavior. The record names its owner and status, and a draft names its decider and decide-by date. Retention bounds are Limit records.
 
 **Rationale:** The contract establishes the data lifetime and the owner of each later action.
 
@@ -61,7 +65,7 @@ This extension replaces no baseline rule.
 
 ### Authorize and audit lifecycle changes (standards/rule/ext-lifecycle.authorize-and-audit-lifecycle-changes)
 
-**Requirement:** A lifecycle operation MUST apply its documented authorization and audit requirements.
+**Requirement:** A lifecycle operation MUST apply its documented authorization. It records its audit as an audit record when the audit extension is selected, and as a standalone record otherwise.
 
 **Rationale:** Retention and deletion can have legal and business consequences.
 
@@ -121,7 +125,7 @@ This extension replaces no baseline rule.
 
 ### Record the release of a legal hold (standards/rule/ext-lifecycle.record-the-release-of-a-legal-hold)
 
-**Requirement:** The release of a legal hold MUST produce a record naming the actor, the data covered, the reason, and the retention that resumes.
+**Requirement:** The release of a legal hold MUST produce a record naming the actor, the data covered, the reason, and the retention that resumes. The record is an audit record when the audit extension is selected, and a standalone record otherwise.
 
 **Rationale:** A hold suspends an erasure obligation, so its release is the moment that obligation resumes. Without a record, nothing states when the suspension ended, and a subject's [erasure request](https://gdpr-info.eu/art-17-gdpr/) cannot be answered with a date. The release is also the point where data becomes deletable again, so the next retention run needs it to be unambiguous.
 
@@ -139,7 +143,7 @@ This extension replaces no baseline rule.
 
 **Default:** Use `deleted_at_utc` when a soft-delete timestamp is required.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** The name states the lifecycle event and timestamp unit.
 
@@ -147,7 +151,7 @@ This extension replaces no baseline rule.
 
 **Default:** Keep archive records under the owning module.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** The module owns archive semantics and its access controls.
 
@@ -155,7 +159,7 @@ This extension replaces no baseline rule.
 
 **Default:** Use a separate read model when archived history is query-shaped instead of an aggregate invariant.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** Query-shaped history does not need to enlarge the transactional aggregate boundary.
 
@@ -165,25 +169,25 @@ None.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-lifecycle.record-lifecycle-scope | inspection | Lifecycle documentation names every required lifecycle field and owner. |
-| standards/rule/ext-lifecycle.default-to-hard-delete | test | `DataDeleteTests` asserts tests prove hard deletion when no retention or restore requirement applies. |
-| standards/rule/ext-lifecycle.model-retained-lifecycle-states | test | `DataDeleteTests` prove documented soft-delete or archive transitions. |
-| standards/rule/ext-lifecycle.reject-hidden-lifecycle-flags | inspection | Lifecycle review identifies aggregate behavior beyond a hidden boolean. |
-| standards/rule/ext-lifecycle.model-lifecycle-operations-in-domain | test | `DataBehaviorTests` exercise each applicable delete, archive, and restore behavior. |
-| standards/rule/ext-lifecycle.authorize-and-audit-lifecycle-changes | test | `DataBehaviorTests` prove documented authorization and audit evidence. |
-| standards/rule/ext-lifecycle.exclude-persistence-only-lifecycle-behavior | inspection | Source review finds no lifecycle rule implemented only by storage behavior. |
-| standards/rule/ext-lifecycle.exclude-inactive-records-from-normal-reads | test | `DataReadTests` exclude deleted and archived records. |
-| standards/rule/ext-lifecycle.authorize-lifecycle-access-paths | test | `DataReadTests` require named authorized access. |
-| standards/rule/ext-lifecycle.define-post-deletion-references | inspection | Specifications define references, export, and uniqueness behavior after deletion. |
-| standards/rule/ext-lifecycle.define-storage-lifecycle-behavior | test | `DataStorageTests` cover declared document lifecycle behavior. |
-| standards/rule/ext-lifecycle.define-relational-lifecycle-behavior | test | `DataStorageTests` cover declared relational lifecycle behavior. |
-| standards/rule/ext-lifecycle.test-provider-lifecycle-paths | test | `DataStorageTests` cover active, deleted, archived, administrative, and restore queries. |
-| standards/rule/ext-lifecycle.bound-purge-and-archive-work | test | `DataPurgeTests` cover batching, cancellation, resume, and observable progress. |
-| standards/rule/ext-lifecycle.preserve-legal-hold-data | test | `DataPurgeTests` remain retained during scheduled lifecycle work. |
-| standards/rule/ext-lifecycle.align-backup-deletion-behavior | operation | Backup and replica records show the documented deletion guarantee. |
-| standards/rule/ext-lifecycle.record-the-release-of-a-legal-hold | test | `DataPurgeTests` assert a hold release writes its record, and the next run deletes the released data. |
-| standards/rule/ext-lifecycle.name-soft-delete-timestamps | inspection | Soft-delete timestamp names use the default or record a local replacement. |
-| standards/rule/ext-lifecycle.keep-archive-records-module-owned | inspection | Archive source paths remain within the owning module or record a replacement. |
-| standards/rule/ext-lifecycle.separate-query-shaped-history | inspection | Query-shaped archive history uses a read model or records a replacement. |
+| standards/rule/ext-lifecycle.record-lifecycle-scope | guidance | Does each lifecycle record name every required field, its owner, and its status? |
+| standards/rule/ext-lifecycle.default-to-hard-delete | guidance | Is deletion hard wherever no retention or restore requirement applies? |
+| standards/rule/ext-lifecycle.model-retained-lifecycle-states | guidance | Does each retained record have a business reason and explicit transition? |
+| standards/rule/ext-lifecycle.reject-hidden-lifecycle-flags | guidance | Is lifecycle behavior more than a hidden boolean? |
+| standards/rule/ext-lifecycle.model-lifecycle-operations-in-domain | guidance | Does the aggregate expose each applicable lifecycle operation? |
+| standards/rule/ext-lifecycle.authorize-and-audit-lifecycle-changes | guidance | Does each operation apply its authorization and record its audit? |
+| standards/rule/ext-lifecycle.exclude-persistence-only-lifecycle-behavior | guidance | Is any lifecycle rule implemented only by storage behavior? |
+| standards/rule/ext-lifecycle.exclude-inactive-records-from-normal-reads | guidance | Do normal queries exclude deleted and archived records? |
+| standards/rule/ext-lifecycle.authorize-lifecycle-access-paths | guidance | Do administrative and restore queries use named authorized paths? |
+| standards/rule/ext-lifecycle.define-post-deletion-references | guidance | Does the specification define post-deletion references, exports, and uniqueness? |
+| standards/rule/ext-lifecycle.define-storage-lifecycle-behavior | guidance | Does the document implementation define state, queries, indexes, and purge behavior? |
+| standards/rule/ext-lifecycle.define-relational-lifecycle-behavior | guidance | Does the relational implementation define columns, filters, indexes, and migrations? |
+| standards/rule/ext-lifecycle.test-provider-lifecycle-paths | guidance | Do tests cover normal and lifecycle query paths? |
+| standards/rule/ext-lifecycle.bound-purge-and-archive-work | guidance | Is purge and archive work resumable, bounded, and observable? |
+| standards/rule/ext-lifecycle.preserve-legal-hold-data | guidance | Does retention work record progress and preserve held data? |
+| standards/rule/ext-lifecycle.record-the-release-of-a-legal-hold | guidance | Does each hold release record actor, data, reason, and resumed retention? |
+| standards/rule/ext-lifecycle.align-backup-deletion-behavior | guidance | Do backups and replicas follow the documented deletion guarantee? |
+| standards/rule/ext-lifecycle.name-soft-delete-timestamps | guidance | Do soft-delete timestamps use the default or record an Exception? |
+| standards/rule/ext-lifecycle.keep-archive-records-module-owned | guidance | Do archive records stay in the owning module or record an Exception? |
+| standards/rule/ext-lifecycle.separate-query-shaped-history | guidance | Is query-shaped history a read model or is an Exception recorded? |

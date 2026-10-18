@@ -10,11 +10,15 @@ Activation scope: `project`.
 
 Applicable specification kinds: None.
 
-The consumer enables `locale` when the product supports more than one locale. A possible future translation does not activate it.
+The consumer enables `locale` when the product supports more than one locale. A possible future translation does not activate it. The product brief or decision records locales, default locale, fallback behavior, and URL strategy.
 
-## Baseline relationship
+## Replaces
 
-The product brief or decision records locales, default locale, fallback behavior, and URL strategy. This extension replaces no baseline rule.
+This extension replaces no baseline rule.
+
+## Switches on
+
+This extension switches on no record type.
 
 ## Agent Summary {#agent-summary}
 
@@ -30,7 +34,7 @@ The product brief or decision records locales, default locale, fallback behavior
 
 ### Record supported locale behavior (standards/rule/ext-locale.record-supported-locale-behavior)
 
-**Requirement:** A localization decision MUST list supported locale identifiers, default locale, fallback chain, user selection, and browser-detection behavior.
+**Requirement:** A localization decision MUST list supported locale identifiers, default locale, fallback chain, user selection, and browser-detection behavior. The record names its owner and status, and a draft names its decider and decide-by date.
 
 **Rationale:** One decision defines the product's locale contract before catalogs and routes appear.
 
@@ -44,7 +48,7 @@ The product brief or decision records locales, default locale, fallback behavior
 
 **Requirement:** A localized application MUST define one documented locale route shape.
 
-**Rationale:** One shape gives users, crawlers, and links a predictable localized address. A path segment is the baseline shape. It makes every localized page a distinct address that a link, a crawler, and a cache entry can each name. A cookie or header shape serves several locales from one address, so a shared cache and a search index see one of them. An application with no public pages, whose locale is a property of the signed-in account, documents one of those shapes instead.
+**Rationale:** One shape gives users, crawlers, and links a predictable localized address. A path segment is the default shape. It makes every localized page a distinct address that a link, a crawler, and a cache entry can each name. A cookie or header shape serves several locales from one address, so a shared cache and a search index see one of them. An application with no public pages, whose locale is a property of the signed-in account, documents one of those shapes instead.
 
 **Example:** `/nl/orders/42` places the locale in the documented path segment, so a crawler and a shared cache each address one language.
 
@@ -68,7 +72,7 @@ The product brief or decision records locales, default locale, fallback behavior
 
 ### Name messages by meaning (standards/rule/ext-locale.name-messages-by-meaning)
 
-**Requirement:** A locale catalog MUST use semantic keys rather than source-language sentences.
+**Requirement:** A locale catalog MUST use semantic keys that cite Term records rather than source-language sentences.
 
 **Rationale:** A meaning-based key remains stable when one language changes wording.
 
@@ -86,19 +90,19 @@ The declaration states the fallback locale and what a missing key does at build 
 
 ### Follow the validation message grammar (standards/rule/ext-locale.follow-the-validation-message-grammar)
 
-**Requirement:** A validation catalog MUST write empty-field errors as field-naming imperatives and format or length errors with the concrete bound, without `please`.
+**Requirement:** A validation catalog MUST state the field label, what is wrong, and what is accepted, without technical wording.
 
-**Rationale:** [The GOV.UK Design System](https://design-system.service.gov.uk/components/error-message/) separates the two forms because each answers a different failure. An imperative tells the reader what to do next, and a bound tells the reader what the limit is rather than that one exists.
+**Rationale:** The shape holds in every language, and each language's sentence pattern lives on the field's Term labels and the language's writing page.
 
-**Example:** The empty case is "Enter your email address". The format case is "Enter an email address in the correct format, like name@example.com". A length case carries the count: "Name must be 200 characters or less".
+**Example:** The Term record for a field carries the sentence pattern for each supported language.
 
 ### Resolve every shown identifier (standards/rule/ext-locale.resolve-every-shown-identifier)
 
-**Requirement:** A screen MUST resolve every machine identifier it renders to a humanized catalog label and never render the raw identifier.
+**Requirement:** A screen MUST resolve every closed-set code it renders to its Term record label and never render the raw code. User-facing reference numbers are not closed-set codes.
 
-**Rationale:** The identifier is a contract value and the label is copy. A resolution value, a refusal ground, a role code, or a billing state carries its label beside the rest of the screen's copy.
+**Rationale:** The code is a contract value and the Term label is copy. A resolution value, a refusal ground, a role code, or a billing state carries its label beside the rest of the screen's copy.
 
-**Example:** An oversell resolution row shows "Stock returned" from the catalog rather than `inventory-reacquired`.
+**Example:** A shipment row shows the Term label for `shipment-delayed` in the active locale.
 
 ### Format values with active locale (standards/rule/ext-locale.format-values-with-active-locale)
 
@@ -134,7 +138,7 @@ The platform supplies every one of them. [The `Intl` namespace](https://develope
 
 **Default:** Keep catalogs under one application-owned locale root.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** One root makes ownership and catalog discovery predictable.
 
@@ -142,7 +146,7 @@ The platform supplies every one of them. [The `Intl` namespace](https://develope
 
 **Default:** Split catalogs by module only when catalog size requires it.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** Module splitting follows a measured size boundary instead of early fragmentation.
 
@@ -150,7 +154,7 @@ The platform supplies every one of them. [The `Intl` namespace](https://develope
 
 **Default:** Use BCP 47 locale identifiers.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** BCP 47 gives routes, catalogs, and selection one familiar identifier form.
 
@@ -158,7 +162,7 @@ The platform supplies every one of them. [The `Intl` namespace](https://develope
 
 **Default:** Keep locale selection in the URL or documented session preference.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** Explicit selection avoids an implicit global locale that callers cannot inspect.
 
@@ -168,23 +172,23 @@ No library is selected by this extension. A localization package needs a decisio
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-locale.record-supported-locale-behavior | inspection | Product brief or decision lists the required locale contract fields. |
-| standards/rule/ext-locale.avoid-catalog-only-locale-claims | inspection | Locale support review cites the decision rather than catalog presence. |
-| standards/rule/ext-locale.define-one-locale-route-shape | test | `LocaleRoutesTests` exercise the documented localized URL shape. |
-| standards/rule/ext-locale.handle-unavailable-locale-segments | test | `LocaleRoutesTests` follow product fallback policy. |
-| standards/rule/ext-locale.avoid-duplicate-localized-urls | static | `LocaleRoutesTests` asserts crawl or route review identifies one indexable URL per localized content item. |
-| standards/rule/ext-locale.store-user-facing-copy-in-catalogs | static | `LocaleMessagesTests` resolves copy through locale catalogs. |
-| standards/rule/ext-locale.name-messages-by-meaning | inspection | Catalog review identifies semantic message keys. |
-| standards/rule/ext-locale.complete-or-fall-back-catalog-values | test | `LocaleMessagesTests` asserts each supported locale resolves required keys or declared fallback. |
-| standards/rule/ext-locale.follow-the-validation-message-grammar | inspection | Catalog review asserts each empty-field message is imperative and each bound message states the count. |
-| standards/rule/ext-locale.resolve-every-shown-identifier | inspection | Screen review finds no raw kebab-case or dotted identifier rendered without a catalog label. |
-| standards/rule/ext-locale.format-values-with-active-locale | test | `LocaleFormatTests` verify dates, numbers, currency, plurals, lists, and relative time. |
-| standards/rule/ext-locale.preserve-locale-neutral-business-data | inspection | Domain and OpenAPI review confirms locale-neutral stored and wire values. |
-| standards/rule/ext-locale.localize-public-presentation-content | test | `LocaleContentTests` render metadata, labels, validation, and safe errors in active locale. |
-| standards/rule/ext-locale.keep-stable-error-codes-locale-neutral | test | `LocaleContentTests` retain stable codes across locale selections. |
-| standards/rule/ext-locale.use-one-catalog-root | inspection | Catalog paths use the owned root or record a local replacement. |
-| standards/rule/ext-locale.split-catalogs-by-module-when-needed | inspection | Module catalog splits record their size rationale. |
-| standards/rule/ext-locale.use-bcp-47-identifiers | static | `LocaleTests` accepts BCP 47 values or a recorded replacement. |
-| standards/rule/ext-locale.keep-locale-selection-explicit | test | `LocaleTests` use URL or documented session preference. |
+| standards/rule/ext-locale.record-supported-locale-behavior | guidance | Does the decision list locales, default, fallback, selection, owner, and status? |
+| standards/rule/ext-locale.avoid-catalog-only-locale-claims | guidance | Is supported-locale evidence the decision rather than catalog files? |
+| standards/rule/ext-locale.define-one-locale-route-shape | guidance | Does the application define and use one locale route shape? |
+| standards/rule/ext-locale.handle-unavailable-locale-segments | guidance | Do unsupported or missing locale segments follow product policy? |
+| standards/rule/ext-locale.avoid-duplicate-localized-urls | guidance | Is there one indexable URL per localized content item? |
+| standards/rule/ext-locale.store-user-facing-copy-in-catalogs | guidance | Is user-facing copy stored in locale catalogs? |
+| standards/rule/ext-locale.name-messages-by-meaning | guidance | Do catalog keys cite Term records instead of source sentences? |
+| standards/rule/ext-locale.complete-or-fall-back-catalog-values | guidance | Does each locale resolve required keys or use its declared fallback? |
+| standards/rule/ext-locale.follow-the-validation-message-grammar | guidance | Does each validation message state label, fault, and accepted input? |
+| standards/rule/ext-locale.resolve-every-shown-identifier | guidance | Does each shown code render its Term label rather than the raw code? |
+| standards/rule/ext-locale.format-values-with-active-locale | guidance | Are dates, numbers, currency, plurals, lists, and relative time localized? |
+| standards/rule/ext-locale.preserve-locale-neutral-business-data | guidance | Do Domain values and API contracts stay locale-neutral? |
+| standards/rule/ext-locale.localize-public-presentation-content | guidance | Do metadata, labels, validation, and safe errors follow the active locale? |
+| standards/rule/ext-locale.keep-stable-error-codes-locale-neutral | guidance | Is each stable error code identical across locales? |
+| standards/rule/ext-locale.use-one-catalog-root | guidance | Do catalogs sit under one owned root or record an Exception? |
+| standards/rule/ext-locale.split-catalogs-by-module-when-needed | guidance | Is each module split justified by size or is an Exception recorded? |
+| standards/rule/ext-locale.use-bcp-47-identifiers | guidance | Are locale identifiers BCP 47 or is an Exception recorded? |
+| standards/rule/ext-locale.keep-locale-selection-explicit | guidance | Is selection in the URL or a documented session preference? |

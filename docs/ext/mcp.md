@@ -2,25 +2,33 @@
 
 ## Intent
 
-An MCP server presents the product's API to an LLM client running outside the product. This page states how the server presents itself, describes its tools, and words its refusals.
+An MCP server presents the product's API to an LLM client running outside the product. The API provisions own the behavior the server calls. This page states how the server presents itself, describes its tools, and words its refusals.
 
 ## Activation
 
 Activation scope: `project`.
 
-Applicable specification kinds: None.
+Applicable specification kinds: `entry-point`.
 
-The consumer selects `mcp` when the product ships a Model Context Protocol server that an LLM client starts on a user's own machine. An internal integration the product itself hosts does not select it.
+The consumer selects `mcp` when the product ships a Model Context Protocol server that an LLM client starts on a user's own machine. An internal integration the product itself hosts does not select it. The server acts as an authenticated user or API key against the public API and holds no permission of its own. Authentication and authorization stay with the baseline API and security pages.
 
-## Baseline relationship
+## Replaces
 
-The API provisions own the behavior the server calls, and the frontend provisions own nothing here because the server renders no pages. This extension adds presentation rules for the LLM consumer and replaces no baseline rule.
+This extension replaces no baseline rule.
+
+## Switches on
+
+This extension switches on no record type.
 
 ## Agent Summary {#agent-summary}
 
 - Pass server instructions at initialize. (standards/rule/ext-mcp.pass-server-instructions-at-initialize)
 - Title each tool imperatively and describe it declaratively. (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
 - State parameter polarity and side effects in descriptions. (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
+- Scope each tool to named use cases and permissions. (standards/rule/ext-mcp.scope-each-tool-to-named-use-cases)
+- Confirm every writing tool explicitly. (standards/rule/ext-mcp.confirm-every-writing-tool)
+- Exclude secrets and personal data from tool surfaces. (standards/rule/ext-mcp.exclude-secrets-and-personal-data)
+- State the distribution and update path. (standards/rule/ext-mcp.state-the-distribution-and-update-path)
 - State the refusing side on each refusal. (standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal)
 
 ## Standards
@@ -31,7 +39,7 @@ The API provisions own the behavior the server calls, and the frontend provision
 
 **Rationale:** The MCP specification's initialize response carries server instructions, and a client loads them once per session while it loads each tool description per call. Scope and policy therefore belong at the server level, because they hold for every call. Tool mechanics stay in the tool descriptions, where the model reads them at the moment it chooses.
 
-**Example:** "Runs over stdio, one merchant per process, against the hosted API. Reads cover the merchant's own data, and three tools create or change records. A policy refusal returns the problem code, and a write needing a person's confirmation refuses until they give it."
+**Example:** "Runs over stdio, one account per process, against the hosted API. Reads cover the account's own data, and three tools create or change records. A policy refusal returns the problem code, and a write needing a person's confirmation refuses until they give it."
 
 ### Write one tool description for one decision (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
 
@@ -54,24 +62,52 @@ The API provisions own the behavior the server calls, and the frontend provision
 }
 ```
 
+### Scope each tool to named use cases (standards/rule/ext-mcp.scope-each-tool-to-named-use-cases)
+
+**Requirement:** Each tool MUST name the use cases and permissions it reaches.
+
+**Rationale:** A stated scope lets a reviewer tell which product behavior the tool exposes.
+
+### Confirm every writing tool (standards/rule/ext-mcp.confirm-every-writing-tool)
+
+**Requirement:** Every tool that writes MUST refuse until the person confirms the write.
+
+**Rationale:** A person approves each write before the model performs it.
+
+### Exclude secrets and personal data (standards/rule/ext-mcp.exclude-secrets-and-personal-data)
+
+**Requirement:** Tool descriptions and logs MUST exclude secrets and personal data.
+
+**Rationale:** Descriptions reach the model and logs reach operators, and neither needs values that grant access or identify a person.
+
+### State the distribution and update path (standards/rule/ext-mcp.state-the-distribution-and-update-path)
+
+**Requirement:** The server documentation MUST state how a user installs and updates the server.
+
+**Rationale:** A locally installed server needs a stated path from release to machine.
+
 ## Conventions
 
 ### State the refusing side on each refusal (standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal)
 
 **Default:** Prefix an input-shape refusal with `Needs:`, a human-confirmation refusal with `Needs confirmation:`, and a server-side refusal with `Refused:`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** The prefix tells the model which side of the boundary failed. It then repairs its own input, asks the person, or reports the server, without retrying a refusal a retry cannot satisfy.
 
 ## Dependencies
 
-No library is selected by this extension. An MCP SDK needs a decision and a manifest pin.
+No library is selected by this extension. An MCP SDK needs a decision; the manifest already pins `@modelcontextprotocol/server`.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-mcp.pass-server-instructions-at-initialize | static | The server construction passes a non-empty `instructions` value to the MCP server. |
-| standards/rule/ext-mcp.write-one-tool-description-for-one-decision | static | `apps/mcp/src/tools/` review finds imperative titles, declarative descriptions, positive booleans, and stated side effects. |
-| standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal | inspection | Refusal strings carry the three prefixes or record a local replacement. |
+| standards/rule/ext-mcp.pass-server-instructions-at-initialize | guidance | Does the server pass a non-empty instructions value at initialize? |
+| standards/rule/ext-mcp.write-one-tool-description-for-one-decision | guidance | Does {path}, the declared tools directory, show imperative titles and stated side effects? |
+| standards/rule/ext-mcp.scope-each-tool-to-named-use-cases | guidance | Does each tool name the use cases and permissions it reaches? |
+| standards/rule/ext-mcp.confirm-every-writing-tool | guidance | Does every writing tool refuse until the person confirms? |
+| standards/rule/ext-mcp.exclude-secrets-and-personal-data | guidance | Are descriptions and logs free of secrets and personal data? |
+| standards/rule/ext-mcp.state-the-distribution-and-update-path | guidance | Does the documentation state install and update steps? |
+| standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal | guidance | Do refusals carry the three prefixes or record an Exception? |

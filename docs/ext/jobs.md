@@ -8,19 +8,25 @@ Scheduled work runs independently of HTTP requests and remains safe when replica
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `workflow`, `end-to-end-flow`.
+Applicable specification kinds: `use-case`, `journey`.
 
 The consumer enables `jobs` for recurring, delayed, or calendar-based work. It activates `standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request`, so the project declares the execution host that runs the scheduler.
 
-## Baseline relationship
+## Replaces
 
 This extension replaces no baseline rule.
+
+## Switches on
+
+This extension switches on the Limit and Runbook record types.
 
 ## Agent Summary {#agent-summary}
 
 - Record timing, overlap, retry, and owner behavior. (standards/rule/ext-jobs.record-schedule-behavior)
 - Run jobs in Worker with bounded execution. (standards/rule/ext-jobs.run-jobs-in-worker, standards/rule/ext-jobs.bound-job-execution)
 - Lease an occurrence across replicas. (standards/rule/ext-jobs.store-execution-leases)
+- Generate fencing values monotonically per occurrence. (standards/rule/ext-jobs.generate-monotonic-fencing-values)
+- Scope occurrences and leases by tenant. (standards/rule/ext-jobs.scope-occurrences-and-leases-by-tenant)
 - Dispatch Application commands without direct storage mutation. (standards/rule/ext-jobs.dispatch-application-behavior, standards/rule/ext-jobs.exclude-direct-storage-and-http-execution)
 - Bound retry and support duplicate execution. (standards/rule/ext-jobs.bound-job-retries, standards/rule/ext-jobs.tolerate-duplicate-execution)
 - Define missed-occurrence and manual-replay behavior. (standards/rule/ext-jobs.persist-occurrence-recovery-points, standards/rule/ext-jobs.define-misfire-recovery)
@@ -30,7 +36,7 @@ This extension replaces no baseline rule.
 
 ### Record schedule behavior (standards/rule/ext-jobs.record-schedule-behavior)
 
-**Requirement:** A scheduled-job use case or decision MUST name schedule, time zone, delay, overlap, misfire, idempotency, retry, and operating owner.
+**Requirement:** A scheduled-job use case or decision MUST name schedule, time zone, delay, overlap, misfire, idempotency, retry, and operating owner. The record names its owner and status, and a draft names its decider and decide-by date.
 
 **Rationale:** The contract describes when work may run and how it recovers from normal scheduling faults.
 
@@ -50,7 +56,7 @@ This extension replaces no baseline rule.
 
 **Requirement:** A scheduled-job store MUST record lease owner, expiry, and fencing value in PostgreSQL.
 
-**Rationale:** The lease identifies the replica that can complete one planned occurrence.
+**Rationale:** The lease identifies the replica that can complete one planned occurrence. The outbox extension cites this definition for its own claims.
 
 ### Renew only owned leases (standards/rule/ext-jobs.renew-only-owned-leases)
 
@@ -63,6 +69,18 @@ This extension replaces no baseline rule.
 **Requirement:** A scheduled-job lease MUST prevent two replicas from completing the same occurrence.
 
 **Rationale:** One occurrence needs one logical completion even when replicas overlap.
+
+### Generate monotonic fencing values (standards/rule/ext-jobs.generate-monotonic-fencing-values)
+
+**Requirement:** A scheduled-job store MUST generate each fencing value monotonically per occurrence and check it on every completion write.
+
+**Rationale:** A monotonic value lets the store reject a completion from a worker that no longer owns the lease.
+
+### Scope occurrences and leases by tenant (standards/rule/ext-jobs.scope-occurrences-and-leases-by-tenant)
+
+**Requirement:** A scheduled-job occurrence and its lease MUST carry tenant scope when the product isolates tenants.
+
+**Rationale:** Tenant scope keeps one tenant's scheduled work separate from another's.
 
 ### Dispatch Application behavior (standards/rule/ext-jobs.dispatch-application-behavior)
 
@@ -90,9 +108,9 @@ This extension replaces no baseline rule.
 
 ### Treat unavailable schedule stores as outages (standards/rule/ext-jobs.treat-unavailable-schedule-stores-as-outages)
 
-**Requirement:** A Worker MUST treat an unavailable scheduler store as a transient dependency outage with backed-off, rate-limited logging.
+**Requirement:** A Worker MUST treat an unavailable scheduler store as the store outage `standards/rule/ext-outbox.distinguish-dependency-outage` defines, with backed-off, rate-limited logging.
 
-**Rationale:** The implementation stores availability differs from a claimed occurrence's retry or poison outcome.
+**Rationale:** Store availability differs from a claimed occurrence's retry or poison outcome.
 
 ### Persist occurrence recovery points (standards/rule/ext-jobs.persist-occurrence-recovery-points)
 
@@ -108,7 +126,7 @@ This extension replaces no baseline rule.
 
 ### Provide operational recovery procedures (standards/rule/ext-jobs.provide-operational-recovery-procedures)
 
-**Requirement:** A scheduled-job owner MUST provide inspection, manual replay, and disable procedures.
+**Requirement:** A scheduled-job owner MUST provide Runbook records for inspection, manual replay, and disable.
 
 **Rationale:** Operators need controlled actions for stalled, failed, or unsafe schedules.
 
@@ -118,11 +136,11 @@ Each procedure names the interface that performs it. A procedure that reads "dis
 
 ### Derive stable occurrence identity (standards/rule/ext-jobs.derive-stable-occurrence-identity)
 
-**Requirement:** A scheduled-job store MUST derive each occurrence identity from its schedule ID and scheduled instant.
+**Requirement:** A scheduled-job store MUST derive each occurrence identity from its schedule ID and scheduled instant. The schedule declares occurrence retention as a Limit record, and the store removes older occurrences.
 
 **Rationale:** One planned time receives one stable identity across retries and replicas.
 
-The key space grows with the schedule's frequency and its retention, so a per-second schedule kept for a year is over thirty million rows. A schedule therefore declares how long its occurrences are retained, and the store removes the rest. [Quartz states the same practice](https://quartz-scheduler.net/documentation/best-practices.html) for a persistent job store.
+The key space grows with the schedule's frequency and its retention, so a per-second schedule kept for a year is over thirty million rows. [Quartz states the same practice](https://quartz-scheduler.net/documentation/best-practices.html) for a persistent job store.
 
 **Example:** A daily schedule retaining occurrences for ninety days holds ninety rows. A minute schedule at the same retention holds over a hundred thousand, which is a different storage decision.
 
@@ -146,7 +164,7 @@ The key space grows with the schedule's frequency and its retention, so a per-se
 
 ### Audit manual replay (standards/rule/ext-jobs.audit-manual-replay)
 
-**Requirement:** A manual replay MUST create an audited new attempt for the same occurrence identity.
+**Requirement:** A manual replay MUST create a new attempt for the same occurrence identity. The attempt is an audit record when the audit extension is selected, and a standalone record otherwise.
 
 **Rationale:** Replay preserves the original scheduled instant and its history.
 
@@ -180,7 +198,7 @@ The key space grows with the schedule's frequency and its retention, so a per-se
 
 **Default:** Create one job handler under the module that owns its behavior.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** The module owns the business action and its schedule meaning.
 
@@ -188,7 +206,7 @@ The key space grows with the schedule's frequency and its retention, so a per-se
 
 **Default:** Resolve scoped dependencies inside an execution scope and dispose the scope after the Command completes.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** One scope isolates a job occurrence's dependencies and disposal.
 
@@ -196,7 +214,7 @@ The key space grows with the schedule's frequency and its retention, so a per-se
 
 **Default:** Keep schedule definitions separate from Command behavior.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
 **Rationale:** Timing policy and business behavior change for different reasons.
 
@@ -206,31 +224,33 @@ No additional baseline package is required. Schedule state uses selected persist
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-jobs.record-schedule-behavior | inspection | Job documentation records each required schedule and operating field. |
-| standards/rule/ext-jobs.run-jobs-in-worker | test | `JobsWorkerTests` run through Worker rather than WebApi. |
-| standards/rule/ext-jobs.bound-job-execution | test | `JobsWorkerTests` stop new job work and honor cancellation and duration bounds. |
-| standards/rule/ext-jobs.store-execution-leases | test | `JobsLeaseTests` store owner, expiry, and fencing value. |
-| standards/rule/ext-jobs.renew-only-owned-leases | test | `JobsLeaseTests` stop the worker after ownership loss. |
-| standards/rule/ext-jobs.prevent-duplicate-completion | test | `JobsLeaseTests` produce one completed occurrence. |
-| standards/rule/ext-jobs.dispatch-application-behavior | static | `JobsCommandTests` asserts job source dispatches an Application Command or approved port. |
-| standards/rule/ext-jobs.exclude-direct-storage-and-http-execution | static | `JobsCommandTests` asserts job source contains no direct session, DbContext, Domain bypass, or WebApi call. |
-| standards/rule/ext-jobs.bound-job-retries | test | `JobsRetryTests` exercise attempt bounds, backoff, cancellation, and poison state. |
-| standards/rule/ext-jobs.tolerate-duplicate-execution | test | `JobsRetryTests` leave correct command and side-effect outcomes. |
-| standards/rule/ext-jobs.treat-unavailable-schedule-stores-as-outages | test | `JobsRetryTests` use backed-off, rate-limited logging. |
-| standards/rule/ext-jobs.persist-occurrence-recovery-points | test | `JobsRecoveryTests` retain scheduled, started, and completed occurrence times. |
-| standards/rule/ext-jobs.define-misfire-recovery | test | `JobsRecoveryTests` follow the documented skip or replay policy. |
-| standards/rule/ext-jobs.provide-operational-recovery-procedures | operation | Runbooks provide inspection, manual replay, and disable procedures. |
-| standards/rule/ext-jobs.derive-stable-occurrence-identity | test | `JobsOccurrenceTests` derive stable IDs from schedule ID and instant. |
-| standards/rule/ext-jobs.persist-occurrence-state | test | `JobsOccurrenceTests` persist all declared occurrence lifecycle states. |
-| standards/rule/ext-jobs.scope-command-idempotency-by-occurrence | test | `JobsOccurrenceTests` asserts duplicate occurrence commands use one idempotency scope. |
-| standards/rule/ext-jobs.restrict-completion-by-fencing-value | test | `JobsOccurrenceTests` cannot mark an occurrence complete. |
-| standards/rule/ext-jobs.audit-manual-replay | test | `JobsOccurrenceTests` asserts manual replay records a new audited attempt under the same identity. |
-| standards/rule/ext-jobs.prefer-utc-schedules | inspection | Schedule review records UTC or a documented business-local deviation. |
-| standards/rule/ext-jobs.define-business-local-clock-behavior | test | `JobsTimeTests` cover the named IANA zone's skipped and repeated times. |
-| standards/rule/ext-jobs.test-time-transitions | test | `JobsTimeTests` inject time and execute representative clock transitions. |
-| standards/rule/ext-jobs.exclude-machine-local-time | static | `JobsTimeTests` asserts job source reads no machine-local clock. |
-| standards/rule/ext-jobs.place-handlers-with-owned-behavior | inspection | Job handler location follows module ownership or records replacement. |
-| standards/rule/ext-jobs.use-execution-scopes | test | `JobsTests` create and dispose a scope per Command. |
-| standards/rule/ext-jobs.separate-schedule-definitions | inspection | Schedule definition source remains separate from Command behavior. |
+| standards/rule/ext-jobs.record-schedule-behavior | guidance | Does each schedule record name every required field, its owner, and its status? |
+| standards/rule/ext-jobs.run-jobs-in-worker | guidance | Does every scheduled job run in Worker, outside WebApi request handling? |
+| standards/rule/ext-jobs.bound-job-execution | guidance | Does each job honor cancellation and duration bounds and stop during shutdown? |
+| standards/rule/ext-jobs.store-execution-leases | guidance | Does the store record lease owner, expiry, and fencing value per occurrence? |
+| standards/rule/ext-jobs.renew-only-owned-leases | guidance | Does a replica stop when its lease renewal fails? |
+| standards/rule/ext-jobs.prevent-duplicate-completion | guidance | Does the lease prevent two replicas completing one occurrence? |
+| standards/rule/ext-jobs.generate-monotonic-fencing-values | guidance | Are fencing values monotonic per occurrence and checked on completion? |
+| standards/rule/ext-jobs.scope-occurrences-and-leases-by-tenant | guidance | Do occurrences and leases carry tenant scope where tenants are isolated? |
+| standards/rule/ext-jobs.dispatch-application-behavior | guidance | Does each job dispatch an Application Command or approved port? |
+| standards/rule/ext-jobs.exclude-direct-storage-and-http-execution | guidance | Is job source free of direct storage mutation and WebApi calls? |
+| standards/rule/ext-jobs.bound-job-retries | guidance | Are attempts bounded with cancellation-aware backoff and a poison state? |
+| standards/rule/ext-jobs.tolerate-duplicate-execution | guidance | Do the job Command and side effect tolerate duplicate execution? |
+| standards/rule/ext-jobs.treat-unavailable-schedule-stores-as-outages | guidance | Does an unavailable store get backed-off, rate-limited logging? |
+| standards/rule/ext-jobs.persist-occurrence-recovery-points | guidance | Does the store persist last scheduled, started, and completed times? |
+| standards/rule/ext-jobs.define-misfire-recovery | guidance | Does the specification define skip or replay behavior for missed occurrences? |
+| standards/rule/ext-jobs.provide-operational-recovery-procedures | guidance | Do Runbook records cover inspection, manual replay, and disable? |
+| standards/rule/ext-jobs.derive-stable-occurrence-identity | guidance | Are occurrence identities stable per schedule and instant, with declared retention? |
+| standards/rule/ext-jobs.persist-occurrence-state | guidance | Does the store persist scheduled, processing, completed, and dead-letter state? |
+| standards/rule/ext-jobs.scope-command-idempotency-by-occurrence | guidance | Do retries of one occurrence share its idempotency scope? |
+| standards/rule/ext-jobs.restrict-completion-by-fencing-value | guidance | Is completion refused once the fencing value is stale? |
+| standards/rule/ext-jobs.audit-manual-replay | guidance | Does manual replay create a new audited attempt under the same identity? |
+| standards/rule/ext-jobs.prefer-utc-schedules | guidance | Is each schedule UTC or a documented business-local deviation? |
+| standards/rule/ext-jobs.define-business-local-clock-behavior | guidance | Does each local schedule name its zone and transition behavior? |
+| standards/rule/ext-jobs.test-time-transitions | guidance | Do tests inject the clock and cover representative transitions? |
+| standards/rule/ext-jobs.exclude-machine-local-time | guidance | Is production job code free of machine-local time reads? |
+| standards/rule/ext-jobs.place-handlers-with-owned-behavior | guidance | Does each handler sit with its behavior's module or record an Exception? |
+| standards/rule/ext-jobs.use-execution-scopes | guidance | Does each occurrence resolve scoped dependencies in one disposed scope? |
+| standards/rule/ext-jobs.separate-schedule-definitions | guidance | Are schedule definitions separate from Command behavior or is an Exception recorded? |
