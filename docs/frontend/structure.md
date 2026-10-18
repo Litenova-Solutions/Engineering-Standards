@@ -1,31 +1,41 @@
-# Frontend Structure
+# Frontend structure
 
 ## Intent
 
-
-A React frontend is three folders under `src`. The frame holds everything cross-cutting. The routes hold one file per address. The modules hold one folder per backend use case the frontend calls.
+A frontend holds three parts: a frame, routes, and use-case modules. The frame holds everything cross-cutting. The routes hold the addresses the frontend serves. The modules hold one folder per backend use case the frontend calls. Each frontend is one entry-point record.
 
 The module tree mirrors the backend's Application tree in kebab case. A reader holding a use case specification then finds the frontend code that serves it without a second map.
 
-## Agent Summary {#agent-summary}
+## Agent summary {#agent-summary}
 
-
-- Three folders sit under `src`, each with one job. (standards/rule/frontend-structure.use-the-frontend-application-tree)
+- A frame, routes, and modules sit under `src`, each with one job. (standards/rule/frontend-structure.use-the-frontend-application-tree)
 - A module path resolves to a backend use case folder. (standards/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case)
 - A shared file sits in the narrowest folder holding every reader. (standards/rule/frontend-structure.place-a-shared-file-in-the-folder-that-owns-it)
 - A folder named for nothing is refused. (standards/rule/frontend-structure.reject-a-folder-name-that-owns-nothing)
 - A route file composes and imports no other route. (standards/rule/frontend-structure.keep-a-route-file-thin)
 - Browser APIs belong to the frame. (standards/rule/frontend-structure.locate-the-frame-in-the-app-folder)
 - One visual authority serves every frontend. (standards/rule/frontend-structure.keep-shared-packages-non-application-specific)
+- Every public use case appears in a journey or names its caller. (standards/rule/frontend-structure.cover-public-use-cases-in-journeys)
+
+## React
+
+React frontends use `src/app` for the frame, `src/routes` for one file per address, and `src/modules` for the use-case code. The router generates the typed route tree from the files under `src/routes`. A route file holds its search parameters, its loader, and its component. Shared files use the `.tsx` extension.
+
+## Svelte
+
+Svelte frontends use `src/routes` for one folder per address, and `src/lib/app` and `src/lib/modules` for the frame and the use-case code. The toolkit generates the route types from the folders under `src/routes`. A page holds its parameters, its load, and its component. Imports resolve through the `$lib` alias, which points at `src/lib`.
+
+Shared files use the `.svelte` extension. A device client serves one page with no router. Route groups keep their parenthesized names, because those names are router syntax.
 
 ## Standards
 
-
 ### Use the frontend application tree (standards/rule/frontend-structure.use-the-frontend-application-tree)
 
-**Requirement:** A React frontend MUST use `src/app`, `src/routes`, and `src/modules` for the frame, the addresses, and the use-case code.
+**Requirement:** A frontend MUST use the frame, routes, and modules layout its stack section states.
 
 **Example:**
+
+React:
 
 ```text
 apps/{frontend}/
@@ -34,18 +44,36 @@ apps/{frontend}/
     routes/    one file per address, compiled into a typed route tree
     modules/   one folder per backend module, aggregate, and use case
   tests/
-    unit/      logic tests and the structure check
+    unit/      logic tests
     routes/    the route contract suite
     e2e/       evidence specifications
   package.json
   vite.config.ts
 ```
 
-The generated route tree, build output, and dependency folders stay untracked.
+Svelte:
+
+```text
+apps/{frontend}/
+  src/
+    routes/    one folder per address, with a page per folder
+    lib/
+      app/       the frame: client configuration, session, language, permissions, formatting, shell data
+      modules/   one folder per backend module, aggregate, and use case
+  tests/
+    unit/      logic tests
+    routes/    the route contract suite
+    e2e/       evidence specifications
+  svelte.config.js
+  vite.config.ts
+  package.json
+```
+
+The generated route artifacts, build output, and dependency folders stay untracked.
 
 ### Mirror the backend use case path in kebab case (standards/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case)
 
-**Requirement:** A use-case folder MUST sit at `src/modules/{module}/{aggregate}/{use-case}/` in kebab case, resolving to the backend folder of the same three names.
+**Requirement:** A use-case folder MUST sit under the modules root at `{module}/{aggregate}/{use-case}/` in kebab case, resolving to the backend folder of the same three names.
 
 **Rationale:** A reader holding a specification page then finds the frontend code by translating three names. No second register has to be learned to make that translation.
 
@@ -68,19 +96,19 @@ apps/admin/src/modules/orders/orders/search-merchant-orders/
 
 **Rationale:** The lowest folder holding every reader is the only place where moving the file changes nothing else. A reader finds it beside its consumers rather than through an index.
 
-**Example:** Three order queries share one tab strip, so `orders-tabs.tsx` sits flat in `modules/orders/orders/`. A file read by several aggregates sits flat in the module folder.
+**Example:** Three order queries share one tab strip, so `orders-tabs.tsx` sits flat in `modules/orders/orders/` on React and `orders-tabs.svelte` sits flat in `lib/modules/orders/orders/` on Svelte. A file read by several aggregates sits flat in the module folder.
 
 ### Reject a folder name that owns nothing (standards/rule/frontend-structure.reject-a-folder-name-that-owns-nothing)
 
-**Requirement:** A folder under `src` MUST NOT be named `shared`, `common`, `utils`, `util`, `helpers`, `misc`, `components`, `hooks`, `lib`, `types`, or `services`.
+**Requirement:** A folder under `src` MUST NOT be named `shared`, `common`, `utils`, `util`, `helpers`, `misc`, `components`, `hooks`, `types`, or `services`. A React folder MUST also NOT be named `lib`, and a Svelte folder under `src/lib` MUST also NOT be named `stores`.
 
-**Rationale:** A folder with one of these names can refuse nothing, so it collects everything and nothing in it is reviewed against a use case.
+**Rationale:** A folder with one of these names can refuse nothing, so it collects everything and nothing in it is reviewed against a use case. `lib` is refused on React because the frame lives in `src/app`, so a `lib` folder would be a second frame. `stores` is refused on Svelte because shared state belongs in the frame or beside its readers, not in one store folder.
 
-**Example:** A query wrapper three use cases share sits flat in the aggregate folder, not in a `shared/` folder beside them.
+**Example:** A shared query three use cases read sits flat in the aggregate folder, not in a `shared/` folder beside them.
 
 ### Keep a route file thin (standards/rule/frontend-structure.keep-a-route-file-thin)
 
-**Requirement:** A route file MUST hold its search parameters, its loader, and its component, with no reusable logic and no import of another route file.
+**Requirement:** A route file MUST hold its input, its load, and its component, with no reusable logic and no import of another route file.
 
 **Rationale:** A column definition or a validation rule in a route file is unreachable from the second route that needs it. An import between two route files makes one address depend on another.
 
@@ -95,17 +123,36 @@ export const Route = createFileRoute("/_console/orders/")({
 });
 ```
 
+The Svelte page does the same in its load:
+
+```ts
+export async function load({ parent, url }) {
+  const { queryClient } = await parent();
+  const search = orderSearch.parse(Object.fromEntries(url.searchParams));
+  await queryClient.ensureQueryData(merchantOrdersQuery(search.q, search.page));
+  return { search };
+}
+```
+
 ### Keep imports directional (standards/rule/frontend-structure.keep-imports-directional)
 
 **Requirement:** An import MUST point from a route to a module to the frame to a shared package, and never in the reverse direction.
 
 **Example:** This direction shows the allowed dependency path.
 
+React:
+
 ```text
 src/routes -> src/modules -> src/app -> packages/*
 ```
 
-A module cannot import a route. A shared package cannot import an application. A frame module cannot reach into one module's use-case folder for a second module's data.
+Svelte:
+
+```text
+src/routes -> src/lib/modules -> src/lib/app -> packages/*
+```
+
+A module cannot import a route. A shared package cannot import an application. A frame module cannot reach into one module's use-case folder for a second module's data. Imports on Svelte resolve through the `$lib` alias, which points at `src/lib`.
 
 ### Keep applications independent (standards/rule/frontend-structure.keep-applications-independent)
 
@@ -121,20 +168,25 @@ A module cannot import a route. A shared package cannot import an application. A
 
 ### Locate the frame in the app folder (standards/rule/frontend-structure.locate-the-frame-in-the-app-folder)
 
-**Requirement:** A frontend MUST place its client configuration, its session read, its language choice, its permissions, its formatting, and its shell data in `src/app`.
+**Requirement:** A frontend MUST place its cross-route values in the frame folder its stack section states. Those values are the client configuration, the session read, the language choice, the permissions, the formatting, and the shell data.
 
 **Rationale:** These values cross every route, so a route holding one of them holds it twice with two copies to keep equal. A browser API reached from a use-case module belongs here as well, because a module renders and reads data rather than touching the device.
 
-## Conventions
+### Cover public use cases in journeys (standards/rule/frontend-structure.cover-public-use-cases-in-journeys)
 
+**Requirement:** Every public use case MUST appear in a journey or name its background caller.
+
+**Rationale:** A use case in no journey and with no named caller is unreachable from every actor. The journey or the caller name states who reaches it and why.
+
+## Conventions
 
 ### Use the generated route tree (standards/rule/frontend-structure.use-the-generated-route-tree)
 
-**Default:** Generate the typed route tree from the files under `src/routes` with the router's own command, and keep it untracked.
+**Default:** Generate the typed route artifacts from the files under `src/routes` with the router's own command, and keep them untracked.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The tree is derived from the route files, so committing it adds a second copy that a renamed file leaves behind.
+**Rationale:** The artifacts derive from the route files, so committing them adds a second copy that a renamed file leaves behind.
 
 ### Use explicit public entry points for workspace packages (standards/rule/frontend-structure.use-explicit-public-entry-points-for-workspace-packages)
 
@@ -156,22 +208,23 @@ A module cannot import a route. A shared package cannot import an application. A
 
 This informative example demonstrates `standards/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case`, `standards/rule/frontend-structure.place-a-shared-file-in-the-folder-that-owns-it`, and `standards/rule/frontend-structure.reject-a-folder-name-that-owns-nothing`.
 
-A search use case folder holds its query wrapper and its table. The aggregate folder holds the tab strip its three sibling use cases share. Nothing sits in a `shared/` folder, because that name would own nothing and the structure check refuses it.
+A search use case folder holds its query definition and its table. The aggregate folder holds the tab strip its three sibling use cases share. Nothing sits in a `shared/` folder, because that name owns nothing.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/frontend-structure.use-the-frontend-application-tree | inspection | Folder review compares each frontend tree against the layout in this section. |
-| standards/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case | test | `tests/unit/structure.test.ts` calls `checkModuleStructure` and asserts an empty result. |
-| standards/rule/frontend-structure.keep-a-use-case-folder-flat | test | `checkModuleStructure` reports a subfolder inside a use-case folder by its own message. |
-| standards/rule/frontend-structure.place-a-shared-file-in-the-folder-that-owns-it | inspection | Folder review confirms each file flat in an aggregate or module folder has two real readers. |
-| standards/rule/frontend-structure.reject-a-folder-name-that-owns-nothing | test | `checkModuleStructure` reports each refused name with its path. |
-| standards/rule/frontend-structure.keep-a-route-file-thin | static | The frontend lint config refuses a route import, as `packages/*/eslint.config.js` does. |
-| standards/rule/frontend-structure.keep-imports-directional | inspection | Import review confirms no module imports a route and no package imports an application. |
-| standards/rule/frontend-structure.keep-applications-independent | inspection | Import review confirms no frontend resolves a path inside another frontend. |
-| standards/rule/frontend-structure.keep-shared-packages-non-application-specific | inspection | Package review confirms each shared package names no use case and no screen. |
-| standards/rule/frontend-structure.locate-the-frame-in-the-app-folder | static | The frontend lint config refuses a browser global reached from `src/modules`. |
-| standards/rule/frontend-structure.use-the-generated-route-tree | inspection | The `build` and `type-check` scripts each run the router's generate command. |
-| standards/rule/frontend-structure.use-explicit-public-entry-points-for-workspace-packages | inspection | Import review confirms no application imports a path its package manifest does not export. |
-| standards/rule/frontend-structure.keep-tests-near-their-ownership-boundary | inspection | Test layout review confirms logic tests sit beside their module and browser suites share one root. |
+| standards/rule/frontend-structure.use-the-frontend-application-tree | guidance | Does each frontend tree match the layout its stack section states? |
+| standards/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case | guidance | Does each use-case folder resolve to its backend folder? |
+| standards/rule/frontend-structure.keep-a-use-case-folder-flat | guidance | Does each use-case folder hold files and no subfolder? |
+| standards/rule/frontend-structure.place-a-shared-file-in-the-folder-that-owns-it | guidance | Does each shared file sit in the narrowest folder holding every reader? |
+| standards/rule/frontend-structure.reject-a-folder-name-that-owns-nothing | guidance | Does any folder carry a refused name? |
+| standards/rule/frontend-structure.keep-a-route-file-thin | guidance | Does each route file hold only its input, its load, and its component? |
+| standards/rule/frontend-structure.keep-imports-directional | guidance | Does every import follow the route to module to frame to package direction? |
+| standards/rule/frontend-structure.keep-applications-independent | guidance | Does any frontend import source from another frontend? |
+| standards/rule/frontend-structure.keep-shared-packages-non-application-specific | guidance | Does any shared package name a use case or a screen? |
+| standards/rule/frontend-structure.locate-the-frame-in-the-app-folder | guidance | Does the frame hold every cross-route value and browser use? |
+| standards/rule/frontend-structure.cover-public-use-cases-in-journeys | guidance | Does every public use case appear in a journey or name its background caller? |
+| standards/rule/frontend-structure.use-the-generated-route-tree | guidance | Do the build and type-check scripts each run the router's generate command? |
+| standards/rule/frontend-structure.use-explicit-public-entry-points-for-workspace-packages | guidance | Does any application import a path its package manifest does not export? |
+| standards/rule/frontend-structure.keep-tests-near-their-ownership-boundary | guidance | Do logic tests sit beside their module and browser suites share one root? |

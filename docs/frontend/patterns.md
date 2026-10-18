@@ -1,10 +1,10 @@
-# UI Pattern Decisions
+# UI pattern decisions
 
 ## Intent
 
 Every recurring interface question is decided once and recorded in one catalog. Each entry holds the options considered, the option chosen, the compact-screen behaviour, and the implementation per platform. Implementers build from the chosen option and extend the catalog rather than redrawing the pattern.
 
-## Agent Summary {#agent-summary}
+## Agent summary {#agent-summary}
 
 - One catalog holds every interface pattern decision. (standards/rule/frontend-patterns.keep-one-pattern-catalog)
 - Each pattern records its options, costs, and choice. (standards/rule/frontend-patterns.record-every-option-considered)
@@ -45,7 +45,7 @@ The catalog is one file valid against `schemas/ui-pattern-catalog.schema.json`. 
 | `implementations` | The status and source paths per platform |
 | `library` | The library pattern id the entry starts from, if any |
 
-The `breakpoints` map names viewport widths in CSS pixels, and `groups` collect related patterns. The optional `registry` field names the command or path rendering every option for review.
+The `breakpoints` map names viewport widths in CSS pixels, and `groups` collect related patterns. The optional `registry` field names the command or path rendering every product-added option for review.
 
 ### The pattern library
 
@@ -69,7 +69,7 @@ A choice starts as a recommendation and settles when an owner chooses. A later c
 |:---|:---|
 | `recommended` | The reviewer recommendation, standing until an owner chooses |
 | `owner` | The owner choice, with an optional note |
-| changed by record | A later choice, naming the decision record |
+| `owner` or `recommended`, plus `record` | A later choice, naming the decision record that made it |
 
 ### The compact variant
 
@@ -147,7 +147,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Rationale:** One implementation keeps every route on the same behaviour. A route redrawing the pattern is a second decision the catalog cannot track.
 
-**Example:** The catalog names `packages/ui/src/table/sort-header.tsx` under `react-web`, so every invoice route composes it.
+**Example:** The catalog names `packages/ui/src/table/sort-header.tsx` under `react-web` and `packages/ui/src/table/sort-header.svelte` under `svelte`, so every invoice route composes one of them.
 
 ### Update the catalog with the code (standards/rule/frontend-patterns.update-the-catalog-with-the-code)
 
@@ -155,7 +155,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Rationale:** A catalog updated later is a catalog updated never. A deliberate departure in one route names a decision record, so the exception stays reviewable.
 
-**Example:** A route departing from the chosen option names `decision.record`, such as `docs/decisions/014-invoice-sort-menu.md`.
+**Example:** A route departing from the chosen option names `decision.record`, such as `docs/product/decisions/0014-invoice-sort-menu.md`.
 
 ### State the implementation status (standards/rule/frontend-patterns.state-the-implementation-status)
 
@@ -163,13 +163,13 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Rationale:** A reader then knows what is built and what is missing on each platform. The Concepts section defines the four values.
 
-**Example:** A `pending` Blazor entry states in `gap` that the shared table control does not exist yet.
+**Example:** A `pending` entry for one platform states in `gap` what is missing there.
 
 ### Keep the catalog platform neutral (standards/rule/frontend-patterns.keep-the-catalog-platform-neutral)
 
 **Requirement:** A pattern MUST name behaviour and structure, never a component library.
 
-**Rationale:** Platforms bind through `implementations`, so one catalog serves React with shadcn/ui, Blazor, and later profiles. A library named in a pattern forces a second catalog per platform.
+**Rationale:** Platforms bind through `implementations`, so one catalog serves every composed profile. A library named in a pattern forces a second catalog per platform.
 
 **Example:** An option describes a menu listing sort fields rather than naming the component rendering it.
 
@@ -177,7 +177,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ### Keep a visual registry (standards/rule/frontend-patterns.keep-a-visual-registry)
 
-**Default:** Review library options in the shared library viewer, and draw only product-specific options in a product registry at two widths.
+**Default:** Review library options in the shared library viewer, and draw only product-specific options in a product registry at 390 and 1280 CSS pixels.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -195,7 +195,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Default:** Start each catalog entry from its library pattern, through `library`, and keep the library option ids and the recommended option.
 
-**Replacement:** A consumer can replace this default with a local catalog carrying its own reason.
+**Replacement:** Start an entry without `library` and record why the library pattern does not fit.
 
 **Rationale:** A shared starting point keeps choices comparable across products and keeps the library recommendation visible. A product choosing a different option records its reason in the entry, so the departure stays reviewable.
 
@@ -209,17 +209,17 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/frontend-patterns.keep-one-pattern-catalog | static | `node standards/tools/validate-ui.mjs` reports a missing catalog or a schema failure. |
-| standards/rule/frontend-patterns.record-every-option-considered | static | `node standards/tools/validate-ui.mjs` reports fewer than two options or a choice naming no option. |
-| standards/rule/frontend-patterns.record-who-chose | inspection | Review confirms each decision source is `owner` or `recommended` with no agent-marked owner choice. |
-| standards/rule/frontend-patterns.declare-the-compact-behaviour | static | `node standards/tools/validate-ui.mjs` reports a compact option naming no recorded option. |
-| standards/rule/frontend-patterns.implement-a-chosen-pattern-once | static | `node standards/tools/validate-ui.mjs` reports a named component path that does not exist. |
-| standards/rule/frontend-patterns.update-the-catalog-with-the-code | inspection | Review confirms the catalog entry changed with its implementation or names a record. |
-| standards/rule/frontend-patterns.state-the-implementation-status | inspection | Review confirms each platform entry states one status and each gap reads complete. |
-| standards/rule/frontend-patterns.keep-the-catalog-platform-neutral | inspection | Review confirms no pattern names a component library outside `implementations`. |
-| standards/rule/frontend-patterns.keep-a-visual-registry | inspection | Review confirms the registry renders every option in each theme at both widths. |
-| standards/rule/frontend-patterns.report-pattern-feedback-after-the-work | inspection | Review confirms task reports carry proposals with pattern id, change, reason, and option. |
-| standards/rule/frontend-patterns.start-from-the-pattern-library | inspection | Review confirms each catalog entry sets `library` or records its own reason, and keeps library option ids. |
-| standards/rule/frontend-patterns.promote-library-improvements | inspection | Review confirms accepted generic proposals reached the library as a new or refined option. |
+| standards/rule/frontend-patterns.keep-one-pattern-catalog | checkable | `node standards/tools/validate-ui.mjs` reports a missing catalog or a schema failure. |
+| standards/rule/frontend-patterns.record-every-option-considered | checkable | `node standards/tools/validate-ui.mjs` reports fewer than two options or a choice naming no option. |
+| standards/rule/frontend-patterns.record-who-chose | guidance | Does each decision record owner or recommended, with no agent-marked owner choice? |
+| standards/rule/frontend-patterns.declare-the-compact-behaviour | checkable | `node standards/tools/validate-ui.mjs` reports a compact option naming no recorded option. |
+| standards/rule/frontend-patterns.implement-a-chosen-pattern-once | checkable | `node standards/tools/validate-ui.mjs` reports a named component path that does not exist. |
+| standards/rule/frontend-patterns.update-the-catalog-with-the-code | guidance | Did the catalog entry change with its implementation or name a record? |
+| standards/rule/frontend-patterns.state-the-implementation-status | checkable | `node standards/tools/validate-ui.mjs` reports a partial or pending entry without a gap. |
+| standards/rule/frontend-patterns.keep-the-catalog-platform-neutral | guidance | Does any pattern name a component library outside implementations? |
+| standards/rule/frontend-patterns.keep-a-visual-registry | guidance | Does the registry render every product-added option in each theme at 390 and 1280 pixels? |
+| standards/rule/frontend-patterns.report-pattern-feedback-after-the-work | guidance | Does each completion report carry proposals with pattern id, change, reason, and option? |
+| standards/rule/frontend-patterns.start-from-the-pattern-library | guidance | Does each entry set library or record its own reason, keeping library option ids? |
+| standards/rule/frontend-patterns.promote-library-improvements | guidance | Did each accepted generic proposal reach the library as a new or refined option? |
