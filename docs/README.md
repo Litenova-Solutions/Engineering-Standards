@@ -4,7 +4,7 @@
 
 Use this index to load the canonical page for current work.
 
-Each directory under `docs/` is one provision area. A page path states the scope its provisions carry, so `frontend/components.md` owns `FRONTEND.COMPONENTS`. The [provision index](reference/provisions.md) resolves any identifier to its page.
+The provision areas are BACKEND, BLAZOR, CORE, EXT, FRONTEND, PROFILE, QUALITY, REACT, SVELTE, and WORKSPACE, one directory each under `docs/`. A page path states the scope its provisions carry, so `frontend/components.md` owns `frontend-components`. The [provision index](reference/provisions.md) resolves any identifier to its page. The `tools/`, `guide/`, and `reference/` directories carry no provisions.
 
 ## Which page do you want
 
@@ -12,7 +12,7 @@ A **tutorial** takes you through a first working result, one step at a time.
 A **how-to** solves one stated problem for a reader who already has it running.
 A **reference** states exact values, options, and defaults, and is read by looking up.
 A **command** page documents one command: its options, its exit codes, and what it runs underneath.
-A **topic**, **profile**, or **extension** page owns the provisions a reader cites.
+A standards page owns the provisions a reader cites: one per core concern, per stack, per workspace concern, per backend concern, per frontend concern, per quality concern, or per extension.
 
 ## Core
 
@@ -23,14 +23,16 @@ A **topic**, **profile**, or **extension** page owns the provisions a reader cit
 - [Product intent](core/product.md)
 - [Release standard](core/release.md)
 - [Authoring standard](core/authoring.md)
+- [Maintaining the standards](core/maintaining.md)
+- [Project model](core/model.md)
 
 ## Profile
 
-- [.NET and React platform profile](profile/react.md)
-- [.NET and Blazor platform profile](profile/blazor.md)
-- [.NET and Svelte platform profile](profile/svelte.md)
+- [React stack](profile/react.md)
+- [Svelte stack](profile/svelte.md)
+- [Blazor stack](profile/blazor.md)
 
-The profile selects every baseline page. Exact versions and composition remain in `standards.manifest.json`.
+Each stack page states what selecting that stack adds: its pages, its pins, and its checks. Exact versions and composition remain in `standards.manifest.json`.
 
 ## Workspace
 
@@ -47,6 +49,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Persistence](backend/persistence.md)
 - [HTTP API](backend/api.md)
 - [Backend testing](backend/testing.md)
+- [Identifiers](backend/identifiers.md)
 
 ## Frontend
 
@@ -58,6 +61,16 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Frontend data and state](frontend/data.md)
 - [Frontend testing](frontend/testing.md)
 
+Each frontend page is stack-neutral, with short per-stack sections for what differs between React and Svelte.
+
+## React
+
+- [React components](react/components.md)
+
+## Svelte
+
+- [Svelte components](svelte/components.md)
+
 ## Blazor
 
 - [Blazor structure](blazor/structure.md)
@@ -66,15 +79,6 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Blazor data and state](blazor/data.md)
 - [Browser persistence](blazor/browser.md)
 - [Blazor testing](blazor/testing.md)
-
-## Svelte
-
-- [Svelte structure](svelte/structure.md)
-- [Svelte rendering and routes](svelte/rendering.md)
-- [Svelte components](svelte/components.md)
-- [Svelte UI governance](svelte/ui.md)
-- [Svelte data and state](svelte/data.md)
-- [Svelte testing](svelte/testing.md)
 
 ## Quality
 
@@ -102,6 +106,8 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Reporting](ext/report.md)
 - [Scheduled jobs](ext/jobs.md)
 - [Static marketing site](ext/site.md)
+- [Release stage](ext/stage.md)
+- [Agent delegation](ext/delegation.md)
 
 ## Tools
 
@@ -110,7 +116,7 @@ The profile selects every baseline page. Exact versions and composition remain i
 - [Generate Provisions](tools/generate-provisions.md)
 - [Validate Consumer](tools/validate-consumer.md)
 - [Validate Controlled UI](tools/validate-ui.md)
-- [Validate Use-Case Parity](tools/validate-parity.md)
+- [Project model builder](tools/model.md)
 
 ## Guide
 

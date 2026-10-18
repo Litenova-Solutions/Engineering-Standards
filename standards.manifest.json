@@ -1,10 +1,9 @@
 {
   "$schema": "./schemas/standards-manifest.schema.json",
-  "schemaVersion": 4,
-  "version": "1.19.0",
+  "schemaVersion": 5,
+  "version": "2.0.0",
   "name": "engineering-standards",
   "agentsEntry": "AGENTS.md",
-  "defaultProfile": "dotnet-react",
   "paths": {
     "docs": "docs",
     "template": "templates",
@@ -20,19 +19,27 @@
       "FRONTEND",
       "PROFILE",
       "QUALITY",
+      "REACT",
       "SVELTE",
       "WORKSPACE"
     ]
   },
-  "profiles": {
-    "dotnet-react": {
-      "entry": "docs/profile/react.md",
+  "stacks": {
+    "dotnet": {
       "pages": [
         "docs/workspace/structure.md",
         "docs/workspace/naming.md",
         "docs/workspace/dependencies.md",
         "docs/workspace/config.md",
+        "docs/core/agent.md",
         "docs/core/authoring.md",
+        "docs/core/maintaining.md",
+        "docs/core/model.md",
+        "docs/core/principles.md",
+        "docs/core/product.md",
+        "docs/core/release.md",
+        "docs/core/scope.md",
+        "docs/core/system.md",
         "docs/backend/architecture.md",
         "docs/backend/domain.md",
         "docs/backend/application.md",
@@ -44,6 +51,7 @@
         "docs/frontend/rendering.md",
         "docs/frontend/components.md",
         "docs/frontend/ui.md",
+        "docs/frontend/patterns.md",
         "docs/frontend/data.md",
         "docs/frontend/testing.md",
         "docs/quality/security.md",
@@ -51,18 +59,87 @@
         "docs/quality/ci.md"
       ]
     },
-    "dotnet-blazor": {
-      "entry": "docs/profile/blazor.md",
+    "react": {
       "pages": [
         "docs/workspace/structure.md",
         "docs/workspace/naming.md",
         "docs/workspace/dependencies.md",
         "docs/workspace/config.md",
+        "docs/core/agent.md",
         "docs/core/authoring.md",
-        "docs/backend/architecture.md",
-        "docs/backend/domain.md",
-        "docs/backend/application.md",
-        "docs/backend/identifiers.md",
+        "docs/core/maintaining.md",
+        "docs/core/model.md",
+        "docs/core/principles.md",
+        "docs/core/product.md",
+        "docs/core/release.md",
+        "docs/core/scope.md",
+        "docs/core/system.md",
+        "docs/profile/react.md",
+        "docs/frontend/structure.md",
+        "docs/frontend/rendering.md",
+        "docs/frontend/components.md",
+        "docs/frontend/ui.md",
+        "docs/frontend/patterns.md",
+        "docs/frontend/data.md",
+        "docs/frontend/testing.md",
+        "docs/react/components.md",
+        "docs/quality/security.md",
+        "docs/quality/operations.md",
+        "docs/quality/ci.md"
+      ]
+    },
+    "svelte": {
+      "pages": [
+        "docs/workspace/structure.md",
+        "docs/workspace/naming.md",
+        "docs/workspace/dependencies.md",
+        "docs/workspace/config.md",
+        "docs/core/agent.md",
+        "docs/core/authoring.md",
+        "docs/core/maintaining.md",
+        "docs/core/model.md",
+        "docs/core/principles.md",
+        "docs/core/product.md",
+        "docs/core/release.md",
+        "docs/core/scope.md",
+        "docs/core/system.md",
+        "docs/profile/svelte.md",
+        "docs/frontend/structure.md",
+        "docs/frontend/rendering.md",
+        "docs/frontend/components.md",
+        "docs/frontend/ui.md",
+        "docs/frontend/patterns.md",
+        "docs/frontend/data.md",
+        "docs/frontend/testing.md",
+        "docs/svelte/components.md",
+        "docs/quality/security.md",
+        "docs/quality/operations.md",
+        "docs/quality/ci.md"
+      ]
+    },
+    "blazor-web": {
+      "pages": [
+        "docs/workspace/structure.md",
+        "docs/workspace/naming.md",
+        "docs/workspace/dependencies.md",
+        "docs/workspace/config.md",
+        "docs/core/agent.md",
+        "docs/core/authoring.md",
+        "docs/core/maintaining.md",
+        "docs/core/model.md",
+        "docs/core/principles.md",
+        "docs/core/product.md",
+        "docs/core/release.md",
+        "docs/core/scope.md",
+        "docs/core/system.md",
+        "docs/profile/blazor.md",
+        "docs/frontend/structure.md",
+        "docs/frontend/rendering.md",
+        "docs/frontend/components.md",
+        "docs/frontend/ui.md",
+        "docs/frontend/patterns.md",
+        "docs/frontend/data.md",
+        "docs/frontend/testing.md",
         "docs/blazor/structure.md",
         "docs/blazor/rendering.md",
         "docs/blazor/components.md",
@@ -73,177 +150,156 @@
         "docs/quality/operations.md",
         "docs/quality/ci.md"
       ]
-    },
-    "dotnet-svelte": {
-      "entry": "docs/profile/svelte.md",
-      "pages": [
-        "docs/workspace/structure.md",
-        "docs/workspace/naming.md",
-        "docs/workspace/dependencies.md",
-        "docs/workspace/config.md",
-        "docs/core/authoring.md",
-        "docs/backend/architecture.md",
-        "docs/backend/domain.md",
-        "docs/backend/application.md",
-        "docs/backend/persistence.md",
-        "docs/backend/api.md",
-        "docs/backend/testing.md",
-        "docs/backend/identifiers.md",
-        "docs/svelte/structure.md",
-        "docs/svelte/rendering.md",
-        "docs/svelte/components.md",
-        "docs/svelte/ui.md",
-        "docs/svelte/data.md",
-        "docs/svelte/testing.md",
-        "docs/quality/security.md",
-        "docs/quality/operations.md",
-        "docs/quality/ci.md"
-      ]
     }
   },
   "extensions": {
     "bdd": {
       "path": "docs/ext/bdd.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "use-case",
-        "end-to-end-flow"
+      "replaces": [],
+      "switchesOn": [
+        "case"
       ]
     },
     "compat": {
       "path": "docs/ext/compat.md",
-      "activationScope": "project"
+      "activationScope": "project",
+      "replaces": [],
+      "switchesOn": []
     },
     "cache": {
       "path": "docs/ext/cache.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "use-case"
-      ]
+      "replaces": [],
+      "switchesOn": []
     },
     "concurrency": {
       "path": "docs/ext/concurrency.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "module",
-        "aggregate",
-        "use-case",
-        "workflow"
-      ]
+      "replaces": [],
+      "switchesOn": []
     },
     "lifecycle": {
       "path": "docs/ext/lifecycle.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "use-case",
-        "workflow",
-        "domain-policy"
+      "replaces": [],
+      "switchesOn": [
+        "limit"
       ]
     },
     "containers": {
       "path": "docs/ext/containers.md",
-      "activationScope": "project"
+      "activationScope": "project",
+      "replaces": [],
+      "switchesOn": []
     },
     "integrations": {
       "path": "docs/ext/integrations.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "use-case",
-        "workflow",
-        "domain-policy",
-        "end-to-end-flow"
-      ]
+      "replaces": [],
+      "switchesOn": []
     },
     "audit": {
       "path": "docs/ext/audit.md",
-      "activationScope": "project"
+      "activationScope": "project",
+      "replaces": [
+        "standards/rule/quality-security.record-security-audit-events"
+      ],
+      "switchesOn": []
     },
     "locale": {
       "path": "docs/ext/locale.md",
-      "activationScope": "project"
+      "activationScope": "project",
+      "replaces": [],
+      "switchesOn": []
     },
     "mcp": {
       "path": "docs/ext/mcp.md",
-      "activationScope": "project"
+      "activationScope": "project",
+      "replaces": [],
+      "switchesOn": []
     },
     "tenancy": {
       "path": "docs/ext/tenancy.md",
-      "activationScope": "project"
+      "activationScope": "project",
+      "replaces": [],
+      "switchesOn": []
     },
     "outbox": {
       "path": "docs/ext/outbox.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "use-case",
-        "workflow",
-        "end-to-end-flow"
+      "replaces": [
+        "standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work"
+      ],
+      "switchesOn": [
+        "event",
+        "limit"
       ]
     },
     "efcore": {
       "path": "docs/ext/efcore.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "module",
-        "use-case"
-      ]
+      "replaces": [
+        "standards/rule/workspace-dependencies.keep-application-dependencies-narrow",
+        "standards/rule/backend-architecture.separate-command-and-query-behavior",
+        "standards/rule/backend-persistence.stage-aggregate-writes-through-repositories",
+        "standards/rule/backend-persistence.query-through-iquerysession",
+        "standards/rule/backend-persistence.commit-once-in-the-command-pipeline",
+        "standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work",
+        "standards/rule/backend-persistence.keep-mappings-and-aliases-explicit",
+        "standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain",
+        "standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly",
+        "standards/rule/backend-persistence.bound-aggregate-document-growth",
+        "standards/rule/ext-outbox.stage-messages-with-business-work"
+      ],
+      "switchesOn": []
     },
     "realtime": {
       "path": "docs/ext/realtime.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "use-case",
-        "end-to-end-flow"
+      "replaces": [],
+      "switchesOn": [
+        "event"
       ]
     },
     "report": {
       "path": "docs/ext/report.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "use-case"
-      ]
+      "replaces": [],
+      "switchesOn": []
     },
     "jobs": {
       "path": "docs/ext/jobs.md",
       "activationScope": "local",
-      "applicableKinds": [
-        "use-case",
-        "workflow",
-        "end-to-end-flow"
+      "replaces": [],
+      "switchesOn": [
+        "limit"
       ]
     },
     "stage": {
       "path": "docs/ext/stage.md",
-      "activationScope": "project"
+      "activationScope": "project",
+      "replaces": [],
+      "switchesOn": []
     },
     "delegation": {
       "path": "docs/ext/delegation.md",
-      "activationScope": "project"
+      "activationScope": "project",
+      "replaces": [],
+      "switchesOn": []
     },
     "site": {
       "path": "docs/ext/site.md",
-      "activationScope": "project"
+      "activationScope": "project",
+      "replaces": [],
+      "switchesOn": []
     }
   },
   "stack": {
     "dotnet": "10.0.113",
-    "aspnetcore": "10.0.13",
-    "marten": "9.50.1",
     "postgresql": "18",
-    "litebus": "7.0.0-preview.6",
-    "aspire": "13.6.1",
     "node": "24.22.0",
-    "pnpm": "11.28.5",
-    "vite": "8.3.4",
-    "react": "19.3.0",
-    "svelte": "5.57.2",
-    "sveltekit": "3.0.1",
-    "bits-ui": "2.19.5",
-    "typescript": "6.0.3",
-    "tailwindcss": "4.3.3",
-    "shadcn": "4.21.5",
-    "base-ui": "1.8.0",
-    "astro": "7.3.8",
-    "@astrojs/svelte": "9.0.1"
+    "pnpm": "11.28.5"
   },
   "packages": {
     "nuget": {
@@ -309,6 +365,7 @@
       "xunit.v3.mtp-v2": "3.2.2"
     },
     "npm": {
+      "@astrojs/svelte": "9.0.1",
       "@axe-core/playwright": "4.13.0",
       "@base-ui/react": "1.9.0",
       "@eslint/js": "10.0.1",
@@ -445,509 +502,7 @@
   },
   "overridePolicy": {
     "requiresReviewBy": [
-      "standards/rule/frontend-ui",
-      "standards/rule/svelte-ui"
+      "standards/rule/frontend-ui"
     ]
-  },
-  "loadPlans": {
-    "backend.api": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/backend/api.md#agent-summary",
-        "docs/quality/security.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/backend/api.md",
-        "docs/quality/security.md",
-        "docs/workspace/naming.md"
-      ]
-    },
-    "backend.application": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/backend/architecture.md#agent-summary",
-        "docs/backend/application.md#agent-summary",
-        "docs/backend/persistence.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/backend/architecture.md",
-        "docs/backend/application.md",
-        "docs/backend/persistence.md",
-        "docs/workspace/naming.md"
-      ]
-    },
-    "backend.domain": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/backend/architecture.md#agent-summary",
-        "docs/backend/domain.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/backend/architecture.md",
-        "docs/backend/domain.md",
-        "docs/workspace/naming.md"
-      ]
-    },
-    "backend.infrastructure": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/backend/architecture.md#agent-summary",
-        "docs/backend/persistence.md#agent-summary",
-        "docs/workspace/dependencies.md#agent-summary",
-        "docs/quality/operations.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/backend/architecture.md",
-        "docs/backend/persistence.md",
-        "docs/workspace/dependencies.md",
-        "docs/quality/operations.md"
-      ]
-    },
-    "backend.testing": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/backend/testing.md#agent-summary",
-        "docs/core/release.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/backend/testing.md",
-        "docs/core/release.md"
-      ]
-    },
-    "blazor.browser": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/blazor/browser.md#agent-summary",
-        "docs/quality/security.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/blazor/browser.md",
-        "docs/blazor/data.md",
-        "docs/quality/security.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "blazor.components": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/blazor/components.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/blazor/components.md",
-        "docs/blazor/structure.md",
-        "docs/workspace/naming.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "blazor.data": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/blazor/data.md#agent-summary",
-        "docs/blazor/browser.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/blazor/data.md",
-        "docs/blazor/browser.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "blazor.rendering": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/blazor/rendering.md#agent-summary",
-        "docs/blazor/components.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/blazor/rendering.md",
-        "docs/blazor/components.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "blazor.structure": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/blazor/structure.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/blazor/structure.md",
-        "docs/workspace/naming.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "blazor.testing": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/blazor/testing.md#agent-summary",
-        "docs/core/release.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/blazor/testing.md",
-        "docs/core/release.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "core.authoring": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/core/authoring.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/core/authoring.md",
-        "CONTRIBUTING.md"
-      ]
-    },
-    "core.release": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/core/release.md#agent-summary",
-        "docs/quality/security.md#agent-summary",
-        "docs/quality/operations.md#agent-summary",
-        "docs/quality/ci.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/core/release.md",
-        "docs/quality/security.md",
-        "docs/quality/operations.md",
-        "docs/quality/ci.md"
-      ]
-    },
-    "core.product": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/core/product.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/core/product.md",
-        "docs/reference/decision-records.md"
-      ]
-    },
-    "core.usecase": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/core/system.md#agent-summary",
-        "docs/core/release.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/core/system.md",
-        "docs/core/release.md"
-      ]
-    },
-    "frontend.components": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/frontend/components.md#agent-summary",
-        "docs/frontend/ui.md#agent-summary",
-        "docs/frontend/rendering.md#agent-summary",
-        "docs/frontend/testing.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/frontend/components.md",
-        "docs/frontend/ui.md",
-        "docs/frontend/rendering.md",
-        "docs/frontend/testing.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "frontend.data": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/frontend/data.md#agent-summary",
-        "docs/workspace/config.md#agent-summary",
-        "docs/quality/security.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/frontend/data.md",
-        "docs/workspace/config.md",
-        "docs/quality/security.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "frontend.rendering": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/profile/react.md#agent-summary",
-        "docs/frontend/rendering.md#agent-summary",
-        "docs/frontend/components.md#agent-summary",
-        "docs/frontend/ui.md#agent-summary",
-        "docs/quality/security.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/frontend/rendering.md",
-        "docs/frontend/components.md",
-        "docs/frontend/ui.md",
-        "docs/quality/security.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "frontend.structure": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/frontend/structure.md#agent-summary",
-        "docs/frontend/ui.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/frontend/structure.md",
-        "docs/frontend/ui.md",
-        "docs/workspace/naming.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "frontend.testing": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/frontend/testing.md#agent-summary",
-        "docs/core/release.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/frontend/testing.md",
-        "docs/core/release.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "frontend.ui": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/frontend/ui.md#agent-summary",
-        "docs/frontend/components.md#agent-summary",
-        "docs/frontend/testing.md#agent-summary",
-        "docs/workspace/dependencies.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/frontend/ui.md",
-        "docs/frontend/components.md",
-        "docs/frontend/testing.md",
-        "docs/workspace/dependencies.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "quality.operations": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/quality/operations.md#agent-summary",
-        "docs/quality/ci.md#agent-summary",
-        "docs/workspace/config.md#agent-summary",
-        "docs/core/release.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/quality/operations.md",
-        "docs/quality/ci.md",
-        "docs/workspace/config.md",
-        "docs/core/release.md"
-      ]
-    },
-    "quality.security": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/quality/security.md#agent-summary",
-        "docs/quality/operations.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/quality/security.md",
-        "docs/quality/operations.md"
-      ]
-    },
-    "svelte.components": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/svelte/components.md#agent-summary",
-        "docs/svelte/ui.md#agent-summary",
-        "docs/svelte/rendering.md#agent-summary",
-        "docs/svelte/testing.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/svelte/components.md",
-        "docs/svelte/ui.md",
-        "docs/svelte/rendering.md",
-        "docs/svelte/testing.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "svelte.data": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/svelte/data.md#agent-summary",
-        "docs/workspace/config.md#agent-summary",
-        "docs/quality/security.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/svelte/data.md",
-        "docs/workspace/config.md",
-        "docs/quality/security.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "svelte.rendering": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/profile/svelte.md#agent-summary",
-        "docs/svelte/rendering.md#agent-summary",
-        "docs/svelte/components.md#agent-summary",
-        "docs/svelte/ui.md#agent-summary",
-        "docs/quality/security.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/svelte/rendering.md",
-        "docs/svelte/components.md",
-        "docs/svelte/ui.md",
-        "docs/quality/security.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "svelte.structure": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/svelte/structure.md#agent-summary",
-        "docs/svelte/ui.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/svelte/structure.md",
-        "docs/svelte/ui.md",
-        "docs/workspace/naming.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "svelte.testing": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/svelte/testing.md#agent-summary",
-        "docs/core/release.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/svelte/testing.md",
-        "docs/core/release.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "svelte.ui": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/svelte/ui.md#agent-summary",
-        "docs/svelte/components.md#agent-summary",
-        "docs/svelte/testing.md#agent-summary",
-        "docs/workspace/dependencies.md#agent-summary",
-        "docs/frontend/patterns.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/svelte/ui.md",
-        "docs/svelte/components.md",
-        "docs/svelte/testing.md",
-        "docs/workspace/dependencies.md",
-        "docs/frontend/patterns.md"
-      ]
-    },
-    "workspace.dependencies": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/core/principles.md#agent-summary",
-        "docs/workspace/dependencies.md#agent-summary",
-        "docs/workspace/config.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/core/principles.md",
-        "docs/workspace/dependencies.md",
-        "docs/workspace/config.md"
-      ]
-    },
-    "workspace.structure": {
-      "tier0": [
-        "AGENTS.md"
-      ],
-      "tier1": [
-        "docs/workspace/structure.md#agent-summary",
-        "docs/workspace/naming.md#agent-summary",
-        "docs/workspace/config.md#agent-summary",
-        "docs/core/authoring.md#agent-summary"
-      ],
-      "tier2": [
-        "docs/workspace/structure.md",
-        "docs/workspace/naming.md",
-        "docs/workspace/config.md",
-        "docs/core/authoring.md"
-      ]
-    }
   }
 }

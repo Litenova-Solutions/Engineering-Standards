@@ -20,15 +20,6 @@ jobs:
     # The default step timeout is six hours. A hung validator would hold a runner
     # for that long and report nothing useful at the end of it.
     timeout-minutes: 10
-    strategy:
-      # Both Node lines report. A failure on one line is a fact about that line,
-      # so cancelling the other run would remove the comparison that identifies it.
-      fail-fast: false
-      matrix:
-        # The exact pin is the reproducible primary run. The major is the floor
-        # the tools claim in tools/README.md, and it runs so the claim is tested
-        # rather than asserted.
-        node: ['24.16.0', '22']
     steps:
       - name: Check out the repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -36,7 +27,8 @@ jobs:
       - name: Configure Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: ${{ matrix.node }}
+          # The Node release the manifest pins under `stack`.
+          node-version: '24.22.0'
           package-manager-cache: false
 
       - name: Run standards validator cases
@@ -54,11 +46,32 @@ jobs:
       - name: Run consumer validator cases
         run: node tools/validate-consumer.cases.mjs
 
-      - name: Run parity validator cases
-        run: node tools/validate-parity.cases.mjs
-
       - name: Check whitespace errors
         run: git diff --check
+
+  model:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up the pinned SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Configure Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.22.0'
+          package-manager-cache: false
+
+      - name: Build the model builder
+        run: dotnet build tools/model/Litenova.Model
+
+      - name: Run model builder cases
+        run: node tools/model.cases.mjs
 
   skipped-checks:
     if: github.event_name == 'pull_request'

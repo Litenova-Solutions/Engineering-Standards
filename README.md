@@ -14,24 +14,26 @@
 
 The Agentic Engineering System is the standards contract Litenova Solutions uses for software work by humans and AI agents.
 
-Standards v1.19.0 targets one bounded-context business application. The `dotnet-react` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more React frontends. The `dotnet-blazor` profile replaces the frontend with a .NET WebAssembly client. The `dotnet-svelte` profile replaces the frontend with Svelte applications on SvelteKit.
+Standards v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend: `react`, `svelte`, or `blazor-web`.
 
 ## What It Defines
 
-- Product and domain specifications that own approved intent.
+- Project records that own approved intent, from why through how the business works.
+- A model builder that joins those records to code, screens, tests, and test runs.
 - Domain, Application.Abstractions, Application, Infrastructure, and WebApi boundaries.
 - Implementation conventions for backend and frontend work.
 - Verification, security, operations, and release evidence.
 - Conditional extensions for capabilities outside the baseline.
 - Controlled technical prose for standards and agent instructions.
 
-The baseline profile applies first. An extension or consumer decision names each Standard that it replaces.
+The stacks a consumer selects apply first. An extension or project exception names each Standard that it replaces.
 
 ## Documentation
 
 - [Hosted documentation](https://www.litenova.solutions/Standards)
 - [Repository documentation index](docs/README.md)
 - [Agentic Engineering System](docs/core/system.md)
+- [Project model](docs/core/model.md)
 - [Authoring standard](docs/core/authoring.md)
 - [Get started](docs/guide/getting-started.md)
 - [Command index](docs/tools/README.md)
@@ -45,7 +47,7 @@ git submodule add https://github.com/Litenova-Solutions/Engineering-Standards.gi
 git -C standards checkout --detach <approved-tag-or-commit>
 ```
 
-Add `standards.project.json`, a short root `AGENTS.md`, and the product and domain specifications required by current work.
+Add `standards.project.json`, a short root `AGENTS.md`, and the project records required by current work.
 
 Follow [Get started](docs/guide/getting-started.md) when creating a consumer repository.
 
@@ -56,10 +58,12 @@ The [template index](templates/consumer/README.md) lists each consumer template 
 ```text
 docs/                    One directory per provision area, plus guides, commands, and reference material
 schemas/                 JSON contracts for standards and consumer configuration
-templates/consumer/      Consumer specification templates
+templates/consumer/      Consumer record templates
 templates/standard/      Standards authoring templates
-tools/                   Dependency-free reference validators and fixture suites, documented under docs/tools/
-standards.manifest.json  Versions, profiles, extensions, and agent load plans
+tools/                   Reference validators and fixture suites, documented under docs/tools/
+tools/model/             The project model builder and its fixture suite
+patterns/ui/             The UI pattern library, its data, and its viewer
+standards.manifest.json  Versions, stacks, extensions, and package pins
 ```
 
 ## Project

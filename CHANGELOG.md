@@ -1,5 +1,26 @@
 # Changelog
 
+## v2.0.0
+
+This release describes every project as one typed model. People and agents write intent records, a builder reads the code, screens, tests, and test runs, and the links between the two are computed. `docs/core/model.md` owns the record types, the links, the authority order, and the size and stack profiles.
+
+- Product, Constraint, Research, Decision, and Requirement state why the product exists and what it must do or guarantee. A Requirement is a promise, a behaviour, or a quality, and a promise carries effective-dated values.
+- Problem and Feature state who hurts and what the product offers against it. A Feature is planned, shipped, later, or refused.
+- Actor, Role, and Permission state who acts and what each may do. Journey and Entry point state how each reaches the product.
+- Module, Business record, Rule, Use case, Result, Case, and Event state how the business works and what each operation returns. A Case is one working example, and a Result is one success or one named refusal.
+- Limit and Runbook state the bounds the product runs within and how to run it.
+- Standard, Exception, and Known gap state how the project builds, where it departs, and what it lacks. Term states what each word means, in each language the product ships.
+- Each record carries an owner and a status of draft, approved, or retired. A draft names its decider and a decide-by date. A record is replaced, never edited after approval.
+- Added the model builder at `tools/model/`. It reads the written records with the code, routes, tests, and latest test run, and writes `model.json` with the computed implements, calls, and proves links. `check` runs the model checks, `render` writes the generated page regions, and `query` answers an agent asking about one record.
+- Marked every standards provision checkable or guidance. A checkable row names the command that checks it, and a guidance row states the question a reviewer answers.
+- Replaced the three named profiles with one size and a stack per surface. A consumer selects small or large, the `dotnet` stack for its backend, and one of `react`, `svelte`, or `blazor-web` per frontend. Size decides which record types and test projects apply, and stack decides which technology pages and checks apply.
+- Merged the React and Svelte pages into one stack-neutral page per frontend concern, with short per-stack sections for what differs. Rules that apply to one stack only stay on that stack's pages.
+- Made extension replacement machine-readable. The manifest records per extension the baseline provisions it replaces and the record types it switches on. A replaced baseline rule and its check no longer apply beside the extension.
+- Replaced silent baselines with Known gap records. Each accepted gap carries an owner and an end date, and its check stays red until then.
+- Replaced overrides with Exception records. Each departure from a standard carries its reason and review date.
+- Removed Workflow, numbered identifiers, load plans, hand-written implementation status, and the identifier maps. Identifiers use the `type/home.name` form, chosen by a person and stable once approved. Agents query the model instead of reading page lists.
+- This release takes effect as the `v2.0.0` tag, the immutable reference a consumer records in `reviewedStandardsVersion`.
+
 ## v1.19.0
 
 This release gives a consumer's business intent one home and one shape. A consumer on v1.18.0 adopts it by reading the entries below and recording 1.19.0 in `reviewedStandardsVersion`. Nothing in a consumer fails until it writes a `product-topic` page or a decision with `affects`.

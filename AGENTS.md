@@ -2,9 +2,9 @@
 
 Read this file before changing this repository or a consumer application. (standards/rule/core-agent.select-task-context)
 
-Standards v1.19.0 covers one bounded-context business application. The `dotnet-react` profile uses ASP.NET Core, PostgreSQL, Marten, and zero or more React frontends. (standards/rule/core-scope.use-the-supported-application-profile, standards/rule/core-scope.keep-one-bounded-context)
+Standards v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend. (standards/rule/core-scope.use-the-supported-application-profile, standards/rule/core-scope.keep-one-bounded-context)
 
-The canonical human index is `docs/README.md`. Exact versions, profiles, extensions, and task load plans are in `standards.manifest.json`. (standards/rule/profile-react.use-manifest-version-pins, standards/rule/profile-blazor.use-manifest-version-pins, standards/rule/profile-svelte.use-manifest-version-pins, standards/rule/core-agent.select-task-context)
+The canonical human index is `docs/README.md`. Exact versions, stacks, extensions, and switched-on types are in `standards.manifest.json`. (standards/rule/workspace-dependencies.pin-every-dependency-centrally, standards/rule/core-scope.select-conditional-extensions-explicitly)
 
 A provision ID states its own page: `standards/<kind>/<page>.<heading-slug>` names `docs/<area>/<page>.md`, so `standards/rule/frontend-components.compose-composites-in-page-code` is in `docs/frontend/components.md`. `docs/reference/provisions.md` lists every identifier with its heading. (standards/rule/core-authoring.use-the-declared-identifier-grammar, standards/rule/core-authoring.regenerate-the-provision-index)
 
@@ -30,21 +30,26 @@ A consumer records the release it reviewed in `reviewedStandardsVersion`. (stand
 
 ## Context Loading
 
-1. Read the consumer `AGENTS.md` and `standards.project.json`. (standards/rule/core-agent.load-context-by-tier)
-2. Read the active use-case specification before changing observable behavior. (standards/rule/core-agent.read-active-behavior-specifications)
-3. Select the narrowest task under `loadPlans` in the manifest. (standards/rule/core-agent.select-task-context)
-4. Read its Tier 1 Agent Summary sections. (standards/rule/core-agent.load-context-by-tier)
-5. Read Tier 2 before generating files or changing public boundaries. (standards/rule/core-agent.escalate-from-summary-to-full-document)
-6. Read selected project extensions and locally applicable extensions. (standards/rule/core-agent.load-applicable-extensions, standards/rule/core-system.select-extensions-before-applying-them)
-7. Inspect neighboring consumer files after loading the applicable standard. (standards/rule/core-agent.inspect-local-examples-after-standards)
+1. Read the consumer `AGENTS.md` and `standards.project.json`. (standards/rule/core-agent.select-task-context)
+2. Query the model for the records the task touches. (standards/rule/core-agent.select-task-context)
+3. Read the generated agent context for those records, then the records themselves. (standards/rule/core-agent.select-task-context)
+4. Read the full standards pages the query names before generating files or changing public boundaries. (standards/rule/core-agent.select-task-context)
+5. Read selected extensions and their switched-on types before editing inside their boundary. (standards/rule/core-agent.load-applicable-extensions, standards/rule/core-system.select-extensions-before-applying-them)
+6. Inspect neighboring consumer files after loading the applicable standard. (standards/rule/core-agent.inspect-local-examples-after-standards)
+
+Run the query from the standards root as below, adding the `standards/` prefix from a consumer root.
+
+```bash
+dotnet run --project tools/model/Litenova.Model -- query <id>
+```
 
 Do not load unrelated conventions or inactive extensions. (standards/rule/core-agent.load-applicable-extensions, standards/rule/core-system.select-extensions-before-applying-them)
 
 ## Source Precedence
 
-Apply guidance in this order: consumer override, baseline-replacing extension, selected profile, then core page. (standards/rule/core-agent.apply-guidance-precedence)
+Apply guidance in this order: project exception, baseline-replacing extension, selected stacks, then core page. (standards/rule/core-agent.apply-guidance-precedence)
 
-A named local convention can replace a baseline convention. Stop when requirements conflict without declared precedence. (standards/rule/core-agent.apply-guidance-precedence, standards/rule/core-agent.stop-on-unresolved-conflict)
+A project exception with a reason and review date can replace a baseline rule. Stop when requirements conflict without declared precedence. (standards/rule/core-agent.apply-guidance-precedence, standards/rule/core-agent.stop-on-unresolved-conflict)
 
 Quote both conflicting IDs and paths when requesting a decision. (standards/rule/core-agent.stop-on-unresolved-conflict)
 
@@ -52,10 +57,10 @@ Quote both conflicting IDs and paths when requesting a decision. (standards/rule
 
 1. Confirm the requested scope and affected repositories. (standards/rule/core-agent.make-coherent-scoped-changes)
 2. Read `git status` and preserve unrelated work. (standards/rule/core-agent.inspect-existing-work-before-editing)
-3. Load the active specification and applicable extensions. (standards/rule/core-agent.load-applicable-extensions, standards/rule/core-agent.read-active-behavior-specifications)
+3. Query the model for the active records and load the applicable extensions. (standards/rule/core-agent.select-task-context, standards/rule/core-agent.load-applicable-extensions)
 4. Check the manifest before changing dependencies. (standards/rule/workspace-dependencies.pin-every-dependency-centrally, standards/rule/workspace-dependencies.approve-new-packages-explicitly)
 5. Match compliant neighboring patterns. (standards/rule/core-agent.inspect-local-examples-after-standards)
-6. Change documentation, code, tests, contracts, and operations as one unit. (standards/rule/core-agent.update-behavior-records-with-code)
+6. Change records, code, tests, contracts, and operations as one unit. (standards/rule/core-system.update-specifications-with-behavior)
 
 Do not add an unauthorized package, schema migration, authentication change, public break, or external side effect. (standards/rule/core-agent.inspect-existing-work-before-editing)
 
@@ -76,15 +81,11 @@ A consumer template's `reviewedStandardsVersion` field is set to the latest rele
 - Give each rejected Domain rule its own exception type and stable failure code. (standards/rule/backend-domain.reject-business-violations-with-domain-exceptions)
 - Organize each layer by the same modules, aggregates, and use cases. (standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case)
 - Write commands through repositories and commit through the command pipeline. (standards/rule/backend-application.keep-command-handlers-narrow, standards/rule/backend-persistence.commit-once-in-the-command-pipeline)
-- Derive authenticated actors from verified claims and authorize target resources. (standards/rule/backend-api.derive-authenticated-identity-from-claims, standards/rule/backend-api.authorize-the-target-resource)
+- Derive the actor from verified claims, and authorize each target from declared permissions. (standards/rule/backend-application.enforce-target-authorization-in-the-pipeline)
 - Use the controlled shadcn/ui baseline for React web frontends. (standards/rule/frontend-ui.select-one-visual-authority, standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)
 - Use the controlled shadcn-svelte baseline for Svelte frontends. (standards/rule/svelte-ui.select-one-visual-authority, standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package)
 
 Read the full cited provisions before applying these boundaries. (standards/rule/core-agent.select-task-context)
-
-## Specification Cards
-
-An aggregate, module, or use-case specification carries a card under its title, before its first section. The card is `At a glance` on an aggregate, `Module map` on a module, and `Business impact` on a use case. An aggregate or use-case page also carries `Terms used`, and a card lifts from the page and invents nothing. The reference consumer validator requires the callouts and their position. (standards/rule/core-authoring.use-the-declared-page-contract)
 
 ## Pattern feedback
 
@@ -100,29 +101,26 @@ node tools/generate-provisions.mjs
 node tools/validate-standards.mjs
 node tools/validate-ui.cases.mjs
 node tools/validate-consumer.cases.mjs
+dotnet build tools/model/Litenova.Model
+node tools/model.cases.mjs
 node patterns/ui/library.mjs --check
 git diff --check
 ```
 
-The standards validator checks current schemas, manifest references, provision IDs, page contracts, links, prose, summaries, and evidence mappings. (standards/rule/core-authoring.run-repeatable-authoring-checks, standards/rule/core-authoring.validate-current-standards-material)
+The standards validator checks current schemas, manifest references, provision IDs, page contracts, links, prose, summaries, and verification marks. (standards/rule/core-authoring.run-repeatable-authoring-checks, standards/rule/core-authoring.validate-current-standards-material)
 
 Run extension-specific checks when their rules, schemas, templates, or validators change. (standards/rule/core-release.run-boundary-selected-checks)
 
 ## Consumer Verification
 
-`standards/rule/quality-ci.run-applicable-gates-on-every-pull-request` in [continuous integration](docs/quality/ci.md) owns the exact consumer gate commands. Run the gates its table selects for each changed area. (standards/rule/core-release.run-boundary-selected-checks, standards/rule/quality-ci.run-applicable-gates-on-every-pull-request)
+`standards/rule/quality-ci.run-applicable-gates-on-every-pull-request` in [continuous integration](docs/quality/ci.md) owns the consumer gates. Run the gates its job table selects for each changed area. (standards/rule/core-release.run-boundary-selected-checks, standards/rule/quality-ci.run-applicable-gates-on-every-pull-request)
 
-Run the reference validators from the consumer root, then Playwright for affected browser flows and every applicable extension check. (standards/rule/core-release.run-boundary-selected-checks)
-
-```bash
-node standards/tools/validate-consumer.mjs
-node standards/tools/validate-ui.mjs
-```
+Run Playwright for affected browser flows and every applicable extension check. (standards/rule/core-release.run-boundary-selected-checks)
 
 ## Completion
 
-Run every applicable check and compare observable behavior with the active use case. (standards/rule/core-agent.run-and-report-verification)
+Run every applicable check and compare observable behavior with the active records. (standards/rule/core-release.report-verification-exactly)
 
-Inspect generated differences and report exact commands, results, evidence scope, and skipped checks. (standards/rule/core-agent.run-and-report-verification, standards/rule/core-release.report-verification-exactly)
+Inspect generated differences and report exact commands, results, evidence scope, and skipped checks. (standards/rule/core-release.report-verification-exactly)
 
-Leave no placeholder implementation, `TODO`, or untracked generated output. (standards/rule/core-release.complete-observable-use-case-slices, standards/rule/core-release.regenerate-application-contracts)
+Leave no placeholder implementation, `TODO`, or untracked generated output. (standards/rule/core-system.deliver-one-complete-use-case, standards/rule/core-release.regenerate-application-contracts)
