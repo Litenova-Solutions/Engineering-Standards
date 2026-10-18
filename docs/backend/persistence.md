@@ -2,24 +2,22 @@
 
 ## Intent
 
-
 This page states how the backend stores and reads aggregates. Commands load and stage aggregates through Domain-owned repositories. Queries read through the session directly in Application, because the selected profile treats document queries as an explicit read-side dependency.
 
 One scoped session and one command post-handler own the transaction boundary. Marten is the baseline provider, and the `efcore` extension replaces the provider-specific rules named below.
 
 ## Agent Summary {#agent-summary}
 
-
 - Commands write through repositories, never the session directly. (standards/rule/backend-persistence.stage-aggregate-writes-through-repositories)
 - Queries project through the read session with scope and limits applied. (standards/rule/backend-persistence.query-through-iquerysession)
 - One post-handler commits each command; nothing else calls save. (standards/rule/backend-persistence.commit-once-in-the-command-pipeline)
 - Repositories buffer events for the post-handler to drain. (standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work)
-- Workflow progress and outgoing work commit in one transaction. (standards/rule/backend-persistence.stage-workflow-progress-with-outgoing-work)
 - Document aliases and identifier mappings are declared explicitly. (standards/rule/backend-persistence.keep-mappings-and-aliases-explicit)
 - Infrastructure owns the stored JSON contract, not Domain. (standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain)
 - Stored contract changes carry a reviewed transformation. (standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly)
 - Aggregate documents carry no unbounded collection. (standards/rule/backend-persistence.bound-aggregate-document-growth)
 - Database identifiers use snake case. (standards/rule/backend-persistence.use-database-naming-conventions)
+- Persistence behavior is proved against PostgreSQL. (standards/rule/backend-persistence.test-persistence-against-postgresql)
 
 ## Concepts
 
@@ -29,17 +27,16 @@ The provisions on this page divide into two groups. A reader replacing the provi
 
 | Group | What it fixes | Provisions |
 |:---|:---|:---|
-| Provider-neutral | The boundary, the transaction shape, and the obligations on stored data. | `WRITE.001`, `COMMIT.001`, `EVENT.001`, `WORKFLOW.001`, `EVOLUTION.001`, `GROWTH.001`, `NAMING.001`, `SCHEMA.001`, `TEST.001` |
-| Provider-specific | The member names and configuration surface the pinned provider supplies. | `READ.001`, `MAPPING.001`, `SERIALIZATION.001` |
+| Provider-neutral | The boundary, the transaction shape, and the obligations on stored data. | `standards/rule/backend-persistence.stage-aggregate-writes-through-repositories`, `standards/rule/backend-persistence.commit-once-in-the-command-pipeline`, `standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work`, `standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly`, `standards/rule/backend-persistence.bound-aggregate-document-growth`, `standards/rule/backend-persistence.use-database-naming-conventions`, `standards/rule/backend-persistence.control-production-schema-changes`, `standards/rule/backend-persistence.test-persistence-against-postgresql`, `standards/rule/backend-persistence.review-query-plans-for-new-indexes`, `standards/rule/backend-persistence.add-read-documents-for-query-shaped-data` |
+| Provider-specific | The member names and configuration surface the pinned provider supplies. | `standards/rule/backend-persistence.query-through-iquerysession`, `standards/rule/backend-persistence.keep-mappings-and-aliases-explicit`, `standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain`, `standards/rule/backend-persistence.register-one-scoped-session`, `standards/rule/backend-persistence.use-this-infrastructure-layout`, `standards/rule/backend-persistence.persist-one-explicit-state-object` |
 
 The provider-neutral group states one obligation each, and the member named in its text is the baseline binding rather than the obligation. `standards/rule/backend-persistence.commit-once-in-the-command-pipeline` requires exactly one commit for a command pipeline; `SaveChangesAsync` is the call that performs it under the baseline provider.
 
-The provider-specific group is replaced by [the EF Core extension](../ext/efcore.md) when a consumer selects it. No consumer runs both providers over one aggregate.
+The EF Core extension states in its own Baseline relationship section which provisions it replaces for the aggregates it owns. No consumer runs both providers over one aggregate.
 
 The manifest pins both providers' packages, because the extension is part of this release. A pinned package is an available choice rather than an active one, and `standards.project.json` records which choices a consumer made.
 
 ## Standards
-
 
 ### Stage aggregate writes through repositories (standards/rule/backend-persistence.stage-aggregate-writes-through-repositories)
 
@@ -51,13 +48,20 @@ The manifest pins both providers' packages, because the extension is part of thi
 
 **Requirement:** A query handler MUST project through `IQuerySession`, applying filter, scope, ordering, and limit before materialization.
 
-**Rationale:** A read-store interface per aggregate, a generic read repository, or a callback wrapper adds a layer that the session already provides.
+**Rationale:** A read-store interface per aggregate, a generic read repository, or a callback wrapper adds a layer that the session already provides. Ordering and paging follow `standards/rule/backend-api.bound-collection-queries`.
+
+| Provider | Query surface |
+|:---|:---|
+| Marten baseline | `IQuerySession` |
+| EF Core extension | The context type the extension declares |
+
+The table names the binding per provider; the obligation to project with filter, scope, ordering, and limit holds under each.
 
 ### Commit once in the command pipeline (standards/rule/backend-persistence.commit-once-in-the-command-pipeline)
 
 **Requirement:** Exactly one global command post-handler MUST call `SaveChangesAsync` for a command pipeline.
 
-**Rationale:** A failed command then leaves the scoped session uncommitted. Handlers, repositories, validators, reactions, orchestrators, and endpoints never commit.
+**Rationale:** A failed command then leaves the scoped session uncommitted. Handlers, repositories, validators, reactions, and endpoints never commit.
 
 The obligation is one commit for one pipeline, not one named method. Under the baseline provider that commit is `IDocumentSession.SaveChangesAsync`. Under the `efcore` extension it is `DbContext.SaveChangesAsync`, wrapped in an explicit transaction when the pipeline writes through more than one context.
 
@@ -66,12 +70,6 @@ The obligation is one commit for one pipeline, not one named method. Under the b
 **Requirement:** A repository MUST register each touched aggregate with the internal scoped event buffer that the post-handler drains.
 
 **Rationale:** The post-handler collects pending events before committing, so no public unit-of-work type is needed. Best-effort delivery publishes after the commit succeeds.
-
-### Stage Workflow progress with outgoing work (standards/rule/backend-persistence.stage-workflow-progress-with-outgoing-work)
-
-**Requirement:** A durable workflow advancement MUST stage its workflow state and outgoing command envelope in the same scoped session.
-
-**Rationale:** The post-handler commits both once and the Worker dispatches only after that commit. A failure before commit advances neither progress nor outgoing work.
 
 ### Keep mappings and aliases explicit (standards/rule/backend-persistence.keep-mappings-and-aliases-explicit)
 
@@ -119,16 +117,15 @@ A reviewed step is one that produces an artifact a person approved before it ran
 
 **Requirement:** Repository behavior, projections, mappings, correctness indexes, commit behavior, and schema application MUST run against the pinned PostgreSQL through Testcontainers.
 
-**Rationale:** An in-memory substitute cannot prove persistence behavior, because it does not run the query planner or the constraints.
+**Rationale:** An in-memory substitute cannot prove persistence behavior, because it does not run the query planner or the constraints. HTTP integration through the real host is covered by `standards/rule/backend-testing.test-http-integration-through-the-real-host`.
 
 ## Conventions
-
 
 ### Use this Infrastructure layout (standards/rule/backend-persistence.use-this-infrastructure-layout)
 
 **Default:** Place Marten configuration, repositories, commit behavior, and serialization under one Infrastructure persistence folder.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
 **Example:**
 
@@ -152,9 +149,6 @@ A reviewed step is one that produces an artifact a person approved before it ran
         Consents/
           ConsentRepository.cs
           ConsentMartenConfiguration.cs
-      Workflows/
-        OrderFulfillmentWorkflowStore.cs
-        WorkflowCommandOutbox.cs
 ```
 
 The module folders follow `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case`. A single-aggregate module stays flat when its aggregate root's plural name equals the module name. For example, `Post` stays flat under `Posts`. Otherwise, each aggregate takes its own folder.
@@ -165,23 +159,15 @@ This also applies to modules with multiple aggregates. The example keeps aggrega
 
 **Default:** Register `IDocumentSession` with the WebApi request or Worker operation scope.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
 **Rationale:** Repositories and the commit handler in one command then resolve the same session instance.
-
-### Make ordering explicit (standards/rule/backend-persistence.make-ordering-explicit)
-
-**Default:** Give every multi-item query deterministic ordering, a maximum result size, and a stable pagination tie-breaker.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** Without a tie-breaker, two pages can repeat or skip a row when sort values collide.
 
 ### Review query plans for new indexes (standards/rule/backend-persistence.review-query-plans-for-new-indexes)
 
 **Default:** Add an index only from an accepted query or a measured operating need, and inspect its plan on representative data.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
 **Rationale:** An index added without a plan reading costs write throughput for a read that may never run.
 
@@ -189,15 +175,15 @@ This also applies to modules with multiple aggregates. The example keeps aggrega
 
 **Default:** Add a module-owned read document for repeated cross-aggregate composition, deep traversal, or a distorting index shape.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
 **Rationale:** Stored aggregate documents already serve accepted simple reads. The use case defines the read document's consistency and rebuild behavior.
 
 ### Persist one explicit state object (standards/rule/backend-persistence.persist-one-explicit-state-object)
 
-**Default:** Persist the aggregate state record itself rather than a flattened projection of its fields.
+**Default:** Persist the aggregate state record itself rather than a flattened projection of its fields. Round-trip every state record through the configured serializer in integration tests.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
 **Example:** A stable discriminator property can use `$state` with `draft`, `published`, and `archived` values. The persisted state value contains its state-specific data:
 
@@ -210,7 +196,7 @@ This also applies to modules with multiple aggregates. The example keeps aggrega
 }
 ```
 
-The example registers every concrete Aggregate state record in Infrastructure. Round-trip every state record through the configured Marten serializer in integration tests.
+The example registers every concrete Aggregate state record in Infrastructure.
 
 Adding a state discriminator can break an older application version during a mixed-version deployment. The release plan either prevents the older version from reading the new state or introduces a compatible reader before commands can persist that state.
 
@@ -249,24 +235,21 @@ internal sealed class PostRepository(
 
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/backend-persistence.stage-aggregate-writes-through-repositories | inspection | `ArchitectureTests` asserts no command handler resolves `IDocumentSession` and no repository exposes it. |
-| standards/rule/backend-persistence.query-through-iquerysession | inspection | `ArchitectureTests` asserts each query handler resolves `IQuerySession` and no read-store abstraction exists. |
-| standards/rule/backend-persistence.commit-once-in-the-command-pipeline | inspection | `ArchitectureTests` asserts `SaveChangesAsync` appears only in the command post-handler. |
-| standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work | inspection | `PersistenceCommitTests` asserts pending events are collected before commit and published only after it succeeds. |
-| standards/rule/backend-persistence.stage-workflow-progress-with-outgoing-work | inspection | `WorkflowPersistenceTests` asserts progress and the outgoing envelope commit together or not at all. |
-| standards/rule/backend-persistence.keep-mappings-and-aliases-explicit | inspection | `MartenMappingTests` asserts each stored aggregate declares an explicit alias and identifier mapping. |
-| standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain | inspection | `SerializationTests` asserts every stored polymorphic subtype round-trips under the configured contract. |
-| standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly | inspection | `DocumentEvolutionTests` reads a document written in the previous shape and asserts the declared transformation result. |
-| standards/rule/backend-persistence.bound-aggregate-document-growth | inspection | `DocumentSizeTests` asserts each embedded collection has a declared maximum from its use case. |
-| standards/rule/backend-persistence.use-database-naming-conventions | inspection | `SchemaNamingTests` asserts every generated database identifier is snake case. |
-| standards/rule/backend-persistence.control-production-schema-changes | inspection | Deployment review confirms the schema step runs before traffic shifts and startup applies no schema change. |
-| standards/rule/backend-persistence.test-persistence-against-postgresql | test | `PersistenceIntegrationTests` runs against the manifest-pinned PostgreSQL image through Testcontainers. |
-| standards/rule/backend-persistence.use-this-infrastructure-layout | inspection | Folder review locates store configuration, repositories, and commit behavior under the persistence folder, or records a named local replacement. |
-| standards/rule/backend-persistence.register-one-scoped-session | inspection | `SessionLifetimeTests` asserts repositories and the commit handler resolve one session per operation. |
-| standards/rule/backend-persistence.make-ordering-explicit | inspection | `QueryOrderingTests` asserts each multi-item query declares ordering, a bound, and a tie-breaker. |
-| standards/rule/backend-persistence.review-query-plans-for-new-indexes | inspection | Index review records the accepted query and the PostgreSQL plan that justified it. |
-| standards/rule/backend-persistence.add-read-documents-for-query-shaped-data | inspection | Read-document review records its consistency and rebuild behavior alongside its owning use case. |
-| standards/rule/backend-persistence.persist-one-explicit-state-object | inspection | `SerializationTests` asserts each persisted aggregate round-trips its state record type. |
+| standards/rule/backend-persistence.stage-aggregate-writes-through-repositories | guidance | Does each command handler reach persistence only through a Domain repository? |
+| standards/rule/backend-persistence.query-through-iquerysession | guidance | Does each query handler project through the session named for its provider, with filter, scope, ordering, and limit applied first? |
+| standards/rule/backend-persistence.commit-once-in-the-command-pipeline | guidance | Does exactly one command post-handler commit each pipeline, with no other caller committing? |
+| standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work | guidance | Does each repository register touched aggregates with the internal buffer the post-handler drains? |
+| standards/rule/backend-persistence.keep-mappings-and-aliases-explicit | guidance | Does each stored aggregate declare a stable alias, identifier mapping, and the indexes its queries need? |
+| standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain | guidance | Does Infrastructure own the stored JSON contract with every persisted subtype registered? |
+| standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly | guidance | Does each stored-contract change carry a reviewed transformation or an expand-and-contract rollout? |
+| standards/rule/backend-persistence.bound-aggregate-document-growth | guidance | Does each embedded collection in an aggregate document have an accepted business bound? |
+| standards/rule/backend-persistence.use-database-naming-conventions | guidance | Is each generated database identifier snake case? |
+| standards/rule/backend-persistence.control-production-schema-changes | guidance | Does each hosted schema change run as a reviewed step before traffic shifts? |
+| standards/rule/backend-persistence.test-persistence-against-postgresql | guidance | Does each persistence behavior run against the pinned PostgreSQL through Testcontainers? |
+| standards/rule/backend-persistence.use-this-infrastructure-layout | guidance | Do store configuration, repositories, and commit behavior sit under the one persistence folder? |
+| standards/rule/backend-persistence.register-one-scoped-session | guidance | Do the repositories and the commit handler in one command resolve one session? |
+| standards/rule/backend-persistence.review-query-plans-for-new-indexes | guidance | Does each new index record its accepted query and the plan that justified it? |
+| standards/rule/backend-persistence.add-read-documents-for-query-shaped-data | guidance | Does each read document record its consistency and rebuild behavior beside its owning use case? |
+| standards/rule/backend-persistence.persist-one-explicit-state-object | guidance | Does each aggregate persist its state record with every state round-tripping through the serializer? |

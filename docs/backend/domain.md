@@ -2,27 +2,28 @@
 
 ## Intent
 
+Domain holds the business model and protects aggregate invariants. It references no persistence, HTTP, messaging, logging, configuration, injection, serialization, or provider concept. Its names match the Terms its records use.
 
-Domain contains the business model and protects aggregate invariants without persistence, HTTP, mediator, dependency injection, or provider concepts. Its types use the language from the product glossary, module specifications, and use-case specifications.
-
-The profile gives every Aggregate an explicit state record hierarchy from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home. It avoids later replacement of an enum, status string, or flag-based lifecycle.
+Every aggregate exposes its lifecycle as state records from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home. It avoids later replacement of an enum, status string, or flag-based lifecycle.
 
 ## Agent Summary {#agent-summary}
 
-
 - Domain references only the base class library and its own types. (standards/rule/backend-domain.keep-domain-free-of-outer-layer-concerns)
-- Domain names match the approved glossary term. (standards/rule/backend-domain.use-one-ubiquitous-language)
+- Domain names match the Terms the records use. (standards/rule/backend-domain.use-one-ubiquitous-language)
 - The aggregate root is the only public mutation entry point. (standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries)
 - Every aggregate root derives from the one project base. (standards/rule/backend-domain.use-the-project-aggregate-root-contract)
 - Lifecycle uses an abstract state base with sealed case records. (standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records)
-- Closed sets are record hierarchies, never enums. (standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
+- Closed sets are record hierarchies with stable codes, never enums. (standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
 - Aggregates are created through named static factories only. (standards/rule/backend-domain.create-valid-aggregates-through-named-factories)
-- Mutation methods check state, protect invariants, and record events. (standards/rule/backend-domain.express-transitions-through-business-methods)
+- Mutations check state; transitions also replace state and record events. (standards/rule/backend-domain.express-transitions-through-business-methods)
 - Children change only through their root, and collections are read-only. (standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary)
 - Identifiers are typed record structs over version 7 GUIDs. (standards/rule/backend-domain.use-strongly-typed-version-7-identifiers)
+- Money is one value object with decimal amount and currency code. (standards/rule/backend-domain.make-money-and-decimal-rules-explicit)
+- Time, randomness, and identifiers arrive as arguments; Domain reads no clock. (standards/rule/backend-domain.pass-nondeterministic-values-into-domain)
+- Each rejected rule throws its own exception type with a stable code. (standards/rule/backend-domain.reject-business-violations-with-domain-exceptions)
+- Domain events carry business data only; envelope identity lives outside. (standards/rule/backend-domain.raise-immutable-domain-facts)
 
 ## Standards
-
 
 ### Keep Domain free of outer-layer concerns (standards/rule/backend-domain.keep-domain-free-of-outer-layer-concerns)
 
@@ -32,15 +33,15 @@ The profile gives every Aggregate an explicit state record hierarchy from its fi
 
 ### Use one ubiquitous language (standards/rule/backend-domain.use-one-ubiquitous-language)
 
-**Requirement:** A Domain type, property, method, exception, or event name MUST match the term its module glossary approves.
+**Requirement:** A Domain type, property, method, exception, or event name MUST match a Term record in the project language record.
 
-**Rationale:** A business action named `Publish` in the glossary is not `SetStatus` in code. The module specification records rejected synonyms that could plausibly return.
+**Rationale:** A business action named `Publish` in the language record is not `SetStatus` in code. The language record holds each Term meaning, labels per language, rejected words, and broader and narrower links. Records cite the Terms they use, and the glossary is generated from the language record.
 
 ### Treat aggregates as consistency boundaries (standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries)
 
 **Requirement:** An aggregate root MUST be the only public mutation entry point for every invariant its transaction protects.
 
-**Rationale:** External code sets no property and calls no child mutation method. A command normally changes one aggregate, and an approved record names the invariant before one command changes several.
+**Rationale:** External code sets no property and calls no child mutation method. A command normally changes one aggregate. The use-case record names any immediate invariant before one command changes several.
 
 ### Use the project aggregate root contract (standards/rule/backend-domain.use-the-project-aggregate-root-contract)
 
@@ -50,7 +51,7 @@ The profile gives every Aggregate an explicit state record hierarchy from its fi
 
 ### Model every Aggregate lifecycle with state records (standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records)
 
-**Requirement:** An aggregate MUST expose one `State` property backed by an abstract `{Aggregate}State` record and sealed per-state records.
+**Requirement:** An aggregate MUST expose one `State` property backed by an abstract `{Aggregate}State` record and sealed per-state records. Callers read lifecycle only through that property.
 
 **Rationale:** An enum, string discriminator, boolean flag, parallel nullable field, or computed state cannot carry state-specific data or prove exhaustiveness. State records hold that data, and aggregate methods own the transitions.
 
@@ -75,32 +76,63 @@ public sealed record ProfileActiveState : ProfileState;
 
 ### Model every closed set of domain values without enums (standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
 
-**Requirement:** The Domain project MUST model every closed set as an abstract record base with sealed cases rather than an `enum`.
+**Requirement:** The Domain project MUST model every closed set as an abstract record base with sealed cases rather than an `enum`. Every case MUST expose one stable `Code`. A set whose cases carry no data MUST expose a `FromCode` factory that rebuilds every case from its label. A boundary converts a label to its case through `FromCode`, never through `ToString`. An unrecognized label is a validation failure rather than a default case.
 
 **Rationale:** An enum is a named integer. It carries no case data, admits undefined values through a cast, and forces parallel fields when a case later gains data. A closed hierarchy lets the compiler check exhaustiveness.
 
 **Example:**
 
 ```csharp
-public abstract record RefundOutcome;
+public abstract record RefundOutcome
+{
+    public abstract string Code { get; }
+}
 
-public sealed record RefundPendingOutcome(string Reason) : RefundOutcome;
+public sealed record RefundPendingOutcome(string Reason) : RefundOutcome
+{
+    public override string Code => "pending";
+}
 
-public sealed record RefundSucceededOutcome(DateTimeOffset ProviderTime) : RefundOutcome;
+public sealed record RefundSucceededOutcome(DateTimeOffset ProviderTime) : RefundOutcome
+{
+    public override string Code => "succeeded";
+}
 
-public sealed record RefundFailedOutcome(string Classification) : RefundOutcome;
+public sealed record RefundFailedOutcome(string Classification) : RefundOutcome
+{
+    public override string Code => "failed";
+}
 
-public sealed record RefundReversedOutcome(DateTimeOffset ProviderTime) : RefundOutcome;
+public sealed record RefundReversedOutcome(DateTimeOffset ProviderTime) : RefundOutcome
+{
+    public override string Code => "reversed";
+}
 ```
 
-A case that owns no data is still a sealed record. The set can grow case data later without a breaking change:
+A case that owns no data is still a sealed record, so the set can grow case data later without a breaking change:
 
 ```csharp
-public abstract record MerchantRole;
+public abstract record MerchantRole
+{
+    public abstract string Code { get; }
 
-public sealed record MerchantOwnerRole : MerchantRole;
+    public static MerchantRole FromCode(string code) => code switch
+    {
+        "owner" => new MerchantOwnerRole(),
+        "warehouse-staff" => new MerchantWarehouseStaffRole(),
+        _ => throw new MerchantUnsupportedRoleException(code),
+    };
+}
 
-public sealed record MerchantWarehouseStaffRole : MerchantRole;
+public sealed record MerchantOwnerRole : MerchantRole
+{
+    public override string Code => "owner";
+}
+
+public sealed record MerchantWarehouseStaffRole : MerchantRole
+{
+    public override string Code => "warehouse-staff";
+}
 ```
 
 Callers branch with a `switch` expression on the case type. A `switch` that omits a case surfaces at review as a missing arm rather than a silent default. A case that carries data exposes it directly instead of through a separate nullable field:
@@ -116,11 +148,9 @@ var next = outcome switch
 };
 ```
 
-The example uses a typed value object for a closed set represented by one scalar (`standards/rule/backend-domain.use-immutable-value-objects-for-domain-concepts`). It can own validation, normalization, or formatting without per-case data or behavior. The example does not use an enum as its backing field.
+A closed set represented by one scalar uses a typed value object, never an enum backing field.
 
-The example does not represent a Domain closed set with an enum, scalar discriminator, or boolean flags.
-
-This rule binds the Domain project. A C# `enum` declaration in Domain is invalid under every reading of it. The same set appears at three other layers, and each layer has exactly one permitted form:
+This rule binds the Domain project. The same set appears at three other layers, and each layer has exactly one permitted form:
 
 | Layer | Form of a closed set | Owning provision |
 |:---|:---|:---|
@@ -131,18 +161,16 @@ This rule binds the Domain project. A C# `enum` declaration in Domain is invalid
 
 A transport `enum` is permitted in one situation: every case of the set carries no data, and the labels are the complete contract. A set where any case carries data crosses the boundary as a polymorphic model instead.
 
-A transport enum never re-enters Domain. The Application layer converts the label to its record case before it calls a Domain method. An unrecognized label is a validation failure rather than a default case. Without that conversion rule, the boundary exception readmits the integer the Domain rule removed.
+A transport enum never re-enters Domain. The Application layer converts the label to its record case before it calls a Domain method.
 
-Each union exposes one stable code or label. Its `FromCode` factory round-trips every case. A boundary projects through that member, never the record's default `ToString()`. The default can leak a concrete type name instead of `owner`.
-
-Round-trip tests cover every case, which catches a renamed code and a missing label:
+Round-trip tests cover every data-less case, which catches a renamed code and a missing label:
 
 ```csharp
 [Theory]
-[MemberData(nameof(AllCases))]
-public void FromCode_round_trips_every_case(RefundOutcome outcome)
+[MemberData(nameof(AllRoles))]
+public void FromCode_round_trips_every_case(MerchantRole role)
 {
-    RefundOutcome.FromCode(outcome.Code).Should().Be(outcome);
+    MerchantRole.FromCode(role.Code).Should().Be(role);
 }
 ```
 
@@ -163,9 +191,9 @@ public sealed class Order : AggregateRoot<OrderId>
     {
         if (lines.Count == 0) throw new OrderEmptyException();
 
-        var order = new Order(id, customer, OrderState.AwaitingPayment.Instance);
+        var order = new Order(id, customer, new OrderAwaitingPaymentState());
         foreach (var line in lines) order.AddLine(OrderLine.Create(id, line.Product, line.Quantity, line.Price));
-        order.Record(new OrderPlacedEvent(id, customer, placedAt));
+        order.RaiseDomainEvent(new OrderPlacedEvent(id, customer, placedAt));
         return order;
     }
 }
@@ -173,11 +201,11 @@ public sealed class Order : AggregateRoot<OrderId>
 
 ### Express transitions through business methods (standards/rule/backend-domain.express-transitions-through-business-methods)
 
-**Requirement:** A public aggregate mutation method MUST check current state, protect its invariants, replace state, and record its domain events.
+**Requirement:** A public aggregate mutation method MUST check current state and protect its invariants. A method that moves the lifecycle MUST also replace state and record its transition event.
 
-**Rationale:** A handler then calls `post.Publish(utcNow)` without testing the state first. A generic `Set`, `Update`, `Process`, or `Handle` name hides which business action ran.
+**Rationale:** A handler then calls `post.Publish(utcNow)` without testing the state first. A generic `Set`, `Update`, `Process`, or `Handle` name hides which business action ran. A mutation that changes no lifecycle state, such as `ChangeTitle` on a draft, checks state and assigns without recording a transition.
 
-The four steps run in that order. A method that replaces state before checking an invariant leaves a rejected aggregate holding the new state. A method that records an event before replacing state can record a fact the next check refuses. A method that throws after recording an event loses the whole call, because the aggregate is never persisted.
+Checks run before replacement, and replacement runs before recording. A method that replaces state before checking an invariant leaves a rejected aggregate holding the new state.
 
 ### Keep child entities inside the aggregate boundary (standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary)
 
@@ -187,19 +215,94 @@ The four steps run in that order. A method that replaces state before checking a
 
 ### Use strongly typed version 7 identifiers (standards/rule/backend-domain.use-strongly-typed-version-7-identifiers)
 
-**Requirement:** An aggregate identity MUST be a `readonly record struct` wrapping one `Guid` created with `Guid.CreateVersion7()`.
+**Requirement:** An aggregate identity MUST be a `readonly record struct` wrapping one `Guid` in version 7 form. It MUST declare no implicit conversion, no primitive alias, and no public parameterless creation path.
 
-**Rationale:** It implements the project `IStronglyTypedId` marker and `IParsable<TId>`, rejects `Guid.Empty`, and each factory also rejects the struct default. No implicit conversion erases the type.
+**Rationale:** It implements the project `IStronglyTypedId` marker and `IParsable<TId>`, rejects `Guid.Empty`, and each factory also rejects the struct default. New values arrive from the caller: a factory takes its identifier as an argument. A method that needs several identifiers takes a generator as an argument. Domain reads no clock and calls no static source of time or randomness.
 
-Version 7 embeds a millisecond timestamp, so the identity factory reads a clock. That read is the one exception to `standards/rule/backend-domain.pass-nondeterministic-values-into-domain`. It observes no business time and decides nothing. A test that needs a fixed identity passes one in rather than freezing a clock.
+Version 7 values come from the caller-supplied generator, so Domain observes no business time and decides nothing about clocks. Persistence rejects a duplicate key and the operation fails, which is the same path as any other write conflict.
 
-**Example:** [RFC 9562](https://www.rfc-editor.org/info/rfc9562) defines version 7 as a timestamp followed by at least 74 random bits. The Domain writes no collision handling for that space. Persistence rejects a duplicate key and the operation fails, which is the same path as any other write conflict.
+**Example:**
+
+```csharp
+public readonly record struct PostId : IStronglyTypedId, IParsable<PostId>
+{
+    private PostId(Guid value)
+    {
+        Value = value;
+    }
+
+    public Guid Value { get; }
+
+    public static PostId From(Guid value)
+    {
+        if (value == Guid.Empty)
+        {
+            throw new PostIdentityRequiredException();
+        }
+
+        return new PostId(value);
+    }
+
+    public static PostId Parse(string value, IFormatProvider? provider) =>
+        From(Guid.Parse(value));
+
+    public static bool TryParse(
+        string? value,
+        IFormatProvider? provider,
+        out PostId result)
+    {
+        if (Guid.TryParse(value, out var parsed) && parsed != Guid.Empty)
+        {
+            result = new PostId(parsed);
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
+
+    public override string ToString() => Value.ToString();
+}
+```
+
+The `IParsable<TId>` implementation supports Minimal API route and query binding. `Parse` follows the .NET parsing contract for malformed text; `From` applies the domain empty-identity rule.
 
 ### Use immutable value objects for domain concepts (standards/rule/backend-domain.use-immutable-value-objects-for-domain-concepts)
 
 **Requirement:** A value object MUST be immutable, compare by its complete value, and expose creation through a static method rather than a constructor.
 
-**Rationale:** It exposes no setter and no implicit conversion, because a primitive conversion hides validation and a value conversion erases the domain type. Reading uses `Value` or `ToString`.
+**Rationale:** It exposes no setter and no implicit conversion, because a primitive conversion hides validation and a value conversion erases the domain type. Reading uses `Value` or `ToString`. Creation through a named static method keeps every construction path under the validation the type declares.
+
+**Example:**
+
+```csharp
+public sealed record PostTitle
+{
+    private PostTitle(string value)
+    {
+        Value = value;
+    }
+
+    public string Value { get; }
+
+    public static PostTitle Create(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new PostTitleRequiredException();
+        }
+
+        if (value.Length > 200)
+        {
+            throw new PostTitleExceedsMaximumLengthException(value.Length);
+        }
+
+        return new PostTitle(value);
+    }
+
+    public override string ToString() => Value;
+}
+```
 
 ### Define collection value semantics explicitly (standards/rule/backend-domain.define-collection-value-semantics-explicitly)
 
@@ -207,47 +310,151 @@ Version 7 embeds a millisecond timestamp, so the identity factory reads a clock.
 
 **Rationale:** Default record equality compares collection references, not contents. Constructors copy incoming mutable collections and members return read-only views. The module terms state whether order is part of the value.
 
+**Example:**
+
+```csharp
+public sealed record PostTags
+{
+    private readonly IReadOnlyList<string> _values;
+
+    private PostTags(IEnumerable<string> values)
+    {
+        _values = values.ToList().AsReadOnly();
+    }
+
+    public IReadOnlyList<string> Values => _values;
+
+    public static PostTags Create(IEnumerable<string> values) => new(values);
+
+    public bool Equals(PostTags? other) =>
+        other is not null && _values.SequenceEqual(other._values);
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+
+        foreach (var value in _values)
+        {
+            hash.Add(value, StringComparer.Ordinal);
+        }
+
+        return hash.ToHashCode();
+    }
+}
+```
+
+The example treats tag order as meaningful. If order is irrelevant, creation normalizes to the documented comparison order before storing values.
+
 ### Make money and decimal rules explicit (standards/rule/backend-domain.make-money-and-decimal-rules-explicit)
 
-**Requirement:** A monetary amount MUST use `decimal` inside a `Money` value object that carries its currency.
+**Requirement:** A monetary amount MUST use `decimal` inside one shared `Money` value object that carries an ISO 4217 currency code. `Money` MUST serialize as `{ "amount": "12.50", "currency": "EUR" }`.
 
-**Rationale:** The module specification defines supported currencies, scale, rounding, sign rules, and cross-currency arithmetic, and Infrastructure maps that precision explicitly.
+**Rationale:** The owning module record defines supported currencies, scale, rounding, sign rules, and cross-currency arithmetic. Infrastructure maps that precision explicitly. A use case fixed to one currency accepts an amount alone and states that currency in its record.
+
+**Example:**
+
+```csharp
+public sealed record Money
+{
+    private Money(decimal amount, string currency)
+    {
+        Amount = amount;
+        Currency = currency;
+    }
+
+    public decimal Amount { get; }
+
+    public string Currency { get; }
+
+    public static Money Create(decimal amount, string currency) => new(amount, currency);
+
+    public override string ToString() => $"{Amount} {Currency}";
+}
+```
+
+```json
+{ "amount": "12.50", "currency": "EUR" }
+```
+
+The amount serializes as a string, so no reader parses it as binary floating point.
 
 ### Keep binary floating point out of exact quantities (standards/rule/backend-domain.keep-binary-floating-point-out-of-exact-quantities)
 
 **Requirement:** A Domain type MUST NOT use `double` or `float` for a monetary amount, a rate applied to one, or a quantity compared for exact equality.
 
-**Rationale:** Binary floating point cannot represent most decimal fractions, so two amounts that a person reads as equal compare as different. The prohibition belonged in a rationale, where it obliged nobody.
+**Rationale:** Binary floating point cannot represent most decimal fractions, so two amounts that a person reads as equal compare as different.
 
 **Example:** A tax rate multiplied into a `Money` amount is a `decimal`. A measured latency in a diagnostic record is not a domain quantity and is outside this rule.
 
 ### Use stateless domain services for ownerless rules (standards/rule/backend-domain.use-stateless-domain-services-for-ownerless-rules)
 
-**Requirement:** A domain service MUST be stateless, accept and return Domain values, and perform no persistence, messaging, clock, or provider call.
+**Requirement:** A domain service MUST be stateless, accept and return Domain values, and perform no persistence, messaging, logging, clock, authorization, or provider call.
 
 **Rationale:** It exists only when a calculation spans concepts with no natural aggregate owner. Application loads the aggregates, calls the service, and passes its result into aggregate behavior.
 
 A domain service is stateless and takes no port, so its tests are Domain tests. They sit beside the aggregate tests in the Domain test project, with no harness, no substitute, and no fixture.
 
+**Example:**
+
+```csharp
+public sealed class OrderPricingDomainService
+{
+    public Money CalculateTotal(
+        IReadOnlyList<OrderLine> lines,
+        Currency currency)
+    {
+        return lines.Aggregate(
+            Money.Zero(currency),
+            (total, line) => total.Add(line.Subtotal));
+    }
+}
+```
+
+Application supplies the lines and passes the returned `Money` to `Order.ConfirmPrice`. The service has no repository, clock, logger, or provider client.
+
 ### Keep repository interfaces in Domain (standards/rule/backend-domain.keep-repository-interfaces-in-domain)
 
-**Requirement:** A repository interface MUST expose only aggregate and Domain types, without `IQueryable`, a session, or a generic CRUD surface.
+**Requirement:** A repository interface MUST expose only aggregate and Domain types, without `IQueryable`, a session, or a generic CRUD surface. Each repository MUST serve exactly one aggregate root.
 
 **Rationale:** A required load uses `GetByIdAsync` and throws `{Aggregate}NotFoundException`, so a handler repeats no null check. A nullable `FindBy...Async` is reserved for lookups where absence is normal.
 
-This interface is the write side only. Reading for a Query uses a Read Model owned by Application and shaped by Infrastructure, and that path declares no Domain interface. A repository that gained a projection method would put query shapes in the Domain, which is the coupling this layer exists to prevent.
+This interface is the write side only. Reading for a Query uses a Read Model owned by Application and shaped by Infrastructure, and that path declares no Domain interface. A repository that gained a projection method would put query shapes in Domain, which is the coupling this layer exists to prevent.
+
+**Example:**
+
+```csharp
+public interface IPostRepository
+{
+    Task<Post> GetByIdAsync(
+        PostId id,
+        CancellationToken cancellationToken);
+
+    void Store(Post post);
+}
+```
+
+`GetByIdAsync` returns a loaded `Post` and throws `PostNotFoundException` when the identity has no aggregate. The Infrastructure implementation owns that throw. The command pipeline owns the commit. `Store` stages the aggregate through the selected provider implementation.
+
+```csharp
+// Infrastructure implementation throws the aggregate's own not-found exception.
+public async Task<Post> GetByIdAsync(PostId id, CancellationToken cancellationToken)
+{
+    var post = await session.LoadAsync<Post>(id, cancellationToken);
+    return post ?? throw new PostNotFoundException();
+}
+```
 
 ### Raise immutable domain facts (standards/rule/backend-domain.raise-immutable-domain-facts)
 
-**Requirement:** A domain event MUST be a public immutable record named `{Aggregate}{PastFact}Event` implementing `IDomainEvent`.
+**Requirement:** A domain event MUST be a public immutable record named `{Aggregate}{PastFact}Event` implementing `IDomainEvent`. It MUST carry business data only: typed identifiers and the values its reactions need.
 
-**Rationale:** The name states which aggregate raised the fact without opening the file. The event carries the business data its reactions need, and no aggregate, session, service, mutable collection, or exception.
+**Rationale:** The name states which aggregate raised the fact without opening the file. The event carries no aggregate, session, service, mutable collection, or exception. Envelope identity, such as message identity and causation identity, lives on the published integration event that carries the fact outside the process.
 
 ### Reject business violations with Domain exceptions (standards/rule/backend-domain.reject-business-violations-with-domain-exceptions)
 
 **Requirement:** A rejected business rule MUST throw a `DomainException` subclass named `{DomainType}{Reason}Exception` carrying a stable code.
 
-**Rationale:** The name always leads with the aggregate root. Domain throws no `InvalidOperationException`, `ArgumentException`, validation, HTTP, or provider exception for a business rejection, and carries no transport status.
+**Rationale:** The name always leads with the aggregate root. Domain throws no `InvalidOperationException`, `ArgumentException`, validation, HTTP, or provider exception for a business rejection, and carries no transport status. Exception names follow `standards/rule/workspace-naming.name-exceptions-by-failed-rule`; this provision owns the one-type-per-rule shape and the code each type carries.
 
 **Example:**
 
@@ -291,13 +498,13 @@ Application validators handle malformed caller input through validation errors. 
 
 **Requirement:** An aggregate MUST store another aggregate's typed identifier rather than an object reference.
 
-**Rationale:** Application loads each aggregate through its repository when a command coordinates several. The use-case specification names any immediate cross-aggregate invariant.
+**Rationale:** Application loads each aggregate through its repository when a command coordinates several. The use-case record names any immediate cross-aggregate invariant.
 
 ### Pass nondeterministic values into Domain (standards/rule/backend-domain.pass-nondeterministic-values-into-domain)
 
-**Requirement:** Domain behavior MUST receive time, randomness, and external values as parameters rather than read them.
+**Requirement:** Domain behavior MUST receive time, randomness, and new identifiers as arguments rather than read them. Domain MUST NOT read a clock.
 
-**Rationale:** Application obtains the value through an owned port and passes it in, so a Domain test supplies an explicit value and stays deterministic.
+**Rationale:** Application obtains each value through an owned port and passes it in, so a Domain test supplies an explicit value and stays deterministic. A method that needs more than one value receives a clock or a generator through its arguments. Version 7 identifiers come from the caller-supplied generator.
 
 ### Document every public Domain contract (standards/rule/backend-domain.document-every-public-domain-contract)
 
@@ -307,20 +514,13 @@ Application validators handle malformed caller input through validation errors. 
 
 ## Conventions
 
-
-### Apply the documented defaults (standards/rule/backend-domain.apply-the-documented-defaults)
-
-**Default:** Read each code block in this section as the named design rule only, without its namespace and unrelated declarations.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** Consumer files still apply `standards/rule/backend-domain.document-every-public-domain-contract` to their complete public contracts.
+*Read each code block in the Conventions section as the named design rule only, without its namespace and unrelated declarations.*
 
 ### Organize a module by aggregate and concept (standards/rule/backend-domain.organize-a-module-by-aggregate-and-concept)
 
 **Default:** Give each aggregate a folder named with its plural root name, holding its own states, events, exceptions, and concepts.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
 **Rationale:** A single aggregate stays flat only when its plural root name equals the module name. Separate aggregates never share lifecycle, event, or rejection folders.
 
@@ -390,53 +590,37 @@ Application validators handle malformed caller input through validation errors. 
         ConsentGrantedEvent.cs
 ```
 
-Each aggregate-specific repository interface stays with the aggregate it loads. The other layers mirror this organization: Application, Infrastructure. WebApi use the same module and per-aggregate folder names, per `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case`.
+Each aggregate-specific repository interface stays with the aggregate it loads. Application, Infrastructure, and WebApi use the same module and per-aggregate folder names, per `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case`.
 
 ### Use these Domain names (standards/rule/backend-domain.use-these-domain-names)
 
-**Default:** Name each Domain type from the aggregate root it belongs to, following the tables in this section.
+**Default:** Name each Domain type from the aggregate root it belongs to, following the workspace naming provisions cited below.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
+
+**Rationale:** Aggregate-owned names follow `standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root`. Architectural suffixes follow `standards/rule/workspace-naming.use-architectural-suffixes`. Exception names follow `standards/rule/workspace-naming.name-exceptions-by-failed-rule`. A state case takes the flat or the nested form, and a project keeps the form it picks.
 
 **Example:**
 
-| Domain role | Pattern | Example |
-|:---|:---|:---|
-| Aggregate root | `{Aggregate}` | `Post` |
-| Child entity | `{Aggregate}{Part}` | `OrderLine` |
-| Aggregate value object | `{Aggregate}{Term}` | `MerchantLegalProfile` |
-| Shared kernel value object | `{Term}` | `Money`, `EmailAddress` |
-| Strongly typed ID | `{Aggregate}Id` | `PostId` |
-| Typed state base | `{Aggregate}State` | `PostState` |
-| Typed state case, flat | `{Aggregate}{State}State` | `PostPublishedState` |
-| Typed state case, nested | `{Aggregate}State.{State}` | `PostState.Published` |
-| Domain union base | `{Aggregate}{Concept}` | `RefundOutcome` |
-| Domain union case | `{Aggregate}{Case}{Concept}` | `RefundSucceededOutcome`, `MerchantWarehouseStaffRole` |
-| Repository | `I{Aggregate}Repository` | `IPostRepository` |
-| Domain service | `{BusinessRule}DomainService` | `OrderPricingDomainService` |
-| Domain event | `{Aggregate}{PastFact}Event` | `PostPublishedEvent` |
-| Domain exception | `{DomainType}{Reason}Exception` | `PostAlreadyPublishedException` |
+The flat form declares each case as a top-level record carrying the aggregate prefix. The nested form declares each case inside its `{Aggregate}State` base, which already carries that prefix. `PostState.Published` therefore reads as its full name at every call site. A nested case never repeats the prefix its parent supplies.
 
-Every aggregate-owned type starts with the aggregate root's full name (`standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root`). `SalesCatalog` anchors `SalesCatalogPublishedEvent`. The example does not abbreviate the anchor. `Term` is the glossary term represented by a value object.
-
-An aggregate value object uses its aggregate prefix. A Shared kernel value object keeps its bare name. `BusinessRule` names a domain service policy. `DomainType` names the aggregate-owned type. Union bases and cases end with their concept. The example stores each type in its own file.
-
-A state case takes one of two forms, and a project picks one and keeps it. The flat form declares each case as a top-level record carrying the aggregate prefix. The nested form declares each case inside its `{Aggregate}State` base, which already carries that prefix. `PostState.Published` therefore reads as its full name at every call site. A nested case never repeats the prefix its parent supplies.
-
-The nested form keeps the cases and the base in one file. The flat form keeps one type per file. Both satisfy `standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root`, because the qualified name still leads with the aggregate root.
+The nested form keeps the cases and the base in one file. The flat form keeps one type per file.
 
 ### Define the shared Domain contracts once (standards/rule/backend-domain.define-the-shared-domain-contracts-once)
 
 **Default:** Declare the shared Domain contracts once in the Domain project and reuse them across every module.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
 **Example:**
 
 ```csharp
 public interface IDomainEvent;
 
-public abstract class DomainException(string message) : Exception(message);
+public abstract class DomainException(string message) : Exception(message)
+{
+    public abstract string Code { get; }
+}
 
 public interface IStronglyTypedId
 {
@@ -477,74 +661,21 @@ public abstract class AggregateRoot<TId> : IAggregateRoot
 }
 ```
 
-`ClearDomainEvents` is Event-delivery mechanics, not a business mutation entry point. Infrastructure calls it only after the selected atomic, durable, rebuildable, or optional path has accepted the pending Events.
+`ClearDomainEvents` is Event-delivery mechanics, not a business mutation entry point. Infrastructure calls it only after the selected delivery path has accepted the pending events.
 
 Concrete aggregates validate that `id.Value` is not `Guid.Empty` before calling or while calling the base constructor. The base remains free of aggregate-specific exceptions.
-
-### Define typed IDs without primitive escape hatches (standards/rule/backend-domain.define-typed-ids-without-primitive-escape-hatches)
-
-**Default:** Give a typed identifier no implicit conversion, no primitive property alias, and no parameterless public creation path.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Example:**
-
-```csharp
-public readonly record struct PostId : IStronglyTypedId, IParsable<PostId>
-{
-    private PostId(Guid value)
-    {
-        Value = value;
-    }
-
-    public Guid Value { get; }
-
-    public static PostId New() => new(Guid.CreateVersion7());
-
-    public static PostId From(Guid value)
-    {
-        if (value == Guid.Empty)
-        {
-            throw new PostIdentityRequiredException();
-        }
-
-        return new PostId(value);
-    }
-
-    public static PostId Parse(string value, IFormatProvider? provider) =>
-        From(Guid.Parse(value));
-
-    public static bool TryParse(
-        string? value,
-        IFormatProvider? provider,
-        out PostId result)
-    {
-        if (Guid.TryParse(value, out var parsed) && parsed != Guid.Empty)
-        {
-            result = new PostId(parsed);
-            return true;
-        }
-
-        result = default;
-        return false;
-    }
-
-    public override string ToString() => Value.ToString();
-}
-```
-
-The `IParsable<TId>` implementation supports Minimal API route and query binding. `Parse` follows the .NET parsing contract for malformed text; `From` applies the domain empty-identity rule.
 
 ### Keep ID representations aligned at every boundary (standards/rule/backend-domain.keep-id-representations-aligned-at-every-boundary)
 
 **Default:** Represent an identifier the same way in Domain, persistence, transport, and generated clients.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
 **Example:**
 
 | Boundary | Representation | Owner |
 |:---|:---|:---|
+| Creation | Caller-supplied value or generator through arguments. | Caller |
 | Domain and Application | `PostId` | Domain |
 | Minimal API route and query | UUID text parsed through `IParsable<PostId>` | WebApi |
 | JSON | UUID string | WebApi converter |
@@ -561,165 +692,6 @@ if (typeof(IStronglyTypedId).IsAssignableFrom(context.JsonTypeInfo.Type))
     schema.Type = JsonSchemaType.String;
     schema.Format = "uuid";
     schema.Properties?.Clear();
-}
-```
-
-### Keep state records as the only Aggregate lifecycle representation (standards/rule/backend-domain.keep-state-records-as-the-only-aggregate-lifecycle-representation)
-
-**Default:** Read aggregate lifecycle only through the `State` property and its record type.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Example:**
-
-```csharp
-public abstract record PostState;
-
-public sealed record PostDraftState : PostState;
-
-public sealed record PostPublishedState(
-    DateTimeOffset PublishedAt) : PostState;
-
-public sealed record PostArchivedState(
-    DateTimeOffset ArchivedAt,
-    string Reason) : PostState;
-```
-
-`PublishedAt` exists only on `PostPublishedState`, and archive facts exist only on `PostArchivedState`. The Aggregate cannot combine facts from mutually exclusive states.
-
-A one-state Aggregate uses the same shape from its first implementation:
-
-```csharp
-public abstract record ProfileState;
-
-public sealed record ProfileActiveState : ProfileState;
-```
-
-Infrastructure persists each state hierarchy with stable discriminators. It does not add a lifecycle enum or shadow state fields back into Domain or infer a different state after loading.
-
-### Keep value creation and equality explicit (standards/rule/backend-domain.keep-value-creation-and-equality-explicit)
-
-**Default:** Create every value object through a named static method and declare its equality explicitly.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Example:**
-
-```csharp
-public sealed record PostTitle
-{
-    private PostTitle(string value)
-    {
-        Value = value;
-    }
-
-    public string Value { get; }
-
-    public static PostTitle Create(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new PostTitleRequiredException();
-        }
-
-        if (value.Length > 200)
-        {
-            throw new PostTitleExceedsMaximumLengthException(value.Length);
-        }
-
-        return new PostTitle(value);
-    }
-
-    public override string ToString() => Value;
-}
-```
-
-A collection value object defines content equality rather than relying on the collection reference:
-
-```csharp
-public sealed record PostTags
-{
-    private readonly IReadOnlyList<string> _values;
-
-    private PostTags(IEnumerable<string> values)
-    {
-        _values = values.ToList().AsReadOnly();
-    }
-
-    public IReadOnlyList<string> Values => _values;
-
-    public static PostTags Create(IEnumerable<string> values) => new(values);
-
-    public bool Equals(PostTags? other) =>
-        other is not null && _values.SequenceEqual(other._values);
-
-    public override int GetHashCode()
-    {
-        var hash = new HashCode();
-
-        foreach (var value in _values)
-        {
-            hash.Add(value, StringComparer.Ordinal);
-        }
-
-        return hash.ToHashCode();
-    }
-}
-```
-
-The example treats tag order as meaningful. If order is irrelevant, creation normalizes to the documented comparison order before storing values.
-
-### Keep domain services pure (standards/rule/backend-domain.keep-domain-services-pure)
-
-**Default:** Keep a domain service free of persistence, messaging, logging, clock, authorization, and provider calls.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Example:**
-
-```csharp
-public sealed class OrderPricingDomainService
-{
-    public Money CalculateTotal(
-        IReadOnlyList<OrderLine> lines,
-        Currency currency)
-    {
-        return lines.Aggregate(
-            Money.Zero(currency),
-            (total, line) => total.Add(line.Subtotal));
-    }
-}
-```
-
-Application supplies the lines and passes the returned `Money` to `Order.ConfirmPrice`. The service has no repository, clock, logger, or provider client.
-
-### Keep repository contracts aggregate-specific (standards/rule/backend-domain.keep-repository-contracts-aggregate-specific)
-
-**Default:** Declare one repository interface per aggregate rather than a shared generic contract.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Example:**
-
-```csharp
-public interface IPostRepository
-{
-    Task<Post> GetByIdAsync(
-        PostId id,
-        CancellationToken cancellationToken);
-
-    void Store(Post post);
-}
-```
-
-`GetByIdAsync` returns a loaded `Post` and throws `PostNotFoundException` when the identity has no aggregate. The Infrastructure implementation owns that throw. The command pipeline owns the commit. `Store` stages the aggregate through the selected provider implementation.
-
-```csharp
-// Infrastructure implementation throws the aggregate's own not-found exception.
-public async Task<Post> GetByIdAsync(PostId id, CancellationToken cancellationToken)
-{
-    var post = await session.LoadAsync<Post>(id, cancellationToken);
-    return post ?? throw new PostNotFoundException();
 }
 ```
 
@@ -830,37 +802,30 @@ The event payload captures the publication fact without carrying the mutable `Po
 
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/backend-domain.keep-domain-free-of-outer-layer-concerns | inspection | `ArchitectureTests` asserts the Domain assembly references no package outside the base class library. |
-| standards/rule/backend-domain.use-one-ubiquitous-language | inspection | Terminology review compares each new Domain name against `docs/domain/glossary.md` and the module terms table. |
-| standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries | inspection | `ArchitectureTests` asserts no child entity exposes a public setter or mutation method outside its root. |
-| standards/rule/backend-domain.use-the-project-aggregate-root-contract | inspection | `ArchitectureTests` asserts every aggregate root derives from the single project base and declares no second event list. |
-| standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records | inspection | `ArchitectureTests` asserts each aggregate exposes one abstract state base with sealed cases and no lifecycle flag or enum. |
-| standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums | inspection | `ArchitectureTests` asserts the Domain assembly declares no enum type and each closed set exposes sealed case records. |
-| standards/rule/backend-domain.create-valid-aggregates-through-named-factories | inspection | `ArchitectureTests` asserts no aggregate root declares a public constructor and each creation path is a named static factory. |
-| standards/rule/backend-domain.express-transitions-through-business-methods | inspection | `DomainBehaviorTests` asserts each mutation method rejects its disallowed source states and records its declared event. |
-| standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary | inspection | `ArchitectureTests` asserts each child collection property returns a read-only interface and exposes no mutation path. |
-| standards/rule/backend-domain.use-strongly-typed-version-7-identifiers | inspection | `TypedIdTests` asserts each identifier rejects an empty and default value and declares no implicit primitive conversion. |
-| standards/rule/backend-domain.use-immutable-value-objects-for-domain-concepts | inspection | `ValueObjectTests` asserts each value type is immutable, compares by value, and rejects invalid input at creation. |
-| standards/rule/backend-domain.define-collection-value-semantics-explicitly | inspection | `ValueObjectTests` asserts each collection value compares by contents under its declared ordering rule. |
-| standards/rule/backend-domain.make-money-and-decimal-rules-explicit | inspection | `MoneyTests` asserts arithmetic honors the declared scale, rounding, and cross-currency rules. |
-| standards/rule/backend-domain.keep-binary-floating-point-out-of-exact-quantities | test | `DomainArchitectureTests` asserts no Domain member declares a `double` or `float` parameter, property, or return type. |
-| standards/rule/backend-domain.use-stateless-domain-services-for-ownerless-rules | inspection | `ArchitectureTests` asserts no domain service holds state or resolves a persistence, clock, or provider dependency. |
-| standards/rule/backend-domain.keep-repository-interfaces-in-domain | inspection | `ArchitectureTests` asserts each repository signature names only Domain types and exposes no queryable or session. |
-| standards/rule/backend-domain.raise-immutable-domain-facts | inspection | `DomainEventTests` asserts each event is an immutable record whose name leads with its aggregate root. |
-| standards/rule/backend-domain.reject-business-violations-with-domain-exceptions | inspection | `DomainExceptionTests` asserts each rejection throws its own type with a stable code and no transport detail. |
-| standards/rule/backend-domain.reference-other-aggregates-by-id | inspection | `ArchitectureTests` asserts no aggregate declares a field or property typed as another aggregate root. |
-| standards/rule/backend-domain.pass-nondeterministic-values-into-domain | inspection | `ArchitectureTests` asserts no Domain type reads system time or generates a random business value. |
-| standards/rule/backend-domain.document-every-public-domain-contract | static | The Release build fails on a missing XML comment through the `1591` documentation warning promoted to an error. |
-| standards/rule/backend-domain.apply-the-documented-defaults | inspection | Review confirms each consumer file carries the full contract that its example omits. |
-| standards/rule/backend-domain.organize-a-module-by-aggregate-and-concept | inspection | Folder review compares each Domain module tree against its aggregate roster, or records a named local replacement. |
-| standards/rule/backend-domain.use-these-domain-names | inspection | Naming review compares each new Domain type against the tables in this section. |
-| standards/rule/backend-domain.define-the-shared-domain-contracts-once | inspection | `ArchitectureTests` asserts one declaration exists for each shared Domain marker and base contract. |
-| standards/rule/backend-domain.define-typed-ids-without-primitive-escape-hatches | inspection | `TypedIdTests` asserts no identifier declares an implicit conversion or public parameterless creation path. |
-| standards/rule/backend-domain.keep-id-representations-aligned-at-every-boundary | inspection | `TypedIdTests` asserts the persisted and serialized forms match the Domain representation for each identifier. |
-| standards/rule/backend-domain.keep-state-records-as-the-only-aggregate-lifecycle-representation | inspection | `ArchitectureTests` asserts no aggregate exposes a lifecycle flag, status string, or computed state alongside its state record. |
-| standards/rule/backend-domain.keep-value-creation-and-equality-explicit | inspection | `ValueObjectTests` asserts each value type creates through a named method and declares its equality members. |
-| standards/rule/backend-domain.keep-domain-services-pure | inspection | `ArchitectureTests` asserts no domain service resolves an outer-layer dependency. |
-| standards/rule/backend-domain.keep-repository-contracts-aggregate-specific | inspection | `ArchitectureTests` asserts each repository interface names exactly one aggregate root. |
+| standards/rule/backend-domain.keep-domain-free-of-outer-layer-concerns | guidance | Does the Domain assembly reference only the base class library and project-owned Domain types? |
+| standards/rule/backend-domain.use-one-ubiquitous-language | guidance | Does each Domain name match a Term record in the project language record? |
+| standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries | guidance | Is each aggregate root the only public mutation path for the invariants its transaction protects? |
+| standards/rule/backend-domain.use-the-project-aggregate-root-contract | guidance | Does every aggregate root derive from the one project base and use its identity and event mechanics? |
+| standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records | guidance | Does each aggregate expose one State property over an abstract base with sealed cases, read only through that property? |
+| standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums | guidance | Is each closed set a record hierarchy with stable codes and FromCode for data-less sets, with no enum in Domain? |
+| standards/rule/backend-domain.create-valid-aggregates-through-named-factories | guidance | Does each aggregate root create instances only through a named static factory that checks identity and records events? |
+| standards/rule/backend-domain.express-transitions-through-business-methods | guidance | Does each mutation check state, and does each lifecycle move also replace state and record its event? |
+| standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary | guidance | Do children expose no mutable state outside their root, with collections surfaced as read-only views? |
+| standards/rule/backend-domain.use-strongly-typed-version-7-identifiers | guidance | Is each identity a readonly record struct over a version 7 Guid with no conversion, alias, or parameterless creation? |
+| standards/rule/backend-domain.use-immutable-value-objects-for-domain-concepts | guidance | Is each value object immutable, compared by complete value, and created through a static method? |
+| standards/rule/backend-domain.define-collection-value-semantics-explicitly | guidance | Does each collection value implement content equality and a matching hash under its ordering rule? |
+| standards/rule/backend-domain.make-money-and-decimal-rules-explicit | guidance | Is each monetary amount a decimal in the shared Money object with the stated JSON shape? |
+| standards/rule/backend-domain.keep-binary-floating-point-out-of-exact-quantities | guidance | Does no Domain member use double or float for money, a rate applied to money, or an exactly compared quantity? |
+| standards/rule/backend-domain.use-stateless-domain-services-for-ownerless-rules | guidance | Is each domain service stateless, confined to Domain values, and free of the banned calls? |
+| standards/rule/backend-domain.keep-repository-interfaces-in-domain | guidance | Does each repository serve one aggregate with Domain-only types and no queryable, session, or generic surface? |
+| standards/rule/backend-domain.raise-immutable-domain-facts | guidance | Is each domain event an immutable record named for its aggregate and fact, carrying business data only? |
+| standards/rule/backend-domain.reject-business-violations-with-domain-exceptions | guidance | Does each rejected rule throw its own DomainException type with a stable code and no transport status? |
+| standards/rule/backend-domain.reference-other-aggregates-by-id | guidance | Does each aggregate store other aggregates as typed identifiers rather than object references? |
+| standards/rule/backend-domain.pass-nondeterministic-values-into-domain | guidance | Does Domain receive time, randomness, and identifiers as arguments and read no clock? |
+| standards/rule/backend-domain.document-every-public-domain-contract | guidance | Does every public Domain type and member document its constraint, result, or failure? |
+| standards/rule/backend-domain.organize-a-module-by-aggregate-and-concept | guidance | Does each Domain module give each aggregate its plural folder with its own states, events, and concepts? |
+| standards/rule/backend-domain.use-these-domain-names | guidance | Does each Domain name follow the cited workspace naming provisions and the chosen state-case form? |
+| standards/rule/backend-domain.define-the-shared-domain-contracts-once | guidance | Is each shared Domain contract declared once, with DomainException declaring its abstract Code? |
+| standards/rule/backend-domain.keep-id-representations-aligned-at-every-boundary | guidance | Is each identifier represented the same way at every boundary in the table? |
