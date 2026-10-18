@@ -6,47 +6,41 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 ## Agent Summary {#agent-summary}
 
-- Finish complete observable use-case slices. (standards/rule/core-release.complete-observable-use-case-slices)
-- Verify deployed end-to-end flows. (standards/rule/core-release.verify-connected-end-to-end-flows)
+- Verify connected journeys. (standards/rule/core-release.verify-connected-journeys)
 - Run checks selected by changed boundary. (standards/rule/core-release.run-boundary-selected-checks)
 - Commit regenerated application contracts with source. (standards/rule/core-release.regenerate-application-contracts)
 - Meet every declared release readiness gate. (standards/rule/core-release.meet-release-readiness-gates)
 - Report exact verification scope and omissions. (standards/rule/core-release.report-verification-exactly)
 - Bind release evidence to one immutable artifact. (standards/rule/core-release.identify-immutable-release-artifacts)
-- Accepted debt lives in baselines that only shrink. (standards/rule/core-release.record-accepted-debt-as-a-shrinking-baseline)
+- Accepted debt lives as a Known gap. (standards/rule/core-release.record-accepted-debt-as-a-known-gap)
 - A first release keeps a readiness record before its artifact. (standards/rule/core-release.keep-a-first-release-readiness-record)
+- State each release as a complete record. (standards/rule/core-release.state-each-release-as-a-complete-record)
 
 ## Standards
 
-### Complete observable use-case slices (standards/rule/core-release.complete-observable-use-case-slices)
+### Keep unfinished behavior in draft (standards/rule/core-release.keep-unfinished-behavior-in-draft)
 
-**Requirement:** A completed use-case slice MUST include Domain behavior, Application coordination, persistence, entry points, automated evidence, and operating impact.
+**Requirement:** A use case with unfinished behavior MUST keep its record in draft.
 
-**Rationale:** The complete path delivers one observable behavior rather than an unfinished inner layer.
+**Rationale:** Draft status prevents incomplete code from claiming released behavior.
 
-### Mark incomplete behavior as planned (standards/rule/core-release.mark-incomplete-behavior-as-planned)
+### Verify connected journeys (standards/rule/core-release.verify-connected-journeys)
 
-**Requirement:** Placeholder behavior MUST retain `implementationStatus: planned`.
+**Requirement:** A completed journey MUST connect verified use cases to one observable outcome through a deployed public boundary.
 
-**Rationale:** Planned status prevents incomplete code from claiming released behavior.
-
-### Verify connected end-to-end flows (standards/rule/core-release.verify-connected-end-to-end-flows)
-
-**Requirement:** A completed end-to-end flow MUST connect verified use cases and workflows to one observable outcome through a deployed public boundary.
-
-**Rationale:** A passing `E2E-*` test proves the connected product path.
+**Rationale:** A passing journey test proves the connected product path.
 
 ### Run boundary-selected checks (standards/rule/core-release.run-boundary-selected-checks)
 
-**Requirement:** A release change MUST run every check selected by its changed backend, frontend, flow, product, domain, implementation, API, and extension boundaries.
+**Requirement:** A release change MUST run every check selected by its changed backend, frontend, journey, product, domain, API, and extension boundaries.
 
 **Rationale:** Each boundary adds evidence that a narrow test category cannot replace.
 
 ### Run backend release checks (standards/rule/core-release.run-backend-release-checks)
 
-**Requirement:** A backend change MUST run Release build and test checks.
+**Requirement:** A backend change MUST pass the release build and the backend test suites.
 
-**Rationale:** Build and test evidence cover compilation and backend behavior after a source change.
+**Rationale:** The release build compiles the solution in release mode. The backend suites are the architecture, integration, and acceptance suites the size profile requires.
 
 ### Run frontend release checks (standards/rule/core-release.run-frontend-release-checks)
 
@@ -54,15 +48,15 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 **Rationale:** The frontend requires dependency, static, behavior, and production compilation evidence.
 
-### Run flow checks (standards/rule/core-release.run-flow-checks)
+### Run journey checks (standards/rule/core-release.run-journey-checks)
 
-**Requirement:** An end-to-end flow change MUST run its end-to-end tests.
+**Requirement:** A journey change MUST run its journey tests.
 
-**Rationale:** Flow changes need evidence through their deployed public boundary.
+**Rationale:** Journey changes need evidence through their deployed public boundary.
 
 ### Run consistency checks (standards/rule/core-release.run-consistency-checks)
 
-**Requirement:** A product, domain, implementation, or API change MUST run code-document consistency checks and the reference consumer validator.
+**Requirement:** A product, domain, or API change MUST pass the reference consumer validator.
 
 **Rationale:** `node standards/tools/validate-consumer.mjs` checks metadata, links, and cross-file references.
 
@@ -86,9 +80,9 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 ### Meet release readiness gates (standards/rule/core-release.meet-release-readiness-gates)
 
-**Requirement:** A release MUST provide verified included specifications and passing deployed end-to-end evidence for its included flows.
+**Requirement:** A release MUST include only verified use cases and passing deployed journey evidence for its included journeys.
 
-**Rationale:** Release evidence proves the included product outcome through its deployed public boundary.
+**Rationale:** A use case is verified when every one of its Cases is proved by a passing test. Release evidence proves the included product outcome through its deployed public boundary.
 
 ### Apply release access controls (standards/rule/core-release.apply-release-access-controls)
 
@@ -110,7 +104,7 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 ### Provide release delivery controls (standards/rule/core-release.provide-release-delivery-controls)
 
-**Requirement:** A release MUST provide CI, tested deployment and rollback paths, current Operating Limits, and required runbooks.
+**Requirement:** A release MUST provide CI, tested deployment and rollback paths, current operating limits, and the runbooks those limits name.
 
 **Rationale:** Repeatable delivery and operation need current execution and recovery records.
 
@@ -122,27 +116,15 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 ### Resolve release blockers (standards/rule/core-release.resolve-release-blockers)
 
-**Requirement:** A release MUST resolve every blocking decision condition and external claim or exclude its affected behavior from all owning records.
+**Requirement:** A release MUST settle every open decision and external claim it depends on, or exclude the affected behavior from every owning record.
 
 **Rationale:** A declared reduced boundary is valid only when product and release records agree.
 
-### Select conditional capabilities after activation (standards/rule/core-release.select-conditional-capabilities-after-activation)
-
-**Requirement:** A release MAY include a conditional capability only after its selected extension applies.
-
-**Rationale:** Extension activation criteria identify when a conditional capability becomes applicable.
-
 ### Report verification exactly (standards/rule/core-release.report-verification-exactly)
 
-**Requirement:** A completion report MUST name exact commands, outcomes, evidence scope, and skipped checks.
+**Requirement:** A completion report MUST name exact commands, outcomes, evidence scope, skipped checks, generated differences, scope limits, and covered use cases.
 
 **Rationale:** Reviewers can distinguish completed evidence from unrun or irrelevant checks.
-
-### Avoid overbroad completion claims (standards/rule/core-release.avoid-overbroad-completion-claims)
-
-**Requirement:** A completion report MUST NOT claim repository-wide results from one project or test category.
-
-**Rationale:** Evidence scope limits what a passing command proves.
 
 ### Identify immutable release artifacts (standards/rule/core-release.identify-immutable-release-artifacts)
 
@@ -152,41 +134,45 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 ### List included release behavior (standards/rule/core-release.list-included-release-behavior)
 
-**Requirement:** A release record MUST list included end-to-end flows, use cases, workflows, and selected applicable extensions.
+**Requirement:** A release record MUST list included journeys, use cases, and selected applicable extensions.
 
 **Rationale:** The record defines the behavior boundary for the immutable artifact.
 
 ### Record release evidence (standards/rule/core-release.record-release-evidence)
 
-**Requirement:** A release record MUST list build, test, contract, security, end-to-end, schema, backup, deployment, readiness, diagnostics, smoke-test, and rollback results.
+**Requirement:** A release record MUST list build, test, contract, security, journey, schema, backup, deployment, readiness, diagnostics, smoke-test, and rollback results.
 
 **Rationale:** The complete evidence set makes the release supportable by its maintainer.
 
 ### Record operating readiness (standards/rule/core-release.record-operating-readiness)
 
-**Requirement:** A release record MUST list Operating Limits, alerts, runbooks, known operating conditions, and skipped checks.
+**Requirement:** A release record MUST list operating limits, alerts, runbooks, known operating conditions, and skipped checks.
 
 **Rationale:** Operating context identifies residual boundaries after release.
 
 ### Keep release records non-authoritative (standards/rule/core-release.keep-release-records-non-authoritative)
 
-**Requirement:** A release record MUST NOT redefine specifications or copy acceptance criteria.
+**Requirement:** A release record MUST NOT restate a specification or copy a Case.
 
-**Rationale:** Specifications remain the canonical authority for behavior and criteria.
+**Rationale:** Specifications remain the canonical authority for behavior and Cases.
 
-### Record accepted debt as a shrinking baseline (standards/rule/core-release.record-accepted-debt-as-a-shrinking-baseline)
+### Record accepted debt as a known gap (standards/rule/core-release.record-accepted-debt-as-a-known-gap)
 
-**Requirement:** An owning check MUST refuse both an unlisted gap and a stale entry while accepted debt lives in a machine-readable baseline whose entries only shrink.
+**Requirement:** Accepted debt MUST live as a Known gap with an owner and an end date.
 
-**Rationale:** A baseline with no exit is a permanent exemption. A check that refuses only the missing half lets listed debt rot, because nobody removes an entry the suite never questions.
-
-**Example:** The prose baseline records one count per page, and its check refuses a missing page and a clean page still listed.
+**Rationale:** The gap names its check, which reports until the end date and fails after it. The [model page](model.md) states the Known gap shape.
 
 ### Keep a first-release readiness record (standards/rule/core-release.keep-a-first-release-readiness-record)
 
-**Requirement:** A consumer before its first production release MUST keep a readiness record naming its dated rehearsals, green gates, and backup owner.
+**Requirement:** A consumer before its first production release MUST keep a readiness record with dated rehearsals, green gates, and a rehearsal owner.
 
-**Rationale:** A release record binds evidence to one artifact, so it has nothing to say before the first artifact exists. The readiness record states instead what proves the product may take data.
+**Rationale:** A release record binds evidence to one artifact, so it has nothing to say before the first artifact exists. The readiness record states instead what proves the product may take data. The rehearsal owner owns the backup and restore rehearsal.
+
+### State each release as a complete record (standards/rule/core-release.state-each-release-as-a-complete-record)
+
+**Requirement:** A release record MUST state its complete behavior and evidence without depending on an earlier release record.
+
+**Rationale:** A reader judges one release from one record. No upgrade guide or earlier record fills a gap in it.
 
 ## Conventions
 
@@ -194,55 +180,53 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 **Default:** Keep release records under `docs/releases/`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a different location as an Exception citing this convention.
 
 **Example:** `docs/releases/2026-08-21.md` records one immutable artifact and its evidence.
 
 ### Treat check warnings as failures (standards/rule/core-release.treat-check-warnings-as-failures)
 
-**Default:** Treat build and lint warnings as failures unless a repository records a narrow suppression with its reason.
+**Default:** Treat build and lint warnings as failures unless the build configuration records a narrow suppression with its reason.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a different policy as an Exception citing this convention.
 
 **Rationale:** Unreviewed warnings can conceal a changed compiler, linter, or dependency boundary.
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/core-release.verify-connected-end-to-end-flows`, `standards/rule/core-release.identify-immutable-release-artifacts`, and `standards/rule/core-release.record-release-evidence`.
+This informative example demonstrates `standards/rule/core-release.verify-connected-journeys`, `standards/rule/core-release.identify-immutable-release-artifacts`, and `standards/rule/core-release.record-release-evidence`.
 
-An order-checkout release includes verified stock, order, payment, and shipment behaviors. `E2E-ORDER-CHECKOUT-01` passes against deployed API and PostgreSQL, and the record cites the image digest and release evidence.
+An order-checkout release includes verified stock, order, payment, and shipment use cases. The checkout journey passes against the deployed API and database, and the record cites the image digest and release evidence.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-release.complete-observable-use-case-slices | inspection | Use-case review links each complete slice boundary and operating impact. |
-| standards/rule/core-release.mark-incomplete-behavior-as-planned | static | Incomplete behavior retains `implementationStatus: planned`. |
-| standards/rule/core-release.verify-connected-end-to-end-flows | test | Deployed `E2E-*` test proves the selected connected flow. |
-| standards/rule/core-release.run-boundary-selected-checks | inspection | Completion report maps each changed boundary to executed checks. |
-| standards/rule/core-release.run-backend-release-checks | test | `ReleaseGatesTests` commands exit successfully. |
-| standards/rule/core-release.run-frontend-release-checks | test | `ReleaseGatesTests` asserts frontend frozen install, lint, type, test, and build commands exit successfully. |
-| standards/rule/core-release.run-flow-checks | test | `ReleaseGatesTests` pass against their declared boundary. |
-| standards/rule/core-release.run-consistency-checks | test | `ReleaseGatesTests` asserts reference consumer validator passes after product, domain, implementation, or API change. |
-| standards/rule/core-release.run-extension-checks | test | `ReleaseGatesTests` asserts affected selected extensions report their stated verification evidence. |
-| standards/rule/core-release.regenerate-application-contracts | static | `ReleaseDerivedTests` asserts generated OpenAPI and client diff matches changed source contract. |
-| standards/rule/core-release.keep-generated-contracts-stable | static | `ReleaseDerivedTests` asserts generated-contract diff contains no timestamp, machine path, or unstable order. |
-| standards/rule/core-release.meet-release-readiness-gates | inspection | Release record identifies verified specifications and deployed end-to-end evidence. |
-| standards/rule/core-release.apply-release-access-controls | test | `ReleaseReadinessTests` prove authentication and target authorization. |
-| standards/rule/core-release.provide-release-data-recovery | test | `ReleaseReadinessTests` asserts schema and backup restore exercises pass from declared starting state. |
-| standards/rule/core-release.provide-release-operating-visibility | test | `ReleaseReadinessTests` expose health and trace diagnostics without source-controlled secrets. |
-| standards/rule/core-release.provide-release-delivery-controls | operation | CI, deployment, rollback, limits, and runbook records are current. |
-| standards/rule/core-release.record-the-release-artifact | operation | One release record identifies the immutable artifact. |
-| standards/rule/core-release.resolve-release-blockers | inspection | Release review resolves blockers or excludes behavior in all owning records. |
-| standards/rule/core-release.select-conditional-capabilities-after-activation | inspection | Included conditional behavior has selected extension evidence. |
-| standards/rule/core-release.report-verification-exactly | inspection | Completion report contains exact commands, outcomes, evidence scope, and skipped checks. |
-| standards/rule/core-release.avoid-overbroad-completion-claims | inspection | Completion claim scope matches the project and test evidence run. |
-| standards/rule/core-release.identify-immutable-release-artifacts | operation | Release record identifies source commit and immutable artifact. |
-| standards/rule/core-release.list-included-release-behavior | inspection | Release record lists selected behavior and extension scope. |
-| standards/rule/core-release.record-release-evidence | operation | Release record stores each listed test and operational result. |
-| standards/rule/core-release.record-operating-readiness | operation | Release record includes current limits, alerts, runbooks, operating conditions, and omissions. |
-| standards/rule/core-release.keep-release-records-non-authoritative | inspection | Release-record review links specifications and criteria rather than duplicating them. |
-| standards/rule/core-release.record-accepted-debt-as-a-shrinking-baseline | inspection | Baseline review shows entries only shrink while the owning check refuses unlisted and stale entries. |
-| standards/rule/core-release.keep-a-first-release-readiness-record | inspection | Readiness review reads dated rehearsals, green gates, and the backup owner from one record. |
-| standards/rule/core-release.store-release-records-together | inspection | Release record path uses `docs/releases/` or a local replacement. |
-| standards/rule/core-release.treat-check-warnings-as-failures | inspection | Warning suppression record names its narrow reason. |
+| standards/rule/core-release.keep-unfinished-behavior-in-draft | guidance | Is every use case with unfinished behavior still in draft? |
+| standards/rule/core-release.verify-connected-journeys | guidance | Does each completed journey reach one observable outcome through a deployed public boundary? |
+| standards/rule/core-release.run-boundary-selected-checks | guidance | Did the change run every check its changed boundaries select? |
+| standards/rule/core-release.run-backend-release-checks | guidance | Did the release build and every required backend suite pass? |
+| standards/rule/core-release.run-frontend-release-checks | guidance | Did install, lint, type checks, tests, and the production build all pass? |
+| standards/rule/core-release.run-journey-checks | guidance | Did the journey tests pass against the deployed boundary? |
+| standards/rule/core-release.run-consistency-checks | checkable | `node standards/tools/validate-consumer.mjs` exits zero. |
+| standards/rule/core-release.run-extension-checks | guidance | Did each affected extension report its stated verification evidence? |
+| standards/rule/core-release.regenerate-application-contracts | guidance | Do committed contracts match a fresh generation from their source? |
+| standards/rule/core-release.keep-generated-contracts-stable | guidance | Is the contract diff free of timestamps, machine paths, and unstable order? |
+| standards/rule/core-release.meet-release-readiness-gates | guidance | Is every included use case verified, with passing journey evidence for each journey? |
+| standards/rule/core-release.apply-release-access-controls | guidance | Do authentication and authorization guard every restricted release path? |
+| standards/rule/core-release.provide-release-data-recovery | guidance | Do schema setup, backup instructions, and a tested restore all exist? |
+| standards/rule/core-release.provide-release-operating-visibility | guidance | Do health signals and trace diagnostics ship without secrets in source control? |
+| standards/rule/core-release.provide-release-delivery-controls | guidance | Are CI, deployment, rollback, limits, and runbooks all current? |
+| standards/rule/core-release.record-the-release-artifact | guidance | Does one release record name the immutable artifact? |
+| standards/rule/core-release.resolve-release-blockers | guidance | Is every open decision and external claim settled or excluded in every owning record? |
+| standards/rule/core-release.report-verification-exactly | guidance | Would a reviewer learn the commands, outcomes, scope, omissions, and limits from the report? |
+| standards/rule/core-release.identify-immutable-release-artifacts | guidance | Does the release record name the source commit and artifact reference? |
+| standards/rule/core-release.list-included-release-behavior | guidance | Does the record list every included journey, use case, and extension? |
+| standards/rule/core-release.record-release-evidence | guidance | Does the record hold a result for every listed evidence kind? |
+| standards/rule/core-release.record-operating-readiness | guidance | Does the record state limits, alerts, runbooks, conditions, and omissions? |
+| standards/rule/core-release.keep-release-records-non-authoritative | guidance | Does the record link outward instead of restating behavior? |
+| standards/rule/core-release.record-accepted-debt-as-a-known-gap | guidance | Does every accepted debt live as a Known gap with owner and end date? |
+| standards/rule/core-release.keep-a-first-release-readiness-record | guidance | Does one record hold dated rehearsals, green gates, and a rehearsal owner? |
+| standards/rule/core-release.state-each-release-as-a-complete-record | guidance | Would a reader judge the release from this record alone? |
+| standards/rule/core-release.store-release-records-together | guidance | Does the record path follow the default or a recorded Exception? |
+| standards/rule/core-release.treat-check-warnings-as-failures | guidance | Does the build fail on warnings except for recorded narrow suppressions? |

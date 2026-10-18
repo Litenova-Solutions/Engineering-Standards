@@ -6,13 +6,13 @@ The standards use one page grammar and one controlled technical prose profile. T
 
 ## Agent Summary {#agent-summary}
 
-- Use literal controlled prose, repository terminology, and a recorded vocabulary. (standards/rule/core-authoring.apply-controlled-prose-measures, standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation, standards/rule/core-authoring.remove-a-reread-page-from-the-prose-baseline, standards/rule/core-authoring.state-meaning-literally, standards/rule/core-authoring.use-one-term-for-one-concept, standards/rule/core-authoring.record-the-project-vocabulary-as-data, standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope, standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets, standards/rule/core-authoring.exclude-the-compound-that-names-another-concept)
+- Use literal controlled prose, repository terminology, and a recorded vocabulary. (standards/rule/core-authoring.apply-controlled-prose-measures, standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation, standards/rule/core-authoring.exclude-generated-regions-from-prose-checks, standards/rule/core-authoring.state-meaning-literally, standards/rule/core-authoring.use-one-term-for-one-concept, standards/rule/core-authoring.record-the-project-vocabulary-as-data, standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope, standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets, standards/rule/core-authoring.exclude-the-compound-that-names-another-concept)
 - Write one testable obligation in each Standards provision. (standards/rule/core-authoring.use-one-normative-vocabulary, standards/rule/core-authoring.write-atomic-standards-provisions)
 - Name the kind, page, and heading in each ID. (standards/rule/core-authoring.use-the-declared-identifier-grammar, standards/rule/core-authoring.name-the-owning-page-in-the-identifier, standards/rule/core-authoring.exclude-a-sequence-number-from-the-identifier)
 - Keep a replaceable default under its Convention heading. (standards/rule/core-authoring.identify-actionable-conventions)
 - Route the reader, apply each page contract, and state one layer per page. (standards/rule/core-authoring.use-the-declared-page-contract, standards/rule/core-authoring.route-the-reader-before-listing-pages, standards/rule/core-authoring.name-the-tool-rather-than-the-mechanism, standards/rule/core-authoring.state-one-layer-per-page, standards/rule/core-authoring.name-the-escape-from-every-abstraction, standards/rule/core-authoring.record-a-setting-as-reference)
 - Keep summaries informative and cite every projected provision. (standards/rule/core-authoring.keep-agent-summaries-informative)
-- Map every provision to exact verification evidence. (standards/rule/core-authoring.map-provisions-to-evidence)
+- Map every provision to exact verification evidence. (standards/rule/core-authoring.map-provisions-to-evidence, standards/rule/core-authoring.mark-every-provision-checkable-or-guidance)
 - Validate current material and publish complete releases. (standards/rule/core-authoring.validate-current-standards-material, standards/rule/core-authoring.exclude-historical-transition-material, standards/rule/core-authoring.publish-each-release-as-a-complete-contract, standards/rule/core-authoring.exclude-cross-release-compatibility-work, standards/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves, standards/rule/core-authoring.record-the-reviewed-standards-release)
 - Classify every specification file and derive every computed fact. (standards/rule/core-authoring.classify-every-specification-file, standards/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it)
 - Run the authoring checks and regenerate the provision index. (standards/rule/core-authoring.run-repeatable-authoring-checks, standards/rule/core-authoring.regenerate-the-provision-index)
@@ -36,9 +36,10 @@ The glossary controls repository engineering terms. Code identifiers, product na
 - A prose paragraph has one topic and at most six sentences.
 - A table cell has at most 20 visible words.
 - Headings, fenced code, metadata, URLs, and link destinations do not count.
-- A quotation does not count: a blockquote that opens with a quotation mark holds a source's own words.
+- A quotation does not count: a blockquote whose first character is a quotation mark holds a source's own words.
 - Inline code and literal identifiers each count as one word.
 - Hyphenated, dotted, and path-like tokens each count as one word.
+- A generated region does not count.
 
 Controlled prose uses full forms such as `do not` and `cannot`. It excludes contractions, idioms, rhetorical fragments, unexplained pronouns, and `and/or`.
 
@@ -67,7 +68,7 @@ Every review applies four quality tests:
 
 Standards define required boundaries. Conventions define replaceable defaults. Intent, rationale, examples, summaries, guides, and indexes are informative.
 
-`AGENTS.md` and Agent Summary sections are concise projections. Every projected policy cites its canonical provision ID. A projection cannot introduce or strengthen an obligation.
+In this repository, `AGENTS.md` and Agent Summary sections are concise projections. Every projected policy cites its canonical provision ID. A projection cannot introduce or strengthen an obligation. A consumer `AGENTS.md` carries Tier-0 instructions, which cite the project Exception records and local conventions.
 
 `CONTRIBUTING.md` owns contribution workflow and review. `CHANGELOG.md` is the only repository release note.
 
@@ -102,28 +103,40 @@ A topic, profile, and extension page each state exact obligations for a reader w
 
 An index and the glossary carry no layer. An index routes a reader to a page, and the glossary resolves one term. Neither answers a question about the subject itself.
 
-The order is a reading order rather than an authoring order. A page links down to the next layer and never up. A reader who wants more detail always has one step available, and never has to take it.
+The order is a reading order rather than an authoring order. A page links down to the next layer and never up. An index links to the pages it routes, and any page may link to the glossary. A reader who wants more detail always has one step available, and never has to take it.
 
 Layer 4 has no page class of its own. It is the `Underneath` section of a command page, which is the one place a command page states its own mechanism. A wrapper with no way through it cannot be debugged when it fails.
 
 ### Page contracts
 
-A directory names the class of every page inside it, and the class states the contract.
+Every standards page uses one class below. Every consumer page uses one record template or one style below. The class, template, or style states the required sections.
 
-| Page class | Directory | Required H2 order |
+| Page class | Template | Required H2 order |
 |:---|:---|:---|
-| Topic | `docs/<area>/` | Intent, Agent Summary, optional Concepts, Standards, Conventions, optional Reference example, Verification |
-| Profile | `docs/profile/` | Intent, Agent Summary, Standards, Composition, Conventions, Verification |
-| Extension | `docs/ext/` | Intent, Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, Verification |
-| Tutorial | `docs/tutorial/` | Purpose, Prerequisites, Lesson, What you built |
-| How-to | `docs/guide/` | Purpose, optional Prerequisites, Procedure, Verification |
-| Reference | `docs/reference/` | Intent, Reference, optional Notes |
-| Command | `docs/tools/` | Name, Synopsis, Description, Arguments, Options, Exit codes, Examples, Underneath |
-| Index | any `README.md` | Intent, then navigation groups |
-| Glossary | `docs/reference/glossary.md` | Alphabetical term headings with one-sentence definitions and optional examples |
+| Topic | `templates/standard/topic.md` | Intent, Agent Summary, optional Concepts, Standards, Conventions, optional Reference example, Verification |
+| Profile | This table states the contract. | Intent, Agent Summary, Standards, Composition, Conventions, Verification |
+| Extension | `templates/standard/extension.md` | Intent, Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, Verification |
+
+| Style | Template | Required H2 order |
+|:---|:---|:---|
+| product-topic | `templates/consumer/product-topic.md` | Summary, The situation, What we do, Costs and risks, Evidence |
+| permission-list | `templates/consumer/permission-list.md` | Permissions |
+| entry-point-list | `templates/consumer/entry-point-list.md` | Entry points |
+| limit-set | `templates/consumer/limit-set.md` | Limits |
+| rule-set | `templates/consumer/rule-set.md` | Rules |
+| index | This table states the contract. | Intent, then navigation groups |
+| tutorial | `templates/consumer/tutorial.md` | Purpose, Prerequisites, Lesson, What you built |
+| how-to | `templates/consumer/how-to.md` | Purpose, optional Prerequisites, Procedure, Verification |
+| reference | `templates/consumer/reference.md` | Intent, Reference, optional Notes |
+| command | `templates/consumer/command.md` | Name, Synopsis, Description, Arguments, Options, Exit codes, Examples, Underneath |
+| configuration | `templates/consumer/configuration.md` | Intent, Settings, Precedence, optional Notes |
+| glossary | `templates/consumer/glossary.md` | Alphabetical term headings with one-sentence definitions and optional examples |
+| scenario-cast | `templates/consumer/scenario-cast.md` | The organization, The people, The occasion, The amounts, Recurring situations, optional What this page does not do |
+
+A style with no template file follows the required order in this table.
 
 - A page that owns provisions lives at `docs/<area>/<page>.md`, with one lowercase word in each position.
-- A tutorial, how-to, reference, or command page uses a descriptive file name, because no identifier derives from it.
+- A style page uses a descriptive file name, because no identifier derives from it.
 - A normative page has one H1 with a Title Case title.
 - A provision heading uses sentence case, starts with an action verb, and ends with its ID.
 - A required empty section contains only `None.`
@@ -131,6 +144,10 @@ A directory names the class of every page inside it, and the class states the co
 - Provision or Reference example blocks contain examples. A standalone Examples section is invalid.
 - A tutorial, how-to, reference, command, or index page contains no normative provisions.
 - A tutorial states one path. An option, an alternative, or a branch belongs on a how-to page.
+
+### Generated regions
+
+A generated region is a body section a tool writes. It opens with `<!-- generated:<name> -->` and closes with `<!-- /generated:<name> -->`, where `<name>` identifies the region. Only the owning tool writes between the fences. Prose checks skip the region. An edit inside the fences is lost at the next generation.
 
 ### Standards provision contract
 
@@ -172,7 +189,7 @@ The uppercase normative vocabulary is `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`
 
 A convention is a provision under a `## Conventions` heading. Its ID follows the same grammar as a Standard, and its heading names the replaceable default. Convention blocks contain no uppercase normative modal.
 
-The `overrides[].provisionId` field accepts only Standards IDs. A local convention cites its convention ID in owning local documentation.
+A departure from a Standard is recorded as an Exception record citing the provision. A local convention cites its convention ID in owning local documentation. The [model page](model.md) states the Exception record shape.
 
 ### Provision identity
 
@@ -181,15 +198,15 @@ Every provision ID follows `standards/<kind>/<page>.<heading-slug>`.
 | Segment | Source | Purpose |
 |:---|:---|:---|
 | `standards` | The repository | Names the source that owns the provision |
-| `<kind>` | The assertion class | Names one of `invariant`, `validation`, `authorization`, `acceptance-criterion`, `policy`, or `rule` |
+| `<kind>` | The assertion class | Names `rule` for every provision |
 | `<page>` | The `<area>-<stem>` of the page path | Names the one page that owns the assertion |
 | `<heading-slug>` | The provision heading | Names the assertion the heading states |
 
-The eight areas are `CORE`, `PROFILE`, `WORKSPACE`, `BACKEND`, `FRONTEND`, `BLAZOR`, `QUALITY`, and `EXT`. Each is one directory under `docs/`, and `provisionRegistry.areas` lists them.
+The nine areas are `CORE`, `PROFILE`, `WORKSPACE`, `BACKEND`, `FRONTEND`, `SVELTE`, `BLAZOR`, `QUALITY`, and `EXT`. Each is one directory under `docs/`, and `provisionRegistry.areas` lists them.
 
 The page segment joins the directory to the file stem, so `docs/frontend/components.md` owns `frontend-components`. A citation therefore names the file a reader must open, so `standards/rule/frontend-components.compose-composites-in-page-code` needs no lookup step.
 
-Two pages cannot share an identifier. The page segment carries the area, so `docs/frontend/structure.md` and `docs/blazor/structure.md` stay distinct even when they state one rule.
+Two pages cannot share a page segment. The page segment carries the area, so `docs/frontend/structure.md` and `docs/blazor/structure.md` stay distinct even when they state one rule.
 
 The heading slug is the kebab-case form of the heading with the parenthetical ID removed. A renamed heading renames the identifier, so the two never disagree.
 
@@ -197,10 +214,11 @@ A provision identifier carries no sequence number. A counter orders a provision 
 
 An active provision ID identifies its current assertion. A changed, split, merged, or newly normative provision receives a new ID.
 
+Consumer record identifiers follow the [identifier page](../backend/identifiers.md) and the [model page](model.md).
+
 ### Summary contract
 
 - An Agent Summary has at most ten bullets.
-- Each bullet has at most 20 words.
 - Each bullet ends with one or more valid provision IDs.
 - A summary contains no uppercase normative modal.
 - A summary selects frequent or high-risk provisions.
@@ -211,14 +229,14 @@ An active provision ID identifies its current assertion. A changed, split, merge
 Every normative page ends with a Verification table:
 
 ```markdown
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/page.state-one-action | static, test | `WritingPageTests` asserts exact command, artifact, test, assertion, or observable result. |
+| standards/rule/page.state-one-action | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic. |
 ```
 
-The table contains exactly one row for every Standard and Convention ID on the page. Methods are `static`, `test`, `inspection`, and `operation`.
+Each row marks its provision `checkable` or `guidance`. A `checkable` row names the tool that checks the provision, and its evidence starts with that tool's command in backticks. A `guidance` row states the question a reviewer answers, in one sentence.
 
-A row can combine distinct methods. Evidence names a command, path, test, artifact, assertion, or observable result.
+The table contains exactly one row for every Standard and Convention ID on the page.
 
 Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
@@ -252,21 +270,15 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ### Apply the prose measures to consumer documentation (standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation)
 
-**Requirement:** A consumer specification page MUST satisfy the prose measures unless the project prose baseline records that page.
+**Requirement:** A consumer specification page MUST satisfy the prose measures.
 
-**Rationale:** The profile applied only to this repository, so a consumer inherited the rule and no check. One consumer carried thousands of measure violations under a passing validator, because the run that reported the pass never looked.
+**Rationale:** Consumer pages inherit the profile, so they need the same check the standards apply to their own pages. A page that cannot satisfy the measures yet is recorded as a Known gap, which carries an owner and an end date.
 
-**Example:** The baseline records the count and the review date a page's debt was accepted at.
+### Exclude generated regions from prose checks (standards/rule/core-authoring.exclude-generated-regions-from-prose-checks)
 
-```json
-{ "pages": { "docs/domain/modules/sales/README.md": { "count": 58, "lastReviewed": "2026-08-25" } } }
-```
+**Requirement:** A prose check MUST skip every generated region.
 
-### Remove a reread page from the prose baseline (standards/rule/core-authoring.remove-a-reread-page-from-the-prose-baseline)
-
-**Requirement:** A change that advances a page's `lastReviewed` date MUST remove that page from the prose baseline.
-
-**Rationale:** A baseline with no exit is a permanent exemption. `lastReviewed` already means a human read the page against the code. That reading is when the prose is in front of somebody, so the debt retires against work the project already performs.
+**Rationale:** A generated region holds tool output, and prose measures judge authored words. Counting generated words would fail a page for text no author wrote.
 
 ### Use active and explicit sentences (standards/rule/core-authoring.use-active-and-explicit-sentences)
 
@@ -278,7 +290,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Requirement:** Authored prose MUST NOT substitute metaphor or flourish for direct statement where a literal phrase carries the same meaning.
 
-**Rationale:** A metaphor carries connotations its author did not choose. It also defeats terminology review, because a reader cannot tell whether a figure of speech names a defined concept or decorates one. A settlement route described as a rung on a ladder asserts an ordering that the three routes do not have.
+**Rationale:** A metaphor carries connotations its author did not choose. It also defeats terminology review, because a reader cannot tell whether a figure of speech names a defined concept or decorates one.
 
 **Example:** Write `a parameter worth varying`, not `a dial worth turning`. Write `this point still matters`, not `this point earns its keep`.
 
@@ -325,18 +337,18 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Requirement:** A language record MUST list, in `except`, every compound in which a rejected word names a concept other than the one the rejection is about.
 
-**Rationale:** A rejection matches a word, and a word belongs to more than one term. One consumer rejected `reservation` across its inventory module, where the term is `checkout hold`. The module also documents a `uniqueness reservation`, which is a row in a registry and has no lifetime at all. Five pages reported a breach no edit could remove. Renaming the compound in one module would give one concept two names across the repository. That is the shape of a check somebody turns off.
+**Rationale:** A rejection matches a word, and a word belongs to more than one term. A library module can reject `reservation` where the term is `hold`, while its reading room still books a `reading-room reservation`. Without an exemption the check reports a breach no edit can remove, and that is the shape of a check somebody turns off.
 
 **Example:** The exemption covers the compound and nothing else, so the bare word stays rejected in the same sentence.
 
 ```json
-{ "term": "checkout hold", "rejected": ["reservation"], "scope": "^domain/modules/inventory/",
-  "except": ["uniqueness reservation"], "reason": "one word for two rules with different lifetimes" }
+{ "term": "hold", "rejected": ["reservation"], "scope": "^docs/domain/modules/circulation/",
+  "except": ["reading-room reservation"], "reason": "one word for a book hold and a seat booking" }
 ```
 
 ### Use controlled capitalization (standards/rule/core-authoring.use-controlled-capitalization)
 
-**Requirement:** Authored prose MUST use Title Case for page titles and sentence case for provision headings and body text.
+**Requirement:** Authored prose MUST use Title Case for page titles, sentence case for provision headings, and normal capitalization for body text.
 
 **Rationale:** Exact code names, layer names, product names, and sentence starts retain their normal capitalization.
 
@@ -348,7 +360,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ### Use the declared page contract (standards/rule/core-authoring.use-the-declared-page-contract)
 
-**Requirement:** An authored page MUST use the required structure and heading rules for its page class.
+**Requirement:** An authored page MUST use the required structure for its page class or style.
 
 **Rationale:** Stable page classes let readers find authority, context, defaults, and evidence predictably.
 
@@ -392,7 +404,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Requirement:** A provision ID MUST follow `standards/<kind>/<page>.<heading-slug>`.
 
-**Rationale:** The kind names the assertion class, the page names the file, and the slug names the assertion, so a citation resolves to one heading.
+**Rationale:** The kind is `rule` for every provision. The page names the file, and the slug names the assertion, so a citation resolves to one heading.
 
 **Example:** `standards/rule/frontend-components.compose-composites-in-page-code` names a rule on the frontend components page, and its slug restates its heading.
 
@@ -416,7 +428,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Requirement:** An actionable Convention provision MUST follow the Convention provision contract defined by this page.
 
-**Rationale:** A distinct heading under `## Conventions` makes each replaceable default traceable without turning it into a Standards override.
+**Rationale:** A distinct heading under `## Conventions` makes each replaceable default traceable without turning it into a Standards rule.
 
 ### Keep Agent Summaries informative (standards/rule/core-authoring.keep-agent-summaries-informative)
 
@@ -436,6 +448,12 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Rationale:** Exact evidence makes each provision reviewable by humans and tools.
 
+### Mark every provision checkable or guidance (standards/rule/core-authoring.mark-every-provision-checkable-or-guidance)
+
+**Requirement:** A Verification row MUST mark its provision `checkable` or `guidance`.
+
+**Rationale:** The mark tells a reader whether a tool or a person judges the provision. An unmarked row leaves that question open.
+
 ### Regenerate the provision index (standards/rule/core-authoring.regenerate-the-provision-index)
 
 **Requirement:** A standards change MUST leave `docs/reference/provisions.md` equal to the output of `node tools/generate-provisions.mjs`.
@@ -454,52 +472,45 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ### Declare structured specification metadata (standards/rule/core-authoring.declare-structured-specification-metadata)
 
-**Requirement:** A structured consumer specification MUST open with a `---` delimited JSON block satisfying `schemas/specification-metadata.schema.json` for its declared kind.
+**Requirement:** A consumer page MUST open with a frontmatter block satisfying the record schema for its declared type.
 
-**Rationale:** The opening and closing delimiters are each a line containing only `---`, and the block between them is one JSON object.
+**Rationale:** The schema owns the field list for every record type and style. The block is one JSON object between two lines containing only `---`. The [model page](model.md) states the record types and their homes.
 
-**Example:** A use-case specification opens with this carrier.
+**Example:** A use-case page opens with this carrier.
 
 ```markdown
 ---
 {
-  "kind": "use-case",
-  "id": "orders.cancel-order",
-  "specStatus": "approved",
-  "implementationStatus": "planned",
+  "type": "use-case",
+  "id": "use-case/orders.cancel-order",
+  "title": "Cancel order",
   "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD",
-  "operationType": "command",
-  "actors": ["customer"],
-  "entryPoints": [],
-  "risks": [],
-  "applicableExtensions": []
+  "status": "approved"
 }
 ---
 ```
 
 ### Use one metadata carrier (standards/rule/core-authoring.use-one-metadata-carrier)
 
-**Requirement:** A structured consumer specification MUST use its opening JSON block as its only metadata carrier.
+**Requirement:** A consumer page MUST use its opening frontmatter block as its only metadata carrier.
 
 **Rationale:** Source links, implementation paths, and verification evidence belong in relevant body sections.
 
 ### Classify every specification file (standards/rule/core-authoring.classify-every-specification-file)
 
-**Requirement:** Every Markdown file under the consumer documentation root MUST open with a Specification Metadata block or sit under a declared unstructured path.
+**Requirement:** Every Markdown file under the consumer documentation root MUST declare a record type or page style, or sit under a declared unstructured path.
 
-**Rationale:** A file the validator cannot classify is skipped, and a skipped file is reported as sound. A directory index owning no aggregate, use case, or policy carries `section-index`.
+**Rationale:** A file the validator cannot classify is skipped, and a skipped file is reported as sound. A directory index owning no record carries the index style.
 
-**Example:** A navigation index declares its kind rather than omitting the block.
+**Example:** A navigation index declares its style rather than omitting the block.
 
 ```markdown
 ---
 {
-  "kind": "section-index",
-  "id": "policies",
-  "specStatus": "approved",
-  "owner": "platform",
-  "lastReviewed": "2026-01-01"
+  "type": "index",
+  "title": "Policies",
+  "owner": "__OWNER__",
+  "status": "approved"
 }
 ---
 ```
@@ -520,9 +531,9 @@ Every command declares an audit position. To count the declarations:
 
 ### Run repeatable authoring checks (standards/rule/core-authoring.run-repeatable-authoring-checks)
 
-**Requirement:** A standards change MUST pass the authoring fixture suite, repository validator, applicable specialist validators, and `git diff --check`.
+**Requirement:** A standards change MUST pass the repository validator, every fixture suite, and `git diff --check`.
 
-**Rationale:** Every skipped check appears with its exact reason in the change report.
+**Rationale:** Every skipped check appears with its exact reason in the change report. The tools README names each fixture suite and its command.
 
 ### Validate current standards material (standards/rule/core-authoring.validate-current-standards-material)
 
@@ -558,9 +569,9 @@ Every command declares an audit position. To count the declarations:
 
 ### Record the reviewed standards release (standards/rule/core-authoring.record-the-reviewed-standards-release)
 
-**Requirement:** A consumer MUST record the standards release it last reviewed in `reviewedStandardsVersion` within `standards.project.json`.
+**Requirement:** A consumer MUST record the standards release it adopts in `reviewedStandardsVersion` within `standards.project.json`.
 
-**Rationale:** A provision can gain force while keeping its identifier, so an override written against an earlier release would otherwise apply to a rule nobody reread. The recorded release makes adoption an explicit act.
+**Rationale:** A provision can gain force while keeping its identifier, so an Exception written against an earlier release would otherwise apply to a rule nobody reread. The recorded release makes adoption an explicit act.
 
 ## Conventions
 
@@ -600,49 +611,50 @@ The identifier above is a grammar placeholder. A real page uses the page segment
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-authoring.keep-authored-prose-ascii-safe | static | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
-| standards/rule/core-authoring.exclude-declared-content-paths-from-the-ascii-check | inspection | The project record lists each excluded content path, and review confirms documents about that content stay in scope. |
-| standards/rule/core-authoring.use-one-normative-vocabulary | inspection | The provision parser reports one approved modal, and review confirms its intended force. |
-| standards/rule/core-authoring.apply-controlled-prose-measures | static | `WritingProseTests` asserts the prose scanner reports no length, contraction, or banned-term diagnostic. |
-| standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation | static | `node tools/validate-consumer.mjs` reports a page carrying a measure violation that the prose baseline does not record. |
-| standards/rule/core-authoring.remove-a-reread-page-from-the-prose-baseline | static | `node tools/validate-consumer.mjs` fails when a baselined page's `lastReviewed` is later than the date its baseline entry records. |
-| standards/rule/core-authoring.use-active-and-explicit-sentences | inspection | The pull request checklist records actor, voice, procedure, and list review. |
-| standards/rule/core-authoring.state-meaning-literally | static, inspection | `node tools/validate-consumer.mjs` emits no `LANGUAGE_MANNERED_TERM` diagnostic, and review confirms each new figure of speech is literal or defined. |
-| standards/rule/core-authoring.use-one-term-for-one-concept | inspection | Terminology review compares new terms with `docs/reference/glossary.md`. |
-| standards/rule/core-authoring.record-the-project-vocabulary-as-data | static | `node tools/validate-consumer.mjs` validates the language record and names the checks a missing record switches off. |
-| standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope | static | `node tools/validate-consumer.mjs` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
-| standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets | static | `node tools/validate-consumer.mjs` reports the non-Markdown surfaces scanned, and fails a pattern matching no file. |
-| standards/rule/core-authoring.exclude-the-compound-that-names-another-concept | static | `node tools/validate-consumer.mjs` reports no `LANGUAGE_REJECTED_SYNONYM` diagnostic for a word inside a compound the record exempts. |
-| standards/rule/core-authoring.use-controlled-capitalization | inspection | The heading scanner passes, and review confirms exact technical capitalization. |
-| standards/rule/core-authoring.apply-the-four-quality-tests | inspection | The pull request checklist records all four quality-test results. |
-| standards/rule/core-authoring.use-the-declared-page-contract | static | `WritingPageTests` asserts the page parser reports the declared H1 and H2 contract. |
-| standards/rule/core-authoring.name-the-tool-rather-than-the-mechanism | inspection | Page review confirms each step names a shipped command where one performs that step. |
-| standards/rule/core-authoring.state-one-layer-per-page | inspection | Page review confirms mechanism detail appears only under an `Underneath` section. |
-| standards/rule/core-authoring.name-the-escape-from-every-abstraction | static | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic for the required `Underneath` section of a command page. |
-| standards/rule/core-authoring.record-a-setting-as-reference | inspection | Review confirms every setting named in a procedure resolves to a row on a configuration page. |
-| standards/rule/core-authoring.write-atomic-standards-provisions | inspection | The provision parser passes, and review confirms one assertion for each active ID. |
-| standards/rule/core-authoring.use-the-declared-identifier-grammar | static | `node tools/validate-standards.mjs` emits no `ID_SLUG_MISMATCH` or `ID_UNKNOWN_REFERENCE` diagnostic. |
-| standards/rule/core-authoring.name-the-owning-page-in-the-identifier | static | `node tools/validate-standards.mjs` emits no `ID_SCOPE_MISMATCH`, `ID_PAGE_FILENAME`, or `ID_AREA_UNKNOWN` diagnostic. |
-| standards/rule/core-authoring.exclude-a-sequence-number-from-the-identifier | inspection | Review confirms each changed identifier carries no sequence number. |
-| standards/rule/core-authoring.identify-actionable-conventions | static | `WritingTests` asserts the parser resolves each Convention heading, Default, Replacement, and Verification row. |
-| standards/rule/core-authoring.keep-agent-summaries-informative | inspection | The summary parser resolves every citation, and review compares each projection with its source. |
-| standards/rule/core-authoring.attach-examples-to-their-provisions | inspection | Review links each required example to its owning provision or Reference example. |
-| standards/rule/core-authoring.map-provisions-to-evidence | static | `WritingVerificationTests` asserts the evidence mapper reports one exact row for every page provision. |
-| standards/rule/core-authoring.regenerate-the-provision-index | static | `node tools/generate-provisions.mjs --check` exits zero, and the repository validator emits no `PROVISIONS_STALE` diagnostic. |
-| standards/rule/core-authoring.route-the-reader-before-listing-pages | static | `node tools/validate-standards.mjs` emits no `INDEX_MISSING_ROUTING` diagnostic for `docs/README.md`. |
-| standards/rule/core-authoring.declare-structured-specification-metadata | static | `node tools/validate-consumer.mjs` validates opening JSON against the metadata schema. |
-| standards/rule/core-authoring.use-one-metadata-carrier | static | `node tools/validate-consumer.mjs` reports no duplicate metadata carrier. |
-| standards/rule/core-authoring.classify-every-specification-file | static | `node tools/validate-consumer.mjs` fails on a Markdown file with no metadata block outside a declared unstructured path. |
-| standards/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it | inspection | Review confirms each count, census, and membership list names its source or its command. |
-| standards/rule/core-authoring.run-repeatable-authoring-checks | static | `WritingValidationTests` asserts cI records zero exits for authoring cases, repository validation, specialist checks, and diff checks. |
-| standards/rule/core-authoring.validate-current-standards-material | static | `node tools/validate-standards.mjs` evaluates current standards material only. |
-| standards/rule/core-authoring.exclude-historical-transition-material | inspection | Pull request review finds no history-specific material in active files. |
-| standards/rule/core-authoring.publish-each-release-as-a-complete-contract | inspection | Release review confirms each active provision resolves without reference to an earlier release. |
-| standards/rule/core-authoring.exclude-cross-release-compatibility-work | inspection | Pull request review finds no cross-release compatibility, migration, deprecation, or alias material. |
-| standards/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves | inspection | Review confirms no active provision requires a consumer to adopt a later standards release. |
-| standards/rule/core-authoring.record-the-reviewed-standards-release | static | `node standards/tools/validate-consumer.mjs` fails when `reviewedStandardsVersion` differs from the pinned manifest version. |
-| standards/rule/core-authoring.prefer-direct-action-headings | inspection | Review records the action verb used by every changed provision heading. |
-| standards/rule/core-authoring.prefer-positive-instructions | inspection | Review identifies the unsafe boundary behind every retained negative instruction. |
-| standards/rule/core-authoring.use-tables-for-exact-mappings | inspection | Review confirms that each changed table represents an exact mapping or comparison. |
+| standards/rule/core-authoring.keep-authored-prose-ascii-safe | checkable | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
+| standards/rule/core-authoring.exclude-declared-content-paths-from-the-ascii-check | guidance | Does the project record name every path outside the ASCII check, with documents about that content still checked? |
+| standards/rule/core-authoring.use-one-normative-vocabulary | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_MODAL_COUNT` or `STANDARD_MODAL_VOCABULARY` diagnostic. |
+| standards/rule/core-authoring.apply-controlled-prose-measures | checkable | `node tools/validate-standards.mjs` emits no `PROSE_SENTENCE_LENGTH`, `PROSE_LIST_LENGTH`, `PROSE_TABLE_CELL_LENGTH`, `PROSE_PARAGRAPH_LENGTH`, `PROSE_CONTRACTION`, or `PROSE_VAGUE_TERM` diagnostic. |
+| standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation | checkable | `node standards/tools/validate-consumer.mjs` reports prose-measure violations on consumer pages. |
+| standards/rule/core-authoring.exclude-generated-regions-from-prose-checks | guidance | Does every prose check skip the text between generated-region fences? |
+| standards/rule/core-authoring.use-active-and-explicit-sentences | guidance | Would a reader find the actor in every sentence, the verb in every step, and one grammar per list? |
+| standards/rule/core-authoring.state-meaning-literally | guidance | Is every figure of speech either literal or a defined term? |
+| standards/rule/core-authoring.use-one-term-for-one-concept | guidance | Would a reader meet each concept under one name only? |
+| standards/rule/core-authoring.record-the-project-vocabulary-as-data | checkable | `node standards/tools/validate-consumer.mjs` validates the language record against the language schema. |
+| standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope | checkable | `node standards/tools/validate-consumer.mjs` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
+| standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets | checkable | `node standards/tools/validate-consumer.mjs` scans every `languageScan` pattern and fails a pattern matching no file. |
+| standards/rule/core-authoring.exclude-the-compound-that-names-another-concept | checkable | `node standards/tools/validate-consumer.mjs` reports no `LANGUAGE_REJECTED_SYNONYM` diagnostic inside an exempt compound. |
+| standards/rule/core-authoring.use-controlled-capitalization | guidance | Do page titles use Title Case and provision headings sentence case? |
+| standards/rule/core-authoring.apply-the-four-quality-tests | guidance | Did a reviewer assess the prose for simplicity, brevity, clarity, and humanity? |
+| standards/rule/core-authoring.use-the-declared-page-contract | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION`, `PAGE_SECTION_ORDER`, or `PAGE_UNKNOWN_SECTION` diagnostic. |
+| standards/rule/core-authoring.name-the-tool-rather-than-the-mechanism | guidance | Does each procedure step name the shipped command that performs it? |
+| standards/rule/core-authoring.state-one-layer-per-page | guidance | Does mechanism detail appear only under an `Underneath` section? |
+| standards/rule/core-authoring.name-the-escape-from-every-abstraction | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic for a command page. |
+| standards/rule/core-authoring.record-a-setting-as-reference | guidance | Does every setting named in a procedure resolve to a configuration page row? |
+| standards/rule/core-authoring.write-atomic-standards-provisions | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_REQUIREMENT_COUNT`, `STANDARD_SENTENCE_COUNT`, or `STANDARD_LABEL_INVALID` diagnostic. |
+| standards/rule/core-authoring.use-the-declared-identifier-grammar | checkable | `node tools/validate-standards.mjs` emits no `ID_SLUG_MISMATCH` or `ID_UNKNOWN_REFERENCE` diagnostic. |
+| standards/rule/core-authoring.name-the-owning-page-in-the-identifier | checkable | `node tools/validate-standards.mjs` emits no `ID_SCOPE_MISMATCH` or `ID_PAGE_FILENAME` diagnostic. |
+| standards/rule/core-authoring.exclude-a-sequence-number-from-the-identifier | guidance | Do changed identifiers name assertions with words alone? |
+| standards/rule/core-authoring.identify-actionable-conventions | checkable | `node tools/validate-standards.mjs` emits no `CONVENTION_MISSING_DEFAULT` or `CONVENTION_MISSING_REPLACEMENT` diagnostic. |
+| standards/rule/core-authoring.keep-agent-summaries-informative | checkable | `node tools/validate-standards.mjs` emits no `SUMMARY_COUNT`, `SUMMARY_MISSING_ID`, or `SUMMARY_UNKNOWN_ID` diagnostic. |
+| standards/rule/core-authoring.attach-examples-to-their-provisions | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_EXAMPLE_LABEL` or `PAGE_UNKNOWN_SECTION` diagnostic. |
+| standards/rule/core-authoring.map-provisions-to-evidence | checkable | `node tools/validate-standards.mjs` emits no `VERIFY_MISSING_ID` or `VERIFY_UNKNOWN_ID` diagnostic. |
+| standards/rule/core-authoring.mark-every-provision-checkable-or-guidance | guidance | Does every Verification row carry exactly one of the two marks? |
+| standards/rule/core-authoring.regenerate-the-provision-index | checkable | `node tools/generate-provisions.mjs --check` exits zero. |
+| standards/rule/core-authoring.route-the-reader-before-listing-pages | checkable | `node tools/validate-standards.mjs` emits no `INDEX_MISSING_ROUTING` diagnostic. |
+| standards/rule/core-authoring.declare-structured-specification-metadata | checkable | `node standards/tools/validate-consumer.mjs` validates each opening frontmatter block against the record schema. |
+| standards/rule/core-authoring.use-one-metadata-carrier | guidance | Is the opening frontmatter block the only metadata on each page? |
+| standards/rule/core-authoring.classify-every-specification-file | checkable | `node standards/tools/validate-consumer.mjs` fails a Markdown file with no declared type outside a declared unstructured path. |
+| standards/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it | guidance | Does each count, census, and membership list name its source or its command? |
+| standards/rule/core-authoring.run-repeatable-authoring-checks | checkable | `node tools/validate-standards.mjs`, every `node tools/*.cases.mjs` suite, and `git diff --check` exit zero. |
+| standards/rule/core-authoring.validate-current-standards-material | guidance | Does the validator read the working tree and no earlier release? |
+| standards/rule/core-authoring.exclude-historical-transition-material | guidance | Does any active file carry history-specific material between releases? |
+| standards/rule/core-authoring.publish-each-release-as-a-complete-contract | checkable | `node tools/validate-standards.mjs` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
+| standards/rule/core-authoring.exclude-cross-release-compatibility-work | guidance | Would a consumer find any promise of migration, mapping, or alias here? |
+| standards/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves | guidance | Does any active provision oblige a consumer to adopt a later release? |
+| standards/rule/core-authoring.record-the-reviewed-standards-release | checkable | `node standards/tools/validate-consumer.mjs` fails when `reviewedStandardsVersion` differs from the pinned release. |
+| standards/rule/core-authoring.prefer-direct-action-headings | guidance | Does every changed provision heading start with a concrete action verb? |
+| standards/rule/core-authoring.prefer-positive-instructions | guidance | Does every retained prohibition guard an explicit unsafe boundary? |
+| standards/rule/core-authoring.use-tables-for-exact-mappings | guidance | Is each changed table a comparison or a field mapping? |
