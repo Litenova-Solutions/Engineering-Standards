@@ -4,79 +4,116 @@
 
 This page governs where a consumer states its business intent and in what shape. Business intent is what the product commits to as a business. It covers what the product sells, to whom, at what price, and in which markets. It also covers how the company runs and what comes next.
 
-Business intent is not behavior. A domain specification states what the software does today and matches the code. A product page states what the business has decided and why, and it can describe a position the code does not carry yet. The two connect in one direction: a domain specification cites a product rule, and a product page never describes behavior.
+Business intent is not behavior. A rule, use case, or journey states what the software does today and matches the code. A product page states what the business has decided and why, and it can describe a position the code does not carry yet. The two connect in one direction: behavior records name the requirements they fulfil, and a product page never describes behavior.
 
 Business intent has three parts that age differently. The present is the position a reader acts on. The future is the next planned change. The past is the decision that set each choice. This page keeps all three in one home, `docs/product/`, without letting a page narrate its own history.
 
 ## Agent Summary {#agent-summary}
 
-- Business intent lives in one-shaped topic pages that read as chapters before commitments. (standards/rule/core-product.keep-business-intent-under-product, standards/rule/core-product.state-each-topic-in-one-page-shape, standards/rule/core-product.place-the-story-before-the-commitments)
-- Each topic states numbered product rules that specifications and code cite, and no behavior. (standards/rule/core-product.identify-every-product-rule, standards/rule/core-product.cite-product-rules-from-domain-specifications, standards/rule/core-product.keep-behavior-out-of-product-pages)
-- Each choice and refusal links the decision record that set it. (standards/rule/core-product.trace-every-choice-to-a-decision, standards/rule/core-product.record-each-product-choice-as-a-decision)
-- A person approves a product decision, and an agent may build on a draft. (standards/rule/core-product.name-the-person-who-approved-a-decision, standards/rule/core-product.build-on-a-draft-decision-before-approval)
-- A changed choice is a new decision, recorded before its code. (standards/rule/core-product.replace-a-decision-with-a-new-record, standards/rule/core-product.record-a-decision-before-its-code)
-- Behavior work lands intent before code, and checks reject an uncarried rule. (standards/rule/core-product.build-intent-before-specification-before-code, standards/rule/core-product.reject-an-uncarried-product-rule)
-- The History section is written by a command from the decisions. (standards/rule/core-product.derive-history-from-decisions)
-- Generated research is source material until a person approves a decision drawn from it. (standards/rule/core-product.treat-generated-research-as-source-material)
-- Each topic carries a review date, and commercial work loads the product pages first. (standards/rule/core-product.review-a-topic-by-its-date, standards/rule/core-product.load-product-intent-before-commercial-work)
-- One command reports which product rules a specification cites. (standards/rule/core-product.report-which-product-rules-are-carried)
+- Why-layer records live in their homes under docs/product/ and docs/research/. (standards/rule/core-product.keep-business-intent-under-product, standards/rule/core-product.group-product-topics-by-area)
+- The brief states one product; each topic holds Requirement entries, never behavior. (standards/rule/core-product.state-one-product, standards/rule/core-product.state-each-topic-in-one-page-shape, standards/rule/core-product.identify-every-requirement, standards/rule/core-product.keep-behavior-out-of-product-pages)
+- Chapters tell the story with sources before the commitments. (standards/rule/core-product.place-the-story-before-the-commitments, standards/rule/core-product.cite-sources-for-chapter-claims)
+- Constraints are answered, research cites read sources, problems pair with features. (standards/rule/core-product.answer-every-constraint, standards/rule/core-product.record-research-with-read-sources, standards/rule/core-product.state-each-problem-and-feature)
+- Each choice links its decision; history and coverage derive from the model. (standards/rule/core-product.trace-every-choice-to-a-decision, standards/rule/core-product.record-each-product-choice-as-a-decision, standards/rule/core-product.derive-history-from-decisions, standards/rule/core-product.derive-requirement-coverage-from-the-model)
+- An agent drafts, a person approves, and a new record replaces an old choice. (standards/rule/core-product.name-the-person-who-approved-a-decision, standards/rule/core-product.replace-a-decision-with-a-new-record, standards/rule/core-product.build-on-a-draft-decision-before-approval)
+- Records cite requirements in fulfils; checks fail an unfulfilled one. (standards/rule/core-product.cite-requirements-from-records, standards/rule/core-product.reject-an-unfulfilled-requirement)
+- Work lands intent, research, decision, requirement, records, code, and tests. (standards/rule/core-product.build-intent-before-specification-before-code)
+- Generated records are source material until a decision states the claim. (standards/rule/core-product.treat-generated-research-as-source-material)
+- Each topic carries a review date; commercial work loads intent first. (standards/rule/core-product.review-a-topic-by-its-date, standards/rule/core-product.load-product-intent-before-commercial-work)
+- Decisions share one numbered sequence. (standards/rule/core-product.name-product-decisions-in-one-numbered-sequence)
 
 ## Concepts
 
+The record types and links are defined in [docs/core/model.md](model.md).
+
 | Term | Meaning |
 |:---|:---|
-| Product brief | The one page stating what the product is, for whom, and its boundary. It routes to every topic. |
-| Product topic | One page of business intent, such as pricing or one market: a chapter for people, then the commitments. |
-| Product rule | One testable commitment on a topic page, identified as `product/<topic>.<rule>`. |
-| Product decision | A decision record whose `affects` field names the product pages it sets. |
-| Source material | Research, books, and digests produced outside `docs/`, often by agents, which carry no authority. |
+| Product | The one record stating what the product is, for whom, and its boundary. |
+| Constraint | An outside rule the product must obey, with its source and whether it applies. |
+| Research | An outside fact behind a choice, with the sources read and the question asked. |
+| Decision | A dated choice with options, decider, evidence, and what would change it. |
+| Requirement | One testable commitment: a promise, a behaviour, or a quality. |
+| Problem | A pain or job someone has today, with who it affects. |
+| Feature | What the product offers against a problem: planned, shipped, later, or refused. |
+| Product topic | One page of business intent holding Requirement entries. |
+| Source material | Generated records outside docs/ carrying no authority until cited. |
 
-The order of authority runs from the decision to the code:
+Authority runs constraint, product, requirement, rule, then use case. Decisions explain choices. Research and prose carry none.
 
 ```text
-product decision  ->  product topic rule  ->  domain specification  ->  code
-(why, dated)          (what we commit to)     (how it behaves)          (what runs)
+constraint  ->  product  ->  requirement  ->  rule, use case  ->  code
+(outside rule)   (what we are)  (what we commit)  (how it behaves)  (what runs)
 ```
 
-A product decision sets the position. A topic page states it as rules. A domain specification cites the rule it implements. The code is the record of what happens today. When a specification or the code contradicts a product rule, either the code carries a defect or the business changed. A changed business is a new decision, approved by a person, before any page or code moves.
+A decision sets the position. A topic page states it as requirements. Behavior records name the requirements they fulfil. The code is the record of what happens today. When behavior contradicts a requirement, either the code carries a defect or the business changed. A changed business is a new decision, approved by a person, before any page or code moves.
 
 ## Standards
 
 ### Keep business intent under product (standards/rule/core-product.keep-business-intent-under-product)
 
-**Requirement:** A consumer MUST state its business intent in the product brief and in `product-topic` pages under `docs/product/`, and nowhere else.
+**Requirement:** A consumer MUST keep its brief, product topic pages, decisions, constraints, problems, and features under `docs/product/`, and its research under `docs/research/`.
 
-**Rationale:** Intent split across a brief, research notes, an archive, and generated books has no single answer to the question an agent asks before building. One home gives every reader one place to look.
+**Rationale:** Intent split across notes and books has no single answer to the question an agent asks before building. One home per kind gives every reader one place to look.
+
+### State one product (standards/rule/core-product.state-one-product)
+
+**Requirement:** A consumer MUST state exactly one Product record in its brief, with boundary, never list, and audience.
+
+**Rationale:** One product gives every reader one answer to what the business is. The never list refuses what the product will not become.
+
+### Answer every constraint (standards/rule/core-product.answer-every-constraint)
+
+**Requirement:** A consumer MUST record each outside rule as a Constraint with source and applicability, and mark constraints answered.
+
+**Rationale:** An unanswered constraint is a law the product may break unknowingly. A project with no outside rules records that answer too.
 
 ### State each topic in one page shape (standards/rule/core-product.state-each-topic-in-one-page-shape)
 
-**Requirement:** A `product-topic` page MUST carry the chapter sections and the commitment sections of the product topic template, and the metadata field `reviewBy`.
+**Requirement:** A `product-topic` page MUST carry the chapter sections and the commitment sections of the product topic template, and the frontmatter field `reviewBy`.
 
-**Rationale:** The fixed shape puts the present, the future, and the past of one topic on one page. The chapter sections are Summary, The situation, What we do, Why it is better, A worked example, Costs and risks, and How sure we are. The commitment sections are Rules, Position, Refusals, Open questions, Next, History, and Evidence. A reader learns where each answer sits once and finds it on every topic.
+**Rationale:** The fixed shape puts the present, the future, and the past of one topic on one page. The chapter sections are Summary, The situation, What we do, Why it is better, A worked example, Costs and risks, and How sure we are. The commitment sections are Rules, Position, Refusals, Open questions, Next, History, and Evidence. Rules holds every testable commitment as a Requirement entry. Position holds choices with their decisions, including choices no system carries. A reader learns where each answer sits once and finds it on every topic.
 
 ### Place the story before the commitments (standards/rule/core-product.place-the-story-before-the-commitments)
 
-**Requirement:** A `product-topic` page MUST place its chapter for people before its commitments, with each claim in the chapter citing its source.
+**Requirement:** A `product-topic` page MUST place its chapter for people before its commitments.
 
-**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so a person understands the choice before reading its rules. Sources keep the story checkable rather than a pitch.
+**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so a person understands the choice before reading its rules. Sources keep the story checkable rather than a pitch, as `standards/rule/core-product.cite-sources-for-chapter-claims` requires.
 
-### Identify every product rule (standards/rule/core-product.identify-every-product-rule)
+### Cite sources for chapter claims (standards/rule/core-product.cite-sources-for-chapter-claims)
 
-**Requirement:** Each Rules entry MUST open with one identifier `product/<topic>.<rule>` that names its own page `id` and appears on no other page.
+**Requirement:** Each claim in the chapter MUST cite its source.
 
-**Rationale:** An identifier lets a specification, a test, or a code element cite a business commitment, and lets a validator resolve the citation. A rule written only as prose cannot be traced to anything that implements it.
+**Rationale:** A number without its source cannot be rechecked. The chapter convinces only when its claims are checkable.
 
-### Cite product rules from domain specifications (standards/rule/core-product.cite-product-rules-from-domain-specifications)
+### Identify every requirement (standards/rule/core-product.identify-every-requirement)
 
-**Requirement:** A domain specification that implements a product rule MUST cite the rule identifier.
+**Requirement:** Each Requirement entry MUST carry one identifier `requirement/<topic>.<name>` naming its own page, with kind and statement. A promise MUST carry its values with effective dates.
 
-**Rationale:** The citation runs from behavior to intent, so a product change shows which specifications to revisit.
+**Rationale:** An identifier lets a record name the commitment it fulfils, and lets the model resolve the name. A commitment written only as prose cannot be traced. Kinds are promise, behaviour, and quality, as [docs/core/model.md](model.md) defines.
+
+### Cite requirements from records (standards/rule/core-product.cite-requirements-from-records)
+
+**Requirement:** A rule, use case, or journey that carries a requirement MUST name it in `fulfils`.
+
+**Rationale:** The link runs from behavior to intent, so a product change shows which records to revisit.
 
 ### Keep behavior out of product pages (standards/rule/core-product.keep-behavior-out-of-product-pages)
 
 **Requirement:** A product page MUST NOT describe states, entry points, failure codes, or handlers.
 
-**Rationale:** A product page that describes behavior becomes a second specification, and it drifts from the first. The domain specification owns behavior and cites the product rule it implements.
+**Rationale:** A product page that describes behavior becomes a second specification, and it drifts from the first. Behavior records own behavior and name the requirements they fulfil.
+
+### Record research with read sources (standards/rule/core-product.record-research-with-read-sources)
+
+**Requirement:** A Research record MUST state its question and list each source with its read date. It lives under `docs/research/`.
+
+**Rationale:** A fact without its source cannot be rechecked. The read date shows when the outside fact was true.
+
+### State each problem and feature (standards/rule/core-product.state-each-problem-and-feature)
+
+**Requirement:** A Problem MUST state who it affects and what they face. A Feature MUST name the problems it solves and its state.
+
+**Rationale:** Problems without owners attract solutions nobody needs. A refused feature keeps its reason so the refusal is not relitigated.
 
 ### Trace every choice to a decision (standards/rule/core-product.trace-every-choice-to-a-decision)
 
@@ -86,31 +123,31 @@ A product decision sets the position. A topic page states it as rules. A domain 
 
 ### Record each product choice as a decision (standards/rule/core-product.record-each-product-choice-as-a-decision)
 
-**Requirement:** A decision that sets product pages MUST name them in `affects` and carry the sections of the product decision template.
+**Requirement:** A decision that sets product records MUST name them in `decides` and carry the sections of the decision template.
 
-**Rationale:** A business choice is argued from options and evidence, and it is reopened by a condition rather than by a date. The template sections are Context, Options considered, Decision, Evidence, Consequences, and What would change it. The override sections of a standards decision do not fit a business choice.
+**Rationale:** A business choice is argued from options and evidence, and it is reopened by a condition rather than by a date. The sections are Context, Options, Decision, Consequences, and Evidence.
 
 ### Name the person who approved a decision (standards/rule/core-product.name-the-person-who-approved-a-decision)
 
-**Requirement:** An `approved` product decision MUST carry `decidedBy` and `decided`, set by the accountable person and never by an agent.
+**Requirement:** An agent MAY draft a decision. Only the named decider approves it, and an approved decision MUST carry `decided`.
 
-**Rationale:** Product, commercial, and legal choices belong to an accountable person, as `standards/rule/core-system.keep-decision-authority-with-accountable-people` states. The fields make that approval visible and checkable. A draft decision supports building, while approval gates the release.
+**Rationale:** Product, commercial, and legal choices belong to an accountable person, as `standards/rule/core-system.keep-decision-authority-with-accountable-people` states. The decider is named while the decision is a draft. Approval gates the release, while building may start on a draft.
 
 ### Replace a decision with a new record (standards/rule/core-product.replace-a-decision-with-a-new-record)
 
-**Requirement:** A changed product choice MUST be a new decision naming the old one in `supersedes`, with the old one retired in the same change.
+**Requirement:** A changed choice MUST be a new decision naming the old one in `replaces`, with the old one retired in the same change.
 
 **Rationale:** A decision edited in place loses the reason it once held, and the topic pages that cited it silently change meaning. A replaced record stays readable as the past.
 
 ### Derive history from decisions (standards/rule/core-product.derive-history-from-decisions)
 
-**Requirement:** The History section of a `product-topic` page MUST list exactly the decisions whose `affects` names the page, as written by `node standards/tools/product-records.mjs --write`.
+**Requirement:** The History section of a product topic page MUST list exactly the decisions that decide its entries, as a generated region.
 
-**Rationale:** A past typed by hand drifts from the records it claims to summarize. Deriving it keeps the page in the present tense and the past one link away.
+**Rationale:** A past typed by hand drifts from the records it claims. Only the model builder writes the region. Regions are fenced as [docs/core/model.md](model.md) defines.
 
 ### Treat generated research as source material (standards/rule/core-product.treat-generated-research-as-source-material)
 
-**Requirement:** An agent MUST treat research outside `docs/` as source material until a research claim or an approved product decision states it.
+**Requirement:** An agent MUST treat records generated outside `docs/` as source material until a Research record or an approved decision states the claim.
 
 **Rationale:** Generated research mixes verified facts, inferences, and recommendations in one voice. A recommendation from an agent that reads as a decision gets built without anyone having made it.
 
@@ -126,31 +163,25 @@ A product decision sets the position. A topic page states it as rules. A domain 
 
 **Rationale:** Commercial behavior that contradicts the business position compiles and passes its tests. Only the product pages say it is wrong.
 
-### Report which product rules are carried (standards/rule/core-product.report-which-product-rules-are-carried)
+### Derive requirement coverage from the model (standards/rule/core-product.derive-requirement-coverage-from-the-model)
 
-**Requirement:** A consumer MUST be able to list every product rule with the specifications that cite it, using `node standards/tools/product-records.mjs --coverage`.
+**Requirement:** A consumer MUST derive its requirement coverage from the model, never by hand.
 
-**Rationale:** A rule that no specification cites is intent the system does not carry yet. The list separates planned work from forgotten work.
+**Rationale:** A requirement no record fulfils is intent the system does not carry yet. The model lists each requirement with the records that fulfil it.
 
 ### Build intent before specification before code (standards/rule/core-product.build-intent-before-specification-before-code)
 
-**Requirement:** A behavior change MUST land its product rule and decision, then its research evidence, then its specification citation, then its code, in that order.
+**Requirement:** A behavior change MUST land intent, research, decision, requirement, specification records, code, and tests, in that order. A decision written after its code shipped is a defect.
 
-**Rationale:** The order makes each layer checkable before the next one builds on it. A specification written before its decision argues from code, and a decision written after its code records what already shipped.
+**Rationale:** The order makes each layer checkable before the next builds on it. A specification written before its decision argues from code. Approval follows `standards/rule/core-principles.refuse-approval-behind-a-draft-decision`: nothing is approved behind a draft.
 
-**Example:** A price change lands decision `0011-raise-the-monthly-plan` and rule `product/pricing.monthly-plan-fee`, then its research note, then the billing citation, then the code.
+**Example:** A price change lands its research note, then decision `decision/0011-raise-the-monthly-plan` and requirement `requirement/pricing.monthly-plan-fee`, then the billing `fulfils` link, then the code.
 
-### Reject an uncarried product rule (standards/rule/core-product.reject-an-uncarried-product-rule)
+### Reject an unfulfilled requirement (standards/rule/core-product.reject-an-unfulfilled-requirement)
 
-**Requirement:** A consumer MUST fail its checks on an uncarried product rule and on a rule-less aggregate, unless a trace baseline names each with a reason.
+**Requirement:** A consumer MUST fail its checks on a requirement no record fulfils, unless a Known gap names it with owner and end date.
 
-**Rationale:** A list nobody clears separates planned work from nothing. The baseline reason states which of the two each entry is: work dated for later, or intent that never becomes code.
-
-**Example:** A reason opens with one fixed prefix, so a reader sees the kind of gap at once. The prefixes are Company practice, Refusal, Planned, Carried not yet cited, Missing, Engineering only, and Not yet cited.
-
-```json
-{ "rules": { "product/pricing.launch-discount": { "reason": "Planned: the launch discount ships with the spring release." } } }
-```
+**Rationale:** A list nobody clears separates planned work from nothing. The gap states whether the requirement is dated work or intent that never becomes code.
 
 ### Build on a draft decision before approval (standards/rule/core-product.build-on-a-draft-decision-before-approval)
 
@@ -158,21 +189,15 @@ A product decision sets the position. A topic page states it as rules. A domain 
 
 **Rationale:** Approval before every edit stalls agent work on a queue of one person. The release still needs the approval, so nothing ships on a draft alone.
 
-### Record a decision before its code (standards/rule/core-product.record-a-decision-before-its-code)
-
-**Requirement:** A decision recorded after its code shipped is a defect, so an agent MUST record the decision before changing code.
-
-**Rationale:** A decision written after its code argues from what already shipped. The chain stays honest only when intent precedes the change it authorizes.
-
 ## Conventions
 
 ### Group product topics by area (standards/rule/core-product.group-product-topics-by-area)
 
-**Default:** Keep the brief at `docs/product/brief.md`, topic pages in one folder per area, and product decisions at `docs/product/decisions/`.
+**Default:** Keep the brief at `docs/product/brief.md`, topic pages in one folder per area, and constraints, decisions, problems, features, and journeys each in their folder. Research lives under `docs/research/`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records an Exception naming this provision, with its reason and review date.
 
-**Rationale:** An area folder keeps related topics together, and one decision folder keeps one numbering sequence.
+**Rationale:** An area folder keeps related topics together. One folder per kind keeps each record findable.
 
 **Example:**
 
@@ -180,59 +205,69 @@ A product decision sets the position. A topic page states it as rules. A domain 
 docs/product/
   README.md
   brief.md
-  capabilities.md
   business/
     model.md
     pricing.md
   markets/
     expansion.md
-    netherlands.md
+    <market>.md
   company/
     legal-and-tax.md
   roadmap/
     milestones.md
     later.md
-    refused.md
+  constraints/
+    <name>.md
   decisions/
-    0001-sell-the-whole-event-cycle.md
+    0001-monthly-plan.md
+  problems/
+    <name>.md
+  features/
+    <name>.md
+  journeys/
+    <name>.md
 ```
 
 ### Name product decisions in one numbered sequence (standards/rule/core-product.name-product-decisions-in-one-numbered-sequence)
 
-**Default:** Name each product decision `<four-digit number>-<short-title>.md` and use the file name as its `id`.
+**Default:** Name each product decision `<four-digit number>-<name>.md` and use `decision/<four-digit number>-<name>` as its identifier.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records an Exception naming this provision, with its reason and review date.
 
-**Rationale:** One sequence orders the record by when a choice was proposed, and the title makes a link readable without opening it.
+**Rationale:** One sequence orders the record by when a choice was proposed. The number counts as a word, so digits never stand alone.
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/core-product.trace-every-choice-to-a-decision`, `standards/rule/core-product.identify-every-product-rule`, and `standards/rule/core-product.cite-product-rules-from-domain-specifications`.
+This informative example demonstrates `standards/rule/core-product.trace-every-choice-to-a-decision`, `standards/rule/core-product.identify-every-requirement`, and `standards/rule/core-product.cite-requirements-from-records`.
 
-A subscription business keeps `docs/product/business/pricing.md` with id `pricing`. Its Rules section states `product/pricing.monthly-plan-fee`, and its Position row for the monthly plan links `0003-monthly-plan`. The billing specification for the invoice use case cites `product/pricing.monthly-plan-fee`. When the price changes, decision `0011-raise-the-monthly-plan` supersedes `0003-monthly-plan`. The pricing row then links the new record, and the History section lists both.
+A subscription business keeps `docs/product/business/pricing.md` with id `pricing`. Its Rules section states `requirement/pricing.monthly-plan-fee`, and its Position row for the monthly plan links `decision/0003-monthly-plan`. The billing use case names the requirement in `fulfils`. When the price changes, decision `decision/0011-raise-the-monthly-plan` replaces `decision/0003-monthly-plan`. The pricing row then links the new record, and History lists both.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-product.keep-business-intent-under-product | static | `node standards/tools/validate-consumer.mjs` fails a `product-topic` page outside `docs/product/`. |
-| standards/rule/core-product.state-each-topic-in-one-page-shape | static | `node standards/tools/validate-consumer.mjs` fails a `product-topic` page missing a required section or `reviewBy`. |
-| standards/rule/core-product.place-the-story-before-the-commitments | static | `node standards/tools/validate-consumer.mjs` fails a topic whose sections are out of order or that adds a section among the commitments. |
-| standards/rule/core-product.identify-every-product-rule | static | `node standards/tools/validate-consumer.mjs` fails a Rules entry without an identifier, a foreign topic segment, a duplicate, or an unresolved citation. |
-| standards/rule/core-product.cite-product-rules-from-domain-specifications | inspection | Specification review confirms that each use case cites the product rules it implements. |
-| standards/rule/core-product.keep-behavior-out-of-product-pages | inspection | Documentation review confirms that no product page names a state, entry point, failure code, or handler. |
-| standards/rule/core-product.trace-every-choice-to-a-decision | static | `node standards/tools/validate-consumer.mjs` fails an entry with no decision link, a retired link, or a draft link on an approved page. |
-| standards/rule/core-product.record-each-product-choice-as-a-decision | static | `node standards/tools/validate-consumer.mjs` fails a decision whose `affects` names no product page or that misses a required section. |
-| standards/rule/core-product.name-the-person-who-approved-a-decision | static | `node standards/tools/validate-consumer.mjs` fails an approved product decision without `decidedBy` or `decided`. |
-| standards/rule/core-product.replace-a-decision-with-a-new-record | static | `node standards/tools/validate-consumer.mjs` fails a `supersededBy` on a record that is not retired, and a pair that does not name each other. |
-| standards/rule/core-product.derive-history-from-decisions | static | `node standards/tools/product-records.mjs` exits 1 when a History section differs from the decisions that name its page. |
-| standards/rule/core-product.treat-generated-research-as-source-material | inspection | Change review confirms each product position cites an approved decision or a research claim, never a generated record. |
-| standards/rule/core-product.review-a-topic-by-its-date | static | `node standards/tools/validate-consumer.mjs` fails a `product-topic` page whose `reviewBy` date has passed. |
-| standards/rule/core-product.load-product-intent-before-commercial-work | inspection | The change report for commercial behavior lists the product pages read before the change. |
-| standards/rule/core-product.report-which-product-rules-are-carried | static | `node standards/tools/product-records.mjs --coverage` lists each product rule with its citing pages. |
-| standards/rule/core-product.build-intent-before-specification-before-code | inspection | Change review confirms the product record, evidence, specification, and code landed in that order. |
-| standards/rule/core-product.reject-an-uncarried-product-rule | static | `node standards/tools/product-records.mjs --check` exits 1 on an unlisted gap or a stale baseline entry. |
-| standards/rule/core-product.build-on-a-draft-decision-before-approval | inspection | Change review confirms the release approval while the code cites a draft decision. |
-| standards/rule/core-product.record-a-decision-before-its-code | inspection | Change review confirms each decision date precedes its code change. |
-| standards/rule/core-product.group-product-topics-by-area | inspection | Documentation review compares `docs/product/` against the example layout or a named local replacement. |
-| standards/rule/core-product.name-product-decisions-in-one-numbered-sequence | inspection | Documentation review confirms each product decision file name matches its `id` and carries a four-digit number. |
+| standards/rule/core-product.keep-business-intent-under-product | checkable | `node tools/validate-consumer.mjs` fails a why-layer record outside its home folder. |
+| standards/rule/core-product.state-one-product | checkable | `node tools/validate-consumer.mjs` fails a brief without one product, boundary, and audience. |
+| standards/rule/core-product.answer-every-constraint | checkable | `node tools/validate-consumer.mjs` fails a constraint without source and applicability, or a project with unanswered constraints. |
+| standards/rule/core-product.state-each-topic-in-one-page-shape | checkable | `node tools/validate-consumer.mjs` fails a topic page missing a required section or `reviewBy`. |
+| standards/rule/core-product.place-the-story-before-the-commitments | checkable | `node tools/validate-consumer.mjs` fails a topic whose chapter follows its commitments. |
+| standards/rule/core-product.cite-sources-for-chapter-claims | guidance | Does each claim in the chapter cite its source? |
+| standards/rule/core-product.identify-every-requirement | checkable | `node tools/validate-consumer.mjs` fails a Requirement entry without identifier, kind, or statement, or a promise without effective-dated values. |
+| standards/rule/core-product.cite-requirements-from-records | guidance | Does every record that carries a requirement name it in `fulfils`? |
+| standards/rule/core-product.keep-behavior-out-of-product-pages | guidance | Does any product page name a state, entry point, failure code, or handler? |
+| standards/rule/core-product.record-research-with-read-sources | checkable | `node tools/validate-consumer.mjs` fails a Research record without question or source read date. |
+| standards/rule/core-product.state-each-problem-and-feature | checkable | `node tools/validate-consumer.mjs` fails a problem or feature missing its required fields. |
+| standards/rule/core-product.trace-every-choice-to-a-decision | guidance | Does every Position and Refusals entry link an unretired decision, approved when the page is approved? |
+| standards/rule/core-product.record-each-product-choice-as-a-decision | checkable | `node tools/validate-consumer.mjs` fails a decision missing a required section or `decides` target. |
+| standards/rule/core-product.name-the-person-who-approved-a-decision | guidance | Did the named decider approve the decision, and does the record carry the date? |
+| standards/rule/core-product.replace-a-decision-with-a-new-record | guidance | Does the new decision name the old one in `replaces`, with the old one retired? |
+| standards/rule/core-product.derive-history-from-decisions | guidance | Does History list exactly the decisions that decide the page, as generated? |
+| standards/rule/core-product.treat-generated-research-as-source-material | guidance | Does every new position trace to a Research record or an approved decision? |
+| standards/rule/core-product.review-a-topic-by-its-date | checkable | `node tools/validate-consumer.mjs` fails a topic page whose `reviewBy` date has passed. |
+| standards/rule/core-product.load-product-intent-before-commercial-work | guidance | Does the change report list the product pages read before the change? |
+| standards/rule/core-product.derive-requirement-coverage-from-the-model | guidance | Does the coverage list come from the model rather than hand-kept notes? |
+| standards/rule/core-product.build-intent-before-specification-before-code | guidance | Did intent, research, decision, requirement, records, code, and tests land in order? |
+| standards/rule/core-product.reject-an-unfulfilled-requirement | guidance | Does every requirement have a fulfilling record or a Known gap naming it? |
+| standards/rule/core-product.build-on-a-draft-decision-before-approval | guidance | Does the release hold approval for every decision the code builds on? |
+| standards/rule/core-product.group-product-topics-by-area | guidance | Does `docs/product/` follow the example layout, or does an Exception record the replacement? |
+| standards/rule/core-product.name-product-decisions-in-one-numbered-sequence | checkable | `node tools/validate-consumer.mjs` fails a decision file whose name does not match its identifier. |
