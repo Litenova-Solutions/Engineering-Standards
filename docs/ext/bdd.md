@@ -2,33 +2,39 @@
 
 ## Intent
 
-This extension adds executable scenarios for critical cross-layer examples. A consumer writes them as Reqnroll Gherkin features or as LightBDD feature classes in C#. The use-case specification remains the authored behavior source.
+This extension adds executable scenarios for critical cross-layer examples. A consumer writes them as Reqnroll Gherkin features with C# step definitions or as LightBDD feature classes. The use-case specification remains the authored behavior source.
 
 ## Activation
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `end-to-end-flow`.
+Applicable record types: `use-case`, `journey`.
 
 The consumer enables `bdd` when a critical example needs business-language review and execution through a public system boundary. Routine unit behavior does not activate it.
 
-## Baseline relationship
+## Replaces
 
-This extension adds `apps/api/tests/{ProjectName}.Acceptance.Tests/` and the manifest-pinned packages of one runner. It replaces no baseline rule.
+This extension replaces no baseline provision. It adds an acceptance test project and the manifest-pinned packages of one runner.
+
+## Switches on
+
+This extension switches on no optional record type.
+
+## Runners
 
 A consumer selects one runner for the whole suite and keeps the provisions below with either.
 
-| Runner | A scenario is | It cites a criterion with | Its business-readable text is |
+| Runner | A scenario is | It proves a Case with | Its business-readable text is |
 |:---|:---|:---|:---|
-| Reqnroll | A Gherkin scenario in a `.feature` file, bound to step definitions | A `@` tag line | The feature file |
-| LightBDD | A C# method on a feature class, whose steps are calls to step methods | The trait form of `standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form` | The scenario method, the step method names, and the generated report |
+| Reqnroll | A Gherkin scenario in a `.feature` file, bound to step definitions | A `proves:` line under the scenario title | The feature file |
+| LightBDD | A C# method on a feature class, whose steps are calls to step methods | A `/// <proves>` tag on the scenario method | The scenario method, the step method names, and the generated report |
 
 LightBDD moves the binding from text matching to the compiler. A step that no longer exists, or whose parameters changed, fails the build rather than the run. A consumer that generates its API client from the published contract extends the same property to every request a step sends.
 
 ## Agent Summary {#agent-summary}
 
 - Select BDD scenarios for shared cross-layer examples. (standards/rule/ext-bdd.select-shared-critical-examples)
-- Trace each scenario to acceptance criteria. (standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)
+- Prove one Case from each scenario. (standards/rule/ext-bdd.prove-a-case-from-every-scenario)
 - Drive scenarios through public behavior. (standards/rule/ext-bdd.drive-public-behavior)
 - Keep direct database checks at durable boundaries. (standards/rule/ext-bdd.limit-database-assertions)
 - Isolate scenario data and execution order. (standards/rule/ext-bdd.own-scenario-data, standards/rule/ext-bdd.isolate-scenario-execution)
@@ -42,19 +48,19 @@ LightBDD moves the binding from text matching to the compiler. A step that no lo
 
 **Rationale:** A selected scenario gives product, domain, engineering, and testing discussions one executable example.
 
-### Avoid routine Gherkin duplication (standards/rule/ext-bdd.avoid-routine-gherkin-duplication)
+### Avoid routine scenario duplication (standards/rule/ext-bdd.avoid-routine-scenario-duplication)
 
 **Requirement:** A test author MUST NOT duplicate every unit or validation case as a scenario.
 
 **Rationale:** Unit and validation tests retain their narrower feedback and failure location.
 
-### Tag scenarios with acceptance criteria (standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria)
+### Prove a Case from every scenario (standards/rule/ext-bdd.prove-a-case-from-every-scenario)
 
-**Requirement:** Every BDD scenario MUST cite its acceptance criteria: a Reqnroll scenario by `@AC-MODULE-USE-CASE-NN` tags, a LightBDD scenario by the C# test trait.
+**Requirement:** Every BDD scenario MUST carry one `proves` claim naming the Case it proves. A LightBDD scenario carries the claim as a `/// <proves>` tag on the scenario method. A Reqnroll scenario carries the claim as a `proves:` line under its title. The scenario steps MUST call the proved use case and assert its Result.
 
-**Rationale:** The owning use-case specification contains the acceptance criterion text and examples. The tag is the criterion identifier with one `@` in front, which is the same identifier `standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion` and `standards/rule/backend-testing.cite-an-acceptance-criterion-in-one-exact-form` cite from their own test attributes. One identifier reaches a feature file as a tag, a C# test as a trait, and a browser test as the opening of its title. The three forms differ only in what their tool requires.
+**Rationale:** A Case pairs one situation with the Result it leads to. The claim, the steps, and the assertion together prove it.
 
-**Example:** `@AC-ORDERS-CANCEL-ORDER-01` traces a cancellation scenario to its accepted criterion.
+**Example:** `/// <proves>case/cancel-order.cancelling-twice-is-refused</proves>` traces a cancellation scenario to its Case.
 
 ### Drive public behavior (standards/rule/ext-bdd.drive-public-behavior)
 
@@ -110,7 +116,7 @@ LightBDD moves the binding from text matching to the compiler. A step that no lo
 
 **Default:** Group feature files or feature classes under module folders in `Acceptance.Tests`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
 **Rationale:** Module folders align scenarios with the business vocabulary they exercise.
 
@@ -118,7 +124,7 @@ LightBDD moves the binding from text matching to the compiler. A step that no lo
 
 **Default:** Keep step definitions narrow and reusable only within one business vocabulary.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
 **Rationale:** Broad generic steps hide business meaning and create unrelated coupling.
 
@@ -126,17 +132,17 @@ LightBDD moves the binding from text matching to the compiler. A step that no lo
 
 **Default:** Store values for one scenario in a scenario context object.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
 **Rationale:** The context is scenario state rather than a service locator.
 
 ### Mark pull-request scenarios (standards/rule/ext-bdd.mark-pull-request-scenarios)
 
-**Default:** Mark the small pull-request subset with `@critical` separately from acceptance-ID tags.
+**Default:** Mark the small pull-request subset separately from the proves claim: a Reqnroll scenario with the `@critical` tag, a LightBDD scenario with a critical test trait.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** The tag selects fast feedback without altering acceptance-criterion traceability. `@critical` names the scenarios whose failure stops a release, and the project records which ones those are. A tag that every scenario carries selects nothing, so the subset has a stated size bound and an owner who keeps it there.
+**Rationale:** The marking selects fast feedback without altering Case proof. `@critical` names the scenarios whose failure stops a release, and the project records which ones those are. A marking that every scenario carries selects nothing, so the subset has a stated size bound and an owner who keeps it there.
 
 ## Dependencies
 
@@ -147,20 +153,20 @@ LightBDD 3.12 is built against xUnit v3 3.2. Its test project therefore runs the
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-bdd.select-shared-critical-examples | inspection | Selected scenarios explain their shared cross-layer business example in the owning specification. |
-| standards/rule/ext-bdd.avoid-routine-gherkin-duplication | inspection | Scenario review distinguishes selected behavior from unit and validation coverage. |
-| standards/rule/ext-bdd.tag-scenarios-with-acceptance-criteria | static | `node standards/tools/validate-consumer.mjs` resolves every `@AC-...` scenario tag and every scenario trait to a declared acceptance criterion. |
-| standards/rule/ext-bdd.drive-public-behavior | test | `BddBoundaryTests` call the declared HTTP or other public boundary. |
-| standards/rule/ext-bdd.assert-observable-outcomes | test | `BddBoundaryTests` cover a declared observable result. |
-| standards/rule/ext-bdd.limit-database-assertions | inspection | Any direct database assertion names its documented durable boundary. |
-| standards/rule/ext-bdd.own-scenario-data | test | `BddStateTests` use scenario-owned identifiers and actor state. |
-| standards/rule/ext-bdd.isolate-scenario-execution | test | `BddStateTests` asserts randomized scenario order passes after database reset. |
-| standards/rule/ext-bdd.translate-business-phrases | inspection | Step definitions delegate business phrases to typed test-driver calls. |
-| standards/rule/ext-bdd.exclude-production-internals | static | `BddStepsTests` projects contain no repository, handler, session, or service-provider resolution. |
-| standards/rule/ext-bdd.preserve-scenario-failures | test | `BddStepsTests` retain the original failure after hook cleanup. |
-| standards/rule/ext-bdd.group-feature-files-by-module | inspection | Feature file locations follow the module convention or record a local replacement. |
-| standards/rule/ext-bdd.keep-steps-vocabulary-scoped | inspection | Step review identifies one business vocabulary for each reusable step set. |
-| standards/rule/ext-bdd.limit-scenario-context | inspection | Scenario context review confirms no service registration or resolution behavior. |
-| standards/rule/ext-bdd.mark-pull-request-scenarios | test | Pull-request workflow selects `@critical` independently from acceptance-ID tags. |
+| standards/rule/ext-bdd.select-shared-critical-examples | guidance | Does the scenario give shared discussions one executable cross-layer example? |
+| standards/rule/ext-bdd.avoid-routine-scenario-duplication | guidance | Does the suite leave unit and validation cases to their narrower tests? |
+| standards/rule/ext-bdd.prove-a-case-from-every-scenario | guidance | Does every scenario carry one proves claim for a Case its steps prove? |
+| standards/rule/ext-bdd.drive-public-behavior | guidance | Do all steps call the HTTP API or another declared public boundary? |
+| standards/rule/ext-bdd.assert-observable-outcomes | guidance | Does each scenario assert a response, read, event, record, or other observable outcome? |
+| standards/rule/ext-bdd.limit-database-assertions | guidance | Does each direct database assertion name its documented durable boundary? |
+| standards/rule/ext-bdd.own-scenario-data | guidance | Does each scenario own its identifiers, actor context, requests, responses, and expected state? |
+| standards/rule/ext-bdd.isolate-scenario-execution | guidance | Does the suite reset state between scenarios and avoid order dependence? |
+| standards/rule/ext-bdd.translate-business-phrases | guidance | Do step definitions delegate business phrases to typed driver calls? |
+| standards/rule/ext-bdd.exclude-production-internals | guidance | Is the suite free of repository, handler, session, and provider resolution? |
+| standards/rule/ext-bdd.preserve-scenario-failures | guidance | Do hooks await setup and cleanup without replacing the scenario failure? |
+| standards/rule/ext-bdd.group-feature-files-by-module | guidance | Do feature files follow the module folders or a recorded Exception? |
+| standards/rule/ext-bdd.keep-steps-vocabulary-scoped | guidance | Does each reusable step set serve one business vocabulary or a recorded Exception? |
+| standards/rule/ext-bdd.limit-scenario-context | guidance | Does the scenario context hold state only, or is there a recorded Exception? |
+| standards/rule/ext-bdd.mark-pull-request-scenarios | guidance | Does the pull-request subset stay small, owned, and separate from Case proof? |

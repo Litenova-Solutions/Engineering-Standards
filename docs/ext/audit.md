@@ -18,15 +18,19 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 Activation scope: `project`.
 
-Applicable specification kinds: None.
+Applicable record types: None.
 
 The consumer enables `audit` when a person or a machine acts inside data that another party owns, and a later reviewer must establish accountability. Regulatory obligation, customer contract, payment scope, and platform-side support access each meet this condition.
 
 [Audit obligations](../reference/audit-obligations.md) maps each provision on this page to the external obligation it satisfies.
 
-## Baseline relationship
+## Replaces
 
 This extension replaces `standards/rule/quality-security.record-security-audit-events`. The baseline states the required record fields for one security audit event. This extension owns the producer, the transaction boundary, the selection policy, the store, and the read path.
+
+## Switches on
+
+This extension switches on no optional record type.
 
 ## Agent Summary {#agent-summary}
 
@@ -45,9 +49,9 @@ This extension replaces `standards/rule/quality-security.record-security-audit-e
 
 ### Record the audit adoption decision (standards/rule/ext-audit.record-the-audit-adoption-decision)
 
-**Requirement:** An audit adoption decision MUST record the audited categories, the retention period of each category, the read access model, and the integrity method.
+**Requirement:** An audit adoption decision MUST record its owner, status, decider, and decide-by. It MUST record the audited categories with the retention period and lawful basis of each. It MUST record the bulk-read threshold, the read access model, the integrity method, and the processing-records entry.
 
-**Rationale:** The selection, its retention, and its protection are policy choices. A reviewer evaluates the declared policy before evaluating the implementation.
+**Rationale:** The selection, its retention, and its protection are policy choices. A reviewer evaluates the declared policy before evaluating the implementation. No record is approved while this decision is draft.
 
 ### Declare audit selection on every Command (standards/rule/ext-audit.declare-audit-selection-on-every-command)
 
@@ -93,7 +97,7 @@ This extension replaces `standards/rule/quality-security.record-security-audit-e
 
 ### Record the required audit fields (standards/rule/ext-audit.record-the-required-audit-fields)
 
-**Requirement:** An audit record MUST contain actor kind, actor identity, action, target kind, target identity, outcome, business time, record time, and tenant.
+**Requirement:** An audit record MUST contain actor kind, actor identity, action, target kind, target identity, outcome, business time, record time, and tenant. A project without the tenancy extension records a fixed tenant value.
 
 **Rationale:** These fields carry the accountability question. Business time states when the action happened, and record time states when the evidence was written.
 
@@ -119,11 +123,11 @@ This extension replaces `standards/rule/quality-security.record-security-audit-e
 
 ### Use a closed actor set (standards/rule/ext-audit.use-a-closed-actor-set)
 
-**Requirement:** An audit actor MUST be one member of a closed set that distinguishes a person, a device, and a named process.
+**Requirement:** An audit actor MUST be one of `person`, `company`, `provider`, `system`, or `guest`.
 
-**Rationale:** An absent actor collapses three answers into one. A scheduled process acted, a device acted, or nobody recorded the actor, and only the third is a defect.
+**Rationale:** An absent actor collapses three answers into one. A scheduled process acted, a device acted, or nobody recorded the actor, and only the third is a defect. A device maps to the person whose account authorized it, with the device recorded as the client description. A named process maps to `system`.
 
-**Example:** A warehouse handheld records a device actor with the account that authorized the device.
+**Example:** A warehouse handheld records the person actor whose account authorized it, and the origin record names the device.
 
 ### Record delegated administrative access (standards/rule/ext-audit.record-delegated-administrative-access)
 
@@ -269,9 +273,9 @@ The algorithm is named because two implementations that each chose their own can
 
 ### Give the trail a read path (standards/rule/ext-audit.give-the-trail-a-read-path)
 
-**Requirement:** An audited system MUST provide a permission-gated read of the trail, filtered by tenant, actor, action, target, and outcome.
+**Requirement:** An audited system MUST provide a read of the trail. The read is a use case that needs a Permission record, filtered by tenant, actor, action, target, and outcome.
 
-**Rationale:** A trail that no use case reads is storage rather than a control. The reviewer and the customer ask one query.
+**Rationale:** A trail that no use case reads is storage rather than a control. The actor holds a Role at a scope, the Role allows the Permission, and the guard permits the read.
 
 ### Audit reads of the trail (standards/rule/ext-audit.audit-reads-of-the-trail)
 
@@ -281,7 +285,7 @@ The algorithm is named because two implementations that each chose their own can
 
 ### Record personal-data reads (standards/rule/ext-audit.record-personal-data-reads)
 
-**Requirement:** A query that returns personal data across a tenant or account boundary MUST produce an audit record.
+**Requirement:** A query that returns personal data across a tenant or account boundary MUST produce an audit record. A project without the tenancy extension defines the account boundary in the adoption decision.
 
 **Rationale:** A read leaves no state change and therefore no other trace. Disclosure without a record cannot be investigated.
 
@@ -291,7 +295,7 @@ The algorithm is named because two implementations that each chose their own can
 
 **Rationale:** The cross-boundary rule catches a disclosure to the wrong party. It does not catch an export of every record a party may read one at a time. That is the shape a copied dataset has. [Article 30 of the GDPR](https://gdpr-info.eu/art-30-gdpr/) asks what categories of data were processed and by whom, and an unrecorded bulk read cannot answer either.
 
-**Example:** A project records the threshold beside its audit obligations. A list endpoint whose page size can exceed it audits the read with the subject count rather than the subjects.
+**Example:** A project records the threshold in the adoption decision. A list endpoint whose page size can exceed it audits the read with the subject count rather than the subjects.
 
 ### Record bulk export (standards/rule/ext-audit.record-bulk-export)
 
@@ -301,7 +305,7 @@ The algorithm is named because two implementations that each chose their own can
 
 ### Reject an undeclared Command (standards/rule/ext-audit.reject-an-undeclared-command)
 
-**Requirement:** An automated check MUST fail when a Command declares neither audited nor excluded status.
+**Requirement:** An automated check MUST fail when a Command declares neither audited nor excluded status. A composition refusal at startup satisfies this rule.
 
 **Rationale:** The next Command is written by somebody who did not read this page. Only an automated gate catches it.
 
@@ -311,7 +315,7 @@ The algorithm is named because two implementations that each chose their own can
 
 **Default:** Keep the audit record, its store, the producer, and the integrity job under `Infrastructure/Auditing/`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
 **Rationale:** One Infrastructure location contains the evidence mechanism.
 
@@ -319,15 +323,15 @@ The algorithm is named because two implementations that each chose their own can
 
 **Default:** Declare the action, target kind, category, and exclusion reason as an attribute on the Command type.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
 **Rationale:** The declaration stays with the code it describes, so a review reads both at once.
 
 ### Use a fixed category vocabulary (standards/rule/ext-audit.use-a-fixed-category-vocabulary)
 
-**Default:** Classify each audited action as `authentication`, `access`, `grant`, `money`, `configuration`, `privacy`, or `support`.
+**Default:** Classify each audited action as `authentication`, `authorization-denial`, `grant-change`, `monetary-action`, `tenant-configuration`, `personal-data-read`, `bulk-export`, or `background-process-change`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
 **Rationale:** The category drives retention and the review query, so a free-text value defeats both.
 
@@ -335,7 +339,7 @@ The algorithm is named because two implementations that each chose their own can
 
 **Default:** Store audit records in the business database, under a separate account holding insert and select privileges.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
 **Rationale:** One database provides the atomic success write. Privilege separation provides the append-only guarantee.
 
@@ -343,7 +347,7 @@ The algorithm is named because two implementations that each chose their own can
 
 **Default:** Publish a copy of each record to an external security platform through the outbox, and keep the local store authoritative.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
 **Rationale:** Delivery is at-least-once and evidence needs one durable source. The copy serves detection and the store serves accountability.
 
@@ -355,49 +359,49 @@ No additional baseline package is required. The `tenancy` extension owns tenant 
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-audit.record-the-audit-adoption-decision | inspection | Adoption decision records categories, per-category retention, access model, and integrity method. |
-| standards/rule/ext-audit.declare-audit-selection-on-every-command | static | `AuditSelectionTests` asserts every Command type carries an audited or excluded declaration. |
-| standards/rule/ext-audit.cover-the-required-audit-categories | inspection | Declared selection contains one entry for each of the eight required categories. |
-| standards/rule/ext-audit.exclude-indiscriminate-auditing | inspection | Selection record justifies each audited category rather than covering all Commands. |
-| standards/rule/ext-audit.emit-audit-records-at-the-mediation-boundary | test | `AuditBoundaryTests` produce one record for a Command with no audit call in the handler. |
-| standards/rule/ext-audit.restrict-handler-contribution-to-determined-values | static | `AuditBoundaryTests` asserts handler sources set only target identity and reason. |
-| standards/rule/ext-audit.exclude-derived-audit-trails | static | `AuditBoundaryTests` asserts no audit writer subscribes to domain events or database triggers. |
-| standards/rule/ext-audit.record-the-required-audit-fields | test | `AuditRecordTests` assert every required field is present and non-default. |
-| standards/rule/ext-audit.state-the-action-as-use-case-identity | test | `AuditRecordTests` match each `action` value against the registered use-case identity list. |
-| standards/rule/ext-audit.record-the-failure-code-on-an-unsuccessful-attempt | test | `AuditRecordTests` carry a failure code on `denied` and `failed` records. |
-| standards/rule/ext-audit.version-the-audit-record-shape | test | `AuditRecordTests` carry an explicit schema version value. |
-| standards/rule/ext-audit.use-a-closed-actor-set | static | `AuditActorTests` asserts the actor type is a closed set covering person, device, and process. |
-| standards/rule/ext-audit.record-delegated-administrative-access | test | `AuditActorTests` set the grant field for an action taken under a support grant. |
-| standards/rule/ext-audit.record-every-attempt-outcome | test | `AuditStatusTests` assert one of the three declared outcome values. |
-| standards/rule/ext-audit.record-refused-authorization | test | `AuditStatusTests` produce a `denied` record from a refused authorization. |
-| standards/rule/ext-audit.record-failed-audited-attempts | test | `AuditStatusTests` produce a `failed` record from a permitted attempt that throws. |
-| standards/rule/ext-audit.record-the-request-origin | test | `AuditContextTests` carry origin address, client description, and request identifier. |
-| standards/rule/ext-audit.record-the-operation-trace-identity | test | `AuditContextTests` match the record trace identifier to the diagnostic log entry. |
-| standards/rule/ext-audit.exclude-secrets-and-payment-data | test | `AuditClassificationTests` reject a record containing a credential or payment value. |
-| standards/rule/ext-audit.exclude-personal-data-beyond-actor-identity | static | `AuditClassificationTests` asserts the record type exposes no personal-data field. |
-| standards/rule/ext-audit.exclude-state-snapshots | static | `AuditClassificationTests` asserts the record type exposes no before or after state field. |
-| standards/rule/ext-audit.commit-a-success-record-with-its-business-change | test | `AuditAtomicTests` observe no audit record after the business transaction rolls back. |
-| standards/rule/ext-audit.write-an-unsuccessful-record-outside-the-failed-transaction | test | `AuditAtomicTests` retain a `denied` record after the request transaction rolls back. |
-| standards/rule/ext-audit.stage-the-audit-write-before-the-business-commit | test | `AuditAtomicTests` assert the audit stage priority precedes the commit stage priority. |
-| standards/rule/ext-audit.publish-unsuccessful-write-failures | operation | Metrics backend receives the unsuccessful-path write failure count. |
-| standards/rule/ext-audit.scope-every-record-to-its-tenant | test | `AuditIsolationTests` carry the tenant of the acted-on resource. |
-| standards/rule/ext-audit.enforce-append-only-through-storage-privilege | test | `AuditProtectionTests` receive a privilege error from update and delete statements. |
-| standards/rule/ext-audit.provide-tamper-evidence | test | `AuditProtectionTests` detect a modified record through a broken chain value. |
-| standards/rule/ext-audit.verify-the-integrity-chain-on-a-schedule | operation | Scheduled verification job publishes its result and raises an alert on a break. |
-| standards/rule/ext-audit.add-a-correcting-record | test | `AuditProtectionTests` append a correcting record that references the original. |
-| standards/rule/ext-audit.anchor-the-audit-chain-outside-its-own-store | operation | The published checkpoint records the chain head and count, and a recomputed chain disagreeing with it raises an alert. |
-| standards/rule/ext-audit.retain-each-category-for-its-declared-period | test | `AuditPurgeTests` remove records past the declared retention of their category. |
-| standards/rule/ext-audit.remove-the-identity-mapping-on-erasure | test | `AuditPurgeTests` retain records and resolve no person after identity removal. |
-| standards/rule/ext-audit.give-the-trail-a-read-path | test | `AuditAccessTests` return records filtered by each declared filter and reject an unpermitted caller. |
-| standards/rule/ext-audit.audit-reads-of-the-trail | test | `AuditAccessTests` produce one record for a completed trail read. |
-| standards/rule/ext-audit.record-personal-data-reads | test | `AuditReadTests` produce a record for a cross-boundary personal-data query. |
-| standards/rule/ext-audit.record-a-bulk-read-inside-its-own-boundary | test | `AuditReadTests` produce a record, carrying the subject count, for a query above the declared threshold. |
-| standards/rule/ext-audit.record-bulk-export | test | `AuditExportTests` produce a record naming the requested export scope. |
-| standards/rule/ext-audit.reject-an-undeclared-command | static | `AuditSelectionTests` fails the build for a Command with no declaration. |
-| standards/rule/ext-audit.keep-audit-infrastructure-in-one-location | inspection | Audit Infrastructure files use the documented path or a local replacement. |
-| standards/rule/ext-audit.declare-audit-selection-beside-the-command | inspection | Command types carry the declaration attribute or a local replacement. |
-| standards/rule/ext-audit.use-a-fixed-category-vocabulary | test | `AuditSelectionTests` assert each category value belongs to the declared vocabulary. |
-| standards/rule/ext-audit.store-the-trail-beside-the-business-data | inspection | Audit table privileges separate the writing account from the application account. |
-| standards/rule/ext-audit.publish-a-copy-to-the-security-platform | inspection | Outbox configuration publishes audit copies and names the local store authoritative. |
+| standards/rule/ext-audit.record-the-audit-adoption-decision | guidance | Does the adoption decision record the required fields, and is no record approved behind its draft? |
+| standards/rule/ext-audit.declare-audit-selection-on-every-command | guidance | Does every Command declare audited status or excluded status with a reason? |
+| standards/rule/ext-audit.cover-the-required-audit-categories | guidance | Does the declared selection contain one entry for each required category? |
+| standards/rule/ext-audit.exclude-indiscriminate-auditing | guidance | Does the selection justify each audited category rather than auditing every Command? |
+| standards/rule/ext-audit.emit-audit-records-at-the-mediation-boundary | guidance | Does the producer run in the mediation pipeline rather than inside handlers? |
+| standards/rule/ext-audit.restrict-handler-contribution-to-determined-values | guidance | Does each handler contribute only the audit values it alone determines? |
+| standards/rule/ext-audit.exclude-derived-audit-trails | guidance | Is the trail produced directly rather than derived from events, triggers, or capture? |
+| standards/rule/ext-audit.record-the-required-audit-fields | guidance | Does every record carry each required field, including the tenant value? |
+| standards/rule/ext-audit.state-the-action-as-use-case-identity | guidance | Does each action value name the invoked use case? |
+| standards/rule/ext-audit.record-the-failure-code-on-an-unsuccessful-attempt | guidance | Does each denied or failed record carry its stable failure code? |
+| standards/rule/ext-audit.version-the-audit-record-shape | guidance | Does every record carry an explicit schema version? |
+| standards/rule/ext-audit.use-a-closed-actor-set | guidance | Is every actor one of the five Actor kinds, with devices and processes mapped? |
+| standards/rule/ext-audit.record-delegated-administrative-access | guidance | Does an action under a support grant record that the grant was used? |
+| standards/rule/ext-audit.record-every-attempt-outcome | guidance | Does every record carry one of the three declared outcomes? |
+| standards/rule/ext-audit.record-refused-authorization | guidance | Does a refused authorization produce a denied record? |
+| standards/rule/ext-audit.record-failed-audited-attempts | guidance | Does a permitted attempt that throws produce a failed record? |
+| standards/rule/ext-audit.record-the-request-origin | guidance | Does each request-produced record carry origin, client, and request identifier? |
+| standards/rule/ext-audit.record-the-operation-trace-identity | guidance | Does each record carry the trace identifier of its operation? |
+| standards/rule/ext-audit.exclude-secrets-and-payment-data | guidance | Is every record free of credentials, tokens, session identifiers, keys, and payment values? |
+| standards/rule/ext-audit.exclude-personal-data-beyond-actor-identity | guidance | Does each record hold only pseudonymous actor and target identifiers? |
+| standards/rule/ext-audit.exclude-state-snapshots | guidance | Is every record free of before and after state copies? |
+| standards/rule/ext-audit.commit-a-success-record-with-its-business-change | guidance | Does a succeeded record commit in the same transaction as its change? |
+| standards/rule/ext-audit.write-an-unsuccessful-record-outside-the-failed-transaction | guidance | Does a denied or failed record survive the rollback of its transaction? |
+| standards/rule/ext-audit.stage-the-audit-write-before-the-business-commit | guidance | Does the audit stage run before the business commit stage? |
+| standards/rule/ext-audit.publish-unsuccessful-write-failures | guidance | Does the deployment publish the write failure count of the unsuccessful path? |
+| standards/rule/ext-audit.scope-every-record-to-its-tenant | guidance | Does each record carry the tenant of the acted-on resource? |
+| standards/rule/ext-audit.enforce-append-only-through-storage-privilege | guidance | Does the writing account lack update and delete privileges on the store? |
+| standards/rule/ext-audit.provide-tamper-evidence | guidance | Does each record chain to its predecessor with the stated hash? |
+| standards/rule/ext-audit.anchor-the-audit-chain-outside-its-own-store | guidance | Does a checkpoint the operators cannot rewrite anchor the chain head? |
+| standards/rule/ext-audit.verify-the-integrity-chain-on-a-schedule | guidance | Does a scheduled job verify the chain and alert on a break? |
+| standards/rule/ext-audit.add-a-correcting-record | guidance | Is each correction a new record referencing the earlier one? |
+| standards/rule/ext-audit.retain-each-category-for-its-declared-period | guidance | Are records deleted after the declared retention of their category? |
+| standards/rule/ext-audit.remove-the-identity-mapping-on-erasure | guidance | Does erasure remove the identity mapping while retaining the records? |
+| standards/rule/ext-audit.give-the-trail-a-read-path | guidance | Does a permission-gated read filter the trail by every declared filter? |
+| standards/rule/ext-audit.audit-reads-of-the-trail | guidance | Does a completed trail read produce one audit record? |
+| standards/rule/ext-audit.record-personal-data-reads | guidance | Does a cross-boundary personal-data query produce a record? |
+| standards/rule/ext-audit.record-a-bulk-read-inside-its-own-boundary | guidance | Does a query above the threshold produce a record carrying the subject count? |
+| standards/rule/ext-audit.record-bulk-export | guidance | Does each export produce a record naming the requested scope? |
+| standards/rule/ext-audit.reject-an-undeclared-command | guidance | Does the build or startup fail for a Command with no declaration? |
+| standards/rule/ext-audit.keep-audit-infrastructure-in-one-location | guidance | Does the audit code use the documented path or a recorded Exception? |
+| standards/rule/ext-audit.declare-audit-selection-beside-the-command | guidance | Does each Command carry the declaration attribute or a recorded Exception? |
+| standards/rule/ext-audit.use-a-fixed-category-vocabulary | guidance | Does each category value belong to the eight-value vocabulary? |
+| standards/rule/ext-audit.store-the-trail-beside-the-business-data | guidance | Is the trail in the business database under separated privileges or a recorded Exception? |
+| standards/rule/ext-audit.publish-a-copy-to-the-security-platform | guidance | Does a published copy leave the local store authoritative, or is there a recorded Exception? |
