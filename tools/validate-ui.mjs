@@ -4,8 +4,16 @@
 // The validator is deliberately local and deterministic. It reads the shared UI
 // package the consumer declares, its registry configuration, its source lock, its
 // design contract, its stylesheets, and the pattern catalog when the consumer
-// declares one, then checks the boundary each frontend
-// keeps. It never fetches a registry or a package. Consumers may add stricter AST
+// declares one, then checks the boundary each frontend keeps: the registry
+// configuration, the source lock digests, the design contract sections, the
+// token stylesheet surface, literal colours in other shared stylesheets, the
+// class-string utility rules, the application import boundary, the dependency
+// boundary, and the pattern catalog references.
+// It never fetches a registry or a package. It performs no other scan: no
+// route reading, no environment access check, no file or export naming check,
+// no secret or browser storage check, and no raw HTML sink check. A page that
+// credits this tool with one of those scans misstates its evidence. Consumers
+// may add stricter AST
 // rules, but they should preserve these checks.
 //
 // It reads no page document. The route code is the page contract, and the route
@@ -30,6 +38,11 @@ const USAGE = `Usage: node tools/validate-ui.mjs [consumerRoot] [--format=json] 
 
 Validates the controlled web UI contract for the consumer at consumerRoot,
 which defaults to the current directory.
+
+Checks the shared package configuration, source lock, design contract,
+token stylesheet, shared stylesheets, class strings, application imports,
+the dependency boundary, and the pattern catalog. Nothing else: no route,
+environment, naming, secret, storage, or HTML sink scan.
 
   --format=json   Write one JSON object on stdout instead of human-readable lines.
   --help          Print this text and exit.

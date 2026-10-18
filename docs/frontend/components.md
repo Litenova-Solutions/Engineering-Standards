@@ -2,24 +2,37 @@
 
 ## Intent
 
-
 One shared UI package holds everything a page draws with. It holds the registry primitives the pinned CLI copies in, and the composites those primitives are assembled into.
 
 Page code composes composites and nothing else. The boundary is enforced rather than described, so a page that improvises fails at lint with a message naming the component to use.
 
 ## Agent Summary {#agent-summary}
 
-
 - One package holds the registry primitives and the composites. (standards/rule/frontend-components.keep-primitives-and-composites-in-one-shared-package)
-- Page code composes composites and takes no class name. (standards/rule/frontend-components.compose-composites-in-page-code)
+- Page code composes composites and takes no class name. (standards/rule/frontend-components.compose-composites-in-page-code, standards/rule/frontend-components.write-no-class-name-in-page-code)
 - The lint refuses a raw element and names the composite instead. (standards/rule/frontend-components.use-no-raw-element-in-page-code)
 - A drawing no composite makes goes in a visual file. (standards/rule/frontend-components.place-a-drawing-no-composite-makes-in-a-visual-file)
 - A missing composite is added to the package. (standards/rule/frontend-components.add-a-missing-composite-to-the-shared-package)
 - Interactive UI supports keyboard, focus, labels, and announcements. (standards/rule/frontend-components.meet-accessibility-requirements)
-- Data-aware components render every applicable state. (standards/rule/frontend-components.render-complete-states)
+- Data components and controls render every applicable state. (standards/rule/frontend-components.render-complete-states)
+
+## React
+
+- A class or style binding spells `className` or `style`.
+- A visual file ends with `*.visual.tsx`.
+- The raw HTML sink is `dangerouslySetInnerHTML`.
+- The route error surface is the route error component.
+- Component authoring follows `../react/components.md`.
+
+## Svelte
+
+- A class or style binding spells `class`, `class:`, `style`, or `style:`.
+- A visual file ends with `*.visual.svelte`.
+- The raw HTML sink is `{@html}`.
+- The route error surface is the route error page.
+- Component authoring follows `../svelte/components.md`.
 
 ## Standards
-
 
 ### Keep primitives and composites in one shared package (standards/rule/frontend-components.keep-primitives-and-composites-in-one-shared-package)
 
@@ -37,9 +50,11 @@ Page code composes composites and nothing else. The boundary is enforced rather 
 
 ### Write no class name in page code (standards/rule/frontend-components.write-no-class-name-in-page-code)
 
-**Requirement:** A component under a route or module folder MUST NOT declare a `className` or a `style` attribute.
+**Requirement:** A component under a route or module folder MUST NOT declare a class or style binding.
 
-**Rationale:** Layout belongs to the floorplan and to the display composites. A class in a route file is a second layout beside the floorplan, and the next route copies it.
+**Rationale:** Layout belongs to the floorplan and to the display composites. A class in route code is a second layout beside the floorplan, and the next route copies it.
+
+The stack sections name the binding for each stack.
 
 ### Use no raw element in page code (standards/rule/frontend-components.use-no-raw-element-in-page-code)
 
@@ -57,9 +72,9 @@ Page code composes composites and nothing else. The boundary is enforced rather 
 | `input`, `select`, `textarea` | a field from the shared form library |
 | `form` | the shared form component |
 | `table` | `DataTable` |
-| `img` | the shared image component |
+| `img` | the shared image component, which `standards/rule/frontend-components.use-a-composite-for-a-content-image` owns |
 
-Text elements stay available, because a sentence is not a component decision. `p`, `h2`, `h3`, `strong`, `ul`, and `li` carry prose.
+Text elements stay available, because a sentence is not a component decision. `p`, `h2`, `h3`, `em`, `strong`, `ul`, `ol`, and `li` carry prose. The floorplan owns the `h1`, so it is not in the list. Any other element follows the same rule: page code MUST NOT declare it, and the author adds a composite or a visual file instead.
 
 ### Prefer a composite over a primitive (standards/rule/frontend-components.prefer-a-composite-over-a-primitive)
 
@@ -71,9 +86,9 @@ Text elements stay available, because a sentence is not a component decision. `p
 
 ### Place a drawing no composite makes in a visual file (standards/rule/frontend-components.place-a-drawing-no-composite-makes-in-a-visual-file)
 
-**Requirement:** A file named `*.visual.tsx` MAY write class names, and uses semantic theme tokens only.
+**Requirement:** A visual file MAY write class names, and uses semantic theme tokens only.
 
-**Rationale:** A stock-location map, a packing-slip preview, and a public frame have no composite. Refusing them pushes the drawing into an arbitrary value that no token governs. The file name is the declaration that this is the exception.
+**Rationale:** A stock-location map, a packing-slip preview, and a public frame have no composite. Refusing them pushes the drawing into an arbitrary value that no token governs. The file name is the declaration that this is the exception. The stack sections name the file pattern.
 
 ### Add a missing composite to the shared package (standards/rule/frontend-components.add-a-missing-composite-to-the-shared-package)
 
@@ -85,9 +100,9 @@ Text elements stay available, because a sentence is not a component decision. `p
 
 **Requirement:** Interactive UI MUST support keyboard operation, visible focus, semantic elements, programmatic labels, and asynchronous status announcements.
 
-**Rationale:** A clickable `div` loses all five at once, so a native element is the starting point.
+**Rationale:** A clickable `div` loses them all at once, so a native element is the starting point.
 
-The five are the ones a component can get wrong on its own. [WCAG 2.2](https://www.w3.org/TR/WCAG22/) adds nine criteria that a component cannot satisfy by itself, because each one is a property of a flow or a page:
+These are the properties a component gets wrong on its own. [WCAG 2.2](https://www.w3.org/TR/WCAG22/) adds criteria that a component cannot satisfy by itself, because each one is a property of a flow or a page:
 
 | Criterion | Level | What the UI has to do |
 |:---|:---|:---|
@@ -101,19 +116,19 @@ The five are the ones a component can get wrong on its own. [WCAG 2.2](https://w
 | 3.3.8 Accessible Authentication (Minimum) | AA | Offer a sign-in path with no cognitive function test. |
 | 3.3.9 Accessible Authentication (Enhanced) | AAA | Offer that path with no object recognition or personal content test either. |
 
-The AA criteria bind a project targeting AA. The three AAA rows are listed so a project selecting them knows what it selected. The route suite checks keyboard reach and visible focus on every route. The tests of a route assert target size and status announcements, which is where the flow-level criteria are checked.
+The AA criteria bind every project. The AAA rows bind only a project that targets AAA. The route suite checks keyboard reach, visible focus, target size, and status announcements on every route.
 
 ### Render complete states (standards/rule/frontend-components.render-complete-states)
 
-**Requirement:** A data or permission-aware component MUST render its loading, empty, error, forbidden, disabled, pending, and ready states.
+**Requirement:** A data component MUST render its loading, empty, error, forbidden, and ready states. A control MUST render its disabled and pending states, prevent duplicate submission, and keep an error recovery path usable.
 
-**Rationale:** A mutation control also prevents duplicate submission and keeps an error recovery path usable.
+**Rationale:** Data states describe what arrived; control states describe what the reader may do.
 
-These seven are the states a component has. `disabled` and `pending` describe a control and have no route equivalent. A route adds `not-found` under `standards/rule/frontend-rendering.represent-route-states`, because a missing target resolves at the route rather than inside a component.
+A route adds `not-found` under `standards/rule/frontend-rendering.represent-route-states`, because a missing target resolves at the route rather than inside a component. Each state name is a term in the project's language record.
 
 ### Keep props narrow (standards/rule/frontend-components.keep-props-narrow)
 
-**Requirement:** A composite MUST receive the values and callbacks it needs, not a client, a store, or an aggregate-shaped object.
+**Requirement:** A composite MUST receive the values and callbacks it needs, not a client, a store, or a business record.
 
 **Rationale:** The shared package serves applications it does not know, so a prop carrying one application's data model couples the two.
 
@@ -127,22 +142,23 @@ These seven are the states a component has. `disabled` and `pending` describe a 
 
 **Requirement:** A component MUST NOT pass untrusted content to a raw HTML sink.
 
-**Rationale:** Stored rich content requires a project decision naming the sanitizer, the allowed elements and attributes, the link policy, and the test cases.
+**Rationale:** Stored rich content requires a decision record naming the sanitizer, the allowed elements and attributes, the link policy, and the test cases.
+
+The stack sections name the sink.
 
 ### Use a composite for a content image (standards/rule/frontend-components.use-a-composite-for-a-content-image)
 
 **Requirement:** An informative or decorative image MUST render through the shared image component, which owns its shape, its sizing, and its fallback.
 
-**Rationale:** An informative image carries meaningful alternative text and a decorative image carries empty alternative text. A `src` and `alt` written in a page bypass both.
+**Rationale:** An informative image carries meaningful alternative text and a decorative image carries empty alternative text. A `src` and `alt` written in a page bypass both. The raw-element rule refuses `img` in page code under `standards/rule/frontend-components.use-no-raw-element-in-page-code`.
 
 ## Conventions
-
 
 ### Name components for their role (standards/rule/frontend-components.name-components-for-their-role)
 
 **Default:** Name a component for the role it plays, such as `OrderShipmentsSection` or `RedeliverOrderDialog`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
 **Rationale:** A name such as `OrderComponent` or `GenericModal` describes its file type rather than its job.
 
@@ -150,15 +166,15 @@ These seven are the states a component has. `disabled` and `pending` describe a 
 
 **Default:** Render a visible card, panel, or section title as a heading element at its correct level.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
-**Rationale:** Some primitive sources default a title to a non-heading element, which removes it from the document outline and from the browser test that finds it.
+**Rationale:** Some primitive sources default a title to a non-heading element, which removes it from the outline and the browser test that finds it.
 
 ### Keep domain values typed until display (standards/rule/frontend-components.keep-domain-values-typed-until-display)
 
 **Default:** Keep branded and generated identifier types until the presentation boundary converts them.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
 **Rationale:** Dates, money, and status convert to display strings there with explicit locale and zone behaviour.
 
@@ -166,15 +182,15 @@ These seven are the states a component has. `disabled` and `pending` describe a 
 
 **Default:** Compose class names through the one merge helper the shared package exports, and keep every merge or variant helper import inside it.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
 **Rationale:** A second merging helper produces a different conflict resolution for the same class pair. Page code has no reason to hold one.
 
-### Keep error boundaries scoped (standards/rule/frontend-components.keep-error-boundaries-scoped)
+### Keep error handling scoped (standards/rule/frontend-components.keep-error-boundaries-scoped)
 
-**Default:** Use the route's error component for route failure, and a component boundary only where recovery keeps the page usable.
+**Default:** Use the route error surface for route failure, and a component boundary only where recovery keeps the page usable. The stack sections name the surface for each stack.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
 **Rationale:** A component boundary that cannot recover hides the failure while leaving the page broken.
 
@@ -186,23 +202,23 @@ A shipment section renders its facts, its commands, and its states by composing 
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/frontend-components.keep-primitives-and-composites-in-one-shared-package | inspection | Package review confirms one shared package holds the registry source and that no application holds a copy. |
-| standards/rule/frontend-components.compose-composites-in-page-code | static | `node standards/tools/validate-ui.mjs` refuses a primitive library import reached from an application. |
-| standards/rule/frontend-components.write-no-class-name-in-page-code | static | `packages/*/eslint.config.js` reports a `className` or `style` attribute in page code. |
-| standards/rule/frontend-components.use-no-raw-element-in-page-code | static | `packages/*/eslint.config.js` reports each refused element with the composite replacing it. |
-| standards/rule/frontend-components.prefer-a-composite-over-a-primitive | static | The same `eslint.config.js` refuses each replaced primitive by its module path. |
-| standards/rule/frontend-components.place-a-drawing-no-composite-makes-in-a-visual-file | inspection | File review confirms each visual file uses semantic tokens and no arbitrary value. |
-| standards/rule/frontend-components.add-a-missing-composite-to-the-shared-package | inspection | Package review confirms each composite is exported from a documented entry point. |
-| standards/rule/frontend-components.meet-accessibility-requirements | test | `tests/routes/every-route.spec.ts` presses `Tab` and asserts every focused element shows an indicator. |
-| standards/rule/frontend-components.render-complete-states | inspection | Component review confirms each data-aware composite names every state it renders. |
-| standards/rule/frontend-components.keep-props-narrow | inspection | Prop review confirms no composite prop type names a client, a store, or a model. |
-| standards/rule/frontend-components.use-declared-visual-variants | static | `node standards/tools/validate-ui.mjs` rejects a literal value where a theme token exists. |
-| standards/rule/frontend-components.protect-rich-content-boundaries | static | `node standards/tools/validate-ui.mjs` reports each raw HTML sink for review against its decision. |
-| standards/rule/frontend-components.use-a-composite-for-a-content-image | static | The same `eslint.config.js` refuses an `img` element in page code. |
-| standards/rule/frontend-components.name-components-for-their-role | inspection | Naming review compares each new component name against its rendered role. |
-| standards/rule/frontend-components.give-card-and-section-titles-heading-semantics | test | `tests/routes/every-route.spec.ts` asserts each visible section title resolves as a heading. |
-| standards/rule/frontend-components.keep-domain-values-typed-until-display | inspection | Review confirms conversion to display strings happens at the presentation boundary. |
-| standards/rule/frontend-components.compose-class-names-in-the-shared-package | static | The same `eslint.config.js` refuses a direct import of a class merge helper in page code. |
-| standards/rule/frontend-components.keep-error-boundaries-scoped | inspection | Error boundary review confirms each boundary has a recovery path that keeps its surroundings usable. |
+| standards/rule/frontend-components.keep-primitives-and-composites-in-one-shared-package | guidance | Does one shared package hold the registry source and the composites, with no copy in an application? |
+| standards/rule/frontend-components.compose-composites-in-page-code | checkable | `node standards/tools/validate-ui.mjs` refuses a primitive library import reached from an application. |
+| standards/rule/frontend-components.write-no-class-name-in-page-code | guidance | Does any component under a route or module folder declare a class or style binding? |
+| standards/rule/frontend-components.use-no-raw-element-in-page-code | guidance | Does page code declare a refused element, and does each refusal name its composite? |
+| standards/rule/frontend-components.prefer-a-composite-over-a-primitive | guidance | Does page code import a primitive where the shared package provides a composite? |
+| standards/rule/frontend-components.place-a-drawing-no-composite-makes-in-a-visual-file | guidance | Does every visual file use semantic tokens only, and does any other file write class names? |
+| standards/rule/frontend-components.add-a-missing-composite-to-the-shared-package | guidance | Is every layout, control, or surface a second page needs exported from the shared package? |
+| standards/rule/frontend-components.meet-accessibility-requirements | checkable | `tests/routes/every-route.spec.ts` presses `Tab` and asserts every focused element shows an indicator. |
+| standards/rule/frontend-components.render-complete-states | guidance | Does every data component render each named state and every control render its own, with each name a recorded term? |
+| standards/rule/frontend-components.keep-props-narrow | guidance | Does any composite prop type name a client, a store, or a business record? |
+| standards/rule/frontend-components.use-declared-visual-variants | guidance | Does every repeated variant use theme tokens through the variant helper? |
+| standards/rule/frontend-components.protect-rich-content-boundaries | guidance | Does any component pass untrusted content to a raw HTML sink without its recorded decision? |
+| standards/rule/frontend-components.use-a-composite-for-a-content-image | guidance | Does every content image render through the shared image component with its owned text? |
+| standards/rule/frontend-components.name-components-for-their-role | guidance | Does every component name describe the role it plays? |
+| standards/rule/frontend-components.give-card-and-section-titles-heading-semantics | checkable | `tests/routes/every-route.spec.ts` asserts each visible section title resolves as a heading. |
+| standards/rule/frontend-components.keep-domain-values-typed-until-display | guidance | Does conversion to display strings happen only at the presentation boundary? |
+| standards/rule/frontend-components.compose-class-names-in-the-shared-package | guidance | Does every class merge go through the shared package helper? |
+| standards/rule/frontend-components.keep-error-boundaries-scoped | guidance | Does each error boundary have a recovery path that keeps its surroundings usable? |
