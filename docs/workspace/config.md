@@ -2,11 +2,9 @@
 
 ## Intent
 
-
 Repository configuration should make builds repeatable and fail before a deployment starts with missing or invalid values. Version pins, compiler rules, environment access, and secret handling have one defined owner.
 
 ## Agent Summary {#agent-summary}
-
 
 - The SDK is pinned at the root with patch roll-forward only. (standards/rule/workspace-config.pin-the-sdk-at-the-workspace-root)
 - One props file owns the .NET build settings. (standards/rule/workspace-config.centralize-net-build-settings)
@@ -17,19 +15,19 @@ Repository configuration should make builds repeatable and fail before a deploym
 - Tracked configuration carries placeholders only. (standards/rule/workspace-config.keep-secrets-outside-source-control)
 - One workspace owns the frontend dependency graph. (standards/rule/workspace-config.use-one-frontend-dependency-graph)
 - The JavaScript toolchain is pinned in the root manifest. (standards/rule/workspace-config.pin-the-javascript-toolchain)
+- A React ESLint flat config pins its React version. (standards/rule/workspace-config.pin-the-react-version-in-the-eslint-flat-config)
 
 ## Standards
 
-
 ### Pin the SDK at the workspace root (standards/rule/workspace-config.pin-the-sdk-at-the-workspace-root)
 
-**Requirement:** Root `global.json` MUST pin the manifest SDK version and permit patch roll-forward only.
+**Requirement:** Root `global.json` MUST pin the manifest dotnet stack release and permit patch roll-forward only.
 
 **Rationale:** `dotnet` invoked from the workspace root and from `apps/api/` then selects the same feature band.
 
 ### Centralize .NET build settings (standards/rule/workspace-config.centralize-net-build-settings)
 
-**Requirement:** `apps/api/Directory.Build.props` MUST set the profile target framework and enable nullable types, implicit usings, and warnings as errors.
+**Requirement:** `apps/api/Directory.Build.props` MUST set the target framework of the manifest dotnet stack release, and enable nullable types, implicit usings, and warnings as errors.
 
 **Rationale:** One file then owns the settings that would otherwise drift between projects.
 
@@ -41,9 +39,9 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 ### Commit the tool manifest (standards/rule/workspace-config.commit-the-tool-manifest)
 
-**Requirement:** Root `.config/dotnet-tools.json` MUST pin every required local .NET tool.
+**Requirement:** Root `.config/dotnet-tools.json` MUST pin every local .NET tool a documented repository command invokes.
 
-**Rationale:** A tool matching a framework package uses the compatible manifest pin, so local and CI runs use one version.
+**Rationale:** When a tool ships in the manifest dotnet stack release, its pin matches that release, so local and CI runs use one version.
 
 ### Validate backend options at startup (standards/rule/workspace-config.validate-backend-options-at-startup)
 
@@ -53,7 +51,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 ### Validate frontend environment access (standards/rule/workspace-config.validate-frontend-environment-access)
 
-**Requirement:** A frontend MUST read environment variables through `lib/env.ts` and separate server-only from browser-visible values.
+**Requirement:** A frontend MUST read environment variables through one validated environment module, and MUST separate server-only from browser-visible values. The module lives at `src/lib/env.ts` under the frontend root, reached through the framework alias.
 
 **Rationale:** Browser-visible names use the framework prefix, so an unprefixed value cannot reach the bundle by accident.
 
@@ -71,24 +69,23 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 ### Pin the JavaScript toolchain (standards/rule/workspace-config.pin-the-javascript-toolchain)
 
-**Requirement:** Root `package.json` MUST declare the manifest pnpm release in `packageManager` and a compatible Node.js engine.
+**Requirement:** Root `package.json` MUST declare the manifest pnpm stack release in `packageManager` and a Node.js engine matching the manifest node stack release.
 
 **Rationale:** CI provisions that Node.js release and invokes the declared pnpm release, so local and CI resolve identically.
 
 ### Pin the React version in the ESLint flat config (standards/rule/workspace-config.pin-the-react-version-in-the-eslint-flat-config)
 
-**Requirement:** A React ESLint flat config MUST set a concrete `settings.react.version` rather than leave it at `detect`.
+**Requirement:** When the workspace holds a React frontend, its ESLint flat config MUST set a concrete `settings.react.version` rather than leave it at `detect`.
 
 **Rationale:** Version detection calls context APIs that the pinned ESLint release removed, and a concrete version skips detection entirely.
 
 ## Conventions
 
-
 ### Keep environment examples beside applications (standards/rule/workspace-config.keep-environment-examples-beside-applications)
 
 **Default:** Keep a `.env.example` beside each frontend and deployable host listing required names and safe values.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** The example sits next to the options module that reads those names, so both change together.
 
@@ -96,7 +93,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 **Default:** Keep developer overrides in ignored local files or a platform secret store.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A second committed environment-specific source competes with the deployment platform for the same value.
 
@@ -104,28 +101,27 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 **Default:** Emit structured logs through standard logging abstractions and keep exporter configuration in hosts.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** Application code then carries no provider choice, so an exporter change stays inside deployment settings.
 
 ### Keep documentation directories out of build-artifact ignore rules (standards/rule/workspace-config.keep-documentation-directories-out-of-build-artifact-ignore-rules)
 
-**Default:** Exclude `docs/releases/` from build-artifact ignore rules such as `[Rr]elease/`.
+**Default:** Exclude a documentation directory from a build-artifact ignore rule that matches it by accident.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
-**Rationale:** A platform `.gitignore` commonly matches that documentation directory by accident and silently untracks release records.
+**Rationale:** A platform `.gitignore` commonly matches a documentation name and silently untracks its records.
 
 **Example:**
 
 ```gitignore
-[Rr]elease/
-[Rr]eleases/
-!docs/releases/
-!docs/releases/*.md
+[Oo]utput/
+!docs/<directory>/
+!docs/<directory>/*.md
 ```
 
-Confirm with `git check-ignore docs/releases/<file>.md` that no release record is ignored. The example applies the same negation to any other documentation directory whose name collides with a build-output pattern.
+Confirm with `git check-ignore docs/<directory>/<file>.md` that no record is ignored.
 
 ## Reference example
 
@@ -135,20 +131,19 @@ This informative example demonstrates `standards/rule/workspace-config.validate-
 
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/workspace-config.pin-the-sdk-at-the-workspace-root | static | `global.json` declares the manifest SDK version with patch-only roll-forward. |
-| standards/rule/workspace-config.centralize-net-build-settings | static | `Directory.Build.props` declares the target framework and each required build setting. |
-| standards/rule/workspace-config.centralize-nuget-versions | static | `Directory.Packages.props` enables central management and each project reference omits its version. |
-| standards/rule/workspace-config.commit-the-tool-manifest | static | `.config/dotnet-tools.json` pins each required tool at its manifest-compatible version. |
-| standards/rule/workspace-config.validate-backend-options-at-startup | static | `OptionsValidationTests` asserts startup fails when a required configuration value is absent or malformed. |
-| standards/rule/workspace-config.validate-frontend-environment-access | static | `node standards/tools/validate-ui.mjs` reports direct environment access outside the environment module. |
-| standards/rule/workspace-config.keep-secrets-outside-source-control | static | The CI secret scan fails when a tracked file under `apps/` or the root carries a credential-shaped value. |
-| standards/rule/workspace-config.use-one-frontend-dependency-graph | static | `pnpm install --frozen-lockfile` succeeds from the root and no nested lockfile is tracked. |
-| standards/rule/workspace-config.pin-the-javascript-toolchain | static | Root `package.json` declares the manifest pnpm release and its Node.js engine range. |
-| standards/rule/workspace-config.pin-the-react-version-in-the-eslint-flat-config | static | The flat config declares a concrete `settings.react.version` and `pnpm lint` runs without a detection error. |
-| standards/rule/workspace-config.keep-environment-examples-beside-applications | inspection | Each frontend and host directory holds an environment example listing required names with safe values. |
-| standards/rule/workspace-config.keep-local-overrides-untracked | inspection | The ignore rules cover local settings files and no second environment-specific source is tracked. |
-| standards/rule/workspace-config.keep-logging-configuration-provider-neutral | inspection | Application source resolves only logging abstractions, and exporters appear in host registration. |
-| standards/rule/workspace-config.keep-documentation-directories-out-of-build-artifact-ignore-rules | static | `git check-ignore docs/releases` reports no match. |
+| standards/rule/workspace-config.pin-the-sdk-at-the-workspace-root | guidance | Does root global.json pin the manifest dotnet release with patch-only roll-forward? |
+| standards/rule/workspace-config.centralize-net-build-settings | guidance | Does Directory.Build.props set the manifest target framework, nullable types, implicit usings, and warnings as errors? |
+| standards/rule/workspace-config.centralize-nuget-versions | guidance | Does Directory.Packages.props enable central management with the manifest pins, and do projects omit versions? |
+| standards/rule/workspace-config.commit-the-tool-manifest | guidance | Does .config/dotnet-tools.json pin each local tool a documented command invokes? |
+| standards/rule/workspace-config.validate-backend-options-at-startup | guidance | Does each configuration section bind a validated options class that fails startup on bad values? |
+| standards/rule/workspace-config.validate-frontend-environment-access | guidance | Does each frontend read environment values only through its validated module with server values separated? |
+| standards/rule/workspace-config.keep-secrets-outside-source-control | guidance | Does each tracked configuration file carry only safe defaults and placeholders? |
+| standards/rule/workspace-config.use-one-frontend-dependency-graph | guidance | Does the workspace use one root manifest and lockfile with no nested lockfile tracked? |
+| standards/rule/workspace-config.pin-the-javascript-toolchain | guidance | Does root package.json declare the manifest pnpm release and a matching Node engine? |
+| standards/rule/workspace-config.pin-the-react-version-in-the-eslint-flat-config | guidance | Does each React flat config set a concrete settings.react.version? |
+| standards/rule/workspace-config.keep-environment-examples-beside-applications | guidance | Does each frontend and host directory hold an environment example with safe values? |
+| standards/rule/workspace-config.keep-local-overrides-untracked | guidance | Are local overrides ignored with no second tracked environment-specific source? |
+| standards/rule/workspace-config.keep-logging-configuration-provider-neutral | guidance | Does application source use only logging abstractions with exporters in hosts? |
+| standards/rule/workspace-config.keep-documentation-directories-out-of-build-artifact-ignore-rules | guidance | Does git check-ignore report no match for each documentation directory? |

@@ -1,12 +1,10 @@
-# Naming and Code Style
+# Naming and code style
 
 ## Intent
-
 
 Names should expose business intent and architectural role without requiring a reader to open the file. Fixed suffixes and file conventions reduce variation across agent sessions.
 
 ## Agent Summary {#agent-summary}
-
 
 - One primary type per C# file, named for the file. (standards/rule/workspace-naming.match-c-files-and-primary-types)
 - Aggregate-owned types lead with their aggregate root name. (standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root)
@@ -19,7 +17,6 @@ Names should expose business intent and architectural role without requiring a r
 - Frontend names follow one predictable case mapping. (standards/rule/workspace-naming.use-predictable-frontend-names)
 
 ## Standards
-
 
 ### Match C# files and primary types (standards/rule/workspace-naming.match-c-files-and-primary-types)
 
@@ -57,9 +54,6 @@ Names should expose business intent and architectural role without requiring a r
 | Aggregate state case, nested | `{Aggregate}State.{State}` | `PostState.Published` |
 | Domain event | `{Aggregate}{PastFact}Event` | `PostPublishedEvent` |
 | Event handler | `{Action}On{PastFact}Handler` | `NotifySubscribersOnPostPublishedHandler` |
-| Workflow | `{BusinessPurpose}Workflow` | `OrderFulfillmentWorkflow` |
-| Workflow state | `{BusinessPurpose}WorkflowState` | `OrderFulfillmentWorkflowState` |
-| Workflow Orchestrator | `{BusinessPurpose}WorkflowOrchestrator` | `OrderFulfillmentWorkflowOrchestrator` |
 | Repository interface | `I{Aggregate}Repository` | `IPostRepository` |
 | Repository implementation | `{Aggregate}Repository` | `PostRepository` |
 | Endpoint | `{UseCase}Endpoint` | `CreateDraftEndpoint` |
@@ -67,8 +61,8 @@ Names should expose business intent and architectural role without requiring a r
 | HTTP response model | `{UseCase}ResponseModel` | `CreateDraftResponseModel` |
 | HTTP response item model | `{UseCase}ResponseItemModel` | `ListPostsResponseItemModel` |
 | HTTP pagination model | `PaginationModel` | `PaginationModel` |
-| Polymorphic transport model base | `{Concept}Model` | `RefundOutcomeModel` |
-| Polymorphic transport model case | `{Case}{Concept}Model` | `RefundSucceededOutcomeModel` |
+| Polymorphic transport model base | `{Concept}Model` | `FulfillmentOutcomeModel` |
+| Polymorphic transport model case | `{Case}{Concept}Model` | `ShippedFulfillmentOutcomeModel` |
 | API mapping class | `{UseCase}ApiMappings` | `CreateDraftApiMappings` |
 | Options class | `{ConfigurationPurpose}Options` | `EmailOptions` |
 | Persistence configuration | `{PersistedType}Configuration` | `PostConfiguration` |
@@ -81,15 +75,15 @@ The example does not shorten an Application type to `{UseCase}Result`, `{UseCase
 
 The example does not shorten an HTTP transport type to `{UseCase}Request` or `{UseCase}Response`. `Model` marks the type as passive boundary data rather than an operation or rich business object. Other project-owned, passive HTTP DTOs also name their concrete role and end in `Model`, such as `ListPostsResponseItemModel` or `PaginationModel`. The example uses `ApiMappings` instead of the context-dependent `Mappings` suffix.
 
-A polymorphic transport model mirrors a Domain discriminated union (`standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape`). Its abstract base names the concept. Each sealed case names its case. Both end in `Model`, such as `RefundOutcomeModel` and `RefundSucceededOutcomeModel`.
+A polymorphic transport model mirrors a Domain discriminated union (`standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape`). Its abstract base names the concept. Each sealed case names its case. Both end in `Model`, such as `FulfillmentOutcomeModel` and `ShippedFulfillmentOutcomeModel`.
 
-The transport name drops the Domain union's aggregate prefix, such as `PaymentRefundOutcome`. Its discriminator string keeps the Domain union's stable case code unchanged.
+The transport name drops the Domain union's aggregate prefix, such as `OrderFulfillmentOutcome`. Its discriminator string keeps the Domain union's stable case code unchanged.
 
 ### Name asynchronous methods completely (standards/rule/workspace-naming.name-asynchronous-methods-completely)
 
 **Requirement:** A method returning `Task` or `ValueTask` MUST end in `Async` and take `CancellationToken cancellationToken` last when cancellable.
 
-**Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature.
+**Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature. A method is cancellable when it performs I/O or awaits.
 
 ### Name exceptions by failed rule (standards/rule/workspace-naming.name-exceptions-by-failed-rule)
 
@@ -117,18 +111,17 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 ### Use predictable frontend names (standards/rule/workspace-naming.use-predictable-frontend-names)
 
-**Requirement:** A frontend folder MUST use kebab-case, a component file and export PascalCase, and a hook file `use-{name}`.
+**Requirement:** A frontend folder MUST use kebab-case, and a component file and its export MUST use PascalCase. A React hook file MUST use `use-{name}`.
 
 **Rationale:** One predictable mapping lets a reader move between the documentation tree and the source tree without translation.
 
 ## Conventions
 
-
 ### Align business names across layers (standards/rule/workspace-naming.align-business-names-across-layers)
 
 **Default:** Use one business name for a module across Domain, Application, endpoints, features, and documentation.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** The Posts module maps to `Domain/Posts`, `features/posts`, and `docs/domain/modules/posts` without translation.
 
@@ -136,7 +129,7 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 **Default:** Start a namespace with the project name and follow the folders beneath the project root.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** Including `src` or `apps` in a namespace couples the type name to a workspace layout decision. The project root is the directory holding the project file, so every folder above it is outside the namespace.
 
@@ -144,7 +137,7 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 **Default:** Avoid `Manager`, `Helper`, `Processor`, `Common`, `Utility`, `BaseService`, `DataService`, `MessageBus`, `Engine`, `Facade`, `Wrapper`, and `Factory` when a narrower name exists.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A generic name invites unrelated responsibility, because nothing in it excludes the next addition. `Factory` is generic on a class and exact on a named static aggregate factory method, so the default names the class and not the method.
 
@@ -152,7 +145,7 @@ The transport name drops the Domain union's aggregate prefix, such as `PaymentRe
 
 **Default:** Derive route segments and JSON field names from the current aggregate or ubiquitous term.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** Renaming a Domain concept then renames its boundary names, so the contract and the language stay aligned.
 
@@ -178,19 +171,18 @@ internal sealed class CreateDraftCommandHandler(
 
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/workspace-naming.match-c-files-and-primary-types | inspection | `NamingTests` asserts each C# file declares one primary top-level type matching its file name. |
-| standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root | inspection | `NamingTests` asserts each aggregate-owned type name begins with its aggregate root name. |
-| standards/rule/workspace-naming.use-architectural-suffixes | inspection | `NamingTests` asserts each architectural type carries the suffix its role requires. |
-| standards/rule/workspace-naming.name-asynchronous-methods-completely | static | `NamingTests` asserts each task-returning method ends in `Async` with the cancellation token last. |
-| standards/rule/workspace-naming.name-exceptions-by-failed-rule | static | `NamingTests` asserts each Domain exception name leads with its aggregate root and names its reason. |
-| standards/rule/workspace-naming.use-intent-revealing-boolean-names | inspection | `NamingTests` asserts each boolean member uses an intent-revealing prefix or verb. |
-| standards/rule/workspace-naming.keep-implementation-style-consistent | inspection | The Release build enforces the style rules through analyzer warnings promoted to errors. |
-| standards/rule/workspace-naming.use-current-language-features | inspection | The Release build enforces the language version and modern-construct analyzers as errors. |
-| standards/rule/workspace-naming.use-predictable-frontend-names | inspection | `node standards/tools/validate-ui.mjs` reports a frontend path or export that breaks the naming form. |
-| standards/rule/workspace-naming.align-business-names-across-layers | inspection | Module review compares each layer folder name against the module identifier. |
-| standards/rule/workspace-naming.keep-namespaces-aligned-with-folders | inspection | `NamingTests` asserts each namespace matches its folder path beneath the project root. |
-| standards/rule/workspace-naming.avoid-generic-type-names | inspection | `NamingTests` reports each generic boundary name for review against a narrower alternative. |
-| standards/rule/workspace-naming.derive-boundary-names-from-the-ubiquitous-term | inspection | Boundary review compares each route segment and field name against its current ubiquitous term. |
+| standards/rule/workspace-naming.match-c-files-and-primary-types | guidance | Does each C# file declare one primary type matching its file name? |
+| standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root | guidance | Does each aggregate-owned type name begin with its aggregate root name? |
+| standards/rule/workspace-naming.use-architectural-suffixes | guidance | Does each architectural type carry the suffix its role requires? |
+| standards/rule/workspace-naming.name-asynchronous-methods-completely | guidance | Does each task-returning method end in Async with the token last when cancellable? |
+| standards/rule/workspace-naming.name-exceptions-by-failed-rule | guidance | Does each Domain exception name lead with its root and name its reason? |
+| standards/rule/workspace-naming.use-intent-revealing-boolean-names | guidance | Does each boolean member use an intent-revealing prefix or verb? |
+| standards/rule/workspace-naming.keep-implementation-style-consistent | guidance | Does production C# use file-scoped namespaces, braces, explicit modifiers, and sealed classes? |
+| standards/rule/workspace-naming.use-current-language-features | guidance | Does production code target the pinned language version with current constructs? |
+| standards/rule/workspace-naming.use-predictable-frontend-names | guidance | Does each frontend follow the folder, component, and hook naming form? |
+| standards/rule/workspace-naming.align-business-names-across-layers | guidance | Does one business name span each module across layers and documentation? |
+| standards/rule/workspace-naming.keep-namespaces-aligned-with-folders | guidance | Does each namespace match its folder path beneath the project root? |
+| standards/rule/workspace-naming.avoid-generic-type-names | guidance | Does each type name avoid the generic names this rule lists when a narrower name exists? |
+| standards/rule/workspace-naming.derive-boundary-names-from-the-ubiquitous-term | guidance | Does each route segment and field name derive from its current ubiquitous term? |

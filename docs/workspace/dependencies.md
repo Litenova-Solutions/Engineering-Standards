@@ -2,30 +2,20 @@
 
 ## Intent
 
-
-Project references and package ownership make the application boundary visible to the compiler. The selected profile permits direct framework types only in the layers that own them and rejects packages introduced without a current requirement.
+Project references and package ownership make the application boundary visible to the compiler. Each selected stack permits direct framework types only in the layers that own them, and each project rejects packages introduced without a current requirement.
 
 ## Agent Summary {#agent-summary}
-
 
 - Project references match the declared graph. (standards/rule/workspace-dependencies.use-the-project-reference-graph)
 - Domain carries no package reference. (standards/rule/workspace-dependencies.keep-domain-package-free)
 - Application references only its permitted abstractions. (standards/rule/workspace-dependencies.keep-application-dependencies-narrow)
 - Provider packages live only in Infrastructure. (standards/rule/workspace-dependencies.keep-providers-in-infrastructure)
-- Every dependency version comes from the manifest. (standards/rule/workspace-dependencies.pin-every-dependency-centrally)
+- Every dependency version resolves through central management or the lockfile. (standards/rule/workspace-dependencies.pin-every-dependency-centrally)
 - A new package arrives with a decision and a manifest pin. (standards/rule/workspace-dependencies.approve-new-packages-explicitly)
 - Frontends stay isolated from each other's source. (standards/rule/workspace-dependencies.keep-frontend-applications-isolated)
 - Web UI packages come from the manifest baseline. (standards/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary)
 
-## Concepts
-
-
-### Agent tooling for the baseline
-
-shadcn publishes an agent skill that activates on `components.json`, runs `shadcn info --json` to read the project setup, and looks a component up before generating code. A workspace installs it with `pnpm dlx skills add shadcn/ui`. shadcn also publishes a Model Context Protocol server for registry search, reading the registries the project's `components.json` declares. The skill is documented at [https://ui.shadcn.com/docs/skills](https://ui.shadcn.com/docs/skills) and the server at [https://ui.shadcn.com/docs/mcp](https://ui.shadcn.com/docs/mcp), both read 2026-10-08.
-
 ## Standards
-
 
 ### Use the project reference graph (standards/rule/workspace-dependencies.use-the-project-reference-graph)
 
@@ -54,15 +44,15 @@ shadcn publishes an agent skill that activates on `components.json`, runs `shadc
 
 ### Keep Application dependencies narrow (standards/rule/workspace-dependencies.keep-application-dependencies-narrow)
 
-**Requirement:** Application MUST reference only LiteBus command and query abstractions, required read abstractions, and Microsoft abstractions its ports need.
+**Requirement:** Application MUST reference only LiteBus command and query abstractions, required read abstractions, and Microsoft abstractions its ports need. The `IQuerySession` read boundary is the one provider package this allows, assigned by the ownership table.
 
-**Rationale:** A provider package in Application makes the coordination layer depend on the technology Infrastructure was meant to hide.
+**Rationale:** A provider package in Application makes the coordination layer depend on the technology Infrastructure was meant to hide. The Requirement names the one read boundary this allows.
 
 ### Keep providers in Infrastructure (standards/rule/workspace-dependencies.keep-providers-in-infrastructure)
 
 **Requirement:** A database provider, external SDK, resilience, discovery, or serialization adapter MUST live in Infrastructure.
 
-**Rationale:** Infrastructure is the only layer that a provider change is allowed to reach.
+**Rationale:** Infrastructure is the only layer that a provider change may reach, except the `IQuerySession` read boundary the ownership table assigns to Application.
 
 ### Pin every dependency centrally (standards/rule/workspace-dependencies.pin-every-dependency-centrally)
 
@@ -88,18 +78,17 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 ### Keep the approved web UI dependency boundary (standards/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary)
 
-**Requirement:** A React web frontend MUST take its UI packages from the `uiBaseline` in `standards.manifest.json`.
+**Requirement:** A React web frontend MUST take its UI packages from the `uiBaseline` in `standards.manifest.json`, and a Svelte web frontend from `uiBaselineSvelte`.
 
-**Rationale:** That baseline pins shadcn/ui, Tailwind CSS v4, Base UI, Lucide, and the utility packages that the installed source imports directly.
+**Rationale:** Each baseline pins its design system, styling, base components, icons, and the utility packages the installed source imports directly.
 
 ## Conventions
-
 
 ### Reference only the LiteBus module required (standards/rule/workspace-dependencies.reference-only-the-litebus-module-required)
 
 **Default:** Reference the LiteBus command, query, or event module that the code actually uses.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A unified application bus package pulls in contracts that the layer never dispatches.
 
@@ -107,7 +96,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 **Default:** Keep generated API types free of dependencies and limit the shared client to the pinned generator's runtime, its query plugin, and those types.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A generated package that owns state, UI behavior, or authentication policy stops being regenerable.
 
@@ -115,7 +104,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 **Default:** Keep assertion, substitution, host, container, and architecture-test packages inside test projects.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A test package referenced by a production project ships to production.
 
@@ -123,7 +112,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 **Default:** Assign each baseline package to the owning layer named in the table in this section.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Example:**
 
@@ -133,13 +122,15 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 | Application.Abstractions | Required LiteBus module abstractions only |
 | Application | Required LiteBus module abstractions; `Marten` for the selected `IQuerySession` read boundary; Microsoft abstractions used by public ports |
 | Infrastructure | `Marten`; LiteBus registration modules. Provider, resilience, service-discovery, and configuration packages required by implemented adapters |
-| WebApi | JWT bearer authentication, ASP.NET Core OpenAPI, build-time OpenAPI generation, Scalar, and required LiteBus mediator abstractions |
+| WebApi | JWT Bearer [REDACTED] ASP.NET Core OpenAPI, build-time OpenAPI generation, Scalar, and required LiteBus mediator abstractions |
+| Worker | LiteBus registration modules; the provider, resilience, and configuration packages its hosted jobs need |
 | ServiceDefaults | Health checks, service discovery, HTTP resilience, and OpenTelemetry registration and instrumentation |
 | AppHost | Aspire AppHost and resource hosting packages |
 | Domain.Tests | xUnit v3 and assertions |
 | Application.Tests | xUnit v3, assertions, and NSubstitute |
 | Integration.Tests | xUnit v3, assertions, test host, Testcontainers PostgreSQL, and the Microsoft.Testing.Platform report and coverage extensions |
 | Architecture.Tests | xUnit v3, assertions, and NetArchTest |
+| Acceptance.Tests | xUnit v3, assertions, the behaviour runner its extension selects, test host, and the report and coverage extensions |
 
 Test projects reference xUnit v3 and run on Microsoft.Testing.Platform. The consumer `global.json` sets `"test": { "runner": "Microsoft.Testing.Platform" }`, because the .NET 10 `dotnet test` command refuses the VSTest mode for these projects.
 
@@ -153,18 +144,17 @@ An Application query handler may inject `IQuerySession` because Marten is the se
 
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/workspace-dependencies.use-the-project-reference-graph | inspection | `ArchitectureTests` asserts the project reference set matches the declared graph exactly. |
-| standards/rule/workspace-dependencies.keep-domain-package-free | inspection | `ArchitectureTests` asserts the Domain project declares no package reference. |
-| standards/rule/workspace-dependencies.keep-application-dependencies-narrow | inspection | `ArchitectureTests` asserts the Application package set matches the permitted list. |
-| standards/rule/workspace-dependencies.keep-providers-in-infrastructure | inspection | `ArchitectureTests` asserts each provider package is referenced only by Infrastructure. |
-| standards/rule/workspace-dependencies.pin-every-dependency-centrally | static | The CI dependency check compares each resolved NuGet and npm version against `standards.manifest.json`. |
-| standards/rule/workspace-dependencies.approve-new-packages-explicitly | inspection | The decision record names the five fields and the manifest entry lands in the same pull request. |
-| standards/rule/workspace-dependencies.keep-frontend-applications-isolated | inspection | `ImportBoundaryTests` asserts no cross-application or internal-feature import exists. |
-| standards/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary | static | `node standards/tools/validate-ui.mjs` reports a UI package outside the manifest baseline. |
-| standards/rule/workspace-dependencies.reference-only-the-litebus-module-required | inspection | Project files reference only the LiteBus modules the code dispatches. |
-| standards/rule/workspace-dependencies.keep-generated-packages-dependency-light | static | `package.json` declares no dependency in the generated types package and only the generator's runtime in the client. |
-| standards/rule/workspace-dependencies.keep-test-dependencies-in-test-projects | inspection | No production project references an assertion, substitution, host, container, or architecture-test package. |
-| standards/rule/workspace-dependencies.use-this-baseline-package-ownership | inspection | Each baseline package appears in the layer that the ownership table assigns. |
+| standards/rule/workspace-dependencies.use-the-project-reference-graph | guidance | Does each project reference follow the declared graph with no added edge? |
+| standards/rule/workspace-dependencies.keep-domain-package-free | guidance | Does the Domain project reference no package beyond the base class library? |
+| standards/rule/workspace-dependencies.keep-application-dependencies-narrow | guidance | Does Application reference only permitted abstractions and the one read boundary? |
+| standards/rule/workspace-dependencies.keep-providers-in-infrastructure | guidance | Does each provider adapter live in Infrastructure apart from the read boundary? |
+| standards/rule/workspace-dependencies.pin-every-dependency-centrally | guidance | Does every version resolve through central management or the lockfile at the manifest or consumer pin? |
+| standards/rule/workspace-dependencies.approve-new-packages-explicitly | guidance | Does each package outside the manifest carry a decision with use case, alternatives, layer, cost, and removal condition? |
+| standards/rule/workspace-dependencies.keep-frontend-applications-isolated | guidance | Is each frontend free of imports from another application's source or internal feature files? |
+| standards/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary | guidance | Does each React frontend take UI packages from uiBaseline and each Svelte one from uiBaselineSvelte? |
+| standards/rule/workspace-dependencies.reference-only-the-litebus-module-required | guidance | Does each project reference only the LiteBus modules its code dispatches? |
+| standards/rule/workspace-dependencies.keep-generated-packages-dependency-light | guidance | Does the generated types package stay dependency-free with a thin client? |
+| standards/rule/workspace-dependencies.keep-test-dependencies-in-test-projects | guidance | Do production projects reference no test package? |
+| standards/rule/workspace-dependencies.use-this-baseline-package-ownership | guidance | Does each baseline package sit in the layer the ownership table assigns? |

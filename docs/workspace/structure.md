@@ -1,23 +1,22 @@
-# Workspace Structure
+# Workspace structure
 
 ## Intent
-
 
 One canonical monorepo tree lets agents locate applications, shared packages, documentation, and tests without searching for a project-specific interpretation. The structure supports an API-only application, one frontend, or multiple frontends while retaining one bounded context.
 
 ## Agent Summary {#agent-summary}
 
-
 - Consumers share one canonical root tree. (standards/rule/workspace-structure.use-the-canonical-root-tree)
+- The project config declares size and stacks. (standards/rule/workspace-structure.declare-size-and-stacks-in-project-config)
+- The generated model folder stays untracked. (standards/rule/workspace-structure.keep-the-generated-model-out-of-source-control)
 - Production and test projects sit in separate roots. (standards/rule/workspace-structure.keep-net-production-and-test-projects-separate)
 - Runnable applications live under apps. (standards/rule/workspace-structure.keep-runnable-applications-under-apps)
-- An AppHost that runs several applications sits beside them under apps. (standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs)
+- An AppHost that runs more than one application sits beside them under apps. (standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs)
 - Shared packages have two consumers or hold generated output. (standards/rule/workspace-structure.limit-shared-typescript-packages)
 - Consumer documentation lives under the root docs directory. (standards/rule/workspace-structure.keep-consumer-documentation-at-the-root)
 - READMEs orient and link; they never restate records. (standards/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records)
 
 ## Standards
-
 
 ### Use the canonical root tree (standards/rule/workspace-structure.use-the-canonical-root-tree)
 
@@ -29,6 +28,7 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
 {repo}/
   .config/
     dotnet-tools.json
+  .model/                      generated; ignored
   apps/
     api/
       {ProjectName}.slnx
@@ -37,35 +37,64 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
       src/
       tests/
     {frontend}/
-    apphost/                 when an AppHost runs more than one application
+    apphost/                   when an AppHost runs more than one application
   packages/
   docs/
     product/
       brief.md
-      flows/                 create with the first end-to-end flow
+      {area}/                  product topic pages carrying requirement entries
+      constraints/             create with the first constraint record
+      decisions/
+      features/                create with the first feature record
+      journeys/                create with the first journey record
+      problems/                create with the first problem record
+    research/                  create with the first research record
     domain/
       README.md
-      glossary.md
+      actors/
+      roles/
+      permissions.md
+      entry-points.md
       modules/
-      workflows/             create with the first workflow
-      policies/              create with the first domain policy
-    decisions/               create with the first decision
-    operations/              create with the first operating record
-      limits.md              create when operating limits exist
-    runbooks/                create with the first runbook
-    releases/                create with the first release record
-    research/                create with the first research record
-    ui/                      create with the first UI decision or guide
+        {module}/
+          README.md
+          {records-plural}/
+            README.md
+            {use-case}.md
+      rules/                   create with the first cross-record rule set
+    operations/                create with the first operating record
+      limits.md                create with the first limit record
+      secrets.json             create with the first secret
+      log/                     create with the first operations entry
+    runbooks/                  create with the first runbook
+    exceptions/                create with the first exception record
+    known-gaps/                create with the first known-gap record
+    ui/                        create with the first UI decision or guide
+    language.json
   standards/
   AGENTS.md
   global.json
-  package.json             when a frontend or TypeScript package exists
-  pnpm-lock.yaml           when a frontend or TypeScript package exists
-  pnpm-workspace.yaml      when a frontend or TypeScript package exists
+  package.json                 when a frontend or TypeScript package exists
+  pnpm-lock.yaml               when a frontend or TypeScript package exists
+  pnpm-workspace.yaml          when a frontend or TypeScript package exists
   standards.project.json
 ```
 
-The example does not place the .NET solution or a frontend application at the workspace root.
+The example does not place the .NET solution or a frontend application at the workspace root. Under `modules/`, each module folder holds one folder per business record in plural kebab-case form.
+
+A record page lives at the home the tree names for its type. An entry lives on its home page. Requirements live on product topic pages, permissions on the permissions page, entry points on the entry-point page, and limits on the limits page. Rules, results, cases, and events live on their business record or use case page.
+
+### Declare size and stacks in project config (standards/rule/workspace-structure.declare-size-and-stacks-in-project-config)
+
+**Requirement:** `standards.project.json` MUST declare `size` as `small` or `large`, and MUST declare one stack per frontend in `paths.frontends` beside the `dotnet` backend.
+
+**Rationale:** Size decides which record types and test projects apply, and each stack decides which technology pages and checks apply.
+
+### Keep the generated model out of source control (standards/rule/workspace-structure.keep-the-generated-model-out-of-source-control)
+
+**Requirement:** The generated `.model/` folder MUST stay out of source control.
+
+**Rationale:** The model builder writes `model.json` there from records, code, routes, tests, and test runs, so the folder is rebuilt rather than reviewed.
 
 ### Keep .NET production and test projects separate (standards/rule/workspace-structure.keep-net-production-and-test-projects-separate)
 
@@ -86,20 +115,22 @@ apps/api/
     {ProjectName}.Application/
     {ProjectName}.Infrastructure/
     {ProjectName}.WebApi/
-    {ProjectName}.AppHost/          when an orchestration host runs the API alone
-    {ProjectName}.ServiceDefaults/  when a local orchestration host is used
+    {ProjectName}.Worker/             when background work needs a host
+    {ProjectName}.AppHost/            when an orchestration host runs the API alone
+    {ProjectName}.ServiceDefaults/    when a local orchestration host is used
   tests/
-    {ProjectName}.Domain.Tests/
-    {ProjectName}.Application.Tests/
-    {ProjectName}.Integration.Tests/
     {ProjectName}.Architecture.Tests/
+    {ProjectName}.Integration.Tests/
+    {ProjectName}.Acceptance.Tests/   when size is large
+    {ProjectName}.Domain.Tests/       optional unit tests
+    {ProjectName}.Application.Tests/  optional unit tests
 ```
 
-Worker and Acceptance.Tests are conditional projects introduced by extensions. `AppHost` and `ServiceDefaults` are local hosting and diagnostics projects rather than application layers. An application that orchestrates its local dependencies another way ships neither, and records no override for their absence.
+Worker is conditional on the extension that runs background work. Acceptance.Tests is required when `size` is large and optional otherwise. Domain.Tests and Application.Tests are optional in both sizes. `AppHost` and `ServiceDefaults` are local hosting and diagnostics projects rather than application layers. An application that orchestrates its local dependencies another way ships neither, and records no Exception for their absence.
 
 ### Keep one workspace solution beside the API solution (standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution)
 
-**Requirement:** A workspace MAY carry one additional solution at its root that lists the .NET projects of more than one deployable unit.
+**Requirement:** When a workspace carries a root solution, that solution MUST list the .NET projects of more than one deployable unit. A build, a test run, and a configuration MUST still name the API solution.
 
 **Rationale:** The API solution stays at `apps/api/` and remains the one a build, a test run, and `paths.apiSolution` name. A workspace holding a second .NET deployable, such as a command-line tool, otherwise has no single file an editor can open across both. Two solution files listing overlapping projects is a supported MSBuild arrangement, and the projects themselves stay where `standards/rule/workspace-structure.keep-net-production-and-test-projects-separate` puts them.
 
@@ -143,24 +174,23 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 ### Keep consumer documentation at the root (standards/rule/workspace-structure.keep-consumer-documentation-at-the-root)
 
-**Requirement:** Product, domain, UI, and decision documentation MUST live under the root `docs/` directory.
+**Requirement:** Project records MUST live under the root `docs/` directory.
 
-**Rationale:** Placing it inside the standards submodule or the solution tree makes it disappear when either is replaced.
+**Rationale:** Placing them inside the standards submodule or the solution tree makes them disappear when either is replaced.
 
 ### Keep orientation documents separate from canonical records (standards/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records)
 
-**Requirement:** A README MUST link to the approved specification rather than restate its content.
+**Requirement:** A README under `docs/` MUST link to the approved record rather than restate its content.
 
 **Rationale:** A README that restates a decision becomes a second authored source that drifts from the record it summarizes.
 
 ## Conventions
 
-
 ### Name frontends by audience (standards/rule/workspace-structure.name-frontends-by-audience)
 
 **Default:** Name a frontend for its audience, such as `web`, `admin`, `portal`, or `docs`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** `frontend`, `client`, or `app` names the technology rather than the audience it serves.
 
@@ -168,7 +198,7 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 **Default:** Keep bootstrap, release, and CI helper scripts under root `scripts/`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** An application-specific script may stay inside its application when no other workspace calls it.
 
@@ -176,7 +206,7 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 **Default:** Place generated OpenAPI types in `packages/api-types/` and a thin client in `packages/api-client/` when more than one frontend consumes the API.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A single frontend may own both locally until a second consumer appears.
 
@@ -188,17 +218,18 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/workspace-structure.use-the-canonical-root-tree | inspection | Root tree review compares the workspace against the layout in this section. |
-| standards/rule/workspace-structure.keep-net-production-and-test-projects-separate | test | `SolutionStructureTests` asserts each project resolves under its declared source or test root. |
-| standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution | static | `node standards/tools/validate-consumer.mjs` resolves `paths.apiSolution` to the solution under `apps/api/`, whether or not a root solution exists. |
-| standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs | inspection | Root tree review confirms an AppHost running a frontend sits at `apps/apphost/`, and one running the API alone under `apps/api/src/`. |
-| standards/rule/workspace-structure.keep-runnable-applications-under-apps | inspection | Root tree review confirms each runnable application sits under `apps/` and each library under `packages/`. |
-| standards/rule/workspace-structure.limit-shared-typescript-packages | inspection | Package review records the two consumers or the generated-output purpose for each shared package. |
-| standards/rule/workspace-structure.keep-consumer-documentation-at-the-root | inspection | Root tree review confirms every structured specification resolves under root `docs/`. |
-| standards/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records | inspection | README review confirms each summary links to its approved specification. |
-| standards/rule/workspace-structure.name-frontends-by-audience | static | Each directory under `apps/` carries an audience name rather than a technology name. |
-| standards/rule/workspace-structure.keep-scripts-at-the-root | inspection | Bootstrap, release, and CI helper scripts resolve under root `scripts/`. |
-| standards/rule/workspace-structure.keep-generated-api-contracts-in-packages | inspection | Generated types and the typed client resolve under `packages/` when two frontends consume the API. |
+| standards/rule/workspace-structure.use-the-canonical-root-tree | guidance | Does the workspace match the canonical tree with records at their homes? |
+| standards/rule/workspace-structure.declare-size-and-stacks-in-project-config | guidance | Does standards.project.json declare size and one stack per frontend? |
+| standards/rule/workspace-structure.keep-the-generated-model-out-of-source-control | guidance | Is the generated .model/ folder untracked? |
+| standards/rule/workspace-structure.keep-net-production-and-test-projects-separate | guidance | Do production projects sit under src/ and test projects under tests/? |
+| standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution | guidance | Does any root solution list more than one deployable while builds name the API solution? |
+| standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs | guidance | Does an AppHost running a frontend sit at apps/apphost/ and an API-only one under apps/api/src/? |
+| standards/rule/workspace-structure.keep-runnable-applications-under-apps | guidance | Does each runnable application sit under apps/ and each library under packages/? |
+| standards/rule/workspace-structure.limit-shared-typescript-packages | guidance | Does each shared package have two consumers or carry generated output? |
+| standards/rule/workspace-structure.keep-consumer-documentation-at-the-root | guidance | Do all project records live under the root docs/ directory? |
+| standards/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records | guidance | Does each README under docs/ link to its record rather than restate it? |
+| standards/rule/workspace-structure.name-frontends-by-audience | guidance | Does each directory under apps/ carry an audience name? |
+| standards/rule/workspace-structure.keep-scripts-at-the-root | guidance | Do bootstrap, release, and CI helper scripts sit under root scripts/? |
+| standards/rule/workspace-structure.keep-generated-api-contracts-in-packages | guidance | Do generated types and the typed client sit under packages/ with two frontends? |
