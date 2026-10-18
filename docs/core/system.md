@@ -1,9 +1,8 @@
-# Agentic Engineering System
+# Agentic engineering system
 
 ## Intent
 
-
-The Agentic Engineering System coordinates software work with agents as active engineering participants. It combines specifications, architecture standards, agent protocols, implementation conventions, tests, operating controls, and release records.
+The Agentic engineering system coordinates software work with agents as active engineering participants. It combines records, architecture standards, agent protocols, implementation conventions, tests, operating controls, and release records.
 
 In this name:
 
@@ -21,49 +20,48 @@ The system names responsibilities without assuming separate departments or job t
 
 AI agents perform a substantial part of engineering work. They can inspect repositories, propose designs, edit authorized artifacts, run tools, and collect evidence. They do not own unresolved product policy, legal judgment, financial decisions, or risk acceptance.
 
-Agent-led execution increases the need for explicit technical concepts. Agents distinguish modules from aggregates and end-to-end flows from workflows. They also distinguish approved specifications from implementation claims.
+Agent-led execution increases the need for explicit technical concepts. Agents distinguish modules from business records and journeys from event reactions. They also distinguish approved records from implementation claims.
 
 ### Why the system exists
 
 Without a shared engineering system, two capable contributors or agents can implement the same request with different boundaries, names, transaction behavior, and verification. Each local result may compile while the workspace loses a coherent model.
 
-The system addresses five recurring problems:
+The system addresses recurring problems:
 
 - Product intent can be lost between a request and its implementation.
-- Agents can invent missing rules when a specification leaves a decision implicit.
+- Agents can invent missing rules when a record leaves a decision implicit.
 - Standard technical concepts can be renamed until developers no longer recognize the established pattern.
 - A use case can be implemented in one layer while persistence, public entry points, tests, or operating impact remain incomplete.
 - Documentation can claim behavior that code and automated evidence do not support.
 
-The system makes the specification durable and the agent replaceable. A different person, model, or tool should be able to continue from the same approved records and obtain the same required boundaries.
+The system makes the record durable and the agent replaceable. A different person, model, or tool should be able to continue from the same approved records and obtain the same required boundaries.
 
-### Three connected layers
+### Connected layers
 
 The system contains one delivery approach and one operating model:
 
 | Layer | Meaning | Concrete example |
 |:---|:---|:---|
-| Agentic Engineering System | The complete system of standards, specifications, implementation, verification, operations, and release control. | The repository structure, provision IDs, templates, tests, runbooks, and release records. |
-| Specification-Driven Delivery | Approved specifications select work and define completion. | `orders.cancel-order` defines behavior before its Command, endpoint, and tests are accepted. |
-| Agent-Driven Engineering | Agents perform substantial engineering execution within approved scope and report decisions they cannot make. | An agent loads the cancellation specification, implements it, runs its checks, and reports an unknown refund policy. |
+| Agentic engineering system | The complete system of standards, records, implementation, verification, operations, and release control. | The repository structure, provision IDs, templates, tests, runbooks, and release records. |
+| Record-driven delivery | Approved records select work and define completion. | `use-case/orders.cancel-order` defines behavior before its Command, endpoint, and tests are accepted. |
+| Agent-driven engineering | Agents perform substantial engineering execution within approved scope and report decisions they cannot make. | An agent loads the cancellation record, implements it, runs its checks, and reports an unknown refund policy. |
 
-`Driven` means engineering work starts from an approved specification and completion is judged against it. A specification is more than a prompt because it remains in the workspace after one agent session ends.
+`Driven` means engineering work starts from an approved record and completion is judged against it. A record is more than a prompt because it remains in the workspace after one agent session ends.
 
 `Agent-driven` describes who performs much of the execution. It does not transfer business decision authority to the agent.
 
-## Agent Summary {#agent-summary}
-
+## Agent summary {#agent-summary}
 
 - Agents stop and ask when a decision belongs to a person. (standards/rule/core-system.keep-decision-authority-with-accountable-people)
-- Approved specifications define the work, and each one situates its subject. (standards/rule/core-system.drive-work-from-approved-specifications, standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
-- Flows link their use cases rather than restate them, and every use case names what calls it. (standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow, standards/rule/core-system.name-what-calls-a-use-case)
+- Approved records define the work, and each one situates its subject. (standards/rule/core-system.drive-work-from-approved-specifications, standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
+- Journeys link their use cases rather than restate them, and every use case names what reaches it. (standards/rule/core-system.connect-one-product-outcome-through-a-journey, standards/rule/core-system.name-what-calls-a-use-case)
 - One module name is used across every layer. (standards/rule/core-system.group-language-and-use-cases-by-module)
-- Module specifications map aggregates to state, invariants, and commands. (standards/rule/core-system.make-aggregate-ownership-explicit)
-- One use case is one Command or Query, with a status, one specification, and a mapping that resolves. (standards/rule/core-system.deliver-one-complete-use-case, standards/rule/core-system.state-implemented-before-acceptance-evidence-exists, standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence, standards/rule/core-system.resolve-every-implementation-mapping-name, standards/rule/core-system.name-the-handler-an-implemented-use-case-owns)
-- Workflow specifications name state, triggers, recovery, and owner. (standards/rule/core-system.specify-autonomous-progress-as-a-workflow)
-- Every event reaction declares its delivery classification. (standards/rule/core-system.record-events-and-event-reactions-separately)
-- Domain rule IDs encode their enforcement classification. (standards/rule/core-system.classify-domain-rules-by-enforcement-boundary)
-- Specifications map each business state to a state record. (standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records)
+- Module pages map business records to state, rules, and commands. (standards/rule/core-system.make-aggregate-ownership-explicit)
+- One use case is one command or query, with computed status and resolvable mapping. (standards/rule/core-system.deliver-one-complete-use-case, standards/rule/core-system.compute-use-case-status-from-evidence, standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)
+- Every event reaction declares its delivery classification. (standards/rule/core-system.declare-event-reaction-delivery)
+- Each rule states its kind, and each act needs a permission. (standards/rule/core-system.state-each-rule-with-its-kind, standards/rule/core-system.grant-access-through-roles-and-permissions)
+- Records map each business state to a state record. (standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records)
+- Authority follows the ladder, and every link sits on its source record. (standards/rule/core-system.resolve-authority-by-ladder, standards/rule/core-system.declare-each-link-on-its-source)
 
 ## Concepts
 
@@ -77,23 +75,17 @@ Domain
   contains the business language, rules, state, and behavior
 
 Module
-  groups related language, use cases, aggregates, and code
+  groups related language, use cases, business records, and code
 
-End-to-End Flow
+Journey
   connects use cases to one observable product outcome
   can appear in a release record
 
 Use Case
   defines one independently testable Command or Query goal
 
-Workflow
-  coordinates system-controlled work across transactions or time
-
-Workflow Orchestrator
-  stores workflow progress and selects the next Command
-
-Aggregate
-  protects invariants and state changed in one transaction
+Business Record
+  protects facts and rules changed in one step
 
 Event
   records a completed fact
@@ -101,42 +93,40 @@ Event
 Event Reaction
   defines behavior caused by an Event
 
-Acceptance Criterion
-  defines one observable Use Case result
+Result
+  defines one way a Use Case ends
+
+Case
+  defines one working example of a Use Case
 
 Acceptance Test
-  proves one or more Acceptance Criteria
+  proves one or more Cases
 
-End-to-End Test
-  proves one complete End-to-End Flow through public boundaries
+Journey Test
+  proves one complete Journey through public boundaries
 ```
 
 The central relationships are:
 
 ```text
 Product outcome
-  End-to-End Flow
+  Journey
     Use Cases
-      Acceptance Criteria
+      Results
+      Cases
       Acceptance Tests
-    End-to-End Tests
+    Journey Tests
 
 Domain
   Modules
     Use Cases
-    Aggregates
-      Aggregate States
-      Aggregate Invariants
-  Domain Policies
-  Workflows
-
-Workflow
-  Workflow Orchestrator
-    receives Events
-    issues Commands
+    Business Records
+      Business States
+      Rules
+  Rules
 
 Command
-  normally changes one Aggregate
+  normally changes one Business Record
 
 Query
   reads a Read Model
@@ -144,85 +134,147 @@ Query
 
 The [glossary](../reference/glossary.md) defines each term below. This section records the relationships and distinctions that a one-sentence definition cannot carry.
 
-### Product and end-to-end flow
+### Product and journey
 
-A product specification names users, problems, outcomes, exclusions, commercial constraints, and operating context. It is not a synonym for the frontend application.
+The product record (the brief) names users, problems, outcomes, exclusions, commercial constraints, and operating context. It is not a synonym for the frontend application.
 
-An end-to-end flow begins at an accepted starting condition, crosses every required system boundary, and ends at one observable product outcome. It does not mean every possible product feature. The record may include actor decisions, branches, waiting periods, failures, and recovery.
+A journey begins at an accepted starting condition, crosses every required system boundary, and ends at one observable product outcome. It does not mean every possible product feature. The record lists ordered steps with what must exist first, and may include actor decisions, branches, waiting periods, failures, and recovery.
 
-A flow links existing use-case specifications instead of repeating their inputs and rules. For an online shop, `order-checkout` can connect stock reservation, order creation, payment start, and shipment dispatch. Order cancellation and payment reconciliation are separate flows.
+A journey links existing use-case records instead of repeating their inputs and rules. For an online shop, `journey/checkout` can connect stock reservation, order creation, payment start, and shipment dispatch. Order cancellation and payment reconciliation are separate journeys.
 
 ### Domain and module
 
 Orders, refunds, shipment delivery, money, and cancellation policy are domain concepts. HTTP, JSON serialization, database sessions, and queue clients are technical mechanisms.
 
-The capitalized `Domain` project is the code layer that implements domain types and behavior. The business domain exists independently of that project. A domain policy may be enforced by Domain or Application code when its facts cross aggregate or module boundaries.
+The capitalized `Domain` project is the code layer that implements domain types and behavior. The business domain exists independently of that project. A rule across business records may be enforced by Domain or Application code when its facts cross record or module boundaries.
 
 `Orders module` is natural in product discussion and maps to `Domain/Orders`, `Application/Orders`, endpoint groups, frontend features, and tests. A module is not automatically:
 
 - An assembly or deployment unit.
 - A transaction boundary.
-- One aggregate.
+- One business record.
 - A runtime base type or interface.
 
-A module may contain no aggregate, one aggregate, or multiple related aggregates. Independent language, responsibility, or change reasons indicate separate modules.
+A module may contain no business record, one business record, or multiple related business records. Independent language, responsibility, or change reasons indicate separate modules. A use case belongs to the business record whose folder holds its page.
 
 ### Use case, Command, and Query
 
-A use case owns its trigger, input, authorization, result, rules, failures, acceptance criteria, entry points, implementation impact, and operating impact.
+A use case owns its trigger, input, permissions, result, rules, refusals, entry points, implementation impact, and operating impact.
 
 One top-level Command owns one command pipeline and one transaction commit. A Query reads a Read Model without changing business state.
 
-`orders.cancel-order` is a use case. `CancelOrderCommand` is its Application message. `Order.Cancel` is its aggregate action. These names stay aligned without treating the use case, Command, and aggregate as one boundary.
+`use-case/orders.cancel-order` is a use case. `CancelOrderCommand` is its Application message. `OrderCancel` is its business-record action. These names stay aligned without treating the use case, Command, and business record as one boundary.
 
-### Workflow and workflow orchestrator
+Work that spans business records is a command that reads several records and writes one, an event reaction, or a background job. A background job is work that runs without an HTTP request, on a schedule or from a queue.
 
-A workflow exists when the system stores progress, awaits an event or time, retries work, handles duplicate delivery, compensates, or exposes operator recovery.
+### Business record, root, state, and rule
 
-`Orchestrator` means the component selects and schedules the next action. It does not perform every action itself. It receives facts, updates workflow state, issues the next Command, records retries and timeouts, and exposes failures needing an operator.
+A business record is not every entity in a module. `Root` identifies the mutation entry point, not an inheritance hierarchy for every domain object.
 
-Process Manager and orchestration-based Saga are industry mappings for this pattern. The system uses `Workflow Orchestrator` because the name identifies both the business record and its technical responsibility.
+Developers may call it an aggregate; the record type is business record. Every business record uses one abstract `{Record}State` record and one or more sealed state records, including a record with one current state.
 
-### Aggregate, root, state, and invariant
+A rule that is always true cannot be false after commit. `rule/order.capacity-limits-confirmation`, for example, limits confirmed and reserved quantities to capacity.
 
-An aggregate is not every entity in a module. `Root` identifies the mutation entry point, not an inheritance hierarchy for every domain object.
+### Rules and permissions
 
-Every aggregate uses one abstract `{Aggregate}State` record and one or more sealed state records, including an aggregate with one current state.
+Each rule states its kind: always true, checked before, or across records. The kind decides how the rule is proved.
 
-An invariant cannot be temporarily false after commit. `INV-INVENTORY-01`, for example, limits confirmed and reserved quantities to capacity.
+Checked-before rules include message shape: required fields, lengths, and formats are checked before business behavior runs. A persistence constraint is an always-true rule enforced by the store, such as a unique key. Each rule also states where it is enforced: validator, aggregate, store, guard, or reaction.
 
-### Domain policy and other rule types
-
-A domain policy belongs to the business domain but is not owned by one aggregate invariant. It may apply within one module or across modules.
-
-A refund limit based on provider-confirmed captured money may require facts from Orders, Payments, and Refunds. The policy names its owner, consistency requirement, enforcement point, failure behavior, and verification.
-
-The system classifies rules by where they are enforced:
-
-| Term | Word-level meaning | Technical ownership |
-|:---|:---|:---|
-| Validation Rule | `Validation` checks message shape or format before business behavior runs. | Command or Query validator |
-| Authorization Policy | `Authorization` decides whether an identified actor may act on a target. | Application policy and target authorization |
-| Aggregate Invariant | `Invariant` holds after every aggregate transaction. | Aggregate root and owned objects |
-| Domain Policy | `Domain` places the policy in business behavior; `Policy` selects or limits behavior from facts. | Domain or Application policy component |
-| Workflow Rule | Controls when a workflow advances, waits, retries, compensates, fails, or needs an operator. | Workflow Orchestrator |
-| Persistence Constraint | `Persistence` means stored data; `Constraint` means the store rejects an invalid value or relationship. | Database or document-store configuration |
+An actor holds a role at a scope; a role allows permissions; a use case needs permissions; an entry point may offer fewer. Actor kinds are person, company, provider, system, and guest. Role scopes are platform, organizer, event, and self. Permissions come from one shared closed list.
 
 ### Event and event reaction
 
 Event names use past-tense forms such as `OrderConfirmed` and `ShipmentDispatched`. `Reaction` states the causal relationship without prescribing the implementation.
 
-A reaction may map to an event handler, workflow orchestrator, projection, or scheduled job. `OrderConfirmed` may cause the reaction `Dispatch shipment`, implemented as a durable workflow rather than a class named `DispatchShipmentReaction`.
+A reaction may map to an event handler, a projection, a command that reads several records, or a background job. `OrderConfirmed` may cause the reaction `Dispatch shipment`, implemented as a background job rather than a class named `DispatchShipmentReaction`.
 
-### Acceptance and end-to-end verification
+Each reaction declares one delivery classification:
 
-An acceptance test cites the exact criterion identifier. The test name remains free to describe its specific case.
+- `atomic`: the reaction completes in the same transaction as the event.
+- `durable`: the reaction is recorded beside the event and runs after the commit, retrying until it succeeds.
+- `rebuildable`: a missed delivery is recovered by rebuilding the effect from its source records.
+- `best-effort-optional`: the reaction may be skipped or lost without breaking a promise.
 
-Acceptance tests prove use-case behavior. End-to-end tests prove that connected use cases produce the release outcome.
+Select atomic for a required effect inside one consistency boundary, and durable for one outside it. Select rebuildable for a derived view, and best-effort-optional only where no record needs the effect.
+
+### Result, Case, and verification
+
+A result names one way a use case ends: success, or a named refusal with its failure code. A case pairs one situation with the result it leads to.
+
+An acceptance test proves a case only when its steps call the use case and assert the result. Acceptance tests prove use-case behavior. Journey tests prove that connected use cases produce the release outcome.
+
+### Authority and links
+
+What should happen follows constraint, product, requirement, rule, then use case. A decision explains a choice and is replaced, never edited. Research, examples, and prose carry no authority.
+
+What is true today comes from code, screens, and test runs. A mismatch between the two is a defect, assigned to the owner of the higher record. A failing test does not settle intent.
+
+When two records at one level disagree, the one whose decision was approved later wins; otherwise their shared owner decides.
+
+Written links live on the record named first: a decision decides a requirement, a rule fulfils one, a use case raises an event. The model builder computes implements, calls, and proves from code, routes, and test runs.
+
+| Link | From | To |
+|:---|:---|:---|
+| decides | decision | requirement, feature, rule |
+| based on | decision, requirement, rule | constraint, research |
+| affects | problem | actor |
+| solves | feature | problem |
+| fulfils | rule, use case, journey | requirement |
+| governs | rule | business record, use case |
+| returns | use case | result |
+| illustrates | case | result |
+| raises | use case | event |
+| reacts to | use case | event |
+| holds at scope | actor | role |
+| allows | role | permission |
+| needs | use case | permission |
+| reached through | use case | entry point |
+| uses | any record | term |
+| replaces | record | the record it replaces |
+| depends on | module | module |
+| implements (computed) | code | use case, rule, event |
+| calls (computed) | screen | use case |
+| proves (computed) | test | case |
+
+### Record catalog
+
+Every record has an owner and a status: draft, approved, or retired, with a decider and a decide-by date while it is a draft.
+
+| Record | Home |
+|:---|:---|
+| product | `docs/product/brief.md` |
+| constraint | `docs/product/constraints/` |
+| research | `docs/research/` |
+| decision | `docs/product/decisions/` |
+| requirement | product topic pages |
+| problem | `docs/product/problems/` |
+| feature | `docs/product/features/` |
+| actor | `docs/domain/actors/` |
+| role | `docs/domain/roles/` |
+| permission | `docs/domain/permissions.md` |
+| journey | `docs/product/journeys/` |
+| module | `docs/domain/modules/<module>/README.md` |
+| business record | module page folders |
+| rule | its home page |
+| use case | business-record folders |
+| result, case, event | entries in their pages |
+| entry point | `docs/domain/entry-points.md` |
+| limit | `docs/operations/limits.md` |
+| runbook | `docs/runbooks/` |
+| exception | `docs/exceptions/` |
+| known gap | `docs/known-gaps/` |
+| term | `docs/language.json` |
+
+### Entry points
+
+People and systems reach the product through entry points. An entry point is a web app, a public API, a CLI, an MCP server, a site, a reaction, or a job.
+
+The model builder computes which screens call which use case from routes and generated clients.
 
 ### Scenario and reference cast
 
-A scenario is one concrete occasion for the subject of a specification: who acts, what surrounds them, and what they would do instead. It answers when the behavior happens, which no rule, state, or mapping table states.
+A scenario is one concrete occasion for the subject of a record: who acts, what surrounds them, and what they would do instead. It answers when the behavior happens, which no rule, state, or mapping table states.
 
 A reference cast is the one record every scenario draws its people, place, dates, and amounts from. Independent scenarios invent a merchant and a customer for each page, so nothing carries between two pages read in sequence.
 
@@ -230,217 +282,162 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 ## Standards
 
-
 ### Keep decision authority with accountable people (standards/rule/core-system.keep-decision-authority-with-accountable-people)
 
-**Requirement:** An agent MUST stop affected work and record the question when an unknown fact changes behavior, authorization, money movement, data handling, or recovery.
+**Requirement:** An agent MUST stop affected work and record the question in a draft decision when an unknown fact changes behavior, money, data, access, or recovery.
 
 **Rationale:** Decision owners approve outcomes, terms, policies, criteria, commitments, and risk. An agent contribution stays a proposal until an accountable person accepts it.
 
-### Drive work from approved specifications (standards/rule/core-system.drive-work-from-approved-specifications)
+### Drive work from approved records (standards/rule/core-system.drive-work-from-approved-specifications)
 
-**Requirement:** An agent MUST start behavior work from the approved product, flow, module, and use-case specifications rather than from a prompt alone.
+**Requirement:** An agent MUST start behavior work from the approved use-case and module records, plus the product and journey records when they exist for the behavior.
 
-**Rationale:** A prompt, ticket, chat message, or code comment can initiate work. The owning specification records the approved behavior, and code does not silently replace it.
+**Rationale:** A prompt, ticket, chat message, or code comment can initiate work. The owning record holds the approved behavior, and code does not silently replace it.
 
-### Connect one product outcome through an end-to-end flow (standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow)
+### Resolve authority by ladder (standards/rule/core-system.resolve-authority-by-ladder)
 
-**Requirement:** An end-to-end flow MUST link its use-case specifications without repeating their inputs, rules, failures, or acceptance criteria.
+**Requirement:** What should happen follows constraint, then product, requirement, rule, and use case in that order. Every record carries an owner.
 
-**Rationale:** A flow can cross modules and include branches, waiting, failure, and recovery. Its tests use `E2E-{FLOW}-{NN}`, and a verified flow has at least one passing deployed test.
+**Rationale:** The ladder settles ties without a meeting; the owner answers for each record.
+
+### Write each record in its catalog shape (standards/rule/core-system.write-each-record-in-its-catalog-shape)
+
+**Requirement:** Every written record MUST use its catalog type, identifier form, home, owner, and status.
+
+**Rationale:** One shape per type lets the model builder read every record the same way.
+
+### Declare each link on its source (standards/rule/core-system.declare-each-link-on-its-source)
+
+**Requirement:** Every written link MUST live on the record the link table names first, and every citation MUST resolve to a written record.
+
+**Rationale:** Links on the source keep each record readable alone; resolving citations keep the graph whole.
+
+### Connect one product outcome through a journey (standards/rule/core-system.connect-one-product-outcome-through-a-journey)
+
+**Requirement:** A journey MUST link its use-case records without repeating their inputs, rules, refusals, or results. Every public use case MUST sit in at least one journey or name its background caller.
+
+**Rationale:** A journey can cross modules and include branches, waiting, failure, and recovery. Its tests prove the connected outcome through public boundaries.
 
 ### Group language and use cases by module (standards/rule/core-system.group-language-and-use-cases-by-module)
 
-**Requirement:** A module name MUST be identical across documentation, Domain and Application folders, endpoint groups, frontend features, tests, and acceptance identifiers.
+**Requirement:** A module name MUST be identical across documentation, Domain and Application folders, endpoint groups, frontend features, tests, and record identifiers.
 
 **Rationale:** A module is a navigation and ownership boundary. It defines no transaction boundary and needs no runtime `Module` or `IModule` type.
 
-### Make aggregate ownership explicit (standards/rule/core-system.make-aggregate-ownership-explicit)
+### Make business-record ownership explicit (standards/rule/core-system.make-aggregate-ownership-explicit)
 
-**Requirement:** A module specification MUST map each aggregate to the state it owns, its invariants, and the commands that change it.
+**Requirement:** A module page MUST map each business record to the state it owns, its rules, and the commands that change it. A command MUST change one business record unless an approved record names the rule that demands more.
 
-**Rationale:** A command normally changes one aggregate. Changing several atomically requires an approved record naming the invariant or domain policy that demands it.
+**Rationale:** One record per command keeps each transaction boundary visible.
 
 ### Deliver one complete use case (standards/rule/core-system.deliver-one-complete-use-case)
 
-**Requirement:** A use case MUST map to one top-level Command or Query and reach `verified` only when every layer and its evidence are complete.
+**Requirement:** A use case MUST map to one top-level Command or Query. It is complete only with Domain behavior, Application coordination, persistence, entry points, automated evidence, and operating impact.
 
-**Rationale:** Multi-step product outcomes belong to an end-to-end flow, and autonomous multi-transaction progress belongs to a workflow. Placeholder work leaves the use case `planned`.
+**Rationale:** Multi-step product outcomes belong to a journey. Placeholder work leaves the use case unimplemented.
 
-**Example:** A use case whose handler throws `NotImplementedException` stays `planned`.
+**Example:** A use case whose handler throws `NotImplementedException` is not implemented.
 
-### State implemented before acceptance evidence exists (standards/rule/core-system.state-implemented-before-acceptance-evidence-exists)
+### Compute use-case status from evidence (standards/rule/core-system.compute-use-case-status-from-evidence)
 
-**Requirement:** A use case whose Domain behavior, coordination, persistence, and entry point all exist without proving acceptance criteria MUST carry `implemented`.
+**Requirement:** Use-case status MUST be computed from code, screens, and test runs, never written by hand. A use case is implemented when code implements it, and verified when every one of its cases is proved by a passing test.
 
-**Rationale:** `planned` and `verified` describe the two ends. Working code with unproven acceptance criteria is the ordinary middle state, and leaving it undefined makes the value a matter of taste.
+**Rationale:** Computed status cannot drift from what the repository proves.
 
 **Example:** Aligned identifiers and implementation names have this shape:
 
 ```text
-Use case:       orders.cancel-order
-Command:        CancelOrderCommand
-Result:         CancelOrderCommandResult
-Handler:        CancelOrderCommandHandler
-Aggregate call: Order.Cancel
-Event reference: orders.order-cancelled
-Event type:     OrderCancelled
-Endpoint:       CancelOrderEndpoint
-Acceptance ID:  AC-ORDERS-CANCEL-ORDER-01
+Use case: use-case/orders.cancel-order
+Command:  CancelOrderCommand
+Result:   result/cancel-order.order-cancelled
+Case:     case/cancel-order.cancelling-twice-is-refused
+Event:    event/order.cancelled
+Endpoint: CancelOrderEndpoint
 ```
 
-A use case reaches `verified` only after Domain behavior, coordination, persistence, entry points, evidence, and operating impact are complete. Placeholder work leaves the use case `planned`.
+### Keep use cases and handlers in one-to-one correspondence (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)
 
-### Keep specifications and use cases in one-to-one correspondence (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)
+**Requirement:** Every handler MUST resolve to exactly one use case, by the folder rule or one `implements` anchor. Every use case MUST resolve back to its handler.
 
-**Requirement:** Every implemented use case MUST resolve to exactly one use-case specification that resolves back to it.
+**Rationale:** Neither direction is visible without the check. Code with no use case reads as a reviewed feature and is not one. A use case with no code states a plan in the present tense.
 
-**Rationale:** Neither direction is visible without the check. Code with no specification reads as a reviewed feature and is not one. A specification with no code states a plan in the present tense.
-
-**Example:** `node standards/tools/validate-parity.mjs` reports both directions.
-
-```text
-FAIL (2 problem(s)):
-  - handler with no specification: Application/Sales/Vouchers/RedeemVoucher -> sales.redeem-voucher
-  - specification with no handler: docs/domain/modules/sales/vouchers/void-voucher.md
-```
+**Example:** `dotnet run --project tools/model/Litenova.Model -- query use-case/orders.cancel-order` shows the handler the folder rule resolves.
 
 ### Name what calls a use case (standards/rule/core-system.name-what-calls-a-use-case)
 
-**Requirement:** An `implemented` or `verified` use-case specification MUST name every declared surface that invokes it, or state `None` with the reason no surface does.
+**Requirement:** A use case MUST declare the entry points it is reached through, or name its background caller with the reason no entry point reaches it.
 
 **Rationale:** A route calls use cases from its code, so the edge runs one way. Nothing answers the question asked before a change: who breaks if this operation moves. A use case reached only by a schedule or a reaction has a real answer. Writing it down separates it from one nobody wired up.
 
-**Example:** A Consumers section names one surface per row, and a surface is one the project declared.
+**Example:** A use case reached only by a reaction names that reaction as its caller.
 
 ```text
-## Consumers
-
-| Surface | Consumer |
-|:---|:---|
-| web | `apps/web/app/orders/[orderId]/page.tsx` |
-| cli | `acme orders cancel` |
+"reachedThrough": ["entry-point/webshop"]
 ```
 
-### Resolve every Implementation mapping name (standards/rule/core-system.resolve-every-implementation-mapping-name)
+### Declare event reaction delivery (standards/rule/core-system.declare-event-reaction-delivery)
 
-**Requirement:** Every code name an Implementation mapping states MUST resolve to a declared type, a member of one, a project, or an existing path.
+**Requirement:** A use case that reacts to an event MUST declare exactly one delivery classification, and its implementation MUST deliver with that classification. A reaction MUST NOT declare `best-effort-optional` when a record needs its effect.
 
-**Rationale:** The mapping is the only part of a specification that points at code, and nothing else in the page fails when the code moves. A renamed handler leaves a page that reads correctly and names an artifact that no longer exists. That is worse than a page with no mapping. A row that names no artifact writes `None`.
+**Rationale:** The classification tells the reader what a failure costs: rollback, retry, rebuild, or loss.
 
-**Example:** A mapping row states its target in a code span, and each span resolves.
+### State each rule with its kind (standards/rule/core-system.state-each-rule-with-its-kind)
 
-```text
-| Handler | `CancelOrderCommandHandler` |
-| Aggregate method | `Order.Cancel` |
-| Entry Point | `POST /api/orders/{orderId}:cancel` (`CancelOrderEndpoint`) |
-| Automated tests | `Acme.Integration.Tests` |
-```
+**Requirement:** Each rule MUST state its kind, what it governs, and where it is enforced. A rule whose statement says not, no, never, or cannot MUST keep that word in its name.
 
-`CancelOrderCommandHandler` resolves as a declared type, `Order.Cancel` as a member of one, `CancelOrderEndpoint` as a declared type, and `Acme.Integration.Tests` as a project. The route carries a path rather than an identifier. It is read as a route and resolved by the entry-point checks.
+**Rationale:** The kind decides the proof; the name lets a reviewer read the rule as a true sentence.
 
-### Name the handler an implemented use case owns (standards/rule/core-system.name-the-handler-an-implemented-use-case-owns)
+**Example:** `rule/order.cancel-only-before-shipment` is a checked-before rule enforced by the validator.
 
-**Requirement:** The Implementation mapping of an `implemented` or `verified` use case MUST name the handler its operation folder declares.
+### Grant access through roles and permissions (standards/rule/core-system.grant-access-through-roles-and-permissions)
 
-**Rationale:** `standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence` proves that a handler and a page exist for each other. It does not prove that the page names that handler. A page can satisfy parity while its mapping points at the handler of a use case somebody split in two. Naming the derived handler is what makes the mapping fail on the rename rather than after it.
+**Requirement:** An actor MUST hold a role at a scope to act; a role MUST allow each permission its holders exercise. A use case MUST declare the permissions it needs, and an entry point MUST offer each permission it exercises.
 
-**Example:** `apps/api/src/Acme.Application/Orders/Orders/CancelOrder/CancelOrderCommandHandler.cs` obliges `docs/domain/modules/orders/orders/cancel-order.md` to state `CancelOrderCommandHandler` in its Implementation mapping.
+**Rationale:** The chain gives every access decision one path to audit: actor, role, permission, use case.
 
-### Specify autonomous progress as a workflow (standards/rule/core-system.specify-autonomous-progress-as-a-workflow)
+### Model every business-record lifecycle with state records (standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records)
 
-**Requirement:** A workflow specification MUST name its owner, participating modules, starting fact, completion and failure conditions, durable state, commands, awaited events, retries, and operator actions.
+**Requirement:** A business-record page MUST map every business state to a sealed state record under one abstract state base.
 
-**Rationale:** System-controlled progress crossing a transaction or time boundary needs each of these. Branches inside one atomic command stay in the use-case handler.
+**Rationale:** This holds from the first implementation, including a record with one current state. An enum, status string, boolean flag, or computed discriminator cannot carry state-specific facts.
 
-### Record events and event reactions separately (standards/rule/core-system.record-events-and-event-reactions-separately)
+### State one occasion for every behavior record (standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
 
-**Requirement:** An event reaction MUST declare one delivery classification of `atomic`, `durable`, `rebuildable`, or `best-effort-optional`.
-
-**Rationale:** A required projection refresh is never `best-effort-optional`. Domain events are internal facts, and integration events are versioned contracts leaving the context.
-
-### Classify domain rules by enforcement boundary (standards/rule/core-system.classify-domain-rules-by-enforcement-boundary)
-
-**Requirement:** A domain rule ID MUST carry the prefix of its enforcement classification, keeping that number for the life of the rule.
-
-**Rationale:** The classifications are aggregate invariant, domain policy, validation rule, authorization policy, persistence constraint, and workflow rule. A failure code is not a domain rule ID.
-
-### Model every aggregate lifecycle with state records (standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records)
-
-**Requirement:** An aggregate specification MUST map every business state to a sealed state record under one abstract `{Aggregate}State` base.
-
-**Rationale:** This holds from the first implementation, including an aggregate with one current state. An enum, status string, boolean flag, or computed discriminator cannot carry state-specific facts.
-
-### State one occasion for every behavior specification (standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
-
-**Requirement:** A module, aggregate, use-case, domain-policy, or end-to-end-flow specification MUST carry a `Scenario` section stating one concrete occasion for its subject.
+**Requirement:** A module, business-record, use-case, or journey page MUST carry a `Scenario` section stating one concrete occasion for its subject.
 
 **Rationale:** Every other section states a rule, a state, or a mapping. None of them says when the behavior happens, or who is under pressure while it does. A reader who cannot place an operation in the world reads its rules as arbitrary constraints. An agent writing against it cannot tell an ordinary case from an exceptional one.
 
-**Example:** A warehouse scan specification states the hour, the parcel queue, and the handheld that lost signal before it states its failure codes.
+**Example:** A warehouse scan page states the hour, the parcel queue, and the handheld that lost signal before it states its failure codes.
 
 ### Keep a scenario informative (standards/rule/core-system.keep-a-scenario-informative)
 
-**Requirement:** A `Scenario` section MUST NOT contain a domain rule, acceptance, or end-to-end identifier.
+**Requirement:** A `Scenario` section MUST NOT contain a record identifier.
 
-**Rationale:** An identifier inside a scenario reads as a second definition of the rule it names, and two definitions drift. The section illustrates the page, so a scenario that contradicts the page's own tables is the part that is wrong.
+**Rationale:** An identifier inside a scenario reads as a second definition of the record it names, and two definitions drift. The section illustrates the page, so a scenario that contradicts the page's own tables is the part that is wrong.
 
-**Example:** A scenario says Alex is refused because the last unit went to somebody else, and the rules table says `INV-INVENTORY-01`.
+**Example:** A scenario says Alex is refused because the last unit went to somebody else, and the rules table carries the rule.
 
 ### Derive every scenario from one reference cast (standards/rule/core-system.derive-every-scenario-from-one-reference-cast)
 
-**Requirement:** A consumer MUST record one `scenario-cast` specification and draw the people, place, dates, and amounts of every `Scenario` section from it.
+**Requirement:** A consumer MUST record one `scenario-cast` page and draw the people, place, dates, and amounts of every `Scenario` section from it.
 
-**Rationale:** One cast makes a sequence of pages describe one occasion rather than many unrelated illustrations. The reader carries context from each page to the next. The cast costs nothing to maintain because it names no code, and its figures come from the specifications.
+**Rationale:** One cast makes a sequence of pages describe one occasion rather than many unrelated illustrations. The reader carries context from each page to the next. The cast costs nothing to maintain because it names no code, and its figures come from the records.
 
-**Example:** Alex, the customer who places the order in one specification, is the person who receives the shipment in another.
+**Example:** Alex, the customer who places the order in one record, is the person who receives the shipment in another.
 
-### Declare Specification Metadata (standards/rule/core-system.declare-specification-metadata)
+### Update records with behavior (standards/rule/core-system.update-specifications-with-behavior)
 
-**Requirement:** A structured specification MUST open with one JSON metadata block declaring at least `kind`, `id`, `specStatus`, `owner`, and `lastReviewed`.
+**Requirement:** An observable behavior change MUST update its use-case page, implementation, tests, generated contracts, product citation, decision, journey, and operating records together.
 
-**Rationale:** A behavior specification also declares `implementationStatus`. An index, decision, evidence, limits, or policy record declares none, because it claims no implemented behavior.
-
-### Select extensions before applying them (standards/rule/core-system.select-extensions-before-applying-them)
-
-**Requirement:** A local extension MUST appear in `applicableExtensions` only on a specification kind that its manifest entry allows.
-
-**Rationale:** `selectedExtensions` in `standards.project.json` is the project allow-list, and selection alone permits dependencies and structure.
-
-### Exclude a project-scoped extension from local metadata (standards/rule/core-system.exclude-a-project-scoped-extension-from-local-metadata)
-
-**Requirement:** A project-scoped extension MUST NOT appear in the `applicableExtensions` list of any specification.
-
-**Rationale:** Selection in `standards.project.json` already applies it everywhere, so a local listing implies a scope it does not have.
-
-### Give acceptance criteria stable ownership (standards/rule/core-system.give-acceptance-criteria-stable-ownership)
-
-**Requirement:** An acceptance criterion identifier MUST use `AC-{MODULE}-{USE-CASE}-{NN}` with segments matching its owning use-case identifier.
-
-**Rationale:** The numeric suffix starts at `01` and uses two digits. An acceptance test cites the identifier without redefining its text.
-
-**Example:** One owning use-case specification can define a criterion:
-
-```text
-[AC-ORDERS-CANCEL-ORDER-01] An authorized customer can cancel an unpaid order.
-```
-
-Acceptance tests reference the ID without redefining its text. A static documentation check proves that the reference exists. A passing test provides execution evidence.
-
-### Update specifications with behavior (standards/rule/core-system.update-specifications-with-behavior)
-
-**Requirement:** An observable behavior change MUST update its use-case specification, implementation, tests, generated contracts, affected flow, workflow, and operating records together.
-
-**Rationale:** Approved metadata then maps to current names and paths. A retired specification never remains a public entry point.
+**Rationale:** Approved records then map to current names and paths.
 
 ## Conventions
-
 
 ### Use this consumer documentation layout (standards/rule/core-system.use-this-consumer-documentation-layout)
 
 **Default:** Use the consumer documentation layout in this section, creating a directory only when its first real artifact exists.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
 **Example:**
 
@@ -449,95 +446,107 @@ docs/
   product/
     README.md
     brief.md
-    flows/
-      order-checkout.md
     business/
       pricing.md
+    markets/
+      expansion.md
     roadmap/
       milestones.md
     decisions/
-      0001-monthly-plan.md
+      0047-guest-checkout.md
+    problems/
+      abandoned-carts-lose-sales.md
+    features/
+      guest-checkout.md
+    journeys/
+      check-out-as-a-guest.md
+    constraints/
+      payment-card-rules.md
   domain/
     README.md
     glossary.md
     scenarios.md
+    actors/
+      buyer.md
+    roles/
+      shop-manager.md
+    permissions.md
+    entry-points.md
+    rules/
+      pricing-rules.md
     modules/
       README.md
       orders/
         README.md
-        cancel-order.md
-      customers/
-        README.md
-        customer-accounts/
-          claim-guest-order.md
-        consents/
-          grant-consent.md
-    workflows/
-      order-fulfillment.md
-    policies/
-      refund-limit.md
-  tools/
-    README.md
-    configuration.md
-    project-up.md
-  reference/
-  guide/
-  decisions/
+        orders/
+          README.md
+          cancel-order.md
+  research/
+    address-lookup-providers.md
   operations/
     limits.md
     security-and-privacy.md
   runbooks/
+    restore-a-backup.md
+  exceptions/
+    temporary-direct-database-read.md
+  known-gaps/
+    checkout-cases-unproved.md
+  tools/
+    README.md
+    configuration.md
+  reference/
+  guide/
   releases/
-  research/
 ```
 
-`product/` holds the brief, the end-to-end flows, and the business intent: one topic page per area and the product decisions behind them. The [product intent standard](product.md) owns its shape. `decisions/` at the root holds standards override decisions only.
+`product/` holds the brief, the journeys, and the business intent: one topic page per area with its requirements, and the product decisions behind them. `domain/` holds the actors, roles, permissions, entry points, rules, and modules; the glossary renders from the term records.
 
 `tools/` holds one command page for each command the repository ships, beside the configuration page that owns every setting a reader can change. `reference/` holds the pages a reader looks up rather than reads. `guide/` holds the tutorial and the how-to pages, which name those commands rather than the mechanism beneath them.
 
 The example creates an optional directory only when its first real artifact is added. The example does not create empty directories or placeholder records during inception.
 
-### Group module use-case files by aggregate root (standards/rule/core-system.group-module-use-case-files-by-aggregate-root)
+### Group module use-case files by business record (standards/rule/core-system.group-module-use-case-files-by-aggregate-root)
 
-**Default:** Group module use-case files under a plural kebab-case aggregate subdirectory, each holding one `kind: aggregate` README, including a module with one aggregate root.
+**Default:** Group module use-case files under a plural kebab-case business-record subdirectory, each holding that record's page, including a module with one business record.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** A module README carries `kind: module`, and one file cannot carry two kinds. A flat module therefore has nowhere to put the aggregate specification that `standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `{module}.{name}`, so only the directory changes.
+**Rationale:** A module page cannot carry the business-record page that `standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `use-case/<module>.<name>`, so only the directory changes.
 
 ### Keep operational and security references under operations (standards/rule/core-system.keep-operational-and-security-references-under-operations)
 
-**Default:** Keep operating and security reference prose under `docs/operations/`, with `limits.md` as its only structured record.
+**Default:** Keep operating and security reference prose under `docs/operations/`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** Enforceable security and privacy rules still belong to their owning use-case authorization sections and domain policies.
+**Rationale:** Enforceable security and privacy rules still belong to their owning use-case sections and rules.
 
 ### Use established technical terms (standards/rule/core-system.use-established-technical-terms)
 
-**Default:** Use aggregate, invariant, Command, Query, repository, projection, outbox, idempotency, transaction, and orchestrator with their accepted technical meanings.
+**Default:** Use business record, aggregate, Command, Query, repository, projection, outbox, idempotency, and transaction with their accepted technical meanings.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
 **Rationale:** Replacing a precise term with a softer synonym hides the established pattern. Explain the term and give an example instead.
 
 ### Use ordinary capitalization in prose (standards/rule/core-system.use-ordinary-capitalization-in-prose)
 
-**Default:** Write module, use case, workflow, aggregate, invariant, event, and policy as ordinary nouns in prose.
+**Default:** Write module, use case, journey, business record, rule, event, and decision as ordinary nouns in prose.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** Exact schema kinds and code types keep their declared capitalization, so the distinction stays meaningful.
+**Rationale:** Exact record types and code types keep their declared capitalization, so the distinction stays meaningful.
 
-### Keep specifications readable without tooling (standards/rule/core-system.keep-specifications-readable-without-tooling)
+### Keep records readable without tooling (standards/rule/core-system.keep-specifications-readable-without-tooling)
 
-**Default:** Use JSON only for the metadata block, and write outcomes, rules, failures, examples, and mappings in Markdown.
+**Default:** Use JSON only for the frontmatter block, and write rules, results, cases, and examples in Markdown.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** A specification that needs tooling to read stops being reviewable by the person who owns its decisions.
+**Rationale:** A record that needs tooling to read stops being reviewable by the person who owns its decisions.
 
-### Bound a scenario to one paragraph (standards/rule/core-system.bound-a-scenario-to-one-paragraph)
+### Bound a scenario to 120 words (standards/rule/core-system.bound-a-scenario-to-one-paragraph)
 
 **Default:** Keep a `Scenario` section within 120 words.
 
@@ -547,46 +556,42 @@ The example creates an optional directory only when its first real artifact is a
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow`, `standards/rule/core-system.specify-autonomous-progress-as-a-workflow`, and `standards/rule/core-system.record-events-and-event-reactions-separately`.
+This informative example demonstrates `standards/rule/core-system.connect-one-product-outcome-through-a-journey`, `standards/rule/core-system.declare-event-reaction-delivery`, and `standards/rule/core-system.make-aggregate-ownership-explicit`.
 
-The `order-checkout` end-to-end flow links `catalog.reserve-stock`, `orders.create-order`, `payments.start-payment`, and `shipping.dispatch-shipment`. The `payment-fulfillment` workflow begins with provider confirmation, issues one stock confirmation Command, awaits its event, and then issues the shipment Command. Each Command owns one transaction. `E2E-ORDER-CHECKOUT-01` verifies the connected outcome through the deployed API.
+The `journey/checkout` journey links `use-case/catalog.reserve-stock`, `use-case/orders.create-order`, `use-case/payments.start-payment`, and `use-case/shipping.dispatch-shipment`. Order cancellation and payment reconciliation are separate journeys.
 
-The Orders module contains `Order` and `OrderClaim`. `orders.cancel-order` changes `Order` and cites `INV-ORDERS-01`. `orders.claim-guest-order` changes `OrderClaim` and cites `INV-ORDERS-04`. Their shared module name does not merge their transaction boundaries.
+The orders module contains `Order` and `OrderClaim`. `use-case/orders.cancel-order` changes `Order` and cites `rule/order.cancel-only-before-shipment`. `use-case/orders.claim-guest-order` changes `OrderClaim`. Their shared module name does not merge their transaction boundaries.
 
-`OrderConfirmed` records a completed fact. `Dispatch shipment` is its event reaction. A durable `OrderFulfillmentWorkflowOrchestrator` may implement that reaction by issuing `DispatchShipmentCommand`. The specification does not require a class named `DispatchShipmentReaction`.
+`OrderConfirmed` records a completed fact. `Dispatch shipment` is its event reaction, declared durable. The page does not name the class that runs it.
 
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-system.keep-decision-authority-with-accountable-people | inspection | The change report names the recorded question and the accountable person for each unresolved decision. |
-| standards/rule/core-system.drive-work-from-approved-specifications | inspection | The change report cites the approved specification that authorized each behavior change. |
-| standards/rule/core-system.connect-one-product-outcome-through-an-end-to-end-flow | inspection | `node standards/tools/validate-consumer.mjs` resolves each flow use case to its file and rejects a duplicate end-to-end identifier. |
-| standards/rule/core-system.group-language-and-use-cases-by-module | inspection | `node standards/tools/validate-consumer.mjs` resolves each module reference to one declared module directory. |
-| standards/rule/core-system.make-aggregate-ownership-explicit | inspection | The module specification carries an aggregate table naming owned state, invariant identifiers, and commands. |
-| standards/rule/core-system.deliver-one-complete-use-case | inspection | `node standards/tools/validate-consumer.mjs` resolves each use-case identifier to one operation type and its declared entry points. |
-| standards/rule/core-system.state-implemented-before-acceptance-evidence-exists | inspection | Each `implemented` use case resolves to existing Domain, Application, persistence, and entry-point code with no acceptance test. |
-| standards/rule/core-system.name-what-calls-a-use-case | static | `node standards/tools/validate-consumer.mjs` reports an implemented use case with no Consumers section, an unexplained `None`, or an undeclared surface. |
-| standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence | static | `node standards/tools/validate-parity.mjs` reports no handler without a specification and no specification without a handler. |
-| standards/rule/core-system.resolve-every-implementation-mapping-name | static | `node standards/tools/validate-parity.mjs` reports each Implementation mapping name that resolves to no declaration, member, project, or path. |
-| standards/rule/core-system.name-the-handler-an-implemented-use-case-owns | static | `node standards/tools/validate-parity.mjs` reports each implemented use case whose Implementation mapping omits its derived handler. |
-| standards/rule/core-system.specify-autonomous-progress-as-a-workflow | inspection | `node standards/tools/validate-consumer.mjs` resolves each workflow module reference and the template requires the named sections. |
-| standards/rule/core-system.record-events-and-event-reactions-separately | inspection | The owning specification records one delivery classification for each event reaction. |
-| standards/rule/core-system.classify-domain-rules-by-enforcement-boundary | inspection | `node standards/tools/validate-consumer.mjs` rejects a domain rule ID whose prefix does not match its declared classification. |
-| standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records | inspection | The aggregate specification carries a state mapping table, and `ArchitectureTests` asserts the code matches it. |
-| standards/rule/core-system.state-one-occasion-for-every-behavior-specification | static | `node standards/tools/validate-consumer.mjs` fails a module, aggregate, use-case, domain-policy, or end-to-end-flow page carrying no `Scenario` section. |
-| standards/rule/core-system.keep-a-scenario-informative | static | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section containing an `INV-`, `POL-`, `VAL-`, `AC-`, or `E2E-` identifier. |
-| standards/rule/core-system.derive-every-scenario-from-one-reference-cast | static | `node standards/tools/validate-consumer.mjs` fails a documentation set holding no `scenario-cast` specification or more than one. |
-| standards/rule/core-system.declare-specification-metadata | inspection | `node standards/tools/validate-consumer.mjs` validates each metadata block against `schemas/specification-metadata.schema.json`. |
-| standards/rule/core-system.select-extensions-before-applying-them | inspection | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension in local metadata and a local extension on an excluded kind. |
-| standards/rule/core-system.exclude-a-project-scoped-extension-from-local-metadata | static | `node standards/tools/validate-consumer.mjs` rejects a project-scoped extension listed in local metadata. |
-| standards/rule/core-system.give-acceptance-criteria-stable-ownership | inspection | `node standards/tools/validate-consumer.mjs` rejects a duplicate acceptance identifier and one whose segments miss its use case. |
-| standards/rule/core-system.update-specifications-with-behavior | inspection | The change report links each changed implementation surface to the records updated in the same change. |
-| standards/rule/core-system.use-this-consumer-documentation-layout | inspection | Documentation tree review compares the consumer layout against this section, or records a named local replacement. |
-| standards/rule/core-system.group-module-use-case-files-by-aggregate-root | inspection | `node standards/tools/validate-consumer.mjs` resolves each use case in its module or one aggregate subdirectory. |
-| standards/rule/core-system.keep-operational-and-security-references-under-operations | inspection | Documentation review confirms operating and security prose resolves under `docs/operations/`. |
-| standards/rule/core-system.use-established-technical-terms | inspection | Terminology review compares each new term against the glossary and this list. |
-| standards/rule/core-system.use-ordinary-capitalization-in-prose | inspection | Prose review confirms ordinary nouns outside sentence starts, titles, and exact identifiers. |
-| standards/rule/core-system.keep-specifications-readable-without-tooling | inspection | Specification review confirms JSON appears only in the opening metadata block. |
-| standards/rule/core-system.bound-a-scenario-to-one-paragraph | static | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |
+| standards/rule/core-system.keep-decision-authority-with-accountable-people | guidance | Which draft decision records each question that stopped the work? |
+| standards/rule/core-system.drive-work-from-approved-specifications | guidance | Which approved records authorized each behavior change? |
+| standards/rule/core-system.resolve-authority-by-ladder | guidance | Which ladder settles the conflict, and which record lacks an owner? |
+| standards/rule/core-system.write-each-record-in-its-catalog-shape | guidance | Which record breaks its catalog type, home, owner, or status? |
+| standards/rule/core-system.declare-each-link-on-its-source | guidance | Which link sits off its source, and which citation resolves nowhere? |
+| standards/rule/core-system.connect-one-product-outcome-through-a-journey | guidance | Which journey links the use case, or which background caller replaces it? |
+| standards/rule/core-system.group-language-and-use-cases-by-module | checkable | `node standards/tools/validate-consumer.mjs` resolves each module reference to one declared module directory. |
+| standards/rule/core-system.make-aggregate-ownership-explicit | guidance | Which business record lacks its state, rules, or commands on the module page? |
+| standards/rule/core-system.deliver-one-complete-use-case | guidance | Which layer or evidence does the incomplete use case still lack? |
+| standards/rule/core-system.compute-use-case-status-from-evidence | guidance | Which use-case status did a hand write instead of the evidence? |
+| standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence | guidance | Which handler lacks its use case, or which use case lacks its handler? |
+| standards/rule/core-system.name-what-calls-a-use-case | guidance | Which entry points reach the use case, or which background caller does? |
+| standards/rule/core-system.declare-event-reaction-delivery | guidance | Which reaction lacks exactly one classification the implementation honors? |
+| standards/rule/core-system.state-each-rule-with-its-kind | guidance | Which rule lacks its kind, governor, enforcement, or kept negation? |
+| standards/rule/core-system.grant-access-through-roles-and-permissions | guidance | Which act lacks its actor, role, permission, and use-case path? |
+| standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records | guidance | Which business state lacks its sealed state record in page and code? |
+| standards/rule/core-system.state-one-occasion-for-every-behavior-specification | checkable | `node standards/tools/validate-consumer.mjs` fails a behavior page carrying no `Scenario` section. |
+| standards/rule/core-system.keep-a-scenario-informative | checkable | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section containing a record identifier. |
+| standards/rule/core-system.derive-every-scenario-from-one-reference-cast | checkable | `node standards/tools/validate-consumer.mjs` fails a documentation set with no or several `scenario-cast` pages; the reviewer confirms each scenario draws from it. |
+| standards/rule/core-system.update-specifications-with-behavior | guidance | Which affected record did the behavior change leave behind? |
+| standards/rule/core-system.use-this-consumer-documentation-layout | guidance | Which directory breaks the layout without a declared exception? |
+| standards/rule/core-system.group-module-use-case-files-by-aggregate-root | checkable | `node standards/tools/validate-consumer.mjs` resolves each use case to its module or one business-record subdirectory. |
+| standards/rule/core-system.keep-operational-and-security-references-under-operations | guidance | Which operating or security prose sits outside `docs/operations/`? |
+| standards/rule/core-system.use-established-technical-terms | guidance | Which term replaces an established technical meaning with a softer synonym? |
+| standards/rule/core-system.use-ordinary-capitalization-in-prose | guidance | Which ordinary noun carries capitalization outside names and identifiers? |
+| standards/rule/core-system.keep-specifications-readable-without-tooling | guidance | Which JSON sits outside the frontmatter block? |
+| standards/rule/core-system.bound-a-scenario-to-one-paragraph | checkable | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |

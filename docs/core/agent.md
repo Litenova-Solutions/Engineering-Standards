@@ -1,65 +1,56 @@
-# Agent Operating Protocol
+# Agent operating protocol
 
 ## Intent
 
-This protocol controls how agents select context, resolve standards, preserve user work, and report completion. It keeps detailed conventions available without loading every document.
+This protocol controls how agents select context, resolve standards, preserve user work, and report completion. Agents query the project model for the records a task needs, and read the generated agent context first.
 
-## Agent Summary {#agent-summary}
+## Agent summary {#agent-summary}
 
-- Select the narrowest applicable task context. (standards/rule/core-agent.select-task-context, standards/rule/core-agent.load-context-by-tier)
-- Read active use cases before behavior changes. (standards/rule/core-agent.load-applicable-extensions)
-- Apply declared guidance precedence. (standards/rule/core-agent.apply-guidance-precedence)
-- Stop and quote unresolved conflicts. (standards/rule/core-agent.stop-on-unresolved-conflict)
+- Query the model for the records the task needs. (standards/rule/core-agent.select-task-context)
+- Skip the query only for a change that adds no surface. (standards/rule/core-agent.follow-the-local-pattern-before-the-model-query)
+- Load selected extensions before editing inside their boundary. (standards/rule/core-agent.load-applicable-extensions)
+- Apply guidance in precedence order. (standards/rule/core-agent.apply-guidance-precedence)
+- Replace a convention only through a declared exception. (standards/rule/core-agent.replace-only-declared-conventions)
+- Stop and quote conflicts nothing resolves. (standards/rule/core-agent.stop-on-unresolved-conflict)
 - Preserve unrelated work and side-effect boundaries. (standards/rule/core-agent.inspect-existing-work-before-editing, standards/rule/core-agent.restrict-unapproved-side-effects)
-- Update behavior records with implementation. (standards/rule/core-agent.update-behavior-records-with-code)
-- Report exact verification evidence. (standards/rule/core-agent.run-and-report-verification)
-- Generated records stay source material until intent states them. (standards/rule/core-agent.treat-tracked-records-as-source-material)
-- Agent working files live under one ignored-and-tracked split. (standards/rule/core-agent.keep-agent-working-files-under-agents)
-- Pattern-following changes read local context first and skip load-plan selection. (standards/rule/core-agent.follow-the-local-pattern-before-the-load-plan)
+- Make the smallest coherent change the request allows. (standards/rule/core-agent.make-coherent-scoped-changes)
+- Read the full record before generating files or changing public boundaries. (standards/rule/core-agent.escalate-from-summary-to-full-document)
+- Inspect neighboring files after loading standards. (standards/rule/core-agent.inspect-local-examples-after-standards)
+- Keep agent working files under the split the project declares. (standards/rule/core-agent.keep-agent-working-files-under-agents)
 
 ## Standards
 
 ### Select task context (standards/rule/core-agent.select-task-context)
 
-**Requirement:** An agent MUST select the active task from `loadPlans` in `standards.manifest.json` before editing.
+**Requirement:** An agent MUST query the project model for the records that cover the request, and read the generated agent context, before editing.
 
-**Rationale:** The selected task identifies the smallest standards context that covers the request.
+**Rationale:** The query returns the smallest record set that covers the request, with the links the model computed from code, screens, and test runs.
 
-### Follow the local pattern before the load plan (standards/rule/core-agent.follow-the-local-pattern-before-the-load-plan)
+**Example:** `dotnet run --project tools/model/Litenova.Model -- query use-case/orders.cancel-order` returns the use case with its rules, results, and cases.
 
-**Requirement:** A change adding no module, aggregate, frontend, dependency, or public boundary MAY skip load-plan selection after reading the consumer agent context and neighboring code.
+### Follow the local pattern before the model query (standards/rule/core-agent.follow-the-local-pattern-before-the-model-query)
 
-**Rationale:** Boundary-adding changes keep the existing requirement, because a new surface needs the full context the load plan selects.
+**Requirement:** A change that adds no module, business record, frontend, dependency, or public boundary MAY skip the model query. It reads the consumer agent context and neighboring code instead.
 
-**Example:** A handler change that follows the module pattern reads `AGENTS.md` and the sibling handler, then edits without selecting a task.
+**Rationale:** Boundary-adding changes keep the full query, because a new surface needs the context the model selects.
 
-### Load context by tier (standards/rule/core-agent.load-context-by-tier)
-
-**Requirement:** An agent MUST load Tier 0, then Tier 1, and Tier 2 when the selected task requires full guidance.
-
-**Rationale:** Tier 0 carries repository instructions, Tier 1 carries summaries, and Tier 2 carries full topic documents.
+**Example:** A handler change that follows the module pattern reads `AGENTS.md` and the sibling handler, then edits without querying the model.
 
 ### Load applicable extensions (standards/rule/core-agent.load-applicable-extensions)
 
-**Requirement:** An agent MUST load selected project extensions and selected applicable local extensions before their boundaries affect work.
+**Requirement:** An agent MUST load selected project extensions and selected applicable local extensions before editing code or prose inside the extension's boundary.
 
-**Rationale:** The implementation projects extensions apply when selected; local extensions also require the active specification kind.
-
-### Read active behavior specifications (standards/rule/core-agent.read-active-behavior-specifications)
-
-**Requirement:** An agent MUST read the active use-case specification before changing observable application behavior.
-
-**Rationale:** The specification defines accepted behavior, risks, rules, and verification context.
+**Rationale:** A selected extension applies to the whole project; a local extension applies to its own boundary.
 
 ### Apply guidance precedence (standards/rule/core-agent.apply-guidance-precedence)
 
-**Requirement:** An agent MUST apply consumer overrides, applicable extensions, selected profile conventions, and core standards in that order.
+**Requirement:** An agent MUST apply approved exceptions, applicable extensions, selected profile standards and conventions, and core standards in that order.
 
 **Rationale:** The order resolves a more local approved replacement before a broader baseline.
 
 ### Replace only declared conventions (standards/rule/core-agent.replace-only-declared-conventions)
 
-**Requirement:** An agent MAY apply a local convention replacement only when consumer documentation states that replacement directly.
+**Requirement:** An agent MAY apply a replacement for a convention only when an approved exception record declares that replacement.
 
 **Rationale:** An undocumented local preference does not replace a baseline default.
 
@@ -77,7 +68,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 ### Restrict unapproved side effects (standards/rule/core-agent.restrict-unapproved-side-effects)
 
-**Requirement:** An agent MUST NOT add packages, migrations, authentication changes, public API breaks, or external side effects without authorization.
+**Requirement:** An agent MUST NOT add packages or migrations, change authentication, break a public API, or change production data without approval. The same ban covers publishing a release, spending money, and any outside call that changes state; the task authorizer gives the approval.
 
 **Rationale:** These changes alter project boundaries beyond an ordinary implementation edit.
 
@@ -85,49 +76,23 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 **Requirement:** An agent MUST make the smallest coherent change that satisfies the authorized request.
 
-**Rationale:** A coherent change includes its required specification, code, test, and operating evidence.
-
-### Update behavior records with code (standards/rule/core-agent.update-behavior-records-with-code)
-
-**Requirement:** An agent MUST update affected product, domain, page, decision, API, test, and generated artifacts with observable behavior changes.
-
-**Rationale:** One behavior change needs current records at every affected boundary.
-
-### Run and report verification (standards/rule/core-agent.run-and-report-verification)
-
-**Requirement:** An agent MUST run applicable checks, inspect generated differences, compare results with the active use case, and report exact evidence.
-
-**Rationale:** A narrow passing test does not establish repository-wide completion.
-
-### Treat tracked records as source material (standards/rule/core-agent.treat-tracked-records-as-source-material)
-
-**Requirement:** An agent MUST treat a tracked record as source material until a product page or an approved decision states its claim.
-
-**Rationale:** A record written to survive a session reads as settled after a month. The rule keeps it readable without letting it answer what only intent or code answers.
+**Rationale:** A coherent change includes its required records, code, tests, and operating evidence.
 
 ## Conventions
 
-### Select one task label (standards/rule/core-agent.select-one-task-label)
-
-**Default:** Select the narrowest manifest task that covers the edit.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** A second task loads only when the edit crosses its boundary.
-
 ### Escalate from summary to full document (standards/rule/core-agent.escalate-from-summary-to-full-document)
 
-**Default:** Read Tier 2 before generating a file, changing a public boundary, or choosing between patterns.
+**Default:** Read the full record before generating a file, changing a public boundary, or choosing between patterns.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** A small edit matching an existing local pattern can remain at Tier 1.
+**Rationale:** A small edit matching an existing local pattern can remain at the generated agent context.
 
 ### Inspect local examples after standards (standards/rule/core-agent.inspect-local-examples-after-standards)
 
 **Default:** Inspect neighboring consumer files after loading applicable standards.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
 **Rationale:** Compliant local names and shapes provide the best implementation starting point.
 
@@ -135,7 +100,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 **Default:** Keep agent working files under `.agents/`, with tracked `skills/` and `records/` folders and ignored scratch and delegate folders.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
 **Rationale:** Generated work with no home lands beside authored records or vanishes with the session. The split keeps what survives apart from what never leaves the machine.
 
@@ -151,29 +116,23 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/core-agent.select-task-context`, `standards/rule/core-agent.read-active-behavior-specifications`, and `standards/rule/core-agent.load-applicable-extensions`.
+This informative example demonstrates `standards/rule/core-agent.select-task-context`, `standards/rule/core-agent.load-applicable-extensions`, and `standards/rule/core-agent.inspect-local-examples-after-standards`.
 
-A Command-handler change selects `backend.application`, reads its active use case, and loads selected applicable extensions. It excludes unrelated frontend and container guidance.
+A command-handler change queries the model for its use case, reads the generated agent context, and loads the selected extensions whose boundary the change touches. It excludes unrelated frontend and container guidance.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-agent.select-task-context | inspection | Change review identifies the selected manifest task before editing. |
-| standards/rule/core-agent.follow-the-local-pattern-before-the-load-plan | inspection | Change review confirms a pattern-following change cites its local context and no load plan. |
-| standards/rule/core-agent.load-context-by-tier | inspection | Agent report lists required Tier 0, Tier 1, and Tier 2 documents. |
-| standards/rule/core-agent.load-applicable-extensions | inspection | Agent report lists selected project and applicable local extensions. |
-| standards/rule/core-agent.read-active-behavior-specifications | inspection | Behavior-change report cites the active use-case specification. |
-| standards/rule/core-agent.apply-guidance-precedence | inspection | Design review applies sources in declared precedence order. |
-| standards/rule/core-agent.replace-only-declared-conventions | inspection | Consumer documentation records each local convention replacement. |
-| standards/rule/core-agent.stop-on-unresolved-conflict | inspection | Unresolved conflict report quotes both provision IDs and paths. |
-| standards/rule/core-agent.inspect-existing-work-before-editing | inspection | Change report records initial status and preserved unrelated work. |
-| standards/rule/core-agent.restrict-unapproved-side-effects | inspection | Review identifies authorization for each listed boundary-changing side effect. |
-| standards/rule/core-agent.make-coherent-scoped-changes | inspection | Diff review connects each changed artifact to the authorized request. |
-| standards/rule/core-agent.update-behavior-records-with-code | inspection | Behavior review links changed implementation to affected current records. |
-| standards/rule/core-agent.run-and-report-verification | inspection | Completion report lists commands, outcomes, evidence scope, and skipped checks. |
-| standards/rule/core-agent.treat-tracked-records-as-source-material | inspection | Change review traces each behavior claim to a product page or an approved decision. |
-| standards/rule/core-agent.select-one-task-label | inspection | Agent report selects one narrowest task or names an additional crossed boundary. |
-| standards/rule/core-agent.escalate-from-summary-to-full-document | inspection | File-generation and public-boundary reports cite loaded Tier 2 guidance. |
-| standards/rule/core-agent.inspect-local-examples-after-standards | inspection | Change review identifies neighboring compliant consumer patterns. |
-| standards/rule/core-agent.keep-agent-working-files-under-agents | inspection | Tree review finds working files under `.agents/` or a named local replacement. |
+| standards/rule/core-agent.select-task-context | guidance | Which model query selected the records the change cites? |
+| standards/rule/core-agent.follow-the-local-pattern-before-the-model-query | guidance | Which local pattern did the change follow, and which surface did it avoid adding? |
+| standards/rule/core-agent.load-applicable-extensions | guidance | Which extensions did the agent load before editing inside their boundary? |
+| standards/rule/core-agent.apply-guidance-precedence | guidance | In which order did the design apply exceptions, extensions, profile, and core standards? |
+| standards/rule/core-agent.replace-only-declared-conventions | guidance | Which approved exception record declares each convention replacement? |
+| standards/rule/core-agent.stop-on-unresolved-conflict | guidance | Which quoted conflict stopped the work, with both provision identifiers? |
+| standards/rule/core-agent.inspect-existing-work-before-editing | guidance | What did `git status` show, and which unrelated work stayed untouched? |
+| standards/rule/core-agent.restrict-unapproved-side-effects | guidance | Which approval covers each listed side effect the change makes? |
+| standards/rule/core-agent.make-coherent-scoped-changes | guidance | Which changed artifact does the authorized request fail to explain? |
+| standards/rule/core-agent.escalate-from-summary-to-full-document | guidance | Which full record did the file generation or boundary change cite? |
+| standards/rule/core-agent.inspect-local-examples-after-standards | guidance | Which neighboring files shaped the change after the standards? |
+| standards/rule/core-agent.keep-agent-working-files-under-agents | guidance | Which working files sit outside `.agents/` or the declared replacement? |

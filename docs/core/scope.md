@@ -1,32 +1,34 @@
-# Supported Scope
+# Supported scope
 
 ## Intent
 
-The selected profile supports one application class so agents can make concrete decisions without inventing architecture for every task. The profile fits a business web application.
+Every project selects one size and declares its stacks, so agents can make concrete decisions without inventing architecture for every task.
 
-Applications outside this boundary can use individual ideas but do not claim selected-profile conformance.
+Projects outside this boundary can use individual ideas but do not claim conformance.
 
-## Agent Summary {#agent-summary}
+## Agent summary {#agent-summary}
 
-- Use the supported ASP.NET Core and PostgreSQL profile. (standards/rule/core-scope.use-the-supported-application-profile)
+- Select one size and declare one stack per frontend. (standards/rule/core-scope.select-size-profile-and-stacks)
 - Keep one business context and deployment boundary. (standards/rule/core-scope.keep-one-bounded-context)
 - Select conditional extensions only when criteria apply. (standards/rule/core-scope.select-conditional-extensions-explicitly)
-- Record unsupported architecture decisions explicitly. (standards/rule/core-scope.record-unsupported-scope-decisions)
+- Record every selection with its criterion and review date. (standards/rule/core-scope.record-selected-extensions)
+- State whether any outside constraint applies. (standards/rule/core-scope.answer-the-constraints-question)
 - Declare a consumer that ships no backend. (standards/rule/core-scope.declare-a-consumer-that-has-no-backend)
+- Record unsupported architecture decisions explicitly. (standards/rule/core-scope.record-unsupported-scope-decisions)
 
 ## Standards
 
-### Use the supported application profile (standards/rule/core-scope.use-the-supported-application-profile)
+### Select a size profile and stacks (standards/rule/core-scope.select-size-profile-and-stacks)
 
-**Requirement:** A `dotnet-react` profile consumer MUST use one business web system with ASP.NET Core API, PostgreSQL, Marten, and zero or more React frontends.
+**Requirement:** A consumer MUST select the small or large size, and MUST declare one stack for each frontend it ships. The size decides which record types and test projects the project needs; each stack decides which technology pages and checks apply. Small needs the core types with Architecture and Integration test projects, while large adds problems, features, journeys, and cases with the Acceptance project. The backend stack is always dotnet; each frontend declares react, svelte, or blazor-web.
 
-**Rationale:** The supported profile gives one repository, backend, persistence model, and optional web interface boundary.
+**Rationale:** One size and explicit stacks let every check know which records and pages to require.
 
-**Example:** An API-only catalog fits; a native-only mobile application does not.
+**Example:** A library catalog with one web frontend selects small with the svelte stack; a clinic booking system with journeys selects large.
 
 ### Keep one bounded context (standards/rule/core-scope.keep-one-bounded-context)
 
-**Requirement:** A `dotnet-react` profile consumer MUST keep one business language and deployment boundary.
+**Requirement:** A consumer MUST keep one business language and deployment boundary.
 
 **Rationale:** Modules organize related language, models, use cases, and code without becoming independent services or bounded contexts.
 
@@ -34,21 +36,35 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 ### Select conditional extensions explicitly (standards/rule/core-scope.select-conditional-extensions-explicitly)
 
-**Requirement:** A consumer MUST select an extension declared in `extensions` within `standards.manifest.json` only when that extension's stated activation criteria apply.
+**Requirement:** A consumer MUST select an extension only when its activation criteria apply, and MUST select every extension whose criteria apply.
 
-**Rationale:** Conditional capabilities stay inactive until a documented product or engineering condition requires them. The manifest is the authoritative list, so a release that adds an extension does not leave this rule naming a shorter set. A rule that enumerated capabilities instead would name seven of the sixteen the release ships.
+**Rationale:** Conditional capabilities stay inactive until a documented product or engineering condition requires them. The manifest's extension list is the closed set a project selects from.
 
-**Example:** Caching, durable messaging, executable BDD, realtime delivery, multitenancy, reporting, and alternate persistence are extensions. [The extension index](../ext/README.md) groups every shipped extension by the capability it adds.
+**Example:** Caching, durable messaging, and multitenancy are extensions; the extension index lists each with its activation criteria.
 
 ### Record selected extensions (standards/rule/core-scope.record-selected-extensions)
 
-**Requirement:** A consumer MUST list every selected extension in `selectedExtensions` in `standards.project.json`.
+**Requirement:** A consumer MUST list every selected extension in `selectedExtensions` in `standards.project.json`, each with its criterion and review date.
 
 **Rationale:** The project record determines which extension boundaries apply to its work.
 
+**Example:**
+
+```json
+{ "id": "caching", "criterion": "catalog reads miss the latency target", "reviewBy": "2027-01-15" }
+```
+
+### Answer the constraints question (standards/rule/core-scope.answer-the-constraints-question)
+
+**Requirement:** A consumer MUST state in `standards.project.json` whether any outside constraint applies to the project.
+
+**Rationale:** An empty answer is a stated answer: it records that no outside rule binds the project.
+
+**Example:** A clinic booking system records that medical-device regulation does not apply to appointment scheduling.
+
 ### Declare a consumer that has no backend (standards/rule/core-scope.declare-a-consumer-that-has-no-backend)
 
-**Requirement:** A consumer with no backend MUST omit `paths.apiSolution` and record a decision naming every baseline rule left without a surface.
+**Requirement:** A consumer with no backend MUST omit `paths.apiSolution` and record a decision naming the areas and surfaces left without coverage.
 
 **Rationale:** A frontend and its build-time content can satisfy the workspace, frontend, security, operations, and continuous integration conventions with no API, database, or persistence layer. Adding a backend to obtain conformance contradicts `standards/rule/core-principles.require-current-complexity-activation`.
 
@@ -64,35 +80,36 @@ Applications outside this boundary can use individual ideas but do not claim sel
 
 ### Start with one API and database (standards/rule/core-scope.start-with-one-api-and-database)
 
-**Default:** Use one API deployable and one database for the baseline profile.
+**Default:** Use one API deployable and one database.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** A Worker appears only when a process continues independently of an HTTP request.
+**Rationale:** A background job appears only when a process continues without an HTTP request.
 
 ### Measure capacity before expansion (standards/rule/core-scope.measure-capacity-before-expansion)
 
 **Default:** Record current load, latency target, and observed constraint before adding caches, replicas, queues, or partitioning.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer can replace this default with an approved exception record.
 
 **Rationale:** Measured evidence establishes which capacity change addresses the observed limitation.
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/core-scope.use-the-supported-application-profile` and `standards/rule/core-scope.select-conditional-extensions-explicitly`.
+This informative example demonstrates `standards/rule/core-scope.select-size-profile-and-stacks` and `standards/rule/core-scope.select-conditional-extensions-explicitly`.
 
 A publishing product can support sign-in, draft creation, publication, and public reading. Multi-tenant publication, live editing, and bulk analytics require their selected extension boundaries.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-scope.use-the-supported-application-profile | inspection | Consumer profile and project structure match the supported application definition. |
-| standards/rule/core-scope.keep-one-bounded-context | inspection | Architecture review identifies one business language and deployment boundary. |
-| standards/rule/core-scope.select-conditional-extensions-explicitly | inspection | Every selected extension cites its activation condition. |
-| standards/rule/core-scope.record-selected-extensions | static | `ScopeExtensionsTests` asserts project schema validation resolves each selected extension. |
-| standards/rule/core-scope.declare-a-consumer-that-has-no-backend | static | `node standards/tools/validate-consumer.mjs` accepts an absent `paths.apiSolution` only alongside its recorded decision. |
-| standards/rule/core-scope.record-unsupported-scope-decisions | inspection | Unsupported architecture work cites a separate profile or project decision. |
-| standards/rule/core-scope.start-with-one-api-and-database | inspection | Baseline topology uses one API and database or records a replacement. |
-| standards/rule/core-scope.measure-capacity-before-expansion | inspection | Capacity decision records load, target latency, and observed constraint. |
+| standards/rule/core-scope.select-size-profile-and-stacks | guidance | Which size did the project select, and which stack does each frontend declare? |
+| standards/rule/core-scope.keep-one-bounded-context | guidance | Which second language or deployment boundary does the design introduce? |
+| standards/rule/core-scope.select-conditional-extensions-explicitly | guidance | Which criterion justifies each selection, and which applicable extension stays unselected? |
+| standards/rule/core-scope.record-selected-extensions | checkable | `node standards/tools/validate-consumer.mjs` rejects a selection without a criterion or review date. |
+| standards/rule/core-scope.answer-the-constraints-question | guidance | Where does the project state which outside constraints apply? |
+| standards/rule/core-scope.declare-a-consumer-that-has-no-backend | checkable | `node standards/tools/validate-consumer.mjs` accepts a missing `paths.apiSolution` only with its recorded decision. |
+| standards/rule/core-scope.record-unsupported-scope-decisions | guidance | Which decision records each architecture outside the supported boundary? |
+| standards/rule/core-scope.start-with-one-api-and-database | guidance | Which second deployable or database does the topology add, and why? |
+| standards/rule/core-scope.measure-capacity-before-expansion | guidance | Which load, target, and observed constraint justify the added capacity? |
