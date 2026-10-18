@@ -889,4 +889,8 @@ if (findings.length) {
   for (const item of findings) console.log(`  - ${item}`);
   process.exit(1);
 }
-console.log('\nPASS: every specification identifier is cited by a code element, every code identifier resolves to a specification, every invariant and path has a test, and every marked file carries a tag.');
+if (known.length) {
+  console.log(`\nPASS: no finding beyond the ${known.length} the baseline ${baselineRel} records, and no baseline entry is stale.`);
+} else {
+  console.log('\nPASS: every specification identifier is cited by a code element, every code identifier resolves to a specification, every invariant and path has a test, and every marked file carries a tag.');
+}
