@@ -8,13 +8,17 @@ Reporting separates complex joins, aggregate analysis, and large exports from no
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`.
+Applicable record types: `use-case`.
 
 The consumer enables `report` for a documented query or export with complex relational SQL, large results, long processing, object storage, or exceptional latency budget.
 
-## Baseline relationship
+## Replaces
 
-This extension does not replace the baseline rule for ordinary queries. Long-running exports activate `standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request`, so the project declares the execution host that runs them.
+None. Ordinary queries stay under `standards/rule/backend-persistence.query-through-iquerysession`; this extension governs reads whose cost or duration exceeds that path.
+
+## Switches on
+
+`limit`. Selecting `report` requires Limit records for the request budget and the report bounds.
 
 ## Agent Summary {#agent-summary}
 
@@ -22,6 +26,7 @@ This extension does not replace the baseline rule for ordinary queries. Long-run
 - Keep raw SQL parameterized in Infrastructure. (standards/rule/ext-report.parameterize-report-sql, standards/rule/ext-report.keep-raw-sql-in-infrastructure)
 - Apply item-read authorization to report data. (standards/rule/ext-report.apply-item-read-authorization)
 - Run budget-exceeding exports in Worker. (standards/rule/ext-report.run-budget-exceeding-exports-in-worker)
+- Scope export output to the tenant. (standards/rule/ext-report.scope-export-output-to-the-tenant)
 - Bound report work and output retention. (standards/rule/ext-report.define-report-limits)
 - Escape spreadsheet formula-leading values. (standards/rule/ext-report.escape-formula-leading-export-values)
 
@@ -31,7 +36,7 @@ This extension does not replace the baseline rule for ordinary queries. Long-run
 
 **Requirement:** A reporting proposal MUST record the report, representative data volume, plan or limitation, latency target, maximum result, and operating owner.
 
-**Rationale:** The record establishes why a normal request projection cannot meet the documented boundary.
+**Rationale:** The record establishes why a normal request projection cannot meet the documented boundary. The use-case page carries the record with its owner and status.
 
 ### Avoid speculative reporting systems (standards/rule/ext-report.avoid-speculative-reporting-systems)
 
@@ -65,7 +70,7 @@ This extension does not replace the baseline rule for ordinary queries. Long-run
 
 ### Run budget-exceeding exports in Worker (standards/rule/ext-report.run-budget-exceeding-exports-in-worker)
 
-**Requirement:** An export exceeding its request budget MUST run through Worker.
+**Requirement:** An export exceeding its request budget MUST run through Worker. The budget is a Limit record the export's use case names.
 
 **Rationale:** Worker execution frees the HTTP request from long-running report work.
 
@@ -75,9 +80,15 @@ This extension does not replace the baseline rule for ordinary queries. Long-run
 
 **Rationale:** Export files can contain sensitive data and need controlled access and retention.
 
+### Scope export output to the tenant (standards/rule/ext-report.scope-export-output-to-the-tenant)
+
+**Requirement:** An export MUST store its output under a tenant-scoped object-storage path.
+
+**Rationale:** A shared output path lets one tenant guess another tenant's export address.
+
 ### Define report limits (standards/rule/ext-report.define-report-limits)
 
-**Requirement:** A report specification MUST define maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime.
+**Requirement:** A report specification MUST state each bound as a Limit record: maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime.
 
 **Rationale:** Explicit limits bound database, Worker, and object-storage cost.
 
@@ -93,14 +104,6 @@ This extension does not replace the baseline rule for ordinary queries. Long-run
 
 **Rationale:** Spreadsheet applications can interpret unescaped values as executable formulas.
 
-### Reject formula-leading import values (standards/rule/ext-report.reject-formula-leading-import-values)
-
-**Requirement:** A CSV or spreadsheet import MUST reject or neutralize a value that begins with a formula-leading character.
-
-**Rationale:** The formula-leading characters are the equals sign, the plus sign, the minus sign, the at sign, the tab, and the carriage return. Escaping on the way out protects the reader of this export. It does not protect the reader of the next one. An imported value stored unchanged is re-exported by a different report that may not escape it. [CSV injection](https://owasp.org/www-community/attacks/CSV_Injection) travels through the store, so the boundary that admits the value is where it stops.
-
-**Example:** An import that rejects the value reports the row and the field. An import that neutralizes it records what it changed, because a silently altered value is a data defect the owner cannot see.
-
 ### Define export encoding and columns (standards/rule/ext-report.define-export-encoding-and-columns)
 
 **Requirement:** An export format MUST use explicit character encoding and a stable column contract.
@@ -113,7 +116,7 @@ This extension does not replace the baseline rule for ordinary queries. Long-run
 
 **Default:** Keep report definitions in Application under their business module.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Business meaning and authorization belong with the module that owns the report.
 
@@ -121,7 +124,7 @@ This extension does not replace the baseline rule for ordinary queries. Long-run
 
 **Default:** Keep SQL, row mappings, and storage providers in Infrastructure.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Query and storage implementation details are provider boundaries.
 
@@ -129,7 +132,7 @@ This extension does not replace the baseline rule for ordinary queries. Long-run
 
 **Default:** Keep Worker orchestration separate from report business rules.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Worker scheduling and execution do not define report authorization or meaning.
 
@@ -139,21 +142,21 @@ No report or object-storage package is selected by default. Each provider needs 
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-report.record-reporting-need | inspection | Report specification records each required cost and ownership field. |
-| standards/rule/ext-report.avoid-speculative-reporting-systems | inspection | Reporting decision names an accepted current query or export need. |
-| standards/rule/ext-report.parameterize-report-sql | test | `ReportSqlTests` bind actor, tenant, filter, range, sort, and pagination values. |
-| standards/rule/ext-report.keep-raw-sql-in-infrastructure | inspection | Source review locates raw report SQL and connection handling in Infrastructure. |
-| standards/rule/ext-report.review-report-plans | operation | Review record includes plans and indexes for representative report data. |
-| standards/rule/ext-report.apply-item-read-authorization | test | `ReportAuthzTests` cover actor, role, owner, tenant, and sensitive fields. |
-| standards/rule/ext-report.run-budget-exceeding-exports-in-worker | test | `ReportExportTests` queue work through Worker. |
-| standards/rule/ext-report.protect-export-output | test | `ReportExportTests` require owner authorization and honor expiry. |
-| standards/rule/ext-report.define-report-limits | inspection | Report specification declares each report cost and storage limit. |
-| standards/rule/ext-report.support-report-cancellation | test | `ReportLimitsTests` stop work and remove expired output. |
-| standards/rule/ext-report.escape-formula-leading-export-values | test | `ReportContentTests` asserts formula-leading export values are escaped except reviewed formula fields. |
-| standards/rule/ext-report.define-export-encoding-and-columns | test | `ReportContentTests` assert explicit encoding and stable column order. |
-| standards/rule/ext-report.reject-formula-leading-import-values | test | `ReportContentTests` assert an imported formula-leading value is rejected or recorded as neutralized. |
-| standards/rule/ext-report.keep-report-definitions-in-application | inspection | Report definitions remain module-owned in Application or record a replacement. |
-| standards/rule/ext-report.keep-report-providers-in-infrastructure | inspection | SQL and storage code remain in Infrastructure or record a replacement. |
-| standards/rule/ext-report.separate-worker-orchestration | inspection | Worker code does not contain report business rule ownership. |
+| standards/rule/ext-report.record-reporting-need | guidance | Does the use-case page record the report, volume, plan, target, maximum, and owner? |
+| standards/rule/ext-report.avoid-speculative-reporting-systems | guidance | Does reporting serve an accepted current query or export? |
+| standards/rule/ext-report.parameterize-report-sql | guidance | Does every report query bind actor, tenant, filter, range, sort, and pagination values? |
+| standards/rule/ext-report.keep-raw-sql-in-infrastructure | guidance | Do raw report SQL and connection handling live in Infrastructure? |
+| standards/rule/ext-report.review-report-plans | guidance | Did the owner review plans and indexes on representative data? |
+| standards/rule/ext-report.apply-item-read-authorization | guidance | Does each report and export enforce the item-read rules? |
+| standards/rule/ext-report.run-budget-exceeding-exports-in-worker | guidance | Does each export past its request budget run through Worker? |
+| standards/rule/ext-report.protect-export-output | guidance | Does export output carry an owner and expiry with short-lived authorized download? |
+| standards/rule/ext-report.scope-export-output-to-the-tenant | guidance | Does each export store its output under a tenant-scoped path? |
+| standards/rule/ext-report.define-report-limits | guidance | Does each report bound live as a Limit record? |
+| standards/rule/ext-report.support-report-cancellation | guidance | Does report work cancel, and does expired output clear? |
+| standards/rule/ext-report.escape-formula-leading-export-values | guidance | Are formula-leading export values escaped except reviewed formula fields? |
+| standards/rule/ext-report.define-export-encoding-and-columns | guidance | Does each export state its encoding and stable columns? |
+| standards/rule/ext-report.keep-report-definitions-in-application | guidance | Do report definitions live in their module or a recorded Exception? |
+| standards/rule/ext-report.keep-report-providers-in-infrastructure | guidance | Do SQL and storage code live in Infrastructure or a recorded Exception? |
+| standards/rule/ext-report.separate-worker-orchestration | guidance | Is Worker orchestration separate from report business rules or a recorded Exception? |

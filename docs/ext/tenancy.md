@@ -8,16 +8,21 @@ Multitenancy makes tenant identity part of authorization, persistence, caches, j
 
 Activation scope: `project`.
 
-Applicable specification kinds: None.
+Applicable record types: none.
 
 The consumer enables `tenancy` only when independent customer organizations share one deployment and require isolated data or policy.
 
-## Baseline relationship
+## Replaces
 
-The adoption decision records tenant source, storage model, isolation guarantee, administrative access model, and data evolution path. This extension replaces no baseline rule.
+None. This extension adds tenant obligations the baseline does not state.
+
+## Switches on
+
+None. Tenant scope applies to records every profile already requires.
 
 ## Agent Summary {#agent-summary}
 
+- Record the tenant adoption decision. (standards/rule/ext-tenancy.record-the-tenant-adoption-decision)
 - Define tenancy storage and isolation guarantees. (standards/rule/ext-tenancy.define-tenant-isolation)
 - Resolve tenant identity from trusted context. (standards/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context)
 - Match actor and resource tenants. (standards/rule/ext-tenancy.verify-actor-and-target-tenancy)
@@ -26,6 +31,12 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 - Declare tenant scope for operational work. (standards/rule/ext-tenancy.scope-tenant-operations)
 
 ## Standards
+
+### Record the tenant adoption decision (standards/rule/ext-tenancy.record-the-tenant-adoption-decision)
+
+**Requirement:** A consumer selecting `tenancy` MUST record a Decision naming the tenant source, storage model, isolation guarantee, administrative access model, and data evolution path. It states the bound on tenant enumeration in all-tenant records.
+
+**Rationale:** The Decision carries its owner, status, decider, and decide-by date. Approval waits while that Decision is a draft.
 
 ### Define tenant isolation (standards/rule/ext-tenancy.define-tenant-isolation)
 
@@ -53,13 +64,13 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 
 ### Verify actor and target tenancy (standards/rule/ext-tenancy.verify-actor-and-target-tenancy)
 
-**Requirement:** A protected multi-tenant operation MUST confirm that the actor and target resource belong to the resolved tenant.
+**Requirement:** A protected multi-tenant operation MUST confirm the actor's tenant scope and the target's tenant. The actor holds the use case's needed Permission at the resolved tenant's scope, and the target resource belongs to that tenant.
 
-**Rationale:** Both the caller and requested resource need the same authorized tenant scope.
+**Rationale:** Both the caller and requested resource need the same authorized tenant scope. The chain runs Actor holds Role at scope, Role allows Permission, use case needs Permission.
 
 ### Isolate administrative cross-tenant access (standards/rule/ext-tenancy.isolate-administrative-cross-tenant-access)
 
-**Requirement:** An administrative cross-tenant operation MUST use a distinct policy, actor permission, and audit trail.
+**Requirement:** An administrative cross-tenant operation MUST require a Permission the actor holds through a Role at platform scope, and MUST write an audit record.
 
 **Rationale:** Exceptional access needs stronger visibility than normal tenant-scoped behavior.
 
@@ -67,7 +78,7 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 
 **Requirement:** A multi-tenant persistence implementation MUST resolve its tenant when the session is created, through the selected provider's own tenancy support.
 
-**Rationale:** Provider-supported tenancy gives queries and storage a consistent isolation mechanism. Session creation is the point that matters. A session opened without a tenant has an unscoped next query. Adding the filter per query instead leaves every new query one omission away from reading across tenants. The baseline provider resolves it from the registered tenancy at session creation, so no query carries the concern.
+**Rationale:** Provider-supported tenancy gives queries and storage a consistent isolation mechanism. Session creation is the point that matters. A session opened without a tenant has an unscoped next query. Adding the filter per query instead leaves every new query one omission away from reading across tenants. The baseline provider resolves it from the registered tenancy at session creation, so no query carries the concern. An Entity Framework Core implementation resolves the tenant when the context is created and applies it through a query filter convention.
 
 ### Scope tenant-owned records (standards/rule/ext-tenancy.scope-tenant-owned-records)
 
@@ -95,9 +106,9 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 
 ### Record an all-tenant operation (standards/rule/ext-tenancy.record-an-all-tenant-operation)
 
-**Requirement:** An operation running at all-tenant scope MUST produce a record naming the actor, the operation, the tenants reached, and the reason.
+**Requirement:** An operation running at all-tenant scope MUST produce a record naming the actor, the operation, and the reason. The record states the tenant count and lists the tenant identifiers reached up to the bound the adoption Decision states.
 
-**Rationale:** A documented scope states what an operation is allowed to touch. It does not state what one run touched, which is the question a tenant asks after an incident. An all-tenant run is also the one case where no tenant's own audit trail holds the whole event. [The OWASP logging guidance](https://owasp.org/www-project-cheat-sheets/cheatsheets/Logging_Cheat_Sheet) treats an administrative action over many subjects as one event to record.
+**Rationale:** A documented scope states what an operation is allowed to touch. It does not state what one run touched, which is the question a tenant asks after an incident. An all-tenant run is also the one case where no tenant's own audit trail holds the whole event. [The OWASP logging guidance](https://owasp.org/www-project-cheat-sheets/cheatsheets/Logging_Cheat_Sheet) treats an administrative action over many subjects as one event to record. When the audit extension is selected, the record is an audit record; otherwise it stays a standalone record.
 
 **Example:** A support export covering every tenant records the operator, the export, the tenant count, and the incident it was run for.
 
@@ -107,15 +118,15 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 
 **Default:** Represent tenant identity with a strongly typed `TenantId`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** A typed identity prevents accidental confusion with actor, aggregate, or string identifiers.
+**Rationale:** A typed identity prevents accidental confusion with actor, business record, or string identifiers.
 
 ### Use one tenant accessor (standards/rule/ext-tenancy.use-one-tenant-accessor)
 
 **Default:** Use one current-tenant accessor at the trusted host boundary.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** One accessor centralizes trusted tenant resolution.
 
@@ -123,7 +134,7 @@ The adoption decision records tenant source, storage model, isolation guarantee,
 
 **Default:** Pass tenant scope through Application messages or trusted ports rather than ambient Domain request state.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Explicit scope preserves Domain independence from host request state.
 
@@ -133,20 +144,21 @@ Marten tenancy support is part of the baseline persistence package. Another isol
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-tenancy.define-tenant-isolation | inspection | Tenant decision records model, isolation guarantee, and operating trade-off. |
-| standards/rule/ext-tenancy.avoid-unplanned-isolation-models | inspection | Any mixed isolation model records decision and data evolution plan. |
-| standards/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context | test | `TenancyResolveTests` resolve tenant identity from each trusted source. |
-| standards/rule/ext-tenancy.reject-unrestricted-tenant-input | test | `TenancyResolveTests` asserts request tenant-ID tampering cannot select a tenant boundary. |
-| standards/rule/ext-tenancy.verify-actor-and-target-tenancy | test | `TenancyAuthzTests` reject mismatched scope. |
-| standards/rule/ext-tenancy.isolate-administrative-cross-tenant-access | test | `TenancyAuthzTests` require policy, permission, and audit evidence. |
-| standards/rule/ext-tenancy.use-selected-tenant-storage-support | test | `TenancyStorageTests` exercise selected provider tenancy behavior. |
-| standards/rule/ext-tenancy.scope-tenant-owned-records | static, test | `TenancyStorageTests` include tenant scope at every listed boundary. |
-| standards/rule/ext-tenancy.apply-cross-tenant-disclosure-policy | test | `TenancyDisclosureTests` return the documented not-found or forbidden response. |
-| standards/rule/ext-tenancy.protect-tenant-diagnostics | test | `TenancyDisclosureTests` exclude foreign tenant identifiers and data. |
-| standards/rule/ext-tenancy.scope-tenant-operations | inspection | Operating procedures declare one-tenant or all-tenant scope. |
-| standards/rule/ext-tenancy.record-an-all-tenant-operation | test | `TenancyOperationTests` assert an all-tenant run writes a record naming the actor, the operation, and the tenants reached. |
-| standards/rule/ext-tenancy.use-typed-tenant-identities | static | Tenant references use `TenantId` or a documented local replacement. |
-| standards/rule/ext-tenancy.use-one-tenant-accessor | inspection | Host code has one trusted current-tenant accessor. |
-| standards/rule/ext-tenancy.pass-tenant-scope-explicitly | static | `TenancyTests` asserts domain code reads no ambient tenant request state. |
+| standards/rule/ext-tenancy.record-the-tenant-adoption-decision | guidance | Does an owned Decision record the tenant source, model, guarantee, access, path, and bound? |
+| standards/rule/ext-tenancy.define-tenant-isolation | guidance | Does the decision define the isolation model, guarantee, and trade-off? |
+| standards/rule/ext-tenancy.avoid-unplanned-isolation-models | guidance | Does each mixed model record its decision and evolution plan? |
+| standards/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context | guidance | Does each trusted source resolve the tenant? |
+| standards/rule/ext-tenancy.reject-unrestricted-tenant-input | guidance | Can request tampering with a tenant ID select another boundary? |
+| standards/rule/ext-tenancy.verify-actor-and-target-tenancy | guidance | Do mismatched actor and target tenants fail? |
+| standards/rule/ext-tenancy.isolate-administrative-cross-tenant-access | guidance | Does administrative access need its platform-scope Permission and write its audit record? |
+| standards/rule/ext-tenancy.use-selected-tenant-storage-support | guidance | Does each provider resolve the tenant at session creation? |
+| standards/rule/ext-tenancy.scope-tenant-owned-records | guidance | Does every listed boundary include tenant scope? |
+| standards/rule/ext-tenancy.apply-cross-tenant-disclosure-policy | guidance | Does each cross-tenant response use the documented policy? |
+| standards/rule/ext-tenancy.protect-tenant-diagnostics | guidance | Do diagnostics exclude foreign tenant identifiers and data? |
+| standards/rule/ext-tenancy.scope-tenant-operations | guidance | Does each procedure declare one-tenant or all-tenant scope? |
+| standards/rule/ext-tenancy.record-an-all-tenant-operation | guidance | Does each all-tenant run write its record with count and bounded list? |
+| standards/rule/ext-tenancy.use-typed-tenant-identities | guidance | Do tenant references use TenantId or a recorded Exception? |
+| standards/rule/ext-tenancy.use-one-tenant-accessor | guidance | Does the host boundary hold one current-tenant accessor or a recorded Exception? |
+| standards/rule/ext-tenancy.pass-tenant-scope-explicitly | guidance | Does domain code read no ambient tenant state, or does an Exception record it? |

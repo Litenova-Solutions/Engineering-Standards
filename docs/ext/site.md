@@ -10,13 +10,17 @@ This page states what the build produces, what each page carries, and where shar
 
 Activation scope: `project`.
 
-Applicable specification kinds: None.
+Applicable record types: none.
 
 The consumer selects `site` when it ships a public static website beside its application, such as marketing pages, pricing, or help articles. A page the application itself serves does not select it.
 
-## Baseline relationship
+## Replaces
 
-The frontend and UI pages govern application frontends declared in `paths.frontends`. A static site is not an application frontend and is declared in `paths.sites` instead. This extension replaces no baseline provision.
+None. The frontend and UI pages govern application frontends declared in `paths.frontends`. A static site is not an application frontend, and this extension replaces no baseline provision.
+
+## Switches on
+
+None. Prices and claims read Requirement entries and Terms, which every profile requires.
 
 ## Agent Summary {#agent-summary}
 
@@ -201,7 +205,7 @@ Sitemap: https://example.test/sitemap.xml
 
 ### Keep each repeated fact in one data source (standards/rule/ext-site.keep-each-repeated-fact-in-one-data-source)
 
-**Requirement:** A fact stated on more than one page MUST live in one data source every such page reads.
+**Requirement:** A fact stated on more than one page MUST live in one data source every such page reads. A fact that is a product word MUST live as a Term record with labels per language.
 
 **Rationale:** One source means one edit reaches every page, and two pages cannot disagree. Pages read facts by reference rather than repeating them.
 
@@ -231,7 +235,7 @@ Sitemap: https://example.test/sitemap.xml
 
 **Requirement:** Every price and claim on the site MUST come from the consumer records the site convention names.
 
-**Rationale:** The site repeats commercial facts it does not own, so it reads them where they are owned. A price changed in the record reaches the site on the next build.
+**Rationale:** The site repeats commercial facts it does not own, so it reads them where they are owned. A price changed in the record reaches the site on the next build. The named records carry their own owner and status.
 
 ### Declare each static site in the project record (standards/rule/ext-site.declare-each-static-site-in-the-project-record)
 
@@ -242,7 +246,7 @@ Sitemap: https://example.test/sitemap.xml
 **Example:**
 
 ```json
-{"name": "site", "path": "apps/site", "generator": "astro"}
+{"name": "marketing", "path": "sites/marketing", "generator": "astro"}
 ```
 
 ## Conventions
@@ -251,7 +255,7 @@ Sitemap: https://example.test/sitemap.xml
 
 **Default:** Generate the site with Astro and prerender every page to static output.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Astro renders pages to files at build time and ships no client script unless a component asks for one. That matches the static obligations above without extra machinery.
 
@@ -265,7 +269,7 @@ export default defineConfig({ output: 'static' });
 
 **Default:** Write components in Astro or Svelte and render every component on the server.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Either component form renders to HTML at build time. No component hydrates in the browser, so interactivity stays absent by construction.
 
@@ -273,7 +277,7 @@ export default defineConfig({ output: 'static' });
 
 **Default:** Write site styles with Tailwind.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** One utility stylesheet compiles at build time into the file the pages link. No style comes from another origin.
 
@@ -281,7 +285,7 @@ export default defineConfig({ output: 'static' });
 
 **Default:** Present a light scheme by default with a dark scheme the reader chooses.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Light is the initial scheme, and the reader switches to dark without an account or a stored preference on a server. The choice persists in the browser alone.
 
@@ -289,7 +293,7 @@ export default defineConfig({ output: 'static' });
 
 **Default:** Read site prices and claims from the consumer product brief and pricing record.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** The names state the records without fixing their paths, because each consumer holds them where its own tree does. A fixed path would bind every consumer to one tree.
 
@@ -299,31 +303,31 @@ This extension selects its generator stack through `standards.manifest.json`, wh
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-site.render-every-page-to-static-files | static, test | `SiteBuildTests` serve the output directory with a file server and read every page. |
-| standards/rule/ext-site.avoid-client-scripts-without-a-named-interactive-need | static | `SiteScriptTests` match each shipped script against its recorded need. |
-| standards/rule/ext-site.load-every-script-from-the-site-origin | static | `SiteScriptTests` resolve each script address to the site origin. |
-| standards/rule/ext-site.state-allowed-sources-in-a-content-security-policy | static | `SiteHeadersTests` read the policy from the served response headers. |
-| standards/rule/ext-site.load-nothing-from-a-third-party-origin | test | `SiteLoadingTests` load every page with the network blocked except the site origin. |
-| standards/rule/ext-site.give-every-page-one-main-heading-and-landmark-elements | test | `SiteStructureTests` count top-level headings and landmarks on every page. |
-| standards/rule/ext-site.name-every-page-with-a-title-and-a-description | test | `SiteHeadTests` read the title and description from every page head. |
-| standards/rule/ext-site.point-every-page-at-its-absolute-canonical-address | test | `SiteHeadTests` resolve the canonical link of every page to an absolute address. |
-| standards/rule/ext-site.reference-language-alternates-from-every-translated-page | test | `SiteHeadTests` follow each alternate link and its fallback on multilingual pages. |
-| standards/rule/ext-site.generate-a-sitemap-covering-every-page | test | `SiteDiscoveryTests` parse the sitemap and request every listed address. |
-| standards/rule/ext-site.point-crawler-rules-at-the-sitemap | test | `SiteDiscoveryTests` read the crawler rules and request the named sitemap. |
-| standards/rule/ext-site.list-every-page-for-language-models | test | `SiteDiscoveryTests` match the page list against the built pages. |
-| standards/rule/ext-site.publish-full-page-text-for-language-models | test | `SiteDiscoveryTests` match the full-text file against default-language pages. |
-| standards/rule/ext-site.publish-a-markdown-copy-beside-every-page | test | `SiteDiscoveryTests` follow the Markdown link from every page head. |
-| standards/rule/ext-site.mark-pages-with-json-ld-structured-data | test | `SiteDataTests` parse the JSON-LD graph on every page. |
-| standards/rule/ext-site.keep-each-repeated-fact-in-one-data-source | inspection | Data review traces each repeated fact to one source file. |
-| standards/rule/ext-site.render-every-language-from-one-page-structure | inspection | Layout review finds one structure with per-language text. |
-| standards/rule/ext-site.mark-unfinished-facts-with-visible-placeholders | inspection | Page review finds each missing fact under a visible placeholder. |
-| standards/rule/ext-site.reject-a-release-build-carrying-a-placeholder | test | `SiteReleaseTests` refuse a release build while a placeholder remains. |
-| standards/rule/ext-site.read-site-prices-and-claims-from-consumer-records | inspection | Price review traces each site price and claim to its record. |
-| standards/rule/ext-site.declare-each-static-site-in-the-project-record | static | `node standards/tools/validate-consumer.mjs` reads `paths.sites` for the site entry. |
-| standards/rule/ext-site.generate-the-site-with-astro | static | `SiteBuildTests` read the generator from `astro.config.mjs` or record a local replacement. |
-| standards/rule/ext-site.render-components-on-the-server-with-astro-or-svelte | inspection | Component review finds Astro or Svelte sources with no browser hydration. |
-| standards/rule/ext-site.use-tailwind-for-site-styles | static | `SiteBuildTests` compile styles through Tailwind or record a local replacement. |
-| standards/rule/ext-site.default-to-a-light-scheme-with-a-reader-chosen-dark-scheme | test | `SiteSchemeTests` read the initial scheme and the reader switch. |
-| standards/rule/ext-site.read-prices-and-claims-from-product-and-pricing-records | inspection | Source review names the product brief and pricing record or a local replacement. |
+| standards/rule/ext-site.render-every-page-to-static-files | guidance | Does the build write every page as a static file needing no server? |
+| standards/rule/ext-site.avoid-client-scripts-without-a-named-interactive-need | guidance | Does each shipped script serve a recorded interactive need? |
+| standards/rule/ext-site.load-every-script-from-the-site-origin | guidance | Does every client script load from the site origin? |
+| standards/rule/ext-site.state-allowed-sources-in-a-content-security-policy | guidance | Does the policy name every source the pages load? |
+| standards/rule/ext-site.load-nothing-from-a-third-party-origin | guidance | Does any page load from a third-party origin? |
+| standards/rule/ext-site.give-every-page-one-main-heading-and-landmark-elements | guidance | Does every page carry one top-level heading and landmarks? |
+| standards/rule/ext-site.name-every-page-with-a-title-and-a-description | guidance | Does every page state its title and description? |
+| standards/rule/ext-site.point-every-page-at-its-absolute-canonical-address | guidance | Does every page link its absolute canonical address? |
+| standards/rule/ext-site.reference-language-alternates-from-every-translated-page | guidance | Does each translated page link its alternates and fallback? |
+| standards/rule/ext-site.generate-a-sitemap-covering-every-page | guidance | Does the sitemap list every page with its alternates? |
+| standards/rule/ext-site.point-crawler-rules-at-the-sitemap | guidance | Do the crawler rules point at the sitemap? |
+| standards/rule/ext-site.list-every-page-for-language-models | guidance | Does the page list match the built pages? |
+| standards/rule/ext-site.publish-full-page-text-for-language-models | guidance | Does the full-text file match the default-language pages? |
+| standards/rule/ext-site.publish-a-markdown-copy-beside-every-page | guidance | Does every page link its Markdown copy? |
+| standards/rule/ext-site.mark-pages-with-json-ld-structured-data | guidance | Does every page carry its JSON-LD graph? |
+| standards/rule/ext-site.keep-each-repeated-fact-in-one-data-source | guidance | Does each repeated fact live in one source, each word as a Term? |
+| standards/rule/ext-site.render-every-language-from-one-page-structure | guidance | Does one structure render every language with text alone per language? |
+| standards/rule/ext-site.mark-unfinished-facts-with-visible-placeholders | guidance | Does each missing fact show a visible placeholder naming it? |
+| standards/rule/ext-site.reject-a-release-build-carrying-a-placeholder | guidance | Does a release build fail while a placeholder remains? |
+| standards/rule/ext-site.read-site-prices-and-claims-from-consumer-records | guidance | Does each site price and claim trace to its named record? |
+| standards/rule/ext-site.declare-each-static-site-in-the-project-record | checkable | `node standards/tools/validate-consumer.mjs` refuses a selected site extension whose `paths.sites` entry is missing. |
+| standards/rule/ext-site.generate-the-site-with-astro | guidance | Does Astro generate the site or does an Exception record a replacement? |
+| standards/rule/ext-site.render-components-on-the-server-with-astro-or-svelte | guidance | Do Astro or Svelte sources render server-side or does an Exception record a replacement? |
+| standards/rule/ext-site.use-tailwind-for-site-styles | guidance | Do Tailwind styles build the site or does an Exception record a replacement? |
+| standards/rule/ext-site.default-to-a-light-scheme-with-a-reader-chosen-dark-scheme | guidance | Is light the initial scheme with a reader-chosen dark scheme or a recorded Exception? |
+| standards/rule/ext-site.read-prices-and-claims-from-product-and-pricing-records | guidance | Do prices and claims read the brief and pricing record or a recorded Exception? |

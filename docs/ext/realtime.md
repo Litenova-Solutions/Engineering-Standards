@@ -8,13 +8,17 @@ Realtime transport reduces visible update delay when polling cannot meet an acce
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `end-to-end-flow`.
+Applicable record types: `use-case`, `journey`.
 
 The consumer enables `realtime` after measuring polling interval, visible delay, request cost, and required update target. It names acceptable disconnect and missed-message recovery.
 
-## Baseline relationship
+## Replaces
 
-This extension replaces no baseline rule. SignalR browser clients add pinned `@microsoft/signalr`; server-sent events use platform capabilities.
+This extension replaces no baseline provision. Server-sent events use platform capabilities.
+
+## Switches on
+
+`event`, `limit`. Selecting `realtime` requires Event records for the notifications it carries and Limit records for the bounds it sets.
 
 ## Agent Summary {#agent-summary}
 
@@ -31,7 +35,7 @@ This extension replaces no baseline rule. SignalR browser clients add pinned `@m
 
 **Requirement:** A realtime use case MUST document polling behavior, measured cost, update latency, expected connections, and recovery behavior.
 
-**Rationale:** The record compares realtime cost with an accepted user-visible update target.
+**Rationale:** The record compares realtime cost with an accepted user-visible update target. The use-case page carries the record with its owner and status.
 
 ### Reject cosmetic realtime adoption (standards/rule/ext-realtime.reject-cosmetic-realtime-adoption)
 
@@ -83,11 +87,9 @@ This extension replaces no baseline rule. SignalR browser clients add pinned `@m
 
 ### Bound realtime resources (standards/rule/ext-realtime.bound-realtime-resources)
 
-**Requirement:** A realtime deployment MUST set connection, message, group, payload, and backpressure limits.
+**Requirement:** A realtime deployment MUST set four bounds as Limit records. They are the maximum concurrent connections per host, the maximum receive message size, the maximum parallel invocations per connection, and the client timeout.
 
-**Rationale:** Explicit limits protect server memory, CPU, and connection capacity.
-
-Each limit is set rather than inherited. A transport ships defaults that suit a sample application, and the value a deployment needs comes from its own connection count and message size. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the knobs. They are the maximum concurrent connections per host, the maximum receive message size, the maximum parallel invocations per connection, and the client timeout. A deployment records the value it set for each, and the observation that produced it.
+**Rationale:** Explicit limits protect server memory, CPU, and connection capacity. Each value comes from the deployment's own connection count and message size, with the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same knobs.
 
 ### Reject unbounded slow-client buffering (standards/rule/ext-realtime.reject-unbounded-slow-client-buffering)
 
@@ -101,7 +103,7 @@ Each limit is set rather than inherited. A transport ships defaults that suit a 
 
 **Default:** Keep hubs or endpoints in WebApi, publication adapters in Infrastructure, and browser connections under `lib/realtime/`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Transport and provider details remain outside business feature ownership.
 
@@ -109,28 +111,28 @@ Each limit is set rather than inherited. A transport ships defaults that suit a 
 
 **Default:** Let feature modules subscribe through narrow operation-specific functions.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Operation-level functions keep subscription inputs and effects visible to the owning feature.
 
 ## Dependencies
 
-- `@microsoft/signalr` when SignalR is selected
+- `@microsoft/signalr` when SignalR is selected, through a decision and a manifest pin.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-realtime.record-realtime-need | inspection | Use-case documentation records polling, cost, target latency, connections, and recovery. |
-| standards/rule/ext-realtime.reject-cosmetic-realtime-adoption | inspection | Realtime decision cites a measurable update requirement. |
-| standards/rule/ext-realtime.use-server-sent-events-for-notifications | test | `RealtimeTransportTests` use the server-sent events boundary. |
-| standards/rule/ext-realtime.use-signalr-for-interactive-messaging | test | `RealtimeTransportTests` use SignalR capabilities. |
-| standards/rule/ext-realtime.record-transport-support | inspection | Realtime specification records chosen transport and hosting support. |
-| standards/rule/ext-realtime.authenticate-and-authorize-subscriptions | test | `RealtimeAuthTests` cover anonymous, unrelated, owner, and tenant-scoped connections. |
-| standards/rule/ext-realtime.revalidate-long-lived-access | test | `RealtimeAuthTests` revalidate expired session or token access. |
-| standards/rule/ext-realtime.reconnect-and-refresh-authoritative-state | test | `RealtimeRecoveryTests` use bounded reconnect and authoritative refresh. |
-| standards/rule/ext-realtime.tolerate-notification-ordering-differences | test | `RealtimeRecoveryTests` asserts duplicate and reordered notifications leave the client state correct. |
-| standards/rule/ext-realtime.bound-realtime-resources | operation | Deployment configuration declares every required connection and message limit. |
-| standards/rule/ext-realtime.reject-unbounded-slow-client-buffering | test | `RealtimeCapacityTests` show bounded buffering and controlled backpressure behavior. |
-| standards/rule/ext-realtime.place-realtime-code-at-outer-boundaries | inspection | Source review locates realtime transport code at the documented boundaries. |
-| standards/rule/ext-realtime.subscribe-through-narrow-functions | inspection | Feature review identifies operation-specific subscription functions. |
+| standards/rule/ext-realtime.record-realtime-need | guidance | Does the use-case page record polling, cost, target latency, connections, and recovery? |
+| standards/rule/ext-realtime.reject-cosmetic-realtime-adoption | guidance | Does the realtime decision cite a measurable update requirement? |
+| standards/rule/ext-realtime.use-server-sent-events-for-notifications | guidance | Does each one-way notification use the server-sent events boundary? |
+| standards/rule/ext-realtime.use-signalr-for-interactive-messaging | guidance | Does each bidirectional use case use SignalR capabilities? |
+| standards/rule/ext-realtime.record-transport-support | guidance | Does the use-case page record the transport and hosting support? |
+| standards/rule/ext-realtime.authenticate-and-authorize-subscriptions | guidance | Do anonymous, unrelated, owner, and tenant-scoped connections meet the authorization rule? |
+| standards/rule/ext-realtime.revalidate-long-lived-access | guidance | Does an expired session or token lose access? |
+| standards/rule/ext-realtime.reconnect-and-refresh-authoritative-state | guidance | Does the client reconnect with bounded backoff and refresh authoritative state? |
+| standards/rule/ext-realtime.tolerate-notification-ordering-differences | guidance | Do duplicate and reordered notifications leave client state correct? |
+| standards/rule/ext-realtime.bound-realtime-resources | guidance | Does each of the four bounds live as a Limit record with its value? |
+| standards/rule/ext-realtime.reject-unbounded-slow-client-buffering | guidance | Is slow-client buffering bounded with controlled backpressure? |
+| standards/rule/ext-realtime.place-realtime-code-at-outer-boundaries | guidance | Does realtime transport code sit at the documented boundaries or a recorded Exception? |
+| standards/rule/ext-realtime.subscribe-through-narrow-functions | guidance | Do features subscribe through operation-specific functions or a recorded Exception? |
