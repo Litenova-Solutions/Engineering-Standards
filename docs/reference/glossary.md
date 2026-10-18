@@ -1,305 +1,511 @@
 # Glossary
 
-## Acceptance criterion
+## Actor
 
-One observable condition owned by a use-case specification and identified as `AC-{MODULE}-{USE-CASE}-{NN}`.
+One person, company, provider, system, or guest that touches the product.
 
-## Acceptance test
-
-Automated executable evidence that cites and proves one or more acceptance criteria.
+Term `term/actor`.
 
 ## Agent
 
-A software system that can inspect context, reason about bounded work, change authorized artifacts, and run verification within delegated authority.
+Software that inspects context, reasons about bounded work, changes authorized files, and runs verification.
 
-## Agent Summary
+Term `term/agent`.
 
-The anchored Tier 1 projection that gives agents short task context while the full document remains canonical.
+## Agent summary
 
-## Agent-Driven Engineering
+The short task context for agents, while the full page stays canonical.
 
-The operating model in which agents perform substantial engineering execution while people retain decision authority and review responsibility.
+Term `term/agent-summary`.
 
-## Agentic Engineering System
+## Agent-driven engineering
 
-A system for specifying, building, verifying, releasing, and operating software with agents as active engineering participants.
+The operating model where agents do engineering work and people keep decision authority.
 
-## Aggregate
+Term `term/agent-driven-engineering`.
 
-A cluster of Domain objects changed as one transaction and protected through one external mutation entry point.
+## Agentic engineering system
 
-## Aggregate invariant
+A system for specifying, building, verifying, releasing, and operating software with agents.
 
-A rule that remains true after every transaction changing its owning aggregate and uses an `INV-{MODULE}-{NN}` identifier.
+Term `term/agentic-engineering-system`.
 
 ## Aggregate root
 
-The only external mutation entry point for an aggregate.
+The single type through which outside code changes a business record.
 
-## Aggregate state
+Term `term/aggregate-root`.
 
-The complete lifecycle condition represented by one abstract `{Aggregate}State` record and one or more sealed state records.
+## Alert inventory
+
+The list of fired alerts and the runbook each one names.
+
+Term `term/alert-inventory`.
+
+## AppHost
+
+The local orchestrator that starts every application and dependency together.
+
+Term `term/apphost`.
 
 ## Architecture layer
 
-One project boundary in the backend solution: Domain, Application, Infrastructure, or WebApi.
+One project boundary in the backend: Domain, Application, Infrastructure, or WebApi.
+
+Term `term/architecture-layer`.
 
 ## Audit record
 
-One entry in the audit trail, stating the actor, action, target, outcome, time, origin, and reason for one attempted action.
+One entry stating actor, action, target, outcome, time, origin, and reason.
+
+Term `term/audit-record`.
 
 ## Audit trail
 
-The append-only evidence store that establishes accountability for attempted actions, separate from the diagnostic log and the domain event stream.
+The append-only store holding audit records, apart from logs and domain events.
+
+Term `term/audit-trail`.
 
 ## Authorization policy
 
-A policy deciding whether an identified actor can perform an operation on a specific target.
+One rule deciding whether an actor may perform an operation on a target.
+
+Term `term/authorization-policy`.
+
+## Business record
+
+One thing kept consistent and changed in one step.
+
+Term `term/business-record`. Rejected: entity.
+
+## Case
+
+One worked example leading from a situation to one named result.
+
+Term `term/case`. Rejected: acceptance criterion.
+
+## Central package management
+
+One central file pinning every dependency version in the workspace.
+
+Term `term/central-package-management`.
 
 ## Command
 
-An Application message that can change business state through one top-level command pipeline and transaction commit.
+One message that changes business state through the command pipeline.
+
+Term `term/command`.
 
 ## Command page
 
-A page documenting one shipped command: its arguments, its options, its exit codes, and what it runs underneath.
+One page documenting a shipped command: arguments, options, exit codes, and underneath.
+
+Term `term/command-page`.
+
+## Component inventory
+
+The list of shipped components published with each release artifact.
+
+Term `term/component-inventory`. Rejected: SBOM.
 
 ## Configuration page
 
-A page holding every setting a reader can change, each with its default, its scope, and what overrides it.
+One page holding every setting a reader can change.
+
+Term `term/configuration-page`.
+
+## Constraint
+
+One outside rule the product obeys, such as a law or provider terms.
+
+Term `term/constraint`.
 
 ## Controlled technical prose
 
-The repository-owned English profile defining fixed structures, bounded prose, exact terms, and testable provisions.
+The fixed profile for structures, bounded prose, exact terms, and testable provisions.
+
+Term `term/controlled-technical-prose`.
 
 ## Convention
 
-A replaceable default for a name, location, file shape, or implementation pattern.
+One replaceable default for a name, location, file shape, or pattern.
 
-## Convention ID
+Term `term/convention`.
 
-A provision ID whose topic segment is `CONVENTION`, such as `standards/rule/backend-api.use-this-endpoint-layout`, which marks a replaceable default.
+## CORS
+
+The browser rule deciding which origins may call the API.
+
+Term `term/cors`.
 
 ## Current standards material
 
-Published standards pages, templates, instructions, and validators that define the pinned release without transition or release-history material.
+The pinned release without transition or history material.
 
-## Decision Evidence
+Term `term/current-standards-material`.
 
-An optional research record for external facts that need an owner and lifecycle beyond their owning decision.
+## Decision
+
+One dated choice with options weighed, evidence cited, and a decider named.
+
+Term `term/decision`. Rejected: product decision.
 
 ## Derived artifact
 
-A committed application file produced deterministically from an authored source, such as OpenAPI or generated TypeScript types.
+One committed file produced from an authored source, such as generated types.
+
+Term `term/derived-artifact`.
 
 ## Domain
 
-The real-world knowledge, language, rules, state, and behavior modeled by the software.
+The real-world knowledge, language, rules, state, and behavior the software models.
+
+Term `term/domain`.
 
 ## Domain event
 
-An immutable, package-free Domain record describing a completed fact inside the bounded context.
+One immutable record describing a completed fact inside the boundary.
 
-## Domain policy
+Term `term/domain-event`.
 
-An accepted business rule outside one aggregate invariant and identified as `POL-{POLICY}-{NN}`.
+## Domain repository
 
-## Domain rule ID
+One port that loads and stages complete business records.
 
-A consumer domain rule identifier such as `INV-ORDERS-01`, whose prefix names its enforcement classification.
-
-## End-to-end flow
-
-A connection of use cases from an accepted starting condition to one observable product outcome across required system boundaries.
-
-## End-to-end test
-
-An automated test identified as `E2E-{FLOW}-{NN}` that verifies one complete flow through deployed public boundaries and required infrastructure.
+Term `term/domain-repository`. Rejected: repository used alone.
 
 ## Engineering system
 
-A connected set of decisions, specifications, standards, implementation conventions, verification, operating controls, and release practices.
+One connected set of decisions, specifications, standards, verification, and release practices.
+
+Term `term/engineering-system`.
 
 ## Entry point
 
-A path through which an actor or system invokes or observes a use case.
+One way people or systems reach the product.
+
+Term `term/entry-point`.
 
 ## Event
 
-An immutable statement that a relevant fact completed, named in past tense.
+One immutable statement that a relevant fact completed.
+
+Term `term/event`.
 
 ## Event reaction
 
-Behavior caused by an event without prescribing a handler, orchestrator, projection, or scheduled-job implementation.
+Behavior caused by an event, without prescribing its implementation.
+
+Term `term/event-reaction`.
+
+## Exception
+
+One recorded departure from a standard, with reason and review date.
+
+Term `term/exception`. Rejected: override, standards override.
 
 ## Extension
 
-A conditional standards bundle selected by a project or an allowed local specification.
+One conditional standards bundle a project selects when its criterion holds.
+
+Term `term/extension`.
+
+## Feature
+
+One offer against a problem: planned, shipped, later, or refused.
+
+Term `term/feature`.
 
 ## How-to page
 
-A page solving one stated problem for a reader who already has a working result, which may branch.
+One page solving a stated problem for a reader with a working result.
+
+Term `term/how-to-page`.
+
+## Input validation
+
+Checks on a command or query shape before business behavior runs.
+
+Term `term/input-validation`.
 
 ## Integration event
 
-A versioned message contract delivered outside the bounded context.
+One versioned message contract delivered outside the boundary.
+
+Term `term/integration-event`.
+
+## Journey
+
+The ordered steps by which an actor reaches one goal.
+
+Term `term/journey`.
+
+## Known gap
+
+One known missing piece with an owner and an end date.
+
+Term `term/known-gap`.
 
 ## Layer
 
-One of the four depths a documentation page answers at, named by number, and distinct from an architecture layer.
+One of the depths a documentation page answers at.
+
+Term `term/layer`.
+
+## Limit
+
+One bound the product runs within.
+
+Term `term/limit`. Rejected: operating limit.
+
+## Lockfile
+
+The committed file recording the exact resolved dependency versions.
+
+Term `term/lockfile`.
 
 ## Module
 
-A cohesive Domain area organizing language, use cases, aggregates, code, and ownership without implying a deployment or transaction boundary.
+One business area organizing language, records, use cases, and ownership.
+
+Term `term/module`.
 
 ## Normative
 
-Required for a conforming consumer through an identified Standards provision.
+Required for a conforming consumer through an identified provision.
 
-## Operating limit
-
-An enforced, tested, supported, or alerting boundary for system operation.
+Term `term/normative`.
 
 ## Page
 
-One authored Markdown file under `docs/`, carrying the section contract of its page class.
+One authored Markdown file under the documentation root.
 
-## Page class
-
-One of `topic`, `profile`, `extension`, `tutorial`, `how-to`, `reference`, `command`, `index`, or `glossary`, which selects the required section order for a page.
+Term `term/page`.
 
 ## Page segment
 
-The `<area>-<stem>` segment of a provision ID that names its owning page, such as `frontend-components`.
+The part of a provision ID naming its owning page.
+
+Term `term/page-segment`.
+
+## Page style
+
+One page template for prose or record lists.
+
+Term `term/page-style`. Rejected: page class.
+
+## Permission
+
+One allowed action from the shared closed list.
+
+Term `term/permission`.
 
 ## Persistence constraint
 
-A rule enforced by durable storage, such as uniqueness, a required relationship, or a bounded value.
+One rule enforced by durable storage, such as uniqueness.
 
-## Platform profile
+Term `term/persistence-constraint`.
 
-A supported composition of architecture, frameworks, project layout, and baseline pages.
+## Problem
+
+One pain or job someone has today.
+
+Term `term/problem`.
 
 ## Product
 
-The software capability offered to users with its supported outcomes, operating boundary, exclusions, and external commitments.
+The software capability offered to users, with its boundary and exclusions.
 
-## Product decision
-
-A decision record whose `affects` field names the product pages it sets, approved by a named accountable person.
-
-## Product rule
-
-One testable business commitment on a product topic page, identified as `product/<topic>.<rule>` and cited by specifications.
+Term `term/product`.
 
 ## Product topic
 
-One page of business intent under `docs/product/`, written as a chapter for people and followed by its commitments.
+One business-intent page carrying requirement entries.
+
+Term `term/product-topic`.
 
 ## Projection
 
-A process deriving a Read Model from authoritative facts with the delivery guarantee required by its owning behavior.
+One read model derived from authoritative facts.
+
+Term `term/projection`.
 
 ## Provision
 
-One identified Standard or Convention block with one Requirement or replaceable Default and one evidence mapping.
+One identified standard or convention block with one assertion.
+
+Term `term/provision`.
 
 ## Provision ID
 
-The `standards/<kind>/<page>.<heading-slug>` identifier of one provision, such as `standards/rule/frontend-components.compose-composites-in-page-code`.
+The identifier of one provision, naming kind, page, and heading.
+
+Term `term/provision-id`.
 
 ## Query
 
-An Application message that reads a Read Model without changing business state.
+One message reading a read model without changing business state.
 
-## Read Model
+Term `term/query`.
 
-Data shaped for a Query without aggregate loading or mutation.
+## Rate limit
+
+One bound on request frequency at an exposed endpoint.
+
+Term `term/rate-limit`.
+
+## Read model
+
+Data shaped for a query, without business record loading.
+
+Term `term/read-model`.
+
+## Recovery objectives
+
+The accepted time and data loss bounds for a restore.
+
+Term `term/recovery-objectives`.
 
 ## Reference cast
 
-The one specification every scenario draws its people, place, dates, and amounts from.
+The people, place, dates, and amounts every scenario draws on.
+
+Term `term/reference-cast`.
 
 ## Reference page
 
-A page of exact values a reader looks up rather than reads end to end.
+One page of exact values a reader looks up.
 
-## Release Record
+Term `term/reference-page`.
 
-The immutable evidence record for one release artifact, including build, tests, deployment, recovery, diagnostics, operating limits, and runbooks.
+## Requirement
 
-## Repository (Domain port)
+One thing the product does or guarantees.
 
-A Domain-owned port that loads and stages complete aggregates without exposing general queries or committing transactions.
+Term `term/requirement`. Rejected: product rule.
 
-## Risk
+## Research
 
-A use-case metadata value that activates additional specification and verification for a named area of potential harm or failure.
+One outside fact informing a choice.
+
+Term `term/research`. Rejected: decision evidence.
+
+## Result
+
+One way a use case ends: success or a named refusal.
+
+Term `term/result`.
+
+## Role
+
+One named set of permissions an actor may hold at a scope.
+
+Term `term/role`.
+
+## Roll-forward
+
+Recovery by deploying a newer version rather than restoring the old one.
+
+Term `term/roll-forward`.
+
+## Runbook
+
+The steps to run or recover the product.
+
+Term `term/runbook`.
 
 ## Scenario
 
-One concrete occasion for a specification's subject, stating who acts, what surrounds them, and what they would do instead.
+One concrete occasion for a specification subject, stating who acts.
+
+Term `term/scenario`.
+
+## Secret inventory
+
+The list of production secrets with owner, location, and rotation date.
+
+Term `term/secret-inventory`.
 
 ## Source material
 
-Research, books, and digests kept outside `docs/`, often produced by agents, which carry no authority until a research claim or an approved decision states them.
+Research kept outside the documentation, carrying no authority alone.
+
+Term `term/source-material`.
 
 ## Specification
 
-An approved, versioned statement of required behavior or constraint that persists beyond one task or agent session.
+One approved statement of required behavior or constraint.
 
-## Specification Metadata
+Term `term/specification`.
 
-The opening JSON block identifying a structured document's kind, ID, authority, owner, review date, and implementation data.
+## Specification metadata
 
-## Specification-Driven Delivery
+The opening block stating a page type, owner, status, and records.
 
-The delivery approach in which approved specifications select work, record behavior, and define completion.
+Term `term/specification-metadata`. Rejected: frontmatter.
+
+## Specification-driven delivery
+
+Delivery where approved specifications select work and define completion.
+
+Term `term/specification-driven-delivery`.
 
 ## Standard
 
-One identified Standards provision stating a required boundary for a conforming consumer.
+One identified provision stating a required boundary for consumers.
 
-## Standards override
-
-A consumer replacement for one Standard, identified by its provision ID and an accepted project decision.
+Term `term/standard`.
 
 ## Standards release
 
-One published, pinned, complete standards contract that depends on no earlier release and carries no compatibility guarantee.
+One published, pinned, complete standards contract.
+
+Term `term/standards-release`.
+
+## Sub-processor
+
+One provider processing personal data for the product.
+
+Term `term/sub-processor`.
+
+## Term
+
+One word with a meaning, labels per language, and rejected words.
+
+Term `term/term`.
+
+## Trace context
+
+The trace and span identifiers carried across logs and calls.
+
+Term `term/trace-context`.
 
 ## Tutorial
 
-A page taking a reader through one first working result, with no option, no alternative, and no branch.
+One page taking a reader to a first working result.
+
+Term `term/tutorial`.
 
 ## Underneath
 
-The section of a command page that states what the command runs on the reader's behalf, and how to run those steps directly.
+The command page section stating what the command runs.
+
+Term `term/underneath`.
 
 ## Use case
 
-One independently testable actor or system goal implemented as one top-level Command or Query operation.
+One command or query with its permissions, results, and cases.
 
-## Validation rule
+Term `term/use-case`.
 
-A rule checking a Command or Query's shape, format, or bounded value before business behavior runs.
+## Value object
 
-## Value Object
+One immutable type defined by its values rather than identity.
 
-An immutable Domain type defined by its values and rules instead of an independent identity.
-
-## Workflow
-
-System-controlled progress across a transaction or time boundary with durable coordination and recovery behavior.
-
-## Workflow orchestrator
-
-The component that persists workflow progress and selects its next action.
-
-## Workflow rule
-
-A rule controlling when a workflow advances, waits, retries, compensates, fails, completes, or requires operator action.
+Term `term/value-object`.
 
 ## Workspace
 
-The Git repository that holds a consumer application or these standards, as distinct from a Domain repository port.
+The repository holding a consumer application or the standards.
+
+Term `term/workspace`. Rejected: repo.

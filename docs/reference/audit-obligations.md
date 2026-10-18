@@ -101,9 +101,9 @@ Building to that model costs nothing at design time. It lets a project map the t
 
 The sources behind every table above:
 
-- [NIST SP 800-53 Rev. 5, AU family](https://csf.tools/reference/nist-sp-800-53/r5/au/)
-- [ISO/IEC 27001:2022 Annex A 8.15 implementation guidance](https://www.isms.online/iso-27001/annex-a-2022/how-to-implement-iso-27001-2022-annex-a-control-8-15-logging/)
-- [PCI DSS 4.0 Requirement 10](https://www.herodevs.com/blog-posts/pci-dss-4-0-requirement-10-how-to-log-and-monitor-all-access-to-system-components-and-cardholder-data)
+- [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final)
+- [ISO/IEC 27001:2022](https://www.iso.org/standard/27001)
+- [PCI DSS](https://www.pcisecuritystandards.org/standards/pci-dss/)
 - [OWASP Logging Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html)
 - [DMTF Cloud Auditing Data Federation](https://www.dmtf.org/standards/cadf)
 - [Open Cybersecurity Schema Framework](https://github.com/ocsf/ocsf-schema)
