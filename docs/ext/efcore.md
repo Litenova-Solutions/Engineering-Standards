@@ -2,7 +2,7 @@
 
 ## Intent
 
-This extension replaces Marten persistence for aggregates with accepted relational navigation, change-tracking, or provider requirements that Marten cannot satisfy.
+This extension states the Entity Framework Core form of the read, query and mapping rules. It applies to aggregates with accepted relational navigation, change-tracking, or provider requirements that the baseline provider cannot satisfy.
 
 ## Activation
 
@@ -12,18 +12,33 @@ Applicable specification kinds: `module`, `use-case`.
 
 The consumer enables `efcore` only after a decision records aggregate scope, relational requirement, data evolution effect, and the Marten baseline gap.
 
-## Baseline relationship
+## Replaces
 
-For EF Core-owned aggregate paths, this extension replaces `standards/rule/workspace-dependencies.keep-application-dependencies-narrow`, `standards/rule/backend-architecture.separate-command-and-query-behavior`, `standards/rule/backend-persistence.stage-aggregate-writes-through-repositories`, `standards/rule/backend-persistence.query-through-iquerysession`, `standards/rule/backend-persistence.commit-once-in-the-command-pipeline`, `standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work`, `standards/rule/backend-persistence.keep-mappings-and-aliases-explicit`, `standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain`, `standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly`, and `standards/rule/backend-persistence.bound-aggregate-document-growth`.
+For Entity Framework Core-owned aggregate paths, this extension replaces:
 
-When `outbox` applies to an EF Core-owned command, this extension also replaces `standards/rule/ext-outbox.stage-messages-with-business-work` for that command.
+- `standards/rule/backend-persistence.query-through-iquerysession`: EF Core queries use `IApplicationDbContext`.
+- `standards/rule/backend-persistence.keep-mappings-and-aliases-explicit`: EF Core mappings use `IEntityTypeConfiguration<T>` classes.
+- `standards/rule/workspace-dependencies.keep-application-dependencies-narrow`: Application references the Entity Framework Core query surface its query interface needs.
+- `standards/rule/backend-architecture.separate-command-and-query-behavior`: the read half only; the invariant half still binds.
+
+For an EF Core-owned command with durable delivery, this extension also replaces:
+
+- `standards/rule/ext-outbox.stage-messages-with-business-work`
+- `standards/rule/ext-outbox.use-the-scoped-business-session`
+- `standards/rule/ext-outbox.reject-independent-outbox-commits`
+
+Every other baseline provision binds EF Core-owned paths unchanged.
+
+## Switches on
+
+This extension switches on no optional record type.
 
 ## Agent Summary {#agent-summary}
 
 - Record affected aggregates and persistence effects. (standards/rule/ext-efcore.record-ef-core-replacement-scope)
 - Stage each Command through one write provider. (standards/rule/ext-efcore.use-one-write-provider, standards/rule/ext-efcore.reject-mixed-provider-writes)
 - Keep EF Core writes behind repositories. (standards/rule/ext-efcore.stage-aggregate-writes-in-repositories, standards/rule/ext-efcore.exclude-direct-handler-commits)
-- Query EF Core through `IApplicationDbContext`. (standards/rule/ext-efcore.define-ef-core-query-roots, standards/rule/ext-efcore.retain-marten-query-boundary)
+- Query EF Core through `IApplicationDbContext` and resolve the tenant at context creation. (standards/rule/ext-efcore.define-ef-core-query-roots, standards/rule/ext-efcore.retain-marten-query-boundary, standards/rule/ext-efcore.resolve-the-tenant-at-context-creation)
 - Commit EF Core changes through its LiteBus post-handler. (standards/rule/ext-efcore.commit-ef-core-command-work-once)
 - Stage EF Core outbox records with EF Core business work. (standards/rule/ext-efcore.stage-ef-core-outbox-records-together)
 - Configure relational mappings in Infrastructure. (standards/rule/ext-efcore.configure-ef-core-mappings-in-infrastructure)
@@ -89,9 +104,9 @@ When `outbox` applies to an EF Core-owned command, this extension also replaces 
 
 ### Define EF Core query roots (standards/rule/ext-efcore.define-ef-core-query-roots)
 
-**Requirement:** Application MUST own one public `IApplicationDbContext` exposing required generic sets or named query roots.
+**Requirement:** Application MUST own one public `IApplicationDbContext` exposing required generic sets or named query roots. Application MUST reference only the Entity Framework Core abstractions that interface needs.
 
-**Rationale:** The interface defines the EF Core query boundary without exposing the Infrastructure DbContext.
+**Rationale:** The interface defines the EF Core query boundary without exposing the Infrastructure DbContext. The permitted surface is the query types the interface exposes and the manifest-pinned `Microsoft.EntityFrameworkCore` package that declares them.
 
 ### Implement query roots in Infrastructure (standards/rule/ext-efcore.implement-query-roots-in-infrastructure)
 
@@ -107,7 +122,7 @@ When `outbox` applies to an EF Core-owned command, this extension also replaces 
 
 ### Project EF Core queries directly (standards/rule/ext-efcore.project-ef-core-queries-directly)
 
-**Requirement:** An EF Core query handler MUST use `AsNoTracking`, filter before materialization, apply deterministic ordering and limits, and project result records.
+**Requirement:** An EF Core query handler MUST use `AsNoTracking`, filter before materialization, apply deterministic ordering and limits, and project result records. A command MUST NOT enforce an invariant from a read projection.
 
 **Rationale:** The implementation reads handlers return shaped results without loading mutable aggregate state.
 
@@ -116,6 +131,12 @@ When `outbox` applies to an EF Core-owned command, this extension also replaces 
 **Requirement:** An EF Core query implementation MUST NOT add one read-store interface per aggregate.
 
 **Rationale:** `IApplicationDbContext` supplies the selected EF Core query boundary.
+
+### Resolve the tenant at context creation (standards/rule/ext-efcore.resolve-the-tenant-at-context-creation)
+
+**Requirement:** An EF Core DbContext MUST resolve the tenant when the context is created and apply the tenant filter to tenant-owned sets.
+
+**Rationale:** Resolution at creation keeps the tenant out of every query, and the filter convention applies it to each tenant-owned set.
 
 ### Commit EF Core Command work once (standards/rule/ext-efcore.commit-ef-core-command-work-once)
 
@@ -137,15 +158,9 @@ When `outbox` applies to an EF Core-owned command, this extension also replaces 
 
 ### Stage EF Core outbox records together (standards/rule/ext-efcore.stage-ef-core-outbox-records-together)
 
-**Requirement:** An EF Core-owned Command MUST map and stage outbox records with aggregate changes or Workflow progress through the same DbContext.
+**Requirement:** An EF Core-owned Command MUST map and stage outbox records with aggregate changes through the same DbContext.
 
 **Rationale:** The DbContext transaction makes the outbox record and business work durable together.
-
-### Commit EF Core outbox records once (standards/rule/ext-efcore.commit-ef-core-outbox-records-once)
-
-**Requirement:** An EF Core outbox Command MUST commit its aggregate and outbox changes through one `SaveChangesAsync` call.
-
-**Rationale:** One call prevents separate durable outcomes for the business change and message.
 
 ### Reject cross-provider outbox storage (standards/rule/ext-efcore.reject-cross-provider-outbox-storage)
 
@@ -261,15 +276,15 @@ The previous release database is the schema of the last released artifact, not t
 
 **Default:** Use `Infrastructure/Persistence/EfCore/` for `ApplicationDbContext`, factory, post-handler, configurations, migrations, and repositories.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Example:** `Infrastructure/Persistence/EfCore/Configurations/` holds entity mapping classes.
 
 ### Use snake-case relational names (standards/rule/ext-efcore.use-snake-case-relational-names)
 
-**Default:** Use `snake_case` through the pinned naming-conventions package and verify generated names in each migration.
+**Default:** Use the pinned naming-conventions package and verify generated names in each migration. `standards/rule/backend-persistence.use-database-naming-conventions` owns the casing.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** The migration shows the exact names that reach the database.
 
@@ -281,43 +296,43 @@ The previous release database is the schema of the last released artifact, not t
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-efcore.record-ef-core-replacement-scope | inspection | EF Core decision records all required replacement and rollback fields. |
-| standards/rule/ext-efcore.retain-unaffected-baseline-persistence | inspection | Nonselected aggregate paths retain baseline persistence documentation and code. |
-| standards/rule/ext-efcore.use-one-write-provider | test | `EfCoreTransactionTests` stage aggregate work through one selected provider. |
-| standards/rule/ext-efcore.reject-mixed-provider-writes | static | `EfCoreTransactionTests` asserts command handlers contain no mixed Marten and EF Core aggregate repository writes. |
-| standards/rule/ext-efcore.record-provider-selection | inspection | Adoption decision records Command provider selection and architecture-test evidence. |
-| standards/rule/ext-efcore.register-one-command-post-handler | test | `EfCoreTransactionTests` asserts command registration resolves only its selected provider post-handler. |
-| standards/rule/ext-efcore.resolve-cross-provider-invariants | inspection | Cross-provider invariant review selects one provider or shared transaction evidence. |
-| standards/rule/ext-efcore.stage-aggregate-writes-in-repositories | test | `EfCoreWriteTests` stage changes through scoped DbContext. |
-| standards/rule/ext-efcore.exclude-direct-handler-commits | static | Command handlers contain no DbContext injection or `SaveChangesAsync` call. |
-| standards/rule/ext-efcore.define-ef-core-query-roots | static | Application exposes one owned `IApplicationDbContext` query interface. |
-| standards/rule/ext-efcore.implement-query-roots-in-infrastructure | static | `EfCoreReadTests` asserts infrastructure DbContext implements the owned query interface. |
-| standards/rule/ext-efcore.retain-marten-query-boundary | static | Marten query handlers retain `IQuerySession`. |
-| standards/rule/ext-efcore.project-ef-core-queries-directly | test | `EfCoreReadTests` use no tracking, authorized filters, deterministic limits, and projections. |
-| standards/rule/ext-efcore.avoid-per-aggregate-read-stores | static | `EfCoreReadTests` asserts eF Core query source contains no per-aggregate read-store interface pattern. |
-| standards/rule/ext-efcore.commit-ef-core-command-work-once | test | EF Core Command tests observe one post-handler `SaveChangesAsync` call. |
-| standards/rule/ext-efcore.process-changed-aggregate-events | test | `EfCoreCommitTests` classify and stage Domain Events correctly. |
-| standards/rule/ext-efcore.use-durable-outbox-delivery | static | `EfCoreCommitTests` asserts eF Core durable Commands commit no Marten session. |
-| standards/rule/ext-efcore.stage-ef-core-outbox-records-together | test | `EfCoreOutboxTests` stage message and business work through one DbContext. |
-| standards/rule/ext-efcore.commit-ef-core-outbox-records-once | test | `EfCoreOutboxTests` observe one commit for aggregate and message. |
-| standards/rule/ext-efcore.reject-cross-provider-outbox-storage | static | `EfCoreOutboxTests` asserts eF Core Command source writes no required outbox record through Marten. |
-| standards/rule/ext-efcore.configure-ef-core-mappings-in-infrastructure | static | `EfCoreMappingTests` asserts eF Core mappings use Infrastructure-owned configuration classes. |
-| standards/rule/ext-efcore.configure-relational-details-explicitly | inspection | Mapping review records every declared relational configuration category. |
-| standards/rule/ext-efcore.retain-domain-state-values | test | `EfCoreStateTests` retain the aggregate's one Domain state value. |
-| standards/rule/ext-efcore.map-stable-relational-state-shape | static | `EfCoreStateTests` asserts domain source contains no relational lifecycle flags or duplicate nullable state values. |
-| standards/rule/ext-efcore.use-direct-state-mapping-only-when-supported | test | `EfCoreStateTests` materialize, track, and round-trip every state case. |
-| standards/rule/ext-efcore.map-unsupported-state-shapes-in-infrastructure | test | `EfCoreStateTests` map valid discriminator values to Domain states. |
-| standards/rule/ext-efcore.review-new-persisted-states | inspection | New state review and integration fixture cover migration, mixed versions, and rollback. |
-| standards/rule/ext-efcore.generate-migrations-for-schema-changes | static | `EfCoreMigrationsTests` asserts eF Core schema diffs include a generated migration. |
-| standards/rule/ext-efcore.review-migration-effects | inspection | Migration review covers each declared storage and rollback effect. |
-| standards/rule/ext-efcore.apply-migrations-as-release-work | operation | Release record applies migration before replica startup. |
-| standards/rule/ext-efcore.keep-migration-files-together | static | `EfCoreMigrationsTests` asserts migration commit contains migration, snapshot, and reviewed SQL artifacts. |
-| standards/rule/ext-efcore.test-migration-starting-states | test | `EfCoreMigrationsTests` run from empty and previous-release databases. |
-| standards/rule/ext-efcore.reject-startup-schema-mutation | static | `EfCoreMigrationsTests` asserts production and staging startup source calls none of the prohibited schema APIs. |
-| standards/rule/ext-efcore.configure-optimistic-tokens | test | `EfCoreConcurrencyTests` carry expected version and use configured EF Core token. |
-| standards/rule/ext-efcore.map-ef-core-concurrency-conflict | test | `EfCoreConcurrencyTests` maps provider exception to Application contract. |
-| standards/rule/ext-efcore.reject-automatic-command-retry | test | `EfCoreConcurrencyTests` proves no complete Command automatic retry. |
-| standards/rule/ext-efcore.use-the-ef-core-infrastructure-layout | inspection | EF Core Infrastructure paths use the default layout or a local replacement. |
-| standards/rule/ext-efcore.use-snake-case-relational-names | test | `EfCoreTests` asserts generated migrations contain verified snake-case database names. |
+| standards/rule/ext-efcore.record-ef-core-replacement-scope | guidance | Does the decision name aggregates, evolution, transactions, queries, packages and rollback? |
+| standards/rule/ext-efcore.retain-unaffected-baseline-persistence | guidance | Does every unaffected aggregate path retain its baseline persistence behavior? |
+| standards/rule/ext-efcore.use-one-write-provider | checkable | `EfCoreTransactionTests` stage aggregate work through one selected provider. |
+| standards/rule/ext-efcore.reject-mixed-provider-writes | checkable | `EfCoreTransactionTests` assert no mixed Marten and EF Core aggregate repository writes. |
+| standards/rule/ext-efcore.record-provider-selection | guidance | Does the decision name each Command path's provider and its test evidence? |
+| standards/rule/ext-efcore.register-one-command-post-handler | checkable | `EfCoreTransactionTests` assert each command resolves only its selected provider post-handler. |
+| standards/rule/ext-efcore.resolve-cross-provider-invariants | guidance | Does each cross-provider invariant use one provider or a reviewed shared transaction? |
+| standards/rule/ext-efcore.stage-aggregate-writes-in-repositories | checkable | `EfCoreWriteTests` stage changes through the scoped DbContext. |
+| standards/rule/ext-efcore.exclude-direct-handler-commits | checkable | `EfCoreWriteTests` assert handlers inject no DbContext and call no `SaveChangesAsync`. |
+| standards/rule/ext-efcore.define-ef-core-query-roots | checkable | `EfCoreReadTests` assert one owned `IApplicationDbContext` and no wider EF surface. |
+| standards/rule/ext-efcore.implement-query-roots-in-infrastructure | checkable | `EfCoreReadTests` assert the Infrastructure DbContext implements the owned query interface. |
+| standards/rule/ext-efcore.retain-marten-query-boundary | checkable | `EfCoreReadTests` assert Marten query handlers retain `IQuerySession`. |
+| standards/rule/ext-efcore.project-ef-core-queries-directly | checkable | `EfCoreReadTests` assert no tracking, authorized filters, deterministic limits, projections, and no invariant from a projection. |
+| standards/rule/ext-efcore.avoid-per-aggregate-read-stores | checkable | `EfCoreReadTests` assert no per-aggregate read-store interface pattern exists. |
+| standards/rule/ext-efcore.resolve-the-tenant-at-context-creation | checkable | `EfCoreReadTests` assert tenant resolution at creation and tenant filters on owned sets. |
+| standards/rule/ext-efcore.commit-ef-core-command-work-once | checkable | `EfCoreCommitTests` observe one post-handler `SaveChangesAsync` call per owned Command. |
+| standards/rule/ext-efcore.process-changed-aggregate-events | checkable | `EfCoreCommitTests` classify and stage Domain Events correctly. |
+| standards/rule/ext-efcore.use-durable-outbox-delivery | checkable | `EfCoreCommitTests` assert EF Core durable Commands commit no Marten session. |
+| standards/rule/ext-efcore.stage-ef-core-outbox-records-together | checkable | `EfCoreOutboxTests` stage message and business work through one DbContext. |
+| standards/rule/ext-efcore.reject-cross-provider-outbox-storage | checkable | `EfCoreOutboxTests` assert EF Core Commands write no outbox record through Marten. |
+| standards/rule/ext-efcore.configure-ef-core-mappings-in-infrastructure | checkable | `EfCoreMappingTests` assert EF Core mappings use Infrastructure-owned configuration classes. |
+| standards/rule/ext-efcore.configure-relational-details-explicitly | guidance | Does the mapping review record every declared relational configuration category? |
+| standards/rule/ext-efcore.retain-domain-state-values | checkable | `EfCoreStateTests` retain the aggregate's one Domain state value. |
+| standards/rule/ext-efcore.map-stable-relational-state-shape | checkable | `EfCoreStateTests` assert no relational lifecycle flags or duplicate nullable state values. |
+| standards/rule/ext-efcore.use-direct-state-mapping-only-when-supported | checkable | `EfCoreStateTests` materialize, track, and round-trip every state case. |
+| standards/rule/ext-efcore.map-unsupported-state-shapes-in-infrastructure | checkable | `EfCoreStateTests` map valid discriminator values to Domain states. |
+| standards/rule/ext-efcore.review-new-persisted-states | guidance | Does the new state review cover migration, mixed versions, rollback and a fixture? |
+| standards/rule/ext-efcore.generate-migrations-for-schema-changes | checkable | `EfCoreMigrationsTests` assert EF Core schema diffs include a generated migration. |
+| standards/rule/ext-efcore.review-migration-effects | guidance | Does the migration review cover every declared storage and rollback effect? |
+| standards/rule/ext-efcore.apply-migrations-as-release-work | checkable | `EfCoreMigrationsTests` place migration application before replica startup in the release record. |
+| standards/rule/ext-efcore.keep-migration-files-together | checkable | `EfCoreMigrationsTests` assert each migration commit holds migration, snapshot, and reviewed SQL. |
+| standards/rule/ext-efcore.test-migration-starting-states | checkable | `EfCoreMigrationsTests` run from empty and previous-release databases. |
+| standards/rule/ext-efcore.reject-startup-schema-mutation | checkable | `EfCoreMigrationsTests` assert startup calls none of the prohibited schema APIs. |
+| standards/rule/ext-efcore.configure-optimistic-tokens | checkable | `EfCoreConcurrencyTests` carry expected version and use the configured EF Core token. |
+| standards/rule/ext-efcore.map-ef-core-concurrency-conflict | checkable | `EfCoreConcurrencyTests` map the provider exception to the Application contract. |
+| standards/rule/ext-efcore.reject-automatic-command-retry | checkable | `EfCoreConcurrencyTests` prove no complete Command automatic retry. |
+| standards/rule/ext-efcore.use-the-ef-core-infrastructure-layout | guidance | Does each EF Core Infrastructure path use the default layout or record an Exception? |
+| standards/rule/ext-efcore.use-snake-case-relational-names | checkable | `EfCoreTests` assert generated migrations contain verified snake-case database names. |

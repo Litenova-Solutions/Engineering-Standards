@@ -8,13 +8,17 @@ External systems are unreliable and outside application change control. This ext
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `workflow`, `domain-policy`, `end-to-end-flow`.
+Applicable specification kinds: `use-case`, `rule`, `journey`.
 
 The consumer enables `integrations` for each use case that calls or publishes to an external service, receives a webhook, or uses a provider SDK.
 
-## Baseline relationship
+## Replaces
 
-This extension adds pinned HTTP resilience and network simulation packages. It replaces no baseline rule.
+This extension replaces no baseline provision.
+
+## Switches on
+
+This extension switches on no optional record type.
 
 ## Agent Summary {#agent-summary}
 
@@ -24,6 +28,7 @@ This extension adds pinned HTTP resilience and network simulation packages. It r
 - Retry only bounded and idempotent provider calls. (standards/rule/ext-integrations.bound-transient-retries, standards/rule/ext-integrations.protect-non-idempotent-calls)
 - Translate provider failures without leaks. (standards/rule/ext-integrations.translate-provider-failure-outcomes, standards/rule/ext-integrations.exclude-provider-internals)
 - Verify inbound provider messages before processing. (standards/rule/ext-integrations.verify-inbound-provider-messages)
+- Reject formula-leading import values. (standards/rule/ext-integrations.reject-formula-leading-import-values)
 - Test failure modes at the network boundary. (standards/rule/ext-integrations.simulate-integration-boundaries)
 
 ## Standards
@@ -98,13 +103,21 @@ The stable codes come from the project's own error catalog, which is the same re
 
 The order is not free. The signature is verified first, over the raw body, before the body is parsed or any other check reads it. A parser that runs first is attacker-reachable code behind no authentication, and a body already deserialized is no longer the bytes the signature covered. [Stripe's signature guidance](https://stripe.com/docs/webhooks/signatures) states the same requirement.
 
-**Example:** A failed signature returns its status with no body, because a message explaining which check failed tells an unauthenticated caller how to pass it.
+**Example:** A failed signature returns 401 with no body, because a message explaining which check failed tells an unauthenticated caller how to pass it.
 
 ### Process duplicate messages safely (standards/rule/ext-integrations.process-duplicate-messages-safely)
 
 **Requirement:** An inbound provider handler MUST store or process duplicate events idempotently.
 
 **Rationale:** Provider delivery can repeat one event after a timeout or acknowledgement failure.
+
+### Reject formula-leading import values (standards/rule/ext-integrations.reject-formula-leading-import-values)
+
+**Requirement:** A CSV or spreadsheet import MUST reject or neutralize a value that begins with a formula-leading character.
+
+**Rationale:** The formula-leading characters are the equals sign, the plus sign, the minus sign, the at sign, the tab, and the carriage return. Escaping on the way out protects the reader of this export. It does not protect the reader of the next one. An imported value stored unchanged is re-exported by a different report that may not escape it. [CSV injection](https://owasp.org/www-community/attacks/CSV_Injection) travels through the store, so the boundary that admits the value is where it stops.
+
+**Example:** An import that rejects the value reports the row and the field. An import that neutralizes it records what it changed, because a silently altered value is a data defect the owner cannot see.
 
 ### Simulate integration boundaries (standards/rule/ext-integrations.simulate-integration-boundaries)
 
@@ -126,7 +139,7 @@ An unexpected response shape is the mode a provider produces without failing. A 
 
 **Default:** Place provider code under `Infrastructure/Integrations/{Provider}/`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** One provider folder gives transport code a clear Infrastructure boundary.
 
@@ -134,7 +147,7 @@ An unexpected response shape is the mode a provider produces without failing. A 
 
 **Default:** Keep one options class, client, transport models, mappings, and registration module in each provider folder.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** Related provider implementation details remain discoverable together.
 
@@ -142,7 +155,7 @@ An unexpected response shape is the mode a provider produces without failing. A 
 
 **Default:** Keep business-action ports with their Application use cases.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** The use case states why it needs the external behavior.
 
@@ -153,21 +166,22 @@ An unexpected response shape is the mode a provider produces without failing. A 
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-integrations.define-business-action-ports | inspection | Application source review identifies business-action provider ports. |
-| standards/rule/ext-integrations.isolate-provider-implementations | static | `ExternalPortTests` asserts application assembly references no provider SDK or transport-model type. |
-| standards/rule/ext-integrations.bind-client-configuration | test | `ExternalClientTests` reject missing or invalid external client configuration. |
-| standards/rule/ext-integrations.use-managed-http-clients | static | `ExternalClientTests` asserts hTTP integration registration uses the owned factory and declared discovery path. |
-| standards/rule/ext-integrations.reject-per-request-http-clients | static | `ExternalClientTests` reports no per-request HTTP client construction. |
-| standards/rule/ext-integrations.bound-transient-retries | test | `ExternalRetryTests` verify bounded jittered retry for transient failures. |
-| standards/rule/ext-integrations.protect-non-idempotent-calls | test | `ExternalRetryTests` shows no retry without documented provider protection. |
-| standards/rule/ext-integrations.translate-provider-failure-outcomes | test | `ExternalFailureTests` asserts provider failures map to project-owned outcomes and stable diagnostics. |
-| standards/rule/ext-integrations.exclude-provider-internals | test | `ExternalFailureTests` expose no provider body, credential, header, type, or account identifier. |
-| standards/rule/ext-integrations.verify-inbound-provider-messages | test | `ExternalInboundTests` reject invalid signatures, timestamps, content, size, schema, and identities. |
-| standards/rule/ext-integrations.process-duplicate-messages-safely | test | `ExternalInboundTests` leave one accepted external effect. |
-| standards/rule/ext-integrations.simulate-integration-boundaries | test | `ExternalTestTests` runs each provider contract against a controllable local endpoint. |
-| standards/rule/ext-integrations.cover-provider-failure-modes | test | `ExternalTestTests` suite covers every declared failure mode. |
-| standards/rule/ext-integrations.group-provider-code | inspection | Provider paths use the documented folder or record a local replacement. |
-| standards/rule/ext-integrations.keep-provider-components-together | inspection | Provider folder review finds each documented component. |
-| standards/rule/ext-integrations.keep-ports-near-use-cases | inspection | Business-action ports remain near their owning Application use cases. |
+| standards/rule/ext-integrations.define-business-action-ports | guidance | Does each Application port name a business action without naming its provider? |
+| standards/rule/ext-integrations.isolate-provider-implementations | checkable | `ExternalPortTests` assert the Application assembly references no provider SDK or transport type. |
+| standards/rule/ext-integrations.bind-client-configuration | checkable | `ExternalClientTests` reject missing or invalid external client configuration. |
+| standards/rule/ext-integrations.use-managed-http-clients | checkable | `ExternalClientTests` assert HTTP registration uses the owned factory and declared discovery path. |
+| standards/rule/ext-integrations.reject-per-request-http-clients | checkable | `ExternalClientTests` report no per-request HTTP client construction. |
+| standards/rule/ext-integrations.bound-transient-retries | checkable | `ExternalRetryTests` verify bounded jittered retry for transient failures. |
+| standards/rule/ext-integrations.protect-non-idempotent-calls | checkable | `ExternalRetryTests` show no retry without documented provider protection. |
+| standards/rule/ext-integrations.translate-provider-failure-outcomes | checkable | `ExternalFailureTests` assert provider failures map to project-owned outcomes and stable diagnostics. |
+| standards/rule/ext-integrations.exclude-provider-internals | checkable | `ExternalFailureTests` expose no provider body, credential, header, type, or account identifier. |
+| standards/rule/ext-integrations.verify-inbound-provider-messages | checkable | `ExternalInboundTests` reject invalid signatures, timestamps, content, size, schema, and identities. |
+| standards/rule/ext-integrations.process-duplicate-messages-safely | checkable | `ExternalInboundTests` leave one accepted external effect. |
+| standards/rule/ext-integrations.reject-formula-leading-import-values | checkable | `ExternalInboundTests` reject or neutralize formula-leading import values. |
+| standards/rule/ext-integrations.simulate-integration-boundaries | checkable | `ExternalTestTests` run each provider contract against a controllable local endpoint. |
+| standards/rule/ext-integrations.cover-provider-failure-modes | checkable | `ExternalTestTests` suite covers every declared failure mode. |
+| standards/rule/ext-integrations.group-provider-code | guidance | Does each provider folder hold its code or record an Exception? |
+| standards/rule/ext-integrations.keep-provider-components-together | guidance | Does each provider folder hold its options, client, models, mappings and registration? |
+| standards/rule/ext-integrations.keep-ports-near-use-cases | guidance | Does each business-action port stay with its owning Application use case? |

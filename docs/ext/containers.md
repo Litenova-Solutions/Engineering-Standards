@@ -12,9 +12,13 @@ Applicable specification kinds: None.
 
 The consumer enables `containers` when production or staging deploys the API, Worker, or frontend as a container image.
 
-## Baseline relationship
+## Replaces
 
-The extension adds no application package and replaces no baseline rule.
+This extension replaces no baseline provision. Its schema, rollback and secret rules cite the baseline rules that own those obligations.
+
+## Switches on
+
+This extension switches on `limit` and `runbook`. `standards/rule/ext-containers.declare-writable-paths-and-limits` records resource bounds as Limit records, and `standards/rule/ext-containers.retain-rollback-material` records the rollback procedure as a Runbook record.
 
 ## Agent Summary {#agent-summary}
 
@@ -47,11 +51,11 @@ The extension adds no application package and replaces no baseline rule.
 
 **Rationale:** A small runtime layer reduces attack surface and image transfer cost.
 
-### Exclude build and secret material (standards/rule/ext-containers.exclude-build-and-secret-material)
+### Exclude build material from runtime images (standards/rule/ext-containers.exclude-build-material-from-runtime-images)
 
-**Requirement:** A runtime image MUST NOT contain source, tests, package caches, credentials, or local configuration.
+**Requirement:** A runtime image MUST NOT contain source, tests, package caches, or local configuration.
 
-**Rationale:** Build-only and secret material has no production runtime purpose.
+**Rationale:** Build-only material has no production runtime purpose. Secrets stay out under `standards/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data`.
 
 ### Supply runtime configuration externally (standards/rule/ext-containers.supply-runtime-configuration-externally)
 
@@ -67,13 +71,13 @@ The extension adds no application package and replaces no baseline rule.
 
 ### Apply schema work before traffic (standards/rule/ext-containers.apply-schema-work-before-traffic)
 
-**Requirement:** A release job MUST apply reviewed schema changes before traffic shifts to new application replicas.
+**Requirement:** A release job MUST apply reviewed schema changes before traffic shifts to new application replicas, under `standards/rule/backend-persistence.control-production-schema-changes`.
 
-**Rationale:** One controlled job gives schema changes clear ordering and evidence.
+**Rationale:** The release job is the container platform's form of the reviewed step the baseline rule requires.
 
 ### Keep schema work out of startup (standards/rule/ext-containers.keep-schema-work-out-of-startup)
 
-**Requirement:** An application replica MUST NOT alter the production schema during startup.
+**Requirement:** An application replica MUST NOT alter the production schema during startup, under `standards/rule/backend-persistence.control-production-schema-changes`.
 
 **Rationale:** Replica startup can occur concurrently and lacks release-job control.
 
@@ -85,21 +89,15 @@ The extension adds no application package and replaces no baseline rule.
 
 ### Test released traffic (standards/rule/ext-containers.test-released-traffic)
 
-**Requirement:** A release deployment MUST run its included end-to-end tests after traffic reaches the new version.
+**Requirement:** A release deployment MUST run the release's recorded end-to-end suite after traffic reaches the new version.
 
-**Rationale:** The test verifies the deployed path rather than only an image build.
+**Rationale:** The test verifies the deployed path rather than only an image build. The release record names the suite.
 
 ### Retain rollback material (standards/rule/ext-containers.retain-rollback-material)
 
-**Requirement:** A release owner MUST retain the previous image digest and an executable rollback command.
+**Requirement:** A release owner MUST record the rollback procedure as a Runbook record identifying the previous image digest, under `standards/rule/quality-operations.keep-rollback-executable`.
 
-**Rationale:** A known digest and command allow a controlled return to the last released artifact.
-
-### Check rollback compatibility (standards/rule/ext-containers.check-rollback-compatibility)
-
-**Requirement:** A release owner MUST confirm schema and configuration compatibility with the previous application before deployment.
-
-**Rationale:** Rollback depends on the previous application accepting the current persisted and configured state.
+**Rationale:** The digest identifies one immutable image, and the Runbook carries the tested command.
 
 ### Limit container privileges (standards/rule/ext-containers.limit-container-privileges)
 
@@ -109,7 +107,7 @@ The extension adds no application package and replaces no baseline rule.
 
 ### Declare writable paths and limits (standards/rule/ext-containers.declare-writable-paths-and-limits)
 
-**Requirement:** A deployment MUST declare writable paths and apply measured CPU and memory limits.
+**Requirement:** A deployment MUST declare writable paths and record CPU and memory bounds as Limit records.
 
 **Rationale:** Explicit limits protect node capacity and document required mutable storage.
 
@@ -151,9 +149,9 @@ The extension adds no application package and replaces no baseline rule.
 
 ### Exclude build timestamps from contracts (standards/rule/ext-containers.exclude-build-timestamps-from-contracts)
 
-**Requirement:** A generated application contract MUST NOT contain a build timestamp.
+**Requirement:** A published OpenAPI document or generated client MUST NOT contain a build timestamp.
 
-**Rationale:** Build timestamps create nondeterministic generated output without application meaning.
+**Rationale:** Build timestamps create nondeterministic generated output without application meaning. A generated-at field and a build-time comment are both build timestamps.
 
 ### Separate frontend configuration classes (standards/rule/ext-containers.separate-frontend-configuration-classes)
 
@@ -171,7 +169,7 @@ The extension adds no application package and replaces no baseline rule.
 
 **Requirement:** A frontend image build MUST NOT use `ARG`, copied environment files, or image layers for secrets.
 
-**Rationale:** Build arguments, copied files, and layers can retain a secret in image history.
+**Rationale:** Build arguments, copied files, and layers can retain a secret in image history. Secrets stay out of layers under `standards/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data`.
 
 ## Conventions
 
@@ -179,7 +177,7 @@ The extension adds no application package and replaces no baseline rule.
 
 **Default:** Keep one Dockerfile beside each deployable application.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** The Dockerfile stays near the project that defines its runtime output.
 
@@ -187,7 +185,7 @@ The extension adds no application package and replaces no baseline rule.
 
 **Default:** Build images from the workspace root when shared project or package files are required.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** Root context supplies shared build inputs while the Dockerfile excludes unrelated secrets.
 
@@ -197,31 +195,30 @@ No application package is required.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-containers.build-release-images-in-stages | static | `ContainersImageTests` asserts dockerfile review shows multi-stage builds and digest-pinned release bases. |
-| standards/rule/ext-containers.run-images-as-non-root | test | `ContainersImageTests` with its declared non-root runtime user. |
-| standards/rule/ext-containers.copy-only-runtime-files | inspection | Image file listing contains only declared runtime outputs. |
-| standards/rule/ext-containers.exclude-build-and-secret-material | static | `ContainersImageTests` contain no build-only files, credentials, or local configuration. |
-| standards/rule/ext-containers.supply-runtime-configuration-externally | operation | Deployment configuration supplies declared runtime values outside the image. |
-| standards/rule/ext-containers.exclude-environment-configuration-from-images | static | `ContainersConfigTests` contains no environment-specific configuration. |
-| standards/rule/ext-containers.apply-schema-work-before-traffic | operation | Release record places the reviewed schema job before traffic shift. |
-| standards/rule/ext-containers.keep-schema-work-out-of-startup | test | `ContainersSchemaTests` perform no production schema mutation. |
-| standards/rule/ext-containers.wait-for-replica-readiness | operation | Deployment event log records readiness before traffic shift. |
-| standards/rule/ext-containers.test-released-traffic | test | `ContainersTrafficTests` pass after new-version traffic shift. |
-| standards/rule/ext-containers.retain-rollback-material | operation | Release record stores the previous digest and tested rollback command. |
-| standards/rule/ext-containers.check-rollback-compatibility | test | `ContainersRollbackTests` proves prior application schema and configuration compatibility. |
-| standards/rule/ext-containers.limit-container-privileges | static | `ContainersSecurityTests` asserts deployment manifest defines read-only filesystem and capability restrictions. |
-| standards/rule/ext-containers.declare-writable-paths-and-limits | operation | Deployment manifest records writable paths and measured resource limits. |
-| standards/rule/ext-containers.run-the-application-as-pid-1 | test | `ContainersProcessTests` confirms the application receives the container stop signal. |
-| standards/rule/ext-containers.set-sufficient-shutdown-time | test | `ContainersProcessTests` asserts in-flight work stops within the declared grace period. |
-| standards/rule/ext-containers.write-runtime-logs-to-streams | test | `ContainersProcessTests` asserts container logs appear on standard output or standard error. |
-| standards/rule/ext-containers.keep-mutable-data-external | inspection | Runtime design identifies no required mutable container filesystem state. |
-| standards/rule/ext-containers.apply-oci-release-labels | static | `ContainersMetadataTests` asserts built image inspection reports the four required OCI labels. |
-| standards/rule/ext-containers.record-image-digests | operation | Release record identifies the deployed artifact by immutable digest. |
-| standards/rule/ext-containers.exclude-build-timestamps-from-contracts | static | `ContainersMetadataTests` asserts generated-contract diff contains no build timestamp. |
-| standards/rule/ext-containers.separate-frontend-configuration-classes | inspection | Frontend build review separates public configuration from server-only secrets. |
-| standards/rule/ext-containers.use-protected-frontend-secret-delivery | inspection | Frontend build review identifies secret mounts or runtime injection. |
-| standards/rule/ext-containers.exclude-insecure-frontend-secret-carriers | static | Dockerfile scan rejects `ARG`, copied environment files, and secret-bearing layers. |
-| standards/rule/ext-containers.place-dockerfiles-beside-deployables | inspection | Each deployable has a colocated Dockerfile or a recorded local replacement. |
-| standards/rule/ext-containers.build-from-the-workspace-root | test | `ContainersTests` asserts image builds access declared shared inputs from repository-root context. |
+| standards/rule/ext-containers.build-release-images-in-stages | checkable | `ContainersImageTests` assert multi-stage builds and digest-pinned release bases. |
+| standards/rule/ext-containers.run-images-as-non-root | checkable | `ContainersImageTests` assert the declared non-root runtime user. |
+| standards/rule/ext-containers.copy-only-runtime-files | checkable | `ContainersImageTests` match the image file listing against the declared runtime manifest. |
+| standards/rule/ext-containers.exclude-build-material-from-runtime-images | checkable | `ContainersImageTests` find no build-only files or local configuration in runtime images. |
+| standards/rule/ext-containers.supply-runtime-configuration-externally | checkable | `ContainersConfigTests` match deployment manifests against runtime values declared outside the image. |
+| standards/rule/ext-containers.exclude-environment-configuration-from-images | checkable | `ContainersConfigTests` find no environment-specific configuration in release images. |
+| standards/rule/ext-containers.apply-schema-work-before-traffic | checkable | `ContainersSchemaTests` place the reviewed schema job before the traffic shift. |
+| standards/rule/ext-containers.keep-schema-work-out-of-startup | checkable | `ContainersSchemaTests` observe no production schema mutation from replica startup. |
+| standards/rule/ext-containers.wait-for-replica-readiness | checkable | `ContainersTrafficTests` assert new replicas reach readiness before traffic shifts. |
+| standards/rule/ext-containers.test-released-traffic | checkable | `ContainersTrafficTests` pass after new-version traffic shift. |
+| standards/rule/ext-containers.retain-rollback-material | checkable | `ContainersRollbackTests` resolve the Runbook record and its previous image digest. |
+| standards/rule/ext-containers.limit-container-privileges | checkable | `ContainersSecurityTests` assert read-only filesystem and dropped capabilities in the deployment manifest. |
+| standards/rule/ext-containers.declare-writable-paths-and-limits | checkable | `ContainersSecurityTests` match the manifest against declared writable paths and Limit records. |
+| standards/rule/ext-containers.run-the-application-as-pid-1 | checkable | `ContainersProcessTests` confirm the application receives the container stop signal. |
+| standards/rule/ext-containers.set-sufficient-shutdown-time | checkable | `ContainersProcessTests` assert in-flight work stops within the declared grace period. |
+| standards/rule/ext-containers.write-runtime-logs-to-streams | checkable | `ContainersProcessTests` assert container logs appear on standard output or standard error. |
+| standards/rule/ext-containers.keep-mutable-data-external | guidance | Does the design keep every piece of mutable data outside the container filesystem? |
+| standards/rule/ext-containers.apply-oci-release-labels | checkable | `ContainersMetadataTests` assert the four required OCI labels on built images. |
+| standards/rule/ext-containers.record-image-digests | checkable | `ContainersMetadataTests` identify the deployed artifact by immutable digest in the release record. |
+| standards/rule/ext-containers.exclude-build-timestamps-from-contracts | checkable | `ContainersMetadataTests` assert the generated-contract diff contains no build timestamp. |
+| standards/rule/ext-containers.separate-frontend-configuration-classes | guidance | Does the frontend build keep public configuration apart from server-only secrets? |
+| standards/rule/ext-containers.use-protected-frontend-secret-delivery | guidance | Does the frontend build deliver every secret through mounts or runtime injection? |
+| standards/rule/ext-containers.exclude-insecure-frontend-secret-carriers | checkable | `ContainersConfigTests` reject `ARG`, copied environment files and secret-bearing layers. |
+| standards/rule/ext-containers.place-dockerfiles-beside-deployables | checkable | `ContainersTests` assert a colocated Dockerfile per deployable or a recorded Exception. |
+| standards/rule/ext-containers.build-from-the-workspace-root | checkable | `ContainersTests` assert image builds access declared shared inputs from repository-root context. |

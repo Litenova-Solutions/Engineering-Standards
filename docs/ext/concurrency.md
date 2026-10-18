@@ -8,13 +8,17 @@ Concurrency control protects invariants when accepted writes overlap. Idempotenc
 
 Activation scope: `local`.
 
-Applicable specification kinds: `module`, `aggregate`, `use-case`, `workflow`.
+Applicable specification kinds: `module`, `business-record`, `use-case`.
 
-The consumer enables `concurrency` when accepted writes can conflict or retries can duplicate irreversible or externally visible effects. A use case with `concurrency` Risk activates it.
+The consumer enables `concurrency` when accepted writes can conflict or retries can duplicate irreversible or externally visible effects.
 
-## Baseline relationship
+## Replaces
 
-This extension adds no baseline project and replaces no baseline rule.
+This extension replaces no baseline provision. `standards/rule/ext-concurrency.return-precondition-outcomes` extends `standards/rule/backend-api.use-consistent-status-codes` with the 428 row for a missing precondition.
+
+## Switches on
+
+This extension switches on `limit`. `standards/rule/ext-concurrency.set-key-retention` records key retention as a Limit record.
 
 ## Agent Summary {#agent-summary}
 
@@ -22,7 +26,7 @@ This extension adds no baseline project and replaces no baseline rule.
 - Use expected versions for documented write conflicts. (standards/rule/ext-concurrency.compare-expected-aggregate-versions)
 - Return stable precondition and version-conflict responses. (standards/rule/ext-concurrency.map-failed-expected-versions, standards/rule/ext-concurrency.apply-http-version-preconditions)
 - Scope and fingerprint idempotency keys. (standards/rule/ext-concurrency.scope-client-keys, standards/rule/ext-concurrency.enforce-key-uniqueness)
-- Commit replay records with business changes. (standards/rule/ext-concurrency.commit-replay-records-with-changes)
+- Commit replay records with business changes. (standards/rule/ext-concurrency.store-idempotency-state-atomically)
 - Keep external effects outside uncommitted work. (standards/rule/ext-concurrency.delay-irreversible-provider-calls)
 - Retain keys through safe retry windows. (standards/rule/ext-concurrency.set-key-retention, standards/rule/ext-concurrency.retain-safe-retry-keys)
 
@@ -70,7 +74,7 @@ This extension adds no baseline project and replaces no baseline rule.
 
 **Requirement:** An HTTP API MUST return 428 `precondition_required` for missing `If-Match` and 409 `version_conflict` for stale versions.
 
-**Rationale:** Distinct outcomes show whether a caller omitted or supplied an obsolete version.
+**Rationale:** Distinct outcomes show whether a caller omitted or supplied an obsolete version. This extends the outcome table of `standards/rule/backend-api.use-consistent-status-codes`.
 
 ### Hide provider version values (standards/rule/ext-concurrency.hide-provider-version-values)
 
@@ -80,15 +84,15 @@ This extension adds no baseline project and replaces no baseline rule.
 
 ### Scope client keys (standards/rule/ext-concurrency.scope-client-keys)
 
-**Requirement:** An idempotent operation MUST scope its client key to the authenticated actor and operation.
+**Requirement:** An idempotent operation MUST scope its client key to the tenant, authenticated actor and operation.
 
-**Rationale:** Actor and operation scope prevents one caller's key from replaying another operation.
+**Rationale:** Tenant, actor and operation scope prevents one caller's key from replaying another operation. A project without the tenancy extension uses one fixed tenant value.
 
 ### Store idempotency state atomically (standards/rule/ext-concurrency.store-idempotency-state-atomically)
 
-**Requirement:** An idempotent operation MUST store its fingerprint, state, response status, response body, and expiry with its business change.
+**Requirement:** An idempotent operation MUST store its fingerprint, state, response status, response body, and expiry with its business change in one provider transaction.
 
-**Rationale:** One transaction connects the accepted change to the result that later calls replay.
+**Rationale:** One transaction connects the accepted change to the result that later calls replay. It leaves no completed record without its change and no change without its replay record.
 
 ### Reject conflicting key reuse (standards/rule/ext-concurrency.reject-conflicting-key-reuse)
 
@@ -98,9 +102,9 @@ This extension adds no baseline project and replaces no baseline rule.
 
 ### Enforce key uniqueness (standards/rule/ext-concurrency.enforce-key-uniqueness)
 
-**Requirement:** An idempotency store MUST enforce a unique constraint on actor, operation, and client key.
+**Requirement:** An idempotency store MUST enforce a unique constraint on tenant, actor, operation, and client key.
 
-**Rationale:** The constraint selects one accepted winner when concurrent requests use the same key.
+**Rationale:** The constraint selects one accepted winner when concurrent requests use the same key. A project without the tenancy extension uses one fixed tenant value.
 
 ### Canonicalize request fingerprints (standards/rule/ext-concurrency.canonicalize-request-fingerprints)
 
@@ -128,12 +132,6 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Rationale:** Callers need one documented result while an identical request is still active.
 
-### Commit replay records with changes (standards/rule/ext-concurrency.commit-replay-records-with-changes)
-
-**Requirement:** An idempotent implementation MUST stage the completed replay record and business change in one provider transaction.
-
-**Rationale:** The transaction prevents a completed record without its change or a change without its replay record.
-
 ### Reload concurrent winners (standards/rule/ext-concurrency.reload-concurrent-winners)
 
 **Requirement:** A losing concurrent idempotency request MUST reload and replay the winning record when its fingerprint matches.
@@ -160,7 +158,7 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 ### Set key retention (standards/rule/ext-concurrency.set-key-retention)
 
-**Requirement:** An idempotency owner MUST set key retention from the caller retry window and business risk.
+**Requirement:** An idempotency owner MUST record key retention as a Limit record set from the caller retry window and business risk.
 
 **Rationale:** Retention lasts through the period in which callers can safely retry.
 
@@ -200,7 +198,7 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Default:** Use `Idempotency-Key` for HTTP commands that accept client keys, bounded to 255 characters of visible ASCII.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** The standard header makes client-key behavior recognizable at the HTTP boundary. [The IETF draft](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/) leaves the value opaque, which leaves a server storing whatever a client sends as a key. A bound stops an unbounded key from becoming an unbounded store entry. A character set stops a key from carrying a control character into a log line.
 
@@ -208,7 +206,7 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Default:** Keep idempotency persistence and transaction handling in Infrastructure.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** Provider transactions and constraints belong outside Application and Domain.
 
@@ -216,7 +214,7 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Default:** Keep replay response mapping at the API boundary.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** HTTP statuses and headers are transport concerns.
 
@@ -224,7 +222,7 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Default:** Declare the idempotency header as required on each applicable HTTP operation.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 
 **Rationale:** Generated API contracts expose the requirement through `standards/rule/backend-api.publish-precise-complete-schemas`.
 
@@ -234,36 +232,35 @@ No additional package is required by the baseline implementation.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-concurrency.document-write-conflict-behavior | inspection | The use-case specification names conflicts, invalid state, winner behavior, and caller response. |
-| standards/rule/ext-concurrency.limit-version-checks | inspection | Every version check links to a documented conflicting-write case. |
-| standards/rule/ext-concurrency.compare-expected-aggregate-versions | test | `ConcurrencyVersionTests` race conflicting aggregate writes with expected versions. |
-| standards/rule/ext-concurrency.map-failed-expected-versions | test | `ConcurrencyVersionTests` asserts a failed expected version returns 409 Problem Details with its stable code. |
-| standards/rule/ext-concurrency.reject-silent-overwrites | test | `ConcurrencyVersionTests` asserts conflicting accepted writes preserve the winner without silent replacement. |
-| standards/rule/ext-concurrency.apply-http-version-preconditions | test | `ConcurrencyVersionTests` require and validate a strong persistence-derived ETag. |
-| standards/rule/ext-concurrency.return-precondition-outcomes | test | Missing and stale `If-Match` tests return the documented status and code. |
-| standards/rule/ext-concurrency.hide-provider-version-values | static | `ConcurrencyVersionTests` asserts public transport models expose no provider-specific version field. |
-| standards/rule/ext-concurrency.scope-client-keys | test | `IdempotencyKeyTests` asserts same keys from different actors or operations do not replay each other. |
-| standards/rule/ext-concurrency.store-idempotency-state-atomically | test | `IdempotencyKeyTests` commit replay state with the accepted business change. |
-| standards/rule/ext-concurrency.reject-conflicting-key-reuse | test | `IdempotencyKeyTests` asserts reused keys with changed input return the documented rejection. |
-| standards/rule/ext-concurrency.enforce-key-uniqueness | test | `IdempotencyKeyTests` asserts concurrent inserts prove the actor-operation-key uniqueness constraint. |
-| standards/rule/ext-concurrency.canonicalize-request-fingerprints | test | `IdempotencyKeyTests` asserts equivalent mapped requests produce one fingerprint without credentials or client key. |
-| standards/rule/ext-concurrency.protect-fingerprint-source-data | inspection | Stored fingerprint review confirms sensitive source data is hashed when not required. |
-| standards/rule/ext-concurrency.replay-completed-results | test | `IdempotencyReplayTests` return the original accepted status and body. |
-| standards/rule/ext-concurrency.define-concurrent-retry-behavior | test | `IdempotencyReplayTests` prove the documented wait, in-progress, or conflict behavior. |
-| standards/rule/ext-concurrency.commit-replay-records-with-changes | test | `IdempotencyReplayTests` leave no completed replay record without its business change. |
-| standards/rule/ext-concurrency.reload-concurrent-winners | test | `IdempotencyReplayTests` reload and replay the matching winner record. |
-| standards/rule/ext-concurrency.discard-failed-replay-state | test | `IdempotencyReplayTests` leave no business change or completed replay state. |
-| standards/rule/ext-concurrency.delay-irreversible-provider-calls | inspection | Integration review shows irreversible provider calls occur after commit. |
-| standards/rule/ext-concurrency.route-required-external-effects-durably | inspection | Required effects select an outbox or documented provider idempotency contract. |
-| standards/rule/ext-concurrency.set-key-retention | inspection | The use case records retry window, risk, and retention duration. |
-| standards/rule/ext-concurrency.bound-expired-record-cleanup | test | `IdempotencyRetentionTests` show bounded deletion of expired idempotency records. |
-| standards/rule/ext-concurrency.retain-safe-retry-keys | test | `IdempotencyRetentionTests` reject expiration before the documented safe retry time. |
-| standards/rule/ext-concurrency.declare-replayed-transport-outcomes | inspection | The use case lists replayed statuses and headers. |
-| standards/rule/ext-concurrency.restrict-replay-data | inspection | Stored replay records contain only fields required for accepted-result reproduction. |
-| standards/rule/ext-concurrency.exclude-unsafe-replay-outcomes | test | `IdempotencyOutcomeTests` exclude authentication, transient failures, cookies, hop-by-hop headers, tokens, and secrets. |
-| standards/rule/ext-concurrency.use-the-standard-idempotency-header | inspection | HTTP contract review uses `Idempotency-Key` or records a local replacement. |
-| standards/rule/ext-concurrency.keep-idempotency-persistence-in-infrastructure | inspection | Source review locates idempotency transaction work in Infrastructure. |
-| standards/rule/ext-concurrency.map-replay-responses-at-the-api-boundary | inspection | Source review locates replay HTTP mapping at the API boundary. |
-| standards/rule/ext-concurrency.declare-applicable-headers | static | `ConcurrencyTests` asserts generated OpenAPI declares the header for every applicable operation. |
+| standards/rule/ext-concurrency.document-write-conflict-behavior | guidance | Does the use case name conflicts, invalid state, winner behavior and caller response? |
+| standards/rule/ext-concurrency.limit-version-checks | checkable | `ConcurrencyVersionTests` link every version check to a documented conflicting-write case. |
+| standards/rule/ext-concurrency.compare-expected-aggregate-versions | checkable | `ConcurrencyVersionTests` race conflicting aggregate writes with expected versions. |
+| standards/rule/ext-concurrency.map-failed-expected-versions | checkable | `ConcurrencyVersionTests` assert a failed expected version returns 409 Problem Details with its stable code. |
+| standards/rule/ext-concurrency.reject-silent-overwrites | checkable | `ConcurrencyVersionTests` assert conflicting accepted writes preserve the winner without silent replacement. |
+| standards/rule/ext-concurrency.apply-http-version-preconditions | checkable | `ConcurrencyVersionTests` require and validate a strong persistence-derived ETag. |
+| standards/rule/ext-concurrency.return-precondition-outcomes | checkable | `ConcurrencyVersionTests` return 428 for a missing `If-Match` and 409 for a stale version. |
+| standards/rule/ext-concurrency.hide-provider-version-values | checkable | `ConcurrencyVersionTests` assert public transport models expose no provider-specific version field. |
+| standards/rule/ext-concurrency.scope-client-keys | checkable | `IdempotencyKeyTests` assert keys from different tenants, actors or operations do not replay each other. |
+| standards/rule/ext-concurrency.store-idempotency-state-atomically | checkable | `IdempotencyKeyTests` commit fingerprint, state, response and expiry with the accepted business change. |
+| standards/rule/ext-concurrency.reject-conflicting-key-reuse | checkable | `IdempotencyKeyTests` assert reused keys with changed input return the documented rejection. |
+| standards/rule/ext-concurrency.enforce-key-uniqueness | checkable | `IdempotencyKeyTests` assert concurrent inserts prove the tenant-actor-operation-key uniqueness constraint. |
+| standards/rule/ext-concurrency.canonicalize-request-fingerprints | checkable | `IdempotencyKeyTests` assert equivalent mapped requests produce one fingerprint without credentials or client key. |
+| standards/rule/ext-concurrency.protect-fingerprint-source-data | guidance | Is sensitive fingerprint source data hashed wherever support needs no original content? |
+| standards/rule/ext-concurrency.replay-completed-results | checkable | `IdempotencyReplayTests` return the original accepted status and body. |
+| standards/rule/ext-concurrency.define-concurrent-retry-behavior | checkable | `IdempotencyReplayTests` prove the documented wait, in-progress, or conflict behavior. |
+| standards/rule/ext-concurrency.reload-concurrent-winners | checkable | `IdempotencyReplayTests` reload and replay the matching winner record. |
+| standards/rule/ext-concurrency.discard-failed-replay-state | checkable | `IdempotencyReplayTests` leave no business change or completed replay state. |
+| standards/rule/ext-concurrency.delay-irreversible-provider-calls | guidance | Does every irreversible provider call run only after its business transaction commits? |
+| standards/rule/ext-concurrency.route-required-external-effects-durably | guidance | Does each required effect use the outbox or a documented provider idempotency contract? |
+| standards/rule/ext-concurrency.set-key-retention | guidance | Does the Limit record cover the caller retry window and the business risk? |
+| standards/rule/ext-concurrency.bound-expired-record-cleanup | checkable | `IdempotencyRetentionTests` show bounded deletion of expired idempotency records. |
+| standards/rule/ext-concurrency.retain-safe-retry-keys | checkable | `IdempotencyRetentionTests` reject expiration before the documented safe retry time. |
+| standards/rule/ext-concurrency.declare-replayed-transport-outcomes | checkable | `IdempotencyOutcomeTests` match replayed statuses and headers against the declared list. |
+| standards/rule/ext-concurrency.restrict-replay-data | guidance | Does each stored replay field serve the accepted result callers reproduce? |
+| standards/rule/ext-concurrency.exclude-unsafe-replay-outcomes | checkable | `IdempotencyOutcomeTests` exclude authentication, transient failures, cookies, hop-by-hop headers, tokens, and secrets. |
+| standards/rule/ext-concurrency.use-the-standard-idempotency-header | checkable | `ConcurrencyTests` assert applicable operations accept `Idempotency-Key` or record an Exception. |
+| standards/rule/ext-concurrency.keep-idempotency-persistence-in-infrastructure | checkable | `ConcurrencyTests` assert idempotency persistence and transaction handling live in Infrastructure. |
+| standards/rule/ext-concurrency.map-replay-responses-at-the-api-boundary | checkable | `ConcurrencyTests` assert replay response mapping lives at the API boundary. |
+| standards/rule/ext-concurrency.declare-applicable-headers | checkable | `ConcurrencyTests` asserts generated OpenAPI declares the header for every applicable operation. |

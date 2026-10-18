@@ -12,14 +12,19 @@ Applicable specification kinds: None.
 
 The consumer selects `delegation` when one agent starts another on the same tree.
 
-## Baseline relationship
+## Replaces
 
 This extension replaces no baseline provision. The agent protocol governs one agent, and this extension governs the handoff between two.
+
+## Switches on
+
+This extension switches on no optional record type.
 
 ## Agent Summary {#agent-summary}
 
 - Brief each worker with goal, context, sources, and output. (standards/rule/ext-delegation.write-a-brief-before-delegating)
 - Hold each worker inside its named paths. (standards/rule/ext-delegation.restrict-a-worker-to-its-paths)
+- Ask the brief first, then ask a person. (standards/rule/ext-delegation.ask-only-unanswered-questions)
 - Re-run verification before accepting worker output. (standards/rule/ext-delegation.verify-before-accepting-worker-output)
 
 ## Standards
@@ -41,9 +46,15 @@ Output: the files to change and the report to write.
 
 ### Restrict a worker to its paths (standards/rule/ext-delegation.restrict-a-worker-to-its-paths)
 
-**Requirement:** A delegated worker MUST stay inside the paths its brief names, commit nothing, and ask no question its brief answers.
+**Requirement:** A delegated worker MUST stay inside the paths its brief names and commit nothing.
 
-**Rationale:** A worker with the whole tree rewrites what another worker owns. A question the brief answers is a reading failure, not a gap in the brief.
+**Rationale:** A worker with the whole tree rewrites what another worker owns.
+
+### Ask only unanswered questions (standards/rule/ext-delegation.ask-only-unanswered-questions)
+
+**Requirement:** A delegated worker MUST ask no question its brief answers.
+
+**Rationale:** A question the brief answers is a reading failure, not a gap in the brief.
 
 ### Verify before accepting worker output (standards/rule/ext-delegation.verify-before-accepting-worker-output)
 
@@ -61,8 +72,9 @@ This extension adds no required package.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-delegation.write-a-brief-before-delegating | inspection | Delegation review reads goal, context, sources, and output in each brief. |
-| standards/rule/ext-delegation.restrict-a-worker-to-its-paths | inspection | Diff review confirms each worker change stays inside its brief paths with no commit. |
-| standards/rule/ext-delegation.verify-before-accepting-worker-output | inspection | Acceptance review names the verification run the delegating agent watched pass. |
+| standards/rule/ext-delegation.write-a-brief-before-delegating | guidance | Does each brief state goal, context, sources and output? |
+| standards/rule/ext-delegation.restrict-a-worker-to-its-paths | checkable | `git diff --name-only` lists only the brief's named paths, and the worker commits nothing. |
+| standards/rule/ext-delegation.ask-only-unanswered-questions | guidance | Did the worker ask only questions its brief leaves unanswered? |
+| standards/rule/ext-delegation.verify-before-accepting-worker-output | guidance | Which verification run did the delegating agent watch pass before accepting the output? |
