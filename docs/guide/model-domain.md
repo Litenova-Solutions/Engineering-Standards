@@ -1,325 +1,147 @@
-# Model a Domain Module
+# Model a domain module
 
 ## Purpose
 
-Produce a domain model that connects business language, aggregate behavior, use cases, and verification evidence.
+This tutorial models one domain module that the model builder reads. At the end the module holds its language, its business records, its rules with kinds, its use cases with results and cases, its events, and its permissions. The worked example is the circulation desk of a library.
+
+This guide carries no provision. Each step cites the provisions it satisfies.
 
 ## Prerequisites
 
-Start with:
+- Finish [Get started](getting-started.md) through its configuration steps.
+- Read the product brief and the requirements this module fulfils.
+- Read the decisions that constrain identity, persistence, security, or external behavior.
+- Copy the `module.md`, `business-record.md`, and `use-case.md` templates from the [template index](../../templates/consumer/README.md).
 
-- The product brief and affected end-to-end flow.
-- The domain glossary.
-- The module purpose and actors.
-- Known domain policies, examples, and failure cases.
-- Decisions that constrain identity, persistence, security, or external behavior.
+## Lesson
 
-An end-to-end flow connects use cases that produce one observable product outcome. For example, `customer-completes-purchase` may cross Orders, Payments, and Shipping. It provides delivery context, while each module retains responsibility for its own rules.
+1. Name the module language. Write one Term entry per word with its meaning, its labels, and the words it rejects. Use the same term in documentation, domain types, application operations, API descriptions, and frontend features. This satisfies `standards/rule/backend-domain.use-one-ubiquitous-language`.
 
-If a command depends on an unknown policy, record it under `Open modeling questions` and stop that use case. Other use cases with complete rules may continue.
-
-## Procedure
-
-### Name the module language
-
-Record each module term with one definition and rejected synonyms. Use the same term in documentation, domain types, application operations, API descriptions, and frontend features.
-
-For the Orders module:
-
-| Term | Definition | Rejected synonyms |
-|:---|:---|:---|
-| Order | One customer commitment to one merchant in one currency. | Cart, purchase record |
-| Cancel | End an Order before fulfillment under the approved policy. | Delete, disable |
-| Claim | Attach an authenticated customer to an existing guest Order. | Adopt, transfer |
-
-Rejected synonyms prevent later contributors from creating `PurchaseRecord` beside `Order`. They also tell an agent which plausible names are wrong for this domain.
-
-### Write the occasion before the rules
-
-Name one occasion the module exists for, and write it down before the first table. State who acts, what surrounds them, what they are under pressure from, and what they use today instead.
-
-For the Orders module, a flash sale opens at nine on a Tuesday. Four hundred people reach the storefront inside a minute, and the last twelve units go to whoever commits first. Without an order record, Northwind Traders reconstructs who bought what from a payment export and a group chat.
-
-Record that occasion in the module specification's `Scenario` section, and reuse its people and amounts in every aggregate and use-case scenario beneath it. One reference cast in `docs/domain/scenarios.md` holds the names, the place, the dates, and the figures, so two pages read in sequence describe one occasion.
-
-A scenario carries no rule identifier. It illustrates the page and never governs it.
-
-### Draw aggregate boundaries from aggregate invariants
-
-An aggregate is a consistency boundary. It groups state that must remain valid together in one command transaction. The aggregate root is the object through which callers request every change inside that boundary.
-
-An invariant is a condition that must be true before and after every successful aggregate change. `An Order total equals the sum of its lines` is an invariant because no successful `Order` operation may leave those values inconsistent.
-
-A module may contain no aggregate, one aggregate, or multiple related aggregates:
-
-```text
-Orders module
-  Order aggregate
-    root: Order
-    owns: lines, totals, merchant, currency, lifecycle
-    references: CustomerAccountId, PaymentId
-    protects: INV-ORDERS-01, INV-ORDERS-02
-
-  OrderClaim aggregate
-    root: OrderClaim
-    owns: guest claim lifecycle and claim evidence
-    references: OrderId, CustomerAccountId
-    protects: INV-ORDERS-04
-```
-
-An aggregate owns a child when the child has no independent consistency boundary and changes only through the root. Reference another aggregate by typed ID when it can change independently.
-
-Do not place `CustomerAccount` inside `Order` for convenient navigation. Store `CustomerAccountId` and use a read model for customer presentation. CustomerAccount and Order have separate consistency boundaries even if one page displays both.
-
-Record the result in the module specification:
-
-| Aggregate | Owns | Aggregate invariants | Commands |
-|:---|:---|:---|:---|
-| `Order` | Lines, totals, and lifecycle | `INV-ORDERS-01` | `orders.create-order`, `orders.cancel-order` |
-| `OrderClaim` | Guest claim lifecycle | `INV-ORDERS-04` | `orders.claim-guest-order` |
-
-### Define every aggregate state
-
-Aggregate state is a business-valid condition with its required data and permitted behavior. A state object represents that condition as a type. It does more than label the aggregate.
-
-Describe states before writing transitions:
-
-| State | Meaning | Required facts |
-|:---|:---|:---|
-| `Draft` | The Post is editable and not public. | Author and content |
-| `Published` | The Post is public. | Publication time |
-| `Archived` | The Post is retained but removed from discovery. | Archive time and reason |
-
-Create an abstract state record and sealed state records for every aggregate, including an aggregate with one current state:
-
-```csharp
-public abstract record PostState;
-
-public sealed record PostDraftState : PostState;
-
-public sealed record PostPublishedState(
-    DateTimeOffset PublishedAt) : PostState;
-
-public sealed record PostArchivedState(
-    DateTimeOffset ArchivedAt,
-    PostArchiveReason Reason) : PostState;
-```
-
-Put state-specific data on the state record. Do not duplicate `PublishedAt` or `ArchivedAt` on the aggregate. Do not add `PostStatus`, `IsPublished`, or a state string.
-
-An enum can name a fixed list of labels. It cannot require the data and behavior associated with each condition. Adding more lifecycle behavior later forces replacement of the enum and every switch built around it. State types make that extension boundary explicit from the initial implementation.
-
-A one-state aggregate still defines the extension point:
-
-```csharp
-public abstract record ProfileState;
-
-public sealed record ProfileActiveState : ProfileState;
-```
-
-For each state, answer:
-
-- What business fact makes this state true?
-- Which data is required only in this state?
-- Which actions are allowed from this state?
-- Which actions are rejected from this state, and why?
-
-An unanswered question belongs in the module specification. It does not receive a guessed default.
-
-### Write transition rules
-
-A transition is a business action that replaces one valid state with another. Record its source state, target state, aggregate invariant IDs, event, and owning use case.
-
-| From state | Business action | To state | Aggregate invariants | Event | Use case |
-|:---|:---|:---|:---|:---|:---|
-| `Draft` | `Publish` | `Published` | `INV-POSTS-01` | `PostPublishedEvent` | `posts.publish-post` |
-| `Published` | `Archive` | `Archived` | `INV-POSTS-02` | `PostArchivedEvent` | `posts.archive-post` |
-
-The aggregate root owns the transition:
-
-```csharp
-public void Publish(DateTimeOffset publishedAt)
-{
-    if (State is not PostDraftState)
-    {
-        throw new PostCannotBePublishedException(Id, State);
-    }
-
-    State = new PostPublishedState(publishedAt);
-    RaiseDomainEvent(
-        new PostPublishedEvent(Id, AuthorId, Title, publishedAt));
-}
-```
-
-Document rejected source states in the use-case failure table and acceptance criteria. A transition with no owning use case cannot be delivered or tested.
-
-### Give invariants and policies stable identities
-
-An aggregate invariant uses `INV-{MODULE}-{NN}`:
-
-| ID | Invariant | Protected by | Failure |
-|:---|:---|:---|:---|
-| `INV-POSTS-01` | Only a draft Post can be published. | `Post.Publish` | `PostCannotBePublishedException` |
-| `INV-POSTS-02` | Only a published Post can be archived. | `Post.Archive` | `PostCannotBeArchivedException` |
-
-A domain policy is a named business rule that does not belong to one aggregate transition. Domain identifies its business authority. Policy indicates that the rule guides or constrains decisions across a wider scope. A policy may apply within one module or coordinate multiple modules.
-
-Use `POL-{POLICY}-{NN}` for a domain policy:
-
-| ID | Policy | Applies to modules | Consistency | Enforcement |
-|:---|:---|:---|:---|:---|
-| `POL-CUSTOMER-DATA-RETENTION-01` | Customer deletion completes within 24 hours unless legal hold applies. | Customers, Orders | Eventual within 24 hours | Customer deletion workflow |
-
-This retention rule is a domain policy because one aggregate cannot enforce deletion across Customers and Orders in one transaction. `Only a draft Post can be published` remains an aggregate invariant because `Post.Publish` can enforce it immediately.
-
-Do not renumber or reuse an approved domain rule ID. Link affected acceptance criteria.
-
-### Select entities and value objects
-
-Use a child entity when identity and continuity matter inside the aggregate. Use a value object when its complete value defines equality.
-
-- `OrderLineId` identifies one line through quantity changes, so `OrderLine` is an entity.
-- `PostTitle` is replaced as a complete value. It is a value object.
-- `Money` combines amount and currency and defines arithmetic rules. It is a value object.
-- `PostTags` defines collection equality and normalization. It is a collection value object.
-
-Give each aggregate a typed version 7 ID. Use typed IDs for identities that participate in domain behavior.
-
-### Separate validation rules from aggregate invariants
-
-A validation rule rejects caller-correctable input before a command handler starts domain work. An aggregate invariant protects business consistency regardless of which caller invokes the domain object.
-
-For `PostTitle`:
-
-- The validator returns stable errors for missing text or more than 200 characters.
-- `PostTitle.Create` checks the same limits and throws a specific domain exception if another caller bypasses validation.
-- `Post` accepts `PostTitle`, not the raw string.
-
-Current aggregate state decides whether behavior is allowed. That check does not move into an application validator. For example, `title is required` is a validation rule, while `only a draft Post can be published` is an aggregate invariant.
-
-### Identify domain services
-
-Place a rule on the aggregate or value object that owns it. Use a stateless domain service only when no object is a natural owner.
-
-```csharp
-public sealed class OrderPricingDomainService
-{
-    public Money CalculateTotal(
-        IReadOnlyList<OrderLine> lines,
-        Currency currency)
-    {
-        return lines.Aggregate(
-            Money.Zero(currency),
-            (total, line) => total.Add(line.Subtotal));
-    }
-}
-```
-
-Application obtains required aggregates and external facts before calling the service.
-
-### Record events and event reactions
-
-An event is an immutable record of a completed fact. An event reaction is work triggered because that fact occurred. Event identifies the input fact. Reaction identifies the resulting action and does not imply that the work is secondary or optional.
-
-| Event reference | Code type | Business meaning | Event reaction | Owning module | Delivery |
-|:---|:---|:---|:---|:---|:---|
-| `orders.order-confirmed` | `OrderConfirmedEvent` | The paid Order is final. | Dispatch shipment. | Shipping | `durable` |
-| `shipping.shipment-dispatched` | `ShipmentDispatched` | A parcel left the warehouse. | Send the tracking link to the customer. | Communications | `durable` |
-| `posts.post-published` | `PostPublishedEvent` | A Post became public. | Refresh the public catalog. | Posts | `rebuildable` |
-
-A domain event remains an internal domain contract. Translate it to an integration event when another system consumes a versioned external message.
-
-An event may have no event reaction. Do not create an event only because every method is expected to emit one.
-
-### Separate atomic work from a durable workflow
-
-One top-level command handler may coordinate multiple aggregates in one transaction when the use case names the rule requiring atomic consistency. It stages every changed aggregate and lets the command post-handler commit once.
-
-Do not dispatch another command through `ICommandMediator` from that handler.
-
-Create a workflow when the system advances work across a transaction or time boundary. Workflow means the durable sequence of steps and waiting points. Workflow orchestrator means the component that records progress and chooses the next command.
-
-```text
-PaymentConfirmed
-  OrderFulfillmentWorkflow
-    issue catalog.confirm-reservation
-    await ReservationConfirmed
-    issue shipping.dispatch-shipment
-    await ShipmentDispatched
-    complete
-```
-
-Each issued command owns one transaction. The workflow orchestrator records progress and the outgoing command durably without mutating the participating aggregates.
-
-### Map the model to use cases
-
-Each command use-case specification names:
-
-- Aggregates changed.
-- Business methods called.
-- Source and target states when applicable.
-- `INV-*` and `POL-*` domain rule IDs.
-- Domain events.
-- Rejected behavior and observable failures.
-- Acceptance criteria for allowed and rejected behavior.
-
-Each query states `No domain transition` and names its read model. It does not load an aggregate for presentation.
-
-### Use a matching folder shape
-
-```text
-apps/api/src/Shop.Domain/
-  Orders/                         Orders is the plural of the primary aggregate Order,
-    Order.cs                       so Order stays flat and OrderClaim takes a plural folder
-    OrderId.cs
-    IOrderRepository.cs
-    States/
-      OrderState.cs
-      OrderPendingState.cs
-      OrderConfirmedState.cs
-      OrderCancelledState.cs
-    Events/
-      OrderConfirmedEvent.cs
-    Exceptions/
-      OrderCannotBeCancelledException.cs
-    OrderClaims/                    namespace Shop.Domain.Orders.OrderClaims
-      OrderClaim.cs
-      OrderClaimId.cs
-      IOrderClaimRepository.cs
-      States/
-        OrderClaimState.cs
-        OrderClaimUnclaimedState.cs
-        OrderClaimClaimedState.cs
-
-apps/api/src/Shop.Application/
-  Orders/
-    CancelOrder/
-      CancelOrderCommand.cs
-      CancelOrderCommandResult.cs
-      CancelOrderCommandValidator.cs
-      CancelOrderCommandHandler.cs
-  Workflows/
-    OrderFulfillment/
-      OrderFulfillmentWorkflow.cs
-      OrderFulfillmentWorkflowOrchestrator.cs
-```
-
-The Orders folder represents the Orders module in every layer. It is not a runtime `Module` object and does not require `IModule`, `ModuleRoot`, or another technical wrapper.
-
-Create subfolders only when real types require them.
-
-## Verification
-
-- The module uses one term for each concept and records rejected synonyms.
-- Every module, aggregate, use-case, and domain-policy specification carries a scenario drawn from the reference cast.
-- Every aggregate boundary names owned children, referenced aggregate IDs, and protected `INV-*` invariants.
-- Every aggregate has one abstract state base and at least one sealed state record.
-- Every transition maps to an aggregate method and command use case.
-- Every `INV-*` and `POL-*` rule has acceptance coverage.
-- Value objects define validation and equality.
-- Domain services are stateless and have no outer-layer dependency.
-- Events contain stable business facts and no aggregate references.
-- Event reactions state their owner and delivery classification.
-- Multi-aggregate commands name the rule requiring one transaction.
-- Durable workflows name progress state, commands, events, retries, and recovery.
-- Persistence tests round-trip every concrete aggregate state record.
+    | Term | Meaning | Rejected words |
+    |:---|:---|:---|
+    | `term/loan` | One member holds one copy until its due date | Checkout, issue |
+    | `term/copy` | One lendable item on the shelves | Volume, unit |
+    | `term/member` | One person allowed to borrow | Patron, user |
+
+    Rejected words stop a later contributor from creating `Checkout` beside `Loan`. They also tell an agent which plausible names are wrong for this domain.
+
+2. Write the occasion before the rules. Name one occasion the module exists for: who acts, what surrounds them, and what they use today instead. Record it in the module page, and reuse its people and figures on every page beneath it. This satisfies `standards/rule/core-system.state-one-occasion-for-every-behavior-specification` and `standards/rule/core-system.keep-a-scenario-informative`.
+
+    Saturday morning at the central library brings two hundred members before noon. Each hands books across the desk and trusts the stamp card inside the cover. Without a loan record, the desk reconstructs who holds what from the card index and memory.
+
+3. Write the module record. Give the module a person-chosen identifier such as `module/circulation`. Name each module it depends on, or remove the field. This satisfies `standards/rule/core-system.group-language-and-use-cases-by-module`.
+4. Draw business-record boundaries from invariants. A business record is a consistency boundary: state that must stay valid together in one command. An invariant is a condition that holds before and after every successful change. This satisfies `standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries` and `standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary`.
+
+    | Business record | Owns | References by typed ID |
+    |:---|:---|:---|
+    | `business-record/circulation.loan` | Loan lifecycle, due date, return facts | `CopyId`, `MemberId` |
+    | `business-record/circulation.hold` | Hold queue position and expiry | `CopyId`, `MemberId` |
+
+    A record owns a child when the child has no independent boundary and changes only through the record. Reference another record by typed ID when it changes on its own. Do not place `Member` inside `Loan` for convenient navigation. This satisfies `standards/rule/backend-domain.reference-other-aggregates-by-id`.
+5. Define every state. A state is a business-valid condition with its required data and permitted behavior. Describe states before writing transitions. This satisfies `standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records`.
+
+    | State | Meaning | Required facts |
+    |:---|:---|:---|
+    | `Open` | The copy is out and the member holds it | Due date |
+    | `Returned` | The copy is back on the shelves | Return date |
+
+    Create an abstract state record and one sealed record per state. Put state-specific data on the state record. This satisfies `standards/rule/backend-domain.keep-state-records-as-the-only-aggregate-lifecycle-representation`.
+
+    ```csharp
+    public abstract record LoanState;
+
+    public sealed record LoanOpenState(
+        DateTimeOffset DueDate) : LoanState;
+
+    public sealed record LoanReturnedState(
+        DateTimeOffset ReturnedAt) : LoanState;
+    ```
+
+    For each state, answer what makes it true, which data it alone requires, and which actions it allows and rejects. An unanswered question stays on the page. It receives no guessed default.
+6. Write the rules with kinds. Give each rule a person-chosen identifier of one to six lowercase words. A statement with not, no, never, or cannot keeps that word in its name. This satisfies `standards/rule/core-system.classify-domain-rules-by-enforcement-boundary`.
+
+    | Rule | Kind | Enforced by | Statement | Refusal |
+    |:---|:---|:---|:---|:---|
+    | `rule/loan.only-an-open-loan-closes` | `always-true` | `aggregate` | Only an open loan closes. | `result/return-a-copy.loan-not-open` |
+    | `rule/loan.a-due-date-is-required-to-borrow` | `checked-before` | `validator` | A borrow carries a due date. | `result/borrow-a-copy.due-date-missing` |
+    | `rule/loan.no-copy-carries-two-open-loans` | `across-records` | `store` | No copy carries two open loans. | `result/borrow-a-copy.copy-already-on-loan` |
+
+    An `always-true` rule holds after every change to its record. A `checked-before` rule rejects caller-correctable input before domain work starts. An `across-records` rule spans records that one transaction cannot hold. Input shape stays in the validator; current record state stays in the record. This satisfies `standards/rule/backend-application.separate-input-validation-from-invariants`.
+7. Name the people and their permissions. Write one actor page per party and one role page per grantable set. Name the permission each use case needs. This satisfies `standards/rule/backend-application.enforce-target-authorization-in-the-pipeline`.
+
+    | Actor | Role | Permission |
+    |:---|:---|:---|
+    | `actor/member` | `role/member` at self scope | `permission/borrow-copy` |
+    | `actor/librarian` | `role/librarian` at desk scope | `permission/close-any-loan` |
+
+8. Write the use cases. Give each use case a name that is unique across the project, so its results and cases resolve. Name the operation, the needed permissions, the entry points, the raised events, and the fulfilled requirements. This satisfies `standards/rule/backend-application.use-this-operation-layout` and `standards/rule/backend-application.keep-command-handlers-narrow`.
+
+    | Use case | Operation | Needs | Raises |
+    |:---|:---|:---|:---|
+    | `use-case/circulation.borrow-a-copy` | `command` | `permission/borrow-copy` | `event/loan.copy-borrowed` |
+    | `use-case/circulation.return-a-copy` | `command` | `permission/borrow-copy` | `event/loan.copy-returned` |
+    | `use-case/circulation.list-open-loans` | `query` | `permission/borrow-copy` | None |
+
+    A query states no domain transition and names its read model. It loads no business record for presentation.
+9. Write one result per ending. A result is one way a use case ends: success, or a named refusal with its failure code. This satisfies `standards/rule/backend-application.model-expected-use-case-failures-explicitly` and `standards/rule/backend-api.use-consistent-status-codes`.
+
+    | Result | Outcome | Code | Status |
+    |:---|:---|:---|:---|
+    | `result/borrow-a-copy.copy-borrowed` | `success` | None | 201 |
+    | `result/borrow-a-copy.copy-already-on-loan` | `refusal` | `failure/circulation.copy-already-on-loan` | 409 |
+    | `result/borrow-a-copy.due-date-missing` | `refusal` | `failure/circulation.due-date-missing` | 400 |
+
+    Each refusal explains what the caller sees. The failure code is stable across releases.
+10. Write the cases. A case is one working example: a situation and the result it leads to. Each case names its result. A case with no proving test yet becomes a known-gap record with an owner and an end date.
+
+    | Case | Situation | Action | Result | Expect |
+    |:---|:---|:---|:---|:---|
+    | `case/borrow-a-copy.first-borrow-succeeds` | The copy sits on the shelf | The member borrows it | `result/borrow-a-copy.copy-borrowed` | The loan opens with a due date |
+    | `case/borrow-a-copy.second-borrow-is-refused` | The copy is already out | Another member borrows it | `result/borrow-a-copy.copy-already-on-loan` | The desk sees the refusal code |
+
+    Name each test by the observable behavior it asserts. This satisfies `standards/rule/backend-testing.name-tests-by-observable-behavior`. An acceptance scenario carries one `/// <proves>case/...</proves>` tag. The model builder confirms the claim when the scenario calls the use case and asserts the result.
+11. Record the events. An event is an immutable record of a completed fact. Name what completed and which fields it carries. This satisfies `standards/rule/backend-domain.raise-immutable-domain-facts`.
+
+    | Event | Meaning | Carries |
+    |:---|:---|:---|
+    | `event/loan.copy-borrowed` | A member took a copy from the desk | `loanId`, `copyId`, `memberId`, `dueDate` |
+    | `event/loan.copy-returned` | A copy came back to the shelves | `loanId`, `copyId`, `returnedAt` |
+
+    Work that crosses a transaction or time boundary is a use case that reacts to an event, or a use case on a schedule. It declares what it reacts to and its delivery. This satisfies `standards/rule/backend-application.keep-event-reaction-implementations-explicit`.
+12. Keep one transaction per command. One handler stages the records its use case owns and lets the pipeline commit once. It dispatches no further command. This satisfies `standards/rule/backend-application.keep-one-state-changing-use-case-in-one-command-pipeline` and `standards/rule/backend-persistence.commit-once-in-the-command-pipeline`.
+13. Map the model to folders. Mirror the module, record, and use case path in every layer. This satisfies `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case` and `standards/rule/backend-architecture.use-mirrored-module-folders`.
+
+    ```text
+    apps/api/src/Library.Domain/
+      Circulation/
+        Loans/
+          Loan.cs
+          LoanId.cs
+          ILoanRepository.cs
+          States/
+            LoanState.cs
+            LoanOpenState.cs
+            LoanReturnedState.cs
+          Events/
+            CopyBorrowedEvent.cs
+          Exceptions/
+            CopyAlreadyOnLoanException.cs
+
+    apps/api/src/Library.Application/
+      Circulation/
+        Loans/
+          BorrowACopy/
+            BorrowACopyCommand.cs
+            BorrowACopyCommandResult.cs
+            BorrowACopyCommandValidator.cs
+            BorrowACopyCommandHandler.cs
+    ```
+
+    Create subfolders only when real types require them.
+14. Run the model check. Run `dotnet run --project standards/tools/model -- check` from the consumer root. It resolves every citation, computes the code, screen, and test links, and reports each unproved case.
+
+## What you built
+
+- One module with its language, records, rules, use cases, results, cases, events, and permissions.
+- Every identifier is person-chosen, and every citation resolves.
+- Every case is proved by a passing test or owned by a known gap.

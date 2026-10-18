@@ -14,6 +14,8 @@ Start with:
 - The adoption decision required by `standards/rule/ext-audit.record-the-audit-adoption-decision`.
 - A command pipeline that commits once for each Command.
 - A database account that the application does not use for business writes.
+- The LiteBus release that `standards.manifest.json` pins for the `LiteBus.*` packages.
+- The pipeline reference in the `docs/` directory of the [LiteBus v7 branch](https://github.com/litenova/LiteBus/tree/v7/docs).
 
 Read the extension page before this guide. The extension states the obligations. This guide states one compliant way to meet them.
 
@@ -137,6 +139,7 @@ internal sealed class WriteFailedAuditRecordErrorHandler(IAuditFailureWriter wri
         var scope = AmbientExecutionContext.Current.Items[AuditScope.Key] as AuditScope;
         if (scope is null)
         {
+            writer.CountMissingScope();
             return;
         }
 
@@ -146,7 +149,7 @@ internal sealed class WriteFailedAuditRecordErrorHandler(IAuditFailureWriter wri
 }
 ```
 
-Publish the write failure count of this path, which is `standards/rule/ext-audit.publish-unsuccessful-write-failures`. The separate connection accepts a rare loss at process death, and only the counter separates that from a defect.
+Publish the write failure count of this path, which is `standards/rule/ext-audit.publish-unsuccessful-write-failures`. Count a missing scope on the same counter before returning. The separate connection accepts a rare loss at process death, and only the counter separates that from a defect.
 
 ### Protect the store
 
@@ -169,3 +172,4 @@ Confirm three behaviors by test before review:
 - A refused authorization leaves one `denied` record after the transaction rolls back.
 - A committed Command leaves exactly one `succeeded` record in the same transaction.
 - An `UPDATE` against the audit table returns a privilege error.
+- Each behavior above is a Case on its own use case page, proved by the test that asserts it.
