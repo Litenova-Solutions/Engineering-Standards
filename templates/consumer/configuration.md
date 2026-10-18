@@ -1,25 +1,26 @@
 ---
 {
-  "kind": "configuration",
-  "id": "__CONFIGURATION_ID__",
-  "specStatus": "approved",
-  "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD"
+  "type": "configuration",
+  "title": "<Configuration title>",
+  "owner": "<owner>",
+  "status": "draft",
+  "decider": "<owner>",
+  "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# __CONFIGURATION_TITLE__
+# <Configuration title>
 
 ## Intent
 
 State which settings this page owns and which surface reads them.
 
-Every setting a reader can change appears here with its default. A setting introduced inside a procedure is findable only by the reader who already knows that procedure.
+Every setting a reader can change appears here with its default.
 
 ## Settings
 
 | Setting | Default | Scope | Effect |
 |:---|:---|:---|:---|
-| `__SETTING__` | `__DEFAULT__` | `__SCOPE__` | State what the setting changes. |
+| `<setting>` | `<default>` | `<scope>` | State what the setting changes. |
 
 ## Precedence
 

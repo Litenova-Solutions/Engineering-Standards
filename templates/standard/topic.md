@@ -28,7 +28,7 @@ State the page scope and the boundary it owns.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| {standards/rule/page.state-one-action} | static | `{Topic}Tests` asserts the exact command, artifact, or result this provision requires. |
-| {standards/rule/page.use-one-default} | inspection | Inspect the default or its named local replacement. |
+| {standards/rule/page.state-one-action} | checkable | `node tools/validate-standards.mjs` reports this provision satisfied on the page that carries it. |
+| {standards/rule/page.use-one-default} | guidance | Does the page carry the default or its named local replacement? |

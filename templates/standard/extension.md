@@ -8,13 +8,13 @@ State the optional capability and its boundary.
 
 Activation scope: `{local|project}`.
 
-Applicable specification kinds: `{kind}`.
+Applicable record types: `<type>`.
 
 Activate this extension when one exact current condition applies.
 
 ## Baseline relationship
 
-This extension replaces `{standards/rule/page.state-one-action}`, or states that it replaces no baseline provision.
+This extension replaces `{standards/rule/page.state-one-action}`, or states that it replaces no baseline provision. It switches on `<optional type>`, or states that it switches on none.
 
 ## Agent Summary {#agent-summary}
 
@@ -44,7 +44,7 @@ None.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| {standards/rule/page.state-one-extension-action} | test | `{Topic}Tests` asserts the exact extension behavior this provision requires. |
-| {standards/rule/page.use-one-extension-default} | inspection | Inspect the default or its named local replacement. |
+| {standards/rule/page.state-one-extension-action} | checkable | `node tools/validate-standards.mjs` reports this provision satisfied on the page that carries it. |
+| {standards/rule/page.use-one-extension-default} | guidance | Does the page carry the default or its named local replacement? |

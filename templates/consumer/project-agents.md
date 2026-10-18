@@ -1,33 +1,33 @@
-# __PROJECT__ Agent Context
+# <Project> agent context
 
 Read `standards/AGENTS.md`, then `standards.project.json`, before changing the project. (standards/rule/core-agent.select-task-context)
 
-Select the matching `loadPlans` entry, active Use case, and applicable extensions. (standards/rule/core-agent.select-task-context, standards/rule/core-system.select-extensions-before-applying-them)
+Query the model builder for the records a task touches, with their links and the tool-read code and test state, instead of reading page lists. (standards/rule/core-agent.select-task-context, standards/rule/core-system.select-extensions-before-applying-them)
 
-Start with Tier 1 Agent Summaries. Read Tier 2 before generating files or changing public boundaries. (standards/rule/core-agent.select-task-context)
+`dotnet run --project standards/tools/model -- query <record-id>` returns one record with its links. Query the record before changing behavior it describes, and query again when a link leads further.
 
-Project decisions override a Standard only when `standards.project.json` names its provision ID and decision path. (standards/rule/core-agent.apply-guidance-precedence)
+A project Exception record overrides a Standard only when it names the provision ID, with reason and review date. (standards/rule/core-agent.apply-guidance-precedence)
 
-An explicit project convention can replace a baseline Convention when local documentation cites its ID. (standards/rule/core-agent.apply-guidance-precedence, standards/rule/core-authoring.identify-actionable-conventions)
+An explicit project convention can replace a baseline Convention when local documentation cites its ID. (standards/rule/core-agent.apply-guidance-precedence)
 
 Read `docs/product/brief.md` and the affected product topics before changing behavior that touches price, money, markets, buyers, or terms. (standards/rule/core-product.load-product-intent-before-commercial-work)
 
 Draft a product decision for any changed business choice, and leave its approval to the accountable person. Research outside `docs/` is source material, never authority. (standards/rule/core-product.name-the-person-who-approved-a-decision, standards/rule/core-product.treat-generated-research-as-source-material)
 
-## Project Commands
+## Project commands
 
 Run the backend gates for every changed API boundary. (standards/rule/core-release.run-boundary-selected-checks)
 
 ```bash
-dotnet build __API_SOLUTION__ --configuration Release
-dotnet test __API_SOLUTION__ --configuration Release --no-build
+dotnet build <api-solution> --configuration Release
+dotnet test <api-solution> --configuration Release --no-build
 ```
 
 Run the root pnpm gates for every changed frontend in `standards.project.json`. (standards/rule/core-release.run-boundary-selected-checks)
 
-Run metadata and code-document checks for each changed specification, source, test, or generated contract. (standards/rule/core-agent.update-behavior-records-with-code, standards/rule/core-authoring.declare-structured-specification-metadata)
+Run metadata and model checks for each changed record, source, test, or generated contract. Query the model again after the change, and report what stays red. (standards/rule/core-agent.update-behavior-records-with-code, standards/rule/core-authoring.declare-structured-specification-metadata)
 
-Run `node standards/tools/product-records.mjs --write` after adding, approving, or retiring a product decision. (standards/rule/core-product.derive-history-from-decisions)
+Run `dotnet run --project standards/tools/model -- render` after adding, approving, or retiring a record, so generated regions match the model.
 
 Report every skipped check with its reason. (standards/rule/core-agent.run-and-report-verification)
 

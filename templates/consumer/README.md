@@ -1,59 +1,64 @@
-# Document Templates
+# Document templates
 
 ## Intent
 
-These files are starting points for consumer documentation. Copy only the files required by the current stage and replace every `__PLACEHOLDER__` before committing.
+These files are starting points for consumer records. Copy only the files the current work needs, replace every `<placeholder>` before committing, and remove any optional line left unused.
 
-Read [Get started](../../docs/guide/getting-started.md) before creating a consumer repository.
+A page record carries its type, identifier, title, owner, and status in JSON frontmatter, with the body sections its template shows. An entry record sits in its page frontmatter: requirements on a product topic page, rules and events on a business record page, results and cases on a use case page, and permissions, entry points, and limits on their list pages. Terms live in the language record instead of on a page.
 
-## Inception files
+## Project setup
 
 | Template | Target | Purpose |
 |:---|:---|:---|
-| `standards.project.json` | `standards.project.json` | Selects the profile, reviewed standards release, paths, allowed extensions, and standards overrides. |
-| `standards.project.svelte.json` | `standards.project.json` | The same wiring for a `dotnet-svelte` consumer, with one Svelte frontend instead. |
+| `standards.project.json` | `standards.project.json` | Selects the size, stacks, reviewed standards release, paths, owners, optional types, and extensions. |
 | `project-agents.md` | `AGENTS.md` | Provides the short consumer agent entry point. |
-| `product-brief.md` | `docs/product/brief.md` | Defines the product boundary and linked end-to-end flows. |
-| `domain-index.md` | `docs/domain/README.md` | Lists modules, workflows, and domain policies. |
-| `glossary.md` | `docs/domain/glossary.md` | Defines shared domain language. |
-| `language.json` | `docs/language.json` | Closes the vocabulary prose is checked against: terms, rejected synonyms, each rejection's scope, and the mannered terms. |
+| `language.json` | `docs/language.json` | Holds the Term entries prose is checked against, with rejected words and mannered terms. |
 | `scenario-cast.md` | `docs/domain/scenarios.md` | Fixes the people, place, dates, and amounts every `Scenario` section draws from. |
-| `modules-index.md` | `docs/domain/modules/README.md` | Defines the module documentation boundary. |
 
-## Add when required
+## Page records
 
-| Template | Typical target | Trigger |
+| Template | Target | Purpose |
 |:---|:---|:---|
-| `module.md` | `docs/domain/modules/{module}/README.md` | The first use case for a module is approved. |
-| `aggregate.md` | `docs/domain/modules/{module}/{aggregates}/README.md` | A module groups use cases under an aggregate-root subdirectory. |
-| `use-case.md` | `docs/domain/modules/{module}/{use-case}.md` | One Command or Query goal is approved. |
-| `end-to-end-flow.md` | `docs/product/flows/{flow}.md` | Use cases connect to one product outcome. |
-| `workflow.md` | `docs/domain/workflows/{workflow}.md` | System progress crosses a transaction or time boundary. |
-| `domain-policy.md` | `docs/domain/policies/{policy}.md` | A business rule is not owned by one aggregate invariant. |
-| `decision-evidence.md` | `docs/research/{record}.md` | A large external investigation needs its own owner and lifecycle. |
-| `operating-limits.md` | `docs/operations/limits.md` | A pilot or release has enforced, tested, supported, or alert values. |
-| `section-index.md` | `docs/{section}/README.md` | A directory needs an index and owns no aggregate, use case, or policy. |
-| `design-contract.md` | `packages/ui/DESIGN.md` | States the brand, tokens, composites, floorplans, do list, refusals, motion, and voice every frontend composes from. |
-| `ui-source-lock.json` | `packages/ui/ui-source-lock.json` | Records the installed registry source, the decoded preset, the registry address, the digests, and the dependencies. |
-| `ui-pattern-catalog.json` | `docs/ui/pattern-catalog.json` | A controlled frontend records each recurring UI decision with its options, choice, compact behaviour, and implementation status. |
-| `decision.md` | `docs/decisions/{id}.md` | A standards override or expensive-to-reverse choice is required. |
-| `product-topic.md` | `docs/product/{area}/{topic}.md` | One area of business intent needs its rules, position, and next step stated. |
-| `product-decision.md` | `docs/product/decisions/{id}.md` | A business, commercial, market, or company choice sets a product page. |
-| `ui-override-decision.md` | `docs/decisions/{id}.md` | A shared UI package visual authority, registry, or specialist-control override is required. |
-| `runbook.md` | `docs/runbooks/{runbook}.md` | An operator needs a repeatable recovery or operating procedure. |
-| `release-record.md` | `docs/releases/{release}.md` | One immutable release artifact is evaluated. |
-| `tutorial.md` | `docs/guide/{tutorial}.md` | A newcomer needs one path to a first working result. |
-| `how-to.md` | `docs/guide/{how-to}.md` | A reader who is already running needs one stated goal solved. |
-| `command.md` | `docs/tools/{command}.md` | The repository ships a command a reader runs. |
-| `reference.md` | `docs/reference/{record}.md` | A reader looks up exact values rather than reading a procedure. |
-| `configuration.md` | `docs/tools/configuration.md` | A setting a reader can change needs its default, scope, and precedence. |
+| `product-brief.md` | `docs/product/brief.md` | Defines the product boundary, what it never does, and its audience. |
+| `constraint.md` | `docs/product/constraints/<name>.md` | Records one outside rule and whether it applies. |
+| `research.md` | `docs/research/<name>.md` | Records one outside fact that informs a choice. |
+| `decision.md` | `docs/product/decisions/<number>-<name>.md` | Records one dated choice with its options and evidence. |
+| `problem.md` | `docs/product/problems/<name>.md` | Records one pain someone has today. |
+| `feature.md` | `docs/product/features/<name>.md` | Records what is offered against a problem. |
+| `actor.md` | `docs/domain/actors/<name>.md` | Records one person, company, provider, system, or guest. |
+| `role.md` | `docs/domain/roles/<name>.md` | Records one named set of permissions at a scope. |
+| `journey.md` | `docs/product/journeys/<name>.md` | Records the ordered steps an actor takes toward one goal. |
+| `module.md` | `docs/domain/modules/<module>/README.md` | Defines one business area and its boundaries. |
+| `business-record.md` | `docs/domain/modules/<module>/<records>/README.md` | Defines one record changed in one step, with its rule and event entries. |
+| `use-case.md` | `docs/domain/modules/<module>/<records>/<use-case>.md` | Defines one command or query, with its result and case entries. |
+| `runbook.md` | `docs/runbooks/<name>.md` | Gives one repeatable recovery or operating procedure. |
+| `exception.md` | `docs/exceptions/<name>.md` | Records one departure from a standard, with reason and review date. |
+| `known-gap.md` | `docs/known-gaps/<name>.md` | Records one accepted gap whose check stays red. |
 
-A template `id` is not always the filename. The operating-limits record lives at `docs/operations/limits.md` but keeps the fixed metadata `id` of `operating-limits`. The record kind, not the filename, sets the id. Use-case, module, flow, workflow, and policy ids follow their own kind rules in the Agentic Engineering System page.
+## Entry lists and page styles
 
-Markdown specification templates begin with Specification Metadata validated by [the schema](../../schemas/specification-metadata.schema.json). The Agentic Engineering System page defines semantic relationships that JSON Schema cannot prove across files.
+| Template | Target | Purpose |
+|:---|:---|:---|
+| `product-topic.md` | `docs/product/<area>/<topic>.md` | States one area of business intent, with its requirement entries. |
+| `permission-list.md` | `docs/domain/permissions.md` | Holds the permission entries roles allow. |
+| `entry-point-list.md` | `docs/domain/entry-points.md` | Holds the entry point entries use cases are reached through. |
+| `limit-set.md` | `docs/operations/limits.md` | Holds the limit entries the product runs within. |
+| `rule-set.md` | `docs/domain/rules/<name>.md` | Holds rule entries that sit together outside one record. |
+| `glossary.md` | `docs/domain/glossary.md` | Renders the Term entries from the language record. |
+| `index.md` | `docs/<section>/README.md` | Lists what one directory holds and what lives elsewhere. |
+| `tutorial.md` | `docs/guide/<tutorial>.md` | Gives a newcomer one path to a first working result. |
+| `how-to.md` | `docs/guide/<how-to>.md` | Solves one stated goal for a reader who is already running. |
+| `command.md` | `docs/tools/<command>.md` | Documents one command the repository ships. |
+| `reference.md` | `docs/reference/<name>.md` | Publishes exact values a reader looks up. |
+| `configuration.md` | `docs/tools/configuration.md` | Documents settings a reader can change, with defaults and precedence. |
 
-A workspace with controlled React web frontends also validates the shared UI package with `schemas/design-contract.schema.json` and `schemas/ui-source-lock.schema.json`. Run `node standards/tools/validate-ui.mjs` from the consumer root after adding or changing those files.
+## Interface
 
-The design contract and the source lock are a coherent pair, and both travel with the shared package rather than with an application. A workspace names the package once in `paths.uiPackage`, and each controlled frontend declares its density profile and its own stylesheet entry. Replace the placeholder digest in `ui-source-lock.json` with the digest of the normalized installed source before validating.
+| Template | Target | Purpose |
+|:---|:---|:---|
+| `design-contract.md` | `packages/ui/DESIGN.md` | States the brand, tokens, composites, and voice every frontend composes from. |
+| `ui-source-lock.json` | `packages/ui/ui-source-lock.json` | Records the installed registry source, digests, and dependencies. |
+| `ui-pattern-catalog.json` | `docs/ui/pattern-catalog.json` | Records each recurring interface decision with its options and choice. |
+| `ui-override-decision.md` | `docs/decisions/<id>.md` | Records one visual authority, registry, or specialist-control override. |
 
-The standards do not generate application code. Agents load the active specification, selected profile, task conventions, and applicable extensions before implementing one complete slice.
+The model builder reads each record and writes the computed state into `model.json`. Run its `render` verb after adding, approving, or retiring a record, so generated regions match the model.

@@ -1,13 +1,14 @@
 ---
 {
-  "kind": "tutorial",
-  "id": "__TUTORIAL_ID__",
-  "specStatus": "approved",
-  "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD"
+  "type": "tutorial",
+  "title": "<Tutorial title>",
+  "owner": "<owner>",
+  "status": "draft",
+  "decider": "<owner>",
+  "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# __TUTORIAL_TITLE__
+# <Tutorial title>
 
 ## Purpose
 

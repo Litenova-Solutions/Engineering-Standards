@@ -1,13 +1,14 @@
 ---
 {
-  "kind": "how-to",
-  "id": "__HOW_TO_ID__",
-  "specStatus": "approved",
-  "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD"
+  "type": "how-to",
+  "title": "<How-to title>",
+  "owner": "<owner>",
+  "status": "draft",
+  "decider": "<owner>",
+  "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# __HOW_TO_TITLE__
+# <How-to title>
 
 ## Purpose
 

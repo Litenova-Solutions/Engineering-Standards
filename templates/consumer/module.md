@@ -1,103 +1,23 @@
 ---
 {
-  "kind": "module",
-  "id": "__MODULE__",
-  "specStatus": "approved",
-  "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD",
-  "applicableExtensions": []
+  "type": "module",
+  "id": "module/<name>",
+  "title": "<Module display title>",
+  "owner": "<owner>",
+  "status": "draft",
+  "decider": "<owner>",
+  "decideBy": "<YYYY-MM-DD>",
+  "dependsOn": ["<module id, or remove this line>"],
+  "replaces": "<module id, or remove this line>",
+  "terms": ["term/<term-name>"]
 }
 ---
-# __TITLE__
-
-## Module map
-
-- Authority level: Lift the level and its position from the authority hierarchy.
-- Aggregates: Lift each root with its invariant, state, and use-case counts.
-- Use cases: Lift the total and the planned count from the Use cases table.
-- Events raised: Lift the events from the Events and event reactions table.
-- Reacts to: Lift the reactions from the Events and event reactions table.
-- Terms: Lift the terms this module defines.
-- Policies: Lift the policy identifiers this module links.
+# <Module display title>
 
 ## Purpose
 
-State the domain area, its language, and the outcomes its use cases support. A module organizes specifications and code. It is not a transaction or deployment boundary.
+State the business area, its language, and the outcomes its use cases support.
 
-## Scenario
+## Boundaries
 
-State the occasion this module exists for: what its actors are doing, when it happens in the subject's life, and what they use today instead. Draw the people, place, dates, and amounts from the reference cast record. This section is informative. It defines no term, rule, or state.
-
-## Actors
-
-- Name each actor and responsibility in this module.
-
-## Terms
-
-| Term | Definition | Rejected synonyms |
-|:---|:---|:---|
-| `__TERM__` | Define the term in business language. | List words that do not replace it. |
-
-## Aggregate ownership
-
-| Aggregate | Owns | References by ID | Aggregate Invariants | Commands |
-|:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | List state changed atomically. | List other aggregate IDs. | `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Link Command use cases. |
-
-Write `None` when the module has no aggregate. A module may contain multiple related aggregates. Each aggregate remains one transaction boundary.
-
-## Business states
-
-| Aggregate | State | Meaning | Required facts |
-|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__STATE__` | State the business meaning. | List facts required in this state. |
-
-Every aggregate lists at least one business state, including an aggregate with one current state. Remove this section only when the module has no aggregate.
-
-## Technical state mapping
-
-| Aggregate | Abstract state base | Business state | Sealed state record |
-|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__AGGREGATE__State` | `__STATE__` | `__STATE____AGGREGATE__State` |
-
-Define this mapping before the first Command implementation. Do not use an enum, status string, boolean flags, or nullable lifecycle fields as the aggregate lifecycle representation.
-
-## Transitions
-
-| Aggregate | From state | Business action | To state | Aggregate Invariants | Use case |
-|:---|:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__FROM_STATE__` | `__ACTION__` | `__TO_STATE__` | `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Link the Command specification. |
-
-## Aggregate invariants
-
-| ID | Rule | Protected by | Failure |
-|:---|:---|:---|:---|
-| `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | State one invariant. | Name the aggregate or Value Object. | Name the rejected outcome. |
-
-Do not reuse an approved invariant identifier.
-
-## Events and event reactions
-
-| Event reference | Code type | Business meaning | Event reaction | Owner | Delivery |
-|:---|:---|:---|:---|:---|:---|
-| `__MODULE__.__PAST_TENSE_EVENT__` | `__PAST_TENSE_EVENT_TYPE__` | State what completed. | State caused behavior or `None`. | Name the owner. | `atomic`, `durable`, `rebuildable`, or `best-effort-optional` |
-
-## Use cases
-
-| Use case | Operation | Implementation status |
-|:---|:---|:---|
-| `__MODULE__.__USE_CASE__` | `command` or `query` | `planned` or `verified` |
-
-## Rule and transition coverage
-
-| Rule or transition | Use cases | Acceptance criteria |
-|:---|:---|:---|
-| `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Link each owning use case. | List stable acceptance IDs. |
-
-## Dependencies
-
-- Link another module only when this module requires its public behavior.
-
-## Open modeling questions
-
-- Record an unresolved business definition that blocks a state, transition, aggregate invariant, policy, or event.
+State what belongs in this module and what belongs in a neighbour instead.

@@ -1,50 +1,39 @@
 ---
 {
-  "kind": "decision",
-  "id": "__DECISION_ID__",
-  "specStatus": "draft",
-  "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD"
+  "type": "decision",
+  "id": "decision/<number>-<name>",
+  "title": "<Decision display title>",
+  "owner": "<owner>",
+  "status": "draft",
+  "decider": "<owner>",
+  "decideBy": "<YYYY-MM-DD>",
+  "decided": "<YYYY-MM-DD, set on approval>",
+  "options": ["<one option>"],
+  "changeWhen": "<The measurable condition that reopens this decision>",
+  "decides": ["<requirement, feature, rule, or constraint-applicability id>"],
+  "basedOn": ["<constraint or research id, or remove this line>"],
+  "replaces": "<decision id, or remove this line>",
+  "terms": ["term/<term-name>"]
 }
 ---
-# __TITLE__
+# <Decision display title>
 
 ## Context
 
-State the concrete constraint or conflict.
+State the situation that forced a choice, with the facts that bound it.
+
+## Options
+
+State each option weighed, with its strongest reason and its strongest cost.
 
 ## Decision
 
-State the selected behavior. Change `specStatus` to `approved` when accepted.
-
-## Standards impact
-
-- Name every standards rule replaced or write `None`.
-
-## Activation conditions
-
-| Condition | Required claims or evidence | Owner | Status |
-|:---|:---|:---|:---|
-| State the condition before activation. | Link Decision Evidence, a test, provider statement, policy, or review. | `__OWNER__` | `pending`, `met`, or `rejected` |
-
-Remove this section when the decision applies immediately without a gate.
-
-## Review controls
-
-- Scope: `__SCOPE__`.
-- Review or expiry date: `__REVIEW_OR_EXPIRY_DATE__`.
-- Compensating control: `__COMPENSATING_CONTROL__`.
-- Security approval: `__SECURITY_APPROVAL__`.
-- Removal condition: `__REMOVAL_CONDITION__`.
+State the selected option in one paragraph. A decision is replaced, never edited after approval.
 
 ## Consequences
 
-State required work, accepted cost, and replacement or review condition.
+State what the product, the company, or the code now has to do, and the cost accepted.
 
-## Pending decisions
+## Evidence
 
-- Link a separate decision for each unresolved external, policy, or provider choice. Remove this section when none remain.
-
-## Verification
-
-State how reviewers confirm the decision is applied.
+Link each research record the decision rests on, with its confidence.

@@ -1,22 +1,23 @@
 ---
 {
-  "kind": "command",
-  "id": "__COMMAND_ID__",
-  "specStatus": "approved",
-  "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD"
+  "type": "command",
+  "title": "<Command title>",
+  "owner": "<owner>",
+  "status": "draft",
+  "decider": "<owner>",
+  "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# __COMMAND_TITLE__
+# <Command title>
 
 ## Name
 
-`__COMMAND__` starts one named operation and reports its result.
+`<command>` starts one named operation and reports its result.
 
 ## Synopsis
 
 ```bash
-__COMMAND__ [arguments] [options]
+<command> [arguments] [options]
 ```
 
 ## Description
@@ -29,13 +30,13 @@ Name the tutorial or how-to page a reader arrives from.
 
 | Argument | Required | Effect |
 |:---|:---|:---|
-| `__ARGUMENT__` | yes | State what the argument selects. |
+| `<argument>` | yes | State what the argument selects. |
 
 ## Options
 
 | Option | Default | Effect |
 |:---|:---|:---|
-| `--__OPTION__` | `__DEFAULT__` | State what the option changes. |
+| `--<option>` | `<default>` | State what the option changes. |
 
 ## Exit codes
 
@@ -48,7 +49,7 @@ Name the tutorial or how-to page a reader arrives from.
 ## Examples
 
 ```bash
-__COMMAND__
+<command>
 ```
 
 ## Underneath

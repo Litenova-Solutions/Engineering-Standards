@@ -1,27 +1,21 @@
 ---
 {
-  "kind": "runbook",
-  "id": "__RUNBOOK_ID__",
-  "specStatus": "approved",
-  "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD"
+  "type": "runbook",
+  "id": "runbook/<name>",
+  "title": "<Runbook display title>",
+  "owner": "<owner>",
+  "status": "draft",
+  "decider": "<owner>",
+  "decideBy": "<YYYY-MM-DD>",
+  "limit": "<limit id, or remove this line>",
+  "trigger": "<alert or request, or remove this line>",
+  "replaces": "<runbook id, or remove this line>",
+  "terms": ["term/<term-name>"]
 }
 ---
-# __TITLE__
+# <Runbook display title>
 
-Last tested: `YYYY-MM-DD`.
-
-## Purpose
-
-State the failure, operational task, or recovery outcome covered by this runbook.
-
-## Trigger
-
-State the alert, request, or observation that starts the runbook.
-
-## Impact
-
-State the end-to-end flow, data, delivery target, or recovery objective at risk.
+Keep either `limit` or `trigger` in the frontmatter, and remove the other line.
 
 ## Prerequisites
 
@@ -36,12 +30,12 @@ State the end-to-end flow, data, delivery target, or recovery objective at risk.
 3. Verify the result before continuing.
 
 ```text
-__EXACT_COMMAND_OR_PLATFORM_ACTION__
+<exact command or platform action>
 ```
 
 ## Verification
 
-State the health checks, end-to-end test, data checks, or metrics that prove recovery.
+State the health checks, data checks, or metrics that prove recovery.
 
 ## Rollback or recovery
 

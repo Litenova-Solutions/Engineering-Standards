@@ -1,134 +1,66 @@
 ---
 {
-  "kind": "use-case",
-  "id": "use-case/__MODULE__.__USE_CASE__",
-  "specStatus": "approved",
-  "implementationStatus": "planned",
-  "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD",
-  "operationType": "__OPERATION_TYPE__",
-  "actors": ["__ACTOR__"],
-  "entryPoints": [],
-  "risks": [],
-  "applicableExtensions": []
+  "type": "use-case",
+  "id": "use-case/<module>.<name>",
+  "title": "<Use case display title>",
+  "owner": "<owner>",
+  "status": "draft",
+  "decider": "<owner>",
+  "decideBy": "<YYYY-MM-DD>",
+  "operation": "<command|query>",
+  "needs": ["permission/<name, or empty with anonymous true>"],
+  "anonymous": false,
+  "reachedThrough": ["entry-point/<name>"],
+  "raises": ["event/<record>.<past-tense>"],
+  "reactsTo": ["<event id, or remove this line>"],
+  "fulfils": ["requirement/<topic>.<name>"],
+  "input": [
+    {
+      "name": "<field>",
+      "meaning": "<What this field means>",
+      "rules": ["<The shape each value obeys>"]
+    }
+  ],
+  "results": [
+    {
+      "type": "result",
+      "id": "result/<use-case>.<name>",
+      "title": "<Success display title>",
+      "outcome": "success",
+      "status": "<HTTP status>",
+      "meaning": "<The observable result in one sentence>"
+    },
+    {
+      "type": "result",
+      "id": "result/<use-case>.<name>",
+      "title": "<Refusal display title>",
+      "outcome": "refusal",
+      "code": "failure/<module>.<reason>",
+      "status": "<HTTP status>",
+      "meaning": "<What the caller sees in one sentence>"
+    }
+  ],
+  "cases": [
+    {
+      "type": "case",
+      "id": "case/<use-case>.<name>",
+      "title": "<Case display title>",
+      "situation": "<The starting state>",
+      "action": "<What the actor does>",
+      "result": "result/<use-case>.<name>",
+      "expect": "<The observable result>"
+    }
+  ],
+  "replaces": "<use-case id, or remove this line>",
+  "terms": ["term/<term-name>"]
 }
 ---
-# __TITLE__
-
-## Business impact
-
-- Risk: Lift the risks from the metadata block.
-- Refusals: Lift the refusal codes from the Failures table.
-- Authorized for: Lift the actors from the metadata block.
-- Reached from: Lift the entry points from the metadata block and the Consumers table.
-
-## Terms used
-
-- Lift each canonical term the body uses, linked to its glossary heading.
+# <Use case display title>
 
 ## Goal
 
-State the actor or system goal and its observable result.
-
-## Scenario
-
-Situate this operation in one concrete occasion: name the person, state what surrounds them, and state what they would do instead without this operation. Draw the people, place, dates, and amounts from the reference cast record. This section is informative. It defines no rule, term, state, or actor, and it carries no rule or acceptance identifier.
+State the actor goal and its observable result.
 
 ## Trigger
 
 State the actor action, event, schedule, or system condition that starts this use case.
-
-## Authorization
-
-State how actor identity is established and how target access is checked. Write `Not applicable` for a trusted system trigger with no actor decision.
-
-## Input
-
-| Field | Meaning | Input Rules |
-|:---|:---|:---|
-| `__FIELD__` | State its business meaning. | State required shape, range, or format. |
-
-## Result
-
-State the observable result without exposing persistence types.
-
-## Rules
-
-| Domain rule ID | Type | Required behavior |
-|:---|:---|:---|
-| `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | Aggregate Invariant | State how this use case applies the invariant. |
-| `policy/__POLICY__.refund-within-the-window` | Domain Policy | Remove when no domain policy applies. |
-
-## Successful path
-
-1. Describe successful behavior in business terms.
-
-## Domain behavior
-
-For a Command, list every aggregate changed. For a Query, write `No Domain transition` and name the Read Model.
-
-| Aggregate | Source state | Business action | Target state | Rules | Event references |
-|:---|:---|:---|:---|:---|:---|
-| `__AGGREGATE__` | `__SOURCE_STATE__` | `__ACTION__` | `__TARGET_STATE__` | `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action` | `event/__AGGREGATE_ANCHOR__.__PAST_TENSE_EVENT__` |
-
-When more than one aggregate appears, state the invariant or domain policy that requires one transaction.
-
-## Failures
-
-| Code | Condition | Observable result | Recovery |
-|:---|:---|:---|:---|
-| `__ERROR_CODE__` | State the failed rule. | State the caller-visible result. | State retry, correction, or no recovery. |
-
-## Acceptance criteria
-
-- [acceptance-criterion/__MODULE__.__USE_CASE__.__CRITERION_TOPIC__] Replace with one observable criterion.
-
-A use case with `implementationStatus: planned` may have no test reference. A verified use case has at least one acceptance criterion, every acceptance ID appears in automated test source, and applicable test commands have passed.
-
-## Examples
-
-### Successful example
-
-Given the required starting state
-When the actor performs the operation
-Then the expected result is observable
-
-### Rejected example
-
-Given a state that violates `invariant/__AGGREGATE_ANCHOR__.state-allows-the-action`
-When the actor performs the operation
-Then `__ERROR_CODE__` is returned without a state change
-
-## Implementation mapping
-
-| Role | Name or path |
-|:---|:---|
-| Command or Query | `__USE_CASE__Command` or `__USE_CASE__Query` |
-| Handler | `__USE_CASE__CommandHandler` or `__USE_CASE__QueryHandler` |
-| Aggregate method or Read Model | `__AGGREGATE__.__ACTION__` |
-| Entry Point | `POST __ROUTE__` (`__USE_CASE__Endpoint`) |
-| Automated tests | `__TEST_PROJECT__` |
-
-Add this section when implementation begins. Do not use it as the source for business behavior.
-
-State every name in a code span. Each one resolves to a declared type, a member written as `Type.Member`, a project, or a repository path. A route carries a path rather than an identifier, so the entry-point checks resolve it. A row that names no artifact writes `None`. An `implemented` or `verified` use case names the handler its operation folder declares. (`standards/rule/core-system.resolve-every-implementation-mapping-name`, `standards/rule/core-system.name-the-handler-an-implemented-use-case-owns`)
-
-## Consumers
-
-Name every declared surface that invokes this use case, one per row. A surface is a frontend the project declares or a `paths.surfaces` entry. Write `None.` with the reason when a schedule, a reaction, or another use case is the only caller. A route that calls this use case is named here by its route file. (`standards/rule/core-system.name-what-calls-a-use-case`)
-
-| Surface | Consumer |
-|:---|:---|
-| `__APP__` | `apps/__APP__/__ROUTE_FOLDER__/page.tsx` |
-
-## Risk and assurance
-
-Add only sections required by `risks`: authorization, money, sensitive data, irreversible behavior, concurrency, durable delivery, or availability.
-
-## Operating impact
-
-State schema, external dependency, diagnostic, deployment, recovery, or runbook changes. Write `None` when no operating change exists.
-
-## Verification
-
-- List exact commands and expected evidence for this use case.

@@ -1,50 +1,53 @@
 {
   "$schema": "./standards/schemas/standards-project.schema.json",
   "project": {
-    "name": "__PROJECT__"
+    "name": "<project>"
   },
-  "profile": "dotnet-react",
-  "reviewedStandardsVersion": "1.19.0",
+  "size": "<small|large>",
+  "stacks": ["dotnet", "<react|svelte|blazor-web>"],
+  "reviewedStandardsVersion": "2.0.0",
+  "optionalTypes": ["<constraint|research|limit|runbook>"],
+  "constraints": {
+    "answered": false
+  },
+  "owners": ["<owner>"],
   "paths": {
-    "apiSolution": "__API_SOLUTION__",
+    "apiSolution": "<api-solution>",
     "docs": "docs",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
     "unstructuredDocs": [],
-    "surfaces": [],
     "testRoots": [],
     "languageScan": [],
     "uiPackage": {
-      "name": "@__PROJECT__/ui",
+      "name": "@<project>/ui",
       "path": "packages/ui",
       "componentsJson": "packages/ui/components.json",
       "primitives": "packages/ui/src/components",
       "tokens": "packages/ui/src/styles/tokens.css",
       "sourceLock": "packages/ui/ui-source-lock.json",
       "designContract": "packages/ui/DESIGN.md",
-      "publicExports": ["@__PROJECT__/ui/floorplans", "@__PROJECT__/ui/display", "@__PROJECT__/ui/forms"]
+      "publicExports": ["@<project>/ui/floorplans", "@<project>/ui/display", "@<project>/ui/forms"]
     },
     "uiPatterns": "docs/ui/pattern-catalog.json",
     "frontends": [
       {
-        "name": "web",
-        "path": "apps/web",
-        "platform": "react-web",
+        "name": "<frontend>",
+        "path": "apps/<frontend>",
+        "platform": "<react|svelte|blazor-web>",
         "ui": {
           "profile": "application-balanced",
-          "globalCss": "apps/web/src/styles.css"
+          "globalCss": "apps/<frontend>/src/<styles>.css"
         }
       }
     ],
     "sites": []
   },
-  "selectedExtensions": [],
-  "prohibitedKinds": [],
-  "overrides": [],
-  "parity": {
-    "ignoreHandlers": [],
-    "ignoreUseCases": [],
-    "sourceRoots": [],
-    "foreignNames": []
-  }
+  "extensions": [
+    {
+      "id": "<extension>",
+      "criterion": "<Why this extension applies>",
+      "reviewBy": "<YYYY-MM-DD>"
+    }
+  ]
 }

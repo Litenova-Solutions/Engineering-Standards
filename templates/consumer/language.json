@@ -1,12 +1,32 @@
 {
   "$schema": "../../schemas/language.schema.json",
-  "schemaVersion": 1,
   "terms": [
     {
-      "term": "__TERM__",
-      "rejected": ["__REJECTED_SYNONYM__"],
-      "scope": "^domain/modules/__MODULE__/",
-      "reason": "__WHY_THE_SYNONYM_IS_WRONG_HERE__"
+      "id": "term/<name>",
+      "term": "<English label>",
+      "meaning": "<Meaning in at most 25 words>",
+      "labels": {
+        "nl": "<Dutch label>",
+        "de": "<German label>"
+      },
+      "rejected": [
+        {
+          "word": "<rejected word>",
+          "reason": "<Why it is wrong here>",
+          "scope": "<path scope, or remove this line>",
+          "except": "<exception, or remove this line>"
+        }
+      ],
+      "broader": "<term id, or remove this line>",
+      "narrower": ["<term id>"],
+      "values": [
+        {
+          "code": "<code>",
+          "label": "<label>"
+        }
+      ],
+      "owner": "<owner>",
+      "status": "draft"
     }
   ],
   "mannered": [

@@ -1,13 +1,14 @@
 ---
 {
-  "kind": "reference",
-  "id": "__REFERENCE_ID__",
-  "specStatus": "approved",
-  "owner": "__OWNER__",
-  "lastReviewed": "YYYY-MM-DD"
+  "type": "reference",
+  "title": "<Reference title>",
+  "owner": "<owner>",
+  "status": "draft",
+  "decider": "<owner>",
+  "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# __REFERENCE_TITLE__
+# <Reference title>
 
 ## Intent
 
@@ -17,9 +18,9 @@ State which exact values this page publishes and who looks them up.
 
 | Name | Value | Meaning |
 |:---|:---|:---|
-| `__NAME__` | `__VALUE__` | State what the value selects or produces. |
+| `<name>` | `<value>` | State what the value selects or produces. |
 
-Name the source each value is read from, so a reader can check it. A restated value is accurate until the next unrelated commit.
+Name the source each value is read from, so a reader can check it.
 
 ## Notes
 
