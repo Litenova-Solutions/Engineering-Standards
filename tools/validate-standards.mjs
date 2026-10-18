@@ -17,13 +17,13 @@ import {
 } from './prose.mjs';
 import { unsupportedSchemaKeywords, validateSchemaValue } from './schema.mjs';
 
-// Every provision identifier is standards/<kind>/<page>.<heading-slug>. The
-// grammar lives in provisions.mjs, so the validator, the generator, and the
+// Every provision identifier is standards/<rule|convention>/<page>.<heading-slug>.
+// The grammar lives in provisions.mjs, so the validator, the generator, and the
 // parsed heading cannot report three different formats.
 // (standards/rule/core-authoring.identifier-must-follow-format)
 const PROVISION_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${PROVISION_ID_SOURCE})\\)\\s*$`);
 const CITATION_SOURCE = PROVISION_ID_SOURCE;
-const METHODS = new Set(['static', 'test', 'inspection', 'operation']);
+const MARKS = new Set(['checkable', 'guidance']);
 const MODALS = /\b(?:MUST NOT|SHOULD NOT|MUST|SHOULD|MAY)\b/g;
 const OTHER_NORMATIVE = /\b(?:REQUIRED|FORBIDDEN|SHALL)\b/;
 const PROVISION_LABEL = /^\*\*(Requirement|Deviation|Rationale|Example|Default|Replacement):\*\*/;
@@ -58,6 +58,8 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'EXTENSION_BASELINE',
   'EXTENSION_DEPENDENCIES',
   'EXTENSION_KIND',
+  'EXTENSION_REPLACES_ENFORCED',
+  'EXTENSION_REPLACES_UNKNOWN',
   'EXTENSION_SCOPE',
   'GLOSSARY_DEFINITION',
   'GLOSSARY_ORDER',
@@ -77,7 +79,6 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'MANIFEST_ANCHOR',
   'MANIFEST_DUPLICATE_PATH',
   'MANIFEST_JSON',
-  'MANIFEST_LOAD_PLAN',
   'MANIFEST_PATH',
   'OVERRIDE_UNKNOWN_ID',
   'PAGE_EMPTY_SECTION',
@@ -86,8 +87,6 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'PAGE_TITLE_CASE',
   'PAGE_TITLE_COUNT',
   'PAGE_UNKNOWN_SECTION',
-  'PROFILE_COMPOSITION_EXTRA',
-  'PROFILE_COMPOSITION_MISSING',
   'PROSE_AND_OR',
   'PROSE_CONTRACTION',
   'PROSE_LIST_LENGTH',
@@ -100,9 +99,12 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'PROVISIONS_STALE',
   'PROVISION_RESTATES_HEADING',
   'REFERENCE_EXAMPLE_DECLARATION',
+  'REMOVED_IDENTIFIER',
   'SCHEMA_INVALID',
   'SCHEMA_JSON',
   'SCHEMA_UNSUPPORTED_KEYWORD',
+  'STACK_COMPOSITION_EXTRA',
+  'STACK_COMPOSITION_MISSING',
   'STANDARD_DEVIATION_SENTENCE',
   'STANDARD_EXAMPLE_LABEL',
   'STANDARD_INFORMATIVE_NORMATIVE',
@@ -123,14 +125,15 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'SUMMARY_NORMATIVE',
   'SUMMARY_RESTATES_REQUIREMENT',
   'SUMMARY_UNKNOWN_ID',
+  'VERIFY_COMMAND',
   'VERIFY_DUPLICATE_ID',
-  'VERIFY_DUPLICATE_METHOD',
   'VERIFY_GENERIC_EVIDENCE',
-  'VERIFY_METHOD',
+  'VERIFY_HEADER',
+  'VERIFY_MARK',
   'VERIFY_MISSING_ID',
-  'VERIFY_NO_ARTIFACT',
   'VERIFY_TEMPLATED_EVIDENCE',
   'VERIFY_UNKNOWN_ID',
+  'WORKFLOW_KIND',
 
   'TEMPLATE_INDEX_PATH',
 
@@ -187,10 +190,6 @@ function isCurrentStandardsMaterial(relative) {
 function lineNumber(text, offset) {
   return text.slice(0, offset).split('\n').length;
 }
-
-
-
-
 
 function titleCase(value) {
   const small = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'with']);
@@ -370,7 +369,7 @@ function checkProse(relative, raw, kind, add) {
   checkProseMeasures(relative, raw, add);
 }
 
-function parsePage(relative, raw, add, globalIds, virtual = false) {
+function parsePage(relative, raw, add, globalIds, root, virtual = false) {
   const kind = pageClass(relative);
   const lines = raw.split(/\r?\n/);
   const clean = stripFences(lines);
@@ -615,14 +614,23 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
     }
   }
 
+  // Every provision carries its verification mark: checkable with the command
+  // that checks it, or guidance with the question a reviewer answers. The table
+  // header names the columns, so the provision index reads the marks from the
+  // same rows this gate checks.
   const verification = sections.find((section) => section.name === 'Verification');
-  if (verification) {
-    for (let index = verification.line; index < clean.length; index += 1) {
-      const match = clean[index].line.match(new RegExp(`^\\|\\s*(${CITATION_SOURCE})\\s*\\|\\s*([^|]+?)\\s*\\|\\s*([^|]+?)\\s*\\|\\s*$`));
+  if (verification && (kind === 'topic' || kind === 'profile' || kind === 'extension')) {
+    const position = sections.findIndex((section) => section.name === 'Verification');
+    const end = position + 1 < sections.length ? sections[position + 1].line - 1 : clean.length;
+    const header = clean.slice(verification.line, end).find((item) => /^\|\s*ID\s*\|\s*Mark\s*\|\s*Evidence\s*\|\s*$/.test(item.line));
+    if (!header) {
+      add(relative, verification.line, 'VERIFY_HEADER', 'Verification must use a table with the header row | ID | Mark | Evidence |');
+    }
+    for (let index = verification.line; index < end; index += 1) {
+      const match = clean[index].line.match(new RegExp(`^\\|\\s*(${CITATION_SOURCE})\\s*\\|\\s*([^|]*?)\\s*\\|\\s*([^|]*?)\\s*\\|\\s*$`));
       if (!match) continue;
-      const methods = match[2].split(',').map((item) => item.trim()).filter(Boolean);
-      for (const method of methods) if (!METHODS.has(method)) add(relative, index + 1, 'VERIFY_METHOD', `unknown verification method '${method}'`);
-      if (new Set(methods).size !== methods.length) add(relative, index + 1, 'VERIFY_DUPLICATE_METHOD', `Verification repeats a method for '${match[1]}'`);
+      const mark = match[2].trim();
+      if (!MARKS.has(mark)) add(relative, index + 1, 'VERIFY_MARK', `unknown verification mark '${mark || '(empty)'}' for '${match[1]}'; write checkable or guidance`);
       const evidence = match[3].trim();
       if (GENERIC_EVIDENCE.test(visibleText(evidence))) add(relative, index + 1, 'VERIFY_GENERIC_EVIDENCE', `Verification for '${match[1]}' uses generic evidence`);
       // Evidence that echoes its own provision heading names no artifact. It
@@ -632,12 +640,8 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
       if (ownerClaim && claim(evidence).includes(ownerClaim)) {
         add(relative, index + 1, 'VERIFY_TEMPLATED_EVIDENCE', `Verification for '${match[1]}' repeats its provision heading instead of naming evidence`);
       }
-      // A static or test claim is checkable only when it names the command,
-      // path, identifier, or assertion that produces the result.
-      if (methods.some((method) => method === 'static' || method === 'test') && !/`[^`]+`/.test(evidence)) {
-        add(relative, index + 1, 'VERIFY_NO_ARTIFACT', `Verification for '${match[1]}' claims a ${methods.join(' and ')} method but names no artifact`);
-      }
-      verificationRows.push({ id: match[1], line: index + 1, evidence });
+      if (mark === 'checkable') checkVerificationCommand(relative, index + 1, match[1], evidence, root, add);
+      verificationRows.push({ id: match[1], mark, line: index + 1, evidence });
     }
     const rowIds = verificationRows.map((row) => row.id);
     for (const provision of provisions) {
@@ -651,9 +655,34 @@ function parsePage(relative, raw, add, globalIds, virtual = false) {
   }
 
   if (!virtual) checkProse(relative, raw, kind, add);
-  return { kind, provisions, headings, summaryReferences };
+  return { kind, provisions, headings, summaryReferences, verificationRows };
 }
 
+// A checkable row's Evidence starts with the command that checks it, in
+// backticks, and that command names a file the repository holds. A command
+// with no repository path is a consumer command the page itself defines, so
+// only a named file that does not exist fails.
+function checkVerificationCommand(relative, line, id, evidence, root, add) {
+  const command = evidence.match(/`([^`]+)`/)?.[1] ?? '';
+  if (!command) {
+    add(relative, line, 'VERIFY_COMMAND', `Verification for '${id}' is checkable but names no command`);
+    return;
+  }
+  const tokens = command.split(/\s+/);
+  const candidates = [];
+  const projectIndex = tokens.indexOf('--project');
+  if (projectIndex >= 0 && tokens[projectIndex + 1]) candidates.push(tokens[projectIndex + 1]);
+  for (const token of tokens) {
+    const cleaned = token.replace(/^['"]|['",;]+$/g, '').split('#')[0];
+    if (/^(?:[\w.-]+\/)+[\w.-]+$/.test(cleaned)) candidates.push(cleaned);
+  }
+  for (const candidate of candidates) {
+    if (!fs.existsSync(path.join(root, candidate))) {
+      add(relative, line, 'VERIFY_COMMAND', `Verification for '${id}' names '${candidate}', which does not exist in the repository`);
+      return;
+    }
+  }
+}
 
 function validateSchemaConsumer(root, schemaRelative, valueRelative, add) {
   const schemaFile = path.join(root, schemaRelative);
@@ -701,7 +730,7 @@ function checkLinks(root, files, add) {
   }
 }
 
-function checkManifest(root, add) {
+function checkManifest(root, add, context) {
   const manifestFile = path.join(root, 'standards.manifest.json');
   if (!fs.existsSync(manifestFile)) return;
   let manifest;
@@ -712,12 +741,11 @@ function checkManifest(root, add) {
     return;
   }
   const references = [manifest.agentsEntry];
-  for (const profile of Object.values(manifest.profiles ?? {})) {
-    references.push(profile.entry, ...(profile.pages ?? []));
-    if (new Set(profile.pages ?? []).size !== (profile.pages ?? []).length) add('standards.manifest.json', 1, 'MANIFEST_DUPLICATE_PATH', `profile '${profile.entry}' contains a duplicate page path`);
+  for (const stack of Object.values(manifest.stacks ?? {})) {
+    references.push(stack.entry, ...(stack.pages ?? []));
+    if (new Set(stack.pages ?? []).size !== (stack.pages ?? []).length) add('standards.manifest.json', 1, 'MANIFEST_DUPLICATE_PATH', `stack '${stack.entry}' contains a duplicate page path`);
   }
   for (const extension of Object.values(manifest.extensions ?? {})) references.push(extension.path);
-  for (const plan of Object.values(manifest.loadPlans ?? {})) references.push(...(plan.tier0 ?? []), ...(plan.tier1 ?? []), ...(plan.tier2 ?? []));
   for (const reference of references.filter(Boolean)) {
     const [relative, anchor] = reference.split('#');
     const target = path.join(root, relative);
@@ -727,18 +755,18 @@ function checkManifest(root, add) {
     }
     if (anchor && !anchorsFor(fs.readFileSync(target, 'utf8')).has(anchor)) add('standards.manifest.json', 1, 'MANIFEST_ANCHOR', `anchor '#${anchor}' does not exist in '${relative}'`);
   }
-  for (const [id, profile] of Object.entries(manifest.profiles ?? {})) {
-    const entry = path.join(root, profile.entry);
+  for (const [id, stack] of Object.entries(manifest.stacks ?? {})) {
+    const entry = path.join(root, stack.entry);
     if (!fs.existsSync(entry)) continue;
     const raw = fs.readFileSync(entry, 'utf8');
-    // The Composition section is the profile's list, so only that section is
+    // The Composition section is the stack's list, so only that section is
     // compared with the manifest. A link in Intent or Conventions is prose
-    // pointing at a page, not a claim that the profile composes it.
+    // pointing at a page, not a claim that the stack composes it.
     const composition = sectionBody(raw.split(/\r?\n/), 'Composition');
     const actual = new Set([...composition.matchAll(/\[[^\]]+\]\(([^)#]+)(?:#[^)]+)?\)/g)].map((match) => slash(path.relative(root, path.resolve(path.dirname(entry), decodeURIComponent(match[1]))))));
-    const expected = new Set(profile.pages ?? []);
-    for (const page of expected) if (!actual.has(page)) add(profile.entry, 1, 'PROFILE_COMPOSITION_MISSING', `profile '${id}' Composition omits '${page}'`);
-    for (const page of actual) if (!expected.has(page)) add(profile.entry, 1, 'PROFILE_COMPOSITION_EXTRA', `profile '${id}' Composition adds '${page}' outside the manifest`);
+    const expected = new Set(stack.pages ?? []);
+    for (const page of expected) if (!actual.has(page)) add(stack.entry, 1, 'STACK_COMPOSITION_MISSING', `stack '${id}' Composition omits '${page}'`);
+    for (const page of actual) if (!expected.has(page)) add(stack.entry, 1, 'STACK_COMPOSITION_EXTRA', `stack '${id}' Composition adds '${page}' outside the manifest`);
   }
   for (const [id, extension] of Object.entries(manifest.extensions ?? {})) {
     const file = path.join(root, extension.path);
@@ -759,11 +787,16 @@ function checkManifest(root, add) {
     if (!activationDetail.length) add(extension.path, 1, 'EXTENSION_ACTIVATION', `extension '${id}' has no activation criterion`);
     if (!baseline) add(extension.path, 1, 'EXTENSION_BASELINE', `extension '${id}' has an empty Baseline relationship`);
     if (!dependencies) add(extension.path, 1, 'EXTENSION_DEPENDENCIES', `extension '${id}' has an empty Dependencies section`);
-  }
-  const writingPlan = manifest.loadPlans?.['core.authoring'];
-  if (!writingPlan || !(writingPlan.tier1 ?? []).includes('docs/core/authoring.md#agent-summary')
-    || !(writingPlan.tier2 ?? []).includes('docs/core/authoring.md') || !(writingPlan.tier2 ?? []).includes('CONTRIBUTING.md')) {
-    add('standards.manifest.json', 1, 'MANIFEST_LOAD_PLAN', 'core.authoring must load the authoring summary, page, and CONTRIBUTING.md');
+    // A replacement is machine-readable: every replaced ID resolves to an
+    // active provision, and the replacing extension enforces its own
+    // provisions instead, so the replaced one has no row in its table.
+    const replaces = Array.isArray(extension.replaces) ? extension.replaces : [];
+    const ownRows = context.verificationRowsByPage.get(extension.path) ?? [];
+    for (const replaced of replaces) {
+      if (!context.activeIds.has(replaced)) add('standards.manifest.json', 1, 'EXTENSION_REPLACES_UNKNOWN', `extension '${id}' replaces unknown provision '${replaced}'`);
+      const row = ownRows.find((item) => item.id === replaced);
+      if (row) add(extension.path, row.line, 'EXTENSION_REPLACES_ENFORCED', `extension '${id}' replaces '${replaced}' and still enforces it in its own Verification table`);
+    }
   }
 }
 
@@ -791,6 +824,41 @@ function normalizeTemplate(relative, raw) {
     .replaceAll('{How-To Title}', 'How-To Title')
     .replaceAll('{Tutorial Title}', 'Tutorial Title')
     .replaceAll('{Command Title}', 'Command Title');
+}
+
+// The 2.0.0 model removed every numbered identifier, the old slashed kinds,
+// and Workflow as a specification kind. A bare prefix in a refusal list is
+// documentation; a prefix with content after it is a live old form.
+const REMOVED_IDENTIFIER_PATTERNS = [
+  /\b(?:acceptance-criterion|authorization|invariant|policy|validation|flow|workflow|end-to-end-flow|domain-policy|aggregate|value|path)\/[A-Za-z0-9][\w.-]*/g,
+  /\bnighthall\/rule\/[A-Za-z0-9][\w.-]*/g,
+  /\b(?:AC|AUTZ|INV|POL|VAL|RULE|E2E)-[A-Za-z0-9][\w-]*/g,
+];
+const WORKFLOW_KIND_PATTERNS = [
+  /\bWorkflows?\b/g,
+  /[`"']workflows?[`"']/g,
+  /\bworkflows?\/[A-Za-z0-9]/g,
+];
+
+function checkRemovedForms(root, add) {
+  for (const directory of ['docs', 'templates']) {
+    for (const file of walk(path.join(root, directory), (candidate) => /\.(?:md|json)$/.test(candidate))) {
+      const relative = slash(path.relative(root, file));
+      const lines = fs.readFileSync(file, 'utf8').split(/\r?\n/);
+      lines.forEach((line, index) => {
+        for (const pattern of REMOVED_IDENTIFIER_PATTERNS) {
+          pattern.lastIndex = 0;
+          const match = line.match(pattern)?.[0];
+          if (match) add(relative, index + 1, 'REMOVED_IDENTIFIER', `removed identifier form '${match}' is not valid in 2.0.0`);
+        }
+        for (const pattern of WORKFLOW_KIND_PATTERNS) {
+          pattern.lastIndex = 0;
+          const match = line.match(pattern)?.[0];
+          if (match) add(relative, index + 1, 'WORKFLOW_KIND', `'${match}' uses Workflow as a specification kind, which 2.0.0 removed`);
+        }
+      });
+    }
+  }
 }
 
 export function validateRepository(rootInput = '.') {
@@ -828,7 +896,7 @@ export function validateRepository(rootInput = '.') {
     const prose = stripFences(raw.split(/\r?\n/)).map((item) => item.line).join('\n');
     const nonAscii = prose.match(/[^\x00-\x7F]/);
     if (nonAscii) add(relative, lineNumber(prose, nonAscii.index), 'PROSE_NON_ASCII', nonAsciiMessage(nonAscii[0], 'non-ASCII character '));
-    parsedPages.push({ relative, raw, parsed: parsePage(relative, raw, add, globalIds) });
+    parsedPages.push({ relative, raw, parsed: parsePage(relative, raw, add, globalIds, root) });
     if (relative === 'AGENTS.md' || relative.endsWith('/project-agents.md')) checkAgentProjection(relative, raw, add);
   }
 
@@ -883,12 +951,14 @@ export function validateRepository(rootInput = '.') {
     const normalized = normalizeTemplate(relative, fs.readFileSync(file, 'utf8'));
     const nonAscii = stripFences(normalized.split(/\r?\n/)).map((item) => item.line).join('\n').match(/[^\x00-\x7F]/);
     if (nonAscii) add(relative, 1, 'PROSE_NON_ASCII', nonAsciiMessage(nonAscii[0], 'authoring template contains non-ASCII character '));
-    parsePage(virtualRelative, normalized, add, globalIds, true);
+    parsePage(virtualRelative, normalized, add, globalIds, root, true);
     checkProse(relative, normalized, pageClass(virtualRelative), add);
   }
 
   checkLinks(root, currentMarkdown, add);
-  checkManifest(root, add);
+  const verificationRowsByPage = new Map(parsedPages.map((page) => [page.relative, page.parsed.verificationRows ?? []]));
+  checkManifest(root, add, { activeIds, verificationRowsByPage });
+  checkRemovedForms(root, add);
 
   // The provision index is derived. A stale page would send a reader to the wrong
   // heading, so the gate compares it with the active standards.
@@ -1046,7 +1116,7 @@ function runCli() {
   for (const diagnostic of errors) console.error(`${diagnostic.relative}:${diagnostic.line} [${diagnostic.code}] ${diagnostic.message}`);
   if (warnings.length) {
     const counts = new Map();
-    for (const diagnostic of warnings) counts.set(diagnostic.code, (counts.get(diagnostic.code) ?? 0) + 1);
+    for (const diagnostic of warnings) counts.set(diagnostic.code, (counts.get(code) ?? 0) + 1);
     console.error(`\nStandards authoring warnings (${warnings.length}). These do not fail the build:`);
     for (const code of [...counts.keys()].sort()) console.error(`  ${String(counts.get(code)).padStart(4)}  ${code}`);
     console.error('  Run with --warnings to list every occurrence.');
@@ -1062,3 +1132,7 @@ function runCli() {
 }
 
 if (pathToFileURL(process.argv[1] ?? '').href === import.meta.url) runCli();
+
+
+
+

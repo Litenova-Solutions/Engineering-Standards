@@ -1,14 +1,12 @@
-# Frontend Data and State
+# Frontend data and state
 
 ## Intent
-
 
 The browser holds no contract of its own. It calls the API through one generated client, reads every answer through the query cache, and writes through a mutation.
 
 Every failure arrives as one problem type with a stable code. The page branches on the code, and the words a person reads come from the application's own dictionary rather than from the response body.
 
 ## Agent Summary {#agent-summary}
-
 
 - The client is generated from the published contract. (standards/rule/frontend-data.generate-the-client-from-the-published-contract)
 - The session is an HTTP-only cookie the API holds. (standards/rule/frontend-data.keep-the-session-in-an-api-owned-cookie)
@@ -18,13 +16,13 @@ Every failure arrives as one problem type with a stable code. The page branches 
 - A field refusal lands on its own field. (standards/rule/frontend-data.place-a-field-refusal-on-its-field)
 - A form validates with the generated schema. (standards/rule/frontend-data.validate-a-form-with-the-generated-schema)
 - A success invalidates what the command changed. (standards/rule/frontend-data.update-the-cache-a-command-changed)
+- Copy resolves through locale dictionaries with fill and plural support. (standards/rule/frontend-data.localize-copy-through-locale-dictionaries)
 
 ## Concepts
 
+### Outcomes of a command
 
-### The three outcomes of a command
-
-Every command ends in exactly one of three states, and a page handles all three.
+Every command ends in one outcome. A page handles each outcome as the table states.
 
 | Outcome | What the page does |
 |:---|:---|
@@ -48,10 +46,27 @@ type Problem = {
 };
 ```
 
-The code is the discriminator. Two codes invented by the client cover what the API cannot answer. One names a request that never left the browser. One names a response that was not a problem document. A code this build has never heard of is still handled, because the page branches on presence rather than on a list.
+The code is the discriminator. The client invents codes for what the API cannot answer. `failure/client.unreachable` names a request that received no response. `failure/client.unauthenticated` names a refused authentication. `failure/client.http_<status>` names a response status the client maps to no problem, with the status in place of `<status>`. A code this build has never heard of is still handled. The page branches on the code's presence rather than on a list of known codes.
+
+The problem carries the `traceId` the API returns for the request. Every error the user sees shows that `traceId` in a copyable form in its detail, never as the headline. When the problem carries none, the client reads the `X-Trace-Id` response header instead.
+
+## React
+
+- The frame root is `src/app`.
+- The client generator adds the `@tanstack/react-query` plugin.
+- The component's own state is local component state.
+- The dictionary library meets the locale-dictionary contract the rule below states.
+- The shared package's form entry point is its form hook.
+
+## Svelte
+
+- The frame root is `src/lib/app`.
+- The client generator adds the `@tanstack/svelte-query` plugin.
+- The component's own state is a rune.
+- The dictionary library is `svelte-i18n`, or machinery meeting the same contract.
+- The shared package's form entry point is its form creator.
 
 ## Standards
-
 
 ### Generate the client from the published contract (standards/rule/frontend-data.generate-the-client-from-the-published-contract)
 
@@ -63,9 +78,11 @@ The code is the discriminator. Two codes invented by the client cover what the A
 
 ```json
 {
-  "plugins": ["@hey-api/client-fetch", "@hey-api/typescript", "@hey-api/sdk", "zod", "@tanstack/react-query"]
+  "plugins": ["@hey-api/client-fetch", "@hey-api/typescript", "@hey-api/sdk", "zod"]
 }
 ```
+
+Each stack adds the TanStack Query plugin its section names.
 
 ### Use one configured client per application (standards/rule/frontend-data.use-one-configured-client-per-application)
 
@@ -75,21 +92,21 @@ The code is the discriminator. Two codes invented by the client cover what the A
 
 ### Keep the session in an API owned cookie (standards/rule/frontend-data.keep-the-session-in-an-api-owned-cookie)
 
-**Requirement:** The API MUST hold the browser session in an HTTP-only cookie, and no frontend code may hold a token.
+**Requirement:** The API MUST hold the browser session in an HTTP-only cookie, and frontend code MUST NOT hold a token.
 
 **Rationale:** Every value a script can read is a value any script on the page can read. The API runs the authorization code flow and keeps the tokens encrypted in the cookie. A refused sign-in lands on a signed-out page rather than on an error.
 
 ### Set the write marker on every request (standards/rule/frontend-data.set-the-write-marker-on-every-request)
 
-**Requirement:** A client MUST send its marker header on every request, and the API accepts a cookie-authenticated write only when it is present.
+**Requirement:** A client MUST send its marker header on every write. The API MUST accept a cookie-authenticated write only when it carries the header. The header has the form `X-<Project>-Request` with the value `1`, and project configuration names the exact header.
 
-**Rationale:** A browser sends its cookie on a cross-site request on its own, so the header separates a page's write from a forged post. A page on another site cannot add a custom header without a preflight the API never grants.
+**Rationale:** A browser sends its cookie on a cross-site request on its own, so the header separates a page's write from a forged post. A page on another site cannot add a custom header without a preflight the API never grants. The name varies by project, so configuration owns it rather than code.
 
 ### Map every failure to one problem type (standards/rule/frontend-data.map-every-failure-to-one-problem-type)
 
-**Requirement:** A frontend MUST convert every failure into one problem type, and decide what to show from its code.
+**Requirement:** A frontend MUST convert every failure into one problem type, and decide what to show from its code. Every error the user sees MUST show the problem's `traceId` in a copyable form in its detail, never as the headline.
 
-**Rationale:** Displaying a raw response body leaks whatever the API included and gives the reader no consistent recovery path. A code is a published identifier, so a page's decision survives a reworded message.
+**Rationale:** Displaying a raw response body leaks whatever the API included and gives the reader no consistent recovery path. A code is a published identifier, so a page's decision survives a reworded message. The `traceId` lets support find the request the reader saw fail.
 
 ### Place a refusal beside what was refused (standards/rule/frontend-data.place-a-refusal-beside-what-was-refused)
 
@@ -103,9 +120,13 @@ The code is the discriminator. Two codes invented by the client cover what the A
 <ProblemAlert error={mutation.error} describe={describe} />
 ```
 
+```svelte
+<ProblemAlert error={mutation.error} describe={describe} />
+```
+
 ### Place a field refusal on its field (standards/rule/frontend-data.place-a-field-refusal-on-its-field)
 
-**Requirement:** A field problem MUST be applied to the field it names, and the form stays open until the problem is resolved or abandoned.
+**Requirement:** A field problem MUST be applied to the field it names, and the form stays open until the problem is resolved or abandoned. The frame owns one helper that applies field problems to a form.
 
 **Rationale:** A list of problems above a long form makes the reader read each sentence and each label to pair them.
 
@@ -129,21 +150,21 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 ### Assign state to the narrowest owner (standards/rule/frontend-data.assign-state-to-the-narrowest-owner)
 
-**Requirement:** A value MUST live with the narrowest owner that can hold it, preferring server data, then the address, then form state, then local component state.
+**Requirement:** A value MUST live with the narrowest owner that can hold it. The order prefers server data, then the address, then form state, then the component's own state.
 
 **Rationale:** A store placed above that order makes unrelated components re-render and hides where a value changes.
 
 ### Route a personal value in a header (standards/rule/frontend-data.route-a-personal-value-in-a-header)
 
-**Requirement:** A value that names a person MUST travel in a request header rather than in the query string.
+**Requirement:** A value that names a person MUST travel in a request header rather than in the query string. The published contract declares the header each operation reads.
 
 **Rationale:** A query string is written into a proxy log, the browser history, and the referrer of whatever the reader opens next. The address keeps its own copy, so a filtered list stays a link somebody can share.
 
 ### Read a permission from the session (standards/rule/frontend-data.read-a-permission-from-the-session)
 
-**Requirement:** A page MUST decide whether to offer a command from the session's permission codes, and the API decides every command.
+**Requirement:** A page MUST decide whether to offer a command from the Permissions the session's Actor holds at the record's scope. The API MUST decide every command.
 
-**Rationale:** The page avoids offering what would be refused, and the API refuses what is offered in error. A page hiding a control nobody may use makes the surface look thinner than the product is.
+**Rationale:** Permissions are the project's Permission records: an Actor holds a Role at a scope, a Role allows Permissions, and a use case needs Permissions. The page reads the Actor's permission codes from the session the API returns for the signed-in Actor. The page avoids offering what would be refused, and the API refuses what is offered in error. A page hiding a control nobody may use makes the surface look thinner than the product is.
 
 ### Name the zone for every timestamp (standards/rule/frontend-data.name-the-zone-for-every-timestamp)
 
@@ -169,22 +190,29 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 **Rationale:** A rollback is a silent visual change. A reader using a screen reader heard the optimistic value announced, and nothing tells them it was withdrawn. [The ARIA live-region technique](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19) is the mechanism, and a test of the route asserts the announcement.
 
-## Conventions
+### Localize copy through locale dictionaries (standards/rule/frontend-data.localize-copy-through-locale-dictionaries)
 
+**Requirement:** Copy MUST resolve through locale dictionaries with fill and plural support, one chunk per language, and typed keys with a declared fallback.
+
+**Rationale:** A second copy of one sentence in two components drifts at the first rewording. A dictionary per language keeps one sentence in one place, and a key the catalog lacks fails where the fallback says it fails.
+
+**Example:** Each stack names its dictionary library in its section above. A workspace may carry its own dictionary machinery when it meets the same contract.
+
+## Conventions
 
 ### Keep the client boundary in the frame (standards/rule/frontend-data.keep-the-client-boundary-in-the-frame)
 
-**Default:** Place the client configuration, the problem mapping, and the file download helpers in `src/app`, and keep them out of every use-case folder.
+**Default:** Place the client configuration, the problem mapping, and the file download helpers in the frame root. Keep them out of every use-case folder. Each stack section names the frame root.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A project departs from this default through an Exception record.
 
 **Rationale:** One place configures the client, so a change to the base address or to the headers is one edit rather than one per application.
 
 ### Regenerate the client rather than editing it (standards/rule/frontend-data.regenerate-the-client-rather-than-editing-it)
 
-**Default:** Regenerate the client from the document with the published command, and edit nothing under the generated directory.
+**Default:** Regenerate the client from the document with the workspace's `api:types` command, and edit nothing under the generated directory.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A project departs from this default through an Exception record.
 
 **Rationale:** A hand edit is overwritten by the next generation, so the change appears to work until it disappears. The named command is what a reviewer runs to prove the committed output matches the document.
 
@@ -192,15 +220,15 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 **Default:** Keep a form schema or a view model in its owning use-case folder until a second use case needs it.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A project departs from this default through an Exception record.
 
 **Rationale:** Moving a schema early creates a shared contract before its second consumer defines what it must satisfy.
 
 ### Build a form on the shared form library (standards/rule/frontend-data.build-a-form-on-the-shared-form-library)
 
-**Default:** Build a form on the shared package's form hook and its registered field components.
+**Default:** Build a form on the shared package's form entry point and its registered field components.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A project departs from this default through an Exception record.
 
 **Rationale:** A form library reached for directly in every use-case folder gives each folder its own idea of what a field is. None of them knows how to show a refusal.
 
@@ -212,25 +240,26 @@ A redelivery dialog holds one field. Submitting validates against the generated 
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/frontend-data.generate-the-client-from-the-published-contract | static | `pnpm api:types` regenerates the client and CI fails when the committed output differs. |
-| standards/rule/frontend-data.use-one-configured-client-per-application | static | `grep -rn createClient packages/*/src` finds one call in the frame. |
-| standards/rule/frontend-data.keep-the-session-in-an-api-owned-cookie | inspection | API review confirms the cookie is HTTP-only and no frontend file reads a token. |
-| standards/rule/frontend-data.set-the-write-marker-on-every-request | static | The client configuration sets the marker header, and the frontend lint refuses a `fetch` in page code. |
-| standards/rule/frontend-data.map-every-failure-to-one-problem-type | test | `src/problem.test.ts` asserts an unrecognised code still produces a problem with a status and a code. |
-| standards/rule/frontend-data.place-a-refusal-beside-what-was-refused | test | An evidence specification addresses `[data-code="failure/..."]` after provoking a refusal. |
-| standards/rule/frontend-data.place-a-field-refusal-on-its-field | inspection | Form review confirms each problem is applied through the shared helper rather than listed. |
-| standards/rule/frontend-data.validate-a-form-with-the-generated-schema | static | `pnpm type-check` fails when a request body gains a field the generated schema omits. |
-| standards/rule/frontend-data.update-the-cache-a-command-changed | inspection | Mutation review confirms each success names the keys it invalidates and nothing else. |
-| standards/rule/frontend-data.assign-state-to-the-narrowest-owner | inspection | State review compares each stored value against the ownership order in this section. |
-| standards/rule/frontend-data.route-a-personal-value-in-a-header | static | `grep -rn X-Shop-Contact packages/*/src` finds the header set beside the generated call. |
-| standards/rule/frontend-data.read-a-permission-from-the-session | inspection | Review confirms each offered command is gated by a permission code from the session read. |
-| standards/rule/frontend-data.name-the-zone-for-every-timestamp | test | `src/app/format.test.ts` asserts the same instant renders differently in two zones. |
-| standards/rule/frontend-data.keep-secrets-out-of-browser-storage | static | `node standards/tools/validate-ui.mjs` reports a secret written to browser storage or a public variable. |
-| standards/rule/frontend-data.make-optimistic-behavior-recoverable | inspection | Optimistic update review confirms each path rolls back and reconciles on failure. |
-| standards/rule/frontend-data.announce-the-outcome-of-an-optimistic-update | test | `tests/e2e/` asserts a rejected optimistic update writes its outcome to the live region. |
-| standards/rule/frontend-data.keep-the-client-boundary-in-the-frame | inspection | Folder review confirms the client configuration sits in `src/app` and in no use-case folder. |
-| standards/rule/frontend-data.regenerate-the-client-rather-than-editing-it | inspection | The generated directory carries a header naming the generator, and no file in it names an author. |
-| standards/rule/frontend-data.keep-schemas-operation-specific | operation | Schema review confirms each shared schema has two real readers. |
-| standards/rule/frontend-data.build-a-form-on-the-shared-form-library | static | The frontend lint refuses a `form` element and a direct form library import in page code. |
+| standards/rule/frontend-data.generate-the-client-from-the-published-contract | checkable | `pnpm api:types` regenerates the client, and the contract check fails when the committed output differs. |
+| standards/rule/frontend-data.use-one-configured-client-per-application | guidance | Does every read and write pass through the one configured client? |
+| standards/rule/frontend-data.keep-the-session-in-an-api-owned-cookie | guidance | Does the API hold the session in an HTTP-only cookie with no token in frontend code? |
+| standards/rule/frontend-data.set-the-write-marker-on-every-request | guidance | Does the client send the configured marker header on every write? |
+| standards/rule/frontend-data.map-every-failure-to-one-problem-type | guidance | Does every failure become one problem, with the traceId shown in the error detail? |
+| standards/rule/frontend-data.place-a-refusal-beside-what-was-refused | guidance | Does each refusal render beside what was refused, in the application's sentence for its code? |
+| standards/rule/frontend-data.place-a-field-refusal-on-its-field | guidance | Does each field problem reach its field through the frame's helper, with the form left open? |
+| standards/rule/frontend-data.validate-a-form-with-the-generated-schema | guidance | Does a spec submit contract-invalid input and assert a client-side refusal? |
+| standards/rule/frontend-data.update-the-cache-a-command-changed | guidance | Does each successful command invalidate the queries it changed and no others? |
+| standards/rule/frontend-data.assign-state-to-the-narrowest-owner | guidance | Does each value live with the narrowest owner the order allows? |
+| standards/rule/frontend-data.route-a-personal-value-in-a-header | guidance | Does each person-naming value travel in its contract-declared header? |
+| standards/rule/frontend-data.read-a-permission-from-the-session | guidance | Does each offered command follow the Actor's held Permissions, with the API deciding? |
+| standards/rule/frontend-data.name-the-zone-for-every-timestamp | guidance | Does each timestamp formatter receive an explicit IANA zone from its caller? |
+| standards/rule/frontend-data.keep-secrets-out-of-browser-storage | guidance | Is any secret or privileged credential kept out of browser storage and public variables? |
+| standards/rule/frontend-data.make-optimistic-behavior-recoverable | guidance | Does each optimistic update declare identity, conflict behavior, rollback, and reconciliation? |
+| standards/rule/frontend-data.announce-the-outcome-of-an-optimistic-update | guidance | Does a differing server result announce through a live region? |
+| standards/rule/frontend-data.localize-copy-through-locale-dictionaries | guidance | Does all copy resolve through locale dictionaries with fill, plurals, and a declared fallback? |
+| standards/rule/frontend-data.keep-the-client-boundary-in-the-frame | guidance | Do the client configuration, problem mapping, and download helpers sit only in the frame root? |
+| standards/rule/frontend-data.regenerate-the-client-rather-than-editing-it | checkable | `pnpm api:types` regenerates the client; committed output that differs from generated output fails the contract check. |
+| standards/rule/frontend-data.keep-schemas-operation-specific | guidance | Does each shared schema serve two real readers? |
+| standards/rule/frontend-data.build-a-form-on-the-shared-form-library | guidance | Is each form built on the shared package's form entry point and field components? |

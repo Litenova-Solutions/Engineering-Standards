@@ -1,32 +1,41 @@
-# Frontend Testing
+# Frontend testing
 
 ## Intent
 
-
-Frontend tests prove behavior at the cheapest boundary that represents the risk. Four kinds run against a frontend, and each one answers one question.
+Frontend tests prove behavior at the cheapest boundary that represents the risk. Each kind in the table below runs against a frontend, and each one answers one question.
 
 | Kind | Where it runs | What it proves |
 |:---|:---|:---|
 | Logic | Vitest beside the module | A mapping, a computed window, a state decision |
 | Structure | Vitest beside the suite | The module tree mirrors the backend |
 | Route contract | Playwright against a running stack | Every route renders one floorplan and passes the browser checks |
-| Evidence | Playwright against a running stack | A use case's paths, with each declared refusal provoked by name |
+| Evidence | Playwright against a running stack | A use case's Cases, with each declared refusal provoked by name |
 
 A browser suite needs a deployment. Nothing in it starts one, so the same suite runs against a developer's stack and against a review deployment.
 
+Related rules live on other pages. `standards/rule/core-release.run-frontend-release-checks` owns the gates a changed frontend runs. `standards/rule/frontend-structure.keep-tests-near-their-ownership-boundary` owns test layout. `standards/rule/frontend-ui.prove-ui-behavior-and-appearance` owns the evidence a UI change runs.
+
 ## Agent Summary {#agent-summary}
 
-
 - The test level matches the risk it covers. (standards/rule/frontend-testing.match-test-level-to-risk)
-- A proving test title opens with the criterion or path it proves. (standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion, standards/rule/frontend-testing.name-a-browser-test-with-the-path-it-proves)
+- A test proves a Case by calling its use case and asserting its Result. (standards/rule/frontend-testing.prove-a-case-by-calling-its-use-case)
 - Each declared refusal is reached by its code. (standards/rule/frontend-testing.assert-each-declared-refusal-by-its-code)
-- Tests assert observable behavior in every applicable state. (standards/rule/frontend-testing.test-observable-states)
+- Tests assert observable behavior in each applicable state. (standards/rule/frontend-testing.test-observable-states)
 - Mocks stay at owned contract boundaries. (standards/rule/frontend-testing.keep-mocks-at-owned-boundaries)
+- HTTP in component tests is served by network mocks. (standards/rule/frontend-testing.use-network-mocks-for-component-tests)
 - The structure test proves the module mirror. (standards/rule/frontend-testing.prove-the-module-mirror-in-a-structure-test)
-- A changed frontend runs its five gate commands. (standards/rule/frontend-testing.run-the-changed-application-gates)
+- Every public use case sits in a Journey or names its background caller. (standards/rule/frontend-testing.reach-every-public-use-case-from-a-journey)
+- Browser checks run through the Playwright CLI. (standards/rule/frontend-testing.run-browser-checks-through-the-playwright-cli)
+
+## React
+
+- The mocks rule forbids replacing the rendering library, the router, and the query library.
+
+## Svelte
+
+- The mocks rule forbids replacing Svelte, SvelteKit, the query library, and the form library.
 
 ## Standards
-
 
 ### Match test level to risk (standards/rule/frontend-testing.match-test-level-to-risk)
 
@@ -34,63 +43,51 @@ A browser suite needs a deployment. Nothing in it starts one, so the same suite 
 
 **Rationale:** Matching level to risk keeps the fast tests fast and reserves browser runs for behavior only a browser proves.
 
-### Start a proving test title with its criterion (standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion)
+### Prove a case by calling its use case (standards/rule/frontend-testing.prove-a-case-by-calling-its-use-case)
 
-**Requirement:** A frontend test proving an acceptance criterion MUST open its title with that identifier in square brackets.
+**Requirement:** A test MUST prove a Case by calling the Case's use case in its steps and asserting the Case's Result. For a use case that moves money, a route test or evidence specification that reads MUST also submit and assert.
 
-**Rationale:** A runner reports the title, so a reader watching a failure sees the criterion without opening the file. A scan reads one position rather than every string.
+**Rationale:** Steps that call the use case and assert the Result let the model builder compute proof from the test body. A title tag claims proof without exercising anything. A use case that moves money and is only read has never shown it can complete.
 
-**Example:** A browser test opens its title with the criterion it proves.
-
-```typescript
-test('[AC-POSTS-CREATE-DRAFT-01] creates a draft', async ({ page }) => {
-  // Browser behavior.
-})
-```
-
-### Name a browser test with the path it proves (standards/rule/frontend-testing.name-a-browser-test-with-the-path-it-proves)
-
-**Requirement:** A browser test proving one outcome of one use case MUST open its title with `[path/<module>.<use-case>.<outcome>]`.
-
-**Rationale:** The path coverage check derives the reachable paths from the route code and reads the titles to find the proof. A title that names anything else contributes nothing to that check and cannot be traced to a specification page.
-
-**Example:** One specification names its paths in the order a reader reaches them.
-
-```typescript
-test('[path/orders.read-order.not-found] says the order is not there', async ({ page }) => {
-  // Browser behavior.
-})
-```
+**Example:** An evidence specification for placing an order submits the order and asserts the confirmation the success Result promises.
 
 ### Assert each declared refusal by its code (standards/rule/frontend-testing.assert-each-declared-refusal-by-its-code)
 
-**Requirement:** An evidence specification for a use case declaring a refusal MUST reach that refusal and assert it by its published code.
+**Requirement:** An evidence specification for a use case declaring a refusal MUST reach that refusal and assert it by its Result's code.
 
-**Rationale:** A refusal that only appears in a log has never been seen rendered. Addressing it by code also proves the code the specification declares is the code the page shows.
+**Rationale:** A refusal that only appears in a log has never been seen rendered. Addressing it by code also proves the code the Result declares is the code the page shows. The Case records the situation that reaches it.
 
 **Example:** The refusal alert carries the code, so the assertion names it.
 
 ```typescript
-await expect(refusalFor(page, "failure/refunds.exceeds_refundable")).toBeVisible({ timeout: AFTER_ACTION });
+await expect(refusalFor(page, "failure/orders.not_found")).toBeVisible({ timeout: AFTER_ACTION });
 ```
 
 ### Test observable states (standards/rule/frontend-testing.test-observable-states)
 
-**Requirement:** A frontend test MUST assert observable behavior across loading, empty, error, forbidden, not-found, pending, validation, and success states.
+**Requirement:** A frontend test MUST assert observable behavior in each state applicable to what the test covers: loading, empty, error, forbidden, not-found, pending, validation, and success.
 
-**Rationale:** An assertion on internal state passes while the rendered page stays broken.
+**Rationale:** An assertion on internal state passes while the rendered page stays broken. The Case states which of these its situation reaches, so a logic test asserts no route state it cannot reach. The project records each state as a Term with labels per language.
 
 ### Keep mocks at owned boundaries (standards/rule/frontend-testing.keep-mocks-at-owned-boundaries)
 
-**Requirement:** A frontend test MUST NOT mock the rendering library, the router, the query library, the generated types, or an implementation-private function.
+**Requirement:** A frontend test MUST NOT mock the generated types or an implementation-private function, nor a library its stack section names.
 
 **Rationale:** A test may still replace the generated operation boundary, because that is an owned contract. Everything else it replaces becomes a claim about code the test no longer exercises.
+
+### Use network mocks for component tests (standards/rule/frontend-testing.use-network-mocks-for-component-tests)
+
+**Requirement:** A component or logic test that needs HTTP MUST serve its answers through network mocks generated from the published contract.
+
+**Rationale:** A mocked client proves the mock rather than the component. A network mock answers the same request the browser would send, so the generated client stays in the path it takes in production.
+
+**Example:** The handlers are `msw` handlers derived from the OpenAPI document and run in the browser worker and the node server alike. The workspace keeps one mock-generation command that regenerates them.
 
 ### Isolate browser tests (standards/rule/frontend-testing.isolate-browser-tests)
 
 **Requirement:** A browser test MUST create or identify its own data, its own authentication context, and its own expected state.
 
-**Rationale:** A test depending on execution order or on leftover data fails for reasons unrelated to the change under review. A command that spends a seeded record leaves the next run a deployment with nothing to read. So a suite exercises a command as far as its own form refuses, unless the record is the test's own.
+**Rationale:** A test depending on execution order or on leftover data fails for reasons unrelated to the change under review. A test MUST NOT spend a seeded record; it creates the record it needs.
 
 ### Prove the module mirror in a structure test (standards/rule/frontend-testing.prove-the-module-mirror-in-a-structure-test)
 
@@ -106,44 +103,39 @@ test("every module folder names a backend use case, and no folder is named for n
 });
 ```
 
-### Run the changed application gates (standards/rule/frontend-testing.run-the-changed-application-gates)
+### Reach every public use case from a journey (standards/rule/frontend-testing.reach-every-public-use-case-from-a-journey)
 
-**Requirement:** A changed frontend MUST run a frozen installation, lint, type checking, the logic tests, and a production build.
+**Requirement:** Every public use case MUST sit in a Journey or name its background caller.
 
-**Rationale:** Browser runs additionally when a route, a command, a session path, or a browser integration changes. The route tree is regenerated inside the build and type-check scripts, so a route added without a regenerated tree fails rather than passing unreviewed.
+**Rationale:** A public use case no Journey reaches and no background caller names has no stated path to it. The model builder reports each one, so the gap stays visible until a Journey or a caller claims it.
 
-The dependency audit is not on this list because it belongs to a different trigger. A source change runs these five; a manifest or lockfile change runs the audit that `standards/rule/quality-security.pin-and-review-dependencies` requires, through the gate table in `standards/rule/quality-ci.run-applicable-gates-on-every-pull-request`.
+### Run browser checks through the Playwright CLI (standards/rule/frontend-testing.run-browser-checks-through-the-playwright-cli)
 
-### Prove controlled UI changes (standards/rule/frontend-testing.prove-controlled-ui-changes)
+**Requirement:** A browser suite MUST run through the Playwright CLI, addressable per route and per file.
 
-**Requirement:** A primitive, composite, token, source, floorplan, or page-contract change MUST run the narrowest evidence its risk requires.
+**Rationale:** The command line is the interface every runner shares: the developer, the drill, and the integration job. A check that runs only inside an editor plugin or a proxy runner cannot be repeated by the next investigator.
 
-**Rationale:** The evidence matrix in `docs/frontend/ui.md` names it per change class, so evidence follows the change rather than a fixed suite.
+**Example:** One route contract runs on its own line, against the stack already running.
+
+```text
+pnpm --filter @shop/webshop exec playwright test --project=routes --grep "ticket keeps the route contract"
+```
 
 ## Conventions
-
-
-### Keep focused tests beside source (standards/rule/frontend-testing.keep-focused-tests-beside-source)
-
-**Default:** Name a logic test `*.test.ts` or `*.test.tsx` beside its module, and keep browser specifications under one `tests/e2e/` root per frontend.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** Support fixtures and page objects then sit under one `tests/support/` folder rather than beside features.
 
 ### Query by accessible behavior (standards/rule/frontend-testing.query-by-accessible-behavior)
 
 **Default:** Query elements by role, label, name, or visible text before reaching for a test identifier.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A project departs from this default through an Exception record.
 
-**Rationale:** A query by accessible name fails when the accessible name breaks, which is the behavior worth protecting. Two attributes are load-bearing rather than identifiers: the floorplan's own attribute, and a component's slot.
+**Rationale:** A query by accessible name fails when the accessible name breaks, which is the behavior worth protecting. The floorplan's `data-floorplan` attribute is structural rather than an identifier, so a query may use it to scope to one floorplan. Slot content is addressed by its accessible role and name.
 
 ### Keep test support narrow (standards/rule/frontend-testing.keep-test-support-narrow)
 
 **Default:** Limit test support to render helpers for required providers, to one API helper that every specification shares, and to the locator helpers.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A project departs from this default through an Exception record.
 
 **Rationale:** Support code that grows into a second application framework becomes its own untested surface. One API helper means a change to the actor header or the idempotency key reaches the fixtures and not every specification.
 
@@ -151,7 +143,7 @@ The dependency audit is not on this list because it belongs to a different trigg
 
 **Default:** Read a record identifier a browser test needs from the running deployment, and fall back to an absent identifier when the deployment holds none.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A project departs from this default through an Exception record.
 
 **Rationale:** A hard-coded identifier passes against one deployment and fails against the next. A fallback keeps the route visited as a not-found page, which is the state a reader can reach anyway.
 
@@ -163,19 +155,18 @@ A withdrawal window is a pure function, so it takes a logic test beside it. A re
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/frontend-testing.match-test-level-to-risk | inspection | Test review compares each new test against the level its risk requires. |
-| standards/rule/frontend-testing.start-a-proving-test-title-with-its-criterion | static | `node standards/tools/validate-consumer.mjs` resolves each bracketed title citation under the declared test roots to a declared criterion. |
-| standards/rule/frontend-testing.name-a-browser-test-with-the-path-it-proves | static | The same validator resolves each `[path/<id>]` title to a path its specification declares. |
-| standards/rule/frontend-testing.assert-each-declared-refusal-by-its-code | test | An evidence specification asserts `[data-code="failure/..."]` is visible after the command. |
-| standards/rule/frontend-testing.test-observable-states | test | `*.test.tsx` asserts each applicable state through user-observable output. |
-| standards/rule/frontend-testing.keep-mocks-at-owned-boundaries | test | Review of `*.test.ts` confirms no test replaces a library internal or a private function. |
-| standards/rule/frontend-testing.isolate-browser-tests | test | A randomized `playwright test` order confirms no case depends on another. |
-| standards/rule/frontend-testing.prove-the-module-mirror-in-a-structure-test | test | `tests/unit/structure.test.ts` asserts `checkModuleStructure` returns an empty list. |
-| standards/rule/frontend-testing.run-the-changed-application-gates | test | The CI frontend job runs `pnpm lint`, `type-check`, `test`, and `build`, failing on any non-zero exit. |
-| standards/rule/frontend-testing.prove-controlled-ui-changes | test | Review confirms each changed surface has the evidence the matrix in `docs/frontend/ui.md` names. |
-| standards/rule/frontend-testing.keep-focused-tests-beside-source | inspection | Test layout review confirms the two roots and the beside-source naming. |
-| standards/rule/frontend-testing.query-by-accessible-behavior | inspection | Test review confirms each identifier query has no stable user-facing alternative. |
-| standards/rule/frontend-testing.keep-test-support-narrow | inspection | Test support review confirms the helpers stay limited to providers, one API helper, and locators. |
-| standards/rule/frontend-testing.read-the-deployment-for-its-identifiers | inspection | Support review confirms each record identifier is read from the deployment rather than written in a specification. |
+| standards/rule/frontend-testing.match-test-level-to-risk | guidance | Does each new test sit at the level its risk requires? |
+| standards/rule/frontend-testing.prove-a-case-by-calling-its-use-case | guidance | Do the test's steps call the use case and assert the Result, submitting where money moves? |
+| standards/rule/frontend-testing.assert-each-declared-refusal-by-its-code | guidance | Does the specification reach each declared refusal and assert it by its Result's code? |
+| standards/rule/frontend-testing.test-observable-states | guidance | Does each test assert observable output in the states its situation reaches? |
+| standards/rule/frontend-testing.keep-mocks-at-owned-boundaries | guidance | Is every mock at an owned boundary, replacing no library internal or private function? |
+| standards/rule/frontend-testing.use-network-mocks-for-component-tests | guidance | Does each component test needing HTTP run through contract-generated network mocks? |
+| standards/rule/frontend-testing.isolate-browser-tests | guidance | Does each browser test create its own data, context, and expected state? |
+| standards/rule/frontend-testing.prove-the-module-mirror-in-a-structure-test | guidance | Does the structure test resolve every module folder to a backend use-case folder? |
+| standards/rule/frontend-testing.reach-every-public-use-case-from-a-journey | guidance | Does every public use case sit in a Journey or name its background caller? |
+| standards/rule/frontend-testing.run-browser-checks-through-the-playwright-cli | guidance | Does each browser check run through the Playwright CLI per route and per file? |
+| standards/rule/frontend-testing.query-by-accessible-behavior | guidance | Does each identifier query lack a stable user-facing alternative? |
+| standards/rule/frontend-testing.keep-test-support-narrow | guidance | Do the helpers stay limited to providers, one API helper, and locators? |
+| standards/rule/frontend-testing.read-the-deployment-for-its-identifiers | guidance | Is each record identifier read from the deployment rather than written in a specification? |
