@@ -134,6 +134,12 @@ The four-attribute pattern serves four consumers.
 
 The kind-prefixed grammar makes every consumer's filter a one-character prefix. `grep '^invariant/'` returns every invariant. `grep '^event/'` returns every past-tense event. `grep '^failure/'` returns every failure code.
 
+### Spec-sync baseline
+
+A consumer records accepted spec-sync debt in a baseline file. The `specSync.baseline` field of `standards.project.json` names the file, relative to the repository root. The file holds a JSON array of finding strings, sorted, each exactly as the validator prints it after the two-space dash.
+
+A finding the baseline lists is reported as known and does not fail the run. A finding it does not list fails as without a baseline. A baseline entry matching no current finding fails as a stale baseline entry, so the list only shrinks. `node standards/tools/validate-spec-sync.mjs --write-baseline` writes the current findings to the configured file in sorted order. With no configured baseline the validator behaves as without one.
+
 ## Standards
 
 ### State the identifier grammar (standards/rule/backend-identifiers.state-the-identifier-grammar)

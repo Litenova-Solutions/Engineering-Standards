@@ -504,6 +504,79 @@ reportLine('an unknown option is a usage error', 'Unknown option --strict', run(
 reportLine('--help states the synopsis and exits 0', 'Usage: node standards/tools/validate-spec-sync.mjs', run('--help'), 0);
 reportLine('--format=json writes one machine-readable object', '"tool": "validate-spec-sync"', run('--format=json'), 0);
 
+console.log('\nAccepted-debt baseline (standards/rule/core-release.record-accepted-debt-as-a-shrinking-baseline)');
+const BASELINE = 'docs/spec-sync-baseline.json';
+const VOID_FINDING = 'spec identifier with no code element: use-case/sales.void-voucher';
+const CODE_FINDING = 'code identifier with no specification: use-case/sales.refund-voucher';
+function withBaseline(entries) {
+  const project = baseProject();
+  project.specSync.baseline = BASELINE;
+  writeJson(projectFile, project);
+  write(BASELINE, `${JSON.stringify(entries, null, 2)}\n`);
+}
+function withoutBaseline() {
+  writeJson(projectFile, baseProject());
+  fs.rmSync(path.join(fixture, BASELINE), { force: true });
+}
+function checkBaseline(name, predicate, result) {
+  if (predicate(result)) {
+    console.log(`  pass  ${name}`);
+    return;
+  }
+  failures += 1;
+  console.log(`  FAIL  ${name}`);
+  console.log(`        exit:     ${result.status}`);
+  console.log(`        actual:   ${result.output.trim().split('\n').join('\n        ')}`);
+}
+{
+  withBaseline([VOID_FINDING]);
+  const file = write(VOID_PAGE, pageText(['use-case/sales.void-voucher']));
+  const result = run();
+  checkBaseline(
+    'a finding the baseline lists is reported as known and does not fail',
+    (outcome) => outcome.status === 0 && outcome.output.includes('KNOWN (1 finding(s))') && outcome.output.includes(VOID_FINDING) && !outcome.output.includes('FAIL ('),
+    result,
+  );
+  fs.rmSync(file);
+  withoutBaseline();
+}
+{
+  withBaseline([]);
+  const file = write(VOID_PAGE, pageText(['use-case/sales.void-voucher']));
+  report('a finding the baseline omits fails', VOID_FINDING, run());
+  fs.rmSync(file);
+  withoutBaseline();
+}
+{
+  withBaseline([VOID_FINDING]);
+  report('a baseline entry matching no finding fails as stale', `stale baseline entry: ${VOID_FINDING}`, run());
+  withoutBaseline();
+}
+{
+  const project = baseProject();
+  project.specSync.baseline = BASELINE;
+  writeJson(projectFile, project);
+  const page = write(VOID_PAGE, pageText(['use-case/sales.void-voucher']));
+  const command = write(`${APPLICATION}/RefundVoucherCommand.cs`, '/// <implements>shop/use-case/sales.refund-voucher</implements>\npublic sealed record RefundVoucherCommand;\n');
+  const written = run('--write-baseline');
+  const expected = `${JSON.stringify([CODE_FINDING, VOID_FINDING], null, 2)}\n`;
+  const actual = fs.readFileSync(path.join(fixture, BASELINE), 'utf8');
+  checkBaseline(
+    '--write-baseline writes the current findings to the configured file in sorted order',
+    (outcome) => outcome.status === 0 && actual === expected,
+    written,
+  );
+  checkBaseline(
+    'a run against the written baseline reports the findings as known and passes',
+    (outcome) => outcome.status === 0 && outcome.output.includes('KNOWN (2 finding(s))') && !outcome.output.includes('FAIL ('),
+    run(),
+  );
+  fs.rmSync(page);
+  fs.rmSync(command);
+  withoutBaseline();
+}
+reportLine('--write-baseline without a configured baseline is a usage error', '--write-baseline needs specSync.baseline', run('--write-baseline'), 2);
+
 {
   const saved = fs.readFileSync(projectFile);
   fs.rmSync(projectFile);

@@ -17,7 +17,7 @@
 // no compiler, and fetches nothing.
 //
 // Usage:
-//   node standards/tools/validate-spec-sync.mjs [consumerRoot] [--report] [--format=json] [--help]
+//   node standards/tools/validate-spec-sync.mjs [consumerRoot] [--report] [--write-baseline] [--format=json] [--help]
 //
 // consumerRoot defaults to the current working directory. The consumer must
 // contain standards.project.json. Exit code is non-zero when any check fails.
@@ -26,13 +26,18 @@
 // existing gap. It is a command-line flag rather than a configuration field, so a
 // suppressed run stays visible in the command that produced it.
 //
+// '--write-baseline' writes the current findings to the configured baseline file
+// and exits 0, so a consumer records accepted debt without hand-writing the
+// file. It needs 'specSync.baseline' and fails without it.
+//
 // Optional configuration is the 'specSync' block of standards.project.json:
 //
 //   "specSync": {
 //     "codeRoots": ["apps/api/src", "apps/api/tests"],
 //     "markedRoots": ["apps/api/src/Shop.Domain", "apps/api/src/Shop.Application", "apps/api/src/Shop.WebApi", "apps/api/tests"],
 //     "featureRoots": ["apps/api/tests/Shop.Acceptance.Tests/Features"],
-//     "evidenceRoots": ["apps/admin", "apps/storefront"]
+//     "evidenceRoots": ["apps/admin", "apps/storefront"],
+//     "baseline": "docs/spec-sync-baseline.json"
 //   }
 //
 // 'codeRoots' names the directories whose C# files are read for markup tags.
@@ -47,6 +52,15 @@
 // <covers> tag or an '@implements_' tag does, so a UI criterion resolves when a
 // frontend test names it. A browser test cites a path by opening its title with
 // '[path/<id>]'. Only test files under those roots are read.
+//
+// A baseline holds accepted debt as a sorted JSON array of finding strings,
+// each exactly as the run prints it after the two-space dash. The
+// 'specSync.baseline' field names the file, relative to the repository root. A
+// finding the baseline lists is reported as known and does not fail. A finding
+// it omits fails as without a baseline. An entry matching no finding fails as
+// a stale baseline entry, so the list only shrinks. Without a configured
+// baseline the run behaves as without one.
+// (standards/rule/core-release.record-accepted-debt-as-a-shrinking-baseline)
 //
 // The marking grammar this validator enforces is one identifier per XML doc tag:
 //
@@ -113,17 +127,18 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { projectSource } from './identifiers.mjs';
 
-const USAGE = `Usage: node standards/tools/validate-spec-sync.mjs [consumerRoot] [--report] [--format=json] [--help]
+const USAGE = `Usage: node standards/tools/validate-spec-sync.mjs [consumerRoot] [--report] [--write-baseline] [--format=json] [--help]
 
 Cross-references the specification identifiers a consumer declares with the code
 elements that mark them, for the consumer at consumerRoot, which defaults to the
 current directory. The consumer must contain standards.project.json.
 
   --report        List findings and exit 0 instead of failing on them.
+  --write-baseline  Write the current findings to the configured specSync.baseline file and exit 0.
   --format=json   Write one JSON object on stdout instead of human-readable lines.
   --help          Print this text and exit.
 
-Exit codes: 0 no finding or --report, 1 at least one finding, 2 usage error.`;
+Exit codes: 0 no finding, --report, or --write-baseline; 1 at least one finding; 2 usage error.`;
 
 const args = process.argv.slice(2);
 if (args.includes('--help') || args.includes('-h')) {
@@ -131,9 +146,10 @@ if (args.includes('--help') || args.includes('-h')) {
   process.exit(0);
 }
 const reportOnly = args.includes('--report');
+const writeBaseline = args.includes('--write-baseline');
 const jsonOutput = args.includes('--format=json');
 const positional = args.filter((value) => !value.startsWith('-'));
-const unknown = args.filter((value) => value.startsWith('-') && value !== '--report' && value !== '--format=json');
+const unknown = args.filter((value) => value.startsWith('-') && value !== '--report' && value !== '--write-baseline' && value !== '--format=json');
 if (unknown.length) {
   console.error(`Unknown option ${unknown.join(', ')}`);
   console.error(USAGE);
@@ -770,6 +786,62 @@ for (const id of [...specIds].sort()) {
 }
 const useCaseLevel = [...useCaseLevelProof].sort();
 
+// ---- accepted-debt baseline ------------------------------------------------
+// A consumer names a baseline file at 'specSync.baseline': a repository-relative
+// JSON file holding a sorted array of finding strings, each exactly as the run
+// prints it after the two-space dash. A finding the baseline lists is reported
+// as known and does not fail. A finding it omits fails as without a baseline.
+// An entry matching no finding fails as a stale baseline entry, so the list
+// only shrinks. Without a configured baseline the run behaves as without one.
+// (standards/rule/core-release.record-accepted-debt-as-a-shrinking-baseline)
+const baselineRel = typeof specSync.baseline === 'string' && specSync.baseline.length
+  ? slash(specSync.baseline)
+  : null;
+const baselineFile = baselineRel ? path.join(root, specSync.baseline) : null;
+let baselineEntries = [];
+let baselineProblem = null;
+if (baselineFile && fs.existsSync(baselineFile)) {
+  try {
+    const parsed = JSON.parse(readText(baselineFile));
+    if (!Array.isArray(parsed) || parsed.some((entry) => typeof entry !== 'string')) {
+      baselineProblem = `spec-sync baseline must be an array of finding strings: ${baselineRel}`;
+    } else {
+      baselineEntries = parsed;
+    }
+  } catch (cause) {
+    baselineProblem = `spec-sync baseline is not valid JSON: ${baselineRel} (${cause.message})`;
+  }
+}
+
+if (writeBaseline) {
+  if (!baselineFile) {
+    console.error('--write-baseline needs specSync.baseline in standards.project.json');
+    process.exit(2);
+  }
+  const sorted = [...findings].sort();
+  fs.mkdirSync(path.dirname(baselineFile), { recursive: true });
+  fs.writeFileSync(baselineFile, `${JSON.stringify(sorted, null, 2)}\n`);
+  console.log(`Wrote ${sorted.length} finding(s) to ${baselineRel}.`);
+  process.exit(0);
+}
+
+const known = [];
+if (baselineProblem) {
+  finding(baselineProblem);
+} else if (baselineRel) {
+  const accepted = new Set(baselineEntries);
+  const matched = new Set();
+  const current = [...findings];
+  findings.length = 0;
+  for (const item of current) {
+    if (accepted.has(item)) { known.push(item); matched.add(item); }
+    else findings.push(item);
+  }
+  for (const entry of baselineEntries) {
+    if (!matched.has(entry)) finding(`stale baseline entry: ${entry}`);
+  }
+}
+
 // ---- report ----------------------------------------------------------------
 if (jsonOutput) {
   console.log(JSON.stringify({
@@ -789,6 +861,7 @@ if (jsonOutput) {
     criteriaNamingPaths: criterionPaths.size,
     useCaseLevelProof: useCaseLevel,
     reportOnly,
+    ...(baselineRel ? { baseline: baselineRel, known } : {}),
     findings,
   }, null, 2));
   process.exit(findings.length && !reportOnly ? 1 : 0);
@@ -801,6 +874,10 @@ console.log(`Specification identifiers: ${specIds.size}, code identifiers: ${cod
 console.log(`Scanned ${specPages.length} specification page(s), ${codeFiles.length} C# file(s), ${featureFiles.length} feature file(s), ${frontendFiles.length} frontend test file(s); ${testFiles.size} file(s) carry a test citation`);
 console.log(`Path proof: ${criterionPaths.size} criterion(s) name a path; ${useCaseLevel.length} use case(s) prove their paths at use-case level because no criterion names a path`);
 if (useCaseLevel.length) console.log(`Use-case-level path proof: ${useCaseLevel.join(', ')}`);
+if (known.length) {
+  console.log(`\nKNOWN (${known.length} finding(s)) against ${baselineRel}:`);
+  for (const item of known) console.log(`  - ${item}`);
+}
 if (findings.length && reportOnly) {
   console.log(`\nREPORT (${findings.length} finding(s)):`);
   for (const item of findings) console.log(`  - ${item}`);

@@ -32,6 +32,7 @@ This release gives a consumer's business intent one home and one shape. A consum
 - Taught `tools/validate-consumer.mjs` to read each file once and `tools/validate-parity.mjs` to map namespaces through a precomputed lookup, with identical output.
 - Taught `tools/validate-standards.mjs` to validate every shipped consumer template against the schema.
 - Gave the spawned UI validator a 120-second timeout with a distinct message when the spawn itself fails.
+- Added `specSync.baseline` to `schemas/standards-project.schema.json` and `tools/validate-spec-sync.mjs`. A consumer names a baseline file holding a sorted array of accepted finding strings. A listed finding is reported as known and does not fail, an unlisted finding fails, and an entry matching no finding fails as stale. `--write-baseline` writes the current findings to the configured file in sorted order. `docs/backend/identifiers.md` describes the file and the flag.
 - This release takes effect as the `v1.19.0` tag, the immutable reference a consumer records in `reviewedStandardsVersion`.
 
 ## v1.18.0

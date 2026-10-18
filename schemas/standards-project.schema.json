@@ -282,6 +282,10 @@
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/projectPath" }
         },
+        "baseline": {
+          "description": "Repository-relative path of the spec-sync baseline: a JSON file holding a sorted array of accepted finding strings.",
+          "$ref": "#/$defs/projectPath"
+        },
         "evidenceRoots": {
           "description": "Frontend directories whose test files are read for acceptance-criterion citations. Defaults to every path in paths.frontends.",
           "type": "array",
