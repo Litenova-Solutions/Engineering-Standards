@@ -446,6 +446,32 @@ run('empty extension dependencies', (root) => {
 run('missing writing load plan', (root) => write(root, 'standards.manifest.json', '{}'), ['MANIFEST_LOAD_PLAN']);
 
 run('invalid override IDs', (root) => write(root, 'templates/consumer/standards.project.json', JSON.stringify({ overrides: [{ provisionId: 'standards/rule/core-topic.unknown-override' }] })), ['OVERRIDE_UNKNOWN_ID']);
+run('svelte template with an unknown override', (root) => write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify({ overrides: [{ provisionId: 'standards/rule/core-topic.unknown-override' }] })), ['OVERRIDE_UNKNOWN_ID']);
+run('svelte template with a known override', (root) => write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify({ overrides: [{ provisionId: 'standards/rule/core-topic.keep-the-topic-bounded' }] })), []);
+// The shipped schema requires a review date on a UI override in either UI
+// scope. The fixture carries the real schema and the real svelte template, so
+// the shipped conditional is what these cases prove.
+const shippedSchema = fs.readFileSync(new URL('../schemas/standards-project.schema.json', import.meta.url), 'utf8');
+const shippedSvelte = JSON.parse(fs.readFileSync(new URL('../templates/consumer/standards.project.svelte.json', import.meta.url), 'utf8'));
+run('svelte-ui override without a review date', (root) => {
+  write(root, 'schemas/standards-project.schema.json', shippedSchema);
+  const template = { ...shippedSvelte, overrides: [{ provisionId: 'standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/overrides.md' }] };
+  write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify(template));
+}, ['SCHEMA_INVALID']);
+run('svelte-ui override with a review date', (root) => {
+  write(root, 'schemas/standards-project.schema.json', shippedSchema);
+  const template = { ...shippedSvelte, overrides: [{ provisionId: 'standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/overrides.md', reviewBy: '2999-01-01' }] };
+  write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify(template));
+}, ['OVERRIDE_UNKNOWN_ID'], ['SCHEMA_INVALID']);
+run('frontend-ui override without a review date', (root) => {
+  write(root, 'schemas/standards-project.schema.json', shippedSchema);
+  const template = { ...shippedSvelte, overrides: [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/overrides.md' }] };
+  write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify(template));
+}, ['SCHEMA_INVALID']);
+run('shipped svelte template meets the shipped schema', (root) => {
+  write(root, 'schemas/standards-project.schema.json', shippedSchema);
+  write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify(shippedSvelte));
+}, [], ['SCHEMA_INVALID']);
 
 // oneOf is enforced rather than allowed and skipped. Without the branch check a
 // value matching none of the shapes would validate cleanly.

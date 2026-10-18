@@ -566,7 +566,7 @@ console.log('\nSvelte baseline (standards/rule/svelte-ui.pin-the-baseline-in-the
   }
   {
     const lock = readJson(lockFile);
-    lock.cli = '4.21.1';
+    lock.cli = '4.21.5';
     writeJson(lockFile, lock);
     report('a svelte source lock naming the react CLI pin', "cli must match manifest shadcn-svelte pin '1.7.0'", run());
     asSvelte();

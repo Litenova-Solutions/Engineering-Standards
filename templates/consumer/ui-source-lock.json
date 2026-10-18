@@ -2,7 +2,7 @@
   "$schema": "./standards/schemas/ui-source-lock.schema.json",
   "schemaVersion": 1,
   "generator": "shadcn/ui",
-  "cli": "4.21.1",
+  "cli": "4.21.5",
   "preset": {
     "style": "nova",
     "base": "base-ui",

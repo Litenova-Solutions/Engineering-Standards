@@ -28,25 +28,25 @@ This extension suspends no baseline provision by itself. A `pre-production` cons
 
 **Requirement:** A consumer MUST declare `pre-production` or `production` as its release stage in `standards.project.json`.
 
-**Rationale:** A life stage is not an override. A temporary position recorded as an expiring override reads as a defect with a date, while a declared stage states what the project is.
+**Rationale:** A life stage is not an override. A temporary position recorded as an expiring override reads as a defect with a date, while a declared stage states what the project is. The project record holds `releaseStage` with one of the two values above.
 
 **Example:** A consumer with no customer data in any deployment declares the early stage.
 
 ```json
-{"releaseStage": "pre-production"}
+{"releaseStage": "pre-production", "deferredProvisions": [], "promotionPlan": "docs/decisions/promote-to-production.md"}
 ```
 
 ### Defer named provisions until promotion (standards/rule/ext-stage.defer-named-provisions-until-promotion)
 
 **Requirement:** A `pre-production` consumer MAY defer the compatibility, migration, and test provisions its promotion plan names.
 
-**Rationale:** The deferred provisions assume a running service with users. Naming them in the promotion plan keeps the deferral bounded, so it ends at promotion instead of drifting.
+**Rationale:** The deferred provisions assume a running service with users. Naming them in the promotion plan keeps the deferral bounded, so it ends at promotion instead of drifting. `deferredProvisions` is an array of provision IDs deferred until production.
 
 ### Promote through a recorded decision (standards/rule/ext-stage.promote-through-a-recorded-decision)
 
 **Requirement:** A consumer MUST record its promotion to `production` as a decision before its first deployment holds customer data.
 
-**Rationale:** The promotion gate is what ends every deferral. Without a recorded moment, the relaxed rules last until somebody notices they never ended.
+**Rationale:** The promotion gate is what ends every deferral. Without a recorded moment, the relaxed rules last until somebody notices they never ended. `promotionPlan` is a repository-relative path to the decision that promotes the stage.
 
 ## Conventions
 

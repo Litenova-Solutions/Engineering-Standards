@@ -92,9 +92,17 @@ const finding = (message) => findings.push(message);
 const slash = (value) => value.split(path.sep).join('/');
 const relativeToRoot = (file) => slash(path.relative(root, file));
 
+// A byte-order mark is not content. Some editors still write one at the start
+// of a file, and it breaks the metadata and JSON reads below, so every text
+// read for Markdown or JSON strips it.
+function readText(file) {
+  const text = fs.readFileSync(file, 'utf8');
+  return text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+}
+
 function readJson(file, label) {
   try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
+    return JSON.parse(readText(file));
   } catch (cause) {
     console.error(`${label}: cannot parse JSON (${cause.message})`);
     process.exit(2);
@@ -280,7 +288,7 @@ for (const [id, files] of derived) {
 // standards/rule/core-authoring.declare-structured-specification-metadata. A page whose block does not parse is reported by
 // the consumer validator, so it is skipped here rather than reported twice.
 function metadata(file) {
-  const raw = fs.readFileSync(file, 'utf8');
+  const raw = readText(file);
   if (!raw.startsWith('---')) return null;
   const end = raw.indexOf('\n---', 3);
   if (end < 0) return null;
@@ -296,7 +304,7 @@ const specifications = new Map(); // id -> {file, implementationStatus, text}
 for (const file of walk(domainDocs, (candidate) => candidate.endsWith('.md'))) {
   const meta = metadata(file);
   if (meta?.kind !== 'use-case' || typeof meta.id !== 'string') continue;
-  specifications.set(meta.id, { file, implementationStatus: meta.implementationStatus, text: fs.readFileSync(file, 'utf8') });
+  specifications.set(meta.id, { file, implementationStatus: meta.implementationStatus, text: readText(file) });
 }
 
 // ---- compare both directions ------------------------------------------------
@@ -398,6 +406,17 @@ for (const sourceRoot of sourceRoots()) {
   }
 }
 
+// Every directory answers a namespace row by its trailing segments, so every
+// trailing segment path of every source directory is collected once here. One
+// set lookup then answers both the exact and the trailing match for every span.
+const namespaceTails = new Set();
+for (const directory of namespaceDirectories) {
+  const segments = directory.split('/');
+  for (let start = 0; start < segments.length; start += 1) {
+    namespaceTails.add(segments.slice(start).join('/'));
+  }
+}
+
 // A span is examined only when it names something a reader could look up. A span
 // carrying whitespace is a route or a phrase, a span carrying a separator is a
 // path, and a span starting lower-case is a field, a code, or an identifier the
@@ -426,8 +445,8 @@ function resolveSpan(span) {
       const head = segments.slice(0, taken).join('.');
       if (projectNames.has(head)) tails.push(`${head}/${segments.slice(taken).join('/')}`);
     }
-    if (tails.some((tail) => namespaceDirectories.has(tail)
-                             || [...namespaceDirectories].some((directory) => directory.endsWith(`/${tail}`)))) {
+    if (tails.some((tail) => namespaceTails.has(tail))) {
+      // The suffix set holds the exact and the trailing match alike.
       return null;
     }
   }

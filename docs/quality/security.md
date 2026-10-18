@@ -8,16 +8,16 @@ Security boundaries follow identity, resource ownership, data classification, an
 ## Agent Summary {#agent-summary}
 
 
-- Tokens are validated against issuer, audience, signature, lifetime, and claims. (standards/rule/quality-security.keep-backend-authentication-provider-neutral)
-- The actor comes from claims and becomes a typed identifier. (standards/rule/quality-security.derive-the-actor-from-claims)
+- Tokens are validated and the actor comes from claims. (standards/rule/quality-security.keep-backend-authentication-provider-neutral, standards/rule/quality-security.derive-the-actor-from-claims)
+- Breach notification meets its deadline, and live data at rest stays encrypted or accepted. (standards/rule/quality-security.report-a-breach-within-72-hours, standards/rule/quality-security.protect-live-data-at-rest)
 - Every protected operation authorizes its target resource. (standards/rule/quality-security.authorize-each-target-resource)
 - Trust boundaries validate shape, range, and bounds before use. (standards/rule/quality-security.validate-at-trust-boundaries)
-- Secrets stay out of source, logs, diagnostics, and storage. (standards/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data)
+- Secrets and personal data stay out of source, logs, diagnostics, and storage. (standards/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data, standards/rule/quality-security.keep-personal-data-out-of-logs)
 - Database input is always parameterized. (standards/rule/quality-security.parameterize-database-input)
 - Public errors carry a code, safe message, trace, and field errors. (standards/rule/quality-security.limit-public-error-detail)
 - Frontends escape output and apply policy, headers, and forgery protection. (standards/rule/quality-security.protect-browser-boundaries)
 - Dependencies resolve from exact pins and a frozen lockfile. (standards/rule/quality-security.pin-and-review-dependencies)
-- Use cases handle only the fields they require. (standards/rule/quality-security.minimize-sensitive-data)
+- Personal data stays inventoried, portable, and removable, and an unsalted digest counts as personal data. (standards/rule/quality-security.minimize-sensitive-data, standards/rule/quality-security.keep-a-personal-data-inventory-per-store, standards/rule/quality-security.apply-erasure-and-export-to-every-store, standards/rule/quality-security.treat-an-unsalted-digest-of-an-address-as-personal-data)
 
 ## Standards
 
@@ -89,6 +89,42 @@ Security boundaries follow identity, resource ownership, data classification, an
 **Requirement:** A use case MUST collect, return, log, export, and retain only the fields it requires.
 
 **Rationale:** A use case carrying the `sensitive-data` risk also documents classification, access, retention, deletion, and audit behavior.
+
+### Keep a personal-data inventory per store (standards/rule/quality-security.keep-a-personal-data-inventory-per-store)
+
+**Requirement:** A platform holding personal data MUST keep a personal-data inventory per store naming the fields, purposes, and retention of each store.
+
+**Rationale:** An inventory the team can read is the map every export, erasure, and breach answer starts from.
+
+### Apply erasure and export to every store (standards/rule/quality-security.apply-erasure-and-export-to-every-store)
+
+**Requirement:** Erasure and export MUST reach every store holding personal data, including backups, logs, search indexes, and outboxes, within a stated bound for backups.
+
+**Rationale:** A request the team honors in the database but leaves in a log export answers half the duty. Backups state their own bound, because a backup cannot answer field by field.
+
+### Keep personal data out of logs (standards/rule/quality-security.keep-personal-data-out-of-logs)
+
+**Requirement:** A log, trace, or diagnostic record MUST NOT carry personal data in clear.
+
+**Rationale:** Redaction at the sink fails once, while a field never emitted fails nowhere.
+
+### Treat an unsalted digest of an address as personal data (standards/rule/quality-security.treat-an-unsalted-digest-of-an-address-as-personal-data)
+
+**Requirement:** An unsalted digest of an address MUST receive the same handling as the address itself.
+
+**Rationale:** A digest without a salt reverses by table lookup, so it hides nothing from anyone holding the table.
+
+### Report a breach within 72 hours (standards/rule/quality-security.report-a-breach-within-72-hours)
+
+**Requirement:** A breach-notification procedure MUST name an owner and a backup person and meet the 72-hour notification deadline.
+
+**Rationale:** A deadline nobody owns slips past the team, and an owner without a backup fails on the first absence.
+
+### Protect live data at rest (standards/rule/quality-security.protect-live-data-at-rest)
+
+**Requirement:** Live data at rest MUST carry encryption or a recorded risk acceptance.
+
+**Rationale:** Encryption is the default, and the written acceptance keeps the exception visible instead of silent.
 
 ### Bound abuse at exposed endpoints (standards/rule/quality-security.bound-abuse-at-exposed-endpoints)
 
@@ -183,6 +219,12 @@ This informative example demonstrates `standards/rule/quality-security.authorize
 | standards/rule/quality-security.protect-browser-boundaries | inspection | `FrontendSecurityTests` asserts the policy, headers, redirect validation, and forgery protection are present on each response. |
 | standards/rule/quality-security.pin-and-review-dependencies | static | `pnpm install --frozen-lockfile` and the NuGet restore fail when a resolved version differs from its manifest pin. |
 | standards/rule/quality-security.minimize-sensitive-data | inspection | Data review compares each returned and logged field against the field list its use case declares. |
+| standards/rule/quality-security.keep-a-personal-data-inventory-per-store | inspection | Privacy review reads the inventory and matches each store against the fields the code stores. |
+| standards/rule/quality-security.apply-erasure-and-export-to-every-store | test | `ErasureTests` asserts one request clears the database, logs, indexes, and outbox inside the stated bound. |
+| standards/rule/quality-security.keep-personal-data-out-of-logs | inspection | Log review samples emitted records and finds no personal-data value in clear. |
+| standards/rule/quality-security.treat-an-unsalted-digest-of-an-address-as-personal-data | inspection | Data review lists every stored digest with its salt and flags each unsalted one for personal-data handling. |
+| standards/rule/quality-security.report-a-breach-within-72-hours | operation | Incident review confirms the procedure names an owner, a backup person, and the deadline. |
+| standards/rule/quality-security.protect-live-data-at-rest | inspection | Storage review confirms encryption on each live store or a recorded acceptance for the gap. |
 | standards/rule/quality-security.bound-abuse-at-exposed-endpoints | inspection | `RateLimitTests` asserts each declared endpoint returns 429 with its stable code above the configured limit. |
 | standards/rule/quality-security.keep-one-limit-store-across-replicas | inspection | Deployment review confirms the limiter resolves a shared store wherever the replica count is above one. |
 | standards/rule/quality-security.restrict-cross-origin-access | inspection | `CorsTests` asserts an unlisted origin is rejected and no wildcard origin is served with credentials. |

@@ -19,6 +19,20 @@ This release gives a consumer's business intent one home and one shape. A consum
 - Taught `tools/validate-spec-sync.mjs` the LightBDD form. A C# method marked `[Scenario]` whose documentation carries no `<covers>` tag is a finding, as a Gherkin scenario without an implementation tag already was. Feature files remain optional, and `featureRoots` applies only to a Reqnroll consumer.
 - Added `prose.enforcement` to `schemas/standards-project.schema.json` and `tools/validate-consumer.mjs`. Set to `report`, the prose measures, the prose baseline and the mannered terms print as advisories and do not fail the run. Rejected synonyms still fail. A consumer that reports names the overridden provisions in `overrides`.
 - Raised the npm pins to the latest releases of 2026-10-14, with Node 24.22.0, pnpm 11.28.5, and Vite 8.3.4. `@lucide/svelte` replaces the deprecated `lucide-svelte`, and TanStack Svelte Query 6 examples in `docs/svelte/rendering.md` pass an options accessor. TypeScript stays on 6.0.3, because `svelte-check` and `typescript-eslint` do not yet accept TypeScript 7.
+- Taught `tools/validate-consumer.mjs` to check every consumer override. An unknown provision ID fails, a missing decision file fails, and a passed `reviewBy` fails in every scope. The schema review condition now covers both UI scopes.
+- Added `deferredProvisions` and `promotionPlan` to `schemas/standards-project.schema.json`. `tools/validate-consumer.mjs` reads `releaseStage`, reports a missing value, and refuses an unknown value. It resolves each deferred ID and fails a `production` declaration with a non-empty deferral. `docs/ext/stage.md` describes all three fields.
+- Added personal-data provisions to `docs/quality/security.md`. A platform holding personal data keeps a per-store inventory. Erasure and export reach every store with a stated backup bound. No log carries personal data in clear, and an unsalted address digest counts as personal data. A breach procedure names an owner and a backup person and meets the 72-hour deadline. Live data at rest carries encryption or a recorded acceptance.
+- Added operating provisions to `docs/quality/operations.md`. A release names every provider the code calls in a sub-processor list kept in sync with the code. Every recurring job reports liveness that pages a person on silence. Every alert names its runbook, and a restore is rehearsed before the first production data.
+- Narrowed `standards/rule/backend-api.model-a-monetary-value-as-one-object` to response models and to requests where the caller chooses the currency. A request against a fixed-currency account carries the amount alone.
+- Added `standards/rule/core-agent.follow-the-local-pattern-before-the-load-plan`. A change adding no module, aggregate, frontend, dependency, or public boundary reads the consumer agent context and neighboring code first. It may then skip load-plan selection.
+- Raised the LiteBus pins in `standards.manifest.json` to `7.0.0-preview.6`.
+- Taught the tools to strip a leading byte-order mark before parsing Markdown or JSON.
+- Taught `tools/validate-consumer.mjs` to report a malformed project file or manifest. The report carries the file path and the parse message instead of a stack trace.
+- Taught `tools/validate-spec-sync.mjs` to resolve the identifiers-mapping page from the configured `domainDocs` and to exempt identifiers cited only by `planned` pages.
+- Taught `tools/validate-consumer.mjs` to read each file once and `tools/validate-parity.mjs` to map namespaces through a precomputed lookup, with identical output.
+- Taught `tools/validate-standards.mjs` to validate every shipped consumer template against the schema.
+- Gave the spawned UI validator a 120-second timeout with a distinct message when the spawn itself fails.
+- This release takes effect as the `v1.19.0` tag, the immutable reference a consumer records in `reviewedStandardsVersion`.
 
 ## v1.18.0
 

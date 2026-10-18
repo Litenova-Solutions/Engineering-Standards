@@ -194,6 +194,15 @@ fileCase(
   null,
 );
 
+handler(`${applicationProject}/Sales/Vouchers/BomVoucher/BomVoucherCommandHandler.cs`);
+fileCase(
+  'a specification page with a BOM still parses',
+  'docs/domain/modules/sales/vouchers/bom-voucher.md',
+  `\uFEFF${specificationText('use-case/sales.bom-voucher')}`,
+  null,
+);
+fs.rmSync(path.join(fixture, `${applicationProject}/Sales/Vouchers/BomVoucher/BomVoucherCommandHandler.cs`));
+
 console.log('\nName derivation (standards/rule/backend-application.use-this-operation-layout)');
 specification('docs/domain/modules/event-operations/event-tasks/update-event-task.md', 'use-case/event-operations.update-event-task');
 fileCase(
@@ -325,6 +334,12 @@ mappingCase(
 mappingCase(
   'a row writing None',
   '| Handler | `RedeemVoucherCommandHandler` |\n| Read Model | `None` |',
+  null,
+);
+
+mappingCase(
+  'a row naming a namespace directory',
+  '| Handler | `RedeemVoucherCommandHandler` |\n| Namespace | `Acme.Application.Sales.Vouchers.RedeemVoucher` |',
   null,
 );
 

@@ -364,13 +364,13 @@ GET    /api/posts?after={cursor}&limit=20
 
 ### Model a monetary value as one object (standards/rule/backend-api.model-a-monetary-value-as-one-object)
 
-**Default:** Carry every monetary value as one `Money` transport object holding `amount` and an ISO 4217 `currency`.
+**Default:** Carry a monetary value as one `Money` object in a response model and in a request where the caller chooses the currency.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** Split sibling fields pair by a server invariant the schema cannot see, so a report reads the two independently. `standards/rule/backend-domain.make-money-and-decimal-rules-explicit` already carries the same shape in the Domain, and the transport model mirrors it.
+**Rationale:** Split sibling fields pair by a server invariant the schema cannot see, so a report reads the two independently. `standards/rule/backend-domain.make-money-and-decimal-rules-explicit` already carries the same shape in the Domain, and the transport model mirrors it. The object holds `amount` and an ISO 4217 `currency`. A caller who cannot choose the currency cannot set it honestly.
 
-**Example:** `unitPrice` and `currencyCode` become `price` of type `Money`. An amount that mirrors an order's currency carries it explicitly rather than by adjacency.
+**Example:** `unitPrice` and `currencyCode` become `price` of type `Money`. A request that references an account with a fixed currency carries `amount` alone.
 
 ### Name transport fields by one rule set (standards/rule/backend-api.name-transport-fields-by-one-rule-set)
 
@@ -417,7 +417,7 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 | standards/rule/backend-api.reflect-enforced-authentication-in-the-contract | test | `OpenApiSecurityTests` asserts every operation with an authorization policy declares a matching security entry. |
 | standards/rule/backend-api.publish-precise-complete-schemas | test | `OpenApiSchemaTests` asserts closed-set fields publish an enum or oneOf and control headers are required. |
 | standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape | test | `PolymorphicContractTests` round-trips every union case and asserts the discriminator equals its Domain case code. |
-| standards/rule/backend-api.model-a-monetary-value-as-one-object | static | `apps/api/openapi/{ProjectName}.json` carries a `Money` schema and every monetary field references it. |
+| standards/rule/backend-api.model-a-monetary-value-as-one-object | static | `apps/api/openapi/{ProjectName}.json` carries a `Money` schema referenced by response fields and currency-choosing requests. |
 | standards/rule/backend-api.name-transport-fields-by-one-rule-set | inspection | A schema review of `apps/api/openapi/{ProjectName}.json` finds no banned prefix, no banned noise word, and one suffix per time shape. |
 | standards/rule/backend-api.reject-a-collapsed-or-borrowed-wire-contract | test | `PolymorphicContractTests` asserts no data-bearing set serializes as an enum and no inner-layer type reaches the wire. |
 | standards/rule/backend-api.use-this-endpoint-layout | inspection | Endpoint folder review locates each operation under its module and aggregate, or records a named local replacement. |

@@ -35,6 +35,19 @@
       "type": "string",
       "enum": ["pre-production", "production"]
     },
+    "deferredProvisions": {
+      "description": "The provisions this pre-production consumer defers until its promotion plan ends the deferral. Empty once the consumer is in production.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^standards/rule/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "promotionPlan": {
+      "description": "The decision record that names each deferred provision and the promotion that ends the deferral.",
+      "$ref": "#/$defs/projectPath"
+    },
     "reviewedStandardsVersion": {
       "description": "The standards release whose complete contract this project last reviewed.",
       "type": "string",
@@ -314,7 +327,7 @@
         "allOf": [
           {
             "if": {
-              "properties": { "provisionId": { "pattern": "^standards/rule/frontend-ui\\." } },
+              "properties": { "provisionId": { "pattern": "^standards/rule/(frontend-ui|svelte-ui)\\." } },
               "required": ["provisionId"]
             },
             "then": { "required": ["reviewBy"] }

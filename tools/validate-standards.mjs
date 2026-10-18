@@ -902,14 +902,18 @@ export function validateRepository(rootInput = '.') {
     add(INDEX_PATH, 1, 'PROVISIONS_STALE', 'generated provision index is missing; run node tools/generate-provisions.mjs');
   }
   validateSchemaConsumer(root, 'schemas/standards-manifest.schema.json', 'standards.manifest.json', add);
-  validateSchemaConsumer(root, 'schemas/standards-project.schema.json', 'templates/consumer/standards.project.json', add);
+  // Every shipped consumer template meets the schema it teaches. A template
+  // the schema never reads drifts from it in silence.
+  const projectTemplates = ['templates/consumer/standards.project.json', 'templates/consumer/standards.project.svelte.json'];
+  for (const template of projectTemplates) validateSchemaConsumer(root, 'schemas/standards-project.schema.json', template, add);
 
-  const projectTemplate = path.join(root, 'templates', 'consumer', 'standards.project.json');
-  if (fs.existsSync(projectTemplate)) {
+  for (const template of projectTemplates) {
+    const projectTemplate = path.join(root, template);
+    if (!fs.existsSync(projectTemplate)) continue;
     try {
       const project = JSON.parse(fs.readFileSync(projectTemplate, 'utf8'));
       for (const override of project.overrides ?? []) {
-        if (!activeIds.has(override.provisionId)) add('templates/consumer/standards.project.json', 1, 'OVERRIDE_UNKNOWN_ID', `override references unknown Standard '${override.provisionId}'`);
+        if (!activeIds.has(override.provisionId)) add(template, 1, 'OVERRIDE_UNKNOWN_ID', `override references unknown Standard '${override.provisionId}'`);
       }
     } catch {
       // Schema diagnostics report invalid JSON.

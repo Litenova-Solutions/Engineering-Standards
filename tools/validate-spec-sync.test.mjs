@@ -342,6 +342,27 @@ fileCase(
   null,
 );
 
+fileCase(
+  'a planned page citing an invariant no code enforces',
+  'docs/domain/modules/sales/vouchers/plan-refund.md',
+  '---\n{\n  "kind": "use-case",\n  "id": "use-case/sales.plan-refund",\n  "specStatus": "approved",\n  "implementationStatus": "planned"\n}\n---\n\n# Plan refund\n\nThe page cites `invariant/voucher.never-refunded`.\n',
+  null,
+);
+
+console.log('\nByte-order marks');
+fileCase(
+  'a planned page with a byte-order mark still reads its metadata',
+  'docs/domain/modules/sales/vouchers/bom-plan.md',
+  '\uFEFF---\n{\n  "kind": "use-case",\n  "id": "use-case/sales.bom-plan",\n  "specStatus": "approved",\n  "implementationStatus": "planned"\n}\n---\n\n# BOM plan\n',
+  null,
+);
+{
+  const saved = fs.readFileSync(projectFile);
+  fs.writeFileSync(projectFile, `\uFEFF${saved.toString('utf8')}`);
+  report('a project file with a byte-order mark still parses', null, run());
+  fs.writeFileSync(projectFile, saved);
+}
+
 console.log('\nMarkable declarations (standards/rule/core-system.documentation-and-code-change-together)');
 fileCase(
   'a port that ends in a markable word is not a markable element',
@@ -449,6 +470,25 @@ console.log('\nConsumer configuration');
   delete project.specSync;
   writeJson(projectFile, project);
   report('the built-in roots cover the fixture layout', null, run());
+  writeJson(projectFile, baseProject());
+}
+
+{
+  const configured = baseProject();
+  configured.paths.domainDocs = 'docs/spec';
+  configured.specSync.codeRoots = ['apps/api/src/Shop.Custom'];
+  configured.specSync.featureRoots = ['apps/api/tests/NoFeaturesHere'];
+  writeJson(projectFile, configured);
+  const mappingFiles = [
+    write('docs/spec/orders/place-order.md', '---\n{\n  "kind": "use-case",\n  "id": "use-case/sales.place-order",\n  "specStatus": "approved",\n  "implementationStatus": "implemented"\n}\n---\n\n# Place order\n'),
+    write('docs/spec/identifiers-mapping.md', '# Identifiers mapping\n\n- `invariant/sales.legacy-rule` is a historical row.\n'),
+    write('apps/api/src/Shop.Custom/PlaceOrderCommand.cs', '/// <implements>shop/use-case/sales.place-order</implements>\npublic sealed record PlaceOrderCommand;\n'),
+  ];
+  report('a mapping page under a configured domainDocs is not reconciled as a spec page', null, run());
+  for (const file of mappingFiles) fs.rmSync(file);
+  fs.rmSync(path.join(fixture, 'docs/spec'), { recursive: true, force: true });
+  fs.rmSync(path.join(fixture, 'apps/api/src/Shop.Custom'), { recursive: true, force: true });
+  writeJson(projectFile, baseProject());
   writeJson(projectFile, baseProject());
 }
 

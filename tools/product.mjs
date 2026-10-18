@@ -30,11 +30,18 @@ export const TOPIC_SECTIONS = [...CHAPTER_SECTIONS, ...COMMITMENT_SECTIONS];
 // override sections. (standards/rule/core-product.record-each-product-choice-as-a-decision)
 export const PRODUCT_DECISION_SECTIONS = ['Context', 'Options considered', 'Decision', 'Evidence', 'Consequences', 'What would change it'];
 
+// A byte-order mark is not content. Some editors still write one at the start
+// of a file, and it breaks the metadata read below, so every read strips it.
+function stripBom(text) {
+  return text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+}
+
 export function readMeta(raw) {
-  if (!raw.startsWith('---')) return null;
-  const end = raw.indexOf('\n---', 3);
+  const text = stripBom(raw);
+  if (!text.startsWith('---')) return null;
+  const end = text.indexOf('\n---', 3);
   if (end < 0) return null;
-  try { return JSON.parse(raw.slice(3, end).trim()); } catch { return null; }
+  try { return JSON.parse(text.slice(3, end).trim()); } catch { return null; }
 }
 
 export function sectionBody(raw, name) {
@@ -120,7 +127,7 @@ export function collectProductRecords(docsRoot) {
       const full = path.join(directory, entry.name);
       if (entry.isDirectory()) { walk(full); continue; }
       if (!entry.name.endsWith('.md')) continue;
-      const raw = fs.readFileSync(full, 'utf8');
+      const raw = stripBom(fs.readFileSync(full, 'utf8'));
       const meta = readMeta(raw);
       if (!meta) continue;
       const docsRel = path.relative(docsRoot, full).replace(/\\/g, '/');

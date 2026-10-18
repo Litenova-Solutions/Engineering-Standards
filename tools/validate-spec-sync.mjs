@@ -147,9 +147,17 @@ const finding = (message) => findings.push(message);
 const slash = (value) => value.split(path.sep).join('/');
 const relativeToRoot = (file) => slash(path.relative(root, file));
 
+// A byte-order mark is not content. Some editors still write one at the start
+// of a file, and it breaks the metadata and JSON reads below, so every text
+// read for Markdown or JSON strips it.
+function readText(file) {
+  const text = fs.readFileSync(file, 'utf8');
+  return text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+}
+
 function readJson(file, label) {
   try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
+    return JSON.parse(readText(file));
   } catch (cause) {
     console.error(`${label}: cannot parse JSON (${cause.message})`);
     process.exit(2);
@@ -175,7 +183,7 @@ const MARKING_ONLY_KINDS = ['value'];
 
 function readSchemeKinds() {
   try {
-    const text = fs.readFileSync(SCHEME_PAGE, 'utf8');
+    const text = readText(SCHEME_PAGE);
     const found = new Set();
     for (const line of text.split(/\r?\n/)) {
       const match = line.match(/^\|\s*`([a-z][a-z-]*)`\s*\|/);
@@ -294,13 +302,15 @@ const markedRoots = configuredMarkedRoots.map((value) => slash(value).replace(/\
 const isMarked = (relative) => markedRoots.some((prefix) => relative === prefix || relative.startsWith(`${prefix}/`));
 
 // ---- collect specification identifiers -------------------------------------
+const citedBy = new Map();      // id -> files citing it, for the planned-page exemption
+const plannedFiles = new Set(); // files whose metadata status is planned
 const specPages = [];
 const declaredIds = new Set();       // metadata id any page states
 const declaredMeta = new Map();      // id -> metadata, for the planned and retired exemptions
 const citedIds = new Set();          // any identifier a page cites in prose or a table
 
 function metadata(file) {
-  const raw = fs.readFileSync(file, 'utf8');
+  const raw = readText(file);
   if (!raw.startsWith('---')) return null;
   const end = raw.indexOf('\n---', 3);
   if (end < 0) return null;
@@ -323,12 +333,17 @@ function stripFences(text) {
   return out.join('\n');
 }
 
+// The migration index lives beside the specifications, wherever the consumer
+// puts them, so its path comes from the configured documentation root.
+const mappingRel = slash(path.relative(root, path.join(domainDocs, 'identifiers-mapping.md')));
+
 for (const file of walk(domainDocs, (candidate) => candidate.endsWith('.md'))) {
   const rel = relativeToRoot(file);
   if (path.basename(file) === 'identifiers-tombstones.md') continue;
-  const isMapping = rel === 'docs/domain/identifiers-mapping.md';
+  const isMapping = rel === mappingRel;
   if (!isMapping) specPages.push(file);
   const meta = metadata(file);
+  if (meta?.implementationStatus === 'planned') plannedFiles.add(file);
   if (meta && typeof meta.id === 'string') {
     const id = bareIdentifier(meta.id);
     if (id) {
@@ -336,19 +351,23 @@ for (const file of walk(domainDocs, (candidate) => candidate.endsWith('.md'))) {
       declaredMeta.set(id, meta);
     }
   }
-  const identifiers = scanIdentifiers(stripFences(fs.readFileSync(file, 'utf8')));
+  const identifiers = scanIdentifiers(stripFences(readText(file)));
   for (const id of identifiers) {
     // The mapping is a generated migration index. Its current exception
     // identifiers are declarations; its historical acceptance and invariant
     // rows are not active specifications.
-    if (!isMapping || id.startsWith('exception/') || id.startsWith('event/')) citedIds.add(id);
+    if (!isMapping || id.startsWith('exception/') || id.startsWith('event/')) {
+      citedIds.add(id);
+      if (!citedBy.has(id)) citedBy.set(id, new Set());
+      citedBy.get(id).add(file);
+    }
   }
 }
 
 const retiredIds = new Set();
 const tombstoneFile = path.join(domainDocs, 'identifiers-tombstones.md');
 if (fs.existsSync(tombstoneFile)) {
-  for (const match of fs.readFileSync(tombstoneFile, 'utf8').matchAll(/^-\s*`([^`]+)`\s*->/gm)) retiredIds.add(match[1]);
+  for (const match of readText(tombstoneFile).matchAll(/^-\s*`([^`]+)`\s*->/gm)) retiredIds.add(match[1]);
 }
 const specIds = new Set([...declaredIds, ...citedIds].filter((id) => !retiredIds.has(id)));
 
@@ -370,7 +389,7 @@ function useCaseOf(id) {
 
 for (const file of specPages) {
   const rel = relativeToRoot(file);
-  for (const line of stripFences(fs.readFileSync(file, 'utf8')).split('\n')) {
+  for (const line of stripFences(readText(file)).split('\n')) {
     const match = line.match(CRITERION_PATH);
     if (!match) continue;
     const criterion = bareIdentifier(match[1]);
@@ -691,6 +710,15 @@ for (const id of testCitedIds) {
   }
 }
 
+// A planned page describes work that has not been built, so an identifier
+// cited only by planned pages needs no code element and no test yet. This
+// mirrors the parity validator, which skips planned specifications.
+// (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)
+function citedOnlyByPlanned(id) {
+  const citers = citedBy.get(id);
+  return !!citers && citers.size > 0 && [...citers].every((file) => plannedFiles.has(file));
+}
+
 // ---- compare both directions -----------------------------------------------
 const codeIds = new Set([...codeTags.keys(), ...testCitedIds]);
 
@@ -700,6 +728,7 @@ for (const id of [...specIds].sort()) {
   if (codeTags.has(id) || testCitedIds.has(id)) continue;
   const meta = declaredMeta.get(id);
   if (meta && (meta.implementationStatus === 'planned' || meta.specStatus === 'retired')) continue;
+  if (!meta && citedOnlyByPlanned(id)) continue;
   finding(`spec identifier with no code element: ${id}`);
 }
 
@@ -715,6 +744,7 @@ for (const id of [...specIds].sort()) {
   const parsed = parseCitation(id);
   if (!parsed || parsed.kind !== 'invariant') continue;
   if (testCitedIds.has(id)) continue;
+  if (!declaredIds.has(id) && citedOnlyByPlanned(id)) continue;
   const enforcers = enforcedBy.get(id);
   if (enforcers && [...enforcers].some((useCase) => testedUseCases.has(useCase))) continue;
   finding(`invariant without a test: ${id}`);
@@ -730,6 +760,7 @@ for (const id of [...specIds].sort()) {
   const parsed = parseCitation(id);
   if (!parsed || parsed.kind !== 'path') continue;
   if (testCitedIds.has(id) || provenByCriterion.has(id)) continue;
+  if (!declaredIds.has(id) && citedOnlyByPlanned(id)) continue;
   const useCase = parsed.body.split('.').length >= 3 ? useCaseOf(id) : null;
   if (useCase && !pathNamingUseCases.has(useCase) && testedUseCases.has(useCase)) {
     useCaseLevelProof.add(useCase);

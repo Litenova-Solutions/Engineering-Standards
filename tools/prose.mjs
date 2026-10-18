@@ -28,8 +28,9 @@ const CONTRACTIONS = /\b(?:ain't|aren't|can't|couldn't|didn't|doesn't|don't|hadn
 
 const AND_OR = /\band\/or\b/i;
 
-// The page's metadata block: three dashes, one JSON object, three dashes.
-const METADATA_BLOCK = /^---\r?\n\{[\s\S]*?\r?\n\}\r?\n---\r?\n/;
+// The page's metadata block: three dashes, one JSON object, three dashes. The
+// optional byte-order mark is what some editors write at the start of a file.
+const METADATA_BLOCK = /^(?:\uFEFF)?---\r?\n\{[\s\S]*?\r?\n\}\r?\n---\r?\n/;
 
 export const PROSE_LIMITS = Object.freeze({
   sentence: 25,

@@ -1118,6 +1118,129 @@ console.log('\nProduct records (standards/rule/core-product.trace-every-choice-t
   }
 }
 
+console.log('\nConsumer overrides (STD-1: every override is checked)');
+projectCase('override naming a provision the pinned standards carry', (p) => { p.overrides = [{ provisionId: 'standards/rule/ext-stage.declare-the-release-stage', decision: 'docs/decisions/0001-fixture.md', reviewBy: '2999-01-01' }]; }, null);
+projectCase('override naming an unknown provision', (p) => { p.overrides = [{ provisionId: 'standards/rule/core-topic.unknown-override', decision: 'docs/decisions/0001-fixture.md', reviewBy: '2999-01-01' }]; }, "override 'standards/rule/core-topic.unknown-override' is not a provision");
+projectCase('override naming a decision file that does not exist', (p) => { p.overrides = [{ provisionId: 'standards/rule/ext-stage.declare-the-release-stage', decision: 'docs/decisions/0009-missing.md', reviewBy: '2999-01-01' }]; }, "decision 'docs/decisions/0009-missing.md' does not exist");
+projectCase('override naming no decision file', (p) => { p.overrides = [{ provisionId: 'standards/rule/ext-stage.declare-the-release-stage', reviewBy: '2999-01-01' }]; }, 'names no decision file');
+projectCase('override past its review date outside a UI scope', (p) => { p.overrides = [{ provisionId: 'standards/rule/ext-stage.declare-the-release-stage', decision: 'docs/decisions/0001-fixture.md', reviewBy: '2020-01-01' }]; }, 'review date 2020-01-01 has passed');
+projectCase('override past its review date inside a UI scope', (p) => { p.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/0001-fixture.md', reviewBy: '2020-01-01' }]; }, 'review date 2020-01-01 has passed');
+
+console.log('\nRelease stage (STD-2: the stage is read and bounded)');
+projectCase('unknown release stage', (p) => { p.releaseStage = 'staging'; }, "releaseStage 'staging' is unknown");
+projectCase('pre-production stage with no deferral', (p) => { p.releaseStage = 'pre-production'; }, null);
+projectCase('production stage with no deferral', (p) => { p.releaseStage = 'production'; }, null);
+projectCase('deferral naming a provision the pinned standards carry', (p) => { p.releaseStage = 'pre-production'; p.deferredProvisions = ['standards/rule/ext-stage.declare-the-release-stage']; }, null);
+projectCase('deferral naming an unknown provision', (p) => { p.releaseStage = 'pre-production'; p.deferredProvisions = ['standards/rule/core-topic.unknown-override']; }, "deferredProvisions 'standards/rule/core-topic.unknown-override' is not a provision");
+projectCase('production stage that still defers a provision', (p) => { p.releaseStage = 'production'; p.deferredProvisions = ['standards/rule/ext-stage.declare-the-release-stage']; }, 'still defers 1 provision(s)');
+projectCase('promotion plan that is not on disk', (p) => { p.promotionPlan = 'docs/decisions/0009-missing.md'; }, "promotionPlan 'docs/decisions/0009-missing.md' does not exist");
+projectCase('promotion plan that is on disk', (p) => { p.promotionPlan = 'docs/decisions/0001-fixture.md'; }, null);
+{
+  // A missing stage is reported, not refused: the fixture declares none, so a
+  // machine-readable run carries the advisory and still exits 0.
+  const result = spawnSync(process.execPath, [validator, fixture, '--format=json'], { encoding: 'utf8' });
+  let parsed = null;
+  try {
+    parsed = JSON.parse(result.stdout);
+  } catch {
+    parsed = null;
+  }
+  const wanted = `standards.project.json: no 'releaseStage' is declared`;
+  if (result.status !== 0 || !parsed || !(parsed.advisories ?? []).some((item) => String(item).includes(wanted))) {
+    failures += 1;
+    console.log('  FAIL  missing release stage is reported as an advisory');
+    console.log(`        expected exit 0 with an advisory naming ${wanted}`);
+  } else {
+    console.log('  pass  missing release stage is reported as an advisory');
+  }
+}
+
+console.log('\nMalformed input (STD-8: a parse failure exits 2 with its path)');
+{
+  const original = readFixture('standards.project.json');
+  writeFile('standards.project.json', '{\n  "project": {\n');
+  const result = spawnSync(process.execPath, [validator, fixture], { encoding: 'utf8' });
+  writeFile('standards.project.json', original);
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+  if (result.status !== 2 || !output.includes('standards.project.json: not valid JSON') || output.includes('\n    at ')) {
+    failures += 1;
+    console.log('  FAIL  malformed project file exits 2 with its path and no stack trace');
+    console.log(`        expected exit 2 naming 'standards.project.json: not valid JSON', got exit ${result.status}`);
+  } else {
+    console.log('  pass  malformed project file exits 2 with its path and no stack trace');
+  }
+}
+{
+  const original = readFixture('standards/standards.manifest.json');
+  writeFile('standards/standards.manifest.json', '{\n  "version": "1.19.0",\n');
+  const result = spawnSync(process.execPath, [validator, fixture], { encoding: 'utf8' });
+  writeFile('standards/standards.manifest.json', original);
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+  if (result.status !== 2 || !output.includes('standards/standards.manifest.json: not valid JSON')) {
+    failures += 1;
+    console.log('  FAIL  malformed manifest exits 2 with its path');
+    console.log(`        expected exit 2 naming 'standards/standards.manifest.json: not valid JSON', got exit ${result.status}`);
+  } else {
+    console.log('  pass  malformed manifest exits 2 with its path');
+  }
+}
+{
+  const original = readFixture('standards.project.json');
+  writeFile('standards.project.json', '{\n  "project": {\n');
+  let status = -1;
+  let parsed = null;
+  try {
+    const result = spawnSync(process.execPath, [validator, fixture, '--format=json'], { encoding: 'utf8' });
+    status = result.status;
+    parsed = JSON.parse(result.stdout);
+  } catch {
+    parsed = null;
+  }
+  writeFile('standards.project.json', original);
+  if (status !== 2 || !parsed || parsed.ok !== false || !String(parsed.problems ?? []).includes('not valid JSON')) {
+    failures += 1;
+    console.log('  FAIL  malformed project file keeps the machine-readable contract');
+    console.log('        expected exit 2 with ok false and the parse message in problems');
+  } else {
+    console.log('  pass  malformed project file keeps the machine-readable contract');
+  }
+}
+
+console.log('\nByte-order mark (STD-7: a leading mark is stripped before parsing)');
+fileCase(
+  'page with a leading byte-order mark',
+  'docs/domain/modules/orders/bom-page.md',
+  `\uFEFF---\n${JSON.stringify({ kind: 'section-index', id: 'bom-page', specStatus: 'approved', owner: 'fixture', lastReviewed: '2026-01-01' }, null, 2)}\n---\n\n# BOM page\n`,
+  null,
+);
+{
+  const original = readFixture('standards.project.json');
+  writeFile('standards.project.json', `\uFEFF${original}`);
+  report('project file with a leading byte-order mark', null, run());
+  writeFile('standards.project.json', original);
+}
+
+console.log('\nUI child validator (STD-13: the spawn carries a timeout)');
+projectCase('UI activation spawns the child validator', (p) => { p.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/0001-fixture.md', reviewBy: '2999-01-01' }]; }, { absent: 'could not start' });
+
+console.log('\nSingle read (STD-11: each file is read once and reused)');
+{
+  // The --prose detail reads the same text the main scan already read. A long
+  // sentence keeps its detail line after the read-once change.
+  const page = 'docs/domain/modules/orders/README.md';
+  const original = readFixture(page);
+  writeFile(page, `${original}\n${'word '.repeat(30).trim()}.\n`);
+  const result = spawnSync(process.execPath, [validator, fixture, '--prose'], { encoding: 'utf8' });
+  writeFile(page, original);
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+  if (!output.includes('Controlled prose (') || !output.includes('PROSE_SENTENCE_LENGTH')) {
+    failures += 1;
+    console.log('  FAIL  prose detail lists the measures behind the counts');
+  } else {
+    console.log('  pass  prose detail lists the measures behind the counts');
+  }
+}
+
 if (!process.env.KEEP_FIXTURE) fs.rmSync(fixture, { recursive: true, force: true }); else console.log(`fixture: ${fixture}`);
 console.log(`\n${failures ? `FAIL (${failures} case(s))` : 'PASS: every case behaved as specified'}`);
 process.exit(failures ? 1 : 0);

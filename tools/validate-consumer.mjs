@@ -23,6 +23,7 @@ import {
   PRODUCT_RULE, PRODUCT_RULE_FORM, TOPIC_SECTIONS, PRODUCT_DECISION_SECTIONS,
   collectProductRecords, decisionsAffecting, definedRules, linkedFiles, sectionBody as productSection, sectionEntries, statesNone,
 } from './product.mjs';
+import { collectProvisions } from './provisions.mjs';
 
 const USAGE = `Usage: node tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
 
@@ -56,8 +57,46 @@ const err = (m) => errors.push(m);
 const advisories = [];
 const advise = (m) => advisories.push(m);
 
+// Every read in this file passes through one cache, so a file the checks
+// revisit is read once and reused. The cache also strips a leading byte-order
+// mark, which some editors still write: without the strip a page that carries
+// a metadata block reports none.
+const textCache = new Map();
+function readText(p) {
+  let text = textCache.get(p);
+  if (text === undefined) {
+    text = fs.readFileSync(p, 'utf8');
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    textCache.set(p, text);
+  }
+  return text;
+}
+
 function readJson(p) {
-  return JSON.parse(fs.readFileSync(p, 'utf8'));
+  return JSON.parse(readText(p));
+}
+
+// A malformed project file or manifest ends the run as a usage error, with the
+// path and the parse message. A stack trace would break the --format=json
+// contract a machine reader relies on.
+function failInput(message) {
+  if (jsonOutput) {
+    console.log(JSON.stringify({
+      tool: 'validate-consumer',
+      consumer: root,
+      ok: false,
+      scanned: { documentationRoot: 'docs', files: 0, metadataBlocks: 0 },
+      acceptanceIds: 0,
+      acceptanceCitations: 0,
+      testFiles: 0,
+      endToEndIds: 0,
+      problems: [message],
+      advisories: [],
+    }, null, 2));
+  } else {
+    console.error(message);
+  }
+  process.exit(2);
 }
 
 // `fs.globSync` arrived in Node 22 and is still marked experimental, so calling
@@ -118,7 +157,12 @@ if (!fs.existsSync(projectFile)) {
   console.error(`No standards.project.json at ${root}`);
   process.exit(2);
 }
-const project = readJson(projectFile);
+let project;
+try {
+  project = readJson(projectFile);
+} catch (cause) {
+  failInput(`standards.project.json: not valid JSON (${cause.message})`);
+}
 // The documentation root is configuration, not a constant. A hard-coded docs/
 // scans nothing in a consumer that keeps its pages elsewhere, and a scan of
 // nothing reports PASS. 'docs' stays the default because that is the layout the
@@ -167,7 +211,14 @@ const selected = new Set(selections.map((entry) => entry.id));
 let manifest = null;
 for (const rel of ['standards/standards.manifest.json', '../standards.manifest.json']) {
   const p = path.join(root, rel);
-  if (fs.existsSync(p)) { manifest = readJson(p); break; }
+  if (fs.existsSync(p)) {
+    try {
+      manifest = readJson(p);
+    } catch (cause) {
+      failInput(`${rel}: not valid JSON (${cause.message})`);
+    }
+    break;
+  }
 }
 // The manifest names the id scopes whose overrides expire. A recorded override in
 // one of those scopes activates the controlled UI validator.
@@ -217,6 +268,68 @@ for (const entry of selections) {
   if (entry.reviewBy < today) {
     err(`standards.project.json: selectedExtensions '${entry.id}' was due for review on ${entry.reviewBy}; confirm the criterion still applies or remove the selection`);
   }
+}
+
+// The provision ids every override and deferral resolves against. They come
+// from the standards release this validator ships in, which is the contract
+// the consumer reviewed. An empty set means the docs are absent, and the id
+// checks stay silent rather than failing what they cannot see.
+let knownProvisions = null;
+try {
+  const standardsRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+  const ids = collectProvisions(standardsRoot).map((row) => row.id);
+  if (ids.length) knownProvisions = new Set(ids);
+} catch {
+  knownProvisions = null;
+}
+
+// Every override names a provision the pinned standards carry, and its
+// decision file exists and reads. A carried review date stays live. The expiry
+// applies to every scope: a backend override nobody revisits is the same
+// unreviewed position as a UI one.
+for (const override of project.overrides ?? []) {
+  const id = override?.provisionId ?? '(unnamed)';
+  if (knownProvisions && !knownProvisions.has(override?.provisionId)) err(`standards.project.json: override '${id}' is not a provision in the pinned standards`);
+  const decision = override?.decision;
+  if (typeof decision !== 'string' || !decision.trim()) {
+    err(`standards.project.json: override '${id}' names no decision file`);
+  } else {
+    const decisionFile = path.join(root, decision);
+    if (!fs.existsSync(decisionFile)) err(`standards.project.json: override '${id}' decision '${decision}' does not exist`);
+    else {
+      try {
+        fs.accessSync(decisionFile, fs.constants.R_OK);
+      } catch {
+        err(`standards.project.json: override '${id}' decision '${decision}' is not readable`);
+      }
+    }
+  }
+  if (override?.reviewBy !== undefined && override.reviewBy < today) err(`standards.project.json: override '${id}' review date ${override.reviewBy} has passed; renew the decision`);
+}
+
+// The release stage states what the project is: 'pre-production' before any
+// deployment holds customer data, 'production' after. A missing stage is
+// reported rather than refused, so a consumer that has not adopted the stage
+// extension keeps passing while the gap stays visible.
+const RELEASE_STAGES = ['pre-production', 'production'];
+const releaseStage = project.releaseStage;
+if (releaseStage === undefined) {
+  advise(`standards.project.json: no 'releaseStage' is declared; declare 'pre-production' or 'production' so deferred provisions stay bounded`);
+} else if (!RELEASE_STAGES.includes(releaseStage)) {
+  err(`standards.project.json: releaseStage '${releaseStage}' is unknown; expected one of ${RELEASE_STAGES.join(', ')}`);
+}
+const deferredProvisions = project.deferredProvisions ?? [];
+if (!Array.isArray(deferredProvisions)) {
+  err('standards.project.json: deferredProvisions must be an array of provision ids');
+} else {
+  for (const id of deferredProvisions) {
+    if (knownProvisions && !knownProvisions.has(id)) err(`standards.project.json: deferredProvisions '${id}' is not a provision in the pinned standards`);
+  }
+  if (releaseStage === 'production' && deferredProvisions.length) err(`standards.project.json: releaseStage 'production' still defers ${deferredProvisions.length} provision(s); production carries no deferral`);
+}
+const promotionPlan = project.promotionPlan;
+if (typeof promotionPlan === 'string' && promotionPlan.trim() && !fs.existsSync(path.join(root, promotionPlan))) {
+  err(`standards.project.json: promotionPlan '${promotionPlan}' does not exist; the deferred provisions name no plan that ends them`);
 }
 
 // ---- schema-equivalent kind rules ------------------------------------------
@@ -414,7 +527,7 @@ function useCaseFile(mod, name) {
 
 for (const f of files) {
   const rel = path.relative(root, f).replace(/\\/g, '/');
-  const raw = fs.readFileSync(f, 'utf8');
+  const raw = readText(f);
   const hasMeta = raw.startsWith('---');
 
   // Research prose (Codex/Fable notes and indexes without a metadata block)
@@ -692,7 +805,7 @@ for (const kind of SINGLETON_KINDS) {
   // A product rule cited anywhere in the documentation resolves to the page that
   // defines it. (standards/rule/core-product.identify-every-product-rule)
   for (const file of files) {
-    const raw = fs.readFileSync(file, 'utf8');
+    const raw = readText(file);
     for (const match of raw.matchAll(PRODUCT_RULE)) {
       const rule = match[1];
       if (/\.md$/.test(rule)) continue;
@@ -809,7 +922,7 @@ for (const relative of testRoots) {
       if (!TEST_SOURCE.test(entry.name)) continue;
       testFiles += 1;
       const rel = path.relative(root, candidate).replace(/\\/g, '/');
-      for (const id of citationsIn(entry.name, fs.readFileSync(candidate, 'utf8'))) {
+      for (const id of citationsIn(entry.name, readText(candidate))) {
         if (!citations.has(id)) citations.set(id, []);
         citations.get(id).push(rel);
       }
@@ -926,16 +1039,23 @@ if (uiActivated) {
   // standards repository at a path other than 'standards/'.
   const uiValidator = path.join(path.dirname(fileURLToPath(import.meta.url)), 'validate-ui.mjs');
   if (fs.existsSync(uiValidator)) {
-    const result = spawnSync(process.execPath, [uiValidator, root], { encoding: 'utf8' });
-    uiOutput = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim();
-    if (result.status !== 0) {
-      // Each UI problem is carried into this validator's own list rather than
-      // left in a block of text. A caller reading the structured output has no
-      // 'above' to look at, and a caller reading the human output sees the same
-      // problems either way.
-      const lifted = uiOutput.split('\n').filter((line) => line.startsWith('  - ')).map((line) => `controlled UI: ${line.slice(4)}`);
-      if (lifted.length) for (const item of lifted) err(item);
-      else err(`controlled UI validation failed with exit code ${result.status}`);
+    // The child validator gets 120 seconds. A spawn failure reports the
+    // validator path rather than a UI content failure, because a validator
+    // that never started proved nothing about the UI.
+    const result = spawnSync(process.execPath, [uiValidator, root], { encoding: 'utf8', timeout: 120000 });
+    if (result.error) {
+      err(`controlled UI validator at ${uiValidator} could not start (${result.error.message})`);
+    } else {
+      uiOutput = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim();
+      if (result.status !== 0) {
+        // Each UI problem is carried into this validator's own list rather than
+        // left in a block of text. A caller reading the structured output has no
+        // 'above' to look at, and a caller reading the human output sees the same
+        // problems either way.
+        const lifted = uiOutput.split('\n').filter((line) => line.startsWith('  - ')).map((line) => `controlled UI: ${line.slice(4)}`);
+        if (lifted.length) for (const item of lifted) err(item);
+        else err(`controlled UI validation failed with exit code ${result.status}`);
+      }
     }
   } else {
     err(`controlled UI configuration is present but the UI validator is missing at ${uiValidator}`);
@@ -1001,7 +1121,7 @@ let languageSummary = '';
   const proseCodes = new Map();
   for (const f of languageFiles) {
     const rel = path.relative(root, f).replace(/\\/g, '/');
-    const raw = fs.readFileSync(f, 'utf8');
+    const raw = readText(f);
     // A scope is written against the documentation root. AGENTS.md sits above
     // it, so it matches no scoped rule and is checked by the mannered list.
     const scopeRel = f === agentsFile ? rel : path.relative(docsRoot, f).replace(/\\/g, '/');
@@ -1044,7 +1164,7 @@ let languageSummary = '';
       const absolute = path.join(root, relativePath);
       const rel = relativePath.replace(/\\/g, '/');
       scannedSurfaces += 1;
-      checkLanguageInSource(rel, fs.readFileSync(absolute, 'utf8'), compiled, (_r, line, code, message) => {
+      checkLanguageInSource(rel, readText(absolute), compiled, (_r, line, code, message) => {
         languageFindings.push(`${rel}:${line}: ${code} ${message}`);
       });
     }
@@ -1105,7 +1225,7 @@ let languageSummary = '';
     const detail = [];
     for (const f of files) {
       const rel = path.relative(root, f).replace(/\\/g, '/');
-      checkProseMeasures(rel, fs.readFileSync(f, 'utf8'), (r, line, code, message) => detail.push(`${r}:${line}: ${code} ${message}`));
+      checkProseMeasures(rel, readText(f), (r, line, code, message) => detail.push(`${r}:${line}: ${code} ${message}`));
     }
     console.log(`\nControlled prose (${detail.length}):`);
     for (const d of detail) console.log(`  - ${d}`);
@@ -1154,7 +1274,7 @@ if (fs.existsSync(modulesRoot)) {
 // specification declares in its metadata, and every event classification a type
 // declares in the source. Acceptance criteria are excluded because the duplicate
 // check above already reads them.
-const scanDocs = files.map((f) => ({ rel: path.relative(root, f).replace(/\\/g, '/'), raw: fs.readFileSync(f, 'utf8') }));
+const scanDocs = files.map((f) => ({ rel: path.relative(root, f).replace(/\\/g, '/'), raw: readText(f) }));
 const docText = scanDocs.map((d) => d.raw).join('\n');
 for (const { rel, meta } of metas) {
   if (meta && typeof meta.id === 'string' && /^[a-z][a-z0-9-]*\//.test(meta.id)) identifierContext.definitions.push({ id: meta.id, rel });
@@ -1162,7 +1282,7 @@ for (const { rel, meta } of metas) {
 for (const f of files) {
   if (path.basename(f) !== 'identifiers-tombstones.md') continue;
   identifierContext.tombstoneRel = path.relative(root, f).replace(/\\/g, '/');
-  for (const m of fs.readFileSync(f, 'utf8').matchAll(/^-\s+`([^`]+)`\s*->\s*`?([^`\s]+)`?/gm)) identifierContext.tombstones.set(m[1], m[2]);
+  for (const m of readText(f).matchAll(/^-\s+`([^`]+)`\s*->\s*`?([^`\s]+)`?/gm)) identifierContext.tombstones.set(m[1], m[2]);
 }
 
 // The source the four-attribute scan reads is the project's own parity roots. A
@@ -1173,7 +1293,7 @@ for (const sourceRoot of Array.isArray(project.parity?.sourceRoots) ? project.pa
   let matched;
   try { matched = globFiles(root, `${String(sourceRoot).replace(/\/+$/, '')}/**/*.cs`); }
   catch (e) { err(`standards.project.json: parity.sourceRoots '${sourceRoot}' could not be read (${e.message})`); continue; }
-  for (const relative of matched) sourceFiles.push({ rel: relative, raw: fs.readFileSync(path.join(root, relative), 'utf8') });
+  for (const relative of matched) sourceFiles.push({ rel: relative, raw: readText(path.join(root, relative)) });
 }
 for (const file of sourceFiles) {
   for (const m of file.raw.matchAll(/Classification\s*=\s*"([^"]*)"/g)) identifierContext.definitions.push({ id: m[1], rel: file.rel });
@@ -1209,7 +1329,8 @@ if (testRoots.length) console.log(`Acceptance citations: ${citations.size} of ${
 if (uiOutput) console.log(`\n${uiOutput}`);
 if (advisories.length) {
   // The count and the worst pages are in the Language line; --prose lists every measure.
-  console.log(`\nADVISORY (${advisories.length} prose finding(s), reported because prose.enforcement is 'report')`);
+  const proseNote = project.prose?.enforcement === 'report' ? `, reported because prose.enforcement is 'report'` : '';
+  console.log(`\nADVISORY (${advisories.length} finding(s)${proseNote})`);
   if (process.argv.includes('--prose')) for (const a of advisories) console.log(`  - ${a}`);
 }
 if (errors.length) {

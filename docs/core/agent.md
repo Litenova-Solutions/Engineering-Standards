@@ -15,6 +15,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 - Report exact verification evidence. (standards/rule/core-agent.run-and-report-verification)
 - Generated records stay source material until intent states them. (standards/rule/core-agent.treat-tracked-records-as-source-material)
 - Agent working files live under one ignored-and-tracked split. (standards/rule/core-agent.keep-agent-working-files-under-agents)
+- Pattern-following changes read local context first and skip load-plan selection. (standards/rule/core-agent.follow-the-local-pattern-before-the-load-plan)
 
 ## Standards
 
@@ -23,6 +24,14 @@ This protocol controls how agents select context, resolve standards, preserve us
 **Requirement:** An agent MUST select the active task from `loadPlans` in `standards.manifest.json` before editing.
 
 **Rationale:** The selected task identifies the smallest standards context that covers the request.
+
+### Follow the local pattern before the load plan (standards/rule/core-agent.follow-the-local-pattern-before-the-load-plan)
+
+**Requirement:** A change adding no module, aggregate, frontend, dependency, or public boundary MAY skip load-plan selection after reading the consumer agent context and neighboring code.
+
+**Rationale:** Boundary-adding changes keep the existing requirement, because a new surface needs the full context the load plan selects.
+
+**Example:** A handler change that follows the module pattern reads `AGENTS.md` and the sibling handler, then edits without selecting a task.
 
 ### Load context by tier (standards/rule/core-agent.load-context-by-tier)
 
@@ -151,6 +160,7 @@ A Command-handler change selects `backend.application`, reads its active use cas
 | ID | Method | Evidence |
 |:---|:---|:---|
 | standards/rule/core-agent.select-task-context | inspection | Change review identifies the selected manifest task before editing. |
+| standards/rule/core-agent.follow-the-local-pattern-before-the-load-plan | inspection | Change review confirms a pattern-following change cites its local context and no load plan. |
 | standards/rule/core-agent.load-context-by-tier | inspection | Agent report lists required Tier 0, Tier 1, and Tier 2 documents. |
 | standards/rule/core-agent.load-applicable-extensions | inspection | Agent report lists selected project and applicable local extensions. |
 | standards/rule/core-agent.read-active-behavior-specifications | inspection | Behavior-change report cites the active use-case specification. |
