@@ -54,7 +54,8 @@ A scenario proves a case of a use case reached only by a reaction or a job when
 a when step sets it off and the scenario asserts an effect: the refusal's code,
 or a then step from a class not named in `proof.outcomeOnlySteps`. An
 integration test proves a case when it names the use case's message type or
-requests one of its endpoint routes. A known gap naming a use case also covers
+requests one of its endpoint routes, in its own body or in a method declared in
+the same file that it calls. A known gap naming a use case also covers
 proof and result findings about its cases and results.
 
 Each record also carries `effectiveStatus`: draft when the record, a decision

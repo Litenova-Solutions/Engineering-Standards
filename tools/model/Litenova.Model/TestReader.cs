@@ -218,14 +218,19 @@ static class TestReader
                 }
             }
 
-            foreach (var name in scope.DescendantNodes().OfType<IdentifierNameSyntax>())
+            // An integration test often sends its message from a helper declared in the same file, on its own
+            // class or on a world type nested beside it, so what those helpers name counts for the test.
+            foreach (var reached in ReachedInFile(scope, root))
             {
-                identifiers.Add(name.Identifier.ValueText);
-            }
+                foreach (var name in reached.DescendantNodes().OfType<IdentifierNameSyntax>())
+                {
+                    identifiers.Add(name.Identifier.ValueText);
+                }
 
-            foreach (var created in scope.DescendantNodes().OfType<ObjectCreationExpressionSyntax>())
-            {
-                identifiers.Add(created.Type.ToString().Split('<', '.').Last());
+                foreach (var created in reached.DescendantNodes().OfType<ObjectCreationExpressionSyntax>())
+                {
+                    identifiers.Add(created.Type.ToString().Split('<', '.').Last());
+                }
             }
 
             scenarios.Add(new ScenarioInfo(
@@ -240,6 +245,51 @@ static class TestReader
                 identifiers,
                 RoutesIn(scope, containing)));
         }
+    }
+
+    /// <summary>
+    ///     The test's own body and the body of every method declared in the same file that it calls,
+    ///     directly or through a member access, followed transitively.
+    /// </summary>
+    private static List<SyntaxNode> ReachedInFile(SyntaxNode scope, SyntaxNode root)
+    {
+        var declared = root.DescendantNodes().OfType<MethodDeclarationSyntax>()
+            .GroupBy(method => method.Identifier.ValueText, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.ToList(), StringComparer.Ordinal);
+        var reached = new List<SyntaxNode> { scope };
+        var seen = new HashSet<SyntaxNode> { scope };
+        var pending = new Queue<SyntaxNode>([scope]);
+
+        while (pending.Count > 0)
+        {
+            foreach (var invocation in pending.Dequeue().DescendantNodes().OfType<InvocationExpressionSyntax>())
+            {
+                var name = invocation.Expression switch
+                {
+                    IdentifierNameSyntax identifier => identifier.Identifier.ValueText,
+                    MemberAccessExpressionSyntax access => access.Name.Identifier.ValueText,
+                    _ => null
+                };
+
+                if (name is null || !declared.TryGetValue(name, out var targets))
+                {
+                    continue;
+                }
+
+                foreach (var target in targets)
+                {
+                    var targetBody = (SyntaxNode?)target.Body ?? target.ExpressionBody;
+
+                    if (targetBody is not null && seen.Add(targetBody))
+                    {
+                        reached.Add(targetBody);
+                        pending.Enqueue(targetBody);
+                    }
+                }
+            }
+        }
+
+        return reached;
     }
 
     private static void AddStep(
