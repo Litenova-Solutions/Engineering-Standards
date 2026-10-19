@@ -2,43 +2,40 @@
 
 ## Intent
 
-
-Security boundaries follow identity, resource ownership, data classification, and trust transitions across API, persistence, frontend, external services, and operations. Authentication establishes identity. Each use case still defines authorization for its target.
+Security boundaries follow identity, resource ownership, data classification, and trust transitions across API, persistence, frontend, external services, and operations. Authentication establishes identity. Each use case declares the permissions it needs, and the application guard authorizes from them.
 
 ## Agent Summary {#agent-summary}
 
-
 - Tokens are validated and the actor comes from claims. (standards/rule/quality-security.keep-backend-authentication-provider-neutral, standards/rule/quality-security.derive-the-actor-from-claims)
-- Breach notification meets its deadline, and live data at rest stays encrypted or accepted. (standards/rule/quality-security.report-a-breach-within-72-hours, standards/rule/quality-security.protect-live-data-at-rest)
-- Every protected operation authorizes its target resource. (standards/rule/quality-security.authorize-each-target-resource)
+- Breach notification meets its deadline, and live data at rest stays encrypted or excepted. (standards/rule/quality-security.report-a-breach-within-its-deadline, standards/rule/quality-security.protect-live-data-at-rest)
+- The application guard authorizes every protected operation. (standards/rule/quality-security.authorize-each-target-resource, standards/rule/quality-security.restrict-a-protected-collection-in-the-database)
 - Trust boundaries validate shape, range, and bounds before use. (standards/rule/quality-security.validate-at-trust-boundaries)
 - Secrets and personal data stay out of source, logs, diagnostics, and storage. (standards/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data, standards/rule/quality-security.keep-personal-data-out-of-logs)
 - Database input is always parameterized. (standards/rule/quality-security.parameterize-database-input)
-- Public errors carry a code, safe message, trace, and field errors. (standards/rule/quality-security.limit-public-error-detail)
+- Public errors use the HTTP API error contract. (standards/rule/quality-security.limit-public-error-detail)
 - Frontends escape output and apply policy, headers, and forgery protection. (standards/rule/quality-security.protect-browser-boundaries)
-- Dependencies resolve from exact pins and a frozen lockfile. (standards/rule/quality-security.pin-and-review-dependencies)
-- Personal data stays inventoried, portable, and removable, and an unsalted digest counts as personal data. (standards/rule/quality-security.minimize-sensitive-data, standards/rule/quality-security.keep-a-personal-data-inventory-per-store, standards/rule/quality-security.apply-erasure-and-export-to-every-store, standards/rule/quality-security.treat-an-unsalted-digest-of-an-address-as-personal-data)
+- Personal data stays inventoried, portable, and removable, and an unsalted digest counts as personal data. (standards/rule/quality-security.minimize-sensitive-data, standards/rule/quality-security.keep-a-personal-data-inventory-per-store, standards/rule/quality-security.apply-erasure-and-export-to-every-store, standards/rule/quality-security.treat-an-unsalted-digest-as-personal-data)
+- Exposed endpoints declare limits, origins stay listed, audit events are recorded, and secrets rotate. (standards/rule/quality-security.bound-abuse-at-exposed-endpoints, standards/rule/quality-security.keep-one-limit-store-across-replicas, standards/rule/quality-security.restrict-cross-origin-access, standards/rule/quality-security.record-security-audit-events, standards/rule/quality-security.rotate-production-secrets)
 
 ## Standards
 
-
 ### Keep backend authentication provider-neutral (standards/rule/quality-security.keep-backend-authentication-provider-neutral)
 
-**Requirement:** A backend MUST validate issuer, audience, signature, lifetime, and required claims through OIDC and JWT bearer standards.
+**Requirement:** A backend MUST validate issuer, audience, signature, lifetime, and required claims through OIDC and JWT Bearer.
 
 **Rationale:** Provider-specific login and session behavior belongs to a frontend or an extension. An unsigned token, an unvalidated decode, or a client-supplied identity header is never accepted.
 
 ### Derive the actor from claims (standards/rule/quality-security.derive-the-actor-from-claims)
 
-**Requirement:** The authenticated actor identifier MUST come from verified claims and convert to the project typed identifier at the WebApi boundary.
+**Requirement:** Actor resolution MUST follow `standards/rule/backend-api.derive-authenticated-identity-from-claims` and `standards/rule/backend-api.reject-a-client-supplied-actor-identifier`.
 
-**Rationale:** The accessor exposes the typed subject plus the declared roles and scopes that endpoint policies need. Request data never supplies the current actor.
+**Rationale:** Actor resolution has one owner: the WebApi boundary. Request data never supplies the current actor.
 
 ### Authorize each target resource (standards/rule/quality-security.authorize-each-target-resource)
 
-**Requirement:** A protected query or command MUST check role, ownership, tenant, state, or delegated access against its target.
+**Requirement:** The application guard MUST authorize every protected operation from its use case's declared permissions, as `standards/rule/backend-application.enforce-target-authorization-in-the-pipeline` states, with endpoints adding only coarse policies.
 
-**Rationale:** A single-target operation resolves its target and checks the caller against it.
+**Rationale:** One decision from one declaration stops operations about the same record asking different questions. An actor holds a role at a scope, a role allows permissions, and a use case needs permissions.
 
 ### Restrict a protected collection in the database (standards/rule/quality-security.restrict-a-protected-collection-in-the-database)
 
@@ -50,9 +47,9 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ### Validate at trust boundaries (standards/rule/quality-security.validate-at-trust-boundaries)
 
-**Requirement:** A trust boundary MUST validate transport shape, required values, length, range, format, file metadata, and pagination bounds before use.
+**Requirement:** A trust boundary MUST validate transport shape and file metadata before use, leaving message checks to application validators as `standards/rule/backend-application.separate-input-validation-from-invariants` states.
 
-**Rationale:** Domain validates business invariants separately. Database content, provider responses, file contents, and generated text stay untrusted when they cross into a new output context.
+**Rationale:** Message shape, required values, length, range, format, and pagination bounds are the validator checks `standards/rule/backend-application.separate-input-validation-from-invariants` names. Domain validates business invariants separately. Database content, provider responses, file contents, and generated text stay untrusted when they cross into a new output context.
 
 ### Keep secrets out of tracked and observable data (standards/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data)
 
@@ -68,27 +65,21 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ### Limit public error detail (standards/rule/quality-security.limit-public-error-detail)
 
-**Requirement:** A public error MUST expose only a stable code, safe message, trace identifier, and allowed field errors.
+**Requirement:** A public error MUST use the error contract `standards/rule/backend-api.return-stable-problem-details` and `standards/rule/backend-api.keep-error-responses-free-of-internal-detail` define.
 
-**Rationale:** A stack trace, SQL, connection detail, provider body, uncontracted internal identifier, or authorization reason that reveals resource existence gives an attacker structure.
+**Rationale:** The error contract has one owner: the HTTP API rules. A stack trace, SQL, connection detail, provider body, uncontracted internal identifier, or authorization reason that reveals resource existence gives an attacker structure.
 
 ### Protect browser boundaries (standards/rule/quality-security.protect-browser-boundaries)
 
-**Requirement:** A frontend MUST apply framework escaping, a documented Content Security Policy, secure headers, redirect validation, and request forgery protection.
+**Requirement:** A frontend MUST apply framework escaping, a documented Content Security Policy, secure headers, redirect validation, forgery protection, and sanitization of approved rich content.
 
-**Rationale:** Approved rich content is sanitized before render. A route guard or hidden control is presentation, so it never replaces API authorization.
-
-### Pin and review dependencies (standards/rule/quality-security.pin-and-review-dependencies)
-
-**Requirement:** A dependency MUST resolve from an exact manifest pin and a frozen lockfile, with integrity and certificate verification enabled.
-
-**Rationale:** Package review still covers install scripts, transitive changes, source reputation, maintenance status, and advisories before a pin changes.
+**Rationale:** A route guard or hidden control is presentation, so it never replaces API authorization.
 
 ### Minimize sensitive data (standards/rule/quality-security.minimize-sensitive-data)
 
-**Requirement:** A use case MUST collect, return, log, export, and retain only the fields it requires.
+**Requirement:** A use case MUST collect, return, log, export, and retain only the fields its input and results declare.
 
-**Rationale:** A use case carrying the `sensitive-data` risk also documents classification, access, retention, deletion, and audit behavior.
+**Rationale:** A use case handling sensitive data states its classification, access, retention, deletion, and audit behavior on its page.
 
 ### Keep a personal-data inventory per store (standards/rule/quality-security.keep-a-personal-data-inventory-per-store)
 
@@ -98,9 +89,9 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ### Apply erasure and export to every store (standards/rule/quality-security.apply-erasure-and-export-to-every-store)
 
-**Requirement:** Erasure and export MUST reach every store holding personal data, including backups, logs, search indexes, and outboxes, within a stated bound for backups.
+**Requirement:** Erasure and export MUST reach every store holding personal data, with backups expiring inside the retention bound the Limit records state.
 
-**Rationale:** A request the team honors in the database but leaves in a log export answers half the duty. Backups state their own bound, because a backup cannot answer field by field.
+**Rationale:** Stores include logs, search indexes, and outboxes beside the database. A request the team honors in the database but leaves in a log export answers half the duty. A backup cannot answer field by field, so it carries a retention bound instead.
 
 ### Keep personal data out of logs (standards/rule/quality-security.keep-personal-data-out-of-logs)
 
@@ -108,41 +99,41 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 **Rationale:** Redaction at the sink fails once, while a field never emitted fails nowhere.
 
-### Treat an unsalted digest of an address as personal data (standards/rule/quality-security.treat-an-unsalted-digest-of-an-address-as-personal-data)
+### Treat an unsalted digest as personal data (standards/rule/quality-security.treat-an-unsalted-digest-as-personal-data)
 
-**Requirement:** An unsalted digest of an address MUST receive the same handling as the address itself.
+**Requirement:** An unsalted digest of personal data MUST receive the same handling as the data itself.
 
 **Rationale:** A digest without a salt reverses by table lookup, so it hides nothing from anyone holding the table.
 
-### Report a breach within 72 hours (standards/rule/quality-security.report-a-breach-within-72-hours)
+### Report a breach within its deadline (standards/rule/quality-security.report-a-breach-within-its-deadline)
 
-**Requirement:** A breach-notification procedure MUST name an owner and a backup person and meet the 72-hour notification deadline.
+**Requirement:** A breach-notification procedure MUST name an owner and a backup person and meet the deadline the applicable Constraint record states.
 
 **Rationale:** A deadline nobody owns slips past the team, and an owner without a backup fails on the first absence.
 
 ### Protect live data at rest (standards/rule/quality-security.protect-live-data-at-rest)
 
-**Requirement:** Live data at rest MUST carry encryption or a recorded risk acceptance.
+**Requirement:** Live data at rest MUST carry encryption or an Exception record naming this rule.
 
-**Rationale:** Encryption is the default, and the written acceptance keeps the exception visible instead of silent.
+**Rationale:** Encryption is the default, and the Exception keeps the gap visible with its reason and review date.
 
 ### Bound abuse at exposed endpoints (standards/rule/quality-security.bound-abuse-at-exposed-endpoints)
 
-**Requirement:** A public, authentication, webhook, search, upload, or expensive endpoint MUST declare a rate or concurrency limit and its rejection response.
+**Requirement:** A public, authentication, webhook, search, or upload endpoint MUST declare its limit as a Limit record with key, owner, and rejection response.
 
-**Rationale:** The declaration also names the limiting key and monitoring owner. A caller above the limit receives 429 with a stable code.
+**Rationale:** The key limits one caller, the owner monitors the limit, and the rejection response is 429 with a stable code.
 
 ### Keep one limit store across replicas (standards/rule/quality-security.keep-one-limit-store-across-replicas)
 
 **Requirement:** A deployment running more than one replica MUST hold its rate and concurrency counters in one store that every replica reads.
 
-**Rationale:** A per-process counter multiplies the declared limit by the replica count, so the limit a specification states is not the limit the system applies. The multiplier also changes when the deployment scales, which makes the effective limit unstated. This was a rationale sentence, where it obliged nobody.
+**Rationale:** A per-process counter multiplies the declared limit by the replica count, so the limit a specification states is not the limit the system applies. The multiplier also changes when the deployment scales, which makes the effective limit unstated.
 
 ### Restrict cross-origin access (standards/rule/quality-security.restrict-cross-origin-access)
 
 **Requirement:** A cross-origin policy MUST list its allowed origins, methods, headers, and credential mode without using a wildcard origin.
 
-**Rationale:** Validated configuration owns the allowlist so an unlisted origin cannot be introduced by a deployment value.
+**Rationale:** Validated configuration owns the allowlist, so an unlisted origin cannot arrive by mistake. Deployment-owned origins are allowed when the allowlist shape is validated at startup.
 
 ### Record security audit events (standards/rule/quality-security.record-security-audit-events)
 
@@ -152,24 +143,17 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ### Rotate production secrets (standards/rule/quality-security.rotate-production-secrets)
 
-**Requirement:** A production secret MUST have an owner, rotation interval, storage location, revocation procedure, and tested recovery.
+**Requirement:** A production secret MUST have a secret-inventory entry naming its owner, storage location, and next rotation date, with revocation and recovery in a runbook.
 
-**Rationale:** Rotation supports overlap when clients cannot switch at once. Procedures, logs, artifacts, and audit records carry no secret value.
-
-### Enforce supply-chain gates in CI (standards/rule/quality-security.enforce-supply-chain-gates-in-ci)
-
-**Requirement:** CI MUST scan direct and transitive dependencies, pin every action to an immutable reference, and publish an inventory per release.
-
-**Rationale:** A known high-severity vulnerability then requires a documented exception before the release proceeds.
+**Rationale:** Rotation allows overlap while clients switch. Procedures, logs, artifacts, and audit records carry no secret value, as `standards/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data` states.
 
 ## Conventions
-
 
 ### Use one current actor abstraction (standards/rule/quality-security.use-one-current-actor-abstraction)
 
 **Default:** Expose one narrow current-actor accessor in WebApi that maps verified claims to typed identity, roles, and scopes.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception that names this provision and states its reason, review date, and removal condition.
 
 **Rationale:** Application receives the actor through input that WebApi creates, or through a narrow trusted port when behavior must stay host-independent.
 
@@ -177,7 +161,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 **Default:** Define Content Security Policy, frame restrictions, content-type protection, referrer policy, and transport security in one host location.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception that names this provision and states its reason, review date, and removal condition.
 
 **Rationale:** One location keeps the header set reviewable instead of spread across middleware registrations.
 
@@ -185,15 +169,15 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 **Default:** Set a fallback policy requiring an authenticated user, and mark each public endpoint with `AllowAnonymous` intentionally.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception that names this provision and states its reason, review date, and removal condition.
 
-**Rationale:** A new endpoint is then protected by default. Named role or scope policies add coarse checks while handlers retain resource authorization.
+**Rationale:** A new endpoint is then protected by default. Named role or scope policies add coarse checks while the guard retains resource authorization.
 
 ### Test the resource authorization matrix (standards/rule/quality-security.test-the-resource-authorization-matrix)
 
 **Default:** Cover anonymous, invalid-token, unrelated-actor, owner, and each privileged grant for every protected operation.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception that names this provision and states its reason, review date, and removal condition.
 
 **Rationale:** The matrix also covers disclosure behavior and the collection query predicate. A UI redirect or hidden control is not evidence.
 
@@ -205,33 +189,30 @@ This informative example demonstrates `standards/rule/quality-security.authorize
 
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/quality-security.keep-backend-authentication-provider-neutral | inspection | `AuthenticationTests` rejects tokens with a wrong issuer, audience, signature, or expiry, and rejects identity headers. |
-| standards/rule/quality-security.derive-the-actor-from-claims | inspection | `ActorIdentityTests` asserts the actor resolves from claims and that request-supplied identifiers are ignored. |
-| standards/rule/quality-security.authorize-each-target-resource | inspection | `TargetAuthorizationTests` asserts each protected single-target operation rejects a non-owner. |
-| standards/rule/quality-security.restrict-a-protected-collection-in-the-database | test | `TargetAuthorizationTests` asserts each protected collection query emits its scope predicate in the captured SQL, before the paging clause. |
-| standards/rule/quality-security.validate-at-trust-boundaries | static | `InputValidationTests` asserts each boundary rejects malformed shape, out-of-range values, and unbounded pagination. |
-| standards/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data | inspection | `SecretScanTests` and the CI secret scan assert no tracked file or emitted diagnostic carries a secret value. |
-| standards/rule/quality-security.parameterize-database-input | inspection | `SqlInjectionTests` asserts no query path concatenates an external value into command text. |
-| standards/rule/quality-security.limit-public-error-detail | inspection | `ErrorDisclosureTests` asserts each public error carries only the four permitted elements. |
-| standards/rule/quality-security.protect-browser-boundaries | inspection | `FrontendSecurityTests` asserts the policy, headers, redirect validation, and forgery protection are present on each response. |
-| standards/rule/quality-security.pin-and-review-dependencies | static | `pnpm install --frozen-lockfile` and the NuGet restore fail when a resolved version differs from its manifest pin. |
-| standards/rule/quality-security.minimize-sensitive-data | inspection | Data review compares each returned and logged field against the field list its use case declares. |
-| standards/rule/quality-security.keep-a-personal-data-inventory-per-store | inspection | Privacy review reads the inventory and matches each store against the fields the code stores. |
-| standards/rule/quality-security.apply-erasure-and-export-to-every-store | test | `ErasureTests` asserts one request clears the database, logs, indexes, and outbox inside the stated bound. |
-| standards/rule/quality-security.keep-personal-data-out-of-logs | inspection | Log review samples emitted records and finds no personal-data value in clear. |
-| standards/rule/quality-security.treat-an-unsalted-digest-of-an-address-as-personal-data | inspection | Data review lists every stored digest with its salt and flags each unsalted one for personal-data handling. |
-| standards/rule/quality-security.report-a-breach-within-72-hours | operation | Incident review confirms the procedure names an owner, a backup person, and the deadline. |
-| standards/rule/quality-security.protect-live-data-at-rest | inspection | Storage review confirms encryption on each live store or a recorded acceptance for the gap. |
-| standards/rule/quality-security.bound-abuse-at-exposed-endpoints | inspection | `RateLimitTests` asserts each declared endpoint returns 429 with its stable code above the configured limit. |
-| standards/rule/quality-security.keep-one-limit-store-across-replicas | inspection | Deployment review confirms the limiter resolves a shared store wherever the replica count is above one. |
-| standards/rule/quality-security.restrict-cross-origin-access | inspection | `CorsTests` asserts an unlisted origin is rejected and no wildcard origin is served with credentials. |
-| standards/rule/quality-security.record-security-audit-events | inspection | `AuditEventTests` asserts each security-relevant operation emits an event carrying all seven fields. |
-| standards/rule/quality-security.rotate-production-secrets | operation | The secret inventory records owner, interval, location, revocation, and the date of the last recovery test. |
-| standards/rule/quality-security.enforce-supply-chain-gates-in-ci | inspection | The CI supply-chain job fails on an unpinned action reference or an unexcepted high-severity advisory. |
-| standards/rule/quality-security.use-one-current-actor-abstraction | inspection | `ArchitectureTests` asserts one actor accessor type exists and Application resolves no claims principal. |
-| standards/rule/quality-security.keep-secure-headers-in-host-configuration | static | `SecureHeaderTests` asserts every required header is present on a representative response. |
-| standards/rule/quality-security.use-deny-by-default-policies | inspection | `AuthorizationPolicyTests` asserts every endpoint without `AllowAnonymous` rejects an anonymous caller. |
-| standards/rule/quality-security.test-the-resource-authorization-matrix | test | `AuthorizationMatrixTests` asserts each protected operation across the five caller cases and its collection predicate. |
+| standards/rule/quality-security.keep-backend-authentication-provider-neutral | guidance | Does the backend validate issuer, audience, signature, lifetime, and claims, and refuse identity headers? |
+| standards/rule/quality-security.derive-the-actor-from-claims | guidance | Does actor resolution follow the WebApi boundary rules this rule cites? |
+| standards/rule/quality-security.authorize-each-target-resource | guidance | Does the guard authorize every protected operation from its declared permissions? |
+| standards/rule/quality-security.restrict-a-protected-collection-in-the-database | guidance | Does every protected collection query apply its scope as a database predicate before paging? |
+| standards/rule/quality-security.validate-at-trust-boundaries | guidance | Does every trust boundary validate its shape and metadata before use? |
+| standards/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data | guidance | Is every secret absent from source, logs, traces, messages, files, URLs, snapshots, layers, and browser storage? |
+| standards/rule/quality-security.parameterize-database-input | guidance | Does every external value reach the database through a query API or parameter? |
+| standards/rule/quality-security.limit-public-error-detail | guidance | Does every public error use the HTTP API error contract? |
+| standards/rule/quality-security.protect-browser-boundaries | guidance | Does every frontend apply escaping, policy, headers, redirect validation, and forgery protection? |
+| standards/rule/quality-security.minimize-sensitive-data | guidance | Does every use case handle only the fields its input and results declare? |
+| standards/rule/quality-security.keep-a-personal-data-inventory-per-store | guidance | Does the inventory name the fields, purposes, and retention of each store? |
+| standards/rule/quality-security.apply-erasure-and-export-to-every-store | guidance | Do erasure and export reach every store, with backups expiring inside their bound? |
+| standards/rule/quality-security.keep-personal-data-out-of-logs | guidance | Is personal data absent in clear from every log, trace, and diagnostic record? |
+| standards/rule/quality-security.treat-an-unsalted-digest-as-personal-data | guidance | Does every unsalted digest of personal data receive personal-data handling? |
+| standards/rule/quality-security.report-a-breach-within-its-deadline | guidance | Does the breach procedure name an owner, a backup person, and meet its deadline? |
+| standards/rule/quality-security.protect-live-data-at-rest | guidance | Is every live store encrypted, or covered by an Exception naming this rule? |
+| standards/rule/quality-security.bound-abuse-at-exposed-endpoints | guidance | Does every exposed endpoint declare its limit, and answer 429 above it? |
+| standards/rule/quality-security.keep-one-limit-store-across-replicas | guidance | Do all replicas read rate and concurrency counters from one store? |
+| standards/rule/quality-security.restrict-cross-origin-access | guidance | Does the cross-origin policy list origins, methods, headers, and credential mode without a wildcard origin? |
+| standards/rule/quality-security.record-security-audit-events | guidance | Does every security audit event record actor, action, target, outcome, timestamp, trace, and reason? |
+| standards/rule/quality-security.rotate-production-secrets | guidance | Does every production secret have a secret-inventory entry and a revocation runbook? |
+| standards/rule/quality-security.use-one-current-actor-abstraction | guidance | Does WebApi expose one current-actor accessor, or does an Exception record the replacement? |
+| standards/rule/quality-security.keep-secure-headers-in-host-configuration | guidance | Are the secure headers defined in one host location, or is an Exception recorded? |
+| standards/rule/quality-security.use-deny-by-default-policies | guidance | Is every new endpoint protected by default, or is an Exception recorded? |
+| standards/rule/quality-security.test-the-resource-authorization-matrix | guidance | Does every protected operation pass each caller case the convention lists, or is an Exception recorded? |
