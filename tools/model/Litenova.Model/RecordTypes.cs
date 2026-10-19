@@ -52,7 +52,8 @@ static class RecordTypes
     /// </summary>
     public static readonly Dictionary<string, HashSet<string>> LinkTargets = new(StringComparer.Ordinal)
     {
-        ["decides"] = ["requirement", "feature", "rule"],
+        ["decides"] = ["requirement", "feature", "rule", "constraint"],
+        ["deliveredBy"] = ["feature"],
         ["basedOn"] = ["constraint", "research"],
         ["affects"] = ["actor"],
         ["solves"] = ["problem"],

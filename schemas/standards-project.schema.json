@@ -49,6 +49,19 @@
         "enum": ["constraint", "research", "limit", "runbook"]
       }
     },
+    "proof": {
+      "description": "How the model builder confirms proof claims for this project.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "jobTriggerSteps": {
+          "description": "Steps classes whose when steps run a job, such as one that moves a simulated clock.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" }
+        }
+      }
+    },
     "constraints": {
       "description": "Present once the project has stated which outside constraints apply to it, possibly none.",
       "type": "object",

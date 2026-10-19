@@ -62,6 +62,9 @@ sealed class ConsumerConfig
     /// <summary>The optional types the project records.</summary>
     public IReadOnlyList<string> OptionalTypes { get; private set; } = [];
 
+    /// <summary>The steps classes whose when steps run a job, such as one that moves a simulated clock.</summary>
+    public IReadOnlyList<string> JobTriggerSteps { get; private set; } = [];
+
     /// <summary>
     ///     Reads the declaration, falling back to the documented defaults.
     /// </summary>
@@ -122,6 +125,19 @@ sealed class ConsumerConfig
                 .. optional.EnumerateArray()
                              .Where(entry => entry.ValueKind == JsonValueKind.String)
                              .Select(entry => entry.GetString()!),
+            ];
+        }
+
+        if (document.RootElement.TryGetProperty("proof", out var proof)
+            && proof.ValueKind == JsonValueKind.Object
+            && proof.TryGetProperty("jobTriggerSteps", out var triggers)
+            && triggers.ValueKind == JsonValueKind.Array)
+        {
+            config.JobTriggerSteps =
+            [
+                .. triggers.EnumerateArray()
+                           .Where(entry => entry.ValueKind == JsonValueKind.String)
+                           .Select(entry => entry.GetString()!),
             ];
         }
 

@@ -39,6 +39,7 @@ sealed class ProjectModel
     public List<CallsLink> Calls { get; } = [];
     public List<ProvesLink> Proves { get; } = [];
     public Dictionary<string, UseCaseStatus> Status { get; } = new(StringComparer.Ordinal);
+    public Dictionary<string, string> EffectiveStatus { get; } = new(StringComparer.Ordinal);
 
     /// <summary>Failure codes by the class whose literal carries them.</summary>
     public Dictionary<string, HashSet<string>> ExceptionCodes { get; } = new(StringComparer.Ordinal);
@@ -74,6 +75,7 @@ sealed class ProjectModel
                 writer.WriteString("title", record.Title);
                 WriteNullable(writer, "owner", record.Owner);
                 WriteNullable(writer, "status", record.Status);
+                WriteNullable(writer, "effectiveStatus", EffectiveStatus.GetValueOrDefault(record.Id));
                 WriteNullable(writer, "decider", record.Decider);
                 WriteNullable(writer, "decideBy", record.DecideBy);
 

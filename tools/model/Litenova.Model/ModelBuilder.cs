@@ -42,6 +42,7 @@ static class ModelBuilder
             ComputeExceptionCodes(model);
             ComputeProves(model);
             ComputeStatus(model);
+            ComputeAuthority(model);
         });
 
         Console.Error.WriteLine($"[time] build total {total.Elapsed.TotalSeconds:0.0}s");
@@ -139,9 +140,15 @@ static class ModelBuilder
                 ? code.Class[..^"Event".Length]
                 : code.Class);
 
+            var owner = OwnerOfEventFile(model, code.File);
             var match = events.FirstOrDefault(record =>
-                Identifiers.TrySplit(record.Id, out _, out _, out var name)
-                && name == kebab);
+                    Identifiers.TrySplit(record.Id, out _, out var home, out var name)
+                    && name == kebab
+                    && owner is not null
+                    && home == owner)
+                ?? events.FirstOrDefault(record =>
+                    Identifiers.TrySplit(record.Id, out _, out _, out var name)
+                    && name == kebab);
 
             if (match is not null)
             {
@@ -150,6 +157,74 @@ static class ModelBuilder
                     model.Config.Relative(code.File), match.Id, "event"));
             }
         }
+    }
+
+    /// <summary>
+    ///     Computes each record's effective status: draft when the record is a draft, when a draft
+    ///     decision decides it, or when a requirement it fulfils is effectively a draft. A result or
+    ///     a case takes its use case's effective status.
+    /// </summary>
+    private static void ComputeAuthority(ProjectModel model)
+    {
+        var draftDecided = model.Records
+            .Where(record => record.Type == "decision" && record.Status == "draft")
+            .SelectMany(decision => decision.Ids("decides"))
+            .ToHashSet(StringComparer.Ordinal);
+
+        string Own(Record record) =>
+            record.Status == "draft" || draftDecided.Contains(record.Id) ? "draft" : record.Status ?? "approved";
+
+        foreach (var record in model.Records.Where(record => record.Type is "requirement" or "feature" or "constraint" or "product" or "decision"))
+        {
+            model.EffectiveStatus[record.Id] = Own(record);
+        }
+
+        foreach (var record in model.Records.Where(record => record.Type is "rule" or "use-case" or "journey"))
+        {
+            var own = Own(record);
+            var inherited = record.Ids("fulfils").Any(id =>
+                model.EffectiveStatus.TryGetValue(id, out var status) && status == "draft");
+
+            model.EffectiveStatus[record.Id] = own == "approved" && inherited ? "draft" : own;
+        }
+
+        foreach (var record in model.Records.Where(record => record.Type is "result" or "case"))
+        {
+            var own = Own(record);
+            var useCase = Identifiers.TrySplit(record.Id, out _, out var home, out _) && home is not null
+                ? UseCaseOf(model, home)
+                : null;
+            var inherited = useCase is not null
+                && model.EffectiveStatus.TryGetValue(useCase.Id, out var status)
+                && status == "draft";
+
+            model.EffectiveStatus[record.Id] = own == "approved" && inherited ? "draft" : own;
+        }
+    }
+
+    /// <summary>
+    ///     The name of the business record whose page folder mirrors the code folder holding
+    ///     the event: <c>Domain/&lt;Module&gt;/&lt;Plural&gt;/Events/</c> beside <c>modules/&lt;module&gt;/&lt;plural&gt;/</c>.
+    /// </summary>
+    private static string? OwnerOfEventFile(ProjectModel model, string file)
+    {
+        var parts = file.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var events = Array.LastIndexOf(parts, "Events");
+
+        if (events < 2)
+        {
+            return null;
+        }
+
+        var plural = Naming.Kebab(parts[events - 1]);
+        var module = Naming.Kebab(parts[events - 2]);
+
+        var owner = model.Records.FirstOrDefault(record =>
+            record.Type == "business-record"
+            && Path.GetFileName(Path.GetDirectoryName(record.File)) == plural
+            && Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(record.File))) == module);
+
+        return owner is not null && Identifiers.TrySplit(owner.Id, out _, out _, out var name) ? name : null;
     }
 
     private static void ComputeImplements(ProjectModel model)
@@ -327,7 +402,7 @@ static class ModelBuilder
         {
             if (BackgroundOnly(model, useCase))
             {
-                return test.Steps.Any(step => step.Phase == "then");
+                return Triggers(model, test, useCase) && AssertsThrough(test, home);
             }
 
             if (!Belongs(test, home) && !Calls(model, test, home))
@@ -414,6 +489,48 @@ static class ModelBuilder
             && step.ReceiverType is { } type
             && model.StepCalls.TryGetValue($"{type}.{step.Method}", out var called)
             && called.Contains(operation));
+    }
+
+    /// <summary>
+    ///     Whether a when step sets a background use case off: it drives a use case that raises
+    ///     an event the reaction reacts to, or it is a step of a declared job trigger.
+    /// </summary>
+    private static bool Triggers(ProjectModel model, ScenarioInfo test, Record useCase)
+    {
+        var reactsTo = useCase.Ids("reactsTo").ToHashSet(StringComparer.Ordinal);
+
+        if (reactsTo.Count > 0)
+        {
+            var producers = model.Records
+                .Where(record => record.Type == "use-case" && record.Ids("raises").Any(reactsTo.Contains))
+                .Select(record => Identifiers.TrySplit(record.Id, out _, out _, out var name) ? name : null)
+                .OfType<string>();
+
+            if (producers.Any(producer => Belongs(test, producer) || Calls(model, test, producer)))
+            {
+                return true;
+            }
+        }
+
+        var jobs = useCase.Ids("reachedThrough").Any(entry =>
+            model.ById.TryGetValue(entry, out var point) && point.Field("kind") == "job");
+
+        return jobs && test.Steps.Any(step =>
+            step.Phase == "when"
+            && model.Config.JobTriggerSteps.Any(trigger =>
+                string.Equals(step.ReceiverType, trigger, StringComparison.Ordinal)
+                || string.Equals(step.Receiver, trigger.EndsWith("Steps", StringComparison.Ordinal) ? trigger[..^"Steps".Length] : trigger, StringComparison.OrdinalIgnoreCase)));
+    }
+
+    /// <summary>Whether a then step of the use case's own steps class asserts the effect.</summary>
+    private static bool AssertsThrough(ScenarioInfo test, string home)
+    {
+        var stepsClass = Naming.Pascal(home) + "Steps";
+
+        return test.Steps.Any(step =>
+            step.Phase == "then"
+            && (string.Equals(step.ReceiverType, stepsClass, StringComparison.Ordinal)
+                || string.Equals(step.Receiver, stepsClass[..^"Steps".Length], StringComparison.OrdinalIgnoreCase)));
     }
 
     private static bool Belongs(ScenarioInfo test, string home)

@@ -6,7 +6,7 @@ namespace Litenova.Model;
 /// <summary>
 ///     Every model check: schema, identifiers, citations, gates, proof and reach.
 /// </summary>
-static class Checker
+static partial class Checker
 {
     /// <summary>Every finding code a known gap may name.</summary>
     public static readonly HashSet<string> Codes = new(StringComparer.Ordinal)
@@ -19,6 +19,19 @@ static class Checker
         "profile-type-missing", "product-not-singleton",
         "journey-reach", "use-case-access", "result-status", "region-unknown",
         "use-case-without-case", "requirement-unfulfilled",
+        "business-record-name-clash", "decision-decides-nothing", "link-unresolved",
+    };
+
+    /// <summary>Requirement kinds that code makes true, so some rule, use case or journey fulfils them.</summary>
+    private static readonly HashSet<string> FulfilledKinds = new(StringComparer.Ordinal)
+    {
+        "promise", "behaviour", "quality",
+    };
+
+    /// <summary>Feature states under which a requirement is not yet, or never, made true by code.</summary>
+    private static readonly HashSet<string> UndeliveredStates = new(StringComparer.Ordinal)
+    {
+        "planned", "later", "refused",
     };
 
     /// <summary>Runs every check, partitioning findings from known gaps.</summary>
@@ -33,6 +46,7 @@ static class Checker
         Time("gates", () => CheckGates(model, findings));
         Time("proof", () => CheckProof(model, findings));
         Time("fulfilment", () => CheckFulfilment(model, findings));
+        Time("links", () => CheckLinks(model, findings));
         Time("access", () => CheckAccess(model, findings));
         Time("status", () => CheckResultStatus(model, findings));
         Time("regions", () => CheckRegions(model, findings));
@@ -189,12 +203,18 @@ static class Checker
                 break;
 
             case "requirement":
-                RequireEnum(record, "kind", ["promise", "behaviour", "quality"], findings);
+                RequireEnum(record, "kind", ["promise", "behaviour", "quality", "target", "practice"], findings);
                 RequireString(record, "statement", findings);
 
                 if (record.Field("kind") == "promise")
                 {
                     RequireArray(record, "values", 1, findings);
+                }
+
+                if (record.Field("kind") == "target")
+                {
+                    RequireString(record, "measure", findings);
+                    RequireString(record, "by", findings);
                 }
 
                 break;
@@ -412,6 +432,11 @@ static class Checker
 
     private static void CheckReplaces(ProjectModel model, Record record, List<Finding> findings)
     {
+        if (record.Type != "decision" && record.Ids("replaces").Any())
+        {
+            findings.Add(new Finding("invalid-field", $"Record '{record.Id}' carries replaces; only a decision replaces another record.", record.File, record.Line, SubjectOf(record)));
+        }
+
         foreach (var target in record.Ids("replaces"))
         {
             if (model.ById.TryGetValue(target, out var resolved) && resolved.Type != record.Type)
@@ -472,9 +497,9 @@ static class Checker
                 moduleNames.Add(name);
             }
 
-            if (record.Type == "business-record")
+            if (record.Type == "business-record" && !recordNames.Add(name))
             {
-                recordNames.Add(name);
+                findings.Add(new Finding("business-record-name-clash", $"Business-record name '{name}' is used twice; rule and event homes cannot resolve.", record.File, record.Line, SubjectOf(record)));
             }
 
             if (record.Type == "use-case")
@@ -774,6 +799,14 @@ static class Checker
             }
         }
 
+        foreach (var decision in model.Records.Where(record => record.Type == "decision" && record.Status != "retired"))
+        {
+            if (!decision.Ids("decides").Any())
+            {
+                findings.Add(new Finding("decision-decides-nothing", $"Decision '{decision.Id}' names nothing it decides.", decision.File, decision.Line, SubjectOf(decision)));
+            }
+        }
+
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         foreach (var gap in model.Records.Where(record => record.Type == "known-gap"))
@@ -822,7 +855,16 @@ static class Checker
 
         foreach (var requirement in model.Records.Where(record => record.Type == "requirement" && record.Status != "retired"))
         {
-            if (!fulfilled.Contains(requirement.Id))
+            if (!FulfilledKinds.Contains(requirement.Field("kind") ?? ""))
+            {
+                continue;
+            }
+
+            var undelivered = requirement.Ids("deliveredBy").Any(id =>
+                model.ById.TryGetValue(id, out var feature)
+                && UndeliveredStates.Contains(feature.Field("state") ?? ""));
+
+            if (!fulfilled.Contains(requirement.Id) && !undelivered)
             {
                 findings.Add(new Finding("requirement-unfulfilled", $"Requirement '{requirement.Id}' is fulfilled by no rule, use case or journey.", requirement.File, requirement.Line, SubjectOf(requirement)));
             }
@@ -908,6 +950,59 @@ static class Checker
             }
         }
     }
+
+    private static void CheckLinks(ProjectModel model, List<Finding> findings)
+    {
+        var found = new System.Collections.Concurrent.ConcurrentBag<Finding>();
+
+        Parallel.ForEach(model.Bodies, body =>
+        {
+            var text = WithoutCode(body.Body);
+            var starts = LineStarts(text);
+            var folder = Path.GetDirectoryName(body.File) ?? ".";
+
+            foreach (Match match in MarkdownLink().Matches(text))
+            {
+                var target = match.Groups["target"].Value.Trim('<', '>');
+
+                if (target.Length == 0 || target.StartsWith('#') || UriScheme().IsMatch(target))
+                {
+                    continue;
+                }
+
+                var path = Uri.UnescapeDataString(target.Split('#')[0].Split('?')[0]);
+                var resolved = Path.GetFullPath(Path.Combine(folder, path.Replace('/', Path.DirectorySeparatorChar)));
+
+                if (!File.Exists(resolved) && !Directory.Exists(resolved))
+                {
+                    found.Add(new Finding("link-unresolved", $"Link '{target}' resolves to no file.", body.File, body.BodyStartLine + LineOf(starts, match.Index) - 1, body.PageId));
+                }
+            }
+        });
+
+        findings.AddRange(found);
+    }
+
+    /// <summary>Blanks fenced and inline code, keeping offsets and line breaks, so links in examples are not read.</summary>
+    private static string WithoutCode(string text)
+    {
+        static string Blank(Match match) => Regex.Replace(match.Value, @"[^\r\n]", " ");
+
+        var fenced = FencedCode().Replace(text, Blank);
+        return InlineCode().Replace(fenced, Blank);
+    }
+
+    [GeneratedRegex(@"!?\[[^\]\r\n]*\]\((?<target>[^)\s]+)(?:\s+""[^""]*"")?\)")]
+    private static partial Regex MarkdownLink();
+
+    [GeneratedRegex(@"^[a-zA-Z][a-zA-Z0-9+.-]*:")]
+    private static partial Regex UriScheme();
+
+    [GeneratedRegex(@"(?ms)^[ \t]*(```|~~~).*?^[ \t]*\1[^\r\n]*$")]
+    private static partial Regex FencedCode();
+
+    [GeneratedRegex(@"`[^`\r\n]*`")]
+    private static partial Regex InlineCode();
 
     private static void CheckAccess(ProjectModel model, List<Finding> findings)
     {

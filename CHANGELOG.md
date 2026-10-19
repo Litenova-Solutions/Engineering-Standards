@@ -4,11 +4,14 @@
 
 This release describes every project as one typed model. People and agents write intent records, a builder reads the code, screens, tests, and test runs, and the links between the two are computed. `docs/core/model.md` owns the record types, the links, the authority order, and the size and stack profiles.
 
-- Product, Constraint, Research, Decision, and Requirement state why the product exists and what it must do or guarantee. A Requirement is a promise, a behaviour, or a quality, and a promise carries effective-dated values.
+- Product, Constraint, Research, Decision, and Requirement state why the product exists and what it must do or guarantee. A Requirement is a promise, a behaviour, a quality, a target, or a practice, and a promise carries effective-dated values.
 - Problem and Feature state who hurts and what the product offers against it. A Feature is planned, shipped, later, or refused.
 - Actor, Role, and Permission state who acts and what each may do. Journey and Entry point state how each reaches the product.
 - Module, Business record, Rule, Use case, Result, Case, and Event state how the business works and what each operation returns. A Case is one working example, and a Result is one success or one named refusal.
 - Limit and Runbook state the bounds the product runs within and how to run it.
+- Only a decision carries `replaces`. Every decision names what it decides, and every Markdown link on a page points at an existing file.
+- A target or practice requirement is measured or kept outside the code; a planned, later, or refused feature delivers a requirement the code does not keep yet.
+- The builder writes each record's effective status, matches a domain event within the business record that owns its folder, and confirms a reaction or job case only when a when step sets it off and its own then step asserts the effect.
 - Standard, Exception, and Known gap state how the project builds, where it departs, and what it lacks. Term states what each word means, in each language the product ships.
 - Each record carries an owner and a status of draft, approved, or retired. A draft names its decider and a decide-by date. A record is replaced, never edited after approval.
 - Added the model builder at `tools/model/`. It reads the written records with the code, routes, tests, and latest test run, and writes `model.json` with the computed implements, calls, and proves links. `check` runs the model checks, `render` writes the generated page regions, and `query` answers an agent asking about one record.

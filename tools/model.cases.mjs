@@ -42,6 +42,9 @@ const FINDING_CODES = [
   'use-case-access',
   'result-status',
   'region-unknown',
+  'business-record-name-clash',
+  'decision-decides-nothing',
+  'link-unresolved',
 ];
 
 const repository = path.dirname(path.dirname(fileURLToPath(import.meta.url)));

@@ -31,7 +31,7 @@ The record types and links are defined in [docs/core/model.md](model.md).
 | Constraint | An outside rule the product must obey, with its source and whether it applies. |
 | Research | An outside fact behind a choice, with the sources read and the question asked. |
 | Decision | A dated choice with options, decider, evidence, and what would change it. |
-| Requirement | One testable commitment: a promise, a behaviour, or a quality. |
+| Requirement | One commitment: a promise, behaviour, or quality the code keeps, or a target or practice kept elsewhere. |
 | Problem | A pain or job someone has today, with who it affects. |
 | Feature | What the product offers against a problem: planned, shipped, later, or refused. |
 | Product topic | One page of business intent holding Requirement entries. |
@@ -88,7 +88,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 **Requirement:** Each Requirement entry MUST carry one identifier `requirement/<topic>.<name>` naming its own page, with kind, statement, and for a promise its values with effective dates.
 
-**Rationale:** An identifier lets a record name the commitment it fulfils, and lets the model resolve the name. A commitment written only as prose cannot be traced. Kinds are promise, behaviour, and quality, as [docs/core/model.md](model.md) defines.
+**Rationale:** An identifier lets a record name the commitment it fulfils, and lets the model resolve the name. A commitment written only as prose cannot be traced. Kinds are promise, behaviour, quality, target, and practice. A target names what is counted in `measure` and the date or milestone in `by`. A practice is a commitment kept in how the company works. Any requirement may name in `deliveredBy` the planned, later, or refused feature that carries it.
 
 ### Cite requirements from records (standards/rule/core-product.cite-requirements-from-records)
 
@@ -178,9 +178,9 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 ### Reject an unfulfilled requirement (standards/rule/core-product.reject-an-unfulfilled-requirement)
 
-**Requirement:** A consumer MUST fail its checks on a requirement no record fulfils, unless a Known gap names it with owner and end date.
+**Requirement:** A consumer MUST fail its checks on a promise, behaviour, or quality requirement that nothing fulfils or delivers, outside a Known gap.
 
-**Rationale:** A list nobody clears separates planned work from nothing. The gap states whether the requirement is dated work or intent that never becomes code.
+**Rationale:** A rule, use case, or journey fulfils a requirement, and a planned, later, or refused feature delivers it. A target or practice is measured or kept outside the code, so deleting one to clear the check loses intent. Planned work belongs to its feature, so a Known gap marks only what nobody owns.
 
 ### Build on a draft decision before approval (standards/rule/core-product.build-on-a-draft-decision-before-approval)
 

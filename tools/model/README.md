@@ -50,6 +50,16 @@ business record whose folder holds its page. Each `proves` link carries
 `indirect`, which is true when the use case runs only through reactions or
 jobs.
 
+A scenario proves a case of a use case reached only by a reaction or a job when
+a when step sets it off and a then step of the use case's own steps class
+asserts the effect. For a reaction, the when step drives a use case that raises
+an event in `reactsTo`. For a job, the when step belongs to a steps class named
+in `proof.jobTriggerSteps`, such as one that moves a simulated clock.
+
+Each record also carries `effectiveStatus`: draft when the record, a decision
+deciding it, or a requirement it fulfils is a draft. A result or a case takes
+its use case's effective status.
+
 A use case is implemented when a handler, a tagged reaction, or a tagged job
 carries it. It is verified when it has at least one case and every case is
 proved by a passing test. Without test results nothing is verified.
@@ -68,6 +78,7 @@ default.
 | `paths.webapi` | `apps/api/src/*.WebApi` |
 | `paths.infrastructure` | `apps/api/src/*.Infrastructure` |
 | `paths.testRoots` | `[]` |
+| `proof.jobTriggerSteps` | `[]` |
 | `paths.frontends[].path` | — |
 | `paths.apiClient` | `packages/api` |
 | `paths.testResults` | `TestResults` |

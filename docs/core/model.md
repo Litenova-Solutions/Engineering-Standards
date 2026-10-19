@@ -96,7 +96,7 @@ Every written record carries the shared fields. Entries inherit owner and status
 | `status` | pages; entries inherit | Draft, approved, or retired |
 | `decider` | on drafts | The owner deciding by the date |
 | `decideBy` | on drafts | The decision date in ISO form |
-| `replaces` | when replacing | The identifier this record replaces |
+| `replaces` | decision, when replacing | The decision this decision replaces |
 | `terms` | when used | The term identifiers the record uses |
 
 ### Links
@@ -122,7 +122,7 @@ Written links live as fields on the record they start from.
 | `steps` | journey | Ordered use cases with actors |
 | `dependsOn` | module | Modules |
 | `terms` | any record | Terms |
-| `replaces` | any record | The replaced record of its type |
+| `replaces` | decision | The replaced decision |
 
 Containment follows the identifier: a business record belongs to its module, and a result belongs to the use case named in its identifier. The builder computes the remaining links from code, routes, and tests: implements, calls, and proves.
 
@@ -190,7 +190,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Requirement:** A record MUST NOT stand approved behind a draft decision.
 
-**Rationale:** Approval means the reasoning behind the record already holds.
+**Rationale:** Approval means the reasoning behind the record already holds. The builder also writes each record's `effectiveStatus`: draft when the record, a decision deciding it, or a requirement it fulfils is a draft. A result or a case takes its use case's effective status.
 
 ### Record accepted gaps as known gaps (standards/rule/core-model.record-accepted-gaps-as-known-gaps)
 
@@ -228,9 +228,21 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 ### Retire records with replaces (standards/rule/core-model.retire-records-with-replaces)
 
-**Requirement:** A replacement MUST name the record it replaces.
+**Requirement:** A replacing decision MUST name the decision it replaces, and no other record type carries `replaces`.
 
-**Rationale:** Both records stay: the old one stands retired beside the new one.
+**Rationale:** Decisions alone keep the past: the old one stands retired beside the new one. Every other record changes in place, and a rename rewrites every citation in the same change.
+
+### Name what every decision decides (standards/rule/core-model.name-what-every-decision-decides)
+
+**Requirement:** Every decision that is not retired MUST name in `decides` at least one requirement, feature, rule, or constraint.
+
+**Rationale:** The draft gate and the computed effective status follow `decides`. A decision that names nothing holds back nothing, so its approval state means nothing.
+
+### Resolve every page link (standards/rule/core-model.resolve-every-page-link)
+
+**Requirement:** Every Markdown link outside code on a page under the record roots MUST point at an existing file, by its relative path.
+
+**Rationale:** A link shaped like an identifier, or to a moved file, reads as navigation and leads nowhere. An identifier is cited in backticks, and a link names a file.
 
 ### Declare size stacks and optional types (standards/rule/core-model.declare-size-stacks-and-optional-types)
 
@@ -287,7 +299,9 @@ Generated regions sit inside fences that only the builder writes and prose check
 | standards/rule/core-model.authorize-access-through-the-permission-chain | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape` and `reference-unresolved`. |
 | standards/rule/core-model.express-module-order-as-depends-on | guidance | Does any record rank modules instead of linking them? |
 | standards/rule/core-model.keep-one-owner-and-status-on-every-record | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `owner-unknown` and `draft-without-decider`. |
-| standards/rule/core-model.retire-records-with-replaces | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `reference-unresolved`. |
+| standards/rule/core-model.retire-records-with-replaces | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `invalid-field` for `replaces` outside a decision and `reference-unresolved` for an unknown target. |
+| standards/rule/core-model.name-what-every-decision-decides | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `decision-decides-nothing`. |
+| standards/rule/core-model.resolve-every-page-link | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `link-unresolved`. |
 | standards/rule/core-model.declare-size-stacks-and-optional-types | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `profile-type-missing` and `record-shape`. |
 | standards/rule/core-model.give-every-use-case-its-results | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `use-case-without-success` and `case-result-unresolved`. |
 | standards/rule/core-model.cover-every-public-use-case-from-a-journey | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `journey-reach`. |
