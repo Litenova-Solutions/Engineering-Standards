@@ -59,7 +59,7 @@ static class CodeReader
 
         var files = new List<string>();
 
-        foreach (var root in new[] { config.ApplicationRoot, config.DomainRoot, config.WebApiRoot, config.InfrastructureRoot })
+        foreach (var root in new[] { config.ApplicationRoot, config.ApplicationRoot + ".Abstractions", config.DomainRoot, config.WebApiRoot, config.InfrastructureRoot })
         {
             files.AddRange(SourceTree.Files(root, ".cs"));
         }
