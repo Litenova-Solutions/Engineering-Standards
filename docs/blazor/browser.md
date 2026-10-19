@@ -11,7 +11,7 @@ Browser storage is the only durable store in a client-only product. It is small,
 - A changed shape ships a migration that reads every released version. (standards/rule/blazor-browser.provide-a-migration-for-every-changed-shape)
 - A read returns a typed result covering unavailable, absent, corrupt, and present. (standards/rule/blazor-browser.treat-reads-as-fallible)
 - A growing collection declares its bound and eviction rule. (standards/rule/blazor-browser.bound-what-is-stored)
-- Durable state exports to one file and imports from it. (standards/rule/blazor-browser.provide-export-and-import)
+- Durable state exports to one versioned file and imports from it. (standards/rule/blazor-browser.provide-export-and-import)
 
 ## Standards
 
@@ -27,13 +27,13 @@ Browser storage is the only durable store in a client-only product. It is small,
 
 **Rationale:** The version segment increments when the stored shape changes incompatibly. A raw string literal elsewhere in the code is a second, unversioned declaration.
 
-**Example:** `taal.progress.v1` names its product, its area, and its shape version.
+**Example:** `shop.cart.v1` names its product, its area, and its shape version.
 
 ### Provide a migration for every changed shape (standards/rule/blazor-browser.provide-a-migration-for-every-changed-shape)
 
 **Requirement:** A change to a persisted shape MUST ship a migration that reads every previously released version and produces the current one.
 
-**Rationale:** The migration runs at startup before the store reports ready. Data it cannot interpret is preserved under a quarantine key and reported, because deleting unreadable user data is not a recovery.
+**Rationale:** The migration runs at startup before the store finishes loading. Data it cannot interpret is preserved under a quarantine key and reported, because deleting unreadable user data is not a recovery.
 
 ### Treat reads as fallible (standards/rule/blazor-browser.treat-reads-as-fallible)
 
@@ -49,11 +49,9 @@ Browser storage is the only durable store in a client-only product. It is small,
 
 ### Provide export and import (standards/rule/blazor-browser.provide-export-and-import)
 
-**Requirement:** Durable state MUST export to one file the user can save and import from that same file.
+**Requirement:** Durable state MUST export to one versioned file that imports the same version, transforms an older version, and refuses a newer version.
 
-**Rationale:** This is the only recovery path in a product with no server, so it is required rather than optional. Device-local state is excluded from the export.
-
-The file carries its own schema version, and the import path states what it does with each one it can meet. The same version imports. An older version imports through a stated transformation. A newer version is refused, with a message naming the application version that wrote it. A partial import of an unknown shape loses data silently.
+**Rationale:** The user saves the file, which is the only recovery path in a product with no server. Device-local state is excluded from the export. The file carries its own schema version. A refusal names the application version that wrote the file. A partial import of an unknown shape loses data silently.
 
 ## Conventions
 
@@ -83,14 +81,14 @@ The file carries its own schema version, and the import path states what it does
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/blazor-browser.own-storage-in-infrastructure | test | `ClientArchitectureTests` asserts every storage call resolves the Application interface. |
-| standards/rule/blazor-browser.version-and-scope-every-storage-key | test | `StorageKeyTests` asserts each key is a declared constant matching the naming form. |
-| standards/rule/blazor-browser.provide-a-migration-for-every-changed-shape | test | `StorageMigrationTests` reads a record written in each released version and asserts the current shape. |
-| standards/rule/blazor-browser.treat-reads-as-fallible | test | `StorageAdapterTests` covers the unavailable, absent, corrupt, and present outcomes. |
-| standards/rule/blazor-browser.bound-what-is-stored | inspection | Each persisting specification names its collection bound and eviction rule. |
-| standards/rule/blazor-browser.provide-export-and-import | test | `PortabilityTests` asserts an export reimports to identical durable state. |
-| standards/rule/blazor-browser.select-the-storage-mechanism-per-shape | inspection | Storage review matches each persisted shape to its declared mechanism. |
-| standards/rule/blazor-browser.keep-a-stable-serialization-contract | test | `SerializationTests` asserts a record with an unknown property still reads. |
-| standards/rule/blazor-browser.record-the-classification | test | `StorageKeyTests` asserts durable and device-local keys use separate prefixes. |
+| standards/rule/blazor-browser.own-storage-in-infrastructure | guidance | Does every storage call resolve the Application interface? |
+| standards/rule/blazor-browser.version-and-scope-every-storage-key | guidance | Is each key a declared constant carrying product, area, and version? |
+| standards/rule/blazor-browser.provide-a-migration-for-every-changed-shape | guidance | Does each changed shape ship a migration reading every released version? |
+| standards/rule/blazor-browser.treat-reads-as-fallible | guidance | Does the adapter return unavailable, absent, corrupt, and present as typed outcomes? |
+| standards/rule/blazor-browser.bound-what-is-stored | guidance | Does each persisting specification state its collection bound and eviction rule? |
+| standards/rule/blazor-browser.provide-export-and-import | guidance | Does an export reimport to identical durable state, refusing a newer version? |
+| standards/rule/blazor-browser.select-the-storage-mechanism-per-shape | guidance | Does each persisted shape use its declared mechanism? |
+| standards/rule/blazor-browser.keep-a-stable-serialization-contract | guidance | Does a record with an unknown property still read? |
+| standards/rule/blazor-browser.record-the-classification | guidance | Do durable and device-local keys use separate prefixes? |

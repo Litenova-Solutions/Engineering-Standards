@@ -12,6 +12,7 @@ A client component renders what it is given and reports what the user did. Busin
 - A view model exposes no Domain or Application type. (standards/rule/blazor-components.own-the-layer-contract)
 - Browser access runs through an Application interface. (standards/rule/blazor-components.resolve-browser-behavior-through-an-interface)
 - One component per file, named for what it renders. (standards/rule/blazor-components.place-one-component-per-file)
+- Focus, keyboard, labelling, and announcements live in the owning component. (standards/rule/blazor-components.keep-accessibility-in-the-component)
 
 ## Standards
 
@@ -37,7 +38,7 @@ A client component renders what it is given and reports what the user did. Busin
 
 **Requirement:** A feature view model MUST expose no Domain aggregate, Domain closed set, or Application result record.
 
-**Rationale:** Each layer mirrors the shape it needs, as the baseline layer ownership rule requires. Shared-kernel typed identifiers and value objects are the one sanctioned crossing.
+**Rationale:** Each layer mirrors the shape it needs, as `standards/rule/backend-architecture.own-each-layers-contract-types` requires. Shared-kernel typed identifiers and value objects are the one sanctioned crossing.
 
 This rule and `standards/rule/blazor-structure.keep-domain-free-of-browser-concerns` guard the same boundary from opposite sides. That rule keeps browser types out of Domain. This rule keeps Domain types out of the view. Neither implies the other, because a view model can name an aggregate without Domain naming a component.
 
@@ -52,6 +53,12 @@ This rule and `standards/rule/blazor-structure.keep-domain-free-of-browser-conce
 **Requirement:** A `.razor` file MUST declare one routable or reusable component named for what it renders.
 
 **Rationale:** Bundling components by kind hides each one. A component with more than trivial logic uses a code-behind partial class rather than a large inline block.
+
+### Keep accessibility in the component (standards/rule/blazor-components.keep-accessibility-in-the-component)
+
+**Requirement:** A component MUST own focus management, keyboard interaction, labelling, and live-region announcements for its interaction.
+
+**Rationale:** A page that composes the component cannot know which element should receive focus.
 
 ## Conventions
 
@@ -71,24 +78,16 @@ This rule and `standards/rule/blazor-structure.keep-domain-free-of-browser-conce
 
 **Rationale:** A hard-coded color, spacing value, or font size duplicates a token that already exists.
 
-### Keep accessibility in the component (standards/rule/blazor-components.keep-accessibility-in-the-component)
-
-**Default:** Place focus management, keyboard interaction, labelling, and live-region announcements in the component that owns the interaction.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** A page that composes the component cannot know which element should receive focus.
-
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/blazor-components.keep-components-presentational | test | `ClientArchitectureTests` asserts no component resolves storage, interop, or a Domain service. |
-| standards/rule/blazor-components.declare-every-parameter-type | test | `ComponentContractTests` asserts each parameter declares a feature-owned concrete type. |
-| standards/rule/blazor-components.raise-events-rather-than-mutating | test | `ComponentContractTests` asserts each child reports upward through a callback parameter. |
-| standards/rule/blazor-components.own-the-layer-contract | test | `ClientArchitectureTests` asserts no view model exposes a Domain or Application type. |
-| standards/rule/blazor-components.resolve-browser-behavior-through-an-interface | test | `ClientArchitectureTests` asserts no component injects the interop runtime directly. |
-| standards/rule/blazor-components.place-one-component-per-file | test | `ComponentContractTests` asserts each component file declares one primary component. |
-| standards/rule/blazor-components.name-for-the-boundary-role | inspection | Naming review compares each feature component against its rendered role. |
-| standards/rule/blazor-components.apply-one-styling-system | inspection | Style review locates each color, spacing, and font value in the token set. |
-| standards/rule/blazor-components.keep-accessibility-in-the-component | test | `ComponentAccessibilityTests` covers keyboard paths and announcements for each interactive component. |
+| standards/rule/blazor-components.keep-components-presentational | guidance | Does any component resolve storage, interop, or a Domain service? |
+| standards/rule/blazor-components.declare-every-parameter-type | guidance | Does each parameter declare a feature-owned concrete type? |
+| standards/rule/blazor-components.raise-events-rather-than-mutating | guidance | Does each child report upward through a callback parameter? |
+| standards/rule/blazor-components.own-the-layer-contract | guidance | Does any view model expose a Domain or Application type? |
+| standards/rule/blazor-components.resolve-browser-behavior-through-an-interface | guidance | Does any component inject the interop runtime directly? |
+| standards/rule/blazor-components.place-one-component-per-file | guidance | Does each component file declare one primary component? |
+| standards/rule/blazor-components.keep-accessibility-in-the-component | guidance | Do keyboard paths and announcements work in each interactive component? |
+| standards/rule/blazor-components.name-for-the-boundary-role | guidance | Does each feature component name match its rendered role? |
+| standards/rule/blazor-components.apply-one-styling-system | guidance | Is each color, spacing, and font value a defined token? |

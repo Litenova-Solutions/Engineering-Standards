@@ -7,7 +7,7 @@ The client has four test projects matching its four boundaries. Core tests run w
 ## Agent Summary {#agent-summary}
 
 - Four test projects match the four client boundaries. (standards/rule/blazor-testing.use-the-four-client-test-projects)
-- Every acceptance criterion of a verified use case is cited by a test. (standards/rule/blazor-testing.cite-acceptance-criteria)
+- Each Case is proved by a test calling the use case and asserting the Result. (standards/rule/blazor-testing.prove-each-case-with-a-test)
 - Domain and Application tests run with no browser or storage. (standards/rule/blazor-testing.test-the-core-without-a-browser)
 - Component tests substitute every Application interface. (standards/rule/blazor-testing.replace-interop-in-component-tests)
 - A browser suite covers the primary flow, storage loss, offline, and portability. (standards/rule/blazor-testing.verify-real-browser-behavior-end-to-end)
@@ -31,11 +31,11 @@ tests/
   {ProjectName}.EndToEnd.Tests/        real browser flows
 ```
 
-### Cite acceptance criteria (standards/rule/blazor-testing.cite-acceptance-criteria)
+### Prove each case with a test (standards/rule/blazor-testing.prove-each-case-with-a-test)
 
-**Requirement:** Every acceptance criterion of a verified use case MUST appear in at least one automated test.
+**Requirement:** Each Case of a use case MUST be proved by an automated test whose steps call the use case and assert the Result.
 
-**Rationale:** A use case is not verified until its identifiers appear in tests, matching the baseline rule.
+**Rationale:** A test proves a Case only when its steps call the use case and assert the Result. The link is then computed from the test rather than claimed in prose. A Case no test proves is recorded as a Known gap with an owner and an end date.
 
 ### Test the core without a browser (standards/rule/blazor-testing.test-the-core-without-a-browser)
 
@@ -47,7 +47,7 @@ tests/
 
 **Requirement:** A component test MUST inject a test double for every Application interface, including interop.
 
-**Rationale:** Coverage includes keyboard interaction and the loading, empty, and error states each route declares. A component test starts no browser and asserts on user-visible output rather than markup structure.
+**Rationale:** Coverage includes keyboard interaction and the states each route declares. A component test starts no browser and asserts on user-visible output rather than markup structure.
 
 ### Verify real browser behavior end to end (standards/rule/blazor-testing.verify-real-browser-behavior-end-to-end)
 
@@ -83,13 +83,13 @@ The measurement names the tool that produced it and the compression it applied. 
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/blazor-testing.use-the-four-client-test-projects | test | `ClientSolutionTests` asserts the four test projects exist and run in CI. |
-| standards/rule/blazor-testing.cite-acceptance-criteria | static | `node standards/tools/validate-consumer.mjs` resolves each acceptance identifier to a test reference. |
-| standards/rule/blazor-testing.test-the-core-without-a-browser | test | `ClientArchitectureTests` asserts no core test project references a browser or interop type. |
-| standards/rule/blazor-testing.replace-interop-in-component-tests | test | `ComponentContractTests` asserts each render substitutes every Application interface. |
-| standards/rule/blazor-testing.verify-real-browser-behavior-end-to-end | test | `EndToEndTests` covers the primary flow, storage loss, offline startup, and export with import. |
-| standards/rule/blazor-testing.enforce-the-first-load-budget | operation | The CI budget job compares published transfer size against the Operating Limits value. |
-| standards/rule/blazor-testing.keep-browser-capability-tests-honest | test | `CapabilityTests` covers the supported and unsupported path of each capability-dependent feature. |
-| standards/rule/blazor-testing.keep-end-to-end-tests-few | inspection | Browser suite review confirms each case maps to a required flow or a named interaction. |
+| standards/rule/blazor-testing.use-the-four-client-test-projects | guidance | Do the four test projects exist and run in CI? |
+| standards/rule/blazor-testing.prove-each-case-with-a-test | guidance | Does each Case have a test whose steps call the use case and assert the Result? |
+| standards/rule/blazor-testing.test-the-core-without-a-browser | guidance | Does any core test project reference a browser or interop type? |
+| standards/rule/blazor-testing.replace-interop-in-component-tests | guidance | Does each render substitute every Application interface? |
+| standards/rule/blazor-testing.verify-real-browser-behavior-end-to-end | guidance | Does the browser suite cover the primary flow, storage loss, offline startup, and portability? |
+| standards/rule/blazor-testing.enforce-the-first-load-budget | guidance | Does the CI publish job fail when transfer size exceeds the recorded budget? |
+| standards/rule/blazor-testing.keep-browser-capability-tests-honest | guidance | Does each capability-dependent feature test both its paths? |
+| standards/rule/blazor-testing.keep-end-to-end-tests-few | guidance | Does each browser case map to a required flow or named interaction? |

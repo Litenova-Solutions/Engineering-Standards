@@ -31,7 +31,7 @@ Every use case runs through Application. State carries a declared classification
 
 **Requirement:** Persisted state MUST load once during startup into a typed store that components read from.
 
-**Rationale:** A component reading storage on render turns every frame into an input-output call. A route renders its loading state until the store reports ready.
+**Rationale:** A component reading storage on render turns every frame into an input-output call. A route renders its loading state until the store finishes loading.
 
 ### Keep derived values single-sourced (standards/rule/blazor-data.keep-derived-values-single-sourced)
 
@@ -71,13 +71,13 @@ Every use case runs through Application. State carries a declared classification
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/blazor-data.route-use-cases-through-application | test | `ClientArchitectureTests` asserts no component resolves a Domain service or storage adapter. |
-| standards/rule/blazor-data.classify-state | inspection | Each specification introducing state names one of the three classifications. |
-| standards/rule/blazor-data.load-persisted-state-once | test | `StartupStateTests` asserts persisted state loads before the first content render. |
-| standards/rule/blazor-data.keep-derived-values-single-sourced | inspection | Derived-value review locates one computation site for each value. |
-| standards/rule/blazor-data.validate-at-the-boundary | test | `ValidationTests` asserts each form failure originates from its Application validator. |
-| standards/rule/blazor-data.make-failure-explicit | test | `HandlerResultTests` covers success and each named failure of every handler union. |
-| standards/rule/blazor-data.keep-forms-typed | test | `FormContractTests` asserts each form binds a feature-owned model and maps to a command. |
-| standards/rule/blazor-data.prefer-explicit-refresh | inspection | Mutation review confirms the store updates from the result rather than a follow-up query. |
+| standards/rule/blazor-data.route-use-cases-through-application | guidance | Does any component resolve a Domain service or storage adapter? |
+| standards/rule/blazor-data.classify-state | guidance | Does each specification introducing state name one classification? |
+| standards/rule/blazor-data.load-persisted-state-once | guidance | Does persisted state load before the first render? |
+| standards/rule/blazor-data.keep-derived-values-single-sourced | guidance | Does each derived value have one computation site? |
+| standards/rule/blazor-data.validate-at-the-boundary | guidance | Does each form failure originate from its Application validator? |
+| standards/rule/blazor-data.make-failure-explicit | guidance | Does each handler union cover success and every named failure? |
+| standards/rule/blazor-data.keep-forms-typed | guidance | Does each form bind a feature-owned model and map to a command? |
+| standards/rule/blazor-data.prefer-explicit-refresh | guidance | Does the store update from each result without a follow-up query? |

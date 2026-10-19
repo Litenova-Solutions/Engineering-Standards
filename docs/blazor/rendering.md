@@ -8,7 +8,7 @@ The client renders entirely in the browser. Routes declare their own templates a
 
 - Rendering runs in the browser with no server round trip. (standards/rule/blazor-rendering.render-on-the-client-only)
 - A routable component declares its own template under `Pages/`. (standards/rule/blazor-rendering.declare-routes-on-pages)
-- Each route defines loading, empty, error, and content behavior. (standards/rule/blazor-rendering.give-every-route-explicit-states)
+- Each route defines loading, empty, error, forbidden, not-found, and ready behavior. (standards/rule/blazor-rendering.give-every-route-explicit-states)
 - Pages a first-time visitor reads download no runtime. (standards/rule/blazor-rendering.keep-the-acquisition-surface-static)
 - The application starts and navigates offline after first load. (standards/rule/blazor-rendering.operate-offline-after-first-load)
 
@@ -18,7 +18,7 @@ The client renders entirely in the browser. Routes declare their own templates a
 
 **Requirement:** A page MUST render without server-side execution at first paint.
 
-**Rationale:** Interactive server rendering, automatic render mode, and prerendering each require a live server connection, so all three are outside this profile.
+**Rationale:** Interactive server rendering, automatic render mode, and prerendering each require a live server connection, so all three are outside this stack.
 
 ### Declare routes on pages (standards/rule/blazor-rendering.declare-routes-on-pages)
 
@@ -28,9 +28,9 @@ The client renders entirely in the browser. Routes declare their own templates a
 
 ### Give every route explicit states (standards/rule/blazor-rendering.give-every-route-explicit-states)
 
-**Requirement:** A route MUST define its loading, empty, error, and content behavior.
+**Requirement:** A route MUST define its loading, empty, error, forbidden, not-found, and ready behavior.
 
-**Rationale:** A route reading persisted state renders its loading state until the read completes, so it never shows content from an unloaded store.
+**Rationale:** A route reading persisted state renders its loading state until the read completes, so it never shows an unloaded store as ready. All six apply to a client-rendered route: an unparsable parameter renders not-found, and a route the actor is not allowed to read renders forbidden. Each state name is a term in the project's language record.
 
 ### Keep the acquisition surface static (standards/rule/blazor-rendering.keep-the-acquisition-surface-static)
 
@@ -66,12 +66,12 @@ The rule covers the online case as much as the offline one. A cached shell serve
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/blazor-rendering.render-on-the-client-only | test | `PublishOutputTests` asserts the output declares no render mode requiring a server. |
-| standards/rule/blazor-rendering.declare-routes-on-pages | test | `RouteContractTests` asserts each routable component declares one template with typed parameters. |
-| standards/rule/blazor-rendering.give-every-route-explicit-states | test | `RouteStateTests` asserts each route renders its loading, empty, error, and content states. |
-| standards/rule/blazor-rendering.keep-the-acquisition-surface-static | test | `AcquisitionTests` asserts a landing page loads without fetching the framework payload. |
-| standards/rule/blazor-rendering.operate-offline-after-first-load | test | `OfflineStartupTests` starts the application with the network disabled after a first load. |
-| standards/rule/blazor-rendering.name-routes-for-the-reader | inspection | Route review compares each template against its documented use-case name. |
-| standards/rule/blazor-rendering.keep-navigation-state-in-the-url | inspection | Navigation review confirms refresh-surviving state appears in the route or query string. |
+| standards/rule/blazor-rendering.render-on-the-client-only | guidance | Does the published output declare no server render mode? |
+| standards/rule/blazor-rendering.declare-routes-on-pages | guidance | Does each routable component declare one template with typed parameters? |
+| standards/rule/blazor-rendering.give-every-route-explicit-states | guidance | Does each route render its six states, with not-found for bad parameters? |
+| standards/rule/blazor-rendering.keep-the-acquisition-surface-static | guidance | Does each landing page load without fetching the framework payload? |
+| standards/rule/blazor-rendering.operate-offline-after-first-load | guidance | Does the application start offline after first load, with stated limits? |
+| standards/rule/blazor-rendering.name-routes-for-the-reader | guidance | Does each template match its documented use-case name? |
+| standards/rule/blazor-rendering.keep-navigation-state-in-the-url | guidance | Does refresh-surviving state appear in the route or query string? |

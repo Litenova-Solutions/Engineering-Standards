@@ -18,7 +18,7 @@ The client is one Blazor WebAssembly application organized around the same busin
 
 **Requirement:** A client solution MUST contain Domain, Application, Infrastructure, and Web production projects and no server project.
 
-**Rationale:** This replaces the `apps/api/` solution path in the workspace structure convention, because a client-only consumer has no API directory.
+**Rationale:** This replaces the API solution path in `standards/rule/workspace-structure.use-the-canonical-root-tree`, because a client-only consumer has no API directory.
 
 **Example:**
 
@@ -95,12 +95,12 @@ Infrastructure -> Application and Domain
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/blazor-structure.use-the-client-solution-tree | test | `ClientSolutionTests` asserts four production projects exist and no server project is present. |
-| standards/rule/blazor-structure.organize-features-by-module-and-use-case | test | `ClientArchitectureTests` asserts each feature path resolves to a declared module and use case. |
-| standards/rule/blazor-structure.isolate-module-internals | test | `ClientArchitectureTests` asserts no cross-module reference resolves an internal feature type. |
-| standards/rule/blazor-structure.keep-imports-directional | test | `ClientArchitectureTests` asserts the project reference graph matches the declared direction. |
-| standards/rule/blazor-structure.keep-domain-free-of-browser-concerns | test | `ClientArchitectureTests` asserts Domain and Application reference no browser or interop type. |
-| standards/rule/blazor-structure.place-interop-adapters-together | inspection | Interop review locates each adapter and its matching script, or records a named local replacement. |
-| standards/rule/blazor-structure.keep-static-content-out-of-the-assembly | inspection | Published output serves runtime content from `wwwroot/` rather than an embedded resource. |
+| standards/rule/blazor-structure.use-the-client-solution-tree | guidance | Do four production projects exist, with no server project? |
+| standards/rule/blazor-structure.organize-features-by-module-and-use-case | guidance | Does each feature path resolve to a declared module and use case? |
+| standards/rule/blazor-structure.isolate-module-internals | guidance | Does any cross-module reference resolve an internal feature type? |
+| standards/rule/blazor-structure.keep-imports-directional | guidance | Does the reference graph match the declared direction? |
+| standards/rule/blazor-structure.keep-domain-free-of-browser-concerns | guidance | Do Domain and Application reference any browser or interop type? |
+| standards/rule/blazor-structure.place-interop-adapters-together | guidance | Does each adapter sit beside its matching script, or record a replacement? |
+| standards/rule/blazor-structure.keep-static-content-out-of-the-assembly | guidance | Does published output serve runtime content from `wwwroot/` rather than embedded resources? |
