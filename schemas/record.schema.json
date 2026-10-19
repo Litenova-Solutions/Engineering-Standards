@@ -226,7 +226,15 @@
           { "$ref": "#/$defs/requirementId" },
           { "$ref": "#/$defs/featureId" },
           { "$ref": "#/$defs/ruleId" },
-          { "$ref": "#/$defs/constraintId" }
+          { "$ref": "#/$defs/constraintId" },
+          { "$ref": "#/$defs/permissionId" },
+          { "$ref": "#/$defs/roleId" },
+          { "$ref": "#/$defs/actorId" },
+          { "$ref": "#/$defs/exceptionId" },
+          { "$ref": "#/$defs/projectStandardId" },
+          { "$ref": "#/$defs/entryPointId" },
+          { "$ref": "#/$defs/limitId" },
+          { "$ref": "#/$defs/decisionId" }
         ]
       }
     },

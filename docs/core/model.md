@@ -105,7 +105,7 @@ Written links live as fields on the record they start from.
 
 | Field | Written on | Points at |
 |:---|:---|:---|
-| `decides` | decision | Requirements, features, rules, constraint answers |
+| `decides` | decision | Requirements, features, rules, constraints, and the permissions, roles, actors, exceptions, standards, entry points, limits, or decisions an engineering choice settles |
 | `basedOn` | decision, requirement, rule | Constraints, research |
 | `affects` | problem | Actors |
 | `solves` | feature | Problems |
@@ -234,7 +234,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 ### Name what every decision decides (standards/rule/core-model.name-what-every-decision-decides)
 
-**Requirement:** Every decision that is not retired MUST name in `decides` at least one requirement, feature, rule, or constraint.
+**Requirement:** Every decision that is not retired MUST name at least one record it settles in `decides`.
 
 **Rationale:** The draft gate and the computed effective status follow `decides`. A decision that names nothing holds back nothing, so its approval state means nothing.
 
