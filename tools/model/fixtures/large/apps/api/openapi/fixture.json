@@ -1,0 +1,49 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Fixture",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/lending/borrow-copy": {
+      "post": {
+        "operationId": "BorrowCopy"
+      }
+    },
+    "/api/lending/return-copy": {
+      "post": {
+        "operationId": "ReturnCopy"
+      }
+    },
+    "/api/lending/extend-loan": {
+      "post": {
+        "operationId": "ExtendLoan"
+      }
+    },
+    "/api/lending/list-loans": {
+      "get": {
+        "operationId": "ListLoans"
+      }
+    },
+    "/api/lending/register-copy": {
+      "post": {
+        "operationId": "RegisterCopy"
+      }
+    },
+    "/api/lending/retire-copy": {
+      "post": {
+        "operationId": "RetireCopy"
+      }
+    },
+    "/api/lending/place-hold": {
+      "post": {
+        "operationId": "PlaceHold"
+      }
+    },
+    "/api/lending/cancel-hold": {
+      "post": {
+        "operationId": "CancelHold"
+      }
+    }
+  }
+}

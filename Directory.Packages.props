@@ -1,0 +1,10 @@
+<Project>
+    <!--
+        The one source of package versions for the standards repository's own
+        tools. Kept beside Directory.Build.props so the consumer's central
+        versions do not apply inside the standards repository.
+    -->
+    <ItemGroup>
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+<Project>
+    <!--
+        The standards repository builds its own tools with its own settings.
+        A consumer checks this repository out as a submodule, so without this
+        file the consumer's root MSBuild files would apply inside it.
+    -->
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+        <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    </PropertyGroup>
+</Project>

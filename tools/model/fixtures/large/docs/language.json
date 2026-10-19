@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "terms": [
+    {
+      "id": "term/loan",
+      "term": "loan",
+      "meaning": "A copy lent to a reader until its due date.",
+      "labels": {
+        "nl": "lening",
+        "de": "Leihe"
+      },
+      "rejected": [
+        {
+          "word": "checkout",
+          "reason": "Checkout names the desk action."
+        }
+      ],
+      "owner": "lending-team",
+      "status": "approved"
+    },
+    {
+      "id": "term/copy",
+      "term": "copy",
+      "meaning": "One physical item the library lends.",
+      "labels": {
+        "nl": "exemplaar",
+        "de": "Exemplar"
+      },
+      "rejected": [],
+      "owner": "lending-team",
+      "status": "approved"
+    },
+    {
+      "id": "term/hold",
+      "term": "hold",
+      "meaning": "A reader queue for one copy.",
+      "labels": {
+        "nl": "reservering",
+        "de": "Vormerkung"
+      },
+      "rejected": [],
+      "owner": "lending-team",
+      "status": "approved"
+    },
+    {
+      "id": "term/reader",
+      "term": "reader",
+      "meaning": "A person holding a library card.",
+      "labels": {
+        "nl": "lezer",
+        "de": "Leser"
+      },
+      "rejected": [],
+      "owner": "lending-team",
+      "status": "approved"
+    }
+  ],
+  "mannered": [
+    {
+      "term": "one-way-door",
+      "instead": "irreversible"
+    }
+  ]
+}
