@@ -51,10 +51,11 @@ business record whose folder holds its page. Each `proves` link carries
 jobs.
 
 A scenario proves a case of a use case reached only by a reaction or a job when
-a when step sets it off and a then step of the use case's own steps class
-asserts the effect. For a reaction, the when step drives a use case that raises
-an event in `reactsTo`. For a job, the when step belongs to a steps class named
-in `proof.jobTriggerSteps`, such as one that moves a simulated clock.
+a when step sets it off and the scenario asserts an effect: the refusal's code,
+or a then step from a class not named in `proof.outcomeOnlySteps`. An
+integration test proves a case when it names the use case's message type or
+requests one of its endpoint routes. A known gap naming a use case also covers
+proof and result findings about its cases and results.
 
 Each record also carries `effectiveStatus`: draft when the record, a decision
 deciding it, or a requirement it fulfils is a draft. A result or a case takes
@@ -79,6 +80,7 @@ default.
 | `paths.infrastructure` | `apps/api/src/*.Infrastructure` |
 | `paths.testRoots` | `[]` |
 | `proof.jobTriggerSteps` | `[]` |
+| `proof.outcomeOnlySteps` | `[]` |
 | `paths.frontends[].path` | — |
 | `paths.apiClient` | `packages/api` |
 | `paths.testResults` | `TestResults` |
