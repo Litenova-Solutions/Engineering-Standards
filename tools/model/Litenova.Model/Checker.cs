@@ -676,8 +676,12 @@ static partial class Checker
             }
         }
 
-        Collect(Identifiers.Citation.Matches(text), Identifiers.TrimCitation);
-        Collect(Identifiers.SharedCitation().Matches(text), value => value);
+        // A link target is a file path, so a path that starts with a record type's name, such as
+        // product/brief.md, is not a citation. Blanking the targets keeps every offset in place.
+        var prose = LinkTarget().Replace(text, match => "](" + new string(' ', match.Length - 3) + ")");
+
+        Collect(Identifiers.Citation.Matches(prose), Identifiers.TrimCitation);
+        Collect(Identifiers.SharedCitation().Matches(prose), value => value);
 
         foreach (var entry in cited.OrderBy(left => left.Value).ThenBy(left => left.Key, StringComparer.Ordinal))
         {
@@ -1008,6 +1012,9 @@ static partial class Checker
 
     [GeneratedRegex(@"^[a-zA-Z][a-zA-Z0-9+.-]*:")]
     private static partial Regex UriScheme();
+
+    [GeneratedRegex(@"\]\([^)\s]*\)")]
+    private static partial Regex LinkTarget();
 
     [GeneratedRegex(@"(?ms)^[ \t]*(```|~~~).*?^[ \t]*\1[^\r\n]*$")]
     private static partial Regex FencedCode();
