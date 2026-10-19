@@ -847,7 +847,7 @@ function normalizeTemplate(relative, raw) {
 const REMOVED_IDENTIFIER_PATTERNS = [
   /\b(?:acceptance-criterion|authorization|invariant|policy|validation|flow|workflow|end-to-end-flow|domain-policy|aggregate|value|path)\/[A-Za-z0-9][\w.-]*/g,
   /\b(?!standards\/)[a-z][a-z0-9-]*\/rule\/[A-Za-z0-9][\w.-]*/g,
-  /\b(?:AC|AUTZ|INV|POL|VAL|RULE)(?:-[A-Z0-9]+)*-[0-9]{2,}\b|\bE2E-[0-9]+\b/g,
+  /\b(?:AC|AUTZ|INV|POL|VAL|RULE)(?:-[A-Z][A-Z0-9]*)+-[0-9]{2,}\b|\bE2E-[0-9]+\b/g,
 ];
 const WORKFLOW_KIND_PATTERNS = [
   /\bWorkflows?\b/g,
