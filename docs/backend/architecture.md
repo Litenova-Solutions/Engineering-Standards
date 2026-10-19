@@ -2,33 +2,38 @@
 
 ## Intent
 
-
 The backend is a five-project modular monolith. Project boundaries separate business rules, the contracts every layer names, use-case coordination, technical adapters, and HTTP hosting without splitting each concern into a separate assembly.
 
 CQRS separates write and read behavior inside one Application project. Modules and use cases provide the internal navigation boundary.
 
 ## Agent Summary {#agent-summary}
 
-
-- Domain, Application.Abstractions, Application, Infrastructure, and WebApi are the five baseline projects. (standards/rule/backend-architecture.use-five-application-projects)
-- Project references point inward and never outward. (standards/rule/backend-architecture.point-dependencies-inward)
-- Each layer defines its own messages, results, and transport models. (standards/rule/backend-architecture.own-each-layers-contract-types)
-- One Application project holds every message, handler, and module-owned port. (standards/rule/backend-architecture.keep-one-application-assembly)
-- A type lives at the lowest folder holding its consumers, and every layer repeats the same module and aggregate order. (standards/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers, standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case)
-- Handlers, validators, and implementations stay internal and sealed. (standards/rule/backend-architecture.keep-implementation-types-internal)
-- Aggregates own invariants; handlers only coordinate. (standards/rule/backend-architecture.keep-business-invariants-in-domain)
-- Commands write through repositories; queries read projections. (standards/rule/backend-architecture.separate-command-and-query-behavior)
-- Background work names its execution host, and a Worker project is one option. (standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request, standards/rule/backend-architecture.create-a-worker-project-when-background-work-needs-its-own-process)
-- Architecture tests prove every structural boundary. (standards/rule/backend-architecture.test-structural-boundaries)
+- Five baseline projects form the modular monolith. (standards/rule/backend-architecture.use-five-application-projects)
+- References point inward while each layer owns its contracts. (standards/rule/backend-architecture.point-dependencies-inward, standards/rule/backend-architecture.own-each-layers-contract-types)
+- One Application project holds messages, handlers, and module-owned ports. (standards/rule/backend-architecture.keep-one-application-assembly)
+- Module and aggregate order folders in every layer. (standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case, standards/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers)
+- Handlers, validators, and endpoint code stay internal and sealed. (standards/rule/backend-architecture.keep-implementation-types-internal)
+- Aggregates enforce transitions while commands write and queries project. (standards/rule/backend-architecture.keep-business-invariants-in-domain, standards/rule/backend-architecture.separate-command-and-query-behavior)
+- A Decision names the execution host for background work. (standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request, standards/rule/backend-architecture.create-a-worker-project-when-background-work-needs-its-own-process)
+- Architecture tests prove the structural boundaries. (standards/rule/backend-architecture.test-structural-boundaries)
+- Each process composes itself without a second provider. (standards/rule/backend-architecture.compose-each-process-explicitly, standards/rule/backend-architecture.keep-composition-in-hosts)
+- Scanned projects expose one public assembly marker. (standards/rule/backend-architecture.use-one-public-assembly-marker-per-scanned-project)
 
 ## Standards
-
 
 ### Use five application projects (standards/rule/backend-architecture.use-five-application-projects)
 
 **Requirement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline projects.
 
-**Example:** An application layout can contain:
+**Rationale:** `Application.Abstractions` holds the contracts more than one module names: the pipeline's own positions, the cross-module ports, the transport-neutral failures, and the published integration events. It references Domain and the required LiteBus module abstractions, and nothing else. No type in it can name a use case, a handler, or a module.
+
+That refusal is the reason it is a project rather than a folder. A folder inside Application cannot decline what a developer puts in it, and the folder that tries becomes the place every unplaced type goes.
+
+An implementation never belongs there. The project name states the test, and a type that cannot pass it belongs to a module under `standards/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers`.
+
+`AppHost` and `ServiceDefaults` support local hosting and diagnostics. They are hosts, not application layers.
+
+**Example:**
 
 ```text
 apps/api/src/{ProjectName}.Domain/
@@ -38,12 +43,6 @@ apps/api/src/{ProjectName}.Infrastructure/
 apps/api/src/{ProjectName}.WebApi/
 ```
 
-`Application.Abstractions` holds the contracts more than one module names: the pipeline's own positions, the cross-module ports, the transport-neutral failures, and the published integration events. It references Domain and nothing else, so no type in it can name a use case, a handler, or a module. That refusal is the reason it is a project rather than a folder. A folder inside Application cannot decline what a developer puts in it, and the folder that tries becomes the place every unplaced type goes.
-
-An implementation never belongs there. The project name states the test, and a type that cannot pass it belongs to a module under `standards/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers`.
-
-`AppHost` and `ServiceDefaults` support local hosting and diagnostics. They are hosts, not application layers.
-
 ### Point dependencies inward (standards/rule/backend-architecture.point-dependencies-inward)
 
 **Requirement:** A project reference MUST point inward, so Domain references no outer layer and WebApi composes the process.
@@ -52,13 +51,13 @@ An implementation never belongs there. The project name states the test, and a t
 
 ### Own each layer's contract types (standards/rule/backend-architecture.own-each-layers-contract-types)
 
-**Requirement:** A layer MUST define its own messages, results, and transport models rather than reuse an inner layer's type as its outward contract.
+**Requirement:** A layer MUST define its own outward contracts rather than reuse an inner layer's type, except for Shared-kernel values and aggregate typed IDs.
 
-**Rationale:** A change to an inner shape then stops rippling through every outer layer. The Shared kernel is the one sanctioned exception.
+**Rationale:** A change to an inner shape then stops rippling through every outer layer. Shared-kernel values cross because the kernel is shared, and aggregate typed IDs cross because messages name their targets.
 
 ### Keep one Application assembly (standards/rule/backend-architecture.keep-one-application-assembly)
 
-**Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, orchestrators, and ports in one Application project.
+**Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application project, and cross-module contracts in Application.Abstractions.
 
 **Rationale:** Separate Write, Read, Contracts, and event-handler assemblies are outside this profile. The separation this profile keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the assemblies holding them. Splitting assemblies buys a deployment boundary the profile does not use, and costs a project reference that every use case has to cross.
 
@@ -68,16 +67,46 @@ An implementation never belongs there. The project name states the test, and a t
 
 **Rationale:** An aggregate stays flat only when its plural name equals the single module name. Module is an organization term, not a runtime base type, so no `IModule` or `ModuleRoot` contract exists.
 
+Infrastructure holds module folders beside its provider-wide Persistence root, because provider plumbing serves every module and belongs to none.
+
 A folder named for a technical grouping rather than a module defeats the rule, because the next unrelated type fits it. `Shared`, `Common`, `Util`, `Helpers`, `Core`, and `Misc` inside a layer are the names that do this.
 
-**Example:** The architecture test asserts the folder names directly, because a rule only a reviewer checks stops holding at the first missed file.
+**Example:**
+
+```text
+# single-aggregate module whose aggregate name matches the module: the aggregate stays flat in every layer
+Domain/Posts/
+Application/Posts/CreateDraft/
+Infrastructure/Posts/
+WebApi/Endpoints/Posts/CreateDraft/
+
+# multi-aggregate module: module, then plural aggregate folder, then operation, mirrored in every layer
+Domain/Customers/CustomerAccounts/
+Domain/Customers/Consents/
+Application/Customers/CustomerAccounts/RestrictAccount/
+Application/Customers/Consents/GrantConsent/
+Infrastructure/Customers/CustomerAccounts/
+Infrastructure/Customers/Consents/
+WebApi/Endpoints/Customers/CustomerAccounts/RestrictAccount/
+WebApi/Endpoints/Customers/Consents/GrantConsent/
+
+# Infrastructure keeps provider-wide plumbing under Persistence, beside the module folders
+Infrastructure/Persistence/Marten/
+Infrastructure/Posts/
+Infrastructure/Customers/CustomerAccounts/
+```
+
+The architecture test asserts the folder names directly, because a rule only a reviewer checks stops holding at the first missed file.
 
 ```csharp
 Types.InAssembly(ApplicationAssemblyMarker.Assembly)
     .Should()
     .NotResideInNamespaceContaining("Shared")
     .And().NotResideInNamespaceContaining("Common")
+    .And().NotResideInNamespaceContaining("Util")
     .And().NotResideInNamespaceContaining("Helpers")
+    .And().NotResideInNamespaceContaining("Core")
+    .And().NotResideInNamespaceContaining("Misc")
     .GetResult()
     .IsSuccessful.Should().BeTrue();
 ```
@@ -90,13 +119,13 @@ Types.InAssembly(ApplicationAssemblyMarker.Assembly)
 
 Two kinds of type travel with something else rather than by their own consumer count. A type that exists only to shape one contract's input or output stays with that contract, and a closed enumerated set stays whole.
 
-The rule is mechanical, so placement is counted rather than judged. The contracts project is what remains after the count rather than a destination anyone chooses. A folder named for the absence of a reason (`Shared`, `Common`, `Util`, `Helpers`) can refuse nothing. Such a folder accumulates until a tenth of the layer sits outside the module tree, unreviewed, and named for no aggregate.
+The rule is mechanical, so placement is counted rather than judged. The contracts project is what remains after the count rather than a destination anyone chooses. A folder named for the absence of a reason (`Shared`, `Common`, `Util`, `Helpers`, `Core`, `Misc`) can refuse nothing. Such a folder accumulates until a tenth of the layer sits outside the module tree, unreviewed, and named for no aggregate.
 
 Domain's shared kernel is the one folder of that name a solution keeps. Its membership is closed by `standards/rule/backend-architecture.own-each-layers-contract-types` rather than open to whatever needs a home. A service that coordinates several aggregates lives in the module that owns the aggregates it reads and writes, not with whichever module calls it first.
 
 ### Keep implementation types internal (standards/rule/backend-architecture.keep-implementation-types-internal)
 
-**Requirement:** A handler, validator, persistence implementation, or endpoint implementation MUST be declared `internal sealed`.
+**Requirement:** A handler, validator, definition, persistence implementation, or endpoint implementation MUST be declared `internal sealed`.
 
 **Rationale:** Messages, results, assembly markers, and ports stay public only when another project uses them. Assembly scanning is not a reason to widen visibility.
 
@@ -114,13 +143,15 @@ Domain's shared kernel is the one folder of that name a solution keeps. Its memb
 
 ### Declare the execution host for work that outlives a request (standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request)
 
-**Requirement:** An application MUST declare the execution host that runs its durable dispatch, queue consumption, workflow advancement, and scheduled work.
+**Requirement:** An application MUST declare the execution host that runs its durable dispatch, queue consumption, and scheduled work.
 
 **Rationale:** The declared host is either the WebApi process or a Worker project. A rule that only restricts when a Worker project may exist never says where the work runs without one. A project can then host four background services inside WebApi, deviate from no rule it can name, and record no decision. Naming the host makes the choice visible whichever way it goes.
 
+The declaration lives in a Decision record following `standards/rule/core-model.keep-one-owner-and-status-on-every-record`. Durable dispatch and queue consumption follow the outbox extension, and scheduled work follows the jobs extension.
+
 The host is a composition decision, not a code-placement decision. The background service classes live in Infrastructure either way, because they hold provider and scheduling concerns. The host registers them.
 
-**Example:** A project record naming WebApi as the execution host states that durable dispatch shares the request process, and states what an unavailable process costs.
+**Example:** A Decision naming WebApi as the execution host states that durable dispatch shares the request process, and states what an unavailable process costs.
 
 ### Create a Worker project when background work needs its own process (standards/rule/backend-architecture.create-a-worker-project-when-background-work-needs-its-own-process)
 
@@ -144,48 +175,11 @@ The host is a composition decision, not a code-placement decision. The backgroun
 
 ## Conventions
 
-
-### Use mirrored module folders (standards/rule/backend-architecture.use-mirrored-module-folders)
-
-**Default:** Mirror the module, aggregate, and layer-detail folder order in every layer.
-
-**Replacement:** A consumer can replace this default with an explicit local convention.
-
-**Rationale:** A single-aggregate module stays flat when the aggregate root's plural name equals the module name. Otherwise each aggregate uses its own plural folder.
-
-**Example:**
-
-```text
-# single-aggregate module whose aggregate name matches the module: the aggregate stays flat in every layer
-Domain/Posts/
-Application/Posts/CreateDraft/
-Infrastructure/Posts/
-WebApi/Endpoints/Posts/CreateDraft/
-
-# multi-aggregate module: module, then plural aggregate folder, then operation, mirrored in every layer
-Domain/Customers/CustomerAccounts/
-Domain/Customers/Consents/
-Application/Customers/CustomerAccounts/RestrictAccount/
-Application/Customers/Consents/GrantConsent/
-Infrastructure/Customers/CustomerAccounts/
-Infrastructure/Customers/Consents/
-WebApi/Endpoints/Customers/CustomerAccounts/RestrictAccount/
-WebApi/Endpoints/Customers/Consents/GrantConsent/
-
-# a workflow that coordinates modules uses the separate Workflows path
-Application/Workflows/PublicationDelivery/
-Infrastructure/Workflows/PublicationDelivery/
-```
-
-The mirrored folder names identify one domain module even though each layer owns different responsibilities. A documented workflow that coordinates modules uses the separate `Workflows/{Workflow}` path.
-
-That path exists only where a workflow does. A consumer listing `workflow` in `prohibitedKinds` has no workflow specification and therefore no `Workflows/` folder, so the two settings agree rather than conflict. A `Workflows/` folder in a consumer that prohibits the kind is a folder with no specification behind it.
-
 ### Keep composition in hosts (standards/rule/backend-architecture.keep-composition-in-hosts)
 
 **Default:** Keep service registration in `Program.cs` and host registration modules.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Domain and Application declare abstractions, so a registration call inside either inverts the dependency direction.
 
@@ -202,7 +196,7 @@ WebApiServiceRegistration.AddWebApi(...)
 
 **Default:** Expose one `public static` assembly marker in each project that an approved scanner reads.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** The marker gives the scanner an assembly reference while the scanned handlers stay internal.
 
@@ -216,26 +210,24 @@ Publishing a post follows this direction:
 2. Application loads `Post` through `IPostRepository`.
 3. Domain `Post.Publish` enforces publication rules and raises `PostPublishedEvent`.
 4. Infrastructure stages and commits the document through the command pipeline.
-5. An event reaction implementation handles the event through its documented atomic, durable, rebuildable, or optional delivery path.
+5. An event reaction implementation handles the event through the delivery classification its reaction declares under `standards/rule/backend-application.keep-event-reaction-implementations-explicit`.
 
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/backend-architecture.use-five-application-projects | inspection | `SolutionStructureTests` asserts the solution contains the five baseline projects and no other layer project, and that contracts references Domain alone. |
-| standards/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers | static | `ArchitectureTests` asserts no Application or WebApi folder takes a `Shared, Common, Util, Helpers`, or module name, and every contracts type has cross-module consumers. |
-| standards/rule/backend-architecture.point-dependencies-inward | inspection | `ArchitectureTests` asserts the project reference graph matches the inward matrix in the dependencies convention. |
-| standards/rule/backend-architecture.own-each-layers-contract-types | inspection | `ArchitectureTests` asserts no Application result or WebApi model exposes a Domain type across the layer boundary. |
-| standards/rule/backend-architecture.keep-one-application-assembly | inspection | `SolutionStructureTests` asserts one Application project holds every command, query, handler, and port type. |
-| standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case | static | `ArchitectureTests` asserts each layer folder path resolves to a declared module and aggregate, with no project-wide type folders. |
-| standards/rule/backend-architecture.keep-implementation-types-internal | inspection | `ArchitectureTests` asserts every handler, validator, repository implementation, and endpoint type is internal and sealed. |
-| standards/rule/backend-architecture.keep-business-invariants-in-domain | inspection | `ArchitectureTests` asserts no command handler references an invariant identifier that its aggregate already enforces. |
-| standards/rule/backend-architecture.separate-command-and-query-behavior | inspection | `ArchitectureTests` asserts no query handler resolves a repository and no command handler resolves a read session. |
-| standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request | inspection | The project record or a decision names the execution host for durable dispatch, queue consumption, workflow advancement, and scheduled work. |
-| standards/rule/backend-architecture.create-a-worker-project-when-background-work-needs-its-own-process | inspection | The Worker project decision record names the scaling, deployment, or isolation boundary that requires an independent process. |
-| standards/rule/backend-architecture.test-structural-boundaries | test | `ArchitectureTests` runs in the Release test pass and covers each declared structural boundary. |
-| standards/rule/backend-architecture.compose-each-process-explicitly | inspection | `CompositionTests` asserts no registration path builds a second provider or resolves a service locator. |
-| standards/rule/backend-architecture.use-mirrored-module-folders | inspection | Folder review compares each layer tree against its module list, or records a named local replacement. |
-| standards/rule/backend-architecture.keep-composition-in-hosts | inspection | `ArchitectureTests` asserts no Domain or Application type calls a service-registration method. |
-| standards/rule/backend-architecture.use-one-public-assembly-marker-per-scanned-project | inspection | `ArchitectureTests` asserts each scanned project exposes exactly one public assembly marker type. |
+| standards/rule/backend-architecture.use-five-application-projects | guidance | Does the solution hold exactly the five baseline projects? |
+| standards/rule/backend-architecture.point-dependencies-inward | guidance | Does every project reference point toward Domain without an outward edge? |
+| standards/rule/backend-architecture.own-each-layers-contract-types | guidance | Does each layer define its own contracts apart from kernel values and typed IDs? |
+| standards/rule/backend-architecture.keep-one-application-assembly | guidance | Does one Application project hold every message, handler, and module-owned port? |
+| standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case | guidance | Does each layer folder path resolve to a declared module and aggregate? |
+| standards/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers | guidance | Does each type sit at the lowest folder holding its consumers, with no banned folder name? |
+| standards/rule/backend-architecture.keep-implementation-types-internal | guidance | Is every handler, validator, definition, and endpoint implementation internal and sealed? |
+| standards/rule/backend-architecture.keep-business-invariants-in-domain | guidance | Does every state transition run inside its aggregate or value object? |
+| standards/rule/backend-architecture.separate-command-and-query-behavior | guidance | Do commands mutate through repositories while queries project without aggregates? |
+| standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request | guidance | Which Decision names the execution host for dispatch, queue consumption, and scheduled work? |
+| standards/rule/backend-architecture.create-a-worker-project-when-background-work-needs-its-own-process | guidance | Does background work needing its own process run in a Worker project? |
+| standards/rule/backend-architecture.test-structural-boundaries | guidance | Do the architecture tests prove references, packages, visibility, folders, and inheritance? |
+| standards/rule/backend-architecture.compose-each-process-explicitly | guidance | Does each host register its own services without building a second provider? |
+| standards/rule/backend-architecture.keep-composition-in-hosts | guidance | Does all service registration live in hosts and host modules? |
+| standards/rule/backend-architecture.use-one-public-assembly-marker-per-scanned-project | guidance | Does each scanned project expose exactly one public assembly marker? |

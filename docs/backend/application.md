@@ -2,33 +2,30 @@
 
 ## Intent
 
-
 Application coordinates use cases. It translates a command or query into domain and persistence work, applies structural input validation, and returns a transport-neutral result. It does not contain HTTP behavior or provider implementations.
 
 Every folder in the project is a module, an aggregate, or a use case. The contracts more than one module names live in the sibling `Application.Abstractions` project, and the pipeline's own machinery lives in one folder named for it.
 
 ## Agent Summary {#agent-summary}
 
-
-- One folder per operation holds its message, definition, result, validator, and handler. (standards/rule/backend-application.organize-application-by-operation)
-- Commands and queries dispatch through separate entry points. (standards/rule/backend-application.dispatch-commands-and-queries-through-separate-entry-points)
-- Messages are public when hosts need them; handlers stay internal. (standards/rule/backend-application.co-locate-contracts-and-implementations)
-- Validators check input shape; Domain decides state permission. (standards/rule/backend-application.separate-input-validation-from-invariants)
-- Expected failures throw typed Application exceptions with stable codes. (standards/rule/backend-application.model-expected-use-case-failures-explicitly)
-- Handlers authorize against the target data they load. (standards/rule/backend-application.enforce-target-authorization-in-the-pipeline)
-- Command handlers load, call Domain, stage, and return. (standards/rule/backend-application.keep-command-handlers-narrow)
-- Queries project through the read session, never through aggregates. (standards/rule/backend-application.project-queries-directly)
-- Results mirror the Domain closed set rather than flattening it. (standards/rule/backend-application.mirror-a-domain-closed-set-in-the-result)
-- Ports name the business action, own their types, and sit with the module that owns their aggregates. (standards/rule/backend-application.define-narrow-external-ports, standards/rule/backend-application.declare-a-port-where-its-consumers-meet)
+- One folder per operation holds its message, definition, result, validator, and handler. (standards/rule/backend-application.organize-application-by-operation, standards/rule/backend-application.use-this-operation-layout)
+- Commands and queries dispatch through separate mediator entry points. (standards/rule/backend-application.dispatch-commands-and-queries-through-separate-entry-points, standards/rule/backend-application.use-the-pinned-mediator-entry-points)
+- Validators check input shape and report Validity while Domain decides state permission. (standards/rule/backend-application.separate-input-validation-from-invariants, standards/rule/backend-application.report-input-problems-as-validity)
+- Expected failures throw typed exceptions carrying their Result code. (standards/rule/backend-application.model-expected-use-case-failures-explicitly)
+- The guard authorizes from declared permissions while handlers authorize nothing. (standards/rule/backend-application.enforce-target-authorization-in-the-pipeline, standards/rule/backend-application.declare-every-pipeline-position-beside-the-message)
+- Command handlers load, call, stage, and return without nesting. (standards/rule/backend-application.keep-command-handlers-narrow, standards/rule/backend-application.keep-one-state-changing-use-case-in-one-command-pipeline)
+- Queries project to result records without loading aggregates. (standards/rule/backend-application.project-queries-directly)
+- Results mirror Domain closed sets while narrowing needs a recorded decision. (standards/rule/backend-application.mirror-a-domain-closed-set-in-the-result, standards/rule/backend-application.record-a-decision-for-closed-set-narrowing)
+- Reactions declare one delivery classification and run it. (standards/rule/backend-application.keep-event-reaction-implementations-explicit)
+- Ports stay narrow and declared with consumers while messages stay immutable records mapped at boundaries. (standards/rule/backend-application.define-narrow-external-ports, standards/rule/backend-application.declare-a-port-where-its-consumers-meet, standards/rule/backend-application.keep-messages-immutable, standards/rule/backend-application.return-use-case-results, standards/rule/backend-application.keep-mappings-at-the-owning-boundary)
 
 ## Standards
-
 
 ### Organize Application by operation (standards/rule/backend-application.organize-application-by-operation)
 
 **Requirement:** Each command or query MUST own one operation folder under its module holding its message, result, validator, handler, mapping, and definition of pipeline-read values.
 
-**Rationale:** Grouping by technical type scatters one operation across the project. Type names share the use-case prefix and end in the `Command` or `Query` role. A message declares a value the pipeline reads through `IMessageDefinition<TMessage>.Describe` in a `{UseCase}Definition` in the same folder. An attribute on the message itself carries the value instead, where the value is a constant and the position is an exemption. A definition keeps what the pipeline needs to know beside the operation, rather than in a registry the reader has to find.
+**Rationale:** Grouping by technical type scatters one operation across the project. Type names share the use-case prefix and follow the suffix table under `standards/rule/workspace-naming.use-architectural-suffixes`. Pipeline-read values are declared beside the message under `standards/rule/backend-application.declare-every-pipeline-position-beside-the-message`.
 
 ### Dispatch commands and queries through separate entry points (standards/rule/backend-application.dispatch-commands-and-queries-through-separate-entry-points)
 
@@ -36,61 +33,78 @@ Every folder in the project is a module, an aggregate, or a use case. The contra
 
 **Rationale:** Two entry points keep the write and read paths distinguishable at every call site, and let the pipeline compose different stages for each. A unified bus hides that difference behind one method, and the difference is the one this profile's whole command and query split depends on.
 
-The rule states the property rather than the package. The profile pins one library that supplies it, named in `standards/rule/backend-application.use-the-pinned-mediator-entry-points`. A consumer replacing that library replaces a convention rather than overriding a Standard.
-
-### Co-locate contracts and implementations (standards/rule/backend-application.co-locate-contracts-and-implementations)
-
-**Requirement:** A handler, validator, or definition MUST be `internal sealed`, and a message or result becomes public only when a host uses it.
-
-**Rationale:** A collection query names each row `{UseCase}QueryResultItem` rather than a repository-wide summary type. Input errors are reported through the pipeline's own `ValidationFailure`, so command and query failures reach a host in one shape.
+The rule states the property rather than the package. The profile pins one library that supplies it, named in `standards/rule/backend-application.use-the-pinned-mediator-entry-points`. A consumer replacing that library records an Exception against the convention rather than touching this rule.
 
 ### Separate input validation from invariants (standards/rule/backend-application.separate-input-validation-from-invariants)
 
 **Requirement:** A validator MUST limit its checks to structural input, leaving aggregate state decisions to Domain.
 
-**Rationale:** Domain owns state permission. A validator rejects an empty title, malformed identifier, or invalid page size. It reports what it finds as a `Validity` rather than throwing. Every validator for a message therefore runs, and the caller is told about the whole form in one answer. `ValidationFailure` carries exactly a member, a code, and a message, and carries no HTTP status.
+**Rationale:** Domain owns state permission. A validator rejects an empty title, malformed identifier, or invalid page size. Every validator for a message reports Validity under `standards/rule/backend-application.report-input-problems-as-validity`, so the caller learns the whole form in one answer.
+
+### Report input problems as Validity (standards/rule/backend-application.report-input-problems-as-validity)
+
+**Requirement:** A validator MUST report its findings as Validity, with each ValidationFailure carrying a member, a code, and a message, and no HTTP status.
+
+**Rationale:** Every validator for a message runs, and the pipeline merges their findings before it refuses the request. The member names the input member, the code names the stable reason, and the message explains the problem in caller-safe language. Validity and ValidationFailure come from the pinned mediator's abstractions, named in `standards/rule/backend-application.use-the-pinned-mediator-entry-points`.
 
 ### Model expected use-case failures explicitly (standards/rule/backend-application.model-expected-use-case-failures-explicitly)
 
-**Requirement:** An expected use-case failure MUST throw a transport-neutral Application exception carrying a stable code and a safe message.
+**Requirement:** An expected use-case failure MUST throw a transport-neutral Application exception carrying the refusal Result's stable code and a safe message.
 
 **Rationale:** One public abstract `UseCaseException` has sealed `ResourceNotFoundException`, `UseCaseForbiddenException`, and `UseCaseConflictException` subclasses. They carry no HTTP result, provider exception, or stack detail, and handlers do not catch them.
 
-Those three are permanent: the same input fails the same way on every attempt. A failure that a later attempt can pass is transient and belongs to the caller's retry decision rather than to this hierarchy. The `integrations` extension owns the transient case, because a transient failure always comes from an outbound dependency.
+The use case lists every Result it returns, and each refusal Result carries its failure code. A conflict fails identical input identically until the caller rereads the resource and retries with current state. A failure that a blind retry can pass is transient and belongs to the integrations extension.
 
 ### Enforce target authorization in the pipeline (standards/rule/backend-application.enforce-target-authorization-in-the-pipeline)
 
-**Requirement:** The authorization guard, not the handler, MUST authorize every message an account can take, from the action and resource that message declares.
+**Requirement:** The authorization guard, not the handler, MUST authorize every message from the permissions its use case needs and the resource the message names.
 
-**Rationale:** Ownership, tenant, role, state or delegated access is resolved against the target data through an `IScopeOwnerLookup` for the record the message names. WebApi may enforce coarse authenticated, role, or scope policies first. It cannot replace an authorization decision that depends on business data.
+**Rationale:** The message declares its needs as permission codes with the resource subject, and the guard resolves the actor's roles at the subject's scope. Ownership, tenant, role, state, or delegated access is resolved against the target data through an `IScopeOwnerLookup` for the record the message names.
 
-Making the decision once, from a declaration, stops two messages about the same record asking different questions. It also lets composition refuse to start when a message states no position at all. A refusal is reported as a denial rather than raised, so a refused attempt reaches the audit trail beside the ones that succeeded.
+Making the decision once, from a declaration, stops two messages about the same record asking different questions. It also lets composition refuse to start when a message states no position at all. A refusal is reported as a denial rather than raised, so a refused attempt reaches the audit trail beside the ones that succeeded. The audit extension records the denial under `standards/rule/ext-audit.record-refused-authorization`.
 
-A collection query has no single target record, so `IScopeOwnerLookup` has nothing to resolve. Its authorized scope is a predicate the database applies, stated by `standards/rule/quality-security.authorize-each-target-resource`. Filtering a loaded collection in memory satisfies neither rule, and is the shape [OWASP names as broken object level authorization](https://owasp.org/www-project-top-ten/2021/A01_2021-Broken_Access_Control/).
+A collection query has no single target record, so `IScopeOwnerLookup` has nothing to resolve. Its authorized scope is a database predicate under `standards/rule/quality-security.restrict-a-protected-collection-in-the-database`, applied before paging. Filtering a loaded collection in memory satisfies neither rule, and is the shape [OWASP names as broken object level authorization](https://owasp.org/www-project-top-ten/2021/A01_2021-Broken_Access_Control/).
+
+WebApi enforces coarse authenticated, role, or scope policies first under `standards/rule/backend-api.apply-only-coarse-policies-at-the-endpoint`, which cannot replace a decision that depends on business data.
 
 ### Keep command handlers narrow (standards/rule/backend-application.keep-command-handlers-narrow)
 
-**Requirement:** A command handler MUST load aggregates, call domain behavior, stage changes, and return a result without committing or mapping transport.
+**Requirement:** A command handler MUST load aggregates, call domain behavior, stage changes, and return a result, leaving commit, transport mapping, audit, and authorization to their owners.
 
-**Rationale:** The commit post-handler owns the transaction, and WebApi owns error mapping. A handler that does either duplicates a boundary that already exists.
+**Rationale:** The commit post-handler owns the transaction under `standards/rule/backend-persistence.commit-once-in-the-command-pipeline`, WebApi owns error mapping, the audit completion handler owns the trail, and the guard owns authorization. A handler that does any of those duplicates a boundary that already exists.
 
 ### Project queries directly (standards/rule/backend-application.project-queries-directly)
 
-**Requirement:** A query handler MUST project directly to its result record through `IQuerySession` without loading an aggregate.
+**Requirement:** A query handler MUST project directly to its result record without loading an aggregate.
 
-**Rationale:** Loading an aggregate for presentation pulls invariant enforcement into a read path that cannot use it.
+**Rationale:** Loading an aggregate for presentation pulls invariant enforcement into a read path that cannot use it. The command and query split lives in `standards/rule/backend-architecture.separate-command-and-query-behavior`, and the read boundary lives in `standards/rule/backend-persistence.query-through-iquerysession`.
 
 ### Mirror a Domain closed set in the result (standards/rule/backend-application.mirror-a-domain-closed-set-in-the-result)
 
 **Requirement:** An Application result carrying a Domain closed set MUST model that set with the same shape as its own union or code value.
 
-**Rationale:** The set's information then survives to the caller and the layers stay aligned. Application exposes no Domain union type and never flattens case data into an enum with nullable fields. Narrowing requires a decision and an updated specification.
+**Rationale:** The set's information then survives to the caller and the layers stay aligned. Application exposes no Domain union type and never flattens case data into an enum with nullable fields. Narrowing follows `standards/rule/backend-application.record-a-decision-for-closed-set-narrowing`, and the set itself follows `standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums`.
+
+**Example:**
+
+| Layer | Shape |
+|:---|:---|
+| Domain | Union with one case per value |
+| Application | Result union or code value with the same cases |
+| WebApi | Transport model with the same shape |
+| OpenAPI | Enum or oneOf with a discriminator |
+
+### Record a decision for closed-set narrowing (standards/rule/backend-application.record-a-decision-for-closed-set-narrowing)
+
+**Requirement:** A layer MUST NOT narrow a Domain closed set without a recorded decision and an updated specification.
+
+**Rationale:** Narrowing drops cases an outer layer declines to carry. The decision and the specification follow `standards/rule/core-model.keep-one-owner-and-status-on-every-record`.
 
 ### Define narrow external ports (standards/rule/backend-application.define-narrow-external-ports)
 
-**Requirement:** Application MUST declare a public port interface named for its business action, with a narrow surface and project-owned types.
+**Requirement:** Application MUST declare each external port as a public interface with a noun or verb name, one method or one purpose, and project-owned types.
 
-**Rationale:** Provider names and transport models stay in Infrastructure, so a provider change does not reach Application.
+**Rationale:** A noun name reads as the capability (`IPostArchive`) and a verb name reads as the act (`IArchivePosts`). Provider names and transport models stay in Infrastructure, so a provider change does not reach Application.
 
 ### Declare a port where its consumers meet (standards/rule/backend-application.declare-a-port-where-its-consumers-meet)
 
@@ -100,11 +114,19 @@ A collection query has no single target record, so `IScopeOwnerLookup` has nothi
 
 A port declared beside its aggregate is reviewed with that aggregate's specification; a port in a project-wide folder is reviewed by nobody. Where a port serves aggregates in one module but is called from another, the declaring module is the one that owns the aggregates. That module is the one whose rules change when the port changes.
 
+### Declare every pipeline position beside the message (standards/rule/backend-application.declare-every-pipeline-position-beside-the-message)
+
+**Requirement:** A message MUST declare a value or an exemption for every pipeline position the baseline and the selected extensions require.
+
+**Rationale:** The baseline holds one position: authorization, declared as `RequiredAuthorization` or a constant exemption attribute. The declaration lives in a `{UseCase}Definition` class in the operation folder, implementing the position's definition interface. An exemption lives as an attribute on the message itself. The audit extension adds the audit selection position under `standards/rule/ext-audit.declare-audit-selection-on-every-command`. Composition refuses to start when a message states no value or exemption for a required position.
+
 ### Keep event reaction implementations explicit (standards/rule/backend-application.keep-event-reaction-implementations-explicit)
 
-**Requirement:** An event reaction implementation MUST declare whether its delivery is atomic, durable, rebuildable, or best-effort-optional.
+**Requirement:** An event reaction implementation MUST declare exactly one delivery classification: atomic, durable, rebuildable, or best-effort-optional.
 
-**Rationale:** The declaration selects the mechanism. Required delivery activates the outbox extension, and required derived state uses an atomic, durable, or rebuildable projection path.
+**Rationale:** Atomic reactions commit with the triggering command's transaction, and a failure rolls both back. Durable reactions run after commit through durable delivery, and a failure retries until it succeeds. Rebuildable reactions build derived state that a rebuild reproduces, and a failure waits for the next rebuild. Best-effort-optional reactions may skip or drop their effect, and no record needs it.
+
+The use-case record declares the classification under `standards/rule/core-system.declare-event-reaction-delivery`, and the reaction's definition beside the operation carries the same value. Required delivery activates the outbox extension, and required derived state uses an atomic, durable, or rebuildable path.
 
 ### Keep one state-changing Use case in one Command pipeline (standards/rule/backend-application.keep-one-state-changing-use-case-in-one-command-pipeline)
 
@@ -112,22 +134,15 @@ A port declared beside its aggregate is reviewed with that aggregate's specifica
 
 **Rationale:** Nested dispatch can run the commit post-handler before the top-level use case finishes. A top-level handler may still coordinate several aggregates when an approved record names the invariant requiring one transaction.
 
-A second command that has to run is staged for durable delivery instead, which is what a workflow orchestrator does under `standards/rule/backend-application.advance-durable-workflows-through-separate-commands`. That path is not an exemption from this rule. The staged command enters its own pipeline and owns its own transaction, so no nesting occurs.
-
-### Advance durable Workflows through separate Commands (standards/rule/backend-application.advance-durable-workflows-through-separate-commands)
-
-**Requirement:** A workflow orchestrator MUST stage the next command for durable delivery rather than mutate a participating aggregate.
-
-**Rationale:** Each issued command then enters its own pipeline and owns one transaction. Workflow state and the outgoing message commit together, so duplicate triggers stay safe.
+A second command that has to run is staged for durable delivery instead. That path is not an exemption from this rule. The staged command enters its own pipeline and owns its own transaction, so no nesting occurs.
 
 ## Conventions
-
 
 ### Use this operation layout (standards/rule/backend-application.use-this-operation-layout)
 
 **Default:** Place each operation in a folder named for its use case under its module and aggregate.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Example:**
 
@@ -163,7 +178,7 @@ A second command that has to run is staged for durable delivery instead, which i
       ListPostsQueryResultItem.cs
       ListPostsQueryValidator.cs
       ListPostsQueryHandler.cs
-    OnPostPublished/
+    NotifySubscribersOnPostPublished/
       NotifySubscribersOnPostPublishedHandler.cs
       IPostPublicationNotifier.cs   a port one use case names
   Customers/                        two aggregates: operations nest under each aggregate
@@ -178,15 +193,15 @@ A second command that has to run is staged for durable delivery instead, which i
         GrantConsentCommandHandler.cs
 ```
 
-The folder hierarchy follows `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case`: module, then aggregate, then operation. A single-aggregate module places its operation folders directly under the module only when the aggregate root's plural name equals the module name. Otherwise, and for any module with more than one aggregate, operation folders nest under the aggregate the use case targets.
+Module and aggregate order, including the single-aggregate flat form, follow `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case`.
 
-Only a use case gets a folder. A type that is not a use case sits flat in the folder that owns it, chosen by `standards/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers`. A reader can then take every folder name below a module as the name of one operation. A folder named for a service, a technical kind, or a caller breaks that reading and is drift rather than a second convention.
+Only a use case gets a folder. A type that is not a use case sits flat in the folder that owns it, chosen by `standards/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers`. A reader can then take every folder name below a module as the name of one operation. A reaction is a use case that reacts to an event, so its folder takes the reaction's use-case name under `standards/rule/backend-application.keep-event-reaction-implementations-explicit`. A folder named for a service, a technical kind, or a caller breaks that reading and is drift rather than a second convention.
 
 ### Keep messages immutable (standards/rule/backend-application.keep-messages-immutable)
 
 **Default:** Declare commands, queries, results, and validation errors as records.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Typed identifiers and Shared-kernel value objects may cross the boundary. An aggregate-owned value object does not, so the message carries a primitive and the handler reconstructs it.
 
@@ -194,7 +209,7 @@ Only a use case gets a folder. A type that is not a use case sits flat in the fo
 
 **Default:** Return only the values the caller needs from an Application result.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** An aggregate, session, provider response, or HTTP result leaving Application makes an inner concern part of the outward contract.
 
@@ -202,7 +217,7 @@ Only a use case gets a folder. A type that is not a use case sits flat in the fo
 
 **Default:** Own domain-to-result projection in Application, transport mapping in WebApi, and view models in the frontend.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Each mapping then changes with the boundary that defines its shape.
 
@@ -210,13 +225,13 @@ Only a use case gets a folder. A type that is not a use case sits flat in the fo
 
 **Default:** Dispatch a command through `ICommandMediator.SendAsync` and a query through `IQueryMediator.QueryAsync`, from the LiteBus version the manifest pins.
 
-**Replacement:** A consumer can replace this default with another library that supplies two separate entry points, recorded as a local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** The profile pins one library so every project reads the same call at every dispatch site. The obligation that the two paths stay separate belongs to `standards/rule/backend-application.dispatch-commands-and-queries-through-separate-entry-points` and survives the replacement.
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/backend-application.co-locate-contracts-and-implementations` and `standards/rule/backend-application.keep-command-handlers-narrow`.
+This informative example demonstrates `standards/rule/backend-architecture.keep-implementation-types-internal` and `standards/rule/backend-application.keep-command-handlers-narrow`.
 
 ```csharp
 public sealed record CreateDraftCommand(
@@ -278,55 +293,27 @@ internal sealed class ConfirmOrderCommandHandler(
 
 The handler stages both Aggregates because the use-case specification names the rule that requires one transaction. It does not call `ICommandMediator` or commit.
 
-### Advance a durable workflow without mutating module aggregates
-
-```csharp
-internal sealed class AdvanceOrderFulfillmentWorkflowCommandHandler(
-    IOrderFulfillmentWorkflowStore workflows,
-    IWorkflowCommandOutbox outbox)
-    : ICommandHandler<AdvanceOrderFulfillmentWorkflowCommand>
-{
-    public async Task HandleAsync(
-        AdvanceOrderFulfillmentWorkflowCommand command,
-        CancellationToken cancellationToken)
-    {
-        var workflow = await workflows.GetAsync(
-            command.WorkflowId,
-            cancellationToken);
-
-        var nextCommand = workflow.RecordPaymentConfirmed(
-            command.PaymentId,
-            command.OccurredAt);
-
-        workflows.Store(workflow);
-        outbox.Enqueue(nextCommand, workflow.Id);
-    }
-}
-```
-
-Infrastructure stages Workflow state and the outgoing Command in the same session. The Worker later dispatches the outgoing Command through a new command pipeline.
-
 ## Verification
 
-
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/backend-application.organize-application-by-operation | static | `ArchitectureTests` asserts each operation folder holds one message, result, validator, handler, and definition, and composition refuses undeclared pipeline values. |
-| standards/rule/backend-application.dispatch-commands-and-queries-through-separate-entry-points | inspection | `ArchitectureTests` asserts no dispatch path resolves a shared bus abstraction over the two separate entry points. |
-| standards/rule/backend-application.co-locate-contracts-and-implementations | inspection | `ArchitectureTests` asserts handler and validator types are internal and sealed while messages and results carry their role suffix. |
-| standards/rule/backend-application.separate-input-validation-from-invariants | inspection | `ValidationTests` asserts each validator rejects structural input and defers state decisions to the aggregate. |
-| standards/rule/backend-application.model-expected-use-case-failures-explicitly | inspection | `UseCaseFailureTests` asserts each expected failure surfaces its stable code with no transport or provider detail attached. |
-| standards/rule/backend-application.enforce-target-authorization-in-the-pipeline | static | Composition requires a `RequiredAuthorization` or an exemption per message; `PipelineStageTests` asserts no handler authorizes itself, and `PipelineCompositionTests` asserts guard coverage. |
-| standards/rule/backend-application.keep-command-handlers-narrow | static | `PipelineStageTests` asserts no command handler commits, audits, or authorizes; `ArchitectureTests` asserts none catches domain exceptions or references HTTP types. |
-| standards/rule/backend-application.project-queries-directly | inspection | `ArchitectureTests` asserts no query handler resolves a repository or returns an aggregate type. |
-| standards/rule/backend-application.mirror-a-domain-closed-set-in-the-result | inspection | `ResultContractTests` asserts each result union carries one record per Domain case and exposes no Domain type. |
-| standards/rule/backend-application.define-narrow-external-ports | inspection | `ArchitectureTests` asserts no Application port signature names a provider type or transport model. |
-| standards/rule/backend-application.declare-a-port-where-its-consumers-meet | static | `ArchitectureTests` asserts every contracts-project port is named by more than one module; no module-owned port sits outside its aggregates' module. |
-| standards/rule/backend-application.keep-event-reaction-implementations-explicit | inspection | `ReactionTests` asserts each reaction runs under the delivery classification its specification declares. |
-| standards/rule/backend-application.keep-one-state-changing-use-case-in-one-command-pipeline | inspection | `ArchitectureTests` asserts no command handler resolves or calls the command mediator. |
-| standards/rule/backend-application.advance-durable-workflows-through-separate-commands | inspection | `WorkflowOrchestrationTests` asserts the orchestrator stages progress and its outgoing command in one transaction. |
-| standards/rule/backend-application.use-this-operation-layout | operation | Folder review compares each operation path against its use-case identifier, or records a named local replacement. |
-| standards/rule/backend-application.keep-messages-immutable | inspection | `ArchitectureTests` asserts each message and result is a record exposing no aggregate or Domain union type. |
-| standards/rule/backend-application.return-use-case-results | inspection | `ArchitectureTests` asserts no Application result exposes an aggregate, session, provider, or HTTP type. |
-| standards/rule/backend-application.keep-mappings-at-the-owning-boundary | inspection | Mapping review locates each conversion in the layer that owns its output shape. |
-| standards/rule/backend-application.use-the-pinned-mediator-entry-points | static | `ArchitectureTests` asserts each dispatch site calls `ICommandMediator.SendAsync` or `IQueryMediator.QueryAsync`. |
+| standards/rule/backend-application.organize-application-by-operation | guidance | Does each operation folder hold its message, result, validator, handler, and definition? |
+| standards/rule/backend-application.dispatch-commands-and-queries-through-separate-entry-points | guidance | Does each dispatch site call its own command or query entry point? |
+| standards/rule/backend-application.separate-input-validation-from-invariants | guidance | Does each validator check only structural input and defer state decisions? |
+| standards/rule/backend-application.report-input-problems-as-validity | guidance | Does each validator report Validity with member, code, and message failures? |
+| standards/rule/backend-application.model-expected-use-case-failures-explicitly | guidance | Does each expected failure throw its typed exception with its Result code? |
+| standards/rule/backend-application.enforce-target-authorization-in-the-pipeline | checkable | `dotnet test` runs the pipeline suites, which assert guard coverage and no self-authorizing handler. |
+| standards/rule/backend-application.keep-command-handlers-narrow | checkable | `dotnet test` runs the pipeline stage suite, which asserts handlers commit, audit, and authorize nothing. |
+| standards/rule/backend-application.project-queries-directly | guidance | Does each query handler project to its result without loading an aggregate? |
+| standards/rule/backend-application.mirror-a-domain-closed-set-in-the-result | guidance | Does each result union carry one record per Domain case? |
+| standards/rule/backend-application.record-a-decision-for-closed-set-narrowing | guidance | Does each narrowed set name its decision and updated specification? |
+| standards/rule/backend-application.define-narrow-external-ports | guidance | Does each port name its business action with project-owned types? |
+| standards/rule/backend-application.declare-a-port-where-its-consumers-meet | guidance | Does each port sit at the lowest folder holding its consumers? |
+| standards/rule/backend-application.declare-every-pipeline-position-beside-the-message | guidance | Does each message declare a value or exemption for every required position? |
+| standards/rule/backend-application.keep-event-reaction-implementations-explicit | guidance | Does each reaction declare exactly one classification it honors? |
+| standards/rule/backend-application.keep-one-state-changing-use-case-in-one-command-pipeline | guidance | Does any command handler dispatch another command through the mediator? |
+| standards/rule/backend-application.use-this-operation-layout | guidance | Does each operation path match its module, aggregate, and use case? |
+| standards/rule/backend-application.keep-messages-immutable | guidance | Is each message, result, and validation error a record? |
+| standards/rule/backend-application.return-use-case-results | guidance | Does each result return only values the caller needs? |
+| standards/rule/backend-application.keep-mappings-at-the-owning-boundary | guidance | Does each conversion live in the layer owning its output shape? |
+| standards/rule/backend-application.use-the-pinned-mediator-entry-points | guidance | Does each dispatch site call the pinned mediator entry points? |

@@ -4,18 +4,18 @@
 
 WebApi is a thin transport adapter. It maps HTTP input to Application messages, dispatches through the specific mediator, and maps results to stable HTTP contracts. Business rules, persistence access, and provider behavior remain outside endpoints.
 
-## Agent Summary {#agent-summary}
+## Agent Summary
 
-- One class per operation implements `IEndpoint` and dispatches through its mediator. (standards/rule/backend-api.use-one-endpoint-per-operation)
-- Endpoints receive mediators and HTTP-boundary services only. (standards/rule/backend-api.keep-endpoint-dependencies-transport-focused)
-- Actor identity comes from verified claims, never from the request. (standards/rule/backend-api.derive-authenticated-identity-from-claims, standards/rule/backend-api.reject-a-client-supplied-actor-identifier)
-- Authorization checks the target resource, not only authentication. (standards/rule/backend-api.authorize-the-target-resource)
-- Errors return Problem Details with a stable code and trace identifier. (standards/rule/backend-api.return-stable-problem-details)
-- Error responses carry no exception, stack, SQL, provider, or secret text. (standards/rule/backend-api.keep-error-responses-free-of-internal-detail)
-- Collection reads carry deterministic ordering and a bounded limit. (standards/rule/backend-api.bound-collection-queries)
-- Custom methods carry transitions, and naming rules bind money and fields. (standards/rule/backend-api.state-an-unexpressible-transition-as-a-custom-method, standards/rule/backend-api.apply-patch-to-a-partial-update, standards/rule/backend-api.model-a-monetary-value-as-one-object, standards/rule/backend-api.name-transport-fields-by-one-rule-set)
-- The contract is generated, committed, and declares authentication. (standards/rule/backend-api.treat-openapi-as-a-generated-contract, standards/rule/backend-api.reflect-enforced-authentication-in-the-contract)
-- Transport models mirror the shape of the Domain closed set they carry. (standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape, standards/rule/backend-api.reject-a-collapsed-or-borrowed-wire-contract)
+- One endpoint class per operation dispatches through its mediator. (standards/rule/backend-api.use-one-endpoint-per-operation, standards/rule/backend-api.exclude-mvc-controllers-from-the-profile, standards/rule/backend-api.use-this-endpoint-layout)
+- Endpoints take transport dependencies and map no errors. (standards/rule/backend-api.keep-endpoint-dependencies-transport-focused, standards/rule/backend-api.defer-error-mapping-to-the-global-handler)
+- Endpoints enforce coarse policies while the guard decides targets. (standards/rule/backend-api.apply-only-coarse-policies-at-the-endpoint)
+- Errors return Problem Details with Result codes and consistent statuses. (standards/rule/backend-api.return-stable-problem-details, standards/rule/backend-api.use-consistent-status-codes)
+- Routes stay resource-oriented with custom methods, PATCH, and PUT. (standards/rule/backend-api.keep-routes-resource-oriented, standards/rule/backend-api.state-an-unexpressible-transition-as-a-custom-method, standards/rule/backend-api.apply-patch-to-a-partial-update, standards/rule/backend-api.use-put-for-a-whole-replacement, standards/rule/backend-api.name-routes-from-resources)
+- Collections page with bounds, cursors, and declared maxima. (standards/rule/backend-api.bound-collection-queries, standards/rule/backend-api.use-opaque-cursors-for-collection-paging, standards/rule/backend-api.version-cursors-with-stable-sort-values, standards/rule/backend-api.declare-a-smaller-collection-maximum, standards/rule/backend-api.use-offsets-for-proven-bounded-datasets)
+- The contract generates on Release, commits, and declares metadata. (standards/rule/backend-api.treat-openapi-as-a-generated-contract, standards/rule/backend-api.commit-the-generated-contract-its-consumers-read, standards/rule/backend-api.reflect-enforced-authentication-in-the-contract, standards/rule/backend-api.publish-precise-complete-schemas, standards/rule/backend-api.declare-operation-metadata-in-the-contract, standards/rule/backend-api.expose-development-tooling-in-development-only, standards/rule/backend-api.generate-the-contract-without-hosted-dependencies)
+- Transport models mirror closed sets with discriminators and Money objects. (standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape, standards/rule/backend-api.reject-a-collapsed-or-borrowed-wire-contract, standards/rule/backend-api.publish-label-only-sets-as-string-enums, standards/rule/backend-api.mark-polymorphic-transport-models-with-discriminators, standards/rule/backend-api.model-a-monetary-value-as-one-object)
+- Field, boolean, time, failure, path, and numeric names follow one vocabulary. (standards/rule/backend-api.name-transport-types-by-their-boundary-role, standards/rule/backend-api.name-boolean-fields-as-conditions, standards/rule/backend-api.name-time-fields-with-at, standards/rule/backend-api.use-standard-field-vocabulary, standards/rule/backend-api.name-failure-pairs-code-and-reason, standards/rule/backend-api.name-path-parameters-per-resource, standards/rule/backend-api.avoid-noise-words-in-field-names, standards/rule/backend-api.keep-numeric-transport-types-precise)
+- Cookie-authenticated writes carry the marker header while Program.cs holds composition. (standards/rule/backend-api.require-the-marker-header-on-cookie-authenticated-writes, standards/rule/backend-api.keep-programcs-as-composition)
 
 ## Standards
 
@@ -42,43 +42,25 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 **Rationale:** A second transport pattern splits routing, filters, and error mapping across two models that behave differently.
 
-An application arriving with controllers converts them rather than keeping both. Each action becomes one endpoint under `standards/rule/backend-api.use-this-endpoint-layout`. An action filter becomes an endpoint filter or a pipeline stage. Model-state validation becomes the Application validator that `standards/rule/backend-application.separate-input-validation-from-invariants` already requires. A conversion that cannot finish in one change records a decision naming this provision and the date the last controller leaves.
-
 ### Keep endpoint dependencies transport-focused (standards/rule/backend-api.keep-endpoint-dependencies-transport-focused)
 
-**Requirement:** An endpoint route handler MUST NOT receive an aggregate repository, a Marten session, a `DbContext`, a provider SDK, or a broad application service.
+**Requirement:** An endpoint MUST NOT take an aggregate repository, a document session, a `DbContext`, a provider client, or an application service.
 
-**Rationale:** Endpoint classes are mapped from the root application at startup, so they hold no scoped dependency. Route-handler parameters may still receive mediators and HTTP-boundary services such as an actor accessor.
+**Rationale:** Endpoint classes are mapped from the root application at startup, so they hold no scoped dependency. Route-handler parameters take mediators and HTTP-boundary services such as an actor accessor.
 
 ### Defer error mapping to the global handler (standards/rule/backend-api.defer-error-mapping-to-the-global-handler)
 
-**Requirement:** An endpoint MUST NOT catch a known application exception.
+**Requirement:** An endpoint MUST NOT catch a `UseCaseException`, a `DomainException`, or a validation failure.
 
 **Rationale:** One global handler produces every error response, so a caught exception at the endpoint creates a second, divergent mapping.
 
-### Derive authenticated identity from claims (standards/rule/backend-api.derive-authenticated-identity-from-claims)
+### Apply only coarse policies at the endpoint (standards/rule/backend-api.apply-only-coarse-policies-at-the-endpoint)
 
-**Requirement:** A WebApi endpoint MUST read the authenticated actor identifier from verified claims.
+**Requirement:** A WebApi endpoint MUST enforce only coarse authenticated, role, or scope policies, leaving target decisions to the application guard.
 
-**Rationale:** Verified claims are the only part of a request that the caller cannot choose.
+**Rationale:** Authentication establishes who is calling. It does not establish that the caller may act on this specific resource. Target authorization lives in `standards/rule/backend-application.enforce-target-authorization-in-the-pipeline`, which decides from the permissions the use case needs.
 
-**Example:** An administrator acting on another resource passes a separate target identifier and satisfies its authorization policy. The administrator identity still comes from claims.
-
-### Reject a client-supplied actor identifier (standards/rule/backend-api.reject-a-client-supplied-actor-identifier)
-
-**Requirement:** A WebApi endpoint MUST NOT read the authenticated actor identifier from the body, form, route, query, or a client-controlled header.
-
-**Rationale:** Any request-controlled source lets a caller act as another actor.
-
-### Authorize the target resource (standards/rule/backend-api.authorize-the-target-resource)
-
-**Requirement:** A WebApi endpoint MUST verify role, ownership, tenant, state, or policy against the target resource before it returns protected data or changes state.
-
-**Rationale:** Authentication establishes who is calling. It does not establish that the caller may act on this specific resource.
-
-**Example:** An operation applies a stable forbidden or not-found policy when revealing that a resource exists would leak information.
-
-A collection endpoint has no single target resource. Its authorization is the database predicate that `standards/rule/quality-security.authorize-each-target-resource` requires. The predicate applies before paging, so no page is assembled from rows the caller may not read.
+An operation applies a stable forbidden or not-found policy when revealing that a resource exists would leak information.
 
 ### Return stable Problem Details (standards/rule/backend-api.return-stable-problem-details)
 
@@ -107,15 +89,11 @@ A collection endpoint has no single target resource. Its authorization is the da
 }
 ```
 
-`type` is a stable absolute URI owned by the consumer. `errors` appears only when field or message validation entries exist. `code` carries the categorised failure class, and `detail` carries the free-form prose explanation; a request body names the same pair `code` and `reason` under `standards/rule/backend-api.name-transport-fields-by-one-rule-set`. WebApi maps Application member names to their public JSON field names. `traceId` carries the trace identifier from the current [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent`, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
+`type` is a stable absolute URI owned by the consumer. `errors` appears only when `ValidationFailure` entries exist, carrying their member, code, and message. `code` carries the refusal Result's failure code, and `detail` carries the free-form prose explanation. A request body names the same pair `code` and `reason` under `standards/rule/backend-api.name-failure-pairs-code-and-reason`.
+
+WebApi maps Application member names to their public JSON field names. `traceId` carries the trace identifier from the current [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent`, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
 
 The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. It maps validation exceptions to 400, missing targets through the operation's 404 policy, and forbidden failures to 403 or the declared 404 disclosure policy. It maps conflicts and state rejections to 409, and unexpected exceptions to 500 with code `internal_error`. It maps known Domain exception types individually. It does not report cancellation from a disconnected request as an application error.
-
-### Keep error responses free of internal detail (standards/rule/backend-api.keep-error-responses-free-of-internal-detail)
-
-**Requirement:** An error response MUST NOT contain an exception message, a stack trace, SQL, a provider response body, or a secret.
-
-**Rationale:** Error paths are the most common accidental disclosure route, because internal text reaches them without passing a response model.
 
 ### Use consistent status codes (standards/rule/backend-api.use-consistent-status-codes)
 
@@ -128,7 +106,8 @@ The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. I
 | Outcome | Status |
 |:---|:---:|
 | Successful read | 200 |
-| Successful creation | 201 with a resource location when one exists |
+| Successful creation of a readable resource | 201 with the resource location |
+| Successful creation without a read route | 201 |
 | Successful command without a response body | 204 |
 | Structural validation failure | 400 |
 | Missing or invalid authentication | 401 |
@@ -136,12 +115,15 @@ The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. I
 | Resource unavailable under the disclosure policy | 404 |
 | State, version, or idempotency conflict | 409 |
 | Accepted background operation | 202 with status location |
+| Unexpected failure | 500 |
 
-### Reject a success status for a failed outcome (standards/rule/backend-api.reject-a-success-status-for-a-failed-outcome)
+### Require the marker header on cookie-authenticated writes (standards/rule/backend-api.require-the-marker-header-on-cookie-authenticated-writes)
 
-**Requirement:** A WebApi operation MUST NOT return 200 for a documented error.
+**Requirement:** The API MUST refuse a cookie-authenticated write without the project's marker header.
 
-**Rationale:** A success status with an error body forces every client to parse the body before it knows the outcome.
+**Rationale:** A write is any request other than GET, HEAD, or OPTIONS. The header takes the form `X-<Project>-Request: 1`, with the exact name set in project configuration. A page on another site cannot add the header, so its absence exposes a cross-site forgery.
+
+The refused request is unauthenticated, so it answers 401 under `standards/rule/backend-api.use-consistent-status-codes`. The frontend pages own sending the header; this rule owns the API refusal.
 
 ### Keep routes resource-oriented (standards/rule/backend-api.keep-routes-resource-oriented)
 
@@ -165,7 +147,7 @@ POST /api/merchants/{merchantId}:close
 POST /api/orders/{orderId}/refund-requests/{refundId}:decide
 ```
 
-The operationId keeps its verb-noun form, so `CancelShipment` names the same transition the path states.
+The `operationId` keeps its verb-noun form, so `CancelShipment` names the same transition the path states.
 
 ### Apply PATCH to a partial update (standards/rule/backend-api.apply-patch-to-a-partial-update)
 
@@ -185,11 +167,11 @@ The operationId keeps its verb-noun form, so `CancelShipment` names the same tra
 
 ### Bound collection queries (standards/rule/backend-api.bound-collection-queries)
 
-**Requirement:** A collection endpoint MUST apply deterministic ordering, a default limit of 20, and a declared maximum limit of 100 or lower.
+**Requirement:** A collection endpoint MUST apply deterministic ordering, a default limit of 20, and the use case's declared maximum limit of 100 or lower.
 
-**Rationale:** An unbounded collection read turns one caller into a source of unbounded database and serialization work. An accepted use case may declare a smaller maximum.
+**Rationale:** An unbounded collection read turns one caller into a source of unbounded database and serialization work. Query-side ordering lives in `standards/rule/backend-persistence.make-ordering-explicit`, which this rule's ordering follows. Cursor mechanics live in `standards/rule/backend-api.use-opaque-cursors-for-collection-paging` and `standards/rule/backend-api.version-cursors-with-stable-sort-values`.
 
-**Example:** The baseline request uses `after` as an opaque cursor and `limit` as a positive integer. The implementation fetches one record beyond the requested limit to determine whether another page exists. The response uses one shape:
+**Example:** A request uses `after` as an opaque cursor and `limit` as a positive integer. The implementation fetches one record beyond the requested limit to determine whether another page exists. The response uses one shape:
 
 ```json
 {
@@ -202,7 +184,17 @@ The operationId keeps its verb-noun form, so `CancelShipment` names the same tra
 }
 ```
 
-The cursor contains a version and the last stable sort values, including a unique tie-breaker. The example treats it as untrusted input and returns 400 with code `invalid_cursor` when it is malformed or unsupported. It places no sensitive value in a readable cursor. An implementation may use an offset for a proven bounded dataset. The public profile contract remains opaque unless a consumer convention replaces this rule across its API.
+### Use opaque cursors for collection paging (standards/rule/backend-api.use-opaque-cursors-for-collection-paging)
+
+**Requirement:** A collection endpoint MUST page with an opaque cursor and refuse a malformed cursor with 400 and code `invalid_cursor`.
+
+**Rationale:** The endpoint treats the cursor as untrusted input. An unsupported cursor version answers the same refusal.
+
+### Version cursors with stable sort values (standards/rule/backend-api.version-cursors-with-stable-sort-values)
+
+**Requirement:** A paging cursor MUST carry a version and the last stable sort values, including a unique tie-breaker, and no sensitive value in readable form.
+
+**Rationale:** The version lets the sort evolve without breaking stored cursors. The tie-breaker matches the query's stable order under `standards/rule/backend-persistence.make-ordering-explicit`.
 
 ### Treat OpenAPI as a generated contract (standards/rule/backend-api.treat-openapi-as-a-generated-contract)
 
@@ -212,24 +204,28 @@ The cursor contains a version and the last stable sort values, including a uniqu
 
 **Example:** The API source artifact is `apps/api/openapi/{ProjectName}.json`. WebApi references `Microsoft.AspNetCore.OpenApi` and `Microsoft.Extensions.ApiDescription.Server`, enables `OpenApiGenerateDocuments`, sets `OpenApiDocumentsDirectory` to that directory, and passes `--file-name {ProjectName}` through `OpenApiGenerateDocumentsOptions`.
 
-Build-time generation boots the host, which is [what Microsoft's own guidance does](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/overview). A boot reaches every startup guard. A project whose composition refuses to start without a secret, a certificate, or a reachable dependency cannot generate its contract from a clean checkout. Two answers are valid, and the project records which one it uses.
+Build-time generation boots the host, which is [what Microsoft's own guidance does](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/overview). A boot reaches every startup guard. A project whose composition refuses to start without a secret, a certificate, or a reachable dependency cannot generate its contract from a clean checkout. Two answers are valid, and the project records which one it uses under `standards/rule/backend-api.generate-the-contract-without-hosted-dependencies`.
 
 | Answer | What the project does | What it costs |
 |:---|:---|:---|
 | Generation environment | Set an environment for the generation run whose composition wires no hosted dependency. | The generated document reflects that environment's endpoint set. |
 | Deferred guard | Move each startup refusal from composition to first use. | A misconfiguration surfaces on the first request instead of at boot. |
 
-The generation run contacts no hosted dependency and runs no schema change under either answer.
+Generation without hosted dependencies follows `standards/rule/backend-api.generate-the-contract-without-hosted-dependencies`.
 
-Every operation sets a stable name through `WithName`, which becomes `operationId`, and declares authorization, request, success, and Problem Details response metadata. The implementation uses typed results or `Produces` metadata so the generated document contains every documented status. It adds explicit summaries and descriptions, or enables XML documentation on named handler methods. Comments on route lambdas are not contract documentation.
+When TypeScript consumes the API, the pinned generator reads the source artifact. The generated client, its model types, its request schemas, and its query options are one workspace package, because every frontend and every command reads them.
 
-When TypeScript consumes the API, the pinned generator reads the source artifact. The generated client, its model types, its request schemas, and its query options are one workspace package, because every frontend and every command reads them. Scalar may expose API documentation in Development, and hosted environments do not expose development tooling by default.
+### Declare operation metadata in the contract (standards/rule/backend-api.declare-operation-metadata-in-the-contract)
+
+**Requirement:** An operation MUST declare a stable `operationId`, its authorization, request, success, and Problem Details metadata, and typed results or `Produces` metadata, and a summary.
+
+**Rationale:** A stable name through `WithName` becomes `operationId`. Authorization metadata cites the enforced policies, and Problem Details metadata covers every documented failure status. Comments on route lambdas are not contract documentation, so operations carry explicit summaries and descriptions.
 
 ### Commit the generated contract its consumers read (standards/rule/backend-api.commit-the-generated-contract-its-consumers-read)
 
 **Requirement:** A WebApi project MUST commit its generated OpenAPI artifact when a frontend or external consumer reads it.
 
-**Rationale:** A committed artifact makes every contract change visible in review and lets CI fail on an unregenerated document.
+**Rationale:** A committed artifact makes every contract change visible in review and lets CI fail on an unregenerated document. Consumers read the artifact through the generated client, model, schema, and query-option packages.
 
 ### Reflect enforced authentication in the contract (standards/rule/backend-api.reflect-enforced-authentication-in-the-contract)
 
@@ -249,28 +245,45 @@ When TypeScript consumes the API, the pinned generator reads the source artifact
 
 An operation requiring a control header declares it as a required parameter, for example `Idempotency-Key` or `If-Match`. The implementation prefers typed results, typed boundary enums, and parameter metadata over handwritten schemas that drift from code.
 
+### Expose development tooling in Development only (standards/rule/backend-api.expose-development-tooling-in-development-only)
+
+**Requirement:** A WebApi project MUST expose Scalar and development tooling in Development only.
+
+**Rationale:** Hosted environments do not expose development tooling by default.
+
 ### Mirror a Domain closed set as a transport model of the same shape (standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape)
 
 **Requirement:** A WebApi transport model for a Domain closed set MUST preserve the shape of that set.
 
-**Rationale:** A transport shape that differs from its Domain set discards information the Domain carries.
+**Rationale:** A transport shape that differs from its Domain set discards information the Domain carries. Label-only sets follow `standards/rule/backend-api.publish-label-only-sets-as-string-enums`, and data-bearing sets follow `standards/rule/backend-api.mark-polymorphic-transport-models-with-discriminators`. Narrowing follows `standards/rule/backend-application.record-a-decision-for-closed-set-narrowing`.
 
-**Example:** A label-only set maps to a string `enum`. A data-bearing set maps to an abstract base record with one sealed record per case, published as `oneOf` with a discriminator. The polymorphic type uses `System.Text.Json` polymorphism so the serializer and generated contract agree:
+**Example:** A label-only set maps to a string `enum`. A data-bearing set maps to an abstract base record with one sealed record per case, published as `oneOf` with a discriminator.
 
-- Declare an abstract base record, because a concrete base cannot mark the discriminator property as required.
-- Put `[JsonPolymorphic]` and one `[JsonDerivedType(typeof(CaseModel), "case-code")]` per case on the base type.
-- Carry this metadata on the type, not only in host options.
-- Use string discriminators equal to the Domain union's stable case codes.
-- Name the discriminator through `[JsonPolymorphic(TypeDiscriminatorPropertyName = "...")]`, using a name such as `type` or `outcome`.
+### Publish label-only sets as string enums (standards/rule/backend-api.publish-label-only-sets-as-string-enums)
+
+**Requirement:** A transport model for a label-only set MUST publish its values as an OpenAPI string `enum`.
+
+**Rationale:** The permission to use a plain enum for a label-only set lives in `standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums`.
+
+### Mark polymorphic transport models with discriminators (standards/rule/backend-api.mark-polymorphic-transport-models-with-discriminators)
+
+**Requirement:** A data-bearing set MUST map to an abstract base record with one sealed record per case, published as `oneOf` with a string discriminator.
+
+**Rationale:** A concrete base cannot mark the discriminator property as required, so the base stays abstract. String discriminators equal the Domain union's stable case codes. Discriminator strings stay stable across identifier renames.
+
+**Example:**
+
+- Declare an abstract base record carrying `JsonPolymorphic` and one `JsonDerivedType` per case.
+- Carry the metadata on the type, not only in host options.
+- Name the discriminator through `TypeDiscriminatorPropertyName`, using a name such as `type` or `outcome`.
 - Opt derived types in explicitly, so an unregistered runtime subtype fails serialization.
-
-Discriminator strings are contract values that an identifier rename cannot change. Never use integer discriminators or mix discriminator forms. Narrowing a set requires a decision and an updated specification. A document or schema transformer completes discriminator metadata that the generator omits, and the source change regenerates the document and typed consumers per `standards/rule/backend-api.treat-openapi-as-a-generated-contract`.
+- A document or schema transformer completes discriminator metadata that the generator omits.
 
 ### Reject a collapsed or borrowed wire contract (standards/rule/backend-api.reject-a-collapsed-or-borrowed-wire-contract)
 
 **Requirement:** A WebApi transport model MUST NOT collapse a data-bearing set into an `enum` or reuse a Domain or Application type as the wire contract.
 
-**Rationale:** Each layer owns its own contract type per `standards/rule/backend-architecture.own-each-layers-contract-types`. Narrowing a set requires a decision and an updated specification.
+**Rationale:** Each layer owns its own contract type per `standards/rule/backend-architecture.own-each-layers-contract-types`. Narrowing follows `standards/rule/backend-application.record-a-decision-for-closed-set-narrowing`.
 
 ## Conventions
 
@@ -278,7 +291,7 @@ Discriminator strings are contract values that an identifier rename cannot chang
 
 **Default:** Group endpoint folders by module, then aggregate, then use case, following `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case`.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** The folder path matches the specification path, so a reader locates an operation from its use-case identifier.
 
@@ -317,15 +330,15 @@ Discriminator strings are contract values that an identifier rename cannot chang
   Program.cs
 ```
 
-A single-aggregate module nests use-case folders directly under the module only when the aggregate root's plural name equals the module name. Otherwise, and for any module with more than one aggregate, use-case folders nest under the aggregate.
+Module nesting, including the single-aggregate flat form, follows the cited folder rule.
 
-### Keep transport models independent (standards/rule/backend-api.keep-transport-models-independent)
+### Name transport types by their boundary role (standards/rule/backend-api.name-transport-types-by-their-boundary-role)
 
-**Default:** Name request and response models `{UseCase}RequestModel` and `{UseCase}ResponseModel`, a collection item `{UseCase}ResponseItemModel`, pagination metadata `PaginationModel`, and an operation mapping class `{UseCase}ApiMappings`.
+**Default:** Transport types take the names the suffix table assigns their roles.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** A name that ends in its boundary role keeps transport concerns out of Application messages and results.
+**Rationale:** The suffix table lives in `standards/rule/workspace-naming.use-architectural-suffixes`. A name that ends in its boundary role keeps transport concerns out of Application messages and results.
 
 **Example:** Another passive HTTP DTO names its boundary role and ends in `Model`.
 
@@ -333,14 +346,14 @@ A single-aggregate module nests use-case folders directly under the module only 
 
 **Default:** Derive each route from its resource and subresource, and use an action segment only when the operation maps to neither.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Example:**
 
 ```text
 POST   /api/posts
 GET    /api/posts/{postId}
-POST   /api/posts/{postId}/publication
+GET    /api/posts/{postId}/publication
 GET    /api/posts?after={cursor}&limit=20
 ```
 
@@ -348,41 +361,111 @@ GET    /api/posts?after={cursor}&limit=20
 
 **Default:** Emit a plain numeric schema for an `int32` or `double` field, and reserve a string-or-number union for `int64` values beyond the JavaScript safe integer range.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** An over-broad union forces every consumer to coerce values that were never strings.
 
 ### Keep Program.cs as composition (standards/rule/backend-api.keep-programcs-as-composition)
 
-**Default:** Keep `Program.cs` to module registration, middleware order, endpoint discovery, health endpoints, OpenAPI, and host startup.
+**Default:** `Program.cs` holds module registration, middleware order, endpoint discovery, health endpoints, OpenAPI, and host startup, ending with an empty partial `Program` class.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Order-sensitive middleware stays reviewable when one file shows the sequence.
+**Rationale:** Order-sensitive middleware stays reviewable when one file shows the sequence. Process composition lives in `standards/rule/backend-architecture.compose-each-process-explicitly`, which this file implements for WebApi.
 
-**Example:** The visible order is trusted forwarded headers, exception handling, transport security, authentication, authorization, endpoints, then health. Forwarded headers appear only when the deployment boundary requires trusted proxies. OpenAPI and Scalar map only in Development. `Program.cs` ends with an empty `public partial class Program` so the integration test host can target the real entry point.
+**Example:** The visible order is trusted forwarded headers, exception handling, transport security, authentication, authorization, endpoints, then health. Forwarded headers appear only when the deployment boundary requires trusted proxies. OpenAPI and Scalar map only in Development.
 
 ### Model a monetary value as one object (standards/rule/backend-api.model-a-monetary-value-as-one-object)
 
 **Default:** Carry a monetary value as one `Money` object in a response model and in a request where the caller chooses the currency.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Split sibling fields pair by a server invariant the schema cannot see, so a report reads the two independently. `standards/rule/backend-domain.make-money-and-decimal-rules-explicit` already carries the same shape in the Domain, and the transport model mirrors it. The object holds `amount` and an ISO 4217 `currency`. A caller who cannot choose the currency cannot set it honestly.
 
 **Example:** `unitPrice` and `currencyCode` become `price` of type `Money`. A request that references an account with a fixed currency carries `amount` alone.
 
-### Name transport fields by one rule set (standards/rule/backend-api.name-transport-fields-by-one-rule-set)
+### Name boolean fields as conditions (standards/rule/backend-api.name-boolean-fields-as-conditions)
 
-**Default:** Name transport fields with positive booleans, one `At` time suffix, standard vocabulary names, `code` beside `reason`, per-resource path parameters, and no noise word.
+**Default:** Boolean fields use the same condition names as code, in camel case.
 
-**Replacement:** A consumer can replace this default with an explicit local convention.
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** A type prefix repeats what the schema already declares. A mixed suffix set hides which shape a field carries, and a noise word names nothing an integrator can act on.
+**Rationale:** Boolean names live in `standards/rule/workspace-naming.use-intent-revealing-boolean-names`, and transport carries the camel-case form.
 
-**Example:** `isBuyable` becomes `buyable`, `placedAt` becomes `createdAt`, `defaultLocaleTag` becomes `defaultLanguageTag`, `keyName` becomes `displayName`, and `/details` takes the aggregate name.
+**Example:** `IsBuyable` in code becomes `isBuyable` on the wire.
 
-The rule set names the standard behind each clause. The boolean and noise-word clauses trace to the Azure naming conventions and the Microsoft Style Guide. The `At` suffix traces to [AIP-142](https://google.aip.dev/142), the boolean form to [AIP-140](https://google.aip.dev/140), and `languageTag` to [RFC 5646](https://datatracker.ietf.org/doc/html/rfc5646).
+### Name time fields with At (standards/rule/backend-api.name-time-fields-with-at)
+
+**Default:** Time fields end in At, following [AIP-142](https://google.aip.dev/142).
+
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+
+**Rationale:** A mixed suffix set hides which shape a field carries.
+
+**Example:** `createdAt` names the creation time.
+
+### Use standard field vocabulary (standards/rule/backend-api.use-standard-field-vocabulary)
+
+**Default:** Field names use created over placed, languageTag over locale, and displayName over keyName.
+
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+
+**Rationale:** `languageTag` follows [RFC 5646](https://datatracker.ietf.org/doc/html/rfc5646).
+
+**Example:** `defaultLanguageTag` replaces `defaultLocaleTag`.
+
+### Name failure pairs code and reason (standards/rule/backend-api.name-failure-pairs-code-and-reason)
+
+**Default:** A request body names a failure with code for the class and reason for the explanation.
+
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+
+**Rationale:** The pair mirrors the Problem Details code and detail on the wire under `standards/rule/backend-api.return-stable-problem-details`.
+
+### Name path parameters per resource (standards/rule/backend-api.name-path-parameters-per-resource)
+
+**Default:** Each path parameter names its own resource identity, and a details segment takes the aggregate name.
+
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+
+**Rationale:** A shared id hides which resource it identifies.
+
+**Example:** `/api/posts/{postId}` names the post; `/details` takes the aggregate name.
+
+### Avoid noise words in field names (standards/rule/backend-api.avoid-noise-words-in-field-names)
+
+**Default:** Field names carry no type prefix and no noise word.
+
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+
+**Rationale:** The noise words are data, info, item, object, value, and thing; the type prefixes are str, int, bool, num, obj, and arr. A type prefix repeats what the schema already declares, and a noise word names nothing an integrator can act on.
+
+**Example:** `customerInfo` becomes `customer`.
+
+### Declare a smaller collection maximum (standards/rule/backend-api.declare-a-smaller-collection-maximum)
+
+**Default:** A use case with stricter needs declares its smaller maximum on its collection query message and states the reason on its use-case record.
+
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+
+**Rationale:** The endpoint enforces the declared maximum under `standards/rule/backend-api.bound-collection-queries`.
+
+### Use offsets for proven bounded datasets (standards/rule/backend-api.use-offsets-for-proven-bounded-datasets)
+
+**Default:** A collection over a proven bounded dataset pages with an offset while the public contract stays cursor-shaped.
+
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+
+**Rationale:** The use-case record states the bound that makes the dataset safe for offsets.
+
+### Generate the contract without hosted dependencies (standards/rule/backend-api.generate-the-contract-without-hosted-dependencies)
+
+**Default:** The generation run contacts no hosted dependency and runs no schema change, and the project records its chosen answer.
+
+**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+
+**Rationale:** A generation environment wires no hosted dependency for the generation run, and the document reflects that environment's endpoint set. A deferred guard moves each startup refusal from composition to first use, and a misconfiguration surfaces on the first request instead of at boot.
 
 ## Reference example
 
@@ -394,34 +477,45 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/backend-api.use-one-endpoint-per-operation | test | `EndpointDiscoveryTests` asserts every mapped route resolves to one endpoint type and one mediator dispatch. |
-| standards/rule/backend-api.exclude-mvc-controllers-from-the-profile | static | `WebApiArchitectureTests` asserts the assembly declares no type deriving from ControllerBase. |
-| standards/rule/backend-api.keep-endpoint-dependencies-transport-focused | test | `WebApiArchitectureTests` asserts no endpoint parameter resolves a repository, session, context, or provider client. |
-| standards/rule/backend-api.defer-error-mapping-to-the-global-handler | static | `WebApiArchitectureTests` asserts no endpoint type catches an application or Domain exception. |
-| standards/rule/backend-api.derive-authenticated-identity-from-claims | test | `ActorIdentityTests` asserts each protected operation resolves its actor from the request claims principal. |
-| standards/rule/backend-api.reject-a-client-supplied-actor-identifier | test | `ActorIdentityTests` posts a body, query, and header actor identifier and asserts each one is ignored. |
-| standards/rule/backend-api.authorize-the-target-resource | test | `TargetAuthorizationTests` calls each protected operation as a non-owner and asserts 403 or the declared 404. |
-| standards/rule/backend-api.return-stable-problem-details | test | `ProblemDetailsContractTests` asserts code, traceId, and errors on a validation failure response. |
-| standards/rule/backend-api.keep-error-responses-free-of-internal-detail | test | `ErrorDisclosureTests` asserts no error body contains an exception message, stack frame, SQL, or configured secret. |
-| standards/rule/backend-api.use-consistent-status-codes | test | `StatusContractTests` asserts the outcome-table status code for each documented result. |
-| standards/rule/backend-api.reject-a-success-status-for-a-failed-outcome | test | `StatusContractTests` asserts every documented error path returns its declared non-success status. |
-| standards/rule/backend-api.keep-routes-resource-oriented | static | `RouteShapeTests` asserts lowercase plural segments, kebab-case subresources, and identity outside the body. |
-| standards/rule/backend-api.state-an-unexpressible-transition-as-a-custom-method | static | `apps/api/openapi/{ProjectName}.json` states each unexpressible transition as POST with a colon-suffixed final path segment. |
-| standards/rule/backend-api.apply-patch-to-a-partial-update | static | `apps/api/openapi/{ProjectName}.json` declares `application/merge-patch+json` on each partial update and PUT on no partial update. |
-| standards/rule/backend-api.use-put-for-a-whole-replacement | static | `apps/api/openapi/{ProjectName}.json` declares PUT on whole-replacement operations only. |
-| standards/rule/backend-api.bound-collection-queries | test | `CollectionPagingTests` asserts deterministic ordering, the default limit, and rejection above the maximum. |
-| standards/rule/backend-api.treat-openapi-as-a-generated-contract | static | A Release build regenerates `apps/api/openapi/` and CI fails when regeneration changes the tree. |
-| standards/rule/backend-api.commit-the-generated-contract-its-consumers-read | static | The committed `apps/api/openapi/` artifact exists for each consumer-read contract and CI fails on a difference. |
-| standards/rule/backend-api.reflect-enforced-authentication-in-the-contract | test | `OpenApiSecurityTests` asserts every operation with an authorization policy declares a matching security entry. |
-| standards/rule/backend-api.publish-precise-complete-schemas | test | `OpenApiSchemaTests` asserts closed-set fields publish an enum or oneOf and control headers are required. |
-| standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape | test | `PolymorphicContractTests` round-trips every union case and asserts the discriminator equals its Domain case code. |
-| standards/rule/backend-api.model-a-monetary-value-as-one-object | static | `apps/api/openapi/{ProjectName}.json` carries a `Money` schema referenced by response fields and currency-choosing requests. |
-| standards/rule/backend-api.name-transport-fields-by-one-rule-set | inspection | A schema review of `apps/api/openapi/{ProjectName}.json` finds no banned prefix, no banned noise word, and one suffix per time shape. |
-| standards/rule/backend-api.reject-a-collapsed-or-borrowed-wire-contract | test | `PolymorphicContractTests` asserts no data-bearing set serializes as an enum and no inner-layer type reaches the wire. |
-| standards/rule/backend-api.use-this-endpoint-layout | inspection | Endpoint folder review locates each operation under its module and aggregate, or records a named local replacement. |
-| standards/rule/backend-api.keep-transport-models-independent | static | `TransportNamingTests` asserts each transport type ends in RequestModel, ResponseModel, Model, or ApiMappings. |
-| standards/rule/backend-api.name-routes-from-resources | static | `RouteShapeTests` reports each action segment for review against its resource alternatives. |
-| standards/rule/backend-api.keep-numeric-transport-types-precise | test | `OpenApiSchemaTests` asserts each int32 and double field publishes a plain numeric schema. |
-| standards/rule/backend-api.keep-programcs-as-composition | inspection | `Program.cs` review confirms the recorded middleware order and locates registration in layer-owned extension methods. |
+| standards/rule/backend-api.use-one-endpoint-per-operation | guidance | Does each mapped route resolve to one endpoint type and one mediator dispatch? |
+| standards/rule/backend-api.exclude-mvc-controllers-from-the-profile | guidance | Does any type derive from ControllerBase? |
+| standards/rule/backend-api.keep-endpoint-dependencies-transport-focused | guidance | Does any endpoint take a repository, session, context, provider, or service? |
+| standards/rule/backend-api.defer-error-mapping-to-the-global-handler | guidance | Does any endpoint catch an application or Domain exception? |
+| standards/rule/backend-api.apply-only-coarse-policies-at-the-endpoint | guidance | Does any endpoint decide target authorization instead of enforcing coarse policies? |
+| standards/rule/backend-api.return-stable-problem-details | guidance | Does each error response carry code, traceId, and field errors? |
+| standards/rule/backend-api.use-consistent-status-codes | guidance | Does each operation return its outcome-table status code? |
+| standards/rule/backend-api.require-the-marker-header-on-cookie-authenticated-writes | guidance | Does a cookie-authenticated write without the marker header answer 401? |
+| standards/rule/backend-api.keep-routes-resource-oriented | guidance | Do routes use plural segments, kebab subresources, and body command data? |
+| standards/rule/backend-api.state-an-unexpressible-transition-as-a-custom-method | guidance | Does each unexpressible transition use POST with a colon-suffixed verb? |
+| standards/rule/backend-api.apply-patch-to-a-partial-update | guidance | Does each partial update use PATCH with merge-patch media? |
+| standards/rule/backend-api.use-put-for-a-whole-replacement | guidance | Does each PUT replace the whole resource its path names? |
+| standards/rule/backend-api.bound-collection-queries | guidance | Do collection endpoints order deterministically within default and maximum limits? |
+| standards/rule/backend-api.use-opaque-cursors-for-collection-paging | guidance | Does a malformed cursor answer 400 with code invalid_cursor? |
+| standards/rule/backend-api.version-cursors-with-stable-sort-values | guidance | Does each cursor carry a version, stable sort values, and no readable secret? |
+| standards/rule/backend-api.treat-openapi-as-a-generated-contract | checkable | `dotnet build` regenerates the OpenAPI artifact, and the gate fails on a changed tree. |
+| standards/rule/backend-api.declare-operation-metadata-in-the-contract | guidance | Does each operation declare its operationId, metadata, typed results, and summary? |
+| standards/rule/backend-api.commit-the-generated-contract-its-consumers-read | guidance | Is the generated artifact committed and current for each consumer? |
+| standards/rule/backend-api.reflect-enforced-authentication-in-the-contract | guidance | Does each authenticated operation declare its security scheme and requirement? |
+| standards/rule/backend-api.publish-precise-complete-schemas | guidance | Does each schema declare its value set, bounds, format, and control headers? |
+| standards/rule/backend-api.expose-development-tooling-in-development-only | guidance | Do Scalar and development tooling map in Development only? |
+| standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape | guidance | Does each transport model preserve its Domain set shape? |
+| standards/rule/backend-api.publish-label-only-sets-as-string-enums | guidance | Does each label-only set publish a string enum? |
+| standards/rule/backend-api.mark-polymorphic-transport-models-with-discriminators | guidance | Does each data-bearing set publish oneOf with a string discriminator? |
+| standards/rule/backend-api.reject-a-collapsed-or-borrowed-wire-contract | guidance | Does any transport model collapse a set or reuse an inner type? |
+| standards/rule/backend-api.use-this-endpoint-layout | guidance | Does each endpoint folder match its module, aggregate, and use case? |
+| standards/rule/backend-api.name-transport-types-by-their-boundary-role | guidance | Does each transport type carry the suffix its role assigns? |
+| standards/rule/backend-api.name-routes-from-resources | guidance | Does each route derive from its resource with action segments justified? |
+| standards/rule/backend-api.keep-numeric-transport-types-precise | guidance | Does each numeric field publish a plain schema except large int64 unions? |
+| standards/rule/backend-api.keep-programcs-as-composition | guidance | Does `Program.cs` hold only composition in the recorded order? |
+| standards/rule/backend-api.model-a-monetary-value-as-one-object | guidance | Does each monetary value travel as one Money object? |
+| standards/rule/backend-api.name-boolean-fields-as-conditions | guidance | Does each boolean field use the camel-case condition name? |
+| standards/rule/backend-api.name-time-fields-with-at | guidance | Does each time field end in At? |
+| standards/rule/backend-api.use-standard-field-vocabulary | guidance | Does each field use the standard vocabulary over its rejected synonym? |
+| standards/rule/backend-api.name-failure-pairs-code-and-reason | guidance | Does each request failure name code for the class and reason? |
+| standards/rule/backend-api.name-path-parameters-per-resource | guidance | Does each path parameter name its own resource identity? |
+| standards/rule/backend-api.avoid-noise-words-in-field-names | guidance | Does any field name carry a type prefix or noise word? |
+| standards/rule/backend-api.declare-a-smaller-collection-maximum | guidance | Does each lowered maximum name its value and reason? |
+| standards/rule/backend-api.use-offsets-for-proven-bounded-datasets | guidance | Does each offset page cite the bound making it safe? |
+| standards/rule/backend-api.generate-the-contract-without-hosted-dependencies | guidance | Does generation avoid hosted dependencies with its answer recorded? |
