@@ -22,7 +22,8 @@ sealed record ScenarioInfo(
 /// <summary>What the test read found: scenarios and file comments.</summary>
 sealed record TestRead(
     IReadOnlyList<ScenarioInfo> Scenarios,
-    IReadOnlyList<CodeComment> Comments);
+    IReadOnlyList<CodeComment> Comments,
+    IReadOnlyDictionary<string, IReadOnlySet<string>> StepCalls);
 
 /// <summary>
 ///     Reads acceptance scenarios: the case each claims, the steps it runs,
@@ -43,13 +44,14 @@ static class TestReader
         var scenarios = new List<ScenarioInfo>();
         var comments = new List<CodeComment>();
         var gate = new object();
+        var stepCalls = new System.Collections.Concurrent.ConcurrentDictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal);
 
         System.Threading.Tasks.Parallel.ForEach(
             files,
             () => (Scenarios: new List<ScenarioInfo>(), Comments: new List<CodeComment>()),
             (file, _, local) =>
             {
-                ReadFile(file, local.Scenarios, local.Comments);
+                ReadFile(file, local.Scenarios, local.Comments, stepCalls);
 
                 return local;
             },
@@ -68,10 +70,15 @@ static class TestReader
                 .ThenBy(scenario => scenario.Line)],
             [.. comments
                 .OrderBy(comment => comment.File, StringComparer.Ordinal)
-                .ThenBy(comment => comment.Line)]);
+                .ThenBy(comment => comment.Line)],
+            stepCalls);
     }
 
-    private static void ReadFile(string file, List<ScenarioInfo> scenarios, List<CodeComment> comments)
+    private static void ReadFile(
+        string file,
+        List<ScenarioInfo> scenarios,
+        List<CodeComment> comments,
+        System.Collections.Concurrent.ConcurrentDictionary<string, IReadOnlySet<string>> stepCalls)
     {
         SyntaxTree tree;
 
@@ -85,6 +92,28 @@ static class TestReader
         }
 
         var root = tree.GetRoot();
+
+        // A steps method names the generated-client operations it calls, such as api.CompleteTicketResaleAsync,
+        // so a scenario's when step is joined to the use case it really exercises.
+        foreach (var type in root.DescendantNodes().OfType<ClassDeclarationSyntax>()
+                     .Where(type => type.Identifier.Text.EndsWith("Steps", StringComparison.Ordinal)))
+        {
+            foreach (var method in type.Members.OfType<MethodDeclarationSyntax>())
+            {
+                var called = method.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                    .Select(invocation => invocation.Expression)
+                    .OfType<MemberAccessExpressionSyntax>()
+                    .Select(access => access.Name.Identifier.Text)
+                    .Where(name => name.Length > "Async".Length && name.EndsWith("Async", StringComparison.Ordinal))
+                    .Select(name => name[..^"Async".Length])
+                    .ToHashSet(StringComparer.Ordinal);
+
+                stepCalls.AddOrUpdate(
+                    $"{type.Identifier.Text}.{method.Identifier.Text}",
+                    called,
+                    (_, known) => known.Concat(called).ToHashSet(StringComparer.Ordinal));
+            }
+        }
 
         foreach (var token in root.DescendantTokens())
         {

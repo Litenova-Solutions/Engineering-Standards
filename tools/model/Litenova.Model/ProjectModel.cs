@@ -28,6 +28,10 @@ sealed class ProjectModel
     public CodeModel Code { get; set; } = new();
     public List<ScreenInfo> Screens { get; } = [];
     public List<ScenarioInfo> Tests { get; } = [];
+
+    /// <summary>The generated-client operations each steps method calls, keyed by class and method.</summary>
+    public IReadOnlyDictionary<string, IReadOnlySet<string>> StepCalls { get; set; } =
+        new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal);
     public List<CodeComment> TestComments { get; } = [];
     public List<CodeComment> ScreenComments { get; } = [];
     public TestRun? TestRun { get; set; }

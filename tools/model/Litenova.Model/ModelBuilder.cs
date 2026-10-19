@@ -30,6 +30,7 @@ static class ModelBuilder
         var tests = Timed("tests", () => TestReader.Read(config));
 
         model.Tests.AddRange(tests.Scenarios);
+        model.StepCalls = tests.StepCalls;
         model.TestComments.AddRange(tests.Comments);
         model.TestRun = Timed("testrun", () => TestRunReader.Read(config));
 
@@ -329,7 +330,7 @@ static class ModelBuilder
                 return test.Steps.Any(step => step.Phase == "then");
             }
 
-            if (!Belongs(test, home))
+            if (!Belongs(test, home) && !Calls(model, test, home))
             {
                 return false;
             }
@@ -402,6 +403,17 @@ static class ModelBuilder
             && result.Field("outcome") == "refusal"
                 ? result
                 : null;
+    }
+
+    private static bool Calls(ProjectModel model, ScenarioInfo test, string home)
+    {
+        var operation = Naming.Pascal(home);
+
+        return test.Steps.Any(step =>
+            step.Phase == "when"
+            && step.ReceiverType is { } type
+            && model.StepCalls.TryGetValue($"{type}.{step.Method}", out var called)
+            && called.Contains(operation));
     }
 
     private static bool Belongs(ScenarioInfo test, string home)

@@ -99,7 +99,7 @@ size profile and defaults to `large`. `owners` is the closed owner list.
 | `case-result-unresolved` | A case ends in another use case's result. |
 | `refusal-not-thrown` | A refusal code appears in no backend string literal. |
 | `use-case-unimplemented` | A use case has no handler, reaction or job. |
-| `proves-unconfirmed` | A test's claim has no step, message or effect that proves it. |
+| `proves-unconfirmed` | A test claims a case, but none of its when steps belongs to the use case or calls its generated-client operation, or it asserts no refusal the case names. |
 | `profile-type-missing` | The size profile requires a type no record holds. |
 | `product-not-singleton` | The project holds no single product record. |
 | `journey-reach` | A public use case sits in no journey. It runs on the large profile only. |
