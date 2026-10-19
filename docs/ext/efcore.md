@@ -24,7 +24,7 @@ For Entity Framework Core-owned aggregate paths, this extension replaces:
 For an EF Core-owned command with durable delivery, this extension also replaces:
 
 - `standards/rule/ext-outbox.stage-messages-with-business-work`
-- `standards/rule/ext-outbox.use-the-scoped-business-session`
+- `standards/rule/ext-outbox.stage-messages-with-business-work`
 - `standards/rule/ext-outbox.reject-independent-outbox-commits`
 
 Every other baseline provision binds EF Core-owned paths unchanged.

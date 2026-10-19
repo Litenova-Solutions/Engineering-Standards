@@ -27,7 +27,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ### Derive the actor from claims (standards/rule/quality-security.derive-the-actor-from-claims)
 
-**Requirement:** Actor resolution MUST follow `standards/rule/backend-api.derive-authenticated-identity-from-claims` and `standards/rule/backend-api.reject-a-client-supplied-actor-identifier`.
+**Requirement:** Actor resolution MUST follow `standards/rule/quality-security.derive-the-actor-from-claims` and `standards/rule/quality-security.derive-the-actor-from-claims`.
 
 **Rationale:** Actor resolution has one owner: the WebApi boundary. Request data never supplies the current actor.
 
@@ -65,7 +65,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ### Limit public error detail (standards/rule/quality-security.limit-public-error-detail)
 
-**Requirement:** A public error MUST use the error contract `standards/rule/backend-api.return-stable-problem-details` and `standards/rule/backend-api.keep-error-responses-free-of-internal-detail` define.
+**Requirement:** A public error MUST use the error contract `standards/rule/backend-api.return-stable-problem-details` and `standards/rule/quality-security.limit-public-error-detail` define.
 
 **Rationale:** The error contract has one owner: the HTTP API rules. A stack trace, SQL, connection detail, provider body, uncontracted internal identifier, or authorization reason that reveals resource existence gives an attacker structure.
 

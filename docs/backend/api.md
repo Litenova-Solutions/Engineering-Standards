@@ -169,7 +169,7 @@ The `operationId` keeps its verb-noun form, so `CancelShipment` names the same t
 
 **Requirement:** A collection endpoint MUST apply deterministic ordering, a default limit of 20, and the use case's declared maximum limit of 100 or lower.
 
-**Rationale:** An unbounded collection read turns one caller into a source of unbounded database and serialization work. Query-side ordering lives in `standards/rule/backend-persistence.make-ordering-explicit`, which this rule's ordering follows. Cursor mechanics live in `standards/rule/backend-api.use-opaque-cursors-for-collection-paging` and `standards/rule/backend-api.version-cursors-with-stable-sort-values`.
+**Rationale:** An unbounded collection read turns one caller into a source of unbounded database and serialization work. Query-side ordering lives in `standards/rule/backend-api.bound-collection-queries`, which this rule's ordering follows. Cursor mechanics live in `standards/rule/backend-api.use-opaque-cursors-for-collection-paging` and `standards/rule/backend-api.version-cursors-with-stable-sort-values`.
 
 **Example:** A request uses `after` as an opaque cursor and `limit` as a positive integer. The implementation fetches one record beyond the requested limit to determine whether another page exists. The response uses one shape:
 
@@ -194,7 +194,7 @@ The `operationId` keeps its verb-noun form, so `CancelShipment` names the same t
 
 **Requirement:** A paging cursor MUST carry a version and the last stable sort values, including a unique tie-breaker, and no sensitive value in readable form.
 
-**Rationale:** The version lets the sort evolve without breaking stored cursors. The tie-breaker matches the query's stable order under `standards/rule/backend-persistence.make-ordering-explicit`.
+**Rationale:** The version lets the sort evolve without breaking stored cursors. The tie-breaker matches the query's stable order under `standards/rule/backend-api.bound-collection-queries`.
 
 ### Treat OpenAPI as a generated contract (standards/rule/backend-api.treat-openapi-as-a-generated-contract)
 

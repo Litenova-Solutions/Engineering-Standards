@@ -69,7 +69,7 @@ Write an architecture test over every `ICommand` implementation. Fail the build 
 
 ### Carry request context to the pipeline
 
-Capture the origin at the HTTP boundary and place it where the pipeline reads it. The endpoint already resolves the actor from verified claims under `standards/rule/backend-api.derive-authenticated-identity-from-claims`.
+Capture the origin at the HTTP boundary and place it where the pipeline reads it. The endpoint already resolves the actor from verified claims under `standards/rule/quality-security.derive-the-actor-from-claims`.
 
 Register middleware that reads the connection address, the user agent, and the request identifier. Expose them through a scoped accessor that the audit producer resolves. This satisfies `standards/rule/ext-audit.record-the-request-origin` and `standards/rule/ext-audit.record-the-operation-trace-identity`.
 

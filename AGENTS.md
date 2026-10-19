@@ -2,7 +2,7 @@
 
 Read this file before changing this repository or a consumer application. (standards/rule/core-agent.select-task-context)
 
-Standards v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend. (standards/rule/core-scope.use-the-supported-application-profile, standards/rule/core-scope.keep-one-bounded-context)
+Standards v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend. (standards/rule/core-scope.select-size-profile-and-stacks, standards/rule/core-scope.keep-one-bounded-context)
 
 The canonical human index is `docs/README.md`. Exact versions, stacks, extensions, and switched-on types are in `standards.manifest.json`. (standards/rule/workspace-dependencies.pin-every-dependency-centrally, standards/rule/core-scope.select-conditional-extensions-explicitly)
 
@@ -34,7 +34,7 @@ A consumer records the release it reviewed in `reviewedStandardsVersion`. (stand
 2. Query the model for the records the task touches. (standards/rule/core-agent.select-task-context)
 3. Read the generated agent context for those records, then the records themselves. (standards/rule/core-agent.select-task-context)
 4. Read the full standards pages the query names before generating files or changing public boundaries. (standards/rule/core-agent.select-task-context)
-5. Read selected extensions and their switched-on types before editing inside their boundary. (standards/rule/core-agent.load-applicable-extensions, standards/rule/core-system.select-extensions-before-applying-them)
+5. Read selected extensions and their switched-on types before editing inside their boundary. (standards/rule/core-agent.load-applicable-extensions, standards/rule/core-scope.record-selected-extensions)
 6. Inspect neighboring consumer files after loading the applicable standard. (standards/rule/core-agent.inspect-local-examples-after-standards)
 
 Run the query from the standards root as below, adding the `standards/` prefix from a consumer root.
@@ -43,7 +43,7 @@ Run the query from the standards root as below, adding the `standards/` prefix f
 dotnet run --project tools/model/Litenova.Model -- query <id>
 ```
 
-Do not load unrelated conventions or inactive extensions. (standards/rule/core-agent.load-applicable-extensions, standards/rule/core-system.select-extensions-before-applying-them)
+Do not load unrelated conventions or inactive extensions. (standards/rule/core-agent.load-applicable-extensions, standards/rule/core-scope.record-selected-extensions)
 
 ## Source Precedence
 
@@ -68,7 +68,7 @@ Do not add an unauthorized package, schema migration, authentication change, pub
 
 The standards manifest carries a `version` field. The actual current version is the highest git tag in this repository. The agent reads the highest tag before assuming a version. It sets the manifest to the next release being prepared. It adds new `CHANGELOG.md` entries to the topmost entry under that release's heading. (standards/rule/core-maintaining.publish-a-standards-release-from-a-tag)
 
-A consumer template's `reviewedStandardsVersion` field is set to the latest released tag, never higher. Aspirational `CHANGELOG.md` entries for un-released versions move below the current release. (standards/rule/core-maintaining.record-the-release-a-consumer-adopts)
+A consumer template's `reviewedStandardsVersion` field is set to the latest released tag, never higher. Aspirational `CHANGELOG.md` entries for un-released versions move below the current release. (standards/rule/core-authoring.record-the-reviewed-standards-release)
 
 ## High-Risk Boundaries
 
@@ -83,7 +83,7 @@ A consumer template's `reviewedStandardsVersion` field is set to the latest rele
 - Write commands through repositories and commit through the command pipeline. (standards/rule/backend-application.keep-command-handlers-narrow, standards/rule/backend-persistence.commit-once-in-the-command-pipeline)
 - Derive the actor from verified claims, and authorize each target from declared permissions. (standards/rule/backend-application.enforce-target-authorization-in-the-pipeline)
 - Use the controlled shadcn/ui baseline for React web frontends. (standards/rule/frontend-ui.select-one-visual-authority, standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)
-- Use the controlled shadcn-svelte baseline for Svelte frontends. (standards/rule/svelte-ui.select-one-visual-authority, standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package)
+- Use the controlled shadcn-svelte baseline for Svelte frontends. (standards/rule/frontend-ui.select-one-visual-authority, standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)
 
 Read the full cited provisions before applying these boundaries. (standards/rule/core-agent.select-task-context)
 

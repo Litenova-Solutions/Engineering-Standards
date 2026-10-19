@@ -45,7 +45,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     | `Open` | The copy is out and the member holds it | Due date |
     | `Returned` | The copy is back on the shelves | Return date |
 
-    Create an abstract state record and one sealed record per state. Put state-specific data on the state record. This satisfies `standards/rule/backend-domain.keep-state-records-as-the-only-aggregate-lifecycle-representation`.
+    Create an abstract state record and one sealed record per state. Put state-specific data on the state record. This satisfies `standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records`.
 
     ```csharp
     public abstract record LoanState;
@@ -58,7 +58,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     ```
 
     For each state, answer what makes it true, which data it alone requires, and which actions it allows and rejects. An unanswered question stays on the page. It receives no guessed default.
-6. Write the rules with kinds. Give each rule a person-chosen identifier of one to six lowercase words. A statement with not, no, never, or cannot keeps that word in its name. This satisfies `standards/rule/core-system.classify-domain-rules-by-enforcement-boundary`.
+6. Write the rules with kinds. Give each rule a person-chosen identifier of one to six lowercase words. A statement with not, no, never, or cannot keeps that word in its name. This satisfies `standards/rule/core-system.state-each-rule-with-its-kind`.
 
     | Rule | Kind | Enforced by | Statement | Refusal |
     |:---|:---|:---|:---|:---|
@@ -109,7 +109,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 
     Work that crosses a transaction or time boundary is a use case that reacts to an event, or a use case on a schedule. It declares what it reacts to and its delivery. This satisfies `standards/rule/backend-application.keep-event-reaction-implementations-explicit`.
 12. Keep one transaction per command. One handler stages the records its use case owns and lets the pipeline commit once. It dispatches no further command. This satisfies `standards/rule/backend-application.keep-one-state-changing-use-case-in-one-command-pipeline` and `standards/rule/backend-persistence.commit-once-in-the-command-pipeline`.
-13. Map the model to folders. Mirror the module, record, and use case path in every layer. This satisfies `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case` and `standards/rule/backend-architecture.use-mirrored-module-folders`.
+13. Map the model to folders. Mirror the module, record, and use case path in every layer. This satisfies `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case` and `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case`.
 
     ```text
     apps/api/src/Library.Domain/

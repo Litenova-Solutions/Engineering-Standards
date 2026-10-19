@@ -38,7 +38,7 @@ The manifest is the machine-readable source for `activationScope`, `replaces`, a
 
 ## Activation
 
-`standards/rule/core-scope.select-conditional-extensions-explicitly` states when an extension activates. `standards/rule/core-system.select-extensions-before-applying-them` states where it is listed. `standards/rule/core-scope.record-selected-extensions` requires the project record.
+`standards/rule/core-scope.select-conditional-extensions-explicitly` states when an extension activates. `standards/rule/core-scope.record-selected-extensions` states where it is listed. `standards/rule/core-scope.record-selected-extensions` requires the project record.
 
 The [agent protocol](../core/agent.md) carries the ordered steps an agent follows.
 

@@ -10,7 +10,7 @@ Activation scope: `project`.
 
 Applicable record types: None.
 
-The consumer enables `compat` for public APIs, partner clients, mobile clients, or independently deployed consumers. Same-release internal APIs retain `standards/rule/backend-testing.verify-generated-contracts`. A project in its pre-production stage defers these rules through the stage extension.
+The consumer enables `compat` for public APIs, partner clients, mobile clients, or independently deployed consumers. Same-release internal APIs retain `standards/rule/backend-api.treat-openapi-as-a-generated-contract`. A project in its pre-production stage defers these rules through the stage extension.
 
 ## Replaces
 
