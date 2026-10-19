@@ -31,6 +31,7 @@ const FINDING_CODES = [
   'known-gap-expired',
   'rule-name-negation',
   'use-case-without-success',
+  'use-case-without-case',
   'case-result-unresolved',
   'refusal-not-thrown',
   'use-case-unimplemented',

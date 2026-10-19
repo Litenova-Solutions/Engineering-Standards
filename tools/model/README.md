@@ -94,6 +94,7 @@ size profile and defaults to `large`. `owners` is the closed owner list.
 | `gap-unknown-check` | A known gap names a check that does not exist. |
 | `rule-name-negation` | A rule statement negates what its name keeps none of. |
 | `use-case-without-success` | A use case has no success result. |
+| `use-case-without-case` | A use case has no case. It runs on the large profile only. |
 | `case-result-unresolved` | A case ends in another use case's result. |
 | `refusal-not-thrown` | A refusal code appears in no backend string literal. |
 | `use-case-unimplemented` | A use case has no handler, reaction or job. |

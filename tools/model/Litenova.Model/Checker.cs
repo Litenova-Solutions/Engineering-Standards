@@ -18,6 +18,7 @@ static class Checker
         "refusal-not-thrown", "use-case-unimplemented", "proves-unconfirmed",
         "profile-type-missing", "product-not-singleton",
         "journey-reach", "use-case-access", "result-status", "region-unknown",
+        "use-case-without-case",
     };
 
     /// <summary>Runs every check, partitioning findings from known gaps.</summary>
@@ -829,6 +830,13 @@ static class Checker
             if (!own.Any(result => result.Field("outcome") == "success"))
             {
                 findings.Add(new Finding("use-case-without-success", $"Use case '{useCase.Id}' has no success result.", useCase.File, useCase.Line, SubjectOf(useCase)));
+            }
+
+            if (model.Config.Size == "large"
+                && !model.Records.Any(record => record.Type == "case"
+                    && Identifiers.TrySplit(record.Id, out _, out var caseHome, out _) && caseHome == name))
+            {
+                findings.Add(new Finding("use-case-without-case", $"Use case '{useCase.Id}' has no case.", useCase.File, useCase.Line, SubjectOf(useCase)));
             }
 
             if (model.Status.TryGetValue(useCase.Id, out var status) && !status.Implemented)
