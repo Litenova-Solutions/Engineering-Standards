@@ -87,9 +87,20 @@ static partial class Checker
                 continue;
             }
 
+            // A gap naming a use case also covers findings about the cases and results it holds.
+            var subjects = new List<string> { finding.Subject };
+
+            if ((finding.Subject.StartsWith("case/", StringComparison.Ordinal) || finding.Subject.StartsWith("result/", StringComparison.Ordinal))
+                && Identifiers.TrySplit(finding.Subject, out _, out var home, out _)
+                && home is not null
+                && ModelBuilder.UseCaseOf(model, home) is { } holder)
+            {
+                subjects.Add(holder.Id);
+            }
+
             var covered = gaps.Any(gap =>
                 gap.Field("check") == finding.Code
-                && gap.Ids("subject").Contains(finding.Subject, StringComparer.Ordinal)
+                && gap.Ids("subject").Any(subject => subjects.Contains(subject, StringComparer.Ordinal))
                 && gap.Status != "retired"
                 && gap.Field("endsBy") is { } endsBy
                 && DateOnly.TryParse(endsBy, out var ends)

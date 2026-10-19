@@ -17,7 +17,8 @@ sealed record ScenarioInfo(
     IReadOnlyList<ScenarioStep> Steps,
     IReadOnlyList<string> Codes,
     IReadOnlyList<int> Statuses,
-    IReadOnlySet<string> Identifiers);
+    IReadOnlySet<string> Identifiers,
+    IReadOnlyList<string> Routes);
 
 /// <summary>What the test read found: scenarios and file comments.</summary>
 sealed record TestRead(
@@ -236,7 +237,8 @@ static class TestReader
                 steps,
                 [.. codes],
                 [.. statuses.Distinct().Order()],
-                identifiers));
+                identifiers,
+                RoutesIn(scope, containing)));
         }
     }
 
@@ -298,6 +300,39 @@ static class TestReader
         }
 
         return new ScenarioStep(phase, "", null, CalledName(invocation) ?? "");
+    }
+
+    /// <summary>
+    ///     The request paths a test names: string literals beginning with a slash, in the method or in its
+    ///     class's constants, with each interpolation hole read as one path parameter.
+    /// </summary>
+    private static List<string> RoutesIn(SyntaxNode scope, TypeDeclarationSyntax? containing)
+    {
+        var routes = new SortedSet<string>(StringComparer.Ordinal);
+        var nodes = scope.DescendantNodesAndSelf().ToList();
+
+        if (containing is not null)
+        {
+            nodes.AddRange(containing.Members.OfType<FieldDeclarationSyntax>().SelectMany(field => field.DescendantNodes()));
+        }
+
+        foreach (var node in nodes)
+        {
+            var text = node switch
+            {
+                LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression) => literal.Token.ValueText,
+                InterpolatedStringExpressionSyntax interpolated => string.Concat(interpolated.Contents.Select(part =>
+                    part is InterpolatedStringTextSyntax piece ? piece.TextToken.ValueText : "{}")),
+                _ => null,
+            };
+
+            if (text is not null && text.StartsWith('/') && text.Length > 1 && !text.Contains(' '))
+            {
+                routes.Add(text.Split('?')[0]);
+            }
+        }
+
+        return [.. routes];
     }
 
     private static Dictionary<string, string> MemberTypes(TypeDeclarationSyntax containing)

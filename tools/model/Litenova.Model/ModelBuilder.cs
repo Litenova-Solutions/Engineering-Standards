@@ -402,7 +402,12 @@ static class ModelBuilder
         {
             if (BackgroundOnly(model, useCase))
             {
-                return Triggers(model, test, useCase) && AssertsThrough(test, home);
+                // The trigger may arrive through an entry the model does not link to the reaction, such as a
+                // processor webhook, so any when step sets it off; the assertion is what ties the proof to it.
+                var setOff = Triggers(model, test, useCase) || test.Steps.Any(step => step.Phase == "when");
+                var asserted = refusal is null ? AssertsEffect(model, test) : Asserts(test, refusal) || AssertsEffect(model, test);
+
+                return setOff && asserted;
             }
 
             if (!Belongs(test, home) && !Calls(model, test, home))
@@ -415,8 +420,14 @@ static class ModelBuilder
 
         var pascal = Naming.Pascal(home);
 
-        if (!test.Identifiers.Contains(pascal + "Command", StringComparer.Ordinal)
-            && !test.Identifiers.Contains(pascal + "Query", StringComparer.Ordinal))
+        // An integration test names the message it sends, or requests the use case's own endpoint.
+        var namesMessage = test.Identifiers.Contains(pascal + "Command", StringComparer.Ordinal)
+            || test.Identifiers.Contains(pascal + "Query", StringComparer.Ordinal);
+        var requestsEndpoint = model.Code.Endpoints
+            .Where(endpoint => endpoint.UseCaseId == useCase.Id && endpoint.Route.Length > 0)
+            .Any(endpoint => test.Routes.Any(route => RouteMatches(endpoint.Route, route)));
+
+        if (!namesMessage && !requestsEndpoint)
         {
             return false;
         }
@@ -434,6 +445,41 @@ static class ModelBuilder
         return test.Codes.Contains(code)
             || model.ExceptionCodes.Any(entry =>
                 entry.Value.Contains(code) && test.Identifiers.Contains(entry.Key));
+    }
+
+    /// <summary>
+    ///     Whether a path a test requests is the endpoint's route: the same segments, where a route
+    ///     parameter matches any segment and an interpolation hole matches only a parameter. A route mapped
+    ///     inside a group may omit the group's prefix, so the path may carry leading segments the route lacks.
+    /// </summary>
+    private static bool RouteMatches(string template, string path)
+    {
+        static string[] Segments(string value) => value.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        var route = Segments(template);
+        var requested = Segments(path);
+
+        if (route.Length == 0 || requested.Length < route.Length)
+        {
+            return false;
+        }
+
+        var offset = requested.Length - route.Length;
+
+        for (var index = 0; index < route.Length; index++)
+        {
+            var wanted = route[index];
+            var given = requested[offset + index];
+            var parameter = wanted.StartsWith('{') && wanted.EndsWith('}');
+
+            if (parameter ? given.Length == 0 : !string.Equals(wanted, given, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        // A route of parameters alone says nothing about which endpoint was asked.
+        return route.Any(segment => !segment.StartsWith('{'));
     }
 
     private static bool ConfirmRule(ProjectModel model, ScenarioInfo test, Record rule)
@@ -522,16 +568,17 @@ static class ModelBuilder
                 || string.Equals(step.Receiver, trigger.EndsWith("Steps", StringComparison.Ordinal) ? trigger[..^"Steps".Length] : trigger, StringComparison.OrdinalIgnoreCase)));
     }
 
-    /// <summary>Whether a then step of the use case's own steps class asserts the effect.</summary>
-    private static bool AssertsThrough(ScenarioInfo test, string home)
-    {
-        var stepsClass = Naming.Pascal(home) + "Steps";
-
-        return test.Steps.Any(step =>
+    /// <summary>
+    ///     Whether a then step asserts an effect rather than only the outcome of a request: a step of a class
+    ///     named in <c>proof.outcomeOnlySteps</c> states that a call succeeded or was refused, which a job or
+    ///     a reaction does not answer, so it proves nothing about what the use case did.
+    /// </summary>
+    private static bool AssertsEffect(ProjectModel model, ScenarioInfo test) =>
+        test.Steps.Any(step =>
             step.Phase == "then"
-            && (string.Equals(step.ReceiverType, stepsClass, StringComparison.Ordinal)
-                || string.Equals(step.Receiver, stepsClass[..^"Steps".Length], StringComparison.OrdinalIgnoreCase)));
-    }
+            && !model.Config.OutcomeOnlySteps.Any(only =>
+                string.Equals(step.ReceiverType, only, StringComparison.Ordinal)
+                || string.Equals(step.Receiver, only.EndsWith("Steps", StringComparison.Ordinal) ? only[..^"Steps".Length] : only, StringComparison.OrdinalIgnoreCase)));
 
     private static bool Belongs(ScenarioInfo test, string home)
     {

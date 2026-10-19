@@ -59,6 +59,12 @@
           "type": "array",
           "uniqueItems": true,
           "items": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" }
+        },
+        "outcomeOnlySteps": {
+          "description": "Steps classes whose then steps state only that a request succeeded or was refused.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" }
         }
       }
     },
