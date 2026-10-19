@@ -95,6 +95,7 @@ size profile and defaults to `large`. `owners` is the closed owner list.
 | `rule-name-negation` | A rule statement negates what its name keeps none of. |
 | `use-case-without-success` | A use case has no success result. |
 | `use-case-without-case` | A use case has no case. It runs on the large profile only. |
+| `requirement-unfulfilled` | A requirement is fulfilled by no rule, use case or journey. |
 | `case-result-unresolved` | A case ends in another use case's result. |
 | `refusal-not-thrown` | A refusal code appears in no backend string literal. |
 | `use-case-unimplemented` | A use case has no handler, reaction or job. |

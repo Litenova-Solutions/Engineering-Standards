@@ -266,7 +266,7 @@ A subscription business keeps `docs/product/business/pricing.md` with id `pricin
 | standards/rule/core-product.load-product-intent-before-commercial-work | guidance | Does the change report list the product pages read before the change? |
 | standards/rule/core-product.derive-requirement-coverage-from-the-model | guidance | Does the coverage list come from the model rather than hand-kept notes? |
 | standards/rule/core-product.build-intent-before-specification-before-code | guidance | Did intent, research, decision, requirement, records, code, and tests land in order? |
-| standards/rule/core-product.reject-an-unfulfilled-requirement | guidance | Does every requirement have a fulfilling record or a Known gap naming it? |
+| standards/rule/core-product.reject-an-unfulfilled-requirement | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports no `requirement-unfulfilled` finding outside an open Known gap. |
 | standards/rule/core-product.build-on-a-draft-decision-before-approval | guidance | Does the release hold approval for every decision the code builds on? |
 | standards/rule/core-product.group-product-topics-by-area | guidance | Does `docs/product/` follow the example layout, or does an Exception record the replacement? |
 | standards/rule/core-product.name-product-decisions-in-one-numbered-sequence | checkable | `node tools/validate-consumer.mjs` fails a decision file whose name does not match its identifier. |

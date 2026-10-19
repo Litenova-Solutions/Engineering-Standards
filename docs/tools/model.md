@@ -37,6 +37,7 @@ The finding codes are:
 | `rule-name-negation` | A rule statement negates what its name does not keep. |
 | `use-case-without-success` | A use case ends with no success result. |
 | `use-case-without-case` | A use case has no case. It runs on the large profile only. |
+| `requirement-unfulfilled` | A requirement is fulfilled by no rule, use case or journey. |
 | `case-result-unresolved` | A case names no result of its own use case. |
 | `refusal-not-thrown` | A refusal result names a code the code never throws. |
 | `use-case-unimplemented` | No code implements the use case and no known gap covers it. |

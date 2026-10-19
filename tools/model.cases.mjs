@@ -32,6 +32,7 @@ const FINDING_CODES = [
   'rule-name-negation',
   'use-case-without-success',
   'use-case-without-case',
+  'requirement-unfulfilled',
   'case-result-unresolved',
   'refusal-not-thrown',
   'use-case-unimplemented',

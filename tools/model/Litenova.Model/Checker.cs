@@ -18,7 +18,7 @@ static class Checker
         "refusal-not-thrown", "use-case-unimplemented", "proves-unconfirmed",
         "profile-type-missing", "product-not-singleton",
         "journey-reach", "use-case-access", "result-status", "region-unknown",
-        "use-case-without-case",
+        "use-case-without-case", "requirement-unfulfilled",
     };
 
     /// <summary>Runs every check, partitioning findings from known gaps.</summary>
@@ -32,6 +32,7 @@ static class Checker
         Time("refused", () => CheckRefusedForms(model, findings));
         Time("gates", () => CheckGates(model, findings));
         Time("proof", () => CheckProof(model, findings));
+        Time("fulfilment", () => CheckFulfilment(model, findings));
         Time("access", () => CheckAccess(model, findings));
         Time("status", () => CheckResultStatus(model, findings));
         Time("regions", () => CheckRegions(model, findings));
@@ -808,6 +809,22 @@ static class Checker
                     findings.Add(new Finding("rule-name-negation", $"Rule '{rule.Id}' says '{negation}' but its name keeps none.", rule.File, rule.Line, SubjectOf(rule)));
                     break;
                 }
+            }
+        }
+    }
+
+    private static void CheckFulfilment(ProjectModel model, List<Finding> findings)
+    {
+        var fulfilled = model.Records
+            .Where(record => record.Type is "rule" or "use-case" or "journey")
+            .SelectMany(record => record.Ids("fulfils"))
+            .ToHashSet(StringComparer.Ordinal);
+
+        foreach (var requirement in model.Records.Where(record => record.Type == "requirement" && record.Status != "retired"))
+        {
+            if (!fulfilled.Contains(requirement.Id))
+            {
+                findings.Add(new Finding("requirement-unfulfilled", $"Requirement '{requirement.Id}' is fulfilled by no rule, use case or journey.", requirement.File, requirement.Line, SubjectOf(requirement)));
             }
         }
     }
