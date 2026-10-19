@@ -49,7 +49,7 @@ static partial class Identifiers
             RecordTypes.All.OrderBy(kind => kind, StringComparer.Ordinal).Select(Regex.Escape));
 
         return new Regex(
-            $@"\b(?:{kinds}|failure)/[A-Za-z0-9][A-Za-z0-9._-]*",
+            $@"(?<![A-Za-z0-9_./-])(?:{kinds}|failure)/[A-Za-z0-9][A-Za-z0-9._-]*",
             RegexOptions.Compiled);
     }
 
