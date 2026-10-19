@@ -846,7 +846,7 @@ function normalizeTemplate(relative, raw) {
 // documentation; a prefix with content after it is a live old form.
 const REMOVED_IDENTIFIER_PATTERNS = [
   /\b(?:acceptance-criterion|authorization|invariant|policy|validation|flow|workflow|end-to-end-flow|domain-policy|aggregate|value|path)\/[A-Za-z0-9][\w.-]*/g,
-  /\bnighthall\/rule\/[A-Za-z0-9][\w.-]*/g,
+  /\b(?!standards\/)[a-z][a-z0-9-]*\/rule\/[A-Za-z0-9][\w.-]*/g,
   /\b(?:AC|AUTZ|INV|POL|VAL|RULE|E2E)-[A-Za-z0-9][\w-]*/g,
 ];
 const WORKFLOW_KIND_PATTERNS = [

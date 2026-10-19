@@ -591,7 +591,7 @@ run('schema JSON', (root) => {
 
 run('removed numbered identifier', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites INV-ORDERS-01.\n'), ['REMOVED_IDENTIFIER']);
 run('removed slashed identifier', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites invariant/orders.only-placed-ships.\n'), ['REMOVED_IDENTIFIER']);
-run('removed nighthall rule prefix', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites nighthall/rule/agents.what-nighthall-is.\n'), ['REMOVED_IDENTIFIER']);
+run('removed project rule prefix', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites acme/rule/agents.what-acme-is.\n'), ['REMOVED_IDENTIFIER']);
 run('bare refused prefixes are documentation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nRefused prefixes are AC-, INV-, path/, value/ and workflow/.\n\n' + INDEX_ROUTING), []);
 run('Workflow as a kind', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nA Workflow names its triggers and owner.\n'), ['WORKFLOW_KIND']);
 run('lowercase workflow prose passes', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe release workflow runs weekly.\n\n' + INDEX_ROUTING), []);
