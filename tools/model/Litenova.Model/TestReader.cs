@@ -98,15 +98,47 @@ static class TestReader
         foreach (var type in root.DescendantNodes().OfType<ClassDeclarationSyntax>()
                      .Where(type => type.Identifier.Text.EndsWith("Steps", StringComparison.Ordinal)))
         {
-            foreach (var method in type.Members.OfType<MethodDeclarationSyntax>())
-            {
-                var called = method.DescendantNodes().OfType<InvocationExpressionSyntax>()
+            var methods = type.Members.OfType<MethodDeclarationSyntax>().ToList();
+            var direct = methods.ToDictionary(
+                method => method,
+                method => method.DescendantNodes().OfType<InvocationExpressionSyntax>()
                     .Select(invocation => invocation.Expression)
                     .OfType<MemberAccessExpressionSyntax>()
                     .Select(access => access.Name.Identifier.Text)
                     .Where(name => name.Length > "Async".Length && name.EndsWith("Async", StringComparison.Ordinal))
                     .Select(name => name[..^"Async".Length])
-                    .ToHashSet(StringComparer.Ordinal);
+                    .ToHashSet(StringComparer.Ordinal));
+
+            // A step often calls a private helper of its own class that makes the client call, so the
+            // operations a helper calls count for every method of the class that invokes it.
+            var helpers = methods.GroupBy(method => method.Identifier.Text, StringComparer.Ordinal)
+                .ToDictionary(group => group.Key, group => group.ToList(), StringComparer.Ordinal);
+
+            foreach (var method in methods)
+            {
+                var called = new HashSet<string>(direct[method], StringComparer.Ordinal);
+                var seen = new HashSet<MethodDeclarationSyntax> { method };
+                var pending = new Queue<MethodDeclarationSyntax>([method]);
+
+                while (pending.Count > 0)
+                {
+                    foreach (var name in pending.Dequeue().DescendantNodes().OfType<InvocationExpressionSyntax>()
+                                 .Select(invocation => invocation.Expression)
+                                 .OfType<IdentifierNameSyntax>()
+                                 .Select(identifier => identifier.Identifier.Text))
+                    {
+                        if (!helpers.TryGetValue(name, out var targets))
+                        {
+                            continue;
+                        }
+
+                        foreach (var target in targets.Where(seen.Add))
+                        {
+                            called.UnionWith(direct[target]);
+                            pending.Enqueue(target);
+                        }
+                    }
+                }
 
                 stepCalls.AddOrUpdate(
                     $"{type.Identifier.Text}.{method.Identifier.Text}",
