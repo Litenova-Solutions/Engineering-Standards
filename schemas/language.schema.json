@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/language.schema.json",
   "title": "Litenova Project Language Record",
-  "description": "The closed vocabulary a project's prose is checked against: each term, the synonyms rejected in favour of it, the scope each rejection binds, and the mannered terms no page may use.",
+  "description": "The closed vocabulary a project's prose is checked against: one Term entry per concept, with its meaning, labels per language, rejected synonyms, broader and narrower terms, and closed-set values, plus the mannered terms no page may use.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "terms", "mannered"],
@@ -10,10 +10,10 @@
     "$schema": { "type": "string" },
     "schemaVersion": {
       "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See standards/rule/core-authoring.publish-each-release-as-a-complete-contract and standards/rule/core-authoring.exclude-cross-release-compatibility-work.",
-      "const": 1
+      "const": 2
     },
     "terms": {
-      "description": "One entry per concept. The glossary defines the meaning; this record is what the validator reads.",
+      "description": "One entry per concept. Each entry is a Term record; the glossary page renders from these entries.",
       "type": "array",
       "uniqueItems": true,
       "items": { "$ref": "#/$defs/term" }
@@ -29,19 +29,94 @@
     "term": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["term", "rejected"],
+      "required": ["id", "term", "meaning", "owner", "status"],
       "properties": {
+        "id": {
+          "description": "The Term identifier.",
+          "type": "string",
+          "pattern": "^term/[a-z0-9][a-z0-9-]*$"
+        },
         "term": {
           "description": "The one word or phrase this project uses for the concept.",
           "type": "string",
           "minLength": 1
         },
+        "meaning": {
+          "description": "What the term means, in at most 25 words.",
+          "type": "string",
+          "minLength": 1
+        },
+        "labels": {
+          "description": "The term in each interface language beside English.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "nl": { "type": "string", "minLength": 1 },
+            "de": { "type": "string", "minLength": 1 }
+          }
+        },
         "rejected": {
           "description": "Words that name the same concept and must not appear inside the scope.",
           "type": "array",
-          "minItems": 1,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1 }
+          "items": { "$ref": "#/$defs/rejected" }
+        },
+        "broader": {
+          "description": "The wider Term this one sits under, where the vocabulary implies one.",
+          "anyOf": [
+            { "$ref": "#/$defs/termRef" },
+            {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/termRef" }
+            }
+          ]
+        },
+        "narrower": {
+          "description": "The Terms that sit under this one, where the vocabulary implies them.",
+          "anyOf": [
+            { "$ref": "#/$defs/termRef" },
+            {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/termRef" }
+            }
+          ]
+        },
+        "values": {
+          "description": "The closed set of codes this Term holds, where it names one.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/termValue" }
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "approved", "retired"]
+        }
+      }
+    },
+    "termRef": {
+      "type": "string",
+      "pattern": "^term/[a-z0-9][a-z0-9-]*$"
+    },
+    "rejected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["word", "reason"],
+      "properties": {
+        "word": {
+          "description": "The rejected synonym.",
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "description": "Why the synonym is rejected here. Appears in the diagnostic, so a reader fixes the sentence rather than searching for the rule.",
+          "type": "string",
+          "minLength": 1
         },
         "scope": {
           "description": "A regular expression over the documentation-root-relative path, with forward slashes. Absent means every page. A word correct in one module and wrong in another carries the scope of the module that rejects it.",
@@ -49,14 +124,25 @@
           "minLength": 1
         },
         "except": {
-          "description": "Compounds in which a rejected word names a different concept, so a match inside one is not reported. Each is matched whole and case-insensitively, the way a term is. A rejection that fires on a compound the project defines elsewhere reports a breach nobody can fix, and a check with false positives is a check somebody turns off.",
+          "description": "Compounds in which a rejected word names a different concept, so a match inside one is not reported. Each is matched whole and case-insensitively, the way a term is.",
           "type": "array",
-          "minItems": 1,
           "uniqueItems": true,
           "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "termValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "label"],
+      "properties": {
+        "code": {
+          "description": "The stable code the closed set uses.",
+          "type": "string",
+          "minLength": 1
         },
-        "reason": {
-          "description": "Why the synonym is rejected here. Appears in the diagnostic, so a reader fixes the sentence rather than searching for the rule.",
+        "label": {
+          "description": "The words a reader sees for the code.",
           "type": "string",
           "minLength": 1
         }

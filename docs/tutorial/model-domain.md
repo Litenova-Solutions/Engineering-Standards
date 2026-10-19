@@ -1,8 +1,8 @@
-# Model a domain module
+# Model a Domain Module
 
 ## Purpose
 
-This tutorial models one domain module that the model builder reads. At the end the module holds its language, its business records, its rules with kinds, its use cases with results and cases, its events, and its permissions. The worked example is the circulation desk of a library.
+This tutorial models one domain module that the model builder reads. At the end the module holds its language, its business records, its rules, its use cases, its events, and its permissions. The worked example is the circulation desk of a library.
 
 This guide carries no provision. Each step cites the provisions it satisfies.
 
@@ -25,7 +25,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 
     Rejected words stop a later contributor from creating `Checkout` beside `Loan`. They also tell an agent which plausible names are wrong for this domain.
 
-2. Write the occasion before the rules. Name one occasion the module exists for: who acts, what surrounds them, and what they use today instead. Record it in the module page, and reuse its people and figures on every page beneath it. This satisfies `standards/rule/core-system.state-one-occasion-for-every-behavior-specification` and `standards/rule/core-system.keep-a-scenario-informative`.
+2. Write the occasion before the rules. Name one occasion the module exists for: who acts, what surrounds them, and what they use today instead. Record it in the module page, and reuse its people and figures on every page beneath it. This satisfies `standards/rule/core-system.state-one-occasion-for-every-behavior-record` and `standards/rule/core-system.keep-a-scenario-informative`.
 
     Saturday morning at the central library brings two hundred members before noon. Each hands books across the desk and trusts the stamp card inside the cover. Without a loan record, the desk reconstructs who holds what from the card index and memory.
 

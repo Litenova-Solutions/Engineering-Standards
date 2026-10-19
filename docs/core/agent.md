@@ -1,13 +1,12 @@
-# Agent operating protocol
+# Agent Operating Protocol
 
 ## Intent
 
 This protocol controls how agents select context, resolve standards, preserve user work, and report completion. Agents query the project model for the records a task needs, and read the generated agent context first.
 
-## Agent summary {#agent-summary}
+## Agent Summary {#agent-summary}
 
-- Query the model for the records the task needs. (standards/rule/core-agent.select-task-context)
-- Skip the query only for a change that adds no surface. (standards/rule/core-agent.follow-the-local-pattern-before-the-model-query)
+- Query the model for the records the task needs, skipping only a change that adds no surface. (standards/rule/core-agent.select-task-context, standards/rule/core-agent.follow-the-local-pattern-before-the-model-query)
 - Load selected extensions before editing inside their boundary. (standards/rule/core-agent.load-applicable-extensions)
 - Apply guidance in precedence order. (standards/rule/core-agent.apply-guidance-precedence)
 - Replace a convention only through a declared exception. (standards/rule/core-agent.replace-only-declared-conventions)
@@ -30,7 +29,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 ### Follow the local pattern before the model query (standards/rule/core-agent.follow-the-local-pattern-before-the-model-query)
 
-**Requirement:** A change that adds no module, business record, frontend, dependency, or public boundary MAY skip the model query. It reads the consumer agent context and neighboring code instead.
+**Requirement:** A change adding no module, business record, frontend, dependency, or public boundary MAY skip the model query, reading the agent context and neighboring code instead.
 
 **Rationale:** Boundary-adding changes keep the full query, because a new surface needs the context the model selects.
 
@@ -68,9 +67,9 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 ### Restrict unapproved side effects (standards/rule/core-agent.restrict-unapproved-side-effects)
 
-**Requirement:** An agent MUST NOT add packages or migrations, change authentication, break a public API, or change production data without approval. The same ban covers publishing a release, spending money, and any outside call that changes state; the task authorizer gives the approval.
+**Requirement:** An agent MUST NOT act without approval on packages, migrations, authentication, a public API, production data, releases, spending, or outside calls that change state.
 
-**Rationale:** These changes alter project boundaries beyond an ordinary implementation edit.
+**Rationale:** These changes alter project boundaries beyond an ordinary implementation edit. The task authorizer gives the approval.
 
 ### Make coherent scoped changes (standards/rule/core-agent.make-coherent-scoped-changes)
 

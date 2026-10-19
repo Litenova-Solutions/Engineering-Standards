@@ -74,7 +74,7 @@ The stack sections name the binding for each stack.
 | `table` | `DataTable` |
 | `img` | the shared image component, which `standards/rule/frontend-components.use-a-composite-for-a-content-image` owns |
 
-Text elements stay available, because a sentence is not a component decision. `p`, `h2`, `h3`, `em`, `strong`, `ul`, `ol`, and `li` carry prose. The floorplan owns the `h1`, so it is not in the list. Any other element follows the same rule: page code MUST NOT declare it, and the author adds a composite or a visual file instead.
+Text elements stay available, because a sentence is not a component decision. `p`, `h2`, `h3`, `em`, `strong`, `ul`, `ol`, and `li` carry prose. The floorplan owns the `h1`, so it is not in the list. Any other element follows the same rule: page code declares no other element, and the author adds a composite or a visual file instead.
 
 ### Prefer a composite over a primitive (standards/rule/frontend-components.prefer-a-composite-over-a-primitive)
 
@@ -120,7 +120,7 @@ The AA criteria bind every project. The AAA rows bind only a project that target
 
 ### Render complete states (standards/rule/frontend-components.render-complete-states)
 
-**Requirement:** A data component MUST render its loading, empty, error, forbidden, and ready states. A control MUST render its disabled and pending states, prevent duplicate submission, and keep an error recovery path usable.
+**Requirement:** A data component MUST render loading, empty, error, forbidden, and ready; a control renders disabled and pending, prevents duplicate submission, and keeps recovery usable.
 
 **Rationale:** Data states describe what arrived; control states describe what the reader may do.
 
@@ -186,13 +186,13 @@ The stack sections name the sink.
 
 **Rationale:** A second merging helper produces a different conflict resolution for the same class pair. Page code has no reason to hold one.
 
-### Keep error handling scoped (standards/rule/frontend-components.keep-error-boundaries-scoped)
+### Keep error boundaries scoped (standards/rule/frontend-components.keep-error-boundaries-scoped)
 
-**Default:** Use the route error surface for route failure, and a component boundary only where recovery keeps the page usable. The stack sections name the surface for each stack.
+**Default:** Use the route error surface for route failure, and a component boundary only where recovery keeps the page usable.
 
 **Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
-**Rationale:** A component boundary that cannot recover hides the failure while leaving the page broken.
+**Rationale:** A component boundary that cannot recover hides the failure while leaving the page broken. The stack sections name the surface for each stack.
 
 ## Reference example
 

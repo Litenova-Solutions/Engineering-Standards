@@ -112,7 +112,8 @@
         },
         "implementations": {
           "type": "object",
-          "description": "Keyed by frontend platform, such as react-web, svelte, or blazor-web.",
+          "description": "Keyed by frontend platform: react, svelte, or blazor-web.",
+          "propertyNames": { "enum": ["react", "svelte", "blazor-web"] },
           "additionalProperties": {
             "type": "object",
             "additionalProperties": false,

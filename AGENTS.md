@@ -2,7 +2,7 @@
 
 Read this file before changing this repository or a consumer application. (standards/rule/core-agent.select-task-context)
 
-Standards v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend. (standards/rule/core-scope.select-size-profile-and-stacks, standards/rule/core-scope.keep-one-bounded-context)
+Standards v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend. (standards/rule/core-scope.select-a-size-profile-and-stacks, standards/rule/core-scope.keep-one-bounded-context)
 
 The canonical human index is `docs/README.md`. Exact versions, stacks, extensions, and switched-on types are in `standards.manifest.json`. (standards/rule/workspace-dependencies.pin-every-dependency-centrally, standards/rule/core-scope.select-conditional-extensions-explicitly)
 
@@ -37,7 +37,7 @@ A consumer records the release it reviewed in `reviewedStandardsVersion`. (stand
 5. Read selected extensions and their switched-on types before editing inside their boundary. (standards/rule/core-agent.load-applicable-extensions, standards/rule/core-scope.record-selected-extensions)
 6. Inspect neighboring consumer files after loading the applicable standard. (standards/rule/core-agent.inspect-local-examples-after-standards)
 
-Run the query from the standards root as below, adding the `standards/` prefix from a consumer root.
+Run the query from the standards root as below, adding the `standards/` prefix from a consumer root. (standards/rule/core-agent.select-task-context)
 
 ```bash
 dotnet run --project tools/model/Litenova.Model -- query <id>
@@ -60,7 +60,7 @@ Quote both conflicting IDs and paths when requesting a decision. (standards/rule
 3. Query the model for the active records and load the applicable extensions. (standards/rule/core-agent.select-task-context, standards/rule/core-agent.load-applicable-extensions)
 4. Check the manifest before changing dependencies. (standards/rule/workspace-dependencies.pin-every-dependency-centrally, standards/rule/workspace-dependencies.approve-new-packages-explicitly)
 5. Match compliant neighboring patterns. (standards/rule/core-agent.inspect-local-examples-after-standards)
-6. Change records, code, tests, contracts, and operations as one unit. (standards/rule/core-system.update-specifications-with-behavior)
+6. Change records, code, tests, contracts, and operations as one unit. (standards/rule/core-system.update-records-with-behavior)
 
 Do not add an unauthorized package, schema migration, authentication change, public break, or external side effect. (standards/rule/core-agent.inspect-existing-work-before-editing)
 

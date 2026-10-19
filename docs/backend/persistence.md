@@ -181,7 +181,7 @@ This also applies to modules with multiple aggregates. The example keeps aggrega
 
 ### Persist one explicit state object (standards/rule/backend-persistence.persist-one-explicit-state-object)
 
-**Default:** Persist the aggregate state record itself rather than a flattened projection of its fields. Round-trip every state record through the configured serializer in integration tests.
+**Default:** Persist the aggregate state record itself rather than a flattened projection, round-tripping every state record through the configured serializer in integration tests.
 
 **Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 

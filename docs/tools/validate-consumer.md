@@ -7,14 +7,16 @@
 ## Synopsis
 
 ```bash
-node standards/tools/validate-consumer.mjs [consumerRoot] [--prose]
+node standards/tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
 ```
 
 ## Description
 
-This command reads `standards.project.json` and every Markdown file under the declared documentation root. It checks Specification Metadata against the metadata schema, identifier grammar, file relationships, extension scope, link resolution, acceptance trace uniqueness, recorded vocabulary, and controlled prose.
+This command reads `standards.project.json` and every Markdown page under the declared documentation root. It checks the project record against the project schema and the reviewed release against the manifest. It checks the stacks and extensions the project names, every page's frontmatter against the record schema, and each page's required sections. It checks the language record with the prose measures and the rejected words, and the controlled UI through the UI validator.
 
-Run it from the consumer root after changing a specification, a project path, or a language record. The default output names the worst prose files and their dominant measure.
+Prose checks skip fenced generated regions, which only the model builder writes. The builder owns identifier resolution, coverage, traces, and the computed links between records, code, screens, and tests.
+
+Run it from the consumer root after changing a page, a project path, or a language record. The default output names the worst prose files and their dominant measure.
 
 ## Arguments
 
@@ -34,9 +36,9 @@ Run it from the consumer root after changing a specification, a project path, or
 
 | Code | Meaning |
 |:---|:---|
-| `0` | Metadata is valid, links resolve, and cross-file references are consistent. |
+| `0` | Configuration, frontmatter, language, and prose are valid. |
 | `1` | At least one check reported a defect. |
-| `2` | The root holds no `standards.project.json`. |
+| `2` | The root holds no `standards.project.json`, an option is unknown, or an input file is unreadable. |
 
 ## Examples
 
@@ -46,7 +48,7 @@ Validate the consumer from its root:
 node standards/tools/validate-consumer.mjs
 ```
 
-List the prose measures behind a baselined page:
+List the prose measures behind a page count:
 
 ```bash
 node standards/tools/validate-consumer.mjs --prose
@@ -54,4 +56,4 @@ node standards/tools/validate-consumer.mjs --prose
 
 ## Underneath
 
-None.
+`tools/prose.mjs` reads the language record and the prose measures, and `tools/schema.mjs` reads every record against its schema. The command spawns `tools/validate-ui.mjs` with `--format=json` and merges its structured findings.

@@ -51,7 +51,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 ### Validate frontend environment access (standards/rule/workspace-config.validate-frontend-environment-access)
 
-**Requirement:** A frontend MUST read environment variables through one validated environment module, and MUST separate server-only from browser-visible values. The module lives at `src/lib/env.ts` under the frontend root, reached through the framework alias.
+**Requirement:** A frontend MUST read environment variables through one validated module separating server-only from browser-visible values, at `src/lib/env.ts` through the framework alias.
 
 **Rationale:** Browser-visible names use the framework prefix, so an unprefixed value cannot reach the bundle by accident.
 
@@ -85,7 +85,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 **Default:** Keep a `.env.example` beside each frontend and deployable host listing required names and safe values.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** The example sits next to the options module that reads those names, so both change together.
 
@@ -93,7 +93,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 **Default:** Keep developer overrides in ignored local files or a platform secret store.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A second committed environment-specific source competes with the deployment platform for the same value.
 
@@ -101,7 +101,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 **Default:** Emit structured logs through standard logging abstractions and keep exporter configuration in hosts.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** Application code then carries no provider choice, so an exporter change stays inside deployment settings.
 
@@ -109,7 +109,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 **Default:** Exclude a documentation directory from a build-artifact ignore rule that matches it by accident.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A platform `.gitignore` commonly matches a documentation name and silently untracks its records.
 

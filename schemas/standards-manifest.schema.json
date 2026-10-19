@@ -9,22 +9,17 @@
     "version",
     "name",
     "agentsEntry",
-    "defaultProfile",
     "paths",
     "provisionRegistry",
-    "profiles",
+    "stacks",
     "extensions",
-    "stack",
-    "packages",
-    "uiBaseline",
-    "overridePolicy",
-    "loadPlans"
+    "uiBaseline"
   ],
   "properties": {
     "$schema": { "type": "string" },
     "schemaVersion": {
       "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See standards/rule/core-authoring.publish-each-release-as-a-complete-contract and standards/rule/core-authoring.exclude-cross-release-compatibility-work.",
-      "const": 4
+      "const": 5
     },
     "version": {
       "type": "string",
@@ -57,25 +52,13 @@
         }
       }
     },
-    "overridePolicy": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["requiresReviewBy"],
-      "properties": {
-        "requiresReviewBy": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/idScope" }
-        }
-      }
-    },
-    "profiles": {
+    "stacks": {
       "type": "object",
       "minProperties": 1,
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["entry", "pages"],
+        "required": ["pages"],
         "properties": {
           "entry": { "$ref": "#/$defs/repositoryPath" },
           "pages": {
@@ -130,7 +113,7 @@
         "nativeBoundary"
       ],
       "properties": {
-        "platform": { "const": "react-web" },
+        "platform": { "const": "react" },
         "system": { "const": "shadcn/ui" },
         "styling": { "const": "tailwindcss-v4" },
         "base": { "const": "base-ui" },
@@ -233,11 +216,6 @@
         },
         "nativeBoundary": { "const": "separate-platform-profile" }
       }
-    },
-    "loadPlans": {
-      "type": "object",
-      "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/loadPlan" }
     }
   },
   "$defs": {
@@ -249,10 +227,6 @@
       "type": "string",
       "pattern": "^[A-Z][A-Z0-9]*$"
     },
-    "idScope": {
-      "type": "string",
-      "pattern": "^standards\\/(?:acceptance-criterion|authorization|invariant|policy|rule|validation)\\/[a-z][a-z0-9-]*$"
-    },
     "repositoryPath": {
       "type": "string",
       "minLength": 1,
@@ -261,6 +235,14 @@
     "versionMap": {
       "type": "object",
       "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "recordType": {
+      "type": "string",
+      "enum": ["product", "constraint", "research", "decision", "requirement", "problem", "feature", "actor", "role", "permission", "journey", "module", "business-record", "rule", "use-case", "result", "case", "event", "entry-point", "limit", "runbook", "standard", "exception", "known-gap", "term"]
+    },
+    "provisionId": {
+      "type": "string",
+      "pattern": "^standards/(rule|convention)/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
     },
     "extension": {
       "type": "object",
@@ -276,10 +258,17 @@
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "enum": ["module", "aggregate", "use-case", "end-to-end-flow", "workflow", "domain-policy"]
-          }
+          "items": { "$ref": "#/$defs/recordType" }
+        },
+        "replaces": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/provisionId" }
+        },
+        "switchesOn": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/recordType" }
         }
       },
       "allOf": [
@@ -292,28 +281,6 @@
           "else": { "not": { "required": ["applicableKinds"] } }
         }
       ]
-    },
-    "loadPlan": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["tier0", "tier1", "tier2"],
-      "properties": {
-        "tier0": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/repositoryPath" }
-        },
-        "tier1": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/repositoryPath" }
-        },
-        "tier2": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/repositoryPath" }
-        }
-      }
     }
   }
 }

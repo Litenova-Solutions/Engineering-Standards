@@ -1,4 +1,4 @@
-# Workspace structure
+# Workspace Structure
 
 ## Intent
 
@@ -86,7 +86,7 @@ A record page lives at the home the tree names for its type. An entry lives on i
 
 ### Declare size and stacks in project config (standards/rule/workspace-structure.declare-size-and-stacks-in-project-config)
 
-**Requirement:** `standards.project.json` MUST declare `size` as `small` or `large`, and MUST declare one stack per frontend in `paths.frontends` beside the `dotnet` backend.
+**Requirement:** `standards.project.json` MUST declare `size` as `small` or `large` and one stack per frontend in `paths.frontends` beside the `dotnet` backend.
 
 **Rationale:** Size decides which record types and test projects apply, and each stack decides which technology pages and checks apply.
 
@@ -130,7 +130,7 @@ Worker is conditional on the extension that runs background work. Acceptance.Tes
 
 ### Keep one workspace solution beside the API solution (standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution)
 
-**Requirement:** When a workspace carries a root solution, that solution MUST list the .NET projects of more than one deployable unit. A build, a test run, and a configuration MUST still name the API solution.
+**Requirement:** A root solution MUST list the .NET projects of more than one deployable unit, with builds, test runs, and configuration still naming the API solution.
 
 **Rationale:** The API solution stays at `apps/api/` and remains the one a build, a test run, and `paths.apiSolution` name. A workspace holding a second .NET deployable, such as a command-line tool, otherwise has no single file an editor can open across both. Two solution files listing overlapping projects is a supported MSBuild arrangement, and the projects themselves stay where `standards/rule/workspace-structure.keep-net-production-and-test-projects-separate` puts them.
 
@@ -190,7 +190,7 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 **Default:** Name a frontend for its audience, such as `web`, `admin`, `portal`, or `docs`.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** `frontend`, `client`, or `app` names the technology rather than the audience it serves.
 
@@ -198,7 +198,7 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 **Default:** Keep bootstrap, release, and CI helper scripts under root `scripts/`.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** An application-specific script may stay inside its application when no other workspace calls it.
 
@@ -206,7 +206,7 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 **Default:** Place generated OpenAPI types in `packages/api-types/` and a thin client in `packages/api-client/` when more than one frontend consumes the API.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A single frontend may own both locally until a second consumer appears.
 

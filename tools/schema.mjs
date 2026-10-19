@@ -18,7 +18,7 @@
 // every name outside it fails the schema rather than passing unread. That is why
 // the repository ships no schema library: the gate is what makes a local
 // evaluator safe, and a library that accepts every keyword removes it.
-export const SCHEMA_ANNOTATIONS = new Set(['$schema', '$id', '$defs', '$comment', 'title', 'description', 'default', 'examples', 'deprecated']);
+export const SCHEMA_ANNOTATIONS = new Set(['$schema', '$id', '$defs', '$comment', 'title', 'description', 'default', 'examples', 'deprecated', 'format']);
 export const SCHEMA_KEYWORDS = new Set([
   ...SCHEMA_ANNOTATIONS,
   '$ref', 'type', 'const', 'enum', 'pattern', 'minLength', 'maxLength',

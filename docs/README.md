@@ -4,7 +4,7 @@
 
 Use this index to load the canonical page for current work.
 
-The provision areas are BACKEND, BLAZOR, CORE, EXT, FRONTEND, PROFILE, QUALITY, REACT, SVELTE, and WORKSPACE, one directory each under `docs/`. A page path states the scope its provisions carry, so `frontend/components.md` owns `frontend-components`. The [provision index](reference/provisions.md) resolves any identifier to its page. The `tools/`, `guide/`, and `reference/` directories carry no provisions.
+The provision areas are BACKEND, BLAZOR, CORE, EXT, FRONTEND, PROFILE, QUALITY, REACT, SVELTE, and WORKSPACE, one directory each under `docs/`. A page path states the scope its provisions carry, so `frontend/components.md` owns `frontend-components`. The [provision index](reference/provisions.md) resolves any identifier to its page. The `tools/`, `guide/`, `tutorial/`, and `reference/` directories carry no provisions.
 
 ## Which page do you want
 
@@ -12,7 +12,7 @@ A **tutorial** takes you through a first working result, one step at a time.
 A **how-to** solves one stated problem for a reader who already has it running.
 A **reference** states exact values, options, and defaults, and is read by looking up.
 A **command** page documents one command: its options, its exit codes, and what it runs underneath.
-A standards page owns the provisions a reader cites: one per core concern, per stack, per workspace concern, per backend concern, per frontend concern, per quality concern, or per extension.
+A standards page owns the provisions a reader cites for one concern.
 
 ## Core
 
@@ -120,9 +120,12 @@ Each frontend page is stack-neutral, with short per-stack sections for what diff
 
 ## Guide
 
-- [Get started](guide/getting-started.md)
-- [Model a domain](guide/model-domain.md)
 - [Build an audit trail](guide/audit-trail.md)
+
+## Tutorial
+
+- [Get started](tutorial/getting-started.md)
+- [Model a domain](tutorial/model-domain.md)
 
 ## Reference
 

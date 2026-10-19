@@ -21,9 +21,9 @@ Backend tests prove domain behavior, use-case coordination, real persistence and
 
 ### Keep the test projects the size profile requires (standards/rule/backend-testing.keep-the-test-projects-the-size-profile-requires)
 
-**Requirement:** A backend solution MUST hold the test projects its size profile requires and no other baseline test project. A small solution requires Architecture and Integration projects, with Acceptance optional. A large solution requires Architecture, Integration, and Acceptance projects.
+**Requirement:** A backend solution MUST hold exactly the test projects its size profile requires: Architecture and Integration for small, adding Acceptance for large.
 
-**Rationale:** Unit test projects are optional in both profiles. An Acceptance project without the executable BDD extension is an unnamed baseline project: select the extension, or name the project for what it actually is.
+**Rationale:** Unit test projects are optional in both profiles. Acceptance stays optional for small. An Acceptance project without the executable BDD extension is an unnamed baseline project: select the extension, or name the project for what it actually is.
 
 **Example:** A test suite can contain:
 
@@ -63,15 +63,15 @@ The default strategy is one database per test class, cloned from a migrated temp
 
 ### Enforce architecture rules (standards/rule/backend-testing.enforce-architecture-rules)
 
-**Requirement:** An architecture test MUST assert the structural boundaries that `standards/rule/backend-architecture.test-structural-boundaries` names, and MUST run in the Release test pass.
+**Requirement:** An architecture test MUST assert the structural boundaries that `standards/rule/backend-architecture.test-structural-boundaries` names, running in the Release test pass.
 
 **Rationale:** These are the boundaries a compiler does not enforce, so a review miss otherwise lands in the main branch.
 
 ### Prove each Case with a test that calls its use case (standards/rule/backend-testing.prove-each-case-with-a-test-that-calls-its-use-case)
 
-**Requirement:** Each Case of a use case MUST be proved by a test carrying one `/// <proves>case/<use-case>.<name></proves>` tag naming that Case. The test MUST call the use case and assert its result: for a refusal, the Result code.
+**Requirement:** Each Case MUST be proved by a test carrying one `/// <proves>case/<use-case>.<name></proves>` tag and calling its use case.
 
-**Rationale:** The tag is the claim; the model builder confirms it. An acceptance scenario is confirmed when its When step belongs to the use case steps class. An integration test is confirmed when its body names the use case message type. A Case no test proves is recorded as a Known gap with owner and end date.
+**Rationale:** The tag is the claim; the model builder confirms it. An acceptance scenario is confirmed when its When step belongs to the use case steps class. An integration test is confirmed when its body names the use case message type. A Case no test proves is recorded as a Known gap with owner and end date. The test asserts the result, and for a refusal the Result code.
 
 A test carries no coverage tag; the proves tag is its only record citation. The latest test run marks each confirmed claim passing or failing.
 
@@ -83,7 +83,7 @@ A test carries no coverage tag; the proves tag is its only record citation. The 
 
 ### Prove each Rule at its enforcement point (standards/rule/backend-testing.prove-each-rule-at-its-enforcement-point)
 
-**Requirement:** Each Rule MUST be proved at the point its `enforcedBy` names. A validator or guard Rule is proved through the Cases of the use cases it governs. An aggregate or store Rule is proved by a test carrying a proves tag for that Rule.
+**Requirement:** Each Rule MUST be proved at the point its `enforcedBy` names: governed Cases for validator and guard Rules, a proves tag otherwise.
 
 **Rationale:** A validator Rule is proved by a refused request. A store Rule is proved by an integration test that provokes the refusal. A reaction Rule is proved through the Cases of its reacting use case. The builder confirms an aggregate or store claim when the test body names the governed business record code type.
 
@@ -186,7 +186,7 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 | standards/rule/backend-testing.prove-each-rule-at-its-enforcement-point | guidance | Is each Rule proved at its enforcement point, with store refusals provoked through integration? |
 | standards/rule/backend-testing.use-evidence-rather-than-one-coverage-target | guidance | Is coverage collected for review with no percentage treated as sufficient testing? |
 | standards/rule/backend-testing.use-one-production-faithful-integration-harness | guidance | Does the integration project own one container fixture, ApiFactory, and isolation helper? |
-| standards/rule/backend-testing.mirror-production-module-names | guidance | Does each test tree mirror production module names apart from the exempt harness files? |
+| standards/rule/backend-testing.mirror-production-module-names | guidance | Does each test project tree list the same module folders as production, apart from the exempt harness files? |
 | standards/rule/backend-testing.name-tests-by-observable-behavior | guidance | Does each test name state operation, condition, and expected result on its production type class? |
 | standards/rule/backend-testing.use-builders-for-valid-defaults | guidance | Does each test data builder produce valid state by default through its domain factory? |
 | standards/rule/backend-testing.keep-assertions-focused | guidance | Does each test assert only its named outcome rather than a whole-object snapshot? |

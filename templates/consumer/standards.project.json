@@ -1,53 +1,47 @@
 {
   "$schema": "./standards/schemas/standards-project.schema.json",
   "project": {
-    "name": "<project>"
+    "name": "fixture-shop"
   },
-  "size": "<small|large>",
-  "stacks": ["dotnet", "<react|svelte|blazor-web>"],
+  "size": "small",
+  "stacks": ["dotnet", "react"],
   "reviewedStandardsVersion": "2.0.0",
-  "optionalTypes": ["<constraint|research|limit|runbook>"],
+  "optionalTypes": [],
   "constraints": {
-    "answered": false
+    "answered": true
   },
-  "owners": ["<owner>"],
+  "owners": ["fixture-owner"],
   "paths": {
-    "apiSolution": "<api-solution>",
+    "apiSolution": "apps/api/Fixture.slnx",
     "docs": "docs",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
     "unstructuredDocs": [],
-    "testRoots": [],
+    "testRoots": ["apps/api/tests"],
     "languageScan": [],
     "uiPackage": {
-      "name": "@<project>/ui",
+      "name": "@fixture/ui",
       "path": "packages/ui",
       "componentsJson": "packages/ui/components.json",
       "primitives": "packages/ui/src/components",
       "tokens": "packages/ui/src/styles/tokens.css",
       "sourceLock": "packages/ui/ui-source-lock.json",
       "designContract": "packages/ui/DESIGN.md",
-      "publicExports": ["@<project>/ui/floorplans", "@<project>/ui/display", "@<project>/ui/forms"]
+      "publicExports": ["@fixture/ui/floorplans"]
     },
     "uiPatterns": "docs/ui/pattern-catalog.json",
     "frontends": [
       {
-        "name": "<frontend>",
-        "path": "apps/<frontend>",
-        "platform": "<react|svelte|blazor-web>",
+        "name": "web",
+        "path": "apps/web",
+        "platform": "react",
         "ui": {
           "profile": "application-balanced",
-          "globalCss": "apps/<frontend>/src/<styles>.css"
+          "globalCss": "apps/web/src/styles.css"
         }
       }
     ],
     "sites": []
   },
-  "extensions": [
-    {
-      "id": "<extension>",
-      "criterion": "<Why this extension applies>",
-      "reviewBy": "<YYYY-MM-DD>"
-    }
-  ]
+  "selectedExtensions": []
 }

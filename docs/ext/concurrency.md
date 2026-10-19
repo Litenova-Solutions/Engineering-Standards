@@ -12,11 +12,9 @@ Applicable specification kinds: `module`, `business-record`, `use-case`.
 
 The consumer enables `concurrency` when accepted writes can conflict or retries can duplicate irreversible or externally visible effects.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline provision. `standards/rule/ext-concurrency.return-precondition-outcomes` extends `standards/rule/backend-api.use-consistent-status-codes` with the 428 row for a missing precondition.
-
-## Switches on
 
 This extension switches on `limit`. `standards/rule/ext-concurrency.set-key-retention` records key retention as a Limit record.
 

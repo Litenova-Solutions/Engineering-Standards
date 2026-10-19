@@ -8,7 +8,7 @@ State the optional capability and its boundary.
 
 Activation scope: `{local|project}`.
 
-Applicable record types: `<type>`.
+Applicable specification kinds: `<type>`.
 
 Activate this extension when one exact current condition applies.
 

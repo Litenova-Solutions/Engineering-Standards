@@ -2,15 +2,15 @@
 
 ## Intent
 
-These files are starting points for consumer records. Copy only the files the current work needs, replace every `<placeholder>` before committing, and remove any optional line left unused.
+These files are starting points for consumer records. Copy only the files the current work needs, replace every `<placeholder>` before committing, and remove any optional line left unused. The JSON templates carry working example values; adjust them to the project.
 
-A page record carries its type, identifier, title, owner, and status in JSON frontmatter, with the body sections its template shows. An entry record sits in its page frontmatter: requirements on a product topic page, rules and events on a business record page, results and cases on a use case page, and permissions, entry points, and limits on their list pages. Terms live in the language record instead of on a page.
+A page record carries its type, identifier, title, owner, and status in JSON frontmatter, with the body sections its template shows. An entry record sits in its page frontmatter. Requirements sit on a product topic page. Rules and events sit on a business record page, and results and cases on a use case page. Permissions, entry points, and limits sit on their list pages. Terms live in the language record instead of on a page.
 
 ## Project setup
 
 | Template | Target | Purpose |
 |:---|:---|:---|
-| `standards.project.json` | `standards.project.json` | Selects the size, stacks, reviewed standards release, paths, owners, optional types, and extensions. |
+| `standards.project.json` | `standards.project.json` | Selects the size, stacks, reviewed standards release, paths, owners, optional types, and selected extensions. |
 | `project-agents.md` | `AGENTS.md` | Provides the short consumer agent entry point. |
 | `language.json` | `docs/language.json` | Holds the Term entries prose is checked against, with rejected words and mannered terms. |
 | `scenario-cast.md` | `docs/domain/scenarios.md` | Fixes the people, place, dates, and amounts every `Scenario` section draws from. |
@@ -59,6 +59,5 @@ A page record carries its type, identifier, title, owner, and status in JSON fro
 | `design-contract.md` | `packages/ui/DESIGN.md` | States the brand, tokens, composites, and voice every frontend composes from. |
 | `ui-source-lock.json` | `packages/ui/ui-source-lock.json` | Records the installed registry source, digests, and dependencies. |
 | `ui-pattern-catalog.json` | `docs/ui/pattern-catalog.json` | Records each recurring interface decision with its options and choice. |
-| `ui-override-decision.md` | `docs/decisions/<id>.md` | Records one visual authority, registry, or specialist-control override. |
 
 The model builder reads each record and writes the computed state into `model.json`. Run its `render` verb after adding, approving, or retiring a record, so generated regions match the model.

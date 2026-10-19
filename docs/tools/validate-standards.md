@@ -7,12 +7,12 @@
 ## Synopsis
 
 ```bash
-node tools/validate-standards.mjs [repositoryRoot] [--warnings]
+node tools/validate-standards.mjs [repositoryRoot] [--warnings] [--format=json] [--help]
 ```
 
 ## Description
 
-This command is the repository gate for every page, template, and identifier under `docs/`. It reads page contracts and section order, atomic Standards and Convention blocks, provision identity, and controlled prose. It also reads internal links, manifest paths, extension declarations, and the generated provision index.
+This command is the repository gate for every page, template, and identifier under `docs/`. It reads page contracts and section order, atomic Standards and Convention blocks, provision identity, verification marks, and controlled prose. It also reads internal links, manifest paths, extension declarations, and the generated provision index.
 
 Run it after changing any page, any template, or any authoring rule.
 
@@ -36,7 +36,7 @@ Run it after changing any page, any template, or any authoring rule.
 |:---|:---|
 | `0` | Every authoring check passed. |
 | `1` | At least one check reported a defect. |
-| `2` | More than one root was passed, or the root is not a directory. |
+| `2` | The usage is invalid, or an input file is unreadable. |
 
 ## Examples
 
@@ -49,7 +49,7 @@ node tools/validate-standards.mjs
 Validate another checkout and list every warning occurrence:
 
 ```bash
-node tools/validate-standards.mjs /path/to/standards --warnings
+node tools/validate-standards.mjs ../standards --warnings
 ```
 
 ## Underneath

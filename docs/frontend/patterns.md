@@ -1,10 +1,10 @@
-# UI pattern decisions
+# UI Pattern Decisions
 
 ## Intent
 
 Every recurring interface question is decided once and recorded in one catalog. Each entry holds the options considered, the option chosen, the compact-screen behaviour, and the implementation per platform. Implementers build from the chosen option and extend the catalog rather than redrawing the pattern.
 
-## Agent summary {#agent-summary}
+## Agent Summary {#agent-summary}
 
 - One catalog holds every interface pattern decision. (standards/rule/frontend-patterns.keep-one-pattern-catalog)
 - Each pattern records its options, costs, and choice. (standards/rule/frontend-patterns.record-every-option-considered)

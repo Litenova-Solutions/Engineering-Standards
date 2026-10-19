@@ -1,4 +1,4 @@
-# Frontend rendering and routes
+# Frontend Rendering and Routes
 
 ## Intent
 
@@ -6,7 +6,7 @@ A route file answers three questions: what address is this, what data does it ne
 
 The render boundary is chosen by the audience the route serves. A console is already open, so it renders in the browser from a cache its loader filled. A public page arrives from a link or a search result, so its first response carries its title, its description, and its links.
 
-## Agent summary {#agent-summary}
+## Agent Summary {#agent-summary}
 
 - A loader fills the query cache before the component runs. (standards/rule/frontend-rendering.load-route-data-in-the-loader)
 - A component reads the key its loader filled. (standards/rule/frontend-rendering.read-route-data-with-a-suspense-query)
@@ -131,7 +131,7 @@ These six are the states a route has. A control adds `disabled` and `pending` un
 
 ### Keep authenticated caching explicit (standards/rule/frontend-rendering.keep-authenticated-caching-explicit)
 
-**Requirement:** Actor-specific data MUST declare its cache key, its partition boundary, its invalidation owner, and its security review before it is cached. The declaration sits beside the query definition that sets the cache key.
+**Requirement:** Actor-specific data MUST declare its cache key, partition, invalidation owner, and security review before caching, beside the query definition setting the key.
 
 **Rationale:** Shared route or loader behaviour otherwise serves one actor's data to another. An uncached read is the safe default, and a cache partitioned per request is the safe server shape.
 

@@ -8,15 +8,13 @@ An MCP server presents the product's API to an LLM client running outside the pr
 
 Activation scope: `project`.
 
-Applicable specification kinds: `entry-point`.
+Applicable specification kinds: None.
 
 The consumer selects `mcp` when the product ships a Model Context Protocol server that an LLM client starts on a user's own machine. An internal integration the product itself hosts does not select it. The server acts as an authenticated user or API key against the public API and holds no permission of its own. Authentication and authorization stay with the baseline API and security pages.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline rule.
-
-## Switches on
 
 This extension switches on no record type.
 
@@ -76,7 +74,7 @@ This extension switches on no record type.
 
 ### Exclude secrets and personal data (standards/rule/ext-mcp.exclude-secrets-and-personal-data)
 
-**Requirement:** Tool descriptions and logs MUST exclude secrets and personal data.
+**Requirement:** Tool descriptions and logs MUST exclude secrets and personal data from every field they carry.
 
 **Rationale:** Descriptions reach the model and logs reach operators, and neither needs values that grant access or identify a person.
 

@@ -328,7 +328,9 @@ function validateComponentsJson(file, baseline, baselineOverride, platform) {
   const label = relativeToRoot(file);
   const config = readJson(file, label);
   if (!config) return;
-  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  // Findings cite the stack-neutral provisions whatever the platform, because
+  // the UI rules live on one page per concern with small per-stack sections.
+  const ui = 'frontend-ui';
   if (platform === 'svelte') {
     // shadcn-svelte writes tailwind.baseColor with no cssVariables field, and
     // its icon, menu, and registry fields are optional. An omitted field takes
@@ -339,7 +341,7 @@ function validateComponentsJson(file, baseline, baselineOverride, platform) {
       if (config[key] !== undefined && config[key] !== value) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
     }
     if (config.registry && config.registry !== baseline.registry?.url && !baselineOverride) {
-      error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${config.registry}' is not the built-in shadcn-svelte registry; an additional registry requires an override decision`);
+      error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${config.registry}' is not the built-in shadcn-svelte registry; an additional registry requires an exception`);
     }
     return;
   }
@@ -356,7 +358,7 @@ function validateComponentsJson(file, baseline, baselineOverride, platform) {
   if (config.tailwind?.baseColor !== baseline.baseColor) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
   if (config.tailwind?.cssVariables !== baseline.cssVariables) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.cssVariables must be ${baseline.cssVariables}`);
   if (config.registries && Object.keys(config.registries).length > 0 && !baselineOverride) {
-    error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: an additional registry requires an override decision`);
+    error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: an additional registry requires an exception`);
   }
 }
 
@@ -367,7 +369,7 @@ function validateSourceLock(file, baseline, packageRoot, manifest, baselineOverr
   const label = relativeToRoot(file);
   const lock = readJson(file, label);
   if (!lock) return;
-  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  const ui = 'frontend-ui';
   for (const key of ['schemaVersion', 'generator', 'cli', 'preset', 'registry', 'formatter', 'components']) required(lock, key, label);
   schemaCheck('ui-source-lock.schema.json', lock, label, `standards/rule/${ui}.track-source-changes`);
   const cliPackage = platform === 'svelte' ? 'shadcn-svelte' : 'shadcn';
@@ -376,7 +378,7 @@ function validateSourceLock(file, baseline, packageRoot, manifest, baselineOverr
   // no separate branch for the word is reachable.
   if (!/^\d+\.\d+\.\d+$/.test(lock.cli ?? '')) error(`${label}: cli must be a pinned semantic version`);
   else if (expectedCli && lock.cli !== expectedCli) error(`${label}: cli must match manifest ${cliPackage} pin '${expectedCli}'`);
-  if ((lock.registry?.name !== baseline.registry?.name || lock.registry?.url !== baseline.registry?.url) && !baselineOverride) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${lock.registry?.name ?? '(unnamed)'}' is not the built-in ${baseline.registry?.name ?? 'registry'} registry; an additional registry requires an override decision`);
+  if ((lock.registry?.name !== baseline.registry?.name || lock.registry?.url !== baseline.registry?.url) && !baselineOverride) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${lock.registry?.name ?? '(unnamed)'}' is not the built-in ${baseline.registry?.name ?? 'registry'} registry; an additional registry requires an exception`);
   for (const key of ['style', 'base', 'cssVariables', 'baseColor', 'theme', 'chartColor', 'font', 'fontHeading', 'icons', 'radius', 'menuAccent', 'menuColor', 'componentsStyle']) {
     if (baseline[key] !== undefined && lock.preset?.[key] !== baseline[key]) {
       error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: preset.${key} does not match the manifest baseline`);
@@ -418,7 +420,7 @@ const DESIGN_SECTIONS = ['Brand', 'Tokens', 'Vocabulary', 'Patterns', 'Do', 'Do 
 function validateDesignContract(pkg, platform) {
   const label = relativeToRoot(filePath(pkg.designContract));
   const file = filePath(pkg.designContract);
-  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  const ui = 'frontend-ui';
   if (!fs.existsSync(file)) {
     error(`[standards/rule/${ui}.publish-a-design-contract] shared package '${pkg.name}': no design contract at '${pkg.designContract}'`);
     return null;
@@ -509,7 +511,7 @@ function cssStructure(text, report) {
 
 function validateGlobalCss(file, platform) {
   const label = relativeToRoot(file);
-  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  const ui = 'frontend-ui';
   const text = fs.readFileSync(file, 'utf8');
   let malformed = false;
   const structure = cssStructure(text, (reason) => {
@@ -624,7 +626,7 @@ function reportGlobalStatement(label, statement, ui) {
 // its device rules here, from the same tokens.
 function validateFrontendStylesheet(file, packageRoot, pkg, platform) {
   const label = relativeToRoot(file);
-  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  const ui = 'frontend-ui';
   const text = fs.readFileSync(file, 'utf8');
   const structure = cssStructure(text, () => {});
   const imports = [...text.matchAll(/@import\s+(["'])([^"']+)\1/g)].map((match) => match[2]);
@@ -663,7 +665,7 @@ function validateFrontendStylesheet(file, packageRoot, pkg, platform) {
 // (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)
 function validateSharedStylesheets(packageRoot, tokensFile, platform) {
   const tokenPath = path.resolve(tokensFile);
-  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  const ui = 'frontend-ui';
   const files = walk(packageRoot, (candidate) => candidate.endsWith('.css'));
   for (const file of files) {
     if (path.resolve(file) === tokenPath) continue;
@@ -685,7 +687,7 @@ function validateSharedStylesheets(packageRoot, tokensFile, platform) {
 // an application does not, and `validateApplicationImports` refuses it there.
 // (standards/rule/frontend-ui.restrict-css-decisions)
 function validateSourceScan(target, primitives, platform) {
-  const ui = platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  const ui = 'frontend-ui';
   const files = walk(target, (file) => /\.(?:ts|tsx|js|jsx|svelte)$/.test(file));
   for (const source of files) {
     const relative = relativeToRoot(source);
@@ -724,7 +726,7 @@ const SVELTE_IMPORT_BOUNDARIES = [
 ];
 
 function validateApplicationImports(frontendRoot, pkg, platform) {
-  const components = platform === 'svelte' ? 'svelte-components' : 'frontend-components';
+  const components = 'frontend-components';
   const boundaries = platform === 'svelte' ? SVELTE_IMPORT_BOUNDARIES : REACT_IMPORT_BOUNDARIES;
   const files = walk(frontendRoot, (file) => /\.(?:ts|tsx|js|jsx|svelte)$/.test(file));
   for (const source of files) {
@@ -792,7 +794,7 @@ function validateDependencyBoundary() {
       ...(packageJson.resolutions ?? {}),
     };
     for (const name of visualPackages) {
-      if (dependencies[name]) error(`[standards/rule/frontend-ui.select-one-visual-authority] ${label}: second general-purpose visual dependency '${name}' requires an override`);
+      if (dependencies[name]) error(`[standards/rule/frontend-ui.select-one-visual-authority] ${label}: second general-purpose visual dependency '${name}' requires an exception`);
     }
   }
 }
@@ -920,7 +922,7 @@ function validatePatternCatalog(relative) {
 
 // ---- run --------------------------------------------------------------------
 
-const CONTROLLED_PLATFORMS = ['react-web', 'svelte'];
+const CONTROLLED_PLATFORMS = ['react', 'svelte'];
 
 const projectFile = path.join(root, 'standards.project.json');
 if (!fs.existsSync(projectFile)) {
@@ -944,12 +946,12 @@ let checked = 0;
 // lock reports in its own gate; this read stays silent and assumes React.
 function lockPlatform() {
   const sourceLock = project?.paths?.uiPackage?.sourceLock;
-  if (!sourceLock) return 'react-web';
+  if (!sourceLock) return 'react';
   try {
     const lock = JSON.parse(fs.readFileSync(filePath(sourceLock), 'utf8'));
-    return lock?.generator === 'shadcn-svelte' ? 'svelte' : 'react-web';
+    return lock?.generator === 'shadcn-svelte' ? 'svelte' : 'react';
   } catch {
-    return 'react-web';
+    return 'react';
   }
 }
 
@@ -957,37 +959,63 @@ const packagePlatform = lockPlatform();
 const baseline = packagePlatform === 'svelte' ? (manifest?.uiBaselineSvelte ?? null) : (manifest?.uiBaseline ?? null);
 const baselineKey = packagePlatform === 'svelte' ? 'uiBaselineSvelte' : 'uiBaseline';
 
-// A UI rule override carries a review date and stops being valid once that date
-// passes. This check is time dependent by design; every other check in this
-// validator depends only on repository files.
-const today = new Date().toISOString().slice(0, 10);
-// The manifest names the id scopes whose overrides expire. The policy is declared
-// data, so renaming a scope never silently drops the review requirement.
-const reviewScopes = manifest?.overridePolicy?.requiresReviewBy ?? [];
-const expires = (provisionId) => reviewScopes.some((scope) => String(provisionId ?? '').startsWith(`${scope}.`));
-for (const override of project?.overrides ?? []) {
-  if (!expires(override?.provisionId)) continue;
-  const label = `override '${override.provisionId}'`;
-  const page = String(override?.provisionId ?? '').split('/')[2]?.split('.')[0] ?? 'frontend-ui';
-  if (!override.reviewBy) {
-    error(`[standards/rule/${page}.select-one-visual-authority] ${label}: a UI rule override requires 'reviewBy' with the review or removal date`);
-    continue;
+// A rule override is an Exception record: docs/exceptions/<name>.md carrying the
+// provision it departs from, the reason, the review date, and the removal
+// condition. The consumer validator owns the record shape; this validator reads
+// the departure its own gates need and enforces the review date. The folder
+// moves with paths.records.exception when the consumer sets it.
+const UI_EXCEPTION_PAGES = new Set(['frontend-ui', 'frontend-components', 'frontend-patterns']);
+
+function readUiExceptions() {
+  const folder = project?.paths?.records?.exception ?? 'docs/exceptions';
+  const directory = filePath(folder);
+  if (!fs.existsSync(directory)) return [];
+  const found = [];
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+    const file = path.join(directory, entry.name);
+    const raw = fs.readFileSync(file, 'utf8');
+    if (!raw.startsWith('---')) continue;
+    const end = raw.indexOf('\n---', 3);
+    if (end < 0) continue;
+    let meta = null;
+    try {
+      meta = JSON.parse(raw.slice(3, end).trim());
+    } catch {
+      continue;
+    }
+    if (!meta || meta.type !== 'exception' || typeof meta.standard !== 'string') continue;
+    found.push({ file: relativeToRoot(file), standard: meta.standard, reviewBy: meta.reviewBy });
   }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(override.reviewBy)) error(`${label}: reviewBy must be YYYY-MM-DD`);
-  else if (override.reviewBy < today) error(`[standards/rule/${page}.select-one-visual-authority] ${label}: review date ${override.reviewBy} has passed; renew the decision`);
-  if (override.decision && !fs.existsSync(filePath(override.decision))) error(`${label}: decision does not exist '${override.decision}'`);
+  return found;
+}
+
+const uiExceptions = readUiExceptions();
+
+// An exception carries a review date and stops being valid once that date
+// passes. This check is time dependent by design; every other check in this
+// validator depends only on repository files. Only exceptions against the UI
+// pages are read here; the rest belong to the checks that enforce them.
+const today = new Date().toISOString().slice(0, 10);
+for (const exception of uiExceptions) {
+  const page = String(exception.standard).split('/')[2]?.split('.')[0] ?? '';
+  if (!UI_EXCEPTION_PAGES.has(page)) continue;
+  if (typeof exception.reviewBy !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(exception.reviewBy)) continue;
+  if (exception.reviewBy < today) {
+    error(`[${exception.standard}] ${exception.file}: review date ${exception.reviewBy} has passed; renew the decision`);
+  }
 }
 
 // A controlled frontend composes the shared package, so the workspace declares
 // it once. A frontend that composes no shared component carries no UI block.
 // (standards/rule/frontend-ui.select-one-visual-authority)
-// An additional registry passes both registry gates under an override decision
-// against the pinned baseline provision. The review date on that decision is
-// checked above; the gates below check its presence.
-const baselineOverride = (project?.overrides ?? []).some((override) => override?.provisionId === 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package' || override?.provisionId === 'standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package');
+// An additional registry passes both registry gates under an exception against
+// the pinned baseline provision. The review date on that record is checked
+// above; the gates below check its presence.
+const baselineOverride = uiExceptions.some((exception) => exception.standard === 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package');
 const pkg = project?.paths?.uiPackage ?? null;
 if (!controlled.length && pkg) {
-  error('standards.project.json: paths.uiPackage is declared but no frontend declares a controlled platform (react-web, svelte)');
+  error('standards.project.json: paths.uiPackage is declared but no frontend declares a controlled platform (react, svelte)');
 }
 if (controlled.length && !pkg) {
   error(`standards/rule/frontend-ui.select-one-visual-authority standards.project.json: ${controlled.length} controlled frontend(s) and no paths.uiPackage`);
@@ -1037,7 +1065,7 @@ if (pkg) {
 
 for (const frontend of controlled) {
   const label = `frontend '${frontend.name}'`;
-  const ui = frontend.platform === 'svelte' ? 'svelte-ui' : 'frontend-ui';
+  const ui = 'frontend-ui';
   if (!frontend.ui) {
     error(`${label}: a controlled frontend requires a 'ui' block declaring its density profile`);
     continue;

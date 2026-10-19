@@ -8,19 +8,9 @@ This extension adds executable scenarios for critical cross-layer examples. A co
 
 Activation scope: `local`.
 
-Applicable record types: `use-case`, `journey`.
+Applicable specification kinds: `use-case`, `journey`.
 
 The consumer enables `bdd` when a critical example needs business-language review and execution through a public system boundary. Routine unit behavior does not activate it.
-
-## Replaces
-
-This extension replaces no baseline provision. It adds an acceptance test project and the manifest-pinned packages of one runner.
-
-## Switches on
-
-This extension switches on no optional record type.
-
-## Runners
 
 A consumer selects one runner for the whole suite and keeps the provisions below with either.
 
@@ -30,6 +20,12 @@ A consumer selects one runner for the whole suite and keeps the provisions below
 | LightBDD | A C# method on a feature class, whose steps are calls to step methods | A `/// <proves>` tag on the scenario method | The scenario method, the step method names, and the generated report |
 
 LightBDD moves the binding from text matching to the compiler. A step that no longer exists, or whose parameters changed, fails the build rather than the run. A consumer that generates its API client from the published contract extends the same property to every request a step sends.
+
+## Baseline relationship
+
+This extension replaces no baseline provision. It adds an acceptance test project and the manifest-pinned packages of one runner.
+
+This extension switches on `case`. Its scenarios prove Case records.
 
 ## Agent Summary {#agent-summary}
 
@@ -56,9 +52,9 @@ LightBDD moves the binding from text matching to the compiler. A step that no lo
 
 ### Prove a Case from every scenario (standards/rule/ext-bdd.prove-a-case-from-every-scenario)
 
-**Requirement:** Every BDD scenario MUST carry one `proves` claim naming the Case it proves. A LightBDD scenario carries the claim as a `/// <proves>` tag on the scenario method. A Reqnroll scenario carries the claim as a `proves:` line under its title. The scenario steps MUST call the proved use case and assert its Result.
+**Requirement:** Every BDD scenario MUST carry one `proves` claim naming its Case, with steps calling the proved use case and asserting its Result.
 
-**Rationale:** A Case pairs one situation with the Result it leads to. The claim, the steps, and the assertion together prove it.
+**Rationale:** A Case pairs one situation with the Result it leads to. The claim, the steps, and the assertion together prove it. A LightBDD scenario carries the claim as a `/// <proves>` tag on the scenario method. A Reqnroll scenario carries it as a `proves:` line under its title.
 
 **Example:** `/// <proves>case/cancel-order.cancelling-twice-is-refused</proves>` traces a cancellation scenario to its Case.
 

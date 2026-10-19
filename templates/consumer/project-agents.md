@@ -4,7 +4,7 @@ Read `standards/AGENTS.md`, then `standards.project.json`, before changing the p
 
 Query the model builder for the records a task touches, with their links and the tool-read code and test state, instead of reading page lists. (standards/rule/core-agent.select-task-context, standards/rule/core-scope.record-selected-extensions)
 
-`dotnet run --project standards/tools/model -- query <record-id>` returns one record with its links. Query the record before changing behavior it describes, and query again when a link leads further.
+`dotnet run --project standards/tools/model -- query <record-id>` returns one record with its links. Query the record before changing behavior it describes, and query again when a link leads further. (standards/rule/core-agent.select-task-context)
 
 A project Exception record overrides a Standard only when it names the provision ID, with reason and review date. (standards/rule/core-agent.apply-guidance-precedence)
 
@@ -25,9 +25,9 @@ dotnet test <api-solution> --configuration Release --no-build
 
 Run the root pnpm gates for every changed frontend in `standards.project.json`. (standards/rule/core-release.run-boundary-selected-checks)
 
-Run metadata and model checks for each changed record, source, test, or generated contract. Query the model again after the change, and report what stays red. (standards/rule/core-system.update-specifications-with-behavior, standards/rule/core-authoring.declare-structured-specification-metadata)
+Run metadata and model checks for each changed record, source, test, or generated contract. Query the model again after the change, and report what stays red. (standards/rule/core-system.update-records-with-behavior, standards/rule/core-authoring.declare-structured-specification-metadata)
 
-Run `dotnet run --project standards/tools/model -- render` after adding, approving, or retiring a record, so generated regions match the model.
+Run `dotnet run --project standards/tools/model -- render` after adding, approving, or retiring a record, so generated regions match the model. (standards/rule/core-system.update-records-with-behavior)
 
 Report every skipped check with its reason. (standards/rule/core-release.report-verification-exactly)
 
@@ -37,4 +37,4 @@ Cite every path of every use case a route calls in a test title, or record an ex
 
 Run `node standards/tools/validate-ui.mjs` after changing UI configuration, vocabulary, the design contract, source locks, CSS, or primitives. Run the route suite after changing a route. (standards/rule/frontend-ui.prove-ui-behavior-and-appearance, standards/rule/frontend-ui.check-every-route-in-a-browser)
 
-Record an override decision before selecting another visual system or component base. (standards/rule/frontend-ui.select-one-visual-authority)
+Record an exception before selecting another visual system or component base. (standards/rule/frontend-ui.select-one-visual-authority)

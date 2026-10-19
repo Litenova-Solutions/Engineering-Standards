@@ -8,15 +8,13 @@ OpenAPI freshness proves that committed artifacts match source code. It does not
 
 Activation scope: `project`.
 
-Applicable record types: None.
+Applicable specification kinds: None.
 
 The consumer enables `compat` for public APIs, partner clients, mobile clients, or independently deployed consumers. Same-release internal APIs retain `standards/rule/backend-api.treat-openapi-as-a-generated-contract`. A project in its pre-production stage defers these rules through the stage extension.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline provision.
-
-## Switches on
 
 This extension switches on no optional record type.
 
@@ -88,7 +86,7 @@ This extension switches on no optional record type.
 
 ### Assign operation IDs (standards/rule/ext-compat.assign-operation-ids)
 
-**Requirement:** Every operation exposed to an independent consumer MUST have a deliberate `operationId`. An endpoint whose shape a specification outside the project fixes is out of scope.
+**Requirement:** Every operation exposed to an independent consumer MUST have a deliberate `operationId`, except an endpoint whose shape a specification outside the project fixes.
 
 **Rationale:** Generated clients and tools use the identifier as an operation-level contract name.
 
@@ -120,7 +118,7 @@ This extension switches on no optional record type.
 
 ### Record version retirement (standards/rule/ext-compat.record-version-retirement)
 
-**Requirement:** A versioning decision MUST name the owner of each affected consumer, the deadline, and the removal condition. The decision records its owner, status, decider, and decide-by. A version is removed only after its decision is approved.
+**Requirement:** A versioning decision MUST name the owner of each affected consumer, the deadline, and the removal condition, with the decision approved before any removal.
 
 **Rationale:** Named ownership makes a future removal reviewable rather than implicit.
 
@@ -138,7 +136,7 @@ This extension switches on no optional record type.
 
 ### Record deprecation conditions (standards/rule/ext-compat.record-deprecation-conditions)
 
-**Requirement:** A deprecation decision MUST record the sunset date and replacement operation. The decision records its owner, status, decider, and decide-by. Nothing is removed while the decision is draft.
+**Requirement:** A deprecation decision MUST record the sunset date and replacement operation, with nothing removed while the decision is draft.
 
 **Rationale:** Consumers need a fixed end date and a named supported alternative.
 
@@ -156,7 +154,7 @@ This extension switches on no optional record type.
 
 ### Exercise generated consumers (standards/rule/ext-compat.exercise-generated-consumers)
 
-**Requirement:** An API owner MUST test each first-party generated client against the changed OpenAPI document, and each client MUST compile and exercise its changed operations.
+**Requirement:** An API owner MUST test each first-party generated client against the changed OpenAPI document, with each client compiling and exercising its changed operations.
 
 **Rationale:** Generated clients expose exhaustive handling and schema differences that a structural diff can miss.
 

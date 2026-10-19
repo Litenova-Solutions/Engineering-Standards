@@ -10,15 +10,13 @@ This page states what the build produces, what each page carries, and where shar
 
 Activation scope: `project`.
 
-Applicable record types: none.
+Applicable specification kinds: None.
 
 The consumer selects `site` when it ships a public static website beside its application, such as marketing pages, pricing, or help articles. A page the application itself serves does not select it.
 
-## Replaces
+## Baseline relationship
 
 None. The frontend and UI pages govern application frontends declared in `paths.frontends`. A static site is not an application frontend, and this extension replaces no baseline provision.
-
-## Switches on
 
 None. Prices and claims read Requirement entries and Terms, which every profile requires.
 
@@ -205,7 +203,7 @@ Sitemap: https://example.test/sitemap.xml
 
 ### Keep each repeated fact in one data source (standards/rule/ext-site.keep-each-repeated-fact-in-one-data-source)
 
-**Requirement:** A fact stated on more than one page MUST live in one data source every such page reads. A fact that is a product word MUST live as a Term record with labels per language.
+**Requirement:** A repeated fact MUST live in one data source every page reads, as a Term record with labels per language for a product word.
 
 **Rationale:** One source means one edit reaches every page, and two pages cannot disagree. Pages read facts by reference rather than repeating them.
 

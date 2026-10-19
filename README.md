@@ -35,7 +35,7 @@ The stacks a consumer selects apply first. An extension or project exception nam
 - [Agentic Engineering System](docs/core/system.md)
 - [Project model](docs/core/model.md)
 - [Authoring standard](docs/core/authoring.md)
-- [Get started](docs/guide/getting-started.md)
+- [Get started](docs/tutorial/getting-started.md)
 - [Command index](docs/tools/README.md)
 
 ## Use the Standards
@@ -49,7 +49,7 @@ git -C standards checkout --detach <approved-tag-or-commit>
 
 Add `standards.project.json`, a short root `AGENTS.md`, and the project records required by current work.
 
-Follow [Get started](docs/guide/getting-started.md) when creating a consumer repository.
+Follow [Get started](docs/tutorial/getting-started.md) when creating a consumer repository.
 
 The [template index](templates/consumer/README.md) lists each consumer template and its target path.
 

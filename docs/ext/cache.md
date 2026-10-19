@@ -8,15 +8,13 @@ Caching trades freshness and invalidation work for lower latency or source load.
 
 Activation scope: `local`.
 
-Applicable record types: `use-case`.
+Applicable specification kinds: `use-case`.
 
 The consumer enables `cache` after traces or load tests identify a repeated expensive read and the use case can state acceptable staleness. Future traffic alone does not activate it.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline provision. A provider package needs a project decision and manifest pin.
-
-## Switches on
 
 This extension switches on `limit`. The accepted staleness and the expiry of each cache are Limit records.
 
@@ -33,7 +31,7 @@ This extension switches on `limit`. The accepted staleness and the expiry of eac
 
 ### Record measured cache need (standards/rule/ext-cache.record-measured-cache-need)
 
-**Requirement:** A cache proposal MUST record its observed query, representative load, latency, source cost, target, and accepted staleness. The accepted staleness is a Limit record. The proposal records its owner, status, decider, and decide-by.
+**Requirement:** A cache proposal MUST record its observed query, representative load, latency, source cost, target, accepted staleness as a Limit record, owner, status, decider, and decide-by.
 
 **Rationale:** The record makes the cache's freshness and operating-cost trade-off reviewable.
 
@@ -61,13 +59,13 @@ This extension switches on `limit`. The accepted staleness and the expiry of eac
 
 ### Define cache invalidation (standards/rule/ext-cache.define-cache-invalidation)
 
-**Requirement:** A cached value MUST define expiry, invalidating write events, an invalidation owner, and behavior after invalidation failure. The expiry is a Limit record.
+**Requirement:** A cached value MUST define expiry as a Limit record, invalidating write events, an invalidation owner, and behavior after invalidation failure.
 
 **Rationale:** An explicit contract makes stale data behavior visible before implementation.
 
 ### Record a manual cache invalidation (standards/rule/ext-cache.record-a-manual-cache-invalidation)
 
-**Requirement:** An invalidation an operator triggers by hand MUST produce a record naming the actor, the scope cleared, and the reason. When the audit extension is selected, the record is an audit record, and the audit adoption decision states its category.
+**Requirement:** A manual invalidation MUST produce a record naming actor, scope, and reason, as an audit record in its category when the audit extension is selected.
 
 **Rationale:** A manual clear changes what every later reader sees and leaves no trace in the data itself. Investigating a stale-read report afterwards means knowing whether somebody already cleared the entry. [Article 30 of the GDPR](https://gdpr-info.eu/art-30-gdpr/) treats an administrative action over personal data as processing that has a record.
 

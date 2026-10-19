@@ -4,7 +4,7 @@
   "title": "Litenova Standards Consumer Project",
   "type": "object",
   "additionalProperties": false,
-  "required": ["project", "profile", "reviewedStandardsVersion", "paths", "selectedExtensions", "overrides"],
+  "required": ["project", "size", "stacks", "reviewedStandardsVersion", "paths", "selectedExtensions"],
   "properties": {
     "$schema": { "type": "string" },
     "project": {
@@ -26,27 +26,43 @@
         }
       }
     },
-    "profile": {
+    "size": {
+      "description": "The size profile of this project. Small requires the core record types with Architecture and Integration test projects; large adds problems, features, journeys and cases with the Acceptance project.",
       "type": "string",
-      "pattern": "^[a-z][a-z0-9-]*$"
+      "enum": ["small", "large"]
     },
-    "releaseStage": {
-      "description": "The release stage of this consumer: pre-production before the first deployment holds customer data, production after. See the stage extension.",
-      "type": "string",
-      "enum": ["pre-production", "production"]
-    },
-    "deferredProvisions": {
-      "description": "The provisions this pre-production consumer defers until its promotion plan ends the deferral. Empty once the consumer is in production.",
+    "stacks": {
+      "description": "The stacks this project builds with: dotnet for the backend, and one per frontend from its platform.",
       "type": "array",
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "pattern": "^standards/rule/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+        "enum": ["dotnet", "react", "svelte", "blazor-web"]
       }
     },
-    "promotionPlan": {
-      "description": "The decision record that names each deferred provision and the promotion that ends the deferral.",
-      "$ref": "#/$defs/projectPath"
+    "optionalTypes": {
+      "description": "The optional record types this project writes beside what its size requires.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["constraint", "research", "limit", "runbook"]
+      }
+    },
+    "constraints": {
+      "description": "Present once the project has stated which outside constraints apply to it, possibly none.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["answered"],
+      "properties": {
+        "answered": { "const": true }
+      }
+    },
+    "owners": {
+      "description": "The closed list of names a record owner comes from.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
     },
     "reviewedStandardsVersion": {
       "description": "The standards release whose complete contract this project last reviewed.",
@@ -88,11 +104,27 @@
           }
         },
         "domainDocs": { "$ref": "#/$defs/projectPath" },
+        "records": {
+          "description": "Home folders per record type, where they differ from the defaults the model states.",
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^(product|constraint|research|decision|requirement|problem|feature|actor|role|permission|journey|module|business-record|rule|use-case|result|case|event|entry-point|limit|runbook|exception|known-gap|term)$"
+          },
+          "additionalProperties": { "$ref": "#/$defs/projectPath" }
+        },
         "testRoots": {
-          "description": "Directories holding automated test source. An acceptance criterion is cited from one of these, as a scenario tag, a C# AcceptanceCriterion trait, or a bracketed browser-test title.",
+          "description": "Directories holding automated test source. A case is proved from one of these, as a scenario whose steps call the use case and assert the result.",
           "type": "array",
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/projectPath" }
+        },
+        "testResults": {
+          "description": "Where the latest test run results live, so passing and failing proof is read from them. Defaults to the test result files under the test roots.",
+          "$ref": "#/$defs/projectPath"
+        },
+        "apiClient": {
+          "description": "The generated API client the frontends import, so route calls resolve to the use cases they reach.",
+          "$ref": "#/$defs/projectPath"
         },
         "surfaces": {
           "description": "The surfaces outside paths.frontends that invoke a use case: a command-line tool, a distributed server, a background host, an event reaction. Each frontend is already a surface under its own name. A Consumers row names one of these.",
@@ -128,9 +160,9 @@
               "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
               "path": { "$ref": "#/$defs/projectPath" },
               "platform": {
-                "description": "The frontend platform. Required on every entry, so a frontend outside the controlled UI contract declares that position instead of omitting the field.",
+                "description": "The frontend stack. Required on every entry, so a frontend outside the controlled UI contract declares that position instead of omitting the field.",
                 "type": "string",
-                "enum": ["react-web", "react-native", "svelte", "other-web"]
+                "enum": ["react", "svelte", "blazor-web"]
               },
               "ui": { "$ref": "#/$defs/ui" }
             },
@@ -139,12 +171,12 @@
                 "if": { "required": ["ui"] },
                 "then": {
                   "required": ["platform"],
-                  "properties": { "platform": { "enum": ["react-web", "svelte"] } }
+                  "properties": { "platform": { "enum": ["react", "svelte"] } }
                 }
               },
               {
                 "if": {
-                  "properties": { "platform": { "enum": ["react-web", "svelte"] } },
+                  "properties": { "platform": { "enum": ["react", "svelte"] } },
                   "required": ["platform"]
                 },
                 "then": { "required": ["ui"] }
@@ -171,46 +203,42 @@
             }
           }
         }
-      }
-    },
-    "allOf": [
-      {
-        "$comment": "A controlled web frontend composes the shared package, so declaring one makes the package required. A workspace whose frontends are all outside the contract declares no package.",
-        "if": {
-          "required": ["frontends"],
-          "properties": {
-            "frontends": {
-              "contains": {
-                "required": ["platform"],
-                "properties": { "platform": { "enum": ["react-web", "svelte"] } }
+      },
+      "allOf": [
+        {
+          "$comment": "A controlled web frontend composes the shared package, so declaring one makes the package required. A workspace whose frontends are all outside the contract declares no package.",
+          "if": {
+            "required": ["frontends"],
+            "properties": {
+              "frontends": {
+                "contains": {
+                  "required": ["platform"],
+                  "properties": { "platform": { "enum": ["react", "svelte"] } }
+                }
               }
             }
-          }
-        },
-        "then": { "required": ["uiPackage"] }
-      }
-    ],
+          },
+          "then": { "required": ["uiPackage"] }
+        }
+      ]
+    },
     "scenarioWordLimit": {
       "description": "The word bound a Scenario section stays within. Omitted, the recorded default of 120 applies, and the validator refuses a value below 40.",
       "type": "integer"
     },
     "prose": {
-      "description": "Where the controlled-prose baseline lives. The baseline records the debt a page carried when the measures were first applied to it, and a page whose lastReviewed date moves leaves the baseline.",
+      "description": "How the controlled-prose measures and the mannered terms are treated.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "baseline": {
-          "description": "Defaults to prose-baseline.json under the documentation root.",
-          "$ref": "#/$defs/projectPath"
-        },
         "enforcement": {
-          "description": "Whether the prose measures, the prose baseline and the mannered terms fail the consumer validator ('refuse', the default) or are reported as advisories ('report'). Rejected synonyms always fail. A consumer that reports names the overridden provisions in 'overrides'.",
+          "description": "Whether the prose measures and the mannered terms fail the consumer validator ('refuse', the default) or are reported as advisories ('report'). Rejected synonyms always fail.",
           "enum": ["refuse", "report"]
         }
       }
     },
     "prohibitedKinds": {
-      "description": "Specification kinds this consumer does not use. A specification declaring one is refused.",
+      "description": "Record types or page styles this consumer does not use. A page declaring one is refused.",
       "type": "array",
       "uniqueItems": true,
       "items": {
@@ -218,123 +246,40 @@
         "pattern": "^[a-z][a-z0-9-]*$"
       }
     },
-    "parity": {
-      "description": "Configuration for the specification and use-case parity check. Every field is optional and every default is empty.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "applicationProject": {
-          "description": "The Application project directory, when discovery by convention cannot resolve exactly one.",
-          "$ref": "#/$defs/projectPath"
-        },
-        "ignoreHandlers": {
-          "description": "Glob patterns for handlers that carry no use-case specification.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "ignoreUseCases": {
-          "description": "Use-case specification ids that resolve to no handler.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
-          }
-        },
-        "sourceRoots": {
-          "description": "Directories an Implementation mapping name resolves a declaration, project, or path in. Defaults to the directory holding the solution.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/projectPath" }
-        },
-        "foreignNames": {
-          "description": "Names an Implementation mapping states that a package declares rather than this repository, which no local scan can find.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1 }
-        }
-      }
-    },
-    "specSync": {
-      "description": "Configuration for the specification-sync validator. Every field is optional, and each default is derived from paths.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "codeRoots": {
-          "description": "Directories whose C# files are read for marking tags. Defaults to apps/api/src and apps/api/tests.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/projectPath" }
-        },
-        "markedRoots": {
-          "description": "Directories whose type-declaring files must carry a tag. Defaults to the Domain, Application, and WebApi projects plus every test root.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/projectPath" }
-        },
-        "featureRoots": {
-          "description": "Directories holding Reqnroll feature files, for a consumer whose BDD runner is Reqnroll. Defaults to apps/api/tests/{ProjectName}.Acceptance.Tests/Features, where {ProjectName} is project.name. A LightBDD scenario is C# and is read from codeRoots.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/projectPath" }
-        },
-        "baseline": {
-          "description": "Repository-relative path of the spec-sync baseline: a JSON file holding a sorted array of accepted finding strings.",
-          "$ref": "#/$defs/projectPath"
-        },
-        "evidenceRoots": {
-          "description": "Frontend directories whose test files are read for acceptance-criterion citations. Defaults to every path in paths.frontends.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/projectPath" }
-        }
-      }
-    },
     "selectedExtensions": {
-      "description": "Extensions active for this project. A bare string selects the extension. An object also records the criterion that was met and the date the selection is next reviewed, so a selection that costs nothing to keep still expires.",
+      "description": "Extensions active for this project. Each entry records the criterion that was met and the date the selection is next reviewed, so a selection that costs nothing to keep still expires.",
       "type": "array",
       "uniqueItems": true,
       "items": {
-        "oneOf": [
-          { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["id", "criterion", "reviewBy"],
-            "properties": {
-              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-              "criterion": { "type": "string", "minLength": 1 },
-              "reviewBy": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
-            }
-          }
-        ]
-      }
-    },
-    "overrides": {
-      "type": "array",
-      "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["provisionId", "decision"],
+        "required": ["id", "criterion", "reviewBy"],
         "properties": {
-          "provisionId": { "type": "string", "pattern": "^standards/rule/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$" },
-          "decision": { "$ref": "#/$defs/projectPath" },
-          "reviewBy": {
-            "type": "string",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "criterion": { "type": "string", "minLength": 1 },
+          "reviewBy": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "deferredProvisions": {
+            "description": "The provisions this selection defers, each with the date the deferral ends. Only the stage extension defers provisions.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["provision", "until"],
+              "properties": {
+                "provision": { "type": "string", "pattern": "^standards/(rule|convention)/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$" },
+                "until": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+              }
+            }
           }
         },
         "allOf": [
           {
-            "if": {
-              "properties": { "provisionId": { "pattern": "^standards/rule/(frontend-ui|svelte-ui)\\." } },
-              "required": ["provisionId"]
-            },
-            "then": { "required": ["reviewBy"] }
+            "if": { "required": ["deferredProvisions"] },
+            "then": {
+              "required": ["id"],
+              "properties": { "id": { "const": "stage" } }
+            }
           }
         ]
       }

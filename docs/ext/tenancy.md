@@ -8,15 +8,13 @@ Multitenancy makes tenant identity part of authorization, persistence, caches, j
 
 Activation scope: `project`.
 
-Applicable record types: none.
+Applicable specification kinds: None.
 
 The consumer enables `tenancy` only when independent customer organizations share one deployment and require isolated data or policy.
 
-## Replaces
+## Baseline relationship
 
 None. This extension adds tenant obligations the baseline does not state.
-
-## Switches on
 
 None. Tenant scope applies to records every profile already requires.
 
@@ -34,9 +32,9 @@ None. Tenant scope applies to records every profile already requires.
 
 ### Record the tenant adoption decision (standards/rule/ext-tenancy.record-the-tenant-adoption-decision)
 
-**Requirement:** A consumer selecting `tenancy` MUST record a Decision naming the tenant source, storage model, isolation guarantee, administrative access model, and data evolution path. It states the bound on tenant enumeration in all-tenant records.
+**Requirement:** A consumer selecting `tenancy` MUST record a Decision naming tenant source, storage model, isolation guarantee, administrative access, evolution path, and enumeration bound.
 
-**Rationale:** The Decision carries its owner, status, decider, and decide-by date. Approval waits while that Decision is a draft.
+**Rationale:** The Decision carries its owner, status, decider, and decide-by date. Approval waits while that Decision is a draft. The enumeration bound caps tenant identifiers in all-tenant records.
 
 ### Define tenant isolation (standards/rule/ext-tenancy.define-tenant-isolation)
 
@@ -64,13 +62,13 @@ None. Tenant scope applies to records every profile already requires.
 
 ### Verify actor and target tenancy (standards/rule/ext-tenancy.verify-actor-and-target-tenancy)
 
-**Requirement:** A protected multi-tenant operation MUST confirm the actor's tenant scope and the target's tenant. The actor holds the use case's needed Permission at the resolved tenant's scope, and the target resource belongs to that tenant.
+**Requirement:** A protected multi-tenant operation MUST confirm actor and target tenancy, with the needed Permission held at the resolved scope and the target belonging to it.
 
 **Rationale:** Both the caller and requested resource need the same authorized tenant scope. The chain runs Actor holds Role at scope, Role allows Permission, use case needs Permission.
 
 ### Isolate administrative cross-tenant access (standards/rule/ext-tenancy.isolate-administrative-cross-tenant-access)
 
-**Requirement:** An administrative cross-tenant operation MUST require a Permission the actor holds through a Role at platform scope, and MUST write an audit record.
+**Requirement:** An administrative cross-tenant operation MUST require a Permission the actor holds through a Role at platform scope, writing an audit record.
 
 **Rationale:** Exceptional access needs stronger visibility than normal tenant-scoped behavior.
 
@@ -106,7 +104,7 @@ None. Tenant scope applies to records every profile already requires.
 
 ### Record an all-tenant operation (standards/rule/ext-tenancy.record-an-all-tenant-operation)
 
-**Requirement:** An operation running at all-tenant scope MUST produce a record naming the actor, the operation, and the reason. The record states the tenant count and lists the tenant identifiers reached up to the bound the adoption Decision states.
+**Requirement:** An all-tenant operation MUST record actor, operation, reason, tenant count, and reached tenant identifiers up to the adoption Decision bound.
 
 **Rationale:** A documented scope states what an operation is allowed to touch. It does not state what one run touched, which is the question a tenant asks after an incident. An all-tenant run is also the one case where no tenant's own audit trail holds the whole event. [The OWASP logging guidance](https://owasp.org/www-project-cheat-sheets/cheatsheets/Logging_Cheat_Sheet) treats an administrative action over many subjects as one event to record. When the audit extension is selected, the record is an audit record; otherwise it stays a standalone record.
 

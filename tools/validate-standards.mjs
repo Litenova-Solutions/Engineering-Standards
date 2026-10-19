@@ -28,7 +28,7 @@ const MODALS = /\b(?:MUST NOT|SHOULD NOT|MUST|SHOULD|MAY)\b/g;
 const OTHER_NORMATIVE = /\b(?:REQUIRED|FORBIDDEN|SHALL)\b/;
 const PROVISION_LABEL = /^\*\*(Requirement|Deviation|Rationale|Example|Default|Replacement):\*\*/;
 const GENERIC_EVIDENCE = /\b(?:verify compliance|check compliance|inspect evidence|verify evidence)\b/i;
-const ACTION_VERBS = new Set(`Accept Activate Add Advance Align Anchor Announce Apply Approve Assert Assign Attach Audit Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify Co-locate Collect Commit Compare Complete Compose Configure Connect Control Copy Cover Create Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document Drive Emit Enforce Escalate Escape Evolve Exclude Exercise Expose Express Finish Follow Format Gate Generate Give Govern Group Handle Hide Hold Identify Implement Inject Inspect Isolate Keep Lease Limit List Load Localize Locate Make Map Mark Match Measure Meet Minimize Mirror Model Move Name Note Operate Organize Own Parameterize Parse Pass Persist Pin Place Plan Point Prefer Preserve Prevent Process Project Promote Protect Prove Provide Publish Purge Query Raise Read Reconnect Record Recover Reference Reflect Regenerate Register Reject Reload Release Remove Render Replay Replace Report Represent Require Renew Requeue Resolve Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tag Test Tolerate Trace Track Translate Treat Update Use Validate Verify Version Wait Write`.split(' '));
+const ACTION_VERBS = new Set(`Accept Activate Add Advance Align Anchor Announce Answer Apply Approve Ask Assert Assign Attach Audit Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify Co-locate Collect Commit Compare Complete Compose Compute Configure Confirm Connect Control Copy Cover Create Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document Drive Emit Enforce Escalate Escape Evolve Exclude Exercise Expose Express Finish Follow Format Gate Generate Give Govern Grant Group Handle Hide Hold Identify Implement Inject Inspect Isolate Keep Lease Limit List Load Localize Locate Make Map Mark Match Measure Meet Minimize Mirror Model Move Name Note Operate Organize Own Parameterize Parse Pass Persist Pin Place Plan Point Prefer Preserve Prevent Process Project Promote Protect Prove Provide Publish Purge Query Raise Reach Read Reconnect Record Recover Reference Reflect Refuse Regenerate Register Reject Reload Release Remove Render Replay Replace Report Represent Require Renew Requeue Resolve Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set Show Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tag Test Tolerate Trace Track Translate Treat Update Use Validate Verify Version Wait Write`.split(' '));
 // Every authoring rule is an error. This set stays empty unless a new rule is
 // landed against existing content, in which case it holds that rule only while
 // its count is burned down.
@@ -80,7 +80,6 @@ export const STABLE_DIAGNOSTIC_CODES = Object.freeze([
   'MANIFEST_DUPLICATE_PATH',
   'MANIFEST_JSON',
   'MANIFEST_PATH',
-  'OVERRIDE_UNKNOWN_ID',
   'PAGE_EMPTY_SECTION',
   'PAGE_MISSING_SECTION',
   'PAGE_SECTION_ORDER',
@@ -183,8 +182,13 @@ function walk(directory, predicate, result = []) {
 }
 
 function isCurrentStandardsMaterial(relative) {
+  // The model tool owns its own directory: its fixtures are consumer-shaped
+  // test data that can never satisfy the authoring contract, and its own
+  // suite checks the tool. The authoring checks read the standards material.
   return relative !== 'CHANGELOG.md'
-    && relative !== 'LICENSE.md';
+    && relative !== 'LICENSE.md'
+    && relative !== 'tools/model'
+    && !relative.startsWith('tools/model/');
 }
 
 function lineNumber(text, offset) {
@@ -309,9 +313,15 @@ function pageClass(relative) {
   return PAGE_CLASS_AREA[area] ?? 'topic';
 }
 
-function expectedSections(kind) {
+function expectedSections(kind, relative = '') {
   if (kind === 'topic') {
-    return { required: ['Intent', 'Agent Summary', 'Standards', 'Conventions', 'Verification'], optional: ['Concepts', 'Reference example'] };
+    // Each frontend page is stack-neutral with short per-stack sections for
+    // what differs between React and Svelte. No other topic page carries
+    // stack sections. (standards/rule/core-authoring.use-the-declared-page-contract)
+    const optional = relative.startsWith('docs/frontend/')
+      ? ['Concepts', 'React', 'Svelte', 'Reference example']
+      : ['Concepts', 'Reference example'];
+    return { required: ['Intent', 'Agent Summary', 'Standards', 'Conventions', 'Verification'], optional };
   }
   if (kind === 'profile') {
     return { required: ['Intent', 'Agent Summary', 'Standards', 'Composition', 'Conventions', 'Verification'], optional: [] };
@@ -334,7 +344,7 @@ function expectedSections(kind) {
 }
 
 function checkSectionOrder(relative, kind, sections, add) {
-  const contract = expectedSections(kind);
+  const contract = expectedSections(kind, relative);
   if (!contract) return;
   const names = sections.map((section) => section.name);
   for (const required of contract.required) {
@@ -345,7 +355,7 @@ function checkSectionOrder(relative, kind, sections, add) {
     if (!allowed.has(section.name)) add(relative, section.line, 'PAGE_UNKNOWN_SECTION', `H2 '${section.name}' is not valid for ${kind} pages`);
   }
   const canonical = kind === 'topic'
-    ? ['Intent', 'Agent Summary', 'Concepts', 'Standards', 'Conventions', 'Reference example', 'Verification']
+    ? ['Intent', 'Agent Summary', 'Concepts', ...(relative.startsWith('docs/frontend/') ? ['React', 'Svelte'] : []), 'Standards', 'Conventions', 'Reference example', 'Verification']
     : kind === 'how-to'
       ? ['Purpose', 'Prerequisites', 'Procedure', 'Verification']
       : kind === 'reference'
@@ -463,7 +473,7 @@ function parsePage(relative, raw, add, globalIds, root, virtual = false) {
   if (kind && kind !== 'index' && h1Count === 1 && !titleCase(h1Title)) add(relative, h1Line, 'PAGE_TITLE_CASE', `H1 '${h1Title}' must use Title Case`);
   checkSectionOrder(relative, kind, sections, add);
   checkIndexAndGlossary(relative, kind, raw, sections, add);
-  const sectionContract = expectedSections(kind);
+  const sectionContract = expectedSections(kind, relative);
   if (sectionContract) {
     for (const section of sections) {
       if ([...sectionContract.required, ...sectionContract.optional].includes(section.name)
@@ -659,9 +669,11 @@ function parsePage(relative, raw, add, globalIds, root, virtual = false) {
 }
 
 // A checkable row's Evidence starts with the command that checks it, in
-// backticks, and that command names a file the repository holds. A command
-// with no repository path is a consumer command the page itself defines, so
-// only a named file that does not exist fails.
+// backticks. A shipped tool is cited in its consumer-side form, so a leading
+// `standards/` resolves against the repository root with the prefix removed. A
+// path outside `tools/` is a consumer command the page itself defines, such as
+// the consumer's route suite, which exists in consumers rather than here, so
+// only a shipped tool path that does not exist fails.
 function checkVerificationCommand(relative, line, id, evidence, root, add) {
   const command = evidence.match(/`([^`]+)`/)?.[1] ?? '';
   if (!command) {
@@ -676,7 +688,9 @@ function checkVerificationCommand(relative, line, id, evidence, root, add) {
     const cleaned = token.replace(/^['"]|['",;]+$/g, '').split('#')[0];
     if (/^(?:[\w.-]+\/)+[\w.-]+$/.test(cleaned)) candidates.push(cleaned);
   }
-  for (const candidate of candidates) {
+  for (let candidate of candidates) {
+    if (candidate.startsWith('standards/')) candidate = candidate.slice('standards/'.length);
+    if (!candidate.startsWith('tools/')) continue;
     if (!fs.existsSync(path.join(root, candidate))) {
       add(relative, line, 'VERIFY_COMMAND', `Verification for '${id}' names '${candidate}', which does not exist in the repository`);
       return;
@@ -756,6 +770,7 @@ function checkManifest(root, add, context) {
     if (anchor && !anchorsFor(fs.readFileSync(target, 'utf8')).has(anchor)) add('standards.manifest.json', 1, 'MANIFEST_ANCHOR', `anchor '#${anchor}' does not exist in '${relative}'`);
   }
   for (const [id, stack] of Object.entries(manifest.stacks ?? {})) {
+    if (!stack.entry) continue;
     const entry = path.join(root, stack.entry);
     if (!fs.existsSync(entry)) continue;
     const raw = fs.readFileSync(entry, 'utf8');
@@ -974,21 +989,7 @@ export function validateRepository(rootInput = '.') {
   validateSchemaConsumer(root, 'schemas/standards-manifest.schema.json', 'standards.manifest.json', add);
   // Every shipped consumer template meets the schema it teaches. A template
   // the schema never reads drifts from it in silence.
-  const projectTemplates = ['templates/consumer/standards.project.json', 'templates/consumer/standards.project.svelte.json'];
-  for (const template of projectTemplates) validateSchemaConsumer(root, 'schemas/standards-project.schema.json', template, add);
-
-  for (const template of projectTemplates) {
-    const projectTemplate = path.join(root, template);
-    if (!fs.existsSync(projectTemplate)) continue;
-    try {
-      const project = JSON.parse(fs.readFileSync(projectTemplate, 'utf8'));
-      for (const override of project.overrides ?? []) {
-        if (!activeIds.has(override.provisionId)) add(template, 1, 'OVERRIDE_UNKNOWN_ID', `override references unknown Standard '${override.provisionId}'`);
-      }
-    } catch {
-      // Schema diagnostics report invalid JSON.
-    }
-  }
+  validateSchemaConsumer(root, 'schemas/standards-project.schema.json', 'templates/consumer/standards.project.json', add);
 
   // The template index is the only map from a template file to the consumer path
   // it targets. A renamed template leaves a row pointing at nothing, and that row

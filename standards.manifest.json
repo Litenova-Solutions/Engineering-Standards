@@ -156,6 +156,10 @@
     "bdd": {
       "path": "docs/ext/bdd.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "use-case",
+        "journey"
+      ],
       "replaces": [],
       "switchesOn": [
         "case"
@@ -170,18 +174,34 @@
     "cache": {
       "path": "docs/ext/cache.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "use-case"
+      ],
       "replaces": [],
-      "switchesOn": []
+      "switchesOn": [
+        "limit"
+      ]
     },
     "concurrency": {
       "path": "docs/ext/concurrency.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "module",
+        "business-record",
+        "use-case"
+      ],
       "replaces": [],
-      "switchesOn": []
+      "switchesOn": [
+        "limit"
+      ]
     },
     "lifecycle": {
       "path": "docs/ext/lifecycle.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "use-case",
+        "rule"
+      ],
       "replaces": [],
       "switchesOn": [
         "limit"
@@ -191,11 +211,19 @@
       "path": "docs/ext/containers.md",
       "activationScope": "project",
       "replaces": [],
-      "switchesOn": []
+      "switchesOn": [
+        "limit",
+        "runbook"
+      ]
     },
     "integrations": {
       "path": "docs/ext/integrations.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "use-case",
+        "rule",
+        "journey"
+      ],
       "replaces": [],
       "switchesOn": []
     },
@@ -228,52 +256,71 @@
     "outbox": {
       "path": "docs/ext/outbox.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "use-case",
+        "journey"
+      ],
       "replaces": [
         "standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work"
       ],
       "switchesOn": [
         "event",
-        "limit"
+        "limit",
+        "runbook"
       ]
     },
     "efcore": {
       "path": "docs/ext/efcore.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "module",
+        "use-case"
+      ],
       "replaces": [
+        "standards/rule/backend-persistence.query-through-iquerysession",
+        "standards/rule/backend-persistence.keep-mappings-and-aliases-explicit",
         "standards/rule/workspace-dependencies.keep-application-dependencies-narrow",
         "standards/rule/backend-architecture.separate-command-and-query-behavior",
-        "standards/rule/backend-persistence.stage-aggregate-writes-through-repositories",
-        "standards/rule/backend-persistence.query-through-iquerysession",
-        "standards/rule/backend-persistence.commit-once-in-the-command-pipeline",
-        "standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work",
-        "standards/rule/backend-persistence.keep-mappings-and-aliases-explicit",
-        "standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain",
-        "standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly",
-        "standards/rule/backend-persistence.bound-aggregate-document-growth",
-        "standards/rule/ext-outbox.stage-messages-with-business-work"
+        "standards/rule/ext-outbox.stage-messages-with-business-work",
+        "standards/rule/ext-outbox.reject-independent-outbox-commits"
       ],
       "switchesOn": []
     },
     "realtime": {
       "path": "docs/ext/realtime.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "use-case",
+        "journey"
+      ],
       "replaces": [],
       "switchesOn": [
-        "event"
+        "event",
+        "limit"
       ]
     },
     "report": {
       "path": "docs/ext/report.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "use-case"
+      ],
       "replaces": [],
-      "switchesOn": []
+      "switchesOn": [
+        "limit"
+      ]
     },
     "jobs": {
       "path": "docs/ext/jobs.md",
       "activationScope": "local",
+      "applicableKinds": [
+        "use-case",
+        "journey"
+      ],
       "replaces": [],
       "switchesOn": [
-        "limit"
+        "limit",
+        "runbook"
       ]
     },
     "stage": {
@@ -441,7 +488,7 @@
     }
   },
   "uiBaseline": {
-    "platform": "react-web",
+    "platform": "react",
     "system": "shadcn/ui",
     "styling": "tailwindcss-v4",
     "base": "base-ui",
@@ -499,10 +546,5 @@
       "admin-dense"
     ],
     "nativeBoundary": "separate-platform-profile"
-  },
-  "overridePolicy": {
-    "requiresReviewBy": [
-      "standards/rule/frontend-ui"
-    ]
   }
 }

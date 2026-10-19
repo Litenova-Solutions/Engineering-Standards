@@ -24,4 +24,4 @@ State what the product is and who uses it, in one short paragraph.
 
 Link each product topic page under `docs/product/`, one line per area.
 
-- [<Topic>](<area>/<topic>.md): state the question this topic answers.
+- Link each topic page with its title and the question it answers.

@@ -1,0 +1,1284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/record.schema.json",
+  "title": "Litenova Project Record Frontmatter",
+  "description": "The JSON frontmatter block opening a consumer documentation page: one page record or one page style, with the entry records it carries.",
+  "oneOf": [
+    { "$ref": "#/$defs/productPage" },
+    { "$ref": "#/$defs/constraintPage" },
+    { "$ref": "#/$defs/researchPage" },
+    { "$ref": "#/$defs/decisionPage" },
+    { "$ref": "#/$defs/problemPage" },
+    { "$ref": "#/$defs/featurePage" },
+    { "$ref": "#/$defs/actorPage" },
+    { "$ref": "#/$defs/rolePage" },
+    { "$ref": "#/$defs/journeyPage" },
+    { "$ref": "#/$defs/modulePage" },
+    { "$ref": "#/$defs/businessRecordPage" },
+    { "$ref": "#/$defs/useCasePage" },
+    { "$ref": "#/$defs/runbookPage" },
+    { "$ref": "#/$defs/exceptionPage" },
+    { "$ref": "#/$defs/knownGapPage" },
+    { "$ref": "#/$defs/productTopicPage" },
+    { "$ref": "#/$defs/permissionListPage" },
+    { "$ref": "#/$defs/entryPointListPage" },
+    { "$ref": "#/$defs/limitSetPage" },
+    { "$ref": "#/$defs/ruleSetPage" },
+    { "$ref": "#/$defs/indexPage" },
+    { "$ref": "#/$defs/tutorialPage" },
+    { "$ref": "#/$defs/howToPage" },
+    { "$ref": "#/$defs/referencePage" },
+    { "$ref": "#/$defs/commandPage" },
+    { "$ref": "#/$defs/configurationPage" },
+    { "$ref": "#/$defs/glossaryPage" },
+    { "$ref": "#/$defs/scenarioCastPage" }
+  ],
+  "$defs": {
+    "productId": {
+      "type": "string",
+      "pattern": "^product/[a-z0-9][a-z0-9-]*$"
+    },
+    "constraintId": {
+      "type": "string",
+      "pattern": "^constraint/[a-z0-9][a-z0-9-]*$"
+    },
+    "researchId": {
+      "type": "string",
+      "pattern": "^research/[a-z0-9][a-z0-9-]*$"
+    },
+    "decisionId": {
+      "type": "string",
+      "pattern": "^decision/[0-9]+-[a-z0-9][a-z0-9-]*$"
+    },
+    "requirementId": {
+      "type": "string",
+      "pattern": "^requirement/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+    },
+    "problemId": {
+      "type": "string",
+      "pattern": "^problem/[a-z0-9][a-z0-9-]*$"
+    },
+    "featureId": {
+      "type": "string",
+      "pattern": "^feature/[a-z0-9][a-z0-9-]*$"
+    },
+    "actorId": {
+      "type": "string",
+      "pattern": "^actor/[a-z0-9][a-z0-9-]*$"
+    },
+    "roleId": {
+      "type": "string",
+      "pattern": "^role/[a-z0-9][a-z0-9-]*$"
+    },
+    "permissionId": {
+      "type": "string",
+      "pattern": "^permission/[a-z0-9][a-z0-9-]*$"
+    },
+    "journeyId": {
+      "type": "string",
+      "pattern": "^journey/[a-z0-9][a-z0-9-]*$"
+    },
+    "moduleId": {
+      "type": "string",
+      "pattern": "^module/[a-z0-9][a-z0-9-]*$"
+    },
+    "businessRecordId": {
+      "type": "string",
+      "pattern": "^business-record/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+    },
+    "ruleId": {
+      "type": "string",
+      "pattern": "^rule/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+    },
+    "useCaseId": {
+      "type": "string",
+      "pattern": "^use-case/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+    },
+    "resultId": {
+      "type": "string",
+      "pattern": "^result/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^case/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+    },
+    "eventId": {
+      "type": "string",
+      "pattern": "^event/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+    },
+    "entryPointId": {
+      "type": "string",
+      "pattern": "^entry-point/[a-z0-9][a-z0-9-]*$"
+    },
+    "limitId": {
+      "type": "string",
+      "pattern": "^limit/[a-z0-9][a-z0-9-]*$"
+    },
+    "runbookId": {
+      "type": "string",
+      "pattern": "^runbook/[a-z0-9][a-z0-9-]*$"
+    },
+    "projectStandardId": {
+      "type": "string",
+      "pattern": "^standard/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+    },
+    "exceptionId": {
+      "type": "string",
+      "pattern": "^exception/[a-z0-9][a-z0-9-]*$"
+    },
+    "knownGapId": {
+      "type": "string",
+      "pattern": "^known-gap/[a-z0-9][a-z0-9-]*$"
+    },
+    "termId": {
+      "type": "string",
+      "pattern": "^term/[a-z0-9][a-z0-9-]*$"
+    },
+    "failureCode": {
+      "type": "string",
+      "pattern": "^failure/[a-z0-9][a-z0-9-]*\\.[a-zA-Z0-9][a-zA-Z0-9_-]*$"
+    },
+    "standardsProvisionId": {
+      "type": "string",
+      "pattern": "^standards/(rule|convention)/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+    },
+    "genericRecordId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z-]+/[a-z0-9][a-z0-9._-]*$"
+    },
+    "ownerName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "approved", "retired"]
+    },
+    "isoDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "termIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/termId" }
+    },
+    "actorIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/actorId" }
+    },
+    "permissionIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/permissionId" }
+    },
+    "moduleIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/moduleId" }
+    },
+    "eventIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/eventId" }
+    },
+    "entryPointIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/entryPointId" }
+    },
+    "problemIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/problemId" }
+    },
+    "requirementIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/requirementId" }
+    },
+    "genericIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/genericRecordId" }
+    },
+    "basedOnArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/constraintId" },
+          { "$ref": "#/$defs/researchId" }
+        ]
+      }
+    },
+    "decidesArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/requirementId" },
+          { "$ref": "#/$defs/featureId" },
+          { "$ref": "#/$defs/ruleId" },
+          { "$ref": "#/$defs/constraintId" }
+        ]
+      }
+    },
+    "governsArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/businessRecordId" },
+          { "$ref": "#/$defs/useCaseId" }
+        ]
+      }
+    },
+    "refusalValue": {
+      "anyOf": [
+        { "$ref": "#/$defs/resultId" },
+        { "$ref": "#/$defs/failureCode" }
+      ]
+    },
+    "limitValue": {
+      "anyOf": [{ "type": "string" }, { "type": "number" }]
+    },
+    "standardRef": {
+      "anyOf": [
+        { "$ref": "#/$defs/standardsProvisionId" },
+        { "$ref": "#/$defs/projectStandardId" }
+      ]
+    },
+    "holdItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "scope"],
+      "properties": {
+        "role": { "$ref": "#/$defs/roleId" },
+        "scope": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "journeyStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["useCase"],
+      "properties": {
+        "useCase": { "$ref": "#/$defs/useCaseId" },
+        "actor": { "$ref": "#/$defs/actorId" },
+        "requires": { "$ref": "#/$defs/genericIdArray" }
+      }
+    },
+    "researchSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url"],
+      "properties": {
+        "url": { "$ref": "#/$defs/nonEmptyString" },
+        "read": { "$ref": "#/$defs/isoDate" }
+      }
+    },
+    "promiseValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "effectiveFrom"],
+      "properties": {
+        "value": { "$ref": "#/$defs/nonEmptyString" },
+        "effectiveFrom": { "$ref": "#/$defs/isoDate" }
+      }
+    },
+    "useCaseInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "meaning"],
+      "properties": {
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "meaning": { "$ref": "#/$defs/nonEmptyString" },
+        "rules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "recordsArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/requirementEntry" },
+          { "$ref": "#/$defs/permissionEntry" },
+          { "$ref": "#/$defs/ruleEntry" },
+          { "$ref": "#/$defs/resultEntry" },
+          { "$ref": "#/$defs/caseEntry" },
+          { "$ref": "#/$defs/eventEntry" },
+          { "$ref": "#/$defs/entryPointEntry" },
+          { "$ref": "#/$defs/limitEntry" },
+          { "$ref": "#/$defs/standardEntry" }
+        ]
+      }
+    },
+    "requirementEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "kind", "statement"],
+      "properties": {
+        "type": { "const": "requirement" },
+        "id": { "$ref": "#/$defs/requirementId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/requirementId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "kind": { "enum": ["promise", "behaviour", "quality"] },
+        "statement": { "$ref": "#/$defs/nonEmptyString" },
+        "values": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/promiseValue" }
+        },
+        "basedOn": { "$ref": "#/$defs/basedOnArray" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "permissionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "code", "codeType", "meaning"],
+      "properties": {
+        "type": { "const": "permission" },
+        "id": { "$ref": "#/$defs/permissionId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/permissionId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "codeType": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9]*$"
+        },
+        "meaning": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "ruleEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "kind", "enforcedBy", "statement"],
+      "properties": {
+        "type": { "const": "rule" },
+        "id": { "$ref": "#/$defs/ruleId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/ruleId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "kind": { "enum": ["always-true", "checked-before", "across-records"] },
+        "enforcedBy": { "enum": ["validator", "aggregate", "store", "guard", "reaction"] },
+        "statement": { "$ref": "#/$defs/nonEmptyString" },
+        "governs": { "$ref": "#/$defs/governsArray" },
+        "refusal": { "$ref": "#/$defs/refusalValue" },
+        "basedOn": { "$ref": "#/$defs/basedOnArray" },
+        "fulfils": { "$ref": "#/$defs/requirementIdArray" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "resultEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "outcome", "meaning"],
+      "properties": {
+        "type": { "const": "result" },
+        "id": { "$ref": "#/$defs/resultId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "type": "integer" },
+        "replaces": { "$ref": "#/$defs/resultId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "outcome": { "enum": ["success", "refusal"] },
+        "code": { "$ref": "#/$defs/failureCode" },
+        "meaning": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["outcome"],
+            "properties": { "outcome": { "const": "refusal" } }
+          },
+          "then": { "required": ["code"] }
+        }
+      ]
+    },
+    "caseEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "situation", "action", "result", "expect"],
+      "properties": {
+        "type": { "const": "case" },
+        "id": { "$ref": "#/$defs/caseId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/caseId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "situation": { "$ref": "#/$defs/nonEmptyString" },
+        "action": { "$ref": "#/$defs/nonEmptyString" },
+        "result": { "$ref": "#/$defs/resultId" },
+        "expect": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "eventEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "meaning", "carries"],
+      "properties": {
+        "type": { "const": "event" },
+        "id": { "$ref": "#/$defs/eventId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/eventId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "meaning": { "$ref": "#/$defs/nonEmptyString" },
+        "carries": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "entryPointEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "kind"],
+      "properties": {
+        "type": { "const": "entry-point" },
+        "id": { "$ref": "#/$defs/entryPointId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/entryPointId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "kind": { "enum": ["web-app", "public-api", "cli", "mcp-server", "site", "reaction", "job"] },
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "offers": { "$ref": "#/$defs/permissionIdArray" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "limitEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "bound", "value"],
+      "properties": {
+        "type": { "const": "limit" },
+        "id": { "$ref": "#/$defs/limitId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/limitId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "bound": { "$ref": "#/$defs/nonEmptyString" },
+        "value": { "$ref": "#/$defs/limitValue" },
+        "runbook": { "$ref": "#/$defs/runbookId" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "standardEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title"],
+      "properties": {
+        "type": { "const": "standard" },
+        "id": { "$ref": "#/$defs/projectStandardId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/projectStandardId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "statement": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "productPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "boundary", "neverDoes", "audience"],
+      "properties": {
+        "type": { "const": "product" },
+        "id": { "$ref": "#/$defs/productId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/productId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "boundary": { "$ref": "#/$defs/nonEmptyString" },
+        "neverDoes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "audience": { "$ref": "#/$defs/actorIdArray" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "constraintPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "source", "applies", "appliesBecause"],
+      "properties": {
+        "type": { "const": "constraint" },
+        "id": { "$ref": "#/$defs/constraintId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/constraintId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "source": { "$ref": "#/$defs/nonEmptyString" },
+        "applies": { "type": "boolean" },
+        "appliesBecause": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "researchPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "sources", "question"],
+      "properties": {
+        "type": { "const": "research" },
+        "id": { "$ref": "#/$defs/researchId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/researchId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "sources": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/researchSource" }
+        },
+        "question": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "decisionPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "options", "changeWhen"],
+      "properties": {
+        "type": { "const": "decision" },
+        "id": { "$ref": "#/$defs/decisionId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/decisionId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "decided": { "$ref": "#/$defs/isoDate" },
+        "options": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "changeWhen": { "$ref": "#/$defs/nonEmptyString" },
+        "decides": { "$ref": "#/$defs/decidesArray" },
+        "basedOn": { "$ref": "#/$defs/basedOnArray" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        },
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "approved" } }
+          },
+          "then": { "required": ["decided"] }
+        }
+      ]
+    },
+    "problemPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "statement"],
+      "properties": {
+        "type": { "const": "problem" },
+        "id": { "$ref": "#/$defs/problemId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/problemId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "affects": { "$ref": "#/$defs/actorIdArray" },
+        "statement": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "featurePage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "state"],
+      "properties": {
+        "type": { "const": "feature" },
+        "id": { "$ref": "#/$defs/featureId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/featureId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "state": { "enum": ["planned", "shipped", "later", "refused"] },
+        "solves": { "$ref": "#/$defs/problemIdArray" },
+        "refusedBecause": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        },
+        {
+          "if": {
+            "required": ["state"],
+            "properties": { "state": { "const": "refused" } }
+          },
+          "then": { "required": ["refusedBecause"] }
+        }
+      ]
+    },
+    "actorPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "kind"],
+      "properties": {
+        "type": { "const": "actor" },
+        "id": { "$ref": "#/$defs/actorId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/actorId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "kind": { "enum": ["person", "company", "provider", "system", "guest"] },
+        "holds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/holdItem" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "rolePage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "scope"],
+      "properties": {
+        "type": { "const": "role" },
+        "id": { "$ref": "#/$defs/roleId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/roleId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "scope": { "enum": ["platform", "organizer", "event", "self"] },
+        "allows": { "$ref": "#/$defs/permissionIdArray" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "journeyPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "actor", "goal", "steps"],
+      "properties": {
+        "type": { "const": "journey" },
+        "id": { "$ref": "#/$defs/journeyId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/journeyId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "actor": { "$ref": "#/$defs/actorId" },
+        "goal": { "$ref": "#/$defs/nonEmptyString" },
+        "steps": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/journeyStep" }
+        },
+        "fulfils": { "$ref": "#/$defs/requirementIdArray" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "modulePage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status"],
+      "properties": {
+        "type": { "const": "module" },
+        "id": { "$ref": "#/$defs/moduleId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/moduleId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "dependsOn": { "$ref": "#/$defs/moduleIdArray" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "businessRecordPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "codeName", "states"],
+      "properties": {
+        "type": { "const": "business-record" },
+        "id": { "$ref": "#/$defs/businessRecordId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/businessRecordId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "codeName": { "$ref": "#/$defs/nonEmptyString" },
+        "states": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "useCasePage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "operation"],
+      "properties": {
+        "type": { "const": "use-case" },
+        "id": { "$ref": "#/$defs/useCaseId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/useCaseId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "operation": { "enum": ["command", "query"] },
+        "needs": { "$ref": "#/$defs/permissionIdArray" },
+        "anonymous": { "type": "boolean" },
+        "reachedThrough": { "$ref": "#/$defs/entryPointIdArray" },
+        "raises": { "$ref": "#/$defs/eventIdArray" },
+        "reactsTo": { "$ref": "#/$defs/eventIdArray" },
+        "fulfils": { "$ref": "#/$defs/requirementIdArray" },
+        "input": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/useCaseInput" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "runbookPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status"],
+      "properties": {
+        "type": { "const": "runbook" },
+        "id": { "$ref": "#/$defs/runbookId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/runbookId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "limit": { "$ref": "#/$defs/limitId" },
+        "trigger": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        },
+        {
+          "anyOf": [{ "required": ["limit"] }, { "required": ["trigger"] }]
+        }
+      ]
+    },
+    "exceptionPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "standard", "reason", "reviewBy", "removeWhen"],
+      "properties": {
+        "type": { "const": "exception" },
+        "id": { "$ref": "#/$defs/exceptionId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/exceptionId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "standard": { "$ref": "#/$defs/standardRef" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" },
+        "reviewBy": { "$ref": "#/$defs/isoDate" },
+        "removeWhen": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "knownGapPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "check", "subject", "endsBy", "reason"],
+      "properties": {
+        "type": { "const": "known-gap" },
+        "id": { "$ref": "#/$defs/knownGapId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "replaces": { "$ref": "#/$defs/knownGapId" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "check": { "$ref": "#/$defs/nonEmptyString" },
+        "subject": { "$ref": "#/$defs/genericIdArray" },
+        "endsBy": { "$ref": "#/$defs/isoDate" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
+    "productTopicPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "product-topic" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "permissionListPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "permission-list" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "entryPointListPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "entry-point-list" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "limitSetPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "limit-set" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "ruleSetPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "rule-set" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "indexPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "index" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "tutorialPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "tutorial" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "howToPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "how-to" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "referencePage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "reference" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "commandPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "command" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "configurationPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "configuration" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "glossaryPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "glossary" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    },
+    "scenarioCastPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "scenario-cast" },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "records": { "$ref": "#/$defs/recordsArray" }
+      }
+    }
+  }
+}

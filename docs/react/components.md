@@ -34,6 +34,10 @@ function OrderTotal({ orderId }: { orderId: string }) {
 
 **Rationale:** An untyped prop fails at the call site the next author writes, which is the most expensive place to learn a shape. Strict mode turns that failure into a build error.
 
+## Conventions
+
+None.
+
 ## Verification
 
 | ID | Mark | Evidence |

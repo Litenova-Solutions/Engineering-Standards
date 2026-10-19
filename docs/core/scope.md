@@ -1,4 +1,4 @@
-# Supported scope
+# Supported Scope
 
 ## Intent
 
@@ -6,9 +6,9 @@ Every project selects one size and declares its stacks, so agents can make concr
 
 Projects outside this boundary can use individual ideas but do not claim conformance.
 
-## Agent summary {#agent-summary}
+## Agent Summary {#agent-summary}
 
-- Select one size and declare one stack per frontend. (standards/rule/core-scope.select-size-profile-and-stacks)
+- Select one size and declare one stack per frontend. (standards/rule/core-scope.select-a-size-profile-and-stacks)
 - Keep one business context and deployment boundary. (standards/rule/core-scope.keep-one-bounded-context)
 - Select conditional extensions only when criteria apply. (standards/rule/core-scope.select-conditional-extensions-explicitly)
 - Record every selection with its criterion and review date. (standards/rule/core-scope.record-selected-extensions)
@@ -18,11 +18,11 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 ## Standards
 
-### Select a size profile and stacks (standards/rule/core-scope.select-size-profile-and-stacks)
+### Select a size profile and stacks (standards/rule/core-scope.select-a-size-profile-and-stacks)
 
-**Requirement:** A consumer MUST select the small or large size, and MUST declare one stack for each frontend it ships. The size decides which record types and test projects the project needs; each stack decides which technology pages and checks apply. Small needs the core types with Architecture and Integration test projects, while large adds problems, features, journeys, and cases with the Acceptance project. The backend stack is always dotnet; each frontend declares react, svelte, or blazor-web.
+**Requirement:** A consumer MUST select the small or large size and declare one stack per frontend, with the backend stack always dotnet.
 
-**Rationale:** One size and explicit stacks let every check know which records and pages to require.
+**Rationale:** One size and explicit stacks let every check know which records and pages to require. The size decides which record types and test projects the project needs; each stack decides which technology pages and checks apply. Small needs the core types with Architecture and Integration test projects, while large adds problems, features, journeys, and cases with the Acceptance project. Each frontend declares react, svelte, or blazor-web.
 
 **Example:** A library catalog with one web frontend selects small with the svelte stack; a clinic booking system with journeys selects large.
 
@@ -36,7 +36,7 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 ### Select conditional extensions explicitly (standards/rule/core-scope.select-conditional-extensions-explicitly)
 
-**Requirement:** A consumer MUST select an extension only when its activation criteria apply, and MUST select every extension whose criteria apply.
+**Requirement:** A consumer MUST select every extension whose activation criteria apply, and no extension whose criteria do not.
 
 **Rationale:** Conditional capabilities stay inactive until a documented product or engineering condition requires them. The manifest's extension list is the closed set a project selects from.
 
@@ -96,7 +96,7 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/core-scope.select-size-profile-and-stacks` and `standards/rule/core-scope.select-conditional-extensions-explicitly`.
+This informative example demonstrates `standards/rule/core-scope.select-a-size-profile-and-stacks` and `standards/rule/core-scope.select-conditional-extensions-explicitly`.
 
 A publishing product can support sign-in, draft creation, publication, and public reading. Multi-tenant publication, live editing, and bulk analytics require their selected extension boundaries.
 
@@ -104,7 +104,7 @@ A publishing product can support sign-in, draft creation, publication, and publi
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-scope.select-size-profile-and-stacks | guidance | Which size did the project select, and which stack does each frontend declare? |
+| standards/rule/core-scope.select-a-size-profile-and-stacks | guidance | Which size did the project select, and which stack does each frontend declare? |
 | standards/rule/core-scope.keep-one-bounded-context | guidance | Which second language or deployment boundary does the design introduce? |
 | standards/rule/core-scope.select-conditional-extensions-explicitly | guidance | Which criterion justifies each selection, and which applicable extension stays unselected? |
 | standards/rule/core-scope.record-selected-extensions | checkable | `node standards/tools/validate-consumer.mjs` rejects a selection without a criterion or review date. |

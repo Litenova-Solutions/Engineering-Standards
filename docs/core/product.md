@@ -19,8 +19,7 @@ Business intent has three parts that age differently. The present is the positio
 - Records cite requirements in fulfils; checks fail an unfulfilled one. (standards/rule/core-product.cite-requirements-from-records, standards/rule/core-product.reject-an-unfulfilled-requirement)
 - Work lands intent, research, decision, requirement, records, code, and tests. (standards/rule/core-product.build-intent-before-specification-before-code)
 - Generated records are source material until a decision states the claim. (standards/rule/core-product.treat-generated-research-as-source-material)
-- Each topic carries a review date; commercial work loads intent first. (standards/rule/core-product.review-a-topic-by-its-date, standards/rule/core-product.load-product-intent-before-commercial-work)
-- Decisions share one numbered sequence. (standards/rule/core-product.name-product-decisions-in-one-numbered-sequence)
+- Each topic carries a review date, commercial work loads intent first, and decisions share one numbered sequence. (standards/rule/core-product.review-a-topic-by-its-date, standards/rule/core-product.load-product-intent-before-commercial-work, standards/rule/core-product.name-product-decisions-in-one-numbered-sequence)
 
 ## Concepts
 
@@ -87,7 +86,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 ### Identify every requirement (standards/rule/core-product.identify-every-requirement)
 
-**Requirement:** Each Requirement entry MUST carry one identifier `requirement/<topic>.<name>` naming its own page, with kind and statement. A promise MUST carry its values with effective dates.
+**Requirement:** Each Requirement entry MUST carry one identifier `requirement/<topic>.<name>` naming its own page, with kind, statement, and for a promise its values with effective dates.
 
 **Rationale:** An identifier lets a record name the commitment it fulfils, and lets the model resolve the name. A commitment written only as prose cannot be traced. Kinds are promise, behaviour, and quality, as [docs/core/model.md](model.md) defines.
 
@@ -105,13 +104,13 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 ### Record research with read sources (standards/rule/core-product.record-research-with-read-sources)
 
-**Requirement:** A Research record MUST state its question and list each source with its read date. It lives under `docs/research/`.
+**Requirement:** A Research record under `docs/research/` MUST state its question and list each source with its read date.
 
 **Rationale:** A fact without its source cannot be rechecked. The read date shows when the outside fact was true.
 
 ### State each problem and feature (standards/rule/core-product.state-each-problem-and-feature)
 
-**Requirement:** A Problem MUST state who it affects and what they face. A Feature MUST name the problems it solves and its state.
+**Requirement:** A Problem MUST state who it affects and what they face, and a Feature the problems it solves and its state.
 
 **Rationale:** Problems without owners attract solutions nobody needs. A refused feature keeps its reason so the refusal is not relitigated.
 
@@ -129,9 +128,9 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 ### Name the person who approved a decision (standards/rule/core-product.name-the-person-who-approved-a-decision)
 
-**Requirement:** An agent MAY draft a decision. Only the named decider approves it, and an approved decision MUST carry `decided`.
+**Requirement:** Only the named decider approves a decision, and an approved decision MUST carry `decided`.
 
-**Rationale:** Product, commercial, and legal choices belong to an accountable person, as `standards/rule/core-system.keep-decision-authority-with-accountable-people` states. The decider is named while the decision is a draft. Approval gates the release, while building may start on a draft.
+**Rationale:** Product, commercial, and legal choices belong to an accountable person, as `standards/rule/core-system.keep-decision-authority-with-accountable-people` states. The decider is named while the decision is a draft. Approval gates the release, while building may start on a draft. An agent drafts the decision for the decider.
 
 ### Replace a decision with a new record (standards/rule/core-product.replace-a-decision-with-a-new-record)
 
@@ -171,7 +170,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 ### Build intent before specification before code (standards/rule/core-product.build-intent-before-specification-before-code)
 
-**Requirement:** A behavior change MUST land intent, research, decision, requirement, specification records, code, and tests, in that order. A decision written after its code shipped is a defect.
+**Requirement:** A behavior change MUST land intent, research, decision, requirement, specification, code, and tests in that order; a decision written after its code is a defect.
 
 **Rationale:** The order makes each layer checkable before the next builds on it. A specification written before its decision argues from code. Approval follows `standards/rule/core-principles.refuse-approval-behind-a-draft-decision`: nothing is approved behind a draft.
 
@@ -193,7 +192,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 ### Group product topics by area (standards/rule/core-product.group-product-topics-by-area)
 
-**Default:** Keep the brief at `docs/product/brief.md`, topic pages in one folder per area, and constraints, decisions, problems, features, and journeys each in their folder. Research lives under `docs/research/`.
+**Default:** Keep the brief at `docs/product/brief.md`, topic pages in one folder per area, each other kind in its folder, and research under `docs/research/`.
 
 **Replacement:** A consumer records an Exception naming this provision, with its reason and review date.
 

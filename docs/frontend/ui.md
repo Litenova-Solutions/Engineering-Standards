@@ -122,7 +122,7 @@ The density is chosen per frontend rather than per workspace, because density is
 
 ### Publish a design contract (standards/rule/frontend-ui.publish-a-design-contract)
 
-**Requirement:** A workspace MUST publish one design contract with its shared UI package. It carries the required sections: Brand, Tokens, Vocabulary, Patterns, Do, Do not, Motion, Voice.
+**Requirement:** A workspace MUST publish one design contract with its shared UI package, carrying the required sections: Brand, Tokens, Vocabulary, Patterns, Do, Do not, Motion, Voice.
 
 **Rationale:** An author that has read no contract picks its own tokens, its own motion, and its own voice. The picks differ on the next page, and the difference is what a reader sees as clutter. One contract keeps the answers in one file.
 
@@ -169,7 +169,9 @@ The density is chosen per frontend rather than per workspace, because density is
 
 **Rationale:** The floorplan fixes the layout, the heading position, and the slots, so a reviewer reads which floorplan a route composes. The slots take domain values: the business record state, the use cases that state permits, and the refusal results of the called use case.
 
-**Example (React):** An order route composes the entity floorplan and fills each slot from the order.
+**Example:** An order route composes the entity floorplan and fills each slot from the order.
+
+React:
 
 ```tsx
 <EntityPage
@@ -181,7 +183,7 @@ The density is chosen per frontend rather than per workspace, because density is
 />
 ```
 
-**Example (Svelte):** An order route composes the entity floorplan and fills each slot from the order.
+Svelte:
 
 ```svelte
 <EntityPage title={order.number}>
@@ -214,19 +216,19 @@ The density is chosen per frontend rather than per workspace, because density is
 
 ### Derive each page type from a named reference (standards/rule/frontend-ui.derive-each-page-type-from-a-named-reference)
 
-**Requirement:** Every route MUST carry a `data-registry-item` attribute on its page frame. The attribute names the published registry item its page type was built from. A recorded freestyle route carries no attribute and names its decision record instead.
+**Requirement:** Every route MUST carry a `data-registry-item` attribute naming its page type's registry item, with a freestyle route carrying no attribute and naming its decision record.
 
 **Rationale:** An author with no named reference invents a page from primitives, and the next author invents another. An attribute that resolves keeps every page of one type on one reference.
 
 ### Select a tone from the closed set (standards/rule/frontend-ui.select-a-tone-from-the-closed-set)
 
-**Requirement:** A state indicator MUST take one tone from the closed set. Each application MUST declare its state-to-tone mapping once as an exhaustive typed table. Each tone is a term in the project's language record.
+**Requirement:** A state indicator MUST take one tone from the closed set, each application declaring its state-to-tone mapping once as an exhaustive table of language terms.
 
 **Rationale:** A page that picks a colour picks a meaning nobody agreed to. One mapping means the same state reads the same way on every screen. A new state then fails to compile until its tone and its word exist.
 
 ### Keep tokens in one stylesheet (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)
 
-**Requirement:** An application stylesheet MUST import the shared package's token stylesheet and declare no rule. A stylesheet the shared package ships MUST declare no literal colour.
+**Requirement:** An application stylesheet MUST import the shared package's token stylesheet and declare no rule, with no literal colour in any stylesheet the shared package ships.
 
 **Rationale:** One token sheet is what makes two applications look like one product. An application stylesheet imports it and declares no rule, so a second sheet never introduces a value the first has no opinion about. A stylesheet the shared package ships beside the token sheet declares no literal colour.
 
@@ -248,9 +250,9 @@ The density is chosen per frontend rather than per workspace, because density is
 
 **Rationale:** A form dialog with more inputs than the table allows scrolls, loses its title, and hides the refusal beside the field that caused it. A confirmation dialog for an action taking nothing reads as a warning rather than as a question.
 
-### Show the trace identifier in error detail (standards/rule/frontend-ui.show-the-trace-id-in-error-detail)
+### Show the trace ID in error detail (standards/rule/frontend-ui.show-the-trace-id-in-error-detail)
 
-**Requirement:** Every error the user sees MUST show its trace identifier in the error detail in a copyable form, never as the headline. The identifier comes from the problem body or the `X-Trace-Id` response header.
+**Requirement:** Every error the user sees MUST show its trace identifier in copyable form in the error detail, from the problem body or the `X-Trace-Id` header.
 
 **Rationale:** Support reads the identifier to find the failure, and the reader copies it without retyping. A headline carries what happened; the identifier belongs in the detail.
 
@@ -262,7 +264,7 @@ The density is chosen per frontend rather than per workspace, because density is
 
 ### Prove every result a route calls (standards/rule/frontend-ui.prove-every-result-a-route-calls)
 
-**Requirement:** Every result of every use case a route calls MUST be proved by a passing test or named by a known-gap record. The record carries an owner and an end date.
+**Requirement:** Every result a called use case returns MUST be proved by a passing test or a known-gap record with owner and end date.
 
 **Rationale:** A refusal a reader can reach and no test provokes is a refusal nobody has seen render. The calls come from the route code, so the obligation follows the code rather than a declaration.
 
@@ -286,7 +288,7 @@ test('shows the changed total before payment', async ({ page }) => {
 
 **Rationale:** The lock normalizes source before hashing, so two workspaces compute the same digest for identical source. One lock beside one copy is what makes a changed primitive report a fork rather than pass unreported.
 
-### Govern behavior packages (standards/rule/frontend-ui.govern-behavior-companions-and-specialist-controls)
+### Govern behavior packages (standards/rule/frontend-ui.govern-behavior-packages)
 
 **Requirement:** A behavior package MUST name the decision record approving it for the capability it supplies, and render through baseline components and tokens.
 
@@ -363,7 +365,7 @@ test('shows the changed total before payment', async ({ page }) => {
 | standards/rule/frontend-ui.prove-every-result-a-route-calls | guidance | Is every result the route calls proved by a passing test or named by a known-gap record? |
 | standards/rule/frontend-ui.restrict-css-decisions | checkable | `node standards/tools/validate-ui.mjs` rejects an arbitrary value, a raw palette value, or an important modifier. |
 | standards/rule/frontend-ui.track-source-changes | checkable | `node standards/tools/validate-ui.mjs` recomputes each digest and reports changed primitive source. |
-| standards/rule/frontend-ui.govern-behavior-companions-and-specialist-controls | guidance | Does every behavior package name its approving decision and render through baseline components and tokens? |
+| standards/rule/frontend-ui.govern-behavior-packages | guidance | Does every behavior package name its approving decision and render through baseline components and tokens? |
 | standards/rule/frontend-ui.prove-ui-behavior-and-appearance | checkable | `tests/routes/every-route.spec.ts` runs on the changed route, and review confirms the change named the matrix evidence. |
 | standards/rule/frontend-ui.record-a-frontend-outside-the-controlled-contract | guidance | Does every frontend outside the controlled platforms declare its platform and name its replacement boundaries? |
 | standards/rule/frontend-ui.use-the-product-profiles | checkable | `node standards/tools/validate-ui.mjs` refuses a controlled frontend with no density profile. |

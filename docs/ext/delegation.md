@@ -12,11 +12,9 @@ Applicable specification kinds: None.
 
 The consumer selects `delegation` when one agent starts another on the same tree.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline provision. The agent protocol governs one agent, and this extension governs the handoff between two.
-
-## Switches on
 
 This extension switches on no optional record type.
 

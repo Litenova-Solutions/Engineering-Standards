@@ -44,7 +44,7 @@ Project references and package ownership make the application boundary visible t
 
 ### Keep Application dependencies narrow (standards/rule/workspace-dependencies.keep-application-dependencies-narrow)
 
-**Requirement:** Application MUST reference only LiteBus command and query abstractions, required read abstractions, and Microsoft abstractions its ports need. The `IQuerySession` read boundary is the one provider package this allows, assigned by the ownership table.
+**Requirement:** Application MUST reference only LiteBus command and query abstractions, required read abstractions, and needed Microsoft abstractions, plus the `IQuerySession` read boundary.
 
 **Rationale:** A provider package in Application makes the coordination layer depend on the technology Infrastructure was meant to hide. The Requirement names the one read boundary this allows.
 
@@ -88,7 +88,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 **Default:** Reference the LiteBus command, query, or event module that the code actually uses.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A unified application bus package pulls in contracts that the layer never dispatches.
 
@@ -96,7 +96,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 **Default:** Keep generated API types free of dependencies and limit the shared client to the pinned generator's runtime, its query plugin, and those types.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A generated package that owns state, UI behavior, or authentication policy stops being regenerable.
 
@@ -104,7 +104,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 **Default:** Keep assertion, substitution, host, container, and architecture-test packages inside test projects.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A test package referenced by a production project ships to production.
 
@@ -112,7 +112,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 **Default:** Assign each baseline package to the owning layer named in the table in this section.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Example:**
 

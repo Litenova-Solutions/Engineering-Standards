@@ -33,6 +33,10 @@ Components in a Svelte frontend hold state in runes with typed boundaries. The s
 
 **Rationale:** An untyped prop fails at the call site the next author writes, which is the most expensive place to learn a shape. Strict mode turns that failure into a build error.
 
+## Conventions
+
+None.
+
 ## Verification
 
 | ID | Mark | Evidence |

@@ -12,11 +12,9 @@ Applicable specification kinds: None.
 
 The consumer enables `containers` when production or staging deploys the API, Worker, or frontend as a container image.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline provision. Its schema, rollback and secret rules cite the baseline rules that own those obligations.
-
-## Switches on
 
 This extension switches on `limit` and `runbook`. `standards/rule/ext-containers.declare-writable-paths-and-limits` records resource bounds as Limit records, and `standards/rule/ext-containers.retain-rollback-material` records the rollback procedure as a Runbook record.
 

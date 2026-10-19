@@ -1,4 +1,4 @@
-# Naming and code style
+# Naming and Code Style
 
 ## Intent
 
@@ -111,7 +111,7 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 
 ### Use predictable frontend names (standards/rule/workspace-naming.use-predictable-frontend-names)
 
-**Requirement:** A frontend folder MUST use kebab-case, and a component file and its export MUST use PascalCase. A React hook file MUST use `use-{name}`.
+**Requirement:** A frontend folder MUST use kebab-case, a component file and its export PascalCase, and a React hook file `use-{name}`.
 
 **Rationale:** One predictable mapping lets a reader move between the documentation tree and the source tree without translation.
 
@@ -121,7 +121,7 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 
 **Default:** Use one business name for a module across Domain, Application, endpoints, features, and documentation.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** The Posts module maps to `Domain/Posts`, `features/posts`, and `docs/domain/modules/posts` without translation.
 
@@ -129,7 +129,7 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 
 **Default:** Start a namespace with the project name and follow the folders beneath the project root.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** Including `src` or `apps` in a namespace couples the type name to a workspace layout decision. The project root is the directory holding the project file, so every folder above it is outside the namespace.
 
@@ -137,7 +137,7 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 
 **Default:** Avoid `Manager`, `Helper`, `Processor`, `Common`, `Utility`, `BaseService`, `DataService`, `MessageBus`, `Engine`, `Facade`, `Wrapper`, and `Factory` when a narrower name exists.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** A generic name invites unrelated responsibility, because nothing in it excludes the next addition. `Factory` is generic on a class and exact on a named static aggregate factory method, so the default names the class and not the method.
 
@@ -145,7 +145,7 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 
 **Default:** Derive route segments and JSON field names from the current aggregate or ubiquitous term.
 
-**Exception:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
 **Rationale:** Renaming a Domain concept then renames its boundary names, so the contract and the language stay aligned.
 

@@ -8,15 +8,13 @@ A consumer passes through two release stages. Before the first deployment holds 
 
 Activation scope: `project`.
 
-Applicable record types: none.
+Applicable specification kinds: None.
 
 The consumer selects `stage` before its first deployment holds customer data, or to record a promotion it already passed.
 
-## Replaces
+## Baseline relationship
 
 None. A `pre-production` consumer defers provisions through this extension; the compat extension still governs versioning once selected.
-
-## Switches on
 
 None. The promotion Decision is a core record every profile requires.
 
@@ -42,7 +40,7 @@ None. The promotion Decision is a core record every profile requires.
 
 ### Defer named provisions until promotion (standards/rule/ext-stage.defer-named-provisions-until-promotion)
 
-**Requirement:** A `pre-production` consumer MUST name each deferred provision with its end date in the stage extension selection. A `production` consumer MUST carry no deferred provisions.
+**Requirement:** A `pre-production` consumer MUST name each deferred provision with its end date in the stage extension selection, with a `production` consumer carrying no deferred provisions.
 
 **Rationale:** A deferral ends at promotion instead of drifting. Each entry names the provision and the date its deferral ends. The promotion Decision names the same provisions.
 
@@ -54,7 +52,7 @@ None. The promotion Decision is a core record every profile requires.
 
 ### Promote through a recorded decision (standards/rule/ext-stage.promote-through-a-recorded-decision)
 
-**Requirement:** A consumer MUST approve its promotion to `production` as a Decision before its first deployment holds customer data. The promotion ends every deferred provision.
+**Requirement:** A consumer MUST approve its promotion to `production` as a Decision before its first deployment holds customer data, ending every deferred provision.
 
 **Rationale:** Without a recorded moment, the relaxed rules last until somebody notices they never ended. The Decision carries its owner, status, decider, and decide-by date like any Decision.
 

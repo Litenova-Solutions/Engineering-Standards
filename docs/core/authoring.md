@@ -113,7 +113,7 @@ Every standards page uses one class below. Every consumer page uses one record t
 
 | Page class | Template | Required H2 order |
 |:---|:---|:---|
-| Topic | `templates/standard/topic.md` | Intent, Agent Summary, optional Concepts, Standards, Conventions, optional Reference example, Verification |
+| Topic | `templates/standard/topic.md` | Intent, Agent Summary, optional Concepts, optional React and Svelte on frontend pages, Standards, Conventions, optional Reference example, Verification |
 | Profile | This table states the contract. | Intent, Agent Summary, Standards, Composition, Conventions, Verification |
 | Extension | `templates/standard/extension.md` | Intent, Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, Verification |
 
@@ -202,7 +202,7 @@ Every provision ID follows `standards/<kind>/<page>.<heading-slug>`.
 | `<page>` | The `<area>-<stem>` of the page path | Names the one page that owns the assertion |
 | `<heading-slug>` | The provision heading | Names the assertion the heading states |
 
-The nine areas are `CORE`, `PROFILE`, `WORKSPACE`, `BACKEND`, `FRONTEND`, `SVELTE`, `BLAZOR`, `QUALITY`, and `EXT`. Each is one directory under `docs/`, and `provisionRegistry.areas` lists them.
+The ten areas are `CORE`, `PROFILE`, `WORKSPACE`, `BACKEND`, `FRONTEND`, `REACT`, `SVELTE`, `BLAZOR`, `QUALITY`, and `EXT`. Each is one directory under `docs/`, and `provisionRegistry.areas` lists them.
 
 The page segment joins the directory to the file stem, so `docs/frontend/components.md` owns `frontend-components`. A citation therefore names the file a reader must open, so `standards/rule/frontend-components.compose-composites-in-page-code` needs no lookup step.
 

@@ -1,5 +1,6 @@
 {
   "$schema": "../../schemas/language.schema.json",
+  "schemaVersion": 2,
   "terms": [
     {
       "id": "term/<name>",
@@ -14,7 +15,7 @@
           "word": "<rejected word>",
           "reason": "<Why it is wrong here>",
           "scope": "<path scope, or remove this line>",
-          "except": "<exception, or remove this line>"
+          "except": ["<compound that reuses the word, or remove this line>"]
         }
       ],
       "broader": "<term id, or remove this line>",

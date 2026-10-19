@@ -66,6 +66,17 @@ export function blankMetadata(raw) {
   return raw.replace(METADATA_BLOCK, (match) => match.replace(/[^\n]/g, ' '));
 }
 
+// A generated region holds text the model builder wrote, so the measures do not
+// reach inside one. The region is blanked rather than dropped, which keeps
+// every reported line number equal to the line number in the file. An opener
+// with no closer is left alone: an unclosed region is a builder defect rather
+// than prose a page author can fix.
+const GENERATED_REGION = /<!--\s*generated:[^>]*-->[\s\S]*?<!--\s*\/generated:[^>]*-->/g;
+
+export function blankGeneratedRegions(raw) {
+  return raw.replace(GENERATED_REGION, (match) => match.replace(/[^\n]/g, ' '));
+}
+
 // A fenced block is literal content, so the measures do not reach inside one.
 // The line is replaced rather than dropped, which keeps every reported line
 // number equal to the line number in the file.
@@ -123,7 +134,7 @@ export function sentences(value) {
 // Walks a Markdown page and reports every controlled-prose measure it breaks.
 // `add(relative, line, code, message)` receives each finding.
 export function checkProseMeasures(relative, raw, add) {
-  const lines = stripFences(blankMetadata(raw).split(/\r?\n/));
+  const lines = stripFences(blankGeneratedRegions(blankMetadata(raw)).split(/\r?\n/));
   let paragraph = [];
   let list = [];
   // The exempt columns are a property of one table, so the set resets when a
@@ -295,10 +306,10 @@ function blankRejectionColumns(text) {
 }
 
 // A metadata block is machine content and an owner name is not prose, so the
-// scan starts after the block. A fenced block is code, and a link destination
-// is a path rather than a sentence.
+// scan starts after the block. A fenced block is code, a generated region is
+// builder output, and a link destination is a path rather than a sentence.
 function scannableProse(raw) {
-  return blankRejectionColumns(blankMetadata(raw)
+  return blankRejectionColumns(blankGeneratedRegions(blankMetadata(raw))
     .replace(/```[\s\S]*?```/g, (match) => match.replace(/[^\n]/g, ' '))
     .replace(/`[^`\n]*`/g, (match) => ' '.repeat(match.length))
     .replace(/\]\([^)\n]*\)/g, (match) => ' '.repeat(match.length)));
@@ -308,29 +319,44 @@ function lineOf(text, index) {
   return text.slice(0, index).split('\n').length;
 }
 
+function scopePattern(scope) {
+  try {
+    return scope ? new RegExp(scope) : null;
+  } catch {
+    return null;
+  }
+}
+
 // Compiles a language record once so a scan over many files does not rebuild
-// every pattern per file.
+// every pattern per file. Each rejected entry carries its own word, reason,
+// scope and compounds, and falls back to the scope and compounds its term
+// declares when it names none of its own.
 export function compileLanguage(language) {
   if (!language) return null;
-  const mannered = (language.mannered ?? []).map((entry) => ({
-    term: entry.term,
-    instead: entry.instead,
-    pattern: termPattern(entry.term),
-  }));
+  const mannered = (Array.isArray(language.mannered) ? language.mannered : [])
+    .filter((entry) => entry && typeof entry.term === 'string')
+    .map((entry) => ({
+      term: entry.term,
+      instead: entry.instead,
+      pattern: termPattern(entry.term),
+    }));
   const rejected = [];
-  for (const entry of language.terms ?? []) {
-    // Compiled once per term rather than once per synonym, because every
-    // synonym of one term is exempt in the same compounds.
-    const except = (entry.except ?? []).map(termPattern);
-
-    for (const synonym of entry.rejected ?? []) {
+  const terms = Array.isArray(language.terms) ? language.terms : [];
+  for (const entry of terms) {
+    if (!entry || typeof entry !== 'object') continue;
+    const termScope = entry.scope ?? null;
+    const termExcept = Array.isArray(entry.except) ? entry.except : [];
+    const synonyms = Array.isArray(entry.rejected) ? entry.rejected : [];
+    for (const synonym of synonyms) {
+      if (!synonym || typeof synonym.word !== 'string') continue;
+      const except = (Array.isArray(synonym.except) ? synonym.except : termExcept).map(termPattern);
       rejected.push({
         term: entry.term,
-        synonym,
-        scope: entry.scope ? new RegExp(entry.scope) : null,
-        reason: entry.reason,
+        synonym: synonym.word,
+        scope: scopePattern(synonym.scope ?? termScope),
+        reason: synonym.reason,
         except,
-        pattern: termPattern(synonym),
+        pattern: termPattern(synonym.word),
       });
     }
   }

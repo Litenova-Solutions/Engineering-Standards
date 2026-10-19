@@ -33,7 +33,7 @@ This page defines one repository topic.
 
 ## Conventions
 
-### Use the default location (standards/rule/core-topic.use-the-default-location)
+### Use the default location (standards/convention/core-topic.use-the-default-location)
 
 **Default:** Store the topic in its owning documentation area.
 
@@ -41,10 +41,10 @@ This page defines one repository topic.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-topic.keep-the-topic-bounded | inspection | Inspect the declared topic boundary. |
-| standards/rule/core-topic.use-the-default-location | static | \`node tools/validate-standards.mjs\` resolves the topic document location. |
+| standards/rule/core-topic.keep-the-topic-bounded | checkable | \`node tools/validate-standards.mjs\` confirms the topic stays inside its declared boundary. |
+| standards/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |
 `;
 
 const extension = `# Sample Extension
@@ -85,9 +85,9 @@ None.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-sample.record-extension-activation | static | \`node tools/validate-consumer.mjs\` resolves applicable specification metadata. |
+| standards/rule/ext-sample.record-extension-activation | checkable | \`node tools/validate-standards.mjs\` confirms each applicable specification records its activation. |
 `;
 
 const profile = `# Sample Profile
@@ -116,9 +116,9 @@ None.
 
 ## Verification
 
-| ID | Method | Evidence |
+| ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/profile-sample.apply-the-complete-profile | static | \`node tools/validate-standards.mjs\` compares the profile with its manifest entry. |
+| standards/rule/profile-sample.apply-the-complete-profile | checkable | \`node tools/validate-standards.mjs\` compares the stack composition with its manifest entry. |
 `;
 
 const guide = `# Sample Guide
@@ -243,6 +243,9 @@ function base(root) {
   write(root, 'docs/reference/sample.md', reference);
   write(root, 'docs/tools/sample.md', command);
   write(root, 'docs/reference/glossary.md', '# Glossary\n\n## Topic\n\nA bounded standards subject.\n');
+  // Checkable evidence names a repository file, so the fixture carries the
+  // stub the evidence commands cite.
+  write(root, 'tools/validate-standards.mjs', '// Fixture stub so checkable evidence resolves.\n');
   // The provision index is derived, so the fixture repository carries a current one.
   write(root, INDEX_PATH, `${buildProvisionIndex(root)}\n`);
 }
@@ -271,6 +274,26 @@ run('reference page out of order', (root) => write(root, 'docs/reference/sample.
   .replace('The values above come from the repository manifest.', 'State the exact values that this repository publishes.\n\n## Intent\n\nThe values above come from the repository manifest.')), ['PAGE_SECTION_ORDER']);
 run('command page hiding its mechanism', (root) => write(root, 'docs/tools/sample.md', command.replace('## Underneath\n\nNone.\n', '')), ['PAGE_MISSING_SECTION']);
 run('command page without exit codes', (root) => write(root, 'docs/tools/sample.md', command.replace('## Exit codes', '## Results')), ['PAGE_MISSING_SECTION', 'PAGE_UNKNOWN_SECTION']);
+const frontendPage = topicPage
+  .replaceAll('core-topic', 'frontend-sample')
+  .replace('## Standards', '## React\n\n- React names the binding the rule below forbids.\n\n## Svelte\n\n- Svelte names the binding the rule below forbids.\n\n## Standards');
+run('frontend topic with per-stack sections', (root) => {
+  write(root, 'docs/frontend/sample.md', frontendPage);
+  write(root, INDEX_PATH, `${buildProvisionIndex(root)}\n`);
+}, []);
+run('per-stack section outside frontend pages', (root) => write(root, 'docs/core/topic.md', topicPage.replace('## Standards', '## React\n\n- React names the binding the rule below forbids.\n\n## Standards')), ['PAGE_UNKNOWN_SECTION']);
+run('per-stack section after standards', (root) => write(root, 'docs/frontend/sample.md', topicPage.replaceAll('core-topic', 'frontend-sample').replace('## Verification', '## React\n\n- React names the binding the rule above forbids.\n\n## Verification')), ['PAGE_SECTION_ORDER']);
+for (const verb of ['Answer', 'Ask', 'Compute', 'Confirm', 'Grant', 'Reach', 'Refuse', 'Show']) {
+  const lower = verb.toLowerCase();
+  run(`action heading starting with '${lower}'`, (root) => {
+    const page = topicPage
+      .replaceAll('Keep the topic bounded', `${verb} the topic boundary`)
+      .replaceAll('keep-the-topic-bounded', `${lower}-the-topic-boundary`)
+      .replace('MUST keep the topic', `MUST ${lower} the topic`);
+    write(root, 'docs/core/topic.md', page);
+    write(root, INDEX_PATH, `${buildProvisionIndex(root)}\n`);
+  }, []);
+}
 run('index without a routing block', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nUse this page to find repository documentation.\n'), ['INDEX_MISSING_ROUTING']);
 run('routing block after the first navigation group', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nUse this page to find repository documentation.\n\n## Core\n\n- [Topic](core/topic.md)\n\n' + INDEX_ROUTING), ['INDEX_MISSING_ROUTING']);
 run('stale provision index', (root) => write(root, INDEX_PATH, '# Provision Index\n\n## Intent\n\nThis page is out of date.\n'), ['PROVISIONS_STALE']);
@@ -292,7 +315,7 @@ run('missing deviation', (root) => write(root, 'docs/core/topic.md', topicPage.r
 run('missing convention default', (root) => write(root, 'docs/core/topic.md', topicPage.replace('**Default:** Store the topic in its owning documentation area.\n\n', '')), ['CONVENTION_MISSING_DEFAULT']);
 run('normative convention', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Store the topic in its owning documentation area.', 'Consumers MUST store the topic in its owning documentation area.')), ['CONVENTION_NORMATIVE']);
 run('summary without ID', (root) => write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)', '- Keep the topic bounded.')), ['SUMMARY_MISSING_ID']);
-run('missing evidence row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.keep-the-topic-bounded | inspection | Inspect the declared topic boundary. |\n', '')), ['VERIFY_MISSING_ID']);
+run('missing evidence row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.keep-the-topic-bounded | checkable | `node tools/validate-standards.mjs` confirms the topic stays inside its declared boundary. |\n', '')), ['VERIFY_MISSING_ID']);
 run('long sentence', (root) => write(root, 'docs/core/topic.md', topicPage.replace('This page defines one repository topic.', 'This sentence contains more than twenty five visible words because the fixture must prove that descriptive prose cannot exceed the fixed controlled technical prose sentence limit in active documentation.')), ['PROSE_SENTENCE_LENGTH']);
 run('long list item', (root) => write(root, 'docs/guide/sample.md', guide.replace('- Read the applicable canonical provision.', '- Read the applicable canonical provision and every related document before you create any artifact or run any verification command for this repository task.')), ['PROSE_LIST_LENGTH']);
 run('non-ASCII prose', (root) => write(root, 'docs/core/topic.md', topicPage.replace('one repository topic', 'one repository topic - with an em dash -').replace('- with an em dash -', '\u2014 with an em dash')), ['PROSE_NON_ASCII']);
@@ -319,7 +342,7 @@ run('invalid schema consumer', (root) => {
   write(root, 'standards.manifest.json', JSON.stringify({ version: '1.17.0' }));
 }, ['SCHEMA_INVALID']);
 run('unsupported schema keyword', (root) => {
-  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', format: 'custom' }));
+  write(root, 'schemas/standards-manifest.schema.json', JSON.stringify({ type: 'object', unevaluatedProperties: false }));
   write(root, 'standards.manifest.json', '{}');
 }, ['SCHEMA_UNSUPPORTED_KEYWORD']);
 // The keyword gate is what makes a local evaluator safe, so it has to reach
@@ -402,11 +425,26 @@ run('summary ID position', (root) => write(root, 'docs/core/topic.md', topicPage
 run('normative summary', (root) => write(root, 'docs/core/topic.md', topicPage.replace('- Keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)', '- Consumers MUST keep the topic bounded. (standards/rule/core-topic.keep-the-topic-bounded)')), ['SUMMARY_NORMATIVE']);
 run('unknown summary ID', (root) => write(root, 'docs/core/topic.md', topicPage.replace('standards/rule/core-topic.keep-the-topic-bounded)', 'standards/rule/core-topic.unknown-summary)')), ['SUMMARY_UNKNOWN_ID']);
 
-run('duplicate verification row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |', '| standards/rule/core-topic.keep-the-topic-bounded | inspection | Inspect the declared topic boundary. |\n| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |')), ['VERIFY_DUPLICATE_ID']);
-run('duplicate verification method', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.use-the-default-location | static |', '| standards/rule/core-topic.use-the-default-location | static, static |')), ['VERIFY_DUPLICATE_METHOD']);
-run('generic verification evidence', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Inspect the declared topic boundary.', 'Inspect evidence for the topic boundary.')), ['VERIFY_GENERIC_EVIDENCE']);
-run('invalid verification method', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.use-the-default-location | static |', '| standards/rule/core-topic.use-the-default-location | manual |')), ['VERIFY_METHOD']);
-run('unknown verification row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |', '| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |\n| standards/rule/core-topic.unknown-verification | static | `node tools/validate-standards.mjs` asserts the unknown row. |')), ['VERIFY_UNKNOWN_ID']);
+run('duplicate verification row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |', '| standards/rule/core-topic.keep-the-topic-bounded | checkable | `node tools/validate-standards.mjs` confirms the topic stays inside its declared boundary. |\n| standards/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |')), ['VERIFY_DUPLICATE_ID']);
+run('old verification method header', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| ID | Mark | Evidence |', '| ID | Method | Evidence |')), ['VERIFY_HEADER']);
+run('verification without a table', (root) => write(root, 'docs/core/topic.md', topicPage.replace('## Verification\n\n| ID | Mark | Evidence |\n|:---|:---|:---|\n| standards/rule/core-topic.keep-the-topic-bounded | checkable | `node tools/validate-standards.mjs` confirms the topic stays inside its declared boundary. |\n| standards/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |\n', '## Verification\n\n- Confirm that the validator exits with code zero.\n')), ['VERIFY_HEADER', 'VERIFY_MISSING_ID']);
+run('unknown verification mark', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.keep-the-topic-bounded | checkable |', '| standards/rule/core-topic.keep-the-topic-bounded | manual |')), ['VERIFY_MARK']);
+run('checkable evidence naming a missing file', (root) => write(root, 'docs/core/topic.md', topicPage.replace('`node tools/validate-standards.mjs` confirms the topic stays inside its declared boundary.', '`node tools/validate-missing.mjs` confirms the topic stays inside its declared boundary.')), ['VERIFY_COMMAND']);
+run('checkable evidence naming no command', (root) => write(root, 'docs/core/topic.md', topicPage.replace('`node tools/validate-standards.mjs` confirms the topic stays inside its declared boundary.', 'A reviewer confirms the topic stays inside its declared boundary.')), ['VERIFY_COMMAND']);
+run('checkable evidence naming the consumer-side tool path', (root) => {
+  write(root, 'docs/core/topic.md', topicPage.replace('`node tools/validate-standards.mjs` confirms the topic stays inside its declared boundary.', '`node standards/tools/validate-standards.mjs` confirms the topic stays inside its declared boundary.'));
+  write(root, INDEX_PATH, `${buildProvisionIndex(root)}\n`);
+}, []);
+run('checkable evidence naming a consumer-side suite path', (root) => {
+  write(root, 'docs/core/topic.md', topicPage.replace('`node tools/validate-standards.mjs` confirms the topic stays inside its declared boundary.', '`tests/routes/every-route.spec.ts` proves the topic boundary in a browser.'));
+  write(root, INDEX_PATH, `${buildProvisionIndex(root)}\n`);
+}, []);
+run('guidance evidence names no command', (root) => {
+  write(root, 'docs/core/topic.md', topicPage.replace('| standards/rule/core-topic.keep-the-topic-bounded | checkable | `node tools/validate-standards.mjs` confirms the topic stays inside its declared boundary. |', '| standards/rule/core-topic.keep-the-topic-bounded | guidance | Does the topic stay inside its declared boundary? |'));
+  write(root, INDEX_PATH, `${buildProvisionIndex(root)}\n`);
+}, []);
+run('generic verification evidence', (root) => write(root, 'docs/core/topic.md', topicPage.replace('confirms the topic stays inside its declared boundary.', 'runs, then inspect evidence for the topic boundary.')), ['VERIFY_GENERIC_EVIDENCE']);
+run('unknown verification row', (root) => write(root, 'docs/core/topic.md', topicPage.replace('| standards/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |', '| standards/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |\n| standards/rule/core-topic.unknown-verification | checkable | `node tools/validate-standards.mjs` asserts the unknown row. |')), ['VERIFY_UNKNOWN_ID']);
 
 run('contraction', (root) => write(root, 'docs/core/topic.md', topicPage.replace('This page defines one repository topic.', "This page isn't a second repository topic.")), ['PROSE_CONTRACTION']);
 run('and-or', (root) => write(root, 'docs/core/topic.md', topicPage.replace('one repository topic', 'one repository and/or consumer topic')), ['PROSE_AND_OR']);
@@ -418,16 +456,17 @@ const rejectionTable = '\n\n| Rejected | Use instead | Reason |\n|:---|:---|:---
 run('rejection table exempts its refused word and its reason', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes${rejectionTable}`)), []);
 run('an ordinary reason column is still measured', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes\n\n| Step | Reason |\n|:---|:---|\n| Publish | The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result. |\n`)), ['PROSE_TABLE_CELL_LENGTH']);
 run('a long cell beside a rejection column is still measured', (root) => write(root, 'docs/reference/sample.md', reference.replace('## Notes', `## Notes\n\n| Rejected | Use instead | Reason |\n|:---|:---|:---|\n| client | The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result. | Short. |\n`)), ['PROSE_TABLE_CELL_LENGTH']);
-run('long table cell', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Inspect the declared topic boundary.', 'The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result.')), ['PROSE_TABLE_CELL_LENGTH']);
+run('long table cell', (root) => write(root, 'docs/core/topic.md', topicPage.replace('Does the topic live in its owning documentation area?', 'The repository report records the declared topic boundary with its owner, scope, source, review date, status, evidence, command, path, and result.')), ['PROSE_TABLE_CELL_LENGTH']);
 run('normative guide prose', (root) => write(root, 'docs/guide/sample.md', guide.replace('Create one verified standards artifact.', 'Consumers MUST create one verified standards artifact.')), ['PROSE_NORMATIVE_LOCATION']);
 
 run('broken anchor', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nRead the [missing anchor](core/topic.md#missing).\n'), ['ANCHOR_BROKEN']);
 run('manifest JSON', (root) => write(root, 'standards.manifest.json', '{'), ['MANIFEST_JSON']);
 run('manifest path', (root) => write(root, 'standards.manifest.json', JSON.stringify({ agentsEntry: 'missing.md' })), ['MANIFEST_PATH']);
 run('manifest anchor', (root) => write(root, 'standards.manifest.json', JSON.stringify({ agentsEntry: 'docs/core/topic.md#missing' })), ['MANIFEST_ANCHOR']);
-run('manifest duplicate path', (root) => write(root, 'standards.manifest.json', JSON.stringify({ profiles: { sample: { entry: 'docs/profile/sample.md', pages: ['docs/core/topic.md', 'docs/core/topic.md'] } } })), ['MANIFEST_DUPLICATE_PATH']);
-run('profile composition missing', (root) => write(root, 'standards.manifest.json', JSON.stringify({ profiles: { sample: { entry: 'docs/profile/sample.md', pages: ['docs/core/topic.md', 'docs/core/other.md'] } } })), ['PROFILE_COMPOSITION_MISSING']);
-run('profile composition extra', (root) => write(root, 'standards.manifest.json', JSON.stringify({ profiles: { sample: { entry: 'docs/profile/sample.md', pages: [] } } })), ['PROFILE_COMPOSITION_EXTRA']);
+run('manifest duplicate path', (root) => write(root, 'standards.manifest.json', JSON.stringify({ stacks: { sample: { entry: 'docs/profile/sample.md', pages: ['docs/core/topic.md', 'docs/core/topic.md'] } } })), ['MANIFEST_DUPLICATE_PATH']);
+run('stack composition missing', (root) => write(root, 'standards.manifest.json', JSON.stringify({ stacks: { sample: { entry: 'docs/profile/sample.md', pages: ['docs/core/topic.md', 'docs/core/other.md'] } } })), ['STACK_COMPOSITION_MISSING']);
+run('stack composition extra', (root) => write(root, 'standards.manifest.json', JSON.stringify({ stacks: { sample: { entry: 'docs/profile/sample.md', pages: [] } } })), ['STACK_COMPOSITION_EXTRA']);
+run('stack composition matches', (root) => write(root, 'standards.manifest.json', JSON.stringify({ provisionRegistry: { areas: ['CORE', 'EXT', 'PROFILE'] }, stacks: { sample: { entry: 'docs/profile/sample.md', pages: ['docs/core/topic.md'] } } })), []);
 
 run('extension scope mismatch', (root) => write(root, 'standards.manifest.json', JSON.stringify({ extensions: { sample: { path: 'docs/ext/sample.md', activationScope: 'project' } } })), ['EXTENSION_SCOPE']);
 run('extension kind mismatch', (root) => write(root, 'standards.manifest.json', JSON.stringify({ extensions: { sample: { path: 'docs/ext/sample.md', activationScope: 'local', applicableKinds: ['workflow'] } } })), ['EXTENSION_KIND']);
@@ -443,35 +482,25 @@ run('empty extension dependencies', (root) => {
   write(root, 'docs/ext/sample.md', extension.replace('## Dependencies\n\nNone.', '## Dependencies\n'));
   write(root, 'standards.manifest.json', JSON.stringify({ extensions: { sample: { path: 'docs/ext/sample.md', activationScope: 'local', applicableKinds: ['use-case'] } } }));
 }, ['EXTENSION_DEPENDENCIES']);
-run('missing writing load plan', (root) => write(root, 'standards.manifest.json', '{}'), ['MANIFEST_LOAD_PLAN']);
+run('extension replacing an unknown provision', (root) => {
+  write(root, 'standards.manifest.json', JSON.stringify({ extensions: { sample: { path: 'docs/ext/sample.md', activationScope: 'local', applicableKinds: ['use-case'], replaces: ['standards/rule/core-topic.unknown-replacement'] } } }));
+}, ['EXTENSION_REPLACES_UNKNOWN']);
+run('extension enforcing a replaced provision', (root) => {
+  write(root, 'standards.manifest.json', JSON.stringify({ extensions: { sample: { path: 'docs/ext/sample.md', activationScope: 'local', applicableKinds: ['use-case'], replaces: ['standards/rule/ext-sample.record-extension-activation'] } } }));
+}, ['EXTENSION_REPLACES_ENFORCED']);
+run('extension replacing a baseline provision', (root) => {
+  write(root, 'standards.manifest.json', JSON.stringify({ provisionRegistry: { areas: ['CORE', 'EXT', 'PROFILE'] }, extensions: { sample: { path: 'docs/ext/sample.md', activationScope: 'local', applicableKinds: ['use-case'], replaces: ['standards/rule/core-topic.keep-the-topic-bounded'] } } }));
+}, []);
 
-run('invalid override IDs', (root) => write(root, 'templates/consumer/standards.project.json', JSON.stringify({ overrides: [{ provisionId: 'standards/rule/core-topic.unknown-override' }] })), ['OVERRIDE_UNKNOWN_ID']);
-run('svelte template with an unknown override', (root) => write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify({ overrides: [{ provisionId: 'standards/rule/core-topic.unknown-override' }] })), ['OVERRIDE_UNKNOWN_ID']);
-run('svelte template with a known override', (root) => write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify({ overrides: [{ provisionId: 'standards/rule/core-topic.keep-the-topic-bounded' }] })), []);
-// The shipped schema requires a review date on a UI override in either UI
-// scope. The fixture carries the real schema and the real svelte template, so
-// the shipped conditional is what these cases prove.
+// Overrides are gone: a departure from a Standard is an Exception record, so the
+// project schema refuses an `overrides` entry and no override ID is resolved.
+// The fixture carries the real schema, so the shipped refusal is what this
+// case proves.
 const shippedSchema = fs.readFileSync(new URL('../schemas/standards-project.schema.json', import.meta.url), 'utf8');
-const shippedSvelte = JSON.parse(fs.readFileSync(new URL('../templates/consumer/standards.project.svelte.json', import.meta.url), 'utf8'));
-run('svelte-ui override without a review date', (root) => {
+run('project template carrying a removed overrides entry', (root) => {
   write(root, 'schemas/standards-project.schema.json', shippedSchema);
-  const template = { ...shippedSvelte, overrides: [{ provisionId: 'standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/overrides.md' }] };
-  write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify(template));
+  write(root, 'templates/consumer/standards.project.json', JSON.stringify({ overrides: [{ provisionId: 'standards/rule/core-topic.keep-the-topic-bounded' }] }));
 }, ['SCHEMA_INVALID']);
-run('svelte-ui override with a review date', (root) => {
-  write(root, 'schemas/standards-project.schema.json', shippedSchema);
-  const template = { ...shippedSvelte, overrides: [{ provisionId: 'standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/overrides.md', reviewBy: '2999-01-01' }] };
-  write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify(template));
-}, ['OVERRIDE_UNKNOWN_ID'], ['SCHEMA_INVALID']);
-run('frontend-ui override without a review date', (root) => {
-  write(root, 'schemas/standards-project.schema.json', shippedSchema);
-  const template = { ...shippedSvelte, overrides: [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/overrides.md' }] };
-  write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify(template));
-}, ['SCHEMA_INVALID']);
-run('shipped svelte template meets the shipped schema', (root) => {
-  write(root, 'schemas/standards-project.schema.json', shippedSchema);
-  write(root, 'templates/consumer/standards.project.svelte.json', JSON.stringify(shippedSvelte));
-}, [], ['SCHEMA_INVALID']);
 
 // oneOf is enforced rather than allowed and skipped. Without the branch check a
 // value matching none of the shapes would validate cleanly.
@@ -523,13 +552,9 @@ run('summary bullet repeats its provision', (root) => write(root, 'docs/core/top
   '- Keep the topic inside its declared boundary. (standards/rule/core-topic.keep-the-topic-bounded)',
 )), ['SUMMARY_RESTATES_REQUIREMENT']);
 run('evidence repeats its provision heading', (root) => write(root, 'docs/core/topic.md', topicPage.replace(
-  '| standards/rule/core-topic.keep-the-topic-bounded | inspection | Inspect the declared topic boundary. |',
-  '| standards/rule/core-topic.keep-the-topic-bounded | inspection | Pull request review asserts `keep the topic bounded` in the owning specification. |',
+  '| standards/rule/core-topic.keep-the-topic-bounded | checkable | `node tools/validate-standards.mjs` confirms the topic stays inside its declared boundary. |',
+  '| standards/rule/core-topic.keep-the-topic-bounded | checkable | Pull request review asserts `keep the topic bounded` in the owning specification. |',
 )), ['VERIFY_TEMPLATED_EVIDENCE']);
-run('static evidence names no artifact', (root) => write(root, 'docs/core/topic.md', topicPage.replace(
-  '| standards/rule/core-topic.use-the-default-location | static | `node tools/validate-standards.mjs` resolves the topic document location. |',
-  '| standards/rule/core-topic.use-the-default-location | static | The reviewer resolves the topic document location. |',
-)), ['VERIFY_NO_ARTIFACT']);
 const fixtureAreas = ['CORE', 'EXT', 'PROFILE'];
 
 function registryManifest(areas = fixtureAreas) {
@@ -563,6 +588,13 @@ run('schema JSON', (root) => {
   write(root, 'schemas/standards-manifest.schema.json', '{');
   write(root, 'standards.manifest.json', '{}');
 }, ['SCHEMA_JSON']);
+
+run('removed numbered identifier', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites INV-ORDERS-01.\n'), ['REMOVED_IDENTIFIER']);
+run('removed slashed identifier', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites invariant/orders.only-placed-ships.\n'), ['REMOVED_IDENTIFIER']);
+run('removed nighthall rule prefix', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe page cites nighthall/rule/agents.what-nighthall-is.\n'), ['REMOVED_IDENTIFIER']);
+run('bare refused prefixes are documentation', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nRefused prefixes are AC-, INV-, path/, value/ and workflow/.\n\n' + INDEX_ROUTING), []);
+run('Workflow as a kind', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nA Workflow names its triggers and owner.\n'), ['WORKFLOW_KIND']);
+run('lowercase workflow prose passes', (root) => write(root, 'docs/README.md', '# Documentation\n\n## Intent\n\nThe release workflow runs weekly.\n\n' + INDEX_ROUTING), []);
 
 const usage = spawnSync(process.execPath, [script, 'one', 'two'], { encoding: 'utf8' });
 executed += 1;

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-// Writes docs/reference/provisions.md from the active standards. Pass --check to
+// Writes docs/reference/provisions.md from the active standards, with each
+// provision's Verification mark and evidence. Pass --check to
 // compare without writing. (standards/rule/core-authoring.regenerate-the-provision-index)
 
 import fs from 'node:fs';

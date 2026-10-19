@@ -12,11 +12,9 @@ Applicable specification kinds: `use-case`, `journey`.
 
 The consumer enables `jobs` for recurring, delayed, or calendar-based work. It activates `standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request`, so the project declares the execution host that runs the scheduler.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline rule.
-
-## Switches on
 
 This extension switches on the Limit and Runbook record types.
 
@@ -36,9 +34,9 @@ This extension switches on the Limit and Runbook record types.
 
 ### Record schedule behavior (standards/rule/ext-jobs.record-schedule-behavior)
 
-**Requirement:** A scheduled-job use case or decision MUST name schedule, time zone, delay, overlap, misfire, idempotency, retry, and operating owner. The record names its owner and status, and a draft names its decider and decide-by date.
+**Requirement:** A scheduled-job record MUST name schedule, time zone, delay, overlap, misfire, idempotency, retry, owners, and status, with a draft naming decider and decide-by date.
 
-**Rationale:** The contract describes when work may run and how it recovers from normal scheduling faults.
+**Rationale:** The contract describes when work may run and how it recovers from normal scheduling faults. Owners are the operating owner and the record owner.
 
 ### Run jobs in Worker (standards/rule/ext-jobs.run-jobs-in-worker)
 
@@ -136,7 +134,7 @@ Each procedure names the interface that performs it. A procedure that reads "dis
 
 ### Derive stable occurrence identity (standards/rule/ext-jobs.derive-stable-occurrence-identity)
 
-**Requirement:** A scheduled-job store MUST derive each occurrence identity from its schedule ID and scheduled instant. The schedule declares occurrence retention as a Limit record, and the store removes older occurrences.
+**Requirement:** A scheduled-job store MUST derive each occurrence identity from its schedule ID and scheduled instant, removing occurrences older than the schedule's retention Limit record.
 
 **Rationale:** One planned time receives one stable identity across retries and replicas.
 
@@ -164,7 +162,7 @@ The key space grows with the schedule's frequency and its retention, so a per-se
 
 ### Audit manual replay (standards/rule/ext-jobs.audit-manual-replay)
 
-**Requirement:** A manual replay MUST create a new attempt for the same occurrence identity. The attempt is an audit record when the audit extension is selected, and a standalone record otherwise.
+**Requirement:** A manual replay MUST create a new attempt for the same occurrence identity: an audit record when audit is selected, a standalone record otherwise.
 
 **Rationale:** Replay preserves the original scheduled instant and its history.
 
@@ -237,7 +235,7 @@ No additional baseline package is required. Schedule state uses selected persist
 | standards/rule/ext-jobs.dispatch-application-behavior | guidance | Does each job dispatch an Application Command or approved port? |
 | standards/rule/ext-jobs.exclude-direct-storage-and-http-execution | guidance | Is job source free of direct storage mutation and WebApi calls? |
 | standards/rule/ext-jobs.bound-job-retries | guidance | Are attempts bounded with cancellation-aware backoff and a poison state? |
-| standards/rule/ext-jobs.tolerate-duplicate-execution | guidance | Do the job Command and side effect tolerate duplicate execution? |
+| standards/rule/ext-jobs.tolerate-duplicate-execution | guidance | Do the job Command and side effect stay correct when a lease or process failure replays them? |
 | standards/rule/ext-jobs.treat-unavailable-schedule-stores-as-outages | guidance | Does an unavailable store get backed-off, rate-limited logging? |
 | standards/rule/ext-jobs.persist-occurrence-recovery-points | guidance | Does the store persist last scheduled, started, and completed times? |
 | standards/rule/ext-jobs.define-misfire-recovery | guidance | Does the specification define skip or replay behavior for missed occurrences? |

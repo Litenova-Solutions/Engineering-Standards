@@ -1,4 +1,4 @@
-# Frontend data and state
+# Frontend Data and State
 
 ## Intent
 
@@ -46,7 +46,7 @@ type Problem = {
 };
 ```
 
-The code is the discriminator. The client invents codes for what the API cannot answer. `failure/client.unreachable` names a request that received no response. `failure/client.unauthenticated` names a refused authentication. `failure/client.http_<status>` names a response status the client maps to no problem, with the status in place of `<status>`. A code this build has never heard of is still handled. The page branches on the code's presence rather than on a list of known codes.
+The code is the discriminator. The client invents codes for what the API cannot answer. `failure/client.unreachable` names a request that received no response, and `failure/client.unauthenticated` names a refused authentication. `failure/client.http_<status>` names a response status the client maps to no problem, with the status in place of `<status>`. A code this build has never heard of is still handled. The page branches on the code's presence rather than on a list of known codes.
 
 The problem carries the `traceId` the API returns for the request. Every error the user sees shows that `traceId` in a copyable form in its detail, never as the headline. When the problem carries none, the client reads the `X-Trace-Id` response header instead.
 
@@ -92,21 +92,21 @@ Each stack adds the TanStack Query plugin its section names.
 
 ### Keep the session in an API owned cookie (standards/rule/frontend-data.keep-the-session-in-an-api-owned-cookie)
 
-**Requirement:** The API MUST hold the browser session in an HTTP-only cookie, and frontend code MUST NOT hold a token.
+**Requirement:** The API MUST hold the browser session in an HTTP-only cookie, with frontend code holding no token.
 
 **Rationale:** Every value a script can read is a value any script on the page can read. The API runs the authorization code flow and keeps the tokens encrypted in the cookie. A refused sign-in lands on a signed-out page rather than on an error.
 
 ### Set the write marker on every request (standards/rule/frontend-data.set-the-write-marker-on-every-request)
 
-**Requirement:** A client MUST send its marker header on every write. The API MUST accept a cookie-authenticated write only when it carries the header. The header has the form `X-<Project>-Request` with the value `1`, and project configuration names the exact header.
+**Requirement:** A client MUST send its marker header on every write, with the API accepting a cookie-authenticated write only when it carries that header.
 
-**Rationale:** A browser sends its cookie on a cross-site request on its own, so the header separates a page's write from a forged post. A page on another site cannot add a custom header without a preflight the API never grants. The name varies by project, so configuration owns it rather than code.
+**Rationale:** A browser sends its cookie on a cross-site request on its own, so the header separates a page's write from a forged post. A page on another site cannot add a custom header without a preflight the API never grants. The name varies by project, so configuration owns it rather than code. The header has the form `X-<Project>-Request` with the value `1`.
 
 ### Map every failure to one problem type (standards/rule/frontend-data.map-every-failure-to-one-problem-type)
 
-**Requirement:** A frontend MUST convert every failure into one problem type, and decide what to show from its code. Every error the user sees MUST show the problem's `traceId` in a copyable form in its detail, never as the headline.
+**Requirement:** A frontend MUST convert every failure into one problem type, deciding from its code and showing the `traceId` in copyable form in each error's detail.
 
-**Rationale:** Displaying a raw response body leaks whatever the API included and gives the reader no consistent recovery path. A code is a published identifier, so a page's decision survives a reworded message. The `traceId` lets support find the request the reader saw fail.
+**Rationale:** Displaying a raw response body leaks whatever the API included and gives the reader no consistent recovery path. A code is a published identifier, so a page's decision survives a reworded message. The `traceId` lets support find the request the reader saw fail. The `traceId` never serves as the headline.
 
 ### Place a refusal beside what was refused (standards/rule/frontend-data.place-a-refusal-beside-what-was-refused)
 
@@ -126,7 +126,7 @@ Each stack adds the TanStack Query plugin its section names.
 
 ### Place a field refusal on its field (standards/rule/frontend-data.place-a-field-refusal-on-its-field)
 
-**Requirement:** A field problem MUST be applied to the field it names, and the form stays open until the problem is resolved or abandoned. The frame owns one helper that applies field problems to a form.
+**Requirement:** A field problem MUST reach the field it names through the frame's one helper, with the form staying open until resolved or abandoned.
 
 **Rationale:** A list of problems above a long form makes the reader read each sentence and each label to pair them.
 
@@ -150,19 +150,19 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 ### Assign state to the narrowest owner (standards/rule/frontend-data.assign-state-to-the-narrowest-owner)
 
-**Requirement:** A value MUST live with the narrowest owner that can hold it. The order prefers server data, then the address, then form state, then the component's own state.
+**Requirement:** A value MUST live with the narrowest owner that can hold it: server data, then the address, then form state, then the component's own state.
 
 **Rationale:** A store placed above that order makes unrelated components re-render and hides where a value changes.
 
 ### Route a personal value in a header (standards/rule/frontend-data.route-a-personal-value-in-a-header)
 
-**Requirement:** A value that names a person MUST travel in a request header rather than in the query string. The published contract declares the header each operation reads.
+**Requirement:** A value naming a person MUST travel in a request header rather than the query string, with the contract declaring the header each operation reads.
 
 **Rationale:** A query string is written into a proxy log, the browser history, and the referrer of whatever the reader opens next. The address keeps its own copy, so a filtered list stays a link somebody can share.
 
 ### Read a permission from the session (standards/rule/frontend-data.read-a-permission-from-the-session)
 
-**Requirement:** A page MUST decide whether to offer a command from the Permissions the session's Actor holds at the record's scope. The API MUST decide every command.
+**Requirement:** A page MUST offer a command from the session Actor's Permissions at the record's scope, with the API deciding every command.
 
 **Rationale:** Permissions are the project's Permission records: an Actor holds a Role at a scope, a Role allows Permissions, and a use case needs Permissions. The page reads the Actor's permission codes from the session the API returns for the signed-in Actor. The page avoids offering what would be refused, and the API refuses what is offered in error. A page hiding a control nobody may use makes the surface look thinner than the product is.
 
@@ -202,11 +202,11 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 ### Keep the client boundary in the frame (standards/rule/frontend-data.keep-the-client-boundary-in-the-frame)
 
-**Default:** Place the client configuration, the problem mapping, and the file download helpers in the frame root. Keep them out of every use-case folder. Each stack section names the frame root.
+**Default:** Place the client configuration, problem mapping, and download helpers in the frame root, keeping them out of every use-case folder.
 
 **Replacement:** A project departs from this default through an Exception record.
 
-**Rationale:** One place configures the client, so a change to the base address or to the headers is one edit rather than one per application.
+**Rationale:** One place configures the client, so a change to the base address or to the headers is one edit rather than one per application. Each stack section names the frame root.
 
 ### Regenerate the client rather than editing it (standards/rule/frontend-data.regenerate-the-client-rather-than-editing-it)
 

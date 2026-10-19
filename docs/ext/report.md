@@ -8,15 +8,13 @@ Reporting separates complex joins, aggregate analysis, and large exports from no
 
 Activation scope: `local`.
 
-Applicable record types: `use-case`.
+Applicable specification kinds: `use-case`.
 
 The consumer enables `report` for a documented query or export with complex relational SQL, large results, long processing, object storage, or exceptional latency budget.
 
-## Replaces
+## Baseline relationship
 
 None. Ordinary queries stay under `standards/rule/backend-persistence.query-through-iquerysession`; this extension governs reads whose cost or duration exceeds that path.
-
-## Switches on
 
 `limit`. Selecting `report` requires Limit records for the request budget and the report bounds.
 
@@ -70,7 +68,7 @@ None. Ordinary queries stay under `standards/rule/backend-persistence.query-thro
 
 ### Run budget-exceeding exports in Worker (standards/rule/ext-report.run-budget-exceeding-exports-in-worker)
 
-**Requirement:** An export exceeding its request budget MUST run through Worker. The budget is a Limit record the export's use case names.
+**Requirement:** An export exceeding its request budget MUST run through Worker, with the budget a Limit record the export's use case names.
 
 **Rationale:** Worker execution frees the HTTP request from long-running report work.
 

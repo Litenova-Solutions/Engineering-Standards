@@ -47,7 +47,7 @@ A term lives in the language record. Stack versions live in the manifest. Covera
 
 ### Classify record authority (standards/rule/core-principles.classify-record-authority)
 
-**Requirement:** A record MUST carry exactly one status: draft, approved, or retired. A draft MUST name its decider and decide-by date.
+**Requirement:** A record MUST carry exactly one status of draft, approved, or retired, with a draft naming its decider and decide-by date.
 
 **Rationale:** Draft records are under review. Approved records are authoritative. Retired records stay readable as the past.
 
@@ -59,7 +59,7 @@ A term lives in the language record. Stack versions live in the manifest. Covera
 
 ### Separate authority from implementation (standards/rule/core-principles.separate-authority-from-implementation)
 
-**Requirement:** A record MUST NOT write its own implementation status. Implemented and verified are computed from code and test runs.
+**Requirement:** A record MUST NOT write its own implementation status, since implemented and verified are computed from code and test runs.
 
 **Rationale:** An approved planned target is not an implemented behavior claim. [docs/core/model.md](model.md) defines how the model computes both.
 
@@ -71,9 +71,9 @@ A term lives in the language record. Stack versions live in the manifest. Covera
 
 ### Prove enforceable boundaries mechanically (standards/rule/core-principles.prove-enforceable-boundaries-mechanically)
 
-**Requirement:** Enforceable boundaries are project and package references, compiler visibility, permission guards, store constraints, and lint rules. A consumer MUST prove each with a reference, visibility, an architecture test, a behavior test, or a lint rule.
+**Requirement:** A consumer MUST prove each enforceable boundary mechanically: a reference, visibility, an architecture test, a behavior test, or a lint rule.
 
-**Rationale:** Tools prove structural constraints, while specifications explain decisions that require judgment.
+**Rationale:** Tools prove structural constraints, while specifications explain decisions that require judgment. Enforceable boundaries are project and package references, compiler visibility, permission guards, store constraints, and lint rules.
 
 **Example:** A project-reference test proves Domain has no Infrastructure reference.
 

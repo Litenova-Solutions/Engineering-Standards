@@ -12,11 +12,9 @@ Applicable specification kinds: None.
 
 The consumer enables `locale` when the product supports more than one locale. A possible future translation does not activate it. The product brief or decision records locales, default locale, fallback behavior, and URL strategy.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline rule.
-
-## Switches on
 
 This extension switches on no record type.
 
@@ -34,9 +32,9 @@ This extension switches on no record type.
 
 ### Record supported locale behavior (standards/rule/ext-locale.record-supported-locale-behavior)
 
-**Requirement:** A localization decision MUST list supported locale identifiers, default locale, fallback chain, user selection, and browser-detection behavior. The record names its owner and status, and a draft names its decider and decide-by date.
+**Requirement:** A localization decision MUST list supported locales, default locale, fallback chain, user selection, browser detection, owner, and status.
 
-**Rationale:** One decision defines the product's locale contract before catalogs and routes appear.
+**Rationale:** One decision defines the product's locale contract before catalogs and routes appear. A draft names its decider and decide-by date.
 
 ### Avoid catalog-only locale claims (standards/rule/ext-locale.avoid-catalog-only-locale-claims)
 
@@ -98,7 +96,7 @@ The declaration states the fallback locale and what a missing key does at build 
 
 ### Resolve every shown identifier (standards/rule/ext-locale.resolve-every-shown-identifier)
 
-**Requirement:** A screen MUST resolve every closed-set code it renders to its Term record label and never render the raw code. User-facing reference numbers are not closed-set codes.
+**Requirement:** A screen MUST resolve every closed-set code it renders to its Term record label and never render the raw code, excluding user-facing reference numbers.
 
 **Rationale:** The code is a contract value and the Term label is copy. A resolution value, a refusal ground, a role code, or a billing state carries its label beside the rest of the screen's copy.
 

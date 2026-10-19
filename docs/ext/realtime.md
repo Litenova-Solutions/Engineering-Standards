@@ -8,15 +8,13 @@ Realtime transport reduces visible update delay when polling cannot meet an acce
 
 Activation scope: `local`.
 
-Applicable record types: `use-case`, `journey`.
+Applicable specification kinds: `use-case`, `journey`.
 
 The consumer enables `realtime` after measuring polling interval, visible delay, request cost, and required update target. It names acceptable disconnect and missed-message recovery.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline provision. Server-sent events use platform capabilities.
-
-## Switches on
 
 `event`, `limit`. Selecting `realtime` requires Event records for the notifications it carries and Limit records for the bounds it sets.
 
@@ -87,7 +85,7 @@ This extension replaces no baseline provision. Server-sent events use platform c
 
 ### Bound realtime resources (standards/rule/ext-realtime.bound-realtime-resources)
 
-**Requirement:** A realtime deployment MUST set four bounds as Limit records. They are the maximum concurrent connections per host, the maximum receive message size, the maximum parallel invocations per connection, and the client timeout.
+**Requirement:** A realtime deployment MUST set four Limit-record bounds: concurrent connections per host, receive message size, parallel invocations per connection, and client timeout.
 
 **Rationale:** Explicit limits protect server memory, CPU, and connection capacity. Each value comes from the deployment's own connection count and message size, with the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same knobs.
 

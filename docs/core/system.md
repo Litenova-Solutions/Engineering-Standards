@@ -1,4 +1,4 @@
-# Agentic engineering system
+# Agentic Engineering System
 
 ## Intent
 
@@ -50,17 +50,17 @@ The system contains one delivery approach and one operating model:
 
 `Agent-driven` describes who performs much of the execution. It does not transfer business decision authority to the agent.
 
-## Agent summary {#agent-summary}
+## Agent Summary {#agent-summary}
 
 - Agents stop and ask when a decision belongs to a person. (standards/rule/core-system.keep-decision-authority-with-accountable-people)
-- Approved records define the work, and each one situates its subject. (standards/rule/core-system.drive-work-from-approved-specifications, standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
+- Approved records define the work, and each one situates its subject. (standards/rule/core-system.drive-work-from-approved-records, standards/rule/core-system.state-one-occasion-for-every-behavior-record)
 - Journeys link their use cases rather than restate them, and every use case names what reaches it. (standards/rule/core-system.connect-one-product-outcome-through-a-journey, standards/rule/core-system.name-what-calls-a-use-case)
 - One module name is used across every layer. (standards/rule/core-system.group-language-and-use-cases-by-module)
-- Module pages map business records to state, rules, and commands. (standards/rule/core-system.make-aggregate-ownership-explicit)
-- One use case is one command or query, with computed status and resolvable mapping. (standards/rule/core-system.deliver-one-complete-use-case, standards/rule/core-system.compute-use-case-status-from-evidence, standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)
+- Module pages map business records to state, rules, and commands. (standards/rule/core-system.make-business-record-ownership-explicit)
+- One use case is one command or query, with computed status and resolvable mapping. (standards/rule/core-system.deliver-one-complete-use-case, standards/rule/core-system.compute-use-case-status-from-evidence, standards/rule/core-system.keep-use-cases-and-handlers-in-one-to-one-correspondence)
 - Every event reaction declares its delivery classification. (standards/rule/core-system.declare-event-reaction-delivery)
 - Each rule states its kind, and each act needs a permission. (standards/rule/core-system.state-each-rule-with-its-kind, standards/rule/core-system.grant-access-through-roles-and-permissions)
-- Records map each business state to a state record. (standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records)
+- Records map each business state to a state record. (standards/rule/core-system.model-every-business-record-lifecycle-with-state-records)
 - Authority follows the ladder, and every link sits on its source record. (standards/rule/core-system.resolve-authority-by-ladder, standards/rule/core-system.declare-each-link-on-its-source)
 
 ## Concepts
@@ -288,7 +288,7 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 **Rationale:** Decision owners approve outcomes, terms, policies, criteria, commitments, and risk. An agent contribution stays a proposal until an accountable person accepts it.
 
-### Drive work from approved records (standards/rule/core-system.drive-work-from-approved-specifications)
+### Drive work from approved records (standards/rule/core-system.drive-work-from-approved-records)
 
 **Requirement:** An agent MUST start behavior work from the approved use-case and module records, plus the product and journey records when they exist for the behavior.
 
@@ -296,7 +296,7 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 ### Resolve authority by ladder (standards/rule/core-system.resolve-authority-by-ladder)
 
-**Requirement:** What should happen follows constraint, then product, requirement, rule, and use case in that order. Every record carries an owner.
+**Requirement:** Authority MUST follow constraint, then product, requirement, rule, and use case in that order, with every record carrying an owner.
 
 **Rationale:** The ladder settles ties without a meeting; the owner answers for each record.
 
@@ -308,15 +308,15 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 ### Declare each link on its source (standards/rule/core-system.declare-each-link-on-its-source)
 
-**Requirement:** Every written link MUST live on the record the link table names first, and every citation MUST resolve to a written record.
+**Requirement:** Every written link MUST live on the record the link table names first, with every citation resolving to a written record.
 
 **Rationale:** Links on the source keep each record readable alone; resolving citations keep the graph whole.
 
 ### Connect one product outcome through a journey (standards/rule/core-system.connect-one-product-outcome-through-a-journey)
 
-**Requirement:** A journey MUST link its use-case records without repeating their inputs, rules, refusals, or results. Every public use case MUST sit in at least one journey or name its background caller.
+**Requirement:** A journey MUST link its use-case records without repeating their content, and every public use case sits in a journey or names its background caller.
 
-**Rationale:** A journey can cross modules and include branches, waiting, failure, and recovery. Its tests prove the connected outcome through public boundaries.
+**Rationale:** A journey can cross modules and include branches, waiting, failure, and recovery. Its tests prove the connected outcome through public boundaries. Repeated content means inputs, rules, refusals, and results.
 
 ### Group language and use cases by module (standards/rule/core-system.group-language-and-use-cases-by-module)
 
@@ -324,23 +324,23 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 **Rationale:** A module is a navigation and ownership boundary. It defines no transaction boundary and needs no runtime `Module` or `IModule` type.
 
-### Make business-record ownership explicit (standards/rule/core-system.make-aggregate-ownership-explicit)
+### Make business-record ownership explicit (standards/rule/core-system.make-business-record-ownership-explicit)
 
-**Requirement:** A module page MUST map each business record to the state it owns, its rules, and the commands that change it. A command MUST change one business record unless an approved record names the rule that demands more.
+**Requirement:** A module page MUST map each business record to its state, rules, and commands, with one record per command unless an approved record demands more.
 
 **Rationale:** One record per command keeps each transaction boundary visible.
 
 ### Deliver one complete use case (standards/rule/core-system.deliver-one-complete-use-case)
 
-**Requirement:** A use case MUST map to one top-level Command or Query. It is complete only with Domain behavior, Application coordination, persistence, entry points, automated evidence, and operating impact.
+**Requirement:** A use case MUST map to one Command or Query, complete only with Domain behavior, Application coordination, persistence, entry points, evidence, and operating impact.
 
-**Rationale:** Multi-step product outcomes belong to a journey. Placeholder work leaves the use case unimplemented.
+**Rationale:** Multi-step product outcomes belong to a journey. Placeholder work leaves the use case unimplemented. The Command or Query is top level, and the evidence is automated.
 
 **Example:** A use case whose handler throws `NotImplementedException` is not implemented.
 
 ### Compute use-case status from evidence (standards/rule/core-system.compute-use-case-status-from-evidence)
 
-**Requirement:** Use-case status MUST be computed from code, screens, and test runs, never written by hand. A use case is implemented when code implements it, and verified when every one of its cases is proved by a passing test.
+**Requirement:** Use-case status MUST come from code, screens, and test runs: implemented when code implements it, verified when every Case passes its proof.
 
 **Rationale:** Computed status cannot drift from what the repository proves.
 
@@ -355,9 +355,9 @@ Event:    event/order.cancelled
 Endpoint: CancelOrderEndpoint
 ```
 
-### Keep use cases and handlers in one-to-one correspondence (standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence)
+### Keep use cases and handlers in one-to-one correspondence (standards/rule/core-system.keep-use-cases-and-handlers-in-one-to-one-correspondence)
 
-**Requirement:** Every handler MUST resolve to exactly one use case, by the folder rule or one `implements` anchor. Every use case MUST resolve back to its handler.
+**Requirement:** Every handler MUST resolve to one use case by the folder rule or one `implements` anchor, with every use case resolving back to its handler.
 
 **Rationale:** Neither direction is visible without the check. Code with no use case reads as a reviewed feature and is not one. A use case with no code states a plan in the present tense.
 
@@ -377,31 +377,31 @@ Endpoint: CancelOrderEndpoint
 
 ### Declare event reaction delivery (standards/rule/core-system.declare-event-reaction-delivery)
 
-**Requirement:** A use case that reacts to an event MUST declare exactly one delivery classification, and its implementation MUST deliver with that classification. A reaction MUST NOT declare `best-effort-optional` when a record needs its effect.
+**Requirement:** An event reaction MUST declare exactly one delivery classification and deliver with it, never `best-effort-optional` when a record needs its effect.
 
 **Rationale:** The classification tells the reader what a failure costs: rollback, retry, rebuild, or loss.
 
 ### State each rule with its kind (standards/rule/core-system.state-each-rule-with-its-kind)
 
-**Requirement:** Each rule MUST state its kind, what it governs, and where it is enforced. A rule whose statement says not, no, never, or cannot MUST keep that word in its name.
+**Requirement:** Each rule MUST state its kind, governed target, and enforcement point, keeping a negation word in its name when its statement says one.
 
-**Rationale:** The kind decides the proof; the name lets a reviewer read the rule as a true sentence.
+**Rationale:** The kind decides the proof; the name lets a reviewer read the rule as a true sentence. Negation words are not, no, never, and cannot.
 
 **Example:** `rule/order.cancel-only-before-shipment` is a checked-before rule enforced by the validator.
 
 ### Grant access through roles and permissions (standards/rule/core-system.grant-access-through-roles-and-permissions)
 
-**Requirement:** An actor MUST hold a role at a scope to act; a role MUST allow each permission its holders exercise. A use case MUST declare the permissions it needs, and an entry point MUST offer each permission it exercises.
+**Requirement:** Access MUST flow from actor through role and permission to use case, with each link declared: holds, allows, needs, and offers.
 
-**Rationale:** The chain gives every access decision one path to audit: actor, role, permission, use case.
+**Rationale:** The chain gives every access decision one path to audit: actor, role, permission, use case. The hold names its scope.
 
-### Model every business-record lifecycle with state records (standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records)
+### Model every business-record lifecycle with state records (standards/rule/core-system.model-every-business-record-lifecycle-with-state-records)
 
 **Requirement:** A business-record page MUST map every business state to a sealed state record under one abstract state base.
 
 **Rationale:** This holds from the first implementation, including a record with one current state. An enum, status string, boolean flag, or computed discriminator cannot carry state-specific facts.
 
-### State one occasion for every behavior record (standards/rule/core-system.state-one-occasion-for-every-behavior-specification)
+### State one occasion for every behavior record (standards/rule/core-system.state-one-occasion-for-every-behavior-record)
 
 **Requirement:** A module, business-record, use-case, or journey page MUST carry a `Scenario` section stating one concrete occasion for its subject.
 
@@ -425,7 +425,7 @@ Endpoint: CancelOrderEndpoint
 
 **Example:** Alex, the customer who places the order in one record, is the person who receives the shipment in another.
 
-### Update records with behavior (standards/rule/core-system.update-specifications-with-behavior)
+### Update records with behavior (standards/rule/core-system.update-records-with-behavior)
 
 **Requirement:** An observable behavior change MUST update its use-case page, implementation, tests, generated contracts, product citation, decision, journey, and operating records together.
 
@@ -506,13 +506,13 @@ docs/
 
 The example creates an optional directory only when its first real artifact is added. The example does not create empty directories or placeholder records during inception.
 
-### Group module use-case files by business record (standards/rule/core-system.group-module-use-case-files-by-aggregate-root)
+### Group module use-case files by business record (standards/rule/core-system.group-module-use-case-files-by-business-record)
 
 **Default:** Group module use-case files under a plural kebab-case business-record subdirectory, each holding that record's page, including a module with one business record.
 
 **Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** A module page cannot carry the business-record page that `standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `use-case/<module>.<name>`, so only the directory changes.
+**Rationale:** A module page cannot carry the business-record page that `standards/rule/core-system.model-every-business-record-lifecycle-with-state-records` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `use-case/<module>.<name>`, so only the directory changes.
 
 ### Keep operational and security references under operations (standards/rule/core-system.keep-operational-and-security-references-under-operations)
 
@@ -538,7 +538,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Exact record types and code types keep their declared capitalization, so the distinction stays meaningful.
 
-### Keep records readable without tooling (standards/rule/core-system.keep-specifications-readable-without-tooling)
+### Keep records readable without tooling (standards/rule/core-system.keep-records-readable-without-tooling)
 
 **Default:** Use JSON only for the frontmatter block, and write rules, results, cases, and examples in Markdown.
 
@@ -546,7 +546,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** A record that needs tooling to read stops being reviewable by the person who owns its decisions.
 
-### Bound a scenario to 120 words (standards/rule/core-system.bound-a-scenario-to-one-paragraph)
+### Bound a scenario to 120 words (standards/rule/core-system.bound-a-scenario-to-120-words)
 
 **Default:** Keep a `Scenario` section within 120 words.
 
@@ -556,7 +556,7 @@ The example creates an optional directory only when its first real artifact is a
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/core-system.connect-one-product-outcome-through-a-journey`, `standards/rule/core-system.declare-event-reaction-delivery`, and `standards/rule/core-system.make-aggregate-ownership-explicit`.
+This informative example demonstrates `standards/rule/core-system.connect-one-product-outcome-through-a-journey`, `standards/rule/core-system.declare-event-reaction-delivery`, and `standards/rule/core-system.make-business-record-ownership-explicit`.
 
 The `journey/checkout` journey links `use-case/catalog.reserve-stock`, `use-case/orders.create-order`, `use-case/payments.start-payment`, and `use-case/shipping.dispatch-shipment`. Order cancellation and payment reconciliation are separate journeys.
 
@@ -569,29 +569,29 @@ The orders module contains `Order` and `OrderClaim`. `use-case/orders.cancel-ord
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | standards/rule/core-system.keep-decision-authority-with-accountable-people | guidance | Which draft decision records each question that stopped the work? |
-| standards/rule/core-system.drive-work-from-approved-specifications | guidance | Which approved records authorized each behavior change? |
+| standards/rule/core-system.drive-work-from-approved-records | guidance | Which approved records authorized each behavior change? |
 | standards/rule/core-system.resolve-authority-by-ladder | guidance | Which ladder settles the conflict, and which record lacks an owner? |
 | standards/rule/core-system.write-each-record-in-its-catalog-shape | guidance | Which record breaks its catalog type, home, owner, or status? |
 | standards/rule/core-system.declare-each-link-on-its-source | guidance | Which link sits off its source, and which citation resolves nowhere? |
 | standards/rule/core-system.connect-one-product-outcome-through-a-journey | guidance | Which journey links the use case, or which background caller replaces it? |
 | standards/rule/core-system.group-language-and-use-cases-by-module | checkable | `node standards/tools/validate-consumer.mjs` resolves each module reference to one declared module directory. |
-| standards/rule/core-system.make-aggregate-ownership-explicit | guidance | Which business record lacks its state, rules, or commands on the module page? |
+| standards/rule/core-system.make-business-record-ownership-explicit | guidance | Which business record lacks its state, rules, or commands on the module page? |
 | standards/rule/core-system.deliver-one-complete-use-case | guidance | Which layer or evidence does the incomplete use case still lack? |
 | standards/rule/core-system.compute-use-case-status-from-evidence | guidance | Which use-case status did a hand write instead of the evidence? |
-| standards/rule/core-system.keep-specifications-and-use-cases-in-one-to-one-correspondence | guidance | Which handler lacks its use case, or which use case lacks its handler? |
+| standards/rule/core-system.keep-use-cases-and-handlers-in-one-to-one-correspondence | guidance | Which handler lacks its use case, or which use case lacks its handler? |
 | standards/rule/core-system.name-what-calls-a-use-case | guidance | Which entry points reach the use case, or which background caller does? |
 | standards/rule/core-system.declare-event-reaction-delivery | guidance | Which reaction lacks exactly one classification the implementation honors? |
 | standards/rule/core-system.state-each-rule-with-its-kind | guidance | Which rule lacks its kind, governor, enforcement, or kept negation? |
 | standards/rule/core-system.grant-access-through-roles-and-permissions | guidance | Which act lacks its actor, role, permission, and use-case path? |
-| standards/rule/core-system.model-every-aggregate-lifecycle-with-state-records | guidance | Which business state lacks its sealed state record in page and code? |
-| standards/rule/core-system.state-one-occasion-for-every-behavior-specification | checkable | `node standards/tools/validate-consumer.mjs` fails a behavior page carrying no `Scenario` section. |
+| standards/rule/core-system.model-every-business-record-lifecycle-with-state-records | guidance | Which business state lacks its sealed state record in page and code? |
+| standards/rule/core-system.state-one-occasion-for-every-behavior-record | checkable | `node standards/tools/validate-consumer.mjs` fails a behavior page carrying no `Scenario` section. |
 | standards/rule/core-system.keep-a-scenario-informative | checkable | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section containing a record identifier. |
 | standards/rule/core-system.derive-every-scenario-from-one-reference-cast | checkable | `node standards/tools/validate-consumer.mjs` fails a documentation set with no or several `scenario-cast` pages; the reviewer confirms each scenario draws from it. |
-| standards/rule/core-system.update-specifications-with-behavior | guidance | Which affected record did the behavior change leave behind? |
+| standards/rule/core-system.update-records-with-behavior | guidance | Which affected record did the behavior change leave behind? |
 | standards/rule/core-system.use-this-consumer-documentation-layout | guidance | Which directory breaks the layout without a declared exception? |
-| standards/rule/core-system.group-module-use-case-files-by-aggregate-root | checkable | `node standards/tools/validate-consumer.mjs` resolves each use case to its module or one business-record subdirectory. |
+| standards/rule/core-system.group-module-use-case-files-by-business-record | checkable | `node standards/tools/validate-consumer.mjs` resolves each use case to its module or one business-record subdirectory. |
 | standards/rule/core-system.keep-operational-and-security-references-under-operations | guidance | Which operating or security prose sits outside `docs/operations/`? |
 | standards/rule/core-system.use-established-technical-terms | guidance | Which term replaces an established technical meaning with a softer synonym? |
 | standards/rule/core-system.use-ordinary-capitalization-in-prose | guidance | Which ordinary noun carries capitalization outside names and identifiers? |
-| standards/rule/core-system.keep-specifications-readable-without-tooling | guidance | Which JSON sits outside the frontmatter block? |
-| standards/rule/core-system.bound-a-scenario-to-one-paragraph | checkable | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |
+| standards/rule/core-system.keep-records-readable-without-tooling | guidance | Which JSON sits outside the frontmatter block? |
+| standards/rule/core-system.bound-a-scenario-to-120-words | checkable | `node standards/tools/validate-consumer.mjs` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |

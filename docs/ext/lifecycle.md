@@ -12,11 +12,9 @@ Applicable specification kinds: `use-case`, `rule`.
 
 The consumer enables `lifecycle` when a use case requires deletion, retention, archival, restore, legal hold, subject-access export, or post-deletion uniqueness behavior.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline rule.
-
-## Switches on
 
 This extension switches on the Limit record type.
 
@@ -33,9 +31,9 @@ This extension switches on the Limit record type.
 
 ### Record lifecycle scope (standards/rule/ext-lifecycle.record-lifecycle-scope)
 
-**Requirement:** A lifecycle use case or decision MUST name data classification, retention, deletion trigger, purge owner, hold, export, restore, and backup behavior. The record names its owner and status, and a draft names its decider and decide-by date. Retention bounds are Limit records.
+**Requirement:** A lifecycle record MUST name classification, retention, deletion trigger, purge owner, hold, export, restore, backup, owner, and status.
 
-**Rationale:** The contract establishes the data lifetime and the owner of each later action.
+**Rationale:** The contract establishes the data lifetime and the owner of each later action. Retention bounds are Limit records, and a draft names its decider and decide-by date.
 
 ### Default to hard delete (standards/rule/ext-lifecycle.default-to-hard-delete)
 
@@ -65,7 +63,7 @@ This extension switches on the Limit record type.
 
 ### Authorize and audit lifecycle changes (standards/rule/ext-lifecycle.authorize-and-audit-lifecycle-changes)
 
-**Requirement:** A lifecycle operation MUST apply its documented authorization. It records its audit as an audit record when the audit extension is selected, and as a standalone record otherwise.
+**Requirement:** A lifecycle operation MUST apply its documented authorization, recording its audit as an audit record when audit is selected and a standalone record otherwise.
 
 **Rationale:** Retention and deletion can have legal and business consequences.
 
@@ -125,7 +123,7 @@ This extension switches on the Limit record type.
 
 ### Record the release of a legal hold (standards/rule/ext-lifecycle.record-the-release-of-a-legal-hold)
 
-**Requirement:** The release of a legal hold MUST produce a record naming the actor, the data covered, the reason, and the retention that resumes. The record is an audit record when the audit extension is selected, and a standalone record otherwise.
+**Requirement:** A legal-hold release MUST record actor, data covered, reason, and resumed retention: an audit record when audit is selected, a standalone record otherwise.
 
 **Rationale:** A hold suspends an erasure obligation, so its release is the moment that obligation resumes. Without a record, nothing states when the suspension ended, and a subject's [erasure request](https://gdpr-info.eu/art-17-gdpr/) cannot be answered with a date. The release is also the point where data becomes deletable again, so the next retention run needs it to be unambiguous.
 
@@ -180,7 +178,7 @@ None.
 | standards/rule/ext-lifecycle.exclude-persistence-only-lifecycle-behavior | guidance | Is any lifecycle rule implemented only by storage behavior? |
 | standards/rule/ext-lifecycle.exclude-inactive-records-from-normal-reads | guidance | Do normal queries exclude deleted and archived records? |
 | standards/rule/ext-lifecycle.authorize-lifecycle-access-paths | guidance | Do administrative and restore queries use named authorized paths? |
-| standards/rule/ext-lifecycle.define-post-deletion-references | guidance | Does the specification define post-deletion references, exports, and uniqueness? |
+| standards/rule/ext-lifecycle.define-post-deletion-references | guidance | Does the specification state what post-deletion references, exports, and uniqueness remain? |
 | standards/rule/ext-lifecycle.define-storage-lifecycle-behavior | guidance | Does the document implementation define state, queries, indexes, and purge behavior? |
 | standards/rule/ext-lifecycle.define-relational-lifecycle-behavior | guidance | Does the relational implementation define columns, filters, indexes, and migrations? |
 | standards/rule/ext-lifecycle.test-provider-lifecycle-paths | guidance | Do tests cover normal and lifecycle query paths? |

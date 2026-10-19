@@ -21,13 +21,13 @@
       "rules": ["<The shape each value obeys>"]
     }
   ],
-  "results": [
+  "records": [
     {
       "type": "result",
       "id": "result/<use-case>.<name>",
       "title": "<Success display title>",
       "outcome": "success",
-      "status": "<HTTP status>",
+      "status": "<HTTP status, or remove this line when no HTTP entry point reaches this use case>",
       "meaning": "<The observable result in one sentence>"
     },
     {
@@ -36,11 +36,9 @@
       "title": "<Refusal display title>",
       "outcome": "refusal",
       "code": "failure/<module>.<reason>",
-      "status": "<HTTP status>",
+      "status": "<HTTP status, or remove this line when no HTTP entry point reaches this use case>",
       "meaning": "<What the caller sees in one sentence>"
-    }
-  ],
-  "cases": [
+    },
     {
       "type": "case",
       "id": "case/<use-case>.<name>",

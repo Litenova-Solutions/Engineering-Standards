@@ -1,4 +1,4 @@
-# Frontend testing
+# Frontend Testing
 
 ## Intent
 
@@ -45,7 +45,7 @@ Related rules live on other pages. `standards/rule/core-release.run-frontend-rel
 
 ### Prove a case by calling its use case (standards/rule/frontend-testing.prove-a-case-by-calling-its-use-case)
 
-**Requirement:** A test MUST prove a Case by calling the Case's use case in its steps and asserting the Case's Result. For a use case that moves money, a route test or evidence specification that reads MUST also submit and assert.
+**Requirement:** A test MUST prove a Case by calling its use case and asserting its Result, submitting a money-moving use case rather than only reading it.
 
 **Rationale:** Steps that call the use case and assert the Result let the model builder compute proof from the test body. A title tag claims proof without exercising anything. A use case that moves money and is only read has never shown it can complete.
 
@@ -87,7 +87,7 @@ await expect(refusalFor(page, "failure/orders.not_found")).toBeVisible({ timeout
 
 **Requirement:** A browser test MUST create or identify its own data, its own authentication context, and its own expected state.
 
-**Rationale:** A test depending on execution order or on leftover data fails for reasons unrelated to the change under review. A test MUST NOT spend a seeded record; it creates the record it needs.
+**Rationale:** A test depending on execution order or on leftover data fails for reasons unrelated to the change under review. A test spends no seeded record; it creates the record it needs.
 
 ### Prove the module mirror in a structure test (standards/rule/frontend-testing.prove-the-module-mirror-in-a-structure-test)
 

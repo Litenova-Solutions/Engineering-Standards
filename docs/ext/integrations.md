@@ -12,11 +12,9 @@ Applicable specification kinds: `use-case`, `rule`, `journey`.
 
 The consumer enables `integrations` for each use case that calls or publishes to an external service, receives a webhook, or uses a provider SDK.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces no baseline provision.
-
-## Switches on
 
 This extension switches on no optional record type.
 

@@ -12,7 +12,7 @@ Applicable specification kinds: `module`, `use-case`.
 
 The consumer enables `efcore` only after a decision records aggregate scope, relational requirement, data evolution effect, and the Marten baseline gap.
 
-## Replaces
+## Baseline relationship
 
 For Entity Framework Core-owned aggregate paths, this extension replaces:
 
@@ -24,12 +24,9 @@ For Entity Framework Core-owned aggregate paths, this extension replaces:
 For an EF Core-owned command with durable delivery, this extension also replaces:
 
 - `standards/rule/ext-outbox.stage-messages-with-business-work`
-- `standards/rule/ext-outbox.stage-messages-with-business-work`
 - `standards/rule/ext-outbox.reject-independent-outbox-commits`
 
 Every other baseline provision binds EF Core-owned paths unchanged.
-
-## Switches on
 
 This extension switches on no optional record type.
 
@@ -104,7 +101,7 @@ This extension switches on no optional record type.
 
 ### Define EF Core query roots (standards/rule/ext-efcore.define-ef-core-query-roots)
 
-**Requirement:** Application MUST own one public `IApplicationDbContext` exposing required generic sets or named query roots. Application MUST reference only the Entity Framework Core abstractions that interface needs.
+**Requirement:** Application MUST own one public `IApplicationDbContext` exposing required generic sets or named query roots, referencing only the Entity Framework Core abstractions that interface needs.
 
 **Rationale:** The interface defines the EF Core query boundary without exposing the Infrastructure DbContext. The permitted surface is the query types the interface exposes and the manifest-pinned `Microsoft.EntityFrameworkCore` package that declares them.
 
@@ -122,9 +119,9 @@ This extension switches on no optional record type.
 
 ### Project EF Core queries directly (standards/rule/ext-efcore.project-ef-core-queries-directly)
 
-**Requirement:** An EF Core query handler MUST use `AsNoTracking`, filter before materialization, apply deterministic ordering and limits, and project result records. A command MUST NOT enforce an invariant from a read projection.
+**Requirement:** An EF Core query handler MUST use `AsNoTracking`, filter before materialization, order and limit deterministically, and project records.
 
-**Rationale:** The implementation reads handlers return shaped results without loading mutable aggregate state.
+**Rationale:** The implementation reads handlers return shaped results without loading mutable aggregate state. No command enforces an invariant from a read projection.
 
 ### Avoid per-aggregate read stores (standards/rule/ext-efcore.avoid-per-aggregate-read-stores)
 
@@ -282,7 +279,7 @@ The previous release database is the schema of the last released artifact, not t
 
 ### Use snake-case relational names (standards/rule/ext-efcore.use-snake-case-relational-names)
 
-**Default:** Use the pinned naming-conventions package and verify generated names in each migration. `standards/rule/backend-persistence.use-database-naming-conventions` owns the casing.
+**Default:** Use the pinned naming-conventions package and verify generated names in each migration, with casing owned by `standards/rule/backend-persistence.use-database-naming-conventions`.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
 

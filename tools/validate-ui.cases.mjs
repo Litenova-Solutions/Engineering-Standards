@@ -116,7 +116,7 @@ function build() {
     'packages/ui/src/styles',
     'apps/web/src/routes',
     'apps/web/src/modules',
-    'docs/decisions',
+    'docs/exceptions',
     'standards/tools',
     'standards/schemas',
     'standards/patterns/ui',
@@ -169,7 +169,6 @@ function build() {
   fs.writeFileSync(tokensCss, cleanCss);
   fs.writeFileSync(appStyles, cleanAppStyles);
   fs.writeFileSync(appCase, 'export function Case() {\n  return <main>Orders</main>;\n}\n');
-  fs.writeFileSync(path.join(fixture, 'docs/decisions/ui-override.md'), '# Override\n');
 
   writeJson(path.join(packageRoot, 'components.json'), {
     style: 'base-nova',
@@ -254,6 +253,33 @@ function pathCase(name, relative, contents, expectation) {
   fs.writeFileSync(file, contents);
   report(name, expectation, run());
   fs.rmSync(file);
+}
+
+// An exception case writes one Exception record and expects one rule outcome.
+// The record carries the provision it departs from, the reason, the review
+// date, and the removal condition, which is the whole override mechanism.
+function writeException(name, standard, reviewBy) {
+  const file = path.join(fixture, 'docs/exceptions', `${name}.md`);
+  const meta = {
+    type: 'exception',
+    id: `exception/${name}`,
+    title: `Fixture exception ${name}`,
+    owner: 'fixture',
+    status: 'approved',
+    standard,
+    reason: 'The fixture needs this departure.',
+    reviewBy,
+    removeWhen: 'The fixture no longer needs it.',
+  };
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, `---\n${JSON.stringify(meta, null, 2)}\n---\n# Fixture exception ${name}\n`);
+  return file;
+}
+
+function exceptionCase(name, file, standard, reviewBy, expectation) {
+  const written = writeException(file, standard, reviewBy);
+  report(name, expectation, run());
+  fs.rmSync(written);
 }
 
 function lockCase(name, mutate, expectation) {
@@ -361,19 +387,39 @@ pathCase('a shared stylesheet carrying a literal colour', 'packages/ui/src/style
 pathCase('a shared stylesheet carrying a hex colour', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  color: #b9bbc6;\n}\n', "literal colour '#b9bbc6' belongs in the token stylesheet");
 
 console.log('\nSource boundary (standards/rule/frontend-ui.select-one-visual-authority)');
-manifestCase('second visual system in the workspace root', { dependencies: { '@mui/material': '7.0.0' } }, "second general-purpose visual dependency '@mui/material' requires an override");
-manifestCase('second visual system in optionalDependencies', { optionalDependencies: { bootstrap: '5.3.3' } }, "second general-purpose visual dependency 'bootstrap' requires an override");
-manifestCase('second visual system pinned through pnpm overrides', { pnpm: { overrides: { '@mantine/core': '8.0.0' } } }, "second general-purpose visual dependency '@mantine/core' requires an override");
-manifestCase('second visual system pinned through resolutions', { resolutions: { antd: '5.0.0' } }, "second general-purpose visual dependency 'antd' requires an override");
-configCase('UI override without a review date', (project) => {
-  project.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md' }];
-}, "a UI rule override requires 'reviewBy'");
-configCase('UI override with an expired review date', (project) => {
-  project.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md', reviewBy: '2020-01-01' }];
-}, 'has passed; renew the decision');
-configCase('UI override with a live review date', (project) => {
-  project.overrides = [{ provisionId: 'standards/rule/frontend-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
-}, null);
+manifestCase('second visual system in the workspace root', { dependencies: { '@mui/material': '7.0.0' } }, "second general-purpose visual dependency '@mui/material' requires an exception");
+manifestCase('second visual system in optionalDependencies', { optionalDependencies: { bootstrap: '5.3.3' } }, "second general-purpose visual dependency 'bootstrap' requires an exception");
+manifestCase('second visual system pinned through pnpm overrides', { pnpm: { overrides: { '@mantine/core': '8.0.0' } } }, "second general-purpose visual dependency '@mantine/core' requires an exception");
+manifestCase('second visual system pinned through resolutions', { resolutions: { antd: '5.0.0' } }, "second general-purpose visual dependency 'antd' requires an exception");
+exceptionCase('UI exception with an expired review date', 'ui-authority', 'standards/rule/frontend-ui.select-one-visual-authority', '2020-01-01', "[standards/rule/frontend-ui.select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision");
+exceptionCase('UI exception with a live review date', 'ui-authority', 'standards/rule/frontend-ui.select-one-visual-authority', '2099-01-01', null);
+exceptionCase('exception against another area stays unread by the UI validator', 'other-area', 'standards/rule/core-agent.select-task-context', '2020-01-01', null);
+{
+  // The exceptions folder moves with paths.records.exception when the consumer
+  // sets it. The record below lives outside the default folder and still
+  // expires.
+  const originalProject = fs.readFileSync(projectFile, 'utf8');
+  const project = JSON.parse(originalProject);
+  project.paths.records = { exception: 'docs/departures' };
+  writeJson(projectFile, project);
+  const file = path.join(fixture, 'docs/departures', 'moved.md');
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const meta = {
+    type: 'exception',
+    id: 'exception/moved',
+    title: 'Moved exception',
+    owner: 'fixture',
+    status: 'approved',
+    standard: 'standards/rule/frontend-ui.select-one-visual-authority',
+    reason: 'The fixture needs this departure.',
+    reviewBy: '2020-01-01',
+    removeWhen: 'The fixture no longer needs it.',
+  };
+  fs.writeFileSync(file, `---\n${JSON.stringify(meta, null, 2)}\n---\n# Moved exception\n`);
+  report('exceptions folder set through paths.records.exception', "[standards/rule/frontend-ui.select-one-visual-authority] docs/departures/moved.md: review date 2020-01-01 has passed; renew the decision", run());
+  fs.rmSync(path.join(fixture, 'docs/departures'), { recursive: true, force: true });
+  fs.writeFileSync(projectFile, originalProject);
+}
 
 console.log('\nShared package (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
 configCase('a controlled frontend with no shared package', (project) => {
@@ -409,21 +455,18 @@ console.log('\nAdditional registries (standards/rule/frontend-ui.pin-the-baselin
   const componentsFile = path.join(packageRoot, 'components.json');
   const originalComponents = fs.readFileSync(componentsFile, 'utf8');
   const originalLock = fs.readFileSync(lockFile, 'utf8');
-  const originalProject = fs.readFileSync(projectFile, 'utf8');
   const components = JSON.parse(originalComponents);
   components.registries = { '@fixture/blocks': 'https://blocks.fixture.test/r' };
   fs.writeFileSync(componentsFile, JSON.stringify(components, null, 2));
   const lock = JSON.parse(originalLock);
   lock.registry = { name: 'fixture', url: 'https://blocks.fixture.test' };
   fs.writeFileSync(lockFile, JSON.stringify(lock, null, 2));
-  const withOverride = JSON.parse(originalProject);
-  withOverride.overrides = [{ provisionId: 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
-  fs.writeFileSync(projectFile, JSON.stringify(withOverride, null, 2));
-  report('an additional registry with the override passes both gates', null, run());
-  fs.writeFileSync(projectFile, originalProject);
+  const exceptionPath = writeException('extra-registry', 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package', '2099-01-01');
+  report('an additional registry with the exception passes both gates', null, run());
+  fs.rmSync(exceptionPath);
   const output = run();
-  report('the configuration gate refuses without the override', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: an additional registry requires an override decision", output);
-  report('the source-lock gate refuses without the override', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: registry 'fixture' is not the built-in shadcn registry", output);
+  report('the configuration gate refuses without the exception', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: an additional registry requires an exception", output);
+  report('the source-lock gate refuses without the exception', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: registry 'fixture' is not the built-in shadcn registry", output);
   fs.writeFileSync(componentsFile, originalComponents);
   fs.writeFileSync(lockFile, originalLock);
 }
@@ -482,17 +525,17 @@ catalogCase('a pattern naming no catalog group', (catalog) => {
   catalog.patterns[0].group = 'no-such-group';
 }, "pattern 'orders-list-page': group 'no-such-group' is not one of the catalog groups");
 catalogCase('a component path that does not exist', (catalog) => {
-  catalog.patterns[0].implementations['react-web'].components = ['packages/ui/src/floorplans/no-such.tsx'];
-}, "pattern 'orders-list-page': implementations.react-web.components[0] does not exist 'packages/ui/src/floorplans/no-such.tsx'");
+  catalog.patterns[0].implementations.react.components = ['packages/ui/src/floorplans/no-such.tsx'];
+}, "pattern 'orders-list-page': implementations.react.components[0] does not exist 'packages/ui/src/floorplans/no-such.tsx'");
 catalogCase('an adopted status with no components', (catalog) => {
-  delete catalog.patterns[0].implementations['react-web'].components;
-}, "pattern 'orders-list-page': implementations.react-web has status 'adopted' with no components");
+  delete catalog.patterns[0].implementations.react.components;
+}, "pattern 'orders-list-page': implementations.react has status 'adopted' with no components");
 catalogCase('a partial status with no gap', (catalog) => {
-  catalog.patterns[0].implementations['react-web'] = { status: 'partial' };
-}, "pattern 'orders-list-page': implementations.react-web has status 'partial' with no gap");
+  catalog.patterns[0].implementations.react = { status: 'partial' };
+}, "pattern 'orders-list-page': implementations.react has status 'partial' with no gap");
 catalogCase('a pending status with no gap', (catalog) => {
-  catalog.patterns[0].implementations['react-web'] = { status: 'pending' };
-}, "pattern 'orders-list-page': implementations.react-web has status 'pending' with no gap");
+  catalog.patterns[0].implementations.react = { status: 'pending' };
+}, "pattern 'orders-list-page': implementations.react has status 'pending' with no gap");
 catalogCase('two patterns sharing one id', (catalog) => {
   catalog.patterns[1].id = catalog.patterns[0].id;
 }, "duplicate pattern id 'orders-list-page'");
@@ -522,9 +565,9 @@ pathCase('a svelte class directive is read as one token', 'apps/web/src/modules/
 pathCase('a svelte style attribute is an inline style', 'apps/web/src/modules/orders/styled.svelte', '<div style="color: red">Overdue</div>\n', 'an inline style belongs in a shared component');
 pathCase('a svelte style directive is an inline style', 'apps/web/src/modules/orders/styled-directive.svelte', '<div style:color={ink}>Overdue</div>\n', 'an inline style belongs in a shared component');
 pathCase('a svelte style block is not an inline style', 'apps/web/src/modules/orders/scoped.svelte', '<style>\n  .scoped {\n    color: red;\n  }\n</style>\n<div class="scoped">Overdue</div>\n', null);
-manifestCase('second svelte visual system in the workspace root', { dependencies: { 'flowbite-svelte': '1.33.1' } }, "second general-purpose visual dependency 'flowbite-svelte' requires an override");
+manifestCase('second svelte visual system in the workspace root', { dependencies: { 'flowbite-svelte': '1.33.1' } }, "second general-purpose visual dependency 'flowbite-svelte' requires an exception");
 
-console.log('\nSvelte baseline (standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package, standards/rule/svelte-ui.track-source-changes, standards/rule/svelte-ui.select-one-visual-authority, standards/rule/svelte-components.compose-composites-in-page-code)');
+console.log('\nSvelte baseline (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package, standards/rule/frontend-ui.track-source-changes, standards/rule/frontend-ui.select-one-visual-authority, standards/rule/frontend-components.compose-composites-in-page-code)');
 {
   const componentsFile = path.join(packageRoot, 'components.json');
   const originalComponents = fs.readFileSync(componentsFile, 'utf8');
@@ -553,15 +596,15 @@ console.log('\nSvelte baseline (standards/rule/svelte-ui.pin-the-baseline-in-the
   };
   asSvelte();
   report('a svelte package validates against the svelte baseline', null, run());
-  pathCase('a svelte application importing the primitive library', 'apps/web/src/routes/bits.svelte', '<script>\nimport { Dialog } from "bits-ui";\n</script>\n<Dialog />\n', "[standards/rule/svelte-components.compose-composites-in-page-code] apps/web/src/routes/bits.svelte: imports the primitive library directly");
+  pathCase('a svelte application importing the primitive library', 'apps/web/src/routes/bits.svelte', '<script>\nimport { Dialog } from "bits-ui";\n</script>\n<Dialog />\n', "[standards/rule/frontend-components.compose-composites-in-page-code] apps/web/src/routes/bits.svelte: imports the primitive library directly");
   pathCase('a svelte application importing the react primitive library is outside its boundary', 'apps/web/src/routes/shim.svelte', '<script>\nimport { Dialog } from "@base-ui/react/dialog";\n</script>\n', null);
   pathCase('a svelte application importing a table library', 'apps/web/src/routes/table.svelte', '<script>\nimport { flexRender } from "@tanstack/svelte-table";\n</script>\n', 'imports the table library directly');
-  pathCase('a svelte utility violation cites the svelte provision', 'packages/ui/src/floorplans/card.svelte', '<div class="text-red-500">Overdue</div>\n', "[standards/rule/svelte-ui.restrict-css-decisions] packages/ui/src/floorplans/card.svelte: raw Tailwind palette value requires a semantic token 'text-red-500'");
+  pathCase('a svelte utility violation cites the svelte provision', 'packages/ui/src/floorplans/card.svelte', '<div class="text-red-500">Overdue</div>\n', "[standards/rule/frontend-ui.restrict-css-decisions] packages/ui/src/floorplans/card.svelte: raw Tailwind palette value requires a semantic token 'text-red-500'");
   {
     const lock = readJson(lockFile);
     lock.preset.baseColor = 'slate';
     writeJson(lockFile, lock);
-    report('a svelte source lock describing a preset the manifest does not pin', "[standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: preset.baseColor does not match the manifest baseline", run());
+    report('a svelte source lock describing a preset the manifest does not pin', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: preset.baseColor does not match the manifest baseline", run());
     asSvelte();
   }
   {
@@ -582,7 +625,7 @@ console.log('\nSvelte baseline (standards/rule/svelte-ui.pin-the-baseline-in-the
     const components = readJson(componentsFile);
     components.tailwind.baseColor = 'slate';
     writeJson(componentsFile, components);
-    report('svelte components.json naming a base colour the baseline does not pin', "[standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: tailwind.baseColor must be 'neutral'", run());
+    report('svelte components.json naming a base colour the baseline does not pin', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: tailwind.baseColor must be 'neutral'", run());
     asSvelte();
   }
   {
@@ -590,17 +633,15 @@ console.log('\nSvelte baseline (standards/rule/svelte-ui.pin-the-baseline-in-the
     components.registry = 'https://blocks.fixture.test';
     writeJson(componentsFile, components);
     report('svelte components.json naming another registry', "registry 'https://blocks.fixture.test' is not the built-in shadcn-svelte registry", run());
-    const project = readJson(projectFile);
-    project.overrides = [{ provisionId: 'standards/rule/svelte-ui.pin-the-baseline-in-the-shared-package', decision: 'docs/decisions/ui-override.md', reviewBy: '2099-01-01' }];
-    writeJson(projectFile, project);
-    report('a svelte registry override carries the svelte provision', null, run());
+    const exceptionPath = writeException('extra-registry', 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package', '2099-01-01');
+    report('a svelte registry exception carries the frontend provision', null, run());
+    fs.rmSync(exceptionPath);
     asSvelte();
   }
   {
-    const project = readJson(projectFile);
-    project.overrides = [{ provisionId: 'standards/rule/svelte-ui.select-one-visual-authority', decision: 'docs/decisions/ui-override.md' }];
-    writeJson(projectFile, project);
-    report('a svelte UI override without a review date', "[standards/rule/svelte-ui.select-one-visual-authority] override 'standards/rule/svelte-ui.select-one-visual-authority': a UI rule override requires 'reviewBy'", run());
+    const exceptionPath = writeException('ui-authority', 'standards/rule/frontend-ui.select-one-visual-authority', '2020-01-01');
+    report('a svelte UI exception with an expired review date', "[standards/rule/frontend-ui.select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision", run());
+    fs.rmSync(exceptionPath);
     asSvelte();
   }
   fs.writeFileSync(componentsFile, originalComponents);

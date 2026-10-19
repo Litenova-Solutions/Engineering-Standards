@@ -7,12 +7,12 @@
 ## Synopsis
 
 ```bash
-node tools/generate-provisions.mjs [repositoryRoot] [--check]
+node tools/generate-provisions.mjs [repositoryRoot] [--check] [--help]
 ```
 
 ## Description
 
-`docs/reference/provisions.md` is derived from the active standards. This command rebuilds it, so a citation reaches its heading in one step.
+`docs/reference/provisions.md` is derived from the active standards. This command rebuilds it, so a citation reaches its heading in one step. The page carries each provision with its verification mark and its evidence.
 
 Run it after adding, renaming, or removing a provision. A hand edit is overwritten on the next run.
 
@@ -35,6 +35,7 @@ Run it after adding, renaming, or removing a provision. A hand edit is overwritt
 |:---|:---|
 | `0` | The page was written, or `--check` found it current. |
 | `1` | `--check` found the page stale. |
+| `2` | The usage is invalid. |
 
 ## Examples
 

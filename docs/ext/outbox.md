@@ -14,11 +14,9 @@ The consumer enables `outbox` when a committed change requires durable delivery 
 
 A use case that stages a durable message selects this extension. The extension activates `standards/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request`, so the project declares the execution host that runs the dispatcher.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces `standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work`.
-
-## Switches on
 
 This extension switches on the Event, Limit, and Runbook record types.
 
@@ -39,9 +37,9 @@ This extension switches on the Event, Limit, and Runbook record types.
 
 ### Record durable delivery behavior (standards/rule/ext-outbox.record-durable-delivery-behavior)
 
-**Requirement:** A durable-delivery specification MUST document delivery guarantee, downstream boundary, duplicate behavior, retry horizon, and recovery owner. The record names its owner and status, and a draft names its decider and decide-by date.
+**Requirement:** A durable-delivery specification MUST document delivery guarantee, downstream boundary, duplicate behavior, retry horizon, recovery owner, record owner, and status.
 
-**Rationale:** The specification defines the expected delivery behavior before a message record exists.
+**Rationale:** The specification defines the expected delivery behavior before a message record exists. A draft names its decider and decide-by date.
 
 ### Exclude manually repeatable reactions (standards/rule/ext-outbox.exclude-manually-repeatable-reactions)
 
@@ -81,7 +79,7 @@ This extension switches on the Event, Limit, and Runbook record types.
 
 ### Classify message kinds (standards/rule/ext-outbox.classify-message-kinds)
 
-**Requirement:** An outbox record MUST name its message kind as integration event, journey-step command, or provider side effect. An integration event cites its Event record.
+**Requirement:** An outbox record MUST name its message kind as integration event, journey-step command, or provider side effect, with an integration event citing its Event record.
 
 **Rationale:** The kind decides dispatch ownership and transport, and the Event record carries the raises and reacts-to links.
 
@@ -225,7 +223,7 @@ A message record therefore carries its own shape version, and the dispatcher sel
 
 ### Audit outbox replay (standards/rule/ext-outbox.audit-outbox-replay)
 
-**Requirement:** An outbox replay MUST record actor, reason, time, and previous failure without editing the original payload. The replay record is an audit record when the audit extension is selected, and a standalone record otherwise.
+**Requirement:** An outbox replay MUST record actor, reason, time, and failure without editing the payload: an audit record when audit is selected, a standalone record otherwise.
 
 **Rationale:** Replay history preserves message evidence and explains a renewed dispatch attempt.
 

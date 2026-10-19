@@ -1,4 +1,4 @@
-# Frontend structure
+# Frontend Structure
 
 ## Intent
 
@@ -6,12 +6,13 @@ A frontend holds three parts: a frame, routes, and use-case modules. The frame h
 
 The module tree mirrors the backend's Application tree in kebab case. A reader holding a use case specification then finds the frontend code that serves it without a second map.
 
-## Agent summary {#agent-summary}
+## Agent Summary {#agent-summary}
 
 - A frame, routes, and modules sit under `src`, each with one job. (standards/rule/frontend-structure.use-the-frontend-application-tree)
 - A module path resolves to a backend use case folder. (standards/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case)
 - A shared file sits in the narrowest folder holding every reader. (standards/rule/frontend-structure.place-a-shared-file-in-the-folder-that-owns-it)
 - A folder named for nothing is refused. (standards/rule/frontend-structure.reject-a-folder-name-that-owns-nothing)
+- React refuses `lib` and Svelte refuses `stores` under `src/lib`. (standards/rule/frontend-structure.refuse-stack-specific-folder-names)
 - A route file composes and imports no other route. (standards/rule/frontend-structure.keep-a-route-file-thin)
 - Browser APIs belong to the frame. (standards/rule/frontend-structure.locate-the-frame-in-the-app-folder)
 - One visual authority serves every frontend. (standards/rule/frontend-structure.keep-shared-packages-non-application-specific)
@@ -100,11 +101,17 @@ apps/admin/src/modules/orders/orders/search-merchant-orders/
 
 ### Reject a folder name that owns nothing (standards/rule/frontend-structure.reject-a-folder-name-that-owns-nothing)
 
-**Requirement:** A folder under `src` MUST NOT be named `shared`, `common`, `utils`, `util`, `helpers`, `misc`, `components`, `hooks`, `types`, or `services`. A React folder MUST also NOT be named `lib`, and a Svelte folder under `src/lib` MUST also NOT be named `stores`.
+**Requirement:** A folder under `src` MUST NOT be named `shared`, `common`, `utils`, `util`, `helpers`, `misc`, `components`, `hooks`, `types`, or `services`.
 
-**Rationale:** A folder with one of these names can refuse nothing, so it collects everything and nothing in it is reviewed against a use case. `lib` is refused on React because the frame lives in `src/app`, so a `lib` folder would be a second frame. `stores` is refused on Svelte because shared state belongs in the frame or beside its readers, not in one store folder.
+**Rationale:** A folder with one of these names can refuse nothing, so it collects everything and nothing in it is reviewed against a use case.
 
 **Example:** A shared query three use cases read sits flat in the aggregate folder, not in a `shared/` folder beside them.
+
+### Refuse stack-specific folder names (standards/rule/frontend-structure.refuse-stack-specific-folder-names)
+
+**Requirement:** A React folder MUST NOT be named `lib`, nor a Svelte folder under `src/lib` be named `stores`.
+
+**Rationale:** `lib` is refused on React because the frame lives in `src/app`, so a `lib` folder would be a second frame. `stores` is refused on Svelte because shared state belongs in the frame or beside its readers, not in one store folder.
 
 ### Keep a route file thin (standards/rule/frontend-structure.keep-a-route-file-thin)
 
@@ -168,7 +175,7 @@ A module cannot import a route. A shared package cannot import an application. A
 
 ### Locate the frame in the app folder (standards/rule/frontend-structure.locate-the-frame-in-the-app-folder)
 
-**Requirement:** A frontend MUST place its cross-route values in the frame folder its stack section states. Those values are the client configuration, the session read, the language choice, the permissions, the formatting, and the shell data.
+**Requirement:** A frontend MUST place cross-route values in the frame folder its stack section states: client configuration, session read, language choice, permissions, formatting, and shell data.
 
 **Rationale:** These values cross every route, so a route holding one of them holds it twice with two copies to keep equal. A browser API reached from a use-case module belongs here as well, because a module renders and reads data rather than touching the device.
 
@@ -219,6 +226,7 @@ A search use case folder holds its query definition and its table. The aggregate
 | standards/rule/frontend-structure.keep-a-use-case-folder-flat | guidance | Does each use-case folder hold files and no subfolder? |
 | standards/rule/frontend-structure.place-a-shared-file-in-the-folder-that-owns-it | guidance | Does each shared file sit in the narrowest folder holding every reader? |
 | standards/rule/frontend-structure.reject-a-folder-name-that-owns-nothing | guidance | Does any folder carry a refused name? |
+| standards/rule/frontend-structure.refuse-stack-specific-folder-names | guidance | Does any React folder take the name `lib`, or any Svelte folder under `src/lib` the name `stores`? |
 | standards/rule/frontend-structure.keep-a-route-file-thin | guidance | Does each route file hold only its input, its load, and its component? |
 | standards/rule/frontend-structure.keep-imports-directional | guidance | Does every import follow the route to module to frame to package direction? |
 | standards/rule/frontend-structure.keep-applications-independent | guidance | Does any frontend import source from another frontend? |

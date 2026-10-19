@@ -1,4 +1,4 @@
-# Get started
+# Get Started
 
 ## Purpose
 
@@ -16,7 +16,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 ## Lesson
 
 1. Pin the standards release. Add the standards repository as a submodule or another pinned dependency. This satisfies `standards/rule/workspace-structure.use-the-canonical-root-tree`.
-2. Copy the project configuration. Copy `standards.project.json` and `project-agents.md` from the [template index](../../templates/consumer/README.md). Fill every placeholder and name every owner. Set `size` to `small`, list `dotnet` plus one platform per frontend under `stacks`, and set `reviewedStandardsVersion` to the pinned release. This satisfies `standards/rule/core-scope.select-size-profile-and-stacks`.
+2. Copy the project configuration. Copy `standards.project.json` and `project-agents.md` from the [template index](../../templates/consumer/README.md). Fill every placeholder and name every owner. Set `size` to `small`, list `dotnet` plus one platform per frontend under `stacks`, and set `reviewedStandardsVersion` to the pinned release. This satisfies `standards/rule/core-scope.select-a-size-profile-and-stacks`.
 3. Select extensions only when their criteria already hold. Write each selection in the object form with its criterion and review date. This satisfies `standards/rule/core-scope.select-conditional-extensions-explicitly` and `standards/rule/core-scope.record-selected-extensions`.
 4. Create the toolchain configuration from the manifest pins. Add the SDK pin, the shared build settings, the central NuGet versions, the tool manifest, and the JavaScript toolchain pin. This satisfies `standards/rule/workspace-config.pin-the-sdk-at-the-workspace-root`, `standards/rule/workspace-config.centralize-net-build-settings`, `standards/rule/workspace-config.centralize-nuget-versions`, `standards/rule/workspace-config.commit-the-tool-manifest`, and `standards/rule/workspace-config.pin-the-javascript-toolchain`.
 5. Add only the packages the manifest already pins. Record each new package approval explicitly. This satisfies `standards/rule/workspace-dependencies.pin-every-dependency-centrally` and `standards/rule/workspace-dependencies.approve-new-packages-explicitly`.
@@ -27,8 +27,8 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 10. State which constraints apply. Write one constraint record per outside rule, or record that none applies, and set `constraints.answered` to true. The `standards.project.json` template defines the fields.
 11. Record the first decision. Copy `decision.md` from the template index. Name the options, the decider, and what would change the choice. This satisfies `standards/rule/core-product.record-each-product-choice-as-a-decision` and `standards/rule/core-product.trace-every-choice-to-a-decision`.
 12. Write the people records. Add one actor page per party, one role page per grantable set, and the permission entries on the permissions page. Each use case later names the permissions it needs. The `actor.md`, `role.md`, and `permission-list.md` templates define the fields.
-13. Write the module and its business records. Follow [Model a domain module](model-domain.md) for the module, the rules, the use cases with their results and cases, the events, and the permissions. This satisfies `standards/rule/core-system.group-language-and-use-cases-by-module`.
-14. Implement one use case. Express the transition through a business method, keep the handler narrow, commit once in the command pipeline, expose one endpoint, and authorize the target. This satisfies `standards/rule/backend-domain.express-transitions-through-business-methods`, `standards/rule/backend-application.keep-command-handlers-narrow`, `standards/rule/backend-persistence.commit-once-in-the-command-pipeline`, `standards/rule/backend-api.use-one-endpoint-per-operation`, and `standards/rule/quality-security.authorize-each-target-resource`.
+13. Write the module and its business records. Follow [Model a domain module](model-domain.md) for the module, the rules, the use cases, the events, and the permissions. This satisfies `standards/rule/core-system.group-language-and-use-cases-by-module`.
+14. Implement one use case. Move the transition into a business method, keep the handler narrow, commit once, expose one endpoint, and authorize the target. This satisfies `standards/rule/backend-domain.express-transitions-through-business-methods`, `standards/rule/backend-application.keep-command-handlers-narrow`, `standards/rule/backend-persistence.commit-once-in-the-command-pipeline`, `standards/rule/backend-api.use-one-endpoint-per-operation`, and `standards/rule/quality-security.authorize-each-target-resource`.
 15. Declare each frontend. Run the row that matches the platform in `standards.project.json`.
 
     | Platform | Structure step | UI step |

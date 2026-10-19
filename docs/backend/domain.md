@@ -8,20 +8,16 @@ Every aggregate exposes its lifecycle as state records from its first implementa
 
 ## Agent Summary {#agent-summary}
 
-- Domain references only the base class library and its own types. (standards/rule/backend-domain.keep-domain-free-of-outer-layer-concerns)
-- Domain names match the Terms the records use. (standards/rule/backend-domain.use-one-ubiquitous-language)
-- The aggregate root is the only public mutation entry point. (standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries)
+- Domain references only the base class library, and names match the Terms the records use. (standards/rule/backend-domain.keep-domain-free-of-outer-layer-concerns, standards/rule/backend-domain.use-one-ubiquitous-language)
+- The aggregate root is the only public mutation entry point, with children changing only through it and read-only collections. (standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries, standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary)
 - Every aggregate root derives from the one project base. (standards/rule/backend-domain.use-the-project-aggregate-root-contract)
-- Lifecycle uses an abstract state base with sealed case records. (standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records)
-- Closed sets are record hierarchies with stable codes, never enums. (standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
+- Lifecycle uses an abstract state base with sealed case records, and closed sets are hierarchies with stable codes. (standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records, standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
 - Aggregates are created through named static factories only. (standards/rule/backend-domain.create-valid-aggregates-through-named-factories)
 - Mutations check state; transitions also replace state and record events. (standards/rule/backend-domain.express-transitions-through-business-methods)
-- Children change only through their root, and collections are read-only. (standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary)
 - Identifiers are typed record structs over version 7 GUIDs. (standards/rule/backend-domain.use-strongly-typed-version-7-identifiers)
 - Money is one value object with decimal amount and currency code. (standards/rule/backend-domain.make-money-and-decimal-rules-explicit)
 - Time, randomness, and identifiers arrive as arguments; Domain reads no clock. (standards/rule/backend-domain.pass-nondeterministic-values-into-domain)
-- Each rejected rule throws its own exception type with a stable code. (standards/rule/backend-domain.reject-business-violations-with-domain-exceptions)
-- Domain events carry business data only; envelope identity lives outside. (standards/rule/backend-domain.raise-immutable-domain-facts)
+- Each rejected rule throws its own exception type, and domain events carry business data only. (standards/rule/backend-domain.reject-business-violations-with-domain-exceptions, standards/rule/backend-domain.raise-immutable-domain-facts)
 
 ## Standards
 
@@ -51,7 +47,7 @@ Every aggregate exposes its lifecycle as state records from its first implementa
 
 ### Model every Aggregate lifecycle with state records (standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records)
 
-**Requirement:** An aggregate MUST expose one `State` property backed by an abstract `{Aggregate}State` record and sealed per-state records. Callers read lifecycle only through that property.
+**Requirement:** An aggregate MUST expose its lifecycle only through one `State` property backed by an abstract `{Aggregate}State` record with sealed per-state records.
 
 **Rationale:** An enum, string discriminator, boolean flag, parallel nullable field, or computed state cannot carry state-specific data or prove exhaustiveness. State records hold that data, and aggregate methods own the transitions.
 
@@ -76,9 +72,9 @@ public sealed record ProfileActiveState : ProfileState;
 
 ### Model every closed set of domain values without enums (standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
 
-**Requirement:** The Domain project MUST model every closed set as an abstract record base with sealed cases rather than an `enum`. Every case MUST expose one stable `Code`. A set whose cases carry no data MUST expose a `FromCode` factory that rebuilds every case from its label. A boundary converts a label to its case through `FromCode`, never through `ToString`. An unrecognized label is a validation failure rather than a default case.
+**Requirement:** The Domain project MUST model every closed set as an abstract record base with sealed cases exposing one stable `Code`, converting labels through `FromCode`.
 
-**Rationale:** An enum is a named integer. It carries no case data, admits undefined values through a cast, and forces parallel fields when a case later gains data. A closed hierarchy lets the compiler check exhaustiveness.
+**Rationale:** An enum is a named integer. It carries no case data, admits undefined values through a cast, and forces parallel fields when a case later gains data. A closed hierarchy lets the compiler check exhaustiveness. A boundary converts a label to its case through `FromCode`, never through `ToString`. An unrecognized label is a validation failure rather than a default case.
 
 **Example:**
 
@@ -201,7 +197,7 @@ public sealed class Order : AggregateRoot<OrderId>
 
 ### Express transitions through business methods (standards/rule/backend-domain.express-transitions-through-business-methods)
 
-**Requirement:** A public aggregate mutation method MUST check current state and protect its invariants. A method that moves the lifecycle MUST also replace state and record its transition event.
+**Requirement:** A public aggregate mutation method MUST check current state and protect its invariants, replacing state and recording its transition event when it moves the lifecycle.
 
 **Rationale:** A handler then calls `post.Publish(utcNow)` without testing the state first. A generic `Set`, `Update`, `Process`, or `Handle` name hides which business action ran. A mutation that changes no lifecycle state, such as `ChangeTitle` on a draft, checks state and assigns without recording a transition.
 
@@ -215,7 +211,7 @@ Checks run before replacement, and replacement runs before recording. A method t
 
 ### Use strongly typed version 7 identifiers (standards/rule/backend-domain.use-strongly-typed-version-7-identifiers)
 
-**Requirement:** An aggregate identity MUST be a `readonly record struct` wrapping one `Guid` in version 7 form. It MUST declare no implicit conversion, no primitive alias, and no public parameterless creation path.
+**Requirement:** An aggregate identity MUST be a `readonly record struct` wrapping one version 7 `Guid`, declaring no implicit conversion, primitive alias, or public parameterless creation path.
 
 **Rationale:** It implements the project `IStronglyTypedId` marker and `IParsable<TId>`, rejects `Guid.Empty`, and each factory also rejects the struct default. New values arrive from the caller: a factory takes its identifier as an argument. A method that needs several identifiers takes a generator as an argument. Domain reads no clock and calls no static source of time or randomness.
 
@@ -347,7 +343,7 @@ The example treats tag order as meaningful. If order is irrelevant, creation nor
 
 ### Make money and decimal rules explicit (standards/rule/backend-domain.make-money-and-decimal-rules-explicit)
 
-**Requirement:** A monetary amount MUST use `decimal` inside one shared `Money` value object that carries an ISO 4217 currency code. `Money` MUST serialize as `{ "amount": "12.50", "currency": "EUR" }`.
+**Requirement:** A monetary amount MUST use `decimal` inside one shared `Money` value object carrying an ISO 4217 currency code and serializing as `{ "amount": "12.50", "currency": "EUR" }`.
 
 **Rationale:** The owning module record defines supported currencies, scale, rounding, sign rules, and cross-currency arithmetic. Infrastructure maps that precision explicitly. A use case fixed to one currency accepts an amount alone and states that currency in its record.
 
@@ -414,7 +410,7 @@ Application supplies the lines and passes the returned `Money` to `Order.Confirm
 
 ### Keep repository interfaces in Domain (standards/rule/backend-domain.keep-repository-interfaces-in-domain)
 
-**Requirement:** A repository interface MUST expose only aggregate and Domain types, without `IQueryable`, a session, or a generic CRUD surface. Each repository MUST serve exactly one aggregate root.
+**Requirement:** A repository interface MUST expose only aggregate and Domain types for exactly one aggregate root, without `IQueryable`, a session, or a generic CRUD surface.
 
 **Rationale:** A required load uses `GetByIdAsync` and throws `{Aggregate}NotFoundException`, so a handler repeats no null check. A nullable `FindBy...Async` is reserved for lookups where absence is normal.
 
@@ -446,9 +442,9 @@ public async Task<Post> GetByIdAsync(PostId id, CancellationToken cancellationTo
 
 ### Raise immutable domain facts (standards/rule/backend-domain.raise-immutable-domain-facts)
 
-**Requirement:** A domain event MUST be a public immutable record named `{Aggregate}{PastFact}Event` implementing `IDomainEvent`. It MUST carry business data only: typed identifiers and the values its reactions need.
+**Requirement:** A domain event MUST be a public immutable record named `{Aggregate}{PastFact}Event` implementing `IDomainEvent` and carrying business data only.
 
-**Rationale:** The name states which aggregate raised the fact without opening the file. The event carries no aggregate, session, service, mutable collection, or exception. Envelope identity, such as message identity and causation identity, lives on the published integration event that carries the fact outside the process.
+**Rationale:** The name states which aggregate raised the fact without opening the file. The event carries no aggregate, session, service, mutable collection, or exception. Envelope identity, such as message identity and causation identity, lives on the published integration event that carries the fact outside the process. Business data means typed identifiers and the values its reactions need.
 
 ### Reject business violations with Domain exceptions (standards/rule/backend-domain.reject-business-violations-with-domain-exceptions)
 
@@ -502,7 +498,7 @@ Application validators handle malformed caller input through validation errors. 
 
 ### Pass nondeterministic values into Domain (standards/rule/backend-domain.pass-nondeterministic-values-into-domain)
 
-**Requirement:** Domain behavior MUST receive time, randomness, and new identifiers as arguments rather than read them. Domain MUST NOT read a clock.
+**Requirement:** Domain behavior MUST receive time, randomness, and new identifiers as arguments rather than read them, and read no clock.
 
 **Rationale:** Application obtains each value through an owned port and passes it in, so a Domain test supplies an explicit value and stays deterministic. A method that needs more than one value receives a clock or a generator through its arguments. Version 7 identifiers come from the caller-supplied generator.
 

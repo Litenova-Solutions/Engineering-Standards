@@ -18,17 +18,15 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 Activation scope: `project`.
 
-Applicable record types: None.
+Applicable specification kinds: None.
 
 The consumer enables `audit` when a person or a machine acts inside data that another party owns, and a later reviewer must establish accountability. Regulatory obligation, customer contract, payment scope, and platform-side support access each meet this condition.
 
 [Audit obligations](../reference/audit-obligations.md) maps each provision on this page to the external obligation it satisfies.
 
-## Replaces
+## Baseline relationship
 
 This extension replaces `standards/rule/quality-security.record-security-audit-events`. The baseline states the required record fields for one security audit event. This extension owns the producer, the transaction boundary, the selection policy, the store, and the read path.
-
-## Switches on
 
 This extension switches on no optional record type.
 
@@ -49,9 +47,9 @@ This extension switches on no optional record type.
 
 ### Record the audit adoption decision (standards/rule/ext-audit.record-the-audit-adoption-decision)
 
-**Requirement:** An audit adoption decision MUST record its owner, status, decider, and decide-by. It MUST record the audited categories with the retention period and lawful basis of each. It MUST record the bulk-read threshold, the read access model, the integrity method, and the processing-records entry.
+**Requirement:** An audit adoption decision MUST record its owner, status, decider, decide-by, audited categories, threshold, access model, integrity method, and records entry.
 
-**Rationale:** The selection, its retention, and its protection are policy choices. A reviewer evaluates the declared policy before evaluating the implementation. No record is approved while this decision is draft.
+**Rationale:** The selection, its retention, and its protection are policy choices. A reviewer evaluates the declared policy before evaluating the implementation. No record is approved while this decision is draft. Each audited category carries its retention period and lawful basis. The decision records the bulk-read threshold, the read access model, the integrity method, and the processing-records entry.
 
 ### Declare audit selection on every Command (standards/rule/ext-audit.declare-audit-selection-on-every-command)
 
@@ -97,9 +95,9 @@ This extension switches on no optional record type.
 
 ### Record the required audit fields (standards/rule/ext-audit.record-the-required-audit-fields)
 
-**Requirement:** An audit record MUST contain actor kind, actor identity, action, target kind, target identity, outcome, business time, record time, and tenant. A project without the tenancy extension records a fixed tenant value.
+**Requirement:** An audit record MUST contain actor, action, target, outcome, business time, record time, and tenant, fixed where the tenancy extension is absent.
 
-**Rationale:** These fields carry the accountability question. Business time states when the action happened, and record time states when the evidence was written.
+**Rationale:** These fields carry the accountability question. Business time states when the action happened, and record time states when the evidence was written. Actor and target each carry kind and identity.
 
 ### State the action as use-case identity (standards/rule/ext-audit.state-the-action-as-use-case-identity)
 
@@ -273,7 +271,7 @@ The algorithm is named because two implementations that each chose their own can
 
 ### Give the trail a read path (standards/rule/ext-audit.give-the-trail-a-read-path)
 
-**Requirement:** An audited system MUST provide a read of the trail. The read is a use case that needs a Permission record, filtered by tenant, actor, action, target, and outcome.
+**Requirement:** An audited system MUST provide a trail read as a use case needing a Permission record, filtered by tenant, actor, action, target, and outcome.
 
 **Rationale:** A trail that no use case reads is storage rather than a control. The actor holds a Role at a scope, the Role allows the Permission, and the guard permits the read.
 
@@ -285,7 +283,7 @@ The algorithm is named because two implementations that each chose their own can
 
 ### Record personal-data reads (standards/rule/ext-audit.record-personal-data-reads)
 
-**Requirement:** A query that returns personal data across a tenant or account boundary MUST produce an audit record. A project without the tenancy extension defines the account boundary in the adoption decision.
+**Requirement:** A query returning personal data across a boundary MUST produce an audit record, defining the account boundary in the adoption decision where tenancy is absent.
 
 **Rationale:** A read leaves no state change and therefore no other trace. Disclosure without a record cannot be investigated.
 
@@ -305,7 +303,7 @@ The algorithm is named because two implementations that each chose their own can
 
 ### Reject an undeclared Command (standards/rule/ext-audit.reject-an-undeclared-command)
 
-**Requirement:** An automated check MUST fail when a Command declares neither audited nor excluded status. A composition refusal at startup satisfies this rule.
+**Requirement:** An automated check MUST fail when a Command declares neither audited nor excluded status, with a composition refusal at startup satisfying this rule.
 
 **Rationale:** The next Command is written by somebody who did not read this page. Only an automated gate catches it.
 
