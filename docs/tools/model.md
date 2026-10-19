@@ -41,7 +41,7 @@ The finding codes are:
 | `case-result-unresolved` | A case names no result of its own use case. |
 | `refusal-not-thrown` | A refusal result names a code the code never throws. |
 | `use-case-unimplemented` | No code implements the use case and no known gap covers it. |
-| `proves-unconfirmed` | A test claims a case, but none of its when steps belongs to the use case or calls its generated-client operation, or it asserts no refusal the case names. |
+| `proves-unconfirmed` | No when step of a claimed case reaches its use case, or no assertion matches its refusal. |
 | `profile-type-missing` | The size profile requires a type the project lacks. |
 | `journey-reach` | A public use case sits in no journey and names no background caller. |
 
