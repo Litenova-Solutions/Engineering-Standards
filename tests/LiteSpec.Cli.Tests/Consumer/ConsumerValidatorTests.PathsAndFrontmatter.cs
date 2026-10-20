@@ -44,6 +44,27 @@ public sealed partial class ConsumerValidatorTests
         AssertProblem(RunConsumer(folder.Path), "stack 'cobol' is not a stack the pinned LiteSpec release ships");
     }
 
+    [Fact(DisplayName = "stack-scoped extension without its stack")]
+    public void StackScopedExtensionWithoutItsStack()
+    {
+        using var folder = ConsumerFixture.Create();
+        ConsumerFixture.MutateProject(folder.Path, project =>
+        {
+            project["stacks"] = new JsonArray("svelte");
+            project["selectedExtensions"] = new JsonArray(new JsonObject { ["id"] = "efcore", ["criterion"] = "orders need relational reporting", ["reviewBy"] = "2999-01-01" });
+        });
+        AssertProblem(RunConsumer(folder.Path), "extensions 'efcore' supports only the dotnet stack, which the project does not name in stacks");
+    }
+
+    [Fact(DisplayName = "stack-scoped extension with its stack")]
+    public void StackScopedExtensionWithItsStack()
+    {
+        using var folder = ConsumerFixture.Create();
+        ConsumerFixture.MutateProject(folder.Path, project =>
+            project["selectedExtensions"] = new JsonArray(new JsonObject { ["id"] = "efcore", ["criterion"] = "orders need relational reporting", ["reviewBy"] = "2999-01-01" }));
+        AssertAbsent(RunConsumer(folder.Path), "supports only the dotnet stack");
+    }
+
     [Fact(DisplayName = "frontend declaring the backend stack as its platform")]
     public void FrontendDeclaringBackendStackAsPlatform()
     {

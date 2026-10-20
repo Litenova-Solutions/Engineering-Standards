@@ -60,7 +60,7 @@ static class StackReaders
 
         foreach (var frontend in config.Frontends)
         {
-            if (frontend.Platform == "svelte")
+            if (frontend.Platform is "svelte" or "react")
             {
                 frontends.Add(new TypeScriptFrontendReader(frontend));
             }

@@ -4,6 +4,8 @@ namespace LiteSpec.Model.Readers.TypeScript;
 
 /// <summary>
 ///     Which operations and use cases each route of one TypeScript frontend calls, read from the route's code.
+///     A Svelte route is a folder holding <c>+page.svelte</c>; a React route is a file under <c>src/routes</c>
+///     that declares its address in <c>createFileRoute</c>, the router's file convention.
 /// </summary>
 sealed partial class TypeScriptFrontendReader(FrontendConfig frontend) : IFrontendReader
 {
@@ -37,7 +39,9 @@ sealed partial class TypeScriptFrontendReader(FrontendConfig frontend) : IFronte
 
         foreach (var file in SourceTree.Files(routes, Extensions))
         {
-            if (Address(file, routes) is { } address && !EndpointBesidePage(file))
+            var address = frontend.Platform == "react" ? ReactAddress(file, routes) : Address(file, routes);
+
+            if (address is not null && (frontend.Platform == "react" || !EndpointBesidePage(file)))
             {
                 starts.Add((frontend, file, address));
             }
@@ -145,7 +149,7 @@ sealed partial class TypeScriptFrontendReader(FrontendConfig frontend) : IFronte
         var reached = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { start };
         var pending = new Queue<string>([start]);
 
-        foreach (var sibling in RouteSiblings(start))
+        foreach (var sibling in frontend.Platform == "react" ? ReactRouteSiblings(start) : RouteSiblings(start))
         {
             if (reached.Add(sibling))
             {
@@ -305,6 +309,55 @@ sealed partial class TypeScriptFrontendReader(FrontendConfig frontend) : IFronte
         return null;
     }
 
+    /// <summary>
+    ///     The address a React route file declares, with pathless layout segments and route groups
+    ///     removed so it matches the address a reader of the page sees. A lazy file, the root route
+    ///     and a file the router ignores declare no address of their own.
+    /// </summary>
+    private static string? ReactAddress(string file, string routes)
+    {
+        var relative = Path.GetRelativePath(routes, file);
+        var name = Path.GetFileName(file);
+
+        if (name.StartsWith("__root", StringComparison.Ordinal)
+            || name.Contains(".lazy.", StringComparison.Ordinal)
+            || relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Any(part => part.StartsWith("-", StringComparison.Ordinal)))
+        {
+            return null;
+        }
+
+        var declared = FileRoute().Match(SourceTree.Read(file));
+
+        if (!declared.Success)
+        {
+            return null;
+        }
+
+        var segments = declared.Groups["path"].Value
+            .Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .Where(segment => !segment.StartsWith("_", StringComparison.Ordinal)
+                && !(segment.StartsWith("(", StringComparison.Ordinal) && segment.EndsWith(")", StringComparison.Ordinal)));
+
+        return "/" + string.Join('/', segments);
+    }
+
+    /// <summary>The lazy half of a React route, which the router splits into its own file.</summary>
+    private static IEnumerable<string> ReactRouteSiblings(string route)
+    {
+        var folder = Path.GetDirectoryName(route)!;
+        var stem = Path.GetFileNameWithoutExtension(route);
+
+        foreach (var extension in new[] { ".tsx", ".ts", ".jsx", ".js" })
+        {
+            var candidate = Path.Combine(folder, stem + ".lazy" + extension);
+
+            if (File.Exists(candidate))
+            {
+                yield return candidate;
+            }
+        }
+    }
+
     private static bool EndpointBesidePage(string file)
     {
         var name = Path.GetFileName(file);
@@ -340,6 +393,9 @@ sealed partial class TypeScriptFrontendReader(FrontendConfig frontend) : IFronte
 
     [GeneratedRegex(@"(?:(?<!\.)|(?<=\.\.\.))(?<![\w$])(?<name>\w+)\s*\(")]
     private static partial Regex Call();
+
+    [GeneratedRegex(@"\bcreateFileRoute\(\s*[""'`](?<path>[^""'`]*)[""'`]")]
+    private static partial Regex FileRoute();
 
     [GeneratedRegex(@"\{(?<name>[^}:]+):[^}]+\}")]
     private static partial Regex TemplateConstraint();

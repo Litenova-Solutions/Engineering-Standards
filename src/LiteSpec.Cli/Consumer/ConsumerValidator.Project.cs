@@ -193,6 +193,18 @@ static partial class ConsumerValidator
                 {
                     run.Err($"litespec.project.json: extensions '{selection.IdText}' is not an extension in the pinned LiteSpec release; known ids are {string.Join(", ", known)}");
                 }
+                else if ((shipped as JsonObject)?["stacks"] is JsonArray supported
+                    && (run.Project as JsonObject)?["stacks"] is JsonArray declared)
+                {
+                    // An extension written for one stack replaces rules only that stack
+                    // carries, so selecting it without the stack applies nothing it states.
+                    var supportedStacks = supported.Select(AsString).OfType<string>().ToList();
+
+                    if (!declared.Select(AsString).OfType<string>().Any(supportedStacks.Contains))
+                    {
+                        run.Err($"litespec.project.json: extensions '{selection.IdText}' supports only the {string.Join(", ", supportedStacks)} stack, which the project does not name in stacks [litespec/rule/profile-stacks.apply-the-complete-stack]");
+                    }
+                }
             }
         }
 

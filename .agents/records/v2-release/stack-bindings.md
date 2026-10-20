@@ -142,10 +142,11 @@ URLs keep the release and page: `litespec.dev/2.0.0/dotnet/domain`.
 - The model builder reads through `IBackendReader`, `IFrontendReader`, `IScenarioReader` and `ITestRunReader` (`src/LiteSpec.Cli/Model/Readers/`), and reads JUnit XML beside TRX. `model.json` and `model check` output are byte-identical to the previous build on both fixtures.
 - 1052 provisions; 366 tests pass.
 
-## Known limits
+## Limits fixed on 2026-10-20
 
-- The builder reads screens for Svelte frontends only, so React routes are not linked to use cases. This predates the split.
-- Two neutral verification rows on `backend/application.md` name `dotnet test` as their evidence command, because .NET is the only binding that runs them today.
+- The builder read screens for Svelte frontends only. It now reads React routes too: a file under `src/routes` declaring `createFileRoute("...")` is a screen at that address, without pathless `_layout` segments and route groups; `__root`, `.lazy.` files and `-` prefixed paths declare no screen of their own, and a lazy file is followed as part of its route.
+- Two neutral verification rows on `backend/application.md` named `dotnet test`. They are guidance rows now, since a stack-neutral rule cannot name one stack's command.
+- `litespec consumer` refuses a stack-scoped extension (`stacks` in the manifest) when the project names none of its stacks.
 
 ## Questions that were open
 

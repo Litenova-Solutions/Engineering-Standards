@@ -232,8 +232,8 @@ Only a use case gets a folder. A type that is not a use case sits flat in the fo
 | litespec/rule/backend-application.separate-input-validation-from-invariants | guidance | Does each validator check only structural input and defer state decisions? |
 | litespec/rule/backend-application.report-input-problems-as-validity-findings | guidance | Does each validator report validity findings with member, code, and message failures? |
 | litespec/rule/backend-application.model-expected-use-case-failures-explicitly | guidance | Does each expected failure throw its typed exception with its Result code? |
-| litespec/rule/backend-application.enforce-target-authorization-in-the-pipeline | checkable | `dotnet test` runs the pipeline suites, which assert guard coverage and no self-authorizing handler. |
-| litespec/rule/backend-application.keep-command-handlers-narrow | checkable | `dotnet test` runs the pipeline stage suite, which asserts handlers commit, audit, and authorize nothing. |
+| litespec/rule/backend-application.enforce-target-authorization-in-the-pipeline | guidance | Does the pipeline suite assert that every target has a guard and no handler authorizes itself? |
+| litespec/rule/backend-application.keep-command-handlers-narrow | guidance | Does the pipeline stage suite assert that no handler commits, audits, or authorizes? |
 | litespec/rule/backend-application.project-queries-directly | guidance | Does each query handler project to its result without loading an aggregate? |
 | litespec/rule/backend-application.mirror-a-domain-closed-set-in-the-result | guidance | Does each result union carry one record per Domain case? |
 | litespec/rule/backend-application.record-a-decision-for-closed-set-narrowing | guidance | Does each narrowed set name its decision and updated specification? |
