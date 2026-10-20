@@ -5,7 +5,7 @@
 <h1 align="center">LiteSpec</h1>
 
 <p align="center">
-  <a href="https://www.litenova.solutions/LiteSpec"><img src="https://img.shields.io/badge/docs-online-f8c258?labelColor=3e3643" alt="Documentation"></a>
+  <a href="https://litespec.dev"><img src="https://img.shields.io/badge/docs-online-f8c258?labelColor=3e3643" alt="Documentation"></a>
   <a href="https://github.com/Litenova-Solutions/LiteSpec/releases/latest"><img src="https://img.shields.io/github/v/release/Litenova-Solutions/LiteSpec?label=version&color=3e3643" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/Litenova-Solutions/LiteSpec" alt="MIT license"></a>
 </p>
@@ -30,7 +30,7 @@ The stacks a consumer selects apply first. An extension or project exception nam
 
 ## Documentation
 
-- [Hosted documentation](https://www.litenova.solutions/LiteSpec)
+- [Hosted documentation](https://litespec.dev)
 - [Repository documentation index](docs/README.md)
 - [LiteSpec](docs/core/system.md)
 - [Project model](docs/core/model.md)

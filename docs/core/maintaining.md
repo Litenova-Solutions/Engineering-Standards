@@ -36,7 +36,7 @@ A citation from one page to another names the cited provision by its current ide
 
 ### The LiteSpec release
 
-A LiteSpec release is a tagged snapshot of the repository. Between releases, `litespec.manifest.json`, the topmost changelog entry, and the consumer template's `reviewedLiteSpecVersion` name the release being prepared. The new tag carries that version number and makes the release current. Each schema `$id` names that release under `https://www.litenova.solutions/LiteSpec/<version>/schemas/`, so a pinned consumer keeps resolving the shapes it reviewed.
+A LiteSpec release is a tagged snapshot of the repository. Between releases, `litespec.manifest.json`, the topmost changelog entry, and the consumer template's `reviewedLiteSpecVersion` name the release being prepared. The new tag carries that version number and makes the release current. Each schema `$id` names that release under `https://litespec.dev/<version>/schemas/`, so a pinned consumer keeps resolving the shapes it reviewed.
 
 ## Standards
 

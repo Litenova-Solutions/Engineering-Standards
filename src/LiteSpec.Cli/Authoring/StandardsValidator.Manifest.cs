@@ -282,7 +282,7 @@ static partial class StandardsValidator
     }
 
     /// <summary>The published home every schema id names, followed by the release version.</summary>
-    public const string SchemaHome = "https://www.litenova.solutions/LiteSpec/";
+    public const string SchemaHome = "https://litespec.dev/";
 
     // A schema id is the URL a consumer's editor fetches, so it names the release that
     // ships the schema: a pinned consumer keeps resolving the shape it reviewed.

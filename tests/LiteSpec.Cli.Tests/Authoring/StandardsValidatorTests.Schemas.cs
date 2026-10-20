@@ -30,7 +30,7 @@ public sealed partial class StandardsValidatorTests
         using var temp = Cli.Temp("standards");
         StandardsFixture.Base(temp.Path);
         StandardsFixture.Write(temp.Path, "litespec.manifest.json", "{\"version\":\"2.0.0\"}");
-        StandardsFixture.Write(temp.Path, "schemas/record.schema.json", "{\"$id\":\"https://www.litenova.solutions/LiteSpec/2.0.0/schemas/record.schema.json\",\"type\":\"object\"}");
+        StandardsFixture.Write(temp.Path, "schemas/record.schema.json", "{\"$id\":\"https://litespec.dev/2.0.0/schemas/record.schema.json\",\"type\":\"object\"}");
 
         var result = StandardsValidator.Validate(temp.Path);
 

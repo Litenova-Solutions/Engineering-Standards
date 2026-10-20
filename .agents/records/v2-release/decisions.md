@@ -89,13 +89,9 @@ Not changed: the claim that standard error stays on the Windows code page was ch
 
 `origin` is `https://github.com/Litenova-Solutions/LiteSpec.git`.
 
-### D11. The published home is https://www.litenova.solutions/LiteSpec
+### D11. The published home is https://litespec.dev
 
-The owner chose `litenova.solutions/LiteSpec` (2026-10-20). That site is the Next.js app in `Litenova.Solutions-Public-Site`, which already stages a pinned release of this repository's `docs/` (today tag `v1.17.0` of the old repository) under `/Standards`, with search and `llms.txt`. So LiteSpec ships no site generator of its own; the site repository publishes it.
-
-In this repository: every schema `$id` is now `https://www.litenova.solutions/LiteSpec/<version>/schemas/<file>` (six pointed at GitHub and two at `litenova.nl` before), the new `SCHEMA_ID` check in `litespec validate` keeps them on the manifest version, `docs/core/maintaining.md` states it, and the README links to `/LiteSpec`.
-
-**Still to do, in the site repository** (after the `v2.0.0` tag, because its runbook pins releases by tag): point the submodule at `Litenova-Solutions/LiteSpec` under `litespec/`, move the route from `/Standards` to `/LiteSpec` with permanent redirects, serve `schemas/` at `/LiteSpec/<version>/schemas/`, and replace its copied v1 Node validators with the CLI.
+The owner first chose `litenova.solutions/LiteSpec`, then pivoted to buying `litespec.dev` (2026-10-20; the registry had no record of it that day). Every schema `$id` reads `https://litespec.dev/<version>/schemas/<file>`, the `SCHEMA_ID` check in `litespec validate` keeps them on the manifest version, `docs/core/maintaining.md` states it, and the README links to `https://litespec.dev`. The site is LiteSpec's own: the plan is a `litespec site` command and a deploy on each tag. The company site's `/Standards` route becomes a permanent redirect to it.
 
 ## Progress
 
