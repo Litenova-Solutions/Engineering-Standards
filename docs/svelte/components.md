@@ -6,11 +6,11 @@ Components in a Svelte frontend hold state in runes with typed boundaries. The s
 
 ## Agent Summary {#agent-summary}
 
-- Components hold state in runes with typed props. (standards/rule/svelte-components.write-components-in-runes-mode, standards/rule/svelte-components.keep-component-boundaries-typed)
+- Components hold state in runes with typed props. (litespec/rule/svelte-components.write-components-in-runes-mode, litespec/rule/svelte-components.keep-component-boundaries-typed)
 
 ## Standards
 
-### Write components in runes mode (standards/rule/svelte-components.write-components-in-runes-mode)
+### Write components in runes mode (litespec/rule/svelte-components.write-components-in-runes-mode)
 
 **Requirement:** A component MUST hold its local state in runes, with props from `$props` and derived values from `$derived`.
 
@@ -27,7 +27,7 @@ Components in a Svelte frontend hold state in runes with typed boundaries. The s
 </script>
 ```
 
-### Keep component boundaries typed (standards/rule/svelte-components.keep-component-boundaries-typed)
+### Keep component boundaries typed (litespec/rule/svelte-components.keep-component-boundaries-typed)
 
 **Requirement:** A component MUST type its props, its events, and its snippets under strict mode.
 
@@ -41,5 +41,5 @@ None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/svelte-components.write-components-in-runes-mode | checkable | `svelte-check` fails on a legacy reactive statement or an untyped `$props` call. |
-| standards/rule/svelte-components.keep-component-boundaries-typed | checkable | `svelte-check` runs under strict mode and fails on an untyped prop, event, or snippet. |
+| litespec/rule/svelte-components.write-components-in-runes-mode | checkable | `svelte-check` fails on a legacy reactive statement or an untyped `$props` call. |
+| litespec/rule/svelte-components.keep-component-boundaries-typed | checkable | `svelte-check` runs under strict mode and fails on an untyped prop, event, or snippet. |

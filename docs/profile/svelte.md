@@ -8,12 +8,12 @@ This stack serves a Svelte frontend in a product whose backend is the dotnet sta
 
 The shared stack rules on the [Stacks](stacks.md) page apply to every stack.
 
-- Each frontend's rendering mode follows the audience that reads it. (standards/rule/profile-svelte.select-a-rendering-mode-by-audience)
-- A device client is one static page with no router. (standards/rule/profile-svelte.build-a-device-client-as-one-static-page)
+- Each frontend's rendering mode follows the audience that reads it. (litespec/rule/profile-svelte.select-a-rendering-mode-by-audience)
+- A device client is one static page with no router. (litespec/rule/profile-svelte.build-a-device-client-as-one-static-page)
 
 ## Standards
 
-### Select a rendering mode by audience (standards/rule/profile-svelte.select-a-rendering-mode-by-audience)
+### Select a rendering mode by audience (litespec/rule/profile-svelte.select-a-rendering-mode-by-audience)
 
 **Requirement:** A Svelte frontend MUST render as a static application when it is a console, and on the server when a public page is indexed.
 
@@ -21,7 +21,7 @@ The shared stack rules on the [Stacks](stacks.md) page apply to every stack.
 
 **Example:** A back-office console and an internal admin console ship as static files. A public storefront runs as a Node server that hydrates in the browser. A warehouse handheld client ships as one static page.
 
-### Build a device client as one static page (standards/rule/profile-svelte.build-a-device-client-as-one-static-page)
+### Build a device client as one static page (litespec/rule/profile-svelte.build-a-device-client-as-one-static-page)
 
 **Requirement:** A device client MUST ship as one static page with no router.
 
@@ -46,7 +46,7 @@ The shared stack rules on the [Stacks](stacks.md) page apply to every stack.
 - [Product Intent](../core/product.md)
 - [Release Standard](../core/release.md)
 - [Supported scope](../core/scope.md)
-- [Agentic engineering system](../core/system.md)
+- [LiteSpec](../core/system.md)
 
 ### Stack
 
@@ -77,5 +77,5 @@ This stack adds no conventions.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/profile-svelte.select-a-rendering-mode-by-audience | guidance | Does each frontend render in the mode its audience requires? |
-| standards/rule/profile-svelte.build-a-device-client-as-one-static-page | guidance | Is each device client one static page with no router? |
+| litespec/rule/profile-svelte.select-a-rendering-mode-by-audience | guidance | Does each frontend render in the mode its audience requires? |
+| litespec/rule/profile-svelte.build-a-device-client-as-one-static-page | guidance | Is each device client one static page with no router? |

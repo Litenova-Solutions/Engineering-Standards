@@ -1,11 +1,11 @@
 {
-  "$schema": "./standards/schemas/standards-project.schema.json",
+  "$schema": "./litespec/schemas/litespec-project.schema.json",
   "project": {
     "name": "fixture-shop"
   },
   "size": "small",
   "stacks": ["dotnet", "react"],
-  "reviewedStandardsVersion": "2.0.0",
+  "reviewedLiteSpecVersion": "2.0.0",
   "optionalTypes": [],
   "constraints": {
     "answered": true

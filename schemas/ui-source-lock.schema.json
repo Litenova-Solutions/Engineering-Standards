@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/ui-source-lock.schema.json",
+  "$id": "https://github.com/Litenova-Solutions/LiteSpec/schemas/ui-source-lock.schema.json",
   "title": "Litenova Shared UI Package Source Lock",
   "description": "The record beside the one copy of the registry source. It names the pinned CLI, the registry it came from, and the digest of every installed primitive, so a hand edit to copied source reports rather than passing unreviewed.",
   "type": "object",
@@ -9,13 +9,13 @@
   "properties": {
     "$schema": { "type": "string" },
     "schemaVersion": {
-      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See standards/rule/core-authoring.publish-each-release-as-a-complete-contract and standards/rule/core-authoring.exclude-cross-release-compatibility-work.",
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See litespec/rule/core-authoring.publish-each-release-as-a-complete-contract and litespec/rule/core-authoring.exclude-cross-release-compatibility-work.",
       "const": 1
     },
     "generator": { "enum": ["shadcn/ui", "shadcn-svelte"] },
     "cli": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
     "preset": {
-      "description": "The decoded preset the shared package installs. Every field matches the uiBaseline the standards manifest pins, so the lock and the manifest cannot describe two different presets.",
+      "description": "The decoded preset the shared package installs. Every field matches the uiBaseline the LiteSpec manifest pins, so the lock and the manifest cannot describe two different presets.",
       "type": "object",
       "additionalProperties": false,
       "required": [

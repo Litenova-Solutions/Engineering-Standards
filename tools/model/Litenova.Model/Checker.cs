@@ -699,7 +699,7 @@ static partial class Checker
             return true;
         }
 
-        if (id.StartsWith("standards/", StringComparison.Ordinal))
+        if (id.StartsWith("litespec/", StringComparison.Ordinal))
         {
             return model.Provisions.Count == 0 || model.Provisions.Contains(id);
         }
@@ -1098,7 +1098,7 @@ static partial class Checker
 
     private static void CheckProfile(ProjectModel model, List<Finding> findings)
     {
-        var declaration = Path.Combine(model.Config.Root, "standards.project.json");
+        var declaration = Path.Combine(model.Config.Root, "litespec.project.json");
         var required = model.Config.Size == "small"
             ? RecordTypes.SmallRequired
             : RecordTypes.SmallRequired.Concat(RecordTypes.LargeAdded).ToList();

@@ -20,89 +20,89 @@ None. Tenant scope applies to records every profile already requires.
 
 ## Agent Summary {#agent-summary}
 
-- Record the tenant adoption decision. (standards/rule/ext-tenancy.record-the-tenant-adoption-decision)
-- Define tenancy storage and isolation guarantees. (standards/rule/ext-tenancy.define-tenant-isolation)
-- Resolve tenant identity from trusted context. (standards/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context)
-- Match actor and resource tenants. (standards/rule/ext-tenancy.verify-actor-and-target-tenancy)
-- Scope every tenant-owned persistence boundary. (standards/rule/ext-tenancy.scope-tenant-owned-records)
-- Prevent cross-tenant disclosure in responses and diagnostics. (standards/rule/ext-tenancy.apply-cross-tenant-disclosure-policy, standards/rule/ext-tenancy.protect-tenant-diagnostics)
-- Declare tenant scope for operational work. (standards/rule/ext-tenancy.scope-tenant-operations)
+- Record the tenant adoption decision. (litespec/rule/ext-tenancy.record-the-tenant-adoption-decision)
+- Define tenancy storage and isolation guarantees. (litespec/rule/ext-tenancy.define-tenant-isolation)
+- Resolve tenant identity from trusted context. (litespec/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context)
+- Match actor and resource tenants. (litespec/rule/ext-tenancy.verify-actor-and-target-tenancy)
+- Scope every tenant-owned persistence boundary. (litespec/rule/ext-tenancy.scope-tenant-owned-records)
+- Prevent cross-tenant disclosure in responses and diagnostics. (litespec/rule/ext-tenancy.apply-cross-tenant-disclosure-policy, litespec/rule/ext-tenancy.protect-tenant-diagnostics)
+- Declare tenant scope for operational work. (litespec/rule/ext-tenancy.scope-tenant-operations)
 
 ## Standards
 
-### Record the tenant adoption decision (standards/rule/ext-tenancy.record-the-tenant-adoption-decision)
+### Record the tenant adoption decision (litespec/rule/ext-tenancy.record-the-tenant-adoption-decision)
 
 **Requirement:** A consumer selecting `tenancy` MUST record a Decision naming tenant source, storage model, isolation guarantee, administrative access, evolution path, and enumeration bound.
 
 **Rationale:** The Decision carries its owner, status, decider, and decide-by date. Approval waits while that Decision is a draft. The enumeration bound caps tenant identifiers in all-tenant records.
 
-### Define tenant isolation (standards/rule/ext-tenancy.define-tenant-isolation)
+### Define tenant isolation (litespec/rule/ext-tenancy.define-tenant-isolation)
 
 **Requirement:** A multi-tenant decision MUST define shared-table, schema, or database isolation and state its guarantee and operating trade-off.
 
 **Rationale:** The selected storage model determines data isolation, operational complexity, and scaling behavior.
 
-### Avoid unplanned isolation models (standards/rule/ext-tenancy.avoid-unplanned-isolation-models)
+### Avoid unplanned isolation models (litespec/rule/ext-tenancy.avoid-unplanned-isolation-models)
 
 **Requirement:** A multi-tenant system MUST NOT mix isolation models without a decision and data evolution plan.
 
 **Rationale:** Mixed models create unclear guarantees and operational recovery behavior.
 
-### Resolve tenant identity from trusted context (standards/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context)
+### Resolve tenant identity from trusted context (litespec/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context)
 
 **Requirement:** A trusted host boundary MUST resolve tenant identity from verified claims, host mapping, or another authenticated source.
 
 **Rationale:** Trusted resolution prevents callers from selecting a tenant outside their authenticated context.
 
-### Reject unrestricted tenant input (standards/rule/ext-tenancy.reject-unrestricted-tenant-input)
+### Reject unrestricted tenant input (litespec/rule/ext-tenancy.reject-unrestricted-tenant-input)
 
 **Requirement:** A tenant resolver MUST NOT accept an unrestricted tenant ID from request data.
 
 **Rationale:** Client-controlled identity can select another tenant's data boundary.
 
-### Verify actor and target tenancy (standards/rule/ext-tenancy.verify-actor-and-target-tenancy)
+### Verify actor and target tenancy (litespec/rule/ext-tenancy.verify-actor-and-target-tenancy)
 
 **Requirement:** A protected multi-tenant operation MUST confirm actor and target tenancy, with the needed Permission held at the resolved scope and the target belonging to it.
 
 **Rationale:** Both the caller and requested resource need the same authorized tenant scope. The chain runs Actor holds Role at scope, Role allows Permission, use case needs Permission.
 
-### Isolate administrative cross-tenant access (standards/rule/ext-tenancy.isolate-administrative-cross-tenant-access)
+### Isolate administrative cross-tenant access (litespec/rule/ext-tenancy.isolate-administrative-cross-tenant-access)
 
 **Requirement:** An administrative cross-tenant operation MUST require a Permission the actor holds through a Role at platform scope, writing an audit record.
 
 **Rationale:** Exceptional access needs stronger visibility than normal tenant-scoped behavior.
 
-### Use selected tenant storage support (standards/rule/ext-tenancy.use-selected-tenant-storage-support)
+### Use selected tenant storage support (litespec/rule/ext-tenancy.use-selected-tenant-storage-support)
 
 **Requirement:** A multi-tenant persistence implementation MUST resolve its tenant when the session is created, through the selected provider's own tenancy support.
 
 **Rationale:** Provider-supported tenancy gives queries and storage a consistent isolation mechanism. Session creation is the point that matters. A session opened without a tenant has an unscoped next query. Adding the filter per query instead leaves every new query one omission away from reading across tenants. The baseline provider resolves it from the registered tenancy at session creation, so no query carries the concern. An Entity Framework Core implementation resolves the tenant when the context is created and applies it through a query filter convention.
 
-### Scope tenant-owned records (standards/rule/ext-tenancy.scope-tenant-owned-records)
+### Scope tenant-owned records (litespec/rule/ext-tenancy.scope-tenant-owned-records)
 
 **Requirement:** Every tenant-owned document, query, unique constraint, cache key, outbox record, job, export, and object-storage path MUST include tenant scope.
 
 **Rationale:** Omitting scope from one storage or background boundary can disclose or mix tenant data.
 
-### Apply cross-tenant disclosure policy (standards/rule/ext-tenancy.apply-cross-tenant-disclosure-policy)
+### Apply cross-tenant disclosure policy (litespec/rule/ext-tenancy.apply-cross-tenant-disclosure-policy)
 
 **Requirement:** A cross-tenant resource response MUST use the documented not-found or forbidden policy.
 
 **Rationale:** The product chooses one disclosure outcome for unauthorized resource existence.
 
-### Protect tenant diagnostics (standards/rule/ext-tenancy.protect-tenant-diagnostics)
+### Protect tenant diagnostics (litespec/rule/ext-tenancy.protect-tenant-diagnostics)
 
 **Requirement:** Errors, logs, metrics, and traces MUST NOT reveal another tenant's business identifiers or data.
 
 **Rationale:** Diagnostics can bypass an API response's normal resource-disclosure boundary.
 
-### Scope tenant operations (standards/rule/ext-tenancy.scope-tenant-operations)
+### Scope tenant operations (litespec/rule/ext-tenancy.scope-tenant-operations)
 
 **Requirement:** Backup, restore, replay, deletion, export, support access, and incident investigation MUST document one-tenant or all-tenant scope.
 
 **Rationale:** Operating work can cause a broader data effect than one normal request.
 
-### Record an all-tenant operation (standards/rule/ext-tenancy.record-an-all-tenant-operation)
+### Record an all-tenant operation (litespec/rule/ext-tenancy.record-an-all-tenant-operation)
 
 **Requirement:** An all-tenant operation MUST record actor, operation, reason, tenant count, and reached tenant identifiers up to the adoption Decision bound.
 
@@ -112,7 +112,7 @@ None. Tenant scope applies to records every profile already requires.
 
 ## Conventions
 
-### Use typed tenant identities (standards/rule/ext-tenancy.use-typed-tenant-identities)
+### Use typed tenant identities (litespec/rule/ext-tenancy.use-typed-tenant-identities)
 
 **Default:** Represent tenant identity with a strongly typed `TenantId`.
 
@@ -120,7 +120,7 @@ None. Tenant scope applies to records every profile already requires.
 
 **Rationale:** A typed identity prevents accidental confusion with actor, business record, or string identifiers.
 
-### Use one tenant accessor (standards/rule/ext-tenancy.use-one-tenant-accessor)
+### Use one tenant accessor (litespec/rule/ext-tenancy.use-one-tenant-accessor)
 
 **Default:** Use one current-tenant accessor at the trusted host boundary.
 
@@ -128,7 +128,7 @@ None. Tenant scope applies to records every profile already requires.
 
 **Rationale:** One accessor centralizes trusted tenant resolution.
 
-### Pass tenant scope explicitly (standards/rule/ext-tenancy.pass-tenant-scope-explicitly)
+### Pass tenant scope explicitly (litespec/rule/ext-tenancy.pass-tenant-scope-explicitly)
 
 **Default:** Pass tenant scope through Application messages or trusted ports rather than ambient Domain request state.
 
@@ -144,19 +144,19 @@ Marten tenancy support is part of the baseline persistence package. Another isol
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-tenancy.record-the-tenant-adoption-decision | guidance | Does an owned Decision record the tenant source, model, guarantee, access, path, and bound? |
-| standards/rule/ext-tenancy.define-tenant-isolation | guidance | Does the decision define the isolation model, guarantee, and trade-off? |
-| standards/rule/ext-tenancy.avoid-unplanned-isolation-models | guidance | Does each mixed model record its decision and evolution plan? |
-| standards/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context | guidance | Does each trusted source resolve the tenant? |
-| standards/rule/ext-tenancy.reject-unrestricted-tenant-input | guidance | Can request tampering with a tenant ID select another boundary? |
-| standards/rule/ext-tenancy.verify-actor-and-target-tenancy | guidance | Do mismatched actor and target tenants fail? |
-| standards/rule/ext-tenancy.isolate-administrative-cross-tenant-access | guidance | Does administrative access need its platform-scope Permission and write its audit record? |
-| standards/rule/ext-tenancy.use-selected-tenant-storage-support | guidance | Does each provider resolve the tenant at session creation? |
-| standards/rule/ext-tenancy.scope-tenant-owned-records | guidance | Does every listed boundary include tenant scope? |
-| standards/rule/ext-tenancy.apply-cross-tenant-disclosure-policy | guidance | Does each cross-tenant response use the documented policy? |
-| standards/rule/ext-tenancy.protect-tenant-diagnostics | guidance | Do diagnostics exclude foreign tenant identifiers and data? |
-| standards/rule/ext-tenancy.scope-tenant-operations | guidance | Does each procedure declare one-tenant or all-tenant scope? |
-| standards/rule/ext-tenancy.record-an-all-tenant-operation | guidance | Does each all-tenant run write its record with count and bounded list? |
-| standards/rule/ext-tenancy.use-typed-tenant-identities | guidance | Do tenant references use TenantId or a recorded Exception? |
-| standards/rule/ext-tenancy.use-one-tenant-accessor | guidance | Does the host boundary hold one current-tenant accessor or a recorded Exception? |
-| standards/rule/ext-tenancy.pass-tenant-scope-explicitly | guidance | Does domain code read no ambient tenant state, or does an Exception record it? |
+| litespec/rule/ext-tenancy.record-the-tenant-adoption-decision | guidance | Does an owned Decision record the tenant source, model, guarantee, access, path, and bound? |
+| litespec/rule/ext-tenancy.define-tenant-isolation | guidance | Does the decision define the isolation model, guarantee, and trade-off? |
+| litespec/rule/ext-tenancy.avoid-unplanned-isolation-models | guidance | Does each mixed model record its decision and evolution plan? |
+| litespec/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context | guidance | Does each trusted source resolve the tenant? |
+| litespec/rule/ext-tenancy.reject-unrestricted-tenant-input | guidance | Can request tampering with a tenant ID select another boundary? |
+| litespec/rule/ext-tenancy.verify-actor-and-target-tenancy | guidance | Do mismatched actor and target tenants fail? |
+| litespec/rule/ext-tenancy.isolate-administrative-cross-tenant-access | guidance | Does administrative access need its platform-scope Permission and write its audit record? |
+| litespec/rule/ext-tenancy.use-selected-tenant-storage-support | guidance | Does each provider resolve the tenant at session creation? |
+| litespec/rule/ext-tenancy.scope-tenant-owned-records | guidance | Does every listed boundary include tenant scope? |
+| litespec/rule/ext-tenancy.apply-cross-tenant-disclosure-policy | guidance | Does each cross-tenant response use the documented policy? |
+| litespec/rule/ext-tenancy.protect-tenant-diagnostics | guidance | Do diagnostics exclude foreign tenant identifiers and data? |
+| litespec/rule/ext-tenancy.scope-tenant-operations | guidance | Does each procedure declare one-tenant or all-tenant scope? |
+| litespec/rule/ext-tenancy.record-an-all-tenant-operation | guidance | Does each all-tenant run write its record with count and bounded list? |
+| litespec/rule/ext-tenancy.use-typed-tenant-identities | guidance | Do tenant references use TenantId or a recorded Exception? |
+| litespec/rule/ext-tenancy.use-one-tenant-accessor | guidance | Does the host boundary hold one current-tenant accessor or a recorded Exception? |
+| litespec/rule/ext-tenancy.pass-tenant-scope-explicitly | guidance | Does domain code read no ambient tenant state, or does an Exception record it? |

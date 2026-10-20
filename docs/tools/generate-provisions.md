@@ -20,7 +20,7 @@ Run it after adding, renaming, or removing a provision. A hand edit is overwritt
 
 | Argument | Required | Effect |
 |:---|:---|:---|
-| `repositoryRoot` | no | Selects the standards repository to read. The default is the repository holding this command. |
+| `repositoryRoot` | no | Selects the LiteSpec repository to read. The default is the repository holding this command. |
 
 ## Options
 

@@ -25,12 +25,12 @@ const appRoot = path.join(fixture, 'apps/web');
 const appStyles = path.join(appRoot, 'src/styles.css');
 const appCase = path.join(appRoot, 'src/routes/case.tsx');
 const tokensCss = path.join(packageRoot, 'src/styles/tokens.css');
-const projectFile = path.join(fixture, 'standards.project.json');
+const projectFile = path.join(fixture, 'litespec.project.json');
 const lockFile = path.join(packageRoot, 'ui-source-lock.json');
 const designFile = path.join(packageRoot, 'DESIGN.md');
 const catalogFile = path.join(fixture, 'docs/ui/pattern-catalog.json');
-const fixtureValidator = path.join(fixture, 'standards/tools', 'validate-ui.mjs');
-const fixtureLibrary = path.join(fixture, 'standards/patterns/ui/library.json');
+const fixtureValidator = path.join(fixture, 'litespec/tools', 'validate-ui.mjs');
+const fixtureLibrary = path.join(fixture, 'litespec/patterns/ui/library.json');
 
 // The structure the pinned CLI actually generates: the three approved imports,
 // the dark variant, the theme mapping, both token blocks, and the documented
@@ -117,18 +117,18 @@ function build() {
     'apps/web/src/routes',
     'apps/web/src/modules',
     'docs/exceptions',
-    'standards/tools',
-    'standards/schemas',
-    'standards/patterns/ui',
+    'litespec/tools',
+    'litespec/schemas',
+    'litespec/patterns/ui',
   ]) {
     fs.mkdirSync(path.join(fixture, directory), { recursive: true });
   }
-  fs.copyFileSync(path.join(repository, 'standards.manifest.json'), path.join(fixture, 'standards/standards.manifest.json'));
+  fs.copyFileSync(path.join(repository, 'litespec.manifest.json'), path.join(fixture, 'litespec/litespec.manifest.json'));
   for (const schema of fs.readdirSync(path.join(repository, 'schemas'))) {
-    fs.copyFileSync(path.join(repository, 'schemas', schema), path.join(fixture, 'standards/schemas', schema));
+    fs.copyFileSync(path.join(repository, 'schemas', schema), path.join(fixture, 'litespec/schemas', schema));
   }
   for (const tool of ['validate-ui.mjs', 'schema.mjs']) {
-    fs.copyFileSync(path.join(repository, 'tools', tool), path.join(fixture, 'standards/tools', tool));
+    fs.copyFileSync(path.join(repository, 'tools', tool), path.join(fixture, 'litespec/tools', tool));
   }
   // The library-citation cases run the validator copy above, so the library
   // they read is this fixture rather than the release's own library.
@@ -153,14 +153,14 @@ function build() {
       },
     ],
   });
-  writeJson(projectFile, resolvePlaceholders(readJson(path.join(repository, 'templates/consumer/standards.project.json'))));
+  writeJson(projectFile, resolvePlaceholders(readJson(path.join(repository, 'templates/consumer/litespec.project.json'))));
   const project = readJson(projectFile);
   project.paths.uiPackage.name = '@fixture/ui';
   project.paths.uiPackage.publicExports = ['@fixture/ui/floorplans'];
   writeJson(projectFile, project);
 
   const lock = readJson(path.join(repository, 'templates/consumer/ui-source-lock.json'));
-  lock.$schema = './standards/schemas/ui-source-lock.schema.json';
+  lock.$schema = './litespec/schemas/ui-source-lock.schema.json';
   writeJson(lockFile, lock);
 
   fs.writeFileSync(path.join(packageRoot, 'src/components/button.tsx'), 'export function Button() {\n  return null;\n}\n');
@@ -324,7 +324,7 @@ function configCase(name, mutate, expectation) {
   writeJson(projectFile, project);
   report(name, expectation, run());
   writeJson(projectFile, (() => {
-    const restored = resolvePlaceholders(readJson(path.join(repository, 'templates/consumer/standards.project.json')));
+    const restored = resolvePlaceholders(readJson(path.join(repository, 'templates/consumer/litespec.project.json')));
     restored.paths.uiPackage.name = '@fixture/ui';
     restored.paths.uiPackage.publicExports = ['@fixture/ui/floorplans'];
     return restored;
@@ -336,7 +336,7 @@ build();
 console.log('Baseline');
 report('tracked templates validate as shipped', null, run());
 
-console.log('\nAllowed construction (standards/rule/frontend-ui.restrict-css-decisions)');
+console.log('\nAllowed construction (litespec/rule/frontend-ui.restrict-css-decisions)');
 compositeCase('approved layout utilities', 'export const C = () => <div className="grid gap-6 lg:grid-cols-2" />;', null);
 compositeCase('semantic token classes', 'export const C = () => <div className="bg-background text-foreground border-border" />;', null);
 compositeCase('state and container variants', 'export const C = () => <div className="data-[state=open]:rotate-180 has-[input:checked]:bg-accent min-[420px]:flex" />;', null);
@@ -353,7 +353,7 @@ pathCase('a visual file is still held to the token rule', 'apps/web/src/modules/
 pathCase('generated web asset is ignored', 'apps/web/android/app/src/main/assets/public/generated.css', '.generated { color: red; }\n', null);
 appCaseWith('a route composing one floorplan', 'import { ListPage } from "@fixture/ui/floorplans";\nexport function Case() {\n  return <ListPage title="Orders" />;\n}\n', null);
 
-console.log('\nRestricted Tailwind use (standards/rule/frontend-ui.restrict-css-decisions)');
+console.log('\nRestricted Tailwind use (litespec/rule/frontend-ui.restrict-css-decisions)');
 compositeCase('arbitrary length', 'export const C = () => <div className="w-[37rem]" />;', "arbitrary Tailwind value requires a semantic token or declared variant 'w-[37rem]'");
 compositeCase('arbitrary color', 'export const C = () => <div className="bg-[#19324a]" />;', "'bg-[#19324a]'");
 compositeCase('raw palette value', 'export const C = () => <div className="text-red-500" />;', "raw Tailwind palette value requires a semantic token 'text-red-500'");
@@ -369,31 +369,31 @@ cssCase('an unterminated string is reported once', `${cleanCss}[data-token="prom
 cssCase('apply directive outside the generated base layer', `${cleanCss}@layer components {\n  .btn { @apply px-4 py-2; }\n}\n`, "'@apply' outside the generated '@layer base' block");
 cssCase('unapproved global import', `${cleanCss}@import "bootstrap/dist/css/bootstrap.css";\n`, "import 'bootstrap/dist/css/bootstrap.css' is outside the approved global CSS surface");
 
-console.log('\nApplication boundary (standards/rule/frontend-components.compose-composites-in-page-code)');
+console.log('\nApplication boundary (litespec/rule/frontend-components.compose-composites-in-page-code)');
 appCaseWith('an application importing the primitive library', 'import { Dialog } from "@base-ui/react/dialog";\nexport function Case() {\n  return <Dialog />;\n}\n', "imports the primitive library directly");
 appCaseWith('an application importing a table library', 'import { flexRender } from "@tanstack/react-table";\nexport function Case() {\n  return <main>{flexRender}</main>;\n}\n', 'imports the table library directly');
 appCaseWith('a library name inside a doc comment is prose', '/** Reads a value from `@base-ui/react` in the composite that wraps it. */\nexport function Case() {\n  return <main>Orders</main>;\n}\n', null);
 
-console.log('\nApplication stylesheet (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)');
+console.log('\nApplication stylesheet (litespec/rule/frontend-ui.keep-tokens-in-one-stylesheet)');
 appStylesCase('an application stylesheet importing the package tokens', cleanAppStyles, null);
 appStylesCase('an application stylesheet writing a value from a token', `${cleanAppStyles}\n:where(button) {\n  --ring-width: 2px;\n}\n`, null);
 appStylesCase('an application stylesheet declaring a literal value', `${cleanAppStyles}\nbody {\n  background: #ffffff;\n}\n`, "declares 'background'");
 appStylesCase('an application stylesheet importing nothing', '', 'imports no stylesheet');
 appStylesCase('an application stylesheet importing a third-party sheet', '@import "bootstrap/dist/css/bootstrap.css";\n', "import 'bootstrap/dist/css/bootstrap.css' is outside the shared package");
 
-console.log('\nShared stylesheets (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)');
+console.log('\nShared stylesheets (litespec/rule/frontend-ui.keep-tokens-in-one-stylesheet)');
 pathCase('a shared stylesheet written from tokens', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  background: radial-gradient(farthest-side, var(--scroll-shade), transparent);\n}\n', null);
 pathCase('a shared stylesheet carrying a literal colour', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  background: radial-gradient(farthest-side, oklch(0 0 0 / 0.16), transparent);\n}\n', "literal colour 'oklch(' belongs in the token stylesheet");
 pathCase('a shared stylesheet carrying a hex colour', 'packages/ui/src/styles/shadows.css', '@utility shade {\n  color: #b9bbc6;\n}\n', "literal colour '#b9bbc6' belongs in the token stylesheet");
 
-console.log('\nSource boundary (standards/rule/frontend-ui.select-one-visual-authority)');
+console.log('\nSource boundary (litespec/rule/frontend-ui.select-one-visual-authority)');
 manifestCase('second visual system in the workspace root', { dependencies: { '@mui/material': '7.0.0' } }, "second general-purpose visual dependency '@mui/material' requires an exception");
 manifestCase('second visual system in optionalDependencies', { optionalDependencies: { bootstrap: '5.3.3' } }, "second general-purpose visual dependency 'bootstrap' requires an exception");
 manifestCase('second visual system pinned through pnpm overrides', { pnpm: { overrides: { '@mantine/core': '8.0.0' } } }, "second general-purpose visual dependency '@mantine/core' requires an exception");
 manifestCase('second visual system pinned through resolutions', { resolutions: { antd: '5.0.0' } }, "second general-purpose visual dependency 'antd' requires an exception");
-exceptionCase('UI exception with an expired review date', 'ui-authority', 'standards/rule/frontend-ui.select-one-visual-authority', '2020-01-01', "[standards/rule/frontend-ui.select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision");
-exceptionCase('UI exception with a live review date', 'ui-authority', 'standards/rule/frontend-ui.select-one-visual-authority', '2099-01-01', null);
-exceptionCase('exception against another area stays unread by the UI validator', 'other-area', 'standards/rule/core-agent.select-task-context', '2020-01-01', null);
+exceptionCase('UI exception with an expired review date', 'ui-authority', 'litespec/rule/frontend-ui.select-one-visual-authority', '2020-01-01', "[litespec/rule/frontend-ui.select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision");
+exceptionCase('UI exception with a live review date', 'ui-authority', 'litespec/rule/frontend-ui.select-one-visual-authority', '2099-01-01', null);
+exceptionCase('exception against another area stays unread by the UI validator', 'other-area', 'litespec/rule/core-agent.select-task-context', '2020-01-01', null);
 {
   // The exceptions folder moves with paths.records.exception when the consumer
   // sets it. The record below lives outside the default folder and still
@@ -410,18 +410,18 @@ exceptionCase('exception against another area stays unread by the UI validator',
     title: 'Moved exception',
     owner: 'fixture',
     status: 'approved',
-    standard: 'standards/rule/frontend-ui.select-one-visual-authority',
+    standard: 'litespec/rule/frontend-ui.select-one-visual-authority',
     reason: 'The fixture needs this departure.',
     reviewBy: '2020-01-01',
     removeWhen: 'The fixture no longer needs it.',
   };
   fs.writeFileSync(file, `---\n${JSON.stringify(meta, null, 2)}\n---\n# Moved exception\n`);
-  report('exceptions folder set through paths.records.exception', "[standards/rule/frontend-ui.select-one-visual-authority] docs/departures/moved.md: review date 2020-01-01 has passed; renew the decision", run());
+  report('exceptions folder set through paths.records.exception', "[litespec/rule/frontend-ui.select-one-visual-authority] docs/departures/moved.md: review date 2020-01-01 has passed; renew the decision", run());
   fs.rmSync(path.join(fixture, 'docs/departures'), { recursive: true, force: true });
   fs.writeFileSync(projectFile, originalProject);
 }
 
-console.log('\nShared package (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
+console.log('\nShared package (litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
 configCase('a controlled frontend with no shared package', (project) => {
   delete project.paths.uiPackage;
 }, 'and no paths.uiPackage');
@@ -450,7 +450,7 @@ configCase('a source lock outside the package root', (project) => {
   fs.writeFileSync(lockFile, original);
 }
 
-console.log('\nAdditional registries (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
+console.log('\nAdditional registries (litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package)');
 {
   const componentsFile = path.join(packageRoot, 'components.json');
   const originalComponents = fs.readFileSync(componentsFile, 'utf8');
@@ -461,28 +461,28 @@ console.log('\nAdditional registries (standards/rule/frontend-ui.pin-the-baselin
   const lock = JSON.parse(originalLock);
   lock.registry = { name: 'fixture', url: 'https://blocks.fixture.test' };
   fs.writeFileSync(lockFile, JSON.stringify(lock, null, 2));
-  const exceptionPath = writeException('extra-registry', 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package', '2099-01-01');
+  const exceptionPath = writeException('extra-registry', 'litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package', '2099-01-01');
   report('an additional registry with the exception passes both gates', null, run());
   fs.rmSync(exceptionPath);
   const output = run();
-  report('the configuration gate refuses without the exception', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: an additional registry requires an exception", output);
-  report('the source-lock gate refuses without the exception', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: registry 'fixture' is not the built-in shadcn registry", output);
+  report('the configuration gate refuses without the exception', "[litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: an additional registry requires an exception", output);
+  report('the source-lock gate refuses without the exception', "[litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: registry 'fixture' is not the built-in shadcn registry", output);
   fs.writeFileSync(componentsFile, originalComponents);
   fs.writeFileSync(lockFile, originalLock);
 }
 
-console.log('\nSource lock (standards/rule/frontend-ui.track-source-changes)');
+console.log('\nSource lock (litespec/rule/frontend-ui.track-source-changes)');
 fs.appendFileSync(path.join(packageRoot, 'src/components/button.tsx'), '// local change\n');
 report('changed copied source without a fork record', 'no longer matches the recorded digest', run());
 fs.writeFileSync(path.join(packageRoot, 'src/components/button.tsx'), 'export function Button() {\n  return null;\n}\n');
 lockCase('a dependency the manifest does not pin', (lock) => {
   lock.components[0].dependencies = ['not-a-pinned-package'];
-}, "dependency 'not-a-pinned-package' is not pinned in the standards manifest");
+}, "dependency 'not-a-pinned-package' is not pinned in the LiteSpec manifest");
 lockCase('a path escaping the package root', (lock) => {
   lock.components[0].paths = ['../../../outside/button.tsx'];
 }, 'path escapes the shared package root');
 
-console.log('\nDesign contract (standards/rule/frontend-ui.publish-a-design-contract, standards/rule/frontend-ui.declare-a-closed-floorplan-set)');
+console.log('\nDesign contract (litespec/rule/frontend-ui.publish-a-design-contract, litespec/rule/frontend-ui.declare-a-closed-floorplan-set)');
 const contract = fs.readFileSync(designFile, 'utf8');
 fs.rmSync(designFile);
 report('shared package with no design contract', 'no design contract at', run());
@@ -495,7 +495,7 @@ report('design contract naming no floorplan', 'array has fewer than 1 items', ru
 fs.writeFileSync(designFile, contract);
 report('the shipped design contract is accepted', null, run());
 
-console.log('\nPattern catalog (standards/rule/frontend-patterns.keep-one-pattern-catalog, standards/rule/frontend-patterns.record-every-option-considered, standards/rule/frontend-patterns.declare-the-compact-behaviour, standards/rule/frontend-patterns.implement-a-chosen-pattern-once, standards/rule/frontend-patterns.state-the-implementation-status)');
+console.log('\nPattern catalog (litespec/rule/frontend-patterns.keep-one-pattern-catalog, litespec/rule/frontend-patterns.record-every-option-considered, litespec/rule/frontend-patterns.declare-the-compact-behaviour, litespec/rule/frontend-patterns.implement-a-chosen-pattern-once, litespec/rule/frontend-patterns.state-the-implementation-status)');
 report('the shipped pattern catalog is accepted', null, run());
 configCase('a workspace with no pattern catalog', (project) => {
   delete project.paths.uiPatterns;
@@ -543,7 +543,7 @@ catalogCase('two options sharing one id', (catalog) => {
   catalog.patterns[0].options[1].id = catalog.patterns[0].options[0].id;
 }, "pattern 'orders-list-page' has a duplicate option id 'filter-table'");
 
-console.log('\nPattern library citations (standards/rule/frontend-patterns.keep-one-pattern-catalog)');
+console.log('\nPattern library citations (litespec/rule/frontend-patterns.keep-one-pattern-catalog)');
 report('the fixture validator accepts the shipped catalog', null, run(fixtureValidator));
 libraryCatalogCase('a pattern citing the library pattern it matches', (catalog) => {
   catalog.patterns[0].library = 'record-list';
@@ -557,7 +557,7 @@ libraryCatalogCase('a pattern renaming a library option', (catalog) => {
   catalog.patterns[0].options[0].name = 'Renamed table';
 }, "pattern 'orders-list-page': options[0].name 'Renamed table' does not match the UI pattern library option 'filter-table' name 'Filterable table'");
 
-console.log('\nSvelte sources (standards/rule/frontend-ui.restrict-css-decisions)');
+console.log('\nSvelte sources (litespec/rule/frontend-ui.restrict-css-decisions)');
 pathCase('a svelte file is scanned for utility violations', 'packages/ui/src/floorplans/card.svelte', '<div class="text-red-500">Overdue</div>\n', "raw Tailwind palette value requires a semantic token 'text-red-500'");
 pathCase('a svelte visual file keeps its own layout', 'apps/web/src/modules/seat-map/seat-map.visual.svelte', '<div class="grid">Map</div>\n', null);
 pathCase('a svelte visual file is still held to the token rule', 'apps/web/src/modules/seat-map/other.visual.svelte', '<div class="bg-red-500">Map</div>\n', "raw Tailwind palette value requires a semantic token 'bg-red-500'");
@@ -567,7 +567,7 @@ pathCase('a svelte style directive is an inline style', 'apps/web/src/modules/or
 pathCase('a svelte style block is not an inline style', 'apps/web/src/modules/orders/scoped.svelte', '<style>\n  .scoped {\n    color: red;\n  }\n</style>\n<div class="scoped">Overdue</div>\n', null);
 manifestCase('second svelte visual system in the workspace root', { dependencies: { 'flowbite-svelte': '1.33.1' } }, "second general-purpose visual dependency 'flowbite-svelte' requires an exception");
 
-console.log('\nSvelte baseline (standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package, standards/rule/frontend-ui.track-source-changes, standards/rule/frontend-ui.select-one-visual-authority, standards/rule/frontend-components.compose-composites-in-page-code)');
+console.log('\nSvelte baseline (litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package, litespec/rule/frontend-ui.track-source-changes, litespec/rule/frontend-ui.select-one-visual-authority, litespec/rule/frontend-components.compose-composites-in-page-code)');
 {
   const componentsFile = path.join(packageRoot, 'components.json');
   const originalComponents = fs.readFileSync(componentsFile, 'utf8');
@@ -596,15 +596,15 @@ console.log('\nSvelte baseline (standards/rule/frontend-ui.pin-the-baseline-in-t
   };
   asSvelte();
   report('a svelte package validates against the svelte baseline', null, run());
-  pathCase('a svelte application importing the primitive library', 'apps/web/src/routes/bits.svelte', '<script>\nimport { Dialog } from "bits-ui";\n</script>\n<Dialog />\n', "[standards/rule/frontend-components.compose-composites-in-page-code] apps/web/src/routes/bits.svelte: imports the primitive library directly");
+  pathCase('a svelte application importing the primitive library', 'apps/web/src/routes/bits.svelte', '<script>\nimport { Dialog } from "bits-ui";\n</script>\n<Dialog />\n', "[litespec/rule/frontend-components.compose-composites-in-page-code] apps/web/src/routes/bits.svelte: imports the primitive library directly");
   pathCase('a svelte application importing the react primitive library is outside its boundary', 'apps/web/src/routes/shim.svelte', '<script>\nimport { Dialog } from "@base-ui/react/dialog";\n</script>\n', null);
   pathCase('a svelte application importing a table library', 'apps/web/src/routes/table.svelte', '<script>\nimport { flexRender } from "@tanstack/svelte-table";\n</script>\n', 'imports the table library directly');
-  pathCase('a svelte utility violation cites the svelte provision', 'packages/ui/src/floorplans/card.svelte', '<div class="text-red-500">Overdue</div>\n', "[standards/rule/frontend-ui.restrict-css-decisions] packages/ui/src/floorplans/card.svelte: raw Tailwind palette value requires a semantic token 'text-red-500'");
+  pathCase('a svelte utility violation cites the svelte provision', 'packages/ui/src/floorplans/card.svelte', '<div class="text-red-500">Overdue</div>\n', "[litespec/rule/frontend-ui.restrict-css-decisions] packages/ui/src/floorplans/card.svelte: raw Tailwind palette value requires a semantic token 'text-red-500'");
   {
     const lock = readJson(lockFile);
     lock.preset.baseColor = 'slate';
     writeJson(lockFile, lock);
-    report('a svelte source lock describing a preset the manifest does not pin', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: preset.baseColor does not match the manifest baseline", run());
+    report('a svelte source lock describing a preset the manifest does not pin', "[litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: preset.baseColor does not match the manifest baseline", run());
     asSvelte();
   }
   {
@@ -625,7 +625,7 @@ console.log('\nSvelte baseline (standards/rule/frontend-ui.pin-the-baseline-in-t
     const components = readJson(componentsFile);
     components.tailwind.baseColor = 'slate';
     writeJson(componentsFile, components);
-    report('svelte components.json naming a base colour the baseline does not pin', "[standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: tailwind.baseColor must be 'neutral'", run());
+    report('svelte components.json naming a base colour the baseline does not pin', "[litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: tailwind.baseColor must be 'neutral'", run());
     asSvelte();
   }
   {
@@ -633,14 +633,14 @@ console.log('\nSvelte baseline (standards/rule/frontend-ui.pin-the-baseline-in-t
     components.registry = 'https://blocks.fixture.test';
     writeJson(componentsFile, components);
     report('svelte components.json naming another registry', "registry 'https://blocks.fixture.test' is not the built-in shadcn-svelte registry", run());
-    const exceptionPath = writeException('extra-registry', 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package', '2099-01-01');
+    const exceptionPath = writeException('extra-registry', 'litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package', '2099-01-01');
     report('a svelte registry exception carries the frontend provision', null, run());
     fs.rmSync(exceptionPath);
     asSvelte();
   }
   {
-    const exceptionPath = writeException('ui-authority', 'standards/rule/frontend-ui.select-one-visual-authority', '2020-01-01');
-    report('a svelte UI exception with an expired review date', "[standards/rule/frontend-ui.select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision", run());
+    const exceptionPath = writeException('ui-authority', 'litespec/rule/frontend-ui.select-one-visual-authority', '2020-01-01');
+    report('a svelte UI exception with an expired review date', "[litespec/rule/frontend-ui.select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision", run());
     fs.rmSync(exceptionPath);
     asSvelte();
   }

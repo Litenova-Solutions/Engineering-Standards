@@ -18,10 +18,10 @@
 //
 // It reads no page document. The route code is the page contract, and the route
 // suite proves each route in a browser.
-// (standards/rule/frontend-ui.check-every-route-in-a-browser)
+// (litespec/rule/frontend-ui.check-every-route-in-a-browser)
 //
 // Usage:
-//   node standards/tools/validate-ui.mjs [consumerRoot]
+//   node litespec/tools/validate-ui.mjs [consumerRoot]
 
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -237,7 +237,7 @@ function classStrings(text) {
 // value, which it does not.
 //
 // The names below are the functional variants of the Tailwind release that
-// `standards.manifest.json` pins under `packages.npm.tailwindcss`. They compose,
+// `litespec.manifest.json` pins under `packages.npm.tailwindcss`. They compose,
 // so `group-data-[open]` and `not-has-[a]` are one variant each. A Tailwind
 // release that adds a functional variant needs this list and a fixture case;
 // until it has both, the new variant reports as an arbitrary selector rather
@@ -298,7 +298,7 @@ function inspectClassString(value, report, options = {}) {
 function schemaCheck(schemaName, value, label, provisionId) {
   const file = path.join(schemaRoot, schemaName);
   if (!fs.existsSync(file)) {
-    error(`${label}: schema '${schemaName}' is missing from the standards release`);
+    error(`${label}: schema '${schemaName}' is missing from the LiteSpec release`);
     return false;
   }
   const schema = readJson(file, schemaName);
@@ -336,12 +336,12 @@ function validateComponentsJson(file, baseline, baselineOverride, platform) {
     // its icon, menu, and registry fields are optional. An omitted field takes
     // the CLI default the baseline records, so only a present field is
     // compared. The style field is deprecated under Tailwind v4 and unread.
-    if (config.tailwind?.baseColor !== baseline.baseColor) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
+    if (config.tailwind?.baseColor !== baseline.baseColor) error(`[litespec/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
     for (const [key, value] of Object.entries({ iconLibrary: baseline.icons, menuColor: baseline.menuColor, menuAccent: baseline.menuAccent })) {
-      if (config[key] !== undefined && config[key] !== value) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
+      if (config[key] !== undefined && config[key] !== value) error(`[litespec/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
     }
     if (config.registry && config.registry !== baseline.registry?.url && !baselineOverride) {
-      error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${config.registry}' is not the built-in shadcn-svelte registry; an additional registry requires an exception`);
+      error(`[litespec/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${config.registry}' is not the built-in shadcn-svelte registry; an additional registry requires an exception`);
     }
     return;
   }
@@ -353,12 +353,12 @@ function validateComponentsJson(file, baseline, baselineOverride, platform) {
     rtl: false,
   };
   for (const [key, value] of Object.entries(expected)) {
-    if (config[key] !== value) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
+    if (config[key] !== value) error(`[litespec/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: ${key} must be ${JSON.stringify(value)}`);
   }
-  if (config.tailwind?.baseColor !== baseline.baseColor) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
-  if (config.tailwind?.cssVariables !== baseline.cssVariables) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.cssVariables must be ${baseline.cssVariables}`);
+  if (config.tailwind?.baseColor !== baseline.baseColor) error(`[litespec/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.baseColor must be '${baseline.baseColor}'`);
+  if (config.tailwind?.cssVariables !== baseline.cssVariables) error(`[litespec/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: tailwind.cssVariables must be ${baseline.cssVariables}`);
   if (config.registries && Object.keys(config.registries).length > 0 && !baselineOverride) {
-    error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: an additional registry requires an exception`);
+    error(`[litespec/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: an additional registry requires an exception`);
   }
 }
 
@@ -371,17 +371,17 @@ function validateSourceLock(file, baseline, packageRoot, manifest, baselineOverr
   if (!lock) return;
   const ui = 'frontend-ui';
   for (const key of ['schemaVersion', 'generator', 'cli', 'preset', 'registry', 'formatter', 'components']) required(lock, key, label);
-  schemaCheck('ui-source-lock.schema.json', lock, label, `standards/rule/${ui}.track-source-changes`);
+  schemaCheck('ui-source-lock.schema.json', lock, label, `litespec/rule/${ui}.track-source-changes`);
   const cliPackage = platform === 'svelte' ? 'shadcn-svelte' : 'shadcn';
   const expectedCli = manifest?.packages?.npm?.[cliPackage];
   // The pinned-version test already rejects `latest` and every other range, so
   // no separate branch for the word is reachable.
   if (!/^\d+\.\d+\.\d+$/.test(lock.cli ?? '')) error(`${label}: cli must be a pinned semantic version`);
   else if (expectedCli && lock.cli !== expectedCli) error(`${label}: cli must match manifest ${cliPackage} pin '${expectedCli}'`);
-  if ((lock.registry?.name !== baseline.registry?.name || lock.registry?.url !== baseline.registry?.url) && !baselineOverride) error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${lock.registry?.name ?? '(unnamed)'}' is not the built-in ${baseline.registry?.name ?? 'registry'} registry; an additional registry requires an exception`);
+  if ((lock.registry?.name !== baseline.registry?.name || lock.registry?.url !== baseline.registry?.url) && !baselineOverride) error(`[litespec/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: registry '${lock.registry?.name ?? '(unnamed)'}' is not the built-in ${baseline.registry?.name ?? 'registry'} registry; an additional registry requires an exception`);
   for (const key of ['style', 'base', 'cssVariables', 'baseColor', 'theme', 'chartColor', 'font', 'fontHeading', 'icons', 'radius', 'menuAccent', 'menuColor', 'componentsStyle']) {
     if (baseline[key] !== undefined && lock.preset?.[key] !== baseline[key]) {
-      error(`[standards/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: preset.${key} does not match the manifest baseline`);
+      error(`[litespec/rule/${ui}.pin-the-baseline-in-the-shared-package] ${label}: preset.${key} does not match the manifest baseline`);
     }
   }
   const pinnedPackages = new Set(Object.keys(manifest?.packages?.npm ?? {}));
@@ -391,7 +391,7 @@ function validateSourceLock(file, baseline, packageRoot, manifest, baselineOverr
     const itemLabel = `${label}.${item?.name ?? 'component'}`;
     for (const key of ['name', 'address', 'status', 'paths', 'digest', 'dependencies']) required(item, key, itemLabel);
     for (const dependency of array(item, 'dependencies', itemLabel)) {
-      if (!pinnedPackages.has(dependency)) error(`[standards/rule/${ui}.track-source-changes] ${itemLabel}: dependency '${dependency}' is not pinned in the standards manifest`);
+      if (!pinnedPackages.has(dependency)) error(`[litespec/rule/${ui}.track-source-changes] ${itemLabel}: dependency '${dependency}' is not pinned in the LiteSpec manifest`);
     }
     for (const relative of array(item, 'paths', itemLabel)) {
       const candidate = path.resolve(packageRoot, relative);
@@ -404,7 +404,7 @@ function validateSourceLock(file, baseline, packageRoot, manifest, baselineOverr
         continue;
       }
       if (digest(candidate) !== item.digest && item.status === 'baseline') {
-        error(`[standards/rule/frontend-ui.track-source-changes] ${itemLabel}: '${relative}' no longer matches the recorded digest; record it as extended or forked`);
+        error(`[litespec/rule/frontend-ui.track-source-changes] ${itemLabel}: '${relative}' no longer matches the recorded digest; record it as extended or forked`);
       }
     }
   }
@@ -415,28 +415,28 @@ const DESIGN_SECTIONS = ['Brand', 'Tokens', 'Vocabulary', 'Patterns', 'Do', 'Do 
 // The design contract travels with the shared package, so it is read once for the
 // workspace rather than once per application. A floorplan it names outside the
 // closed set is a design decision, not a route-level choice.
-// (standards/rule/frontend-ui.publish-a-design-contract,
-// standards/rule/frontend-ui.declare-a-closed-floorplan-set)
+// (litespec/rule/frontend-ui.publish-a-design-contract,
+// litespec/rule/frontend-ui.declare-a-closed-floorplan-set)
 function validateDesignContract(pkg, platform) {
   const label = relativeToRoot(filePath(pkg.designContract));
   const file = filePath(pkg.designContract);
   const ui = 'frontend-ui';
   if (!fs.existsSync(file)) {
-    error(`[standards/rule/${ui}.publish-a-design-contract] shared package '${pkg.name}': no design contract at '${pkg.designContract}'`);
+    error(`[litespec/rule/${ui}.publish-a-design-contract] shared package '${pkg.name}': no design contract at '${pkg.designContract}'`);
     return null;
   }
   const metadata = parseMetadata(file);
   if (!metadata) {
-    error(`[standards/rule/${ui}.publish-a-design-contract] ${label}: design contract has no metadata block`);
+    error(`[litespec/rule/${ui}.publish-a-design-contract] ${label}: design contract has no metadata block`);
     return null;
   }
-  schemaCheck('design-contract.schema.json', metadata, label, `standards/rule/${ui}.publish-a-design-contract`);
+  schemaCheck('design-contract.schema.json', metadata, label, `litespec/rule/${ui}.publish-a-design-contract`);
   if (pkg.name && metadata.package !== pkg.name) {
-    error(`[standards/rule/${ui}.publish-a-design-contract] ${label}: package must be '${pkg.name}'`);
+    error(`[litespec/rule/${ui}.publish-a-design-contract] ${label}: package must be '${pkg.name}'`);
   }
   const present = new Set(sectionNames(fs.readFileSync(file, 'utf8')));
   for (const section of DESIGN_SECTIONS) {
-    if (!present.has(section)) error(`[standards/rule/${ui}.publish-a-design-contract] ${label}: missing required section '${section}'`);
+    if (!present.has(section)) error(`[litespec/rule/${ui}.publish-a-design-contract] ${label}: missing required section '${section}'`);
   }
   return metadata;
 }
@@ -516,7 +516,7 @@ function validateGlobalCss(file, platform) {
   let malformed = false;
   const structure = cssStructure(text, (reason) => {
     malformed = true;
-    error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: global CSS has ${reason}`);
+    error(`[litespec/rule/${ui}.restrict-css-decisions] ${label}: global CSS has ${reason}`);
   });
   let depth = 0;
   for (const character of structure) {
@@ -524,13 +524,13 @@ function validateGlobalCss(file, platform) {
     if (character === '}') {
       depth -= 1;
       if (depth < 0) {
-        error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: closing brace has no matching opening brace`);
+        error(`[litespec/rule/${ui}.restrict-css-decisions] ${label}: closing brace has no matching opening brace`);
         malformed = true;
         break;
       }
     }
   }
-  if (!malformed && depth !== 0) error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: global CSS has an unclosed block`);
+  if (!malformed && depth !== 0) error(`[litespec/rule/${ui}.restrict-css-decisions] ${label}: global CSS has an unclosed block`);
   // The packages the manifest already pins. A pinned font family is a token, so
   // importing one from the token sheet is the sheet doing its job rather than a
   // project reaching for a stylesheet the sheet cannot see.
@@ -542,7 +542,7 @@ function validateGlobalCss(file, platform) {
     if (allowedGlobalImports.has(specifier) || specifier.startsWith('./')) continue;
     const packageName = specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0];
     if (!pinned.has(packageName)) {
-      error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: import '${specifier}' is outside the approved global CSS surface`);
+      error(`[litespec/rule/${ui}.restrict-css-decisions] ${label}: import '${specifier}' is outside the approved global CSS surface`);
     }
   }
   classifyGlobalCss(label, structure, ui);
@@ -597,7 +597,7 @@ function classifyGlobalCss(label, stripped, ui) {
       statement = '';
     }
   }
-  if (applyOutsideBase) error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: '@apply' outside the generated '@layer base' block hides an unreviewed utility group`);
+  if (applyOutsideBase) error(`[litespec/rule/${ui}.restrict-css-decisions] ${label}: '@apply' outside the generated '@layer base' block hides an unreviewed utility group`);
 }
 
 function reportGlobalStatement(label, statement, ui) {
@@ -605,7 +605,7 @@ function reportGlobalStatement(label, statement, ui) {
   if (!value) return;
   if (value.startsWith('@')) {
     const name = value.slice(1).split(/[\s(;]/)[0];
-    if (!allowedGlobalAtRules.has(name)) error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: at-rule '@${name}' is outside the approved global CSS surface`);
+    if (!allowedGlobalAtRules.has(name)) error(`[litespec/rule/${ui}.restrict-css-decisions] ${label}: at-rule '@${name}' is outside the approved global CSS surface`);
     return;
   }
   // The generated theme entry declares the color-scheme class itself.
@@ -614,7 +614,7 @@ function reportGlobalStatement(label, statement, ui) {
     const trimmed = selector.trim();
     if (allowedClassSelectors.has(trimmed)) continue;
     if (trimmed.startsWith('.') || trimmed.startsWith('#')) {
-      error(`[standards/rule/${ui}.restrict-css-decisions] ${label}: selector '${trimmed}' is a feature style; use a component variant or semantic token`);
+      error(`[litespec/rule/${ui}.restrict-css-decisions] ${label}: selector '${trimmed}' is a feature style; use a component variant or semantic token`);
     }
   }
 }
@@ -631,13 +631,13 @@ function validateFrontendStylesheet(file, packageRoot, pkg, platform) {
   const structure = cssStructure(text, () => {});
   const imports = [...text.matchAll(/@import\s+(["'])([^"']+)\1/g)].map((match) => match[2]);
   if (!imports.length) {
-    error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: imports no stylesheet; an application stylesheet imports the shared package's token stylesheet`);
+    error(`[litespec/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: imports no stylesheet; an application stylesheet imports the shared package's token stylesheet`);
     return;
   }
   for (const value of imports) {
     if (value.startsWith('./') || value.startsWith('../')) continue;
     if (!value.startsWith(`${pkg.name}/`)) {
-      error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: import '${value}' is outside the shared package '${pkg.name}'`);
+      error(`[litespec/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: import '${value}' is outside the shared package '${pkg.name}'`);
     }
   }
   for (const match of structure.matchAll(/\{([^}]*)\}/g)) {
@@ -648,11 +648,11 @@ function validateFrontendStylesheet(file, packageRoot, pkg, platform) {
       // that reads as a CSS property is a literal the token sheet owns.
       if (!property || property.startsWith('--') || property.startsWith('@')) continue;
       if (!/^-?[a-z][a-z0-9-]*$/i.test(property)) continue;
-      error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: declares '${property}'; a value written in an application belongs in the shared package's tokens`);
+      error(`[litespec/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: declares '${property}'; a value written in an application belongs in the shared package's tokens`);
     }
   }
   if (!within(path.resolve(root), packageRoot)) {
-    error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: the shared package root '${pkg.path}' is outside the workspace`);
+    error(`[litespec/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: the shared package root '${pkg.path}' is outside the workspace`);
   }
 }
 
@@ -662,7 +662,7 @@ function validateFrontendStylesheet(file, packageRoot, pkg, platform) {
 // utilities, device rules, and display helpers, written from tokens. A literal
 // colour here is a second token sheet beside the first, so every stylesheet but
 // the token sheet is held to the same rule as an application stylesheet.
-// (standards/rule/frontend-ui.keep-tokens-in-one-stylesheet)
+// (litespec/rule/frontend-ui.keep-tokens-in-one-stylesheet)
 function validateSharedStylesheets(packageRoot, tokensFile, platform) {
   const tokenPath = path.resolve(tokensFile);
   const ui = 'frontend-ui';
@@ -676,7 +676,7 @@ function validateSharedStylesheets(packageRoot, tokensFile, platform) {
     for (const match of structure.matchAll(/\b(?:oklch|rgba?|hsla?)\(|#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3,4}\b/g)) {
       if (reported.has(match[0])) continue;
       reported.add(match[0]);
-      error(`[standards/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: literal colour '${match[0]}' belongs in the token stylesheet`);
+      error(`[litespec/rule/${ui}.keep-tokens-in-one-stylesheet] ${label}: literal colour '${match[0]}' belongs in the token stylesheet`);
     }
   }
 }
@@ -685,7 +685,7 @@ function validateSharedStylesheets(packageRoot, tokensFile, platform) {
 // authored file outside the copied primitive boundary and the tests. The shared
 // package owns the primitive library, so its composites import it deliberately;
 // an application does not, and `validateApplicationImports` refuses it there.
-// (standards/rule/frontend-ui.restrict-css-decisions)
+// (litespec/rule/frontend-ui.restrict-css-decisions)
 function validateSourceScan(target, primitives, platform) {
   const ui = 'frontend-ui';
   const files = walk(target, (file) => /\.(?:ts|tsx|js|jsx|svelte)$/.test(file));
@@ -701,7 +701,7 @@ function validateSourceScan(target, primitives, platform) {
         const key = `${kind}:${token}`;
         if (reported.has(key)) return;
         reported.add(key);
-        error(`[standards/rule/${ui}.restrict-css-decisions] ${relative}: ${utilityMessages[kind]} '${token}'`);
+        error(`[litespec/rule/${ui}.restrict-css-decisions] ${relative}: ${utilityMessages[kind]} '${token}'`);
       }, { variants: false });
     }
     // A visual file is the one drawing no shared component makes, so it lays
@@ -741,7 +741,7 @@ function validateApplicationImports(frontendRoot, pkg, platform) {
       // only a real import statement counts.
       const statements = [...text.matchAll(/(?:^|\n)\s*(?:import|export)[^;\n]*['"][^'"]+['"]/g)].map((match) => match[0]);
       if (!statements.some((statement) => boundary.pattern.test(statement))) continue;
-      error(`[standards/rule/${components}.compose-composites-in-page-code] ${relative}: ${boundary.message} from shared package '${pkg.name}'`);
+      error(`[litespec/rule/${components}.compose-composites-in-page-code] ${relative}: ${boundary.message} from shared package '${pkg.name}'`);
     }
   }
 }
@@ -794,7 +794,7 @@ function validateDependencyBoundary() {
       ...(packageJson.resolutions ?? {}),
     };
     for (const name of visualPackages) {
-      if (dependencies[name]) error(`[standards/rule/frontend-ui.select-one-visual-authority] ${label}: second general-purpose visual dependency '${name}' requires an exception`);
+      if (dependencies[name]) error(`[litespec/rule/frontend-ui.select-one-visual-authority] ${label}: second general-purpose visual dependency '${name}' requires an exception`);
     }
   }
 }
@@ -810,12 +810,12 @@ function validatePatternCatalog(relative) {
   const file = filePath(relative);
   const label = relativeToRoot(file);
   if (!fs.existsSync(file)) {
-    error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] pattern catalog: no catalog at '${relative}'`);
+    error(`[litespec/rule/frontend-patterns.keep-one-pattern-catalog] pattern catalog: no catalog at '${relative}'`);
     return;
   }
   const catalog = readJson(file, label);
   if (!catalog) return;
-  schemaCheck('ui-pattern-catalog.schema.json', catalog, label, 'standards/rule/frontend-patterns.keep-one-pattern-catalog');
+  schemaCheck('ui-pattern-catalog.schema.json', catalog, label, 'litespec/rule/frontend-patterns.keep-one-pattern-catalog');
   // A catalog that breaks the schema still reads below, so each access guards
   // its own shape rather than assuming the schema proved it.
   const breakpoints = catalog.breakpoints && typeof catalog.breakpoints === 'object' && !Array.isArray(catalog.breakpoints)
@@ -824,7 +824,7 @@ function validatePatternCatalog(relative) {
   const groupIds = new Set(Array.isArray(catalog.groups) ? catalog.groups.map((group) => group?.id) : []);
   const patterns = Array.isArray(catalog.patterns) ? catalog.patterns : [];
   // A pattern citing a library pattern starts from the library's entry. The
-  // library ships with the standards release the validator runs from, so it
+  // library ships with the LiteSpec release the validator runs from, so it
   // resolves beside this file rather than under the consumer root. A catalog
   // that cites nothing reads nothing here.
   const citesLibrary = patterns.some((pattern) => typeof pattern?.library === 'string' && pattern.library !== '');
@@ -832,7 +832,7 @@ function validatePatternCatalog(relative) {
   if (citesLibrary) {
     const libraryFile = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'patterns', 'ui', 'library.json');
     if (!fs.existsSync(libraryFile)) {
-      error(`${label}: the UI pattern library is missing from the standards release`);
+      error(`${label}: the UI pattern library is missing from the LiteSpec release`);
     } else {
       const library = readJson(libraryFile, 'UI pattern library');
       if (library) {
@@ -845,7 +845,7 @@ function validatePatternCatalog(relative) {
   for (const pattern of patterns) {
     const id = pattern?.id ?? '(unnamed)';
     if (pattern?.id !== undefined) {
-      if (seenPatterns.has(pattern.id)) error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${label}: duplicate pattern id '${pattern.id}'`);
+      if (seenPatterns.has(pattern.id)) error(`[litespec/rule/frontend-patterns.keep-one-pattern-catalog] ${label}: duplicate pattern id '${pattern.id}'`);
       seenPatterns.add(pattern.id);
     }
     const where = `${label}: pattern '${id}'`;
@@ -854,25 +854,25 @@ function validatePatternCatalog(relative) {
     const seenOptions = new Set();
     for (const option of options) {
       if (option?.id === undefined) continue;
-      if (seenOptions.has(option.id)) error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${where} has a duplicate option id '${option.id}'`);
+      if (seenOptions.has(option.id)) error(`[litespec/rule/frontend-patterns.keep-one-pattern-catalog] ${where} has a duplicate option id '${option.id}'`);
       seenOptions.add(option.id);
     }
     if (pattern?.group !== undefined && !groupIds.has(pattern.group)) {
-      error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${where}: group '${pattern.group}' is not one of the catalog groups`);
+      error(`[litespec/rule/frontend-patterns.keep-one-pattern-catalog] ${where}: group '${pattern.group}' is not one of the catalog groups`);
     }
     if (pattern?.decision?.option !== undefined && !optionIds.has(pattern.decision.option)) {
-      error(`[standards/rule/frontend-patterns.record-every-option-considered] ${where}: decision.option '${pattern.decision.option}' is not one of its options`);
+      error(`[litespec/rule/frontend-patterns.record-every-option-considered] ${where}: decision.option '${pattern.decision.option}' is not one of its options`);
     }
     if (pattern?.compact?.breakpoint !== undefined && !breakpoints.has(pattern.compact.breakpoint)) {
-      error(`[standards/rule/frontend-patterns.declare-the-compact-behaviour] ${where}: compact.breakpoint '${pattern.compact.breakpoint}' is not a key of breakpoints`);
+      error(`[litespec/rule/frontend-patterns.declare-the-compact-behaviour] ${where}: compact.breakpoint '${pattern.compact.breakpoint}' is not a key of breakpoints`);
     }
     if (pattern?.compact?.option !== undefined && !optionIds.has(pattern.compact.option)) {
-      error(`[standards/rule/frontend-patterns.declare-the-compact-behaviour] ${where}: compact.option '${pattern.compact.option}' is not one of its options`);
+      error(`[litespec/rule/frontend-patterns.declare-the-compact-behaviour] ${where}: compact.option '${pattern.compact.option}' is not one of its options`);
     }
     const extensions = Array.isArray(pattern?.extensions) ? pattern.extensions : [];
     extensions.forEach((extension, index) => {
       if (extension?.option !== undefined && !optionIds.has(extension.option)) {
-        error(`[standards/rule/frontend-patterns.record-every-option-considered] ${where}: extensions[${index}].option '${extension.option}' is not one of its options`);
+        error(`[litespec/rule/frontend-patterns.record-every-option-considered] ${where}: extensions[${index}].option '${extension.option}' is not one of its options`);
       }
     });
     // A citation names the library pattern the entry starts from. An option id
@@ -882,7 +882,7 @@ function validatePatternCatalog(relative) {
     if (typeof pattern?.library === 'string' && pattern.library !== '' && libraryById) {
       const entry = libraryById.get(pattern.library);
       if (entry === undefined) {
-        error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${where}: library '${pattern.library}' is not a pattern in the UI pattern library`);
+        error(`[litespec/rule/frontend-patterns.keep-one-pattern-catalog] ${where}: library '${pattern.library}' is not a pattern in the UI pattern library`);
       } else {
         const libraryOptions = Array.isArray(entry?.options) ? entry.options : [];
         const libraryNames = new Map(libraryOptions.map((option) => [option?.id, option?.name]));
@@ -890,7 +890,7 @@ function validatePatternCatalog(relative) {
           if (option?.id === undefined || !libraryNames.has(option.id)) return;
           const libraryName = libraryNames.get(option.id);
           if (typeof libraryName === 'string' && option?.name !== undefined && option.name !== libraryName) {
-            error(`[standards/rule/frontend-patterns.keep-one-pattern-catalog] ${where}: options[${index}].name '${option.name}' does not match the UI pattern library option '${option.id}' name '${libraryName}'`);
+            error(`[litespec/rule/frontend-patterns.keep-one-pattern-catalog] ${where}: options[${index}].name '${option.name}' does not match the UI pattern library option '${option.id}' name '${libraryName}'`);
           }
         });
       }
@@ -904,17 +904,17 @@ function validatePatternCatalog(relative) {
         implementation.components.forEach((component, index) => {
           if (typeof component !== 'string' || !component) return;
           if (!fs.existsSync(filePath(component))) {
-            error(`[standards/rule/frontend-patterns.implement-a-chosen-pattern-once] ${target}.components[${index}] does not exist '${component}'`);
+            error(`[litespec/rule/frontend-patterns.implement-a-chosen-pattern-once] ${target}.components[${index}] does not exist '${component}'`);
           }
         });
       }
       const components = implementation?.components;
       if (implementation?.status === 'adopted' && (components === undefined || (Array.isArray(components) && components.length === 0))) {
-        error(`[standards/rule/frontend-patterns.implement-a-chosen-pattern-once] ${target} has status 'adopted' with no components`);
+        error(`[litespec/rule/frontend-patterns.implement-a-chosen-pattern-once] ${target} has status 'adopted' with no components`);
       }
       const gap = implementation?.gap;
       if ((implementation?.status === 'partial' || implementation?.status === 'pending') && (gap === undefined || gap === null || gap === '')) {
-        error(`[standards/rule/frontend-patterns.state-the-implementation-status] ${target} has status '${implementation.status}' with no gap`);
+        error(`[litespec/rule/frontend-patterns.state-the-implementation-status] ${target} has status '${implementation.status}' with no gap`);
       }
     }
   }
@@ -924,15 +924,15 @@ function validatePatternCatalog(relative) {
 
 const CONTROLLED_PLATFORMS = ['react', 'svelte'];
 
-const projectFile = path.join(root, 'standards.project.json');
+const projectFile = path.join(root, 'litespec.project.json');
 if (!fs.existsSync(projectFile)) {
-  console.error(`No standards.project.json at ${root}`);
+  console.error(`No litespec.project.json at ${root}`);
   process.exit(2);
 }
-const project = readJson(projectFile, 'standards.project.json');
-const manifestFile = fs.existsSync(path.join(root, 'standards/standards.manifest.json'))
-  ? path.join(root, 'standards/standards.manifest.json')
-  : path.join(root, '../standards.manifest.json');
+const project = readJson(projectFile, 'litespec.project.json');
+const manifestFile = fs.existsSync(path.join(root, 'litespec/litespec.manifest.json'))
+  ? path.join(root, 'litespec/litespec.manifest.json')
+  : path.join(root, '../litespec.manifest.json');
 const manifest = fs.existsSync(manifestFile) ? readJson(manifestFile, relativeToRoot(manifestFile)) : null;
 const frontends = project?.paths?.frontends ?? [];
 const controlled = frontends.filter((frontend) => CONTROLLED_PLATFORMS.includes(frontend?.platform));
@@ -1008,24 +1008,24 @@ for (const exception of uiExceptions) {
 
 // A controlled frontend composes the shared package, so the workspace declares
 // it once. A frontend that composes no shared component carries no UI block.
-// (standards/rule/frontend-ui.select-one-visual-authority)
+// (litespec/rule/frontend-ui.select-one-visual-authority)
 // An additional registry passes both registry gates under an exception against
 // the pinned baseline provision. The review date on that record is checked
 // above; the gates below check its presence.
-const baselineOverride = uiExceptions.some((exception) => exception.standard === 'standards/rule/frontend-ui.pin-the-baseline-in-the-shared-package');
+const baselineOverride = uiExceptions.some((exception) => exception.standard === 'litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package');
 const pkg = project?.paths?.uiPackage ?? null;
 if (!controlled.length && pkg) {
-  error('standards.project.json: paths.uiPackage is declared but no frontend declares a controlled platform (react, svelte)');
+  error('litespec.project.json: paths.uiPackage is declared but no frontend declares a controlled platform (react, svelte)');
 }
 if (controlled.length && !pkg) {
-  error(`standards/rule/frontend-ui.select-one-visual-authority standards.project.json: ${controlled.length} controlled frontend(s) and no paths.uiPackage`);
+  error(`litespec/rule/frontend-ui.select-one-visual-authority litespec.project.json: ${controlled.length} controlled frontend(s) and no paths.uiPackage`);
 }
 
 let packageSummary = null;
 
 if (pkg) {
   const label = `shared package '${pkg.name ?? '(unnamed)'}'`;
-  if (!baseline) error(`${label}: the standards manifest has no ${baselineKey}`);
+  if (!baseline) error(`${label}: the LiteSpec manifest has no ${baselineKey}`);
   for (const key of ['name', 'path', 'componentsJson', 'primitives', 'tokens', 'sourceLock', 'designContract']) required(pkg, key, label);
   const exports = array(pkg, 'publicExports', label);
   if (exports.length === 0) error(`${label}: publicExports must contain at least one entry point`);
@@ -1103,7 +1103,7 @@ for (const frontend of controlled) {
           const key = `${kind}:${token}`;
           if (seen.has(key)) return;
           seen.add(key);
-          error(`[standards/rule/${ui}.restrict-css-decisions] ${relative}: ${utilityMessages[kind]} '${token}'`);
+          error(`[litespec/rule/${ui}.restrict-css-decisions] ${relative}: ${utilityMessages[kind]} '${token}'`);
         });
       }
     }
@@ -1118,7 +1118,7 @@ for (const frontend of controlled) {
       // none of those after its name, so element styles never match this test.
       const inline = source.endsWith('.svelte') ? /\sstyle(?::|=|\{)/ : /style=\{\{/;
       if (inline.test(fs.readFileSync(source, 'utf8'))) {
-        error(`[standards/rule/${ui}.restrict-css-decisions] ${relative}: an inline style belongs in a shared component`);
+        error(`[litespec/rule/${ui}.restrict-css-decisions] ${relative}: an inline style belongs in a shared component`);
       }
     }
   }
@@ -1126,7 +1126,7 @@ for (const frontend of controlled) {
 
 // A workspace that records pattern decisions keeps one catalog beside its
 // design contract. A workspace without one reports nothing here.
-// (standards/rule/frontend-patterns.keep-one-pattern-catalog)
+// (litespec/rule/frontend-patterns.keep-one-pattern-catalog)
 if (project?.paths?.uiPatterns) {
   validatePatternCatalog(project.paths.uiPatterns);
 }
@@ -1155,7 +1155,7 @@ if (errors.length) {
 if (!pkg) {
   // A silent skip reads as conformance. Naming the frontends and the platform
   // each one declared makes the skipped scope visible in the output that a
-  // reviewer reads. (standards/rule/frontend-ui.record-a-frontend-outside-the-controlled-contract)
+  // reviewer reads. (litespec/rule/frontend-ui.record-a-frontend-outside-the-controlled-contract)
   const declared = frontends.map((frontend) => `${frontend.name} (platform: ${frontend.platform ?? 'undeclared'})`);
   console.log('PASS: no controlled web frontend is present.');
   if (declared.length) console.log(`Skipped frontends: ${declared.join(', ')}`);

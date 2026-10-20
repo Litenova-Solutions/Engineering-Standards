@@ -8,16 +8,16 @@ One scoped session and one command post-handler own the transaction boundary. Ma
 
 ## Agent Summary {#agent-summary}
 
-- Commands write through repositories, never the session directly. (standards/rule/backend-persistence.stage-aggregate-writes-through-repositories)
-- Queries project through the read session with scope and limits applied. (standards/rule/backend-persistence.query-through-iquerysession)
-- One post-handler commits each command; nothing else calls save. (standards/rule/backend-persistence.commit-once-in-the-command-pipeline)
-- Repositories buffer events for the post-handler to drain. (standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work)
-- Document aliases and identifier mappings are declared explicitly. (standards/rule/backend-persistence.keep-mappings-and-aliases-explicit)
-- Infrastructure owns the stored JSON contract, not Domain. (standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain)
-- Stored contract changes carry a reviewed transformation. (standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly)
-- Aggregate documents carry no unbounded collection. (standards/rule/backend-persistence.bound-aggregate-document-growth)
-- Database identifiers use snake case. (standards/rule/backend-persistence.use-database-naming-conventions)
-- Persistence behavior is proved against PostgreSQL. (standards/rule/backend-persistence.test-persistence-against-postgresql)
+- Commands write through repositories, never the session directly. (litespec/rule/backend-persistence.stage-aggregate-writes-through-repositories)
+- Queries project through the read session with scope and limits applied. (litespec/rule/backend-persistence.query-through-iquerysession)
+- One post-handler commits each command; nothing else calls save. (litespec/rule/backend-persistence.commit-once-in-the-command-pipeline)
+- Repositories buffer events for the post-handler to drain. (litespec/rule/backend-persistence.collect-events-without-a-public-unit-of-work)
+- Document aliases and identifier mappings are declared explicitly. (litespec/rule/backend-persistence.keep-mappings-and-aliases-explicit)
+- Infrastructure owns the stored JSON contract, not Domain. (litespec/rule/backend-persistence.keep-serialization-behavior-out-of-domain)
+- Stored contract changes carry a reviewed transformation. (litespec/rule/backend-persistence.evolve-stored-document-contracts-explicitly)
+- Aggregate documents carry no unbounded collection. (litespec/rule/backend-persistence.bound-aggregate-document-growth)
+- Database identifiers use snake case. (litespec/rule/backend-persistence.use-database-naming-conventions)
+- Persistence behavior is proved against PostgreSQL. (litespec/rule/backend-persistence.test-persistence-against-postgresql)
 
 ## Concepts
 
@@ -27,28 +27,28 @@ The provisions on this page divide into two groups. A reader replacing the provi
 
 | Group | What it fixes | Provisions |
 |:---|:---|:---|
-| Provider-neutral | The boundary, the transaction shape, and the obligations on stored data. | `standards/rule/backend-persistence.stage-aggregate-writes-through-repositories`, `standards/rule/backend-persistence.commit-once-in-the-command-pipeline`, `standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work`, `standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly`, `standards/rule/backend-persistence.bound-aggregate-document-growth`, `standards/rule/backend-persistence.use-database-naming-conventions`, `standards/rule/backend-persistence.control-production-schema-changes`, `standards/rule/backend-persistence.test-persistence-against-postgresql`, `standards/rule/backend-persistence.review-query-plans-for-new-indexes`, `standards/rule/backend-persistence.add-read-documents-for-query-shaped-data` |
-| Provider-specific | The member names and configuration surface the pinned provider supplies. | `standards/rule/backend-persistence.query-through-iquerysession`, `standards/rule/backend-persistence.keep-mappings-and-aliases-explicit`, `standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain`, `standards/rule/backend-persistence.register-one-scoped-session`, `standards/rule/backend-persistence.use-this-infrastructure-layout`, `standards/rule/backend-persistence.persist-one-explicit-state-object` |
+| Provider-neutral | The boundary, the transaction shape, and the obligations on stored data. | `litespec/rule/backend-persistence.stage-aggregate-writes-through-repositories`, `litespec/rule/backend-persistence.commit-once-in-the-command-pipeline`, `litespec/rule/backend-persistence.collect-events-without-a-public-unit-of-work`, `litespec/rule/backend-persistence.evolve-stored-document-contracts-explicitly`, `litespec/rule/backend-persistence.bound-aggregate-document-growth`, `litespec/rule/backend-persistence.use-database-naming-conventions`, `litespec/rule/backend-persistence.control-production-schema-changes`, `litespec/rule/backend-persistence.test-persistence-against-postgresql`, `litespec/rule/backend-persistence.review-query-plans-for-new-indexes`, `litespec/rule/backend-persistence.add-read-documents-for-query-shaped-data` |
+| Provider-specific | The member names and configuration surface the pinned provider supplies. | `litespec/rule/backend-persistence.query-through-iquerysession`, `litespec/rule/backend-persistence.keep-mappings-and-aliases-explicit`, `litespec/rule/backend-persistence.keep-serialization-behavior-out-of-domain`, `litespec/rule/backend-persistence.register-one-scoped-session`, `litespec/rule/backend-persistence.use-this-infrastructure-layout`, `litespec/rule/backend-persistence.persist-one-explicit-state-object` |
 
-The provider-neutral group states one obligation each, and the member named in its text is the baseline binding rather than the obligation. `standards/rule/backend-persistence.commit-once-in-the-command-pipeline` requires exactly one commit for a command pipeline; `SaveChangesAsync` is the call that performs it under the baseline provider.
+The provider-neutral group states one obligation each, and the member named in its text is the baseline binding rather than the obligation. `litespec/rule/backend-persistence.commit-once-in-the-command-pipeline` requires exactly one commit for a command pipeline; `SaveChangesAsync` is the call that performs it under the baseline provider.
 
 The EF Core extension states in its own Baseline relationship section which provisions it replaces for the aggregates it owns. No consumer runs both providers over one aggregate.
 
-The manifest pins both providers' packages, because the extension is part of this release. A pinned package is an available choice rather than an active one, and `standards.project.json` records which choices a consumer made.
+The manifest pins both providers' packages, because the extension is part of this release. A pinned package is an available choice rather than an active one, and `litespec.project.json` records which choices a consumer made.
 
 ## Standards
 
-### Stage aggregate writes through repositories (standards/rule/backend-persistence.stage-aggregate-writes-through-repositories)
+### Stage aggregate writes through repositories (litespec/rule/backend-persistence.stage-aggregate-writes-through-repositories)
 
 **Requirement:** A command handler MUST reach persistence only through a Domain repository, never through `IDocumentSession`.
 
 **Rationale:** Infrastructure implements each repository with the scoped session. A repository loads one aggregate type and exposes no session, generic query, or save operation.
 
-### Query through IQuerySession (standards/rule/backend-persistence.query-through-iquerysession)
+### Query through IQuerySession (litespec/rule/backend-persistence.query-through-iquerysession)
 
 **Requirement:** A query handler MUST project through `IQuerySession`, applying filter, scope, ordering, and limit before materialization.
 
-**Rationale:** A read-store interface per aggregate, a generic read repository, or a callback wrapper adds a layer that the session already provides. Ordering and paging follow `standards/rule/backend-api.bound-collection-queries`.
+**Rationale:** A read-store interface per aggregate, a generic read repository, or a callback wrapper adds a layer that the session already provides. Ordering and paging follow `litespec/rule/backend-api.bound-collection-queries`.
 
 | Provider | Query surface |
 |:---|:---|
@@ -57,7 +57,7 @@ The manifest pins both providers' packages, because the extension is part of thi
 
 The table names the binding per provider; the obligation to project with filter, scope, ordering, and limit holds under each.
 
-### Commit once in the command pipeline (standards/rule/backend-persistence.commit-once-in-the-command-pipeline)
+### Commit once in the command pipeline (litespec/rule/backend-persistence.commit-once-in-the-command-pipeline)
 
 **Requirement:** Exactly one global command post-handler MUST call `SaveChangesAsync` for a command pipeline.
 
@@ -65,19 +65,19 @@ The table names the binding per provider; the obligation to project with filter,
 
 The obligation is one commit for one pipeline, not one named method. Under the baseline provider that commit is `IDocumentSession.SaveChangesAsync`. Under the `efcore` extension it is `DbContext.SaveChangesAsync`, wrapped in an explicit transaction when the pipeline writes through more than one context.
 
-### Collect events without a public unit of work (standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work)
+### Collect events without a public unit of work (litespec/rule/backend-persistence.collect-events-without-a-public-unit-of-work)
 
 **Requirement:** A repository MUST register each touched aggregate with the internal scoped event buffer that the post-handler drains.
 
 **Rationale:** The post-handler collects pending events before committing, so no public unit-of-work type is needed. Best-effort delivery publishes after the commit succeeds.
 
-### Keep mappings and aliases explicit (standards/rule/backend-persistence.keep-mappings-and-aliases-explicit)
+### Keep mappings and aliases explicit (litespec/rule/backend-persistence.keep-mappings-and-aliases-explicit)
 
 **Requirement:** Each stored aggregate MUST declare a stable document alias, typed-identifier mapping, and the indexes its accepted queries need.
 
 **Rationale:** A CLR rename then cannot change a document type or collection name. Infrastructure owns the store configuration.
 
-### Keep serialization behavior out of Domain (standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain)
+### Keep serialization behavior out of Domain (litespec/rule/backend-persistence.keep-serialization-behavior-out-of-domain)
 
 **Requirement:** Infrastructure MUST own the JSON contract for stored documents, including member names, constructors, converters, and polymorphic registration.
 
@@ -85,7 +85,7 @@ The obligation is one commit for one pipeline, not one named method. Under the b
 
 Registration covers the types this store actually persists. A union referenced from another aggregate is registered by the store that writes it, once, rather than by every store that names the referencing type. A type reachable only through an identifier is not persisted here and needs no registration.
 
-### Evolve stored document contracts explicitly (standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly)
+### Evolve stored document contracts explicitly (litespec/rule/backend-persistence.evolve-stored-document-contracts-explicitly)
 
 **Requirement:** A rename, removal, type change, member move, or discriminator change MUST have a reviewed data transformation or an expand-and-contract rollout.
 
@@ -93,19 +93,19 @@ Registration covers the types this store actually persists. A union referenced f
 
 An additive change is the only kind that needs no transformation, and it is additive only when every earlier document stays valid. A new member with a defined absent-value behavior qualifies. A new required member, a narrowed type, and a new discriminator value that an earlier reader rejects do not.
 
-### Bound aggregate document growth (standards/rule/backend-persistence.bound-aggregate-document-growth)
+### Bound aggregate document growth (litespec/rule/backend-persistence.bound-aggregate-document-growth)
 
 **Requirement:** An aggregate document MUST NOT embed a collection that has no accepted business bound.
 
 **Rationale:** Unbounded growth belongs in another aggregate, an owned document record, or a separate query-shaped document, depending on the consistency boundary it needs.
 
-### Use database naming conventions (standards/rule/backend-persistence.use-database-naming-conventions)
+### Use database naming conventions (litespec/rule/backend-persistence.use-database-naming-conventions)
 
 **Requirement:** A PostgreSQL schema, table, column, index, constraint, document alias, or SQL identifier MUST use `snake_case`.
 
 **Rationale:** .NET types keep normal C# naming, so the mapping layer performs the conversion once. Under the baseline provider the store configuration sets the casing. Under the `efcore` extension the pinned `EFCore.NamingConventions` package applies it, so no configuration repeats the rule per entity.
 
-### Control production schema changes (standards/rule/backend-persistence.control-production-schema-changes)
+### Control production schema changes (litespec/rule/backend-persistence.control-production-schema-changes)
 
 **Requirement:** A hosted environment MUST apply schema changes through a reviewed step before traffic shifts, not from a starting replica.
 
@@ -113,15 +113,15 @@ An additive change is the only kind that needs no transformation, and it is addi
 
 A reviewed step is one that produces an artifact a person approved before it ran. Under the baseline provider that is a generated patch from `martendb` schema migration, applied by a deployment step. Under the `efcore` extension it is a generated migration, applied by `dotnet ef database update` or an idempotent script. A tool that alters the schema from application startup is not a reviewed step whichever provider runs it.
 
-### Test persistence against PostgreSQL (standards/rule/backend-persistence.test-persistence-against-postgresql)
+### Test persistence against PostgreSQL (litespec/rule/backend-persistence.test-persistence-against-postgresql)
 
 **Requirement:** Repository behavior, projections, mappings, correctness indexes, commit behavior, and schema application MUST run against the pinned PostgreSQL through Testcontainers.
 
-**Rationale:** An in-memory substitute cannot prove persistence behavior, because it does not run the query planner or the constraints. HTTP integration through the real host is covered by `standards/rule/backend-testing.test-http-integration-through-the-real-host`.
+**Rationale:** An in-memory substitute cannot prove persistence behavior, because it does not run the query planner or the constraints. HTTP integration through the real host is covered by `litespec/rule/backend-testing.test-http-integration-through-the-real-host`.
 
 ## Conventions
 
-### Use this Infrastructure layout (standards/rule/backend-persistence.use-this-infrastructure-layout)
+### Use this Infrastructure layout (litespec/rule/backend-persistence.use-this-infrastructure-layout)
 
 **Default:** Place Marten configuration, repositories, commit behavior, and serialization under one Infrastructure persistence folder.
 
@@ -151,11 +151,11 @@ A reviewed step is one that produces an artifact a person approved before it ran
           ConsentMartenConfiguration.cs
 ```
 
-The module folders follow `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case`. A single-aggregate module stays flat when its aggregate root's plural name equals the module name. For example, `Post` stays flat under `Posts`. Otherwise, each aggregate takes its own folder.
+The module folders follow `litespec/rule/backend-architecture.organize-every-layer-by-module-and-use-case`. A single-aggregate module stays flat when its aggregate root's plural name equals the module name. For example, `Post` stays flat under `Posts`. Otherwise, each aggregate takes its own folder.
 
 This also applies to modules with multiple aggregates. The example keeps aggregate-specific configuration beside the aggregate. The example keeps session and commit plumbing under the Marten root.
 
-### Register one scoped session (standards/rule/backend-persistence.register-one-scoped-session)
+### Register one scoped session (litespec/rule/backend-persistence.register-one-scoped-session)
 
 **Default:** Register `IDocumentSession` with the WebApi request or Worker operation scope.
 
@@ -163,7 +163,7 @@ This also applies to modules with multiple aggregates. The example keeps aggrega
 
 **Rationale:** Repositories and the commit handler in one command then resolve the same session instance.
 
-### Review query plans for new indexes (standards/rule/backend-persistence.review-query-plans-for-new-indexes)
+### Review query plans for new indexes (litespec/rule/backend-persistence.review-query-plans-for-new-indexes)
 
 **Default:** Add an index only from an accepted query or a measured operating need, and inspect its plan on representative data.
 
@@ -171,7 +171,7 @@ This also applies to modules with multiple aggregates. The example keeps aggrega
 
 **Rationale:** An index added without a plan reading costs write throughput for a read that may never run.
 
-### Add read documents for query-shaped data (standards/rule/backend-persistence.add-read-documents-for-query-shaped-data)
+### Add read documents for query-shaped data (litespec/rule/backend-persistence.add-read-documents-for-query-shaped-data)
 
 **Default:** Add a module-owned read document for repeated cross-aggregate composition, deep traversal, or a distorting index shape.
 
@@ -179,7 +179,7 @@ This also applies to modules with multiple aggregates. The example keeps aggrega
 
 **Rationale:** Stored aggregate documents already serve accepted simple reads. The use case defines the read document's consistency and rebuild behavior.
 
-### Persist one explicit state object (standards/rule/backend-persistence.persist-one-explicit-state-object)
+### Persist one explicit state object (litespec/rule/backend-persistence.persist-one-explicit-state-object)
 
 **Default:** Persist the aggregate state record itself rather than a flattened projection, round-tripping every state record through the configured serializer in integration tests.
 
@@ -202,7 +202,7 @@ Adding a state discriminator can break an older application version during a mix
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain` and `standards/rule/backend-persistence.use-this-infrastructure-layout`.
+This informative example demonstrates `litespec/rule/backend-persistence.keep-serialization-behavior-out-of-domain` and `litespec/rule/backend-persistence.use-this-infrastructure-layout`.
 
 An `Order` document may contain a `PaymentMethod` collection with `CardPayment` and `BankTransfer` values. Infrastructure registers stable `card` and `bank_transfer` discriminators through the JSON contract resolver. The Domain hierarchy carries no JSON attributes.
 
@@ -237,19 +237,19 @@ internal sealed class PostRepository(
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/backend-persistence.stage-aggregate-writes-through-repositories | guidance | Does each command handler reach persistence only through a Domain repository? |
-| standards/rule/backend-persistence.query-through-iquerysession | guidance | Does each query handler project through the session named for its provider, with filter, scope, ordering, and limit applied first? |
-| standards/rule/backend-persistence.commit-once-in-the-command-pipeline | guidance | Does exactly one command post-handler commit each pipeline, with no other caller committing? |
-| standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work | guidance | Does each repository register touched aggregates with the internal buffer the post-handler drains? |
-| standards/rule/backend-persistence.keep-mappings-and-aliases-explicit | guidance | Does each stored aggregate declare a stable alias, identifier mapping, and the indexes its queries need? |
-| standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain | guidance | Does Infrastructure own the stored JSON contract with every persisted subtype registered? |
-| standards/rule/backend-persistence.evolve-stored-document-contracts-explicitly | guidance | Does each stored-contract change carry a reviewed transformation or an expand-and-contract rollout? |
-| standards/rule/backend-persistence.bound-aggregate-document-growth | guidance | Does each embedded collection in an aggregate document have an accepted business bound? |
-| standards/rule/backend-persistence.use-database-naming-conventions | guidance | Is each generated database identifier snake case? |
-| standards/rule/backend-persistence.control-production-schema-changes | guidance | Does each hosted schema change run as a reviewed step before traffic shifts? |
-| standards/rule/backend-persistence.test-persistence-against-postgresql | guidance | Does each persistence behavior run against the pinned PostgreSQL through Testcontainers? |
-| standards/rule/backend-persistence.use-this-infrastructure-layout | guidance | Do store configuration, repositories, and commit behavior sit under the one persistence folder? |
-| standards/rule/backend-persistence.register-one-scoped-session | guidance | Do the repositories and the commit handler in one command resolve one session? |
-| standards/rule/backend-persistence.review-query-plans-for-new-indexes | guidance | Does each new index record its accepted query and the plan that justified it? |
-| standards/rule/backend-persistence.add-read-documents-for-query-shaped-data | guidance | Does each read document record its consistency and rebuild behavior beside its owning use case? |
-| standards/rule/backend-persistence.persist-one-explicit-state-object | guidance | Does each aggregate persist its state record with every state round-tripping through the serializer? |
+| litespec/rule/backend-persistence.stage-aggregate-writes-through-repositories | guidance | Does each command handler reach persistence only through a Domain repository? |
+| litespec/rule/backend-persistence.query-through-iquerysession | guidance | Does each query handler project through the session named for its provider, with filter, scope, ordering, and limit applied first? |
+| litespec/rule/backend-persistence.commit-once-in-the-command-pipeline | guidance | Does exactly one command post-handler commit each pipeline, with no other caller committing? |
+| litespec/rule/backend-persistence.collect-events-without-a-public-unit-of-work | guidance | Does each repository register touched aggregates with the internal buffer the post-handler drains? |
+| litespec/rule/backend-persistence.keep-mappings-and-aliases-explicit | guidance | Does each stored aggregate declare a stable alias, identifier mapping, and the indexes its queries need? |
+| litespec/rule/backend-persistence.keep-serialization-behavior-out-of-domain | guidance | Does Infrastructure own the stored JSON contract with every persisted subtype registered? |
+| litespec/rule/backend-persistence.evolve-stored-document-contracts-explicitly | guidance | Does each stored-contract change carry a reviewed transformation or an expand-and-contract rollout? |
+| litespec/rule/backend-persistence.bound-aggregate-document-growth | guidance | Does each embedded collection in an aggregate document have an accepted business bound? |
+| litespec/rule/backend-persistence.use-database-naming-conventions | guidance | Is each generated database identifier snake case? |
+| litespec/rule/backend-persistence.control-production-schema-changes | guidance | Does each hosted schema change run as a reviewed step before traffic shifts? |
+| litespec/rule/backend-persistence.test-persistence-against-postgresql | guidance | Does each persistence behavior run against the pinned PostgreSQL through Testcontainers? |
+| litespec/rule/backend-persistence.use-this-infrastructure-layout | guidance | Do store configuration, repositories, and commit behavior sit under the one persistence folder? |
+| litespec/rule/backend-persistence.register-one-scoped-session | guidance | Do the repositories and the commit handler in one command resolve one session? |
+| litespec/rule/backend-persistence.review-query-plans-for-new-indexes | guidance | Does each new index record its accepted query and the plan that justified it? |
+| litespec/rule/backend-persistence.add-read-documents-for-query-shaped-data | guidance | Does each read document record its consistency and rebuild behavior beside its owning use case? |
+| litespec/rule/backend-persistence.persist-one-explicit-state-object | guidance | Does each aggregate persist its state record with every state round-tripping through the serializer? |

@@ -24,12 +24,6 @@ The operating model where agents do engineering work and people keep decision au
 
 Term `term/agent-driven-engineering`.
 
-## Agentic engineering system
-
-A system for specifying, building, verifying, releasing, and operating software with agents.
-
-Term `term/agentic-engineering-system`.
-
 ## Aggregate root
 
 The single type through which outside code changes a business record.
@@ -258,6 +252,18 @@ One bound the product runs within.
 
 Term `term/limit`. Rejected: operating limit.
 
+## LiteSpec
+
+The standards contract for specifying, building, verifying, releasing, and operating software with agents.
+
+Term `term/litespec`.
+
+## LiteSpec release
+
+One published, pinned, complete standards contract.
+
+Term `term/litespec-release`.
+
 ## Lockfile
 
 The committed file recording the exact resolved dependency versions.
@@ -455,12 +461,6 @@ Term `term/specification-driven-delivery`.
 One identified provision stating a required boundary for consumers.
 
 Term `term/standard`.
-
-## Standards release
-
-One published, pinned, complete standards contract.
-
-Term `term/standards-release`.
 
 ## Sub-processor
 

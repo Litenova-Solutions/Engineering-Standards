@@ -1,7 +1,7 @@
 // Controlled technical prose measures and the project language record.
 //
 // Both validators read this module. `validate-standards.mjs` applies it to the
-// standards repository's own pages, and `validate-consumer.mjs` applies it to a
+// LiteSpec repository's own pages, and `validate-consumer.mjs` applies it to a
 // consumer's specification tree. A second copy of these rules would drift from
 // the first, and the drift would be invisible: each validator would keep
 // reporting a pass against its own idea of the profile.

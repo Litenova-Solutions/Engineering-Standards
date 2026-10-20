@@ -10,7 +10,7 @@ A page record carries its type, identifier, title, owner, and status in JSON fro
 
 | Template | Target | Purpose |
 |:---|:---|:---|
-| `standards.project.json` | `standards.project.json` | Selects the size, stacks, reviewed standards release, paths, owners, optional types, and selected extensions. |
+| `litespec.project.json` | `litespec.project.json` | Selects the size, stacks, reviewed LiteSpec release, paths, owners, optional types, and selected extensions. |
 | `project-agents.md` | `AGENTS.md` | Provides the short consumer agent entry point. |
 | `language.json` | `docs/language.json` | Holds the Term entries prose is checked against, with rejected words and mannered terms. |
 | `scenario-cast.md` | `docs/domain/scenarios.md` | Fixes the people, place, dates, and amounts every `Scenario` section draws from. |

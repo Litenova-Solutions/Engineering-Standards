@@ -2,25 +2,25 @@
 
 ## Intent
 
-This stack serves a product that has no server of its own. It combines a .NET client-side domain model, browser-local persistence, and a Blazor WebAssembly application compiled to static output. A product running wholly in the browser cannot satisfy the server conventions, so this stack names its excluded pages and their replacements. A consumer selecting only this stack has no backend, declared under `standards/rule/core-scope.declare-a-consumer-that-has-no-backend`. Exact framework and package versions live only in standards.manifest.json.
+This stack serves a product that has no server of its own. It combines a .NET client-side domain model, browser-local persistence, and a Blazor WebAssembly application compiled to static output. A product running wholly in the browser cannot satisfy the server conventions, so this stack names its excluded pages and their replacements. A consumer selecting only this stack has no backend, declared under `litespec/rule/core-scope.declare-a-consumer-that-has-no-backend`. Exact framework and package versions live only in litespec.manifest.json.
 
 ## Agent Summary {#agent-summary}
 
 The shared stack rules on the [Stacks](stacks.md) page apply to every stack.
 
-- Blazor stays outside the controlled UI contract. (standards/rule/profile-blazor.keep-blazor-outside-the-ui-contract)
-- Each excluded page is named with its reason. (standards/rule/profile-blazor.list-excluded-baselines)
-- The client publishes as static WebAssembly with no server render mode. (standards/rule/profile-blazor.publish-static-webassembly-output)
+- Blazor stays outside the controlled UI contract. (litespec/rule/profile-blazor.keep-blazor-outside-the-ui-contract)
+- Each excluded page is named with its reason. (litespec/rule/profile-blazor.list-excluded-baselines)
+- The client publishes as static WebAssembly with no server render mode. (litespec/rule/profile-blazor.publish-static-webassembly-output)
 
 ## Standards
 
-### Keep Blazor outside the UI contract (standards/rule/profile-blazor.keep-blazor-outside-the-ui-contract)
+### Keep Blazor outside the UI contract (litespec/rule/profile-blazor.keep-blazor-outside-the-ui-contract)
 
 **Requirement:** A consumer selecting this stack MUST NOT apply the controlled UI contract.
 
 **Rationale:** The contract's route checks read TypeScript, so they cannot read a Blazor component. The Blazor pages state the styling, accessibility, and state rules that apply instead.
 
-### List excluded baselines (standards/rule/profile-blazor.list-excluded-baselines)
+### List excluded baselines (litespec/rule/profile-blazor.list-excluded-baselines)
 
 **Requirement:** This stack MUST name each page another stack composes that this stack does not, with the reason.
 
@@ -49,7 +49,7 @@ CI conventions apply with the client jobs. Build, test, publish, dependency, inv
 | `react/components.md` | React-only component rules. A Blazor product has no React frontend. |
 | `svelte/components.md` | Svelte-only component rules. A Blazor product has no Svelte frontend. |
 
-### Publish static WebAssembly output (standards/rule/profile-blazor.publish-static-webassembly-output)
+### Publish static WebAssembly output (litespec/rule/profile-blazor.publish-static-webassembly-output)
 
 **Requirement:** A consumer MUST publish a standalone Blazor WebAssembly application to static files.
 
@@ -74,7 +74,7 @@ CI conventions apply with the client jobs. Build, test, publish, dependency, inv
 - [Product Intent](../core/product.md)
 - [Release Standard](../core/release.md)
 - [Supported scope](../core/scope.md)
-- [Agentic engineering system](../core/system.md)
+- [LiteSpec](../core/system.md)
 
 ### Stack
 
@@ -104,7 +104,7 @@ CI conventions apply with the client jobs. Build, test, publish, dependency, inv
 
 ## Conventions
 
-### Verify with the .NET toolchain (standards/rule/profile-blazor.verify-with-the-net-toolchain)
+### Verify with the .NET toolchain (litespec/rule/profile-blazor.verify-with-the-net-toolchain)
 
 **Default:** Run client verification through `dotnet` rather than a Node package manager.
 
@@ -119,7 +119,7 @@ dotnet build apps/web/{ProjectName}.slnx --configuration Release
 dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 ```
 
-### Record a first-load budget (standards/rule/profile-blazor.record-a-first-load-budget)
+### Record a first-load budget (litespec/rule/profile-blazor.record-a-first-load-budget)
 
 **Default:** Record the compressed transfer size of the framework payload as a Limit record in Operating Limits.
 
@@ -131,8 +131,8 @@ dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/profile-blazor.keep-blazor-outside-the-ui-contract | guidance | Does the consumer apply any UI contract page or route check? |
-| standards/rule/profile-blazor.list-excluded-baselines | guidance | Does the table name every omitted page with its reason? |
-| standards/rule/profile-blazor.publish-static-webassembly-output | guidance | Does the published output hold no server assembly or server render mode? |
-| standards/rule/profile-blazor.verify-with-the-net-toolchain | guidance | Does the CI client job run `dotnet build` and `dotnet test`? |
-| standards/rule/profile-blazor.record-a-first-load-budget | guidance | Does Operating Limits record the budget the publish job enforces? |
+| litespec/rule/profile-blazor.keep-blazor-outside-the-ui-contract | guidance | Does the consumer apply any UI contract page or route check? |
+| litespec/rule/profile-blazor.list-excluded-baselines | guidance | Does the table name every omitted page with its reason? |
+| litespec/rule/profile-blazor.publish-static-webassembly-output | guidance | Does the published output hold no server assembly or server render mode? |
+| litespec/rule/profile-blazor.verify-with-the-net-toolchain | guidance | Does the CI client job run `dotnet build` and `dotnet test`? |
+| litespec/rule/profile-blazor.record-a-first-load-budget | guidance | Does Operating Limits record the budget the publish job enforces? |

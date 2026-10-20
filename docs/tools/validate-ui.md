@@ -2,12 +2,12 @@
 
 ## Name
 
-`node standards/tools/validate-ui.mjs` holds an opted-in consumer with a controlled web frontend to the UI contract.
+`node litespec/tools/validate-ui.mjs` holds an opted-in consumer with a controlled web frontend to the UI contract.
 
 ## Synopsis
 
 ```bash
-node standards/tools/validate-ui.mjs [consumerRoot] [--format=json] [--help]
+node litespec/tools/validate-ui.mjs [consumerRoot] [--format=json] [--help]
 ```
 
 ## Description
@@ -46,7 +46,7 @@ The command reads no page file. The route code is the page contract, and the rou
 Validate the consumer from its root:
 
 ```bash
-node standards/tools/validate-ui.mjs
+node litespec/tools/validate-ui.mjs
 ```
 
 ## Underneath

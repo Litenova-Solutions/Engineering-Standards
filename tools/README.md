@@ -10,8 +10,8 @@ This directory holds the commands the repository ships. Each one is documented a
 |:---|:---|
 | `node tools/validate-standards.mjs` | [Validate Standards](../docs/tools/validate-standards.md) |
 | `node tools/generate-provisions.mjs` | [Generate Provisions](../docs/tools/generate-provisions.md) |
-| `node standards/tools/validate-consumer.mjs` | [Validate Consumer](../docs/tools/validate-consumer.md) |
-| `node standards/tools/validate-ui.mjs` | [Validate Controlled UI](../docs/tools/validate-ui.md) |
+| `node litespec/tools/validate-consumer.mjs` | [Validate Consumer](../docs/tools/validate-consumer.md) |
+| `node litespec/tools/validate-ui.mjs` | [Validate Controlled UI](../docs/tools/validate-ui.md) |
 | `dotnet run --project tools/model/Litenova.Model -- build\|check\|render\|query` | [Model Builder](../docs/tools/model.md) |
 
 Every Node command is dependency-free with no install step, and the floor is Node 22. Nothing here reads a package manifest, a lockfile, or `node_modules`. The model builder is a .NET tool and needs the pinned SDK.

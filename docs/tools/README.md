@@ -8,7 +8,7 @@ Every Node command is dependency-free and runs with no install step. The floor i
 
 Every Node command accepts `--help`, and every validator accepts `--format=json` for a caller that reads the result rather than the text. The model builder's `check` accepts `--format json` with the same effect.
 
-## Standards repository
+## LiteSpec repository
 
 - [Validate Standards](validate-standards.md)
 - [Generate Provisions](generate-provisions.md)
@@ -19,4 +19,4 @@ Every Node command accepts `--help`, and every validator accepts `--format=json`
 - [Validate Controlled UI](validate-ui.md)
 - [Model Builder](model.md)
 
-A consumer runs its commands from the consumer root, where `standards.project.json` sits. The standards repository is a submodule at `standards/`, so the path carries that prefix.
+A consumer runs its commands from the consumer root, where `litespec.project.json` sits. The LiteSpec repository is a submodule at `litespec/`, so the path carries that prefix.

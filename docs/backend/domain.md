@@ -8,44 +8,44 @@ Every aggregate exposes its lifecycle as state records from its first implementa
 
 ## Agent Summary {#agent-summary}
 
-- Domain references only the base class library, and names match the Terms the records use. (standards/rule/backend-domain.keep-domain-free-of-outer-layer-concerns, standards/rule/backend-domain.use-one-ubiquitous-language)
-- The aggregate root is the only public mutation entry point, with children changing only through it and read-only collections. (standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries, standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary)
-- Every aggregate root derives from the one project base. (standards/rule/backend-domain.use-the-project-aggregate-root-contract)
-- Lifecycle uses an abstract state base with sealed case records, and closed sets are hierarchies with stable codes. (standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records, standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
-- Aggregates are created through named static factories only. (standards/rule/backend-domain.create-valid-aggregates-through-named-factories)
-- Mutations check state; transitions also replace state and record events. (standards/rule/backend-domain.express-transitions-through-business-methods)
-- Identifiers are typed record structs over version 7 GUIDs. (standards/rule/backend-domain.use-strongly-typed-version-7-identifiers)
-- Money is one value object with decimal amount and currency code. (standards/rule/backend-domain.make-money-and-decimal-rules-explicit)
-- Time, randomness, and identifiers arrive as arguments; Domain reads no clock. (standards/rule/backend-domain.pass-nondeterministic-values-into-domain)
-- Each rejected rule throws its own exception type, and domain events carry business data only. (standards/rule/backend-domain.reject-business-violations-with-domain-exceptions, standards/rule/backend-domain.raise-immutable-domain-facts)
+- Domain references only the base class library, and names match the Terms the records use. (litespec/rule/backend-domain.keep-domain-free-of-outer-layer-concerns, litespec/rule/backend-domain.use-one-ubiquitous-language)
+- The aggregate root is the only public mutation entry point, with children changing only through it and read-only collections. (litespec/rule/backend-domain.treat-aggregates-as-consistency-boundaries, litespec/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary)
+- Every aggregate root derives from the one project base. (litespec/rule/backend-domain.use-the-project-aggregate-root-contract)
+- Lifecycle uses an abstract state base with sealed case records, and closed sets are hierarchies with stable codes. (litespec/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records, litespec/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
+- Aggregates are created through named static factories only. (litespec/rule/backend-domain.create-valid-aggregates-through-named-factories)
+- Mutations check state; transitions also replace state and record events. (litespec/rule/backend-domain.express-transitions-through-business-methods)
+- Identifiers are typed record structs over version 7 GUIDs. (litespec/rule/backend-domain.use-strongly-typed-version-7-identifiers)
+- Money is one value object with decimal amount and currency code. (litespec/rule/backend-domain.make-money-and-decimal-rules-explicit)
+- Time, randomness, and identifiers arrive as arguments; Domain reads no clock. (litespec/rule/backend-domain.pass-nondeterministic-values-into-domain)
+- Each rejected rule throws its own exception type, and domain events carry business data only. (litespec/rule/backend-domain.reject-business-violations-with-domain-exceptions, litespec/rule/backend-domain.raise-immutable-domain-facts)
 
 ## Standards
 
-### Keep Domain free of outer-layer concerns (standards/rule/backend-domain.keep-domain-free-of-outer-layer-concerns)
+### Keep Domain free of outer-layer concerns (litespec/rule/backend-domain.keep-domain-free-of-outer-layer-concerns)
 
 **Requirement:** The Domain project MUST reference only the .NET base class library and project-owned Domain types.
 
 **Rationale:** No persistence, web, mediator, logging, configuration, injection, serialization, or provider package enters Domain. Infrastructure registers a persisted discriminator rather than Domain carrying a serialization attribute.
 
-### Use one ubiquitous language (standards/rule/backend-domain.use-one-ubiquitous-language)
+### Use one ubiquitous language (litespec/rule/backend-domain.use-one-ubiquitous-language)
 
 **Requirement:** A Domain type, property, method, exception, or event name MUST match a Term record in the project language record.
 
 **Rationale:** A business action named `Publish` in the language record is not `SetStatus` in code. The language record holds each Term meaning, labels per language, rejected words, and broader and narrower links. Records cite the Terms they use, and the glossary is generated from the language record.
 
-### Treat aggregates as consistency boundaries (standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries)
+### Treat aggregates as consistency boundaries (litespec/rule/backend-domain.treat-aggregates-as-consistency-boundaries)
 
 **Requirement:** An aggregate root MUST be the only public mutation entry point for every invariant its transaction protects.
 
 **Rationale:** External code sets no property and calls no child mutation method. A command normally changes one aggregate. The use-case record names any immediate invariant before one command changes several.
 
-### Use the project aggregate root contract (standards/rule/backend-domain.use-the-project-aggregate-root-contract)
+### Use the project aggregate root contract (litespec/rule/backend-domain.use-the-project-aggregate-root-contract)
 
 **Requirement:** An aggregate root MUST derive from the project-owned `AggregateRoot<TId>` and take identity and event mechanics from that base.
 
 **Rationale:** The base owns the typed identity, the pending event collection, protected recording, and clearing. It owns no timestamp, audit, tenant, lifecycle, or persistence behavior.
 
-### Model every Aggregate lifecycle with state records (standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records)
+### Model every Aggregate lifecycle with state records (litespec/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records)
 
 **Requirement:** An aggregate MUST expose its lifecycle only through one `State` property backed by an abstract `{Aggregate}State` record with sealed per-state records.
 
@@ -70,7 +70,7 @@ public abstract record ProfileState;
 public sealed record ProfileActiveState : ProfileState;
 ```
 
-### Model every closed set of domain values without enums (standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
+### Model every closed set of domain values without enums (litespec/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
 
 **Requirement:** The Domain project MUST model every closed set as an abstract record base with sealed cases exposing one stable `Code`, converting labels through `FromCode`.
 
@@ -150,10 +150,10 @@ This rule binds the Domain project. The same set appears at three other layers, 
 
 | Layer | Form of a closed set | Owning provision |
 |:---|:---|:---|
-| Domain | Abstract record base with sealed cases. | `standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums` |
-| Application | The same union shape, mirrored. | `standards/rule/backend-application.mirror-a-domain-closed-set-in-the-result` |
-| Transport | Polymorphic `oneOf` model, or string `enum` for a label-only set. | `standards/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape` |
-| Persistence | One stable string discriminator for each case. | `standards/rule/backend-persistence.keep-serialization-behavior-out-of-domain` |
+| Domain | Abstract record base with sealed cases. | `litespec/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums` |
+| Application | The same union shape, mirrored. | `litespec/rule/backend-application.mirror-a-domain-closed-set-in-the-result` |
+| Transport | Polymorphic `oneOf` model, or string `enum` for a label-only set. | `litespec/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape` |
+| Persistence | One stable string discriminator for each case. | `litespec/rule/backend-persistence.keep-serialization-behavior-out-of-domain` |
 
 A transport `enum` is permitted in one situation: every case of the set carries no data, and the labels are the complete contract. A set where any case carries data crosses the boundary as a polymorphic model instead.
 
@@ -170,7 +170,7 @@ public void FromCode_round_trips_every_case(MerchantRole role)
 }
 ```
 
-### Create valid aggregates through named factories (standards/rule/backend-domain.create-valid-aggregates-through-named-factories)
+### Create valid aggregates through named factories (litespec/rule/backend-domain.create-valid-aggregates-through-named-factories)
 
 **Requirement:** An aggregate root MUST create instances only through a static factory named for its business action.
 
@@ -195,7 +195,7 @@ public sealed class Order : AggregateRoot<OrderId>
 }
 ```
 
-### Express transitions through business methods (standards/rule/backend-domain.express-transitions-through-business-methods)
+### Express transitions through business methods (litespec/rule/backend-domain.express-transitions-through-business-methods)
 
 **Requirement:** A public aggregate mutation method MUST check current state and protect its invariants, replacing state and recording its transition event when it moves the lifecycle.
 
@@ -203,13 +203,13 @@ public sealed class Order : AggregateRoot<OrderId>
 
 Checks run before replacement, and replacement runs before recording. A method that replaces state before checking an invariant leaves a rejected aggregate holding the new state.
 
-### Keep child entities inside the aggregate boundary (standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary)
+### Keep child entities inside the aggregate boundary (litespec/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary)
 
 **Requirement:** A child entity MUST expose no mutable state outside its aggregate root, surfacing its collection as a read-only view.
 
 **Rationale:** The root creates, finds, and changes children through business methods. A child with lifecycle states uses the same sealed state records and no enum.
 
-### Use strongly typed version 7 identifiers (standards/rule/backend-domain.use-strongly-typed-version-7-identifiers)
+### Use strongly typed version 7 identifiers (litespec/rule/backend-domain.use-strongly-typed-version-7-identifiers)
 
 **Requirement:** An aggregate identity MUST be a `readonly record struct` wrapping one version 7 `Guid`, declaring no implicit conversion, primitive alias, or public parameterless creation path.
 
@@ -263,7 +263,7 @@ public readonly record struct PostId : IStronglyTypedId, IParsable<PostId>
 
 The `IParsable<TId>` implementation supports Minimal API route and query binding. `Parse` follows the .NET parsing contract for malformed text; `From` applies the domain empty-identity rule.
 
-### Use immutable value objects for domain concepts (standards/rule/backend-domain.use-immutable-value-objects-for-domain-concepts)
+### Use immutable value objects for domain concepts (litespec/rule/backend-domain.use-immutable-value-objects-for-domain-concepts)
 
 **Requirement:** A value object MUST be immutable, compare by its complete value, and expose creation through a static method rather than a constructor.
 
@@ -300,7 +300,7 @@ public sealed record PostTitle
 }
 ```
 
-### Define collection value semantics explicitly (standards/rule/backend-domain.define-collection-value-semantics-explicitly)
+### Define collection value semantics explicitly (litespec/rule/backend-domain.define-collection-value-semantics-explicitly)
 
 **Requirement:** A value object containing a collection MUST implement content equality and a matching hash for its declared ordering rule.
 
@@ -341,7 +341,7 @@ public sealed record PostTags
 
 The example treats tag order as meaningful. If order is irrelevant, creation normalizes to the documented comparison order before storing values.
 
-### Make money and decimal rules explicit (standards/rule/backend-domain.make-money-and-decimal-rules-explicit)
+### Make money and decimal rules explicit (litespec/rule/backend-domain.make-money-and-decimal-rules-explicit)
 
 **Requirement:** A monetary amount MUST use `decimal` inside one shared `Money` value object carrying an ISO 4217 currency code and serializing as `{ "amount": "12.50", "currency": "EUR" }`.
 
@@ -374,7 +374,7 @@ public sealed record Money
 
 The amount serializes as a string, so no reader parses it as binary floating point.
 
-### Keep binary floating point out of exact quantities (standards/rule/backend-domain.keep-binary-floating-point-out-of-exact-quantities)
+### Keep binary floating point out of exact quantities (litespec/rule/backend-domain.keep-binary-floating-point-out-of-exact-quantities)
 
 **Requirement:** A Domain type MUST NOT use `double` or `float` for a monetary amount, a rate applied to one, or a quantity compared for exact equality.
 
@@ -382,7 +382,7 @@ The amount serializes as a string, so no reader parses it as binary floating poi
 
 **Example:** A tax rate multiplied into a `Money` amount is a `decimal`. A measured latency in a diagnostic record is not a domain quantity and is outside this rule.
 
-### Use stateless domain services for ownerless rules (standards/rule/backend-domain.use-stateless-domain-services-for-ownerless-rules)
+### Use stateless domain services for ownerless rules (litespec/rule/backend-domain.use-stateless-domain-services-for-ownerless-rules)
 
 **Requirement:** A domain service MUST be stateless, accept and return Domain values, and perform no persistence, messaging, logging, clock, authorization, or provider call.
 
@@ -408,7 +408,7 @@ public sealed class OrderPricingDomainService
 
 Application supplies the lines and passes the returned `Money` to `Order.ConfirmPrice`. The service has no repository, clock, logger, or provider client.
 
-### Keep repository interfaces in Domain (standards/rule/backend-domain.keep-repository-interfaces-in-domain)
+### Keep repository interfaces in Domain (litespec/rule/backend-domain.keep-repository-interfaces-in-domain)
 
 **Requirement:** A repository interface MUST expose only aggregate and Domain types for exactly one aggregate root, without `IQueryable`, a session, or a generic CRUD surface.
 
@@ -440,17 +440,17 @@ public async Task<Post> GetByIdAsync(PostId id, CancellationToken cancellationTo
 }
 ```
 
-### Raise immutable domain facts (standards/rule/backend-domain.raise-immutable-domain-facts)
+### Raise immutable domain facts (litespec/rule/backend-domain.raise-immutable-domain-facts)
 
 **Requirement:** A domain event MUST be a public immutable record named `{Aggregate}{PastFact}Event` implementing `IDomainEvent` and carrying business data only.
 
 **Rationale:** The name states which aggregate raised the fact without opening the file. The event carries no aggregate, session, service, mutable collection, or exception. Envelope identity, such as message identity and causation identity, lives on the published integration event that carries the fact outside the process. Business data means typed identifiers and the values its reactions need.
 
-### Reject business violations with Domain exceptions (standards/rule/backend-domain.reject-business-violations-with-domain-exceptions)
+### Reject business violations with Domain exceptions (litespec/rule/backend-domain.reject-business-violations-with-domain-exceptions)
 
 **Requirement:** A rejected business rule MUST throw a `DomainException` subclass named `{DomainType}{Reason}Exception` carrying a stable code.
 
-**Rationale:** The name always leads with the aggregate root. Domain throws no `InvalidOperationException`, `ArgumentException`, validation, HTTP, or provider exception for a business rejection, and carries no transport status. Exception names follow `standards/rule/workspace-naming.name-exceptions-by-failed-rule`; this provision owns the one-type-per-rule shape and the code each type carries.
+**Rationale:** The name always leads with the aggregate root. Domain throws no `InvalidOperationException`, `ArgumentException`, validation, HTTP, or provider exception for a business rejection, and carries no transport status. Exception names follow `litespec/rule/workspace-naming.name-exceptions-by-failed-rule`; this provision owns the one-type-per-rule shape and the code each type carries.
 
 **Example:**
 
@@ -490,19 +490,19 @@ Two rules that share a caller-visible failure code because a boundary maps them 
 
 Application validators handle malformed caller input through validation errors. Aggregate and value-object exceptions remain the last defense when direct Domain use violates a rule. Command handlers do not catch expected Domain exceptions. The host maps them through the documented error boundary.
 
-### Reference other aggregates by ID (standards/rule/backend-domain.reference-other-aggregates-by-id)
+### Reference other aggregates by ID (litespec/rule/backend-domain.reference-other-aggregates-by-id)
 
 **Requirement:** An aggregate MUST store another aggregate's typed identifier rather than an object reference.
 
 **Rationale:** Application loads each aggregate through its repository when a command coordinates several. The use-case record names any immediate cross-aggregate invariant.
 
-### Pass nondeterministic values into Domain (standards/rule/backend-domain.pass-nondeterministic-values-into-domain)
+### Pass nondeterministic values into Domain (litespec/rule/backend-domain.pass-nondeterministic-values-into-domain)
 
 **Requirement:** Domain behavior MUST receive time, randomness, and new identifiers as arguments rather than read them, and read no clock.
 
 **Rationale:** Application obtains each value through an owned port and passes it in, so a Domain test supplies an explicit value and stays deterministic. A method that needs more than one value receives a clock or a generator through its arguments. Version 7 identifiers come from the caller-supplied generator.
 
-### Document every public Domain contract (standards/rule/backend-domain.document-every-public-domain-contract)
+### Document every public Domain contract (litespec/rule/backend-domain.document-every-public-domain-contract)
 
 **Requirement:** Every public Domain type and member MUST carry XML documentation stating the business constraint, result, or failure it represents.
 
@@ -512,7 +512,7 @@ Application validators handle malformed caller input through validation errors. 
 
 *Read each code block in the Conventions section as the named design rule only, without its namespace and unrelated declarations.*
 
-### Organize a module by aggregate and concept (standards/rule/backend-domain.organize-a-module-by-aggregate-and-concept)
+### Organize a module by aggregate and concept (litespec/rule/backend-domain.organize-a-module-by-aggregate-and-concept)
 
 **Default:** Give each aggregate a folder named with its plural root name, holding its own states, events, exceptions, and concepts.
 
@@ -586,15 +586,15 @@ Application validators handle malformed caller input through validation errors. 
         ConsentGrantedEvent.cs
 ```
 
-Each aggregate-specific repository interface stays with the aggregate it loads. Application, Infrastructure, and WebApi use the same module and per-aggregate folder names, per `standards/rule/backend-architecture.organize-every-layer-by-module-and-use-case`.
+Each aggregate-specific repository interface stays with the aggregate it loads. Application, Infrastructure, and WebApi use the same module and per-aggregate folder names, per `litespec/rule/backend-architecture.organize-every-layer-by-module-and-use-case`.
 
-### Use these Domain names (standards/rule/backend-domain.use-these-domain-names)
+### Use these Domain names (litespec/rule/backend-domain.use-these-domain-names)
 
 **Default:** Name each Domain type from the aggregate root it belongs to, following the workspace naming provisions cited below.
 
 **Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
-**Rationale:** Aggregate-owned names follow `standards/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root`. Architectural suffixes follow `standards/rule/workspace-naming.use-architectural-suffixes`. Exception names follow `standards/rule/workspace-naming.name-exceptions-by-failed-rule`. A state case takes the flat or the nested form, and a project keeps the form it picks.
+**Rationale:** Aggregate-owned names follow `litespec/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root`. Architectural suffixes follow `litespec/rule/workspace-naming.use-architectural-suffixes`. Exception names follow `litespec/rule/workspace-naming.name-exceptions-by-failed-rule`. A state case takes the flat or the nested form, and a project keeps the form it picks.
 
 **Example:**
 
@@ -602,7 +602,7 @@ The flat form declares each case as a top-level record carrying the aggregate pr
 
 The nested form keeps the cases and the base in one file. The flat form keeps one type per file.
 
-### Define the shared Domain contracts once (standards/rule/backend-domain.define-the-shared-domain-contracts-once)
+### Define the shared Domain contracts once (litespec/rule/backend-domain.define-the-shared-domain-contracts-once)
 
 **Default:** Declare the shared Domain contracts once in the Domain project and reuse them across every module.
 
@@ -661,7 +661,7 @@ public abstract class AggregateRoot<TId> : IAggregateRoot
 
 Concrete aggregates validate that `id.Value` is not `Guid.Empty` before calling or while calling the base constructor. The base remains free of aggregate-specific exceptions.
 
-### Keep ID representations aligned at every boundary (standards/rule/backend-domain.keep-id-representations-aligned-at-every-boundary)
+### Keep ID representations aligned at every boundary (litespec/rule/backend-domain.keep-id-representations-aligned-at-every-boundary)
 
 **Default:** Represent an identifier the same way in Domain, persistence, transport, and generated clients.
 
@@ -693,7 +693,7 @@ if (typeof(IStronglyTypedId).IsAssignableFrom(context.JsonTypeInfo.Type))
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/backend-domain.use-the-project-aggregate-root-contract`, `standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records`, and `standards/rule/backend-domain.create-valid-aggregates-through-named-factories`.
+This informative example demonstrates `litespec/rule/backend-domain.use-the-project-aggregate-root-contract`, `litespec/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records`, and `litespec/rule/backend-domain.create-valid-aggregates-through-named-factories`.
 
 ```csharp
 public sealed class Post : AggregateRoot<PostId>
@@ -800,28 +800,28 @@ The event payload captures the publication fact without carrying the mutable `Po
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/backend-domain.keep-domain-free-of-outer-layer-concerns | guidance | Does the Domain assembly reference only the base class library and project-owned Domain types? |
-| standards/rule/backend-domain.use-one-ubiquitous-language | guidance | Does each Domain name match a Term record in the project language record? |
-| standards/rule/backend-domain.treat-aggregates-as-consistency-boundaries | guidance | Is each aggregate root the only public mutation path for the invariants its transaction protects? |
-| standards/rule/backend-domain.use-the-project-aggregate-root-contract | guidance | Does every aggregate root derive from the one project base and use its identity and event mechanics? |
-| standards/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records | guidance | Does each aggregate expose one State property over an abstract base with sealed cases, read only through that property? |
-| standards/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums | guidance | Is each closed set a record hierarchy with stable codes and FromCode for data-less sets, with no enum in Domain? |
-| standards/rule/backend-domain.create-valid-aggregates-through-named-factories | guidance | Does each aggregate root create instances only through a named static factory that checks identity and records events? |
-| standards/rule/backend-domain.express-transitions-through-business-methods | guidance | Does each mutation check state, and does each lifecycle move also replace state and record its event? |
-| standards/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary | guidance | Do children expose no mutable state outside their root, with collections surfaced as read-only views? |
-| standards/rule/backend-domain.use-strongly-typed-version-7-identifiers | guidance | Is each identity a readonly record struct over a version 7 Guid with no conversion, alias, or parameterless creation? |
-| standards/rule/backend-domain.use-immutable-value-objects-for-domain-concepts | guidance | Is each value object immutable, compared by complete value, and created through a static method? |
-| standards/rule/backend-domain.define-collection-value-semantics-explicitly | guidance | Does each collection value implement content equality and a matching hash under its ordering rule? |
-| standards/rule/backend-domain.make-money-and-decimal-rules-explicit | guidance | Is each monetary amount a decimal in the shared Money object with the stated JSON shape? |
-| standards/rule/backend-domain.keep-binary-floating-point-out-of-exact-quantities | guidance | Does no Domain member use double or float for money, a rate applied to money, or an exactly compared quantity? |
-| standards/rule/backend-domain.use-stateless-domain-services-for-ownerless-rules | guidance | Is each domain service stateless, confined to Domain values, and free of the banned calls? |
-| standards/rule/backend-domain.keep-repository-interfaces-in-domain | guidance | Does each repository serve one aggregate with Domain-only types and no queryable, session, or generic surface? |
-| standards/rule/backend-domain.raise-immutable-domain-facts | guidance | Is each domain event an immutable record named for its aggregate and fact, carrying business data only? |
-| standards/rule/backend-domain.reject-business-violations-with-domain-exceptions | guidance | Does each rejected rule throw its own DomainException type with a stable code and no transport status? |
-| standards/rule/backend-domain.reference-other-aggregates-by-id | guidance | Does each aggregate store other aggregates as typed identifiers rather than object references? |
-| standards/rule/backend-domain.pass-nondeterministic-values-into-domain | guidance | Does Domain receive time, randomness, and identifiers as arguments and read no clock? |
-| standards/rule/backend-domain.document-every-public-domain-contract | guidance | Does every public Domain type and member document its constraint, result, or failure? |
-| standards/rule/backend-domain.organize-a-module-by-aggregate-and-concept | guidance | Does each Domain module give each aggregate its plural folder with its own states, events, and concepts? |
-| standards/rule/backend-domain.use-these-domain-names | guidance | Does each Domain name follow the cited workspace naming provisions and the chosen state-case form? |
-| standards/rule/backend-domain.define-the-shared-domain-contracts-once | guidance | Is each shared Domain contract declared once, with DomainException declaring its abstract Code? |
-| standards/rule/backend-domain.keep-id-representations-aligned-at-every-boundary | guidance | Is each identifier represented the same way at every boundary in the table? |
+| litespec/rule/backend-domain.keep-domain-free-of-outer-layer-concerns | guidance | Does the Domain assembly reference only the base class library and project-owned Domain types? |
+| litespec/rule/backend-domain.use-one-ubiquitous-language | guidance | Does each Domain name match a Term record in the project language record? |
+| litespec/rule/backend-domain.treat-aggregates-as-consistency-boundaries | guidance | Is each aggregate root the only public mutation path for the invariants its transaction protects? |
+| litespec/rule/backend-domain.use-the-project-aggregate-root-contract | guidance | Does every aggregate root derive from the one project base and use its identity and event mechanics? |
+| litespec/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records | guidance | Does each aggregate expose one State property over an abstract base with sealed cases, read only through that property? |
+| litespec/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums | guidance | Is each closed set a record hierarchy with stable codes and FromCode for data-less sets, with no enum in Domain? |
+| litespec/rule/backend-domain.create-valid-aggregates-through-named-factories | guidance | Does each aggregate root create instances only through a named static factory that checks identity and records events? |
+| litespec/rule/backend-domain.express-transitions-through-business-methods | guidance | Does each mutation check state, and does each lifecycle move also replace state and record its event? |
+| litespec/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary | guidance | Do children expose no mutable state outside their root, with collections surfaced as read-only views? |
+| litespec/rule/backend-domain.use-strongly-typed-version-7-identifiers | guidance | Is each identity a readonly record struct over a version 7 Guid with no conversion, alias, or parameterless creation? |
+| litespec/rule/backend-domain.use-immutable-value-objects-for-domain-concepts | guidance | Is each value object immutable, compared by complete value, and created through a static method? |
+| litespec/rule/backend-domain.define-collection-value-semantics-explicitly | guidance | Does each collection value implement content equality and a matching hash under its ordering rule? |
+| litespec/rule/backend-domain.make-money-and-decimal-rules-explicit | guidance | Is each monetary amount a decimal in the shared Money object with the stated JSON shape? |
+| litespec/rule/backend-domain.keep-binary-floating-point-out-of-exact-quantities | guidance | Does no Domain member use double or float for money, a rate applied to money, or an exactly compared quantity? |
+| litespec/rule/backend-domain.use-stateless-domain-services-for-ownerless-rules | guidance | Is each domain service stateless, confined to Domain values, and free of the banned calls? |
+| litespec/rule/backend-domain.keep-repository-interfaces-in-domain | guidance | Does each repository serve one aggregate with Domain-only types and no queryable, session, or generic surface? |
+| litespec/rule/backend-domain.raise-immutable-domain-facts | guidance | Is each domain event an immutable record named for its aggregate and fact, carrying business data only? |
+| litespec/rule/backend-domain.reject-business-violations-with-domain-exceptions | guidance | Does each rejected rule throw its own DomainException type with a stable code and no transport status? |
+| litespec/rule/backend-domain.reference-other-aggregates-by-id | guidance | Does each aggregate store other aggregates as typed identifiers rather than object references? |
+| litespec/rule/backend-domain.pass-nondeterministic-values-into-domain | guidance | Does Domain receive time, randomness, and identifiers as arguments and read no clock? |
+| litespec/rule/backend-domain.document-every-public-domain-contract | guidance | Does every public Domain type and member document its constraint, result, or failure? |
+| litespec/rule/backend-domain.organize-a-module-by-aggregate-and-concept | guidance | Does each Domain module give each aggregate its plural folder with its own states, events, and concepts? |
+| litespec/rule/backend-domain.use-these-domain-names | guidance | Does each Domain name follow the cited workspace naming provisions and the chosen state-case form? |
+| litespec/rule/backend-domain.define-the-shared-domain-contracts-once | guidance | Is each shared Domain contract declared once, with DomainException declaring its abstract Code? |
+| litespec/rule/backend-domain.keep-id-representations-aligned-at-every-boundary | guidance | Is each identifier represented the same way at every boundary in the table? |

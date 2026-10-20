@@ -4,7 +4,7 @@
 
 This page records the external obligations that the [audit extension](../ext/audit.md) satisfies. It is informative. The extension page owns every provision.
 
-`standards/rule/ext-audit.record-the-audit-adoption-decision` requires an adoption decision. `standards/rule/ext-audit.cover-the-required-audit-categories` requires a stated selection of audited categories. Both ask a project to say why it audits what it audits. This page is the source those answers draw on, so a project records a decision rather than a survey.
+`litespec/rule/ext-audit.record-the-audit-adoption-decision` requires an adoption decision. `litespec/rule/ext-audit.cover-the-required-audit-categories` requires a stated selection of audited categories. Both ask a project to say why it audits what it audits. This page is the source those answers draw on, so a project records a decision rather than a survey.
 
 ## Reference
 
@@ -59,7 +59,7 @@ The General Data Protection Regulation pulls in two directions at once. Reading 
 
 The resolution is the record shape. A trail retained on a legal-obligation or legitimate-interest basis stays lawful, and a supervisory authority accepts it. A trail that copies names, addresses, message bodies, or state snapshots into an append-only store conflicts with Article 17. No retention policy resolves that conflict.
 
-`standards/rule/ext-audit.exclude-personal-data-beyond-actor-identity` and `standards/rule/ext-audit.exclude-state-snapshots` prevent that conflict at design time. `standards/rule/ext-audit.remove-the-identity-mapping-on-erasure` then satisfies an erasure request by removing the mapping from actor identifier to person. The record keeps its evidential value and the person stops being identifiable from it.
+`litespec/rule/ext-audit.exclude-personal-data-beyond-actor-identity` and `litespec/rule/ext-audit.exclude-state-snapshots` prevent that conflict at design time. `litespec/rule/ext-audit.remove-the-identity-mapping-on-erasure` then satisfies an erasure request by removing the mapping from actor identifier to person. The record keeps its evidential value and the person stops being identifiable from it.
 
 Two consequences follow for a project. Record the lawful basis and the retention period of each audited category in the adoption decision. Include the trail in the records of processing activities, because it is itself a processing activity.
 
@@ -79,23 +79,23 @@ Building to that model costs nothing at design time. It lets a project map the t
 
 | Obligation | Source | Provision |
 |:---|:---|:---|
-| Select audited events and record the rationale | AU-2 | `standards/rule/ext-audit.record-the-audit-adoption-decision`, `standards/rule/ext-audit.declare-audit-selection-on-every-command` |
-| Cover the required event categories | AU-2, PCI 10.2.1, ISO 8.15 | `standards/rule/ext-audit.cover-the-required-audit-categories` |
-| Generate records across every component | AU-12 | `standards/rule/ext-audit.emit-audit-records-at-the-mediation-boundary` |
-| State the required record content | AU-3, PCI 10.2.2 | `standards/rule/ext-audit.record-the-required-audit-fields` |
-| Identify the affected resource | AU-3, PCI 10.2.2 | `standards/rule/ext-audit.record-the-required-audit-fields` |
-| Indicate success or failure | AU-3, PCI 10.2.2 | `standards/rule/ext-audit.record-every-attempt-outcome` |
-| Record invalid access attempts | PCI 10.2.1.4, OWASP | `standards/rule/ext-audit.record-refused-authorization` |
-| Record the origination of the event | AU-3, PCI 10.2.2, ISO 8.15 | `standards/rule/ext-audit.record-the-request-origin` |
-| Record credential and privilege change | PCI 10.2.1.5, ISO 8.15 | `standards/rule/ext-audit.cover-the-required-audit-categories` |
-| Record access to the audit records | PCI 10.2.1.3 | `standards/rule/ext-audit.audit-reads-of-the-trail` |
-| Record sensitive data access and export | OWASP, GDPR Art. 30 | `standards/rule/ext-audit.record-personal-data-reads`, `standards/rule/ext-audit.record-bulk-export` |
-| Exclude secrets and payment data | OWASP, PCI | `standards/rule/ext-audit.exclude-secrets-and-payment-data` |
-| Exclude sensitive personal data | OWASP, GDPR Art. 17 | `standards/rule/ext-audit.exclude-personal-data-beyond-actor-identity` |
-| Protect records from change and deletion | AU-9, ISO 8.15, GDPR Art. 32 | `standards/rule/ext-audit.enforce-append-only-through-storage-privilege`, `standards/rule/ext-audit.provide-tamper-evidence` |
-| Retain for a defined period | AU-11 | `standards/rule/ext-audit.retain-each-category-for-its-declared-period` |
-| Satisfy erasure without destroying evidence | GDPR Art. 17 | `standards/rule/ext-audit.remove-the-identity-mapping-on-erasure` |
-| Review and analyze the records | AU-6, ISO 8.15 | `standards/rule/ext-audit.give-the-trail-a-read-path` |
+| Select audited events and record the rationale | AU-2 | `litespec/rule/ext-audit.record-the-audit-adoption-decision`, `litespec/rule/ext-audit.declare-audit-selection-on-every-command` |
+| Cover the required event categories | AU-2, PCI 10.2.1, ISO 8.15 | `litespec/rule/ext-audit.cover-the-required-audit-categories` |
+| Generate records across every component | AU-12 | `litespec/rule/ext-audit.emit-audit-records-at-the-mediation-boundary` |
+| State the required record content | AU-3, PCI 10.2.2 | `litespec/rule/ext-audit.record-the-required-audit-fields` |
+| Identify the affected resource | AU-3, PCI 10.2.2 | `litespec/rule/ext-audit.record-the-required-audit-fields` |
+| Indicate success or failure | AU-3, PCI 10.2.2 | `litespec/rule/ext-audit.record-every-attempt-outcome` |
+| Record invalid access attempts | PCI 10.2.1.4, OWASP | `litespec/rule/ext-audit.record-refused-authorization` |
+| Record the origination of the event | AU-3, PCI 10.2.2, ISO 8.15 | `litespec/rule/ext-audit.record-the-request-origin` |
+| Record credential and privilege change | PCI 10.2.1.5, ISO 8.15 | `litespec/rule/ext-audit.cover-the-required-audit-categories` |
+| Record access to the audit records | PCI 10.2.1.3 | `litespec/rule/ext-audit.audit-reads-of-the-trail` |
+| Record sensitive data access and export | OWASP, GDPR Art. 30 | `litespec/rule/ext-audit.record-personal-data-reads`, `litespec/rule/ext-audit.record-bulk-export` |
+| Exclude secrets and payment data | OWASP, PCI | `litespec/rule/ext-audit.exclude-secrets-and-payment-data` |
+| Exclude sensitive personal data | OWASP, GDPR Art. 17 | `litespec/rule/ext-audit.exclude-personal-data-beyond-actor-identity` |
+| Protect records from change and deletion | AU-9, ISO 8.15, GDPR Art. 32 | `litespec/rule/ext-audit.enforce-append-only-through-storage-privilege`, `litespec/rule/ext-audit.provide-tamper-evidence` |
+| Retain for a defined period | AU-11 | `litespec/rule/ext-audit.retain-each-category-for-its-declared-period` |
+| Satisfy erasure without destroying evidence | GDPR Art. 17 | `litespec/rule/ext-audit.remove-the-identity-mapping-on-erasure` |
+| Review and analyze the records | AU-6, ISO 8.15 | `litespec/rule/ext-audit.give-the-trail-a-read-path` |
 
 ## Notes
 
@@ -103,8 +103,8 @@ The sources behind every table above:
 
 - [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final)
 - [ISO/IEC 27001:2022](https://www.iso.org/standard/27001)
-- [PCI DSS](https://www.pcisecuritystandards.org/standards/pci-dss/)
+- [PCI DSS](https://www.pcisecuritystandards.org/litespec/pci-dss/)
 - [OWASP Logging Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html)
-- [DMTF Cloud Auditing Data Federation](https://www.dmtf.org/standards/cadf)
+- [DMTF Cloud Auditing Data Federation](https://www.dmtf.org/litespec/cadf)
 - [Open Cybersecurity Schema Framework](https://github.com/ocsf/ocsf-schema)
 - [Erasure rights against audit retention](https://axiom.co/blog/the-right-to-be-forgotten-vs-audit-trail-mandates)

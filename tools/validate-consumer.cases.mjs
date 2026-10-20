@@ -25,7 +25,7 @@ const repository = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const validator = path.join(repository, 'tools', 'validate-consumer.mjs');
 const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'litenova-consumer-cases-'));
 
-const manifest = JSON.parse(fs.readFileSync(path.join(repository, 'standards.manifest.json'), 'utf8'));
+const manifest = JSON.parse(fs.readFileSync(path.join(repository, 'litespec.manifest.json'), 'utf8'));
 const manifestVersion = manifest.version ?? '2.0.0';
 const knownExtension = Object.keys(manifest.extensions ?? {})[0] ?? 'outbox';
 
@@ -287,19 +287,19 @@ function joinMeta(meta, body) {
 function build() {
   // The project file drives path resolution. The fixture declares no frontend,
   // so the controlled UI validator stays out of these cases.
-  writeFile('standards.project.json', `${JSON.stringify({
+  writeFile('litespec.project.json', `${JSON.stringify({
     project: { name: 'fixture' },
     size: 'small',
     stacks: [],
-    reviewedStandardsVersion: manifestVersion,
+    reviewedLiteSpecVersion: manifestVersion,
     paths: { docs: 'docs', domainDocs: 'docs/domain', uiDocs: 'docs/ui', frontends: [] },
     selectedExtensions: [],
     owners: ['fixture'],
     constraints: { answered: true },
     optionalTypes: [],
   }, null, 2)}\n`);
-  fs.mkdirSync(path.join(fixture, 'standards'), { recursive: true });
-  fs.copyFileSync(path.join(repository, 'standards.manifest.json'), path.join(fixture, 'standards/standards.manifest.json'));
+  fs.mkdirSync(path.join(fixture, 'litespec'), { recursive: true });
+  fs.copyFileSync(path.join(repository, 'litespec.manifest.json'), path.join(fixture, 'litespec/litespec.manifest.json'));
   for (const [target, meta, body] of PAGES) writeFile(target, page(meta, body));
   writeFile('docs/language.json', `${JSON.stringify(LANGUAGE, null, 2)}\n`);
 }
@@ -371,14 +371,14 @@ function bodyCase(name, relative, transform, expectation) {
   writeFile(relative, original);
 }
 
-// Mutate standards.project.json, assert the outcome, then restore it.
+// Mutate litespec.project.json, assert the outcome, then restore it.
 function projectCase(name, mutate, expectation) {
-  const original = readFixture('standards.project.json');
+  const original = readFixture('litespec.project.json');
   const project = JSON.parse(original);
   mutate(project);
-  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  writeFile('litespec.project.json', `${JSON.stringify(project, null, 2)}\n`);
   report(name, expectation, run());
-  writeFile('standards.project.json', original);
+  writeFile('litespec.project.json', original);
 }
 
 // Mutate one JSON file, assert the outcome, then restore it.
@@ -398,31 +398,31 @@ report('fixture validates as written', null, run());
 
 console.log('\nProject record');
 projectCase('size outside the allowed sizes', (p) => { p.size = 'colossal'; }, '/size');
-projectCase('reviewed version outside its form', (p) => { p.reviewedStandardsVersion = 'v2'; }, '/reviewedStandardsVersion');
+projectCase('reviewed version outside its form', (p) => { p.reviewedLiteSpecVersion = 'v2'; }, '/reviewedLiteSpecVersion');
 projectCase('selected extensions outside its array form', (p) => { p.selectedExtensions = 'outbox'; }, '/selectedExtensions');
 projectCase('frontend platform outside the stacks', (p) => { p.paths.frontends = [{ name: 'web', path: 'apps/web', platform: 'winforms' }]; }, '/paths/frontends/0/platform');
 
 console.log('\nManifest version and extensions');
-projectCase('reviewed version behind the pinned release', (p) => { p.reviewedStandardsVersion = '0.0.0'; }, 'does not match the pinned standards');
-projectCase('extension the manifest does not ship', (p) => { p.selectedExtensions = [{ id: 'no-such-extension', criterion: 'Nothing needs it.', reviewBy: '2999-01-01' }]; }, "is not an extension in the pinned standards");
+projectCase('reviewed version behind the pinned release', (p) => { p.reviewedLiteSpecVersion = '0.0.0'; }, 'does not match the pinned LiteSpec release');
+projectCase('extension the manifest does not ship', (p) => { p.selectedExtensions = [{ id: 'no-such-extension', criterion: 'Nothing needs it.', reviewBy: '2999-01-01' }]; }, "is not an extension in the pinned LiteSpec release");
 projectCase('extension whose review date passed', (p) => { p.selectedExtensions = [{ id: knownExtension, criterion: 'The suite needs one.', reviewBy: '2020-01-01' }]; }, 'was due for review on 2020-01-01');
 projectCase('known extension with a live review date', (p) => { p.selectedExtensions = [{ id: knownExtension, criterion: 'The suite needs one.', reviewBy: '2999-01-01' }]; }, null);
 
 console.log('\nRelease stage');
 const stageSelection = (fields) => ({ id: 'stage', criterion: 'No deployment holds customer data.', reviewBy: '2999-01-01', ...fields });
-const liveDeferral = { provision: 'standards/rule/ext-stage.declare-the-release-stage', until: '2999-01-01' };
+const liveDeferral = { provision: 'litespec/rule/ext-stage.declare-the-release-stage', until: '2999-01-01' };
 projectCase('stage selection with its release stage and a live deferral', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'pre-production', deferredProvisions: [liveDeferral] })]; }, null);
 projectCase('stage selection without a release stage', (p) => { p.selectedExtensions = [stageSelection({})]; }, 'releaseStage');
 projectCase('stage selection with an unknown release stage', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'beta' })]; }, '/releaseStage');
 projectCase('release stage on another extension', (p) => { p.selectedExtensions = [{ id: knownExtension, criterion: 'The suite needs one.', reviewBy: '2999-01-01', releaseStage: 'production' }]; }, '/id');
 projectCase('production stage that still defers', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'production', deferredProvisions: [liveDeferral] })]; }, 'declares production and still defers');
-projectCase('deferral of a provision the standards do not hold', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'pre-production', deferredProvisions: [{ provision: 'standards/rule/core-model.no-such-rule', until: '2999-01-01' }] })]; }, 'is not a provision in the pinned standards');
+projectCase('deferral of a provision the standards do not hold', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'pre-production', deferredProvisions: [{ provision: 'litespec/rule/core-model.no-such-rule', until: '2999-01-01' }] })]; }, 'is not a provision in the pinned LiteSpec release');
 projectCase('deferral past its end date', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'pre-production', deferredProvisions: [{ ...liveDeferral, until: '2020-01-01' }] })]; }, 'ended on 2020-01-01');
 
 console.log('\nConfigured paths');
 projectCase('documentation root that is on disk', (p) => { p.paths.docs = 'docs'; }, null);
 projectCase('documentation root that is not on disk', (p) => { p.paths.docs = 'documentation'; }, "paths.docs 'documentation' does not exist");
-projectCase('documentation root that holds no Markdown', (p) => { p.paths.docs = 'standards'; }, 'Scanned no Markdown files');
+projectCase('documentation root that holds no Markdown', (p) => { p.paths.docs = 'litespec'; }, 'Scanned no Markdown files');
 projectCase('language record path that is not on disk', (p) => { p.paths.language = 'docs/missing.json'; }, "paths.language 'docs/missing.json' does not exist");
 projectCase('frontend path that is not on disk', (p) => { p.paths.frontends = [{ name: 'web', path: 'apps/missing', platform: 'react' }]; }, "frontend 'web' path 'apps/missing' does not exist");
 fileCase(
@@ -484,25 +484,25 @@ bodyCase('sentence past the word bound', 'docs/domain/modules/orders/README.md',
   // case green however the project schema treats the prose block.
   const page = 'docs/domain/modules/orders/README.md';
   const originalPage = readFixture(page);
-  const originalProject = readFixture('standards.project.json');
+  const originalProject = readFixture('litespec.project.json');
   const project = JSON.parse(originalProject);
   project.prose = { enforcement: 'report' };
   writeFile(page, `${originalPage}\n${LONG_SENTENCE}\n`);
-  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  writeFile('litespec.project.json', `${JSON.stringify(project, null, 2)}\n`);
   report('report mode turns measures into advisories', { absent: 'controlled-prose problem(s)' }, run());
   writeFile(page, originalPage);
-  writeFile('standards.project.json', originalProject);
+  writeFile('litespec.project.json', originalProject);
 }
 projectCase('language scan pattern that matches nothing', (p) => { p.paths.languageScan = ['src/**/*.cs']; }, 'matches no file');
 {
-  const originalProject = readFixture('standards.project.json');
+  const originalProject = readFixture('litespec.project.json');
   const project = JSON.parse(originalProject);
   project.paths.languageScan = ['src/**/*.cs'];
-  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  writeFile('litespec.project.json', `${JSON.stringify(project, null, 2)}\n`);
   writeFile('src/order-claims.cs', '// the orderclaim handling lives here\n');
   report('rejected synonym in a scanned surface', 'LANGUAGE_REJECTED_SYNONYM', run());
   fs.rmSync(path.join(fixture, 'src'), { recursive: true, force: true });
-  writeFile('standards.project.json', originalProject);
+  writeFile('litespec.project.json', originalProject);
 }
 
 console.log('\nControlled UI');
@@ -511,7 +511,7 @@ projectCase('frontend outside the controlled contract stays quiet', (p) => { p.p
 {
   // A controlled frontend with an unreadable shared package fails the child
   // validator, and its findings merge into this validator's list.
-  const originalProject = readFixture('standards.project.json');
+  const originalProject = readFixture('litespec.project.json');
   const project = JSON.parse(originalProject);
   project.paths.frontends = [{ name: 'web', path: 'apps/web', platform: 'react', ui: { profile: 'application-balanced' } }];
   project.paths.uiPackage = {
@@ -524,7 +524,7 @@ projectCase('frontend outside the controlled contract stays quiet', (p) => { p.p
     designContract: 'packages/ui/DESIGN.md',
     publicExports: ['fixture-ui'],
   };
-  writeFile('standards.project.json', `${JSON.stringify(project, null, 2)}\n`);
+  writeFile('litespec.project.json', `${JSON.stringify(project, null, 2)}\n`);
   writeFile('apps/web/package.json', '{}\n');
   writeFile('packages/ui/components.json', '{}\n');
   fs.mkdirSync(path.join(fixture, 'packages/ui/src'), { recursive: true });
@@ -534,13 +534,13 @@ projectCase('frontend outside the controlled contract stays quiet', (p) => { p.p
   report('child validator findings merge with their prefix', 'controlled UI:', run());
   fs.rmSync(path.join(fixture, 'apps'), { recursive: true, force: true });
   fs.rmSync(path.join(fixture, 'packages'), { recursive: true, force: true });
-  writeFile('standards.project.json', originalProject);
+  writeFile('litespec.project.json', originalProject);
 }
 
 console.log('\nMachine-readable contract');
 {
-  const original = readFixture('standards.project.json');
-  writeFile('standards.project.json', '{\n');
+  const original = readFixture('litespec.project.json');
+  writeFile('litespec.project.json', '{\n');
   let status = -1;
   let parsed = null;
   try {
@@ -550,7 +550,7 @@ console.log('\nMachine-readable contract');
   } catch {
     parsed = null;
   }
-  writeFile('standards.project.json', original);
+  writeFile('litespec.project.json', original);
   if (status !== 2 || !parsed || parsed.ok !== false || !String(parsed.problems ?? []).includes('not valid JSON')) {
     failures += 1;
     console.log('  FAIL  malformed project file keeps the machine-readable contract');
@@ -588,10 +588,10 @@ fileCase(
   null,
 );
 {
-  const original = readFixture('standards.project.json');
-  writeFile('standards.project.json', `\uFEFF${original}`);
+  const original = readFixture('litespec.project.json');
+  writeFile('litespec.project.json', `\uFEFF${original}`);
   report('project file with a leading byte-order mark', null, run());
-  writeFile('standards.project.json', original);
+  writeFile('litespec.project.json', original);
 }
 
 console.log('\nProse detail (each file is read once and reused)');

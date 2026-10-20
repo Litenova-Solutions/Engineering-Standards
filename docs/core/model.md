@@ -6,16 +6,16 @@ Every project describes itself as records of fixed types joined by fixed links. 
 
 ## Agent Summary {#agent-summary}
 
-- Write every record in its home folder. (standards/rule/core-model.write-every-record-in-its-home)
-- State shared fields, one owner, and one status on every record. (standards/rule/core-model.state-the-common-fields-on-every-record, standards/rule/core-model.keep-one-owner-and-status-on-every-record)
-- Write each link on the record it starts from. (standards/rule/core-model.write-links-on-the-record-that-points)
-- Follow the authority order, with ties going to the later decision. (standards/rule/core-model.follow-the-authority-order, standards/rule/core-model.resolve-ties-by-the-later-decision)
-- Hold approval behind draft decisions and record gaps as known gaps. (standards/rule/core-model.hold-approval-behind-draft-decisions, standards/rule/core-model.record-accepted-gaps-as-known-gaps)
-- Apply guidance precedence and authorize through the permission chain. (standards/rule/core-model.apply-guidance-precedence, standards/rule/core-model.authorize-access-through-the-permission-chain)
-- Express module order as links and retire records with replaces. (standards/rule/core-model.express-module-order-as-depends-on, standards/rule/core-model.retire-records-with-replaces)
-- Declare the size, stacks, and optional types. (standards/rule/core-model.declare-size-stacks-and-optional-types)
-- Give every use case its results and cover public ones from journeys. (standards/rule/core-model.give-every-use-case-its-results, standards/rule/core-model.cover-every-public-use-case-from-a-journey)
-- Read truth from code, screens, and test runs, and render views from the model. (standards/rule/core-model.read-truth-from-code-screens-and-test-runs, standards/rule/core-model.render-generated-regions-from-the-model)
+- Write every record in its home folder. (litespec/rule/core-model.write-every-record-in-its-home)
+- State shared fields, one owner, and one status on every record. (litespec/rule/core-model.state-the-common-fields-on-every-record, litespec/rule/core-model.keep-one-owner-and-status-on-every-record)
+- Write each link on the record it starts from. (litespec/rule/core-model.write-links-on-the-record-that-points)
+- Follow the authority order, with ties going to the later decision. (litespec/rule/core-model.follow-the-authority-order, litespec/rule/core-model.resolve-ties-by-the-later-decision)
+- Hold approval behind draft decisions and record gaps as known gaps. (litespec/rule/core-model.hold-approval-behind-draft-decisions, litespec/rule/core-model.record-accepted-gaps-as-known-gaps)
+- Apply guidance precedence and authorize through the permission chain. (litespec/rule/core-model.apply-guidance-precedence, litespec/rule/core-model.authorize-access-through-the-permission-chain)
+- Express module order as links and retire records with replaces. (litespec/rule/core-model.express-module-order-as-depends-on, litespec/rule/core-model.retire-records-with-replaces)
+- Declare the size, stacks, and optional types. (litespec/rule/core-model.declare-size-stacks-and-optional-types)
+- Give every use case its results and cover public ones from journeys. (litespec/rule/core-model.give-every-use-case-its-results, litespec/rule/core-model.cover-every-public-use-case-from-a-journey)
+- Read truth from code, screens, and test runs, and render views from the model. (litespec/rule/core-model.read-truth-from-code-screens-and-test-runs, litespec/rule/core-model.render-generated-regions-from-the-model)
 
 ## Concepts
 
@@ -154,7 +154,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 ## Standards
 
-### Write every record in its home (standards/rule/core-model.write-every-record-in-its-home)
+### Write every record in its home (litespec/rule/core-model.write-every-record-in-its-home)
 
 **Requirement:** A project MUST keep every record in the home its type names.
 
@@ -162,49 +162,49 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Example:** A decision lives at `docs/product/decisions/0047-extend-loan-period.md`.
 
-### State the common fields on every record (standards/rule/core-model.state-the-common-fields-on-every-record)
+### State the common fields on every record (litespec/rule/core-model.state-the-common-fields-on-every-record)
 
 **Requirement:** Every written record MUST carry its type, identifier, title, owner, and status.
 
 **Rationale:** Shared fields let the builder join records across pages.
 
-### Write links on the record that points (standards/rule/core-model.write-links-on-the-record-that-points)
+### Write links on the record that points (litespec/rule/core-model.write-links-on-the-record-that-points)
 
 **Requirement:** A link MUST live as fields on the record it starts from.
 
 **Rationale:** One writing site keeps a link and its source in one edit.
 
-### Follow the authority order (standards/rule/core-model.follow-the-authority-order)
+### Follow the authority order (litespec/rule/core-model.follow-the-authority-order)
 
 **Requirement:** A conflict MUST resolve toward the higher authority.
 
 **Rationale:** Constraint outranks product, product outranks requirement, requirement outranks rule, and rule outranks use case. Decisions explain a choice and carry no rank; research and prose carry none.
 
-### Resolve ties by the later decision (standards/rule/core-model.resolve-ties-by-the-later-decision)
+### Resolve ties by the later decision (litespec/rule/core-model.resolve-ties-by-the-later-decision)
 
 **Requirement:** A tie MUST resolve toward the later approved decision.
 
 **Rationale:** The shared owner decides when no later decision separates the records.
 
-### Hold approval behind draft decisions (standards/rule/core-model.hold-approval-behind-draft-decisions)
+### Hold approval behind draft decisions (litespec/rule/core-model.hold-approval-behind-draft-decisions)
 
 **Requirement:** A record MUST NOT stand approved behind a draft decision.
 
 **Rationale:** Approval means the reasoning behind the record already holds. The builder also writes each record's `effectiveStatus`: draft when the record, a decision deciding it, or a requirement it fulfils is a draft. A result or a case takes its use case's effective status.
 
-### Record accepted gaps as known gaps (standards/rule/core-model.record-accepted-gaps-as-known-gaps)
+### Record accepted gaps as known gaps (litespec/rule/core-model.record-accepted-gaps-as-known-gaps)
 
 **Requirement:** An accepted gap MUST live as a known gap with owner and end date.
 
 **Rationale:** A dated owner turns missing work into a visible promise.
 
-### Apply guidance precedence (standards/rule/core-model.apply-guidance-precedence)
+### Apply guidance precedence (litespec/rule/core-model.apply-guidance-precedence)
 
 **Requirement:** A conflict MUST resolve toward the exception, extension, profile, or core, in that order.
 
 **Rationale:** A project requirement never overrides a shared standard; the conflict becomes an exception.
 
-### Authorize access through the permission chain (standards/rule/core-model.authorize-access-through-the-permission-chain)
+### Authorize access through the permission chain (litespec/rule/core-model.authorize-access-through-the-permission-chain)
 
 **Requirement:** A use case MUST name the permissions it needs.
 
@@ -212,13 +212,13 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Example:** An anonymous use case sets `anonymous` and names no permission.
 
-### Express module order as depends on (standards/rule/core-model.express-module-order-as-depends-on)
+### Express module order as depends on (litespec/rule/core-model.express-module-order-as-depends-on)
 
 **Requirement:** Module order MUST live as depends on links between modules.
 
 **Rationale:** A link states the dependency without ranking one module above another.
 
-### Keep one owner and status on every record (standards/rule/core-model.keep-one-owner-and-status-on-every-record)
+### Keep one owner and status on every record (litespec/rule/core-model.keep-one-owner-and-status-on-every-record)
 
 **Requirement:** Every page MUST name one owner and one status.
 
@@ -226,25 +226,25 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Example:** A draft names its decider and decide-by date.
 
-### Retire records with replaces (standards/rule/core-model.retire-records-with-replaces)
+### Retire records with replaces (litespec/rule/core-model.retire-records-with-replaces)
 
 **Requirement:** A replacing decision MUST name the decision it replaces, and no other record type carries `replaces`.
 
 **Rationale:** Decisions alone keep the past: the old one stands retired beside the new one. Every other record changes in place, and a rename rewrites every citation in the same change.
 
-### Name what every decision decides (standards/rule/core-model.name-what-every-decision-decides)
+### Name what every decision decides (litespec/rule/core-model.name-what-every-decision-decides)
 
 **Requirement:** Every decision that is not retired MUST name at least one record it settles in `decides`.
 
 **Rationale:** The draft gate and the computed effective status follow `decides`. A decision that names nothing holds back nothing, so its approval state means nothing.
 
-### Resolve every page link (standards/rule/core-model.resolve-every-page-link)
+### Resolve every page link (litespec/rule/core-model.resolve-every-page-link)
 
 **Requirement:** Every Markdown link outside code on a page under the record roots MUST point at an existing file, by its relative path.
 
 **Rationale:** A link shaped like an identifier, or to a moved file, reads as navigation and leads nowhere. An identifier is cited in backticks, and a link names a file.
 
-### Declare size stacks and optional types (standards/rule/core-model.declare-size-stacks-and-optional-types)
+### Declare size stacks and optional types (litespec/rule/core-model.declare-size-stacks-and-optional-types)
 
 **Requirement:** A project MUST declare its size, stacks, and optional types.
 
@@ -252,7 +252,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Example:** A library loans system declares small with a single backend stack.
 
-### Give every use case its results (standards/rule/core-model.give-every-use-case-its-results)
+### Give every use case its results (litespec/rule/core-model.give-every-use-case-its-results)
 
 **Requirement:** A use case MUST end in a success result and name its refusals.
 
@@ -260,13 +260,13 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Example:** A loan use case names `loaned` and `book-not-available`.
 
-### Cover every public use case from a journey (standards/rule/core-model.cover-every-public-use-case-from-a-journey)
+### Cover every public use case from a journey (litespec/rule/core-model.cover-every-public-use-case-from-a-journey)
 
 **Requirement:** A public use case MUST sit in a journey or name its background caller.
 
 **Rationale:** Reachability shows readers how each operation is found.
 
-### Read truth from code screens and test runs (standards/rule/core-model.read-truth-from-code-screens-and-test-runs)
+### Read truth from code screens and test runs (litespec/rule/core-model.read-truth-from-code-screens-and-test-runs)
 
 **Requirement:** Implemented and verified MUST come from the builder, never from handwriting.
 
@@ -276,7 +276,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 ## Conventions
 
-### Render generated regions from the model (standards/rule/core-model.render-generated-regions-from-the-model)
+### Render generated regions from the model (litespec/rule/core-model.render-generated-regions-from-the-model)
 
 **Default:** Generated regions on a page come from the model builder.
 
@@ -288,22 +288,22 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-model.write-every-record-in-its-home | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape`. |
-| standards/rule/core-model.state-the-common-fields-on-every-record | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape`. |
-| standards/rule/core-model.write-links-on-the-record-that-points | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `reference-unresolved`. |
-| standards/rule/core-model.follow-the-authority-order | guidance | Does each conflict resolve toward the higher authority? |
-| standards/rule/core-model.resolve-ties-by-the-later-decision | guidance | Does the later approved decision settle each tie? |
-| standards/rule/core-model.hold-approval-behind-draft-decisions | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `draft-gate`. |
-| standards/rule/core-model.record-accepted-gaps-as-known-gaps | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape` and `known-gap-expired`. |
-| standards/rule/core-model.apply-guidance-precedence | guidance | Does intent override a standard anywhere without an exception? |
-| standards/rule/core-model.authorize-access-through-the-permission-chain | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape` and `reference-unresolved`. |
-| standards/rule/core-model.express-module-order-as-depends-on | guidance | Does any record rank modules instead of linking them? |
-| standards/rule/core-model.keep-one-owner-and-status-on-every-record | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `owner-unknown` and `draft-without-decider`. |
-| standards/rule/core-model.retire-records-with-replaces | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `invalid-field` for `replaces` outside a decision and `reference-unresolved` for an unknown target. |
-| standards/rule/core-model.name-what-every-decision-decides | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `decision-decides-nothing`. |
-| standards/rule/core-model.resolve-every-page-link | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `link-unresolved`. |
-| standards/rule/core-model.declare-size-stacks-and-optional-types | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `profile-type-missing` and `record-shape`. |
-| standards/rule/core-model.give-every-use-case-its-results | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `use-case-without-success` and `case-result-unresolved`. |
-| standards/rule/core-model.cover-every-public-use-case-from-a-journey | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `journey-reach`. |
-| standards/rule/core-model.read-truth-from-code-screens-and-test-runs | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `use-case-unimplemented`, `proves-unconfirmed`, and `refusal-not-thrown`. |
-| standards/rule/core-model.render-generated-regions-from-the-model | guidance | Are generated regions current, or is a replacement recorded? |
+| litespec/rule/core-model.write-every-record-in-its-home | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape`. |
+| litespec/rule/core-model.state-the-common-fields-on-every-record | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape`. |
+| litespec/rule/core-model.write-links-on-the-record-that-points | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `reference-unresolved`. |
+| litespec/rule/core-model.follow-the-authority-order | guidance | Does each conflict resolve toward the higher authority? |
+| litespec/rule/core-model.resolve-ties-by-the-later-decision | guidance | Does the later approved decision settle each tie? |
+| litespec/rule/core-model.hold-approval-behind-draft-decisions | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `draft-gate`. |
+| litespec/rule/core-model.record-accepted-gaps-as-known-gaps | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape` and `known-gap-expired`. |
+| litespec/rule/core-model.apply-guidance-precedence | guidance | Does intent override a standard anywhere without an exception? |
+| litespec/rule/core-model.authorize-access-through-the-permission-chain | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape` and `reference-unresolved`. |
+| litespec/rule/core-model.express-module-order-as-depends-on | guidance | Does any record rank modules instead of linking them? |
+| litespec/rule/core-model.keep-one-owner-and-status-on-every-record | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `owner-unknown` and `draft-without-decider`. |
+| litespec/rule/core-model.retire-records-with-replaces | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `invalid-field` for `replaces` outside a decision and `reference-unresolved` for an unknown target. |
+| litespec/rule/core-model.name-what-every-decision-decides | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `decision-decides-nothing`. |
+| litespec/rule/core-model.resolve-every-page-link | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `link-unresolved`. |
+| litespec/rule/core-model.declare-size-stacks-and-optional-types | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `profile-type-missing` and `record-shape`. |
+| litespec/rule/core-model.give-every-use-case-its-results | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `use-case-without-success` and `case-result-unresolved`. |
+| litespec/rule/core-model.cover-every-public-use-case-from-a-journey | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `journey-reach`. |
+| litespec/rule/core-model.read-truth-from-code-screens-and-test-runs | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `use-case-unimplemented`, `proves-unconfirmed`, and `refusal-not-thrown`. |
+| litespec/rule/core-model.render-generated-regions-from-the-model | guidance | Are generated regions current, or is a replacement recorded? |

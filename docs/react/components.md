@@ -6,12 +6,12 @@ Components in a React frontend are function components with typed boundaries. Th
 
 ## Agent Summary {#agent-summary}
 
-- Components are function components using hooks. (standards/rule/react-components.write-components-as-functions)
-- Components type their props and events under strict mode. (standards/rule/react-components.keep-component-boundaries-typed)
+- Components are function components using hooks. (litespec/rule/react-components.write-components-as-functions)
+- Components type their props and events under strict mode. (litespec/rule/react-components.keep-component-boundaries-typed)
 
 ## Standards
 
-### Write components as functions (standards/rule/react-components.write-components-as-functions)
+### Write components as functions (litespec/rule/react-components.write-components-as-functions)
 
 **Requirement:** A component MUST be a function component using hooks, not a class component.
 
@@ -28,7 +28,7 @@ function OrderTotal({ orderId }: { orderId: string }) {
 }
 ```
 
-### Keep component boundaries typed (standards/rule/react-components.keep-component-boundaries-typed)
+### Keep component boundaries typed (litespec/rule/react-components.keep-component-boundaries-typed)
 
 **Requirement:** A component MUST type its props and its events under strict mode.
 
@@ -42,5 +42,5 @@ None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/react-components.write-components-as-functions | guidance | Is every component a function component using hooks? |
-| standards/rule/react-components.keep-component-boundaries-typed | checkable | `pnpm type-check` runs under strict mode and fails on an untyped prop or event. |
+| litespec/rule/react-components.write-components-as-functions | guidance | Is every component a function component using hooks? |
+| litespec/rule/react-components.keep-component-boundaries-typed | checkable | `pnpm type-check` runs under strict mode and fails on an untyped prop or event. |

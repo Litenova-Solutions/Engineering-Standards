@@ -1,6 +1,6 @@
 # Model fixtures
 
-Two fixture consumers and one broken overlay per check. The suite in `standards/tools/model.cases.mjs` copies a fixture to a temporary folder, applies an overlay, and runs the model builder check.
+Two fixture consumers and one broken overlay per check. The suite in `litespec/tools/model.cases.mjs` copies a fixture to a temporary folder, applies an overlay, and runs the model builder check.
 
 ## Fixtures
 

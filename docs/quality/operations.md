@@ -6,16 +6,16 @@ A released application is observable, deployable, recoverable, and supportable b
 
 ## Agent Summary {#agent-summary}
 
-- One local command starts the whole stack. (standards/rule/quality-operations.start-the-stack-with-one-local-command)
-- Diagnostics carry correlation identifiers and stable names. (standards/rule/quality-operations.emit-correlated-diagnostics, standards/rule/quality-operations.pass-trace-context-in-the-w3c-format)
-- Liveness and readiness are separate endpoints. (standards/rule/quality-operations.separate-liveness-and-readiness)
-- Schema changes run as a release step before traffic. (standards/rule/quality-operations.apply-schema-changes-outside-request-startup)
-- Backups declare their owner, retention, and tested restore, rehearsed before the first production data. (standards/rule/quality-operations.define-backup-and-restore-behavior, standards/rule/quality-operations.exercise-a-restore-before-the-first-production-data)
-- Deployments promote versioned artifacts from one deploy tree, and secrets stay out of the repository. (standards/rule/quality-operations.use-a-repeatable-deployment, standards/rule/quality-operations.keep-deployment-descriptors-together, standards/rule/quality-operations.keep-production-secrets-out-of-the-repository)
-- Rollback and each runbook are rehearsed before release. (standards/rule/quality-operations.keep-rollback-executable, standards/rule/quality-operations.exercise-every-runbook-before-release)
-- Workers and recurring jobs publish their own health, and silence pages a person. (standards/rule/quality-operations.operate-background-work-independently, standards/rule/quality-operations.report-liveness-from-every-recurring-job)
-- External calls declare timeouts, cancellation, and bounded retries, and each provider appears in the sub-processor list. (standards/rule/quality-operations.bound-external-calls, standards/rule/quality-operations.list-every-sub-processor)
-- Every alert declares its runbook, and each baseline alert adds owner, threshold, window, severity, and coverage. (standards/rule/quality-operations.define-actionable-baseline-alerts, standards/rule/quality-operations.cover-the-baseline-alert-set, standards/rule/quality-operations.name-a-runbook-on-every-alert, standards/rule/quality-operations.route-each-severity-to-a-declared-destination)
+- One local command starts the whole stack. (litespec/rule/quality-operations.start-the-stack-with-one-local-command)
+- Diagnostics carry correlation identifiers and stable names. (litespec/rule/quality-operations.emit-correlated-diagnostics, litespec/rule/quality-operations.pass-trace-context-in-the-w3c-format)
+- Liveness and readiness are separate endpoints. (litespec/rule/quality-operations.separate-liveness-and-readiness)
+- Schema changes run as a release step before traffic. (litespec/rule/quality-operations.apply-schema-changes-outside-request-startup)
+- Backups declare their owner, retention, and tested restore, rehearsed before the first production data. (litespec/rule/quality-operations.define-backup-and-restore-behavior, litespec/rule/quality-operations.exercise-a-restore-before-the-first-production-data)
+- Deployments promote versioned artifacts from one deploy tree, and secrets stay out of the repository. (litespec/rule/quality-operations.use-a-repeatable-deployment, litespec/rule/quality-operations.keep-deployment-descriptors-together, litespec/rule/quality-operations.keep-production-secrets-out-of-the-repository)
+- Rollback and each runbook are rehearsed before release. (litespec/rule/quality-operations.keep-rollback-executable, litespec/rule/quality-operations.exercise-every-runbook-before-release)
+- Workers and recurring jobs publish their own health, and silence pages a person. (litespec/rule/quality-operations.operate-background-work-independently, litespec/rule/quality-operations.report-liveness-from-every-recurring-job)
+- External calls declare timeouts, cancellation, and bounded retries, and each provider appears in the sub-processor list. (litespec/rule/quality-operations.bound-external-calls, litespec/rule/quality-operations.list-every-sub-processor)
+- Every alert declares its runbook, and each baseline alert adds owner, threshold, window, severity, and coverage. (litespec/rule/quality-operations.define-actionable-baseline-alerts, litespec/rule/quality-operations.cover-the-baseline-alert-set, litespec/rule/quality-operations.name-a-runbook-on-every-alert, litespec/rule/quality-operations.route-each-severity-to-a-declared-destination)
 
 ## Concepts
 
@@ -40,19 +40,19 @@ Operating truth lives in the records this section names. Each record below state
 
 ## Standards
 
-### Start the stack with one local command (standards/rule/quality-operations.start-the-stack-with-one-local-command)
+### Start the stack with one local command (litespec/rule/quality-operations.start-the-stack-with-one-local-command)
 
 **Requirement:** A workspace MUST start WebApi, PostgreSQL, configured frontends, and its Worker where one exists, with one local command named in the consumer `AGENTS.md`.
 
 **Rationale:** The baseline command is Aspire's `AppHost`, and `ServiceDefaults` supplies the shared discovery, health, resilience, and telemetry defaults its resources rely on. A workspace that orchestrates the same set another way satisfies this rule with its own command. The obligation is that one command brings the stack up, not that one tool does.
 
-### Emit correlated diagnostics (standards/rule/quality-operations.emit-correlated-diagnostics)
+### Emit correlated diagnostics (litespec/rule/quality-operations.emit-correlated-diagnostics)
 
 **Requirement:** A host MUST emit structured logs, traces, and metrics, with correlation identifiers on logs and traces and service labels on metrics.
 
 **Rationale:** Logs and traces carry timestamp, level, service, environment, trace identifier, and span identifier. Metrics carry service and environment labels. Correlated identifiers let one request be followed across hosts. Stable event names keep dashboards working across releases.
 
-### Pass trace context in the W3C format (standards/rule/quality-operations.pass-trace-context-in-the-w3c-format)
+### Pass trace context in the W3C format (litespec/rule/quality-operations.pass-trace-context-in-the-w3c-format)
 
 **Requirement:** A host MUST read and write trace context as the [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent` and `tracestate` headers, using one configured propagator.
 
@@ -60,87 +60,87 @@ Operating truth lives in the records this section names. Each record below state
 
 One propagator is the part that matters. Two configured propagators produce two identifiers for one request, and the trace splits at whichever hop reads the other one.
 
-**Example:** The trace identifier in a Problem Details response is the trace-id field of the current `traceparent`, which is what `standards/rule/backend-api.return-stable-problem-details` returns.
+**Example:** The trace identifier in a Problem Details response is the trace-id field of the current `traceparent`, which is what `litespec/rule/backend-api.return-stable-problem-details` returns.
 
-### Separate liveness and readiness (standards/rule/quality-operations.separate-liveness-and-readiness)
+### Separate liveness and readiness (litespec/rule/quality-operations.separate-liveness-and-readiness)
 
 **Requirement:** A host MUST expose `/health/live` without dependency checks and `/health/ready` including its critical dependencies.
 
 **Rationale:** Readiness fails when the application cannot safely serve traffic, while liveness stays true so the orchestrator does not restart a healthy process.
 
-### Apply schema changes outside request startup (standards/rule/quality-operations.apply-schema-changes-outside-request-startup)
+### Apply schema changes outside request startup (litespec/rule/quality-operations.apply-schema-changes-outside-request-startup)
 
 **Requirement:** A hosted schema change MUST run as a dedicated release step before traffic shifts, reviewed against both application versions.
 
 **Rationale:** A replica that applies schema at startup races its siblings and serves traffic against a half-applied schema.
 
-### Define backup and restore behavior (standards/rule/quality-operations.define-backup-and-restore-behavior)
+### Define backup and restore behavior (litespec/rule/quality-operations.define-backup-and-restore-behavior)
 
 **Requirement:** A release MUST document backup owner, schedule, retention, encryption, location, restore command, and recovery objectives.
 
 **Rationale:** A backup without a tested restore is not a backup.
 
-### Exercise a restore before the first production data (standards/rule/quality-operations.exercise-a-restore-before-the-first-production-data)
+### Exercise a restore before the first production data (litespec/rule/quality-operations.exercise-a-restore-before-the-first-production-data)
 
 **Requirement:** A project MUST rehearse a restore on representative data before its first deployment holds production data.
 
 **Rationale:** The first restore attempt is the wrong time to learn the backup cannot restore.
 
-### Use a repeatable deployment (standards/rule/quality-operations.use-a-repeatable-deployment)
+### Use a repeatable deployment (litespec/rule/quality-operations.use-a-repeatable-deployment)
 
 **Requirement:** A deployment MUST use versioned artifacts, declared configuration, a schema step, readiness checks, and a passing release job.
 
 **Rationale:** Deploying from an uncommitted tree or a mutable branch reference makes the deployed content unknowable afterwards.
 
-### Keep rollback executable (standards/rule/quality-operations.keep-rollback-executable)
+### Keep rollback executable (litespec/rule/quality-operations.keep-rollback-executable)
 
 **Requirement:** The rollback runbook MUST state the previous artifact reference, command, configuration and schema compatibility, data recovery condition, and the expand-and-contract sequence for destructive schema work.
 
-**Rationale:** Rollback is a required runbook, so `standards/rule/quality-operations.exercise-every-runbook-before-release` rehearses it.
+**Rationale:** Rollback is a required runbook, so `litespec/rule/quality-operations.exercise-every-runbook-before-release` rehearses it.
 
-### Operate background work independently (standards/rule/quality-operations.operate-background-work-independently)
+### Operate background work independently (litespec/rule/quality-operations.operate-background-work-independently)
 
 **Requirement:** A Worker MUST publish its own liveness, readiness, processing rate, failure count, retry count, oldest pending age, and shutdown behavior.
 
 **Rationale:** WebApi readiness otherwise hides a failed durable-delivery Worker while the queue grows unobserved.
 
-### Report liveness from every recurring job (standards/rule/quality-operations.report-liveness-from-every-recurring-job)
+### Report liveness from every recurring job (litespec/rule/quality-operations.report-liveness-from-every-recurring-job)
 
 **Requirement:** Every recurring job MUST report liveness that pages a person when the job goes silent.
 
 **Rationale:** A job that stops without a signal looks exactly like a job with nothing to do.
 
-### Bound external calls (standards/rule/quality-operations.bound-external-calls)
+### Bound external calls (litespec/rule/quality-operations.bound-external-calls)
 
 **Requirement:** Every network call MUST declare an explicit timeout and cancellation path, with retries only for idempotent operations named by a bounded retry policy.
 
 **Rationale:** An unbounded call holds a request thread until an unrelated system recovers.
 
-### List every sub-processor (standards/rule/quality-operations.list-every-sub-processor)
+### List every sub-processor (litespec/rule/quality-operations.list-every-sub-processor)
 
 **Requirement:** A release MUST call only providers the generated sub-processor list names from the project's provider Actors.
 
 **Rationale:** The model builder renders the list from the provider Actor records. A provider added in code but missing from the list answers a customer question wrong.
 
-### Define actionable baseline alerts (standards/rule/quality-operations.define-actionable-baseline-alerts)
+### Define actionable baseline alerts (litespec/rule/quality-operations.define-actionable-baseline-alerts)
 
 **Requirement:** A baseline alert MUST declare owner, threshold, evaluation window, severity, and runbook before a production release.
 
 **Rationale:** The alert inventory is generated from the Limit entries and the runbook each names.
 
-### Cover the baseline alert set (standards/rule/quality-operations.cover-the-baseline-alert-set)
+### Cover the baseline alert set (litespec/rule/quality-operations.cover-the-baseline-alert-set)
 
 **Requirement:** Baseline coverage MUST include sustained readiness failures, unexpected HTTP errors, release-flow latency, PostgreSQL outages, and failed deployments.
 
 **Rationale:** These failures end a release when nobody observes them.
 
-### Name a runbook on every alert (standards/rule/quality-operations.name-a-runbook-on-every-alert)
+### Name a runbook on every alert (litespec/rule/quality-operations.name-a-runbook-on-every-alert)
 
 **Requirement:** Every alert MUST name the runbook that answers it.
 
 **Rationale:** An alert without a runbook asks whoever receives it to invent the response.
 
-### Route each severity to a declared destination (standards/rule/quality-operations.route-each-severity-to-a-declared-destination)
+### Route each severity to a declared destination (litespec/rule/quality-operations.route-each-severity-to-a-declared-destination)
 
 **Requirement:** An alert inventory MUST state, for each severity it uses, the destination that receives the alert and the response time expected of it.
 
@@ -148,13 +148,13 @@ One propagator is the part that matters. Two configured propagators produce two 
 
 **Example:** A two-severity inventory routes `page` to the on-call destination with a stated response time, and `ticket` to the queue reviewed each working day.
 
-### Exercise every runbook before release (standards/rule/quality-operations.exercise-every-runbook-before-release)
+### Exercise every runbook before release (litespec/rule/quality-operations.exercise-every-runbook-before-release)
 
 **Requirement:** Each required runbook MUST carry a dated rehearsal in the operations log before a production release, with restore rehearsed on representative data.
 
-**Rationale:** A runbook is a claim until somebody runs it. The restore rehearsal is the one `standards/rule/quality-operations.exercise-a-restore-before-the-first-production-data` requires.
+**Rationale:** A runbook is a claim until somebody runs it. The restore rehearsal is the one `litespec/rule/quality-operations.exercise-a-restore-before-the-first-production-data` requires.
 
-### Keep production secrets out of the repository (standards/rule/quality-operations.keep-production-secrets-out-of-the-repository)
+### Keep production secrets out of the repository (litespec/rule/quality-operations.keep-production-secrets-out-of-the-repository)
 
 **Requirement:** Production environment values MUST live on the host, never in the repository.
 
@@ -162,7 +162,7 @@ One propagator is the part that matters. Two configured propagators produce two 
 
 ## Conventions
 
-### Use stable service names (standards/rule/quality-operations.use-stable-service-names)
+### Use stable service names (litespec/rule/quality-operations.use-stable-service-names)
 
 **Default:** Keep service, resource, meter, and trace-source names identical across environments.
 
@@ -170,7 +170,7 @@ One propagator is the part that matters. Two configured propagators produce two 
 
 **Rationale:** A deployment-generated identifier breaks every dashboard and alert that referenced the previous name.
 
-### Keep runbooks near project documentation (standards/rule/quality-operations.keep-runbooks-near-project-documentation)
+### Keep runbooks near project documentation (litespec/rule/quality-operations.keep-runbooks-near-project-documentation)
 
 **Default:** Place runbooks under `docs/runbooks/` stating trigger, impact, prerequisites, steps, and verification, covering restore, rollback, schema failure, leaked secrets, dependency outages, and extension recovery.
 
@@ -178,7 +178,7 @@ One propagator is the part that matters. Two configured propagators produce two 
 
 **Rationale:** One folder keeps every procedure where the alert inventory points.
 
-### Keep deployment descriptors together (standards/rule/quality-operations.keep-deployment-descriptors-together)
+### Keep deployment descriptors together (litespec/rule/quality-operations.keep-deployment-descriptors-together)
 
 **Default:** Keep compose files, proxy configuration, the environment example, database setup, observability, DNS records, alert definitions, service definitions, and bootstrap scripts under one `deploy/` tree.
 
@@ -188,7 +188,7 @@ One propagator is the part that matters. Two configured propagators produce two 
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/quality-operations.use-a-repeatable-deployment` and `standards/rule/quality-operations.keep-rollback-executable`.
+This informative example demonstrates `litespec/rule/quality-operations.use-a-repeatable-deployment` and `litespec/rule/quality-operations.keep-rollback-executable`.
 
 A release applies a reviewed Marten schema plan and deploys the versioned API artifact. It waits for `/health/ready`, then runs the included end-to-end tests. One retained command restores the previous artifact when a test fails.
 
@@ -196,25 +196,25 @@ A release applies a reviewed Marten schema plan and deploys the versioned API ar
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/quality-operations.start-the-stack-with-one-local-command | guidance | Does one command named in AGENTS.md start every local resource? |
-| standards/rule/quality-operations.emit-correlated-diagnostics | guidance | Do logs and traces carry correlation identifiers, and metrics service labels? |
-| standards/rule/quality-operations.pass-trace-context-in-the-w3c-format | guidance | Does one propagator read and write W3C trace context on every host? |
-| standards/rule/quality-operations.apply-schema-changes-outside-request-startup | guidance | Does the schema step run before traffic shifts, and never at replica startup? |
-| standards/rule/quality-operations.define-backup-and-restore-behavior | guidance | Does the release document owner, schedule, retention, encryption, location, command, and objectives? |
-| standards/rule/quality-operations.exercise-a-restore-before-the-first-production-data | guidance | Did the project rehearse a restore on representative data before production data? |
-| standards/rule/quality-operations.use-a-repeatable-deployment | guidance | Does every deployment use versioned artifacts, declared configuration, and a passing release job? |
-| standards/rule/quality-operations.keep-rollback-executable | guidance | Does the rollback runbook state its reference, command, compatibility, and data condition? |
-| standards/rule/quality-operations.operate-background-work-independently | guidance | Does the Worker publish its own health, rates, counts, age, and shutdown behavior? |
-| standards/rule/quality-operations.report-liveness-from-every-recurring-job | guidance | Does every recurring job report liveness that pages a person on silence? |
-| standards/rule/quality-operations.bound-external-calls | guidance | Does every network call declare a timeout, a cancellation path, and bounded idempotent retries? |
-| standards/rule/quality-operations.list-every-sub-processor | guidance | Does every provider the code calls appear as a provider Actor? |
-| standards/rule/quality-operations.separate-liveness-and-readiness | guidance | Does liveness ignore dependencies while readiness checks the critical ones? |
-| standards/rule/quality-operations.define-actionable-baseline-alerts | guidance | Does every baseline alert declare owner, threshold, window, severity, and runbook? |
-| standards/rule/quality-operations.cover-the-baseline-alert-set | guidance | Does baseline coverage include sustained readiness failures, unexpected HTTP errors, release-flow latency, PostgreSQL outages, and failed deployments? |
-| standards/rule/quality-operations.name-a-runbook-on-every-alert | guidance | Does every alert name the runbook that answers it? |
-| standards/rule/quality-operations.route-each-severity-to-a-declared-destination | guidance | Does every severity state its destination and expected response time? |
-| standards/rule/quality-operations.exercise-every-runbook-before-release | guidance | Does every required runbook carry a dated rehearsal in the operations log? |
-| standards/rule/quality-operations.keep-production-secrets-out-of-the-repository | guidance | Are production values on the host, with only placeholders in the repository? |
-| standards/rule/quality-operations.use-stable-service-names | guidance | Are service, resource, meter, and trace names identical across environments, or is an Exception recorded? |
-| standards/rule/quality-operations.keep-runbooks-near-project-documentation | guidance | Is every runbook under docs/runbooks with its sections, or is an Exception recorded? |
-| standards/rule/quality-operations.keep-deployment-descriptors-together | guidance | Are the deployment descriptors under one deploy tree, or is an Exception recorded? |
+| litespec/rule/quality-operations.start-the-stack-with-one-local-command | guidance | Does one command named in AGENTS.md start every local resource? |
+| litespec/rule/quality-operations.emit-correlated-diagnostics | guidance | Do logs and traces carry correlation identifiers, and metrics service labels? |
+| litespec/rule/quality-operations.pass-trace-context-in-the-w3c-format | guidance | Does one propagator read and write W3C trace context on every host? |
+| litespec/rule/quality-operations.apply-schema-changes-outside-request-startup | guidance | Does the schema step run before traffic shifts, and never at replica startup? |
+| litespec/rule/quality-operations.define-backup-and-restore-behavior | guidance | Does the release document owner, schedule, retention, encryption, location, command, and objectives? |
+| litespec/rule/quality-operations.exercise-a-restore-before-the-first-production-data | guidance | Did the project rehearse a restore on representative data before production data? |
+| litespec/rule/quality-operations.use-a-repeatable-deployment | guidance | Does every deployment use versioned artifacts, declared configuration, and a passing release job? |
+| litespec/rule/quality-operations.keep-rollback-executable | guidance | Does the rollback runbook state its reference, command, compatibility, and data condition? |
+| litespec/rule/quality-operations.operate-background-work-independently | guidance | Does the Worker publish its own health, rates, counts, age, and shutdown behavior? |
+| litespec/rule/quality-operations.report-liveness-from-every-recurring-job | guidance | Does every recurring job report liveness that pages a person on silence? |
+| litespec/rule/quality-operations.bound-external-calls | guidance | Does every network call declare a timeout, a cancellation path, and bounded idempotent retries? |
+| litespec/rule/quality-operations.list-every-sub-processor | guidance | Does every provider the code calls appear as a provider Actor? |
+| litespec/rule/quality-operations.separate-liveness-and-readiness | guidance | Does liveness ignore dependencies while readiness checks the critical ones? |
+| litespec/rule/quality-operations.define-actionable-baseline-alerts | guidance | Does every baseline alert declare owner, threshold, window, severity, and runbook? |
+| litespec/rule/quality-operations.cover-the-baseline-alert-set | guidance | Does baseline coverage include sustained readiness failures, unexpected HTTP errors, release-flow latency, PostgreSQL outages, and failed deployments? |
+| litespec/rule/quality-operations.name-a-runbook-on-every-alert | guidance | Does every alert name the runbook that answers it? |
+| litespec/rule/quality-operations.route-each-severity-to-a-declared-destination | guidance | Does every severity state its destination and expected response time? |
+| litespec/rule/quality-operations.exercise-every-runbook-before-release | guidance | Does every required runbook carry a dated rehearsal in the operations log? |
+| litespec/rule/quality-operations.keep-production-secrets-out-of-the-repository | guidance | Are production values on the host, with only placeholders in the repository? |
+| litespec/rule/quality-operations.use-stable-service-names | guidance | Are service, resource, meter, and trace names identical across environments, or is an Exception recorded? |
+| litespec/rule/quality-operations.keep-runbooks-near-project-documentation | guidance | Is every runbook under docs/runbooks with its sections, or is an Exception recorded? |
+| litespec/rule/quality-operations.keep-deployment-descriptors-together | guidance | Are the deployment descriptors under one deploy tree, or is an Exception recorded? |

@@ -1,20 +1,20 @@
 <p align="center">
-  <img src="assets/agentic-engineering-system-icon.svg" alt="Agentic Engineering System" width="88" height="88">
+  <img src="assets/litespec-icon.svg" alt="LiteSpec" width="88" height="88">
 </p>
 
-<h1 align="center">Agentic Engineering System</h1>
+<h1 align="center">LiteSpec</h1>
 
 <p align="center">
   <a href="https://www.litenova.solutions/Standards"><img src="https://img.shields.io/badge/docs-online-f8c258?labelColor=3e3643" alt="Documentation"></a>
-  <a href="https://github.com/Litenova-Solutions/Engineering-Standards/releases/latest"><img src="https://img.shields.io/github/v/release/Litenova-Solutions/Engineering-Standards?label=version&color=3e3643" alt="Latest release"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/Litenova-Solutions/Engineering-Standards" alt="MIT license"></a>
+  <a href="https://github.com/Litenova-Solutions/LiteSpec/releases/latest"><img src="https://img.shields.io/github/v/release/Litenova-Solutions/LiteSpec?label=version&color=3e3643" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Litenova-Solutions/LiteSpec" alt="MIT license"></a>
 </p>
 
 ## Intent
 
-The Agentic Engineering System is the standards contract Litenova Solutions uses for software work by humans and AI agents.
+LiteSpec is the standards contract Litenova Solutions uses for software work by humans and AI agents.
 
-Standards v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend: `react`, `svelte`, or `blazor-web`.
+LiteSpec v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend: `react`, `svelte`, or `blazor-web`.
 
 ## What It Defines
 
@@ -32,7 +32,7 @@ The stacks a consumer selects apply first. An extension or project exception nam
 
 - [Hosted documentation](https://www.litenova.solutions/Standards)
 - [Repository documentation index](docs/README.md)
-- [Agentic Engineering System](docs/core/system.md)
+- [LiteSpec](docs/core/system.md)
 - [Project model](docs/core/model.md)
 - [Authoring standard](docs/core/authoring.md)
 - [Get started](docs/tutorial/getting-started.md)
@@ -43,11 +43,11 @@ The stacks a consumer selects apply first. An extension or project exception nam
 Pin a published release as a repository submodule:
 
 ```bash
-git submodule add https://github.com/Litenova-Solutions/Engineering-Standards.git standards
-git -C standards checkout --detach <approved-tag-or-commit>
+git submodule add https://github.com/Litenova-Solutions/LiteSpec.git standards
+git -C LiteSpec checkout --detach <approved-tag-or-commit>
 ```
 
-Add `standards.project.json`, a short root `AGENTS.md`, and the project records required by current work.
+Add `litespec.project.json`, a short root `AGENTS.md`, and the project records required by current work.
 
 Follow [Get started](docs/tutorial/getting-started.md) when creating a consumer repository.
 
@@ -63,7 +63,7 @@ templates/standard/      Standards authoring templates
 tools/                   Reference validators and fixture suites, documented under docs/tools/
 tools/model/             The project model builder and its fixture suite
 patterns/ui/             The UI pattern library, its data, and its viewer
-standards.manifest.json  Versions, stacks, extensions, and package pins
+litespec.manifest.json  Versions, stacks, extensions, and package pins
 ```
 
 ## Project

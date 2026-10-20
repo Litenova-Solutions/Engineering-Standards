@@ -2,7 +2,7 @@
 
 // Writes docs/reference/provisions.md from the active standards, with each
 // provision's Verification mark and evidence. Pass --check to
-// compare without writing. (standards/rule/core-authoring.regenerate-the-provision-index)
+// compare without writing. (litespec/rule/core-authoring.regenerate-the-provision-index)
 
 import fs from 'node:fs';
 import path from 'node:path';

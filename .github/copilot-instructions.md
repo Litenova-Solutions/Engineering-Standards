@@ -1,10 +1,10 @@
 # GitHub Copilot Instructions
 
-Read `AGENTS.md` as the canonical agent protocol. In a consumer repository, read `standards/AGENTS.md`, `standards.project.json`, the model query result for the active records, and enabled extensions.
+Read `AGENTS.md` as the canonical agent protocol. In a consumer repository, read `litespec/AGENTS.md`, `litespec.project.json`, the model query result for the active records, and enabled extensions.
 
 ## Working in this repository
 
-Every provision ID is `standards/<kind>/<page>.<heading-slug>`, and the page segment names the page path. `standards/rule/frontend-components.compose-composites-in-page-code` lives in `docs/frontend/components.md`, so a citation needs no lookup step.
+Every provision ID is `litespec/<kind>/<page>.<heading-slug>`, and the page segment names the page path. `litespec/rule/frontend-components.compose-composites-in-page-code` lives in `docs/frontend/components.md`, so a citation needs no lookup step.
 
 A changed assertion takes a new ID. Do not edit an active Requirement in place, and do not add an alias or a replacement map. `CONTRIBUTING.md` states the amendment order.
 

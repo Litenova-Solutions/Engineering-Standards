@@ -20,18 +20,18 @@ This extension switches on no record type.
 
 ## Agent Summary {#agent-summary}
 
-- Pass server instructions at initialize. (standards/rule/ext-mcp.pass-server-instructions-at-initialize)
-- Title each tool imperatively and describe it declaratively. (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
-- State parameter polarity and side effects in descriptions. (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
-- Scope each tool to named use cases and permissions. (standards/rule/ext-mcp.scope-each-tool-to-named-use-cases)
-- Confirm every writing tool explicitly. (standards/rule/ext-mcp.confirm-every-writing-tool)
-- Exclude secrets and personal data from tool surfaces. (standards/rule/ext-mcp.exclude-secrets-and-personal-data)
-- State the distribution and update path. (standards/rule/ext-mcp.state-the-distribution-and-update-path)
-- State the refusing side on each refusal. (standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal)
+- Pass server instructions at initialize. (litespec/rule/ext-mcp.pass-server-instructions-at-initialize)
+- Title each tool imperatively and describe it declaratively. (litespec/rule/ext-mcp.write-one-tool-description-for-one-decision)
+- State parameter polarity and side effects in descriptions. (litespec/rule/ext-mcp.write-one-tool-description-for-one-decision)
+- Scope each tool to named use cases and permissions. (litespec/rule/ext-mcp.scope-each-tool-to-named-use-cases)
+- Confirm every writing tool explicitly. (litespec/rule/ext-mcp.confirm-every-writing-tool)
+- Exclude secrets and personal data from tool surfaces. (litespec/rule/ext-mcp.exclude-secrets-and-personal-data)
+- State the distribution and update path. (litespec/rule/ext-mcp.state-the-distribution-and-update-path)
+- State the refusing side on each refusal. (litespec/rule/ext-mcp.state-the-refusing-side-on-each-refusal)
 
 ## Standards
 
-### Pass server instructions at initialize (standards/rule/ext-mcp.pass-server-instructions-at-initialize)
+### Pass server instructions at initialize (litespec/rule/ext-mcp.pass-server-instructions-at-initialize)
 
 **Requirement:** An MCP server MUST pass an `instructions` value at initialize stating its transport, its audience, its write surface, and its refusal behavior.
 
@@ -39,7 +39,7 @@ This extension switches on no record type.
 
 **Example:** "Runs over stdio, one account per process, against the hosted API. Reads cover the account's own data, and three tools create or change records. A policy refusal returns the problem code, and a write needing a person's confirmation refuses until they give it."
 
-### Write one tool description for one decision (standards/rule/ext-mcp.write-one-tool-description-for-one-decision)
+### Write one tool description for one decision (litespec/rule/ext-mcp.write-one-tool-description-for-one-decision)
 
 **Requirement:** An MCP tool MUST title its action imperatively, describe its behavior declaratively, use positive parameter polarity, and state its side effects.
 
@@ -60,25 +60,25 @@ This extension switches on no record type.
 }
 ```
 
-### Scope each tool to named use cases (standards/rule/ext-mcp.scope-each-tool-to-named-use-cases)
+### Scope each tool to named use cases (litespec/rule/ext-mcp.scope-each-tool-to-named-use-cases)
 
 **Requirement:** Each tool MUST name the use cases and permissions it reaches.
 
 **Rationale:** A stated scope lets a reviewer tell which product behavior the tool exposes.
 
-### Confirm every writing tool (standards/rule/ext-mcp.confirm-every-writing-tool)
+### Confirm every writing tool (litespec/rule/ext-mcp.confirm-every-writing-tool)
 
 **Requirement:** Every tool that writes MUST refuse until the person confirms the write.
 
 **Rationale:** A person approves each write before the model performs it.
 
-### Exclude secrets and personal data (standards/rule/ext-mcp.exclude-secrets-and-personal-data)
+### Exclude secrets and personal data (litespec/rule/ext-mcp.exclude-secrets-and-personal-data)
 
 **Requirement:** Tool descriptions and logs MUST exclude secrets and personal data from every field they carry.
 
 **Rationale:** Descriptions reach the model and logs reach operators, and neither needs values that grant access or identify a person.
 
-### State the distribution and update path (standards/rule/ext-mcp.state-the-distribution-and-update-path)
+### State the distribution and update path (litespec/rule/ext-mcp.state-the-distribution-and-update-path)
 
 **Requirement:** The server documentation MUST state how a user installs and updates the server.
 
@@ -86,7 +86,7 @@ This extension switches on no record type.
 
 ## Conventions
 
-### State the refusing side on each refusal (standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal)
+### State the refusing side on each refusal (litespec/rule/ext-mcp.state-the-refusing-side-on-each-refusal)
 
 **Default:** Prefix an input-shape refusal with `Needs:`, a human-confirmation refusal with `Needs confirmation:`, and a server-side refusal with `Refused:`.
 
@@ -102,10 +102,10 @@ No library is selected by this extension. An MCP SDK needs a decision; the manif
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-mcp.pass-server-instructions-at-initialize | guidance | Does the server pass a non-empty instructions value at initialize? |
-| standards/rule/ext-mcp.write-one-tool-description-for-one-decision | guidance | Does {path}, the declared tools directory, show imperative titles and stated side effects? |
-| standards/rule/ext-mcp.scope-each-tool-to-named-use-cases | guidance | Does each tool name the use cases and permissions it reaches? |
-| standards/rule/ext-mcp.confirm-every-writing-tool | guidance | Does every writing tool refuse until the person confirms? |
-| standards/rule/ext-mcp.exclude-secrets-and-personal-data | guidance | Are descriptions and logs free of secrets and personal data? |
-| standards/rule/ext-mcp.state-the-distribution-and-update-path | guidance | Does the documentation state install and update steps? |
-| standards/rule/ext-mcp.state-the-refusing-side-on-each-refusal | guidance | Do refusals carry the three prefixes or record an Exception? |
+| litespec/rule/ext-mcp.pass-server-instructions-at-initialize | guidance | Does the server pass a non-empty instructions value at initialize? |
+| litespec/rule/ext-mcp.write-one-tool-description-for-one-decision | guidance | Does {path}, the declared tools directory, show imperative titles and stated side effects? |
+| litespec/rule/ext-mcp.scope-each-tool-to-named-use-cases | guidance | Does each tool name the use cases and permissions it reaches? |
+| litespec/rule/ext-mcp.confirm-every-writing-tool | guidance | Does every writing tool refuse until the person confirms? |
+| litespec/rule/ext-mcp.exclude-secrets-and-personal-data | guidance | Are descriptions and logs free of secrets and personal data? |
+| litespec/rule/ext-mcp.state-the-distribution-and-update-path | guidance | Does the documentation state install and update steps? |
+| litespec/rule/ext-mcp.state-the-refusing-side-on-each-refusal | guidance | Do refusals carry the three prefixes or record an Exception? |

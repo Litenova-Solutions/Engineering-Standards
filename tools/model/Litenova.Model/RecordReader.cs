@@ -365,7 +365,7 @@ static class RecordReader
 
             var relative = Path.GetRelativePath(root, file);
 
-            if (relative.StartsWith("standards" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+            if (relative.StartsWith("litespec" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
                 || relative.StartsWith(".agents" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
             {
                 continue;
@@ -379,7 +379,7 @@ static class RecordReader
 
     private static IReadOnlySet<string> ReadProvisions(ConsumerConfig config)
     {
-        var docs = Path.Combine(config.Root, "standards", "docs");
+        var docs = Path.Combine(config.Root, "litespec", "docs");
 
         if (!Directory.Exists(docs))
         {

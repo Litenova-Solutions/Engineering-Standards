@@ -95,4 +95,4 @@ dotnet run --project tools/model/Litenova.Model -- query --root ../consumer use-
 
 ## Underneath
 
-The builder reads paths from `standards.project.json` and the test run from TRX files under `paths.testResults`. Nothing beneath it is separately runnable.
+The builder reads paths from `litespec.project.json` and the test run from TRX files under `paths.testResults`. Nothing beneath it is separately runnable.

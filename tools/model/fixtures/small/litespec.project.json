@@ -2,14 +2,9 @@
   "project": {
     "name": "Fixture Library"
   },
-  "size": "large",
-  "reviewedStandardsVersion": "2.0.0",
-  "optionalTypes": [
-    "constraint",
-    "research",
-    "limit",
-    "runbook"
-  ],
+  "size": "small",
+  "reviewedLiteSpecVersion": "2.0.0",
+  "optionalTypes": [],
   "constraints": {
     "answered": true
   },
@@ -29,16 +24,7 @@
     "testRoots": [
       "apps/api/tests"
     ],
-    "frontends": [
-      {
-        "name": "catalog",
-        "path": "apps/catalog",
-        "platform": "svelte"
-      }
-    ],
-    "apiClient": "packages/api",
-    "contract": "apps/api/openapi/fixture.json",
-    "contractPath": "apps/api/openapi/fixture.json",
+    "frontends": [],
     "records": {}
   },
   "selectedExtensions": []

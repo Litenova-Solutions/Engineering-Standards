@@ -10,3 +10,4 @@ artifacts/
 mcps/
 .opencode/
 patterns/ui/dist/
+.agents/

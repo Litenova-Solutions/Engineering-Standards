@@ -2,7 +2,7 @@
 
 ## Name
 
-`node tools/validate-standards.mjs` holds the standards repository to its own authoring contract.
+`node tools/validate-standards.mjs` holds the LiteSpec repository to its own authoring contract.
 
 ## Synopsis
 
@@ -20,7 +20,7 @@ Run it after changing any page, any template, or any authoring rule.
 
 | Argument | Required | Effect |
 |:---|:---|:---|
-| `repositoryRoot` | no | Selects the standards repository to read. The default is the working directory. |
+| `repositoryRoot` | no | Selects the LiteSpec repository to read. The default is the working directory. |
 
 ## Options
 

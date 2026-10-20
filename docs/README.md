@@ -1,4 +1,4 @@
-# Engineering Standards Documentation
+# LiteSpec Documentation
 
 ## Intent
 
@@ -18,7 +18,7 @@ A standards page owns the provisions a reader cites for one concern.
 
 - [Scope](core/scope.md)
 - [Principles](core/principles.md)
-- [Agentic Engineering System](core/system.md)
+- [LiteSpec](core/system.md)
 - [Agent protocol](core/agent.md)
 - [Product intent](core/product.md)
 - [Release standard](core/release.md)
@@ -32,7 +32,7 @@ A standards page owns the provisions a reader cites for one concern.
 - [Svelte stack](profile/svelte.md)
 - [Blazor stack](profile/blazor.md)
 
-Each stack page states what selecting that stack adds: its pages, its pins, and its checks. Exact versions and composition remain in `standards.manifest.json`.
+Each stack page states what selecting that stack adds: its pages, its pins, and its checks. Exact versions and composition remain in `litespec.manifest.json`.
 
 ## Workspace
 

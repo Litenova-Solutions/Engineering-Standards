@@ -16,7 +16,7 @@ Litenova.Model render --root <consumer>
 Litenova.Model query --root <consumer> <id>
 ```
 
-Run from the standards repository as
+Run from the LiteSpec repository as
 `dotnet run --project tools/model/Litenova.Model -- <command> ...`.
 
 - `build` writes `model.json`, by default to `<consumer>/.model/model.json`.
@@ -68,7 +68,7 @@ proved by a passing test. Without test results nothing is verified.
 
 ## Configuration
 
-`build` reads `standards.project.json` for paths. Each entry below shows its
+`build` reads `litespec.project.json` for paths. Each entry below shows its
 default.
 
 | Path | Default |

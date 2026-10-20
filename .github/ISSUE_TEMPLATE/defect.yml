@@ -14,7 +14,7 @@ body:
     attributes:
       label: Scope
       description: The provision ID, page path, schema, template, or tool that holds the defect.
-      placeholder: standards/rule/core-authoring.regenerate-the-provision-index, or tools/validate-consumer.mjs
+      placeholder: litespec/rule/core-authoring.regenerate-the-provision-index, or tools/validate-consumer.mjs
     validations:
       required: true
 
@@ -46,7 +46,7 @@ body:
     id: release
     attributes:
       label: Release
-      description: The standards release this was found against.
+      description: The LiteSpec release this was found against.
       placeholder: v1.15.0
     validations:
       required: true

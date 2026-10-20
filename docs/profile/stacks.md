@@ -6,25 +6,25 @@ Stacks are the second selection axis beside size ([Supported scope](../core/scop
 
 ## Agent Summary {#agent-summary}
 
-- Selecting a stack applies every page that stack lists. (standards/rule/profile-stacks.apply-the-complete-stack)
-- Versions resolve from the manifest. (standards/rule/profile-stacks.use-manifest-version-pins)
-- A replacement names every provision ID it replaces. (standards/rule/profile-stacks.declare-replacements)
+- Selecting a stack applies every page that stack lists. (litespec/rule/profile-stacks.apply-the-complete-stack)
+- Versions resolve from the manifest. (litespec/rule/profile-stacks.use-manifest-version-pins)
+- A replacement names every provision ID it replaces. (litespec/rule/profile-stacks.declare-replacements)
 
 ## Standards
 
-### Apply the complete stack (standards/rule/profile-stacks.apply-the-complete-stack)
+### Apply the complete stack (litespec/rule/profile-stacks.apply-the-complete-stack)
 
 **Requirement:** A consumer selecting a stack MUST apply every page that stack lists in the manifest.
 
 **Rationale:** A consumer cannot claim a stack while silently omitting an applicable page, because the stack is the unit of conformance.
 
-### Use manifest version pins (standards/rule/profile-stacks.use-manifest-version-pins)
+### Use manifest version pins (litespec/rule/profile-stacks.use-manifest-version-pins)
 
-**Requirement:** A consumer MUST resolve every SDK, framework, and package version from `standards.manifest.json`.
+**Requirement:** A consumer MUST resolve every SDK, framework, and package version from `litespec.manifest.json`.
 
 **Rationale:** A version copied from prose, an example, a package search, or agent memory drifts from the pin that the manifest owns.
 
-### Declare replacements (standards/rule/profile-stacks.declare-replacements)
+### Declare replacements (litespec/rule/profile-stacks.declare-replacements)
 
 **Requirement:** An extension or consumer override MUST name every baseline provision ID it replaces.
 
@@ -36,9 +36,9 @@ This page states the rules every stack shares, so it lists no stack composition 
 
 ## Conventions
 
-### Keep the stack visible (standards/rule/profile-stacks.keep-the-stack-visible)
+### Keep the stack visible (litespec/rule/profile-stacks.keep-the-stack-visible)
 
-**Default:** Name each selected stack in `standards.project.json` and the solution, applications, and commands in the root `AGENTS.md`.
+**Default:** Name each selected stack in `litespec.project.json` and the solution, applications, and commands in the root `AGENTS.md`.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -48,7 +48,7 @@ This page states the rules every stack shares, so it lists no stack composition 
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/profile-stacks.apply-the-complete-stack | guidance | Does the consumer apply every page its stacks list? |
-| standards/rule/profile-stacks.use-manifest-version-pins | guidance | Does each resolved version match its manifest pin? |
-| standards/rule/profile-stacks.declare-replacements | guidance | Does each replacement name every provision ID it replaces? |
-| standards/rule/profile-stacks.keep-the-stack-visible | guidance | Do `standards.project.json` and the root `AGENTS.md` name the selection? |
+| litespec/rule/profile-stacks.apply-the-complete-stack | guidance | Does the consumer apply every page its stacks list? |
+| litespec/rule/profile-stacks.use-manifest-version-pins | guidance | Does each resolved version match its manifest pin? |
+| litespec/rule/profile-stacks.declare-replacements | guidance | Does each replacement name every provision ID it replaces? |
+| litespec/rule/profile-stacks.keep-the-stack-visible | guidance | Do `litespec.project.json` and the root `AGENTS.md` name the selection? |

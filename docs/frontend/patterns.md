@@ -6,15 +6,15 @@ Every recurring interface question is decided once and recorded in one catalog. 
 
 ## Agent Summary {#agent-summary}
 
-- One catalog holds every interface pattern decision. (standards/rule/frontend-patterns.keep-one-pattern-catalog)
-- Each pattern records its options, costs, and choice. (standards/rule/frontend-patterns.record-every-option-considered)
-- Each decision records an owner or recommended source. (standards/rule/frontend-patterns.record-who-chose)
-- Each pattern declares its compact-screen behaviour. (standards/rule/frontend-patterns.declare-the-compact-behaviour)
-- The shared package implements each chosen pattern once. (standards/rule/frontend-patterns.implement-a-chosen-pattern-once)
-- Catalog and code change together, or a record explains. (standards/rule/frontend-patterns.update-the-catalog-with-the-code, standards/rule/frontend-patterns.state-the-implementation-status)
-- Patterns name behaviour, never a component library. (standards/rule/frontend-patterns.keep-the-catalog-platform-neutral)
-- Agents build on the choice and report ideas after. (standards/rule/frontend-patterns.keep-a-visual-registry, standards/rule/frontend-patterns.report-pattern-feedback-after-the-work)
-- Start each entry from the library and propose generic improvements back. (standards/rule/frontend-patterns.start-from-the-pattern-library, standards/rule/frontend-patterns.promote-library-improvements)
+- One catalog holds every interface pattern decision. (litespec/rule/frontend-patterns.keep-one-pattern-catalog)
+- Each pattern records its options, costs, and choice. (litespec/rule/frontend-patterns.record-every-option-considered)
+- Each decision records an owner or recommended source. (litespec/rule/frontend-patterns.record-who-chose)
+- Each pattern declares its compact-screen behaviour. (litespec/rule/frontend-patterns.declare-the-compact-behaviour)
+- The shared package implements each chosen pattern once. (litespec/rule/frontend-patterns.implement-a-chosen-pattern-once)
+- Catalog and code change together, or a record explains. (litespec/rule/frontend-patterns.update-the-catalog-with-the-code, litespec/rule/frontend-patterns.state-the-implementation-status)
+- Patterns name behaviour, never a component library. (litespec/rule/frontend-patterns.keep-the-catalog-platform-neutral)
+- Agents build on the choice and report ideas after. (litespec/rule/frontend-patterns.keep-a-visual-registry, litespec/rule/frontend-patterns.report-pattern-feedback-after-the-work)
+- Start each entry from the library and propose generic improvements back. (litespec/rule/frontend-patterns.start-from-the-pattern-library, litespec/rule/frontend-patterns.promote-library-improvements)
 
 ## Concepts
 
@@ -49,7 +49,7 @@ The `breakpoints` map names viewport widths in CSS pixels, and `groups` collect 
 
 ### The pattern library
 
-The standards ship a UI pattern library at `patterns/ui`, holding every recurring screen, element, and scenario of a business application. Each library pattern carries several drawn options, a recommended option, and a compact-screen behaviour, in `patterns/ui/library.json`.
+LiteSpec ships a UI pattern library at `patterns/ui`, holding every recurring screen, element, and scenario of a business application. Each library pattern carries several drawn options, a recommended option, and a compact-screen behaviour, in `patterns/ui/library.json`.
 
 The library mocks are plain HTML and CSS in semantic tokens, so a reader on any front-end profile reads them without running a profile toolchain. Every mock draws on one neutral cast, Acme Supply, a wholesale supplier back office, so a reader moving between options meets the same records.
 
@@ -107,9 +107,9 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ## Standards
 
-### Keep one pattern catalog (standards/rule/frontend-patterns.keep-one-pattern-catalog)
+### Keep one pattern catalog (litespec/rule/frontend-patterns.keep-one-pattern-catalog)
 
-**Requirement:** A workspace with a controlled frontend MUST keep one pattern catalog at `paths.uiPatterns` in `standards.project.json`, valid against the schema.
+**Requirement:** A workspace with a controlled frontend MUST keep one pattern catalog at `paths.uiPatterns` in `litespec.project.json`, valid against the schema.
 
 **Rationale:** A decision kept in one catalog is found before it is remade. A decision kept in chat is decided again on the next page, and the two answers differ.
 
@@ -119,7 +119,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 { "paths": { "uiPatterns": "docs/ui/patterns.json" } }
 ```
 
-### Record every option considered (standards/rule/frontend-patterns.record-every-option-considered)
+### Record every option considered (litespec/rule/frontend-patterns.record-every-option-considered)
 
 **Requirement:** Each pattern MUST record at least two options with rationale and cost, and name the chosen option.
 
@@ -127,13 +127,13 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Example:** An invoice list considers two sort options: clickable headers, and a menu listing sort fields. The entry records the rationale and cost of each, then names the chosen one.
 
-### Record who chose (standards/rule/frontend-patterns.record-who-chose)
+### Record who chose (litespec/rule/frontend-patterns.record-who-chose)
 
 **Requirement:** Each pattern decision MUST record its source as `owner` or `recommended`.
 
 **Rationale:** A recommended choice stands until an owner chooses. An agent never marks its own choice as the owner's. The catalog then shows which choices are settled and which await review.
 
-### Declare the compact behaviour (standards/rule/frontend-patterns.declare-the-compact-behaviour)
+### Declare the compact behaviour (litespec/rule/frontend-patterns.declare-the-compact-behaviour)
 
 **Requirement:** Each pattern MUST name one breakpoint and state whether the chosen option reflows below it or a named option replaces it.
 
@@ -141,7 +141,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Example:** The entry names breakpoint `compact`; below it invoice rows render as cards.
 
-### Implement a chosen pattern once (standards/rule/frontend-patterns.implement-a-chosen-pattern-once)
+### Implement a chosen pattern once (litespec/rule/frontend-patterns.implement-a-chosen-pattern-once)
 
 **Requirement:** The shared UI package MUST implement each chosen pattern once at the source paths the catalog names per platform.
 
@@ -149,7 +149,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Example:** The catalog names `packages/ui/src/table/sort-header.tsx` under `react-web` and `packages/ui/src/table/sort-header.svelte` under `svelte`, so every invoice route composes one of them.
 
-### Update the catalog with the code (standards/rule/frontend-patterns.update-the-catalog-with-the-code)
+### Update the catalog with the code (litespec/rule/frontend-patterns.update-the-catalog-with-the-code)
 
 **Requirement:** A change that switches option, adds an option, or extends a pattern MUST update the catalog entry in the same change as its implementation.
 
@@ -157,7 +157,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Example:** A route departing from the chosen option names `decision.record`, such as `docs/product/decisions/0014-invoice-sort-menu.md`.
 
-### State the implementation status (standards/rule/frontend-patterns.state-the-implementation-status)
+### State the implementation status (litespec/rule/frontend-patterns.state-the-implementation-status)
 
 **Requirement:** Each platform entry MUST state one status and the gap when that status is `partial` or `pending`.
 
@@ -165,7 +165,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Example:** A `pending` entry for one platform states in `gap` what is missing there.
 
-### Keep the catalog platform neutral (standards/rule/frontend-patterns.keep-the-catalog-platform-neutral)
+### Keep the catalog platform neutral (litespec/rule/frontend-patterns.keep-the-catalog-platform-neutral)
 
 **Requirement:** A pattern MUST name behaviour and structure, never a component library.
 
@@ -175,7 +175,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ## Conventions
 
-### Keep a visual registry (standards/rule/frontend-patterns.keep-a-visual-registry)
+### Keep a visual registry (litespec/rule/frontend-patterns.keep-a-visual-registry)
 
 **Default:** Review library options in the shared library viewer, and draw only product-specific options in a product registry at 390 and 1280 CSS pixels.
 
@@ -183,15 +183,15 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Rationale:** An option seen beside its rivals is judged on appearance rather than description. The library viewer already renders every library option, so a product registry draws only the patterns and options the product added. The product registry command or path lives in the catalog `registry` field.
 
-### Report pattern feedback after the work (standards/rule/frontend-patterns.report-pattern-feedback-after-the-work)
+### Report pattern feedback after the work (litespec/rule/frontend-patterns.report-pattern-feedback-after-the-work)
 
 **Default:** Finish the task on the chosen pattern, then report a proposal in the completion report with pattern id, change, reason, and affected option.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** An agent never changes a decision on its own and never stops mid-task to ask. The owner accepts, refuses, or defers the proposal, and an accepted proposal follows `standards/rule/frontend-patterns.update-the-catalog-with-the-code`.
+**Rationale:** An agent never changes a decision on its own and never stops mid-task to ask. The owner accepts, refuses, or defers the proposal, and an accepted proposal follows `litespec/rule/frontend-patterns.update-the-catalog-with-the-code`.
 
-### Start from the pattern library (standards/rule/frontend-patterns.start-from-the-pattern-library)
+### Start from the pattern library (litespec/rule/frontend-patterns.start-from-the-pattern-library)
 
 **Default:** Start each catalog entry from its library pattern, through `library`, and keep the library option ids and the recommended option.
 
@@ -199,27 +199,27 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Rationale:** A shared starting point keeps choices comparable across products and keeps the library recommendation visible. A product choosing a different option records its reason in the entry, so the departure stays reviewable.
 
-### Promote library improvements (standards/rule/frontend-patterns.promote-library-improvements)
+### Promote library improvements (litespec/rule/frontend-patterns.promote-library-improvements)
 
 **Default:** Send an accepted proposal that is not specific to one product to the library, as a new option or a refined one.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The library improves from use across products, while each product keeps its own choices. The proposal follows `standards/rule/frontend-patterns.report-pattern-feedback-after-the-work`, and it reaches the library after the owner accepts it.
+**Rationale:** The library improves from use across products, while each product keeps its own choices. The proposal follows `litespec/rule/frontend-patterns.report-pattern-feedback-after-the-work`, and it reaches the library after the owner accepts it.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/frontend-patterns.keep-one-pattern-catalog | checkable | `node standards/tools/validate-ui.mjs` reports a missing catalog or a schema failure. |
-| standards/rule/frontend-patterns.record-every-option-considered | checkable | `node standards/tools/validate-ui.mjs` reports fewer than two options or a choice naming no option. |
-| standards/rule/frontend-patterns.record-who-chose | guidance | Does each decision record owner or recommended, with no agent-marked owner choice? |
-| standards/rule/frontend-patterns.declare-the-compact-behaviour | checkable | `node standards/tools/validate-ui.mjs` reports a compact option naming no recorded option. |
-| standards/rule/frontend-patterns.implement-a-chosen-pattern-once | checkable | `node standards/tools/validate-ui.mjs` reports a named component path that does not exist. |
-| standards/rule/frontend-patterns.update-the-catalog-with-the-code | guidance | Did the catalog entry change with its implementation or name a record? |
-| standards/rule/frontend-patterns.state-the-implementation-status | checkable | `node standards/tools/validate-ui.mjs` reports a partial or pending entry without a gap. |
-| standards/rule/frontend-patterns.keep-the-catalog-platform-neutral | guidance | Does any pattern name a component library outside implementations? |
-| standards/rule/frontend-patterns.keep-a-visual-registry | guidance | Does the registry render every product-added option in each theme at 390 and 1280 pixels? |
-| standards/rule/frontend-patterns.report-pattern-feedback-after-the-work | guidance | Does each completion report carry proposals with pattern id, change, reason, and option? |
-| standards/rule/frontend-patterns.start-from-the-pattern-library | guidance | Does each entry set library or record its own reason, keeping library option ids? |
-| standards/rule/frontend-patterns.promote-library-improvements | guidance | Did each accepted generic proposal reach the library as a new or refined option? |
+| litespec/rule/frontend-patterns.keep-one-pattern-catalog | checkable | `node litespec/tools/validate-ui.mjs` reports a missing catalog or a schema failure. |
+| litespec/rule/frontend-patterns.record-every-option-considered | checkable | `node litespec/tools/validate-ui.mjs` reports fewer than two options or a choice naming no option. |
+| litespec/rule/frontend-patterns.record-who-chose | guidance | Does each decision record owner or recommended, with no agent-marked owner choice? |
+| litespec/rule/frontend-patterns.declare-the-compact-behaviour | checkable | `node litespec/tools/validate-ui.mjs` reports a compact option naming no recorded option. |
+| litespec/rule/frontend-patterns.implement-a-chosen-pattern-once | checkable | `node litespec/tools/validate-ui.mjs` reports a named component path that does not exist. |
+| litespec/rule/frontend-patterns.update-the-catalog-with-the-code | guidance | Did the catalog entry change with its implementation or name a record? |
+| litespec/rule/frontend-patterns.state-the-implementation-status | checkable | `node litespec/tools/validate-ui.mjs` reports a partial or pending entry without a gap. |
+| litespec/rule/frontend-patterns.keep-the-catalog-platform-neutral | guidance | Does any pattern name a component library outside implementations? |
+| litespec/rule/frontend-patterns.keep-a-visual-registry | guidance | Does the registry render every product-added option in each theme at 390 and 1280 pixels? |
+| litespec/rule/frontend-patterns.report-pattern-feedback-after-the-work | guidance | Does each completion report carry proposals with pattern id, change, reason, and option? |
+| litespec/rule/frontend-patterns.start-from-the-pattern-library | guidance | Does each entry set library or record its own reason, keeping library option ids? |
+| litespec/rule/frontend-patterns.promote-library-improvements | guidance | Did each accepted generic proposal reach the library as a new or refined option? |

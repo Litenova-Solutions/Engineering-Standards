@@ -6,16 +6,16 @@ The standards use one page grammar and one controlled technical prose profile. T
 
 ## Agent Summary {#agent-summary}
 
-- Use literal controlled prose, repository terminology, and a recorded vocabulary. (standards/rule/core-authoring.apply-controlled-prose-measures, standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation, standards/rule/core-authoring.exclude-generated-regions-from-prose-checks, standards/rule/core-authoring.state-meaning-literally, standards/rule/core-authoring.use-one-term-for-one-concept, standards/rule/core-authoring.record-the-project-vocabulary-as-data, standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope, standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets, standards/rule/core-authoring.exclude-the-compound-that-names-another-concept)
-- Write one testable obligation in each Standards provision. (standards/rule/core-authoring.use-one-normative-vocabulary, standards/rule/core-authoring.write-atomic-standards-provisions)
-- Name the kind, page, and heading in each ID. (standards/rule/core-authoring.use-the-declared-identifier-grammar, standards/rule/core-authoring.name-the-owning-page-in-the-identifier, standards/rule/core-authoring.exclude-a-sequence-number-from-the-identifier)
-- Keep a replaceable default under its Convention heading. (standards/rule/core-authoring.identify-actionable-conventions)
-- Route the reader, apply each page contract, and state one layer per page. (standards/rule/core-authoring.use-the-declared-page-contract, standards/rule/core-authoring.route-the-reader-before-listing-pages, standards/rule/core-authoring.name-the-tool-rather-than-the-mechanism, standards/rule/core-authoring.state-one-layer-per-page, standards/rule/core-authoring.name-the-escape-from-every-abstraction, standards/rule/core-authoring.record-a-setting-as-reference)
-- Keep summaries informative and cite every projected provision. (standards/rule/core-authoring.keep-agent-summaries-informative)
-- Map every provision to exact verification evidence. (standards/rule/core-authoring.map-provisions-to-evidence, standards/rule/core-authoring.mark-every-provision-checkable-or-guidance)
-- Validate current material and publish complete releases. (standards/rule/core-authoring.validate-current-standards-material, standards/rule/core-authoring.exclude-historical-transition-material, standards/rule/core-authoring.publish-each-release-as-a-complete-contract, standards/rule/core-authoring.exclude-cross-release-compatibility-work, standards/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves, standards/rule/core-authoring.record-the-reviewed-standards-release)
-- Classify every specification file and derive every computed fact. (standards/rule/core-authoring.classify-every-specification-file, standards/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it)
-- Run the authoring checks and regenerate the provision index. (standards/rule/core-authoring.run-repeatable-authoring-checks, standards/rule/core-authoring.regenerate-the-provision-index)
+- Use literal controlled prose, repository terminology, and a recorded vocabulary. (litespec/rule/core-authoring.apply-controlled-prose-measures, litespec/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation, litespec/rule/core-authoring.exclude-generated-regions-from-prose-checks, litespec/rule/core-authoring.state-meaning-literally, litespec/rule/core-authoring.use-one-term-for-one-concept, litespec/rule/core-authoring.record-the-project-vocabulary-as-data, litespec/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope, litespec/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets, litespec/rule/core-authoring.exclude-the-compound-that-names-another-concept)
+- Write one testable obligation in each Standards provision. (litespec/rule/core-authoring.use-one-normative-vocabulary, litespec/rule/core-authoring.write-atomic-standards-provisions)
+- Name the kind, page, and heading in each ID. (litespec/rule/core-authoring.use-the-declared-identifier-grammar, litespec/rule/core-authoring.name-the-owning-page-in-the-identifier, litespec/rule/core-authoring.exclude-a-sequence-number-from-the-identifier)
+- Keep a replaceable default under its Convention heading. (litespec/rule/core-authoring.identify-actionable-conventions)
+- Route the reader, apply each page contract, and state one layer per page. (litespec/rule/core-authoring.use-the-declared-page-contract, litespec/rule/core-authoring.route-the-reader-before-listing-pages, litespec/rule/core-authoring.name-the-tool-rather-than-the-mechanism, litespec/rule/core-authoring.state-one-layer-per-page, litespec/rule/core-authoring.name-the-escape-from-every-abstraction, litespec/rule/core-authoring.record-a-setting-as-reference)
+- Keep summaries informative and cite every projected provision. (litespec/rule/core-authoring.keep-agent-summaries-informative)
+- Map every provision to exact verification evidence. (litespec/rule/core-authoring.map-provisions-to-evidence, litespec/rule/core-authoring.mark-every-provision-checkable-or-guidance)
+- Validate current material and publish complete releases. (litespec/rule/core-authoring.validate-current-standards-material, litespec/rule/core-authoring.exclude-historical-transition-material, litespec/rule/core-authoring.publish-each-release-as-a-complete-contract, litespec/rule/core-authoring.exclude-cross-release-compatibility-work, litespec/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves, litespec/rule/core-authoring.record-the-reviewed-litespec-release)
+- Classify every specification file and derive every computed fact. (litespec/rule/core-authoring.classify-every-specification-file, litespec/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it)
+- Run the authoring checks and regenerate the provision index. (litespec/rule/core-authoring.run-repeatable-authoring-checks, litespec/rule/core-authoring.regenerate-the-provision-index)
 
 ## Concepts
 
@@ -76,7 +76,7 @@ Current standards material is the published snapshot. The validator evaluates cu
 
 ### Release model
 
-Each standards release is a complete contract. A release states every active provision without depending on an earlier release.
+Each LiteSpec release is a complete contract. A release states every active provision without depending on an earlier release.
 
 The repository publishes no compatibility guarantee between its own releases. The repository publishes no migration path, deprecation period, replacement map, or identifier alias.
 
@@ -86,7 +86,7 @@ A consumer pins one release and keeps that release for as long as the consumer c
 
 Version numbers identify complete pinned contracts. They do not claim Semantic Versioning compatibility. A patch release corrects a narrow contract area. A minor release makes one coherent standards evolution. A major release replaces supported scope, method, or platform profile.
 
-This release model governs the standards repository. A consumer product is a running service with its own users. Consumer API compatibility, schema migration, deprecation, and rollback stay required wherever their owning provisions and extensions apply.
+This release model governs the LiteSpec repository. A consumer product is a running service with its own users. Consumer API compatibility, schema migration, deprecation, and rollback stay required wherever their owning provisions and extensions apply.
 
 ### Documentation layers
 
@@ -152,7 +152,7 @@ A generated region is a body section a tool writes. It opens with `<!-- generate
 ### Standards provision contract
 
 ```markdown
-### State one action (standards/rule/page.state-one-action)
+### State one action (litespec/rule/page.state-one-action)
 
 **Requirement:** The named actor MUST perform one testable action.
 
@@ -176,7 +176,7 @@ The uppercase normative vocabulary is `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`
 ### Convention provision contract
 
 ```markdown
-### Use the default name (standards/rule/page.use-the-default-name)
+### Use the default name (litespec/rule/page.use-the-default-name)
 
 **Default:** Use the stated default for this boundary.
 
@@ -193,7 +193,7 @@ A departure from a Standard is recorded as an Exception record citing the provis
 
 ### Provision identity
 
-Every provision ID follows `standards/<kind>/<page>.<heading-slug>`.
+Every provision ID follows `litespec/<kind>/<page>.<heading-slug>`.
 
 | Segment | Source | Purpose |
 |:---|:---|:---|
@@ -204,7 +204,7 @@ Every provision ID follows `standards/<kind>/<page>.<heading-slug>`.
 
 The ten areas are `CORE`, `PROFILE`, `WORKSPACE`, `BACKEND`, `FRONTEND`, `REACT`, `SVELTE`, `BLAZOR`, `QUALITY`, and `EXT`. Each is one directory under `docs/`, and `provisionRegistry.areas` lists them.
 
-The page segment joins the directory to the file stem, so `docs/frontend/components.md` owns `frontend-components`. A citation therefore names the file a reader must open, so `standards/rule/frontend-components.compose-composites-in-page-code` needs no lookup step.
+The page segment joins the directory to the file stem, so `docs/frontend/components.md` owns `frontend-components`. A citation therefore names the file a reader must open, so `litespec/rule/frontend-components.compose-composites-in-page-code` needs no lookup step.
 
 Two pages cannot share a page segment. The page segment carries the area, so `docs/frontend/structure.md` and `docs/blazor/structure.md` stay distinct even when they state one rule.
 
@@ -231,7 +231,7 @@ Every normative page ends with a Verification table:
 ```markdown
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/page.state-one-action | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic. |
+| litespec/rule/page.state-one-action | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic. |
 ```
 
 Each row marks its provision `checkable` or `guidance`. A `checkable` row names the tool that checks the provision, and its evidence starts with that tool's command in backticks. A `guidance` row states the question a reviewer answers, in one sentence.
@@ -242,7 +242,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ## Standards
 
-### Keep authored prose ASCII-safe (standards/rule/core-authoring.keep-authored-prose-ascii-safe)
+### Keep authored prose ASCII-safe (litespec/rule/core-authoring.keep-authored-prose-ascii-safe)
 
 **Requirement:** Authored prose MUST contain only ASCII unless required code, data, or mathematical content uses another character.
 
@@ -250,43 +250,43 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** `Use a hyphen.` is ASCII text; a typographic dash is not.
 
-### Exclude declared content paths from the ASCII check (standards/rule/core-authoring.exclude-declared-content-paths-from-the-ascii-check)
+### Exclude declared content paths from the ASCII check (litespec/rule/core-authoring.exclude-declared-content-paths-from-the-ascii-check)
 
 **Requirement:** An ASCII check MUST exclude only the natural-language content paths that the project record declares.
 
 **Rationale:** A product whose subject is another language carries that language in its content files, where a diacritic is part of a word. Every document about that content stays in scope.
 
-### Use one normative vocabulary (standards/rule/core-authoring.use-one-normative-vocabulary)
+### Use one normative vocabulary (litespec/rule/core-authoring.use-one-normative-vocabulary)
 
 **Requirement:** A Standards provision MUST use exactly one approved uppercase modal and no other uppercase normative term.
 
 **Rationale:** The Standards provision contract defines the approved modal set and its RFC interpretation.
 
-### Apply controlled prose measures (standards/rule/core-authoring.apply-controlled-prose-measures)
+### Apply controlled prose measures (litespec/rule/core-authoring.apply-controlled-prose-measures)
 
 **Requirement:** Authored prose MUST satisfy the prose measures and omit contractions, idioms, fragments, unexplained pronouns, `and/or`, and banned vague terms.
 
 **Rationale:** Bounded, direct prose reduces interpretation differences without weakening technical meaning.
 
-### Apply the prose measures to consumer documentation (standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation)
+### Apply the prose measures to consumer documentation (litespec/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation)
 
 **Requirement:** A consumer specification page MUST satisfy the prose measures.
 
 **Rationale:** Consumer pages inherit the profile, so they need the same check the standards apply to their own pages. A page that cannot satisfy the measures yet is recorded as a Known gap, which carries an owner and an end date.
 
-### Exclude generated regions from prose checks (standards/rule/core-authoring.exclude-generated-regions-from-prose-checks)
+### Exclude generated regions from prose checks (litespec/rule/core-authoring.exclude-generated-regions-from-prose-checks)
 
 **Requirement:** A prose check MUST skip every generated region.
 
 **Rationale:** A generated region holds tool output, and prose measures judge authored words. Counting generated words would fail a page for text no author wrote.
 
-### Use active and explicit sentences (standards/rule/core-authoring.use-active-and-explicit-sentences)
+### Use active and explicit sentences (litespec/rule/core-authoring.use-active-and-explicit-sentences)
 
 **Requirement:** Authored prose MUST use active voice, explicit actors, imperative procedure steps, parallel lists, and passive voice only when actors are irrelevant.
 
 **Rationale:** Explicit actors and parallel actions make ownership and execution boundaries visible.
 
-### State meaning literally (standards/rule/core-authoring.state-meaning-literally)
+### State meaning literally (litespec/rule/core-authoring.state-meaning-literally)
 
 **Requirement:** Authored prose MUST NOT substitute metaphor or flourish for direct statement where a literal phrase carries the same meaning.
 
@@ -294,7 +294,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** Write `a parameter worth varying`, not `a dial worth turning`. Write `this point still matters`, not `this point earns its keep`.
 
-### Use one term for one concept (standards/rule/core-authoring.use-one-term-for-one-concept)
+### Use one term for one concept (litespec/rule/core-authoring.use-one-term-for-one-concept)
 
 **Requirement:** Authored prose MUST use one glossary term per concept without copying ASD-STE100 vocabulary or claiming ASD-STE100 compliance.
 
@@ -302,7 +302,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** The validator reports `Standards authoring checks passed.`, not `This document is ASD-STE100 compliant.`
 
-### Record the project vocabulary as data (standards/rule/core-authoring.record-the-project-vocabulary-as-data)
+### Record the project vocabulary as data (litespec/rule/core-authoring.record-the-project-vocabulary-as-data)
 
 **Requirement:** A consumer MUST record each term, its rejected synonyms, the scope of each rejection, and its mannered terms in a language record satisfying `schemas/language.schema.json`.
 
@@ -315,13 +315,13 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
   "reason": "client names the API consumer" }
 ```
 
-### Reject a recorded synonym inside its scope (standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope)
+### Reject a recorded synonym inside its scope (litespec/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope)
 
 **Requirement:** Authored prose MUST NOT use a synonym that the project language record rejects for the scope the page sits in.
 
 **Rationale:** Terminology drift is invisible one page at a time and plain across a module. The expensive case is a synonym that is a defined term elsewhere. The same word then names two parties, and no reader can tell which one is meant.
 
-### Check the vocabulary on every surface a reader meets (standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets)
+### Check the vocabulary on every surface a reader meets (litespec/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets)
 
 **Requirement:** A consumer MUST name every non-Markdown surface its vocabulary reaches in `paths.languageScan`, including source, interface copy, the API contract, and acceptance tests.
 
@@ -333,7 +333,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 { "paths": { "languageScan": ["apps/*/lib/i18n/dictionaries/*.json", "apps/api/tests/**/*.feature"] } }
 ```
 
-### Exclude the compound that names another concept (standards/rule/core-authoring.exclude-the-compound-that-names-another-concept)
+### Exclude the compound that names another concept (litespec/rule/core-authoring.exclude-the-compound-that-names-another-concept)
 
 **Requirement:** A language record MUST list, in `except`, every compound in which a rejected word names a concept other than the one the rejection is about.
 
@@ -346,25 +346,25 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
   "except": ["reading-room reservation"], "reason": "one word for a book hold and a seat booking" }
 ```
 
-### Use controlled capitalization (standards/rule/core-authoring.use-controlled-capitalization)
+### Use controlled capitalization (litespec/rule/core-authoring.use-controlled-capitalization)
 
 **Requirement:** Authored prose MUST use Title Case for page titles, sentence case for provision headings, and normal capitalization for body text.
 
 **Rationale:** Exact code names, layer names, product names, and sentence starts retain their normal capitalization.
 
-### Apply the four quality tests (standards/rule/core-authoring.apply-the-four-quality-tests)
+### Apply the four quality tests (litespec/rule/core-authoring.apply-the-four-quality-tests)
 
 **Requirement:** A reviewer MUST assess authored prose for simplicity, brevity, clarity, and humanity before approval.
 
 **Rationale:** Human review covers meaning and tone that deterministic checks cannot prove.
 
-### Use the declared page contract (standards/rule/core-authoring.use-the-declared-page-contract)
+### Use the declared page contract (litespec/rule/core-authoring.use-the-declared-page-contract)
 
 **Requirement:** An authored page MUST use the required structure for its page class or style.
 
 **Rationale:** Stable page classes let readers find authority, context, defaults, and evidence predictably.
 
-### Name the tool rather than the mechanism (standards/rule/core-authoring.name-the-tool-rather-than-the-mechanism)
+### Name the tool rather than the mechanism (litespec/rule/core-authoring.name-the-tool-rather-than-the-mechanism)
 
 **Requirement:** A tutorial step or how-to step MUST name the repository command that performs that step, where one exists.
 
@@ -372,13 +372,13 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** A step reads `Run \`./shop up\`` rather than listing the compose start, the readiness wait, and each process launch.
 
-### State one layer per page (standards/rule/core-authoring.state-one-layer-per-page)
+### State one layer per page (litespec/rule/core-authoring.state-one-layer-per-page)
 
 **Requirement:** A page MUST NOT describe both a command and the mechanism that command runs, outside an `Underneath` section.
 
 **Rationale:** A reader who wanted the command reads the mechanism as noise, and a reader who wanted the mechanism reads the command as an obstacle.
 
-### Name the escape from every abstraction (standards/rule/core-authoring.name-the-escape-from-every-abstraction)
+### Name the escape from every abstraction (litespec/rule/core-authoring.name-the-escape-from-every-abstraction)
 
 **Requirement:** A command page MUST state under `Underneath` what the command runs, or state that nothing beneath it is separately runnable.
 
@@ -386,83 +386,83 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** A command with no separately runnable mechanism writes `None.` under `Underneath`.
 
-### Record a setting as reference (standards/rule/core-authoring.record-a-setting-as-reference)
+### Record a setting as reference (litespec/rule/core-authoring.record-a-setting-as-reference)
 
 **Requirement:** A configuration setting a reader can change MUST appear on a configuration page with its default, its scope, and what overrides it.
 
 **Rationale:** A setting introduced inside a procedure is findable only by the reader who already knows which procedure mentioned it.
 
-### Write atomic Standards provisions (standards/rule/core-authoring.write-atomic-standards-provisions)
+### Write atomic Standards provisions (litespec/rule/core-authoring.write-atomic-standards-provisions)
 
 **Requirement:** A Standards provision MUST follow the Standards provision contract and provision identity policy defined by this page.
 
 **Rationale:** One identified assertion has one authority and one verification mapping.
 
-**Example:** `### Keep business invariants in Domain (standards/rule/backend-architecture.keep-business-invariants-in-domain)` owns one invariant-enforcement assertion.
+**Example:** `### Keep business invariants in Domain (litespec/rule/backend-architecture.keep-business-invariants-in-domain)` owns one invariant-enforcement assertion.
 
-### Use the declared identifier grammar (standards/rule/core-authoring.use-the-declared-identifier-grammar)
+### Use the declared identifier grammar (litespec/rule/core-authoring.use-the-declared-identifier-grammar)
 
-**Requirement:** A provision ID MUST follow `standards/<kind>/<page>.<heading-slug>`.
+**Requirement:** A provision ID MUST follow `litespec/<kind>/<page>.<heading-slug>`.
 
 **Rationale:** The kind is `rule` for every provision. The page names the file, and the slug names the assertion, so a citation resolves to one heading.
 
-**Example:** `standards/rule/frontend-components.compose-composites-in-page-code` names a rule on the frontend components page, and its slug restates its heading.
+**Example:** `litespec/rule/frontend-components.compose-composites-in-page-code` names a rule on the frontend components page, and its slug restates its heading.
 
-### Name the owning page in the identifier (standards/rule/core-authoring.name-the-owning-page-in-the-identifier)
+### Name the owning page in the identifier (litespec/rule/core-authoring.name-the-owning-page-in-the-identifier)
 
 **Requirement:** A provision ID page segment MUST name its own `docs/<area>/<page>.md` path as `<area>-<stem>`.
 
 **Rationale:** The page segment names the file a reader opens, and the area keeps two pages with one stem distinct.
 
-**Example:** `standards/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case` and `standards/rule/blazor-structure.organize-features-by-module-and-use-case` name two pages.
+**Example:** `litespec/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case` and `litespec/rule/blazor-structure.organize-features-by-module-and-use-case` name two pages.
 
-### Exclude a sequence number from the identifier (standards/rule/core-authoring.exclude-a-sequence-number-from-the-identifier)
+### Exclude a sequence number from the identifier (litespec/rule/core-authoring.exclude-a-sequence-number-from-the-identifier)
 
 **Requirement:** A provision ID MUST NOT contain a sequence number.
 
 **Rationale:** A counter orders a provision against its siblings and names no assertion, which is what the heading slug already does.
 
-**Example:** `standards/rule/core-authoring.apply-controlled-prose-measures` names one assertion; a trailing `-002` would order it against a sibling instead.
+**Example:** `litespec/rule/core-authoring.apply-controlled-prose-measures` names one assertion; a trailing `-002` would order it against a sibling instead.
 
-### Identify actionable conventions (standards/rule/core-authoring.identify-actionable-conventions)
+### Identify actionable conventions (litespec/rule/core-authoring.identify-actionable-conventions)
 
 **Requirement:** An actionable Convention provision MUST follow the Convention provision contract defined by this page.
 
 **Rationale:** A distinct heading under `## Conventions` makes each replaceable default traceable without turning it into a Standards rule.
 
-### Keep Agent Summaries informative (standards/rule/core-authoring.keep-agent-summaries-informative)
+### Keep Agent Summaries informative (litespec/rule/core-authoring.keep-agent-summaries-informative)
 
 **Requirement:** An Agent Summary MUST follow the summary contract without adding authority to its cited projections.
 
 **Rationale:** Tier 1 context stays short while the full provision remains canonical.
 
-### Attach examples to their provisions (standards/rule/core-authoring.attach-examples-to-their-provisions)
+### Attach examples to their provisions (litespec/rule/core-authoring.attach-examples-to-their-provisions)
 
 **Requirement:** An informative example MUST belong to its provision or a Reference example that lists every demonstrated provision.
 
 **Rationale:** Readers can distinguish an illustration from an independent obligation.
 
-### Map provisions to evidence (standards/rule/core-authoring.map-provisions-to-evidence)
+### Map provisions to evidence (litespec/rule/core-authoring.map-provisions-to-evidence)
 
 **Requirement:** A normative page MUST map every Standard and Convention ID through the verification contract.
 
 **Rationale:** Exact evidence makes each provision reviewable by humans and tools.
 
-### Mark every provision checkable or guidance (standards/rule/core-authoring.mark-every-provision-checkable-or-guidance)
+### Mark every provision checkable or guidance (litespec/rule/core-authoring.mark-every-provision-checkable-or-guidance)
 
 **Requirement:** A Verification row MUST mark its provision `checkable` or `guidance`.
 
 **Rationale:** The mark tells a reader whether a tool or a person judges the provision. An unmarked row leaves that question open.
 
-### Regenerate the provision index (standards/rule/core-authoring.regenerate-the-provision-index)
+### Regenerate the provision index (litespec/rule/core-authoring.regenerate-the-provision-index)
 
 **Requirement:** A standards change MUST leave `docs/reference/provisions.md` equal to the output of `node tools/generate-provisions.mjs`.
 
 **Rationale:** One generated page resolves every ID to its heading and owning page, so a reader follows a citation in one step instead of searching.
 
-**Example:** The page lists `standards/rule/frontend-components.compose-composites-in-page-code` with its heading and a link into `frontend/components.md`.
+**Example:** The page lists `litespec/rule/frontend-components.compose-composites-in-page-code` with its heading and a link into `frontend/components.md`.
 
-### Route the reader before listing pages (standards/rule/core-authoring.route-the-reader-before-listing-pages)
+### Route the reader before listing pages (litespec/rule/core-authoring.route-the-reader-before-listing-pages)
 
 **Requirement:** A documentation root index MUST state which page class answers which reader question before its first navigation group.
 
@@ -470,7 +470,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 **Example:** A `Which page do you want` section names each class in the reader's terms, one sentence for each.
 
-### Declare structured specification metadata (standards/rule/core-authoring.declare-structured-specification-metadata)
+### Declare structured specification metadata (litespec/rule/core-authoring.declare-structured-specification-metadata)
 
 **Requirement:** A consumer page MUST open with a frontmatter block satisfying the record schema for its declared type.
 
@@ -490,13 +490,13 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 ---
 ```
 
-### Use one metadata carrier (standards/rule/core-authoring.use-one-metadata-carrier)
+### Use one metadata carrier (litespec/rule/core-authoring.use-one-metadata-carrier)
 
 **Requirement:** A consumer page MUST use its opening frontmatter block as its only metadata carrier.
 
 **Rationale:** Source links, implementation paths, and verification evidence belong in relevant body sections.
 
-### Classify every specification file (standards/rule/core-authoring.classify-every-specification-file)
+### Classify every specification file (litespec/rule/core-authoring.classify-every-specification-file)
 
 **Requirement:** Every Markdown file under the consumer documentation root MUST declare a record type or page style, or sit under a declared unstructured path.
 
@@ -515,7 +515,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 ---
 ```
 
-### Derive a computed fact instead of restating it (standards/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it)
+### Derive a computed fact instead of restating it (litespec/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it)
 
 **Requirement:** A specification MUST name the source or the command that produces any count, census, or membership list computed from code.
 
@@ -529,19 +529,19 @@ Every command declares an audit position. To count the declarations:
     grep -rl "Audited(" src/Application --include=*.cs | wc -l
 ```
 
-### Run repeatable authoring checks (standards/rule/core-authoring.run-repeatable-authoring-checks)
+### Run repeatable authoring checks (litespec/rule/core-authoring.run-repeatable-authoring-checks)
 
 **Requirement:** A standards change MUST pass the repository validator, every fixture suite, and `git diff --check`.
 
 **Rationale:** Every skipped check appears with its exact reason in the change report. The tools README names each fixture suite and its command.
 
-### Validate current standards material (standards/rule/core-authoring.validate-current-standards-material)
+### Validate current standards material (litespec/rule/core-authoring.validate-current-standards-material)
 
 **Requirement:** The standards validator MUST evaluate only current standards material.
 
 **Rationale:** Each pinned release is a complete snapshot. Changelog and Git history provide release context outside validation.
 
-### Exclude historical transition material (standards/rule/core-authoring.exclude-historical-transition-material)
+### Exclude historical transition material (litespec/rule/core-authoring.exclude-historical-transition-material)
 
 **Requirement:** Current standards material MUST NOT contain history-specific paths, IDs, terminology, aliases, replacement maps, standards-release migration material, compatibility rules, or transition checks.
 
@@ -549,45 +549,45 @@ Every command declares an audit position. To count the declarations:
 
 **Example:** An extension page naming the baseline provision it replaces states a relationship inside the current contract. A page recording that a provision carried another identifier in an earlier release states a relationship between releases, and is invalid.
 
-### Publish each release as a complete contract (standards/rule/core-authoring.publish-each-release-as-a-complete-contract)
+### Publish each release as a complete contract (litespec/rule/core-authoring.publish-each-release-as-a-complete-contract)
 
-**Requirement:** A standards release MUST state every active provision without depending on an earlier release.
+**Requirement:** A LiteSpec release MUST state every active provision without depending on an earlier release.
 
 **Rationale:** A consumer reads one pinned snapshot and needs no other release to determine its obligations.
 
-### Exclude cross-release compatibility work (standards/rule/core-authoring.exclude-cross-release-compatibility-work)
+### Exclude cross-release compatibility work (litespec/rule/core-authoring.exclude-cross-release-compatibility-work)
 
-**Requirement:** The standards repository MUST NOT publish a compatibility guarantee, migration path, deprecation period, or identifier alias between its own releases.
+**Requirement:** The LiteSpec repository MUST NOT publish a compatibility guarantee, migration path, deprecation period, or identifier alias between its own releases.
 
 **Rationale:** The standards are a pinned contract rather than a running service. A consumer product keeps its own API compatibility, migration, deprecation, and rollback provisions.
 
-### Keep a pinned release for as long as it serves (standards/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves)
+### Keep a pinned release for as long as it serves (litespec/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves)
 
-**Requirement:** A consumer MAY keep any published standards release for as long as that consumer chooses.
+**Requirement:** A consumer MAY keep any published LiteSpec release for as long as that consumer chooses.
 
 **Rationale:** Adoption is a consumer decision, and no repository change obliges a consumer to move to a later release.
 
-### Record the reviewed standards release (standards/rule/core-authoring.record-the-reviewed-standards-release)
+### Record the reviewed LiteSpec release (litespec/rule/core-authoring.record-the-reviewed-litespec-release)
 
-**Requirement:** A consumer MUST record the standards release it adopts in `reviewedStandardsVersion` within `standards.project.json`.
+**Requirement:** A consumer MUST record the LiteSpec release it adopts in `reviewedLiteSpecVersion` within `litespec.project.json`.
 
 **Rationale:** A provision can gain force while keeping its identifier, so an Exception written against an earlier release would otherwise apply to a rule nobody reread. The recorded release makes adoption an explicit act.
 
 ## Conventions
 
-### Prefer direct action headings (standards/rule/core-authoring.prefer-direct-action-headings)
+### Prefer direct action headings (litespec/rule/core-authoring.prefer-direct-action-headings)
 
 **Default:** Start a provision heading with a concrete action verb.
 
 **Replacement:** Use a concept heading only for informative definitions and indexes.
 
-### Prefer positive instructions (standards/rule/core-authoring.prefer-positive-instructions)
+### Prefer positive instructions (litespec/rule/core-authoring.prefer-positive-instructions)
 
 **Default:** State the required action positively when the positive form defines the complete boundary.
 
 **Replacement:** Use a prohibition when unsafe or invalid behavior needs an explicit boundary.
 
-### Use tables for exact mappings (standards/rule/core-authoring.use-tables-for-exact-mappings)
+### Use tables for exact mappings (litespec/rule/core-authoring.use-tables-for-exact-mappings)
 
 **Default:** Use a table for repeated fields, fixed comparisons, or exact evidence mappings.
 
@@ -595,10 +595,10 @@ Every command declares an audit position. To count the declarations:
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/core-authoring.write-atomic-standards-provisions`, `standards/rule/core-authoring.attach-examples-to-their-provisions`, and `standards/rule/core-authoring.map-provisions-to-evidence`.
+This informative example demonstrates `litespec/rule/core-authoring.write-atomic-standards-provisions`, `litespec/rule/core-authoring.attach-examples-to-their-provisions`, and `litespec/rule/core-authoring.map-provisions-to-evidence`.
 
 ```markdown
-### Keep the layer package-free (standards/rule/page.keep-the-layer-package-free)
+### Keep the layer package-free (litespec/rule/page.keep-the-layer-package-free)
 
 **Requirement:** The named project MUST contain no persistence, web, mediator, logging, or dependency-injection package reference.
 
@@ -613,48 +613,48 @@ The identifier above is a grammar placeholder. A real page uses the page segment
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/core-authoring.keep-authored-prose-ascii-safe | checkable | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
-| standards/rule/core-authoring.exclude-declared-content-paths-from-the-ascii-check | guidance | Does the project record name every path outside the ASCII check, with documents about that content still checked? |
-| standards/rule/core-authoring.use-one-normative-vocabulary | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_MODAL_COUNT` or `STANDARD_MODAL_VOCABULARY` diagnostic. |
-| standards/rule/core-authoring.apply-controlled-prose-measures | checkable | `node tools/validate-standards.mjs` emits no `PROSE_SENTENCE_LENGTH`, `PROSE_LIST_LENGTH`, `PROSE_TABLE_CELL_LENGTH`, `PROSE_PARAGRAPH_LENGTH`, `PROSE_CONTRACTION`, or `PROSE_VAGUE_TERM` diagnostic. |
-| standards/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation | checkable | `node standards/tools/validate-consumer.mjs` reports prose-measure violations on consumer pages. |
-| standards/rule/core-authoring.exclude-generated-regions-from-prose-checks | guidance | Does every prose check skip the text between generated-region fences? |
-| standards/rule/core-authoring.use-active-and-explicit-sentences | guidance | Would a reader find the actor in every sentence, the verb in every step, and one grammar per list? |
-| standards/rule/core-authoring.state-meaning-literally | guidance | Is every figure of speech either literal or a defined term? |
-| standards/rule/core-authoring.use-one-term-for-one-concept | guidance | Would a reader meet each concept under one name only? |
-| standards/rule/core-authoring.record-the-project-vocabulary-as-data | checkable | `node standards/tools/validate-consumer.mjs` validates the language record against the language schema. |
-| standards/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope | checkable | `node standards/tools/validate-consumer.mjs` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
-| standards/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets | checkable | `node standards/tools/validate-consumer.mjs` scans every `languageScan` pattern and fails a pattern matching no file. |
-| standards/rule/core-authoring.exclude-the-compound-that-names-another-concept | checkable | `node standards/tools/validate-consumer.mjs` reports no `LANGUAGE_REJECTED_SYNONYM` diagnostic inside an exempt compound. |
-| standards/rule/core-authoring.use-controlled-capitalization | guidance | Do page titles use Title Case and provision headings sentence case? |
-| standards/rule/core-authoring.apply-the-four-quality-tests | guidance | Did a reviewer assess the prose for simplicity, brevity, clarity, and humanity? |
-| standards/rule/core-authoring.use-the-declared-page-contract | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION`, `PAGE_SECTION_ORDER`, or `PAGE_UNKNOWN_SECTION` diagnostic. |
-| standards/rule/core-authoring.name-the-tool-rather-than-the-mechanism | guidance | Does each procedure step name the shipped command that performs it? |
-| standards/rule/core-authoring.state-one-layer-per-page | guidance | Does mechanism detail appear only under an `Underneath` section? |
-| standards/rule/core-authoring.name-the-escape-from-every-abstraction | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic for a command page. |
-| standards/rule/core-authoring.record-a-setting-as-reference | guidance | Does every setting named in a procedure resolve to a configuration page row? |
-| standards/rule/core-authoring.write-atomic-standards-provisions | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_REQUIREMENT_COUNT`, `STANDARD_SENTENCE_COUNT`, or `STANDARD_LABEL_INVALID` diagnostic. |
-| standards/rule/core-authoring.use-the-declared-identifier-grammar | checkable | `node tools/validate-standards.mjs` emits no `ID_SLUG_MISMATCH` or `ID_UNKNOWN_REFERENCE` diagnostic. |
-| standards/rule/core-authoring.name-the-owning-page-in-the-identifier | checkable | `node tools/validate-standards.mjs` emits no `ID_SCOPE_MISMATCH` or `ID_PAGE_FILENAME` diagnostic. |
-| standards/rule/core-authoring.exclude-a-sequence-number-from-the-identifier | guidance | Do changed identifiers name assertions with words alone? |
-| standards/rule/core-authoring.identify-actionable-conventions | checkable | `node tools/validate-standards.mjs` emits no `CONVENTION_MISSING_DEFAULT` or `CONVENTION_MISSING_REPLACEMENT` diagnostic. |
-| standards/rule/core-authoring.keep-agent-summaries-informative | checkable | `node tools/validate-standards.mjs` emits no `SUMMARY_COUNT`, `SUMMARY_MISSING_ID`, or `SUMMARY_UNKNOWN_ID` diagnostic. |
-| standards/rule/core-authoring.attach-examples-to-their-provisions | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_EXAMPLE_LABEL` or `PAGE_UNKNOWN_SECTION` diagnostic. |
-| standards/rule/core-authoring.map-provisions-to-evidence | checkable | `node tools/validate-standards.mjs` emits no `VERIFY_MISSING_ID` or `VERIFY_UNKNOWN_ID` diagnostic. |
-| standards/rule/core-authoring.mark-every-provision-checkable-or-guidance | guidance | Does every Verification row carry exactly one of the two marks? |
-| standards/rule/core-authoring.regenerate-the-provision-index | checkable | `node tools/generate-provisions.mjs --check` exits zero. |
-| standards/rule/core-authoring.route-the-reader-before-listing-pages | checkable | `node tools/validate-standards.mjs` emits no `INDEX_MISSING_ROUTING` diagnostic. |
-| standards/rule/core-authoring.declare-structured-specification-metadata | checkable | `node standards/tools/validate-consumer.mjs` validates each opening frontmatter block against the record schema. |
-| standards/rule/core-authoring.use-one-metadata-carrier | guidance | Is the opening frontmatter block the only metadata on each page? |
-| standards/rule/core-authoring.classify-every-specification-file | checkable | `node standards/tools/validate-consumer.mjs` fails a Markdown file with no declared type outside a declared unstructured path. |
-| standards/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it | guidance | Does each count, census, and membership list name its source or its command? |
-| standards/rule/core-authoring.run-repeatable-authoring-checks | checkable | `node tools/validate-standards.mjs`, every `node tools/*.cases.mjs` suite, and `git diff --check` exit zero. |
-| standards/rule/core-authoring.validate-current-standards-material | guidance | Does the validator read the working tree and no earlier release? |
-| standards/rule/core-authoring.exclude-historical-transition-material | guidance | Does any active file carry history-specific material between releases? |
-| standards/rule/core-authoring.publish-each-release-as-a-complete-contract | checkable | `node tools/validate-standards.mjs` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
-| standards/rule/core-authoring.exclude-cross-release-compatibility-work | guidance | Would a consumer find any promise of migration, mapping, or alias here? |
-| standards/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves | guidance | Does any active provision oblige a consumer to adopt a later release? |
-| standards/rule/core-authoring.record-the-reviewed-standards-release | checkable | `node standards/tools/validate-consumer.mjs` fails when `reviewedStandardsVersion` differs from the pinned release. |
-| standards/rule/core-authoring.prefer-direct-action-headings | guidance | Does every changed provision heading start with a concrete action verb? |
-| standards/rule/core-authoring.prefer-positive-instructions | guidance | Does every retained prohibition guard an explicit unsafe boundary? |
-| standards/rule/core-authoring.use-tables-for-exact-mappings | guidance | Is each changed table a comparison or a field mapping? |
+| litespec/rule/core-authoring.keep-authored-prose-ascii-safe | checkable | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
+| litespec/rule/core-authoring.exclude-declared-content-paths-from-the-ascii-check | guidance | Does the project record name every path outside the ASCII check, with documents about that content still checked? |
+| litespec/rule/core-authoring.use-one-normative-vocabulary | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_MODAL_COUNT` or `STANDARD_MODAL_VOCABULARY` diagnostic. |
+| litespec/rule/core-authoring.apply-controlled-prose-measures | checkable | `node tools/validate-standards.mjs` emits no `PROSE_SENTENCE_LENGTH`, `PROSE_LIST_LENGTH`, `PROSE_TABLE_CELL_LENGTH`, `PROSE_PARAGRAPH_LENGTH`, `PROSE_CONTRACTION`, or `PROSE_VAGUE_TERM` diagnostic. |
+| litespec/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation | checkable | `node litespec/tools/validate-consumer.mjs` reports prose-measure violations on consumer pages. |
+| litespec/rule/core-authoring.exclude-generated-regions-from-prose-checks | guidance | Does every prose check skip the text between generated-region fences? |
+| litespec/rule/core-authoring.use-active-and-explicit-sentences | guidance | Would a reader find the actor in every sentence, the verb in every step, and one grammar per list? |
+| litespec/rule/core-authoring.state-meaning-literally | guidance | Is every figure of speech either literal or a defined term? |
+| litespec/rule/core-authoring.use-one-term-for-one-concept | guidance | Would a reader meet each concept under one name only? |
+| litespec/rule/core-authoring.record-the-project-vocabulary-as-data | checkable | `node litespec/tools/validate-consumer.mjs` validates the language record against the language schema. |
+| litespec/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope | checkable | `node litespec/tools/validate-consumer.mjs` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
+| litespec/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets | checkable | `node litespec/tools/validate-consumer.mjs` scans every `languageScan` pattern and fails a pattern matching no file. |
+| litespec/rule/core-authoring.exclude-the-compound-that-names-another-concept | checkable | `node litespec/tools/validate-consumer.mjs` reports no `LANGUAGE_REJECTED_SYNONYM` diagnostic inside an exempt compound. |
+| litespec/rule/core-authoring.use-controlled-capitalization | guidance | Do page titles use Title Case and provision headings sentence case? |
+| litespec/rule/core-authoring.apply-the-four-quality-tests | guidance | Did a reviewer assess the prose for simplicity, brevity, clarity, and humanity? |
+| litespec/rule/core-authoring.use-the-declared-page-contract | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION`, `PAGE_SECTION_ORDER`, or `PAGE_UNKNOWN_SECTION` diagnostic. |
+| litespec/rule/core-authoring.name-the-tool-rather-than-the-mechanism | guidance | Does each procedure step name the shipped command that performs it? |
+| litespec/rule/core-authoring.state-one-layer-per-page | guidance | Does mechanism detail appear only under an `Underneath` section? |
+| litespec/rule/core-authoring.name-the-escape-from-every-abstraction | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic for a command page. |
+| litespec/rule/core-authoring.record-a-setting-as-reference | guidance | Does every setting named in a procedure resolve to a configuration page row? |
+| litespec/rule/core-authoring.write-atomic-standards-provisions | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_REQUIREMENT_COUNT`, `STANDARD_SENTENCE_COUNT`, or `STANDARD_LABEL_INVALID` diagnostic. |
+| litespec/rule/core-authoring.use-the-declared-identifier-grammar | checkable | `node tools/validate-standards.mjs` emits no `ID_SLUG_MISMATCH` or `ID_UNKNOWN_REFERENCE` diagnostic. |
+| litespec/rule/core-authoring.name-the-owning-page-in-the-identifier | checkable | `node tools/validate-standards.mjs` emits no `ID_SCOPE_MISMATCH` or `ID_PAGE_FILENAME` diagnostic. |
+| litespec/rule/core-authoring.exclude-a-sequence-number-from-the-identifier | guidance | Do changed identifiers name assertions with words alone? |
+| litespec/rule/core-authoring.identify-actionable-conventions | checkable | `node tools/validate-standards.mjs` emits no `CONVENTION_MISSING_DEFAULT` or `CONVENTION_MISSING_REPLACEMENT` diagnostic. |
+| litespec/rule/core-authoring.keep-agent-summaries-informative | checkable | `node tools/validate-standards.mjs` emits no `SUMMARY_COUNT`, `SUMMARY_MISSING_ID`, or `SUMMARY_UNKNOWN_ID` diagnostic. |
+| litespec/rule/core-authoring.attach-examples-to-their-provisions | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_EXAMPLE_LABEL` or `PAGE_UNKNOWN_SECTION` diagnostic. |
+| litespec/rule/core-authoring.map-provisions-to-evidence | checkable | `node tools/validate-standards.mjs` emits no `VERIFY_MISSING_ID` or `VERIFY_UNKNOWN_ID` diagnostic. |
+| litespec/rule/core-authoring.mark-every-provision-checkable-or-guidance | guidance | Does every Verification row carry exactly one of the two marks? |
+| litespec/rule/core-authoring.regenerate-the-provision-index | checkable | `node tools/generate-provisions.mjs --check` exits zero. |
+| litespec/rule/core-authoring.route-the-reader-before-listing-pages | checkable | `node tools/validate-standards.mjs` emits no `INDEX_MISSING_ROUTING` diagnostic. |
+| litespec/rule/core-authoring.declare-structured-specification-metadata | checkable | `node litespec/tools/validate-consumer.mjs` validates each opening frontmatter block against the record schema. |
+| litespec/rule/core-authoring.use-one-metadata-carrier | guidance | Is the opening frontmatter block the only metadata on each page? |
+| litespec/rule/core-authoring.classify-every-specification-file | checkable | `node litespec/tools/validate-consumer.mjs` fails a Markdown file with no declared type outside a declared unstructured path. |
+| litespec/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it | guidance | Does each count, census, and membership list name its source or its command? |
+| litespec/rule/core-authoring.run-repeatable-authoring-checks | checkable | `node tools/validate-standards.mjs`, every `node tools/*.cases.mjs` suite, and `git diff --check` exit zero. |
+| litespec/rule/core-authoring.validate-current-standards-material | guidance | Does the validator read the working tree and no earlier release? |
+| litespec/rule/core-authoring.exclude-historical-transition-material | guidance | Does any active file carry history-specific material between releases? |
+| litespec/rule/core-authoring.publish-each-release-as-a-complete-contract | checkable | `node tools/validate-standards.mjs` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
+| litespec/rule/core-authoring.exclude-cross-release-compatibility-work | guidance | Would a consumer find any promise of migration, mapping, or alias here? |
+| litespec/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves | guidance | Does any active provision oblige a consumer to adopt a later release? |
+| litespec/rule/core-authoring.record-the-reviewed-litespec-release | checkable | `node litespec/tools/validate-consumer.mjs` fails when `reviewedLiteSpecVersion` differs from the pinned release. |
+| litespec/rule/core-authoring.prefer-direct-action-headings | guidance | Does every changed provision heading start with a concrete action verb? |
+| litespec/rule/core-authoring.prefer-positive-instructions | guidance | Does every retained prohibition guard an explicit unsafe boundary? |
+| litespec/rule/core-authoring.use-tables-for-exact-mappings | guidance | Is each changed table a comparison or a field mapping? |

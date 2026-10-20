@@ -1,5 +1,5 @@
 {
-  "$schema": "./standards/schemas/ui-source-lock.schema.json",
+  "$schema": "./litespec/schemas/ui-source-lock.schema.json",
   "schemaVersion": 1,
   "generator": "shadcn/ui",
   "cli": "4.21.5",

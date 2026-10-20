@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/standards-manifest.schema.json",
-  "title": "Litenova Engineering Standards Manifest",
+  "$id": "https://github.com/Litenova-Solutions/LiteSpec/schemas/litespec-manifest.schema.json",
+  "title": "LiteSpec Manifest",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,7 +18,7 @@
   "properties": {
     "$schema": { "type": "string" },
     "schemaVersion": {
-      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See standards/rule/core-authoring.publish-each-release-as-a-complete-contract and standards/rule/core-authoring.exclude-cross-release-compatibility-work.",
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See litespec/rule/core-authoring.publish-each-release-as-a-complete-contract and litespec/rule/core-authoring.exclude-cross-release-compatibility-work.",
       "const": 5
     },
     "version": {
@@ -242,7 +242,7 @@
     },
     "provisionId": {
       "type": "string",
-      "pattern": "^standards/(rule|convention)/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+      "pattern": "^litespec/(rule|convention)/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
     },
     "extension": {
       "type": "object",

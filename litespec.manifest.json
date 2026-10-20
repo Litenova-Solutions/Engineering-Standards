@@ -1,8 +1,8 @@
 {
-  "$schema": "./schemas/standards-manifest.schema.json",
+  "$schema": "./schemas/litespec-manifest.schema.json",
   "schemaVersion": 5,
   "version": "2.0.0",
-  "name": "engineering-standards",
+  "name": "litespec",
   "agentsEntry": "AGENTS.md",
   "paths": {
     "docs": "docs",
@@ -231,7 +231,7 @@
       "path": "docs/ext/audit.md",
       "activationScope": "project",
       "replaces": [
-        "standards/rule/quality-security.record-security-audit-events"
+        "litespec/rule/quality-security.record-security-audit-events"
       ],
       "switchesOn": []
     },
@@ -261,7 +261,7 @@
         "journey"
       ],
       "replaces": [
-        "standards/rule/backend-persistence.collect-events-without-a-public-unit-of-work"
+        "litespec/rule/backend-persistence.collect-events-without-a-public-unit-of-work"
       ],
       "switchesOn": [
         "event",
@@ -277,12 +277,12 @@
         "use-case"
       ],
       "replaces": [
-        "standards/rule/backend-persistence.query-through-iquerysession",
-        "standards/rule/backend-persistence.keep-mappings-and-aliases-explicit",
-        "standards/rule/workspace-dependencies.keep-application-dependencies-narrow",
-        "standards/rule/backend-architecture.separate-command-and-query-behavior",
-        "standards/rule/ext-outbox.stage-messages-with-business-work",
-        "standards/rule/ext-outbox.reject-independent-outbox-commits"
+        "litespec/rule/backend-persistence.query-through-iquerysession",
+        "litespec/rule/backend-persistence.keep-mappings-and-aliases-explicit",
+        "litespec/rule/workspace-dependencies.keep-application-dependencies-narrow",
+        "litespec/rule/backend-architecture.separate-command-and-query-behavior",
+        "litespec/rule/ext-outbox.stage-messages-with-business-work",
+        "litespec/rule/ext-outbox.reject-independent-outbox-commits"
       ],
       "switchesOn": []
     },

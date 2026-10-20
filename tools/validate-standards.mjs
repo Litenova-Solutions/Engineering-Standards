@@ -17,10 +17,10 @@ import {
 } from './prose.mjs';
 import { unsupportedSchemaKeywords, validateSchemaValue } from './schema.mjs';
 
-// Every provision identifier is standards/<rule|convention>/<page>.<heading-slug>.
+// Every provision identifier is litespec/<rule|convention>/<page>.<heading-slug>.
 // The grammar lives in provisions.mjs, so the validator, the generator, and the
 // parsed heading cannot report three different formats.
-// (standards/rule/core-authoring.identifier-must-follow-format)
+// (litespec/rule/core-authoring.identifier-must-follow-format)
 const PROVISION_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${PROVISION_ID_SOURCE})\\)\\s*$`);
 const CITATION_SOURCE = PROVISION_ID_SOURCE;
 const MARKS = new Set(['checkable', 'guidance']);
@@ -278,7 +278,7 @@ function anchorsFor(raw) {
 
 // A directory names the class of every page inside it. Four of these hold pages a
 // reader follows or looks up rather than pages that own provisions, and each one
-// answers a question at a single layer. (standards/rule/core-authoring.state-one-layer-per-page)
+// answers a question at a single layer. (litespec/rule/core-authoring.state-one-layer-per-page)
 const PAGE_CLASS_AREA = {
   ext: 'extension',
   profile: 'profile',
@@ -320,7 +320,7 @@ function expectedSections(kind, relative = '') {
   if (kind === 'topic') {
     // Each frontend page is stack-neutral with short per-stack sections for
     // what differs between React and Svelte. No other topic page carries
-    // stack sections. (standards/rule/core-authoring.use-the-declared-page-contract)
+    // stack sections. (litespec/rule/core-authoring.use-the-declared-page-contract)
     const optional = relative.startsWith('docs/frontend/')
       ? ['Concepts', 'React', 'Svelte', 'Reference example']
       : ['Concepts', 'Reference example'];
@@ -339,7 +339,7 @@ function expectedSections(kind, relative = '') {
   if (kind === 'reference') return { required: ['Intent', 'Reference'], optional: ['Notes'] };
   // Underneath is required rather than optional, so a command page that hides its
   // mechanism fails rather than passing in silence. A command with nothing
-  // separately runnable writes 'None.' (standards/rule/core-authoring.name-the-escape-from-every-abstraction)
+  // separately runnable writes 'None.' (litespec/rule/core-authoring.name-the-escape-from-every-abstraction)
   if (kind === 'command') {
     return { required: ['Name', 'Synopsis', 'Description', 'Arguments', 'Options', 'Exit codes', 'Examples', 'Underneath'], optional: [] };
   }
@@ -466,7 +466,7 @@ function parsePage(relative, raw, add, globalIds, root, virtual = false) {
   }
 
   // An index navigates. A numbered procedure inside one duplicates a canonical
-  // provision without citing it. (standards/rule/core-authoring.use-the-declared-page-contract)
+  // provision without citing it. (litespec/rule/core-authoring.use-the-declared-page-contract)
   if (kind === 'index') {
     const step = clean.find((item) => /^\s*\d+\.\s+\S/.test(item.line));
     if (step) add(relative, step.number, 'INDEX_CONTAINS_PROCEDURE', 'an index must not contain a numbered procedure');
@@ -597,7 +597,7 @@ function parsePage(relative, raw, add, globalIds, root, virtual = false) {
 
   // A provision whose Requirement or Default only repeats its own heading
   // states no obligation. The heading is a label; the assertion belongs in the
-  // labeled block. (standards/rule/core-authoring.write-atomic-standards-provisions, standards/rule/core-authoring.identify-actionable-conventions)
+  // labeled block. (litespec/rule/core-authoring.write-atomic-standards-provisions, litespec/rule/core-authoring.identify-actionable-conventions)
   for (const provision of provisions) {
     const label = provision.section === 'Standards' ? 'Requirement' : 'Default';
     const assertion = provision.body.find((item) => item.line.startsWith(`**${label}:**`));
@@ -609,7 +609,7 @@ function parsePage(relative, raw, add, globalIds, root, virtual = false) {
   }
 
   // Tier 1 exists to compress Tier 2. A bullet identical to its provision adds
-  // no context and makes the escalation pointless. (standards/rule/core-authoring.keep-agent-summaries-informative)
+  // no context and makes the escalation pointless. (litespec/rule/core-authoring.keep-agent-summaries-informative)
   for (const reference of summaryReferences) {
     const provision = provisions.find((item) => item.id === reference.id);
     if (provision?.claim && reference.claim && provision.claim === reference.claim) {
@@ -673,7 +673,7 @@ function parsePage(relative, raw, add, globalIds, root, virtual = false) {
 
 // A checkable row's Evidence starts with the command that checks it, in
 // backticks. A shipped tool is cited in its consumer-side form, so a leading
-// `standards/` resolves against the repository root with the prefix removed. A
+// `litespec/` resolves against the repository root with the prefix removed. A
 // path outside `tools/` is a consumer command the page itself defines, such as
 // the consumer's route suite, which exists in consumers rather than here, so
 // only a shipped tool path that does not exist fails.
@@ -692,7 +692,7 @@ function checkVerificationCommand(relative, line, id, evidence, root, add) {
     if (/^(?:[\w.-]+\/)+[\w.-]+$/.test(cleaned)) candidates.push(cleaned);
   }
   for (let candidate of candidates) {
-    if (candidate.startsWith('standards/')) candidate = candidate.slice('standards/'.length);
+    if (candidate.startsWith('litespec/')) candidate = candidate.slice('litespec/'.length);
     if (!candidate.startsWith('tools/')) continue;
     if (!fs.existsSync(path.join(root, candidate))) {
       add(relative, line, 'VERIFY_COMMAND', `Verification for '${id}' names '${candidate}', which does not exist in the repository`);
@@ -748,29 +748,29 @@ function checkLinks(root, files, add) {
 }
 
 function checkManifest(root, add, context) {
-  const manifestFile = path.join(root, 'standards.manifest.json');
+  const manifestFile = path.join(root, 'litespec.manifest.json');
   if (!fs.existsSync(manifestFile)) return;
   let manifest;
   try {
     manifest = JSON.parse(fs.readFileSync(manifestFile, 'utf8'));
   } catch (cause) {
-    add('standards.manifest.json', 1, 'MANIFEST_JSON', cause.message);
+    add('litespec.manifest.json', 1, 'MANIFEST_JSON', cause.message);
     return;
   }
   const references = [manifest.agentsEntry];
   for (const stack of Object.values(manifest.stacks ?? {})) {
     references.push(stack.entry, ...(stack.pages ?? []));
-    if (new Set(stack.pages ?? []).size !== (stack.pages ?? []).length) add('standards.manifest.json', 1, 'MANIFEST_DUPLICATE_PATH', `stack '${stack.entry}' contains a duplicate page path`);
+    if (new Set(stack.pages ?? []).size !== (stack.pages ?? []).length) add('litespec.manifest.json', 1, 'MANIFEST_DUPLICATE_PATH', `stack '${stack.entry}' contains a duplicate page path`);
   }
   for (const extension of Object.values(manifest.extensions ?? {})) references.push(extension.path);
   for (const reference of references.filter(Boolean)) {
     const [relative, anchor] = reference.split('#');
     const target = path.join(root, relative);
     if (!fs.existsSync(target)) {
-      add('standards.manifest.json', 1, 'MANIFEST_PATH', `path '${relative}' does not exist`);
+      add('litespec.manifest.json', 1, 'MANIFEST_PATH', `path '${relative}' does not exist`);
       continue;
     }
-    if (anchor && !anchorsFor(fs.readFileSync(target, 'utf8')).has(anchor)) add('standards.manifest.json', 1, 'MANIFEST_ANCHOR', `anchor '#${anchor}' does not exist in '${relative}'`);
+    if (anchor && !anchorsFor(fs.readFileSync(target, 'utf8')).has(anchor)) add('litespec.manifest.json', 1, 'MANIFEST_ANCHOR', `anchor '#${anchor}' does not exist in '${relative}'`);
   }
   for (const [id, stack] of Object.entries(manifest.stacks ?? {})) {
     if (!stack.entry) continue;
@@ -811,7 +811,7 @@ function checkManifest(root, add, context) {
     const replaces = Array.isArray(extension.replaces) ? extension.replaces : [];
     const ownRows = context.verificationRowsByPage.get(extension.path) ?? [];
     for (const replaced of replaces) {
-      if (!context.activeIds.has(replaced)) add('standards.manifest.json', 1, 'EXTENSION_REPLACES_UNKNOWN', `extension '${id}' replaces unknown provision '${replaced}'`);
+      if (!context.activeIds.has(replaced)) add('litespec.manifest.json', 1, 'EXTENSION_REPLACES_UNKNOWN', `extension '${id}' replaces unknown provision '${replaced}'`);
       const row = ownRows.find((item) => item.id === replaced);
       if (row) add(extension.path, row.line, 'EXTENSION_REPLACES_ENFORCED', `extension '${id}' replaces '${replaced}' and still enforces it in its own Verification table`);
     }
@@ -820,7 +820,7 @@ function checkManifest(root, add, context) {
 
 function manifestRegistry(root) {
   const absent = { present: false, areas: new Set() };
-  const file = path.join(root, 'standards.manifest.json');
+  const file = path.join(root, 'litespec.manifest.json');
   if (!fs.existsSync(file)) return absent;
   try {
     const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -833,10 +833,10 @@ function manifestRegistry(root) {
 
 function normalizeTemplate(relative, raw) {
   return raw
-    .replaceAll('{standards/rule/page.state-one-action}', 'standards/rule/template.state-one-action')
-    .replaceAll('{standards/rule/page.use-one-default}', 'standards/rule/template.use-one-default')
-    .replaceAll('{standards/rule/page.state-one-extension-action}', 'standards/rule/template.state-one-extension-action')
-    .replaceAll('{standards/rule/page.use-one-extension-default}', 'standards/rule/template.use-one-extension-default')
+    .replaceAll('{litespec/rule/page.state-one-action}', 'litespec/rule/template.state-one-action')
+    .replaceAll('{litespec/rule/page.use-one-default}', 'litespec/rule/template.use-one-default')
+    .replaceAll('{litespec/rule/page.state-one-extension-action}', 'litespec/rule/template.state-one-extension-action')
+    .replaceAll('{litespec/rule/page.use-one-extension-default}', 'litespec/rule/template.use-one-extension-default')
     .replaceAll('{Topic Title}', 'Topic Title')
     .replaceAll('{Extension Title}', 'Extension Title')
     .replaceAll('{How-To Title}', 'How-To Title')
@@ -849,7 +849,7 @@ function normalizeTemplate(relative, raw) {
 // documentation; a prefix with content after it is a live old form.
 const REMOVED_IDENTIFIER_PATTERNS = [
   /\b(?:acceptance-criterion|authorization|invariant|policy|validation|flow|workflow|end-to-end-flow|domain-policy|aggregate|value|path)\/[A-Za-z0-9][\w.-]*/g,
-  /\b(?!standards\/)[a-z][a-z0-9-]*\/rule\/[A-Za-z0-9][\w.-]*/g,
+  /\b(?!litespec\/)[a-z][a-z0-9-]*\/rule\/[A-Za-z0-9][\w.-]*/g,
   /\b(?:AC|AUTZ|INV|POL|VAL|RULE)(?:-[A-Z][A-Z0-9]*)+-[0-9]{2,}\b|\bE2E-[0-9]+\b/g,
 ];
 const WORKFLOW_KIND_PATTERNS = [
@@ -921,7 +921,7 @@ export function validateRepository(rootInput = '.') {
   // Provision identity comes from the path and the heading. The page segment is
   // <area>-<stem>, so it names the page without a lookup, and the slug is the
   // heading slug, so the identifier and the heading cannot drift apart.
-  // (standards/rule/core-authoring.identifier-must-follow-format)
+  // (litespec/rule/core-authoring.identifier-must-follow-format)
   const registry = manifestRegistry(root);
   for (const page of registry.present ? parsedPages : []) {
     const provisions = page.parsed.provisions ?? [];
@@ -980,7 +980,7 @@ export function validateRepository(rootInput = '.') {
 
   // The provision index is derived. A stale page would send a reader to the wrong
   // heading, so the gate compares it with the active standards.
-  // (standards/rule/core-authoring.regenerate-the-provision-index)
+  // (litespec/rule/core-authoring.regenerate-the-provision-index)
   const indexFile = path.join(root, INDEX_PATH);
   if (fs.existsSync(indexFile)) {
     const expected = `${buildProvisionIndex(root)}\n`;
@@ -989,19 +989,19 @@ export function validateRepository(rootInput = '.') {
   } else if (fs.existsSync(path.join(root, 'docs', 'reference'))) {
     add(INDEX_PATH, 1, 'PROVISIONS_STALE', 'generated provision index is missing; run node tools/generate-provisions.mjs');
   }
-  validateSchemaConsumer(root, 'schemas/standards-manifest.schema.json', 'standards.manifest.json', add);
+  validateSchemaConsumer(root, 'schemas/litespec-manifest.schema.json', 'litespec.manifest.json', add);
   // Every shipped consumer template meets the schema it teaches. A template
   // the schema never reads drifts from it in silence.
-  validateSchemaConsumer(root, 'schemas/standards-project.schema.json', 'templates/consumer/standards.project.json', add);
+  validateSchemaConsumer(root, 'schemas/litespec-project.schema.json', 'templates/consumer/litespec.project.json', add);
 
   // The template index is the only map from a template file to the consumer path
   // it targets. A renamed template leaves a row pointing at nothing, and that row
-  // reads exactly like a correct one. (standards/rule/core-principles.keep-one-authored-source)
+  // reads exactly like a correct one. (litespec/rule/core-principles.keep-one-authored-source)
   checkTemplateIndex(root, add);
 
   // A reader who cannot tell a tutorial from a reference opens both and trusts
   // neither, so the documentation root names each class before it links to one.
-  // (standards/rule/core-authoring.route-the-reader-before-listing-pages)
+  // (litespec/rule/core-authoring.route-the-reader-before-listing-pages)
   checkRootIndexRouting(root, add);
 
   diagnostics.sort((left, right) => left.relative.localeCompare(right.relative) || left.line - right.line || left.code.localeCompare(right.code));
@@ -1069,7 +1069,7 @@ function checkTemplateIndex(root, add) {
 
 const USAGE = `Usage: node tools/validate-standards.mjs [repositoryRoot] [--warnings] [--format=json] [--help]
 
-Validates the authoring contract over the standards repository at repositoryRoot,
+Validates the authoring contract over the LiteSpec repository at repositoryRoot,
 which defaults to the current directory.
 
   --warnings      List every warning occurrence instead of a count per code.

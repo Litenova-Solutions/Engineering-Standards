@@ -2,23 +2,23 @@
 
 // Shared builder for docs/reference/provisions.md. The validator and the
 // generator both call buildProvisionIndex, so the checked-in page and its
-// freshness gate cannot disagree. (standards/rule/core-authoring.generate-the-provision-index)
+// freshness gate cannot disagree. (litespec/rule/core-authoring.generate-the-provision-index)
 
 import fs from 'node:fs';
 import path from 'node:path';
 
 const INDEX_PATH = 'docs/reference/provisions.md';
 
-// Every provision identifier is standards/<kind>/<page>.<heading-slug>. The kind
+// Every provision identifier is litespec/<kind>/<page>.<heading-slug>. The kind
 // names the assertion class, the page names the owning page, and the heading slug
 // names the assertion. No segment carries a sequence number.
-// (standards/rule/core-authoring.identifier-must-follow-format)
+// (litespec/rule/core-authoring.identifier-must-follow-format)
 export const PROVISION_KINDS = Object.freeze([
   'convention',
   'rule',
 ]);
 const KIND_ALTERNATION = PROVISION_KINDS.join('|');
-export const PROVISION_ID_SOURCE = `standards\\/(?:${KIND_ALTERNATION})\\/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*`;
+export const PROVISION_ID_SOURCE = `litespec\\/(?:${KIND_ALTERNATION})\\/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*`;
 const PROVISION_ID = new RegExp(`^${PROVISION_ID_SOURCE}$`);
 const RULE_HEADING = new RegExp(`^###\\s+(.+?)\\s+\\((${PROVISION_ID_SOURCE})\\)\\s*$`);
 
@@ -34,9 +34,9 @@ export function headingSlug(value) {
 }
 
 // The page segment is <area>-<stem>, so two pages named structure.md in two
-// areas stay distinct. (standards/rule/core-authoring.identifier-must-name-its-page)
+// areas stay distinct. (litespec/rule/core-authoring.identifier-must-name-its-page)
 export function parseProvisionId(id) {
-  const match = String(id).match(/^standards\/([a-z-]+)\/([a-z][a-z0-9-]*)\.([a-z0-9][a-z0-9-]*)$/);
+  const match = String(id).match(/^litespec\/([a-z-]+)\/([a-z][a-z0-9-]*)\.([a-z0-9][a-z0-9-]*)$/);
   if (!match) return null;
   return { kind: match[1], page: match[2], slug: match[3] };
 }

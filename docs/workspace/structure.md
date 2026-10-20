@@ -6,19 +6,19 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
 
 ## Agent Summary {#agent-summary}
 
-- Consumers share one canonical root tree. (standards/rule/workspace-structure.use-the-canonical-root-tree)
-- The project config declares size and stacks. (standards/rule/workspace-structure.declare-size-and-stacks-in-project-config)
-- The generated model folder stays untracked. (standards/rule/workspace-structure.keep-the-generated-model-out-of-source-control)
-- Production and test projects sit in separate roots. (standards/rule/workspace-structure.keep-net-production-and-test-projects-separate)
-- Runnable applications live under apps. (standards/rule/workspace-structure.keep-runnable-applications-under-apps)
-- An AppHost that runs more than one application sits beside them under apps. (standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs)
-- Shared packages have two consumers or hold generated output. (standards/rule/workspace-structure.limit-shared-typescript-packages)
-- Consumer documentation lives under the root docs directory. (standards/rule/workspace-structure.keep-consumer-documentation-at-the-root)
-- READMEs orient and link; they never restate records. (standards/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records)
+- Consumers share one canonical root tree. (litespec/rule/workspace-structure.use-the-canonical-root-tree)
+- The project config declares size and stacks. (litespec/rule/workspace-structure.declare-size-and-stacks-in-project-config)
+- The generated model folder stays untracked. (litespec/rule/workspace-structure.keep-the-generated-model-out-of-source-control)
+- Production and test projects sit in separate roots. (litespec/rule/workspace-structure.keep-net-production-and-test-projects-separate)
+- Runnable applications live under apps. (litespec/rule/workspace-structure.keep-runnable-applications-under-apps)
+- An AppHost that runs more than one application sits beside them under apps. (litespec/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs)
+- Shared packages have two consumers or hold generated output. (litespec/rule/workspace-structure.limit-shared-typescript-packages)
+- Consumer documentation lives under the root docs directory. (litespec/rule/workspace-structure.keep-consumer-documentation-at-the-root)
+- READMEs orient and link; they never restate records. (litespec/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records)
 
 ## Standards
 
-### Use the canonical root tree (standards/rule/workspace-structure.use-the-canonical-root-tree)
+### Use the canonical root tree (litespec/rule/workspace-structure.use-the-canonical-root-tree)
 
 **Requirement:** A consumer workspace MUST use the canonical root tree declared in this section.
 
@@ -71,36 +71,36 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
     known-gaps/                create with the first known-gap record
     ui/                        create with the first UI decision or guide
     language.json
-  standards/
+  litespec/
   AGENTS.md
   global.json
   package.json                 when a frontend or TypeScript package exists
   pnpm-lock.yaml               when a frontend or TypeScript package exists
   pnpm-workspace.yaml          when a frontend or TypeScript package exists
-  standards.project.json
+  litespec.project.json
 ```
 
 The example does not place the .NET solution or a frontend application at the workspace root. Under `modules/`, each module folder holds one folder per business record in plural kebab-case form.
 
 A record page lives at the home the tree names for its type. An entry lives on its home page. Requirements live on product topic pages, permissions on the permissions page, entry points on the entry-point page, and limits on the limits page. Rules, results, cases, and events live on their business record or use case page.
 
-### Declare size and stacks in project config (standards/rule/workspace-structure.declare-size-and-stacks-in-project-config)
+### Declare size and stacks in project config (litespec/rule/workspace-structure.declare-size-and-stacks-in-project-config)
 
-**Requirement:** `standards.project.json` MUST declare `size` as `small` or `large` and one stack per frontend in `paths.frontends` beside the `dotnet` backend.
+**Requirement:** `litespec.project.json` MUST declare `size` as `small` or `large` and one stack per frontend in `paths.frontends` beside the `dotnet` backend.
 
 **Rationale:** Size decides which record types and test projects apply, and each stack decides which technology pages and checks apply.
 
-### Keep the generated model out of source control (standards/rule/workspace-structure.keep-the-generated-model-out-of-source-control)
+### Keep the generated model out of source control (litespec/rule/workspace-structure.keep-the-generated-model-out-of-source-control)
 
 **Requirement:** The generated `.model/` folder MUST stay out of source control.
 
 **Rationale:** The model builder writes `model.json` there from records, code, routes, tests, and test runs, so the folder is rebuilt rather than reviewed.
 
-### Keep .NET production and test projects separate (standards/rule/workspace-structure.keep-net-production-and-test-projects-separate)
+### Keep .NET production and test projects separate (litespec/rule/workspace-structure.keep-net-production-and-test-projects-separate)
 
 **Requirement:** Production projects MUST live under `apps/api/src/` and test projects under `apps/api/tests/`, with the solution directly under `apps/api/`.
 
-**Rationale:** The split makes a test dependency reaching a production project visible in the path itself. A workspace AppHost is the one production project outside it, placed by `standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs`.
+**Rationale:** The split makes a test dependency reaching a production project visible in the path itself. A workspace AppHost is the one production project outside it, placed by `litespec/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs`.
 
 **Example:** The baseline tree is:
 
@@ -128,15 +128,15 @@ apps/api/
 
 Worker is conditional on the extension that runs background work. Acceptance.Tests is required when `size` is large and optional otherwise. Domain.Tests and Application.Tests are optional in both sizes. `AppHost` and `ServiceDefaults` are local hosting and diagnostics projects rather than application layers. An application that orchestrates its local dependencies another way ships neither, and records no Exception for their absence.
 
-### Keep one workspace solution beside the API solution (standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution)
+### Keep one workspace solution beside the API solution (litespec/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution)
 
 **Requirement:** A root solution MUST list the .NET projects of more than one deployable unit, with builds, test runs, and configuration still naming the API solution.
 
-**Rationale:** The API solution stays at `apps/api/` and remains the one a build, a test run, and `paths.apiSolution` name. A workspace holding a second .NET deployable, such as a command-line tool, otherwise has no single file an editor can open across both. Two solution files listing overlapping projects is a supported MSBuild arrangement, and the projects themselves stay where `standards/rule/workspace-structure.keep-net-production-and-test-projects-separate` puts them.
+**Rationale:** The API solution stays at `apps/api/` and remains the one a build, a test run, and `paths.apiSolution` name. A workspace holding a second .NET deployable, such as a command-line tool, otherwise has no single file an editor can open across both. Two solution files listing overlapping projects is a supported MSBuild arrangement, and the projects themselves stay where `litespec/rule/workspace-structure.keep-net-production-and-test-projects-separate` puts them.
 
 **Example:** A workspace with an API and a command-line tool carries `apps/api/{ProjectName}.slnx`, `apps/cli/{ProjectName}.Cli.slnx` where one exists, and a root `{ProjectName}.slnx` listing both sets.
 
-### Place a workspace AppHost beside the applications it runs (standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs)
+### Place a workspace AppHost beside the applications it runs (litespec/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs)
 
 **Requirement:** An AppHost that runs more than one application under `apps/` MUST live at `apps/apphost/{ProjectName}.AppHost/` rather than under `apps/api/src/`.
 
@@ -158,27 +158,27 @@ apps/
   {frontend}/
 ```
 
-The workspace solution of `standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution` lists the AppHost, and the API solution lists it too when a test project references it.
+The workspace solution of `litespec/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution` lists the AppHost, and the API solution lists it too when a test project references it.
 
-### Keep runnable applications under apps (standards/rule/workspace-structure.keep-runnable-applications-under-apps)
+### Keep runnable applications under apps (litespec/rule/workspace-structure.keep-runnable-applications-under-apps)
 
 **Requirement:** An independently runnable frontend, API, or deployed host MUST live under `apps/{name}/`.
 
 **Rationale:** A reusable package under `apps/` or deployable code under `packages/` inverts what each root promises.
 
-### Limit shared TypeScript packages (standards/rule/workspace-structure.limit-shared-typescript-packages)
+### Limit shared TypeScript packages (litespec/rule/workspace-structure.limit-shared-typescript-packages)
 
 **Requirement:** A shared TypeScript package MUST have at least two consumers or carry generated output shared by design.
 
 **Rationale:** The baseline permits shared configuration, generated API types, a thin client, and CSS theme tokens.
 
-### Keep consumer documentation at the root (standards/rule/workspace-structure.keep-consumer-documentation-at-the-root)
+### Keep consumer documentation at the root (litespec/rule/workspace-structure.keep-consumer-documentation-at-the-root)
 
 **Requirement:** Project records MUST live under the root `docs/` directory.
 
-**Rationale:** Placing them inside the standards submodule or the solution tree makes them disappear when either is replaced.
+**Rationale:** Placing them inside the LiteSpec submodule or the solution tree makes them disappear when either is replaced.
 
-### Keep orientation documents separate from canonical records (standards/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records)
+### Keep orientation documents separate from canonical records (litespec/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records)
 
 **Requirement:** A README under `docs/` MUST link to the approved record rather than restate its content.
 
@@ -186,7 +186,7 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 ## Conventions
 
-### Name frontends by audience (standards/rule/workspace-structure.name-frontends-by-audience)
+### Name frontends by audience (litespec/rule/workspace-structure.name-frontends-by-audience)
 
 **Default:** Name a frontend for its audience, such as `web`, `admin`, `portal`, or `docs`.
 
@@ -194,7 +194,7 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 **Rationale:** `frontend`, `client`, or `app` names the technology rather than the audience it serves.
 
-### Keep scripts at the root (standards/rule/workspace-structure.keep-scripts-at-the-root)
+### Keep scripts at the root (litespec/rule/workspace-structure.keep-scripts-at-the-root)
 
 **Default:** Keep bootstrap, release, and CI helper scripts under root `scripts/`.
 
@@ -202,7 +202,7 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 **Rationale:** An application-specific script may stay inside its application when no other workspace calls it.
 
-### Keep generated API contracts in packages (standards/rule/workspace-structure.keep-generated-api-contracts-in-packages)
+### Keep generated API contracts in packages (litespec/rule/workspace-structure.keep-generated-api-contracts-in-packages)
 
 **Default:** Place generated OpenAPI types in `packages/api-types/` and a thin client in `packages/api-client/` when more than one frontend consumes the API.
 
@@ -212,7 +212,7 @@ The workspace solution of `standards/rule/workspace-structure.keep-one-workspace
 
 ## Reference example
 
-This informative example demonstrates `standards/rule/workspace-structure.use-the-canonical-root-tree` and `standards/rule/workspace-structure.limit-shared-typescript-packages`.
+This informative example demonstrates `litespec/rule/workspace-structure.use-the-canonical-root-tree` and `litespec/rule/workspace-structure.limit-shared-typescript-packages`.
 
 An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/admin/`. Both frontends may import generated transport types from `packages/api-types/`. Neither imports the other frontend's feature code.
 
@@ -220,16 +220,16 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/workspace-structure.use-the-canonical-root-tree | guidance | Does the workspace match the canonical tree with records at their homes? |
-| standards/rule/workspace-structure.declare-size-and-stacks-in-project-config | guidance | Does standards.project.json declare size and one stack per frontend? |
-| standards/rule/workspace-structure.keep-the-generated-model-out-of-source-control | guidance | Is the generated .model/ folder untracked? |
-| standards/rule/workspace-structure.keep-net-production-and-test-projects-separate | guidance | Do production projects sit under src/ and test projects under tests/? |
-| standards/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution | guidance | Does any root solution list more than one deployable while builds name the API solution? |
-| standards/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs | guidance | Does an AppHost running a frontend sit at apps/apphost/ and an API-only one under apps/api/src/? |
-| standards/rule/workspace-structure.keep-runnable-applications-under-apps | guidance | Does each runnable application sit under apps/ and each library under packages/? |
-| standards/rule/workspace-structure.limit-shared-typescript-packages | guidance | Does each shared package have two consumers or carry generated output? |
-| standards/rule/workspace-structure.keep-consumer-documentation-at-the-root | guidance | Do all project records live under the root docs/ directory? |
-| standards/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records | guidance | Does each README under docs/ link to its record rather than restate it? |
-| standards/rule/workspace-structure.name-frontends-by-audience | guidance | Does each directory under apps/ carry an audience name? |
-| standards/rule/workspace-structure.keep-scripts-at-the-root | guidance | Do bootstrap, release, and CI helper scripts sit under root scripts/? |
-| standards/rule/workspace-structure.keep-generated-api-contracts-in-packages | guidance | Do generated types and the typed client sit under packages/ with two frontends? |
+| litespec/rule/workspace-structure.use-the-canonical-root-tree | guidance | Does the workspace match the canonical tree with records at their homes? |
+| litespec/rule/workspace-structure.declare-size-and-stacks-in-project-config | guidance | Does litespec.project.json declare size and one stack per frontend? |
+| litespec/rule/workspace-structure.keep-the-generated-model-out-of-source-control | guidance | Is the generated .model/ folder untracked? |
+| litespec/rule/workspace-structure.keep-net-production-and-test-projects-separate | guidance | Do production projects sit under src/ and test projects under tests/? |
+| litespec/rule/workspace-structure.keep-one-workspace-solution-beside-the-api-solution | guidance | Does any root solution list more than one deployable while builds name the API solution? |
+| litespec/rule/workspace-structure.place-a-workspace-apphost-beside-the-applications-it-runs | guidance | Does an AppHost running a frontend sit at apps/apphost/ and an API-only one under apps/api/src/? |
+| litespec/rule/workspace-structure.keep-runnable-applications-under-apps | guidance | Does each runnable application sit under apps/ and each library under packages/? |
+| litespec/rule/workspace-structure.limit-shared-typescript-packages | guidance | Does each shared package have two consumers or carry generated output? |
+| litespec/rule/workspace-structure.keep-consumer-documentation-at-the-root | guidance | Do all project records live under the root docs/ directory? |
+| litespec/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records | guidance | Does each README under docs/ link to its record rather than restate it? |
+| litespec/rule/workspace-structure.name-frontends-by-audience | guidance | Does each directory under apps/ carry an audience name? |
+| litespec/rule/workspace-structure.keep-scripts-at-the-root | guidance | Do bootstrap, release, and CI helper scripts sit under root scripts/? |
+| litespec/rule/workspace-structure.keep-generated-api-contracts-in-packages | guidance | Do generated types and the typed client sit under packages/ with two frontends? |

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Litenova-Solutions/Engineering-Standards/schemas/record.schema.json",
+  "$id": "https://github.com/Litenova-Solutions/LiteSpec/schemas/record.schema.json",
   "title": "Litenova Project Record Frontmatter",
   "description": "The JSON frontmatter block opening a consumer documentation page: one page record or one page style, with the entry records it carries.",
   "oneOf": [
@@ -140,7 +140,7 @@
     },
     "standardsProvisionId": {
       "type": "string",
-      "pattern": "^standards/(rule|convention)/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+      "pattern": "^litespec/(rule|convention)/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
     },
     "genericRecordId": {
       "type": "string",

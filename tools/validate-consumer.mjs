@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Consumer validator for the Litenova engineering standards.
+// Consumer validator for LiteSpec.
 //
 // Holds a consumer repository to the release it pinned. It checks the project
 // record against the project schema, the manifest version and the stacks and
@@ -11,10 +11,10 @@
 // tests.
 //
 // Usage:
-//   node standards/tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
+//   node litespec/tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
 //
 // consumerRoot defaults to the current working directory. The consumer must
-// contain standards.project.json. Exit code is non-zero when any check fails.
+// contain litespec.project.json. Exit code is non-zero when any check fails.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -23,10 +23,10 @@ import { fileURLToPath } from 'node:url';
 import { checkProseMeasures, checkLanguage, checkLanguageInSource, compileLanguage } from './prose.mjs';
 import { schemaProblems } from './schema.mjs';
 
-const USAGE = `Usage: node standards/tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
+const USAGE = `Usage: node litespec/tools/validate-consumer.mjs [consumerRoot] [--prose] [--format=json] [--help]
 
 Validates the consumer repository at consumerRoot, which defaults to the
-current directory. The consumer must contain standards.project.json.
+current directory. The consumer must contain litespec.project.json.
 
   --prose         List every controlled-prose measure behind the reported counts.
   --format=json   Write one JSON object on stdout instead of human-readable lines.
@@ -146,34 +146,34 @@ function globFiles(from, pattern) {
 }
 
 // The schemas ship with this validator, so they resolve from its own location
-// rather than from the consumer. A consumer may pin the standards repository
-// at a path other than 'standards/'.
+// rather than from the consumer. A consumer may pin the LiteSpec repository
+// at a path other than 'litespec/'.
 const toolsDir = path.dirname(fileURLToPath(import.meta.url));
 const standardsRoot = path.dirname(toolsDir);
-const projectSchemaFile = path.join(standardsRoot, 'schemas', 'standards-project.schema.json');
+const projectSchemaFile = path.join(standardsRoot, 'schemas', 'litespec-project.schema.json');
 const recordSchemaFile = path.join(standardsRoot, 'schemas', 'record.schema.json');
 const languageSchemaFile = path.join(standardsRoot, 'schemas', 'language.schema.json');
 for (const schemaFile of [projectSchemaFile, recordSchemaFile, languageSchemaFile]) {
-  if (!fs.existsSync(schemaFile)) failInput(`Schema '${path.relative(standardsRoot, schemaFile).replace(/\\/g, '/')}' is missing from the pinned standards; the validator cannot run without it`);
+  if (!fs.existsSync(schemaFile)) failInput(`Schema '${path.relative(standardsRoot, schemaFile).replace(/\\/g, '/')}' is missing from the pinned LiteSpec release; the validator cannot run without it`);
 }
 const readSchema = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 
 // ---- project record ---------------------------------------------------------
-const projectFile = path.join(root, 'standards.project.json');
+const projectFile = path.join(root, 'litespec.project.json');
 if (!fs.existsSync(projectFile)) {
-  console.error(`No standards.project.json at ${root}`);
+  console.error(`No litespec.project.json at ${root}`);
   process.exit(2);
 }
 let project;
 try {
   project = readJson(projectFile);
 } catch (cause) {
-  failInput(`standards.project.json: not valid JSON (${cause.message})`);
+  failInput(`litespec.project.json: not valid JSON (${cause.message})`);
 }
 // The project record is validated through the shared schema module, so the
 // schema is the one statement of its shape. A hand table beside it would need
 // the same edit twice and drift on the third.
-for (const problem of schemaProblems(projectSchemaFile, project, 'standards.project.json', readSchema)) err(problem);
+for (const problem of schemaProblems(projectSchemaFile, project, 'litespec.project.json', readSchema)) err(problem);
 
 // The documentation root is configuration, not a constant. A hard-coded docs/
 // scans nothing in a consumer that keeps its pages elsewhere, and a scan of
@@ -189,8 +189,8 @@ for (const [field, value, consequence] of [
   ['paths.language', project.paths?.language, 'the vocabulary and mannered-term checks resolve nothing'],
 ]) {
   if (value === undefined) continue;
-  if (typeof value !== 'string' || !value.trim()) { err(`standards.project.json: ${field} '${value}' is not a path`); continue; }
-  if (!fs.existsSync(path.join(root, value))) err(`standards.project.json: ${field} '${value}' does not exist; ${consequence}`);
+  if (typeof value !== 'string' || !value.trim()) { err(`litespec.project.json: ${field} '${value}' is not a path`); continue; }
+  if (!fs.existsSync(path.join(root, value))) err(`litespec.project.json: ${field} '${value}' does not exist; ${consequence}`);
 }
 
 // A selection records the criterion that was met and the date it is next
@@ -203,7 +203,7 @@ const selected = new Set(selections.map((entry) => entry.id));
 
 // ---- manifest: version, stacks, extensions -----------------------------------
 let manifest = null;
-for (const rel of ['standards/standards.manifest.json', '../standards.manifest.json']) {
+for (const rel of ['litespec/litespec.manifest.json', '../litespec.manifest.json']) {
   const p = path.join(root, rel);
   if (fs.existsSync(p)) {
     try {
@@ -215,13 +215,13 @@ for (const rel of ['standards/standards.manifest.json', '../standards.manifest.j
   }
 }
 // Adopting a release means accepting its complete contract, so the project
-// records the release it reviewed. A mismatch means the pinned standards moved
+// records the release it reviewed. A mismatch means the pinned LiteSpec release moved
 // without anyone re-reading the contract that now applies.
 if (manifest?.version) {
-  const reviewed = project.reviewedStandardsVersion;
-  if (!reviewed) err(`standards.project.json: missing 'reviewedStandardsVersion'; the pinned standards are ${manifest.version}`);
+  const reviewed = project.reviewedLiteSpecVersion;
+  if (!reviewed) err(`litespec.project.json: missing 'reviewedLiteSpecVersion'; the pinned LiteSpec release are ${manifest.version}`);
   else if (reviewed !== manifest.version) {
-    err(`standards.project.json: reviewedStandardsVersion '${reviewed}' does not match the pinned standards ${manifest.version}; re-review the contract and record the new version`);
+    err(`litespec.project.json: reviewedLiteSpecVersion '${reviewed}' does not match the pinned LiteSpec release ${manifest.version}; re-review the contract and record the new version`);
   }
 }
 
@@ -235,7 +235,7 @@ if (manifest?.extensions) {
   const known = Object.keys(manifest.extensions).sort();
   for (const id of selected) {
     if (!manifest.extensions[id]) {
-      err(`standards.project.json: extensions '${id}' is not an extension in the pinned standards; known ids are ${known.join(', ')}`);
+      err(`litespec.project.json: extensions '${id}' is not an extension in the pinned LiteSpec release; known ids are ${known.join(', ')}`);
     }
   }
 }
@@ -247,7 +247,7 @@ const today = new Date().toISOString().slice(0, 10);
 for (const entry of selections) {
   if (!entry.reviewBy) continue;
   if (entry.reviewBy < today) {
-    err(`standards.project.json: extensions '${entry.id}' was due for review on ${entry.reviewBy}; confirm the criterion still applies or remove the selection`);
+    err(`litespec.project.json: extensions '${entry.id}' was due for review on ${entry.reviewBy}; confirm the criterion still applies or remove the selection`);
   }
 }
 
@@ -257,20 +257,20 @@ for (const entry of selections) {
 const stageSelection = selections.find((entry) => entry.id === 'stage');
 const deferrals = Array.isArray(stageSelection?.deferredProvisions) ? stageSelection.deferredProvisions : [];
 if (stageSelection?.releaseStage === 'production' && deferrals.length) {
-  err(`standards.project.json: extensions 'stage' declares production and still defers ${deferrals.length} provision(s); the promotion decision ends every deferral`);
+  err(`litespec.project.json: extensions 'stage' declares production and still defers ${deferrals.length} provision(s); the promotion decision ends every deferral`);
 }
 if (deferrals.length) {
   const indexFile = path.join(standardsRoot, 'docs', 'reference', 'provisions.md');
   const knownProvisions = new Set(fs.existsSync(indexFile)
-    ? [...readText(indexFile).matchAll(/^\| (standards\/(?:rule|convention)\/[^\s|]+) \|/gm)].map((match) => match[1])
+    ? [...readText(indexFile).matchAll(/^\| (litespec\/(?:rule|convention)\/[^\s|]+) \|/gm)].map((match) => match[1])
     : []);
   for (const deferral of deferrals) {
     if (!deferral?.provision) continue;
     if (!knownProvisions.has(deferral.provision)) {
-      err(`standards.project.json: extensions 'stage' defers '${deferral.provision}', which is not a provision in the pinned standards`);
+      err(`litespec.project.json: extensions 'stage' defers '${deferral.provision}', which is not a provision in the pinned LiteSpec release`);
     }
     if (deferral.until && deferral.until < today) {
-      err(`standards.project.json: extensions 'stage' deferral of '${deferral.provision}' ended on ${deferral.until}; apply the provision or record a new deferral`);
+      err(`litespec.project.json: extensions 'stage' deferral of '${deferral.provision}' ended on ${deferral.until}; apply the provision or record a new deferral`);
     }
   }
 }
@@ -286,12 +286,12 @@ for (const frontend of frontends) {
   // A declared frontend whose directory is absent reads as a frontend with no
   // code, and every check for it passes by having nothing to read.
   if (frontend?.path !== undefined && !fs.existsSync(path.join(root, frontend.path))) {
-    err(`standards.project.json: frontend '${name}' path '${frontend.path}' does not exist; the checks for that frontend read nothing`);
+    err(`litespec.project.json: frontend '${name}' path '${frontend.path}' does not exist; the checks for that frontend read nothing`);
   }
   if (!frontend?.platform) {
-    err(`standards.project.json: frontend '${name}' declares no 'platform'; one of ${knownStacks.join(', ')} is required`);
+    err(`litespec.project.json: frontend '${name}' declares no 'platform'; one of ${knownStacks.join(', ')} is required`);
   } else if (!knownStacks.includes(frontend.platform)) {
-    err(`standards.project.json: frontend '${name}' has unknown platform '${frontend.platform}'; expected one of ${knownStacks.join(', ')}`);
+    err(`litespec.project.json: frontend '${name}' has unknown platform '${frontend.platform}'; expected one of ${knownStacks.join(', ')}`);
   } else if (CONTROLLED_PLATFORMS.includes(frontend.platform)) {
     controlledFrontends.push(frontend);
   }
@@ -303,9 +303,9 @@ for (const frontend of frontends) {
 // rather than a row per application.
 const uiPackage = project.paths?.uiPackage ?? null;
 if (controlledFrontends.length && !uiPackage) {
-  err(`standards.project.json: ${controlledFrontends.length} controlled frontend(s) and no 'paths.uiPackage'; the shared UI package every controlled web frontend composes is undeclared`);
+  err(`litespec.project.json: ${controlledFrontends.length} controlled frontend(s) and no 'paths.uiPackage'; the shared UI package every controlled web frontend composes is undeclared`);
 } else if (uiPackage) {
-  const uiPackageLabel = `standards.project.json: paths.uiPackage '${uiPackage.name ?? '(unnamed)'}'`;
+  const uiPackageLabel = `litespec.project.json: paths.uiPackage '${uiPackage.name ?? '(unnamed)'}'`;
   for (const key of ['path', 'componentsJson', 'primitives', 'tokens', 'sourceLock', 'designContract']) {
     if (uiPackage[key] !== undefined && !fs.existsSync(path.join(root, uiPackage[key]))) {
       err(`${uiPackageLabel}: ${key} path does not exist '${uiPackage[key]}'`);
@@ -314,7 +314,7 @@ if (controlledFrontends.length && !uiPackage) {
   for (const frontend of controlledFrontends) {
     const stylesheet = frontend.ui?.globalCss;
     if (stylesheet !== undefined && !fs.existsSync(path.join(root, stylesheet))) {
-      err(`standards.project.json: frontend '${frontend.name}' ui.globalCss path does not exist '${stylesheet}'`);
+      err(`litespec.project.json: frontend '${frontend.name}' ui.globalCss path does not exist '${stylesheet}'`);
     }
   }
 }
@@ -423,7 +423,7 @@ let languageSummary = '';
       if (!shape.length && scopesOk) compiled = compileLanguage(record);
     }
   } else if (languagePath) {
-    err(`standards.project.json: paths.language '${languagePath}' does not exist; the vocabulary and mannered-term checks resolve nothing`);
+    err(`litespec.project.json: paths.language '${languagePath}' does not exist; the vocabulary and mannered-term checks resolve nothing`);
   }
 
   // AGENTS.md is scanned for language even though it carries no record and
@@ -468,13 +468,13 @@ let languageSummary = '';
     try {
       matched = globFiles(root, pattern);
     } catch (e) {
-      err(`standards.project.json: paths.languageScan '${pattern}' could not be read (${e.message})`);
+      err(`litespec.project.json: paths.languageScan '${pattern}' could not be read (${e.message})`);
       continue;
     }
     // A pattern that matches nothing switches a surface off in silence, which
     // is the shape this validator refuses everywhere else.
     if (!matched.length) {
-      err(`standards.project.json: paths.languageScan '${pattern}' matches no file; the vocabulary check over that surface did not run`);
+      err(`litespec.project.json: paths.languageScan '${pattern}' matches no file; the vocabulary check over that surface did not run`);
       continue;
     }
     for (const relativePath of matched) {
@@ -500,7 +500,7 @@ let languageSummary = '';
   }
 
   for (const [rel, count] of proseCounts) {
-    proseErr(`${rel}: ${count} controlled-prose problem(s); run 'node standards/tools/validate-consumer.mjs --prose' to list them`);
+    proseErr(`${rel}: ${count} controlled-prose problem(s); run 'node litespec/tools/validate-consumer.mjs --prose' to list them`);
   }
   const manneredCount = languageFindings.filter((f) => f.includes('LANGUAGE_MANNERED_TERM')).length;
   const rejectedCount = languageFindings.length - manneredCount;
@@ -542,7 +542,7 @@ let languageSummary = '';
 const uiActivated = controlledFrontends.length > 0 || Boolean(uiPackage);
 if (uiActivated) {
   // Resolve the sibling validator from this file so a consumer may pin the
-  // standards repository at a path other than 'standards/'.
+  // LiteSpec repository at a path other than 'litespec/'.
   const uiValidator = path.join(toolsDir, 'validate-ui.mjs');
   if (fs.existsSync(uiValidator)) {
     // The child validator gets 120 seconds and answers as JSON, so its

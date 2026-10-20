@@ -74,7 +74,7 @@ sealed class ConsumerConfig
     public static ConsumerConfig Load(string root)
     {
         var config = new ConsumerConfig(Path.GetFullPath(root));
-        var file = Path.Combine(config.Root, "standards.project.json");
+        var file = Path.Combine(config.Root, "litespec.project.json");
 
         using var document = File.Exists(file)
             ? JsonDocument.Parse(File.ReadAllBytes(file))

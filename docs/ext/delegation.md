@@ -20,14 +20,14 @@ This extension switches on no optional record type.
 
 ## Agent Summary {#agent-summary}
 
-- Brief each worker with goal, context, sources, and output. (standards/rule/ext-delegation.write-a-brief-before-delegating)
-- Hold each worker inside its named paths. (standards/rule/ext-delegation.restrict-a-worker-to-its-paths)
-- Ask the brief first, then ask a person. (standards/rule/ext-delegation.ask-only-unanswered-questions)
-- Re-run verification before accepting worker output. (standards/rule/ext-delegation.verify-before-accepting-worker-output)
+- Brief each worker with goal, context, sources, and output. (litespec/rule/ext-delegation.write-a-brief-before-delegating)
+- Hold each worker inside its named paths. (litespec/rule/ext-delegation.restrict-a-worker-to-its-paths)
+- Ask the brief first, then ask a person. (litespec/rule/ext-delegation.ask-only-unanswered-questions)
+- Re-run verification before accepting worker output. (litespec/rule/ext-delegation.verify-before-accepting-worker-output)
 
 ## Standards
 
-### Write a brief before delegating (standards/rule/ext-delegation.write-a-brief-before-delegating)
+### Write a brief before delegating (litespec/rule/ext-delegation.write-a-brief-before-delegating)
 
 **Requirement:** An agent that starts another agent MUST give it a written brief stating goal, context, sources, and output.
 
@@ -42,19 +42,19 @@ Sources: the records and pages to read first.
 Output: the files to change and the report to write.
 ```
 
-### Restrict a worker to its paths (standards/rule/ext-delegation.restrict-a-worker-to-its-paths)
+### Restrict a worker to its paths (litespec/rule/ext-delegation.restrict-a-worker-to-its-paths)
 
 **Requirement:** A delegated worker MUST stay inside the paths its brief names and commit nothing.
 
 **Rationale:** A worker with the whole tree rewrites what another worker owns.
 
-### Ask only unanswered questions (standards/rule/ext-delegation.ask-only-unanswered-questions)
+### Ask only unanswered questions (litespec/rule/ext-delegation.ask-only-unanswered-questions)
 
 **Requirement:** A delegated worker MUST ask no question its brief answers.
 
 **Rationale:** A question the brief answers is a reading failure, not a gap in the brief.
 
-### Verify before accepting worker output (standards/rule/ext-delegation.verify-before-accepting-worker-output)
+### Verify before accepting worker output (litespec/rule/ext-delegation.verify-before-accepting-worker-output)
 
 **Requirement:** A delegating agent MUST re-run the verification its brief names before accepting worker output.
 
@@ -72,7 +72,7 @@ This extension adds no required package.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-delegation.write-a-brief-before-delegating | guidance | Does each brief state goal, context, sources and output? |
-| standards/rule/ext-delegation.restrict-a-worker-to-its-paths | checkable | `git diff --name-only` lists only the brief's named paths, and the worker commits nothing. |
-| standards/rule/ext-delegation.ask-only-unanswered-questions | guidance | Did the worker ask only questions its brief leaves unanswered? |
-| standards/rule/ext-delegation.verify-before-accepting-worker-output | guidance | Which verification run did the delegating agent watch pass before accepting the output? |
+| litespec/rule/ext-delegation.write-a-brief-before-delegating | guidance | Does each brief state goal, context, sources and output? |
+| litespec/rule/ext-delegation.restrict-a-worker-to-its-paths | checkable | `git diff --name-only` lists only the brief's named paths, and the worker commits nothing. |
+| litespec/rule/ext-delegation.ask-only-unanswered-questions | guidance | Did the worker ask only questions its brief leaves unanswered? |
+| litespec/rule/ext-delegation.verify-before-accepting-worker-output | guidance | Which verification run did the delegating agent watch pass before accepting the output? |

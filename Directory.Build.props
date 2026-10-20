@@ -1,6 +1,6 @@
 <Project>
     <!--
-        The standards repository builds its own tools with its own settings.
+        The LiteSpec repository builds its own tools with its own settings.
         A consumer checks this repository out as a submodule, so without this
         file the consumer's root MSBuild files would apply inside it.
     -->

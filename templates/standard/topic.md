@@ -6,11 +6,11 @@ State the page scope and the boundary it owns.
 
 ## Agent Summary {#agent-summary}
 
-- State one high-risk projection and cite its canonical provision. ({standards/rule/page.state-one-action})
+- State one high-risk projection and cite its canonical provision. ({litespec/rule/page.state-one-action})
 
 ## Standards
 
-### State one action ({standards/rule/page.state-one-action})
+### State one action ({litespec/rule/page.state-one-action})
 
 **Requirement:** The named actor MUST perform one testable action.
 
@@ -20,7 +20,7 @@ State the page scope and the boundary it owns.
 
 ## Conventions
 
-### Use one default ({standards/rule/page.use-one-default})
+### Use one default ({litespec/rule/page.use-one-default})
 
 **Default:** State one replaceable default.
 
@@ -30,5 +30,5 @@ State the page scope and the boundary it owns.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| {standards/rule/page.state-one-action} | checkable | `node tools/validate-standards.mjs` reports this provision satisfied on the page that carries it. |
-| {standards/rule/page.use-one-default} | guidance | Does the page carry the default or its named local replacement? |
+| {litespec/rule/page.state-one-action} | checkable | `node tools/validate-standards.mjs` reports this provision satisfied on the page that carries it. |
+| {litespec/rule/page.use-one-default} | guidance | Does the page carry the default or its named local replacement? |
