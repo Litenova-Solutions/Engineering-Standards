@@ -14,7 +14,7 @@ Treat active standards as the complete current contract. (standards/rule/core-au
 
 Do not retain history-specific paths, IDs, terminology, aliases, maps, standards-release migration material, compatibility rules, or transition checks. (standards/rule/core-authoring.exclude-historical-transition-material)
 
-Keep release context in `CHANGELOG.md` and Git history. The repository validator evaluates current material only. (standards/rule/core-authoring.validate-current-standards-material)
+Keep release context in `CHANGELOG.md`, the `changelog/` archives, and Git history. The repository validator evaluates current material only. (standards/rule/core-authoring.validate-current-standards-material)
 
 ## Provision Changes
 
@@ -94,7 +94,7 @@ A consumer records the release it reviewed in `reviewedStandardsVersion`, so ado
 
 `standards/rule/core-authoring.exclude-cross-release-compatibility-work` covers standards releases only. A consumer product is a running service, and its own API compatibility, migration, deprecation, and rollback provisions still apply.
 
-`CHANGELOG.md` is the repository release note. The changelog describes the current contract without prescribing a transition path. (standards/rule/core-authoring.validate-current-standards-material)
+`CHANGELOG.md` is the repository release note for the current major version. When a new major version starts, the previous major version's entries move to `changelog/v<major>.md`, linked from the top of `CHANGELOG.md`. The changelog describes the current contract without prescribing a transition path. An entry states one change and who it affects. It links to the page holding the detail rather than restating it. (standards/rule/core-authoring.validate-current-standards-material)
 
 ## Maintainer Review
 

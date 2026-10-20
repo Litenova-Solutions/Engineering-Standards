@@ -135,4 +135,4 @@ Each frontend page is stack-neutral, with short per-stack sections for what diff
 - [Decision records](reference/decision-records.md)
 - [Consumer templates](../templates/consumer/README.md)
 
-Consumers pin a complete release. `CHANGELOG.md` is the only repository release note.
+Consumers pin a complete release. `CHANGELOG.md` is the repository release note for the current major version, and `changelog/v<major>.md` holds each earlier major version.

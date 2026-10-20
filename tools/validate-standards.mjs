@@ -184,8 +184,11 @@ function walk(directory, predicate, result = []) {
 function isCurrentStandardsMaterial(relative) {
   // The model tool owns its own directory: its fixtures are consumer-shaped
   // test data that can never satisfy the authoring contract, and its own
-  // suite checks the tool. The authoring checks read the standards material.
+  // suite checks the tool. The changelog and its archives are release history.
+  // The authoring checks read the standards material.
   return relative !== 'CHANGELOG.md'
+    && relative !== 'changelog'
+    && !relative.startsWith('changelog/')
     && relative !== 'LICENSE.md'
     && relative !== 'tools/model'
     && !relative.startsWith('tools/model/');

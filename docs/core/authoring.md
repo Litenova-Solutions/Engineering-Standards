@@ -70,7 +70,7 @@ Standards define required boundaries. Conventions define replaceable defaults. I
 
 In this repository, `AGENTS.md` and Agent Summary sections are concise projections. Every projected policy cites its canonical provision ID. A projection cannot introduce or strengthen an obligation. A consumer `AGENTS.md` carries Tier-0 instructions, which cite the project Exception records and local conventions.
 
-`CONTRIBUTING.md` owns contribution workflow and review. `CHANGELOG.md` is the only repository release note.
+`CONTRIBUTING.md` owns contribution workflow and review. `CHANGELOG.md` is the repository release note for the current major version, and `changelog/v<major>.md` holds each earlier major version.
 
 Current standards material is the published snapshot. The validator evaluates current material, not release history.
 
