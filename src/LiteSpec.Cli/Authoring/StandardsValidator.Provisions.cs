@@ -250,7 +250,7 @@ static partial class StandardsValidator
     {
         // A provision whose Requirement or Default only repeats its own heading
         // states no obligation. The heading is a label; the assertion belongs in the
-        // labeled block. (litespec/rule/core-authoring.write-atomic-standards-provisions, litespec/rule/core-authoring.identify-actionable-conventions)
+        // labeled block. (litespec/core/authoring#write-atomic-standards-provisions, litespec/core/authoring#identify-actionable-conventions)
         foreach (var provision in provisions)
         {
             var label = provision.Section == "Standards" ? "Requirement" : "Default";
@@ -272,7 +272,7 @@ static partial class StandardsValidator
     static void CheckSummaryRestatement(string relative, List<Provision> provisions, List<SummaryReference> summaryReferences, Action<string, int, string, string> add)
     {
         // Tier 1 exists to compress Tier 2. A bullet identical to its provision adds
-        // no context and makes the escalation pointless. (litespec/rule/core-authoring.keep-agent-summaries-informative)
+        // no context and makes the escalation pointless. (litespec/core/authoring#keep-agent-summaries-informative)
         foreach (var reference in summaryReferences)
         {
             var provision = provisions.FirstOrDefault(item => item.Id == reference.Id);
@@ -316,7 +316,7 @@ static partial class StandardsValidator
         // header names the columns, so the provision index reads the marks from the
         // same rows this gate checks.
         var verification = sections.FirstOrDefault(section => section.Name == "Verification");
-        if (verification is null || (kind != "topic" && kind != "profile" && kind != "extension"))
+        if (verification is null || (kind != "topic" && kind != "stack" && kind != "extension"))
         {
             return;
         }

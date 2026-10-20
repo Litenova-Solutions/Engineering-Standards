@@ -15,7 +15,7 @@
   "properties": {
     "kind": { "const": "design-contract" },
     "schemaVersion": {
-      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See litespec/rule/core-authoring.publish-each-release-as-a-complete-contract and litespec/rule/core-authoring.exclude-cross-release-compatibility-work.",
+      "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See litespec/core/authoring#publish-each-release-as-a-complete-contract and litespec/core/authoring#exclude-cross-release-compatibility-work.",
       "const": 1
     },
     "package": {

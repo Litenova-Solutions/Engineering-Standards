@@ -140,7 +140,7 @@
     },
     "standardsProvisionId": {
       "type": "string",
-      "pattern": "^litespec/(rule|convention)/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+      "pattern": "^litespec/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*#[a-z0-9]+(?:-[a-z0-9]+)*$"
     },
     "genericRecordId": {
       "type": "string",

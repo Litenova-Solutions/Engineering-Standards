@@ -71,7 +71,12 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "non-action heading")]
     public void NonActionHeading() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the topic bounded", "### Topic boundary")),
+        root =>
+        {
+            var page = StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the topic bounded", "### Topic boundary");
+            page = page.Replace("litespec/core/topic#keep-the-topic-bounded", "litespec/core/topic#topic-boundary");
+            StandardsFixture.Write(root, "docs/core/topic.md", page);
+        },
         ["HEADING_ACTION"]);
 
     [Fact(DisplayName = "uncited agent projection")]

@@ -141,7 +141,7 @@ public sealed partial class StandardsValidatorTests
         root =>
         {
             StandardsFixture.Write(root, "schemas/litespec-project.schema.json", StandardsFixture.ShippedProjectSchema());
-            StandardsFixture.Write(root, "templates/consumer/litespec.project.json", "{\"overrides\":[{\"provisionId\":\"litespec/rule/core-topic.keep-the-topic-bounded\"}]}");
+            StandardsFixture.Write(root, "templates/consumer/litespec.project.json", "{\"overrides\":[{\"provisionId\":\"litespec/core/topic#keep-the-topic-bounded\"}]}");
         },
         ["SCHEMA_INVALID"]);
 

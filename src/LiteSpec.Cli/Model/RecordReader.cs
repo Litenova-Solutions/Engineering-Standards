@@ -1,4 +1,5 @@
 using System.Text.Json;
+using LiteSpec.Authoring;
 
 namespace LiteSpec.Model;
 
@@ -379,27 +380,16 @@ static class RecordReader
 
     private static IReadOnlySet<string> ReadProvisions(ConsumerConfig config)
     {
-        var docs = Path.Combine(config.Root, "litespec", "docs");
+        var root = Path.Combine(config.Root, "litespec");
 
-        if (!Directory.Exists(docs))
+        if (!Directory.Exists(Path.Combine(root, "docs")))
         {
             return new HashSet<string>(StringComparer.Ordinal);
         }
 
-        var found = new HashSet<string>(StringComparer.Ordinal);
-
-        foreach (var file in SourceTree.Files(docs, ".md"))
-        {
-            foreach (var line in File.ReadLines(file))
-            {
-                foreach (var match in Identifiers.ProvisionHeading().Matches(line).Cast<System.Text.RegularExpressions.Match>())
-                {
-                    found.Add(match.Value.Trim('(', ')'));
-                }
-            }
-        }
-
-        return found;
+        return new HashSet<string>(
+            Provisions.Collect(root).Select(row => row.Id),
+            StringComparer.Ordinal);
     }
 
     private static string? StringField(JsonElement element, string name) =>

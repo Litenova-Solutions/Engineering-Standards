@@ -44,17 +44,20 @@ sealed record StackSet(
     ITestRunReader TestRuns);
 
 /// <summary>
-///     Picks the readers for a consumer: the backend and scenario readers from the
-///     project's backend stack, one frontend reader per declared frontend from its
-///     platform, and a test-run reader across every supported result format.
+///     Picks the readers for a consumer: the .NET backend and scenario readers when the
+///     project names the dotnet or blazor stack, one frontend reader per declared
+///     frontend from its platform, and a test-run reader across every supported result format.
 /// </summary>
 static class StackReaders
 {
     /// <summary>Picks the readers for the consumer.</summary>
     public static StackSet For(ConsumerConfig config)
     {
-        IBackendReader backend = new DotnetBackendReader();
-        IScenarioReader scenarios = new DotnetScenarioReader();
+        var dotnet = config.Stacks.Contains("dotnet", StringComparer.Ordinal)
+            || config.Stacks.Contains("blazor", StringComparer.Ordinal);
+
+        IBackendReader backend = dotnet ? new DotnetBackendReader() : new EmptyBackendReader();
+        IScenarioReader scenarios = dotnet ? new DotnetScenarioReader() : new EmptyScenarioReader();
 
         var frontends = new List<IFrontendReader>();
 
@@ -69,5 +72,18 @@ static class StackReaders
         ITestRunReader runs = new CombinedTestRunReader(new TrxTestRunReader(), new JUnitRunReader());
 
         return new StackSet(backend, frontends, scenarios, runs);
+    }
+
+    /// <summary>Reads no backend: the project names no stack with .NET sources.</summary>
+    sealed class EmptyBackendReader : IBackendReader
+    {
+        public CodeModel Read(ConsumerConfig config) => new();
+    }
+
+    /// <summary>Reads no scenarios: the project names no stack with .NET tests.</summary>
+    sealed class EmptyScenarioReader : IScenarioReader
+    {
+        public TestRead Read(ConsumerConfig config) =>
+            new([], [], new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal));
     }
 }

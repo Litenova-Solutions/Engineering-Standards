@@ -19,11 +19,11 @@ static class StandardsFixture
 
         ## Agent Summary {#agent-summary}
 
-        - Keep the topic bounded. (litespec/rule/core-topic.keep-the-topic-bounded)
+        - Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)
 
         ## Standards
 
-        ### Keep the topic bounded (litespec/rule/core-topic.keep-the-topic-bounded)
+        ### Keep the topic bounded
 
         **Requirement:** Consumers MUST keep the topic inside its declared boundary.
 
@@ -31,7 +31,7 @@ static class StandardsFixture
 
         ## Conventions
 
-        ### Use the default location (litespec/convention/core-topic.use-the-default-location)
+        ### Use the default location
 
         **Default:** Store the topic in its owning documentation area.
 
@@ -41,8 +41,8 @@ static class StandardsFixture
 
         | ID | Mark | Evidence |
         |:---|:---|:---|
-        | litespec/rule/core-topic.keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |
-        | litespec/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |
+        | litespec/core/topic#keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |
+        | litespec/core/topic#use-the-default-location | guidance | Does the topic live in its owning documentation area? |
         """) + "\n";
 
     /// <summary>The extension page, with CLI evidence.</summary>
@@ -67,11 +67,11 @@ static class StandardsFixture
 
         ## Agent Summary {#agent-summary}
 
-        - Record extension activation. (litespec/rule/ext-sample.record-extension-activation)
+        - Record extension activation. (litespec/ext/sample#record-extension-activation)
 
         ## Standards
 
-        ### Record extension activation (litespec/rule/ext-sample.record-extension-activation)
+        ### Record extension activation
 
         **Requirement:** Consumers MUST record activation on each applicable specification.
 
@@ -87,30 +87,26 @@ static class StandardsFixture
 
         | ID | Mark | Evidence |
         |:---|:---|:---|
-        | litespec/rule/ext-sample.record-extension-activation | checkable | `litespec validate` confirms each applicable specification records its activation. |
+        | litespec/ext/sample#record-extension-activation | checkable | `litespec validate` confirms each applicable specification records its activation. |
         """) + "\n";
 
-    /// <summary>The profile page, with CLI evidence.</summary>
-    public static readonly string ProfilePage = Normalize("""
-        # Sample Profile
+    /// <summary>The stack page, with CLI evidence.</summary>
+    public static readonly string StackPage = Normalize("""
+        # Sample Stack
 
         ## Intent
 
-        This profile selects one standards composition.
+        This stack selects one standards composition.
 
         ## Agent Summary {#agent-summary}
 
-        - Apply the complete profile. (litespec/rule/profile-sample.apply-the-complete-profile)
+        - Apply the complete stack. (litespec/backend/sample/stack#apply-the-complete-stack)
 
         ## Standards
 
-        ### Apply the complete profile (litespec/rule/profile-sample.apply-the-complete-profile)
+        ### Apply the complete stack
 
-        **Requirement:** Consumers MUST apply every document in the selected profile composition.
-
-        ## Composition
-
-        - [Topic standard](../core/topic.md)
+        **Requirement:** Consumers MUST apply every document in the selected stack composition.
 
         ## Conventions
 
@@ -120,7 +116,7 @@ static class StandardsFixture
 
         | ID | Mark | Evidence |
         |:---|:---|:---|
-        | litespec/rule/profile-sample.apply-the-complete-profile | checkable | `litespec validate` compares the stack composition with its manifest entry. |
+        | litespec/backend/sample/stack#apply-the-complete-stack | checkable | `litespec validate` confirms every document in the selected stack composition. |
         """) + "\n";
 
     /// <summary>The how-to page.</summary>
@@ -275,7 +271,7 @@ static class StandardsFixture
     {
         Write(root, "docs/core/topic.md", TopicPage);
         Write(root, "docs/ext/sample.md", ExtensionPage);
-        Write(root, "docs/profile/sample.md", ProfilePage);
+        Write(root, "docs/backend/sample/stack.md", StackPage);
         Write(root, "docs/guide/sample.md", GuidePage);
         Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nUse this page to find repository documentation.\n\n" + IndexRouting);
         Write(root, "docs/tutorial/sample.md", TutorialPage);

@@ -3,10 +3,25 @@ namespace LiteSpec.Tests.Authoring;
 /// <summary>Identifier, Standard, and Convention cases, each asserting its diagnostic codes.</summary>
 public sealed partial class StandardsValidatorTests
 {
-    [Fact(DisplayName = "duplicate ID")]
+    [Fact(DisplayName = "duplicate slug on one page")]
     public void DuplicateId() => Check(
-        root => StandardsFixture.Write(root, "docs/core/duplicate.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "# Topic Standard", "# Duplicate Standard")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "## Conventions", "### Keep the topic bounded\n\n**Requirement:** Consumers MUST keep the topic inside its declared boundary.\n\n## Conventions")),
         ["ID_DUPLICATE"]);
+
+    [Fact(DisplayName = "identifier text in a provision heading")]
+    public void IdInHeading() => Check(
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the topic bounded", "### Keep the topic bounded (litespec/core/topic#keep-the-topic-bounded)")),
+        ["ID_IN_HEADING"]);
+
+    [Fact(DisplayName = "legacy litespec rule citation")]
+    public void LegacyRuleCitation() => Check(
+        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe page cites litespec/rule/core-topic.keep-the-topic-bounded.\n"),
+        ["REMOVED_IDENTIFIER"]);
+
+    [Fact(DisplayName = "page file name that is not kebab case")]
+    public void PageFileNameNotKebab() => Check(
+        root => StandardsFixture.Write(root, "docs/core/TwoWords.md", StandardsFixture.TopicPage),
+        ["ID_PAGE_FILENAME"]);
 
     [Fact(DisplayName = "missing requirement")]
     public void MissingRequirement() => Check(
@@ -35,37 +50,27 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "summary without ID")]
     public void SummaryWithoutId() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/rule/core-topic.keep-the-topic-bounded)", "- Keep the topic bounded.")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)", "- Keep the topic bounded.")),
         ["SUMMARY_MISSING_ID"]);
 
     [Fact(DisplayName = "missing evidence row")]
     public void MissingEvidenceRow() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/rule/core-topic.keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |\n", "")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/core/topic#keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |\n", "")),
         ["VERIFY_MISSING_ID"]);
-
-    [Fact(DisplayName = "missing provision ID")]
-    public void MissingProvisionId() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the topic bounded (litespec/rule/core-topic.keep-the-topic-bounded)", "### Keep the topic bounded")),
-        ["ID_MISSING"]);
-
-    [Fact(DisplayName = "misplaced provision ID")]
-    public void MisplacedProvisionId() => Check(
-        root => StandardsFixture.Write(root, "docs/guide/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.GuidePage, "## Procedure", "## Procedure\n\n### Keep extra work bounded (litespec/rule/guide-sample.keep-extra-work-bounded)\n\nRecord one informative note.")),
-        ["ID_LOCATION"]);
 
     [Fact(DisplayName = "unknown active ID")]
     public void UnknownActiveId() => Check(
-        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe page cites litespec/rule/core-topic.unknown-rule.\n"),
+        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe page cites litespec/core/topic#unknown-rule.\n"),
         ["ID_UNKNOWN_REFERENCE"]);
 
     [Fact(DisplayName = "stale citation")]
     public void StaleCitation() => Check(
-        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe page cites litespec/rule/core-topic.keep-the-topic-bounded-elsewhere.\n"),
+        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe page cites litespec/core/topic#keep-the-topic-bounded-elsewhere.\n"),
         ["ID_UNKNOWN_REFERENCE"]);
 
     [Fact(DisplayName = "grammar notation is not a citation")]
     public void GrammarNotationIsNotCitation() => Check(
-        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nAn identifier uses litespec/<kind>/<page>.<heading-slug> as its grammar.\n\n" + StandardsFixture.IndexRouting),
+        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nAn identifier uses litespec/<page>#<slug> as its grammar.\n\n" + StandardsFixture.IndexRouting),
         []);
 
     [Fact(DisplayName = "unsupported modal vocabulary")]

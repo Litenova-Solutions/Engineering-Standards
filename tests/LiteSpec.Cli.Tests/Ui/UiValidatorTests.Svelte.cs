@@ -7,7 +7,7 @@ namespace LiteSpec.Tests.Ui;
 /// </summary>
 public sealed partial class UiValidatorTests
 {
-    // Svelte sources (litespec/rule/frontend-ui.restrict-css-decisions).
+    // Svelte sources (litespec/frontend/web/ui#restrict-css-decisions).
 
     [Fact]
     public void A_Svelte_File_Is_Scanned_For_Utility_Violations()
@@ -90,10 +90,10 @@ public sealed partial class UiValidatorTests
             "second general-purpose visual dependency 'flowbite-svelte' requires an exception");
     }
 
-    // Svelte baseline (litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package,
-    // litespec/rule/frontend-ui.track-source-changes,
-    // litespec/rule/frontend-ui.select-one-visual-authority,
-    // litespec/rule/frontend-components.compose-composites-in-page-code).
+    // Svelte baseline (litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package,
+    // litespec/frontend/web/ui#track-source-changes,
+    // litespec/frontend/ui#select-one-visual-authority,
+    // litespec/frontend/components#compose-composites-in-page-code).
 
     [Fact]
     public void A_Svelte_Package_Validates_Against_The_Svelte_Baseline()
@@ -112,7 +112,7 @@ public sealed partial class UiValidatorTests
             fixture.PathCase(
                 "apps/web/src/routes/bits.svelte",
                 "<script>\nimport { Dialog } from \"bits-ui\";\n</script>\n<Dialog />\n"),
-            "[litespec/rule/frontend-components.compose-composites-in-page-code] apps/web/src/routes/bits.svelte: imports the primitive library directly");
+            "[litespec/frontend/components#compose-composites-in-page-code] apps/web/src/routes/bits.svelte: imports the primitive library directly");
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public sealed partial class UiValidatorTests
             fixture.PathCase(
                 "packages/ui/src/floorplans/card.svelte",
                 "<div class=\"text-red-500\">Overdue</div>\n"),
-            "[litespec/rule/frontend-ui.restrict-css-decisions] packages/ui/src/floorplans/card.svelte: raw Tailwind palette value requires a semantic token 'text-red-500'");
+            "[litespec/frontend/web/ui#restrict-css-decisions] packages/ui/src/floorplans/card.svelte: raw Tailwind palette value requires a semantic token 'text-red-500'");
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public sealed partial class UiValidatorTests
         fixture.MutateLock(sourceLock => ((JsonObject)sourceLock["preset"]!)["baseColor"] = "slate");
         UiFixture.AssertProblem(
             fixture.Run(),
-            "[litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: preset.baseColor does not match the manifest baseline");
+            "[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: preset.baseColor does not match the manifest baseline");
     }
 
     [Fact]
@@ -195,7 +195,7 @@ public sealed partial class UiValidatorTests
         UiFixture.WriteJson(fixture.ComponentsFile, components);
         UiFixture.AssertProblem(
             fixture.Run(),
-            "[litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: tailwind.baseColor must be 'neutral'");
+            "[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] packages/ui/components.json: tailwind.baseColor must be 'neutral'");
     }
 
     [Fact]
@@ -219,7 +219,7 @@ public sealed partial class UiValidatorTests
         var components = (JsonObject)UiFixture.ReadJson(fixture.ComponentsFile)!;
         components["registry"] = "https://blocks.fixture.test";
         UiFixture.WriteJson(fixture.ComponentsFile, components);
-        fixture.WriteException("extra-registry", "litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package", "2099-01-01");
+        fixture.WriteException("extra-registry", "litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package", "2099-01-01");
         UiFixture.AssertClean(fixture.Run());
     }
 
@@ -228,10 +228,10 @@ public sealed partial class UiValidatorTests
     {
         using var fixture = UiFixture.Create();
         fixture.AsSvelte();
-        fixture.WriteException("ui-authority", "litespec/rule/frontend-ui.select-one-visual-authority", "2020-01-01");
+        fixture.WriteException("ui-authority", "litespec/frontend/ui#select-one-visual-authority", "2020-01-01");
         UiFixture.AssertProblem(
             fixture.Run(),
-            "[litespec/rule/frontend-ui.select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision");
+            "[litespec/frontend/ui#select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision");
     }
 
     [Fact]

@@ -7,8 +7,8 @@ namespace LiteSpec.Tests.Ui;
 /// </summary>
 public sealed partial class UiValidatorTests
 {
-    // Design contract (litespec/rule/frontend-ui.publish-a-design-contract,
-    // litespec/rule/frontend-ui.declare-a-closed-floorplan-set).
+    // Design contract (litespec/frontend/ui#publish-a-design-contract,
+    // litespec/frontend/ui#declare-a-closed-floorplan-set).
 
     [Fact]
     public void Shared_Package_With_No_Design_Contract()
@@ -52,11 +52,11 @@ public sealed partial class UiValidatorTests
         UiFixture.AssertClean(fixture.Run());
     }
 
-    // Pattern catalog (litespec/rule/frontend-patterns.keep-one-pattern-catalog,
-    // litespec/rule/frontend-patterns.record-every-option-considered,
-    // litespec/rule/frontend-patterns.declare-the-compact-behaviour,
-    // litespec/rule/frontend-patterns.implement-a-chosen-pattern-once,
-    // litespec/rule/frontend-patterns.state-the-implementation-status).
+    // Pattern catalog (litespec/frontend/patterns#keep-one-pattern-catalog,
+    // litespec/frontend/patterns#record-every-option-considered,
+    // litespec/frontend/patterns#declare-the-compact-behaviour,
+    // litespec/frontend/web/patterns#implement-a-chosen-pattern-once,
+    // litespec/frontend/patterns#state-the-implementation-status).
 
     [Fact]
     public void The_Shipped_Pattern_Catalog_Is_Accepted()
@@ -251,7 +251,7 @@ public sealed partial class UiValidatorTests
             "pattern 'orders-list-page' has a duplicate option id 'filter-table'");
     }
 
-    // Pattern library citations (litespec/rule/frontend-patterns.keep-one-pattern-catalog).
+    // Pattern library citations (litespec/frontend/patterns#keep-one-pattern-catalog).
 
     [Fact]
     public void The_Fixture_Validator_Accepts_The_Shipped_Catalog()

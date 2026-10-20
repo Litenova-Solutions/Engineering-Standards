@@ -10,19 +10,19 @@ An extension may add requirements, packages, projects, and verification. It repl
 
 | Extension | Activation scope | Replaces | Switches on | Activate when |
 |:---|:---|:---|:---|:---|
-| [bdd](bdd.md) | `local` | None | `case` | Shared critical examples need executable BDD scenarios. |
+| [bdd](../backend/dotnet/ext/bdd.md) | `local` | None | `case` | Shared critical examples need executable BDD scenarios. |
 | [compat](compat.md) | `project` | None | None | Public or independently deployed consumers need breaking-change detection and versioning. |
 | [cache](cache.md) | `local` | None | `limit` | Measurements show repeated expensive reads with bounded staleness. |
 | [concurrency](concurrency.md) | `local` | None | `limit` | Conflicting writes or repeated delivery can violate behavior. |
 | [lifecycle](lifecycle.md) | `local` | None | `limit` | Deletion, retention, archival, restore, or legal hold behavior applies. |
 | [containers](containers.md) | `project` | None | `limit`, `runbook` | A hosted environment deploys container images. |
 | [integrations](integrations.md) | `local` | None | None | Behavior calls or receives data from an external system. |
-| [audit](audit.md) | `project` | `litespec/rule/quality-security.record-security-audit-events` | None | A reviewer must establish who acted inside data another party owns. |
+| [audit](audit.md) | `project` | `litespec/quality/security#record-security-audit-events` | None | A reviewer must establish who acted inside data another party owns. |
 | [locale](locale.md) | `project` | None | None | The product commits to more than one locale. |
 | [mcp](mcp.md) | `project` | None | None | The product ships a Model Context Protocol server an LLM client starts on a user's own machine. |
 | [tenancy](tenancy.md) | `project` | None | None | Independent customer organizations share one deployment. |
-| [outbox](outbox.md) | `local` | `litespec/rule/backend-persistence.collect-events-without-a-public-unit-of-work` | `event`, `limit`, `runbook` | A committed change requires delivery that cannot be lost. |
-| [efcore](efcore.md) | `local` | The persistence and dependency provisions its Baseline relationship section names | None | Selected aggregates require relational persistence instead of Marten. |
+| [outbox](outbox.md) | `local` | `litespec/backend/persistence#collect-events-without-a-public-unit-of-work` | `event`, `limit`, `runbook` | A committed change requires delivery that cannot be lost. |
+| [efcore](../backend/dotnet/ext/efcore.md) | `local` | The persistence and dependency provisions its Baseline relationship section names | None | Selected aggregates require relational persistence instead of Marten. |
 | [realtime](realtime.md) | `local` | None | `event`, `limit` | Polling cannot meet a measured update-latency requirement. |
 | [report](report.md) | `local` | None | `limit` | Complex reports or large exports exceed normal request reads. |
 | [jobs](jobs.md) | `local` | None | `limit`, `runbook` | Behavior requires recurring, delayed, or calendar-based Worker work. |
@@ -38,7 +38,7 @@ The manifest is the machine-readable source for `activationScope`, `replaces`, a
 
 ## Activation
 
-`litespec/rule/core-scope.select-conditional-extensions-explicitly` states when an extension activates. `litespec/rule/core-scope.record-selected-extensions` states where it is listed. `litespec/rule/core-scope.record-selected-extensions` requires the project record.
+`litespec/core/scope#select-conditional-extensions-explicitly` states when an extension activates. `litespec/core/scope#record-selected-extensions` states where it is listed. `litespec/core/scope#record-selected-extensions` requires the project record.
 
 The [agent protocol](../core/agent.md) carries the ordered steps an agent follows.
 
@@ -55,4 +55,4 @@ The project selects both `locale` and `outbox`, each with the criterion it met a
 }
 ```
 
-`litespec/rule/core-scope.select-conditional-extensions-explicitly` requires that an extension is selected only when its criteria apply, and the object form records which criterion that was. The consumer validator reports a selection whose `reviewBy` has passed. A selection that costs nothing to keep is a selection nobody removes.
+`litespec/core/scope#select-conditional-extensions-explicitly` requires that an extension is selected only when its criteria apply, and the object form records which criterion that was. The consumer validator reports a selection whose `reviewBy` has passed. A selection that costs nothing to keep is a selection nobody removes.

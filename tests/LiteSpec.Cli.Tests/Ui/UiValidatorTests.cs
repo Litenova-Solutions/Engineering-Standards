@@ -14,7 +14,7 @@ public sealed partial class UiValidatorTests
         UiFixture.AssertClean(fixture.Run());
     }
 
-    // Allowed construction (litespec/rule/frontend-ui.restrict-css-decisions).
+    // Allowed construction (litespec/frontend/web/ui#restrict-css-decisions).
 
     [Fact]
     public void Approved_Layout_Utilities()
@@ -143,7 +143,7 @@ public sealed partial class UiValidatorTests
             "import { ListPage } from \"@fixture/ui/floorplans\";\nexport function Case() {\n  return <ListPage title=\"Orders\" />;\n}\n"));
     }
 
-    // Restricted Tailwind use (litespec/rule/frontend-ui.restrict-css-decisions).
+    // Restricted Tailwind use (litespec/frontend/web/ui#restrict-css-decisions).
 
     [Fact]
     public void Arbitrary_Length()

@@ -51,16 +51,16 @@ The system contains one delivery approach and one operating model:
 
 ## Agent Summary {#agent-summary}
 
-- Agents stop and ask when a decision belongs to a person. (litespec/rule/core-system.keep-decision-authority-with-accountable-people)
-- Approved records define the work, and each one situates its subject. (litespec/rule/core-system.drive-work-from-approved-records, litespec/rule/core-system.state-one-occasion-for-every-behavior-record)
-- Journeys link their use cases rather than restate them, and every use case names what reaches it. (litespec/rule/core-system.connect-one-product-outcome-through-a-journey, litespec/rule/core-system.name-what-calls-a-use-case)
-- One module name is used across every layer. (litespec/rule/core-system.group-language-and-use-cases-by-module)
-- Module pages map business records to state, rules, and commands. (litespec/rule/core-system.make-business-record-ownership-explicit)
-- One use case is one command or query, with computed status and resolvable mapping. (litespec/rule/core-system.deliver-one-complete-use-case, litespec/rule/core-system.compute-use-case-status-from-evidence, litespec/rule/core-system.keep-use-cases-and-handlers-in-one-to-one-correspondence)
-- Every event reaction declares its delivery classification. (litespec/rule/core-system.declare-event-reaction-delivery)
-- Each rule states its kind, and each act needs a permission. (litespec/rule/core-system.state-each-rule-with-its-kind, litespec/rule/core-system.grant-access-through-roles-and-permissions)
-- Records map each business state to a state record. (litespec/rule/core-system.model-every-business-record-lifecycle-with-state-records)
-- Authority follows the ladder, and every link sits on its source record. (litespec/rule/core-system.resolve-authority-by-ladder, litespec/rule/core-system.declare-each-link-on-its-source)
+- Agents stop and ask when a decision belongs to a person. (litespec/core/system#keep-decision-authority-with-accountable-people)
+- Approved records define the work, and each one situates its subject. (litespec/core/system#drive-work-from-approved-records, litespec/core/system#state-one-occasion-for-every-behavior-record)
+- Journeys link their use cases rather than restate them, and every use case names what reaches it. (litespec/core/system#connect-one-product-outcome-through-a-journey, litespec/core/system#name-what-calls-a-use-case)
+- One module name is used across every layer. (litespec/core/system#group-language-and-use-cases-by-module)
+- Module pages map business records to state, rules, and commands. (litespec/core/system#make-business-record-ownership-explicit)
+- One use case is one command or query, with computed status and resolvable mapping. (litespec/core/system#deliver-one-complete-use-case, litespec/core/system#compute-use-case-status-from-evidence, litespec/core/system#keep-use-cases-and-handlers-in-one-to-one-correspondence)
+- Every event reaction declares its delivery classification. (litespec/core/system#declare-event-reaction-delivery)
+- Each rule states its kind, and each act needs a permission. (litespec/core/system#state-each-rule-with-its-kind, litespec/core/system#grant-access-through-roles-and-permissions)
+- Records map each business state to a state record. (litespec/core/system#model-every-business-record-lifecycle-with-state-records)
+- Authority follows the ladder, and every link sits on its source record. (litespec/core/system#resolve-authority-by-ladder, litespec/core/system#declare-each-link-on-its-source)
 
 ## Concepts
 
@@ -281,55 +281,55 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 ## Standards
 
-### Keep decision authority with accountable people (litespec/rule/core-system.keep-decision-authority-with-accountable-people)
+### Keep decision authority with accountable people
 
 **Requirement:** An agent MUST stop affected work and record the question in a draft decision when an unknown fact changes behavior, money, data, access, or recovery.
 
 **Rationale:** Decision owners approve outcomes, terms, policies, criteria, commitments, and risk. An agent contribution stays a proposal until an accountable person accepts it.
 
-### Drive work from approved records (litespec/rule/core-system.drive-work-from-approved-records)
+### Drive work from approved records
 
 **Requirement:** An agent MUST start behavior work from the approved use-case and module records, plus the product and journey records when they exist for the behavior.
 
 **Rationale:** A prompt, ticket, chat message, or code comment can initiate work. The owning record holds the approved behavior, and code does not silently replace it.
 
-### Resolve authority by ladder (litespec/rule/core-system.resolve-authority-by-ladder)
+### Resolve authority by ladder
 
 **Requirement:** Authority MUST follow constraint, then product, requirement, rule, and use case in that order, with every record carrying an owner.
 
 **Rationale:** The ladder settles ties without a meeting; the owner answers for each record.
 
-### Write each record in its catalog shape (litespec/rule/core-system.write-each-record-in-its-catalog-shape)
+### Write each record in its catalog shape
 
 **Requirement:** Every written record MUST use its catalog type, identifier form, home, owner, and status.
 
 **Rationale:** One shape per type lets the model builder read every record the same way.
 
-### Declare each link on its source (litespec/rule/core-system.declare-each-link-on-its-source)
+### Declare each link on its source
 
 **Requirement:** Every written link MUST live on the record the link table names first, with every citation resolving to a written record.
 
 **Rationale:** Links on the source keep each record readable alone; resolving citations keep the graph whole.
 
-### Connect one product outcome through a journey (litespec/rule/core-system.connect-one-product-outcome-through-a-journey)
+### Connect one product outcome through a journey
 
 **Requirement:** A journey MUST link its use-case records without repeating their content, and every public use case sits in a journey or names its background caller.
 
 **Rationale:** A journey can cross modules and include branches, waiting, failure, and recovery. Its tests prove the connected outcome through public boundaries. Repeated content means inputs, rules, refusals, and results.
 
-### Group language and use cases by module (litespec/rule/core-system.group-language-and-use-cases-by-module)
+### Group language and use cases by module
 
 **Requirement:** A module name MUST be identical across documentation, Domain and Application folders, endpoint groups, frontend features, tests, and record identifiers.
 
 **Rationale:** A module is a navigation and ownership boundary. It defines no transaction boundary and needs no runtime `Module` or `IModule` type.
 
-### Make business-record ownership explicit (litespec/rule/core-system.make-business-record-ownership-explicit)
+### Make business-record ownership explicit
 
 **Requirement:** A module page MUST map each business record to its state, rules, and commands, with one record per command unless an approved record demands more.
 
 **Rationale:** One record per command keeps each transaction boundary visible.
 
-### Deliver one complete use case (litespec/rule/core-system.deliver-one-complete-use-case)
+### Deliver one complete use case
 
 **Requirement:** A use case MUST map to one Command or Query, complete only with Domain behavior, Application coordination, persistence, entry points, evidence, and operating impact.
 
@@ -337,7 +337,7 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 **Example:** A use case whose handler throws `NotImplementedException` is not implemented.
 
-### Compute use-case status from evidence (litespec/rule/core-system.compute-use-case-status-from-evidence)
+### Compute use-case status from evidence
 
 **Requirement:** Use-case status MUST come from code, screens, and test runs: implemented when code implements it, verified when every Case passes its proof.
 
@@ -354,7 +354,7 @@ Event:    event/order.cancelled
 Endpoint: CancelOrderEndpoint
 ```
 
-### Keep use cases and handlers in one-to-one correspondence (litespec/rule/core-system.keep-use-cases-and-handlers-in-one-to-one-correspondence)
+### Keep use cases and handlers in one-to-one correspondence
 
 **Requirement:** Every handler MUST resolve to one use case by the folder rule or one `implements` anchor, with every use case resolving back to its handler.
 
@@ -362,7 +362,7 @@ Endpoint: CancelOrderEndpoint
 
 **Example:** `litespec model query use-case/orders.cancel-order` shows the handler the folder rule resolves.
 
-### Name what calls a use case (litespec/rule/core-system.name-what-calls-a-use-case)
+### Name what calls a use case
 
 **Requirement:** A use case MUST declare the entry points it is reached through, or name its background caller with the reason no entry point reaches it.
 
@@ -374,13 +374,13 @@ Endpoint: CancelOrderEndpoint
 "reachedThrough": ["entry-point/webshop"]
 ```
 
-### Declare event reaction delivery (litespec/rule/core-system.declare-event-reaction-delivery)
+### Declare event reaction delivery
 
 **Requirement:** An event reaction MUST declare exactly one delivery classification and deliver with it, never `best-effort-optional` when a record needs its effect.
 
 **Rationale:** The classification tells the reader what a failure costs: rollback, retry, rebuild, or loss.
 
-### State each rule with its kind (litespec/rule/core-system.state-each-rule-with-its-kind)
+### State each rule with its kind
 
 **Requirement:** Each rule MUST state its kind, governed target, and enforcement point, keeping a negation word in its name when its statement says one.
 
@@ -388,19 +388,19 @@ Endpoint: CancelOrderEndpoint
 
 **Example:** `rule/order.cancel-only-before-shipment` is a checked-before rule enforced by the validator.
 
-### Grant access through roles and permissions (litespec/rule/core-system.grant-access-through-roles-and-permissions)
+### Grant access through roles and permissions
 
 **Requirement:** Access MUST flow from actor through role and permission to use case, with each link declared: holds, allows, needs, and offers.
 
 **Rationale:** The chain gives every access decision one path to audit: actor, role, permission, use case. The hold names its scope.
 
-### Model every business-record lifecycle with state records (litespec/rule/core-system.model-every-business-record-lifecycle-with-state-records)
+### Model every business-record lifecycle with state records
 
 **Requirement:** A business-record page MUST map every business state to a sealed state record under one abstract state base.
 
 **Rationale:** This holds from the first implementation, including a record with one current state. An enum, status string, boolean flag, or computed discriminator cannot carry state-specific facts.
 
-### State one occasion for every behavior record (litespec/rule/core-system.state-one-occasion-for-every-behavior-record)
+### State one occasion for every behavior record
 
 **Requirement:** A module, business-record, use-case, or journey page MUST carry a `Scenario` section stating one concrete occasion for its subject.
 
@@ -408,7 +408,7 @@ Endpoint: CancelOrderEndpoint
 
 **Example:** A warehouse scan page states the hour, the parcel queue, and the handheld that lost signal before it states its failure codes.
 
-### Keep a scenario informative (litespec/rule/core-system.keep-a-scenario-informative)
+### Keep a scenario informative
 
 **Requirement:** A `Scenario` section MUST NOT contain a record identifier.
 
@@ -416,7 +416,7 @@ Endpoint: CancelOrderEndpoint
 
 **Example:** A scenario says Alex is refused because the last unit went to somebody else, and the rules table carries the rule.
 
-### Derive every scenario from one reference cast (litespec/rule/core-system.derive-every-scenario-from-one-reference-cast)
+### Derive every scenario from one reference cast
 
 **Requirement:** A consumer MUST record one `scenario-cast` page and draw the people, place, dates, and amounts of every `Scenario` section from it.
 
@@ -424,7 +424,7 @@ Endpoint: CancelOrderEndpoint
 
 **Example:** Alex, the customer who places the order in one record, is the person who receives the shipment in another.
 
-### Update records with behavior (litespec/rule/core-system.update-records-with-behavior)
+### Update records with behavior
 
 **Requirement:** An observable behavior change MUST update its use-case page, implementation, tests, generated contracts, product citation, decision, journey, and operating records together.
 
@@ -432,7 +432,7 @@ Endpoint: CancelOrderEndpoint
 
 ## Conventions
 
-### Use this consumer documentation layout (litespec/rule/core-system.use-this-consumer-documentation-layout)
+### Use this consumer documentation layout
 
 **Default:** Use the consumer documentation layout in this section, creating a directory only when its first real artifact exists.
 
@@ -505,15 +505,15 @@ docs/
 
 The example creates an optional directory only when its first real artifact is added. The example does not create empty directories or placeholder records during inception.
 
-### Group module use-case files by business record (litespec/rule/core-system.group-module-use-case-files-by-business-record)
+### Group module use-case files by business record
 
 **Default:** Group module use-case files under a plural kebab-case business-record subdirectory, each holding that record's page, including a module with one business record.
 
 **Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** A module page cannot carry the business-record page that `litespec/rule/core-system.model-every-business-record-lifecycle-with-state-records` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `use-case/<module>.<name>`, so only the directory changes.
+**Rationale:** A module page cannot carry the business-record page that `litespec/core/system#model-every-business-record-lifecycle-with-state-records` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `use-case/<module>.<name>`, so only the directory changes.
 
-### Keep operational and security references under operations (litespec/rule/core-system.keep-operational-and-security-references-under-operations)
+### Keep operational and security references under operations
 
 **Default:** Keep operating and security reference prose under `docs/operations/`.
 
@@ -521,7 +521,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Enforceable security and privacy rules still belong to their owning use-case sections and rules.
 
-### Use established technical terms (litespec/rule/core-system.use-established-technical-terms)
+### Use established technical terms
 
 **Default:** Use business record, aggregate, Command, Query, repository, projection, outbox, idempotency, and transaction with their accepted technical meanings.
 
@@ -529,7 +529,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Replacing a precise term with a softer synonym hides the established pattern. Explain the term and give an example instead.
 
-### Use ordinary capitalization in prose (litespec/rule/core-system.use-ordinary-capitalization-in-prose)
+### Use ordinary capitalization in prose
 
 **Default:** Write module, use case, journey, business record, rule, event, and decision as ordinary nouns in prose.
 
@@ -537,7 +537,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** Exact record types and code types keep their declared capitalization, so the distinction stays meaningful.
 
-### Keep records readable without tooling (litespec/rule/core-system.keep-records-readable-without-tooling)
+### Keep records readable without tooling
 
 **Default:** Use JSON only for the frontmatter block, and write rules, results, cases, and examples in Markdown.
 
@@ -545,7 +545,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Rationale:** A record that needs tooling to read stops being reviewable by the person who owns its decisions.
 
-### Bound a scenario to 120 words (litespec/rule/core-system.bound-a-scenario-to-120-words)
+### Bound a scenario to 120 words
 
 **Default:** Keep a `Scenario` section within 120 words.
 
@@ -555,7 +555,7 @@ The example creates an optional directory only when its first real artifact is a
 
 ## Reference example
 
-This informative example demonstrates `litespec/rule/core-system.connect-one-product-outcome-through-a-journey`, `litespec/rule/core-system.declare-event-reaction-delivery`, and `litespec/rule/core-system.make-business-record-ownership-explicit`.
+This informative example demonstrates `litespec/core/system#connect-one-product-outcome-through-a-journey`, `litespec/core/system#declare-event-reaction-delivery`, and `litespec/core/system#make-business-record-ownership-explicit`.
 
 The `journey/checkout` journey links `use-case/catalog.reserve-stock`, `use-case/orders.create-order`, `use-case/payments.start-payment`, and `use-case/shipping.dispatch-shipment`. Order cancellation and payment reconciliation are separate journeys.
 
@@ -567,30 +567,30 @@ The orders module contains `Order` and `OrderClaim`. `use-case/orders.cancel-ord
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/core-system.keep-decision-authority-with-accountable-people | guidance | Which draft decision records each question that stopped the work? |
-| litespec/rule/core-system.drive-work-from-approved-records | guidance | Which approved records authorized each behavior change? |
-| litespec/rule/core-system.resolve-authority-by-ladder | guidance | Which ladder settles the conflict, and which record lacks an owner? |
-| litespec/rule/core-system.write-each-record-in-its-catalog-shape | guidance | Which record breaks its catalog type, home, owner, or status? |
-| litespec/rule/core-system.declare-each-link-on-its-source | guidance | Which link sits off its source, and which citation resolves nowhere? |
-| litespec/rule/core-system.connect-one-product-outcome-through-a-journey | guidance | Which journey links the use case, or which background caller replaces it? |
-| litespec/rule/core-system.group-language-and-use-cases-by-module | checkable | `litespec consumer` resolves each module reference to one declared module directory. |
-| litespec/rule/core-system.make-business-record-ownership-explicit | guidance | Which business record lacks its state, rules, or commands on the module page? |
-| litespec/rule/core-system.deliver-one-complete-use-case | guidance | Which layer or evidence does the incomplete use case still lack? |
-| litespec/rule/core-system.compute-use-case-status-from-evidence | guidance | Which use-case status did a hand write instead of the evidence? |
-| litespec/rule/core-system.keep-use-cases-and-handlers-in-one-to-one-correspondence | guidance | Which handler lacks its use case, or which use case lacks its handler? |
-| litespec/rule/core-system.name-what-calls-a-use-case | guidance | Which entry points reach the use case, or which background caller does? |
-| litespec/rule/core-system.declare-event-reaction-delivery | guidance | Which reaction lacks exactly one classification the implementation honors? |
-| litespec/rule/core-system.state-each-rule-with-its-kind | guidance | Which rule lacks its kind, governor, enforcement, or kept negation? |
-| litespec/rule/core-system.grant-access-through-roles-and-permissions | guidance | Which act lacks its actor, role, permission, and use-case path? |
-| litespec/rule/core-system.model-every-business-record-lifecycle-with-state-records | guidance | Which business state lacks its sealed state record in page and code? |
-| litespec/rule/core-system.state-one-occasion-for-every-behavior-record | checkable | `litespec consumer` fails a behavior page carrying no `Scenario` section. |
-| litespec/rule/core-system.keep-a-scenario-informative | checkable | `litespec consumer` fails a `Scenario` section containing a record identifier. |
-| litespec/rule/core-system.derive-every-scenario-from-one-reference-cast | checkable | `litespec consumer` fails a documentation set with no or several `scenario-cast` pages; the reviewer confirms each scenario draws from it. |
-| litespec/rule/core-system.update-records-with-behavior | guidance | Which affected record did the behavior change leave behind? |
-| litespec/rule/core-system.use-this-consumer-documentation-layout | guidance | Which directory breaks the layout without a declared exception? |
-| litespec/rule/core-system.group-module-use-case-files-by-business-record | checkable | `litespec consumer` resolves each use case to its module or one business-record subdirectory. |
-| litespec/rule/core-system.keep-operational-and-security-references-under-operations | guidance | Which operating or security prose sits outside `docs/operations/`? |
-| litespec/rule/core-system.use-established-technical-terms | guidance | Which term replaces an established technical meaning with a softer synonym? |
-| litespec/rule/core-system.use-ordinary-capitalization-in-prose | guidance | Which ordinary noun carries capitalization outside names and identifiers? |
-| litespec/rule/core-system.keep-records-readable-without-tooling | guidance | Which JSON sits outside the frontmatter block? |
-| litespec/rule/core-system.bound-a-scenario-to-120-words | checkable | `litespec consumer` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |
+| litespec/core/system#keep-decision-authority-with-accountable-people | guidance | Which draft decision records each question that stopped the work? |
+| litespec/core/system#drive-work-from-approved-records | guidance | Which approved records authorized each behavior change? |
+| litespec/core/system#resolve-authority-by-ladder | guidance | Which ladder settles the conflict, and which record lacks an owner? |
+| litespec/core/system#write-each-record-in-its-catalog-shape | guidance | Which record breaks its catalog type, home, owner, or status? |
+| litespec/core/system#declare-each-link-on-its-source | guidance | Which link sits off its source, and which citation resolves nowhere? |
+| litespec/core/system#connect-one-product-outcome-through-a-journey | guidance | Which journey links the use case, or which background caller replaces it? |
+| litespec/core/system#group-language-and-use-cases-by-module | checkable | `litespec consumer` resolves each module reference to one declared module directory. |
+| litespec/core/system#make-business-record-ownership-explicit | guidance | Which business record lacks its state, rules, or commands on the module page? |
+| litespec/core/system#deliver-one-complete-use-case | guidance | Which layer or evidence does the incomplete use case still lack? |
+| litespec/core/system#compute-use-case-status-from-evidence | guidance | Which use-case status did a hand write instead of the evidence? |
+| litespec/core/system#keep-use-cases-and-handlers-in-one-to-one-correspondence | guidance | Which handler lacks its use case, or which use case lacks its handler? |
+| litespec/core/system#name-what-calls-a-use-case | guidance | Which entry points reach the use case, or which background caller does? |
+| litespec/core/system#declare-event-reaction-delivery | guidance | Which reaction lacks exactly one classification the implementation honors? |
+| litespec/core/system#state-each-rule-with-its-kind | guidance | Which rule lacks its kind, governor, enforcement, or kept negation? |
+| litespec/core/system#grant-access-through-roles-and-permissions | guidance | Which act lacks its actor, role, permission, and use-case path? |
+| litespec/core/system#model-every-business-record-lifecycle-with-state-records | guidance | Which business state lacks its sealed state record in page and code? |
+| litespec/core/system#state-one-occasion-for-every-behavior-record | checkable | `litespec consumer` fails a behavior page carrying no `Scenario` section. |
+| litespec/core/system#keep-a-scenario-informative | checkable | `litespec consumer` fails a `Scenario` section containing a record identifier. |
+| litespec/core/system#derive-every-scenario-from-one-reference-cast | checkable | `litespec consumer` fails a documentation set with no or several `scenario-cast` pages; the reviewer confirms each scenario draws from it. |
+| litespec/core/system#update-records-with-behavior | guidance | Which affected record did the behavior change leave behind? |
+| litespec/core/system#use-this-consumer-documentation-layout | guidance | Which directory breaks the layout without a declared exception? |
+| litespec/core/system#group-module-use-case-files-by-business-record | checkable | `litespec consumer` resolves each use case to its module or one business-record subdirectory. |
+| litespec/core/system#keep-operational-and-security-references-under-operations | guidance | Which operating or security prose sits outside `docs/operations/`? |
+| litespec/core/system#use-established-technical-terms | guidance | Which term replaces an established technical meaning with a softer synonym? |
+| litespec/core/system#use-ordinary-capitalization-in-prose | guidance | Which ordinary noun carries capitalization outside names and identifiers? |
+| litespec/core/system#keep-records-readable-without-tooling | guidance | Which JSON sits outside the frontmatter block? |
+| litespec/core/system#bound-a-scenario-to-120-words | checkable | `litespec consumer` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |

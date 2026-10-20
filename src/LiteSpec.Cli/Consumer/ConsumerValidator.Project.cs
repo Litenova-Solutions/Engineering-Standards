@@ -9,15 +9,15 @@ namespace LiteSpec.Consumer;
 /// </summary>
 static partial class ConsumerValidator
 {
-    static readonly string[] DefaultStacks = ["blazor-web", "react", "svelte"];
+    static readonly string[] DefaultStacks = ["blazor", "react", "svelte"];
 
     static readonly string[] ControlledPlatforms = ["react", "svelte"];
 
-    // A stack without a kind predates the two layers; only dotnet was ever a backend.
-    static string StackKind(JsonNode? stack) =>
-        AsString((stack as JsonObject)?["kind"]) ?? "frontend";
+    // Whether a manifest path sits under a folder, compared by text.
+    static bool IsUnder(string path, string folder) =>
+        path == folder || path.StartsWith(folder + "/", StringComparison.Ordinal);
 
-    static readonly Regex ProvisionRow = new(@"^\| (litespec/(?:rule|convention)/[^\s|]+) \|", RegexOptions.Multiline);
+    static readonly Regex ProvisionRow = new(@"^\| (litespec/[^\s|]*#[^\s|]*) \|", RegexOptions.Multiline);
 
     /// <summary>
     ///     Validates the project record against the project schema, resolves the documentation
@@ -148,64 +148,115 @@ static partial class ConsumerValidator
 
         // A stack the pinned release does not ship selects no page, so every
         // stack-scoped provision would pass by applying to nothing.
-        // A frontend platform names a frontend stack, and the project names one backend
-        // stack: a backend stack declared as a platform would select the wrong pages.
-        var manifestStacks = (manifest as JsonObject)?["stacks"] as JsonObject;
-        var knownStacks = manifestStacks is not null
-            ? manifestStacks.Where(pair => StackKind(pair.Value) == "frontend").Select(pair => pair.Key).OrderBy(key => key, StringComparer.Ordinal).ToList()
-            : new List<string>(DefaultStacks);
+        var project = run.Project as JsonObject;
+        var manifestObj = manifest as JsonObject;
+        var shape = PropString(project, "shape") ?? "server";
+        var named = project?["stacks"] is JsonArray declaredStacks
+            ? declaredStacks.Select(AsString).OfType<string>().ToList()
+            : new List<string>();
 
-        run.KnownStacks.AddRange(knownStacks);
-
-        if (manifestStacks is not null && (run.Project as JsonObject)?["stacks"] is JsonArray declaredStacks)
+        if (manifestObj is not null)
         {
-            var backendStacks = manifestStacks.Where(pair => StackKind(pair.Value) == "backend").Select(pair => pair.Key).OrderBy(key => key, StringComparer.Ordinal).ToList();
-            var named = declaredStacks.Select(AsString).OfType<string>().ToList();
-            var backends = named.Where(backendStacks.Contains).ToList();
+            var stacks = LiteSpec.Authoring.Layout.Stacks(manifestObj);
+            var byId = stacks.ToDictionary(stack => stack.Id, stack => stack, StringComparer.Ordinal);
+            var backendIds = stacks.Where(stack => stack.Kind == "backend").Select(stack => stack.Id).OrderBy(id => id, StringComparer.Ordinal).ToList();
+            var frontendIds = stacks.Where(stack => stack.Kind == "frontend").Select(stack => stack.Id).OrderBy(id => id, StringComparer.Ordinal).ToList();
 
-            if (backends.Count != 1)
+            run.KnownStacks.AddRange(frontendIds);
+
+            foreach (var stack in named.Where(stack => !byId.ContainsKey(stack)))
             {
-                run.Err($"litespec.project.json: stacks name {backends.Count} backend stacks; name exactly one of {string.Join(", ", backendStacks)} [litespec/rule/core-scope.select-a-size-profile-and-stacks]");
+                run.Err($"litespec.project.json: stack '{stack}' is not a stack the pinned LiteSpec release ships [litespec/core/scope#select-a-size-profile-and-stacks]");
             }
 
-            foreach (var stack in named.Where(stack => !manifestStacks.ContainsKey(stack)))
+            var backends = named.Where(byId.ContainsKey).Where(stack => byId[stack].Kind == "backend").ToList();
+
+            // A server project names exactly one backend stack; a client-only
+            // project names none, and reads the backend pages its shape lists.
+            if (shape == "client-only")
             {
-                run.Err($"litespec.project.json: stack '{stack}' is not a stack the pinned LiteSpec release ships [litespec/rule/core-scope.select-a-size-profile-and-stacks]");
+                foreach (var backend in backends)
+                {
+                    run.Err($"litespec.project.json: shape 'client-only' names backend stack '{backend}'; a client-only project names no backend stack [litespec/core/scope#select-a-size-profile-and-stacks]");
+                }
             }
-        }
-
-        if ((manifest as JsonObject)?["extensions"] is JsonObject extensions)
-        {
-            // A selection is checked against the manifest, not only against itself, so a
-            // release that renamed an extension fails the stale selection rather than
-            // passing a contract nobody selected.
-            var known = extensions.Select(pair => pair.Key).OrderBy(key => key, StringComparer.Ordinal).ToList();
-            var reported = new HashSet<string>(StringComparer.Ordinal);
-
-            foreach (var selection in run.Selections)
+            else if (backends.Count != 1)
             {
-                if (!reported.Add(selection.IdText))
+                run.Err($"litespec.project.json: stacks name {backends.Count} backend stacks; name exactly one of {string.Join(", ", backendIds)} [litespec/core/scope#select-a-size-profile-and-stacks]");
+            }
+
+            // A stack whose requires is not also named misses the pages its own
+            // stack builds on, so the selection applies half a stack.
+            foreach (var stack in named.Where(byId.ContainsKey))
+            {
+                foreach (var required in byId[stack].Requires)
+                {
+                    if (!named.Contains(required))
+                    {
+                        run.Err($"litespec.project.json: stack '{stack}' requires '{required}', which the project does not name in stacks [litespec/core/scope#select-a-size-profile-and-stacks]");
+                    }
+                }
+            }
+
+            // A frontend stack whose pairsWith excludes the project's backend stack
+            // works beside another backend only; absent pairsWith means any backend.
+            foreach (var stack in named.Where(byId.ContainsKey).Where(stack => byId[stack].Kind == "frontend"))
+            {
+                var pairs = byId[stack].PairsWith;
+
+                if (pairs.Count == 0)
                 {
                     continue;
                 }
 
-                if (selection.Id is null || !extensions.TryGetPropertyValue(selection.Id, out var shipped) || IsFalsy(shipped))
+                foreach (var backend in backends.Where(backend => !pairs.Contains(backend)))
                 {
-                    run.Err($"litespec.project.json: extensions '{selection.IdText}' is not an extension in the pinned LiteSpec release; known ids are {string.Join(", ", known)}");
+                    run.Err($"litespec.project.json: frontend stack '{stack}' pairs only with {string.Join(", ", pairs)}, not with backend stack '{backend}' [litespec/core/scope#select-a-size-profile-and-stacks]");
                 }
-                else if ((shipped as JsonObject)?["stacks"] is JsonArray supported
-                    && (run.Project as JsonObject)?["stacks"] is JsonArray declared)
-                {
-                    // An extension written for one stack replaces rules only that stack
-                    // carries, so selecting it without the stack applies nothing it states.
-                    var supportedStacks = supported.Select(AsString).OfType<string>().ToList();
+            }
 
-                    if (!declared.Select(AsString).OfType<string>().Any(supportedStacks.Contains))
+            if (manifestObj["extensions"] is JsonObject extensions)
+            {
+                // A selection is checked against the manifest, not only against itself, so a
+                // release that renamed an extension fails the stale selection rather than
+                // passing a contract nobody selected.
+                var known = extensions.Select(pair => pair.Key).OrderBy(key => key, StringComparer.Ordinal).ToList();
+                var reported = new HashSet<string>(StringComparer.Ordinal);
+
+                foreach (var selection in run.Selections)
+                {
+                    if (!reported.Add(selection.IdText))
                     {
-                        run.Err($"litespec.project.json: extensions '{selection.IdText}' supports only the {string.Join(", ", supportedStacks)} stack, which the project does not name in stacks [litespec/rule/profile-stacks.apply-the-complete-stack]");
+                        continue;
+                    }
+
+                    if (selection.Id is null || !extensions.TryGetPropertyValue(selection.Id, out var shipped) || IsFalsy(shipped))
+                    {
+                        run.Err($"litespec.project.json: extensions '{selection.IdText}' is not an extension in the pinned LiteSpec release; known ids are {string.Join(", ", known)}");
+                    }
+                    else
+                    {
+                        // An extension under a stack folder supports that stack only;
+                        // under docs/ext/ it supports every stack. Selecting it without
+                        // its stack applies nothing it states.
+                        var path = AsString((shipped as JsonObject)?["path"]);
+
+                        if (path is not null && !IsUnder(path, "docs/ext"))
+                        {
+                            var supported = stacks.Where(stack => IsUnder(path, stack.Folder)).Select(stack => stack.Id).OrderBy(id => id, StringComparer.Ordinal).ToList();
+
+                            if (supported.Count > 0 && !named.Any(supported.Contains))
+                            {
+                                run.Err($"litespec.project.json: extensions '{selection.IdText}' supports only the {string.Join(", ", supported)} stack, which the project does not name in stacks [litespec/core/scope#select-a-size-profile-and-stacks]");
+                            }
+                        }
                     }
                 }
             }
+        }
+        else
+        {
+            run.KnownStacks.AddRange(DefaultStacks);
         }
 
         // An extension selected without a surface costs nothing to keep, so nobody
@@ -262,6 +313,15 @@ static partial class ConsumerValidator
                     continue;
                 }
 
+                // The old litespec/rule/ form names no provision in this release; a
+                // deferral names its provision as litespec/<page>#<slug>.
+                if (provision.StartsWith("litespec/rule/", StringComparison.Ordinal)
+                    || provision.StartsWith("litespec/convention/", StringComparison.Ordinal))
+                {
+                    run.Err($"litespec.project.json: extensions 'stage' defers '{provision}', which uses the retired litespec/rule/ form; name the provision as litespec/<page>#<slug>");
+                    continue;
+                }
+
                 if (!knownProvisions.Contains(provision))
                 {
                     run.Err($"litespec.project.json: extensions 'stage' defers '{provision}', which is not a provision in the pinned LiteSpec release");
@@ -307,14 +367,23 @@ static partial class ConsumerValidator
             }
 
             var platform = declared is not null && declared.TryGetPropertyValue("platform", out var platformValue) ? platformValue : null;
+            var namedStacks = (run.Project as JsonObject)?["stacks"] is JsonArray namedArray
+                ? namedArray.Select(AsString).OfType<string>().ToHashSet(StringComparer.Ordinal)
+                : new HashSet<string>(StringComparer.Ordinal);
 
+            // A frontend platform names a frontend stack the project names: a backend
+            // stack declared as a platform would select the wrong pages.
             if (IsFalsy(platform))
             {
-                run.Err($"litespec.project.json: frontend '{name}' declares no 'platform'; one of {string.Join(", ", run.KnownStacks)} is required");
+                run.Err($"litespec.project.json: frontend '{name}' declares no 'platform'; one of {string.Join(", ", run.KnownStacks)} is required [litespec/core/scope#select-a-size-profile-and-stacks]");
             }
             else if (AsString(platform) is not string stack || !run.KnownStacks.Contains(stack))
             {
-                run.Err($"litespec.project.json: frontend '{name}' has unknown platform '{JsText(platform)}'; expected one of {string.Join(", ", run.KnownStacks)}");
+                run.Err($"litespec.project.json: frontend '{name}' has unknown platform '{JsText(platform)}'; expected one of {string.Join(", ", run.KnownStacks)} [litespec/core/scope#select-a-size-profile-and-stacks]");
+            }
+            else if (!namedStacks.Contains(stack))
+            {
+                run.Err($"litespec.project.json: frontend '{name}' platform '{stack}' is not a stack the project names in stacks [litespec/core/scope#select-a-size-profile-and-stacks]");
             }
             else if (ControlledPlatforms.Contains(stack))
             {

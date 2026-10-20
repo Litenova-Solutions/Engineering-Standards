@@ -3,6 +3,8 @@
     "name": "Fixture Library"
   },
   "size": "large",
+  "shape": "server",
+  "stacks": ["dotnet", "svelte"],
   "reviewedLiteSpecVersion": "2.0.0",
   "optionalTypes": [
     "constraint",

@@ -29,55 +29,33 @@ static partial class StandardsValidator
 
     const string RoutingHeading = "Which page do you want";
 
-    static void CheckPageIdentity(List<ParsedPage> parsedPages, ManifestRegistryInfo registry, Action<string, int, string, string> add)
+    static void CheckPageIdentity(List<ParsedPage> parsedPages, Action<string, int, string, string> add)
     {
-        // Provision identity comes from the path and the heading. The page segment is
-        // <area>-<stem>, so it names the page without a lookup, and the slug is the
-        // heading slug, so the identifier and the heading cannot drift apart.
-        // (litespec/rule/core-authoring.identifier-must-follow-format)
-        if (!registry.Present)
-        {
-            return;
-        }
-
+        // Provision identity comes from the path and the heading: the identifier names
+        // the page path, so every folder and file stem on that path is lowercase kebab
+        // case and the navigation pages keep their README.md name.
         foreach (var page in parsedPages)
         {
-            var provisions = page.Parsed.Provisions;
-            if (provisions.Count == 0)
+            if (!page.Relative.StartsWith("docs/", StringComparison.Ordinal))
             {
                 continue;
             }
 
-            var parts = PageIdentityPattern().Match(page.Relative);
-            if (!parts.Success)
+            var segments = page.Relative["docs/".Length..].Split('/');
+            for (var index = 0; index < segments.Length; index++)
             {
-                add(page.Relative, 1, "ID_PAGE_FILENAME", $"page owns {provisions.Count} provisions, so its path must be docs/<area>/<page>.md with one lowercase word in each position");
-                continue;
-            }
-
-            var areaDir = parts.Groups[1].Value;
-            var pageSegment = $"{areaDir}-{parts.Groups[2].Value}";
-            if (!registry.Areas.Contains(areaDir.ToUpperInvariant()))
-            {
-                add(page.Relative, 1, "ID_AREA_UNKNOWN", $"directory '{areaDir}' is not a registered provisionRegistry area");
-            }
-
-            foreach (var provision in provisions)
-            {
-                var parsed = Provisions.Parse(provision.Id);
-                if (parsed is null)
+                var last = index == segments.Length - 1;
+                if (last && segments[index] == "README.md")
                 {
                     continue;
                 }
 
-                if (parsed.Page != pageSegment)
+                var name = last && segments[index].EndsWith(".md", StringComparison.OrdinalIgnoreCase)
+                    ? segments[index][..^".md".Length]
+                    : segments[index];
+                if (!KebabSegmentPattern().IsMatch(name))
                 {
-                    add(page.Relative, provision.Line, "ID_SCOPE_MISMATCH", $"provision '{provision.Id}' does not name the page '{pageSegment}' its path derives");
-                }
-
-                if (parsed.Slug != Provisions.HeadingSlug(provision.Title))
-                {
-                    add(page.Relative, provision.Line, "ID_SLUG_MISMATCH", $"provision '{provision.Id}' slug does not match its heading");
+                    add(page.Relative, 1, "ID_PAGE_FILENAME", $"path segment '{name}' is not lowercase kebab case");
                 }
             }
         }
@@ -107,10 +85,10 @@ static partial class StandardsValidator
     }
 
     static string NormalizeTemplate(string relative, string raw) => raw
-        .Replace("{litespec/rule/page.state-one-action}", "litespec/rule/template.state-one-action", StringComparison.Ordinal)
-        .Replace("{litespec/rule/page.use-one-default}", "litespec/rule/template.use-one-default", StringComparison.Ordinal)
-        .Replace("{litespec/rule/page.state-one-extension-action}", "litespec/rule/template.state-one-extension-action", StringComparison.Ordinal)
-        .Replace("{litespec/rule/page.use-one-extension-default}", "litespec/rule/template.use-one-extension-default", StringComparison.Ordinal)
+        .Replace("{litespec/page#state-one-action}", "litespec/core/template#state-one-action", StringComparison.Ordinal)
+        .Replace("{litespec/page#use-one-default}", "litespec/core/template#use-one-default", StringComparison.Ordinal)
+        .Replace("{litespec/page#state-one-extension-action}", "litespec/ext/template#state-one-extension-action", StringComparison.Ordinal)
+        .Replace("{litespec/page#use-one-extension-default}", "litespec/ext/template#use-one-extension-default", StringComparison.Ordinal)
         .Replace("{Topic Title}", "Topic Title", StringComparison.Ordinal)
         .Replace("{Extension Title}", "Extension Title", StringComparison.Ordinal)
         .Replace("{How-To Title}", "How-To Title", StringComparison.Ordinal)
@@ -218,13 +196,15 @@ static partial class StandardsValidator
         return Uri.UnescapeDataString(value);
     }
 
-    // The 2.0.0 model removed every numbered identifier, the old slashed kinds,
-    // and Workflow as a specification kind. A bare prefix in a refusal list is
-    // documentation; a prefix with content after it is a live old form.
+    // The 2.0.0 model removed every numbered identifier, the old slashed kinds, the
+    // legacy litespec rule and convention form, and Workflow as a specification kind.
+    // A bare prefix in a refusal list is documentation; a prefix with content after
+    // it is a live old form.
     static readonly Regex[] RemovedIdentifierPatterns =
     [
         RemovedIdentifierSlashedKinds(),
         RemovedIdentifierProjectRule(),
+        RemovedIdentifierLegacyLiteSpec(),
         RemovedIdentifierNumbered(),
     ];
 
@@ -369,7 +349,7 @@ static partial class StandardsValidator
         }
     }
 
-    [GeneratedRegex(@"^docs/([a-z][a-z0-9]*)/([a-z][a-z0-9]*)\.md$")] private static partial Regex PageIdentityPattern();
+    [GeneratedRegex(@"^[a-z0-9]+(?:-[a-z0-9]+)*$")] private static partial Regex KebabSegmentPattern();
 
     [GeneratedRegex(@"\[[^\]]*\]\(([^)]+)\)")] private static partial Regex MarkdownLinkPattern();
 
@@ -384,6 +364,8 @@ static partial class StandardsValidator
     [GeneratedRegex(@"\b(?:acceptance-criterion|authorization|invariant|policy|validation|flow|workflow|end-to-end-flow|domain-policy|aggregate|value|path)/[A-Za-z0-9][A-Za-z0-9_.-]*")] private static partial Regex RemovedIdentifierSlashedKinds();
 
     [GeneratedRegex(@"\b(?!litespec/)[a-z][a-z0-9-]*/rule/[A-Za-z0-9][A-Za-z0-9_.-]*")] private static partial Regex RemovedIdentifierProjectRule();
+
+    [GeneratedRegex(@"\blitespec/(?:rule|convention)/[A-Za-z0-9_.-]*\.[A-Za-z0-9_.-]+")] private static partial Regex RemovedIdentifierLegacyLiteSpec();
 
     [GeneratedRegex(@"\b(?:AC|AUTZ|INV|POL|VAL|RULE)(?:-[A-Z][A-Z0-9]*)+-[0-9]{2,}\b|\bE2E-[0-9]+\b")] private static partial Regex RemovedIdentifierNumbered();
 

@@ -50,19 +50,21 @@ static partial class StandardsValidator
         "EXTENSION_KIND",
         "EXTENSION_REPLACES_ENFORCED",
         "EXTENSION_REPLACES_UNKNOWN",
+        "EXTENSION_LOCATION",
         "EXTENSION_SCOPE",
+        "EXTENSION_UNLISTED",
+        "LAYER_UNREACHABLE",
+        "SHAPE_PAGE",
+        "STACK_FOLDER",
+        "STACK_REFERENCE",
         "EXTENSION_STACK_UNKNOWN",
         "GLOSSARY_DEFINITION",
         "GLOSSARY_ORDER",
         "HEADING_ACTION",
         "HEADING_EMPTY_BODY",
-        "ID_AREA_UNKNOWN",
         "ID_DUPLICATE",
-        "ID_LOCATION",
-        "ID_MISSING",
+        "ID_IN_HEADING",
         "ID_PAGE_FILENAME",
-        "ID_SCOPE_MISMATCH",
-        "ID_SLUG_MISMATCH",
         "ID_UNKNOWN_REFERENCE",
         "INDEX_CONTAINS_PROCEDURE",
         "INDEX_INTENT",
@@ -213,8 +215,7 @@ static partial class StandardsValidator
             }
         }
 
-        var registry = ReadManifestRegistry(resolved);
-        CheckPageIdentity(parsedPages, registry, Add);
+        CheckPageIdentity(parsedPages, Add);
 
         var activeIds = new HashSet<string>(globalIds.Keys, StringComparer.Ordinal);
         CheckCitations(parsedPages, activeIds, Add);
@@ -227,7 +228,7 @@ static partial class StandardsValidator
 
         // The provision index is derived. A stale page would send a reader to the wrong
         // heading, so the gate compares it with the active standards.
-        // (litespec/rule/core-authoring.regenerate-the-provision-index)
+        // (litespec/core/authoring#regenerate-the-provision-index)
         var indexFile = JoinRoot(resolved, Provisions.IndexPath);
         if (File.Exists(indexFile))
         {
@@ -251,12 +252,12 @@ static partial class StandardsValidator
 
         // The template index is the only map from a template file to the consumer path
         // it targets. A renamed template leaves a row pointing at nothing, and that row
-        // reads exactly like a correct one. (litespec/rule/core-principles.keep-one-authored-source)
+        // reads exactly like a correct one. (litespec/core/principles#keep-one-authored-source)
         CheckTemplateIndex(resolved, Add);
 
         // A reader who cannot tell a tutorial from a reference opens both and trusts
         // neither, so the documentation root names each class before it links to one.
-        // (litespec/rule/core-authoring.route-the-reader-before-listing-pages)
+        // (litespec/core/authoring#route-the-reader-before-listing-pages)
         CheckRootIndexRouting(resolved, Add);
 
         // A stable sort: diagnostics that share a file, line, and code keep the order
@@ -392,28 +393,24 @@ static partial class StandardsValidator
     /// <summary>One parsed page: its relative path, its raw text, and its blocks.</summary>
     private sealed record ParsedPage(string Relative, string Raw, ParsedBlocks Parsed);
 
-    /// <summary>The manifest's provision registry: whether one parsed, and its registered areas.</summary>
-    private sealed record ManifestRegistryInfo(bool Present, HashSet<string> Areas);
 
-    // Every provision identifier is litespec/<rule|convention>/<page>.<heading-slug>.
-    // The grammar lives in Provisions, so the validator, the generator, and the
-    // parsed heading cannot report three different formats.
-    // (litespec/rule/core-authoring.identifier-must-follow-format)
+    // Every provision identifier is litespec/<page>#<heading-slug>, computed from
+    // the owning page path and the heading. The grammar lives in Provisions, so the
+    // validator, the generator, and the parsed heading cannot report three different
+    // formats.
     static string IdPattern => Provisions.IdSource.Replace("\\/", "/", StringComparison.Ordinal);
 
-    static readonly Lazy<Regex> ProvisionHeadingLazy = new(() => new Regex($"^###\\s+(.+?)\\s+\\(({IdPattern})\\)\\s*$"));
     static readonly Lazy<Regex> CitationLazy = new(() => new Regex($"\\b(?:{IdPattern})\\b"));
     static readonly Lazy<Regex> SummaryPositionLazy = new(() => new Regex($"\\((?:{IdPattern})(?:,\\s*{IdPattern})*\\)\\s*$"));
     static readonly Lazy<Regex> VerificationRowLazy = new(() => new Regex($"^\\|\\s*({IdPattern})\\s*\\|\\s*([^|]*?)\\s*\\|\\s*([^|]*?)\\s*\\|\\s*$"));
 
-    static Regex ProvisionHeadingPattern => ProvisionHeadingLazy.Value;
     static Regex CitationPattern => CitationLazy.Value;
     static Regex SummaryPositionPattern => SummaryPositionLazy.Value;
     static Regex VerificationRowPattern => VerificationRowLazy.Value;
 
     /// <summary>The action verbs a provision heading may start with.</summary>
     static readonly HashSet<string> ActionVerbs = new(
-        ("Accept Activate Add Advance Describe Reuse Share Take Align Anchor Announce Answer Apply Approve Ask Assert Assign Attach Audit " +
+        ("Accept Activate Add Advance Describe Order Prefetch Reuse Sanitize Share Take Align Anchor Announce Answer Apply Approve Ask Assert Assign Attach Audit " +
         "Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify " +
         "Co-locate Collect Commit Compare Complete Compose Compute Configure Confirm Connect Control Copy Cover Create " +
         "Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document " +

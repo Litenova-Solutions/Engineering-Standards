@@ -91,7 +91,7 @@
           "status": "adopted",
           "components": ["packages/ui/src/components/data-table.tsx"]
         },
-        "blazor-web": {
+        "blazor": {
           "status": "pending",
           "gap": "No Blazor frontend implements the table yet."
         }

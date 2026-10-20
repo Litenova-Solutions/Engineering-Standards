@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using LiteSpec.Tests.Support;
 
 namespace LiteSpec.Tests.Model;
@@ -18,6 +19,23 @@ public sealed class StackReaderTests
         Assert.Contains(
             $"{records} records, {handlers} handlers, {screens} screens, {scenarios} scenarios.",
             result.Stdout);
+    }
+
+    /// <summary>A project naming neither dotnet nor blazor reads no .NET backend or scenarios.</summary>
+    [Fact]
+    public void Build_Without_Dotnet_Or_Blazor_Reads_No_Backend()
+    {
+        using var temp = ModelFixture.Prepare("small");
+
+        var projectFile = Path.Combine(temp.Path, "litespec.project.json");
+        var project = JsonNode.Parse(File.ReadAllText(projectFile))!.AsObject();
+        project["stacks"] = new JsonArray(JsonValue.Create("react"));
+        File.WriteAllText(projectFile, project.ToJsonString());
+
+        var result = Cli.Run("model", "build", "--root", temp.Path);
+        Assert.Equal(0, result.Status);
+        Assert.Contains("0 handlers", result.Stdout);
+        Assert.Contains("0 scenarios", result.Stdout);
     }
 
     /// <summary>Clean fixtures write no test run: neither holds a result file.</summary>

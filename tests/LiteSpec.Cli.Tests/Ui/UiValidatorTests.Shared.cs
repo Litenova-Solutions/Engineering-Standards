@@ -7,7 +7,7 @@ namespace LiteSpec.Tests.Ui;
 /// </summary>
 public sealed partial class UiValidatorTests
 {
-    // Source boundary (litespec/rule/frontend-ui.select-one-visual-authority).
+    // Source boundary (litespec/frontend/ui#select-one-visual-authority).
 
     [Fact]
     public void Second_Visual_System_In_The_Workspace_Root()
@@ -56,17 +56,17 @@ public sealed partial class UiValidatorTests
     public void UI_Exception_With_An_Expired_Review_Date()
     {
         using var fixture = UiFixture.Create();
-        fixture.WriteException("ui-authority", "litespec/rule/frontend-ui.select-one-visual-authority", "2020-01-01");
+        fixture.WriteException("ui-authority", "litespec/frontend/ui#select-one-visual-authority", "2020-01-01");
         UiFixture.AssertProblem(
             fixture.Run(),
-            "[litespec/rule/frontend-ui.select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision");
+            "[litespec/frontend/ui#select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision");
     }
 
     [Fact]
     public void UI_Exception_With_A_Live_Review_Date()
     {
         using var fixture = UiFixture.Create();
-        fixture.WriteException("ui-authority", "litespec/rule/frontend-ui.select-one-visual-authority", "2099-01-01");
+        fixture.WriteException("ui-authority", "litespec/frontend/ui#select-one-visual-authority", "2099-01-01");
         UiFixture.AssertClean(fixture.Run());
     }
 
@@ -74,7 +74,7 @@ public sealed partial class UiValidatorTests
     public void Exception_Against_Another_Area_Stays_Unread_By_The_UI_Validator()
     {
         using var fixture = UiFixture.Create();
-        fixture.WriteException("other-area", "litespec/rule/core-agent.select-task-context", "2020-01-01");
+        fixture.WriteException("other-area", "litespec/core/agent#select-task-context", "2020-01-01");
         UiFixture.AssertClean(fixture.Run());
     }
 
@@ -88,14 +88,14 @@ public sealed partial class UiValidatorTests
         });
         fixture.WriteExceptionFile(
             "docs/departures/moved.md",
-            UiFixture.ExceptionMeta("exception/moved", "Moved exception", "litespec/rule/frontend-ui.select-one-visual-authority", "2020-01-01"),
+            UiFixture.ExceptionMeta("exception/moved", "Moved exception", "litespec/frontend/ui#select-one-visual-authority", "2020-01-01"),
             "Moved exception");
         UiFixture.AssertProblem(
             fixture.Run(),
-            "[litespec/rule/frontend-ui.select-one-visual-authority] docs/departures/moved.md: review date 2020-01-01 has passed; renew the decision");
+            "[litespec/frontend/ui#select-one-visual-authority] docs/departures/moved.md: review date 2020-01-01 has passed; renew the decision");
     }
 
-    // Shared package (litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package).
+    // Shared package (litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package).
 
     [Fact]
     public void A_Controlled_Frontend_With_No_Shared_Package()
@@ -157,14 +157,14 @@ public sealed partial class UiValidatorTests
         UiFixture.AssertProblem(fixture.Run(), "preset.style does not match the manifest baseline");
     }
 
-    // Additional registries (litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package).
+    // Additional registries (litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package).
 
     [Fact]
     public void An_Additional_Registry_With_The_Exception_Passes_Both_Gates()
     {
         using var fixture = UiFixture.Create();
         fixture.AddAdditionalRegistry();
-        fixture.WriteException("extra-registry", "litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package", "2099-01-01");
+        fixture.WriteException("extra-registry", "litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package", "2099-01-01");
         UiFixture.AssertClean(fixture.Run());
     }
 
@@ -175,7 +175,7 @@ public sealed partial class UiValidatorTests
         fixture.AddAdditionalRegistry();
         UiFixture.AssertProblem(
             fixture.Run(),
-            "[litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/components.json: an additional registry requires an exception");
+            "[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] packages/ui/components.json: an additional registry requires an exception");
     }
 
     [Fact]
@@ -185,10 +185,10 @@ public sealed partial class UiValidatorTests
         fixture.AddAdditionalRegistry();
         UiFixture.AssertProblem(
             fixture.Run(),
-            "[litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: registry 'fixture' is not the built-in shadcn registry");
+            "[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] packages/ui/ui-source-lock.json: registry 'fixture' is not the built-in shadcn registry");
     }
 
-    // Source lock (litespec/rule/frontend-ui.track-source-changes).
+    // Source lock (litespec/frontend/web/ui#track-source-changes).
 
     [Fact]
     public void Changed_Copied_Source_Without_A_Fork_Record()

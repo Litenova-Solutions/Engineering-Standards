@@ -305,7 +305,7 @@ static partial class Checker
 
             case "use-case":
                 RequireEnum(record, "operation", ["command", "query"], findings);
-                // A retired use case names no entry point (litespec/rule/core-principles.retire-public-behavior-deliberately), so only a live one must be reached.
+                // A retired use case names no entry point, so only a live one must be reached.
                 if (record.Status != "retired")
                 {
                     RequireIds(record, "reachedThrough", 1, findings);

@@ -31,13 +31,19 @@
       "type": "string",
       "enum": ["small", "large"]
     },
+    "shape": {
+      "description": "The shape of this project: server for a project with a backend, client-only for a project with frontends and no backend. Defaults to server.",
+      "type": "string",
+      "enum": ["server", "client-only"],
+      "default": "server"
+    },
     "stacks": {
       "description": "The stacks this project builds with: dotnet for the backend, and one per frontend from its platform.",
       "type": "array",
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "enum": ["dotnet", "react", "svelte", "blazor-web"]
+        "enum": ["dotnet", "react", "svelte", "blazor"]
       }
     },
     "optionalTypes": {
@@ -197,7 +203,7 @@
               "platform": {
                 "description": "The frontend stack. Required on every entry, so a frontend outside the controlled UI contract declares that position instead of omitting the field.",
                 "type": "string",
-                "enum": ["react", "svelte", "blazor-web"]
+                "enum": ["react", "svelte", "blazor"]
               },
               "ui": { "$ref": "#/$defs/ui" }
             },
@@ -306,7 +312,7 @@
               "additionalProperties": false,
               "required": ["provision", "until"],
               "properties": {
-                "provision": { "type": "string", "pattern": "^litespec/(rule|convention)/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$" },
+                "provision": { "type": "string", "pattern": "^litespec/[a-z0-9]+(-[a-z0-9]+)*(/[a-z0-9]+(-[a-z0-9]+)*)*#[a-z0-9]+(-[a-z0-9]+)*$" },
                 "until": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
               }
             }

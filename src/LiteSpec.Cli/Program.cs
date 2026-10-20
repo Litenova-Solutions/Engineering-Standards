@@ -2,6 +2,7 @@ using LiteSpec;
 using LiteSpec.Authoring;
 using LiteSpec.Book;
 using LiteSpec.Consumer;
+using LiteSpec.Init;
 using LiteSpec.Model;
 using LiteSpec.Ui;
 
@@ -17,6 +18,7 @@ const string usage = """
       provisions    Write or check docs/reference/provisions.md.
 
     Commands in a consumer repository:
+      init          Write litespec.project.json from a preset.
       consumer      Validate the consumer's project file, records and prose.
       ui            Validate the controlled web UI contract.
       model         Build, check, render or query the project model.
@@ -40,6 +42,7 @@ return args[0] switch
     "--version" => Version(),
     "validate" => StandardsValidator.Run(rest),
     "provisions" => ProvisionsCommand.Run(rest),
+    "init" => InitCommand.Run(rest),
     "consumer" => ConsumerValidator.Run(rest),
     "ui" => UiValidator.Run(rest),
     "model" => ModelCommand.Run(rest),

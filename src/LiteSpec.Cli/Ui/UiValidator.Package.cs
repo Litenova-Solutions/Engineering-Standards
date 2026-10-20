@@ -28,7 +28,6 @@ static partial class UiValidator
 
             // Findings cite the stack-neutral provisions whatever the platform, because
             // the UI rules live on one page per concern with small per-stack sections.
-            const string ui = "frontend-ui";
             if (platform == "svelte")
             {
                 // shadcn-svelte writes tailwind.baseColor with no cssVariables field, and
@@ -37,7 +36,7 @@ static partial class UiValidator
                 // compared. The style field is deprecated under Tailwind v4 and unread.
                 if (!StrictEqual(Dot(Child(config, "tailwind"), "baseColor"), Child(baseline, "baseColor")))
                 {
-                    Errors.Add($"[litespec/rule/{ui}.pin-the-baseline-in-the-shared-package] {label}: tailwind.baseColor must be '{Show(Child(baseline, "baseColor"))}'");
+                    Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: tailwind.baseColor must be '{Show(Child(baseline, "baseColor"))}'");
                 }
 
                 foreach (var (key, baselineKey) in new[] { ("iconLibrary", "icons"), ("menuColor", "menuColor"), ("menuAccent", "menuAccent") })
@@ -46,14 +45,14 @@ static partial class UiValidator
                     var got = Child(config, key);
                     if (got.Found && !StrictEqual(got, want))
                     {
-                        Errors.Add($"[litespec/rule/{ui}.pin-the-baseline-in-the-shared-package] {label}: {key} must be {StringifyOrUndefined(want)}");
+                        Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: {key} must be {StringifyOrUndefined(want)}");
                     }
                 }
 
                 var registry = Child(config, "registry");
                 if (Truthy(registry) && !StrictEqual(registry, Dot(Child(baseline, "registry"), "url")) && !baselineOverride)
                 {
-                    Errors.Add($"[litespec/rule/{ui}.pin-the-baseline-in-the-shared-package] {label}: registry '{Show(registry)}' is not the built-in shadcn-svelte registry; an additional registry requires an exception");
+                    Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: registry '{Show(registry)}' is not the built-in shadcn-svelte registry; an additional registry requires an exception");
                 }
 
                 return;
@@ -70,26 +69,26 @@ static partial class UiValidator
             {
                 if (!StrictEqual(Child(config, key), want))
                 {
-                    Errors.Add($"[litespec/rule/{ui}.pin-the-baseline-in-the-shared-package] {label}: {key} must be {StringifyOrUndefined(want)}");
+                    Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: {key} must be {StringifyOrUndefined(want)}");
                 }
             }
 
             var tailwind = Child(config, "tailwind");
             if (!StrictEqual(Dot(tailwind, "baseColor"), Child(baseline, "baseColor")))
             {
-                Errors.Add($"[litespec/rule/{ui}.pin-the-baseline-in-the-shared-package] {label}: tailwind.baseColor must be '{Show(Child(baseline, "baseColor"))}'");
+                Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: tailwind.baseColor must be '{Show(Child(baseline, "baseColor"))}'");
             }
 
             var cssVariables = Child(baseline, "cssVariables");
             if (!StrictEqual(Dot(tailwind, "cssVariables"), cssVariables))
             {
-                Errors.Add($"[litespec/rule/{ui}.pin-the-baseline-in-the-shared-package] {label}: tailwind.cssVariables must be {Show(cssVariables)}");
+                Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: tailwind.cssVariables must be {Show(cssVariables)}");
             }
 
             var registries = Child(config, "registries");
             if (registries is { Found: true, Node: not null } && RegistriesNonEmpty(registries.Node) && !baselineOverride)
             {
-                Errors.Add($"[litespec/rule/{ui}.pin-the-baseline-in-the-shared-package] {label}: an additional registry requires an exception");
+                Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: an additional registry requires an exception");
             }
         }
 
@@ -113,13 +112,12 @@ static partial class UiValidator
                 return;
             }
 
-            const string ui = "frontend-ui";
             foreach (var key in new[] { "schemaVersion", "generator", "cli", "preset", "registry", "formatter", "components" })
             {
                 Required(lockNode, key, label);
             }
 
-            SchemaCheck("ui-source-lock.schema.json", lockNode, label, $"litespec/rule/{ui}.track-source-changes");
+            SchemaCheck("ui-source-lock.schema.json", lockNode, label, "litespec/frontend/web/ui#track-source-changes");
             var cliPackage = platform == "svelte" ? "shadcn-svelte" : "shadcn";
             var expectedCli = Chain(manifest, "packages", "npm", cliPackage);
             var cli = Child(lockNode, "cli");
@@ -140,7 +138,7 @@ static partial class UiValidator
             var baselineRegistry = Child(baseline, "registry");
             if ((!StrictEqual(Dot(lockRegistry, "name"), Dot(baselineRegistry, "name")) || !StrictEqual(Dot(lockRegistry, "url"), Dot(baselineRegistry, "url"))) && !baselineOverride)
             {
-                Errors.Add($"[litespec/rule/{ui}.pin-the-baseline-in-the-shared-package] {label}: registry '{ShowOr(Dot(lockRegistry, "name"), "(unnamed)")}' is not the built-in {ShowOr(Dot(baselineRegistry, "name"), "registry")} registry; an additional registry requires an exception");
+                Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: registry '{ShowOr(Dot(lockRegistry, "name"), "(unnamed)")}' is not the built-in {ShowOr(Dot(baselineRegistry, "name"), "registry")} registry; an additional registry requires an exception");
             }
 
             foreach (var key in new[] { "style", "base", "cssVariables", "baseColor", "theme", "chartColor", "font", "fontHeading", "icons", "radius", "menuAccent", "menuColor", "componentsStyle" })
@@ -148,7 +146,7 @@ static partial class UiValidator
                 var want = Child(baseline, key);
                 if (want.Found && !StrictEqual(Dot(Child(lockNode, "preset"), key), want))
                 {
-                    Errors.Add($"[litespec/rule/{ui}.pin-the-baseline-in-the-shared-package] {label}: preset.{key} does not match the manifest baseline");
+                    Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: preset.{key} does not match the manifest baseline");
                 }
             }
 
@@ -168,7 +166,7 @@ static partial class UiValidator
                     var name = dependency is JsonValue dependencyValue && dependencyValue.TryGetValue<string>(out var dependencyName) ? dependencyName : null;
                     if (name is null || !pinnedPackages.Contains(name))
                     {
-                        Errors.Add($"[litespec/rule/{ui}.track-source-changes] {itemLabel}: dependency '{ShowNode(dependency)}' is not pinned in the LiteSpec manifest");
+                        Errors.Add($"[litespec/frontend/web/ui#track-source-changes] {itemLabel}: dependency '{ShowNode(dependency)}' is not pinned in the LiteSpec manifest");
                     }
                 }
 
@@ -205,7 +203,7 @@ static partial class UiValidator
                     var isBaseline = status is { Node: JsonValue statusValue } && statusValue.TryGetValue<string>(out var statusText) && statusText == "baseline";
                     if (!matches && isBaseline)
                     {
-                        Errors.Add($"[litespec/rule/frontend-ui.track-source-changes] {itemLabel}: '{relative}' no longer matches the recorded digest; record it as extended or forked");
+                        Errors.Add($"[litespec/frontend/web/ui#track-source-changes] {itemLabel}: '{relative}' no longer matches the recorded digest; record it as extended or forked");
                     }
                 }
             }
@@ -214,16 +212,15 @@ static partial class UiValidator
         // The design contract travels with the shared package, so it is read once for the
         // workspace rather than once per application. A floorplan it names outside the
         // closed set is a design decision, not a route-level choice.
-        // (litespec/rule/frontend-ui.publish-a-design-contract,
-        // litespec/rule/frontend-ui.declare-a-closed-floorplan-set)
+        // (litespec/frontend/ui#publish-a-design-contract,
+        // litespec/frontend/ui#declare-a-closed-floorplan-set)
         public void ValidateDesignContract(JsonNode? package, string platform)
         {
             _ = platform;
-            const string ui = "frontend-ui";
             var contract = Child(package, "designContract");
             if (contract.Node is not JsonValue contractValue || !contractValue.TryGetValue<string>(out var relative))
             {
-                Errors.Add($"[litespec/rule/{ui}.publish-a-design-contract] shared package '{Show(Child(package, "name"))}': no design contract at '{Show(contract)}'");
+                Errors.Add($"[litespec/frontend/ui#publish-a-design-contract] shared package '{Show(Child(package, "name"))}': no design contract at '{Show(contract)}'");
                 return;
             }
 
@@ -231,22 +228,22 @@ static partial class UiValidator
             var label = RelativeToRoot(file);
             if (!Exists(file))
             {
-                Errors.Add($"[litespec/rule/{ui}.publish-a-design-contract] shared package '{Show(Child(package, "name"))}': no design contract at '{relative}'");
+                Errors.Add($"[litespec/frontend/ui#publish-a-design-contract] shared package '{Show(Child(package, "name"))}': no design contract at '{relative}'");
                 return;
             }
 
             var metadata = ParseMetadata(file);
             if (metadata is null)
             {
-                Errors.Add($"[litespec/rule/{ui}.publish-a-design-contract] {label}: design contract has no metadata block");
+                Errors.Add($"[litespec/frontend/ui#publish-a-design-contract] {label}: design contract has no metadata block");
                 return;
             }
 
-            SchemaCheck("design-contract.schema.json", metadata, label, $"litespec/rule/{ui}.publish-a-design-contract");
+            SchemaCheck("design-contract.schema.json", metadata, label, "litespec/frontend/ui#publish-a-design-contract");
             var name = Child(package, "name");
             if (Truthy(name) && !StrictEqual(Child(metadata, "package"), name))
             {
-                Errors.Add($"[litespec/rule/{ui}.publish-a-design-contract] {label}: package must be '{Show(name)}'");
+                Errors.Add($"[litespec/frontend/ui#publish-a-design-contract] {label}: package must be '{Show(name)}'");
             }
 
             var present = SectionNames(File.ReadAllText(file)).ToHashSet(StringComparer.Ordinal);
@@ -254,7 +251,7 @@ static partial class UiValidator
             {
                 if (!present.Contains(section))
                 {
-                    Errors.Add($"[litespec/rule/{ui}.publish-a-design-contract] {label}: missing required section '{section}'");
+                    Errors.Add($"[litespec/frontend/ui#publish-a-design-contract] {label}: missing required section '{section}'");
                 }
             }
         }

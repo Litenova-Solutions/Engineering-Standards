@@ -18,7 +18,7 @@ public sealed partial class ConsumerValidatorTests
 
     static JsonObject LiveDeferral() => new()
     {
-        ["provision"] = "litespec/rule/ext-stage.declare-the-release-stage",
+        ["provision"] = "litespec/core/scope#select-a-size-profile-and-stacks",
         ["until"] = "2999-01-01",
     };
 
@@ -107,7 +107,7 @@ public sealed partial class ConsumerValidatorTests
                 selection["deferredProvisions"] = new JsonArray(
                     new JsonObject
                     {
-                        ["provision"] = "litespec/rule/core-model.no-such-rule",
+                        ["provision"] = "litespec/core/scope#no-such-provision",
                         ["until"] = "2999-01-01",
                     });
             }));

@@ -53,6 +53,9 @@ public sealed class ModelCheckTests
     /// <summary>The one overlay without a finding code: bare refused prefixes exit 0.</summary>
     const string RefusedBarePrefix = "refused-bare-prefix";
 
+    /// <summary>The second path to refused forms: the retired provision form exits 1.</summary>
+    const string RefusedOldProvision = "refused-old-provision";
+
     /// <summary>Clean small fixture exits 0.</summary>
     [Fact]
     public void Clean_Small_Fixture_Exits_0()
@@ -89,7 +92,7 @@ public sealed class ModelCheckTests
         var overlays = Directory.GetDirectories(Cli.Fixture("Model/broken"))
             .Select(Path.GetFileName)
             .OfType<string>()
-            .Where(name => name != RefusedBarePrefix)
+            .Where(name => name != RefusedBarePrefix && name != RefusedOldProvision)
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToList();
         var codes = FindingCodeList.OrderBy(code => code, StringComparer.Ordinal).ToList();
@@ -123,5 +126,15 @@ public sealed class ModelCheckTests
         using var fixture = ModelFixture.Prepare("large", RefusedBarePrefix);
         var result = Cli.Run("model", "check", "--root", fixture.Path, "--format", "json");
         Assert.Equal(0, result.Status);
+    }
+
+    /// <summary>The retired provision form exits 1 with identifier-refused-form.</summary>
+    [Fact]
+    public void Old_Provision_Form_Is_Refused()
+    {
+        using var fixture = ModelFixture.Prepare("large", RefusedOldProvision);
+        var result = Cli.Run("model", "check", "--root", fixture.Path, "--format", "json");
+        Assert.Equal(1, result.Status);
+        Assert.Contains("identifier-refused-form", result.Output);
     }
 }

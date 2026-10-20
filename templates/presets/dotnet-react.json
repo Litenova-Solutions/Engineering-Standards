@@ -1,0 +1,13 @@
+{
+  "shape": "server",
+  "stacks": ["dotnet", "react"],
+  "paths": {
+    "frontends": [
+      {
+        "name": "web",
+        "path": "apps/web",
+        "platform": "react"
+      }
+    ]
+  }
+}

@@ -14,95 +14,95 @@ The consumer enables `report` for a documented query or export with complex rela
 
 ## Baseline relationship
 
-None. Ordinary queries stay under `litespec/rule/backend-persistence.query-through-the-read-session`; this extension governs reads whose cost or duration exceeds that path.
+None. Ordinary queries stay under `litespec/backend/persistence#query-through-the-read-session`; this extension governs reads whose cost or duration exceeds that path.
 
 `limit`. Selecting `report` requires Limit records for the request budget and the report bounds.
 
 ## Agent Summary {#agent-summary}
 
-- Record cost before adding reporting infrastructure. (litespec/rule/ext-report.record-reporting-need)
-- Keep raw SQL parameterized in Infrastructure. (litespec/rule/ext-report.parameterize-report-sql, litespec/rule/ext-report.keep-raw-sql-in-infrastructure)
-- Apply item-read authorization to report data. (litespec/rule/ext-report.apply-item-read-authorization)
-- Run budget-exceeding exports in Worker. (litespec/rule/ext-report.run-budget-exceeding-exports-in-worker)
-- Scope export output to the tenant. (litespec/rule/ext-report.scope-export-output-to-the-tenant)
-- Bound report work and output retention. (litespec/rule/ext-report.define-report-limits)
-- Escape spreadsheet formula-leading values. (litespec/rule/ext-report.escape-formula-leading-export-values)
+- Record cost before adding reporting infrastructure. (litespec/ext/report#record-reporting-need)
+- Keep raw SQL parameterized in Infrastructure. (litespec/ext/report#parameterize-report-sql, litespec/ext/report#keep-raw-sql-in-infrastructure)
+- Apply item-read authorization to report data. (litespec/ext/report#apply-item-read-authorization)
+- Run budget-exceeding exports in Worker. (litespec/ext/report#run-budget-exceeding-exports-in-worker)
+- Scope export output to the tenant. (litespec/ext/report#scope-export-output-to-the-tenant)
+- Bound report work and output retention. (litespec/ext/report#define-report-limits)
+- Escape spreadsheet formula-leading values. (litespec/ext/report#escape-formula-leading-export-values)
 
 ## Standards
 
-### Record reporting need (litespec/rule/ext-report.record-reporting-need)
+### Record reporting need
 
 **Requirement:** A reporting proposal MUST record the report, representative data volume, plan or limitation, latency target, maximum result, and operating owner.
 
 **Rationale:** The record establishes why a normal request projection cannot meet the documented boundary. The use-case page carries the record with its owner and status.
 
-### Avoid speculative reporting systems (litespec/rule/ext-report.avoid-speculative-reporting-systems)
+### Avoid speculative reporting systems
 
 **Requirement:** A project MUST NOT create reporting infrastructure for possible future analytics.
 
 **Rationale:** Reporting infrastructure needs an accepted query or export with a present cost boundary.
 
-### Parameterize report SQL (litespec/rule/ext-report.parameterize-report-sql)
+### Parameterize report SQL
 
 **Requirement:** A reporting query MUST parameterize every actor, tenant, filter, range, sort, and pagination value.
 
 **Rationale:** Parameters preserve data isolation and protect raw SQL from injection.
 
-### Keep raw SQL in Infrastructure (litespec/rule/ext-report.keep-raw-sql-in-infrastructure)
+### Keep raw SQL in Infrastructure
 
 **Requirement:** Infrastructure MUST own raw reporting SQL and connection handling.
 
 **Rationale:** Provider-specific query and connection behavior stays outside Application and Domain.
 
-### Review report plans (litespec/rule/ext-report.review-report-plans)
+### Review report plans
 
 **Requirement:** A report owner MUST review query plans and indexes with representative data.
 
 **Rationale:** Representative volumes reveal cost that small local datasets can hide.
 
-### Apply item-read authorization (litespec/rule/ext-report.apply-item-read-authorization)
+### Apply item-read authorization
 
 **Requirement:** A report or export MUST enforce actor, role, ownership, tenant, and sensitive-field rules that apply to item reads.
 
 **Rationale:** A bulk interface cannot bypass data access checks applied to individual resources.
 
-### Run budget-exceeding exports in Worker (litespec/rule/ext-report.run-budget-exceeding-exports-in-worker)
+### Run budget-exceeding exports in Worker
 
 **Requirement:** An export exceeding its request budget MUST run through Worker, with the budget a Limit record the export's use case names.
 
 **Rationale:** Worker execution frees the HTTP request from long-running report work.
 
-### Protect export output (litespec/rule/ext-report.protect-export-output)
+### Protect export output
 
 **Requirement:** An export worker MUST store output in approved object storage with an owner, expiry, and short-lived authorized download.
 
 **Rationale:** Export files can contain sensitive data and need controlled access and retention.
 
-### Scope export output to the tenant (litespec/rule/ext-report.scope-export-output-to-the-tenant)
+### Scope export output to the tenant
 
 **Requirement:** An export MUST store its output under a tenant-scoped object-storage path.
 
 **Rationale:** A shared output path lets one tenant guess another tenant's export address.
 
-### Define report limits (litespec/rule/ext-report.define-report-limits)
+### Define report limits
 
 **Requirement:** A report specification MUST state each bound as a Limit record: maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime.
 
 **Rationale:** Explicit limits bound database, Worker, and object-storage cost.
 
-### Support report cancellation (litespec/rule/ext-report.support-report-cancellation)
+### Support report cancellation
 
 **Requirement:** A report implementation MUST support cancellation and remove expired outputs.
 
 **Rationale:** Cancellation and expiry prevent abandoned work and files from consuming resources indefinitely.
 
-### Escape formula-leading export values (litespec/rule/ext-report.escape-formula-leading-export-values)
+### Escape formula-leading export values
 
 **Requirement:** A CSV or spreadsheet export MUST escape formula-leading values unless a reviewed field intentionally contains a formula.
 
 **Rationale:** Spreadsheet applications can interpret unescaped values as executable formulas.
 
-### Define export encoding and columns (litespec/rule/ext-report.define-export-encoding-and-columns)
+### Define export encoding and columns
 
 **Requirement:** An export format MUST use explicit character encoding and a stable column contract.
 
@@ -110,7 +110,7 @@ None. Ordinary queries stay under `litespec/rule/backend-persistence.query-throu
 
 ## Conventions
 
-### Keep report definitions in Application (litespec/rule/ext-report.keep-report-definitions-in-application)
+### Keep report definitions in Application
 
 **Default:** Keep report definitions in Application under their business module.
 
@@ -118,7 +118,7 @@ None. Ordinary queries stay under `litespec/rule/backend-persistence.query-throu
 
 **Rationale:** Business meaning and authorization belong with the module that owns the report.
 
-### Keep report providers in Infrastructure (litespec/rule/ext-report.keep-report-providers-in-infrastructure)
+### Keep report providers in Infrastructure
 
 **Default:** Keep SQL, row mappings, and storage providers in Infrastructure.
 
@@ -126,7 +126,7 @@ None. Ordinary queries stay under `litespec/rule/backend-persistence.query-throu
 
 **Rationale:** Query and storage implementation details are provider boundaries.
 
-### Separate Worker orchestration (litespec/rule/ext-report.separate-worker-orchestration)
+### Separate Worker orchestration
 
 **Default:** Keep Worker orchestration separate from report business rules.
 
@@ -142,19 +142,19 @@ No report or object-storage package is selected by default. Each provider needs 
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/ext-report.record-reporting-need | guidance | Does the use-case page record the report, volume, plan, target, maximum, and owner? |
-| litespec/rule/ext-report.avoid-speculative-reporting-systems | guidance | Does reporting serve an accepted current query or export? |
-| litespec/rule/ext-report.parameterize-report-sql | guidance | Does every report query bind actor, tenant, filter, range, sort, and pagination values? |
-| litespec/rule/ext-report.keep-raw-sql-in-infrastructure | guidance | Do raw report SQL and connection handling live in Infrastructure? |
-| litespec/rule/ext-report.review-report-plans | guidance | Did the owner review plans and indexes on representative data? |
-| litespec/rule/ext-report.apply-item-read-authorization | guidance | Does each report and export enforce the item-read rules? |
-| litespec/rule/ext-report.run-budget-exceeding-exports-in-worker | guidance | Does each export past its request budget run through Worker? |
-| litespec/rule/ext-report.protect-export-output | guidance | Does export output carry an owner and expiry with short-lived authorized download? |
-| litespec/rule/ext-report.scope-export-output-to-the-tenant | guidance | Does each export store its output under a tenant-scoped path? |
-| litespec/rule/ext-report.define-report-limits | guidance | Does each report bound live as a Limit record? |
-| litespec/rule/ext-report.support-report-cancellation | guidance | Does report work cancel, and does expired output clear? |
-| litespec/rule/ext-report.escape-formula-leading-export-values | guidance | Are formula-leading export values escaped except reviewed formula fields? |
-| litespec/rule/ext-report.define-export-encoding-and-columns | guidance | Does each export state its encoding and stable columns? |
-| litespec/rule/ext-report.keep-report-definitions-in-application | guidance | Do report definitions live in their module or a recorded Exception? |
-| litespec/rule/ext-report.keep-report-providers-in-infrastructure | guidance | Do SQL and storage code live in Infrastructure or a recorded Exception? |
-| litespec/rule/ext-report.separate-worker-orchestration | guidance | Is Worker orchestration separate from report business rules or a recorded Exception? |
+| litespec/ext/report#record-reporting-need | guidance | Does the use-case page record the report, volume, plan, target, maximum, and owner? |
+| litespec/ext/report#avoid-speculative-reporting-systems | guidance | Does reporting serve an accepted current query or export? |
+| litespec/ext/report#parameterize-report-sql | guidance | Does every report query bind actor, tenant, filter, range, sort, and pagination values? |
+| litespec/ext/report#keep-raw-sql-in-infrastructure | guidance | Do raw report SQL and connection handling live in Infrastructure? |
+| litespec/ext/report#review-report-plans | guidance | Did the owner review plans and indexes on representative data? |
+| litespec/ext/report#apply-item-read-authorization | guidance | Does each report and export enforce the item-read rules? |
+| litespec/ext/report#run-budget-exceeding-exports-in-worker | guidance | Does each export past its request budget run through Worker? |
+| litespec/ext/report#protect-export-output | guidance | Does export output carry an owner and expiry with short-lived authorized download? |
+| litespec/ext/report#scope-export-output-to-the-tenant | guidance | Does each export store its output under a tenant-scoped path? |
+| litespec/ext/report#define-report-limits | guidance | Does each report bound live as a Limit record? |
+| litespec/ext/report#support-report-cancellation | guidance | Does report work cancel, and does expired output clear? |
+| litespec/ext/report#escape-formula-leading-export-values | guidance | Are formula-leading export values escaped except reviewed formula fields? |
+| litespec/ext/report#define-export-encoding-and-columns | guidance | Does each export state its encoding and stable columns? |
+| litespec/ext/report#keep-report-definitions-in-application | guidance | Do report definitions live in their module or a recorded Exception? |
+| litespec/ext/report#keep-report-providers-in-infrastructure | guidance | Do SQL and storage code live in Infrastructure or a recorded Exception? |
+| litespec/ext/report#separate-worker-orchestration | guidance | Is Worker orchestration separate from report business rules or a recorded Exception? |

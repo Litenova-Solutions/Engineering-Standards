@@ -11,18 +11,9 @@ static partial class StandardsValidator
     /// <summary>A page contract: its required and optional H2 sections.</summary>
     private sealed record PageContract(List<string> Required, List<string> Optional);
 
-    // A directory names the class of every page inside it. Four of these hold pages a
-    // reader follows or looks up rather than pages that own provisions, and each one
-    // answers a question at a single layer. (litespec/rule/core-authoring.state-one-layer-per-page)
-    static readonly Dictionary<string, string> PageClassAreas = new(StringComparer.Ordinal)
-    {
-        ["ext"] = "extension",
-        ["profile"] = "profile",
-        ["guide"] = "how-to",
-        ["tutorial"] = "tutorial",
-        ["reference"] = "reference",
-        ["tools"] = "command",
-    };
+    // A page's location names its class. Four areas hold pages a reader follows or
+    // looks up rather than pages that own provisions, and each one answers a
+    // question at a single layer. (litespec/core/authoring#state-one-layer-per-page)
 
     static readonly HashSet<string> TitleSmallWords = new(
         ["a", "an", "and", "as", "at", "by", "for", "in", "of", "on", "or", "the", "to", "with"],
@@ -45,34 +36,63 @@ static partial class StandardsValidator
             return "index";
         }
 
-        // A page owning no provision derives no identifier from its stem, so it carries
-        // a descriptive hyphenated name. A stem pattern refusing the hyphen returned no
-        // class for every such page, and a page with no class is held to no contract.
-        var area = PageAreaPattern().Match(relative);
-        if (!area.Success)
+        if (!relative.StartsWith("docs/", StringComparison.Ordinal) || !relative.EndsWith(".md", StringComparison.Ordinal))
         {
             return null;
         }
 
-        return PageClassAreas.GetValueOrDefault(area.Groups[1].Value, "topic");
+        // Any page inside an ext/ folder is an extension page, whether it extends one
+        // stack or every stack.
+        if (relative.Contains("/ext/", StringComparison.Ordinal))
+        {
+            return "extension";
+        }
+
+        var segments = relative["docs/".Length..^".md".Length].Split('/');
+        if (segments[0] == "tools")
+        {
+            return "command";
+        }
+
+        if (segments[0] == "reference")
+        {
+            return "reference";
+        }
+
+        if (segments[0] == "tutorial")
+        {
+            return "tutorial";
+        }
+
+        if (segments[0] == "guide")
+        {
+            return "how-to";
+        }
+
+        if ((segments[0] == "backend" || segments[0] == "frontend") && segments[^1] == "stack")
+        {
+            return "stack";
+        }
+
+        return "topic";
     }
 
     static PageContract? ExpectedSections(string? kind, string relative = "")
     {
         if (kind == "topic")
         {
-            // Each frontend page is stack-neutral with short per-stack sections for
+            // Each shared web page is stack-neutral with short per-stack sections for
             // what differs between React and Svelte. No other topic page carries
-            // stack sections. (litespec/rule/core-authoring.use-the-declared-page-contract)
-            var optional = relative.StartsWith("docs/frontend/", StringComparison.Ordinal)
+            // stack sections. (litespec/core/authoring#use-the-declared-page-contract)
+            var optional = relative.StartsWith("docs/frontend/web/", StringComparison.Ordinal)
                 ? new List<string> { "Concepts", "React", "Svelte", "Reference example" }
                 : new List<string> { "Concepts", "Reference example" };
             return new PageContract(["Intent", "Agent Summary", "Standards", "Conventions", "Verification"], optional);
         }
 
-        if (kind == "profile")
+        if (kind == "stack")
         {
-            return new PageContract(["Intent", "Agent Summary", "Standards", "Composition", "Conventions", "Verification"], []);
+            return new PageContract(["Intent", "Agent Summary", "Standards", "Conventions", "Verification"], []);
         }
 
         if (kind == "extension")
@@ -99,7 +119,7 @@ static partial class StandardsValidator
 
         // Underneath is required rather than optional, so a command page that hides its
         // mechanism fails rather than passing in silence. A command with nothing
-        // separately runnable writes 'None.' (litespec/rule/core-authoring.name-the-escape-from-every-abstraction)
+        // separately runnable writes 'None.' (litespec/core/authoring#name-the-escape-from-every-abstraction)
         if (kind == "command")
         {
             return new PageContract(["Name", "Synopsis", "Description", "Arguments", "Options", "Exit codes", "Examples", "Underneath"], []);
@@ -138,7 +158,7 @@ static partial class StandardsValidator
         if (kind == "topic")
         {
             canonical = ["Intent", "Agent Summary", "Concepts"];
-            if (relative.StartsWith("docs/frontend/", StringComparison.Ordinal))
+            if (relative.StartsWith("docs/frontend/web/", StringComparison.Ordinal))
             {
                 canonical.AddRange(["React", "Svelte"]);
             }
@@ -379,51 +399,53 @@ static partial class StandardsValidator
             }
 
             var heading = H3Pattern().Match(line);
-            if (heading.Success)
+            if (!heading.Success)
             {
-                var rule = ProvisionHeadingPattern.Match(line);
-                if ((currentH2 == "Standards" || currentH2 == "Conventions") && !rule.Success)
-                {
-                    add(relative, index + 1, "ID_MISSING", $"provision heading '{heading.Groups[1].Value}' has no valid ID");
-                    continue;
-                }
-
-                if (!rule.Success)
-                {
-                    continue;
-                }
-
-                var id = rule.Groups[2].Value;
-                var firstWord = FirstWordPattern().Match(rule.Groups[1].Value);
-                if (!firstWord.Success || !ActionVerbs.Contains(firstWord.Value))
-                {
-                    add(relative, index + 1, "HEADING_ACTION", $"provision heading '{rule.Groups[1].Value}' must start with an action verb");
-                }
-
-                if (globalIds.TryGetValue(id, out var first))
-                {
-                    add(relative, index + 1, "ID_DUPLICATE", $"provision ID '{id}' also appears in {first}");
-                }
-                else
-                {
-                    globalIds[id] = $"{relative}:{index + 1}";
-                }
-
-                if (currentH2 != "Standards" && currentH2 != "Conventions")
-                {
-                    add(relative, index + 1, "ID_LOCATION", $"provision ID '{id}' is outside Standards or Conventions");
-                    continue;
-                }
-
-                var cursor = index + 1;
-                var body = new List<LineItem>();
-                while (cursor < clean.Count && !H23Pattern().IsMatch(clean[cursor].Line))
-                {
-                    body.Add(clean[cursor++]);
-                }
-
-                provisions.Add(new Provision(id, rule.Groups[1].Value, currentH2, index + 1, body));
+                continue;
             }
+
+            if (currentH2 != "Standards" && currentH2 != "Conventions")
+            {
+                continue;
+            }
+
+            if (!Provisions.IsProvisionPage(relative))
+            {
+                continue;
+            }
+
+            // The identifier is computed from the page path and the heading, so the
+            // heading carries no ID text of its own.
+            var title = heading.Groups[1].Value.Trim();
+            if (title.Contains("litespec/", StringComparison.Ordinal))
+            {
+                add(relative, index + 1, "ID_IN_HEADING", $"provision heading '{title}' carries identifier text; the ID is computed from the page and the heading");
+            }
+
+            var id = $"litespec/{Provisions.PagePath(relative)}#{Provisions.HeadingSlug(title)}";
+            var firstWord = FirstWordPattern().Match(title);
+            if (!firstWord.Success || !ActionVerbs.Contains(firstWord.Value))
+            {
+                add(relative, index + 1, "HEADING_ACTION", $"provision heading '{title}' must start with an action verb");
+            }
+
+            if (globalIds.TryGetValue(id, out var first))
+            {
+                add(relative, index + 1, "ID_DUPLICATE", $"provision ID '{id}' also appears in {first}");
+            }
+            else
+            {
+                globalIds[id] = $"{relative}:{index + 1}";
+            }
+
+            var cursor = index + 1;
+            var body = new List<LineItem>();
+            while (cursor < clean.Count && !H23Pattern().IsMatch(clean[cursor].Line))
+            {
+                body.Add(clean[cursor++]);
+            }
+
+            provisions.Add(new Provision(id, title, currentH2, index + 1, body));
         }
 
         // A heading with no body and no lower-level heading beneath it groups
@@ -466,7 +488,7 @@ static partial class StandardsValidator
         }
 
         // An index navigates. A numbered procedure inside one duplicates a canonical
-        // provision without citing it. (litespec/rule/core-authoring.use-the-declared-page-contract)
+        // provision without citing it. (litespec/core/authoring#use-the-declared-page-contract)
         if (kind == "index")
         {
             var step = clean.FirstOrDefault(item => NumberedStepPattern().IsMatch(item.Line));
@@ -560,9 +582,6 @@ static partial class StandardsValidator
 
     [GeneratedRegex(@"^\s*(?:[-*+] |\d+\.\s+)")]
     private static partial Regex ListMarkerPattern();
-
-    [GeneratedRegex(@"^docs/([a-z][a-z0-9]*)/[a-z][a-z0-9-]*\.md$")]
-    private static partial Regex PageAreaPattern();
 
     [GeneratedRegex(@"[A-Za-z0-9][A-Za-z0-9./+-]*")]
     private static partial Regex TitleTokenPattern();

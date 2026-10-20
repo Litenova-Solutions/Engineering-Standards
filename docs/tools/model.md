@@ -27,9 +27,9 @@ The finding codes are:
 |:---|:---|
 | `record-shape` | A record fails the shape its type requires. |
 | `identifier-form` | An identifier breaks the form its type requires. |
-| `identifier-refused-form` | A retired identifier form appears in docs, code, or tests. |
+| `identifier-refused-form` | A retired identifier form appears in docs, code, or tests, including the provision form of the 1.x releases. |
 | `identifier-duplicate` | One identifier names two records. |
-| `reference-unresolved` | A citation names no written record. |
+| `reference-unresolved` | A citation names no written record or pinned shared provision. |
 | `draft-gate` | An approved record rests on a draft decision. |
 | `owner-unknown` | A record names no owner from the owners list. |
 | `draft-without-decider` | A draft names no decider or no decide-by date. |
@@ -108,4 +108,4 @@ litespec model query --root ../consumer use-case/orders.cancel-order
 
 ## Underneath
 
-The builder reads paths from `litespec.project.json` and the test run from TRX files under `paths.testResults`. Nothing beneath it is separately runnable.
+The builder reads paths, `shape`, and `stacks` from `litespec.project.json`. It reads shared provisions from the pinned docs under `litespec/docs`, and the test run from TRX or JUnit XML files under `paths.testResults`. Nothing beneath it is separately runnable.

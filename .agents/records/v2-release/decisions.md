@@ -7,7 +7,7 @@ This file records the choices made while preparing v2.0.0 on `release/v2.0.0`, s
 ### D1. The product name is LiteSpec everywhere it names the product
 
 - "Agentic Engineering System", "Litenova Engineering Standards" and "Engineering Standards" become "LiteSpec". Litenova Solutions stays as the company that authors it.
-- Provision IDs change prefix: `standards/rule/...` becomes `litespec/rule/...`. This is a v2.0.0 complete contract, so no alias is kept (`litespec/rule/core-authoring.exclude-cross-release-compatibility-work`).
+- Provision IDs change prefix: `standards/rule/...` becomes `litespec/rule/...`. This is a v2.0.0 complete contract, so no alias is kept (`litespec/core/authoring#exclude-cross-release-compatibility-work`).
 - Files: `standards.manifest.json` becomes `litespec.manifest.json`, `standards.project.json` becomes `litespec.project.json`, and the two schemas become `schemas/litespec-manifest.schema.json` and `schemas/litespec-project.schema.json`.
 - The consumer submodule path is `litespec/`, not `standards/`.
 - The project field `reviewedStandardsVersion` becomes `reviewedLiteSpecVersion`. Considered `reviewedVersion`; rejected because a consumer project file holds other versions, and the explicit name is greppable.
@@ -37,7 +37,7 @@ The .NET 10 `dotnet test` command refuses VSTest mode for xUnit v3 projects, so 
 
 ### D5. The release branch carries 2.0.0 in the manifest, the changelog and the consumer template
 
-The audit flagged `reviewedLiteSpecVersion: "2.0.0"` as higher than the latest tag `v1.18.0`. The consumer validator requires that field to equal the pinned manifest version, and `litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag` says the release carries its version in the manifest, the changelog and the template. So 2.0.0 stays, and the two sentences that contradicted it were rewritten: `AGENTS.md` "Version Handling" and `docs/core/maintaining.md` "The LiteSpec release". **Owner action:** tag `v2.0.0` on the release commit.
+The audit flagged `reviewedLiteSpecVersion: "2.0.0"` as higher than the latest tag `v1.18.0`. The consumer validator requires that field to equal the pinned manifest version, and `litespec/core/maintaining#publish-a-litespec-release-from-a-tag` says the release carries its version in the manifest, the changelog and the template. So 2.0.0 stays, and the two sentences that contradicted it were rewritten: `AGENTS.md` "Version Handling" and `docs/core/maintaining.md` "The LiteSpec release". **Owner action:** tag `v2.0.0` on the release commit.
 
 ### D6. Behaviour changes made while porting
 
@@ -59,7 +59,7 @@ A read-only audit ran before the port landed (28 findings). Fixed: rename leftov
 Also fixed after the first audit, as decisions taken on the owner's behalf:
 
 - **D7. A result's HTTP status is `httpStatus`.** A result carried its HTTP status in `status`, the field every other record uses for draft, approved or retired, and the book had a workaround for the clash. It is now `httpStatus` (integer, 200 to 599) in the schema, the checker, the book, the use-case template and every fixture, and `status` always means the lifecycle. Done before the v2.0.0 tag because afterwards it would be a breaking change.
-- **D8. Two checks gained the provisions that own them.** `litespec/rule/backend-identifiers.keep-business-record-names-unique-across-the-project` owns `business-record-name-clash`, and `litespec/rule/backend-api.record-each-results-http-status` owns `result-status`. Both are new provisions; **review their wording**.
+- **D8. Two checks gained the provisions that own them.** `litespec/backend/identifiers#keep-business-record-names-unique-across-the-project` owns `business-record-name-clash`, and `litespec/backend/api#record-each-results-http-status` owns `result-status`. Both are new provisions; **review their wording**.
 - **D9. Failure-code reasons are lowercase.** The schema allowed an uppercase reason segment while the checker accepted lowercase only; no page or template used uppercase, so the schema now matches the checker.
 
 **Left for the owner:**
@@ -92,6 +92,10 @@ Not changed: the claim that standard error stays on the Windows code page was ch
 ### D11. The published home is https://litespec.dev
 
 The owner first chose `litenova.solutions/LiteSpec`, then pivoted to buying `litespec.dev` (2026-10-20; the registry had no record of it that day). Every schema `$id` reads `https://litespec.dev/<version>/schemas/<file>`, the `SCHEMA_ID` check in `litespec validate` keeps them on the manifest version, `docs/core/maintaining.md` states it, and the README links to `https://litespec.dev`. The site is LiteSpec's own: the plan is a `litespec site` command and a deploy on each tag. The company site's `/Standards` route becomes a permanent redirect to it.
+
+### D12. The 2.0.0 structure: nested folders, path + fragment IDs, shapes and presets
+
+Chosen by the owner on 2026-10-20 after comparing layer-nested, concern-nested and separate-repository layouts, and after stating that v1 rules do not bind v2. The full target and build notes are in [structure.md](structure.md). In short: a stack is a folder inside its area (`backend/dotnet/`, `frontend/web/react/`); a stack applies its folder and every folder above it; a provision ID is `litespec/<page>#<slug>` with no ID in the heading; a project names a size, a shape (`server` or `client-only`) and its stacks; v1 profiles became presets for `litespec init`; the old-to-new ID map is kept for a later migration tool. This supersedes the `docs/dotnet/` area and the `specification` manifest list of D11's successor (stack-bindings.md).
 
 ## Progress
 

@@ -7,29 +7,29 @@ public sealed partial class StandardsValidatorTests
     public void SummaryCount() => Check(
         root =>
         {
-            var bullets = string.Join("\n", Enumerable.Repeat("- Keep the topic bounded. (litespec/rule/core-topic.keep-the-topic-bounded)", 11));
-            StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/rule/core-topic.keep-the-topic-bounded)", bullets));
+            var bullets = string.Join("\n", Enumerable.Repeat("- Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)", 11));
+            StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)", bullets));
         },
         ["SUMMARY_COUNT"]);
 
     [Fact(DisplayName = "summary ID position")]
     public void SummaryIdPosition() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/rule/core-topic.keep-the-topic-bounded)", "- Keep the topic bounded. (litespec/rule/core-topic.keep-the-topic-bounded) Extra text.")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)", "- Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded) Extra text.")),
         ["SUMMARY_ID_POSITION"]);
 
     [Fact(DisplayName = "normative summary")]
     public void NormativeSummary() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/rule/core-topic.keep-the-topic-bounded)", "- Consumers MUST keep the topic bounded. (litespec/rule/core-topic.keep-the-topic-bounded)")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)", "- Consumers MUST keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)")),
         ["SUMMARY_NORMATIVE"]);
 
     [Fact(DisplayName = "unknown summary ID")]
     public void UnknownSummaryId() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "litespec/rule/core-topic.keep-the-topic-bounded)", "litespec/rule/core-topic.unknown-summary)")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "litespec/core/topic#keep-the-topic-bounded)", "litespec/core/topic#unknown-summary)")),
         ["SUMMARY_UNKNOWN_ID"]);
 
     [Fact(DisplayName = "duplicate verification row")]
     public void DuplicateVerificationRow() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |", "| litespec/rule/core-topic.keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |\n| litespec/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/core/topic#use-the-default-location | guidance | Does the topic live in its owning documentation area? |", "| litespec/core/topic#keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |\n| litespec/core/topic#use-the-default-location | guidance | Does the topic live in its owning documentation area? |")),
         ["VERIFY_DUPLICATE_ID"]);
 
     [Fact(DisplayName = "old verification method header")]
@@ -39,12 +39,12 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "verification without a table")]
     public void VerificationWithoutTable() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "## Verification\n\n| ID | Mark | Evidence |\n|:---|:---|:---|\n| litespec/rule/core-topic.keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |\n| litespec/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |\n", "## Verification\n\n- Confirm that the validator exits with code zero.\n")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "## Verification\n\n| ID | Mark | Evidence |\n|:---|:---|:---|\n| litespec/core/topic#keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |\n| litespec/core/topic#use-the-default-location | guidance | Does the topic live in its owning documentation area? |\n", "## Verification\n\n- Confirm that the validator exits with code zero.\n")),
         ["VERIFY_HEADER", "VERIFY_MISSING_ID"]);
 
     [Fact(DisplayName = "unknown verification mark")]
     public void UnknownVerificationMark() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/rule/core-topic.keep-the-topic-bounded | checkable |", "| litespec/rule/core-topic.keep-the-topic-bounded | manual |")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/core/topic#keep-the-topic-bounded | checkable |", "| litespec/core/topic#keep-the-topic-bounded | manual |")),
         ["VERIFY_MARK"]);
 
     [Fact(DisplayName = "checkable evidence naming a missing file")]
@@ -80,7 +80,7 @@ public sealed partial class StandardsValidatorTests
     public void GuidanceEvidenceNoCommand() => Check(
         root =>
         {
-            StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/rule/core-topic.keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |", "| litespec/rule/core-topic.keep-the-topic-bounded | guidance | Does the topic stay inside its declared boundary? |"));
+            StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/core/topic#keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |", "| litespec/core/topic#keep-the-topic-bounded | guidance | Does the topic stay inside its declared boundary? |"));
             StandardsFixture.RebuildIndex(root);
         },
         []);
@@ -92,7 +92,7 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "unknown verification row")]
     public void UnknownVerificationRow() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |", "| litespec/convention/core-topic.use-the-default-location | guidance | Does the topic live in its owning documentation area? |\n| litespec/rule/core-topic.unknown-verification | checkable | `litespec validate` asserts the unknown row. |")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/core/topic#use-the-default-location | guidance | Does the topic live in its owning documentation area? |", "| litespec/core/topic#use-the-default-location | guidance | Does the topic live in its owning documentation area? |\n| litespec/core/topic#unknown-verification | checkable | `litespec validate` asserts the unknown row. |")),
         ["VERIFY_UNKNOWN_ID"]);
 
     [Fact(DisplayName = "provision restates its heading")]
@@ -102,11 +102,11 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "summary bullet repeats its provision")]
     public void SummaryRepeatsProvision() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/rule/core-topic.keep-the-topic-bounded)", "- Keep the topic inside its declared boundary. (litespec/rule/core-topic.keep-the-topic-bounded)")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)", "- Keep the topic inside its declared boundary. (litespec/core/topic#keep-the-topic-bounded)")),
         ["SUMMARY_RESTATES_REQUIREMENT"]);
 
     [Fact(DisplayName = "evidence repeats its provision heading")]
     public void EvidenceRepeatsHeading() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/rule/core-topic.keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |", "| litespec/rule/core-topic.keep-the-topic-bounded | checkable | Pull request review asserts `keep the topic bounded` in the owning specification. |")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/core/topic#keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |", "| litespec/core/topic#keep-the-topic-bounded | checkable | Pull request review asserts `keep the topic bounded` in the owning specification. |")),
         ["VERIFY_TEMPLATED_EVIDENCE"]);
 }

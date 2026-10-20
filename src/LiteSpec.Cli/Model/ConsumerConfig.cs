@@ -53,6 +53,12 @@ sealed class ConsumerConfig
     /// <summary>The size profile: small or large.</summary>
     public string Size { get; private set; } = "large";
 
+    /// <summary>The project shape: server or client-only.</summary>
+    public string Shape { get; private set; } = "server";
+
+    /// <summary>The named stacks. A declaration without stacks predates them and reads as dotnet.</summary>
+    public IReadOnlyList<string> Stacks { get; private set; } = ["dotnet"];
+
     /// <summary>The closed owner list.</summary>
     public IReadOnlyList<string> Owners { get; private set; } = [];
 
@@ -103,6 +109,24 @@ sealed class ConsumerConfig
             && size.GetString() is "small" or "large")
         {
             config.Size = size.GetString()!;
+        }
+
+        if (document.RootElement.TryGetProperty("shape", out var shape)
+            && shape.ValueKind == JsonValueKind.String
+            && shape.GetString() is { Length: > 0 } shapeName)
+        {
+            config.Shape = shapeName;
+        }
+
+        if (document.RootElement.TryGetProperty("stacks", out var stacks)
+            && stacks.ValueKind == JsonValueKind.Array)
+        {
+            config.Stacks =
+            [
+                .. stacks.EnumerateArray()
+                             .Where(entry => entry.ValueKind == JsonValueKind.String)
+                             .Select(entry => entry.GetString()!),
+            ];
         }
 
         if (document.RootElement.TryGetProperty("owners", out var owners)

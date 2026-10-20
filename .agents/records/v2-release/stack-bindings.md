@@ -6,7 +6,7 @@ Status: built on `release/v2.0.0` (2026-10-20). The owner approved the direction
 
 LiteSpec should accept other backends later (Go, Java, Python, Node) without a second rewrite. Today it can't:
 
-- `litespec/rule/core-scope.select-a-size-profile-and-stacks` requires "the backend stack always dotnet".
+- `litespec/core/scope#select-a-size-profile-and-stacks` requires "the backend stack always dotnet".
 - `docs/backend/` mixes stack-neutral rules ("Point dependencies inward", "Treat aggregates as consistency boundaries") with .NET realizations ("Use five application projects", "Use one public assembly marker per scanned project").
 - `docs/workspace/` mixes the same way ("Pin every dependency centrally" next to "Centralize NuGet versions" and "Commit the tool manifest").
 - The manifest's `stacks.dotnet.pages` lists 30 pages, including the frontend pages, so a stack is "everything" rather than its own binding.
@@ -36,7 +36,7 @@ Measured on 2026-10-20: of 1010 provisions, about 600 are written without a stac
 - Where a rule has no stack-neutral core ("Use one public assembly marker per scanned project"), it moves to the binding whole.
 - An extension that is binding-only says so: `efcore` becomes a `dotnet` extension; `bdd` keeps its neutral rules and moves the Reqnroll and LightBDD runner rules into the `dotnet` binding.
 
-Provision IDs of moved rules change. That is allowed now and costly after the `v2.0.0` tag (`litespec/rule/core-authoring.exclude-cross-release-compatibility-work` forbids aliases, so a later move would break every consumer citation).
+Provision IDs of moved rules change. That is allowed now and costly after the `v2.0.0` tag (`litespec/core/authoring#exclude-cross-release-compatibility-work` forbids aliases, so a later move would break every consumer citation).
 
 ### S3. Manifest shape
 

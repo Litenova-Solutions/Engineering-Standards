@@ -60,11 +60,10 @@ static partial class UiValidator
         // authored file outside the copied primitive boundary and the tests. The shared
         // package owns the primitive library, so its composites import it deliberately;
         // an application does not, and `ValidateApplicationImports` refuses it there.
-        // (litespec/rule/frontend-ui.restrict-css-decisions)
+        // (litespec/frontend/web/ui#restrict-css-decisions)
         public void ValidateSourceScan(string target, string? primitives, string platform)
         {
             _ = platform;
-            const string ui = "frontend-ui";
             foreach (var source in Walk(target, file => SourceFile.IsMatch(file)))
             {
                 var relative = RelativeToRoot(source);
@@ -86,7 +85,7 @@ static partial class UiValidator
                             return;
                         }
 
-                        Errors.Add($"[litespec/rule/{ui}.restrict-css-decisions] {relative}: {UtilityMessages[kind]} '{token}'");
+                        Errors.Add($"[litespec/frontend/web/ui#restrict-css-decisions] {relative}: {UtilityMessages[kind]} '{token}'");
                     }, variants: false);
                 }
 
@@ -95,7 +94,6 @@ static partial class UiValidator
 
         public void ValidateApplicationImports(string frontendRoot, string packageName, string platform)
         {
-            const string components = "frontend-components";
             var boundaries = platform == "svelte" ? SvelteImportBoundaries : ReactImportBoundaries;
             foreach (var source in Walk(frontendRoot, file => SourceFile.IsMatch(file)))
             {
@@ -127,7 +125,7 @@ static partial class UiValidator
                         continue;
                     }
 
-                    Errors.Add($"[litespec/rule/{components}.compose-composites-in-page-code] {relative}: {boundary.Message} from shared package '{packageName}'");
+                    Errors.Add($"[litespec/frontend/components#compose-composites-in-page-code] {relative}: {boundary.Message} from shared package '{packageName}'");
                 }
             }
         }
@@ -191,7 +189,7 @@ static partial class UiValidator
                 {
                     if (dependencies.TryGetValue(name, out var dependency) && Truthy(dependency))
                     {
-                        Errors.Add($"[litespec/rule/frontend-ui.select-one-visual-authority] {label}: second general-purpose visual dependency '{name}' requires an exception");
+                        Errors.Add($"[litespec/frontend/ui#select-one-visual-authority] {label}: second general-purpose visual dependency '{name}' requires an exception");
                     }
                 }
 

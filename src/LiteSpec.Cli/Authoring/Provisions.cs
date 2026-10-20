@@ -13,18 +13,19 @@ static class Provisions
     /// <summary>The generated provision index, relative to the repository root.</summary>
     public const string IndexPath = "docs/reference/provisions.md";
 
-    /// <summary>Every provision identifier kind (PROVISION_KINDS).</summary>
+    /// <summary>Every provision kind (PROVISION_KINDS).</summary>
     public static readonly IReadOnlyList<string> Kinds = ["convention", "rule"];
 
     /// <summary>The provision identifier pattern as a .NET regex source (PROVISION_ID_SOURCE).</summary>
-    public static readonly string IdSource = $"litespec\\/(?:{string.Join("|", Kinds)})\\/[a-z][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*";
+    public static readonly string IdSource = "litespec\\/[a-z0-9]+(?:-[a-z0-9]+)*(?:\\/[a-z0-9]+(?:-[a-z0-9]+)*)*#[a-z0-9]+(?:-[a-z0-9]+)*";
 
-    // Every provision identifier is litespec/<kind>/<page>.<heading-slug>. The kind
-    // names the assertion class, the page names the owning page, and the heading slug
-    // names the assertion. No segment carries a sequence number.
+    // Every provision identifier is litespec/<page>#<heading-slug>. The page is the
+    // owning page path relative to docs/ without its extension, and the slug is the
+    // heading slug. The heading carries no ID text; the ID is computed from the path
+    // and the heading. No segment carries a sequence number.
     static readonly Regex ProvisionIdPattern = new($"^{IdSource}$");
-    static readonly Regex RuleHeading = new($"^###\\s+(.+?)\\s+\\(({IdSource})\\)\\s*$");
-    static readonly Regex ParseIdPattern = new(@"^litespec\/([a-z-]+)\/([a-z][a-z0-9-]*)\.([a-z0-9][a-z0-9-]*)$");
+    static readonly Regex ProvisionHeading = new(@"^###\s+(.+?)\s*$");
+    static readonly Regex ParseIdPattern = new(@"^litespec\/([a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*)#([a-z0-9]+(?:-[a-z0-9]+)*)$");
     static readonly Regex SectionHeading = new(@"^##\s+(.+?)\s*(?:\{#.*\})?\s*$");
     static readonly Regex Fence = new(@"^\s*```");
     static readonly Regex SeparatorCell = new(@"^:?-+:?$");
@@ -44,9 +45,10 @@ static class Provisions
     }
 
     /// <summary>
-    ///     Splits a provision identifier into its kind, page and slug. The page segment
-    ///     is <c>&lt;area&gt;-&lt;stem&gt;</c>, so two pages named <c>structure.md</c> in two
-    ///     areas stay distinct. Returns null when the identifier is malformed.
+    ///     Splits a provision identifier into its page and slug. The page is the owning
+    ///     page path relative to <c>docs/</c> without its extension, so two pages named
+    ///     <c>structure.md</c> in two folders stay distinct. Returns null when the
+    ///     identifier is malformed.
     /// </summary>
     public static ProvisionId? Parse(string id)
     {
@@ -57,11 +59,29 @@ static class Provisions
             return null;
         }
 
-        return new ProvisionId(match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value);
+        return new ProvisionId(match.Groups[1].Value, match.Groups[2].Value);
     }
 
-    /// <summary>Whether the identifier names a provision of a known kind.</summary>
+    /// <summary>Whether the identifier matches the provision identifier pattern.</summary>
     public static bool IsProvisionId(string id) => ProvisionIdPattern.IsMatch(id);
+
+    // A provision is a ### heading inside a page's Standards or Conventions section,
+    // on any page under docs/ except the lookup areas and the navigation pages, which
+    // own no provisions.
+    static readonly string[] ExcludedAreas = ["docs/tools/", "docs/reference/", "docs/tutorial/", "docs/guide/"];
+
+    /// <summary>Whether provisions are collected from this repository-relative path.</summary>
+    public static bool IsProvisionPage(string relative) =>
+        relative.StartsWith("docs/", StringComparison.Ordinal)
+        && relative.EndsWith(".md", StringComparison.Ordinal)
+        && !relative.EndsWith("/README.md", StringComparison.Ordinal)
+        && !ExcludedAreas.Any(area => relative.StartsWith(area, StringComparison.Ordinal));
+
+    /// <summary>
+    ///     The page path a provision identifier names: the repository-relative page path
+    ///     without the <c>docs/</c> prefix and the <c>.md</c> extension.
+    /// </summary>
+    public static string PagePath(string relative) => relative["docs/".Length..^".md".Length];
 
     /// <summary>Collects every provision row from the standards pages, sorted by identifier.</summary>
     public static List<ProvisionRow> Collect(string root)
@@ -72,11 +92,12 @@ static class Provisions
         {
             var relative = Slash(Path.GetRelativePath(root, file));
 
-            if (relative == IndexPath)
+            if (!IsProvisionPage(relative))
             {
                 continue;
             }
 
+            var page = PagePath(relative);
             var lines = StripFences(LineSplit.Split(File.ReadAllText(file)));
             var marks = CollectVerificationMarks(lines);
             var section = "";
@@ -95,22 +116,23 @@ static class Provisions
                     continue;
                 }
 
-                var rule = RuleHeading.Match(line);
+                var provision = ProvisionHeading.Match(line);
 
-                if (!rule.Success)
+                if (!provision.Success)
                 {
                     continue;
                 }
 
-                var id = rule.Groups[2].Value;
-                var parsed = Parse(id);
+                var title = provision.Groups[1].Value.Trim();
+                var slug = HeadingSlug(title);
+                var id = $"litespec/{page}#{slug}";
                 var verification = marks.TryGetValue(id, out var found) ? found : (Mark: "", Evidence: "");
                 rows.Add(new ProvisionRow(
                     id,
-                    rule.Groups[1].Value,
+                    title,
                     relative,
-                    HeadingSlug($"{rule.Groups[1].Value} ({id})"),
-                    parsed?.Kind ?? "",
+                    slug,
+                    section == "Standards" ? "rule" : "convention",
                     verification.Mark,
                     verification.Evidence));
             }
@@ -124,13 +146,14 @@ static class Provisions
     public static string BuildIndex(string root)
     {
         var rows = Collect(root);
-        var kinds = new Dictionary<string, List<ProvisionRow>>(StringComparer.Ordinal);
+        var areas = new Dictionary<string, List<ProvisionRow>>(StringComparer.Ordinal);
 
         foreach (var row in rows)
         {
-            if (!kinds.TryGetValue(row.Kind, out var group))
+            var area = row.Page.Split('/').Length > 1 ? row.Page.Split('/')[1] : "";
+            if (!areas.TryGetValue(area, out var group))
             {
-                kinds[row.Kind] = group = [];
+                areas[area] = group = [];
             }
 
             group.Add(row);
@@ -146,24 +169,23 @@ static class Provisions
             "",
             "Run `litespec provisions` after any provision change. The repository validator fails when this page and the active standards disagree.",
             "",
-            $"The active release states {rows.Count} {(rows.Count == 1 ? "provision" : "provisions")} across {kinds.Count} {(kinds.Count == 1 ? "kind" : "kinds")}.",
+            $"The active release states {rows.Count} {(rows.Count == 1 ? "provision" : "provisions")} across {areas.Count} {(areas.Count == 1 ? "area" : "areas")}.",
             "",
         };
 
-        foreach (var kind in kinds.Keys.OrderBy(name => name, StringComparer.Ordinal))
+        foreach (var area in areas.Keys.OrderBy(name => name, StringComparer.Ordinal))
         {
-            lines.Add($"## {kind}");
+            lines.Add($"## {area}");
             lines.Add("");
-            lines.Add("| ID | Provision | Page | Mark | Evidence |");
+            lines.Add("| ID | Provision | Kind | Mark | Evidence |");
             lines.Add("|:---|:---|:---|:---|:---|");
 
-            foreach (var row in kinds[kind])
+            foreach (var row in areas[area])
             {
-                var href = Slash(Path.GetRelativePath(Path.GetDirectoryName(IndexPath)!, row.Page));
-                var page = row.Page.StartsWith("docs/", StringComparison.Ordinal) ? row.Page["docs/".Length..] : row.Page;
+                var page = PagePath(row.Page);
                 var mark = row.Mark.Length > 0 ? row.Mark : "-";
                 var evidence = EscapeCell(row.Evidence);
-                lines.Add($"| {row.Id} | [{EscapeCell(row.Heading)}]({href}#{row.Anchor}) | `{page}` | {mark} | {(evidence.Length > 0 ? evidence : "-")} |");
+                lines.Add($"| {row.Id} | [{EscapeCell(row.Heading)}](../{page}.md#{row.Anchor}) | {row.Kind} | {mark} | {(evidence.Length > 0 ? evidence : "-")} |");
             }
 
             lines.Add("");
@@ -302,16 +324,15 @@ static class Provisions
 /// <summary>
 ///     A parsed provision identifier.
 /// </summary>
-/// <param name="Kind">The assertion class, such as <c>rule</c>.</param>
-/// <param name="Page">The owning page as <c>&lt;area&gt;-&lt;stem&gt;</c>.</param>
-/// <param name="Slug">The assertion slug.</param>
-sealed record ProvisionId(string Kind, string Page, string Slug);
+/// <param name="Page">The owning page path relative to <c>docs/</c> without its extension.</param>
+/// <param name="Slug">The heading slug.</param>
+sealed record ProvisionId(string Page, string Slug);
 
 /// <summary>
 ///     One provision with its heading, owning page and Verification mark.
 /// </summary>
 /// <param name="Id">The provision identifier.</param>
-/// <param name="Heading">The Standards heading without its identifier.</param>
+/// <param name="Heading">The provision heading.</param>
 /// <param name="Page">The owning page, relative to the repository root.</param>
 /// <param name="Anchor">The heading slug the index links to.</param>
 /// <param name="Kind">The assertion class.</param>

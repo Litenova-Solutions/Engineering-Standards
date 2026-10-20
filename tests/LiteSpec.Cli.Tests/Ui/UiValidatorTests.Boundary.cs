@@ -5,7 +5,7 @@ namespace LiteSpec.Tests.Ui;
 /// </summary>
 public sealed partial class UiValidatorTests
 {
-    // Application boundary (litespec/rule/frontend-components.compose-composites-in-page-code).
+    // Application boundary (litespec/frontend/components#compose-composites-in-page-code).
 
     [Fact]
     public void An_Application_Importing_The_Primitive_Library()
@@ -33,7 +33,7 @@ public sealed partial class UiValidatorTests
             "/** Reads a value from `@base-ui/react` in the composite that wraps it. */\nexport function Case() {\n  return <main>Orders</main>;\n}\n"));
     }
 
-    // Application stylesheet (litespec/rule/frontend-ui.keep-tokens-in-one-stylesheet).
+    // Application stylesheet (litespec/frontend/web/ui#keep-tokens-in-one-stylesheet).
 
     [Fact]
     public void An_Application_Stylesheet_Importing_The_Package_Tokens()
@@ -77,7 +77,7 @@ public sealed partial class UiValidatorTests
             "import 'bootstrap/dist/css/bootstrap.css' is outside the shared package");
     }
 
-    // Shared stylesheets (litespec/rule/frontend-ui.keep-tokens-in-one-stylesheet).
+    // Shared stylesheets (litespec/frontend/web/ui#keep-tokens-in-one-stylesheet).
 
     [Fact]
     public void A_Shared_Stylesheet_Written_From_Tokens()

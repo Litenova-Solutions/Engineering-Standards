@@ -14,7 +14,7 @@
 
 LiteSpec is the standards contract Litenova Solutions uses for software work by humans and AI agents.
 
-LiteSpec v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend: `react`, `svelte`, or `blazor-web`.
+LiteSpec v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend: `react`, `svelte`, or `blazor`.
 
 ## What It Defines
 

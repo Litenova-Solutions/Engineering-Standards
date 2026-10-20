@@ -17,7 +17,7 @@ static partial class UiValidator
             var label = RelativeToRoot(file);
             if (!Exists(file))
             {
-                Errors.Add($"[litespec/rule/frontend-patterns.keep-one-pattern-catalog] pattern catalog: no catalog at '{relative}'");
+                Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] pattern catalog: no catalog at '{relative}'");
                 return;
             }
 
@@ -27,7 +27,7 @@ static partial class UiValidator
                 return;
             }
 
-            SchemaCheck("ui-pattern-catalog.schema.json", catalog, label, "litespec/rule/frontend-patterns.keep-one-pattern-catalog");
+            SchemaCheck("ui-pattern-catalog.schema.json", catalog, label, "litespec/frontend/patterns#keep-one-pattern-catalog");
 
             // A catalog that breaks the schema still reads below, so each access guards
             // its own shape rather than assuming the schema proved it.
@@ -74,7 +74,7 @@ static partial class UiValidator
                 {
                     if (seenPatterns.Any(candidate => StrictEqual(candidate, id)))
                     {
-                        Errors.Add($"[litespec/rule/frontend-patterns.keep-one-pattern-catalog] {label}: duplicate pattern id '{Show(id)}'");
+                        Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] {label}: duplicate pattern id '{Show(id)}'");
                     }
 
                     seenPatterns.Add(id);
@@ -96,7 +96,7 @@ static partial class UiValidator
 
                     if (seenOptions.Any(candidate => StrictEqual(candidate, optionId)))
                     {
-                        Errors.Add($"[litespec/rule/frontend-patterns.keep-one-pattern-catalog] {where} has a duplicate option id '{Show(optionId)}'");
+                        Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] {where} has a duplicate option id '{Show(optionId)}'");
                     }
 
                     seenOptions.Add(optionId);
@@ -105,26 +105,26 @@ static partial class UiValidator
                 var group = Child(pattern, "group");
                 if (group.Found && !groupIds.Any(candidate => StrictEqual(candidate, group)))
                 {
-                    Errors.Add($"[litespec/rule/frontend-patterns.keep-one-pattern-catalog] {where}: group '{Show(group)}' is not one of the catalog groups");
+                    Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] {where}: group '{Show(group)}' is not one of the catalog groups");
                 }
 
                 var decisionOption = Dot(Child(pattern, "decision"), "option");
                 if (decisionOption.Found && !optionIds.Any(candidate => StrictEqual(candidate, decisionOption)))
                 {
-                    Errors.Add($"[litespec/rule/frontend-patterns.record-every-option-considered] {where}: decision.option '{Show(decisionOption)}' is not one of its options");
+                    Errors.Add($"[litespec/frontend/patterns#record-every-option-considered] {where}: decision.option '{Show(decisionOption)}' is not one of its options");
                 }
 
                 var compact = Child(pattern, "compact");
                 var breakpoint = Dot(compact, "breakpoint");
                 if (breakpoint.Found && !(breakpoint.Node is JsonValue breakpointValue && breakpointValue.TryGetValue<string>(out var breakpointName) && breakpoints.Contains(breakpointName)))
                 {
-                    Errors.Add($"[litespec/rule/frontend-patterns.declare-the-compact-behaviour] {where}: compact.breakpoint '{Show(breakpoint)}' is not a key of breakpoints");
+                    Errors.Add($"[litespec/frontend/patterns#declare-the-compact-behaviour] {where}: compact.breakpoint '{Show(breakpoint)}' is not a key of breakpoints");
                 }
 
                 var compactOption = Dot(compact, "option");
                 if (compactOption.Found && !optionIds.Any(candidate => StrictEqual(candidate, compactOption)))
                 {
-                    Errors.Add($"[litespec/rule/frontend-patterns.declare-the-compact-behaviour] {where}: compact.option '{Show(compactOption)}' is not one of its options");
+                    Errors.Add($"[litespec/frontend/patterns#declare-the-compact-behaviour] {where}: compact.option '{Show(compactOption)}' is not one of its options");
                 }
 
                 var extensions = Child(pattern, "extensions").Node is JsonArray extensionArray
@@ -135,7 +135,7 @@ static partial class UiValidator
                     var extensionOption = Child(extensions[index], "option");
                     if (extensionOption.Found && !optionIds.Any(candidate => StrictEqual(candidate, extensionOption)))
                     {
-                        Errors.Add($"[litespec/rule/frontend-patterns.record-every-option-considered] {where}: extensions[{index}].option '{Show(extensionOption)}' is not one of its options");
+                        Errors.Add($"[litespec/frontend/patterns#record-every-option-considered] {where}: extensions[{index}].option '{Show(extensionOption)}' is not one of its options");
                     }
                 }
 
@@ -159,7 +159,7 @@ static partial class UiValidator
 
                     if (!foundEntry)
                     {
-                        Errors.Add($"[litespec/rule/frontend-patterns.keep-one-pattern-catalog] {where}: library '{libraryId}' is not a pattern in the UI pattern library");
+                        Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] {where}: library '{libraryId}' is not a pattern in the UI pattern library");
                     }
                     else
                     {
@@ -194,7 +194,7 @@ static partial class UiValidator
                             var optionName = Child(options[index], "name");
                             if (libraryName.Value is { Node: JsonValue expectedValue } && expectedValue.TryGetValue<string>(out var expectedName) && optionName.Found && !StrictEqual(optionName, libraryName.Value))
                             {
-                                Errors.Add($"[litespec/rule/frontend-patterns.keep-one-pattern-catalog] {where}: options[{index}].name '{Show(optionName)}' does not match the UI pattern library option '{Show(optionId)}' name '{expectedName}'");
+                                Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] {where}: options[{index}].name '{Show(optionName)}' does not match the UI pattern library option '{Show(optionId)}' name '{expectedName}'");
                             }
                         }
                     }
@@ -217,7 +217,7 @@ static partial class UiValidator
 
                             if (!Exists(FilePath(component)))
                             {
-                                Errors.Add($"[litespec/rule/frontend-patterns.implement-a-chosen-pattern-once] {target}.components[{index}] does not exist '{component}'");
+                                Errors.Add($"[litespec/frontend/web/patterns#implement-a-chosen-pattern-once] {target}.components[{index}] does not exist '{component}'");
                             }
                         }
                     }
@@ -226,13 +226,13 @@ static partial class UiValidator
                     var status = Child(implementation, "status");
                     if (status is { Node: JsonValue statusValue } && statusValue.TryGetValue<string>(out var statusText) && statusText == "adopted" && (!components.Found || (components.Node is JsonArray adopted && adopted.Count == 0)))
                     {
-                        Errors.Add($"[litespec/rule/frontend-patterns.implement-a-chosen-pattern-once] {target} has status 'adopted' with no components");
+                        Errors.Add($"[litespec/frontend/web/patterns#implement-a-chosen-pattern-once] {target} has status 'adopted' with no components");
                     }
 
                     var gap = Child(implementation, "gap");
                     if (status is { Node: JsonValue gapStatusValue } && gapStatusValue.TryGetValue<string>(out var gapStatus) && (gapStatus == "partial" || gapStatus == "pending") && (gap.Node is null || (gap.Node is JsonValue gapValue && gapValue.TryGetValue<string>(out var gapText) && gapText.Length == 0)))
                     {
-                        Errors.Add($"[litespec/rule/frontend-patterns.state-the-implementation-status] {target} has status '{Show(status)}' with no gap");
+                        Errors.Add($"[litespec/frontend/patterns#state-the-implementation-status] {target} has status '{Show(status)}' with no gap");
                     }
                 }
             }

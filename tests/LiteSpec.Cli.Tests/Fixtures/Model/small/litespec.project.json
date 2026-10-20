@@ -3,6 +3,8 @@
     "name": "Fixture Library"
   },
   "size": "small",
+  "shape": "server",
+  "stacks": ["dotnet"],
   "reviewedLiteSpecVersion": "2.0.0",
   "optionalTypes": [],
   "constraints": {

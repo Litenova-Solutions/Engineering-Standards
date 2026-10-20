@@ -10,6 +10,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateProject(folder.Path, project =>
         {
+            project["stacks"] = new JsonArray("dotnet", "react");
             PathsOf(project)["frontends"] = new JsonArray(
                 new JsonObject { ["name"] = "web", ["path"] = "apps/web", ["platform"] = "react" });
         });
@@ -22,8 +23,9 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateProject(folder.Path, project =>
         {
+            project["stacks"] = new JsonArray("dotnet", "blazor");
             PathsOf(project)["frontends"] = new JsonArray(
-                new JsonObject { ["name"] = "door", ["path"] = "apps/door", ["platform"] = "blazor-web" });
+                new JsonObject { ["name"] = "door", ["path"] = "apps/door", ["platform"] = "blazor" });
         });
         AssertAbsent(RunConsumer(folder.Path), "controlled UI");
     }
@@ -36,6 +38,7 @@ public sealed partial class ConsumerValidatorTests
         // validator, and its findings merge into this validator's list.
         ConsumerFixture.MutateProject(folder.Path, project =>
         {
+            project["stacks"] = new JsonArray("dotnet", "react");
             PathsOf(project)["frontends"] = new JsonArray(
                 new JsonObject
                 {

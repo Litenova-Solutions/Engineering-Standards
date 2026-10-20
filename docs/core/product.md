@@ -10,16 +10,16 @@ Business intent has three parts that age differently. The present is the positio
 
 ## Agent Summary {#agent-summary}
 
-- Why-layer records live in their homes under docs/product/ and docs/research/. (litespec/rule/core-product.keep-business-intent-under-product, litespec/rule/core-product.group-product-topics-by-area)
-- The brief states one product; each topic holds Requirement entries, never behavior. (litespec/rule/core-product.state-one-product, litespec/rule/core-product.state-each-topic-in-one-page-shape, litespec/rule/core-product.identify-every-requirement, litespec/rule/core-product.keep-behavior-out-of-product-pages)
-- Chapters tell the story with sources before the commitments. (litespec/rule/core-product.place-the-story-before-the-commitments, litespec/rule/core-product.cite-sources-for-chapter-claims)
-- Constraints are answered, research cites read sources, problems pair with features. (litespec/rule/core-product.answer-every-constraint, litespec/rule/core-product.record-research-with-read-sources, litespec/rule/core-product.state-each-problem-and-feature)
-- Each choice links its decision; history and coverage derive from the model. (litespec/rule/core-product.trace-every-choice-to-a-decision, litespec/rule/core-product.record-each-product-choice-as-a-decision, litespec/rule/core-product.derive-history-from-decisions, litespec/rule/core-product.derive-requirement-coverage-from-the-model)
-- An agent drafts, a person approves, and a new record replaces an old choice. (litespec/rule/core-product.name-the-person-who-approved-a-decision, litespec/rule/core-product.replace-a-decision-with-a-new-record, litespec/rule/core-product.build-on-a-draft-decision-before-approval)
-- Records cite requirements in fulfils; checks fail an unfulfilled one. (litespec/rule/core-product.cite-requirements-from-records, litespec/rule/core-product.reject-an-unfulfilled-requirement)
-- Work lands intent, research, decision, requirement, records, code, and tests. (litespec/rule/core-product.build-intent-before-specification-before-code)
-- Generated records are source material until a decision states the claim. (litespec/rule/core-product.treat-generated-research-as-source-material)
-- Each topic carries a review date, commercial work loads intent first, and decisions share one numbered sequence. (litespec/rule/core-product.review-a-topic-by-its-date, litespec/rule/core-product.load-product-intent-before-commercial-work, litespec/rule/core-product.name-product-decisions-in-one-numbered-sequence)
+- Why-layer records live in their homes under docs/product/ and docs/research/. (litespec/core/product#keep-business-intent-under-product, litespec/core/product#group-product-topics-by-area)
+- The brief states one product; each topic holds Requirement entries, never behavior. (litespec/core/product#state-one-product, litespec/core/product#state-each-topic-in-one-page-shape, litespec/core/product#identify-every-requirement, litespec/core/product#keep-behavior-out-of-product-pages)
+- Chapters tell the story with sources before the commitments. (litespec/core/product#place-the-story-before-the-commitments, litespec/core/product#cite-sources-for-chapter-claims)
+- Constraints are answered, research cites read sources, problems pair with features. (litespec/core/product#answer-every-constraint, litespec/core/product#record-research-with-read-sources, litespec/core/product#state-each-problem-and-feature)
+- Each choice links its decision; history and coverage derive from the model. (litespec/core/product#trace-every-choice-to-a-decision, litespec/core/product#record-each-product-choice-as-a-decision, litespec/core/product#derive-history-from-decisions, litespec/core/product#derive-requirement-coverage-from-the-model)
+- An agent drafts, a person approves, and a new record replaces an old choice. (litespec/core/product#name-the-person-who-approved-a-decision, litespec/core/product#replace-a-decision-with-a-new-record, litespec/core/product#build-on-a-draft-decision-before-approval)
+- Records cite requirements in fulfils; checks fail an unfulfilled one. (litespec/core/product#cite-requirements-from-records, litespec/core/product#reject-an-unfulfilled-requirement)
+- Work lands intent, research, decision, requirement, records, code, and tests. (litespec/core/product#build-intent-before-specification-before-code)
+- Generated records are source material until a decision states the claim. (litespec/core/product#treat-generated-research-as-source-material)
+- Each topic carries a review date, commercial work loads intent first, and decisions share one numbered sequence. (litespec/core/product#review-a-topic-by-its-date, litespec/core/product#load-product-intent-before-commercial-work, litespec/core/product#name-product-decisions-in-one-numbered-sequence)
 
 ## Concepts
 
@@ -48,141 +48,141 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 ## Standards
 
-### Keep business intent under product (litespec/rule/core-product.keep-business-intent-under-product)
+### Keep business intent under product
 
 **Requirement:** A consumer MUST keep its brief, product topic pages, decisions, constraints, problems, and features under `docs/product/`, and its research under `docs/research/`.
 
 **Rationale:** Intent split across notes and books has no single answer to the question an agent asks before building. One home per kind gives every reader one place to look.
 
-### State one product (litespec/rule/core-product.state-one-product)
+### State one product
 
 **Requirement:** A consumer MUST state exactly one Product record in its brief, with boundary, never list, and audience.
 
 **Rationale:** One product gives every reader one answer to what the business is. The never list refuses what the product will not become.
 
-### Answer every constraint (litespec/rule/core-product.answer-every-constraint)
+### Answer every constraint
 
 **Requirement:** A consumer MUST record each outside rule as a Constraint with source and applicability, and mark constraints answered.
 
 **Rationale:** An unanswered constraint is a law the product may break unknowingly. A project with no outside rules records that answer too.
 
-### State each topic in one page shape (litespec/rule/core-product.state-each-topic-in-one-page-shape)
+### State each topic in one page shape
 
 **Requirement:** A `product-topic` page MUST carry the chapter sections and the commitment sections of the product topic template, and the frontmatter field `reviewBy`.
 
 **Rationale:** The fixed shape puts the present, the future, and the past of one topic on one page. The chapter sections are Summary, The situation, What we do, Why it is better, A worked example, Costs and risks, and How sure we are. The commitment sections are Rules, Position, Refusals, Open questions, Next, History, and Evidence. Rules holds every testable commitment as a Requirement entry. Position holds choices with their decisions, including choices no system carries. A reader learns where each answer sits once and finds it on every topic.
 
-### Place the story before the commitments (litespec/rule/core-product.place-the-story-before-the-commitments)
+### Place the story before the commitments
 
 **Requirement:** A `product-topic` page MUST place its chapter for people before its commitments.
 
-**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so a person understands the choice before reading its rules. Sources keep the story checkable rather than a pitch, as `litespec/rule/core-product.cite-sources-for-chapter-claims` requires.
+**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so a person understands the choice before reading its rules. Sources keep the story checkable rather than a pitch, as `litespec/core/product#cite-sources-for-chapter-claims` requires.
 
-### Cite sources for chapter claims (litespec/rule/core-product.cite-sources-for-chapter-claims)
+### Cite sources for chapter claims
 
 **Requirement:** Each claim in the chapter MUST cite its source.
 
 **Rationale:** A number without its source cannot be rechecked. The chapter convinces only when its claims are checkable.
 
-### Identify every requirement (litespec/rule/core-product.identify-every-requirement)
+### Identify every requirement
 
 **Requirement:** Each Requirement entry MUST carry one identifier `requirement/<topic>.<name>` naming its own page, with kind, statement, and for a promise its values with effective dates.
 
 **Rationale:** An identifier lets a record name the commitment it fulfils, and lets the model resolve the name. A commitment written only as prose cannot be traced. Kinds are promise, behaviour, quality, target, and practice. A target names what is counted in `measure` and the date or milestone in `by`. A practice is a commitment kept in how the company works. Any requirement may name in `deliveredBy` the planned, later, or refused feature that carries it.
 
-### Cite requirements from records (litespec/rule/core-product.cite-requirements-from-records)
+### Cite requirements from records
 
 **Requirement:** A rule, use case, or journey that carries a requirement MUST name it in `fulfils`.
 
 **Rationale:** The link runs from behavior to intent, so a product change shows which records to revisit.
 
-### Keep behavior out of product pages (litespec/rule/core-product.keep-behavior-out-of-product-pages)
+### Keep behavior out of product pages
 
 **Requirement:** A product page MUST NOT describe states, entry points, failure codes, or handlers.
 
 **Rationale:** A product page that describes behavior becomes a second specification, and it drifts from the first. Behavior records own behavior and name the requirements they fulfil.
 
-### Record research with read sources (litespec/rule/core-product.record-research-with-read-sources)
+### Record research with read sources
 
 **Requirement:** A Research record under `docs/research/` MUST state its question and list each source with its read date.
 
 **Rationale:** A fact without its source cannot be rechecked. The read date shows when the outside fact was true.
 
-### State each problem and feature (litespec/rule/core-product.state-each-problem-and-feature)
+### State each problem and feature
 
 **Requirement:** A Problem MUST state who it affects and what they face, and a Feature the problems it solves and its state.
 
 **Rationale:** Problems without owners attract solutions nobody needs. A refused feature keeps its reason so the refusal is not relitigated.
 
-### Trace every choice to a decision (litespec/rule/core-product.trace-every-choice-to-a-decision)
+### Trace every choice to a decision
 
 **Requirement:** Every Position and Refusals entry MUST link an unretired decision record, and an approved one whenever the page is approved.
 
 **Rationale:** A position with no decision behind it is an opinion that nobody approved. The link lets a reader check who chose it, when, and on what evidence.
 
-### Record each product choice as a decision (litespec/rule/core-product.record-each-product-choice-as-a-decision)
+### Record each product choice as a decision
 
 **Requirement:** A decision that sets product records MUST name them in `decides` and carry the sections of the decision template.
 
 **Rationale:** A business choice is argued from options and evidence, and it is reopened by a condition rather than by a date. The sections are Context, Options, Decision, Consequences, and Evidence.
 
-### Name the person who approved a decision (litespec/rule/core-product.name-the-person-who-approved-a-decision)
+### Name the person who approved a decision
 
 **Requirement:** Only the named decider approves a decision, and an approved decision MUST carry `decided`.
 
-**Rationale:** Product, commercial, and legal choices belong to an accountable person, as `litespec/rule/core-system.keep-decision-authority-with-accountable-people` states. The decider is named while the decision is a draft. Approval gates the release, while building may start on a draft. An agent drafts the decision for the decider.
+**Rationale:** Product, commercial, and legal choices belong to an accountable person, as `litespec/core/system#keep-decision-authority-with-accountable-people` states. The decider is named while the decision is a draft. Approval gates the release, while building may start on a draft. An agent drafts the decision for the decider.
 
-### Replace a decision with a new record (litespec/rule/core-product.replace-a-decision-with-a-new-record)
+### Replace a decision with a new record
 
 **Requirement:** A changed choice MUST be a new decision naming the old one in `replaces`, with the old one retired in the same change.
 
 **Rationale:** A decision edited in place loses the reason it once held, and the topic pages that cited it silently change meaning. A replaced record stays readable as the past.
 
-### Derive history from decisions (litespec/rule/core-product.derive-history-from-decisions)
+### Derive history from decisions
 
 **Requirement:** The History section of a product topic page MUST list exactly the decisions that decide its entries, as a generated region.
 
 **Rationale:** A past typed by hand drifts from the records it claims. Only the model builder writes the region. Regions are fenced as [docs/core/model.md](model.md) defines.
 
-### Treat generated research as source material (litespec/rule/core-product.treat-generated-research-as-source-material)
+### Treat generated research as source material
 
 **Requirement:** An agent MUST treat records generated outside `docs/` as source material until a Research record or an approved decision states the claim.
 
 **Rationale:** Generated research mixes verified facts, inferences, and recommendations in one voice. A recommendation from an agent that reads as a decision gets built without anyone having made it.
 
-### Review a topic by its date (litespec/rule/core-product.review-a-topic-by-its-date)
+### Review a topic by its date
 
 **Requirement:** The owner MUST reread a `product-topic` page against its decisions and evidence before its `reviewBy` date, then move the date.
 
 **Rationale:** A stale strategy misdirects every plan built on it, and nothing in the code fails when a market or a price moves. A date makes the reread due rather than optional.
 
-### Load product intent before commercial work (litespec/rule/core-product.load-product-intent-before-commercial-work)
+### Load product intent before commercial work
 
 **Requirement:** An agent MUST read the product brief and the affected product topics before changing behavior that touches price, money, markets, customers, or terms.
 
 **Rationale:** Commercial behavior that contradicts the business position compiles and passes its tests. Only the product pages say it is wrong.
 
-### Derive requirement coverage from the model (litespec/rule/core-product.derive-requirement-coverage-from-the-model)
+### Derive requirement coverage from the model
 
 **Requirement:** A consumer MUST derive its requirement coverage from the model, never by hand.
 
 **Rationale:** A requirement no record fulfils is intent the system does not carry yet. The model lists each requirement with the records that fulfil it.
 
-### Build intent before specification before code (litespec/rule/core-product.build-intent-before-specification-before-code)
+### Build intent before specification before code
 
 **Requirement:** A behavior change MUST land intent, research, decision, requirement, specification, code, and tests in that order; a decision written after its code is a defect.
 
-**Rationale:** The order makes each layer checkable before the next builds on it. A specification written before its decision argues from code. Approval follows `litespec/rule/core-principles.refuse-approval-behind-a-draft-decision`: nothing is approved behind a draft.
+**Rationale:** The order makes each layer checkable before the next builds on it. A specification written before its decision argues from code. Approval follows `litespec/core/principles#refuse-approval-behind-a-draft-decision`: nothing is approved behind a draft.
 
 **Example:** A price change lands its research note, then decision `decision/0011-raise-the-monthly-plan` and requirement `requirement/pricing.monthly-plan-fee`, then the billing `fulfils` link, then the code.
 
-### Reject an unfulfilled requirement (litespec/rule/core-product.reject-an-unfulfilled-requirement)
+### Reject an unfulfilled requirement
 
 **Requirement:** A consumer MUST fail its checks on a promise, behaviour, or quality requirement that nothing fulfils or delivers, outside a Known gap.
 
 **Rationale:** A rule, use case, or journey fulfils a requirement, and a planned, later, or refused feature delivers it. A target or practice is measured or kept outside the code, so deleting one to clear the check loses intent. Planned work belongs to its feature, so a Known gap marks only what nobody owns.
 
-### Build on a draft decision before approval (litespec/rule/core-product.build-on-a-draft-decision-before-approval)
+### Build on a draft decision before approval
 
 **Requirement:** An agent MAY build on a `draft` decision while approval gates the release, not the code.
 
@@ -190,7 +190,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 ## Conventions
 
-### Group product topics by area (litespec/rule/core-product.group-product-topics-by-area)
+### Group product topics by area
 
 **Default:** Keep the brief at `docs/product/brief.md`, topic pages in one folder per area, each other kind in its folder, and research under `docs/research/`.
 
@@ -227,7 +227,7 @@ docs/product/
     <name>.md
 ```
 
-### Name product decisions in one numbered sequence (litespec/rule/core-product.name-product-decisions-in-one-numbered-sequence)
+### Name product decisions in one numbered sequence
 
 **Default:** Name each product decision `<four-digit number>-<name>.md` and use `decision/<four-digit number>-<name>` as its identifier.
 
@@ -237,7 +237,7 @@ docs/product/
 
 ## Reference example
 
-This informative example demonstrates `litespec/rule/core-product.trace-every-choice-to-a-decision`, `litespec/rule/core-product.identify-every-requirement`, and `litespec/rule/core-product.cite-requirements-from-records`.
+This informative example demonstrates `litespec/core/product#trace-every-choice-to-a-decision`, `litespec/core/product#identify-every-requirement`, and `litespec/core/product#cite-requirements-from-records`.
 
 A subscription business keeps `docs/product/business/pricing.md` with id `pricing`. Its Rules section states `requirement/pricing.monthly-plan-fee`, and its Position row for the monthly plan links `decision/0003-monthly-plan`. The billing use case names the requirement in `fulfils`. When the price changes, decision `decision/0011-raise-the-monthly-plan` replaces `decision/0003-monthly-plan`. The pricing row then links the new record, and History lists both.
 
@@ -245,28 +245,28 @@ A subscription business keeps `docs/product/business/pricing.md` with id `pricin
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/core-product.keep-business-intent-under-product | checkable | `litespec consumer` fails a why-layer record outside its home folder. |
-| litespec/rule/core-product.state-one-product | checkable | `litespec consumer` fails a brief without one product, boundary, and audience. |
-| litespec/rule/core-product.answer-every-constraint | checkable | `litespec consumer` fails a constraint without source and applicability, or a project with unanswered constraints. |
-| litespec/rule/core-product.state-each-topic-in-one-page-shape | checkable | `litespec consumer` fails a topic page missing a required section or `reviewBy`. |
-| litespec/rule/core-product.place-the-story-before-the-commitments | checkable | `litespec consumer` fails a topic whose chapter follows its commitments. |
-| litespec/rule/core-product.cite-sources-for-chapter-claims | guidance | Does each claim in the chapter cite its source? |
-| litespec/rule/core-product.identify-every-requirement | checkable | `litespec consumer` fails a Requirement entry without identifier, kind, or statement, or a promise without effective-dated values. |
-| litespec/rule/core-product.cite-requirements-from-records | guidance | Does every record that carries a requirement name it in `fulfils`? |
-| litespec/rule/core-product.keep-behavior-out-of-product-pages | guidance | Does any product page name a state, entry point, failure code, or handler? |
-| litespec/rule/core-product.record-research-with-read-sources | checkable | `litespec consumer` fails a Research record without question or source read date. |
-| litespec/rule/core-product.state-each-problem-and-feature | checkable | `litespec consumer` fails a problem or feature missing its required fields. |
-| litespec/rule/core-product.trace-every-choice-to-a-decision | guidance | Does every Position and Refusals entry link an unretired decision, approved when the page is approved? |
-| litespec/rule/core-product.record-each-product-choice-as-a-decision | checkable | `litespec consumer` fails a decision missing a required section or `decides` target. |
-| litespec/rule/core-product.name-the-person-who-approved-a-decision | guidance | Did the named decider approve the decision, and does the record carry the date? |
-| litespec/rule/core-product.replace-a-decision-with-a-new-record | guidance | Does the new decision name the old one in `replaces`, with the old one retired? |
-| litespec/rule/core-product.derive-history-from-decisions | guidance | Does History list exactly the decisions that decide the page, as generated? |
-| litespec/rule/core-product.treat-generated-research-as-source-material | guidance | Does every new position trace to a Research record or an approved decision? |
-| litespec/rule/core-product.review-a-topic-by-its-date | checkable | `litespec consumer` fails a topic page whose `reviewBy` date has passed. |
-| litespec/rule/core-product.load-product-intent-before-commercial-work | guidance | Does the change report list the product pages read before the change? |
-| litespec/rule/core-product.derive-requirement-coverage-from-the-model | guidance | Does the coverage list come from the model rather than hand-kept notes? |
-| litespec/rule/core-product.build-intent-before-specification-before-code | guidance | Did intent, research, decision, requirement, records, code, and tests land in order? |
-| litespec/rule/core-product.reject-an-unfulfilled-requirement | checkable | `litespec model check` reports no `requirement-unfulfilled` finding outside an open Known gap. |
-| litespec/rule/core-product.build-on-a-draft-decision-before-approval | guidance | Does the release hold approval for every decision the code builds on? |
-| litespec/rule/core-product.group-product-topics-by-area | guidance | Does `docs/product/` follow the example layout, or does an Exception record the replacement? |
-| litespec/rule/core-product.name-product-decisions-in-one-numbered-sequence | checkable | `litespec consumer` fails a decision file whose name does not match its identifier. |
+| litespec/core/product#keep-business-intent-under-product | checkable | `litespec consumer` fails a why-layer record outside its home folder. |
+| litespec/core/product#state-one-product | checkable | `litespec consumer` fails a brief without one product, boundary, and audience. |
+| litespec/core/product#answer-every-constraint | checkable | `litespec consumer` fails a constraint without source and applicability, or a project with unanswered constraints. |
+| litespec/core/product#state-each-topic-in-one-page-shape | checkable | `litespec consumer` fails a topic page missing a required section or `reviewBy`. |
+| litespec/core/product#place-the-story-before-the-commitments | checkable | `litespec consumer` fails a topic whose chapter follows its commitments. |
+| litespec/core/product#cite-sources-for-chapter-claims | guidance | Does each claim in the chapter cite its source? |
+| litespec/core/product#identify-every-requirement | checkable | `litespec consumer` fails a Requirement entry without identifier, kind, or statement, or a promise without effective-dated values. |
+| litespec/core/product#cite-requirements-from-records | guidance | Does every record that carries a requirement name it in `fulfils`? |
+| litespec/core/product#keep-behavior-out-of-product-pages | guidance | Does any product page name a state, entry point, failure code, or handler? |
+| litespec/core/product#record-research-with-read-sources | checkable | `litespec consumer` fails a Research record without question or source read date. |
+| litespec/core/product#state-each-problem-and-feature | checkable | `litespec consumer` fails a problem or feature missing its required fields. |
+| litespec/core/product#trace-every-choice-to-a-decision | guidance | Does every Position and Refusals entry link an unretired decision, approved when the page is approved? |
+| litespec/core/product#record-each-product-choice-as-a-decision | checkable | `litespec consumer` fails a decision missing a required section or `decides` target. |
+| litespec/core/product#name-the-person-who-approved-a-decision | guidance | Did the named decider approve the decision, and does the record carry the date? |
+| litespec/core/product#replace-a-decision-with-a-new-record | guidance | Does the new decision name the old one in `replaces`, with the old one retired? |
+| litespec/core/product#derive-history-from-decisions | guidance | Does History list exactly the decisions that decide the page, as generated? |
+| litespec/core/product#treat-generated-research-as-source-material | guidance | Does every new position trace to a Research record or an approved decision? |
+| litespec/core/product#review-a-topic-by-its-date | checkable | `litespec consumer` fails a topic page whose `reviewBy` date has passed. |
+| litespec/core/product#load-product-intent-before-commercial-work | guidance | Does the change report list the product pages read before the change? |
+| litespec/core/product#derive-requirement-coverage-from-the-model | guidance | Does the coverage list come from the model rather than hand-kept notes? |
+| litespec/core/product#build-intent-before-specification-before-code | guidance | Did intent, research, decision, requirement, records, code, and tests land in order? |
+| litespec/core/product#reject-an-unfulfilled-requirement | checkable | `litespec model check` reports no `requirement-unfulfilled` finding outside an open Known gap. |
+| litespec/core/product#build-on-a-draft-decision-before-approval | guidance | Does the release hold approval for every decision the code builds on? |
+| litespec/core/product#group-product-topics-by-area | guidance | Does `docs/product/` follow the example layout, or does an Exception record the replacement? |
+| litespec/core/product#name-product-decisions-in-one-numbered-sequence | checkable | `litespec consumer` fails a decision file whose name does not match its identifier. |

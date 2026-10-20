@@ -23,6 +23,7 @@ The UI pattern library under `patterns/ui/` keeps its Node tooling (`node patter
 
 ## Consumer repository
 
+- [Initialize Consumer](init.md)
 - [Validate Consumer](consumer.md)
 - [Validate Controlled UI](ui.md)
 - [Model Builder](model.md)

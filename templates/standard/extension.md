@@ -14,15 +14,15 @@ Activate this extension when one exact current condition applies.
 
 ## Baseline relationship
 
-This extension replaces `{litespec/rule/page.state-one-action}`, or states that it replaces no baseline provision. It switches on `<optional type>`, or states that it switches on none.
+This extension replaces `{litespec/page#state-one-action}`, or states that it replaces no baseline provision. It switches on `<optional type>`, or states that it switches on none.
 
 ## Agent Summary {#agent-summary}
 
-- State one high-risk projection and cite its canonical provision. ({litespec/rule/page.state-one-extension-action})
+- State one high-risk projection and cite its canonical provision. ({litespec/page#state-one-extension-action})
 
 ## Standards
 
-### State one extension action ({litespec/rule/page.state-one-extension-action})
+### State one extension action
 
 **Requirement:** The activated extension MUST perform one testable action.
 
@@ -32,7 +32,7 @@ This extension replaces `{litespec/rule/page.state-one-action}`, or states that 
 
 ## Conventions
 
-### Use one extension default ({litespec/rule/page.use-one-extension-default})
+### Use one extension default
 
 **Default:** State one replaceable extension default.
 
@@ -46,5 +46,5 @@ None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| {litespec/rule/page.state-one-extension-action} | checkable | `litespec validate` reports this provision satisfied on the page that carries it. |
-| {litespec/rule/page.use-one-extension-default} | guidance | Does the page carry the default or its named local replacement? |
+| {litespec/page#state-one-extension-action} | checkable | `litespec validate` reports this provision satisfied on the page that carries it. |
+| {litespec/page#use-one-extension-default} | guidance | Does the page carry the default or its named local replacement? |

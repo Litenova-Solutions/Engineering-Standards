@@ -29,4 +29,24 @@ public sealed class ProvisionsCommandTests
         var result = Cli.Run("provisions", "--bogus");
         Assert.Equal(2, result.Status);
     }
+
+    [Fact(DisplayName = "provisions writes one section per area")]
+    public void WritesSectionPerArea()
+    {
+        using var temp = Cli.Temp("provisions");
+        StandardsFixture.Base(temp.Path);
+        var index = Provisions.BuildIndex(temp.Path);
+
+        Assert.Contains("| ID | Provision | Kind | Mark | Evidence |", index);
+        Assert.Contains("litespec/core/topic#keep-the-topic-bounded", index);
+        Assert.Contains("litespec/core/topic#use-the-default-location", index);
+        Assert.Contains("[Keep the topic bounded](../core/topic.md#keep-the-topic-bounded)", index);
+        Assert.Contains("| litespec/backend/sample/stack#apply-the-complete-stack | [Apply the complete stack](../backend/sample/stack.md#apply-the-complete-stack) | rule |", index);
+        Assert.Contains("| litespec/ext/sample#record-extension-activation | [Record extension activation](../ext/sample.md#record-extension-activation) | rule |", index);
+
+        var backend = index.IndexOf("## backend", StringComparison.Ordinal);
+        var core = index.IndexOf("## core", StringComparison.Ordinal);
+        var ext = index.IndexOf("## ext", StringComparison.Ordinal);
+        Assert.True(backend >= 0 && core > backend && ext > core);
+    }
 }

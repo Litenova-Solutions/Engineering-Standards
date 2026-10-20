@@ -1,0 +1,3221 @@
+{
+ "litespec/rule/backend-api.apply-only-coarse-policies-at-the-endpoint": [
+  "litespec/backend/api#apply-only-coarse-policies-at-the-endpoint"
+ ],
+ "litespec/rule/backend-api.apply-patch-to-a-partial-update": [
+  "litespec/backend/api#apply-patch-to-a-partial-update"
+ ],
+ "litespec/rule/backend-api.avoid-noise-words-in-field-names": [
+  "litespec/backend/api#avoid-noise-words-in-field-names"
+ ],
+ "litespec/rule/backend-api.bound-collection-queries": [
+  "litespec/backend/api#bound-collection-queries"
+ ],
+ "litespec/rule/backend-api.commit-the-generated-contract-its-consumers-read": [
+  "litespec/backend/api#commit-the-generated-contract-its-consumers-read"
+ ],
+ "litespec/rule/backend-api.declare-a-smaller-collection-maximum": [
+  "litespec/backend/api#declare-a-smaller-collection-maximum"
+ ],
+ "litespec/rule/backend-api.declare-stable-operation-metadata-in-the-contract": [
+  "litespec/backend/api#declare-stable-operation-metadata-in-the-contract"
+ ],
+ "litespec/rule/backend-api.defer-error-mapping-to-the-global-handler": [
+  "litespec/backend/api#defer-error-mapping-to-the-global-handler"
+ ],
+ "litespec/rule/backend-api.expose-development-tooling-in-development-only": [
+  "litespec/backend/api#expose-development-tooling-in-development-only"
+ ],
+ "litespec/rule/backend-api.generate-the-contract-without-hosted-dependencies": [
+  "litespec/backend/api#generate-the-contract-without-hosted-dependencies"
+ ],
+ "litespec/rule/backend-api.keep-endpoint-dependencies-transport-focused": [
+  "litespec/backend/api#keep-endpoint-dependencies-transport-focused"
+ ],
+ "litespec/rule/backend-api.keep-numeric-transport-types-precise": [
+  "litespec/backend/api#keep-numeric-transport-types-precise"
+ ],
+ "litespec/rule/backend-api.keep-routes-resource-oriented": [
+  "litespec/backend/api#keep-routes-resource-oriented"
+ ],
+ "litespec/rule/backend-api.map-one-operation-per-endpoint": [
+  "litespec/backend/api#map-one-operation-per-endpoint"
+ ],
+ "litespec/rule/backend-api.mark-polymorphic-models-with-discriminators": [
+  "litespec/backend/api#mark-polymorphic-models-with-discriminators"
+ ],
+ "litespec/rule/backend-api.mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape": [
+  "litespec/backend/api#mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape"
+ ],
+ "litespec/rule/backend-api.model-a-monetary-value-as-one-object": [
+  "litespec/backend/api#model-a-monetary-value-as-one-object"
+ ],
+ "litespec/rule/backend-api.name-boolean-fields-as-conditions": [
+  "litespec/backend/api#name-boolean-fields-as-conditions"
+ ],
+ "litespec/rule/backend-api.name-failure-pairs-code-and-reason": [
+  "litespec/backend/api#name-failure-pairs-code-and-reason"
+ ],
+ "litespec/rule/backend-api.name-path-parameters-per-resource": [
+  "litespec/backend/api#name-path-parameters-per-resource"
+ ],
+ "litespec/rule/backend-api.name-routes-from-resources": [
+  "litespec/backend/api#name-routes-from-resources"
+ ],
+ "litespec/rule/backend-api.name-time-fields-with-at": [
+  "litespec/backend/api#name-time-fields-with-at"
+ ],
+ "litespec/rule/backend-api.name-transport-types-by-their-boundary-role": [
+  "litespec/backend/api#name-transport-types-by-their-boundary-role"
+ ],
+ "litespec/rule/backend-api.publish-label-only-sets-as-string-enums": [
+  "litespec/backend/api#publish-label-only-sets-as-string-enums"
+ ],
+ "litespec/rule/backend-api.publish-precise-complete-schemas": [
+  "litespec/backend/api#publish-precise-complete-schemas"
+ ],
+ "litespec/rule/backend-api.record-each-results-http-status": [
+  "litespec/backend/api#record-each-results-http-status"
+ ],
+ "litespec/rule/backend-api.reflect-enforced-authentication-in-the-contract": [
+  "litespec/backend/api#reflect-enforced-authentication-in-the-contract"
+ ],
+ "litespec/rule/backend-api.reject-a-collapsed-or-borrowed-wire-contract": [
+  "litespec/backend/api#reject-a-collapsed-or-borrowed-wire-contract"
+ ],
+ "litespec/rule/backend-api.require-the-marker-header-on-cookie-authenticated-writes": [
+  "litespec/backend/api#require-the-marker-header-on-cookie-authenticated-writes"
+ ],
+ "litespec/rule/backend-api.return-stable-problem-details": [
+  "litespec/backend/api#return-stable-problem-details"
+ ],
+ "litespec/rule/backend-api.state-an-unexpressible-transition-as-a-custom-method": [
+  "litespec/backend/api#state-an-unexpressible-transition-as-a-custom-method"
+ ],
+ "litespec/rule/backend-api.treat-openapi-as-a-generated-contract": [
+  "litespec/backend/api#treat-openapi-as-a-generated-contract"
+ ],
+ "litespec/rule/backend-api.use-consistent-status-codes": [
+  "litespec/backend/api#use-consistent-status-codes"
+ ],
+ "litespec/rule/backend-api.use-offsets-for-proven-bounded-datasets": [
+  "litespec/backend/api#use-offsets-for-proven-bounded-datasets"
+ ],
+ "litespec/rule/backend-api.use-opaque-cursors-for-collection-paging": [
+  "litespec/backend/api#use-opaque-cursors-for-collection-paging"
+ ],
+ "litespec/rule/backend-api.use-put-for-a-whole-replacement": [
+  "litespec/backend/api#use-put-for-a-whole-replacement"
+ ],
+ "litespec/rule/backend-api.use-standard-field-vocabulary": [
+  "litespec/backend/api#use-standard-field-vocabulary"
+ ],
+ "litespec/rule/backend-api.use-this-endpoint-layout": [
+  "litespec/backend/api#use-this-endpoint-layout"
+ ],
+ "litespec/rule/backend-api.version-cursors-with-stable-sort-values": [
+  "litespec/backend/api#version-cursors-with-stable-sort-values"
+ ],
+ "litespec/rule/backend-application.declare-a-port-where-its-consumers-meet": [
+  "litespec/backend/application#declare-a-port-where-its-consumers-meet"
+ ],
+ "litespec/rule/backend-application.declare-every-pipeline-position-beside-the-message": [
+  "litespec/backend/application#declare-every-pipeline-position-beside-the-message"
+ ],
+ "litespec/rule/backend-application.define-narrow-external-ports": [
+  "litespec/backend/application#define-narrow-external-ports"
+ ],
+ "litespec/rule/backend-application.dispatch-commands-and-queries-through-separate-entry-points": [
+  "litespec/backend/application#dispatch-commands-and-queries-through-separate-entry-points"
+ ],
+ "litespec/rule/backend-application.enforce-target-authorization-in-the-pipeline": [
+  "litespec/backend/application#enforce-target-authorization-in-the-pipeline"
+ ],
+ "litespec/rule/backend-application.keep-command-handlers-narrow": [
+  "litespec/backend/application#keep-command-handlers-narrow"
+ ],
+ "litespec/rule/backend-application.keep-event-reaction-implementations-explicit": [
+  "litespec/backend/application#keep-event-reaction-implementations-explicit"
+ ],
+ "litespec/rule/backend-application.keep-mappings-at-the-owning-boundary": [
+  "litespec/backend/application#keep-mappings-at-the-owning-boundary"
+ ],
+ "litespec/rule/backend-application.keep-messages-immutable": [
+  "litespec/backend/application#keep-messages-immutable"
+ ],
+ "litespec/rule/backend-application.keep-one-state-changing-use-case-in-one-pipeline": [
+  "litespec/backend/application#keep-one-state-changing-use-case-in-one-pipeline"
+ ],
+ "litespec/rule/backend-application.mirror-a-domain-closed-set-in-the-result": [
+  "litespec/backend/application#mirror-a-domain-closed-set-in-the-result"
+ ],
+ "litespec/rule/backend-application.model-expected-use-case-failures-explicitly": [
+  "litespec/backend/application#model-expected-use-case-failures-explicitly"
+ ],
+ "litespec/rule/backend-application.organize-application-by-operation": [
+  "litespec/backend/application#organize-application-by-operation"
+ ],
+ "litespec/rule/backend-application.project-queries-directly": [
+  "litespec/backend/application#project-queries-directly"
+ ],
+ "litespec/rule/backend-application.record-a-decision-for-closed-set-narrowing": [
+  "litespec/backend/application#record-a-decision-for-closed-set-narrowing"
+ ],
+ "litespec/rule/backend-application.report-input-problems-as-validity-findings": [
+  "litespec/backend/application#report-input-problems-as-validity-findings"
+ ],
+ "litespec/rule/backend-application.return-use-case-results": [
+  "litespec/backend/application#return-use-case-results"
+ ],
+ "litespec/rule/backend-application.separate-input-validation-from-invariants": [
+  "litespec/backend/application#separate-input-validation-from-invariants"
+ ],
+ "litespec/rule/backend-application.use-this-operation-layout": [
+  "litespec/backend/application#use-this-operation-layout"
+ ],
+ "litespec/rule/backend-architecture.compose-each-process-explicitly": [
+  "litespec/backend/architecture#compose-each-process-explicitly"
+ ],
+ "litespec/rule/backend-architecture.create-a-worker-project-when-background-work-needs-its-own-process": [
+  "litespec/backend/architecture#create-a-worker-project-when-background-work-needs-its-own-process"
+ ],
+ "litespec/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request": [
+  "litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request"
+ ],
+ "litespec/rule/backend-architecture.keep-business-invariants-in-domain": [
+  "litespec/backend/architecture#keep-business-invariants-in-domain"
+ ],
+ "litespec/rule/backend-architecture.keep-implementation-types-hidden": [
+  "litespec/backend/architecture#keep-implementation-types-hidden"
+ ],
+ "litespec/rule/backend-architecture.keep-one-application-part": [
+  "litespec/backend/architecture#keep-one-application-part"
+ ],
+ "litespec/rule/backend-architecture.keep-service-registration-in-hosts": [
+  "litespec/backend/architecture#keep-service-registration-in-hosts"
+ ],
+ "litespec/rule/backend-architecture.organize-every-layer-by-module-and-use-case": [
+  "litespec/backend/architecture#organize-every-layer-by-module-and-use-case"
+ ],
+ "litespec/rule/backend-architecture.own-each-layers-contract-types": [
+  "litespec/backend/architecture#own-each-layers-contract-types"
+ ],
+ "litespec/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers": [
+  "litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers"
+ ],
+ "litespec/rule/backend-architecture.point-dependencies-inward": [
+  "litespec/backend/architecture#point-dependencies-inward"
+ ],
+ "litespec/rule/backend-architecture.separate-command-and-query-behavior": [
+  "litespec/backend/architecture#separate-command-and-query-behavior"
+ ],
+ "litespec/rule/backend-architecture.test-structural-boundaries": [
+  "litespec/backend/architecture#test-structural-boundaries"
+ ],
+ "litespec/rule/backend-architecture.use-five-application-parts": [
+  "litespec/backend/architecture#use-five-application-parts"
+ ],
+ "litespec/rule/backend-domain.align-id-representations-at-every-boundary": [
+  "litespec/backend/domain#align-id-representations-at-every-boundary"
+ ],
+ "litespec/rule/backend-domain.create-valid-aggregates-through-named-factories": [
+  "litespec/backend/domain#create-valid-aggregates-through-named-factories"
+ ],
+ "litespec/rule/backend-domain.define-collection-value-semantics-explicitly": [
+  "litespec/backend/domain#define-collection-value-semantics-explicitly"
+ ],
+ "litespec/rule/backend-domain.describe-every-public-domain-contract-in-documentation": [
+  "litespec/backend/domain#describe-every-public-domain-contract-in-documentation"
+ ],
+ "litespec/rule/backend-domain.expose-repositories-for-one-aggregate-only": [
+  "litespec/backend/domain#expose-repositories-for-one-aggregate-only"
+ ],
+ "litespec/rule/backend-domain.express-transitions-through-business-methods": [
+  "litespec/backend/domain#express-transitions-through-business-methods"
+ ],
+ "litespec/rule/backend-domain.identify-aggregates-with-strongly-typed-version-7-values": [
+  "litespec/backend/domain#identify-aggregates-with-strongly-typed-version-7-values"
+ ],
+ "litespec/rule/backend-domain.keep-binary-floating-point-out-of-exact-quantities": [
+  "litespec/backend/domain#keep-binary-floating-point-out-of-exact-quantities"
+ ],
+ "litespec/rule/backend-domain.keep-child-entities-inside-the-aggregate-boundary": [
+  "litespec/backend/domain#keep-child-entities-inside-the-aggregate-boundary"
+ ],
+ "litespec/rule/backend-domain.keep-domain-independent-of-outer-layers": [
+  "litespec/backend/domain#keep-domain-independent-of-outer-layers"
+ ],
+ "litespec/rule/backend-domain.model-every-aggregate-lifecycle-with-state-types": [
+  "litespec/backend/domain#model-every-aggregate-lifecycle-with-state-types"
+ ],
+ "litespec/rule/backend-domain.model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy": [
+  "litespec/backend/domain#model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy"
+ ],
+ "litespec/rule/backend-domain.model-money-with-exact-decimal-values": [
+  "litespec/backend/domain#model-money-with-exact-decimal-values"
+ ],
+ "litespec/rule/backend-domain.organize-a-module-by-aggregate-and-concept": [
+  "litespec/backend/domain#organize-a-module-by-aggregate-and-concept"
+ ],
+ "litespec/rule/backend-domain.pass-nondeterministic-values-into-domain": [
+  "litespec/backend/domain#pass-nondeterministic-values-into-domain"
+ ],
+ "litespec/rule/backend-domain.raise-immutable-facts-as-domain-events": [
+  "litespec/backend/domain#raise-immutable-facts-as-domain-events"
+ ],
+ "litespec/rule/backend-domain.reference-other-aggregates-by-id": [
+  "litespec/backend/domain#reference-other-aggregates-by-id"
+ ],
+ "litespec/rule/backend-domain.reject-business-violations-with-dedicated-errors": [
+  "litespec/backend/domain#reject-business-violations-with-dedicated-errors"
+ ],
+ "litespec/rule/backend-domain.reuse-the-shared-domain-contracts-across-modules": [
+  "litespec/backend/domain#reuse-the-shared-domain-contracts-across-modules"
+ ],
+ "litespec/rule/backend-domain.take-identity-and-events-from-the-project-root-contract": [
+  "litespec/backend/domain#take-identity-and-events-from-the-project-root-contract"
+ ],
+ "litespec/rule/backend-domain.treat-aggregates-as-consistency-boundaries": [
+  "litespec/backend/domain#treat-aggregates-as-consistency-boundaries"
+ ],
+ "litespec/rule/backend-domain.use-immutable-value-objects-for-domain-concepts": [
+  "litespec/backend/domain#use-immutable-value-objects-for-domain-concepts"
+ ],
+ "litespec/rule/backend-domain.use-one-ubiquitous-language": [
+  "litespec/backend/domain#use-one-ubiquitous-language"
+ ],
+ "litespec/rule/backend-domain.use-stateless-domain-services-for-ownerless-rules": [
+  "litespec/backend/domain#use-stateless-domain-services-for-ownerless-rules"
+ ],
+ "litespec/rule/backend-domain.use-these-domain-names": [
+  "litespec/backend/domain#use-these-domain-names"
+ ],
+ "litespec/rule/backend-identifiers.cite-shared-provisions-in-their-published-form": [
+  "litespec/backend/identifiers#cite-shared-provisions-in-their-published-form"
+ ],
+ "litespec/rule/backend-identifiers.follow-the-identifier-form-of-each-record-type": [
+  "litespec/backend/identifiers#follow-the-identifier-form-of-each-record-type"
+ ],
+ "litespec/rule/backend-identifiers.keep-business-record-names-unique-across-the-project": [
+  "litespec/backend/identifiers#keep-business-record-names-unique-across-the-project"
+ ],
+ "litespec/rule/backend-identifiers.keep-negation-in-rule-names": [
+  "litespec/backend/identifiers#keep-negation-in-rule-names"
+ ],
+ "litespec/rule/backend-identifiers.keep-use-case-names-unique-across-the-project": [
+  "litespec/backend/identifiers#keep-use-case-names-unique-across-the-project"
+ ],
+ "litespec/rule/backend-identifiers.keep-wire-codes-stable": [
+  "litespec/backend/identifiers#keep-wire-codes-stable"
+ ],
+ "litespec/rule/backend-identifiers.name-records-with-one-to-six-words": [
+  "litespec/backend/identifiers#name-records-with-one-to-six-words"
+ ],
+ "litespec/rule/backend-identifiers.reject-the-retired-identifier-forms": [
+  "litespec/backend/identifiers#reject-the-retired-identifier-forms"
+ ],
+ "litespec/rule/backend-identifiers.resolve-every-identifier-citation": [
+  "litespec/backend/identifiers#resolve-every-identifier-citation"
+ ],
+ "litespec/rule/backend-persistence.add-read-documents-for-query-shaped-data": [
+  "litespec/backend/persistence#add-read-documents-for-query-shaped-data"
+ ],
+ "litespec/rule/backend-persistence.bound-aggregate-document-growth": [
+  "litespec/backend/persistence#bound-aggregate-document-growth"
+ ],
+ "litespec/rule/backend-persistence.collect-events-without-a-public-unit-of-work": [
+  "litespec/backend/persistence#collect-events-without-a-public-unit-of-work"
+ ],
+ "litespec/rule/backend-persistence.commit-each-command-pipeline-once": [
+  "litespec/backend/persistence#commit-each-command-pipeline-once"
+ ],
+ "litespec/rule/backend-persistence.control-production-schema-changes": [
+  "litespec/backend/persistence#control-production-schema-changes"
+ ],
+ "litespec/rule/backend-persistence.evolve-stored-document-contracts-explicitly": [
+  "litespec/backend/persistence#evolve-stored-document-contracts-explicitly"
+ ],
+ "litespec/rule/backend-persistence.keep-mappings-and-aliases-explicit": [
+  "litespec/backend/persistence#keep-mappings-and-aliases-explicit"
+ ],
+ "litespec/rule/backend-persistence.keep-serialization-behavior-out-of-domain": [
+  "litespec/backend/persistence#keep-serialization-behavior-out-of-domain"
+ ],
+ "litespec/rule/backend-persistence.persist-one-explicit-state-object": [
+  "litespec/backend/persistence#persist-one-explicit-state-object"
+ ],
+ "litespec/rule/backend-persistence.query-through-the-read-session": [
+  "litespec/backend/persistence#query-through-the-read-session"
+ ],
+ "litespec/rule/backend-persistence.review-query-plans-for-new-indexes": [
+  "litespec/backend/persistence#review-query-plans-for-new-indexes"
+ ],
+ "litespec/rule/backend-persistence.stage-aggregate-writes-through-domain-repositories": [
+  "litespec/backend/persistence#stage-aggregate-writes-through-domain-repositories"
+ ],
+ "litespec/rule/backend-persistence.test-persistence-against-postgresql": [
+  "litespec/backend/persistence#test-persistence-against-postgresql"
+ ],
+ "litespec/rule/backend-persistence.use-database-naming-conventions": [
+  "litespec/backend/persistence#use-database-naming-conventions"
+ ],
+ "litespec/rule/backend-persistence.use-one-persistence-folder": [
+  "litespec/backend/persistence#use-one-persistence-folder"
+ ],
+ "litespec/rule/backend-persistence.use-one-session-per-command": [
+  "litespec/backend/persistence#use-one-session-per-command"
+ ],
+ "litespec/rule/backend-testing.assert-architecture-boundaries-with-tests": [
+  "litespec/backend/testing#assert-architecture-boundaries-with-tests"
+ ],
+ "litespec/rule/backend-testing.isolate-integration-state": [
+  "litespec/backend/testing#isolate-integration-state"
+ ],
+ "litespec/rule/backend-testing.keep-assertions-focused": [
+  "litespec/backend/testing#keep-assertions-focused"
+ ],
+ "litespec/rule/backend-testing.keep-the-test-suites-the-size-profile-requires": [
+  "litespec/backend/testing#keep-the-test-suites-the-size-profile-requires"
+ ],
+ "litespec/rule/backend-testing.mirror-production-module-names": [
+  "litespec/backend/testing#mirror-production-module-names"
+ ],
+ "litespec/rule/backend-testing.name-tests-by-observable-behavior": [
+  "litespec/backend/testing#name-tests-by-observable-behavior"
+ ],
+ "litespec/rule/backend-testing.prove-each-rule-at-its-enforcement-point": [
+  "litespec/backend/testing#prove-each-rule-at-its-enforcement-point"
+ ],
+ "litespec/rule/backend-testing.share-one-production-faithful-integration-harness": [
+  "litespec/backend/testing#share-one-production-faithful-integration-harness"
+ ],
+ "litespec/rule/backend-testing.tag-the-test-that-proves-each-case": [
+  "litespec/backend/testing#tag-the-test-that-proves-each-case"
+ ],
+ "litespec/rule/backend-testing.test-application-coordination": [
+  "litespec/backend/testing#test-application-coordination"
+ ],
+ "litespec/rule/backend-testing.test-domain-in-isolation": [
+  "litespec/backend/testing#test-domain-in-isolation"
+ ],
+ "litespec/rule/backend-testing.test-http-integration-through-the-real-application-host": [
+  "litespec/backend/testing#test-http-integration-through-the-real-application-host"
+ ],
+ "litespec/rule/backend-testing.use-builders-for-valid-defaults": [
+  "litespec/backend/testing#use-builders-for-valid-defaults"
+ ],
+ "litespec/rule/backend-testing.use-evidence-rather-than-one-coverage-target": [
+  "litespec/backend/testing#use-evidence-rather-than-one-coverage-target"
+ ],
+ "litespec/rule/blazor-browser.bound-what-is-stored": [
+  "litespec/frontend/blazor/browser#bound-what-is-stored"
+ ],
+ "litespec/rule/blazor-browser.keep-a-stable-serialization-contract": [
+  "litespec/frontend/blazor/browser#keep-a-stable-serialization-contract"
+ ],
+ "litespec/rule/blazor-browser.own-storage-in-infrastructure": [
+  "litespec/frontend/blazor/browser#own-storage-in-infrastructure"
+ ],
+ "litespec/rule/blazor-browser.provide-a-migration-for-every-changed-shape": [
+  "litespec/frontend/blazor/browser#provide-a-migration-for-every-changed-shape"
+ ],
+ "litespec/rule/blazor-browser.provide-export-and-import": [
+  "litespec/frontend/blazor/browser#provide-export-and-import"
+ ],
+ "litespec/rule/blazor-browser.record-the-classification": [
+  "litespec/frontend/blazor/browser#record-the-classification"
+ ],
+ "litespec/rule/blazor-browser.select-the-storage-mechanism-per-shape": [
+  "litespec/frontend/blazor/browser#select-the-storage-mechanism-per-shape"
+ ],
+ "litespec/rule/blazor-browser.treat-reads-as-fallible": [
+  "litespec/frontend/blazor/browser#treat-reads-as-fallible"
+ ],
+ "litespec/rule/blazor-browser.version-and-scope-every-storage-key": [
+  "litespec/frontend/blazor/browser#version-and-scope-every-storage-key"
+ ],
+ "litespec/rule/blazor-components.apply-one-styling-system": [
+  "litespec/frontend/blazor/components#apply-one-styling-system"
+ ],
+ "litespec/rule/blazor-components.declare-every-parameter-type": [
+  "litespec/frontend/blazor/components#declare-every-parameter-type"
+ ],
+ "litespec/rule/blazor-components.keep-accessibility-in-the-component": [
+  "litespec/frontend/blazor/components#keep-accessibility-in-the-component"
+ ],
+ "litespec/rule/blazor-components.keep-components-presentational": [
+  "litespec/frontend/blazor/components#keep-components-presentational"
+ ],
+ "litespec/rule/blazor-components.name-for-the-boundary-role": [
+  "litespec/frontend/blazor/components#name-for-the-boundary-role"
+ ],
+ "litespec/rule/blazor-components.own-the-layer-contract": [
+  "litespec/frontend/blazor/components#own-the-layer-contract"
+ ],
+ "litespec/rule/blazor-components.place-one-component-per-file": [
+  "litespec/frontend/blazor/components#place-one-component-per-file"
+ ],
+ "litespec/rule/blazor-components.raise-events-rather-than-mutating": [
+  "litespec/frontend/blazor/components#raise-events-rather-than-mutating"
+ ],
+ "litespec/rule/blazor-components.resolve-browser-behavior-through-an-interface": [
+  "litespec/frontend/blazor/components#resolve-browser-behavior-through-an-interface"
+ ],
+ "litespec/rule/blazor-data.classify-state": [
+  "litespec/frontend/blazor/data#classify-state"
+ ],
+ "litespec/rule/blazor-data.keep-derived-values-single-sourced": [
+  "litespec/frontend/blazor/data#keep-derived-values-single-sourced"
+ ],
+ "litespec/rule/blazor-data.keep-forms-typed": [
+  "litespec/frontend/blazor/data#keep-forms-typed"
+ ],
+ "litespec/rule/blazor-data.load-persisted-state-once": [
+  "litespec/frontend/blazor/data#load-persisted-state-once"
+ ],
+ "litespec/rule/blazor-data.make-failure-explicit": [
+  "litespec/frontend/blazor/data#make-failure-explicit"
+ ],
+ "litespec/rule/blazor-data.prefer-explicit-refresh": [
+  "litespec/frontend/blazor/data#prefer-explicit-refresh"
+ ],
+ "litespec/rule/blazor-data.route-use-cases-through-application": [
+  "litespec/frontend/blazor/data#route-use-cases-through-application"
+ ],
+ "litespec/rule/blazor-data.validate-at-the-boundary": [
+  "litespec/frontend/blazor/data#validate-at-the-boundary"
+ ],
+ "litespec/rule/blazor-rendering.declare-routes-on-pages": [
+  "litespec/frontend/blazor/rendering#declare-routes-on-pages"
+ ],
+ "litespec/rule/blazor-rendering.give-every-route-explicit-states": [
+  "litespec/frontend/blazor/rendering#give-every-route-explicit-states"
+ ],
+ "litespec/rule/blazor-rendering.keep-navigation-state-in-the-url": [
+  "litespec/frontend/blazor/rendering#keep-navigation-state-in-the-url"
+ ],
+ "litespec/rule/blazor-rendering.keep-the-acquisition-surface-static": [
+  "litespec/frontend/blazor/rendering#keep-the-acquisition-surface-static"
+ ],
+ "litespec/rule/blazor-rendering.name-routes-for-the-reader": [
+  "litespec/frontend/blazor/rendering#name-routes-for-the-reader"
+ ],
+ "litespec/rule/blazor-rendering.operate-offline-after-first-load": [
+  "litespec/frontend/blazor/rendering#operate-offline-after-first-load"
+ ],
+ "litespec/rule/blazor-rendering.render-on-the-client-only": [
+  "litespec/frontend/blazor/rendering#render-on-the-client-only"
+ ],
+ "litespec/rule/blazor-structure.isolate-module-internals": [
+  "litespec/frontend/blazor/structure#isolate-module-internals"
+ ],
+ "litespec/rule/blazor-structure.keep-domain-free-of-browser-concerns": [
+  "litespec/frontend/blazor/structure#keep-domain-free-of-browser-concerns"
+ ],
+ "litespec/rule/blazor-structure.keep-imports-directional": [
+  "litespec/frontend/blazor/structure#keep-imports-directional"
+ ],
+ "litespec/rule/blazor-structure.keep-static-content-out-of-the-assembly": [
+  "litespec/frontend/blazor/structure#keep-static-content-out-of-the-assembly"
+ ],
+ "litespec/rule/blazor-structure.organize-features-by-module-and-use-case": [
+  "litespec/frontend/blazor/structure#organize-features-by-module-and-use-case"
+ ],
+ "litespec/rule/blazor-structure.place-interop-adapters-together": [
+  "litespec/frontend/blazor/structure#place-interop-adapters-together"
+ ],
+ "litespec/rule/blazor-structure.use-the-client-solution-tree": [
+  "litespec/frontend/blazor/structure#use-the-client-solution-tree"
+ ],
+ "litespec/rule/blazor-testing.enforce-the-first-load-budget": [
+  "litespec/frontend/blazor/testing#enforce-the-first-load-budget"
+ ],
+ "litespec/rule/blazor-testing.keep-browser-capability-tests-honest": [
+  "litespec/frontend/blazor/testing#keep-browser-capability-tests-honest"
+ ],
+ "litespec/rule/blazor-testing.keep-end-to-end-tests-few": [
+  "litespec/frontend/blazor/testing#keep-end-to-end-tests-few"
+ ],
+ "litespec/rule/blazor-testing.prove-each-case-with-a-test": [
+  "litespec/frontend/blazor/testing#prove-each-case-with-a-test"
+ ],
+ "litespec/rule/blazor-testing.replace-interop-in-component-tests": [
+  "litespec/frontend/blazor/testing#replace-interop-in-component-tests"
+ ],
+ "litespec/rule/blazor-testing.test-the-core-without-a-browser": [
+  "litespec/frontend/blazor/testing#test-the-core-without-a-browser"
+ ],
+ "litespec/rule/blazor-testing.use-the-four-client-test-projects": [
+  "litespec/frontend/blazor/testing#use-the-four-client-test-projects"
+ ],
+ "litespec/rule/blazor-testing.verify-real-browser-behavior-end-to-end": [
+  "litespec/frontend/blazor/testing#verify-real-browser-behavior-end-to-end"
+ ],
+ "litespec/rule/core-agent.apply-guidance-precedence": [
+  "litespec/core/agent#apply-guidance-precedence"
+ ],
+ "litespec/rule/core-agent.escalate-from-summary-to-full-document": [
+  "litespec/core/agent#escalate-from-summary-to-full-document"
+ ],
+ "litespec/rule/core-agent.follow-the-local-pattern-before-the-model-query": [
+  "litespec/core/agent#follow-the-local-pattern-before-the-model-query"
+ ],
+ "litespec/rule/core-agent.inspect-existing-work-before-editing": [
+  "litespec/core/agent#inspect-existing-work-before-editing"
+ ],
+ "litespec/rule/core-agent.inspect-local-examples-after-standards": [
+  "litespec/core/agent#inspect-local-examples-after-standards"
+ ],
+ "litespec/rule/core-agent.keep-agent-working-files-under-agents": [
+  "litespec/core/agent#keep-agent-working-files-under-agents"
+ ],
+ "litespec/rule/core-agent.load-applicable-extensions": [
+  "litespec/core/agent#load-applicable-extensions"
+ ],
+ "litespec/rule/core-agent.make-coherent-scoped-changes": [
+  "litespec/core/agent#make-coherent-scoped-changes"
+ ],
+ "litespec/rule/core-agent.replace-only-declared-conventions": [
+  "litespec/core/agent#replace-only-declared-conventions"
+ ],
+ "litespec/rule/core-agent.restrict-unapproved-side-effects": [
+  "litespec/core/agent#restrict-unapproved-side-effects"
+ ],
+ "litespec/rule/core-agent.select-task-context": [
+  "litespec/core/agent#select-task-context"
+ ],
+ "litespec/rule/core-agent.stop-on-unresolved-conflict": [
+  "litespec/core/agent#stop-on-unresolved-conflict"
+ ],
+ "litespec/rule/core-authoring.apply-controlled-prose-measures": [
+  "litespec/core/authoring#apply-controlled-prose-measures"
+ ],
+ "litespec/rule/core-authoring.apply-the-four-quality-tests": [
+  "litespec/core/authoring#apply-the-four-quality-tests"
+ ],
+ "litespec/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation": [
+  "litespec/core/authoring#apply-the-prose-measures-to-consumer-documentation"
+ ],
+ "litespec/rule/core-authoring.attach-examples-to-their-provisions": [
+  "litespec/core/authoring#attach-examples-to-their-provisions"
+ ],
+ "litespec/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets": [
+  "litespec/core/authoring#check-the-vocabulary-on-every-surface-a-reader-meets"
+ ],
+ "litespec/rule/core-authoring.classify-every-specification-file": [
+  "litespec/core/authoring#classify-every-specification-file"
+ ],
+ "litespec/rule/core-authoring.declare-structured-specification-metadata": [
+  "litespec/core/authoring#declare-structured-specification-metadata"
+ ],
+ "litespec/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it": [
+  "litespec/core/authoring#derive-a-computed-fact-instead-of-restating-it"
+ ],
+ "litespec/rule/core-authoring.exclude-a-sequence-number-from-the-identifier": [
+  "litespec/core/authoring#exclude-a-sequence-number-from-the-identifier"
+ ],
+ "litespec/rule/core-authoring.exclude-cross-release-compatibility-work": [
+  "litespec/core/authoring#exclude-cross-release-compatibility-work"
+ ],
+ "litespec/rule/core-authoring.exclude-declared-content-paths-from-the-ascii-check": [
+  "litespec/core/authoring#exclude-declared-content-paths-from-the-ascii-check"
+ ],
+ "litespec/rule/core-authoring.exclude-generated-regions-from-prose-checks": [
+  "litespec/core/authoring#exclude-generated-regions-from-prose-checks"
+ ],
+ "litespec/rule/core-authoring.exclude-historical-transition-material": [
+  "litespec/core/authoring#exclude-historical-transition-material"
+ ],
+ "litespec/rule/core-authoring.exclude-the-compound-that-names-another-concept": [
+  "litespec/core/authoring#exclude-the-compound-that-names-another-concept"
+ ],
+ "litespec/rule/core-authoring.identify-actionable-conventions": [
+  "litespec/core/authoring#identify-actionable-conventions"
+ ],
+ "litespec/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves": [
+  "litespec/core/authoring#keep-a-pinned-release-for-as-long-as-it-serves"
+ ],
+ "litespec/rule/core-authoring.keep-agent-summaries-informative": [
+  "litespec/core/authoring#keep-agent-summaries-informative"
+ ],
+ "litespec/rule/core-authoring.keep-authored-prose-ascii-safe": [
+  "litespec/core/authoring#keep-authored-prose-ascii-safe"
+ ],
+ "litespec/rule/core-authoring.map-provisions-to-evidence": [
+  "litespec/core/authoring#map-provisions-to-evidence"
+ ],
+ "litespec/rule/core-authoring.mark-every-provision-checkable-or-guidance": [
+  "litespec/core/authoring#mark-every-provision-checkable-or-guidance"
+ ],
+ "litespec/rule/core-authoring.name-the-escape-from-every-abstraction": [
+  "litespec/core/authoring#name-the-escape-from-every-abstraction"
+ ],
+ "litespec/rule/core-authoring.name-the-owning-page-in-the-identifier": [
+  "litespec/core/authoring#name-the-owning-page-in-the-identifier"
+ ],
+ "litespec/rule/core-authoring.name-the-tool-rather-than-the-mechanism": [
+  "litespec/core/authoring#name-the-tool-rather-than-the-mechanism"
+ ],
+ "litespec/rule/core-authoring.prefer-direct-action-headings": [
+  "litespec/core/authoring#prefer-direct-action-headings"
+ ],
+ "litespec/rule/core-authoring.prefer-positive-instructions": [
+  "litespec/core/authoring#prefer-positive-instructions"
+ ],
+ "litespec/rule/core-authoring.publish-each-release-as-a-complete-contract": [
+  "litespec/core/authoring#publish-each-release-as-a-complete-contract"
+ ],
+ "litespec/rule/core-authoring.record-a-setting-as-reference": [
+  "litespec/core/authoring#record-a-setting-as-reference"
+ ],
+ "litespec/rule/core-authoring.record-the-project-vocabulary-as-data": [
+  "litespec/core/authoring#record-the-project-vocabulary-as-data"
+ ],
+ "litespec/rule/core-authoring.record-the-reviewed-litespec-release": [
+  "litespec/core/authoring#record-the-reviewed-litespec-release"
+ ],
+ "litespec/rule/core-authoring.regenerate-the-provision-index": [
+  "litespec/core/authoring#regenerate-the-provision-index"
+ ],
+ "litespec/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope": [
+  "litespec/core/authoring#reject-a-recorded-synonym-inside-its-scope"
+ ],
+ "litespec/rule/core-authoring.route-the-reader-before-listing-pages": [
+  "litespec/core/authoring#route-the-reader-before-listing-pages"
+ ],
+ "litespec/rule/core-authoring.run-repeatable-authoring-checks": [
+  "litespec/core/authoring#run-repeatable-authoring-checks"
+ ],
+ "litespec/rule/core-authoring.state-meaning-literally": [
+  "litespec/core/authoring#state-meaning-literally"
+ ],
+ "litespec/rule/core-authoring.state-one-layer-per-page": [
+  "litespec/core/authoring#state-one-layer-per-page"
+ ],
+ "litespec/rule/core-authoring.use-active-and-explicit-sentences": [
+  "litespec/core/authoring#use-active-and-explicit-sentences"
+ ],
+ "litespec/rule/core-authoring.use-controlled-capitalization": [
+  "litespec/core/authoring#use-controlled-capitalization"
+ ],
+ "litespec/rule/core-authoring.use-one-metadata-carrier": [
+  "litespec/core/authoring#use-one-metadata-carrier"
+ ],
+ "litespec/rule/core-authoring.use-one-normative-vocabulary": [
+  "litespec/core/authoring#use-one-normative-vocabulary"
+ ],
+ "litespec/rule/core-authoring.use-one-term-for-one-concept": [
+  "litespec/core/authoring#use-one-term-for-one-concept"
+ ],
+ "litespec/rule/core-authoring.use-tables-for-exact-mappings": [
+  "litespec/core/authoring#use-tables-for-exact-mappings"
+ ],
+ "litespec/rule/core-authoring.use-the-declared-identifier-grammar": [
+  "litespec/core/authoring#use-the-declared-identifier-grammar"
+ ],
+ "litespec/rule/core-authoring.use-the-declared-page-contract": [
+  "litespec/core/authoring#use-the-declared-page-contract"
+ ],
+ "litespec/rule/core-authoring.validate-current-standards-material": [
+  "litespec/core/authoring#validate-current-standards-material"
+ ],
+ "litespec/rule/core-authoring.write-atomic-standards-provisions": [
+  "litespec/core/authoring#write-atomic-standards-provisions"
+ ],
+ "litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag": [
+  "litespec/core/maintaining#publish-a-litespec-release-from-a-tag"
+ ],
+ "litespec/rule/core-maintaining.replace-every-citation-on-a-rename": [
+  "litespec/core/maintaining#replace-every-citation-on-a-rename"
+ ],
+ "litespec/rule/core-maintaining.state-the-provision-lifecycle": [
+  "litespec/core/maintaining#state-the-provision-lifecycle"
+ ],
+ "litespec/rule/core-model.apply-guidance-precedence": [
+  "litespec/core/model#apply-guidance-precedence"
+ ],
+ "litespec/rule/core-model.authorize-access-through-the-permission-chain": [
+  "litespec/core/model#authorize-access-through-the-permission-chain"
+ ],
+ "litespec/rule/core-model.cover-every-public-use-case-from-a-journey": [
+  "litespec/core/model#cover-every-public-use-case-from-a-journey"
+ ],
+ "litespec/rule/core-model.declare-size-stacks-and-optional-types": [
+  "litespec/core/model#declare-size-stacks-and-optional-types"
+ ],
+ "litespec/rule/core-model.express-module-order-as-depends-on": [
+  "litespec/core/model#express-module-order-as-depends-on"
+ ],
+ "litespec/rule/core-model.follow-the-authority-order": [
+  "litespec/core/model#follow-the-authority-order"
+ ],
+ "litespec/rule/core-model.give-every-use-case-its-results": [
+  "litespec/core/model#give-every-use-case-its-results"
+ ],
+ "litespec/rule/core-model.hold-approval-behind-draft-decisions": [
+  "litespec/core/model#hold-approval-behind-draft-decisions"
+ ],
+ "litespec/rule/core-model.keep-one-owner-and-status-on-every-record": [
+  "litespec/core/model#keep-one-owner-and-status-on-every-record"
+ ],
+ "litespec/rule/core-model.name-what-every-decision-decides": [
+  "litespec/core/model#name-what-every-decision-decides"
+ ],
+ "litespec/rule/core-model.read-truth-from-code-screens-and-test-runs": [
+  "litespec/core/model#read-truth-from-code-screens-and-test-runs"
+ ],
+ "litespec/rule/core-model.record-accepted-gaps-as-known-gaps": [
+  "litespec/core/model#record-accepted-gaps-as-known-gaps"
+ ],
+ "litespec/rule/core-model.render-generated-regions-from-the-model": [
+  "litespec/core/model#render-generated-regions-from-the-model"
+ ],
+ "litespec/rule/core-model.resolve-every-page-link": [
+  "litespec/core/model#resolve-every-page-link"
+ ],
+ "litespec/rule/core-model.resolve-ties-by-the-later-decision": [
+  "litespec/core/model#resolve-ties-by-the-later-decision"
+ ],
+ "litespec/rule/core-model.retire-records-with-replaces": [
+  "litespec/core/model#retire-records-with-replaces"
+ ],
+ "litespec/rule/core-model.state-the-common-fields-on-every-record": [
+  "litespec/core/model#state-the-common-fields-on-every-record"
+ ],
+ "litespec/rule/core-model.write-every-record-in-its-home": [
+  "litespec/core/model#write-every-record-in-its-home"
+ ],
+ "litespec/rule/core-model.write-links-on-the-record-that-points": [
+  "litespec/core/model#write-links-on-the-record-that-points"
+ ],
+ "litespec/rule/core-principles.avoid-generic-boundary-names": [
+  "litespec/core/principles#avoid-generic-boundary-names"
+ ],
+ "litespec/rule/core-principles.classify-record-authority": [
+  "litespec/core/principles#classify-record-authority"
+ ],
+ "litespec/rule/core-principles.keep-one-authored-source": [
+  "litespec/core/principles#keep-one-authored-source"
+ ],
+ "litespec/rule/core-principles.locate-package-versions-in-the-manifest": [
+  "litespec/core/principles#locate-package-versions-in-the-manifest"
+ ],
+ "litespec/rule/core-principles.locate-record-status-in-frontmatter": [
+  "litespec/core/principles#locate-record-status-in-frontmatter"
+ ],
+ "litespec/rule/core-principles.name-boundary-intent": [
+  "litespec/core/principles#name-boundary-intent"
+ ],
+ "litespec/rule/core-principles.prefer-direct-owned-dependencies": [
+  "litespec/core/principles#prefer-direct-owned-dependencies"
+ ],
+ "litespec/rule/core-principles.prefer-local-code-until-reuse-is-real": [
+  "litespec/core/principles#prefer-local-code-until-reuse-is-real"
+ ],
+ "litespec/rule/core-principles.prove-cases-with-tests": [
+  "litespec/core/principles#prove-cases-with-tests"
+ ],
+ "litespec/rule/core-principles.prove-enforceable-boundaries-mechanically": [
+  "litespec/core/principles#prove-enforceable-boundaries-mechanically"
+ ],
+ "litespec/rule/core-principles.refuse-approval-behind-a-draft-decision": [
+  "litespec/core/principles#refuse-approval-behind-a-draft-decision"
+ ],
+ "litespec/rule/core-principles.require-current-complexity-activation": [
+  "litespec/core/principles#require-current-complexity-activation"
+ ],
+ "litespec/rule/core-principles.retire-public-behavior-deliberately": [
+  "litespec/core/principles#retire-public-behavior-deliberately"
+ ],
+ "litespec/rule/core-principles.separate-authority-from-implementation": [
+  "litespec/core/principles#separate-authority-from-implementation"
+ ],
+ "litespec/rule/core-product.answer-every-constraint": [
+  "litespec/core/product#answer-every-constraint"
+ ],
+ "litespec/rule/core-product.build-intent-before-specification-before-code": [
+  "litespec/core/product#build-intent-before-specification-before-code"
+ ],
+ "litespec/rule/core-product.build-on-a-draft-decision-before-approval": [
+  "litespec/core/product#build-on-a-draft-decision-before-approval"
+ ],
+ "litespec/rule/core-product.cite-requirements-from-records": [
+  "litespec/core/product#cite-requirements-from-records"
+ ],
+ "litespec/rule/core-product.cite-sources-for-chapter-claims": [
+  "litespec/core/product#cite-sources-for-chapter-claims"
+ ],
+ "litespec/rule/core-product.derive-history-from-decisions": [
+  "litespec/core/product#derive-history-from-decisions"
+ ],
+ "litespec/rule/core-product.derive-requirement-coverage-from-the-model": [
+  "litespec/core/product#derive-requirement-coverage-from-the-model"
+ ],
+ "litespec/rule/core-product.group-product-topics-by-area": [
+  "litespec/core/product#group-product-topics-by-area"
+ ],
+ "litespec/rule/core-product.identify-every-requirement": [
+  "litespec/core/product#identify-every-requirement"
+ ],
+ "litespec/rule/core-product.keep-behavior-out-of-product-pages": [
+  "litespec/core/product#keep-behavior-out-of-product-pages"
+ ],
+ "litespec/rule/core-product.keep-business-intent-under-product": [
+  "litespec/core/product#keep-business-intent-under-product"
+ ],
+ "litespec/rule/core-product.load-product-intent-before-commercial-work": [
+  "litespec/core/product#load-product-intent-before-commercial-work"
+ ],
+ "litespec/rule/core-product.name-product-decisions-in-one-numbered-sequence": [
+  "litespec/core/product#name-product-decisions-in-one-numbered-sequence"
+ ],
+ "litespec/rule/core-product.name-the-person-who-approved-a-decision": [
+  "litespec/core/product#name-the-person-who-approved-a-decision"
+ ],
+ "litespec/rule/core-product.place-the-story-before-the-commitments": [
+  "litespec/core/product#place-the-story-before-the-commitments"
+ ],
+ "litespec/rule/core-product.record-each-product-choice-as-a-decision": [
+  "litespec/core/product#record-each-product-choice-as-a-decision"
+ ],
+ "litespec/rule/core-product.record-research-with-read-sources": [
+  "litespec/core/product#record-research-with-read-sources"
+ ],
+ "litespec/rule/core-product.reject-an-unfulfilled-requirement": [
+  "litespec/core/product#reject-an-unfulfilled-requirement"
+ ],
+ "litespec/rule/core-product.replace-a-decision-with-a-new-record": [
+  "litespec/core/product#replace-a-decision-with-a-new-record"
+ ],
+ "litespec/rule/core-product.review-a-topic-by-its-date": [
+  "litespec/core/product#review-a-topic-by-its-date"
+ ],
+ "litespec/rule/core-product.state-each-problem-and-feature": [
+  "litespec/core/product#state-each-problem-and-feature"
+ ],
+ "litespec/rule/core-product.state-each-topic-in-one-page-shape": [
+  "litespec/core/product#state-each-topic-in-one-page-shape"
+ ],
+ "litespec/rule/core-product.state-one-product": [
+  "litespec/core/product#state-one-product"
+ ],
+ "litespec/rule/core-product.trace-every-choice-to-a-decision": [
+  "litespec/core/product#trace-every-choice-to-a-decision"
+ ],
+ "litespec/rule/core-product.treat-generated-research-as-source-material": [
+  "litespec/core/product#treat-generated-research-as-source-material"
+ ],
+ "litespec/rule/core-release.apply-release-access-controls": [
+  "litespec/core/release#apply-release-access-controls"
+ ],
+ "litespec/rule/core-release.identify-immutable-release-artifacts": [
+  "litespec/core/release#identify-immutable-release-artifacts"
+ ],
+ "litespec/rule/core-release.keep-a-first-release-readiness-record": [
+  "litespec/core/release#keep-a-first-release-readiness-record"
+ ],
+ "litespec/rule/core-release.keep-generated-contracts-stable": [
+  "litespec/core/release#keep-generated-contracts-stable"
+ ],
+ "litespec/rule/core-release.keep-release-records-non-authoritative": [
+  "litespec/core/release#keep-release-records-non-authoritative"
+ ],
+ "litespec/rule/core-release.keep-unfinished-behavior-in-draft": [
+  "litespec/core/release#keep-unfinished-behavior-in-draft"
+ ],
+ "litespec/rule/core-release.list-included-release-behavior": [
+  "litespec/core/release#list-included-release-behavior"
+ ],
+ "litespec/rule/core-release.meet-release-readiness-gates": [
+  "litespec/core/release#meet-release-readiness-gates"
+ ],
+ "litespec/rule/core-release.provide-release-data-recovery": [
+  "litespec/core/release#provide-release-data-recovery"
+ ],
+ "litespec/rule/core-release.provide-release-delivery-controls": [
+  "litespec/core/release#provide-release-delivery-controls"
+ ],
+ "litespec/rule/core-release.provide-release-operating-visibility": [
+  "litespec/core/release#provide-release-operating-visibility"
+ ],
+ "litespec/rule/core-release.record-accepted-debt-as-a-known-gap": [
+  "litespec/core/release#record-accepted-debt-as-a-known-gap"
+ ],
+ "litespec/rule/core-release.record-operating-readiness": [
+  "litespec/core/release#record-operating-readiness"
+ ],
+ "litespec/rule/core-release.record-release-evidence": [
+  "litespec/core/release#record-release-evidence"
+ ],
+ "litespec/rule/core-release.record-the-release-artifact": [
+  "litespec/core/release#record-the-release-artifact"
+ ],
+ "litespec/rule/core-release.regenerate-application-contracts": [
+  "litespec/core/release#regenerate-application-contracts"
+ ],
+ "litespec/rule/core-release.report-verification-exactly": [
+  "litespec/core/release#report-verification-exactly"
+ ],
+ "litespec/rule/core-release.resolve-release-blockers": [
+  "litespec/core/release#resolve-release-blockers"
+ ],
+ "litespec/rule/core-release.run-backend-release-checks": [
+  "litespec/core/release#run-backend-release-checks"
+ ],
+ "litespec/rule/core-release.run-boundary-selected-checks": [
+  "litespec/core/release#run-boundary-selected-checks"
+ ],
+ "litespec/rule/core-release.run-consistency-checks": [
+  "litespec/core/release#run-consistency-checks"
+ ],
+ "litespec/rule/core-release.run-extension-checks": [
+  "litespec/core/release#run-extension-checks"
+ ],
+ "litespec/rule/core-release.run-frontend-release-checks": [
+  "litespec/core/release#run-frontend-release-checks"
+ ],
+ "litespec/rule/core-release.run-journey-checks": [
+  "litespec/core/release#run-journey-checks"
+ ],
+ "litespec/rule/core-release.state-each-release-as-a-complete-record": [
+  "litespec/core/release#state-each-release-as-a-complete-record"
+ ],
+ "litespec/rule/core-release.store-release-records-together": [
+  "litespec/core/release#store-release-records-together"
+ ],
+ "litespec/rule/core-release.treat-check-warnings-as-failures": [
+  "litespec/core/release#treat-check-warnings-as-failures"
+ ],
+ "litespec/rule/core-release.verify-connected-journeys": [
+  "litespec/core/release#verify-connected-journeys"
+ ],
+ "litespec/rule/core-scope.answer-the-constraints-question": [
+  "litespec/core/scope#answer-the-constraints-question"
+ ],
+ "litespec/rule/core-scope.declare-a-consumer-that-has-no-backend": [
+  "litespec/core/scope#declare-a-consumer-that-has-no-backend"
+ ],
+ "litespec/rule/core-scope.keep-one-bounded-context": [
+  "litespec/core/scope#keep-one-bounded-context"
+ ],
+ "litespec/rule/core-scope.measure-capacity-before-expansion": [
+  "litespec/core/scope#measure-capacity-before-expansion"
+ ],
+ "litespec/rule/core-scope.record-selected-extensions": [
+  "litespec/core/scope#record-selected-extensions"
+ ],
+ "litespec/rule/core-scope.record-unsupported-scope-decisions": [
+  "litespec/core/scope#record-unsupported-scope-decisions"
+ ],
+ "litespec/rule/core-scope.select-a-size-profile-and-stacks": [
+  "litespec/core/scope#select-a-size-profile-and-stacks"
+ ],
+ "litespec/rule/core-scope.select-conditional-extensions-explicitly": [
+  "litespec/core/scope#select-conditional-extensions-explicitly"
+ ],
+ "litespec/rule/core-scope.start-with-one-api-and-database": [
+  "litespec/core/scope#start-with-one-api-and-database"
+ ],
+ "litespec/rule/core-system.bound-a-scenario-to-120-words": [
+  "litespec/core/system#bound-a-scenario-to-120-words"
+ ],
+ "litespec/rule/core-system.compute-use-case-status-from-evidence": [
+  "litespec/core/system#compute-use-case-status-from-evidence"
+ ],
+ "litespec/rule/core-system.connect-one-product-outcome-through-a-journey": [
+  "litespec/core/system#connect-one-product-outcome-through-a-journey"
+ ],
+ "litespec/rule/core-system.declare-each-link-on-its-source": [
+  "litespec/core/system#declare-each-link-on-its-source"
+ ],
+ "litespec/rule/core-system.declare-event-reaction-delivery": [
+  "litespec/core/system#declare-event-reaction-delivery"
+ ],
+ "litespec/rule/core-system.deliver-one-complete-use-case": [
+  "litespec/core/system#deliver-one-complete-use-case"
+ ],
+ "litespec/rule/core-system.derive-every-scenario-from-one-reference-cast": [
+  "litespec/core/system#derive-every-scenario-from-one-reference-cast"
+ ],
+ "litespec/rule/core-system.drive-work-from-approved-records": [
+  "litespec/core/system#drive-work-from-approved-records"
+ ],
+ "litespec/rule/core-system.grant-access-through-roles-and-permissions": [
+  "litespec/core/system#grant-access-through-roles-and-permissions"
+ ],
+ "litespec/rule/core-system.group-language-and-use-cases-by-module": [
+  "litespec/core/system#group-language-and-use-cases-by-module"
+ ],
+ "litespec/rule/core-system.group-module-use-case-files-by-business-record": [
+  "litespec/core/system#group-module-use-case-files-by-business-record"
+ ],
+ "litespec/rule/core-system.keep-a-scenario-informative": [
+  "litespec/core/system#keep-a-scenario-informative"
+ ],
+ "litespec/rule/core-system.keep-decision-authority-with-accountable-people": [
+  "litespec/core/system#keep-decision-authority-with-accountable-people"
+ ],
+ "litespec/rule/core-system.keep-operational-and-security-references-under-operations": [
+  "litespec/core/system#keep-operational-and-security-references-under-operations"
+ ],
+ "litespec/rule/core-system.keep-records-readable-without-tooling": [
+  "litespec/core/system#keep-records-readable-without-tooling"
+ ],
+ "litespec/rule/core-system.keep-use-cases-and-handlers-in-one-to-one-correspondence": [
+  "litespec/core/system#keep-use-cases-and-handlers-in-one-to-one-correspondence"
+ ],
+ "litespec/rule/core-system.make-business-record-ownership-explicit": [
+  "litespec/core/system#make-business-record-ownership-explicit"
+ ],
+ "litespec/rule/core-system.model-every-business-record-lifecycle-with-state-records": [
+  "litespec/core/system#model-every-business-record-lifecycle-with-state-records"
+ ],
+ "litespec/rule/core-system.name-what-calls-a-use-case": [
+  "litespec/core/system#name-what-calls-a-use-case"
+ ],
+ "litespec/rule/core-system.resolve-authority-by-ladder": [
+  "litespec/core/system#resolve-authority-by-ladder"
+ ],
+ "litespec/rule/core-system.state-each-rule-with-its-kind": [
+  "litespec/core/system#state-each-rule-with-its-kind"
+ ],
+ "litespec/rule/core-system.state-one-occasion-for-every-behavior-record": [
+  "litespec/core/system#state-one-occasion-for-every-behavior-record"
+ ],
+ "litespec/rule/core-system.update-records-with-behavior": [
+  "litespec/core/system#update-records-with-behavior"
+ ],
+ "litespec/rule/core-system.use-established-technical-terms": [
+  "litespec/core/system#use-established-technical-terms"
+ ],
+ "litespec/rule/core-system.use-ordinary-capitalization-in-prose": [
+  "litespec/core/system#use-ordinary-capitalization-in-prose"
+ ],
+ "litespec/rule/core-system.use-this-consumer-documentation-layout": [
+  "litespec/core/system#use-this-consumer-documentation-layout"
+ ],
+ "litespec/rule/core-system.write-each-record-in-its-catalog-shape": [
+  "litespec/core/system#write-each-record-in-its-catalog-shape"
+ ],
+ "litespec/rule/dotnet-api.declare-operation-metadata-in-the-contract": [
+  "litespec/backend/dotnet/api#declare-operation-metadata-in-the-contract"
+ ],
+ "litespec/rule/dotnet-api.exclude-mvc-controllers-from-the-profile": [
+  "litespec/backend/dotnet/api#exclude-mvc-controllers-from-the-profile"
+ ],
+ "litespec/rule/dotnet-api.keep-programcs-as-composition": [
+  "litespec/backend/dotnet/api#keep-programcs-as-composition"
+ ],
+ "litespec/rule/dotnet-api.mark-polymorphic-transport-models-with-discriminators": [
+  "litespec/backend/dotnet/api#mark-polymorphic-transport-models-with-discriminators"
+ ],
+ "litespec/rule/dotnet-api.use-one-endpoint-per-operation": [
+  "litespec/backend/dotnet/api#use-one-endpoint-per-operation"
+ ],
+ "litespec/rule/dotnet-application.keep-one-state-changing-use-case-in-one-command-pipeline": [
+  "litespec/backend/dotnet/application#keep-one-state-changing-use-case-in-one-command-pipeline"
+ ],
+ "litespec/rule/dotnet-application.report-input-problems-as-validity": [
+  "litespec/backend/dotnet/application#report-input-problems-as-validity"
+ ],
+ "litespec/rule/dotnet-application.use-the-pinned-mediator-entry-points": [
+  "litespec/backend/dotnet/application#use-the-pinned-mediator-entry-points"
+ ],
+ "litespec/rule/dotnet-architecture.keep-composition-in-hosts": [
+  "litespec/backend/dotnet/architecture#keep-composition-in-hosts"
+ ],
+ "litespec/rule/dotnet-architecture.keep-implementation-types-internal": [
+  "litespec/backend/dotnet/architecture#keep-implementation-types-internal"
+ ],
+ "litespec/rule/dotnet-architecture.keep-one-application-assembly": [
+  "litespec/backend/dotnet/architecture#keep-one-application-assembly"
+ ],
+ "litespec/rule/dotnet-architecture.use-five-application-projects": [
+  "litespec/backend/dotnet/architecture#use-five-application-projects"
+ ],
+ "litespec/rule/dotnet-architecture.use-one-public-assembly-marker-per-scanned-project": [
+  "litespec/backend/dotnet/architecture#use-one-public-assembly-marker-per-scanned-project"
+ ],
+ "litespec/rule/dotnet-config.centralize-net-build-settings": [
+  "litespec/backend/dotnet/config#centralize-net-build-settings"
+ ],
+ "litespec/rule/dotnet-config.centralize-nuget-versions": [
+  "litespec/backend/dotnet/config#centralize-nuget-versions"
+ ],
+ "litespec/rule/dotnet-config.commit-the-tool-manifest": [
+  "litespec/backend/dotnet/config#commit-the-tool-manifest"
+ ],
+ "litespec/rule/dotnet-config.set-the-sdk-floor-at-the-workspace-root": [
+  "litespec/backend/dotnet/config#set-the-sdk-floor-at-the-workspace-root"
+ ],
+ "litespec/rule/dotnet-config.validate-backend-options-at-startup": [
+  "litespec/backend/dotnet/config#validate-backend-options-at-startup"
+ ],
+ "litespec/rule/dotnet-domain.define-the-shared-domain-contracts-once": [
+  "litespec/backend/dotnet/domain#define-the-shared-domain-contracts-once"
+ ],
+ "litespec/rule/dotnet-domain.document-every-public-domain-contract": [
+  "litespec/backend/dotnet/domain#document-every-public-domain-contract"
+ ],
+ "litespec/rule/dotnet-domain.keep-domain-free-of-outer-layer-concerns": [
+  "litespec/backend/dotnet/domain#keep-domain-free-of-outer-layer-concerns"
+ ],
+ "litespec/rule/dotnet-domain.keep-id-representations-aligned-at-every-boundary": [
+  "litespec/backend/dotnet/domain#keep-id-representations-aligned-at-every-boundary"
+ ],
+ "litespec/rule/dotnet-domain.keep-repository-interfaces-in-domain": [
+  "litespec/backend/dotnet/domain#keep-repository-interfaces-in-domain"
+ ],
+ "litespec/rule/dotnet-domain.make-money-and-decimal-rules-explicit": [
+  "litespec/backend/dotnet/domain#make-money-and-decimal-rules-explicit"
+ ],
+ "litespec/rule/dotnet-domain.model-every-aggregate-lifecycle-with-state-records": [
+  "litespec/backend/dotnet/domain#model-every-aggregate-lifecycle-with-state-records"
+ ],
+ "litespec/rule/dotnet-domain.model-every-closed-set-of-domain-values-without-enums": [
+  "litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums"
+ ],
+ "litespec/rule/dotnet-domain.raise-immutable-domain-facts": [
+  "litespec/backend/dotnet/domain#raise-immutable-domain-facts"
+ ],
+ "litespec/rule/dotnet-domain.reject-business-violations-with-domain-exceptions": [
+  "litespec/backend/dotnet/domain#reject-business-violations-with-domain-exceptions"
+ ],
+ "litespec/rule/dotnet-domain.use-strongly-typed-version-7-identifiers": [
+  "litespec/backend/dotnet/domain#use-strongly-typed-version-7-identifiers"
+ ],
+ "litespec/rule/dotnet-domain.use-the-project-aggregate-root-contract": [
+  "litespec/backend/dotnet/domain#use-the-project-aggregate-root-contract"
+ ],
+ "litespec/rule/dotnet-naming.keep-implementation-style-consistent": [
+  "litespec/backend/dotnet/naming#keep-implementation-style-consistent"
+ ],
+ "litespec/rule/dotnet-naming.match-c-files-and-primary-types": [
+  "litespec/backend/dotnet/naming#match-c-files-and-primary-types"
+ ],
+ "litespec/rule/dotnet-naming.name-asynchronous-methods-completely": [
+  "litespec/backend/dotnet/naming#name-asynchronous-methods-completely"
+ ],
+ "litespec/rule/dotnet-packages.keep-application-dependencies-narrow": [
+  "litespec/backend/dotnet/packages#keep-application-dependencies-narrow"
+ ],
+ "litespec/rule/dotnet-packages.keep-domain-package-free": [
+  "litespec/backend/dotnet/packages#keep-domain-package-free"
+ ],
+ "litespec/rule/dotnet-packages.pin-every-dependency-centrally": [
+  "litespec/backend/dotnet/packages#pin-every-dependency-centrally"
+ ],
+ "litespec/rule/dotnet-packages.reference-only-the-litebus-module-required": [
+  "litespec/backend/dotnet/packages#reference-only-the-litebus-module-required"
+ ],
+ "litespec/rule/dotnet-packages.use-the-project-reference-graph": [
+  "litespec/backend/dotnet/packages#use-the-project-reference-graph"
+ ],
+ "litespec/rule/dotnet-packages.use-this-baseline-package-ownership": [
+  "litespec/backend/dotnet/packages#use-this-baseline-package-ownership"
+ ],
+ "litespec/rule/dotnet-persistence.commit-once-in-the-command-pipeline": [
+  "litespec/backend/dotnet/persistence#commit-once-in-the-command-pipeline"
+ ],
+ "litespec/rule/dotnet-persistence.query-through-iquerysession": [
+  "litespec/backend/dotnet/persistence#query-through-iquerysession"
+ ],
+ "litespec/rule/dotnet-persistence.register-one-scoped-session": [
+  "litespec/backend/dotnet/persistence#register-one-scoped-session"
+ ],
+ "litespec/rule/dotnet-persistence.stage-aggregate-writes-through-repositories": [
+  "litespec/backend/dotnet/persistence#stage-aggregate-writes-through-repositories"
+ ],
+ "litespec/rule/dotnet-persistence.use-this-infrastructure-layout": [
+  "litespec/backend/dotnet/persistence#use-this-infrastructure-layout"
+ ],
+ "litespec/rule/dotnet-testing.enforce-architecture-rules": [
+  "litespec/backend/dotnet/testing#enforce-architecture-rules"
+ ],
+ "litespec/rule/dotnet-testing.keep-the-test-projects-the-size-profile-requires": [
+  "litespec/backend/dotnet/testing#keep-the-test-projects-the-size-profile-requires"
+ ],
+ "litespec/rule/dotnet-testing.prove-each-case-with-a-test-that-calls-its-use-case": [
+  "litespec/backend/dotnet/testing#prove-each-case-with-a-test-that-calls-its-use-case"
+ ],
+ "litespec/rule/dotnet-testing.test-http-integration-through-the-real-host": [
+  "litespec/backend/dotnet/testing#test-http-integration-through-the-real-host"
+ ],
+ "litespec/rule/dotnet-testing.use-one-production-faithful-integration-harness": [
+  "litespec/backend/dotnet/testing#use-one-production-faithful-integration-harness"
+ ],
+ "litespec/rule/dotnet-workspace.declare-size-and-stacks-in-project-config": [
+  "litespec/backend/dotnet/workspace#declare-size-and-stacks-in-project-config"
+ ],
+ "litespec/rule/dotnet-workspace.keep-net-production-and-test-projects-separate": [
+  "litespec/backend/dotnet/workspace#keep-net-production-and-test-projects-separate"
+ ],
+ "litespec/rule/dotnet-workspace.keep-one-workspace-solution-beside-the-api-solution": [
+  "litespec/backend/dotnet/workspace#keep-one-workspace-solution-beside-the-api-solution"
+ ],
+ "litespec/rule/dotnet-workspace.place-a-workspace-apphost-beside-the-applications-it-runs": [
+  "litespec/backend/dotnet/workspace#place-a-workspace-apphost-beside-the-applications-it-runs"
+ ],
+ "litespec/rule/ext-audit.add-a-correcting-record": [
+  "litespec/ext/audit#add-a-correcting-record"
+ ],
+ "litespec/rule/ext-audit.anchor-the-audit-chain-outside-its-own-store": [
+  "litespec/ext/audit#anchor-the-audit-chain-outside-its-own-store"
+ ],
+ "litespec/rule/ext-audit.audit-reads-of-the-trail": [
+  "litespec/ext/audit#audit-reads-of-the-trail"
+ ],
+ "litespec/rule/ext-audit.commit-a-success-record-with-its-business-change": [
+  "litespec/ext/audit#commit-a-success-record-with-its-business-change"
+ ],
+ "litespec/rule/ext-audit.cover-the-required-audit-categories": [
+  "litespec/ext/audit#cover-the-required-audit-categories"
+ ],
+ "litespec/rule/ext-audit.declare-audit-selection-beside-the-command": [
+  "litespec/ext/audit#declare-audit-selection-beside-the-command"
+ ],
+ "litespec/rule/ext-audit.declare-audit-selection-on-every-command": [
+  "litespec/ext/audit#declare-audit-selection-on-every-command"
+ ],
+ "litespec/rule/ext-audit.emit-audit-records-at-the-mediation-boundary": [
+  "litespec/ext/audit#emit-audit-records-at-the-mediation-boundary"
+ ],
+ "litespec/rule/ext-audit.enforce-append-only-through-storage-privilege": [
+  "litespec/ext/audit#enforce-append-only-through-storage-privilege"
+ ],
+ "litespec/rule/ext-audit.exclude-derived-audit-trails": [
+  "litespec/ext/audit#exclude-derived-audit-trails"
+ ],
+ "litespec/rule/ext-audit.exclude-indiscriminate-auditing": [
+  "litespec/ext/audit#exclude-indiscriminate-auditing"
+ ],
+ "litespec/rule/ext-audit.exclude-personal-data-beyond-actor-identity": [
+  "litespec/ext/audit#exclude-personal-data-beyond-actor-identity"
+ ],
+ "litespec/rule/ext-audit.exclude-secrets-and-payment-data": [
+  "litespec/ext/audit#exclude-secrets-and-payment-data"
+ ],
+ "litespec/rule/ext-audit.exclude-state-snapshots": [
+  "litespec/ext/audit#exclude-state-snapshots"
+ ],
+ "litespec/rule/ext-audit.give-the-trail-a-read-path": [
+  "litespec/ext/audit#give-the-trail-a-read-path"
+ ],
+ "litespec/rule/ext-audit.keep-audit-infrastructure-in-one-location": [
+  "litespec/ext/audit#keep-audit-infrastructure-in-one-location"
+ ],
+ "litespec/rule/ext-audit.provide-tamper-evidence": [
+  "litespec/ext/audit#provide-tamper-evidence"
+ ],
+ "litespec/rule/ext-audit.publish-a-copy-to-the-security-platform": [
+  "litespec/ext/audit#publish-a-copy-to-the-security-platform"
+ ],
+ "litespec/rule/ext-audit.publish-unsuccessful-write-failures": [
+  "litespec/ext/audit#publish-unsuccessful-write-failures"
+ ],
+ "litespec/rule/ext-audit.record-a-bulk-read-inside-its-own-boundary": [
+  "litespec/ext/audit#record-a-bulk-read-inside-its-own-boundary"
+ ],
+ "litespec/rule/ext-audit.record-bulk-export": [
+  "litespec/ext/audit#record-bulk-export"
+ ],
+ "litespec/rule/ext-audit.record-delegated-administrative-access": [
+  "litespec/ext/audit#record-delegated-administrative-access"
+ ],
+ "litespec/rule/ext-audit.record-every-attempt-outcome": [
+  "litespec/ext/audit#record-every-attempt-outcome"
+ ],
+ "litespec/rule/ext-audit.record-failed-audited-attempts": [
+  "litespec/ext/audit#record-failed-audited-attempts"
+ ],
+ "litespec/rule/ext-audit.record-personal-data-reads": [
+  "litespec/ext/audit#record-personal-data-reads"
+ ],
+ "litespec/rule/ext-audit.record-refused-authorization": [
+  "litespec/ext/audit#record-refused-authorization"
+ ],
+ "litespec/rule/ext-audit.record-the-audit-adoption-decision": [
+  "litespec/ext/audit#record-the-audit-adoption-decision"
+ ],
+ "litespec/rule/ext-audit.record-the-failure-code-on-an-unsuccessful-attempt": [
+  "litespec/ext/audit#record-the-failure-code-on-an-unsuccessful-attempt"
+ ],
+ "litespec/rule/ext-audit.record-the-operation-trace-identity": [
+  "litespec/ext/audit#record-the-operation-trace-identity"
+ ],
+ "litespec/rule/ext-audit.record-the-request-origin": [
+  "litespec/ext/audit#record-the-request-origin"
+ ],
+ "litespec/rule/ext-audit.record-the-required-audit-fields": [
+  "litespec/ext/audit#record-the-required-audit-fields"
+ ],
+ "litespec/rule/ext-audit.reject-an-undeclared-command": [
+  "litespec/ext/audit#reject-an-undeclared-command"
+ ],
+ "litespec/rule/ext-audit.remove-the-identity-mapping-on-erasure": [
+  "litespec/ext/audit#remove-the-identity-mapping-on-erasure"
+ ],
+ "litespec/rule/ext-audit.restrict-handler-contribution-to-determined-values": [
+  "litespec/ext/audit#restrict-handler-contribution-to-determined-values"
+ ],
+ "litespec/rule/ext-audit.retain-each-category-for-its-declared-period": [
+  "litespec/ext/audit#retain-each-category-for-its-declared-period"
+ ],
+ "litespec/rule/ext-audit.scope-every-record-to-its-tenant": [
+  "litespec/ext/audit#scope-every-record-to-its-tenant"
+ ],
+ "litespec/rule/ext-audit.stage-the-audit-write-before-the-business-commit": [
+  "litespec/ext/audit#stage-the-audit-write-before-the-business-commit"
+ ],
+ "litespec/rule/ext-audit.state-the-action-as-use-case-identity": [
+  "litespec/ext/audit#state-the-action-as-use-case-identity"
+ ],
+ "litespec/rule/ext-audit.store-the-trail-beside-the-business-data": [
+  "litespec/ext/audit#store-the-trail-beside-the-business-data"
+ ],
+ "litespec/rule/ext-audit.use-a-closed-actor-set": [
+  "litespec/ext/audit#use-a-closed-actor-set"
+ ],
+ "litespec/rule/ext-audit.use-a-fixed-category-vocabulary": [
+  "litespec/ext/audit#use-a-fixed-category-vocabulary"
+ ],
+ "litespec/rule/ext-audit.verify-the-integrity-chain-on-a-schedule": [
+  "litespec/ext/audit#verify-the-integrity-chain-on-a-schedule"
+ ],
+ "litespec/rule/ext-audit.version-the-audit-record-shape": [
+  "litespec/ext/audit#version-the-audit-record-shape"
+ ],
+ "litespec/rule/ext-audit.write-an-unsuccessful-record-outside-the-failed-transaction": [
+  "litespec/ext/audit#write-an-unsuccessful-record-outside-the-failed-transaction"
+ ],
+ "litespec/rule/ext-bdd.assert-observable-outcomes": [
+  "litespec/backend/dotnet/ext/bdd#assert-observable-outcomes"
+ ],
+ "litespec/rule/ext-bdd.avoid-routine-scenario-duplication": [
+  "litespec/backend/dotnet/ext/bdd#avoid-routine-scenario-duplication"
+ ],
+ "litespec/rule/ext-bdd.drive-public-behavior": [
+  "litespec/backend/dotnet/ext/bdd#drive-public-behavior"
+ ],
+ "litespec/rule/ext-bdd.exclude-production-internals": [
+  "litespec/backend/dotnet/ext/bdd#exclude-production-internals"
+ ],
+ "litespec/rule/ext-bdd.group-feature-files-by-module": [
+  "litespec/backend/dotnet/ext/bdd#group-feature-files-by-module"
+ ],
+ "litespec/rule/ext-bdd.isolate-scenario-execution": [
+  "litespec/backend/dotnet/ext/bdd#isolate-scenario-execution"
+ ],
+ "litespec/rule/ext-bdd.keep-steps-vocabulary-scoped": [
+  "litespec/backend/dotnet/ext/bdd#keep-steps-vocabulary-scoped"
+ ],
+ "litespec/rule/ext-bdd.limit-database-assertions": [
+  "litespec/backend/dotnet/ext/bdd#limit-database-assertions"
+ ],
+ "litespec/rule/ext-bdd.limit-scenario-context": [
+  "litespec/backend/dotnet/ext/bdd#limit-scenario-context"
+ ],
+ "litespec/rule/ext-bdd.mark-pull-request-scenarios": [
+  "litespec/backend/dotnet/ext/bdd#mark-pull-request-scenarios"
+ ],
+ "litespec/rule/ext-bdd.own-scenario-data": [
+  "litespec/backend/dotnet/ext/bdd#own-scenario-data"
+ ],
+ "litespec/rule/ext-bdd.preserve-scenario-failures": [
+  "litespec/backend/dotnet/ext/bdd#preserve-scenario-failures"
+ ],
+ "litespec/rule/ext-bdd.prove-a-case-from-every-scenario": [
+  "litespec/backend/dotnet/ext/bdd#prove-a-case-from-every-scenario"
+ ],
+ "litespec/rule/ext-bdd.select-shared-critical-examples": [
+  "litespec/backend/dotnet/ext/bdd#select-shared-critical-examples"
+ ],
+ "litespec/rule/ext-bdd.translate-business-phrases": [
+  "litespec/backend/dotnet/ext/bdd#translate-business-phrases"
+ ],
+ "litespec/rule/ext-cache.avoid-unbounded-key-locks": [
+  "litespec/ext/cache#avoid-unbounded-key-locks"
+ ],
+ "litespec/rule/ext-cache.bound-cache-refresh-work": [
+  "litespec/ext/cache#bound-cache-refresh-work"
+ ],
+ "litespec/rule/ext-cache.compose-cache-keys-from-result-inputs": [
+  "litespec/ext/cache#compose-cache-keys-from-result-inputs"
+ ],
+ "litespec/rule/ext-cache.define-cache-invalidation": [
+  "litespec/ext/cache#define-cache-invalidation"
+ ],
+ "litespec/rule/ext-cache.define-cache-outage-behavior": [
+  "litespec/ext/cache#define-cache-outage-behavior"
+ ],
+ "litespec/rule/ext-cache.emit-a-signal-for-each-degraded-cache-path": [
+  "litespec/ext/cache#emit-a-signal-for-each-degraded-cache-path"
+ ],
+ "litespec/rule/ext-cache.exclude-unsafe-cache-key-material": [
+  "litespec/ext/cache#exclude-unsafe-cache-key-material"
+ ],
+ "litespec/rule/ext-cache.keep-source-data-authoritative": [
+  "litespec/ext/cache#keep-source-data-authoritative"
+ ],
+ "litespec/rule/ext-cache.place-cache-access-at-an-outer-boundary": [
+  "litespec/ext/cache#place-cache-access-at-an-outer-boundary"
+ ],
+ "litespec/rule/ext-cache.prefer-bounded-staleness": [
+  "litespec/ext/cache#prefer-bounded-staleness"
+ ],
+ "litespec/rule/ext-cache.record-a-manual-cache-invalidation": [
+  "litespec/ext/cache#record-a-manual-cache-invalidation"
+ ],
+ "litespec/rule/ext-cache.record-measured-cache-need": [
+  "litespec/ext/cache#record-measured-cache-need"
+ ],
+ "litespec/rule/ext-cache.remove-unjustified-caches": [
+  "litespec/ext/cache#remove-unjustified-caches"
+ ],
+ "litespec/rule/ext-compat.assign-operation-ids": [
+  "litespec/ext/compat#assign-operation-ids"
+ ],
+ "litespec/rule/ext-compat.assign-versioned-operation-ids": [
+  "litespec/ext/compat#assign-versioned-operation-ids"
+ ],
+ "litespec/rule/ext-compat.classify-breaking-contract-changes": [
+  "litespec/ext/compat#classify-breaking-contract-changes"
+ ],
+ "litespec/rule/ext-compat.classify-compatible-additions": [
+  "litespec/ext/compat#classify-compatible-additions"
+ ],
+ "litespec/rule/ext-compat.classify-independent-consumer-changes": [
+  "litespec/ext/compat#classify-independent-consumer-changes"
+ ],
+ "litespec/rule/ext-compat.diff-release-contracts": [
+  "litespec/ext/compat#diff-release-contracts"
+ ],
+ "litespec/rule/ext-compat.exercise-generated-consumers": [
+  "litespec/ext/compat#exercise-generated-consumers"
+ ],
+ "litespec/rule/ext-compat.gate-new-error-outcomes": [
+  "litespec/ext/compat#gate-new-error-outcomes"
+ ],
+ "litespec/rule/ext-compat.keep-baseline-references-immutable": [
+  "litespec/ext/compat#keep-baseline-references-immutable"
+ ],
+ "litespec/rule/ext-compat.keep-problem-details-codes-stable": [
+  "litespec/ext/compat#keep-problem-details-codes-stable"
+ ],
+ "litespec/rule/ext-compat.preserve-stable-error-codes": [
+  "litespec/ext/compat#preserve-stable-error-codes"
+ ],
+ "litespec/rule/ext-compat.publish-deprecation-context": [
+  "litespec/ext/compat#publish-deprecation-context"
+ ],
+ "litespec/rule/ext-compat.record-deprecation-conditions": [
+  "litespec/ext/compat#record-deprecation-conditions"
+ ],
+ "litespec/rule/ext-compat.record-version-retirement": [
+  "litespec/ext/compat#record-version-retirement"
+ ],
+ "litespec/rule/ext-compat.reject-unapproved-breaking-diffs": [
+  "litespec/ext/compat#reject-unapproved-breaking-diffs"
+ ],
+ "litespec/rule/ext-compat.resolve-uncertain-classifications-safely": [
+  "litespec/ext/compat#resolve-uncertain-classifications-safely"
+ ],
+ "litespec/rule/ext-compat.retain-compatible-operation-ids": [
+  "litespec/ext/compat#retain-compatible-operation-ids"
+ ],
+ "litespec/rule/ext-compat.retain-release-baselines": [
+  "litespec/ext/compat#retain-release-baselines"
+ ],
+ "litespec/rule/ext-compat.retain-supported-versions": [
+  "litespec/ext/compat#retain-supported-versions"
+ ],
+ "litespec/rule/ext-compat.review-exhaustive-consumer-changes": [
+  "litespec/ext/compat#review-exhaustive-consumer-changes"
+ ],
+ "litespec/rule/ext-compat.signal-planned-public-removal": [
+  "litespec/ext/compat#signal-planned-public-removal"
+ ],
+ "litespec/rule/ext-compat.store-current-openapi-source": [
+  "litespec/ext/compat#store-current-openapi-source"
+ ],
+ "litespec/rule/ext-compat.treat-errors-as-contracts": [
+  "litespec/ext/compat#treat-errors-as-contracts"
+ ],
+ "litespec/rule/ext-compat.use-one-diff-tool": [
+  "litespec/ext/compat#use-one-diff-tool"
+ ],
+ "litespec/rule/ext-compat.version-breaking-contracts": [
+  "litespec/ext/compat#version-breaking-contracts"
+ ],
+ "litespec/rule/ext-concurrency.apply-http-version-preconditions": [
+  "litespec/ext/concurrency#apply-http-version-preconditions"
+ ],
+ "litespec/rule/ext-concurrency.bound-expired-record-cleanup": [
+  "litespec/ext/concurrency#bound-expired-record-cleanup"
+ ],
+ "litespec/rule/ext-concurrency.canonicalize-request-fingerprints": [
+  "litespec/ext/concurrency#canonicalize-request-fingerprints"
+ ],
+ "litespec/rule/ext-concurrency.compare-expected-aggregate-versions": [
+  "litespec/ext/concurrency#compare-expected-aggregate-versions"
+ ],
+ "litespec/rule/ext-concurrency.declare-applicable-headers": [
+  "litespec/ext/concurrency#declare-applicable-headers"
+ ],
+ "litespec/rule/ext-concurrency.declare-replayed-transport-outcomes": [
+  "litespec/ext/concurrency#declare-replayed-transport-outcomes"
+ ],
+ "litespec/rule/ext-concurrency.define-concurrent-retry-behavior": [
+  "litespec/ext/concurrency#define-concurrent-retry-behavior"
+ ],
+ "litespec/rule/ext-concurrency.delay-irreversible-provider-calls": [
+  "litespec/ext/concurrency#delay-irreversible-provider-calls"
+ ],
+ "litespec/rule/ext-concurrency.discard-failed-replay-state": [
+  "litespec/ext/concurrency#discard-failed-replay-state"
+ ],
+ "litespec/rule/ext-concurrency.document-write-conflict-behavior": [
+  "litespec/ext/concurrency#document-write-conflict-behavior"
+ ],
+ "litespec/rule/ext-concurrency.enforce-key-uniqueness": [
+  "litespec/ext/concurrency#enforce-key-uniqueness"
+ ],
+ "litespec/rule/ext-concurrency.exclude-unsafe-replay-outcomes": [
+  "litespec/ext/concurrency#exclude-unsafe-replay-outcomes"
+ ],
+ "litespec/rule/ext-concurrency.hide-provider-version-values": [
+  "litespec/ext/concurrency#hide-provider-version-values"
+ ],
+ "litespec/rule/ext-concurrency.keep-idempotency-persistence-in-infrastructure": [
+  "litespec/ext/concurrency#keep-idempotency-persistence-in-infrastructure"
+ ],
+ "litespec/rule/ext-concurrency.limit-version-checks": [
+  "litespec/ext/concurrency#limit-version-checks"
+ ],
+ "litespec/rule/ext-concurrency.map-failed-expected-versions": [
+  "litespec/ext/concurrency#map-failed-expected-versions"
+ ],
+ "litespec/rule/ext-concurrency.map-replay-responses-at-the-api-boundary": [
+  "litespec/ext/concurrency#map-replay-responses-at-the-api-boundary"
+ ],
+ "litespec/rule/ext-concurrency.protect-fingerprint-source-data": [
+  "litespec/ext/concurrency#protect-fingerprint-source-data"
+ ],
+ "litespec/rule/ext-concurrency.reject-conflicting-key-reuse": [
+  "litespec/ext/concurrency#reject-conflicting-key-reuse"
+ ],
+ "litespec/rule/ext-concurrency.reject-silent-overwrites": [
+  "litespec/ext/concurrency#reject-silent-overwrites"
+ ],
+ "litespec/rule/ext-concurrency.reload-concurrent-winners": [
+  "litespec/ext/concurrency#reload-concurrent-winners"
+ ],
+ "litespec/rule/ext-concurrency.replay-completed-results": [
+  "litespec/ext/concurrency#replay-completed-results"
+ ],
+ "litespec/rule/ext-concurrency.restrict-replay-data": [
+  "litespec/ext/concurrency#restrict-replay-data"
+ ],
+ "litespec/rule/ext-concurrency.retain-safe-retry-keys": [
+  "litespec/ext/concurrency#retain-safe-retry-keys"
+ ],
+ "litespec/rule/ext-concurrency.return-precondition-outcomes": [
+  "litespec/ext/concurrency#return-precondition-outcomes"
+ ],
+ "litespec/rule/ext-concurrency.route-required-external-effects-durably": [
+  "litespec/ext/concurrency#route-required-external-effects-durably"
+ ],
+ "litespec/rule/ext-concurrency.scope-client-keys": [
+  "litespec/ext/concurrency#scope-client-keys"
+ ],
+ "litespec/rule/ext-concurrency.set-key-retention": [
+  "litespec/ext/concurrency#set-key-retention"
+ ],
+ "litespec/rule/ext-concurrency.store-idempotency-state-atomically": [
+  "litespec/ext/concurrency#store-idempotency-state-atomically"
+ ],
+ "litespec/rule/ext-concurrency.use-the-standard-idempotency-header": [
+  "litespec/ext/concurrency#use-the-standard-idempotency-header"
+ ],
+ "litespec/rule/ext-containers.apply-oci-release-labels": [
+  "litespec/ext/containers#apply-oci-release-labels"
+ ],
+ "litespec/rule/ext-containers.apply-schema-work-before-traffic": [
+  "litespec/ext/containers#apply-schema-work-before-traffic"
+ ],
+ "litespec/rule/ext-containers.build-from-the-workspace-root": [
+  "litespec/ext/containers#build-from-the-workspace-root"
+ ],
+ "litespec/rule/ext-containers.build-release-images-in-stages": [
+  "litespec/ext/containers#build-release-images-in-stages"
+ ],
+ "litespec/rule/ext-containers.copy-only-runtime-files": [
+  "litespec/ext/containers#copy-only-runtime-files"
+ ],
+ "litespec/rule/ext-containers.declare-writable-paths-and-limits": [
+  "litespec/ext/containers#declare-writable-paths-and-limits"
+ ],
+ "litespec/rule/ext-containers.exclude-build-material-from-runtime-images": [
+  "litespec/ext/containers#exclude-build-material-from-runtime-images"
+ ],
+ "litespec/rule/ext-containers.exclude-build-timestamps-from-contracts": [
+  "litespec/ext/containers#exclude-build-timestamps-from-contracts"
+ ],
+ "litespec/rule/ext-containers.exclude-environment-configuration-from-images": [
+  "litespec/ext/containers#exclude-environment-configuration-from-images"
+ ],
+ "litespec/rule/ext-containers.exclude-insecure-frontend-secret-carriers": [
+  "litespec/ext/containers#exclude-insecure-frontend-secret-carriers"
+ ],
+ "litespec/rule/ext-containers.keep-mutable-data-external": [
+  "litespec/ext/containers#keep-mutable-data-external"
+ ],
+ "litespec/rule/ext-containers.keep-schema-work-out-of-startup": [
+  "litespec/ext/containers#keep-schema-work-out-of-startup"
+ ],
+ "litespec/rule/ext-containers.limit-container-privileges": [
+  "litespec/ext/containers#limit-container-privileges"
+ ],
+ "litespec/rule/ext-containers.place-dockerfiles-beside-deployables": [
+  "litespec/ext/containers#place-dockerfiles-beside-deployables"
+ ],
+ "litespec/rule/ext-containers.record-image-digests": [
+  "litespec/ext/containers#record-image-digests"
+ ],
+ "litespec/rule/ext-containers.retain-rollback-material": [
+  "litespec/ext/containers#retain-rollback-material"
+ ],
+ "litespec/rule/ext-containers.run-images-as-non-root": [
+  "litespec/ext/containers#run-images-as-non-root"
+ ],
+ "litespec/rule/ext-containers.run-the-application-as-pid-1": [
+  "litespec/ext/containers#run-the-application-as-pid-1"
+ ],
+ "litespec/rule/ext-containers.separate-frontend-configuration-classes": [
+  "litespec/ext/containers#separate-frontend-configuration-classes"
+ ],
+ "litespec/rule/ext-containers.set-sufficient-shutdown-time": [
+  "litespec/ext/containers#set-sufficient-shutdown-time"
+ ],
+ "litespec/rule/ext-containers.supply-runtime-configuration-externally": [
+  "litespec/ext/containers#supply-runtime-configuration-externally"
+ ],
+ "litespec/rule/ext-containers.test-released-traffic": [
+  "litespec/ext/containers#test-released-traffic"
+ ],
+ "litespec/rule/ext-containers.use-protected-frontend-secret-delivery": [
+  "litespec/ext/containers#use-protected-frontend-secret-delivery"
+ ],
+ "litespec/rule/ext-containers.wait-for-replica-readiness": [
+  "litespec/ext/containers#wait-for-replica-readiness"
+ ],
+ "litespec/rule/ext-containers.write-runtime-logs-to-streams": [
+  "litespec/ext/containers#write-runtime-logs-to-streams"
+ ],
+ "litespec/rule/ext-delegation.ask-only-unanswered-questions": [
+  "litespec/ext/delegation#ask-only-unanswered-questions"
+ ],
+ "litespec/rule/ext-delegation.restrict-a-worker-to-its-paths": [
+  "litespec/ext/delegation#restrict-a-worker-to-its-paths"
+ ],
+ "litespec/rule/ext-delegation.verify-before-accepting-worker-output": [
+  "litespec/ext/delegation#verify-before-accepting-worker-output"
+ ],
+ "litespec/rule/ext-delegation.write-a-brief-before-delegating": [
+  "litespec/ext/delegation#write-a-brief-before-delegating"
+ ],
+ "litespec/rule/ext-efcore.apply-migrations-as-release-work": [
+  "litespec/backend/dotnet/ext/efcore#apply-migrations-as-release-work"
+ ],
+ "litespec/rule/ext-efcore.avoid-per-aggregate-read-stores": [
+  "litespec/backend/dotnet/ext/efcore#avoid-per-aggregate-read-stores"
+ ],
+ "litespec/rule/ext-efcore.commit-ef-core-command-work-once": [
+  "litespec/backend/dotnet/ext/efcore#commit-ef-core-command-work-once"
+ ],
+ "litespec/rule/ext-efcore.configure-ef-core-mappings-in-infrastructure": [
+  "litespec/backend/dotnet/ext/efcore#configure-ef-core-mappings-in-infrastructure"
+ ],
+ "litespec/rule/ext-efcore.configure-optimistic-tokens": [
+  "litespec/backend/dotnet/ext/efcore#configure-optimistic-tokens"
+ ],
+ "litespec/rule/ext-efcore.configure-relational-details-explicitly": [
+  "litespec/backend/dotnet/ext/efcore#configure-relational-details-explicitly"
+ ],
+ "litespec/rule/ext-efcore.define-ef-core-query-roots": [
+  "litespec/backend/dotnet/ext/efcore#define-ef-core-query-roots"
+ ],
+ "litespec/rule/ext-efcore.exclude-direct-handler-commits": [
+  "litespec/backend/dotnet/ext/efcore#exclude-direct-handler-commits"
+ ],
+ "litespec/rule/ext-efcore.generate-migrations-for-schema-changes": [
+  "litespec/backend/dotnet/ext/efcore#generate-migrations-for-schema-changes"
+ ],
+ "litespec/rule/ext-efcore.implement-query-roots-in-infrastructure": [
+  "litespec/backend/dotnet/ext/efcore#implement-query-roots-in-infrastructure"
+ ],
+ "litespec/rule/ext-efcore.keep-migration-files-together": [
+  "litespec/backend/dotnet/ext/efcore#keep-migration-files-together"
+ ],
+ "litespec/rule/ext-efcore.map-ef-core-concurrency-conflict": [
+  "litespec/backend/dotnet/ext/efcore#map-ef-core-concurrency-conflict"
+ ],
+ "litespec/rule/ext-efcore.map-stable-relational-state-shape": [
+  "litespec/backend/dotnet/ext/efcore#map-stable-relational-state-shape"
+ ],
+ "litespec/rule/ext-efcore.map-unsupported-state-shapes-in-infrastructure": [
+  "litespec/backend/dotnet/ext/efcore#map-unsupported-state-shapes-in-infrastructure"
+ ],
+ "litespec/rule/ext-efcore.process-changed-aggregate-events": [
+  "litespec/backend/dotnet/ext/efcore#process-changed-aggregate-events"
+ ],
+ "litespec/rule/ext-efcore.project-ef-core-queries-directly": [
+  "litespec/backend/dotnet/ext/efcore#project-ef-core-queries-directly"
+ ],
+ "litespec/rule/ext-efcore.record-ef-core-replacement-scope": [
+  "litespec/backend/dotnet/ext/efcore#record-ef-core-replacement-scope"
+ ],
+ "litespec/rule/ext-efcore.record-provider-selection": [
+  "litespec/backend/dotnet/ext/efcore#record-provider-selection"
+ ],
+ "litespec/rule/ext-efcore.register-one-command-post-handler": [
+  "litespec/backend/dotnet/ext/efcore#register-one-command-post-handler"
+ ],
+ "litespec/rule/ext-efcore.reject-automatic-command-retry": [
+  "litespec/backend/dotnet/ext/efcore#reject-automatic-command-retry"
+ ],
+ "litespec/rule/ext-efcore.reject-cross-provider-outbox-storage": [
+  "litespec/backend/dotnet/ext/efcore#reject-cross-provider-outbox-storage"
+ ],
+ "litespec/rule/ext-efcore.reject-mixed-provider-writes": [
+  "litespec/backend/dotnet/ext/efcore#reject-mixed-provider-writes"
+ ],
+ "litespec/rule/ext-efcore.reject-startup-schema-mutation": [
+  "litespec/backend/dotnet/ext/efcore#reject-startup-schema-mutation"
+ ],
+ "litespec/rule/ext-efcore.resolve-cross-provider-invariants": [
+  "litespec/backend/dotnet/ext/efcore#resolve-cross-provider-invariants"
+ ],
+ "litespec/rule/ext-efcore.resolve-the-tenant-at-context-creation": [
+  "litespec/backend/dotnet/ext/efcore#resolve-the-tenant-at-context-creation"
+ ],
+ "litespec/rule/ext-efcore.retain-domain-state-values": [
+  "litespec/backend/dotnet/ext/efcore#retain-domain-state-values"
+ ],
+ "litespec/rule/ext-efcore.retain-marten-query-boundary": [
+  "litespec/backend/dotnet/ext/efcore#retain-marten-query-boundary"
+ ],
+ "litespec/rule/ext-efcore.retain-unaffected-baseline-persistence": [
+  "litespec/backend/dotnet/ext/efcore#retain-unaffected-baseline-persistence"
+ ],
+ "litespec/rule/ext-efcore.review-migration-effects": [
+  "litespec/backend/dotnet/ext/efcore#review-migration-effects"
+ ],
+ "litespec/rule/ext-efcore.review-new-persisted-states": [
+  "litespec/backend/dotnet/ext/efcore#review-new-persisted-states"
+ ],
+ "litespec/rule/ext-efcore.stage-aggregate-writes-in-repositories": [
+  "litespec/backend/dotnet/ext/efcore#stage-aggregate-writes-in-repositories"
+ ],
+ "litespec/rule/ext-efcore.stage-ef-core-outbox-records-together": [
+  "litespec/backend/dotnet/ext/efcore#stage-ef-core-outbox-records-together"
+ ],
+ "litespec/rule/ext-efcore.test-migration-starting-states": [
+  "litespec/backend/dotnet/ext/efcore#test-migration-starting-states"
+ ],
+ "litespec/rule/ext-efcore.use-direct-state-mapping-only-when-supported": [
+  "litespec/backend/dotnet/ext/efcore#use-direct-state-mapping-only-when-supported"
+ ],
+ "litespec/rule/ext-efcore.use-durable-outbox-delivery": [
+  "litespec/backend/dotnet/ext/efcore#use-durable-outbox-delivery"
+ ],
+ "litespec/rule/ext-efcore.use-one-write-provider": [
+  "litespec/backend/dotnet/ext/efcore#use-one-write-provider"
+ ],
+ "litespec/rule/ext-efcore.use-snake-case-relational-names": [
+  "litespec/backend/dotnet/ext/efcore#use-snake-case-relational-names"
+ ],
+ "litespec/rule/ext-efcore.use-the-ef-core-infrastructure-layout": [
+  "litespec/backend/dotnet/ext/efcore#use-the-ef-core-infrastructure-layout"
+ ],
+ "litespec/rule/ext-integrations.bind-client-configuration": [
+  "litespec/ext/integrations#bind-client-configuration"
+ ],
+ "litespec/rule/ext-integrations.bound-transient-retries": [
+  "litespec/ext/integrations#bound-transient-retries"
+ ],
+ "litespec/rule/ext-integrations.cover-provider-failure-modes": [
+  "litespec/ext/integrations#cover-provider-failure-modes"
+ ],
+ "litespec/rule/ext-integrations.define-business-action-ports": [
+  "litespec/ext/integrations#define-business-action-ports"
+ ],
+ "litespec/rule/ext-integrations.exclude-provider-internals": [
+  "litespec/ext/integrations#exclude-provider-internals"
+ ],
+ "litespec/rule/ext-integrations.group-provider-code": [
+  "litespec/ext/integrations#group-provider-code"
+ ],
+ "litespec/rule/ext-integrations.isolate-provider-implementations": [
+  "litespec/ext/integrations#isolate-provider-implementations"
+ ],
+ "litespec/rule/ext-integrations.keep-ports-near-use-cases": [
+  "litespec/ext/integrations#keep-ports-near-use-cases"
+ ],
+ "litespec/rule/ext-integrations.keep-provider-components-together": [
+  "litespec/ext/integrations#keep-provider-components-together"
+ ],
+ "litespec/rule/ext-integrations.process-duplicate-messages-safely": [
+  "litespec/ext/integrations#process-duplicate-messages-safely"
+ ],
+ "litespec/rule/ext-integrations.protect-non-idempotent-calls": [
+  "litespec/ext/integrations#protect-non-idempotent-calls"
+ ],
+ "litespec/rule/ext-integrations.reject-formula-leading-import-values": [
+  "litespec/ext/integrations#reject-formula-leading-import-values"
+ ],
+ "litespec/rule/ext-integrations.reject-per-request-http-clients": [
+  "litespec/ext/integrations#reject-per-request-http-clients"
+ ],
+ "litespec/rule/ext-integrations.simulate-integration-boundaries": [
+  "litespec/ext/integrations#simulate-integration-boundaries"
+ ],
+ "litespec/rule/ext-integrations.translate-provider-failure-outcomes": [
+  "litespec/ext/integrations#translate-provider-failure-outcomes"
+ ],
+ "litespec/rule/ext-integrations.use-managed-http-clients": [
+  "litespec/ext/integrations#use-managed-http-clients"
+ ],
+ "litespec/rule/ext-integrations.verify-inbound-provider-messages": [
+  "litespec/ext/integrations#verify-inbound-provider-messages"
+ ],
+ "litespec/rule/ext-jobs.audit-manual-replay": [
+  "litespec/ext/jobs#audit-manual-replay"
+ ],
+ "litespec/rule/ext-jobs.bound-job-execution": [
+  "litespec/ext/jobs#bound-job-execution"
+ ],
+ "litespec/rule/ext-jobs.bound-job-retries": [
+  "litespec/ext/jobs#bound-job-retries"
+ ],
+ "litespec/rule/ext-jobs.define-business-local-clock-behavior": [
+  "litespec/ext/jobs#define-business-local-clock-behavior"
+ ],
+ "litespec/rule/ext-jobs.define-misfire-recovery": [
+  "litespec/ext/jobs#define-misfire-recovery"
+ ],
+ "litespec/rule/ext-jobs.derive-stable-occurrence-identity": [
+  "litespec/ext/jobs#derive-stable-occurrence-identity"
+ ],
+ "litespec/rule/ext-jobs.dispatch-application-behavior": [
+  "litespec/ext/jobs#dispatch-application-behavior"
+ ],
+ "litespec/rule/ext-jobs.exclude-direct-storage-and-http-execution": [
+  "litespec/ext/jobs#exclude-direct-storage-and-http-execution"
+ ],
+ "litespec/rule/ext-jobs.exclude-machine-local-time": [
+  "litespec/ext/jobs#exclude-machine-local-time"
+ ],
+ "litespec/rule/ext-jobs.generate-monotonic-fencing-values": [
+  "litespec/ext/jobs#generate-monotonic-fencing-values"
+ ],
+ "litespec/rule/ext-jobs.persist-occurrence-recovery-points": [
+  "litespec/ext/jobs#persist-occurrence-recovery-points"
+ ],
+ "litespec/rule/ext-jobs.persist-occurrence-state": [
+  "litespec/ext/jobs#persist-occurrence-state"
+ ],
+ "litespec/rule/ext-jobs.place-handlers-with-owned-behavior": [
+  "litespec/ext/jobs#place-handlers-with-owned-behavior"
+ ],
+ "litespec/rule/ext-jobs.prefer-utc-schedules": [
+  "litespec/ext/jobs#prefer-utc-schedules"
+ ],
+ "litespec/rule/ext-jobs.prevent-duplicate-completion": [
+  "litespec/ext/jobs#prevent-duplicate-completion"
+ ],
+ "litespec/rule/ext-jobs.provide-operational-recovery-procedures": [
+  "litespec/ext/jobs#provide-operational-recovery-procedures"
+ ],
+ "litespec/rule/ext-jobs.record-schedule-behavior": [
+  "litespec/ext/jobs#record-schedule-behavior"
+ ],
+ "litespec/rule/ext-jobs.renew-only-owned-leases": [
+  "litespec/ext/jobs#renew-only-owned-leases"
+ ],
+ "litespec/rule/ext-jobs.restrict-completion-by-fencing-value": [
+  "litespec/ext/jobs#restrict-completion-by-fencing-value"
+ ],
+ "litespec/rule/ext-jobs.run-jobs-in-worker": [
+  "litespec/ext/jobs#run-jobs-in-worker"
+ ],
+ "litespec/rule/ext-jobs.scope-command-idempotency-by-occurrence": [
+  "litespec/ext/jobs#scope-command-idempotency-by-occurrence"
+ ],
+ "litespec/rule/ext-jobs.scope-occurrences-and-leases-by-tenant": [
+  "litespec/ext/jobs#scope-occurrences-and-leases-by-tenant"
+ ],
+ "litespec/rule/ext-jobs.separate-schedule-definitions": [
+  "litespec/ext/jobs#separate-schedule-definitions"
+ ],
+ "litespec/rule/ext-jobs.store-execution-leases": [
+  "litespec/ext/jobs#store-execution-leases"
+ ],
+ "litespec/rule/ext-jobs.test-time-transitions": [
+  "litespec/ext/jobs#test-time-transitions"
+ ],
+ "litespec/rule/ext-jobs.tolerate-duplicate-execution": [
+  "litespec/ext/jobs#tolerate-duplicate-execution"
+ ],
+ "litespec/rule/ext-jobs.treat-unavailable-schedule-stores-as-outages": [
+  "litespec/ext/jobs#treat-unavailable-schedule-stores-as-outages"
+ ],
+ "litespec/rule/ext-jobs.use-execution-scopes": [
+  "litespec/ext/jobs#use-execution-scopes"
+ ],
+ "litespec/rule/ext-lifecycle.align-backup-deletion-behavior": [
+  "litespec/ext/lifecycle#align-backup-deletion-behavior"
+ ],
+ "litespec/rule/ext-lifecycle.authorize-and-audit-lifecycle-changes": [
+  "litespec/ext/lifecycle#authorize-and-audit-lifecycle-changes"
+ ],
+ "litespec/rule/ext-lifecycle.authorize-lifecycle-access-paths": [
+  "litespec/ext/lifecycle#authorize-lifecycle-access-paths"
+ ],
+ "litespec/rule/ext-lifecycle.bound-purge-and-archive-work": [
+  "litespec/ext/lifecycle#bound-purge-and-archive-work"
+ ],
+ "litespec/rule/ext-lifecycle.default-to-hard-delete": [
+  "litespec/ext/lifecycle#default-to-hard-delete"
+ ],
+ "litespec/rule/ext-lifecycle.define-post-deletion-references": [
+  "litespec/ext/lifecycle#define-post-deletion-references"
+ ],
+ "litespec/rule/ext-lifecycle.define-relational-lifecycle-behavior": [
+  "litespec/ext/lifecycle#define-relational-lifecycle-behavior"
+ ],
+ "litespec/rule/ext-lifecycle.define-storage-lifecycle-behavior": [
+  "litespec/ext/lifecycle#define-storage-lifecycle-behavior"
+ ],
+ "litespec/rule/ext-lifecycle.exclude-inactive-records-from-normal-reads": [
+  "litespec/ext/lifecycle#exclude-inactive-records-from-normal-reads"
+ ],
+ "litespec/rule/ext-lifecycle.exclude-persistence-only-lifecycle-behavior": [
+  "litespec/ext/lifecycle#exclude-persistence-only-lifecycle-behavior"
+ ],
+ "litespec/rule/ext-lifecycle.keep-archive-records-module-owned": [
+  "litespec/ext/lifecycle#keep-archive-records-module-owned"
+ ],
+ "litespec/rule/ext-lifecycle.model-lifecycle-operations-in-domain": [
+  "litespec/ext/lifecycle#model-lifecycle-operations-in-domain"
+ ],
+ "litespec/rule/ext-lifecycle.model-retained-lifecycle-states": [
+  "litespec/ext/lifecycle#model-retained-lifecycle-states"
+ ],
+ "litespec/rule/ext-lifecycle.name-soft-delete-timestamps": [
+  "litespec/ext/lifecycle#name-soft-delete-timestamps"
+ ],
+ "litespec/rule/ext-lifecycle.preserve-legal-hold-data": [
+  "litespec/ext/lifecycle#preserve-legal-hold-data"
+ ],
+ "litespec/rule/ext-lifecycle.record-lifecycle-scope": [
+  "litespec/ext/lifecycle#record-lifecycle-scope"
+ ],
+ "litespec/rule/ext-lifecycle.record-the-release-of-a-legal-hold": [
+  "litespec/ext/lifecycle#record-the-release-of-a-legal-hold"
+ ],
+ "litespec/rule/ext-lifecycle.reject-hidden-lifecycle-flags": [
+  "litespec/ext/lifecycle#reject-hidden-lifecycle-flags"
+ ],
+ "litespec/rule/ext-lifecycle.separate-query-shaped-history": [
+  "litespec/ext/lifecycle#separate-query-shaped-history"
+ ],
+ "litespec/rule/ext-lifecycle.test-provider-lifecycle-paths": [
+  "litespec/ext/lifecycle#test-provider-lifecycle-paths"
+ ],
+ "litespec/rule/ext-locale.avoid-catalog-only-locale-claims": [
+  "litespec/ext/locale#avoid-catalog-only-locale-claims"
+ ],
+ "litespec/rule/ext-locale.avoid-duplicate-localized-urls": [
+  "litespec/ext/locale#avoid-duplicate-localized-urls"
+ ],
+ "litespec/rule/ext-locale.complete-or-fall-back-catalog-values": [
+  "litespec/ext/locale#complete-or-fall-back-catalog-values"
+ ],
+ "litespec/rule/ext-locale.define-one-locale-route-shape": [
+  "litespec/ext/locale#define-one-locale-route-shape"
+ ],
+ "litespec/rule/ext-locale.follow-the-validation-message-grammar": [
+  "litespec/ext/locale#follow-the-validation-message-grammar"
+ ],
+ "litespec/rule/ext-locale.format-values-with-active-locale": [
+  "litespec/ext/locale#format-values-with-active-locale"
+ ],
+ "litespec/rule/ext-locale.handle-unavailable-locale-segments": [
+  "litespec/ext/locale#handle-unavailable-locale-segments"
+ ],
+ "litespec/rule/ext-locale.keep-locale-selection-explicit": [
+  "litespec/ext/locale#keep-locale-selection-explicit"
+ ],
+ "litespec/rule/ext-locale.keep-stable-error-codes-locale-neutral": [
+  "litespec/ext/locale#keep-stable-error-codes-locale-neutral"
+ ],
+ "litespec/rule/ext-locale.localize-public-presentation-content": [
+  "litespec/ext/locale#localize-public-presentation-content"
+ ],
+ "litespec/rule/ext-locale.name-messages-by-meaning": [
+  "litespec/ext/locale#name-messages-by-meaning"
+ ],
+ "litespec/rule/ext-locale.preserve-locale-neutral-business-data": [
+  "litespec/ext/locale#preserve-locale-neutral-business-data"
+ ],
+ "litespec/rule/ext-locale.record-supported-locale-behavior": [
+  "litespec/ext/locale#record-supported-locale-behavior"
+ ],
+ "litespec/rule/ext-locale.resolve-every-shown-identifier": [
+  "litespec/ext/locale#resolve-every-shown-identifier"
+ ],
+ "litespec/rule/ext-locale.split-catalogs-by-module-when-needed": [
+  "litespec/ext/locale#split-catalogs-by-module-when-needed"
+ ],
+ "litespec/rule/ext-locale.store-user-facing-copy-in-catalogs": [
+  "litespec/ext/locale#store-user-facing-copy-in-catalogs"
+ ],
+ "litespec/rule/ext-locale.use-bcp-47-identifiers": [
+  "litespec/ext/locale#use-bcp-47-identifiers"
+ ],
+ "litespec/rule/ext-locale.use-one-catalog-root": [
+  "litespec/ext/locale#use-one-catalog-root"
+ ],
+ "litespec/rule/ext-mcp.confirm-every-writing-tool": [
+  "litespec/ext/mcp#confirm-every-writing-tool"
+ ],
+ "litespec/rule/ext-mcp.exclude-secrets-and-personal-data": [
+  "litespec/ext/mcp#exclude-secrets-and-personal-data"
+ ],
+ "litespec/rule/ext-mcp.pass-server-instructions-at-initialize": [
+  "litespec/ext/mcp#pass-server-instructions-at-initialize"
+ ],
+ "litespec/rule/ext-mcp.scope-each-tool-to-named-use-cases": [
+  "litespec/ext/mcp#scope-each-tool-to-named-use-cases"
+ ],
+ "litespec/rule/ext-mcp.state-the-distribution-and-update-path": [
+  "litespec/ext/mcp#state-the-distribution-and-update-path"
+ ],
+ "litespec/rule/ext-mcp.state-the-refusing-side-on-each-refusal": [
+  "litespec/ext/mcp#state-the-refusing-side-on-each-refusal"
+ ],
+ "litespec/rule/ext-mcp.write-one-tool-description-for-one-decision": [
+  "litespec/ext/mcp#write-one-tool-description-for-one-decision"
+ ],
+ "litespec/rule/ext-outbox.accept-repeated-delivery": [
+  "litespec/ext/outbox#accept-repeated-delivery"
+ ],
+ "litespec/rule/ext-outbox.audit-outbox-replay": [
+  "litespec/ext/outbox#audit-outbox-replay"
+ ],
+ "litespec/rule/ext-outbox.avoid-automatic-durable-bus-adoption": [
+  "litespec/ext/outbox#avoid-automatic-durable-bus-adoption"
+ ],
+ "litespec/rule/ext-outbox.await-target-acceptance": [
+  "litespec/ext/outbox#await-target-acceptance"
+ ],
+ "litespec/rule/ext-outbox.back-off-unavailable-store-polling": [
+  "litespec/ext/outbox#back-off-unavailable-store-polling"
+ ],
+ "litespec/rule/ext-outbox.bound-delivery-retries": [
+  "litespec/ext/outbox#bound-delivery-retries"
+ ],
+ "litespec/rule/ext-outbox.classify-message-kinds": [
+  "litespec/ext/outbox#classify-message-kinds"
+ ],
+ "litespec/rule/ext-outbox.classify-permanent-delivery-failure": [
+  "litespec/ext/outbox#classify-permanent-delivery-failure"
+ ],
+ "litespec/rule/ext-outbox.define-claim-ownership": [
+  "litespec/ext/outbox#define-claim-ownership"
+ ],
+ "litespec/rule/ext-outbox.deploy-readers-before-writers": [
+  "litespec/ext/outbox#deploy-readers-before-writers"
+ ],
+ "litespec/rule/ext-outbox.dispatch-claimed-records-in-worker": [
+  "litespec/ext/outbox#dispatch-claimed-records-in-worker"
+ ],
+ "litespec/rule/ext-outbox.dispatch-journey-step-commands-in-a-new-scope": [
+  "litespec/ext/outbox#dispatch-journey-step-commands-in-a-new-scope"
+ ],
+ "litespec/rule/ext-outbox.distinguish-dependency-outage": [
+  "litespec/ext/outbox#distinguish-dependency-outage"
+ ],
+ "litespec/rule/ext-outbox.exclude-manually-repeatable-reactions": [
+  "litespec/ext/outbox#exclude-manually-repeatable-reactions"
+ ],
+ "litespec/rule/ext-outbox.exclude-request-transaction-dispatch": [
+  "litespec/ext/outbox#exclude-request-transaction-dispatch"
+ ],
+ "litespec/rule/ext-outbox.gate-dispatch-on-readiness": [
+  "litespec/ext/outbox#gate-dispatch-on-readiness"
+ ],
+ "litespec/rule/ext-outbox.group-outbox-infrastructure": [
+  "litespec/ext/outbox#group-outbox-infrastructure"
+ ],
+ "litespec/rule/ext-outbox.identify-repeated-delivery": [
+  "litespec/ext/outbox#identify-repeated-delivery"
+ ],
+ "litespec/rule/ext-outbox.isolate-the-worker-host": [
+  "litespec/ext/outbox#isolate-the-worker-host"
+ ],
+ "litespec/rule/ext-outbox.keep-provider-mapping-with-integration": [
+  "litespec/ext/outbox#keep-provider-mapping-with-integration"
+ ],
+ "litespec/rule/ext-outbox.model-outbox-lifecycle-states": [
+  "litespec/ext/outbox#model-outbox-lifecycle-states"
+ ],
+ "litespec/rule/ext-outbox.plan-undispatched-rollback-records": [
+  "litespec/ext/outbox#plan-undispatched-rollback-records"
+ ],
+ "litespec/rule/ext-outbox.preserve-message-identity-during-retry": [
+  "litespec/ext/outbox#preserve-message-identity-during-retry"
+ ],
+ "litespec/rule/ext-outbox.protect-active-worker-compatibility": [
+  "litespec/ext/outbox#protect-active-worker-compatibility"
+ ],
+ "litespec/rule/ext-outbox.publish-backlog-indicators": [
+  "litespec/ext/outbox#publish-backlog-indicators"
+ ],
+ "litespec/rule/ext-outbox.publish-best-effort-reactions-after-commit": [
+  "litespec/ext/outbox#publish-best-effort-reactions-after-commit"
+ ],
+ "litespec/rule/ext-outbox.record-durable-delivery-behavior": [
+  "litespec/ext/outbox#record-durable-delivery-behavior"
+ ],
+ "litespec/rule/ext-outbox.reject-independent-outbox-commits": [
+  "litespec/ext/outbox#reject-independent-outbox-commits"
+ ],
+ "litespec/rule/ext-outbox.release-claim-transactions-before-calls": [
+  "litespec/ext/outbox#release-claim-transactions-before-calls"
+ ],
+ "litespec/rule/ext-outbox.requeue-expired-claims": [
+  "litespec/ext/outbox#requeue-expired-claims"
+ ],
+ "litespec/rule/ext-outbox.restrict-completion-to-current-lease-owners": [
+  "litespec/ext/outbox#restrict-completion-to-current-lease-owners"
+ ],
+ "litespec/rule/ext-outbox.restrict-message-retry-to-claimed-records": [
+  "litespec/ext/outbox#restrict-message-retry-to-claimed-records"
+ ],
+ "litespec/rule/ext-outbox.serialize-durable-messages": [
+  "litespec/ext/outbox#serialize-durable-messages"
+ ],
+ "litespec/rule/ext-outbox.set-delivery-alerts": [
+  "litespec/ext/outbox#set-delivery-alerts"
+ ],
+ "litespec/rule/ext-outbox.stage-messages-with-business-work": [
+  "litespec/ext/outbox#stage-messages-with-business-work"
+ ],
+ "litespec/rule/ext-outbox.store-failure-and-completion-evidence": [
+  "litespec/ext/outbox#store-failure-and-completion-evidence"
+ ],
+ "litespec/rule/ext-outbox.store-required-message-fields": [
+  "litespec/ext/outbox#store-required-message-fields"
+ ],
+ "litespec/rule/ext-outbox.support-coexisting-message-producers": [
+  "litespec/ext/outbox#support-coexisting-message-producers"
+ ],
+ "litespec/rule/ext-outbox.version-message-types": [
+  "litespec/ext/outbox#version-message-types"
+ ],
+ "litespec/rule/ext-realtime.authenticate-and-authorize-subscriptions": [
+  "litespec/ext/realtime#authenticate-and-authorize-subscriptions"
+ ],
+ "litespec/rule/ext-realtime.bound-realtime-resources": [
+  "litespec/ext/realtime#bound-realtime-resources"
+ ],
+ "litespec/rule/ext-realtime.place-realtime-code-at-outer-boundaries": [
+  "litespec/ext/realtime#place-realtime-code-at-outer-boundaries"
+ ],
+ "litespec/rule/ext-realtime.reconnect-and-refresh-authoritative-state": [
+  "litespec/ext/realtime#reconnect-and-refresh-authoritative-state"
+ ],
+ "litespec/rule/ext-realtime.record-realtime-need": [
+  "litespec/ext/realtime#record-realtime-need"
+ ],
+ "litespec/rule/ext-realtime.record-transport-support": [
+  "litespec/ext/realtime#record-transport-support"
+ ],
+ "litespec/rule/ext-realtime.reject-cosmetic-realtime-adoption": [
+  "litespec/ext/realtime#reject-cosmetic-realtime-adoption"
+ ],
+ "litespec/rule/ext-realtime.reject-unbounded-slow-client-buffering": [
+  "litespec/ext/realtime#reject-unbounded-slow-client-buffering"
+ ],
+ "litespec/rule/ext-realtime.revalidate-long-lived-access": [
+  "litespec/ext/realtime#revalidate-long-lived-access"
+ ],
+ "litespec/rule/ext-realtime.subscribe-through-narrow-functions": [
+  "litespec/ext/realtime#subscribe-through-narrow-functions"
+ ],
+ "litespec/rule/ext-realtime.tolerate-notification-ordering-differences": [
+  "litespec/ext/realtime#tolerate-notification-ordering-differences"
+ ],
+ "litespec/rule/ext-realtime.use-server-sent-events-for-notifications": [
+  "litespec/ext/realtime#use-server-sent-events-for-notifications"
+ ],
+ "litespec/rule/ext-realtime.use-signalr-for-interactive-messaging": [
+  "litespec/ext/realtime#use-signalr-for-interactive-messaging"
+ ],
+ "litespec/rule/ext-report.apply-item-read-authorization": [
+  "litespec/ext/report#apply-item-read-authorization"
+ ],
+ "litespec/rule/ext-report.avoid-speculative-reporting-systems": [
+  "litespec/ext/report#avoid-speculative-reporting-systems"
+ ],
+ "litespec/rule/ext-report.define-export-encoding-and-columns": [
+  "litespec/ext/report#define-export-encoding-and-columns"
+ ],
+ "litespec/rule/ext-report.define-report-limits": [
+  "litespec/ext/report#define-report-limits"
+ ],
+ "litespec/rule/ext-report.escape-formula-leading-export-values": [
+  "litespec/ext/report#escape-formula-leading-export-values"
+ ],
+ "litespec/rule/ext-report.keep-raw-sql-in-infrastructure": [
+  "litespec/ext/report#keep-raw-sql-in-infrastructure"
+ ],
+ "litespec/rule/ext-report.keep-report-definitions-in-application": [
+  "litespec/ext/report#keep-report-definitions-in-application"
+ ],
+ "litespec/rule/ext-report.keep-report-providers-in-infrastructure": [
+  "litespec/ext/report#keep-report-providers-in-infrastructure"
+ ],
+ "litespec/rule/ext-report.parameterize-report-sql": [
+  "litespec/ext/report#parameterize-report-sql"
+ ],
+ "litespec/rule/ext-report.protect-export-output": [
+  "litespec/ext/report#protect-export-output"
+ ],
+ "litespec/rule/ext-report.record-reporting-need": [
+  "litespec/ext/report#record-reporting-need"
+ ],
+ "litespec/rule/ext-report.review-report-plans": [
+  "litespec/ext/report#review-report-plans"
+ ],
+ "litespec/rule/ext-report.run-budget-exceeding-exports-in-worker": [
+  "litespec/ext/report#run-budget-exceeding-exports-in-worker"
+ ],
+ "litespec/rule/ext-report.scope-export-output-to-the-tenant": [
+  "litespec/ext/report#scope-export-output-to-the-tenant"
+ ],
+ "litespec/rule/ext-report.separate-worker-orchestration": [
+  "litespec/ext/report#separate-worker-orchestration"
+ ],
+ "litespec/rule/ext-report.support-report-cancellation": [
+  "litespec/ext/report#support-report-cancellation"
+ ],
+ "litespec/rule/ext-site.avoid-client-scripts-without-a-named-interactive-need": [
+  "litespec/ext/site#avoid-client-scripts-without-a-named-interactive-need"
+ ],
+ "litespec/rule/ext-site.declare-each-static-site-in-the-project-record": [
+  "litespec/ext/site#declare-each-static-site-in-the-project-record"
+ ],
+ "litespec/rule/ext-site.default-to-a-light-scheme-with-a-reader-chosen-dark-scheme": [
+  "litespec/ext/site#default-to-a-light-scheme-with-a-reader-chosen-dark-scheme"
+ ],
+ "litespec/rule/ext-site.generate-a-sitemap-covering-every-page": [
+  "litespec/ext/site#generate-a-sitemap-covering-every-page"
+ ],
+ "litespec/rule/ext-site.generate-the-site-with-astro": [
+  "litespec/ext/site#generate-the-site-with-astro"
+ ],
+ "litespec/rule/ext-site.give-every-page-one-main-heading-and-landmark-elements": [
+  "litespec/ext/site#give-every-page-one-main-heading-and-landmark-elements"
+ ],
+ "litespec/rule/ext-site.keep-each-repeated-fact-in-one-data-source": [
+  "litespec/ext/site#keep-each-repeated-fact-in-one-data-source"
+ ],
+ "litespec/rule/ext-site.list-every-page-for-language-models": [
+  "litespec/ext/site#list-every-page-for-language-models"
+ ],
+ "litespec/rule/ext-site.load-every-script-from-the-site-origin": [
+  "litespec/ext/site#load-every-script-from-the-site-origin"
+ ],
+ "litespec/rule/ext-site.load-nothing-from-a-third-party-origin": [
+  "litespec/ext/site#load-nothing-from-a-third-party-origin"
+ ],
+ "litespec/rule/ext-site.mark-pages-with-json-ld-structured-data": [
+  "litespec/ext/site#mark-pages-with-json-ld-structured-data"
+ ],
+ "litespec/rule/ext-site.mark-unfinished-facts-with-visible-placeholders": [
+  "litespec/ext/site#mark-unfinished-facts-with-visible-placeholders"
+ ],
+ "litespec/rule/ext-site.name-every-page-with-a-title-and-a-description": [
+  "litespec/ext/site#name-every-page-with-a-title-and-a-description"
+ ],
+ "litespec/rule/ext-site.point-crawler-rules-at-the-sitemap": [
+  "litespec/ext/site#point-crawler-rules-at-the-sitemap"
+ ],
+ "litespec/rule/ext-site.point-every-page-at-its-absolute-canonical-address": [
+  "litespec/ext/site#point-every-page-at-its-absolute-canonical-address"
+ ],
+ "litespec/rule/ext-site.publish-a-markdown-copy-beside-every-page": [
+  "litespec/ext/site#publish-a-markdown-copy-beside-every-page"
+ ],
+ "litespec/rule/ext-site.publish-full-page-text-for-language-models": [
+  "litespec/ext/site#publish-full-page-text-for-language-models"
+ ],
+ "litespec/rule/ext-site.read-prices-and-claims-from-product-and-pricing-records": [
+  "litespec/ext/site#read-prices-and-claims-from-product-and-pricing-records"
+ ],
+ "litespec/rule/ext-site.read-site-prices-and-claims-from-consumer-records": [
+  "litespec/ext/site#read-site-prices-and-claims-from-consumer-records"
+ ],
+ "litespec/rule/ext-site.reference-language-alternates-from-every-translated-page": [
+  "litespec/ext/site#reference-language-alternates-from-every-translated-page"
+ ],
+ "litespec/rule/ext-site.reject-a-release-build-carrying-a-placeholder": [
+  "litespec/ext/site#reject-a-release-build-carrying-a-placeholder"
+ ],
+ "litespec/rule/ext-site.render-components-on-the-server-with-astro-or-svelte": [
+  "litespec/ext/site#render-components-on-the-server-with-astro-or-svelte"
+ ],
+ "litespec/rule/ext-site.render-every-language-from-one-page-structure": [
+  "litespec/ext/site#render-every-language-from-one-page-structure"
+ ],
+ "litespec/rule/ext-site.render-every-page-to-static-files": [
+  "litespec/ext/site#render-every-page-to-static-files"
+ ],
+ "litespec/rule/ext-site.state-allowed-sources-in-a-content-security-policy": [
+  "litespec/ext/site#state-allowed-sources-in-a-content-security-policy"
+ ],
+ "litespec/rule/ext-site.use-tailwind-for-site-styles": [
+  "litespec/ext/site#use-tailwind-for-site-styles"
+ ],
+ "litespec/rule/ext-stage.declare-the-release-stage": [
+  "litespec/ext/stage#declare-the-release-stage"
+ ],
+ "litespec/rule/ext-stage.defer-named-provisions-until-promotion": [
+  "litespec/ext/stage#defer-named-provisions-until-promotion"
+ ],
+ "litespec/rule/ext-stage.promote-through-a-recorded-decision": [
+  "litespec/ext/stage#promote-through-a-recorded-decision"
+ ],
+ "litespec/rule/ext-tenancy.apply-cross-tenant-disclosure-policy": [
+  "litespec/ext/tenancy#apply-cross-tenant-disclosure-policy"
+ ],
+ "litespec/rule/ext-tenancy.avoid-unplanned-isolation-models": [
+  "litespec/ext/tenancy#avoid-unplanned-isolation-models"
+ ],
+ "litespec/rule/ext-tenancy.define-tenant-isolation": [
+  "litespec/ext/tenancy#define-tenant-isolation"
+ ],
+ "litespec/rule/ext-tenancy.isolate-administrative-cross-tenant-access": [
+  "litespec/ext/tenancy#isolate-administrative-cross-tenant-access"
+ ],
+ "litespec/rule/ext-tenancy.pass-tenant-scope-explicitly": [
+  "litespec/ext/tenancy#pass-tenant-scope-explicitly"
+ ],
+ "litespec/rule/ext-tenancy.protect-tenant-diagnostics": [
+  "litespec/ext/tenancy#protect-tenant-diagnostics"
+ ],
+ "litespec/rule/ext-tenancy.record-an-all-tenant-operation": [
+  "litespec/ext/tenancy#record-an-all-tenant-operation"
+ ],
+ "litespec/rule/ext-tenancy.record-the-tenant-adoption-decision": [
+  "litespec/ext/tenancy#record-the-tenant-adoption-decision"
+ ],
+ "litespec/rule/ext-tenancy.reject-unrestricted-tenant-input": [
+  "litespec/ext/tenancy#reject-unrestricted-tenant-input"
+ ],
+ "litespec/rule/ext-tenancy.resolve-tenant-identity-from-trusted-context": [
+  "litespec/ext/tenancy#resolve-tenant-identity-from-trusted-context"
+ ],
+ "litespec/rule/ext-tenancy.scope-tenant-operations": [
+  "litespec/ext/tenancy#scope-tenant-operations"
+ ],
+ "litespec/rule/ext-tenancy.scope-tenant-owned-records": [
+  "litespec/ext/tenancy#scope-tenant-owned-records"
+ ],
+ "litespec/rule/ext-tenancy.use-one-tenant-accessor": [
+  "litespec/ext/tenancy#use-one-tenant-accessor"
+ ],
+ "litespec/rule/ext-tenancy.use-selected-tenant-storage-support": [
+  "litespec/ext/tenancy#use-selected-tenant-storage-support"
+ ],
+ "litespec/rule/ext-tenancy.use-typed-tenant-identities": [
+  "litespec/ext/tenancy#use-typed-tenant-identities"
+ ],
+ "litespec/rule/ext-tenancy.verify-actor-and-target-tenancy": [
+  "litespec/ext/tenancy#verify-actor-and-target-tenancy"
+ ],
+ "litespec/rule/frontend-components.add-a-missing-composite-to-the-shared-package": [
+  "litespec/frontend/components#add-a-missing-composite-to-the-shared-package"
+ ],
+ "litespec/rule/frontend-components.compose-class-names-in-the-shared-package": [
+  "litespec/frontend/web/components#compose-class-names-in-the-shared-package"
+ ],
+ "litespec/rule/frontend-components.compose-composites-in-page-code": [
+  "litespec/frontend/components#compose-composites-in-page-code"
+ ],
+ "litespec/rule/frontend-components.give-card-and-section-titles-heading-semantics": [
+  "litespec/frontend/components#expose-card-and-section-titles-as-headings",
+  "litespec/frontend/web/components#give-card-and-section-titles-heading-semantics"
+ ],
+ "litespec/rule/frontend-components.keep-domain-values-typed-until-display": [
+  "litespec/frontend/components#keep-domain-values-typed-until-display"
+ ],
+ "litespec/rule/frontend-components.keep-error-boundaries-scoped": [
+  "litespec/frontend/components#keep-error-boundaries-scoped"
+ ],
+ "litespec/rule/frontend-components.keep-primitives-and-composites-in-one-shared-package": [
+  "litespec/frontend/components#keep-shared-ui-in-one-package",
+  "litespec/frontend/web/components#keep-primitives-and-composites-in-one-shared-package"
+ ],
+ "litespec/rule/frontend-components.keep-props-narrow": [
+  "litespec/frontend/components#keep-component-inputs-narrow"
+ ],
+ "litespec/rule/frontend-components.meet-accessibility-requirements": [
+  "litespec/frontend/components#support-keyboard-focus-labels-and-announcements",
+  "litespec/frontend/web/components#meet-accessibility-requirements"
+ ],
+ "litespec/rule/frontend-components.name-components-for-their-role": [
+  "litespec/frontend/components#name-components-for-their-role"
+ ],
+ "litespec/rule/frontend-components.place-a-drawing-no-composite-makes-in-a-visual-file": [
+  "litespec/frontend/components#place-a-drawing-no-composite-makes-in-an-exception-file",
+  "litespec/frontend/web/components#place-a-drawing-no-composite-makes-in-a-visual-file"
+ ],
+ "litespec/rule/frontend-components.prefer-a-composite-over-a-primitive": [
+  "litespec/frontend/components#prefer-a-composite-over-a-primitive"
+ ],
+ "litespec/rule/frontend-components.protect-rich-content-boundaries": [
+  "litespec/frontend/components#sanitize-untrusted-rich-content",
+  "litespec/frontend/web/components#protect-rich-content-boundaries"
+ ],
+ "litespec/rule/frontend-components.render-complete-states": [
+  "litespec/frontend/components#render-complete-states"
+ ],
+ "litespec/rule/frontend-components.use-a-composite-for-a-content-image": [
+  "litespec/frontend/components#use-a-composite-for-a-content-image"
+ ],
+ "litespec/rule/frontend-components.use-declared-visual-variants": [
+  "litespec/frontend/components#use-declared-visual-variants"
+ ],
+ "litespec/rule/frontend-components.use-no-raw-element-in-page-code": [
+  "litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code",
+  "litespec/frontend/web/components#use-no-raw-element-in-page-code"
+ ],
+ "litespec/rule/frontend-components.write-no-class-name-in-page-code": [
+  "litespec/frontend/components#write-no-class-name-in-page-code"
+ ],
+ "litespec/rule/frontend-data.announce-the-outcome-of-an-optimistic-update": [
+  "litespec/frontend/data#announce-the-outcome-of-an-optimistic-update"
+ ],
+ "litespec/rule/frontend-data.assign-state-to-the-narrowest-owner": [
+  "litespec/frontend/data#assign-state-to-the-narrowest-owner",
+  "litespec/frontend/web/data#assign-state-to-the-narrowest-owner"
+ ],
+ "litespec/rule/frontend-data.build-a-form-on-the-shared-form-library": [
+  "litespec/frontend/data#build-a-form-on-the-shared-form-library",
+  "litespec/frontend/web/data#build-a-form-on-the-shared-form-library"
+ ],
+ "litespec/rule/frontend-data.generate-the-client-from-the-published-contract": [
+  "litespec/frontend/data#generate-the-client-from-the-published-contract",
+  "litespec/frontend/web/data#generate-the-client-from-the-published-contract"
+ ],
+ "litespec/rule/frontend-data.keep-schemas-operation-specific": [
+  "litespec/frontend/data#keep-schemas-operation-specific"
+ ],
+ "litespec/rule/frontend-data.keep-secrets-out-of-browser-storage": [
+  "litespec/frontend/data#keep-secrets-out-of-browser-storage"
+ ],
+ "litespec/rule/frontend-data.keep-the-client-boundary-in-the-frame": [
+  "litespec/frontend/data#keep-the-client-boundary-in-the-frame",
+  "litespec/frontend/web/data#keep-the-client-boundary-in-the-frame"
+ ],
+ "litespec/rule/frontend-data.keep-the-session-in-an-api-owned-cookie": [
+  "litespec/frontend/data#keep-the-session-in-an-api-owned-cookie"
+ ],
+ "litespec/rule/frontend-data.localize-copy-through-locale-dictionaries": [
+  "litespec/frontend/data#localize-copy-through-locale-dictionaries",
+  "litespec/frontend/web/data#localize-copy-through-locale-dictionaries"
+ ],
+ "litespec/rule/frontend-data.make-optimistic-behavior-recoverable": [
+  "litespec/frontend/data#make-optimistic-behavior-recoverable"
+ ],
+ "litespec/rule/frontend-data.map-every-failure-to-one-problem-type": [
+  "litespec/frontend/data#map-every-failure-to-one-problem-type",
+  "litespec/frontend/web/data#map-every-failure-to-one-problem-type"
+ ],
+ "litespec/rule/frontend-data.name-the-zone-for-every-timestamp": [
+  "litespec/frontend/data#name-the-zone-for-every-timestamp"
+ ],
+ "litespec/rule/frontend-data.place-a-field-refusal-on-its-field": [
+  "litespec/frontend/data#place-a-field-refusal-on-its-field"
+ ],
+ "litespec/rule/frontend-data.place-a-refusal-beside-what-was-refused": [
+  "litespec/frontend/data#place-a-refusal-beside-what-was-refused",
+  "litespec/frontend/web/data#place-a-refusal-beside-what-was-refused"
+ ],
+ "litespec/rule/frontend-data.read-a-permission-from-the-session": [
+  "litespec/frontend/data#read-a-permission-from-the-session"
+ ],
+ "litespec/rule/frontend-data.regenerate-the-client-rather-than-editing-it": [
+  "litespec/frontend/data#regenerate-the-client-rather-than-editing-it",
+  "litespec/frontend/web/data#regenerate-the-client-rather-than-editing-it"
+ ],
+ "litespec/rule/frontend-data.route-a-personal-value-in-a-header": [
+  "litespec/frontend/data#route-a-personal-value-in-a-header"
+ ],
+ "litespec/rule/frontend-data.set-the-write-marker-on-every-request": [
+  "litespec/frontend/data#set-the-write-marker-on-every-request"
+ ],
+ "litespec/rule/frontend-data.update-the-cache-a-command-changed": [
+  "litespec/frontend/data#update-the-cache-a-command-changed",
+  "litespec/frontend/web/data#update-the-cache-a-command-changed"
+ ],
+ "litespec/rule/frontend-data.use-one-configured-client-per-application": [
+  "litespec/frontend/data#use-one-configured-client-per-application"
+ ],
+ "litespec/rule/frontend-data.validate-a-form-with-the-generated-schema": [
+  "litespec/frontend/data#validate-a-form-with-the-generated-schema",
+  "litespec/frontend/web/data#validate-a-form-with-the-generated-schema"
+ ],
+ "litespec/rule/frontend-patterns.declare-the-compact-behaviour": [
+  "litespec/frontend/patterns#declare-the-compact-behaviour"
+ ],
+ "litespec/rule/frontend-patterns.implement-a-chosen-pattern-once": [
+  "litespec/frontend/patterns#implement-a-chosen-pattern-once",
+  "litespec/frontend/web/patterns#implement-a-chosen-pattern-once"
+ ],
+ "litespec/rule/frontend-patterns.keep-a-visual-registry": [
+  "litespec/frontend/patterns#keep-a-visual-registry",
+  "litespec/frontend/web/patterns#keep-a-visual-registry"
+ ],
+ "litespec/rule/frontend-patterns.keep-one-pattern-catalog": [
+  "litespec/frontend/patterns#keep-one-pattern-catalog"
+ ],
+ "litespec/rule/frontend-patterns.keep-the-catalog-platform-neutral": [
+  "litespec/frontend/patterns#keep-the-catalog-platform-neutral"
+ ],
+ "litespec/rule/frontend-patterns.promote-library-improvements": [
+  "litespec/frontend/patterns#promote-library-improvements"
+ ],
+ "litespec/rule/frontend-patterns.record-every-option-considered": [
+  "litespec/frontend/patterns#record-every-option-considered"
+ ],
+ "litespec/rule/frontend-patterns.record-who-chose": [
+  "litespec/frontend/patterns#record-who-chose"
+ ],
+ "litespec/rule/frontend-patterns.report-pattern-feedback-after-the-work": [
+  "litespec/frontend/patterns#report-pattern-feedback-after-the-work"
+ ],
+ "litespec/rule/frontend-patterns.start-from-the-pattern-library": [
+  "litespec/frontend/patterns#start-from-the-pattern-library"
+ ],
+ "litespec/rule/frontend-patterns.state-the-implementation-status": [
+  "litespec/frontend/patterns#state-the-implementation-status"
+ ],
+ "litespec/rule/frontend-patterns.update-the-catalog-with-the-code": [
+  "litespec/frontend/patterns#update-the-catalog-with-the-code"
+ ],
+ "litespec/rule/frontend-rendering.build-the-server-query-cache-per-request": [
+  "litespec/frontend/rendering#build-the-server-data-cache-per-request",
+  "litespec/frontend/web/rendering#build-the-server-query-cache-per-request"
+ ],
+ "litespec/rule/frontend-rendering.define-route-metadata-deliberately": [
+  "litespec/frontend/web/rendering#define-route-metadata-deliberately"
+ ],
+ "litespec/rule/frontend-rendering.keep-authenticated-caching-explicit": [
+  "litespec/frontend/rendering#keep-authenticated-caching-explicit",
+  "litespec/frontend/web/rendering#keep-authenticated-caching-explicit"
+ ],
+ "litespec/rule/frontend-rendering.keep-layouts-stable": [
+  "litespec/frontend/rendering#keep-layouts-stable"
+ ],
+ "litespec/rule/frontend-rendering.keep-proxy-behavior-at-the-edge": [
+  "litespec/frontend/rendering#keep-proxy-behavior-at-the-edge",
+  "litespec/frontend/web/rendering#keep-proxy-behavior-at-the-edge"
+ ],
+ "litespec/rule/frontend-rendering.keep-search-parameters-validated-by-a-schema": [
+  "litespec/frontend/rendering#keep-address-parameters-validated-by-a-schema",
+  "litespec/frontend/web/rendering#keep-search-parameters-validated-by-a-schema"
+ ],
+ "litespec/rule/frontend-rendering.keep-server-only-code-identifiable": [
+  "litespec/frontend/rendering#keep-server-only-code-identifiable"
+ ],
+ "litespec/rule/frontend-rendering.load-a-route-on-intent": [
+  "litespec/frontend/rendering#prefetch-a-route-on-intent",
+  "litespec/frontend/web/rendering#load-a-route-on-intent"
+ ],
+ "litespec/rule/frontend-rendering.load-route-data-in-the-loader": [
+  "litespec/frontend/rendering#load-route-data-before-rendering",
+  "litespec/frontend/web/rendering#load-route-data-in-the-loader"
+ ],
+ "litespec/rule/frontend-rendering.read-route-data-with-a-suspense-query": [
+  "litespec/frontend/rendering#read-route-data-from-the-route-cache",
+  "litespec/frontend/web/rendering#read-route-data-with-a-suspense-query"
+ ],
+ "litespec/rule/frontend-rendering.represent-route-states": [
+  "litespec/frontend/rendering#represent-route-states"
+ ],
+ "litespec/rule/frontend-rendering.split-one-chunk-per-route-and-per-language": [
+  "litespec/frontend/rendering#load-each-route-and-each-language-separately",
+  "litespec/frontend/web/rendering#split-one-chunk-per-route-and-per-language"
+ ],
+ "litespec/rule/frontend-rendering.use-a-pathless-layout-route-for-a-shell": [
+  "litespec/frontend/rendering#use-a-shared-layout-for-a-shell",
+  "litespec/frontend/web/rendering#use-a-pathless-layout-route-for-a-shell"
+ ],
+ "litespec/rule/frontend-structure.cover-public-use-cases-in-journeys": [
+  "litespec/frontend/structure#cover-public-use-cases-in-journeys"
+ ],
+ "litespec/rule/frontend-structure.keep-a-route-file-thin": [
+  "litespec/frontend/structure#keep-a-route-entry-thin",
+  "litespec/frontend/web/structure#keep-a-route-file-thin"
+ ],
+ "litespec/rule/frontend-structure.keep-a-use-case-folder-flat": [
+  "litespec/frontend/structure#keep-a-use-case-folder-flat"
+ ],
+ "litespec/rule/frontend-structure.keep-applications-independent": [
+  "litespec/frontend/structure#keep-applications-independent"
+ ],
+ "litespec/rule/frontend-structure.keep-imports-directional": [
+  "litespec/frontend/structure#order-imports-from-routes-to-shared-packages",
+  "litespec/frontend/web/structure#keep-imports-directional"
+ ],
+ "litespec/rule/frontend-structure.keep-shared-packages-non-application-specific": [
+  "litespec/frontend/structure#keep-shared-packages-non-application-specific"
+ ],
+ "litespec/rule/frontend-structure.keep-tests-near-their-ownership-boundary": [
+  "litespec/frontend/structure#place-tests-at-their-ownership-boundary",
+  "litespec/frontend/web/structure#keep-tests-near-their-ownership-boundary"
+ ],
+ "litespec/rule/frontend-structure.locate-the-frame-in-the-app-folder": [
+  "litespec/frontend/structure#locate-cross-route-values-in-the-frame",
+  "litespec/frontend/web/structure#locate-the-frame-in-the-app-folder"
+ ],
+ "litespec/rule/frontend-structure.mirror-the-backend-use-case-path-in-kebab-case": [
+  "litespec/frontend/structure#mirror-the-backend-use-case-path-in-kebab-case"
+ ],
+ "litespec/rule/frontend-structure.place-a-shared-file-in-the-folder-that-owns-it": [
+  "litespec/frontend/structure#place-a-shared-file-in-the-folder-that-owns-it"
+ ],
+ "litespec/rule/frontend-structure.refuse-stack-specific-folder-names": [
+  "litespec/frontend/web/structure#refuse-stack-specific-folder-names"
+ ],
+ "litespec/rule/frontend-structure.reject-a-folder-name-that-owns-nothing": [
+  "litespec/frontend/structure#reject-a-folder-name-that-owns-nothing"
+ ],
+ "litespec/rule/frontend-structure.use-explicit-public-entry-points-for-workspace-packages": [
+  "litespec/frontend/structure#use-explicit-public-entry-points-for-shared-packages",
+  "litespec/frontend/web/structure#use-explicit-public-entry-points-for-workspace-packages"
+ ],
+ "litespec/rule/frontend-structure.use-the-frontend-application-tree": [
+  "litespec/frontend/structure#organize-a-frontend-into-frame-routes-and-modules",
+  "litespec/frontend/web/structure#use-the-frontend-application-tree"
+ ],
+ "litespec/rule/frontend-structure.use-the-generated-route-tree": [
+  "litespec/frontend/web/structure#use-the-generated-route-tree"
+ ],
+ "litespec/rule/frontend-testing.assert-each-declared-refusal-by-its-code": [
+  "litespec/frontend/testing#assert-each-declared-refusal-by-its-code",
+  "litespec/frontend/web/testing#assert-each-declared-refusal-by-its-code"
+ ],
+ "litespec/rule/frontend-testing.isolate-browser-tests": [
+  "litespec/frontend/testing#isolate-browser-tests"
+ ],
+ "litespec/rule/frontend-testing.keep-mocks-at-owned-boundaries": [
+  "litespec/frontend/testing#keep-mocks-at-owned-boundaries",
+  "litespec/frontend/web/testing#keep-mocks-at-owned-boundaries"
+ ],
+ "litespec/rule/frontend-testing.keep-test-support-narrow": [
+  "litespec/frontend/testing#keep-test-support-narrow"
+ ],
+ "litespec/rule/frontend-testing.match-test-level-to-risk": [
+  "litespec/frontend/testing#match-test-level-to-risk",
+  "litespec/frontend/web/testing#match-test-level-to-risk"
+ ],
+ "litespec/rule/frontend-testing.prove-a-case-by-calling-its-use-case": [
+  "litespec/frontend/testing#prove-a-case-by-calling-its-use-case"
+ ],
+ "litespec/rule/frontend-testing.prove-the-module-mirror-in-a-structure-test": [
+  "litespec/frontend/testing#prove-the-module-mirror-in-a-structure-test",
+  "litespec/frontend/web/testing#prove-the-module-mirror-in-a-structure-test"
+ ],
+ "litespec/rule/frontend-testing.query-by-accessible-behavior": [
+  "litespec/frontend/testing#query-by-accessible-behavior",
+  "litespec/frontend/web/testing#query-by-accessible-behavior"
+ ],
+ "litespec/rule/frontend-testing.reach-every-public-use-case-from-a-journey": [
+  "litespec/frontend/testing#reach-every-public-use-case-from-a-journey"
+ ],
+ "litespec/rule/frontend-testing.read-the-deployment-for-its-identifiers": [
+  "litespec/frontend/testing#read-the-deployment-for-its-identifiers"
+ ],
+ "litespec/rule/frontend-testing.run-browser-checks-through-the-playwright-cli": [
+  "litespec/frontend/testing#run-browser-checks-through-the-command-line",
+  "litespec/frontend/web/testing#run-browser-checks-through-the-playwright-cli"
+ ],
+ "litespec/rule/frontend-testing.test-observable-states": [
+  "litespec/frontend/testing#test-observable-states"
+ ],
+ "litespec/rule/frontend-testing.use-network-mocks-for-component-tests": [
+  "litespec/frontend/testing#use-network-mocks-for-component-tests",
+  "litespec/frontend/web/testing#use-network-mocks-for-component-tests"
+ ],
+ "litespec/rule/frontend-ui.check-every-route-in-a-browser": [
+  "litespec/frontend/ui#check-every-route",
+  "litespec/frontend/web/ui#check-every-route-in-a-browser"
+ ],
+ "litespec/rule/frontend-ui.compose-each-route-from-one-floorplan": [
+  "litespec/frontend/ui#compose-each-route-from-one-floorplan",
+  "litespec/frontend/web/ui#compose-each-route-from-one-floorplan"
+ ],
+ "litespec/rule/frontend-ui.declare-a-closed-floorplan-set": [
+  "litespec/frontend/ui#declare-a-closed-floorplan-set"
+ ],
+ "litespec/rule/frontend-ui.derive-each-page-type-from-a-named-reference": [
+  "litespec/frontend/ui#derive-each-page-type-from-a-named-reference",
+  "litespec/frontend/web/ui#derive-each-page-type-from-a-named-reference"
+ ],
+ "litespec/rule/frontend-ui.govern-behavior-packages": [
+  "litespec/frontend/ui#govern-behavior-packages"
+ ],
+ "litespec/rule/frontend-ui.hold-the-declared-base-colour": [
+  "litespec/frontend/ui#hold-the-declared-base-colour",
+  "litespec/frontend/web/ui#hold-the-declared-base-colour"
+ ],
+ "litespec/rule/frontend-ui.keep-a-blocked-command-visible-with-its-reason": [
+  "litespec/frontend/ui#keep-a-blocked-command-visible-with-its-reason"
+ ],
+ "litespec/rule/frontend-ui.keep-layout-inside-floorplans": [
+  "litespec/frontend/ui#keep-layout-inside-floorplans",
+  "litespec/frontend/web/ui#keep-layout-inside-floorplans"
+ ],
+ "litespec/rule/frontend-ui.keep-separators-at-the-subtle-step": [
+  "litespec/frontend/ui#keep-separators-at-the-subtle-step"
+ ],
+ "litespec/rule/frontend-ui.keep-tokens-in-one-stylesheet": [
+  "litespec/frontend/ui#keep-tokens-in-one-definition",
+  "litespec/frontend/web/ui#keep-tokens-in-one-stylesheet"
+ ],
+ "litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package": [
+  "litespec/frontend/ui#pin-the-baseline-in-the-shared-package",
+  "litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package"
+ ],
+ "litespec/rule/frontend-ui.prove-every-result-a-route-calls": [
+  "litespec/frontend/ui#prove-every-result-a-route-calls",
+  "litespec/frontend/web/ui#prove-every-result-a-route-calls"
+ ],
+ "litespec/rule/frontend-ui.prove-ui-behavior-and-appearance": [
+  "litespec/frontend/ui#prove-ui-behavior-and-appearance",
+  "litespec/frontend/web/ui#prove-ui-behavior-and-appearance"
+ ],
+ "litespec/rule/frontend-ui.publish-a-design-contract": [
+  "litespec/frontend/ui#publish-a-design-contract"
+ ],
+ "litespec/rule/frontend-ui.publish-one-registry-item-per-floorplan": [
+  "litespec/frontend/web/ui#publish-one-registry-item-per-floorplan"
+ ],
+ "litespec/rule/frontend-ui.record-a-freestyle-route": [
+  "litespec/frontend/ui#record-a-freestyle-route"
+ ],
+ "litespec/rule/frontend-ui.record-a-frontend-outside-the-controlled-contract": [
+  "litespec/frontend/ui#record-a-frontend-outside-the-controlled-contract"
+ ],
+ "litespec/rule/frontend-ui.restrict-css-decisions": [
+  "litespec/frontend/ui#restrict-styling-to-semantic-tokens",
+  "litespec/frontend/web/ui#restrict-css-decisions"
+ ],
+ "litespec/rule/frontend-ui.select-a-command-surface-by-size": [
+  "litespec/frontend/ui#select-a-command-surface-by-size"
+ ],
+ "litespec/rule/frontend-ui.select-a-tone-from-the-closed-set": [
+  "litespec/frontend/ui#select-a-tone-from-the-closed-set",
+  "litespec/frontend/web/ui#select-a-tone-from-the-closed-set"
+ ],
+ "litespec/rule/frontend-ui.select-one-visual-authority": [
+  "litespec/frontend/ui#select-one-visual-authority"
+ ],
+ "litespec/rule/frontend-ui.show-the-trace-id-in-error-detail": [
+  "litespec/frontend/ui#show-the-trace-id-in-error-detail"
+ ],
+ "litespec/rule/frontend-ui.track-source-changes": [
+  "litespec/frontend/web/ui#track-source-changes"
+ ],
+ "litespec/rule/frontend-ui.use-the-product-profiles": [
+  "litespec/frontend/ui#use-the-product-profiles"
+ ],
+ "litespec/rule/frontend-ui.use-the-source-update-procedure": [
+  "litespec/frontend/web/ui#use-the-source-update-procedure"
+ ],
+ "litespec/rule/page.keep-the-layer-package-free": [
+  "litespec/core/authoring#keep-the-layer-package-free"
+ ],
+ "litespec/rule/page.state-one-action": [
+  "litespec/core/authoring#state-one-action"
+ ],
+ "litespec/rule/page.state-the-rule": [
+  "litespec/core/maintaining#state-the-rule"
+ ],
+ "litespec/rule/page.use-the-default-name": [
+  "litespec/core/authoring#use-the-default-name"
+ ],
+ "litespec/rule/profile-blazor.keep-blazor-outside-the-ui-contract": [
+  "litespec/frontend/blazor/stack#keep-blazor-outside-the-ui-contract"
+ ],
+ "litespec/rule/profile-blazor.list-excluded-baselines": [
+  "litespec/core/scope#declare-a-consumer-that-has-no-backend"
+ ],
+ "litespec/rule/profile-blazor.publish-static-webassembly-output": [
+  "litespec/frontend/blazor/stack#publish-static-webassembly-output"
+ ],
+ "litespec/rule/profile-blazor.record-a-first-load-budget": [
+  "litespec/frontend/blazor/stack#record-a-first-load-budget"
+ ],
+ "litespec/rule/profile-blazor.verify-with-the-net-toolchain": [
+  "litespec/frontend/blazor/stack#verify-with-the-net-toolchain"
+ ],
+ "litespec/rule/profile-dotnet.declare-dotnet-as-the-backend-stack": [
+  "litespec/backend/dotnet/stack#declare-dotnet-as-the-backend-stack"
+ ],
+ "litespec/rule/profile-dotnet.write-test-results-the-model-builder-reads": [
+  "litespec/backend/dotnet/stack#write-test-results-the-model-builder-reads"
+ ],
+ "litespec/rule/profile-react.build-a-device-client-as-one-static-page": [
+  "litespec/frontend/web/react/stack#build-a-device-client-as-one-static-page"
+ ],
+ "litespec/rule/profile-react.select-a-rendering-mode-by-audience": [
+  "litespec/frontend/web/react/stack#select-a-rendering-mode-by-audience"
+ ],
+ "litespec/rule/profile-stacks.apply-the-complete-stack": [
+  "litespec/core/stacks#apply-the-complete-stack"
+ ],
+ "litespec/rule/profile-stacks.declare-replacements": [
+  "litespec/core/stacks#declare-replacements"
+ ],
+ "litespec/rule/profile-stacks.keep-the-stack-visible": [
+  "litespec/core/stacks#keep-the-stack-visible"
+ ],
+ "litespec/rule/profile-stacks.use-manifest-version-pins": [
+  "litespec/core/stacks#use-manifest-version-pins"
+ ],
+ "litespec/rule/profile-svelte.build-a-device-client-as-one-static-page": [
+  "litespec/frontend/web/svelte/stack#build-a-device-client-as-one-static-page"
+ ],
+ "litespec/rule/profile-svelte.select-a-rendering-mode-by-audience": [
+  "litespec/frontend/web/svelte/stack#select-a-rendering-mode-by-audience"
+ ],
+ "litespec/rule/quality-ci.apply-the-documented-defaults": [
+  "litespec/quality/ci#apply-the-documented-defaults"
+ ],
+ "litespec/rule/quality-ci.check-documentation-on-every-pull-request": [
+  "litespec/quality/ci#check-documentation-on-every-pull-request"
+ ],
+ "litespec/rule/quality-ci.enforce-the-supply-chain-gate": [
+  "litespec/quality/ci#enforce-the-supply-chain-gate"
+ ],
+ "litespec/rule/quality-ci.keep-a-canonical-job-graph": [
+  "litespec/quality/ci#keep-a-canonical-job-graph"
+ ],
+ "litespec/rule/quality-ci.keep-generated-contracts-fresh": [
+  "litespec/quality/ci#keep-generated-contracts-fresh"
+ ],
+ "litespec/rule/quality-ci.promote-verified-artifacts": [
+  "litespec/quality/ci#promote-verified-artifacts"
+ ],
+ "litespec/rule/quality-ci.protect-the-default-branch": [
+  "litespec/quality/ci#protect-the-default-branch"
+ ],
+ "litespec/rule/quality-ci.record-every-branch-protection-bypass": [
+  "litespec/quality/ci#record-every-branch-protection-bypass"
+ ],
+ "litespec/rule/quality-ci.review-schema-artifacts": [
+  "litespec/quality/ci#review-schema-artifacts"
+ ],
+ "litespec/rule/quality-ci.run-applicable-gates-on-every-pull-request": [
+  "litespec/quality/ci#run-applicable-gates-on-every-pull-request"
+ ],
+ "litespec/rule/quality-operations.apply-schema-changes-outside-request-startup": [
+  "litespec/quality/operations#apply-schema-changes-outside-request-startup"
+ ],
+ "litespec/rule/quality-operations.bound-external-calls": [
+  "litespec/quality/operations#bound-external-calls"
+ ],
+ "litespec/rule/quality-operations.cover-the-baseline-alert-set": [
+  "litespec/quality/operations#cover-the-baseline-alert-set"
+ ],
+ "litespec/rule/quality-operations.define-actionable-baseline-alerts": [
+  "litespec/quality/operations#define-actionable-baseline-alerts"
+ ],
+ "litespec/rule/quality-operations.define-backup-and-restore-behavior": [
+  "litespec/quality/operations#define-backup-and-restore-behavior"
+ ],
+ "litespec/rule/quality-operations.emit-correlated-diagnostics": [
+  "litespec/quality/operations#emit-correlated-diagnostics"
+ ],
+ "litespec/rule/quality-operations.exercise-a-restore-before-the-first-production-data": [
+  "litespec/quality/operations#exercise-a-restore-before-the-first-production-data"
+ ],
+ "litespec/rule/quality-operations.exercise-every-runbook-before-release": [
+  "litespec/quality/operations#exercise-every-runbook-before-release"
+ ],
+ "litespec/rule/quality-operations.keep-deployment-descriptors-together": [
+  "litespec/quality/operations#keep-deployment-descriptors-together"
+ ],
+ "litespec/rule/quality-operations.keep-production-secrets-out-of-the-repository": [
+  "litespec/quality/operations#keep-production-secrets-out-of-the-repository"
+ ],
+ "litespec/rule/quality-operations.keep-rollback-executable": [
+  "litespec/quality/operations#keep-rollback-executable"
+ ],
+ "litespec/rule/quality-operations.keep-runbooks-near-project-documentation": [
+  "litespec/quality/operations#keep-runbooks-near-project-documentation"
+ ],
+ "litespec/rule/quality-operations.list-every-sub-processor": [
+  "litespec/quality/operations#list-every-sub-processor"
+ ],
+ "litespec/rule/quality-operations.name-a-runbook-on-every-alert": [
+  "litespec/quality/operations#name-a-runbook-on-every-alert"
+ ],
+ "litespec/rule/quality-operations.operate-background-work-independently": [
+  "litespec/quality/operations#operate-background-work-independently"
+ ],
+ "litespec/rule/quality-operations.pass-trace-context-in-the-w3c-format": [
+  "litespec/quality/operations#pass-trace-context-in-the-w3c-format"
+ ],
+ "litespec/rule/quality-operations.report-liveness-from-every-recurring-job": [
+  "litespec/quality/operations#report-liveness-from-every-recurring-job"
+ ],
+ "litespec/rule/quality-operations.route-each-severity-to-a-declared-destination": [
+  "litespec/quality/operations#route-each-severity-to-a-declared-destination"
+ ],
+ "litespec/rule/quality-operations.separate-liveness-and-readiness": [
+  "litespec/quality/operations#separate-liveness-and-readiness"
+ ],
+ "litespec/rule/quality-operations.start-the-stack-with-one-local-command": [
+  "litespec/quality/operations#start-the-stack-with-one-local-command"
+ ],
+ "litespec/rule/quality-operations.use-a-repeatable-deployment": [
+  "litespec/quality/operations#use-a-repeatable-deployment"
+ ],
+ "litespec/rule/quality-operations.use-stable-service-names": [
+  "litespec/quality/operations#use-stable-service-names"
+ ],
+ "litespec/rule/quality-security.apply-erasure-and-export-to-every-store": [
+  "litespec/quality/security#apply-erasure-and-export-to-every-store"
+ ],
+ "litespec/rule/quality-security.authorize-each-target-resource": [
+  "litespec/quality/security#authorize-each-target-resource"
+ ],
+ "litespec/rule/quality-security.bound-abuse-at-exposed-endpoints": [
+  "litespec/quality/security#bound-abuse-at-exposed-endpoints"
+ ],
+ "litespec/rule/quality-security.derive-the-actor-from-claims": [
+  "litespec/quality/security#derive-the-actor-from-claims"
+ ],
+ "litespec/rule/quality-security.keep-a-personal-data-inventory-per-store": [
+  "litespec/quality/security#keep-a-personal-data-inventory-per-store"
+ ],
+ "litespec/rule/quality-security.keep-backend-authentication-provider-neutral": [
+  "litespec/quality/security#keep-backend-authentication-provider-neutral"
+ ],
+ "litespec/rule/quality-security.keep-one-limit-store-across-replicas": [
+  "litespec/quality/security#keep-one-limit-store-across-replicas"
+ ],
+ "litespec/rule/quality-security.keep-personal-data-out-of-logs": [
+  "litespec/quality/security#keep-personal-data-out-of-logs"
+ ],
+ "litespec/rule/quality-security.keep-secrets-out-of-tracked-and-observable-data": [
+  "litespec/quality/security#keep-secrets-out-of-tracked-and-observable-data"
+ ],
+ "litespec/rule/quality-security.keep-secure-headers-in-host-configuration": [
+  "litespec/quality/security#keep-secure-headers-in-host-configuration"
+ ],
+ "litespec/rule/quality-security.limit-public-error-detail": [
+  "litespec/quality/security#limit-public-error-detail"
+ ],
+ "litespec/rule/quality-security.minimize-sensitive-data": [
+  "litespec/quality/security#minimize-sensitive-data"
+ ],
+ "litespec/rule/quality-security.parameterize-database-input": [
+  "litespec/quality/security#parameterize-database-input"
+ ],
+ "litespec/rule/quality-security.protect-browser-boundaries": [
+  "litespec/quality/security#protect-browser-boundaries"
+ ],
+ "litespec/rule/quality-security.protect-live-data-at-rest": [
+  "litespec/quality/security#protect-live-data-at-rest"
+ ],
+ "litespec/rule/quality-security.record-security-audit-events": [
+  "litespec/quality/security#record-security-audit-events"
+ ],
+ "litespec/rule/quality-security.report-a-breach-within-its-deadline": [
+  "litespec/quality/security#report-a-breach-within-its-deadline"
+ ],
+ "litespec/rule/quality-security.restrict-a-protected-collection-in-the-database": [
+  "litespec/quality/security#restrict-a-protected-collection-in-the-database"
+ ],
+ "litespec/rule/quality-security.restrict-cross-origin-access": [
+  "litespec/quality/security#restrict-cross-origin-access"
+ ],
+ "litespec/rule/quality-security.rotate-production-secrets": [
+  "litespec/quality/security#rotate-production-secrets"
+ ],
+ "litespec/rule/quality-security.test-the-resource-authorization-matrix": [
+  "litespec/quality/security#test-the-resource-authorization-matrix"
+ ],
+ "litespec/rule/quality-security.treat-an-unsalted-digest-as-personal-data": [
+  "litespec/quality/security#treat-an-unsalted-digest-as-personal-data"
+ ],
+ "litespec/rule/quality-security.use-deny-by-default-policies": [
+  "litespec/quality/security#use-deny-by-default-policies"
+ ],
+ "litespec/rule/quality-security.use-one-current-actor-abstraction": [
+  "litespec/quality/security#use-one-current-actor-abstraction"
+ ],
+ "litespec/rule/quality-security.validate-at-trust-boundaries": [
+  "litespec/quality/security#validate-at-trust-boundaries"
+ ],
+ "litespec/rule/react-components.keep-component-boundaries-typed": [
+  "litespec/frontend/web/react/components#keep-component-boundaries-typed"
+ ],
+ "litespec/rule/react-components.write-components-as-functions": [
+  "litespec/frontend/web/react/components#write-components-as-functions"
+ ],
+ "litespec/rule/svelte-components.keep-component-boundaries-typed": [
+  "litespec/frontend/web/svelte/components#keep-component-boundaries-typed"
+ ],
+ "litespec/rule/svelte-components.write-components-in-runes-mode": [
+  "litespec/frontend/web/svelte/components#write-components-in-runes-mode"
+ ],
+ "litespec/rule/workspace-config.keep-documentation-directories-out-of-build-artifact-ignore-rules": [
+  "litespec/workspace/config#keep-documentation-directories-out-of-build-artifact-ignore-rules"
+ ],
+ "litespec/rule/workspace-config.keep-environment-examples-beside-applications": [
+  "litespec/workspace/config#keep-environment-examples-beside-applications"
+ ],
+ "litespec/rule/workspace-config.keep-local-overrides-untracked": [
+  "litespec/workspace/config#keep-local-overrides-untracked"
+ ],
+ "litespec/rule/workspace-config.keep-logging-configuration-provider-neutral": [
+  "litespec/workspace/config#keep-logging-configuration-provider-neutral"
+ ],
+ "litespec/rule/workspace-config.keep-secrets-outside-source-control": [
+  "litespec/workspace/config#keep-secrets-outside-source-control"
+ ],
+ "litespec/rule/workspace-config.pin-the-javascript-toolchain": [
+  "litespec/workspace/config#pin-the-javascript-toolchain"
+ ],
+ "litespec/rule/workspace-config.pin-the-react-version-in-the-eslint-flat-config": [
+  "litespec/workspace/config#pin-the-react-version-in-the-eslint-flat-config"
+ ],
+ "litespec/rule/workspace-config.use-one-frontend-dependency-graph": [
+  "litespec/workspace/config#use-one-frontend-dependency-graph"
+ ],
+ "litespec/rule/workspace-config.validate-backend-configuration-at-startup": [
+  "litespec/workspace/config#validate-backend-configuration-at-startup"
+ ],
+ "litespec/rule/workspace-config.validate-frontend-environment-access": [
+  "litespec/workspace/config#validate-frontend-environment-access"
+ ],
+ "litespec/rule/workspace-dependencies.approve-new-packages-explicitly": [
+  "litespec/workspace/dependencies#approve-new-packages-explicitly"
+ ],
+ "litespec/rule/workspace-dependencies.assign-each-baseline-package-to-its-owning-layer": [
+  "litespec/workspace/dependencies#assign-each-baseline-package-to-its-owning-layer"
+ ],
+ "litespec/rule/workspace-dependencies.follow-the-declared-dependency-graph": [
+  "litespec/workspace/dependencies#follow-the-declared-dependency-graph"
+ ],
+ "litespec/rule/workspace-dependencies.keep-application-free-of-provider-packages": [
+  "litespec/workspace/dependencies#keep-application-free-of-provider-packages"
+ ],
+ "litespec/rule/workspace-dependencies.keep-domain-dependency-free": [
+  "litespec/workspace/dependencies#keep-domain-dependency-free"
+ ],
+ "litespec/rule/workspace-dependencies.keep-frontend-applications-isolated": [
+  "litespec/workspace/dependencies#keep-frontend-applications-isolated"
+ ],
+ "litespec/rule/workspace-dependencies.keep-generated-packages-dependency-light": [
+  "litespec/workspace/dependencies#keep-generated-packages-dependency-light"
+ ],
+ "litespec/rule/workspace-dependencies.keep-providers-in-infrastructure": [
+  "litespec/workspace/dependencies#keep-providers-in-infrastructure"
+ ],
+ "litespec/rule/workspace-dependencies.keep-test-dependencies-in-test-projects": [
+  "litespec/workspace/dependencies#keep-test-dependencies-in-test-projects"
+ ],
+ "litespec/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary": [
+  "litespec/workspace/dependencies#keep-the-approved-web-ui-dependency-boundary"
+ ],
+ "litespec/rule/workspace-dependencies.pin-every-dependency-version-centrally": [
+  "litespec/workspace/dependencies#pin-every-dependency-version-centrally"
+ ],
+ "litespec/rule/workspace-naming.align-business-names-across-layers": [
+  "litespec/workspace/naming#align-business-names-across-layers"
+ ],
+ "litespec/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root": [
+  "litespec/workspace/naming#anchor-aggregate-owned-types-on-the-aggregate-root"
+ ],
+ "litespec/rule/workspace-naming.avoid-generic-type-names": [
+  "litespec/workspace/naming#avoid-generic-type-names"
+ ],
+ "litespec/rule/workspace-naming.derive-boundary-names-from-the-ubiquitous-term": [
+  "litespec/workspace/naming#derive-boundary-names-from-the-ubiquitous-term"
+ ],
+ "litespec/rule/workspace-naming.keep-namespaces-aligned-with-folders": [
+  "litespec/workspace/naming#keep-namespaces-aligned-with-folders"
+ ],
+ "litespec/rule/workspace-naming.name-asynchronous-operations-completely": [
+  "litespec/workspace/naming#name-asynchronous-operations-completely"
+ ],
+ "litespec/rule/workspace-naming.name-exceptions-by-failed-rule": [
+  "litespec/workspace/naming#name-exceptions-by-failed-rule"
+ ],
+ "litespec/rule/workspace-naming.use-architectural-suffixes": [
+  "litespec/workspace/naming#use-architectural-suffixes"
+ ],
+ "litespec/rule/workspace-naming.use-current-language-features": [
+  "litespec/workspace/naming#use-current-language-features"
+ ],
+ "litespec/rule/workspace-naming.use-intent-revealing-boolean-names": [
+  "litespec/workspace/naming#use-intent-revealing-boolean-names"
+ ],
+ "litespec/rule/workspace-naming.use-predictable-frontend-names": [
+  "litespec/workspace/naming#use-predictable-frontend-names"
+ ],
+ "litespec/rule/workspace-structure.declare-size-and-application-stacks-in-project-config": [
+  "litespec/workspace/structure#declare-size-and-application-stacks-in-project-config"
+ ],
+ "litespec/rule/workspace-structure.keep-consumer-documentation-at-the-root": [
+  "litespec/workspace/structure#keep-consumer-documentation-at-the-root"
+ ],
+ "litespec/rule/workspace-structure.keep-generated-api-contracts-in-packages": [
+  "litespec/workspace/structure#keep-generated-api-contracts-in-packages"
+ ],
+ "litespec/rule/workspace-structure.keep-orientation-documents-separate-from-canonical-records": [
+  "litespec/workspace/structure#keep-orientation-documents-separate-from-canonical-records"
+ ],
+ "litespec/rule/workspace-structure.keep-production-and-test-code-separate": [
+  "litespec/workspace/structure#keep-production-and-test-code-separate"
+ ],
+ "litespec/rule/workspace-structure.keep-runnable-applications-under-apps": [
+  "litespec/workspace/structure#keep-runnable-applications-under-apps"
+ ],
+ "litespec/rule/workspace-structure.keep-scripts-at-the-root": [
+  "litespec/workspace/structure#keep-scripts-at-the-root"
+ ],
+ "litespec/rule/workspace-structure.keep-the-generated-model-out-of-source-control": [
+  "litespec/workspace/structure#keep-the-generated-model-out-of-source-control"
+ ],
+ "litespec/rule/workspace-structure.limit-shared-typescript-packages": [
+  "litespec/workspace/structure#limit-shared-typescript-packages"
+ ],
+ "litespec/rule/workspace-structure.name-frontends-by-audience": [
+  "litespec/workspace/structure#name-frontends-by-audience"
+ ],
+ "litespec/rule/workspace-structure.use-the-canonical-root-tree": [
+  "litespec/workspace/structure#use-the-canonical-root-tree"
+ ]
+}

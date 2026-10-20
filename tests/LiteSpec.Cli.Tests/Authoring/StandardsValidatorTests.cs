@@ -77,9 +77,9 @@ public sealed partial class StandardsValidatorTests
     public void FrontendWithPerStackSections() => Check(
         root =>
         {
-            var page = StandardsFixture.TopicPage.Replace("core-topic", "frontend-sample");
+            var page = StandardsFixture.TopicPage.Replace("core/topic", "frontend/web/sample");
             page = StandardsFixture.ReplaceFirst(page, "## Standards", "## React\n\n- React names the binding the rule below forbids.\n\n## Svelte\n\n- Svelte names the binding the rule below forbids.\n\n## Standards");
-            StandardsFixture.Write(root, "docs/frontend/sample.md", page);
+            StandardsFixture.Write(root, "docs/frontend/web/sample.md", page);
             StandardsFixture.RebuildIndex(root);
         },
         []);
@@ -89,9 +89,14 @@ public sealed partial class StandardsValidatorTests
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "## Standards", "## React\n\n- React names the binding the rule below forbids.\n\n## Standards")),
         ["PAGE_UNKNOWN_SECTION"]);
 
+    [Fact(DisplayName = "stack page carrying a composition section")]
+    public void StackWithCompositionSection() => Check(
+        root => StandardsFixture.Write(root, "docs/backend/sample/stack.md", StandardsFixture.ReplaceFirst(StandardsFixture.StackPage, "## Conventions", "## Composition\n\n- [Topic standard](../../core/topic.md)\n\n## Conventions")),
+        ["PAGE_UNKNOWN_SECTION"]);
+
     [Fact(DisplayName = "per-stack section after standards")]
     public void PerStackAfterStandards() => Check(
-        root => StandardsFixture.Write(root, "docs/frontend/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage.Replace("core-topic", "frontend-sample"), "## Verification", "## React\n\n- React names the binding the rule above forbids.\n\n## Verification")),
+        root => StandardsFixture.Write(root, "docs/frontend/web/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage.Replace("core/topic", "frontend/web/sample"), "## Verification", "## React\n\n- React names the binding the rule above forbids.\n\n## Verification")),
         ["PAGE_SECTION_ORDER"]);
 
     static void CheckActionHeading(string verb)
@@ -183,19 +188,21 @@ public sealed partial class StandardsValidatorTests
             "EXTENSION_KIND",
             "EXTENSION_REPLACES_ENFORCED",
             "EXTENSION_REPLACES_UNKNOWN",
+            "EXTENSION_LOCATION",
             "EXTENSION_SCOPE",
+            "EXTENSION_UNLISTED",
+            "LAYER_UNREACHABLE",
+            "SHAPE_PAGE",
+            "STACK_FOLDER",
+            "STACK_REFERENCE",
             "EXTENSION_STACK_UNKNOWN",
             "GLOSSARY_DEFINITION",
             "GLOSSARY_ORDER",
             "HEADING_ACTION",
             "HEADING_EMPTY_BODY",
-            "ID_AREA_UNKNOWN",
             "ID_DUPLICATE",
-            "ID_LOCATION",
-            "ID_MISSING",
+            "ID_IN_HEADING",
             "ID_PAGE_FILENAME",
-            "ID_SCOPE_MISMATCH",
-            "ID_SLUG_MISMATCH",
             "ID_UNKNOWN_REFERENCE",
             "INDEX_CONTAINS_PROCEDURE",
             "INDEX_INTENT",

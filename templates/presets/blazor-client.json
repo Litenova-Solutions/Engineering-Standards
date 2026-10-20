@@ -1,0 +1,13 @@
+{
+  "shape": "client-only",
+  "stacks": ["blazor"],
+  "paths": {
+    "frontends": [
+      {
+        "name": "app",
+        "path": "apps/app",
+        "platform": "blazor"
+      }
+    ]
+  }
+}

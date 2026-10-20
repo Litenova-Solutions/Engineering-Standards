@@ -10,8 +10,8 @@ static partial class Identifiers
     /// <summary>A citation of a project record or a failure code.</summary>
     public static readonly Regex Citation = BuildCitation();
 
-    /// <summary>A citation of a shared standards provision.</summary>
-    [GeneratedRegex(@"\blitespec/(?:rule|convention)/[A-Za-z0-9][A-Za-z0-9._-]*")]
+    /// <summary>A citation of a shared standards provision: litespec/&lt;page&gt;#&lt;slug&gt;.</summary>
+    [GeneratedRegex(@"\blitespec/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*#[a-z0-9]+(?:-[a-z0-9]+)*")]
     public static partial Regex SharedCitation();
 
     /// <summary>A failure code. Modules are kebab-case, so both parts allow hyphens.</summary>
@@ -20,10 +20,10 @@ static partial class Identifiers
 
     /// <summary>
     ///     Every refused old form in one pass: the dotted prefixes, the prefixed
-    ///     continuations, and the numbered tokens. Each alternative needs content
+    ///     continuations, the numbered tokens, and the old provision form. Each alternative needs content
     ///     after its prefix, so a bare prefix as documentation lists it matches nothing.
     /// </summary>
-    [GeneratedRegex(@"\b(?:acceptance-criterion|path|policy|value|flow)/[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)+|\b(?:authorization|invariant|validation|workflow|end-to-end-flow|domain-policy|aggregate)/[A-Za-z0-9][A-Za-z0-9._-]*|\b(?<![a-z0-9-])(?!litespec/)[a-z][a-z0-9-]*/rule/[A-Za-z0-9][A-Za-z0-9._-]*|\b(?:AC|AUTZ|INV|POL|VAL|RULE)(?:-[A-Z][A-Z0-9]*)+-[0-9]{2,}\b|\bE2E-[0-9]+\b")]
+    [GeneratedRegex(@"\b(?:acceptance-criterion|path|policy|value|flow)/[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)+|\b(?:authorization|invariant|validation|workflow|end-to-end-flow|domain-policy|aggregate)/[A-Za-z0-9][A-Za-z0-9._-]*|\b(?<![a-z0-9-])(?!litespec/)[a-z][a-z0-9-]*/rule/[A-Za-z0-9][A-Za-z0-9._-]*|\b(?:AC|AUTZ|INV|POL|VAL|RULE)(?:-[A-Z][A-Z0-9]*)+-[0-9]{2,}\b|\bE2E-[0-9]+\b|\blitespec/(?:rule|convention)/[A-Za-z0-9][A-Za-z0-9._-]*")]
     public static partial Regex RefusedAny();
 
     /// <summary>A written anchor on a reaction or job.</summary>
@@ -38,8 +38,8 @@ static partial class Identifiers
     [GeneratedRegex(@"^#{1,6}\s+.*\((?<id>standard/[a-z0-9][a-z0-9-]*\.[a-z0-9][a-z0-9-]*)\)\s*$")]
     public static partial Regex StandardHeading();
 
-    /// <summary>A shared provision carried as a heading.</summary>
-    [GeneratedRegex(@"\(litespec/(?:rule|convention)/[A-Za-z0-9][A-Za-z0-9._-]*\)")]
+    /// <summary>A shared provision carried as a heading, which holds no ID text.</summary>
+    [GeneratedRegex(@"^###\s+(?<heading>.+?)\s*$")]
     public static partial Regex ProvisionHeading();
 
     private static Regex BuildCitation()

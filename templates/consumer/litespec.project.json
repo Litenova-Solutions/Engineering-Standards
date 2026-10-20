@@ -4,20 +4,28 @@
     "name": "fixture-shop"
   },
   "size": "small",
-  "stacks": ["dotnet", "react"],
+  "shape": "server",
+  "stacks": [
+    "dotnet",
+    "react"
+  ],
   "reviewedLiteSpecVersion": "2.0.0",
   "optionalTypes": [],
   "constraints": {
     "answered": true
   },
-  "owners": ["fixture-owner"],
+  "owners": [
+    "fixture-owner"
+  ],
   "paths": {
     "apiSolution": "apps/api/Fixture.slnx",
     "docs": "docs",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
     "unstructuredDocs": [],
-    "testRoots": ["apps/api/tests"],
+    "testRoots": [
+      "apps/api/tests"
+    ],
     "languageScan": [],
     "uiPackage": {
       "name": "@fixture/ui",
@@ -27,7 +35,9 @@
       "tokens": "packages/ui/src/styles/tokens.css",
       "sourceLock": "packages/ui/ui-source-lock.json",
       "designContract": "packages/ui/DESIGN.md",
-      "publicExports": ["@fixture/ui/floorplans"]
+      "publicExports": [
+        "@fixture/ui/floorplans"
+      ]
     },
     "uiPatterns": "docs/ui/pattern-catalog.json",
     "frontends": [

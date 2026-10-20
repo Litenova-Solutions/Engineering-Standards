@@ -1,0 +1,13 @@
+{
+  "shape": "server",
+  "stacks": ["dotnet", "svelte"],
+  "paths": {
+    "frontends": [
+      {
+        "name": "web",
+        "path": "apps/web",
+        "platform": "svelte"
+      }
+    ]
+  }
+}

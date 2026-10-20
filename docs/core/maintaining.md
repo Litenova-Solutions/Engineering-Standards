@@ -4,13 +4,13 @@
 
 This page is the maintainer's manual for the LiteSpec repository itself. It states how a provision moves through its lifecycle. It states how an identifier rename is handled. It states how citations are written. It states how a LiteSpec release is published.
 
-The page exists because `litespec/rule/core-authoring.publish-each-release-as-a-complete-contract` requires each LiteSpec release to state its complete contract. A maintainer who follows those rules needs the procedures this page states.
+The page exists because `litespec/core/authoring#publish-each-release-as-a-complete-contract` requires each LiteSpec release to state its complete contract. A maintainer who follows those rules needs the procedures this page states.
 
 ## Agent Summary {#agent-summary}
 
-- State the provision lifecycle. (litespec/rule/core-maintaining.state-the-provision-lifecycle)
-- Replace every citation on a rename. (litespec/rule/core-maintaining.replace-every-citation-on-a-rename)
-- Publish a LiteSpec release from a tag. (litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag)
+- State the provision lifecycle. (litespec/core/maintaining#state-the-provision-lifecycle)
+- Replace every citation on a rename. (litespec/core/maintaining#replace-every-citation-on-a-rename)
+- Publish a LiteSpec release from a tag. (litespec/core/maintaining#publish-a-litespec-release-from-a-tag)
 
 ## Concepts
 
@@ -28,7 +28,7 @@ A provision never goes from active back to draft. A retirement is permanent.
 
 ### The identifier
 
-Every provision ID is `litespec/<kind>/<page>.<heading-slug>`, defined by `litespec/rule/core-authoring.use-the-declared-identifier-grammar`. A rename replaces the identifier outright. The repository keeps no alias and no mapping from an old identifier.
+Every provision ID is `litespec/<page>#<slug>`, defined by `litespec/core/authoring#use-the-declared-identifier-grammar`. A rename replaces the identifier outright. The repository keeps no alias and no mapping from an old identifier.
 
 ### Citations
 
@@ -40,7 +40,7 @@ A LiteSpec release is a tagged snapshot of the repository. Between releases, `li
 
 ## Standards
 
-### State the provision lifecycle (litespec/rule/core-maintaining.state-the-provision-lifecycle)
+### State the provision lifecycle
 
 **Requirement:** A maintainer MUST keep each provision in exactly one of three states: draft, active, or retired.
 
@@ -48,7 +48,7 @@ A LiteSpec release is a tagged snapshot of the repository. Between releases, `li
 
 **Example:** A provision is added in draft. When cited from a Verification row it becomes active. When its assertion is folded into a richer rule, the provision is retired.
 
-### Replace every citation on a rename (litespec/rule/core-maintaining.replace-every-citation-on-a-rename)
+### Replace every citation on a rename
 
 **Requirement:** A provision rename MUST replace every citation of the old identifier in one change.
 
@@ -56,7 +56,7 @@ A LiteSpec release is a tagged snapshot of the repository. Between releases, `li
 
 **Example:** Renaming a provision changes its heading, its ID, every Agent Summary bullet, every Verification row, and every cross-page citation together.
 
-### Publish a LiteSpec release from a tag (litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag)
+### Publish a LiteSpec release from a tag
 
 **Requirement:** A LiteSpec release MUST set one new git tag and carry it in the manifest version, the changelog entry, and the consumer template version.
 
@@ -68,15 +68,14 @@ None.
 
 ## Reference example
 
-This informative example demonstrates `litespec/rule/core-maintaining.state-the-provision-lifecycle`, `litespec/rule/core-maintaining.replace-every-citation-on-a-rename`, and `litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag`.
+This informative example demonstrates `litespec/core/maintaining#state-the-provision-lifecycle`, `litespec/core/maintaining#replace-every-citation-on-a-rename`, and `litespec/core/maintaining#publish-a-litespec-release-from-a-tag`.
 
 ### Step one, adding a provision
 
 A maintainer writes a new provision on a page. The provision is in `draft` until a validator case, Verification row, or Agent Summary cites it.
 
 ```text
-### State the rule (litespec/rule/page.state-the-rule)
-
+### State the rule
 **Requirement:** A consumer MUST do the thing.
 **Rationale:** The thing matters.
 ```
@@ -95,6 +94,6 @@ The maintainer checks the tag with the highest version number with `git describe
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/core-maintaining.state-the-provision-lifecycle | guidance | Is every provision in exactly one lifecycle state, with retired identifiers cited nowhere? |
-| litespec/rule/core-maintaining.replace-every-citation-on-a-rename | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
-| litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag | guidance | Does one new tag carry the next version across the manifest, the changelog, and the template? |
+| litespec/core/maintaining#state-the-provision-lifecycle | guidance | Is every provision in exactly one lifecycle state, with retired identifiers cited nowhere? |
+| litespec/core/maintaining#replace-every-citation-on-a-rename | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
+| litespec/core/maintaining#publish-a-litespec-release-from-a-tag | guidance | Does one new tag carry the next version across the manifest, the changelog, and the template? |

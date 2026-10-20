@@ -10,115 +10,37 @@
     "extension": "docs/ext",
     "uiPatternLibrary": "patterns/ui"
   },
-  "provisionRegistry": {
-    "areas": [
-      "BACKEND",
-      "BLAZOR",
-      "CORE",
-      "DOTNET",
-      "EXT",
-      "FRONTEND",
-      "PROFILE",
-      "QUALITY",
-      "REACT",
-      "SVELTE",
-      "WORKSPACE"
-    ]
-  },
-  "specification": {
-    "entry": "docs/profile/stacks.md",
-    "pages": [
-      "docs/profile/stacks.md",
-      "docs/core/system.md",
-      "docs/core/model.md",
-      "docs/core/principles.md",
-      "docs/core/scope.md",
-      "docs/core/product.md",
-      "docs/core/agent.md",
-      "docs/core/authoring.md",
-      "docs/core/maintaining.md",
-      "docs/core/release.md",
-      "docs/workspace/structure.md",
-      "docs/workspace/naming.md",
-      "docs/workspace/dependencies.md",
-      "docs/workspace/config.md",
-      "docs/backend/architecture.md",
-      "docs/backend/domain.md",
-      "docs/backend/application.md",
-      "docs/backend/persistence.md",
-      "docs/backend/api.md",
-      "docs/backend/testing.md",
-      "docs/backend/identifiers.md",
-      "docs/quality/security.md",
-      "docs/quality/operations.md",
-      "docs/quality/ci.md"
-    ]
-  },
   "stacks": {
     "dotnet": {
-      "kind": "backend",
-      "entry": "docs/profile/dotnet.md",
-      "pages": [
-        "docs/profile/dotnet.md",
-        "docs/dotnet/architecture.md",
-        "docs/dotnet/domain.md",
-        "docs/dotnet/application.md",
-        "docs/dotnet/persistence.md",
-        "docs/dotnet/api.md",
-        "docs/dotnet/testing.md",
-        "docs/dotnet/workspace.md",
-        "docs/dotnet/naming.md",
-        "docs/dotnet/packages.md",
-        "docs/dotnet/config.md"
-      ]
+      "folder": "docs/backend/dotnet"
     },
     "react": {
-      "kind": "frontend",
-      "entry": "docs/profile/react.md",
-      "pages": [
-        "docs/profile/react.md",
-        "docs/frontend/structure.md",
-        "docs/frontend/rendering.md",
-        "docs/frontend/components.md",
-        "docs/frontend/ui.md",
-        "docs/frontend/patterns.md",
-        "docs/frontend/data.md",
-        "docs/frontend/testing.md",
-        "docs/react/components.md"
-      ]
+      "folder": "docs/frontend/web/react"
     },
     "svelte": {
-      "kind": "frontend",
-      "entry": "docs/profile/svelte.md",
-      "pages": [
-        "docs/profile/svelte.md",
-        "docs/frontend/structure.md",
-        "docs/frontend/rendering.md",
-        "docs/frontend/components.md",
-        "docs/frontend/ui.md",
-        "docs/frontend/patterns.md",
-        "docs/frontend/data.md",
-        "docs/frontend/testing.md",
-        "docs/svelte/components.md"
-      ]
+      "folder": "docs/frontend/web/svelte"
     },
-    "blazor-web": {
-      "kind": "frontend",
-      "entry": "docs/profile/blazor.md",
-      "pages": [
-        "docs/profile/blazor.md",
-        "docs/blazor/structure.md",
-        "docs/blazor/rendering.md",
-        "docs/blazor/components.md",
-        "docs/blazor/data.md",
-        "docs/blazor/browser.md",
-        "docs/blazor/testing.md"
+    "blazor": {
+      "folder": "docs/frontend/blazor"
+    }
+  },
+  "shapes": {
+    "server": {
+      "backendStacks": 1
+    },
+    "client-only": {
+      "backendStacks": 0,
+      "backendPages": [
+        "docs/backend/architecture.md",
+        "docs/backend/domain.md",
+        "docs/backend/application.md",
+        "docs/backend/identifiers.md"
       ]
     }
   },
   "extensions": {
     "bdd": {
-      "path": "docs/ext/bdd.md",
+      "path": "docs/backend/dotnet/ext/bdd.md",
       "activationScope": "local",
       "applicableKinds": [
         "use-case",
@@ -127,9 +49,6 @@
       "replaces": [],
       "switchesOn": [
         "case"
-      ],
-      "stacks": [
-        "dotnet"
       ]
     },
     "compat": {
@@ -198,7 +117,7 @@
       "path": "docs/ext/audit.md",
       "activationScope": "project",
       "replaces": [
-        "litespec/rule/quality-security.record-security-audit-events"
+        "litespec/quality/security#record-security-audit-events"
       ],
       "switchesOn": []
     },
@@ -228,7 +147,7 @@
         "journey"
       ],
       "replaces": [
-        "litespec/rule/backend-persistence.collect-events-without-a-public-unit-of-work"
+        "litespec/backend/persistence#collect-events-without-a-public-unit-of-work"
       ],
       "switchesOn": [
         "event",
@@ -237,24 +156,21 @@
       ]
     },
     "efcore": {
-      "path": "docs/ext/efcore.md",
+      "path": "docs/backend/dotnet/ext/efcore.md",
       "activationScope": "local",
       "applicableKinds": [
         "module",
         "use-case"
       ],
       "replaces": [
-        "litespec/rule/dotnet-persistence.query-through-iquerysession",
-        "litespec/rule/backend-persistence.keep-mappings-and-aliases-explicit",
-        "litespec/rule/dotnet-packages.keep-application-dependencies-narrow",
-        "litespec/rule/backend-architecture.separate-command-and-query-behavior",
-        "litespec/rule/ext-outbox.stage-messages-with-business-work",
-        "litespec/rule/ext-outbox.reject-independent-outbox-commits"
+        "litespec/backend/dotnet/persistence#query-through-iquerysession",
+        "litespec/backend/persistence#keep-mappings-and-aliases-explicit",
+        "litespec/backend/dotnet/packages#keep-application-dependencies-narrow",
+        "litespec/backend/architecture#separate-command-and-query-behavior",
+        "litespec/ext/outbox#stage-messages-with-business-work",
+        "litespec/ext/outbox#reject-independent-outbox-commits"
       ],
-      "switchesOn": [],
-      "stacks": [
-        "dotnet"
-      ]
+      "switchesOn": []
     },
     "realtime": {
       "path": "docs/ext/realtime.md",

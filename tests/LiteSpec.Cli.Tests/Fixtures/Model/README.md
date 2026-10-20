@@ -57,4 +57,6 @@ The builder and the suite use these codes:
 
 `broken/refused-bare-prefix/` is the exception: it adds bare refused prefixes with nothing after them, as documentation listing the refused forms writes them, and exits 0.
 
+`broken/refused-old-provision/` cites the retired `litespec/rule/...` provision form in code and exits 1 with `identifier-refused-form`.
+
 An open known gap that names the finding code and the subject reports the finding as known and exits 0. An expired gap exits 1.

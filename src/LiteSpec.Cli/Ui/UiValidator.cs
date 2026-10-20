@@ -109,7 +109,7 @@ static partial class UiValidator
         {
             // A silent skip reads as conformance. Naming the frontends and the platform
             // each one declared makes the skipped scope visible in the output that a
-            // reviewer reads. (litespec/rule/frontend-ui.record-a-frontend-outside-the-controlled-contract)
+            // reviewer reads. (litespec/frontend/ui#record-a-frontend-outside-the-controlled-contract)
             Console.WriteLine("PASS: no controlled web frontend is present.");
             if (report.Frontends.Count > 0)
             {
@@ -146,7 +146,8 @@ static partial class UiValidator
 
     static readonly HashSet<string> UiExceptionPages = new(StringComparer.Ordinal)
     {
-        "frontend-ui", "frontend-components", "frontend-patterns",
+        "frontend/ui", "frontend/components", "frontend/patterns",
+        "frontend/web/ui", "frontend/web/components", "frontend/web/patterns",
     };
 
     static readonly Regex ReviewDate = new("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", RegexOptions.Compiled);
@@ -293,8 +294,10 @@ static partial class UiValidator
             var today = DateTime.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             foreach (var exception in uiExceptions)
             {
-                var parts = exception.Standard.Split('/');
-                var page = parts.Length > 2 ? parts[2].Split('.')[0] : "";
+                // A provision ID is litespec/<page>#<slug>; the page decides whether the UI checks own it.
+                var page = exception.Standard.StartsWith("litespec/", StringComparison.Ordinal)
+                    ? exception.Standard["litespec/".Length..].Split('#')[0]
+                    : "";
                 if (!UiExceptionPages.Contains(page))
                 {
                     continue;
@@ -313,11 +316,11 @@ static partial class UiValidator
 
             // A controlled frontend composes the shared package, so the workspace declares
             // it once. A frontend that composes no shared component carries no UI block.
-            // (litespec/rule/frontend-ui.select-one-visual-authority)
+            // (litespec/frontend/ui#select-one-visual-authority)
             // An additional registry passes both registry gates under an exception against
             // the pinned baseline provision. The review date on that record is checked
             // above; the gates below check its presence.
-            var baselineOverride = uiExceptions.Any(exception => exception.Standard == "litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package");
+            var baselineOverride = uiExceptions.Any(exception => exception.Standard == "litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package");
             var pkgValue = Chain(project, "paths", "uiPackage");
             var pkg = pkgValue.Found ? pkgValue.Node : null;
             var hasPkg = pkg is not null && TruthyNode(pkg);
@@ -328,7 +331,7 @@ static partial class UiValidator
 
             if (controlled.Count > 0 && !hasPkg)
             {
-                Errors.Add($"litespec/rule/frontend-ui.select-one-visual-authority litespec.project.json: {controlled.Count} controlled frontend(s) and no paths.uiPackage");
+                Errors.Add($"litespec/frontend/ui#select-one-visual-authority litespec.project.json: {controlled.Count} controlled frontend(s) and no paths.uiPackage");
             }
 
             UiSharedPackage? packageSummary = null;
@@ -458,7 +461,6 @@ static partial class UiValidator
             foreach (var frontend in controlled)
             {
                 var label = $"frontend '{Show(Child(frontend, "name"))}'";
-                const string ui = "frontend-ui";
                 var uiBlock = Child(frontend, "ui");
                 if (!Truthy(uiBlock))
                 {
@@ -536,7 +538,7 @@ static partial class UiValidator
                                     return;
                                 }
 
-                                Errors.Add($"[litespec/rule/{ui}.restrict-css-decisions] {relative}: {UtilityMessages[kind]} '{token}'");
+                                Errors.Add($"[litespec/frontend/web/ui#restrict-css-decisions] {relative}: {UtilityMessages[kind]} '{token}'");
                             });
                         }
                     }
@@ -566,7 +568,7 @@ static partial class UiValidator
                         var inline = source.EndsWith(".svelte", StringComparison.Ordinal) ? SvelteInlineStyle : ReactInlineStyle;
                         if (inline.IsMatch(File.ReadAllText(source)))
                         {
-                            Errors.Add($"[litespec/rule/{ui}.restrict-css-decisions] {relative}: an inline style belongs in a shared component");
+                            Errors.Add($"[litespec/frontend/web/ui#restrict-css-decisions] {relative}: an inline style belongs in a shared component");
                         }
                     }
                 }
@@ -574,7 +576,7 @@ static partial class UiValidator
 
             // A workspace that records pattern decisions keeps one catalog beside its
             // design contract. A workspace without one reports nothing here.
-            // (litespec/rule/frontend-patterns.keep-one-pattern-catalog)
+            // (litespec/frontend/patterns#keep-one-pattern-catalog)
             var uiPatterns = Chain(project, "paths", "uiPatterns");
             if (Truthy(uiPatterns))
             {

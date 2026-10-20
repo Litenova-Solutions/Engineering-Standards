@@ -5,7 +5,7 @@ using LiteSpec.Schemas;
 namespace LiteSpec.Authoring;
 
 /// <summary>
-///     The manifest contract: references, stack composition, extensions, and schema consumers.
+///     The manifest contract: references, folder-based stacks, shapes, extensions, and schema consumers.
 /// </summary>
 static partial class StandardsValidator
 {
@@ -21,26 +21,6 @@ static partial class StandardsValidator
         JsonObject => "[object Object]",
         _ => JsonString(node) ?? node.ToJsonString(),
     };
-
-    static ManifestRegistryInfo ReadManifestRegistry(string root)
-    {
-        var file = Path.Combine(root, "litespec.manifest.json");
-        if (!File.Exists(file))
-        {
-            return new ManifestRegistryInfo(false, []);
-        }
-
-        try
-        {
-            var manifest = JsonNode.Parse(TrimBom(ReadText(file))) as JsonObject;
-            var areas = new HashSet<string>(JsonStrings((manifest?["provisionRegistry"] as JsonObject)?["areas"]), StringComparer.Ordinal);
-            return new ManifestRegistryInfo(true, areas);
-        }
-        catch
-        {
-            return new ManifestRegistryInfo(false, []);
-        }
-    }
 
     static void CheckManifest(string root, Action<string, int, string, string> add, HashSet<string> activeIds, Dictionary<string, List<VerificationRow>> rowsByPage)
     {
@@ -70,40 +50,7 @@ static partial class StandardsValidator
         }
 
         var stacks = obj?["stacks"] as JsonObject;
-        if (stacks is not null)
-        {
-            foreach (var (_, stackNode) in stacks)
-            {
-                var stack = stackNode as JsonObject;
-                var entry = JsonString(stack?["entry"]);
-                var pagesNode = stack?["pages"] as JsonArray;
-                var pages = JsonStrings(pagesNode);
-                if (pagesNode is not null && pagesNode.All(node => JsonString(node) is not null)
-                    && new HashSet<string>(pages, StringComparer.Ordinal).Count != pagesNode.Count)
-                {
-                    add("litespec.manifest.json", 1, "MANIFEST_DUPLICATE_PATH", $"stack '{entry ?? "undefined"}' contains a duplicate page path");
-                }
-
-                if (entry is { Length: > 0 })
-                {
-                    references.Add(entry);
-                }
-
-                references.AddRange(pages);
-            }
-        }
-
-        var specification = obj?["specification"] as JsonObject;
-        if (specification is not null)
-        {
-            if (JsonString(specification["entry"]) is { Length: > 0 } specificationEntry)
-            {
-                references.Add(specificationEntry);
-            }
-
-            references.AddRange(JsonStrings(specification["pages"] as JsonArray));
-        }
-
+        var shapes = obj?["shapes"] as JsonObject;
         var extensions = obj?["extensions"] as JsonObject;
         if (extensions is not null)
         {
@@ -114,6 +61,14 @@ static partial class StandardsValidator
                 {
                     references.Add(path);
                 }
+            }
+        }
+
+        if (shapes is not null)
+        {
+            foreach (var (_, shapeNode) in shapes)
+            {
+                references.AddRange(JsonStrings((shapeNode as JsonObject)?["backendPages"] as JsonArray));
             }
         }
 
@@ -140,69 +95,23 @@ static partial class StandardsValidator
             }
         }
 
-        CheckStackComposition(root, stacks, add);
-        if (specification is not null)
+        if (obj is not null)
         {
-            CheckStackComposition(root, new JsonObject { ["specification"] = specification.DeepClone() }, add);
-            CheckLayers(root, specification, stacks, extensions, add);
+            CheckStackFolders(root, stacks, add);
+            CheckStackReferences(obj, add);
+            CheckShapePages(shapes, add);
+            CheckExtensionLocations(obj, add);
+            CheckUnlistedExtensions(root, extensions, add);
+            CheckLayerCoverage(root, stacks, add);
+            CheckStrayPages(root, add);
         }
 
         CheckManifestExtensions(root, extensions, activeIds, rowsByPage, add);
     }
 
-    // Areas whose pages belong to no layer: guides, commands, references, and the
-    // extensions, which the manifest lists on their own.
-    static readonly string[] LayerFreeAreas = ["docs/ext/", "docs/guide/", "docs/reference/", "docs/tools/", "docs/tutorial/"];
-
-    // Every page belongs to the specification, which every consumer applies, or to at
-    // least one stack binding, never both. An unlisted page applies to nobody, and a page
-    // in both layers would bind a stack-neutral rule to one stack.
-    // (litespec/rule/profile-stacks.apply-the-complete-stack)
-    static void CheckLayers(string root, JsonObject specification, JsonObject? stacks, JsonObject? extensions, Action<string, int, string, string> add)
-    {
-        var specificationPages = JsonStrings(specification["pages"] as JsonArray).ToHashSet(StringComparer.Ordinal);
-        var stackPages = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var (_, stackNode) in stacks ?? [])
-        {
-            stackPages.UnionWith(JsonStrings((stackNode as JsonObject)?["pages"] as JsonArray));
-        }
-
-        var docs = Path.Combine(root, "docs");
-        if (Directory.Exists(docs))
-        {
-            foreach (var file in Directory.GetFiles(docs, "*.md", SearchOption.AllDirectories).OrderBy(name => name, StringComparer.Ordinal))
-            {
-                var relative = Slash(Path.GetRelativePath(root, file));
-                if (Path.GetFileName(relative) == "README.md" || LayerFreeAreas.Any(area => relative.StartsWith(area, StringComparison.Ordinal)))
-                {
-                    continue;
-                }
-
-                if (!specificationPages.Contains(relative) && !stackPages.Contains(relative))
-                {
-                    add(relative, 1, "LAYER_UNLISTED", "page is listed in neither the specification nor any stack in litespec.manifest.json");
-                }
-            }
-        }
-
-        foreach (var page in specificationPages.Where(stackPages.Contains).OrderBy(page => page, StringComparer.Ordinal))
-        {
-            add("litespec.manifest.json", 1, "LAYER_OVERLAP", $"page '{page}' is listed in the specification and in a stack");
-        }
-
-        foreach (var (id, extensionNode) in extensions ?? [])
-        {
-            foreach (var stack in JsonStrings((extensionNode as JsonObject)?["stacks"] as JsonArray))
-            {
-                if (stacks is null || !stacks.ContainsKey(stack))
-                {
-                    add("litespec.manifest.json", 1, "EXTENSION_STACK_UNKNOWN", $"extension '{id}' names stack '{stack}', which the manifest does not ship");
-                }
-            }
-        }
-    }
-
-    static void CheckStackComposition(string root, JsonObject? stacks, Action<string, int, string, string> add)
+    // A stack ships a folder of pages, so the folder names the stack's area and holds
+    // its entry page. Anything else selects nothing.
+    static void CheckStackFolders(string root, JsonObject? stacks, Action<string, int, string, string> add)
     {
         if (stacks is null)
         {
@@ -211,62 +120,253 @@ static partial class StandardsValidator
 
         foreach (var (id, stackNode) in stacks)
         {
+            var folder = JsonString((stackNode as JsonObject)?["folder"]);
+            if (folder is null || folder.Length == 0)
+            {
+                continue;
+            }
+
+            if (Layout.KindFor(folder).Length == 0)
+            {
+                add("litespec.manifest.json", 1, "STACK_FOLDER", $"stack '{id}' folder '{folder}' is not under 'docs/backend/' or 'docs/frontend/'");
+                continue;
+            }
+
+            var trimmed = folder.TrimEnd('/');
+            if (!Directory.Exists(JoinRoot(root, trimmed)))
+            {
+                add("litespec.manifest.json", 1, "STACK_FOLDER", $"stack '{id}' folder '{folder}' does not exist");
+                continue;
+            }
+
+            if (!File.Exists(JoinRoot(root, trimmed + "/stack.md")))
+            {
+                add("litespec.manifest.json", 1, "STACK_FOLDER", $"stack '{id}' folder '{folder}' holds no 'stack.md'");
+            }
+        }
+    }
+
+    // requires and pairsWith name other shipped stacks, and a frontend stack only
+    // pairs with a backend one. An unknown name selects nothing.
+    static void CheckStackReferences(JsonObject manifest, Action<string, int, string, string> add)
+    {
+        var stacks = manifest["stacks"] as JsonObject;
+        if (stacks is null)
+        {
+            return;
+        }
+
+        var kinds = Layout.Stacks(manifest).ToDictionary(stack => stack.Id, stack => stack.Kind, StringComparer.Ordinal);
+        foreach (var (id, stackNode) in stacks)
+        {
             var stack = stackNode as JsonObject;
-            var entry = JsonString(stack?["entry"]);
-            if (entry is null || entry.Length == 0)
+            foreach (var required in JsonStrings(stack?["requires"]))
+            {
+                if (!stacks.ContainsKey(required))
+                {
+                    add("litespec.manifest.json", 1, "STACK_REFERENCE", $"stack '{id}' requires '{required}', which the manifest does not ship");
+                }
+            }
+
+            foreach (var partner in JsonStrings(stack?["pairsWith"]))
+            {
+                if (!stacks.ContainsKey(partner))
+                {
+                    add("litespec.manifest.json", 1, "STACK_REFERENCE", $"stack '{id}' pairs with '{partner}', which the manifest does not ship");
+                }
+                else if (kinds.GetValueOrDefault(partner) == "frontend")
+                {
+                    add("litespec.manifest.json", 1, "STACK_REFERENCE", $"stack '{id}' pairs with '{partner}', which is a frontend stack");
+                }
+            }
+        }
+    }
+
+    // A shape lists backend pages for projects without a backend stack. Only a page
+    // directly in docs/backend/ can stand in for the backend layer.
+    static void CheckShapePages(JsonObject? shapes, Action<string, int, string, string> add)
+    {
+        if (shapes is null)
+        {
+            return;
+        }
+
+        const string backendPrefix = "docs/backend/";
+        foreach (var (id, shapeNode) in shapes)
+        {
+            var pagesNode = (shapeNode as JsonObject)?["backendPages"] as JsonArray;
+            if (pagesNode is null)
             {
                 continue;
             }
 
-            var entryFile = JoinRoot(root, entry);
-            if (!File.Exists(entryFile) && !Directory.Exists(entryFile))
+            var pages = JsonStrings(pagesNode);
+            if (pagesNode.All(node => JsonString(node) is not null)
+                && new HashSet<string>(pages, StringComparer.Ordinal).Count != pagesNode.Count)
+            {
+                add("litespec.manifest.json", 1, "MANIFEST_DUPLICATE_PATH", $"shape '{id}' contains a duplicate backend page path");
+            }
+
+            foreach (var page in pages)
+            {
+                var rest = page.StartsWith(backendPrefix, StringComparison.Ordinal) ? page[backendPrefix.Length..] : null;
+                if (rest is null || rest.Length <= ".md".Length || rest.Contains('/') || !rest.EndsWith(".md", StringComparison.Ordinal))
+                {
+                    add("litespec.manifest.json", 1, "SHAPE_PAGE", $"shape '{id}' backend page '{page}' is not a page directly in 'docs/backend/'");
+                }
+            }
+        }
+    }
+
+    // An extension's path is its scope: docs/ext/ supports every stack, a stack
+    // folder's ext/ supports that stack only. The file name is the extension id.
+    static void CheckExtensionLocations(JsonObject manifest, Action<string, int, string, string> add)
+    {
+        var extensions = manifest["extensions"] as JsonObject;
+        if (extensions is null)
+        {
+            return;
+        }
+
+        var folders = Layout.Stacks(manifest).Select(stack => stack.Folder.Replace('\\', '/').TrimEnd('/')).ToList();
+        foreach (var (id, extensionNode) in extensions)
+        {
+            var path = JsonString((extensionNode as JsonObject)?["path"]);
+            if (path is null || path.Length == 0)
             {
                 continue;
             }
 
-            if (!File.Exists(entryFile))
+            var file = $"ext/{id}.md";
+            if (path != $"docs/{file}" && !folders.Any(folder => folder.Length > 0 && path == $"{folder}/{file}"))
+            {
+                add("litespec.manifest.json", 1, "EXTENSION_LOCATION", $"extension '{id}' path '{path}' is not 'docs/ext/{id}.md' or '<stack folder>/ext/{id}.md'");
+            }
+        }
+    }
+
+    // Every page in an ext/ folder is selected through the manifest. A page no
+    // extension lists applies to no project.
+    static void CheckUnlistedExtensions(string root, JsonObject? extensions, Action<string, int, string, string> add)
+    {
+        if (extensions is null)
+        {
+            return;
+        }
+
+        var listed = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var (_, extensionNode) in extensions)
+        {
+            if (JsonString((extensionNode as JsonObject)?["path"]) is { } path)
+            {
+                listed.Add(path);
+            }
+        }
+
+        var docs = Path.Combine(root, "docs");
+        if (!Directory.Exists(docs))
+        {
+            return;
+        }
+
+        foreach (var file in Directory.GetFiles(docs, "*.md", SearchOption.AllDirectories).OrderBy(name => name, StringComparer.Ordinal))
+        {
+            var relative = Slash(Path.GetRelativePath(root, file));
+            if (Path.GetFileName(relative) != "README.md"
+                && relative.Contains("/ext/", StringComparison.Ordinal)
+                && !listed.Contains(relative))
+            {
+                add(relative, 1, "EXTENSION_UNLISTED", "page is in an ext/ folder but no extension in litespec.manifest.json lists it");
+            }
+        }
+    }
+
+    // A backend or frontend page applies through a stack folder: the page's folder is
+    // a stack folder or an ancestor of one. Anything else no selection reaches.
+    static void CheckLayerCoverage(string root, JsonObject? stacks, Action<string, int, string, string> add)
+    {
+        if (stacks is null)
+        {
+            return;
+        }
+
+        var covered = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var (_, stackNode) in stacks)
+        {
+            var folder = JsonString((stackNode as JsonObject)?["folder"]);
+            var kind = folder is null ? "" : Layout.KindFor(folder);
+            if (folder is null || folder.Length == 0 || kind.Length == 0)
             {
                 continue;
             }
 
-            // The Composition section is the stack's list, so only that section is
-            // compared with the manifest. A link in Intent or Conventions is prose
-            // pointing at a page, not a claim that the stack composes it.
-            var composition = SectionBody(SplitLines(ReadText(entryFile)), "Composition");
-            var actual = new List<string>();
-            foreach (Match match in CompositionLinkPattern().Matches(composition))
+            var area = kind == "backend" ? "docs/backend" : "docs/frontend";
+            var current = folder.Replace('\\', '/').TrimEnd('/');
+            while (current.Length >= area.Length
+                && current.StartsWith(area, StringComparison.Ordinal)
+                && (current.Length == area.Length || current[area.Length] == '/'))
             {
-                var resolved = Slash(Path.GetRelativePath(root, Path.GetFullPath(Path.Combine(Path.GetDirectoryName(entryFile)!, TryDecodeURIComponent(match.Groups[1].Value, out var decoded) ? decoded : match.Groups[1].Value))));
-                if (!actual.Contains(resolved))
+                covered.Add(current);
+                if (current.Length == area.Length)
                 {
-                    actual.Add(resolved);
+                    break;
                 }
+
+                current = current[..current.LastIndexOf('/')];
+            }
+        }
+
+        foreach (var area in new[] { "docs/backend", "docs/frontend" })
+        {
+            var directory = JoinRoot(root, area);
+            if (!Directory.Exists(directory))
+            {
+                continue;
             }
 
-            var expected = new List<string>();
-            foreach (var page in JsonStrings(stack?["pages"]))
+            foreach (var file in Directory.GetFiles(directory, "*.md", SearchOption.AllDirectories).OrderBy(name => name, StringComparer.Ordinal))
             {
-                if (!expected.Contains(page))
+                var relative = Slash(Path.GetRelativePath(root, file));
+                if (Path.GetFileName(relative) == "README.md" || relative.Contains("/ext/", StringComparison.Ordinal))
                 {
-                    expected.Add(page);
+                    continue;
                 }
+
+                var folder = Slash(Path.GetDirectoryName(relative) ?? "");
+                if (!covered.Contains(folder))
+                {
+                    add(relative, 1, "LAYER_UNREACHABLE", "page is applied by no stack selection in litespec.manifest.json");
+                }
+            }
+        }
+    }
+
+    // Every page lives in a known area: the always-applied areas, a stack area, an
+    // ext/ folder, or the guides and references no selection applies. Anything else
+    // is a leftover path outside the tree.
+    static readonly string[] KnownAreas =
+    [
+        "docs/core/", "docs/workspace/", "docs/quality/", "docs/ext/", "docs/backend/",
+        "docs/frontend/", "docs/guide/", "docs/reference/", "docs/tools/", "docs/tutorial/",
+    ];
+
+    static void CheckStrayPages(string root, Action<string, int, string, string> add)
+    {
+        var docs = Path.Combine(root, "docs");
+        if (!Directory.Exists(docs))
+        {
+            return;
+        }
+
+        foreach (var file in Directory.GetFiles(docs, "*.md", SearchOption.AllDirectories).OrderBy(name => name, StringComparer.Ordinal))
+        {
+            var relative = Slash(Path.GetRelativePath(root, file));
+            if (Path.GetFileName(relative) == "README.md" || KnownAreas.Any(area => relative.StartsWith(area, StringComparison.Ordinal)))
+            {
+                continue;
             }
 
-            foreach (var page in expected)
-            {
-                if (!actual.Contains(page))
-                {
-                    add(entry, 1, "STACK_COMPOSITION_MISSING", $"stack '{id}' Composition omits '{page}'");
-                }
-            }
-
-            foreach (var page in actual)
-            {
-                if (!expected.Contains(page))
-                {
-                    add(entry, 1, "STACK_COMPOSITION_EXTRA", $"stack '{id}' Composition adds '{page}' outside the manifest");
-                }
-            }
+            add(relative, 1, "LAYER_UNLISTED", "page is in none of the known docs areas");
         }
     }
 
@@ -439,9 +539,6 @@ static partial class StandardsValidator
             add(valueRelative, 1, "SCHEMA_INVALID", error);
         }
     }
-
-    [GeneratedRegex(@"\[[^\]]+\]\(([^)#]+)(?:#[^)]+)?\)")]
-    private static partial Regex CompositionLinkPattern();
 
     [GeneratedRegex(@"`([^`]+)`")]
     private static partial Regex InlineCodePattern();

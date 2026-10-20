@@ -20,29 +20,29 @@ This extension switches on no record type.
 
 ## Agent Summary {#agent-summary}
 
-- Record supported locale behavior. (litespec/rule/ext-locale.record-supported-locale-behavior)
-- Keep localized routes canonical. (litespec/rule/ext-locale.define-one-locale-route-shape, litespec/rule/ext-locale.avoid-duplicate-localized-urls)
-- Store copy under stable semantic keys. (litespec/rule/ext-locale.store-user-facing-copy-in-catalogs, litespec/rule/ext-locale.name-messages-by-meaning)
-- Write validation copy by the grammar and humanize every shown identifier. (litespec/rule/ext-locale.follow-the-validation-message-grammar, litespec/rule/ext-locale.resolve-every-shown-identifier)
-- Format user-facing values by locale. (litespec/rule/ext-locale.format-values-with-active-locale)
-- Keep Domain and API values locale-neutral. (litespec/rule/ext-locale.preserve-locale-neutral-business-data)
-- Localize safe public content without changing error codes. (litespec/rule/ext-locale.localize-public-presentation-content, litespec/rule/ext-locale.keep-stable-error-codes-locale-neutral)
+- Record supported locale behavior. (litespec/ext/locale#record-supported-locale-behavior)
+- Keep localized routes canonical. (litespec/ext/locale#define-one-locale-route-shape, litespec/ext/locale#avoid-duplicate-localized-urls)
+- Store copy under stable semantic keys. (litespec/ext/locale#store-user-facing-copy-in-catalogs, litespec/ext/locale#name-messages-by-meaning)
+- Write validation copy by the grammar and humanize every shown identifier. (litespec/ext/locale#follow-the-validation-message-grammar, litespec/ext/locale#resolve-every-shown-identifier)
+- Format user-facing values by locale. (litespec/ext/locale#format-values-with-active-locale)
+- Keep Domain and API values locale-neutral. (litespec/ext/locale#preserve-locale-neutral-business-data)
+- Localize safe public content without changing error codes. (litespec/ext/locale#localize-public-presentation-content, litespec/ext/locale#keep-stable-error-codes-locale-neutral)
 
 ## Standards
 
-### Record supported locale behavior (litespec/rule/ext-locale.record-supported-locale-behavior)
+### Record supported locale behavior
 
 **Requirement:** A localization decision MUST list supported locales, default locale, fallback chain, user selection, browser detection, owner, and status.
 
 **Rationale:** One decision defines the product's locale contract before catalogs and routes appear. A draft names its decider and decide-by date.
 
-### Avoid catalog-only locale claims (litespec/rule/ext-locale.avoid-catalog-only-locale-claims)
+### Avoid catalog-only locale claims
 
 **Requirement:** A product MUST NOT infer supported locales from catalog files alone.
 
 **Rationale:** Catalog presence cannot define routing, fallback, selection, or browser-detection behavior.
 
-### Define one locale route shape (litespec/rule/ext-locale.define-one-locale-route-shape)
+### Define one locale route shape
 
 **Requirement:** A localized application MUST define one documented locale route shape.
 
@@ -50,25 +50,25 @@ This extension switches on no record type.
 
 **Example:** `/nl/orders/42` places the locale in the documented path segment, so a crawler and a shared cache each address one language.
 
-### Handle unavailable locale segments (litespec/rule/ext-locale.handle-unavailable-locale-segments)
+### Handle unavailable locale segments
 
 **Requirement:** A localized application MUST redirect unsupported or missing locale segments according to product policy.
 
 **Rationale:** The policy identifies the fallback or error behavior for an unavailable route locale.
 
-### Avoid duplicate localized URLs (litespec/rule/ext-locale.avoid-duplicate-localized-urls)
+### Avoid duplicate localized URLs
 
 **Requirement:** A localized application MUST NOT publish multiple indexable URLs for the same localized content.
 
 **Rationale:** Duplicate indexable locations split search and canonical-link behavior.
 
-### Store user-facing copy in catalogs (litespec/rule/ext-locale.store-user-facing-copy-in-catalogs)
+### Store user-facing copy in catalogs
 
 **Requirement:** A localized application MUST store user-facing copy in locale catalogs.
 
 **Rationale:** Catalogs separate translated wording from application behavior and source code.
 
-### Name messages by meaning (litespec/rule/ext-locale.name-messages-by-meaning)
+### Name messages by meaning
 
 **Requirement:** A locale catalog MUST use semantic keys that cite Term records rather than source-language sentences.
 
@@ -76,7 +76,7 @@ This extension switches on no record type.
 
 **Example:** `orders.cancel.confirmation` identifies intent without copying the English sentence.
 
-### Complete or fall back catalog values (litespec/rule/ext-locale.complete-or-fall-back-catalog-values)
+### Complete or fall back catalog values
 
 **Requirement:** Each supported locale MUST contain required keys or use its declared fallback.
 
@@ -86,7 +86,7 @@ The declaration states the fallback locale and what a missing key does at build 
 
 **Example:** A catalog check runs in the frontend lint gate, so the two outcomes are visible before review rather than in a browser.
 
-### Follow the validation message grammar (litespec/rule/ext-locale.follow-the-validation-message-grammar)
+### Follow the validation message grammar
 
 **Requirement:** A validation catalog MUST state the field label, what is wrong, and what is accepted, without technical wording.
 
@@ -94,7 +94,7 @@ The declaration states the fallback locale and what a missing key does at build 
 
 **Example:** The Term record for a field carries the sentence pattern for each supported language.
 
-### Resolve every shown identifier (litespec/rule/ext-locale.resolve-every-shown-identifier)
+### Resolve every shown identifier
 
 **Requirement:** A screen MUST resolve every closed-set code it renders to its Term record label and never render the raw code, excluding user-facing reference numbers.
 
@@ -102,7 +102,7 @@ The declaration states the fallback locale and what a missing key does at build 
 
 **Example:** A shipment row shows the Term label for `shipment-delayed` in the active locale.
 
-### Format values with active locale (litespec/rule/ext-locale.format-values-with-active-locale)
+### Format values with active locale
 
 **Requirement:** A localized interface MUST format dates, times, numbers, currency, plurals, lists, and relative time by active locale.
 
@@ -112,19 +112,19 @@ The platform supplies every one of them. [The `Intl` namespace](https://develope
 
 **Example:** A formatter instance is created once per locale and reused, because construction is the expensive part.
 
-### Preserve locale-neutral business data (litespec/rule/ext-locale.preserve-locale-neutral-business-data)
+### Preserve locale-neutral business data
 
 **Requirement:** Domain values and API contracts MUST remain locale-neutral unless a use case explicitly exchanges localized content.
 
 **Rationale:** Stable business values and wire contracts do not change with interface language.
 
-### Localize public presentation content (litespec/rule/ext-locale.localize-public-presentation-content)
+### Localize public presentation content
 
 **Requirement:** Public metadata, form labels, validation messages, and user-safe errors MUST follow the active locale.
 
 **Rationale:** Visible content needs the same locale behavior as the page that presents it.
 
-### Keep stable error codes locale-neutral (litespec/rule/ext-locale.keep-stable-error-codes-locale-neutral)
+### Keep stable error codes locale-neutral
 
 **Requirement:** A stable API error code MUST NOT change by locale.
 
@@ -132,7 +132,7 @@ The platform supplies every one of them. [The `Intl` namespace](https://develope
 
 ## Conventions
 
-### Use one catalog root (litespec/rule/ext-locale.use-one-catalog-root)
+### Use one catalog root
 
 **Default:** Keep catalogs under one application-owned locale root.
 
@@ -140,7 +140,7 @@ The platform supplies every one of them. [The `Intl` namespace](https://develope
 
 **Rationale:** One root makes ownership and catalog discovery predictable.
 
-### Split catalogs by module when needed (litespec/rule/ext-locale.split-catalogs-by-module-when-needed)
+### Split catalogs by module when needed
 
 **Default:** Split catalogs by module only when catalog size requires it.
 
@@ -148,7 +148,7 @@ The platform supplies every one of them. [The `Intl` namespace](https://develope
 
 **Rationale:** Module splitting follows a measured size boundary instead of early fragmentation.
 
-### Use BCP 47 identifiers (litespec/rule/ext-locale.use-bcp-47-identifiers)
+### Use BCP 47 identifiers
 
 **Default:** Use BCP 47 locale identifiers.
 
@@ -156,7 +156,7 @@ The platform supplies every one of them. [The `Intl` namespace](https://develope
 
 **Rationale:** BCP 47 gives routes, catalogs, and selection one familiar identifier form.
 
-### Keep locale selection explicit (litespec/rule/ext-locale.keep-locale-selection-explicit)
+### Keep locale selection explicit
 
 **Default:** Keep locale selection in the URL or documented session preference.
 
@@ -172,21 +172,21 @@ No library is selected by this extension. A localization package needs a decisio
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/ext-locale.record-supported-locale-behavior | guidance | Does the decision list locales, default, fallback, selection, owner, and status? |
-| litespec/rule/ext-locale.avoid-catalog-only-locale-claims | guidance | Is supported-locale evidence the decision rather than catalog files? |
-| litespec/rule/ext-locale.define-one-locale-route-shape | guidance | Does the application define and use one locale route shape? |
-| litespec/rule/ext-locale.handle-unavailable-locale-segments | guidance | Do unsupported or missing locale segments follow product policy? |
-| litespec/rule/ext-locale.avoid-duplicate-localized-urls | guidance | Is there one indexable URL per localized content item? |
-| litespec/rule/ext-locale.store-user-facing-copy-in-catalogs | guidance | Is user-facing copy stored in locale catalogs? |
-| litespec/rule/ext-locale.name-messages-by-meaning | guidance | Do catalog keys cite Term records instead of source sentences? |
-| litespec/rule/ext-locale.complete-or-fall-back-catalog-values | guidance | Does each locale resolve required keys or use its declared fallback? |
-| litespec/rule/ext-locale.follow-the-validation-message-grammar | guidance | Does each validation message state label, fault, and accepted input? |
-| litespec/rule/ext-locale.resolve-every-shown-identifier | guidance | Does each shown code render its Term label rather than the raw code? |
-| litespec/rule/ext-locale.format-values-with-active-locale | guidance | Are dates, numbers, currency, plurals, lists, and relative time localized? |
-| litespec/rule/ext-locale.preserve-locale-neutral-business-data | guidance | Do Domain values and API contracts stay locale-neutral? |
-| litespec/rule/ext-locale.localize-public-presentation-content | guidance | Do metadata, labels, validation, and safe errors follow the active locale? |
-| litespec/rule/ext-locale.keep-stable-error-codes-locale-neutral | guidance | Is each stable error code identical across locales? |
-| litespec/rule/ext-locale.use-one-catalog-root | guidance | Do catalogs sit under one owned root or record an Exception? |
-| litespec/rule/ext-locale.split-catalogs-by-module-when-needed | guidance | Is each module split justified by size or is an Exception recorded? |
-| litespec/rule/ext-locale.use-bcp-47-identifiers | guidance | Are locale identifiers BCP 47 or is an Exception recorded? |
-| litespec/rule/ext-locale.keep-locale-selection-explicit | guidance | Is selection in the URL or a documented session preference? |
+| litespec/ext/locale#record-supported-locale-behavior | guidance | Does the decision list locales, default, fallback, selection, owner, and status? |
+| litespec/ext/locale#avoid-catalog-only-locale-claims | guidance | Is supported-locale evidence the decision rather than catalog files? |
+| litespec/ext/locale#define-one-locale-route-shape | guidance | Does the application define and use one locale route shape? |
+| litespec/ext/locale#handle-unavailable-locale-segments | guidance | Do unsupported or missing locale segments follow product policy? |
+| litespec/ext/locale#avoid-duplicate-localized-urls | guidance | Is there one indexable URL per localized content item? |
+| litespec/ext/locale#store-user-facing-copy-in-catalogs | guidance | Is user-facing copy stored in locale catalogs? |
+| litespec/ext/locale#name-messages-by-meaning | guidance | Do catalog keys cite Term records instead of source sentences? |
+| litespec/ext/locale#complete-or-fall-back-catalog-values | guidance | Does each locale resolve required keys or use its declared fallback? |
+| litespec/ext/locale#follow-the-validation-message-grammar | guidance | Does each validation message state label, fault, and accepted input? |
+| litespec/ext/locale#resolve-every-shown-identifier | guidance | Does each shown code render its Term label rather than the raw code? |
+| litespec/ext/locale#format-values-with-active-locale | guidance | Are dates, numbers, currency, plurals, lists, and relative time localized? |
+| litespec/ext/locale#preserve-locale-neutral-business-data | guidance | Do Domain values and API contracts stay locale-neutral? |
+| litespec/ext/locale#localize-public-presentation-content | guidance | Do metadata, labels, validation, and safe errors follow the active locale? |
+| litespec/ext/locale#keep-stable-error-codes-locale-neutral | guidance | Is each stable error code identical across locales? |
+| litespec/ext/locale#use-one-catalog-root | guidance | Do catalogs sit under one owned root or record an Exception? |
+| litespec/ext/locale#split-catalogs-by-module-when-needed | guidance | Is each module split justified by size or is an Exception recorded? |
+| litespec/ext/locale#use-bcp-47-identifiers | guidance | Are locale identifiers BCP 47 or is an Exception recorded? |
+| litespec/ext/locale#keep-locale-selection-explicit | guidance | Is selection in the URL or a documented session preference? |

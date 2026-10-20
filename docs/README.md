@@ -4,7 +4,9 @@
 
 Use this index to load the canonical page for current work.
 
-The provision areas are BACKEND, BLAZOR, CORE, EXT, FRONTEND, PROFILE, QUALITY, REACT, SVELTE, and WORKSPACE, one directory each under `docs/`. A page path states the scope its provisions carry, so `frontend/components.md` owns `frontend-components`. The [provision index](reference/provisions.md) resolves any identifier to its page. The `tools/`, `guide/`, `tutorial/`, and `reference/` directories carry no provisions.
+The folder a page sits in decides who applies it. Pages in `core/`, `workspace/` and `quality/` apply to every project. Pages directly in `backend/` and `frontend/` are principles for every backend and every frontend. A stack folder such as `backend/dotnet/` holds how one stack realizes them, and a project applies its stack's folder and every folder above it.
+
+A provision ID is its page and heading, so `litespec/frontend/components#compose-composites-in-page-code` is a heading in `frontend/components.md`. The [provision index](reference/provisions.md) lists them all. The `tools/`, `guide/`, `tutorial/` and `reference/` folders carry no provisions.
 
 ## Which page do you want
 
@@ -16,25 +18,16 @@ A standards page owns the provisions a reader cites for one concern.
 
 ## Core
 
-- [Scope](core/scope.md)
-- [Principles](core/principles.md)
 - [LiteSpec](core/system.md)
-- [Agent protocol](core/agent.md)
+- [Supported scope](core/scope.md)
+- [Stacks](core/stacks.md)
+- [Principles](core/principles.md)
+- [Project model](core/model.md)
 - [Product intent](core/product.md)
-- [Release standard](core/release.md)
+- [Agent protocol](core/agent.md)
 - [Authoring standard](core/authoring.md)
 - [Maintaining the standards](core/maintaining.md)
-- [Project model](core/model.md)
-
-## Profile
-
-- [Stacks](profile/stacks.md)
-- [.NET stack](profile/dotnet.md)
-- [React stack](profile/react.md)
-- [Svelte stack](profile/svelte.md)
-- [Blazor stack](profile/blazor.md)
-
-The Stacks page lists the specification, which every consumer applies. Each stack page states what selecting that stack adds: its pages, its pins, and its checks. Exact versions and composition remain in `litespec.manifest.json`.
+- [Release standard](core/release.md)
 
 ## Workspace
 
@@ -43,7 +36,15 @@ The Stacks page lists the specification, which every consumer applies. Each stac
 - [Dependencies](workspace/dependencies.md)
 - [Configuration](workspace/config.md)
 
+## Quality
+
+- [Security](quality/security.md)
+- [Operations](quality/operations.md)
+- [Continuous integration](quality/ci.md)
+
 ## Backend
+
+These principles hold for every backend. A backend stack folder states how its technology realizes them.
 
 - [Architecture](backend/architecture.md)
 - [Domain](backend/domain.md)
@@ -53,22 +54,25 @@ The Stacks page lists the specification, which every consumer applies. Each stac
 - [Backend testing](backend/testing.md)
 - [Identifiers](backend/identifiers.md)
 
-Each backend page is stack-neutral. The Dotnet pages state how a .NET backend realizes it.
+## Dotnet stack
 
-## Dotnet
-
-- [.NET architecture](dotnet/architecture.md)
-- [.NET domain](dotnet/domain.md)
-- [.NET application](dotnet/application.md)
-- [.NET persistence](dotnet/persistence.md)
-- [.NET HTTP API](dotnet/api.md)
-- [.NET testing](dotnet/testing.md)
-- [.NET workspace](dotnet/workspace.md)
-- [.NET naming](dotnet/naming.md)
-- [.NET packages](dotnet/packages.md)
-- [.NET configuration](dotnet/config.md)
+- [.NET stack](backend/dotnet/stack.md)
+- [.NET architecture](backend/dotnet/architecture.md)
+- [.NET domain](backend/dotnet/domain.md)
+- [.NET application](backend/dotnet/application.md)
+- [.NET persistence](backend/dotnet/persistence.md)
+- [.NET HTTP API](backend/dotnet/api.md)
+- [.NET testing](backend/dotnet/testing.md)
+- [.NET workspace](backend/dotnet/workspace.md)
+- [.NET naming](backend/dotnet/naming.md)
+- [.NET packages](backend/dotnet/packages.md)
+- [.NET configuration](backend/dotnet/config.md)
+- [EF Core persistence](backend/dotnet/ext/efcore.md), an extension for this stack
+- [Executable acceptance BDD](backend/dotnet/ext/bdd.md), an extension for this stack
 
 ## Frontend
+
+These principles hold for every frontend, the Blazor stack and a native client included.
 
 - [Frontend structure](frontend/structure.md)
 - [Frontend rendering and routes](frontend/rendering.md)
@@ -78,35 +82,43 @@ Each backend page is stack-neutral. The Dotnet pages state how a .NET backend re
 - [Frontend data and state](frontend/data.md)
 - [Frontend testing](frontend/testing.md)
 
-The React and Svelte stacks share these pages, with short per-stack sections for what differs. The Blazor stack has its own pages.
+## Web
 
-## React
+The TypeScript web pages that the React and Svelte stacks share. This folder is a group, not a stack: no project selects it directly.
 
-- [React components](react/components.md)
+- [Web structure](frontend/web/structure.md)
+- [Web rendering and routes](frontend/web/rendering.md)
+- [TypeScript web components](frontend/web/components.md)
+- [Web UI](frontend/web/ui.md)
+- [Web UI pattern decisions](frontend/web/patterns.md)
+- [Web data and state](frontend/web/data.md)
+- [Web testing](frontend/web/testing.md)
 
-## Svelte
+## React stack
 
-- [Svelte components](svelte/components.md)
+- [React stack](frontend/web/react/stack.md)
+- [React components](frontend/web/react/components.md)
 
-## Blazor
+## Svelte stack
 
-- [Blazor structure](blazor/structure.md)
-- [Blazor rendering and routes](blazor/rendering.md)
-- [Blazor components](blazor/components.md)
-- [Blazor data and state](blazor/data.md)
-- [Browser persistence](blazor/browser.md)
-- [Blazor testing](blazor/testing.md)
+- [Svelte stack](frontend/web/svelte/stack.md)
+- [Svelte components](frontend/web/svelte/components.md)
 
-## Quality
+## Blazor stack
 
-- [Security](quality/security.md)
-- [Operations](quality/operations.md)
-- [Continuous integration](quality/ci.md)
+- [Blazor stack](frontend/blazor/stack.md)
+- [Blazor structure](frontend/blazor/structure.md)
+- [Blazor rendering and routes](frontend/blazor/rendering.md)
+- [Blazor components](frontend/blazor/components.md)
+- [Blazor data and state](frontend/blazor/data.md)
+- [Browser persistence](frontend/blazor/browser.md)
+- [Blazor testing](frontend/blazor/testing.md)
 
 ## Ext
 
+Extensions any stack can select. An extension for one stack sits in that stack's `ext/` folder and is listed with the stack.
+
 - [Extension catalog and selection](ext/README.md)
-- [Executable acceptance BDD](ext/bdd.md)
 - [API compatibility](ext/compat.md)
 - [Caching](ext/cache.md)
 - [Concurrency and idempotency](ext/concurrency.md)
@@ -118,7 +130,6 @@ The React and Svelte stacks share these pages, with short per-stack sections for
 - [Model Context Protocol](ext/mcp.md)
 - [Multitenancy](ext/tenancy.md)
 - [Outbox worker](ext/outbox.md)
-- [EF Core persistence](ext/efcore.md)
 - [Realtime updates](ext/realtime.md)
 - [Reporting](ext/report.md)
 - [Scheduled jobs](ext/jobs.md)
@@ -129,6 +140,7 @@ The React and Svelte stacks share these pages, with short per-stack sections for
 ## Tools
 
 - [Command index](tools/README.md)
+- [Initialize Consumer](tools/init.md)
 - [Validate Standards](tools/validate.md)
 - [Generate Provisions](tools/provisions.md)
 - [Validate Consumer](tools/consumer.md)
