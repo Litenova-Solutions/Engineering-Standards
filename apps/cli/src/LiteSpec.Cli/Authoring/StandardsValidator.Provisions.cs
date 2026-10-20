@@ -10,7 +10,7 @@ static partial class StandardsValidator
     static readonly HashSet<string> VerificationMarks = new(["checkable", "guidance"], StringComparer.Ordinal);
 
     static readonly HashSet<string> LiteSpecCommands = new(
-        ["validate", "provisions", "consumer", "ui", "model", "book"],
+        ["validate", "provisions", "consumer", "ui", "model", "book", "patterns"],
         StringComparer.Ordinal);
 
     // A claim is the comparable core of a heading, a Requirement, a Default, or a
@@ -316,7 +316,7 @@ static partial class StandardsValidator
         // header names the columns, so the provision index reads the marks from the
         // same rows this gate checks.
         var verification = sections.FirstOrDefault(section => section.Name == "Verification");
-        if (verification is null || (kind != "topic" && kind != "stack" && kind != "extension"))
+        if (verification is null || (kind != "topic" && kind != "stack" && kind != "extension" && kind != "pattern"))
         {
             return;
         }

@@ -14,9 +14,9 @@ A stack is one technology's binding of the specification, held in one folder: a 
 
 ### Apply the complete stack
 
-**Requirement:** A consumer selecting a stack MUST apply every page in the stack's folder and in each folder above it.
+**Requirement:** A consumer selecting a stack MUST apply the pages in its folder, every folder above it, and their subfolders that hold no stack.
 
-**Rationale:** A consumer cannot claim a stack while silently omitting an applicable page, because the stack is the unit of conformance. A deeper page replaces only the provisions it names.
+**Rationale:** A consumer cannot claim a stack while silently omitting an applicable page, because the stack is the unit of conformance. A deeper page replaces only the provisions it names. A stack folder is one with a `stack.md` page, so `frontend/patterns/` applies with `frontend/`, while `frontend/web/` applies only through its stacks.
 
 ### Use manifest version pins
 

@@ -29,4 +29,8 @@ The UI pattern library under `packages/ui-patterns/` keeps its Node tooling (`no
 - [Model Builder](model.md)
 - [Book](book.md)
 
+## Anywhere
+
+- [Draw Patterns](patterns.md)
+
 A consumer runs its commands from the consumer root, where `litespec.project.json` sits.

@@ -101,6 +101,12 @@ Chosen by the owner on 2026-10-20 after comparing layer-nested, concern-nested a
 
 Chosen by the owner on 2026-10-20. The standard (`docs/`, `schemas/`, `templates/`, `litespec.manifest.json`) stays at the root, because a consumer pins the root at `litespec/` and every path it reads starts there. Each deliverable has its own folder, following LiteSpec's own workspace rules where they apply: the CLI at `apps/cli/` (its solution beside `src/` and `tests/`), the UI pattern library at `packages/ui-patterns/`, and later `apps/site/` and `packages/analyzers/`. A root `LiteSpec.slnx` lists every .NET project. Rejected: separate repositories (a CLI must match its release exactly) and the standard under `spec/` (an empty segment in every consumer path). The UI validator now reads the pattern library folder from the manifest's `paths.uiPatternLibrary`.
 
+### D14. UI patterns are specification text with drawn wireframes
+
+Chosen by the owner on 2026-10-20. The `.mjs` mocks drew one product's HTML, which no other frontend could reuse and no agent could read as structure. Each pattern now lives on a pattern page in `docs/frontend/patterns/<group>.md`, and each option carries a wireframe in a closed text language defined in `docs/frontend/patterns.md`. Agents read the text and build it in their own stack, style and design system. People choose from the pictures `litespec patterns preview` draws, at 1200 and 390 pixels, with the default outlined. No SVG is committed; `litespec patterns svg` prints one for the site. A pattern heading is a name rather than an action, so its ID survives a change of default. A folder holding no stack, such as `docs/frontend/patterns/`, applies with its parent (a stack folder is one with a `stack.md` page). The record-detail group is the sample: 14 patterns and 101 options, converted by two Muse workers from the library data and judged here. The other nine groups follow once the owner accepts the sample, and then `packages/ui-patterns/` is deleted, with no retirement period.
+
+Language gaps found during the conversion and closed: `action disabled` (a refused command), `field radio`, and `aside sticky`. Gaps left open: a progress part, icons in tab labels, and a way to place a status under a heading rather than beside it.
+
 ## Progress
 
 - [x] Rename sweep (commit `a37601c`).
@@ -108,3 +114,4 @@ Chosen by the owner on 2026-10-20. The standard (`docs/`, `schemas/`, `templates
 - [x] 346 tests pass; `litespec validate` passes except the untracked proposal file; `litespec provisions --check` is current; the pattern library check passes.
 - [x] Comments describe the code without reference to the deleted Node scripts.
 - [x] D7 to D9, final verification, commit, push.
+- [ ] D14: owner review of the record-detail preview, then the other nine groups and the library deletion.

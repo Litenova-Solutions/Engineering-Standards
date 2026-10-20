@@ -282,7 +282,8 @@ static partial class StandardsValidator
     }
 
     // A backend or frontend page applies through a stack folder: the page's folder is
-    // a stack folder or an ancestor of one. Anything else no selection reaches.
+    // a stack folder, an ancestor of one, or a folder holding no stack below one of
+    // those. Anything else no selection reaches.
     static void CheckLayerCoverage(string root, JsonObject? stacks, Action<string, int, string, string> add)
     {
         if (stacks is null)
@@ -314,6 +315,11 @@ static partial class StandardsValidator
 
                 current = current[..current.LastIndexOf('/')];
             }
+        }
+
+        foreach (var folder in covered.ToList())
+        {
+            covered.UnionWith(Layout.CompanionFolders(root, folder));
         }
 
         foreach (var area in new[] { "docs/backend", "docs/frontend" })

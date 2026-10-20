@@ -69,6 +69,11 @@ static partial class StandardsValidator
             return "how-to";
         }
 
+        if (Patterns.PatternPage.IsPatternPage(relative))
+        {
+            return "pattern";
+        }
+
         if ((segments[0] == "backend" || segments[0] == "frontend") && segments[^1] == "stack")
         {
             return "stack";
@@ -88,6 +93,13 @@ static partial class StandardsValidator
                 ? new List<string> { "Concepts", "React", "Svelte", "Reference example" }
                 : new List<string> { "Concepts", "Reference example" };
             return new PageContract(["Intent", "Agent Summary", "Standards", "Conventions", "Verification"], optional);
+        }
+
+        // A pattern page offers drawn options for recurring interface questions; its
+        // Standards hold the rules every option keeps.
+        if (kind == "pattern")
+        {
+            return new PageContract(["Intent", "Agent Summary", "Patterns", "Verification"], ["Concepts", "Standards", "Conventions"]);
         }
 
         if (kind == "stack")
@@ -164,6 +176,10 @@ static partial class StandardsValidator
             }
 
             canonical.AddRange(["Standards", "Conventions", "Reference example", "Verification"]);
+        }
+        else if (kind == "pattern")
+        {
+            canonical = ["Intent", "Agent Summary", "Concepts", "Standards", "Conventions", "Patterns", "Verification"];
         }
         else if (kind == "how-to")
         {
@@ -404,7 +420,8 @@ static partial class StandardsValidator
                 continue;
             }
 
-            if (currentH2 != "Standards" && currentH2 != "Conventions")
+            var pattern = currentH2 == "Patterns" && kind == "pattern";
+            if (currentH2 != "Standards" && currentH2 != "Conventions" && !pattern)
             {
                 continue;
             }
@@ -424,7 +441,8 @@ static partial class StandardsValidator
 
             var id = $"litespec/{Provisions.PagePath(relative)}#{Provisions.HeadingSlug(title)}";
             var firstWord = FirstWordPattern().Match(title);
-            if (!firstWord.Success || !ActionVerbs.Contains(firstWord.Value))
+            // A pattern heading is the pattern's name, so its ID survives a change of default.
+            if (!pattern && (!firstWord.Success || !ActionVerbs.Contains(firstWord.Value)))
             {
                 add(relative, index + 1, "HEADING_ACTION", $"provision heading '{title}' must start with an action verb");
             }
@@ -535,12 +553,22 @@ static partial class StandardsValidator
             }
         }
 
-        CheckProvisionBodies(relative, provisions, add);
+        var rules = provisions.Where(provision => provision.Section != "Patterns").ToList();
+        CheckProvisionBodies(relative, rules, add);
         CheckSummary(relative, clean, summaryStart, summaryEnd, summaryLine, summaryReferences, add);
-        CheckProvisionClaims(relative, provisions, add);
-        CheckSummaryRestatement(relative, provisions, summaryReferences, add);
+        CheckProvisionClaims(relative, rules, add);
+        CheckSummaryRestatement(relative, rules, summaryReferences, add);
         CheckNormativeLocation(relative, clean, provisions, summaryStart, summaryEnd, add);
         CheckVerificationTable(relative, kind, sections, clean, provisions, verificationRows, root, add);
+
+        if (kind == "pattern")
+        {
+            var group = Path.GetFileNameWithoutExtension(relative);
+            foreach (var (line, message) in Patterns.PatternPage.Parse(group, raw).Check())
+            {
+                add(relative, line, "PATTERN_INVALID", message);
+            }
+        }
 
         if (!@virtual)
         {

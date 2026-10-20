@@ -45,6 +45,62 @@ static class StandardsFixture
         | litespec/core/topic#use-the-default-location | guidance | Does the topic live in its owning documentation area? |
         """) + "\n";
 
+    /// <summary>The pattern page: one pattern with two drawn options.</summary>
+    public static readonly string PatternPage = Normalize("""
+        # Sample Patterns
+
+        ## Intent
+
+        This page offers drawn options for one recurring question.
+
+        ## Agent Summary {#agent-summary}
+
+        - The record header offers two options. (litespec/frontend/patterns/sample#record-header)
+
+        ## Patterns
+
+        ### Record header
+
+        **Question:** How does the top of a record read?
+
+        **Default:** `one-primary`
+
+        **Rationale:** One primary action answers what comes next.
+
+        #### `one-primary`: One primary action
+
+        ```wireframe
+        page
+          header
+            heading "SO-1042"
+            action primary "Mark as shipped"
+        ```
+
+        **Rationale:** The next step is plain.
+
+        **Cost:** Other commands wait in a menu.
+
+        #### `two-equal`: Two equal actions
+
+        ```wireframe
+        page
+          header
+            heading "SO-1042"
+            action "Mark as shipped"
+            action "Refund"
+        ```
+
+        **Rationale:** Both commands are one click away.
+
+        **Cost:** The reader compares labels before acting.
+
+        ## Verification
+
+        | ID | Mark | Evidence |
+        |:---|:---|:---|
+        | litespec/frontend/patterns/sample#record-header | guidance | Does the top of each record page match the default option or the one its catalog records? |
+        """) + "\n";
+
     /// <summary>The extension page, with CLI evidence.</summary>
     public static readonly string ExtensionPage = Normalize("""
         # Sample Extension
@@ -272,6 +328,7 @@ static class StandardsFixture
         Write(root, "docs/core/topic.md", TopicPage);
         Write(root, "docs/ext/sample.md", ExtensionPage);
         Write(root, "docs/backend/sample/stack.md", StackPage);
+        Write(root, "docs/frontend/patterns/sample.md", PatternPage);
         Write(root, "docs/guide/sample.md", GuidePage);
         Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nUse this page to find repository documentation.\n\n" + IndexRouting);
         Write(root, "docs/tutorial/sample.md", TutorialPage);

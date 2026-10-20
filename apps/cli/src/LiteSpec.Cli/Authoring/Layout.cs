@@ -62,7 +62,7 @@ static class Layout
             }
 
             var area = stack.Kind == "backend" ? "docs/backend" : "docs/frontend";
-            foreach (var folder in ChainFolders(stack.Folder, area))
+            foreach (var folder in ChainFolders(stack.Folder, area).SelectMany(folder => CompanionFolders(root, folder).Prepend(folder)))
             {
                 foreach (var page in PagesDirectlyIn(root, folder))
                 {
@@ -115,6 +115,42 @@ static class Layout
             current = current[..current.LastIndexOf('/')];
         }
     }
+
+    /// <summary>
+    ///     The folders that apply with <paramref name="folder"/>: each subfolder, at any
+    ///     depth, that is not an <c>ext/</c> folder and holds no stack. A stack folder is
+    ///     one with a <c>stack.md</c> page, so <c>docs/frontend/patterns</c> applies with
+    ///     <c>docs/frontend</c> while <c>docs/frontend/web</c>, which holds stacks, does not.
+    /// </summary>
+    public static IEnumerable<string> CompanionFolders(string root, string folder)
+    {
+        var directory = Path.Combine(root, folder.Replace('/', Path.DirectorySeparatorChar));
+        if (!Directory.Exists(directory))
+        {
+            yield break;
+        }
+
+        foreach (var sub in Directory.GetDirectories(directory).OrderBy(name => name, StringComparer.Ordinal))
+        {
+            var name = Path.GetFileName(sub);
+            if (name == "ext" || HoldsStack(sub))
+            {
+                continue;
+            }
+
+            var relative = $"{folder.TrimEnd('/')}/{name}";
+            yield return relative;
+
+            foreach (var deeper in CompanionFolders(root, relative))
+            {
+                yield return deeper;
+            }
+        }
+    }
+
+    static bool HoldsStack(string directory) =>
+        File.Exists(Path.Combine(directory, "stack.md"))
+        || Directory.GetDirectories(directory).Any(sub => Path.GetFileName(sub) != "ext" && HoldsStack(sub));
 
     static IEnumerable<string> PagesDirectlyIn(string root, string folder)
     {

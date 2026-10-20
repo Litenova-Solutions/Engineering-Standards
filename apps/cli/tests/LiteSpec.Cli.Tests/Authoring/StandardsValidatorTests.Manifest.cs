@@ -275,12 +275,13 @@ public sealed partial class StandardsValidatorTests
         Assert.DoesNotContain("EXTENSION_UNLISTED", codes);
     }
 
-    [Fact(DisplayName = "page in a folder no stack covers")]
+    [Fact(DisplayName = "page in a stack folder the manifest does not list")]
     public void PageInUncoveredFolder()
     {
         var codes = LayerCodes(root =>
         {
             LayerPage(root, "docs/backend/sample/stack.md");
+            LayerPage(root, "docs/backend/stray/stack.md");
             LayerPage(root, "docs/backend/stray/orphan.md");
             StandardsFixture.Write(root, "litespec.manifest.json", "{\"stacks\":{\"sample\":{\"folder\":\"docs/backend/sample\"}}}");
         });
@@ -288,17 +289,18 @@ public sealed partial class StandardsValidatorTests
         Assert.Contains("LAYER_UNREACHABLE", codes);
     }
 
-    [Fact(DisplayName = "page in a nested folder of a stack")]
+    [Fact(DisplayName = "page in a folder holding no stack applies with its parent")]
     public void PageInNestedFolderOfAStack()
     {
         var codes = LayerCodes(root =>
         {
             LayerPage(root, "docs/backend/sample/stack.md");
             LayerPage(root, "docs/backend/sample/nested/deep.md");
-            StandardsFixture.Write(root, "litespec.manifest.json", "{\"stacks\":{\"sample\":{\"folder\":\"docs/backend/sample\"}}}");
+            LayerPage(root, "docs/frontend/patterns/record-detail.md");
+            StandardsFixture.Write(root, "litespec.manifest.json", "{\"stacks\":{\"sample\":{\"folder\":\"docs/backend/sample\"},\"web\":{\"folder\":\"docs/frontend/web\"}}}");
         });
 
-        Assert.Contains("LAYER_UNREACHABLE", codes);
+        Assert.DoesNotContain("LAYER_UNREACHABLE", codes);
     }
 
     [Fact(DisplayName = "pages in stack folders and their ancestors")]

@@ -14,7 +14,7 @@ static class Provisions
     public const string IndexPath = "docs/reference/provisions.md";
 
     /// <summary>Every provision kind (PROVISION_KINDS).</summary>
-    public static readonly IReadOnlyList<string> Kinds = ["convention", "rule"];
+    public static readonly IReadOnlyList<string> Kinds = ["convention", "pattern", "rule"];
 
     /// <summary>The provision identifier pattern as a .NET regex source (PROVISION_ID_SOURCE).</summary>
     public static readonly string IdSource = "litespec\\/[a-z0-9]+(?:-[a-z0-9]+)*(?:\\/[a-z0-9]+(?:-[a-z0-9]+)*)*#[a-z0-9]+(?:-[a-z0-9]+)*";
@@ -111,7 +111,8 @@ static class Provisions
                     section = heading.Groups[1].Value.Trim();
                 }
 
-                if (section != "Standards" && section != "Conventions")
+                var pattern = section == "Patterns" && Patterns.PatternPage.IsPatternPage(relative);
+                if (section != "Standards" && section != "Conventions" && !pattern)
                 {
                     continue;
                 }
@@ -132,7 +133,7 @@ static class Provisions
                     title,
                     relative,
                     slug,
-                    section == "Standards" ? "rule" : "convention",
+                    pattern ? "pattern" : section == "Standards" ? "rule" : "convention",
                     verification.Mark,
                     verification.Evidence));
             }

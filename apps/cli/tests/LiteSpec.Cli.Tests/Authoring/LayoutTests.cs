@@ -167,4 +167,27 @@ public sealed class LayoutTests
         ];
         Assert.Equal(expected, pages);
     }
+
+    [Fact(DisplayName = "a folder holding no stack applies with its parent")]
+    public void AFolderHoldingNoStackAppliesWithItsParent()
+    {
+        using var temp = Cli.Temp("layers");
+        Trees(temp.Path);
+        Page(temp.Path, "docs/frontend/patterns/record-detail.md");
+        Page(temp.Path, "docs/frontend/patterns/forms/inline.md");
+        Page(temp.Path, "docs/backend/sample/guides/errors.md");
+
+        var react = Layout.AppliedPages(temp.Path, Manifest(TreesManifest), "client-only", ["react"], []);
+        var sample = Layout.AppliedPages(temp.Path, Manifest(TreesManifest), "server", ["sample"], []);
+
+        Assert.Contains("docs/frontend/patterns/record-detail.md", react);
+        Assert.Contains("docs/frontend/patterns/forms/inline.md", react);
+        Assert.DoesNotContain("docs/frontend/web/react/native/stack.md", react);
+        Assert.DoesNotContain("docs/backend/sample/guides/errors.md", react);
+        Assert.Contains("docs/backend/sample/guides/errors.md", sample);
+        Assert.DoesNotContain("docs/frontend/patterns/record-detail.md", sample);
+        Assert.Equal(
+            new[] { "docs/frontend/patterns", "docs/frontend/patterns/forms" },
+            Layout.CompanionFolders(temp.Path, "docs/frontend"));
+    }
 }

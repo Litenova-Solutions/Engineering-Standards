@@ -43,6 +43,16 @@ public sealed partial class StandardsValidatorTests
     [Fact(DisplayName = "all page classes pass")]
     public void AllPageClassesPass() => Check(null, []);
 
+    [Fact(DisplayName = "pattern page with a broken wireframe")]
+    public void PatternPageWithBrokenWireframe() => Check(
+        root => StandardsFixture.Write(root, "docs/frontend/patterns/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.PatternPage, "action \"Refund\"", "button \"Refund\"")),
+        ["PATTERN_INVALID"]);
+
+    [Fact(DisplayName = "pattern page whose heading names the pattern rather than an action")]
+    public void PatternHeadingNamesThePattern() => Check(
+        root => StandardsFixture.Write(root, "docs/frontend/patterns/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.PatternPage, "## Patterns\n\n### Record header", "## Standards\n\n### Header layout")),
+        ["HEADING_ACTION"]);
+
     [Fact(DisplayName = "tutorial that omits what the reader built")]
     public void TutorialOmitsWhatReaderBuilt() => Check(
         root => StandardsFixture.Write(root, "docs/tutorial/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.TutorialPage, "## What you built", "## Verification")),
@@ -220,6 +230,7 @@ public sealed partial class StandardsValidatorTests
             "PAGE_TITLE_CASE",
             "PAGE_TITLE_COUNT",
             "PAGE_UNKNOWN_SECTION",
+            "PATTERN_INVALID",
             "PROSE_AND_OR",
             "PROSE_CONTRACTION",
             "PROSE_LIST_LENGTH",

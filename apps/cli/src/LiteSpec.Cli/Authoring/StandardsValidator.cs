@@ -79,6 +79,7 @@ static partial class StandardsValidator
         "PAGE_TITLE_CASE",
         "PAGE_TITLE_COUNT",
         "PAGE_UNKNOWN_SECTION",
+        "PATTERN_INVALID",
         "PROSE_AND_OR",
         "PROSE_CONTRACTION",
         "PROSE_LIST_LENGTH",

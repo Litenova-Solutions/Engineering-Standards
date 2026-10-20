@@ -47,6 +47,84 @@ The catalog is one file valid against `schemas/ui-pattern-catalog.schema.json`. 
 
 The `breakpoints` map names viewport widths, and `groups` collect related patterns. The optional `registry` field names the command or path rendering every product-added option for review.
 
+### Pattern pages
+
+A pattern page holds one group of patterns, such as `docs/frontend/patterns/record-detail.md`. The folder holds no stack, so its pages apply wherever `docs/frontend/` applies. Each `###` heading under `## Patterns` names one pattern, and its ID is `litespec/frontend/patterns/<group>#<pattern-slug>`. The heading is a name rather than an action, so the ID survives a change of default.
+
+A pattern carries four labelled fields, then its options.
+
+| Field | What it holds |
+|:---|:---|
+| `**Question:**` | The recurring question and its situation |
+| `**Default:**` | The option ID a project builds unless its catalog records another |
+| `**Compact:**` | How the default behaves on a narrow screen |
+| `**Rationale:**` | Why the default, the runner-up and when to prefer it, and what never to ship |
+
+Each option is a `####` heading of the form ``#### `option-id`: Option name``. It carries one `wireframe` block, an optional `wireframe compact` block for a different phone layout, then `**Rationale:**`, `**Cost:**` and an optional `**Reference:**`. An option ID is stable once published. The page's Standards hold the rules every option keeps.
+
+### The wireframe language
+
+A wireframe states the structure of one option: which parts sit where, in what order, which action is primary, and the copy they show. It states no colour, font, spacing or component library. An agent builds the option from the text in its own stack and design system. `litespec patterns preview` draws the text for a person to choose from.
+
+```wireframe
+page
+  breadcrumb "Orders" "SO-1042"
+  header
+    heading "SO-1042"
+    status "Paid" positive
+    action primary "Mark as shipped"
+    menu "More"
+      action "Duplicate"
+      action destructive "Cancel order"
+  split 2:1
+    region "Items"
+      table 3 "Item" "Qty" "Total"
+        item: text "Oak desk lamp" · text "2" · text "EUR 90.00"
+    aside
+      card "Customer"
+        fact "Name" "Maria Garcia"
+```
+
+Each line is one part: its name, its modifiers as bare words, its copy in double quotes, then a count or a ratio. Children are indented by two spaces. A line ending in `:` takes inline children, which sit side by side. A middle dot, U+00B7, with a space on each side separates them. A line starting with `#` is a comment. Copy is the real text the product would show, drawn from the Acme Supply cast.
+
+The parts form a closed set.
+
+| Group | Parts |
+|:---|:---|
+| Structure | `page`, `header`, `footer`, `region`, `aside`, `card`, `row`, `split`, `tabs`, `nav`, `breadcrumb`, `toolbar` |
+| Content | `heading`, `text`, `fact`, `figure`, `status`, `message`, `avatar`, `image`, `icon`, `link`, `divider` |
+| Actions and input | `action`, `menu`, `field` |
+| Collections | `list`, `table`, `grid`, `timeline`, `item` |
+| Overlays | `dialog`, `drawer`, `popover`, `toast` |
+
+The modifiers belong to their parts.
+
+| Part | Modifiers |
+|:---|:---|
+| `action` | `primary`, `secondary`, `destructive`, `quiet`, `disabled` |
+| `field` | `text`, `number`, `date`, `select`, `textarea`, `checkbox`, `radio`, `toggle`, `search`, `file`, and a value after `=` |
+| `status`, `message`, `toast` | `neutral`, `positive`, `caution`, `critical`, `info` |
+| `heading` | `small` |
+| `text` | `muted` |
+| `link` | `current` |
+| `nav` | `side` |
+| `footer`, `toolbar`, `aside` | `sticky` |
+| `drawer` | `right`, `left`, `bottom` |
+
+The validator holds each block to these rules.
+
+| Rule | Example |
+|:---|:---|
+| One `page`, at the top | A block never starts with `header` |
+| A `split` holds one child per ratio part | `split 2:1` holds two children |
+| A `row` holds at least two children | |
+| A `list`, `grid` or `timeline` holds one template child and a count | `list 3` with one `item` |
+| A `table` names its columns and a count | `table 4 "Item" "Qty"` |
+| A `header`, `footer`, `toolbar` or overlay holds at most one primary action | |
+| An overlay is a child of `page`, after the page content | `dialog` last in `page` |
+
+On a phone the drawing reflows unless a `wireframe compact` block says otherwise. A `row` or `split` stacks, an `aside` follows the main content, a table keeps its first two columns, and a drawer rises from the bottom.
+
 ### The pattern library
 
 LiteSpec ships a UI pattern library at `packages/ui-patterns`, holding every recurring screen, element, and scenario of a business application. Each library pattern carries several drawn options, a recommended option, and a compact-screen behaviour, in `packages/ui-patterns/library.json`.

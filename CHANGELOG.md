@@ -33,6 +33,13 @@ The first release of LiteSpec: the standards contract for one bounded-context bu
 - `litespec book` generates the project book, a static site with one page per record, an index per type, a lens per actor, a review page, a glossary and search.
 - `litespec consumer` checks the project file, the selection of size, shape, stacks and extensions, every record page against `schemas/record.schema.json`, the controlled prose measures and the project language. `litespec ui` checks the controlled web UI contract. `prose.enforcement: report` turns the prose measures into advisories.
 - `litespec validate` and `litespec provisions` check this repository's own pages, schemas, manifest and provision index.
+- `litespec patterns` draws the UI pattern wireframes for a person to choose from. `preview` writes one offline page with every option at desktop and phone width, `svg` prints one option, and `check` reports broken wireframes.
+
+### UI patterns
+
+- A pattern page in `docs/frontend/patterns/` answers one group of recurring interface questions. Each pattern names its question, its default option, its compact behaviour and its rationale. Each option carries a wireframe in a closed text language, its rationale and its cost.
+- The wireframe language, defined in `docs/frontend/patterns.md`, states structure and real copy, never style. An agent builds an option in its own stack and design system. A pattern ID is `litespec/frontend/patterns/<group>#<pattern>`.
+- Record detail is the first group: 14 patterns and 101 options.
 
 ### Pins
 

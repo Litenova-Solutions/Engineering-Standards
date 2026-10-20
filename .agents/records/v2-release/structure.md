@@ -19,7 +19,9 @@ docs/
 │  │  │                  A group, not a stack: it has no stack.md and cannot be selected.
 │  │  ├─ react/          the react stack: stack.md, components.md
 │  │  └─ svelte/         the svelte stack: stack.md, components.md
-│  └─ blazor/            the blazor stack: stack.md, structure, rendering, components, data, browser, testing
+│  ├─ blazor/            the blazor stack: stack.md, structure, rendering, components, data, browser, testing
+│  └─ patterns/          UI pattern pages, one per group (record-detail.md). Holds no stack, so it applies
+│                        wherever frontend/ applies.
 ├─ tools/  reference/  tutorial/  guide/      no provisions are applied from here by selection
 └─ README.md
 ```
@@ -82,7 +84,7 @@ The `profile/` area and the stack pages' Composition sections no longer exist.
 Given `size`, `shape` (default `server`), `stacks` and `selectedExtensions`:
 
 1. Every page directly in `docs/core/`, `docs/workspace/` and `docs/quality/`.
-2. For each selected stack with folder `F`: every page **directly** in `F` and in each folder between `docs/<area>/` and `F`, inclusive of `docs/<area>/` itself. Pages in sibling folders, in nested stack folders and in `ext/` folders are not included. Selecting `react` applies `docs/frontend/*.md`, `docs/frontend/web/*.md` and `docs/frontend/web/react/*.md`.
+2. For each selected stack with folder `F`: every page **directly** in `F` and in each folder between `docs/<area>/` and `F`, inclusive of `docs/<area>/` itself. Pages in sibling folders, in nested stack folders and in `ext/` folders are not included. Selecting `react` applies `docs/frontend/*.md`, `docs/frontend/web/*.md` and `docs/frontend/web/react/*.md`. A subfolder of any of those folders that holds no stack, such as `docs/frontend/patterns/`, applies with it; a stack folder is one with a `stack.md` page.
 3. In the `client-only` shape: no backend stack, and the backend pages the shape lists.
 4. Each selected extension's page.
 5. A deeper page, a selected extension's `replaces`, and a project Exception record replace the named provision of a shallower page. Order of precedence: project exception, extension, deeper page, shallower page.
