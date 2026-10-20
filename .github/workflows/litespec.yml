@@ -36,10 +36,10 @@ jobs:
         run: dotnet test --solution LiteSpec.slnx --no-build
 
       - name: Check the generated provision index
-        run: dotnet run --project src/LiteSpec.Cli --no-build -- provisions --check
+        run: dotnet run --project apps/cli/src/LiteSpec.Cli --no-build -- provisions --check
 
       - name: Validate the LiteSpec repository
-        run: dotnet run --project src/LiteSpec.Cli --no-build -- validate
+        run: dotnet run --project apps/cli/src/LiteSpec.Cli --no-build -- validate
 
       - name: Check whitespace errors
         run: git diff --check
@@ -60,7 +60,7 @@ jobs:
           package-manager-cache: false
 
       - name: Check the generated pattern library
-        run: node patterns/ui/library.mjs --check
+        run: node packages/ui-patterns/library.mjs --check
 
   skipped-checks:
     if: github.event_name == 'pull_request'

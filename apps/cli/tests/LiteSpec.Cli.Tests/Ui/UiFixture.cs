@@ -120,7 +120,7 @@ sealed class UiFixture : IDisposable
     public string LiteSpecDir => Join("litespec");
 
     /// <summary>The fixture UI pattern library the fixture-local run reads.</summary>
-    public string FixtureLibrary => Join("litespec/patterns/ui/library.json");
+    public string FixtureLibrary => Join("litespec/packages/ui-patterns/library.json");
 
     /// <summary>Builds a fresh fixture from the tracked templates.</summary>
     public static UiFixture Create()
@@ -340,7 +340,7 @@ sealed class UiFixture : IDisposable
             "apps/web/src/modules",
             "docs/exceptions",
             "litespec/schemas",
-            "litespec/patterns/ui",
+            "litespec/packages/ui-patterns",
         })
         {
             Directory.CreateDirectory(Join(directory));

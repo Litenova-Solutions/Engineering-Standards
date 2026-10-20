@@ -49,11 +49,11 @@ The `breakpoints` map names viewport widths, and `groups` collect related patter
 
 ### The pattern library
 
-LiteSpec ships a UI pattern library at `patterns/ui`, holding every recurring screen, element, and scenario of a business application. Each library pattern carries several drawn options, a recommended option, and a compact-screen behaviour, in `patterns/ui/library.json`.
+LiteSpec ships a UI pattern library at `packages/ui-patterns`, holding every recurring screen, element, and scenario of a business application. Each library pattern carries several drawn options, a recommended option, and a compact-screen behaviour, in `packages/ui-patterns/library.json`.
 
 The library mocks are plain HTML and CSS in semantic tokens, so a reader on any frontend stack reads them without running a stack toolchain. Every mock draws on one neutral cast, Acme Supply, a wholesale supplier back office, so a reader moving between options meets the same records.
 
-Browse the library in the viewer at `patterns/ui/dist/ui-patterns.html`, built by `node patterns/ui/build.mjs`. The viewer shows light and dark themes, viewports from 390 CSS pixels to full screen, a side-by-side comparison, and a slideshow. `node patterns/ui/serve.mjs` serves the viewer on localhost and writes reviewer choices to a choices file beside it.
+Browse the library in the viewer at `packages/ui-patterns/dist/ui-patterns.html`, built by `node packages/ui-patterns/build.mjs`. The viewer shows light and dark themes, viewports from 390 CSS pixels to full screen, a side-by-side comparison, and a slideshow. `node packages/ui-patterns/serve.mjs` serves the viewer on localhost and writes reviewer choices to a choices file beside it.
 
 ### Starting a catalog from the library
 

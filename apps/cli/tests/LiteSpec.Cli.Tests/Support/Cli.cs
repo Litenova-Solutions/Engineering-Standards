@@ -23,7 +23,7 @@ static class Cli
 
     /// <summary>A folder under the test fixtures, from forward-slash segments.</summary>
     public static string Fixture(string relative) =>
-        Path.Combine(Repository, "tests", "LiteSpec.Cli.Tests", "Fixtures", relative.Replace('/', Path.DirectorySeparatorChar));
+        Path.Combine(Repository, "apps", "cli", "tests", "LiteSpec.Cli.Tests", "Fixtures", relative.Replace('/', Path.DirectorySeparatorChar));
 
     /// <summary>Runs <c>litespec</c> with the arguments, in the working directory when one is given.</summary>
     public static CliResult Run(IEnumerable<string> args, string? workingDirectory = null, IDictionary<string, string>? environment = null)

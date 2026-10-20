@@ -1,6 +1,6 @@
 # Model fixtures
 
-Two fixture consumers and one broken overlay per check. The suite in `tests/LiteSpec.Cli.Tests/Model/ModelCheckTests.cs` copies a fixture to a temporary folder, applies an overlay, and runs the model builder check.
+Two fixture consumers and one broken overlay per check. The suite in `apps/cli/tests/LiteSpec.Cli.Tests/Model/ModelCheckTests.cs` copies a fixture to a temporary folder, applies an overlay, and runs the model builder check.
 
 Run the suite with:
 
@@ -11,7 +11,7 @@ dotnet test --solution LiteSpec.slnx
 Or check one fixture directly:
 
 ```bash
-litespec model check --root tests/LiteSpec.Cli.Tests/Fixtures/Model/small
+litespec model check --root apps/cli/tests/LiteSpec.Cli.Tests/Fixtures/Model/small
 ```
 
 ## Fixtures

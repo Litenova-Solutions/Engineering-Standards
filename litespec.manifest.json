@@ -8,7 +8,7 @@
     "docs": "docs",
     "template": "templates",
     "extension": "docs/ext",
-    "uiPatternLibrary": "patterns/ui"
+    "uiPatternLibrary": "packages/ui-patterns"
   },
   "stacks": {
     "dotnet": {

@@ -48,7 +48,10 @@ static partial class UiValidator
             List<KeyValuePair<JsValue, JsonNode?>>? libraryById = null;
             if (citesLibrary)
             {
-                var libraryFile = LiteSpecHome.PathTo("patterns/ui/library.json");
+                // The manifest names where the release keeps its pattern library.
+                var libraryFolder = CliJson.TryRead(LiteSpecHome.PathTo(LiteSpecHome.ManifestFile))?["paths"]?["uiPatternLibrary"] is JsonValue folder
+                    && folder.TryGetValue<string>(out var configured) ? configured : "packages/ui-patterns";
+                var libraryFile = LiteSpecHome.PathTo($"{libraryFolder}/library.json");
                 if (!File.Exists(libraryFile))
                 {
                     Errors.Add($"{label}: the UI pattern library is missing from the LiteSpec release");

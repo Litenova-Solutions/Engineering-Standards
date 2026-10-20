@@ -58,4 +58,4 @@ litespec book --model ../consumer/.model/model.json --out ../consumer/.book --fi
 
 ## Underneath
 
-It copies its stylesheet and script into the output beside the pages it writes. It writes `search.json`, the title and id index the search page filters. It embeds that same index in the search page so search works when the site opens as files. Nothing beneath it is separately runnable. The book fixtures under `tests/LiteSpec.Cli.Tests/` hold the model and findings for the large library fixture with one use case left unimplemented.
+It copies its stylesheet and script into the output beside the pages it writes. It writes `search.json`, the title and id index the search page filters. It embeds that same index in the search page so search works when the site opens as files. Nothing beneath it is separately runnable. The book fixtures under `apps/cli/tests/LiteSpec.Cli.Tests/` hold the model and findings for the large library fixture with one use case left unimplemented.

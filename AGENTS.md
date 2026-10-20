@@ -40,7 +40,7 @@ A consumer records the release it reviewed in `reviewedLiteSpecVersion`. (litesp
 Run the query from the LiteSpec root as below, adding the `litespec/` prefix from a consumer root. (litespec/core/agent#select-task-context)
 
 ```bash
-dotnet run --project src/LiteSpec.Cli -- model query <id>
+dotnet run --project apps/cli/src/LiteSpec.Cli -- model query <id>
 ```
 
 The [command index](docs/tools/README.md) states how `litespec` runs in each repository. (litespec/core/agent#select-task-context)
@@ -100,9 +100,9 @@ Run these checks for the LiteSpec repository. (litespec/core/authoring#run-repea
 ```bash
 dotnet build LiteSpec.slnx
 dotnet test --solution LiteSpec.slnx
-dotnet run --project src/LiteSpec.Cli -- provisions
-dotnet run --project src/LiteSpec.Cli -- validate
-node patterns/ui/library.mjs --check
+dotnet run --project apps/cli/src/LiteSpec.Cli -- provisions
+dotnet run --project apps/cli/src/LiteSpec.Cli -- validate
+node packages/ui-patterns/library.mjs --check
 git diff --check
 ```
 

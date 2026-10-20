@@ -8,13 +8,13 @@ Every command accepts `--help`, and every validator accepts `--format json` for 
 
 ## Run the CLI
 
-In the LiteSpec repository, run `dotnet run --project src/LiteSpec.Cli -- <command>`. In a consumer that pins LiteSpec at `litespec/`, run `dotnet run --project litespec/src/LiteSpec.Cli -- <command>`. The pages write both forms as `litespec <command>`.
+In the LiteSpec repository, run `dotnet run --project apps/cli/src/LiteSpec.Cli -- <command>`. In a consumer that pins LiteSpec at `litespec/`, run `dotnet run --project litespec/apps/cli/src/LiteSpec.Cli -- <command>`. The pages write both forms as `litespec <command>`.
 
 The CLI needs the .NET 10 SDK and no Node runtime or package install. `dotnet test --solution LiteSpec.slnx` runs the test suite of the CLI.
 
 The CLI finds its LiteSpec checkout above its own binary. Set `LITESPEC_HOME` to a checkout folder to read another one. Set `LITESPEC_TIMING` to print the phase timings of `litespec model` on standard error.
 
-The UI pattern library under `patterns/ui/` keeps its Node tooling (`node patterns/ui/library.mjs --check`), because its items are JavaScript modules that draw HTML for a browser viewer.
+The UI pattern library under `packages/ui-patterns/` keeps its Node tooling (`node packages/ui-patterns/library.mjs --check`), because its items are JavaScript modules that draw HTML for a browser viewer.
 
 ## LiteSpec repository
 

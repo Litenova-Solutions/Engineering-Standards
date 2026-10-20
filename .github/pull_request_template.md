@@ -6,9 +6,9 @@ State the constraint, decision, or defect that requires the change.
 
 - [ ] `dotnet build LiteSpec.slnx`
 - [ ] `dotnet test --solution LiteSpec.slnx`
-- [ ] `dotnet run --project src/LiteSpec.Cli -- provisions`
-- [ ] `dotnet run --project src/LiteSpec.Cli -- validate`
-- [ ] `node patterns/ui/library.mjs --check`
+- [ ] `dotnet run --project apps/cli/src/LiteSpec.Cli -- provisions`
+- [ ] `dotnet run --project apps/cli/src/LiteSpec.Cli -- validate`
+- [ ] `node packages/ui-patterns/library.mjs --check`
 - [ ] `git diff --check`
 
 ## Authoring Review

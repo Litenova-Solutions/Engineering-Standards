@@ -712,7 +712,7 @@
       el("p", { class: "where", html: "One file holds every decision: <code>ui-pattern-choices.json</code>. Each entry names the item, the chosen option with its rationale and cost, the shortlist, and your note." }),
       el("p", { class: "hint-line", id: "file-state", text: sink.state }),
       acts,
-      sink.mode === "server" ? null : el("p", { class: "hint-line", html: "To write straight into the repository instead, run <code>node litespec/patterns/ui/serve.mjs</code> and open the address it prints." }),
+      sink.mode === "server" ? null : el("p", { class: "hint-line", html: "To write straight into the repository instead, run <code>node litespec/packages/ui-patterns/serve.mjs</code> and open the address it prints." }),
     ]));
     var notes = el("textarea", { placeholder: "General notes for the whole application: direction, tone, things that apply to every pattern.", "aria-label": "General notes" });
     notes.value = choices.notes || "";

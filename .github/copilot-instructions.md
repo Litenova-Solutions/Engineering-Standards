@@ -8,16 +8,16 @@ Every provision ID is `litespec/<page>#<slug>`: the page path under `docs/` and 
 
 A changed assertion takes a new ID. Do not edit an active Requirement in place, and do not add an alias or a replacement map. `CONTRIBUTING.md` states the amendment order.
 
-The CLI is the one .NET project under `src/LiteSpec.Cli`, its tests are under `tests/LiteSpec.Cli.Tests`, and a new package needs the owner's approval in `Directory.Packages.props`.
+The CLI is the one .NET project under `apps/cli/src/LiteSpec.Cli`, its tests are under `apps/cli/tests/LiteSpec.Cli.Tests`, and a new package needs the owner's approval in `Directory.Packages.props`.
 
 Run the test suite and the repository validator before proposing a change:
 
 ```bash
 dotnet build LiteSpec.slnx
 dotnet test --solution LiteSpec.slnx
-dotnet run --project src/LiteSpec.Cli -- provisions
-dotnet run --project src/LiteSpec.Cli -- validate
-node patterns/ui/library.mjs --check
+dotnet run --project apps/cli/src/LiteSpec.Cli -- provisions
+dotnet run --project apps/cli/src/LiteSpec.Cli -- validate
+node packages/ui-patterns/library.mjs --check
 git diff --check
 ```
 

@@ -55,16 +55,21 @@ The [template index](templates/consumer/README.md) lists each consumer template 
 
 ## Repository Structure
 
+The standard sits at the root, because the root is what a consumer pins at `litespec/`. Each deliverable beside it has its own folder.
+
 ```text
-docs/                    One directory per provision area, plus guides, commands, and reference material
-schemas/                 JSON contracts for standards and consumer configuration
-templates/consumer/      Consumer record templates
-templates/standard/      Standards authoring templates
-src/LiteSpec.Cli/        The litespec command line
-tests/LiteSpec.Cli.Tests/  Its test suite and fixtures
-LiteSpec.slnx            The solution joining the command and its tests
-patterns/ui/             The UI pattern library, its data, and its viewer
-litespec.manifest.json  Versions, stacks, extensions, and package pins
+docs/                       The standard: core, workspace, quality, backend and frontend principles, stack folders, extensions
+schemas/                    JSON contracts for the manifest, the project file, records, and UI files
+templates/                  Consumer record templates, standard authoring templates, and project presets
+litespec.manifest.json      Version, stacks, shapes, extensions, and package pins
+apps/
+  cli/                      The litespec command line
+    LiteSpec.Cli.slnx
+    src/LiteSpec.Cli/
+    tests/LiteSpec.Cli.Tests/
+packages/
+  ui-patterns/              The UI pattern library, its data, and its viewer
+LiteSpec.slnx               Every .NET project in the repository
 ```
 
 ## Project

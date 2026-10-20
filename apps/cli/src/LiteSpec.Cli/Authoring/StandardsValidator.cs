@@ -498,8 +498,8 @@ static partial class StandardsValidator
             && relative != "changelog"
             && !relative.StartsWith("changelog/", StringComparison.Ordinal)
             && relative != "LICENSE.md"
-            && !relative.StartsWith("src/", StringComparison.Ordinal)
-            && !relative.StartsWith("tests/", StringComparison.Ordinal);
+            && !relative.StartsWith("apps/", StringComparison.Ordinal)
+            && !relative.StartsWith("packages/", StringComparison.Ordinal);
     }
 
     static int LineNumber(string text, int offset)

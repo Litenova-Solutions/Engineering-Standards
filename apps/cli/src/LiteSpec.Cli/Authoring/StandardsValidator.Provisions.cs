@@ -429,8 +429,8 @@ static partial class StandardsValidator
         {
             var candidate = rawCandidate.StartsWith("litespec/", StringComparison.Ordinal) ? rawCandidate["litespec/".Length..] : rawCandidate;
             if (!candidate.StartsWith("tools/", StringComparison.Ordinal)
-                && !candidate.StartsWith("src/LiteSpec.", StringComparison.Ordinal)
-                && !candidate.StartsWith("tests/LiteSpec.", StringComparison.Ordinal))
+                && !candidate.StartsWith("apps/", StringComparison.Ordinal)
+                && !candidate.StartsWith("packages/", StringComparison.Ordinal))
             {
                 continue;
             }

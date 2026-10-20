@@ -2,7 +2,7 @@
  * Serves the registry on localhost and writes the reviewer's choices to
  * ui-pattern-choices.json beside it, on every change.
  *
- *   node litespec/patterns/ui/serve.mjs [port]
+ *   node litespec/packages/ui-patterns/serve.mjs [port]
  *
  * Opened from disk, the registry can only write a file the reviewer picks in a
  * dialog. Opened through this server, the file always lands at the same path

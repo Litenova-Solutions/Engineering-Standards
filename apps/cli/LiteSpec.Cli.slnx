@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LiteSpec.Cli/LiteSpec.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LiteSpec.Cli.Tests/LiteSpec.Cli.Tests.csproj" />
+  </Folder>
+</Solution>

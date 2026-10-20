@@ -97,6 +97,10 @@ The owner first chose `litenova.solutions/LiteSpec`, then pivoted to buying `lit
 
 Chosen by the owner on 2026-10-20 after comparing layer-nested, concern-nested and separate-repository layouts, and after stating that v1 rules do not bind v2. The full target and build notes are in [structure.md](structure.md). In short: a stack is a folder inside its area (`backend/dotnet/`, `frontend/web/react/`); a stack applies its folder and every folder above it; a provision ID is `litespec/<page>#<slug>` with no ID in the heading; a project names a size, a shape (`server` or `client-only`) and its stacks; v1 profiles became presets for `litespec init`. 2.0.0 is a clean-slate release: it carries no migration map, no refusal of 1.x forms, and no compatibility default. This supersedes the `docs/dotnet/` area and the `specification` manifest list of D11's successor (stack-bindings.md).
 
+### D13. The repository is a monorepo with the standard at the root
+
+Chosen by the owner on 2026-10-20. The standard (`docs/`, `schemas/`, `templates/`, `litespec.manifest.json`) stays at the root, because a consumer pins the root at `litespec/` and every path it reads starts there. Each deliverable has its own folder, following LiteSpec's own workspace rules where they apply: the CLI at `apps/cli/` (its solution beside `src/` and `tests/`), the UI pattern library at `packages/ui-patterns/`, and later `apps/site/` and `packages/analyzers/`. A root `LiteSpec.slnx` lists every .NET project. Rejected: separate repositories (a CLI must match its release exactly) and the standard under `spec/` (an empty segment in every consumer path). The UI validator now reads the pattern library folder from the manifest's `paths.uiPatternLibrary`.
+
 ## Progress
 
 - [x] Rename sweep (commit `a37601c`).

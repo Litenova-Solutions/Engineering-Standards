@@ -1,8 +1,8 @@
 /**
  * The UI pattern library as data, generated from the drawn items.
  *
- *   node patterns/ui/library.mjs --write   regenerate library.json from items/*.mjs
- *   node patterns/ui/library.mjs --check   fail when library.json differs from what --write would produce
+ *   node packages/ui-patterns/library.mjs --write   regenerate library.json from items/*.mjs
+ *   node packages/ui-patterns/library.mjs --check   fail when library.json differs from what --write would produce
  *
  * library.json is what a consumer's pattern catalog cites. It is derived from the
  * items, so it is never edited by hand: change an item, then run --write.
@@ -87,10 +87,10 @@ if (problems.length) {
   let current = "";
   try { current = readFileSync(OUT, "utf8"); } catch { /* absent */ }
   if (current.replace(/\r\n/g, "\n") !== text) {
-    console.error("library.json is stale: run node patterns/ui/library.mjs --write");
+    console.error("library.json is stale: run node packages/ui-patterns/library.mjs --write");
     process.exitCode = 1;
   } else console.log(`library.json is current: ${count} patterns`);
 } else {
-  console.error("usage: node patterns/ui/library.mjs --write | --check");
+  console.error("usage: node packages/ui-patterns/library.mjs --write | --check");
   process.exitCode = 2;
 }
