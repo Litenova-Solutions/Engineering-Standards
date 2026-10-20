@@ -11,7 +11,6 @@
   "reason": "<Why this departure is needed>",
   "reviewBy": "<YYYY-MM-DD>",
   "removeWhen": "<The condition that ends this exception>",
-  "replaces": "<exception id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

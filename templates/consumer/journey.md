@@ -17,7 +17,6 @@
       "requires": ["<what must exist first>"]
     }
   ],
-  "replaces": "<journey id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

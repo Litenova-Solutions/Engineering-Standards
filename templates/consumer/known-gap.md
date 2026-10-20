@@ -11,7 +11,6 @@
   "subject": ["<record id>"],
   "endsBy": "<YYYY-MM-DD>",
   "reason": "<Why this gap is accepted for now>",
-  "replaces": "<known-gap id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

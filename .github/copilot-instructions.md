@@ -8,18 +8,19 @@ Every provision ID is `litespec/<kind>/<page>.<heading-slug>`, and the page segm
 
 A changed assertion takes a new ID. Do not edit an active Requirement in place, and do not add an alias or a replacement map. `CONTRIBUTING.md` states the amendment order.
 
-Node tools stay dependency-free with no install step. Do not add a package manifest, a lockfile, or a runtime dependency to `tools/`. The model builder is the one .NET project, under `tools/model/`.
+The CLI is the one .NET project under `src/LiteSpec.Cli`, its tests are under `tests/LiteSpec.Cli.Tests`, and a new package needs the owner's approval in `Directory.Packages.props`.
 
-Run the fixture suites and the repository validator before proposing a change:
+Run the test suite and the repository validator before proposing a change:
 
 ```bash
-node tools/validate-standards.cases.mjs
-node tools/validate-ui.cases.mjs
-node tools/validate-consumer.cases.mjs
-dotnet build tools/model/Litenova.Model
-node tools/model.cases.mjs
-node tools/validate-standards.mjs
-node tools/generate-provisions.mjs
+dotnet build LiteSpec.slnx
+dotnet test --solution LiteSpec.slnx
+dotnet run --project src/LiteSpec.Cli -- provisions
+dotnet run --project src/LiteSpec.Cli -- validate
+node patterns/ui/library.mjs --check
+git diff --check
 ```
+
+The [command index](../docs/tools/README.md) states how `litespec` runs in each repository.
 
 Authored prose is ASCII, active voice, and bounded by the measures in `docs/core/authoring.md`. A list sentence has at most 20 words and any other sentence at most 25.

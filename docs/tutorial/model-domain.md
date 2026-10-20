@@ -138,7 +138,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     ```
 
     Create subfolders only when real types require them.
-14. Run the model check. Run `dotnet run --project litespec/tools/model -- check` from the consumer root. It resolves every citation, computes the code, screen, and test links, and reports each unproved case.
+14. Run the model check. Run `litespec model check` from the consumer root. It resolves every citation, computes the code, screen, and test links, and reports each unproved case. The [command index](../tools/README.md) states how `litespec` runs in a consumer.
 
 ## What you built
 

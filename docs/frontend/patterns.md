@@ -211,13 +211,13 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/frontend-patterns.keep-one-pattern-catalog | checkable | `node litespec/tools/validate-ui.mjs` reports a missing catalog or a schema failure. |
-| litespec/rule/frontend-patterns.record-every-option-considered | checkable | `node litespec/tools/validate-ui.mjs` reports fewer than two options or a choice naming no option. |
+| litespec/rule/frontend-patterns.keep-one-pattern-catalog | checkable | `litespec ui` reports a missing catalog or a schema failure. |
+| litespec/rule/frontend-patterns.record-every-option-considered | checkable | `litespec ui` reports fewer than two options or a choice naming no option. |
 | litespec/rule/frontend-patterns.record-who-chose | guidance | Does each decision record owner or recommended, with no agent-marked owner choice? |
-| litespec/rule/frontend-patterns.declare-the-compact-behaviour | checkable | `node litespec/tools/validate-ui.mjs` reports a compact option naming no recorded option. |
-| litespec/rule/frontend-patterns.implement-a-chosen-pattern-once | checkable | `node litespec/tools/validate-ui.mjs` reports a named component path that does not exist. |
+| litespec/rule/frontend-patterns.declare-the-compact-behaviour | checkable | `litespec ui` reports a compact option naming no recorded option. |
+| litespec/rule/frontend-patterns.implement-a-chosen-pattern-once | checkable | `litespec ui` reports a named component path that does not exist. |
 | litespec/rule/frontend-patterns.update-the-catalog-with-the-code | guidance | Did the catalog entry change with its implementation or name a record? |
-| litespec/rule/frontend-patterns.state-the-implementation-status | checkable | `node litespec/tools/validate-ui.mjs` reports a partial or pending entry without a gap. |
+| litespec/rule/frontend-patterns.state-the-implementation-status | checkable | `litespec ui` reports a partial or pending entry without a gap. |
 | litespec/rule/frontend-patterns.keep-the-catalog-platform-neutral | guidance | Does any pattern name a component library outside implementations? |
 | litespec/rule/frontend-patterns.keep-a-visual-registry | guidance | Does the registry render every product-added option in each theme at 390 and 1280 pixels? |
 | litespec/rule/frontend-patterns.report-pattern-feedback-after-the-work | guidance | Does each completion report carry proposals with pattern id, change, reason, and option? |

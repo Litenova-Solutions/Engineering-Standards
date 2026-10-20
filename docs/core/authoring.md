@@ -231,7 +231,7 @@ Every normative page ends with a Verification table:
 ```markdown
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/page.state-one-action | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic. |
+| litespec/rule/page.state-one-action | checkable | `litespec validate` emits no `PAGE_MISSING_SECTION` diagnostic. |
 ```
 
 Each row marks its provision `checkable` or `guidance`. A `checkable` row names the tool that checks the provision, and its evidence starts with that tool's command in backticks. A `guidance` row states the question a reviewer answers, in one sentence.
@@ -456,7 +456,7 @@ Generic text such as `verify compliance` or `inspect evidence` is invalid.
 
 ### Regenerate the provision index (litespec/rule/core-authoring.regenerate-the-provision-index)
 
-**Requirement:** A standards change MUST leave `docs/reference/provisions.md` equal to the output of `node tools/generate-provisions.mjs`.
+**Requirement:** A standards change MUST leave `docs/reference/provisions.md` equal to the output of `litespec provisions`.
 
 **Rationale:** One generated page resolves every ID to its heading and owning page, so a reader follows a citation in one step instead of searching.
 
@@ -533,7 +533,7 @@ Every command declares an audit position. To count the declarations:
 
 **Requirement:** A standards change MUST pass the repository validator, every fixture suite, and `git diff --check`.
 
-**Rationale:** Every skipped check appears with its exact reason in the change report. The tools README names each fixture suite and its command.
+**Rationale:** Every skipped check appears with its exact reason in the change report. The [command index](../tools/README.md) names each check and its command.
 
 ### Validate current standards material (litespec/rule/core-authoring.validate-current-standards-material)
 
@@ -613,48 +613,48 @@ The identifier above is a grammar placeholder. A real page uses the page segment
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/core-authoring.keep-authored-prose-ascii-safe | checkable | `node tools/validate-standards.mjs` emits no `PROSE_NON_ASCII` diagnostic. |
+| litespec/rule/core-authoring.keep-authored-prose-ascii-safe | checkable | `litespec validate` emits no `PROSE_NON_ASCII` diagnostic. |
 | litespec/rule/core-authoring.exclude-declared-content-paths-from-the-ascii-check | guidance | Does the project record name every path outside the ASCII check, with documents about that content still checked? |
-| litespec/rule/core-authoring.use-one-normative-vocabulary | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_MODAL_COUNT` or `STANDARD_MODAL_VOCABULARY` diagnostic. |
-| litespec/rule/core-authoring.apply-controlled-prose-measures | checkable | `node tools/validate-standards.mjs` emits no `PROSE_SENTENCE_LENGTH`, `PROSE_LIST_LENGTH`, `PROSE_TABLE_CELL_LENGTH`, `PROSE_PARAGRAPH_LENGTH`, `PROSE_CONTRACTION`, or `PROSE_VAGUE_TERM` diagnostic. |
-| litespec/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation | checkable | `node litespec/tools/validate-consumer.mjs` reports prose-measure violations on consumer pages. |
+| litespec/rule/core-authoring.use-one-normative-vocabulary | checkable | `litespec validate` emits no `STANDARD_MODAL_COUNT` or `STANDARD_MODAL_VOCABULARY` diagnostic. |
+| litespec/rule/core-authoring.apply-controlled-prose-measures | checkable | `litespec validate` emits no `PROSE_SENTENCE_LENGTH`, `PROSE_LIST_LENGTH`, `PROSE_TABLE_CELL_LENGTH`, `PROSE_PARAGRAPH_LENGTH`, `PROSE_CONTRACTION`, or `PROSE_VAGUE_TERM` diagnostic. |
+| litespec/rule/core-authoring.apply-the-prose-measures-to-consumer-documentation | checkable | `litespec consumer` reports prose-measure violations on consumer pages. |
 | litespec/rule/core-authoring.exclude-generated-regions-from-prose-checks | guidance | Does every prose check skip the text between generated-region fences? |
 | litespec/rule/core-authoring.use-active-and-explicit-sentences | guidance | Would a reader find the actor in every sentence, the verb in every step, and one grammar per list? |
 | litespec/rule/core-authoring.state-meaning-literally | guidance | Is every figure of speech either literal or a defined term? |
 | litespec/rule/core-authoring.use-one-term-for-one-concept | guidance | Would a reader meet each concept under one name only? |
-| litespec/rule/core-authoring.record-the-project-vocabulary-as-data | checkable | `node litespec/tools/validate-consumer.mjs` validates the language record against the language schema. |
-| litespec/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope | checkable | `node litespec/tools/validate-consumer.mjs` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
-| litespec/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets | checkable | `node litespec/tools/validate-consumer.mjs` scans every `languageScan` pattern and fails a pattern matching no file. |
-| litespec/rule/core-authoring.exclude-the-compound-that-names-another-concept | checkable | `node litespec/tools/validate-consumer.mjs` reports no `LANGUAGE_REJECTED_SYNONYM` diagnostic inside an exempt compound. |
+| litespec/rule/core-authoring.record-the-project-vocabulary-as-data | checkable | `litespec consumer` validates the language record against the language schema. |
+| litespec/rule/core-authoring.reject-a-recorded-synonym-inside-its-scope | checkable | `litespec consumer` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
+| litespec/rule/core-authoring.check-the-vocabulary-on-every-surface-a-reader-meets | checkable | `litespec consumer` scans every `languageScan` pattern and fails a pattern matching no file. |
+| litespec/rule/core-authoring.exclude-the-compound-that-names-another-concept | checkable | `litespec consumer` reports no `LANGUAGE_REJECTED_SYNONYM` diagnostic inside an exempt compound. |
 | litespec/rule/core-authoring.use-controlled-capitalization | guidance | Do page titles use Title Case and provision headings sentence case? |
 | litespec/rule/core-authoring.apply-the-four-quality-tests | guidance | Did a reviewer assess the prose for simplicity, brevity, clarity, and humanity? |
-| litespec/rule/core-authoring.use-the-declared-page-contract | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION`, `PAGE_SECTION_ORDER`, or `PAGE_UNKNOWN_SECTION` diagnostic. |
+| litespec/rule/core-authoring.use-the-declared-page-contract | checkable | `litespec validate` emits no `PAGE_MISSING_SECTION`, `PAGE_SECTION_ORDER`, or `PAGE_UNKNOWN_SECTION` diagnostic. |
 | litespec/rule/core-authoring.name-the-tool-rather-than-the-mechanism | guidance | Does each procedure step name the shipped command that performs it? |
 | litespec/rule/core-authoring.state-one-layer-per-page | guidance | Does mechanism detail appear only under an `Underneath` section? |
-| litespec/rule/core-authoring.name-the-escape-from-every-abstraction | checkable | `node tools/validate-standards.mjs` emits no `PAGE_MISSING_SECTION` diagnostic for a command page. |
+| litespec/rule/core-authoring.name-the-escape-from-every-abstraction | checkable | `litespec validate` emits no `PAGE_MISSING_SECTION` diagnostic for a command page. |
 | litespec/rule/core-authoring.record-a-setting-as-reference | guidance | Does every setting named in a procedure resolve to a configuration page row? |
-| litespec/rule/core-authoring.write-atomic-standards-provisions | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_REQUIREMENT_COUNT`, `STANDARD_SENTENCE_COUNT`, or `STANDARD_LABEL_INVALID` diagnostic. |
-| litespec/rule/core-authoring.use-the-declared-identifier-grammar | checkable | `node tools/validate-standards.mjs` emits no `ID_SLUG_MISMATCH` or `ID_UNKNOWN_REFERENCE` diagnostic. |
-| litespec/rule/core-authoring.name-the-owning-page-in-the-identifier | checkable | `node tools/validate-standards.mjs` emits no `ID_SCOPE_MISMATCH` or `ID_PAGE_FILENAME` diagnostic. |
+| litespec/rule/core-authoring.write-atomic-standards-provisions | checkable | `litespec validate` emits no `STANDARD_REQUIREMENT_COUNT`, `STANDARD_SENTENCE_COUNT`, or `STANDARD_LABEL_INVALID` diagnostic. |
+| litespec/rule/core-authoring.use-the-declared-identifier-grammar | checkable | `litespec validate` emits no `ID_SLUG_MISMATCH` or `ID_UNKNOWN_REFERENCE` diagnostic. |
+| litespec/rule/core-authoring.name-the-owning-page-in-the-identifier | checkable | `litespec validate` emits no `ID_SCOPE_MISMATCH` or `ID_PAGE_FILENAME` diagnostic. |
 | litespec/rule/core-authoring.exclude-a-sequence-number-from-the-identifier | guidance | Do changed identifiers name assertions with words alone? |
-| litespec/rule/core-authoring.identify-actionable-conventions | checkable | `node tools/validate-standards.mjs` emits no `CONVENTION_MISSING_DEFAULT` or `CONVENTION_MISSING_REPLACEMENT` diagnostic. |
-| litespec/rule/core-authoring.keep-agent-summaries-informative | checkable | `node tools/validate-standards.mjs` emits no `SUMMARY_COUNT`, `SUMMARY_MISSING_ID`, or `SUMMARY_UNKNOWN_ID` diagnostic. |
-| litespec/rule/core-authoring.attach-examples-to-their-provisions | checkable | `node tools/validate-standards.mjs` emits no `STANDARD_EXAMPLE_LABEL` or `PAGE_UNKNOWN_SECTION` diagnostic. |
-| litespec/rule/core-authoring.map-provisions-to-evidence | checkable | `node tools/validate-standards.mjs` emits no `VERIFY_MISSING_ID` or `VERIFY_UNKNOWN_ID` diagnostic. |
+| litespec/rule/core-authoring.identify-actionable-conventions | checkable | `litespec validate` emits no `CONVENTION_MISSING_DEFAULT` or `CONVENTION_MISSING_REPLACEMENT` diagnostic. |
+| litespec/rule/core-authoring.keep-agent-summaries-informative | checkable | `litespec validate` emits no `SUMMARY_COUNT`, `SUMMARY_MISSING_ID`, or `SUMMARY_UNKNOWN_ID` diagnostic. |
+| litespec/rule/core-authoring.attach-examples-to-their-provisions | checkable | `litespec validate` emits no `STANDARD_EXAMPLE_LABEL` or `PAGE_UNKNOWN_SECTION` diagnostic. |
+| litespec/rule/core-authoring.map-provisions-to-evidence | checkable | `litespec validate` emits no `VERIFY_MISSING_ID` or `VERIFY_UNKNOWN_ID` diagnostic. |
 | litespec/rule/core-authoring.mark-every-provision-checkable-or-guidance | guidance | Does every Verification row carry exactly one of the two marks? |
-| litespec/rule/core-authoring.regenerate-the-provision-index | checkable | `node tools/generate-provisions.mjs --check` exits zero. |
-| litespec/rule/core-authoring.route-the-reader-before-listing-pages | checkable | `node tools/validate-standards.mjs` emits no `INDEX_MISSING_ROUTING` diagnostic. |
-| litespec/rule/core-authoring.declare-structured-specification-metadata | checkable | `node litespec/tools/validate-consumer.mjs` validates each opening frontmatter block against the record schema. |
+| litespec/rule/core-authoring.regenerate-the-provision-index | checkable | `litespec provisions --check` exits zero. |
+| litespec/rule/core-authoring.route-the-reader-before-listing-pages | checkable | `litespec validate` emits no `INDEX_MISSING_ROUTING` diagnostic. |
+| litespec/rule/core-authoring.declare-structured-specification-metadata | checkable | `litespec consumer` validates each opening frontmatter block against the record schema. |
 | litespec/rule/core-authoring.use-one-metadata-carrier | guidance | Is the opening frontmatter block the only metadata on each page? |
-| litespec/rule/core-authoring.classify-every-specification-file | checkable | `node litespec/tools/validate-consumer.mjs` fails a Markdown file with no declared type outside a declared unstructured path. |
+| litespec/rule/core-authoring.classify-every-specification-file | checkable | `litespec consumer` fails a Markdown file with no declared type outside a declared unstructured path. |
 | litespec/rule/core-authoring.derive-a-computed-fact-instead-of-restating-it | guidance | Does each count, census, and membership list name its source or its command? |
-| litespec/rule/core-authoring.run-repeatable-authoring-checks | checkable | `node tools/validate-standards.mjs`, every `node tools/*.cases.mjs` suite, and `git diff --check` exit zero. |
+| litespec/rule/core-authoring.run-repeatable-authoring-checks | checkable | `litespec validate`, `dotnet test --solution LiteSpec.slnx`, and `git diff --check` exit zero. |
 | litespec/rule/core-authoring.validate-current-standards-material | guidance | Does the validator read the working tree and no earlier release? |
 | litespec/rule/core-authoring.exclude-historical-transition-material | guidance | Does any active file carry history-specific material between releases? |
-| litespec/rule/core-authoring.publish-each-release-as-a-complete-contract | checkable | `node tools/validate-standards.mjs` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
+| litespec/rule/core-authoring.publish-each-release-as-a-complete-contract | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
 | litespec/rule/core-authoring.exclude-cross-release-compatibility-work | guidance | Would a consumer find any promise of migration, mapping, or alias here? |
 | litespec/rule/core-authoring.keep-a-pinned-release-for-as-long-as-it-serves | guidance | Does any active provision oblige a consumer to adopt a later release? |
-| litespec/rule/core-authoring.record-the-reviewed-litespec-release | checkable | `node litespec/tools/validate-consumer.mjs` fails when `reviewedLiteSpecVersion` differs from the pinned release. |
+| litespec/rule/core-authoring.record-the-reviewed-litespec-release | checkable | `litespec consumer` fails when `reviewedLiteSpecVersion` differs from the pinned release. |
 | litespec/rule/core-authoring.prefer-direct-action-headings | guidance | Does every changed provision heading start with a concrete action verb? |
 | litespec/rule/core-authoring.prefer-positive-instructions | guidance | Does every retained prohibition guard an explicit unsafe boundary? |
 | litespec/rule/core-authoring.use-tables-for-exact-mappings | guidance | Is each changed table a comparison or a field mapping? |

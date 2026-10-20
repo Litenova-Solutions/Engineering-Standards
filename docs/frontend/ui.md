@@ -346,9 +346,9 @@ test('shows the changed total before payment', async ({ page }) => {
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/frontend-ui.select-one-visual-authority | checkable | `node litespec/tools/validate-consumer.mjs` refuses a frontend with no declared platform and a workspace with a controlled frontend but no shared package. |
-| litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package | checkable | `node litespec/tools/validate-ui.mjs` compares the committed configuration against the manifest baseline fields. |
-| litespec/rule/frontend-ui.publish-a-design-contract | checkable | `node litespec/tools/validate-ui.mjs` reports a missing contract, a schema failure, or a missing section. |
+| litespec/rule/frontend-ui.select-one-visual-authority | checkable | `litespec consumer` refuses a frontend with no declared platform and a workspace with a controlled frontend but no shared package. |
+| litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package | checkable | `litespec ui` compares the committed configuration against the manifest baseline fields. |
+| litespec/rule/frontend-ui.publish-a-design-contract | checkable | `litespec ui` reports a missing contract, a schema failure, or a missing section. |
 | litespec/rule/frontend-ui.declare-a-closed-floorplan-set | guidance | Does the Patterns section list every floorplan with a when-to-use rule? |
 | litespec/rule/frontend-ui.publish-one-registry-item-per-floorplan | checkable | `shadcn build` (React) or `shadcn-svelte build` (Svelte) exits zero, and review confirms `registry.json` lists one item per declared floorplan. |
 | litespec/rule/frontend-ui.compose-each-route-from-one-floorplan | checkable | `tests/routes/every-route.spec.ts` asserts `page.locator("[data-floorplan]")` has count 1. |
@@ -356,18 +356,18 @@ test('shows the changed total before payment', async ({ page }) => {
 | litespec/rule/frontend-ui.record-a-freestyle-route | guidance | Does every freestyle route name the decision record that justifies its layout? |
 | litespec/rule/frontend-ui.derive-each-page-type-from-a-named-reference | checkable | `tests/routes/every-route.spec.ts` asserts `data-registry-item` resolves to a published registry item on every non-freestyle route. |
 | litespec/rule/frontend-ui.select-a-tone-from-the-closed-set | checkable | `pnpm type-check` fails on a state with no tone; review confirms each tone is a term. |
-| litespec/rule/frontend-ui.keep-tokens-in-one-stylesheet | checkable | `node litespec/tools/validate-ui.mjs` reports an application stylesheet declaring a rule and a shared stylesheet declaring a literal colour. |
+| litespec/rule/frontend-ui.keep-tokens-in-one-stylesheet | checkable | `litespec ui` reports an application stylesheet declaring a rule and a shared stylesheet declaring a literal colour. |
 | litespec/rule/frontend-ui.hold-the-declared-base-colour | guidance | Does the token stylesheet carry only values from the declared base colour ramp, with each departure recorded? |
 | litespec/rule/frontend-ui.keep-separators-at-the-subtle-step | guidance | Is every structural separator and input border at the published border step or lighter? |
 | litespec/rule/frontend-ui.select-a-command-surface-by-size | guidance | Does each command use the surface the Concepts table assigns to its input? |
 | litespec/rule/frontend-ui.show-the-trace-id-in-error-detail | guidance | Does every visible error show its trace identifier copyably in its detail rather than its headline? |
 | litespec/rule/frontend-ui.check-every-route-in-a-browser | checkable | `tests/routes/every-route.spec.ts` runs axe and the Concepts checks on each discovered route. |
 | litespec/rule/frontend-ui.prove-every-result-a-route-calls | guidance | Is every result the route calls proved by a passing test or named by a known-gap record? |
-| litespec/rule/frontend-ui.restrict-css-decisions | checkable | `node litespec/tools/validate-ui.mjs` rejects an arbitrary value, a raw palette value, or an important modifier. |
-| litespec/rule/frontend-ui.track-source-changes | checkable | `node litespec/tools/validate-ui.mjs` recomputes each digest and reports changed primitive source. |
+| litespec/rule/frontend-ui.restrict-css-decisions | checkable | `litespec ui` rejects an arbitrary value, a raw palette value, or an important modifier. |
+| litespec/rule/frontend-ui.track-source-changes | checkable | `litespec ui` recomputes each digest and reports changed primitive source. |
 | litespec/rule/frontend-ui.govern-behavior-packages | guidance | Does every behavior package name its approving decision and render through baseline components and tokens? |
 | litespec/rule/frontend-ui.prove-ui-behavior-and-appearance | checkable | `tests/routes/every-route.spec.ts` runs on the changed route, and review confirms the change named the matrix evidence. |
 | litespec/rule/frontend-ui.record-a-frontend-outside-the-controlled-contract | guidance | Does every frontend outside the controlled platforms declare its platform and name its replacement boundaries? |
-| litespec/rule/frontend-ui.use-the-product-profiles | checkable | `node litespec/tools/validate-ui.mjs` refuses a controlled frontend with no density profile. |
+| litespec/rule/frontend-ui.use-the-product-profiles | checkable | `litespec ui` refuses a controlled frontend with no density profile. |
 | litespec/rule/frontend-ui.use-the-source-update-procedure | guidance | Does the update branch record the pinned CLI, the dry-run output, and separate review of both file sets? |
 | litespec/rule/frontend-ui.keep-a-blocked-command-visible-with-its-reason | guidance | Does each disabled command stay visible with its reason? |

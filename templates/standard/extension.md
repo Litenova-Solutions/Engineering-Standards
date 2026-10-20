@@ -46,5 +46,5 @@ None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| {litespec/rule/page.state-one-extension-action} | checkable | `node tools/validate-standards.mjs` reports this provision satisfied on the page that carries it. |
+| {litespec/rule/page.state-one-extension-action} | checkable | `litespec validate` reports this provision satisfied on the page that carries it. |
 | {litespec/rule/page.use-one-extension-default} | guidance | Does the page carry the default or its named local replacement? |

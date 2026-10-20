@@ -58,7 +58,7 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 **Requirement:** A product, domain, or API change MUST pass the reference consumer validator.
 
-**Rationale:** `node litespec/tools/validate-consumer.mjs` checks metadata, links, and cross-file references.
+**Rationale:** `litespec consumer` checks metadata, links, and cross-file references.
 
 ### Run extension checks (litespec/rule/core-release.run-extension-checks)
 
@@ -208,7 +208,7 @@ An order-checkout release includes verified stock, order, payment, and shipment 
 | litespec/rule/core-release.run-backend-release-checks | guidance | Did the release build and every required backend suite pass? |
 | litespec/rule/core-release.run-frontend-release-checks | guidance | Did install, lint, type checks, tests, and the production build all pass? |
 | litespec/rule/core-release.run-journey-checks | guidance | Did the journey tests pass against the deployed boundary? |
-| litespec/rule/core-release.run-consistency-checks | checkable | `node litespec/tools/validate-consumer.mjs` exits zero. |
+| litespec/rule/core-release.run-consistency-checks | checkable | `litespec consumer` exits zero. |
 | litespec/rule/core-release.run-extension-checks | guidance | Did each affected extension report its stated verification evidence? |
 | litespec/rule/core-release.regenerate-application-contracts | guidance | Do committed contracts match a fresh generation from their source? |
 | litespec/rule/core-release.keep-generated-contracts-stable | guidance | Is the contract diff free of timestamps, machine paths, and unstable order? |

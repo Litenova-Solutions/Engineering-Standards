@@ -205,7 +205,7 @@ A shipment section renders its facts, its commands, and its states by composing 
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/rule/frontend-components.keep-primitives-and-composites-in-one-shared-package | guidance | Does one shared package hold the registry source and the composites, with no copy in an application? |
-| litespec/rule/frontend-components.compose-composites-in-page-code | checkable | `node litespec/tools/validate-ui.mjs` refuses a primitive library import reached from an application. |
+| litespec/rule/frontend-components.compose-composites-in-page-code | checkable | `litespec ui` refuses a primitive library import reached from an application. |
 | litespec/rule/frontend-components.write-no-class-name-in-page-code | guidance | Does any component under a route or module folder declare a class or style binding? |
 | litespec/rule/frontend-components.use-no-raw-element-in-page-code | guidance | Does page code declare a refused element, and does each refusal name its composite? |
 | litespec/rule/frontend-components.prefer-a-composite-over-a-primitive | guidance | Does page code import a primitive where the shared package provides a composite? |

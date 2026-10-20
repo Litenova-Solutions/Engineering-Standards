@@ -69,8 +69,8 @@ Before review:
 - Confirm extension declarations match the manifest.
 - Validate the two tracked schema consumers.
 - Update affected templates and validator cases.
-- Run every fixture suite: the standards, UI, consumer, and model cases, and the pattern library check.
-- Run `node tools/generate-provisions.mjs` and commit the regenerated index. (litespec/rule/core-authoring.regenerate-the-provision-index)
+- Run `dotnet test --solution LiteSpec.slnx` and the pattern library check.
+- Run `litespec provisions` and commit the regenerated index. The [command index](docs/tools/README.md) states how `litespec` runs. (litespec/rule/core-authoring.regenerate-the-provision-index)
 - Update the changelog.
 - Run `git diff --check`.
 

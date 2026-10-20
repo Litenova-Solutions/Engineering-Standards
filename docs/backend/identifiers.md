@@ -151,11 +151,11 @@ result/place-order.item-out-of-stock
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/backend-identifiers.follow-the-identifier-form-of-each-record-type | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `identifier-form`. |
-| litespec/rule/backend-identifiers.name-records-with-one-to-six-words | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `identifier-form`. |
-| litespec/rule/backend-identifiers.keep-use-case-names-unique-across-the-project | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `identifier-duplicate`. |
-| litespec/rule/backend-identifiers.keep-negation-in-rule-names | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `rule-name-negation`. |
+| litespec/rule/backend-identifiers.follow-the-identifier-form-of-each-record-type | checkable | `litespec model check` reports `identifier-form`. |
+| litespec/rule/backend-identifiers.name-records-with-one-to-six-words | checkable | `litespec model check` reports `identifier-form`. |
+| litespec/rule/backend-identifiers.keep-use-case-names-unique-across-the-project | checkable | `litespec model check` reports `use-case-name-clash`. |
+| litespec/rule/backend-identifiers.keep-negation-in-rule-names | checkable | `litespec model check` reports `rule-name-negation`. |
 | litespec/rule/backend-identifiers.keep-wire-codes-stable | guidance | Do clients read the same code values as before? |
-| litespec/rule/backend-identifiers.reject-the-retired-identifier-forms | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `identifier-refused-form`. |
-| litespec/rule/backend-identifiers.resolve-every-identifier-citation | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `reference-unresolved`. |
-| litespec/rule/backend-identifiers.cite-shared-provisions-in-their-published-form | checkable | `node tools/validate-standards.mjs` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
+| litespec/rule/backend-identifiers.reject-the-retired-identifier-forms | checkable | `litespec model check` reports `identifier-refused-form`. |
+| litespec/rule/backend-identifiers.resolve-every-identifier-citation | checkable | `litespec model check` reports `reference-unresolved`. |
+| litespec/rule/backend-identifiers.cite-shared-provisions-in-their-published-form | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |

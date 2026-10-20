@@ -10,7 +10,6 @@
   "state": "<planned|shipped|later|refused>",
   "solves": ["problem/<name>"],
   "refusedBecause": "<reason, when refused>",
-  "replaces": "<feature id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

@@ -8,7 +8,6 @@
   "decider": "<owner>",
   "decideBy": "<YYYY-MM-DD>",
   "dependsOn": ["<module id, or remove this line>"],
-  "replaces": "<module id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

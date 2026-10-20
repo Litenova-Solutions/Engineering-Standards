@@ -1,0 +1,28 @@
+{
+  "project": {
+    "name": "Fixture Library"
+  },
+  "size": "small",
+  "reviewedLiteSpecVersion": "2.0.0",
+  "optionalTypes": [],
+  "constraints": {
+    "answered": true
+  },
+  "owners": [
+    "lending-team"
+  ],
+  "paths": {
+    "docs": "docs",
+    "domainDocs": "docs/domain",
+    "language": "docs/language.json",
+    "application": "apps/api/src/Library.Application",
+    "domain": "apps/api/src/Library.Domain",
+    "webapi": "apps/api/src/Library.WebApi",
+    "testRoots": [
+      "apps/api/tests"
+    ],
+    "frontends": [],
+    "records": {}
+  },
+  "selectedExtensions": []
+}

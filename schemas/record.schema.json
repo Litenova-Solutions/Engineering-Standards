@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Litenova-Solutions/LiteSpec/schemas/record.schema.json",
-  "title": "Litenova Project Record Frontmatter",
+  "title": "LiteSpec Project Record Frontmatter",
   "description": "The JSON frontmatter block opening a consumer documentation page: one page record or one page style, with the entry records it carries.",
   "oneOf": [
     { "$ref": "#/$defs/productPage" },

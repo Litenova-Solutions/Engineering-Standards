@@ -68,6 +68,6 @@ This extension adds no required package.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/ext-stage.declare-the-release-stage | checkable | `node litespec/tools/validate-consumer.mjs` refuses a `stage` selection with a missing or unknown `releaseStage`. |
-| litespec/rule/ext-stage.defer-named-provisions-until-promotion | checkable | `node litespec/tools/validate-consumer.mjs` refuses a deferral naming an unknown provision or past its `until` date, and any deferral in `production`. |
+| litespec/rule/ext-stage.declare-the-release-stage | checkable | `litespec consumer` refuses a `stage` selection with a missing or unknown `releaseStage`. |
+| litespec/rule/ext-stage.defer-named-provisions-until-promotion | checkable | `litespec consumer` refuses a deferral naming an unknown provision or past its `until` date, and any deferral in `production`. |
 | litespec/rule/ext-stage.promote-through-a-recorded-decision | guidance | Does an approved promotion Decision predate the first customer data? |

@@ -6,9 +6,8 @@ LiteSpec coordinates software work with agents as active engineering participant
 
 In this name:
 
-- `Agentic` means agents can inspect context, reason about bounded work, change authorized artifacts, and run verification within explicit decision boundaries.
-- `Engineering` covers the design, implementation, verification, deployment, operation, and evolution of software. It is broader than writing code.
-- `System` means the parts work together and constrain one another. It does not mean a runtime framework, product dependency, or application service.
+- `Lite` means a consumer adopts one bounded context, one size, and its selected stacks, and nothing more.
+- `Spec` means approved written records and provisions define the work, and agents and people build and verify against them.
 
 ### Company context
 
@@ -361,7 +360,7 @@ Endpoint: CancelOrderEndpoint
 
 **Rationale:** Neither direction is visible without the check. Code with no use case reads as a reviewed feature and is not one. A use case with no code states a plan in the present tense.
 
-**Example:** `dotnet run --project tools/model/Litenova.Model -- query use-case/orders.cancel-order` shows the handler the folder rule resolves.
+**Example:** `litespec model query use-case/orders.cancel-order` shows the handler the folder rule resolves.
 
 ### Name what calls a use case (litespec/rule/core-system.name-what-calls-a-use-case)
 
@@ -574,7 +573,7 @@ The orders module contains `Order` and `OrderClaim`. `use-case/orders.cancel-ord
 | litespec/rule/core-system.write-each-record-in-its-catalog-shape | guidance | Which record breaks its catalog type, home, owner, or status? |
 | litespec/rule/core-system.declare-each-link-on-its-source | guidance | Which link sits off its source, and which citation resolves nowhere? |
 | litespec/rule/core-system.connect-one-product-outcome-through-a-journey | guidance | Which journey links the use case, or which background caller replaces it? |
-| litespec/rule/core-system.group-language-and-use-cases-by-module | checkable | `node litespec/tools/validate-consumer.mjs` resolves each module reference to one declared module directory. |
+| litespec/rule/core-system.group-language-and-use-cases-by-module | checkable | `litespec consumer` resolves each module reference to one declared module directory. |
 | litespec/rule/core-system.make-business-record-ownership-explicit | guidance | Which business record lacks its state, rules, or commands on the module page? |
 | litespec/rule/core-system.deliver-one-complete-use-case | guidance | Which layer or evidence does the incomplete use case still lack? |
 | litespec/rule/core-system.compute-use-case-status-from-evidence | guidance | Which use-case status did a hand write instead of the evidence? |
@@ -584,14 +583,14 @@ The orders module contains `Order` and `OrderClaim`. `use-case/orders.cancel-ord
 | litespec/rule/core-system.state-each-rule-with-its-kind | guidance | Which rule lacks its kind, governor, enforcement, or kept negation? |
 | litespec/rule/core-system.grant-access-through-roles-and-permissions | guidance | Which act lacks its actor, role, permission, and use-case path? |
 | litespec/rule/core-system.model-every-business-record-lifecycle-with-state-records | guidance | Which business state lacks its sealed state record in page and code? |
-| litespec/rule/core-system.state-one-occasion-for-every-behavior-record | checkable | `node litespec/tools/validate-consumer.mjs` fails a behavior page carrying no `Scenario` section. |
-| litespec/rule/core-system.keep-a-scenario-informative | checkable | `node litespec/tools/validate-consumer.mjs` fails a `Scenario` section containing a record identifier. |
-| litespec/rule/core-system.derive-every-scenario-from-one-reference-cast | checkable | `node litespec/tools/validate-consumer.mjs` fails a documentation set with no or several `scenario-cast` pages; the reviewer confirms each scenario draws from it. |
+| litespec/rule/core-system.state-one-occasion-for-every-behavior-record | checkable | `litespec consumer` fails a behavior page carrying no `Scenario` section. |
+| litespec/rule/core-system.keep-a-scenario-informative | checkable | `litespec consumer` fails a `Scenario` section containing a record identifier. |
+| litespec/rule/core-system.derive-every-scenario-from-one-reference-cast | checkable | `litespec consumer` fails a documentation set with no or several `scenario-cast` pages; the reviewer confirms each scenario draws from it. |
 | litespec/rule/core-system.update-records-with-behavior | guidance | Which affected record did the behavior change leave behind? |
 | litespec/rule/core-system.use-this-consumer-documentation-layout | guidance | Which directory breaks the layout without a declared exception? |
-| litespec/rule/core-system.group-module-use-case-files-by-business-record | checkable | `node litespec/tools/validate-consumer.mjs` resolves each use case to its module or one business-record subdirectory. |
+| litespec/rule/core-system.group-module-use-case-files-by-business-record | checkable | `litespec consumer` resolves each use case to its module or one business-record subdirectory. |
 | litespec/rule/core-system.keep-operational-and-security-references-under-operations | guidance | Which operating or security prose sits outside `docs/operations/`? |
 | litespec/rule/core-system.use-established-technical-terms | guidance | Which term replaces an established technical meaning with a softer synonym? |
 | litespec/rule/core-system.use-ordinary-capitalization-in-prose | guidance | Which ordinary noun carries capitalization outside names and identifiers? |
 | litespec/rule/core-system.keep-records-readable-without-tooling | guidance | Which JSON sits outside the frontmatter block? |
-| litespec/rule/core-system.bound-a-scenario-to-120-words | checkable | `node litespec/tools/validate-consumer.mjs` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |
+| litespec/rule/core-system.bound-a-scenario-to-120-words | checkable | `litespec consumer` fails a `Scenario` section longer than `scenarioWordLimit`, defaulting to 120 words. |

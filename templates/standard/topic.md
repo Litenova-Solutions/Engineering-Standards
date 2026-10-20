@@ -30,5 +30,5 @@ State the page scope and the boundary it owns.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| {litespec/rule/page.state-one-action} | checkable | `node tools/validate-standards.mjs` reports this provision satisfied on the page that carries it. |
+| {litespec/rule/page.state-one-action} | checkable | `litespec validate` reports this provision satisfied on the page that carries it. |
 | {litespec/rule/page.use-one-default} | guidance | Does the page carry the default or its named local replacement? |

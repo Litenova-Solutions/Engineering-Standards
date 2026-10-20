@@ -49,7 +49,6 @@
       "expect": "<The observable result>"
     }
   ],
-  "replaces": "<use-case id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

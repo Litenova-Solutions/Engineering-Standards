@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Litenova-Solutions/LiteSpec/schemas/design-contract.schema.json",
-  "title": "Litenova Frontend Design Contract",
+  "title": "LiteSpec Frontend Design Contract",
   "description": "The metadata block opening the DESIGN.md a shared UI package ships. The block carries what a validator resolves; the sections under it carry what a reader and an agent compose from.",
   "type": "object",
   "additionalProperties": false,

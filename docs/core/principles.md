@@ -128,13 +128,13 @@ This informative example demonstrates `litespec/rule/core-principles.prefer-dire
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/rule/core-principles.keep-one-authored-source | guidance | Does every fact on the changed pages trace to one authored record? |
-| litespec/rule/core-principles.locate-package-versions-in-the-manifest | checkable | `node tools/validate-consumer.mjs` fails a project whose stack versions do not resolve from the manifest. |
-| litespec/rule/core-principles.locate-record-status-in-frontmatter | checkable | `node tools/validate-consumer.mjs` fails a record whose frontmatter misses a required common field. |
+| litespec/rule/core-principles.locate-package-versions-in-the-manifest | checkable | `litespec consumer` fails a project whose stack versions do not resolve from the manifest. |
+| litespec/rule/core-principles.locate-record-status-in-frontmatter | checkable | `litespec consumer` fails a record whose frontmatter misses a required common field. |
 | litespec/rule/core-principles.prove-cases-with-tests | guidance | Does every Case have a passing test that calls its use case and asserts its Result? |
-| litespec/rule/core-principles.classify-record-authority | checkable | `node tools/validate-consumer.mjs` fails a record with a missing or unknown status, or a draft without decider and decide-by date. |
+| litespec/rule/core-principles.classify-record-authority | checkable | `litespec consumer` fails a record with a missing or unknown status, or a draft without decider and decide-by date. |
 | litespec/rule/core-principles.refuse-approval-behind-a-draft-decision | guidance | Is every decision behind an approved record approved itself? |
-| litespec/rule/core-principles.separate-authority-from-implementation | checkable | `node tools/validate-consumer.mjs` fails a record that writes its own implementation status. |
-| litespec/rule/core-principles.retire-public-behavior-deliberately | checkable | `node tools/validate-consumer.mjs` fails a retired use case that still names an entry point. |
+| litespec/rule/core-principles.separate-authority-from-implementation | checkable | `litespec consumer` fails a record that writes its own implementation status. |
+| litespec/rule/core-principles.retire-public-behavior-deliberately | checkable | `litespec consumer` fails a retired use case that still names an entry point. |
 | litespec/rule/core-principles.prove-enforceable-boundaries-mechanically | guidance | Does a reference, test, or lint rule prove each changed enforceable boundary? |
 | litespec/rule/core-principles.require-current-complexity-activation | guidance | Does a current use case, decision, or requirement name the added complexity? |
 | litespec/rule/core-principles.name-boundary-intent | guidance | Does every changed boundary name state its business action and owner? |

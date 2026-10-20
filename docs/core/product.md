@@ -245,28 +245,28 @@ A subscription business keeps `docs/product/business/pricing.md` with id `pricin
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/core-product.keep-business-intent-under-product | checkable | `node tools/validate-consumer.mjs` fails a why-layer record outside its home folder. |
-| litespec/rule/core-product.state-one-product | checkable | `node tools/validate-consumer.mjs` fails a brief without one product, boundary, and audience. |
-| litespec/rule/core-product.answer-every-constraint | checkable | `node tools/validate-consumer.mjs` fails a constraint without source and applicability, or a project with unanswered constraints. |
-| litespec/rule/core-product.state-each-topic-in-one-page-shape | checkable | `node tools/validate-consumer.mjs` fails a topic page missing a required section or `reviewBy`. |
-| litespec/rule/core-product.place-the-story-before-the-commitments | checkable | `node tools/validate-consumer.mjs` fails a topic whose chapter follows its commitments. |
+| litespec/rule/core-product.keep-business-intent-under-product | checkable | `litespec consumer` fails a why-layer record outside its home folder. |
+| litespec/rule/core-product.state-one-product | checkable | `litespec consumer` fails a brief without one product, boundary, and audience. |
+| litespec/rule/core-product.answer-every-constraint | checkable | `litespec consumer` fails a constraint without source and applicability, or a project with unanswered constraints. |
+| litespec/rule/core-product.state-each-topic-in-one-page-shape | checkable | `litespec consumer` fails a topic page missing a required section or `reviewBy`. |
+| litespec/rule/core-product.place-the-story-before-the-commitments | checkable | `litespec consumer` fails a topic whose chapter follows its commitments. |
 | litespec/rule/core-product.cite-sources-for-chapter-claims | guidance | Does each claim in the chapter cite its source? |
-| litespec/rule/core-product.identify-every-requirement | checkable | `node tools/validate-consumer.mjs` fails a Requirement entry without identifier, kind, or statement, or a promise without effective-dated values. |
+| litespec/rule/core-product.identify-every-requirement | checkable | `litespec consumer` fails a Requirement entry without identifier, kind, or statement, or a promise without effective-dated values. |
 | litespec/rule/core-product.cite-requirements-from-records | guidance | Does every record that carries a requirement name it in `fulfils`? |
 | litespec/rule/core-product.keep-behavior-out-of-product-pages | guidance | Does any product page name a state, entry point, failure code, or handler? |
-| litespec/rule/core-product.record-research-with-read-sources | checkable | `node tools/validate-consumer.mjs` fails a Research record without question or source read date. |
-| litespec/rule/core-product.state-each-problem-and-feature | checkable | `node tools/validate-consumer.mjs` fails a problem or feature missing its required fields. |
+| litespec/rule/core-product.record-research-with-read-sources | checkable | `litespec consumer` fails a Research record without question or source read date. |
+| litespec/rule/core-product.state-each-problem-and-feature | checkable | `litespec consumer` fails a problem or feature missing its required fields. |
 | litespec/rule/core-product.trace-every-choice-to-a-decision | guidance | Does every Position and Refusals entry link an unretired decision, approved when the page is approved? |
-| litespec/rule/core-product.record-each-product-choice-as-a-decision | checkable | `node tools/validate-consumer.mjs` fails a decision missing a required section or `decides` target. |
+| litespec/rule/core-product.record-each-product-choice-as-a-decision | checkable | `litespec consumer` fails a decision missing a required section or `decides` target. |
 | litespec/rule/core-product.name-the-person-who-approved-a-decision | guidance | Did the named decider approve the decision, and does the record carry the date? |
 | litespec/rule/core-product.replace-a-decision-with-a-new-record | guidance | Does the new decision name the old one in `replaces`, with the old one retired? |
 | litespec/rule/core-product.derive-history-from-decisions | guidance | Does History list exactly the decisions that decide the page, as generated? |
 | litespec/rule/core-product.treat-generated-research-as-source-material | guidance | Does every new position trace to a Research record or an approved decision? |
-| litespec/rule/core-product.review-a-topic-by-its-date | checkable | `node tools/validate-consumer.mjs` fails a topic page whose `reviewBy` date has passed. |
+| litespec/rule/core-product.review-a-topic-by-its-date | checkable | `litespec consumer` fails a topic page whose `reviewBy` date has passed. |
 | litespec/rule/core-product.load-product-intent-before-commercial-work | guidance | Does the change report list the product pages read before the change? |
 | litespec/rule/core-product.derive-requirement-coverage-from-the-model | guidance | Does the coverage list come from the model rather than hand-kept notes? |
 | litespec/rule/core-product.build-intent-before-specification-before-code | guidance | Did intent, research, decision, requirement, records, code, and tests land in order? |
-| litespec/rule/core-product.reject-an-unfulfilled-requirement | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports no `requirement-unfulfilled` finding outside an open Known gap. |
+| litespec/rule/core-product.reject-an-unfulfilled-requirement | checkable | `litespec model check` reports no `requirement-unfulfilled` finding outside an open Known gap. |
 | litespec/rule/core-product.build-on-a-draft-decision-before-approval | guidance | Does the release hold approval for every decision the code builds on? |
 | litespec/rule/core-product.group-product-topics-by-area | guidance | Does `docs/product/` follow the example layout, or does an Exception record the replacement? |
-| litespec/rule/core-product.name-product-decisions-in-one-numbered-sequence | checkable | `node tools/validate-consumer.mjs` fails a decision file whose name does not match its identifier. |
+| litespec/rule/core-product.name-product-decisions-in-one-numbered-sequence | checkable | `litespec consumer` fails a decision file whose name does not match its identifier. |

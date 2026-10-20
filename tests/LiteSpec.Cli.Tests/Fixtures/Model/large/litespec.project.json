@@ -1,0 +1,42 @@
+{
+  "project": {
+    "name": "Fixture Library"
+  },
+  "size": "large",
+  "reviewedLiteSpecVersion": "2.0.0",
+  "optionalTypes": [
+    "constraint",
+    "research",
+    "limit",
+    "runbook"
+  ],
+  "constraints": {
+    "answered": true
+  },
+  "owners": [
+    "lending-team"
+  ],
+  "paths": {
+    "docs": "docs",
+    "domainDocs": "docs/domain",
+    "language": "docs/language.json",
+    "application": "apps/api/src/Library.Application",
+    "domain": "apps/api/src/Library.Domain",
+    "webapi": "apps/api/src/Library.WebApi",
+    "testRoots": [
+      "apps/api/tests"
+    ],
+    "frontends": [
+      {
+        "name": "catalog",
+        "path": "apps/catalog",
+        "platform": "svelte"
+      }
+    ],
+    "apiClient": "packages/api",
+    "contract": "apps/api/openapi/fixture.json",
+    "contractPath": "apps/api/openapi/fixture.json",
+    "records": {}
+  },
+  "selectedExtensions": []
+}

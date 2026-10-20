@@ -30,7 +30,6 @@
       "carries": ["<field-name>"]
     }
   ],
-  "replaces": "<business-record id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

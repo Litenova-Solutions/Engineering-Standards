@@ -9,7 +9,6 @@
   "decideBy": "<YYYY-MM-DD>",
   "scope": "<scope, such as platform, tenant or self>",
   "allows": ["permission/<name>"],
-  "replaces": "<role id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

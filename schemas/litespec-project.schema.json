@@ -93,8 +93,24 @@
       "additionalProperties": false,
       "required": ["domainDocs", "uiDocs", "frontends"],
       "properties": {
+        "application": {
+          "description": "The Application project the model builder reads. A * in one segment expands to the first matching folder. Defaults to apps/api/src/*.Application.",
+          "$ref": "#/$defs/projectPath"
+        },
+        "domain": {
+          "description": "The Domain project the model builder reads. A * in one segment expands to the first matching folder. Defaults to apps/api/src/*.Domain.",
+          "$ref": "#/$defs/projectPath"
+        },
+        "infrastructure": {
+          "description": "The Infrastructure project the model builder reads. A * in one segment expands to the first matching folder. Defaults to apps/api/src/*.Infrastructure.",
+          "$ref": "#/$defs/projectPath"
+        },
+        "webapi": {
+          "description": "The WebApi project the model builder reads. A * in one segment expands to the first matching folder. Defaults to apps/api/src/*.WebApi.",
+          "$ref": "#/$defs/projectPath"
+        },
         "apiSolution": {
-          "description": "Path to the API solution. A consumer with no backend omits it and records a SCOPE.BACKEND.001 decision.",
+          "description": "Path to the API solution. A consumer with no backend omits it and records the decision that it has none.",
           "$ref": "#/$defs/projectPath"
         },
         "docs": {

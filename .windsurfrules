@@ -1,1 +1,1 @@
-Treat `AGENTS.md` as the canonical agent protocol. Select task summaries from `litespec.manifest.json`, then read full task documents and enabled extensions when required.
+Treat `AGENTS.md` as the canonical agent protocol. Follow its context-loading order: query the project model for the active records, read the generated agent context, then the full pages the query names and the selected extensions.

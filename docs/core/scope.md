@@ -51,7 +51,7 @@ Projects outside this boundary can use individual ideas but do not claim conform
 **Example:**
 
 ```json
-{ "id": "caching", "criterion": "catalog reads miss the latency target", "reviewBy": "2027-01-15" }
+{ "id": "cache", "criterion": "catalog reads miss the latency target", "reviewBy": "2027-01-15" }
 ```
 
 ### Answer the constraints question (litespec/rule/core-scope.answer-the-constraints-question)
@@ -107,9 +107,9 @@ A publishing product can support sign-in, draft creation, publication, and publi
 | litespec/rule/core-scope.select-a-size-profile-and-stacks | guidance | Which size did the project select, and which stack does each frontend declare? |
 | litespec/rule/core-scope.keep-one-bounded-context | guidance | Which second language or deployment boundary does the design introduce? |
 | litespec/rule/core-scope.select-conditional-extensions-explicitly | guidance | Which criterion justifies each selection, and which applicable extension stays unselected? |
-| litespec/rule/core-scope.record-selected-extensions | checkable | `node litespec/tools/validate-consumer.mjs` rejects a selection without a criterion or review date. |
+| litespec/rule/core-scope.record-selected-extensions | checkable | `litespec consumer` rejects a selection without a criterion or review date. |
 | litespec/rule/core-scope.answer-the-constraints-question | guidance | Where does the project state which outside constraints apply? |
-| litespec/rule/core-scope.declare-a-consumer-that-has-no-backend | checkable | `node litespec/tools/validate-consumer.mjs` accepts a missing `paths.apiSolution` only with its recorded decision. |
+| litespec/rule/core-scope.declare-a-consumer-that-has-no-backend | checkable | `litespec consumer` accepts a missing `paths.apiSolution` only with its recorded decision. |
 | litespec/rule/core-scope.record-unsupported-scope-decisions | guidance | Which decision records each architecture outside the supported boundary? |
 | litespec/rule/core-scope.start-with-one-api-and-database | guidance | Which second deployable or database does the topology add, and why? |
 | litespec/rule/core-scope.measure-capacity-before-expansion | guidance | Which load, target, and observed constraint justify the added capacity? |

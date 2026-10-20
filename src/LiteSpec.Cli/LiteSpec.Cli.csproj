@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>LiteSpec</RootNamespace>
+        <AssemblyName>litespec</AssemblyName>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>litespec</ToolCommandName>
+        <PackageId>LiteSpec.Cli</PackageId>
+        <Description>The LiteSpec command line: authoring checks, the provision index, consumer and UI validation, the project model, and the project book.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="LiteSpec.Cli.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Book/Assets/**" LogicalName="LiteSpec.Book.Assets.%(Filename)%(Extension)" />
+    </ItemGroup>
+
+</Project>

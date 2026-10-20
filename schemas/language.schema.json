@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Litenova-Solutions/LiteSpec/schemas/language.schema.json",
-  "title": "Litenova Project Language Record",
+  "title": "LiteSpec Project Language Record",
   "description": "The closed vocabulary a project's prose is checked against: one Term entry per concept, with its meaning, labels per language, rejected synonyms, broader and narrower terms, and closed-set values, plus the mannered terms no page may use.",
   "type": "object",
   "additionalProperties": false,

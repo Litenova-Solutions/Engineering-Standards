@@ -25,7 +25,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 **Rationale:** The query returns the smallest record set that covers the request, with the links the model computed from code, screens, and test runs.
 
-**Example:** `dotnet run --project tools/model/Litenova.Model -- query use-case/orders.cancel-order` returns the use case with its rules, results, and cases.
+**Example:** `litespec model query use-case/orders.cancel-order` returns the use case with its rules, results, and cases.
 
 ### Follow the local pattern before the model query (litespec/rule/core-agent.follow-the-local-pattern-before-the-model-query)
 

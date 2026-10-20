@@ -40,8 +40,10 @@ A consumer records the release it reviewed in `reviewedLiteSpecVersion`. (litesp
 Run the query from the LiteSpec root as below, adding the `litespec/` prefix from a consumer root. (litespec/rule/core-agent.select-task-context)
 
 ```bash
-dotnet run --project tools/model/Litenova.Model -- query <id>
+dotnet run --project src/LiteSpec.Cli -- model query <id>
 ```
+
+The [command index](docs/tools/README.md) states how `litespec` runs in each repository. (litespec/rule/core-agent.select-task-context)
 
 Do not load unrelated conventions or inactive extensions. (litespec/rule/core-agent.load-applicable-extensions, litespec/rule/core-scope.record-selected-extensions)
 
@@ -68,7 +70,7 @@ Do not add an unauthorized package, schema migration, authentication change, pub
 
 The LiteSpec manifest carries a `version` field. The actual current version is the highest git tag in this repository. The agent reads the highest tag before assuming a version. It sets the manifest to the next release being prepared. It adds new `CHANGELOG.md` entries to the topmost entry under that release's heading. (litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag)
 
-A consumer template's `reviewedLiteSpecVersion` field is set to the latest released tag, never higher. Aspirational `CHANGELOG.md` entries for un-released versions move below the current release. (litespec/rule/core-authoring.record-the-reviewed-litespec-release)
+The consumer template's `reviewedLiteSpecVersion` equals the manifest version, so a consumer created from the template passes the consumer check against the release it pins. The tag makes that release current. (litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag, litespec/rule/core-authoring.record-the-reviewed-litespec-release)
 
 ## High-Risk Boundaries
 
@@ -96,13 +98,10 @@ Agents building UI follow the chosen pattern from the catalog. An agent that see
 Run these checks for the LiteSpec repository. (litespec/rule/core-authoring.run-repeatable-authoring-checks)
 
 ```bash
-node tools/validate-standards.cases.mjs
-node tools/generate-provisions.mjs
-node tools/validate-standards.mjs
-node tools/validate-ui.cases.mjs
-node tools/validate-consumer.cases.mjs
-dotnet build tools/model/Litenova.Model
-node tools/model.cases.mjs
+dotnet build LiteSpec.slnx
+dotnet test --solution LiteSpec.slnx
+dotnet run --project src/LiteSpec.Cli -- provisions
+dotnet run --project src/LiteSpec.Cli -- validate
 node patterns/ui/library.mjs --check
 git diff --check
 ```

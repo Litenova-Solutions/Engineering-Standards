@@ -323,7 +323,7 @@ This extension selects its generator stack through `litespec.manifest.json`, whi
 | litespec/rule/ext-site.mark-unfinished-facts-with-visible-placeholders | guidance | Does each missing fact show a visible placeholder naming it? |
 | litespec/rule/ext-site.reject-a-release-build-carrying-a-placeholder | guidance | Does a release build fail while a placeholder remains? |
 | litespec/rule/ext-site.read-site-prices-and-claims-from-consumer-records | guidance | Does each site price and claim trace to its named record? |
-| litespec/rule/ext-site.declare-each-static-site-in-the-project-record | checkable | `node litespec/tools/validate-consumer.mjs` refuses a selected site extension whose `paths.sites` entry is missing. |
+| litespec/rule/ext-site.declare-each-static-site-in-the-project-record | checkable | `litespec consumer` refuses a selected site extension whose `paths.sites` entry is missing. |
 | litespec/rule/ext-site.generate-the-site-with-astro | guidance | Does Astro generate the site or does an Exception record a replacement? |
 | litespec/rule/ext-site.render-components-on-the-server-with-astro-or-svelte | guidance | Do Astro or Svelte sources render server-side or does an Exception record a replacement? |
 | litespec/rule/ext-site.use-tailwind-for-site-styles | guidance | Do Tailwind styles build the site or does an Exception record a replacement? |

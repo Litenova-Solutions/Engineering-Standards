@@ -39,13 +39,13 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 
 16. Deliver one complete slice. Ship source, tests, contracts, and operating evidence for one use case. This satisfies `litespec/rule/core-system.deliver-one-complete-use-case`.
 17. Add the operating records. Write the limits and runbooks, add deployment, backup, restore, and rollback, and configure the pipeline gates. This satisfies `litespec/rule/quality-operations.start-the-stack-with-one-local-command` and `litespec/rule/quality-ci.run-applicable-gates-on-every-pull-request`.
-18. Build the model. Run `dotnet run --project litespec/tools/model -- build` from the consumer root. It writes `model.json` with the computed links between records, code, screens, and tests.
-19. Check the model. Run `dotnet run --project litespec/tools/model -- check`. It exits 1 on any unresolved citation, missing link, or unproved case. Fix every finding before continuing.
-20. Render the generated regions. Run `dotnet run --project litespec/tools/model -- render`. Commit what it wrote.
-21. Run the remaining validators. Run `node litespec/tools/validate-consumer.mjs` and `node litespec/tools/validate-ui.mjs` from the consumer root. Both exit 0 on a clean tree. This satisfies `litespec/rule/core-release.run-consistency-checks`.
+18. Build the model. Run `litespec model build` from the consumer root. It writes `model.json` with the computed links between records, code, screens, and tests.
+19. Check the model. Run `litespec model check`. It exits 1 on any unresolved citation, missing link, or unproved case. Fix every finding before continuing.
+20. Render the generated regions. Run `litespec model render`. Commit what it wrote.
+21. Run the remaining validators. Run `litespec consumer` and `litespec ui` from the consumer root. Both exit 0 on a clean tree. This satisfies `litespec/rule/core-release.run-consistency-checks`.
 
 ## What you built
 
 - A consumer repository in the small profile that the model check accepts.
 - One implemented use case with records, code, tests, and generated contracts.
-- The command pages for the checks are [validate-consumer](../tools/validate-consumer.md) and [validate-ui](../tools/validate-ui.md).
+- The command pages for the checks are [consumer](../tools/consumer.md) and [ui](../tools/ui.md). See the [command index](../tools/README.md).

@@ -38,13 +38,13 @@ The stacks a consumer selects apply first. An extension or project exception nam
 - [Get started](docs/tutorial/getting-started.md)
 - [Command index](docs/tools/README.md)
 
-## Use the Standards
+## Use LiteSpec
 
 Pin a published release as a repository submodule:
 
 ```bash
-git submodule add https://github.com/Litenova-Solutions/LiteSpec.git standards
-git -C LiteSpec checkout --detach <approved-tag-or-commit>
+git submodule add https://github.com/Litenova-Solutions/LiteSpec.git litespec
+git -C litespec checkout --detach <approved-tag-or-commit>
 ```
 
 Add `litespec.project.json`, a short root `AGENTS.md`, and the project records required by current work.
@@ -60,8 +60,9 @@ docs/                    One directory per provision area, plus guides, commands
 schemas/                 JSON contracts for standards and consumer configuration
 templates/consumer/      Consumer record templates
 templates/standard/      Standards authoring templates
-tools/                   Reference validators and fixture suites, documented under docs/tools/
-tools/model/             The project model builder and its fixture suite
+src/LiteSpec.Cli/        The litespec command line
+tests/LiteSpec.Cli.Tests/  Its test suite and fixtures
+LiteSpec.slnx            The solution joining the command and its tests
 patterns/ui/             The UI pattern library, its data, and its viewer
 litespec.manifest.json  Versions, stacks, extensions, and package pins
 ```

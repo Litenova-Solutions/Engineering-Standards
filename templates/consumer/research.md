@@ -14,7 +14,6 @@
       "read": "<YYYY-MM-DD>"
     }
   ],
-  "replaces": "<research id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

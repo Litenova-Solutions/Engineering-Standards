@@ -2,12 +2,12 @@
 
 ## Name
 
-`node tools/book/book.mjs` generates the project book, a static website that reads a consumer's `model.json`, so a founder or reviewer reads the project model as linked pages.
+`litespec book` generates the project book, a static website that reads a consumer's `model.json`, so a founder or reviewer reads the project model as linked pages.
 
 ## Synopsis
 
 ```bash
-node tools/book/book.mjs --model <model.json> --out <folder> [--findings <file>]
+litespec book --model <model.json> --out <folder> [--findings <file>]
 ```
 
 ## Description
@@ -45,16 +45,16 @@ None. Everything passes through options.
 Generate the book for a consumer whose model is built:
 
 ```bash
-node tools/book/book.mjs --model ../consumer/.model/model.json --out ../consumer/.book
+litespec book --model ../consumer/.model/model.json --out ../consumer/.book
 ```
 
 Generate it with the check findings on the review page:
 
 ```bash
-dotnet run --project tools/model/Litenova.Model -- check --root ../consumer --format json > /tmp/findings.json
-node tools/book/book.mjs --model ../consumer/.model/model.json --out ../consumer/.book --findings /tmp/findings.json
+litespec model check --root ../consumer --format json > /tmp/findings.json
+litespec book --model ../consumer/.model/model.json --out ../consumer/.book --findings /tmp/findings.json
 ```
 
 ## Underneath
 
-The generator is plain Node with no dependencies and no build step. It copies `assets/book.css` and `assets/book.js` into the output beside the pages it writes. It writes `search.json`, the title and id index the search page filters. It embeds that same index in the search page so search works when the site opens as files. Nothing beneath it is separately runnable. The fixtures under `tools/book/fixtures/` are the model and findings the model builder writes for the large library fixture with one use case left unimplemented.
+It copies its stylesheet and script into the output beside the pages it writes. It writes `search.json`, the title and id index the search page filters. It embeds that same index in the search page so search works when the site opens as files. Nothing beneath it is separately runnable. The book fixtures under `tests/LiteSpec.Cli.Tests/` hold the model and findings for the large library fixture with one use case left unimplemented.

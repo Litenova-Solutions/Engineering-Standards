@@ -366,6 +366,12 @@ Data shaped for a query, without business record loading.
 
 Term `term/read-model`.
 
+## Record-driven delivery
+
+Delivery where approved records select work and define completion.
+
+Term `term/record-driven-delivery`.
+
 ## Recovery objectives
 
 The accepted time and data loss bounds for a restore.
@@ -449,12 +455,6 @@ Term `term/specification`.
 The opening block stating a page type, owner, status, and records.
 
 Term `term/specification-metadata`. Rejected: frontmatter.
-
-## Specification-driven delivery
-
-Delivery where approved specifications select work and define completion.
-
-Term `term/specification-driven-delivery`.
 
 ## Standard
 

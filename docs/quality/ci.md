@@ -17,15 +17,15 @@ Continuous integration proves that a pull request preserves the selected standar
 
 ## Concepts
 
-The first table lists the CI jobs. Every job is a gate: it fails the pull request when it fails. A project's size profile selects the jobs it runs.
+The first table lists the CI jobs. Every job is a gate: it fails the pull request when it fails. A project's size profile selects the jobs it runs. The [command index](../tools/README.md) states how `litespec` runs in a consumer.
 
 | Job | Checks | Selected by | Command | Small | Large |
 |:---|:---|:---|:---|:---|:---|
 | build | Solution and frontends compile. | Any source change. | `dotnet build <solution>` and `pnpm build` per frontend. | Runs. | Runs. |
 | test-backend | Architecture, integration, and acceptance suites pass. | Backend or contract change. | `dotnet test <solution>`. | Architecture and integration only. | Runs all suites. |
 | test-frontend | Lint, type-check, and route suite pass. | Frontend change. | `pnpm lint`, `pnpm type-check`, and the route suite. | Runs. | Runs. |
-| model | Model check, then every check reading model.json. | Record, code, or test change. | `dotnet run --project litespec/tools/model/Litenova.Model -- check`. | Runs. | Runs. |
-| docs | Page contract, configuration, language, prose. | Documentation change. | `node litespec/tools/validate-consumer.mjs`. | Runs. | Runs. |
+| model | Model check, then every check reading model.json. | Record, code, or test change. | `litespec model check`. | Runs. | Runs. |
+| docs | Page contract, configuration, language, prose. | Documentation change. | `litespec consumer`. | Runs. | Runs. |
 | contract | Published document and clients unchanged. | API or contract change. | Regenerate, then `git diff --exit-code`. | Runs. | Runs. |
 | supply-chain | Pins, licences, secrets, action pins, inventory. | Manifest, lockfile, or workflow change. | Frozen restores, `pnpm audit`, licence and secret scans. | Runs. | Runs. |
 | release | Every job above passes. | Release commit only. | Every command above on the release commit. | Runs. | Runs. |
@@ -123,7 +123,7 @@ A backend-only pull request runs the build, test-backend, model, docs, contract,
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/rule/quality-ci.run-applicable-gates-on-every-pull-request | guidance | Does every pull request run the jobs the jobs table selects for its changed areas? |
-| litespec/rule/quality-ci.check-documentation-on-every-pull-request | checkable | `node tools/validate-consumer.mjs` fails on a page that breaks the page contract, configuration, language, or prose rules. |
+| litespec/rule/quality-ci.check-documentation-on-every-pull-request | checkable | `litespec consumer` fails on a page that breaks the page contract, configuration, language, or prose rules. |
 | litespec/rule/quality-ci.keep-generated-contracts-fresh | guidance | Does CI regenerate the contracts from source and fail on any difference? |
 | litespec/rule/quality-ci.review-schema-artifacts | guidance | Does every persistence change publish a reviewed schema artifact with its destructive operations listed? |
 | litespec/rule/quality-ci.enforce-the-supply-chain-gate | guidance | Does the supply-chain job scan, pin, inventory, and block a release with a high-severity advisory and no Exception? |

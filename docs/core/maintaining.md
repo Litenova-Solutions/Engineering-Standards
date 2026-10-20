@@ -36,7 +36,7 @@ A citation from one page to another names the cited provision by its current ide
 
 ### The LiteSpec release
 
-A LiteSpec release is a tagged snapshot of the repository. The version in `litespec.manifest.json` matches the tag with the highest version number. The changelog entry appears above the previous releases. The `reviewedLiteSpecVersion` in the consumer template is the latest released tag.
+A LiteSpec release is a tagged snapshot of the repository. Between releases, `litespec.manifest.json`, the topmost changelog entry, and the consumer template's `reviewedLiteSpecVersion` name the release being prepared. The new tag carries that version number and makes the release current.
 
 ## Standards
 
@@ -96,5 +96,5 @@ The maintainer checks the tag with the highest version number with `git describe
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/rule/core-maintaining.state-the-provision-lifecycle | guidance | Is every provision in exactly one lifecycle state, with retired identifiers cited nowhere? |
-| litespec/rule/core-maintaining.replace-every-citation-on-a-rename | checkable | `node tools/validate-standards.mjs` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
+| litespec/rule/core-maintaining.replace-every-citation-on-a-rename | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
 | litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag | guidance | Does one new tag carry the next version across the manifest, the changelog, and the template? |

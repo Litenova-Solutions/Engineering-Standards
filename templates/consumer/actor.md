@@ -14,7 +14,6 @@
       "scope": "<scope>"
     }
   ],
-  "replaces": "<actor id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

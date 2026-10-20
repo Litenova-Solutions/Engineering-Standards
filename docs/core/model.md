@@ -288,22 +288,22 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/core-model.write-every-record-in-its-home | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape`. |
-| litespec/rule/core-model.state-the-common-fields-on-every-record | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape`. |
-| litespec/rule/core-model.write-links-on-the-record-that-points | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `reference-unresolved`. |
+| litespec/rule/core-model.write-every-record-in-its-home | checkable | `litespec model check` reports `record-shape`. |
+| litespec/rule/core-model.state-the-common-fields-on-every-record | checkable | `litespec model check` reports `record-shape`. |
+| litespec/rule/core-model.write-links-on-the-record-that-points | checkable | `litespec model check` reports `reference-unresolved`. |
 | litespec/rule/core-model.follow-the-authority-order | guidance | Does each conflict resolve toward the higher authority? |
 | litespec/rule/core-model.resolve-ties-by-the-later-decision | guidance | Does the later approved decision settle each tie? |
-| litespec/rule/core-model.hold-approval-behind-draft-decisions | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `draft-gate`. |
-| litespec/rule/core-model.record-accepted-gaps-as-known-gaps | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape` and `known-gap-expired`. |
+| litespec/rule/core-model.hold-approval-behind-draft-decisions | checkable | `litespec model check` reports `draft-gate`. |
+| litespec/rule/core-model.record-accepted-gaps-as-known-gaps | checkable | `litespec model check` reports `record-shape` and `known-gap-expired`. |
 | litespec/rule/core-model.apply-guidance-precedence | guidance | Does intent override a standard anywhere without an exception? |
-| litespec/rule/core-model.authorize-access-through-the-permission-chain | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `record-shape` and `reference-unresolved`. |
+| litespec/rule/core-model.authorize-access-through-the-permission-chain | checkable | `litespec model check` reports `record-shape` and `reference-unresolved`. |
 | litespec/rule/core-model.express-module-order-as-depends-on | guidance | Does any record rank modules instead of linking them? |
-| litespec/rule/core-model.keep-one-owner-and-status-on-every-record | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `owner-unknown` and `draft-without-decider`. |
-| litespec/rule/core-model.retire-records-with-replaces | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `invalid-field` for `replaces` outside a decision and `reference-unresolved` for an unknown target. |
-| litespec/rule/core-model.name-what-every-decision-decides | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `decision-decides-nothing`. |
-| litespec/rule/core-model.resolve-every-page-link | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `link-unresolved`. |
-| litespec/rule/core-model.declare-size-stacks-and-optional-types | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `profile-type-missing` and `record-shape`. |
-| litespec/rule/core-model.give-every-use-case-its-results | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `use-case-without-success` and `case-result-unresolved`. |
-| litespec/rule/core-model.cover-every-public-use-case-from-a-journey | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `journey-reach`. |
-| litespec/rule/core-model.read-truth-from-code-screens-and-test-runs | checkable | `dotnet run --project tools/model/Litenova.Model -- check` reports `use-case-unimplemented`, `proves-unconfirmed`, and `refusal-not-thrown`. |
+| litespec/rule/core-model.keep-one-owner-and-status-on-every-record | checkable | `litespec model check` reports `owner-unknown` and `draft-without-decider`. |
+| litespec/rule/core-model.retire-records-with-replaces | checkable | `litespec model check` reports `invalid-field` for `replaces` outside a decision and `reference-unresolved` for an unknown target. |
+| litespec/rule/core-model.name-what-every-decision-decides | checkable | `litespec model check` reports `decision-decides-nothing`. |
+| litespec/rule/core-model.resolve-every-page-link | checkable | `litespec model check` reports `link-unresolved`. |
+| litespec/rule/core-model.declare-size-stacks-and-optional-types | checkable | `litespec model check` reports `profile-type-missing` and `record-shape`. |
+| litespec/rule/core-model.give-every-use-case-its-results | checkable | `litespec model check` reports `use-case-without-success` and `case-result-unresolved`. |
+| litespec/rule/core-model.cover-every-public-use-case-from-a-journey | checkable | `litespec model check` reports `journey-reach`. |
+| litespec/rule/core-model.read-truth-from-code-screens-and-test-runs | checkable | `litespec model check` reports `use-case-unimplemented`, `proves-unconfirmed`, and `refusal-not-thrown`. |
 | litespec/rule/core-model.render-generated-regions-from-the-model | guidance | Are generated regions current, or is a replacement recorded? |

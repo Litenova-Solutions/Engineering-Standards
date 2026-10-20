@@ -1,0 +1,375 @@
+using System.Text.RegularExpressions;
+
+namespace LiteSpec.Authoring;
+
+/// <summary>
+///     The repository-wide checks: identity, citations, templates, links, indexes, and removed forms.
+/// </summary>
+static partial class StandardsValidator
+{
+    // A standards template seeds one page class, so it is parsed as the page it
+    // produces and held to that page's contract.
+    // An authoring template is parsed as the page class it produces, so its
+    // placeholder identifiers are normalized into valid ones and its virtual path
+    // stands in for a real page path. Both live in the same namespace as real pages,
+    // which is what makes the parse meaningful and also what makes the stem
+    // reserved. A real page at one of these paths would share a scope with a
+    // template and report as a duplicate of a file nobody wrote.
+    static readonly Dictionary<string, string> TemplateVirtualPath = new(StringComparer.Ordinal)
+    {
+        ["extension.md"] = "docs/ext/template.md",
+        ["how-to.md"] = "docs/guide/template.md",
+        ["tutorial.md"] = "docs/tutorial/template.md",
+        ["command.md"] = "docs/tools/template.md",
+    };
+
+    static readonly HashSet<string> ReservedTemplateStems = new(
+        [.. TemplateVirtualPath.Values, "docs/core/template.md"],
+        StringComparer.Ordinal);
+
+    const string RoutingHeading = "Which page do you want";
+
+    static void CheckPageIdentity(List<ParsedPage> parsedPages, ManifestRegistryInfo registry, Action<string, int, string, string> add)
+    {
+        // Provision identity comes from the path and the heading. The page segment is
+        // <area>-<stem>, so it names the page without a lookup, and the slug is the
+        // heading slug, so the identifier and the heading cannot drift apart.
+        // (litespec/rule/core-authoring.identifier-must-follow-format)
+        if (!registry.Present)
+        {
+            return;
+        }
+
+        foreach (var page in parsedPages)
+        {
+            var provisions = page.Parsed.Provisions;
+            if (provisions.Count == 0)
+            {
+                continue;
+            }
+
+            var parts = PageIdentityPattern().Match(page.Relative);
+            if (!parts.Success)
+            {
+                add(page.Relative, 1, "ID_PAGE_FILENAME", $"page owns {provisions.Count} provisions, so its path must be docs/<area>/<page>.md with one lowercase word in each position");
+                continue;
+            }
+
+            var areaDir = parts.Groups[1].Value;
+            var pageSegment = $"{areaDir}-{parts.Groups[2].Value}";
+            if (!registry.Areas.Contains(areaDir.ToUpperInvariant()))
+            {
+                add(page.Relative, 1, "ID_AREA_UNKNOWN", $"directory '{areaDir}' is not a registered provisionRegistry area");
+            }
+
+            foreach (var provision in provisions)
+            {
+                var parsed = Provisions.Parse(provision.Id);
+                if (parsed is null)
+                {
+                    continue;
+                }
+
+                if (parsed.Page != pageSegment)
+                {
+                    add(page.Relative, provision.Line, "ID_SCOPE_MISMATCH", $"provision '{provision.Id}' does not name the page '{pageSegment}' its path derives");
+                }
+
+                if (parsed.Slug != Provisions.HeadingSlug(provision.Title))
+                {
+                    add(page.Relative, provision.Line, "ID_SLUG_MISMATCH", $"provision '{provision.Id}' slug does not match its heading");
+                }
+            }
+        }
+    }
+
+    static void CheckCitations(List<ParsedPage> parsedPages, HashSet<string> activeIds, Action<string, int, string, string> add)
+    {
+        foreach (var page in parsedPages)
+        {
+            foreach (var reference in page.Parsed.SummaryReferences)
+            {
+                if (!activeIds.Contains(reference.Id))
+                {
+                    add(page.Relative, reference.Line, "SUMMARY_UNKNOWN_ID", $"Agent Summary cites unknown provision '{reference.Id}'");
+                }
+            }
+
+            var prose = string.Join('\n', StripFences(SplitLines(page.Raw)).Select(item => item.Line));
+            foreach (Match match in CitationPattern.Matches(prose))
+            {
+                if (!activeIds.Contains(match.Value))
+                {
+                    add(page.Relative, LineNumber(prose, match.Index), "ID_UNKNOWN_REFERENCE", $"active content references unknown provision '{match.Value}'");
+                }
+            }
+        }
+    }
+
+    static string NormalizeTemplate(string relative, string raw) => raw
+        .Replace("{litespec/rule/page.state-one-action}", "litespec/rule/template.state-one-action", StringComparison.Ordinal)
+        .Replace("{litespec/rule/page.use-one-default}", "litespec/rule/template.use-one-default", StringComparison.Ordinal)
+        .Replace("{litespec/rule/page.state-one-extension-action}", "litespec/rule/template.state-one-extension-action", StringComparison.Ordinal)
+        .Replace("{litespec/rule/page.use-one-extension-default}", "litespec/rule/template.use-one-extension-default", StringComparison.Ordinal)
+        .Replace("{Topic Title}", "Topic Title", StringComparison.Ordinal)
+        .Replace("{Extension Title}", "Extension Title", StringComparison.Ordinal)
+        .Replace("{How-To Title}", "How-To Title", StringComparison.Ordinal)
+        .Replace("{Tutorial Title}", "Tutorial Title", StringComparison.Ordinal)
+        .Replace("{Command Title}", "Command Title", StringComparison.Ordinal);
+
+    static void CheckAuthoringTemplates(string root, Dictionary<string, string> globalIds, Action<string, int, string, string> add)
+    {
+        var templateRoot = Path.Combine(root, "templates", "standard");
+        foreach (var file in Walk(templateRoot, candidate => candidate.EndsWith(".md", StringComparison.Ordinal)))
+        {
+            var relative = Slash(Path.GetRelativePath(root, file));
+            var virtualRelative = TemplateVirtualPath.GetValueOrDefault(Path.GetFileName(file), "docs/core/template.md");
+            var normalized = NormalizeTemplate(relative, ReadText(file));
+            var stripped = string.Join('\n', StripFences(SplitLines(normalized)).Select(item => item.Line));
+            var nonAscii = NonAsciiOffset(stripped);
+            if (nonAscii >= 0)
+            {
+                add(relative, 1, "PROSE_NON_ASCII", NonAsciiMessage(stripped[nonAscii], "authoring template contains non-ASCII character "));
+            }
+
+            ParsePage(virtualRelative, normalized, add, globalIds, root, @virtual: true);
+            CheckProse(relative, normalized, PageClass(virtualRelative), add);
+        }
+    }
+
+    static void CheckLinks(string root, List<string> files, Action<string, int, string, string> add)
+    {
+        var anchors = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+        foreach (var file in files)
+        {
+            anchors[file] = AnchorsFor(ReadText(file));
+        }
+
+        foreach (var file in files)
+        {
+            var raw = ReadText(file);
+            var relative = Slash(Path.GetRelativePath(root, file));
+            foreach (Match match in MarkdownLinkPattern().Matches(raw))
+            {
+                var href = match.Groups[1].Value.Trim();
+                if (AbsoluteUriPattern().IsMatch(href))
+                {
+                    continue;
+                }
+
+                var parts = href.Split('#');
+                var targetPart = parts[0];
+                var anchor = parts.Length > 1 ? parts[1] : "";
+                var target = targetPart.Length > 0
+                    ? Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file)!, DecodeURIComponent(targetPart)))
+                    : file;
+                if (targetPart.Length > 0 && !File.Exists(target) && !Directory.Exists(target))
+                {
+                    add(relative, LineNumber(raw, match.Index), "LINK_BROKEN", $"link target '{href}' does not exist");
+                    continue;
+                }
+
+                if (anchor.Length > 0 && (File.Exists(target) || Directory.Exists(target)) && target.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!anchors.TryGetValue(target, out var targetAnchors))
+                    {
+                        targetAnchors = AnchorsFor(ReadText(target));
+                    }
+
+                    if (!targetAnchors.Contains(anchor))
+                    {
+                        add(relative, LineNumber(raw, match.Index), "ANCHOR_BROKEN", $"anchor '#{anchor}' does not exist in '{Slash(Path.GetRelativePath(root, target))}'");
+                    }
+                }
+            }
+        }
+    }
+
+    static string DecodeURIComponent(string value)
+    {
+        for (var index = 0; index < value.Length; index++)
+        {
+            if (value[index] == '%' && (index + 2 > value.Length - 1 || !Uri.IsHexDigit(value[index + 1]) || !Uri.IsHexDigit(value[index + 2])))
+            {
+                throw new InvalidOperationException($"Malformed escape in link target '{value}'.");
+            }
+        }
+
+        return Uri.UnescapeDataString(value);
+    }
+
+    // The 2.0.0 model removed every numbered identifier, the old slashed kinds,
+    // and Workflow as a specification kind. A bare prefix in a refusal list is
+    // documentation; a prefix with content after it is a live old form.
+    static readonly Regex[] RemovedIdentifierPatterns =
+    [
+        RemovedIdentifierSlashedKinds(),
+        RemovedIdentifierProjectRule(),
+        RemovedIdentifierNumbered(),
+    ];
+
+    static readonly Regex[] WorkflowKindPatterns =
+    [
+        WorkflowKindCapitalized(),
+        WorkflowKindQuoted(),
+        WorkflowKindPath(),
+    ];
+
+    static void CheckRemovedForms(string root, Action<string, int, string, string> add)
+    {
+        foreach (var directory in new[] { "docs", "templates" })
+        {
+            foreach (var file in Walk(Path.Combine(root, directory), candidate => candidate.EndsWith(".md", StringComparison.Ordinal) || candidate.EndsWith(".json", StringComparison.Ordinal)))
+            {
+                var relative = Slash(Path.GetRelativePath(root, file));
+                var lines = SplitLines(ReadText(file));
+                for (var index = 0; index < lines.Length; index++)
+                {
+                    foreach (var pattern in RemovedIdentifierPatterns)
+                    {
+                        var match = pattern.Match(lines[index]);
+                        if (match.Success)
+                        {
+                            add(relative, index + 1, "REMOVED_IDENTIFIER", $"removed identifier form '{match.Value}' is not valid in 2.0.0");
+                        }
+                    }
+
+                    foreach (var pattern in WorkflowKindPatterns)
+                    {
+                        var match = pattern.Match(lines[index]);
+                        if (match.Success)
+                        {
+                            add(relative, index + 1, "WORKFLOW_KIND", $"'{match.Value}' uses Workflow as a specification kind, which 2.0.0 removed");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    static void CheckTemplateIndex(string root, Action<string, int, string, string> add)
+    {
+        const string relative = "templates/consumer/README.md";
+        var indexFile = JoinRoot(root, relative);
+        if (!File.Exists(indexFile))
+        {
+            return;
+        }
+
+        var lines = SplitLines(ReadText(indexFile));
+        for (var index = 0; index < lines.Length; index++)
+        {
+            var row = TemplateRowPattern().Match(lines[index]);
+            if (!row.Success)
+            {
+                continue;
+            }
+
+            var template = row.Groups[1].Value;
+            var target = Path.Combine(root, "templates", "consumer", template);
+            if (!File.Exists(target) && !Directory.Exists(target))
+            {
+                add(relative, index + 1, "TEMPLATE_INDEX_PATH", $"template '{template}' named in the index does not exist");
+            }
+        }
+
+        // Every tracked template appears in the index. A shipped template that no row
+        // names is a template a consumer cannot find.
+        var named = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var line in lines)
+        {
+            var row = TemplateRowPattern().Match(line);
+            if (row.Success)
+            {
+                named.Add(row.Groups[1].Value);
+            }
+        }
+
+        var directory = Path.Combine(root, "templates", "consumer");
+        if (!Directory.Exists(directory))
+        {
+            return;
+        }
+
+        foreach (var entry in Directory.GetFileSystemEntries(directory).Select(Path.GetFileName).OrderBy(name => name, StringComparer.Ordinal))
+        {
+            if (entry == "README.md" || named.Contains(entry!))
+            {
+                continue;
+            }
+
+            add(relative, 1, "TEMPLATE_INDEX_PATH", $"template '{entry}' is tracked but no index row names it");
+        }
+    }
+
+    static void CheckRootIndexRouting(string root, Action<string, int, string, string> add)
+    {
+        const string relative = "docs/README.md";
+        var file = JoinRoot(root, relative);
+        if (!File.Exists(file))
+        {
+            return;
+        }
+
+        var lines = SplitLines(ReadText(file));
+        var routingLine = -1;
+        var firstGroupLine = -1;
+        var currentHeading = "";
+        for (var index = 0; index < lines.Length; index++)
+        {
+            var heading = RoutingHeadingPattern().Match(lines[index]);
+            if (heading.Success)
+            {
+                currentHeading = heading.Groups[1].Value;
+                if (currentHeading == RoutingHeading && routingLine < 0)
+                {
+                    routingLine = index + 1;
+                }
+
+                continue;
+            }
+
+            // A navigation group is a section whose body lists links. Intent introduces
+            // the page and names no destination, so a link inside it starts no group.
+            if (firstGroupLine < 0 && currentHeading.Length > 0 && currentHeading != "Intent" && currentHeading != RoutingHeading && NavBulletPattern().IsMatch(lines[index]))
+            {
+                firstGroupLine = index + 1;
+            }
+        }
+
+        if (routingLine < 0)
+        {
+            add(relative, 1, "INDEX_MISSING_ROUTING", $"documentation root index has no '{RoutingHeading}' section, so a reader cannot tell which page class answers their question");
+            return;
+        }
+
+        if (firstGroupLine >= 0 && routingLine > firstGroupLine)
+        {
+            add(relative, routingLine, "INDEX_MISSING_ROUTING", $"'{RoutingHeading}' appears after the first navigation group at line {firstGroupLine}");
+        }
+    }
+
+    [GeneratedRegex(@"^docs/([a-z][a-z0-9]*)/([a-z][a-z0-9]*)\.md$")] private static partial Regex PageIdentityPattern();
+
+    [GeneratedRegex(@"\[[^\]]*\]\(([^)]+)\)")] private static partial Regex MarkdownLinkPattern();
+
+    [GeneratedRegex(@"^(?:https?:|mailto:)")] private static partial Regex AbsoluteUriPattern();
+
+    [GeneratedRegex(@"^\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|")] private static partial Regex TemplateRowPattern();
+
+    [GeneratedRegex(@"^##\s+(.+?)\s*$")] private static partial Regex RoutingHeadingPattern();
+
+    [GeneratedRegex(@"^-\s+\[")] private static partial Regex NavBulletPattern();
+
+    [GeneratedRegex(@"\b(?:acceptance-criterion|authorization|invariant|policy|validation|flow|workflow|end-to-end-flow|domain-policy|aggregate|value|path)/[A-Za-z0-9][A-Za-z0-9_.-]*")] private static partial Regex RemovedIdentifierSlashedKinds();
+
+    [GeneratedRegex(@"\b(?!litespec/)[a-z][a-z0-9-]*/rule/[A-Za-z0-9][A-Za-z0-9_.-]*")] private static partial Regex RemovedIdentifierProjectRule();
+
+    [GeneratedRegex(@"\b(?:AC|AUTZ|INV|POL|VAL|RULE)(?:-[A-Z][A-Z0-9]*)+-[0-9]{2,}\b|\bE2E-[0-9]+\b")] private static partial Regex RemovedIdentifierNumbered();
+
+    [GeneratedRegex(@"\bWorkflows?\b")] private static partial Regex WorkflowKindCapitalized();
+
+    [GeneratedRegex(@"[`""']workflows?[`""']")] private static partial Regex WorkflowKindQuoted();
+
+    [GeneratedRegex(@"\bworkflows?/[A-Za-z0-9]")] private static partial Regex WorkflowKindPath();
+}

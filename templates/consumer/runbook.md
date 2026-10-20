@@ -9,7 +9,6 @@
   "decideBy": "<YYYY-MM-DD>",
   "limit": "<limit id, or remove this line>",
   "trigger": "<alert or request, or remove this line>",
-  "replaces": "<runbook id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

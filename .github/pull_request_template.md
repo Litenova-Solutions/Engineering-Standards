@@ -4,13 +4,10 @@ State the constraint, decision, or defect that requires the change.
 
 ## Verification
 
-- [ ] `node tools/validate-standards.cases.mjs`
-- [ ] `node tools/generate-provisions.mjs`
-- [ ] `node tools/validate-standards.mjs`
-- [ ] `node tools/validate-ui.cases.mjs`
-- [ ] `node tools/validate-consumer.cases.mjs`
-- [ ] `dotnet build tools/model/Litenova.Model`
-- [ ] `node tools/model.cases.mjs`
+- [ ] `dotnet build LiteSpec.slnx`
+- [ ] `dotnet test --solution LiteSpec.slnx`
+- [ ] `dotnet run --project src/LiteSpec.Cli -- provisions`
+- [ ] `dotnet run --project src/LiteSpec.Cli -- validate`
 - [ ] `node patterns/ui/library.mjs --check`
 - [ ] `git diff --check`
 

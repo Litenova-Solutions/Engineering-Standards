@@ -61,7 +61,7 @@ Each stack page states what selecting that stack adds: its pages, its pins, and 
 - [Frontend data and state](frontend/data.md)
 - [Frontend testing](frontend/testing.md)
 
-Each frontend page is stack-neutral, with short per-stack sections for what differs between React and Svelte.
+Each frontend page is stack-neutral, with short per-stack sections for what differs between React, Svelte, and Blazor.
 
 ## React
 
@@ -112,10 +112,10 @@ Each frontend page is stack-neutral, with short per-stack sections for what diff
 ## Tools
 
 - [Command index](tools/README.md)
-- [Validate Standards](tools/validate-standards.md)
-- [Generate Provisions](tools/generate-provisions.md)
-- [Validate Consumer](tools/validate-consumer.md)
-- [Validate Controlled UI](tools/validate-ui.md)
+- [Validate Standards](tools/validate.md)
+- [Generate Provisions](tools/provisions.md)
+- [Validate Consumer](tools/consumer.md)
+- [Validate Controlled UI](tools/ui.md)
 - [Project model builder](tools/model.md)
 
 ## Guide

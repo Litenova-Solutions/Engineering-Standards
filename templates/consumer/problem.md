@@ -9,7 +9,6 @@
   "decideBy": "<YYYY-MM-DD>",
   "statement": "<The pain in one sentence>",
   "affects": ["actor/<name>"],
-  "replaces": "<problem id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

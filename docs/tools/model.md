@@ -2,15 +2,15 @@
 
 ## Name
 
-`dotnet run --project tools/model/Litenova.Model --` builds the project model, checks it, renders generated regions, and answers record queries.
+`litespec model` builds the project model, checks it, renders generated regions, and answers record queries.
 
 ## Synopsis
 
 ```bash
-dotnet run --project tools/model/Litenova.Model -- build --root <consumer> [--out <file>]
-dotnet run --project tools/model/Litenova.Model -- check --root <consumer> [--format json]
-dotnet run --project tools/model/Litenova.Model -- render --root <consumer>
-dotnet run --project tools/model/Litenova.Model -- query --root <consumer> <id>
+litespec model build --root <consumer> [--out <file>]
+litespec model check --root <consumer> [--format json]
+litespec model render --root <consumer>
+litespec model query --root <consumer> <id>
 ```
 
 ## Description
@@ -44,6 +44,18 @@ The finding codes are:
 | `proves-unconfirmed` | No when step of a claimed case reaches its use case, or no assertion matches its refusal. |
 | `profile-type-missing` | The size profile requires a type the project lacks. |
 | `journey-reach` | A public use case sits in no journey and names no background caller. |
+| `invalid-field` | A field holds a value outside its shape, or a record other than a decision carries `replaces`. |
+| `use-case-name-clash` | Two use cases share one name across the project. |
+| `business-record-name-clash` | Two business records share one name across the project. |
+| `gap-unknown-check` | A known gap names a check that no check uses. |
+| `decision-decides-nothing` | A decision names nothing it decides. |
+| `link-unresolved` | A Markdown link on a record page resolves to no file. |
+| `use-case-access` | A use case names no permission, is not anonymous, and runs beyond reactions and jobs. |
+| `result-status` | A result carries an HTTP status it must not, or misses one it must. |
+| `region-unknown` | A generated region names no region the builder renders. |
+| `product-not-singleton` | The project holds no single product record. |
+
+The generated regions `render` writes are `history`, `use-case-coverage`, `sub-processors`, `runbook-index`, `rule-map`, `operations-log`, `open-questions`, `journeys`, `glossary`, `exceptions`, `census`, `business-record-map`, `audit-register`, `alert-inventory`, and `counts`. A region reads `<!-- generated:<name> -->` to `<!-- /generated:<name> -->`.
 
 ## Arguments
 
@@ -72,25 +84,25 @@ The finding codes are:
 Build the model for a consumer:
 
 ```bash
-dotnet run --project tools/model/Litenova.Model -- build --root ../consumer
+litespec model build --root ../consumer
 ```
 
 Check the model and read the findings from another program:
 
 ```bash
-dotnet run --project tools/model/Litenova.Model -- check --root ../consumer --format json
+litespec model check --root ../consumer --format json
 ```
 
 Render the generated regions after a record change:
 
 ```bash
-dotnet run --project tools/model/Litenova.Model -- render --root ../consumer
+litespec model render --root ../consumer
 ```
 
 Print one record with its links:
 
 ```bash
-dotnet run --project tools/model/Litenova.Model -- query --root ../consumer use-case/orders.cancel-order
+litespec model query --root ../consumer use-case/orders.cancel-order
 ```
 
 ## Underneath

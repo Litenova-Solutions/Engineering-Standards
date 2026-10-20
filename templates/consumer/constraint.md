@@ -10,7 +10,6 @@
   "source": "<URL or document>",
   "applies": true,
   "appliesBecause": "<Why this constraint applies in one sentence>",
-  "replaces": "<constraint id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---

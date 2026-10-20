@@ -10,7 +10,6 @@
   "boundary": "<What the product covers in one sentence>",
   "neverDoes": ["<One thing the product will never do>"],
   "audience": ["actor/<name>"],
-  "replaces": "<product id, or remove this line>",
   "terms": ["term/<term-name>"]
 }
 ---
