@@ -408,6 +408,17 @@ projectCase('extension the manifest does not ship', (p) => { p.selectedExtension
 projectCase('extension whose review date passed', (p) => { p.selectedExtensions = [{ id: knownExtension, criterion: 'The suite needs one.', reviewBy: '2020-01-01' }]; }, 'was due for review on 2020-01-01');
 projectCase('known extension with a live review date', (p) => { p.selectedExtensions = [{ id: knownExtension, criterion: 'The suite needs one.', reviewBy: '2999-01-01' }]; }, null);
 
+console.log('\nRelease stage');
+const stageSelection = (fields) => ({ id: 'stage', criterion: 'No deployment holds customer data.', reviewBy: '2999-01-01', ...fields });
+const liveDeferral = { provision: 'standards/rule/ext-stage.declare-the-release-stage', until: '2999-01-01' };
+projectCase('stage selection with its release stage and a live deferral', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'pre-production', deferredProvisions: [liveDeferral] })]; }, null);
+projectCase('stage selection without a release stage', (p) => { p.selectedExtensions = [stageSelection({})]; }, 'releaseStage');
+projectCase('stage selection with an unknown release stage', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'beta' })]; }, '/releaseStage');
+projectCase('release stage on another extension', (p) => { p.selectedExtensions = [{ id: knownExtension, criterion: 'The suite needs one.', reviewBy: '2999-01-01', releaseStage: 'production' }]; }, '/id');
+projectCase('production stage that still defers', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'production', deferredProvisions: [liveDeferral] })]; }, 'declares production and still defers');
+projectCase('deferral of a provision the standards do not hold', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'pre-production', deferredProvisions: [{ provision: 'standards/rule/core-model.no-such-rule', until: '2999-01-01' }] })]; }, 'is not a provision in the pinned standards');
+projectCase('deferral past its end date', (p) => { p.selectedExtensions = [stageSelection({ releaseStage: 'pre-production', deferredProvisions: [{ ...liveDeferral, until: '2020-01-01' }] })]; }, 'ended on 2020-01-01');
+
 console.log('\nConfigured paths');
 projectCase('documentation root that is on disk', (p) => { p.paths.docs = 'docs'; }, null);
 projectCase('documentation root that is not on disk', (p) => { p.paths.docs = 'documentation'; }, "paths.docs 'documentation' does not exist");

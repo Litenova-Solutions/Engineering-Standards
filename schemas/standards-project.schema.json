@@ -277,6 +277,10 @@
           "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
           "criterion": { "type": "string", "minLength": 1 },
           "reviewBy": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "releaseStage": {
+            "description": "The release stage the stage extension declares: pre-production until a deployment holds customer data, production after the promotion decision.",
+            "enum": ["pre-production", "production"]
+          },
           "deferredProvisions": {
             "description": "The provisions this selection defers, each with the date the deferral ends. Only the stage extension defers provisions.",
             "type": "array",
@@ -299,6 +303,16 @@
               "required": ["id"],
               "properties": { "id": { "const": "stage" } }
             }
+          },
+          {
+            "if": { "required": ["releaseStage"] },
+            "then": {
+              "properties": { "id": { "const": "stage" } }
+            }
+          },
+          {
+            "if": { "properties": { "id": { "const": "stage" } } },
+            "then": { "required": ["releaseStage"] }
           }
         ]
       }

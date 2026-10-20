@@ -251,6 +251,30 @@ for (const entry of selections) {
   }
 }
 
+// The schema refuses a stage selection without a release stage. A deferral
+// naming no provision defers nothing, one past its date has drifted, and a
+// production project defers nothing at all.
+const stageSelection = selections.find((entry) => entry.id === 'stage');
+const deferrals = Array.isArray(stageSelection?.deferredProvisions) ? stageSelection.deferredProvisions : [];
+if (stageSelection?.releaseStage === 'production' && deferrals.length) {
+  err(`standards.project.json: extensions 'stage' declares production and still defers ${deferrals.length} provision(s); the promotion decision ends every deferral`);
+}
+if (deferrals.length) {
+  const indexFile = path.join(standardsRoot, 'docs', 'reference', 'provisions.md');
+  const knownProvisions = new Set(fs.existsSync(indexFile)
+    ? [...readText(indexFile).matchAll(/^\| (standards\/(?:rule|convention)\/[^\s|]+) \|/gm)].map((match) => match[1])
+    : []);
+  for (const deferral of deferrals) {
+    if (!deferral?.provision) continue;
+    if (!knownProvisions.has(deferral.provision)) {
+      err(`standards.project.json: extensions 'stage' defers '${deferral.provision}', which is not a provision in the pinned standards`);
+    }
+    if (deferral.until && deferral.until < today) {
+      err(`standards.project.json: extensions 'stage' deferral of '${deferral.provision}' ended on ${deferral.until}; apply the provision or record a new deferral`);
+    }
+  }
+}
+
 // Every frontend declares its stack. Without the field a frontend silently
 // skips every stack-scoped check, and the omission is indistinguishable from a
 // considered position.

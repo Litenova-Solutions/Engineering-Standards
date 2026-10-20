@@ -30,12 +30,12 @@ None. The promotion Decision is a core record every profile requires.
 
 **Requirement:** A consumer MUST declare `pre-production` or `production` as its release stage in `standards.project.json`.
 
-**Rationale:** A life stage is not a departure from a standard. The project record holds `releaseStage` with one of the two values above.
+**Rationale:** A life stage is not a departure from a standard. The `stage` selection in `selectedExtensions` holds `releaseStage` with one of the two values above, beside the deferrals that stage allows.
 
 **Example:** A consumer with no customer data in any deployment declares the early stage.
 
 ```json
-{"releaseStage": "pre-production"}
+{"id": "stage", "criterion": "no deployment holds customer data", "reviewBy": "2026-12-01", "releaseStage": "pre-production"}
 ```
 
 ### Defer named provisions until promotion (standards/rule/ext-stage.defer-named-provisions-until-promotion)
@@ -47,7 +47,7 @@ None. The promotion Decision is a core record every profile requires.
 **Example:** The stage selection carries each deferral with its end.
 
 ```json
-{"id": "stage", "criterion": "no deployment holds customer data", "reviewBy": "2026-12-01", "deferredProvisions": [{"provision": "standards/rule/ext-compat.classify-breaking-contract-changes", "until": "2026-12-01"}]}
+{"id": "stage", "criterion": "no deployment holds customer data", "reviewBy": "2026-12-01", "releaseStage": "pre-production", "deferredProvisions": [{"provision": "standards/rule/ext-compat.classify-breaking-contract-changes", "until": "2026-12-01"}]}
 ```
 
 ### Promote through a recorded decision (standards/rule/ext-stage.promote-through-a-recorded-decision)
@@ -68,6 +68,6 @@ This extension adds no required package.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/ext-stage.declare-the-release-stage | checkable | `node standards/tools/validate-consumer.mjs` refuses a missing or unknown `releaseStage`. |
-| standards/rule/ext-stage.defer-named-provisions-until-promotion | checkable | `node standards/tools/validate-consumer.mjs` reads each `deferredProvisions` entry and refuses any entry in `production`. |
+| standards/rule/ext-stage.declare-the-release-stage | checkable | `node standards/tools/validate-consumer.mjs` refuses a `stage` selection with a missing or unknown `releaseStage`. |
+| standards/rule/ext-stage.defer-named-provisions-until-promotion | checkable | `node standards/tools/validate-consumer.mjs` refuses a deferral naming an unknown provision or past its `until` date, and any deferral in `production`. |
 | standards/rule/ext-stage.promote-through-a-recorded-decision | guidance | Does an approved promotion Decision predate the first customer data? |
