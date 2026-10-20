@@ -127,7 +127,6 @@ sealed class BookIndex
 
 /// <summary>
 ///     The index over model.json for the book generator. Pure data shaping, no HTML.
-///     A port of <c>tools/book/lib/model.mjs</c>.
 /// </summary>
 static class BookModel
 {
@@ -328,7 +327,7 @@ static class BookModel
             list.Add(record);
         }
 
-        // OrderBy is stable, like the Node sort: equal titles keep their file order.
+        // OrderBy is stable, so equal titles keep their file order.
         foreach (var type in index.ByType.Keys.ToList())
         {
             index.ByType[type] = index.ByType[type].OrderBy(SortTitle, BookRender.LocaleComparer).ToList();
@@ -336,7 +335,7 @@ static class BookModel
 
         foreach (var record in records.OfType<JsonObject>())
         {
-            // Object.entries over an array yields its indices; the port covers both shapes.
+            // Links arrive as a field map or as a list; a list reads by position.
             IEnumerable<(string Field, JsonNode? Targets)> entries = record["links"] switch
             {
                 JsonObject linkMap => linkMap.Select(pair => (pair.Key, pair.Value)),

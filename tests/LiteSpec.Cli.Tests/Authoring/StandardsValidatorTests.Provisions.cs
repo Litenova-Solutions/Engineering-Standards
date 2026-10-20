@@ -1,6 +1,6 @@
 namespace LiteSpec.Tests.Authoring;
 
-/// <summary>Identifier, Standard, and Convention cases from the Node suite.</summary>
+/// <summary>Identifier, Standard, and Convention cases, each asserting its diagnostic codes.</summary>
 public sealed partial class StandardsValidatorTests
 {
     [Fact(DisplayName = "duplicate ID")]

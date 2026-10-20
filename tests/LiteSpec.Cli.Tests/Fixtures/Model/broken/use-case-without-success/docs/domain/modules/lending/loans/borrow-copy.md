@@ -34,7 +34,7 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "failure/lending.copy_not_available",
-      "status": 409,
+      "httpStatus": 409,
       "meaning": "The copy is unavailable."
     },
     {

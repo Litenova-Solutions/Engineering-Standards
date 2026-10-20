@@ -2,10 +2,10 @@ using LiteSpec.Tests.Support;
 
 namespace LiteSpec.Tests.Model;
 
-/// <summary>Proves <c>litespec model check</c> against the fixtures, one test per Node case in <c>tools/model.cases.mjs</c>.</summary>
+/// <summary>Proves <c>litespec model check</c> against the fixtures, one test per broken overlay.</summary>
 public sealed class ModelCheckTests
 {
-    /// <summary>Every finding code the builder emits: the <c>FINDING_CODES</c> list in <c>tools/model.cases.mjs</c>.</summary>
+    /// <summary>Every finding code the builder emits, one entry per broken overlay.</summary>
     static readonly string[] FindingCodeList =
     [
         "record-shape",

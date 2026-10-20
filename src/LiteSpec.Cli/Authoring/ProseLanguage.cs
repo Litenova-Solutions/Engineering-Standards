@@ -298,13 +298,13 @@ static partial class Prose
         return node is JsonValue value && value.TryGetValue<string>(out var text) ? text : null;
     }
 
-    // Interpolated into a diagnostic, as JavaScript interpolates the raw field.
+    // Renders a language field for a diagnostic: strings read as themselves, a missing field reads as undefined, and other values render in their JSON form.
     static string LanguageText(JsonNode? node)
     {
         return LanguageString(node) ?? (node is null ? "undefined" : node.ToString());
     }
 
-    // Absent or empty, like a falsy JavaScript reason, carries no suffix.
+    // An absent or empty reason adds no suffix to the diagnostic.
     static string? LanguageReason(JsonNode? node)
     {
         var reason = LanguageString(node);

@@ -9,7 +9,7 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 - One endpoint class per operation dispatches through its mediator. (litespec/rule/backend-api.use-one-endpoint-per-operation, litespec/rule/backend-api.exclude-mvc-controllers-from-the-profile, litespec/rule/backend-api.use-this-endpoint-layout)
 - Endpoints take transport dependencies and map no errors. (litespec/rule/backend-api.keep-endpoint-dependencies-transport-focused, litespec/rule/backend-api.defer-error-mapping-to-the-global-handler)
 - Endpoints enforce coarse policies while the guard decides targets. (litespec/rule/backend-api.apply-only-coarse-policies-at-the-endpoint)
-- Errors return Problem Details with Result codes and consistent statuses. (litespec/rule/backend-api.return-stable-problem-details, litespec/rule/backend-api.use-consistent-status-codes)
+- Errors return Problem Details with Result codes and consistent statuses, and each result records its status. (litespec/rule/backend-api.return-stable-problem-details, litespec/rule/backend-api.use-consistent-status-codes, litespec/rule/backend-api.record-each-results-http-status)
 - Routes stay resource-oriented with custom methods, PATCH, and PUT. (litespec/rule/backend-api.keep-routes-resource-oriented, litespec/rule/backend-api.state-an-unexpressible-transition-as-a-custom-method, litespec/rule/backend-api.apply-patch-to-a-partial-update, litespec/rule/backend-api.use-put-for-a-whole-replacement, litespec/rule/backend-api.name-routes-from-resources)
 - Collections page with bounds, cursors, and declared maxima. (litespec/rule/backend-api.bound-collection-queries, litespec/rule/backend-api.use-opaque-cursors-for-collection-paging, litespec/rule/backend-api.version-cursors-with-stable-sort-values, litespec/rule/backend-api.declare-a-smaller-collection-maximum, litespec/rule/backend-api.use-offsets-for-proven-bounded-datasets)
 - The contract generates on Release, commits, and declares metadata. (litespec/rule/backend-api.treat-openapi-as-a-generated-contract, litespec/rule/backend-api.commit-the-generated-contract-its-consumers-read, litespec/rule/backend-api.reflect-enforced-authentication-in-the-contract, litespec/rule/backend-api.publish-precise-complete-schemas, litespec/rule/backend-api.declare-operation-metadata-in-the-contract, litespec/rule/backend-api.expose-development-tooling-in-development-only, litespec/rule/backend-api.generate-the-contract-without-hosted-dependencies)
@@ -74,7 +74,7 @@ An operation applies a stable forbidden or not-found policy when revealing that 
 {
   "type": "https://example.test/problems/validation",
   "title": "Request validation failed",
-  "status": 400,
+  "httpStatus": 400,
   "detail": "One or more values are invalid.",
   "instance": "/api/posts",
   "code": "validation_failed",
@@ -94,6 +94,12 @@ An operation applies a stable forbidden or not-found policy when revealing that 
 WebApi maps Application member names to their public JSON field names. `traceId` carries the trace identifier from the current [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent`, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
 
 The example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. It maps validation exceptions to 400, missing targets through the operation's 404 policy, and forbidden failures to 403 or the declared 404 disclosure policy. It maps conflicts and state rejections to 409, and unexpected exceptions to 500 with code `internal_error`. It maps known Domain exception types individually. It does not report cancellation from a disconnected request as an application error.
+
+### Record each result's HTTP status (litespec/rule/backend-api.record-each-results-http-status)
+
+**Requirement:** A result MUST carry `httpStatus` exactly when an HTTP entry point reaches its use case.
+
+**Rationale:** The outcome table, the route, and the tests read one recorded status. A use case reached only by reactions or jobs has no HTTP answer to record.
 
 ### Use consistent status codes (litespec/rule/backend-api.use-consistent-status-codes)
 
@@ -485,6 +491,7 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 | litespec/rule/backend-api.defer-error-mapping-to-the-global-handler | guidance | Does any endpoint catch an application or Domain exception? |
 | litespec/rule/backend-api.apply-only-coarse-policies-at-the-endpoint | guidance | Does any endpoint decide target authorization instead of enforcing coarse policies? |
 | litespec/rule/backend-api.return-stable-problem-details | guidance | Does each error response carry code, traceId, and field errors? |
+| litespec/rule/backend-api.record-each-results-http-status | checkable | `litespec model check` reports `result-status`. |
 | litespec/rule/backend-api.use-consistent-status-codes | guidance | Does each operation return its outcome-table status code? |
 | litespec/rule/backend-api.require-the-marker-header-on-cookie-authenticated-writes | guidance | Does a cookie-authenticated write without the marker header answer 401? |
 | litespec/rule/backend-api.keep-routes-resource-oriented | guidance | Do routes use plural segments, kebab subresources, and body command data? |

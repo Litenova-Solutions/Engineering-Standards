@@ -51,7 +51,7 @@ The finding codes are:
 | `decision-decides-nothing` | A decision names nothing it decides. |
 | `link-unresolved` | A Markdown link on a record page resolves to no file. |
 | `use-case-access` | A use case names no permission, is not anonymous, and runs beyond reactions and jobs. |
-| `result-status` | A result carries an HTTP status it must not, or misses one it must. |
+| `result-status` | A result carries an `httpStatus` it must not, or misses one it must. |
 | `region-unknown` | A generated region names no region the builder renders. |
 | `product-not-singleton` | The project holds no single product record. |
 

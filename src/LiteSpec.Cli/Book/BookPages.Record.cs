@@ -276,10 +276,8 @@ static partial class BookPages
             {
                 var fields = BookRender.Fields(result) ?? new JsonObject();
                 var code = BookRender.IsTruthy(fields["code"]) ? $" <code>{BookRender.Esc(fields["code"])}</code>" : "";
-                // Only a numeric status is the HTTP status. A string is the record
-                // status, which the authority strip already shows, so it stays out.
-                var status = fields["status"] is JsonValue number && number.GetValueKind() == System.Text.Json.JsonValueKind.Number
-                    ? $" <span class=\"dim\">HTTP {BookRender.Str(fields["status"])}</span>"
+                var status = fields["httpStatus"] is JsonValue number && number.GetValueKind() == System.Text.Json.JsonValueKind.Number
+                    ? $" <span class=\"dim\">HTTP {BookRender.Str(fields["httpStatus"])}</span>"
                     : "";
                 return $"<li>{BookRender.RecordLink(index, rel, BookRender.StrProp(result, "id") ?? "")} <span class=\"dim\">{BookRender.EscOr(fields["outcome"], "")}</span>{code}{status}</li>";
             }));

@@ -136,7 +136,7 @@
     },
     "failureCode": {
       "type": "string",
-      "pattern": "^failure/[a-z0-9][a-z0-9-]*\\.[a-zA-Z0-9][a-zA-Z0-9_-]*$"
+      "pattern": "^failure/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9_-]*$"
     },
     "standardsProvisionId": {
       "type": "string",
@@ -450,7 +450,8 @@
         "id": { "$ref": "#/$defs/resultId" },
         "title": { "$ref": "#/$defs/nonEmptyString" },
         "owner": { "$ref": "#/$defs/ownerName" },
-        "status": { "type": "integer" },
+        "status": { "$ref": "#/$defs/status" },
+        "httpStatus": { "type": "integer", "minimum": 200, "maximum": 599 },
         "terms": { "$ref": "#/$defs/termIdArray" },
         "outcome": { "enum": ["success", "refusal"] },
         "code": { "$ref": "#/$defs/failureCode" },

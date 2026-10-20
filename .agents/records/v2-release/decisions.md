@@ -31,13 +31,49 @@ This file records the choices made while preparing v2.0.0 on `release/v2.0.0`, s
 
 `patterns/ui/` holds 26,000 lines of JavaScript modules that draw HTML mocks for a browser viewer, with Playwright screenshots. Porting that to .NET would mean rewriting the library's content, not its tooling. It stays Node, and `node patterns/ui/library.mjs --check` remains a repository check. CI now runs that check (it did not before).
 
+### D4. Tests run on Microsoft.Testing.Platform, with a root global.json that sets only the runner
+
+The .NET 10 `dotnet test` command refuses VSTest mode for xUnit v3 projects, so `global.json` sets `"test": { "runner": "Microsoft.Testing.Platform" }`. It sets no `sdk` section, because commit `ce130df` dropped the SDK pin on purpose so a consumer's own `global.json` governs. The command is `dotnet test --solution LiteSpec.slnx`. The VSTest packages (`Microsoft.NET.Test.Sdk`, `xunit.runner.visualstudio`) were dropped; `xunit.v3` 4.0.2 is the only test package.
+
+### D5. The release branch carries 2.0.0 in the manifest, the changelog and the consumer template
+
+The audit flagged `reviewedLiteSpecVersion: "2.0.0"` as higher than the latest tag `v1.18.0`. The consumer validator requires that field to equal the pinned manifest version, and `litespec/rule/core-maintaining.publish-a-litespec-release-from-a-tag` says the release carries its version in the manifest, the changelog and the template. So 2.0.0 stays, and the two sentences that contradicted it were rewritten: `AGENTS.md` "Version Handling" and `docs/core/maintaining.md` "The LiteSpec release". **Owner action:** tag `v2.0.0` on the release commit.
+
+### D6. Behaviour changes made while porting
+
+- The consumer validator runs the UI checks in-process; the 120-second child timeout and the "could not start" message are gone (changelog entry added).
+- Every command writes UTF-8 and `
+` line ends on every platform (the first build wrote the Windows code page and `
+`).
+- `litespec validate` checks that a `litespec <command>` in a Verification row names a real command, and that a cited `src/LiteSpec.*` or `tests/LiteSpec.*` path exists.
+- `litespec validate` skips `src/`, `tests/`, `.agents/`, `bin/` and `obj/`, as the Node validator skipped `tools/model/`.
+- `litespec model` parses options with the shared parser (`query <id> --root X` now works), exits 2 when the root holds no `litespec.project.json`, sorts findings on one line by code and message, parses ISO dates with the invariant culture, and exempts a retired use case from `reachedThrough`.
+- `litespec model` reads record roots from `paths.docs`; the project schema now declares `paths.application`, `domain`, `infrastructure` and `webapi`, which the builder always read but the schema refused.
+- The provision index says "1 kind" instead of "1 kinds"; the book closes two table-head rows it left open.
+- `litespec model` printed `[time]` phase timings to standard error on every run; they now print only when `LITESPEC_TIMING` is set.
+
+## Audit findings
+
+A read-only audit ran before the port landed (28 findings). Fixed: rename leftovers (icon title, schema titles, glossary term, `.windsurfrules`), the extension index `switchesOn` column (7 rows out of step with the manifest), the ten finding codes and the region list missing from `docs/tools/model.md`, the wrong evidence code in `docs/backend/identifiers.md`, the retired use-case contradiction, the schema and builder path mismatch, `caching` instead of `cache` in `docs/core/scope.md`, the README submodule path, the Blazor omission in `docs/README.md`, the version contradiction (D5), the model builder code defects listed in D6, `replaces` in 14 consumer templates (only a decision may carry it), and the "1 kinds" grammar.
+
+Also fixed after the first audit, as decisions taken on the owner's behalf:
+
+- **D7. A result's HTTP status is `httpStatus`.** A result carried its HTTP status in `status`, the field every other record uses for draft, approved or retired, and the book had a workaround for the clash. It is now `httpStatus` (integer, 200 to 599) in the schema, the checker, the book, the use-case template and every fixture, and `status` always means the lifecycle. Done before the v2.0.0 tag because afterwards it would be a breaking change.
+- **D8. Two checks gained the provisions that own them.** `litespec/rule/backend-identifiers.keep-business-record-names-unique-across-the-project` owns `business-record-name-clash`, and `litespec/rule/backend-api.record-each-results-http-status` owns `result-status`. Both are new provisions; **review their wording**.
+- **D9. Failure-code reasons are lowercase.** The schema allowed an uppercase reason segment while the checker accepted lowercase only; no page or template used uppercase, so the schema now matches the checker.
+
+**Left for the owner:**
+
+1. An unreadable TRX file is skipped silently, so verified counts can shrink without a finding. Fixing it adds a new finding code.
+2. When the LiteSpec docs are not beside the consumer, any `litespec/...` citation resolves; this leniency is undocumented.
+3. Your untracked `PROPOSAL-CONSUMER-SPECIFICATIONS.md` predates v2 and makes `litespec validate` report 15 broken links while it sits in the working tree. It was not committed or changed.
+4. The read-only defect review of the CLI and the comment cleanup of `src/` were stopped by Claude Code because the machine ran low on memory. The comment cleanup was finished by hand; the defect review did not run. Ask for it to be rerun when the machine has memory to spare.
+5. Rename the GitHub repository to `Litenova-Solutions/LiteSpec` and tag `v2.0.0` (D1, D5).
+
 ## Progress
 
-- [x] Rename sweep, checks green on the Node tooling (commit `a37601c`).
-- [x] CLI skeleton: project, dispatcher, shared argument and JSON helpers, LiteSpec home lookup, test runner support.
-- [x] CI workflow `.github/workflows/litespec.yml`: build, test, provision index, validate, whitespace, pattern library.
-- [ ] Ports by the Muse swarm (see the table below), verified by the judge.
-- [ ] Parity check: Node and .NET outputs compared on the repository and fixtures.
-- [ ] Node scripts removed; docs, agent files and changelog updated.
-- [ ] Audit findings fixed.
-- [ ] Final verification, commit, push.
+- [x] Rename sweep (commit `a37601c`).
+- [x] CLI and tests by a Muse swarm of 12 writers plus 1 auditor, judged and fixed by the judge; Node and C# outputs compared on this repository and on the fixtures before the Node tools were deleted (commit `60f4f5a`).
+- [x] 346 tests pass; `litespec validate` passes except the untracked proposal file; `litespec provisions --check` is current; the pattern library check passes.
+- [x] Comments describe the code without reference to the deleted Node scripts.
+- [x] D7 to D9, final verification, commit, push.

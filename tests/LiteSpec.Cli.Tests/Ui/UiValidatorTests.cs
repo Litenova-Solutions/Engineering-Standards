@@ -1,9 +1,7 @@
 namespace LiteSpec.Tests.Ui;
 
 /// <summary>
-/// Ports the <c>litespec ui</c> cases from <c>tools/validate-ui.cases.mjs</c>: one test
-/// per Node case, with the same fixture and expectations. Test names carry the Node
-/// case names word for word.
+/// <c>litespec ui</c> cases: one test per validator rule, asserting the expected diagnostics.
 /// </summary>
 public sealed partial class UiValidatorTests
 {

@@ -1,6 +1,6 @@
 namespace LiteSpec.Tests.Authoring;
 
-/// <summary>Page titles, sections, links, and glossary cases from the Node suite.</summary>
+/// <summary>Page titles, sections, links, and glossary cases, each asserting its diagnostic codes.</summary>
 public sealed partial class StandardsValidatorTests
 {
     [Fact(DisplayName = "section order")]

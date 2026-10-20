@@ -1,6 +1,6 @@
 namespace LiteSpec.Tests.Authoring;
 
-/// <summary>Controlled-prose cases from the Node suite.</summary>
+/// <summary>Controlled-prose cases, each asserting its diagnostic codes.</summary>
 public sealed partial class StandardsValidatorTests
 {
     [Fact(DisplayName = "long sentence")]

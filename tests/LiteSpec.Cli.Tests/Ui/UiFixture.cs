@@ -8,8 +8,7 @@ using LiteSpec.Tests.Support;
 namespace LiteSpec.Tests.Ui;
 
 /// <summary>
-/// A throwaway UI consumer built from the tracked templates, mirroring the fixture
-/// that the Node UI suite built before the CLI replaced it. Each test creates its own instance
+/// A throwaway UI consumer built from the tracked templates. Each test creates its own instance
 /// in its own temporary folder because tests run in parallel.
 /// </summary>
 sealed class UiFixture : IDisposable
@@ -134,7 +133,7 @@ sealed class UiFixture : IDisposable
     /// <summary>Reads a JSON file.</summary>
     public static JsonNode? ReadJson(string file) => JsonNode.Parse(File.ReadAllText(file));
 
-    /// <summary>Writes a JSON file the way the Node cases do: two-space indented with a trailing newline.</summary>
+    /// <summary>Writes a JSON file two-space indented with a trailing newline.</summary>
     public static void WriteJson(string file, JsonNode? value)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(file)!);
@@ -146,8 +145,7 @@ sealed class UiFixture : IDisposable
 
     /// <summary>
     /// Runs <c>litespec ui</c> against the fixture with the LiteSpec home pointed at the
-    /// fixture's own vendored copy. This is the equivalent of the Node suite running the
-    /// validator copy inside the fixture, so the library it reads is the fixture library.
+    /// fixture's own vendored copy, so the library it reads is the fixture library.
     /// </summary>
     public CliResult RunWithFixtureHome() => Cli.Run(
         new[] { "ui", "--root", Root },
@@ -286,7 +284,7 @@ sealed class UiFixture : IDisposable
         });
     }
 
-    /// <summary>Converts the fixture to the Svelte baseline, as the Node suite's <c>asSvelte</c> does.</summary>
+    /// <summary>Converts the fixture to the Svelte baseline with its generator, registry, and configuration.</summary>
     public void AsSvelte()
     {
         MutateProject(project =>

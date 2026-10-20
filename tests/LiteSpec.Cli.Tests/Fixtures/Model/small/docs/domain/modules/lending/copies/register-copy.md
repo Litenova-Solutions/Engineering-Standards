@@ -32,7 +32,7 @@
       "title": "Registered",
       "owner": "lending-team",
       "outcome": "success",
-      "status": 201,
+      "httpStatus": 201,
       "meaning": "The copy is registered."
     },
     {
@@ -42,7 +42,7 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "failure/lending.copy_already_registered",
-      "status": 409,
+      "httpStatus": 409,
       "meaning": "The copy is already registered."
     }
   ]

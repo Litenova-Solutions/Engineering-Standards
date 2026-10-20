@@ -6,15 +6,14 @@ using LiteSpec.Tests.Support;
 namespace LiteSpec.Tests.Consumer;
 
 /// <summary>
-/// Builds the throwaway small consumer the Node suite in
-/// <c>tools/validate-consumer.cases.mjs</c> describes: a library-style shop with
+/// Builds the throwaway small consumer every consumer case validates: a library-style shop with
 /// one module, one business record, one use case with its results, one rule and
 /// one event, actors, roles, permissions, entry points, one requirement, one
 /// decision, and one page per page style. Every test owns its own folder.
 /// </summary>
 static class ConsumerFixture
 {
-    /// <summary>Matches <c>JSON.stringify(value, null, 2)</c>: two-space indent, relaxed escaping.</summary>
+    /// <summary>Two-space indent with relaxed escaping for fixture JSON.</summary>
     static readonly JsonSerializerOptions Json = new()
     {
         WriteIndented = true,
@@ -149,7 +148,7 @@ static class ConsumerFixture
             """),
         new("docs/domain/modules/orders/cancel-order.md",
             """
-            {"type":"use-case","id":"use-case/orders.cancel-order","title":"Cancel order","owner":"fixture","status":"approved","operation":"command","needs":["permission/cancel-order"],"reachedThrough":["entry-point/web"],"raises":["event/order-claim.order-cancelled"],"fulfils":["requirement/pricing.flat-fee"],"records":[{"type":"result","id":"result/cancel-order.order-cancelled","title":"Order cancelled","outcome":"success","status":200,"meaning":"The order claim was cancelled."},{"type":"result","id":"result/cancel-order.cancel-refused","title":"Cancel refused","outcome":"refusal","code":"failure/orders.cancel-refused","status":409,"meaning":"The shipment already left, so the cancel is refused."}]}
+            {"type":"use-case","id":"use-case/orders.cancel-order","title":"Cancel order","owner":"fixture","status":"approved","operation":"command","needs":["permission/cancel-order"],"reachedThrough":["entry-point/web"],"raises":["event/order-claim.order-cancelled"],"fulfils":["requirement/pricing.flat-fee"],"records":[{"type":"result","id":"result/cancel-order.order-cancelled","title":"Order cancelled","outcome":"success","httpStatus":200,"meaning":"The order claim was cancelled."},{"type":"result","id":"result/cancel-order.cancel-refused","title":"Cancel refused","outcome":"refusal","code":"failure/orders.cancel-refused","httpStatus":409,"meaning":"The shipment already left, so the cancel is refused."}]}
             """,
             """
             # Cancel order
@@ -313,13 +312,13 @@ static class ConsumerFixture
         return new ManifestInfo(version, known);
     }
 
-    /// <summary>Serializes a node the way <c>JSON.stringify(value, null, 2)</c> would.</summary>
+    /// <summary>Serializes a JSON value with two-space indent and relaxed escaping.</summary>
     public static string Stringify(JsonNode? node) => node!.ToJsonString(Json);
 
-    /// <summary>Parses inline JSON into a node.</summary>
+    /// <summary>Parses inline JSON into a JSON value.</summary>
     public static JsonNode Meta(string json) => JsonNode.Parse(json)!;
 
-    /// <summary>Wraps frontmatter and a body in a page, like the Node <c>page</c> helper.</summary>
+    /// <summary>Combines frontmatter JSON and a body into one page.</summary>
     public static string Page(JsonNode meta, string body) => $"---\n{Stringify(meta)}\n---\n{body}";
 
     /// <summary>Builds a fresh fixture consumer in its own temporary folder.</summary>

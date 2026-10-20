@@ -31,7 +31,7 @@
       "title": "Listed",
       "owner": "lending-team",
       "outcome": "success",
-      "status": 200,
+      "httpStatus": 200,
       "meaning": "The loans are listed."
     },
     {

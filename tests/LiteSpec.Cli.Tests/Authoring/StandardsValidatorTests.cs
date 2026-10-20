@@ -4,14 +4,14 @@ using LiteSpec.Tests.Support;
 namespace LiteSpec.Tests.Authoring;
 
 /// <summary>
-///     The xUnit port of <c>tools/validate-standards.cases.mjs</c>: one test per
-///     Node case, asserting the same diagnostic codes. This part holds the runner,
+///     Standards validator cases: one test per validator rule, in both directions,
+///     asserting the expected diagnostic codes. This part holds the runner,
 ///     the coverage gate, the usage case, and the page-class cases.
 /// </summary>
 public sealed partial class StandardsValidatorTests
 {
     /// <summary>
-    ///     Runs one Node <c>run(name, mutate, expected, forbidden)</c> case:
+    ///     Runs one case with a mutation and its expected and forbidden codes:
     ///     every expected code is present, every forbidden code is absent, and a
     ///     passing case reports no diagnostics.
     /// </summary>

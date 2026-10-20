@@ -74,9 +74,9 @@ static partial class Prose
         @"(?<![A-Za-z0-9_])and/or(?![A-Za-z0-9_])",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
-    // JavaScript \b is ASCII-only while .NET \b reaches Unicode letters, so every
-    // word boundary is written out as an explicit class. Case-insensitive matches
-    // are culture-invariant, as in JavaScript.
+    // .NET \b reaches Unicode letters, so every word boundary is written out as
+    // an explicit ASCII class. Case-insensitive matches are culture-invariant,
+    // so the same text reports the same diagnostics on every machine.
     const RegexOptions WordOptions = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
 
     // One pattern per vague term, in the same order as VagueTerms.
@@ -460,7 +460,7 @@ static partial class Prose
         return new string(chars);
     }
 
-    // Counts non-overlapping occurrences, as a global JavaScript match does.
+    // Counts non-overlapping occurrences, advancing past each match.
     static int CountOccurrences(string line, string marker)
     {
         var count = 0;

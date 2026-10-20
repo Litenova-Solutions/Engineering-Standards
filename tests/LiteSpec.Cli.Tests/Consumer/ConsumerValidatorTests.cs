@@ -4,9 +4,8 @@ using LiteSpec.Tests.Support;
 namespace LiteSpec.Tests.Consumer;
 
 /// <summary>
-/// Proves <c>litespec consumer</c>, one test per case in
-/// <c>tools/validate-consumer.cases.mjs</c>, with the same fixture consumer and
-/// the same expectations. Each test owns its own folder because tests run in parallel.
+/// Proves <c>litespec consumer</c> against the fixture consumer, asserting the expected
+/// diagnostics. Each test owns its own folder because tests run in parallel.
 /// </summary>
 public sealed partial class ConsumerValidatorTests
 {
@@ -17,7 +16,7 @@ public sealed partial class ConsumerValidatorTests
         .Select(line => line[4..])
         .ToList();
 
-    /// <summary>Asserts the Node <c>report</c> null form: no problems and exit 0.</summary>
+    /// <summary>Asserts a clean run: no problems and exit 0.</summary>
     static void AssertClean(CliResult result)
     {
         var problems = Problems(result);
@@ -25,7 +24,7 @@ public sealed partial class ConsumerValidatorTests
         Assert.Empty(problems);
     }
 
-    /// <summary>Asserts the Node <c>report</c> string form: some problem carries the expectation.</summary>
+    /// <summary>Asserts a failing run: exit 1 with some problem carrying the expectation.</summary>
     static void AssertProblem(CliResult result, string expected)
     {
         var problems = Problems(result);
@@ -34,8 +33,8 @@ public sealed partial class ConsumerValidatorTests
     }
 
     /// <summary>
-    /// Asserts the Node <c>report</c> absent form: no problem names the diagnostic.
-    /// The exit code follows the problems actually printed, as the Node suite does.
+    /// Asserts no problem names the diagnostic. The exit code follows the problems
+    /// actually printed: 1 when any problem remains, 0 otherwise.
     /// </summary>
     static void AssertAbsent(CliResult result, string absent)
     {

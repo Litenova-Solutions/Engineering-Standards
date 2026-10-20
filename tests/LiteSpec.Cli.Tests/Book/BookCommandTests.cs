@@ -2,7 +2,7 @@ using LiteSpec.Tests.Support;
 
 namespace LiteSpec.Tests.Book;
 
-/// <summary>Proves <c>litespec book</c> writes the project book from a fixture model, the port of <c>tools/book/book.mjs</c>.</summary>
+/// <summary>Proves <c>litespec book</c> writes the project book from a fixture model.</summary>
 public sealed class BookCommandTests
 {
     /// <summary>The book writes <c>index.html</c>, the two assets, and one page per record.</summary>
@@ -25,7 +25,7 @@ public sealed class BookCommandTests
             "No record page was written.");
     }
 
-    /// <summary>A missing --model exits 2, the usage error code book.mjs returns for bad arguments.</summary>
+    /// <summary>A missing --model exits 2 and names the missing option, the usage error for bad arguments.</summary>
     [Fact]
     public void Book_Without_Model_Exits_2()
     {

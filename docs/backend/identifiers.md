@@ -9,6 +9,7 @@ Every record carries one identifier naming its type, home, and name. One form pe
 - Follow the form the record type names. (litespec/rule/backend-identifiers.follow-the-identifier-form-of-each-record-type)
 - Name records with one to six words. (litespec/rule/backend-identifiers.name-records-with-one-to-six-words)
 - Keep each use case name unique. (litespec/rule/backend-identifiers.keep-use-case-names-unique-across-the-project)
+- Keep each business record name unique. (litespec/rule/backend-identifiers.keep-business-record-names-unique-across-the-project)
 - Keep negation in rule names. (litespec/rule/backend-identifiers.keep-negation-in-rule-names)
 - Keep wire codes stable. (litespec/rule/backend-identifiers.keep-wire-codes-stable)
 - Reject the retired forms. (litespec/rule/backend-identifiers.reject-the-retired-identifier-forms)
@@ -96,6 +97,12 @@ Shared provisions keep their published `litespec/rule/...` form.
 
 **Rationale:** Results and cases belong to the use case named in their identifier, so a duplicate leaves that home unclear.
 
+### Keep business record names unique across the project (litespec/rule/backend-identifiers.keep-business-record-names-unique-across-the-project)
+
+**Requirement:** A business record name MUST be unique across the project.
+
+**Rationale:** Rules and events take their home from the business record named in their identifier, so two records with one name leave that home unclear.
+
 ### Keep negation in rule names (litespec/rule/backend-identifiers.keep-negation-in-rule-names)
 
 **Requirement:** A rule name MUST keep the negation its statement makes.
@@ -154,6 +161,7 @@ result/place-order.item-out-of-stock
 | litespec/rule/backend-identifiers.follow-the-identifier-form-of-each-record-type | checkable | `litespec model check` reports `identifier-form`. |
 | litespec/rule/backend-identifiers.name-records-with-one-to-six-words | checkable | `litespec model check` reports `identifier-form`. |
 | litespec/rule/backend-identifiers.keep-use-case-names-unique-across-the-project | checkable | `litespec model check` reports `use-case-name-clash`. |
+| litespec/rule/backend-identifiers.keep-business-record-names-unique-across-the-project | checkable | `litespec model check` reports `business-record-name-clash`. |
 | litespec/rule/backend-identifiers.keep-negation-in-rule-names | checkable | `litespec model check` reports `rule-name-negation`. |
 | litespec/rule/backend-identifiers.keep-wire-codes-stable | guidance | Do clients read the same code values as before? |
 | litespec/rule/backend-identifiers.reject-the-retired-identifier-forms | checkable | `litespec model check` reports `identifier-refused-form`. |

@@ -32,7 +32,7 @@
       "title": "Placed",
       "owner": "lending-team",
       "outcome": "success",
-      "status": 201,
+      "httpStatus": 201,
       "meaning": "The hold is placed."
     },
     {
@@ -42,7 +42,7 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "failure/lending.hold_already_waiting",
-      "status": 409,
+      "httpStatus": 409,
       "meaning": "A hold is already waiting."
     }
   ]

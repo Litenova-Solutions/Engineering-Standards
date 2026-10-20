@@ -10,9 +10,9 @@ using LiteSpec.Schemas;
 namespace LiteSpec.Ui;
 
 /// <summary>
-///     A JSON property read the way JavaScript reads it: whether the key exists,
+///     A JSON property read with its presence: whether the key exists,
 ///     and the value when it does. A missing key and an explicit JSON null both
-///     hold a null node; only <see cref="Found"/> tells them apart.
+///     hold a null value; only <see cref="Found"/> tells them apart.
 /// </summary>
 readonly record struct JsValue(bool Found, JsonNode? Node);
 
@@ -38,11 +38,11 @@ static partial class UiValidator
             ? new JsValue(true, value)
             : new JsValue(false, null);
 
-    /// <summary>Reads one optional link of a JavaScript <c>?.</c> chain.</summary>
+    /// <summary>Reads one optional link of a <c>?.</c> chain.</summary>
     static JsValue Dot(JsValue value, string key) =>
         value.Node is JsonObject found ? Child(found, key) : new JsValue(false, null);
 
-    /// <summary>Walks a JavaScript <c>?.</c> chain from a node.</summary>
+    /// <summary>Walks a <c>?.</c> chain from a value.</summary>
     static JsValue Chain(JsonNode? node, params string[] keys)
     {
         var current = new JsValue(true, node);
@@ -58,10 +58,10 @@ static partial class UiValidator
     static string Show(JsValue value) =>
         value.Node is null ? (value.Found ? "null" : "undefined") : ShowNode(value.Node);
 
-    /// <summary>How a template string prints a read held as a found flag and a node.</summary>
+    /// <summary>How a message prints a read held as a found flag and a value.</summary>
     static string Show(bool found, JsonNode? node) => Show(new JsValue(found, node));
 
-    /// <summary>How a template string prints a node: scalars raw, objects opaque.</summary>
+    /// <summary>How a message prints a value: scalars raw, objects opaque.</summary>
     static string ShowNode(JsonNode? node) => node switch
     {
         null => "null",
@@ -78,14 +78,14 @@ static partial class UiValidator
         _ => "[object Object]",
     };
 
-    /// <summary>A read with a fallback for a missing or null node, like <c>??</c>.</summary>
+    /// <summary>A read with a fallback for a missing or null value.</summary>
     static string ShowOr(JsValue value, string fallback) =>
         value.Node is null ? fallback : ShowNode(value.Node);
 
-    /// <summary>Whether a read is truthy the way JavaScript tests it.</summary>
+    /// <summary>Whether a read counts as present.</summary>
     static bool Truthy(JsValue value) => value is { Found: true, Node: not null } && TruthyNode(value.Node);
 
-    /// <summary>Whether a node is truthy the way JavaScript tests it.</summary>
+    /// <summary>Whether a value counts as present: null, empty strings, false and zero are absent, objects and arrays are present.</summary>
     static bool TruthyNode(JsonNode? node) => node switch
     {
         null => false,
@@ -100,7 +100,7 @@ static partial class UiValidator
         _ => true,
     };
 
-    /// <summary>Whether two reads are strictly equal the way JavaScript compares them.</summary>
+    /// <summary>Whether two reads are strictly equal: primitives compare by type and value, objects and arrays by reference.</summary>
     static bool StrictEqual(JsValue left, JsValue right)
     {
         if (!left.Found || !right.Found)
@@ -152,7 +152,7 @@ static partial class UiValidator
     static string StringifyOrUndefined(JsValue value) =>
         !value.Found ? "undefined" : value.Node is null ? "null" : value.Node.ToJsonString(CompactRelaxed);
 
-    /// <summary>The keys of the manifest's pinned npm packages, like <c>Object.keys</c>.</summary>
+    /// <summary>The keys of the manifest's pinned npm packages.</summary>
     static HashSet<string> NpmKeys(JsonNode? manifest)
     {
         var npm = Chain(manifest, "packages", "npm").Node;
@@ -165,7 +165,7 @@ static partial class UiValidator
         };
     }
 
-    /// <summary>Whether a path exists as a file or a directory, like <c>existsSync</c>.</summary>
+    /// <summary>Whether a path exists as a file or a directory.</summary>
     static bool Exists(string path) => File.Exists(path) || Directory.Exists(path);
 
     /// <summary>Whether a candidate path stays inside a root, compared by text.</summary>

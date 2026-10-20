@@ -15,7 +15,7 @@ sealed record BookPage(string Url, string Title, string Main, string Active, boo
 
 /// <summary>
 ///     The <c>litespec book</c> command: generate the project book, a static site
-///     from a consumer's model.json. A port of <c>tools/book/book.mjs</c>.
+///     from a consumer's model.json.
 /// </summary>
 static class BookCommand
 {

@@ -1,6 +1,6 @@
 namespace LiteSpec.Tests.Authoring;
 
-/// <summary>Schema, template-index, and template cases from the Node suite.</summary>
+/// <summary>Schema, template-index, and template cases, each asserting its diagnostic codes.</summary>
 public sealed partial class StandardsValidatorTests
 {
     static readonly string OneOfSchema =

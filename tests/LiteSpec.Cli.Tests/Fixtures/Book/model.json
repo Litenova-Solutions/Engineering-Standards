@@ -1303,7 +1303,7 @@
         "title": "Borrowed",
         "owner": "lending-team",
         "outcome": "success",
-        "status": 201,
+        "httpStatus": 201,
         "meaning": "The copy is lent."
       },
       "links": {}
@@ -1326,7 +1326,7 @@
         "owner": "lending-team",
         "outcome": "refusal",
         "code": "failure/lending.copy_not_available",
-        "status": 409,
+        "httpStatus": 409,
         "meaning": "The copy is unavailable."
       },
       "links": {}
@@ -1348,7 +1348,7 @@
         "title": "Cancelled",
         "owner": "lending-team",
         "outcome": "success",
-        "status": 200,
+        "httpStatus": 200,
         "meaning": "The hold is cancelled."
       },
       "links": {}
@@ -1371,7 +1371,7 @@
         "owner": "lending-team",
         "outcome": "refusal",
         "code": "failure/lending.hold_not_waiting",
-        "status": 409,
+        "httpStatus": 409,
         "meaning": "The hold already left the queue."
       },
       "links": {}
@@ -1393,7 +1393,7 @@
         "title": "Extended",
         "owner": "lending-team",
         "outcome": "success",
-        "status": 200,
+        "httpStatus": 200,
         "meaning": "The loan is extended."
       },
       "links": {}
@@ -1416,7 +1416,7 @@
         "owner": "lending-team",
         "outcome": "refusal",
         "code": "failure/lending.extension_refused",
-        "status": 409,
+        "httpStatus": 409,
         "meaning": "The extension is refused."
       },
       "links": {}
@@ -1438,7 +1438,7 @@
         "title": "Listed",
         "owner": "lending-team",
         "outcome": "success",
-        "status": 200,
+        "httpStatus": 200,
         "meaning": "The loans are listed."
       },
       "links": {}
@@ -1461,7 +1461,7 @@
         "owner": "lending-team",
         "outcome": "refusal",
         "code": "failure/lending.hold_already_waiting",
-        "status": 409,
+        "httpStatus": 409,
         "meaning": "A hold is already waiting."
       },
       "links": {}
@@ -1483,7 +1483,7 @@
         "title": "Placed",
         "owner": "lending-team",
         "outcome": "success",
-        "status": 201,
+        "httpStatus": 201,
         "meaning": "The hold is placed."
       },
       "links": {}
@@ -1506,7 +1506,7 @@
         "owner": "lending-team",
         "outcome": "refusal",
         "code": "failure/lending.copy_already_registered",
-        "status": 409,
+        "httpStatus": 409,
         "meaning": "The copy is already registered."
       },
       "links": {}
@@ -1528,7 +1528,7 @@
         "title": "Registered",
         "owner": "lending-team",
         "outcome": "success",
-        "status": 201,
+        "httpStatus": 201,
         "meaning": "The copy is registered."
       },
       "links": {}
@@ -1551,7 +1551,7 @@
         "owner": "lending-team",
         "outcome": "refusal",
         "code": "failure/lending.copy_on_loan",
-        "status": 409,
+        "httpStatus": 409,
         "meaning": "The copy is on loan."
       },
       "links": {}
@@ -1573,7 +1573,7 @@
         "title": "Retired",
         "owner": "lending-team",
         "outcome": "success",
-        "status": 200,
+        "httpStatus": 200,
         "meaning": "The copy is retired."
       },
       "links": {}
@@ -1596,7 +1596,7 @@
         "owner": "lending-team",
         "outcome": "refusal",
         "code": "failure/lending.loan_not_active",
-        "status": 409,
+        "httpStatus": 409,
         "meaning": "The loan is inactive."
       },
       "links": {}
@@ -1618,7 +1618,7 @@
         "title": "Returned",
         "owner": "lending-team",
         "outcome": "success",
-        "status": 200,
+        "httpStatus": 200,
         "meaning": "The copy is returned."
       },
       "links": {}
@@ -2038,7 +2038,7 @@
             "title": "Borrowed",
             "owner": "lending-team",
             "outcome": "success",
-            "status": 201,
+            "httpStatus": 201,
             "meaning": "The copy is lent."
           },
           {
@@ -2048,7 +2048,7 @@
             "owner": "lending-team",
             "outcome": "refusal",
             "code": "failure/lending.copy_not_available",
-            "status": 409,
+            "httpStatus": 409,
             "meaning": "The copy is unavailable."
           },
           {
@@ -2126,7 +2126,7 @@
             "title": "Cancelled",
             "owner": "lending-team",
             "outcome": "success",
-            "status": 200,
+            "httpStatus": 200,
             "meaning": "The hold is cancelled."
           },
           {
@@ -2136,7 +2136,7 @@
             "owner": "lending-team",
             "outcome": "refusal",
             "code": "failure/lending.hold_not_waiting",
-            "status": 409,
+            "httpStatus": 409,
             "meaning": "The hold already left the queue."
           },
           {
@@ -2214,7 +2214,7 @@
             "title": "Extended",
             "owner": "lending-team",
             "outcome": "success",
-            "status": 200,
+            "httpStatus": 200,
             "meaning": "The loan is extended."
           },
           {
@@ -2224,7 +2224,7 @@
             "owner": "lending-team",
             "outcome": "refusal",
             "code": "failure/lending.extension_refused",
-            "status": 409,
+            "httpStatus": 409,
             "meaning": "The extension is refused."
           },
           {
@@ -2299,7 +2299,7 @@
             "title": "Listed",
             "owner": "lending-team",
             "outcome": "success",
-            "status": 200,
+            "httpStatus": 200,
             "meaning": "The loans are listed."
           },
           {
@@ -2374,7 +2374,7 @@
             "title": "Placed",
             "owner": "lending-team",
             "outcome": "success",
-            "status": 201,
+            "httpStatus": 201,
             "meaning": "The hold is placed."
           },
           {
@@ -2384,7 +2384,7 @@
             "owner": "lending-team",
             "outcome": "refusal",
             "code": "failure/lending.hold_already_waiting",
-            "status": 409,
+            "httpStatus": 409,
             "meaning": "A hold is already waiting."
           },
           {
@@ -2462,7 +2462,7 @@
             "title": "Registered",
             "owner": "lending-team",
             "outcome": "success",
-            "status": 201,
+            "httpStatus": 201,
             "meaning": "The copy is registered."
           },
           {
@@ -2472,7 +2472,7 @@
             "owner": "lending-team",
             "outcome": "refusal",
             "code": "failure/lending.copy_already_registered",
-            "status": 409,
+            "httpStatus": 409,
             "meaning": "The copy is already registered."
           },
           {
@@ -2550,7 +2550,7 @@
             "title": "Retired",
             "owner": "lending-team",
             "outcome": "success",
-            "status": 200,
+            "httpStatus": 200,
             "meaning": "The copy is retired."
           },
           {
@@ -2560,7 +2560,7 @@
             "owner": "lending-team",
             "outcome": "refusal",
             "code": "failure/lending.copy_on_loan",
-            "status": 409,
+            "httpStatus": 409,
             "meaning": "The copy is on loan."
           },
           {
@@ -2638,7 +2638,7 @@
             "title": "Returned",
             "owner": "lending-team",
             "outcome": "success",
-            "status": 200,
+            "httpStatus": 200,
             "meaning": "The copy is returned."
           },
           {
@@ -2648,7 +2648,7 @@
             "owner": "lending-team",
             "outcome": "refusal",
             "code": "failure/lending.loan_not_active",
-            "status": 409,
+            "httpStatus": 409,
             "meaning": "The loan is inactive."
           },
           {

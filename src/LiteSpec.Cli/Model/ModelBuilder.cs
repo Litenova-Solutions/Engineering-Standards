@@ -45,7 +45,7 @@ static class ModelBuilder
             ComputeAuthority(model);
         });
 
-        Console.Error.WriteLine($"[time] build total {total.Elapsed.TotalSeconds:0.0}s");
+        Timing.Report($"[time] build total {total.Elapsed.TotalSeconds:0.0}s");
 
         return model;
     }
@@ -55,7 +55,7 @@ static class ModelBuilder
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var value = run();
 
-        Console.Error.WriteLine($"[time] {name} {watch.Elapsed.TotalSeconds:0.0}s");
+        Timing.Report($"[time] {name} {watch.Elapsed.TotalSeconds:0.0}s");
 
         return value;
     }

@@ -85,7 +85,7 @@ static partial class Checker
 
         run();
 
-        Console.Error.WriteLine($"[time] check-{name} {watch.Elapsed.TotalSeconds:0.0}s");
+        Timing.Report($"[time] check-{name} {watch.Elapsed.TotalSeconds:0.0}s");
     }
 
     private static (IReadOnlyList<Finding> Findings, IReadOnlyList<Finding> Known) Suppress(
@@ -1082,21 +1082,21 @@ static partial class Checker
 
             if (ModelBuilder.BackgroundOnly(model, useCase))
             {
-                if (result.Has("status"))
+                if (result.Has("httpStatus"))
                 {
-                    findings.Add(new Finding("result-status", $"Result '{result.Id}' carries a status but '{useCase.Id}' is reached only through reactions or jobs.", result.File, result.Line, SubjectOf(result)));
+                    findings.Add(new Finding("result-status", $"Result '{result.Id}' carries an httpStatus but '{useCase.Id}' is reached only through reactions or jobs.", result.File, result.Line, SubjectOf(result)));
                 }
 
                 continue;
             }
 
-            if (!result.Has("status"))
+            if (!result.Has("httpStatus"))
             {
-                findings.Add(new Finding("result-status", $"Result '{result.Id}' has no status.", result.File, result.Line, SubjectOf(result)));
+                findings.Add(new Finding("result-status", $"Result '{result.Id}' has no httpStatus.", result.File, result.Line, SubjectOf(result)));
             }
             else if (ResultStatus(result) is not (>= 200 and <= 599))
             {
-                findings.Add(new Finding("result-status", $"Result '{result.Id}' has status '{result.Raw.GetProperty("status")}', which is no HTTP status.", result.File, result.Line, SubjectOf(result)));
+                findings.Add(new Finding("result-status", $"Result '{result.Id}' has httpStatus '{result.Raw.GetProperty("httpStatus")}', which is no HTTP status.", result.File, result.Line, SubjectOf(result)));
             }
         }
     }
@@ -1192,7 +1192,7 @@ static partial class Checker
     private static int? ResultStatus(Record record)
     {
         if (record.Raw.ValueKind != JsonValueKind.Object
-            || !record.Raw.TryGetProperty("status", out var value))
+            || !record.Raw.TryGetProperty("httpStatus", out var value))
         {
             return null;
         }

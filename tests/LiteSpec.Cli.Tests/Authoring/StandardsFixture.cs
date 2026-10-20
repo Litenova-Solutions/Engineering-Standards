@@ -4,9 +4,8 @@ using LiteSpec.Tests.Support;
 namespace LiteSpec.Tests.Authoring;
 
 /// <summary>
-///     The minimal LiteSpec tree the Node suite builds, ported from
-///     <c>tools/validate-standards.cases.mjs</c>. Each case starts from
-///     <see cref="Base"/> and mutates one file.
+///     The minimal LiteSpec tree every standards case mutates, so each case isolates one rule.
+///     Each case starts from <see cref="Base"/> and changes one file.
 /// </summary>
 static class StandardsFixture
 {
@@ -269,8 +268,8 @@ static class StandardsFixture
 
     /// <summary>
     ///     Writes the minimal repository every case mutates. Checkable evidence
-    ///     names <c>litespec validate</c>, which needs no stub file, so unlike the
-    ///     Node fixture this tree carries no <c>tools/</c> stub.
+    ///     names <c>litespec validate</c>, which needs no stub file, so this tree
+    ///     carries no <c>tools/</c> stub.
     /// </summary>
     public static void Base(string root)
     {
@@ -286,7 +285,7 @@ static class StandardsFixture
         RebuildIndex(root);
     }
 
-    /// <summary>Replaces the first occurrence, like JavaScript <c>String.replace</c>.</summary>
+    /// <summary>Replaces the first occurrence of one substring with another.</summary>
     public static string ReplaceFirst(string text, string oldValue, string newValue)
     {
         var index = text.IndexOf(oldValue, StringComparison.Ordinal);

@@ -316,7 +316,7 @@ static partial class ConsumerValidator
         Path.GetRelativePath(root, file).Replace(Path.DirectorySeparatorChar, '/');
 
     /// <summary>
-    ///     The string value of a node, or null for anything else.
+    ///     The string value of a JSON value, or null for anything else.
     /// </summary>
     static string? AsString(JsonNode? node) =>
         node is JsonValue value && value.TryGetValue<string>(out var text) ? text : null;
@@ -325,7 +325,7 @@ static partial class ConsumerValidator
         container is not null && container.TryGetPropertyValue(key, out var value) ? AsString(value) : null;
 
     /// <summary>
-    ///     How a value reads inside a message, following JavaScript template interpolation:
+    ///     How a value reads inside a message:
     ///     a string reads as itself, JSON null as <c>null</c>, and other primitives as their JSON form.
     /// </summary>
     static string JsText(JsonNode? node) => node switch
@@ -345,7 +345,7 @@ static partial class ConsumerValidator
             : "undefined";
 
     /// <summary>
-    ///     JavaScript truthiness for a parsed JSON value: missing, null, false, zero and
+    ///     Whether a parsed JSON value counts as present: missing, null, false, zero and
     ///     the empty string are falsy, and every object and array is truthy.
     /// </summary>
     static bool IsTruthy(JsonNode? node)
@@ -376,7 +376,7 @@ static partial class ConsumerValidator
     static bool IsFalsy(JsonNode? node) => !IsTruthy(node);
 
     /// <summary>
-    ///     JavaScript strict equality for two parsed JSON values.
+    ///     Whether two parsed JSON values are strictly equal: primitives compare by type and value, objects and arrays by reference.
     /// </summary>
     static bool StrictEqual(JsonNode? left, JsonNode? right)
     {

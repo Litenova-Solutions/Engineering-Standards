@@ -4,8 +4,7 @@ namespace LiteSpec.Book;
 
 /// <summary>
 ///     Page renderers for the book generator. Every count is computed from model.json.
-///     A port of <c>tools/book/lib/pages.mjs</c>; the record-field, record-page and
-///     index renderers live in the sibling <c>BookPages.*.cs</c> files.
+///     The record-field, record-page and index renderers live in the sibling <c>BookPages.*.cs</c> files.
 /// </summary>
 static partial class BookPages
 {

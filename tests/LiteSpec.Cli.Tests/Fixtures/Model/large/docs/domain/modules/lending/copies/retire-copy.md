@@ -34,7 +34,7 @@
       "title": "Retired",
       "owner": "lending-team",
       "outcome": "success",
-      "status": 200,
+      "httpStatus": 200,
       "meaning": "The copy is retired."
     },
     {
@@ -44,7 +44,7 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "failure/lending.copy_on_loan",
-      "status": 409,
+      "httpStatus": 409,
       "meaning": "The copy is on loan."
     },
     {

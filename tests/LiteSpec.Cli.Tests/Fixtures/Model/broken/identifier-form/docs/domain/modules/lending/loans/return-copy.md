@@ -34,7 +34,7 @@
       "title": "Returned",
       "owner": "lending-team",
       "outcome": "success",
-      "status": 200,
+      "httpStatus": 200,
       "meaning": "The copy is returned."
     },
     {
@@ -44,7 +44,7 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "failure/lending.loan_not_active",
-      "status": 409,
+      "httpStatus": 409,
       "meaning": "The loan is inactive."
     },
     {

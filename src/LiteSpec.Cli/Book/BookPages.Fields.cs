@@ -49,7 +49,7 @@ static partial class BookPages
             ["business-record"] = ["codeName", "states"],
             ["rule"] = ["kind", "enforcedBy", "statement"],
             ["use-case"] = ["operation", "anonymous", "input"],
-            ["result"] = ["outcome", "code", "status", "meaning"],
+            ["result"] = ["outcome", "code", "httpStatus", "meaning"],
             ["case"] = ["situation", "action", "expect"],
             ["event"] = ["meaning", "carries"],
             ["entry-point"] = ["kind", "path"],
@@ -309,12 +309,6 @@ static partial class BookPages
                 return;
             }
 
-            // A result's record status and its HTTP status share one field name; only
-            // a number is the HTTP status. The record status is already in the strip.
-            if (BookRender.StrProp(record, "type") == "result" && field == "status" && !IsNumber(fields[field]))
-            {
-                return;
-            }
 
             var html = field == "rejected"
                 ? RenderRejected(index, rel, fields[field])

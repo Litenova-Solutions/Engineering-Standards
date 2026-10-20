@@ -3,8 +3,7 @@ using LiteSpec.Tests.Support;
 namespace LiteSpec.Tests.Model;
 
 /// <summary>
-///     Copies a model fixture to a fresh temporary folder and applies a broken overlay,
-///     the way <c>prepare</c> in <c>tools/model.cases.mjs</c> does.
+///     Copies a model fixture to a fresh temporary folder and applies a broken overlay.
 /// </summary>
 static class ModelFixture
 {
@@ -32,7 +31,7 @@ static class ModelFixture
         }
     }
 
-    /// <summary>Writes the known-gap record the Node cases use to cover <c>use-case-unimplemented</c>.</summary>
+    /// <summary>Writes the known-gap record covering <c>use-case-unimplemented</c>.</summary>
     /// <param name="root">The prepared fixture folder.</param>
     /// <param name="endsBy">The gap's end date, <c>yyyy-MM-dd</c>.</param>
     public static void WriteKnownGap(string root, string endsBy)
@@ -93,8 +92,7 @@ static class ModelFixture
         }
     }
 
-    // The same bytes the Node cases' gapFile writes: JSON frontmatter, a
-    // heading, and one line of body, joined with line feeds.
+    // Writes JSON frontmatter, a heading, and one line of body, joined with line feeds.
     static string GapFile(string endsBy) =>
         "---\n"
         + "{\n"

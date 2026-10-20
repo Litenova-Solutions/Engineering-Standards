@@ -34,7 +34,7 @@
       "title": "Extended",
       "owner": "lending-team",
       "outcome": "success",
-      "status": 200,
+      "httpStatus": 200,
       "meaning": "The loan is extended."
     },
     {
@@ -44,7 +44,7 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "failure/lending.extension_refused",
-      "status": 409,
+      "httpStatus": 409,
       "meaning": "The extension is refused."
     },
     {

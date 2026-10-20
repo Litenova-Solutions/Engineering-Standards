@@ -42,14 +42,13 @@ static class JsonSchema
     static readonly string[] ChildMaps = ["properties", "patternProperties", "$defs"];
     static readonly string[] ChildValues = ["items", "contains", "propertyNames", "additionalProperties", "if", "then", "else", "not"];
 
-    // Compact JSON with no escaping beyond what JSON.stringify does, so structural
-    // comparison and diagnostic text match the Node evaluator.
+    // Compact JSON with relaxed escaping, so structural comparison and diagnostic text stay stable.
     static readonly JsonSerializerOptions CompactJson = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 
     /// <summary>
     ///     Reports each keyword the evaluator does not implement, descending into every
     ///     subschema position. <paramref name="add"/> takes the relative path, line, code
-    ///     and message, like the Node callback.
+    ///     and message.
     /// </summary>
     public static void UnsupportedKeywords(JsonNode? schema, string relative, string pointer, Action<string, int, string, string> add)
     {
@@ -95,8 +94,8 @@ static class JsonSchema
             }
             else if (map is JsonArray entries)
             {
-                // A malformed schema can hold an array where a map belongs; the Node
-                // Object.entries call then yields its indices, so the gate does too.
+                // A malformed schema can hold an array where a map belongs; the gate
+                // then reads it by index, so every entry is still checked.
                 for (var index = 0; index < entries.Count; index++)
                 {
                     UnsupportedKeywords(entries[index], relative, $"{pointer}/{key}/{index}", add);
@@ -120,7 +119,7 @@ static class JsonSchema
 
     /// <summary>
     ///     Resolves a local <c>#/...</c> reference against the schema root, unescaping
-    ///     pointer segments the way the Node evaluator does.
+    ///     <c>~1</c> to <c>/</c> and <c>~0</c> to <c>~</c> in each pointer segment.
     /// </summary>
     /// <exception cref="InvalidOperationException">The reference does not start with <c>#/</c>.</exception>
     public static JsonNode? ResolveRef(JsonNode root, string reference)
@@ -156,8 +155,7 @@ static class JsonSchema
     /// <summary>
     ///     Validates <paramref name="value"/> against <paramref name="schema"/>, appending
     ///     one <c>{location}: ...</c> message per violation to <paramref name="errors"/>.
-    ///     A missing property is distinct from an explicit JSON null, the way the Node
-    ///     evaluator distinguishes <c>undefined</c> from <c>null</c>.
+    ///     A missing property is distinct from an explicit JSON null.
     /// </summary>
     public static void Validate(JsonNode? value, JsonNode? schema, JsonNode root, string location, List<string> errors)
     {
@@ -603,7 +601,7 @@ static class JsonSchema
 
     static string StripLocationPrefix(string message, string location)
     {
-        // The Node String.replace with a string pattern removes the first occurrence.
+        // Removes the first occurrence of the location prefix.
         var prefix = $"{location}: ";
         var index = message.IndexOf(prefix, StringComparison.Ordinal);
         return index >= 0 ? message.Remove(index, prefix.Length) : message;

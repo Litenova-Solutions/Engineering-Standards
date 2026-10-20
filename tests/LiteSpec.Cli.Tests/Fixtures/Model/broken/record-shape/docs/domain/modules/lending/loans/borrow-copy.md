@@ -33,7 +33,7 @@
       "title": "Borrowed",
       "owner": "lending-team",
       "outcome": "success",
-      "status": 201,
+      "httpStatus": 201,
       "meaning": "The copy is lent."
     },
     {
@@ -43,7 +43,7 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "failure/lending.copy_not_available",
-      "status": 409,
+      "httpStatus": 409,
       "meaning": "The copy is unavailable."
     },
     {

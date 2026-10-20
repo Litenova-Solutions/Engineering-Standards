@@ -12,6 +12,8 @@ In the LiteSpec repository, run `dotnet run --project src/LiteSpec.Cli -- <comma
 
 The CLI needs the .NET 10 SDK and no Node runtime or package install. `dotnet test --solution LiteSpec.slnx` runs the test suite of the CLI.
 
+The CLI finds its LiteSpec checkout above its own binary. Set `LITESPEC_HOME` to a checkout folder to read another one. Set `LITESPEC_TIMING` to print the phase timings of `litespec model` on standard error.
+
 The UI pattern library under `patterns/ui/` keeps its Node tooling (`node patterns/ui/library.mjs --check`), because its items are JavaScript modules that draw HTML for a browser viewer.
 
 ## LiteSpec repository

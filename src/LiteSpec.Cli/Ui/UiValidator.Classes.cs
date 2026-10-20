@@ -7,16 +7,15 @@ static partial class UiValidator
 {
     // Tailwind class strings are extracted from class attributes and class-merge
     // helper calls before any utility rule runs. Scanning a whole file with a
-    // utility pattern reports ordinary JavaScript (`= !loading`) and prose in
+    // utility pattern reports ordinary code (`= !loading`) and prose in
     // comments, so the utility rules only see strings that reach a class attribute.
     static readonly HashSet<string> ClassHelpers = new(StringComparer.Ordinal)
     {
         "cn", "clsx", "cva", "tv", "twMerge", "twJoin",
     };
 
-    // The patterns below keep JavaScript word-boundary and word-character semantics
-    // through RegexOptions.ECMAScript, which also keeps the source identical to the
-    // script this ports.
+    // The patterns below use RegexOptions.ECMAScript, so word boundaries and
+    // word characters stay ASCII-only and match class attributes the same way on every runtime.
     static readonly Regex ClassAttribute = new(@"\b(?:className|class)\s*=\s*", RegexOptions.Compiled | RegexOptions.ECMAScript);
 
     static readonly Regex ClassDirective = new(@"\bclass:([^\s=/>]+)", RegexOptions.Compiled | RegexOptions.ECMAScript);

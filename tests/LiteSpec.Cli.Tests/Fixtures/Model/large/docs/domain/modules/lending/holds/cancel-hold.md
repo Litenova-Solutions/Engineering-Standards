@@ -34,7 +34,7 @@
       "title": "Cancelled",
       "owner": "lending-team",
       "outcome": "success",
-      "status": 200,
+      "httpStatus": 200,
       "meaning": "The hold is cancelled."
     },
     {
@@ -44,7 +44,7 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "failure/lending.hold_not_waiting",
-      "status": 409,
+      "httpStatus": 409,
       "meaning": "The hold already left the queue."
     },
     {

@@ -1,6 +1,6 @@
 namespace LiteSpec.Tests.Authoring;
 
-/// <summary>Agent Summary and Verification cases from the Node suite.</summary>
+/// <summary>Agent Summary and Verification cases, each asserting its diagnostic codes.</summary>
 public sealed partial class StandardsValidatorTests
 {
     [Fact(DisplayName = "summary count")]

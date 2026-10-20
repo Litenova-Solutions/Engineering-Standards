@@ -7,28 +7,26 @@ using System.Text.Json.Nodes;
 namespace LiteSpec.Book;
 
 /// <summary>
-///     Shared HTML for the book generator: escaping, the page shell and navigation.
-///     A port of <c>tools/book/lib/render.mjs</c>, plus the JavaScript value
-///     semantics (truthiness, string coercion, locale comparison) the port needs.
+///     Shared HTML for the book generator: escaping, the page shell and navigation,
+///     plus the value semantics (truthiness, string coercion, locale comparison) the pages need.
 /// </summary>
 static class BookRender
 {
     /// <summary>
-    ///     The collation the Node generator's bare <c>localeCompare</c> calls use,
-    ///     approximated with the "en" culture.
+    ///     The English collation the generator sorts with, backed by the "en" culture.
     /// </summary>
     public static readonly CompareInfo Locale = CultureInfo.GetCultureInfo("en").CompareInfo;
 
     static readonly JsonSerializerOptions CompactJson = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 
-    /// <summary>Compares two strings the way the generator's <c>localeCompare</c> calls do.</summary>
+    /// <summary>Compares two strings with English collation.</summary>
     public static int LocaleCompare(string left, string right) => Locale.Compare(left, right, CompareOptions.None);
 
     /// <summary>An <see cref="IComparer{T}"/> that compares strings with <see cref="LocaleCompare"/>.</summary>
     public static IComparer<string> LocaleComparer { get; } = Comparer<string>.Create(LocaleCompare);
 
     /// <summary>
-    ///     JavaScript <c>String(value ?? "")</c>: missing values become the empty string,
+    ///     Coerces a value to its display string: missing values become the empty string,
     ///     arrays join with commas, objects become <c>[object Object]</c>.
     /// </summary>
     public static string Str(JsonNode? value)
@@ -45,7 +43,7 @@ static class BookRender
     }
 
     /// <summary>
-    ///     A property read inside a template literal: a missing property is
+    ///     A property read for display: a missing property is
     ///     <c>undefined</c>, a JSON null is <c>null</c>, anything else coerces.
     /// </summary>
     public static string PropText(JsonObject? obj, string name)
@@ -58,7 +56,7 @@ static class BookRender
         return value is null ? "null" : Str(value);
     }
 
-    /// <summary>JavaScript truthiness: only missing, empty-string, zero, false and NaN values are falsy.</summary>
+    /// <summary>Tests presence: missing, empty-string, zero, false and NaN values are falsy, everything else is truthy.</summary>
     public static bool IsTruthy(JsonNode? value)
     {
         return value switch
@@ -74,14 +72,14 @@ static class BookRender
         };
     }
 
-    /// <summary>Whether the node holds the boolean <c>true</c>, as a strict <c>=== true</c> check does.</summary>
+    /// <summary>Whether the value holds the boolean <c>true</c>.</summary>
     public static bool IsTrue(JsonNode? value) =>
         value is JsonValue scalar && scalar.TryGetValue<bool>(out var flag) && flag;
 
-    /// <summary>JavaScript <c>value || fallback</c> coerced to a string.</summary>
+    /// <summary>Coerces a value to a string, or returns the fallback when it is falsy.</summary>
     public static string OrStr(JsonNode? value, string fallback) => IsTruthy(value) ? Str(value) : fallback;
 
-    /// <summary>Escapes the five HTML metacharacters, exactly like the generator's <c>esc</c>.</summary>
+    /// <summary>Escapes the five HTML metacharacters.</summary>
     public static string Esc(string? value)
     {
         if (string.IsNullOrEmpty(value))
@@ -109,13 +107,13 @@ static class BookRender
     /// <summary>Coerces a JSON value with <see cref="Str"/> and escapes it.</summary>
     public static string Esc(JsonNode? value) => Esc(Str(value));
 
-    /// <summary>JavaScript <c>esc(value || fallback)</c>.</summary>
+    /// <summary>Coerces a value with a fallback and escapes it for HTML.</summary>
     public static string EscOr(JsonNode? value, string fallback) => Esc(OrStr(value, fallback));
 
-    /// <summary>JavaScript <c>JSON.stringify(value)</c>: compact JSON without escaping quotes.</summary>
+    /// <summary>Serializes a value as compact JSON.</summary>
     public static string JsonCompact(JsonNode? value) => JsonSerializer.Serialize(value, CompactJson);
 
-    /// <summary>JavaScript <c>JSON.stringify(value, null, 2)</c>.</summary>
+    /// <summary>Serializes a value as indented JSON.</summary>
     public static string JsonIndented(JsonNode? value) => JsonSerializer.Serialize(value, CliJson.Options);
 
     /// <summary>Reads a string property, or null when it is missing or not a string.</summary>

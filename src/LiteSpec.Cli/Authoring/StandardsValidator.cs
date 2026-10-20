@@ -486,7 +486,7 @@ static partial class StandardsValidator
         return result;
     }
 
-    // English collation, as Node's default localeCompare uses, so the order is the same on every machine.
+    // Sorts with English collation so diagnostics order identically on every machine.
     static readonly StringComparer SortOrder = StringComparer.Create(CultureInfo.GetCultureInfo("en"), ignoreCase: false);
 
     static bool IsCurrentStandardsMaterial(string relative)
