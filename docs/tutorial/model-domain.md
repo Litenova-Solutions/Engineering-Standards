@@ -9,7 +9,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 ## Prerequisites
 
 - Finish [Get started](getting-started.md) through its configuration steps.
-- Read the product brief and the requirements this module fulfils.
+- Read the product brief and the requirements this module fulfills.
 - Read the decisions that constrain identity, persistence, security, or external behavior.
 - Copy the `module.md`, `business-record.md`, and `use-case.md` templates from the [template index](../../templates/consumer/README.md).
 
@@ -109,7 +109,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 
     Work that crosses a transaction or time boundary is a use case that reacts to an event, or a use case on a schedule. It declares what it reacts to and its delivery. This satisfies `litespec/backend/application#keep-event-reaction-implementations-explicit`.
 12. Keep one transaction per command. One handler stages the records its use case owns and lets the pipeline commit once. It dispatches no further command. This satisfies `litespec/backend/application#keep-one-state-changing-use-case-in-one-pipeline` and `litespec/backend/persistence#commit-each-command-pipeline-once`.
-13. Map the model to folders. Mirror the module, record, and use case path in every layer. This satisfies `litespec/backend/architecture#organize-every-layer-by-module-and-use-case` and `litespec/backend/architecture#organize-every-layer-by-module-and-use-case`.
+13. Map the model to folders. Mirror the module, record, and use case path in every layer. This satisfies `litespec/backend/architecture#organize-every-layer-by-module-and-use-case`.
 
     ```text
     apps/api/src/Library.Domain/

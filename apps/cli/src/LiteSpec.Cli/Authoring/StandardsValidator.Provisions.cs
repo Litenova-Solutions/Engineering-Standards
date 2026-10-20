@@ -3,14 +3,14 @@ using System.Text.RegularExpressions;
 namespace LiteSpec.Authoring;
 
 /// <summary>
-///     The provision contract: labels, assertions, summaries, and verification tables.
+///     The provision contract: labels, assertions, and verification tables.
 /// </summary>
 static partial class StandardsValidator
 {
     static readonly HashSet<string> VerificationMarks = new(["checkable", "guidance"], StringComparer.Ordinal);
 
     static readonly HashSet<string> LiteSpecCommands = new(
-        ["validate", "provisions", "consumer", "ui", "model", "book", "patterns"],
+        ["validate", "provisions", "consumer", "ui", "model", "book", "patterns", "init"],
         StringComparer.Ordinal);
 
     // A claim is the comparable core of a heading, a Requirement, a Default, or a
@@ -206,46 +206,6 @@ static partial class StandardsValidator
         }
     }
 
-    static void CheckSummary(string relative, List<LineItem> clean, int summaryStart, int summaryEnd, int summaryLine, List<SummaryReference> summaryReferences, Action<string, int, string, string> add)
-    {
-        if (summaryStart < 0)
-        {
-            return;
-        }
-
-        var bullets = clean.Skip(summaryStart).Take(summaryEnd - summaryStart).Where(item => SummaryBulletPattern().IsMatch(item.Line)).ToList();
-        if (bullets.Count > 10)
-        {
-            add(relative, summaryLine, "SUMMARY_COUNT", $"Agent Summary has {bullets.Count} bullets; maximum is 10");
-        }
-
-        foreach (var bullet in bullets)
-        {
-            var text = Prose.VisibleText(bullet.Line);
-            if (ModalsPattern().Matches(text).Count > 0 || OtherNormativePattern().IsMatch(text))
-            {
-                add(relative, bullet.Number, "SUMMARY_NORMATIVE", "Agent Summary contains normative vocabulary");
-            }
-
-            var ids = CitationPattern.Matches(bullet.Line).Cast<Match>().Select(match => match.Value).ToList();
-            if (ids.Count == 0)
-            {
-                add(relative, bullet.Number, "SUMMARY_MISSING_ID", "Agent Summary bullet cites no provision ID");
-            }
-
-            if (!SummaryPositionPattern.IsMatch(bullet.Line))
-            {
-                add(relative, bullet.Number, "SUMMARY_ID_POSITION", "Agent Summary bullet must end with its provision citations");
-            }
-
-            var bulletClaim = Claim(TrailingParenPattern().Replace(text, ""));
-            foreach (var id in ids)
-            {
-                summaryReferences.Add(new SummaryReference(id, bullet.Number, bulletClaim));
-            }
-        }
-    }
-
     static void CheckProvisionClaims(string relative, List<Provision> provisions, Action<string, int, string, string> add)
     {
         // A provision whose Requirement or Default only repeats its own heading
@@ -269,34 +229,12 @@ static partial class StandardsValidator
         }
     }
 
-    static void CheckSummaryRestatement(string relative, List<Provision> provisions, List<SummaryReference> summaryReferences, Action<string, int, string, string> add)
-    {
-        // Tier 1 exists to compress Tier 2. A bullet identical to its provision adds
-        // no context and makes the escalation pointless. (litespec/core/authoring#keep-agent-summaries-informative)
-        foreach (var reference in summaryReferences)
-        {
-            var provision = provisions.FirstOrDefault(item => item.Id == reference.Id);
-            if (provision is not null && provision.Claim.Length > 0 && reference.Claim.Length > 0 && provision.Claim == reference.Claim)
-            {
-                add(relative, reference.Line, "SUMMARY_RESTATES_REQUIREMENT", $"Agent Summary bullet for '{reference.Id}' repeats its provision verbatim");
-            }
-        }
-    }
-
-    static void CheckNormativeLocation(string relative, List<LineItem> clean, List<Provision> provisions, int summaryStart, int summaryEnd, Action<string, int, string, string> add)
+    static void CheckNormativeLocation(string relative, List<LineItem> clean, List<Provision> provisions, Action<string, int, string, string> add)
     {
         var provisionLines = new HashSet<int>(provisions.SelectMany(provision => new[] { provision.Line }.Concat(provision.Body.Select(item => item.Number))));
-        var summaryLines = new HashSet<int>();
-        if (summaryStart >= 0)
-        {
-            foreach (var number in clean.Skip(summaryStart).Take(summaryEnd - summaryStart).Select(item => item.Number))
-            {
-                summaryLines.Add(number);
-            }
-        }
         foreach (var item in clean)
         {
-            if (provisionLines.Contains(item.Number) || summaryLines.Contains(item.Number))
+            if (provisionLines.Contains(item.Number))
             {
                 continue;
             }
@@ -484,12 +422,6 @@ static partial class StandardsValidator
 
     [GeneratedRegex(@"\bSHOULD(?: NOT)?\b")]
     private static partial Regex ShouldPattern();
-
-    [GeneratedRegex(@"^\s*-\s+")]
-    private static partial Regex SummaryBulletPattern();
-
-    [GeneratedRegex(@"\([^)]*\)\s*$")]
-    private static partial Regex TrailingParenPattern();
 
     [GeneratedRegex(@"^\|\s*ID\s*\|\s*Mark\s*\|\s*Evidence\s*\|\s*$")]
     private static partial Regex VerifyHeaderPattern();

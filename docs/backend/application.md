@@ -6,19 +6,6 @@ Application coordinates use cases. It translates a command or query into domain 
 
 Every folder in the project is a module, an aggregate, or a use case. The contracts more than one module names live in the shared application contracts, and the pipeline's own machinery lives in one folder named for it.
 
-## Agent Summary {#agent-summary}
-
-- One folder per operation holds its message, definition, result, validator, and handler. (litespec/backend/application#organize-application-by-operation, litespec/backend/application#use-this-operation-layout)
-- Commands and queries dispatch through separate mediator entry points. (litespec/backend/application#dispatch-commands-and-queries-through-separate-entry-points)
-- Validators check input shape and report validity findings while Domain decides state permission. (litespec/backend/application#separate-input-validation-from-invariants, litespec/backend/application#report-input-problems-as-validity-findings)
-- Expected failures throw typed exceptions carrying their Result code. (litespec/backend/application#model-expected-use-case-failures-explicitly)
-- The guard authorizes from declared permissions while handlers authorize nothing. (litespec/backend/application#enforce-target-authorization-in-the-pipeline, litespec/backend/application#declare-every-pipeline-position-beside-the-message)
-- Command handlers load, call, stage, and return without nesting. (litespec/backend/application#keep-command-handlers-narrow, litespec/backend/application#keep-one-state-changing-use-case-in-one-pipeline)
-- Queries project to result records without loading aggregates. (litespec/backend/application#project-queries-directly)
-- Results mirror Domain closed sets while narrowing needs a recorded decision. (litespec/backend/application#mirror-a-domain-closed-set-in-the-result, litespec/backend/application#record-a-decision-for-closed-set-narrowing)
-- Reactions declare one delivery classification and run it. (litespec/backend/application#keep-event-reaction-implementations-explicit)
-- Ports stay narrow and declared with consumers while messages stay immutable records mapped at boundaries. (litespec/backend/application#define-narrow-external-ports, litespec/backend/application#declare-a-port-where-its-consumers-meet, litespec/backend/application#keep-messages-immutable, litespec/backend/application#return-use-case-results, litespec/backend/application#keep-mappings-at-the-owning-boundary)
-
 ## Standards
 
 ### Organize Application by operation
@@ -31,7 +18,7 @@ Every folder in the project is a module, an aggregate, or a use case. The contra
 
 **Requirement:** An application MUST dispatch a command and a query through two separate Application-facing entry points rather than one message bus abstraction.
 
-**Rationale:** Two entry points keep the write and read paths distinguishable at every call site, and let the pipeline compose different stages for each. A unified bus hides that difference behind one method, and the difference is the one this profile's whole command and query split depends on.
+**Rationale:** Two entry points keep the write and read paths distinguishable at every call site, and let the pipeline compose different stages for each. A unified bus hides that difference behind one method, and the difference is the one this backend's whole command and query split depends on.
 
 The rule states the property rather than the package. Each stack binding pins one library that supplies it. A consumer replacing that library records an Exception against the binding convention rather than touching this rule.
 

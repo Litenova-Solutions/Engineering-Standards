@@ -4,18 +4,6 @@
 
 A release joins deployed product behavior with evidence that a maintainer can operate it. One completed layer or passing test category does not meet this outcome.
 
-## Agent Summary {#agent-summary}
-
-- Verify connected journeys. (litespec/core/release#verify-connected-journeys)
-- Run checks selected by changed boundary. (litespec/core/release#run-boundary-selected-checks)
-- Commit regenerated application contracts with source. (litespec/core/release#regenerate-application-contracts)
-- Meet every declared release readiness gate. (litespec/core/release#meet-release-readiness-gates)
-- Report exact verification scope and omissions. (litespec/core/release#report-verification-exactly)
-- Bind release evidence to one immutable artifact. (litespec/core/release#identify-immutable-release-artifacts)
-- Accepted debt lives as a Known gap. (litespec/core/release#record-accepted-debt-as-a-known-gap)
-- A first release keeps a readiness record before its artifact. (litespec/core/release#keep-a-first-release-readiness-record)
-- State each release as a complete record. (litespec/core/release#state-each-release-as-a-complete-record)
-
 ## Standards
 
 ### Keep unfinished behavior in draft
@@ -40,7 +28,7 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 **Requirement:** A backend change MUST pass the release build and the backend test suites.
 
-**Rationale:** The release build compiles the solution in release mode. The backend suites are the architecture, integration, and acceptance suites the size profile requires.
+**Rationale:** The release build compiles the solution in release mode. The backend suites are the architecture, integration, and acceptance suites the size requires.
 
 ### Run frontend release checks
 

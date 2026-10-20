@@ -12,7 +12,7 @@ litespec validate [--root <path>] [--warnings] [--format json] [--help]
 
 ## Description
 
-This command is the repository gate for every page, template, and identifier under `docs/`. It reads page contracts and section order, atomic Standards and Convention blocks, provision identity, verification marks, and controlled prose. It also reads internal links, manifest paths, extension declarations, and the generated provision index.
+This command is the repository gate for every page, template, and identifier under `docs/`. It reads page contracts and section order, atomic Standards and Convention blocks, provision identity, pattern pages and their wireframes, verification marks, and ASCII prose. It also reads internal links, manifest paths, extension declarations, and the generated provision index.
 
 Run it after changing any page, any template, or any authoring rule.
 

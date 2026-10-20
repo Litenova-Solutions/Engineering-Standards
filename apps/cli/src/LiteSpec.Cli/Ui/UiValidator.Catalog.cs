@@ -1,4 +1,6 @@
 using System.Text.Json.Nodes;
+using LiteSpec.Authoring;
+using LiteSpec.Patterns;
 
 namespace LiteSpec.Ui;
 
@@ -7,7 +9,7 @@ static partial class UiValidator
     private sealed partial class Session
     {
         // The pattern catalog records one decision per recurring UI question: the
-        // options considered, the option chosen, the compact behaviour, and the
+        // options considered, the option chosen, the compact behavior, and the
         // implementation per platform. The schema proves the shape; the checks below
         // prove the references the schema cannot see across properties, so every named
         // option, breakpoint, group, and component path resolves.
@@ -40,33 +42,25 @@ static partial class UiValidator
                 ? patternArray.ToList()
                 : new List<JsonNode?>();
 
-            // A pattern citing a library pattern starts from the library's entry. The
-            // library ships with the LiteSpec release the validator runs from, so it
-            // resolves beside this tool rather than under the consumer root. A catalog
-            // that cites nothing reads nothing here.
-            var citesLibrary = patterns.Any(pattern => Child(pattern, "library") is { Node: JsonValue value } && value.TryGetValue<string>(out var cited) && cited.Length > 0);
-            List<KeyValuePair<JsValue, JsonNode?>>? libraryById = null;
-            if (citesLibrary)
+            // A pattern citing a LiteSpec pattern starts from its entry on a pattern page.
+            // The pages ship with the LiteSpec release the validator runs from, so they
+            // resolve beside this tool rather than under the consumer root.
+            var pages = new Dictionary<string, PatternPage?>(StringComparer.Ordinal);
+            Pattern? Cited(string id)
             {
-                // The manifest names where the release keeps its pattern library.
-                var libraryFolder = CliJson.TryRead(LiteSpecHome.PathTo(LiteSpecHome.ManifestFile))?["paths"]?["uiPatternLibrary"] is JsonValue folder
-                    && folder.TryGetValue<string>(out var configured) ? configured : "packages/ui-patterns";
-                var libraryFile = LiteSpecHome.PathTo($"{libraryFolder}/library.json");
-                if (!File.Exists(libraryFile))
+                if (Provisions.Parse(id) is not { } parsed || !parsed.Page.StartsWith("frontend/patterns/", StringComparison.Ordinal))
                 {
-                    Errors.Add($"{label}: the UI pattern library is missing from the LiteSpec release");
+                    return null;
                 }
-                else
+
+                if (!pages.TryGetValue(parsed.Page, out var page))
                 {
-                    var library = ReadJson(libraryFile, "UI pattern library");
-                    if (library is not null)
-                    {
-                        var entries = Child(library, "patterns").Node is JsonArray libraryArray
-                            ? libraryArray.ToList()
-                            : new List<JsonNode?>();
-                        libraryById = entries.Select(entry => new KeyValuePair<JsValue, JsonNode?>(Child(entry, "id"), entry)).ToList();
-                    }
+                    var path = LiteSpecHome.Root is null ? null : LiteSpecHome.PathTo($"docs/{parsed.Page}.md");
+                    page = path is not null && File.Exists(path) ? PatternPage.Parse(Path.GetFileNameWithoutExtension(path), File.ReadAllText(path)) : null;
+                    pages[parsed.Page] = page;
                 }
+
+                return page?.Patterns.FirstOrDefault(candidate => candidate.Slug == parsed.Slug);
             }
 
             var seenPatterns = new List<JsValue>();
@@ -121,13 +115,13 @@ static partial class UiValidator
                 var breakpoint = Dot(compact, "breakpoint");
                 if (breakpoint.Found && !(breakpoint.Node is JsonValue breakpointValue && breakpointValue.TryGetValue<string>(out var breakpointName) && breakpoints.Contains(breakpointName)))
                 {
-                    Errors.Add($"[litespec/frontend/patterns#declare-the-compact-behaviour] {where}: compact.breakpoint '{Show(breakpoint)}' is not a key of breakpoints");
+                    Errors.Add($"[litespec/frontend/patterns#declare-the-compact-behavior] {where}: compact.breakpoint '{Show(breakpoint)}' is not a key of breakpoints");
                 }
 
                 var compactOption = Dot(compact, "option");
                 if (compactOption.Found && !optionIds.Any(candidate => StrictEqual(candidate, compactOption)))
                 {
-                    Errors.Add($"[litespec/frontend/patterns#declare-the-compact-behaviour] {where}: compact.option '{Show(compactOption)}' is not one of its options");
+                    Errors.Add($"[litespec/frontend/patterns#declare-the-compact-behavior] {where}: compact.option '{Show(compactOption)}' is not one of its options");
                 }
 
                 var extensions = Child(pattern, "extensions").Node is JsonArray extensionArray
@@ -142,62 +136,31 @@ static partial class UiValidator
                     }
                 }
 
-                // A citation names the library pattern the entry starts from. An option id
-                // the library does not have is the product's own option, which is allowed;
-                // an option id the library has keeps the library's name, because a renamed
-                // copy reads as the same option and is not.
-                var library = Child(pattern, "library");
-                if (library is { Node: JsonValue libraryValue } && libraryValue.TryGetValue<string>(out var libraryId) && libraryId.Length > 0 && libraryById is not null)
+                // A citation names the LiteSpec pattern the entry starts from. An option id
+                // the pattern does not have is the product's own option, which is allowed;
+                // an option id the pattern has keeps its name, because a renamed copy reads
+                // as the same option and is not.
+                if (Child(pattern, "library") is { Node: JsonValue libraryValue } && libraryValue.TryGetValue<string>(out var libraryId) && libraryId.Length > 0)
                 {
-                    var foundEntry = false;
-                    JsonNode? entry = null;
-                    foreach (var candidate in libraryById)
+                    if (Cited(libraryId) is not { } cited)
                     {
-                        if (!foundEntry && StrictEqual(candidate.Key, library))
-                        {
-                            foundEntry = true;
-                            entry = candidate.Value;
-                        }
-                    }
-
-                    if (!foundEntry)
-                    {
-                        Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] {where}: library '{libraryId}' is not a pattern in the UI pattern library");
+                        Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] {where}: library '{libraryId}' is not a pattern on a LiteSpec pattern page");
                     }
                     else
                     {
-                        var libraryOptions = Child(entry, "options").Node is JsonArray libraryOptionArray
-                            ? libraryOptionArray.ToList()
-                            : new List<JsonNode?>();
-                        var libraryNames = libraryOptions
-                            .Select(option => (Id: Child(option, "id"), Name: Child(option, "name")))
-                            .ToList();
                         for (var index = 0; index < options.Count; index++)
                         {
                             var optionId = Child(options[index], "id");
-                            if (!optionId.Found)
-                            {
-                                continue;
-                            }
-
-                            JsValue? libraryName = null;
-                            foreach (var candidate in libraryNames)
-                            {
-                                if (libraryName is null && StrictEqual(candidate.Id, optionId))
-                                {
-                                    libraryName = candidate.Name;
-                                }
-                            }
-
-                            if (libraryName is null)
-                            {
-                                continue;
-                            }
-
                             var optionName = Child(options[index], "name");
-                            if (libraryName.Value is { Node: JsonValue expectedValue } && expectedValue.TryGetValue<string>(out var expectedName) && optionName.Found && !StrictEqual(optionName, libraryName.Value))
+                            if (optionId.Node is not JsonValue idValue || !idValue.TryGetValue<string>(out var optionKey)
+                                || cited.Options.FirstOrDefault(candidate => candidate.Id == optionKey) is not { } expected)
                             {
-                                Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] {where}: options[{index}].name '{Show(optionName)}' does not match the UI pattern library option '{Show(optionId)}' name '{expectedName}'");
+                                continue;
+                            }
+
+                            if (optionName.Node is JsonValue nameValue && nameValue.TryGetValue<string>(out var name) && name != expected.Name)
+                            {
+                                Errors.Add($"[litespec/frontend/patterns#keep-one-pattern-catalog] {where}: options[{index}].name '{name}' does not match the LiteSpec pattern option '{optionKey}' name '{expected.Name}'");
                             }
                         }
                     }

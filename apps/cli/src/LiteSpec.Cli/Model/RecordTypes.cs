@@ -29,7 +29,7 @@ static class RecordTypes
         "case", "event", "standard",
     };
 
-    /// <summary>Types the small profile requires.</summary>
+    /// <summary>Types the small size requires.</summary>
     public static readonly IReadOnlyList<string> SmallRequired =
     [
         "product", "decision", "requirement", "actor", "role", "permission",
@@ -37,7 +37,7 @@ static class RecordTypes
         "entry-point", "standard", "exception", "known-gap", "term",
     ];
 
-    /// <summary>Types only the large profile requires.</summary>
+    /// <summary>Types only the large size requires.</summary>
     public static readonly IReadOnlyList<string> LargeAdded = ["problem", "feature", "journey", "case"];
 
     /// <summary>The entry-point kinds that run in the background.</summary>
@@ -57,7 +57,7 @@ static class RecordTypes
         ["basedOn"] = ["constraint", "research"],
         ["affects"] = ["actor"],
         ["solves"] = ["problem"],
-        ["fulfils"] = ["requirement"],
+        ["fulfills"] = ["requirement"],
         ["governs"] = ["business-record", "use-case"],
         ["raises"] = ["event"],
         ["reactsTo"] = ["event"],

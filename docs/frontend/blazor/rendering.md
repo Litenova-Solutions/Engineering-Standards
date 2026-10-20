@@ -6,15 +6,6 @@ The client renders entirely in the browser. Routes declare their own templates a
 
 This page states how the Blazor stack follows the frontend rendering rules ([Frontend rendering](../rendering.md)).
 
-## Agent Summary {#agent-summary}
-
-- Rendering runs in the browser with no server round trip. (litespec/frontend/blazor/rendering#render-on-the-client-only)
-- A routable component declares its own template under `Pages/`. (litespec/frontend/blazor/rendering#declare-routes-on-pages)
-- Each route defines loading, empty, error, forbidden, not-found, and ready behavior. (litespec/frontend/blazor/rendering#give-every-route-explicit-states)
-- Pages a first-time visitor reads download no runtime. (litespec/frontend/blazor/rendering#keep-the-acquisition-surface-static)
-- The application starts and navigates offline after first load. (litespec/frontend/blazor/rendering#operate-offline-after-first-load)
-- Route names match the reader's words, and navigation state lives in the URL. (litespec/frontend/blazor/rendering#name-routes-for-the-reader, litespec/frontend/blazor/rendering#keep-navigation-state-in-the-url)
-
 ## Standards
 
 ### Render on the client only

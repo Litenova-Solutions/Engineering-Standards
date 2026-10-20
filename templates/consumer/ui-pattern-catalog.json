@@ -1,5 +1,5 @@
 {
-  "$schema": "./litespec/schemas/ui-pattern-catalog.schema.json",
+  "$schema": "../../litespec/schemas/ui-pattern-catalog.schema.json",
   "kind": "ui-pattern-catalog",
   "schemaVersion": 1,
   "breakpoints": {
@@ -43,7 +43,7 @@
       },
       "compact": {
         "breakpoint": "compact",
-        "behaviour": "Below 768 pixels the filters stack above the table and the table scrolls horizontally."
+        "behavior": "Below 768 pixels the filters stack above the table and the table scrolls horizontally."
       },
       "extensions": [
         {
@@ -84,7 +84,7 @@
       "compact": {
         "breakpoint": "compact",
         "option": "toolbar-sort",
-        "behaviour": "Below 768 pixels headers lose their sort controls and one toolbar above the table sorts."
+        "behavior": "Below 768 pixels headers lose their sort controls and one toolbar above the table sorts."
       },
       "implementations": {
         "react": {

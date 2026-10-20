@@ -4,14 +4,6 @@
 
 Architecture in a dotnet backend is five projects with explicit composition roots. The shared provisions live on the stack-neutral page ([Backend architecture](../architecture.md)); this page holds what dotnet alone requires.
 
-## Agent Summary {#agent-summary}
-
-- Five projects form the dotnet modular monolith. (litespec/backend/dotnet/architecture#use-five-application-projects)
-- One Application assembly holds messages, handlers, and ports. (litespec/backend/dotnet/architecture#keep-one-application-assembly)
-- Handlers and endpoint code stay internal and sealed. (litespec/backend/dotnet/architecture#keep-implementation-types-internal)
-- Composition lives in hosts and host modules. (litespec/backend/dotnet/architecture#keep-composition-in-hosts)
-- Scanned projects expose one public assembly marker. (litespec/backend/dotnet/architecture#use-one-public-assembly-marker-per-scanned-project)
-
 ## Standards
 
 ### Use five application projects
@@ -42,7 +34,7 @@ apps/api/src/{ProjectName}.WebApi/
 
 **Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application project, and cross-module contracts in Application.Abstractions.
 
-**Rationale:** Separate Write, Read, Contracts, and event-handler assemblies are outside this profile. The separation this profile keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the assemblies holding them. Splitting assemblies buys a deployment boundary the profile does not use, and costs a project reference that every use case has to cross.
+**Rationale:** Separate Write, Read, Contracts, and event-handler assemblies are outside this stack. The separation this stack keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the assemblies holding them. Splitting assemblies buys a deployment boundary the stack does not use, and costs a project reference that every use case has to cross.
 
 This realizes litespec/backend/architecture#keep-one-application-part in the dotnet stack.
 

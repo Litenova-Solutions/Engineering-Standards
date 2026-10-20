@@ -6,14 +6,6 @@ A route answers three questions: what address is this, what data does it need, a
 
 The render boundary follows the audience the route serves. A console serves a signed-in reader from a cache its route filled. A public page arrives from a link, so its first response already describes itself.
 
-## Agent Summary {#agent-summary}
-
-- A route loads its reads before rendering, and the view reads them from the route cache. (litespec/frontend/rendering#load-route-data-before-rendering, litespec/frontend/rendering#read-route-data-from-the-route-cache)
-- Address state lives in a validated schema, and each route and language loads alone. (litespec/frontend/rendering#keep-address-parameters-validated-by-a-schema, litespec/frontend/rendering#load-each-route-and-each-language-separately)
-- A route prefetches on intent and states its six display states. (litespec/frontend/rendering#prefetch-a-route-on-intent, litespec/frontend/rendering#represent-route-states)
-- Actor-specific caches declare their boundary, proxies only route, and each server request builds its own cache. (litespec/frontend/rendering#keep-authenticated-caching-explicit, litespec/frontend/rendering#keep-proxy-behavior-at-the-edge, litespec/frontend/rendering#build-the-server-data-cache-per-request)
-- A shell shares one layout, layouts stay lean, and server code shows its ownership. (litespec/frontend/rendering#use-a-shared-layout-for-a-shell, litespec/frontend/rendering#keep-layouts-stable, litespec/frontend/rendering#keep-server-only-code-identifiable)
-
 ## Standards
 
 ### Load route data before rendering
@@ -64,7 +56,7 @@ These six are the states a route has. A control adds `disabled` and `pending` un
 
 **Requirement:** Actor-specific data MUST declare its cache key, partition, invalidation owner, and security review before caching, beside the read definition setting the key.
 
-**Rationale:** Shared route behaviour otherwise serves one actor's data to another. An uncached read is the safe default, and a cache partitioned per request is the safe server shape.
+**Rationale:** Shared route behavior otherwise serves one actor's data to another. An uncached read is the safe default, and a cache partitioned per request is the safe server shape.
 
 ### Keep proxy behavior at the edge
 

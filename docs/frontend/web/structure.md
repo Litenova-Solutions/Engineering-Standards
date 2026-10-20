@@ -4,15 +4,6 @@
 
 This page holds how the TypeScript web stacks realize the Frontend structure rules ([Frontend structure](../structure.md)). It states the toolchain, folders, and commands the React and Svelte stacks share. A provision here cites the neutral rule it realizes, where one exists.
 
-## Agent Summary {#agent-summary}
-
-- A frame, routes, and modules sit under `src`, each with one job. (litespec/frontend/web/structure#use-the-frontend-application-tree)
-- React refuses `lib` and Svelte refuses `stores` under `src/lib`. (litespec/frontend/web/structure#refuse-stack-specific-folder-names)
-- A route file composes and imports no other route. (litespec/frontend/web/structure#keep-a-route-file-thin)
-- Imports run from routes to modules to the frame to shared packages. (litespec/frontend/web/structure#keep-imports-directional)
-- Browser APIs belong to the frame. (litespec/frontend/web/structure#locate-the-frame-in-the-app-folder)
-- The router generates its tree, packages export documented paths, and tests sit at their boundary. (litespec/frontend/web/structure#use-the-generated-route-tree, litespec/frontend/web/structure#use-explicit-public-entry-points-for-workspace-packages, litespec/frontend/web/structure#keep-tests-near-their-ownership-boundary)
-
 ## React
 
 React frontends use `src/app` for the frame, `src/routes` for one file per address, and `src/modules` for the use-case code. The router generates the typed route tree from the files under `src/routes`. A route file holds its search parameters, its loader, and its component. Shared files use the `.tsx` extension.

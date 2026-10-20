@@ -2,14 +2,7 @@
 
 ## Intent
 
-This stack serves a Svelte frontend beside the product's backend stack. A Svelte frontend takes one of three shapes, chosen by who reads it. An authenticated console is a static SvelteKit application. A public surface whose pages are shared as links and read by a search engine renders on the server. A device client that asks one question repeatedly is a static page with no router. The shared stack rules on the [Stacks](../../../core/stacks.md) page apply to every stack.
-
-## Agent Summary {#agent-summary}
-
-The shared stack rules on the [Stacks](../../../core/stacks.md) page apply to every stack.
-
-- Each frontend's rendering mode follows the audience that reads it. (litespec/frontend/web/svelte/stack#select-a-rendering-mode-by-audience)
-- A device client is one static page with no router. (litespec/frontend/web/svelte/stack#build-a-device-client-as-one-static-page)
+This stack serves a Svelte frontend beside the product's backend stack. A Svelte frontend takes one of three rendering modes, chosen by who reads it. An authenticated console is a static SvelteKit application. A public surface whose pages are shared as links and read by a search engine renders on the server. A device client that asks one question repeatedly is a static page with no router. The shared stack rules on the [Stacks](../../../core/stacks.md) page apply to every stack.
 
 ## Standards
 

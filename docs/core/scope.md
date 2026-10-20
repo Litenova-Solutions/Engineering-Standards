@@ -6,19 +6,9 @@ Every project selects one size, one shape, and its stacks, so agents can make co
 
 Projects outside this boundary can use individual ideas but do not claim conformance.
 
-## Agent Summary {#agent-summary}
-
-- Select one size, one shape, and the stacks the shape takes. (litespec/core/scope#select-a-size-profile-and-stacks)
-- Keep one business context and deployment boundary. (litespec/core/scope#keep-one-bounded-context)
-- Select conditional extensions only when criteria apply. (litespec/core/scope#select-conditional-extensions-explicitly)
-- Record every selection with its criterion and review date. (litespec/core/scope#record-selected-extensions)
-- State whether any outside constraint applies. (litespec/core/scope#answer-the-constraints-question)
-- A consumer with no server declares the client-only shape. (litespec/core/scope#declare-a-consumer-that-has-no-backend)
-- Record unsupported architecture decisions explicitly. (litespec/core/scope#record-unsupported-scope-decisions)
-
 ## Standards
 
-### Select a size profile and stacks
+### Select a size, a shape and stacks
 
 **Requirement:** A consumer MUST select a size, a shape, one stack per frontend, and one backend stack unless the shape is client-only.
 
@@ -72,9 +62,9 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 ### Record unsupported scope decisions
 
-**Requirement:** A consumer MUST record a separate profile or project decision for microservices, multiple contexts, native clients, other platforms, event sourcing, active-active regions, or large pipelines.
+**Requirement:** A consumer MUST record a separate project decision for microservices, multiple contexts, native clients, other platforms, event sourcing, active-active regions, or large pipelines.
 
-**Rationale:** These architectures change the supported profile's assumptions and require their own boundaries.
+**Rationale:** These architectures change the supported scope's assumptions and require their own boundaries.
 
 ## Conventions
 
@@ -96,7 +86,7 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 ## Reference example
 
-This informative example demonstrates `litespec/core/scope#select-a-size-profile-and-stacks` and `litespec/core/scope#select-conditional-extensions-explicitly`.
+This informative example demonstrates `litespec/core/scope#select-a-size-a-shape-and-stacks` and `litespec/core/scope#select-conditional-extensions-explicitly`.
 
 A publishing product can support sign-in, draft creation, publication, and public reading. Multi-tenant publication, live editing, and bulk analytics require their selected extension boundaries.
 
@@ -104,7 +94,7 @@ A publishing product can support sign-in, draft creation, publication, and publi
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/core/scope#select-a-size-profile-and-stacks | checkable | `litespec consumer` refuses a shape whose backend stack count is wrong and a platform that names no frontend stack. |
+| litespec/core/scope#select-a-size-a-shape-and-stacks | checkable | `litespec consumer` refuses a shape whose backend stack count is wrong and a platform that names no frontend stack. |
 | litespec/core/scope#keep-one-bounded-context | guidance | Which second language or deployment boundary does the design introduce? |
 | litespec/core/scope#select-conditional-extensions-explicitly | guidance | Which criterion justifies each selection, and which applicable extension stays unselected? |
 | litespec/core/scope#record-selected-extensions | checkable | `litespec consumer` rejects a selection without a criterion or review date. |

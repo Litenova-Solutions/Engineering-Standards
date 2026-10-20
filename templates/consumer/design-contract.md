@@ -23,7 +23,7 @@ Three words it is not: __WORD__, __WORD__, __WORD__.
 
 ## Tokens
 
-Values live in the global CSS entry. Change them there. A colour written into a component is a colour nobody can theme and nobody can find.
+Values live in the global CSS entry. Change them there. A color written into a component is a color nobody can theme and nobody can find.
 
 | Token | Utility | What it is for |
 |:---|:---|:---|
@@ -57,7 +57,7 @@ The floorplans this package provides. A route composes exactly one of them, or n
 
 ## Do not
 
-- Do not decorate. A border earns its place, a colour earns its place, and nothing else does.
+- Do not decorate. A border earns its place, a color earns its place, and nothing else does.
 - Do not nest a card inside a card.
 - Do not ship a button whose success is a paragraph. Success is a `role=status` announcement, and failure is `role=alert`.
 

@@ -4,15 +4,6 @@
 
 This page holds how the Blazor stack realizes the frontend testing principles ([Frontend testing](../testing.md)). The client has four test projects matching its four boundaries. Core tests run without a browser, component tests substitute interop, and a small browser suite proves the behavior only a real browser can show.
 
-## Agent Summary {#agent-summary}
-
-- Four test projects match the four client boundaries. (litespec/frontend/blazor/testing#use-the-four-client-test-projects)
-- Each Case is proved by a test calling the use case. (litespec/frontend/blazor/testing#prove-each-case-with-a-test)
-- Core tests run with no browser and components substitute interop. (litespec/frontend/blazor/testing#test-the-core-without-a-browser, litespec/frontend/blazor/testing#replace-interop-in-component-tests)
-- The browser suite covers the primary flow, storage loss, offline, and portability. (litespec/frontend/blazor/testing#verify-real-browser-behavior-end-to-end)
-- CI fails when the first-load payload exceeds its budget. (litespec/frontend/blazor/testing#enforce-the-first-load-budget)
-- Capability tests cover both paths and end-to-end tests stay few. (litespec/frontend/blazor/testing#keep-browser-capability-tests-honest, litespec/frontend/blazor/testing#keep-end-to-end-tests-few)
-
 ## Standards
 
 ### Use the four client test projects

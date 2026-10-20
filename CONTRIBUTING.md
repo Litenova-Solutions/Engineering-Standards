@@ -14,7 +14,7 @@ Treat active standards as the complete current contract. (litespec/core/authorin
 
 Do not retain history-specific paths, IDs, terminology, aliases, maps, standards-release migration material, compatibility rules, or transition checks. (litespec/core/authoring#exclude-historical-transition-material)
 
-Keep release context in `CHANGELOG.md`, the `changelog/` archives, and Git history. The repository validator evaluates current material only. (litespec/core/authoring#validate-current-standards-material)
+Keep release context in `CHANGELOG.md` and Git history. The repository validator evaluates current material only. (litespec/core/authoring#validate-current-standards-material)
 
 ## Provision Changes
 
@@ -45,7 +45,7 @@ Amend a Standard in this order:
 
 1. Decide whether the assertion changes. A reworded Requirement that obliges the same action keeps its ID. A Requirement that obliges a different action, a wider scope, or a different actor takes a new ID.
 2. Write the new provision under a new heading on its page. Do not reuse the retired heading.
-3. Delete the retired provision, its Agent Summary citation, and its Verification row. Leave no alias, no replacement map, and no note that the identifier moved. (litespec/core/authoring#exclude-historical-transition-material)
+3. Delete the retired provision and its Verification row. Leave no alias, no replacement map, and no note that the identifier moved. (litespec/core/authoring#exclude-historical-transition-material)
 4. Update each page that cited the retired ID. `docs/reference/provisions.md` resolves every citation to its page, and the repository validator reports a citation with no owner.
 5. Update the validator case that covers the rule, in both directions.
 6. Record the change in `CHANGELOG.md` as the current contract, without a transition path.
@@ -54,7 +54,7 @@ A consumer that pinned the earlier release keeps that release and its own except
 
 ## Extension Changes
 
-An extension page declares Activation, Baseline relationship, Agent Summary, Standards, Conventions, Dependencies, and Verification.
+An extension page declares Intent, Activation, Baseline relationship, Standards, Conventions, Dependencies, and Verification.
 
 The extension document names each baseline provision it replaces. The manifest records its path, activation scope, replaced provisions, and switched-on record types.
 
@@ -65,12 +65,14 @@ Do not create a separate extension descriptor. The Markdown page and manifest en
 Before review:
 
 - Inspect changed links, anchors, provision IDs, and evidence rows.
-- Confirm manifest paths and `#agent-summary` anchors.
+- Confirm the manifest paths.
 - Confirm extension declarations match the manifest.
-- Validate the two tracked schema consumers.
+- Validate the two tracked schema consumers: `litespec.manifest.json` against its schema and `templates/consumer/litespec.project.json` against the project schema.
 - Update affected templates and validator cases.
-- Run `dotnet test --solution LiteSpec.slnx` and the pattern library check.
+- Run `dotnet build LiteSpec.slnx`.
+- Run `dotnet test --solution LiteSpec.slnx`.
 - Run `litespec provisions` and commit the regenerated index. The [command index](docs/tools/README.md) states how `litespec` runs. (litespec/core/authoring#regenerate-the-provision-index)
+- Run `litespec validate`. The [command index](docs/tools/README.md) states how `litespec` runs.
 - Update the changelog.
 - Run `git diff --check`.
 
@@ -94,7 +96,7 @@ A consumer records the release it reviewed in `reviewedLiteSpecVersion`, so adop
 
 `litespec/core/authoring#exclude-cross-release-compatibility-work` covers LiteSpec releases only. A consumer product is a running service, and its own API compatibility, migration, deprecation, and rollback provisions still apply.
 
-`CHANGELOG.md` is the repository release note for the current major version. When a new major version starts, the previous major version's entries move to `changelog/v<major>.md`, linked from the top of `CHANGELOG.md`. The changelog describes the current contract without prescribing a transition path. An entry states one change and who it affects. It links to the page holding the detail rather than restating it. (litespec/core/authoring#validate-current-standards-material)
+`CHANGELOG.md` is the repository release note for the current major version. The changelog describes the current contract without prescribing a transition path. An entry states one change and who it affects. It links to the page holding the detail rather than restating it. (litespec/core/authoring#validate-current-standards-material)
 
 ## Maintainer Review
 

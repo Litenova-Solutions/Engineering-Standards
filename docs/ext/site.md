@@ -18,20 +18,7 @@ The consumer selects `site` when it ships a public static website beside its app
 
 None. The frontend and UI pages govern application frontends declared in `paths.frontends`. A static site is not an application frontend, and this extension replaces no baseline provision.
 
-None. Prices and claims read Requirement entries and Terms, which every profile requires.
-
-## Agent Summary {#agent-summary}
-
-- Prerender the site to files that need no server. (litespec/ext/site#render-every-page-to-static-files)
-- Ship scripts from the site origin for named needs alone. (litespec/ext/site#avoid-client-scripts-without-a-named-interactive-need, litespec/ext/site#load-every-script-from-the-site-origin)
-- Name allowed sources in a policy and load nothing third-party. (litespec/ext/site#state-allowed-sources-in-a-content-security-policy, litespec/ext/site#load-nothing-from-a-third-party-origin)
-- Give each page one heading, landmarks, title, description, canonical, and alternates. (litespec/ext/site#give-every-page-one-main-heading-and-landmark-elements, litespec/ext/site#name-every-page-with-a-title-and-a-description, litespec/ext/site#point-every-page-at-its-absolute-canonical-address, litespec/ext/site#reference-language-alternates-from-every-translated-page)
-- Generate sitemap, crawler rules, model lists, and Markdown copies. (litespec/ext/site#generate-a-sitemap-covering-every-page, litespec/ext/site#point-crawler-rules-at-the-sitemap, litespec/ext/site#list-every-page-for-language-models, litespec/ext/site#publish-full-page-text-for-language-models, litespec/ext/site#publish-a-markdown-copy-beside-every-page)
-- Carry JSON-LD data for the organization, site, and page. (litespec/ext/site#mark-pages-with-json-ld-structured-data)
-- Hold repeated facts once and render languages from one structure. (litespec/ext/site#keep-each-repeated-fact-in-one-data-source, litespec/ext/site#render-every-language-from-one-page-structure)
-- Show placeholders for missing facts and fail release builds carrying one. (litespec/ext/site#mark-unfinished-facts-with-visible-placeholders, litespec/ext/site#reject-a-release-build-carrying-a-placeholder)
-- Read prices and claims from named consumer records. (litespec/ext/site#read-site-prices-and-claims-from-consumer-records, litespec/ext/site#read-prices-and-claims-from-product-and-pricing-records)
-- Build with Astro, server components, Tailwind, and a light-first scheme. (litespec/ext/site#generate-the-site-with-astro, litespec/ext/site#render-components-on-the-server-with-astro-or-svelte, litespec/ext/site#use-tailwind-for-site-styles, litespec/ext/site#default-to-a-light-scheme-with-a-reader-chosen-dark-scheme)
+None. Prices and claims read Requirement entries and Terms, which every project requires.
 
 ## Standards
 

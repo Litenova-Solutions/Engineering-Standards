@@ -17,7 +17,7 @@
     "event/loan.loan-extended"
   ],
   "reactsTo": [],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.loan-period-days"
   ],
   "results": [

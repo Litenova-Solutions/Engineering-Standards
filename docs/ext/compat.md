@@ -18,16 +18,6 @@ This extension replaces no baseline provision.
 
 This extension switches on no optional record type.
 
-## Agent Summary {#agent-summary}
-
-- Classify every independent-consumer contract change. (litespec/ext/compat#classify-independent-consumer-changes)
-- Treat removals and narrowed contracts as breaking. (litespec/ext/compat#classify-breaking-contract-changes)
-- Diff current OpenAPI against a retained baseline. (litespec/ext/compat#diff-release-contracts)
-- Keep operation IDs during compatible changes. (litespec/ext/compat#retain-compatible-operation-ids)
-- Version and support breaking contracts. (litespec/ext/compat#version-breaking-contracts, litespec/ext/compat#retain-supported-versions)
-- Deprecate public removals before sunset. (litespec/ext/compat#signal-planned-public-removal, litespec/ext/compat#publish-deprecation-context)
-- Preserve error-contract compatibility. (litespec/ext/compat#treat-errors-as-contracts, litespec/ext/compat#gate-new-error-outcomes)
-
 ## Standards
 
 ### Classify independent-consumer changes

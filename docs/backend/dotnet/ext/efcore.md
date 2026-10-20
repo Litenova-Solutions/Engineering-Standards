@@ -30,19 +30,6 @@ Every other baseline provision binds EF Core-owned paths unchanged.
 
 This extension switches on no optional record type.
 
-## Agent Summary {#agent-summary}
-
-- Record affected aggregates and persistence effects. (litespec/backend/dotnet/ext/efcore#record-ef-core-replacement-scope)
-- Stage each Command through one write provider. (litespec/backend/dotnet/ext/efcore#use-one-write-provider, litespec/backend/dotnet/ext/efcore#reject-mixed-provider-writes)
-- Keep EF Core writes behind repositories. (litespec/backend/dotnet/ext/efcore#stage-aggregate-writes-in-repositories, litespec/backend/dotnet/ext/efcore#exclude-direct-handler-commits)
-- Query EF Core through `IApplicationDbContext` and resolve the tenant at context creation. (litespec/backend/dotnet/ext/efcore#define-ef-core-query-roots, litespec/backend/dotnet/ext/efcore#retain-marten-query-boundary, litespec/backend/dotnet/ext/efcore#resolve-the-tenant-at-context-creation)
-- Commit EF Core changes through its LiteBus post-handler. (litespec/backend/dotnet/ext/efcore#commit-ef-core-command-work-once)
-- Stage EF Core outbox records with EF Core business work. (litespec/backend/dotnet/ext/efcore#stage-ef-core-outbox-records-together)
-- Configure relational mappings in Infrastructure. (litespec/backend/dotnet/ext/efcore#configure-ef-core-mappings-in-infrastructure)
-- Preserve Domain state records and lifecycle boundaries. (litespec/backend/dotnet/ext/efcore#retain-domain-state-values, litespec/backend/dotnet/ext/efcore#map-stable-relational-state-shape)
-- Review and release migrations explicitly. (litespec/backend/dotnet/ext/efcore#generate-migrations-for-schema-changes, litespec/backend/dotnet/ext/efcore#apply-migrations-as-release-work)
-- Map EF Core concurrency failures to Application outcomes. (litespec/backend/dotnet/ext/efcore#map-ef-core-concurrency-conflict)
-
 ## Standards
 
 ### Record EF Core replacement scope

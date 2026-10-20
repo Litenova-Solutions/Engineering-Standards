@@ -4,16 +4,6 @@
 
 The client is one Blazor WebAssembly application organized around the same business modules and use cases as the Domain. Pages compose features, feature folders own behavior, and shared folders hold only code with real cross-feature use.
 
-## Agent Summary {#agent-summary}
-
-- The solution holds four production projects and no server project. (litespec/frontend/blazor/structure#use-the-client-solution-tree)
-- Features sit under their module and use-case names. (litespec/frontend/blazor/structure#organize-features-by-module-and-use-case)
-- A module never reaches into another module's feature internals. (litespec/frontend/blazor/structure#isolate-module-internals)
-- Imports run from pages inward, never outward. (litespec/frontend/blazor/structure#keep-imports-directional)
-- Domain and Application carry no browser type. (litespec/frontend/blazor/structure#keep-domain-free-of-browser-concerns)
-- Each browser API sits behind one interop adapter. (litespec/frontend/blazor/structure#place-interop-adapters-together)
-- Runtime content is served from `wwwroot/`, not embedded. (litespec/frontend/blazor/structure#keep-static-content-out-of-the-assembly)
-
 ## Standards
 
 ### Use the client solution tree

@@ -6,14 +6,6 @@ Marten is the baseline provider for persistence. The shared provisions live on t
 
 The `efcore` extension replaces the provider-specific provisions it names for the aggregates it owns.
 
-## Agent Summary {#agent-summary}
-
-- Commands write through repositories, never `IDocumentSession` directly. (litespec/backend/dotnet/persistence#stage-aggregate-writes-through-repositories)
-- Queries project through `IQuerySession` with scope and limits applied. (litespec/backend/dotnet/persistence#query-through-iquerysession)
-- One post-handler calls `SaveChangesAsync` for each command. (litespec/backend/dotnet/persistence#commit-once-in-the-command-pipeline)
-- Marten plumbing sits under one Infrastructure persistence folder. (litespec/backend/dotnet/persistence#use-this-infrastructure-layout)
-- One registration puts `IDocumentSession` in the request or operation scope. (litespec/backend/dotnet/persistence#register-one-scoped-session)
-
 ## Standards
 
 ### Stage aggregate writes through repositories

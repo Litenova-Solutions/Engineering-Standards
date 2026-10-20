@@ -15,17 +15,6 @@ A browser suite needs a deployment. Nothing in it starts one, so the same suite 
 
 Related rules live on other pages. `litespec/core/release#run-frontend-release-checks` owns the gates a changed frontend runs. `litespec/frontend/structure#place-tests-at-their-ownership-boundary` owns test layout. `litespec/frontend/ui#prove-ui-behavior-and-appearance` owns the evidence a UI change runs.
 
-## Agent Summary {#agent-summary}
-
-- Test levels match risk, with logic, browser, and route coverage. (litespec/frontend/testing#match-test-level-to-risk)
-- Each Case is proved by calling its use case, with refusals asserted by code. (litespec/frontend/testing#prove-a-case-by-calling-its-use-case, litespec/frontend/testing#assert-each-declared-refusal-by-its-code)
-- Tests assert observable behavior in each applicable state. (litespec/frontend/testing#test-observable-states)
-- Mocks stay at owned boundaries with network answers from the contract. (litespec/frontend/testing#keep-mocks-at-owned-boundaries, litespec/frontend/testing#use-network-mocks-for-component-tests)
-- Browser tests isolate their data and run through the command line. (litespec/frontend/testing#isolate-browser-tests, litespec/frontend/testing#run-browser-checks-through-the-command-line)
-- The module mirror is proved and every public use case is reached. (litespec/frontend/testing#prove-the-module-mirror-in-a-structure-test, litespec/frontend/testing#reach-every-public-use-case-from-a-journey)
-- Queries use accessible behavior and support stays narrow. (litespec/frontend/testing#query-by-accessible-behavior, litespec/frontend/testing#keep-test-support-narrow)
-- Identifiers come from the deployment under test. (litespec/frontend/testing#read-the-deployment-for-its-identifiers)
-
 ## Standards
 
 ### Match test level to risk

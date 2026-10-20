@@ -18,16 +18,6 @@ This extension replaces no baseline rule.
 
 This extension switches on no record type.
 
-## Agent Summary {#agent-summary}
-
-- Record supported locale behavior. (litespec/ext/locale#record-supported-locale-behavior)
-- Keep localized routes canonical. (litespec/ext/locale#define-one-locale-route-shape, litespec/ext/locale#avoid-duplicate-localized-urls)
-- Store copy under stable semantic keys. (litespec/ext/locale#store-user-facing-copy-in-catalogs, litespec/ext/locale#name-messages-by-meaning)
-- Write validation copy by the grammar and humanize every shown identifier. (litespec/ext/locale#follow-the-validation-message-grammar, litespec/ext/locale#resolve-every-shown-identifier)
-- Format user-facing values by locale. (litespec/ext/locale#format-values-with-active-locale)
-- Keep Domain and API values locale-neutral. (litespec/ext/locale#preserve-locale-neutral-business-data)
-- Localize safe public content without changing error codes. (litespec/ext/locale#localize-public-presentation-content, litespec/ext/locale#keep-stable-error-codes-locale-neutral)
-
 ## Standards
 
 ### Record supported locale behavior

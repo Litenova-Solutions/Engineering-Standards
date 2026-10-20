@@ -2,22 +2,9 @@
 
 ## Intent
 
-This page states how the backend stores and reads aggregates. Commands load and stage aggregates through Domain-owned repositories. Queries read through the session directly in Application, because the selected profile treats document queries as an explicit read-side dependency.
+This page states how the backend stores and reads aggregates. Commands load and stage aggregates through Domain-owned repositories. Queries read through the session directly in Application, because the selected stack treats document queries as an explicit read-side dependency.
 
 One scoped session and one command post-handler own the transaction boundary. The [.NET persistence binding](dotnet/persistence.md) names the baseline provider, and the `efcore` extension replaces the provider-specific rules named below.
-
-## Agent Summary {#agent-summary}
-
-- Commands write through repositories, never the session directly. (litespec/backend/persistence#stage-aggregate-writes-through-domain-repositories)
-- Queries project through the read session with scope and limits applied. (litespec/backend/persistence#query-through-the-read-session)
-- One post-handler commits each command, and repositories buffer events without a public unit of work. (litespec/backend/persistence#commit-each-command-pipeline-once, litespec/backend/persistence#collect-events-without-a-public-unit-of-work)
-- Document aliases and identifier mappings are declared explicitly. (litespec/backend/persistence#keep-mappings-and-aliases-explicit)
-- Infrastructure owns the stored JSON contract, not Domain. (litespec/backend/persistence#keep-serialization-behavior-out-of-domain)
-- Stored contract changes carry a reviewed transformation. (litespec/backend/persistence#evolve-stored-document-contracts-explicitly)
-- Aggregate documents carry no unbounded collection. (litespec/backend/persistence#bound-aggregate-document-growth)
-- Database identifiers use snake case, and hosted schema changes run as reviewed steps. (litespec/backend/persistence#use-database-naming-conventions, litespec/backend/persistence#control-production-schema-changes)
-- Persistence behavior is proved against PostgreSQL, with indexes from reviewed plans and read documents for query shapes. (litespec/backend/persistence#test-persistence-against-postgresql, litespec/backend/persistence#review-query-plans-for-new-indexes, litespec/backend/persistence#add-read-documents-for-query-shaped-data)
-- One persistence folder holds store plumbing, one session serves each command, and each aggregate persists its state object. (litespec/backend/persistence#use-one-persistence-folder, litespec/backend/persistence#use-one-session-per-command, litespec/backend/persistence#persist-one-explicit-state-object)
 
 ## Concepts
 

@@ -66,27 +66,6 @@ public sealed partial class ConsumerValidatorTests
         AssertClean(RunConsumer(folder.Path));
     }
 
-    [Fact(DisplayName = "sentence past the word bound")]
-    public void SentencePastTheWordBound()
-    {
-        using var folder = ConsumerFixture.Create();
-        ConsumerFixture.MutateBody(folder.Path, ModuleReadme, raw => $"{raw}\n{ConsumerFixture.LongSentence}\n");
-        AssertProblem(RunConsumer(folder.Path), "controlled-prose problem(s)");
-    }
-
-    [Fact(DisplayName = "report mode turns measures into advisories")]
-    public void ReportModeTurnsMeasuresIntoAdvisories()
-    {
-        using var folder = ConsumerFixture.Create();
-        // Report mode turns the measures into advisories. The absent form keeps the
-        // case green however the project schema treats the prose block.
-        ConsumerFixture.MutateBody(folder.Path, ModuleReadme, raw => $"{raw}\n{ConsumerFixture.LongSentence}\n");
-        ConsumerFixture.MutateProject(
-            folder.Path,
-            project => project["prose"] = new JsonObject { ["enforcement"] = "report" });
-        AssertAbsent(RunConsumer(folder.Path), "controlled-prose problem(s)");
-    }
-
     [Fact(DisplayName = "language scan pattern that matches nothing")]
     public void LanguageScanPatternThatMatchesNothing()
     {

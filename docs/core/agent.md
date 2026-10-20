@@ -4,19 +4,6 @@
 
 This protocol controls how agents select context, resolve standards, preserve user work, and report completion. Agents query the project model for the records a task needs, and read the generated agent context first.
 
-## Agent Summary {#agent-summary}
-
-- Query the model for the records the task needs, skipping only a change that adds no surface. (litespec/core/agent#select-task-context, litespec/core/agent#follow-the-local-pattern-before-the-model-query)
-- Load selected extensions before editing inside their boundary. (litespec/core/agent#load-applicable-extensions)
-- Apply guidance in precedence order. (litespec/core/agent#apply-guidance-precedence)
-- Replace a convention only through a declared exception. (litespec/core/agent#replace-only-declared-conventions)
-- Stop and quote conflicts nothing resolves. (litespec/core/agent#stop-on-unresolved-conflict)
-- Preserve unrelated work and side-effect boundaries. (litespec/core/agent#inspect-existing-work-before-editing, litespec/core/agent#restrict-unapproved-side-effects)
-- Make the smallest coherent change the request allows. (litespec/core/agent#make-coherent-scoped-changes)
-- Read the full record before generating files or changing public boundaries. (litespec/core/agent#escalate-from-summary-to-full-document)
-- Inspect neighboring files after loading standards. (litespec/core/agent#inspect-local-examples-after-standards)
-- Keep agent working files under the split the project declares. (litespec/core/agent#keep-agent-working-files-under-agents)
-
 ## Standards
 
 ### Select task context
@@ -43,7 +30,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 ### Apply guidance precedence
 
-**Requirement:** An agent MUST apply approved exceptions, applicable extensions, selected profile standards and conventions, and core standards in that order.
+**Requirement:** An agent MUST apply the project exception, the extension, the deeper page, and the shallower page in that order.
 
 **Rationale:** The order resolves a more local approved replacement before a broader baseline.
 
@@ -79,7 +66,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 ## Conventions
 
-### Escalate from summary to full document
+### Read the full record before changing a boundary
 
 **Default:** Read the full record before generating a file, changing a public boundary, or choosing between patterns.
 
@@ -126,12 +113,12 @@ A command-handler change queries the model for its use case, reads the generated
 | litespec/core/agent#select-task-context | guidance | Which model query selected the records the change cites? |
 | litespec/core/agent#follow-the-local-pattern-before-the-model-query | guidance | Which local pattern did the change follow, and which surface did it avoid adding? |
 | litespec/core/agent#load-applicable-extensions | guidance | Which extensions did the agent load before editing inside their boundary? |
-| litespec/core/agent#apply-guidance-precedence | guidance | In which order did the design apply exceptions, extensions, profile, and core standards? |
+| litespec/core/agent#apply-guidance-precedence | guidance | In which order did the design apply the project exception, the extension, and the pages? |
 | litespec/core/agent#replace-only-declared-conventions | guidance | Which approved exception record declares each convention replacement? |
 | litespec/core/agent#stop-on-unresolved-conflict | guidance | Which quoted conflict stopped the work, with both provision identifiers? |
 | litespec/core/agent#inspect-existing-work-before-editing | guidance | What did `git status` show, and which unrelated work stayed untouched? |
 | litespec/core/agent#restrict-unapproved-side-effects | guidance | Which approval covers each listed side effect the change makes? |
 | litespec/core/agent#make-coherent-scoped-changes | guidance | Which changed artifact does the authorized request fail to explain? |
-| litespec/core/agent#escalate-from-summary-to-full-document | guidance | Which full record did the file generation or boundary change cite? |
+| litespec/core/agent#read-the-full-record-before-changing-a-boundary | guidance | Which full record did the file generation or boundary change cite? |
 | litespec/core/agent#inspect-local-examples-after-standards | guidance | Which neighboring files shaped the change after the standards? |
 | litespec/core/agent#keep-agent-working-files-under-agents | guidance | Which working files sit outside `.agents/` or the declared replacement? |

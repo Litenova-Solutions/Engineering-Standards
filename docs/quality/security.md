@@ -4,19 +4,6 @@
 
 Security boundaries follow identity, resource ownership, data classification, and trust transitions across API, persistence, frontend, external services, and operations. Authentication establishes identity. Each use case declares the permissions it needs, and the application guard authorizes from them.
 
-## Agent Summary {#agent-summary}
-
-- Tokens are validated and the actor comes from claims. (litespec/quality/security#keep-backend-authentication-provider-neutral, litespec/quality/security#derive-the-actor-from-claims)
-- Breach notification meets its deadline, and live data at rest stays encrypted or excepted. (litespec/quality/security#report-a-breach-within-its-deadline, litespec/quality/security#protect-live-data-at-rest)
-- The application guard authorizes every protected operation. (litespec/quality/security#authorize-each-target-resource, litespec/quality/security#restrict-a-protected-collection-in-the-database)
-- Trust boundaries validate shape, range, and bounds before use. (litespec/quality/security#validate-at-trust-boundaries)
-- Secrets and personal data stay out of source, logs, diagnostics, and storage. (litespec/quality/security#keep-secrets-out-of-tracked-and-observable-data, litespec/quality/security#keep-personal-data-out-of-logs)
-- Database input is always parameterized. (litespec/quality/security#parameterize-database-input)
-- Public errors use the HTTP API error contract. (litespec/quality/security#limit-public-error-detail)
-- Frontends escape output and apply policy, headers, and forgery protection. (litespec/quality/security#protect-browser-boundaries)
-- Personal data stays inventoried, portable, and removable, and an unsalted digest counts as personal data. (litespec/quality/security#minimize-sensitive-data, litespec/quality/security#keep-a-personal-data-inventory-per-store, litespec/quality/security#apply-erasure-and-export-to-every-store, litespec/quality/security#treat-an-unsalted-digest-as-personal-data)
-- Exposed endpoints declare limits, origins stay listed, audit events are recorded, and secrets rotate. (litespec/quality/security#bound-abuse-at-exposed-endpoints, litespec/quality/security#keep-one-limit-store-across-replicas, litespec/quality/security#restrict-cross-origin-access, litespec/quality/security#record-security-audit-events, litespec/quality/security#rotate-production-secrets)
-
 ## Standards
 
 ### Keep backend authentication provider-neutral
@@ -27,7 +14,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ### Derive the actor from claims
 
-**Requirement:** Actor resolution MUST follow `litespec/quality/security#derive-the-actor-from-claims` and `litespec/quality/security#derive-the-actor-from-claims`.
+**Requirement:** Actor resolution MUST follow `litespec/quality/security#use-one-current-actor-abstraction`.
 
 **Rationale:** Actor resolution has one owner: the WebApi boundary. Request data never supplies the current actor.
 
@@ -65,7 +52,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 ### Limit public error detail
 
-**Requirement:** A public error MUST use the error contract `litespec/backend/api#return-stable-problem-details` and `litespec/quality/security#limit-public-error-detail` define.
+**Requirement:** A public error MUST use the error contract `litespec/backend/api#return-stable-problem-details` defines.
 
 **Rationale:** The error contract has one owner: the HTTP API rules. A stack trace, SQL, connection detail, provider body, uncontracted internal identifier, or authorization reason that reveals resource existence gives an attacker structure.
 

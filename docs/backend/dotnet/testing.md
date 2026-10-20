@@ -2,23 +2,15 @@
 
 ## Intent
 
-Tests in a .NET backend run in the test projects the size profile requires, through xUnit, WebApplicationFactory, and one shared harness. The shared provisions live on the stack-neutral page ([Backend testing](../testing.md)); this page holds what the dotnet stack alone requires.
-
-## Agent Summary {#agent-summary}
-
-- The solution holds the test projects its size profile requires. (litespec/backend/dotnet/testing#keep-the-test-projects-the-size-profile-requires)
-- HTTP integration runs through WebApplicationFactory. (litespec/backend/dotnet/testing#test-http-integration-through-the-real-host)
-- Architecture tests run in the Release test pass. (litespec/backend/dotnet/testing#enforce-architecture-rules)
-- Each Case carries its XML doc proves tag. (litespec/backend/dotnet/testing#prove-each-case-with-a-test-that-calls-its-use-case)
-- One harness owns the container fixture, ApiFactory, and reset helper. (litespec/backend/dotnet/testing#use-one-production-faithful-integration-harness)
+Tests in a .NET backend run in the test projects the size requires, through xUnit, WebApplicationFactory, and one shared harness. The shared provisions live on the stack-neutral page ([Backend testing](../testing.md)); this page holds what the dotnet stack alone requires.
 
 ## Standards
 
-### Keep the test projects the size profile requires
+### Keep the test projects the size requires
 
-**Requirement:** A backend solution MUST hold exactly the test projects its size profile requires: Architecture and Integration for small, adding Acceptance for large.
+**Requirement:** A backend solution MUST hold exactly the test projects its size requires: Architecture and Integration for small, adding Acceptance for large.
 
-**Rationale:** Unit test projects are optional in both profiles. Acceptance stays optional for small. An Acceptance project without the executable BDD extension is an unnamed baseline project: select the extension, or name the project for what it actually is. This provision realizes `litespec/backend/testing#keep-the-test-suites-the-size-profile-requires`.
+**Rationale:** Unit test projects are optional in both sizes. Acceptance stays optional for small. An Acceptance project without the executable BDD extension is an unnamed baseline project: select the extension, or name the project for what it actually is. This provision realizes `litespec/backend/testing#keep-the-test-suites-the-size-requires`.
 
 **Example:** A test suite can contain:
 
@@ -72,7 +64,7 @@ None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/backend/dotnet/testing#keep-the-test-projects-the-size-profile-requires | guidance | Does the solution hold the test projects its size profile requires and no other baseline project? |
+| litespec/backend/dotnet/testing#keep-the-test-projects-the-size-requires | guidance | Does the solution hold the test projects its size requires and no other baseline project? |
 | litespec/backend/dotnet/testing#test-http-integration-through-the-real-host | guidance | Does each HTTP integration test run through WebApplicationFactory covering Problem Details, authentication, and authorization? |
 | litespec/backend/dotnet/testing#enforce-architecture-rules | guidance | Do architecture tests assert the named structural boundaries and run in the Release pass? |
 | litespec/backend/dotnet/testing#prove-each-case-with-a-test-that-calls-its-use-case | guidance | Is each Case proved by a test carrying its XML doc proves tag and calling its use case? |

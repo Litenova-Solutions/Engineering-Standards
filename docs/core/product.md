@@ -4,22 +4,9 @@
 
 This page governs where a consumer states its business intent and in what shape. Business intent is what the product commits to as a business. It covers what the product sells, to whom, at what price, and in which markets. It also covers how the company runs and what comes next.
 
-Business intent is not behavior. A rule, use case, or journey states what the software does today and matches the code. A product page states what the business has decided and why, and it can describe a position the code does not carry yet. The two connect in one direction: behavior records name the requirements they fulfil, and a product page never describes behavior.
+Business intent is not behavior. A rule, use case, or journey states what the software does today and matches the code. A product page states what the business has decided and why, and it can describe a position the code does not carry yet. The two connect in one direction: behavior records name the requirements they fulfill, and a product page never describes behavior.
 
 Business intent has three parts that age differently. The present is the position a reader acts on. The future is the next planned change. The past is the decision that set each choice. This page keeps all three in one home, `docs/product/`, without letting a page narrate its own history.
-
-## Agent Summary {#agent-summary}
-
-- Why-layer records live in their homes under docs/product/ and docs/research/. (litespec/core/product#keep-business-intent-under-product, litespec/core/product#group-product-topics-by-area)
-- The brief states one product; each topic holds Requirement entries, never behavior. (litespec/core/product#state-one-product, litespec/core/product#state-each-topic-in-one-page-shape, litespec/core/product#identify-every-requirement, litespec/core/product#keep-behavior-out-of-product-pages)
-- Chapters tell the story with sources before the commitments. (litespec/core/product#place-the-story-before-the-commitments, litespec/core/product#cite-sources-for-chapter-claims)
-- Constraints are answered, research cites read sources, problems pair with features. (litespec/core/product#answer-every-constraint, litespec/core/product#record-research-with-read-sources, litespec/core/product#state-each-problem-and-feature)
-- Each choice links its decision; history and coverage derive from the model. (litespec/core/product#trace-every-choice-to-a-decision, litespec/core/product#record-each-product-choice-as-a-decision, litespec/core/product#derive-history-from-decisions, litespec/core/product#derive-requirement-coverage-from-the-model)
-- An agent drafts, a person approves, and a new record replaces an old choice. (litespec/core/product#name-the-person-who-approved-a-decision, litespec/core/product#replace-a-decision-with-a-new-record, litespec/core/product#build-on-a-draft-decision-before-approval)
-- Records cite requirements in fulfils; checks fail an unfulfilled one. (litespec/core/product#cite-requirements-from-records, litespec/core/product#reject-an-unfulfilled-requirement)
-- Work lands intent, research, decision, requirement, records, code, and tests. (litespec/core/product#build-intent-before-specification-before-code)
-- Generated records are source material until a decision states the claim. (litespec/core/product#treat-generated-research-as-source-material)
-- Each topic carries a review date, commercial work loads intent first, and decisions share one numbered sequence. (litespec/core/product#review-a-topic-by-its-date, litespec/core/product#load-product-intent-before-commercial-work, litespec/core/product#name-product-decisions-in-one-numbered-sequence)
 
 ## Concepts
 
@@ -31,7 +18,7 @@ The record types and links are defined in [docs/core/model.md](model.md).
 | Constraint | An outside rule the product must obey, with its source and whether it applies. |
 | Research | An outside fact behind a choice, with the sources read and the question asked. |
 | Decision | A dated choice with options, decider, evidence, and what would change it. |
-| Requirement | One commitment: a promise, behaviour, or quality the code keeps, or a target or practice kept elsewhere. |
+| Requirement | One commitment: a promise, behavior, or quality the code keeps, or a target or practice kept elsewhere. |
 | Problem | A pain or job someone has today, with who it affects. |
 | Feature | What the product offers against a problem: planned, shipped, later, or refused. |
 | Product topic | One page of business intent holding Requirement entries. |
@@ -44,7 +31,7 @@ constraint  ->  product  ->  requirement  ->  rule, use case  ->  code
 (outside rule)   (what we are)  (what we commit)  (how it behaves)  (what runs)
 ```
 
-A decision sets the position. A topic page states it as requirements. Behavior records name the requirements they fulfil. The code is the record of what happens today. When behavior contradicts a requirement, either the code carries a defect or the business changed. A changed business is a new decision, approved by a person, before any page or code moves.
+A decision sets the position. A topic page states it as requirements. Behavior records name the requirements they fulfill. The code is the record of what happens today. When behavior contradicts a requirement, either the code carries a defect or the business changed. A changed business is a new decision, approved by a person, before any page or code moves.
 
 ## Standards
 
@@ -88,11 +75,11 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 **Requirement:** Each Requirement entry MUST carry one identifier `requirement/<topic>.<name>` naming its own page, with kind, statement, and for a promise its values with effective dates.
 
-**Rationale:** An identifier lets a record name the commitment it fulfils, and lets the model resolve the name. A commitment written only as prose cannot be traced. Kinds are promise, behaviour, quality, target, and practice. A target names what is counted in `measure` and the date or milestone in `by`. A practice is a commitment kept in how the company works. Any requirement may name in `deliveredBy` the planned, later, or refused feature that carries it.
+**Rationale:** An identifier lets a record name the commitment it fulfills, and lets the model resolve the name. A commitment written only as prose cannot be traced. Kinds are promise, behavior, quality, target, and practice. A target names what is counted in `measure` and the date or milestone in `by`. A practice is a commitment kept in how the company works. Any requirement may name in `deliveredBy` the planned, later, or refused feature that carries it.
 
 ### Cite requirements from records
 
-**Requirement:** A rule, use case, or journey that carries a requirement MUST name it in `fulfils`.
+**Requirement:** A rule, use case, or journey that carries a requirement MUST name it in `fulfills`.
 
 **Rationale:** The link runs from behavior to intent, so a product change shows which records to revisit.
 
@@ -100,7 +87,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 **Requirement:** A product page MUST NOT describe states, entry points, failure codes, or handlers.
 
-**Rationale:** A product page that describes behavior becomes a second specification, and it drifts from the first. Behavior records own behavior and name the requirements they fulfil.
+**Rationale:** A product page that describes behavior becomes a second specification, and it drifts from the first. Behavior records own behavior and name the requirements they fulfill.
 
 ### Record research with read sources
 
@@ -166,7 +153,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 **Requirement:** A consumer MUST derive its requirement coverage from the model, never by hand.
 
-**Rationale:** A requirement no record fulfils is intent the system does not carry yet. The model lists each requirement with the records that fulfil it.
+**Rationale:** A requirement no record fulfills is intent the system does not carry yet. The model lists each requirement with the records that fulfill it.
 
 ### Build intent before specification before code
 
@@ -174,13 +161,13 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 **Rationale:** The order makes each layer checkable before the next builds on it. A specification written before its decision argues from code. Approval follows `litespec/core/principles#refuse-approval-behind-a-draft-decision`: nothing is approved behind a draft.
 
-**Example:** A price change lands its research note, then decision `decision/0011-raise-the-monthly-plan` and requirement `requirement/pricing.monthly-plan-fee`, then the billing `fulfils` link, then the code.
+**Example:** A price change lands its research note, then decision `decision/0011-raise-the-monthly-plan` and requirement `requirement/pricing.monthly-plan-fee`, then the billing `fulfills` link, then the code.
 
 ### Reject an unfulfilled requirement
 
-**Requirement:** A consumer MUST fail its checks on a promise, behaviour, or quality requirement that nothing fulfils or delivers, outside a Known gap.
+**Requirement:** A consumer MUST fail its checks on a promise, behavior, or quality requirement that nothing fulfills or delivers, outside a Known gap.
 
-**Rationale:** A rule, use case, or journey fulfils a requirement, and a planned, later, or refused feature delivers it. A target or practice is measured or kept outside the code, so deleting one to clear the check loses intent. Planned work belongs to its feature, so a Known gap marks only what nobody owns.
+**Rationale:** A rule, use case, or journey fulfills a requirement, and a planned, later, or refused feature delivers it. A target or practice is measured or kept outside the code, so deleting one to clear the check loses intent. Planned work belongs to its feature, so a Known gap marks only what nobody owns.
 
 ### Build on a draft decision before approval
 
@@ -239,7 +226,7 @@ docs/product/
 
 This informative example demonstrates `litespec/core/product#trace-every-choice-to-a-decision`, `litespec/core/product#identify-every-requirement`, and `litespec/core/product#cite-requirements-from-records`.
 
-A subscription business keeps `docs/product/business/pricing.md` with id `pricing`. Its Rules section states `requirement/pricing.monthly-plan-fee`, and its Position row for the monthly plan links `decision/0003-monthly-plan`. The billing use case names the requirement in `fulfils`. When the price changes, decision `decision/0011-raise-the-monthly-plan` replaces `decision/0003-monthly-plan`. The pricing row then links the new record, and History lists both.
+A subscription business keeps `docs/product/business/pricing.md` with id `pricing`. Its Rules section states `requirement/pricing.monthly-plan-fee`, and its Position row for the monthly plan links `decision/0003-monthly-plan`. The billing use case names the requirement in `fulfills`. When the price changes, decision `decision/0011-raise-the-monthly-plan` replaces `decision/0003-monthly-plan`. The pricing row then links the new record, and History lists both.
 
 ## Verification
 
@@ -252,7 +239,7 @@ A subscription business keeps `docs/product/business/pricing.md` with id `pricin
 | litespec/core/product#place-the-story-before-the-commitments | checkable | `litespec consumer` fails a topic whose chapter follows its commitments. |
 | litespec/core/product#cite-sources-for-chapter-claims | guidance | Does each claim in the chapter cite its source? |
 | litespec/core/product#identify-every-requirement | checkable | `litespec consumer` fails a Requirement entry without identifier, kind, or statement, or a promise without effective-dated values. |
-| litespec/core/product#cite-requirements-from-records | guidance | Does every record that carries a requirement name it in `fulfils`? |
+| litespec/core/product#cite-requirements-from-records | guidance | Does every record that carries a requirement name it in `fulfills`? |
 | litespec/core/product#keep-behavior-out-of-product-pages | guidance | Does any product page name a state, entry point, failure code, or handler? |
 | litespec/core/product#record-research-with-read-sources | checkable | `litespec consumer` fails a Research record without question or source read date. |
 | litespec/core/product#state-each-problem-and-feature | checkable | `litespec consumer` fails a problem or feature missing its required fields. |

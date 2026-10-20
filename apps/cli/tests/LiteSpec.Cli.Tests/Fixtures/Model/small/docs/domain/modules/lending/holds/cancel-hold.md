@@ -14,26 +14,26 @@
     "entry-point/library-app"
   ],
   "raises": [
-    "event/hold.hold-cancelled"
+    "event/hold.hold-canceled"
   ],
   "reactsTo": [],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.hold-pickup-window"
   ],
   "results": [
-    "result/cancel-hold.cancelled",
+    "result/cancel-hold.canceled",
     "result/cancel-hold.hold-ended"
   ],
   "cases": [],
   "records": [
     {
       "type": "result",
-      "id": "result/cancel-hold.cancelled",
-      "title": "Cancelled",
+      "id": "result/cancel-hold.canceled",
+      "title": "Canceled",
       "owner": "lending-team",
       "outcome": "success",
       "httpStatus": 200,
-      "meaning": "The hold is cancelled."
+      "meaning": "The hold is canceled."
     },
     {
       "type": "result",

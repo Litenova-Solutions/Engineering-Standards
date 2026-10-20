@@ -35,13 +35,13 @@ The finding codes are:
 | `known-gap-expired` | A known gap passed its end date with its check still red. |
 | `rule-name-negation` | A rule statement negates what its name does not keep. |
 | `use-case-without-success` | A use case ends with no success result. |
-| `use-case-without-case` | A use case has no case. It runs on the large profile only. |
+| `use-case-without-case` | A use case has no case. It runs at large size only. |
 | `requirement-unfulfilled` | A requirement is fulfilled by no rule, use case or journey. |
 | `case-result-unresolved` | A case names no result of its own use case. |
 | `refusal-not-thrown` | A refusal result names a code the code never throws. |
 | `use-case-unimplemented` | No code implements the use case and no known gap covers it. |
 | `proves-unconfirmed` | No when step of a claimed case reaches its use case, or no assertion matches its refusal. |
-| `profile-type-missing` | The size profile requires a type the project lacks. |
+| `size-type-missing` | The size requires a type the project lacks. |
 | `journey-reach` | A public use case sits in no journey and names no background caller. |
 | `invalid-field` | A field holds a value outside its shape, or a record other than a decision carries `replaces`. |
 | `use-case-name-clash` | Two use cases share one name across the project. |

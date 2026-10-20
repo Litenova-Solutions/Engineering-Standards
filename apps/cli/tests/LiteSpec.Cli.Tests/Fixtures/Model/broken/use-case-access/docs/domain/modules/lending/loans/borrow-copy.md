@@ -15,7 +15,7 @@
     "event/loan.loan-borrowed"
   ],
   "reactsTo": [],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.max-active-loans"
   ],
   "results": [

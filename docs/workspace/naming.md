@@ -4,19 +4,6 @@
 
 Names should expose business intent and architectural role without requiring a reader to open the file. Fixed suffixes and file conventions reduce variation across agent sessions.
 
-## Agent Summary {#agent-summary}
-
-- Aggregate-owned types lead with their aggregate root name. (litespec/workspace/naming#anchor-aggregate-owned-types-on-the-aggregate-root)
-- Architectural roles carry their declared suffix. (litespec/workspace/naming#use-architectural-suffixes)
-- Asynchronous operations reveal asynchrony and accept cancellation explicitly. (litespec/workspace/naming#name-asynchronous-operations-completely)
-- Exception names state the failed rule and its owner. (litespec/workspace/naming#name-exceptions-by-failed-rule)
-- Boolean names read as conditions. (litespec/workspace/naming#use-intent-revealing-boolean-names)
-- Code uses the pinned language version's current constructs. (litespec/workspace/naming#use-current-language-features)
-- Frontend names follow one predictable case mapping. (litespec/workspace/naming#use-predictable-frontend-names)
-- Business names stay aligned across layers. (litespec/workspace/naming#align-business-names-across-layers)
-- Namespaces follow their folders beneath the project root. (litespec/workspace/naming#keep-namespaces-aligned-with-folders)
-- Type names avoid the listed generic names, and boundary names derive from the ubiquitous term. (litespec/workspace/naming#avoid-generic-type-names, litespec/workspace/naming#derive-boundary-names-from-the-ubiquitous-term)
-
 ## Standards
 
 ### Anchor aggregate-owned types on the aggregate root
@@ -78,9 +65,9 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 
 ### Name asynchronous operations completely
 
-**Requirement:** An asynchronous operation MUST reveal its asynchrony in its name and accept cancellation explicitly when the operation is cancellable.
+**Requirement:** An asynchronous operation MUST reveal its asynchrony in its name and accept cancellation explicitly when the operation is cancelable.
 
-**Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature. An operation is cancellable when it performs I/O or awaits.
+**Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature. An operation is cancelable when it performs I/O or awaits.
 
 ### Name exceptions by failed rule
 
@@ -146,7 +133,7 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 |:---|:---|:---|
 | litespec/workspace/naming#anchor-aggregate-owned-types-on-the-aggregate-root | guidance | Does each aggregate-owned type name begin with its aggregate root name? |
 | litespec/workspace/naming#use-architectural-suffixes | guidance | Does each architectural type carry the suffix its role requires? |
-| litespec/workspace/naming#name-asynchronous-operations-completely | guidance | Does each asynchronous operation reveal its asynchrony in its name and accept cancellation explicitly when cancellable? |
+| litespec/workspace/naming#name-asynchronous-operations-completely | guidance | Does each asynchronous operation reveal its asynchrony in its name and accept cancellation explicitly when cancelable? |
 | litespec/workspace/naming#name-exceptions-by-failed-rule | guidance | Does each Domain exception name lead with its root and name its reason? |
 | litespec/workspace/naming#use-intent-revealing-boolean-names | guidance | Does each boolean member use an intent-revealing prefix or verb? |
 | litespec/workspace/naming#use-current-language-features | guidance | Does production code target the pinned language version with current constructs? |

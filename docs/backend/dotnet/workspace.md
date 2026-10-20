@@ -4,13 +4,6 @@
 
 A .NET backend realizes the workspace tree with solutions and project files. The shared provisions live on the stack-neutral page ([Workspace structure](../../workspace/structure.md)); this page holds what .NET alone requires.
 
-## Agent Summary {#agent-summary}
-
-- The project config declares size and stacks beside the .NET backend. (litespec/backend/dotnet/workspace#declare-size-and-stacks-in-project-config)
-- Production and test projects sit in separate roots. (litespec/backend/dotnet/workspace#keep-net-production-and-test-projects-separate)
-- A root solution lists more than one deployable unit. (litespec/backend/dotnet/workspace#keep-one-workspace-solution-beside-the-api-solution)
-- An AppHost that runs more than one application sits beside them under apps. (litespec/backend/dotnet/workspace#place-a-workspace-apphost-beside-the-applications-it-runs)
-
 ## Standards
 
 ### Declare size and stacks in project config

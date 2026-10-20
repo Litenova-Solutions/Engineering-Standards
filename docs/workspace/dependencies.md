@@ -4,19 +4,6 @@
 
 Layer dependencies and package ownership make the application boundary visible to review. Each layer accepts only the dependencies its owning provisions allow, and each project rejects packages introduced without a current requirement.
 
-## Agent Summary {#agent-summary}
-
-- Dependencies follow the declared graph with no added edge. (litespec/workspace/dependencies#follow-the-declared-dependency-graph)
-- Domain depends on no external package or framework. (litespec/workspace/dependencies#keep-domain-dependency-free)
-- Application depends only on abstractions and the declared read boundary. (litespec/workspace/dependencies#keep-application-free-of-provider-packages)
-- Provider adapters live only in Infrastructure. (litespec/workspace/dependencies#keep-providers-in-infrastructure)
-- Every version resolves through central management or the lockfile. (litespec/workspace/dependencies#pin-every-dependency-version-centrally)
-- A package outside the manifest carries a decision with its use, cost, and removal condition. (litespec/workspace/dependencies#approve-new-packages-explicitly)
-- Frontends stay isolated and take UI packages from the manifest baseline. (litespec/workspace/dependencies#keep-frontend-applications-isolated, litespec/workspace/dependencies#keep-the-approved-web-ui-dependency-boundary)
-- Generated types stay dependency-free with a thin client. (litespec/workspace/dependencies#keep-generated-packages-dependency-light)
-- Test packages stay inside test projects. (litespec/workspace/dependencies#keep-test-dependencies-in-test-projects)
-- Each baseline package sits in its owning layer. (litespec/workspace/dependencies#assign-each-baseline-package-to-its-owning-layer)
-
 ## Standards
 
 ### Follow the declared dependency graph

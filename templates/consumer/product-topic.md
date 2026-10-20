@@ -6,12 +6,13 @@
   "status": "draft",
   "decider": "<owner>",
   "decideBy": "<YYYY-MM-DD>",
+  "reviewBy": "<YYYY-MM-DD>",
   "records": [
     {
       "type": "requirement",
       "id": "requirement/<topic>.<name>",
       "title": "<Requirement display title>",
-      "kind": "behaviour",
+      "kind": "behavior",
       "statement": "<The commitment in one sentence>",
       "basedOn": ["<constraint or research id, or remove this line>"]
     },
@@ -46,9 +47,48 @@ Tell what the customer faces on this topic. Give the numbers that size the probl
 
 Explain the choice and how it works, as a person would explain it to a colleague. Link the decision records that set it.
 
+## Why it is better
+
+Compare the choice with the main alternative, with the numbers that favor it.
+
+## A worked example
+
+Show one realistic case walking through the choice from start to finish.
+
 ## Costs and risks
 
 State what the choice gives up, what it costs, and what could go wrong.
+
+## How sure we are
+
+State the confidence in the choice and what would raise it.
+
+## Rules
+
+The frontmatter records hold every testable commitment as a Requirement entry.
+
+## Position
+
+State each choice with the decision that set it, including choices no system carries.
+
+## Refusals
+
+State what was refused with the decision behind each refusal.
+
+## Open questions
+
+List the questions still open with who answers each one.
+
+## Next
+
+State the next planned change with its date or milestone.
+
+## History
+
+The model lists the decisions that decide this page.
+
+<!-- generated:history -->
+<!-- /generated:history -->
 
 ## Evidence
 

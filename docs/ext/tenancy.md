@@ -16,17 +16,7 @@ The consumer enables `tenancy` only when independent customer organizations shar
 
 None. This extension adds tenant obligations the baseline does not state.
 
-None. Tenant scope applies to records every profile already requires.
-
-## Agent Summary {#agent-summary}
-
-- Record the tenant adoption decision. (litespec/ext/tenancy#record-the-tenant-adoption-decision)
-- Define tenancy storage and isolation guarantees. (litespec/ext/tenancy#define-tenant-isolation)
-- Resolve tenant identity from trusted context. (litespec/ext/tenancy#resolve-tenant-identity-from-trusted-context)
-- Match actor and resource tenants. (litespec/ext/tenancy#verify-actor-and-target-tenancy)
-- Scope every tenant-owned persistence boundary. (litespec/ext/tenancy#scope-tenant-owned-records)
-- Prevent cross-tenant disclosure in responses and diagnostics. (litespec/ext/tenancy#apply-cross-tenant-disclosure-policy, litespec/ext/tenancy#protect-tenant-diagnostics)
-- Declare tenant scope for operational work. (litespec/ext/tenancy#scope-tenant-operations)
+None. Tenant scope applies to records every project already requires.
 
 ## Standards
 

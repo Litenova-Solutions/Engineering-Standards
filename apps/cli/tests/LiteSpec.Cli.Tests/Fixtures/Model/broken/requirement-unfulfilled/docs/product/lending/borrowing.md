@@ -11,7 +11,7 @@
       "title": "Max active loans",
       "owner": "lending-team",
       "status": "approved",
-      "kind": "behaviour",
+      "kind": "behavior",
       "statement": "A reader holds at most five active loans.",
       "basedOn": []
     },
@@ -21,7 +21,7 @@
       "title": "Loan period days",
       "owner": "lending-team",
       "status": "approved",
-      "kind": "behaviour",
+      "kind": "behavior",
       "statement": "A loan lasts 21 days.",
       "basedOn": []
     },
@@ -31,7 +31,7 @@
       "title": "Hold pickup window",
       "owner": "lending-team",
       "status": "approved",
-      "kind": "behaviour",
+      "kind": "behavior",
       "statement": "A ready hold waits seven days.",
       "basedOn": []
     },
@@ -41,7 +41,7 @@
       "title": "Copy shelf home",
       "owner": "lending-team",
       "status": "approved",
-      "kind": "behaviour",
+      "kind": "behavior",
       "statement": "A copy lives on one home shelf.",
       "basedOn": []
     },
@@ -49,7 +49,7 @@
       "type": "requirement",
       "id": "requirement/borrowing.renewal-by-text-message",
       "title": "Renewal by text message",
-      "kind": "behaviour",
+      "kind": "behavior",
       "statement": "A member renews a loan by replying to a text message."
     }
   ]

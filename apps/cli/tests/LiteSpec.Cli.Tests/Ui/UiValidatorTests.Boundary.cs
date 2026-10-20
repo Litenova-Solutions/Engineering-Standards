@@ -96,7 +96,7 @@ public sealed partial class UiValidatorTests
             fixture.PathCase(
                 "packages/ui/src/styles/shadows.css",
                 "@utility shade {\n  background: radial-gradient(farthest-side, oklch(0 0 0 / 0.16), transparent);\n}\n"),
-            "literal colour 'oklch(' belongs in the token stylesheet");
+            "literal color 'oklch(' belongs in the token stylesheet");
     }
 
     [Fact]
@@ -107,6 +107,6 @@ public sealed partial class UiValidatorTests
             fixture.PathCase(
                 "packages/ui/src/styles/shadows.css",
                 "@utility shade {\n  color: #b9bbc6;\n}\n"),
-            "literal colour '#b9bbc6' belongs in the token stylesheet");
+            "literal color '#b9bbc6' belongs in the token stylesheet");
     }
 }

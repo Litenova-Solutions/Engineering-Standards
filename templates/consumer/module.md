@@ -19,4 +19,4 @@ State the business area, its language, and the outcomes its use cases support.
 
 ## Boundaries
 
-State what belongs in this module and what belongs in a neighbour instead.
+State what belongs in this module and what belongs in a neighbor instead.

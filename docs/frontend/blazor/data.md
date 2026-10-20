@@ -4,15 +4,6 @@
 
 This page holds how the blazor stack realizes the Frontend data rules ([Frontend data](../data.md)). Every use case runs through Application. State carries a declared classification, loads once at startup, and reports failure explicitly rather than through an absent value.
 
-## Agent Summary {#agent-summary}
-
-- A component invokes an Application handler, never Domain directly. (litespec/frontend/blazor/data#route-use-cases-through-application)
-- Every piece of state is durable, device-local, or derived, and persisted state loads once at startup. (litespec/frontend/blazor/data#classify-state, litespec/frontend/blazor/data#load-persisted-state-once)
-- A derived value is computed in one place. (litespec/frontend/blazor/data#keep-derived-values-single-sourced)
-- Validation runs in an Application validator returning a typed result. (litespec/frontend/blazor/data#validate-at-the-boundary)
-- A handler returns a typed result covering each named failure. (litespec/frontend/blazor/data#make-failure-explicit)
-- A form binds a typed model, and the store updates from each command result. (litespec/frontend/blazor/data#keep-forms-typed, litespec/frontend/blazor/data#prefer-explicit-refresh)
-
 ## Standards
 
 ### Route use cases through Application
@@ -49,7 +40,7 @@ This page holds how the blazor stack realizes the Frontend data rules ([Frontend
 
 **Requirement:** An Application handler MUST return a typed result union covering success and each named failure.
 
-**Rationale:** Signalling failure through null, an empty collection, or a bare boolean forces every caller to guess which failure occurred. This realizes litespec/frontend/data#map-every-failure-to-one-problem-type.
+**Rationale:** Signaling failure through null, an empty collection, or a bare boolean forces every caller to guess which failure occurred. This realizes litespec/frontend/data#map-every-failure-to-one-problem-type.
 
 ## Conventions
 

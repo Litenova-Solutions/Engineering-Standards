@@ -187,7 +187,7 @@ static class ModelBuilder
 
     /// <summary>
     ///     Computes each record's effective status: draft when the record is a draft, when a draft
-    ///     decision decides it, or when a requirement it fulfils is effectively a draft. A result or
+    ///     decision decides it, or when a requirement it fulfills is effectively a draft. A result or
     ///     a case takes its use case's effective status.
     /// </summary>
     private static void ComputeAuthority(ProjectModel model)
@@ -208,7 +208,7 @@ static class ModelBuilder
         foreach (var record in model.Records.Where(record => record.Type is "rule" or "use-case" or "journey"))
         {
             var own = Own(record);
-            var inherited = record.Ids("fulfils").Any(id =>
+            var inherited = record.Ids("fulfills").Any(id =>
                 model.EffectiveStatus.TryGetValue(id, out var status) && status == "draft");
 
             model.EffectiveStatus[record.Id] = own == "approved" && inherited ? "draft" : own;

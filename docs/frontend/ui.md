@@ -2,22 +2,9 @@
 
 ## Intent
 
-The shared UI package is a constrained construction language. It provides the primitive source, the interaction behaviour, the layout, and the tokens. A route names one floorplan and fills its slots from the domain. A route suite proves every route.
+The shared UI package is a constrained construction language. It provides the primitive source, the interaction behavior, the layout, and the tokens. A route names one floorplan and fills its slots from the domain. A route suite proves every route.
 
 The route code is the page contract. No page document restates it, because a second description of a page drifts from the code that renders it.
-
-## Agent Summary {#agent-summary}
-
-- One shared package is the visual authority with a pinned baseline and a density profile. (litespec/frontend/ui#select-one-visual-authority, litespec/frontend/ui#pin-the-baseline-in-the-shared-package, litespec/frontend/ui#use-the-product-profiles)
-- One design contract declares the closed floorplan set with choice rules. (litespec/frontend/ui#publish-a-design-contract, litespec/frontend/ui#declare-a-closed-floorplan-set)
-- A route renders one floorplan, or records why it composes none. (litespec/frontend/ui#compose-each-route-from-one-floorplan, litespec/frontend/ui#record-a-freestyle-route)
-- Each page derives from a named reference and keeps layout inside floorplans. (litespec/frontend/ui#derive-each-page-type-from-a-named-reference, litespec/frontend/ui#keep-layout-inside-floorplans)
-- States take tones, tokens live once, colours hold the ramp, and separators stay subtle. (litespec/frontend/ui#select-a-tone-from-the-closed-set, litespec/frontend/ui#keep-tokens-in-one-definition, litespec/frontend/ui#hold-the-declared-base-colour, litespec/frontend/ui#keep-separators-at-the-subtle-step)
-- Commands use the surface their input size assigns and stay visible with reasons when blocked. (litespec/frontend/ui#select-a-command-surface-by-size, litespec/frontend/ui#keep-a-blocked-command-visible-with-its-reason)
-- Errors show trace identifiers and every called result carries proof or a known gap. (litespec/frontend/ui#show-the-trace-id-in-error-detail, litespec/frontend/ui#prove-every-result-a-route-calls)
-- Every route passes its suite and each change names its evidence. (litespec/frontend/ui#check-every-route, litespec/frontend/ui#prove-ui-behavior-and-appearance)
-- Styling uses semantic tokens and behavior packages render through the baseline. (litespec/frontend/ui#restrict-styling-to-semantic-tokens, litespec/frontend/ui#govern-behavior-packages)
-- A frontend outside the contract declares its platform and replacements. (litespec/frontend/ui#record-a-frontend-outside-the-controlled-contract)
 
 ## Concepts
 
@@ -47,7 +34,7 @@ A floorplan exposes its name on its frame. A reviewer and the route suite read t
 
 ### The tone set
 
-A tone names what a state means. The set is closed: a page picks one of them rather than a colour.
+A tone names what a state means. The set is closed: a page picks one of them rather than a color.
 
 | Tone | The state it means |
 |:---|:---|
@@ -57,7 +44,7 @@ A tone names what a state means. The set is closed: a page picks one of them rat
 | `destructive` | The thing asked for was refused |
 | `info` | The page is explaining rather than reporting |
 
-The mapping from a state code to a tone lives in one table in each application. A reader then sees the same colour for the same state on every screen.
+The mapping from a state code to a tone lives in one table in each application. A reader then sees the same color for the same state on every screen.
 
 ### The command surface
 
@@ -174,15 +161,15 @@ The density is chosen per frontend rather than per workspace, because density is
 
 **Requirement:** A state indicator MUST take one tone from the closed set, each application declaring its state-to-tone mapping once as an exhaustive table of language terms.
 
-**Rationale:** A page that picks a colour picks a meaning nobody agreed to. One mapping means the same state reads the same way on every screen. A new state then fails to compile until its tone and its word exist.
+**Rationale:** A page that picks a color picks a meaning nobody agreed to. One mapping means the same state reads the same way on every screen. A new state then fails to compile until its tone and its word exist.
 
 ### Keep tokens in one definition
 
-**Requirement:** An application MUST use the shared token definition and declare no value, with no literal colour in any shipped definition.
+**Requirement:** An application MUST use the shared token definition and declare no value, with no literal color in any shipped definition.
 
-**Rationale:** One token definition is what makes two applications look like one product. An application uses it and declares no value, so a second definition never introduces a value the first has no opinion about. A definition the shared package ships declares no literal colour.
+**Rationale:** One token definition is what makes two applications look like one product. An application uses it and declares no value, so a second definition never introduces a value the first has no opinion about. A definition the shared package ships declares no literal color.
 
-### Hold the declared base colour
+### Hold the declared base color
 
 **Requirement:** A token definition MUST carry only the values the declared baseline publishes, except under a recorded exception.
 
@@ -190,7 +177,7 @@ The density is chosen per frontend rather than per workspace, because density is
 
 ### Keep separators at the subtle step
 
-**Requirement:** A structural separator or input border MUST NOT be darker than the border step the declared base colour publishes.
+**Requirement:** A structural separator or input border MUST NOT be darker than the border step the declared base color publishes.
 
 **Rationale:** A heavier rule beside a lighter one reads as emphasis, so authors stop trusting the token. The border step keeps every separator at one weight.
 
@@ -285,8 +272,8 @@ The density is chosen per frontend rather than per workspace, because density is
 | litespec/frontend/ui#record-a-freestyle-route | guidance | Does every freestyle route name the decision record that justifies its layout? |
 | litespec/frontend/ui#derive-each-page-type-from-a-named-reference | guidance | Does every route name its page type reference, with each freestyle route naming its decision record? |
 | litespec/frontend/ui#select-a-tone-from-the-closed-set | guidance | Does each application declare its state-to-tone mapping once as an exhaustive table of terms? |
-| litespec/frontend/ui#keep-tokens-in-one-definition | guidance | Does each application use the shared token definition with no declared value and no literal colour? |
-| litespec/frontend/ui#hold-the-declared-base-colour | guidance | Does the token definition carry only declared baseline values, with each departure recorded? |
+| litespec/frontend/ui#keep-tokens-in-one-definition | guidance | Does each application use the shared token definition with no declared value and no literal color? |
+| litespec/frontend/ui#hold-the-declared-base-color | guidance | Does the token definition carry only declared baseline values, with each departure recorded? |
 | litespec/frontend/ui#keep-separators-at-the-subtle-step | guidance | Is every structural separator and input border at the published border step or lighter? |
 | litespec/frontend/ui#select-a-command-surface-by-size | guidance | Does each command use the surface the Concepts table assigns to its input? |
 | litespec/frontend/ui#show-the-trace-id-in-error-detail | guidance | Does every visible error show its trace identifier copyably in its detail rather than its headline? |

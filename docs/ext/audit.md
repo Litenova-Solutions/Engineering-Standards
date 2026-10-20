@@ -30,19 +30,6 @@ This extension replaces `litespec/quality/security#record-security-audit-events`
 
 This extension switches on no optional record type.
 
-## Agent Summary {#agent-summary}
-
-- Record the audited categories, retention, access, and integrity method before writing code. (litespec/ext/audit#record-the-audit-adoption-decision)
-- Declare every Command as audited or excluded with a reason. (litespec/ext/audit#declare-audit-selection-on-every-command, litespec/ext/audit#reject-an-undeclared-command)
-- Produce records at the mediation boundary, not inside a handler. (litespec/ext/audit#emit-audit-records-at-the-mediation-boundary, litespec/ext/audit#restrict-handler-contribution-to-determined-values)
-- Record refused and failed attempts, not successes alone. (litespec/ext/audit#record-every-attempt-outcome, litespec/ext/audit#record-refused-authorization)
-- Carry actor, target, outcome, time, origin, and trace identity. (litespec/ext/audit#record-the-required-audit-fields, litespec/ext/audit#record-the-request-origin)
-- Exclude secrets, personal data, and state snapshots from the record. (litespec/ext/audit#exclude-secrets-and-payment-data, litespec/ext/audit#exclude-personal-data-beyond-actor-identity)
-- Commit a success record with its business change. (litespec/ext/audit#commit-a-success-record-with-its-business-change, litespec/ext/audit#stage-the-audit-write-before-the-business-commit)
-- Enforce append-only through storage privilege and chained integrity evidence. (litespec/ext/audit#enforce-append-only-through-storage-privilege, litespec/ext/audit#provide-tamper-evidence)
-- Scope every record to its owning tenant. (litespec/ext/audit#scope-every-record-to-its-tenant)
-- Give the trail a permission-gated read path. (litespec/ext/audit#give-the-trail-a-read-path)
-
 ## Standards
 
 ### Record the audit adoption decision
@@ -353,7 +340,7 @@ The algorithm is named because two implementations that each chose their own can
 
 No additional baseline package is required. The `tenancy` extension owns tenant resolution when a deployment serves several customer organizations. The `outbox` extension owns delivery when `litespec/ext/audit#publish-a-copy-to-the-security-platform` applies.
 
-[Build an audit trail](../guide/audit-trail.md) states one compliant implementation on the command pipeline of the .NET profile.
+[Build an audit trail](../guide/audit-trail.md) states one compliant implementation on the command pipeline of the dotnet stack.
 
 ## Verification
 

@@ -17,16 +17,16 @@ static partial class Checker
         "owner-unknown", "draft-without-decider", "known-gap-expired", "gap-unknown-check",
         "rule-name-negation", "use-case-without-success", "case-result-unresolved",
         "refusal-not-thrown", "use-case-unimplemented", "proves-unconfirmed",
-        "profile-type-missing", "product-not-singleton",
+        "size-type-missing", "product-not-singleton",
         "journey-reach", "use-case-access", "result-status", "region-unknown",
         "use-case-without-case", "requirement-unfulfilled",
         "business-record-name-clash", "decision-decides-nothing", "link-unresolved",
     };
 
-    /// <summary>Requirement kinds that code makes true, so some rule, use case or journey fulfils them.</summary>
+    /// <summary>Requirement kinds that code makes true, so some rule, use case or journey fulfills them.</summary>
     private static readonly HashSet<string> FulfilledKinds = new(StringComparer.Ordinal)
     {
-        "promise", "behaviour", "quality",
+        "promise", "behavior", "quality",
     };
 
     /// <summary>Feature states under which a requirement is not yet, or never, made true by code.</summary>
@@ -45,12 +45,12 @@ static partial class Checker
         Time("citations", () => CheckCitations(model, findings));
         Time("gates", () => CheckGates(model, findings));
         Time("proof", () => CheckProof(model, findings));
-        Time("fulfilment", () => CheckFulfilment(model, findings));
+        Time("fulfillment", () => CheckFulfilment(model, findings));
         Time("links", () => CheckLinks(model, findings));
         Time("access", () => CheckAccess(model, findings));
         Time("status", () => CheckResultStatus(model, findings));
         Time("regions", () => CheckRegions(model, findings));
-        Time("profile", () => CheckProfile(model, findings));
+        Time("profile", () => CheckSizeTypes(model, findings));
         Time("reach", () => CheckJourneyReach(model, findings));
 
         findings.Sort((left, right) =>
@@ -230,7 +230,7 @@ static partial class Checker
                 break;
 
             case "requirement":
-                RequireEnum(record, "kind", ["promise", "behaviour", "quality", "target", "practice"], findings);
+                RequireEnum(record, "kind", ["promise", "behavior", "quality", "target", "practice"], findings);
                 RequireString(record, "statement", findings);
 
                 if (record.Field("kind") == "promise")
@@ -798,7 +798,7 @@ static partial class Checker
     {
         var fulfilled = model.Records
             .Where(record => record.Type is "rule" or "use-case" or "journey")
-            .SelectMany(record => record.Ids("fulfils"))
+            .SelectMany(record => record.Ids("fulfills"))
             .ToHashSet(StringComparer.Ordinal);
 
         foreach (var requirement in model.Records.Where(record => record.Type == "requirement" && record.Status != "retired"))
@@ -1029,7 +1029,7 @@ static partial class Checker
         }
     }
 
-    private static void CheckProfile(ProjectModel model, List<Finding> findings)
+    private static void CheckSizeTypes(ProjectModel model, List<Finding> findings)
     {
         var declaration = Path.Combine(model.Config.Root, "litespec.project.json");
         var required = model.Config.Size == "small"
@@ -1045,7 +1045,7 @@ static partial class Checker
 
             if (RecordTypes.All.Contains(type) && !model.Records.Any(record => record.Type == type))
             {
-                findings.Add(new Finding("profile-type-missing", $"The {model.Config.Size} profile requires {type}, which no record holds.", declaration, 1, null));
+                findings.Add(new Finding("size-type-missing", $"The {model.Config.Size} size requires {type}, which no record holds.", declaration, 1, null));
             }
         }
 

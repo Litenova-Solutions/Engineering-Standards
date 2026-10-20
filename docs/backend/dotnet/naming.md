@@ -4,12 +4,6 @@
 
 Names in a .NET backend follow C# file, asynchronous method, and implementation style rules. The shared provisions live on the stack-neutral page ([Naming and code style](../../workspace/naming.md)); this page holds what the dotnet stack alone requires.
 
-## Agent Summary {#agent-summary}
-
-- One primary type per C# file, named for the file. (litespec/backend/dotnet/naming#match-c-files-and-primary-types)
-- Async methods end in Async and take the token last. (litespec/backend/dotnet/naming#name-asynchronous-methods-completely)
-- Production C# follows the declared style rules. (litespec/backend/dotnet/naming#keep-implementation-style-consistent)
-
 ## Standards
 
 ### Match C# files and primary types
@@ -20,9 +14,9 @@ Names in a .NET backend follow C# file, asynchronous method, and implementation 
 
 ### Name asynchronous methods completely
 
-**Requirement:** A method returning `Task` or `ValueTask` MUST end in `Async` and take `CancellationToken cancellationToken` last when cancellable.
+**Requirement:** A method returning `Task` or `ValueTask` MUST end in `Async` and take `CancellationToken cancellationToken` last when cancelable.
 
-**Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature. A method is cancellable when it performs I/O or awaits. This provision realizes `litespec/workspace/naming#name-asynchronous-operations-completely`.
+**Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature. A method is cancelable when it performs I/O or awaits. This provision realizes `litespec/workspace/naming#name-asynchronous-operations-completely`.
 
 ### Keep implementation style consistent
 
@@ -59,5 +53,5 @@ internal sealed class CreateDraftCommandHandler(
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/backend/dotnet/naming#match-c-files-and-primary-types | guidance | Does each C# file declare one primary type matching its file name? |
-| litespec/backend/dotnet/naming#name-asynchronous-methods-completely | guidance | Does each task-returning method end in Async with the token last when cancellable? |
+| litespec/backend/dotnet/naming#name-asynchronous-methods-completely | guidance | Does each task-returning method end in Async with the token last when cancelable? |
 | litespec/backend/dotnet/naming#keep-implementation-style-consistent | guidance | Does production C# use file-scoped namespaces, braces, explicit modifiers, and sealed classes? |

@@ -49,19 +49,6 @@ The system contains one delivery approach and one operating model:
 
 `Agent-driven` describes who performs much of the execution. It does not transfer business decision authority to the agent.
 
-## Agent Summary {#agent-summary}
-
-- Agents stop and ask when a decision belongs to a person. (litespec/core/system#keep-decision-authority-with-accountable-people)
-- Approved records define the work, and each one situates its subject. (litespec/core/system#drive-work-from-approved-records, litespec/core/system#state-one-occasion-for-every-behavior-record)
-- Journeys link their use cases rather than restate them, and every use case names what reaches it. (litespec/core/system#connect-one-product-outcome-through-a-journey, litespec/core/system#name-what-calls-a-use-case)
-- One module name is used across every layer. (litespec/core/system#group-language-and-use-cases-by-module)
-- Module pages map business records to state, rules, and commands. (litespec/core/system#make-business-record-ownership-explicit)
-- One use case is one command or query, with computed status and resolvable mapping. (litespec/core/system#deliver-one-complete-use-case, litespec/core/system#compute-use-case-status-from-evidence, litespec/core/system#keep-use-cases-and-handlers-in-one-to-one-correspondence)
-- Every event reaction declares its delivery classification. (litespec/core/system#declare-event-reaction-delivery)
-- Each rule states its kind, and each act needs a permission. (litespec/core/system#state-each-rule-with-its-kind, litespec/core/system#grant-access-through-roles-and-permissions)
-- Records map each business state to a state record. (litespec/core/system#model-every-business-record-lifecycle-with-state-records)
-- Authority follows the ladder, and every link sits on its source record. (litespec/core/system#resolve-authority-by-ladder, litespec/core/system#declare-each-link-on-its-source)
-
 ## Concepts
 
 The system uses related concepts rather than one hierarchy:
@@ -211,27 +198,28 @@ What is true today comes from code, screens, and test runs. A mismatch between t
 
 When two records at one level disagree, the one whose decision was approved later wins; otherwise their shared owner decides.
 
-Written links live on the record named first: a decision decides a requirement, a rule fulfils one, a use case raises an event. The model builder computes implements, calls, and proves from code, routes, and test runs.
+Written links live on the record named first: a decision decides a requirement, a rule fulfills one, a use case raises an event. The model builder computes implements, calls, and proves from code, routes, and test runs.
 
-| Link | From | To |
+| Field | Written on | Points at |
 |:---|:---|:---|
-| decides | decision | requirement, feature, rule |
-| based on | decision, requirement, rule | constraint, research |
-| affects | problem | actor |
-| solves | feature | problem |
-| fulfils | rule, use case, journey | requirement |
-| governs | rule | business record, use case |
-| returns | use case | result |
-| illustrates | case | result |
-| raises | use case | event |
-| reacts to | use case | event |
-| holds at scope | actor | role |
-| allows | role | permission |
-| needs | use case | permission |
-| reached through | use case | entry point |
-| uses | any record | term |
-| replaces | record | the record it replaces |
-| depends on | module | module |
+| decides | decision | Requirements, features, rules, constraints, and the permissions, roles, actors, exceptions, standards, entry points, limits, or decisions an engineering choice settles |
+| basedOn | decision, requirement, rule | Constraints, research |
+| affects | problem | Actors |
+| solves | feature | Problems |
+| fulfills | rule, use case, journey | Requirements |
+| governs | rule | Business records, use cases |
+| results | use case | Its result entries |
+| cases | use case | Its use case entries; each names its result |
+| raises | use case | Events |
+| reactsTo | use case | Events it reacts to |
+| holds | actor | Roles at a scope |
+| allows | role | Permissions |
+| needs | use case | Permissions |
+| reachedThrough | use case | Entry points |
+| steps | journey | Ordered use cases with actors |
+| terms | any record | Terms |
+| replaces | decision | The replaced decision |
+| dependsOn | module | Modules |
 | implements (computed) | code | use case, rule, event |
 | calls (computed) | screen | use case |
 | proves (computed) | test | case |
@@ -348,9 +336,9 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 ```text
 Use case: use-case/orders.cancel-order
 Command:  CancelOrderCommand
-Result:   result/cancel-order.order-cancelled
-Case:     case/cancel-order.cancelling-twice-is-refused
-Event:    event/order.cancelled
+Result:   result/cancel-order.order-canceled
+Case:     case/cancel-order.canceling-twice-is-refused
+Event:    event/order.canceled
 Endpoint: CancelOrderEndpoint
 ```
 
@@ -463,8 +451,8 @@ docs/
       payment-card-rules.md
   domain/
     README.md
-    glossary.md
-    scenarios.md
+
+
     actors/
       buyer.md
     roles/
@@ -484,24 +472,25 @@ docs/
     address-lookup-providers.md
   operations/
     limits.md
-    security-and-privacy.md
+    secrets.json
+    log/
   runbooks/
     restore-a-backup.md
   exceptions/
     temporary-direct-database-read.md
   known-gaps/
     checkout-cases-unproved.md
-  tools/
+  ui/
     README.md
-    configuration.md
-  reference/
-  guide/
-  releases/
+
+  language.json
+
+
 ```
 
-`product/` holds the brief, the journeys, and the business intent: one topic page per area with its requirements, and the product decisions behind them. `domain/` holds the actors, roles, permissions, entry points, rules, and modules; the glossary renders from the term records.
+`product/` holds the brief, the journeys, and the business intent: one topic page per area with its requirements, and the product decisions behind them. `domain/` holds the actors, roles, permissions, entry points, rules, and modules.
 
-`tools/` holds one command page for each command the repository ships, beside the configuration page that owns every setting a reader can change. `reference/` holds the pages a reader looks up rather than reads. `guide/` holds the tutorial and the how-to pages, which name those commands rather than the mechanism beneath them.
+`operations/` holds the limits, the secret inventory, and the operations log. `runbooks/`, `exceptions/`, and `known-gaps/` hold their records. `ui/` holds the first UI decision or guide, and `language.json` holds the term records.
 
 The example creates an optional directory only when its first real artifact is added. The example does not create empty directories or placeholder records during inception.
 
@@ -583,12 +572,12 @@ The orders module contains `Order` and `OrderClaim`. `use-case/orders.cancel-ord
 | litespec/core/system#state-each-rule-with-its-kind | guidance | Which rule lacks its kind, governor, enforcement, or kept negation? |
 | litespec/core/system#grant-access-through-roles-and-permissions | guidance | Which act lacks its actor, role, permission, and use-case path? |
 | litespec/core/system#model-every-business-record-lifecycle-with-state-records | guidance | Which business state lacks its sealed state record in page and code? |
-| litespec/core/system#state-one-occasion-for-every-behavior-record | checkable | `litespec consumer` fails a behavior page carrying no `Scenario` section. |
-| litespec/core/system#keep-a-scenario-informative | checkable | `litespec consumer` fails a `Scenario` section containing a record identifier. |
-| litespec/core/system#derive-every-scenario-from-one-reference-cast | checkable | `litespec consumer` fails a documentation set with no or several `scenario-cast` pages; the reviewer confirms each scenario draws from it. |
+| litespec/core/system#state-one-occasion-for-every-behavior-record | guidance | Which behavior page lacks a `Scenario` section stating its concrete occasion? |
+| litespec/core/system#keep-a-scenario-informative | guidance | Does any `Scenario` section contain a record identifier? |
+| litespec/core/system#derive-every-scenario-from-one-reference-cast | guidance | Does one `scenario-cast` page exist, and does each scenario draw from it? |
 | litespec/core/system#update-records-with-behavior | guidance | Which affected record did the behavior change leave behind? |
 | litespec/core/system#use-this-consumer-documentation-layout | guidance | Which directory breaks the layout without a declared exception? |
-| litespec/core/system#group-module-use-case-files-by-business-record | checkable | `litespec consumer` resolves each use case to its module or one business-record subdirectory. |
+| litespec/core/system#group-module-use-case-files-by-business-record | guidance | Does each use case sit under its module or one business-record subdirectory? |
 | litespec/core/system#keep-operational-and-security-references-under-operations | guidance | Which operating or security prose sits outside `docs/operations/`? |
 | litespec/core/system#use-established-technical-terms | guidance | Which term replaces an established technical meaning with a softer synonym? |
 | litespec/core/system#use-ordinary-capitalization-in-prose | guidance | Which ordinary noun carries capitalization outside names and identifiers? |

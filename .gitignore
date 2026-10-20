@@ -9,5 +9,4 @@ artifacts/
 .fuse/
 mcps/
 .opencode/
-packages/ui-patterns/dist/
 .agents/delegate/

@@ -18,16 +18,6 @@ None. Ordinary queries stay under `litespec/backend/persistence#query-through-th
 
 `limit`. Selecting `report` requires Limit records for the request budget and the report bounds.
 
-## Agent Summary {#agent-summary}
-
-- Record cost before adding reporting infrastructure. (litespec/ext/report#record-reporting-need)
-- Keep raw SQL parameterized in Infrastructure. (litespec/ext/report#parameterize-report-sql, litespec/ext/report#keep-raw-sql-in-infrastructure)
-- Apply item-read authorization to report data. (litespec/ext/report#apply-item-read-authorization)
-- Run budget-exceeding exports in Worker. (litespec/ext/report#run-budget-exceeding-exports-in-worker)
-- Scope export output to the tenant. (litespec/ext/report#scope-export-output-to-the-tenant)
-- Bound report work and output retention. (litespec/ext/report#define-report-limits)
-- Escape spreadsheet formula-leading values. (litespec/ext/report#escape-formula-leading-export-values)
-
 ## Standards
 
 ### Record reporting need

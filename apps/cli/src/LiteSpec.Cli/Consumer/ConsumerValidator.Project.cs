@@ -166,7 +166,7 @@ static partial class ConsumerValidator
 
             foreach (var stack in named.Where(stack => !byId.ContainsKey(stack)))
             {
-                run.Err($"litespec.project.json: stack '{stack}' is not a stack the pinned LiteSpec release ships [litespec/core/scope#select-a-size-profile-and-stacks]");
+                run.Err($"litespec.project.json: stack '{stack}' is not a stack the pinned LiteSpec release ships [litespec/core/scope#select-a-size-a-shape-and-stacks]");
             }
 
             var backends = named.Where(byId.ContainsKey).Where(stack => byId[stack].Kind == "backend").ToList();
@@ -177,12 +177,12 @@ static partial class ConsumerValidator
             {
                 foreach (var backend in backends)
                 {
-                    run.Err($"litespec.project.json: shape 'client-only' names backend stack '{backend}'; a client-only project names no backend stack [litespec/core/scope#select-a-size-profile-and-stacks]");
+                    run.Err($"litespec.project.json: shape 'client-only' names backend stack '{backend}'; a client-only project names no backend stack [litespec/core/scope#select-a-size-a-shape-and-stacks]");
                 }
             }
             else if (backends.Count != 1)
             {
-                run.Err($"litespec.project.json: stacks name {backends.Count} backend stacks; name exactly one of {string.Join(", ", backendIds)} [litespec/core/scope#select-a-size-profile-and-stacks]");
+                run.Err($"litespec.project.json: stacks name {backends.Count} backend stacks; name exactly one of {string.Join(", ", backendIds)} [litespec/core/scope#select-a-size-a-shape-and-stacks]");
             }
 
             // A stack whose requires is not also named misses the pages its own
@@ -193,7 +193,7 @@ static partial class ConsumerValidator
                 {
                     if (!named.Contains(required))
                     {
-                        run.Err($"litespec.project.json: stack '{stack}' requires '{required}', which the project does not name in stacks [litespec/core/scope#select-a-size-profile-and-stacks]");
+                        run.Err($"litespec.project.json: stack '{stack}' requires '{required}', which the project does not name in stacks [litespec/core/scope#select-a-size-a-shape-and-stacks]");
                     }
                 }
             }
@@ -211,7 +211,7 @@ static partial class ConsumerValidator
 
                 foreach (var backend in backends.Where(backend => !pairs.Contains(backend)))
                 {
-                    run.Err($"litespec.project.json: frontend stack '{stack}' pairs only with {string.Join(", ", pairs)}, not with backend stack '{backend}' [litespec/core/scope#select-a-size-profile-and-stacks]");
+                    run.Err($"litespec.project.json: frontend stack '{stack}' pairs only with {string.Join(", ", pairs)}, not with backend stack '{backend}' [litespec/core/scope#select-a-size-a-shape-and-stacks]");
                 }
             }
 
@@ -247,7 +247,7 @@ static partial class ConsumerValidator
 
                             if (supported.Count > 0 && !named.Any(supported.Contains))
                             {
-                                run.Err($"litespec.project.json: extensions '{selection.IdText}' supports only the {string.Join(", ", supported)} stack, which the project does not name in stacks [litespec/core/scope#select-a-size-profile-and-stacks]");
+                                run.Err($"litespec.project.json: extensions '{selection.IdText}' supports only the {string.Join(", ", supported)} stack, which the project does not name in stacks [litespec/core/scope#select-a-size-a-shape-and-stacks]");
                             }
                         }
                     }
@@ -366,15 +366,15 @@ static partial class ConsumerValidator
             // stack declared as a platform would select the wrong pages.
             if (IsFalsy(platform))
             {
-                run.Err($"litespec.project.json: frontend '{name}' declares no 'platform'; one of {string.Join(", ", run.KnownStacks)} is required [litespec/core/scope#select-a-size-profile-and-stacks]");
+                run.Err($"litespec.project.json: frontend '{name}' declares no 'platform'; one of {string.Join(", ", run.KnownStacks)} is required [litespec/core/scope#select-a-size-a-shape-and-stacks]");
             }
             else if (AsString(platform) is not string stack || !run.KnownStacks.Contains(stack))
             {
-                run.Err($"litespec.project.json: frontend '{name}' has unknown platform '{JsText(platform)}'; expected one of {string.Join(", ", run.KnownStacks)} [litespec/core/scope#select-a-size-profile-and-stacks]");
+                run.Err($"litespec.project.json: frontend '{name}' has unknown platform '{JsText(platform)}'; expected one of {string.Join(", ", run.KnownStacks)} [litespec/core/scope#select-a-size-a-shape-and-stacks]");
             }
             else if (!namedStacks.Contains(stack))
             {
-                run.Err($"litespec.project.json: frontend '{name}' platform '{stack}' is not a stack the project names in stacks [litespec/core/scope#select-a-size-profile-and-stacks]");
+                run.Err($"litespec.project.json: frontend '{name}' platform '{stack}' is not a stack the project names in stacks [litespec/core/scope#select-a-size-a-shape-and-stacks]");
             }
             else if (ControlledPlatforms.Contains(stack))
             {

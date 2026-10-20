@@ -14,28 +14,28 @@
     "entry-point/library-app"
   ],
   "raises": [
-    "event/hold.hold-cancelled"
+    "event/hold.hold-canceled"
   ],
   "reactsTo": [],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.hold-pickup-window"
   ],
   "results": [
-    "result/cancel-hold.cancelled",
+    "result/cancel-hold.canceled",
     "result/cancel-hold.hold-ended"
   ],
   "cases": [
-    "case/cancel-hold.cancelling-a-waiting-hold-succeeds"
+    "case/cancel-hold.canceling-a-waiting-hold-succeeds"
   ],
   "records": [
     {
       "type": "result",
-      "id": "result/cancel-hold.cancelled",
-      "title": "Cancelled",
+      "id": "result/cancel-hold.canceled",
+      "title": "Canceled",
       "owner": "lending-team",
       "outcome": "success",
       "httpStatus": 200,
-      "meaning": "The hold is cancelled."
+      "meaning": "The hold is canceled."
     },
     {
       "type": "result",
@@ -49,14 +49,14 @@
     },
     {
       "type": "case",
-      "id": "case/cancel-hold.cancelling-a-waiting-hold-succeeds",
-      "title": "Cancelling a waiting hold succeeds",
+      "id": "case/cancel-hold.canceling-a-waiting-hold-succeeds",
+      "title": "Canceling a waiting hold succeeds",
       "owner": "lending-team",
       "status": "approved",
       "situation": "A reader holds a waiting hold.",
       "action": "The reader cancels the hold.",
-      "result": "result/cancel-hold.cancelled",
-      "expect": "The hold is cancelled."
+      "result": "result/cancel-hold.canceled",
+      "expect": "The hold is canceled."
     }
   ]
 }

@@ -96,7 +96,7 @@ static class WireframeParts
         ["heading"] = new(["small"], 1, 1, null, "none"),
         ["text"] = new(["muted"], 1, 1, null, "none"),
         ["fact"] = new([], 2, 2, null, "none"),
-        ["figure"] = new([], 2, 2, null, "none"),
+        ["figure"] = new([], 1, 3, null, "none"),
         ["status"] = new(Tones, 1, 1, null, "none"),
         ["message"] = new(Tones, 1, 1, null, "none"),
         ["avatar"] = new([], 1, 1, null, "none"),
@@ -115,7 +115,7 @@ static class WireframeParts
         ["dialog"] = new([], 0, 1, null, "any"),
         ["drawer"] = new(["right", "left", "bottom"], 0, 1, null, "any"),
         ["popover"] = new([], 0, 1, null, "any"),
-        ["toast"] = new(Tones, 1, 1, null, "none"),
+        ["toast"] = new(Tones, 1, 1, null, "action"),
     };
 
     /// <summary>The parts whose single tone or kind modifier is exclusive.</summary>

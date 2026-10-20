@@ -17,7 +17,7 @@
     "event/loan.loan-borrowed"
   ],
   "reactsTo": [],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.no-such-requirement"
   ],
   "results": [

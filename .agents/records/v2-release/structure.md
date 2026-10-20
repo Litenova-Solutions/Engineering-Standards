@@ -1,124 +1,148 @@
-# LiteSpec 2.0.0 structure and identifier grammar
+# LiteSpec 2.0.0 repository outline
 
-Status: built on `release/v2.0.0` (2026-10-20), approved by the owner. This page is the target the tree and the tools follow. Where it and older pages disagree, this page wins.
+This page states what every folder and file in the repository holds and why it is there. The tree and the tools follow it. Where it and another page disagree, fix one of them.
 
-## 1. The tree
+## 1. The repository
 
+```text
+LiteSpec/
+├─ docs/                     The standard: every page a project applies, plus lookup and how-to pages (section 2)
+├─ schemas/                  JSON Schema contracts, each with $id https://litespec.dev/<version>/schemas/<file>
+│  ├─ litespec-manifest.schema.json   the release manifest
+│  ├─ litespec-project.schema.json    a consumer's litespec.project.json
+│  ├─ record.schema.json              the JSON frontmatter of every consumer record page and page style
+│  ├─ language.schema.json            a consumer's docs/language.json (terms, mannered terms, rejected synonyms)
+│  ├─ design-contract.schema.json     the metadata block of a consumer's UI design contract
+│  ├─ ui-pattern-catalog.schema.json  a consumer's UI pattern catalog (decisions that cite LiteSpec patterns)
+│  └─ ui-source-lock.schema.json      the lock of a consumer's shared UI package sources
+├─ templates/
+│  ├─ consumer/              Starting points a consumer copies: one file per record type and page style, the
+│  │                         project file, the language file, the design contract, the UI catalog and source lock.
+│  │                         README.md maps each template to the path it is copied to.
+│  ├─ presets/               dotnet-react, dotnet-svelte, blazor-client: the stacks, shape and frontends
+│  │                         `litespec init` writes into a new project file. A preset adds no rule.
+│  └─ standard/              Seeds for LiteSpec's own pages: topic, extension, command, how-to, tutorial.
+│                            The validator parses each one as a virtual page, so a seed always passes.
+├─ litespec.manifest.json    The release: version, stacks, shapes, extensions, toolchain and package pins, UI baselines
+├─ apps/
+│  └─ cli/                   The `litespec` command line (section 5)
+├─ assets/litespec-icon.svg  The product mark
+├─ .github/                  CI workflow, pull request template, issue forms, Copilot adapter
+├─ .agents/records/          Release working records for the owner's review (this page and decisions.md).
+│                            .agents/delegate/ is ignored scratch for worker runs.
+├─ AGENTS.md                 The canonical agent protocol for this repository and for consumers
+├─ CLAUDE.md, GEMINI.md, .windsurfrules, .github/copilot-instructions.md
+│                            Short adapters that send each agent to AGENTS.md
+├─ README.md                 What LiteSpec is, how a consumer pins it, and this layout in brief
+├─ CONTRIBUTING.md           How to change the standard: amendment order, review gates, releases
+├─ CHANGELOG.md              The 2.0.0 contract in release-note form
+├─ LICENSE                   MIT
+├─ LiteSpec.slnx             Every .NET project in the repository
+├─ Directory.Build.props     Build settings that shield this checkout from a consumer's own root files
+├─ Directory.Packages.props  Central package pins for the CLI and its tests
+└─ global.json               Selects Microsoft.Testing.Platform as the test runner (no SDK pin)
 ```
+
+A consumer pins the repository root as a submodule at `litespec/`, so every path a consumer reads starts with `litespec/docs/`, `litespec/schemas/` or `litespec/templates/`.
+
+## 2. The standard: docs/
+
+```text
 docs/
-├─ core/                 always applies: system, model, principles, scope, stacks, agent, authoring, maintaining, release, product
-├─ workspace/            always applies: repository, naming, dependency and configuration principles
-├─ quality/              always applies: security, operations, ci
-├─ ext/                  extensions any stack can select
-├─ backend/              backend principles: apply through a backend stack (or the client-only subset, section 4)
-│  └─ dotnet/            the dotnet stack: stack.md + architecture, domain, application, persistence, api, testing,
-│     │                  workspace, naming, packages, config
-│     └─ ext/            extensions for dotnet only: efcore.md, bdd.md
-├─ frontend/             frontend principles: apply through any frontend stack
-│  ├─ web/               shared TypeScript web realization (generated TS client, TanStack, shadcn, Vitest, pnpm).
-│  │  │                  A group, not a stack: it has no stack.md and cannot be selected.
-│  │  ├─ react/          the react stack: stack.md, components.md
-│  │  └─ svelte/         the svelte stack: stack.md, components.md
-│  ├─ blazor/            the blazor stack: stack.md, structure, rendering, components, data, browser, testing
-│  └─ patterns/          UI pattern pages, one per group (record-detail.md). Holds no stack, so it applies
-│                        wherever frontend/ applies.
-├─ tools/  reference/  tutorial/  guide/      no provisions are applied from here by selection
-└─ README.md
+├─ README.md                 The human index: one line per page, by area
+├─ core/                     Applies to every project
+│  ├─ system.md              What LiteSpec is, the record catalogue, the consumer documentation layout
+│  ├─ model.md               Record types, their homes, fields, links and the checks the model builder runs
+│  ├─ product.md             Where business intent lives: the product brief and product topic pages
+│  ├─ scope.md               One bounded context; one size, one shape, its stacks and its extensions
+│  ├─ stacks.md              What selecting a stack applies, version pins, and replacement between pages
+│  ├─ principles.md          Engineering principles for choices no narrower rule covers
+│  ├─ agent.md               How an agent loads context, resolves precedence, preserves work and reports
+│  ├─ authoring.md           The page styles, controlled prose, provision IDs and verification marks
+│  ├─ maintaining.md         Provision lifecycle and publishing a release from a tag
+│  └─ release.md             What a release of a consumer joins and the evidence it ships
+├─ workspace/                Applies to every project: structure, naming, dependencies, config
+├─ quality/                  Applies to every project: security, operations, ci
+├─ backend/                  Backend principles, applied through a backend stack
+│  │                         (api, application, architecture, domain, identifiers, persistence, testing)
+│  └─ dotnet/                The dotnet stack: stack.md and the .NET realization of each principle,
+│     │                      plus config, naming, packages and workspace
+│     └─ ext/                Extensions for dotnet only: bdd, efcore
+├─ frontend/                 Frontend principles, applied through any frontend stack
+│  │                         (components, data, patterns, rendering, structure, testing, ui)
+│  ├─ patterns/              UI pattern pages, one per group (section 4). Holds no stack, so it applies
+│  │                         wherever frontend/ applies.
+│  ├─ web/                   The shared TypeScript web realization for React and Svelte. A group, not a stack.
+│  │  ├─ react/              The react stack: stack.md, components.md
+│  │  └─ svelte/             The svelte stack: stack.md, components.md
+│  └─ blazor/                The blazor stack: stack.md and its structure, rendering, components, data,
+│                            browser and testing pages
+├─ ext/                      Extensions any stack can select, with README.md as their index:
+│                            audit, cache, compat, concurrency, containers, delegation, integrations, jobs,
+│                            lifecycle, locale, mcp, outbox, realtime, report, site, stage, tenancy
+├─ reference/                Lookup pages that own no provisions: provisions.md (generated), glossary.md,
+│                            decision-records.md, audit-obligations.md
+├─ tools/                    One page per `litespec` command, with README.md as their index
+├─ tutorial/                 getting-started.md, model-domain.md
+└─ guide/                    How-to pages: audit-trail.md
 ```
 
-Moves from the 2.0.0 working tree:
+### What a project applies
 
-| From | To |
-|:---|:---|
-| `docs/dotnet/*.md` | `docs/backend/dotnet/*.md` |
-| `docs/profile/dotnet.md` | `docs/backend/dotnet/stack.md` |
-| `docs/profile/stacks.md` | `docs/core/stacks.md` (its Composition section is dropped) |
-| `docs/react/components.md`, `docs/profile/react.md` | `docs/frontend/web/react/components.md`, `.../react/stack.md` |
-| `docs/svelte/components.md`, `docs/profile/svelte.md` | `docs/frontend/web/svelte/components.md`, `.../svelte/stack.md` |
-| `docs/blazor/*.md`, `docs/profile/blazor.md` | `docs/frontend/blazor/*.md`, `.../blazor/stack.md` |
-| `docs/ext/efcore.md`, `docs/ext/bdd.md` | `docs/backend/dotnet/ext/efcore.md`, `.../ext/bdd.md` |
-| `docs/frontend/*.md` | split: principles stay in `docs/frontend/`, the TypeScript web realization moves to `docs/frontend/web/` |
-
-The `profile/` area and the stack pages' Composition sections no longer exist.
-
-## 2. Provision identifiers
-
-- A **provision** is a `###` heading inside a page's `## Standards` (a rule) or `## Conventions` (a convention) section, on any page under `docs/` except `docs/tools/`, `docs/reference/`, `docs/tutorial/`, `docs/guide/` and `README.md` files.
-- Its **ID** is `litespec/<page>#<slug>`:
-  - `<page>` is the page's path relative to `docs/`, forward slashes, without `.md`: `backend/dotnet/domain`.
-  - `<slug>` is the heading's slug: lowercase, backticks removed, every character other than `a-z`, `0-9`, space and hyphen removed, trimmed, runs of spaces replaced by one hyphen, runs of hyphens collapsed. This equals GitHub's and the site's heading anchor.
-  - Example: `docs/backend/dotnet/domain.md`, heading `Model every closed set of domain values without enums` → `litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums`.
-- **The heading carries no ID text.** `### Retire records with replaces`, never `### Retire records with replaces (litespec/...)`. The ID is computed from the path and the heading.
-- Two provisions on one page with the same slug are a duplicate.
-- The pattern that recognizes an ID in text: `litespec/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*#[a-z0-9]+(?:-[a-z0-9]+)*`.
-- A **citation** is any occurrence of that pattern in a page, template, schema, manifest, test fixture, code string or the model. Every citation must resolve to a provision in the release.
-- Agent Summary bullets end with the full IDs they summarize in parentheses, as before. The Verification table's first column holds full IDs, as before.
-- A provision's kind is its section: `rule` under Standards, `convention` under Conventions.
-
-## 3. The manifest
-
-```json
-{
-  "stacks": {
-    "dotnet": { "folder": "docs/backend/dotnet" },
-    "react":  { "folder": "docs/frontend/web/react" },
-    "svelte": { "folder": "docs/frontend/web/svelte" },
-    "blazor": { "folder": "docs/frontend/blazor" }
-  },
-  "shapes": {
-    "server":      { "backendStacks": 1 },
-    "client-only": { "backendStacks": 0, "backendPages": ["docs/backend/architecture.md", "docs/backend/domain.md", "docs/backend/application.md", "docs/backend/identifiers.md"] }
-  },
-  "extensions": { "efcore": { "path": "docs/backend/dotnet/ext/efcore.md", "...": "..." } }
-}
-```
-
-- A stack's **kind** is the area its folder sits in: `docs/backend/...` is a backend stack, `docs/frontend/...` a frontend stack.
-- A stack folder holds a `stack.md`; a group folder (`docs/frontend/web/`) does not.
-- `requires` (optional) names stacks a project must also select with this one, and `pairsWith` (optional) names the only backend stacks a frontend stack works beside; absent means any. No 2.0.0 stack uses either; both exist so a later pairing rule has a checked home.
-- An extension under a stack folder's `ext/` supports that stack only; an extension under `docs/ext/` supports every stack. The location replaces the `stacks` field.
-- `specification`, `kind`, `entry`, `pages` and `provisionRegistry` no longer exist. The pages a selection applies are computed (section 4).
-
-## 4. What a project applies
-
-Given `size`, `shape` (default `server`), `stacks` and `selectedExtensions`:
+Given a size, a shape (default `server`), its stacks and its selected extensions:
 
 1. Every page directly in `docs/core/`, `docs/workspace/` and `docs/quality/`.
-2. For each selected stack with folder `F`: every page **directly** in `F` and in each folder between `docs/<area>/` and `F`, inclusive of `docs/<area>/` itself. Pages in sibling folders, in nested stack folders and in `ext/` folders are not included. Selecting `react` applies `docs/frontend/*.md`, `docs/frontend/web/*.md` and `docs/frontend/web/react/*.md`. A subfolder of any of those folders that holds no stack, such as `docs/frontend/patterns/`, applies with it; a stack folder is one with a `stack.md` page.
-3. In the `client-only` shape: no backend stack, and the backend pages the shape lists.
-4. Each selected extension's page.
-5. A deeper page, a selected extension's `replaces`, and a project Exception record replace the named provision of a shallower page. Order of precedence: project exception, extension, deeper page, shallower page.
+2. For each selected stack with folder `F`, every page directly in `F` and in each folder above it up to `docs/<area>/`. Selecting `react` applies `docs/frontend/`, `docs/frontend/web/` and `docs/frontend/web/react/`.
+3. Each subfolder of those folders that holds no stack, such as `docs/frontend/patterns/`. A stack folder is one with a `stack.md` page, and `ext/` folders apply only by selection.
+4. In the `client-only` shape, no backend stack, and the backend pages the shape lists in the manifest.
+5. Each selected extension's page.
+6. Precedence: a project Exception record, then an extension's `replaces`, then a deeper page, then a shallower page.
 
-## 5. The project file
+## 3. Provision identifiers
 
-```json
-{
-  "size": "small",
-  "shape": "server",
-  "stacks": ["dotnet", "react"],
-  "paths": { "frontends": [{ "name": "web", "path": "apps/web", "platform": "react" }] },
-  "selectedExtensions": ["outbox"]
-}
+- A provision is a `###` heading under a page's `## Standards` (kind `rule`), `## Conventions` (kind `convention`) or, on a pattern page, `## Patterns` (kind `pattern`).
+- Its ID is `litespec/<page>#<slug>`. `<page>` is the path under `docs/` without `.md`. `<slug>` is the heading's anchor: lowercase, backticks removed, characters other than letters, digits, spaces and hyphens removed, spaces turned into hyphens.
+- The heading carries no ID text. A rule or convention heading starts with an action verb. A pattern heading is the pattern's name, so its ID survives a change of default.
+- `docs/reference/provisions.md` lists every provision with its kind and verification mark. `litespec provisions` writes it.
+
+## 4. UI patterns
+
+- `docs/frontend/patterns.md` defines the pattern catalog a consumer keeps, the pattern page format and the wireframe language.
+- `docs/frontend/patterns/<group>.md` holds one group: page frames, lists and tables, record detail, forms and fields, dialogs and overlays, create, edit and remove, feedback and states, navigation, money, time and density, and admin screens.
+- Each pattern names its question, its default option, its compact behaviour and its rationale. Each option carries a `wireframe` block, an optional `wireframe compact` block, its rationale and its cost.
+- `litespec patterns preview` draws every option at 1200 and 390 pixels for a person to choose. No drawing is committed.
+- A consumer's catalog cites a pattern by its ID in `library`, keeps its option ids and names, and records the option it chose.
+
+## 5. The command line: apps/cli/
+
+```text
+apps/cli/
+├─ LiteSpec.Cli.slnx
+├─ src/LiteSpec.Cli/          The `litespec` tool (packable as a .NET tool)
+│  ├─ Program.cs, CliArgs.cs, CliJson.cs, LiteSpecHome.cs
+│  │                          Command dispatch, option parsing, JSON with \n line ends, and finding the checkout
+│  ├─ Authoring/              `validate` and `provisions`: page styles, prose, IDs, manifest, stack layout
+│  ├─ Consumer/               `consumer`: the project file, the selection, record pages, prose and language
+│  ├─ Ui/                     `ui`: the controlled web UI contract, the pattern catalog and design contract
+│  ├─ Model/                  `model build|check|render|query`: records, readers per stack, links and findings
+│  │  └─ Readers/             Dotnet (Roslyn, TRX), TypeScript (React and Svelte routes), JUnit
+│  ├─ Book/                   `book`: the static project book generated from model.json
+│  ├─ Patterns/               `patterns preview|svg|check`: the pattern page reader, wireframe parser and renderer
+│  ├─ Init/                   `init`: a project file from a preset
+│  └─ Schemas/                The JSON Schema evaluator every validator uses
+└─ tests/LiteSpec.Cli.Tests/  xUnit v3 on Microsoft.Testing.Platform, one folder per command
+   ├─ Support/                The CLI runner and the input-error contract
+   └─ Fixtures/               Model/ (small and large library consumers, broken/ overlays per finding code,
+                              junit/ and trx/ results) and Book/ (frozen model and findings)
 ```
 
-`litespec consumer` refuses: a stack the release does not ship; a `server` project naming other than exactly one backend stack; a `client-only` project naming a backend stack; a frontend `platform` that is not a frontend stack the project names; a stack whose `requires` is not also named; a frontend stack whose `pairsWith` excludes the project's backend stack; an extension whose stack the project does not name.
+## 6. The manifest
 
-## 6. Presets
+- `stacks.<id>.folder` names each stack's folder, and its kind is the area that folder sits in. Optional `requires` and `pairsWith` hold pairing rules.
+- `shapes` holds `server` (one backend stack) and `client-only` (no backend stack, with the backend pages it applies).
+- `extensions.<id>.path` names each extension page. An extension under a stack's `ext/` folder supports that stack only.
+- The pins: the .NET workspace, test, and web toolchain versions, and the UI baselines per web stack.
 
-`templates/presets/<name>.json` holds a ready-made `stacks`, `shape` and frontend list: `dotnet-react`, `dotnet-svelte`, and `blazor-client` (shape `client-only`, stacks `["blazor"]`). `litespec init --preset <name> --size <small|large> [--root <path>]` writes `litespec.project.json` from it with the release's `reviewedLiteSpecVersion`, and refuses to overwrite an existing file. A preset adds no rule.
+## 7. The project file
 
-## 7. The provision index
-
-`docs/reference/provisions.md` lists every provision: one `##` section per top-level area (`core`, `workspace`, `quality`, `ext`, `backend`, `frontend`), rows sorted by ID ordinally, columns `ID | Provision | Kind | Mark | Evidence`, the Provision cell linking `[heading](../<page>.md#<slug>)`.
-
-
-## 9. How it was built
-
-- 7 Muse workers split the 7 frontend pages into principles and `frontend/web/` pages and folded the 5 matching Blazor pages into realizations: all 156 original frontend and Blazor provisions are mapped, 51 of them split.
-- 5 Muse workers moved the code: `litespec validate` and `litespec provisions` to the new grammar (`ID_IN_HEADING` added), the manifest checks to folder stacks (`STACK_FOLDER`, `STACK_REFERENCE`, `EXTENSION_LOCATION`, `EXTENSION_UNLISTED`, `LAYER_UNREACHABLE`, `SHAPE_PAGE`) with a shared `Layout` computation, `litespec consumer` and `litespec ui` to shapes and stacks, `litespec model` to the new citations, and the new `litespec init` with three presets.
-- The judge converted the tree with one script: page moves with history, IDs stripped from headings, 2186 citations and every relative link rewritten, the manifest reshaped.
-- Retired: `profile/`, every Composition section, Blazor's "List excluded baselines" rule (the client-only shape replaces it), and the dead provision-registry code.
-- Added: `litespec/core/authoring#keep-identifiers-out-of-provision-headings`.
-- Found while verifying, and fixed: `litespec ui` matched exception records by the old ID layout, so no UI exception ever expired; `litespec init --preset blazor-client` kept a UI package no frontend uses.
-- Clean slate (2026-10-20, owner): 2.0.0 carries no migration or compatibility material. Removed the checks that refused 1.x identifier forms (`REMOVED_IDENTIFIER`, `WORKFLOW_KIND`, `identifier-refused-form`, the old-form deferral refusal), the provision "Reject the retired identifier forms", the 1.x changelog archive, the old-to-new ID map, the `defaultProfile` manifest field, and the default that read a project without `stacks` as dotnet. The changelog describes 2.0.0 as a first release.
-- Result: 1103 provisions, `litespec validate` clean, 419 tests pass.
+A consumer's `litespec.project.json` names its `size`, `shape`, `stacks`, `paths` (record roots, code roots, frontends, UI files) and `selectedExtensions`, and records `reviewedLiteSpecVersion`. `litespec init --preset <name> --size <small|large>` writes a first one. `litespec consumer` refuses a stack the release does not ship, a `server` project without exactly one backend stack, a `client-only` project naming one, a frontend platform the project does not name, an unmet `requires` or `pairsWith`, and an extension whose stack is not selected.

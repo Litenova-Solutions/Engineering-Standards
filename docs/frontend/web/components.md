@@ -4,14 +4,6 @@
 
 This page holds how the TypeScript web stacks realize the frontend component principles ([Frontend components](../components.md)). It states the registry source, the closed element list, and the visual file patterns. It also states the raw HTML sinks and the route suite checks the React and Svelte stacks share.
 
-## Agent Summary {#agent-summary}
-
-- One package holds registry primitives and composites with no hand edits in the registry folder. (litespec/frontend/web/components#keep-primitives-and-composites-in-one-shared-package)
-- Page code declares no raw element from the closed list, and text elements stay available for prose. (litespec/frontend/web/components#use-no-raw-element-in-page-code)
-- A drawing no composite makes goes in a visual file using semantic tokens only. (litespec/frontend/web/components#place-a-drawing-no-composite-makes-in-a-visual-file)
-- The route suite checks accessibility and heading semantics on every route. (litespec/frontend/web/components#meet-accessibility-requirements, litespec/frontend/web/components#give-card-and-section-titles-heading-semantics)
-- Rich content stays out of raw HTML sinks and class names merge in the shared package. (litespec/frontend/web/components#protect-rich-content-boundaries, litespec/frontend/web/components#compose-class-names-in-the-shared-package)
-
 ## React
 
 - A class or style binding spells `className` or `style`.

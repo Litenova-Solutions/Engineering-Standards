@@ -18,15 +18,6 @@ This extension replaces no baseline provision. Server-sent events use platform c
 
 `event`, `limit`. Selecting `realtime` requires Event records for the notifications it carries and Limit records for the bounds it sets.
 
-## Agent Summary {#agent-summary}
-
-- Record polling cost and recovery behavior. (litespec/ext/realtime#record-realtime-need)
-- Select server-sent events or SignalR by need. (litespec/ext/realtime#use-server-sent-events-for-notifications, litespec/ext/realtime#use-signalr-for-interactive-messaging)
-- Authenticate connections and authorize scoped subscriptions. (litespec/ext/realtime#authenticate-and-authorize-subscriptions)
-- Refresh authoritative state after disconnect. (litespec/ext/realtime#reconnect-and-refresh-authoritative-state)
-- Bound connection and message resources. (litespec/ext/realtime#bound-realtime-resources)
-- Keep transport code at outer boundaries. (litespec/ext/realtime#place-realtime-code-at-outer-boundaries)
-
 ## Standards
 
 ### Record realtime need

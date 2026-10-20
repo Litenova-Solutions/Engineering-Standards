@@ -4,19 +4,6 @@
 
 Repository configuration should make builds repeatable and fail before a deployment starts with missing or invalid values. Version pins, compiler rules, environment access, and secret handling have one defined owner.
 
-## Agent Summary {#agent-summary}
-
-- Configuration binds to validated settings at startup. (litespec/workspace/config#validate-backend-configuration-at-startup)
-- Frontends read environment values through one validated module. (litespec/workspace/config#validate-frontend-environment-access)
-- Tracked configuration carries placeholders only. (litespec/workspace/config#keep-secrets-outside-source-control)
-- One workspace owns the frontend dependency graph. (litespec/workspace/config#use-one-frontend-dependency-graph)
-- The JavaScript toolchain is pinned in the root manifest. (litespec/workspace/config#pin-the-javascript-toolchain)
-- A React ESLint flat config pins its React version. (litespec/workspace/config#pin-the-react-version-in-the-eslint-flat-config)
-- Environment examples sit beside applications. (litespec/workspace/config#keep-environment-examples-beside-applications)
-- Local overrides stay untracked. (litespec/workspace/config#keep-local-overrides-untracked)
-- Logging stays provider-neutral. (litespec/workspace/config#keep-logging-configuration-provider-neutral)
-- Documentation directories stay out of ignore rules. (litespec/workspace/config#keep-documentation-directories-out-of-build-artifact-ignore-rules)
-
 ## Standards
 
 ### Validate backend configuration at startup

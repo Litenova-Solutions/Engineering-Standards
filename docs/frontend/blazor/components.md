@@ -4,17 +4,6 @@
 
 This page holds how the Blazor stack realizes the frontend component principles ([Frontend components](../components.md)). A client component renders what it is given and reports what the user did. Business rules stay in Domain and Application, browser access stays behind an interface, and each file holds one component.
 
-## Agent Summary {#agent-summary}
-
-- A component renders from parameters and raises events. (litespec/frontend/blazor/components#keep-components-presentational)
-- Every parameter carries a concrete feature-owned type. (litespec/frontend/blazor/components#declare-every-parameter-type)
-- A child reports upward through a callback. (litespec/frontend/blazor/components#raise-events-rather-than-mutating)
-- A view model exposes no Domain or Application type. (litespec/frontend/blazor/components#own-the-layer-contract)
-- Browser access runs through an Application interface. (litespec/frontend/blazor/components#resolve-browser-behavior-through-an-interface)
-- One component per file, named for what it renders. (litespec/frontend/blazor/components#place-one-component-per-file)
-- Focus, keyboard, labelling, and announcements live in the owning component. (litespec/frontend/blazor/components#keep-accessibility-in-the-component)
-- Feature components use role suffixes and one token-defined styling system. (litespec/frontend/blazor/components#name-for-the-boundary-role, litespec/frontend/blazor/components#apply-one-styling-system)
-
 ## Standards
 
 ### Keep components presentational
@@ -57,7 +46,7 @@ This rule and `litespec/frontend/blazor/structure#keep-domain-free-of-browser-co
 
 ### Keep accessibility in the component
 
-**Requirement:** A component MUST own focus management, keyboard interaction, labelling, and live-region announcements for its interaction.
+**Requirement:** A component MUST own focus management, keyboard interaction, labeling, and live-region announcements for its interaction.
 
 **Rationale:** A page that composes the component cannot know which element should receive focus. This realizes litespec/frontend/components#support-keyboard-focus-labels-and-announcements.
 

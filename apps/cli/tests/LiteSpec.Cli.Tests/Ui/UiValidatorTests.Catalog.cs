@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 namespace LiteSpec.Tests.Ui;
 
 /// <summary>
-/// The design contract, pattern catalog and pattern library citation cases.
+/// The design contract, pattern catalog and pattern citation cases.
 /// </summary>
 public sealed partial class UiValidatorTests
 {
@@ -54,7 +54,7 @@ public sealed partial class UiValidatorTests
 
     // Pattern catalog (litespec/frontend/patterns#keep-one-pattern-catalog,
     // litespec/frontend/patterns#record-every-option-considered,
-    // litespec/frontend/patterns#declare-the-compact-behaviour,
+    // litespec/frontend/patterns#declare-the-compact-behavior,
     // litespec/frontend/web/patterns#implement-a-chosen-pattern-once,
     // litespec/frontend/patterns#state-the-implementation-status).
 
@@ -261,14 +261,14 @@ public sealed partial class UiValidatorTests
     }
 
     [Fact]
-    public void A_Pattern_Citing_The_Library_Pattern_It_Matches()
+    public void A_Pattern_Citing_The_LiteSpec_Pattern_It_Matches()
     {
         using var fixture = UiFixture.Create();
         fixture.MutateCatalog(catalog =>
         {
             var patterns = (JsonArray)catalog["patterns"]!;
             var pattern = (JsonObject)patterns[0]!;
-            pattern["library"] = "record-list";
+            pattern["library"] = "litespec/frontend/patterns/page-frames#record-list";
             ((JsonArray)pattern["options"]!).Add(new JsonObject
             {
                 ["id"] = "fixture-only",
@@ -281,32 +281,32 @@ public sealed partial class UiValidatorTests
     }
 
     [Fact]
-    public void A_Pattern_Citing_A_Library_Pattern_The_Library_Does_Not_Hold()
+    public void A_Pattern_Citing_A_Pattern_No_Page_Holds()
     {
         using var fixture = UiFixture.Create();
         fixture.MutateCatalog(catalog =>
         {
             var patterns = (JsonArray)catalog["patterns"]!;
-            ((JsonObject)patterns[0]!)["library"] = "no-such-pattern";
+            ((JsonObject)patterns[0]!)["library"] = "litespec/frontend/patterns/page-frames#no-such-pattern";
         });
         UiFixture.AssertProblem(
             fixture.RunWithFixtureHome(),
-            "pattern 'orders-list-page': library 'no-such-pattern' is not a pattern in the UI pattern library");
+            "pattern 'orders-list-page': library 'litespec/frontend/patterns/page-frames#no-such-pattern' is not a pattern on a LiteSpec pattern page");
     }
 
     [Fact]
-    public void A_Pattern_Renaming_A_Library_Option()
+    public void A_Pattern_Renaming_A_LiteSpec_Option()
     {
         using var fixture = UiFixture.Create();
         fixture.MutateCatalog(catalog =>
         {
             var patterns = (JsonArray)catalog["patterns"]!;
             var pattern = (JsonObject)patterns[0]!;
-            pattern["library"] = "record-list";
+            pattern["library"] = "litespec/frontend/patterns/page-frames#record-list";
             ((JsonObject)((JsonArray)pattern["options"]!)[0]!)["name"] = "Renamed table";
         });
         UiFixture.AssertProblem(
             fixture.RunWithFixtureHome(),
-            "pattern 'orders-list-page': options[0].name 'Renamed table' does not match the UI pattern library option 'filter-table' name 'Filterable table'");
+            "pattern 'orders-list-page': options[0].name 'Renamed table' does not match the LiteSpec pattern option 'filter-table' name 'Filterable table'");
     }
 }

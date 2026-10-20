@@ -18,15 +18,6 @@ This extension replaces no baseline provision. A provider package needs a projec
 
 This extension switches on `limit`. The accepted staleness and the expiry of each cache are Limit records.
 
-## Agent Summary {#agent-summary}
-
-- Record measurement before adding a cache. (litespec/ext/cache#record-measured-cache-need)
-- Remove caches that measurements no longer justify. (litespec/ext/cache#remove-unjustified-caches)
-- Partition and version each cache key. (litespec/ext/cache#compose-cache-keys-from-result-inputs)
-- Define expiry and invalidation before caching. (litespec/ext/cache#define-cache-invalidation)
-- Keep source data authoritative during failure. (litespec/ext/cache#keep-source-data-authoritative, litespec/ext/cache#define-cache-outage-behavior)
-- Bound concurrent refresh work. (litespec/ext/cache#bound-cache-refresh-work, litespec/ext/cache#avoid-unbounded-key-locks)
-
 ## Standards
 
 ### Record measured cache need
@@ -53,7 +44,7 @@ This extension switches on `limit`. The accepted staleness and the expiry of eac
 
 **Requirement:** A cache key MUST NOT contain a secret, unbounded raw input, or personal data that is not already a hash.
 
-**Rationale:** Keys appear in diagnostics, metrics, and provider administration tools, which is a copy of the value in a store nobody classified. An email address in a key is a personal-data record in the cache provider's key space. It sits outside every retention and erasure path the project defined. [Data minimisation](https://gdpr-info.eu/art-5-gdpr/) applies to an identifier as much as to a field.
+**Rationale:** Keys appear in diagnostics, metrics, and provider administration tools, which is a copy of the value in a store nobody classified. An email address in a key is a personal-data record in the cache provider's key space. It sits outside every retention and erasure path the project defined. [Data minimization](https://gdpr-info.eu/art-5-gdpr/) applies to an identifier as much as to a field.
 
 **Example:** A per-account cache key carries the account's opaque identifier. A key that carried the address instead is replaced by a hash of it, and the entry is bound to the account that owns it.
 

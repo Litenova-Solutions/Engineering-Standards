@@ -6,15 +6,6 @@ This page holds how the TypeScript web stacks realize the frontend rendering rul
 
 Rules with no neutral counterpart bind the web stacks alone.
 
-## Agent Summary {#agent-summary}
-
-- A loader fills the query cache before the component runs, and the component reads the key it filled. (litespec/frontend/web/rendering#load-route-data-in-the-loader, litespec/frontend/web/rendering#read-route-data-with-a-suspense-query)
-- List state lives in the address, behind a schema. (litespec/frontend/web/rendering#keep-search-parameters-validated-by-a-schema)
-- Each route and each language is its own chunk. (litespec/frontend/web/rendering#split-one-chunk-per-route-and-per-language)
-- A route prefetches on intent and states its metadata. (litespec/frontend/web/rendering#load-a-route-on-intent, litespec/frontend/web/rendering#define-route-metadata-deliberately)
-- Actor caches stay explicit, proxies route only, and each server request builds its cache. (litespec/frontend/web/rendering#keep-authenticated-caching-explicit, litespec/frontend/web/rendering#keep-proxy-behavior-at-the-edge, litespec/frontend/web/rendering#build-the-server-query-cache-per-request)
-- A shell uses a pathless layout route. (litespec/frontend/web/rendering#use-a-pathless-layout-route-for-a-shell)
-
 ## React
 
 React routes are files using the router's file convention. Each route declares its search parameters in `validateSearch` and prefetches its reads in its loader. Components read route data with `useSuspenseQuery` over the key the loader filled. A shell is a pathless layout route whose file name starts with an underscore. Server-only code lives in a file whose name and import show the server ownership. The router builds the route tree, and intent preloading fills the query cache.
@@ -124,7 +115,7 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 **Requirement:** Actor-specific data MUST declare its cache key, partition, invalidation owner, and security review before caching, beside the query definition setting the key.
 
-**Rationale:** Shared route or loader behaviour otherwise serves one actor's data to another. An uncached read is the safe default, and a cache partitioned per request is the safe server shape. This realizes litespec/frontend/rendering#keep-authenticated-caching-explicit.
+**Rationale:** Shared route or loader behavior otherwise serves one actor's data to another. An uncached read is the safe default, and a cache partitioned per request is the safe server shape. This realizes litespec/frontend/rendering#keep-authenticated-caching-explicit.
 
 ### Keep proxy behavior at the edge
 

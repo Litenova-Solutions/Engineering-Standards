@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://litespec.dev/2.0.0/schemas/ui-pattern-catalog.schema.json",
   "title": "UI pattern catalog",
-  "description": "One decision per recurring UI question: the options considered, the option chosen, how it changes on a compact screen, and where each frontend implements it. The catalog names behaviour and structure, never a component library, so one catalog serves every frontend platform.",
+  "description": "One decision per recurring UI question: the options considered, the option chosen, how it changes on a compact screen, and where each frontend implements it. The catalog names behavior and structure, never a component library, so one catalog serves every frontend platform.",
   "type": "object",
   "additionalProperties": false,
   "required": ["kind", "schemaVersion", "breakpoints", "groups", "patterns"],
@@ -85,11 +85,11 @@
         "compact": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["breakpoint", "behaviour"],
+          "required": ["breakpoint", "behavior"],
           "properties": {
-            "breakpoint": { "type": "string", "description": "A key of the catalog breakpoints. Below it the compact behaviour applies." },
+            "breakpoint": { "type": "string", "description": "A key of the catalog breakpoints. Below it the compact behavior applies." },
             "option": { "$ref": "#/$defs/slug", "description": "A different option used below the breakpoint. Absent when the chosen option reflows." },
-            "behaviour": { "type": "string", "minLength": 1 }
+            "behavior": { "type": "string", "minLength": 1 }
           }
         },
         "extensions": {
@@ -107,8 +107,8 @@
         },
         "library": {
           "type": "string",
-          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-          "description": "The id of the standards UI pattern library pattern this entry starts from. Its options keep the library's option ids, and the entry may add options of its own."
+          "pattern": "^litespec/frontend/patterns/[a-z0-9]+(-[a-z0-9]+)*#[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "The ID of the LiteSpec pattern this entry starts from, such as litespec/frontend/patterns/record-detail#record-header. Its options keep the pattern's option ids and names, and the entry may add options of its own."
         },
         "implementations": {
           "type": "object",

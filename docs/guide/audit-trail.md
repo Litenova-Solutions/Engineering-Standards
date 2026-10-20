@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Build the audit trail that the [audit extension](../ext/audit.md) requires, on the LiteBus command pipeline of the .NET profile.
+Build the audit trail that the [audit extension](../ext/audit.md) requires, on the LiteBus command pipeline of the .NET stack.
 
 This guide carries no provision. Each step cites the provisions it satisfies.
 
@@ -167,7 +167,7 @@ Declare that query audited. Reading the evidence is a sensitive action under `li
 
 Run the extension verification table in [the audit extension](../ext/audit.md#verification). The table names one evidence row for each provision this guide implements.
 
-Confirm three behaviors by test before review:
+Confirm four behaviors by test before review:
 
 - A refused authorization leaves one `denied` record after the transaction rolls back.
 - A committed Command leaves exactly one `succeeded` record in the same transaction.

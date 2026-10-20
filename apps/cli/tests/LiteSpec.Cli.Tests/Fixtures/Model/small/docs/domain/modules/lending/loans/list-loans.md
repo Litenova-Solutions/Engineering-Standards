@@ -15,7 +15,7 @@
   ],
   "raises": [],
   "reactsTo": [],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.max-active-loans"
   ],
   "results": [

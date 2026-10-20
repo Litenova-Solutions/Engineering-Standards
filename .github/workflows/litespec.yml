@@ -6,7 +6,7 @@ on:
     branches:
       - main
   # A pinned action, a pinned Node release, and a validator that reads the clock
-  # all change behaviour without a commit. A nightly run reports that on the day
+  # all change behavior without a commit. A nightly run reports that on the day
   # it happens rather than on the next pull request.
   schedule:
     - cron: '17 3 * * *'
@@ -43,24 +43,6 @@ jobs:
 
       - name: Check whitespace errors
         run: git diff --check
-
-  patterns:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Configure Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          # The Node release the manifest pins under `stack`. The UI pattern
-          # library draws its items as JavaScript modules for a browser viewer.
-          node-version: "24.22.0"
-          package-manager-cache: false
-
-      - name: Check the generated pattern library
-        run: node packages/ui-patterns/library.mjs --check
 
   skipped-checks:
     if: github.event_name == 'pull_request'

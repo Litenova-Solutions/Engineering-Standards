@@ -44,7 +44,7 @@
       "requires": []
     }
   ],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.max-active-loans"
   ]
 }

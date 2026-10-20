@@ -4,12 +4,6 @@
   "version": "2.0.0",
   "name": "litespec",
   "agentsEntry": "AGENTS.md",
-  "paths": {
-    "docs": "docs",
-    "template": "templates",
-    "extension": "docs/ext",
-    "uiPatternLibrary": "packages/ui-patterns"
-  },
   "stacks": {
     "dotnet": {
       "folder": "docs/backend/dotnet"

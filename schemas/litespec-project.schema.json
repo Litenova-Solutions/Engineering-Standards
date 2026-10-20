@@ -27,7 +27,7 @@
       }
     },
     "size": {
-      "description": "The size profile of this project. Small requires the core record types with Architecture and Integration test projects; large adds problems, features, journeys and cases with the Acceptance project.",
+      "description": "The size of this project. Small requires the core record types with Architecture and Integration test projects; large adds problems, features, journeys and cases with the Acceptance project.",
       "type": "string",
       "enum": ["small", "large"]
     },
@@ -266,17 +266,6 @@
     "scenarioWordLimit": {
       "description": "The word bound a Scenario section stays within. Omitted, the recorded default of 120 applies, and the validator refuses a value below 40.",
       "type": "integer"
-    },
-    "prose": {
-      "description": "How the controlled-prose measures and the mannered terms are treated.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "enforcement": {
-          "description": "Whether the prose measures and the mannered terms fail the consumer validator ('refuse', the default) or are reported as advisories ('report'). Rejected synonyms always fail.",
-          "enum": ["refuse", "report"]
-        }
-      }
     },
     "prohibitedKinds": {
       "description": "Record types or page styles this consumer does not use. A page declaring one is refused.",

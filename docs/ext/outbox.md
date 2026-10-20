@@ -20,19 +20,6 @@ This extension replaces `litespec/backend/persistence#collect-events-without-a-p
 
 This extension switches on the Event, Limit, and Runbook record types.
 
-## Agent Summary {#agent-summary}
-
-- Record delivery guarantee, retry, and recovery ownership. (litespec/ext/outbox#record-durable-delivery-behavior)
-- Stage outbox messages with committed business work. (litespec/ext/outbox#stage-messages-with-business-work, litespec/ext/outbox#store-required-message-fields)
-- Claim and dispatch records only from Worker. (litespec/ext/outbox#dispatch-claimed-records-in-worker, litespec/ext/outbox#exclude-request-transaction-dispatch)
-- Treat delivery as at-least-once. (litespec/ext/outbox#accept-repeated-delivery, litespec/ext/outbox#identify-repeated-delivery)
-- Bound retry and retain poison evidence. (litespec/ext/outbox#bound-delivery-retries)
-- Publish best-effort reactions without the outbox. (litespec/ext/outbox#publish-best-effort-reactions-after-commit)
-- Distinguish store outage from claimed-message failure. (litespec/ext/outbox#distinguish-dependency-outage, litespec/ext/outbox#back-off-unavailable-store-polling)
-- Version message types and deploy readers before writers. (litespec/ext/outbox#version-message-types, litespec/ext/outbox#support-coexisting-message-producers, litespec/ext/outbox#protect-active-worker-compatibility, litespec/ext/outbox#deploy-readers-before-writers)
-- Publish backlog health and delivery targets. (litespec/ext/outbox#publish-backlog-indicators, litespec/ext/outbox#set-delivery-alerts)
-- Preserve state and message identity during replay. (litespec/ext/outbox#model-outbox-lifecycle-states, litespec/ext/outbox#preserve-message-identity-during-retry)
-
 ## Standards
 
 ### Record durable delivery behavior

@@ -17,10 +17,6 @@ static class StandardsFixture
 
         This page defines one repository topic.
 
-        ## Agent Summary {#agent-summary}
-
-        - Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)
-
         ## Standards
 
         ### Keep the topic bounded
@@ -52,10 +48,6 @@ static class StandardsFixture
         ## Intent
 
         This page offers drawn options for one recurring question.
-
-        ## Agent Summary {#agent-summary}
-
-        - The record header offers two options. (litespec/frontend/patterns/sample#record-header)
 
         ## Patterns
 
@@ -121,10 +113,6 @@ static class StandardsFixture
 
         This extension replaces no baseline provision.
 
-        ## Agent Summary {#agent-summary}
-
-        - Record extension activation. (litespec/ext/sample#record-extension-activation)
-
         ## Standards
 
         ### Record extension activation
@@ -153,10 +141,6 @@ static class StandardsFixture
         ## Intent
 
         This stack selects one standards composition.
-
-        ## Agent Summary {#agent-summary}
-
-        - Apply the complete stack. (litespec/backend/sample/stack#apply-the-complete-stack)
 
         ## Standards
 

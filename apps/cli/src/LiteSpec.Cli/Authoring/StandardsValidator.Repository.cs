@@ -65,14 +65,6 @@ static partial class StandardsValidator
     {
         foreach (var page in parsedPages)
         {
-            foreach (var reference in page.Parsed.SummaryReferences)
-            {
-                if (!activeIds.Contains(reference.Id))
-                {
-                    add(page.Relative, reference.Line, "SUMMARY_UNKNOWN_ID", $"Agent Summary cites unknown provision '{reference.Id}'");
-                }
-            }
-
             var prose = string.Join('\n', StripFences(SplitLines(page.Raw)).Select(item => item.Line));
             foreach (Match match in CitationPattern.Matches(prose))
             {
@@ -111,7 +103,6 @@ static partial class StandardsValidator
             }
 
             ParsePage(virtualRelative, normalized, add, globalIds, root, @virtual: true);
-            CheckProse(relative, normalized, PageClass(virtualRelative), add);
         }
     }
 

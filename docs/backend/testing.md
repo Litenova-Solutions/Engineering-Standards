@@ -4,26 +4,13 @@
 
 Backend tests prove domain behavior, use-case coordination, real persistence and HTTP integration, and structural architecture at separate boundaries. Tests prove Cases: each Case of a use case is proved by a test that calls the use case and asserts its result.
 
-## Agent Summary {#agent-summary}
-
-- The codebase holds the test suites its size profile requires. (litespec/backend/testing#keep-the-test-suites-the-size-profile-requires)
-- Domain tests run on explicit inputs alone. (litespec/backend/testing#test-domain-in-isolation)
-- Application tests substitute ports and assert coordination. (litespec/backend/testing#test-application-coordination)
-- HTTP integration runs through the real application host. (litespec/backend/testing#test-http-integration-through-the-real-application-host)
-- Integration cases reset state and never depend on order. (litespec/backend/testing#isolate-integration-state)
-- Architecture tests assert every compiler-invisible boundary. (litespec/backend/testing#assert-architecture-boundaries-with-tests)
-- Each Case is proved by its calling test, and each Rule at its enforcement point. (litespec/backend/testing#tag-the-test-that-proves-each-case, litespec/backend/testing#prove-each-rule-at-its-enforcement-point)
-- Coverage informs review; it is not the sufficiency test. (litespec/backend/testing#use-evidence-rather-than-one-coverage-target)
-- One shared harness owns the container, host factory, and reset. (litespec/backend/testing#share-one-production-faithful-integration-harness)
-- Test code mirrors production modules, names behavior, uses builders, and keeps assertions focused. (litespec/backend/testing#mirror-production-module-names, litespec/backend/testing#name-tests-by-observable-behavior, litespec/backend/testing#use-builders-for-valid-defaults, litespec/backend/testing#keep-assertions-focused)
-
 ## Standards
 
-### Keep the test suites the size profile requires
+### Keep the test suites the size requires
 
-**Requirement:** A backend codebase MUST hold exactly the test suites its size profile requires: architecture and integration for small, adding acceptance for large.
+**Requirement:** A backend codebase MUST hold exactly the test suites its size requires: architecture and integration for small, adding acceptance for large.
 
-**Rationale:** Unit test suites are optional in both profiles. Acceptance stays optional for small. An acceptance suite without the executable BDD extension is an unnamed baseline suite: select the extension, or name the suite for what it actually is.
+**Rationale:** Unit test suites are optional in both sizes. Acceptance stays optional for small. An acceptance suite without the executable BDD extension is an unnamed baseline suite: select the extension, or name the suite for what it actually is.
 
 **Example:** A backend codebase can contain:
 
@@ -172,7 +159,7 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/backend/testing#keep-the-test-suites-the-size-profile-requires | guidance | Does the codebase hold the test suites its size profile requires and no other baseline suite? |
+| litespec/backend/testing#keep-the-test-suites-the-size-requires | guidance | Does the codebase hold the test suites its size requires and no other baseline suite? |
 | litespec/backend/testing#test-domain-in-isolation | guidance | Does each Domain test use explicit inputs with no database, host, container, clock, or mock? |
 | litespec/backend/testing#test-application-coordination | guidance | Does each Application test substitute its ports and assert the handler coordination? |
 | litespec/backend/testing#test-http-integration-through-the-real-application-host | guidance | Does each HTTP integration test run through the real host covering Problem Details, authentication, and authorization? |

@@ -4,17 +4,6 @@
 
 Every record carries one identifier naming its type, home, and name. One form per type lets a reader and a search find the record from the identifier alone.
 
-## Agent Summary {#agent-summary}
-
-- Follow the form the record type names. (litespec/backend/identifiers#follow-the-identifier-form-of-each-record-type)
-- Name records with one to six words. (litespec/backend/identifiers#name-records-with-one-to-six-words)
-- Keep each use case name unique. (litespec/backend/identifiers#keep-use-case-names-unique-across-the-project)
-- Keep each business record name unique. (litespec/backend/identifiers#keep-business-record-names-unique-across-the-project)
-- Keep negation in rule names. (litespec/backend/identifiers#keep-negation-in-rule-names)
-- Keep wire codes stable. (litespec/backend/identifiers#keep-wire-codes-stable)
-- Resolve every citation. (litespec/backend/identifiers#resolve-every-identifier-citation)
-- Cite shared provisions as published. (litespec/backend/identifiers#cite-shared-provisions-in-their-published-form)
-
 ## Concepts
 
 ### Forms per record type

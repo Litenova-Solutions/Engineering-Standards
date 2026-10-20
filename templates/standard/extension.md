@@ -16,10 +16,6 @@ Activate this extension when one exact current condition applies.
 
 This extension replaces `{litespec/page#state-one-action}`, or states that it replaces no baseline provision. It switches on `<optional type>`, or states that it switches on none.
 
-## Agent Summary {#agent-summary}
-
-- State one high-risk projection and cite its canonical provision. ({litespec/page#state-one-extension-action})
-
 ## Standards
 
 ### State one extension action

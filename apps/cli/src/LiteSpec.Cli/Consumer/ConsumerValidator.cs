@@ -6,8 +6,8 @@ namespace LiteSpec.Consumer;
 /// <summary>
 ///     The <c>litespec consumer</c> command: holds a consumer repository to the release it pinned.
 ///     It checks the project record, the manifest version and the named stacks and extensions,
-///     every page's frontmatter and required sections, the language record with the prose
-///     measures and the rejected words, and the controlled UI through the UI validator.
+///     every page's frontmatter and required sections, the language record with
+///     the rejected words, and the controlled UI through the UI validator.
 /// </summary>
 static partial class ConsumerValidator
 {
@@ -15,13 +15,12 @@ static partial class ConsumerValidator
     ///     The help text printed by <c>--help</c> and by every usage error.
     /// </summary>
     public const string Usage = """
-        Usage: litespec consumer [--root <path>] [--prose] [--format json] [--help]
+        Usage: litespec consumer [--root <path>] [--format json] [--help]
 
         Validates the consumer repository at --root, which defaults to the
         current directory. The consumer must contain litespec.project.json.
 
           --root <path>   The consumer repository. Defaults to the current directory.
-          --prose         List every controlled-prose measure behind the reported counts.
           --format json   Write one JSON object on stdout instead of human-readable lines.
           --help          Print this text and exit.
 
@@ -33,7 +32,7 @@ static partial class ConsumerValidator
     /// </summary>
     public static int Run(string[] args)
     {
-        var parsed = CliArgs.Parse(args, ["--prose"], ["--root", "--format"]);
+        var parsed = CliArgs.Parse(args, [], ["--root", "--format"]);
 
         if (parsed.Help)
         {
@@ -57,8 +56,7 @@ static partial class ConsumerValidator
         {
             run = new RunState(
                 Path.GetFullPath(string.IsNullOrEmpty(rootOption) ? Directory.GetCurrentDirectory() : rootOption),
-                parsed.Json,
-                parsed.Has("--prose"));
+                parsed.Json);
         }
         catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
         {
@@ -102,25 +100,19 @@ static partial class ConsumerValidator
     /// </summary>
     sealed class RunState
     {
-        public RunState(string root, bool json, bool prose)
+        public RunState(string root, bool json)
         {
             Root = root;
             Json = json;
-            Prose = prose;
         }
 
         public string Root { get; }
 
         public bool Json { get; }
 
-        public bool Prose { get; }
-
         public List<string> Errors { get; } = [];
 
         public List<string> Advisories { get; } = [];
-
-        /// <summary>Every prose measure behind the counts, when --prose asked for them.</summary>
-        public List<string>? ProseDetail { get; set; }
 
         public Dictionary<string, string> TextCache { get; } = new(StringComparer.Ordinal);
 
@@ -223,11 +215,6 @@ static partial class ConsumerValidator
                     ["advisories"] = new JsonArray([.. Advisories.Select(advisory => (JsonNode?)advisory)]),
                 };
 
-                if (ProseDetail is not null)
-                {
-                    payload["prose"] = new JsonArray([.. ProseDetail.Select(line => (JsonNode?)line)]);
-                }
-
                 CliJson.Write(payload);
 
                 return Errors.Count > 0 ? 1 : 0;
@@ -239,19 +226,12 @@ static partial class ConsumerValidator
 
             if (Advisories.Count > 0)
             {
-                // The count and the worst pages are in the Language line; --prose lists every measure.
-                var prose = (Project as JsonObject)?["prose"] as JsonObject;
-                var note = AsString(prose?["enforcement"]) == "report" ? ", reported because prose.enforcement is 'report'" : "";
-
                 Console.WriteLine();
-                Console.WriteLine($"ADVISORY ({Advisories.Count} finding(s){note})");
+                Console.WriteLine($"ADVISORY ({Advisories.Count} finding(s))");
 
-                if (Prose)
+                foreach (var advisory in Advisories)
                 {
-                    foreach (var advisory in Advisories)
-                    {
-                        Console.WriteLine($"  - {advisory}");
-                    }
+                    Console.WriteLine($"  - {advisory}");
                 }
             }
 
@@ -269,7 +249,7 @@ static partial class ConsumerValidator
             }
 
             Console.WriteLine();
-            Console.WriteLine("PASS: project configuration, page frontmatter, language and prose are valid.");
+            Console.WriteLine("PASS: project configuration, page frontmatter and language are valid.");
             return 0;
         }
 

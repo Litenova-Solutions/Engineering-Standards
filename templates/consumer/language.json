@@ -1,5 +1,5 @@
 {
-  "$schema": "../../schemas/language.schema.json",
+  "$schema": "../litespec/schemas/language.schema.json",
   "schemaVersion": 2,
   "terms": [
     {

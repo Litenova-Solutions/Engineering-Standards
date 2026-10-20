@@ -9,7 +9,7 @@
   "decideBy": "<YYYY-MM-DD>",
   "actor": "actor/<name>",
   "goal": "<The goal in one sentence>",
-  "fulfils": ["requirement/<topic>.<name>"],
+  "fulfills": ["requirement/<topic>.<name>"],
   "steps": [
     {
       "useCase": "use-case/<module>.<name>",

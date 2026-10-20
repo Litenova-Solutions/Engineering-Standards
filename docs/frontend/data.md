@@ -6,19 +6,6 @@ The frontend holds no contract of its own. It calls the API through one generate
 
 Every failure arrives as one problem type with a stable code. The page branches on the code, and the words a person reads come from the application's own dictionary rather than from the response body.
 
-## Agent Summary {#agent-summary}
-
-- The client is generated from the published contract and configured once per application. (litespec/frontend/data#generate-the-client-from-the-published-contract, litespec/frontend/data#use-one-configured-client-per-application)
-- The session is an HTTP-only cookie the API holds, and every write carries a marker header. (litespec/frontend/data#keep-the-session-in-an-api-owned-cookie, litespec/frontend/data#set-the-write-marker-on-every-request)
-- Every failure becomes one problem type branched on its code, with refusals placed beside what was refused. (litespec/frontend/data#map-every-failure-to-one-problem-type, litespec/frontend/data#place-a-refusal-beside-what-was-refused, litespec/frontend/data#place-a-field-refusal-on-its-field)
-- A form validates with the generated schema, and a success updates the cache it changed. (litespec/frontend/data#validate-a-form-with-the-generated-schema, litespec/frontend/data#update-the-cache-a-command-changed)
-- State lives with its narrowest owner, personal values travel in headers, and commands follow session permissions. (litespec/frontend/data#assign-state-to-the-narrowest-owner, litespec/frontend/data#route-a-personal-value-in-a-header, litespec/frontend/data#read-a-permission-from-the-session)
-- Timestamps name their zone and secrets stay out of browser storage. (litespec/frontend/data#name-the-zone-for-every-timestamp, litespec/frontend/data#keep-secrets-out-of-browser-storage)
-- An optimistic update declares recovery and announces a differing outcome. (litespec/frontend/data#make-optimistic-behavior-recoverable, litespec/frontend/data#announce-the-outcome-of-an-optimistic-update)
-- Copy resolves through locale dictionaries with fill and plural support. (litespec/frontend/data#localize-copy-through-locale-dictionaries)
-- The client boundary sits in the frame, the client regenerates from the document, and schemas stay operation specific. (litespec/frontend/data#keep-the-client-boundary-in-the-frame, litespec/frontend/data#regenerate-the-client-rather-than-editing-it, litespec/frontend/data#keep-schemas-operation-specific)
-- A form builds on the shared form library. (litespec/frontend/data#build-a-form-on-the-shared-form-library)
-
 ## Concepts
 
 ### Outcomes of a command

@@ -92,24 +92,24 @@ static partial class StandardsValidator
             var optional = relative.StartsWith("docs/frontend/web/", StringComparison.Ordinal)
                 ? new List<string> { "Concepts", "React", "Svelte", "Reference example" }
                 : new List<string> { "Concepts", "Reference example" };
-            return new PageContract(["Intent", "Agent Summary", "Standards", "Conventions", "Verification"], optional);
+            return new PageContract(["Intent", "Standards", "Conventions", "Verification"], optional);
         }
 
         // A pattern page offers drawn options for recurring interface questions; its
         // Standards hold the rules every option keeps.
         if (kind == "pattern")
         {
-            return new PageContract(["Intent", "Agent Summary", "Patterns", "Verification"], ["Concepts", "Standards", "Conventions"]);
+            return new PageContract(["Intent", "Patterns", "Verification"], ["Concepts", "Standards", "Conventions"]);
         }
 
         if (kind == "stack")
         {
-            return new PageContract(["Intent", "Agent Summary", "Standards", "Conventions", "Verification"], []);
+            return new PageContract(["Intent", "Standards", "Conventions", "Verification"], []);
         }
 
         if (kind == "extension")
         {
-            return new PageContract(["Intent", "Activation", "Baseline relationship", "Agent Summary", "Standards", "Conventions", "Dependencies", "Verification"], []);
+            return new PageContract(["Intent", "Activation", "Baseline relationship", "Standards", "Conventions", "Dependencies", "Verification"], []);
         }
 
         if (kind == "how-to")
@@ -169,7 +169,7 @@ static partial class StandardsValidator
         List<string> canonical;
         if (kind == "topic")
         {
-            canonical = ["Intent", "Agent Summary", "Concepts"];
+            canonical = ["Intent", "Concepts"];
             if (relative.StartsWith("docs/frontend/web/", StringComparison.Ordinal))
             {
                 canonical.AddRange(["React", "Svelte"]);
@@ -179,7 +179,7 @@ static partial class StandardsValidator
         }
         else if (kind == "pattern")
         {
-            canonical = ["Intent", "Agent Summary", "Concepts", "Standards", "Conventions", "Patterns", "Verification"];
+            canonical = ["Intent", "Concepts", "Standards", "Conventions", "Patterns", "Verification"];
         }
         else if (kind == "how-to")
         {
@@ -311,61 +311,6 @@ static partial class StandardsValidator
         }
     }
 
-    static void CheckAgentProjection(string relative, string raw, Action<string, int, string, string> add)
-    {
-        var lines = StripFences(SplitLines(raw));
-        var paragraph = new List<LineItem>();
-        void Flush()
-        {
-            if (paragraph.Count == 0)
-            {
-                return;
-            }
-
-            var text = string.Join(' ', paragraph.Select(item => item.Line));
-            if (!CitationPattern.IsMatch(text))
-            {
-                add(relative, paragraph[0].Number, "AGENT_PROJECTION_ID", "agent projection contains no canonical provision citation");
-            }
-
-            paragraph.Clear();
-        }
-
-        foreach (var item in lines)
-        {
-            if (item.Line.Trim().Length == 0 || H16Pattern().IsMatch(item.Line))
-            {
-                Flush();
-                continue;
-            }
-
-            if (ListMarkerPattern().IsMatch(item.Line))
-            {
-                Flush();
-            }
-
-            paragraph.Add(item);
-            if (ListMarkerPattern().IsMatch(item.Line))
-            {
-                Flush();
-            }
-        }
-
-        Flush();
-    }
-
-    static void CheckProse(string relative, string raw, string? kind, Action<string, int, string, string> add)
-    {
-        // A recorded decision quotes external material verbatim, so the measures
-        // would report the quotation rather than the authoring.
-        if (ReferenceDecisionsPattern().IsMatch(relative))
-        {
-            return;
-        }
-
-        Prose.CheckProseMeasures(relative, raw, add);
-    }
-
     static ParsedBlocks ParsePage(string relative, string raw, Action<string, int, string, string> add, Dictionary<string, string> globalIds, string root, bool @virtual = false)
     {
         var kind = PageClass(relative);
@@ -376,12 +321,8 @@ static partial class StandardsValidator
         var h1Count = 0;
         var h1Title = "";
         var h1Line = 1;
-        var summaryStart = -1;
-        var summaryLine = 1;
-        var summaryEnd = lines.Length;
         var provisions = new List<Provision>();
         var verificationRows = new List<VerificationRow>();
-        var summaryReferences = new List<SummaryReference>();
 
         for (var index = 0; index < clean.Count; index++)
         {
@@ -397,19 +338,9 @@ static partial class StandardsValidator
             var h2 = H2Pattern().Match(line);
             if (h2.Success)
             {
-                if (currentH2 == "Agent Summary")
-                {
-                    summaryEnd = index;
-                }
-
                 var name = PageAnchorSuffixPattern().Replace(h2.Groups[1].Value, "");
                 currentH2 = name;
                 sections.Add(new PageSection(name, index + 1));
-                if (name == "Agent Summary")
-                {
-                    summaryStart = index + 1;
-                    summaryLine = index + 1;
-                }
 
                 continue;
             }
@@ -555,10 +486,8 @@ static partial class StandardsValidator
 
         var rules = provisions.Where(provision => provision.Section != "Patterns").ToList();
         CheckProvisionBodies(relative, rules, add);
-        CheckSummary(relative, clean, summaryStart, summaryEnd, summaryLine, summaryReferences, add);
         CheckProvisionClaims(relative, rules, add);
-        CheckSummaryRestatement(relative, rules, summaryReferences, add);
-        CheckNormativeLocation(relative, clean, provisions, summaryStart, summaryEnd, add);
+        CheckNormativeLocation(relative, clean, provisions, add);
         CheckVerificationTable(relative, kind, sections, clean, provisions, verificationRows, root, add);
 
         if (kind == "pattern")
@@ -570,12 +499,7 @@ static partial class StandardsValidator
             }
         }
 
-        if (!@virtual)
-        {
-            CheckProse(relative, raw, kind, add);
-        }
-
-        return new ParsedBlocks(kind, provisions, summaryReferences, verificationRows);
+        return new ParsedBlocks(kind, provisions, verificationRows);
     }
 
     [GeneratedRegex(@"^#\s+(.+?)\s*$")]

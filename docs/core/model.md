@@ -4,19 +4,6 @@
 
 Every project describes itself as records of fixed types joined by fixed links. People and agents write the intent records. The builder reads the code, screens, tests, and test runs, and computes the links between the two.
 
-## Agent Summary {#agent-summary}
-
-- Write every record in its home folder. (litespec/core/model#write-every-record-in-its-home)
-- State shared fields, one owner, and one status on every record. (litespec/core/model#state-the-common-fields-on-every-record, litespec/core/model#keep-one-owner-and-status-on-every-record)
-- Write each link on the record it starts from. (litespec/core/model#write-links-on-the-record-that-points)
-- Follow the authority order, with ties going to the later decision. (litespec/core/model#follow-the-authority-order, litespec/core/model#resolve-ties-by-the-later-decision)
-- Hold approval behind draft decisions and record gaps as known gaps. (litespec/core/model#hold-approval-behind-draft-decisions, litespec/core/model#record-accepted-gaps-as-known-gaps)
-- Apply guidance precedence and authorize through the permission chain. (litespec/core/model#apply-guidance-precedence, litespec/core/model#authorize-access-through-the-permission-chain)
-- Express module order as links and retire records with replaces. (litespec/core/model#express-module-order-as-depends-on, litespec/core/model#retire-records-with-replaces)
-- Declare the size, stacks, and optional types. (litespec/core/model#declare-size-stacks-and-optional-types)
-- Give every use case its results and cover public ones from journeys. (litespec/core/model#give-every-use-case-its-results, litespec/core/model#cover-every-public-use-case-from-a-journey)
-- Read truth from code, screens, and test runs, and render views from the model. (litespec/core/model#read-truth-from-code-screens-and-test-runs, litespec/core/model#render-generated-regions-from-the-model)
-
 ## Concepts
 
 ### Record types
@@ -70,7 +57,7 @@ A page record is a Markdown file whose opening block names a record type. An ent
 | `journey` | page | `docs/product/journeys/<name>.md` |
 | `module` | page | `docs/domain/modules/<module>/README.md` |
 | `business-record` | page | `docs/domain/modules/<module>/<records>/README.md` |
-| `rule` | entry | On its home page |
+| `rule` | entry | `docs/domain/rules/<name>.md` |
 | `use-case` | page | `docs/domain/modules/<module>/<records>/<use-case>.md` |
 | `result` | entry | In its use case page |
 | `case` | entry | In its use case page |
@@ -78,7 +65,7 @@ A page record is a Markdown file whose opening block names a record type. An ent
 | `entry-point` | entry | `docs/domain/entry-points.md` |
 | `limit` | entry | `docs/operations/limits.md` |
 | `runbook` | page | `docs/runbooks/<name>.md` |
-| `standard` | shared provisions, or entries on rule pages | On a rule page |
+| `standard` | shared provisions, or entries on rule pages | `docs/domain/rules/<name>.md` |
 | `exception` | page | `docs/exceptions/<name>.md` |
 | `known-gap` | page | `docs/known-gaps/<name>.md` |
 | `term` | entry in the language record | `docs/language.json` |
@@ -109,7 +96,7 @@ Written links live as fields on the record they start from.
 | `basedOn` | decision, requirement, rule | Constraints, research |
 | `affects` | problem | Actors |
 | `solves` | feature | Problems |
-| `fulfils` | rule, use case, journey | Requirements |
+| `fulfills` | rule, use case, journey | Requirements |
 | `governs` | rule | Business records, use cases |
 | `results` | use case | Its result entries |
 | `cases` | use case | Its case entries; each names its result |
@@ -190,7 +177,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Requirement:** A record MUST NOT stand approved behind a draft decision.
 
-**Rationale:** Approval means the reasoning behind the record already holds. The builder also writes each record's `effectiveStatus`: draft when the record, a decision deciding it, or a requirement it fulfils is a draft. A result or a case takes its use case's effective status.
+**Rationale:** Approval means the reasoning behind the record already holds. The builder also writes each record's `effectiveStatus`: draft when the record, a decision deciding it, or a requirement it fulfills is a draft. A result or a case takes its use case's effective status.
 
 ### Record accepted gaps as known gaps
 
@@ -200,7 +187,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 ### Apply guidance precedence
 
-**Requirement:** A conflict MUST resolve toward the exception, extension, profile, or core, in that order.
+**Requirement:** A conflict MUST resolve toward the project exception, the extension, the deeper page, or the shallower page, in that order.
 
 **Rationale:** A project requirement never overrides a shared standard; the conflict becomes an exception.
 
@@ -302,7 +289,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 | litespec/core/model#retire-records-with-replaces | checkable | `litespec model check` reports `invalid-field` for `replaces` outside a decision and `reference-unresolved` for an unknown target. |
 | litespec/core/model#name-what-every-decision-decides | checkable | `litespec model check` reports `decision-decides-nothing`. |
 | litespec/core/model#resolve-every-page-link | checkable | `litespec model check` reports `link-unresolved`. |
-| litespec/core/model#declare-size-stacks-and-optional-types | checkable | `litespec model check` reports `profile-type-missing` and `record-shape`. |
+| litespec/core/model#declare-size-stacks-and-optional-types | checkable | `litespec model check` reports `size-type-missing` and `record-shape`. |
 | litespec/core/model#give-every-use-case-its-results | checkable | `litespec model check` reports `use-case-without-success` and `case-result-unresolved`. |
 | litespec/core/model#cover-every-public-use-case-from-a-journey | checkable | `litespec model check` reports `journey-reach`. |
 | litespec/core/model#read-truth-from-code-screens-and-test-runs | checkable | `litespec model check` reports `use-case-unimplemented`, `proves-unconfirmed`, and `refusal-not-thrown`. |

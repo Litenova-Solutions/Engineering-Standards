@@ -4,16 +4,6 @@
 
 This page holds how the dotnet stack realizes the Backend domain rules ([Backend domain](../domain.md)). It states the C# types, project references, and tooling one dotnet Domain project requires. A provision here cites the neutral rule it realizes.
 
-## Agent Summary {#agent-summary}
-
-- Domain references only the base library and documents every public contract. (litespec/backend/dotnet/domain#keep-domain-free-of-outer-layer-concerns, litespec/backend/dotnet/domain#document-every-public-domain-contract)
-- Roots derive from the shared base defined once with its contracts. (litespec/backend/dotnet/domain#use-the-project-aggregate-root-contract, litespec/backend/dotnet/domain#define-the-shared-domain-contracts-once)
-- Lifecycles use abstract state records and closed sets avoid enums. (litespec/backend/dotnet/domain#model-every-aggregate-lifecycle-with-state-records, litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums)
-- Identities are record structs over version 7 GUIDs with aligned representations. (litespec/backend/dotnet/domain#use-strongly-typed-version-7-identifiers, litespec/backend/dotnet/domain#keep-id-representations-aligned-at-every-boundary)
-- Money uses decimal in the shared value object. (litespec/backend/dotnet/domain#make-money-and-decimal-rules-explicit)
-- Repositories expose one aggregate without queryable or generic surfaces. (litespec/backend/dotnet/domain#keep-repository-interfaces-in-domain)
-- Events are immutable records and rejections throw dedicated exceptions. (litespec/backend/dotnet/domain#raise-immutable-domain-facts, litespec/backend/dotnet/domain#reject-business-violations-with-domain-exceptions)
-
 ## Standards
 
 ### Keep Domain free of outer-layer concerns

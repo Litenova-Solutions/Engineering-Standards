@@ -79,11 +79,6 @@ public sealed partial class StandardsValidatorTests
         },
         ["HEADING_ACTION"]);
 
-    [Fact(DisplayName = "uncited agent projection")]
-    public void UncitedAgentProjection() => Check(
-        root => StandardsFixture.Write(root, "AGENTS.md", "# Agent Context\n\nRead the standards before changing code.\n"),
-        ["AGENT_PROJECTION_ID"]);
-
     [Fact(DisplayName = "heading with no body")]
     public void HeadingWithNoBody() => Check(
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "## Standards", string.Join("\n", ["## Concepts", "", "### Empty concept", "", "### Second concept", "", "This concept has a body.", "", "## Standards"]))),

@@ -4,12 +4,6 @@
 
 Application code in a .NET backend dispatches through LiteBus mediators and reports LiteBus validity. The shared provisions live on the stack-neutral page ([Application Layer](../application.md)); this page holds what .NET alone requires.
 
-## Agent Summary {#agent-summary}
-
-- Validators report LiteBus Validity with member, code, and message failures. (litespec/backend/dotnet/application#report-input-problems-as-validity)
-- Command handlers never dispatch another command through the mediator. (litespec/backend/dotnet/application#keep-one-state-changing-use-case-in-one-command-pipeline)
-- Dispatch uses the pinned LiteBus mediator entry points. (litespec/backend/dotnet/application#use-the-pinned-mediator-entry-points)
-
 ## Standards
 
 ### Report input problems as Validity
@@ -36,7 +30,7 @@ This realizes `litespec/backend/application#keep-one-state-changing-use-case-in-
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** The profile pins one library so every project reads the same call at every dispatch site. The obligation that the two paths stay separate belongs to `litespec/backend/application#dispatch-commands-and-queries-through-separate-entry-points` and survives the replacement.
+**Rationale:** The stack pins one library so every project reads the same call at every dispatch site. The obligation that the two paths stay separate belongs to `litespec/backend/application#dispatch-commands-and-queries-through-separate-entry-points` and survives the replacement.
 
 ## Reference example
 

@@ -146,6 +146,8 @@ Extensions any stack can select. An extension for one stack sits in that stack's
 - [Validate Consumer](tools/consumer.md)
 - [Validate Controlled UI](tools/ui.md)
 - [Project model builder](tools/model.md)
+- [Project book](tools/book.md)
+- [Draw patterns](tools/patterns.md)
 
 ## Guide
 
@@ -164,4 +166,4 @@ Extensions any stack can select. An extension for one stack sits in that stack's
 - [Decision records](reference/decision-records.md)
 - [Consumer templates](../templates/consumer/README.md)
 
-Consumers pin a complete release. `CHANGELOG.md` is the repository release note for the current major version, and `changelog/v<major>.md` holds each earlier major version.
+Consumers pin a complete release. `CHANGELOG.md` is the repository release note for the current major version. No earlier-major archive exists in this release.

@@ -165,11 +165,11 @@ sealed partial class PatternPage
                 continue;
             }
 
-            var labelled = FieldLine().Match(line);
+            var labeled = FieldLine().Match(line);
 
-            if (labelled.Success && pattern is not null)
+            if (labeled.Success && pattern is not null)
             {
-                field = labelled.Groups[1].Value;
+                field = labeled.Groups[1].Value;
                 var target = option?.Fields ?? pattern.Fields;
                 var allowed = option is null ? PatternFields : OptionFields;
 
@@ -178,7 +178,7 @@ sealed partial class PatternPage
                     page.Errors.Add((number, $"'**{field}:**' is not a {(option is null ? "pattern" : "option")} field; use {string.Join(", ", allowed)}"));
                 }
 
-                target[field] = labelled.Groups[2].Value.Trim();
+                target[field] = labeled.Groups[2].Value.Trim();
                 continue;
             }
 

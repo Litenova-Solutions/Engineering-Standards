@@ -1,4 +1,4 @@
-// Book behaviour: theme, review mode, table sort, search, mobile navigation.
+// Book behavior: theme, review mode, table sort, search, mobile navigation.
 (() => {
   "use strict";
 

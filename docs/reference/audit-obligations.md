@@ -10,7 +10,7 @@ This page records the external obligations that the [audit extension](../ext/aud
 
 ### The frameworks
 
-Four bodies of guidance apply to a business application that holds personal data or touches payments. They agree far more than they differ. An implementation built to their union satisfies each one without a separate programme.
+Four bodies of guidance apply to a business application that holds personal data or touches payments. They agree far more than they differ. An implementation built to their union satisfies each one without a separate program.
 
 #### NIST SP 800-53, AU family
 
@@ -73,7 +73,7 @@ The record shape follows a model that three sources describe in the same terms. 
 | NIST AU-3 | The required content of one record. |
 | OCSF | Vendor-neutral schema for shipping records to a security platform. |
 
-Building to that model costs nothing at design time. It lets a project map the trail onto a security platform later without remodelling the store.
+Building to that model costs nothing at design time. It lets a project map the trail onto a security platform later without remodeling the store.
 
 ### Obligation to provision map
 

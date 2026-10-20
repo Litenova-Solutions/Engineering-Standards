@@ -4,19 +4,6 @@
 
 One canonical monorepo tree lets agents locate applications, shared packages, documentation, and tests without searching for a project-specific interpretation. The structure supports an API-only application, one frontend, or multiple frontends while retaining one bounded context.
 
-## Agent Summary {#agent-summary}
-
-- Consumers share one canonical root tree. (litespec/workspace/structure#use-the-canonical-root-tree)
-- The project config declares size and stacks. (litespec/workspace/structure#declare-size-and-application-stacks-in-project-config)
-- The generated model folder stays untracked. (litespec/workspace/structure#keep-the-generated-model-out-of-source-control)
-- Production code and test code sit in separate roots. (litespec/workspace/structure#keep-production-and-test-code-separate)
-- Runnable applications live under apps. (litespec/workspace/structure#keep-runnable-applications-under-apps)
-- Shared packages have two consumers or hold generated output. (litespec/workspace/structure#limit-shared-typescript-packages)
-- Consumer documentation lives under the root docs directory. (litespec/workspace/structure#keep-consumer-documentation-at-the-root)
-- READMEs orient and link; they never restate records. (litespec/workspace/structure#keep-orientation-documents-separate-from-canonical-records)
-- Frontends take audience names and scripts stay at the root. (litespec/workspace/structure#name-frontends-by-audience, litespec/workspace/structure#keep-scripts-at-the-root)
-- Generated API contracts live in packages. (litespec/workspace/structure#keep-generated-api-contracts-in-packages)
-
 ## Standards
 
 ### Use the canonical root tree
@@ -68,7 +55,7 @@ One canonical monorepo tree lets agents locate applications, shared packages, do
     runbooks/                  create with the first runbook
     exceptions/                create with the first exception record
     known-gaps/                create with the first known-gap record
-    ui/                        create with the first UI decision or guide
+    ui/                        create with the first UI decision or guide, held in the pattern catalog and the design contract
     language.json
   litespec/
   AGENTS.md

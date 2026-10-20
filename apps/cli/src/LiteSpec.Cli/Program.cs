@@ -20,7 +20,7 @@ const string usage = """
 
     Commands in a consumer repository:
       init          Write litespec.project.json from a preset.
-      consumer      Validate the consumer's project file, records and prose.
+      consumer      Validate the consumer's project file, records and language.
       ui            Validate the controlled web UI contract.
       model         Build, check, render or query the project model.
       book          Generate the project book from model.json.

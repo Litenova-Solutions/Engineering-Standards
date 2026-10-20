@@ -17,7 +17,7 @@
     "event/hold.hold-placed"
   ],
   "reactsTo": [],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.hold-pickup-window"
   ],
   "results": [

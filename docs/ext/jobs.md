@@ -18,18 +18,6 @@ This extension replaces no baseline rule.
 
 This extension switches on the Limit and Runbook record types.
 
-## Agent Summary {#agent-summary}
-
-- Record timing, overlap, retry, and owner behavior. (litespec/ext/jobs#record-schedule-behavior)
-- Run jobs in Worker with bounded execution. (litespec/ext/jobs#run-jobs-in-worker, litespec/ext/jobs#bound-job-execution)
-- Lease an occurrence across replicas. (litespec/ext/jobs#store-execution-leases)
-- Generate fencing values monotonically per occurrence. (litespec/ext/jobs#generate-monotonic-fencing-values)
-- Scope occurrences and leases by tenant. (litespec/ext/jobs#scope-occurrences-and-leases-by-tenant)
-- Dispatch Application commands without direct storage mutation. (litespec/ext/jobs#dispatch-application-behavior, litespec/ext/jobs#exclude-direct-storage-and-http-execution)
-- Bound retry and support duplicate execution. (litespec/ext/jobs#bound-job-retries, litespec/ext/jobs#tolerate-duplicate-execution)
-- Define missed-occurrence and manual-replay behavior. (litespec/ext/jobs#persist-occurrence-recovery-points, litespec/ext/jobs#define-misfire-recovery)
-- Use schedule-derived occurrence identities. (litespec/ext/jobs#derive-stable-occurrence-identity)
-
 ## Standards
 
 ### Record schedule behavior
@@ -170,7 +158,7 @@ The key space grows with the schedule's frequency and its retention, so a per-se
 
 **Requirement:** A scheduled job MUST use a UTC schedule unless its specification names a business-local time requirement and its IANA time zone.
 
-**Rationale:** A local schedule runs twice on one date each year and skips an hour on another. That is what a daylight-saving transition does to a wall clock. That behaviour is correct for a job whose meaning is local, such as a nightly statement at nine in the morning for a reader. It is a defect for every other job, and the earlier recommendation left the difference to a preference. Naming the time zone in the specification is what makes the transition behaviour reviewable.
+**Rationale:** A local schedule runs twice on one date each year and skips an hour on another. That is what a daylight-saving transition does to a wall clock. That behavior is correct for a job whose meaning is local, such as a nightly statement at nine in the morning for a reader. It is a defect for every other job, and the earlier recommendation left the difference to a preference. Naming the time zone in the specification is what makes the transition behavior reviewable.
 
 ### Define business-local clock behavior
 

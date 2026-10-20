@@ -29,10 +29,6 @@ public sealed partial class StandardsValidatorTests
 
         This extension replaces no baseline provision.
 
-        ## Agent Summary {#agent-summary}
-
-        - Record extension activation. (litespec/ext/sample#record-extension-activation)
-
         ## Standards
 
         ### Record extension activation
@@ -60,10 +56,6 @@ public sealed partial class StandardsValidatorTests
         ## Intent
 
         This page defines one repository topic.
-
-        ## Agent Summary {#agent-summary}
-
-        - Keep the topic bounded. (litespec/core/sample#keep-the-topic-bounded)
 
         ## Standards
 

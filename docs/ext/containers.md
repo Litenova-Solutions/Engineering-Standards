@@ -18,17 +18,6 @@ This extension replaces no baseline provision. Its schema, rollback and secret r
 
 This extension switches on `limit` and `runbook`. `litespec/ext/containers#declare-writable-paths-and-limits` records resource bounds as Limit records, and `litespec/ext/containers#retain-rollback-material` records the rollback procedure as a Runbook record.
 
-## Agent Summary {#agent-summary}
-
-- Build multi-stage images from pinned bases. (litespec/ext/containers#build-release-images-in-stages)
-- Run containers as a non-root user. (litespec/ext/containers#run-images-as-non-root)
-- Inject environment configuration outside the image. (litespec/ext/containers#supply-runtime-configuration-externally)
-- Apply reviewed schema changes before traffic. (litespec/ext/containers#apply-schema-work-before-traffic)
-- Shift traffic only after readiness. (litespec/ext/containers#wait-for-replica-readiness)
-- Retain a tested rollback artifact. (litespec/ext/containers#retain-rollback-material)
-- Limit runtime privileges and writable state. (litespec/ext/containers#limit-container-privileges)
-- Record image identity by digest. (litespec/ext/containers#record-image-digests)
-
 ## Standards
 
 ### Build release images in stages

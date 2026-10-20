@@ -17,7 +17,7 @@
     "event/loan.loan-returned"
   ],
   "reactsTo": [],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.loan-period-days"
   ],
   "results": [

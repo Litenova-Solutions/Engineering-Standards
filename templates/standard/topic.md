@@ -4,10 +4,6 @@
 
 State the page scope and the boundary it owns.
 
-## Agent Summary {#agent-summary}
-
-- State one high-risk projection and cite its canonical provision. ({litespec/page#state-one-action})
-
 ## Standards
 
 ### State one action

@@ -11,16 +11,6 @@ This page holds how the TypeScript web stacks realize the frontend testing princ
 | Route contract | Playwright against a running stack | Every route renders one floorplan and passes the browser checks |
 | Evidence | Playwright against a running stack | A use case's Cases, with each declared refusal provoked by name |
 
-## Agent Summary {#agent-summary}
-
-- Web levels use Vitest and Playwright for their risks. (litespec/frontend/web/testing#match-test-level-to-risk)
-- Web refusals are asserted by code in the rendered page. (litespec/frontend/web/testing#assert-each-declared-refusal-by-its-code)
-- Web mocks stay at owned boundaries per stack section. (litespec/frontend/web/testing#keep-mocks-at-owned-boundaries)
-- Web HTTP answers come from contract-generated network mocks. (litespec/frontend/web/testing#use-network-mocks-for-component-tests)
-- The web module mirror is proved in a Vitest structure test. (litespec/frontend/web/testing#prove-the-module-mirror-in-a-structure-test)
-- Browser checks run through the Playwright CLI per route and file. (litespec/frontend/web/testing#run-browser-checks-through-the-playwright-cli)
-- Web queries scope by floorplan and accessible names. (litespec/frontend/web/testing#query-by-accessible-behavior)
-
 ## React
 
 - The mocks rule forbids replacing the rendering library, the router, and the query library.

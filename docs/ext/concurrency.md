@@ -18,16 +18,6 @@ This extension replaces no baseline provision. `litespec/ext/concurrency#return-
 
 This extension switches on `limit`. `litespec/ext/concurrency#set-key-retention` records key retention as a Limit record.
 
-## Agent Summary {#agent-summary}
-
-- Document the conflicting writes and protected invariant. (litespec/ext/concurrency#document-write-conflict-behavior)
-- Use expected versions for documented write conflicts. (litespec/ext/concurrency#compare-expected-aggregate-versions)
-- Return stable precondition and version-conflict responses. (litespec/ext/concurrency#map-failed-expected-versions, litespec/ext/concurrency#apply-http-version-preconditions)
-- Scope and fingerprint idempotency keys. (litespec/ext/concurrency#scope-client-keys, litespec/ext/concurrency#enforce-key-uniqueness)
-- Commit replay records with business changes. (litespec/ext/concurrency#store-idempotency-state-atomically)
-- Keep external effects outside uncommitted work. (litespec/ext/concurrency#delay-irreversible-provider-calls)
-- Retain keys through safe retry windows. (litespec/ext/concurrency#set-key-retention, litespec/ext/concurrency#retain-safe-retry-keys)
-
 ## Standards
 
 ### Document write conflict behavior

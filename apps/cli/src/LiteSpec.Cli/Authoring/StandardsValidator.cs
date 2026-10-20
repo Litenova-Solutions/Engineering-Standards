@@ -37,7 +37,6 @@ static partial class StandardsValidator
     /// <summary>Every diagnostic code the validator can emit, in declaration order.</summary>
     public static readonly IReadOnlyList<string> StableDiagnosticCodes =
     [
-        "AGENT_PROJECTION_ID",
         "ANCHOR_BROKEN",
         "CONVENTION_DEFAULT_SENTENCE",
         "CONVENTION_MISSING_DEFAULT",
@@ -80,15 +79,8 @@ static partial class StandardsValidator
         "PAGE_TITLE_COUNT",
         "PAGE_UNKNOWN_SECTION",
         "PATTERN_INVALID",
-        "PROSE_AND_OR",
-        "PROSE_CONTRACTION",
-        "PROSE_LIST_LENGTH",
         "PROSE_NON_ASCII",
         "PROSE_NORMATIVE_LOCATION",
-        "PROSE_PARAGRAPH_LENGTH",
-        "PROSE_SENTENCE_LENGTH",
-        "PROSE_TABLE_CELL_LENGTH",
-        "PROSE_VAGUE_TERM",
         "PROVISIONS_STALE",
         "PROVISION_RESTATES_HEADING",
         "REFERENCE_EXAMPLE_DECLARATION",
@@ -112,12 +104,6 @@ static partial class StandardsValidator
         "STANDARD_SENTENCE_COUNT",
         "STANDARD_UNEXPECTED_DEVIATION",
         "STANDARD_UNLABELED_CONTENT",
-        "SUMMARY_COUNT",
-        "SUMMARY_ID_POSITION",
-        "SUMMARY_MISSING_ID",
-        "SUMMARY_NORMATIVE",
-        "SUMMARY_RESTATES_REQUIREMENT",
-        "SUMMARY_UNKNOWN_ID",
         "VERIFY_COMMAND",
         "VERIFY_DUPLICATE_ID",
         "VERIFY_GENERIC_EVIDENCE",
@@ -208,10 +194,6 @@ static partial class StandardsValidator
             }
 
             parsedPages.Add(new ParsedPage(relative, raw, ParsePage(relative, raw, Add, globalIds, resolved)));
-            if (relative == "AGENTS.md" || relative.EndsWith("/project-agents.md", StringComparison.Ordinal))
-            {
-                CheckAgentProjection(relative, raw, Add);
-            }
         }
 
         CheckPageIdentity(parsedPages, Add);
@@ -379,14 +361,11 @@ static partial class StandardsValidator
         public string Claim { get; set; } = "";
     }
 
-    /// <summary>One Agent Summary citation: the provision, the bullet's line, and the bullet's claim.</summary>
-    private sealed record SummaryReference(string Id, int Line, string Claim);
-
     /// <summary>One Verification table row: the provision, its mark, its line, and its evidence cell.</summary>
     private sealed record VerificationRow(string Id, string Mark, int Line, string Evidence);
 
     /// <summary>Everything one page parse collects for the later cross-page checks.</summary>
-    private sealed record ParsedBlocks(string? Kind, List<Provision> Provisions, List<SummaryReference> SummaryReferences, List<VerificationRow> VerificationRows);
+    private sealed record ParsedBlocks(string? Kind, List<Provision> Provisions, List<VerificationRow> VerificationRows);
 
     /// <summary>One parsed page: its relative path, its raw text, and its blocks.</summary>
     private sealed record ParsedPage(string Relative, string Raw, ParsedBlocks Parsed);
@@ -399,11 +378,9 @@ static partial class StandardsValidator
     static string IdPattern => Provisions.IdSource.Replace("\\/", "/", StringComparison.Ordinal);
 
     static readonly Lazy<Regex> CitationLazy = new(() => new Regex($"\\b(?:{IdPattern})\\b"));
-    static readonly Lazy<Regex> SummaryPositionLazy = new(() => new Regex($"\\((?:{IdPattern})(?:,\\s*{IdPattern})*\\)\\s*$"));
     static readonly Lazy<Regex> VerificationRowLazy = new(() => new Regex($"^\\|\\s*({IdPattern})\\s*\\|\\s*([^|]*?)\\s*\\|\\s*([^|]*?)\\s*\\|\\s*$"));
 
     static Regex CitationPattern => CitationLazy.Value;
-    static Regex SummaryPositionPattern => SummaryPositionLazy.Value;
     static Regex VerificationRowPattern => VerificationRowLazy.Value;
 
     /// <summary>The action verbs a provision heading may start with.</summary>

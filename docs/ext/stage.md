@@ -16,13 +16,7 @@ The consumer selects `stage` before its first deployment holds customer data, or
 
 None. A `pre-production` consumer defers provisions through this extension; the compat extension still governs versioning once selected.
 
-None. The promotion Decision is a core record every profile requires.
-
-## Agent Summary {#agent-summary}
-
-- Declare the release stage in the project record. (litespec/ext/stage#declare-the-release-stage)
-- Name each deferred provision with its end date. (litespec/ext/stage#defer-named-provisions-until-promotion)
-- Record the promotion before the first customer data. (litespec/ext/stage#promote-through-a-recorded-decision)
+None. The promotion Decision is a core record every project requires.
 
 ## Standards
 

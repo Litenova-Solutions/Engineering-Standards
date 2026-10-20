@@ -94,6 +94,46 @@ public sealed class StackReaderTests
         Assert.False(status.GetProperty("use-case/lending.return-copy").GetProperty("verified").GetBoolean());
     }
 
+    /// <summary>A TRX file verifies the passing case's use case and leaves the failing one unverified.</summary>
+    [Fact]
+    public void Trx_Results_Verify_The_Passing_Case_Only()
+    {
+        using var temp = ModelFixture.Prepare("small");
+
+        File.WriteAllText(
+            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "borrow-copy-trx-case.md"),
+            BorrowCasePage);
+        File.WriteAllText(
+            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "return-copy-trx-case.md"),
+            ReturnCasePage);
+
+        var scenariosFolder = Path.Combine(
+            temp.Path, "apps", "api", "tests", "Library.Acceptance.Tests", "Trx");
+        Directory.CreateDirectory(scenariosFolder);
+        File.WriteAllText(Path.Combine(scenariosFolder, "TrxScenarios.cs"), TrxScenariosFile);
+
+        var resultsFolder = Path.Combine(temp.Path, "TestResults");
+        Directory.CreateDirectory(resultsFolder);
+        File.Copy(Cli.Fixture("Model/trx/results.trx"), Path.Combine(resultsFolder, "results.trx"));
+
+        var output = Path.Combine(temp.Path, ".model", "model.json");
+        var built = Cli.Run("model", "build", "--root", temp.Path, "--out", output);
+        Assert.Equal(0, built.Status);
+
+        using var document = JsonDocument.Parse(File.ReadAllText(output));
+        var root = document.RootElement;
+        var run = root.GetProperty("testRun");
+
+        Assert.Equal(2, run.GetProperty("total").GetInt32());
+        Assert.Equal(1, run.GetProperty("passed").GetInt32());
+        Assert.Equal(1, run.GetProperty("failed").GetInt32());
+
+        var status = root.GetProperty("status");
+
+        Assert.True(status.GetProperty("use-case/lending.borrow-copy").GetProperty("verified").GetBoolean());
+        Assert.False(status.GetProperty("use-case/lending.return-copy").GetProperty("verified").GetBoolean());
+    }
+
     const string BorrowCasePage = """
         ---
         {
@@ -132,6 +172,25 @@ public sealed class StackReaderTests
         # Returning a borrowed copy succeeds
 
         A reader returns a borrowed copy.
+        """;
+
+    const string TrxScenariosFile = """
+        namespace Library.Acceptance.Tests.Trx;
+
+        public sealed class TrxScenarios
+        {
+            /// <proves>case/borrow-copy.borrowing-an-available-copy-succeeds</proves>
+            public Task Borrowing_an_available_copy_succeeds() => Runner.RunScenarioAsync(
+                given => new RegisterCopySteps().RegisterACopy("copy-1"),
+                when => new BorrowCopySteps().BorrowACopy("reader-1", "copy-1"),
+                then => new BorrowCopySteps().TheLoanIsActive());
+
+            /// <proves>case/return-copy.returning-a-borrowed-copy-succeeds</proves>
+            public Task Returning_a_borrowed_copy_succeeds() => Runner.RunScenarioAsync(
+                given => new BorrowCopySteps().BorrowACopy("reader-1", "copy-1"),
+                when => new ReturnCopySteps().ReturnACopy("loan-1"),
+                then => new ReturnCopySteps().TheLoanIsReturned());
+        }
         """;
 
     const string ScenariosFile = """

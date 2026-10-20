@@ -119,8 +119,8 @@ sealed class UiFixture : IDisposable
     /// <summary>The vendored LiteSpec checkout the fixture-local run resolves.</summary>
     public string LiteSpecDir => Join("litespec");
 
-    /// <summary>The fixture UI pattern library the fixture-local run reads.</summary>
-    public string FixtureLibrary => Join("litespec/packages/ui-patterns/library.json");
+    /// <summary>The fixture pattern page the fixture-local run reads.</summary>
+    public string FixturePatternPage => Join("litespec/docs/frontend/patterns/page-frames.md");
 
     /// <summary>Builds a fresh fixture from the tracked templates.</summary>
     public static UiFixture Create()
@@ -145,7 +145,7 @@ sealed class UiFixture : IDisposable
 
     /// <summary>
     /// Runs <c>litespec ui</c> against the fixture with the LiteSpec home pointed at the
-    /// fixture's own vendored copy, so the library it reads is the fixture library.
+    /// fixture's own vendored copy, so the pattern pages it reads are the fixture pages.
     /// </summary>
     public CliResult RunWithFixtureHome() => Cli.Run(
         new[] { "ui", "--root", Root },
@@ -340,7 +340,7 @@ sealed class UiFixture : IDisposable
             "apps/web/src/modules",
             "docs/exceptions",
             "litespec/schemas",
-            "litespec/packages/ui-patterns",
+            "litespec/docs/frontend/patterns",
         })
         {
             Directory.CreateDirectory(Join(directory));
@@ -352,9 +352,9 @@ sealed class UiFixture : IDisposable
             File.Copy(schema, Path.Join(LiteSpecDir, "schemas", Path.GetFileName(schema)));
         }
 
-        // The library-citation cases run with the fixture as the LiteSpec home, so the
-        // library they read is this fixture rather than the release's own library.
-        WriteJson(FixtureLibrary, FixtureLibraryJson());
+        // The citation cases run with the fixture as the LiteSpec home, so the pattern
+        // page they read is this fixture rather than the release's own pages.
+        File.WriteAllText(FixturePatternPage, FixturePatternPageText);
 
         var project = (JsonObject)ReadJson(Path.Join(Cli.Repository, "templates/consumer/litespec.project.json"))!;
         ResolvePlaceholders(project);
@@ -503,45 +503,44 @@ sealed class UiFixture : IDisposable
         ["registries"] = new JsonObject(),
     };
 
-    static JsonObject FixtureLibraryJson() => new()
-    {
-        ["$schema"] = "../../schemas/ui-pattern-library.schema.json",
-        ["kind"] = "ui-pattern-library",
-        ["schemaVersion"] = 1,
-        ["breakpoints"] = new JsonObject { ["compact"] = 768 },
-        ["groups"] = new JsonArray(new JsonObject
-        {
-            ["id"] = "page-frames",
-            ["title"] = "Page frames",
-            ["kind"] = "page-frame",
-        }),
-        ["patterns"] = new JsonArray(new JsonObject
-        {
-            ["id"] = "record-list",
-            ["group"] = "page-frames",
-            ["title"] = "Record list",
-            ["question"] = "How does a reader find one record among many?",
-            ["options"] = new JsonArray(
-                new JsonObject
-                {
-                    ["id"] = "filter-table",
-                    ["name"] = "Filterable table",
-                    ["rationale"] = "Rows scan fast and filters narrow the set.",
-                    ["cost"] = "Needs a table composite with filters.",
-                },
-                new JsonObject
-                {
-                    ["id"] = "search-cards",
-                    ["name"] = "Searchable cards",
-                    ["rationale"] = "Cards show each record with room for detail.",
-                    ["cost"] = "Slow to scan past a few dozen records.",
-                }),
-            ["recommended"] = "filter-table",
-            ["compact"] = new JsonObject
-            {
-                ["breakpoint"] = "compact",
-                ["behaviour"] = "Below 768 pixels the filters stack above the table.",
-            },
-        }),
-    };
+    const string FixturePatternPageText = """
+        # Page Frame Patterns
+
+        ## Intent
+
+        One fixture pattern.
+
+        ## Patterns
+
+        ### Record list
+
+        **Question:** How does a reader find one record among many?
+
+        **Default:** `filter-table`
+
+        **Rationale:** Rows scan fast.
+
+        #### `filter-table`: Filterable table
+
+        ```wireframe
+        page
+          table 3 "Order" "Customer"
+        ```
+
+        **Rationale:** Rows scan fast and filters narrow the set.
+
+        **Cost:** Needs a table composite with filters.
+
+        #### `search-cards`: Searchable cards
+
+        ```wireframe
+        page
+          grid 3
+            card "SO-1042"
+        ```
+
+        **Rationale:** Cards show each record with room for detail.
+
+        **Cost:** Slow to scan past a few dozen records.
+        """;
 }

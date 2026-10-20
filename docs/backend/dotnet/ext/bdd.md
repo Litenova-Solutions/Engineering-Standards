@@ -27,15 +27,6 @@ This extension replaces no baseline provision. It adds an acceptance test projec
 
 This extension switches on `case`. Its scenarios prove Case records.
 
-## Agent Summary {#agent-summary}
-
-- Select BDD scenarios for shared cross-layer examples. (litespec/backend/dotnet/ext/bdd#select-shared-critical-examples)
-- Prove one Case from each scenario. (litespec/backend/dotnet/ext/bdd#prove-a-case-from-every-scenario)
-- Drive scenarios through public behavior. (litespec/backend/dotnet/ext/bdd#drive-public-behavior)
-- Keep direct database checks at durable boundaries. (litespec/backend/dotnet/ext/bdd#limit-database-assertions)
-- Isolate scenario data and execution order. (litespec/backend/dotnet/ext/bdd#own-scenario-data, litespec/backend/dotnet/ext/bdd#isolate-scenario-execution)
-- Keep step definitions outside production internals. (litespec/backend/dotnet/ext/bdd#exclude-production-internals)
-
 ## Standards
 
 ### Select shared critical examples
@@ -56,7 +47,7 @@ This extension switches on `case`. Its scenarios prove Case records.
 
 **Rationale:** A Case pairs one situation with the Result it leads to. The claim, the steps, and the assertion together prove it. A LightBDD scenario carries the claim as a `/// <proves>` tag on the scenario method. A Reqnroll scenario carries it as a `proves:` line under its title.
 
-**Example:** `/// <proves>case/cancel-order.cancelling-twice-is-refused</proves>` traces a cancellation scenario to its Case.
+**Example:** `/// <proves>case/cancel-order.canceling-twice-is-refused</proves>` traces a cancellation scenario to its Case.
 
 ### Drive public behavior
 

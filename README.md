@@ -58,18 +58,27 @@ The [template index](templates/consumer/README.md) lists each consumer template 
 The standard sits at the root, because the root is what a consumer pins at `litespec/`. Each deliverable beside it has its own folder.
 
 ```text
-docs/                       The standard: core, workspace, quality, backend and frontend principles, stack folders, extensions
+docs/                       The standard
+  core/ workspace/ quality/   Pages every project applies
+  backend/                  Backend principles
+    dotnet/                 The dotnet stack, with ext/ for dotnet-only extensions
+  frontend/                 Frontend principles
+    patterns/               UI pattern pages with wireframes, one per group
+    web/                    The shared TypeScript web realization
+      react/ svelte/        The two web stacks
+    blazor/                 The blazor stack
+  ext/                      Extensions any stack can select
+  reference/ tools/ tutorial/ guide/   Lookup, command, tutorial and how-to pages
 schemas/                    JSON contracts for the manifest, the project file, records, and UI files
-templates/                  Consumer record templates, standard authoring templates, and project presets
+templates/
+  consumer/                 Record, project and UI templates a consumer copies
+  presets/                  The selections `litespec init` starts from
+  standard/                 Seeds for LiteSpec's own pages
 litespec.manifest.json      Version, stacks, shapes, extensions, and package pins
 apps/
-  cli/                      The litespec command line
-    LiteSpec.Cli.slnx
-    src/LiteSpec.Cli/
-    tests/LiteSpec.Cli.Tests/
-packages/
-  ui-patterns/              The UI pattern library, its data, and its viewer
+  cli/                      The litespec command line: src/LiteSpec.Cli and tests/LiteSpec.Cli.Tests
 LiteSpec.slnx               Every .NET project in the repository
+AGENTS.md                   The agent protocol; CLAUDE.md, GEMINI.md and the other adapters point to it
 ```
 
 ## Project

@@ -12,12 +12,6 @@ Software that inspects context, reasons about bounded work, changes authorized f
 
 Term `term/agent`.
 
-## Agent summary
-
-The short task context for agents, while the full page stays canonical.
-
-Term `term/agent-summary`.
-
 ## Agent-driven engineering
 
 The operating model where agents do engineering work and people keep decision authority.
@@ -44,7 +38,7 @@ Term `term/apphost`.
 
 ## Architecture layer
 
-One project boundary in the backend: Domain, Application, Infrastructure, or WebApi.
+One project boundary in the backend: Domain, Application, Application.Abstractions, Infrastructure, or WebApi.
 
 Term `term/architecture-layer`.
 
@@ -312,6 +306,12 @@ One rule enforced by durable storage, such as uniqueness.
 
 Term `term/persistence-constraint`.
 
+## Preset
+
+One ready-made selection of shape, stacks, and frontends for a new project.
+
+Term `term/preset`.
+
 ## Problem
 
 One pain or job someone has today.
@@ -420,6 +420,12 @@ Recovery by deploying a newer version rather than restoring the old one.
 
 Term `term/roll-forward`.
 
+## Rule
+
+One testable commitment stating what holds.
+
+Term `term/rule`.
+
 ## Runbook
 
 The steps to run or recover the product.
@@ -438,6 +444,18 @@ The list of production secrets with owner, location, and rotation date.
 
 Term `term/secret-inventory`.
 
+## Shape
+
+One deployment boundary of a project: server or client-only.
+
+Term `term/shape`.
+
+## Size
+
+One required-record set of a project: small or large.
+
+Term `term/size`.
+
 ## Source material
 
 Research kept outside the documentation, carrying no authority alone.
@@ -455,6 +473,12 @@ Term `term/specification`.
 The opening block stating a page type, owner, status, and records.
 
 Term `term/specification-metadata`. Rejected: frontmatter.
+
+## Stack
+
+One technology binding of the specification, held in one folder.
+
+Term `term/stack`.
 
 ## Standard
 

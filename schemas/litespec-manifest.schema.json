@@ -9,7 +9,6 @@
     "version",
     "name",
     "agentsEntry",
-    "paths",
     "stacks",
     "shapes",
     "extensions",
@@ -33,29 +32,6 @@
     },
     "agentsEntry": {
       "$ref": "#/$defs/repositoryPath"
-    },
-    "paths": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "docs",
-        "template",
-        "extension"
-      ],
-      "properties": {
-        "docs": {
-          "$ref": "#/$defs/repositoryPath"
-        },
-        "template": {
-          "$ref": "#/$defs/repositoryPath"
-        },
-        "extension": {
-          "$ref": "#/$defs/repositoryPath"
-        },
-        "uiPatternLibrary": {
-          "$ref": "#/$defs/repositoryPath"
-        }
-      }
     },
     "stacks": {
       "description": "The stacks this release ships, by stack id.",

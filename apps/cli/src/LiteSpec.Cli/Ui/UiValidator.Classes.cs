@@ -74,7 +74,7 @@ static partial class UiValidator
 
     // A character class cannot see an escaped delimiter, so `"px-2 \" px-3"` ends at
     // the middle quote and every later token in the file parses against the wrong
-    // boundary. The scanner honours the backslash escape the language defines, and
+    // boundary. The scanner honors the backslash escape the language defines, and
     // treats an unterminated quote as no literal rather than as one that runs to the
     // end of the file. A single quote inside a comment is therefore skipped instead
     // of swallowing the next real class string.

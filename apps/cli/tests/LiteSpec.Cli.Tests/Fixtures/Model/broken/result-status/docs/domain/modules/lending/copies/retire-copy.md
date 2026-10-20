@@ -17,7 +17,7 @@
     "event/copy.copy-retired"
   ],
   "reactsTo": [],
-  "fulfils": [
+  "fulfills": [
     "requirement/borrowing.copy-shelf-home"
   ],
   "results": [

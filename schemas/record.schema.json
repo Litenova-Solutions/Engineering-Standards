@@ -344,7 +344,7 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
-        "kind": { "enum": ["promise", "behaviour", "quality", "target", "practice"] },
+        "kind": { "enum": ["promise", "behavior", "quality", "target", "practice"] },
         "statement": { "$ref": "#/$defs/nonEmptyString" },
         "values": {
           "type": "array",
@@ -429,7 +429,7 @@
         "governs": { "$ref": "#/$defs/governsArray" },
         "refusal": { "$ref": "#/$defs/refusalValue" },
         "basedOn": { "$ref": "#/$defs/basedOnArray" },
-        "fulfils": { "$ref": "#/$defs/requirementIdArray" }
+        "fulfills": { "$ref": "#/$defs/requirementIdArray" }
       },
       "allOf": [
         {
@@ -878,7 +878,7 @@
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/journeyStep" }
         },
-        "fulfils": { "$ref": "#/$defs/requirementIdArray" }
+        "fulfills": { "$ref": "#/$defs/requirementIdArray" }
       },
       "allOf": [
         {
@@ -967,7 +967,7 @@
         "reachedThrough": { "$ref": "#/$defs/entryPointIdArray" },
         "raises": { "$ref": "#/$defs/eventIdArray" },
         "reactsTo": { "$ref": "#/$defs/eventIdArray" },
-        "fulfils": { "$ref": "#/$defs/requirementIdArray" },
+        "fulfills": { "$ref": "#/$defs/requirementIdArray" },
         "input": {
           "type": "array",
           "uniqueItems": true,
@@ -1084,6 +1084,7 @@
         "status": { "$ref": "#/$defs/status" },
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
+        "reviewBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
         "records": { "$ref": "#/$defs/recordsArray" }
       }

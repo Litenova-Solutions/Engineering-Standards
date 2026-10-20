@@ -6,7 +6,7 @@ namespace LiteSpec.Patterns;
 
 /// <summary>
 ///     Draws one wireframe as an SVG sketch at a desktop or phone width. The sketch
-///     shows structure and copy in one neutral style; tones are its only colours.
+///     shows structure and copy in one neutral style; tones are its only colors.
 ///     Text width is estimated from the character count, so nothing needs a font.
 /// </summary>
 sealed class WireframeRenderer
@@ -193,7 +193,7 @@ sealed class WireframeRenderer
         "avatar" => 32,
         "icon" => 18,
         "image" => 96,
-        "figure" => Math.Max(TextWidth(node.Strings[0], 12), TextWidth(node.Strings.ElementAtOrDefault(1) ?? "", 22, bold: true)) + 32,
+        "figure" => node.Strings.Max(text => TextWidth(text, 22, bold: true)) + 32,
         "heading" => TextWidth(node.Text, node.Has("small") ? 16 : 22, bold: true),
         "text" => TextWidth(node.Text, Body),
         "link" => TextWidth(node.Text, Body),
@@ -611,8 +611,19 @@ sealed class WireframeRenderer
         Boxed(x, y, width, 14, (cx, cy, cw) =>
         {
             var top = cy;
-            cy += Text(node.Strings[0], cx, cy, cw, Muted, 12) + 6;
-            cy += Text(node.Strings[1], cx, cy, cw, Ink, 22, bold: true);
+            // One string is the value alone; two are a label and its value.
+            if (node.Strings.Count > 1)
+            {
+                cy += Text(node.Strings[0], cx, cy, cw, Muted, 12) + 6;
+            }
+
+            cy += Text(node.Strings[node.Strings.Count > 1 ? 1 : 0], cx, cy, cw, Ink, 22, bold: true);
+
+            if (node.Strings.Count > 2)
+            {
+                cy += 4 + Text(node.Strings[2], cx, cy + 4, cw, Muted, 12);
+            }
+
             return cy - top;
         });
 
@@ -927,11 +938,23 @@ sealed class WireframeRenderer
         if (node.Part == "toast")
         {
             var (fill, ink) = ToneColours[Tone(node)];
-            var toastWidth = phone ? width - 32 : Math.Min(380, TextWidth(node.Text, Body) + 64);
+            var actionsWidth = node.Children.Sum(child => TextWidth(child.Text, Body, bold: true) + 16);
+            var toastWidth = phone ? width - 32 : Math.Min(520, TextWidth(node.Text, Body) + 64 + actionsWidth);
             var tx = phone ? 16 : width - toastWidth - 24;
             var ty = pageHeight - 24 - 48;
             svg.Append($"<rect x=\"{N(tx)}\" y=\"{N(ty)}\" width=\"{N(toastWidth)}\" height=\"48\" rx=\"10\" fill=\"#1d2939\"/><circle cx=\"{N(tx + 20)}\" cy=\"{N(ty + 24)}\" r=\"5\" fill=\"{fill}\" stroke=\"{ink}\"/>");
-            Text(node.Text, tx + 36, ty + 15, toastWidth - 48, "#ffffff", Body);
+            Text(node.Text, tx + 36, ty + 15, toastWidth - 48 - actionsWidth, "#ffffff", Body);
+
+            // A toast's actions read as light text links at its right end.
+            var cursor = tx + toastWidth - 16;
+            foreach (var action in Enumerable.Reverse(node.Children))
+            {
+                var labelWidth = TextWidth(action.Text, Body, bold: true);
+                cursor -= labelWidth;
+                Text(action.Text, cursor, ty + 15, labelWidth + 2, "#ffffff", Body, bold: true, underline: true);
+                cursor -= 16;
+            }
+
             return pageHeight;
         }
 
@@ -995,9 +1018,17 @@ sealed class WireframeRenderer
             }
         }
 
+        // Actions that close the overlay's content read as its button row, as a footer would.
         var body = node.Children.Where(child => child.Part != "footer").ToList();
+        var trailing = body.AsEnumerable().Reverse().TakeWhile(IsControl).Reverse().ToList();
+        body = body.Take(body.Count - trailing.Count).ToList();
         var footer = node.Children.Where(child => child.Part == "footer").ToList();
         y += Stack(body, x, y, width, Gap);
+
+        if (trailing.Count > 0)
+        {
+            y += (body.Count > 0 ? Gap * 1.5 : 0) + Flow(trailing, x, y + (body.Count > 0 ? Gap * 1.5 : 0), width, alignEnd: true);
+        }
 
         if (footer.Count > 0)
         {
@@ -1011,7 +1042,7 @@ sealed class WireframeRenderer
     static string Tone(WireframeNode node) => node.Modifiers.FirstOrDefault(WireframeParts.Tones.Contains) ?? "neutral";
 
     // One line of text in the box, truncated with an ellipsis when it would overflow.
-    double Text(string value, double x, double y, double width, string colour, double size, bool bold = false, bool underline = false)
+    double Text(string value, double x, double y, double width, string color, double size, bool bold = false, bool underline = false)
     {
         var shown = Fit(value, width, size, bold);
 
@@ -1022,19 +1053,19 @@ sealed class WireframeRenderer
 
         var weight = bold ? " font-weight=\"600\"" : "";
         var decoration = underline ? " text-decoration=\"underline\"" : "";
-        svg.Append(CultureInfo.InvariantCulture, $"<text x=\"{N(x)}\" y=\"{N(y + size)}\" font-size=\"{N(size)}\" fill=\"{colour}\"{weight}{decoration}{Opacity()}>{WebUtility.HtmlEncode(shown)}</text>");
+        svg.Append(CultureInfo.InvariantCulture, $"<text x=\"{N(x)}\" y=\"{N(y + size)}\" font-size=\"{N(size)}\" fill=\"{color}\"{weight}{decoration}{Opacity()}>{WebUtility.HtmlEncode(shown)}</text>");
         return size * 1.4;
     }
 
     // Word-wrapped text, at most four lines, the last truncated.
-    double Paragraph(string value, double x, double y, double width, string colour, double size)
+    double Paragraph(string value, double x, double y, double width, string color, double size)
     {
         var lines = Wrap(value, width, size);
         var lineHeight = size * 1.45;
 
         for (var index = 0; index < lines.Count; index++)
         {
-            Text(lines[index], x, y + index * lineHeight, width, colour, size);
+            Text(lines[index], x, y + index * lineHeight, width, color, size);
         }
 
         return Math.Max(1, lines.Count) * lineHeight - (lineHeight - size * 1.4);

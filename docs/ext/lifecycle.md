@@ -18,15 +18,6 @@ This extension replaces no baseline rule.
 
 This extension switches on the Limit record type.
 
-## Agent Summary {#agent-summary}
-
-- Record lifecycle ownership and outcomes. (litespec/ext/lifecycle#record-lifecycle-scope)
-- Default to hard delete without retention needs. (litespec/ext/lifecycle#default-to-hard-delete)
-- Model alternate lifecycle states explicitly. (litespec/ext/lifecycle#model-retained-lifecycle-states)
-- Keep lifecycle operations inside Domain behavior. (litespec/ext/lifecycle#model-lifecycle-operations-in-domain, litespec/ext/lifecycle#authorize-and-audit-lifecycle-changes)
-- Separate normal and privileged lifecycle reads. (litespec/ext/lifecycle#exclude-inactive-records-from-normal-reads, litespec/ext/lifecycle#authorize-lifecycle-access-paths)
-- Make purge work bounded and legal-hold safe. (litespec/ext/lifecycle#bound-purge-and-archive-work, litespec/ext/lifecycle#preserve-legal-hold-data)
-
 ## Standards
 
 ### Record lifecycle scope

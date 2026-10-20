@@ -26,7 +26,7 @@
       ],
       "refusal": "result/borrow-copy.copy-unavailable",
       "basedOn": [],
-      "fulfils": [
+      "fulfills": [
         "requirement/borrowing.max-active-loans"
       ]
     },
@@ -43,7 +43,7 @@
         "use-case/lending.borrow-copy"
       ],
       "basedOn": [],
-      "fulfils": [
+      "fulfills": [
         "requirement/borrowing.loan-period-days"
       ]
     },

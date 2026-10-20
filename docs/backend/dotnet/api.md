@@ -4,12 +4,6 @@
 
 The dotnet backend maps each HTTP operation through one endpoint class and generates its OpenAPI contract at build time. The shared provisions live on the stack-neutral page ([HTTP API](../api.md)); this page holds what the dotnet stack alone requires.
 
-## Agent Summary {#agent-summary}
-
-- One endpoint class per operation dispatches through its mediator, with no MVC controllers. (litespec/backend/dotnet/api#use-one-endpoint-per-operation, litespec/backend/dotnet/api#exclude-mvc-controllers-from-the-profile)
-- Operations declare metadata and data-bearing sets map to sealed records with discriminators. (litespec/backend/dotnet/api#declare-operation-metadata-in-the-contract, litespec/backend/dotnet/api#mark-polymorphic-transport-models-with-discriminators)
-- `Program.cs` holds composition. (litespec/backend/dotnet/api#keep-programcs-as-composition)
-
 ## Standards
 
 ### Use one endpoint per operation
@@ -29,7 +23,7 @@ internal interface IEndpoint
 
 At startup, WebApi discovers non-abstract `IEndpoint` implementations in its assembly. It registers each implementation once as an `IEndpoint` singleton. It calls `MapEndpoint` in deterministic type-name order. The discovery code uses framework reflection and dependency injection. It does not require another scanning package.
 
-### Exclude MVC controllers from the profile
+### Exclude MVC controllers from the stack
 
 **Requirement:** A WebApi project MUST NOT route requests through MVC controllers or `ControllerBase`.
 
@@ -72,7 +66,7 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/backend/dotnet/api#use-one-endpoint-per-operation | guidance | Does each mapped route resolve to one `IEndpoint` type and one mediator dispatch? |
-| litespec/backend/dotnet/api#exclude-mvc-controllers-from-the-profile | guidance | Does any type derive from ControllerBase? |
+| litespec/backend/dotnet/api#exclude-mvc-controllers-from-the-stack | guidance | Does any type derive from ControllerBase? |
 | litespec/backend/dotnet/api#declare-operation-metadata-in-the-contract | guidance | Does each operation declare its operationId, metadata, typed results, and summary? |
 | litespec/backend/dotnet/api#mark-polymorphic-transport-models-with-discriminators | guidance | Does each data-bearing set map to sealed records published as oneOf with a string discriminator? |
 | litespec/backend/dotnet/api#keep-programcs-as-composition | guidance | Does `Program.cs` hold only composition in the recorded order? |

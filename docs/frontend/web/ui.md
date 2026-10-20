@@ -4,14 +4,6 @@
 
 This page holds how the TypeScript web stacks realize the frontend UI rules ([Frontend UI](../ui.md)). It states the toolchain, registry, tokens, and suites one web frontend requires. A provision here cites the neutral rule it realizes.
 
-## Agent Summary {#agent-summary}
-
-- The shared package pins the baseline, publishes registry items, and tracks source with the update procedure. (litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package, litespec/frontend/web/ui#publish-one-registry-item-per-floorplan, litespec/frontend/web/ui#track-source-changes, litespec/frontend/web/ui#use-the-source-update-procedure)
-- Routes compose one floorplan from registry references and keep layout inside them. (litespec/frontend/web/ui#compose-each-route-from-one-floorplan, litespec/frontend/web/ui#derive-each-page-type-from-a-named-reference, litespec/frontend/web/ui#keep-layout-inside-floorplans)
-- Tones map in one table, tokens live in one stylesheet, and colours hold the ramp. (litespec/frontend/web/ui#select-a-tone-from-the-closed-set, litespec/frontend/web/ui#keep-tokens-in-one-stylesheet, litespec/frontend/web/ui#hold-the-declared-base-colour)
-- Every route passes the browser suite and each change names its matrix evidence. (litespec/frontend/web/ui#check-every-route-in-a-browser, litespec/frontend/web/ui#prove-every-result-a-route-calls, litespec/frontend/web/ui#prove-ui-behavior-and-appearance)
-- Tailwind classes use semantic tokens without arbitrary values or important modifiers. (litespec/frontend/web/ui#restrict-css-decisions)
-
 ## Concepts
 
 ### The web baseline
@@ -104,19 +96,19 @@ Svelte:
 
 **Requirement:** A state indicator MUST take one tone from the closed set, each application declaring its state-to-tone mapping once as an exhaustive table of language terms.
 
-**Rationale:** A page that picks a colour picks a meaning nobody agreed to. One mapping means the same state reads the same way on every screen. A new state then fails to compile until its tone and its word exist. The table lives in `src/app/states.tsx` on React and `src/lib/app/states.ts` on Svelte. This realizes litespec/frontend/ui#select-a-tone-from-the-closed-set.
+**Rationale:** A page that picks a color picks a meaning nobody agreed to. One mapping means the same state reads the same way on every screen. A new state then fails to compile until its tone and its word exist. The table lives in `src/app/states.tsx` on React and `src/lib/app/states.ts` on Svelte. This realizes litespec/frontend/ui#select-a-tone-from-the-closed-set.
 
 ### Keep tokens in one stylesheet
 
-**Requirement:** An application stylesheet MUST import the shared package's token stylesheet and declare no rule, with no literal colour in any stylesheet the shared package ships.
+**Requirement:** An application stylesheet MUST import the shared package's token stylesheet and declare no rule, with no literal color in any stylesheet the shared package ships.
 
-**Rationale:** One token sheet is what makes two applications look like one product. An application stylesheet imports it and declares no rule, so a second sheet never introduces a value the first has no opinion about. A stylesheet the shared package ships beside the token sheet declares no literal colour. This realizes litespec/frontend/ui#keep-tokens-in-one-definition.
+**Rationale:** One token sheet is what makes two applications look like one product. An application stylesheet imports it and declares no rule, so a second sheet never introduces a value the first has no opinion about. A stylesheet the shared package ships beside the token sheet declares no literal color. This realizes litespec/frontend/ui#keep-tokens-in-one-definition.
 
-### Hold the declared base colour
+### Hold the declared base color
 
 **Requirement:** A token stylesheet MUST carry the values the manifest baseline `baseColor` ramp publishes, and no value outside them except under a recorded exception.
 
-**Rationale:** A token value outside the published ramp is a second palette beside the declared one, and the next author copies it. A recorded exception keeps the deliberate departure visible in the design contract. The React baseline is the manifest `uiBaseline` entry and the Svelte baseline is the `uiBaselineSvelte` entry. This realizes litespec/frontend/ui#hold-the-declared-base-colour.
+**Rationale:** A token value outside the published ramp is a second palette beside the declared one, and the next author copies it. A recorded exception keeps the deliberate departure visible in the design contract. The React baseline is the manifest `uiBaseline` entry and the Svelte baseline is the `uiBaselineSvelte` entry. This realizes litespec/frontend/ui#hold-the-declared-base-color.
 
 ### Check every route in a browser
 
@@ -186,8 +178,8 @@ test('shows the changed total before payment', async ({ page }) => {
 | litespec/frontend/web/ui#keep-layout-inside-floorplans | guidance | Does any route file carry a layout utility outside its floorplan and display composites? |
 | litespec/frontend/web/ui#derive-each-page-type-from-a-named-reference | checkable | `tests/routes/every-route.spec.ts` asserts `data-registry-item` resolves to a published registry item on every non-freestyle route. |
 | litespec/frontend/web/ui#select-a-tone-from-the-closed-set | checkable | `pnpm type-check` fails on a state with no tone; review confirms each tone is a term. |
-| litespec/frontend/web/ui#keep-tokens-in-one-stylesheet | checkable | `litespec ui` reports an application stylesheet declaring a rule and a shared stylesheet declaring a literal colour. |
-| litespec/frontend/web/ui#hold-the-declared-base-colour | guidance | Does the token stylesheet carry only values from the declared base colour ramp, with each departure recorded? |
+| litespec/frontend/web/ui#keep-tokens-in-one-stylesheet | checkable | `litespec ui` reports an application stylesheet declaring a rule and a shared stylesheet declaring a literal color. |
+| litespec/frontend/web/ui#hold-the-declared-base-color | guidance | Does the token stylesheet carry only values from the declared base color ramp, with each departure recorded? |
 | litespec/frontend/web/ui#check-every-route-in-a-browser | checkable | `tests/routes/every-route.spec.ts` runs axe and the Concepts checks on each discovered route. |
 | litespec/frontend/web/ui#prove-every-result-a-route-calls | guidance | Is every result the route calls proved by a passing test or named by a known-gap record? |
 | litespec/frontend/web/ui#restrict-css-decisions | checkable | `litespec ui` rejects an arbitrary value, a raw palette value, or an important modifier. |

@@ -4,10 +4,6 @@
 
 Components in a Svelte frontend hold state in runes with typed boundaries. The shared provisions live on the stack-neutral page ([Frontend components](../../components.md)); this page holds what Svelte alone requires.
 
-## Agent Summary {#agent-summary}
-
-- Components hold state in runes with typed props. (litespec/frontend/web/svelte/components#write-components-in-runes-mode, litespec/frontend/web/svelte/components#keep-component-boundaries-typed)
-
 ## Standards
 
 ### Write components in runes mode

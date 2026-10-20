@@ -13,7 +13,7 @@
   "reachedThrough": ["entry-point/<name>"],
   "raises": ["event/<record>.<past-tense>"],
   "reactsTo": ["<event id, or remove this line>"],
-  "fulfils": ["requirement/<topic>.<name>"],
+  "fulfills": ["requirement/<topic>.<name>"],
   "input": [
     {
       "name": "<field>",

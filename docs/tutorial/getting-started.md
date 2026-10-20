@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This tutorial starts a consumer repository in the small profile. At the end the repository holds its configuration, its first records, one implemented use case, and a passing model check. Where a step differs by stack, run the row that matches the stacks in `litespec.project.json`.
+This tutorial starts a consumer repository at small size. At the end the repository holds its configuration, its first records, one implemented use case, and a passing model check. Where a step differs by stack, run the row that matches the stacks in `litespec.project.json`.
 
 This guide carries no provision. Each step cites the provisions it satisfies.
 
@@ -16,11 +16,11 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 ## Lesson
 
 1. Pin the LiteSpec release. Add the LiteSpec repository as a submodule or another pinned dependency. This satisfies `litespec/workspace/structure#use-the-canonical-root-tree`.
-2. Copy the project configuration. Copy `litespec.project.json` and `project-agents.md` from the [template index](../../templates/consumer/README.md). Fill every placeholder and name every owner. Set `size` to `small`, list `dotnet` plus one platform per frontend under `stacks`, and set `reviewedLiteSpecVersion` to the pinned release. This satisfies `litespec/core/scope#select-a-size-profile-and-stacks`.
+2. Copy the project configuration. Copy `litespec.project.json` and `project-agents.md` from the [template index](../../templates/consumer/README.md). Fill every placeholder and name every owner. Set `size` to `small`, list `dotnet` plus one platform per frontend under `stacks`, and set `reviewedLiteSpecVersion` to the pinned release. This satisfies `litespec/core/scope#select-a-size-a-shape-and-stacks`.
 3. Select extensions only when their criteria already hold. Write each selection in the object form with its criterion and review date. This satisfies `litespec/core/scope#select-conditional-extensions-explicitly` and `litespec/core/scope#record-selected-extensions`.
 4. Create the toolchain configuration from the manifest pins. Add the SDK floor, the shared build settings, the central NuGet versions, the tool manifest, and the JavaScript toolchain pin. This satisfies `litespec/backend/dotnet/config#set-the-sdk-floor-at-the-workspace-root`, `litespec/backend/dotnet/config#centralize-net-build-settings`, `litespec/backend/dotnet/config#centralize-nuget-versions`, `litespec/backend/dotnet/config#commit-the-tool-manifest`, and `litespec/workspace/config#pin-the-javascript-toolchain`.
 5. Add only the packages the manifest already pins. Record each new package approval explicitly. This satisfies `litespec/backend/dotnet/packages#pin-every-dependency-centrally` and `litespec/workspace/dependencies#approve-new-packages-explicitly`.
-6. Create the API solution. Add the five application projects, the AppHost, the ServiceDefaults, and the Architecture and Integration test projects. Add the Acceptance project when the product needs executable specifications. This satisfies `litespec/backend/dotnet/architecture#use-five-application-projects` and `litespec/backend/dotnet/testing#keep-the-test-projects-the-size-profile-requires`.
+6. Create the API solution. Add the five application projects, the AppHost, the ServiceDefaults, and the Architecture and Integration test projects. Add the Acceptance project when the product needs executable specifications. This satisfies `litespec/backend/dotnet/architecture#use-five-application-projects` and `litespec/backend/dotnet/testing#keep-the-test-projects-the-size-requires`.
 7. Apply the file, type, and folder names. Match each C# file to its primary type and each namespace to its folder. This satisfies `litespec/backend/dotnet/naming#match-c-files-and-primary-types` and `litespec/workspace/naming#keep-namespaces-aligned-with-folders`.
 8. Write the product brief. Copy `product-brief.md` from the template index to `docs/product/brief.md`. State the boundary, the refusals, and the audience. This satisfies `litespec/core/product#keep-business-intent-under-product`.
 9. Write one topic page with its requirements. Copy `product-topic.md` from the template index. State each commitment as one requirement with its kind. This satisfies `litespec/core/product#state-each-topic-in-one-page-shape` and `litespec/core/product#identify-every-requirement`.
@@ -46,6 +46,6 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 
 ## What you built
 
-- A consumer repository in the small profile that the model check accepts.
+- A consumer repository at small size that the model check accepts.
 - One implemented use case with records, code, tests, and generated contracts.
 - The command pages for the checks are [consumer](../tools/consumer.md) and [ui](../tools/ui.md). See the [command index](../tools/README.md).

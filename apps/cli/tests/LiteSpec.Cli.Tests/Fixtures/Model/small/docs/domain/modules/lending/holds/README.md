@@ -9,7 +9,7 @@
   "states": [
     "Waiting",
     "Ready",
-    "Cancelled"
+    "Canceled"
   ],
   "records": [
     {
@@ -26,7 +26,7 @@
       ],
       "refusal": "result/place-hold.hold-already-waiting",
       "basedOn": [],
-      "fulfils": [
+      "fulfills": [
         "requirement/borrowing.hold-pickup-window"
       ]
     },
@@ -45,11 +45,11 @@
     },
     {
       "type": "event",
-      "id": "event/hold.hold-cancelled",
-      "title": "Hold cancelled",
+      "id": "event/hold.hold-canceled",
+      "title": "Hold canceled",
       "owner": "lending-team",
       "status": "approved",
-      "meaning": "A hold was cancelled.",
+      "meaning": "A hold was canceled.",
       "carries": [
         "holdId"
       ]

@@ -4,15 +4,6 @@
 
 A .NET backend realizes package boundaries with project references and NuGet central management. The shared provisions live on the stack-neutral page ([Dependencies](../../workspace/dependencies.md)); this page holds what .NET alone requires.
 
-## Agent Summary {#agent-summary}
-
-- Project references match the declared graph. (litespec/backend/dotnet/packages#use-the-project-reference-graph)
-- Domain carries no package beyond the base class library. (litespec/backend/dotnet/packages#keep-domain-package-free)
-- Application references only permitted abstractions and the read boundary. (litespec/backend/dotnet/packages#keep-application-dependencies-narrow)
-- NuGet and npm versions resolve through central management or the lockfile. (litespec/backend/dotnet/packages#pin-every-dependency-centrally)
-- Each project references only the LiteBus modules its code uses. (litespec/backend/dotnet/packages#reference-only-the-litebus-module-required)
-- Each baseline package sits in the project the ownership table assigns. (litespec/backend/dotnet/packages#use-this-baseline-package-ownership)
-
 ## Standards
 
 ### Use the project reference graph
@@ -92,7 +83,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 | Application.Tests | xUnit v3, assertions, and NSubstitute |
 | Integration.Tests | xUnit v3, assertions, test host, Testcontainers PostgreSQL, and the Microsoft.Testing.Platform report and coverage extensions |
 | Architecture.Tests | xUnit v3, assertions, and NetArchTest |
-| Acceptance.Tests | xUnit v3, assertions, the behaviour runner its extension selects, test host, and the report and coverage extensions |
+| Acceptance.Tests | xUnit v3, assertions, the behavior runner its extension selects, test host, and the report and coverage extensions |
 
 Test projects reference xUnit v3 and run on Microsoft.Testing.Platform. The consumer `global.json` sets `"test": { "runner": "Microsoft.Testing.Platform" }`, because the .NET 10 `dotnet test` command refuses the VSTest mode for these projects.
 

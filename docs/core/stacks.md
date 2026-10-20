@@ -4,12 +4,6 @@
 
 A stack is one technology's binding of the specification, held in one folder: a backend stack under `backend/`, a frontend stack under `frontend/`. Selecting a stack applies its folder and every folder above it, so a stack never restates an inherited principle ([Supported scope](scope.md)). Each stack folder holds a `stack.md` that states what the stack adds: its rules, its pins, and its checks. These rules govern every stack selection.
 
-## Agent Summary {#agent-summary}
-
-- Selecting a stack applies its folder and every folder above it. (litespec/core/stacks#apply-the-complete-stack)
-- Versions resolve from the manifest. (litespec/core/stacks#use-manifest-version-pins)
-- A replacement names every provision ID it replaces. (litespec/core/stacks#declare-replacements)
-
 ## Standards
 
 ### Apply the complete stack

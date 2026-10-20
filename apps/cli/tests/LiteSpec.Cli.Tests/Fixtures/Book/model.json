@@ -101,7 +101,7 @@
               "use-case/lending.register-copy"
             ],
             "basedOn": [],
-            "fulfils": [
+            "fulfills": [
               "requirement/borrowing.copy-shelf-home"
             ]
           },
@@ -153,7 +153,7 @@
         "states": [
           "Waiting",
           "Ready",
-          "Cancelled"
+          "Canceled"
         ],
         "records": [
           {
@@ -170,7 +170,7 @@
             ],
             "refusal": "result/place-hold.hold-already-waiting",
             "basedOn": [],
-            "fulfils": [
+            "fulfills": [
               "requirement/borrowing.hold-pickup-window"
             ]
           },
@@ -189,11 +189,11 @@
           },
           {
             "type": "event",
-            "id": "event/hold.hold-cancelled",
-            "title": "Hold cancelled",
+            "id": "event/hold.hold-canceled",
+            "title": "Hold canceled",
             "owner": "lending-team",
             "status": "approved",
-            "meaning": "A hold was cancelled.",
+            "meaning": "A hold was canceled.",
             "carries": [
               "holdId"
             ]
@@ -240,7 +240,7 @@
             ],
             "refusal": "result/borrow-copy.copy-unavailable",
             "basedOn": [],
-            "fulfils": [
+            "fulfills": [
               "requirement/borrowing.max-active-loans"
             ]
           },
@@ -257,7 +257,7 @@
               "use-case/lending.borrow-copy"
             ],
             "basedOn": [],
-            "fulfils": [
+            "fulfills": [
               "requirement/borrowing.loan-period-days"
             ]
           },
@@ -333,8 +333,8 @@
     },
     {
       "type": "case",
-      "id": "case/cancel-hold.cancelling-a-waiting-hold-succeeds",
-      "title": "Cancelling a waiting hold succeeds",
+      "id": "case/cancel-hold.canceling-a-waiting-hold-succeeds",
+      "title": "Canceling a waiting hold succeeds",
       "owner": "lending-team",
       "status": "approved",
       "effectiveStatus": "approved",
@@ -344,18 +344,18 @@
       "line": 28,
       "fields": {
         "type": "case",
-        "id": "case/cancel-hold.cancelling-a-waiting-hold-succeeds",
-        "title": "Cancelling a waiting hold succeeds",
+        "id": "case/cancel-hold.canceling-a-waiting-hold-succeeds",
+        "title": "Canceling a waiting hold succeeds",
         "owner": "lending-team",
         "status": "approved",
         "situation": "A reader holds a waiting hold.",
         "action": "The reader cancels the hold.",
-        "result": "result/cancel-hold.cancelled",
-        "expect": "The hold is cancelled."
+        "result": "result/cancel-hold.canceled",
+        "expect": "The hold is canceled."
       },
       "links": {
         "result": [
-          "result/cancel-hold.cancelled"
+          "result/cancel-hold.canceled"
         ]
       }
     },
@@ -678,8 +678,8 @@
     },
     {
       "type": "event",
-      "id": "event/hold.hold-cancelled",
-      "title": "Hold cancelled",
+      "id": "event/hold.hold-canceled",
+      "title": "Hold canceled",
       "owner": "lending-team",
       "status": "approved",
       "effectiveStatus": null,
@@ -689,11 +689,11 @@
       "line": 48,
       "fields": {
         "type": "event",
-        "id": "event/hold.hold-cancelled",
-        "title": "Hold cancelled",
+        "id": "event/hold.hold-canceled",
+        "title": "Hold canceled",
         "owner": "lending-team",
         "status": "approved",
-        "meaning": "A hold was cancelled.",
+        "meaning": "A hold was canceled.",
         "carries": [
           "holdId"
         ]
@@ -920,7 +920,7 @@
             "requires": []
           }
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.max-active-loans"
         ]
       },
@@ -935,7 +935,7 @@
           "use-case/lending.cancel-hold",
           "use-case/lending.retire-copy"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.max-active-loans"
         ]
       }
@@ -1184,7 +1184,7 @@
         "title": "Copy shelf home",
         "owner": "lending-team",
         "status": "approved",
-        "kind": "behaviour",
+        "kind": "behavior",
         "statement": "A copy lives on one home shelf.",
         "basedOn": []
       },
@@ -1207,7 +1207,7 @@
         "title": "Hold pickup window",
         "owner": "lending-team",
         "status": "approved",
-        "kind": "behaviour",
+        "kind": "behavior",
         "statement": "A ready hold waits seven days.",
         "basedOn": []
       },
@@ -1230,7 +1230,7 @@
         "title": "Loan period days",
         "owner": "lending-team",
         "status": "approved",
-        "kind": "behaviour",
+        "kind": "behavior",
         "statement": "A loan lasts 21 days.",
         "basedOn": []
       },
@@ -1253,7 +1253,7 @@
         "title": "Max active loans",
         "owner": "lending-team",
         "status": "approved",
-        "kind": "behaviour",
+        "kind": "behavior",
         "statement": "A reader holds at most five active loans.",
         "basedOn": []
       },
@@ -1333,8 +1333,8 @@
     },
     {
       "type": "result",
-      "id": "result/cancel-hold.cancelled",
-      "title": "Cancelled",
+      "id": "result/cancel-hold.canceled",
+      "title": "Canceled",
       "owner": "lending-team",
       "status": "approved",
       "effectiveStatus": "approved",
@@ -1344,12 +1344,12 @@
       "line": 24,
       "fields": {
         "type": "result",
-        "id": "result/cancel-hold.cancelled",
-        "title": "Cancelled",
+        "id": "result/cancel-hold.canceled",
+        "title": "Canceled",
         "owner": "lending-team",
         "outcome": "success",
         "httpStatus": 200,
-        "meaning": "The hold is cancelled."
+        "meaning": "The hold is canceled."
       },
       "links": {}
     },
@@ -1713,7 +1713,7 @@
           "use-case/lending.register-copy"
         ],
         "basedOn": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.copy-shelf-home"
         ]
       },
@@ -1721,7 +1721,7 @@
         "governs": [
           "use-case/lending.register-copy"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.copy-shelf-home"
         ]
       }
@@ -1751,7 +1751,7 @@
         ],
         "refusal": "result/place-hold.hold-already-waiting",
         "basedOn": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.hold-pickup-window"
         ]
       },
@@ -1762,7 +1762,7 @@
         "refusal": [
           "result/place-hold.hold-already-waiting"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.hold-pickup-window"
         ]
       }
@@ -1791,7 +1791,7 @@
           "use-case/lending.borrow-copy"
         ],
         "basedOn": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.loan-period-days"
         ]
       },
@@ -1799,7 +1799,7 @@
         "governs": [
           "use-case/lending.borrow-copy"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.loan-period-days"
         ]
       }
@@ -1829,7 +1829,7 @@
         ],
         "refusal": "result/borrow-copy.copy-unavailable",
         "basedOn": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.max-active-loans"
         ]
       },
@@ -1840,7 +1840,7 @@
         "refusal": [
           "result/borrow-copy.copy-unavailable"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.max-active-loans"
         ]
       }
@@ -2021,7 +2021,7 @@
           "event/loan.loan-borrowed"
         ],
         "reactsTo": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.max-active-loans"
         ],
         "results": [
@@ -2074,7 +2074,7 @@
         "raises": [
           "event/loan.loan-borrowed"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.max-active-loans"
         ]
       }
@@ -2106,28 +2106,28 @@
           "entry-point/library-app"
         ],
         "raises": [
-          "event/hold.hold-cancelled"
+          "event/hold.hold-canceled"
         ],
         "reactsTo": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.hold-pickup-window"
         ],
         "results": [
-          "result/cancel-hold.cancelled",
+          "result/cancel-hold.canceled",
           "result/cancel-hold.hold-ended"
         ],
         "cases": [
-          "case/cancel-hold.cancelling-a-waiting-hold-succeeds"
+          "case/cancel-hold.canceling-a-waiting-hold-succeeds"
         ],
         "records": [
           {
             "type": "result",
-            "id": "result/cancel-hold.cancelled",
-            "title": "Cancelled",
+            "id": "result/cancel-hold.canceled",
+            "title": "Canceled",
             "owner": "lending-team",
             "outcome": "success",
             "httpStatus": 200,
-            "meaning": "The hold is cancelled."
+            "meaning": "The hold is canceled."
           },
           {
             "type": "result",
@@ -2141,14 +2141,14 @@
           },
           {
             "type": "case",
-            "id": "case/cancel-hold.cancelling-a-waiting-hold-succeeds",
-            "title": "Cancelling a waiting hold succeeds",
+            "id": "case/cancel-hold.canceling-a-waiting-hold-succeeds",
+            "title": "Canceling a waiting hold succeeds",
             "owner": "lending-team",
             "status": "approved",
             "situation": "A reader holds a waiting hold.",
             "action": "The reader cancels the hold.",
-            "result": "result/cancel-hold.cancelled",
-            "expect": "The hold is cancelled."
+            "result": "result/cancel-hold.canceled",
+            "expect": "The hold is canceled."
           }
         ]
       },
@@ -2160,9 +2160,9 @@
           "entry-point/library-app"
         ],
         "raises": [
-          "event/hold.hold-cancelled"
+          "event/hold.hold-canceled"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.hold-pickup-window"
         ]
       }
@@ -2197,7 +2197,7 @@
           "event/loan.loan-extended"
         ],
         "reactsTo": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.loan-period-days"
         ],
         "results": [
@@ -2250,7 +2250,7 @@
         "raises": [
           "event/loan.loan-extended"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.loan-period-days"
         ]
       }
@@ -2283,7 +2283,7 @@
         ],
         "raises": [],
         "reactsTo": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.max-active-loans"
         ],
         "results": [
@@ -2322,7 +2322,7 @@
         "reachedThrough": [
           "entry-point/library-app"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.max-active-loans"
         ]
       }
@@ -2357,7 +2357,7 @@
           "event/hold.hold-placed"
         ],
         "reactsTo": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.hold-pickup-window"
         ],
         "results": [
@@ -2410,7 +2410,7 @@
         "raises": [
           "event/hold.hold-placed"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.hold-pickup-window"
         ]
       }
@@ -2445,7 +2445,7 @@
           "event/copy.copy-registered"
         ],
         "reactsTo": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.copy-shelf-home"
         ],
         "results": [
@@ -2498,7 +2498,7 @@
         "raises": [
           "event/copy.copy-registered"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.copy-shelf-home"
         ]
       }
@@ -2533,7 +2533,7 @@
           "event/copy.copy-retired"
         ],
         "reactsTo": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.copy-shelf-home"
         ],
         "results": [
@@ -2586,7 +2586,7 @@
         "raises": [
           "event/copy.copy-retired"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.copy-shelf-home"
         ]
       }
@@ -2621,7 +2621,7 @@
           "event/loan.loan-returned"
         ],
         "reactsTo": [],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.loan-period-days"
         ],
         "results": [
@@ -2674,7 +2674,7 @@
         "raises": [
           "event/loan.loan-returned"
         ],
-        "fulfils": [
+        "fulfills": [
           "requirement/borrowing.loan-period-days"
         ]
       }
@@ -2772,7 +2772,7 @@
       {
         "class": "HoldCancelledEvent",
         "path": "apps/api/src/Library.Domain/Lending/Holds/Events/HoldCancelledEvent.cs",
-        "event": "event/hold.hold-cancelled"
+        "event": "event/hold.hold-canceled"
       },
       {
         "class": "HoldPlacedEvent",
@@ -2868,7 +2868,7 @@
       "file": "apps/api/tests/Library.Acceptance.Tests/Lending/Holds/CancelHold/CancelHoldScenarios.cs",
       "line": 6,
       "claims": [
-        "case/cancel-hold.cancelling-a-waiting-hold-succeeds"
+        "case/cancel-hold.canceling-a-waiting-hold-succeeds"
       ],
       "steps": [
         {
@@ -3076,7 +3076,7 @@
       },
       {
         "path": "apps/api/src/Library.Domain/Lending/Holds/Events/HoldCancelledEvent.cs",
-        "to": "event/hold.hold-cancelled",
+        "to": "event/hold.hold-canceled",
         "kind": "event"
       },
       {
@@ -3183,7 +3183,7 @@
       },
       {
         "scenario": "Cancelling_a_waiting_hold_succeeds",
-        "case": "case/cancel-hold.cancelling-a-waiting-hold-succeeds",
+        "case": "case/cancel-hold.canceling-a-waiting-hold-succeeds",
         "confirmed": true,
         "passing": null,
         "indirect": false

@@ -1,117 +1,64 @@
-# LiteSpec v2.0.0 release preparation: decisions and progress
+# LiteSpec 2.0.0 decisions
 
-This file records the choices made while preparing v2.0.0 on `release/v2.0.0`, so the owner can review them. Each decision states what was chosen, the alternatives, and why. Reverse any of them by telling the agent which one.
+This page records the choices behind the 2.0.0 contract, for the owner's review. Each one states what was chosen and why. [structure.md](structure.md) states the resulting layout. Reverse a decision by telling the agent which one.
 
 ## Decisions
 
-### D1. The product name is LiteSpec everywhere it names the product
+### D1. The product is LiteSpec
 
-- "Agentic Engineering System", "Litenova Engineering Standards" and "Engineering Standards" become "LiteSpec". Litenova Solutions stays as the company that authors it.
-- Provision IDs change prefix: `standards/rule/...` becomes `litespec/rule/...`. This is a v2.0.0 complete contract, so no alias is kept (`litespec/core/authoring#exclude-cross-release-compatibility-work`).
-- Files: `standards.manifest.json` becomes `litespec.manifest.json`, `standards.project.json` becomes `litespec.project.json`, and the two schemas become `schemas/litespec-manifest.schema.json` and `schemas/litespec-project.schema.json`.
-- The consumer submodule path is `litespec/`, not `standards/`.
-- The project field `reviewedStandardsVersion` becomes `reviewedLiteSpecVersion`. Considered `reviewedVersion`; rejected because a consumer project file holds other versions, and the explicit name is greppable.
-- Two headings changed with the rename, so their IDs changed with them: `core-authoring.record-the-reviewed-litespec-release` and `core-maintaining.publish-a-litespec-release-from-a-tag`. Glossary terms `term/litespec` and `term/litespec-release` replace `term/agentic-engineering-system` and `term/standards-release`.
-- The common noun "standard" stays where it names the content kind: a page's `## Standards` section, a "standards page", a "standards provision". Renaming those would change the page contract for no reader benefit.
-- `docs/core/system.md` "In this name" now explains `Lite` and `Spec` instead of `Agentic`, `Engineering` and `System`. **Review this wording**; it is new prose.
-- `changelog/v1.md` keeps the old names, because it records what was true in v1.
-- The GitHub repository is renamed to `Litenova-Solutions/LiteSpec` (done by the owner on 2026-10-20), and the local remote points there. The hosted documentation URL `https://www.litenova.solutions/Standards` is unchanged because the site is outside this repository.
+LiteSpec names the product everywhere. Litenova Solutions is the company that authors it. The release files are `litespec.manifest.json` and a consumer's `litespec.project.json`, a consumer pins the repository at `litespec/`, and records the release it reviewed in `reviewedLiteSpecVersion`. The repository is `Litenova-Solutions/LiteSpec`.
 
-### D2. One .NET CLI, `litespec`, replaces the Node validators and the book script
+### D2. One .NET command line, `litespec`
 
-- `src/LiteSpec.Cli/` (assembly and tool command `litespec`) holds every command: `validate`, `provisions`, `consumer`, `ui`, `model`, `book`. The model builder moved in from `tools/model/Litenova.Model/` as `litespec model`.
-- `tests/LiteSpec.Cli.Tests/` (xUnit v3) replaces the four `*.cases.mjs` suites, and holds the model and book fixtures that lived under `tools/`.
-- `LiteSpec.slnx` at the root builds both.
-- One option style: `--root <path>` and `--format json` on every command (the Node scripts took a positional root and `--format=json`; `--format=json` still parses).
-- The consumer validator calls the UI validator in-process instead of spawning a child process, so the 120-second child timeout and the "could not start" message no longer apply.
-- How it runs: `dotnet run --project src/LiteSpec.Cli -- <command>` in this repository, `dotnet run --project litespec/src/LiteSpec.Cli -- <command>` in a consumer. The project is also packable as a .NET tool (`PackAsTool`), so a NuGet feed can ship it later without code changes.
-- New packages (test only): `xunit.v3` 4.0.2, `xunit.runner.visualstudio` 4.0.1, `Microsoft.NET.Test.Sdk` 18.11.0, pinned in `Directory.Packages.props`. No runtime package was added; the JSON Schema subset validator is ported rather than replaced by a library, so behaviour and messages stay identical.
+One .NET 10 tool holds every command: `validate`, `provisions`, `init`, `consumer`, `ui`, `model`, `book` and `patterns`. Every reporting command takes `--root` and `--format json`, and every command writes UTF-8 with `\n` line ends. The consumer validator runs the UI checks in process. The tool is packable with `PackAsTool`, so a NuGet feed can ship it later. The JSON Schema evaluator is LiteSpec's own, so no runtime package was added.
 
-### D3. The UI pattern library keeps its Node tooling
+### D3. Tests run on Microsoft.Testing.Platform
 
-`patterns/ui/` holds 26,000 lines of JavaScript modules that draw HTML mocks for a browser viewer, with Playwright screenshots. Porting that to .NET would mean rewriting the library's content, not its tooling. It stays Node, and `node patterns/ui/library.mjs --check` remains a repository check. CI now runs that check (it did not before).
+`global.json` selects the Microsoft.Testing.Platform runner and pins no SDK, so a consumer's own `global.json` governs. The command is `dotnet test --solution LiteSpec.slnx`. `xunit.v3` is the only test package.
 
-### D4. Tests run on Microsoft.Testing.Platform, with a root global.json that sets only the runner
+### D4. The release branch carries 2.0.0
 
-The .NET 10 `dotnet test` command refuses VSTest mode for xUnit v3 projects, so `global.json` sets `"test": { "runner": "Microsoft.Testing.Platform" }`. It sets no `sdk` section, because commit `ce130df` dropped the SDK pin on purpose so a consumer's own `global.json` governs. The command is `dotnet test --solution LiteSpec.slnx`. The VSTest packages (`Microsoft.NET.Test.Sdk`, `xunit.runner.visualstudio`) were dropped; `xunit.v3` 4.0.2 is the only test package.
+The manifest, the changelog and the consumer template carry 2.0.0. The `v2.0.0` tag makes it the current release.
 
-### D5. The release branch carries 2.0.0 in the manifest, the changelog and the consumer template
+### D5. A result's HTTP status is `httpStatus`
 
-The audit flagged `reviewedLiteSpecVersion: "2.0.0"` as higher than the latest tag `v1.18.0`. The consumer validator requires that field to equal the pinned manifest version, and `litespec/core/maintaining#publish-a-litespec-release-from-a-tag` says the release carries its version in the manifest, the changelog and the template. So 2.0.0 stays, and the two sentences that contradicted it were rewritten: `AGENTS.md` "Version Handling" and `docs/core/maintaining.md` "The LiteSpec release". **Owner action:** tag `v2.0.0` on the release commit.
+A Result records its HTTP status in `httpStatus` (200 to 599), so `status` always means draft, approved or retired. Failure-code reasons are lowercase, and two finding codes have provisions that own them: `business-record-name-clash` and `result-status`.
 
-### D6. Behaviour changes made while porting
+### D6. The published home is https://litespec.dev
 
-- The consumer validator runs the UI checks in-process; the 120-second child timeout and the "could not start" message are gone (changelog entry added).
-- Every command writes UTF-8 and `
-` line ends on every platform (the first build wrote the Windows code page and `
-`).
-- `litespec validate` checks that a `litespec <command>` in a Verification row names a real command, and that a cited `src/LiteSpec.*` or `tests/LiteSpec.*` path exists.
-- `litespec validate` skips `src/`, `tests/`, `.agents/`, `bin/` and `obj/`, as the Node validator skipped `tools/model/`.
-- `litespec model` parses options with the shared parser (`query <id> --root X` now works), exits 2 when the root holds no `litespec.project.json`, sorts findings on one line by code and message, parses ISO dates with the invariant culture, and exempts a retired use case from `reachedThrough`.
-- `litespec model` reads record roots from `paths.docs`; the project schema now declares `paths.application`, `domain`, `infrastructure` and `webapi`, which the builder always read but the schema refused.
-- The provision index says "1 kind" instead of "1 kinds"; the book closes two table-head rows it left open.
-- `litespec model` printed `[time]` phase timings to standard error on every run; they now print only when `LITESPEC_TIMING` is set.
+Every schema `$id` is `https://litespec.dev/<version>/schemas/<file>`, and `litespec validate` keeps them on the manifest version. The site is LiteSpec's own, built by a later `litespec site` command and deployed on each tag.
 
-## Audit findings
+### D7. Stacks are folders inside their area
 
-A read-only audit ran before the port landed (28 findings). Fixed: rename leftovers (icon title, schema titles, glossary term, `.windsurfrules`), the extension index `switchesOn` column (7 rows out of step with the manifest), the ten finding codes and the region list missing from `docs/tools/model.md`, the wrong evidence code in `docs/backend/identifiers.md`, the retired use-case contradiction, the schema and builder path mismatch, `caching` instead of `cache` in `docs/core/scope.md`, the README submodule path, the Blazor omission in `docs/README.md`, the version contradiction (D5), the model builder code defects listed in D6, `replaces` in 14 consumer templates (only a decision may carry it), and the "1 kinds" grammar.
+A stack is a folder with a `stack.md` inside its area: `backend/dotnet/`, `frontend/web/react/`, `frontend/web/svelte/` and `frontend/blazor/`. Selecting a stack applies its folder, every folder above it, and their subfolders that hold no stack. A provision ID is `litespec/<page>#<slug>`, and the heading carries no ID. A project names a size, a shape (`server` or `client-only`) and its stacks. Presets fill in a common selection for `litespec init`.
 
-Also fixed after the first audit, as decisions taken on the owner's behalf:
+### D8. 2.0.0 is a clean-slate release
 
-- **D7. A result's HTTP status is `httpStatus`.** A result carried its HTTP status in `status`, the field every other record uses for draft, approved or retired, and the book had a workaround for the clash. It is now `httpStatus` (integer, 200 to 599) in the schema, the checker, the book, the use-case template and every fixture, and `status` always means the lifecycle. Done before the v2.0.0 tag because afterwards it would be a breaking change.
-- **D8. Two checks gained the provisions that own them.** `litespec/backend/identifiers#keep-business-record-names-unique-across-the-project` owns `business-record-name-clash`, and `litespec/backend/api#record-each-results-http-status` owns `result-status`. Both are new provisions; **review their wording**.
-- **D9. Failure-code reasons are lowercase.** The schema allowed an uppercase reason segment while the checker accepted lowercase only; no page or template used uppercase, so the schema now matches the checker.
+2.0.0 carries no migration map, no refusal of earlier forms, no compatibility default and no history-specific material. The changelog describes 2.0.0 as a complete contract.
 
-**Left for the owner:**
+### D9. The repository is a monorepo with the standard at the root
 
-1. An unreadable TRX file is skipped silently, so verified counts can shrink without a finding. Fixing it adds a new finding code.
-2. When the LiteSpec docs are not beside the consumer, any `litespec/...` citation resolves; this leniency is undocumented.
-3. Your untracked `PROPOSAL-CONSUMER-SPECIFICATIONS.md` predates v2 and makes `litespec validate` report 15 broken links while it sits in the working tree. It was not committed or changed.
-4. Tag `v2.0.0` (D5).
-5. Choose the publishing host (see D11).
+The standard (`docs/`, `schemas/`, `templates/`, `litespec.manifest.json`) stays at the root, because a consumer pins the root and every path it reads starts there. Each deliverable has its own folder: the CLI at `apps/cli/`, later the site at `apps/site/` and analyzers under `packages/`. Rejected: separate repositories, because the CLI must match its release exactly, and the standard under `spec/`, which adds an empty segment to every consumer path.
 
-## CLI defect review
+### D10. UI patterns are specification text with drawn wireframes
 
-A read-only review of `src/LiteSpec.Cli` (rerun after memory recovered) reported 16 findings. Fixed, with tests in `tests/LiteSpec.Cli.Tests/Support/InputErrorTests.cs`:
+Each pattern lives on a pattern page in `docs/frontend/patterns/<group>.md`, and each option carries a wireframe in the closed text language `docs/frontend/patterns.md` defines. Agents build from the text in their own stack and design system. People choose from the drawings `litespec patterns preview` makes at 1200 and 390 pixels. No drawing is committed. The ten groups hold 133 patterns and 947 options, converted from the earlier HTML mocks, which were deleted. A consumer catalog cites a pattern by its ID.
 
-- `validate` crashed on a malformed percent escape in a link; it now reports `LINK_BROKEN`.
-- `consumer` and `ui` crashed when no LiteSpec checkout was found or the root path was invalid; both exit 2 with a message.
-- `consumer --prose --format json` wrote text before the JSON; the measures now sit in a `prose` array inside the object.
-- `provisions --root <typo>` created folders and wrote an empty index; it now exits 2.
-- `model` crashed on an invalid root or a malformed project file; both exit 2. `model build` writes `
-` on every OS, and `model check --format json` uses the shared JSON options.
-- `book` parses with the shared parser (`--model=<file>` works) and its usage lists `--help` and the exit codes; `docs/tools/book.md` and `model.md` list `--help`, and `model.md` names the query-miss exit code.
-- The provision index sorts ordinally; schema `const` and `enum` compare structurally; the glob matcher compiles once per segment; `AGENTS.md` inside the docs root is scanned once; a no-op branch is gone.
+Open gaps in the language: a progress part, icons in tab labels, and a status placed under a heading rather than beside it.
 
-Not changed: the claim that standard error stays on the Windows code page was checked and is false (setting `Console.OutputEncoding` covers both streams). Schema `pattern` checks already use the .NET regex cache.
+### D11. The vocabulary is size, shape, stack and preset
 
-### D10. The remote points at the renamed repository
+"Profile" is gone except for the UI density profile, a separate concept. The provisions and the finding code that carried it were renamed.
 
-`origin` is `https://github.com/Litenova-Solutions/LiteSpec.git`.
+### D12. Prose follows the Google developer documentation style guide
 
-### D11. The published home is https://litespec.dev
+Chosen by the owner on 2026-10-21. The homemade controlled-prose style, its sentence, list, table-cell and paragraph limits, and its bans on contractions and vague words are gone, with their checks. So are the Agent Summary section on every page and the rule that every paragraph of `AGENTS.md` cites a provision. `docs/core/authoring.md` adds five rules to the guide: ASCII only, one term per concept, capitalized modals only inside a Requirement, Title Case page titles, and nothing about earlier releases. The repository uses US English, and the record field `fulfils` and the requirement kind `behaviour` became `fulfills` and `behavior`.
 
-The owner first chose `litenova.solutions/LiteSpec`, then pivoted to buying `litespec.dev` (2026-10-20; the registry had no record of it that day). Every schema `$id` reads `https://litespec.dev/<version>/schemas/<file>`, the `SCHEMA_ID` check in `litespec validate` keeps them on the manifest version, `docs/core/maintaining.md` states it, and the README links to `https://litespec.dev`. The site is LiteSpec's own: the plan is a `litespec site` command and a deploy on each tag. The company site's `/Standards` route becomes a permanent redirect to it.
+## Open items for the owner
 
-### D12. The 2.0.0 structure: nested folders, path + fragment IDs, shapes and presets
-
-Chosen by the owner on 2026-10-20 after comparing layer-nested, concern-nested and separate-repository layouts, and after stating that v1 rules do not bind v2. The full target and build notes are in [structure.md](structure.md). In short: a stack is a folder inside its area (`backend/dotnet/`, `frontend/web/react/`); a stack applies its folder and every folder above it; a provision ID is `litespec/<page>#<slug>` with no ID in the heading; a project names a size, a shape (`server` or `client-only`) and its stacks; v1 profiles became presets for `litespec init`. 2.0.0 is a clean-slate release: it carries no migration map, no refusal of 1.x forms, and no compatibility default. This supersedes the `docs/dotnet/` area and the `specification` manifest list of D11's successor (stack-bindings.md).
-
-### D13. The repository is a monorepo with the standard at the root
-
-Chosen by the owner on 2026-10-20. The standard (`docs/`, `schemas/`, `templates/`, `litespec.manifest.json`) stays at the root, because a consumer pins the root at `litespec/` and every path it reads starts there. Each deliverable has its own folder, following LiteSpec's own workspace rules where they apply: the CLI at `apps/cli/` (its solution beside `src/` and `tests/`), the UI pattern library at `packages/ui-patterns/`, and later `apps/site/` and `packages/analyzers/`. A root `LiteSpec.slnx` lists every .NET project. Rejected: separate repositories (a CLI must match its release exactly) and the standard under `spec/` (an empty segment in every consumer path). The UI validator now reads the pattern library folder from the manifest's `paths.uiPatternLibrary`.
-
-### D14. UI patterns are specification text with drawn wireframes
-
-Chosen by the owner on 2026-10-20. The `.mjs` mocks drew one product's HTML, which no other frontend could reuse and no agent could read as structure. Each pattern now lives on a pattern page in `docs/frontend/patterns/<group>.md`, and each option carries a wireframe in a closed text language defined in `docs/frontend/patterns.md`. Agents read the text and build it in their own stack, style and design system. People choose from the pictures `litespec patterns preview` draws, at 1200 and 390 pixels, with the default outlined. No SVG is committed; `litespec patterns svg` prints one for the site. A pattern heading is a name rather than an action, so its ID survives a change of default. A folder holding no stack, such as `docs/frontend/patterns/`, applies with its parent (a stack folder is one with a `stack.md` page). The record-detail group is the sample: 14 patterns and 101 options, converted by two Muse workers from the library data and judged here. The other nine groups follow once the owner accepts the sample, and then `packages/ui-patterns/` is deleted, with no retirement period.
-
-Language gaps found during the conversion and closed: `action disabled` (a refused command), `field radio`, and `aside sticky`. Gaps left open: a progress part, icons in tab labels, and a way to place a status under a heading rather than beside it.
-
-## Progress
-
-- [x] Rename sweep (commit `a37601c`).
-- [x] CLI and tests by a Muse swarm of 12 writers plus 1 auditor, judged and fixed by the judge; Node and C# outputs compared on this repository and on the fixtures before the Node tools were deleted (commit `60f4f5a`).
-- [x] 346 tests pass; `litespec validate` passes except the untracked proposal file; `litespec provisions --check` is current; the pattern library check passes.
-- [x] Comments describe the code without reference to the deleted Node scripts.
-- [x] D7 to D9, final verification, commit, push.
-- [ ] D14: owner review of the record-detail preview, then the other nine groups and the library deletion.
+1. Buy `litespec.dev` and point it at Cloudflare.
+2. Approve the `v2.0.0` tag.
+3. Decide whether to delete the `v1.14.0` to `v1.18.0` tags on GitHub.
+4. Your untracked `PROPOSAL-CONSUMER-SPECIFICATIONS.md` predates 2.0.0. It makes `litespec validate` report broken links while it sits in the working tree. Delete it or move it out.
+5. An unreadable TRX file is skipped without a finding, so verified counts can shrink silently. A fix adds a finding code.
+6. When the LiteSpec docs are not beside a consumer, any `litespec/...` citation resolves. This leniency is undocumented.

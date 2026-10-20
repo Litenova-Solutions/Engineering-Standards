@@ -7,14 +7,13 @@ using LiteSpec.Ui;
 namespace LiteSpec.Consumer;
 
 /// <summary>
-///     The language and controlled prose checks of the consumer validator.
+///     The language checks of the consumer validator.
 /// </summary>
 static partial class ConsumerValidator
 {
     /// <summary>
     ///     Checks the language record, scans the pages and the extra language surfaces for
-    ///     rejected synonyms and mannered terms, counts the controlled-prose measures, and
-    ///     summarizes the outcome. Prints the per-measure detail when <c>--prose</c> is passed.
+    ///     rejected synonyms and mannered terms, and summarizes the outcome.
     /// </summary>
     static void CheckLanguageAndProse(RunState run)
     {
@@ -106,8 +105,6 @@ static partial class ConsumerValidator
         var languageFiles = File.Exists(agentsFile) && !run.Files.Contains(agentsFile, StringComparer.OrdinalIgnoreCase) ? run.Files.Append(agentsFile).ToList() : run.Files.ToList();
 
         var languageFindings = new List<string>();
-        var proseCounts = new Dictionary<string, int>(StringComparer.Ordinal);
-        var proseCodes = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
 
         foreach (var file in languageFiles)
         {
@@ -122,26 +119,6 @@ static partial class ConsumerValidator
             {
                 languageFindings.Add($"{relative}:{line}: {code} {message}");
             });
-
-            if (file == agentsFile)
-            {
-                continue;
-            }
-
-            var count = 0;
-            var codes = new Dictionary<string, int>(StringComparer.Ordinal);
-
-            Prose.CheckProseMeasures(relative, raw, (_, _, code, _) =>
-            {
-                count += 1;
-                codes[code] = codes.TryGetValue(code, out var seen) ? seen + 1 : 1;
-            });
-
-            if (count > 0)
-            {
-                proseCounts[relative] = count;
-                proseCodes[relative] = codes;
-            }
         }
 
         // The documentation tree is one of the surfaces a word reaches, and usually
@@ -198,29 +175,11 @@ static partial class ConsumerValidator
             }
         }
 
-        // A rejected synonym is always an error. The vocabulary is the project's own,
-        // so a term it rejects is a term it chose to reject. A consumer that sets
-        // `prose.enforcement` to `report` gets the prose measures and the mannered
-        // terms as advisories instead: they are counted and printed, and they do not
-        // fail the run.
-        var proseReportOnly = PropString((run.Project as JsonObject)?["prose"] as JsonObject, "enforcement") == "report";
-        Action<string> proseErr = proseReportOnly ? run.Advise : run.Err;
-
+        // Every language finding is an error. The vocabulary is the project's own,
+        // so a term it rejects or a mannered term it names is a term it chose to act on.
         foreach (var finding in languageFindings)
         {
-            if (finding.Contains("LANGUAGE_MANNERED_TERM", StringComparison.Ordinal))
-            {
-                proseErr(finding);
-            }
-            else
-            {
-                run.Err(finding);
-            }
-        }
-
-        foreach (var (relative, count) in proseCounts)
-        {
-            proseErr($"{relative}: {count} controlled-prose problem(s); run 'litespec consumer --prose' to list them");
+            run.Err(finding);
         }
 
         var manneredCount = languageFindings.Count(finding => finding.Contains("LANGUAGE_MANNERED_TERM", StringComparison.Ordinal));
@@ -229,52 +188,9 @@ static partial class ConsumerValidator
             ? $", {scannedSurfaces} non-Markdown surface(s) scanned"
             : ", documentation only";
 
-        // The default output names the worst files and their dominant measure, so a
-        // reader can act without a second flag. --prose still lists every measure.
-        var hotspot = string.Join("; ", proseCounts
-            .OrderByDescending(pair => pair.Value)
-            .Take(3)
-            .Select(pair =>
-            {
-                var codes = proseCodes.TryGetValue(pair.Key, out var seen) ? seen : new Dictionary<string, int>();
-                var top = codes.OrderByDescending(code => code.Value).Select(code => code.Key).FirstOrDefault() ?? "PROSE_SENTENCE_LENGTH";
-                return $"{pair.Key} ({pair.Value}, mostly {top})";
-            }));
-        var hotspotNote = hotspot.Length > 0 ? $"; worst prose: {hotspot}; run with --prose to list every measure" : "";
-
         run.LanguageSummary = compiled is not null
-            ? $"Language: {manneredCount} mannered term(s), {rejectedCount} rejected synonym(s){surfaceNote}{hotspotNote}"
+            ? $"Language: {manneredCount} mannered term(s), {rejectedCount} rejected synonym(s){surfaceNote}"
             : "Language: no language record found; the vocabulary and mannered-term checks did not run";
-
-        // --prose lists the measures behind the counts, which is what a person needs
-        // to burn a page down. The check itself stays on by default.
-        if (run.Prose)
-        {
-            var detail = new List<string>();
-
-            foreach (var file in run.Files)
-            {
-                var relative = run.Relative(file);
-
-                Prose.CheckProseMeasures(relative, run.ReadText(file), (found, line, code, message) =>
-                {
-                    detail.Add($"{found}:{line}: {code} {message}");
-                });
-            }
-
-            run.ProseDetail = detail;
-
-            if (!run.Json)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"Controlled prose ({detail.Count}):");
-
-                foreach (var line in detail)
-                {
-                    Console.WriteLine($"  - {line}");
-                }
-            }
-        }
     }
 
     /// <summary>

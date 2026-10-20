@@ -18,7 +18,7 @@ public sealed partial class ConsumerValidatorTests
 
     static JsonObject LiveDeferral() => new()
     {
-        ["provision"] = "litespec/core/scope#select-a-size-profile-and-stacks",
+        ["provision"] = "litespec/core/scope#select-a-size-a-shape-and-stacks",
         ["until"] = "2999-01-01",
     };
 

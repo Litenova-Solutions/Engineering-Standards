@@ -4,19 +4,6 @@
 
 WebApi is a thin transport adapter. It maps HTTP input to Application messages, dispatches through the specific mediator, and maps results to stable HTTP contracts. Business rules, persistence access, and provider behavior remain outside endpoints.
 
-## Agent Summary {#agent-summary}
-
-- One endpoint class per operation dispatches through its mediator. (litespec/backend/api#map-one-operation-per-endpoint, litespec/backend/api#use-this-endpoint-layout)
-- Endpoints take transport dependencies and map no errors. (litespec/backend/api#keep-endpoint-dependencies-transport-focused, litespec/backend/api#defer-error-mapping-to-the-global-handler)
-- Endpoints enforce coarse policies while the guard decides targets. (litespec/backend/api#apply-only-coarse-policies-at-the-endpoint)
-- Errors return Problem Details with Result codes and consistent statuses, and each result records its status. (litespec/backend/api#return-stable-problem-details, litespec/backend/api#use-consistent-status-codes, litespec/backend/api#record-each-results-http-status)
-- Routes stay resource-oriented with custom methods, PATCH, and PUT. (litespec/backend/api#keep-routes-resource-oriented, litespec/backend/api#state-an-unexpressible-transition-as-a-custom-method, litespec/backend/api#apply-patch-to-a-partial-update, litespec/backend/api#use-put-for-a-whole-replacement, litespec/backend/api#name-routes-from-resources)
-- Collections page with bounds, cursors, and declared maxima. (litespec/backend/api#bound-collection-queries, litespec/backend/api#use-opaque-cursors-for-collection-paging, litespec/backend/api#version-cursors-with-stable-sort-values, litespec/backend/api#declare-a-smaller-collection-maximum, litespec/backend/api#use-offsets-for-proven-bounded-datasets)
-- The contract generates on Release, commits, and declares metadata. (litespec/backend/api#treat-openapi-as-a-generated-contract, litespec/backend/api#commit-the-generated-contract-its-consumers-read, litespec/backend/api#reflect-enforced-authentication-in-the-contract, litespec/backend/api#publish-precise-complete-schemas, litespec/backend/api#declare-stable-operation-metadata-in-the-contract, litespec/backend/api#expose-development-tooling-in-development-only, litespec/backend/api#generate-the-contract-without-hosted-dependencies)
-- Transport models mirror closed sets with discriminators and Money objects. (litespec/backend/api#mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape, litespec/backend/api#reject-a-collapsed-or-borrowed-wire-contract, litespec/backend/api#publish-label-only-sets-as-string-enums, litespec/backend/api#mark-polymorphic-models-with-discriminators, litespec/backend/api#model-a-monetary-value-as-one-object)
-- Field, boolean, time, failure, path, and numeric names follow one vocabulary. (litespec/backend/api#name-transport-types-by-their-boundary-role, litespec/backend/api#name-boolean-fields-as-conditions, litespec/backend/api#name-time-fields-with-at, litespec/backend/api#use-standard-field-vocabulary, litespec/backend/api#name-failure-pairs-code-and-reason, litespec/backend/api#name-path-parameters-per-resource, litespec/backend/api#avoid-noise-words-in-field-names, litespec/backend/api#keep-numeric-transport-types-precise)
-- Cookie-authenticated writes carry the marker header. (litespec/backend/api#require-the-marker-header-on-cookie-authenticated-writes)
-
 ## Standards
 
 ### Map one operation per endpoint

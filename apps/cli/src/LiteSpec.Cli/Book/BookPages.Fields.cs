@@ -64,7 +64,7 @@ static partial class BookPages
     static readonly IReadOnlySet<string> SkipFields = new HashSet<string>(StringComparer.Ordinal)
     {
         "type", "id", "title", "owner", "status", "records",
-        "decides", "basedOn", "affects", "solves", "fulfils", "governs", "raises",
+        "decides", "basedOn", "affects", "solves", "fulfills", "governs", "raises",
         "reactsTo", "allows", "needs", "reachedThrough", "dependsOn", "terms",
         "result", "offers", "runbook", "limit", "subject", "replaces",
     };

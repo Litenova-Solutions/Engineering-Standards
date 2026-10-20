@@ -58,16 +58,6 @@ public sealed class InputErrorTests
     }
 
     [Fact]
-    public void Consumer_Prose_Detail_Stays_Inside_The_Json_Object()
-    {
-        var result = Cli.Run("consumer", "--root", Cli.Fixture("Model/small"), "--prose", "--format", "json");
-
-        var parsed = (JsonObject)JsonNode.Parse(result.Stdout)!;
-        Assert.Equal("consumer", (string?)parsed["tool"]);
-        Assert.IsType<JsonArray>(parsed["prose"]);
-    }
-
-    [Fact]
     public void Book_Accepts_An_Option_Written_With_An_Equals_Sign()
     {
         using var folder = Cli.Temp("book");

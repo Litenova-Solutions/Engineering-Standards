@@ -4,11 +4,6 @@
 
 Components in a React frontend are function components with typed boundaries. The shared provisions live on the stack-neutral page ([Frontend components](../../components.md)); this page holds what React alone requires.
 
-## Agent Summary {#agent-summary}
-
-- Components are function components using hooks. (litespec/frontend/web/react/components#write-components-as-functions)
-- Components type their props and events under strict mode. (litespec/frontend/web/react/components#keep-component-boundaries-typed)
-
 ## Standards
 
 ### Write components as functions

@@ -4,20 +4,9 @@
 
 Continuous integration proves that a pull request preserves the selected standards, generated contracts, dependencies, and release artifacts. The workflow keeps slow deployment checks separate from fast local feedback while retaining one required merge gate.
 
-## Agent Summary {#agent-summary}
-
-- Pull requests run the jobs their changed areas select. (litespec/quality/ci#run-applicable-gates-on-every-pull-request)
-- The docs job checks documentation on every pull request. (litespec/quality/ci#check-documentation-on-every-pull-request)
-- CI regenerates committed contracts and fails on drift. (litespec/quality/ci#keep-generated-contracts-fresh)
-- Persistence changes publish a reviewed schema artifact. (litespec/quality/ci#review-schema-artifacts)
-- CI enforces the supply-chain gate on every pull request. (litespec/quality/ci#enforce-the-supply-chain-gate)
-- One immutable artifact is promoted through every environment. (litespec/quality/ci#promote-verified-artifacts)
-- The default branch requires checks and review, and every bypass names its actor and reason. (litespec/quality/ci#protect-the-default-branch, litespec/quality/ci#record-every-branch-protection-bypass)
-- CI uses the declared stable job graph. (litespec/quality/ci#keep-a-canonical-job-graph)
-
 ## Concepts
 
-The first table lists the CI jobs. Every job is a gate: it fails the pull request when it fails. A project's size profile selects the jobs it runs. The [command index](../tools/README.md) states how `litespec` runs in a consumer.
+The first table lists the CI jobs. Every job is a gate: it fails the pull request when it fails. A project's size selects the jobs it runs. The [command index](../tools/README.md) states how `litespec` runs in a consumer.
 
 | Job | Checks | Selected by | Command | Small | Large |
 |:---|:---|:---|:---|:---|:---|
@@ -27,7 +16,7 @@ The first table lists the CI jobs. Every job is a gate: it fails the pull reques
 | model | Model check, then every check reading model.json. | Record, code, or test change. | `litespec model check`. | Runs. | Runs. |
 | docs | Page contract, configuration, language, prose. | Documentation change. | `litespec consumer`. | Runs. | Runs. |
 | contract | Published document and clients unchanged. | API or contract change. | Regenerate, then `git diff --exit-code`. | Runs. | Runs. |
-| supply-chain | Pins, licences, secrets, action pins, inventory. | Manifest, lockfile, or workflow change. | Frozen restores, `pnpm audit`, licence and secret scans. | Runs. | Runs. |
+| supply-chain | Pins, licenses, secrets, action pins, inventory. | Manifest, lockfile, or workflow change. | Frozen restores, `pnpm audit`, license and secret scans. | Runs. | Runs. |
 | release | Every job above passes. | Release commit only. | Every command above on the release commit. | Runs. | Runs. |
 
 The second table defines the supply-chain gate.
@@ -38,9 +27,9 @@ The second table defines the supply-chain gate.
 | Pin rule | Exact manifest pin and frozen lockfile, with integrity and certificate verification enabled. |
 | Pin review | Install scripts, transitive changes, source reputation, maintenance status, and advisories before a pin changes. |
 | Action pins | Every action pinned to an immutable reference. |
-| Inventory | A software bill of materials beside each promoted artifact, listing resolved direct and transitive components with versions. |
+| Inventory | A component inventory beside each promoted artifact, listing resolved direct and transitive components with versions. |
 | High-severity advisory | A documented Exception before the release proceeds. |
-| Licence review | Every dependency carries a licence the project approves. |
+| License review | Every dependency carries a license the project approves. |
 
 ## Standards
 
@@ -84,7 +73,7 @@ The second table defines the supply-chain gate.
 
 ### Protect the default branch
 
-**Requirement:** The default branch MUST require the jobs table entries for the project's size profile, a reviewed pull request, and a clean merge state.
+**Requirement:** The default branch MUST require the jobs table entries for the project's size, a reviewed pull request, and a clean merge state.
 
 **Rationale:** A direct push or bypassed check is permitted only during a documented repository recovery action.
 

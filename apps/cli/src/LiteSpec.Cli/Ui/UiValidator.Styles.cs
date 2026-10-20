@@ -284,7 +284,7 @@ static partial class UiValidator
         }
 
         // An application stylesheet imports the shared package's tokens and writes any
-        // value from a token. A literal colour or a literal size here is a second token
+        // value from a token. A literal color or a literal size here is a second token
         // sheet beside the first, so every declaration is held to the custom-property
         // form. A frontend holding no shared composite still declares its focus ring and
         // its device rules here, from the same tokens.
@@ -347,7 +347,7 @@ static partial class UiValidator
 
         // A stylesheet the shared package ships beside the token sheet carries
         // utilities, device rules, and display helpers, written from tokens. A literal
-        // colour here is a second token sheet beside the first, so every stylesheet but
+        // color here is a second token sheet beside the first, so every stylesheet but
         // the token sheet is held to the same rule as an application stylesheet.
         // (litespec/frontend/web/ui#keep-tokens-in-one-stylesheet)
         public void ValidateSharedStylesheets(string packageRoot, string tokensFile, string platform)
@@ -376,7 +376,7 @@ static partial class UiValidator
                         continue;
                     }
 
-                    Errors.Add($"[litespec/frontend/web/ui#keep-tokens-in-one-stylesheet] {label}: literal colour '{match.Value}' belongs in the token stylesheet");
+                    Errors.Add($"[litespec/frontend/web/ui#keep-tokens-in-one-stylesheet] {label}: literal color '{match.Value}' belongs in the token stylesheet");
                 }
             }
         }

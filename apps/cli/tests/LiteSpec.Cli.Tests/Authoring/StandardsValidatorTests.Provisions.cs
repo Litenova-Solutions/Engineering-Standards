@@ -43,11 +43,6 @@ public sealed partial class StandardsValidatorTests
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "Store the topic in its owning documentation area.", "Consumers MUST store the topic in its owning documentation area.")),
         ["CONVENTION_NORMATIVE"]);
 
-    [Fact(DisplayName = "summary without ID")]
-    public void SummaryWithoutId() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "- Keep the topic bounded. (litespec/core/topic#keep-the-topic-bounded)", "- Keep the topic bounded.")),
-        ["SUMMARY_MISSING_ID"]);
-
     [Fact(DisplayName = "missing evidence row")]
     public void MissingEvidenceRow() => Check(
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/core/topic#keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |\n", "")),

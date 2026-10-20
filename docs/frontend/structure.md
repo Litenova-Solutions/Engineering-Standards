@@ -6,19 +6,6 @@ A frontend holds three parts: a frame, routes, and use-case modules. The frame h
 
 The module tree mirrors the backend Application tree in kebab case. A reader holding a use case specification then finds the frontend code that serves it without a second map.
 
-## Agent Summary {#agent-summary}
-
-- A frame, routes, and modules organize each frontend. (litespec/frontend/structure#organize-a-frontend-into-frame-routes-and-modules)
-- A module path resolves to a backend use case folder and stays flat. (litespec/frontend/structure#mirror-the-backend-use-case-path-in-kebab-case, litespec/frontend/structure#keep-a-use-case-folder-flat)
-- A shared file sits in the narrowest folder holding every reader. (litespec/frontend/structure#place-a-shared-file-in-the-folder-that-owns-it)
-- A folder named for nothing is refused. (litespec/frontend/structure#reject-a-folder-name-that-owns-nothing)
-- A route entry holds its input, load, and component. (litespec/frontend/structure#keep-a-route-entry-thin)
-- Imports run from routes toward shared packages. (litespec/frontend/structure#order-imports-from-routes-to-shared-packages)
-- Frontends stay independent and shared packages stay generic. (litespec/frontend/structure#keep-applications-independent, litespec/frontend/structure#keep-shared-packages-non-application-specific)
-- Cross-route values and browser use sit in the frame. (litespec/frontend/structure#locate-cross-route-values-in-the-frame)
-- Every public use case appears in a journey or names its caller. (litespec/frontend/structure#cover-public-use-cases-in-journeys)
-- Shared packages expose documented entry points and tests sit at their ownership boundary. (litespec/frontend/structure#use-explicit-public-entry-points-for-shared-packages, litespec/frontend/structure#place-tests-at-their-ownership-boundary)
-
 ## Standards
 
 ### Organize a frontend into frame, routes, and modules

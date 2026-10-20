@@ -6,12 +6,6 @@ This page is the maintainer's manual for the LiteSpec repository itself. It stat
 
 The page exists because `litespec/core/authoring#publish-each-release-as-a-complete-contract` requires each LiteSpec release to state its complete contract. A maintainer who follows those rules needs the procedures this page states.
 
-## Agent Summary {#agent-summary}
-
-- State the provision lifecycle. (litespec/core/maintaining#state-the-provision-lifecycle)
-- Replace every citation on a rename. (litespec/core/maintaining#replace-every-citation-on-a-rename)
-- Publish a LiteSpec release from a tag. (litespec/core/maintaining#publish-a-litespec-release-from-a-tag)
-
 ## Concepts
 
 ### The provision lifecycle
@@ -21,7 +15,7 @@ A provision passes through three states.
 | State | Meaning |
 |:---|:---|
 | draft | The provision text is being written. |
-| active | The provision is cited from a validator case, a Verification row, or an Agent Summary. |
+| active | The provision is cited from a validator case or a Verification row. |
 | retired | The provision has been replaced or removed. |
 
 A provision never goes from active back to draft. A retirement is permanent.
@@ -54,13 +48,13 @@ A LiteSpec release is a tagged snapshot of the repository. Between releases, `li
 
 **Rationale:** A citation names the provision it resolves to. An old identifier left behind names nothing, and the repository keeps no alias to resolve it. Citations always use current identifiers.
 
-**Example:** Renaming a provision changes its heading, its ID, every Agent Summary bullet, every Verification row, and every cross-page citation together.
+**Example:** Renaming a provision changes its heading, its ID, its Verification row, and every citation together.
 
 ### Publish a LiteSpec release from a tag
 
-**Requirement:** A LiteSpec release MUST set one new git tag and carry it in the manifest version, the changelog entry, and the consumer template version.
+**Requirement:** A LiteSpec release MUST carry the highest git tag in the manifest version, the changelog entry, and the consumer template version.
 
-**Rationale:** A git tag is the only durable artifact that names a release. The new tag carries the next version number. The manifest version, the changelog entry, and the tag are three views of the same fact.
+**Rationale:** A git tag is the only durable artifact that names a release. The highest tag is the current release. The manifest version, the changelog entry, and the template version name that release.
 
 ## Conventions
 
@@ -72,7 +66,7 @@ This informative example demonstrates `litespec/core/maintaining#state-the-provi
 
 ### Step one, adding a provision
 
-A maintainer writes a new provision on a page. The provision is in `draft` until a validator case, Verification row, or Agent Summary cites it.
+A maintainer writes a new provision on a page. The provision is in `draft` until a validator case or a Verification row cites it.
 
 ```text
 ### State the rule
@@ -88,7 +82,7 @@ A rule changes. The maintainer updates the heading, the identifier, and every ci
 
 ### Step three, releasing
 
-The maintainer checks the tag with the highest version number with `git describe --tags --abbrev=0`. The tag is the next release. The manifest version is set, the changelog entry is added, and the commit is tagged.
+The maintainer checks the tag with the highest version number with `git describe --tags --abbrev=0`. The tag is the current release. The manifest version names the release being prepared, the changelog entry is added, and the commit is tagged.
 
 ## Verification
 
@@ -96,4 +90,4 @@ The maintainer checks the tag with the highest version number with `git describe
 |:---|:---|:---|
 | litespec/core/maintaining#state-the-provision-lifecycle | guidance | Is every provision in exactly one lifecycle state, with retired identifiers cited nowhere? |
 | litespec/core/maintaining#replace-every-citation-on-a-rename | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
-| litespec/core/maintaining#publish-a-litespec-release-from-a-tag | guidance | Does one new tag carry the next version across the manifest, the changelog, and the template? |
+| litespec/core/maintaining#publish-a-litespec-release-from-a-tag | guidance | Does one new tag carry the current version across the manifest, the changelog, and the template? |

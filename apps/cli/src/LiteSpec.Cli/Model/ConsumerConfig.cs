@@ -50,7 +50,7 @@ sealed class ConsumerConfig
     /// <summary>Where test result files live.</summary>
     public string TestResultsDir { get; private set; } = "";
 
-    /// <summary>The size profile: small or large.</summary>
+    /// <summary>The project size: small or large.</summary>
     public string Size { get; private set; } = "large";
 
     /// <summary>The project shape: server or client-only.</summary>
@@ -91,7 +91,7 @@ sealed class ConsumerConfig
                 ? found
                 : (JsonElement?)null;
 
-        // Records live under the documentation root; paths.records names per-type homes inside it.
+        // Records live under the documentation roots that paths.docs names.
         config.RecordRoots = ReadRoots(config.Root, paths, "docs", ["docs"]);
         config.LanguagePath = Combine(config.Root, ReadString(paths, "language", "docs/language.json"));
         config.ApplicationRoot = Resolve(config.Root, ReadString(paths, "application", "apps/api/src/*.Application"));

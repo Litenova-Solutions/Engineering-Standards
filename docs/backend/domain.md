@@ -6,19 +6,6 @@ Domain holds the business model and protects aggregate invariants. It references
 
 Every aggregate exposes its lifecycle as state types from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home. It avoids later replacement of an enumeration, status string, or flag-based lifecycle.
 
-## Agent Summary {#agent-summary}
-
-- Domain stays free of outer layers and uses one shared language. (litespec/backend/domain#keep-domain-independent-of-outer-layers, litespec/backend/domain#use-one-ubiquitous-language)
-- Aggregates guard their invariants, hide children, and link peers by identity. (litespec/backend/domain#treat-aggregates-as-consistency-boundaries, litespec/backend/domain#keep-child-entities-inside-the-aggregate-boundary, litespec/backend/domain#reference-other-aggregates-by-id)
-- Roots use the shared contract, factories create valid aggregates, and methods express transitions. (litespec/backend/domain#take-identity-and-events-from-the-project-root-contract, litespec/backend/domain#create-valid-aggregates-through-named-factories, litespec/backend/domain#express-transitions-through-business-methods)
-- Lifecycles use state types and closed sets use hierarchies with stable codes. (litespec/backend/domain#model-every-aggregate-lifecycle-with-state-types, litespec/backend/domain#model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy)
-- Identities are typed version 7 values, nondeterminism arrives as arguments, and representations align. (litespec/backend/domain#identify-aggregates-with-strongly-typed-version-7-values, litespec/backend/domain#pass-nondeterministic-values-into-domain, litespec/backend/domain#align-id-representations-at-every-boundary)
-- Values stay immutable with explicit collection, money, and floating-point rules. (litespec/backend/domain#use-immutable-value-objects-for-domain-concepts, litespec/backend/domain#define-collection-value-semantics-explicitly, litespec/backend/domain#model-money-with-exact-decimal-values, litespec/backend/domain#keep-binary-floating-point-out-of-exact-quantities)
-- Services stay stateless and repositories serve one aggregate with narrow interfaces. (litespec/backend/domain#use-stateless-domain-services-for-ownerless-rules, litespec/backend/domain#expose-repositories-for-one-aggregate-only)
-- Events carry immutable facts and rejections use dedicated error types. (litespec/backend/domain#raise-immutable-facts-as-domain-events, litespec/backend/domain#reject-business-violations-with-dedicated-errors)
-- Public contracts carry business documentation and modules follow naming and layout rules. (litespec/backend/domain#describe-every-public-domain-contract-in-documentation, litespec/backend/domain#organize-a-module-by-aggregate-and-concept, litespec/backend/domain#use-these-domain-names)
-- Shared contracts are declared once and reused across modules. (litespec/backend/domain#reuse-the-shared-domain-contracts-across-modules)
-
 ## Standards
 
 ### Keep Domain independent of outer layers

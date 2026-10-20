@@ -4,14 +4,6 @@
 
 Configuration in a .NET backend pins the SDK, build settings, packages, and tools through MSBuild files. The shared provisions live on the stack-neutral page ([Configuration](../../workspace/config.md)); this page holds what .NET alone requires.
 
-## Agent Summary {#agent-summary}
-
-- The root sets .NET 10 or later as the SDK floor. (litespec/backend/dotnet/config#set-the-sdk-floor-at-the-workspace-root)
-- One props file owns the .NET build settings. (litespec/backend/dotnet/config#centralize-net-build-settings)
-- NuGet versions live in one central props file. (litespec/backend/dotnet/config#centralize-nuget-versions)
-- Local .NET tools are pinned in the tool manifest. (litespec/backend/dotnet/config#commit-the-tool-manifest)
-- Configuration binds to validated options at startup. (litespec/backend/dotnet/config#validate-backend-options-at-startup)
-
 ## Standards
 
 ### Set the SDK floor at the workspace root

@@ -21,6 +21,7 @@
   "paths": {
     "docs": "docs",
     "domainDocs": "docs/domain",
+    "uiDocs": "docs/ui",
     "language": "docs/language.json",
     "application": "apps/api/src/Library.Application",
     "domain": "apps/api/src/Library.Domain",
@@ -32,12 +33,25 @@
       {
         "name": "catalog",
         "path": "apps/catalog",
-        "platform": "svelte"
+        "platform": "svelte",
+        "ui": {
+          "profile": "application-balanced"
+        }
       }
     ],
     "apiClient": "packages/api",
-    "contract": "apps/api/openapi/fixture.json",
-    "contractPath": "apps/api/openapi/fixture.json",
+    "uiPackage": {
+      "name": "@fixture/ui",
+      "path": "packages/ui",
+      "componentsJson": "packages/ui/components.json",
+      "primitives": "packages/ui/src/components",
+      "tokens": "packages/ui/src/styles/tokens.css",
+      "sourceLock": "packages/ui/ui-source-lock.json",
+      "designContract": "packages/ui/DESIGN.md",
+      "publicExports": [
+        "@fixture/ui/floorplans"
+      ]
+    },
     "records": {}
   },
   "selectedExtensions": []

@@ -4,13 +4,6 @@
 
 This stack serves a product that has no server of its own. It combines a .NET client-side domain model, browser-local persistence, and a Blazor WebAssembly application compiled to static output. Such a product declares the `client-only` shape under `litespec/core/scope#declare-a-consumer-that-has-no-backend`, which names the backend pages that still apply. This page adds what Blazor itself requires. Exact framework and package versions live only in litespec.manifest.json.
 
-## Agent Summary {#agent-summary}
-
-The shared stack rules on the [Stacks](../../core/stacks.md) page apply to every stack.
-
-- Blazor stays outside the controlled UI contract. (litespec/frontend/blazor/stack#keep-blazor-outside-the-ui-contract)
-- The client publishes as static WebAssembly with no server render mode. (litespec/frontend/blazor/stack#publish-static-webassembly-output)
-
 ## Standards
 
 ### Keep Blazor outside the UI contract

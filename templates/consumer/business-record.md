@@ -20,7 +20,7 @@
       "governs": ["business-record/<module>.<name>"],
       "refusal": "<result id or failure code, or remove this line>",
       "basedOn": ["<constraint or research id, or remove this line>"],
-      "fulfils": ["requirement/<topic>.<name>"]
+      "fulfills": ["requirement/<topic>.<name>"]
     },
     {
       "type": "event",

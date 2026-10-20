@@ -7,7 +7,7 @@
   "status": "draft",
   "decider": "<owner>",
   "decideBy": "<YYYY-MM-DD>",
-  "standard": "litespec/<rule|convention>/<area>-<topic>.<name>",
+  "standard": "litespec/backend/domain#<slug>",
   "reason": "<Why this departure is needed>",
   "reviewBy": "<YYYY-MM-DD>",
   "removeWhen": "<The condition that ends this exception>",

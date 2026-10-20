@@ -6,19 +6,6 @@ One shared UI package holds everything a page draws with. It holds the shared pr
 
 Page code composes composites and nothing else. The boundary is enforced rather than described, so a page that improvises fails at lint with a message naming the component to use.
 
-## Agent Summary {#agent-summary}
-
-- One package holds the shared primitives and composites, and a second use adds the missing composite there. (litespec/frontend/components#keep-shared-ui-in-one-package, litespec/frontend/components#add-a-missing-composite-to-the-shared-package)
-- Page code composes composites, writes no class name, and prefers a composite over a primitive. (litespec/frontend/components#compose-composites-in-page-code, litespec/frontend/components#write-no-class-name-in-page-code, litespec/frontend/components#prefer-a-composite-over-a-primitive)
-- Page code declares no raw element and each refusal names its composite. (litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code)
-- A drawing no composite makes goes in an exception file using semantic tokens only. (litespec/frontend/components#place-a-drawing-no-composite-makes-in-an-exception-file)
-- Interactive UI supports keyboard operation, visible focus, labels, and announcements. (litespec/frontend/components#support-keyboard-focus-labels-and-announcements)
-- Data components and controls render every applicable state. (litespec/frontend/components#render-complete-states)
-- Composites take narrow inputs and repeated variants use declared theme tokens. (litespec/frontend/components#keep-component-inputs-narrow, litespec/frontend/components#use-declared-visual-variants)
-- Rich content is sanitized and content images render through the shared component. (litespec/frontend/components#sanitize-untrusted-rich-content, litespec/frontend/components#use-a-composite-for-a-content-image)
-- Components are named for their role and domain values stay typed until display. (litespec/frontend/components#name-components-for-their-role, litespec/frontend/components#keep-domain-values-typed-until-display)
-- Section titles carry heading semantics and error boundaries stay scoped. (litespec/frontend/components#expose-card-and-section-titles-as-headings, litespec/frontend/components#keep-error-boundaries-scoped)
-
 ## Standards
 
 ### Keep shared UI in one package
@@ -109,7 +96,7 @@ A route adds `not-found` under `litespec/frontend/rendering#represent-route-stat
 
 **Requirement:** A repeated component variant MUST use theme tokens through the shared package's variant helper rather than repeated literal values.
 
-**Rationale:** Repeated pixel values, colours, or long conditional branches drift apart once more than one composite edits them.
+**Rationale:** Repeated pixel values, colors, or long conditional branches drift apart once more than one composite edits them.
 
 ### Sanitize untrusted rich content
 
@@ -147,7 +134,7 @@ A route adds `not-found` under `litespec/frontend/rendering#represent-route-stat
 
 **Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
-**Rationale:** Dates, money, and status convert to display strings there with explicit locale and zone behaviour.
+**Rationale:** Dates, money, and status convert to display strings there with explicit locale and zone behavior.
 
 ### Keep error boundaries scoped
 

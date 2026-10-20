@@ -28,9 +28,6 @@ static class ConsumerFixture
     /// <summary>The first extension id in the tracked manifest, or <c>outbox</c>.</summary>
     public static string KnownExtension => Manifest.Value.KnownExtension;
 
-    /// <summary>The shared long sentence that breaks the prose measures.</summary>
-    public const string LongSentence = "The shop opens its doors at nine and closes at six with one till open all day for every reader who walks in before noon without fail.";
-
     /// <summary>One fixture page: repository-relative path, frontmatter JSON, body.</summary>
     sealed record PageSpec(string Relative, string Meta, string Body);
 
@@ -138,7 +135,7 @@ static class ConsumerFixture
             """),
         new("docs/domain/modules/orders/order-claims/README.md",
             """
-            {"type":"business-record","id":"business-record/orders.order-claim","title":"Order claim","owner":"fixture","status":"approved","codeName":"OrderClaim","states":["Draft","Cancelled"],"records":[{"type":"rule","id":"rule/order-claim.cancel-before-shipment-only","title":"Cancel before shipment only","kind":"checked-before","enforcedBy":"validator","statement":"A customer cancels an order claim only before its shipment leaves.","governs":["use-case/orders.cancel-order"],"refusal":"result/cancel-order.cancel-refused","basedOn":[],"fulfils":["requirement/pricing.flat-fee"]},{"type":"event","id":"event/order-claim.order-cancelled","title":"Order cancelled","meaning":"An order claim was cancelled.","carries":["orderId"]}]}
+            {"type":"business-record","id":"business-record/orders.order-claim","title":"Order claim","owner":"fixture","status":"approved","codeName":"OrderClaim","states":["Draft","Canceled"],"records":[{"type":"rule","id":"rule/order-claim.cancel-before-shipment-only","title":"Cancel before shipment only","kind":"checked-before","enforcedBy":"validator","statement":"A customer cancels an order claim only before its shipment leaves.","governs":["use-case/orders.cancel-order"],"refusal":"result/cancel-order.cancel-refused","basedOn":[],"fulfills":["requirement/pricing.flat-fee"]},{"type":"event","id":"event/order-claim.order-canceled","title":"Order canceled","meaning":"An order claim was canceled.","carries":["orderId"]}]}
             """,
             """
             # Order claim
@@ -148,7 +145,7 @@ static class ConsumerFixture
             """),
         new("docs/domain/modules/orders/cancel-order.md",
             """
-            {"type":"use-case","id":"use-case/orders.cancel-order","title":"Cancel order","owner":"fixture","status":"approved","operation":"command","needs":["permission/cancel-order"],"reachedThrough":["entry-point/web"],"raises":["event/order-claim.order-cancelled"],"fulfils":["requirement/pricing.flat-fee"],"records":[{"type":"result","id":"result/cancel-order.order-cancelled","title":"Order cancelled","outcome":"success","httpStatus":200,"meaning":"The order claim was cancelled."},{"type":"result","id":"result/cancel-order.cancel-refused","title":"Cancel refused","outcome":"refusal","code":"failure/orders.cancel-refused","httpStatus":409,"meaning":"The shipment already left, so the cancel is refused."}]}
+            {"type":"use-case","id":"use-case/orders.cancel-order","title":"Cancel order","owner":"fixture","status":"approved","operation":"command","needs":["permission/cancel-order"],"reachedThrough":["entry-point/web"],"raises":["event/order-claim.order-canceled"],"fulfills":["requirement/pricing.flat-fee"],"records":[{"type":"result","id":"result/cancel-order.order-canceled","title":"Order canceled","outcome":"success","httpStatus":200,"meaning":"The order claim was canceled."},{"type":"result","id":"result/cancel-order.cancel-refused","title":"Cancel refused","outcome":"refusal","code":"failure/orders.cancel-refused","httpStatus":409,"meaning":"The shipment already left, so the cancel is refused."}]}
             """,
             """
             # Cancel order

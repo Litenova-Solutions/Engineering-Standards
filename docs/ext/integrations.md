@@ -18,17 +18,6 @@ This extension replaces no baseline provision.
 
 This extension switches on no optional record type.
 
-## Agent Summary {#agent-summary}
-
-- Define business-action ports in Application. (litespec/ext/integrations#define-business-action-ports)
-- Keep provider implementation in Infrastructure. (litespec/ext/integrations#isolate-provider-implementations)
-- Configure and validate typed clients. (litespec/ext/integrations#bind-client-configuration)
-- Retry only bounded and idempotent provider calls. (litespec/ext/integrations#bound-transient-retries, litespec/ext/integrations#protect-non-idempotent-calls)
-- Translate provider failures without leaks. (litespec/ext/integrations#translate-provider-failure-outcomes, litespec/ext/integrations#exclude-provider-internals)
-- Verify inbound provider messages before processing. (litespec/ext/integrations#verify-inbound-provider-messages)
-- Reject formula-leading import values. (litespec/ext/integrations#reject-formula-leading-import-values)
-- Test failure modes at the network boundary. (litespec/ext/integrations#simulate-integration-boundaries)
-
 ## Standards
 
 ### Define business-action ports

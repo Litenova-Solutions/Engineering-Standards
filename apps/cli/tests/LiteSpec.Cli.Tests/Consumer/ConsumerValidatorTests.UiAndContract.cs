@@ -134,19 +134,4 @@ public sealed partial class ConsumerValidatorTests
         AssertClean(RunConsumer(folder.Path));
     }
 
-    [Fact(DisplayName = "prose detail lists the measures behind the counts")]
-    public void ProseDetailListsTheMeasuresBehindTheCounts()
-    {
-        using var folder = ConsumerFixture.Create();
-        // The --prose detail reads the same text the main scan already read. A long
-        // sentence keeps its detail line after the read-once change.
-        ConsumerFixture.MutateBody(
-            folder.Path,
-            "docs/domain/modules/orders/README.md",
-            raw => $"{raw}\n{ConsumerFixture.LongSentence}\n");
-        var result = RunConsumer(folder.Path, "--prose");
-        Assert.Equal(1, result.Status);
-        Assert.Contains("Controlled prose (", result.Output, StringComparison.Ordinal);
-        Assert.Contains("PROSE_SENTENCE_LENGTH", result.Output, StringComparison.Ordinal);
-    }
 }

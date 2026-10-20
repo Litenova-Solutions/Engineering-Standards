@@ -25,7 +25,7 @@
         "use-case/lending.register-copy"
       ],
       "basedOn": [],
-      "fulfils": [
+      "fulfills": [
         "requirement/borrowing.copy-shelf-home"
       ]
     },

@@ -18,13 +18,6 @@ This extension replaces no baseline provision. The agent protocol governs one ag
 
 This extension switches on no optional record type.
 
-## Agent Summary {#agent-summary}
-
-- Brief each worker with goal, context, sources, and output. (litespec/ext/delegation#write-a-brief-before-delegating)
-- Hold each worker inside its named paths. (litespec/ext/delegation#restrict-a-worker-to-its-paths)
-- Ask the brief first, then ask a person. (litespec/ext/delegation#ask-only-unanswered-questions)
-- Re-run verification before accepting worker output. (litespec/ext/delegation#verify-before-accepting-worker-output)
-
 ## Standards
 
 ### Write a brief before delegating

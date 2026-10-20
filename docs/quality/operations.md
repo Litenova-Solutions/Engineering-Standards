@@ -4,19 +4,6 @@
 
 A released application is observable, deployable, recoverable, and supportable by one maintainer. Operating behavior is part of the use-case slice when code changes schema, external dependencies, background work, or failure recovery.
 
-## Agent Summary {#agent-summary}
-
-- One local command starts the whole stack. (litespec/quality/operations#start-the-stack-with-one-local-command)
-- Diagnostics carry correlation identifiers and stable names. (litespec/quality/operations#emit-correlated-diagnostics, litespec/quality/operations#pass-trace-context-in-the-w3c-format)
-- Liveness and readiness are separate endpoints. (litespec/quality/operations#separate-liveness-and-readiness)
-- Schema changes run as a release step before traffic. (litespec/quality/operations#apply-schema-changes-outside-request-startup)
-- Backups declare their owner, retention, and tested restore, rehearsed before the first production data. (litespec/quality/operations#define-backup-and-restore-behavior, litespec/quality/operations#exercise-a-restore-before-the-first-production-data)
-- Deployments promote versioned artifacts from one deploy tree, and secrets stay out of the repository. (litespec/quality/operations#use-a-repeatable-deployment, litespec/quality/operations#keep-deployment-descriptors-together, litespec/quality/operations#keep-production-secrets-out-of-the-repository)
-- Rollback and each runbook are rehearsed before release. (litespec/quality/operations#keep-rollback-executable, litespec/quality/operations#exercise-every-runbook-before-release)
-- Workers and recurring jobs publish their own health, and silence pages a person. (litespec/quality/operations#operate-background-work-independently, litespec/quality/operations#report-liveness-from-every-recurring-job)
-- External calls declare timeouts, cancellation, and bounded retries, and each provider appears in the sub-processor list. (litespec/quality/operations#bound-external-calls, litespec/quality/operations#list-every-sub-processor)
-- Every alert declares its runbook, and each baseline alert adds owner, threshold, window, severity, and coverage. (litespec/quality/operations#define-actionable-baseline-alerts, litespec/quality/operations#cover-the-baseline-alert-set, litespec/quality/operations#name-a-runbook-on-every-alert, litespec/quality/operations#route-each-severity-to-a-declared-destination)
-
 ## Concepts
 
 Operating truth lives in the records this section names. Each record below states whether a person or the model builder writes it. The operations log alone keeps the past. Each record names its owner from the project's owner list.

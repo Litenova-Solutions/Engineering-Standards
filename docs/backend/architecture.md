@@ -6,18 +6,6 @@ The backend is a five-part modular monolith. Part boundaries separate business r
 
 CQRS separates write and read behavior inside one Application part. Modules and use cases provide the internal navigation boundary.
 
-## Agent Summary {#agent-summary}
-
-- Five baseline parts form the modular monolith. (litespec/backend/architecture#use-five-application-parts)
-- References point inward while each layer owns its contracts. (litespec/backend/architecture#point-dependencies-inward, litespec/backend/architecture#own-each-layers-contract-types)
-- One Application part holds messages, handlers, and module-owned ports. (litespec/backend/architecture#keep-one-application-part)
-- Module and aggregate order folders in every layer. (litespec/backend/architecture#organize-every-layer-by-module-and-use-case, litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers)
-- Handlers, validators, and endpoint code stay hidden and closed. (litespec/backend/architecture#keep-implementation-types-hidden)
-- Aggregates enforce transitions while commands write and queries project. (litespec/backend/architecture#keep-business-invariants-in-domain, litespec/backend/architecture#separate-command-and-query-behavior)
-- A Decision names the execution host for background work. (litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request, litespec/backend/architecture#create-a-worker-project-when-background-work-needs-its-own-process)
-- Architecture tests prove the structural boundaries. (litespec/backend/architecture#test-structural-boundaries)
-- Each process composes itself without a second provider. (litespec/backend/architecture#compose-each-process-explicitly, litespec/backend/architecture#keep-service-registration-in-hosts)
-
 ## Standards
 
 ### Use five application parts
@@ -58,7 +46,7 @@ WebApi/
 
 **Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application part, and cross-module contracts in Application.Abstractions.
 
-**Rationale:** Separate Write, Read, Contracts, and event-handler parts are outside this profile. The separation this profile keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the parts holding them. Splitting parts buys a deployment boundary the profile does not use, and costs a dependency that every use case has to cross.
+**Rationale:** Separate Write, Read, Contracts, and event-handler parts are outside this backend. The separation this backend keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the parts holding them. Splitting parts buys a deployment boundary the backend does not use, and costs a dependency that every use case has to cross.
 
 ### Organize every layer by module and use case
 

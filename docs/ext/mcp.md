@@ -18,17 +18,6 @@ This extension replaces no baseline rule.
 
 This extension switches on no record type.
 
-## Agent Summary {#agent-summary}
-
-- Pass server instructions at initialize. (litespec/ext/mcp#pass-server-instructions-at-initialize)
-- Title each tool imperatively and describe it declaratively. (litespec/ext/mcp#write-one-tool-description-for-one-decision)
-- State parameter polarity and side effects in descriptions. (litespec/ext/mcp#write-one-tool-description-for-one-decision)
-- Scope each tool to named use cases and permissions. (litespec/ext/mcp#scope-each-tool-to-named-use-cases)
-- Confirm every writing tool explicitly. (litespec/ext/mcp#confirm-every-writing-tool)
-- Exclude secrets and personal data from tool surfaces. (litespec/ext/mcp#exclude-secrets-and-personal-data)
-- State the distribution and update path. (litespec/ext/mcp#state-the-distribution-and-update-path)
-- State the refusing side on each refusal. (litespec/ext/mcp#state-the-refusing-side-on-each-refusal)
-
 ## Standards
 
 ### Pass server instructions at initialize

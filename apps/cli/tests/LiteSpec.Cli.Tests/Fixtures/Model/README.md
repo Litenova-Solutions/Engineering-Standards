@@ -26,13 +26,16 @@ Both fixtures exit 0 under `check`. Each names the same owner, approves every re
 The builder and the suite use these codes:
 
 - `record-shape`
+- `invalid-field`
 - `identifier-form`
 - `identifier-duplicate`
+- `use-case-name-clash`
 - `reference-unresolved`
 - `draft-gate`
 - `owner-unknown`
 - `draft-without-decider`
 - `known-gap-expired`
+- `gap-unknown-check`
 - `rule-name-negation`
 - `use-case-without-success`
 - `use-case-without-case`
@@ -41,7 +44,8 @@ The builder and the suite use these codes:
 - `refusal-not-thrown`
 - `use-case-unimplemented`
 - `proves-unconfirmed`
-- `profile-type-missing`
+- `size-type-missing`
+- `product-not-singleton`
 - `journey-reach`
 - `use-case-access`
 - `result-status`

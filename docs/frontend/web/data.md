@@ -4,15 +4,6 @@
 
 This page holds how the TypeScript web frontends realize the Frontend data rules ([Frontend data](../data.md)). It states the generated client, the query cache behavior, and the tooling the React and Svelte stacks share. A provision here cites the neutral rule it realizes.
 
-## Agent Summary {#agent-summary}
-
-- The workspace generates its TypeScript client, query options, and schemas from the published contract. (litespec/frontend/web/data#generate-the-client-from-the-published-contract)
-- Every failure becomes one problem type with client codes and a copyable trace identifier. (litespec/frontend/web/data#map-every-failure-to-one-problem-type)
-- A refusal renders beside what was refused, and a form validates with the generated schema. (litespec/frontend/web/data#place-a-refusal-beside-what-was-refused, litespec/frontend/web/data#validate-a-form-with-the-generated-schema)
-- A success invalidates the TanStack Query entries it changed, and state lives with its narrowest owner. (litespec/frontend/web/data#update-the-cache-a-command-changed, litespec/frontend/web/data#assign-state-to-the-narrowest-owner)
-- Copy resolves through the stack's dictionary library, and the client boundary sits in the frame root. (litespec/frontend/web/data#localize-copy-through-locale-dictionaries, litespec/frontend/web/data#keep-the-client-boundary-in-the-frame)
-- The client regenerates with `api:types`, and a form builds on the shared form entry point. (litespec/frontend/web/data#regenerate-the-client-rather-than-editing-it, litespec/frontend/web/data#build-a-form-on-the-shared-form-library)
-
 ## Concepts
 
 ### The problem type

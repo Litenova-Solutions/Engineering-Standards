@@ -4,19 +4,6 @@
 
 These principles resolve choices no narrower rule covers. They favor explicit intent, proved behavior, and evidence over speculative abstractions.
 
-## Agent Summary {#agent-summary}
-
-- Author each record once; derive every other appearance from the model. (litespec/core/principles#keep-one-authored-source)
-- Resolve stack versions from the manifest. (litespec/core/principles#locate-package-versions-in-the-manifest)
-- Carry status, owner, decider, and decide-by date in frontmatter. (litespec/core/principles#locate-record-status-in-frontmatter, litespec/core/principles#classify-record-authority)
-- Approve nothing behind a draft decision; never write implementation status. (litespec/core/principles#refuse-approval-behind-a-draft-decision, litespec/core/principles#separate-authority-from-implementation)
-- Prove each Case with a test that calls its use case. (litespec/core/principles#prove-cases-with-tests)
-- Retire behavior by removing its entry points first. (litespec/core/principles#retire-public-behavior-deliberately)
-- Prove enforceable boundaries with references, tests, or lint rules. (litespec/core/principles#prove-enforceable-boundaries-mechanically)
-- Add complexity only for a current documented requirement. (litespec/core/principles#require-current-complexity-activation)
-- Name business intent at boundaries; avoid generic names. (litespec/core/principles#name-boundary-intent, litespec/core/principles#avoid-generic-boundary-names)
-- Use framework types directly; share code only for two real consumers. (litespec/core/principles#prefer-direct-owned-dependencies, litespec/core/principles#prefer-local-code-until-reuse-is-real)
-
 ## Standards
 
 ### Keep one authored source
@@ -119,7 +106,7 @@ A term lives in the language record. Stack versions live in the manifest. Covera
 
 This informative example demonstrates `litespec/core/principles#prefer-direct-owned-dependencies` and `litespec/core/principles#prefer-local-code-until-reuse-is-real`.
 
-- Application query handlers use `IQuerySession` because Marten is part of the selected profile.
+- Application query handlers use `IQuerySession` because Marten is part of the selected stack.
 - Domain repository interfaces remain project-owned because persistence cannot enter Domain.
 - A two-line mapping used once stays beside its endpoint.
 

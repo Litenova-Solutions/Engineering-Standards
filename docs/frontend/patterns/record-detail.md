@@ -4,17 +4,6 @@
 
 A record detail page shows one business record, such as an order, a customer or a product. It shows its state, its facts, its history and the commands a reader may run on it. These patterns answer the recurring questions of that page. Each pattern offers drawn options and names a default.
 
-## Agent Summary {#agent-summary}
-
-- A record header states the record, its state and one primary command. (litespec/frontend/patterns/record-detail#show-one-primary-action-in-a-record-header, litespec/frontend/patterns/record-detail#record-header)
-- A destructive command sits apart from the primary command. (litespec/frontend/patterns/record-detail#keep-destructive-commands-out-of-the-primary-place)
-- Facets of a large record sit in tabs, and the summary holds facts about the record itself. (litespec/frontend/patterns/record-detail#record-tabs, litespec/frontend/patterns/record-detail#record-summary)
-- History, notes and attachments each have one home on the record. (litespec/frontend/patterns/record-detail#record-aside, litespec/frontend/patterns/record-detail#record-timeline, litespec/frontend/patterns/record-detail#record-change-history, litespec/frontend/patterns/record-detail#record-notes, litespec/frontend/patterns/record-detail#record-attachments)
-- Related records are links that carry their own state. (litespec/frontend/patterns/record-detail#related-records)
-- A reader without permission still sees the record. (litespec/frontend/patterns/record-detail#record-the-reader-may-not-change)
-- Identifiers copy in one step, and readers step between records without the list. (litespec/frontend/patterns/record-detail#property-list-with-copy, litespec/frontend/patterns/record-detail#previous-and-next-record)
-- The phone header and the whole order record have their own patterns. (litespec/frontend/patterns/record-detail#record-header-on-a-phone, litespec/frontend/patterns/record-detail#order-record)
-
 ## Standards
 
 ### Show one primary action in a record header
@@ -345,7 +334,7 @@ page
       fact "Standard price" "EUR 45.00"
 ```
 
-**Rationale:** An icon per tab so the row is scannable without reading, with the words still present for anyone who does not recognise the icons.
+**Rationale:** An icon per tab so the row is scannable without reading, with the words still present for anyone who does not recognize the icons.
 
 **Cost:** Carbon's tab guidance is explicit that icons are not permitted in tab labels. Two channels for one thing, and a second set of icons to design and maintain.
 
@@ -633,7 +622,7 @@ page
 
 **Rationale:** Stripe puts a copy button beside every identifier on a charge. Support reads a reference out on the phone or pastes it into a dispute. The human facts stay plain text; the order number, payment reference and customer email copy with one click.
 
-**Cost:** A copy button per row is visual noise on a record nobody quotes. Each button needs its copied confirmation, which is a small behaviour per row.
+**Cost:** A copy button per row is visual noise on a record nobody quotes. Each button needs its copied confirmation, which is a small behavior per row.
 
 **Reference:** Stripe
 
@@ -770,7 +759,7 @@ page
     action primary "Answer the bank"
   split 2:1
     region "What the bank said"
-      text "Cardholder says the order was cancelled by the merchant and the charge is being disputed."
+      text "Cardholder says the order was canceled by the merchant and the charge is being disputed."
       text muted "Received 2 Oct 2026, 14:22"
     aside
       region "Needs a decision"
@@ -780,7 +769,7 @@ page
 
 **Rationale:** The aside stays in place while the sections scroll, so a decision in the aside is always reachable from anywhere on a long record.
 
-**Cost:** A sticky aside on a phone is a stacked block that no longer sticks. The behaviour has two shapes and one of them is untested in practice.
+**Cost:** A sticky aside on a phone is a stacked block that no longer sticks. The behavior has two shapes and one of them is untested in practice.
 
 #### `aside-for-related-records`: Aside for related records
 
@@ -1205,7 +1194,7 @@ page
 
 **Rationale:** '2 parcels on this order' links to the parcels list filtered to this order. The relation is navigable in both directions and the count is never stale.
 
-**Cost:** A link whose text is a number reads as a figure, not a destination, unless the hover and the visited colour make it clear. WCAG 2.4.4 wants the purpose to be clear from the link text.
+**Cost:** A link whose text is a number reads as a figure, not a destination, unless the hover and the visited color make it clear. WCAG 2.4.4 wants the purpose to be clear from the link text.
 
 #### `the-parent-as-a-card-above-the-record-s-own-sections`: The parent as a card above the record's own sections
 
@@ -1351,7 +1340,7 @@ page
     message "Only Finance can answer." neutral
     action disabled "Answer the bank"
   region "What the bank said"
-    text "Cardholder says the order was cancelled by the merchant."
+    text "Cardholder says the order was canceled by the merchant."
 ```
 
 **Rationale:** A page-level notice says what this role may not do on this page, once, and the sections below stay readable. The reader is told rather than blocked.
@@ -1938,7 +1927,7 @@ page
       field "Add proof of collection" file
 ```
 
-**Rationale:** Stripe asks for dispute evidence by category, because the bank checks kinds rather than files: the receipt, the terms, the proof of fulfilment. Each group says whether it is filled, so Priya Shah sees what is still missing before she answers.
+**Rationale:** Stripe asks for dispute evidence by category, because the bank checks kinds rather than files: the receipt, the terms, the proof of fulfillment. Each group says whether it is filled, so Priya Shah sees what is still missing before she answers.
 
 **Cost:** The categories belong to card disputes, so the shape fits nothing else without renaming. A file that proves two things also has to sit in two groups or one group has to stay empty.
 
@@ -2011,7 +2000,7 @@ page
 
 ### Property list with copy
 
-**Question:** Support reads a reference out on the phone and pastes an identifier into a dispute. A property list is labelled values where the identifiers copy with one click. The reader must know the copy landed.
+**Question:** Support reads a reference out on the phone and pastes an identifier into a dispute. A property list is labeled values where the identifiers copy with one click. The reader must know the copy landed.
 
 **Default:** `every-identifier-copies`
 
@@ -2169,7 +2158,7 @@ page
 
 **Default:** `stacked-title-full-width-primary-the-rest-in-a-menu`
 
-**Compact:** This item is the compact behaviour: title and state first, a full-width primary under them, rarer commands in a menu. The compact option is `stacked-title-full-width-primary-the-rest-in-a-menu`.
+**Compact:** This item is the compact behavior: title and state first, a full-width primary under them, rarer commands in a menu. The compact option is `stacked-title-full-width-primary-the-rest-in-a-menu`.
 
 **Rationale:** Keep the stacked title with a full-width primary and the rest in a menu. It keeps the desktop order of title then actions. The primary stays reachable by thumb. The runner-up is the sticky foot bar.
 
@@ -2321,7 +2310,7 @@ page
 
 ### Previous and next record
 
-**Question:** Support works a queue, not a record. The next order in the list waits. The next dispute waits for an answer. Moving on must be one step that keeps the list order. The reader never returns to the list merely to open its neighbour.
+**Question:** Support works a queue, not a record. The next order in the list waits. The next dispute waits for an answer. Moving on must be one step that keeps the list order. The reader never returns to the list merely to open its neighbor.
 
 **Default:** `chevrons-beside-the-breadcrumb`
 
@@ -2329,7 +2318,7 @@ page
 
 **Rationale:** Keep the chevrons beside the breadcrumb. They keep the list order. They cost almost no space. The runner-up is the jump-by-search option.
 
-It fits readers who know the next record number rather than its neighbour. Prefer the list drawer on triage queues where the reader skims many records. Never ship movement without a position. Chevrons that never say 4 of 268 leave the reader lost in the queue.
+It fits readers who know the next record number rather than its neighbor. Prefer the list drawer on triage queues where the reader skims many records. Never ship movement without a position. Chevrons that never say 4 of 268 leave the reader lost in the queue.
 
 #### `chevrons-beside-the-breadcrumb`: Chevrons beside the breadcrumb
 
@@ -2353,7 +2342,7 @@ page
     fact "Cable tray" "EUR 25.00"
 ```
 
-**Rationale:** Gmail puts newer and older arrows above a message, because triage is neighbour to neighbour and the list order is the queue. The position reads between the chevrons, so the reader knows where they are.
+**Rationale:** Gmail puts newer and older arrows above a message, because triage is neighbor to neighbor and the list order is the queue. The position reads between the chevrons, so the reader knows where they are.
 
 **Cost:** Chevrons move one step at a time, so jumping ten records ahead is ten clicks. They also need the list order behind them, which fails when the record was opened from a search.
 
@@ -2459,7 +2448,7 @@ page
 
 **Rationale:** Linear jumps to any issue from its command menu, because a reader who knows the number should not walk the queue to reach it. The order number, customer name or email lands on the record in one step.
 
-**Cost:** Search answers only the record the reader already knows, so it never helps triage an unknown queue. It also needs the menu everywhere, which is a frame behaviour rather than a record pattern.
+**Cost:** Search answers only the record the reader already knows, so it never helps triage an unknown queue. It also needs the menu everywhere, which is a frame behavior rather than a record pattern.
 
 **Reference:** Linear
 
@@ -2482,7 +2471,7 @@ page
     fact "Cable tray" "EUR 25.00"
 ```
 
-**Rationale:** Some consoles deliberately offer no neighbour step, because the list is the queue and the record is the work. The reader finishes an order, closes it, and the list shows what is next. Nothing on the record can carry a stale position.
+**Rationale:** Some consoles deliberately offer no neighbor step, because the list is the queue and the record is the work. The reader finishes an order, closes it, and the list shows what is next. Nothing on the record can carry a stale position.
 
 **Cost:** Every record costs a full round trip through the list, which is slow triage and loses the reader's scroll each time. It is honest but it is the slowest honest option.
 

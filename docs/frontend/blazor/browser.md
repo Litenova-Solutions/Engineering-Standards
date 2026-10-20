@@ -4,15 +4,6 @@
 
 Browser storage is the only durable store in a client-only product. It is small, shared, and can disappear. Access runs through one adapter, keys carry versions, and shapes migrate. The user can always export what they made.
 
-## Agent Summary {#agent-summary}
-
-- Storage is reached only through an Infrastructure adapter. (litespec/frontend/blazor/browser#own-storage-in-infrastructure)
-- Every key is a declared constant carrying product, area, and version. (litespec/frontend/blazor/browser#version-and-scope-every-storage-key)
-- A changed shape ships a migration that reads every released version. (litespec/frontend/blazor/browser#provide-a-migration-for-every-changed-shape)
-- A read returns a typed result covering unavailable, absent, corrupt, and present. (litespec/frontend/blazor/browser#treat-reads-as-fallible)
-- A growing collection declares its bound and eviction rule. (litespec/frontend/blazor/browser#bound-what-is-stored)
-- Durable state exports to one versioned file and imports from it. (litespec/frontend/blazor/browser#provide-export-and-import)
-
 ## Standards
 
 ### Own storage in Infrastructure
