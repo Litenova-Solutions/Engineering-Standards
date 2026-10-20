@@ -6,7 +6,7 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 ## Agent Summary {#agent-summary}
 
-- The SDK is pinned at the root with patch roll-forward only. (standards/rule/workspace-config.pin-the-sdk-at-the-workspace-root)
+- The root sets .NET 10 or later as the SDK floor. (standards/rule/workspace-config.set-the-sdk-floor-at-the-workspace-root)
 - One props file owns the .NET build settings. (standards/rule/workspace-config.centralize-net-build-settings)
 - NuGet versions live in one central props file. (standards/rule/workspace-config.centralize-nuget-versions)
 - Local .NET tools are pinned in the tool manifest. (standards/rule/workspace-config.commit-the-tool-manifest)
@@ -19,11 +19,11 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 ## Standards
 
-### Pin the SDK at the workspace root (standards/rule/workspace-config.pin-the-sdk-at-the-workspace-root)
+### Set the SDK floor at the workspace root (standards/rule/workspace-config.set-the-sdk-floor-at-the-workspace-root)
 
-**Requirement:** Root `global.json` MUST pin the manifest dotnet stack release and permit patch roll-forward only.
+**Requirement:** Root `global.json` MUST set the first feature band of the manifest dotnet major release as its SDK version and roll forward with `latestMajor`.
 
-**Rationale:** `dotnet` invoked from the workspace root and from `apps/api/` then selects the same feature band.
+**Rationale:** Any SDK from that major release on builds the workspace, so a patch or feature band release needs no change to the repository. The manifest names the major release, and `Directory.Build.props` sets its target framework.
 
 ### Centralize .NET build settings (standards/rule/workspace-config.centralize-net-build-settings)
 
@@ -133,7 +133,7 @@ This informative example demonstrates `standards/rule/workspace-config.validate-
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| standards/rule/workspace-config.pin-the-sdk-at-the-workspace-root | guidance | Does root global.json pin the manifest dotnet release with patch-only roll-forward? |
+| standards/rule/workspace-config.set-the-sdk-floor-at-the-workspace-root | guidance | Does root global.json set the manifest major release's first feature band, such as `10.0.100`, with `latestMajor` roll-forward? |
 | standards/rule/workspace-config.centralize-net-build-settings | guidance | Does Directory.Build.props set the manifest target framework, nullable types, implicit usings, and warnings as errors? |
 | standards/rule/workspace-config.centralize-nuget-versions | guidance | Does Directory.Packages.props enable central management with the manifest pins, and do projects omit versions? |
 | standards/rule/workspace-config.commit-the-tool-manifest | guidance | Does .config/dotnet-tools.json pin each local tool a documented command invokes? |

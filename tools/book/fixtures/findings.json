@@ -1,1 +1,20 @@
-{"findings":[{"code":"use-case-unimplemented","line":1,"message":"No code implements the use case and no known gap covers it.","path":"docs/domain/modules/sales/ticket-resales/offer-ticket-back.md","subject":"use-case/sales.offer-ticket-back"}],"known":[{"code":"use-case-unimplemented","line":1,"message":"No code implements the use case and no known gap covers it.","path":"docs/domain/modules/sales/ticket-resales/offer-ticket-back.md","subject":"use-case/sales.offer-ticket-back"}]}
+{
+  "findings": [
+    {
+      "code": "use-case-unimplemented",
+      "message": "Use case \u0027use-case/lending.list-loans\u0027 has no handler, reaction or job.",
+      "path": "docs/domain/modules/lending/loans/list-loans.md",
+      "line": 3,
+      "subject": "use-case/lending.list-loans"
+    }
+  ],
+  "known": [
+    {
+      "code": "use-case-unimplemented",
+      "message": "Use case \u0027use-case/lending.retire-copy\u0027 has no handler, reaction or job.",
+      "path": "docs/domain/modules/lending/copies/retire-copy.md",
+      "line": 3,
+      "subject": "use-case/lending.retire-copy"
+    }
+  ]
+}

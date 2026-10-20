@@ -181,7 +181,7 @@ Each rule states its kind: always true, checked before, or across records. The k
 
 Checked-before rules include message shape: required fields, lengths, and formats are checked before business behavior runs. A persistence constraint is an always-true rule enforced by the store, such as a unique key. Each rule also states where it is enforced: validator, aggregate, store, guard, or reaction.
 
-An actor holds a role at a scope; a role allows permissions; a use case needs permissions; an entry point may offer fewer. Actor kinds are person, company, provider, system, and guest. Role scopes are platform, organizer, event, and self. Permissions come from one shared closed list.
+An actor holds a role at a scope; a role allows permissions; a use case needs permissions; an entry point may offer fewer. Actor kinds are person, company, provider, system, and guest. A role scope is a kebab-case level the project names, such as `platform`, `tenant`, or `self`. Permissions come from one shared closed list.
 
 ### Event and event reaction
 

@@ -10,7 +10,7 @@ A project Exception record overrides a Standard only when it names the provision
 
 An explicit project convention can replace a baseline Convention when local documentation cites its ID. (standards/rule/core-agent.apply-guidance-precedence)
 
-Read `docs/product/brief.md` and the affected product topics before changing behavior that touches price, money, markets, buyers, or terms. (standards/rule/core-product.load-product-intent-before-commercial-work)
+Read `docs/product/brief.md` and the affected product topics before changing behavior that touches price, money, markets, customers, or terms. (standards/rule/core-product.load-product-intent-before-commercial-work)
 
 Draft a product decision for any changed business choice, and leave its approval to the accountable person. Research outside `docs/` is source material, never authority. (standards/rule/core-product.name-the-person-who-approved-a-decision, standards/rule/core-product.treat-generated-research-as-source-material)
 

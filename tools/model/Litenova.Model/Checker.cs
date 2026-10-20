@@ -254,7 +254,7 @@ static partial class Checker
                 break;
 
             case "role":
-                RequireEnum(record, "scope", ["platform", "organizer", "event", "self"], findings);
+                RequirePattern(record, "scope", @"^[a-z0-9]+(-[a-z0-9]+)*$", "kebab-case", findings);
                 RequireIds(record, "allows", 1, findings);
                 break;
 

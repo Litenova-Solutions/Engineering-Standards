@@ -158,7 +158,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 ### Load product intent before commercial work (standards/rule/core-product.load-product-intent-before-commercial-work)
 
-**Requirement:** An agent MUST read the product brief and the affected product topics before changing behavior that touches price, money, markets, buyers, or terms.
+**Requirement:** An agent MUST read the product brief and the affected product topics before changing behavior that touches price, money, markets, customers, or terms.
 
 **Rationale:** Commercial behavior that contradicts the business position compiles and passes its tests. Only the product pages say it is wrong.
 

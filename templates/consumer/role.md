@@ -7,7 +7,7 @@
   "status": "draft",
   "decider": "<owner>",
   "decideBy": "<YYYY-MM-DD>",
-  "scope": "<platform|organizer|event|self>",
+  "scope": "<scope, such as platform, tenant or self>",
   "allows": ["permission/<name>"],
   "replaces": "<role id, or remove this line>",
   "terms": ["term/<term-name>"]

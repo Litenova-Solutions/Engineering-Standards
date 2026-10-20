@@ -118,7 +118,7 @@ test("every module folder names a backend use case, and no folder is named for n
 **Example:** One route contract runs on its own line, against the stack already running.
 
 ```text
-pnpm --filter @shop/webshop exec playwright test --project=routes --grep "ticket keeps the route contract"
+pnpm --filter @shop/webshop exec playwright test --project=routes --grep "cart keeps the route contract"
 ```
 
 ## Conventions

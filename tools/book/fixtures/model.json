@@ -1,1 +1,3269 @@
-{"code":{"events":[{"class":"TicketResoldEvent","event":"event/ticket-resale.ticket-resold","path":"apps/api/src/Harbour.Domain/Sales/TicketResales/Events/TicketResoldEvent.cs"}],"exceptions":[{"class":"ResaleNotListedException","code":"failure/sales.resale-not-listed","path":"apps/api/src/Harbour.Domain/Sales/TicketResales/ResaleNotListedException.cs"}],"handlers":[{"kind":"folder","operation":"command","path":"apps/api/src/Harbour.Application/Sales/TicketResales/CompleteTicketResale/CompleteTicketResaleCommandHandler.cs","useCase":"use-case/sales.complete-ticket-resale"}],"jobs":[],"reactions":[]},"links":{"calls":[{"operation":"completeTicketResale","screen":"admin handed-back tickets","to":"use-case/sales.complete-ticket-resale"}],"implements":[{"kind":"handler","path":"apps/api/src/Harbour.Application/Sales/TicketResales/CompleteTicketResale/CompleteTicketResaleCommandHandler.cs","to":"use-case/sales.complete-ticket-resale"},{"kind":"event","path":"apps/api/src/Harbour.Domain/Sales/TicketResales/Events/TicketResoldEvent.cs","to":"event/ticket-resale.ticket-resold"},{"kind":"result","path":"apps/api/src/Harbour.Domain/Sales/TicketResales/ResaleNotListedException.cs","to":"result/complete-ticket-resale.resale-not-listed"}],"proves":[{"case":"case/complete-ticket-resale.completing-twice-is-refused","confirmed":true,"passing":true,"scenario":"Completing_twice_is_refused_the_second_time"}]},"records":[{"fields":{"audience":["actor/buyer"],"boundary":"Harbour sells software to organizers. The organizer sells the ticket.","neverDoes":["Hold buyer funds","Choose the ticket price"],"owner":"Founder","status":"approved","title":"Harbour","type":"product"},"file":"docs/product/brief.md","id":"product/harbour","line":1,"links":{"terms":["term/original-buyer"]},"owner":"Founder","status":"approved","title":"Harbour","type":"product"},{"fields":{"owner":"Founder","state":"shipped","status":"approved","title":"Ticket resale queue","type":"feature"},"file":"docs/product/features/ticket-resale-queue.md","id":"feature/ticket-resale-queue","line":1,"links":{"solves":["problem/unwanted-tickets-strand-money"]},"owner":"Founder","status":"approved","title":"Ticket resale queue","type":"feature"},{"fields":{"affects":["actor/buyer"],"owner":"Founder","statement":"A buyer who cannot attend strands the money in the ticket.","status":"approved","title":"Unwanted tickets strand money","type":"problem"},"file":"docs/product/problems/unwanted-tickets-strand-money.md","id":"problem/unwanted-tickets-strand-money","line":1,"links":{"affects":["actor/buyer"]},"owner":"Founder","status":"approved","title":"Unwanted tickets strand money","type":"problem"},{"fields":{"decideBy":"2026-11-01","decider":"Founder","options":["Return queue at face value","Open resale at any price"],"owner":"Founder","statement":"What the product must do.","status":"draft","title":"Resale face value return queue","type":"decision"},"file":"docs/product/decisions/0047-resale-face-value-return-queue.md","id":"decision/0047-resale-face-value-return-queue","line":1,"links":{"decides":["requirement/pricing.flat-rate-price"]} ,"owner":"Founder","status":"draft","title":"Resale face value return queue","type":"decision"},{"fields":{"kind":"promise","owner":"Founder","statement":"Flat rate charges a monthly price with an allowance.","status":"approved","title":"Flat rate price","type":"requirement","values":[{"effectiveFrom":"2026-11-01","value":"EUR 149 a month"}]},"file":"docs/product/business/pricing.md","id":"requirement/pricing.flat-rate-price","line":12,"links":{},"owner":"Founder","status":"approved","title":"Flat rate price","type":"requirement"},{"fields":{"holds":[{"role":"role/event-manager","scope":"organizer"}],"kind":"person","owner":"Founder","status":"approved","title":"Organizer","type":"actor"},"file":"docs/domain/actors/organizer.md","id":"actor/organizer","line":1,"links":{},"owner":"Founder","status":"approved","title":"Organizer","type":"actor"},{"fields":{"holds":[{"role":"role/buyer","scope":"self"}],"kind":"person","owner":"Founder","status":"approved","title":"Buyer","type":"actor"},"file":"docs/domain/actors/buyer.md","id":"actor/buyer","line":1,"links":{},"owner":"Founder","status":"approved","title":"Buyer","type":"actor"},{"fields":{"owner":"Founder","scope":"organizer","status":"approved","title":"Event manager","type":"role"},"file":"docs/domain/roles/event-manager.md","id":"role/event-manager","line":1,"links":{"allows":["permission/manage-listing"]},"owner":"Founder","status":"approved","title":"Event manager","type":"role"},{"fields":{"owner":"Founder","scope":"self","status":"approved","title":"Buyer","type":"role"},"file":"docs/domain/roles/buyer.md","id":"role/buyer","line":1,"links":{"allows":["permission/manage-own-tickets"]},"owner":"Founder","status":"approved","title":"Buyer","type":"role"},{"fields":{"code":"manage-listing","codeType":"ManageListing","meaning":"Change the listing of an event.","owner":"Founder","status":"approved","title":"Manage listing","type":"permission"},"file":"docs/domain/permissions.md","id":"permission/manage-listing","line":5,"links":{},"owner":"Founder","status":"approved","title":"Manage listing","type":"permission"},{"fields":{"code":"manage-own-tickets","codeType":"ManageOwnTickets","meaning":"Hand back the buyer's own tickets.","owner":"Founder","status":"approved","title":"Manage own tickets","type":"permission"},"file":"docs/domain/permissions.md","id":"permission/manage-own-tickets","line":11,"links":{},"owner":"Founder","status":"approved","title":"Manage own tickets","type":"permission"},{"fields":{"actor":"actor/buyer","goal":"Hand a ticket back and be settled.","owner":"Founder","status":"approved","steps":[{"actor":"actor/buyer","requires":[],"useCase":"use-case/sales.offer-ticket-back"},{"actor":"actor/organizer","requires":["use-case/sales.offer-ticket-back"],"useCase":"use-case/sales.complete-ticket-resale"}],"title":"Hand a ticket back","type":"journey"},"file":"docs/product/journeys/hand-a-ticket-back.md","id":"journey/hand-a-ticket-back","line":1,"links":{"fulfils":["requirement/pricing.flat-rate-price"]},"owner":"Founder","status":"approved","title":"Hand a ticket back","type":"journey"},{"fields":{"owner":"Founder","status":"approved","title":"Sales","type":"module"},"file":"docs/domain/modules/sales/README.md","id":"module/sales","line":1,"links":{},"owner":"Founder","status":"approved","title":"Sales","type":"module"},{"fields":{"codeName":"TicketResale","owner":"Founder","states":["Listed","Completed","Withdrawn"],"status":"approved","title":"Ticket resale","type":"business-record"},"file":"docs/domain/modules/sales/ticket-resales/README.md","id":"business-record/sales.ticket-resale","line":1,"links":{},"owner":"Founder","status":"approved","title":"Ticket resale","type":"business-record"},{"fields":{"enforcedBy":"aggregate","governs":["business-record/sales.ticket-resale"],"kind":"always-true","owner":"Founder","statement":"Only a listed resale completes.","status":"approved","title":"Only a listed resale completes","type":"rule"},"file":"docs/domain/modules/sales/ticket-resales/README.md","id":"rule/ticket-resale.only-a-listed-resale-completes","line":20,"links":{"governs":["business-record/sales.ticket-resale"]},"owner":"Founder","status":"approved","title":"Only a listed resale completes","type":"rule"},{"fields":{"fulfils":["requirement/pricing.flat-rate-price"],"input":[{"meaning":"The resale, from the route.","name":"ticketResaleId","rules":"Required."}],"needs":["permission/manage-listing"],"operation":"command","owner":"Founder","raises":["event/ticket-resale.ticket-resold"],"reachedThrough":["entry-point/admin"],"status":"approved","title":"Complete ticket resale","type":"use-case"},"file":"docs/domain/modules/sales/ticket-resales/complete-ticket-resale.md","id":"use-case/sales.complete-ticket-resale","line":1,"links":{"fulfils":["requirement/pricing.flat-rate-price"],"needs":["permission/manage-listing"],"raises":["event/ticket-resale.ticket-resold"],"reachedThrough":["entry-point/admin"]},"owner":"Founder","status":"approved","title":"Complete ticket resale","type":"use-case"},{"fields":{"meaning":"The resale completed and the refund due was computed.","outcome":"success","owner":"Founder","status":"approved","title":"Resale completed","type":"result"},"file":"docs/domain/modules/sales/ticket-resales/complete-ticket-resale.md","id":"result/complete-ticket-resale.resale-completed","line":30,"links":{},"owner":"Founder","status":"approved","title":"Resale completed","type":"result"},{"fields":{"code":"failure/sales.resale-not-listed","meaning":"The resale already sold or was withdrawn.","outcome":"refusal","owner":"Founder","status":409,"title":"Resale not listed","type":"result"},"file":"docs/domain/modules/sales/ticket-resales/complete-ticket-resale.md","id":"result/complete-ticket-resale.resale-not-listed","line":36,"links":{},"owner":"Founder","status":"approved","title":"Resale not listed","type":"result"},{"fields":{"action":"Complete it again.","expect":"The second completion is refused.","owner":"Founder","result":"result/complete-ticket-resale.resale-not-listed","situation":"A completed resale.","status":"approved","title":"Completing twice is refused","type":"case"},"file":"docs/domain/modules/sales/ticket-resales/complete-ticket-resale.md","id":"case/complete-ticket-resale.completing-twice-is-refused","line":42,"links":{"result":["result/complete-ticket-resale.resale-not-listed"]},"owner":"Founder","status":"approved","title":"Completing twice is refused","type":"case"},{"fields":{"action":"Nobody buys the unit.","expect":"The resale lapses with no refund due.","owner":"Founder","result":"result/complete-ticket-resale.resale-completed","situation":"A listed resale nobody wants.","status":"approved","title":"A resale nobody buys lapses","type":"case"},"file":"docs/domain/modules/sales/ticket-resales/complete-ticket-resale.md","id":"case/complete-ticket-resale.a-resale-nobody-buys-lapses","line":48,"links":{"result":["result/complete-ticket-resale.resale-completed"]},"owner":"Founder","status":"approved","title":"A resale nobody buys lapses","type":"case"},{"fields":{"carries":["ticketResaleId","refundDue"],"meaning":"A replacement bought the freed unit.","owner":"Founder","status":"approved","title":"Ticket resold","type":"event"},"file":"docs/domain/modules/sales/ticket-resales/README.md","id":"event/ticket-resale.ticket-resold","line":40,"links":{},"owner":"Founder","status":"approved","title":"Ticket resold","type":"event"},{"fields":{"kind":"web-app","owner":"Founder","path":"apps/admin/","status":"approved","title":"Admin","type":"entry-point"},"file":"docs/domain/entry-points.md","id":"entry-point/admin","line":5,"links":{},"owner":"Founder","status":"approved","title":"Admin","type":"entry-point"},{"fields":{"check":"use-case-unimplemented","endsBy":"2026-12-31","owner":"Founder","reason":"The offer step is described but not built.","status":"approved","title":"Offer step unbuilt","type":"known-gap"},"file":"docs/known-gaps/offer-step-unbuilt.md","id":"known-gap/offer-step-unbuilt","line":1,"links":{"subject":["use-case/sales.offer-ticket-back"]} ,"owner":"Founder","status":"approved","title":"Offer step unbuilt","type":"known-gap"},{"fields":{"labels":{"de":"Ursprünglicher Käufer","nl":"Oorspronkelijke koper"},"meaning":"The buyer who first bought the ticket.","owner":"Founder","rejected":[{"reason":"It says nothing about buying first.","word":"holder"}],"status":"approved","term":"Original buyer","title":"Original buyer","type":"term"},"file":"docs/language.json","id":"term/original-buyer","line":3,"links":{},"owner":"Founder","status":"approved","title":"Original buyer","type":"term"}],"root":".","screens":[{"file":"apps/admin/src/routes/handed-back/+page.svelte","frontend":"admin","operations":[{"method":"POST","name":"completeTicketResale","path":"/api/ticket-resales/{id}/completion"}],"route":"handed-back tickets","useCases":["use-case/sales.complete-ticket-resale"]}],"status":{"use-case/sales.complete-ticket-resale":{"implemented":true,"verified":false}},"testRun":{"failed":0,"files":["TestResults/results.trx"],"passed":1,"total":1},"tests":[{"claims":["case/complete-ticket-resale.completing-twice-is-refused"],"class":"CompleteTicketResaleUseCaseScenarios","codes":["failure/sales.resale-not-listed"],"file":"apps/api/tests/Harbour.Acceptance.Tests/Sales/TicketResales/CompleteTicketResaleUseCaseScenarios.cs","line":51,"outcome":"Passed","scenario":"Completing_twice_is_refused_the_second_time","steps":[{"method":"CompleteTicketResale","phase":"when","receiver":"complete","receiverType":"CompleteTicketResaleSteps"}]}],"version":1}
+{
+  "version": 1,
+  "root": ".",
+  "records": [
+    {
+      "type": "actor",
+      "id": "actor/librarian",
+      "title": "Librarian",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/actors/librarian.md",
+      "line": 3,
+      "fields": {
+        "type": "actor",
+        "id": "actor/librarian",
+        "title": "Librarian",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "person",
+        "holds": [
+          {
+            "role": "role/librarian",
+            "scope": "platform"
+          }
+        ]
+      },
+      "links": {
+        "holds": [
+          "role/librarian"
+        ]
+      }
+    },
+    {
+      "type": "actor",
+      "id": "actor/reader",
+      "title": "Reader",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/actors/reader.md",
+      "line": 3,
+      "fields": {
+        "type": "actor",
+        "id": "actor/reader",
+        "title": "Reader",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "person",
+        "holds": [
+          {
+            "role": "role/reader",
+            "scope": "self"
+          }
+        ]
+      },
+      "links": {
+        "holds": [
+          "role/reader"
+        ]
+      }
+    },
+    {
+      "type": "business-record",
+      "id": "business-record/lending.copy",
+      "title": "Copy",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/README.md",
+      "line": 3,
+      "fields": {
+        "type": "business-record",
+        "id": "business-record/lending.copy",
+        "title": "Copy",
+        "owner": "lending-team",
+        "status": "approved",
+        "codeName": "Copy",
+        "states": [
+          "Available",
+          "OnLoan",
+          "Retired"
+        ],
+        "records": [
+          {
+            "type": "rule",
+            "id": "rule/copy.has-one-home-shelf",
+            "title": "Has one home shelf",
+            "owner": "lending-team",
+            "status": "approved",
+            "kind": "always-true",
+            "enforcedBy": "aggregate",
+            "statement": "A copy has one home shelf.",
+            "governs": [
+              "use-case/lending.register-copy"
+            ],
+            "basedOn": [],
+            "fulfils": [
+              "requirement/borrowing.copy-shelf-home"
+            ]
+          },
+          {
+            "type": "event",
+            "id": "event/copy.copy-registered",
+            "title": "Copy registered",
+            "owner": "lending-team",
+            "status": "approved",
+            "meaning": "A copy was registered.",
+            "carries": [
+              "copyId",
+              "shelf"
+            ]
+          },
+          {
+            "type": "event",
+            "id": "event/copy.copy-retired",
+            "title": "Copy retired",
+            "owner": "lending-team",
+            "status": "approved",
+            "meaning": "A copy was retired.",
+            "carries": [
+              "copyId"
+            ]
+          }
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "business-record",
+      "id": "business-record/lending.hold",
+      "title": "Hold",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/README.md",
+      "line": 3,
+      "fields": {
+        "type": "business-record",
+        "id": "business-record/lending.hold",
+        "title": "Hold",
+        "owner": "lending-team",
+        "status": "approved",
+        "codeName": "Hold",
+        "states": [
+          "Waiting",
+          "Ready",
+          "Cancelled"
+        ],
+        "records": [
+          {
+            "type": "rule",
+            "id": "rule/hold.names-one-copy",
+            "title": "Names one copy",
+            "owner": "lending-team",
+            "status": "approved",
+            "kind": "always-true",
+            "enforcedBy": "aggregate",
+            "statement": "A hold names one copy.",
+            "governs": [
+              "use-case/lending.place-hold"
+            ],
+            "refusal": "result/place-hold.hold-already-waiting",
+            "basedOn": [],
+            "fulfils": [
+              "requirement/borrowing.hold-pickup-window"
+            ]
+          },
+          {
+            "type": "event",
+            "id": "event/hold.hold-placed",
+            "title": "Hold placed",
+            "owner": "lending-team",
+            "status": "approved",
+            "meaning": "A hold was placed.",
+            "carries": [
+              "holdId",
+              "copyId",
+              "readerId"
+            ]
+          },
+          {
+            "type": "event",
+            "id": "event/hold.hold-cancelled",
+            "title": "Hold cancelled",
+            "owner": "lending-team",
+            "status": "approved",
+            "meaning": "A hold was cancelled.",
+            "carries": [
+              "holdId"
+            ]
+          }
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "business-record",
+      "id": "business-record/lending.loan",
+      "title": "Loan",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/README.md",
+      "line": 3,
+      "fields": {
+        "type": "business-record",
+        "id": "business-record/lending.loan",
+        "title": "Loan",
+        "owner": "lending-team",
+        "status": "approved",
+        "codeName": "Loan",
+        "states": [
+          "Active",
+          "Returned",
+          "Overdue"
+        ],
+        "records": [
+          {
+            "type": "rule",
+            "id": "rule/loan.has-one-borrower",
+            "title": "Has one borrower",
+            "owner": "lending-team",
+            "status": "approved",
+            "kind": "always-true",
+            "enforcedBy": "aggregate",
+            "statement": "A loan has one borrower.",
+            "governs": [
+              "use-case/lending.borrow-copy"
+            ],
+            "refusal": "result/borrow-copy.copy-unavailable",
+            "basedOn": [],
+            "fulfils": [
+              "requirement/borrowing.max-active-loans"
+            ]
+          },
+          {
+            "type": "rule",
+            "id": "rule/loan.borrowed-copy-never-leaves-unscanned",
+            "title": "Borrowed copy never leaves unscanned",
+            "owner": "lending-team",
+            "status": "approved",
+            "kind": "checked-before",
+            "enforcedBy": "validator",
+            "statement": "A borrowed copy never leaves unscanned.",
+            "governs": [
+              "use-case/lending.borrow-copy"
+            ],
+            "basedOn": [],
+            "fulfils": [
+              "requirement/borrowing.loan-period-days"
+            ]
+          },
+          {
+            "type": "event",
+            "id": "event/loan.loan-borrowed",
+            "title": "Loan borrowed",
+            "owner": "lending-team",
+            "status": "approved",
+            "meaning": "A copy was lent.",
+            "carries": [
+              "loanId",
+              "copyId",
+              "readerId",
+              "dueDate"
+            ]
+          },
+          {
+            "type": "event",
+            "id": "event/loan.loan-returned",
+            "title": "Loan returned",
+            "owner": "lending-team",
+            "status": "approved",
+            "meaning": "A copy was returned.",
+            "carries": [
+              "loanId",
+              "returnedAt"
+            ]
+          },
+          {
+            "type": "event",
+            "id": "event/loan.loan-extended",
+            "title": "Loan extended",
+            "owner": "lending-team",
+            "status": "approved",
+            "meaning": "A loan was extended.",
+            "carries": [
+              "loanId",
+              "newDueDate"
+            ]
+          }
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "case",
+      "id": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+      "title": "Borrowing an available copy succeeds",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/borrow-copy.md",
+      "line": 28,
+      "fields": {
+        "type": "case",
+        "id": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+        "title": "Borrowing an available copy succeeds",
+        "owner": "lending-team",
+        "status": "approved",
+        "situation": "A copy sits available on its shelf.",
+        "action": "The reader borrows the copy.",
+        "result": "result/borrow-copy.borrowed",
+        "expect": "The loan is active."
+      },
+      "links": {
+        "result": [
+          "result/borrow-copy.borrowed"
+        ]
+      }
+    },
+    {
+      "type": "case",
+      "id": "case/cancel-hold.cancelling-a-waiting-hold-succeeds",
+      "title": "Cancelling a waiting hold succeeds",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/cancel-hold.md",
+      "line": 28,
+      "fields": {
+        "type": "case",
+        "id": "case/cancel-hold.cancelling-a-waiting-hold-succeeds",
+        "title": "Cancelling a waiting hold succeeds",
+        "owner": "lending-team",
+        "status": "approved",
+        "situation": "A reader holds a waiting hold.",
+        "action": "The reader cancels the hold.",
+        "result": "result/cancel-hold.cancelled",
+        "expect": "The hold is cancelled."
+      },
+      "links": {
+        "result": [
+          "result/cancel-hold.cancelled"
+        ]
+      }
+    },
+    {
+      "type": "case",
+      "id": "case/extend-loan.extending-an-active-loan-succeeds",
+      "title": "Extending an active loan succeeds",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/extend-loan.md",
+      "line": 28,
+      "fields": {
+        "type": "case",
+        "id": "case/extend-loan.extending-an-active-loan-succeeds",
+        "title": "Extending an active loan succeeds",
+        "owner": "lending-team",
+        "status": "approved",
+        "situation": "A reader holds an active loan.",
+        "action": "The reader extends the loan.",
+        "result": "result/extend-loan.extended",
+        "expect": "The loan is extended."
+      },
+      "links": {
+        "result": [
+          "result/extend-loan.extended"
+        ]
+      }
+    },
+    {
+      "type": "case",
+      "id": "case/list-loans.listing-own-loans-succeeds",
+      "title": "Listing own loans succeeds",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/list-loans.md",
+      "line": 25,
+      "fields": {
+        "type": "case",
+        "id": "case/list-loans.listing-own-loans-succeeds",
+        "title": "Listing own loans succeeds",
+        "owner": "lending-team",
+        "status": "approved",
+        "situation": "A reader holds two active loans.",
+        "action": "The reader lists their loans.",
+        "result": "result/list-loans.listed",
+        "expect": "Both loans are listed."
+      },
+      "links": {
+        "result": [
+          "result/list-loans.listed"
+        ]
+      }
+    },
+    {
+      "type": "case",
+      "id": "case/place-hold.placing-a-hold-succeeds",
+      "title": "Placing a hold succeeds",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/place-hold.md",
+      "line": 28,
+      "fields": {
+        "type": "case",
+        "id": "case/place-hold.placing-a-hold-succeeds",
+        "title": "Placing a hold succeeds",
+        "owner": "lending-team",
+        "status": "approved",
+        "situation": "A copy is on loan to another reader.",
+        "action": "The reader places a hold.",
+        "result": "result/place-hold.placed",
+        "expect": "The hold is placed."
+      },
+      "links": {
+        "result": [
+          "result/place-hold.placed"
+        ]
+      }
+    },
+    {
+      "type": "case",
+      "id": "case/register-copy.registering-a-new-copy-succeeds",
+      "title": "Registering a new copy succeeds",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/register-copy.md",
+      "line": 28,
+      "fields": {
+        "type": "case",
+        "id": "case/register-copy.registering-a-new-copy-succeeds",
+        "title": "Registering a new copy succeeds",
+        "owner": "lending-team",
+        "status": "approved",
+        "situation": "A new copy arrives at the desk.",
+        "action": "The librarian registers the copy.",
+        "result": "result/register-copy.registered",
+        "expect": "The copy is registered."
+      },
+      "links": {
+        "result": [
+          "result/register-copy.registered"
+        ]
+      }
+    },
+    {
+      "type": "case",
+      "id": "case/retire-copy.retiring-an-available-copy-succeeds",
+      "title": "Retiring an available copy succeeds",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/retire-copy.md",
+      "line": 28,
+      "fields": {
+        "type": "case",
+        "id": "case/retire-copy.retiring-an-available-copy-succeeds",
+        "title": "Retiring an available copy succeeds",
+        "owner": "lending-team",
+        "status": "approved",
+        "situation": "A copy sits available past weeding.",
+        "action": "The librarian retires the copy.",
+        "result": "result/retire-copy.retired",
+        "expect": "The copy is retired."
+      },
+      "links": {
+        "result": [
+          "result/retire-copy.retired"
+        ]
+      }
+    },
+    {
+      "type": "case",
+      "id": "case/return-copy.returning-a-borrowed-copy-succeeds",
+      "title": "Returning a borrowed copy succeeds",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/return-copy.md",
+      "line": 28,
+      "fields": {
+        "type": "case",
+        "id": "case/return-copy.returning-a-borrowed-copy-succeeds",
+        "title": "Returning a borrowed copy succeeds",
+        "owner": "lending-team",
+        "status": "approved",
+        "situation": "A reader holds an active loan.",
+        "action": "The reader returns the copy.",
+        "result": "result/return-copy.returned",
+        "expect": "The loan is returned."
+      },
+      "links": {
+        "result": [
+          "result/return-copy.returned"
+        ]
+      }
+    },
+    {
+      "type": "constraint",
+      "id": "constraint/library-privacy-law",
+      "title": "Library privacy law",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/constraints/library-privacy-law.md",
+      "line": 3,
+      "fields": {
+        "type": "constraint",
+        "id": "constraint/library-privacy-law",
+        "title": "Library privacy law",
+        "owner": "lending-team",
+        "status": "approved",
+        "source": "City library privacy ordinance.",
+        "applies": true,
+        "appliesBecause": "The library keeps reader records."
+      },
+      "links": {}
+    },
+    {
+      "type": "decision",
+      "id": "decision/0001-loan-period",
+      "title": "Loan period",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/decisions/0001-loan-period.md",
+      "line": 3,
+      "fields": {
+        "type": "decision",
+        "id": "decision/0001-loan-period",
+        "title": "Loan period",
+        "owner": "lending-team",
+        "status": "approved",
+        "decided": "2026-02-01",
+        "options": [
+          "14 days",
+          "21 days",
+          "28 days"
+        ],
+        "changeWhen": "Reader demand shifts.",
+        "decides": [
+          "requirement/borrowing.loan-period-days"
+        ],
+        "basedOn": []
+      },
+      "links": {
+        "decides": [
+          "requirement/borrowing.loan-period-days"
+        ]
+      }
+    },
+    {
+      "type": "entry-point",
+      "id": "entry-point/library-app",
+      "title": "Library app",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/entry-points.md",
+      "line": 10,
+      "fields": {
+        "type": "entry-point",
+        "id": "entry-point/library-app",
+        "title": "Library app",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "web-app"
+      },
+      "links": {}
+    },
+    {
+      "type": "entry-point",
+      "id": "entry-point/overdue-job",
+      "title": "Overdue job",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/entry-points.md",
+      "line": 18,
+      "fields": {
+        "type": "entry-point",
+        "id": "entry-point/overdue-job",
+        "title": "Overdue job",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "job"
+      },
+      "links": {}
+    },
+    {
+      "type": "event",
+      "id": "event/copy.copy-registered",
+      "title": "Copy registered",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/README.md",
+      "line": 34,
+      "fields": {
+        "type": "event",
+        "id": "event/copy.copy-registered",
+        "title": "Copy registered",
+        "owner": "lending-team",
+        "status": "approved",
+        "meaning": "A copy was registered.",
+        "carries": [
+          "copyId",
+          "shelf"
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "event",
+      "id": "event/copy.copy-retired",
+      "title": "Copy retired",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/README.md",
+      "line": 46,
+      "fields": {
+        "type": "event",
+        "id": "event/copy.copy-retired",
+        "title": "Copy retired",
+        "owner": "lending-team",
+        "status": "approved",
+        "meaning": "A copy was retired.",
+        "carries": [
+          "copyId"
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "event",
+      "id": "event/hold.hold-cancelled",
+      "title": "Hold cancelled",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/README.md",
+      "line": 48,
+      "fields": {
+        "type": "event",
+        "id": "event/hold.hold-cancelled",
+        "title": "Hold cancelled",
+        "owner": "lending-team",
+        "status": "approved",
+        "meaning": "A hold was cancelled.",
+        "carries": [
+          "holdId"
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "event",
+      "id": "event/hold.hold-placed",
+      "title": "Hold placed",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/README.md",
+      "line": 35,
+      "fields": {
+        "type": "event",
+        "id": "event/hold.hold-placed",
+        "title": "Hold placed",
+        "owner": "lending-team",
+        "status": "approved",
+        "meaning": "A hold was placed.",
+        "carries": [
+          "holdId",
+          "copyId",
+          "readerId"
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "event",
+      "id": "event/loan.loan-borrowed",
+      "title": "Loan borrowed",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/README.md",
+      "line": 52,
+      "fields": {
+        "type": "event",
+        "id": "event/loan.loan-borrowed",
+        "title": "Loan borrowed",
+        "owner": "lending-team",
+        "status": "approved",
+        "meaning": "A copy was lent.",
+        "carries": [
+          "loanId",
+          "copyId",
+          "readerId",
+          "dueDate"
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "event",
+      "id": "event/loan.loan-extended",
+      "title": "Loan extended",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/README.md",
+      "line": 78,
+      "fields": {
+        "type": "event",
+        "id": "event/loan.loan-extended",
+        "title": "Loan extended",
+        "owner": "lending-team",
+        "status": "approved",
+        "meaning": "A loan was extended.",
+        "carries": [
+          "loanId",
+          "newDueDate"
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "event",
+      "id": "event/loan.loan-returned",
+      "title": "Loan returned",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/README.md",
+      "line": 66,
+      "fields": {
+        "type": "event",
+        "id": "event/loan.loan-returned",
+        "title": "Loan returned",
+        "owner": "lending-team",
+        "status": "approved",
+        "meaning": "A copy was returned.",
+        "carries": [
+          "loanId",
+          "returnedAt"
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "exception",
+      "id": "exception/shelf-check-bypass",
+      "title": "Shelf check bypass",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/exceptions/shelf-check-bypass.md",
+      "line": 3,
+      "fields": {
+        "type": "exception",
+        "id": "exception/shelf-check-bypass",
+        "title": "Shelf check bypass",
+        "owner": "lending-team",
+        "status": "approved",
+        "standard": "standard/lending.quiet-shelf-check",
+        "reason": "The import runs before opening.",
+        "reviewBy": "2027-01-01",
+        "removeWhen": "The import moves after opening."
+      },
+      "links": {
+        "standard": [
+          "standard/lending.quiet-shelf-check"
+        ]
+      }
+    },
+    {
+      "type": "feature",
+      "id": "feature/hold-queue",
+      "title": "Hold queue",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/features/hold-queue.md",
+      "line": 3,
+      "fields": {
+        "type": "feature",
+        "id": "feature/hold-queue",
+        "title": "Hold queue",
+        "owner": "lending-team",
+        "status": "approved",
+        "state": "shipped",
+        "solves": [
+          "problem/overdue-loans-pile-up"
+        ]
+      },
+      "links": {
+        "solves": [
+          "problem/overdue-loans-pile-up"
+        ]
+      }
+    },
+    {
+      "type": "journey",
+      "id": "journey/borrow-and-return",
+      "title": "Borrow and return",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/journeys/borrow-and-return.md",
+      "line": 3,
+      "fields": {
+        "type": "journey",
+        "id": "journey/borrow-and-return",
+        "title": "Borrow and return",
+        "owner": "lending-team",
+        "status": "approved",
+        "actor": "actor/reader",
+        "goal": "Borrow and return a copy.",
+        "steps": [
+          {
+            "useCase": "use-case/lending.register-copy",
+            "actor": "actor/reader",
+            "requires": []
+          },
+          {
+            "useCase": "use-case/lending.borrow-copy",
+            "actor": "actor/reader",
+            "requires": []
+          },
+          {
+            "useCase": "use-case/lending.extend-loan",
+            "actor": "actor/reader",
+            "requires": []
+          },
+          {
+            "useCase": "use-case/lending.list-loans",
+            "actor": "actor/reader",
+            "requires": []
+          },
+          {
+            "useCase": "use-case/lending.return-copy",
+            "actor": "actor/reader",
+            "requires": []
+          },
+          {
+            "useCase": "use-case/lending.place-hold",
+            "actor": "actor/reader",
+            "requires": []
+          },
+          {
+            "useCase": "use-case/lending.cancel-hold",
+            "actor": "actor/reader",
+            "requires": []
+          },
+          {
+            "useCase": "use-case/lending.retire-copy",
+            "actor": "actor/reader",
+            "requires": []
+          }
+        ],
+        "fulfils": [
+          "requirement/borrowing.max-active-loans"
+        ]
+      },
+      "links": {
+        "steps": [
+          "use-case/lending.register-copy",
+          "use-case/lending.borrow-copy",
+          "use-case/lending.extend-loan",
+          "use-case/lending.list-loans",
+          "use-case/lending.return-copy",
+          "use-case/lending.place-hold",
+          "use-case/lending.cancel-hold",
+          "use-case/lending.retire-copy"
+        ],
+        "fulfils": [
+          "requirement/borrowing.max-active-loans"
+        ]
+      }
+    },
+    {
+      "type": "known-gap",
+      "id": "known-gap/retire-copy-unimplemented",
+      "title": "Retire copy unimplemented",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/known-gaps/retire-copy-unimplemented.md",
+      "line": 3,
+      "fields": {
+        "type": "known-gap",
+        "id": "known-gap/retire-copy-unimplemented",
+        "title": "Retire copy unimplemented",
+        "owner": "lending-team",
+        "status": "approved",
+        "check": "use-case-unimplemented",
+        "subject": [
+          "use-case/lending.retire-copy"
+        ],
+        "endsBy": "2027-06-01",
+        "reason": "Retirement waits for the weeding policy."
+      },
+      "links": {
+        "subject": [
+          "use-case/lending.retire-copy"
+        ]
+      }
+    },
+    {
+      "type": "limit",
+      "id": "limit/active-loans-per-reader",
+      "title": "Active loans per reader",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/operations/limits.md",
+      "line": 10,
+      "fields": {
+        "type": "limit",
+        "id": "limit/active-loans-per-reader",
+        "title": "Active loans per reader",
+        "owner": "lending-team",
+        "status": "approved",
+        "bound": "Active loans per reader",
+        "value": "5",
+        "runbook": "runbook/clear-stuck-holds"
+      },
+      "links": {
+        "runbook": [
+          "runbook/clear-stuck-holds"
+        ]
+      }
+    },
+    {
+      "type": "module",
+      "id": "module/lending",
+      "title": "Lending",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/README.md",
+      "line": 3,
+      "fields": {
+        "type": "module",
+        "id": "module/lending",
+        "title": "Lending",
+        "owner": "lending-team",
+        "status": "approved",
+        "dependsOn": []
+      },
+      "links": {}
+    },
+    {
+      "type": "permission",
+      "id": "permission/borrow-copy",
+      "title": "Borrow copy",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/permissions.md",
+      "line": 10,
+      "fields": {
+        "type": "permission",
+        "id": "permission/borrow-copy",
+        "title": "Borrow copy",
+        "owner": "lending-team",
+        "status": "approved",
+        "code": "borrow-copy",
+        "codeType": "BorrowCopy",
+        "meaning": "Borrow an available copy."
+      },
+      "links": {}
+    },
+    {
+      "type": "permission",
+      "id": "permission/manage-copies",
+      "title": "Manage copies",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/permissions.md",
+      "line": 30,
+      "fields": {
+        "type": "permission",
+        "id": "permission/manage-copies",
+        "title": "Manage copies",
+        "owner": "lending-team",
+        "status": "approved",
+        "code": "manage-copies",
+        "codeType": "ManageCopies",
+        "meaning": "Register and retire copies."
+      },
+      "links": {}
+    },
+    {
+      "type": "permission",
+      "id": "permission/place-hold",
+      "title": "Place hold",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/permissions.md",
+      "line": 40,
+      "fields": {
+        "type": "permission",
+        "id": "permission/place-hold",
+        "title": "Place hold",
+        "owner": "lending-team",
+        "status": "approved",
+        "code": "place-hold",
+        "codeType": "PlaceHold",
+        "meaning": "Place and cancel holds."
+      },
+      "links": {}
+    },
+    {
+      "type": "permission",
+      "id": "permission/read-loans",
+      "title": "Read loans",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/permissions.md",
+      "line": 20,
+      "fields": {
+        "type": "permission",
+        "id": "permission/read-loans",
+        "title": "Read loans",
+        "owner": "lending-team",
+        "status": "approved",
+        "code": "read-loans",
+        "codeType": "ReadLoans",
+        "meaning": "Read own loans."
+      },
+      "links": {}
+    },
+    {
+      "type": "problem",
+      "id": "problem/overdue-loans-pile-up",
+      "title": "Overdue loans pile up",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/problems/overdue-loans-pile-up.md",
+      "line": 3,
+      "fields": {
+        "type": "problem",
+        "id": "problem/overdue-loans-pile-up",
+        "title": "Overdue loans pile up",
+        "owner": "lending-team",
+        "status": "approved",
+        "affects": [
+          "actor/reader"
+        ],
+        "statement": "Readers lose track of due dates."
+      },
+      "links": {
+        "affects": [
+          "actor/reader"
+        ]
+      }
+    },
+    {
+      "type": "product",
+      "id": "product/library",
+      "title": "Library",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/brief.md",
+      "line": 3,
+      "fields": {
+        "type": "product",
+        "id": "product/library",
+        "title": "Library",
+        "owner": "lending-team",
+        "status": "approved",
+        "boundary": "The library lends copies to readers and tracks holds.",
+        "neverDoes": [
+          "The product never sells copies.",
+          "The product never lends without a reader record."
+        ],
+        "audience": [
+          "actor/reader",
+          "actor/librarian"
+        ]
+      },
+      "links": {}
+    },
+    {
+      "type": "requirement",
+      "id": "requirement/borrowing.copy-shelf-home",
+      "title": "Copy shelf home",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/lending/borrowing.md",
+      "line": 40,
+      "fields": {
+        "type": "requirement",
+        "id": "requirement/borrowing.copy-shelf-home",
+        "title": "Copy shelf home",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "behaviour",
+        "statement": "A copy lives on one home shelf.",
+        "basedOn": []
+      },
+      "links": {}
+    },
+    {
+      "type": "requirement",
+      "id": "requirement/borrowing.hold-pickup-window",
+      "title": "Hold pickup window",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/lending/borrowing.md",
+      "line": 30,
+      "fields": {
+        "type": "requirement",
+        "id": "requirement/borrowing.hold-pickup-window",
+        "title": "Hold pickup window",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "behaviour",
+        "statement": "A ready hold waits seven days.",
+        "basedOn": []
+      },
+      "links": {}
+    },
+    {
+      "type": "requirement",
+      "id": "requirement/borrowing.loan-period-days",
+      "title": "Loan period days",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/lending/borrowing.md",
+      "line": 20,
+      "fields": {
+        "type": "requirement",
+        "id": "requirement/borrowing.loan-period-days",
+        "title": "Loan period days",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "behaviour",
+        "statement": "A loan lasts 21 days.",
+        "basedOn": []
+      },
+      "links": {}
+    },
+    {
+      "type": "requirement",
+      "id": "requirement/borrowing.max-active-loans",
+      "title": "Max active loans",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/product/lending/borrowing.md",
+      "line": 10,
+      "fields": {
+        "type": "requirement",
+        "id": "requirement/borrowing.max-active-loans",
+        "title": "Max active loans",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "behaviour",
+        "statement": "A reader holds at most five active loans.",
+        "basedOn": []
+      },
+      "links": {}
+    },
+    {
+      "type": "research",
+      "id": "research/loan-period-benchmarks",
+      "title": "Loan period benchmarks",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/research/loan-period-benchmarks.md",
+      "line": 3,
+      "fields": {
+        "type": "research",
+        "id": "research/loan-period-benchmarks",
+        "title": "Loan period benchmarks",
+        "owner": "lending-team",
+        "status": "approved",
+        "sources": [
+          {
+            "url": "https://example.com/loan-study",
+            "read": "2026-01-15"
+          }
+        ],
+        "question": "How long do city libraries lend?"
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/borrow-copy.borrowed",
+      "title": "Borrowed",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/borrow-copy.md",
+      "line": 24,
+      "fields": {
+        "type": "result",
+        "id": "result/borrow-copy.borrowed",
+        "title": "Borrowed",
+        "owner": "lending-team",
+        "outcome": "success",
+        "status": 201,
+        "meaning": "The copy is lent."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/borrow-copy.copy-unavailable",
+      "title": "Copy unavailable",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/borrow-copy.md",
+      "line": 25,
+      "fields": {
+        "type": "result",
+        "id": "result/borrow-copy.copy-unavailable",
+        "title": "Copy unavailable",
+        "owner": "lending-team",
+        "outcome": "refusal",
+        "code": "failure/lending.copy_not_available",
+        "status": 409,
+        "meaning": "The copy is unavailable."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/cancel-hold.cancelled",
+      "title": "Cancelled",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/cancel-hold.md",
+      "line": 24,
+      "fields": {
+        "type": "result",
+        "id": "result/cancel-hold.cancelled",
+        "title": "Cancelled",
+        "owner": "lending-team",
+        "outcome": "success",
+        "status": 200,
+        "meaning": "The hold is cancelled."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/cancel-hold.hold-ended",
+      "title": "Hold ended",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/cancel-hold.md",
+      "line": 25,
+      "fields": {
+        "type": "result",
+        "id": "result/cancel-hold.hold-ended",
+        "title": "Hold ended",
+        "owner": "lending-team",
+        "outcome": "refusal",
+        "code": "failure/lending.hold_not_waiting",
+        "status": 409,
+        "meaning": "The hold already left the queue."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/extend-loan.extended",
+      "title": "Extended",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/extend-loan.md",
+      "line": 24,
+      "fields": {
+        "type": "result",
+        "id": "result/extend-loan.extended",
+        "title": "Extended",
+        "owner": "lending-team",
+        "outcome": "success",
+        "status": 200,
+        "meaning": "The loan is extended."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/extend-loan.extension-refused",
+      "title": "Extension refused",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/extend-loan.md",
+      "line": 25,
+      "fields": {
+        "type": "result",
+        "id": "result/extend-loan.extension-refused",
+        "title": "Extension refused",
+        "owner": "lending-team",
+        "outcome": "refusal",
+        "code": "failure/lending.extension_refused",
+        "status": 409,
+        "meaning": "The extension is refused."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/list-loans.listed",
+      "title": "Listed",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/list-loans.md",
+      "line": 22,
+      "fields": {
+        "type": "result",
+        "id": "result/list-loans.listed",
+        "title": "Listed",
+        "owner": "lending-team",
+        "outcome": "success",
+        "status": 200,
+        "meaning": "The loans are listed."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/place-hold.hold-already-waiting",
+      "title": "Hold already waiting",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/place-hold.md",
+      "line": 25,
+      "fields": {
+        "type": "result",
+        "id": "result/place-hold.hold-already-waiting",
+        "title": "Hold already waiting",
+        "owner": "lending-team",
+        "outcome": "refusal",
+        "code": "failure/lending.hold_already_waiting",
+        "status": 409,
+        "meaning": "A hold is already waiting."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/place-hold.placed",
+      "title": "Placed",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/place-hold.md",
+      "line": 24,
+      "fields": {
+        "type": "result",
+        "id": "result/place-hold.placed",
+        "title": "Placed",
+        "owner": "lending-team",
+        "outcome": "success",
+        "status": 201,
+        "meaning": "The hold is placed."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/register-copy.copy-already-registered",
+      "title": "Copy already registered",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/register-copy.md",
+      "line": 25,
+      "fields": {
+        "type": "result",
+        "id": "result/register-copy.copy-already-registered",
+        "title": "Copy already registered",
+        "owner": "lending-team",
+        "outcome": "refusal",
+        "code": "failure/lending.copy_already_registered",
+        "status": 409,
+        "meaning": "The copy is already registered."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/register-copy.registered",
+      "title": "Registered",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/register-copy.md",
+      "line": 24,
+      "fields": {
+        "type": "result",
+        "id": "result/register-copy.registered",
+        "title": "Registered",
+        "owner": "lending-team",
+        "outcome": "success",
+        "status": 201,
+        "meaning": "The copy is registered."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/retire-copy.copy-on-loan",
+      "title": "Copy on loan",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/retire-copy.md",
+      "line": 25,
+      "fields": {
+        "type": "result",
+        "id": "result/retire-copy.copy-on-loan",
+        "title": "Copy on loan",
+        "owner": "lending-team",
+        "outcome": "refusal",
+        "code": "failure/lending.copy_on_loan",
+        "status": 409,
+        "meaning": "The copy is on loan."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/retire-copy.retired",
+      "title": "Retired",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/retire-copy.md",
+      "line": 24,
+      "fields": {
+        "type": "result",
+        "id": "result/retire-copy.retired",
+        "title": "Retired",
+        "owner": "lending-team",
+        "outcome": "success",
+        "status": 200,
+        "meaning": "The copy is retired."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/return-copy.loan-inactive",
+      "title": "Loan inactive",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/return-copy.md",
+      "line": 25,
+      "fields": {
+        "type": "result",
+        "id": "result/return-copy.loan-inactive",
+        "title": "Loan inactive",
+        "owner": "lending-team",
+        "outcome": "refusal",
+        "code": "failure/lending.loan_not_active",
+        "status": 409,
+        "meaning": "The loan is inactive."
+      },
+      "links": {}
+    },
+    {
+      "type": "result",
+      "id": "result/return-copy.returned",
+      "title": "Returned",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/return-copy.md",
+      "line": 24,
+      "fields": {
+        "type": "result",
+        "id": "result/return-copy.returned",
+        "title": "Returned",
+        "owner": "lending-team",
+        "outcome": "success",
+        "status": 200,
+        "meaning": "The copy is returned."
+      },
+      "links": {}
+    },
+    {
+      "type": "role",
+      "id": "role/librarian",
+      "title": "Librarian",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/roles/librarian.md",
+      "line": 3,
+      "fields": {
+        "type": "role",
+        "id": "role/librarian",
+        "title": "Librarian",
+        "owner": "lending-team",
+        "status": "approved",
+        "scope": "platform",
+        "allows": [
+          "permission/borrow-copy",
+          "permission/read-loans",
+          "permission/manage-copies",
+          "permission/place-hold"
+        ]
+      },
+      "links": {
+        "allows": [
+          "permission/borrow-copy",
+          "permission/read-loans",
+          "permission/manage-copies",
+          "permission/place-hold"
+        ]
+      }
+    },
+    {
+      "type": "role",
+      "id": "role/reader",
+      "title": "Reader",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/roles/reader.md",
+      "line": 3,
+      "fields": {
+        "type": "role",
+        "id": "role/reader",
+        "title": "Reader",
+        "owner": "lending-team",
+        "status": "approved",
+        "scope": "self",
+        "allows": [
+          "permission/borrow-copy",
+          "permission/read-loans",
+          "permission/place-hold"
+        ]
+      },
+      "links": {
+        "allows": [
+          "permission/borrow-copy",
+          "permission/read-loans",
+          "permission/place-hold"
+        ]
+      }
+    },
+    {
+      "type": "rule",
+      "id": "rule/copy.has-one-home-shelf",
+      "title": "Has one home shelf",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/copies/README.md",
+      "line": 17,
+      "fields": {
+        "type": "rule",
+        "id": "rule/copy.has-one-home-shelf",
+        "title": "Has one home shelf",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "always-true",
+        "enforcedBy": "aggregate",
+        "statement": "A copy has one home shelf.",
+        "governs": [
+          "use-case/lending.register-copy"
+        ],
+        "basedOn": [],
+        "fulfils": [
+          "requirement/borrowing.copy-shelf-home"
+        ]
+      },
+      "links": {
+        "governs": [
+          "use-case/lending.register-copy"
+        ],
+        "fulfils": [
+          "requirement/borrowing.copy-shelf-home"
+        ]
+      }
+    },
+    {
+      "type": "rule",
+      "id": "rule/hold.names-one-copy",
+      "title": "Names one copy",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/holds/README.md",
+      "line": 17,
+      "fields": {
+        "type": "rule",
+        "id": "rule/hold.names-one-copy",
+        "title": "Names one copy",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "always-true",
+        "enforcedBy": "aggregate",
+        "statement": "A hold names one copy.",
+        "governs": [
+          "use-case/lending.place-hold"
+        ],
+        "refusal": "result/place-hold.hold-already-waiting",
+        "basedOn": [],
+        "fulfils": [
+          "requirement/borrowing.hold-pickup-window"
+        ]
+      },
+      "links": {
+        "governs": [
+          "use-case/lending.place-hold"
+        ],
+        "refusal": [
+          "result/place-hold.hold-already-waiting"
+        ],
+        "fulfils": [
+          "requirement/borrowing.hold-pickup-window"
+        ]
+      }
+    },
+    {
+      "type": "rule",
+      "id": "rule/loan.borrowed-copy-never-leaves-unscanned",
+      "title": "Borrowed copy never leaves unscanned",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/README.md",
+      "line": 35,
+      "fields": {
+        "type": "rule",
+        "id": "rule/loan.borrowed-copy-never-leaves-unscanned",
+        "title": "Borrowed copy never leaves unscanned",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "checked-before",
+        "enforcedBy": "validator",
+        "statement": "A borrowed copy never leaves unscanned.",
+        "governs": [
+          "use-case/lending.borrow-copy"
+        ],
+        "basedOn": [],
+        "fulfils": [
+          "requirement/borrowing.loan-period-days"
+        ]
+      },
+      "links": {
+        "governs": [
+          "use-case/lending.borrow-copy"
+        ],
+        "fulfils": [
+          "requirement/borrowing.loan-period-days"
+        ]
+      }
+    },
+    {
+      "type": "rule",
+      "id": "rule/loan.has-one-borrower",
+      "title": "Has one borrower",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/modules/lending/loans/README.md",
+      "line": 17,
+      "fields": {
+        "type": "rule",
+        "id": "rule/loan.has-one-borrower",
+        "title": "Has one borrower",
+        "owner": "lending-team",
+        "status": "approved",
+        "kind": "always-true",
+        "enforcedBy": "aggregate",
+        "statement": "A loan has one borrower.",
+        "governs": [
+          "use-case/lending.borrow-copy"
+        ],
+        "refusal": "result/borrow-copy.copy-unavailable",
+        "basedOn": [],
+        "fulfils": [
+          "requirement/borrowing.max-active-loans"
+        ]
+      },
+      "links": {
+        "governs": [
+          "use-case/lending.borrow-copy"
+        ],
+        "refusal": [
+          "result/borrow-copy.copy-unavailable"
+        ],
+        "fulfils": [
+          "requirement/borrowing.max-active-loans"
+        ]
+      }
+    },
+    {
+      "type": "runbook",
+      "id": "runbook/clear-stuck-holds",
+      "title": "Clear stuck holds",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/runbooks/clear-stuck-holds.md",
+      "line": 3,
+      "fields": {
+        "type": "runbook",
+        "id": "runbook/clear-stuck-holds",
+        "title": "Clear stuck holds",
+        "owner": "lending-team",
+        "status": "approved",
+        "trigger": "A hold stays ready past its pickup window."
+      },
+      "links": {}
+    },
+    {
+      "type": "standard",
+      "id": "standard/lending.quiet-shelf-check",
+      "title": "Quiet shelf check",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/domain/rules/lending-standards.md",
+      "line": 10,
+      "fields": {
+        "type": "standard",
+        "id": "standard/lending.quiet-shelf-check",
+        "title": "Quiet shelf check",
+        "owner": "lending-team",
+        "status": "approved"
+      },
+      "links": {}
+    },
+    {
+      "type": "term",
+      "id": "term/copy",
+      "title": "copy",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/language.json",
+      "line": 22,
+      "fields": {
+        "id": "term/copy",
+        "term": "copy",
+        "meaning": "One physical item the library lends.",
+        "labels": {
+          "nl": "exemplaar",
+          "de": "Exemplar"
+        },
+        "rejected": [],
+        "owner": "lending-team",
+        "status": "approved"
+      },
+      "links": {}
+    },
+    {
+      "type": "term",
+      "id": "term/hold",
+      "title": "hold",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/language.json",
+      "line": 34,
+      "fields": {
+        "id": "term/hold",
+        "term": "hold",
+        "meaning": "A reader queue for one copy.",
+        "labels": {
+          "nl": "reservering",
+          "de": "Vormerkung"
+        },
+        "rejected": [],
+        "owner": "lending-team",
+        "status": "approved"
+      },
+      "links": {}
+    },
+    {
+      "type": "term",
+      "id": "term/loan",
+      "title": "loan",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/language.json",
+      "line": 5,
+      "fields": {
+        "id": "term/loan",
+        "term": "loan",
+        "meaning": "A copy lent to a reader until its due date.",
+        "labels": {
+          "nl": "lening",
+          "de": "Leihe"
+        },
+        "rejected": [
+          {
+            "word": "checkout",
+            "reason": "Checkout names the desk action."
+          }
+        ],
+        "owner": "lending-team",
+        "status": "approved"
+      },
+      "links": {}
+    },
+    {
+      "type": "term",
+      "id": "term/reader",
+      "title": "reader",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": null,
+      "decider": null,
+      "decideBy": null,
+      "file": "docs/language.json",
+      "line": 46,
+      "fields": {
+        "id": "term/reader",
+        "term": "reader",
+        "meaning": "A person holding a library card.",
+        "labels": {
+          "nl": "lezer",
+          "de": "Leser"
+        },
+        "rejected": [],
+        "owner": "lending-team",
+        "status": "approved"
+      },
+      "links": {}
+    },
+    {
+      "type": "use-case",
+      "id": "use-case/lending.borrow-copy",
+      "title": "Borrow copy",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "businessRecord": "business-record/lending.loan",
+      "file": "docs/domain/modules/lending/loans/borrow-copy.md",
+      "line": 3,
+      "fields": {
+        "type": "use-case",
+        "id": "use-case/lending.borrow-copy",
+        "title": "Borrow copy",
+        "owner": "lending-team",
+        "status": "approved",
+        "operation": "command",
+        "needs": [
+          "permission/borrow-copy"
+        ],
+        "anonymous": false,
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/loan.loan-borrowed"
+        ],
+        "reactsTo": [],
+        "fulfils": [
+          "requirement/borrowing.max-active-loans"
+        ],
+        "results": [
+          "result/borrow-copy.borrowed",
+          "result/borrow-copy.copy-unavailable"
+        ],
+        "cases": [
+          "case/borrow-copy.borrowing-an-available-copy-succeeds"
+        ],
+        "records": [
+          {
+            "type": "result",
+            "id": "result/borrow-copy.borrowed",
+            "title": "Borrowed",
+            "owner": "lending-team",
+            "outcome": "success",
+            "status": 201,
+            "meaning": "The copy is lent."
+          },
+          {
+            "type": "result",
+            "id": "result/borrow-copy.copy-unavailable",
+            "title": "Copy unavailable",
+            "owner": "lending-team",
+            "outcome": "refusal",
+            "code": "failure/lending.copy_not_available",
+            "status": 409,
+            "meaning": "The copy is unavailable."
+          },
+          {
+            "type": "case",
+            "id": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+            "title": "Borrowing an available copy succeeds",
+            "owner": "lending-team",
+            "status": "approved",
+            "situation": "A copy sits available on its shelf.",
+            "action": "The reader borrows the copy.",
+            "result": "result/borrow-copy.borrowed",
+            "expect": "The loan is active."
+          }
+        ]
+      },
+      "links": {
+        "needs": [
+          "permission/borrow-copy"
+        ],
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/loan.loan-borrowed"
+        ],
+        "fulfils": [
+          "requirement/borrowing.max-active-loans"
+        ]
+      }
+    },
+    {
+      "type": "use-case",
+      "id": "use-case/lending.cancel-hold",
+      "title": "Cancel hold",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "businessRecord": "business-record/lending.hold",
+      "file": "docs/domain/modules/lending/holds/cancel-hold.md",
+      "line": 3,
+      "fields": {
+        "type": "use-case",
+        "id": "use-case/lending.cancel-hold",
+        "title": "Cancel hold",
+        "owner": "lending-team",
+        "status": "approved",
+        "operation": "command",
+        "needs": [
+          "permission/place-hold"
+        ],
+        "anonymous": false,
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/hold.hold-cancelled"
+        ],
+        "reactsTo": [],
+        "fulfils": [
+          "requirement/borrowing.hold-pickup-window"
+        ],
+        "results": [
+          "result/cancel-hold.cancelled",
+          "result/cancel-hold.hold-ended"
+        ],
+        "cases": [
+          "case/cancel-hold.cancelling-a-waiting-hold-succeeds"
+        ],
+        "records": [
+          {
+            "type": "result",
+            "id": "result/cancel-hold.cancelled",
+            "title": "Cancelled",
+            "owner": "lending-team",
+            "outcome": "success",
+            "status": 200,
+            "meaning": "The hold is cancelled."
+          },
+          {
+            "type": "result",
+            "id": "result/cancel-hold.hold-ended",
+            "title": "Hold ended",
+            "owner": "lending-team",
+            "outcome": "refusal",
+            "code": "failure/lending.hold_not_waiting",
+            "status": 409,
+            "meaning": "The hold already left the queue."
+          },
+          {
+            "type": "case",
+            "id": "case/cancel-hold.cancelling-a-waiting-hold-succeeds",
+            "title": "Cancelling a waiting hold succeeds",
+            "owner": "lending-team",
+            "status": "approved",
+            "situation": "A reader holds a waiting hold.",
+            "action": "The reader cancels the hold.",
+            "result": "result/cancel-hold.cancelled",
+            "expect": "The hold is cancelled."
+          }
+        ]
+      },
+      "links": {
+        "needs": [
+          "permission/place-hold"
+        ],
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/hold.hold-cancelled"
+        ],
+        "fulfils": [
+          "requirement/borrowing.hold-pickup-window"
+        ]
+      }
+    },
+    {
+      "type": "use-case",
+      "id": "use-case/lending.extend-loan",
+      "title": "Extend loan",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "businessRecord": "business-record/lending.loan",
+      "file": "docs/domain/modules/lending/loans/extend-loan.md",
+      "line": 3,
+      "fields": {
+        "type": "use-case",
+        "id": "use-case/lending.extend-loan",
+        "title": "Extend loan",
+        "owner": "lending-team",
+        "status": "approved",
+        "operation": "command",
+        "needs": [
+          "permission/borrow-copy"
+        ],
+        "anonymous": false,
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/loan.loan-extended"
+        ],
+        "reactsTo": [],
+        "fulfils": [
+          "requirement/borrowing.loan-period-days"
+        ],
+        "results": [
+          "result/extend-loan.extended",
+          "result/extend-loan.extension-refused"
+        ],
+        "cases": [
+          "case/extend-loan.extending-an-active-loan-succeeds"
+        ],
+        "records": [
+          {
+            "type": "result",
+            "id": "result/extend-loan.extended",
+            "title": "Extended",
+            "owner": "lending-team",
+            "outcome": "success",
+            "status": 200,
+            "meaning": "The loan is extended."
+          },
+          {
+            "type": "result",
+            "id": "result/extend-loan.extension-refused",
+            "title": "Extension refused",
+            "owner": "lending-team",
+            "outcome": "refusal",
+            "code": "failure/lending.extension_refused",
+            "status": 409,
+            "meaning": "The extension is refused."
+          },
+          {
+            "type": "case",
+            "id": "case/extend-loan.extending-an-active-loan-succeeds",
+            "title": "Extending an active loan succeeds",
+            "owner": "lending-team",
+            "status": "approved",
+            "situation": "A reader holds an active loan.",
+            "action": "The reader extends the loan.",
+            "result": "result/extend-loan.extended",
+            "expect": "The loan is extended."
+          }
+        ]
+      },
+      "links": {
+        "needs": [
+          "permission/borrow-copy"
+        ],
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/loan.loan-extended"
+        ],
+        "fulfils": [
+          "requirement/borrowing.loan-period-days"
+        ]
+      }
+    },
+    {
+      "type": "use-case",
+      "id": "use-case/lending.list-loans",
+      "title": "List loans",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "businessRecord": "business-record/lending.loan",
+      "file": "docs/domain/modules/lending/loans/list-loans.md",
+      "line": 3,
+      "fields": {
+        "type": "use-case",
+        "id": "use-case/lending.list-loans",
+        "title": "List loans",
+        "owner": "lending-team",
+        "status": "approved",
+        "operation": "query",
+        "needs": [
+          "permission/read-loans"
+        ],
+        "anonymous": false,
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [],
+        "reactsTo": [],
+        "fulfils": [
+          "requirement/borrowing.max-active-loans"
+        ],
+        "results": [
+          "result/list-loans.listed"
+        ],
+        "cases": [
+          "case/list-loans.listing-own-loans-succeeds"
+        ],
+        "records": [
+          {
+            "type": "result",
+            "id": "result/list-loans.listed",
+            "title": "Listed",
+            "owner": "lending-team",
+            "outcome": "success",
+            "status": 200,
+            "meaning": "The loans are listed."
+          },
+          {
+            "type": "case",
+            "id": "case/list-loans.listing-own-loans-succeeds",
+            "title": "Listing own loans succeeds",
+            "owner": "lending-team",
+            "status": "approved",
+            "situation": "A reader holds two active loans.",
+            "action": "The reader lists their loans.",
+            "result": "result/list-loans.listed",
+            "expect": "Both loans are listed."
+          }
+        ]
+      },
+      "links": {
+        "needs": [
+          "permission/read-loans"
+        ],
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "fulfils": [
+          "requirement/borrowing.max-active-loans"
+        ]
+      }
+    },
+    {
+      "type": "use-case",
+      "id": "use-case/lending.place-hold",
+      "title": "Place hold",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "businessRecord": "business-record/lending.hold",
+      "file": "docs/domain/modules/lending/holds/place-hold.md",
+      "line": 3,
+      "fields": {
+        "type": "use-case",
+        "id": "use-case/lending.place-hold",
+        "title": "Place hold",
+        "owner": "lending-team",
+        "status": "approved",
+        "operation": "command",
+        "needs": [
+          "permission/place-hold"
+        ],
+        "anonymous": false,
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/hold.hold-placed"
+        ],
+        "reactsTo": [],
+        "fulfils": [
+          "requirement/borrowing.hold-pickup-window"
+        ],
+        "results": [
+          "result/place-hold.placed",
+          "result/place-hold.hold-already-waiting"
+        ],
+        "cases": [
+          "case/place-hold.placing-a-hold-succeeds"
+        ],
+        "records": [
+          {
+            "type": "result",
+            "id": "result/place-hold.placed",
+            "title": "Placed",
+            "owner": "lending-team",
+            "outcome": "success",
+            "status": 201,
+            "meaning": "The hold is placed."
+          },
+          {
+            "type": "result",
+            "id": "result/place-hold.hold-already-waiting",
+            "title": "Hold already waiting",
+            "owner": "lending-team",
+            "outcome": "refusal",
+            "code": "failure/lending.hold_already_waiting",
+            "status": 409,
+            "meaning": "A hold is already waiting."
+          },
+          {
+            "type": "case",
+            "id": "case/place-hold.placing-a-hold-succeeds",
+            "title": "Placing a hold succeeds",
+            "owner": "lending-team",
+            "status": "approved",
+            "situation": "A copy is on loan to another reader.",
+            "action": "The reader places a hold.",
+            "result": "result/place-hold.placed",
+            "expect": "The hold is placed."
+          }
+        ]
+      },
+      "links": {
+        "needs": [
+          "permission/place-hold"
+        ],
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/hold.hold-placed"
+        ],
+        "fulfils": [
+          "requirement/borrowing.hold-pickup-window"
+        ]
+      }
+    },
+    {
+      "type": "use-case",
+      "id": "use-case/lending.register-copy",
+      "title": "Register copy",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "businessRecord": "business-record/lending.copy",
+      "file": "docs/domain/modules/lending/copies/register-copy.md",
+      "line": 3,
+      "fields": {
+        "type": "use-case",
+        "id": "use-case/lending.register-copy",
+        "title": "Register copy",
+        "owner": "lending-team",
+        "status": "approved",
+        "operation": "command",
+        "needs": [
+          "permission/manage-copies"
+        ],
+        "anonymous": false,
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/copy.copy-registered"
+        ],
+        "reactsTo": [],
+        "fulfils": [
+          "requirement/borrowing.copy-shelf-home"
+        ],
+        "results": [
+          "result/register-copy.registered",
+          "result/register-copy.copy-already-registered"
+        ],
+        "cases": [
+          "case/register-copy.registering-a-new-copy-succeeds"
+        ],
+        "records": [
+          {
+            "type": "result",
+            "id": "result/register-copy.registered",
+            "title": "Registered",
+            "owner": "lending-team",
+            "outcome": "success",
+            "status": 201,
+            "meaning": "The copy is registered."
+          },
+          {
+            "type": "result",
+            "id": "result/register-copy.copy-already-registered",
+            "title": "Copy already registered",
+            "owner": "lending-team",
+            "outcome": "refusal",
+            "code": "failure/lending.copy_already_registered",
+            "status": 409,
+            "meaning": "The copy is already registered."
+          },
+          {
+            "type": "case",
+            "id": "case/register-copy.registering-a-new-copy-succeeds",
+            "title": "Registering a new copy succeeds",
+            "owner": "lending-team",
+            "status": "approved",
+            "situation": "A new copy arrives at the desk.",
+            "action": "The librarian registers the copy.",
+            "result": "result/register-copy.registered",
+            "expect": "The copy is registered."
+          }
+        ]
+      },
+      "links": {
+        "needs": [
+          "permission/manage-copies"
+        ],
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/copy.copy-registered"
+        ],
+        "fulfils": [
+          "requirement/borrowing.copy-shelf-home"
+        ]
+      }
+    },
+    {
+      "type": "use-case",
+      "id": "use-case/lending.retire-copy",
+      "title": "Retire copy",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "businessRecord": "business-record/lending.copy",
+      "file": "docs/domain/modules/lending/copies/retire-copy.md",
+      "line": 3,
+      "fields": {
+        "type": "use-case",
+        "id": "use-case/lending.retire-copy",
+        "title": "Retire copy",
+        "owner": "lending-team",
+        "status": "approved",
+        "operation": "command",
+        "needs": [
+          "permission/manage-copies"
+        ],
+        "anonymous": false,
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/copy.copy-retired"
+        ],
+        "reactsTo": [],
+        "fulfils": [
+          "requirement/borrowing.copy-shelf-home"
+        ],
+        "results": [
+          "result/retire-copy.retired",
+          "result/retire-copy.copy-on-loan"
+        ],
+        "cases": [
+          "case/retire-copy.retiring-an-available-copy-succeeds"
+        ],
+        "records": [
+          {
+            "type": "result",
+            "id": "result/retire-copy.retired",
+            "title": "Retired",
+            "owner": "lending-team",
+            "outcome": "success",
+            "status": 200,
+            "meaning": "The copy is retired."
+          },
+          {
+            "type": "result",
+            "id": "result/retire-copy.copy-on-loan",
+            "title": "Copy on loan",
+            "owner": "lending-team",
+            "outcome": "refusal",
+            "code": "failure/lending.copy_on_loan",
+            "status": 409,
+            "meaning": "The copy is on loan."
+          },
+          {
+            "type": "case",
+            "id": "case/retire-copy.retiring-an-available-copy-succeeds",
+            "title": "Retiring an available copy succeeds",
+            "owner": "lending-team",
+            "status": "approved",
+            "situation": "A copy sits available past weeding.",
+            "action": "The librarian retires the copy.",
+            "result": "result/retire-copy.retired",
+            "expect": "The copy is retired."
+          }
+        ]
+      },
+      "links": {
+        "needs": [
+          "permission/manage-copies"
+        ],
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/copy.copy-retired"
+        ],
+        "fulfils": [
+          "requirement/borrowing.copy-shelf-home"
+        ]
+      }
+    },
+    {
+      "type": "use-case",
+      "id": "use-case/lending.return-copy",
+      "title": "Return copy",
+      "owner": "lending-team",
+      "status": "approved",
+      "effectiveStatus": "approved",
+      "decider": null,
+      "decideBy": null,
+      "businessRecord": "business-record/lending.loan",
+      "file": "docs/domain/modules/lending/loans/return-copy.md",
+      "line": 3,
+      "fields": {
+        "type": "use-case",
+        "id": "use-case/lending.return-copy",
+        "title": "Return copy",
+        "owner": "lending-team",
+        "status": "approved",
+        "operation": "command",
+        "needs": [
+          "permission/borrow-copy"
+        ],
+        "anonymous": false,
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/loan.loan-returned"
+        ],
+        "reactsTo": [],
+        "fulfils": [
+          "requirement/borrowing.loan-period-days"
+        ],
+        "results": [
+          "result/return-copy.returned",
+          "result/return-copy.loan-inactive"
+        ],
+        "cases": [
+          "case/return-copy.returning-a-borrowed-copy-succeeds"
+        ],
+        "records": [
+          {
+            "type": "result",
+            "id": "result/return-copy.returned",
+            "title": "Returned",
+            "owner": "lending-team",
+            "outcome": "success",
+            "status": 200,
+            "meaning": "The copy is returned."
+          },
+          {
+            "type": "result",
+            "id": "result/return-copy.loan-inactive",
+            "title": "Loan inactive",
+            "owner": "lending-team",
+            "outcome": "refusal",
+            "code": "failure/lending.loan_not_active",
+            "status": 409,
+            "meaning": "The loan is inactive."
+          },
+          {
+            "type": "case",
+            "id": "case/return-copy.returning-a-borrowed-copy-succeeds",
+            "title": "Returning a borrowed copy succeeds",
+            "owner": "lending-team",
+            "status": "approved",
+            "situation": "A reader holds an active loan.",
+            "action": "The reader returns the copy.",
+            "result": "result/return-copy.returned",
+            "expect": "The loan is returned."
+          }
+        ]
+      },
+      "links": {
+        "needs": [
+          "permission/borrow-copy"
+        ],
+        "reachedThrough": [
+          "entry-point/library-app"
+        ],
+        "raises": [
+          "event/loan.loan-returned"
+        ],
+        "fulfils": [
+          "requirement/borrowing.loan-period-days"
+        ]
+      }
+    }
+  ],
+  "code": {
+    "handlers": [
+      {
+        "useCase": "use-case/lending.borrow-copy",
+        "operation": "BorrowCopy",
+        "kind": "command",
+        "path": "apps/api/src/Library.Application/Lending/Loans/BorrowCopy/BorrowCopyCommandHandler.cs"
+      },
+      {
+        "useCase": "use-case/lending.cancel-hold",
+        "operation": "CancelHold",
+        "kind": "command",
+        "path": "apps/api/src/Library.Application/Lending/Holds/CancelHold/CancelHoldCommandHandler.cs"
+      },
+      {
+        "useCase": "use-case/lending.extend-loan",
+        "operation": "ExtendLoan",
+        "kind": "command",
+        "path": "apps/api/src/Library.Application/Lending/Loans/ExtendLoan/ExtendLoanCommandHandler.cs"
+      },
+      {
+        "useCase": "use-case/lending.place-hold",
+        "operation": "PlaceHold",
+        "kind": "command",
+        "path": "apps/api/src/Library.Application/Lending/Holds/PlaceHold/PlaceHoldCommandHandler.cs"
+      },
+      {
+        "useCase": "use-case/lending.register-copy",
+        "operation": "RegisterCopy",
+        "kind": "command",
+        "path": "apps/api/src/Library.Application/Lending/Copies/RegisterCopy/RegisterCopyCommandHandler.cs"
+      },
+      {
+        "useCase": "use-case/lending.return-copy",
+        "operation": "ReturnCopy",
+        "kind": "command",
+        "path": "apps/api/src/Library.Application/Lending/Loans/ReturnCopy/ReturnCopyCommandHandler.cs"
+      }
+    ],
+    "reactions": [],
+    "jobs": [],
+    "exceptions": [
+      {
+        "code": "failure/lending.copy_already_registered",
+        "path": "apps/api/src/Library.Application/Lending/Copies/RegisterCopy/RegisterCopyCommandHandler.cs",
+        "class": "RegisterCopyCommandHandler"
+      },
+      {
+        "code": "failure/lending.copy_not_available",
+        "path": "apps/api/src/Library.Application/Lending/Loans/BorrowCopy/BorrowCopyCommandHandler.cs",
+        "class": "BorrowCopyCommandHandler"
+      },
+      {
+        "code": "failure/lending.copy_on_loan",
+        "path": "apps/api/src/Library.Domain/Lending/Copies/Copy.cs",
+        "class": "Copy"
+      },
+      {
+        "code": "failure/lending.extension_refused",
+        "path": "apps/api/src/Library.Application/Lending/Loans/ExtendLoan/ExtendLoanCommandHandler.cs",
+        "class": "ExtendLoanCommandHandler"
+      },
+      {
+        "code": "failure/lending.hold_already_waiting",
+        "path": "apps/api/src/Library.Application/Lending/Holds/PlaceHold/PlaceHoldCommandHandler.cs",
+        "class": "PlaceHoldCommandHandler"
+      },
+      {
+        "code": "failure/lending.hold_not_waiting",
+        "path": "apps/api/src/Library.Application/Lending/Holds/CancelHold/CancelHoldCommandHandler.cs",
+        "class": "CancelHoldCommandHandler"
+      },
+      {
+        "code": "failure/lending.loan_not_active",
+        "path": "apps/api/src/Library.Application/Lending/Loans/ReturnCopy/ReturnCopyCommandHandler.cs",
+        "class": "ReturnCopyCommandHandler"
+      }
+    ],
+    "events": [
+      {
+        "class": "CopyRegisteredEvent",
+        "path": "apps/api/src/Library.Domain/Lending/Copies/Events/CopyRegisteredEvent.cs",
+        "event": "event/copy.copy-registered"
+      },
+      {
+        "class": "CopyRetiredEvent",
+        "path": "apps/api/src/Library.Domain/Lending/Copies/Events/CopyRetiredEvent.cs",
+        "event": "event/copy.copy-retired"
+      },
+      {
+        "class": "HoldCancelledEvent",
+        "path": "apps/api/src/Library.Domain/Lending/Holds/Events/HoldCancelledEvent.cs",
+        "event": "event/hold.hold-cancelled"
+      },
+      {
+        "class": "HoldPlacedEvent",
+        "path": "apps/api/src/Library.Domain/Lending/Holds/Events/HoldPlacedEvent.cs",
+        "event": "event/hold.hold-placed"
+      },
+      {
+        "class": "LoanBorrowedEvent",
+        "path": "apps/api/src/Library.Domain/Lending/Loans/Events/LoanBorrowedEvent.cs",
+        "event": "event/loan.loan-borrowed"
+      },
+      {
+        "class": "LoanExtendedEvent",
+        "path": "apps/api/src/Library.Domain/Lending/Loans/Events/LoanExtendedEvent.cs",
+        "event": "event/loan.loan-extended"
+      },
+      {
+        "class": "LoanReturnedEvent",
+        "path": "apps/api/src/Library.Domain/Lending/Loans/Events/LoanReturnedEvent.cs",
+        "event": "event/loan.loan-returned"
+      }
+    ]
+  },
+  "screens": [
+    {
+      "frontend": "catalog",
+      "route": "/loans",
+      "file": "apps/catalog/src/routes/loans/\u002Bpage.svelte",
+      "operations": [],
+      "useCases": []
+    }
+  ],
+  "tests": [
+    {
+      "scenario": "Registering_a_new_copy_succeeds",
+      "class": "RegisterCopyScenarios",
+      "file": "apps/api/tests/Library.Acceptance.Tests/Lending/Copies/RegisterCopy/RegisterCopyScenarios.cs",
+      "line": 6,
+      "claims": [
+        "case/register-copy.registering-a-new-copy-succeeds"
+      ],
+      "steps": [
+        {
+          "phase": "when",
+          "receiver": "",
+          "receiverType": "RegisterCopySteps",
+          "method": "RegisterACopy"
+        },
+        {
+          "phase": "then",
+          "receiver": "",
+          "receiverType": "RegisterCopySteps",
+          "method": "TheCopyIsRegistered"
+        }
+      ],
+      "codes": [],
+      "outcome": null
+    },
+    {
+      "scenario": "Retiring_an_available_copy_succeeds",
+      "class": "RetireCopyScenarios",
+      "file": "apps/api/tests/Library.Acceptance.Tests/Lending/Copies/RetireCopy/RetireCopyScenarios.cs",
+      "line": 6,
+      "claims": [
+        "case/retire-copy.retiring-an-available-copy-succeeds"
+      ],
+      "steps": [
+        {
+          "phase": "given",
+          "receiver": "",
+          "receiverType": "RegisterCopySteps",
+          "method": "RegisterACopy"
+        },
+        {
+          "phase": "when",
+          "receiver": "",
+          "receiverType": "RetireCopySteps",
+          "method": "RetireACopy"
+        },
+        {
+          "phase": "then",
+          "receiver": "",
+          "receiverType": "RetireCopySteps",
+          "method": "TheCopyIsRetired"
+        }
+      ],
+      "codes": [],
+      "outcome": null
+    },
+    {
+      "scenario": "Cancelling_a_waiting_hold_succeeds",
+      "class": "CancelHoldScenarios",
+      "file": "apps/api/tests/Library.Acceptance.Tests/Lending/Holds/CancelHold/CancelHoldScenarios.cs",
+      "line": 6,
+      "claims": [
+        "case/cancel-hold.cancelling-a-waiting-hold-succeeds"
+      ],
+      "steps": [
+        {
+          "phase": "given",
+          "receiver": "",
+          "receiverType": "PlaceHoldSteps",
+          "method": "PlaceAHold"
+        },
+        {
+          "phase": "when",
+          "receiver": "",
+          "receiverType": "CancelHoldSteps",
+          "method": "CancelAHold"
+        },
+        {
+          "phase": "then",
+          "receiver": "",
+          "receiverType": "CancelHoldSteps",
+          "method": "TheHoldIsCancelled"
+        }
+      ],
+      "codes": [],
+      "outcome": null
+    },
+    {
+      "scenario": "Placing_a_hold_succeeds",
+      "class": "PlaceHoldScenarios",
+      "file": "apps/api/tests/Library.Acceptance.Tests/Lending/Holds/PlaceHold/PlaceHoldScenarios.cs",
+      "line": 6,
+      "claims": [
+        "case/place-hold.placing-a-hold-succeeds"
+      ],
+      "steps": [
+        {
+          "phase": "given",
+          "receiver": "",
+          "receiverType": "RegisterCopySteps",
+          "method": "RegisterACopy"
+        },
+        {
+          "phase": "when",
+          "receiver": "",
+          "receiverType": "PlaceHoldSteps",
+          "method": "PlaceAHold"
+        },
+        {
+          "phase": "then",
+          "receiver": "",
+          "receiverType": "PlaceHoldSteps",
+          "method": "TheHoldIsPlaced"
+        }
+      ],
+      "codes": [],
+      "outcome": null
+    },
+    {
+      "scenario": "Borrowing_an_available_copy_succeeds",
+      "class": "BorrowCopyScenarios",
+      "file": "apps/api/tests/Library.Acceptance.Tests/Lending/Loans/BorrowCopy/BorrowCopyScenarios.cs",
+      "line": 6,
+      "claims": [
+        "case/borrow-copy.borrowing-an-available-copy-succeeds"
+      ],
+      "steps": [
+        {
+          "phase": "given",
+          "receiver": "",
+          "receiverType": "RegisterCopySteps",
+          "method": "RegisterACopy"
+        },
+        {
+          "phase": "when",
+          "receiver": "",
+          "receiverType": "BorrowCopySteps",
+          "method": "BorrowACopy"
+        },
+        {
+          "phase": "then",
+          "receiver": "",
+          "receiverType": "BorrowCopySteps",
+          "method": "TheLoanIsActive"
+        }
+      ],
+      "codes": [],
+      "outcome": null
+    },
+    {
+      "scenario": "Extending_an_active_loan_succeeds",
+      "class": "ExtendLoanScenarios",
+      "file": "apps/api/tests/Library.Acceptance.Tests/Lending/Loans/ExtendLoan/ExtendLoanScenarios.cs",
+      "line": 6,
+      "claims": [
+        "case/extend-loan.extending-an-active-loan-succeeds"
+      ],
+      "steps": [
+        {
+          "phase": "given",
+          "receiver": "",
+          "receiverType": "BorrowCopySteps",
+          "method": "BorrowACopy"
+        },
+        {
+          "phase": "when",
+          "receiver": "",
+          "receiverType": "ExtendLoanSteps",
+          "method": "ExtendALoan"
+        },
+        {
+          "phase": "then",
+          "receiver": "",
+          "receiverType": "ExtendLoanSteps",
+          "method": "TheLoanIsExtended"
+        }
+      ],
+      "codes": [],
+      "outcome": null
+    },
+    {
+      "scenario": "Listing_own_loans_succeeds",
+      "class": "ListLoansScenarios",
+      "file": "apps/api/tests/Library.Acceptance.Tests/Lending/Loans/ListLoans/ListLoansScenarios.cs",
+      "line": 6,
+      "claims": [
+        "case/list-loans.listing-own-loans-succeeds"
+      ],
+      "steps": [
+        {
+          "phase": "given",
+          "receiver": "",
+          "receiverType": "BorrowCopySteps",
+          "method": "BorrowACopy"
+        },
+        {
+          "phase": "when",
+          "receiver": "",
+          "receiverType": "ListLoansSteps",
+          "method": "ListOwnLoans"
+        },
+        {
+          "phase": "then",
+          "receiver": "",
+          "receiverType": "ListLoansSteps",
+          "method": "TheLoansAreListed"
+        }
+      ],
+      "codes": [],
+      "outcome": null
+    },
+    {
+      "scenario": "Returning_a_borrowed_copy_succeeds",
+      "class": "ReturnCopyScenarios",
+      "file": "apps/api/tests/Library.Acceptance.Tests/Lending/Loans/ReturnCopy/ReturnCopyScenarios.cs",
+      "line": 6,
+      "claims": [
+        "case/return-copy.returning-a-borrowed-copy-succeeds"
+      ],
+      "steps": [
+        {
+          "phase": "given",
+          "receiver": "",
+          "receiverType": "BorrowCopySteps",
+          "method": "BorrowACopy"
+        },
+        {
+          "phase": "when",
+          "receiver": "",
+          "receiverType": "ReturnCopySteps",
+          "method": "ReturnACopy"
+        },
+        {
+          "phase": "then",
+          "receiver": "",
+          "receiverType": "ReturnCopySteps",
+          "method": "TheLoanIsReturned"
+        }
+      ],
+      "codes": [],
+      "outcome": null
+    },
+    {
+      "scenario": "A_new_copy_is_registered_through_a_helper_of_the_world",
+      "class": "RegisterCopyTests",
+      "file": "apps/api/tests/Library.Integration.Tests/Lending/Copies/RegisterCopy/RegisterCopyTests.cs",
+      "line": 6,
+      "claims": [
+        "case/register-copy.registering-a-new-copy-succeeds"
+      ],
+      "steps": [],
+      "codes": [],
+      "outcome": null
+    }
+  ],
+  "testRun": null,
+  "links": {
+    "implements": [
+      {
+        "path": "apps/api/src/Library.Domain/Lending/Copies/Events/CopyRegisteredEvent.cs",
+        "to": "event/copy.copy-registered",
+        "kind": "event"
+      },
+      {
+        "path": "apps/api/src/Library.Domain/Lending/Copies/Events/CopyRetiredEvent.cs",
+        "to": "event/copy.copy-retired",
+        "kind": "event"
+      },
+      {
+        "path": "apps/api/src/Library.Domain/Lending/Holds/Events/HoldCancelledEvent.cs",
+        "to": "event/hold.hold-cancelled",
+        "kind": "event"
+      },
+      {
+        "path": "apps/api/src/Library.Domain/Lending/Holds/Events/HoldPlacedEvent.cs",
+        "to": "event/hold.hold-placed",
+        "kind": "event"
+      },
+      {
+        "path": "apps/api/src/Library.Domain/Lending/Loans/Events/LoanBorrowedEvent.cs",
+        "to": "event/loan.loan-borrowed",
+        "kind": "event"
+      },
+      {
+        "path": "apps/api/src/Library.Domain/Lending/Loans/Events/LoanExtendedEvent.cs",
+        "to": "event/loan.loan-extended",
+        "kind": "event"
+      },
+      {
+        "path": "apps/api/src/Library.Domain/Lending/Loans/Events/LoanReturnedEvent.cs",
+        "to": "event/loan.loan-returned",
+        "kind": "event"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Loans/BorrowCopy/BorrowCopyCommandHandler.cs",
+        "to": "use-case/lending.borrow-copy",
+        "kind": "handler"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Holds/CancelHold/CancelHoldCommandHandler.cs",
+        "to": "use-case/lending.cancel-hold",
+        "kind": "handler"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Loans/ExtendLoan/ExtendLoanCommandHandler.cs",
+        "to": "use-case/lending.extend-loan",
+        "kind": "handler"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Holds/PlaceHold/PlaceHoldCommandHandler.cs",
+        "to": "use-case/lending.place-hold",
+        "kind": "handler"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Copies/RegisterCopy/RegisterCopyCommandHandler.cs",
+        "to": "use-case/lending.register-copy",
+        "kind": "handler"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Loans/ReturnCopy/ReturnCopyCommandHandler.cs",
+        "to": "use-case/lending.return-copy",
+        "kind": "handler"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Copies/RegisterCopy/RegisterCopyCommandHandler.cs",
+        "to": "result/register-copy.copy-already-registered",
+        "kind": "result"
+      },
+      {
+        "path": "apps/api/src/Library.Domain/Lending/Copies/Copy.cs",
+        "to": "result/retire-copy.copy-on-loan",
+        "kind": "result"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Holds/CancelHold/CancelHoldCommandHandler.cs",
+        "to": "result/cancel-hold.hold-ended",
+        "kind": "result"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Holds/PlaceHold/PlaceHoldCommandHandler.cs",
+        "to": "result/place-hold.hold-already-waiting",
+        "kind": "result"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Loans/BorrowCopy/BorrowCopyCommandHandler.cs",
+        "to": "result/borrow-copy.copy-unavailable",
+        "kind": "result"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Loans/ExtendLoan/ExtendLoanCommandHandler.cs",
+        "to": "result/extend-loan.extension-refused",
+        "kind": "result"
+      },
+      {
+        "path": "apps/api/src/Library.Application/Lending/Loans/ReturnCopy/ReturnCopyCommandHandler.cs",
+        "to": "result/return-copy.loan-inactive",
+        "kind": "result"
+      }
+    ],
+    "calls": [],
+    "proves": [
+      {
+        "scenario": "Registering_a_new_copy_succeeds",
+        "case": "case/register-copy.registering-a-new-copy-succeeds",
+        "confirmed": true,
+        "passing": null,
+        "indirect": false
+      },
+      {
+        "scenario": "Retiring_an_available_copy_succeeds",
+        "case": "case/retire-copy.retiring-an-available-copy-succeeds",
+        "confirmed": true,
+        "passing": null,
+        "indirect": false
+      },
+      {
+        "scenario": "Cancelling_a_waiting_hold_succeeds",
+        "case": "case/cancel-hold.cancelling-a-waiting-hold-succeeds",
+        "confirmed": true,
+        "passing": null,
+        "indirect": false
+      },
+      {
+        "scenario": "Placing_a_hold_succeeds",
+        "case": "case/place-hold.placing-a-hold-succeeds",
+        "confirmed": true,
+        "passing": null,
+        "indirect": false
+      },
+      {
+        "scenario": "Borrowing_an_available_copy_succeeds",
+        "case": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+        "confirmed": true,
+        "passing": null,
+        "indirect": false
+      },
+      {
+        "scenario": "Extending_an_active_loan_succeeds",
+        "case": "case/extend-loan.extending-an-active-loan-succeeds",
+        "confirmed": true,
+        "passing": null,
+        "indirect": false
+      },
+      {
+        "scenario": "Listing_own_loans_succeeds",
+        "case": "case/list-loans.listing-own-loans-succeeds",
+        "confirmed": true,
+        "passing": null,
+        "indirect": false
+      },
+      {
+        "scenario": "Returning_a_borrowed_copy_succeeds",
+        "case": "case/return-copy.returning-a-borrowed-copy-succeeds",
+        "confirmed": true,
+        "passing": null,
+        "indirect": false
+      },
+      {
+        "scenario": "A_new_copy_is_registered_through_a_helper_of_the_world",
+        "case": "case/register-copy.registering-a-new-copy-succeeds",
+        "confirmed": true,
+        "passing": null,
+        "indirect": false
+      }
+    ]
+  },
+  "status": {
+    "use-case/lending.borrow-copy": {
+      "implemented": true,
+      "verified": false
+    },
+    "use-case/lending.cancel-hold": {
+      "implemented": true,
+      "verified": false
+    },
+    "use-case/lending.extend-loan": {
+      "implemented": true,
+      "verified": false
+    },
+    "use-case/lending.list-loans": {
+      "implemented": false,
+      "verified": false
+    },
+    "use-case/lending.place-hold": {
+      "implemented": true,
+      "verified": false
+    },
+    "use-case/lending.register-copy": {
+      "implemented": true,
+      "verified": false
+    },
+    "use-case/lending.retire-copy": {
+      "implemented": false,
+      "verified": false
+    },
+    "use-case/lending.return-copy": {
+      "implemented": true,
+      "verified": false
+    }
+  }
+}

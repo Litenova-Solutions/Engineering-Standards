@@ -57,4 +57,4 @@ node tools/book/book.mjs --model ../consumer/.model/model.json --out ../consumer
 
 ## Underneath
 
-The generator is plain Node with no dependencies and no build step. It copies `assets/book.css` and `assets/book.js` into the output beside the pages it writes. It writes `search.json`, the title and id index the search page filters. It embeds that same index in the search page so search works when the site opens as files. Nothing beneath it is separately runnable. The fixtures under `tools/book/fixtures/` carry a small hand-written model and findings file in the exact shapes the generator reads.
+The generator is plain Node with no dependencies and no build step. It copies `assets/book.css` and `assets/book.js` into the output beside the pages it writes. It writes `search.json`, the title and id index the search page filters. It embeds that same index in the search page so search works when the site opens as files. Nothing beneath it is separately runnable. The fixtures under `tools/book/fixtures/` are the model and findings the model builder writes for the large library fixture with one use case left unimplemented.

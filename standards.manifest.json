@@ -343,7 +343,7 @@
     }
   },
   "stack": {
-    "dotnet": "10.0.113",
+    "dotnet": "10",
     "postgresql": "18",
     "node": "24.22.0",
     "pnpm": "11.28.5"

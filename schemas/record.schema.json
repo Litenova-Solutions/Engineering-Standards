@@ -843,7 +843,7 @@
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
-        "scope": { "enum": ["platform", "organizer", "event", "self"] },
+        "scope": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
         "allows": { "$ref": "#/$defs/permissionIdArray" }
       },
       "allOf": [

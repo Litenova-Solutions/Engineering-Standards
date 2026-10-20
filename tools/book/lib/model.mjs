@@ -120,7 +120,7 @@ export function relFor(url) {
   return depth <= 0 ? "" : "../".repeat(depth);
 }
 
-// Split "use-case/sales.complete-ticket-resale" into type, home and name.
+// Split "use-case/lending.borrow-copy" into type, home and name.
 export function splitId(id) {
   const slash = id.indexOf("/");
   if (slash < 0) return { type: id, home: null, name: "" };
