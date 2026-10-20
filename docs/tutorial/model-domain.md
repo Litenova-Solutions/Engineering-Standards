@@ -38,14 +38,14 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     | `business-record/circulation.hold` | Hold queue position and expiry | `CopyId`, `MemberId` |
 
     A record owns a child when the child has no independent boundary and changes only through the record. Reference another record by typed ID when it changes on its own. Do not place `Member` inside `Loan` for convenient navigation. This satisfies `litespec/rule/backend-domain.reference-other-aggregates-by-id`.
-5. Define every state. A state is a business-valid condition with its required data and permitted behavior. Describe states before writing transitions. This satisfies `litespec/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records`.
+5. Define every state. A state is a business-valid condition with its required data and permitted behavior. Describe states before writing transitions. This satisfies `litespec/rule/backend-domain.model-every-aggregate-lifecycle-with-state-types`.
 
     | State | Meaning | Required facts |
     |:---|:---|:---|
     | `Open` | The copy is out and the member holds it | Due date |
     | `Returned` | The copy is back on the shelves | Return date |
 
-    Create an abstract state record and one sealed record per state. Put state-specific data on the state record. This satisfies `litespec/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records`.
+    Create an abstract state record and one sealed record per state. Put state-specific data on the state record. This satisfies `litespec/rule/dotnet-domain.model-every-aggregate-lifecycle-with-state-records`.
 
     ```csharp
     public abstract record LoanState;
@@ -100,7 +100,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     | `case/borrow-a-copy.second-borrow-is-refused` | The copy is already out | Another member borrows it | `result/borrow-a-copy.copy-already-on-loan` | The desk sees the refusal code |
 
     Name each test by the observable behavior it asserts. This satisfies `litespec/rule/backend-testing.name-tests-by-observable-behavior`. An acceptance scenario carries one `/// <proves>case/...</proves>` tag. The model builder confirms the claim when the scenario calls the use case and asserts the result.
-11. Record the events. An event is an immutable record of a completed fact. Name what completed and which fields it carries. This satisfies `litespec/rule/backend-domain.raise-immutable-domain-facts`.
+11. Record the events. An event is an immutable record of a completed fact. Name what completed and which fields it carries. This satisfies `litespec/rule/dotnet-domain.raise-immutable-domain-facts`.
 
     | Event | Meaning | Carries |
     |:---|:---|:---|
@@ -108,7 +108,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     | `event/loan.copy-returned` | A copy came back to the shelves | `loanId`, `copyId`, `returnedAt` |
 
     Work that crosses a transaction or time boundary is a use case that reacts to an event, or a use case on a schedule. It declares what it reacts to and its delivery. This satisfies `litespec/rule/backend-application.keep-event-reaction-implementations-explicit`.
-12. Keep one transaction per command. One handler stages the records its use case owns and lets the pipeline commit once. It dispatches no further command. This satisfies `litespec/rule/backend-application.keep-one-state-changing-use-case-in-one-command-pipeline` and `litespec/rule/backend-persistence.commit-once-in-the-command-pipeline`.
+12. Keep one transaction per command. One handler stages the records its use case owns and lets the pipeline commit once. It dispatches no further command. This satisfies `litespec/rule/backend-application.keep-one-state-changing-use-case-in-one-pipeline` and `litespec/rule/backend-persistence.commit-each-command-pipeline-once`.
 13. Map the model to folders. Mirror the module, record, and use case path in every layer. This satisfies `litespec/rule/backend-architecture.organize-every-layer-by-module-and-use-case` and `litespec/rule/backend-architecture.organize-every-layer-by-module-and-use-case`.
 
     ```text

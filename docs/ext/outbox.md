@@ -211,7 +211,7 @@ A message record therefore carries its own shape version, and the dispatcher sel
 
 **Requirement:** An outbox record MUST model its lifecycle as an abstract state base with one sealed record for each of pending, processing, dispatched, and dead-letter.
 
-**Rationale:** `pending` becomes `processing`; processing becomes dispatched, pending, or dead-letter; audited replay moves dead-letter to pending. Three of the four carry data the others do not. `processing` holds a lease expiry. `dispatched` holds a dispatch time. `dead-letter` holds a failure reason and an attempt count. A four-value label forces those onto nullable columns that are meaningful in one state each, which is the shape `litespec/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums` removes everywhere else.
+**Rationale:** `pending` becomes `processing`; processing becomes dispatched, pending, or dead-letter; audited replay moves dead-letter to pending. Three of the four carry data the others do not. `processing` holds a lease expiry. `dispatched` holds a dispatch time. `dead-letter` holds a failure reason and an attempt count. A four-value label forces those onto nullable columns that are meaningful in one state each, which is the shape `litespec/rule/backend-domain.model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy` removes everywhere else.
 
 **Example:** `OutboxState.Processing` carries one unexpired lease before a dispatcher records `OutboxState.Dispatched` or a retry state.
 

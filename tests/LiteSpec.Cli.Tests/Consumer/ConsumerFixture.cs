@@ -331,7 +331,7 @@ static class ConsumerFixture
         {
             ["project"] = new JsonObject { ["name"] = "fixture" },
             ["size"] = "small",
-            ["stacks"] = new JsonArray(),
+            ["stacks"] = new JsonArray("dotnet"),
             ["reviewedLiteSpecVersion"] = ManifestVersion,
             ["paths"] = new JsonObject
             {

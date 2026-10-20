@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+  <testsuite name="Library.Acceptance.Tests" tests="2" failures="1">
+    <testcase classname="Library.Acceptance.Tests.JUnit.JUnitScenarios" name="Borrowing_an_available_copy_succeeds" time="0.1" />
+    <testcase classname="Library.Acceptance.Tests.JUnit.JUnitScenarios" name="Returning_a_borrowed_copy_succeeds" time="0.2">
+      <failure message="The loan stayed active.">Expected the loan to be returned.</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

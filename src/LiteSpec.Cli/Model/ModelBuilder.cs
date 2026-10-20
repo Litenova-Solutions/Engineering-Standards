@@ -1,4 +1,5 @@
 using System.Text.Json;
+using LiteSpec.Model.Readers;
 
 namespace LiteSpec.Model;
 
@@ -20,19 +21,20 @@ static class ModelBuilder
         model.Records.AddRange(read.Records);
         model.Bodies.AddRange(read.Bodies);
         model.Provisions = read.Provisions;
-        model.Code = Timed("code", () => CodeReader.Read(config));
+        var stacks = StackReaders.For(config);
+        model.Code = Timed("code", () => stacks.Backend.Read(config));
 
-        var screens = Timed("screens", () => ScreenReader.Read(config, model.Code));
+        var screens = Timed("screens", () => ReadScreens(config, stacks, model.Code));
 
         model.Screens.AddRange(screens.Screens);
         model.ScreenComments.AddRange(screens.Comments);
 
-        var tests = Timed("tests", () => TestReader.Read(config));
+        var tests = Timed("tests", () => stacks.Scenarios.Read(config));
 
         model.Tests.AddRange(tests.Scenarios);
         model.StepCalls = tests.StepCalls;
         model.TestComments.AddRange(tests.Comments);
-        model.TestRun = Timed("testrun", () => TestRunReader.Read(config));
+        model.TestRun = Timed("testrun", () => stacks.TestRuns.Read(config));
 
         Timed("compute", () =>
         {
@@ -62,6 +64,30 @@ static class ModelBuilder
 
     private static void Timed(string name, Action run) =>
         Timed(name, () => { run(); return 0; });
+
+    /// <summary>
+    ///     Reads every frontend's routes through its own reader. Screens keep the
+    ///     frontends' order; comments are ordered by file and line across frontends.
+    /// </summary>
+    private static ScreenRead ReadScreens(ConsumerConfig config, StackSet stacks, CodeModel code)
+    {
+        var screens = new List<ScreenInfo>();
+        var comments = new List<CodeComment>();
+
+        foreach (var frontend in stacks.Frontends)
+        {
+            var read = frontend.Read(config, code);
+
+            screens.AddRange(read.Screens);
+            comments.AddRange(read.Comments);
+        }
+
+        return new ScreenRead(
+            screens,
+            [.. comments
+                .OrderBy(comment => comment.File, StringComparer.Ordinal)
+                .ThenBy(comment => comment.Line)]);
+    }
 
     /// <summary>The record's links with their targets, for model.json.</summary>
     public static Dictionary<string, List<string>> ResolvedLinks(ProjectModel model, Record record)

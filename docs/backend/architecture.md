@@ -2,45 +2,44 @@
 
 ## Intent
 
-The backend is a five-project modular monolith. Project boundaries separate business rules, the contracts every layer names, use-case coordination, technical adapters, and HTTP hosting without splitting each concern into a separate assembly.
+The backend is a five-part modular monolith. Part boundaries separate business rules, the contracts every layer names, use-case coordination, technical adapters, and HTTP hosting without splitting each concern into a deployable unit.
 
-CQRS separates write and read behavior inside one Application project. Modules and use cases provide the internal navigation boundary.
+CQRS separates write and read behavior inside one Application part. Modules and use cases provide the internal navigation boundary.
 
 ## Agent Summary {#agent-summary}
 
-- Five baseline projects form the modular monolith. (litespec/rule/backend-architecture.use-five-application-projects)
+- Five baseline parts form the modular monolith. (litespec/rule/backend-architecture.use-five-application-parts)
 - References point inward while each layer owns its contracts. (litespec/rule/backend-architecture.point-dependencies-inward, litespec/rule/backend-architecture.own-each-layers-contract-types)
-- One Application project holds messages, handlers, and module-owned ports. (litespec/rule/backend-architecture.keep-one-application-assembly)
+- One Application part holds messages, handlers, and module-owned ports. (litespec/rule/backend-architecture.keep-one-application-part)
 - Module and aggregate order folders in every layer. (litespec/rule/backend-architecture.organize-every-layer-by-module-and-use-case, litespec/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers)
-- Handlers, validators, and endpoint code stay internal and sealed. (litespec/rule/backend-architecture.keep-implementation-types-internal)
+- Handlers, validators, and endpoint code stay hidden and closed. (litespec/rule/backend-architecture.keep-implementation-types-hidden)
 - Aggregates enforce transitions while commands write and queries project. (litespec/rule/backend-architecture.keep-business-invariants-in-domain, litespec/rule/backend-architecture.separate-command-and-query-behavior)
 - A Decision names the execution host for background work. (litespec/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request, litespec/rule/backend-architecture.create-a-worker-project-when-background-work-needs-its-own-process)
 - Architecture tests prove the structural boundaries. (litespec/rule/backend-architecture.test-structural-boundaries)
-- Each process composes itself without a second provider. (litespec/rule/backend-architecture.compose-each-process-explicitly, litespec/rule/backend-architecture.keep-composition-in-hosts)
-- Scanned projects expose one public assembly marker. (litespec/rule/backend-architecture.use-one-public-assembly-marker-per-scanned-project)
+- Each process composes itself without a second provider. (litespec/rule/backend-architecture.compose-each-process-explicitly, litespec/rule/backend-architecture.keep-service-registration-in-hosts)
 
 ## Standards
 
-### Use five application projects (litespec/rule/backend-architecture.use-five-application-projects)
+### Use five application parts (litespec/rule/backend-architecture.use-five-application-parts)
 
-**Requirement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline projects.
+**Requirement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline parts.
 
-**Rationale:** `Application.Abstractions` holds the contracts more than one module names: the pipeline's own positions, the cross-module ports, the transport-neutral failures, and the published integration events. It references Domain and the required LiteBus module abstractions, and nothing else. No type in it can name a use case, a handler, or a module.
+**Rationale:** `Application.Abstractions` holds the contracts more than one module names: pipeline positions, cross-module ports, transport-neutral failures, and published integration events. It depends on Domain and nothing else. No type in it can name a use case, a handler, or a module.
 
-That refusal is the reason it is a project rather than a folder. A folder inside Application cannot decline what a developer puts in it, and the folder that tries becomes the place every unplaced type goes.
+That refusal is the reason it is a part rather than a folder. A folder inside Application cannot decline what a developer puts in it, and the folder that tries becomes the place every unplaced type goes.
 
-An implementation never belongs there. The project name states the test, and a type that cannot pass it belongs to a module under `litespec/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers`.
+An implementation never belongs there. The part name states the test, and a type that cannot pass it belongs to a module under `litespec/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers`.
 
-`AppHost` and `ServiceDefaults` support local hosting and diagnostics. They are hosts, not application layers.
+Hosts support local hosting and diagnostics. They are hosts rather than application parts.
 
 **Example:**
 
 ```text
-apps/api/src/{ProjectName}.Domain/
-apps/api/src/{ProjectName}.Application.Abstractions/
-apps/api/src/{ProjectName}.Application/
-apps/api/src/{ProjectName}.Infrastructure/
-apps/api/src/{ProjectName}.WebApi/
+Domain/
+Application.Abstractions/
+Application/
+Infrastructure/
+WebApi/
 ```
 
 ### Point dependencies inward (litespec/rule/backend-architecture.point-dependencies-inward)
@@ -55,11 +54,11 @@ apps/api/src/{ProjectName}.WebApi/
 
 **Rationale:** A change to an inner shape then stops rippling through every outer layer. Shared-kernel values cross because the kernel is shared, and aggregate typed IDs cross because messages name their targets.
 
-### Keep one Application assembly (litespec/rule/backend-architecture.keep-one-application-assembly)
+### Keep one Application part (litespec/rule/backend-architecture.keep-one-application-part)
 
-**Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application project, and cross-module contracts in Application.Abstractions.
+**Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application part, and cross-module contracts in Application.Abstractions.
 
-**Rationale:** Separate Write, Read, Contracts, and event-handler assemblies are outside this profile. The separation this profile keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the assemblies holding them. Splitting assemblies buys a deployment boundary the profile does not use, and costs a project reference that every use case has to cross.
+**Rationale:** Separate Write, Read, Contracts, and event-handler parts are outside this profile. The separation this profile keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the parts holding them. Splitting parts buys a deployment boundary the profile does not use, and costs a dependency that every use case has to cross.
 
 ### Organize every layer by module and use case (litespec/rule/backend-architecture.organize-every-layer-by-module-and-use-case)
 
@@ -91,24 +90,15 @@ WebApi/Endpoints/Customers/CustomerAccounts/RestrictAccount/
 WebApi/Endpoints/Customers/Consents/GrantConsent/
 
 # Infrastructure keeps provider-wide plumbing under Persistence, beside the module folders
-Infrastructure/Persistence/Marten/
+Infrastructure/Persistence/Postgres/
 Infrastructure/Posts/
 Infrastructure/Customers/CustomerAccounts/
 ```
 
 The architecture test asserts the folder names directly, because a rule only a reviewer checks stops holding at the first missed file.
 
-```csharp
-Types.InAssembly(ApplicationAssemblyMarker.Assembly)
-    .Should()
-    .NotResideInNamespaceContaining("Shared")
-    .And().NotResideInNamespaceContaining("Common")
-    .And().NotResideInNamespaceContaining("Util")
-    .And().NotResideInNamespaceContaining("Helpers")
-    .And().NotResideInNamespaceContaining("Core")
-    .And().NotResideInNamespaceContaining("Misc")
-    .GetResult()
-    .IsSuccessful.Should().BeTrue();
+```text
+fail when a type path contains Shared, Common, Util, Helpers, Core, or Misc
 ```
 
 ### Place a type at the lowest folder that holds its consumers (litespec/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers)
@@ -123,11 +113,11 @@ The rule is mechanical, so placement is counted rather than judged. The contract
 
 Domain's shared kernel is the one folder of that name a solution keeps. Its membership is closed by `litespec/rule/backend-architecture.own-each-layers-contract-types` rather than open to whatever needs a home. A service that coordinates several aggregates lives in the module that owns the aggregates it reads and writes, not with whichever module calls it first.
 
-### Keep implementation types internal (litespec/rule/backend-architecture.keep-implementation-types-internal)
+### Keep implementation types hidden (litespec/rule/backend-architecture.keep-implementation-types-hidden)
 
-**Requirement:** A handler, validator, definition, persistence implementation, or endpoint implementation MUST be declared `internal sealed`.
+**Requirement:** An application MUST keep each handler, validator, definition, persistence implementation, and endpoint implementation inside its own part and closed to extension.
 
-**Rationale:** Messages, results, assembly markers, and ports stay public only when another project uses them. Assembly scanning is not a reason to widen visibility.
+**Rationale:** Messages, results, and ports stay public only when another part uses them. Automatic discovery is not a reason to widen visibility.
 
 ### Keep business invariants in Domain (litespec/rule/backend-architecture.keep-business-invariants-in-domain)
 
@@ -175,30 +165,22 @@ The host is a composition decision, not a code-placement decision. The backgroun
 
 ## Conventions
 
-### Keep composition in hosts (litespec/rule/backend-architecture.keep-composition-in-hosts)
+### Keep service registration in hosts (litespec/rule/backend-architecture.keep-service-registration-in-hosts)
 
-**Default:** Keep service registration in `Program.cs` and host registration modules.
+**Default:** Keep service registration in host entry points and host registration modules.
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
 **Rationale:** Domain and Application declare abstractions, so a registration call inside either inverts the dependency direction.
 
-**Example:** One registration entry point per outer layer has this shape:
+**Example:** One registration entry point per outer layer keeps the call order visible.
 
 ```text
-InfrastructureServiceRegistration.AddInfrastructure(...)
-WebApiServiceRegistration.AddWebApi(...)
+infrastructure: register providers and options
+webapi: register transport, authentication, and documentation
 ```
 
-`AddInfrastructure` receives configuration and host environment values needed to bind and validate provider options. `AddWebApi` owns Problem Details, authentication, authorization, endpoint discovery, and OpenAPI. `Program.cs` keeps their call order visible.
-
-### Use one public assembly marker per scanned project (litespec/rule/backend-architecture.use-one-public-assembly-marker-per-scanned-project)
-
-**Default:** Expose one `public static` assembly marker in each project that an approved scanner reads.
-
-**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
-
-**Rationale:** The marker gives the scanner an assembly reference while the scanned handlers stay internal.
+The Infrastructure entry point receives configuration and host environment values needed to bind and validate provider options. The WebApi entry point owns error details, authentication, authorization, endpoint discovery, and API documentation.
 
 ## Reference example
 
@@ -216,18 +198,17 @@ Publishing a post follows this direction:
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/backend-architecture.use-five-application-projects | guidance | Does the solution hold exactly the five baseline projects? |
+| litespec/rule/backend-architecture.use-five-application-parts | guidance | Does the solution hold exactly the five baseline parts? |
 | litespec/rule/backend-architecture.point-dependencies-inward | guidance | Does every project reference point toward Domain without an outward edge? |
 | litespec/rule/backend-architecture.own-each-layers-contract-types | guidance | Does each layer define its own contracts apart from kernel values and typed IDs? |
-| litespec/rule/backend-architecture.keep-one-application-assembly | guidance | Does one Application project hold every message, handler, and module-owned port? |
+| litespec/rule/backend-architecture.keep-one-application-part | guidance | Does one Application part hold every message, handler, and module-owned port? |
 | litespec/rule/backend-architecture.organize-every-layer-by-module-and-use-case | guidance | Does each layer folder path resolve to a declared module and aggregate? |
 | litespec/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers | guidance | Does each type sit at the lowest folder holding its consumers, with no banned folder name? |
-| litespec/rule/backend-architecture.keep-implementation-types-internal | guidance | Is every handler, validator, definition, and endpoint implementation internal and sealed? |
+| litespec/rule/backend-architecture.keep-implementation-types-hidden | guidance | Is every handler, validator, definition, and endpoint implementation hidden and closed? |
 | litespec/rule/backend-architecture.keep-business-invariants-in-domain | guidance | Does every state transition run inside its aggregate or value object? |
 | litespec/rule/backend-architecture.separate-command-and-query-behavior | guidance | Do commands mutate through repositories while queries project without aggregates? |
 | litespec/rule/backend-architecture.declare-the-execution-host-for-work-that-outlives-a-request | guidance | Which Decision names the execution host for dispatch, queue consumption, and scheduled work? |
 | litespec/rule/backend-architecture.create-a-worker-project-when-background-work-needs-its-own-process | guidance | Does background work needing its own process run in a Worker project? |
 | litespec/rule/backend-architecture.test-structural-boundaries | guidance | Do the architecture tests prove references, packages, visibility, folders, and inheritance? |
 | litespec/rule/backend-architecture.compose-each-process-explicitly | guidance | Does each host register its own services without building a second provider? |
-| litespec/rule/backend-architecture.keep-composition-in-hosts | guidance | Does all service registration live in hosts and host modules? |
-| litespec/rule/backend-architecture.use-one-public-assembly-marker-per-scanned-project | guidance | Does each scanned project expose exactly one public assembly marker? |
+| litespec/rule/backend-architecture.keep-service-registration-in-hosts | guidance | Does all service registration live in hosts and host modules? |

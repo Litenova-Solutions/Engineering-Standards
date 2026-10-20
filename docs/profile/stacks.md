@@ -2,7 +2,7 @@
 
 ## Intent
 
-Stacks are the second selection axis beside size ([Supported scope](../core/scope.md)): each frontend declares one stack, which decides which pages and checks apply. These rules govern every stack selection: apply the complete stack, resolve versions from the manifest, declare replacements, and keep the selection visible. Each stack page then states what selecting that stack adds: its pages, its pins, and its checks.
+LiteSpec has two layers. The specification on this page's Composition applies to every consumer, whatever its languages. A stack binding applies when a consumer selects it: one backend stack, and one stack per frontend ([Supported scope](../core/scope.md)). Each stack page states what selecting it adds: its pages, its pins, and its checks. These rules govern every stack selection.
 
 ## Agent Summary {#agent-summary}
 
@@ -32,7 +32,46 @@ Stacks are the second selection axis beside size ([Supported scope](../core/scop
 
 ## Composition
 
-This page states the rules every stack shares, so it lists no stack composition of its own.
+Every consumer applies these pages, whatever its stacks.
+
+### Stack
+
+- [Stacks](stacks.md)
+
+### Core
+
+- [LiteSpec](../core/system.md)
+- [The Project Model](../core/model.md)
+- [Engineering Principles](../core/principles.md)
+- [Supported Scope](../core/scope.md)
+- [Product Intent](../core/product.md)
+- [Agent Operating Protocol](../core/agent.md)
+- [Authoring Standard](../core/authoring.md)
+- [Maintaining the Standards](../core/maintaining.md)
+- [Release Standard](../core/release.md)
+
+### Workspace
+
+- [Workspace Structure](../workspace/structure.md)
+- [Naming and Code Style](../workspace/naming.md)
+- [Dependencies](../workspace/dependencies.md)
+- [Configuration](../workspace/config.md)
+
+### Backend
+
+- [Backend Architecture](../backend/architecture.md)
+- [Domain Layer](../backend/domain.md)
+- [Application Layer](../backend/application.md)
+- [Persistence](../backend/persistence.md)
+- [HTTP API](../backend/api.md)
+- [Backend Testing](../backend/testing.md)
+- [Record Identifiers](../backend/identifiers.md)
+
+### Quality and operations
+
+- [Security](../quality/security.md)
+- [Operations](../quality/operations.md)
+- [Continuous Integration](../quality/ci.md)
 
 ## Conventions
 

@@ -51,6 +51,7 @@ static partial class StandardsValidator
         "EXTENSION_REPLACES_ENFORCED",
         "EXTENSION_REPLACES_UNKNOWN",
         "EXTENSION_SCOPE",
+        "EXTENSION_STACK_UNKNOWN",
         "GLOSSARY_DEFINITION",
         "GLOSSARY_ORDER",
         "HEADING_ACTION",
@@ -128,6 +129,8 @@ static partial class StandardsValidator
         "TEMPLATE_INDEX_PATH",
 
         "INDEX_MISSING_ROUTING",
+        "LAYER_OVERLAP",
+        "LAYER_UNLISTED",
     ];
 
     /// <summary>
@@ -410,7 +413,7 @@ static partial class StandardsValidator
 
     /// <summary>The action verbs a provision heading may start with.</summary>
     static readonly HashSet<string> ActionVerbs = new(
-        ("Accept Activate Add Advance Align Anchor Announce Answer Apply Approve Ask Assert Assign Attach Audit " +
+        ("Accept Activate Add Advance Describe Reuse Share Take Align Anchor Announce Answer Apply Approve Ask Assert Assign Attach Audit " +
         "Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify " +
         "Co-locate Collect Commit Compare Complete Compose Compute Configure Confirm Connect Control Copy Cover Create " +
         "Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document " +

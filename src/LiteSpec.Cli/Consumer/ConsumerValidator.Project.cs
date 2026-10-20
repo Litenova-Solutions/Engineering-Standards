@@ -13,6 +13,10 @@ static partial class ConsumerValidator
 
     static readonly string[] ControlledPlatforms = ["react", "svelte"];
 
+    // A stack without a kind predates the two layers; only dotnet was ever a backend.
+    static string StackKind(JsonNode? stack) =>
+        AsString((stack as JsonObject)?["kind"]) ?? "frontend";
+
     static readonly Regex ProvisionRow = new(@"^\| (litespec/(?:rule|convention)/[^\s|]+) \|", RegexOptions.Multiline);
 
     /// <summary>
@@ -144,11 +148,31 @@ static partial class ConsumerValidator
 
         // A stack the pinned release does not ship selects no page, so every
         // stack-scoped provision would pass by applying to nothing.
-        var knownStacks = (manifest as JsonObject)?["stacks"] is JsonObject stacks
-            ? stacks.Select(pair => pair.Key).OrderBy(key => key, StringComparer.Ordinal).ToList()
+        // A frontend platform names a frontend stack, and the project names one backend
+        // stack: a backend stack declared as a platform would select the wrong pages.
+        var manifestStacks = (manifest as JsonObject)?["stacks"] as JsonObject;
+        var knownStacks = manifestStacks is not null
+            ? manifestStacks.Where(pair => StackKind(pair.Value) == "frontend").Select(pair => pair.Key).OrderBy(key => key, StringComparer.Ordinal).ToList()
             : new List<string>(DefaultStacks);
 
         run.KnownStacks.AddRange(knownStacks);
+
+        if (manifestStacks is not null && (run.Project as JsonObject)?["stacks"] is JsonArray declaredStacks)
+        {
+            var backendStacks = manifestStacks.Where(pair => StackKind(pair.Value) == "backend").Select(pair => pair.Key).OrderBy(key => key, StringComparer.Ordinal).ToList();
+            var named = declaredStacks.Select(AsString).OfType<string>().ToList();
+            var backends = named.Where(backendStacks.Contains).ToList();
+
+            if (backends.Count != 1)
+            {
+                run.Err($"litespec.project.json: stacks name {backends.Count} backend stacks; name exactly one of {string.Join(", ", backendStacks)} [litespec/rule/core-scope.select-a-size-profile-and-stacks]");
+            }
+
+            foreach (var stack in named.Where(stack => !manifestStacks.ContainsKey(stack)))
+            {
+                run.Err($"litespec.project.json: stack '{stack}' is not a stack the pinned LiteSpec release ships [litespec/rule/core-scope.select-a-size-profile-and-stacks]");
+            }
+        }
 
         if ((manifest as JsonObject)?["extensions"] is JsonObject extensions)
         {

@@ -11,12 +11,15 @@
     "agentsEntry",
     "paths",
     "provisionRegistry",
+    "specification",
     "stacks",
     "extensions",
     "uiBaseline"
   ],
   "properties": {
-    "$schema": { "type": "string" },
+    "$schema": {
+      "type": "string"
+    },
     "schemaVersion": {
       "$comment": "Each release pins one exact shape. A consumer adopting a later release absorbs every difference at that moment, so no minor-compatible range exists between two releases. See litespec/rule/core-authoring.publish-each-release-as-a-complete-contract and litespec/rule/core-authoring.exclude-cross-release-compatibility-work.",
       "const": 5
@@ -25,66 +28,142 @@
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"
     },
-    "name": { "type": "string", "minLength": 1 },
-    "agentsEntry": { "$ref": "#/$defs/repositoryPath" },
-    "defaultProfile": { "$ref": "#/$defs/identifier" },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agentsEntry": {
+      "$ref": "#/$defs/repositoryPath"
+    },
+    "defaultProfile": {
+      "$ref": "#/$defs/identifier"
+    },
     "paths": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["docs", "template", "extension"],
+      "required": [
+        "docs",
+        "template",
+        "extension"
+      ],
       "properties": {
-        "docs": { "$ref": "#/$defs/repositoryPath" },
-        "template": { "$ref": "#/$defs/repositoryPath" },
-        "extension": { "$ref": "#/$defs/repositoryPath" },
-        "uiPatternLibrary": { "$ref": "#/$defs/repositoryPath" }
+        "docs": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "template": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "extension": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "uiPatternLibrary": {
+          "$ref": "#/$defs/repositoryPath"
+        }
       }
     },
     "provisionRegistry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["areas"],
+      "required": [
+        "areas"
+      ],
       "properties": {
         "areas": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/idArea" }
+          "items": {
+            "$ref": "#/$defs/idArea"
+          }
+        }
+      }
+    },
+    "specification": {
+      "description": "The stack-neutral pages every consumer applies, whatever its stacks.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry",
+        "pages"
+      ],
+      "properties": {
+        "entry": {
+          "description": "The page whose Composition section lists the pages, checked against this list.",
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/repositoryPath"
+          }
         }
       }
     },
     "stacks": {
+      "description": "The stack bindings this release ships, by stack id.",
       "type": "object",
       "minProperties": 1,
       "additionalProperties": {
+        "description": "One stack binding: the pages that apply when a consumer selects it.",
         "type": "object",
         "additionalProperties": false,
-        "required": ["pages"],
+        "required": [
+          "kind",
+          "entry",
+          "pages"
+        ],
         "properties": {
-          "entry": { "$ref": "#/$defs/repositoryPath" },
+          "kind": {
+            "description": "Whether the stack binds the backend or one frontend. A consumer selects one backend stack.",
+            "enum": [
+              "backend",
+              "frontend"
+            ]
+          },
+          "entry": {
+            "description": "The page whose Composition section lists the pages, checked against this list.",
+            "$ref": "#/$defs/repositoryPath"
+          },
           "pages": {
             "type": "array",
             "minItems": 1,
             "uniqueItems": true,
-            "items": { "$ref": "#/$defs/repositoryPath" }
+            "items": {
+              "$ref": "#/$defs/repositoryPath"
+            }
           }
         }
       }
     },
     "extensions": {
       "type": "object",
-      "additionalProperties": { "$ref": "#/$defs/extension" }
+      "additionalProperties": {
+        "$ref": "#/$defs/extension"
+      }
     },
     "stack": {
       "type": "object",
-      "additionalProperties": { "type": "string", "minLength": 1 }
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "packages": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["nuget", "npm"],
+      "required": [
+        "nuget",
+        "npm"
+      ],
       "properties": {
-        "nuget": { "$ref": "#/$defs/versionMap" },
-        "npm": { "$ref": "#/$defs/versionMap" }
+        "nuget": {
+          "$ref": "#/$defs/versionMap"
+        },
+        "npm": {
+          "$ref": "#/$defs/versionMap"
+        }
       }
     },
     "uiBaseline": {
@@ -113,31 +192,91 @@
         "nativeBoundary"
       ],
       "properties": {
-        "platform": { "const": "react" },
-        "system": { "const": "shadcn/ui" },
-        "styling": { "const": "tailwindcss-v4" },
-        "base": { "const": "base-ui" },
-        "style": { "type": "string", "minLength": 1 },
-        "cssVariables": { "const": true },
-        "baseColor": { "type": "string", "minLength": 1 },
-        "theme": { "type": "string", "minLength": 1 },
-        "chartColor": { "type": "string", "minLength": 1 },
-        "font": { "type": "string", "minLength": 1 },
-        "fontHeading": { "type": "string", "minLength": 1 },
-        "icons": { "const": "lucide" },
-        "radius": { "type": "string", "minLength": 1 },
-        "menuAccent": { "enum": ["subtle", "bold"] },
-        "menuColor": { "enum": ["default", "inverted", "default-translucent", "inverted-translucent"] },
-        "componentsStyle": { "type": "string", "minLength": 1 },
-        "sourceModel": { "const": "shared-ui-package" },
+        "platform": {
+          "const": "react"
+        },
+        "system": {
+          "const": "shadcn/ui"
+        },
+        "styling": {
+          "const": "tailwindcss-v4"
+        },
+        "base": {
+          "const": "base-ui"
+        },
+        "style": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cssVariables": {
+          "const": true
+        },
+        "baseColor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "theme": {
+          "type": "string",
+          "minLength": 1
+        },
+        "chartColor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "font": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fontHeading": {
+          "type": "string",
+          "minLength": 1
+        },
+        "icons": {
+          "const": "lucide"
+        },
+        "radius": {
+          "type": "string",
+          "minLength": 1
+        },
+        "menuAccent": {
+          "enum": [
+            "subtle",
+            "bold"
+          ]
+        },
+        "menuColor": {
+          "enum": [
+            "default",
+            "inverted",
+            "default-translucent",
+            "inverted-translucent"
+          ]
+        },
+        "componentsStyle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceModel": {
+          "const": "shared-ui-package"
+        },
         "registry": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["name", "url", "allowAdditional"],
+          "required": [
+            "name",
+            "url",
+            "allowAdditional"
+          ],
           "properties": {
-            "name": { "const": "shadcn" },
-            "url": { "const": "https://ui.shadcn.com" },
-            "allowAdditional": { "type": "boolean" }
+            "name": {
+              "const": "shadcn"
+            },
+            "url": {
+              "const": "https://ui.shadcn.com"
+            },
+            "allowAdditional": {
+              "type": "boolean"
+            }
           }
         },
         "profiles": {
@@ -146,10 +285,16 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "enum": ["public-light", "application-balanced", "admin-dense"]
+            "enum": [
+              "public-light",
+              "application-balanced",
+              "admin-dense"
+            ]
           }
         },
-        "nativeBoundary": { "const": "separate-platform-profile" }
+        "nativeBoundary": {
+          "const": "separate-platform-profile"
+        }
       }
     },
     "uiBaselineSvelte": {
@@ -178,31 +323,91 @@
         "nativeBoundary"
       ],
       "properties": {
-        "platform": { "const": "svelte" },
-        "system": { "const": "shadcn-svelte" },
-        "styling": { "const": "tailwindcss-v4" },
-        "base": { "const": "bits-ui" },
-        "style": { "type": "string", "minLength": 1 },
-        "cssVariables": { "const": true },
-        "baseColor": { "type": "string", "minLength": 1 },
-        "theme": { "type": "string", "minLength": 1 },
-        "chartColor": { "type": "string", "minLength": 1 },
-        "font": { "type": "string", "minLength": 1 },
-        "fontHeading": { "type": "string", "minLength": 1 },
-        "icons": { "const": "lucide" },
-        "radius": { "type": "string", "minLength": 1 },
-        "menuAccent": { "enum": ["subtle", "bold"] },
-        "menuColor": { "enum": ["default", "inverted", "default-translucent", "inverted-translucent"] },
-        "componentsStyle": { "type": "string", "minLength": 1 },
-        "sourceModel": { "const": "shared-ui-package" },
+        "platform": {
+          "const": "svelte"
+        },
+        "system": {
+          "const": "shadcn-svelte"
+        },
+        "styling": {
+          "const": "tailwindcss-v4"
+        },
+        "base": {
+          "const": "bits-ui"
+        },
+        "style": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cssVariables": {
+          "const": true
+        },
+        "baseColor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "theme": {
+          "type": "string",
+          "minLength": 1
+        },
+        "chartColor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "font": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fontHeading": {
+          "type": "string",
+          "minLength": 1
+        },
+        "icons": {
+          "const": "lucide"
+        },
+        "radius": {
+          "type": "string",
+          "minLength": 1
+        },
+        "menuAccent": {
+          "enum": [
+            "subtle",
+            "bold"
+          ]
+        },
+        "menuColor": {
+          "enum": [
+            "default",
+            "inverted",
+            "default-translucent",
+            "inverted-translucent"
+          ]
+        },
+        "componentsStyle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceModel": {
+          "const": "shared-ui-package"
+        },
         "registry": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["name", "url", "allowAdditional"],
+          "required": [
+            "name",
+            "url",
+            "allowAdditional"
+          ],
           "properties": {
-            "name": { "const": "shadcn-svelte" },
-            "url": { "const": "https://shadcn-svelte.com/registry" },
-            "allowAdditional": { "type": "boolean" }
+            "name": {
+              "const": "shadcn-svelte"
+            },
+            "url": {
+              "const": "https://shadcn-svelte.com/registry"
+            },
+            "allowAdditional": {
+              "type": "boolean"
+            }
           }
         },
         "profiles": {
@@ -211,10 +416,16 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "enum": ["public-light", "application-balanced", "admin-dense"]
+            "enum": [
+              "public-light",
+              "application-balanced",
+              "admin-dense"
+            ]
           }
         },
-        "nativeBoundary": { "const": "separate-platform-profile" }
+        "nativeBoundary": {
+          "const": "separate-platform-profile"
+        }
       }
     }
   },
@@ -234,11 +445,40 @@
     },
     "versionMap": {
       "type": "object",
-      "additionalProperties": { "type": "string", "minLength": 1 }
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "recordType": {
       "type": "string",
-      "enum": ["product", "constraint", "research", "decision", "requirement", "problem", "feature", "actor", "role", "permission", "journey", "module", "business-record", "rule", "use-case", "result", "case", "event", "entry-point", "limit", "runbook", "standard", "exception", "known-gap", "term"]
+      "enum": [
+        "product",
+        "constraint",
+        "research",
+        "decision",
+        "requirement",
+        "problem",
+        "feature",
+        "actor",
+        "role",
+        "permission",
+        "journey",
+        "module",
+        "business-record",
+        "rule",
+        "use-case",
+        "result",
+        "case",
+        "event",
+        "entry-point",
+        "limit",
+        "runbook",
+        "standard",
+        "exception",
+        "known-gap",
+        "term"
+      ]
     },
     "provisionId": {
       "type": "string",
@@ -247,38 +487,78 @@
     "extension": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "activationScope"],
+      "required": [
+        "path",
+        "activationScope"
+      ],
       "properties": {
-        "path": { "$ref": "#/$defs/repositoryPath" },
+        "path": {
+          "$ref": "#/$defs/repositoryPath"
+        },
         "activationScope": {
           "type": "string",
-          "enum": ["project", "local"]
+          "enum": [
+            "project",
+            "local"
+          ]
         },
         "applicableKinds": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/recordType" }
+          "items": {
+            "$ref": "#/$defs/recordType"
+          }
         },
         "replaces": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/provisionId" }
+          "items": {
+            "$ref": "#/$defs/provisionId"
+          }
         },
         "switchesOn": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/recordType" }
+          "items": {
+            "$ref": "#/$defs/recordType"
+          }
+        },
+        "stacks": {
+          "description": "The stacks the extension supports. Absent means every stack.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          }
         }
       },
       "allOf": [
         {
           "if": {
-            "properties": { "activationScope": { "const": "local" } },
-            "required": ["activationScope"]
+            "properties": {
+              "activationScope": {
+                "const": "local"
+              }
+            },
+            "required": [
+              "activationScope"
+            ]
           },
-          "then": { "required": ["applicableKinds"] },
-          "else": { "not": { "required": ["applicableKinds"] } }
+          "then": {
+            "required": [
+              "applicableKinds"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "applicableKinds"
+              ]
+            }
+          }
         }
       ]
     }

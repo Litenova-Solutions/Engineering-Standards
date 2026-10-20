@@ -2,49 +2,38 @@
 
 ## Intent
 
-Project references and package ownership make the application boundary visible to the compiler. Each selected stack permits direct framework types only in the layers that own them, and each project rejects packages introduced without a current requirement.
+Layer dependencies and package ownership make the application boundary visible to review. Each layer accepts only the dependencies its owning provisions allow, and each project rejects packages introduced without a current requirement.
 
 ## Agent Summary {#agent-summary}
 
-- Project references match the declared graph. (litespec/rule/workspace-dependencies.use-the-project-reference-graph)
-- Domain carries no package reference. (litespec/rule/workspace-dependencies.keep-domain-package-free)
-- Application references only its permitted abstractions. (litespec/rule/workspace-dependencies.keep-application-dependencies-narrow)
-- Provider packages live only in Infrastructure. (litespec/rule/workspace-dependencies.keep-providers-in-infrastructure)
-- Every dependency version resolves through central management or the lockfile. (litespec/rule/workspace-dependencies.pin-every-dependency-centrally)
-- A new package arrives with a decision and a manifest pin. (litespec/rule/workspace-dependencies.approve-new-packages-explicitly)
-- Frontends stay isolated from each other's source. (litespec/rule/workspace-dependencies.keep-frontend-applications-isolated)
-- Web UI packages come from the manifest baseline. (litespec/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary)
+- Dependencies follow the declared graph with no added edge. (litespec/rule/workspace-dependencies.follow-the-declared-dependency-graph)
+- Domain depends on no external package or framework. (litespec/rule/workspace-dependencies.keep-domain-dependency-free)
+- Application depends only on abstractions and the declared read boundary. (litespec/rule/workspace-dependencies.keep-application-free-of-provider-packages)
+- Provider adapters live only in Infrastructure. (litespec/rule/workspace-dependencies.keep-providers-in-infrastructure)
+- Every version resolves through central management or the lockfile. (litespec/rule/workspace-dependencies.pin-every-dependency-version-centrally)
+- A package outside the manifest carries a decision with its use, cost, and removal condition. (litespec/rule/workspace-dependencies.approve-new-packages-explicitly)
+- Frontends stay isolated and take UI packages from the manifest baseline. (litespec/rule/workspace-dependencies.keep-frontend-applications-isolated, litespec/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary)
+- Generated types stay dependency-free with a thin client. (litespec/rule/workspace-dependencies.keep-generated-packages-dependency-light)
+- Test packages stay inside test projects. (litespec/rule/workspace-dependencies.keep-test-dependencies-in-test-projects)
+- Each baseline package sits in its owning layer. (litespec/rule/workspace-dependencies.assign-each-baseline-package-to-its-owning-layer)
 
 ## Standards
 
-### Use the project reference graph (litespec/rule/workspace-dependencies.use-the-project-reference-graph)
+### Follow the declared dependency graph (litespec/rule/workspace-dependencies.follow-the-declared-dependency-graph)
 
-**Requirement:** A project reference MUST follow the graph in the table in this section and add no other edge.
+**Requirement:** A dependency between layers or modules MUST follow the declared graph and add no other edge.
 
-**Example:**
+**Rationale:** An undeclared edge lets a layer reach past its boundary, and review cannot refuse what no graph forbids.
 
-| Project | May reference |
-|:---|:---|
-| Domain | No application project |
-| Application.Abstractions | Domain |
-| Application | Domain, Application.Abstractions |
-| Infrastructure | Domain, Application.Abstractions, Application |
-| WebApi | Application.Abstractions, Application, Infrastructure |
-| Worker | Application.Abstractions, Application, Infrastructure |
-| AppHost | Deployable host projects through Aspire resource references |
-| Test projects | Only production projects and test support needed by their test category |
+### Keep Domain dependency-free (litespec/rule/workspace-dependencies.keep-domain-dependency-free)
 
-`WebApi` references Infrastructure for composition in `Program.cs`. Endpoint implementations cannot inject Infrastructure repositories, sessions, or provider clients.
+**Requirement:** The Domain layer MUST depend on no external package or framework.
 
-### Keep Domain package-free (litespec/rule/workspace-dependencies.keep-domain-package-free)
+**Rationale:** Persistence, messaging, web, injection, serialization, and logging libraries all stay outside.
 
-**Requirement:** The Domain project MUST reference no package beyond the .NET base class library.
+### Keep Application free of provider packages (litespec/rule/workspace-dependencies.keep-application-free-of-provider-packages)
 
-**Rationale:** Marten, EF Core, LiteBus, ASP.NET Core, injection, serialization, and logging packages all stay outside.
-
-### Keep Application dependencies narrow (litespec/rule/workspace-dependencies.keep-application-dependencies-narrow)
-
-**Requirement:** Application MUST reference only LiteBus command and query abstractions, required read abstractions, and needed Microsoft abstractions, plus the `IQuerySession` read boundary.
+**Requirement:** Application MUST depend only on messaging abstractions, required read abstractions, and the one declared read boundary.
 
 **Rationale:** A provider package in Application makes the coordination layer depend on the technology Infrastructure was meant to hide. The Requirement names the one read boundary this allows.
 
@@ -52,17 +41,15 @@ Project references and package ownership make the application boundary visible t
 
 **Requirement:** A database provider, external SDK, resilience, discovery, or serialization adapter MUST live in Infrastructure.
 
-**Rationale:** Infrastructure is the only layer that a provider change may reach, except the `IQuerySession` read boundary the ownership table assigns to Application.
+**Rationale:** Infrastructure is the only layer that a provider change may reach, except the read boundary the ownership table assigns to Application.
 
-### Pin every dependency centrally (litespec/rule/workspace-dependencies.pin-every-dependency-centrally)
+### Pin every dependency version centrally (litespec/rule/workspace-dependencies.pin-every-dependency-version-centrally)
 
-**Requirement:** Every NuGet and npm version MUST resolve through central management or the committed lockfile, at the pin `litespec.manifest.json` states where it states one.
+**Requirement:** Every dependency version MUST resolve through central management or the committed lockfile, at the pin `litespec.manifest.json` states where it states one.
 
-**Rationale:** An inline version in a project file is invisible to the manifest that is supposed to own it.
+**Rationale:** An inline version in one module file is invisible to the manifest that is supposed to own it. The manifest pins the baseline stack, which is the set these standards name. A consumer also carries packages for its own product, and it cannot add those to a manifest it does not own. Those versions live in the consumer's own central file or its lockfile, and `litespec/rule/workspace-dependencies.approve-new-packages-explicitly` is what admits them.
 
-The manifest pins the baseline stack, which is the set these standards name. A consumer also carries packages for its own product, and it cannot add those to a manifest it does not own. Those versions live in the consumer's own central file under `litespec/rule/workspace-config.centralize-nuget-versions` or its lockfile, and `litespec/rule/workspace-dependencies.approve-new-packages-explicitly` is what admits them.
-
-**Example:** A consumer generating invoices pins its PDF library in `Directory.Packages.props` with a decision record. The manifest never names it, and the pin is still central.
+**Example:** A consumer generating invoices pins its PDF library in its central version file with a decision record. The manifest never names it, and the pin is still central.
 
 ### Approve new packages explicitly (litespec/rule/workspace-dependencies.approve-new-packages-explicitly)
 
@@ -84,14 +71,6 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 ## Conventions
 
-### Reference only the LiteBus module required (litespec/rule/workspace-dependencies.reference-only-the-litebus-module-required)
-
-**Default:** Reference the LiteBus command, query, or event module that the code actually uses.
-
-**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
-
-**Rationale:** A unified application bus package pulls in contracts that the layer never dispatches.
-
 ### Keep generated packages dependency-light (litespec/rule/workspace-dependencies.keep-generated-packages-dependency-light)
 
 **Default:** Keep generated API types free of dependencies and limit the shared client to the pinned generator's runtime, its query plugin, and those types.
@@ -108,7 +87,7 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 **Rationale:** A test package referenced by a production project ships to production.
 
-### Use this baseline package ownership (litespec/rule/workspace-dependencies.use-this-baseline-package-ownership)
+### Assign each baseline package to its owning layer (litespec/rule/workspace-dependencies.assign-each-baseline-package-to-its-owning-layer)
 
 **Default:** Assign each baseline package to the owning layer named in the table in this section.
 
@@ -116,45 +95,28 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 
 **Example:**
 
-| Project | Direct package groups |
+| Layer | Direct package groups |
 |:---|:---|
 | Domain | None |
-| Application.Abstractions | Required LiteBus module abstractions only |
-| Application | Required LiteBus module abstractions; `Marten` for the selected `IQuerySession` read boundary; Microsoft abstractions used by public ports |
-| Infrastructure | `Marten`; LiteBus registration modules. Provider, resilience, service-discovery, and configuration packages required by implemented adapters |
-| WebApi | JWT Bearer [REDACTED] ASP.NET Core OpenAPI, build-time OpenAPI generation, Scalar, and required LiteBus mediator abstractions |
-| Worker | LiteBus registration modules; the provider, resilience, and configuration packages its hosted jobs need |
-| ServiceDefaults | Health checks, service discovery, HTTP resilience, and OpenTelemetry registration and instrumentation |
-| AppHost | Aspire AppHost and resource hosting packages |
-| Domain.Tests | xUnit v3 and assertions |
-| Application.Tests | xUnit v3, assertions, and NSubstitute |
-| Integration.Tests | xUnit v3, assertions, test host, Testcontainers PostgreSQL, and the Microsoft.Testing.Platform report and coverage extensions |
-| Architecture.Tests | xUnit v3, assertions, and NetArchTest |
-| Acceptance.Tests | xUnit v3, assertions, the behaviour runner its extension selects, test host, and the report and coverage extensions |
+| Application | Required abstractions only, plus the declared read boundary |
+| Infrastructure | Providers and adapters required by implemented ports |
+| Delivery | Host, authentication, and documentation packages |
+| Test code | Test-only packages |
 
-Test projects reference xUnit v3 and run on Microsoft.Testing.Platform. The consumer `global.json` sets `"test": { "runner": "Microsoft.Testing.Platform" }`, because the .NET 10 `dotnet test` command refuses the VSTest mode for these projects.
-
-The example adds a package to the narrowest owning project. A central version entry does not authorize every project to reference that package. Conditional packages such as EF Core, Reqnroll, LightBDD, SignalR, and WireMock are referenced only after their extension activates.
-
-## Reference example
-
-This informative example demonstrates `litespec/rule/workspace-dependencies.keep-application-dependencies-narrow` and `litespec/rule/workspace-dependencies.use-the-project-reference-graph`.
-
-An Application query handler may inject `IQuerySession` because Marten is the selected read model. An Application command handler receives `IPostRepository`, because the Domain owns the aggregate boundary and Infrastructure owns the Marten implementation.
+The example adds a package to the narrowest owning layer. A central version entry does not authorize every layer to reference that package. A consumer references conditional packages only after their extension activates.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/workspace-dependencies.use-the-project-reference-graph | guidance | Does each project reference follow the declared graph with no added edge? |
-| litespec/rule/workspace-dependencies.keep-domain-package-free | guidance | Does the Domain project reference no package beyond the base class library? |
-| litespec/rule/workspace-dependencies.keep-application-dependencies-narrow | guidance | Does Application reference only permitted abstractions and the one read boundary? |
+| litespec/rule/workspace-dependencies.follow-the-declared-dependency-graph | guidance | Does each layer or module dependency follow the declared graph with no added edge? |
+| litespec/rule/workspace-dependencies.keep-domain-dependency-free | guidance | Does Domain depend on no external package or framework? |
+| litespec/rule/workspace-dependencies.keep-application-free-of-provider-packages | guidance | Does Application depend only on abstractions and the declared read boundary? |
 | litespec/rule/workspace-dependencies.keep-providers-in-infrastructure | guidance | Does each provider adapter live in Infrastructure apart from the read boundary? |
-| litespec/rule/workspace-dependencies.pin-every-dependency-centrally | guidance | Does every version resolve through central management or the lockfile at the manifest or consumer pin? |
+| litespec/rule/workspace-dependencies.pin-every-dependency-version-centrally | guidance | Does every version resolve through central management or the lockfile at the manifest or consumer pin? |
 | litespec/rule/workspace-dependencies.approve-new-packages-explicitly | guidance | Does each package outside the manifest carry a decision with use case, alternatives, layer, cost, and removal condition? |
 | litespec/rule/workspace-dependencies.keep-frontend-applications-isolated | guidance | Is each frontend free of imports from another application's source or internal feature files? |
 | litespec/rule/workspace-dependencies.keep-the-approved-web-ui-dependency-boundary | guidance | Does each React frontend take UI packages from uiBaseline and each Svelte one from uiBaselineSvelte? |
-| litespec/rule/workspace-dependencies.reference-only-the-litebus-module-required | guidance | Does each project reference only the LiteBus modules its code dispatches? |
 | litespec/rule/workspace-dependencies.keep-generated-packages-dependency-light | guidance | Does the generated types package stay dependency-free with a thin client? |
 | litespec/rule/workspace-dependencies.keep-test-dependencies-in-test-projects | guidance | Do production projects reference no test package? |
-| litespec/rule/workspace-dependencies.use-this-baseline-package-ownership | guidance | Does each baseline package sit in the layer the ownership table assigns? |
+| litespec/rule/workspace-dependencies.assign-each-baseline-package-to-its-owning-layer | guidance | Does each baseline package sit in the layer the ownership table assigns? |

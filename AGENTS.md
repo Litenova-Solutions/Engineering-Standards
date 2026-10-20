@@ -4,7 +4,7 @@ Read this file before changing this repository or a consumer application. (lites
 
 LiteSpec v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend. (litespec/rule/core-scope.select-a-size-profile-and-stacks, litespec/rule/core-scope.keep-one-bounded-context)
 
-The canonical human index is `docs/README.md`. Exact versions, stacks, extensions, and switched-on types are in `litespec.manifest.json`. (litespec/rule/workspace-dependencies.pin-every-dependency-centrally, litespec/rule/core-scope.select-conditional-extensions-explicitly)
+The canonical human index is `docs/README.md`. Exact versions, stacks, extensions, and switched-on types are in `litespec.manifest.json`. (litespec/rule/dotnet-packages.pin-every-dependency-centrally, litespec/rule/core-scope.select-conditional-extensions-explicitly)
 
 A provision ID states its own page: `litespec/<kind>/<page>.<heading-slug>` names `docs/<area>/<page>.md`, so `litespec/rule/frontend-components.compose-composites-in-page-code` is in `docs/frontend/components.md`. `docs/reference/provisions.md` lists every identifier with its heading. (litespec/rule/core-authoring.use-the-declared-identifier-grammar, litespec/rule/core-authoring.regenerate-the-provision-index)
 
@@ -60,7 +60,7 @@ Quote both conflicting IDs and paths when requesting a decision. (litespec/rule/
 1. Confirm the requested scope and affected repositories. (litespec/rule/core-agent.make-coherent-scoped-changes)
 2. Read `git status` and preserve unrelated work. (litespec/rule/core-agent.inspect-existing-work-before-editing)
 3. Query the model for the active records and load the applicable extensions. (litespec/rule/core-agent.select-task-context, litespec/rule/core-agent.load-applicable-extensions)
-4. Check the manifest before changing dependencies. (litespec/rule/workspace-dependencies.pin-every-dependency-centrally, litespec/rule/workspace-dependencies.approve-new-packages-explicitly)
+4. Check the manifest before changing dependencies. (litespec/rule/dotnet-packages.pin-every-dependency-centrally, litespec/rule/workspace-dependencies.approve-new-packages-explicitly)
 5. Match compliant neighboring patterns. (litespec/rule/core-agent.inspect-local-examples-after-standards)
 6. Change records, code, tests, contracts, and operations as one unit. (litespec/rule/core-system.update-records-with-behavior)
 
@@ -74,15 +74,15 @@ The consumer template's `reviewedLiteSpecVersion` equals the manifest version, s
 
 ## High-Risk Boundaries
 
-- Use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as the application projects. (litespec/rule/backend-architecture.use-five-application-projects)
+- Use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as the application projects. (litespec/rule/dotnet-architecture.use-five-application-projects)
 - Place a type at the lowest folder holding every consumer that names it. (litespec/rule/backend-architecture.place-a-type-at-the-lowest-folder-that-holds-its-consumers)
 - Keep Domain independent from persistence, web, mediator, logging, and dependency injection. (litespec/rule/backend-architecture.point-dependencies-inward)
-- Model aggregate lifecycles with an abstract state and sealed state records. (litespec/rule/backend-domain.model-every-aggregate-lifecycle-with-state-records)
-- Model Domain closed sets as record hierarchies, never enums. (litespec/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums)
+- Model aggregate lifecycles with an abstract state and sealed state records. (litespec/rule/dotnet-domain.model-every-aggregate-lifecycle-with-state-records)
+- Model Domain closed sets as record hierarchies, never enums. (litespec/rule/dotnet-domain.model-every-closed-set-of-domain-values-without-enums)
 - Give each layer ownership of its messages, results, and transport models. (litespec/rule/backend-architecture.own-each-layers-contract-types)
-- Give each rejected Domain rule its own exception type and stable failure code. (litespec/rule/backend-domain.reject-business-violations-with-domain-exceptions)
+- Give each rejected Domain rule its own exception type and stable failure code. (litespec/rule/dotnet-domain.reject-business-violations-with-domain-exceptions)
 - Organize each layer by the same modules, aggregates, and use cases. (litespec/rule/backend-architecture.organize-every-layer-by-module-and-use-case)
-- Write commands through repositories and commit through the command pipeline. (litespec/rule/backend-application.keep-command-handlers-narrow, litespec/rule/backend-persistence.commit-once-in-the-command-pipeline)
+- Write commands through repositories and commit through the command pipeline. (litespec/rule/backend-application.keep-command-handlers-narrow, litespec/rule/backend-persistence.commit-each-command-pipeline-once)
 - Derive the actor from verified claims, and authorize each target from declared permissions. (litespec/rule/backend-application.enforce-target-authorization-in-the-pipeline)
 - Use the controlled shadcn/ui baseline for React web frontends. (litespec/rule/frontend-ui.select-one-visual-authority, litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package)
 - Use the controlled shadcn-svelte baseline for Svelte frontends. (litespec/rule/frontend-ui.select-one-visual-authority, litespec/rule/frontend-ui.pin-the-baseline-in-the-shared-package)

@@ -20,7 +20,7 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 ### Select a size profile and stacks (litespec/rule/core-scope.select-a-size-profile-and-stacks)
 
-**Requirement:** A consumer MUST select the small or large size and declare one stack per frontend, with the backend stack always dotnet.
+**Requirement:** A consumer MUST select the small or large size, one backend stack, and one stack per frontend, from the stacks its release ships.
 
 **Rationale:** One size and explicit stacks let every check know which records and pages to require. The size decides which record types and test projects the project needs; each stack decides which technology pages and checks apply. Small needs the core types with Architecture and Integration test projects, while large adds problems, features, journeys, and cases with the Acceptance project. Each frontend declares react, svelte, or blazor-web.
 

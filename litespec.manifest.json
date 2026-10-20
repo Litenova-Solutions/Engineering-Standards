@@ -15,6 +15,7 @@
       "BACKEND",
       "BLAZOR",
       "CORE",
+      "DOTNET",
       "EXT",
       "FRONTEND",
       "PROFILE",
@@ -24,56 +25,57 @@
       "WORKSPACE"
     ]
   },
+  "specification": {
+    "entry": "docs/profile/stacks.md",
+    "pages": [
+      "docs/profile/stacks.md",
+      "docs/core/system.md",
+      "docs/core/model.md",
+      "docs/core/principles.md",
+      "docs/core/scope.md",
+      "docs/core/product.md",
+      "docs/core/agent.md",
+      "docs/core/authoring.md",
+      "docs/core/maintaining.md",
+      "docs/core/release.md",
+      "docs/workspace/structure.md",
+      "docs/workspace/naming.md",
+      "docs/workspace/dependencies.md",
+      "docs/workspace/config.md",
+      "docs/backend/architecture.md",
+      "docs/backend/domain.md",
+      "docs/backend/application.md",
+      "docs/backend/persistence.md",
+      "docs/backend/api.md",
+      "docs/backend/testing.md",
+      "docs/backend/identifiers.md",
+      "docs/quality/security.md",
+      "docs/quality/operations.md",
+      "docs/quality/ci.md"
+    ]
+  },
   "stacks": {
     "dotnet": {
+      "kind": "backend",
+      "entry": "docs/profile/dotnet.md",
       "pages": [
-        "docs/workspace/structure.md",
-        "docs/workspace/naming.md",
-        "docs/workspace/dependencies.md",
-        "docs/workspace/config.md",
-        "docs/core/agent.md",
-        "docs/core/authoring.md",
-        "docs/core/maintaining.md",
-        "docs/core/model.md",
-        "docs/core/principles.md",
-        "docs/core/product.md",
-        "docs/core/release.md",
-        "docs/core/scope.md",
-        "docs/core/system.md",
-        "docs/backend/architecture.md",
-        "docs/backend/domain.md",
-        "docs/backend/application.md",
-        "docs/backend/persistence.md",
-        "docs/backend/api.md",
-        "docs/backend/testing.md",
-        "docs/backend/identifiers.md",
-        "docs/frontend/structure.md",
-        "docs/frontend/rendering.md",
-        "docs/frontend/components.md",
-        "docs/frontend/ui.md",
-        "docs/frontend/patterns.md",
-        "docs/frontend/data.md",
-        "docs/frontend/testing.md",
-        "docs/quality/security.md",
-        "docs/quality/operations.md",
-        "docs/quality/ci.md"
+        "docs/profile/dotnet.md",
+        "docs/dotnet/architecture.md",
+        "docs/dotnet/domain.md",
+        "docs/dotnet/application.md",
+        "docs/dotnet/persistence.md",
+        "docs/dotnet/api.md",
+        "docs/dotnet/testing.md",
+        "docs/dotnet/workspace.md",
+        "docs/dotnet/naming.md",
+        "docs/dotnet/packages.md",
+        "docs/dotnet/config.md"
       ]
     },
     "react": {
+      "kind": "frontend",
+      "entry": "docs/profile/react.md",
       "pages": [
-        "docs/workspace/structure.md",
-        "docs/workspace/naming.md",
-        "docs/workspace/dependencies.md",
-        "docs/workspace/config.md",
-        "docs/core/agent.md",
-        "docs/core/authoring.md",
-        "docs/core/maintaining.md",
-        "docs/core/model.md",
-        "docs/core/principles.md",
-        "docs/core/product.md",
-        "docs/core/release.md",
-        "docs/core/scope.md",
-        "docs/core/system.md",
         "docs/profile/react.md",
         "docs/frontend/structure.md",
         "docs/frontend/rendering.md",
@@ -82,27 +84,13 @@
         "docs/frontend/patterns.md",
         "docs/frontend/data.md",
         "docs/frontend/testing.md",
-        "docs/react/components.md",
-        "docs/quality/security.md",
-        "docs/quality/operations.md",
-        "docs/quality/ci.md"
+        "docs/react/components.md"
       ]
     },
     "svelte": {
+      "kind": "frontend",
+      "entry": "docs/profile/svelte.md",
       "pages": [
-        "docs/workspace/structure.md",
-        "docs/workspace/naming.md",
-        "docs/workspace/dependencies.md",
-        "docs/workspace/config.md",
-        "docs/core/agent.md",
-        "docs/core/authoring.md",
-        "docs/core/maintaining.md",
-        "docs/core/model.md",
-        "docs/core/principles.md",
-        "docs/core/product.md",
-        "docs/core/release.md",
-        "docs/core/scope.md",
-        "docs/core/system.md",
         "docs/profile/svelte.md",
         "docs/frontend/structure.md",
         "docs/frontend/rendering.md",
@@ -111,44 +99,20 @@
         "docs/frontend/patterns.md",
         "docs/frontend/data.md",
         "docs/frontend/testing.md",
-        "docs/svelte/components.md",
-        "docs/quality/security.md",
-        "docs/quality/operations.md",
-        "docs/quality/ci.md"
+        "docs/svelte/components.md"
       ]
     },
     "blazor-web": {
+      "kind": "frontend",
+      "entry": "docs/profile/blazor.md",
       "pages": [
-        "docs/workspace/structure.md",
-        "docs/workspace/naming.md",
-        "docs/workspace/dependencies.md",
-        "docs/workspace/config.md",
-        "docs/core/agent.md",
-        "docs/core/authoring.md",
-        "docs/core/maintaining.md",
-        "docs/core/model.md",
-        "docs/core/principles.md",
-        "docs/core/product.md",
-        "docs/core/release.md",
-        "docs/core/scope.md",
-        "docs/core/system.md",
         "docs/profile/blazor.md",
-        "docs/frontend/structure.md",
-        "docs/frontend/rendering.md",
-        "docs/frontend/components.md",
-        "docs/frontend/ui.md",
-        "docs/frontend/patterns.md",
-        "docs/frontend/data.md",
-        "docs/frontend/testing.md",
         "docs/blazor/structure.md",
         "docs/blazor/rendering.md",
         "docs/blazor/components.md",
         "docs/blazor/data.md",
         "docs/blazor/browser.md",
-        "docs/blazor/testing.md",
-        "docs/quality/security.md",
-        "docs/quality/operations.md",
-        "docs/quality/ci.md"
+        "docs/blazor/testing.md"
       ]
     }
   },
@@ -163,6 +127,9 @@
       "replaces": [],
       "switchesOn": [
         "case"
+      ],
+      "stacks": [
+        "dotnet"
       ]
     },
     "compat": {
@@ -277,14 +244,17 @@
         "use-case"
       ],
       "replaces": [
-        "litespec/rule/backend-persistence.query-through-iquerysession",
+        "litespec/rule/dotnet-persistence.query-through-iquerysession",
         "litespec/rule/backend-persistence.keep-mappings-and-aliases-explicit",
-        "litespec/rule/workspace-dependencies.keep-application-dependencies-narrow",
+        "litespec/rule/dotnet-packages.keep-application-dependencies-narrow",
         "litespec/rule/backend-architecture.separate-command-and-query-behavior",
         "litespec/rule/ext-outbox.stage-messages-with-business-work",
         "litespec/rule/ext-outbox.reject-independent-outbox-commits"
       ],
-      "switchesOn": []
+      "switchesOn": [],
+      "stacks": [
+        "dotnet"
+      ]
     },
     "realtime": {
       "path": "docs/ext/realtime.md",

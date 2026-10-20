@@ -1,3 +1,6 @@
+using LiteSpec.Authoring;
+using LiteSpec.Tests.Support;
+
 namespace LiteSpec.Tests.Authoring;
 
 /// <summary>Manifest, stack, extension, identifier-scope, and vocabulary cases.</summary>
@@ -43,6 +46,34 @@ public sealed partial class StandardsValidatorTests
     public void StackCompositionMatches() => Check(
         root => StandardsFixture.Write(root, "litespec.manifest.json", "{\"provisionRegistry\":{\"areas\":[\"CORE\",\"EXT\",\"PROFILE\"]},\"stacks\":{\"sample\":{\"entry\":\"docs/profile/sample.md\",\"pages\":[\"docs/core/topic.md\"]}}}"),
         []);
+
+    [Fact(DisplayName = "page in no layer")]
+    public void PageInNoLayer() => Check(
+        root => StandardsFixture.Write(root, "litespec.manifest.json", "{\"specification\":{\"entry\":\"docs/profile/sample.md\",\"pages\":[\"docs/core/topic.md\"]},\"stacks\":{}}"),
+        ["LAYER_UNLISTED"]);
+
+    [Fact(DisplayName = "page in both layers")]
+    public void PageInBothLayers() => Check(
+        root => StandardsFixture.Write(root, "litespec.manifest.json", "{\"specification\":{\"entry\":\"docs/profile/sample.md\",\"pages\":[\"docs/core/topic.md\",\"docs/profile/sample.md\"]},\"stacks\":{\"sample\":{\"kind\":\"backend\",\"entry\":\"docs/profile/sample.md\",\"pages\":[\"docs/profile/sample.md\"]}}}"),
+        ["LAYER_OVERLAP"]);
+
+    [Fact(DisplayName = "extension naming a stack the release does not ship")]
+    public void ExtensionNamingUnknownStack() => Check(
+        root => StandardsFixture.Write(root, "litespec.manifest.json", "{\"specification\":{\"entry\":\"docs/profile/sample.md\",\"pages\":[\"docs/core/topic.md\",\"docs/profile/sample.md\"]},\"stacks\":{},\"extensions\":{\"sample\":{\"path\":\"docs/ext/sample.md\",\"stacks\":[\"cobol\"]}}}"),
+        ["EXTENSION_STACK_UNKNOWN"]);
+
+    [Fact(DisplayName = "every page in exactly one layer")]
+    public void EveryPageInOneLayer()
+    {
+        using var temp = Cli.Temp("standards");
+        StandardsFixture.Base(temp.Path);
+        StandardsFixture.Write(temp.Path, "litespec.manifest.json", "{\"specification\":{\"entry\":\"docs/profile/sample.md\",\"pages\":[\"docs/core/topic.md\"]},\"stacks\":{\"sample\":{\"kind\":\"backend\",\"entry\":\"docs/profile/sample.md\",\"pages\":[\"docs/profile/sample.md\"]}}}");
+
+        var codes = StandardsValidator.Validate(temp.Path).Diagnostics.Select(diagnostic => diagnostic.Code).ToList();
+
+        Assert.DoesNotContain("LAYER_UNLISTED", codes);
+        Assert.DoesNotContain("LAYER_OVERLAP", codes);
+    }
 
     [Fact(DisplayName = "extension scope mismatch")]
     public void ExtensionScopeMismatch() => Check(

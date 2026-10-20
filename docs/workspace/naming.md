@@ -6,23 +6,18 @@ Names should expose business intent and architectural role without requiring a r
 
 ## Agent Summary {#agent-summary}
 
-- One primary type per C# file, named for the file. (litespec/rule/workspace-naming.match-c-files-and-primary-types)
 - Aggregate-owned types lead with their aggregate root name. (litespec/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root)
 - Architectural roles carry their declared suffix. (litespec/rule/workspace-naming.use-architectural-suffixes)
-- Async methods end in Async and take the token last. (litespec/rule/workspace-naming.name-asynchronous-methods-completely)
+- Asynchronous operations reveal asynchrony and accept cancellation explicitly. (litespec/rule/workspace-naming.name-asynchronous-operations-completely)
 - Exception names state the failed rule and its owner. (litespec/rule/workspace-naming.name-exceptions-by-failed-rule)
 - Boolean names read as conditions. (litespec/rule/workspace-naming.use-intent-revealing-boolean-names)
-- Production C# follows the declared style rules. (litespec/rule/workspace-naming.keep-implementation-style-consistent)
 - Code uses the pinned language version's current constructs. (litespec/rule/workspace-naming.use-current-language-features)
 - Frontend names follow one predictable case mapping. (litespec/rule/workspace-naming.use-predictable-frontend-names)
+- Business names stay aligned across layers. (litespec/rule/workspace-naming.align-business-names-across-layers)
+- Namespaces follow their folders beneath the project root. (litespec/rule/workspace-naming.keep-namespaces-aligned-with-folders)
+- Type names avoid the listed generic names, and boundary names derive from the ubiquitous term. (litespec/rule/workspace-naming.avoid-generic-type-names, litespec/rule/workspace-naming.derive-boundary-names-from-the-ubiquitous-term)
 
 ## Standards
-
-### Match C# files and primary types (litespec/rule/workspace-naming.match-c-files-and-primary-types)
-
-**Requirement:** A C# file MUST contain one primary top-level type and take that type's exact name.
-
-**Rationale:** Only a small private or file-scoped nested type stays with its owner. Two public or internal top-level types belong in two files.
 
 ### Anchor aggregate-owned types on the aggregate root (litespec/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root)
 
@@ -69,6 +64,8 @@ Names should expose business intent and architectural role without requiring a r
 | Registration class | `{Layer}ServiceRegistration` | `InfrastructureServiceRegistration` |
 | Assembly marker | `{Layer}AssemblyMarker` | `ApplicationAssemblyMarker` |
 
+In the dotnet stack, the repository interface carries the `I` prefix. In the dotnet stack, options classes carry the `Options` suffix, and each scanned project carries an assembly marker.
+
 An event-reaction folder names the business fact after an `On` prefix. It omits the `Event` suffix. For example, `OnPostPublished` contains `NotifySubscribersOnPostPublishedHandler` for `PostPublishedEvent`. The `On` prefix already marks the reaction. Folder names carry no technical suffix, so `OnPostPublishedEvent` is wrong. The event type keeps its `Event` suffix (`litespec/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root`).
 
 The example does not shorten an Application type to `{UseCase}Result`, `{UseCase}Handler`, or `{UseCase}Validator`. The example does not use an unowned name such as `PostSummary` for a query-specific result item. The full role suffix distinguishes command coordination from query projection without opening the file.
@@ -79,11 +76,11 @@ A polymorphic transport model mirrors a Domain discriminated union (`litespec/ru
 
 The transport name drops the Domain union's aggregate prefix, such as `OrderFulfillmentOutcome`. Its discriminator string keeps the Domain union's stable case code unchanged.
 
-### Name asynchronous methods completely (litespec/rule/workspace-naming.name-asynchronous-methods-completely)
+### Name asynchronous operations completely (litespec/rule/workspace-naming.name-asynchronous-operations-completely)
 
-**Requirement:** A method returning `Task` or `ValueTask` MUST end in `Async` and take `CancellationToken cancellationToken` last when cancellable.
+**Requirement:** An asynchronous operation MUST reveal its asynchrony in its name and accept cancellation explicitly when the operation is cancellable.
 
-**Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature. A method is cancellable when it performs I/O or awaits.
+**Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature. An operation is cancellable when it performs I/O or awaits.
 
 ### Name exceptions by failed rule (litespec/rule/workspace-naming.name-exceptions-by-failed-rule)
 
@@ -97,17 +94,11 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 
 **Rationale:** `HasLines` and `CanPublish` state a condition. `LinesPresent` and `CheckPublish` state neither a question nor an answer.
 
-### Keep implementation style consistent (litespec/rule/workspace-naming.keep-implementation-style-consistent)
-
-**Requirement:** Production C# MUST use file-scoped namespaces, braces on every body, explicit access modifiers, and sealed concrete classes.
-
-**Rationale:** These are the style decisions that change diff readability rather than behavior, so one setting removes the debate.
-
 ### Use current language features (litespec/rule/workspace-naming.use-current-language-features)
 
 **Requirement:** Production code MUST target the pinned language version and use its current construct over an older equivalent.
 
-**Rationale:** Collection expressions, pattern matching, and primary constructors express the same intent with less incidental code.
+**Rationale:** In the dotnet stack, collection expressions, pattern matching, and primary constructors express the same intent with less incidental code.
 
 ### Use predictable frontend names (litespec/rule/workspace-naming.use-predictable-frontend-names)
 
@@ -149,37 +140,15 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 
 **Rationale:** Renaming a Domain concept then renames its boundary names, so the contract and the language stay aligned.
 
-## Reference example
-
-This informative example demonstrates `litespec/rule/workspace-naming.match-c-files-and-primary-types`, `litespec/rule/workspace-naming.use-architectural-suffixes`, and `litespec/rule/workspace-naming.keep-namespaces-aligned-with-folders`.
-
-```csharp
-namespace Example.Application.Posts.CreateDraft;
-
-internal sealed class CreateDraftCommandHandler(
-    IPostRepository postRepository,
-    IClock clock)
-{
-    public async Task<CreateDraftCommandResult> HandleAsync(
-        CreateDraftCommand command,
-        CancellationToken cancellationToken)
-    {
-        // Operation code.
-    }
-}
-```
-
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/workspace-naming.match-c-files-and-primary-types | guidance | Does each C# file declare one primary type matching its file name? |
 | litespec/rule/workspace-naming.anchor-aggregate-owned-types-on-the-aggregate-root | guidance | Does each aggregate-owned type name begin with its aggregate root name? |
 | litespec/rule/workspace-naming.use-architectural-suffixes | guidance | Does each architectural type carry the suffix its role requires? |
-| litespec/rule/workspace-naming.name-asynchronous-methods-completely | guidance | Does each task-returning method end in Async with the token last when cancellable? |
+| litespec/rule/workspace-naming.name-asynchronous-operations-completely | guidance | Does each asynchronous operation reveal its asynchrony in its name and accept cancellation explicitly when cancellable? |
 | litespec/rule/workspace-naming.name-exceptions-by-failed-rule | guidance | Does each Domain exception name lead with its root and name its reason? |
 | litespec/rule/workspace-naming.use-intent-revealing-boolean-names | guidance | Does each boolean member use an intent-revealing prefix or verb? |
-| litespec/rule/workspace-naming.keep-implementation-style-consistent | guidance | Does production C# use file-scoped namespaces, braces, explicit modifiers, and sealed classes? |
 | litespec/rule/workspace-naming.use-current-language-features | guidance | Does production code target the pinned language version with current constructs? |
 | litespec/rule/workspace-naming.use-predictable-frontend-names | guidance | Does each frontend follow the folder, component, and hook naming form? |
 | litespec/rule/workspace-naming.align-business-names-across-layers | guidance | Does one business name span each module across layers and documentation? |

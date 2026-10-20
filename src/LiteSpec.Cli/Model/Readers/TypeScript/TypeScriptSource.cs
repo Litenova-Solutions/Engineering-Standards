@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace LiteSpec.Model;
+namespace LiteSpec.Model.Readers.TypeScript;
 
 /// <summary>
 ///     What a TypeScript file says in code, with what it says in comments left out.

@@ -6,46 +6,22 @@ Repository configuration should make builds repeatable and fail before a deploym
 
 ## Agent Summary {#agent-summary}
 
-- The root sets .NET 10 or later as the SDK floor. (litespec/rule/workspace-config.set-the-sdk-floor-at-the-workspace-root)
-- One props file owns the .NET build settings. (litespec/rule/workspace-config.centralize-net-build-settings)
-- NuGet versions live in one central props file. (litespec/rule/workspace-config.centralize-nuget-versions)
-- Local .NET tools are pinned in the tool manifest. (litespec/rule/workspace-config.commit-the-tool-manifest)
-- Configuration binds to validated options at startup. (litespec/rule/workspace-config.validate-backend-options-at-startup)
+- Configuration binds to validated settings at startup. (litespec/rule/workspace-config.validate-backend-configuration-at-startup)
 - Frontends read environment values through one validated module. (litespec/rule/workspace-config.validate-frontend-environment-access)
 - Tracked configuration carries placeholders only. (litespec/rule/workspace-config.keep-secrets-outside-source-control)
 - One workspace owns the frontend dependency graph. (litespec/rule/workspace-config.use-one-frontend-dependency-graph)
 - The JavaScript toolchain is pinned in the root manifest. (litespec/rule/workspace-config.pin-the-javascript-toolchain)
 - A React ESLint flat config pins its React version. (litespec/rule/workspace-config.pin-the-react-version-in-the-eslint-flat-config)
+- Environment examples sit beside applications. (litespec/rule/workspace-config.keep-environment-examples-beside-applications)
+- Local overrides stay untracked. (litespec/rule/workspace-config.keep-local-overrides-untracked)
+- Logging stays provider-neutral. (litespec/rule/workspace-config.keep-logging-configuration-provider-neutral)
+- Documentation directories stay out of ignore rules. (litespec/rule/workspace-config.keep-documentation-directories-out-of-build-artifact-ignore-rules)
 
 ## Standards
 
-### Set the SDK floor at the workspace root (litespec/rule/workspace-config.set-the-sdk-floor-at-the-workspace-root)
+### Validate backend configuration at startup (litespec/rule/workspace-config.validate-backend-configuration-at-startup)
 
-**Requirement:** Root `global.json` MUST set the first feature band of the manifest dotnet major release as its SDK version and roll forward with `latestMajor`.
-
-**Rationale:** Any SDK from that major release on builds the workspace, so a patch or feature band release needs no change to the repository. The manifest names the major release, and `Directory.Build.props` sets its target framework.
-
-### Centralize .NET build settings (litespec/rule/workspace-config.centralize-net-build-settings)
-
-**Requirement:** `apps/api/Directory.Build.props` MUST set the target framework of the manifest dotnet stack release, and enable nullable types, implicit usings, and warnings as errors.
-
-**Rationale:** One file then owns the settings that would otherwise drift between projects.
-
-### Centralize NuGet versions (litespec/rule/workspace-config.centralize-nuget-versions)
-
-**Requirement:** `apps/api/Directory.Packages.props` MUST enable central package management and carry the exact manifest pins.
-
-**Rationale:** Individual project files then reference package names without versions, so no project can drift.
-
-### Commit the tool manifest (litespec/rule/workspace-config.commit-the-tool-manifest)
-
-**Requirement:** Root `.config/dotnet-tools.json` MUST pin every local .NET tool a documented repository command invokes.
-
-**Rationale:** When a tool ships in the manifest dotnet stack release, its pin matches that release, so local and CI runs use one version.
-
-### Validate backend options at startup (litespec/rule/workspace-config.validate-backend-options-at-startup)
-
-**Requirement:** A configuration section MUST bind to a named options class validated for required fields, ranges, and formats at startup.
+**Requirement:** A backend configuration section MUST bind to a named settings type validated for required fields, ranges, and formats at startup.
 
 **Rationale:** Reading a required setting through a raw configuration lookup defers the failure to the first request that needs it.
 
@@ -125,19 +101,15 @@ Confirm with `git check-ignore docs/<directory>/<file>.md` that no record is ign
 
 ## Reference example
 
-This informative example demonstrates `litespec/rule/workspace-config.validate-backend-options-at-startup` and `litespec/rule/workspace-config.keep-secrets-outside-source-control`.
+This informative example demonstrates `litespec/rule/workspace-config.validate-backend-configuration-at-startup` and `litespec/rule/workspace-config.keep-secrets-outside-source-control`.
 
-`EmailOptions` binds the `Email` section, validates its endpoint and sender during startup, and is injected through `IOptions<EmailOptions>`. The consumer workspace secret store supplies the credential.
+`EmailSettings` binds the `Email` section, validates its endpoint and sender during startup, and is injected as a settings type. The consumer workspace secret store supplies the credential.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/rule/workspace-config.set-the-sdk-floor-at-the-workspace-root | guidance | Does root global.json set the manifest major release's first feature band, such as `10.0.100`, with `latestMajor` roll-forward? |
-| litespec/rule/workspace-config.centralize-net-build-settings | guidance | Does Directory.Build.props set the manifest target framework, nullable types, implicit usings, and warnings as errors? |
-| litespec/rule/workspace-config.centralize-nuget-versions | guidance | Does Directory.Packages.props enable central management with the manifest pins, and do projects omit versions? |
-| litespec/rule/workspace-config.commit-the-tool-manifest | guidance | Does .config/dotnet-tools.json pin each local tool a documented command invokes? |
-| litespec/rule/workspace-config.validate-backend-options-at-startup | guidance | Does each configuration section bind a validated options class that fails startup on bad values? |
+| litespec/rule/workspace-config.validate-backend-configuration-at-startup | guidance | Does each backend section bind a validated settings type that fails startup on bad values? |
 | litespec/rule/workspace-config.validate-frontend-environment-access | guidance | Does each frontend read environment values only through its validated module with server values separated? |
 | litespec/rule/workspace-config.keep-secrets-outside-source-control | guidance | Does each tracked configuration file carry only safe defaults and placeholders? |
 | litespec/rule/workspace-config.use-one-frontend-dependency-graph | guidance | Does the workspace use one root manifest and lockfile with no nested lockfile tracked? |

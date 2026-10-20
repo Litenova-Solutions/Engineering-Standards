@@ -2,38 +2,16 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace LiteSpec.Model;
-
-/// <summary>One step call inside a scenario.</summary>
-sealed record ScenarioStep(string Phase, string Receiver, string? ReceiverType, string Method);
-
-/// <summary>One acceptance scenario and what it claims.</summary>
-sealed record ScenarioInfo(
-    string Name,
-    string Class,
-    string File,
-    int Line,
-    IReadOnlyList<string> Claims,
-    IReadOnlyList<ScenarioStep> Steps,
-    IReadOnlyList<string> Codes,
-    IReadOnlyList<int> Statuses,
-    IReadOnlySet<string> Identifiers,
-    IReadOnlyList<string> Routes);
-
-/// <summary>What the test read found: scenarios and file comments.</summary>
-sealed record TestRead(
-    IReadOnlyList<ScenarioInfo> Scenarios,
-    IReadOnlyList<CodeComment> Comments,
-    IReadOnlyDictionary<string, IReadOnlySet<string>> StepCalls);
+namespace LiteSpec.Model.Readers.Dotnet;
 
 /// <summary>
 ///     Reads acceptance scenarios: the case each claims, the steps it runs,
 ///     and the failure codes it asserts.
 /// </summary>
-static class TestReader
+sealed class DotnetScenarioReader : IScenarioReader
 {
     /// <summary>Reads every scenario and comment under the test roots.</summary>
-    public static TestRead Read(ConsumerConfig config)
+    public TestRead Read(ConsumerConfig config)
     {
         var files = new List<string>();
 

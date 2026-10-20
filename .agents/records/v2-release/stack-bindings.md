@@ -1,6 +1,6 @@
 # Design: the specification and its stack bindings
 
-Status: proposal for the owner, 2026-10-20, on `release/v2.0.0` at commit `888ff7d`. Nothing below is built yet.
+Status: built on `release/v2.0.0` (2026-10-20). The owner approved the direction and asked for the recommended answers: the area is `dotnet`, a principle and its realization are two provisions with two IDs, and workspace splits the same way.
 
 ## Problem
 
@@ -132,7 +132,22 @@ URLs keep the release and page: `litespec.dev/2.0.0/dotnet/domain`.
 4. Regenerate the provision index, and update every citation of a moved ID across `docs/`, `templates/`, `AGENTS.md` and the tests.
 5. Refactor the builder behind the reader contract and add the JUnit reader, with the model fixtures proving the readers produce the same model as before.
 
-## Open questions for the owner
+## Built
+
+- 192 provisions classified by 11 Muse workers: 139 stay as specification, 13 moved to `dotnet-*`, 40 split into a neutral principle and a .NET realization; 37 citations rewritten across the repository (neutral pages cite the principle, everything else the realization, plus the workers' per-line requests).
+- `docs/dotnet/` holds 10 pages (`architecture`, `domain`, `application`, `persistence`, `api`, `testing`, `workspace`, `naming`, `packages`, `config`); `docs/profile/dotnet.md` is the stack page. `backend/identifiers.md` had no .NET rule, so it has no binding page.
+- The manifest has `specification` (24 pages) and stacks with `kind`, `entry` and their own pages; `efcore` and `bdd` declare `stacks: ["dotnet"]`. The React and Svelte stacks share the `frontend/` pages; Blazor has its own.
+- `litespec validate` checks each layer's Composition section against the manifest (the check existed but never ran, because no stack had an `entry`), reports a page in no layer (`LAYER_UNLISTED`) or in both (`LAYER_OVERLAP`), and an extension naming an unknown stack (`EXTENSION_STACK_UNKNOWN`).
+- `litespec consumer` requires exactly one backend stack, refuses a stack the release does not ship, and no longer accepts `dotnet` as a frontend platform (it did before, because it treated every manifest stack as a platform).
+- The model builder reads through `IBackendReader`, `IFrontendReader`, `IScenarioReader` and `ITestRunReader` (`src/LiteSpec.Cli/Model/Readers/`), and reads JUnit XML beside TRX. `model.json` and `model check` output are byte-identical to the previous build on both fixtures.
+- 1052 provisions; 366 tests pass.
+
+## Known limits
+
+- The builder reads screens for Svelte frontends only, so React routes are not linked to use cases. This predates the split.
+- Two neutral verification rows on `backend/application.md` name `dotnet test` as their evidence command, because .NET is the only binding that runs them today.
+
+## Questions that were open
 
 1. **Area name for the .NET binding:** `dotnet` (matches the stack ID; recommended) or `backend-dotnet`.
 2. **`both` rules:** keep the principle and the realization as two provisions with two IDs (recommended, since a future Go binding cites the same principle), or keep one provision with a per-stack section, the way frontend pages do today.

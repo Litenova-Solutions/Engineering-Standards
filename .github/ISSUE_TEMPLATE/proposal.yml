@@ -51,7 +51,7 @@ body:
     attributes:
       label: Conflicting provision
       description: Each provision ID this proposal contradicts. Write `None` when the answer above is no. A conflict named as a yes and nowhere else cannot be reviewed.
-      placeholder: litespec/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums
+      placeholder: litespec/rule/dotnet-domain.model-every-closed-set-of-domain-values-without-enums
     validations:
       required: true
 

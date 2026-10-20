@@ -93,6 +93,17 @@ static partial class StandardsValidator
             }
         }
 
+        var specification = obj?["specification"] as JsonObject;
+        if (specification is not null)
+        {
+            if (JsonString(specification["entry"]) is { Length: > 0 } specificationEntry)
+            {
+                references.Add(specificationEntry);
+            }
+
+            references.AddRange(JsonStrings(specification["pages"] as JsonArray));
+        }
+
         var extensions = obj?["extensions"] as JsonObject;
         if (extensions is not null)
         {
@@ -130,7 +141,65 @@ static partial class StandardsValidator
         }
 
         CheckStackComposition(root, stacks, add);
+        if (specification is not null)
+        {
+            CheckStackComposition(root, new JsonObject { ["specification"] = specification.DeepClone() }, add);
+            CheckLayers(root, specification, stacks, extensions, add);
+        }
+
         CheckManifestExtensions(root, extensions, activeIds, rowsByPage, add);
+    }
+
+    // Areas whose pages belong to no layer: guides, commands, references, and the
+    // extensions, which the manifest lists on their own.
+    static readonly string[] LayerFreeAreas = ["docs/ext/", "docs/guide/", "docs/reference/", "docs/tools/", "docs/tutorial/"];
+
+    // Every page belongs to the specification, which every consumer applies, or to at
+    // least one stack binding, never both. An unlisted page applies to nobody, and a page
+    // in both layers would bind a stack-neutral rule to one stack.
+    // (litespec/rule/profile-stacks.apply-the-complete-stack)
+    static void CheckLayers(string root, JsonObject specification, JsonObject? stacks, JsonObject? extensions, Action<string, int, string, string> add)
+    {
+        var specificationPages = JsonStrings(specification["pages"] as JsonArray).ToHashSet(StringComparer.Ordinal);
+        var stackPages = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var (_, stackNode) in stacks ?? [])
+        {
+            stackPages.UnionWith(JsonStrings((stackNode as JsonObject)?["pages"] as JsonArray));
+        }
+
+        var docs = Path.Combine(root, "docs");
+        if (Directory.Exists(docs))
+        {
+            foreach (var file in Directory.GetFiles(docs, "*.md", SearchOption.AllDirectories).OrderBy(name => name, StringComparer.Ordinal))
+            {
+                var relative = Slash(Path.GetRelativePath(root, file));
+                if (Path.GetFileName(relative) == "README.md" || LayerFreeAreas.Any(area => relative.StartsWith(area, StringComparison.Ordinal)))
+                {
+                    continue;
+                }
+
+                if (!specificationPages.Contains(relative) && !stackPages.Contains(relative))
+                {
+                    add(relative, 1, "LAYER_UNLISTED", "page is listed in neither the specification nor any stack in litespec.manifest.json");
+                }
+            }
+        }
+
+        foreach (var page in specificationPages.Where(stackPages.Contains).OrderBy(page => page, StringComparer.Ordinal))
+        {
+            add("litespec.manifest.json", 1, "LAYER_OVERLAP", $"page '{page}' is listed in the specification and in a stack");
+        }
+
+        foreach (var (id, extensionNode) in extensions ?? [])
+        {
+            foreach (var stack in JsonStrings((extensionNode as JsonObject)?["stacks"] as JsonArray))
+            {
+                if (stacks is null || !stacks.ContainsKey(stack))
+                {
+                    add("litespec.manifest.json", 1, "EXTENSION_STACK_UNKNOWN", $"extension '{id}' names stack '{stack}', which the manifest does not ship");
+                }
+            }
+        }
     }
 
     static void CheckStackComposition(string root, JsonObject? stacks, Action<string, int, string, string> add)

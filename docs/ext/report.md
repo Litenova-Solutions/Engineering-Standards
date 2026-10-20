@@ -14,7 +14,7 @@ The consumer enables `report` for a documented query or export with complex rela
 
 ## Baseline relationship
 
-None. Ordinary queries stay under `litespec/rule/backend-persistence.query-through-iquerysession`; this extension governs reads whose cost or duration exceeds that path.
+None. Ordinary queries stay under `litespec/rule/backend-persistence.query-through-the-read-session`; this extension governs reads whose cost or duration exceeds that path.
 
 `limit`. Selecting `report` requires Limit records for the request budget and the report bounds.
 

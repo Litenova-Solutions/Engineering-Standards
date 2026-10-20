@@ -1,31 +1,14 @@
 using System.Xml.Linq;
 
-namespace LiteSpec.Model;
-
-/// <summary>The latest test run, read from result files.</summary>
-sealed class TestRun
-{
-    /// <summary>The files read, relative to the root.</summary>
-    public List<string> Files { get; } = [];
-
-    /// <summary>Outcome by test name.</summary>
-    public Dictionary<string, string> OutcomeByTest { get; } = new(StringComparer.Ordinal);
-
-    /// <summary>Outcome by scenario method name.</summary>
-    public Dictionary<string, string> OutcomeByMethod { get; } = new(StringComparer.Ordinal);
-
-    public int Total { get; set; }
-    public int Passed { get; set; }
-    public int Failed { get; set; }
-}
+namespace LiteSpec.Model.Readers.Dotnet;
 
 /// <summary>
 ///     Reads test outcomes from TRX files. Absent when the folder holds none.
 /// </summary>
-static class TestRunReader
+sealed class TrxTestRunReader : ITestRunReader
 {
     /// <summary>Reads the run, or null when no result file exists.</summary>
-    public static TestRun? Read(ConsumerConfig config)
+    public TestRun? Read(ConsumerConfig config)
     {
         var files = SourceTree.Files(config.TestResultsDir, ".trx");
 

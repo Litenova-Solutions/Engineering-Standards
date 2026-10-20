@@ -1,7 +1,4 @@
-namespace LiteSpec.Model;
-
-/// <summary>One generated operation: its name, method and path.</summary>
-sealed record GeneratedOperation(string Name, string Method, string Path);
+namespace LiteSpec.Model.Readers.TypeScript;
 
 /// <summary>
 ///     What each generated call name stands for, read from the client every frontend imports.

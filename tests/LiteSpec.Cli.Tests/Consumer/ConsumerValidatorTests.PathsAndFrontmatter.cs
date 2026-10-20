@@ -28,6 +28,30 @@ public sealed partial class ConsumerValidatorTests
         AssertProblem(RunConsumer(folder.Path), "Scanned no Markdown files");
     }
 
+    [Fact(DisplayName = "project naming no backend stack")]
+    public void ProjectNamingNoBackendStack()
+    {
+        using var folder = ConsumerFixture.Create();
+        ConsumerFixture.MutateProject(folder.Path, project => project["stacks"] = new JsonArray("react"));
+        AssertProblem(RunConsumer(folder.Path), "stacks name 0 backend stacks; name exactly one of dotnet");
+    }
+
+    [Fact(DisplayName = "project naming a stack the release does not ship")]
+    public void ProjectNamingUnknownStack()
+    {
+        using var folder = ConsumerFixture.Create();
+        ConsumerFixture.MutateProject(folder.Path, project => project["stacks"] = new JsonArray("dotnet", "cobol"));
+        AssertProblem(RunConsumer(folder.Path), "stack 'cobol' is not a stack the pinned LiteSpec release ships");
+    }
+
+    [Fact(DisplayName = "frontend declaring the backend stack as its platform")]
+    public void FrontendDeclaringBackendStackAsPlatform()
+    {
+        using var folder = ConsumerFixture.Create();
+        ConsumerFixture.MutateProject(folder.Path, project => ((JsonArray)PathsOf(project)["frontends"]!).Add(new JsonObject { ["name"] = "web", ["path"] = "apps/web", ["platform"] = "dotnet" }));
+        AssertProblem(RunConsumer(folder.Path), "frontend 'web' has unknown platform 'dotnet'");
+    }
+
     [Fact(DisplayName = "language record path that is not on disk")]
     public void LanguageRecordPathThatIsNotOnDisk()
     {

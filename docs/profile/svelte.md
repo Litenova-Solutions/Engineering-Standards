@@ -2,7 +2,7 @@
 
 ## Intent
 
-This stack serves a Svelte frontend in a product whose backend is the dotnet stack. A Svelte frontend takes one of three shapes, chosen by who reads it. An authenticated console is a static SvelteKit application. A public surface whose pages are shared as links and read by a search engine renders on the server. A device client that asks one question repeatedly is a static page with no router. The shared stack rules on the [Stacks](stacks.md) page apply to every stack.
+This stack serves a Svelte frontend beside the product's backend stack. A Svelte frontend takes one of three shapes, chosen by who reads it. An authenticated console is a static SvelteKit application. A public surface whose pages are shared as links and read by a search engine renders on the server. A device client that asks one question repeatedly is a static page with no router. The shared stack rules on the [Stacks](stacks.md) page apply to every stack.
 
 ## Agent Summary {#agent-summary}
 
@@ -29,45 +29,23 @@ The shared stack rules on the [Stacks](stacks.md) page apply to every stack.
 
 ## Composition
 
-### Workspace
-
-- [Workspace Structure](../workspace/structure.md)
-- [Naming and Code Style](../workspace/naming.md)
-- [Dependencies](../workspace/dependencies.md)
-- [Configuration](../workspace/config.md)
-
-### Core
-
-- [Agent operating protocol](../core/agent.md)
-- [Authoring Standard](../core/authoring.md)
-- [Maintaining the Standards](../core/maintaining.md)
-- [The Project Model](../core/model.md)
-- [Engineering Principles](../core/principles.md)
-- [Product Intent](../core/product.md)
-- [Release Standard](../core/release.md)
-- [Supported scope](../core/scope.md)
-- [LiteSpec](../core/system.md)
-
 ### Stack
 
-- [Svelte stack](svelte.md)
+- [Svelte Stack](svelte.md)
 
 ### Frontend
 
-- [Frontend structure](../frontend/structure.md)
-- [Frontend rendering and routes](../frontend/rendering.md)
+- [Frontend Structure](../frontend/structure.md)
+- [Frontend Rendering and Routes](../frontend/rendering.md)
 - [Frontend Components](../frontend/components.md)
 - [Controlled UI Governance](../frontend/ui.md)
-- [UI pattern decisions](../frontend/patterns.md)
-- [Frontend data and state](../frontend/data.md)
-- [Frontend testing](../frontend/testing.md)
+- [UI Pattern Decisions](../frontend/patterns.md)
+- [Frontend Data and State](../frontend/data.md)
+- [Frontend Testing](../frontend/testing.md)
+
+### Svelte
+
 - [Svelte Components](../svelte/components.md)
-
-### Quality and operations
-
-- [Security](../quality/security.md)
-- [Operations](../quality/operations.md)
-- [Continuous Integration](../quality/ci.md)
 
 ## Conventions
 

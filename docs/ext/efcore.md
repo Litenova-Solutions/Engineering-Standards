@@ -16,9 +16,9 @@ The consumer enables `efcore` only after a decision records aggregate scope, rel
 
 For Entity Framework Core-owned aggregate paths, this extension replaces:
 
-- `litespec/rule/backend-persistence.query-through-iquerysession`: EF Core queries use `IApplicationDbContext`.
+- `litespec/rule/dotnet-persistence.query-through-iquerysession`: EF Core queries use `IApplicationDbContext`.
 - `litespec/rule/backend-persistence.keep-mappings-and-aliases-explicit`: EF Core mappings use `IEntityTypeConfiguration<T>` classes.
-- `litespec/rule/workspace-dependencies.keep-application-dependencies-narrow`: Application references the Entity Framework Core query surface its query interface needs.
+- `litespec/rule/dotnet-packages.keep-application-dependencies-narrow`: Application references the Entity Framework Core query surface its query interface needs.
 - `litespec/rule/backend-architecture.separate-command-and-query-behavior`: the read half only; the invariant half still binds.
 
 For an EF Core-owned command with durable delivery, this extension also replaces:
@@ -183,7 +183,7 @@ This extension switches on no optional record type.
 
 **Rationale:** The aggregate remains the owner of lifecycle state and state-specific business facts.
 
-A relational column holds the active state record and its discriminator, which is the same contract the baseline provider stores in its document. The column never holds an enumerated integer, because that discards the state-specific facts the record carries and reintroduces the shape `litespec/rule/backend-domain.model-every-closed-set-of-domain-values-without-enums` removes. A state case with its own fields maps to an owned type or to its own table. The discriminator selects which one a read materializes.
+A relational column holds the active state record and its discriminator, which is the same contract the baseline provider stores in its document. The column never holds an enumerated integer, because that discards the state-specific facts the record carries and reintroduces the shape `litespec/rule/backend-domain.model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy` removes. A state case with its own fields maps to an owned type or to its own table. The discriminator selects which one a read materializes.
 
 ### Map stable relational state shape (litespec/rule/ext-efcore.map-stable-relational-state-shape)
 

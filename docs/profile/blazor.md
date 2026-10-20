@@ -57,35 +57,9 @@ CI conventions apply with the client jobs. Build, test, publish, dependency, inv
 
 ## Composition
 
-### Workspace
-
-- [Workspace Structure](../workspace/structure.md)
-- [Naming and Code Style](../workspace/naming.md)
-- [Dependencies](../workspace/dependencies.md)
-- [Configuration](../workspace/config.md)
-
-### Core
-
-- [Agent operating protocol](../core/agent.md)
-- [Authoring Standard](../core/authoring.md)
-- [Maintaining the Standards](../core/maintaining.md)
-- [The Project Model](../core/model.md)
-- [Engineering Principles](../core/principles.md)
-- [Product Intent](../core/product.md)
-- [Release Standard](../core/release.md)
-- [Supported scope](../core/scope.md)
-- [LiteSpec](../core/system.md)
-
 ### Stack
 
-- [Blazor stack](blazor.md)
-
-### Backend
-
-- [Backend Architecture](../backend/architecture.md)
-- [Domain Layer](../backend/domain.md)
-- [Application Layer](../backend/application.md)
-- [Record Identifiers](../backend/identifiers.md)
+- [Blazor Stack](blazor.md)
 
 ### Blazor
 
@@ -95,12 +69,6 @@ CI conventions apply with the client jobs. Build, test, publish, dependency, inv
 - [Blazor Data and State](../blazor/data.md)
 - [Browser Persistence](../blazor/browser.md)
 - [Blazor Testing](../blazor/testing.md)
-
-### Quality and operations
-
-- [Security](../quality/security.md)
-- [Operations](../quality/operations.md)
-- [Continuous Integration](../quality/ci.md)
 
 ## Conventions
 

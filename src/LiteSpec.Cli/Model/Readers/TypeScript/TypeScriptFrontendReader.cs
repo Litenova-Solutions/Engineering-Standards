@@ -1,31 +1,18 @@
 using System.Text.RegularExpressions;
 
-namespace LiteSpec.Model;
-
-/// <summary>One read route: its address, file, operations and use cases.</summary>
-sealed record ScreenInfo(
-    string Frontend,
-    string Route,
-    string File,
-    IReadOnlyList<GeneratedOperation> Operations,
-    IReadOnlyList<string> UseCases);
+namespace LiteSpec.Model.Readers.TypeScript;
 
 /// <summary>
-///     Which operations and use cases each frontend route calls, read from the route's code.
+///     Which operations and use cases each route of one TypeScript frontend calls, read from the route's code.
 /// </summary>
-static partial class ScreenReader
+sealed partial class TypeScriptFrontendReader(FrontendConfig frontend) : IFrontendReader
 {
     private const string RouteFolder = "routes";
 
     private static readonly string[] Extensions = [".ts", ".tsx", ".js", ".jsx", ".svelte", ".svelte.ts"];
 
-    /// <summary>What the screen read found: route screens and file comments.</summary>
-    public sealed record ScreenRead(
-        IReadOnlyList<ScreenInfo> Screens,
-        IReadOnlyList<CodeComment> Comments);
-
-    /// <summary>Reads every route of every Svelte frontend.</summary>
-    public static ScreenRead Read(ConsumerConfig config, CodeModel code)
+    /// <summary>Reads every route of the frontend.</summary>
+    public ScreenRead Read(ConsumerConfig config, CodeModel code)
     {
         var byRoute = new Dictionary<string, string>(StringComparer.Ordinal);
         var byOperation = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -44,24 +31,15 @@ static partial class ScreenReader
         }
 
         var client = GeneratedClient.Read(config.ApiClientSrc);
-        var cache = new FileCache(config);
+        var cache = new FileCache(frontend);
         var starts = new List<(FrontendConfig Frontend, string File, string Address)>();
+        var routes = Path.Combine(frontend.Path, "src", RouteFolder);
 
-        foreach (var frontend in config.Frontends)
+        foreach (var file in SourceTree.Files(routes, Extensions))
         {
-            if (frontend.Platform != "svelte")
+            if (Address(file, routes) is { } address && !EndpointBesidePage(file))
             {
-                continue;
-            }
-
-            var routes = Path.Combine(frontend.Path, "src", RouteFolder);
-
-            foreach (var file in SourceTree.Files(routes, Extensions))
-            {
-                if (Address(file, routes) is { } address && !EndpointBesidePage(file))
-                {
-                    starts.Add((frontend, file, address));
-                }
+                starts.Add((frontend, file, address));
             }
         }
 
@@ -85,27 +63,20 @@ static partial class ScreenReader
     /// <summary>
     ///     One read of every frontend source file, shared by route following and
     ///     comment reads so neither re-reads a file another route already reached.
+    ///     One cache covers one frontend.
     /// </summary>
-    private sealed class FileCache(ConsumerConfig config)
+    private sealed class FileCache(FrontendConfig frontend)
     {
-        private readonly Dictionary<string, string> _texts = ReadAll(config);
+        private readonly Dictionary<string, string> _texts = ReadAll(frontend);
         private readonly System.Collections.Concurrent.ConcurrentDictionary<string, (IReadOnlyList<string> Imports, IReadOnlyList<string> Calls)> _parsed = new(StringComparer.Ordinal);
 
-        private static Dictionary<string, string> ReadAll(ConsumerConfig config)
+        private static Dictionary<string, string> ReadAll(FrontendConfig frontend)
         {
             var texts = new Dictionary<string, string>(StringComparer.Ordinal);
 
-            foreach (var frontend in config.Frontends)
+            foreach (var file in SourceTree.Files(Path.Combine(frontend.Path, "src"), Extensions))
             {
-                if (frontend.Platform != "svelte")
-                {
-                    continue;
-                }
-
-                foreach (var file in SourceTree.Files(Path.Combine(frontend.Path, "src"), Extensions))
-                {
-                    texts.TryAdd(Path.GetFullPath(file), SourceTree.Read(file));
-                }
+                texts.TryAdd(Path.GetFullPath(file), SourceTree.Read(file));
             }
 
             return texts;

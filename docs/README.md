@@ -28,11 +28,13 @@ A standards page owns the provisions a reader cites for one concern.
 
 ## Profile
 
+- [Stacks](profile/stacks.md)
+- [.NET stack](profile/dotnet.md)
 - [React stack](profile/react.md)
 - [Svelte stack](profile/svelte.md)
 - [Blazor stack](profile/blazor.md)
 
-Each stack page states what selecting that stack adds: its pages, its pins, and its checks. Exact versions and composition remain in `litespec.manifest.json`.
+The Stacks page lists the specification, which every consumer applies. Each stack page states what selecting that stack adds: its pages, its pins, and its checks. Exact versions and composition remain in `litespec.manifest.json`.
 
 ## Workspace
 
@@ -51,6 +53,21 @@ Each stack page states what selecting that stack adds: its pages, its pins, and 
 - [Backend testing](backend/testing.md)
 - [Identifiers](backend/identifiers.md)
 
+Each backend page is stack-neutral. The Dotnet pages state how a .NET backend realizes it.
+
+## Dotnet
+
+- [.NET architecture](dotnet/architecture.md)
+- [.NET domain](dotnet/domain.md)
+- [.NET application](dotnet/application.md)
+- [.NET persistence](dotnet/persistence.md)
+- [.NET HTTP API](dotnet/api.md)
+- [.NET testing](dotnet/testing.md)
+- [.NET workspace](dotnet/workspace.md)
+- [.NET naming](dotnet/naming.md)
+- [.NET packages](dotnet/packages.md)
+- [.NET configuration](dotnet/config.md)
+
 ## Frontend
 
 - [Frontend structure](frontend/structure.md)
@@ -61,7 +78,7 @@ Each stack page states what selecting that stack adds: its pages, its pins, and 
 - [Frontend data and state](frontend/data.md)
 - [Frontend testing](frontend/testing.md)
 
-Each frontend page is stack-neutral, with short per-stack sections for what differs between React, Svelte, and Blazor.
+The React and Svelte stacks share these pages, with short per-stack sections for what differs. The Blazor stack has its own pages.
 
 ## React
 
