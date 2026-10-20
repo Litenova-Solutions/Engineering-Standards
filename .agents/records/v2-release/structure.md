@@ -50,7 +50,6 @@ The `profile/` area and the stack pages' Composition sections no longer exist.
 - Two provisions on one page with the same slug are a duplicate.
 - The pattern that recognizes an ID in text: `litespec/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*#[a-z0-9]+(?:-[a-z0-9]+)*`.
 - A **citation** is any occurrence of that pattern in a page, template, schema, manifest, test fixture, code string or the model. Every citation must resolve to a provision in the release.
-- The old form `litespec/rule/<area>-<page>.<slug>` is refused everywhere it appears.
 - Agent Summary bullets end with the full IDs they summarize in parentheses, as before. The Verification table's first column holds full IDs, as before.
 - A provision's kind is its section: `rule` under Standards, `convention` under Conventions.
 
@@ -110,16 +109,14 @@ Given `size`, `shape` (default `server`), `stacks` and `selectedExtensions`:
 
 `docs/reference/provisions.md` lists every provision: one `##` section per top-level area (`core`, `workspace`, `quality`, `ext`, `backend`, `frontend`), rows sorted by ID ordinally, columns `ID | Provision | Kind | Mark | Evidence`, the Provision cell linking `[heading](../<page>.md#<slug>)`.
 
-## 8. The mapping
-
-`.agents/records/v2-release/id-map.json` maps every 2.0.0 working-tree ID (`litespec/rule/...`) to its new ID or IDs. It is the input of a future migration tool.
 
 ## 9. How it was built
 
 - 7 Muse workers split the 7 frontend pages into principles and `frontend/web/` pages and folded the 5 matching Blazor pages into realizations: all 156 original frontend and Blazor provisions are mapped, 51 of them split.
-- 5 Muse workers moved the code: `litespec validate` and `litespec provisions` to the new grammar (`ID_IN_HEADING` added; `ID_MISSING`, `ID_LOCATION`, `ID_SCOPE_MISMATCH`, `ID_SLUG_MISMATCH`, `ID_AREA_UNKNOWN` removed), the manifest checks to folder stacks (`STACK_FOLDER`, `STACK_REFERENCE`, `EXTENSION_LOCATION`, `EXTENSION_UNLISTED`, `LAYER_UNREACHABLE`, `SHAPE_PAGE`) with a shared `Layout` computation, `litespec consumer` and `litespec ui` to shapes and stacks, `litespec model` to the new citations, and the new `litespec init` with three presets.
-- The judge converted the tree with one script: page moves with history, IDs stripped from headings, 2186 citations and every relative link rewritten, the manifest reshaped, and the map saved as `id-map.json` (1057 old IDs).
-- Retired: `profile/`, every Composition section, Blazor's "List excluded baselines" rule (the client-only shape replaces it; its old ID maps to `litespec/core/scope#declare-a-consumer-that-has-no-backend`), and the dead provision-registry code.
+- 5 Muse workers moved the code: `litespec validate` and `litespec provisions` to the new grammar (`ID_IN_HEADING` added), the manifest checks to folder stacks (`STACK_FOLDER`, `STACK_REFERENCE`, `EXTENSION_LOCATION`, `EXTENSION_UNLISTED`, `LAYER_UNREACHABLE`, `SHAPE_PAGE`) with a shared `Layout` computation, `litespec consumer` and `litespec ui` to shapes and stacks, `litespec model` to the new citations, and the new `litespec init` with three presets.
+- The judge converted the tree with one script: page moves with history, IDs stripped from headings, 2186 citations and every relative link rewritten, the manifest reshaped.
+- Retired: `profile/`, every Composition section, Blazor's "List excluded baselines" rule (the client-only shape replaces it), and the dead provision-registry code.
 - Added: `litespec/core/authoring#keep-identifiers-out-of-provision-headings`.
-- Found while verifying, and fixed: `litespec ui` matched exception records by splitting the old ID form, so no UI exception ever expired; the converter rewrote two tests that deliberately use the old form; `litespec init --preset blazor-client` kept a UI package no frontend uses.
+- Found while verifying, and fixed: `litespec ui` matched exception records by the old ID layout, so no UI exception ever expired; `litespec init --preset blazor-client` kept a UI package no frontend uses.
+- Clean slate (2026-10-20, owner): 2.0.0 carries no migration or compatibility material. Removed the checks that refused 1.x identifier forms (`REMOVED_IDENTIFIER`, `WORKFLOW_KIND`, `identifier-refused-form`, the old-form deferral refusal), the provision "Reject the retired identifier forms", the 1.x changelog archive, the old-to-new ID map, the `defaultProfile` manifest field, and the default that read a project without `stacks` as dotnet. The changelog describes 2.0.0 as a first release.
 - Result: 1103 provisions, `litespec validate` clean, 419 tests pass.

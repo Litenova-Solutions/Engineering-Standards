@@ -485,31 +485,6 @@ public sealed partial class StandardsValidatorTests
         Assert.Contains("ID_PAGE_FILENAME", codes);
     }
 
-    [Fact(DisplayName = "removed numbered identifier")]
-    public void RemovedNumberedIdentifier() => Check(
-        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe page cites INV-ORDERS-01.\n"),
-        ["REMOVED_IDENTIFIER"]);
-
-    [Fact(DisplayName = "removed slashed identifier")]
-    public void RemovedSlashedIdentifier() => Check(
-        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe page cites invariant/orders.only-placed-ships.\n"),
-        ["REMOVED_IDENTIFIER"]);
-
-    [Fact(DisplayName = "removed project rule prefix")]
-    public void RemovedProjectRulePrefix() => Check(
-        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe page cites acme/rule/agents.what-acme-is.\n"),
-        ["REMOVED_IDENTIFIER"]);
-
-    [Fact(DisplayName = "bare refused prefixes are documentation")]
-    public void BareRefusedPrefixesAreDocumentation() => Check(
-        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nRefused prefixes are AC-, INV-, path/, value/ and workflow/.\n\n" + StandardsFixture.IndexRouting),
-        []);
-
-    [Fact(DisplayName = "Workflow as a kind")]
-    public void WorkflowAsKind() => Check(
-        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nA Workflow names its triggers and owner.\n"),
-        ["WORKFLOW_KIND"]);
-
     [Fact(DisplayName = "lowercase workflow prose passes")]
     public void LowercaseWorkflowPasses() => Check(
         root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe release workflow runs weekly.\n\n" + StandardsFixture.IndexRouting),

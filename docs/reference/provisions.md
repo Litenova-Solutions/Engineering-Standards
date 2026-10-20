@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading, owning page, a
 
 Run `litespec provisions` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 1103 provisions across 6 areas.
+The active release states 1102 provisions across 6 areas.
 
 ## backend
 
@@ -224,7 +224,6 @@ The active release states 1103 provisions across 6 areas.
 | litespec/backend/identifiers#keep-use-case-names-unique-across-the-project | [Keep use case names unique across the project](../backend/identifiers.md#keep-use-case-names-unique-across-the-project) | rule | checkable | `litespec model check` reports `use-case-name-clash`. |
 | litespec/backend/identifiers#keep-wire-codes-stable | [Keep wire codes stable](../backend/identifiers.md#keep-wire-codes-stable) | rule | guidance | Do clients read the same code values as before? |
 | litespec/backend/identifiers#name-records-with-one-to-six-words | [Name records with one to six words](../backend/identifiers.md#name-records-with-one-to-six-words) | rule | checkable | `litespec model check` reports `identifier-form`. |
-| litespec/backend/identifiers#reject-the-retired-identifier-forms | [Reject the retired identifier forms](../backend/identifiers.md#reject-the-retired-identifier-forms) | rule | checkable | `litespec model check` reports `identifier-refused-form`. |
 | litespec/backend/identifiers#resolve-every-identifier-citation | [Resolve every identifier citation](../backend/identifiers.md#resolve-every-identifier-citation) | rule | checkable | `litespec model check` reports `reference-unresolved`. |
 | litespec/backend/persistence#add-read-documents-for-query-shaped-data | [Add read documents for query-shaped data](../backend/persistence.md#add-read-documents-for-query-shaped-data) | convention | guidance | Does each read document record its consistency and rebuild behavior beside its owning use case? |
 | litespec/backend/persistence#bound-aggregate-document-growth | [Bound aggregate document growth](../backend/persistence.md#bound-aggregate-document-growth) | rule | guidance | Does each embedded collection in an aggregate document have an accepted business bound? |
@@ -315,7 +314,7 @@ The active release states 1103 provisions across 6 areas.
 | litespec/core/authoring#use-one-normative-vocabulary | [Use one normative vocabulary](../core/authoring.md#use-one-normative-vocabulary) | rule | checkable | `litespec validate` emits no `STANDARD_MODAL_COUNT` or `STANDARD_MODAL_VOCABULARY` diagnostic. |
 | litespec/core/authoring#use-one-term-for-one-concept | [Use one term for one concept](../core/authoring.md#use-one-term-for-one-concept) | rule | guidance | Would a reader meet each concept under one name only? |
 | litespec/core/authoring#use-tables-for-exact-mappings | [Use tables for exact mappings](../core/authoring.md#use-tables-for-exact-mappings) | convention | guidance | Is each changed table a comparison or a field mapping? |
-| litespec/core/authoring#use-the-declared-identifier-grammar | [Use the declared identifier grammar](../core/authoring.md#use-the-declared-identifier-grammar) | rule | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` or `REMOVED_IDENTIFIER` diagnostic. |
+| litespec/core/authoring#use-the-declared-identifier-grammar | [Use the declared identifier grammar](../core/authoring.md#use-the-declared-identifier-grammar) | rule | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
 | litespec/core/authoring#use-the-declared-page-contract | [Use the declared page contract](../core/authoring.md#use-the-declared-page-contract) | rule | checkable | `litespec validate` emits no `PAGE_MISSING_SECTION`, `PAGE_SECTION_ORDER`, or `PAGE_UNKNOWN_SECTION` diagnostic. |
 | litespec/core/authoring#validate-current-standards-material | [Validate current standards material](../core/authoring.md#validate-current-standards-material) | rule | guidance | Does the validator read the working tree and no earlier release? |
 | litespec/core/authoring#write-atomic-standards-provisions | [Write atomic Standards provisions](../core/authoring.md#write-atomic-standards-provisions) | rule | checkable | `litespec validate` emits no `STANDARD_REQUIREMENT_COUNT`, `STANDARD_SENTENCE_COUNT`, or `STANDARD_LABEL_INVALID` diagnostic. |

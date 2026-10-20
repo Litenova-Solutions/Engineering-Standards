@@ -13,11 +13,6 @@ public sealed partial class StandardsValidatorTests
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the topic bounded", "### Keep the topic bounded (litespec/core/topic#keep-the-topic-bounded)")),
         ["ID_IN_HEADING"]);
 
-    [Fact(DisplayName = "legacy litespec rule citation")]
-    public void LegacyRuleCitation() => Check(
-        root => StandardsFixture.Write(root, "docs/README.md", "# Documentation\n\n## Intent\n\nThe page cites litespec/rule/core-topic.keep-the-topic-bounded.\n"),
-        ["REMOVED_IDENTIFIER"]);
-
     [Fact(DisplayName = "page file name that is not kebab case")]
     public void PageFileNameNotKebab() => Check(
         root => StandardsFixture.Write(root, "docs/core/TwoWords.md", StandardsFixture.TopicPage),

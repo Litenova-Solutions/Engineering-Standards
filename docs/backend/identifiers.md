@@ -12,7 +12,6 @@ Every record carries one identifier naming its type, home, and name. One form pe
 - Keep each business record name unique. (litespec/backend/identifiers#keep-business-record-names-unique-across-the-project)
 - Keep negation in rule names. (litespec/backend/identifiers#keep-negation-in-rule-names)
 - Keep wire codes stable. (litespec/backend/identifiers#keep-wire-codes-stable)
-- Reject the retired forms. (litespec/backend/identifiers#reject-the-retired-identifier-forms)
 - Resolve every citation. (litespec/backend/identifiers#resolve-every-identifier-citation)
 - Cite shared provisions as published. (litespec/backend/identifiers#cite-shared-provisions-in-their-published-form)
 
@@ -63,13 +62,9 @@ A rule home is a business record name or a module name. A project standard home 
 
 Wire codes are not identifiers and never change shape: failure codes such as `failure/orders.not_found`, audit action codes, and permission codes in code.
 
-### Refused forms
-
-The refused kind words are `acceptance-criterion/`, `path/`, `authorization/`, `invariant/`, `policy/`, `validation/`, `flow/`, `workflow/`, `end-to-end-flow/`, `domain-policy/`, `aggregate/`, a project prefix such as `<project>/rule/`, and `value/`. The refused tokens are `AC-`, `AUTZ-`, `INV-`, `POL-`, `VAL-`, `RULE-`, and `E2E-`.
-
 ### Resolution
 
-Every citation of an identifier resolves to a written record. Unresolved citations fail the check; no list keeps retired names.
+Every citation of an identifier resolves to a written record. Unresolved citations fail the check.
 
 Shared provisions keep their published `litespec/<page>#<slug>` form.
 
@@ -117,12 +112,6 @@ Shared provisions keep their published `litespec/<page>#<slug>` form.
 
 **Rationale:** Failure codes, audit action codes, and permission codes are not identifiers. Clients branch on their values, so a change breaks deployed readers.
 
-### Reject the retired identifier forms
-
-**Requirement:** A record MUST NOT use a retired identifier form.
-
-**Rationale:** Retired forms carry counters and kind words the model no longer defines.
-
 ### Resolve every identifier citation
 
 **Requirement:** Every identifier citation MUST resolve to a written record.
@@ -164,6 +153,5 @@ result/place-order.item-out-of-stock
 | litespec/backend/identifiers#keep-business-record-names-unique-across-the-project | checkable | `litespec model check` reports `business-record-name-clash`. |
 | litespec/backend/identifiers#keep-negation-in-rule-names | checkable | `litespec model check` reports `rule-name-negation`. |
 | litespec/backend/identifiers#keep-wire-codes-stable | guidance | Do clients read the same code values as before? |
-| litespec/backend/identifiers#reject-the-retired-identifier-forms | checkable | `litespec model check` reports `identifier-refused-form`. |
 | litespec/backend/identifiers#resolve-every-identifier-citation | checkable | `litespec model check` reports `reference-unresolved`. |
 | litespec/backend/identifiers#cite-shared-provisions-in-their-published-form | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |

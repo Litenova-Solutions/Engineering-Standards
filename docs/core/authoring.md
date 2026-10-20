@@ -634,7 +634,7 @@ The identifier above is a grammar placeholder. A real page uses the page segment
 | litespec/core/authoring#name-the-escape-from-every-abstraction | checkable | `litespec validate` emits no `PAGE_MISSING_SECTION` diagnostic for a command page. |
 | litespec/core/authoring#record-a-setting-as-reference | guidance | Does every setting named in a procedure resolve to a configuration page row? |
 | litespec/core/authoring#write-atomic-standards-provisions | checkable | `litespec validate` emits no `STANDARD_REQUIREMENT_COUNT`, `STANDARD_SENTENCE_COUNT`, or `STANDARD_LABEL_INVALID` diagnostic. |
-| litespec/core/authoring#use-the-declared-identifier-grammar | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` or `REMOVED_IDENTIFIER` diagnostic. |
+| litespec/core/authoring#use-the-declared-identifier-grammar | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
 | litespec/core/authoring#name-the-owning-page-in-the-identifier | checkable | `litespec validate` emits no `ID_PAGE_FILENAME` or `ID_DUPLICATE` diagnostic. |
 | litespec/core/authoring#keep-identifiers-out-of-provision-headings | checkable | `litespec validate` emits no `ID_IN_HEADING` diagnostic. |
 | litespec/core/authoring#exclude-a-sequence-number-from-the-identifier | guidance | Do changed identifiers name assertions with words alone? |

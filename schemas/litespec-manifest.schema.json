@@ -34,9 +34,6 @@
     "agentsEntry": {
       "$ref": "#/$defs/repositoryPath"
     },
-    "defaultProfile": {
-      "$ref": "#/$defs/identifier"
-    },
     "paths": {
       "type": "object",
       "additionalProperties": false,

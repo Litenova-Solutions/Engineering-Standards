@@ -56,8 +56,8 @@ sealed class ConsumerConfig
     /// <summary>The project shape: server or client-only.</summary>
     public string Shape { get; private set; } = "server";
 
-    /// <summary>The named stacks. A declaration without stacks predates them and reads as dotnet.</summary>
-    public IReadOnlyList<string> Stacks { get; private set; } = ["dotnet"];
+    /// <summary>The stacks the project names in <c>litespec.project.json</c>.</summary>
+    public IReadOnlyList<string> Stacks { get; private set; } = [];
 
     /// <summary>The closed owner list.</summary>
     public IReadOnlyList<string> Owners { get; private set; } = [];

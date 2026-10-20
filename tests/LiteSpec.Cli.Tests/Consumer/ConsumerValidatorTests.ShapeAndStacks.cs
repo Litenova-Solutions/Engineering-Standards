@@ -122,27 +122,4 @@ public sealed partial class ConsumerValidatorTests
         AssertAbsent(RunConsumer(folder.Path), "pairs only with");
     }
 
-    [Fact(DisplayName = "deferral naming the retired rule form")]
-    public void DeferralNamingTheRetiredRuleForm()
-    {
-        using var folder = ConsumerFixture.Create();
-        ConsumerFixture.MutateProject(folder.Path, project =>
-        {
-            project["selectedExtensions"] = new JsonArray(
-                new JsonObject
-                {
-                    ["id"] = "stage",
-                    ["criterion"] = "No deployment holds customer data.",
-                    ["reviewBy"] = "2999-01-01",
-                    ["releaseStage"] = "pre-production",
-                    ["deferredProvisions"] = new JsonArray(
-                        new JsonObject
-                        {
-                            ["provision"] = "litespec/rule/core-scope.retired-example-rule",
-                            ["until"] = "2999-01-01",
-                        }),
-                });
-        });
-        AssertProblem(RunConsumer(folder.Path), "uses the retired litespec/rule/ form");
-    }
 }

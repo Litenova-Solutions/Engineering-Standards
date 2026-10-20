@@ -95,7 +95,7 @@ The owner first chose `litenova.solutions/LiteSpec`, then pivoted to buying `lit
 
 ### D12. The 2.0.0 structure: nested folders, path + fragment IDs, shapes and presets
 
-Chosen by the owner on 2026-10-20 after comparing layer-nested, concern-nested and separate-repository layouts, and after stating that v1 rules do not bind v2. The full target and build notes are in [structure.md](structure.md). In short: a stack is a folder inside its area (`backend/dotnet/`, `frontend/web/react/`); a stack applies its folder and every folder above it; a provision ID is `litespec/<page>#<slug>` with no ID in the heading; a project names a size, a shape (`server` or `client-only`) and its stacks; v1 profiles became presets for `litespec init`; the old-to-new ID map is kept for a later migration tool. This supersedes the `docs/dotnet/` area and the `specification` manifest list of D11's successor (stack-bindings.md).
+Chosen by the owner on 2026-10-20 after comparing layer-nested, concern-nested and separate-repository layouts, and after stating that v1 rules do not bind v2. The full target and build notes are in [structure.md](structure.md). In short: a stack is a folder inside its area (`backend/dotnet/`, `frontend/web/react/`); a stack applies its folder and every folder above it; a provision ID is `litespec/<page>#<slug>` with no ID in the heading; a project names a size, a shape (`server` or `client-only`) and its stacks; v1 profiles became presets for `litespec init`. 2.0.0 is a clean-slate release: it carries no migration map, no refusal of 1.x forms, and no compatibility default. This supersedes the `docs/dotnet/` area and the `specification` manifest list of D11's successor (stack-bindings.md).
 
 ## Progress
 

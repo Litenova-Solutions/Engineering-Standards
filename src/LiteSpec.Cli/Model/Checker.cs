@@ -13,7 +13,7 @@ static partial class Checker
     public static readonly HashSet<string> Codes = new(StringComparer.Ordinal)
     {
         "record-shape", "invalid-field", "identifier-form", "identifier-duplicate",
-        "use-case-name-clash", "reference-unresolved", "identifier-refused-form", "draft-gate",
+        "use-case-name-clash", "reference-unresolved", "draft-gate",
         "owner-unknown", "draft-without-decider", "known-gap-expired", "gap-unknown-check",
         "rule-name-negation", "use-case-without-success", "case-result-unresolved",
         "refusal-not-thrown", "use-case-unimplemented", "proves-unconfirmed",
@@ -43,7 +43,6 @@ static partial class Checker
         Time("schema", () => CheckSchema(model, findings));
         Time("identifiers", () => CheckIdentifiers(model, findings));
         Time("citations", () => CheckCitations(model, findings));
-        Time("refused", () => CheckRefusedForms(model, findings));
         Time("gates", () => CheckGates(model, findings));
         Time("proof", () => CheckProof(model, findings));
         Time("fulfilment", () => CheckFulfilment(model, findings));
@@ -731,93 +730,6 @@ static partial class Checker
         }
 
         return false;
-    }
-
-    private static void CheckRefusedForms(ProjectModel model, List<Finding> findings)
-    {
-        var pageByFile = model.Bodies
-            .Where(body => body.PageId is not null)
-            .ToDictionary(body => body.File, body => body.PageId, StringComparer.Ordinal);
-        var files = new List<(string File, string? Subject)>();
-
-        foreach (var root in model.Config.RecordRoots)
-        {
-            foreach (var file in SourceTree.Files(root, ".md"))
-            {
-                files.Add((file, pageByFile.GetValueOrDefault(file)));
-            }
-        }
-
-        foreach (var root in new[] { model.Config.ApplicationRoot, model.Config.DomainRoot, model.Config.WebApiRoot, model.Config.InfrastructureRoot })
-        {
-            foreach (var file in SourceTree.Files(root, ".cs"))
-            {
-                files.Add((file, null));
-            }
-        }
-
-        foreach (var root in model.Config.TestRoots)
-        {
-            foreach (var file in SourceTree.Files(root, ".cs"))
-            {
-                files.Add((file, null));
-            }
-        }
-
-        foreach (var frontend in model.Config.Frontends)
-        {
-            foreach (var file in SourceTree.Files(frontend.Path, ".ts", ".tsx", ".js", ".jsx", ".svelte", ".svelte.ts"))
-            {
-                files.Add((file, null));
-            }
-        }
-
-        var found = new List<Finding>();
-
-        System.Threading.Tasks.Parallel.ForEach(
-            files,
-            () => new List<Finding>(),
-            (file, _, local) =>
-            {
-                ScanRefused(file.File, SourceTree.Read(file.File), file.Subject, local);
-
-                return local;
-            },
-            local =>
-            {
-                lock (found)
-                {
-                    found.AddRange(local);
-                }
-            });
-
-        findings.AddRange(found);
-    }
-
-    private static readonly string[] FileTails =
-    [
-        ".ts", ".tsx", ".js", ".jsx", ".svelte", ".md", ".json", ".css", ".mjs", ".cjs",
-    ];
-
-    private static void ScanRefused(string file, string text, string? subject, List<Finding> findings)
-    {
-        var seen = new Dictionary<string, int>(StringComparer.Ordinal);
-        var starts = LineStarts(text);
-
-        foreach (Match match in Identifiers.RefusedAny().Matches(text))
-        {
-            if (FileTails.Any(tail => match.Value.EndsWith(tail, StringComparison.OrdinalIgnoreCase)))
-            {
-                continue;
-            }
-
-            seen.TryAdd(match.Value, LineOf(starts, match.Index));
-        }
-
-        foreach (var entry in seen.OrderBy(left => left.Value).ThenBy(left => left.Key, StringComparer.Ordinal))
-        {
-            findings.Add(new Finding("identifier-refused-form", $"Old form '{entry.Key}' is refused.", file, entry.Value, subject));
-        }
     }
 
     private static void CheckGates(ProjectModel model, List<Finding> findings)

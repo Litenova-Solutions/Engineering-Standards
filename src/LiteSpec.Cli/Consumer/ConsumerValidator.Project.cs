@@ -313,15 +313,6 @@ static partial class ConsumerValidator
                     continue;
                 }
 
-                // The old litespec/rule/ form names no provision in this release; a
-                // deferral names its provision as litespec/<page>#<slug>.
-                if (provision.StartsWith("litespec/rule/", StringComparison.Ordinal)
-                    || provision.StartsWith("litespec/convention/", StringComparison.Ordinal))
-                {
-                    run.Err($"litespec.project.json: extensions 'stage' defers '{provision}', which uses the retired litespec/rule/ form; name the provision as litespec/<page>#<slug>");
-                    continue;
-                }
-
                 if (!knownProvisions.Contains(provision))
                 {
                     run.Err($"litespec.project.json: extensions 'stage' defers '{provision}', which is not a provision in the pinned LiteSpec release");

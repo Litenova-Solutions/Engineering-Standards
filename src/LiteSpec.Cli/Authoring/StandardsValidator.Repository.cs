@@ -196,57 +196,6 @@ static partial class StandardsValidator
         return Uri.UnescapeDataString(value);
     }
 
-    // The 2.0.0 model removed every numbered identifier, the old slashed kinds, the
-    // legacy litespec rule and convention form, and Workflow as a specification kind.
-    // A bare prefix in a refusal list is documentation; a prefix with content after
-    // it is a live old form.
-    static readonly Regex[] RemovedIdentifierPatterns =
-    [
-        RemovedIdentifierSlashedKinds(),
-        RemovedIdentifierProjectRule(),
-        RemovedIdentifierLegacyLiteSpec(),
-        RemovedIdentifierNumbered(),
-    ];
-
-    static readonly Regex[] WorkflowKindPatterns =
-    [
-        WorkflowKindCapitalized(),
-        WorkflowKindQuoted(),
-        WorkflowKindPath(),
-    ];
-
-    static void CheckRemovedForms(string root, Action<string, int, string, string> add)
-    {
-        foreach (var directory in new[] { "docs", "templates" })
-        {
-            foreach (var file in Walk(Path.Combine(root, directory), candidate => candidate.EndsWith(".md", StringComparison.Ordinal) || candidate.EndsWith(".json", StringComparison.Ordinal)))
-            {
-                var relative = Slash(Path.GetRelativePath(root, file));
-                var lines = SplitLines(ReadText(file));
-                for (var index = 0; index < lines.Length; index++)
-                {
-                    foreach (var pattern in RemovedIdentifierPatterns)
-                    {
-                        var match = pattern.Match(lines[index]);
-                        if (match.Success)
-                        {
-                            add(relative, index + 1, "REMOVED_IDENTIFIER", $"removed identifier form '{match.Value}' is not valid in 2.0.0");
-                        }
-                    }
-
-                    foreach (var pattern in WorkflowKindPatterns)
-                    {
-                        var match = pattern.Match(lines[index]);
-                        if (match.Success)
-                        {
-                            add(relative, index + 1, "WORKFLOW_KIND", $"'{match.Value}' uses Workflow as a specification kind, which 2.0.0 removed");
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     static void CheckTemplateIndex(string root, Action<string, int, string, string> add)
     {
         const string relative = "templates/consumer/README.md";
@@ -360,18 +309,4 @@ static partial class StandardsValidator
     [GeneratedRegex(@"^##\s+(.+?)\s*$")] private static partial Regex RoutingHeadingPattern();
 
     [GeneratedRegex(@"^-\s+\[")] private static partial Regex NavBulletPattern();
-
-    [GeneratedRegex(@"\b(?:acceptance-criterion|authorization|invariant|policy|validation|flow|workflow|end-to-end-flow|domain-policy|aggregate|value|path)/[A-Za-z0-9][A-Za-z0-9_.-]*")] private static partial Regex RemovedIdentifierSlashedKinds();
-
-    [GeneratedRegex(@"\b(?!litespec/)[a-z][a-z0-9-]*/rule/[A-Za-z0-9][A-Za-z0-9_.-]*")] private static partial Regex RemovedIdentifierProjectRule();
-
-    [GeneratedRegex(@"\blitespec/(?:rule|convention)/[A-Za-z0-9_.-]*\.[A-Za-z0-9_.-]+")] private static partial Regex RemovedIdentifierLegacyLiteSpec();
-
-    [GeneratedRegex(@"\b(?:AC|AUTZ|INV|POL|VAL|RULE)(?:-[A-Z][A-Z0-9]*)+-[0-9]{2,}\b|\bE2E-[0-9]+\b")] private static partial Regex RemovedIdentifierNumbered();
-
-    [GeneratedRegex(@"\bWorkflows?\b")] private static partial Regex WorkflowKindCapitalized();
-
-    [GeneratedRegex(@"[`""']workflows?[`""']")] private static partial Regex WorkflowKindQuoted();
-
-    [GeneratedRegex(@"\bworkflows?/[A-Za-z0-9]")] private static partial Regex WorkflowKindPath();
 }

@@ -232,7 +232,6 @@ public sealed partial class StandardsValidatorTests
             "PROVISION_RESTATES_HEADING",
             "PROVISIONS_STALE",
             "REFERENCE_EXAMPLE_DECLARATION",
-            "REMOVED_IDENTIFIER",
             "SCHEMA_ID",
             "SCHEMA_INVALID",
             "SCHEMA_JSON",
@@ -268,7 +267,6 @@ public sealed partial class StandardsValidatorTests
             "VERIFY_MISSING_ID",
             "VERIFY_TEMPLATED_EVIDENCE",
             "VERIFY_UNKNOWN_ID",
-            "WORKFLOW_KIND",
         };
 
         foreach (var code in StandardsValidator.StableDiagnosticCodes)

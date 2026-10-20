@@ -27,7 +27,6 @@ The finding codes are:
 |:---|:---|
 | `record-shape` | A record fails the shape its type requires. |
 | `identifier-form` | An identifier breaks the form its type requires. |
-| `identifier-refused-form` | A retired identifier form appears in docs, code, or tests, including the provision form of the 1.x releases. |
 | `identifier-duplicate` | One identifier names two records. |
 | `reference-unresolved` | A citation names no written record or pinned shared provision. |
 | `draft-gate` | An approved record rests on a draft decision. |

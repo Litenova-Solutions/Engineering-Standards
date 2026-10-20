@@ -27,7 +27,6 @@ The builder and the suite use these codes:
 
 - `record-shape`
 - `identifier-form`
-- `identifier-refused-form`
 - `identifier-duplicate`
 - `reference-unresolved`
 - `draft-gate`
@@ -54,9 +53,5 @@ The builder and the suite use these codes:
 ## Broken overlays
 
 `broken/<code>/` holds only the files that differ from `large/`. The suite copies `large/` to a temporary folder, copies the overlay files over it, deletes the paths listed in `DELETES.txt` when that file exists, and removes `DELETES.txt` before running the check. Each overlay exits 1 with its one finding code.
-
-`broken/refused-bare-prefix/` is the exception: it adds bare refused prefixes with nothing after them, as documentation listing the refused forms writes them, and exits 0.
-
-`broken/refused-old-provision/` cites the retired `litespec/rule/...` provision form in code and exits 1 with `identifier-refused-form`.
 
 An open known gap that names the finding code and the subject reports the finding as known and exits 0. An expired gap exits 1.

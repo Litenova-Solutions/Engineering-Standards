@@ -91,7 +91,6 @@ static partial class StandardsValidator
         "PROVISIONS_STALE",
         "PROVISION_RESTATES_HEADING",
         "REFERENCE_EXAMPLE_DECLARATION",
-        "REMOVED_IDENTIFIER",
         "SCHEMA_ID",
         "SCHEMA_INVALID",
         "SCHEMA_JSON",
@@ -126,7 +125,6 @@ static partial class StandardsValidator
         "VERIFY_MISSING_ID",
         "VERIFY_TEMPLATED_EVIDENCE",
         "VERIFY_UNKNOWN_ID",
-        "WORKFLOW_KIND",
 
         "TEMPLATE_INDEX_PATH",
 
@@ -224,7 +222,6 @@ static partial class StandardsValidator
         CheckLinks(resolved, current, Add);
         var rowsByPage = parsedPages.ToDictionary(page => page.Relative, page => page.Parsed.VerificationRows, StringComparer.Ordinal);
         CheckManifest(resolved, Add, activeIds, rowsByPage);
-        CheckRemovedForms(resolved, Add);
 
         // The provision index is derived. A stale page would send a reader to the wrong
         // heading, so the gate compares it with the active standards.

@@ -68,6 +68,6 @@ body:
     attributes:
       label: Release
       description: The LiteSpec release this was raised against.
-      placeholder: v1.15.0
+      placeholder: v2.0.0
     validations:
       required: true

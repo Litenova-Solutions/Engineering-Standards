@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace LiteSpec.Model;
 
 /// <summary>
-///     Identifier shapes, citation matching and refused old forms.
+///     Identifier shapes and citation matching.
 /// </summary>
 static partial class Identifiers
 {
@@ -17,14 +17,6 @@ static partial class Identifiers
     /// <summary>A failure code. Modules are kebab-case, so both parts allow hyphens.</summary>
     [GeneratedRegex(@"\bfailure/[a-z0-9_-]+(?:\.[a-z0-9_-]+)+\b")]
     public static partial Regex FailureCode();
-
-    /// <summary>
-    ///     Every refused old form in one pass: the dotted prefixes, the prefixed
-    ///     continuations, the numbered tokens, and the old provision form. Each alternative needs content
-    ///     after its prefix, so a bare prefix as documentation lists it matches nothing.
-    /// </summary>
-    [GeneratedRegex(@"\b(?:acceptance-criterion|path|policy|value|flow)/[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)+|\b(?:authorization|invariant|validation|workflow|end-to-end-flow|domain-policy|aggregate)/[A-Za-z0-9][A-Za-z0-9._-]*|\b(?<![a-z0-9-])(?!litespec/)[a-z][a-z0-9-]*/rule/[A-Za-z0-9][A-Za-z0-9._-]*|\b(?:AC|AUTZ|INV|POL|VAL|RULE)(?:-[A-Z][A-Z0-9]*)+-[0-9]{2,}\b|\bE2E-[0-9]+\b|\blitespec/(?:rule|convention)/[A-Za-z0-9][A-Za-z0-9._-]*")]
-    public static partial Regex RefusedAny();
 
     /// <summary>A written anchor on a reaction or job.</summary>
     [GeneratedRegex(@"<implements>\s*(?<id>use-case/[A-Za-z0-9][A-Za-z0-9._-]*)\s*</implements>")]
