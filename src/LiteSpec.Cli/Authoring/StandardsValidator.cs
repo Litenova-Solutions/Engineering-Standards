@@ -89,6 +89,7 @@ static partial class StandardsValidator
         "PROVISION_RESTATES_HEADING",
         "REFERENCE_EXAMPLE_DECLARATION",
         "REMOVED_IDENTIFIER",
+        "SCHEMA_ID",
         "SCHEMA_INVALID",
         "SCHEMA_JSON",
         "SCHEMA_UNSUPPORTED_KEYWORD",
@@ -240,6 +241,7 @@ static partial class StandardsValidator
         }
 
         ValidateSchemaConsumer(resolved, "schemas/litespec-manifest.schema.json", "litespec.manifest.json", Add);
+        CheckSchemaIds(resolved, Add);
         // Every shipped consumer template meets the schema it teaches. A template
         // the schema never reads drifts from it in silence.
         ValidateSchemaConsumer(resolved, "schemas/litespec-project.schema.json", "templates/consumer/litespec.project.json", Add);

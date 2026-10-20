@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Litenova-Solutions/LiteSpec/schemas/litespec-manifest.schema.json",
+  "$id": "https://www.litenova.solutions/LiteSpec/2.0.0/schemas/litespec-manifest.schema.json",
   "title": "LiteSpec Manifest",
   "type": "object",
   "additionalProperties": false,

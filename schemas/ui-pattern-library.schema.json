@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://litenova.nl/litespec/schemas/ui-pattern-library.schema.json",
+  "$id": "https://www.litenova.solutions/LiteSpec/2.0.0/schemas/ui-pattern-library.schema.json",
   "title": "UI pattern library",
   "description": "The standards' library of recurring UI patterns: for each, the question it answers, the options drawn, the recommended option, and its compact-screen behaviour. Generated from the drawn items under patterns/ui/items; a consumer's pattern catalog cites it.",
   "type": "object",

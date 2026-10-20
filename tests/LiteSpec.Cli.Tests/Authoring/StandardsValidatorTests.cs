@@ -223,6 +223,7 @@ public sealed partial class StandardsValidatorTests
             "PROVISIONS_STALE",
             "REFERENCE_EXAMPLE_DECLARATION",
             "REMOVED_IDENTIFIER",
+            "SCHEMA_ID",
             "SCHEMA_INVALID",
             "SCHEMA_JSON",
             "SCHEMA_UNSUPPORTED_KEYWORD",

@@ -1,3 +1,6 @@
+using LiteSpec.Authoring;
+using LiteSpec.Tests.Support;
+
 namespace LiteSpec.Tests.Authoring;
 
 /// <summary>Schema, template-index, and template cases, each asserting its diagnostic codes.</summary>
@@ -11,6 +14,28 @@ public sealed partial class StandardsValidatorTests
         "{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"id\",\"criterion\",\"reviewBy\"]," +
         "\"properties\":{\"id\":{\"type\":\"string\"},\"criterion\":{\"type\":\"string\"},\"reviewBy\":{\"type\":\"string\"}}}" +
         "]}}}}";
+
+    [Fact(DisplayName = "schema id naming another home or release")]
+    public void SchemaIdNamingAnotherRelease() => Check(
+        root =>
+        {
+            StandardsFixture.Write(root, "litespec.manifest.json", "{\"version\":\"2.0.0\"}");
+            StandardsFixture.Write(root, "schemas/record.schema.json", "{\"$id\":\"https://example.com/schemas/record.schema.json\",\"type\":\"object\"}");
+        },
+        ["SCHEMA_ID"]);
+
+    [Fact(DisplayName = "schema id naming the published home and release")]
+    public void SchemaIdNamingThePublishedRelease()
+    {
+        using var temp = Cli.Temp("standards");
+        StandardsFixture.Base(temp.Path);
+        StandardsFixture.Write(temp.Path, "litespec.manifest.json", "{\"version\":\"2.0.0\"}");
+        StandardsFixture.Write(temp.Path, "schemas/record.schema.json", "{\"$id\":\"https://www.litenova.solutions/LiteSpec/2.0.0/schemas/record.schema.json\",\"type\":\"object\"}");
+
+        var result = StandardsValidator.Validate(temp.Path);
+
+        Assert.DoesNotContain(result.Diagnostics, diagnostic => diagnostic.Code == "SCHEMA_ID");
+    }
 
     [Fact(DisplayName = "invalid schema consumer")]
     public void InvalidSchemaConsumer() => Check(

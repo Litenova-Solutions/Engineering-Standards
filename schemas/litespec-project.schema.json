@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Litenova-Solutions/LiteSpec/schemas/litespec-project.schema.json",
+  "$id": "https://www.litenova.solutions/LiteSpec/2.0.0/schemas/litespec-project.schema.json",
   "title": "LiteSpec Consumer Project",
   "type": "object",
   "additionalProperties": false,

@@ -281,6 +281,57 @@ static partial class StandardsValidator
         }
     }
 
+    /// <summary>The published home every schema id names, followed by the release version.</summary>
+    public const string SchemaHome = "https://www.litenova.solutions/LiteSpec/";
+
+    // A schema id is the URL a consumer's editor fetches, so it names the release that
+    // ships the schema: a pinned consumer keeps resolving the shape it reviewed.
+    static void CheckSchemaIds(string root, Action<string, int, string, string> add)
+    {
+        var schemas = Path.Combine(root, "schemas");
+        var manifest = Path.Combine(root, "litespec.manifest.json");
+        if (!Directory.Exists(schemas) || !File.Exists(manifest))
+        {
+            return;
+        }
+
+        string? version;
+        try
+        {
+            version = JsonNode.Parse(TrimBom(ReadText(manifest)))?["version"] is JsonValue value && value.TryGetValue<string>(out var text) ? text : null;
+        }
+        catch (Exception)
+        {
+            return;
+        }
+
+        if (version is null)
+        {
+            return;
+        }
+
+        foreach (var file in Directory.GetFiles(schemas, "*.json").OrderBy(name => name, StringComparer.Ordinal))
+        {
+            var name = Path.GetFileName(file);
+            var relative = $"schemas/{name}";
+            string? id;
+            try
+            {
+                id = JsonNode.Parse(TrimBom(ReadText(file)))?["$id"] is JsonValue value && value.TryGetValue<string>(out var text) ? text : null;
+            }
+            catch (Exception)
+            {
+                continue;
+            }
+
+            var expected = $"{SchemaHome}{version}/schemas/{name}";
+            if (id is not null && id != expected)
+            {
+                add(relative, 1, "SCHEMA_ID", $"schema $id '{id}' must be '{expected}'");
+            }
+        }
+    }
+
     static void ValidateSchemaConsumer(string root, string schemaRelative, string valueRelative, Action<string, int, string, string> add)
     {
         var schemaFile = JoinRoot(root, schemaRelative);
