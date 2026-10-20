@@ -51,10 +51,20 @@ static partial class ConsumerValidator
         }
 
         var rootOption = parsed.Value("--root");
-        var run = new RunState(
-            Path.GetFullPath(string.IsNullOrEmpty(rootOption) ? Directory.GetCurrentDirectory() : rootOption),
-            parsed.Json,
-            parsed.Has("--prose"));
+        RunState run;
+
+        try
+        {
+            run = new RunState(
+                Path.GetFullPath(string.IsNullOrEmpty(rootOption) ? Directory.GetCurrentDirectory() : rootOption),
+                parsed.Json,
+                parsed.Has("--prose"));
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            Console.Error.WriteLine($"Invalid root '{rootOption}': {exception.Message}");
+            return 2;
+        }
 
         try
         {
@@ -64,6 +74,11 @@ static partial class ConsumerValidator
         catch (FailFast fail)
         {
             return fail.Code;
+        }
+        catch (InvalidOperationException missing) when (LiteSpecHome.Root is null)
+        {
+            Console.Error.WriteLine(missing.Message);
+            return 2;
         }
     }
 
@@ -103,6 +118,9 @@ static partial class ConsumerValidator
         public List<string> Errors { get; } = [];
 
         public List<string> Advisories { get; } = [];
+
+        /// <summary>Every prose measure behind the counts, when --prose asked for them.</summary>
+        public List<string>? ProseDetail { get; set; }
 
         public Dictionary<string, string> TextCache { get; } = new(StringComparer.Ordinal);
 
@@ -195,15 +213,22 @@ static partial class ConsumerValidator
             // nothing has to be recovered by parsing the human lines back apart.
             if (Json)
             {
-                CliJson.Write(new
+                var payload = new JsonObject
                 {
-                    tool = "consumer",
-                    consumer = Root,
-                    ok = Errors.Count == 0,
-                    scanned = new { documentationRoot = DocsPath, files = Files.Count, pages = Pages },
-                    problems = Errors,
-                    advisories = Advisories,
-                });
+                    ["tool"] = "consumer",
+                    ["consumer"] = Root,
+                    ["ok"] = Errors.Count == 0,
+                    ["scanned"] = new JsonObject { ["documentationRoot"] = DocsPath, ["files"] = Files.Count, ["pages"] = Pages },
+                    ["problems"] = new JsonArray([.. Errors.Select(error => (JsonNode?)error)]),
+                    ["advisories"] = new JsonArray([.. Advisories.Select(advisory => (JsonNode?)advisory)]),
+                };
+
+                if (ProseDetail is not null)
+                {
+                    payload["prose"] = new JsonArray([.. ProseDetail.Select(line => (JsonNode?)line)]);
+                }
+
+                CliJson.Write(payload);
 
                 return Errors.Count > 0 ? 1 : 0;
             }

@@ -70,13 +70,14 @@ The generated regions `render` writes are `history`, `use-case-coverage`, `sub-p
 | `--root <consumer>` | the working directory | Selects the consumer repository to read. |
 | `--out <file>` | `.model/model.json` under the root | Writes the model to this file instead. Only `build` reads it. |
 | `--format json` | human lines | Writes the findings as one JSON object. Only `check` reads it. |
+| `--help` | off | Prints the usage text and exits 0. |
 
 ## Exit codes
 
 | Code | Meaning |
 |:---|:---|
 | `0` | The command finished with no open finding. |
-| `1` | `check` found an open finding or an expired known gap. |
+| `1` | `check` found an open finding or an expired known gap, or `query` found no record with the id. |
 | `2` | The arguments are wrong or the root holds no project record. |
 
 ## Examples

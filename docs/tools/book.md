@@ -31,6 +31,7 @@ None. Everything passes through options.
 | `--model <model.json>` | none | Reads this model file. Required. |
 | `--out <folder>` | none | Writes the static site to this folder, creating it. Required. |
 | `--findings <file>` | none | Reads the model-check JSON for the review page, else findings from `model.json`, else none. |
+| `--help` | off | Prints the usage text and exits 0. |
 
 ## Exit codes
 

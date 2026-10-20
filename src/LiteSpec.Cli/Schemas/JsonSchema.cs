@@ -593,8 +593,7 @@ static class JsonSchema
 
     static string Stringify(JsonNode? node) => node is null ? "null" : node.ToJsonString(CompactJson);
 
-    static bool JsonEqual(JsonNode? left, JsonNode? right) =>
-        string.Equals(Stringify(left), Stringify(right), StringComparison.Ordinal);
+    static bool JsonEqual(JsonNode? left, JsonNode? right) => JsonNode.DeepEquals(left, right);
 
     static string RequiredName(JsonNode? node) =>
         node is JsonValue candidate && candidate.TryGetValue<string>(out var name) && name is not null ? name : Stringify(node);

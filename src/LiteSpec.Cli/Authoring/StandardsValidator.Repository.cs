@@ -160,8 +160,14 @@ static partial class StandardsValidator
                 var parts = href.Split('#');
                 var targetPart = parts[0];
                 var anchor = parts.Length > 1 ? parts[1] : "";
+                if (!TryDecodeURIComponent(targetPart, out var decoded))
+                {
+                    add(relative, LineNumber(raw, match.Index), "LINK_BROKEN", $"link target '{href}' holds a malformed percent escape");
+                    continue;
+                }
+
                 var target = targetPart.Length > 0
-                    ? Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file)!, DecodeURIComponent(targetPart)))
+                    ? Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file)!, decoded))
                     : file;
                 if (targetPart.Length > 0 && !File.Exists(target) && !Directory.Exists(target))
                 {
@@ -182,6 +188,20 @@ static partial class StandardsValidator
                     }
                 }
             }
+        }
+    }
+
+    static bool TryDecodeURIComponent(string value, out string decoded)
+    {
+        try
+        {
+            decoded = DecodeURIComponent(value);
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            decoded = value;
+            return false;
         }
     }
 

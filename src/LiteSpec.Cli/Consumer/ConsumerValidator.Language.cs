@@ -103,7 +103,7 @@ static partial class ConsumerValidator
         // so its register is the register that gets copied into every page written
         // afterwards, and a rule the exemplar breaks is a rule that does not hold.
         var agentsFile = Path.Join(run.Root, "AGENTS.md");
-        var languageFiles = File.Exists(agentsFile) ? run.Files.Append(agentsFile).ToList() : run.Files.ToList();
+        var languageFiles = File.Exists(agentsFile) && !run.Files.Contains(agentsFile, StringComparer.OrdinalIgnoreCase) ? run.Files.Append(agentsFile).ToList() : run.Files.ToList();
 
         var languageFindings = new List<string>();
         var proseCounts = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -262,12 +262,17 @@ static partial class ConsumerValidator
                 });
             }
 
-            Console.WriteLine();
-            Console.WriteLine($"Controlled prose ({detail.Count}):");
+            run.ProseDetail = detail;
 
-            foreach (var line in detail)
+            if (!run.Json)
             {
-                Console.WriteLine($"  - {line}");
+                Console.WriteLine();
+                Console.WriteLine($"Controlled prose ({detail.Count}):");
+
+                foreach (var line in detail)
+                {
+                    Console.WriteLine($"  - {line}");
+                }
             }
         }
     }

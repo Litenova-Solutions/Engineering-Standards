@@ -167,7 +167,7 @@ static partial class StandardsValidator
             var actual = new List<string>();
             foreach (Match match in CompositionLinkPattern().Matches(composition))
             {
-                var resolved = Slash(Path.GetRelativePath(root, Path.GetFullPath(Path.Combine(Path.GetDirectoryName(entryFile)!, DecodeURIComponent(match.Groups[1].Value)))));
+                var resolved = Slash(Path.GetRelativePath(root, Path.GetFullPath(Path.Combine(Path.GetDirectoryName(entryFile)!, TryDecodeURIComponent(match.Groups[1].Value, out var decoded) ? decoded : match.Groups[1].Value))));
                 if (!actual.Contains(resolved))
                 {
                     actual.Add(resolved);

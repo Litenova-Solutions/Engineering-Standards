@@ -54,7 +54,23 @@ static partial class UiValidator
             return 2;
         }
 
-        var root = parsed.Root();
+        string root;
+        try
+        {
+            root = parsed.Root();
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            Console.Error.WriteLine($"Invalid root '{parsed.Value("--root")}': {exception.Message}");
+            return 2;
+        }
+
+        if (LiteSpecHome.Root is null)
+        {
+            Console.Error.WriteLine($"No LiteSpec checkout was found above '{AppContext.BaseDirectory}'. Set LITESPEC_HOME to the folder that holds {LiteSpecHome.ManifestFile}.");
+            return 2;
+        }
+
         if (!File.Exists(Path.Combine(root, "litespec.project.json")))
         {
             Console.Error.WriteLine($"No litespec.project.json at {root}");

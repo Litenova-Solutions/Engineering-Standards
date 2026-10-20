@@ -68,6 +68,14 @@ static class ProvisionsCommand
             }
         }
 
+        // A mistyped root would otherwise yield an empty index written into a new folder.
+        if (!Directory.Exists(Path.Combine(root, "docs")))
+        {
+            Console.Error.WriteLine($"Root '{root}' holds no docs folder.");
+            Console.Error.WriteLine(Usage);
+            return 2;
+        }
+
         var target = Path.Combine(root, Provisions.IndexPath.Replace('/', Path.DirectorySeparatorChar));
         var expected = Provisions.BuildIndex(root) + "\n";
         var actual = File.Exists(target) ? File.ReadAllText(target).Replace("\r\n", "\n", StringComparison.Ordinal) : null;

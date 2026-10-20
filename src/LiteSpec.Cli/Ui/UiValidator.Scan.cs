@@ -90,13 +90,6 @@ static partial class UiValidator
                     }, variants: false);
                 }
 
-                // A visual file is the one drawing no shared component makes, so it lays
-                // itself out. The utility rules above still apply to it, so it stays on
-                // semantic tokens.
-                if (VisualFile.IsMatch(source))
-                {
-                    continue;
-                }
             }
         }
 

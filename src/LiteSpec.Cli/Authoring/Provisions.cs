@@ -33,7 +33,6 @@ static class Provisions
     static readonly Regex WhitespaceRun = new(@"\s+");
     static readonly Regex DashRun = new(@"-+");
     static readonly Regex LineSplit = new(@"\r?\n");
-    static readonly CultureInfo English = CultureInfo.GetCultureInfo("en");
 
     /// <summary>Turns a heading into the anchor slug the index links to.</summary>
     public static string HeadingSlug(string value)
@@ -117,7 +116,7 @@ static class Provisions
             }
         }
 
-        rows.Sort((left, right) => string.Compare(left.Id, right.Id, English, CompareOptions.None));
+        rows.Sort((left, right) => string.CompareOrdinal(left.Id, right.Id));
         return rows;
     }
 

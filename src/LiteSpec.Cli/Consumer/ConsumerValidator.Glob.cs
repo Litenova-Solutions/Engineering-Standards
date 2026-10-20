@@ -9,6 +9,9 @@ namespace LiteSpec.Consumer;
 /// </summary>
 static partial class ConsumerValidator
 {
+    // One compiled matcher per glob segment, shared by every directory the walk visits.
+    static readonly System.Collections.Concurrent.ConcurrentDictionary<string, Regex> SegmentMatchers = new(StringComparer.Ordinal);
+
     static readonly HashSet<string> GlobIgnored = new(
         ["node_modules", ".git", "bin", "obj", ".next", "dist", "build", "out", "coverage"],
         StringComparer.Ordinal);
@@ -68,7 +71,7 @@ static partial class ConsumerValidator
                 return;
             }
 
-            var matcher = new Regex(GlobSegment(segment));
+            var matcher = SegmentMatchers.GetOrAdd(segment, key => new Regex(GlobSegment(key)));
 
             foreach (var entry in entries)
             {

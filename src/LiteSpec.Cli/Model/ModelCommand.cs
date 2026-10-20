@@ -13,6 +13,9 @@ static class ModelCommand
           litespec model check --root <consumer> [--format json]
           litespec model render --root <consumer>
           litespec model query --root <consumer> <id>
+          litespec model --help
+
+        Exit codes: 0 no open finding, 1 an open finding or no record with the id, 2 usage error.
         """;
 
     public static int Run(string[] args)
@@ -39,7 +42,17 @@ static class ModelCommand
             return 2;
         }
 
-        var root = parsed.Root();
+        string root;
+
+        try
+        {
+            root = parsed.Root();
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            Console.Error.WriteLine($"Invalid root '{parsed.Value("--root")}': {exception.Message}");
+            return 2;
+        }
 
         if (!Directory.Exists(root))
         {
@@ -55,7 +68,17 @@ static class ModelCommand
             return 2;
         }
 
-        var config = ConsumerConfig.Load(root);
+        ConsumerConfig config;
+
+        try
+        {
+            config = ConsumerConfig.Load(root);
+        }
+        catch (JsonException exception)
+        {
+            Console.Error.WriteLine($"litespec.project.json is not valid JSON: {exception.Message}");
+            return 2;
+        }
 
         try
         {
@@ -67,7 +90,7 @@ static class ModelCommand
                     var output = parsed.Value("--out") ?? Path.Combine(root, ".model", "model.json");
 
                     Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
-                    File.WriteAllText(output, model.ToJson() + Environment.NewLine);
+                    File.WriteAllText(output, model.ToJson() + "\n");
 
                     Console.WriteLine($"{Relative(root, output)}: {model.Records.Count} records, {model.Code.Handlers.Count} handlers, {model.Screens.Count} screens, {model.Tests.Count} scenarios.");
                     return 0;
@@ -87,7 +110,7 @@ static class ModelCommand
                                 findings = findings.Select(AsJson(config)).ToList(),
                                 known = known.Select(AsJson(config)).ToList(),
                             },
-                            new JsonSerializerOptions { WriteIndented = true, NewLine = "\n" }));
+                            CliJson.Options));
                     }
                     else
                     {
