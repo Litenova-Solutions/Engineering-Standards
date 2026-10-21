@@ -2,7 +2,7 @@
 
 ## Intent
 
-A screen spends part of its life empty, loading, refused, offline or failed. These patterns answer what shows in each of those states and how a command reports that it worked. Each pattern offers drawn options and names a default.
+A screen spends part of its life empty, loading, refused, offline, or failed. These patterns answer what shows in each of those states and how a command reports that it worked. Each pattern offers drawn options and names a default.
 
 ## Standards
 
@@ -44,7 +44,7 @@ page
     action primary "New product"
 ```
 
-**Rationale:** One positive title, one line saying what a product is for, and one button that creates the first one.
+**Rationale:** The page shows one positive title, one line saying what a product is for, and one button that creates the first one.
 
 **Cost:** The reader cannot see what a row will look like, so every column is undiscoverable until there is data. Carbon accepts this.
 
@@ -91,7 +91,7 @@ page
       item: text muted "SO-1042" · text muted "Maria Garcia" · text muted "8 Oct 2026, 09:32" · status "Paid" neutral · text muted "EUR 125.00"
 ```
 
-**Rationale:** The table's headers and a single dashed row showing what a row will contain, so the columns are known before there is data.
+**Rationale:** The table keeps its headers and shows a single dashed row with what a row will contain, so the columns are known before there is data.
 
 **Cost:** Carbon says an empty state should replace the table, headers included, because a screen reader otherwise reads six empty headers before the message. This deliberately breaks that.
 
@@ -155,7 +155,7 @@ page
     action "Ask an owner for the role"
 ```
 
-**Rationale:** The list is not empty, it is withheld. Carbon's third empty state is permissions, and this one names the grant rather than saying nothing is there.
+**Rationale:** The list is not empty. It is withheld. Carbon's third empty state is permissions, and this one names the grant rather than saying nothing is there.
 
 **Cost:** It confirms that records exist, which some deployments would rather not do. Naming the grant makes the record count a secret the page reveals.
 
@@ -181,7 +181,7 @@ page
     action destructive "Remove the samples"
 ```
 
-**Rationale:** Real sample rows instead of an empty illustration, fenced with a Sample state and a notice. The reader learns the page by using it rather than by reading about it.
+**Rationale:** The page shows real sample rows instead of an empty illustration, fenced with a `Sample` state and a notice. The reader learns the page by using it rather than by reading about it.
 
 **Cost:** Samples must stay out of every export, total, and customer surface. A sample left in place at go-live ships fake data as the company's own.
 
@@ -200,7 +200,7 @@ page
     link "What a product needs before it can sell"
 ```
 
-**Rationale:** Shopify Polaris's EmptyState: one primary action, one secondary, and a link to learn more. The reader can start blank, copy the shape of a standard gift box, or read what a product needs first.
+**Rationale:** Shopify Polaris uses an `EmptyState` with one primary action, one secondary action, and a link to learn more. The reader can start blank, copy the shape of a standard gift box, or read what a product needs first.
 
 **Cost:** Three ways in is one decision more than one way in. A template only helps if the templates are good, so this needs at least one template that is worth copying.
 
@@ -256,7 +256,7 @@ page
 
 **Rationale:** The title quotes the term that found nothing. The line says how many records exist, so the reader knows the search failed rather than the data. Two actions separate clearing the search from clearing the filters.
 
-**Cost:** Two actions, and Carbon says an empty state should offer one primary action. The secondary one is a ghost link, which is the compromise.
+**Cost:** The pattern uses two actions, and Carbon says an empty state should offer one primary action. The secondary one is a ghost link, which is the compromise.
 
 **Reference:** Carbon
 
@@ -384,7 +384,7 @@ page
     link "Clear the search and the filters"
 ```
 
-**Rationale:** GitHub's issue list: 'No results matched your search', and a single link that clears the query, the filters and the sort together. The toolbar keeps its values, so a reader who wants to change one thing still can.
+**Rationale:** GitHub's issue list shows `No results matched your search` and a single link that clears the query, the filters, and the sort together. The toolbar keeps its values, so a reader who wants to change one thing still can.
 
 **Cost:** It does not say how many records exist without the filters, so the reader cannot tell a narrow search from an empty list. Adding the count is the only change it needs.
 
@@ -441,9 +441,9 @@ page
     text "Reading 268 orders"
 ```
 
-**Rationale:** Carbon's answer for a first read. Each skeleton row is shaped like the row it will become, so nothing moves when the data lands.
+**Rationale:** This is Carbon's answer for a first read. Each skeleton row is shaped like the row it will become, so nothing moves when the data lands.
 
-**Cost:** Carbon also wants the header, toolbar and pagination to match the row size. A skeleton page must get four heights right, or the page jumps.
+**Cost:** Carbon also wants the header, toolbar, and pagination to match the row size. A skeleton page must get four heights right, or the page jumps.
 
 **Reference:** Carbon
 
@@ -492,7 +492,7 @@ page
 
 **Rationale:** A submit is disabled only while it sends. The spinner lives in the button, so the reader's eye is already there and nothing else on the page changes.
 
-**Cost:** A button whose label is replaced by a spinner loses its width, so the layout shifts unless the button holds its size. It also says nothing about how long it will be.
+**Cost:** A button whose label is replaced by a spinner loses its width, so the layout shifts unless the button holds its size. It also says nothing about how long the wait will be.
 
 #### `progress-for-work-that-takes-a-while`: Progress for work that takes a while
 
@@ -512,7 +512,7 @@ page
     fact "In the back office, not in the file" "351"
 ```
 
-**Rationale:** Where the read is genuinely slow, a bar with a percentage and what is happening. This is the case Carbon's skeleton does not cover, because it is not a read.
+**Rationale:** Where the read is genuinely slow, the page shows a bar with a percentage and what is happening. This is the case Carbon's skeleton does not cover, because it is not a read.
 
 **Cost:** A percentage is a claim. If the server cannot estimate the remaining work, the bar is theater, and a bar that stalls at 40% is worse than a spinner.
 
@@ -535,7 +535,7 @@ page
     text "This takes a moment on a deployment this size."
 ```
 
-**Rationale:** A scrim over the whole page with a spinner and a sentence. Unambiguous, and the page underneath is deliberately not readable.
+**Rationale:** The page shows a scrim over the whole page with a spinner and a sentence. The message is unambiguous, and the page underneath is deliberately not readable.
 
 **Cost:** A scrim over the page is neither a shared component nor a page slot. It hides the page a reader may want to scroll.
 
@@ -558,7 +558,7 @@ page
     action quiet "Next ›"
 ```
 
-**Rationale:** No placeholder. The page renders as it will, and the content appears when it does. Correct only where the load is under about 200 milliseconds.
+**Rationale:** The page shows no placeholder. It renders as it will, and the content appears when it does. This option is correct only where the load is under about 200 milliseconds.
 
 **Cost:** Anything slower reads as a page that failed. Every read needs a loading state, so this is the shape the rule refuses.
 
@@ -641,9 +641,9 @@ page
       item: text "Offer the customer credit" · text muted "A credit against a future order" · action primary "Offer credit"
 ```
 
-**Rationale:** One refusal shape: a title saying what is wrong, the detail saying why, and a Why link where the application can explain the refusal. The refusal sentence comes from the dictionary, not the component.
+**Rationale:** The page uses one refusal shape: a title saying what is wrong, the detail saying why, and a `Why` link where the application can explain the refusal. The refusal sentence comes from the dictionary, not the component.
 
-**Cost:** Three pieces per refusal code in two languages, and every new command that can be refused adds a code. The dictionary is the second copy of the domain rules.
+**Cost:** Each refusal code needs three pieces in two languages, and every new command that can be refused adds a code. The dictionary is the second copy of the domain rules.
 
 #### `the-refusal-beside-the-button-that-caused-it`: The refusal beside the button that caused it
 
@@ -661,9 +661,9 @@ page
     action primary "Save the lines"
 ```
 
-**Rationale:** The same refusal, placed under the control that sent it. On a page with one form, the reader is already looking there, so the link between message and control is plain.
+**Rationale:** The page places the same refusal under the control that sent it. On a page with one form, the reader is already looking there, so the link between message and control is plain.
 
-**Cost:** On a page with several forms, one refusal sits above the form and one sits under a button. The reader has to learn which placement means what.
+**Cost:** On a page with several forms, one refusal sits above the form and one sits under a button. The reader needs to learn which placement means what.
 
 #### `the-refusal-with-a-code-for-support`: The refusal with a code, for support
 
@@ -683,9 +683,9 @@ page
     action quiet "Copy the code"
 ```
 
-**Rationale:** The refusal plus the code and a copy control, for the reader who needs to quote it. This is what a support conversation needs and what a normal reader does not.
+**Rationale:** The page shows the refusal plus the code and a copy control for the reader who needs to quote it. This is what a support conversation needs and what a normal reader does not.
 
-**Cost:** A code on screen breaks the usual rule: do not show a raw code. Shown deliberately, it has to be labeled and copyable rather than bare.
+**Cost:** A code on screen breaks the usual rule: do not show a raw code. Shown deliberately, it needs to be labeled and copyable rather than bare.
 
 #### `a-refusal-that-changed-nothing-stated-plainly`: A refusal that changed nothing, stated plainly
 
@@ -746,9 +746,9 @@ page
       item: text "A second refund was refused" · text muted "8 Oct 2026, 11:06" · text muted "Acme Supply"
 ```
 
-**Rationale:** One command on one record refused. It goes into the record's own timeline, where the reader looks for what happened. It does not sit at the top of a page they are passing through.
+**Rationale:** When one command on one record is refused, it goes into the record's own timeline, where the reader looks for what happened. It does not sit at the top of a page they are passing through.
 
-**Cost:** Invisible. A reader who sent the command from somewhere else will not come back to this page to find out why it did not happen.
+**Cost:** The refusal is invisible elsewhere. A reader who sent the command from somewhere else will not come back to this page to find out why it did not happen.
 
 #### `the-refusal-inside-the-dialog-that-sent-it`: The refusal inside the dialog that sent it
 
@@ -793,9 +793,9 @@ page
       item: text "Offer credit" · text muted "Acme Supply pays it from its own account" · action primary "Offer credit"
 ```
 
-**Rationale:** GitHub's merge box disables Merge and says which check blocks it. Where the page already knows the refund window has closed, it says so beside the button, and the refusal never has to happen.
+**Rationale:** GitHub's merge box disables `Merge` and says which check blocks it. Where the page already knows the refund window has closed, it says so beside the button, and the refusal never needs to happen.
 
-**Cost:** Only works for refusals the page can predict from what it already read. The API still refuses, so the dictionary sentence and the button sentence must say the same thing.
+**Cost:** This option works only for refusals the page can predict from what it already read. The API still refuses, so the dictionary sentence and the button sentence must say the same thing.
 
 **Reference:** GitHub
 
@@ -807,7 +807,7 @@ page
 
 **Compact:** The recommended option reflows: one column with the header actions under the title.
 
-**Rationale:** The pick stays on evidence on the page. State, money and timeline all say what changed after a refund. The runner-up is the toast with Undo. Prefer it for a reversible change such as hiding a product from the store. Never ship no message at all. It fails WCAG 4.1.3, since a screen reader user gets no signal.
+**Rationale:** The pick stays on evidence on the page. State, money, and timeline all say what changed after a refund. The runner-up is the toast with `Undo`. Prefer it for a reversible change such as hiding a product from the store. Never ship no message at all. It fails WCAG 4.1.3, since a screen reader user gets no signal.
 
 #### `evidence-on-the-page-not-only-a-toast`: Evidence on the page, not only a toast
 
@@ -828,9 +828,9 @@ page
       item: text "Refunded, EUR 125.00" · text muted "8 Oct 2026, 11:04" · text muted "Priya Shah"
 ```
 
-**Rationale:** The record changes and the page says what changed: the state becomes Refunded, the money section shows the reversal, and the timeline gains an entry. That is evidence a toast cannot be.
+**Rationale:** The record changes and the page says what changed: the state becomes `Refunded`, the money section shows the reversal, and the timeline gains an entry. That is evidence a toast cannot be.
 
-**Cost:** The reader has to find the evidence. A toast is faster and leaves nothing once it goes, so a toast alone is not evidence.
+**Cost:** The reader needs to find the evidence. A toast is faster and leaves nothing once it goes, so a toast alone is not evidence.
 
 #### `a-toast-for-a-change-with-no-evidence-to-leave`: A toast, for a change with no evidence to leave
 
@@ -849,7 +849,7 @@ page
 
 **Rationale:** Where the command changed nothing visible, a toast is the whole answer. Copying a reference is the clearest case: the value was already on screen.
 
-**Cost:** Material allows one action and no Dismiss, and Android warns the timer can take the action away. It is fine for a message with no action.
+**Cost:** Material allows one action and no `Dismiss`, and Android warns the timer can take the action away. It is fine for a message with no action.
 
 **Reference:** Material, Android
 
@@ -871,7 +871,7 @@ page
 
 **Rationale:** Where the command succeeded and the effect is still arriving, the notice says so and stays until it does. A toast that goes would leave the reader unsure.
 
-**Cost:** A success message that waits is a status, not an alert, so it must not take a tone. And a notice that persists has to resolve into something else.
+**Cost:** A success message that waits is a status, not an alert, so it must not take a tone. A notice that persists needs to resolve into something else.
 
 #### `a-success-with-a-count-when-a-batch-partly-worked`: A success with a count, when a batch partly worked
 
@@ -891,7 +891,7 @@ page
 
 **Rationale:** A bulk command's success says what succeeded and what did not, in the same breath. '3 of 5 sent' is more useful than 'Sent'.
 
-**Cost:** A count that is not expected raises a question the message then has to answer. A partial success needs its own copy per command.
+**Cost:** A count that is not expected raises a question the message then needs to answer. A partial success needs its own copy per command.
 
 #### `no-message-because-the-record-says-it`: No message, because the record says it
 
@@ -912,7 +912,7 @@ page
 
 **Rationale:** The lightest answer: the command runs and the thing it changed is visibly different. Nothing announces anything, so there is nothing to read twice.
 
-**Cost:** Fails WCAG 4.1.3 unless the change is exposed as a status. A screen reader user gets no signal that the command worked.
+**Cost:** The pattern fails WCAG 4.1.3 unless the change is exposed as a status. A screen reader user gets no signal that the command worked.
 
 **Reference:** WCAG
 
@@ -951,9 +951,9 @@ page
   toast "Gift box, standard is hidden from the store." positive
 ```
 
-**Rationale:** Gmail and Linear confirm a reversible change with a toast that carries Undo. The list already shows the change. The toast adds the one thing the page cannot, a way back for a few seconds.
+**Rationale:** Gmail and Linear confirm a reversible change with a toast that carries `Undo`. The list already shows the change. The toast adds the one thing the page cannot, a way back for a few seconds.
 
-**Cost:** Never for money, access or stock, which cannot be taken back quietly. Undo also needs the command to be reversible on the server, not hidden on the client.
+**Cost:** Never for money, access, or stock, which cannot be taken back quietly. `Undo` also needs the command to be reversible on the server, not hidden on the client.
 
 **Reference:** Gmail, Linear
 
@@ -974,9 +974,9 @@ page
     action primary disabled "Save"
 ```
 
-**Rationale:** Stripe's settings and Notion's pages say 'Saved' beside the control, with the time, and nothing else moves. A settings form is the case: the values on screen are already the evidence.
+**Rationale:** Stripe's settings and Notion's pages say `Saved` beside the control, with the time, and nothing else moves. A settings form is the case: the values on screen are already the evidence.
 
-**Cost:** Easy to miss, and a screen reader hears it only if it is a live status. It suits settings and not a command that changes money.
+**Cost:** The message is easy to miss, and a screen reader hears it only if it is a live status. It suits settings and not a command that changes money.
 
 **Reference:** Stripe, Notion
 
@@ -990,7 +990,7 @@ page
 
 **Rationale:** Keep one neutral sentence above the page, with no tone and no band. It says why the page holds its state and stays out of the work. The runner-up is the side column, which suits an Acme Supply order where the refund window changes the next step. Never ship a full-width toned band for one record.
 
-A banner stays for facts on every page, such as Sandbox.
+A banner stays for facts on every page, such as `Sandbox`.
 
 #### `a-neutral-notice-above-the-page`: A neutral notice above the page
 
@@ -1010,7 +1010,7 @@ page
     text muted "At the pace of the last seven days the rest sells in four days."
 ```
 
-**Rationale:** One neutral sentence about this page, above the sections: not a band and not a tone. It says why the page is what it is.
+**Rationale:** The page shows one neutral sentence about this page above the sections: not a band and not a tone. It says why the page is what it is.
 
 **Cost:** It sits above the sections, so it is the first thing and the last thing read. A long notice pushes the work down on every visit.
 
@@ -1034,7 +1034,7 @@ page
 
 **Rationale:** A fact about one section goes in that section, not at the top of the page. The reader only meets it where it changes what they do.
 
-**Cost:** The reader has to open the section to learn something that may change whether they should be in the section at all.
+**Cost:** The reader needs to open the section to learn something that may change whether they should be in the section at all.
 
 #### `a-callout-inside-a-form-about-what-the-form-will-do`: A callout inside a form, about what the form will do
 
@@ -1054,7 +1054,7 @@ page
       action primary "Save"
 ```
 
-**Rationale:** A callout inside the field group, in words, before the command runs. This is the position-neutral form of the same rule and it is the one that keeps a tone off a page.
+**Rationale:** The page shows a callout inside the field group, in words, before the command runs. This is the position-neutral form of the same rule and it is the one that keeps a tone off a page.
 
 **Cost:** A callout inside a form is a paragraph among fields, and it is the least visible of the alert shapes. It is also the one a reader reads before committing rather than after.
 
@@ -1097,9 +1097,9 @@ page
     link "What the per-order fee covers"
 ```
 
-**Rationale:** A term hint beside a heading or a table note, where the term is the product's and the glossary entry explains it. Nothing is interrupted.
+**Rationale:** The page shows a term hint beside a heading or a table note, where the term is the product's and the glossary entry explains it. Nothing is interrupted.
 
-**Cost:** Only for a term that is genuinely the product's and genuinely unclear. On any other word it is noise, and every term needs a glossary entry to keep in step.
+**Cost:** Use it only for a term that is genuinely the product's and genuinely unclear. On any other word it is noise, and every term needs a glossary entry to keep in step.
 
 #### `the-fact-as-the-heading-instead-of-an-alert`: The fact as the heading, instead of an alert
 
@@ -1120,9 +1120,9 @@ page
       action destructive "Yes, cancel it"
 ```
 
-**Rationale:** Where the fact is what the page is for, it is the heading and description rather than an alert. No second thing to read, and the page title says the same thing.
+**Rationale:** Where the fact is what the page is for, it is the heading and description rather than an alert. There is no second thing to read, and the page title says the same thing.
 
-**Cost:** The heading cannot carry a tone, so severity has nowhere to go. And the description is one line, which is not much room for a consequence.
+**Cost:** The heading cannot carry a tone, so severity has nowhere to go. The description is one line, which is not much room for a consequence.
 
 #### `the-shipped-banner-for-a-fact-about-the-whole-console`: The shipped Banner, for a fact about the whole console
 
@@ -1139,9 +1139,9 @@ page
       item: text "Oak desk lamp" · text muted "SKU LMP-OAK-01, EUR 45.00" · status "Active" positive · text "412 in stock"
 ```
 
-**Rationale:** A banner in GitHub's and Stripe's test-mode shape. One centered sentence across the top of every page, for a fact that holds on all of them. Sandbox is the case it exists for, in the info tone.
+**Rationale:** The page uses a banner in GitHub's and Stripe's test-mode shape. It shows one centered sentence across the top of every page for a fact that holds on all of them. `Sandbox` is the case it exists for, in the `info` tone.
 
-**Cost:** A band is the loudest place on the screen. Used for a fact about one product it breaks the rule above, so it needs a short list of what may go there.
+**Cost:** A band is the loudest place on the screen. When used for a fact about one product, it breaks the rule above, so it needs a short list of what may go there.
 
 **Reference:** GitHub, Stripe
 
@@ -1182,7 +1182,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the explained action. Each refused command names the role that grants it, and the record stays readable. At the pickup counter reading the record is the point. The runner-up is the read-only section with values as text, which suits a fee form where a form that fails on Save hurts more.
+**Rationale:** Keep the explained action. Each refused command names the role that grants it, and the record stays readable. At the pickup counter reading the record is the point. The runner-up is the read-only section with values as text, which suits a fee form where a form that fails on `Save` hurts more.
 
 Never refuse the whole page to a warehouse lead. Hiding a customer name needed at the counter costs more than the secrecy gains.
 
@@ -1207,9 +1207,9 @@ page
     fact "Country" "Netherlands"
 ```
 
-**Rationale:** The explained action: the button is refused and the reason is visible text beside it, naming the role that can. The record stays readable, which at the counter is the point.
+**Rationale:** This is the explained action: the button is refused and the reason is visible text beside it, naming the role that can. The record stays readable, which at the counter is the point.
 
-**Cost:** A page of refused commands looks broken to somebody who does not know their role. The role's name in the reason is what makes it legible.
+**Cost:** A page of refused commands looks broken to someone who does not know their role. The role's name in the reason is what makes it legible.
 
 #### `the-page-itself-is-refused`: The page itself is refused
 
@@ -1249,7 +1249,7 @@ page
         item: text "SO-1042" · text muted "Picked, dock A by Chris Novak" · text "09:41"
 ```
 
-**Rationale:** A tab, sidebar entry or link appears only for a viewer who may open its page. Invoices, Reports and the money pages stay absent from a warehouse lead's sidebar.
+**Rationale:** A tab, sidebar entry, or link appears only for a viewer who may open its page. Invoices, Reports, and the money pages stay absent from a warehouse lead's sidebar.
 
 **Cost:** The reader cannot find out the capability exists. On a surface where someone is guessing at what the product can do, that is a real cost.
 
@@ -1269,7 +1269,7 @@ page
     message neutral "Answering a bank case needs the Finance role."
 ```
 
-**Rationale:** One neutral band on the area says what the role may not do there, rather than a refused button beside every command. Stated once, in words, at the top.
+**Rationale:** One neutral band on the area says what the role may not do there, rather than a refused button beside every command. It is stated once, in words, at the top.
 
 **Cost:** It repeats on every page of the area, and the reader's eye skips it after the first. A tone may not paint a full-width band on a page about other work.
 
@@ -1293,7 +1293,7 @@ page
 
 **Rationale:** Where the record itself is sensitive but its shape is not, the customer is withheld and the money is shown. A finance reader gets the reconciliation without the personal data.
 
-**Cost:** A screen reader reads whatever is in the DOM, so anything hidden this way has to be absent rather than blurred. Blur alone is not a boundary.
+**Cost:** A screen reader reads whatever is in the `DOM`, so anything hidden this way needs to be absent rather than blurred. Blur alone is not a boundary.
 
 #### `the-role-is-named-in-the-refusal-and-the-way-to-change-it`: The role is named in the refusal, and the way to change it
 
@@ -1311,9 +1311,9 @@ page
       item: text "SO-1040" · text muted "Elin Lindqvist asked 214 days ago" · status "No route" critical · text "EUR 45.00" · action disabled "Refund"
 ```
 
-**Rationale:** The refusal says which role the reader has, which role would be needed, and offers the command that asks for it. Everything a reader can be told without a support call.
+**Rationale:** The refusal says which role the reader has, which role would be needed, and offers the command that asks for it. It tells everything a reader can be told without a support call.
 
-**Cost:** A request that reaches an owner is a message somebody reads, and a busy owner ignores it. It should not be the only route, so the page has to stay useful read-only.
+**Cost:** A request that reaches an owner is a message someone reads, and a busy owner ignores it. It should not be the only route, so the page needs to stay useful read-only.
 
 #### `the-page-refused-with-a-request-sent-to-a-named-person`: The page refused, with a request sent to a named person
 
@@ -1330,7 +1330,7 @@ page
       action primary "Send the request"
 ```
 
-**Rationale:** Google Drive's 'You need access' page. The reader asks for access in place, with a short message. The request goes to a named person rather than to 'an administrator'.
+**Rationale:** This option follows Google Drive's `You need access` page. The reader asks for access in place, with a short message. The request goes to a named person rather than to an administrator.
 
 **Cost:** A request is a message an owner answers, so it needs a place in the owner's queue. Without that it is a button that leads nowhere.
 
@@ -1351,15 +1351,15 @@ page
     fact "Last changed" "2 Sep 2026 by Priya Shah"
 ```
 
-**Rationale:** Stripe shows settings as plain values to a role that reads but never changes them. One line at the top of the section names the role that edits. Nothing looks like a form that fails on Save.
+**Rationale:** Stripe shows settings as plain values to a role that reads but never changes them. One line at the top of the section names the role that edits. Nothing looks like a form that fails on `Save`.
 
-**Cost:** The page looks different for different roles, so a support call about it has to start with which role the caller has.
+**Cost:** The page looks different for different roles, so a support call about it needs to start with which role the caller has.
 
 **Reference:** Stripe
 
 ### Connection is gone
 
-**Question:** The warehouse desk has to work without a connection, which means the back office's counterpart is a stale page. Nothing here shows how fresh its data is, so these options decide what a stale page says.
+**Question:** The warehouse desk needs to work without a connection, which means the back office's counterpart is a stale page. Nothing here shows how fresh its data is, so these options decide what a stale page says.
 
 **Default:** `a-banner-saying-what-is-stale-and-what-still-works`
 
@@ -1388,9 +1388,9 @@ page
     message neutral "Nothing done here reaches the server while offline."
 ```
 
-**Rationale:** A neutral band naming when the page last read and which commands are refused while it is offline. The reader can still read, and knows it.
+**Rationale:** The page shows a neutral band naming when the page last read and which commands are refused while it is offline. The reader can still read, and knows it.
 
-**Cost:** Every page needs a last-read time and a notion of which commands are safe offline. Commands that change money almost never are.
+**Cost:** Every page needs a last-read time and a notion of which commands are safe offline. Commands that change money are almost never safe offline.
 
 #### `read-only-with-every-command-refused-and-why`: Read-only, with every command refused and why
 
@@ -1410,7 +1410,7 @@ page
     fact "Paid" "EUR 125.00"
 ```
 
-**Rationale:** Every command refused with the same reason in words. Unambiguous, and a page of refusals that all say the same thing is noisy.
+**Rationale:** The page refuses every command with the same reason in words. The message is unambiguous, and a page of refusals that all say the same thing is noisy.
 
 **Cost:** A reader on a train sees a page they cannot use. It is honest and it is still frustrating, and the frustration is not information the page can carry.
 
@@ -1433,9 +1433,9 @@ page
     fact "Refunded" "Nothing yet"
 ```
 
-**Rationale:** A wanted command waits as pending, with what it does when the connection returns and a way to drop it. Nothing is lost, and nothing is claimed to have happened.
+**Rationale:** A wanted command waits with a `Waiting` state, with what it does when the connection returns and a way to drop it. Nothing is lost, and nothing is claimed to have happened.
 
-**Cost:** A queued refund is a refund nobody has confirmed, and a queue of them is a liability. The page has to say plainly that the money has not moved.
+**Cost:** A queued refund is a refund nobody has confirmed, and a queue of them is a liability. The page needs to say plainly that the money has not moved.
 
 #### `a-connection-control-in-the-header-always-present`: A connection control in the header, always present
 
@@ -1454,7 +1454,7 @@ page
 
 **Rationale:** The connection is a fact about the session rather than about a page. It lives in the header and holds on every page. A refresh control already exists for the queue version of this.
 
-**Cost:** A second status in a header that already carries the theme and the language. And a header-level indicator is easy to learn and then ignore.
+**Cost:** A second status sits in a header that already carries the theme and the language. A header-level indicator is easy to learn and then easy to ignore.
 
 #### `nothing-shown-because-a-stale-page-is-a-dangerous-one`: Nothing shown, because a stale page is a dangerous one
 
@@ -1469,7 +1469,7 @@ page
     action primary "Try again"
 ```
 
-**Rationale:** Where the reader is about to act on money, a stale page is refused outright. The page says so and offers one thing: try again.
+**Rationale:** Where the reader is about to act on money, a stale page is refused outright. The page says so and offers one thing: `Try again`.
 
 **Cost:** A reader who needs to answer a question at the counter gets nothing. The printed pick list exists precisely because the counter cannot refuse, which is why the two surfaces answer this differently.
 
@@ -1509,7 +1509,7 @@ page
     action primary "Try again"
 ```
 
-**Rationale:** The problem state for status 0. Where a read fails because nothing answered, the section says the server could not be reached. Nothing claims to be current, because nothing is shown.
+**Rationale:** The problem state for status `0`. Where a read fails because nothing answered, the section says the server could not be reached. Nothing claims to be current, because nothing is shown.
 
 **Cost:** It only appears when a read is tried. A page that loaded before the connection dropped looks normal until the reader does something.
 
@@ -1528,7 +1528,7 @@ page
       item: text "SO-1042" · text "Maria Garcia" · text "EUR 125.00"
 ```
 
-**Rationale:** Gmail shows one quiet retry line with a time and a Try now control. The page stays readable while the line says when it retries.
+**Rationale:** Gmail shows one quiet retry line with a time and a `Try now` control. The page stays readable while the line says when it retries.
 
 **Cost:** A countdown is movement on a page the reader is trying to read. It stops once it gives up, and it never counts down forever on a laptop that has gone to sleep.
 
@@ -1536,7 +1536,7 @@ page
 
 ### Sign-in ran out
 
-**Question:** A session ends while the reader is working. Sign-in runs on the application's own origin, and a refused or ended session lands on /signed-out. The reader's unsent work is what this state must not lose.
+**Question:** A session ends while the reader is working. Sign-in runs on the application's own origin, and a refused or ended session lands on `/signed-out`. The reader's unsent work is what this state must not lose.
 
 **Default:** `a-dialog-over-the-work-which-stays-where-it-is`
 
@@ -1560,7 +1560,7 @@ page
     text muted "No back-office frame shows without a session."
 ```
 
-**Rationale:** A refused or ended session lands on /signed-out, worded by one sentence: 'Your sign-in has expired. Sign in again.' No back-office frame, because there is no session to show it to.
+**Rationale:** A refused or ended session lands on `/signed-out`, worded by one sentence: `Your sign-in has expired. Sign in again.` There is no back-office frame, because there is no session to show it to.
 
 **Cost:** The reader leaves their work to sign in again. Whether anything typed survives depends on the browser keeping the page, which is exactly what the other options make explicit.
 
@@ -1609,9 +1609,9 @@ page
       action primary "Sign in again to save"
 ```
 
-**Rationale:** Notion keeps an unsent change in place and says what blocks it beside the control. The Save button becomes the way back, so the reader's eye is already where the answer is.
+**Rationale:** Notion keeps an unsent change in place and says what blocks it beside the control. The `Save` button becomes the way back, so the reader's eye is already where the answer is.
 
-**Cost:** Only the form knows. A reader on a list page, with no Save button, meets the expiry somewhere else, so this needs a page-level sibling.
+**Cost:** Only the form carries this message. A reader on a list page, with no `Save` button, meets the expiry somewhere else, so this needs a page-level sibling.
 
 **Reference:** Notion
 
@@ -1633,7 +1633,7 @@ page
 
 **Rationale:** Dutch banks and DigiD warn before a session ends, with one button to stay. The reader who is still there never meets the expired state at all.
 
-**Cost:** A countdown on a page the reader is trying to use. It appears only when the reader is idle enough to need it and active enough to answer it.
+**Cost:** The warning is a countdown on a page the reader is trying to use. It appears only when the reader is idle enough to need it and active enough to answer it.
 
 **Reference:** DigiD
 
@@ -1655,9 +1655,9 @@ page
       action primary "Save"
 ```
 
-**Rationale:** The refused-command answer applied to a session. The save is refused with the session sentence, in the same alert shape as every other refusal. One component, one dictionary, no special case.
+**Rationale:** This option applies the refused-command answer to a session. The save is refused with the session sentence, in the same alert shape as every other refusal. It uses one component, one dictionary, and no special case.
 
-**Cost:** The reader learns it only when they save. An expiry discovered at Save is later than one discovered at reading, and the typed work waits longer.
+**Cost:** The reader learns it only when they save. An expiry discovered at `Save` is later than one discovered at reading, and the typed work waits longer.
 
 #### `a-toast-and-the-typed-work-goes-with-it`: A toast, and the typed work goes with it
 
@@ -1677,21 +1677,21 @@ page
   toast critical "The sign-in expired. What was typed is not saved."
 ```
 
-**Rationale:** What happens with no design: the save fails, a toast says the session expired, and the toast goes in seconds. Drawn here to be refused on purpose.
+**Rationale:** This is what happens with no design: the save fails, a toast says the session expired, and the toast goes in seconds. It is drawn here to be refused on purpose.
 
 **Cost:** The message leaves and the typed notes leave with it. A reader who looked away loses work they cannot reconstruct.
 
 ### Somebody else saved first
 
-**Question:** Two people edit one record. The API refuses the second save with concurrency/record.changed-elsewhere, worded as 'Someone else changed this'. The reader's unsent edits are still on the page.
+**Question:** Two people edit one record. The API refuses the second save with `concurrency/record.changed-elsewhere`, worded as `Someone else changed this`. The reader's unsent edits are still on the page.
 
 **Default:** `the-refusal-above-save-with-her-value-under-the-field`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the refusal above Save, with her value under the field. It refuses in the dictionary's words and fixes only what collided, with no dialog and no lost keystroke. The runner-up is the field-by-field choice, which suits a record where both people changed several fields.
+**Rationale:** Keep the refusal above `Save`, with her value under the field. It refuses in the dictionary's words and fixes only what collided, with no dialog and no lost keystroke. The runner-up is the field-by-field choice, which suits a record where both people changed several fields.
 
-Never ship read-only until reload. It deletes Alex's notes to resolve an arrival time.
+Never ship `read-only-until-reload`. It deletes Alex's notes to resolve an arrival time.
 
 #### `the-refusal-above-save-with-her-value-under-the-field`: The refusal above Save, with her value under the field
 
@@ -1715,7 +1715,7 @@ page
 
 **Rationale:** Linear refuses the save in words. The other person's value appears under the field it beats, with one button to take hers. The reader fixes exactly what collided.
 
-**Cost:** Works field by field. Where both people rewrote the same long notes, one button per field is not enough and the dialog option takes over.
+**Cost:** This option works field by field. Where both people rewrote the same long notes, one button per field is not enough and the dialog option takes over.
 
 **Reference:** Linear
 
@@ -1769,9 +1769,9 @@ page
     action primary "Compare the two"
 ```
 
-**Rationale:** Dropbox and Office ask on a conflict: keep mine, take theirs, or look at both. Three buttons, no field surgery, and the dialog says whose version is whose.
+**Rationale:** Dropbox and Office ask on a conflict: keep mine, take theirs, or look at both. The dialog offers three buttons with no field surgery, and it says whose version is whose.
 
-**Cost:** Whole-record choice. Alex's arrival time and his notes travel together, so he cannot keep one and take the other.
+**Cost:** This is a whole-record choice. Alex's arrival time and his notes travel together, so he cannot keep one and take the other.
 
 **Reference:** Dropbox, Office
 
@@ -1796,7 +1796,7 @@ page
       action primary "Save"
 ```
 
-**Rationale:** Figma and Google Docs show who else is on the record before anyone saves. Alex sees Priya's avatar on the arrival field and waits or talks, and the refusal never has to happen.
+**Rationale:** Figma and Google Docs show who else is on the record before anyone saves. Alex sees Priya's avatar on the arrival field and waits or talks, and the refusal never needs to happen.
 
 **Cost:** Presence is a live subscription per open record, and it only helps readers who look. The API still refuses, so this is early warning, not handling.
 
@@ -1824,7 +1824,7 @@ page
 
 **Rationale:** Git merges what does not overlap and asks only about the rest. The dock Priya Shah fixed at 09:34 lands in Alex's form silently. Only the arrival time needs a choice.
 
-**Cost:** Silent changes to a form the reader is editing. If Priya's dock fix surprises Alex at Save, the merge reads as tampering.
+**Cost:** The merge makes silent changes to a form the reader is editing. If Priya's dock fix surprises Alex at `Save`, the merge reads as tampering.
 
 **Reference:** Git
 
@@ -1844,7 +1844,7 @@ page
     action primary "Reload her version"
 ```
 
-**Rationale:** The banking answer: the form locks, one button reloads Priya's version, and Alex's edits are dropped. Drawn to be refused: nothing on this form is worth deleting notes over.
+**Rationale:** This is the banking answer: the form locks, one button reloads Priya's version, and Alex's edits are dropped. It is drawn to be refused: nothing on this form is worth deleting notes over.
 
 **Cost:** Alex's notes are gone. A lock that deletes work teaches the reader to type notes somewhere else first.
 
@@ -1909,7 +1909,7 @@ page
 
 **Rationale:** Shopify's bulk operations and Stripe's dashboard keep jobs on the page that started them, each with its state and a way to stop it. The reader who started the import finds it where they stood.
 
-**Cost:** The jobs live on one page. A reader who started an export and moved to refunds has to go back to find it.
+**Cost:** The jobs live on one page. A reader who started an export and moved to refunds needs to go back to find it.
 
 **Reference:** Shopify, Stripe
 
@@ -1932,7 +1932,7 @@ page
 
 **Rationale:** GitHub Actions tells the reader when a run finishes. While it runs there is nothing to decide. A toast plus a timeline entry answers the only two questions: did it work, and where is the evidence.
 
-**Cost:** Silence while it runs. A reader who waits for 850 records with no progress bar waits less patiently than one who watches 70%.
+**Cost:** The page is silent while the job runs. A reader who waits for 850 records with no progress bar waits less patiently than one who watches 70%.
 
 **Reference:** GitHub Actions
 
@@ -1951,7 +1951,7 @@ page
 
 **Rationale:** Mailchimp and Intercom show a bulk send on the rows it touches: each row gains its result as the job reaches it. The reader watches 31 refunds land one by one.
 
-**Cost:** Thirty-one rows updating under the reader's eye. It needs the reader to stay on the page, which is exactly what background work should not need.
+**Cost:** Thirty-one rows update under the reader's eye. The pattern needs the reader to stay on the page, which is exactly what background work should not need.
 
 **Reference:** Mailchimp, Intercom
 
@@ -1993,19 +1993,19 @@ page
     action "Stop the import"
 ```
 
-**Rationale:** The old desktop answer: a progress dialog with nothing behind it clickable. Drawn to be refused: 850 records take minutes, and minutes of a held reader are the cost this whole item exists to remove.
+**Rationale:** This is the old desktop answer: a progress dialog with nothing behind it clickable. It is drawn to be refused: 850 records take minutes, and minutes of a held reader are the cost this whole item exists to remove.
 
-**Cost:** The reader cannot do other work while the job runs. Stop is the only choice, and it wastes the minutes already spent.
+**Cost:** The reader cannot do other work while the job runs. `Stop` is the only choice, and it wastes the minutes already spent.
 
 ### This record does not exist
 
-**Question:** A link names a record that is gone, mistyped, or at another company. A problem state words it as 'Not found'. The reader needs a way back, not a code.
+**Question:** A link names a record that is gone, mistyped, or at another company. A problem state words it as `Not found`. The reader needs a way back, not a code.
 
 **Default:** `not-found-with-the-way-back`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep not found, with the way back. It names the record, covers the three ways a record goes missing, and offers the list and the search. The runner-up is the record state.
+**Rationale:** Keep `Not found`, with the way back. It names the record, covers the three ways a record goes missing, and offers the list and the search. The runner-up is the record state.
 
 It suits a section whose read failed rather than a page whose record is gone. Never ship the bare code. A code means nothing to a reader, and a dead end with a number on it is still a dead end.
 
@@ -2022,7 +2022,7 @@ page
     text "This record does not exist, or it belongs to another company."
 ```
 
-**Rationale:** The problem state for a missing record: 'Not found' and the line that covers gone, mistyped, and another company's. It offers no retry, because the read answered correctly. Nothing claims the record exists.
+**Rationale:** The problem state for a missing record: `Not found` and the line that covers gone, mistyped, and another company's. It offers no retry, because the read answered correctly. Nothing claims the record exists.
 
 **Cost:** No retry and no way back: the record is not there, so there is nothing to retry. The way back in the recommended option is what the reader needs.
 
@@ -2065,7 +2065,7 @@ page
 
 **Rationale:** GitHub shows a missing comment inside an intact thread. The order exists. One line on it does not. Only the lines section says so.
 
-**Cost:** Only for a child that is missing from a parent that exists. Where the whole record is gone, a surviving page is a lie.
+**Cost:** Use it only for a child that is missing from a parent that exists. Where the whole record is gone, a surviving page is a lie.
 
 **Reference:** GitHub
 
@@ -2082,9 +2082,9 @@ page
     action primary "Back to Products"
 ```
 
-**Rationale:** Linear and Notion name who removed a page and when, because 'does not exist' for something the reader saw yesterday reads as a fault. The audit trail already knows. The page says it.
+**Rationale:** Linear and Notion name who removed a page and when, because `does not exist` for something the reader saw yesterday reads as a fault. The audit trail already knows. The page says it.
 
-**Cost:** It confirms the record existed, which leaks across companies if the reader should not know. For another company's record this must fall back to the way back option.
+**Cost:** It confirms the record existed, which leaks across companies if the reader should not know. For another company's record this must fall back to the `not-found-with-the-way-back` option.
 
 **Reference:** Linear, Notion
 
@@ -2103,7 +2103,7 @@ page
       item: text "SO-1042 · Maria Garcia" · text muted "maria@garcia-interiors.example" · action "Open"
 ```
 
-**Rationale:** GitHub's 404 offers search where the reader stands. The reader who mistyped an order number searches without going back to the list first.
+**Rationale:** GitHub's `404` offers search where the reader stands. The reader who mistyped an order number searches without going back to the list first.
 
 **Cost:** A search box on an error page is a second search to keep in step with the list's. It earns its keep only where mistyped codes are common, which pickup codes are.
 
@@ -2122,15 +2122,15 @@ page
     action primary "Back to Home"
 ```
 
-**Rationale:** Vercel and Next.js draw a bare 404. It is honest about the status and silent about everything a reader needs: what is missing, why, and where to go.
+**Rationale:** Vercel and Next.js draw a bare `404`. It is honest about the status and silent about everything a reader needs: what is missing, why, and where to go.
 
-**Cost:** A code means nothing to a reader. Left bare it is a dead end with a number on it.
+**Cost:** A code means nothing to a reader. When left bare, it is a dead end with a number on it.
 
 **Reference:** Vercel, Next.js
 
 ### Something went wrong on our side
 
-**Question:** The server fails a read or a command. A problem state words it as 'That did not go through', with a reference the reader can quote. The reader must know what did not happen.
+**Question:** The server fails a read or a command. A problem state words it as `That did not go through`, with a reference the reader can quote. The reader must know what did not happen.
 
 **Default:** `the-shipped-failure-with-its-reference`
 
@@ -2157,7 +2157,7 @@ page
     action "Try again"
 ```
 
-**Rationale:** The problem state for a failed command: the title, the caller-safe detail, Try again, and a reference the reader can quote to support. The money sentence is the point: what did not move.
+**Rationale:** The problem state for a failed command: the title, the caller-safe detail, `Try again`, and a reference the reader can quote to support. The money sentence is the point: what did not move.
 
 **Cost:** A reference is only useful if support can read it back. Without that lookup it is a number that comforts nobody.
 
@@ -2198,7 +2198,7 @@ page
       item: text "Invoice INV-2041" · text muted "maria@garcia-interiors.example" · status "Paid" positive · action "Resend"
 ```
 
-**Rationale:** Gmail retries a failed send and says when, with Try now for the impatient. A failure that clears on its own should not need a reader to clear it.
+**Rationale:** Gmail retries a failed send and says when, with `Try now` for the impatient. A failure that clears on its own should not need a reader to clear it.
 
 **Cost:** Retrying a refund doubles it unless the command is idempotent. This suits reads and sends, and must never retry money blindly.
 
@@ -2219,7 +2219,7 @@ page
   toast critical "The invoice for SO-1042 was not resent. Retry from here."
 ```
 
-**Rationale:** Gmail's failed send and Linear's failed sync: the reader moved on, so the failure comes to them as a toast with its retry. The page behind is whatever they do now.
+**Rationale:** Gmail's failed send and Linear's failed sync follow this shape: the reader moved on, so the failure comes to them as a toast with its retry. The page behind is whatever they do now.
 
 **Cost:** A toast goes. A failed refund must also land in the record's timeline, or the evidence leaves with the message.
 
@@ -2244,7 +2244,7 @@ page
     fact "Country" "Netherlands"
 ```
 
-**Rationale:** React error boundaries and Vercel's per-section recovery: the money section fails into its retry while the customer section stays readable. One failed read does not take the page.
+**Rationale:** React error boundaries and Vercel's per-section recovery follow this shape: the money section fails into its retry while the customer section stays readable. One failed read does not take the page.
 
 **Cost:** Two sections can fail two different ways on one page. Past one failure the page is a list of retries, and the outcome page takes over.
 
@@ -2266,9 +2266,9 @@ page
     link "Try again"
 ```
 
-**Rationale:** What happens when a failed re-read is swallowed: the old figures stay with a quiet line. Drawn to be refused: a refund total that may be wrong is worse than none.
+**Rationale:** This is what happens when a failed re-read is swallowed: the old figures stay with a quiet line. It is drawn to be refused: a refund total that may be wrong is worse than none.
 
-**Cost:** The reader acts on figures the server could not confirm. For money this is not a degradation, it is misinformation.
+**Cost:** The reader acts on figures the server could not confirm. For money this is not a degradation. It is misinformation.
 
 ### Back office is down for a short while
 
@@ -2297,7 +2297,7 @@ page
     fact "Store" "Paused"
 ```
 
-**Rationale:** Stripe's status banner and Linear's scheduled maintenance: one sentence on every page from days before, with the window and what still works. Nobody meets maintenance by surprise.
+**Rationale:** Stripe's status banner and Linear's scheduled maintenance follow this shape: one sentence on every page from days before, with the window and what still works. Nobody meets maintenance by surprise.
 
 **Cost:** A band on every page for days is days of noise for a 30-minute window. It must appear late enough to matter and early enough to plan the warehouse around.
 
@@ -2405,13 +2405,13 @@ page
     text "No banner, no page, no countdown. The warehouse finds out at 02:00."
 ```
 
-**Rationale:** What happens when maintenance is announced by message only: owners get the mail on Thursday and the warehouse meets the window on Sunday. Drawn to be refused as the only signal.
+**Rationale:** This is what happens when maintenance is announced by message only: owners get the mail on Thursday and the warehouse meets the window on Sunday. It is drawn to be refused as the only signal.
 
 **Cost:** Nobody reads a Thursday message on Sunday at 02:00. A message tells. Only the back office can remind.
 
 ### Too many tries
 
-**Question:** The reader hits a limit: too many exports, too many sign-in tries, too many sends. The API answers 429 with when to try again. The reader needs the wait, not a lecture.
+**Question:** The reader hits a limit: too many exports, too many sign-in tries, or too many sends. The API answers `429` with when to try again. The reader needs the wait, not a lecture.
 
 **Default:** `the-button-waits-and-says-how-long`
 
@@ -2436,7 +2436,7 @@ page
       item: text "SO-1042" · text "Maria Garcia" · text "8 Oct 2026, 09:32" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** GitHub and Stripe answer 429 with Retry-After, and the button counts it down. The reader waits 40 seconds knowing why, instead of clicking a button that keeps refusing.
+**Rationale:** GitHub and Stripe answer `429` with `Retry-After`, and the button counts it down. The reader waits 40 seconds knowing why, instead of clicking a button that keeps refusing.
 
 **Cost:** A countdown on a button is a timer the page must keep honestly. If the reader reloads, the count must survive or start over truthfully.
 
@@ -2522,9 +2522,9 @@ page
     action primary "Back to Orders"
 ```
 
-**Rationale:** Cloudflare answers a hard stop with a page: too many tries, when to come back, and a reference. No retry button, because retrying is what caused this.
+**Rationale:** Cloudflare answers a hard stop with a page: too many tries, when to come back, and a reference. There is no retry button, because retrying is what caused this.
 
-**Cost:** A page with nothing to do but wait. It suits a stop measured in minutes and insults one measured in seconds, which the button option handles.
+**Cost:** The page offers nothing to do but wait. It suits a stop measured in minutes and insults one measured in seconds, which the button option handles.
 
 **Reference:** Cloudflare
 
@@ -2545,9 +2545,9 @@ page
     text muted "1 to 25 of 268"
 ```
 
-**Rationale:** What happens when the 429 is swallowed into a loading state: the search spins with no message. Drawn to be refused: a wait the reader cannot name reads as a page that broke.
+**Rationale:** This is what happens when the `429` is swallowed into a loading state: the search spins with no message. It is drawn to be refused: a wait the reader cannot name reads as a page that broke.
 
-**Cost:** Indistinguishable from a hang. Every second past the first is a second the reader spends deciding whether to reload, which restarts the wait.
+**Cost:** The spinner is indistinguishable from a hang. Every second past the first is a second the reader spends deciding whether to reload, which restarts the wait.
 
 ## Verification
 

@@ -44,7 +44,7 @@ tests/
 
 **Requirement:** A browser suite MUST cover the primary release flow, startup with storage unavailable, offline startup, and export followed by import.
 
-**Rationale:** These four are the paths where a client-only product loses user work, and none of them can be proved without a real browser. This realizes litespec/frontend/testing#match-test-level-to-risk.
+**Rationale:** These four are the paths where a `client-only` product loses user work, and none of them can be proved without a real browser. This realizes litespec/frontend/testing#match-test-level-to-risk.
 
 ### Enforce the first-load budget
 
@@ -56,7 +56,7 @@ tests/
 
 ### Keep browser-capability tests honest
 
-**Default:** Test both the supported and unsupported path of any feature depending on a browser capability.
+**Default:** Test both the supported and unsupported paths of any feature depending on a browser capability.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 

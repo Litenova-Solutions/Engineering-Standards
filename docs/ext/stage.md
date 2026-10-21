@@ -24,7 +24,7 @@ None. The promotion Decision is a core record every project requires.
 
 **Requirement:** A consumer MUST declare `pre-production` or `production` as its release stage in `litespec.project.json`.
 
-**Rationale:** A life stage is not a departure from a standard. The `stage` selection in `selectedExtensions` holds `releaseStage` with one of the two values above, beside the deferrals that stage allows.
+**Rationale:** A life stage is not a departure from a standard. The `stage` selection in `selectedExtensions` holds `releaseStage` with one of the two values above, along with the deferrals that stage allows.
 
 **Example:** A consumer with no customer data in any deployment declares the early stage.
 
@@ -64,4 +64,4 @@ This extension adds no required package.
 |:---|:---|:---|
 | litespec/ext/stage#declare-the-release-stage | checkable | `litespec consumer` refuses a `stage` selection with a missing or unknown `releaseStage`. |
 | litespec/ext/stage#defer-named-provisions-until-promotion | checkable | `litespec consumer` refuses a deferral naming an unknown provision or past its `until` date, and any deferral in `production`. |
-| litespec/ext/stage#promote-through-a-recorded-decision | guidance | Does an approved promotion Decision predate the first customer data? |
+| litespec/ext/stage#promote-through-a-recorded-decision | guidance | Does an approved promotion Decision predate the first deployment holding customer data? |

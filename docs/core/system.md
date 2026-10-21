@@ -4,16 +4,16 @@
 
 LiteSpec coordinates software work with agents as active engineering participants. It combines records, architecture standards, agent protocols, implementation conventions, tests, operating controls, and release records.
 
-In this name:
+The name has two parts:
 
 - `Lite` means a consumer adopts one bounded context, one size, and its selected stacks, and nothing more.
-- `Spec` means approved written records and provisions define the work, and agents and people build and verify against them.
+- `Spec` means approved written records and provisions define the work. Agents and people build and verify against them.
 
 ### Company context
 
-Litenova Solutions authors LiteSpec and uses it as its engineering system for developing software. The system is general enough for another technical team to adopt; Litenova's company context defines the current defaults and explains the decisions in this repository.
+Litenova Solutions authors LiteSpec and uses it as its engineering system for developing software. The system is general enough for another technical team to adopt. Litenova's company context defines the current defaults and explains the decisions in this repository.
 
-Litenova Solutions is currently operated by one technical founder. LiteSpec assumes technical contributors. One person may hold product, domain, architecture, implementation, testing, release, and operations responsibilities at the same time.
+One technical founder currently operates Litenova Solutions. LiteSpec assumes technical contributors. One person may hold product, domain, architecture, implementation, testing, release, and operations responsibilities at the same time.
 
 The system names responsibilities without assuming separate departments or job titles. `Decision owner`, `implementation owner`, and `operations owner` identify accountability. They may identify the same person.
 
@@ -33,7 +33,7 @@ The system addresses recurring problems:
 - A use case can be implemented in one layer while persistence, public entry points, tests, or operating impact remain incomplete.
 - Documentation can claim behavior that code and automated evidence do not support.
 
-The system makes the record durable and the agent replaceable. A different person, model, or tool should be able to continue from the same approved records and obtain the same required boundaries.
+The system makes the record durable and the agent replaceable. A different person, model, or tool should continue from the same approved records and obtain the same required boundaries.
 
 ### Connected layers
 
@@ -45,9 +45,9 @@ The system contains one delivery approach and one operating model:
 | Record-driven delivery | Approved records select work and define completion. | `use-case/orders.cancel-order` defines behavior before its Command, endpoint, and tests are accepted. |
 | Agent-driven engineering | Agents perform substantial engineering execution within approved scope and report decisions they cannot make. | An agent loads the cancellation record, implements it, runs its checks, and reports an unknown refund policy. |
 
-`Driven` means engineering work starts from an approved record and completion is judged against it. A record is more than a prompt because it remains in the workspace after one agent session ends.
+Driven means engineering work starts from an approved record and completion is judged against it. A record is more than a prompt because it remains in the workspace after one agent session ends.
 
-`Agent-driven` describes who performs much of the execution. It does not transfer business decision authority to the agent.
+Agent-driven describes who performs much of the execution. It does not transfer business decision authority to the agent.
 
 ## Concepts
 
@@ -124,7 +124,7 @@ The [glossary](../reference/glossary.md) defines each term below. This section r
 
 The product record (the brief) names users, problems, outcomes, exclusions, commercial constraints, and operating context. It is not a synonym for the frontend application.
 
-A journey begins at an accepted starting condition, crosses every required system boundary, and ends at one observable product outcome. It does not mean every possible product feature. The record lists ordered steps with what must exist first, and may include actor decisions, branches, waiting periods, failures, and recovery.
+A journey begins at an accepted starting condition, crosses every required system boundary, and ends at one observable product outcome. It does not mean every possible product feature. The record lists ordered steps with what must exist first. It may include actor decisions, branches, waiting periods, failures, and recovery.
 
 A journey links existing use-case records instead of repeating their inputs and rules. For an online shop, `journey/checkout` can connect stock reservation, order creation, payment start, and shipment dispatch. Order cancellation and payment reconciliation are separate journeys.
 
@@ -132,7 +132,7 @@ A journey links existing use-case records instead of repeating their inputs and 
 
 Orders, refunds, shipment delivery, money, and cancellation policy are domain concepts. HTTP, JSON serialization, database sessions, and queue clients are technical mechanisms.
 
-The capitalized `Domain` project is the code layer that implements domain types and behavior. The business domain exists independently of that project. A rule across business records may be enforced by Domain or Application code when its facts cross record or module boundaries.
+The capitalized `Domain` project is the code layer that implements domain types and behavior. The business domain exists independently of that project. Domain or Application code may enforce a rule across business records when its facts cross record or module boundaries.
 
 `Orders module` is natural in product discussion and maps to `Domain/Orders`, `Application/Orders`, endpoint groups, frontend features, and tests. A module is not automatically:
 
@@ -147,17 +147,17 @@ A module may contain no business record, one business record, or multiple relate
 
 A use case owns its trigger, input, permissions, result, rules, refusals, entry points, implementation impact, and operating impact.
 
-One top-level Command owns one command pipeline and one transaction commit. A Query reads a Read Model without changing business state.
+One top-level Command owns one command pipeline and one transaction commit. A Query reads a Read model without changing business state.
 
 `use-case/orders.cancel-order` is a use case. `CancelOrderCommand` is its Application message. `OrderCancel` is its business-record action. These names stay aligned without treating the use case, Command, and business record as one boundary.
 
-Work that spans business records is a command that reads several records and writes one, an event reaction, or a background job. A background job is work that runs without an HTTP request, on a schedule or from a queue.
+Work that spans business records is a Command that reads several records and writes one, an event reaction, or a background job. A background job is work that runs without an HTTP request, on a schedule or from a queue.
 
 ### Business record, root, state, and rule
 
 A business record is not every entity in a module. `Root` identifies the mutation entry point, not an inheritance hierarchy for every domain object.
 
-Developers may call it an aggregate; the record type is business record. Every business record uses one abstract `{Record}State` record and one or more sealed state records, including a record with one current state.
+Developers may call it an aggregate. The record type is business record. Every business record uses one abstract `{Record}State` record and one or more sealed state records, including a record with one current state.
 
 A rule that is always true cannot be false after commit. `rule/order.capacity-limits-confirmation`, for example, limits confirmed and reserved quantities to capacity.
 
@@ -167,13 +167,13 @@ Each rule states its kind: always true, checked before, or across records. The k
 
 Checked-before rules include message shape: required fields, lengths, and formats are checked before business behavior runs. A persistence constraint is an always-true rule enforced by the store, such as a unique key. Each rule also states where it is enforced: validator, aggregate, store, guard, or reaction.
 
-An actor holds a role at a scope; a role allows permissions; a use case needs permissions; an entry point may offer fewer. Actor kinds are person, company, provider, system, and guest. A role scope is a kebab-case level the project names, such as `platform`, `tenant`, or `self`. Permissions come from one shared closed list.
+An actor holds a role at a scope. A role allows permissions. A use case needs permissions. An entry point may offer fewer. Actor kinds are person, company, provider, system, and guest. A role scope is a kebab-case level the project names, such as `platform`, `tenant`, or `self`. Permissions come from one shared closed list.
 
 ### Event and event reaction
 
 Event names use past-tense forms such as `OrderConfirmed` and `ShipmentDispatched`. `Reaction` states the causal relationship without prescribing the implementation.
 
-A reaction may map to an event handler, a projection, a command that reads several records, or a background job. `OrderConfirmed` may cause the reaction `Dispatch shipment`, implemented as a background job rather than a class named `DispatchShipmentReaction`.
+A reaction may map to an event handler, a projection, a Command that reads several records, or a background job. `OrderConfirmed` may cause the reaction `Dispatch shipment`, implemented as a background job rather than a class named `DispatchShipmentReaction`.
 
 Each reaction declares one delivery classification:
 
@@ -182,7 +182,7 @@ Each reaction declares one delivery classification:
 - `rebuildable`: a missed delivery is recovered by rebuilding the effect from its source records.
 - `best-effort-optional`: the reaction may be skipped or lost without breaking a promise.
 
-Select atomic for a required effect inside one consistency boundary, and durable for one outside it. Select rebuildable for a derived view, and best-effort-optional only where no record needs the effect.
+Select `atomic` for a required effect inside one consistency boundary. Select `durable` for one outside it. Select `rebuildable` for a derived view. Select `best-effort-optional` only where no record needs the effect.
 
 ### Result, Case, and verification
 
@@ -192,11 +192,11 @@ An acceptance test proves a case only when its steps call the use case and asser
 
 ### Authority and links
 
-What should happen follows constraint, product, requirement, rule, then use case. A decision explains a choice and is replaced, never edited. Research, examples, and prose carry no authority.
+What should happen follows constraint, product, requirement, rule, then use case. A decision explains a choice. It is replaced, never edited. Research, examples, and prose carry no authority.
 
 What is true today comes from code, screens, and test runs. A mismatch between the two is a defect, assigned to the owner of the higher record. A failing test does not settle intent.
 
-When two records at one level disagree, the one whose decision was approved later wins; otherwise their shared owner decides.
+When two records at one level disagree, the one whose decision was approved later wins. Otherwise, their shared owner decides.
 
 Written links live on the record named first: a decision decides a requirement, a rule fulfills one, a use case raises an event. The model builder computes implements, calls, and proves from code, routes, and test runs.
 
@@ -226,7 +226,7 @@ Written links live on the record named first: a decision decides a requirement, 
 
 ### Record catalog
 
-Every record has an owner and a status: draft, approved, or retired, with a decider and a decide-by date while it is a draft.
+Every record has an owner and a status: draft, approved, or retired. A draft has a decider and a decide-by date.
 
 | Record | Home |
 |:---|:---|
@@ -279,13 +279,13 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 **Requirement:** An agent MUST start behavior work from the approved use-case and module records, plus the product and journey records when they exist for the behavior.
 
-**Rationale:** A prompt, ticket, chat message, or code comment can initiate work. The owning record holds the approved behavior, and code does not silently replace it.
+**Rationale:** A prompt, ticket, chat message, or code comment can initiate work. The owning record holds the approved behavior. Code does not silently replace it.
 
 ### Resolve authority by ladder
 
 **Requirement:** Authority MUST follow constraint, then product, requirement, rule, and use case in that order, with every record carrying an owner.
 
-**Rationale:** The ladder settles ties without a meeting; the owner answers for each record.
+**Rationale:** The ladder settles ties without a meeting. The owner answers for each record.
 
 ### Write each record in its catalog shape
 
@@ -297,7 +297,7 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 **Requirement:** Every written link MUST live on the record the link table names first, with every citation resolving to a written record.
 
-**Rationale:** Links on the source keep each record readable alone; resolving citations keep the graph whole.
+**Rationale:** Links on the source keep each record readable alone. Resolving citations keeps the graph whole.
 
 ### Connect one product outcome through a journey
 
@@ -305,11 +305,32 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 **Rationale:** A journey can cross modules and include branches, waiting, failure, and recovery. Its tests prove the connected outcome through public boundaries. Repeated content means inputs, rules, refusals, and results.
 
+**Example:** The running library example connects borrowing and returning through `journey/borrow-and-return`, which links its use cases without repeating their inputs or rules:
+
+```json
+{
+  "type": "journey",
+  "id": "journey/borrow-and-return",
+  "title": "Borrow and return",
+  "owner": "lending-team",
+  "status": "approved",
+  "actor": "actor/reader",
+  "goal": "Borrow and return a copy.",
+  "steps": [
+    { "useCase": "use-case/lending.register-copy", "actor": "actor/reader", "requires": [] },
+    { "useCase": "use-case/lending.borrow-copy", "actor": "actor/reader", "requires": [] },
+    { "useCase": "use-case/lending.extend-loan", "actor": "actor/reader", "requires": [] }
+  ]
+}
+```
+
+The page shows three of the eight steps; each step names its use case and actor only, and the use-case pages keep the inputs, rules, and results, which satisfies this provision.
+
 ### Group language and use cases by module
 
 **Requirement:** A module name MUST be identical across documentation, Domain and Application folders, endpoint groups, frontend features, tests, and record identifiers.
 
-**Rationale:** A module is a navigation and ownership boundary. It defines no transaction boundary and needs no runtime `Module` or `IModule` type.
+**Rationale:** A module is a navigation and ownership boundary. It defines no transaction boundary. It needs no runtime `Module` or `IModule` type.
 
 ### Make business-record ownership explicit
 
@@ -321,7 +342,7 @@ Both are informative. A scenario illustrates its page and never governs it. A sc
 
 **Requirement:** A use case MUST map to one Command or Query, complete only with Domain behavior, Application coordination, persistence, entry points, evidence, and operating impact.
 
-**Rationale:** Multi-step product outcomes belong to a journey. Placeholder work leaves the use case unimplemented. The Command or Query is top level, and the evidence is automated.
+**Rationale:** Multi-step product outcomes belong to a journey. Placeholder work leaves the use case unimplemented. The Command or Query is top level. The evidence is automated.
 
 **Example:** A use case whose handler throws `NotImplementedException` is not implemented.
 
@@ -346,7 +367,7 @@ Endpoint: CancelOrderEndpoint
 
 **Requirement:** Every handler MUST resolve to one use case by the folder rule or one `implements` anchor, with every use case resolving back to its handler.
 
-**Rationale:** Neither direction is visible without the check. Code with no use case reads as a reviewed feature and is not one. A use case with no code states a plan in the present tense.
+**Rationale:** Neither direction is visible without the check. Code with no use case reads as a reviewed feature. It is not one. A use case with no code states a plan in the present tense.
 
 **Example:** `litespec model query use-case/orders.cancel-order` shows the handler the folder rule resolves.
 
@@ -354,7 +375,7 @@ Endpoint: CancelOrderEndpoint
 
 **Requirement:** A use case MUST declare the entry points it is reached through, or name its background caller with the reason no entry point reaches it.
 
-**Rationale:** A route calls use cases from its code, so the edge runs one way. Nothing answers the question asked before a change: who breaks if this operation moves. A use case reached only by a schedule or a reaction has a real answer. Writing it down separates it from one nobody wired up.
+**Rationale:** A route calls use cases from its code. The edge runs one way. Nothing answers the question asked before a change: who breaks if this operation moves. A use case reached only by a schedule or a reaction has a real answer. Writing it down separates it from one nobody wired up.
 
 **Example:** A use case reached only by a reaction names that reaction as its caller.
 
@@ -372,7 +393,7 @@ Endpoint: CancelOrderEndpoint
 
 **Requirement:** Each rule MUST state its kind, governed target, and enforcement point, keeping a negation word in its name when its statement says one.
 
-**Rationale:** The kind decides the proof; the name lets a reviewer read the rule as a true sentence. Negation words are not, no, never, and cannot.
+**Rationale:** The kind decides the proof. The name lets a reviewer read the rule as a true sentence. Negation words are not, no, never, and cannot.
 
 **Example:** `rule/order.cancel-only-before-shipment` is a checked-before rule enforced by the validator.
 
@@ -380,7 +401,7 @@ Endpoint: CancelOrderEndpoint
 
 **Requirement:** Access MUST flow from actor through role and permission to use case, with each link declared: holds, allows, needs, and offers.
 
-**Rationale:** The chain gives every access decision one path to audit: actor, role, permission, use case. The hold names its scope.
+**Rationale:** The chain gives every access decision one path to audit: actor, role, permission, and use case. The hold names its scope.
 
 ### Model every business-record lifecycle with state records
 
@@ -392,7 +413,7 @@ Endpoint: CancelOrderEndpoint
 
 **Requirement:** A module, business-record, use-case, or journey page MUST carry a `Scenario` section stating one concrete occasion for its subject.
 
-**Rationale:** Every other section states a rule, a state, or a mapping. None of them says when the behavior happens, or who is under pressure while it does. A reader who cannot place an operation in the world reads its rules as arbitrary constraints. An agent writing against it cannot tell an ordinary case from an exceptional one.
+**Rationale:** Every other section states a rule, a state, or a mapping. None of them says when the behavior happens. None of them says who is under pressure while it does. A reader who cannot place an operation in the world reads its rules as arbitrary constraints. An agent writing against it cannot tell an ordinary case from an exceptional one.
 
 **Example:** A warehouse scan page states the hour, the parcel queue, and the handheld that lost signal before it states its failure codes.
 
@@ -400,15 +421,15 @@ Endpoint: CancelOrderEndpoint
 
 **Requirement:** A `Scenario` section MUST NOT contain a record identifier.
 
-**Rationale:** An identifier inside a scenario reads as a second definition of the record it names, and two definitions drift. The section illustrates the page, so a scenario that contradicts the page's own tables is the part that is wrong.
+**Rationale:** An identifier inside a scenario reads as a second definition of the record it names. Two definitions drift. The section illustrates the page. A scenario that contradicts the page's own tables is the part that is wrong.
 
-**Example:** A scenario says Alex is refused because the last unit went to somebody else, and the rules table carries the rule.
+**Example:** A scenario says Alex is refused because the last unit went to somebody else. The rules table carries the rule.
 
 ### Derive every scenario from one reference cast
 
 **Requirement:** A consumer MUST record one `scenario-cast` page and draw the people, place, dates, and amounts of every `Scenario` section from it.
 
-**Rationale:** One cast makes a sequence of pages describe one occasion rather than many unrelated illustrations. The reader carries context from each page to the next. The cast costs nothing to maintain because it names no code, and its figures come from the records.
+**Rationale:** One cast makes a sequence of pages describe one occasion rather than many unrelated illustrations. The reader carries context from each page to the next. The cast costs nothing to maintain because it names no code. Its figures come from the records.
 
 **Example:** Alex, the customer who places the order in one record, is the person who receives the shipment in another.
 
@@ -490,7 +511,7 @@ docs/
 
 `product/` holds the brief, the journeys, and the business intent: one topic page per area with its requirements, and the product decisions behind them. `domain/` holds the actors, roles, permissions, entry points, rules, and modules.
 
-`operations/` holds the limits, the secret inventory, and the operations log. `runbooks/`, `exceptions/`, and `known-gaps/` hold their records. `ui/` holds the first UI decision or guide, and `language.json` holds the term records.
+`operations/` holds the limits, the secret inventory, and the operations log. `runbooks/`, `exceptions/`, and `known-gaps/` hold their records. `ui/` holds the first UI decision or guide. `language.json` holds the term records.
 
 The example creates an optional directory only when its first real artifact is added. The example does not create empty directories or placeholder records during inception.
 
@@ -500,7 +521,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** A module page cannot carry the business-record page that `litespec/core/system#model-every-business-record-lifecycle-with-state-records` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `use-case/<module>.<name>`, so only the directory changes.
+**Rationale:** A module page cannot carry the business-record page that `litespec/core/system#model-every-business-record-lifecycle-with-state-records` requires. The subdirectory costs one repeated path segment where the names coincide, as in `modules/products/products/`. The use-case identifier stays `use-case/<module>.<name>`. Only the directory changes.
 
 ### Keep operational and security references under operations
 
@@ -516,7 +537,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** Replacing a precise term with a softer synonym hides the established pattern. Explain the term and give an example instead.
+**Rationale:** Replacing a precise term with a softer synonym hides the established pattern. Explain the term. Give an example instead.
 
 ### Use ordinary capitalization in prose
 
@@ -524,7 +545,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** Exact record types and code types keep their declared capitalization, so the distinction stays meaningful.
+**Rationale:** Exact record types and code types keep their declared capitalization. The distinction stays meaningful.
 
 ### Keep records readable without tooling
 
@@ -540,7 +561,7 @@ The example creates an optional directory only when its first real artifact is a
 
 **Replacement:** A consumer can raise or lower the bound in `scenarioWordLimit` within `litespec.project.json`.
 
-**Rationale:** A scenario that grows past a paragraph becomes the page a reader reads instead of the tables, and it acquires detail that nothing verifies.
+**Rationale:** A scenario that grows past a paragraph becomes the page a reader reads instead of the tables. It acquires detail that nothing verifies.
 
 ## Reference example
 
@@ -548,9 +569,9 @@ This informative example demonstrates `litespec/core/system#connect-one-product-
 
 The `journey/checkout` journey links `use-case/catalog.reserve-stock`, `use-case/orders.create-order`, `use-case/payments.start-payment`, and `use-case/shipping.dispatch-shipment`. Order cancellation and payment reconciliation are separate journeys.
 
-The orders module contains `Order` and `OrderClaim`. `use-case/orders.cancel-order` changes `Order` and cites `rule/order.cancel-only-before-shipment`. `use-case/orders.claim-guest-order` changes `OrderClaim`. Their shared module name does not merge their transaction boundaries.
+The orders module contains `Order` and `OrderClaim`. `use-case/orders.cancel-order` changes `Order`. It cites `rule/order.cancel-only-before-shipment`. `use-case/orders.claim-guest-order` changes `OrderClaim`. Their shared module name does not merge their transaction boundaries.
 
-`OrderConfirmed` records a completed fact. `Dispatch shipment` is its event reaction, declared durable. The page does not name the class that runs it.
+`OrderConfirmed` records a completed fact. `Dispatch shipment` is its event reaction, declared `durable`. The page does not name the class that runs it.
 
 ## Verification
 
@@ -565,12 +586,12 @@ The orders module contains `Order` and `OrderClaim`. `use-case/orders.cancel-ord
 | litespec/core/system#group-language-and-use-cases-by-module | checkable | `litespec consumer` resolves each module reference to one declared module directory. |
 | litespec/core/system#make-business-record-ownership-explicit | guidance | Which business record lacks its state, rules, or commands on the module page? |
 | litespec/core/system#deliver-one-complete-use-case | guidance | Which layer or evidence does the incomplete use case still lack? |
-| litespec/core/system#compute-use-case-status-from-evidence | guidance | Which use-case status did a hand write instead of the evidence? |
+| litespec/core/system#compute-use-case-status-from-evidence | guidance | Which use-case status did a person write by hand instead of the evidence? |
 | litespec/core/system#keep-use-cases-and-handlers-in-one-to-one-correspondence | guidance | Which handler lacks its use case, or which use case lacks its handler? |
 | litespec/core/system#name-what-calls-a-use-case | guidance | Which entry points reach the use case, or which background caller does? |
-| litespec/core/system#declare-event-reaction-delivery | guidance | Which reaction lacks exactly one classification the implementation honors? |
+| litespec/core/system#declare-event-reaction-delivery | guidance | Which reaction lacks exactly one classification that the implementation honors? |
 | litespec/core/system#state-each-rule-with-its-kind | guidance | Which rule lacks its kind, governor, enforcement, or kept negation? |
-| litespec/core/system#grant-access-through-roles-and-permissions | guidance | Which act lacks its actor, role, permission, and use-case path? |
+| litespec/core/system#grant-access-through-roles-and-permissions | guidance | Which access lacks its actor, role, permission, and use-case path? |
 | litespec/core/system#model-every-business-record-lifecycle-with-state-records | guidance | Which business state lacks its sealed state record in page and code? |
 | litespec/core/system#state-one-occasion-for-every-behavior-record | guidance | Which behavior page lacks a `Scenario` section stating its concrete occasion? |
 | litespec/core/system#keep-a-scenario-informative | guidance | Does any `Scenario` section contain a record identifier? |

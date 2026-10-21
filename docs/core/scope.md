@@ -12,9 +12,26 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 **Requirement:** A consumer MUST select a size, a shape, one stack per frontend, and one backend stack unless the shape is client-only.
 
-**Rationale:** One size and explicit stacks let every check know which records and pages to require. The size decides which record types and test projects the project needs; each stack decides which technology pages and checks apply. Small needs the core types with Architecture and Integration test projects, while large adds problems, features, journeys, and cases with the Acceptance project. Each frontend declares react, svelte, or blazor.
+**Rationale:** One size and explicit stacks tell every check which records and pages apply. The size decides which record types and test projects the project needs; each stack decides which technology pages and checks apply. Small needs the core types with Architecture and Integration test projects, while large adds problems, features, journeys, and cases with the Acceptance project. Each frontend declares react, svelte, or blazor.
 
 **Example:** A library catalog with one web frontend selects small with the svelte stack; a clinic booking system with journeys selects large.
+
+The running library example declares large with a server shape and two stacks in `litespec.project.json`:
+
+```json
+{
+  "size": "large",
+  "shape": "server",
+  "stacks": ["dotnet", "svelte"],
+  "optionalTypes": ["constraint", "research", "limit", "runbook"]
+}
+```
+
+The size switches on the large record rows, the shape names a backend stack, and each stack switches on its technology pages, which satisfies this provision.
+
+The three project choices and what each decides: size, shape, and stacks.
+
+![Three project choices and what each decides: size, small or large, decides the record types and the test projects, with large adding problems, features, journeys, and cases; shape, server or client-only, decides whether the project names a backend stack; stacks, one backend stack and one stack per frontend, decide the technology pages and the checks that apply.](../assets/diagrams/core-scope-selection.svg)
 
 ### Keep one bounded context
 
@@ -28,7 +45,7 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 **Requirement:** A consumer MUST select every extension whose activation criteria apply, and no extension whose criteria do not.
 
-**Rationale:** Conditional capabilities stay inactive until a documented product or engineering condition requires them. The manifest's extension list is the closed set a project selects from.
+**Rationale:** Conditional capabilities stay inactive until a documented product or engineering condition applies. The manifest's extension list is the closed set a project selects from.
 
 **Example:** Caching, durable messaging, and multitenancy are extensions; the extension index lists each with its activation criteria.
 
@@ -56,7 +73,7 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 **Requirement:** A consumer with no server of its own MUST declare the `client-only` shape and record a decision naming the surfaces left without coverage.
 
-**Rationale:** The shape decides which backend pages still apply. A client-only product keeps a domain model, so it applies the backend architecture, domain, application, and identifier pages, which the manifest lists under `shapes`. Persistence, the HTTP API, and API testing have no target. Adding a server to obtain conformance contradicts `litespec/core/principles#require-current-complexity-activation`.
+**Rationale:** The shape decides which backend pages still apply. A `client-only` product keeps a domain model, so it applies the backend architecture, domain, application, and identifier pages, which the manifest lists under `shapes`. Persistence, the HTTP API, and API testing have no target. Adding a server to obtain conformance contradicts `litespec/core/principles#require-current-complexity-activation`.
 
 **Example:** `litespec/quality/ci#run-applicable-gates-on-every-pull-request` already permits skipping a gate whose surface does not exist, so a missing backend gate is a recorded consequence rather than an unexplained absence.
 
@@ -64,7 +81,7 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 **Requirement:** A consumer MUST record a separate project decision for microservices, multiple contexts, native clients, other platforms, event sourcing, active-active regions, or large pipelines.
 
-**Rationale:** These architectures change the supported scope's assumptions and require their own boundaries.
+**Rationale:** These architectures change the supported scope's assumptions and need their own boundaries.
 
 ## Conventions
 
@@ -88,7 +105,7 @@ Projects outside this boundary can use individual ideas but do not claim conform
 
 This informative example demonstrates `litespec/core/scope#select-a-size-a-shape-and-stacks` and `litespec/core/scope#select-conditional-extensions-explicitly`.
 
-A publishing product can support sign-in, draft creation, publication, and public reading. Multi-tenant publication, live editing, and bulk analytics require their selected extension boundaries.
+A publishing product can support sign-in, draft creation, publication, and public reading. Multi-tenant publication, live editing, and bulk analytics fall within their selected extension boundaries.
 
 ## Verification
 

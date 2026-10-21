@@ -25,6 +25,7 @@ LiteSpec/
 │                            The validator parses each one as a virtual page, so a seed always passes.
 ├─ litespec.manifest.json    The release: version, stacks, shapes, extensions, toolchain and package pins, UI baselines
 ├─ apps/
+│  ├─ analyzers/             LiteSpec.Analyzers: Roslyn rules for .NET applications (section 9)
 │  ├─ cli/                   The `litespec` command line (section 5)
 │  └─ site/                  litespec.dev: a static Astro site built from the standard (section 8)
 ├─ assets/litespec-icon.svg  The product mark
@@ -119,7 +120,6 @@ Given a size, a shape (default `server`), its stacks and its selected extensions
 
 ```text
 apps/cli/
-├─ LiteSpec.Cli.slnx
 ├─ src/LiteSpec.Cli/          The `litespec` tool (packable as a .NET tool)
 │  ├─ Program.cs, CliArgs.cs, CliJson.cs, LiteSpecHome.cs
 │  │                          Command dispatch, option parsing, JSON with \n line ends, and finding the checkout
@@ -170,3 +170,18 @@ apps/site/
 ```
 
 `pnpm exec astro build` in `apps/site/` writes `dist/`. The CI job `site` runs the wireframe tests and the build.
+
+## 9. The analyzers: apps/analyzers/
+
+```text
+apps/analyzers/
+├─ src/LiteSpec.Analyzers/      The NuGet package: netstandard2.0, Roslyn 4.14
+│  ├─ Layers/                   Layer and LayerResolver: the LiteSpecLayer property, else the assembly name suffix
+│  ├─ Rules/                    Descriptors (every diagnostic and its provision), LayerAnalyzer (the shared base),
+│  │                            and one analyzer per rule under Domain/, Layers/ and Style/
+│  ├─ build/                    The props that make LiteSpecLayer visible to the analyzers
+│  └─ AnalyzerReleases.*.md     Roslyn release tracking for the rule IDs
+└─ tests/LiteSpec.Analyzers.Tests/  One test class per analyzer; Support/Verify compiles marked sources
+```
+
+`dotnet test --solution LiteSpec.slnx` runs the analyzer tests with the CLI tests, and the CI job packs the analyzer.

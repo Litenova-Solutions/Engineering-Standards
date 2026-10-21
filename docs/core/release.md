@@ -154,7 +154,7 @@ A release joins deployed product behavior with evidence that a maintainer can op
 
 **Requirement:** A consumer before its first production release MUST keep a readiness record with dated rehearsals, green gates, and a rehearsal owner.
 
-**Rationale:** A release record binds evidence to one artifact, so it has nothing to say before the first artifact exists. The readiness record states instead what proves the product may take data. The rehearsal owner owns the backup and restore rehearsal.
+**Rationale:** A release record binds evidence to one artifact, so it has nothing to say before the first artifact exists. The readiness record instead states what proves the product may take data. The rehearsal owner owns the backup and restore rehearsal.
 
 ### State each release as a complete record
 

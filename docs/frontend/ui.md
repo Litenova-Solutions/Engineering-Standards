@@ -30,7 +30,7 @@ The domain fills the slots, so a floorplan never invents a state, an action, or 
 | Actions | The use cases the current state permits |
 | Refusals | The refusal results of the use case the route calls |
 
-A floorplan exposes its name on its frame. A reviewer and the route suite read that name to learn which floorplan a route composed.
+A floorplan exposes its name on its frame. A reviewer and the route suite read that name to learn which floorplan a route composes.
 
 ### The tone set
 
@@ -38,10 +38,10 @@ A tone names what a state means. The set is closed: a page picks one of them rat
 
 | Tone | The state it means |
 |:---|:---|
-| `neutral` | Nothing is wrong and nothing is being asked for |
+| `neutral` | Nothing is wrong and nothing is asked for |
 | `positive` | The thing asked for happened |
 | `caution` | A person has to decide |
-| `destructive` | The thing asked for was refused |
+| `destructive` | The thing asked for is refused |
 | `info` | The page is explaining rather than reporting |
 
 The mapping from a state code to a tone lives in one table in each application. A reader then sees the same color for the same state on every screen.
@@ -52,8 +52,8 @@ A command's surface follows the size of its input. A larger surface than the com
 
 | The command takes | Use |
 |:---|:---|
-| Nothing, and can be taken back | A button |
-| Nothing, and cannot be taken back | A confirmation dialog |
+| Nothing and can be taken back | A button |
+| Nothing and cannot be taken back | A confirmation dialog |
 | One to four inputs | A form dialog |
 | More than four inputs | A form page |
 
@@ -72,11 +72,11 @@ The route suite is one specification per frontend that visits every route. It as
 | Keyboard | Every interactive element is reachable and shows a visible focus indicator |
 | Announcements | Asynchronous status changes announce through the platform live region |
 
-The suite discovers its routes from the application route definition rather than from a list. A new route is therefore checked without a specification written for it. A dynamic segment resolves to a record the deployment holds, and falls back to an absent record when it holds none.
+The suite discovers its routes from the application route definition rather than from a list. A new route is therefore checked with no new specification. A dynamic segment resolves to a record the deployment holds, and falls back to an absent record when it holds none.
 
 ### Result proof
 
-A route calls use cases, and each use case declares its results. Proof is computed: a test proves a case when its steps call the use case and assert the result. Every result a route calls is proved by a passing test or named by a known-gap record with an owner and an end date. The calls come from the route code, so the obligation follows the code rather than a declaration.
+A route calls use cases, and each use case declares its results. Proof is computed: a test proves a case when its steps call the use case and assert the result. A passing test proves every result a route calls, or a known-gap record with an owner and an end date names it. The calls come from the route code, so the obligation follows the code rather than a declaration.
 
 ## Standards
 
@@ -86,13 +86,13 @@ A route calls use cases, and each use case declares its results. Proof is comput
 
 **Rationale:** A second general-purpose visual system in one workspace makes every component choice ambiguous. A frontend outside the contract declares another platform and says what replaces the contract.
 
-The density is chosen per frontend rather than per workspace, because density is a property of the audience. `public-light` suits a surface a visitor meets once. `application-balanced` suits a surface a signed-in user works in. `admin-dense` suits a surface an operator reads all day.
+A project chooses the density per frontend rather than per workspace, because density is a property of the audience. `public-light` suits a surface a visitor meets once. `application-balanced` suits a surface a signed-in user works in. `admin-dense` suits a surface an operator reads all day.
 
 ### Pin the baseline in the shared package
 
 **Requirement:** A workspace MUST install the pinned baseline from `litespec.manifest.json` once, into its shared UI package.
 
-**Rationale:** Installing per application is what made a fourth copy, where a fourth drift was invisible. An additional baseline source is permitted under an exception recorded against this provision.
+**Rationale:** Installing per application makes a fourth copy, where a fourth drift is invisible. An additional baseline source is permitted under an exception recorded against this provision.
 
 ### Publish a design contract
 
@@ -117,7 +117,7 @@ The density is chosen per frontend rather than per workspace, because density is
 
 **Requirement:** The `Patterns` section of the design contract MUST list every floorplan the package provides, each with a when-to-use rule.
 
-**Rationale:** A floorplan with no rule for choosing it is chosen by resemblance, and two authors then pick different floorplans for one kind of page. A floorplan outside the list is a design decision rather than a route-level choice.
+**Rationale:** A floorplan with no rule for choosing it leaves the choice to resemblance, and two authors then pick different floorplans for one kind of page. A floorplan outside the list is a design decision rather than a route-level choice.
 
 **Example:** The section states each floorplan and the question that selects it.
 
@@ -203,7 +203,7 @@ The density is chosen per frontend rather than per workspace, because density is
 
 **Requirement:** Every result a called use case returns MUST be proved by a passing test or a known-gap record with owner and end date.
 
-**Rationale:** A refusal a reader can reach and no test provokes is a refusal nobody has seen render. The calls come from the route code, so the obligation follows the code rather than a declaration.
+**Rationale:** A refusal a reader can reach and no test provokes is a refusal nobody sees render. The calls come from the route code, so the obligation follows the code rather than a declaration.
 
 **Example:** A test calls the use case and asserts one refusal result.
 

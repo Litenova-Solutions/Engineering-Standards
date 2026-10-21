@@ -2,7 +2,7 @@
 
 ## Intent
 
-Domain holds the business model and protects aggregate invariants. It references no persistence, HTTP, messaging, logging, configuration, injection, serialization, or provider concept. Its names match the Terms its records use.
+Domain holds the business model and protects aggregate invariants. It references no persistence, HTTP, messaging, logging, configuration, injection, serialization, or provider concept. Its names match the Terms that its records use.
 
 Every aggregate exposes its lifecycle as state types from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home. It avoids later replacement of an enumeration, status string, or flag-based lifecycle.
 
@@ -40,6 +40,10 @@ Every aggregate exposes its lifecycle as state types from its first implementati
 
 **Example:** A post defines one abstract post state with draft and published cases, where the published case carries its publication time. Even an aggregate with one current state defines its hierarchy.
 
+In the library circulation product, `business-record/lending.loan` declares the `Active`, `Overdue`, and `Returned` states. For example, in the .NET stack the loan exposes one abstract loan state with one sealed record per declared state, where the active case carries the due date and the returned case carries the returned time. The diagram shows Borrow from `use-case/lending.borrow-copy` creating Active, Extend from `use-case/lending.extend-loan` keeping Active with a new due date, Return from `use-case/lending.return-copy` moving Active or Overdue to Returned, and the declared Overdue state reached when the due date passes, for which the example names no use case.
+
+![Borrow from borrow-copy creates an Active loan carrying the due date, Extend from extend-loan keeps it Active with a new due date, and Return from return-copy moves an Active or Overdue loan to Returned carrying the returned time; Active and Overdue carry the due date. A dashed arrow from Active to Overdue labeled due date passes shows the declared Overdue state, for which the example names no use case.](../assets/diagrams/backend-aggregate-lifecycle.svg)
+
 ### Model every closed set of domain values as a closed type hierarchy
 
 **Requirement:** Domain code MUST model a closed set as one type hierarchy whose cases the type system can enumerate.
@@ -59,7 +63,7 @@ This rule binds Domain code. The same set appears at three other layers, and eac
 
 A transport `enum` is permitted in one situation: every case of the set carries no data, and the labels are the complete contract. A set where any case carries data crosses the boundary as a polymorphic model instead.
 
-A transport enum never re-enters Domain. The Application layer converts the label to its type case before it calls a Domain method.
+A transport `enum` never re-enters Domain. The Application layer converts the label to its type case before it calls a Domain method.
 
 Round-trip tests cover every data-less case, which catches a renamed code and a missing label.
 
@@ -69,7 +73,7 @@ Round-trip tests cover every data-less case, which catches a renamed code and a 
 
 **Rationale:** The factory accepts typed identifiers, rejects empty identity and violated creation rules, selects the initial state, records required events, and returns a complete aggregate.
 
-A root created with its children composes them inside the same factory call. The children are built from typed values the caller supplies. A caller never hands in an already constructed child, because a caller holding that reference can mutate it after the invariant was checked.
+A root created with its children composes them inside the same factory call. The children are built from typed values the caller supplies. A caller never passes an already constructed child into the factory, because a caller holding that reference can mutate it after the invariant was checked.
 
 **Example:** In the dotnet stack, the factory reads as follows:
 
@@ -95,6 +99,23 @@ public sealed class Order : AggregateRoot<OrderId>
 **Rationale:** A handler then calls `post.Publish(utcNow)` without testing the state first. A generic `Set`, `Update`, `Process`, or `Handle` name hides which business action ran. A mutation that changes no lifecycle state, such as `ChangeTitle` on a draft, checks state and assigns without recording a transition.
 
 Checks run before replacement, and replacement runs before recording. A method that replaces state before checking an invariant leaves a rejected aggregate holding the new state.
+
+**Example:** In the library circulation product, `use-case/lending.return-copy` ends with `result/return-copy.returned` when the loan is active, and with `result/return-copy.loan-inactive` when it is not. For example, in the .NET stack the handler calls one business method, and the method checks the state, replaces it, and records `event/loan.loan-returned`:
+
+```csharp
+public void Return(DateTimeOffset returnedAt)
+{
+    if (State is not LoanActiveState)
+    {
+        throw new LoanNotActiveException();
+    }
+
+    State = new LoanReturnedState(returnedAt);
+    RaiseDomainEvent(new LoanReturnedEvent(Id, returnedAt));
+}
+```
+
+Checks run before replacement, and replacement runs before recording. An inactive loan keeps its state, and the refusal carries the stable code `failure/lending.loan_not_active`.
 
 ### Keep child entities inside the aggregate boundary
 
@@ -210,7 +231,7 @@ The amount serializes as a string, so no reader parses it as binary floating poi
 
 **Rationale:** Binary floating point cannot represent most decimal fractions, so two amounts that a person reads as equal compare as different.
 
-**Example:** A tax rate multiplied into a `Money` amount uses an exact decimal type. A measured latency in a diagnostic record is not a domain quantity and is outside this rule.
+**Example:** A tax rate multiplied into a `Money` amount uses an exact decimal type. A measured latency in a diagnostic record is not a Domain quantity and is outside this rule.
 
 ### Use stateless domain services for ownerless rules
 
@@ -244,7 +265,7 @@ Application supplies the lines and passes the returned `Money` to `Order.Confirm
 
 **Rationale:** A required load uses a get-by-identity operation and fails with `{Aggregate}NotFound`, so a handler repeats no null check. A nullable find operation is reserved for lookups where absence is normal.
 
-This interface is the write side only. Reading for a Query uses a Read Model owned by Application and shaped by Infrastructure, and that path declares no Domain interface. A repository that gained a projection method would put query shapes in Domain, which is the coupling this layer exists to prevent.
+This interface is the write side only. Reading for a query uses a read model owned by Application and shaped by Infrastructure, and that path declares no Domain interface. A repository that gained a projection method would put query shapes in Domain, which is the coupling this layer exists to prevent.
 
 **Example:** A post repository exposes a get-by-identity load that returns a post and fails with its not-found error, plus a store operation that stages the aggregate.
 
@@ -426,7 +447,7 @@ For multiple identifiers, the API uses one converter factory restricted to stron
 | litespec/backend/domain#identify-aggregates-with-strongly-typed-version-7-values | guidance | Is each identity a dedicated type over a version 7 UUID with no conversion, alias, or parameterless creation? |
 | litespec/backend/domain#use-immutable-value-objects-for-domain-concepts | guidance | Is each value object immutable, compared by complete value, and created through a static method? |
 | litespec/backend/domain#define-collection-value-semantics-explicitly | guidance | Does each collection value implement content equality and a matching hash under its ordering rule? |
-| litespec/backend/domain#model-money-with-exact-decimal-values | guidance | Is each monetary amount an exact decimal in the shared Money object with the stated JSON shape? |
+| litespec/backend/domain#model-money-with-exact-decimal-values | guidance | Is each monetary amount an exact decimal in the shared `Money` object with the stated JSON shape? |
 | litespec/backend/domain#keep-binary-floating-point-out-of-exact-quantities | guidance | Does no Domain member use double or float for money, a rate applied to money, or an exactly compared quantity? |
 | litespec/backend/domain#use-stateless-domain-services-for-ownerless-rules | guidance | Is each domain service stateless, confined to Domain values, and free of the banned calls? |
 | litespec/backend/domain#expose-repositories-for-one-aggregate-only | guidance | Does each repository serve one aggregate with Domain-only types and no queryable, session, or generic surface? |

@@ -2,7 +2,7 @@
 
 ## Intent
 
-The backend is a five-part modular monolith. Part boundaries separate business rules, the contracts every layer names, use-case coordination, technical adapters, and HTTP hosting without splitting each concern into a deployable unit.
+The backend is a five-part modular monolith. Part boundaries separate business rules, the contracts every layer names, use-case coordination, technical adapters, and HTTP hosting. They do not split each concern into a deployable unit.
 
 CQRS separates write and read behavior inside one Application part. Modules and use cases provide the internal navigation boundary.
 
@@ -12,7 +12,7 @@ CQRS separates write and read behavior inside one Application part. Modules and 
 
 **Requirement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline parts.
 
-**Rationale:** `Application.Abstractions` holds the contracts more than one module names: pipeline positions, cross-module ports, transport-neutral failures, and published integration events. It depends on Domain and nothing else. No type in it can name a use case, a handler, or a module.
+**Rationale:** `Application.Abstractions` holds the contracts that more than one module names: pipeline positions, cross-module ports, transport-neutral failures, and published integration events. It depends on Domain and nothing else. No type in it can name a use case, a handler, or a module.
 
 That refusal is the reason it is a part rather than a folder. A folder inside Application cannot decline what a developer puts in it, and the folder that tries becomes the place every unplaced type goes.
 
@@ -36,17 +36,21 @@ WebApi/
 
 **Rationale:** Application coordinates Domain, and Infrastructure implements the boundaries both declare. The reference matrix in [Dependencies](../workspace/dependencies.md) applies exactly.
 
+**Example:** Every reference points from an outer project to an inner one, and Domain references none of the others.
+
+![The five application projects and their references: WebApi references Infrastructure, Application, and Application.Abstractions; Infrastructure references Application, Application.Abstractions, and Domain; Application references Application.Abstractions and Domain; Application.Abstractions references Domain; Domain references nothing.](../assets/diagrams/backend-dependencies.svg)
+
 ### Own each layer's contract types
 
-**Requirement:** A layer MUST define its own outward contracts rather than reuse an inner layer's type, except for Shared-kernel values and aggregate typed IDs.
+**Requirement:** A layer MUST define its own outward contracts rather than reuse an inner layer's type, except for shared-kernel values and aggregate typed identifiers.
 
-**Rationale:** A change to an inner shape then stops rippling through every outer layer. Shared-kernel values cross because the kernel is shared, and aggregate typed IDs cross because messages name their targets.
+**Rationale:** A change to an inner shape then stops rippling through every outer layer. Shared-kernel values cross because the kernel is shared, and aggregate typed identifiers cross because messages name their targets.
 
 ### Keep one Application part
 
 **Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application part, and cross-module contracts in Application.Abstractions.
 
-**Rationale:** Separate Write, Read, Contracts, and event-handler parts are outside this backend. The separation this backend keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the parts holding them. Splitting parts buys a deployment boundary the backend does not use, and costs a dependency that every use case has to cross.
+**Rationale:** Separate Write, Read, Contracts, and Event-handler parts are outside this backend. The separation this backend keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the parts holding them. Splitting parts buys a deployment boundary the backend does not use, and costs a dependency that every use case has to cross.
 
 ### Organize every layer by module and use case
 

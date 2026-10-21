@@ -12,7 +12,7 @@ Applicable specification kinds: `use-case`, `journey`.
 
 The consumer enables `outbox` when a committed change requires durable delivery after process failure. Delivery can carry an integration event, a journey-step command, or a provider side effect.
 
-A use case that stages a durable message selects this extension. The extension activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`, so the project declares the execution host that runs the dispatcher.
+A use case that stages a durable message selects this extension. The extension activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`. The project declares the execution host that runs the dispatcher.
 
 ## Baseline relationship
 
@@ -32,13 +32,13 @@ This extension switches on the Event, Limit, and Runbook record types.
 
 **Requirement:** A project MUST NOT activate outbox for a reaction whose delivery guarantee is best-effort and which operators can repeat manually.
 
-**Rationale:** Outbox storage and dispatcher operation are unnecessary when loss is an accepted recoverable outcome. The delivery guarantee comes from the reaction's own declaration, and the module specification records it with the vocabulary its event table already uses.
+**Rationale:** Outbox storage and dispatcher operation are unnecessary when loss is an accepted recoverable outcome. The delivery guarantee comes from the reaction's own declaration. The module specification records it with the vocabulary its event table already uses.
 
 ### Publish best-effort reactions after commit
 
 **Requirement:** A reaction the outbox excludes MUST publish after its commit succeeds without staging an outbox record.
 
-**Rationale:** Best-effort delivery has no durable record, so the commit success is its only guarantee.
+**Rationale:** Best-effort delivery has no durable record. The commit success is its only guarantee.
 
 ### Stage messages with business work
 
@@ -56,7 +56,7 @@ This extension switches on the Event, Limit, and Runbook record types.
 
 **Requirement:** An outbox record MUST contain message identity, kind, stable type, schema version, time, payload, tenant, state, attempt, and next-attempt data.
 
-**Rationale:** The implementation dispatches and recovery need one complete durable description of the message.
+**Rationale:** Dispatch and recovery need one complete durable description of the message.
 
 ### Store failure and completion evidence
 
@@ -68,7 +68,7 @@ This extension switches on the Event, Limit, and Runbook record types.
 
 **Requirement:** An outbox record MUST name its message kind as integration event, journey-step command, or provider side effect, with an integration event citing its Event record.
 
-**Rationale:** The kind decides dispatch ownership and transport, and the Event record carries the raises and reacts-to links.
+**Rationale:** The kind decides dispatch ownership and transport. The Event record carries the raises and reacts-to links.
 
 ### Reject independent outbox commits
 
@@ -148,7 +148,7 @@ This extension switches on the Event, Limit, and Runbook record types.
 
 **Rationale:** Store availability and a claimed record's target result require different recovery paths.
 
-Each one has its own signal. The store's availability is a gauge the readiness endpoint reads. A claimed message's outcome is a counter carrying the result, following [the OpenTelemetry metrics specification](https://opentelemetry.io/docs/specs/otel/metrics/). A single error counter cannot tell an operator whether to restore a database or investigate one destination.
+Each has its own signal. The store's availability is a gauge the readiness endpoint reads. A claimed message's outcome is a counter carrying the result, following [the OpenTelemetry metrics specification](https://opentelemetry.io/docs/specs/otel/metrics/). A single error counter cannot tell an operator whether to restore a database or investigate one destination.
 
 ### Back off unavailable-store polling
 
@@ -180,7 +180,7 @@ Each one has its own signal. The store's availability is a gauge the readiness e
 
 **Rationale:** Active deployment versions can place different valid message shapes in one store.
 
-A message record therefore carries its own shape version, and the dispatcher selects a reader from that value. Adding an optional member with a defined absent-value behavior needs no new version. Removing a member, renaming one, narrowing a type, or changing a discriminator does, and the older reader stays until no record carries the older version.
+A message record therefore carries its own shape version. The dispatcher selects a reader from that value. Adding an optional member with a defined absent-value behavior needs no new version. Removing a member, renaming one, narrowing a type, or changing a discriminator needs a new version. The older reader stays until no record carries the older version.
 
 ### Publish backlog indicators
 
@@ -198,7 +198,7 @@ A message record therefore carries its own shape version, and the dispatcher sel
 
 **Requirement:** An outbox record MUST model its lifecycle as an abstract state base with one sealed record for each of pending, processing, dispatched, and dead-letter.
 
-**Rationale:** `pending` becomes `processing`; processing becomes dispatched, pending, or dead-letter; audited replay moves dead-letter to pending. Three of the four carry data the others do not. `processing` holds a lease expiry. `dispatched` holds a dispatch time. `dead-letter` holds a failure reason and an attempt count. A four-value label forces those onto nullable columns that are meaningful in one state each, which is the shape `litespec/backend/domain#model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy` removes everywhere else.
+**Rationale:** `pending` becomes `processing`. `processing` becomes `dispatched`, `pending`, or `dead-letter`. Audited replay moves `dead-letter` to `pending`. Three of the four carry data the others do not. `processing` holds a lease expiry. `dispatched` holds a dispatch time. `dead-letter` holds a failure reason and an attempt count. A four-value label forces those onto nullable columns that are meaningful in one state each, which is the shape `litespec/backend/domain#model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy` removes everywhere else.
 
 **Example:** `OutboxState.Processing` carries one unexpired lease before a dispatcher records `OutboxState.Dispatched` or a retry state.
 
@@ -276,7 +276,7 @@ A message record therefore carries its own shape version, and the dispatcher sel
 
 ## Dependencies
 
-No additional baseline package is required. Provider-specific dispatch dependencies follow the external integrations extension.
+This extension requires no additional baseline package. Provider-specific dispatch dependencies follow the external integrations extension.
 
 ## Verification
 
@@ -295,25 +295,25 @@ No additional baseline package is required. Provider-specific dispatch dependenc
 | litespec/ext/outbox#exclude-request-transaction-dispatch | guidance | Are request paths free of durable message dispatch? |
 | litespec/ext/outbox#define-claim-ownership | guidance | Does each claim use the jobs lease definition in a short transaction? |
 | litespec/ext/outbox#release-claim-transactions-before-calls | guidance | Are claim transactions released before network calls? |
-| litespec/ext/outbox#restrict-completion-to-current-lease-owners | guidance | Are record updates limited to the current lease owner? |
+| litespec/ext/outbox#restrict-completion-to-current-lease-owners | guidance | Does only the current lease owner update records? |
 | litespec/ext/outbox#requeue-expired-claims | guidance | Do expired claims return to eligible work? |
 | litespec/ext/outbox#accept-repeated-delivery | guidance | Does each consumer handle the same message twice? |
 | litespec/ext/outbox#identify-repeated-delivery | guidance | Does each consumer suppress repeats by message ID or business key? |
-| litespec/ext/outbox#await-target-acceptance | guidance | Is completion withheld until the target accepts? |
+| litespec/ext/outbox#await-target-acceptance | guidance | Does the Worker withhold completion until the target accepts? |
 | litespec/ext/outbox#bound-delivery-retries | guidance | Are retries bounded with exponential backoff and jitter? |
 | litespec/ext/outbox#classify-permanent-delivery-failure | guidance | Do permanent failures dead-letter with safe replay evidence? |
 | litespec/ext/outbox#distinguish-dependency-outage | guidance | Is store outage distinct from claimed-message failure? |
 | litespec/ext/outbox#back-off-unavailable-store-polling | guidance | Does polling back off with rate-limited logging during outages? |
-| litespec/ext/outbox#restrict-message-retry-to-claimed-records | guidance | Are retries limited to claimed records? |
+| litespec/ext/outbox#restrict-message-retry-to-claimed-records | guidance | Does the Worker limit retries to claimed records? |
 | litespec/ext/outbox#gate-dispatch-on-readiness | guidance | Does readiness gate dispatch and stop dead-store polling? |
 | litespec/ext/outbox#version-message-types | guidance | Does each message carry a stable type name and schema version? |
 | litespec/ext/outbox#support-coexisting-message-producers | guidance | Does the dispatcher read every coexisting producer shape? |
-| litespec/ext/outbox#publish-backlog-indicators | guidance | Are pending, failed, age, attempts, duration, and rate published? |
+| litespec/ext/outbox#publish-backlog-indicators | guidance | Does the deployment publish pending, failed, age, attempts, duration, and rate? |
 | litespec/ext/outbox#set-delivery-alerts | guidance | Are alert thresholds Limit records derived from the delivery target? |
 | litespec/ext/outbox#model-outbox-lifecycle-states | guidance | Are lifecycle states sealed records with documented transitions? |
 | litespec/ext/outbox#preserve-message-identity-during-retry | guidance | Is message ID stable across retry and replay? |
 | litespec/ext/outbox#audit-outbox-replay | guidance | Does each replay record actor, reason, time, and prior failure? |
-| litespec/ext/outbox#protect-active-worker-compatibility | guidance | Are new message shapes readable by every active Worker? |
+| litespec/ext/outbox#protect-active-worker-compatibility | guidance | Can every active Worker read new message shapes? |
 | litespec/ext/outbox#deploy-readers-before-writers | guidance | Do releases deploy compatible readers before additive writers? |
 | litespec/ext/outbox#plan-undispatched-rollback-records | guidance | Does the rollback Runbook cover undispatched new-writer records? |
 | litespec/ext/outbox#group-outbox-infrastructure | guidance | Is outbox infrastructure grouped or is an Exception recorded? |

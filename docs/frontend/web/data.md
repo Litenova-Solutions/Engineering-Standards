@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page holds how the TypeScript web frontends realize the Frontend data rules ([Frontend data](../data.md)). It states the generated client, the query cache behavior, and the tooling the React and Svelte stacks share. A provision here cites the neutral rule it realizes.
+This page states how the TypeScript web frontends realize the Frontend data rules ([Frontend data](../data.md)). It states the generated client, the query cache behavior, and the tooling the React and Svelte stacks share. A provision here cites the neutral rule it realizes.
 
 ## Concepts
 
@@ -20,11 +20,13 @@ type Problem = {
 };
 ```
 
-The code is the discriminator. The client invents codes for what the API cannot answer. `failure/client.unreachable` names a request that received no response, and `failure/client.unauthenticated` names a refused authentication. `failure/client.http_<status>` names a response status the client maps to no problem, with the status in place of `<status>`. A code this build has never heard of is still handled. The page branches on the code's presence rather than on a list of known codes.
+The code is the discriminator. The client invents codes for what the API cannot answer. `failure/client.unreachable` names a request that received no response. `failure/client.unauthenticated` names a refused authentication. `failure/client.http_<status>` names a response status the client maps to no problem, with the status in place of `<status>`. A code this build has never heard of is still handled. The page branches on the code's presence rather than on a list of known codes.
 
 The problem carries the `traceId` the API returns for the request. Every error the user sees shows that `traceId` in a copyable form in its detail, never as the headline. When the problem carries none, the client reads the `X-Trace-Id` response header instead.
 
 ## React
+
+The React stack uses these values:
 
 - The frame root is `src/app`.
 - The client generator adds the `@tanstack/react-query` plugin.
@@ -33,6 +35,8 @@ The problem carries the `traceId` the API returns for the request. Every error t
 - The shared package's form entry point is its form hook.
 
 ## Svelte
+
+The Svelte stack uses these values:
 
 - The frame root is `src/lib/app`.
 - The client generator adds the `@tanstack/svelte-query` plugin.
@@ -62,13 +66,13 @@ Each stack adds the TanStack Query plugin its section names.
 
 **Requirement:** A frontend MUST convert every failure into one problem type, deciding from its code and showing the `traceId` in copyable form in each error's detail.
 
-**Rationale:** Displaying a raw response body leaks whatever the API included and gives the reader no consistent recovery path. A code is a published identifier, so a page's decision survives a reworded message. The `traceId` lets support find the request the reader saw fail. The `traceId` never serves as the headline. This realizes litespec/frontend/data#map-every-failure-to-one-problem-type.
+**Rationale:** Displaying a raw response body leaks whatever the API included. The reader gets no consistent recovery path. A code is a published identifier, so a page's decision survives a reworded message. The `traceId` lets support find the request the reader saw fail. The `traceId` never serves as the headline. This realizes litespec/frontend/data#map-every-failure-to-one-problem-type.
 
 ### Place a refusal beside what was refused
 
 **Requirement:** A refusal MUST render beside the record or control that was refused, in the sentence the application holds for that code.
 
-**Rationale:** A refusal at the top of a page says that something failed and nothing about what. The application's own sentence says what was asked, and the code in the markup lets a test provoke it by name. This realizes litespec/frontend/data#place-a-refusal-beside-what-was-refused.
+**Rationale:** A refusal at the top of a page says that something failed. It says nothing about what failed. The application's own sentence says what was asked. The code in the markup lets a test provoke it by name. This realizes litespec/frontend/data#place-a-refusal-beside-what-was-refused.
 
 **Example:** The refusal alert carries the code so a browser test can address it.
 
@@ -96,7 +100,7 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 **Requirement:** A successful command MUST invalidate every query whose answer it changed, and no other query.
 
-**Rationale:** The query cache owns freshness, so a command that changes a record and leaves its cache entry shows the old record until something else refetches. An unrelated invalidation costs a request per affected page. This realizes litespec/frontend/data#update-the-cache-a-command-changed.
+**Rationale:** The query cache owns freshness. A command that changes a record and leaves its cache entry shows the old record until something else refetches. An unrelated invalidation costs a request per affected page. This realizes litespec/frontend/data#update-the-cache-a-command-changed.
 
 **Example:** A mutation invalidates the TanStack Query entries its command changed, and no others.
 
@@ -104,13 +108,13 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 **Requirement:** A value MUST live with the narrowest owner that can hold it: server data, then the address, then form state, then the component's own state.
 
-**Rationale:** A store placed above that order makes unrelated components re-render and hides where a value changes. The component's own state is local component state in React and a rune in Svelte. This realizes litespec/frontend/data#assign-state-to-the-narrowest-owner.
+**Rationale:** A store placed above that order makes unrelated components re-render. It also hides where a value changes. The component's own state is local component state in React and a rune in Svelte. This realizes litespec/frontend/data#assign-state-to-the-narrowest-owner.
 
 ### Localize copy through locale dictionaries
 
 **Requirement:** Copy MUST resolve through locale dictionaries with fill and plural support, one chunk per language, and typed keys with a declared fallback.
 
-**Rationale:** A second copy of one sentence in two components drifts at the first rewording. A dictionary per language keeps one sentence in one place, and a key the catalog lacks fails where the fallback says it fails. This realizes litespec/frontend/data#localize-copy-through-locale-dictionaries.
+**Rationale:** A second copy of one sentence in two components drifts at the first rewording. A dictionary per language keeps one sentence in one place. A key the catalog lacks fails where the fallback says it fails. This realizes litespec/frontend/data#localize-copy-through-locale-dictionaries.
 
 **Example:** Each stack names its dictionary library in its section above. A workspace may carry its own dictionary machinery when it meets the same contract.
 
@@ -122,7 +126,7 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 **Replacement:** A project departs from this default through an Exception record.
 
-**Rationale:** One place configures the client, so a change to the base address or to the headers is one edit rather than one per application. The frame root is `src/app` in React and `src/lib/app` in Svelte. This realizes litespec/frontend/data#keep-the-client-boundary-in-the-frame.
+**Rationale:** One place configures the client. A change to the base address or to the headers is one edit rather than one per application. The frame root is `src/app` in React and `src/lib/app` in Svelte. This realizes litespec/frontend/data#keep-the-client-boundary-in-the-frame.
 
 ### Regenerate the client rather than editing it
 
@@ -130,7 +134,7 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 **Replacement:** A project departs from this default through an Exception record.
 
-**Rationale:** A hand edit is overwritten by the next generation, so the change appears to work until it disappears. The named command is what a reviewer runs to prove the committed output matches the document. This realizes litespec/frontend/data#regenerate-the-client-rather-than-editing-it.
+**Rationale:** A hand edit is overwritten by the next generation. The change appears to work until it disappears. The named command is what a reviewer runs to prove the committed output matches the document. This realizes litespec/frontend/data#regenerate-the-client-rather-than-editing-it.
 
 ### Build a form on the shared form library
 

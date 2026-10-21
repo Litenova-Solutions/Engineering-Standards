@@ -100,9 +100,9 @@ This informative example demonstrates `litespec/workspace/config#validate-backen
 | litespec/workspace/config#validate-frontend-environment-access | guidance | Does each frontend read environment values only through its validated module with server values separated? |
 | litespec/workspace/config#keep-secrets-outside-source-control | guidance | Does each tracked configuration file carry only safe defaults and placeholders? |
 | litespec/workspace/config#use-one-frontend-dependency-graph | guidance | Does the workspace use one root manifest and lockfile with no nested lockfile tracked? |
-| litespec/workspace/config#pin-the-javascript-toolchain | guidance | Does root package.json declare the manifest pnpm release and a matching Node engine? |
-| litespec/workspace/config#pin-the-react-version-in-the-eslint-flat-config | guidance | Does each React flat config set a concrete settings.react.version? |
+| litespec/workspace/config#pin-the-javascript-toolchain | guidance | Does root `package.json` declare the manifest pnpm release and a matching Node engine? |
+| litespec/workspace/config#pin-the-react-version-in-the-eslint-flat-config | guidance | Does each React flat config set a concrete `settings.react.version`? |
 | litespec/workspace/config#keep-environment-examples-beside-applications | guidance | Does each frontend and host directory hold an environment example with safe values? |
 | litespec/workspace/config#keep-local-overrides-untracked | guidance | Are local overrides ignored with no second tracked environment-specific source? |
 | litespec/workspace/config#keep-logging-configuration-provider-neutral | guidance | Does application source use only logging abstractions with exporters in hosts? |
-| litespec/workspace/config#keep-documentation-directories-out-of-build-artifact-ignore-rules | guidance | Does git check-ignore report no match for each documentation directory? |
+| litespec/workspace/config#keep-documentation-directories-out-of-build-artifact-ignore-rules | guidance | Does `git check-ignore` report no match for each documentation directory? |

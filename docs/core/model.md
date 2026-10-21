@@ -2,13 +2,13 @@
 
 ## Intent
 
-Every project describes itself as records of fixed types joined by fixed links. People and agents write the intent records. The builder reads the code, screens, tests, and test runs, and computes the links between the two.
+Every project describes itself with records of fixed types joined by fixed links. People and agents write the intent records. The builder reads the code, screens, tests, and test runs, and computes the links between the two.
 
 ## Concepts
 
 ### Record types
 
-Each type answers one question. Small projects keep the rows marked small. Large projects also keep the rows marked large. Optional rows switch on per project.
+Each type answers one question. Small projects keep the rows marked small. Large projects also keep the rows marked large. Optional rows switch on for each project.
 
 | Type | Kept | Question |
 |:---|:---|:---|
@@ -38,9 +38,13 @@ Each type answers one question. Small projects keep the rows marked small. Large
 | `known-gap` | small | What is missing, owned, until when? |
 | `term` | small | Which word means what? |
 
+The record types group by the question each answers, from intent through operation to project records.
+
+![Record types grouped by the question each answers: why holds product, constraint, research, decision, requirement, and problem; what is offered holds feature; who acts holds actor, role, and permission; how they arrive holds journey and entry-point; how the business works holds module, business-record, rule, use-case, result, case, and event; operation holds limit and runbook; how the project builds and speaks holds standard, exception, known-gap, and term.](../assets/diagrams/core-model-records.svg)
+
 ### Pages and entries
 
-A page record is a Markdown file whose opening block names a record type. An entry record is an object in the records array of that block. Terms are the exception: they live in the language record, one entry per term. Each type has one home.
+A page record is a Markdown file whose opening block names a record type. An entry record is an object in the `records` array of that block. Terms are the exception: they live in the language record, one entry per term. Each type has one home.
 
 | Type | Stored as | Home |
 |:---|:---|:---|
@@ -72,7 +76,7 @@ A page record is a Markdown file whose opening block names a record type. An ent
 
 ### Common fields
 
-Every written record carries the shared fields. Entries inherit owner and status from their page unless they set their own.
+Every written record carries the shared fields. Entries inherit `owner` and `status` from their page unless they set their own.
 
 | Field | Written | Meaning |
 |:---|:---|:---|
@@ -111,25 +115,25 @@ Written links live as fields on the record they start from.
 | `terms` | any record | Terms |
 | `replaces` | decision | The replaced decision |
 
-Containment follows the identifier: a business record belongs to its module, and a result belongs to the use case named in its identifier. The builder computes the remaining links from code, routes, and tests: implements, calls, and proves.
+Containment follows the identifier: a business record belongs to its module, and a result belongs to the use case named in its identifier. The builder computes the remaining links from code, routes, and tests: `implements`, `calls`, and `proves`.
 
 ### Authority
 
-Intent flows down one order: constraint, product, requirement, rule, use case. A decision explains a choice and is replaced, never edited. Research, examples, and prose carry no authority.
+Intent flows down one order: constraint, product, requirement, rule, and use case. A decision explains a choice and is replaced, never edited. Research, examples, and prose carry no authority.
 
-Truth about today comes from code, screens, and test runs. A mismatch between intent and truth is a defect owned by the higher record owner.
+Truth about today comes from code, screens, and test runs. The higher record owner owns the defect when intent and truth mismatch.
 
 A record stays unapproved while a decision behind it stays draft. An accepted gap becomes a known gap; its check reports without failing until the end date. Access flows from actor to role to permission to use case. Module order states dependencies and grants no authority.
 
 ### Statuses
 
-Draft means the record awaits its decider; approved means it holds; retired means a replacement holds. A draft names its decider and decide-by date.
+Draft means the record awaits its decider; approved means it holds; retired means a replacement holds. A draft names its `decider` and `decideBy` date.
 
 Implemented and verified are computed: code grants the first, passing proof grants the second.
 
 ### Size and stacks
 
-Small projects keep the small rows; large projects also keep the large rows. Optional types switch on per project; limits and runbooks join at first production.
+Small projects keep the small rows; large projects also keep the large rows. Optional types switch on for each project; limits and runbooks join at first production.
 
 Each frontend declares one stack, and the backend declares its own. Every project answers whether constraints apply, possibly with none. Owners form a closed list; extensions name replacements and switched-on types.
 
@@ -185,11 +189,47 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Rationale:** A dated owner turns missing work into a visible promise.
 
+**Example:** The running library example accepts that retiring a copy has no handler yet, so the gap lives as a known gap with an owner and an end date in `docs/known-gaps/retire-copy-unimplemented.md`.
+
+```json
+{
+  "type": "known-gap",
+  "id": "known-gap/retire-copy-unimplemented",
+  "title": "Retire copy unimplemented",
+  "owner": "lending-team",
+  "status": "approved",
+  "check": "use-case-unimplemented",
+  "subject": ["use-case/lending.retire-copy"],
+  "endsBy": "2027-06-01",
+  "reason": "Retirement waits for the weeding policy."
+}
+```
+
+The `use-case-unimplemented` check reports without failing until 2027-06-01, and the lending team answers for closing the gap, which satisfies this provision.
+
 ### Apply guidance precedence
 
 **Requirement:** A conflict MUST resolve toward the project exception, the extension, the deeper page, or the shallower page, in that order.
 
 **Rationale:** A project requirement never overrides a shared standard; the conflict becomes an exception.
+
+**Example:** The running library example needs its morning import to skip the quiet shelf check, so it records a project exception that outranks the shared standard in `docs/exceptions/shelf-check-bypass.md`.
+
+```json
+{
+  "type": "exception",
+  "id": "exception/shelf-check-bypass",
+  "title": "Shelf check bypass",
+  "owner": "lending-team",
+  "status": "approved",
+  "standard": "standard/lending.quiet-shelf-check",
+  "reason": "The import runs before opening.",
+  "reviewBy": "2027-01-01",
+  "removeWhen": "The import moves after opening."
+}
+```
+
+The record names the standard it departs from, the reason, and the review date, so the departure stays visible and dated, which satisfies this provision.
 
 ### Authorize access through the permission chain
 
@@ -201,7 +241,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 ### Express module order as depends on
 
-**Requirement:** Module order MUST live as depends on links between modules.
+**Requirement:** Module order MUST live as `dependsOn` links between modules.
 
 **Rationale:** A link states the dependency without ranking one module above another.
 
@@ -211,7 +251,11 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Rationale:** Entries inherit both from their page unless they set their own.
 
-**Example:** A draft names its decider and decide-by date.
+**Example:** A draft names its `decider` and `decideBy` date.
+
+The three statuses and what each allows: a draft awaits its decider, approved holds, and retired means a replacement holds.
+
+![Three record statuses in order: a draft awaits its decider and names its decider and decide-by date; approved holds, and a decision is replaced rather than edited; retired means a replacement holds with the old record beside the new one.](../assets/diagrams/core-record-status.svg)
 
 ### Retire records with replaces
 
@@ -237,7 +281,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Rationale:** Size decides the required record types and test projects; stacks decide the technology pages.
 
-**Example:** A library loans system declares small with a single backend stack.
+**Example:** A library loan system declares small with a single backend stack.
 
 ### Give every use case its results
 
@@ -246,6 +290,45 @@ Generated regions sit inside fences that only the builder writes and prose check
 **Rationale:** Callers branch on named endings, and cases prove one ending each.
 
 **Example:** A loan use case names `loaned` and `book-not-available`.
+
+The running library example carries this in `use-case/lending.borrow-copy`, which names `result/borrow-copy.borrowed` and `result/borrow-copy.copy-unavailable` in `results` and `case/borrow-copy.borrowing-an-available-copy-succeeds` in `cases`:
+
+```json
+"records": [
+  {
+    "type": "result",
+    "id": "result/borrow-copy.borrowed",
+    "title": "Borrowed",
+    "owner": "lending-team",
+    "outcome": "success",
+    "httpStatus": 201,
+    "meaning": "The copy is lent."
+  },
+  {
+    "type": "result",
+    "id": "result/borrow-copy.copy-unavailable",
+    "title": "Copy unavailable",
+    "owner": "lending-team",
+    "outcome": "refusal",
+    "code": "failure/lending.copy_not_available",
+    "httpStatus": 409,
+    "meaning": "The copy is unavailable."
+  },
+  {
+    "type": "case",
+    "id": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+    "title": "Borrowing an available copy succeeds",
+    "owner": "lending-team",
+    "status": "approved",
+    "situation": "A copy sits available on its shelf.",
+    "action": "The reader borrows the copy.",
+    "result": "result/borrow-copy.borrowed",
+    "expect": "The loan is active."
+  }
+]
+```
+
+Success ends with 201, the refusal carries the failure code `failure/lending.copy_not_available` with 409, and the case pairs one situation with the success result, which satisfies this provision.
 
 ### Cover every public use case from a journey
 
@@ -269,7 +352,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 **Replacement:** A project with no builder run records its own generation step.
 
-**Rationale:** Fenced regions keep hand prose and computed views apart.
+**Rationale:** Fenced regions keep handwritten prose and computed views apart.
 
 ## Verification
 

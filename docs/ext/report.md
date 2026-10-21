@@ -126,7 +126,7 @@ None. Ordinary queries stay under `litespec/backend/persistence#query-through-th
 
 ## Dependencies
 
-No report or object-storage package is selected by default. Each provider needs a decision and manifest pin.
+The extension selects no report or object-storage package by default. Each provider needs a decision and manifest pin.
 
 ## Verification
 
@@ -143,7 +143,7 @@ No report or object-storage package is selected by default. Each provider needs 
 | litespec/ext/report#scope-export-output-to-the-tenant | guidance | Does each export store its output under a tenant-scoped path? |
 | litespec/ext/report#define-report-limits | guidance | Does each report bound live as a Limit record? |
 | litespec/ext/report#support-report-cancellation | guidance | Does report work cancel, and does expired output clear? |
-| litespec/ext/report#escape-formula-leading-export-values | guidance | Are formula-leading export values escaped except reviewed formula fields? |
+| litespec/ext/report#escape-formula-leading-export-values | guidance | Are formula-leading export values escaped except for reviewed formula fields? |
 | litespec/ext/report#define-export-encoding-and-columns | guidance | Does each export state its encoding and stable columns? |
 | litespec/ext/report#keep-report-definitions-in-application | guidance | Do report definitions live in their module or a recorded Exception? |
 | litespec/ext/report#keep-report-providers-in-infrastructure | guidance | Do SQL and storage code live in Infrastructure or a recorded Exception? |

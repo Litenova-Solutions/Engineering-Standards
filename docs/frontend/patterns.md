@@ -52,7 +52,7 @@ Each option is a `####` heading of the form ``#### `option-id`: Option name``. I
 
 ### The wireframe language
 
-A wireframe states the structure of one option: which parts sit where, in what order, which action is primary, and the copy they show. It states no color, font, spacing or component library. An agent builds the option from the text in its own stack and design system. `litespec patterns preview` draws the text for a person to choose from.
+A wireframe states the structure of one option: which parts sit where, in what order, which action is primary, and the copy they show. It states no color, font, spacing, or component library. An agent builds the option from the text in its own stack and design system. `litespec patterns preview` draws the text for a person to choose from.
 
 ```wireframe
 page
@@ -73,7 +73,7 @@ page
         fact "Name" "Maria Garcia"
 ```
 
-Each line is one part: its name, its modifiers as bare words, its copy in double quotes, then a count or a ratio. Children are indented by two spaces. A line ending in `:` takes inline children, which sit side by side. A middle dot, U+00B7, with a space on each side separates them. A line starting with `#` is a comment. Copy is the real text the product would show, drawn from the Acme Supply cast.
+Each line is one part: its name, its modifiers as bare words, its copy in double quotes, then a count or a ratio. Children are indented by two spaces. A line ending in `:` takes inline children, which sit side by side. A middle dot, `U+00B7`, with a space on each side separates them. A line starting with `#` is a comment. Copy is the real text the product would show, drawn from the Acme Supply cast.
 
 The parts form a closed set.
 
@@ -106,20 +106,24 @@ The validator holds each block to these rules.
 | One `page`, at the top | A block never starts with `header` |
 | A `split` holds one child per ratio part | `split 2:1` holds two children |
 | A `row` holds at least two children | |
-| A `list`, `grid` or `timeline` holds one template child and a count | `list 3` with one `item` |
+| A `list`, `grid`, or `timeline` holds one template child and a count | `list 3` with one `item` |
 | A `table` names its columns and a count | `table 4 "Item" "Qty"` |
-| A `header`, `footer`, `toolbar` or overlay holds at most one primary action | |
+| A `header`, `footer`, `toolbar`, or overlay holds at most one primary action | |
 | An overlay is a child of `page`, after the page content | `dialog` last in `page` |
-| A `figure` takes a value, a label and a value, or a label, a value and a note | `figure "Paid today" "EUR 1,240.00" "+12% on last week"` |
-| A `toast` holds only `action` children, such as Undo | |
+| A `figure` takes a value, a label and a value, or a label, a value, and a note | `figure "Paid today" "EUR 1,240.00" "+12% on last week"` |
+| A `toast` holds only `action` children, such as `Undo` | |
 
 On a phone the drawing reflows unless a `wireframe compact` block says otherwise. A `row` or `split` stacks, an `aside` follows the main content, a table keeps its first two columns, and a drawer rises from the bottom.
 
 ### Starting a catalog entry from a LiteSpec pattern
 
-A catalog entry may set `library` to one pattern ID, such as `litespec/frontend/patterns/record-detail#record-header`, to start from that pattern. The entry keeps the pattern's option ids and names, so a choice stays comparable across products, and it may add options of its own.
+A catalog entry may set `library` to one pattern ID, such as `litespec/frontend/patterns/record-detail#record-header`, to start from that pattern. The entry keeps the pattern's option IDs and names, so a choice stays comparable across products, and it may add options of its own.
 
 The owner chooses among the combined options with the drawings from `litespec patterns preview`, and records the source. The entry states the compact behavior and the implementation status per platform, and the platform team implements the chosen option in its own components. A choice that differs from the pattern's default records its reason in the entry.
+
+The diagram shows the flow from a LiteSpec pattern through the catalog entry that cites it to the built screen.
+
+![A LiteSpec pattern with three options and a named default, a catalog entry citing the pattern by ID with the chosen option and source owner, and the built loan detail screen, with arrows from the pattern to the entry to the screen.](../assets/diagrams/frontend-pattern-flow.svg)
 
 ### The decision lifecycle
 
@@ -163,7 +167,7 @@ A floorplan implements the chosen option of one page-frame pattern. The pattern 
 |:---|:---|
 | A page-frame pattern and its chosen option | The floorplan implementing that option |
 
-Every page-frame pattern therefore resolves to one floorplan, and every floorplan traces to the pattern entry that chose it.
+Every page-frame pattern therefore resolves to one floorplan, and every floorplan traces to the pattern entry that chooses it.
 
 ## Standards
 
@@ -185,13 +189,28 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Rationale:** A later switch then reads the recorded cost instead of repeating the research. An option recorded without its cost is a preference, not a decision.
 
-**Example:** An invoice list considers two sort options: clickable headers, and a menu listing sort fields. The entry records the rationale and cost of each, then names the chosen one.
+**Example:** An invoice list considers two sort options: clickable headers and a menu listing sort fields. The entry records the rationale and cost of each, then names the chosen one.
 
 ### Record who chose
 
 **Requirement:** Each pattern decision MUST record its source as `owner` or `recommended`.
 
 **Rationale:** A recommended choice stands until an owner chooses. An agent never marks its own choice as the owner's. The catalog then shows which choices are settled and which await review.
+
+**Example:** For example, the library catalog starts its loan header entry from `litespec/frontend/patterns/record-detail#record-header`, keeps the pattern option IDs, and records the owner choice.
+
+```json
+{
+  "id": "loan-header",
+  "group": "record-detail",
+  "library": "litespec/frontend/patterns/record-detail#record-header",
+  "decision": { "option": "title-state-breadcrumb-one-primary-action", "source": "owner" },
+  "compact": { "breakpoint": "compact", "behavior": "The header stacks under the title." },
+  "implementations": { "svelte": { "status": "adopted" } }
+}
+```
+
+The entry names the pattern's default option and records `owner` as the source, so the choice stands as settled and the platform team builds it in its own components.
 
 ### Declare the compact behavior
 
@@ -253,7 +272,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ### Start from a LiteSpec pattern
 
-**Default:** Start each catalog entry from its LiteSpec pattern, through `library`, and keep the pattern's option ids, option names and default.
+**Default:** Start each catalog entry from its LiteSpec pattern, through `library`, and keep the pattern's option IDs, option names, and default.
 
 **Replacement:** Start an entry without `library` and record why no LiteSpec pattern fits.
 
@@ -281,5 +300,5 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 | litespec/frontend/patterns#keep-the-catalog-platform-neutral | guidance | Does any pattern name a component library outside implementations? |
 | litespec/frontend/patterns#keep-a-visual-registry | guidance | Does the registry render every product-added option in each theme at compact and full widths? |
 | litespec/frontend/patterns#report-pattern-feedback-after-the-work | guidance | Does each completion report carry proposals with pattern id, change, reason, and option? |
-| litespec/frontend/patterns#start-from-a-litespec-pattern | guidance | Does each entry set library or record its own reason, keeping the pattern's option ids? |
+| litespec/frontend/patterns#start-from-a-litespec-pattern | guidance | Does each entry set library or record its own reason, keeping the pattern's option IDs? |
 | litespec/frontend/patterns#promote-pattern-improvements | guidance | Did each accepted generic proposal reach the LiteSpec pattern page as a new or refined option? |

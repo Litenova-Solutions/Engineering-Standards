@@ -82,7 +82,7 @@ A rule changes. The maintainer updates the heading, the identifier, and every ci
 
 ### Step three, releasing
 
-The maintainer checks the tag with the highest version number with `git describe --tags --abbrev=0`. The tag is the current release. The manifest version names the release being prepared, the changelog entry is added, and the commit is tagged.
+The maintainer runs `git describe --tags --abbrev=0` to find the tag with the highest version number. The tag is the current release. The manifest version names the release being prepared, the changelog entry is added, and the commit is tagged.
 
 ## Verification
 

@@ -30,7 +30,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     Saturday morning at the central library brings two hundred members before noon. Each hands books across the desk and trusts the stamp card inside the cover. Without a loan record, the desk reconstructs who holds what from the card index and memory.
 
 3. Write the module record. Give the module a person-chosen identifier such as `module/circulation`. Name each module it depends on, or remove the field. This satisfies `litespec/core/system#group-language-and-use-cases-by-module`.
-4. Draw business-record boundaries from invariants. A business record is a consistency boundary: state that must stay valid together in one command. An invariant is a condition that holds before and after every successful change. This satisfies `litespec/backend/domain#treat-aggregates-as-consistency-boundaries` and `litespec/backend/domain#keep-child-entities-inside-the-aggregate-boundary`.
+4. Draw business record boundaries from invariants. A business record is a consistency boundary: state that must stay valid together in one command. An invariant is a condition that holds before and after every successful change. This satisfies `litespec/backend/domain#treat-aggregates-as-consistency-boundaries` and `litespec/backend/domain#keep-child-entities-inside-the-aggregate-boundary`.
 
     | Business record | Owns | References by typed ID |
     |:---|:---|:---|
@@ -58,7 +58,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     ```
 
     For each state, answer what makes it true, which data it alone requires, and which actions it allows and rejects. An unanswered question stays on the page. It receives no guessed default.
-6. Write the rules with kinds. Give each rule a person-chosen identifier of one to six lowercase words. A statement with not, no, never, or cannot keeps that word in its name. This satisfies `litespec/core/system#state-each-rule-with-its-kind`.
+6. Write the rules with kinds. Give each rule a person-chosen identifier of one to six lowercase words. A statement with `not`, `no`, `never`, or `cannot` keeps that word in its name. This satisfies `litespec/core/system#state-each-rule-with-its-kind`.
 
     | Rule | Kind | Enforced by | Statement | Refusal |
     |:---|:---|:---|:---|:---|
@@ -83,7 +83,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     | `use-case/circulation.list-open-loans` | `query` | `permission/borrow-copy` | None |
 
     A query states no domain transition and names its read model. It loads no business record for presentation.
-9. Write one result per ending. A result is one way a use case ends: success, or a named refusal with its failure code. This satisfies `litespec/backend/application#model-expected-use-case-failures-explicitly` and `litespec/backend/api#use-consistent-status-codes`.
+9. Write one result per ending. A result is one way a use case ends: `success`, or a named `refusal` with its failure code. This satisfies `litespec/backend/application#model-expected-use-case-failures-explicitly` and `litespec/backend/api#use-consistent-status-codes`.
 
     | Result | Outcome | Code | Status |
     |:---|:---|:---|:---|
@@ -92,7 +92,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
     | `result/borrow-a-copy.due-date-missing` | `refusal` | `failure/circulation.due-date-missing` | 400 |
 
     Each refusal explains what the caller sees. The failure code is stable across releases.
-10. Write the cases. A case is one working example: a situation and the result it leads to. Each case names its result. A case with no proving test yet becomes a known-gap record with an owner and an end date.
+10. Write the cases. A case is one working example: a situation and the result it leads to. Each case names its result. A case with no proving test yet becomes a known gap record with an owner and an end date.
 
     | Case | Situation | Action | Result | Expect |
     |:---|:---|:---|:---|:---|

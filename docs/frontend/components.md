@@ -4,7 +4,7 @@
 
 One shared UI package holds everything a page draws with. It holds the shared primitives and the composites those primitives are assembled into.
 
-Page code composes composites and nothing else. The boundary is enforced rather than described, so a page that improvises fails at lint with a message naming the component to use.
+Page code composes composites and nothing else. The boundary is enforced rather than described, so a page that improvises fails lint with a message naming the component to use.
 
 ## Standards
 
@@ -22,6 +22,23 @@ Page code composes composites and nothing else. The boundary is enforced rather 
 
 **Rationale:** A composite with a closed property set draws one layout for every caller. A page cannot change spacing for itself and produce the second spacing the next page copies.
 
+**Example:** For example, a loan section in the catalog app draws its facts, its state, and its commands through shared composites, and declares no element, class, or style binding.
+
+```svelte
+<script>
+  import { EntitySection, StatusBadge, DetailActions } from '@fixture/ui/floorplans';
+
+  export let loan;
+</script>
+
+<EntitySection title={loan.title}>
+  <StatusBadge code={loan.state} />
+  <DetailActions actions={loan.commands} />
+</EntitySection>
+```
+
+The section imports only the shared package entry point, so the layout it draws is the one the shared package owns for every other entity page.
+
 ### Write no class name in page code
 
 **Requirement:** A component under a route or module folder MUST NOT declare a class or style binding.
@@ -34,13 +51,13 @@ Each stack realization names the binding for its stack.
 
 **Requirement:** A component under a route or module folder MUST NOT declare a layout or interactive element, and each refusal names the composite to use.
 
-**Rationale:** A raw element carries no focus management, no state, and no accessibility wiring. The reader of the lint message is choosing between two answers, so the message gives one.
+**Rationale:** A raw element carries no focus management, no state, and no accessibility wiring. The reader of the lint message chooses between two answers, so the message gives one.
 
 ### Prefer a composite over a primitive
 
 **Requirement:** Page code MUST import a composite wherever the shared package provides one, and the lint refuses the primitive that composite replaces.
 
-**Rationale:** The composite is where the decision was made once. The primitive is where it has to be made again, per page.
+**Rationale:** The composite is where the decision is made once. The primitive is where it has to be made again, per page.
 
 **Example:** `Card` is `Section`, `Table` is `DataTable`, `Badge` is `StatusBadge`, and `Input` and `Field` are the form fields.
 
@@ -82,7 +99,7 @@ The AA criteria bind every project. The AAA rows bind only a project that target
 
 **Requirement:** A data component MUST render loading, empty, error, forbidden, and ready; a control renders disabled and pending, prevents duplicate submission, and keeps recovery usable.
 
-**Rationale:** Data states describe what arrived; control states describe what the reader may do.
+**Rationale:** Data states describe what arrives; control states describe what the reader may do.
 
 A route adds `not-found` under `litespec/frontend/rendering#represent-route-states`, because a missing target resolves at the route rather than inside a component. Each state name is a term in the project's language record.
 
@@ -108,7 +125,7 @@ A route adds `not-found` under `litespec/frontend/rendering#represent-route-stat
 
 **Requirement:** An informative or decorative image MUST render through the shared image component, which owns its shape, its sizing, and its fallback.
 
-**Rationale:** An informative image carries meaningful alternative text and a decorative image carries empty alternative text. A source and label written in a page bypass both. The raw-element rule refuses unwrapped images in page code under litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code.
+**Rationale:** An informative image carries meaningful alternative text, and a decorative image carries empty alternative text. A source and label written in a page bypass both. The raw-element rule refuses unwrapped images in page code under litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code.
 
 ## Conventions
 

@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page holds how the TypeScript web group realizes the frontend pattern rules ([UI Pattern Decisions](../patterns.md)). It states the React and Svelte bindings and the widths one web implementation requires. A provision here cites the neutral rule it realizes.
+This page states how the TypeScript web group realizes the frontend pattern rules ([UI Pattern Decisions](../patterns.md)). It states the React and Svelte bindings and the widths one web implementation requires. A provision here cites the neutral rule it realizes.
 
 ## Standards
 

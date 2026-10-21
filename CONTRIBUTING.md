@@ -1,105 +1,147 @@
 # Contributing
 
-Submit changes through a branch and pull request against `main`. Direct pushes to `main` are outside the release process.
+## Who this is for
 
-## Authoring Contract
+You contribute to the LiteSpec repository: the standard, the schemas, the templates, the command line, the analyzers, or the site. After reading this page you know where each change goes, which steps it needs, and which checks prove it.
 
-Follow the [authoring standard](docs/core/authoring.md) for every active standards page, template, instruction, and release note.
+## What it is
 
-Keep one canonical source for each provision, version, extension, and technical fact. Link to that source instead of copying it. (litespec/core/principles#keep-one-authored-source)
+Submit every change through a branch and pull request against `main`. Direct pushes to `main` stay outside the release process.
 
-## Current Snapshot
+Follow the [authoring standard](docs/core/authoring.md) for every standards page, template, and release note. Keep one canonical source for each provision, version, extension, and technical fact, and link to that source instead of copying it.
 
-Treat active standards as the complete current contract. (litespec/core/authoring#validate-current-standards-material)
+## Repository map
 
-Do not retain history-specific paths, IDs, terminology, aliases, maps, standards-release migration material, compatibility rules, or transition checks. (litespec/core/authoring#exclude-historical-transition-material)
+| Area | Start with | What lives there |
+|:---|:---|:---|
+| The standard | [docs/README.md](docs/README.md) | Every page a project applies, plus lookup and how-to pages |
+| JSON contracts | [schemas/README.md](schemas/README.md) | The schemas that validate the manifest, the project file, the records, and the UI files |
+| Seed files | [templates/README.md](templates/README.md) | The consumer templates, the init presets, and the seeds for LiteSpec pages |
+| Command line | [apps/cli/README.md](apps/cli/README.md) | The `litespec` tool: validation, scaffolding, model, book, and pattern commands |
+| Analyzers | [apps/analyzers/README.md](apps/analyzers/README.md) | The Roslyn rules that check .NET applications against the standard |
+| Site | [apps/site/README.md](apps/site/README.md) | `litespec.dev`, the static site that publishes the standard |
+| Release pins | [litespec.manifest.json](litespec.manifest.json) | Version, stacks, shapes, extensions, and toolchain and package pins |
+| Release notes | [CHANGELOG.md](CHANGELOG.md) | The current release described as a contract |
+| Automation | [.github/workflows/litespec.yml](.github/workflows/litespec.yml) | The checks every pull request runs |
 
-Keep release context in `CHANGELOG.md` and Git history. The repository validator evaluates current material only. (litespec/core/authoring#validate-current-standards-material)
+## Local setup
 
-## Provision Changes
+1. Install the .NET 10 SDK. The command line and the analyzers build on it, and [Directory.Build.props](Directory.Build.props) targets `net10.0`. [global.json](global.json) selects the test runner and pins no SDK.
+2. Install Node 24 and pnpm 11 only when you change the site. The exact pins live in [apps/site/package.json](apps/site/package.json) and under `stack` in [litespec.manifest.json](litespec.manifest.json).
+3. Run every command in this page from the repository root.
+4. Read `git status` before you start, and leave unrelated work alone.
+5. Add no package without owner approval. [Directory.Packages.props](Directory.Packages.props) holds the central versions for the repository tools.
 
-A new or changed Standard includes:
+## Change workflows
 
-- One atomic Requirement with one provision ID under the page scope the manifest declares. (litespec/core/authoring#use-the-declared-identifier-grammar)
-- An informative example when `litespec/core/authoring#attach-examples-to-their-provisions` requires one.
-- One exact Verification row with the checkable or guidance mark.
-- A current changelog entry.
+Change the records, code, tests, contracts, and operations that belong together in one change. Each workflow below lists its steps in order.
 
-Assign a new ID to each changed Standard assertion. (litespec/core/authoring#write-atomic-standards-provisions)
+### Change a provision and its citations
 
-A provision ID is `litespec/<page>#<slug>`, computed from the page path and the heading; write no ID in the heading. Keep a replaceable default under a `## Conventions` heading. (litespec/core/authoring#use-the-declared-identifier-grammar, litespec/core/authoring#identify-actionable-conventions)
+1. Decide whether the assertion changes. A reword that obliges the same action keeps its ID. A requirement that obliges a different action, a wider scope, or a different actor takes a new ID.
+2. Write the new provision under a new heading on its page. Never reuse the retired heading.
+3. Delete the retired provision and its Verification row. Leave no alias, replacement map, or note that the identifier moved.
+4. Update each page that cited the retired ID. [docs/reference/provisions.md](docs/reference/provisions.md) resolves every citation to its page, and `litespec validate` reports a citation with no owner.
+5. Update the validator case that covers the rule, in both directions: one passing case and one failing case. A rule with only one side stays unverified.
+6. Run `litespec provisions` and commit the regenerated index.
+7. Record the change in [CHANGELOG.md](CHANGELOG.md) as the current contract, without a transition path.
 
-Place a new page where it applies: a principle in its area folder, a realization in its stack folder, such as `docs/backend/dotnet/`. The path states the provision scope. (litespec/core/authoring#use-the-declared-identifier-grammar)
+A consumer that pinned the earlier release keeps that release and its own exceptions. Adopting the new release means re-reading the amended provision and every exception that named the retired ID.
 
-The page segment of an ID is the page path, so two pages never share one. (litespec/core/authoring#name-the-owning-page-in-the-identifier)
+### Add a page
 
-Do not add aliases, replacement maps, alternate paths, compatibility terms, or transition material. (litespec/core/authoring#exclude-historical-transition-material)
+1. Place the page where it applies: a principle in its area folder, a realization in its stack folder such as [docs/backend/dotnet/](docs/backend/dotnet/). The path states the provision scope, and two pages never share one.
+2. Use the sections of its page style from the [authoring standard](docs/core/authoring.md). A Standard states one testable obligation under one heading, with one provision ID, one Verification row, and an example where the standard requires one.
+3. Write no ID in the heading. The ID follows the page path and the heading, so the two never disagree.
+4. Regenerate the provision index and update the changelog.
 
-An actionable Convention includes one convention ID, Default statement, Replacement statement, and Verification row.
+### Add a UI pattern option
 
-### Amend an active provision
+1. Open the group page in [docs/frontend/patterns/](docs/frontend/patterns/) that owns the recurring question.
+2. Add the option under its pattern as a `####` heading with its `wireframe` block, its rationale, and its cost. An option ID stays stable once published, so the catalogs that cite it keep resolving.
+3. Run `litespec patterns check` and fix every broken wireframe before review.
 
-An active provision ID identifies its current assertion, so amending the assertion is not an edit in place. (litespec/core/authoring#write-atomic-standards-provisions)
+### Add an extension
 
-Amend a Standard in this order:
+1. Write the page under [docs/ext/](docs/ext/) for any stack, or under a stack `ext/` folder such as `docs/backend/dotnet/ext/` for one stack only.
+2. Declare Intent, Activation, Baseline relationship, Standards, Conventions, Dependencies, and Verification. Name each baseline provision the extension replaces.
+3. Record the path, the activation scope, the replaced provisions, and the switched-on record types in [litespec.manifest.json](litespec.manifest.json). Create no separate extension descriptor: the page and the manifest entry form the contract.
+4. Update the changelog and regenerate the provision index.
 
-1. Decide whether the assertion changes. A reworded Requirement that obliges the same action keeps its ID. A Requirement that obliges a different action, a wider scope, or a different actor takes a new ID.
-2. Write the new provision under a new heading on its page. Do not reuse the retired heading.
-3. Delete the retired provision and its Verification row. Leave no alias, no replacement map, and no note that the identifier moved. (litespec/core/authoring#exclude-historical-transition-material)
-4. Update each page that cited the retired ID. `docs/reference/provisions.md` resolves every citation to its page, and the repository validator reports a citation with no owner.
-5. Update the validator case that covers the rule, in both directions.
-6. Record the change in `CHANGELOG.md` as the current contract, without a transition path.
+### Add a stack
 
-A consumer that pinned the earlier release keeps that release and its own exceptions. Adopting this release means re-reading the amended provision and any exception that named the retired ID. (litespec/core/authoring#keep-a-pinned-release-for-as-long-as-it-serves, litespec/core/authoring#record-the-reviewed-litespec-release)
+1. Add the folder with its `stack.md` page. Selecting the stack applies that folder, every folder above it, and their subfolders that hold no stack.
+2. Record the folder under `stacks` in [litespec.manifest.json](litespec.manifest.json), with the pairing rules (`requires`, `pairsWith`) when the stack needs them.
+3. Update the pages that list the shipped stacks, the changelog, and the provision index.
 
-## Extension Changes
+### Add a CLI check
 
-An extension page declares Intent, Activation, Baseline relationship, Standards, Conventions, Dependencies, and Verification.
+1. Put the validator beside its command under [apps/cli/src/LiteSpec.Cli/](apps/cli/src/LiteSpec.Cli/): `Authoring/`, `Consumer/`, `Ui/`, `Model/`, `Book/`, `Patterns/`, `Init/`, or `Schemas/`. Read [apps/cli/README.md](apps/cli/README.md) for the file each folder owns.
+2. Add the diagnostic code to the stable list when the rule is final. Every authoring rule is an error. `WarningDiagnosticCodes` stays empty and holds a rule only while a newly added check burns down against existing content.
+3. Cover the rule with one passing case and one failing case in [apps/cli/tests/LiteSpec.Cli.Tests/](apps/cli/tests/LiteSpec.Cli.Tests/), with fixtures under `Fixtures/` where the command reads files.
+4. Run the solution build and tests, then `litespec validate`.
 
-The extension document names each baseline provision it replaces. The manifest records its path, activation scope, replaced provisions, and switched-on record types.
+### Add an analyzer rule
 
-Do not create a separate extension descriptor. The Markdown page and manifest entry form the extension contract.
+1. Add the analyzer under [apps/analyzers/src/LiteSpec.Analyzers/Rules/](apps/analyzers/src/LiteSpec.Analyzers/Rules/) in `Domain/`, `Layers/`, or `Style`, with its descriptor in `Descriptors.cs` naming the provision and its help link.
+2. Note the rule in `AnalyzerReleases.Unshipped.md` with its ID, category, and severity.
+3. Add tests beside the existing ones in [apps/analyzers/tests/LiteSpec.Analyzers.Tests/](apps/analyzers/tests/LiteSpec.Analyzers.Tests/).
+4. Build, test, and pack the package as the verification section shows.
 
-## Required Review
+### Change the site
 
-Before review:
+1. Change behavior in [apps/site/](apps/site/): the loader `src/lib/spec.ts` reads the standard, and the pages, components, layouts, and styles render it. Read [apps/site/README.md](apps/site/README.md) for the file each path owns.
+2. When you change the wireframe renderer, update the golden SVGs beside `wireframe.test.ts` and run the golden tests.
+3. Build the site and run its tests as the verification section shows.
 
-- Inspect changed links, anchors, provision IDs, and evidence rows.
-- Confirm the manifest paths.
-- Confirm extension declarations match the manifest.
-- Validate the two tracked schema consumers: `litespec.manifest.json` against its schema and `templates/consumer/litespec.project.json` against the project schema.
-- Update affected templates and validator cases.
-- Run `dotnet build LiteSpec.slnx`.
-- Run `dotnet test --solution LiteSpec.slnx`.
-- Run `litespec provisions` and commit the regenerated index. The [command index](docs/tools/README.md) states how `litespec` runs. (litespec/core/authoring#regenerate-the-provision-index)
-- Run `litespec validate`. The [command index](docs/tools/README.md) states how `litespec` runs.
-- Update the changelog.
-- Run `git diff --check`.
+## Verification
 
-A changed validator rule includes one passing case and one failing case. A rule without both cases is unverified.
+Run these from the repository root before a change is done:
 
-Every authoring rule is an error. `WARNING_DIAGNOSTIC_CODES` is empty and holds a rule only while a newly added check is burned down against existing content.
+```bash
+dotnet build LiteSpec.slnx
+dotnet test --solution LiteSpec.slnx
+dotnet run --project apps/cli/src/LiteSpec.Cli -- provisions
+dotnet run --project apps/cli/src/LiteSpec.Cli -- validate
+git diff --check
+```
 
-The pull request checklist records the manual active-voice, terminology, atomicity, example, and quality review.
+`litespec validate` checks schemas, manifest references, provision IDs, page contracts, pattern pages and their wireframes, links, and verification marks. `litespec provisions` rewrites the provision index.
 
-## Release Numbering
+Run the further checks your area selects, as [.github/workflows/litespec.yml](.github/workflows/litespec.yml) runs them:
 
-The [authoring standard](docs/core/authoring.md) owns the release model, including the meaning of each version number. This section projects that model for contributors.
+```bash
+dotnet pack apps/analyzers/src/LiteSpec.Analyzers --no-build --output artifacts
+dotnet run --project apps/cli/src/LiteSpec.Cli --no-build -- provisions --check
+```
 
-Each release states its complete contract without depending on an earlier release. (litespec/core/authoring#publish-each-release-as-a-complete-contract)
+For a site change, from the repository root:
 
-Do not add a compatibility guarantee, migration path, deprecation period, replacement map, or identifier alias between LiteSpec releases. (litespec/core/authoring#exclude-cross-release-compatibility-work)
+```bash
+pnpm --dir apps/site install --frozen-lockfile
+pnpm --dir apps/site test
+pnpm --dir apps/site build
+```
 
-A consumer keeps a pinned release for as long as that consumer chooses, and absorbs every difference when adopting a later release. (litespec/core/authoring#keep-a-pinned-release-for-as-long-as-it-serves)
+`test` runs the golden wireframe tests, and `build` renders the static output with its search index.
 
-A consumer records the release it reviewed in `reviewedLiteSpecVersion`, so adopting a later release is an explicit act. (litespec/core/authoring#record-the-reviewed-litespec-release)
+## Pull requests
 
-`litespec/core/authoring#exclude-cross-release-compatibility-work` covers LiteSpec releases only. A consumer product is a running service, and its own API compatibility, migration, deprecation, and rollback provisions still apply.
+1. State the constraint, decision, or defect that requires the change under Reason.
+2. Check off the Verification list with the exact commands you ran.
+3. Complete the Authoring Review list: one current assertion per active ID, the declared identifier grammar, the committed provision index, one testable meaning per provision, glossary terms, useful rationale and examples, guide style, exact verification evidence, and no transition material.
+4. Write `None.` under Skipped Checks, or name each skipped command with its exact reason. Continuous integration fails an empty section.
+5. Resolve each actionable review comment before merge. Use squash merge unless separate commits preserve needed review evidence.
 
-`CHANGELOG.md` is the repository release note for the current major version. The changelog describes the current contract without prescribing a transition path. An entry states one change and who it affects. It links to the page holding the detail rather than restating it. (litespec/core/authoring#validate-current-standards-material)
+The maintainer merges their own pull request after every required check passes and an AI reviewer examines the complete diff.
 
-## Maintainer Review
+The [Defect](.github/ISSUE_TEMPLATE/defect.yml) form reports a page, schema, template, or validator that contradicts the contract. The [Proposal](.github/ISSUE_TEMPLATE/proposal.yml) form proposes a change to what the standard requires, permits, or generates.
 
-The maintainer can merge their own pull request after every required check passes and an AI reviewer examines the complete diff.
+## Releases
 
-Resolve each actionable review comment before merge. Use squash merge unless separate commits preserve necessary review evidence.
+Each release states its complete contract. Add no compatibility guarantee, migration path, deprecation period, replacement map, or identifier alias between LiteSpec releases. That rule covers LiteSpec releases only: a consumer product keeps its own compatibility, migration, and rollback provisions.
+
+To prepare a release:
+
+1. Name the version in [litespec.manifest.json](litespec.manifest.json), in the topmost [CHANGELOG.md](CHANGELOG.md) entry, and in `reviewedLiteSpecVersion` in [templates/consumer/litespec.project.json](templates/consumer/litespec.project.json). Every schema `$id` names the release under `https://litespec.dev/<version>/schemas/`.
+2. Tag the commit with the version number. The highest git tag is the current release, as [docs/core/maintaining.md](docs/core/maintaining.md) states.

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="260" viewBox="0 0 720 260" role="img" aria-labelledby="learn-how-it-works-title learn-how-it-works-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
+  <title id="learn-how-it-works-title">The loop of standard, records, code, and model</title>
+  <desc id="learn-how-it-works-desc">Four boxes run left to right: Standard (rules, pinned), Records (intent, owned), Code and tests (handlers, screens), and Model (.model/model.json). The standard governs the records, the records are implemented by code, and the build reads code into the model. A Checks box below (consumer, model check, CI) takes gaps from the model and sends findings back to the records.</desc>
+  <defs>
+    <marker id="learn-how-it-works-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
+    </marker>
+  </defs>
+
+  <g style="stroke: var(--muted-fg, #77706a); fill: none" stroke-width="1.25" marker-end="url(#learn-how-it-works-arrow)">
+    <path d="M162 75 H 198" />
+    <path d="M332 75 H 368" />
+    <path d="M502 75 H 538" />
+    <path d="M605 112 V170 H452" />
+    <path d="M310 140 V112" />
+  </g>
+
+  <g style="fill: var(--bg, #ffffff); stroke: var(--border, #e5e0d9)" stroke-width="1">
+    <rect x="30" y="40" width="130" height="70" rx="8" />
+    <rect x="200" y="40" width="130" height="70" rx="8" />
+    <rect x="370" y="40" width="130" height="70" rx="8" />
+    <rect x="270" y="142" width="180" height="56" rx="8" />
+  </g>
+  <rect x="540" y="40" width="130" height="70" rx="8" style="fill: var(--accent-subtle, #fffaf0); stroke: var(--accent, #f8c258)" stroke-width="1.5" />
+
+  <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600" text-anchor="middle">
+    <text x="95" y="70">Standard</text>
+    <text x="265" y="70">Records</text>
+    <text x="435" y="70">Code and tests</text>
+    <text x="605" y="70">Model</text>
+    <text x="360" y="166">Checks</text>
+  </g>
+  <g style="fill: var(--muted-fg, #77706a)" font-size="12" text-anchor="middle">
+    <text x="95" y="90">rules, pinned</text>
+    <text x="265" y="90">intent, owned</text>
+    <text x="435" y="90">handlers, screens</text>
+    <text x="605" y="90">.model/model.json</text>
+    <text x="360" y="184">consumer, model check, CI</text>
+    <text x="180" y="32">governs</text>
+    <text x="350" y="32">implements</text>
+    <text x="520" y="32">build reads</text>
+    <text x="530" y="162">gaps</text>
+  </g>
+  <text x="302" y="130" text-anchor="end" font-size="12" style="fill: var(--muted-fg, #77706a)">findings</text>
+  <text x="360" y="240" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">An arrow is the next step of the loop; the checks send their findings back to the records.</text>
+</svg>

@@ -1,0 +1,185 @@
+# Check .NET Code with the Analyzers
+
+## Purpose
+
+Run the LiteSpec Roslyn analyzers over your .NET backend so every build reports the findings that break LiteSpec rules, and fix or record each finding.
+
+This guide carries no provision. Each step cites the provisions it satisfies.
+
+## Prerequisites
+
+Start with:
+
+- The .NET 9.0.300 SDK, or Visual Studio 17.14 or later. The analyzer package targets the compiler that ships in that SDK.
+- A solution with the five projects from [the .NET architecture page](../backend/dotnet/architecture.md#use-five-application-projects): Domain, Application.Abstractions, Application, Infrastructure, and WebApi.
+- One shared build file that all five projects import, such as `apps/api/Directory.Build.props`, with central package management enabled as [the .NET configuration page](../backend/dotnet/config.md#centralize-nuget-versions) describes.
+
+## Procedure
+
+### 1. Add the package once for all five projects
+
+Add one `PackageReference` in `apps/api/Directory.Build.props` so every project inherits it:
+
+```xml
+<ItemGroup>
+  <PackageReference Include="LiteSpec.Analyzers" Version="2.0.0" PrivateAssets="all" />
+</ItemGroup>
+```
+
+`PrivateAssets="all"` keeps the analyzer out of any package you publish. Keep the version in one central place to satisfy `litespec/backend/dotnet/packages#pin-every-dependency-centrally`: with central package management, put the version in `apps/api/Directory.Packages.props` instead:
+
+```xml
+<PackageVersion Include="LiteSpec.Analyzers" Version="2.0.0" />
+```
+
+and omit `Version` from the `PackageReference`. Never add a second copy in a project file.
+
+### 2. Confirm each project layer
+
+A rule runs only in the layers its provision covers. The analyzers read the layer from the assembly name suffix: `Shop.Domain` is Domain and `Shop.Application.Abstractions` is Application.Abstractions, and the same suffix rule maps Application, Infrastructure, and WebApi. Any other assembly is not analyzed. The resolver checks the two-part `Application.Abstractions` suffix before `Application`, so `Shop.Application.Abstractions` never resolves as Application.
+
+When a project name does not end in a layer name, set the layer in its project file:
+
+```xml
+<PropertyGroup>
+  <LiteSpecLayer>Domain</LiteSpecLayer>
+</PropertyGroup>
+```
+
+The values are `Domain`, `Application.Abstractions`, `Application`, `Infrastructure`, `WebApi`, and `None`. Set `None` to opt a project out, for example a test project or a Worker. The package ships a props file that exposes `LiteSpecLayer` to the compiler, so no extra wiring is needed. This step implements `litespec/backend/dotnet/architecture#use-five-application-projects`.
+
+### 3. Build and read the first diagnostics
+
+Build the solution:
+
+```sh
+dotnet build apps/api/Shop.slnx
+```
+
+Each finding is a warning by default and names the provision it enforces. A typical first line reads:
+
+```text
+warning LS1002: Enum 'OrderStatus' models a closed set; use an abstract record with sealed cases and a stable Code (https://litespec.dev/2.0.0/backend/dotnet/domain/#model-every-closed-set-of-domain-values-without-enums)
+```
+
+The trailing address is the help link: it opens the provision the rule enforces, here `litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums`. In Visual Studio the same warning appears in the Error List with its ID, file, and line, and the tooltip carries the help link. In the terminal, `dotnet build` prints the line above.
+
+### 4. Fix a finding
+
+Work through one finding at a time, starting with the Domain layer. The two examples below cover the most common first warnings.
+
+#### Replace an enum with a closed record hierarchy
+
+LS1002 reports any enum in Domain. Before:
+
+```csharp
+public enum OrderStatus
+{
+    Pending,
+    Succeeded,
+    Failed,
+}
+```
+
+After, following the shape on [the .NET domain page](../backend/dotnet/domain.md#model-every-closed-set-of-domain-values-without-enums):
+
+```csharp
+public abstract record OrderStatus
+{
+    public abstract string Code { get; }
+
+    public static OrderStatus FromCode(string code) => code switch
+    {
+        "pending" => new OrderPendingStatus(),
+        "succeeded" => new OrderSucceededStatus(),
+        "failed" => new OrderFailedStatus(),
+        _ => throw new OrderUnsupportedStatusException(code),
+    };
+}
+
+public sealed record OrderPendingStatus : OrderStatus
+{
+    public override string Code => "pending";
+}
+
+public sealed record OrderSucceededStatus : OrderStatus
+{
+    public override string Code => "succeeded";
+}
+
+public sealed record OrderFailedStatus : OrderStatus
+{
+    public override string Code => "failed";
+}
+```
+
+Boundary code converts a label through `FromCode`, and an unrecognized label fails validation instead of falling into a default case. Callers branch on the case type with a `switch` expression. Define `OrderUnsupportedStatusException` as a sealed `DomainException` subclass with a stable code, as `litespec/backend/dotnet/domain#reject-business-violations-with-domain-exceptions` requires.
+
+#### Pass time in as an argument
+
+LS1009 reports any read of a clock, randomness, or new identifier in Domain, such as `DateTimeOffset.UtcNow`, `Guid.NewGuid`, or `Random.Shared`. Before:
+
+```csharp
+public void Publish()
+{
+    State = new PostPublishedState(DateTimeOffset.UtcNow);
+}
+```
+
+After:
+
+```csharp
+public void Publish(DateTimeOffset publishedAt)
+{
+    State = new PostPublishedState(publishedAt);
+}
+```
+
+The caller in Application supplies `publishedAt` from its own clock, and tests pass an explicit value, so Domain stays deterministic. This matches the `Publish` shape on [the .NET domain page](../backend/dotnet/domain.md#model-every-aggregate-lifecycle-with-state-records) and satisfies `litespec/backend/domain#pass-nondeterministic-values-into-domain`.
+
+### 5. Make the build fail on findings in CI
+
+Raise the severities of the rules you enforce in `.editorconfig`:
+
+```ini
+[*.cs]
+dotnet_diagnostic.LS1002.severity = error
+dotnet_diagnostic.LS1009.severity = error
+```
+
+Then fail the build on those warnings. The workspace already treats warnings as errors through `apps/api/Directory.Build.props` under `litespec/backend/dotnet/config#centralize-net-build-settings`. To scope the failure to the analyzers instead, set:
+
+```xml
+<PropertyGroup>
+  <WarningsAsErrors>$(WarningsAsErrors);LS1002;LS1009</WarningsAsErrors>
+</PropertyGroup>
+```
+
+Extend the list with each further ID the team enforces. The `build` job compiles the solution with `dotnet build <solution>`, so a diagnostic raised to an error fails the pull request under `litespec/quality/ci#run-applicable-gates-on-every-pull-request`. See [the continuous integration page](../quality/ci.md#run-applicable-gates-on-every-pull-request) for the jobs each change selects.
+
+### 6. Record a deliberate departure
+
+When a finding is wrong for your project, record an Exception record that cites the provision, with its reason and a review date, as [the model page](../core/model.md) describes. The record lives at `docs/exceptions/<name>.md`. Then suppress narrowly, next to the code:
+
+```csharp
+#pragma warning disable LS1011 // Exception: docs/exceptions/domain-docs-deferred.md
+public string LegacyLabel { get; }
+#pragma warning restore LS1011
+```
+
+Or scope an `.editorconfig` entry to the one file:
+
+```ini
+[Shop.Domain/Legacy/LegacyLabels.cs]
+dotnet_diagnostic.LS1011.severity = suggestion
+```
+
+The example above quiets `litespec/backend/dotnet/domain#document-every-public-domain-contract` for one legacy file only. Never set a project-wide `none` without the record: the record carries the departure, and the suppression only quiets the compiler where the record allows.
+
+## Verification
+
+Confirm the setup with these checks:
+
+- `dotnet build apps/api/Shop.slnx` lists no `LS` warnings, or lists only ones an Exception record covers.
+- Add a temporary enum to the Domain project and rebuild: the build reports `LS1002` naming the enum.
+- Remove the enum and rebuild: the warning is gone.

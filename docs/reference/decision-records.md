@@ -16,7 +16,7 @@ A decision record states one choice that is expensive to reverse, with the optio
 
 ### Identifier form
 
-The identifier is `decision/<number>-<name>`, such as `decision/0047-extend-loan-period`. The number counts as a word toward the six-word name bound. The name states the choice in words; the number keeps proposal order only.
+The identifier is `decision/<number>-<name>`, such as `decision/0047-extend-loan-period`. The number counts as a word toward the six-word name bound. The name states the choice in words. The number keeps proposal order only.
 
 ### What a record contains
 

@@ -30,7 +30,7 @@ Model the record once, as the concrete form of `litespec/ext/audit#record-the-re
 | `auditId` | UUID v7 | Record identity, ordered by write time | `litespec/ext/audit#record-the-required-audit-fields` |
 | `occurredAt` | Timestamp with zone | Business time of the attempt | `litespec/ext/audit#record-the-required-audit-fields` |
 | `recordedAt` | Timestamp with zone | Time the evidence was written | `litespec/ext/audit#record-the-required-audit-fields` |
-| `action` | Use-case identity | The invoked use case | `litespec/ext/audit#state-the-action-as-use-case-identity` |
+| `action` | Use case identity | The invoked use case | `litespec/ext/audit#state-the-action-as-use-case-identity` |
 | `category` | Closed set | Retention and review classification | `litespec/ext/audit#use-a-fixed-category-vocabulary` |
 | `outcome` | Closed set | `succeeded`, `denied`, or `failed` | `litespec/ext/audit#record-every-attempt-outcome` |
 | `failureCode` | Stable code | The refusal or failure reason | `litespec/ext/audit#record-the-failure-code-on-an-unsuccessful-attempt` |
@@ -113,7 +113,7 @@ Implement `ICommandPostHandler`. LiteBus runs a post-handler only when the main 
 
 Stage the record in the same session as the business change, which is `litespec/ext/audit#commit-a-success-record-with-its-business-change`.
 
-Order matters. The post-handler that commits the session runs in the same stage, so give the commit an explicit later priority. `HandlerPriorityAttribute` orders handlers by ascending value, and a handler with no attribute takes priority zero.
+Order matters. The post-handler that commits the session runs in the same stage, so give the commit an explicit later priority. `HandlerPriorityAttribute` orders handlers by ascending value, and a handler with no attribute takes priority `0`.
 
 ```csharp
 [HandlerPriority(10)]

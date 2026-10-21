@@ -122,7 +122,7 @@ This extension switches on no optional record type.
 
 **Requirement:** A public operation scheduled for removal MUST appear in the consumer `CHANGELOG.md`.
 
-**Rationale:** The changelog gives consumers one release-note location for planned removal.
+**Rationale:** The `CHANGELOG.md` gives consumers one release-note location for planned removal.
 
 ### Record deprecation conditions
 
@@ -140,7 +140,7 @@ This extension switches on no optional record type.
 
 **Requirement:** An API owner MUST add an error outcome only when existing consumers safely handle an unknown code.
 
-**Rationale:** Safe fallback behavior avoids consumer failure on a previously unseen outcome.
+**Rationale:** Safe fallback behavior avoids consumer failure on an unseen outcome.
 
 ### Exercise generated consumers
 
@@ -190,12 +190,12 @@ The extension adds no required package. An introduced OpenAPI diff tool needs a 
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/compat#classify-independent-consumer-changes | guidance | Does review classify each independent-consumer contract change? |
-| litespec/ext/compat#classify-breaking-contract-changes | guidance | Does review mark each removed, renamed, narrowed, retyped, or authentication change as breaking? |
-| litespec/ext/compat#classify-compatible-additions | guidance | Does review record why each optional addition preserves existing behavior? |
+| litespec/ext/compat#classify-independent-consumer-changes | guidance | Does the reviewer classify each independent-consumer contract change? |
+| litespec/ext/compat#classify-breaking-contract-changes | guidance | Does the reviewer mark each removed, renamed, narrowed, retyped, or authentication change as breaking? |
+| litespec/ext/compat#classify-compatible-additions | guidance | Does the reviewer record why each optional addition preserves existing behavior? |
 | litespec/ext/compat#review-exhaustive-consumer-changes | guidance | Do added enum values and discriminator cases receive consumer review? |
-| litespec/ext/compat#preserve-stable-error-codes | guidance | Is each removed or reassigned stable code classified as breaking? |
-| litespec/ext/compat#resolve-uncertain-classifications-safely | guidance | Is each unclear change treated as breaking with consumer review? |
+| litespec/ext/compat#preserve-stable-error-codes | guidance | Does the reviewer classify each removed or reassigned stable code as breaking? |
+| litespec/ext/compat#resolve-uncertain-classifications-safely | guidance | Does the reviewer treat each unclear change as breaking with consumer review? |
 | litespec/ext/compat#retain-release-baselines | guidance | Does each release retain its OpenAPI document as an immutable baseline? |
 | litespec/ext/compat#diff-release-contracts | guidance | Do the local run and continuous integration compare against the selected baseline? |
 | litespec/ext/compat#reject-unapproved-breaking-diffs | guidance | Does a breaking diff fail without a new version or an approved decision? |
@@ -206,9 +206,9 @@ The extension adds no required package. An introduced OpenAPI diff tool needs a 
 | litespec/ext/compat#retain-supported-versions | guidance | Does the previous version stay available through its support window? |
 | litespec/ext/compat#record-version-retirement | guidance | Does the versioning decision name its consumer owners, deadline, removal condition, and ownership? |
 | litespec/ext/compat#signal-planned-public-removal | guidance | Does each operation scheduled for removal expose its deprecation signal? |
-| litespec/ext/compat#publish-deprecation-context | guidance | Does the consumer changelog name each operation scheduled for removal? |
+| litespec/ext/compat#publish-deprecation-context | guidance | Does the consumer `CHANGELOG.md` name each operation scheduled for removal? |
 | litespec/ext/compat#record-deprecation-conditions | guidance | Does the deprecation decision record the sunset date, replacement, and ownership? |
-| litespec/ext/compat#treat-errors-as-contracts | guidance | Do type, code, field codes, and statuses receive versioned review? |
+| litespec/ext/compat#treat-errors-as-contracts | guidance | Does the owner treat type, code, field codes, and statuses as versioned contract elements? |
 | litespec/ext/compat#gate-new-error-outcomes | guidance | Do existing consumers safely handle each added unknown code? |
 | litespec/ext/compat#exercise-generated-consumers | guidance | Does each first-party client compile and exercise the changed contract? |
 | litespec/ext/compat#store-current-openapi-source | guidance | Is the generated OpenAPI at the documented path or a recorded Exception? |

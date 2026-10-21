@@ -17,9 +17,9 @@ litespec model query --root <consumer> <id>
 
 The model builder reads the written records, the code anchors, the routes, the tests, and the latest test run. It writes `model.json` with every record and its resolved links. The file names the code, screens, tests, and test runs it read. It adds the computed `implements`, `calls`, and `proves` links, and the computed `implemented` and `verified` state per use case.
 
-`build` writes `model.json` under `.model/` in the consumer root unless `--out` names another file. That folder is generated, and the consumer ignores it in git. `check` builds in memory and reports every finding with its code, message, path, and line. `render` rewrites the fenced generated regions and touches no text outside them. `query` prints one record with its links in both directions, for agents.
+`build` writes `model.json` under `.model/` in the consumer root unless `--out` names another file. That folder is generated, and the consumer ignores it in Git. `check` builds in memory and reports every finding with its code, message, path, and line. `render` rewrites the fenced generated regions and touches no text outside them. `query` prints one record with its links in both directions, for agents.
 
-A finding covered by an open known gap is reported as known and exits zero. The gap covers the finding when its `check` equals the finding code and its `subject` lists the id. An expired known gap fails.
+A finding covered by an open known gap is reported as known and exits zero. The gap covers the finding when its `check` equals the finding code and its `subject` lists the `id`. An expired known gap fails.
 
 The finding codes are:
 
@@ -76,7 +76,7 @@ The generated regions `render` writes are `history`, `use-case-coverage`, `sub-p
 | Code | Meaning |
 |:---|:---|
 | `0` | The command finished with no open finding. |
-| `1` | `check` found an open finding or an expired known gap, or `query` found no record with the id. |
+| `1` | `check` found an open finding or an expired known gap, or `query` found no record with the `id`. |
 | `2` | The arguments are wrong or the root holds no project record. |
 
 ## Examples
@@ -107,4 +107,4 @@ litespec model query --root ../consumer use-case/orders.cancel-order
 
 ## Underneath
 
-The builder reads paths, `shape`, and `stacks` from `litespec.project.json`. It reads shared provisions from the pinned docs under `litespec/docs`, and the test run from TRX or JUnit XML files under `paths.testResults`. Nothing beneath it is separately runnable.
+The builder reads `paths`, `shape`, and `stacks` from `litespec.project.json`. It reads shared provisions from the pinned docs under `litespec/docs`, and the test run from TRX or JUnit XML files under `paths.testResults`. Nothing beneath it is separately runnable.

@@ -2,7 +2,7 @@
 
 ## Intent
 
-Names in a .NET backend follow C# file, asynchronous method, and implementation style rules. The shared provisions live on the stack-neutral page ([Naming and code style](../../workspace/naming.md)); this page holds what the dotnet stack alone requires.
+Names in a .NET backend follow C# file, asynchronous method, and implementation style rules. The shared provisions live on the stack-neutral page ([Naming and code style](../../workspace/naming.md)); this page holds what the .NET stack alone requires.
 
 ## Standards
 
@@ -52,6 +52,6 @@ internal sealed class CreateDraftCommandHandler(
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/backend/dotnet/naming#match-c-files-and-primary-types | guidance | Does each C# file declare one primary type matching its file name? |
-| litespec/backend/dotnet/naming#name-asynchronous-methods-completely | guidance | Does each task-returning method end in Async with the token last when cancelable? |
+| litespec/backend/dotnet/naming#match-c-files-and-primary-types | checkable | `dotnet build` reports no LiteSpec.Analyzers LS3003 diagnostic. |
+| litespec/backend/dotnet/naming#name-asynchronous-methods-completely | checkable | `dotnet build` reports no LiteSpec.Analyzers LS3001 or LS3002 diagnostic. |
 | litespec/backend/dotnet/naming#keep-implementation-style-consistent | guidance | Does production C# use file-scoped namespaces, braces, explicit modifiers, and sealed classes? |

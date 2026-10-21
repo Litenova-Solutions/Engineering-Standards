@@ -2,7 +2,7 @@
 
 ## Intent
 
-A record detail page shows one business record, such as an order, a customer or a product. It shows its state, its facts, its history and the commands a reader may run on it. These patterns answer the recurring questions of that page. Each pattern offers drawn options and names a default.
+A record detail page shows one business record, such as an order, a customer, or a product. It shows its state, its facts, its history, and the commands a reader may run on it. These patterns answer the recurring questions of that page. Each pattern offers drawn options and names a default.
 
 ## Standards
 
@@ -28,9 +28,9 @@ A record detail page shows one business record, such as an order, a customer or 
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the title, state, breadcrumb and one primary action. The state beside the title answers the first question on every record. The runner-up is the overflow menu option. It is the better choice once a record carries four or more commands.
+**Rationale:** Keep the title, state, breadcrumb, and one primary action. The state beside the title answers the first question on every record. The runner-up is the overflow menu option. It is the better choice once a record carries four or more commands.
 
-Prefer the state-driven primary on records with a clear next step, such as an unpaid order. Never ship the title-less option. It fails the check for exactly one h1 per page.
+Prefer the state-driven primary on records with a clear next step, such as an unpaid order. Never ship the title-less option. It fails the check for exactly one `h1` per page.
 
 #### `title-state-breadcrumb-one-primary-action`: Title, state, breadcrumb, one primary action
 
@@ -72,7 +72,7 @@ page
     fact "Paid" "EUR 125.00"
 ```
 
-**Rationale:** The heading and its state, and nothing between them and the content. The trail already says where the record is, so the description repeats it.
+**Rationale:** The heading and its state stand with nothing between them and the content. The trail already says where the record is, so the description repeats it.
 
 **Cost:** A record with a long name or a subtle state loses the one line. That line says which delivery this order belongs to, which is the most-asked question.
 
@@ -164,7 +164,7 @@ page
 
 **Rationale:** The breadcrumb names the record and the page opens straight into its sections. The largest possible use of the space goes to the content.
 
-**Cost:** Fails WCAG 2.4.8 Location in spirit and reads as a bare panel. Every page carries exactly one h1, which automated checks enforce, so this fails that check.
+**Cost:** Fails WCAG 2.4.8 Location in spirit and reads as a bare panel. Every page carries exactly one `h1`, which automated checks enforce, so this fails that check.
 
 #### `title-state-and-who-saved-it-last`: Title, state, and who saved it last
 
@@ -212,7 +212,7 @@ page
     fact "Paid" "EUR 125.00"
 ```
 
-**Rationale:** Stripe draws one primary action on a charge and folds the rest behind an overflow menu. The header stays one line however many commands a record gains. Resend, refund and export all fit without a second row of buttons.
+**Rationale:** Stripe draws one primary action on a charge and folds the rest behind an overflow menu. The header stays one line however many commands a record gains. Resend, refund, and export all fit without a second row of buttons.
 
 **Cost:** Secondary commands are a click further away, and a reader cannot tell what the menu holds without opening it. The menu also needs its items ordered by frequency, which is a judgment per record.
 
@@ -316,7 +316,7 @@ page
       text muted "412 in stock at the Amsterdam warehouse"
 ```
 
-**Rationale:** Each tab carries the number of things in it, so a reader knows whether a facet is worth opening before opening it. Four tabs where one holds three and another holds none.
+**Rationale:** Each tab carries the number of things in it, so a reader knows whether a facet is worth opening before opening it. The example shows four tabs where one holds three and another holds none.
 
 **Cost:** Counts on tabs are a claim that has to stay true. A count of 0 invites a click that leads to an empty state.
 
@@ -354,7 +354,7 @@ page
       fact "Capacity" "40 pallets"
 ```
 
-**Rationale:** Where a record genuinely needs six facets, the row scrolls horizontally with a fade at the edge so the reader knows there is more. Useful on a phone, where four tabs wrap.
+**Rationale:** Where a record genuinely needs six facets, the row scrolls horizontally with a fade at the edge so the reader knows there is more, which is useful on a phone, where four tabs wrap.
 
 **Cost:** A hidden seventh tab is a hidden feature, and a horizontal scroll on a page hides content from anyone who never swipes.
 
@@ -450,7 +450,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the facts about the record itself. A delivery summary states when, where and how full, which is the identity of the record rather than its support. The runner-up is the copyable identifiers option. It is the better choice on records a reader quotes elsewhere, such as an order read out on the phone.
+**Rationale:** Keep the facts about the record itself. A delivery summary states when, where, and how full, which is the identity of the record rather than its support. The runner-up is the copyable identifiers option. It is the better choice on records a reader quotes elsewhere, such as an order read out on the phone.
 
 Prefer the progress bar summary only for the one figure the company watches daily. Never ship the heading-less value row. Values with no section break the rule that a section is the only box.
 
@@ -473,7 +473,7 @@ page
     fact "Loaded" "36 of 40 pallets"
 ```
 
-**Rationale:** The summary holds the facts that define this record: its date, its place, its state, what it holds. Everything else is a section below it.
+**Rationale:** The summary holds the facts that define this record: its date, its place, its state, and what it holds. Everything else is a section below it.
 
 **Cost:** Repeats what the header already says, since the header carries the title and state. Saying a thing twice is what the design contract forbids.
 
@@ -496,9 +496,9 @@ page
       item: text "Oak desk lamp" · text muted "one per parcel" · status "Packed" neutral
 ```
 
-**Rationale:** A single row of label and value pairs stands with no Section around it, because a summary is not a block of content. It restates the heading.
+**Rationale:** A single row of label and value pairs stands with no section around it, because a summary is not a block of content. It restates the heading.
 
-**Cost:** Breaks the rule that a Section is the only box, because the values would float on the canvas with nothing holding them together visually.
+**Cost:** Breaks the rule that a section is the only box, because the values would float on the canvas with nothing holding them together visually.
 
 #### `money-summary-as-a-statement`: Money summary as a statement
 
@@ -518,7 +518,7 @@ page
     fact "Net for Acme Supply" "EUR 59,056.20"
 ```
 
-**Rationale:** Where the record is a settlement, the summary is a statement: what came in, what went out, what is left. It adds up top to bottom, which is what the reader came for.
+**Rationale:** Where the record is a settlement, the summary is a statement: what came in, what went out, and what is left. It adds up top to bottom, which is what the reader came for.
 
 **Cost:** Wrong for a record with no money, and a statement is longer than a summary ought to be, so it pushes the sections down.
 
@@ -542,9 +542,9 @@ page
     text muted "Products and delivery fees"
 ```
 
-**Rationale:** Each fact carries a figure and a quieter line under it, as a figure row with a sub-line. A count beside its unit, a money figure beside what it is.
+**Rationale:** Each fact carries a figure and a quieter line under it, as a figure row with a sub-line: a count beside its unit and a money figure beside what it is.
 
-**Cost:** A figure and a sub-line per fact needs three columns or a wide row. The sub-lines repeat the label meaning in more words.
+**Cost:** A figure and a sub-line per fact need three columns or a wide row. The sub-lines repeat the label meaning in more words.
 
 #### `summary-with-a-progress-bar-for-the-one-number-that-matters`: Summary with a progress bar for the one number that matters
 
@@ -567,7 +567,7 @@ page
     fact "Company" "Acme Supply"
 ```
 
-**Rationale:** One number, 'pallets left', carries a bar and a count. Everything else is plain text, because one figure is worth watching and four are not.
+**Rationale:** One number, `pallets left`, carries a bar and a count. Everything else is plain text, because one figure is worth watching and four are not.
 
 **Cost:** Choosing which number matters is a judgment the data has to support. A bar on a capacity figure implies a ratio that stops mattering once loading is over.
 
@@ -620,7 +620,7 @@ page
     action quiet "Copy"
 ```
 
-**Rationale:** Stripe puts a copy button beside every identifier on a charge. Support reads a reference out on the phone or pastes it into a dispute. The human facts stay plain text; the order number, payment reference and customer email copy with one click.
+**Rationale:** Stripe puts a copy button beside every identifier on a charge. Support reads a reference out on the phone or pastes it into a dispute. The human facts stay plain text; the order number, payment reference, and customer email copy with one click.
 
 **Cost:** A copy button per row is visual noise on a record nobody quotes. Each button needs its copied confirmation, which is a small behavior per row.
 
@@ -648,7 +648,7 @@ page
     fact "Company" "Acme Supply"
 ```
 
-**Rationale:** Vercel opens a project on four stat tiles. Four figures side by side compare at a glance where a fact list reads line by line. Loaded, left, money so far and days to dispatch are the four the company checks each morning.
+**Rationale:** Vercel opens a project on four stat tiles. Four figures side by side compare at a glance where a fact list reads line by line. Loaded, left, money so far, and days to dispatch are the four the company checks each morning.
 
 **Cost:** Tiles carry figures, not sentences, so anything that needs a qualifier does not fit. A tile row also answers nothing about who or where, so the facts still need a home below it.
 
@@ -660,7 +660,7 @@ page
 
 **Default:** `history-in-the-aside-sections-in-the-main-column`
 
-**Compact:** Below the md breakpoint the aside stacks as sections under the header, with history first. The compact option is `aside-collapses-to-a-section-on-narrow-screens`.
+**Compact:** Below the `md` breakpoint the aside stacks as sections under the header, with history first. The compact option is `aside-collapses-to-a-section-on-narrow-screens`.
 
 **Rationale:** Give the pick to history in the aside. History supports the order without describing it, which is exactly what the aside slot is for. The runner-up is the decision panel. It is the better choice on records that wait for someone, such as a dispute with a deadline.
 
@@ -715,7 +715,7 @@ page
           item: text "Collected at the pickup counter" · text muted "14 Mar 2026, 10:41" · text muted "Chris Novak"
 ```
 
-**Rationale:** The aside holds the things that need the reader: a pending decision, a clock, a mismatch. History moves into a tab, because a list of past activity is rarely the reason to open a record.
+**Rationale:** The aside holds the things that need the reader: a pending decision, a clock, and a mismatch. History moves into a tab, because a list of past activity is rarely the reason to open a record.
 
 **Cost:** The aside becomes a work panel, which changes what the page is. An order with nothing pending has an empty aside, which is its own awkward state.
 
@@ -743,7 +743,7 @@ page
       item: text "Counter 1 lost its connection" · text muted "14 Mar 2026, 10:10 to 10:40" · text muted "Acme Supply"
 ```
 
-**Rationale:** The main column takes everything. Sections side by side where there are two that fit.
+**Rationale:** The main column takes everything, with sections side by side where there are two that fit.
 
 **Cost:** A two-line fact list stretched across 1200 pixels is a long measure for a name and an email. The history loses its link to the record.
 
@@ -793,7 +793,7 @@ page
           item: text "Garcia Interiors restock" · text muted "Sat 14 Mar 2026" · text muted "Amsterdam warehouse" · action "Open"
 ```
 
-**Rationale:** The aside holds what relates to this record but is not part of it. That is the delivery it ships with, the other lines on it and the messages it has had.
+**Rationale:** The aside holds what relates to this record but is not part of it. That is the delivery it ships with, the other lines on it, and the messages it has had.
 
 **Cost:** Related records are what a reader navigates to, so putting them in the narrowest column makes them the least likely to be found.
 
@@ -849,9 +849,9 @@ page
           item: text "Collected at the pickup counter" · text muted "14 Mar 2026, 10:41" · text muted "Chris Novak"
 ```
 
-**Rationale:** Linear puts assignee, state, labels and dates in the issue sidebar, because a record a team hands between shifts needs its ownership beside its facts. Alex Morgan sees at a glance that this order waits for Priya Shah under the label refund-check, and the history still reads below the handover.
+**Rationale:** Linear puts assignee, state, labels, and dates in the issue sidebar, because a record a team hands between shifts needs its ownership beside its facts. Alex Morgan sees at a glance that this order waits for Priya Shah under the label `refund-check`, and the history still reads below the handover.
 
-**Cost:** Ownership fields need data that tracks them, and on records one person owns end to end they repeat what the team already knows. The aside also grows long once labels, dates and watchers all claim a row.
+**Cost:** Ownership fields need data that tracks them, and on records one person owns end to end they repeat what the team already knows. The aside also grows long once labels, dates, and watchers all claim a row.
 
 **Reference:** Linear
 
@@ -880,7 +880,7 @@ page
           item: text "Collected at the pickup counter" · text muted "14 Mar 2026, 10:41" · text muted "Chris Novak"
 ```
 
-**Rationale:** HubSpot draws associated records and the activity timeline in one right rail. The aside answers both who this record touches and what happened to it. The delivery, the other order from this customer and the messages sit above a short history with a link to the rest.
+**Rationale:** HubSpot draws associated records and the activity timeline in one right rail. The aside answers both who this record touches and what happened to it. The delivery, the other order from this customer, and the messages sit above a short history with a link to the rest.
 
 **Cost:** Two different jobs in one column, so neither gets the width it wants. Related records compete with history for the top of the aside, and the loser sits below the fold on a short viewport.
 
@@ -932,9 +932,9 @@ page
       item: text "8 Oct, 09:34" · text "Paid by card" · text "Acme Supply" · text "EUR 125.00"
 ```
 
-**Rationale:** When the history is the record rather than context, a table is denser and sortable: when, who, what, with an amount column when money moved.
+**Rationale:** When the history is the record rather than context, a table is denser and sortable: when, who, and what, with an amount column when money moved.
 
-**Cost:** Gives up the shape of a sequence for a grid of facts. A reader asking 'what happened in order' has to read down a table, which is slower than a timeline.
+**Cost:** It gives up the shape of a sequence for a grid of facts. A reader asking 'what happened in order' has to read down a table, which is slower than a timeline.
 
 #### `grouped-by-day-with-a-date-label`: Grouped by day with a date label
 
@@ -1015,7 +1015,7 @@ page
         fact "state" "Awaiting payment to Paid"
 ```
 
-**Rationale:** Each entry names what it changed, so the history answers what the record looks like now as well as how it got here. This is what an audit register carries.
+**Rationale:** Each entry names what it changed, so the history answers what the record looks like now as well as how it got here. This is what an audit trail carries.
 
 **Cost:** A diff needs the before and after. It has to be reconstructed at read time rather than read from the entry that recorded the change.
 
@@ -1039,7 +1039,7 @@ page
       item: text "Confirmation resent at the customer request" · text muted "8 Oct 2026, 11:20" · text muted "Jordan Lee"
 ```
 
-**Rationale:** GitHub lets a reader filter an issue timeline to comments, commits or references, because a long record mixes kinds and the reader usually wants one. The filters sit above the timeline and the count beside each says what choosing it keeps.
+**Rationale:** GitHub lets a reader filter an issue timeline to comments, commits, or references, because a long record mixes kinds and the reader usually wants one. The filters sit above the timeline and the count beside each says what choosing it keeps.
 
 **Cost:** A filtered timeline hides entries without saying which, so a reader can miss the one line that mattered. The filter state also needs a reset that is always visible, or the hiding looks like absence.
 
@@ -1073,7 +1073,7 @@ page
 
 ### Related records
 
-**Question:** An order belongs to a delivery, a customer and a channel. A delivery belongs to a warehouse and a schedule. A common failure states the parent in prose in the description rather than linking to it.
+**Question:** An order belongs to a delivery, a customer, and a channel. A delivery belongs to a warehouse and a schedule. A common failure states the parent in prose in the description rather than linking to it.
 
 **Default:** `each-relation-is-a-link-with-its-state`
 
@@ -1098,7 +1098,7 @@ page
       item: text "Garcia Interiors restock" · text muted "Sat 14 Mar 2026" · text muted "Amsterdam warehouse" · status "Scheduled" info · action "Open delivery"
 ```
 
-**Rationale:** The delivery, the customer and the channel appear as links carrying their own state, so a reader can jump and knows what they will find. Nothing here is prose.
+**Rationale:** The delivery, the customer, and the channel appear as links carrying their own state, so a reader can jump and knows what they will find. Nothing here is prose.
 
 **Cost:** Three links is a small nav of its own, and it competes with the record's own commands for the reader's attention.
 
@@ -1146,9 +1146,9 @@ page
     action "All 1,204"
 ```
 
-**Rationale:** The related record is the other orders, as a short list with the money beside each. Answers 'who else is on this delivery' without leaving.
+**Rationale:** The related record is the other orders, as a short list with the money beside each, which answers 'who else is on this delivery' without leaving.
 
-**Cost:** Anywhere between one and two hundred rows, which is a table with a limit rather than a section. The money page already splits it by delivery for this reason.
+**Cost:** Anywhere between one and two hundred rows, which is a table with a limit rather than a section; the money page already splits it by delivery for this reason.
 
 #### `a-cross-reference-line-not-a-section`: A cross-reference line, not a section
 
@@ -1171,7 +1171,7 @@ page
     fact "Paid" "EUR 125.00"
 ```
 
-**Rationale:** One line under the heading naming the parent record as a link. The smallest possible way to say where this record belongs, and nothing more.
+**Rationale:** One line under the heading names the parent record as a link: the smallest possible way to say where this record belongs, and nothing more.
 
 **Cost:** It stays invisible to anyone who does not read descriptions. It cannot carry the parent state, so the reader has to open it to learn whether it is still live.
 
@@ -1246,7 +1246,7 @@ page
     fact "Packed" "8 Oct 2026, 09:34"
 ```
 
-**Rationale:** Notion shows a preview of a linked page on hover, because the reader usually wants one fact from the parent rather than the parent itself. The delivery row expands to its date, place and state inline, so a reader checking a parcel learns the dispatch window without navigating.
+**Rationale:** Notion shows a preview of a linked page on hover, because the reader usually wants one fact from the parent rather than the parent itself. The delivery row expands to its date, place, and state inline, so a reader checking a parcel learns the dispatch window without navigating.
 
 **Cost:** A preview is a second rendering of the parent to keep true. Only one row can be open at a time before the section doubles in height. It also answers nothing about children, which still need the list.
 
@@ -1343,7 +1343,7 @@ page
     text "Cardholder says the order was canceled by the merchant."
 ```
 
-**Rationale:** A page-level notice says what this role may not do on this page, once, and the sections below stay readable. The reader is told rather than blocked.
+**Rationale:** A page-level notice says what this role may not do on this page, once, and the sections below stay readable. It tells the reader rather than blocking them.
 
 **Cost:** A full-width band on a page about other work breaks the rule that tone marks content, not chrome. This has to be a neutral notice, not a caution one.
 
@@ -1850,7 +1850,7 @@ page
 
 ### Record attachments
 
-**Question:** A dispute needs its evidence, a delivery needs its packing list, a product needs its photos. An attachment is a file the company put on the record, with who added it and when. The reader must know what each file is before opening it.
+**Question:** A dispute needs its evidence, a delivery needs its packing list, and a product needs its photos. An attachment is a file the company put on the record, with who added it and when. The reader must know what each file is before opening it.
 
 **Default:** `a-file-list-with-a-drop-zone`
 
@@ -1899,7 +1899,7 @@ page
       item: image "lamp-front-1080x1350.jpg" · text muted "2.1 MB" · action quiet "Use"
 ```
 
-**Rationale:** GitHub lists release assets as compact rows, because a record with a dozen files has to stay scannable. Name, size and a download action fit one line each; who added it moves to the file's own page.
+**Rationale:** GitHub lists release assets as compact rows, because a record with a dozen files has to stay scannable. Name, size, and a download action fit one line each; who added it moves to the file's own page.
 
 **Cost:** Who and when leave the row, so the reader cannot tell a fresh upload from a stale one without opening it. Compact rows also hide the file kind behind the name alone.
 
@@ -1927,7 +1927,7 @@ page
       field "Add proof of collection" file
 ```
 
-**Rationale:** Stripe asks for dispute evidence by category, because the bank checks kinds rather than files: the receipt, the terms, the proof of fulfillment. Each group says whether it is filled, so Priya Shah sees what is still missing before she answers.
+**Rationale:** Stripe asks for dispute evidence by category, because the bank checks kinds rather than files: the receipt, the terms, and the proof of fulfillment. Each group says whether it is filled, so Priya Shah sees what is still missing before she answers.
 
 **Cost:** The categories belong to card disputes, so the shape fits nothing else without renaming. A file that proves two things also has to sit in two groups or one group has to stay empty.
 
@@ -2000,11 +2000,11 @@ page
 
 ### Property list with copy
 
-**Question:** Support reads a reference out on the phone and pastes an identifier into a dispute. A property list is labeled values where the identifiers copy with one click. The reader must know the copy landed.
+**Question:** Support reads a reference out on the phone and pastes an identifier into a dispute. A property list is a set of labeled values where the identifiers copy with one click. The reader must know the copy landed.
 
 **Default:** `every-identifier-copies`
 
-**Compact:** Below the sm breakpoint each row stacks: the label above its value, the copy button beside the value. The compact option is `stacked-on-a-phone`.
+**Compact:** Below the `sm` breakpoint each row stacks: the label above its value, the copy button beside the value. The compact option is `stacked-on-a-phone`.
 
 **Rationale:** Keep the always-visible copy button on each identifier. Support reaches for it without hunting. The runner-up is the in-place confirmation option. It fits records where a miscopied reference causes real mistakes.
 
@@ -2026,7 +2026,7 @@ page
       item: text "Order" · text "SO-1042" · action quiet "Copy"
 ```
 
-**Rationale:** Stripe puts a copy button beside every identifier on a charge, because support quotes references all day. Order number, payment reference, customer email and parcel codes each copy with one click; human facts stay plain.
+**Rationale:** Stripe puts a copy button beside every identifier on a charge, because support quotes references all day. Order number, payment reference, customer email, and parcel codes each copy with one click; human facts stay plain.
 
 **Cost:** A button per row is noise on records nobody quotes, and each button needs its copied confirmation to be honest. The list also grows long once every identifier claims a row.
 
@@ -2075,7 +2075,7 @@ page
       item: text "Order" · text "SO-1042" · action quiet "Copy"
 ```
 
-**Rationale:** Vercel groups a deployment's identifiers in one card apart from its facts, because identifiers are quoted together. The id, the reference and the address leave in one message. One card holds all three with their copy buttons.
+**Rationale:** Vercel groups a deployment's identifiers in one card apart from its facts, because identifiers are quoted together. The id, the reference, and the address leave in one message. One card holds all three with their copy buttons.
 
 **Cost:** The identifiers leave the facts they belong to. The reader jumps between the summary and the card to connect a value with its meaning. A second card is also a second heading for the same record.
 
@@ -2181,7 +2181,7 @@ page
     fact "Email" "maria@garcia-interiors.example"
 ```
 
-**Rationale:** shadcn dashboard pages stack the header actions under the title below the sm breakpoint, with the primary first and full width. The title and state read first; the thumb finds one large button; rarer commands wait behind the menu.
+**Rationale:** shadcn dashboard pages stack the header actions under the title below the `sm` breakpoint, with the primary first and full width. The title and state read first; the thumb finds one large button; rarer commands wait behind the menu.
 
 **Cost:** The header grows tall on the smallest screen, so the content starts lower. Secondary commands also hide behind a tap that a hurried reader may not try.
 
@@ -2252,7 +2252,7 @@ page
     fact "Email" "maria@garcia-interiors.example"
 ```
 
-**Rationale:** GitHub mobile folds long issue context behind the title, because the title and state are the wayfinding and the rest is detail. One tap opens customer, delivery and placed; until then the header is two lines.
+**Rationale:** GitHub mobile folds long issue context behind the title, because the title and state are the wayfinding and the rest is detail. One tap opens customer, delivery, and placed; until then the header is two lines.
 
 **Cost:** The delivery name hides behind a tap on exactly the record type where which-delivery is the most-asked question. A folded header also looks unfinished to a reader who never unfolds it.
 
@@ -2277,7 +2277,7 @@ page
     fact "Email" "maria@garcia-interiors.example"
 ```
 
-**Rationale:** Material design scrolls a row of action chips under the title, because every action stays visible as a word rather than hiding in a menu. Message, Resend, Refund and Export all fit one swipeable row.
+**Rationale:** Material Design scrolls a row of action chips under the title, because every action stays visible as a word rather than hiding in a menu. Message, Resend, Refund, and Export all fit one swipeable row.
 
 **Cost:** A sideways scroll inside a vertical page hides anything past the edge until swiped. Equal chips also give the destructive action the same weight as a harmless one.
 
@@ -2368,7 +2368,7 @@ page
     text muted "Press j for the previous order, k for the next."
 ```
 
-**Rationale:** Gmail teaches j and k beside its arrows, because a triage reader moves faster without the pointer. The header holds previous and next with their keys, and the position reads beside them.
+**Rationale:** Gmail teaches `j` and `k` beside its arrows, because a triage reader moves faster without the pointer. The header holds previous and next with their keys, and the position reads beside them.
 
 **Cost:** Keyboard hints help nobody on a phone, where warehouse staff do this work. The header also gains two buttons that compete with the record's own commands.
 
@@ -2446,7 +2446,7 @@ page
       item: text "SO-1031" · text muted "Tom Becker · EUR 40.45 · Awaiting"
 ```
 
-**Rationale:** Linear jumps to any issue from its command menu, because a reader who knows the number should not walk the queue to reach it. The order number, customer name or email lands on the record in one step.
+**Rationale:** Linear jumps to any issue from its command menu, because a reader who knows the number should not walk the queue to reach it. The order number, customer name, or email lands on the record in one step.
 
 **Cost:** Search answers only the record the reader already knows, so it never helps triage an unknown queue. It also needs the menu everywhere, which is a frame behavior rather than a record pattern.
 
@@ -2477,13 +2477,13 @@ page
 
 ### Order record
 
-**Question:** The order is the record support opens most. Maria Garcia ordered SO-1042. It totals EUR 125.00 for two lamps, a delivery fee and a cable tray. It must state its lines, its payments and its refunds in one reading. The money adds up. Every refund reads against the payment it reverses.
+**Question:** The order is the record support opens most. Maria Garcia ordered SO-1042. It totals EUR 125.00 for two lamps, a delivery fee, and a cable tray. It must state its lines, its payments, and its refunds in one reading. The money adds up. Every refund reads against the payment it reverses.
 
 **Default:** `summary-three-sections-history-in-the-aside`
 
 **Compact:** On a phone the order stacks in the order the questions are asked at the counter: state and customer first, then parcels, then money. The compact option is `the-order-on-a-phone`.
 
-**Rationale:** Keep the record-page shape with a summary, three sections and history in the aside. Customer, lines and money each keep their own section. The runner-up is the money-first layout. It fits finance readers who reconcile payments against refunds.
+**Rationale:** Keep the record-page shape with a summary, three sections, and history in the aside. Customer, lines, and money each keep their own section. The runner-up is the money-first layout. It fits finance readers who reconcile payments against refunds.
 
 Prefer the tabbed layout only once an order outgrows three sections. Never ship the phone layout as the desktop page. Stacked sections waste most of the width there.
 
@@ -2513,7 +2513,7 @@ page
           item: text "Paid by card" · text muted "Acme Supply · 8 Oct 2026, 09:34"
 ```
 
-**Rationale:** A summary of the order with the customer, the lines and the money beside a history aside. Each facet of SO-1042 has one home and the money adds up top to bottom in its own section.
+**Rationale:** A summary of the order with the customer, the lines, and the money beside a history aside. Each facet of SO-1042 has one home and the money adds up top to bottom in its own section.
 
 **Cost:** Three sections is a ceiling, so the fourth facet waits for a tab or a second page. The aside also stacks below everything under 900 px, which buries the history on a phone.
 
@@ -2533,7 +2533,7 @@ page
         item: text "Oak desk lamp" · text muted "one per parcel · PC-0C893968A2" · status "Packed" neutral
 ```
 
-**Rationale:** Shopify draws an order as tabs for timeline, lines and payments, because an order with messages, notes and refunds outgrows three sections. The customer summary stays above the tabs so the record is always identified.
+**Rationale:** Shopify draws an order as tabs for timeline, lines, and payments, because an order with messages, notes, and refunds outgrows three sections. The customer summary stays above the tabs so the record is always identified.
 
 **Cost:** Lines and payments can no longer be read together, so checking a refund against its line means switching tabs. The tab state also has to live in the URL to stay shareable.
 
@@ -2568,7 +2568,7 @@ page
       item: text "Paid by card" · text muted "Acme Supply · 8 Oct 2026, 09:34"
 ```
 
-**Rationale:** Stripe draws a charge as one scrolling page, because support reads top to bottom and prints the page for the file. Customer, lines, payments, refunds and history follow in the order the questions are asked.
+**Rationale:** Stripe draws a charge as one scrolling page, because support reads top to bottom and prints the page for the file. Customer, lines, payments, refunds, and history follow in the order the questions are asked.
 
 **Cost:** A long page buries the later sections, so refunds sit below the fold on every order. There is also no shortcut to one facet: the reader scrolls past everything above it.
 
@@ -2629,7 +2629,7 @@ page
     status "Settled" positive
 ```
 
-**Rationale:** Zendesk opens a case on the requester, because support answers a person rather than a record. The customer card leads with name, contact and order history, and the lines and money read as that customer's story below it.
+**Rationale:** Zendesk opens a case on the requester, because support answers a person rather than a record. The customer card leads with name, contact, and order history, and the lines and money read as that customer's story below it.
 
 **Cost:** The record's own identity waits behind the customer's, so an order-first reader scrolls past a card they did not open. Customer history on the order also duplicates the customer page.
 

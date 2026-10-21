@@ -2,19 +2,19 @@
 
 ## Intent
 
-This page holds how the TypeScript web stacks realize the frontend rendering rules ([Frontend rendering](../rendering.md)). It states the loaders, queries, router files, and tooling the React and Svelte stacks share. Each realization cites the neutral rule it follows.
+This page states how the TypeScript web stacks realize the frontend rendering rules ([Frontend rendering](../rendering.md)). It states the loaders, queries, router files, and tooling the React and Svelte stacks share. Each realization cites the neutral rule it follows.
 
 Rules with no neutral counterpart bind the web stacks alone.
 
 ## React
 
-React routes are files using the router's file convention. Each route declares its search parameters in `validateSearch` and prefetches its reads in its loader. Components read route data with `useSuspenseQuery` over the key the loader filled. A shell is a pathless layout route whose file name starts with an underscore. Server-only code lives in a file whose name and import show the server ownership. The router builds the route tree, and intent preloading fills the query cache.
+React routes are files using the router's file convention. Each route declares its search parameters in `validateSearch` and prefetches its reads in its loader. Components read route data with `useSuspenseQuery` over the key the loader filled. A shell is a pathless layout route whose file name starts with an underscore. Server-only code lives in a file whose name and import show the server ownership. The router builds the route tree. Intent preloading fills the query cache.
 
 ## Svelte
 
 Svelte routes are folders under `src/routes`, each holding a page. Each page declares its parameters in a schema and prefetches its reads in its load. Pages read route data with a query creator over the key the load filled. A shell is a layout file holding the frame every child page shares. Server-only code lives in a server file or under the server library.
 
-SvelteKit splits each route folder, and intent preloading fills the query cache. A page is a route file, a load is a loader, and a query creator is a suspense query.
+SvelteKit splits each route folder. Intent preloading fills the query cache. A page is a route file, a load is a loader, and a query creator is a suspense query.
 
 ## Standards
 
@@ -22,7 +22,7 @@ SvelteKit splits each route folder, and intent preloading fills the query cache.
 
 **Requirement:** A route's loader MUST prefetch each read it needs through the query cache before the component runs.
 
-**Rationale:** The page then renders with its data rather than showing a spinner after it has already appeared. The cache owns freshness, so the router never holds a second copy. This realizes litespec/frontend/rendering#load-route-data-before-rendering.
+**Rationale:** The page then renders with its data rather than showing a spinner after it has already appeared. The cache owns freshness. The router never holds a second copy. This realizes litespec/frontend/rendering#load-route-data-before-rendering.
 
 **Example:** An entity route prefetches its record and every read the record's own sections need.
 
@@ -55,7 +55,7 @@ export async function load({ parent, params }) {
 
 **Requirement:** A component MUST read route data with a suspense query over the same cache key its loader filled.
 
-**Rationale:** A read naming another key issues a second request, and the two answers can disagree. A failed read reaches the route's error boundary, which draws the shared problem state. This realizes litespec/frontend/rendering#read-route-data-from-the-route-cache.
+**Rationale:** A read naming another key issues a second request. The two answers can disagree. A failed read reaches the route's error boundary, which draws the shared problem state. This realizes litespec/frontend/rendering#read-route-data-from-the-route-cache.
 
 **Example:**
 
@@ -75,7 +75,7 @@ const order = createQuery(() => orderQuery(orderId));
 
 **Requirement:** A route MUST declare its search parameters in a validated schema, including its filters and its page.
 
-**Rationale:** A filtered list is then a link somebody can share, bookmark, and reopen. A filter in component state reaches nobody and is lost on the first navigation away. This realizes litespec/frontend/rendering#keep-address-parameters-validated-by-a-schema.
+**Rationale:** A filtered list is then a link somebody can share, bookmark, and reopen. A filter in component state reaches nobody. It is lost on the first navigation away. This realizes litespec/frontend/rendering#keep-address-parameters-validated-by-a-schema.
 
 **Example:** The list schema declares its own text field and spreads the shared paging fields.
 
@@ -115,13 +115,13 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 **Requirement:** Actor-specific data MUST declare its cache key, partition, invalidation owner, and security review before caching, beside the query definition setting the key.
 
-**Rationale:** Shared route or loader behavior otherwise serves one actor's data to another. An uncached read is the safe default, and a cache partitioned per request is the safe server shape. This realizes litespec/frontend/rendering#keep-authenticated-caching-explicit.
+**Rationale:** Shared route or loader behavior otherwise serves one actor's data to another. An uncached read is the safe default. A cache partitioned per request is the safe server shape. This realizes litespec/frontend/rendering#keep-authenticated-caching-explicit.
 
 ### Keep proxy behavior at the edge
 
 **Requirement:** A development or edge proxy rule MUST route only, and never decide who the actor is or what the actor may read.
 
-**Rationale:** The proxy runs before the request reaches the API, so it cannot see the resource authorization depends on. Forwarding the API's own paths gives the browser one origin, which is what makes an HTTP-only session cookie a first-party cookie of the page. This realizes litespec/frontend/rendering#keep-proxy-behavior-at-the-edge.
+**Rationale:** The proxy runs before the request reaches the API. It cannot see the resource authorization depends on. Forwarding the API's own paths gives the browser one origin. That makes an HTTP-only session cookie a first-party cookie of the page. This realizes litespec/frontend/rendering#keep-proxy-behavior-at-the-edge.
 
 **Example:** A development proxy forwards `/api` and `/auth` to the API and changes nothing else.
 
@@ -169,7 +169,7 @@ The Svelte page does the same in its load:
 <OrdersPage search={data.search} />
 ```
 
-The route resolves its input and composes the floorplan. The query definition owns the typed call, and the table owns the columns. A route links to its use cases through the generated client calls in its code.
+The route resolves its input and composes the floorplan. The query definition owns the typed call. The table owns the columns. A route links to its use cases through the generated client calls in its code.
 
 ## Verification
 

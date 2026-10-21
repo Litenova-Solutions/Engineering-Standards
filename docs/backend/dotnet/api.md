@@ -2,7 +2,7 @@
 
 ## Intent
 
-The dotnet backend maps each HTTP operation through one endpoint class and generates its OpenAPI contract at build time. The shared provisions live on the stack-neutral page ([HTTP API](../api.md)); this page holds what the dotnet stack alone requires.
+The .NET backend maps each HTTP operation through one endpoint class and generates its OpenAPI contract at build time. The shared provisions live on the stack-neutral page ([HTTP API](../api.md)); this page holds what the dotnet stack alone requires.
 
 ## Standards
 
@@ -47,7 +47,7 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 - Carry the metadata on the type, not only in host options.
 - Name the discriminator through `TypeDiscriminatorPropertyName`, using a name such as `type` or `outcome`.
 - Opt derived types in explicitly, so an unregistered runtime subtype fails serialization.
-- A document or schema transformer completes discriminator metadata that the generator omits.
+- Complete discriminator metadata that the generator omits with a document or schema transformer.
 
 ## Conventions
 
@@ -59,14 +59,14 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 **Rationale:** Order-sensitive middleware stays reviewable when one file shows the sequence. Process composition lives in `litespec/backend/architecture#compose-each-process-explicitly`, which this file implements for WebApi.
 
-**Example:** The visible order is trusted forwarded headers, exception handling, transport security, authentication, authorization, endpoints, then health. Forwarded headers appear only when the deployment boundary requires trusted proxies. OpenAPI and Scalar map only in Development.
+**Example:** The visible order is trusted forwarded headers, exception handling, transport security, authentication, authorization, endpoints, and then health. Forwarded headers appear only when the deployment boundary requires trusted proxies. OpenAPI and Scalar map only in Development.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/backend/dotnet/api#use-one-endpoint-per-operation | guidance | Does each mapped route resolve to one `IEndpoint` type and one mediator dispatch? |
-| litespec/backend/dotnet/api#exclude-mvc-controllers-from-the-stack | guidance | Does any type derive from ControllerBase? |
-| litespec/backend/dotnet/api#declare-operation-metadata-in-the-contract | guidance | Does each operation declare its operationId, metadata, typed results, and summary? |
-| litespec/backend/dotnet/api#mark-polymorphic-transport-models-with-discriminators | guidance | Does each data-bearing set map to sealed records published as oneOf with a string discriminator? |
+| litespec/backend/dotnet/api#exclude-mvc-controllers-from-the-stack | checkable | `dotnet build` of the WebApi project reports no LiteSpec.Analyzers LS2003 diagnostic. |
+| litespec/backend/dotnet/api#declare-operation-metadata-in-the-contract | guidance | Does each operation declare its `operationId`, metadata, typed results, and summary? |
+| litespec/backend/dotnet/api#mark-polymorphic-transport-models-with-discriminators | guidance | Does each data-bearing set map to sealed records published as `oneOf` with a string discriminator? |
 | litespec/backend/dotnet/api#keep-programcs-as-composition | guidance | Does `Program.cs` hold only composition in the recorded order? |

@@ -2,7 +2,7 @@
 
 ## Intent
 
-Backend tests prove domain behavior, use-case coordination, real persistence and HTTP integration, and structural architecture at separate boundaries. Tests prove Cases: each Case of a use case is proved by a test that calls the use case and asserts its result.
+Backend tests prove Domain behavior, use-case coordination, real persistence and HTTP integration, and structural architecture at separate boundaries. A test that calls the use case and asserts its result proves each Case of a use case.
 
 ## Standards
 
@@ -20,7 +20,7 @@ integration-tests/
 acceptance-tests/
 ```
 
-A small codebase holds the first two; acceptance appears when the executable BDD extension activates.
+A small codebase holds the first two. Acceptance appears when the executable BDD extension activates.
 
 ### Test Domain in isolation
 
@@ -32,13 +32,26 @@ A small codebase holds the first two; acceptance appears when the executable BDD
 
 **Requirement:** An Application test MUST substitute repositories, clocks, actor accessors, and external ports, then assert the handler's coordination.
 
-**Rationale:** The assertion covers which aggregate loaded, which domain behavior ran, what was staged, and what returned. Validator tests cover each structural rule separately.
+**Rationale:** The assertion covers which aggregate was loaded, which Domain behavior ran, what was staged, and what was returned. Validator tests cover each structural rule separately.
+
+**Example:** For example, in the .NET stack a borrow-copy handler test substitutes the repositories with the clock, and asserts the coordination:
+
+```csharp
+var handler = new BorrowCopyCommandHandler(loans, copies, clock);
+
+var result = await handler.HandleAsync(
+    new BorrowCopyCommand(copyId, readerId), CancellationToken.None);
+
+Assert.NotEqual(Guid.Empty, result.LoanId);
+```
+
+The test asserts which aggregate was loaded, what was staged, and what was returned. A second test names an unavailable copy and asserts the `failure/lending.copy_not_available` refusal. Neither test opens a database connection, because the repositories are substitutes.
 
 ### Test HTTP integration through the real application host
 
 **Requirement:** An HTTP integration test MUST run through the real application host with the real configuration, covering Problem Details, authentication, and resource authorization.
 
-**Rationale:** Persistence behavior against PostgreSQL is covered by `litespec/backend/persistence#test-persistence-against-postgresql`. Both run on the harness that `litespec/backend/testing#share-one-production-faithful-integration-harness` owns.
+**Rationale:** `litespec/backend/persistence#test-persistence-against-postgresql` covers persistence behavior against PostgreSQL. Both run on the harness that `litespec/backend/testing#share-one-production-faithful-integration-harness` owns.
 
 ### Isolate integration state
 
@@ -46,7 +59,7 @@ A small codebase holds the first two; acceptance appears when the executable BDD
 
 **Rationale:** Container and host fixtures may still be shared for cost, because only mutable business state must not leak.
 
-The default strategy is one database per test class, cloned from a migrated template. The harness applies the schema once per run to a template database. Each test class then receives `CREATE DATABASE ... TEMPLATE` of it and drops that database when the class finishes. A clone takes milliseconds, so every class starts from an empty migrated schema without a second container. A project that resets tables between cases instead records that strategy in its testing documentation.
+The default strategy is one database per test class, cloned from a migrated template. The harness applies the schema once per run to a template database. Each test class then receives its database with `CREATE DATABASE ... TEMPLATE` and drops that database when the class finishes. A clone takes milliseconds, so every class starts from an empty migrated schema without a second container. A project that resets tables between cases instead records that strategy in its testing documentation.
 
 ### Assert architecture boundaries with tests
 
@@ -58,25 +71,35 @@ The default strategy is one database per test class, cloned from a migrated temp
 
 **Requirement:** Each Case MUST be proved by a test carrying its proves tag and calling its use case.
 
-**Rationale:** The tag is the claim; the model builder confirms it. An acceptance scenario is confirmed when its When step belongs to the use case steps class. An integration test is confirmed when its body names the use case message type. A Case no test proves is recorded as a Known gap with owner and end date. The test asserts the result, and for a refusal the Result code.
+**Rationale:** The tag is the claim; the model builder confirms it. The model builder confirms an acceptance scenario when its `When` step belongs to the use case steps class. It confirms an integration test when its body names the use case message type. You record a Case no test proves as a Known gap with owner and end date. The test asserts the result, and it asserts the Result code for a refusal.
 
-A test carries no coverage tag; the proves tag is its only record citation. The latest test run marks each confirmed claim passing or failing.
+A test carries no coverage tag. The `proves` tag is its only record citation. The latest test run marks each confirmed claim passing or failing.
 
-**Example:** An acceptance scenario for borrowing a library book carries its Case tag on the scenario method.
+**Example:** An acceptance scenario for borrowing a library book carries its Case tag on the scenario method. In the library circulation product, `BorrowCopyScenarios.Borrowing_an_available_copy_succeeds` in `apps/api/tests/Library.Acceptance.Tests/Lending/Loans/BorrowCopy/BorrowCopyScenarios.cs` carries the tag for `case/borrow-copy.borrowing-an-available-copy-succeeds`, and its `When` step belongs to the `BorrowCopySteps` use case steps class:
+
+```csharp
+/// <proves>case/borrow-copy.borrowing-an-available-copy-succeeds</proves>
+public Task Borrowing_an_available_copy_succeeds() => Runner.RunScenarioAsync(
+    given => new RegisterCopySteps().RegisterACopy("copy-1"),
+    when => new BorrowCopySteps().BorrowACopy("reader-1", "copy-1"),
+    then => new BorrowCopySteps().TheLoanIsActive());
+```
+
+The tag names the Case, the steps call the borrow-copy use case, and the model builder confirms the claim because the `When` step belongs to the use case steps class.
 
 ### Prove each Rule at its enforcement point
 
 **Requirement:** Each Rule MUST be proved at the point its `enforcedBy` names: governed Cases for validator and guard Rules, a proves tag otherwise.
 
-**Rationale:** A validator Rule is proved by a refused request. A store Rule is proved by an integration test that provokes the refusal. A reaction Rule is proved through the Cases of its reacting use case. The builder confirms an aggregate or store claim when the test body names the governed business record code type.
+**Rationale:** A refused request proves a validator Rule. An integration test that provokes the refusal proves a store Rule. The Cases of its reacting use case prove a reaction Rule. The builder confirms an aggregate or store claim when the test body names the governed business record code type.
 
-Input shape is a checked-before Rule enforced by the validator. A persistence constraint is an always-true Rule enforced by the store.
+The validator enforces input shape as a checked-before Rule. The store enforces a persistence constraint as an always-true Rule.
 
 ### Use evidence rather than one coverage target
 
 **Requirement:** A repository MUST NOT treat one coverage percentage as the definition of sufficient testing.
 
-**Rationale:** Line and branch coverage is collected for review. Case proof, Domain negative cases, integration boundaries, security behavior, and architecture rules remain the evidence.
+**Rationale:** You collect line and branch coverage for review. Case proof, Domain negative cases, integration boundaries, security behavior, and architecture rules remain the evidence.
 
 ### Share one production-faithful integration harness
 
@@ -139,7 +162,7 @@ Input shape is a checked-before Rule enforced by the validator. A persistence co
 
 **Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
-**Rationale:** Bypassing domain methods to construct impossible state is reserved for a persistence compatibility test.
+**Rationale:** You reserve bypassing Domain methods to construct impossible state for a persistence compatibility test.
 
 ### Keep assertions focused
 
@@ -165,11 +188,11 @@ A `PostTests.Publish_WhenDraft_MarksPostPublishedAndRaisesEvent` test uses no mo
 | litespec/backend/testing#test-http-integration-through-the-real-application-host | guidance | Does each HTTP integration test run through the real host covering Problem Details, authentication, and authorization? |
 | litespec/backend/testing#isolate-integration-state | guidance | Does each integration test reset state through the documented strategy with no order dependence? |
 | litespec/backend/testing#assert-architecture-boundaries-with-tests | guidance | Do architecture tests assert the named structural boundaries? |
-| litespec/backend/testing#tag-the-test-that-proves-each-case | guidance | Is each Case proved by a test carrying its proves tag, calling the use case and asserting its result? |
-| litespec/backend/testing#prove-each-rule-at-its-enforcement-point | guidance | Is each Rule proved at its enforcement point, with store refusals provoked through integration? |
-| litespec/backend/testing#use-evidence-rather-than-one-coverage-target | guidance | Is coverage collected for review with no percentage treated as sufficient testing? |
+| litespec/backend/testing#tag-the-test-that-proves-each-case | guidance | Does a test carrying its `proves` tag, calling the use case and asserting its result, prove each Case? |
+| litespec/backend/testing#prove-each-rule-at-its-enforcement-point | guidance | Does a test at the enforcement point prove each Rule, with store refusals provoked through integration? |
+| litespec/backend/testing#use-evidence-rather-than-one-coverage-target | guidance | Do you collect coverage for review with no percentage treated as sufficient testing? |
 | litespec/backend/testing#share-one-production-faithful-integration-harness | guidance | Does the integration suite own one container fixture, host factory, and isolation helper? |
 | litespec/backend/testing#mirror-production-module-names | guidance | Does each test project tree list the same module folders as production, apart from the exempt harness files? |
 | litespec/backend/testing#name-tests-by-observable-behavior | guidance | Does each test name state operation, condition, and expected result on its production type class? |
-| litespec/backend/testing#use-builders-for-valid-defaults | guidance | Does each test data builder produce valid state by default through its domain factory? |
+| litespec/backend/testing#use-builders-for-valid-defaults | guidance | Does each test data builder produce valid state by default through its Domain factory? |
 | litespec/backend/testing#keep-assertions-focused | guidance | Does each test assert only its named outcome rather than a whole-object snapshot? |

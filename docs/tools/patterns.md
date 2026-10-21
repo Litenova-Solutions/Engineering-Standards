@@ -42,7 +42,7 @@ A pattern page in `docs/frontend/patterns/` offers several options for one recur
 
 | Code | Meaning |
 |:---|:---|
-| `0` | The page was written, the sketch printed, or the check found no problem. |
+| `0` | The page was written, the sketch was printed, or the check found no problem. |
 | `1` | A page or a wireframe has a problem. `preview` still writes the page and lists the problems. |
 | `2` | The subcommand, a target, a pattern or an option is unknown. |
 
@@ -62,4 +62,4 @@ litespec patterns svg litespec/frontend/patterns/record-detail#record-header tit
 
 ## Underneath
 
-The command parses each fenced `wireframe` block with the language defined in [UI pattern decisions](../frontend/patterns.md) and lays it out with a dependency-free box layout. Text width is estimated from the character count, so the sketch needs no font. Nothing beneath it is separately runnable.
+The command parses each fenced `wireframe` block with the language defined in [UI pattern decisions](../frontend/patterns.md) and lays it out with a dependency-free box layout. The command estimates text width from the character count, so the sketch needs no font. Nothing beneath it is separately runnable.

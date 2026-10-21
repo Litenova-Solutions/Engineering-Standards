@@ -2,7 +2,7 @@
 
 ## Intent
 
-Navigation is the frame around every page: the sidebar, the header, the breadcrumb, tabs, the command palette and the account menu. These patterns answer how a reader moves through the back office and knows where they are. Each pattern offers drawn options and names a default.
+Navigation is the frame around every page: the sidebar, the header, the breadcrumb, tabs, the command palette, and the account menu. These patterns answer how a reader moves through the back office and knows where they are. Each pattern offers drawn options and names a default.
 
 ## Standards
 
@@ -16,7 +16,7 @@ Navigation is the frame around every page: the sidebar, the header, the breadcru
 
 **Requirement:** Every page MUST have its own URL that opens it directly.
 
-**Rationale:** A reader shares, bookmarks and reopens a page by its address. A page reachable only by clicking through cannot be linked from a notification or a record.
+**Rationale:** A reader shares, bookmarks, and reopens a page by its address. A page reachable only by clicking through cannot be linked from a notification or a record.
 
 ## Patterns
 
@@ -26,7 +26,7 @@ Navigation is the frame around every page: the sidebar, the header, the breadcru
 
 **Default:** `grouped-areas-with-expandable-sub-items`
 
-**Compact:** Below the md breakpoint the sidebar becomes an off-canvas sheet: the same entries slide in over a scrim and dismiss with a close control. The compact option is `the-sidebar-as-an-off-canvas-sheet-on-a-phone`.
+**Compact:** Below the md breakpoint the sidebar becomes an off-canvas sheet: the same entries slide in over a scrim and close with a control. The compact option is `the-sidebar-as-an-off-canvas-sheet-on-a-phone`.
 
 **Rationale:** Keep the grouped areas with expandable sub-items. Seven areas with two levels are what Fluent allows. The expandable group is the shape sidebar components ship. The counts beside groups are the runner-up for areas that hold a queue, such as refunds.
 
@@ -60,7 +60,7 @@ page
         item: text "Oak desk lamp" · text "412 in stock" · status "Active" positive · text "EUR 45.00"
 ```
 
-**Rationale:** Seven areas, each expandable, with the current item marked and the sub-item indented under its area. The account sits at the foot.
+**Rationale:** Seven areas expand, with the current item marked and the sub-item indented under its area. The account sits at the foot.
 
 **Cost:** Thirty settings routes in one group means a group longer than the screen. Settings stays open on every settings page, so it never collapses.
 
@@ -155,7 +155,7 @@ page
         item: text "Refunds" · text muted "Orders" · action "Open"
 ```
 
-**Rationale:** The sidebar holds the seven areas and a palette holds everything else. Cmd-K is the shape most consoles now use for a large route count.
+**Rationale:** The sidebar holds the seven areas and a palette holds everything else. Cmd+K is the shape most consoles use for a large route count.
 
 **Cost:** It only works if the reader knows the key exists. It cannot be the only way to anything. WCAG 2.1.1 requires every function to work from the keyboard. A hidden palette is a discoverability problem rather than an accessibility one.
 
@@ -232,7 +232,7 @@ page
         item: text "SO-1042" · text "Maria Garcia" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** The three most recent pages sit above the seven areas, so resuming work is one click instead of re-walking the tree. None of the other variants remembers where the reader was: clearer navigation by recency rather than by structure.
+**Rationale:** The three most recent pages sit above the seven areas, so resuming work is one click instead of re-walking the tree. None of the other variants remembers where the reader was: this one navigates by recency rather than by structure.
 
 **Cost:** Recents are per person, so a shared screen shows another person's trail. A recent that was archived or renamed also needs a rule for what its row says.
 
@@ -486,7 +486,7 @@ page
 
 ### Header bar
 
-**Question:** The bar carries the page title, a sidebar toggle, a help control and the theme. It does not carry the company name. It does not say who is acting. It says nothing about location beyond the page title.
+**Question:** The bar carries the page title, a sidebar toggle, a help control, and the theme. It does not carry the company name. It does not say who is acting. It says nothing about location beyond the page title.
 
 **Default:** `the-bar-with-the-company-name`
 
@@ -515,7 +515,7 @@ page
       item: text "SO-1042" · text "Maria Garcia" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** The page title on the left, then the things that are true everywhere: which company, who is acting, help and theme. The sidebar toggle stays because a phone needs it.
+**Rationale:** The page title on the left, then the things that are true everywhere: which company, who is acting, help, and theme. The sidebar toggle stays because a phone needs it.
 
 **Cost:** Four things in a bar above the content on every page, and a brand mark that repeats what the sidebar already says.
 
@@ -586,7 +586,7 @@ page
       item: text "SO-1042" · text "Maria Garcia" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** The foot switcher, moved into the bar and made explicit. Acting as somebody changes what the session can do, so it belongs where a reader looks for who they are.
+**Rationale:** The foot switcher moves into the bar and becomes explicit. Acting as somebody changes what the session can do, so it belongs where a reader looks for who they are.
 
 **Cost:** On a production deployment with one real account there is nothing to switch to. A switcher that always lists one person is a control that cannot do anything.
 
@@ -745,7 +745,7 @@ page
         item: text "Standard" · text "9,412 of 10,000" · text "EUR 45.00" · status "Active" positive
 ```
 
-**Rationale:** Each tab carries how many things are in it, so a reader knows whether a facet is worth opening. Four tabs where one holds 9,412 and another holds 0.
+**Rationale:** Each tab carries how many things are in it, so a reader knows whether a facet is worth opening: four tabs where one holds 9,412 and another holds 0.
 
 **Cost:** A count of 0 invites a click that leads to an empty state. A count has to be a read per tab rather than a number in a template.
 
@@ -841,7 +841,7 @@ page
       item: text "Garcia Interiors restock" · text muted "Sat 14 Mar 2026 · 40 pallets" · action "Open"
 ```
 
-**Rationale:** Where a record has a handful of facets and they all fit, headed sections on one page. GOV.UK names this as the first-class alternative to tabs and it is the right answer for most records.
+**Rationale:** Where a record has a handful of facets and they all fit, keep headed sections on one page. GOV.UK names this as the first-class alternative to tabs and it is the right answer for most records.
 
 **Cost:** A long page. It stays honest only while the sections stay few, and it is why a record with eight facets carries tabs rather than eight sections.
 
@@ -903,7 +903,7 @@ page
 
 ### Icons in the frame
 
-**Question:** Seven area icons, a sidebar toggle, a help mark and the theme. A page never writes a raw interactive element. Every one of these is a component with a name and an accessible label.
+**Question:** Seven area icons, a sidebar toggle, a help mark, and the theme. A page never writes a raw interactive element. Every one of these is a component with a name and an accessible label.
 
 **Default:** `an-icon-beside-every-label`
 
@@ -1179,7 +1179,7 @@ page
       item: text "SO-1042" · text "Maria Garcia" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** Everything about who you are and how the product looks sits in one place, and the header is left for the page title. Account, language, theme and sign-out are one decision.
+**Rationale:** Everything about who you are and how the product looks sits in one place, and the header is left for the page title. Account, language, theme, and sign-out are one decision.
 
 **Cost:** Two taps for a reader who only wants dark at the end of a shift. The theme is not something a reader opens an account menu to find.
 
@@ -1521,11 +1521,11 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Put the avatar menu in the header. One control holds the account page, the access statement and sign-out. It matches Linear and Vercel, so nobody has to learn it.
+**Rationale:** Put the avatar menu in the header. One control holds the account page, the access statement, and sign-out. It matches Linear and Vercel, so nobody has to learn it.
 
 The sidebar foot is the runner-up, but the foot is far from the top of a long page. It is out of reach without opening the sheet on a phone.
 
-Never ship the bare sign-out link. An account with no page turns language, sessions and closing into support messages.
+Never ship the bare sign-out link. An account with no page turns language, sessions, and closing into support messages.
 
 #### `the-account-in-the-sidebar-foot`: The account in the sidebar foot
 
@@ -1576,7 +1576,7 @@ page
     action "Sign out"
 ```
 
-**Rationale:** Linear and Vercel both put the account in the header: one avatar holds the account page, the preferences and sign-out. The acting person is visible on every page without scrolling to the foot.
+**Rationale:** Linear and Vercel both put the account in the header: one avatar holds the account page, the preferences, and sign-out. The acting person is visible on every page without scrolling to the foot.
 
 **Cost:** The header gains a control on every page, and the menu repeats the sidebar foot it replaces during the transition. The foot still needs a sign-out for readers who look there first.
 
@@ -1600,7 +1600,7 @@ page
       item: text "Email address" · text muted "Where sign-in messages go" · action "Edit"
 ```
 
-**Rationale:** The navigation already lists account, email, sign-in and close as pages, so the menu only has to open one of them. Each page does one job and says what changes.
+**Rationale:** The navigation already lists account, email, sign-in, and close as pages, so the menu only has to open one of them. Each page does one job and says what changes.
 
 **Cost:** Four pages for one account is a tree of its own, and closing an account sits two levels from anywhere. The menu has to name the right page, not the account alone.
 
@@ -1670,11 +1670,11 @@ page
 
 **Rationale:** One account, one company, one link. Nothing to open, nothing to prefer, and sign-out is always visible.
 
-**Cost:** An account with no page has nowhere to put language, sessions or closing, so each of those becomes a support message instead. Never ship this where more than one person administers a company.
+**Cost:** An account with no page has nowhere to put language, sessions, or closing, so each of those becomes a support message instead. Never ship this where more than one person administers a company.
 
 ### Notification inbox
 
-**Question:** Refunds, disputes, invitations and warehouse incidents all need somebody who was looking elsewhere. The console lists them under Needs attention on Home and nowhere else.
+**Question:** Refunds, disputes, invitations, and warehouse incidents all need somebody who was looking elsewhere. The console lists them under Needs attention on Home and nowhere else.
 
 **Default:** `a-bell-in-the-header-with-a-dropdown-panel`
 
@@ -1700,7 +1700,7 @@ page
       item: text "A dispute was opened on order SO-1041" · text muted "Tom Becker · answers in 5 days" · action "Answer"
 ```
 
-**Rationale:** One list on the first page after sign-in, ordered by what needs doing now, with each row carrying the step that deals with it.
+**Rationale:** One list on the first page after sign-in, ordered by what needs doing, with each row carrying the step that deals with it.
 
 **Cost:** Home is one page among many, so a reader working a list all day never sees it. Anything urgent waits for a visit that may not come.
 
@@ -1862,7 +1862,7 @@ page
     action "Contact support"
 ```
 
-**Rationale:** The foot holds search, shortcuts and contact in one menu, so help is one click without leaving the page. The menu is cheaper than a page and closer than the header.
+**Rationale:** The foot holds search, shortcuts, and contact in one menu, so help is one click without leaving the page. The menu is cheaper than a page and closer than the header.
 
 **Cost:** A menu that opens upward from the foot fights the sheet on a phone, where the foot is already inside an overlay. Three entries is also all a menu holds before it wants to be a page.
 
@@ -1911,7 +1911,7 @@ page
         item: text "Refunding an order" · text muted "Guide · Refunds and returns"
 ```
 
-**Rationale:** Linear answers help queries where navigation queries already go: one input searches pages, records and guides together. A reader who learned Cmd-K needs no second shortcut.
+**Rationale:** Linear answers help queries where navigation queries already go: one input searches pages, records, and guides together. A reader who learned Cmd+K needs no second shortcut.
 
 **Cost:** Guides compete with pages and records for the same short list, so a guide the reader wants can sit below records they do not. Help also inherits the palette discoverability problem.
 
@@ -2146,7 +2146,7 @@ page
     text "Alex Morgan · Operations manager"
 ```
 
-**Rationale:** The behavior below the md breakpoint: the same entries slide in over a scrim and dismiss with a close control. Nothing about the tree changes between desktop and phone.
+**Rationale:** The behavior below the md breakpoint: the same entries slide in over a scrim and close with a control. Nothing about the tree changes between desktop and phone.
 
 **Cost:** The sheet covers the page it came from, and a warehouse lead looking up one order costs one extra tap. Forty lookups a day makes the tap worth designing away.
 
@@ -2231,7 +2231,7 @@ page
 
 **Rationale:** Resuming work beats re-walking the tree: three recent pages above the seven areas put the order left open one tap away. The sheet stays one list with two halves.
 
-**Cost:** Recents are personal state on a shared device, and a recent that was renamed needs a rule for what its row says. The areas below also start below the fold on a short phone.
+**Cost:** Recents are personal state on a shared device, and a recent with a changed name needs a rule for what its row says. The areas below also start below the fold on a short phone.
 
 #### `a-segmented-control-for-sibling-pages`: A segmented control for sibling pages
 

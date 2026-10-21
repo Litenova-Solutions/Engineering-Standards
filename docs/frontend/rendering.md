@@ -4,7 +4,7 @@
 
 A route answers three questions: what address is this, what data does it need, and which floorplan draws it. Everything else belongs in a module.
 
-The render boundary follows the audience the route serves. A console serves a signed-in reader from a cache its route filled. A public page arrives from a link, so its first response already describes itself.
+The render boundary follows the audience the route serves. A console serves a signed-in reader from a cache its route fills. A public page arrives from a link, so its first response already describes itself.
 
 ## Standards
 
@@ -12,7 +12,7 @@ The render boundary follows the audience the route serves. A console serves a si
 
 **Requirement:** A route MUST load each read it needs through one shared cache before its view renders.
 
-**Rationale:** The page then renders with its data rather than showing a spinner after it has already appeared. The cache owns freshness, so the router never holds a second copy.
+**Rationale:** The page then renders with its data rather than showing a spinner after it appears. The cache owns freshness, so the router never holds a second copy.
 
 **Example:** An entity route loads its record and every read the record's own sections need.
 
@@ -42,7 +42,7 @@ The render boundary follows the audience the route serves. A console serves a si
 
 **Requirement:** A frontend MUST prefetch the route the reader signals intent toward, without treating that prefetch as a cache beyond the shared cache.
 
-**Rationale:** Most navigations then render from the cache the routes already filled. A router caching a second time serves a stale answer beside a fresh one.
+**Rationale:** Most navigations then render from the cache the routes already fill. A router caching a second time serves a stale answer beside a fresh one.
 
 ### Represent route states
 

@@ -12,14 +12,14 @@ Applicable specification kinds: `use-case`, `journey`.
 
 The consumer enables `bdd` when a critical example needs business-language review and execution through a public system boundary. Routine unit behavior does not activate it.
 
-A consumer selects one runner for the whole suite and keeps the provisions below with either.
+A consumer selects one runner for the whole suite and follows the provisions below with either runner.
 
 | Runner | A scenario is | It proves a Case with | Its business-readable text is |
 |:---|:---|:---|:---|
 | Reqnroll | A Gherkin scenario in a `.feature` file, bound to step definitions | A `proves:` line under the scenario title | The feature file |
 | LightBDD | A C# method on a feature class, whose steps are calls to step methods | A `/// <proves>` tag on the scenario method | The scenario method, the step method names, and the generated report |
 
-LightBDD moves the binding from text matching to the compiler. A step that no longer exists, or whose parameters changed, fails the build rather than the run. A consumer that generates its API client from the published contract extends the same property to every request a step sends.
+LightBDD moves the binding from text matching to the compiler. A step that no longer exists or whose parameters changed fails the build rather than the run. A consumer that generates its API client from the published contract extends the same property to every request a step sends.
 
 ## Baseline relationship
 
@@ -136,7 +136,7 @@ This extension switches on `case`. Its scenarios prove Case records.
 - `Reqnroll` and `Reqnroll.xunit.v3`, for Gherkin features
 - `LightBDD.XUnit3` with `xunit.v3.mtp-v2`, for C# feature classes
 
-LightBDD 3.12 is built against xUnit v3 3.2. Its test project therefore runs the 3.2 line, and other test projects run the current one.
+LightBDD 3.12 builds against xUnit v3 3.2. Its test project therefore runs the 3.2 line, and other test projects run the current one.
 
 ## Verification
 
@@ -151,7 +151,7 @@ LightBDD 3.12 is built against xUnit v3 3.2. Its test project therefore runs the
 | litespec/backend/dotnet/ext/bdd#own-scenario-data | guidance | Does each scenario own its identifiers, actor context, requests, responses, and expected state? |
 | litespec/backend/dotnet/ext/bdd#isolate-scenario-execution | guidance | Does the suite reset state between scenarios and avoid order dependence? |
 | litespec/backend/dotnet/ext/bdd#translate-business-phrases | guidance | Do step definitions delegate business phrases to typed driver calls? |
-| litespec/backend/dotnet/ext/bdd#exclude-production-internals | guidance | Is the suite free of repository, handler, session, and provider resolution? |
+| litespec/backend/dotnet/ext/bdd#exclude-production-internals | guidance | Is the suite free of Domain repository, handler, session, and provider resolution? |
 | litespec/backend/dotnet/ext/bdd#preserve-scenario-failures | guidance | Do hooks await setup and cleanup without replacing the scenario failure? |
 | litespec/backend/dotnet/ext/bdd#group-feature-files-by-module | guidance | Do feature files follow the module folders or a recorded Exception? |
 | litespec/backend/dotnet/ext/bdd#keep-steps-vocabulary-scoped | guidance | Does each reusable step set serve one business vocabulary or a recorded Exception? |

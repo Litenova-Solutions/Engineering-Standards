@@ -8,7 +8,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 
 ## Prerequisites
 
-- Read the [agent protocol](../core/agent.md), the [authoring standard](../core/authoring.md), and [scope](../core/scope.md).
+- Read the [agent protocol](../core/agent.md), the [authoring standard](../core/authoring.md), and the [supported scope](../core/scope.md).
 - Read the [extension catalog](../ext/README.md) to learn which capabilities stay inactive at the start.
 - Install the .NET SDK and Node.js releases that `litespec.manifest.json` pins.
 - Decide which stacks the product ships: `dotnet` plus one platform per frontend.
@@ -24,7 +24,7 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 7. Apply the file, type, and folder names. Match each C# file to its primary type and each namespace to its folder. This satisfies `litespec/backend/dotnet/naming#match-c-files-and-primary-types` and `litespec/workspace/naming#keep-namespaces-aligned-with-folders`.
 8. Write the product brief. Copy `product-brief.md` from the template index to `docs/product/brief.md`. State the boundary, the refusals, and the audience. This satisfies `litespec/core/product#keep-business-intent-under-product`.
 9. Write one topic page with its requirements. Copy `product-topic.md` from the template index. State each commitment as one requirement with its kind. This satisfies `litespec/core/product#state-each-topic-in-one-page-shape` and `litespec/core/product#identify-every-requirement`.
-10. State which constraints apply. Write one constraint record per outside rule, or record that none applies, and set `constraints.answered` to true. The `litespec.project.json` template defines the fields.
+10. State which constraints apply. Write one constraint record per outside rule, or record that none applies, and set `constraints.answered` to `true`. The `litespec.project.json` template defines the fields.
 11. Record the first decision. Copy `decision.md` from the template index. Name the options, the decider, and what would change the choice. This satisfies `litespec/core/product#record-each-product-choice-as-a-decision` and `litespec/core/product#trace-every-choice-to-a-decision`.
 12. Write the people records. Add one actor page per party, one role page per grantable set, and the permission entries on the permissions page. Each use case later names the permissions it needs. The `actor.md`, `role.md`, and `permission-list.md` templates define the fields.
 13. Write the module and its business records. Follow [Model a domain module](model-domain.md) for the module, the rules, the use cases, the events, and the permissions. This satisfies `litespec/core/system#group-language-and-use-cases-by-module`.
@@ -42,10 +42,10 @@ This guide carries no provision. Each step cites the provisions it satisfies.
 18. Build the model. Run `litespec model build` from the consumer root. It writes `model.json` with the computed links between records, code, screens, and tests.
 19. Check the model. Run `litespec model check`. It exits 1 on any unresolved citation, missing link, or unproved case. Fix every finding before continuing.
 20. Render the generated regions. Run `litespec model render`. Commit what it wrote.
-21. Run the remaining validators. Run `litespec consumer` and `litespec ui` from the consumer root. Both exit 0 on a clean tree. This satisfies `litespec/core/release#run-consistency-checks`.
+21. Run the remaining validators. Run `litespec consumer` and `litespec ui` from the consumer root. Both exit `0` on a clean tree. This satisfies `litespec/core/release#run-consistency-checks`.
 
 ## What you built
 
 - A consumer repository at small size that the model check accepts.
 - One implemented use case with records, code, tests, and generated contracts.
-- The command pages for the checks are [consumer](../tools/consumer.md) and [ui](../tools/ui.md). See the [command index](../tools/README.md).
+- The command pages for the checks are [Validate Consumer](../tools/consumer.md) and [Validate Controlled UI](../tools/ui.md). See the [command index](../tools/README.md).

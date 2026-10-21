@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page holds how the TypeScript web stacks realize the frontend testing principles ([Frontend testing](../testing.md)). It states the runners, libraries, and commands one web frontend requires. A provision here cites the neutral rule it realizes.
+This page states how the TypeScript web stacks realize the frontend testing principles ([Frontend testing](../testing.md)). It states the runners, libraries, and commands one web frontend requires. A provision here cites the neutral rule it realizes.
 
 | Kind | Where it runs | What it proves |
 |:---|:---|:---|
@@ -13,9 +13,13 @@ This page holds how the TypeScript web stacks realize the frontend testing princ
 
 ## React
 
+The React stack sets this mock boundary:
+
 - The mocks rule forbids replacing the rendering library, the router, and the query library.
 
 ## Svelte
+
+The Svelte stack sets this mock boundary:
 
 - The mocks rule forbids replacing Svelte, SvelteKit, the query library, and the form library.
 
@@ -25,7 +29,7 @@ This page holds how the TypeScript web stacks realize the frontend testing princ
 
 **Requirement:** A web frontend MUST use Vitest for pure logic, Playwright for navigation and integration, and the route contract for every address.
 
-**Rationale:** Vitest runs beside the module and Playwright runs against a running stack, so fast tests stay fast and browser runs prove browser behavior. This realizes litespec/frontend/testing#match-test-level-to-risk.
+**Rationale:** Vitest runs beside the module. Playwright runs against a running stack. Fast tests stay fast. Browser runs prove browser behavior. This realizes litespec/frontend/testing#match-test-level-to-risk.
 
 ### Assert each declared refusal by its code
 
@@ -49,9 +53,9 @@ await expect(refusalFor(page, "failure/orders.not_found")).toBeVisible({ timeout
 
 **Requirement:** A web component or logic test that needs HTTP MUST serve its answers through network mocks generated from the published contract.
 
-**Rationale:** A mocked client proves the mock rather than the component, so the generated client stays in its production path. This realizes litespec/frontend/testing#use-network-mocks-for-component-tests.
+**Rationale:** A mocked client proves the mock rather than the component. The generated client stays in its production path. This realizes litespec/frontend/testing#use-network-mocks-for-component-tests.
 
-**Example:** The handlers are `msw` handlers derived from the OpenAPI document and run in the browser worker and the node server alike. The workspace keeps one mock-generation command that regenerates them.
+**Example:** The handlers are `msw` handlers derived from the OpenAPI document and run in the browser worker and the Node server alike. The workspace keeps one mock-generation command that regenerates them.
 
 ### Prove the module mirror in a structure test
 

@@ -12,9 +12,9 @@ litespec init --preset <name> --size <small|large> [--root <path>] [--name <proj
 
 ## Description
 
-This command writes `litespec.project.json` into the consumer root. It reads the consumer template and the named preset from the LiteSpec checkout. It overlays the preset's shape, stacks and frontends, then stamps the project size, name and reviewed release. It refuses to overwrite an existing project file.
+This command writes `litespec.project.json` into the consumer root. It reads the consumer template and the named preset from the LiteSpec checkout. It overlays the preset's shape, stacks, and frontends, then stamps the project size, name, and reviewed release. It refuses to overwrite an existing project file.
 
-Three presets ship with the release. `dotnet-react` selects shape `server`, stacks `dotnet` and `react`, and one `react` frontend `web` at `apps/web`. `dotnet-svelte` selects the same shape with stacks `dotnet` and `svelte` and one `svelte` frontend `web` at `apps/web`. `blazor-client` selects shape `client-only`, stack `blazor`, and one `blazor` frontend `app` at `apps/app`.
+Three presets ship with the release. `dotnet-react` selects shape `server`, stacks `dotnet` and `react`, and one `react` frontend `web` at `apps/web`. `dotnet-svelte` selects the same shape with stacks `dotnet` and `svelte`, and one `svelte` frontend `web` at `apps/web`. `blazor-client` selects shape `client-only`, stack `blazor`, and one `blazor` frontend `app` at `apps/app`.
 
 Run it once in an empty folder, then run `litespec consumer` to validate the new project.
 
@@ -26,7 +26,7 @@ None. Everything passes through options.
 
 | Option | Default | Effect |
 |:---|:---|:---|
-| `--preset <name>` | required | Selects the preset: `blazor-client`, `dotnet-react` or `dotnet-svelte`. |
+| `--preset <name>` | required | Selects the preset: `blazor-client`, `dotnet-react`, or `dotnet-svelte`. |
 | `--size <size>` | required | Sets the project size: `small` or `large`. |
 | `--root <path>` | the working directory | Selects the consumer repository to write into. |
 | `--name <project>` | the root folder's name | Sets the project name. |

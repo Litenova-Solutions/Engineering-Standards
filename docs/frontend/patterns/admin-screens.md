@@ -2,7 +2,7 @@
 
 ## Intent
 
-Admin screens configure the back office itself. They cover the team and its roles, API keys and webhooks, data imports, the payment account, supplier invoices and discount codes. These patterns answer how each screen is laid out. Each pattern offers drawn options and names a default.
+Admin screens configure the back office itself. They cover the team and its roles, API keys and webhooks, data imports, the payment account, supplier invoices, and discount codes. These patterns answer how each screen is laid out. Each pattern offers drawn options and names a default.
 
 ## Standards
 
@@ -10,13 +10,13 @@ Admin screens configure the back office itself. They cover the team and its role
 
 **Requirement:** A screen MUST show a newly created API key or secret in full only once, at creation.
 
-**Rationale:** A secret shown again later is a secret anyone with the screen can copy. Showing it once makes the reader store it where it belongs.
+**Rationale:** A secret shown again later is a secret anyone with the screen can copy. Showing it once makes you store it where it belongs.
 
 ### Show what a role allows before granting it
 
 **Requirement:** An invitation or role change MUST show what the chosen role allows before it is sent.
 
-**Rationale:** A role name alone hides what it grants. The reader confirms the access, not the label.
+**Rationale:** A role name alone hides what it grants. You confirm the access, not the label.
 
 ## Patterns
 
@@ -49,7 +49,7 @@ page
 
 **Rationale:** Linear lists members with their role and state in line and pending invitations below, because joining and belonging are one list with two states. The owner acts on a row without opening it.
 
-**Cost:** Row commands for suspend, remove, change role and limit access cannot all fit, so most move into a menu per row.
+**Cost:** Row commands for suspend, remove, change role, and limit access cannot all fit, so most move into a menu per row.
 
 **Reference:** Linear
 
@@ -95,7 +95,7 @@ page
     action primary "Send invitation"
 ```
 
-**Rationale:** Clerk invites with address, role and scope in one dialog, because an invitation is one decision with three fields. The scope line limits warehouse staff to one building at the point of inviting.
+**Rationale:** Clerk invites with address, role, and scope in one dialog, because an invitation is one decision with three fields. The scope line limits warehouse staff to one building at the point of inviting.
 
 **Cost:** Inviting a whole seasonal crew means repeating the dialog per person, so bulk inviting needs a different shape.
 
@@ -116,7 +116,7 @@ page
     message "Seasonal access ends on the date on the card. Nothing is removed by hand." info
 ```
 
-**Rationale:** Vercel scopes team access per project, which fits seasonal staff who work one warehouse and nothing else. The card names the building, the role and the end of the access.
+**Rationale:** Vercel scopes team access per project, which fits seasonal staff who work one warehouse and nothing else. The card names the building, the role, and the end of the access.
 
 **Cost:** Staff cards separate from the member list split the team into two places, and the owner checks both.
 
@@ -145,7 +145,7 @@ page
 
 **Rationale:** GitHub suspends with the reason recorded, because a suspension is reviewed later and the reason is the review. The dialog states what the member keeps and what stops.
 
-**Cost:** A dialog per member action means suspend, remove, reinstate and transfer ownership each carry their own copy to maintain.
+**Cost:** A dialog per member action means suspend, remove, reinstate, and transfer ownership each carry their own copy to maintain.
 
 **Reference:** GitHub
 
@@ -194,7 +194,7 @@ page
         item: text "Counter sync" · text "Read orders, read products" · text "8 Oct, 09:31" · status "Live" positive · action "Rotate"
 ```
 
-**Rationale:** The Stripe Dashboard lists API keys with grants, creation and last use. The back office asks what a key may do and whether it is still used. Revoke and rotate sit on the row.
+**Rationale:** The Stripe Dashboard lists API keys with grants, creation, and last use. The back office asks what a key may do and whether it is still used. Revoke and rotate sit on the row.
 
 **Cost:** Grants in line fit only as short labels, so the full grant list lives on the key page one click down.
 
@@ -324,13 +324,13 @@ page
 
 **Rationale:** Clerk lists allowed origins beside the keys, because the checkout runs on the company's pages and nowhere else. Each origin names where it is used.
 
-**Cost:** Origins are a third concern on a developers page, and keys, webhooks and origins together crowd one set of tabs.
+**Cost:** Origins are a third concern on a developers page, and keys, webhooks, and origins together crowd one set of tabs.
 
 **Reference:** Clerk
 
 ### Bringing data from spreadsheets
 
-**Question:** Contacts, budget lines and newsletter consents arrive from spreadsheets. Each import names what was brought in and what was refused. Each refusal names why. The back office fixes refused rows without importing the file twice.
+**Question:** Contacts, budget lines, and newsletter consents arrive from spreadsheets. Each import names what was brought in and what was refused. Each refusal names why. The back office fixes refused rows without importing the file twice.
 
 **Default:** `imports-with-the-refused-rows-below`
 
@@ -401,9 +401,9 @@ page
         item: text "Contacts template" · text muted "First name, last name, email, phone, consent" · action "Download"
 ```
 
-**Rationale:** Intercom pairs the upload with the template download, because the file imports cleanly only when it starts from the template. The back office downloads, fills and drops in one loop.
+**Rationale:** Intercom pairs the upload with the template download, because the file imports cleanly only when it starts from the template. The back office downloads, fills, and drops in one loop.
 
-**Cost:** The template covers one kind of import, so contacts, budget lines and consents each need their own and the page lists three.
+**Cost:** The template covers one kind of import, so contacts, budget lines, and consents each need their own and the page lists three.
 
 **Reference:** Intercom
 
@@ -425,7 +425,7 @@ page
       item: text "12 rows · address missing" · text muted "Rows 44, 61 and 88." · action "Drop rows"
 ```
 
-**Rationale:** Stripe shows a dry run before a bulk change lands, because the back office should read the damage before it is done. The preview counts accepts, refusals and updates without writing anything.
+**Rationale:** Stripe shows a dry run before a bulk change lands, because the back office should read the damage before it is done. The preview counts accepts, refusals, and updates without writing anything.
 
 **Cost:** A dry run reads a large file twice, so files over 5,000 rows stop before the preview.
 
@@ -703,9 +703,9 @@ page
       action "Replace mandate"
 ```
 
-**Rationale:** Stripe Billing shows the plan, the mandate and the next invoice together, because changing one affects the others. The company reads what they pay and how before changing either.
+**Rationale:** Stripe Billing shows the plan, the mandate, and the next invoice together, because changing one affects the others. The company reads what it pays and how it pays before changing either.
 
-**Cost:** Plan, mandate and next invoice each deserve the top, so the page orders three equals and one of them loses.
+**Cost:** Plan, mandate, and next invoice each deserve the top, so the page orders three equals and one of them loses.
 
 **Reference:** Stripe Billing
 
@@ -747,9 +747,9 @@ page
     action "Replace mandate"
 ```
 
-**Rationale:** Chargebee states the failed charge, the reason and the next retry, because an overdue invoice is a problem with a date. The company fixes the mandate rather than the invoice.
+**Rationale:** Chargebee states the failed charge, the reason, and the next retry, because an overdue invoice is a problem with a date. The company fixes the mandate rather than the invoice.
 
-**Cost:** Dunning copy on the invoice page alarms a reader who opened it to file, not to pay.
+**Cost:** Dunning copy on the invoice page alarms you when you open it to file, not to pay.
 
 **Reference:** Chargebee
 
@@ -767,7 +767,7 @@ page
     message "Mail is free and unlimited. Failed messages are not charged." info
 ```
 
-**Rationale:** Resend breaks message cost down by kind, because delivery codes and reminders fail at different rates. The company reads what each kind cost before the invoice arrives.
+**Rationale:** Resend breaks message cost down by kind, because delivery codes and reminders fail at different rates. The company reads what each kind costs before the invoice arrives.
 
 **Cost:** A cost page per channel multiplies: mail is free and text is metered, and the two need one page or two honest ones.
 
@@ -775,13 +775,13 @@ page
 
 ### Discount and promotion codes
 
-**Question:** A code takes money off an order. Each code has its own value, use limit and dates. The company watches what each code costs. It retires what leaks. It issues new codes for partners and campaigns.
+**Question:** A code takes money off an order. Each code has its own value, use limit, and dates. The company watches what each code costs. It retires what leaks. It issues new codes for partners and campaigns.
 
 **Default:** `code-table-with-use-and-state`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The code table with usage and state is the best option. It shows value, use and dates in one scan. Retiring a leaked code is one command on the row. The editor is the runner-up.
+**Rationale:** The code table with usage and state is the best option. It shows value, use, and dates in one scan. Retiring a leaked code is one command on the row. The editor is the runner-up.
 
 Prefer it for creating a code with several conditions. Never ship the redemption-only list. Redemptions explain the past and the company manages the codes.
 
@@ -830,7 +830,7 @@ page
         fact "State" "Active"
 ```
 
-**Rationale:** Shopify edits a discount as named condition blocks, which fits a code that applies to some products, some channels and some dates. Each block reads as one sentence of the rule.
+**Rationale:** Shopify edits a discount as named condition blocks, which fits a code that applies to some products, some channels, and some dates. Each block reads as one sentence of the rule.
 
 **Cost:** The blocks take a long page, so the back office cannot check one code and move to the next without scrolling past every condition.
 
@@ -902,7 +902,7 @@ page
 
 **Rationale:** Shopify issues a discount code from a short dialog, because a code for a partner is five fields and no conditions. The dialog keeps the list behind it for the names already taken.
 
-**Cost:** Conditions beyond value, limit and dates do not fit, so a code with channel or product rules needs the full editor anyway.
+**Cost:** Conditions beyond value, limit, and dates do not fit, so a code with channel or product rules needs the full editor anyway.
 
 **Reference:** Shopify
 

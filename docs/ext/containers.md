@@ -14,9 +14,9 @@ The consumer enables `containers` when production or staging deploys the API, Wo
 
 ## Baseline relationship
 
-This extension replaces no baseline provision. Its schema, rollback and secret rules cite the baseline rules that own those obligations.
+This extension replaces no baseline provision. Its schema, rollback, and secret rules cite the baseline rules that own those obligations.
 
-This extension switches on `limit` and `runbook`. `litespec/ext/containers#declare-writable-paths-and-limits` records resource bounds as Limit records, and `litespec/ext/containers#retain-rollback-material` records the rollback procedure as a Runbook record.
+This extension switches on `limit` and `runbook`. `litespec/ext/containers#declare-writable-paths-and-limits` records resource bounds as Limit records. `litespec/ext/containers#retain-rollback-material` records the rollback procedure as a Runbook record.
 
 ## Standards
 
@@ -84,7 +84,7 @@ This extension switches on `limit` and `runbook`. `litespec/ext/containers#decla
 
 **Requirement:** A release owner MUST record the rollback procedure as a Runbook record identifying the previous image digest, under `litespec/quality/operations#keep-rollback-executable`.
 
-**Rationale:** The digest identifies one immutable image, and the Runbook carries the tested command.
+**Rationale:** The digest identifies one immutable image. The Runbook carries the tested command.
 
 ### Limit container privileges
 
@@ -164,7 +164,7 @@ This extension switches on `limit` and `runbook`. `litespec/ext/containers#decla
 
 **Default:** Keep one Dockerfile beside each deployable application.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
 **Rationale:** The Dockerfile stays near the project that defines its runtime output.
 
@@ -172,13 +172,13 @@ This extension switches on `limit` and `runbook`. `litespec/ext/containers#decla
 
 **Default:** Build images from the workspace root when shared project or package files are required.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
 **Rationale:** Root context supplies shared build inputs while the Dockerfile excludes unrelated secrets.
 
 ## Dependencies
 
-No application package is required.
+This extension requires no application package.
 
 ## Verification
 
@@ -206,6 +206,6 @@ No application package is required.
 | litespec/ext/containers#exclude-build-timestamps-from-contracts | checkable | `ContainersMetadataTests` assert the generated-contract diff contains no build timestamp. |
 | litespec/ext/containers#separate-frontend-configuration-classes | guidance | Does the frontend build keep public configuration apart from server-only secrets? |
 | litespec/ext/containers#use-protected-frontend-secret-delivery | guidance | Does the frontend build deliver every secret through mounts or runtime injection? |
-| litespec/ext/containers#exclude-insecure-frontend-secret-carriers | checkable | `ContainersConfigTests` reject `ARG`, copied environment files and secret-bearing layers. |
+| litespec/ext/containers#exclude-insecure-frontend-secret-carriers | checkable | `ContainersConfigTests` reject `ARG`, copied environment files, and secret-bearing layers. |
 | litespec/ext/containers#place-dockerfiles-beside-deployables | checkable | `ContainersTests` assert a colocated Dockerfile per deployable or a recorded Exception. |
 | litespec/ext/containers#build-from-the-workspace-root | checkable | `ContainersTests` assert image builds access declared shared inputs from repository-root context. |

@@ -2,7 +2,7 @@
 
 ## Intent
 
-Components in a Svelte frontend hold state in runes with typed boundaries. The shared provisions live on the stack-neutral page ([Frontend components](../../components.md)); this page holds what Svelte alone requires.
+Components in a Svelte frontend hold state in runes with typed boundaries. The shared provisions live on the stack-neutral page ([Frontend components](../../components.md)). This page states what Svelte alone requires.
 
 ## Standards
 
@@ -10,7 +10,7 @@ Components in a Svelte frontend hold state in runes with typed boundaries. The s
 
 **Requirement:** A component MUST hold its local state in runes, with props from `$props` and derived values from `$derived`.
 
-**Rationale:** Runes are the reactivity model the compiler understands, so legacy reactive statements and untyped prop access fall out of every component. An effect covers what derivation cannot express.
+**Rationale:** Runes are the reactivity model the compiler understands. Legacy reactive statements and untyped prop access fall out of every component. An effect covers what derivation cannot express.
 
 **Example:**
 

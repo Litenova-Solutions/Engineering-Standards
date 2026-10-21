@@ -10,7 +10,7 @@ This stack serves a React frontend beside the product's backend stack. A React f
 
 **Requirement:** A React frontend MUST render as a static application when it is a console, and on the server when a public page is indexed.
 
-**Rationale:** A console is reached from the application a signed-in user already has open, so its first response has nothing to index. A public page is reached from a message or a search result, so its title and links belong in the first response. A device client asks one question over and over, so it takes a static page with no router. A page counts as indexed when its readers reach it from a message or a search result.
+**Rationale:** A console is reached from the application a signed-in user already has open. Its first response has nothing to index. A public page is reached from a message or a search result. Its title and links belong in the first response. A device client asks one question over and over. It takes a static page with no router. A page counts as indexed when its readers reach it from a message or a search result.
 
 **Example:** A back-office console and an internal admin console ship as static files. A public storefront runs as a Node server that hydrates in the browser. A warehouse handheld client ships as one static page.
 
@@ -18,7 +18,7 @@ This stack serves a React frontend beside the product's backend stack. A React f
 
 **Requirement:** A device client MUST ship as one static page with no router.
 
-**Rationale:** A device client asks one question over and over, so a router adds downloads without adding destinations.
+**Rationale:** A device client asks one question over and over. A router adds downloads without adding destinations.
 
 
 ## Conventions

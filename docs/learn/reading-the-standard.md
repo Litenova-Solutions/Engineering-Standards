@@ -10,12 +10,25 @@ You don't adopt all of LiteSpec. Your project makes four choices in its `litespe
 
 | Choice | Options | What it changes |
 |:---|:---|:---|
-| Size | `small` or `large` | Which record types you keep. A large project adds problems, features, journeys, cases and an Acceptance test project. |
+| Size | `small` or `large` | Which record types you keep. A large project adds problems, features, journeys, cases, and an Acceptance test project. |
 | Shape | `server` or `client-only` | Whether the project has its own backend. A client-only project has no API and applies only the backend principles about modeling the domain. |
-| Stacks | One backend stack for a server project, and one stack per frontend | Which technology pages apply: today `dotnet` for the backend, and `react`, `svelte` or `blazor` for a frontend. |
-| Extensions | Any of the listed extensions, or none | Extra capabilities with their own rules, such as audit, multitenancy, an outbox or realtime updates. |
+| Stacks | One backend stack for a server project, and one stack per frontend | Which technology pages apply: today `dotnet` for the backend, and `react`, `svelte`, or `blazor` for a frontend. |
+| Extensions | Any of the listed extensions, or none | Extra capabilities with their own rules, such as audit, multitenancy, an outbox, or realtime updates. |
 
 `litespec init --preset dotnet-react --size small` writes a first project file with a common selection. The [selection page](https://litespec.dev/2.0.0/select/) on the site does the same in a form and shows which pages apply.
+
+The library example the model builder tests use declares its own selection in `litespec.project.json`:
+
+```json
+{
+  "size": "large",
+  "shape": "server",
+  "stacks": ["dotnet", "svelte"],
+  "selectedExtensions": []
+}
+```
+
+Read it as four answers: size large, shape server, the dotnet and svelte stacks, and no extensions. That selection applies `backend/dotnet/` and `frontend/web/svelte/`, and it does not apply `frontend/web/react/` or `frontend/blazor/`.
 
 ## How the pages are arranged
 
@@ -34,9 +47,13 @@ docs/
   ext/                          only the extensions a project selects
 ```
 
-Selecting a stack applies its folder and every folder above it. A React project applies `frontend/`, `frontend/web/` and `frontend/web/react/`. The upper pages state the principle, such as "pages compose shared components only". The lower pages state how one stack does it, such as which React component library and which test runner.
+Selecting a stack applies its folder and every folder above it. A React project applies `frontend/`, `frontend/web/`, and `frontend/web/react/`. The upper pages state the principle, such as "pages compose shared components only". The lower pages state how one stack does it, such as which React component library and which test runner.
 
-The other folders explain rather than govern: `learn/` (these pages), `tutorial/`, `guide/`, `reference/` and `tools/`, which describes each command.
+The diagram below shows which folders a server project with the dotnet and react stacks applies, and which it does not.
+
+![A server project with dotnet and react applies core, workspace, quality, backend, backend/dotnet, frontend, frontend/web, frontend/web/react, and selected extensions; it does not apply frontend/web/svelte or frontend/blazor.](../assets/diagrams/learn-selection-layers.svg)
+
+The other folders explain rather than govern: `learn/` (these pages), `tutorial/`, `guide/`, `reference/`, and `tools/`, which describes each command.
 
 ## Reading a page
 
@@ -66,12 +83,26 @@ In the Verification table, each rule is marked `checkable`, with the command tha
 
 The standard expects departures and gives each one a home:
 
-- **An Exception record** replaces one Standard for your project, with its reason, an owner and a date to review it. An agent follows your exception over the standard.
+- **An Exception record** replaces one Standard for your project, with its reason, an owner, and a date to review it. An agent follows your exception over the standard.
 - **A replaced Convention** is a default you change by stating your own in your project's documentation.
 - **A Known gap** records a problem you accept for now, with an owner and an end date, so a check doesn't fail on it forever.
 - **An extension** can replace a baseline rule when you select it. The EF Core extension, for example, replaces the default persistence rules with its own.
 
 When guidance overlaps, the most specific source wins: your exception, then a selected extension, then the deeper page, then the shallower one.
+
+The library example carries one exception, at `docs/exceptions/shelf-check-bypass.md`:
+
+```json
+{
+  "type": "exception",
+  "id": "exception/shelf-check-bypass",
+  "standard": "standard/lending.quiet-shelf-check",
+  "reason": "The import runs before opening.",
+  "reviewBy": "2027-01-01"
+}
+```
+
+Read it as one departure: it names the standard it replaces, the reason, and the date to review it. An agent follows the exception over the standard until that date.
 
 ## UI patterns
 

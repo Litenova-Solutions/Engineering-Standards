@@ -2,7 +2,7 @@
 
 ## Intent
 
-This protocol controls how agents select context, resolve standards, preserve user work, and report completion. Agents query the project model for the records a task needs, and read the generated agent context first.
+This protocol controls how agents select context, resolve standards, preserve user work, and report completion. Agents query the project model for the records a task needs and read the generated agent context first.
 
 ## Standards
 
@@ -56,7 +56,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 **Requirement:** An agent MUST NOT act without approval on packages, migrations, authentication, a public API, production data, releases, spending, or outside calls that change state.
 
-**Rationale:** These changes alter project boundaries beyond an ordinary implementation edit. The task authorizer gives the approval.
+**Rationale:** These changes alter project boundaries beyond an ordinary implementation edit. The task authorizer approves them.
 
 ### Make coherent scoped changes
 
@@ -72,7 +72,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 **Replacement:** A consumer can replace this default with an approved exception record.
 
-**Rationale:** A small edit matching an existing local pattern can remain at the generated agent context.
+**Rationale:** A small edit matching an existing local pattern can use the generated agent context.
 
 ### Inspect local examples after standards
 
@@ -84,7 +84,7 @@ This protocol controls how agents select context, resolve standards, preserve us
 
 ### Keep agent working files under agents
 
-**Default:** Keep agent working files under `.agents/`, with tracked `skills/` and `records/` folders and ignored scratch and delegate folders.
+**Default:** Keep agent working files under `.agents/`, with tracked `skills/` and `records/` folders and ignored `scratch/` and `delegate/` folders.
 
 **Replacement:** A consumer can replace this default with an approved exception record.
 
@@ -112,8 +112,8 @@ A command-handler change queries the model for its use case, reads the generated
 |:---|:---|:---|
 | litespec/core/agent#select-task-context | guidance | Which model query selected the records the change cites? |
 | litespec/core/agent#follow-the-local-pattern-before-the-model-query | guidance | Which local pattern did the change follow, and which surface did it avoid adding? |
-| litespec/core/agent#load-applicable-extensions | guidance | Which extensions did the agent load before editing inside their boundary? |
-| litespec/core/agent#apply-guidance-precedence | guidance | In which order did the design apply the project exception, the extension, and the pages? |
+| litespec/core/agent#load-applicable-extensions | guidance | Which extensions did the agent load before editing inside their boundaries? |
+| litespec/core/agent#apply-guidance-precedence | guidance | In which order did the design apply the project exception, the extension, the deeper page, and the shallower page? |
 | litespec/core/agent#replace-only-declared-conventions | guidance | Which approved exception record declares each convention replacement? |
 | litespec/core/agent#stop-on-unresolved-conflict | guidance | Which quoted conflict stopped the work, with both provision identifiers? |
 | litespec/core/agent#inspect-existing-work-before-editing | guidance | What did `git status` show, and which unrelated work stayed untouched? |

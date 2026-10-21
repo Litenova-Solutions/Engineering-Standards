@@ -2,7 +2,7 @@
 
 ## Intent
 
-Architecture in a dotnet backend is five projects with explicit composition roots. The shared provisions live on the stack-neutral page ([Backend architecture](../architecture.md)); this page holds what dotnet alone requires.
+Architecture in a .NET backend is five projects with explicit composition roots. The shared provisions live on the stack-neutral page ([Backend architecture](../architecture.md)); this page holds what dotnet alone requires.
 
 ## Standards
 
@@ -10,7 +10,7 @@ Architecture in a dotnet backend is five projects with explicit composition root
 
 **Requirement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline projects.
 
-**Rationale:** `Application.Abstractions` holds the contracts more than one module names: the pipeline's own positions, the cross-module ports, the transport-neutral failures, and the published integration events. It references Domain and the required LiteBus module abstractions, and nothing else. No type in it can name a use case, a handler, or a module.
+**Rationale:** `Application.Abstractions` holds the contracts that more than one module names: the pipeline's own positions, the cross-module ports, the transport-neutral failures, and the published integration events. It references Domain and the required LiteBus module abstractions, and nothing else. No type in it can name a use case, a handler, or a module.
 
 That refusal is the reason it is a project rather than a folder. A folder inside Application cannot decline what a developer puts in it, and the folder that tries becomes the place every unplaced type goes.
 
@@ -81,6 +81,6 @@ WebApiServiceRegistration.AddWebApi(...)
 |:---|:---|:---|
 | litespec/backend/dotnet/architecture#use-five-application-projects | guidance | Does the solution hold exactly the five baseline projects? |
 | litespec/backend/dotnet/architecture#keep-one-application-assembly | guidance | Does one Application project hold every message, handler, and module-owned port? |
-| litespec/backend/dotnet/architecture#keep-implementation-types-internal | guidance | Is every handler, validator, definition, and endpoint implementation internal and sealed? |
+| litespec/backend/dotnet/architecture#keep-implementation-types-internal | guidance | Is every handler, validator, definition, and endpoint implementation `internal` and `sealed`? |
 | litespec/backend/dotnet/architecture#keep-composition-in-hosts | guidance | Does all service registration live in hosts and host modules? |
 | litespec/backend/dotnet/architecture#use-one-public-assembly-marker-per-scanned-project | guidance | Does each scanned project expose exactly one public assembly marker? |

@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page holds how the dotnet stack realizes the Backend domain rules ([Backend domain](../domain.md)). It states the C# types, project references, and tooling one dotnet Domain project requires. A provision here cites the neutral rule it realizes.
+This page states how the dotnet stack realizes the Backend domain rules ([Backend domain](../domain.md)). It lists the C# types, project references, and tooling one dotnet Domain project requires. Each provision here cites the stack-neutral rule it realizes.
 
 ## Standards
 
@@ -35,7 +35,7 @@ public sealed record PostPublishedState(
     DateTimeOffset PublishedAt) : PostState;
 ```
 
-Even an Aggregate with one current state defines its hierarchy:
+Even an aggregate with one current state defines its hierarchy:
 
 ```csharp
 public abstract record ProfileState;
@@ -117,9 +117,9 @@ var next = outcome switch
 };
 ```
 
-A closed set represented by one scalar uses a typed value object, never an enum backing field.
+A closed set represented by one scalar uses a typed value object, never an `enum` backing field.
 
-This rule binds the Domain project. The same set appears at three other layers, and each layer has exactly one permitted form:
+This provision binds the Domain project. The same set appears at three other layers, and each layer has exactly one permitted form:
 
 | Layer | Form of a closed set | Owning provision |
 |:---|:---|:---|
@@ -130,7 +130,7 @@ This rule binds the Domain project. The same set appears at three other layers, 
 
 A transport `enum` is permitted in one situation: every case of the set carries no data, and the labels are the complete contract. A set where any case carries data crosses the boundary as a polymorphic model instead.
 
-A transport enum never re-enters Domain. The Application layer converts the label to its record case before it calls a Domain method.
+A transport `enum` never re-enters Domain. The Application layer converts the label to its record case before it calls a Domain method.
 
 Round-trip tests cover every data-less case, which catches a renamed code and a missing label:
 
@@ -142,6 +142,10 @@ public void FromCode_round_trips_every_case(MerchantRole role)
     MerchantRole.FromCode(role.Code).Should().Be(role);
 }
 ```
+
+The diagram shows the `MerchantRole` hierarchy with its cases, `Code`, and `FromCode`, and the same set at the three other layers the table names.
+
+![The Domain hierarchy MerchantRole with sealed cases exposing Code and FromCode, and the same set at three layers: a mirrored union in Application, a string enum in Transport for a label-only set, and one string discriminator per case in Persistence.](../../assets/diagrams/dotnet-closed-set.svg)
 
 ### Use strongly typed version 7 identifiers
 
@@ -195,7 +199,7 @@ public readonly record struct PostId : IStronglyTypedId, IParsable<PostId>
 }
 ```
 
-The `IParsable<TId>` implementation supports Minimal API route and query binding. `Parse` follows the .NET parsing contract for malformed text; `From` applies the domain empty-identity rule.
+The `IParsable<TId>` implementation supports Minimal API route and query binding. `Parse` follows the .NET parsing contract for malformed text. `From` applies the domain empty-identity rule.
 
 ### Make money and decimal rules explicit
 
@@ -251,7 +255,7 @@ public interface IPostRepository
 }
 ```
 
-`GetByIdAsync` returns a loaded `Post` and throws `PostNotFoundException` when the identity has no aggregate. The Infrastructure implementation owns that throw. The command pipeline owns the commit. `Store` stages the aggregate through the selected provider implementation.
+`GetByIdAsync` returns a loaded `Post` and throws `PostNotFoundException` when the identity has no aggregate. The Infrastructure implementation throws that exception. The command pipeline owns the commit. `Store` stages the aggregate through the selected provider implementation.
 
 ```csharp
 // Infrastructure implementation throws the aggregate's own not-found exception.
@@ -310,7 +314,7 @@ public sealed class RefundAllocationRequiredException()
 
 Two rules that share a caller-visible failure code because a boundary maps them to one response still get two exception types. The shared code lives in the two types, not in a string passed by the aggregate. Reuse a single exception type only when one rule can fail from more than one input and the differing values are carried as constructor parameters.
 
-Application validators handle malformed caller input through validation errors. Aggregate and value-object exceptions remain the last defense when direct Domain use violates a rule. Command handlers do not catch expected Domain exceptions. The host maps them through the documented error boundary.
+Application validators handle malformed caller input through validation errors. Aggregate and value-object exceptions remain the final check when direct Domain use violates a rule. Command handlers do not catch expected Domain exceptions. The host maps them through the documented error boundary.
 
 ### Document every public Domain contract
 
@@ -379,9 +383,9 @@ public abstract class AggregateRoot<TId> : IAggregateRoot
 }
 ```
 
-`ClearDomainEvents` is Event-delivery mechanics, not a business mutation entry point. Infrastructure calls it only after the selected delivery path has accepted the pending events.
+`ClearDomainEvents` is event-delivery mechanics, not a business mutation entry point. Infrastructure calls it only after the selected delivery path has accepted the pending events.
 
-Concrete aggregates validate that `id.Value` is not `Guid.Empty` before calling or while calling the base constructor. The base remains free of aggregate-specific exceptions.
+Concrete aggregates validate that `id.Value` is not `Guid.Empty` before or while calling the base constructor. The base remains free of aggregate-specific exceptions.
 
 ### Keep ID representations aligned at every boundary
 
@@ -518,7 +522,7 @@ public sealed record PostPublishedEvent(
     DateTimeOffset PublishedAt) : IDomainEvent;
 ```
 
-The event payload captures the publication fact without carrying the mutable `Post`. An event reaction implementation can use values from the transition or load a current read model when it explicitly needs current data.
+The event payload captures the publication fact without carrying the mutable `Post`. An event reaction implementation uses values from the transition or loads a current read model when it needs current data.
 
 ## Verification
 
@@ -526,13 +530,13 @@ The event payload captures the publication fact without carrying the mutable `Po
 |:---|:---|:---|
 | litespec/backend/dotnet/domain#keep-domain-free-of-outer-layer-concerns | guidance | Does the Domain assembly reference only the base class library and project-owned Domain types? |
 | litespec/backend/dotnet/domain#use-the-project-aggregate-root-contract | guidance | Does every aggregate root derive from the one project base and use its identity and event mechanics? |
-| litespec/backend/dotnet/domain#model-every-aggregate-lifecycle-with-state-records | guidance | Does each aggregate expose one State property over an abstract base with sealed cases, read only through that property? |
-| litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums | guidance | Is each closed set a record hierarchy with stable codes and FromCode for data-less sets, with no enum in Domain? |
-| litespec/backend/dotnet/domain#use-strongly-typed-version-7-identifiers | guidance | Is each identity a readonly record struct over a version 7 Guid with no conversion, alias, or parameterless creation? |
-| litespec/backend/dotnet/domain#make-money-and-decimal-rules-explicit | guidance | Is each monetary amount a decimal in the shared Money object with the stated JSON shape? |
-| litespec/backend/dotnet/domain#keep-repository-interfaces-in-domain | guidance | Does each repository serve one aggregate with Domain-only types and no queryable, session, or generic surface? |
+| litespec/backend/dotnet/domain#model-every-aggregate-lifecycle-with-state-records | guidance | Does each aggregate expose one `State` property over an abstract base with sealed cases, read only through that property? |
+| litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums | guidance | Is each closed set a record hierarchy with stable codes and `FromCode` for data-less sets, with no `enum` in Domain? |
+| litespec/backend/dotnet/domain#use-strongly-typed-version-7-identifiers | guidance | Is each identity a `readonly record struct` over a version 7 `Guid` with no conversion, alias, or parameterless creation? |
+| litespec/backend/dotnet/domain#make-money-and-decimal-rules-explicit | guidance | Is each monetary amount a `decimal` in the shared `Money` object with the stated JSON shape? |
+| litespec/backend/dotnet/domain#keep-repository-interfaces-in-domain | guidance | Does each repository serve one aggregate with Domain-only types and no `IQueryable`, session, or generic surface? |
 | litespec/backend/dotnet/domain#raise-immutable-domain-facts | guidance | Is each domain event an immutable record named for its aggregate and fact, carrying business data only? |
-| litespec/backend/dotnet/domain#reject-business-violations-with-domain-exceptions | guidance | Does each rejected rule throw its own DomainException type with a stable code and no transport status? |
-| litespec/backend/dotnet/domain#document-every-public-domain-contract | guidance | Does every public Domain type and member document its constraint, result, or failure? |
-| litespec/backend/dotnet/domain#define-the-shared-domain-contracts-once | guidance | Is each shared Domain contract declared once, with DomainException declaring its abstract Code? |
+| litespec/backend/dotnet/domain#reject-business-violations-with-domain-exceptions | guidance | Does each rejected rule throw its own `DomainException` type with a stable code and no transport status? |
+| litespec/backend/dotnet/domain#document-every-public-domain-contract | checkable | `dotnet build` of the Domain project reports no LiteSpec.Analyzers LS1011 diagnostic. |
+| litespec/backend/dotnet/domain#define-the-shared-domain-contracts-once | guidance | Is each shared Domain contract declared once, with `DomainException` declaring its abstract `Code`? |
 | litespec/backend/dotnet/domain#keep-id-representations-aligned-at-every-boundary | guidance | Is each identifier represented the same way at every boundary in the table? |

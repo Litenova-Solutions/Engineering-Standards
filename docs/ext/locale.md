@@ -36,7 +36,7 @@ This extension switches on no record type.
 
 **Requirement:** A localized application MUST define one documented locale route shape.
 
-**Rationale:** One shape gives users, crawlers, and links a predictable localized address. A path segment is the default shape. It makes every localized page a distinct address that a link, a crawler, and a cache entry can each name. A cookie or header shape serves several locales from one address, so a shared cache and a search index see one of them. An application with no public pages, whose locale is a property of the signed-in account, documents one of those shapes instead.
+**Rationale:** One shape gives users, crawlers, and links a predictable localized address. A path segment is the default shape. It gives every localized page a distinct address for links, crawlers, and cache entries. A cookie or header shape serves several locales from one address, so a shared cache and a search index see one of them. An application with no public pages, whose locale is a property of the signed-in account, documents one of those shapes instead.
 
 **Example:** `/nl/orders/42` places the locale in the documented path segment, so a crawler and a shared cache each address one language.
 
@@ -72,15 +72,15 @@ This extension switches on no record type.
 
 **Rationale:** A declared fallback prevents missing copy from becoming an unreviewed runtime behavior.
 
-The declaration states the fallback locale and what a missing key does at build time. A key missing from the default locale fails the build, because no fallback exists for it and the interface would render its identifier. A key missing from a non-default locale reports a warning and falls back. Shipping one untranslated string costs less than blocking a release on it.
+The declaration states the fallback locale and what a missing key does at build time. A key missing from the default locale fails the build. No fallback exists for it, and the interface renders its identifier. A key missing from a non-default locale reports a warning and falls back. Shipping one untranslated string costs less than blocking a release on it.
 
-**Example:** A catalog check runs in the frontend lint gate, so the two outcomes are visible before review rather than in a browser.
+**Example:** A catalog check runs in the frontend lint gate. The two outcomes are visible before review, not in a browser.
 
 ### Follow the validation message grammar
 
 **Requirement:** A validation catalog MUST state the field label, what is wrong, and what is accepted, without technical wording.
 
-**Rationale:** The shape holds in every language, and each language's sentence pattern lives on the field's Term labels and the language's writing page.
+**Rationale:** The shape holds in every language. Each language's sentence pattern lives on the field's Term labels and the language's writing page.
 
 **Example:** The Term record for a field carries the sentence pattern for each supported language.
 
@@ -88,7 +88,7 @@ The declaration states the fallback locale and what a missing key does at build 
 
 **Requirement:** A screen MUST resolve every closed-set code it renders to its Term record label and never render the raw code, excluding user-facing reference numbers.
 
-**Rationale:** The code is a contract value and the Term label is copy. A resolution value, a refusal ground, a role code, or a billing state carries its label beside the rest of the screen's copy.
+**Rationale:** The code is a contract value. The Term label is copy. A resolution value, a refusal ground, a role code, or a billing state carries its label beside the rest of the screen's copy.
 
 **Example:** A shipment row shows the Term label for `shipment-delayed` in the active locale.
 
@@ -98,9 +98,9 @@ The declaration states the fallback locale and what a missing key does at build 
 
 **Rationale:** User-facing formatted values need the selected locale's conventions.
 
-The platform supplies every one of them. [The `Intl` namespace](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) has `DateTimeFormat`, `NumberFormat`, `PluralRules`, `ListFormat`, and `RelativeTimeFormat`, and each one carries the locale data the browser already ships. A project-written formatter for any of these is a second locale database that nobody updates. Its plural rules are wrong for the first language with more than two forms.
+The platform supplies all of them. [The `Intl` namespace](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) has `DateTimeFormat`, `NumberFormat`, `PluralRules`, `ListFormat`, and `RelativeTimeFormat`. Each one carries the locale data the browser already ships. A project-written formatter for any of these is a second locale database that no one updates. Its plural rules are wrong for the first language with more than two forms.
 
-**Example:** A formatter instance is created once per locale and reused, because construction is the expensive part.
+**Example:** Create one formatter instance per locale and reuse it. Construction is the expensive part.
 
 ### Preserve locale-neutral business data
 

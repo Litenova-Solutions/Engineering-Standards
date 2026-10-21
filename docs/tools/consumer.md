@@ -12,7 +12,7 @@ litespec consumer [--root <path>] [--format json] [--help]
 
 ## Description
 
-This command reads `litespec.project.json` and every Markdown page under the declared documentation root. It checks the project record against the project schema and the reviewed release against the manifest. It checks the stacks and extensions the project names, every page's frontmatter against the record schema, and each page's required sections. It checks the language record and every page and declared surface against its rejected words and mannered terms, and the controlled UI through the UI validator.
+This command reads `litespec.project.json` and every Markdown page under the declared documentation root. It checks the project record against the project schema and the reviewed release against the manifest. It checks the stacks and extensions the project names, every page's frontmatter against the record schema, and each page's required sections. It checks the language record, every page, and every declared surface against its rejected words and mannered terms, and it checks the controlled UI through the UI validator.
 
 The language checks skip fenced generated regions, which only the model builder writes. The builder owns identifier resolution, coverage, traces, and the computed links between records, code, screens, and tests.
 
@@ -34,7 +34,7 @@ None. Everything passes through options.
 
 | Code | Meaning |
 |:---|:---|
-| `0` | Configuration, frontmatter and language are valid. |
+| `0` | Configuration, frontmatter, and language are valid. |
 | `1` | At least one check reported a defect. |
 | `2` | The root holds no `litespec.project.json`, an option is unknown, or an input file is unreadable. |
 

@@ -10,7 +10,7 @@ Names should expose business intent and architectural role without requiring a r
 
 **Requirement:** An aggregate-owned type's qualified name MUST start with its aggregate root's full name.
 
-**Rationale:** The name then reveals its owner without folder context. This covers events, states, child entities, values, and discriminated unions. A type nested inside a declaring type inherits that type's prefix through its qualified name. `PostState.Published` therefore satisfies this rule, and `PostStatePublishedState` repeats the anchor twice.
+**Rationale:** The name then reveals its owner without folder context. This covers events, states, child business records, values, and discriminated unions. A type nested inside a declaring type inherits that type's prefix through its qualified name. `PostState.Published` therefore satisfies this rule, and `PostStatePublishedState` repeats the anchor twice.
 
 **Example:** `PostPublishedEvent` and `PostState.Published` both lead with `Post`. `PublishedState` declared at namespace level does not.
 
@@ -51,7 +51,7 @@ Names should expose business intent and architectural role without requiring a r
 | Registration class | `{Layer}ServiceRegistration` | `InfrastructureServiceRegistration` |
 | Assembly marker | `{Layer}AssemblyMarker` | `ApplicationAssemblyMarker` |
 
-In the dotnet stack, the repository interface carries the `I` prefix. In the dotnet stack, options classes carry the `Options` suffix, and each scanned project carries an assembly marker.
+In the dotnet stack, the repository interface carries the `I` prefix, options classes carry the `Options` suffix, and each scanned project carries an assembly marker.
 
 An event-reaction folder names the business fact after an `On` prefix. It omits the `Event` suffix. For example, `OnPostPublished` contains `NotifySubscribersOnPostPublishedHandler` for `PostPublishedEvent`. The `On` prefix already marks the reaction. Folder names carry no technical suffix, so `OnPostPublishedEvent` is wrong. The event type keeps its `Event` suffix (`litespec/workspace/naming#anchor-aggregate-owned-types-on-the-aggregate-root`).
 

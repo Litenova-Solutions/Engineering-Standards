@@ -66,7 +66,7 @@ This extension replaces no baseline provision. Server-sent events use platform c
 
 **Requirement:** A realtime client MUST reconnect with bounded backoff and refresh authoritative state after a connection gap.
 
-**Rationale:** A refresh restores server truth after disconnect or missed notifications.
+**Rationale:** A refresh restores authoritative state after disconnect or missed notifications.
 
 ### Tolerate notification ordering differences
 
@@ -78,7 +78,7 @@ This extension replaces no baseline provision. Server-sent events use platform c
 
 **Requirement:** A realtime deployment MUST set four Limit-record bounds: concurrent connections per host, receive message size, parallel invocations per connection, and client timeout.
 
-**Rationale:** Explicit limits protect server memory, CPU, and connection capacity. Each value comes from the deployment's own connection count and message size, with the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same knobs.
+**Rationale:** Explicit limits protect server memory, CPU, and connection capacity. Each value comes from the deployment's own connection count and message size, with the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same settings.
 
 ### Reject unbounded slow-client buffering
 
@@ -106,7 +106,7 @@ This extension replaces no baseline provision. Server-sent events use platform c
 
 ## Dependencies
 
-- `@microsoft/signalr` when SignalR is selected, through a decision and a manifest pin.
+- Selecting SignalR adds `@microsoft/signalr` through a decision and a manifest pin.
 
 ## Verification
 

@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page governs where a consumer states its business intent and in what shape. Business intent is what the product commits to as a business. It covers what the product sells, to whom, at what price, and in which markets. It also covers how the company runs and what comes next.
+This page governs where a consumer states its business intent and in what form. Business intent is what the product commits to as a business. It covers what the product sells, to whom, at what price, and in which markets. It also covers how the company runs and what comes next.
 
 Business intent is not behavior. A rule, use case, or journey states what the software does today and matches the code. A product page states what the business has decided and why, and it can describe a position the code does not carry yet. The two connect in one direction: behavior records name the requirements they fulfill, and a product page never describes behavior.
 
@@ -10,7 +10,7 @@ Business intent has three parts that age differently. The present is the positio
 
 ## Concepts
 
-The record types and links are defined in [docs/core/model.md](model.md).
+The [model page](model.md) defines the record types and links.
 
 | Term | Meaning |
 |:---|:---|
@@ -19,19 +19,19 @@ The record types and links are defined in [docs/core/model.md](model.md).
 | Research | An outside fact behind a choice, with the sources read and the question asked. |
 | Decision | A dated choice with options, decider, evidence, and what would change it. |
 | Requirement | One commitment: a promise, behavior, or quality the code keeps, or a target or practice kept elsewhere. |
-| Problem | A pain or job someone has today, with who it affects. |
+| Problem | A pain or job someone has today, with the people it affects. |
 | Feature | What the product offers against a problem: planned, shipped, later, or refused. |
 | Product topic | One page of business intent holding Requirement entries. |
-| Source material | Generated records outside docs/ carrying no authority until cited. |
+| Source material | Generated records outside `docs/` carrying no authority until cited. |
 
-Authority runs constraint, product, requirement, rule, then use case. Decisions explain choices. Research and prose carry none.
+Authority runs through constraint, product, requirement, rule, and use case. Decisions explain choices. Research and prose carry no authority.
 
 ```text
 constraint  ->  product  ->  requirement  ->  rule, use case  ->  code
 (outside rule)   (what we are)  (what we commit)  (how it behaves)  (what runs)
 ```
 
-A decision sets the position. A topic page states it as requirements. Behavior records name the requirements they fulfill. The code is the record of what happens today. When behavior contradicts a requirement, either the code carries a defect or the business changed. A changed business is a new decision, approved by a person, before any page or code moves.
+A decision sets the position. A product topic page states it as requirements. Behavior records name the requirements they fulfill. The code is the record of what happens today. When behavior contradicts a requirement, either the code carries a defect or the business changed. A changed business is a new decision, approved by a person, before any page or code moves.
 
 ## Standards
 
@@ -45,7 +45,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 **Requirement:** A consumer MUST state exactly one Product record in its brief, with boundary, never list, and audience.
 
-**Rationale:** One product gives every reader one answer to what the business is. The never list refuses what the product will not become.
+**Rationale:** One product gives every reader one answer to what the business is. The never list refuses what the product does not become.
 
 ### Answer every constraint
 
@@ -63,7 +63,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 **Requirement:** A `product-topic` page MUST place its chapter for people before its commitments.
 
-**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so a person understands the choice before reading its rules. Sources keep the story checkable rather than a pitch, as `litespec/core/product#cite-sources-for-chapter-claims` requires.
+**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so you understand the choice before reading its rules. Sources keep the story checkable rather than a pitch, as `litespec/core/product#cite-sources-for-chapter-claims` states.
 
 ### Cite sources for chapter claims
 
@@ -129,7 +129,7 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 
 **Requirement:** The History section of a product topic page MUST list exactly the decisions that decide its entries, as a generated region.
 
-**Rationale:** A past typed by hand drifts from the records it claims. Only the model builder writes the region. Regions are fenced as [docs/core/model.md](model.md) defines.
+**Rationale:** A past typed by hand drifts from the records it claims. Only the model builder writes the region. Regions are fenced as the [model page](model.md) defines.
 
 ### Treat generated research as source material
 
@@ -162,6 +162,12 @@ A decision sets the position. A topic page states it as requirements. Behavior r
 **Rationale:** The order makes each layer checkable before the next builds on it. A specification written before its decision argues from code. Approval follows `litespec/core/principles#refuse-approval-behind-a-draft-decision`: nothing is approved behind a draft.
 
 **Example:** A price change lands its research note, then decision `decision/0011-raise-the-monthly-plan` and requirement `requirement/pricing.monthly-plan-fee`, then the billing `fulfills` link, then the code.
+
+The running library example lands its loan period in the same order: research `research/loan-period-benchmarks` asks how long city libraries lend, decision `decision/0001-loan-period` chooses 21 days and names `requirement/borrowing.loan-period-days` in `decides`, use case `use-case/lending.extend-loan` names that requirement in `fulfills`, and only then does the `ExtendLoanCommand` code carry it. A decision written after that code would be a defect.
+
+The order of work: intent, then the choice and its commitment, then specification records, then code and tests.
+
+![The order of work in four steps: product brief and topic pages state what the business commits; research, decision, and requirement hold the evidence, the choice, and the commitment; specification records carry the rules, use cases, and journeys; code and tests are what the product does today.](../assets/diagrams/core-product-order.svg)
 
 ### Reject an unfulfilled requirement
 
@@ -226,7 +232,7 @@ docs/product/
 
 This informative example demonstrates `litespec/core/product#trace-every-choice-to-a-decision`, `litespec/core/product#identify-every-requirement`, and `litespec/core/product#cite-requirements-from-records`.
 
-A subscription business keeps `docs/product/business/pricing.md` with id `pricing`. Its Rules section states `requirement/pricing.monthly-plan-fee`, and its Position row for the monthly plan links `decision/0003-monthly-plan`. The billing use case names the requirement in `fulfills`. When the price changes, decision `decision/0011-raise-the-monthly-plan` replaces `decision/0003-monthly-plan`. The pricing row then links the new record, and History lists both.
+A subscription business keeps `docs/product/business/pricing.md` with `id` `pricing`. Its Rules section states `requirement/pricing.monthly-plan-fee`, and its Position row for the monthly plan links `decision/0003-monthly-plan`. The billing use case names the requirement in `fulfills`. When the price changes, decision `decision/0011-raise-the-monthly-plan` replaces `decision/0003-monthly-plan`. The pricing row then links the new record, and History lists both.
 
 ## Verification
 

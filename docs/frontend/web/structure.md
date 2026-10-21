@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page holds how the TypeScript web stacks realize the Frontend structure rules ([Frontend structure](../structure.md)). It states the toolchain, folders, and commands the React and Svelte stacks share. A provision here cites the neutral rule it realizes, where one exists.
+This page states how the TypeScript web stacks realize the Frontend structure rules ([Frontend structure](../structure.md)). It states the toolchain, folders, and commands the React and Svelte stacks share. A provision here cites the neutral rule it realizes, where one exists.
 
 ## React
 
@@ -114,13 +114,13 @@ Svelte:
 src/routes -> src/lib/modules -> src/lib/app -> packages/*
 ```
 
-A module cannot import a route. A shared package cannot import an application. A frame module cannot reach into one module's use-case folder for a second module's data. Imports on Svelte resolve through the `$lib` alias, which points at `src/lib`.
+A module cannot import a route. A shared package cannot import an application. A frame module cannot reach into one module's use-case folder for a second module's data. On Svelte, imports resolve through the `$lib` alias, which points at `src/lib`.
 
 ### Locate the frame in the app folder
 
 **Requirement:** A frontend MUST place cross-route values in the frame folder its stack section states: client configuration, session read, language choice, permissions, formatting, and shell data.
 
-**Rationale:** These values cross every route, so a route holding one of them holds it twice with two copies to keep equal. A browser API reached from a use-case module belongs here as well, because a module renders and reads data rather than touching the device. This realizes litespec/frontend/structure#locate-cross-route-values-in-the-frame.
+**Rationale:** These values cross every route. A route holding one of them holds it twice with two copies to keep equal. A browser API reached from a use-case module belongs here as well, because a module renders and reads data rather than touching the device. This realizes litespec/frontend/structure#locate-cross-route-values-in-the-frame.
 
 ## Conventions
 

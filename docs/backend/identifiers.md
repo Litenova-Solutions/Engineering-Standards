@@ -2,7 +2,7 @@
 
 ## Intent
 
-Every record carries one identifier naming its type, home, and name. One form per type lets a reader and a search find the record from the identifier alone.
+Every record carries one identifier naming its type, home, and name. One form per type lets a reader find the record from the identifier alone, by reading or by searching.
 
 ## Concepts
 
@@ -40,9 +40,11 @@ A rule home is a business record name or a module name. A project standard home 
 
 ### Name rules
 
+A name follows these rules:
+
 - Write one to six lowercase words joined by hyphens.
-- Digits may sit inside a word, never as the whole name.
-- The decision number counts as a word.
+- Place digits inside a word, never as the whole name.
+- Count the decision number as a word.
 - Keep a use case name unique across the project.
 - Keep the negation in a rule name when its statement negates.
 - Let a person choose the name; no tool strips words into one.
@@ -93,7 +95,7 @@ Shared provisions keep their published `litespec/<page>#<slug>` form.
 
 **Rationale:** A reviewer reads the name as a true sentence without opening the statement.
 
-**Example:** A statement with never keeps never in its name.
+**Example:** A statement with `never` keeps `never` in its name.
 
 ### Keep wire codes stable
 

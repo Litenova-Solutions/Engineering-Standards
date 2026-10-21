@@ -2,7 +2,7 @@
 
 ## Intent
 
-A stack is one technology's binding of the specification, held in one folder: a backend stack under `backend/`, a frontend stack under `frontend/`. Selecting a stack applies its folder and every folder above it, so a stack never restates an inherited principle ([Supported scope](scope.md)). Each stack folder holds a `stack.md` that states what the stack adds: its rules, its pins, and its checks. These rules govern every stack selection.
+A stack is one technology's binding of the specification, held in one folder: a backend stack under `backend/`, a frontend stack under `frontend/`. Selecting a stack applies its folder and every folder above it, so a stack never restates an inherited principle ([Supported scope](scope.md)). Each stack folder holds a `stack.md` that states what the stack adds: its rules, its version pins, and its checks. These rules govern every stack selection.
 
 ## Standards
 

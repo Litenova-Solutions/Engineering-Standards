@@ -13,10 +13,10 @@ The first table lists the CI jobs. Every job is a gate: it fails the pull reques
 | build | Solution and frontends compile. | Any source change. | `dotnet build <solution>` and `pnpm build` per frontend. | Runs. | Runs. |
 | test-backend | Architecture, integration, and acceptance suites pass. | Backend or contract change. | `dotnet test <solution>`. | Architecture and integration only. | Runs all suites. |
 | test-frontend | Lint, type-check, and route suite pass. | Frontend change. | `pnpm lint`, `pnpm type-check`, and the route suite. | Runs. | Runs. |
-| model | Model check, then every check reading model.json. | Record, code, or test change. | `litespec model check`. | Runs. | Runs. |
+| model | Model check, then every check reading `model.json`. | Record, code, or test change. | `litespec model check`. | Runs. | Runs. |
 | docs | Page contract, configuration, language, prose. | Documentation change. | `litespec consumer`. | Runs. | Runs. |
 | contract | Published document and clients unchanged. | API or contract change. | Regenerate, then `git diff --exit-code`. | Runs. | Runs. |
-| supply-chain | Pins, licenses, secrets, action pins, inventory. | Manifest, lockfile, or workflow change. | Frozen restores, `pnpm audit`, license and secret scans. | Runs. | Runs. |
+| supply-chain | Pins, licenses, secrets, action pins, inventory. | Manifest, lockfile, or workflow change. | Frozen restores, `pnpm audit`, license scans, and secret scans. | Runs. | Runs. |
 | release | Every job above passes. | Release commit only. | Every command above on the release commit. | Runs. | Runs. |
 
 The second table defines the supply-chain gate.
@@ -43,7 +43,7 @@ The second table defines the supply-chain gate.
 
 **Requirement:** The docs job MUST run on every pull request and fail on a page that breaks the page contract, configuration, language, or prose rules.
 
-**Rationale:** Frontmatter shape, configuration, term use, and prose shape are cheapest to check on every pull request.
+**Rationale:** Specification metadata shape, configuration, term use, and prose shape are cheapest to check on every pull request.
 
 ### Keep generated contracts fresh
 
@@ -105,7 +105,7 @@ The second table defines the supply-chain gate.
 
 This informative example demonstrates `litespec/quality/ci#run-applicable-gates-on-every-pull-request` and `litespec/quality/ci#promote-verified-artifacts`.
 
-A backend-only pull request runs the build, test-backend, model, docs, contract, and supply-chain jobs. A pull request that changes a frontend also runs test-frontend. The release job reruns every job on the release commit and promotes the artifact that passed.
+A backend-only pull request runs the `build`, `test-backend`, `model`, `docs`, `contract`, and `supply-chain` jobs. A pull request that changes a frontend also runs `test-frontend`. The `release` job reruns every job on the release commit and promotes the artifact that passed.
 
 ## Verification
 

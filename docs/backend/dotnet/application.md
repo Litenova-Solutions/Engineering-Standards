@@ -10,7 +10,7 @@ Application code in a .NET backend dispatches through LiteBus mediators and repo
 
 **Requirement:** A validator MUST report its findings as Validity, with each ValidationFailure carrying a member, a code, and a message, and no HTTP status.
 
-**Rationale:** Every validator for a message runs, and the pipeline merges their findings before it refuses the request. The member names the input member, the code names the stable reason, and the message explains the problem in caller-safe language. Validity and ValidationFailure come from the pinned mediator's abstractions, named in `litespec/backend/dotnet/application#use-the-pinned-mediator-entry-points`. This realizes `litespec/backend/application#report-input-problems-as-validity-findings`.
+**Rationale:** Every validator for a message runs, and the pipeline merges their findings before it refuses the request. The `member` names the input member, the `code` names the stable reason, and the `message` explains the problem in caller-safe language. `Validity` and `ValidationFailure` come from the pinned mediator's abstractions, named in `litespec/backend/dotnet/application#use-the-pinned-mediator-entry-points`. This realizes `litespec/backend/application#report-input-problems-as-validity-findings`.
 
 ### Keep one state-changing Use case in one Command pipeline
 
@@ -18,7 +18,7 @@ Application code in a .NET backend dispatches through LiteBus mediators and repo
 
 **Rationale:** Nested dispatch can run the commit post-handler before the top-level use case finishes. A top-level handler may still coordinate several aggregates when an approved record names the invariant requiring one transaction.
 
-A second command that has to run is staged for durable delivery instead. That path is not an exemption from this rule. The staged command enters its own pipeline and owns its own transaction, so no nesting occurs.
+A second command that needs to run is staged for durable delivery instead. That path is not an exemption from this rule. The staged command enters its own pipeline and owns its own transaction, so no nesting occurs.
 
 This realizes `litespec/backend/application#keep-one-state-changing-use-case-in-one-pipeline`.
 
@@ -66,7 +66,7 @@ internal sealed class CreateDraftCommandHandler(
 
 The pinned LiteBus package signatures take precedence over illustrative example signatures.
 
-### Coordinate multiple Aggregates without nested dispatch
+### Coordinate multiple aggregates without nested dispatch
 
 ```csharp
 internal sealed class ConfirmOrderCommandHandler(
@@ -94,12 +94,12 @@ internal sealed class ConfirmOrderCommandHandler(
 }
 ```
 
-The handler stages both Aggregates because the use-case specification names the rule that requires one transaction. It does not call `ICommandMediator` or commit.
+The handler stages both aggregates because the use-case specification names the rule that requires one transaction. It does not call `ICommandMediator` or commit.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/backend/dotnet/application#report-input-problems-as-validity | guidance | Does each validator report Validity with member, code, and message failures? |
-| litespec/backend/dotnet/application#keep-one-state-changing-use-case-in-one-command-pipeline | guidance | Does any command handler dispatch another command through `ICommandMediator`? |
+| litespec/backend/dotnet/application#report-input-problems-as-validity | guidance | Does each validator report `Validity` with `member`, `code`, and `message` failures? |
+| litespec/backend/dotnet/application#keep-one-state-changing-use-case-in-one-command-pipeline | checkable | `dotnet build` of the Application project reports no LiteSpec.Analyzers LS2002 diagnostic. |
 | litespec/backend/dotnet/application#use-the-pinned-mediator-entry-points | guidance | Does each dispatch site call the pinned mediator entry points? |

@@ -253,6 +253,7 @@
       "LiteBus.Queries.Abstractions": "7.0.0-preview.6",
       "LiteBus.Storage.PostgreSql": "7.0.0-preview.6",
       "LiteBus.Testing.Mediation": "7.0.0-preview.6",
+      "LiteSpec.Analyzers": "2.0.0",
       "Marten": "9.50.1",
       "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.13",
       "Microsoft.AspNetCore.DataProtection": "10.0.13",

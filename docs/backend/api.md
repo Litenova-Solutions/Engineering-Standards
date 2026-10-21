@@ -18,7 +18,7 @@ WebApi is a thin transport adapter. It maps HTTP input to Application messages, 
 
 **Requirement:** An endpoint MUST NOT take an aggregate repository, a persistence session or context, a provider client, or an application service.
 
-**Rationale:** Endpoints are registered at startup, so they hold no request-scoped dependency. Endpoint handlers take mediators and HTTP-boundary services such as an actor accessor.
+**Rationale:** The application registers endpoints at startup, so they hold no request-scoped dependency. Endpoint handlers take mediators and HTTP-boundary services such as an actor accessor.
 
 ### Defer error mapping to the global handler
 
@@ -38,7 +38,7 @@ An operation applies a stable forbidden or not-found policy when revealing that 
 
 **Requirement:** An error response MUST use [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457) Problem Details carrying a stable application `code`, the current `traceId`, and an `errors` entry for each field failure.
 
-**Rationale:** A stable machine-readable code lets a client branch on the failure, and the trace identifier connects the response to its diagnostics. RFC 9457 obsoletes RFC 7807 and now defines the media type. The contract cites the document a client implementer reads today.
+**Rationale:** A stable machine-readable code lets a client branch on the failure, and the trace identifier connects the response to its diagnostics. RFC 9457 obsoletes RFC 7807 and defines the media type. The contract cites the document a client implementer reads.
 
 **Example:** The serialized contract is:
 
@@ -66,6 +66,24 @@ An operation applies a stable forbidden or not-found policy when revealing that 
 WebApi maps Application member names to their public JSON field names. `traceId` carries the trace identifier from the current [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent`, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
 
 In the dotnet stack, the example uses ASP.NET Core `AddProblemDetails` and one `IExceptionHandler`. It maps validation exceptions to 400, missing targets through the operation's 404 policy, and forbidden failures to 403 or the declared 404 disclosure policy. It maps conflicts and state rejections to 409, and unexpected exceptions to 500 with code `internal_error`. It maps known Domain exception types individually. It does not report cancellation from a disconnected request as an application error.
+
+In the library circulation product, borrowing an unavailable copy ends with `result/borrow-copy.copy-unavailable`, which carries the code `failure/lending.copy_not_available` and the status 409. For example, the global handler answers:
+
+```json
+{
+  "type": "https://example.test/problems/conflict",
+  "title": "Copy unavailable",
+  "httpStatus": 409,
+  "detail": "The copy is unavailable.",
+  "instance": "/api/loans",
+  "code": "failure/lending.copy_not_available",
+  "traceId": "4bf92f3577b34da6a3ce929d0e0e4736"
+}
+```
+
+The endpoint never catches the failure. The diagram shows how a Domain exception or a validation failure reaches the global handler and becomes a status with a Problem Details body.
+
+![A domain exception or a validation failure reaches the global handler, which no endpoint preempts. The handler selects the HTTP status and returns a Problem Details body carrying the stable code, the trace identifier, and one entry per field failure.](../assets/diagrams/backend-error-flow.svg)
 
 ### Record each result's HTTP status
 
@@ -99,9 +117,9 @@ In the dotnet stack, the example uses ASP.NET Core `AddProblemDetails` and one `
 
 **Requirement:** The API MUST refuse a cookie-authenticated write without the project's marker header.
 
-**Rationale:** A write is any request other than GET, HEAD, or OPTIONS. The header takes the form `X-<Project>-Request: 1`, with the exact name set in project configuration. A page on another site cannot add the header, so its absence exposes a cross-site forgery.
+**Rationale:** A write is any request other than GET, HEAD, or OPTIONS. The header takes the form `X-<Project>-Request: 1`. You set the exact name in project configuration. A page on another site cannot add the header, so its absence exposes a cross-site forgery.
 
-The refused request is unauthenticated, so it answers 401 under `litespec/backend/api#use-consistent-status-codes`. The frontend pages own sending the header; this rule owns the API refusal.
+The refused request is unauthenticated, so it answers 401 under `litespec/backend/api#use-consistent-status-codes`. The frontend pages own sending the header. This rule owns the API refusal.
 
 ### Keep routes resource-oriented
 
@@ -182,7 +200,7 @@ The `operationId` keeps its verb-noun form, so `CancelShipment` names the same t
 
 **Example:** The API source artifact is `apps/api/openapi/{ProjectName}.json`. In the dotnet stack, WebApi references `Microsoft.AspNetCore.OpenApi` and `Microsoft.Extensions.ApiDescription.Server`, enables `OpenApiGenerateDocuments`, sets `OpenApiDocumentsDirectory` to that directory, and passes `--file-name {ProjectName}` through `OpenApiGenerateDocumentsOptions`.
 
-Build-time generation boots the host. In the dotnet stack, this is what [Microsoft's own guidance](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/overview) does. A boot reaches every startup guard. A project whose composition refuses to start without a secret, a certificate, or a reachable dependency cannot generate its contract from a clean checkout. Two answers are valid, and the project records which one it uses under `litespec/backend/api#generate-the-contract-without-hosted-dependencies`.
+Build-time generation boots the host. In the dotnet stack, [Microsoft's own guidance](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/overview) boots the host the same way. A boot reaches every startup guard. A project whose composition refuses to start without a secret, a certificate, or a reachable dependency cannot generate its contract from a clean checkout. Two answers are valid, and the project records which one it uses under `litespec/backend/api#generate-the-contract-without-hosted-dependencies`.
 
 | Answer | What the project does | What it costs |
 |:---|:---|:---|
@@ -318,7 +336,7 @@ Module nesting, including the single-aggregate flat form, follows the cited fold
 
 **Rationale:** The suffix table lives in `litespec/workspace/naming#use-architectural-suffixes`. A name that ends in its boundary role keeps transport concerns out of Application messages and results.
 
-**Example:** Another passive HTTP DTO names its boundary role and ends in `Model`.
+**Example:** A passive HTTP DTO names its boundary role and ends in `Model`.
 
 ### Name routes from resources
 
@@ -365,7 +383,7 @@ GET    /api/posts?after={cursor}&limit=20
 
 ### Name time fields with At
 
-**Default:** Time fields end in At, following [AIP-142](https://google.aip.dev/142).
+**Default:** Time fields end in `At`, following [AIP-142](https://google.aip.dev/142).
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
@@ -375,7 +393,7 @@ GET    /api/posts?after={cursor}&limit=20
 
 ### Use standard field vocabulary
 
-**Default:** Field names use created over placed, languageTag over locale, and displayName over keyName.
+**Default:** Field names use `created` over `placed`, `languageTag` over `locale`, and `displayName` over `keyName`.
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
@@ -385,7 +403,7 @@ GET    /api/posts?after={cursor}&limit=20
 
 ### Name failure pairs code and reason
 
-**Default:** A request body names a failure with code for the class and reason for the explanation.
+**Default:** A request body names a failure with `code` for the class and `reason` for the explanation.
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
@@ -393,7 +411,7 @@ GET    /api/posts?after={cursor}&limit=20
 
 ### Name path parameters per resource
 
-**Default:** Each path parameter names its own resource identity, and a details segment takes the aggregate name.
+**Default:** Each path parameter names its own resource identity, and a `details` segment takes the aggregate name.
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
@@ -407,7 +425,7 @@ GET    /api/posts?after={cursor}&limit=20
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** The noise words are data, info, item, object, value, and thing; the type prefixes are str, int, bool, num, obj, and arr. A type prefix repeats what the schema already declares, and a noise word names nothing an integrator can act on.
+**Rationale:** The noise words are `data`, `info`, `item`, `object`, `value`, and `thing`; the type prefixes are `str`, `int`, `bool`, `num`, `obj`, and `arr`. A type prefix repeats what the schema already declares, and a noise word names nothing an integrator can act on.
 
 **Example:** `customerInfo` becomes `customer`.
 
@@ -439,7 +457,7 @@ GET    /api/posts?after={cursor}&limit=20
 
 This informative example demonstrates `litespec/backend/api#keep-endpoint-dependencies-transport-focused` and `litespec/backend/api#mirror-a-domain-closed-set-as-a-transport-model-of-the-same-shape`.
 
-A create endpoint reads the author from claims. It maps `CreateDraftRequestModel` to `CreateDraftCommand` through `CreateDraftApiMappings`. It sends the command through the command mediator. It maps `CreateDraftCommandResult` to `CreateDraftResponseModel` with the new post location. A read endpoint maps `GetPostQueryResult` through `GetPostApiMappings`. Neither endpoint calls the aggregate factory or the repository.
+A create endpoint reads the author from claims. It maps `CreateDraftRequestModel` to `CreateDraftCommand` through `CreateDraftApiMappings`. It sends the command through the command mediator. It maps `CreateDraftCommandResult` to `CreateDraftResponseModel` with the new post location. A read endpoint maps `GetPostQueryResult` through `GetPostApiMappings`. Neither endpoint calls the aggregate factory or the Domain repository.
 
 A refund outcome is a closed set whose cases carry different data. Domain models it once. Application mirrors it per `litespec/backend/application#mirror-a-domain-closed-set-in-the-result`, and WebApi mirrors it again as a polymorphic transport model rather than serializing either inner type.
 
@@ -448,10 +466,10 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/backend/api#map-one-operation-per-endpoint | guidance | Does each mapped route resolve to one endpoint type and one mediator dispatch? |
-| litespec/backend/api#keep-endpoint-dependencies-transport-focused | guidance | Does any endpoint take a repository, session, context, provider, or service? |
-| litespec/backend/api#defer-error-mapping-to-the-global-handler | guidance | Does any endpoint catch an application or Domain exception? |
+| litespec/backend/api#keep-endpoint-dependencies-transport-focused | guidance | Does any endpoint take a Domain repository, session, context, provider, or service? |
+| litespec/backend/api#defer-error-mapping-to-the-global-handler | guidance | Does any endpoint catch an Application or Domain exception? |
 | litespec/backend/api#apply-only-coarse-policies-at-the-endpoint | guidance | Does any endpoint decide target authorization instead of enforcing coarse policies? |
-| litespec/backend/api#return-stable-problem-details | guidance | Does each error response carry code, traceId, and field errors? |
+| litespec/backend/api#return-stable-problem-details | guidance | Does each error response carry `code`, `traceId`, and field errors? |
 | litespec/backend/api#record-each-results-http-status | checkable | `litespec model check` reports `result-status`. |
 | litespec/backend/api#use-consistent-status-codes | guidance | Does each operation return its outcome-table status code? |
 | litespec/backend/api#require-the-marker-header-on-cookie-authenticated-writes | guidance | Does a cookie-authenticated write without the marker header answer 401? |
@@ -460,7 +478,7 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 | litespec/backend/api#apply-patch-to-a-partial-update | guidance | Does each partial update use PATCH with merge-patch media? |
 | litespec/backend/api#use-put-for-a-whole-replacement | guidance | Does each PUT replace the whole resource its path names? |
 | litespec/backend/api#bound-collection-queries | guidance | Do collection endpoints order deterministically within default and maximum limits? |
-| litespec/backend/api#use-opaque-cursors-for-collection-paging | guidance | Does a malformed cursor answer 400 with code invalid_cursor? |
+| litespec/backend/api#use-opaque-cursors-for-collection-paging | guidance | Does a malformed cursor answer 400 with code `invalid_cursor`? |
 | litespec/backend/api#version-cursors-with-stable-sort-values | guidance | Does each cursor carry a version, stable sort values, and no readable secret? |
 | litespec/backend/api#treat-openapi-as-a-generated-contract | guidance | Does the release build regenerate the OpenAPI artifact, with the gate failing on a changed tree? |
 | litespec/backend/api#declare-stable-operation-metadata-in-the-contract | guidance | Does each operation declare its operationId, metadata, and summary? |

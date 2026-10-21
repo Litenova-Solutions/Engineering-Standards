@@ -14,11 +14,11 @@ Every command ends in one outcome. A page handles each outcome as the table stat
 
 | Outcome | What the page does |
 |:---|:---|
-| Success | Invalidates the queries the command changed, then says so where nothing else on screen shows it |
+| Success | Invalidates the queries the command changes, then says so where nothing else on screen shows it |
 | Refusal | Renders the refusal beside what was refused, in the sentence the application holds for that code |
 | Field refusal | Places each problem on the field it belongs to, leaving the form open |
 
-A command that returns success and shows nothing has told nobody anything. A command that lists field problems above a long form makes the reader match each sentence to a field.
+A command that returns success and shows nothing tells nobody anything. A command that lists field problems above a long form makes the reader match each sentence to a field.
 
 ### The problem type
 
@@ -26,7 +26,7 @@ Every failure, whatever produced it, becomes one project-owned problem carrying 
 
 The problem carries a status, a code, a detail, an optional trace identifier, and field problems. Each field problem names its field and carries its own code and message.
 
-The code is the discriminator. A code this build has never heard of is still handled. The page branches on the code's presence rather than on a list of known codes.
+The code is the discriminator. A code this build does not recognize is still handled. The page branches on the code's presence rather than on a list of known codes.
 
 The problem carries the trace identifier the API returns for the request. Every error the user sees shows that identifier in a copyable form in its detail, never as the headline.
 
@@ -60,13 +60,25 @@ The problem carries the trace identifier the API returns for the request. Every 
 
 **Requirement:** A frontend MUST convert every failure into one problem type, deciding from its code and showing its trace identifier in copyable form.
 
-**Rationale:** Displaying a raw response body leaks whatever the API included and gives the reader no consistent recovery path. A code is a published identifier, so a page's decision survives a reworded message. The trace identifier lets support find the request the reader saw fail. It never serves as the headline.
+**Rationale:** Displaying a raw response body leaks whatever the API includes and gives the reader no consistent recovery path. A code is a published identifier, so a page's decision survives a reworded message. The trace identifier lets support find the request the reader saw fail. It never serves as the headline.
 
 ### Place a refusal beside what was refused
 
 **Requirement:** A refusal MUST render beside the record or control that was refused, in the sentence the application holds for that code.
 
-**Rationale:** A refusal at the top of a page says that something failed and nothing about what. The application's own sentence says what was asked, and the code in the markup lets a test provoke it by name.
+**Rationale:** A refusal at the top of a page says that something failed, but not what. The application's own sentence says what was asked, and the code in the markup lets a test provoke it by name.
+
+**Example:** For example, borrowing an unavailable copy refuses with `failure/lending.copy_not_available` under `result/borrow-copy.copy-unavailable`. The page renders the application's sentence for that code beside the Borrow control, with the code in the markup so a test can provoke it by name.
+
+```svelte
+{#if refusal?.code === 'failure/lending.copy_not_available'}
+  <RefusalNotice code="failure/lending.copy_not_available">
+    This copy is already on loan.
+  </RefusalNotice>
+{/if}
+```
+
+The sentence comes from the application's dictionary rather than the response body, and the trace identifier stays in the detail in copyable form.
 
 ### Place a field refusal on its field
 
@@ -85,6 +97,20 @@ The problem carries the trace identifier the API returns for the request. Every 
 **Requirement:** A successful command MUST invalidate every query whose answer it changed, and no other query.
 
 **Rationale:** The query cache owns freshness, so a command that changes a record and leaves its cache entry shows the old record until something else refetches. An unrelated invalidation costs a request per affected page.
+
+**Example:** The generated client in `packages/api/src/generated/sdk.gen.ts` holds both sides of one write. The loans route calls `borrowCopy({ copyId: 'copy-1' })`, and the list reads through `listLoans`.
+
+```ts
+export const borrowCopy = (options) => (options.client ?? client).post({
+    url: '/api/lending/borrow-copy',
+});
+
+export const listLoans = (options) => (options.client ?? client).get({
+    url: '/api/lending/list-loans',
+});
+```
+
+After `borrowCopy` succeeds, the page invalidates the `listLoans` query and no other query, so the list shows the new loan without refetching unrelated pages.
 
 ### Assign state to the narrowest owner
 
@@ -108,13 +134,13 @@ The problem carries the trace identifier the API returns for the request. Every 
 
 **Requirement:** A formatter rendering a timestamp MUST receive an explicit IANA time zone, resolved by the caller from the record the screen shows.
 
-**Rationale:** An instant read out of the API carries no zone, so an implicit one would show a dispatch cut-off time in the reader's own city. A record with its own zone states it. Otherwise the account's zone applies, and an account that chose none falls back to UTC.
+**Rationale:** An instant read out of the API carries no zone, so an implicit one would show a dispatch cut-off time in the reader's own city. A record with its own zone states it. Otherwise the account's zone applies, and an account that chooses none falls back to UTC.
 
 ### Keep secrets out of browser storage
 
 **Requirement:** A frontend MUST NOT store a refresh token, a provider secret, or a privileged credential in browser storage or a browser-visible variable.
 
-**Rationale:** Local storage, session storage, IndexedDB, and a build-time public variable are each readable by any script on the page. A preference a reader chose is not a secret and may be stored under a named key in the frame.
+**Rationale:** Local storage, session storage, IndexedDB, and a build-time public variable can be read by any script on the page. A preference a reader chooses is not a secret and may be stored under a named key in the frame.
 
 ### Make optimistic behavior recoverable
 
@@ -126,7 +152,7 @@ The problem carries the trace identifier the API returns for the request. Every 
 
 **Requirement:** An optimistic update MUST announce its reconciled outcome through a live region when the server result differs from the value shown.
 
-**Rationale:** A rollback is a silent visual change. A reader using a screen reader heard the optimistic value announced, and nothing tells them it was withdrawn. [The ARIA live-region technique](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19) is the mechanism, and a test of the route asserts the announcement.
+**Rationale:** A rollback is a silent visual change. A reader using a screen reader hears the optimistic value announced, and nothing tells them it is withdrawn. [The ARIA live-region technique](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19) is the mechanism, and a test of the route asserts the announcement.
 
 ### Localize copy through locale dictionaries
 
@@ -168,13 +194,13 @@ The problem carries the trace identifier the API returns for the request. Every 
 
 **Replacement:** A project departs from this default through an Exception record.
 
-**Rationale:** A form library reached for directly in every use-case folder gives each folder its own idea of what a field is. None of them knows how to show a refusal.
+**Rationale:** Reaching for a form library directly in every use-case folder gives each folder its own idea of what a field is. None of them knows how to show a refusal.
 
 ## Reference example
 
 This informative example demonstrates `litespec/frontend/data#place-a-field-refusal-on-its-field`, `litespec/frontend/data#update-the-cache-a-command-changed`, and `litespec/frontend/data#validate-a-form-with-the-generated-schema`.
 
-A redelivery dialog holds one field. Submitting validates against the generated schema and applies any field problem back to that field. Success invalidates the order it changed and closes the dialog.
+A redelivery dialog holds one field. Submitting validates against the generated schema and applies any field problem back to that field. Success invalidates the order it changes and closes the dialog.
 
 ## Verification
 

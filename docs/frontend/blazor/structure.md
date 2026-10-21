@@ -34,7 +34,7 @@ apps/web/
     {ProjectName}.EndToEnd.Tests/
 ```
 
-Framework-generated `bin`, `obj`, and publish folders remain untracked.
+Framework-generated `bin`, `obj`, and `publish` folders remain untracked.
 
 ### Organize features by module and use case
 

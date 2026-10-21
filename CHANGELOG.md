@@ -36,6 +36,18 @@ The first release of LiteSpec: the standards contract for one bounded-context bu
 - `litespec validate` and `litespec provisions` check this repository's own pages, schemas, manifest and provision index.
 - `litespec patterns` draws the UI pattern wireframes for a person to choose from. `preview` writes one offline page with every option at desktop and phone width, `svg` prints one option, and `check` reports broken wireframes.
 
+### Analyzers
+
+- `LiteSpec.Analyzers` is a NuGet package of Roslyn analyzers that report a breach of a .NET provision in the editor and the build, each diagnostic linking to its provision. Twenty rules ship: LS1001 to LS1012 check Domain (outer-layer references, enums, state records, Domain exceptions, events, binary floating point, clock and random reads, repositories, documentation, and typed identifiers), LS2001 to LS2004 the outer layers, and LS3001 to LS3004 naming and style.
+- A rule runs only in the layers its provision covers. The layer comes from the `LiteSpecLayer` MSBuild property or the assembly name suffix. The package runs on the .NET 9.0.300 SDK, Visual Studio 17.14, and later.
+- `docs/backend/dotnet/packages.md` adds the convention to reference the package from the five application projects, the manifest pins it, and the rules the analyzers check completely are marked `checkable`.
+
+### The site
+
+- litespec.dev publishes every page of the release for people, with a navigation tree, provision cards, highlighted code, tabbed UI pattern options with a full-screen viewer, search, and light and dark themes.
+- Agents read `/llms.txt`, a raw Markdown copy of every page, one index per selection of shape and stacks, one bundle per layer, and the schemas. `/latest` redirects to the current release.
+- `docs/learn/` holds explanation pages that teach what LiteSpec is, why it exists, and how its parts and tools fit together.
+
 ### UI patterns
 
 - A pattern page in `docs/frontend/patterns/` answers one group of recurring interface questions. Each pattern names its question, its default option, its compact behavior and its rationale. Each option carries a wireframe in a closed text language, its rationale and its cost.

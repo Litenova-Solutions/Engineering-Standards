@@ -17,6 +17,10 @@ LiteSpec has four parts. Each one answers a different question.
 
 Your project pins one LiteSpec release, usually as a Git submodule at `litespec/`. The release never changes under you: when you want a newer one, you move the pin.
 
+The diagram below shows how the four parts connect in a loop, with the checks sending their findings back to the records.
+
+![The standard governs the records, the records are implemented by code and tests, the build reads code into the model, and the checks send findings back to the records.](../assets/diagrams/learn-how-it-works.svg)
+
 ## A use case, end to end
 
 Say a library lets readers borrow copies of books. In LiteSpec, that operation is a **use case**, and it has a record.
@@ -56,7 +60,22 @@ Each result is a record too. The refusal names the HTTP status and the stable fa
 }
 ```
 
-The record's `status` is `approved`, so the owner has agreed to it. An agent builds approved records, and doesn't invent the parts a draft leaves open.
+The record's `status` is `approved`, so the owner has agreed to it. An agent builds approved records and doesn't invent the parts a draft leaves open.
+
+The use case page also carries a case, a small example that proves one ending:
+
+```json
+{
+  "type": "case",
+  "id": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+  "situation": "A copy sits available on its shelf.",
+  "action": "The reader borrows the copy.",
+  "result": "result/borrow-copy.borrowed",
+  "expect": "The loan is active."
+}
+```
+
+Read it as one proven path: when the situation holds and the reader acts, the use case reaches the `borrowed` result, and the loan is active. Each case names exactly one result, so a later acceptance test knows which ending it proves.
 
 ### 2. You build it to the standard
 
@@ -76,10 +95,10 @@ Run the model builder from the project root:
 litespec model build
 ```
 
-It reads every record, the C# code, the frontend routes and the test results, and writes `.model/model.json`. For the library example it reports:
+It reads every record, the C# code, the frontend routes, and the test results, and writes `.model/model.json`. For the library example it reports:
 
 ```text
-.model/model.json: 61 records, 7 handlers, 0 screens, 0 scenarios.
+.model/model.json: 76 records, 7 handlers, 1 screens, 9 scenarios.
 ```
 
 Then ask about one record:
@@ -98,19 +117,28 @@ Alongside the record's own fields, the answer holds what the builder worked out 
     "apps/api/src/Library.Application/Lending/Loans/BorrowCopy/BorrowCopyCommandHandler.cs"
   ],
   "calls": [],
-  "proves": []
+  "proves": [
+    {
+      "scenario": "Borrowing_an_available_copy_succeeds",
+      "kase": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+      "confirmed": true,
+      "passing": null
+    }
+  ]
 }
 ```
 
-The use case is implemented: the builder found its handler. It isn't verified: no acceptance test proves it yet, so `proves` is empty. Nobody had to maintain that link by hand, and it can't go stale, because it's computed again on every build.
+The use case is implemented: the builder found its handler. One acceptance scenario claims its case, and the claim checks out because the scenario's `when` step belongs to the `BorrowCopySteps` class, so `proves` names `Borrowing_an_available_copy_succeeds` as confirmed. It still isn't verified: no test run exists yet, so `passing` is null. Nobody had to maintain those links by hand, and they can't go stale, because they're computed again on every build.
 
 ### 4. The checks report what's missing
 
 `litespec model check` turns gaps into findings, such as a use case with no handler, a result the code never returns, a link to a record that doesn't exist, or a requirement nothing fulfills. `litespec consumer` checks your project file and every record's header. Both run in CI, so a gap shows up in the pull request that introduced it.
 
+For example, if the borrow-copy page named no success result, `litespec model check` reports `use-case-without-success` against `docs/domain/modules/lending/loans/borrow-copy.md`, and the pull request fails until the record names one.
+
 ## Where the rules come from
 
-Every rule in the standard has an ID made of its page and its heading. For example, the rule that a handler implements exactly one use case is `litespec/core/system#keep-use-cases-and-handlers-in-one-to-one-correspondence`, on the [system page](../core/system.md). A review comment, an agent's report or a project exception can cite that ID, and everyone knows exactly which rule is meant.
+Every rule in the standard has an ID made of its page and its heading. For example, the rule that a handler implements exactly one use case is `litespec/core/system#keep-use-cases-and-handlers-in-one-to-one-correspondence`, on the [system page](../core/system.md). A review comment, an agent's report, or a project exception can cite that ID, and everyone knows exactly which rule is meant.
 
 ## Next
 

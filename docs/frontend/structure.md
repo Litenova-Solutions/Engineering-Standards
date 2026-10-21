@@ -27,7 +27,7 @@ The module tree mirrors the backend Application tree in kebab case. A reader hol
 
 **Requirement:** A use-case folder MUST sit under the modules root at `{module}/{aggregate}/{use-case}/` in kebab case, resolving to the backend folder of the same three names.
 
-**Rationale:** A reader holding a specification page then finds the frontend code by translating three names. No second register has to be learned to make that translation.
+**Rationale:** A reader holding a specification page then finds the frontend code by translating three names. The reader learns no second register to make that translation.
 
 **Example:** One backend folder and its frontend counterpart are the same path in two spellings.
 
@@ -35,6 +35,19 @@ The module tree mirrors the backend Application tree in kebab case. A reader hol
 apps/api/src/Shop.Application/Orders/Orders/SearchMerchantOrders/
 {frontend}/modules/orders/orders/search-merchant-orders/
 ```
+
+For example, the library product borrows a copy through `use-case/lending.borrow-copy`, implemented at `apps/api/src/Library.Application/Lending/Loans/BorrowCopy/`. The catalog frontend serves it from the same path in kebab case.
+
+```text
+apps/api/src/Library.Application/Lending/Loans/BorrowCopy/
+apps/catalog/src/modules/lending/loans/borrow-copy/
+```
+
+The three backend names become three lowercase folder names, so a reader holding the use case finds the frontend code by translating Lending, Loans, and BorrowCopy.
+
+The diagram shows the backend path beside its frontend mirror, with one arrow per translated segment.
+
+![The backend folder Lending, Loans, BorrowCopy beside the frontend folders lending, loans, borrow-copy, with one arrow mapping each backend segment to its kebab-case spelling.](../assets/diagrams/frontend-use-case-path.svg)
 
 ### Keep a use case folder flat
 
@@ -96,7 +109,7 @@ A module cannot import a route. A shared package cannot import an application. A
 
 **Requirement:** A frontend MUST place cross-route values in its frame: client configuration, session read, language choice, permissions, formatting, and shell data.
 
-**Rationale:** These values cross every route, so a route holding one of them holds it twice with two copies to keep equal. A browser API reached from a use-case module belongs in the frame, because a module renders and reads data rather than touching the device.
+**Rationale:** These values cross every route, so a route holding one of them holds it twice with two copies to keep equal. A browser API that a use-case module reaches belongs in the frame, because a module renders and reads data rather than touching the device.
 
 ### Cover public use cases in journeys
 

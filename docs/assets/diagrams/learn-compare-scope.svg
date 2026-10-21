@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="400" viewBox="0 0 720 400" role="img" aria-labelledby="learn-compare-scope-title learn-compare-scope-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
+  <title id="learn-compare-scope-title">Scope and verification of spec-driven approaches</title>
+  <desc id="learn-compare-scope-desc">Scatter plot with scope on the horizontal axis, from one change on the left to a whole application on the right, and verification on the vertical axis, from none at the bottom to automated at the top. LiteSpec sits at the top right. Architecture tests sit near it in the upper right. Behavior-driven development sits high at a middle scope. The Tessl tile and Kiro sit in the middle. Spec Kit, OpenSpec, and BMAD sit lower in the left half. Agent OS sits low at a middle scope. Instruction files and ADRs, arc42, and C4 sit at the bottom across middle to broad scope.</desc>
+  <defs>
+    <marker id="learn-compare-scope-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
+    </marker>
+  </defs>
+
+  <!-- Axes: horizontal scope, vertical verification. -->
+  <g style="stroke: var(--muted-fg, #77706a); fill: none" stroke-width="1.25" marker-end="url(#learn-compare-scope-arrow)">
+    <path d="M100 300 H670" />
+    <path d="M100 310 V50" />
+  </g>
+
+  <!-- Points. -->
+  <g style="fill: var(--bg, #ffffff); stroke: var(--muted-fg, #77706a)" stroke-width="1.25">
+    <circle cx="522" cy="96" r="5" />
+    <circle cx="286" cy="108" r="5" />
+    <circle cx="220" cy="151" r="5" />
+    <circle cx="264" cy="168" r="5" />
+    <circle cx="231" cy="199" r="5" />
+    <circle cx="358" cy="223" r="5" />
+    <circle cx="192" cy="228" r="5" />
+    <circle cx="440" cy="281" r="5" />
+    <circle cx="594" cy="286" r="5" />
+    <circle cx="495" cy="295" r="5" />
+  </g>
+  <circle cx="605" cy="72" r="6" style="fill: var(--accent-subtle, #fffaf0); stroke: var(--accent, #f8c258)" stroke-width="1.5" />
+
+  <!-- Axis labels and titles. -->
+  <g style="fill: var(--muted-fg, #77706a)" font-size="12">
+    <text x="110" y="322">one change</text>
+    <text x="660" y="322" text-anchor="end">whole application</text>
+    <text x="92" y="304" text-anchor="end">none</text>
+    <text x="92" y="64" text-anchor="end">automated</text>
+    <text x="385" y="348" text-anchor="middle">Scope of one specification</text>
+    <text transform="rotate(-90 26 180)" x="26" y="180" text-anchor="middle">Verification</text>
+  </g>
+
+  <!-- Point labels. -->
+  <g style="fill: var(--muted-fg, #77706a)" font-size="12">
+    <text x="513" y="100" text-anchor="end">Architecture tests</text>
+    <text x="295" y="112">BDD</text>
+    <text x="211" y="155" text-anchor="end">Tessl tile</text>
+    <text x="273" y="172">Kiro</text>
+    <text x="240" y="203">Spec Kit</text>
+    <text x="367" y="227">BMAD</text>
+    <text x="183" y="232" text-anchor="end">OpenSpec</text>
+    <text x="440" y="271" text-anchor="middle">Agent OS</text>
+    <text x="594" y="274" text-anchor="middle">ADRs, arc42, C4</text>
+    <text x="486" y="299" text-anchor="end">Instruction files</text>
+  </g>
+  <text x="594" y="76" text-anchor="end" font-size="12" font-weight="600" style="fill: var(--accent-text, #a35f0a)">LiteSpec</text>
+
+  <text x="360" y="380" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">Dots place each approach by scope and verification; arrows point to broader scope and stronger checks.</text>
+</svg>

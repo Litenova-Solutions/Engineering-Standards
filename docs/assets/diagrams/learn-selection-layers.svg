@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="600" viewBox="0 0 720 600" role="img" aria-labelledby="learn-selection-layers-title learn-selection-layers-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
+  <title id="learn-selection-layers-title">Which folders a server project with dotnet and react applies</title>
+  <desc id="learn-selection-layers-desc">The selection is server, dotnet, and react. It applies core, workspace, quality, backend, backend/dotnet, frontend, frontend/web, frontend/web/react, and the ext folder for selected extensions only. It does not apply frontend/web/svelte or frontend/blazor. The frontend stacks are react, svelte, and blazor, and a project selects one stack per frontend.</desc>
+  <defs>
+    <marker id="learn-selection-layers-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
+    </marker>
+  </defs>
+
+  <g style="stroke: var(--muted-fg, #77706a); fill: none" stroke-width="1.25" marker-end="url(#learn-selection-layers-arrow)">
+    <path d="M250 70 V 120" />
+  </g>
+
+  <g style="fill: var(--bg, #ffffff); stroke: var(--border, #e5e0d9)" stroke-width="1">
+    <rect x="40" y="122" width="300" height="52" rx="8" />
+    <rect x="40" y="184" width="300" height="52" rx="8" />
+    <rect x="40" y="246" width="300" height="52" rx="8" />
+    <rect x="40" y="308" width="300" height="52" rx="8" />
+    <rect x="40" y="370" width="300" height="52" rx="8" />
+    <rect x="40" y="432" width="300" height="52" rx="8" />
+    <rect x="40" y="494" width="300" height="52" rx="8" />
+    <rect x="380" y="122" width="300" height="52" rx="8" />
+    <rect x="380" y="184" width="300" height="52" rx="8" />
+  </g>
+  <rect x="40" y="12" width="300" height="56" rx="8" style="fill: var(--accent-subtle, #fffaf0); stroke: var(--accent, #f8c258)" stroke-width="1.5" />
+
+  <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600" text-anchor="middle">
+    <text x="190" y="36">server, dotnet, react</text>
+    <text x="190" y="108">Applies</text>
+    <text x="530" y="108">Does not apply</text>
+    <text x="190" y="145">core/, workspace/, quality/</text>
+    <text x="190" y="207">backend/</text>
+    <text x="190" y="269">backend/dotnet/</text>
+    <text x="190" y="331">frontend/</text>
+    <text x="190" y="393">frontend/web/</text>
+    <text x="190" y="455">frontend/web/react/</text>
+    <text x="190" y="517">ext/</text>
+    <text x="530" y="145">frontend/web/svelte/</text>
+    <text x="530" y="207">frontend/blazor/</text>
+  </g>
+  <g style="fill: var(--muted-fg, #77706a)" font-size="12" text-anchor="middle">
+    <text x="190" y="54">the project selection</text>
+    <text x="190" y="163">every project</text>
+    <text x="190" y="225">every server project</text>
+    <text x="190" y="287">the dotnet stack</text>
+    <text x="190" y="349">every frontend project</text>
+    <text x="190" y="411">React and Svelte</text>
+    <text x="190" y="473">the react stack</text>
+    <text x="190" y="535">only selected extensions</text>
+    <text x="530" y="163">not selected</text>
+    <text x="530" y="225">not selected</text>
+  </g>
+  <g style="fill: var(--muted-fg, #77706a)" font-size="12">
+    <text x="380" y="272">The frontend stacks are react, svelte, and blazor;</text>
+    <text x="380" y="288">the project selects one stack per frontend.</text>
+  </g>
+  <text x="360" y="580" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">An arrow means the selection applies the folders below it.</text>
+</svg>

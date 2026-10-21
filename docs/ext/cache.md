@@ -28,7 +28,7 @@ This extension switches on `limit`. The accepted staleness and the expiry of eac
 
 ### Remove unjustified caches
 
-**Requirement:** A cache owner MUST remove a cache when measurements no longer justify its operating cost.
+**Requirement:** A cache owner MUST remove a cache when measurements do not justify its operating cost.
 
 **Rationale:** A cache creates invalidation, capacity, and recovery work that needs continuing value.
 
@@ -44,7 +44,7 @@ This extension switches on `limit`. The accepted staleness and the expiry of eac
 
 **Requirement:** A cache key MUST NOT contain a secret, unbounded raw input, or personal data that is not already a hash.
 
-**Rationale:** Keys appear in diagnostics, metrics, and provider administration tools, which is a copy of the value in a store nobody classified. An email address in a key is a personal-data record in the cache provider's key space. It sits outside every retention and erasure path the project defined. [Data minimization](https://gdpr-info.eu/art-5-gdpr/) applies to an identifier as much as to a field.
+**Rationale:** Keys appear in diagnostics, metrics, and provider administration tools. That copies the value into a store no one classified. An email address in a key is a personal-data record in the cache provider's key space. It sits outside every retention and erasure path the project defined. [Data minimization](https://gdpr-info.eu/art-5-gdpr/) applies to an identifier as much as to a field.
 
 **Example:** A per-account cache key carries the account's opaque identifier. A key that carried the address instead is replaced by a hash of it, and the entry is bound to the account that owns it.
 
@@ -58,7 +58,7 @@ This extension switches on `limit`. The accepted staleness and the expiry of eac
 
 **Requirement:** A manual invalidation MUST produce a record naming actor, scope, and reason, as an audit record in its category when the audit extension is selected.
 
-**Rationale:** A manual clear changes what every later reader sees and leaves no trace in the data itself. Investigating a stale-read report afterwards means knowing whether somebody already cleared the entry. [Article 30 of the GDPR](https://gdpr-info.eu/art-30-gdpr/) treats an administrative action over personal data as processing that has a record.
+**Rationale:** A manual clear changes what every later reader sees and leaves no trace in the data itself. Investigating a stale-read report afterward means knowing whether someone already cleared the entry. [Article 30 of the GDPR](https://gdpr-info.eu/art-30-gdpr/) treats an administrative action over personal data as processing that has a record.
 
 **Example:** A command that clears one tenant's cached price list records the tenant, the operator, and the incident it was run for.
 
@@ -86,7 +86,7 @@ This extension switches on `limit`. The accepted staleness and the expiry of eac
 
 **Requirement:** A cache path MUST emit a metric distinguishing a cache miss, a cache error, and a degraded response.
 
-**Rationale:** A fallback that works is invisible, so an outage runs until somebody notices the source load instead. The three cases need different responses: a miss is normal, an error is an infrastructure fault, and a degraded response is a product behavior change. One counter for all three answers none of them.
+**Rationale:** A fallback that works is invisible. An outage runs until someone notices the source load instead. The three cases need different responses: a miss is normal, an error is an infrastructure fault, and a degraded response is a product behavior change. One counter for all three answers none of them.
 
 **Example:** The metric carries the cache name and the outcome, following [the OpenTelemetry semantic conventions](https://opentelemetry.io/docs/specs/semconv/) for the client it wraps.
 
@@ -116,14 +116,14 @@ This extension switches on `limit`. The accepted staleness and the expiry of eac
 
 ## Dependencies
 
-No provider package is selected by this extension.
+This extension selects no provider package.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/ext/cache#record-measured-cache-need | guidance | Does the proposal record the query, load, latency, cost, target, staleness, and ownership? |
-| litespec/ext/cache#remove-unjustified-caches | guidance | Does a cache leave when measurements no longer justify its cost? |
+| litespec/ext/cache#remove-unjustified-caches | guidance | Does a cache leave when measurements do not justify its cost? |
 | litespec/ext/cache#compose-cache-keys-from-result-inputs | guidance | Does each key separate version, result inputs, and tenant or actor partition? |
 | litespec/ext/cache#exclude-unsafe-cache-key-material | guidance | Is every key free of secrets, unbounded input, and unhashed personal data? |
 | litespec/ext/cache#define-cache-invalidation | guidance | Does each cached value define expiry, events, an owner, and failure behavior? |

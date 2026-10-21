@@ -2,7 +2,7 @@
 
 ## Intent
 
-This stack binds the backend to .NET. The specification states each backend and workspace principle. The pages in this stack's folder state how a .NET backend realizes it. The model builder reads C# code, C# scenarios, and test results for it.
+This stack binds the backend to .NET. The specification states each backend and workspace principle. The pages in this stack's folder state how a .NET backend realizes it. The model builder reads C# code, C# scenarios, and test results for the backend.
 
 ## Standards
 
@@ -16,7 +16,7 @@ This stack binds the backend to .NET. The specification states each backend and 
 
 **Requirement:** A .NET test run MUST write its results as TRX or JUnit XML under `paths.testResults`.
 
-**Rationale:** The model builder computes verified status from those two formats only, so a run in another format proves no case.
+**Rationale:** The model builder computes verified status from those two formats only, so a run in another format verifies no case.
 
 
 ## Conventions

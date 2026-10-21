@@ -2,7 +2,7 @@
 
 ## Intent
 
-Components in a React frontend are function components with typed boundaries. The shared provisions live on the stack-neutral page ([Frontend components](../../components.md)); this page holds what React alone requires.
+Components in a React frontend are function components with typed boundaries. The shared provisions live on the stack-neutral page ([Frontend components](../../components.md)). This page states what React alone requires.
 
 ## Standards
 
@@ -10,7 +10,7 @@ Components in a React frontend are function components with typed boundaries. Th
 
 **Requirement:** A component MUST be a function component using hooks, not a class component.
 
-**Rationale:** Hooks are the reactivity model the renderer understands, so class lifecycle methods fall out of every component. An effect covers what derivation cannot express.
+**Rationale:** Hooks are the reactivity model the renderer understands. Class lifecycle methods fall out of every component. An effect covers what derivation cannot express.
 
 **Example:**
 

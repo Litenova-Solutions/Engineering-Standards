@@ -12,7 +12,7 @@ An audited system keeps three records with different producers, readers, and ret
 | Domain event stream | What became true | The system itself |
 | Audit trail | Who is accountable for an attempt | Reviewers, customers, regulators |
 
-A domain event cannot substitute for an audit record. A domain event carries domain identity rather than use-case identity, and one event type can come from more than one use case. A domain event carries only the fields the domain needs, so an actor the domain ignores is absent. A refused attempt changes no state and raises no event, and refusal is the case a reviewer asks about.
+A domain event cannot substitute for an audit record. A domain event carries domain identity rather than use-case identity. One event type can come from more than one use case. A domain event carries only the fields the domain needs. An actor the domain ignores is absent. A refused attempt changes no state and raises no event. Refusal is the case a reviewer asks about.
 
 ## Activation
 
@@ -84,7 +84,7 @@ This extension switches on no optional record type.
 
 **Requirement:** An audit record MUST contain actor, action, target, outcome, business time, record time, and tenant, fixed where the tenancy extension is absent.
 
-**Rationale:** These fields carry the accountability question. Business time states when the action happened, and record time states when the evidence was written. Actor and target each carry kind and identity.
+**Rationale:** These fields carry the accountability question. Business time states when the action happened. Record time states when the evidence was written. Actor and target each carry kind and identity.
 
 ### State the action as use-case identity
 
@@ -110,9 +110,9 @@ This extension switches on no optional record type.
 
 **Requirement:** An audit actor MUST be one of `person`, `company`, `provider`, `system`, or `guest`.
 
-**Rationale:** An absent actor collapses three answers into one. A scheduled process acted, a device acted, or nobody recorded the actor, and only the third is a defect. A device maps to the person whose account authorized it, with the device recorded as the client description. A named process maps to `system`.
+**Rationale:** An absent actor collapses three answers into one. A scheduled process acted, a device acted, or no one recorded the actor. Only the third is a defect. A device maps to the person whose account authorized it. The device appears as the client description. A named process maps to `system`.
 
-**Example:** A warehouse handheld records the person actor whose account authorized it, and the origin record names the device.
+**Example:** A warehouse handheld records the person actor whose account authorized it. The origin record names the device.
 
 ### Record delegated administrative access
 
@@ -164,7 +164,7 @@ This extension switches on no optional record type.
 
 **Rationale:** A record holding a name, an address, or a message body turns retention into an erasure conflict. An identifier keeps the record meaningful and erasable.
 
-A pseudonymous identifier is still personal data where the party holding it can reverse it. That is the position [the EDPB states](https://edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-012020-processing-personal-data-context-art-6-1). The identifier is therefore safe inside the tenant that owns the mapping, and is a disclosure when it leaves that tenant.
+A pseudonymous identifier is still personal data where the party holding it can reverse it. That is the position [the EDPB states](https://edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-012020-processing-personal-data-context-art-6-1). The identifier is therefore safe inside the tenant that owns the mapping. It is a disclosure when it leaves that tenant.
 
 **Example:** An audit export crossing a tenant boundary replaces each identifier with one derived for that export. The receiving party then cannot join the records back to a subject.
 
@@ -184,7 +184,7 @@ A pseudonymous identifier is still personal data where the party holding it can 
 
 **Requirement:** An audit record with a `denied` or `failed` outcome MUST be written on a connection that the failing transaction does not roll back.
 
-**Rationale:** The transaction that would carry the record is the one being abandoned. The evidence of a refusal must outlive the refusal.
+**Rationale:** The transaction that would carry the record is the one being abandoned. The evidence of a refusal outlives the refusal.
 
 ### Stage the audit write before the business commit
 
@@ -196,7 +196,7 @@ A pseudonymous identifier is still personal data where the party holding it can 
 
 **Requirement:** An audit deployment MUST publish the write failure count of its unsuccessful-outcome path.
 
-**Rationale:** The separate connection accepts a rare lost record at process death. Continuous loss is a defect, and only a published indicator separates the two.
+**Rationale:** The separate connection accepts a rare lost record at process death. Continuous loss is a defect. Only a published indicator separates the two.
 
 ### Scope every record to its tenant
 
@@ -208,17 +208,17 @@ A pseudonymous identifier is still personal data where the party holding it can 
 
 **Requirement:** An audit store MUST refuse update and delete through the privileges granted to the writing account.
 
-**Rationale:** An absent code path is a convention. A revoked privilege is a control that a reviewer can be shown.
+**Rationale:** An absent code path is a convention. A reviewer can verify a revoked privilege.
 
-**Example:** The application account holds `INSERT` and `SELECT` on the audit table and holds neither `UPDATE` nor `DELETE`.
+**Example:** The application account holds `INSERT` and `SELECT` on the audit table. It holds neither `UPDATE` nor `DELETE`.
 
 ### Provide tamper evidence
 
 **Requirement:** An audit store MUST chain each record to its predecessor with a SHA-256 hash over a canonical serialization of both.
 
-**Rationale:** A chain detects an edit and a removal, because a changed or missing record breaks every following value. Detection is the obligation, and prevention at a higher cost is not.
+**Rationale:** A chain detects an edit and a removal, because a changed or missing record breaks every following value. Detection is the obligation. Prevention at a higher cost is not required.
 
-The algorithm is named because two implementations that each chose their own cannot verify each other. A verifier written later cannot recompute a chain whose algorithm nobody recorded. Canonical serialization is named for the same reason: a hash over a serialization that reorders fields verifies nothing.
+The algorithm is named because two implementations that each choose their own cannot verify each other. A verifier written later cannot recompute a chain whose algorithm no one recorded. Canonical serialization is named for the same reason. A hash over a serialization that reorders fields verifies nothing.
 
 **Example:** The chain value is `SHA-256(previousHash || canonical(record))`, where `canonical` sorts object members and uses one fixed encoding for every timestamp and number.
 
@@ -228,7 +228,7 @@ The algorithm is named because two implementations that each chose their own can
 
 **Deviation:** A store whose recorded threat model excludes its own operators publishes no checkpoint.
 
-**Rationale:** A chain proves that records are consistent with each other. It does not prove that the whole chain was not recomputed, which anyone holding the store can do. A checkpoint somebody else holds fixes the chain as it stood at that moment, so a later recomputation disagrees with it.
+**Rationale:** A chain proves that records are consistent with each other. It does not prove that the whole chain was not recomputed, which anyone holding the store can do. A checkpoint someone else holds fixes the chain as it stood at that moment. A later recomputation disagrees with it.
 
 **Example:** The checkpoint is the chain head and its record count, published at a stated interval. A separate append-only destination, a timestamping authority, and a transparency log each qualify.
 
@@ -254,13 +254,13 @@ The algorithm is named because two implementations that each chose their own can
 
 **Requirement:** An erasure request MUST remove the mapping from actor identifier to person and retain every audit record.
 
-**Rationale:** The record keeps its evidential value and the person stops being identifiable from it. This depends on the record holding no personal data.
+**Rationale:** The record keeps its evidential value. The person stops being identifiable from it. This depends on the record holding no personal data.
 
 ### Give the trail a read path
 
 **Requirement:** An audited system MUST provide a trail read as a use case needing a Permission record, filtered by tenant, actor, action, target, and outcome.
 
-**Rationale:** A trail that no use case reads is storage rather than a control. The actor holds a Role at a scope, the Role allows the Permission, and the guard permits the read.
+**Rationale:** A trail that no use case reads is storage rather than a control. The actor holds a Role at a scope. The Role allows the Permission. The guard permits the read.
 
 ### Audit reads of the trail
 
@@ -278,7 +278,7 @@ The algorithm is named because two implementations that each chose their own can
 
 **Requirement:** A query returning personal data for more subjects than its declared threshold MUST produce an audit record, inside one tenant or account boundary as well.
 
-**Rationale:** The cross-boundary rule catches a disclosure to the wrong party. It does not catch an export of every record a party may read one at a time. That is the shape a copied dataset has. [Article 30 of the GDPR](https://gdpr-info.eu/art-30-gdpr/) asks what categories of data were processed and by whom, and an unrecorded bulk read cannot answer either.
+**Rationale:** The cross-boundary rule catches a disclosure to the wrong party. It does not catch an export of every record a party may read one at a time. That is the shape a copied dataset has. [Article 30 of the GDPR](https://gdpr-info.eu/art-30-gdpr/) asks what categories of data were processed and by whom. An unrecorded bulk read cannot answer either.
 
 **Example:** A project records the threshold in the adoption decision. A list endpoint whose page size can exceed it audits the read with the subject count rather than the subjects.
 
@@ -292,7 +292,7 @@ The algorithm is named because two implementations that each chose their own can
 
 **Requirement:** An automated check MUST fail when a Command declares neither audited nor excluded status, with a composition refusal at startup satisfying this rule.
 
-**Rationale:** The next Command is written by somebody who did not read this page. Only an automated gate catches it.
+**Rationale:** The next Command is written by someone who did not read this page. Only an automated gate catches it.
 
 ## Conventions
 
@@ -310,7 +310,7 @@ The algorithm is named because two implementations that each chose their own can
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** The declaration stays with the code it describes, so a review reads both at once.
+**Rationale:** The declaration stays with the code it describes. A review reads both at once.
 
 ### Use a fixed category vocabulary
 
@@ -318,11 +318,11 @@ The algorithm is named because two implementations that each chose their own can
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** The category drives retention and the review query, so a free-text value defeats both.
+**Rationale:** The category drives retention and the review query. A free-text value defeats both.
 
 ### Store the trail beside the business data
 
-**Default:** Store audit records in the business database, under a separate account holding insert and select privileges.
+**Default:** Store audit records in the business database, under a separate account holding `INSERT` and `SELECT` privileges.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
@@ -334,11 +334,11 @@ The algorithm is named because two implementations that each chose their own can
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** Delivery is at-least-once and evidence needs one durable source. The copy serves detection and the store serves accountability.
+**Rationale:** Delivery is at-least-once. Evidence needs one durable source. The copy serves detection. The store serves accountability.
 
 ## Dependencies
 
-No additional baseline package is required. The `tenancy` extension owns tenant resolution when a deployment serves several customer organizations. The `outbox` extension owns delivery when `litespec/ext/audit#publish-a-copy-to-the-security-platform` applies.
+This extension requires no additional baseline package. The `tenancy` extension owns tenant resolution when a deployment serves several customer organizations. The `outbox` extension owns delivery when `litespec/ext/audit#publish-a-copy-to-the-security-platform` applies.
 
 [Build an audit trail](../guide/audit-trail.md) states one compliant implementation on the command pipeline of the dotnet stack.
 
@@ -346,7 +346,7 @@ No additional baseline package is required. The `tenancy` extension owns tenant 
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/audit#record-the-audit-adoption-decision | guidance | Does the adoption decision record the required fields, and is no record approved behind its draft? |
+| litespec/ext/audit#record-the-audit-adoption-decision | guidance | Does the adoption decision record the required fields? Is no record approved behind its draft? |
 | litespec/ext/audit#declare-audit-selection-on-every-command | guidance | Does every Command declare audited status or excluded status with a reason? |
 | litespec/ext/audit#cover-the-required-audit-categories | guidance | Does the declared selection contain one entry for each required category? |
 | litespec/ext/audit#exclude-indiscriminate-auditing | guidance | Does the selection justify each audited category rather than auditing every Command? |

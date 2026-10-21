@@ -27,7 +27,7 @@ Related rules live on other pages. `litespec/core/release#run-frontend-release-c
 
 **Requirement:** A test MUST prove a Case by calling its use case and asserting its Result, submitting a money-moving use case rather than only reading it.
 
-**Rationale:** Steps that call the use case and assert the Result let the model builder compute proof from the test body. A title tag claims proof without exercising anything. A use case that moves money and is only read has never shown it can complete.
+**Rationale:** Steps that call the use case and assert the Result let the model builder compute proof from the test body. A title tag claims proof without exercising anything. A money-moving use case that a test only reads never shows it can complete.
 
 **Example:** An evidence specification for placing an order submits the order and asserts the confirmation the success Result promises.
 
@@ -35,7 +35,7 @@ Related rules live on other pages. `litespec/core/release#run-frontend-release-c
 
 **Requirement:** An evidence specification for a use case declaring a refusal MUST reach that refusal and assert it by its Result's code.
 
-**Rationale:** A refusal that only appears in a log has never been seen rendered. Addressing it by code also proves the code the Result declares is the code the page shows. The Case records the situation that reaches it.
+**Rationale:** A refusal that only appears in a log never renders where a reader can see it. Addressing it by code also proves the code the Result declares is the code the page shows. The Case records the situation that reaches it.
 
 **Example:** The refusal alert carries the code, so the assertion names it.
 
@@ -69,7 +69,7 @@ Related rules live on other pages. `litespec/core/release#run-frontend-release-c
 
 **Requirement:** A frontend calling the API MUST hold a test asserting that its module tree resolves to the backend use-case folders and names no refused folder.
 
-**Rationale:** The mirror is the claim that makes a specification findable from a folder path. A check that runs on every build is what keeps it true after a backend use case is added or renamed.
+**Rationale:** The mirror is the claim that makes a specification findable from a folder path. A check that runs on every build keeps it true when the backend adds or renames a use case.
 
 **Example:** The structure check resolves each folder name against the backend's Application tree.
 
@@ -115,7 +115,7 @@ Related rules live on other pages. `litespec/core/release#run-frontend-release-c
 
 This informative example demonstrates `litespec/frontend/testing#match-test-level-to-risk`, `litespec/frontend/testing#assert-each-declared-refusal-by-its-code`, and `litespec/frontend/testing#isolate-browser-tests`.
 
-A withdrawal window is a pure function, so it takes a logic test beside it. A redelivery dialog is reached only through a record, so it takes an evidence specification. That specification creates the order it needs and asserts the refusal by its code.
+A withdrawal window is a pure function, so it takes a logic test beside it. A reader reaches a redelivery dialog only through a record, so it takes an evidence specification. That specification creates the order it needs and asserts the refusal by its code.
 
 ## Verification
 

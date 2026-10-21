@@ -160,13 +160,13 @@ An API with public and admin frontends uses `apps/api/`, `apps/web/`, and `apps/
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/workspace/structure#use-the-canonical-root-tree | guidance | Does the workspace match the canonical tree with records at their homes? |
-| litespec/workspace/structure#declare-size-and-application-stacks-in-project-config | guidance | Does litespec.project.json declare size and one stack for the backend and each frontend? |
-| litespec/workspace/structure#keep-the-generated-model-out-of-source-control | guidance | Is the generated .model/ folder untracked? |
-| litespec/workspace/structure#keep-production-and-test-code-separate | guidance | Does production code sit under src/ and test code under tests/? |
-| litespec/workspace/structure#keep-runnable-applications-under-apps | guidance | Does each runnable application sit under apps/ and each library under packages/? |
+| litespec/workspace/structure#declare-size-and-application-stacks-in-project-config | guidance | Does `litespec.project.json` declare size and one stack for the backend and each frontend? |
+| litespec/workspace/structure#keep-the-generated-model-out-of-source-control | guidance | Is the generated `.model/` folder untracked? |
+| litespec/workspace/structure#keep-production-and-test-code-separate | guidance | Does production code sit under `src/` and test code under `tests/`? |
+| litespec/workspace/structure#keep-runnable-applications-under-apps | guidance | Does each runnable application sit under `apps/` and each library under `packages/`? |
 | litespec/workspace/structure#limit-shared-typescript-packages | guidance | Does each shared package have two consumers or carry generated output? |
-| litespec/workspace/structure#keep-consumer-documentation-at-the-root | guidance | Do all project records live under the root docs/ directory? |
-| litespec/workspace/structure#keep-orientation-documents-separate-from-canonical-records | guidance | Does each README under docs/ link to its record rather than restate it? |
-| litespec/workspace/structure#name-frontends-by-audience | guidance | Does each directory under apps/ carry an audience name? |
-| litespec/workspace/structure#keep-scripts-at-the-root | guidance | Do bootstrap, release, and CI helper scripts sit under root scripts/? |
-| litespec/workspace/structure#keep-generated-api-contracts-in-packages | guidance | Do generated types and the typed client sit under packages/ with two frontends? |
+| litespec/workspace/structure#keep-consumer-documentation-at-the-root | guidance | Do all project records live under the root `docs/` directory? |
+| litespec/workspace/structure#keep-orientation-documents-separate-from-canonical-records | guidance | Does each `README` under `docs/` link to its record rather than restate it? |
+| litespec/workspace/structure#name-frontends-by-audience | guidance | Does each directory under `apps/` carry an audience name? |
+| litespec/workspace/structure#keep-scripts-at-the-root | guidance | Do bootstrap, release, and CI helper scripts sit under root `scripts/`? |
+| litespec/workspace/structure#keep-generated-api-contracts-in-packages | guidance | Do generated types and the typed client sit under `packages/` with two frontends? |

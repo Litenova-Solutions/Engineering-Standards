@@ -12,7 +12,7 @@ Activation scope: `project`.
 
 Applicable specification kinds: None.
 
-The consumer selects `site` when it ships a public static website beside its application, such as marketing pages, pricing, or help articles. A page the application itself serves does not select it.
+The consumer selects `site` when it ships a public static website beside its application, such as marketing pages, pricing, or help articles. This extension does not cover a page the application itself serves.
 
 ## Baseline relationship
 
@@ -40,7 +40,7 @@ dist/nl/prijzen/index.html
 
 **Requirement:** A page MUST NOT ship a client script unless the site records the interactive need that script serves.
 
-**Rationale:** A marketing page is read rather than operated, so each script needs a named reason to exist. The named need lives beside the script, such as a theme switch kept across pages.
+**Rationale:** A reader reads a marketing page rather than operating it, so each script needs a named reason to exist. The named need lives beside the script, such as a theme switch kept across pages.
 
 **Example:** The theme switch is the one script: `/assets/theme.js`, named in the layout as the reader-chosen scheme.
 
@@ -87,7 +87,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 **Requirement:** Every page MUST state a title element and a description its search result shows.
 
-**Rationale:** The title names the tab and the search result, and the description summarizes the page beneath it. Both come from the page front matter, so each page states its own.
+**Rationale:** The title names the tab and the search result, and the description summarizes the page beneath it. Both come from the page frontmatter, so each page states its own.
 
 ### Point every page at its absolute canonical address
 
@@ -119,7 +119,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 **Requirement:** The site build MUST generate a sitemap listing every page with the language alternates of that page.
 
-**Rationale:** The sitemap is generated from the pages that exist, so it cannot drift from them. Each entry carries the alternates, so a crawler finds every language from one file.
+**Rationale:** The build generates the sitemap from the pages that exist, so it cannot drift from them. Each entry carries the alternates, so a crawler finds every language from one file.
 
 **Example:**
 
@@ -132,9 +132,9 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 ### Point crawler rules at the sitemap
 
-**Requirement:** The site MUST publish crawler rules pointing at the sitemap address.
+**Requirement:** The site MUST publish crawler rules pointing to the sitemap address.
 
-**Rationale:** Crawlers read `robots.txt` first, so the file points at the sitemap from the site root. Access rules for crawler-only paths live in the same file.
+**Rationale:** Crawlers read `robots.txt` first, so the file points to the sitemap from the site root. Access rules for crawler-only paths live in the same file.
 
 **Example:**
 
@@ -148,7 +148,7 @@ Sitemap: https://example.test/sitemap.xml
 
 **Requirement:** The site build MUST generate a page list naming every page with its address and description.
 
-**Rationale:** The `llms.txt` file summarizes the site and groups every page with the address and description a model needs to cite it. It is generated from the pages, so it lists what exists.
+**Rationale:** The `llms.txt` file summarizes the site and groups every page with the address and description a model needs to cite it. The build generates it from the pages, so it lists what exists.
 
 **Example:**
 
@@ -208,7 +208,7 @@ Sitemap: https://example.test/sitemap.xml
 
 **Rationale:** A visible placeholder tells a reviewer what is missing instead of publishing a guess. The placeholder names the fact, so the owner knows what to supply.
 
-**Example:** A page awaiting its final price carries `[[FILL: launch price]]` where the price will stand.
+**Example:** A page awaiting its final price carries `[[FILL: launch price]]` where the price stands.
 
 ### Reject a release build carrying a placeholder
 
@@ -305,8 +305,8 @@ This extension selects its generator stack through `litespec.manifest.json`, whi
 | litespec/ext/site#publish-full-page-text-for-language-models | guidance | Does the full-text file match the default-language pages? |
 | litespec/ext/site#publish-a-markdown-copy-beside-every-page | guidance | Does every page link its Markdown copy? |
 | litespec/ext/site#mark-pages-with-json-ld-structured-data | guidance | Does every page carry its JSON-LD graph? |
-| litespec/ext/site#keep-each-repeated-fact-in-one-data-source | guidance | Does each repeated fact live in one source, each word as a Term? |
-| litespec/ext/site#render-every-language-from-one-page-structure | guidance | Does one structure render every language with text alone per language? |
+| litespec/ext/site#keep-each-repeated-fact-in-one-data-source | guidance | Does each repeated fact live in one source, with each product word as a Term record? |
+| litespec/ext/site#render-every-language-from-one-page-structure | guidance | Does one structure render every language, with each language supplying only text? |
 | litespec/ext/site#mark-unfinished-facts-with-visible-placeholders | guidance | Does each missing fact show a visible placeholder naming it? |
 | litespec/ext/site#reject-a-release-build-carrying-a-placeholder | guidance | Does a release build fail while a placeholder remains? |
 | litespec/ext/site#read-site-prices-and-claims-from-consumer-records | guidance | Does each site price and claim trace to its named record? |

@@ -2,15 +2,15 @@
 
 ## Intent
 
-A page frame is the layout of one kind of page. It covers a home page, a list, a queue, a record, a form, a report, a settings page or an outcome. These patterns answer how each kind of page is laid out. Each pattern offers drawn options and names a default.
+A page frame is the layout of one kind of page. It covers a home page, a list, a queue, a record, a form, a report, a settings page, or an outcome. These patterns answer how each kind of page is laid out. Each pattern offers drawn options and names a default.
 
 ## Standards
 
 ### Name the page in one heading
 
-**Requirement:** Each page MUST show one top-level heading that names the record, list or task it holds.
+**Requirement:** Each page MUST show one top-level heading that names the record, list, or task it holds.
 
-**Rationale:** A reader who lands from a link, a notification or a search learns where they are from one line. Two competing headings make the reader guess which one is the page.
+**Rationale:** A reader who lands from a link, a notification, or a search learns where they are from one line. Two competing headings make the reader guess which one is the page.
 
 ### Show one primary action in a page frame
 
@@ -22,7 +22,7 @@ A page frame is the layout of one kind of page. It covers a home page, a list, a
 
 ### Home page
 
-**Question:** The first page after sign-in tells the reader what needs doing now, in that order, before any figure. A home page typically holds a greeting, stat tiles, a setup section, a needs-attention list and a coming-up list. The disagreement is how much of that sits above the fold, and whether the tiles lead or the work leads.
+**Question:** The first page after sign-in tells the reader what needs doing now, in that order, before any figure. A home page typically holds a greeting, stat tiles, a setup section, a needs-attention list, and a coming-up list. The disagreement is how much of that sits above the fold, and whether the tiles lead or the work leads.
 
 **Default:** `work-first-tiles-second`
 
@@ -53,7 +53,7 @@ page
     figure "Active now" "2"
 ```
 
-**Rationale:** The page opens on what needs doing, then the figures underneath. A returning manager reads the queue and stops. A curious one scrolls for the numbers.
+**Rationale:** The page opens on what needs doing and shows the figures underneath. A returning manager reads the queue and stops. A curious one scrolls for the numbers.
 
 **Cost:** The tiles lose prominence, and a reader who came to check a number has to scroll. It costs one screen of vertical space.
 
@@ -99,7 +99,7 @@ page
       item: text "31 refunds need a decision" · text muted "5 close their 180-day window this week." · action "Decide"
 ```
 
-**Rationale:** The home page is nothing but the queue, ordered by consequence. Nothing sits to scroll past, and no figure misreads as the answer.
+**Rationale:** The home page is nothing but the queue, ordered by consequence. Nothing sits to scroll past, and no figure reads as the answer.
 
 **Cost:** The reader loses orientation entirely. Nothing says how big the day is, how much is coming, or whether anything is broken. The work-page shape calls for two to four tiles below the queue.
 
@@ -133,7 +133,7 @@ page
       item: text "Refund SO-1042" · text muted "Maria Garcia, requested 6 days ago" · status "6 days" caution · text "Priya Shah" · action "Deal with"
 ```
 
-**Rationale:** A triage shape. Each row carries who must act and how long it has waited, so several people can share the queue rather than duplicate the work.
+**Rationale:** It is a triage shape. Each row carries who must act and how long it has waited, so several people can share the queue rather than duplicate the work.
 
 **Cost:** An owner and a clock are only honest if assignment is a real command. With no assignment, every row reads Alex and the columns are noise.
 
@@ -261,7 +261,7 @@ page
       text muted "1 to 25 of 268"
 ```
 
-**Rationale:** A segmented control across the top reads All, Paid, Awaiting, Refunded, Disputed. One control replaces five, and the current choice stays visible rather than hiding in a dropdown.
+**Rationale:** A segmented control across the top reads All, Paid, Awaiting, Refunded, Disputed. One control replaces five, and the current choice stays visible rather than hiding in a list.
 
 **Cost:** Five segments plus a search box crowd one toolbar, and segments have no room for a count per state. The reader cannot see where the work is before choosing.
 
@@ -289,7 +289,7 @@ page
     text muted "1 to 25 of 268"
 ```
 
-**Rationale:** Search, customer, state, date range and channel, each as a control that stays visible. The applied set is restated as removable chips underneath, so the reader never guesses what narrowed the table.
+**Rationale:** Search, customer, state, date range, and channel, each as a control that stays visible. The applied set is restated as removable chips underneath, so the reader never guesses what narrowed the table.
 
 **Cost:** Four controls and a chip row is a lot of chrome above a table, and the chips duplicate the controls. It pays off once the list holds mixed records.
 
@@ -315,7 +315,7 @@ page
     text muted "1 to 25 of 268"
 ```
 
-**Rationale:** The states people return to are saved under names: Late payments, Disputed this week, Garcia orders. A dropdown holds them so the toolbar stays empty until asked.
+**Rationale:** The states people return to are saved under names: Late payments, Disputed this week, Garcia orders. A menu holds them so the toolbar stays empty until asked.
 
 **Cost:** Nothing is discoverable on arrival, and every view needs its own storage. It suits power users and reads poorly as a first-run surface.
 
@@ -337,7 +337,7 @@ page
       item: text "SO-1042" · text "Maria Garcia" · text muted "8 Oct 2026, 09:32" · text "EUR 125.00"
 ```
 
-**Rationale:** Orders waiting for something sit above orders that need nothing. Two tables, so the working set is never mixed with the settled set.
+**Rationale:** Orders waiting for something sit above orders that need nothing. It uses two tables, so the working set never mixes with the settled set.
 
 **Cost:** A list page holds one table, and a second table means a second page or a tab. Following it means two routes and two search states.
 
@@ -360,9 +360,9 @@ page
     text muted "1 to 25 of 214"
 ```
 
-**Rationale:** The GitHub issue-list shape. One filter bar states the query in words, a count says what matched, and a dense table sits under it. The reader sees what narrowed the list without opening a dropdown.
+**Rationale:** The GitHub issue-list shape. One filter bar states the query in words, a count says what matched, and a dense table sits under it. The reader sees what narrowed the list without opening anything.
 
-**Cost:** A query syntax has to be learned, and typing a query is slower than pressing a segment for the two daily states. It fits past a few hundred rows and adds noise below that size.
+**Cost:** A query syntax has to be learned, and typing a query is slower than pressing a segment for the two daily states. It fits lists past a few hundred rows and adds noise below that size.
 
 **Reference:** GitHub
 
@@ -518,7 +518,7 @@ page
       item: text "SO-1031" · text muted "Tom Becker, asked 214 days ago" · status "Window closed" critical · action "Offer credit"
 ```
 
-**Rationale:** The queue is grouped into priority tiers rather than one ordered list: money at risk, refunds closing, everything else. The reader takes the top group and stops if it is empty.
+**Rationale:** The queue is grouped into priority tiers rather than one ordered list: money at risk, refunds closing, and everything else. The reader takes the top group and stops if it is empty.
 
 **Cost:** Groups need a stated ordering and someone has to decide it. Atlassian advises that several simple queues beat one complex one, which argues for separate routes rather than groups on one page.
 
@@ -721,7 +721,7 @@ page
 
 **Rationale:** For a record whose main interest is what happened to it, the history is the main column. The values of the record support it from the side.
 
-**Cost:** Wrong for most records. An order is mostly its facts. An audit trail or a collection record is mostly its history, and the shape has to follow which.
+**Cost:** This option is wrong for most records. An order is mostly its facts. An audit trail or a collection record is mostly its history, and the shape has to follow the record.
 
 #### `editable-properties-in-the-rail`: Editable properties in the rail
 
@@ -872,7 +872,7 @@ page
 
 **Rationale:** The same labeled blocks with the title above its fields rather than beside them. The label gets the full width, so the explanatory line reads at a normal measure.
 
-**Cost:** The page grows longer, and the reader loses the vertical alignment that helped scanning between fields.
+**Cost:** The page grows longer, and the reader loses the vertical alignment that helped readers scan between fields.
 
 #### `two-columns-on-a-wide-screen`: Two columns on a wide screen
 
@@ -977,9 +977,9 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The chevron pair with the period as the heading stays the pick. A reader cannot mistake a chevron for a tab. The dropdown still allows a jump across months. The Shopify-style cards with sparklines are the runner-up. Prefer them mid-month when the question is trend rather than settlement.
+**Rationale:** The chevron pair with the period as the heading stays the pick. A reader cannot mistake a chevron for a tab. The list still allows a jump across months. The Shopify-style cards with sparklines are the runner-up. Prefer them mid-month when the question is trend rather than settlement.
 
-Never ship the two unlabeled month buttons. Nothing said which was previous and which was next.
+Never ship the two unlabeled month buttons. Nothing says which is previous and which is next.
 
 #### `chevron-pair-with-the-period-as-the-heading`: Chevron pair with the period as the heading
 
@@ -1004,9 +1004,9 @@ page
       item: text "Amsterdam warehouse" · text "EUR 49,686.20"
 ```
 
-**Rationale:** The period is the page heading, with an unambiguous chevron on each side to walk consecutive months and a dropdown to jump. A reader cannot mistake a chevron for a tab.
+**Rationale:** The period is the page heading, with an unambiguous chevron on each side to step through consecutive months and a list to jump across them. A reader cannot mistake a chevron for a tab.
 
-**Cost:** Walking months one at a time is slow when comparing a quarter, which is why the dropdown stays.
+**Cost:** Walking months one at a time is slow when comparing a quarter, which is why the list stays.
 
 #### `period-tabs-across-the-top`: Period tabs across the top
 
@@ -1076,7 +1076,7 @@ page
 
 **Rationale:** Keep the two-button shape and make it legible. The pair reads Previous then next as one control around the period. That is the smallest change that removes the ambiguity.
 
-**Cost:** Still a month at a time, and the labels still compete with the heading for attention. Treats the symptom rather than the shape.
+**Cost:** Still a month at a time, and the labels still compete with the heading for attention. It treats the symptom rather than the shape.
 
 #### `report-with-the-breakdown-as-tabs`: Report with the breakdown as tabs
 
@@ -1096,7 +1096,7 @@ page
         item: text "Amsterdam warehouse" · text "EUR 54,000.00" · text "EUR 52,974.00"
 ```
 
-**Rationale:** The statement is the report. By warehouse, By channel and By tax rate sit as tabs beneath it. The top of the page keeps one shape whatever breakdown is chosen.
+**Rationale:** The statement is the report. By warehouse, By channel, and By tax rate sit as tabs beneath it. The top of the page keeps one shape whatever breakdown is chosen.
 
 **Cost:** The reader loses the statement when they want a breakdown, and the tabs have to deep-link.
 
@@ -1154,7 +1154,7 @@ page
 
 ### Settings home
 
-**Question:** Find one setting among many areas. A settings home can carry a whole tree: thirty routes under /settings, and the home has to carry all of it.
+**Question:** Find one setting among many areas. A settings home can carry a whole tree: thirty routes under `/settings`, and the home has to carry all of it.
 
 **Default:** `grouped-links-one-line-each`
 
@@ -1245,7 +1245,7 @@ page
       item: text "Payments" · text muted "The connected account the provider pays into." · action "Open"
 ```
 
-**Rationale:** A Daily, Monthly and Once section. The page states that a monthly task goes in a menu. A once-only setup belongs in settings. That is the rule the page applies to itself.
+**Rationale:** A Daily, Monthly, and Once section. The page states that a monthly task goes in a menu. A once-only setup belongs in settings. That is the rule the page applies to itself.
 
 **Cost:** The grouping is about frequency rather than about the thing. A reader hunting the dock plan must recall which bucket holds it.
 
@@ -1469,7 +1469,7 @@ page
           text muted "Acme Supply, Canal Street 12, Amsterdam"
 ```
 
-**Rationale:** Branding, content and delivery are tabs and the preview does not move. Each tab is a short form, so the two columns never both get long.
+**Rationale:** Branding, content, and delivery are tabs and the preview does not move. Each tab is a short form, so the two columns never both get long.
 
 **Cost:** The preview shows a whole that the reader has only partly set. A tabbed editor grows a third tab here, so this is the next step rather than a change of kind.
 
@@ -1497,7 +1497,7 @@ page
 
 **Rationale:** Webflow's shape. The preview takes the whole page and the settings float over it as a panel. A cover image is judged at real size. Closing the panel is the same as stepping back from the work.
 
-**Cost:** The panel covers the preview it edits, and dragging it aside is fiddly on a laptop trackpad. Prefer it when the visual dominates, such as a cover. Prefer side-by-side for fiddly fields.
+**Cost:** The panel covers the preview it edits, and dragging it aside is awkward on a laptop trackpad. Prefer it when the visual dominates, such as a cover. Prefer side-by-side for detailed fields.
 
 **Reference:** Webflow
 
@@ -1527,7 +1527,7 @@ page
     action primary "Save"
 ```
 
-**Rationale:** An editor with no Cancel silently discards work on leave. A pinned bar naming what is unsaved and offering Save, Discard and Preview solves that without a dialog on every keystroke.
+**Rationale:** An editor with no Cancel silently discards work on leave. A pinned bar naming what is unsaved and offering Save, Discard, and Preview solves that without a dialog on every keystroke.
 
 **Cost:** A bar across the bottom of the page is a full-width band, which the tone rules reserve for deployment identity. It has to be neutral to stay inside the contract.
 
@@ -1650,7 +1650,7 @@ page
 
 **Rationale:** A command sometimes settles one thing and leaves three. Then the outcome page lists them, so the flow does not end with silent work outstanding.
 
-**Cost:** This stops being an outcome page and becomes a work page. The floorplan boundary blurs, and the one-glance property that makes an outcome page good is lost.
+**Cost:** This stops being an outcome page and becomes a work page. The floor plan boundary blurs, and the one-glance property that makes an outcome page good is lost.
 
 #### `confirmation-band-with-the-reference-inside`: Confirmation band with the reference inside
 
@@ -1692,7 +1692,7 @@ page
   toast positive "EUR 45.00 is on its way back to Maria Garcia"
 ```
 
-**Rationale:** No new page at all. The command succeeds, the record updates in place and a toast names what happened. The reader never loses their position.
+**Rationale:** No new page at all. The command succeeds, the record updates in place, and a toast names what happened. The reader never loses their position.
 
 **Cost:** Carbon and Material both warn against transient-only routes. An outcome a reader may need to return to must be a place, not a moment.
 
@@ -1756,7 +1756,7 @@ page
       item: text "Dock 3 scanner is offline" · text muted "Last sync 10:10, scans queue on the device." · status "Offline" critical · action "Open"
 ```
 
-**Rationale:** Each dock carries its count, its share of the day and its last-hour rate, the way Datadog draws per-host cards. A slow dock is visible as a number, not as a feeling.
+**Rationale:** Each dock carries its count, its share of the day, and its last-hour rate, the way Datadog draws per-host cards. A slow dock is visible as a number, not as a feeling.
 
 **Cost:** Four cards with three figures each is twelve numbers before the exceptions. The warehouse lead gets diagnosis, not a glance.
 
@@ -1778,7 +1778,7 @@ page
       item: text "Maria Garcia collected at the pickup counter" · text muted "10:41, Chris Novak." · status "Collected" positive
 ```
 
-**Rationale:** The day reads newest first: dispatches, double reads and connection drops in one place, the way PagerDuty draws an incident timeline. Nothing is grouped away from the reader.
+**Rationale:** The day reads newest first: dispatches, double reads, and connection drops in one place, the way PagerDuty draws an incident timeline. Nothing is grouped away from the reader.
 
 **Cost:** Six hundred dispatches do not fit a timeline, so the page shows the last five and a count of the rest. The count is the page and the timeline is decoration.
 
@@ -1876,7 +1876,7 @@ page
 
 **Rationale:** The month at a glance, with each delivery sitting on its date. Google Calendar's shape, and the only one where a clash between two deliveries is visible without opening either.
 
-**Cost:** Seven columns squeeze hard on a phone, and a date with three deliveries shows three clipped pills. The agenda is the honest phone shape.
+**Cost:** Seven columns are hard to read on a phone, and a date with three deliveries shows three clipped pills. The agenda is the honest phone shape.
 
 **Reference:** Google Calendar
 
@@ -1953,7 +1953,7 @@ page
 
 **Rationale:** The schedule as a plain list page: search, one state filter, one table. Nothing to learn, and the toolbar matches the one an Acme Supply order list uses.
 
-**Cost:** A list answers what, not when: dates read as text and the shape of the month is invisible. Fine for ten deliveries, wrong for ninety-three.
+**Cost:** A list answers what, not when: dates read as text and the shape of the month is invisible. It is fine for ten deliveries and wrong for ninety-three.
 
 #### `mini-month-beside-the-day`: Mini month beside the day
 
@@ -1979,7 +1979,7 @@ page
 
 **Rationale:** Outlook's shape: a small month for orientation, the chosen day in full beside it. The reader never loses the month while reading the delivery.
 
-**Cost:** Two structures need two selections that must agree, and on a phone the mini month stacks above the day it orients. Twice the page for one delivery.
+**Cost:** Two structures need two selections that must agree, and on a phone the mini month stacks above the day it orients. It is twice the page for one delivery.
 
 **Reference:** Outlook
 
@@ -2405,7 +2405,7 @@ page
 
 **Rationale:** The record opens under its own row inside the table. Nothing is overlaid and nothing moves, so the comparison the reader came for is right there.
 
-**Cost:** A wide record cannot fit under a row without breaking the column grid. Readers open several bands and never close them, which NN/g reports.
+**Cost:** A wide record cannot fit under a row without breaking the column grid. Readers open several bands and never close them, as NN/g reports.
 
 **Reference:** NN/g
 

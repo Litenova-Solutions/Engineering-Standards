@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page records the external obligations that the [audit extension](../ext/audit.md) satisfies. It is informative. The extension page owns every provision.
+This page states the external obligations that the [audit extension](../ext/audit.md) satisfies. It is informative. The extension page owns every provision.
 
 `litespec/ext/audit#record-the-audit-adoption-decision` requires an adoption decision. `litespec/ext/audit#cover-the-required-audit-categories` requires a stated selection of audited categories. Both ask a project to say why it audits what it audits. This page is the source those answers draw on, so a project records a decision rather than a survey.
 
@@ -51,7 +51,7 @@ The General Data Protection Regulation pulls in two directions at once. Reading 
 
 | Article | Effect on the trail |
 |:---|:---|
-| Article 5(2) | Accountability requires demonstrating lawful processing, which the trail evidences. |
+| Article 5(2) | Accountability requires demonstrating lawful processing, which the trail shows. |
 | Article 30 | Records of processing activities need evidence of who accessed personal data. |
 | Article 32 | Security of processing covers the integrity and availability of the trail. |
 | Article 17 | Erasure applies to the personal data a record holds. |
@@ -65,7 +65,7 @@ Two consequences follow for a project. Record the lawful basis and the retention
 
 ### Schema alignment
 
-The record shape follows a model that three sources describe in the same terms. An initiator performs an action on a target, producing an outcome, observed at a time and from a place.
+The record shape follows a model that three sources describe in the same terms. An initiator performs an action on a target and produces an outcome at a time and from a place.
 
 | Source | Contribution |
 |:---|:---|

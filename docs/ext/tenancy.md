@@ -54,7 +54,7 @@ None. Tenant scope applies to records every project already requires.
 
 **Requirement:** A protected multi-tenant operation MUST confirm actor and target tenancy, with the needed Permission held at the resolved scope and the target belonging to it.
 
-**Rationale:** Both the caller and requested resource need the same authorized tenant scope. The chain runs Actor holds Role at scope, Role allows Permission, use case needs Permission.
+**Rationale:** Both the caller and requested resource need the same authorized tenant scope. The chain runs Actor holds Role at scope, Role allows Permission, and use case needs Permission.
 
 ### Isolate administrative cross-tenant access
 
@@ -64,7 +64,7 @@ None. Tenant scope applies to records every project already requires.
 
 ### Use selected tenant storage support
 
-**Requirement:** A multi-tenant persistence implementation MUST resolve its tenant when the session is created, through the selected provider's own tenancy support.
+**Requirement:** A multi-tenant persistence implementation MUST resolve its tenant at session creation through the selected provider's own tenancy support.
 
 **Rationale:** Provider-supported tenancy gives queries and storage a consistent isolation mechanism. Session creation is the point that matters. A session opened without a tenant has an unscoped next query. Adding the filter per query instead leaves every new query one omission away from reading across tenants. The baseline provider resolves it from the registered tenancy at session creation, so no query carries the concern. An Entity Framework Core implementation resolves the tenant when the context is created and applies it through a query filter convention.
 
@@ -147,6 +147,6 @@ Marten tenancy support is part of the baseline persistence package. Another isol
 | litespec/ext/tenancy#protect-tenant-diagnostics | guidance | Do diagnostics exclude foreign tenant identifiers and data? |
 | litespec/ext/tenancy#scope-tenant-operations | guidance | Does each procedure declare one-tenant or all-tenant scope? |
 | litespec/ext/tenancy#record-an-all-tenant-operation | guidance | Does each all-tenant run write its record with count and bounded list? |
-| litespec/ext/tenancy#use-typed-tenant-identities | guidance | Do tenant references use TenantId or a recorded Exception? |
+| litespec/ext/tenancy#use-typed-tenant-identities | guidance | Do tenant references use `TenantId` or a recorded Exception? |
 | litespec/ext/tenancy#use-one-tenant-accessor | guidance | Does the host boundary hold one current-tenant accessor or a recorded Exception? |
 | litespec/ext/tenancy#pass-tenant-scope-explicitly | guidance | Does domain code read no ambient tenant state, or does an Exception record it? |

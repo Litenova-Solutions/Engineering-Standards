@@ -50,7 +50,7 @@ page
     action primary "Add it"
 ```
 
-**Rationale:** A dialog with three inputs, one verb on the commit button, Cancel beside it. This is where most creates belong and where they usually end up.
+**Rationale:** The dialog holds three inputs, one verb on the commit button, and Cancel beside it. This is where most creates belong and where they usually end up.
 
 **Cost:** A create that grows past four inputs has to leave the dialog. The typed values come with it or are lost.
 
@@ -74,7 +74,7 @@ page
     action primary "Create delivery"
 ```
 
-**Rationale:** The form pages with sections, steps or more than four inputs. A page gives the fields room and gives the result a link.
+**Rationale:** The form pages with sections, steps, or more than four inputs. A page gives the fields room and gives the result a link.
 
 **Cost:** Leaving the list to create one record, and coming back to the list afterwards, is two navigations for every single creation. It only pays when the form is long.
 
@@ -121,7 +121,7 @@ page
     action "Copy the plan to another"
 ```
 
-**Rationale:** Duplicate a delivery that worked, then change what is different. The copy carries products and a plan and starts as a draft with nothing committed.
+**Rationale:** Duplicate a delivery that worked, and then change what is different. The copy carries products and a plan, and it starts as a draft with nothing committed.
 
 **Cost:** A duplicate of a shipped delivery is nearly meaningless: the orders and the money all belong to the original. It only works for a template-like record with no history.
 
@@ -213,7 +213,7 @@ page
     action "Duplicate Garcia Interiors restock"
 ```
 
-**Rationale:** The way Shopify Polaris draws a split button: the main face creates a blank delivery, the chevron names the other ways to start. Three starting points already exist on this list, and this is the control that holds them without a toggle inside the form.
+**Rationale:** The way Shopify Polaris draws a split button: the main face creates a blank delivery. The chevron names the other ways to start. Three starting points already exist on this list, and this is the control that holds them without a toggle inside the form.
 
 **Cost:** The chevron hides the template and the duplicate from anyone who never opens it. A first-time user still lands on the blank form and never learns the faster start exists.
 
@@ -240,7 +240,7 @@ page
 
 **Rationale:** The way Linear opens creation: one shortcut, one input, and the record type is chosen by typing. A manager who lives in the back office creates without traveling to the list first.
 
-**Cost:** Invisible until learned, and it only starts the create: the form still opens afterwards. It needs the shortcut taught on the page, or nobody finds it.
+**Cost:** It stays invisible until learned, and it only starts the create. The form still opens afterwards. It needs the shortcut taught on the page, or nobody finds it.
 
 **Reference:** Linear
 
@@ -294,9 +294,9 @@ page
     action primary "Save the labeling"
 ```
 
-**Rationale:** Each section's button repeats its own verb: Save the name, Save the labeling. Nothing is ambiguous about what a click will commit.
+**Rationale:** Each section's button repeats its own verb: Save the name, Save the labeling. Nothing is ambiguous about what each button commits.
 
-**Cost:** Still two commits on one screen. It works only because each button names what it commits, which is two things a reader can forget to do.
+**Cost:** It still makes two commits on one screen. It works only because each button names what it commits, which is two things a reader can forget to do.
 
 #### `editing-in-place-in-the-list-row`: Editing in place in the list row
 
@@ -339,7 +339,7 @@ page
     action primary "Raise it and put 188 on sale"
 ```
 
-**Rationale:** Where a change breaks something, the page says what before the reader commits: who is affected, what stops working, what cannot be changed back.
+**Rationale:** Where a change breaks something, the page says what before the reader commits: who is affected, what stops working, and what cannot be changed back.
 
 **Cost:** It needs a read that answers the hypothetical, which is not a command and not the record as it stands.
 
@@ -383,7 +383,7 @@ page
     action primary "Save the new price"
 ```
 
-**Rationale:** A change that the record's own state forbids. The field is read-only, the reason is stated on the field, and the command that would unblock it is named.
+**Rationale:** This is a change that the record's own state forbids. The field is read-only, the reason is stated on the field, and the command that would unblock it is named.
 
 **Cost:** The reader has to leave to unblock and come back, and whatever they typed is only kept if the page holds it. Read-only plus a link is the compromise.
 
@@ -537,7 +537,7 @@ page
       item: text "Oak desk lamp, 2 units" · text muted "Returned at 11:04" · status "Returned" neutral
 ```
 
-**Rationale:** A refund does not remove an order, it reverses it and leaves the record. The customer is shown the order before and after, so the reversal is visible as a fact rather than an absence.
+**Rationale:** A refund does not remove an order. It reverses the order and leaves the record. The customer is shown the order before and after, so the reversal is visible as a fact rather than an absence.
 
 **Cost:** The record grows rather than shrinks. A list of orders has to show an order that was fully reversed without it looking empty.
 
@@ -561,7 +561,7 @@ page
     action destructive "Void and replace"
 ```
 
-**Rationale:** A code that was issued and is being withdrawn. The code stops working, the code stays on the order, and the record says why.
+**Rationale:** This is a code that was issued and is now withdrawn. The code stops working, the code stays on the order, and the record says why.
 
 **Cost:** Void and refund are different verbs for different effects and a reader has to know which is which. Voiding a code that was already used is refused outright, because the order log holds that.
 
@@ -586,7 +586,7 @@ page
     text "This shop is not taking orders at the moment. Orders already placed still ship."
 ```
 
-**Rationale:** Pause rather than remove. The record keeps every property and stops accepting what it accepts. The page says what is still possible while it is paused.
+**Rationale:** Pause the record rather than removing it. The record keeps every property and stops accepting what it accepts. The page says what is still possible while it is paused.
 
 **Cost:** A pause is invisible to a customer unless something tells them. The same page has to answer what happens to somebody who tries to order while this is paused.
 
@@ -631,7 +631,7 @@ page
 
 **Rationale:** The way Gmail removes mail: the command applies at once and the toast carries the way back for eight seconds. Removing a plan entry is too small for a dialog and exactly the size of an Undo.
 
-**Cost:** It only fits what is cheap to reverse. Money, orders and anything the audit trail holds still need the dialog that says what happens. An Undo that expires is not a record.
+**Cost:** It only fits what is cheap to reverse. Money, orders, and anything the audit trail holds still need the dialog that says what happens. An Undo that expires is not a record.
 
 **Reference:** Gmail
 
@@ -810,7 +810,7 @@ page
       item: text "Archive 200 completed deliveries" · text muted "Finished 8 Oct 2026, 11:04" · status "200 archived" positive · action "Read the report"
 ```
 
-**Rationale:** The way Shopify runs bulk operations: past a size no dialog can carry, the selection runs as a job and a report lands afterwards. Refunding 1,204 orders cannot be checked on screen, so it is checked in the report instead.
+**Rationale:** The way Shopify runs bulk operations: past a size no dialog can carry, the selection runs as a job, and a report lands afterwards. Refunding 1,204 orders cannot be checked on screen, so it is checked in the report instead.
 
 **Cost:** The reader walks away and comes back, so the job needs progress, a cancel, and a report that names every row it refused. A job that fails halfway also needs a rule for what already ran.
 
@@ -834,9 +834,9 @@ page
     action destructive "Apply to the 1 that works"
 ```
 
-**Rationale:** The way Terraform plans before it applies. A page says what each row will do, so the refusals are read before anything runs rather than after. Three rows fit, and three hundred still fit, because it is a page.
+**Rationale:** This option works the way Terraform plans before it applies. A page says what each row will do, so the refusals are read before anything runs rather than after. Three rows fit, and three hundred still fit, because it is a page.
 
-**Cost:** The plan can go stale between reading and applying: a payment can settle, a window can close. The apply step must recheck every row and say which answer changed.
+**Cost:** The plan can go stale between reading and applying: a payment can settle, and a window can close. The apply step must recheck every row and say which answer changed.
 
 **Reference:** Terraform
 
@@ -869,7 +869,7 @@ page
     action "Set the date and warehouse"
 ```
 
-**Rationale:** The name is the only required field, and the record exists as a draft. Every later addition is its own command, each audited, each reconstructable.
+**Rationale:** The name is the only required field, and the record exists as a draft. Every later addition is its own audited and reconstructable command.
 
 **Cost:** A draft delivery is nearly useless on its own. If nothing prompts the reader to finish it, it sits unfinished on a list. The setup section is the counterweight.
 
@@ -895,9 +895,9 @@ page
     action primary "Create the delivery"
 ```
 
-**Rationale:** The record is not created until it is whole: name, date, warehouse, one product, one channel. Nothing half-made is ever in a list.
+**Rationale:** The record is not created until it is whole: name, date, warehouse, one product, and one channel. Nothing half-made is ever in a list.
 
-**Cost:** A five-part form before anything exists, and a reader who only wants to pencil in a date has to do all of it.
+**Cost:** It asks for a five-part form before anything exists, and a reader who only wants to pencil in a date has to do all of it.
 
 #### `create-from-a-series-where-the-series-holds-the-parts`: Create from a series, where the series holds the parts
 
@@ -919,7 +919,7 @@ page
     action primary "Create the delivery"
 ```
 
-**Rationale:** The plan carries the warehouse, the delivery plan and the products, and each delivery is created already holding them. One create, many records, no repetition.
+**Rationale:** The plan carries the warehouse, the delivery plan, and the products, and each delivery is created already holding them. One create makes many records with no repetition.
 
 **Cost:** A delivery created from a plan can be edited away from it, and then the two disagree. The plan has to state which fields are shared and what diverging means.
 
@@ -967,7 +967,7 @@ page
     action primary "Continue"
 ```
 
-**Rationale:** One flow from nothing to on sale: the delivery, its products, its channel and the publish step. The reader never lands on a draft they have to finish by hand.
+**Rationale:** One flow from nothing to on sale: the delivery, its products, its channel, and the publish step. The reader never lands on a draft they have to finish by hand.
 
 **Cost:** Carbon says simplify before a wizard, and a stepper is only for a linear flow of three or more steps. Going on sale is linear, so this is the case a stepper exists for.
 
@@ -992,7 +992,7 @@ page
     action primary "Publish it"
 ```
 
-**Rationale:** The form holds everything in the browser and nothing is written until the last click. One command, one audit entry, one record per creation.
+**Rationale:** The form holds everything in the browser and writes nothing until the last step. It makes one command, one audit entry, and one record per creation.
 
 **Cost:** Losing the browser loses the work, and a five-step form held in memory is a lot to lose. The record's state during the form does not exist, so nothing else can read it.
 
@@ -1013,7 +1013,7 @@ page
     action quiet "Dismiss"
 ```
 
-**Rationale:** The way Stripe onboards: the home page carries the setup as a guide with a progress bar, not as one more list. A reader who finished three of five sees two left every time they sign in.
+**Rationale:** The way Stripe onboards: the home page carries the setup as a guide with a progress bar, not as one more list. A reader who has finished three of five sees two left every time they sign in.
 
 **Cost:** It sits at the top of the home page until it is done, and a guide nobody dismisses becomes a banner nobody reads. It needs a dismiss that stays dismissed per company, not per person.
 
@@ -1038,7 +1038,7 @@ page
     text "Nothing is listed, so the storefront shows the delivery as coming soon."
 ```
 
-**Rationale:** The way Webflow gates publish. No checklist page: the missing piece is named where it is missing. The publish button says what it needs, and the section that needs it says so too.
+**Rationale:** This option works the way Webflow gates publish. No checklist page: the missing piece is named where it is missing. The publish button says what it needs, and the section that needs it says so too.
 
 **Cost:** Five missing pieces mean five separate discoveries, and nothing tells the reader how much is left. It fits one gap, not a new company with five.
 
@@ -1135,7 +1135,7 @@ page
     action primary "Schedule the change"
 ```
 
-**Rationale:** A scheduled change: what it will be, when it takes effect, and how to stop it before then. The record shows both the current value and the one coming.
+**Rationale:** A scheduled change names what it will be, when it takes effect, and how to stop it before then. The record shows both the current value and the one coming.
 
 **Cost:** Two values on one record is a rule every read honors. What this is worth carries a date that a reader has to notice.
 
@@ -1198,7 +1198,7 @@ page
       item: text "Garcia Interiors March order" · text muted "Version 11, 12 Jan 2026, 09:04 by Alex Morgan" · action "Restore"
 ```
 
-**Rationale:** The way Notion keeps versions. Every save is a version with a who and a when. Restoring writes a new version rather than rewriting the old. A name changed in October reads in June as what it was then.
+**Rationale:** This option works the way Notion keeps versions. Every save is a version with a who and a when. Restoring writes a new version rather than rewriting the old. A name changed in October reads in June as what it was then.
 
 **Cost:** Versions multiply: a description edited fifty times has fifty rows, and only the last few matter. The list needs grouping by day, or it hides the one version anyone wants.
 
@@ -1232,7 +1232,7 @@ page
 
 ### Duplicating a record
 
-**Question:** A duplicate is a create that starts from something. The copy carries the setup and never the history: prices and a delivery plan travel, orders and money stay with the original.
+**Question:** A duplicate is a create that starts from something. The copy carries the setup and never the history: prices and a delivery plan travel, and orders and money stay with the original.
 
 **Default:** `a-dialog-that-says-what-the-copy-carries`
 
@@ -1287,9 +1287,9 @@ page
   toast info "WELCOME10 copy was created as a draft."
 ```
 
-**Rationale:** The way Mailchimp duplicates a campaign: one menu item, no questions, and the copy lands as a draft, confirmed by a toast. A discount code carries no customers, so there is nothing to check first.
+**Rationale:** The way Mailchimp duplicates a campaign: one menu item with no questions, and the copy lands as a draft, confirmed by a toast. A discount code carries no customers, so there is nothing to check first.
 
-**Cost:** No moment to rename or to choose what travels. It fits records with no customers and no money. A delivery duplicated this way would surprise everyone in June.
+**Cost:** No moment to rename or choose what travels. It fits records with no customers and no money. A delivery duplicated this way would surprise everyone in June.
 
 **Reference:** Mailchimp
 
@@ -1355,7 +1355,7 @@ page
     action primary "Create a manual order"
 ```
 
-**Rationale:** The way Stripe treats a paid invoice as a fact: it can be credited, never copied. An order is one customer payment for one set of products, so duplicating it would invent a payment that never happened.
+**Rationale:** The way Stripe treats a paid invoice as a fact: it can be credited but never copied. An order is one customer payment for one set of products, so duplicating it would invent a payment that never happened.
 
 **Cost:** The reader who wants a second order like this one must build it by hand. The manual order is the way out. This page must name it, or the refusal leaves the reader with nowhere to go.
 
@@ -1386,7 +1386,7 @@ page
 
 ### Putting a list in order by hand
 
-**Question:** Products, plan entries and storefront sections all have an order the reader sets. The customer reads the order the reader left, so the control must work for a mouse, a keyboard and a finger.
+**Question:** Products, plan entries, and storefront sections all have an order the reader sets. The customer reads the order the reader left, so the control must work for a mouse, a keyboard, and a finger.
 
 **Default:** `drag-handles-in-the-list`
 
@@ -1412,7 +1412,7 @@ page
     text "The first product is the one customers see first."
 ```
 
-**Rationale:** The way Notion reorders blocks: a grip on every row, the dragged row lifted, and a line where it will land. The order saves on drop, so there is nothing to forget.
+**Rationale:** The way Notion reorders blocks: a grip sits on every row, the dragged row lifts, and a line shows where it will land. The order saves on drop, so there is nothing to forget.
 
 **Cost:** A grip cannot be used from a keyboard or announced by a screen reader, and on a phone it conflicts with scrolling. The menu move is not an alternative. It is the other half of this option.
 
@@ -1597,7 +1597,7 @@ page
   toast info "Okafor Office restock was archived. Undo."
 ```
 
-**Rationale:** The way Gmail keeps an Undo on every archive: the toast is the way back in the seconds after the click. Archiving the wrong delivery is fixed where it happened, without a visit to another view.
+**Rationale:** The way Gmail keeps an Undo on every archive: the toast is the way back in the seconds after the selection. Archiving the wrong delivery is fixed where it happened, without a visit to another view.
 
 **Cost:** Eight seconds and it is gone, so this is a correction for slips, not the way back. Anyone restoring a day later still needs the archived view.
 
@@ -1646,7 +1646,7 @@ page
 
 **Rationale:** The way Jira refuses to reopen a subtask whose parent is closed: the restore names the blocker and offers the way out. A price tier cannot return while its delivery stays archived.
 
-**Cost:** Two dialogs for one restore, and the offer to restore both at once is a second command hiding inside the first. It must say both are restored, not only the row that was clicked.
+**Cost:** It asks for two dialogs for one restore, and the offer to restore both at once is a second command hiding inside the first. It must say both are restored, not only the row that was selected.
 
 **Reference:** Jira
 
@@ -1707,15 +1707,15 @@ page
 
 ### Inviting a team member
 
-**Question:** Warehouse crew join per delivery and staff join per company. An invitation names the person, the role and the scope before sending, because wrongly granted access must be found and removed later.
+**Question:** Warehouse crew join per delivery, and staff join per company. An invitation names the person, the role, and the scope before sending, because wrongly granted access must be found and removed later.
 
 **Default:** `invite-by-email-with-the-role-chosen-first`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Invite by email with the role chosen first is the pick: person, role and scope are all named on one dialog. The pending list with resend and revoke is the runner-up and the required companion, because an invitation waits far longer than sending takes. Never ship an open invite link for staff roles.
+**Rationale:** Invite by email with the role chosen first is the pick: person, role, and scope are all named on one dialog. The pending list with resend and revoke is the runner-up and the required companion, because an invitation waits far longer than sending takes. Never ship an open invite link for staff roles.
 
-It earns its place only for warehouse crew on one delivery. A request to join is refused: the company invites, nobody applies.
+It earns its place only for warehouse crew on one delivery. A request to join is refused: the company invites. Nobody applies.
 
 #### `invite-by-email-with-the-role-chosen-first`: Invite by email, with the role chosen first
 
@@ -1739,9 +1739,9 @@ page
     action primary "Send the invitation"
 ```
 
-**Rationale:** The way Slack invites: one dialog, the email, then the role with what it can do beside it. The scope line says whether Noa joins the company or one delivery, before the invitation exists.
+**Rationale:** The way Slack invites: one dialog, the email, and the role with what it can do beside it. The scope line says whether Noa joins the company or one delivery, before the invitation exists.
 
-**Cost:** One invitation per person, typed by hand. Assigning forty pickers for a season needs the link option beside it.
+**Cost:** It sends one invitation per person, typed by hand. Assigning forty pickers for a season needs the link option beside it.
 
 **Reference:** Slack
 
@@ -1768,7 +1768,7 @@ page
 
 **Rationale:** The way Discord invites: a link with an expiry and a use count, for forty pickers nobody wants to type by hand. The link joins one delivery in one role, and nothing else.
 
-**Cost:** Anyone with the link joins, including anyone it was forwarded to. It fits warehouse crew on one delivery and is refused for owner, finance and manager roles.
+**Cost:** Anyone with the link joins, including anyone it was forwarded to. It fits warehouse crew on one delivery and is refused for owner, finance, and manager roles.
 
 **Reference:** Discord
 
@@ -1812,7 +1812,7 @@ page
       text "An invitation expires 7 days after it is sent. lena.bakker@example.com expired 8 Oct and needs reissue."
 ```
 
-**Rationale:** The way GitHub lists organization invitations: every waiting invitation shows its age, its expiry and its way out. An invitation is read far more often than it is sent, so the list is the pattern.
+**Rationale:** The way GitHub lists organization invitations: every waiting invitation shows its age, its expiry, and its way out. An invitation is read far more often than it is sent, so the list is the pattern.
 
 **Cost:** A list of the waiting is a list of the neglected: half of it expired quietly. Expired rows must say they expired and offer reissue, or the list fills with rows that can no longer be used.
 
@@ -1841,7 +1841,7 @@ page
 
 **Rationale:** The way Google Workspace reissues an expired invite: the old link stays dead and a new one goes out with fresh expiry. Reissuing is a new invitation with the old role, not the old link made live again.
 
-**Cost:** Two emails for one join, and the first still reads as live to anyone who kept it. The expired link must land on a page that says it expired, not on a bare refusal.
+**Cost:** It sends two emails for one join, and the first still reads as live to anyone who kept it. The expired link must land on a page that says it expired, not on a bare refusal.
 
 **Reference:** Google Workspace
 
@@ -1863,7 +1863,7 @@ page
 
 **Rationale:** The way Slack handles join requests: the asker waits in a queue and an owner approves with the role. It is drawn here to be refused, because the back office has no join request and adding one would invite strangers to ask.
 
-**Cost:** A queue nobody asked for, and every request is a stranger asking for access to money. The company invites its team. Nobody applies. This option stays in the library as the refused shape.
+**Cost:** It is a queue nobody asked for, and every request is a stranger asking for access to money. The company invites its team. Nobody applies. This option stays in the library as the refused shape.
 
 **Reference:** Slack
 
@@ -1931,7 +1931,7 @@ page
 
 **Rationale:** The way Shopify unpublishes a sales channel: the dialog says what stops and what stays, because placed orders outlive the listing. Unpublishing stops sales. It touches nothing sold.
 
-**Cost:** Two truths on one dialog, and the second is the one customers will ask about. The page behind it must keep answering for the sold units after the listing is gone.
+**Cost:** It states two truths on one dialog, and the second is the one customers will ask about. The page behind it must keep answering for the sold units after the listing is gone.
 
 **Reference:** Shopify
 
@@ -1956,7 +1956,7 @@ page
 
 **Rationale:** The way WordPress schedules a post: the date is set on the draft and the publish happens without anyone present. A sale starting at 10:00 on a Tuesday should not need Sam Rivera at the desk at 10:00.
 
-**Cost:** A scheduled publish can land on a draft that changed since: the price moved, the stock moved. The scheduler must recheck at the hour and hold the publish with the reason named.
+**Cost:** A scheduled publish can land on a draft that changed since: the price moved, and the stock moved. The scheduler must recheck at the hour and hold the publish with the reason named.
 
 **Reference:** WordPress
 
@@ -1977,7 +1977,7 @@ page
     text "A channel on sale is the second piece. The storefront is published but lists nothing for this product."
 ```
 
-**Rationale:** The way Squarespace blocks publish on an unfinished site: the button stays and the missing pieces are listed with links to each field. A disabled button alone would read as broken.
+**Rationale:** The way Squarespace blocks publish on an unfinished site: the button stays, and the missing pieces are listed with links to each field. A disabled button alone would read as broken.
 
 **Cost:** Every missing piece is a link away, and fixing one can reveal the next. The list must be complete on first read or the reader learns of them one publish attempt at a time.
 
@@ -2021,7 +2021,7 @@ page
     text "Each channel publishes on its own. Placed orders stay valid on every channel either way."
 ```
 
-**Rationale:** The way Shopify publishes per sales channel: each channel holds its own state, so phone orders can sell while the storefront waits. One publish button per channel, each with its own check.
+**Rationale:** The way Shopify publishes per sales channel: each channel holds its own state, so phone orders can sell while the storefront waits. It shows one publish button per channel, each with its own check.
 
 **Cost:** Three channels in three states is a matrix the reader must hold in mind. The product page must show every channel at once, or one sells what another promised not to.
 
@@ -2029,7 +2029,7 @@ page
 
 ### Scheduling a change for later
 
-**Question:** Prices, fees and sale windows change on dates, not at clicks. A scheduled change names the value, the date and the way to stop it. The record shows both values until the date arrives.
+**Question:** Prices, fees, and sale windows change on dates, not through selection. A scheduled change names the value, the date, and the way to stop it. The record shows both values until the date arrives.
 
 **Default:** `a-change-with-a-date-listed-with-the-record`
 
@@ -2127,7 +2127,7 @@ page
 
 **Rationale:** The way Google Calendar refuses a second booking in a locked room: the clash names both changes and offers the move. One record cannot become two fees on the same morning.
 
-**Cost:** The second change waits on the first being moved or canceled, which means leaving and coming back. It must offer the move inline or the refusal sends the reader hunting.
+**Cost:** The second change waits on the first being moved or canceled, which means leaving and coming back. It must offer the move inline, or the refusal sends the reader hunting.
 
 **Reference:** Google Calendar
 

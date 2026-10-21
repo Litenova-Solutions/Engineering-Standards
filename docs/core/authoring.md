@@ -8,19 +8,19 @@ This page states how LiteSpec pages and consumer specification pages are written
 
 ### Writing style
 
-LiteSpec pages and consumer specification pages follow the [Google developer documentation style guide](https://developers.google.com/style). It covers voice, tense, person, word choice, punctuation, lists, tables, links and code formatting. A question the guide answers is not restated here.
+LiteSpec pages and consumer specification pages follow the [Google developer documentation style guide](https://developers.google.com/style). It covers voice, tense, person, word choice, punctuation, lists, tables, links, and code formatting. A question the guide answers is not restated here.
 
 This page adds five rules to the guide:
 
 - Use ASCII outside code and data. Write a hyphen or a comma where the guide would use an em dash.
 - Use one term for one concept. The glossary owns LiteSpec's terms, and a consumer's language record owns its project terms.
-- Write `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT` and `MAY` in capitals only inside a Standard's Requirement. Elsewhere, write plain words.
+- Write `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`, and `MAY` in capitals only inside a Standard's Requirement. Elsewhere, write plain words.
 - Give a page title Title Case, and every other heading sentence case.
 - State the current contract. A page never describes how an earlier LiteSpec release differed.
 
 ### Page authority
 
-Standards define required boundaries, and Conventions define replaceable defaults. Everything else on a page is informative: the Intent, Concepts, Rationale, Examples, guides, tutorials and indexes.
+Standards define required boundaries, and Conventions define replaceable defaults. Everything else on a page is informative: the Intent, Concepts, Rationale, Examples, guides, tutorials, and indexes.
 
 `AGENTS.md` and a consumer's project agents file project the provisions an agent needs. A projection cites the provision it projects and adds no obligation. When the two disagree, the provision wins.
 
@@ -57,7 +57,7 @@ Every LiteSpec page uses one of these styles. Its location decides its style.
 | Index | A `README.md` | None | Intent, then navigation groups |
 | Glossary | `docs/reference/glossary.md` | None | One heading per term, in alphabetical order |
 
-A consumer page is a record or one of these styles. Each one opens with the frontmatter block the record schema defines.
+A consumer page is a record or one of these styles. Each one opens with the specification metadata block the record schema defines.
 
 | Page style | Template | Sections, in order |
 |:---|:---|:---|
@@ -81,7 +81,7 @@ These rules apply to every page style:
 - A page has one H1.
 - A required section with nothing to say contains only `None.`
 - An example sits inside the provision it illustrates, or in a Reference example that names every provision it demonstrates.
-- A tutorial, how-to, explanation, reference, command or index page owns no provisions.
+- A tutorial, how-to, explanation, reference, command, or index page owns no provisions.
 - A tutorial follows one path. An option or an alternative belongs on a how-to page.
 
 ### Provisions
@@ -109,7 +109,7 @@ A Standard states one testable obligation:
 ```
 
 - The Requirement is one sentence with exactly one capitalized modal, as [RFC 2119](https://www.rfc-editor.org/info/rfc2119/) and [RFC 8174](https://www.rfc-editor.org/info/rfc8174/) define them.
-- A different obligation, prohibition or permission is a separate provision.
+- A different obligation, prohibition, or permission is a separate provision.
 - Conditions and scope belong in the Requirement sentence.
 - Every other paragraph of the provision sits under a Rationale or an Example label and adds no obligation.
 
@@ -127,7 +127,7 @@ A Convention states a default a project may replace:
 
 A project that departs from a Standard records an Exception record that cites the provision. A project that replaces a Convention names its own convention in its documentation. The [model page](model.md) states the Exception record.
 
-A pattern carries its question, its default option, its compact behavior and its rationale, and then its options with their wireframes. [UI pattern decisions](../frontend/patterns.md) states the pattern contract and the wireframe language.
+A pattern carries its question, its default option, its compact behavior, and its rationale, and then its options with their wireframes. [UI pattern decisions](../frontend/patterns.md) states the pattern contract and the wireframe language.
 
 ### Provision identifiers
 
@@ -161,9 +161,9 @@ A generated region is a section a tool writes, between `<!-- generated:<name> --
 
 ### Release model
 
-Each LiteSpec release is a complete contract that states every active provision. LiteSpec publishes no compatibility guarantee, migration path, deprecation period or identifier alias between its own releases. A consumer pins one release, keeps it for as long as it chooses, and adopts a later release by accepting that release's whole contract.
+Each LiteSpec release is a complete contract that states every active provision. LiteSpec publishes no compatibility guarantee, migration path, deprecation period, or identifier alias between its own releases. A consumer pins one release, keeps it for as long as it chooses, and adopts a later release by accepting that release's whole contract.
 
-Version numbers name complete pinned contracts. A patch release corrects a narrow area, a minor release makes one coherent change, and a major release replaces scope, method or a stack.
+Version numbers name complete pinned contracts. A patch release corrects a narrow area, a minor release makes one coherent change, and a major release replaces scope, method, or a stack.
 
 This model governs LiteSpec itself. A consumer product has its own users, so its API compatibility, migration, deprecation and rollback provisions still apply.
 
@@ -173,13 +173,13 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 **Requirement:** Authored prose MUST follow the Google developer documentation style guide, except where this page states a different rule.
 
-**Rationale:** One established guide gives every writer, person or agent, the same answers on voice, word choice and formatting. It reads as ordinary technical writing, and nobody maintains a second guide.
+**Rationale:** One established guide gives every writer, person or agent, the same answers on voice, word choice, and formatting. It reads as ordinary technical writing, and nobody maintains a second guide.
 
 ### Keep authored prose ASCII-safe
 
-**Requirement:** Authored prose MUST contain only ASCII unless code, data or mathematical content requires another character.
+**Requirement:** Authored prose MUST contain only ASCII unless code, data, or mathematical content requires another character.
 
-**Rationale:** ASCII prose stays stable in terminals, diffs, generated context and plain-text tools.
+**Rationale:** ASCII prose stays stable in terminals, diffs, generated context, and plain-text tools.
 
 **Example:** Write a hyphen or a comma where a typographic dash would go.
 
@@ -222,7 +222,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Check the vocabulary on every surface a reader meets
 
-**Requirement:** A consumer MUST name every non-Markdown surface its vocabulary reaches in `paths.languageScan`, including source, interface copy, the API contract and acceptance tests.
+**Requirement:** A consumer MUST name every non-Markdown surface its vocabulary reaches in `paths.languageScan`, including source, interface copy, the API contract, and acceptance tests.
 
 **Rationale:** Documentation is often the smallest surface a reader meets. A rejection also has to reach names, so `ClientOrderId` breaches a rejection of `client` the way a sentence does.
 
@@ -261,7 +261,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 **Requirement:** An authored page MUST use the sections, in order, of its page style.
 
-**Rationale:** A fixed shape lets a reader and a tool find the authority, the context, the defaults and the evidence in the same place on every page.
+**Rationale:** A fixed shape lets a reader and a tool find the authority, the context, the defaults, and the evidence in the same place on every page.
 
 ### Route the reader before listing pages
 
@@ -277,7 +277,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 **Rationale:** A procedure that lists what a command already does becomes a second copy of that command, and the copy drifts.
 
-**Example:** A step reads ``Run `./shop up` `` rather than listing the compose start, the readiness wait and each process launch.
+**Example:** A step reads ``Run `./shop up` `` rather than listing the compose start, the readiness wait, and each process launch.
 
 ### State one layer per page
 
@@ -295,7 +295,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Record a setting as reference
 
-**Requirement:** A configuration setting a reader can change MUST appear on a configuration page with its default, its scope and what overrides it.
+**Requirement:** A configuration setting a reader can change MUST appear on a configuration page with its default, its scope, and what overrides it.
 
 **Rationale:** A setting introduced inside a procedure is found only by the reader who already knows which procedure mentioned it.
 
@@ -367,7 +367,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Declare structured specification metadata
 
-**Requirement:** A consumer page MUST open with a frontmatter block satisfying the record schema for its declared type.
+**Requirement:** A consumer page MUST open with a specification metadata block satisfying the record schema for its declared type.
 
 **Rationale:** The schema owns the field list of every record type and page style. The block is one JSON object between two lines that hold only `---`. The [model page](model.md) states the record types and their homes.
 
@@ -387,9 +387,9 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Use one metadata carrier
 
-**Requirement:** A consumer page MUST use its opening frontmatter block as its only metadata carrier.
+**Requirement:** A consumer page MUST use its opening specification metadata block as its only metadata carrier.
 
-**Rationale:** Source links, implementation paths and verification evidence belong in the body sections they describe.
+**Rationale:** Source links, implementation paths, and verification evidence belong in the body sections they describe.
 
 ### Classify every specification file
 
@@ -399,7 +399,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Derive a computed fact instead of restating it
 
-**Requirement:** A specification MUST name the source or the command that produces any count, census or membership list computed from code.
+**Requirement:** A specification MUST name the source or the command that produces any count, census, or membership list computed from code.
 
 **Rationale:** A restated number is right until the next unrelated commit, and nothing reports when it goes stale.
 
@@ -413,7 +413,7 @@ Every command declares an audit position. To count the declarations:
 
 ### Run repeatable authoring checks
 
-**Requirement:** A standards change MUST pass the repository validator, the test suite and `git diff --check`.
+**Requirement:** A standards change MUST pass the repository validator, the test suite, and `git diff --check`.
 
 **Rationale:** The change report lists every skipped check with its reason. The [command index](../tools/README.md) names each check and its command.
 
@@ -425,7 +425,7 @@ Every command declares an audit position. To count the declarations:
 
 ### Exclude historical transition material
 
-**Requirement:** Current standards material MUST NOT contain history-specific paths, IDs, terms, aliases, replacement maps, release migration material, compatibility rules or transition checks.
+**Requirement:** Current standards material MUST NOT contain history-specific paths, IDs, terms, aliases, replacement maps, release migration material, compatibility rules, or transition checks.
 
 **Rationale:** The published snapshot states its own contract without carrying earlier releases forward. An extension's `Baseline relationship` section names a provision it replaces inside this release, which is not history.
 
@@ -437,9 +437,9 @@ Every command declares an audit position. To count the declarations:
 
 ### Exclude cross-release compatibility work
 
-**Requirement:** The LiteSpec repository MUST NOT publish a compatibility guarantee, migration path, deprecation period or identifier alias between its own releases.
+**Requirement:** The LiteSpec repository MUST NOT publish a compatibility guarantee, migration path, deprecation period, or identifier alias between its own releases.
 
-**Rationale:** LiteSpec is a pinned contract rather than a running service. A consumer product keeps its own API compatibility, migration, deprecation and rollback provisions.
+**Rationale:** LiteSpec is a pinned contract rather than a running service. A consumer product keeps its own API compatibility, migration, deprecation, and rollback provisions.
 
 ### Keep a pinned release for as long as it serves
 
@@ -459,7 +459,7 @@ Every command declares an audit position. To count the declarations:
 
 **Default:** Start a Standard or Convention heading with a concrete action verb.
 
-**Replacement:** Use a noun heading only for a pattern, an informative definition or an index entry.
+**Replacement:** Use a noun heading only for a pattern, an informative definition, or an index entry.
 
 ## Verification
 
@@ -492,15 +492,15 @@ Every command declares an audit position. To count the declarations:
 | litespec/core/authoring#map-provisions-to-evidence | checkable | `litespec validate` emits no `VERIFY_MISSING_ID` or `VERIFY_UNKNOWN_ID` diagnostic. |
 | litespec/core/authoring#mark-every-provision-checkable-or-guidance | checkable | `litespec validate` emits no `VERIFY_MARK` diagnostic. |
 | litespec/core/authoring#regenerate-the-provision-index | checkable | `litespec provisions --check` exits zero. |
-| litespec/core/authoring#declare-structured-specification-metadata | checkable | `litespec consumer` validates each opening frontmatter block against the record schema. |
-| litespec/core/authoring#use-one-metadata-carrier | guidance | Is the opening frontmatter block the only metadata on each page? |
+| litespec/core/authoring#declare-structured-specification-metadata | checkable | `litespec consumer` validates each opening specification metadata block against the record schema. |
+| litespec/core/authoring#use-one-metadata-carrier | guidance | Is the opening specification metadata block the only metadata on each page? |
 | litespec/core/authoring#classify-every-specification-file | checkable | `litespec consumer` fails a Markdown file with no declared type outside a declared unstructured path. |
-| litespec/core/authoring#derive-a-computed-fact-instead-of-restating-it | guidance | Does each count, census and membership list name its source or its command? |
+| litespec/core/authoring#derive-a-computed-fact-instead-of-restating-it | guidance | Does each count, census, and membership list name its source or its command? |
 | litespec/core/authoring#run-repeatable-authoring-checks | checkable | `litespec validate`, `dotnet test --solution LiteSpec.slnx` and `git diff --check` exit zero. |
 | litespec/core/authoring#validate-current-standards-material | guidance | Does the validator read the working tree and no earlier release? |
 | litespec/core/authoring#exclude-historical-transition-material | guidance | Does any active file carry history-specific material between releases? |
 | litespec/core/authoring#publish-each-release-as-a-complete-contract | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
-| litespec/core/authoring#exclude-cross-release-compatibility-work | guidance | Would a consumer find any promise of migration, mapping or alias here? |
+| litespec/core/authoring#exclude-cross-release-compatibility-work | guidance | Would a consumer find any promise of migration, mapping, or alias here? |
 | litespec/core/authoring#keep-a-pinned-release-for-as-long-as-it-serves | guidance | Does any active provision oblige a consumer to adopt a later release? |
 | litespec/core/authoring#record-the-reviewed-litespec-release | checkable | `litespec consumer` fails when `reviewedLiteSpecVersion` differs from the pinned release. |
 | litespec/core/authoring#prefer-direct-action-headings | guidance | Does every changed Standard or Convention heading start with a concrete action verb? |

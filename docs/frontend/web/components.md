@@ -2,9 +2,11 @@
 
 ## Intent
 
-This page holds how the TypeScript web stacks realize the frontend component principles ([Frontend components](../components.md)). It states the registry source, the closed element list, and the visual file patterns. It also states the raw HTML sinks and the route suite checks the React and Svelte stacks share.
+This page states how the TypeScript web stacks realize the frontend component principles ([Frontend components](../components.md)). It states the registry source, the closed element list, and the visual file patterns. It also states the raw HTML sinks and the route suite checks the React and Svelte stacks share.
 
 ## React
+
+The React stack uses these bindings:
 
 - A class or style binding spells `className` or `style`.
 - A visual file ends with `*.visual.tsx`.
@@ -13,6 +15,8 @@ This page holds how the TypeScript web stacks realize the frontend component pri
 - Component authoring follows `react/components.md`.
 
 ## Svelte
+
+The Svelte stack uses these bindings:
 
 - A class or style binding spells `class`, `class:`, `style`, or `style:`.
 - A visual file ends with `*.visual.svelte`.
@@ -26,15 +30,15 @@ This page holds how the TypeScript web stacks realize the frontend component pri
 
 **Requirement:** A workspace MUST hold its registry primitives and its composites in one shared UI package, with no copy in an application.
 
-**Rationale:** A primitive copied into two applications diverges on the first upstream update, and the divergence is invisible because both copies compile. This realizes litespec/frontend/components#keep-shared-ui-in-one-package.
+**Rationale:** A primitive copied into two applications diverges on the first upstream update. The divergence is invisible because both copies compile. This realizes litespec/frontend/components#keep-shared-ui-in-one-package.
 
-**Example:** The primitives sit in one folder the registry CLI writes and no hand edits. The composites sit beside them and import them.
+**Example:** The primitives sit in one folder that the registry CLI writes. No one edits that folder by hand. The composites sit beside them and import them.
 
 ### Use no raw element in page code
 
 **Requirement:** A component under a route or module folder MUST NOT declare a layout or interactive element, and each refusal names the composite to use.
 
-**Rationale:** A raw element carries no focus management, no state, and no accessibility wiring. The reader of the lint message is choosing between two answers, so the message gives one. This realizes litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code.
+**Rationale:** A raw element carries no focus management, no state, and no accessibility wiring. The reader of the lint message chooses between two answers. The message gives one. This realizes litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code.
 
 **Example:** The refused elements and their replacements are one closed list.
 
@@ -54,7 +58,7 @@ Text elements stay available, because a sentence is not a component decision. `p
 
 **Requirement:** A visual file MAY write class names, and uses semantic theme tokens only.
 
-**Rationale:** A stock-location map, a packing-slip preview, and a public frame have no composite. Refusing them pushes the drawing into an arbitrary value that no token governs. The file name is the declaration that this is the exception. The React and Svelte sections name the file pattern. This realizes litespec/frontend/components#place-a-drawing-no-composite-makes-in-an-exception-file.
+**Rationale:** A stock-location map, a packing-slip preview, and a public frame have no composite. Refusing them pushes the drawing into an arbitrary value that no token governs. The file name declares this exception. The React and Svelte sections name the file pattern. This realizes litespec/frontend/components#place-a-drawing-no-composite-makes-in-an-exception-file.
 
 ### Meet accessibility requirements
 

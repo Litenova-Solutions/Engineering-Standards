@@ -78,7 +78,9 @@ templates/
   standard/                 Seeds for LiteSpec's own pages
 litespec.manifest.json      Version, stacks, shapes, extensions, and package pins
 apps/
+  analyzers/                LiteSpec.Analyzers, Roslyn rules for .NET applications: src and tests
   cli/                      The litespec command line: src/LiteSpec.Cli and tests/LiteSpec.Cli.Tests
+  site/                     litespec.dev, a static Astro site built from the standard
 LiteSpec.slnx               Every .NET project in the repository
 AGENTS.md                   The agent protocol; CLAUDE.md, GEMINI.md and the other adapters point to it
 ```

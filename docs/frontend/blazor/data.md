@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page holds how the blazor stack realizes the Frontend data rules ([Frontend data](../data.md)). Every use case runs through Application. State carries a declared classification, loads once at startup, and reports failure explicitly rather than through an absent value.
+This page holds how the Blazor stack realizes the frontend data rules ([Frontend data](../data.md)). Every use case runs through Application. State carries a declared classification, loads once at startup, and reports failure explicitly rather than through an absent value.
 
 ## Standards
 
@@ -40,7 +40,7 @@ This page holds how the blazor stack realizes the Frontend data rules ([Frontend
 
 **Requirement:** An Application handler MUST return a typed result union covering success and each named failure.
 
-**Rationale:** Signaling failure through null, an empty collection, or a bare boolean forces every caller to guess which failure occurred. This realizes litespec/frontend/data#map-every-failure-to-one-problem-type.
+**Rationale:** Signaling failure through `null`, an empty collection, or a bare boolean forces every caller to guess which failure occurred. This realizes litespec/frontend/data#map-every-failure-to-one-problem-type.
 
 ## Conventions
 

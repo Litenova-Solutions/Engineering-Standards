@@ -47,7 +47,7 @@ Operating truth lives in the records this section names. Each record below state
 
 One propagator is the part that matters. Two configured propagators produce two identifiers for one request, and the trace splits at whichever hop reads the other one.
 
-**Example:** The trace identifier in a Problem Details response is the trace-id field of the current `traceparent`, which is what `litespec/backend/api#return-stable-problem-details` returns.
+**Example:** The trace identifier in a Problem Details response is the `trace-id` field of the current `traceparent`, which is what `litespec/backend/api#return-stable-problem-details` returns.
 
 ### Separate liveness and readiness
 
@@ -183,7 +183,7 @@ A release applies a reviewed Marten schema plan and deploys the versioned API ar
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/quality/operations#start-the-stack-with-one-local-command | guidance | Does one command named in AGENTS.md start every local resource? |
+| litespec/quality/operations#start-the-stack-with-one-local-command | guidance | Does one command named in `AGENTS.md` start every local resource? |
 | litespec/quality/operations#emit-correlated-diagnostics | guidance | Do logs and traces carry correlation identifiers, and metrics service labels? |
 | litespec/quality/operations#pass-trace-context-in-the-w3c-format | guidance | Does one propagator read and write W3C trace context on every host? |
 | litespec/quality/operations#apply-schema-changes-outside-request-startup | guidance | Does the schema step run before traffic shifts, and never at replica startup? |
@@ -203,5 +203,5 @@ A release applies a reviewed Marten schema plan and deploys the versioned API ar
 | litespec/quality/operations#exercise-every-runbook-before-release | guidance | Does every required runbook carry a dated rehearsal in the operations log? |
 | litespec/quality/operations#keep-production-secrets-out-of-the-repository | guidance | Are production values on the host, with only placeholders in the repository? |
 | litespec/quality/operations#use-stable-service-names | guidance | Are service, resource, meter, and trace names identical across environments, or is an Exception recorded? |
-| litespec/quality/operations#keep-runbooks-near-project-documentation | guidance | Is every runbook under docs/runbooks with its sections, or is an Exception recorded? |
-| litespec/quality/operations#keep-deployment-descriptors-together | guidance | Are the deployment descriptors under one deploy tree, or is an Exception recorded? |
+| litespec/quality/operations#keep-runbooks-near-project-documentation | guidance | Is every runbook under `docs/runbooks/` with its sections, or is an Exception recorded? |
+| litespec/quality/operations#keep-deployment-descriptors-together | guidance | Are the deployment descriptors under one `deploy/` tree, or is an Exception recorded? |

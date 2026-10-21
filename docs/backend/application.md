@@ -2,9 +2,9 @@
 
 ## Intent
 
-Application coordinates use cases. It translates a command or query into domain and persistence work, applies structural input validation, and returns a transport-neutral result. It does not contain HTTP behavior or provider implementations.
+Application coordinates use cases. It translates a command or query into Domain and persistence work, applies structural input validation, and returns a transport-neutral result. It does not contain HTTP behavior or provider implementations.
 
-Every folder in the project is a module, an aggregate, or a use case. The contracts more than one module names live in the shared application contracts, and the pipeline's own machinery lives in one folder named for it.
+Every folder in the project is a module, an aggregate, or a use case. Contracts that more than one module names live in the shared application contracts. The pipeline machinery lives in one folder named for the pipeline.
 
 ## Standards
 
@@ -12,13 +12,13 @@ Every folder in the project is a module, an aggregate, or a use case. The contra
 
 **Requirement:** Each command or query MUST own one operation folder under its module holding its message, result, validator, handler, mapping, and definition of pipeline-read values.
 
-**Rationale:** Grouping by technical type scatters one operation across the project. Type names share the use-case prefix and follow the suffix table under `litespec/workspace/naming#use-architectural-suffixes`. Pipeline-read values are declared beside the message under `litespec/backend/application#declare-every-pipeline-position-beside-the-message`.
+**Rationale:** Grouping by technical type scatters one operation across the project. Type names share the use-case prefix and follow the suffix table under `litespec/workspace/naming#use-architectural-suffixes`. You declare pipeline-read values beside the message under `litespec/backend/application#declare-every-pipeline-position-beside-the-message`.
 
 ### Dispatch commands and queries through separate entry points
 
 **Requirement:** An application MUST dispatch a command and a query through two separate Application-facing entry points rather than one message bus abstraction.
 
-**Rationale:** Two entry points keep the write and read paths distinguishable at every call site, and let the pipeline compose different stages for each. A unified bus hides that difference behind one method, and the difference is the one this backend's whole command and query split depends on.
+**Rationale:** Two entry points keep the write and read paths distinguishable at every call site, and let the pipeline compose different stages for each. A unified bus hides that difference behind one method. This backend's whole command and query split depends on that difference.
 
 The rule states the property rather than the package. Each stack binding pins one library that supplies it. A consumer replacing that library records an Exception against the binding convention rather than touching this rule.
 
@@ -28,11 +28,30 @@ The rule states the property rather than the package. Each stack binding pins on
 
 **Rationale:** Domain owns state permission. A validator rejects an empty title, malformed identifier, or invalid page size. Every validator for a message reports validity findings under `litespec/backend/application#report-input-problems-as-validity-findings`, so the caller learns the whole form in one answer.
 
+**Example:** In the library circulation product, `use-case/lending.borrow-copy` takes `BorrowCopyCommand`, which carries a copy identifier and a reader identifier. For example, in the .NET stack the validator rejects an empty copy identifier or an empty reader identifier, and accepts every well-formed pair:
+
+```csharp
+public sealed record BorrowCopyCommand(Guid CopyId, Guid ReaderId);
+```
+
+Whether the named copy is available is an aggregate state decision, so the validator never checks it. Domain rejects an unavailable copy with `result/borrow-copy.copy-unavailable`, which carries the stable code `failure/lending.copy_not_available`.
+
 ### Report input problems as validity findings
 
 **Requirement:** A validator MUST report its findings as validity findings, with each failure carrying a member, a code, and a message, and no HTTP status.
 
 **Rationale:** Every validator for a message runs, and the pipeline merges their findings before it refuses the request. The member names the input member, the code names the stable reason, and the message explains the problem in caller-safe language.
+
+**Example:** For example, a borrow request with an empty copy identifier and an empty reader identifier reports two findings, one per member, with no HTTP status:
+
+```json
+[
+  { "member": "CopyId", "code": "required", "message": "A copy is required." },
+  { "member": "ReaderId", "code": "required", "message": "A reader is required." }
+]
+```
+
+The caller learns the whole form in one answer, and the pipeline refuses the request before Domain runs.
 
 ### Model expected use-case failures explicitly
 
@@ -40,7 +59,7 @@ The rule states the property rather than the package. Each stack binding pins on
 
 **Rationale:** One base `UseCaseException` has `ResourceNotFoundException`, `UseCaseForbiddenException`, and `UseCaseConflictException` subtypes. They carry no HTTP result, provider exception, or stack detail, and handlers do not catch them.
 
-The use case lists every Result it returns, and each refusal Result carries its failure code. A conflict fails identical input identically until the caller rereads the resource and retries with current state. A failure that a blind retry can pass is transient and belongs to the integrations extension.
+The use case lists every Result it returns, and each refusal Result carries its failure code. A conflict fails the same input the same way until the caller rereads the resource and retries with current state. A failure that a blind retry can pass is transient and belongs to the integrations extension.
 
 ### Enforce target authorization in the pipeline
 
@@ -48,9 +67,9 @@ The use case lists every Result it returns, and each refusal Result carries its 
 
 **Rationale:** The message declares its needs as permission codes with the resource subject, and the guard resolves the actor's roles at the subject's scope. The guard resolves ownership, tenant, role, state, or delegated access against the target data through a scope owner lookup for the record the message names.
 
-Making the decision once, from a declaration, stops two messages about the same record asking different questions. It also lets composition refuse to start when a message states no position at all. A refusal is reported as a denial rather than raised, so a refused attempt reaches the audit trail beside the ones that succeeded. The audit extension records the denial under `litespec/ext/audit#record-refused-authorization`.
+You decide once from a declaration, so two messages about the same record ask the same question. It also lets composition refuse to start when a message states no position at all. The guard reports a refusal as a denial rather than raising it, so a refused attempt reaches the audit trail beside the ones that succeeded. The audit extension records the denial under `litespec/ext/audit#record-refused-authorization`.
 
-A collection query has no single target record, so a scope owner lookup has nothing to resolve. Its authorized scope is a database predicate under `litespec/quality/security#restrict-a-protected-collection-in-the-database`, applied before paging. Filtering a loaded collection in memory satisfies neither rule, and is the shape [OWASP names as broken object level authorization](https://owasp.org/www-project-top-ten/2021/A01_2021-Broken_Access_Control/).
+A collection query has no single target record, so a scope owner lookup has nothing to resolve. Its authorized scope is a database predicate under `litespec/quality/security#restrict-a-protected-collection-in-the-database`, applied before paging. Filtering a loaded collection in memory satisfies neither rule. It matches the shape [OWASP names as broken object level authorization](https://owasp.org/www-project-top-ten/2021/A01_2021-Broken_Access_Control/).
 
 WebApi enforces coarse authenticated, role, or scope policies first under `litespec/backend/api#apply-only-coarse-policies-at-the-endpoint`, which cannot replace a decision that depends on business data.
 
@@ -59,6 +78,33 @@ WebApi enforces coarse authenticated, role, or scope policies first under `lites
 **Requirement:** A command handler MUST load aggregates, call domain behavior, stage changes, and return a result, leaving commit, transport mapping, audit, and authorization to their owners.
 
 **Rationale:** The commit post-handler owns the transaction under `litespec/backend/persistence#commit-each-command-pipeline-once`, WebApi owns error mapping, the audit completion handler owns the trail, and the guard owns authorization. A handler that does any of those duplicates a boundary that already exists.
+
+**Example:** In the library circulation product, `use-case/lending.borrow-copy` runs through the command pipeline: the endpoint maps the request to `BorrowCopyCommand`, the mediator dispatches it, validation and the authorization guard run, the handler loads the copy through its repository, borrows it through Domain behavior, stages the loan and the copy, and returns the result. The handler never commits, and exactly one post-handler commits after it. The diagram shows each stage from the HTTP request to that single commit.
+
+![An HTTP request reaches the endpoint, which maps it to a command and dispatches it through the command mediator. Validation checks structural input, then the authorization guard checks the permission and the target. The handler loads aggregates through repositories, calls domain behavior, and stages changes. The repository stages the aggregate, and exactly one commit post-handler commits the session once.](../assets/diagrams/backend-command-pipeline.svg)
+
+For example, in the .NET stack the handler reads as follows:
+
+```csharp
+public sealed class BorrowCopyCommandHandler(
+    ILoanRepository loans,
+    ICopyRepository copies,
+    IClock clock)
+{
+    public async Task<BorrowCopyCommandResult> HandleAsync(
+        BorrowCopyCommand command,
+        CancellationToken cancellationToken)
+    {
+        var copy = await copies.GetAsync(command.CopyId, cancellationToken);
+        var loan = Loan.Borrow(copy.Id, command.ReaderId, clock.UtcNow);
+        loans.Store(loan);
+        copies.Store(copy);
+        return new BorrowCopyCommandResult(loan.Id);
+    }
+}
+```
+
+The handler loads, calls, stages, and returns. Commit, error mapping, and authorization belong to their owners, so none appears in the method.
 
 ### Project queries directly
 
@@ -97,9 +143,9 @@ WebApi enforces coarse authenticated, role, or scope policies first under `lites
 
 **Requirement:** A port MUST be declared at the lowest folder holding every consumer that names it, following `litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers`.
 
-**Rationale:** A port whose consumers sit in one module is declared in that module beside the aggregate it serves. Only a port more than one module names is declared in the shared application contracts. Collecting every port in one folder because they share the word "port" is grouping by technical type. `litespec/backend/application#organize-application-by-operation` rejects that grouping one level down for the same reason.
+**Rationale:** You declare a port whose consumers sit in one module in that module beside the aggregate it serves. Only a port that more than one module names belongs in the shared application contracts. Collecting every port in one folder because they share the word "port" is grouping by technical type. `litespec/backend/application#organize-application-by-operation` rejects that grouping one level down for the same reason.
 
-A port declared beside its aggregate is reviewed with that aggregate's specification; a port in a project-wide folder is reviewed by nobody. Where a port serves aggregates in one module but is called from another, the declaring module is the one that owns the aggregates. That module is the one whose rules change when the port changes.
+You review a port declared beside its aggregate with that aggregate's specification. Nobody reviews a port in a project-wide folder. Where a port serves aggregates in one module but is called from another, the declaring module is the one that owns the aggregates. That module is the one whose rules change when the port changes.
 
 ### Declare every pipeline position beside the message
 
@@ -121,7 +167,7 @@ The use-case record declares the classification under `litespec/core/system#decl
 
 **Rationale:** Nested dispatch can run the commit post-handler before the top-level use case finishes. A top-level handler may still coordinate several aggregates when an approved record names the invariant requiring one transaction.
 
-A second command that has to run is staged for durable delivery instead. That path is not an exemption from this rule. The staged command enters its own pipeline and owns its own transaction, so no nesting occurs.
+You stage a second command that has to run for durable delivery instead. That path is not an exemption from this rule. The staged command enters its own pipeline and owns its own transaction, so no nesting occurs.
 
 ## Conventions
 
@@ -184,7 +230,7 @@ In the dotnet stack, the layout is:
 
 Module and aggregate order, including the single-aggregate flat form, follow `litespec/backend/architecture#organize-every-layer-by-module-and-use-case`.
 
-Only a use case gets a folder. A type that is not a use case sits flat in the folder that owns it, chosen by `litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers`. A reader can then take every folder name below a module as the name of one operation. A reaction is a use case that reacts to an event, so its folder takes the reaction's use-case name under `litespec/backend/application#keep-event-reaction-implementations-explicit`. A folder named for a service, a technical kind, or a caller breaks that reading and is drift rather than a second convention.
+Only a use case gets a folder. A type that is not a use case sits flat in the folder that owns it, chosen by `litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers`. You can then take every folder name below a module as the name of one operation. A reaction is a use case that reacts to an event, so its folder takes the reaction's use-case name under `litespec/backend/application#keep-event-reaction-implementations-explicit`. A folder named for a service, a technical kind, or a caller breaks that reading and is drift rather than a second convention.
 
 ### Keep messages immutable
 
@@ -217,7 +263,7 @@ Only a use case gets a folder. A type that is not a use case sits flat in the fo
 | litespec/backend/application#organize-application-by-operation | guidance | Does each operation folder hold its message, result, validator, handler, and definition? |
 | litespec/backend/application#dispatch-commands-and-queries-through-separate-entry-points | guidance | Does each dispatch site call its own command or query entry point? |
 | litespec/backend/application#separate-input-validation-from-invariants | guidance | Does each validator check only structural input and defer state decisions? |
-| litespec/backend/application#report-input-problems-as-validity-findings | guidance | Does each validator report validity findings with member, code, and message failures? |
+| litespec/backend/application#report-input-problems-as-validity-findings | guidance | Does each validator report validity findings with `member`, `code`, and `message` failures? |
 | litespec/backend/application#model-expected-use-case-failures-explicitly | guidance | Does each expected failure throw its typed exception with its Result code? |
 | litespec/backend/application#enforce-target-authorization-in-the-pipeline | guidance | Does the pipeline suite assert that every target has a guard and no handler authorizes itself? |
 | litespec/backend/application#keep-command-handlers-narrow | guidance | Does the pipeline stage suite assert that no handler commits, audits, or authorizes? |

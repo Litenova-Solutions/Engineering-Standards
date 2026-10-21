@@ -2,7 +2,7 @@
 
 ## Intent
 
-Marten is the baseline provider for persistence. The shared provisions live on the stack-neutral page ([Backend persistence](../persistence.md)); this page holds what the dotnet stack alone requires.
+Marten is the baseline provider for persistence. The shared provisions live on the stack-neutral page ([Backend persistence](../persistence.md)); this page holds what the .NET stack alone requires.
 
 The `efcore` extension replaces the provider-specific provisions it names for the aggregates it owns.
 
@@ -12,7 +12,7 @@ The `efcore` extension replaces the provider-specific provisions it names for th
 
 **Requirement:** A command handler MUST reach persistence only through a Domain repository, never through `IDocumentSession`.
 
-**Rationale:** Infrastructure implements each repository with the scoped session. A repository loads one aggregate type and exposes no session, generic query, or save operation. This provision realizes `litespec/backend/persistence#stage-aggregate-writes-through-domain-repositories`.
+**Rationale:** Infrastructure implements each Domain repository with the scoped session. A Domain repository loads one aggregate type and exposes no session, generic query, or save operation. This provision realizes `litespec/backend/persistence#stage-aggregate-writes-through-domain-repositories`.
 
 ### Query through IQuerySession
 
@@ -25,7 +25,7 @@ The `efcore` extension replaces the provider-specific provisions it names for th
 | Marten baseline | `IQuerySession` |
 | EF Core extension | The context type the extension declares |
 
-The table names the binding per provider; the obligation to project with filter, scope, ordering, and limit holds under each.
+The table names the binding per provider. The obligation to project with filter, scope, ordering, and limit holds under each.
 
 ### Commit once in the command pipeline
 
@@ -33,7 +33,7 @@ The table names the binding per provider; the obligation to project with filter,
 
 **Rationale:** A failed command then leaves the scoped session uncommitted. Handlers, repositories, validators, reactions, and endpoints never commit. This provision realizes `litespec/backend/persistence#commit-each-command-pipeline-once`.
 
-The obligation is one commit for one pipeline, not one named method. Under the baseline provider that commit is `IDocumentSession.SaveChangesAsync`. Under the `efcore` extension it is `DbContext.SaveChangesAsync`, wrapped in an explicit transaction when the pipeline writes through more than one context.
+The obligation is one commit for one pipeline, not one named method. Under the baseline provider that commit is `IDocumentSession.SaveChangesAsync`. Under the `efcore` extension it is `DbContext.SaveChangesAsync`. The pipeline wraps the call in an explicit transaction when it writes through more than one context.
 
 ## Conventions
 
@@ -114,4 +114,4 @@ internal sealed class PostRepository(
 | litespec/backend/dotnet/persistence#query-through-iquerysession | guidance | Does each query handler project through `IQuerySession`, with filter, scope, ordering, and limit applied first? |
 | litespec/backend/dotnet/persistence#commit-once-in-the-command-pipeline | guidance | Does exactly one command post-handler call `SaveChangesAsync` for each pipeline, with no other caller committing? |
 | litespec/backend/dotnet/persistence#use-this-infrastructure-layout | guidance | Do Marten configuration, repositories, and commit behavior sit under the one persistence folder? |
-| litespec/backend/dotnet/persistence#register-one-scoped-session | guidance | Do the repositories and the commit handler in one command resolve one `IDocumentSession`? |
+| litespec/backend/dotnet/persistence#register-one-scoped-session | guidance | Do the Domain repositories and the commit handler in one command resolve one `IDocumentSession`? |

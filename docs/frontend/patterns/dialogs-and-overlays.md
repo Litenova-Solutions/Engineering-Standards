@@ -2,7 +2,7 @@
 
 ## Intent
 
-An overlay sits above the page: a dialog, a drawer, a popover, a menu, a toast or a bar that stays in view. These patterns answer when each one fits and how it opens, holds focus and closes. Each pattern offers drawn options and names a default.
+An overlay sits above the page: a dialog, a drawer, a popover, a menu, a toast, or a bar that stays in view. These patterns answer when each one fits and how it opens, holds focus, and closes. Each pattern shows its options as wireframes and names a default.
 
 ## Standards
 
@@ -10,7 +10,7 @@ An overlay sits above the page: a dialog, a drawer, a popover, a menu, a toast o
 
 **Requirement:** A confirmation dialog MUST label its confirm action with the command it runs.
 
-**Rationale:** A reader who scans only the buttons still learns what happens. A button labeled OK or Yes asks the reader to reread the question before acting.
+**Rationale:** A reader who scans only the buttons still learns what happens. A button labeled `OK` or `Yes` asks the reader to reread the question before acting.
 
 ### Return focus when an overlay closes
 
@@ -22,13 +22,13 @@ An overlay sits above the page: a dialog, a drawer, a popover, a menu, a toast o
 
 ### Confirming a command that cannot be taken back
 
-**Question:** When does a command deserve a confirmation step. A launch cancellation cannot be taken back. A confirmation used on routine commands becomes a reflex click that protects nothing.
+**Question:** When does a command deserve a confirmation step? A launch cancellation cannot be taken back. A confirmation used on routine commands becomes a reflex click that protects nothing.
 
 **Default:** `name-the-object-state-the-consequence-offer-the-alternative`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the dialog that names the object, states the consequence in figures, and offers the alternative in the same surface. The runner-up is the dialog with the consequence as numbers. It is the better choice wherever money moves, because the figure is read at the click.
+**Rationale:** Keep the dialog that names the object, states the consequence in numbers, and offers the alternative in the same surface. The runner-up is the dialog with the consequence as numbers. It is the better choice wherever money moves, because the reader sees the number before confirming.
 
 Prefer the typed name only for the single most dangerous object in a deployment. Never ship the undo toast for an irreversible cancellation. An undo there is a second command rather than a reversal.
 
@@ -73,7 +73,7 @@ page
     action disabled "Cancel the launch"
 ```
 
-**Rationale:** Typing guards the single most dangerous object in a deployment. The expected string sits selectable on screen. The commit button stays disabled until the typed name matches it.
+**Rationale:** Typing guards the single most dangerous object in a deployment. The expected string stays visible on screen. The commit button stays disabled until the typed name matches it.
 
 **Cost:** A product that asks people to type names all day trains them to copy and paste without reading. That is the reflex the pattern exists to break. One object per deployment is the ceiling, not one per record type.
 
@@ -146,9 +146,9 @@ page
     action destructive "Refund in full"
 ```
 
-**Rationale:** Where a command changes money, the dialog shows the money. This is the strongest form of the pattern: the reader reads the figure before committing to it.
+**Rationale:** Where a command changes money, the dialog shows the money. This is the strongest form of the pattern: the reader sees the number before committing to it.
 
-**Cost:** The figure has to be read at the moment of the click, which means a read between the button and the command. On a slow connection the dialog waits.
+**Cost:** The dialog reads the number at the moment of the click, which means a read between the button and the command. On a slow connection the dialog waits.
 
 #### `a-dialog-that-says-it-cannot-act-yet`: A dialog that says it cannot act yet
 
@@ -299,7 +299,7 @@ page
     action primary "Send 2 invitations"
 ```
 
-**Rationale:** The large dialog size. Carbon keeps a modal for a short and infrequent task, never for repeated work. Four inputs with a list stays on the right side of that line when the command is rare.
+**Rationale:** The large dialog size. Carbon keeps a modal for a short and infrequent task, never for repeated work. Four inputs with a list stay on the right side of that line when the command is rare.
 
 **Cost:** A 560-pixel dialog holding a table is close to a page with worse navigation. The size has to be argued case by case rather than by a rule.
 
@@ -466,7 +466,7 @@ page
 
 **Rationale:** The recommended shape. The list is untouched and narrowed, the record holds facts, and the way out is back to the full record. Nothing in the drawer is editable, so it cannot become a task.
 
-**Cost:** A 420-pixel drawer against a 1440 screen leaves the list about 900 wide, which is five columns and not eight. Two nested navigations on one screen.
+**Cost:** A 420-pixel drawer against a 1440 screen leaves the list about 900 wide, which is five columns and not eight. That leaves two nested navigations on one screen.
 
 **Reference:** Atlassian
 
@@ -494,7 +494,7 @@ page
     action primary "Open the record"
 ```
 
-**Rationale:** The drawer slides over the table rather than beside it, so it can be wider and holds more without squeezing the table to five columns.
+**Rationale:** The drawer slides over the table rather than beside it, so it can be wider and hold more without squeezing the table to five columns.
 
 **Cost:** The row the reader is comparing against is hidden. Atlassian puts the panel beside the main area and only over it at 1024 and below, so this breaks the source rule at 1440.
 
@@ -521,9 +521,9 @@ page
     action primary "Save"
 ```
 
-**Rationale:** A record and a two-field edit together. This is the one case where a drawer beats a dialog: the reader can see the row and the record at the same time.
+**Rationale:** This is the one case where a drawer beats a dialog: a record and a two-field edit together, where the reader can see the row and the record at the same time.
 
-**Cost:** Two nested sets of controls and one narrow column. Carbon says a modal is not for repeatable work, and this is repeatable work.
+**Cost:** Two nested sets of controls share one narrow column. Carbon says a modal is not for repeatable work, and this is repeatable work.
 
 **Reference:** Carbon
 
@@ -550,7 +550,7 @@ page
     action primary "Show the results"
 ```
 
-**Rationale:** A drawer that holds the filters rather than a record. The list updates behind it as each control changes, so the reader never leaves the results.
+**Rationale:** A drawer holds the filters rather than a record. The list updates behind it as each control changes, so the reader never leaves the results.
 
 **Cost:** Carbon keeps several filter categories out of a menu. A drawer is not a menu, but it is the same discovery problem. It covers the toolbar the reader would use to search.
 
@@ -577,9 +577,9 @@ page
     link "Open the full record"
 ```
 
-**Rationale:** The row's second line opens in a drawer rather than navigating. Cheap for a reader comparing two orders, and it keeps the scroll position and the filters.
+**Rationale:** The row's second line opens in a drawer rather than navigating. That is cheap for a reader comparing two orders, and it keeps the scroll position and the filters.
 
-**Cost:** PatternFly's own guidance reserves primary-detail for comparing a short list of the same type, and requires a selected state and a close control. On 268 orders the comparison is rarer than the navigation.
+**Cost:** PatternFly's own guidance reserves `primary-detail` for comparing a short list of the same type, and requires a selected state and a close control. On 268 orders the comparison is rarer than the navigation.
 
 **Reference:** PatternFly
 
@@ -694,9 +694,9 @@ page
   toast "Confirmations resent to 3 customers." positive
 ```
 
-**Rationale:** No action on it, so it can leave on its own. Base UI's default timeout is 5,000 milliseconds, and nothing is lost by it going.
+**Rationale:** It carries no action, so it can leave on its own. Base UI's default timeout is 5,000 milliseconds, and nothing is lost by it going.
 
-**Cost:** NN/g's own example: a reader missed an error that faded after five seconds and waited five minutes. Fine for a success, wrong for anything else.
+**Cost:** NN/g's own example: a reader missed an error that faded after five seconds and waited five minutes. That is fine for a success and wrong for anything else.
 
 **Reference:** Base UI
 
@@ -737,7 +737,7 @@ page
     item: text "SO-1042" · text "Maria Garcia" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** The same slot filled with a refusal, to show why a failure must not be transient. An alert sits on the page and stays until the command succeeds.
+**Rationale:** The same slot holds a refusal, to show why a failure must not be transient. An alert sits on the page and stays until the command succeeds.
 
 **Cost:** The visual difference between a success toast and an error alert has to be learned. Carbon keeps tones off full-width bands on a page about other work.
 
@@ -758,7 +758,7 @@ page
   toast "The price tier was closed. Undo and Dismiss are both on this message." caution
 ```
 
-**Rationale:** The toast offering Undo and Dismiss together, which is the shape most people reach for first.
+**Rationale:** The toast offers Undo and Dismiss together, which is the shape most people reach for first.
 
 **Cost:** Material forbids it: one action per snackbar, and it may not be Dismiss. Two buttons turn a transient message into a small panel with a timer.
 
@@ -782,7 +782,7 @@ page
 
 **Rationale:** The toast says the export finished and offers Download, which is the only way to get the file. A message that vanishes takes the result with it.
 
-**Cost:** Carbon states it directly: because toasts can dismiss automatically, users must be able to access the result elsewhere. This violates that on purpose, to show what it costs.
+**Cost:** Carbon states it directly: because toasts can dismiss automatically, readers need another route to the result. This violates that rule on purpose, to show what it costs.
 
 **Reference:** Carbon
 
@@ -803,7 +803,7 @@ page
   toast "1 refund was refused by the bank." caution
 ```
 
-**Rationale:** Three toasts stacked at the bottom edge, so several commands in quick succession each say what they did. Base UI caps the viewport at three.
+**Rationale:** Three toasts stack at the bottom edge, so several commands in quick succession each say what they did. Base UI caps the viewport at three.
 
 **Cost:** A stack on a page the reader is working through covers the bottom-right of the table. That corner holds the pagination and the bulk bar.
 
@@ -853,7 +853,7 @@ page
 
 ### Menu of a row's commands
 
-**Question:** Where do the other commands of a row sit. The first command draws inline and the rest sit behind a menu. A row keeps its other commands in its row menu.
+**Question:** Where do the other commands of a row sit? The first command draws inline and the rest sit behind a menu. A row keeps its other commands in its row menu.
 
 **Default:** `a-menu-with-groups-and-a-destructive-item-last`
 
@@ -884,7 +884,7 @@ page
     action quiet "Copy the order number"
 ```
 
-**Rationale:** The recommended shape. The items are grouped under small headings and the destructive one sits at the end, after a separator, in the destructive tone. Nothing is disabled without a reason.
+**Rationale:** The recommended shape groups the items under small headings and puts the destructive one at the end, after a separator, in the destructive tone. Nothing is disabled without a reason.
 
 **Cost:** A menu item that is disabled gives no reason in the menu itself. The reader has to hover or press it to learn why. An explained action solves that on the page, not here.
 
@@ -960,7 +960,7 @@ page
 
 **Rationale:** One button carries the first command and its own half carries the menu. Both stay reachable without the reader ever opening anything to find the first one.
 
-**Cost:** Two targets in one shape, and the second half is a chevron that a reader may read as open rather than the rest. It also breaks where a button would wrap.
+**Cost:** Two targets share one shape, and the second half is a chevron that a reader may read as open rather than the rest. It also breaks where a button would wrap.
 
 #### `no-menu-the-row-s-commands-are-all-on-the-row`: No menu: the row's commands are all on the row
 
@@ -979,9 +979,9 @@ page
       item: text "Oak floor lamp" · text muted "7 of 400 sold"
 ```
 
-**Rationale:** One or two commands inline and nothing hidden, for a row whose whole set is small. NN/g's ceiling for inline placement is two.
+**Rationale:** One or two commands sit inline and nothing is hidden, for a row whose whole set is small. NN/g's ceiling for inline placement is two.
 
-**Cost:** Two buttons plus a checkbox plus five columns is a wide row, and it stops fitting at 24-pixel density. And it breaks the moment a third command arrives.
+**Cost:** Two buttons plus a checkbox plus five columns is a wide row, and it stops fitting at 24-pixel density. It also breaks the moment a third command arrives.
 
 **Reference:** NN/g
 
@@ -1006,7 +1006,7 @@ page
     fact "Email" "maria@garcia-interiors.example"
 ```
 
-**Rationale:** A page-level overflow holding every command for the record, rather than a menu per row. One menu instead of twenty-five.
+**Rationale:** A page-level overflow holds every command for the record, rather than a menu per row: one menu instead of twenty-five.
 
 **Cost:** A command that applies to one record cannot live in a page-level menu. The row-menu rule gives each row its own menu. This inverts that rule.
 
@@ -1029,7 +1029,7 @@ page
     action "Report a problem"
 ```
 
-**Rationale:** The way Linear filters its command menu: typing narrows twenty commands to one without submenus. Suited to rows whose command set keeps growing past what a scan can hold.
+**Rationale:** The way Linear filters its command menu: typing narrows twenty commands to one without submenus. It suits rows whose command set keeps growing past what a scan can hold.
 
 **Cost:** A search field in a menu needs focus on open, which steals the keys a reader uses to move. With six commands it is furniture around a list nobody filters.
 
@@ -1066,7 +1066,7 @@ page
 
 ### Short panel that opens beside a control
 
-**Question:** What earns a panel anchored to a control. It is not a dialog and not a toast. It closes when the reader looks away, and a reference to another record is chosen from a picker instead.
+**Question:** What earns a panel anchored to a control? It is not a dialog and not a toast. It closes when the reader looks away, and a reference to another record is chosen from a picker instead.
 
 **Default:** `a-popover-that-explains-what-a-term-means`
 
@@ -1118,7 +1118,7 @@ page
 
 **Rationale:** A word somebody may not know carries its glossary entry beside it. It answers the question where it is asked.
 
-**Cost:** Only for a term the application has defined. A hint on every unfamiliar word becomes noise, and the glossary has to stay in step with the hint.
+**Cost:** This is only for a term the application has defined. A hint on every unfamiliar word becomes noise, and the glossary has to stay in step with the hint.
 
 #### `a-popover-carrying-the-whole-picker`: A popover carrying the whole picker
 
@@ -1160,7 +1160,7 @@ page
     action quiet "Next month"
 ```
 
-**Rationale:** The date field opens a month grid in a popover rather than a dialog. The form and the calendar stay both visible, and Escape closes the calendar alone.
+**Rationale:** The date field opens a month grid in a popover rather than a dialog. The form and the calendar both stay visible, and Escape closes the calendar alone.
 
 **Cost:** APG puts the grid in a dialog, not a popover. A popover can be clipped by an overflow container, and the calendar is essential rather than advisory.
 
@@ -1209,7 +1209,7 @@ page
     text "This payment method refunds only within 180 days."
 ```
 
-**Rationale:** The row menu for commands and a popover for context, side by side. A reviewer can see the two floating shapes next to each other.
+**Rationale:** The row menu holds commands and a popover holds context, side by side. A reviewer can see the two floating shapes next to each other.
 
 **Cost:** A page with both on it has three floating layers counting the dialog, and a reader has to learn which is which. This is the reason the one-overlay rule wants one overlay at a time.
 
@@ -1291,7 +1291,7 @@ page
       item: text "SO-1042" · text "Maria Garcia" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** A band across the back office that holds on every page, such as which deployment this is. Neutral, never a tone, because it is about the page rather than about work.
+**Rationale:** A band across the back office that holds on every page, such as which deployment this is. It stays neutral, never a tone, because it is about the page rather than about work.
 
 **Cost:** A band on every page is chrome the reader cannot remove, and it competes with the heading for the top of the screen. It has to earn its height.
 
@@ -1312,9 +1312,9 @@ page
     action primary "Save"
 ```
 
-**Rationale:** A bar across the bottom saying what is not saved and offering Save and Discard. It answers a question the editor currently leaves open.
+**Rationale:** A bar across the bottom says what is not saved and offers Save and Discard. It answers a question the editor currently leaves open.
 
-**Cost:** It covers the bottom of the page, which on a table is where the pagination lives. And a neutral band over a form is still a full-width band.
+**Cost:** It covers the bottom of the page, which on a table is where the pagination lives. A neutral band over a form is still a full-width band.
 
 #### `a-bar-naming-a-deadline-that-is-closing`: A bar naming a deadline that is closing
 
@@ -1371,7 +1371,7 @@ page
 
 **Rationale:** The band is scoped to one record rather than the whole console. It appears only where the fact is true and disappears everywhere else.
 
-**Cost:** The reader learns the band on one page and then has to learn that another page does not have one. A scoped band is not a deployment marker, it is a per-record notice.
+**Cost:** The reader learns the band on one page and then has to learn that another page does not have one. A scoped band is not a deployment marker. It is a per-record notice.
 
 #### `no-bar-the-fact-goes-in-the-heading-instead`: No bar: the fact goes in the heading instead
 
@@ -1390,7 +1390,7 @@ page
 
 **Rationale:** The sandbox is named in the heading and the switcher, rather than in a band. Nothing is lost and one element is removed from every page.
 
-**Cost:** A reader who has seen four pages without the word 'sandbox' may not notice it. And the heading is already carrying the record or the page job.
+**Cost:** A reader who has seen four pages without the word `sandbox` may not notice it. The heading already carries the record or the page job.
 
 #### `a-save-bar-pinned-under-the-header`: A save bar pinned under the header
 
@@ -1431,7 +1431,7 @@ page
       item: text "SO-1042" · text "Maria Garcia" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** The way GitHub Primer draws a dismissible Banner: the fact shows once per session and the close is remembered. Suited to announcements, where the second reading has no value.
+**Rationale:** The way GitHub Primer draws a dismissible Banner: the fact shows once per session and the close is remembered. It suits announcements, where the second reading has no value.
 
 **Cost:** A dismissed band cannot carry anything the reader must see. The first dismissal teaches that every band can go, including the next one that matters.
 
@@ -1473,7 +1473,7 @@ page
 
 **Rationale:** The way Material Design draws a modal bottom sheet: a handle, a title naming the record, thumb-sized rows, one full-width dismissal. The sheet is one swipe from gone, so the list behind stays the surface.
 
-**Cost:** One record per sheet. Bulk commands need the list rather than this, and past five rows the sheet needs its own scroll.
+**Cost:** One sheet holds one record. Bulk commands need the list rather than this, and past five rows the sheet needs its own scroll.
 
 **Reference:** Material Design
 
@@ -1616,7 +1616,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Ship A: one scrolling body, one pinned footer, nothing else. D is the runner-up wherever money moves, because the totals pinned above the footer are read at the click.
+**Rationale:** Ship A: one scrolling body, one pinned footer, nothing else. D is the runner-up wherever money moves, because the reader sees the totals above the footer before confirming.
 
 Never ship F: buttons that scroll away ask the reader to agree first and find how after.
 
@@ -1728,7 +1728,7 @@ page
       action destructive "Refund EUR 125.00"
 ```
 
-**Rationale:** The way Stripe pins the total above Pay: the figure the click commits to stays visible while the terms scroll. The reader signs the number, not the scroll position.
+**Rationale:** The way Stripe pins the total above Pay: the number the click commits to stays visible while the terms scroll. The reader signs the number, not the scroll position.
 
 **Cost:** The pinned summary duplicates the body. Where the two disagree the reader trusts the pin, and the body becomes decoration nobody checks.
 
@@ -1794,13 +1794,13 @@ page
 
 ### Keyboard shortcut help overlay
 
-**Question:** Staff who live in lists learn keys faster than clicks. Linear and GitHub both answer ? with an overlay, grouped by where the keys work, closable with the same key.
+**Question:** Staff who live in lists learn keys faster than clicks. Linear and GitHub both answer `?` with an overlay, grouped by where the keys work, closable with the same key.
 
 **Default:** `a-grouped-grid-of-shortcuts`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Ship A: three groups, one grid, every key the application honors, closed by the same key. D is the runner-up on dense pages, where a This page section answers the only keys that work there.
+**Rationale:** Ship A: three groups, one grid, every key the application honors, closed by the same key. D is the runner-up on dense pages, where a `This page` section answers the only keys that work there.
 
 Never ship F: tooltips alone hide the catalog from the reader who would learn it fastest.
 
@@ -1832,7 +1832,7 @@ page
       action "Close"
 ```
 
-**Rationale:** The way Linear answers ?: groups by where the keys work, each key in its own cap, the same key closes. Staff learn the catalog in one reading.
+**Rationale:** The way Linear answers `?`: groups by where the keys work, each key in its own cap, and the same key closes. Staff learn the catalog in one reading.
 
 **Cost:** A catalog dialog lists keys the reader has no reason to press yet. Past twenty keys it is reference rather than learning, and reference belongs on a page.
 
@@ -1913,7 +1913,7 @@ page
       action "Close"
 ```
 
-**Rationale:** The way Figma scopes its shortcuts panel to the tool at hand: only the keys that work here. The list stays short enough to learn. The global keys live one link away.
+**Rationale:** The way Figma scopes its shortcuts panel to the tool at hand, showing only the keys that work here. The list stays short enough to learn. The global keys live one link away.
 
 **Cost:** Page-scoped lists repeat the global keys on every page or omit them. Either way the reader meets two lists where one catalog would do.
 
@@ -2053,7 +2053,7 @@ page
 
 **Rationale:** The way Figma rewrites its right-click menu for a multi-selection: the count in every label, single-record commands gone. The reader cannot ask three rows to open one record.
 
-**Cost:** The menu rewrites per count, so muscle memory for one row breaks at three. And the count must be exact at the click, not at the render.
+**Cost:** The menu rewrites per count, so muscle memory for one row breaks at three. The count must be exact at the click, not at the render.
 
 **Reference:** Figma
 
@@ -2131,14 +2131,14 @@ page
 
 **Rationale:** Included to refuse it: silence hands the gesture to the browser, whose commands act on the page rather than the record. Staff learn the gesture does nothing for them and stop trying.
 
-**Cost:** Inspect element beside Reload, on a row about money. The absence is not neutral. It teaches that right click is not part of the application.
+**Cost:** It puts Inspect element beside Reload on a row about money. The absence is not neutral. It teaches that right click is not part of the application.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/dialogs-and-overlays#name-the-command-on-a-confirm-action | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/dialogs-and-overlays#return-focus-when-an-overlay-closes | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
+| litespec/frontend/patterns/dialogs-and-overlays#name-the-command-on-a-confirm-action | guidance | Does every built page of this kind keep this rule, including in its compact layout? |
+| litespec/frontend/patterns/dialogs-and-overlays#return-focus-when-an-overlay-closes | guidance | Does every built page of this kind keep this rule, including in its compact layout? |
 | litespec/frontend/patterns/dialogs-and-overlays#confirming-a-command-that-cannot-be-taken-back | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
 | litespec/frontend/patterns/dialogs-and-overlays#short-task-in-a-dialog | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
 | litespec/frontend/patterns/dialogs-and-overlays#drawer-beside-the-list | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |

@@ -2,7 +2,7 @@
 
 ## Intent
 
-Browser storage is the only durable store in a client-only product. It is small, shared, and can disappear. Access runs through one adapter, keys carry versions, and shapes migrate. The user can always export what they made.
+Browser storage is the only durable store in a `client-only` product. It is small and shared, and it can disappear. Access runs through one adapter, keys carry versions, and shapes migrate. The user can always export what they made.
 
 ## Standards
 
@@ -24,7 +24,7 @@ Browser storage is the only durable store in a client-only product. It is small,
 
 **Requirement:** A change to a persisted shape MUST ship a migration that reads every previously released version and produces the current one.
 
-**Rationale:** The migration runs at startup before the store finishes loading. Data it cannot interpret is preserved under a quarantine key and reported, because deleting unreadable user data is not a recovery.
+**Rationale:** The migration runs at startup before the store finishes loading. Data it cannot interpret is preserved under a quarantine key and reported. Deleting unreadable user data is not a recovery.
 
 ### Treat reads as fallible
 

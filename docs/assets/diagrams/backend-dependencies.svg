@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="390" viewBox="0 0 720 390" role="img" aria-labelledby="backend-dependencies-title backend-dependencies-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
+  <title id="backend-dependencies-title">The five application projects and their references</title>
+  <desc id="backend-dependencies-desc">Five projects stacked from outermost to innermost: WebApi, Infrastructure, Application, Application.Abstractions, and Domain. WebApi references Infrastructure, Application, and Application.Abstractions. Infrastructure references Application, Application.Abstractions, and Domain. Application references Application.Abstractions and Domain. Application.Abstractions references Domain. Domain references nothing.</desc>
+  <defs>
+    <marker id="backend-dependencies-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
+    </marker>
+  </defs>
+
+  <!-- Each arrow points from a project to a project it references. -->
+  <g style="stroke: var(--muted-fg, #77706a); fill: none" stroke-width="1.25" marker-end="url(#backend-dependencies-arrow)">
+    <!-- one level down, straight -->
+    <path d="M360 60 V 86" />
+    <path d="M360 130 V 156" />
+    <path d="M360 200 V 226" />
+    <path d="M360 270 V 296" />
+    <!-- two levels down, on the right -->
+    <path d="M460 40 C 500 40, 500 180, 466 180" />
+    <path d="M460 110 C 525 110, 525 250, 466 250" />
+    <path d="M460 180 C 500 180, 500 320, 466 320" />
+    <!-- three levels down, on the left -->
+    <path d="M260 40 C 210 40, 210 250, 254 250" />
+    <path d="M260 110 C 185 110, 185 320, 254 320" />
+  </g>
+
+  <g style="fill: var(--bg, #ffffff); stroke: var(--border, #e5e0d9)" stroke-width="1">
+    <rect x="260" y="20" width="200" height="40" rx="8" />
+    <rect x="260" y="90" width="200" height="40" rx="8" />
+    <rect x="260" y="160" width="200" height="40" rx="8" />
+    <rect x="260" y="230" width="200" height="40" rx="8" />
+  </g>
+  <rect x="260" y="300" width="200" height="40" rx="8" style="fill: var(--accent-subtle, #fffaf0); stroke: var(--accent, #f8c258)" stroke-width="1.5" />
+
+  <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600" text-anchor="middle">
+    <text x="360" y="45">WebApi</text>
+    <text x="360" y="115">Infrastructure</text>
+    <text x="360" y="185">Application</text>
+    <text x="360" y="255">Application.Abstractions</text>
+    <text x="360" y="325">Domain</text>
+  </g>
+  <g style="fill: var(--muted-fg, #77706a)" font-size="12">
+    <text x="560" y="45">composes the process</text>
+    <text x="560" y="115">implements the ports</text>
+    <text x="560" y="185">runs the use cases</text>
+    <text x="560" y="255">cross-module contracts</text>
+    <text x="560" y="325">references nothing</text>
+  </g>
+  <text x="360" y="375" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">An arrow points from a project to a project it references. Every arrow points inward, toward Domain.</text>
+</svg>

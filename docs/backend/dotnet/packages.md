@@ -14,7 +14,7 @@ A .NET backend realizes package boundaries with project references and NuGet cen
 
 **Example:**
 
-| Project | May reference |
+| Project | may reference |
 |:---|:---|
 | Domain | No application project |
 | Application.Abstractions | Domain |
@@ -41,11 +41,11 @@ A .NET backend realizes package boundaries with project references and NuGet cen
 
 ### Pin every dependency centrally
 
-**Requirement:** Every NuGet and npm version MUST resolve through central management or the committed lockfile, at the pin `litespec.manifest.json` states where it states one.
+**Requirement:** Every NuGet and npm version MUST resolve through central management or the committed lockfile, using the pin `litespec.manifest.json` states when it states one.
 
 **Rationale:** An inline version in a project file is invisible to the manifest that is supposed to own it. This provision realizes `litespec/workspace/dependencies#pin-every-dependency-version-centrally` for .NET projects.
 
-The manifest pins the baseline stack, which is the set these standards name. A consumer also carries packages for its own product, and it cannot add those to a manifest it does not own. Those versions live in the consumer's own central file under `litespec/backend/dotnet/config#centralize-nuget-versions` or its lockfile, and `litespec/workspace/dependencies#approve-new-packages-explicitly` is what admits them.
+The manifest pins the baseline stack, which is the set these standards name. A consumer also carries packages for its own product, and it cannot add those to a manifest it does not own. Those versions live in the consumer's own central file under `litespec/backend/dotnet/config#centralize-nuget-versions` or its lockfile. `litespec/workspace/dependencies#approve-new-packages-explicitly` admits them.
 
 **Example:** A consumer generating invoices pins its PDF library in `Directory.Packages.props` with a decision record. The manifest never names it, and the pin is still central.
 
@@ -74,8 +74,8 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 | Domain | None |
 | Application.Abstractions | Required LiteBus module abstractions only |
 | Application | Required LiteBus module abstractions; `Marten` for the selected `IQuerySession` read boundary; Microsoft abstractions used by public ports |
-| Infrastructure | `Marten`; LiteBus registration modules. Provider, resilience, service-discovery, and configuration packages required by implemented adapters |
-| WebApi | JWT Bearer [REDACTED] ASP.NET Core OpenAPI, build-time OpenAPI generation, Scalar, and required LiteBus mediator abstractions |
+| Infrastructure | `Marten`; LiteBus registration modules. Provider, resilience, service discovery, and configuration packages required by implemented adapters |
+| WebApi | JWT Bearer authentication, ASP.NET Core OpenAPI, build-time OpenAPI generation, Scalar, and required LiteBus mediator abstractions |
 | Worker | LiteBus registration modules; the provider, resilience, and configuration packages its hosted jobs need |
 | ServiceDefaults | Health checks, service discovery, HTTP resilience, and OpenTelemetry registration and instrumentation |
 | AppHost | Aspire AppHost and resource hosting packages |
@@ -88,6 +88,22 @@ The manifest pins the baseline stack, which is the set these standards name. A c
 Test projects reference xUnit v3 and run on Microsoft.Testing.Platform. The consumer `global.json` sets `"test": { "runner": "Microsoft.Testing.Platform" }`, because the .NET 10 `dotnet test` command refuses the VSTest mode for these projects.
 
 The example adds a package to the narrowest owning project. A central version entry does not authorize every project to reference that package. Conditional packages such as EF Core, Reqnroll, LightBDD, SignalR, and WireMock are referenced only after their extension activates.
+
+### Run LiteSpec.Analyzers in every application project
+
+**Default:** Reference `LiteSpec.Analyzers` at the manifest pin, with `PrivateAssets="all"`, from every Domain, Application.Abstractions, Application, Infrastructure, and WebApi project.
+
+**Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
+
+**Rationale:** The analyzers report a breach of a .NET provision in the editor and the build, at the line that breaks it, with a link to the provision. The package is a development dependency: it adds nothing to the built assemblies, so Domain stays package-free at run time. [Check .NET code with the analyzers](../../guide/check-dotnet-code-with-the-analyzers.md) sets it up, and [Analyzer rules](../../reference/analyzers.md) lists what each rule reports.
+
+**Example:**
+
+```xml
+<ItemGroup>
+  <PackageReference Include="LiteSpec.Analyzers" PrivateAssets="all" />
+</ItemGroup>
+```
 
 ## Reference example
 
@@ -105,3 +121,4 @@ An Application query handler may inject `IQuerySession` because Marten is the se
 | litespec/backend/dotnet/packages#pin-every-dependency-centrally | guidance | Does every version resolve through central management or the lockfile at the manifest or consumer pin? |
 | litespec/backend/dotnet/packages#reference-only-the-litebus-module-required | guidance | Does each project reference only the LiteBus modules its code dispatches? |
 | litespec/backend/dotnet/packages#use-this-baseline-package-ownership | guidance | Does each baseline package sit in the layer the ownership table assigns? |
+| litespec/backend/dotnet/packages#run-litespecanalyzers-in-every-application-project | guidance | Does each of the five application projects reference `LiteSpec.Analyzers` at the manifest pin? |

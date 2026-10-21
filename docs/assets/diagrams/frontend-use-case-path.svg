@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-labelledby="frontend-use-case-path-title frontend-use-case-path-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
+  <title id="frontend-use-case-path-title">The backend use-case path beside its frontend mirror</title>
+  <desc id="frontend-use-case-path-desc">Three backend segments, Lending, Loans, and BorrowCopy, each with an arrow to its frontend spelling: lending, loans, and borrow-copy. The backend path is Library.Application/Lending/Loans/BorrowCopy and the frontend path is modules/lending/loans/borrow-copy.</desc>
+  <defs>
+    <marker id="frontend-use-case-path-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
+    </marker>
+  </defs>
+
+  <g style="fill: var(--muted-fg, #77706a)" font-size="12">
+    <text x="30" y="24">Backend: Library.Application (PascalCase)</text>
+    <text x="410" y="24">Frontend: modules (kebab-case)</text>
+    <text x="345" y="58" text-anchor="middle">module</text>
+    <text x="345" y="133" text-anchor="middle">aggregate</text>
+    <text x="345" y="208" text-anchor="middle">use case</text>
+  </g>
+
+  <!-- Each arrow maps one backend segment to its frontend spelling. -->
+  <g style="stroke: var(--muted-fg, #77706a); fill: none" stroke-width="1.25" marker-end="url(#frontend-use-case-path-arrow)">
+    <path d="M314 84 H 402" />
+    <path d="M314 159 H 402" />
+    <path d="M314 234 H 402" />
+  </g>
+
+  <g style="fill: var(--bg, #ffffff); stroke: var(--border, #e5e0d9)" stroke-width="1">
+    <rect x="30" y="62" width="280" height="44" rx="8" />
+    <rect x="30" y="137" width="280" height="44" rx="8" />
+    <rect x="30" y="212" width="280" height="44" rx="8" />
+    <rect x="410" y="62" width="280" height="44" rx="8" />
+    <rect x="410" y="137" width="280" height="44" rx="8" />
+    <rect x="410" y="212" width="280" height="44" rx="8" />
+  </g>
+
+  <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600" text-anchor="middle">
+    <text x="170" y="89">Lending</text>
+    <text x="170" y="164">Loans</text>
+    <text x="170" y="239">BorrowCopy</text>
+    <text x="550" y="89">lending</text>
+    <text x="550" y="164">loans</text>
+    <text x="550" y="239">borrow-copy</text>
+  </g>
+  <text x="360" y="284" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">An arrow maps one backend segment to its frontend spelling.</text>
+</svg>

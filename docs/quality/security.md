@@ -108,7 +108,7 @@ Security boundaries follow identity, resource ownership, data classification, an
 
 **Requirement:** A public, authentication, webhook, search, or upload endpoint MUST declare its limit as a Limit record with key, owner, and rejection response.
 
-**Rationale:** The key limits one caller, the owner monitors the limit, and the rejection response is 429 with a stable code.
+**Rationale:** The key limits one caller, the owner monitors the limit, and the rejection response is `429` with a stable code.
 
 ### Keep one limit store across replicas
 
@@ -194,7 +194,7 @@ This informative example demonstrates `litespec/quality/security#authorize-each-
 | litespec/quality/security#treat-an-unsalted-digest-as-personal-data | guidance | Does every unsalted digest of personal data receive personal-data handling? |
 | litespec/quality/security#report-a-breach-within-its-deadline | guidance | Does the breach procedure name an owner, a backup person, and meet its deadline? |
 | litespec/quality/security#protect-live-data-at-rest | guidance | Is every live store encrypted, or covered by an Exception naming this rule? |
-| litespec/quality/security#bound-abuse-at-exposed-endpoints | guidance | Does every exposed endpoint declare its limit, and answer 429 above it? |
+| litespec/quality/security#bound-abuse-at-exposed-endpoints | guidance | Does every exposed endpoint declare its limit, and answer `429` above it? |
 | litespec/quality/security#keep-one-limit-store-across-replicas | guidance | Do all replicas read rate and concurrency counters from one store? |
 | litespec/quality/security#restrict-cross-origin-access | guidance | Does the cross-origin policy list origins, methods, headers, and credential mode without a wildcard origin? |
 | litespec/quality/security#record-security-audit-events | guidance | Does every security audit event record actor, action, target, outcome, timestamp, trace, and reason? |

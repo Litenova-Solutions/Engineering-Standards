@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page holds how the TypeScript web stacks realize the frontend UI rules ([Frontend UI](../ui.md)). It states the toolchain, registry, tokens, and suites one web frontend requires. A provision here cites the neutral rule it realizes.
+This page states how the TypeScript web stacks realize the frontend UI rules ([Frontend UI](../ui.md)). It states the toolchain, registry, tokens, and suites one web frontend requires. A provision here cites the neutral rule it realizes.
 
 ## Concepts
 
@@ -12,7 +12,7 @@ The React baseline is the manifest `uiBaseline` entry. The Svelte baseline is th
 
 ### The browser route suite
 
-The browser suite discovers its routes from the generated route tree rather than from a list. A new route is therefore checked without a specification written for it. A dynamic segment resolves to a record the deployment holds, and falls back to an absent record when it holds none.
+The browser suite discovers its routes from the generated route tree rather than from a list. A new route is therefore checked without a specification written for it. A dynamic segment resolves to a record the deployment holds. It falls back to an absent record when the deployment holds none.
 
 | Check | The route passes when |
 |:---|:---|
@@ -33,7 +33,7 @@ The browser suite discovers its routes from the generated route tree rather than
 
 **Requirement:** A workspace MUST install the pinned baseline from `litespec.manifest.json` once, into its shared UI package, using the `uiBaseline` or `uiBaselineSvelte` entry.
 
-**Rationale:** The committed files are the CLI's configuration, the registry source, the token stylesheet, and the source lock beside them. Installing per application is what made a fourth copy, where a fourth drift was invisible. An additional registry is permitted under an exception recorded against this provision. The React baseline is the manifest `uiBaseline` entry and the Svelte baseline is the `uiBaselineSvelte` entry. This realizes litespec/frontend/ui#pin-the-baseline-in-the-shared-package.
+**Rationale:** The committed files are the CLI's configuration, the registry source, the token stylesheet, and the source lock beside them. Installing per application made a fourth copy. Drift in that copy was invisible. An additional registry is permitted under an exception recorded against this provision. The React baseline is the manifest `uiBaseline` entry and the Svelte baseline is the `uiBaselineSvelte` entry. This realizes litespec/frontend/ui#pin-the-baseline-in-the-shared-package.
 
 ### Publish one registry item per floorplan
 
@@ -45,7 +45,7 @@ The browser suite discovers its routes from the generated route tree rather than
 
 **Requirement:** A route MUST render exactly one floorplan from the declared set, unless it is a recorded freestyle route.
 
-**Rationale:** The floorplan fixes the layout, the heading position, and the slots, so a reviewer reads which floorplan a route composes. The slots take domain values: the business record state, the use cases that state permits, and the refusal results of the called use case. This realizes litespec/frontend/ui#compose-each-route-from-one-floorplan.
+**Rationale:** The floorplan fixes the layout, the heading position, and the slots. A reviewer reads which floorplan a route composes. The slots take domain values: the business record state, the use cases that state permits, and the refusal results of the called use case. This realizes litespec/frontend/ui#compose-each-route-from-one-floorplan.
 
 **Example:** An order route composes the entity floorplan and fills each slot from the order.
 
@@ -84,7 +84,7 @@ Svelte:
 
 **Requirement:** Route code MUST NOT carry a layout utility such as `grid`, `flex`, `gap-*`, `space-*`, or `col-span-*`.
 
-**Rationale:** A layout utility in a route file is a second layout beside the floorplan, and the next route copies it. Floorplan and display composites own layout, so one change reaches every route composing them. This realizes litespec/frontend/ui#keep-layout-inside-floorplans.
+**Rationale:** A layout utility in a route file is a second layout beside the floorplan. The next route copies it. Floorplan and display composites own layout. One change reaches every route composing them. This realizes litespec/frontend/ui#keep-layout-inside-floorplans.
 
 ### Derive each page type from a named reference
 
@@ -102,7 +102,7 @@ Svelte:
 
 **Requirement:** An application stylesheet MUST import the shared package's token stylesheet and declare no rule, with no literal color in any stylesheet the shared package ships.
 
-**Rationale:** One token sheet is what makes two applications look like one product. An application stylesheet imports it and declares no rule, so a second sheet never introduces a value the first has no opinion about. A stylesheet the shared package ships beside the token sheet declares no literal color. This realizes litespec/frontend/ui#keep-tokens-in-one-definition.
+**Rationale:** One token sheet makes two applications look like one product. An application stylesheet imports it and declares no rule. A second sheet never introduces a value the first has no opinion about. A stylesheet the shared package ships beside the token sheet declares no literal color. This realizes litespec/frontend/ui#keep-tokens-in-one-definition.
 
 ### Hold the declared base color
 
@@ -166,7 +166,7 @@ test('shows the changed total before payment', async ({ page }) => {
 
 **Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
-**Rationale:** Running `view`, `--dry-run`, and `--diff` first shows what the update changes before it is written. The regenerated files and the local composites change for different reasons, so one review cannot cover both.
+**Rationale:** Running `view`, `--dry-run`, and `--diff` first shows what the update changes before it is written. The regenerated files and the local composites change for different reasons. One review cannot cover both.
 
 ## Verification
 

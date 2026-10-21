@@ -72,9 +72,9 @@ This extension switches on `limit`. `litespec/ext/concurrency#set-key-retention`
 
 ### Scope client keys
 
-**Requirement:** An idempotent operation MUST scope its client key to the tenant, authenticated actor and operation.
+**Requirement:** An idempotent operation MUST scope its client key to the tenant, authenticated actor, and operation.
 
-**Rationale:** Tenant, actor and operation scope prevents one caller's key from replaying another operation. A project without the tenancy extension uses one fixed tenant value.
+**Rationale:** Tenant, actor, and operation scope prevents one caller's key from replaying another operation. A project without the tenancy extension uses one fixed tenant value.
 
 ### Store idempotency state atomically
 
@@ -100,7 +100,7 @@ This extension switches on `limit`. `litespec/ext/concurrency#set-key-retention`
 
 **Rationale:** Equivalent requests produce one comparison value without embedding authentication material.
 
-The actor identifier is in the fingerprint and the credential that proved it is not. Two actors can present the same client key, so a fingerprint without the actor lets one actor's replay return another actor's stored response. A bearer token, a cookie, and a signature are the credential, and each one changes between two requests the rule has to treat as equal.
+The actor identifier is in the fingerprint. The credential that proved it is not in the fingerprint. Two actors can present the same client key. A fingerprint without the actor lets one actor's replay return another actor's stored response. A bearer token, a cookie, and a signature are the credential, and each one changes between two requests the rule has to treat as equal.
 
 ### Protect fingerprint source data
 
@@ -130,7 +130,7 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Requirement:** A failed pre-commit idempotent request MUST leave neither the business change nor a completed replay record.
 
-**Rationale:** A later retry can safely perform the previously uncommitted operation.
+**Rationale:** A later retry can safely perform the uncommitted operation.
 
 ### Delay irreversible provider calls
 
@@ -178,7 +178,7 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Requirement:** An idempotent implementation MUST NOT replay authentication failures, transient server failures, `Set-Cookie`, `Cache-Control`, `Vary`, `Expires`, `Age`, hop-by-hop headers, tokens, or secrets.
 
-**Rationale:** These values are unsafe, transient, or unrelated to the accepted operation result. The caching headers are computed for the response that produced them, so replaying them hands a later caller freshness instructions from an earlier moment. [RFC 9111](https://datatracker.ietf.org/doc/html/rfc9111) makes each one a property of the exchange rather than of the result, and the replayed response computes its own.
+**Rationale:** These values are unsafe, transient, or unrelated to the accepted operation result. The caching headers are computed for the response that produced them. Replaying them hands a later caller freshness instructions from an earlier moment. [RFC 9111](https://datatracker.ietf.org/doc/html/rfc9111) makes each one a property of the exchange rather than of the result. The replayed response computes its own.
 
 ## Conventions
 
@@ -186,15 +186,15 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Default:** Use `Idempotency-Key` for HTTP commands that accept client keys, bounded to 255 characters of visible ASCII.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
-**Rationale:** The standard header makes client-key behavior recognizable at the HTTP boundary. [The IETF draft](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/) leaves the value opaque, which leaves a server storing whatever a client sends as a key. A bound stops an unbounded key from becoming an unbounded store entry. A character set stops a key from carrying a control character into a log line.
+**Rationale:** The standard header makes client-key behavior recognizable at the HTTP boundary. [The IETF draft](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/) leaves the value opaque. A server then stores whatever a client sends as a key. A bound stops an unbounded key from becoming an unbounded store entry. A character set stops a key from carrying a control character into a log line.
 
 ### Keep idempotency persistence in Infrastructure
 
 **Default:** Keep idempotency persistence and transaction handling in Infrastructure.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
 **Rationale:** Provider transactions and constraints belong outside Application and Domain.
 
@@ -202,7 +202,7 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Default:** Keep replay response mapping at the API boundary.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
 **Rationale:** HTTP statuses and headers are transport concerns.
 
@@ -210,19 +210,19 @@ The actor identifier is in the fingerprint and the credential that proved it is 
 
 **Default:** Declare the idempotency header as required on each applicable HTTP operation.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
 **Rationale:** Generated API contracts expose the requirement through `litespec/backend/api#publish-precise-complete-schemas`.
 
 ## Dependencies
 
-No additional package is required by the baseline implementation.
+The baseline implementation requires no additional package.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/concurrency#document-write-conflict-behavior | guidance | Does the use case name conflicts, invalid state, winner behavior and caller response? |
+| litespec/ext/concurrency#document-write-conflict-behavior | guidance | Does the use case name conflicts, invalid state, winner behavior, and caller response? |
 | litespec/ext/concurrency#limit-version-checks | checkable | `ConcurrencyVersionTests` link every version check to a documented conflicting-write case. |
 | litespec/ext/concurrency#compare-expected-aggregate-versions | checkable | `ConcurrencyVersionTests` race conflicting aggregate writes with expected versions. |
 | litespec/ext/concurrency#map-failed-expected-versions | checkable | `ConcurrencyVersionTests` assert a failed expected version returns 409 Problem Details with its stable code. |
@@ -230,8 +230,8 @@ No additional package is required by the baseline implementation.
 | litespec/ext/concurrency#apply-http-version-preconditions | checkable | `ConcurrencyVersionTests` require and validate a strong persistence-derived ETag. |
 | litespec/ext/concurrency#return-precondition-outcomes | checkable | `ConcurrencyVersionTests` return 428 for a missing `If-Match` and 409 for a stale version. |
 | litespec/ext/concurrency#hide-provider-version-values | checkable | `ConcurrencyVersionTests` assert public transport models expose no provider-specific version field. |
-| litespec/ext/concurrency#scope-client-keys | checkable | `IdempotencyKeyTests` assert keys from different tenants, actors or operations do not replay each other. |
-| litespec/ext/concurrency#store-idempotency-state-atomically | checkable | `IdempotencyKeyTests` commit fingerprint, state, response and expiry with the accepted business change. |
+| litespec/ext/concurrency#scope-client-keys | checkable | `IdempotencyKeyTests` assert keys from different tenants, actors, or operations do not replay each other. |
+| litespec/ext/concurrency#store-idempotency-state-atomically | checkable | `IdempotencyKeyTests` commit fingerprint, state, response, and expiry with the accepted business change. |
 | litespec/ext/concurrency#reject-conflicting-key-reuse | checkable | `IdempotencyKeyTests` assert reused keys with changed input return the documented rejection. |
 | litespec/ext/concurrency#enforce-key-uniqueness | checkable | `IdempotencyKeyTests` assert concurrent inserts prove the tenant-actor-operation-key uniqueness constraint. |
 | litespec/ext/concurrency#canonicalize-request-fingerprints | checkable | `IdempotencyKeyTests` assert equivalent mapped requests produce one fingerprint without credentials or client key. |

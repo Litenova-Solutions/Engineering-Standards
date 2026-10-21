@@ -86,7 +86,7 @@ This extension switches on the Limit record type.
 
 **Requirement:** A Marten lifecycle implementation MUST define document state, filtered queries, indexes, purge transformations, and contract evolution.
 
-**Rationale:** The implementation documents storage needs explicit lifecycle behavior beyond an aggregate transition.
+**Rationale:** Marten storage needs explicit lifecycle behavior beyond an aggregate transition.
 
 ### Define relational lifecycle behavior
 
@@ -116,7 +116,7 @@ This extension switches on the Limit record type.
 
 **Requirement:** A legal-hold release MUST record actor, data covered, reason, and resumed retention: an audit record when audit is selected, a standalone record otherwise.
 
-**Rationale:** A hold suspends an erasure obligation, so its release is the moment that obligation resumes. Without a record, nothing states when the suspension ended, and a subject's [erasure request](https://gdpr-info.eu/art-17-gdpr/) cannot be answered with a date. The release is also the point where data becomes deletable again, so the next retention run needs it to be unambiguous.
+**Rationale:** A hold suspends an erasure obligation, and its release resumes that obligation. Without a record, no one can state when the suspension ended. A subject's [erasure request](https://gdpr-info.eu/art-17-gdpr/) then has no answer date. The release is also the point where data becomes deletable again. The next retention run needs an unambiguous release record.
 
 **Example:** A release record names the hold, the release date, and the retention date the covered data now carries.
 
@@ -166,16 +166,16 @@ None.
 | litespec/ext/lifecycle#reject-hidden-lifecycle-flags | guidance | Is lifecycle behavior more than a hidden boolean? |
 | litespec/ext/lifecycle#model-lifecycle-operations-in-domain | guidance | Does the aggregate expose each applicable lifecycle operation? |
 | litespec/ext/lifecycle#authorize-and-audit-lifecycle-changes | guidance | Does each operation apply its authorization and record its audit? |
-| litespec/ext/lifecycle#exclude-persistence-only-lifecycle-behavior | guidance | Is any lifecycle rule implemented only by storage behavior? |
+| litespec/ext/lifecycle#exclude-persistence-only-lifecycle-behavior | guidance | Does storage behavior alone implement any lifecycle rule? |
 | litespec/ext/lifecycle#exclude-inactive-records-from-normal-reads | guidance | Do normal queries exclude deleted and archived records? |
 | litespec/ext/lifecycle#authorize-lifecycle-access-paths | guidance | Do administrative and restore queries use named authorized paths? |
-| litespec/ext/lifecycle#define-post-deletion-references | guidance | Does the specification state what post-deletion references, exports, and uniqueness remain? |
+| litespec/ext/lifecycle#define-post-deletion-references | guidance | Does the specification state which post-deletion references, exports, and uniqueness rules remain? |
 | litespec/ext/lifecycle#define-storage-lifecycle-behavior | guidance | Does the document implementation define state, queries, indexes, and purge behavior? |
 | litespec/ext/lifecycle#define-relational-lifecycle-behavior | guidance | Does the relational implementation define columns, filters, indexes, and migrations? |
 | litespec/ext/lifecycle#test-provider-lifecycle-paths | guidance | Do tests cover normal and lifecycle query paths? |
 | litespec/ext/lifecycle#bound-purge-and-archive-work | guidance | Is purge and archive work resumable, bounded, and observable? |
 | litespec/ext/lifecycle#preserve-legal-hold-data | guidance | Does retention work record progress and preserve held data? |
-| litespec/ext/lifecycle#record-the-release-of-a-legal-hold | guidance | Does each hold release record actor, data, reason, and resumed retention? |
+| litespec/ext/lifecycle#record-the-release-of-a-legal-hold | guidance | Does each legal-hold release record actor, data, reason, and resumed retention? |
 | litespec/ext/lifecycle#align-backup-deletion-behavior | guidance | Do backups and replicas follow the documented deletion guarantee? |
 | litespec/ext/lifecycle#name-soft-delete-timestamps | guidance | Do soft-delete timestamps use the default or record an Exception? |
 | litespec/ext/lifecycle#keep-archive-records-module-owned | guidance | Do archive records stay in the owning module or record an Exception? |

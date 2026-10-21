@@ -4,9 +4,9 @@
 
 Use this index to load the canonical page for current work.
 
-The folder a page sits in decides who applies it. Pages in `core/`, `workspace/` and `quality/` apply to every project. Pages directly in `backend/` and `frontend/` are principles for every backend and every frontend. A stack folder such as `backend/dotnet/` holds how one stack realizes them, and a project applies its stack's folder and every folder above it.
+The folder a page sits in decides who applies it. Pages in `core/`, `workspace/`, and `quality/` apply to every project. Pages directly in `backend/` and `frontend/` are principles for every backend and every frontend. A stack folder such as `backend/dotnet/` holds how one stack realizes them, and a project applies its stack's folder and every folder above it.
 
-A provision ID is its page and heading, so `litespec/frontend/components#compose-composites-in-page-code` is a heading in `frontend/components.md`. The [provision index](reference/provisions.md) lists them all. The `learn/`, `tools/`, `guide/`, `tutorial/` and `reference/` folders carry no provisions.
+A provision ID is its page and heading, so `litespec/frontend/components#compose-composites-in-page-code` is a heading in `frontend/components.md`. The [provision index](reference/provisions.md) lists them all. The `learn/`, `tools/`, `guide/`, `tutorial/`, and `reference/` folders carry no provisions.
 
 ## Which page do you want
 
@@ -24,6 +24,8 @@ A standards page owns the provisions a reader cites for one concern.
 - [How LiteSpec works](learn/how-litespec-works.md)
 - [Read the standard](learn/reading-the-standard.md)
 - [Records and the project model](learn/records-and-the-model.md)
+- [How the tools fit together](learn/the-tooling.md)
+- [How LiteSpec compares](learn/how-litespec-compares.md)
 - [Work with agents](learn/working-with-agents.md)
 - [Adopt LiteSpec](learn/adopting-litespec.md)
 
@@ -65,7 +67,7 @@ These principles hold for every backend. A backend stack folder states how its t
 - [Backend testing](backend/testing.md)
 - [Identifiers](backend/identifiers.md)
 
-## Dotnet stack
+## .NET stack
 
 - [.NET stack](backend/dotnet/stack.md)
 - [.NET architecture](backend/dotnet/architecture.md)
@@ -83,7 +85,7 @@ These principles hold for every backend. A backend stack folder states how its t
 
 ## Frontend
 
-These principles hold for every frontend, the Blazor stack and a native client included.
+These principles hold for every frontend, the Blazor stack, and a native client included.
 
 - [Frontend structure](frontend/structure.md)
 - [Frontend rendering and routes](frontend/rendering.md)
@@ -95,7 +97,7 @@ These principles hold for every frontend, the Blazor stack and a native client i
 
 ## Web
 
-The TypeScript web pages that the React and Svelte stacks share. This folder is a group, not a stack: no project selects it directly.
+This folder holds the TypeScript web pages that the React and Svelte stacks share. This folder is a group, not a stack: no project selects it directly.
 
 - [Web structure](frontend/web/structure.md)
 - [Web rendering and routes](frontend/web/rendering.md)
@@ -125,9 +127,9 @@ The TypeScript web pages that the React and Svelte stacks share. This folder is 
 - [Browser persistence](frontend/blazor/browser.md)
 - [Blazor testing](frontend/blazor/testing.md)
 
-## Ext
+## Extensions
 
-Extensions any stack can select. An extension for one stack sits in that stack's `ext/` folder and is listed with the stack.
+This folder holds extensions any stack can select. An extension for one stack sits in that stack's `ext/` folder and is listed with the stack.
 
 - [Extension catalog and selection](ext/README.md)
 - [API compatibility](ext/compat.md)
@@ -163,6 +165,7 @@ Extensions any stack can select. An extension for one stack sits in that stack's
 ## Guide
 
 - [Build an audit trail](guide/audit-trail.md)
+- [Check .NET code with the analyzers](guide/check-dotnet-code-with-the-analyzers.md)
 
 ## Tutorial
 
@@ -175,6 +178,11 @@ Extensions any stack can select. An extension for one stack sits in that stack's
 - [Provision index](reference/provisions.md)
 - [Audit obligations](reference/audit-obligations.md)
 - [Decision records](reference/decision-records.md)
+- [Analyzer rules](reference/analyzers.md)
+- [Project file](reference/project-file.md)
+- [Release manifest](reference/manifest.md)
+- [Schemas](reference/schemas.md)
+- [Published URLs](reference/published-urls.md)
 - [Consumer templates](../templates/consumer/README.md)
 
 Consumers pin a complete release. `CHANGELOG.md` is the repository release note for the current major version. No earlier-major archive exists in this release.

@@ -10,7 +10,7 @@ Activation scope: `local`.
 
 Applicable specification kinds: `use-case`, `journey`.
 
-The consumer enables `jobs` for recurring, delayed, or calendar-based work. It activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`, so the project declares the execution host that runs the scheduler.
+The consumer enables `jobs` for recurring, delayed, or calendar-based work. It activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`. The project declares the execution host that runs the scheduler.
 
 ## Baseline relationship
 
@@ -60,7 +60,7 @@ This extension switches on the Limit and Runbook record types.
 
 **Requirement:** A scheduled-job store MUST generate each fencing value monotonically per occurrence and check it on every completion write.
 
-**Rationale:** A monotonic value lets the store reject a completion from a worker that no longer owns the lease.
+**Rationale:** A monotonic value lets the store reject a completion from a Worker that no longer owns the lease.
 
 ### Scope occurrences and leases by tenant
 
@@ -116,9 +116,9 @@ This extension switches on the Limit and Runbook record types.
 
 **Rationale:** Operators need controlled actions for stalled, failed, or unsafe schedules.
 
-Each procedure names the interface that performs it. A procedure that reads "disable the schedule" with no command, endpoint, or configuration value behind it is discovered during the incident it was written for. An interface that writes to the schedule store directly is the one to avoid, because it bypasses the occurrence identity `litespec/ext/jobs#derive-stable-occurrence-identity` depends on.
+Each procedure names the interface that performs it. A procedure that says "disable the schedule" without naming a command, an endpoint, or a configuration value remains undiscovered until the incident it was written for. Avoid an interface that writes to the schedule store directly, because it bypasses the occurrence identity `litespec/ext/jobs#derive-stable-occurrence-identity` depends on.
 
-**Example:** A disable procedure names the configuration value or the administrative endpoint that stops the schedule, and states what happens to an occurrence already claimed.
+**Example:** A disable procedure names the configuration value or the administrative endpoint that stops the schedule. It states what happens to an occurrence already claimed.
 
 ### Derive stable occurrence identity
 
@@ -126,9 +126,9 @@ Each procedure names the interface that performs it. A procedure that reads "dis
 
 **Rationale:** One planned time receives one stable identity across retries and replicas.
 
-The key space grows with the schedule's frequency and its retention, so a per-second schedule kept for a year is over thirty million rows. [Quartz states the same practice](https://quartz-scheduler.net/documentation/best-practices.html) for a persistent job store.
+The key space grows with the schedule's frequency and its retention. A per-second schedule kept for a year holds more than 30 million rows. [Quartz states the same practice](https://quartz-scheduler.net/documentation/best-practices.html) for a persistent job store.
 
-**Example:** A daily schedule retaining occurrences for ninety days holds ninety rows. A minute schedule at the same retention holds over a hundred thousand, which is a different storage decision.
+**Example:** A daily schedule that retains occurrences for 90 days holds 90 rows. A minute schedule with the same retention holds more than 100,000 rows. That is a different storage decision.
 
 ### Persist occurrence state
 
@@ -146,7 +146,7 @@ The key space grows with the schedule's frequency and its retention, so a per-se
 
 **Requirement:** A Worker MUST mark completion only while its fencing value remains current.
 
-**Rationale:** A stale worker does not complete work after another replica owns the occurrence.
+**Rationale:** A stale Worker does not complete work after another replica owns the occurrence.
 
 ### Audit manual replay
 
@@ -158,7 +158,7 @@ The key space grows with the schedule's frequency and its retention, so a per-se
 
 **Requirement:** A scheduled job MUST use a UTC schedule unless its specification names a business-local time requirement and its IANA time zone.
 
-**Rationale:** A local schedule runs twice on one date each year and skips an hour on another. That is what a daylight-saving transition does to a wall clock. That behavior is correct for a job whose meaning is local, such as a nightly statement at nine in the morning for a reader. It is a defect for every other job, and the earlier recommendation left the difference to a preference. Naming the time zone in the specification is what makes the transition behavior reviewable.
+**Rationale:** A local schedule runs twice on one date each year and skips an hour on another. A daylight-saving transition does that to a wall clock. That behavior is correct for a job whose meaning is local, such as a nightly statement at 9 AM for a reader. It is a defect for every other job. Naming the time zone in the specification makes the transition behavior reviewable.
 
 ### Define business-local clock behavior
 
@@ -206,7 +206,7 @@ The key space grows with the schedule's frequency and its retention, so a per-se
 
 ## Dependencies
 
-No additional baseline package is required. Schedule state uses selected persistence and PostgreSQL leases.
+This extension requires no additional baseline package. Schedule state uses selected persistence and PostgreSQL leases.
 
 ## Verification
 
@@ -217,7 +217,7 @@ No additional baseline package is required. Schedule state uses selected persist
 | litespec/ext/jobs#bound-job-execution | guidance | Does each job honor cancellation and duration bounds and stop during shutdown? |
 | litespec/ext/jobs#store-execution-leases | guidance | Does the store record lease owner, expiry, and fencing value per occurrence? |
 | litespec/ext/jobs#renew-only-owned-leases | guidance | Does a replica stop when its lease renewal fails? |
-| litespec/ext/jobs#prevent-duplicate-completion | guidance | Does the lease prevent two replicas completing one occurrence? |
+| litespec/ext/jobs#prevent-duplicate-completion | guidance | Does the lease prevent two replicas from completing one occurrence? |
 | litespec/ext/jobs#generate-monotonic-fencing-values | guidance | Are fencing values monotonic per occurrence and checked on completion? |
 | litespec/ext/jobs#scope-occurrences-and-leases-by-tenant | guidance | Do occurrences and leases carry tenant scope where tenants are isolated? |
 | litespec/ext/jobs#dispatch-application-behavior | guidance | Does each job dispatch an Application Command or approved port? |

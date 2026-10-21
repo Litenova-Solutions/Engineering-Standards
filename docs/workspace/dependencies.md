@@ -103,7 +103,7 @@ The example adds a package to the narrowest owning layer. A central version entr
 | litespec/workspace/dependencies#pin-every-dependency-version-centrally | guidance | Does every version resolve through central management or the lockfile at the manifest or consumer pin? |
 | litespec/workspace/dependencies#approve-new-packages-explicitly | guidance | Does each package outside the manifest carry a decision with use case, alternatives, layer, cost, and removal condition? |
 | litespec/workspace/dependencies#keep-frontend-applications-isolated | guidance | Is each frontend free of imports from another application's source or internal feature files? |
-| litespec/workspace/dependencies#keep-the-approved-web-ui-dependency-boundary | guidance | Does each React frontend take UI packages from uiBaseline and each Svelte one from uiBaselineSvelte? |
+| litespec/workspace/dependencies#keep-the-approved-web-ui-dependency-boundary | guidance | Does each React frontend take UI packages from `uiBaseline` and each Svelte one from `uiBaselineSvelte`? |
 | litespec/workspace/dependencies#keep-generated-packages-dependency-light | guidance | Does the generated types package stay dependency-free with a thin client? |
 | litespec/workspace/dependencies#keep-test-dependencies-in-test-projects | guidance | Do production projects reference no test package? |
 | litespec/workspace/dependencies#assign-each-baseline-package-to-its-owning-layer | guidance | Does each baseline package sit in the layer the ownership table assigns? |

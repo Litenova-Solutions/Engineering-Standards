@@ -2,7 +2,7 @@
 
 ## Intent
 
-A form collects values a reader enters to create or change a record. These patterns answer how each kind of field takes its value and how a form reports a refused submit or unsaved work. Each pattern offers drawn options and names a default.
+A form collects values you enter to create or change a record. These patterns answer how each kind of field takes its value and how a form reports a refused submit or unsaved work. Each pattern offers drawn options and names a default.
 
 ## Standards
 
@@ -10,27 +10,27 @@ A form collects values a reader enters to create or change a record. These patte
 
 **Requirement:** Every field MUST carry a visible label that names its value.
 
-**Rationale:** A placeholder disappears as the reader types, so it cannot carry the name of the value. A screen reader and a reader returning to a filled form both read the label.
+**Rationale:** A placeholder disappears as you type, so it cannot carry the name of the value. A screen reader reads the label. You returning to a filled form read it too.
 
 ### Keep entered values after a refused submit
 
 **Requirement:** A form MUST keep every entered value when the API refuses a submit.
 
-**Rationale:** A form that clears itself after a refusal makes the reader type everything again to fix one field. The reader then repairs the field the message names and submits again.
+**Rationale:** A form that clears itself after a refusal makes you type everything again to fix one field. You then repair the field the message names and submit again.
 
 ## Patterns
 
 ### Money field
 
-**Question:** The back office holds prices, fees, refunds and settlement figures. None of them is for the software to choose. The field is where that rule meets a keyboard. The evidence says text input with an inputmode, the currency named in the label, and a symbol prefix that stays hidden from assistive reading.
+**Question:** The back office holds prices, fees, refunds, and settlement figures. The software chooses none of them. The field is where that rule meets a keyboard. The evidence says text input with an `inputmode`, the currency named in the label, and a symbol prefix that stays hidden from assistive reading.
 
 **Default:** `text-input-currency-in-the-label-symbol-inside`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The HMRC prefix with the currency in the label stays the pick. It reads in both themes and it names the currency to a screen reader. It refuses nothing the user can type.
+**Rationale:** The HMRC prefix with the currency in the label stays the pick. It reads in both themes. It names the currency to a screen reader. It refuses nothing you can type.
 
-The customer total restatement is the runner-up. It belongs on every price the customer sees. It stops the fee from surprising either side at checkout. Never ship the stepper. A continuous price cannot be reached by stepping.
+The customer total restatement is the runner-up. It belongs on every price the customer sees. It stops the fee from surprising either side at checkout. Never ship the stepper. You cannot reach a continuous price by stepping.
 
 #### `text-input-currency-in-the-label-symbol-inside`: Text input, currency in the label, symbol inside
 
@@ -47,9 +47,9 @@ page
     text muted "Added at checkout. The company keeps this one."
 ```
 
-**Rationale:** The HMRC pattern places an aria-hidden prefix inside the field. It names the currency in the label. A screen reader hears the currency even though it does not read the symbol. This is not a number input. GDS rejected type number outright.
+**Rationale:** The HMRC pattern places an `aria-hidden` prefix inside the field. It names the currency in the label. A screen reader hears the currency even though it does not read the symbol. This is not a `number` input. GDS rejected the `number` type outright.
 
-**Cost:** The user can type the symbol into the field, so validation has to accept it rather than refuse it. Two decimal places maximum, per the HMRC pattern.
+**Cost:** You can type the symbol into the field, so validation has to accept it rather than refuse it. Allow at most two decimal places, per the HMRC pattern.
 
 **Reference:** HMRC
 
@@ -92,7 +92,7 @@ page
       text "per order"
 ```
 
-**Rationale:** The GOV.UK suffix pattern uses a word rather than a symbol. Per unit, per order and per pallet read better than a symbol where the unit is not money.
+**Rationale:** The GOV.UK suffix pattern uses a word rather than a symbol. Per unit, per order, and per pallet read better than a symbol where the unit is not money.
 
 **Cost:** The suffix takes horizontal room in a narrow field, and it cannot carry a currency. Money and a unit would need two suffixes, which no pattern here supports.
 
@@ -113,9 +113,9 @@ page
     text muted "Whole euros are fine here."
 ```
 
-**Rationale:** The same field in its refused state. The message follows the GOV.UK template. It reads as a specific instruction rather than a rejection.
+**Rationale:** The same field appears in its refused state. The message follows the GOV.UK template. It reads as a specific instruction rather than a rejection.
 
-**Cost:** The three states cannot be seen at once, so a reviewer has to be told which one a mock shows. Each mock here is one state.
+**Cost:** You cannot see the three states at once, so the text states which one the mock shows. Each mock here is one state.
 
 **Reference:** GOV.UK
 
@@ -135,9 +135,9 @@ page
     text muted "Steps of one euro."
 ```
 
-**Rationale:** A plus and a minus sit either side of the value. They cover the case where one amount is the common one. Small deviations are the exception.
+**Rationale:** A plus and a minus sit on either side of the value. They cover the case where one amount is the common one. Small deviations are the exception.
 
-**Cost:** NN/g and Carbon both warn against a stepper for a price. A continuous value cannot be reached by stepping. An amount of 1.50 units cannot be expressed. This is the wrong control for this field.
+**Cost:** NN/g and Carbon both warn against a stepper for a price. You cannot reach a continuous value by stepping. You cannot express an amount of 1.50 units. This is the wrong control for this field.
 
 #### `money-as-a-read-only-fact-with-an-edit-command`: Money as a read-only fact with an edit command
 
@@ -155,9 +155,9 @@ page
     action "Change a priced line"
 ```
 
-**Rationale:** Once a charge has been priced, it is shown as a figure with one command to change it. The value is never retyped, so a mistyped price cannot become a second record.
+**Rationale:** Once a charge has been priced, the page shows it as a figure with one command to change it. You never retype the value, so a mistyped price cannot become a second record.
 
-**Cost:** Editing moves to a second surface for a field the user touches often. A charge already priced is a versioned fact rather than a field.
+**Cost:** Editing moves to a second surface for a field you touch often. A charge already priced is a versioned fact rather than a field.
 
 #### `price-with-the-customer-facing-total-restated`: Price with the customer-facing total restated
 
@@ -174,9 +174,9 @@ page
     fact "Customer pays" "EUR 50.00"
 ```
 
-**Rationale:** Clearer money. The user types what the unit costs and reads what the customer pays on the same screen before saving. The EUR 50.00 all-in figure stops the fee from surprising either side at checkout.
+**Rationale:** The money reads more clearly. You type what the unit costs and read what the customer pays on the same screen before saving. The EUR 50.00 all-in figure stops the fee from surprising either side at checkout.
 
-**Cost:** The restated total must update as the user types, which a static mock cannot show. Costs one line under every price field, even where the fee is zero.
+**Cost:** The restated total must update as you type, which a static mock cannot show. It costs one line under every price field, even where the fee is zero.
 
 #### `gross-price-with-the-net-and-tax-restated`: Gross price with the net and tax restated
 
@@ -195,9 +195,9 @@ page
     fact "Of which VAT at 21 percent" "EUR 0.87"
 ```
 
-**Rationale:** Stripe Dashboard restates every gross amount as net plus tax under the field. The user prices what the customer pays. The user reads what the company keeps.
+**Rationale:** Stripe Dashboard restates every gross amount as net plus tax under the field. You price what the customer pays. You read what the company keeps.
 
-**Cost:** The restated lines update as the user types. The rates come from configuration keyed by date. A price from January restates with January rates. This costs two lines per field even where the user never looks twice.
+**Cost:** The restated lines update as you type. The rates come from configuration keyed by date. A price from January restates with January rates. This costs two lines per field even where you never look twice.
 
 **Reference:** Stripe
 
@@ -222,17 +222,17 @@ page
 
 **Rationale:** Square and Shopify POS put the common amounts one tap away. Most units land on a round price, and typing 45.00 ninety times a year is ninety chances to type 54.00. The field stays for the odd price.
 
-**Cost:** The presets are company data that must be learned or configured, and a stale set pushes the user toward last year prices. Five chips plus a field is also wider than a field alone on a phone.
+**Cost:** The presets are company data that must be learned or configured, and a stale set pushes you toward last year's prices. Five chips plus a field is also wider than a field alone on a phone.
 
 ### Choosing a record
 
-**Question:** A reference to another record is chosen from a picker showing names. Nobody types an identifier. The failure to avoid is a select reading "Choose a warehouse" beside a field holding "WH-0C893968A2" as if it were a value to type.
+**Question:** You choose a reference to another record from a picker showing names. Nobody types an identifier. The failure to avoid is a select reading "Choose a warehouse" beside a field holding "WH-0C893968A2" as if it were a value to type.
 
 **Default:** `searchable-picker-showing-names`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The searchable picker over names stays the pick: nobody types an identifier, and search beats scrolling for every list longer than a screen. The picker with one distinguishing fact per row is the runner-up for records that share a name. Never ship a bare identifier field: a code such as WH-0C893968A2 is not a value a person can type or check.
+**Rationale:** The searchable picker over names stays the pick: nobody types an identifier, and search beats scrolling for every list longer than a screen. The picker with one distinguishing fact per row is the runner-up for records that share a name. Never ship a bare identifier field: a code such as WH-0C893968A2 is not a value you can type or check.
 
 #### `searchable-picker-showing-names`: Searchable picker showing names
 
@@ -250,9 +250,9 @@ page
     field "Name" text
 ```
 
-**Rationale:** A search over names, showing nothing else. Time zone research from NN/g is the reason it searches. In that research 44 percent of first searches were by city. Search beat scrolling every time.
+**Rationale:** It searches over names and shows nothing else. Time zone research from NN/g is the reason it searches. In that research 44 percent of first searches were by city. Search beats scrolling every time.
 
-**Cost:** A picker hides how many records exist, and a user who knows the warehouse is in "Zaandam" still has to search rather than scan. Needs an empty-result state that offers creating one.
+**Cost:** A picker hides how many records exist. If you know the warehouse is in "Zaandam", you still have to search rather than scan. It needs an empty-result state that offers creating one.
 
 #### `picker-with-the-record-s-facts-beside-its-name`: Picker with the record's facts beside its name
 
@@ -269,9 +269,9 @@ page
     field "Name" text = "Trade"
 ```
 
-**Rationale:** Each option carries the one fact that tells two similar records apart. Capacity suits a warehouse and date suits a delivery. State suits a price tier. Two depots both called Rotterdam are told apart by what they hold.
+**Rationale:** Each option carries the one fact that tells two similar records apart. Capacity suits a warehouse and date suits a delivery. State suits a price tier. You tell two depots both called Rotterdam apart by what they hold.
 
-**Cost:** A wider list, and the extra column is only useful for records that share a name. For a record set where names are already unique it is noise.
+**Cost:** The list grows wider, and the extra column is only useful for records that share a name. For a record set where names are already unique it is noise.
 
 #### `a-select-of-names`: A select of names
 
@@ -286,9 +286,9 @@ page
     field "Name" text
 ```
 
-**Rationale:** A plain select listing names. Fewer moving parts than a picker, and it works with the keyboard out of the box.
+**Rationale:** It is a plain select listing names. It has fewer moving parts than a picker, and it works with the keyboard with no extra setup.
 
-**Cost:** The GOV.UK guidance says to reduce the option count before reaching for a select. Research finds selects hard to use. The guidance forbids pre-selecting an option. A 40 warehouse select is the case that guidance is about.
+**Cost:** The GOV.UK guidance says to reduce the option count before reaching for a select. Research finds selects hard to use. The guidance forbids pre-selecting an option. A 40-warehouse select is the case that guidance is about.
 
 **Reference:** GOV.UK
 
@@ -308,7 +308,7 @@ page
     field "Name" text
 ```
 
-**Rationale:** The user types part of a name and the list narrows, but they must choose from the list. APG warns that list autocomplete with automatic selection silently adopts the first suggestion, which stores the wrong record.
+**Rationale:** You type part of a name and the list narrows, but you must choose from the list. APG warns that list autocomplete with automatic selection silently adopts the first suggestion, which stores the wrong record.
 
 **Cost:** The field must not commit on blur or on Enter alone, or a mistyped prefix books the wrong warehouse. That is an implementation rule the mock cannot show.
 
@@ -330,9 +330,9 @@ page
     action "Change what is linked"
 ```
 
-**Rationale:** On a record rather than a form, the relation is shown as a fact. It carries a command to change it. The reader sees what is linked without opening a picker.
+**Rationale:** On a record rather than a form, the page shows the relation as a fact. It carries a command to change it. You see what is linked without opening a picker.
 
-**Cost:** Two steps to change a relation, and on a page with several relations it is several such facts. It belongs on a record page, not on a create form.
+**Cost:** Changing a relation takes two steps, and on a page with several relations it takes several such facts. It belongs on a record page, not on a create form.
 
 #### `a-picker-that-also-creates`: A picker that also creates
 
@@ -350,9 +350,9 @@ page
     field "Name" text
 ```
 
-**Rationale:** The list ends with the command to make the missing record. A user who needs a new warehouse is never sent away. They make one and come back to the form.
+**Rationale:** The list ends with the command to make the missing record. If you need a new warehouse, you are never sent away. You make one and come back to the form.
 
-**Cost:** The field now opens a second surface, and a dialog must never open another dialog. Creating a warehouse has to be a page, which means losing the contents of the form.
+**Cost:** The field opens a second surface, and a dialog must never open another dialog. Creating a warehouse has to be a page, which means losing the contents of the form.
 
 #### `recent-records-above-the-search`: Recent records above the search
 
@@ -372,9 +372,9 @@ page
       item: text "Utrecht depot" · text muted "1,100"
 ```
 
-**Rationale:** Linear opens every picker on the records the person touched last. The warehouse for the next delivery is almost always the warehouse of the last one. Recent first turns the common case into one tap. It leaves search for the rest.
+**Rationale:** Linear opens every picker on the records you touched last. The warehouse for the next delivery is almost always the warehouse of the last one. Recent first turns the common case into one tap. It leaves search for the rest.
 
-**Cost:** Recent is per person, so two users see two orders and a screenshot never matches twice. It also needs an empty state for the first delivery, where nothing is recent yet.
+**Cost:** Recent is per person, so two people see two orders and a screenshot never matches twice. It also needs an empty state for the first delivery, where nothing is recent yet.
 
 **Reference:** Linear
 
@@ -404,13 +404,13 @@ page
 
 ### Date and time field
 
-**Question:** A common failure is the native date input of the browser. It draws as dd/mm/yyyy with a native picker icon. It is visibly not the control of the application. GDS rejected that input for browser implementation problems.
+**Question:** A common failure is the native date input of the browser. It draws as `dd/mm/yyyy` with a native picker icon. It is visibly not the application control. GDS rejected that input for browser implementation problems.
 
 **Default:** `one-text-field-with-a-calendar-that-opens-beside-it`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** One typed field with a calendar beside it stays the pick. There is always a way to type. The calendar serves the users who would rather click.
+**Rationale:** One typed field with a calendar beside it stays the pick. There is always a way to type. The calendar serves you when you would rather click.
 
 The three GDS inputs are the runner-up where accessibility review demands them. They cost the slowest entry in the form. Never ship the native date input. It draws the browser chrome instead of the application control. It renders differently everywhere.
 
@@ -434,9 +434,9 @@ page
     text muted "In the Europe/Amsterdam time zone."
 ```
 
-**Rationale:** The GOV.UK answer to a date uses three fields. It uses numeric inputmode and autocomplete tokens. The hint reads For example, 31 3 1980. Every browser renders it the same.
+**Rationale:** The GOV.UK answer to a date uses three fields. It uses numeric `inputmode` and `autocomplete` tokens. The hint reads "For example, 31 3 1980". Every browser renders it the same.
 
-**Cost:** Three fields for one value, and a user entering 94 dates a year types 282 numbers. This is the most accessible answer and the slowest one.
+**Cost:** Three fields hold one value, and if you enter 94 dates a year you type 282 numbers. This is the most accessible answer and the slowest one.
 
 **Reference:** GOV.UK
 
@@ -457,9 +457,9 @@ page
     field "Leaves the dock" text = "14/03/2026 12:00"
 ```
 
-**Rationale:** One field the user types into, with a calendar beside it for the ones who would rather click. The APG combobox date picker pattern is exactly this. The Carbon rule is that there must always be a way to type.
+**Rationale:** You type into one field, with a calendar beside it if you would rather click. The APG `combobox` date picker pattern is exactly this. The Carbon rule is that there must always be a way to type.
 
-**Cost:** A calendar is a grid of 42 cells to build, translate and test in two languages. It is the most code in the form package for one field.
+**Cost:** A calendar is a grid of 42 cells to build, translate, and test in two languages. It is the most code in the form package for one field.
 
 **Reference:** APG
 
@@ -481,9 +481,9 @@ page
     message critical "The end must be after loading starts."
 ```
 
-**Rationale:** Date and time sit side by side as two fields, with the time zone stated once above them rather than repeated under each. Fewer repetitions of the same fact.
+**Rationale:** Date and time sit side by side as two fields, with the time zone stated once above them rather than repeated under each. That means fewer repetitions of the same fact.
 
-**Cost:** On a narrow screen two fields plus the row wraps to three lines. A time zone that is stated once has to be read before the second field. It does not sit next to that field.
+**Cost:** On a narrow screen two fields plus the row wraps to three lines. You have to read a time zone that is stated once before the second field. It does not sit next to that field.
 
 #### `relative-dates-for-the-near-future-absolute-for-the-far`: Relative dates for the near future, absolute for the far
 
@@ -500,9 +500,9 @@ page
     text "Dispatch is at 08:00 on Sat 14 Mar 2026, so this is 04:00."
 ```
 
-**Rationale:** A dispatch plan is written in relative language: "dispatch at 08:00", "loading 4 hours before". One field takes a duration and the page works out the clock time from the delivery date.
+**Rationale:** A dispatch plan is written in relative language: "dispatch at 08:00", "loading 4 hours before". One field takes a duration and the page calculates the clock time from the delivery date.
 
-**Cost:** An absolute time has to be derivable and shown. The user would otherwise hold it in their head. A relative field cannot express dispatch at 08:00 unless the driver is late.
+**Cost:** The page derives an absolute time and shows it. You would otherwise hold it in your head. A relative field cannot express dispatch at 08:00 unless the driver is late.
 
 #### `a-duration-field-for-a-length-of-time`: A duration field for a length of time
 
@@ -520,9 +520,9 @@ page
     field "Email the customer before the hold ends" select = "10 minutes before"
 ```
 
-**Rationale:** For loading, a timeout or a hold, the user knows four hours, not 04:00. One field takes the number and a unit sits beside it. The NN/g rule says the step and the unit stay explicit.
+**Rationale:** For loading, a timeout or a hold, you know four hours, not 04:00. One field takes the number and a unit sits beside it. The NN/g rule says the step and the unit stay explicit.
 
-**Cost:** Two fields where one number would do, and it cannot express "2h30". A single field parsing both needs error wording for every way a duration can be wrong.
+**Cost:** Two fields do the work where one number would do, and they cannot express "2h30". A single field parsing both needs error wording for every way a duration can be wrong.
 
 #### `the-date-refused-with-the-date-that-was-wrong`: The date refused, with the date that was wrong
 
@@ -539,9 +539,9 @@ page
     message critical "Leaving the dock must be after loading starts. You entered 08:00."
 ```
 
-**Rationale:** The same field refused, with the GOV.UK error wording. It names the field and says what to do. It says what was entered and what is wrong. The user does not have to remember what they typed.
+**Rationale:** The same field appears refused, with the GOV.UK error wording. It names the field and says what to do. It says what was entered and what is wrong. You do not have to remember what you typed.
 
-**Cost:** The message repeats the value, which makes it longer than the field. A message that fits above the input and not inside it.
+**Cost:** The message repeats the value, which makes it longer than the field. The message fits above the input, not inside it.
 
 **Reference:** GOV.UK
 
@@ -564,7 +564,7 @@ page
 
 **Rationale:** Calendly puts the usual lengths above a custom field because most meetings are thirty minutes. Dispatch times cluster the same way around 08:00. Two presets plus Custom covers the week without typing.
 
-**Cost:** The presets are company data that goes stale when the season changes. A preset that names a date has to be regenerated every week. A stale chip offers last month mornings.
+**Cost:** The presets are company data that goes stale when the season changes. A preset that names a date needs a new value every week. A stale chip offers last month mornings.
 
 **Reference:** Calendly
 
@@ -585,13 +585,13 @@ page
 
 **Rationale:** Airbnb and Linear ask for a range as one control with the length read back. A start without an end is not a value the page can use. The readout catches the overnight mistake before the submit does.
 
-**Cost:** Two values in one field need one error message that names both, and a screen reader meets a composite where it expected a field. The labels have to be wired with care.
+**Cost:** Two values in one field need one error message that names both, and a screen reader meets a composite where it expected a field. Wire the labels with care.
 
 **Reference:** Airbnb
 
 ### Text field and its states
 
-**Question:** Every text field has to draw seven states. GOV.UK is blunt about two of them. The label is always visible and above the input. A placeholder is never the label because it vanishes on first keystroke.
+**Question:** Every text field has to draw seven states. GOV.UK is blunt about two of them. The label is always visible and above the input. A placeholder is never the label because it vanishes on the first keystroke.
 
 **Default:** `label-above-help-under-six-states-on-one-page`
 
@@ -618,7 +618,7 @@ page
     text muted "Issued by the system when the line was made."
 ```
 
-**Rationale:** The component reference page for the field: default, filled, focused, error, disabled and readonly. Showing them together is how a reviewer checks one control rather than six screenshots.
+**Rationale:** The component reference page for the field: default, filled, focused, error, disabled, and readonly. Showing them together is how you check one control rather than six screenshots.
 
 **Cost:** Six instances of one field is a style guide, not a screen. It never appears in the product. It exists so the states cannot drift apart.
 
@@ -639,7 +639,7 @@ page
 
 **Rationale:** The label names the field and the placeholder shows an example. Both are present. That is the GOV.UK recommendation once a hint is genuinely needed.
 
-**Cost:** Two sets of words per form field, so a form with five fields carries ten lines before the first value. The hint has to earn its place every time.
+**Cost:** A form field carries two sets of words, so a form with five fields carries ten lines before the first value. The hint has to earn its place every time.
 
 **Reference:** GOV.UK
 
@@ -656,9 +656,9 @@ page
     item: text "SO-1042" · text "Maria Garcia" · text "EUR 125.00"
 ```
 
-**Rationale:** The search field with no label: the only description of what the search covers is a placeholder reading "Order number, name or email".
+**Rationale:** The search field has no label. The only description of what the search covers is a placeholder reading "Order number, name or email".
 
-**Cost:** It fails the GOV.UK guidance on three counts at once. It vanishes on first keystroke. Not every screen reader reads it. Its default color often misses 1.4.3 contrast.
+**Cost:** It fails the GOV.UK guidance on three counts at once. It vanishes on first keystroke. Not every screen reader reads it. Its default color often misses `1.4.3` contrast.
 
 **Reference:** GOV.UK
 
@@ -676,7 +676,7 @@ page
     text muted "148 characters of 1,500"
 ```
 
-**Rationale:** Where a field has a hard limit, the remaining count sits under it. GOV.UK says count characters only where its own research shows it nets positive.
+**Rationale:** Where a field has a hard limit, the remaining count sits under it. GOV.UK says count characters only where its own research shows it helps.
 
 **Cost:** The GOV.UK validation guidance permits live counting only as its own exception. It validates before the field is finished, which is precisely why it needs the exception. On a policy text it is worth it. On a name it is not.
 
@@ -697,9 +697,9 @@ page
     text muted "This is how it appears to a customer, with the line breaks kept."
 ```
 
-**Rationale:** Long answers are shown with the line breaks the typist entered. A policy pasted from a document keeps its paragraphs instead of reflowing into one block.
+**Rationale:** The page shows long answers with the line breaks you entered. A policy pasted from a document keeps its paragraphs instead of reflowing into one block.
 
-**Cost:** Uncontrolled line breaks in stored text are a rendering hazard on a customer page. The width there differs from the width of the editor. It has to be normalized somewhere.
+**Cost:** Uncontrolled line breaks in stored text are a rendering hazard on a customer page. The width there differs from the width of the editor. Normalize it somewhere.
 
 #### `a-field-that-grows-as-the-answer-does`: A field that grows as the answer does
 
@@ -718,9 +718,9 @@ page
     action primary "Record it"
 ```
 
-**Rationale:** The textarea expands with its content up to a limit, so an incident report is not a 74-pixel window with a scrollbar inside it.
+**Rationale:** The `textarea` expands with its content up to a limit, so an incident report is not a 74-pixel window with a scrollbar inside it.
 
-**Cost:** A growing field pushes everything below it down as the reader types, which moves the button they are about to press. Most implementations stop growing at about six lines.
+**Cost:** A growing field pushes everything below it down as you type, which moves the button you are about to press. Most implementations stop growing at about six lines.
 
 #### `inline-confirmation-of-a-good-value`: Inline confirmation of a good value
 
@@ -739,7 +739,7 @@ page
     action primary "Add the tier"
 ```
 
-**Rationale:** Stripe Checkout and Vercel confirm a valid value where it was typed. A tick and a quiet line mark it, instead of waiting for the submit. Confirming Standard early saves the user a round trip for the name they wanted.
+**Rationale:** Stripe Checkout and Vercel confirm a valid value where you typed it. A tick and a quiet line mark it, instead of waiting for the submit. Confirming Standard early saves you a round trip for the name you wanted.
 
 **Cost:** GOV.UK permits live validation only as a narrow exception, because it judges a field before it is finished. The check must wait for a pause in typing, or it nags.
 
@@ -771,15 +771,15 @@ page
 
 ### Choosing one of a few options
 
-**Question:** A closed set. The GOV.UK rules say a select is a last resort. Radios beat a select. Nothing is pre-selected in a question though settings allow it. The naming field below is a radio list with three well worded options.
+**Question:** You choose from a closed set. The GOV.UK rules say a select is a last resort. Radios beat a select. Nothing is pre-selected in a question, though settings allow it. The naming field below is a radio list with three well-worded options.
 
 **Default:** `a-radio-list-with-a-description-per-option`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The radio list with a description per option stays the pick. Each choice carries the sentence that lets a person choose between names that sound alike. The segmented control is the runner-up for two or three short values with no descriptions.
+**Rationale:** The radio list with a description per option stays the pick. Each choice carries the sentence that lets you choose between names that sound alike. The segmented control is the runner-up for two or three short values with no descriptions.
 
-Never ship the native multi-select. GOV.UK rules it out for its usability and assistive record. A checkbox list replaces it.
+Never ship the native `multi-select`. GOV.UK rules it out for its usability and assistive record. A checkbox list replaces it.
 
 #### `a-radio-list-with-a-description-per-option`: A radio list with a description per option
 
@@ -799,7 +799,7 @@ page
     text "The customer names each recipient before dispatch."
 ```
 
-**Rationale:** Each option carries a sentence saying what it means for the customer. That sentence is the only way a person can choose between The customer name and Every recipient named.
+**Rationale:** Each option carries a sentence saying what it means for the customer. That sentence is the only way you can choose between "The customer name" and "Every recipient named".
 
 **Cost:** Three options at 22 pixels each is a tall block, and it does not scale to twelve options, which a permission picker does need.
 
@@ -821,7 +821,7 @@ page
 
 **Rationale:** The choice is between two or three values that are all visible at once. A segmented control shows every option. It hides none of them behind a menu.
 
-**Cost:** Labels have to fit, so "A blank product" and "A template" both had to be shortened. The control grows with its longest label.
+**Cost:** Labels have to fit, so "A blank product" and "A template" are both shortened. The control grows with its longest label.
 
 #### `plan-cards-for-a-priced-choice`: Plan cards for a priced choice
 
@@ -846,7 +846,7 @@ page
     action primary "Change to this plan"
 ```
 
-**Rationale:** For a choice between priced options, each card names the option, its price and its period. The one the company holds says so in words. It does not rely only on a ring.
+**Rationale:** For a choice between priced options, each card names the option, its price, and its period. The one the company holds says so in words. It does not rely only on a ring.
 
 **Cost:** Cards are boxes, and the layout contract says a Section is the only box and never nests. Three plan cards inside a section break that rule three times.
 
@@ -878,7 +878,7 @@ page
 
 **Rationale:** The plan cards carry the choice in a real radio. The tab order and the arrow keys work as a form control. They do not work as a set of buttons.
 
-**Cost:** Two nested controls in one card. The whole card has to forward the click to the radio, and the radio still has to be reachable by Tab.
+**Cost:** One card holds two nested controls. The whole card has to forward the click to the radio, and the radio still has to be reachable by Tab.
 
 #### `a-select-in-a-settings-page-where-nothing-is-pre-selected`: A select, in a settings page where nothing is pre-selected
 
@@ -921,7 +921,7 @@ page
     text muted "7 actions across 2 areas."
 ```
 
-**Rationale:** GOV.UK states it directly: do not use select multiple, because of its history of poor usability and assistive support. Checkboxes in a list, or a dedicated picker where the options are many.
+**Rationale:** GOV.UK states it directly: do not use `select multiple`, because of its history of poor usability and assistive support. Use checkboxes in a list, or a dedicated picker where the options are many.
 
 **Cost:** Twenty checkboxes is a wall. Above about eight, the picker needs a search and a summary of what is chosen, which is a component rather than a field.
 
@@ -943,9 +943,9 @@ page
       item: text "No name" · text muted "A parcel is handed to whoever signs for it."
 ```
 
-**Rationale:** Apple HIG and Radix UI draw a choice with descriptions as a listbox. One button shows the current value. A checkmark marks it in the list. Full keyboard support is included. It carries the same sentences as the radio list in the height of one field.
+**Rationale:** Apple HIG and Radix UI draw a choice with descriptions as a `listbox`. One button shows the current value. A checkmark marks it in the list. It includes full keyboard support. It carries the same sentences as the radio list in the height of one field.
 
-**Cost:** The options hide behind a button, so a reader compares them only by opening the list. A radio list shows all three at once. This one shows one and promises two more.
+**Cost:** The options hide behind a button, so you compare them only by opening the list. A radio list shows all three at once. This one shows one and promises two more.
 
 **Reference:** Apple HIG
 
@@ -982,7 +982,7 @@ page
 
 **Rationale:** The switch with its consequence stated stays the pick. The label says what is on. The line under it says what turning it off does.
 
-The instant apply switch with an undo toast is the runner-up for low risk settings a user flips often. Never ship a switch whose label names the control instead of the outcome. A reader must not open documentation to learn what on means.
+The instant-apply switch with an undo toast is the runner-up for low-risk settings you flip often. Never ship a switch whose label names the control instead of the outcome. You need no documentation to learn what on means.
 
 #### `a-switch-with-the-label-and-its-consequence`: A switch with the label and its consequence
 
@@ -1003,7 +1003,7 @@ page
 
 **Rationale:** The label says what is on and the line under it says what turning it off does, so the choice is reversible and stated.
 
-**Cost:** A switch has no pressed state on first paint, so a reader cannot tell what is currently on without looking twice. It carries no visible text.
+**Cost:** A switch has no pressed state on first paint, so you cannot tell what is currently on without looking twice. It carries no visible text.
 
 #### `a-checkbox-where-the-off-state-is-the-default`: A checkbox where the off state is the default
 
@@ -1023,9 +1023,9 @@ page
     text "Acme Supply, with its address and telephone number, as the law requires."
 ```
 
-**Rationale:** A checkbox rather than a switch, because the default is off and the action is to tick something. The GOV.UK wording phrases it as what ticking does. It does not phrase it as what the box is.
+**Rationale:** Use a checkbox rather than a switch, because the default is off and the action is to tick something. The GOV.UK wording phrases it as what ticking does. It does not phrase it as what the box is.
 
-**Cost:** A checkbox and a switch look nearly identical here, and readers conflate them. The difference has to be carried by the phrasing of the label.
+**Cost:** A checkbox and a switch look nearly identical here, and readers conflate them. The phrasing of the label has to carry the difference.
 
 **Reference:** GOV.UK
 
@@ -1047,9 +1047,9 @@ page
     text "On the 4th, with everything from the previous month."
 ```
 
-**Rationale:** Every setting as a checkbox with a consequence line. One control for the whole page, so nothing about the shape depends on whether the value happens to be on.
+**Rationale:** Every setting is a checkbox with a consequence line. One control for the whole page, so nothing about the shape depends on whether the value happens to be on.
 
-**Cost:** A reviewer cannot see at a glance which are on without reading the boxes. On a settings page with eight such settings that matters.
+**Cost:** You cannot see at a glance which are on without reading the boxes. On a settings page with eight such settings that matters.
 
 #### `two-options-where-the-difference-is-the-money`: Two options where the difference is the money
 
@@ -1075,7 +1075,7 @@ page
 
 **Rationale:** Settlement frequency is a choice between two money outcomes. It gets radio cards with the amount and the date on each. No switch hides the difference.
 
-**Cost:** Cards for a two-way choice is heavy, and the amounts are derived figures that have to be computed per company to stay honest.
+**Cost:** Cards for a two-way choice are heavy, and the amounts are derived figures that have to be computed per company to stay honest.
 
 #### `a-switch-that-is-refused-with-the-reason`: A switch that is refused, with the reason
 
@@ -1092,9 +1092,9 @@ page
     fact "The payment provider" "NL91 ABNA 0417 1643"
 ```
 
-**Rationale:** A setting the role cannot change, switched off and refused, with the reason in visible text. This is the explained-action pattern applied to a control rather than a button.
+**Rationale:** The setting is one the role cannot change: switched off and refused, with the reason in visible text. This is the explained-action pattern applied to a control rather than a button.
 
-**Cost:** A disabled switch with no value is a dead pixel to a reader who does not notice the reason. The reason has to sit directly under it, not at the foot of the section.
+**Cost:** A disabled switch with no value is a dead pixel if you do not notice the reason. The reason has to sit directly under it, not at the foot of the section.
 
 #### `a-switch-with-the-number-it-would-change`: A switch with the number it would change
 
@@ -1113,7 +1113,7 @@ page
     text "Advertise EUR 50.00 instead of EUR 45.00."
 ```
 
-**Rationale:** Where flipping the setting changes an amount, the amount is on the same line. The user reads the consequence before flipping rather than after.
+**Rationale:** Where flipping the setting changes an amount, the amount is on the same line. You read the consequence before flipping rather than after.
 
 **Cost:** A derived figure beside a control has to be current, which means a read that the switch itself depends on. It also puts a number on a page that was otherwise free of them.
 
@@ -1160,7 +1160,7 @@ page
     action primary "Save"
 ```
 
-**Rationale:** Slack draws a three-way notification choice as a segmented control, because the values are short, ordered, and all worth seeing at once. No menu hides the middle option the user wants.
+**Rationale:** Slack draws a three-way notification choice as a segmented control, because the values are short, ordered, and all worth seeing at once. No menu hides the middle option you want.
 
 **Cost:** Three labels have to fit the control, so the wording shortens until it almost stops meaning anything. A fourth option or a per-option description breaks the shape back into radios.
 
@@ -1168,7 +1168,7 @@ page
 
 ### Upload field
 
-**Question:** How does an Acme Supply record take a file. A logo needs a stated type and size. A customer import needs stated columns and row level refusals.
+**Question:** How does an Acme Supply record take a file. A logo needs a stated type and size. A customer import needs stated columns and row-level refusals.
 
 **Default:** `a-drop-zone-that-states-what-it-accepts`
 
@@ -1193,9 +1193,9 @@ page
     field "Banner description" text
 ```
 
-**Rationale:** The accepted types and the size limit in a sentence under the zone, so nobody discovers the limit by being refused.
+**Rationale:** The zone states the accepted types and the size limit in a sentence under it, so nobody discovers the limit by being refused.
 
-**Cost:** A drop zone invites a click anywhere, and a user who drops a file on the page outside the zone gets nothing at all. No affordance says where the zone is.
+**Cost:** A drop zone invites a click anywhere, and if you drop a file on the page outside the zone you get nothing at all. No affordance says where the zone is.
 
 #### `the-file-already-chosen-with-what-it-will-do`: The file already chosen, with what it will do
 
@@ -1215,9 +1215,9 @@ page
     message info "Saving replaces the logo customers see now. It reaches the customer screen within a minute."
 ```
 
-**Rationale:** After the choice, the row carries the file, its size and the consequence of saving. The old logo is replaced and customers see the new one within a minute.
+**Rationale:** After the choice, the row carries the file, its size, and the consequence of saving. The old logo is replaced and customers see the new one within a minute.
 
-**Cost:** A file that has been uploaded but not saved is a resource that exists and is not referenced. It needs a cleanup, or the storage fills with orphans.
+**Cost:** A file that has been uploaded but not saved is a resource that exists and is not referenced. It needs cleanup, or the storage fills with orphans.
 
 #### `a-csv-upload-that-states-its-columns-first`: A CSV upload that states its columns first
 
@@ -1238,7 +1238,7 @@ page
     action primary "Check the file"
 ```
 
-**Rationale:** For an import, the field states what it needs before anything is uploaded: the four column names, and a link to a template. The upload cannot be wrong about a format nobody told it.
+**Rationale:** For an import, the field states what it needs before anything is uploaded: the four column names and a link to a template. The upload cannot be wrong about a format nobody told it.
 
 **Cost:** Stating four columns above the zone is a paragraph of prose, and the layout contract keeps prose out of components. It belongs on the page beside the field, not inside it.
 
@@ -1258,9 +1258,9 @@ page
     action primary "Import the 1,988 good rows"
 ```
 
-**Rationale:** The file is refused for a reason the user can act on: row 412 has no email. A refusal that names a row is worth more than one that says invalid file.
+**Rationale:** The file is refused for a reason you can act on: row 412 has no email. A refusal that names a row is worth more than one that says "invalid file".
 
-**Cost:** Naming one row out of 2,000 needs the whole file read before answering. The upload is not instant and the user waits without knowing why.
+**Cost:** Naming one row out of 2,000 needs a read of the whole file before answering. The upload is not instant, and you wait without knowing why.
 
 #### `an-image-field-with-the-dimensions-stated`: An image field with the dimensions stated
 
@@ -1303,7 +1303,7 @@ page
     action primary "Open the list"
 ```
 
-**Rationale:** After an import, the page says what happened: how many rows became what, how many were refused and why. The user can undo it while nothing has been paid out.
+**Rationale:** After an import, the page says what happened: how many rows became what, how many were refused, and why. You can undo it while nothing has been paid out.
 
 **Cost:** A real import is a command whose effect spans many records, which the architecture reserves for a named exception. The report has to be a real read, not a summary of the session.
 
@@ -1328,7 +1328,7 @@ page
 
 **Rationale:** Dropbox and Google Drive report each file on its own row with its own bar and its own cancel, because two files never finish together. One bar for all would lie about both.
 
-**Cost:** A row per file is a list the page must manage: cancel one, remove one, retry one. For a single logo it is heavier than the one zone it replaces.
+**Cost:** A row per file is a list the page must manage: cancel one, remove one, and retry one. For a single logo it is heavier than the one zone it replaces.
 
 **Reference:** Dropbox
 
@@ -1349,7 +1349,7 @@ page
     text "A wide image across the top. 1600 by 700 pixels reads best."
 ```
 
-**Rationale:** GitHub and Notion take a drop anywhere on the editing surface. The target highlights while the file hovers, so the user never aims at a small box.
+**Rationale:** GitHub and Notion take a drop anywhere on the editing surface. The target highlights while the file hovers, so you never aim at a small box.
 
 **Cost:** A page that accepts drops everywhere must also refuse them precisely: a CSV over the logo box needs a refusal, not a silent nothing. Every surface needs its own accepted list.
 
@@ -1357,13 +1357,13 @@ page
 
 ### Reporting a refused submit
 
-**Question:** How does a form report a refused submit. GOV.UK asks for a summary with focus and links plus a message on each field. WCAG 3.3.1 and 3.3.3 sit underneath.
+**Question:** How does a form report a refused submit. GOV.UK asks for a summary with focus and links, plus a message on each field. WCAG 3.3.1 and 3.3.3 sit underneath.
 
 **Default:** `a-summary-above-the-form-plus-a-message-on-each-field`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the GOV.UK summary with focus plus per-field messages. It meets WCAG 3.3.1 and 3.3.3, and the links carry the reader to each field. Inline validation on blur is the runner-up as a complement, never a replacement. It confirms good values early but cannot orient a reader facing three errors. Never ship the dialog summary: it hides the form the reader must fix.
+**Rationale:** Keep the GOV.UK summary with focus, plus per-field messages. It meets WCAG 3.3.1 and 3.3.3, and the links carry you to each field. Inline validation on blur is the runner-up as a complement, never a replacement. It confirms good values early but cannot orient you facing three errors. Never ship the dialog summary: it hides the form you must fix.
 
 #### `a-summary-above-the-form-plus-a-message-on-each-field`: A summary above the form, plus a message on each field
 
@@ -1386,9 +1386,9 @@ page
     action primary "Create delivery"
 ```
 
-**Rationale:** The GOV.UK pattern in full. The summary comes first and receives focus, with each entry linking to its field. The field repeats the same wording so it reads the same out of context.
+**Rationale:** This is the GOV.UK pattern in full. The summary comes first and receives focus, with each entry linking to its field. The field repeats the same wording so it reads the same out of context.
 
-**Cost:** The wording now exists in two places per error, so it has to be generated once and used twice. Hand-written copies drift, and the drift is invisible.
+**Cost:** The wording exists in two places per error, so generate it once and use it twice. Hand-written copies drift, and the drift is invisible.
 
 **Reference:** GOV.UK
 
@@ -1411,9 +1411,9 @@ page
     action primary "Create delivery"
 ```
 
-**Rationale:** Each field carries its own message and nothing else. The reader sees the error where they have to fix it.
+**Rationale:** Each field carries its own message and nothing else. You see the error where you have to fix it.
 
-**Cost:** On a long form the first error may be below the fold. The reader submits, sees nothing change and concludes the button is broken. G139 exists precisely to jump to the errors.
+**Cost:** On a long form the first error may be below the fold. You submit, see nothing change, and conclude the button is broken. G139 exists to jump to the errors.
 
 #### `a-summary-in-a-dialog-above-the-form`: A summary in a dialog above the form
 
@@ -1434,9 +1434,9 @@ page
     action primary "Fix these"
 ```
 
-**Rationale:** The summary arrives as a dialog over the form, which cannot be scrolled past and cannot be missed, so the reader cannot submit again unaware.
+**Rationale:** The summary arrives as a dialog over the form, which cannot be scrolled past and cannot be missed, so you cannot submit again unaware.
 
-**Cost:** A dialog over a form breaks focus rules: a dialog never opens another layer, and a form is not a dialog. It also hides the form the reader has to fix.
+**Cost:** A dialog over a form breaks focus rules: a dialog never opens another layer, and a form is not a dialog. It also hides the form you have to fix.
 
 #### `a-summary-as-a-banner-above-the-page-not-the-form`: A summary as a banner above the page, not the form
 
@@ -1482,9 +1482,9 @@ page
     action primary "Create delivery"
 ```
 
-**Rationale:** The one field the command refused carries a message and everything else is untouched. The smallest response to a single refusal, which is what most refusals are.
+**Rationale:** The one field the command refused carries a message and everything else is untouched. It is the smallest response to a single refusal, which is what most refusals are.
 
-**Cost:** This common behavior meets WCAG 3.3.1 but not 3.3.3, because Invalid date names no field and says nothing about what to do.
+**Cost:** This common behavior meets WCAG 3.3.1 but not 3.3.3, because "Invalid date" names no field and says nothing about what to do.
 
 #### `the-refused-command-with-what-to-do-instead`: The refused command, with what to do instead
 
@@ -1505,7 +1505,7 @@ page
 
 **Rationale:** When a refusal is about the command rather than a field, it goes above the form as an alert. The alert carries the code sentence. Where the application can help, it states why it was refused and what resolves it.
 
-**Cost:** The refusal is not attached to anything the reader can click, so it explains rather than navigates. It suits a business rule, not a typo.
+**Cost:** The refusal is not attached to anything you can click, so it explains rather than navigates. It suits a business rule, not a typo.
 
 #### `validation-on-leaving-each-field`: Validation on leaving each field
 
@@ -1526,9 +1526,9 @@ page
     action primary "Create delivery"
 ```
 
-**Rationale:** Shopify Polaris and Stripe check a field on blur and mark it good or wrong where it sits. The user fixes one field and moves on. By the submit nothing is left to refuse.
+**Rationale:** Shopify Polaris and Stripe check a field on blur and mark it good or wrong where it sits. You fix one field and move on. By the submit nothing is left to refuse.
 
-**Cost:** A complement to the summary, never a replacement: with three errors and no summary the reader still cannot see them all at once. A check on blur fires while the form is half filled.
+**Cost:** It is a complement to the summary, never a replacement: with three errors and no summary you still cannot see them all at once. A check on blur fires while the form is half-filled.
 
 **Reference:** Shopify Polaris
 
@@ -1551,7 +1551,7 @@ page
 
 **Rationale:** TurboTax and Typeform ask one question per screen with nowhere else for an error to hide. The refusal sits under the only field on the page. A guided flow cannot submit with a field unseen.
 
-**Cost:** Four screens for four fields is the slowest form in this category, and a user who knows all four answers resents the pacing. It fits a first delivery. It does not fit the fortieth.
+**Cost:** Four screens for four fields is the slowest form in this category, and if you know all four answers you resent the pacing. It fits a first delivery. It does not fit the fortieth.
 
 **Reference:** Typeform
 
@@ -1563,7 +1563,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the visible unsaved marker beside Save. The reader never has to remember whether anything was typed. The sticky save bar is the runner-up for long settings pages where the form actions scroll out of view. Never ship silent autosave on money or access. Each save would be an audited command. An audit entry per keystroke batch is not a trail a reviewer can read.
+**Rationale:** Keep the visible unsaved marker beside Save. You never have to remember whether anything was typed. The sticky save bar is the runner-up for long settings pages where the form actions scroll out of view. Never ship silent autosave on money or access. Each save would be an audited command. An audit entry per keystroke batch is not a trail you can read.
 
 #### `a-visible-unsaved-marker-beside-the-save`: A visible unsaved marker beside the Save
 
@@ -1583,7 +1583,7 @@ page
     action primary "Save 2 changes"
 ```
 
-**Rationale:** The moment a field changes, the Save button carries the word Save changes and a note says what changed. The reader never has to remember whether they typed anything.
+**Rationale:** The moment a field changes, the Save button carries the word Save changes and a note says what changed. You never have to remember whether you typed anything.
 
 **Cost:** A note naming one changed field states a derived fact. It has to come from the form rather than the route. A Save that changes its own label moves under the pointer.
 
@@ -1607,7 +1607,7 @@ page
     action primary "Leave and lose both"
 ```
 
-**Rationale:** The Cloudcape rule confirms only when real data is at risk. It stays consistent about it, so the same dialog appears for a Cancel, a breadcrumb and a move away.
+**Rationale:** The Cloudcape rule confirms only when real data is at risk. It stays consistent about it, so the same dialog appears for a Cancel, a breadcrumb, and a move away.
 
 **Cost:** Every page with a form needs the same guard. The browser prompt cannot be worded, so the custom one and the native one both appear on a browser Back.
 
@@ -1626,9 +1626,9 @@ page
     text muted "Saved 4 seconds ago"
 ```
 
-**Rationale:** The form saves itself every few seconds and a quiet marker says Saved 4 seconds ago. Nothing is ever lost and no dialog is ever needed.
+**Rationale:** The form saves itself every few seconds and a quiet marker says "Saved 4 seconds ago". Nothing is ever lost and no dialog is ever needed.
 
-**Cost:** Autosave makes each save a command against money and access, which means an audit entry per keystroke batch. A past decision must stay reconstructable, and a trail of keystroke batches is not one a reviewer can read.
+**Cost:** Autosave makes each save a command against money and access, which means an audit entry per keystroke batch. A past decision must stay reconstructable, and a trail of keystroke batches is not one you can read.
 
 #### `a-draft-saved-and-left-on-the-server`: A draft, saved and left on the server
 
@@ -1646,7 +1646,7 @@ page
     action primary "Publish"
 ```
 
-**Rationale:** The state of the form is a draft the server holds. Leaving the page leaves the draft, and returning to it offers a carry on. GOV.UK asks for this where a long form may be completed over more than one sitting.
+**Rationale:** The state of the form is a draft the server holds. Leaving the page leaves the draft, and returning to it offers "Carry on". GOV.UK asks for this where a long form may be completed over more than one sitting.
 
 **Cost:** A draft is a second version of the record with its own name and its own rules about when it expires. It is a new aggregate, not a field on the form.
 
@@ -1670,9 +1670,9 @@ page
     action primary "Save the naming"
 ```
 
-**Rationale:** For a settings page where each change is independent, each section saves itself on its own Save and the header carries nothing. A reader who changes two areas can save each.
+**Rationale:** For a settings page where each change is independent, each section saves itself on its own Save and the header carries nothing. If you change two areas you can save each.
 
-**Cost:** Two Saves on one screen is the case where a reader edits one form and saves the other. The rule has to be one Save per page or one per section, never a mix.
+**Cost:** Two Saves on one screen is the case where you edit one form and save the other. The rule has to be one Save per page or one per section, never a mix.
 
 #### `a-read-only-form-because-the-state-forbids-it`: A read-only form because the state forbids it
 
@@ -1693,7 +1693,7 @@ page
 
 **Rationale:** Once the sale has opened, the price is a versioned fact and the field is read-only rather than a field with a save. Changing it is a different command with its own consequences.
 
-**Cost:** A read-only field with no command leaves the reader stuck, unless the command to change it is stated. The explained-action pattern exists for exactly this case.
+**Cost:** A read-only field with no command leaves you stuck, unless the command to change it is stated. The explained-action pattern exists for exactly this case.
 
 #### `a-save-bar-pinned-to-the-top-while-dirty`: A save bar pinned to the top while dirty
 
@@ -1714,7 +1714,7 @@ page
 
 **Rationale:** Shopify Polaris pins a contextual save bar to the top of a dirty form. Save and Discard never scroll out of reach on a long settings page. The bar appears with the first keystroke and leaves with the save.
 
-**Cost:** A pinned bar covers content on a phone and follows the reader past sections it has nothing to do with. It also needs the same dirty tracking as the marker, so it adds no new information, only reach.
+**Cost:** A pinned bar covers content on a phone and follows you past sections it has nothing to do with. It also needs the same dirty tracking as the marker, so it adds no new information, only reach.
 
 **Reference:** Shopify Polaris
 
@@ -1738,19 +1738,19 @@ page
     action primary "Save 2 changes"
 ```
 
-**Rationale:** Webflow and Figma mark each changed field with a dot and offer Revert beside it. The user keeps one change and drops another without retyping. The old value sits under the field as the honest fallback.
+**Rationale:** Webflow and Figma mark each changed field with a dot and offer Revert beside it. You keep one change and drop another without retyping. The old value sits under the field as the honest fallback.
 
-**Cost:** A dot plus a revert button per field adds two elements on every row of a long form. A reader who wants to keep everything still needs the page-level Save. It pays off only where partial saves are common.
+**Cost:** A dot plus a revert button per field adds two elements on every row of a long form. If you want to keep everything you still need the page-level Save. It pays off only where partial saves are common.
 
 **Reference:** Figma
 
 ### Picking a period
 
-**Question:** How does a reader pick a period for settlement or reporting. Two typed dates cover every window but ask for both edges. Presets cover the common windows in one tap.
+**Question:** How do you pick a period for settlement or reporting. Two typed dates cover every window but ask for both edges. Presets cover the common windows in one tap.
 
 **Default:** `two-date-inputs-with-presets`
 
-**Compact:** Below the md breakpoint the painted calendar shows one month. The second month of the window follows below it. The compact option is `a-calendar-with-the-range-painted`.
+**Compact:** Below the `md` breakpoint the painted calendar shows one month. The second month of the window follows below it. The compact option is `a-calendar-with-the-range-painted`.
 
 **Rationale:** Keep two typed dates with presets. One tap covers the common windows, typing covers the rare ones, and both edges stay visible. The two-month painted calendar is the runner-up for reporting screens where the window itself is the question. Never ship presets alone with no typed fallback: no preset reaches the launch to delivery window the settlement check wants.
 
@@ -1771,7 +1771,7 @@ page
     action primary "Show settlement"
 ```
 
-**Rationale:** The presets fill both fields and the user adjusts either edge by typing. The common windows cost one tap and the rare ones stay possible. The control that fills the fields and the fields that hold them are one unit.
+**Rationale:** The presets fill both fields and you adjust either edge by typing. The common windows cost one tap and the rare ones stay possible. The control that fills the fields and the fields that hold them are one unit.
 
 **Cost:** Two controls describe one value. The preset shows Custom the moment either date is edited, or the row claims a window it no longer holds.
 
@@ -1790,7 +1790,7 @@ page
     action primary "Show settlement"
 ```
 
-**Rationale:** One tap and no typing for the three windows a settlement check almost always wants. The resolved dates are shown back under the control so the preset is a promise the user can read.
+**Rationale:** One tap covers the three windows a settlement check almost always wants, with no typing. The resolved dates are shown back under the control so the preset is a promise you can read.
 
 **Cost:** No preset reaches a launch-anchored window like the launch to the delivery, so a custom range still needs a second control beside this one.
 
@@ -1812,7 +1812,7 @@ page
 
 **Rationale:** Settlement and tax reporting run by calendar month. Picking March 2026 in one control beats typing the first and the last day of the month by hand.
 
-**Cost:** A window that crosses a month edge, like the fortnight around the delivery, cannot be expressed. Whole months are the only shape this control draws.
+**Cost:** You cannot express a window that crosses a month edge, like the fortnight around the delivery. Whole months are the only shape this control draws.
 
 #### `open-start-rolling-window`: Open-start rolling window
 
@@ -1830,9 +1830,9 @@ page
     action primary "Show settlement"
 ```
 
-**Rationale:** Everything since the launch opened needs an end date only. The start is the opening and never moves. One field replaces two where the user cannot answer differently.
+**Rationale:** Everything since the launch opened needs an end date only. The start is the opening and never moves. One field replaces two where you cannot answer differently.
 
-**Cost:** An open start silently includes old test orders, so the resolved start must be shown back under the field. Without it the user cannot tell what the window holds.
+**Cost:** An open start silently includes old test orders, so the resolved start must be shown back under the field. Without it you cannot tell what the window holds.
 
 #### `refusal-when-the-end-precedes-the-start`: Refusal when the end precedes the start
 
@@ -1851,9 +1851,9 @@ page
     action primary "Show settlement"
 ```
 
-**Rationale:** An end before the start is refused where it was typed, in the GOV.UK template. The message names the field and says what to do. The summary above it says the same in one line.
+**Rationale:** The page refuses an end before the start where you typed it, in the GOV.UK template. The message names the field and says what to do. The summary above it says the same in one line.
 
-**Cost:** One more state to draw and to test. The refusal waits until both fields hold a date. It never fires while the user still types the second one.
+**Cost:** It is one more state to draw and to test. The refusal waits until both fields hold a date. It never fires while you still type the second one.
 
 **Reference:** GOV.UK
 
@@ -1877,7 +1877,7 @@ page
 
 **Rationale:** Each edge is a whole day in Europe/Amsterdam. An order placed at 22:41 on the delivery day falls inside the window that ends on that day. The boundary sentence is part of the control, not documentation beside it.
 
-**Cost:** The sentence must be read to work, and a user thinking in UTC sees different instants. Stating the zone once keeps it from being repeated under each field.
+**Cost:** The sentence must be read to work, and if you think in UTC you see different instants. Stating the zone once keeps it from being repeated under each field.
 
 #### `a-calendar-with-the-range-painted`: A calendar with the range painted
 
@@ -1916,9 +1916,9 @@ page
     action primary "Show settlement"
 ```
 
-**Rationale:** Airbnb and Google Flights paint the chosen range across the calendar, so the user sees the window instead of reading two dates. The endpoints stay readable as dates under the control.
+**Rationale:** Airbnb and Google Flights paint the chosen range across the calendar, so you see the window instead of reading two dates. The endpoints stay readable as dates under the control.
 
-**Cost:** A painted month shows one month, and the settlement window usually spans two. Two months side by side is the honest control, and it does not fit a phone.
+**Cost:** A painted month shows one month, and the settlement window usually spans two. Two months side by side are the honest control, and they do not fit a phone.
 
 **Reference:** Airbnb
 
@@ -1939,21 +1939,21 @@ page
     action primary "Show settlement"
 ```
 
-**Rationale:** Mixpanel and Amplitude anchor ranges to the milestones the business runs on, because last-30-days drifts while the launch stays fixed. The preset resolves to typed dates the user can still adjust.
+**Rationale:** Mixpanel and Amplitude anchor ranges to the milestones the business runs on, because `last-30-days` drifts while the launch stays fixed. The preset resolves to typed dates you can still adjust.
 
-**Cost:** Anchors multiply: launch, dispatch, close, settlement runs. Three anchors fit a control. Six need a picker of their own, and the window stops being one tap.
+**Cost:** Anchors multiply: launch, dispatch, close, and settlement runs. Three anchors fit a control. Six need a picker of their own, and the window stops being one tap.
 
 **Reference:** Mixpanel
 
 ### Slug or URL field with a preview
 
-**Question:** How does a product take the slug customers read. The slug is the short part typed in. The address is what customers read, link and print.
+**Question:** How does a product take the slug customers read. The slug is the short part typed in. The address is what customers read, link, and print.
 
 **Default:** `slug-with-the-live-address-under-it`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the slug with its live address under it. The user types the short part and reads the full address before saving. The transliteration from the name is the runner-up for creation, where typing the same words twice is pure overhead. Never ship an address that cannot be read before it is saved.
+**Rationale:** Keep the slug with its live address under it. You type the short part and read the full address before saving. The transliteration from the name is the runner-up for creation, where typing the same words twice is pure overhead. Never ship an address that cannot be read before it is saved.
 
 #### `slug-with-the-live-address-under-it`: Slug with the live address under it
 
@@ -1974,9 +1974,9 @@ page
     action primary "Save address"
 ```
 
-**Rationale:** Contentful and Shopify show the full address under the slug field and update it as the user types. The short value is never saved unseen. The copy command beside it is how the address leaves the back office.
+**Rationale:** Contentful and Shopify show the full address under the slug field and update it as you type. The short value is never saved unseen. The copy command beside it is how the address leaves the back office.
 
-**Cost:** The address must update as the user types, which a static mock cannot show. It also states the host the platform gives, which the user cannot change on this screen.
+**Cost:** The address must update as you type, which a static mock cannot show. It also states the host the platform gives, which you cannot change on this screen.
 
 **Reference:** Shopify
 
@@ -1999,7 +1999,7 @@ page
 
 **Rationale:** GitHub shows a repository address as a fact and puts Rename behind a command, because an address in use is depended upon. The 30-day redirect is what makes the change survivable.
 
-**Cost:** Two steps to change a value, and the redirect has to be a real behavior, not a sentence. A redirect nobody builds is a promise the page breaks.
+**Cost:** Changing a value takes two steps, and the redirect has to be a real behavior, not a sentence. A redirect nobody builds is a promise the page breaks.
 
 **Reference:** GitHub
 
@@ -2021,9 +2021,9 @@ page
     action primary "Create product"
 ```
 
-**Rationale:** WordPress builds the permalink from the title and lets the user edit it, because the name and the slug agree nine times in ten. Typing both by hand is the same words twice.
+**Rationale:** WordPress builds the permalink from the title and lets you edit it, because the name and the slug agree nine times in ten. Typing both by hand is the same words twice.
 
-**Cost:** The generated value must transliterate Dutch diacritics the way the user expects, and a renamed product must not silently re-slug. Generation runs once at creation, never again.
+**Cost:** The generated value must transliterate Dutch diacritics the way you expect, and a renamed product must not silently re-slug. Generation runs once at creation, never again.
 
 **Reference:** WordPress
 
@@ -2045,9 +2045,9 @@ page
     action primary "Save address"
 ```
 
-**Rationale:** Namecheap answers a taken domain with free alternatives, because a refusal without a next step sends the user back to guessing. The alternatives keep the shape of what was wanted.
+**Rationale:** Namecheap answers a taken domain with free alternatives, because a refusal without a next step sends you back to guessing. The alternatives keep the shape of what was wanted.
 
-**Cost:** The alternatives must be checked live, one by one, or the list offers addresses that fail the same way. Three checks per keystroke pause is a read the page has to budget for.
+**Cost:** The page must check the alternatives live, one by one, or the list offers addresses that fail the same way. Three checks per keystroke pause is a read the page has to budget for.
 
 **Reference:** Namecheap
 
@@ -2069,7 +2069,7 @@ page
     action primary "Save address"
 ```
 
-**Rationale:** The GOV.UK error template applied to a slug: the summary first, then the field, with the message naming what was entered and what to do. The rule is stated once and enforced the same way.
+**Rationale:** The GOV.UK error template applies to a slug. The summary comes first, then the field, with the message naming what was entered and what to do. The page states the rule once and enforces it the same way.
 
 **Cost:** The message repeats the value, which makes it longer than the field. It also has to name every offending character class, not the first one found.
 
@@ -2094,7 +2094,7 @@ page
     action primary "Verify"
 ```
 
-**Rationale:** Vercel and Webflow pair a domain field with the exact DNS record it needs, because the field alone is half the task. The record is stated as values to copy, not as prose to interpret.
+**Rationale:** Vercel and Webflow pair a domain field with the exact DNS record it needs, because the field alone is half the task. The page states the record as values to copy, not as prose to interpret.
 
 **Cost:** Verification is a read against DNS the back office does not control. The badge can only say what the last check found and when. A stale badge claims a state the world has left.
 
@@ -2150,7 +2150,7 @@ page
     text muted "Closed tiers keep their sold quantity but release nothing back."
 ```
 
-**Rationale:** Inventory draws as one row per tier with sold against cap, because the question is the stock, not the row. The leftover line is what the user came to read.
+**Rationale:** Inventory draws as one row per tier with sold against cap, because the question is the stock, not the row. The leftover line is what you came to read.
 
 **Cost:** A row per tier is a table wearing a list costume, and at twelve tiers it needs the table back. Editing still jumps to one tier at a time.
 
@@ -2197,7 +2197,7 @@ page
     action primary "Save hold"
 ```
 
-**Rationale:** Holds are a percentage of the stock kept for the trade counter, restated as units so the user reads both. A percentage survives a stock change. A count does not.
+**Rationale:** Holds are a percentage of the stock kept for the trade counter, restated as units so you read both. A percentage survives a stock change. A count does not.
 
 **Cost:** Two numbers describe one hold, and they round differently: 5% of 10,000 is 500 until the stock becomes 9,999. The units win and the percentage follows.
 
@@ -2219,7 +2219,7 @@ page
     action primary "Save capacity"
 ```
 
-**Rationale:** The refusal is worded on screen, with the field carrying the same message. GOV.UK names the field and says what to do, and the numbers supply the overage. The user reads the overage, not the rule alone.
+**Rationale:** The refusal is worded on screen, with the field carrying the same message. GOV.UK names the field and says what to do, and the numbers supply the overage. You read the overage, not the rule alone.
 
 **Cost:** The message must recompute the overage for every value, and a value that breaks two rules needs two messages. One refusal per field keeps it readable.
 
@@ -2245,15 +2245,15 @@ page
     action primary "Save capacity"
 ```
 
-**Rationale:** Stripe draws an available balance as a fact beside the controls that move it: sold is what happened, the cap is what the user decides. The two must never share a field.
+**Rationale:** Stripe draws an available balance as a fact beside the controls that move it: sold is what happened, the cap is what you decide. The two must never share a field.
 
-**Cost:** Three figures plus a field for one decision, and the derived Left line must update as the cap is typed. It is the most screen per field in this item.
+**Cost:** Three figures plus a field for one decision, and the derived Left line must update as you type the cap. It is the most screen per field in this item.
 
 **Reference:** Stripe
 
 ### Color field for the storefront accent
 
-**Question:** The company brands its storefront with one accent color: a #RRGGBB value dark enough for white button text to read on it. The field takes the value and proves the contrast before it is refused.
+**Question:** The company brands its storefront with one accent color: a `#RRGGBB` value dark enough for white button text to read on it. The field takes the value and proves the contrast before the page refuses it.
 
 **Default:** `hex-field-with-a-swatch-and-a-contrast-readout`
 
@@ -2280,9 +2280,9 @@ page
     action primary "Save accent"
 ```
 
-**Rationale:** Shopify theme editor pairs a hex field with a swatch and the rule it passes. A color value means nothing until it is seen. The readout repeats the validation rule, so the user is told before the request rather than after it.
+**Rationale:** Shopify theme editor pairs a hex field with a swatch and the rule it passes. A color value means nothing until it is seen. The readout repeats the validation rule, so you learn it before the request rather than after it.
 
-**Cost:** The ratio must recompute as the user types, and an unfinished value has no ratio to state. Six characters that are not yet a color need patience, not a refusal.
+**Cost:** The ratio must recompute as you type, and an unfinished value has no ratio to state. Six characters that are not yet a color need patience, not a refusal.
 
 **Reference:** Shopify
 
@@ -2310,9 +2310,9 @@ page
     action primary "Save accent"
 ```
 
-**Rationale:** Slack and Notion offer a row of presets that all satisfy the rule, with a custom field for the user who knows better. One tap covers the common case and cannot produce a failing color.
+**Rationale:** Slack and Notion offer a row of presets that all satisfy the rule, with a custom field for you when you know better. One tap covers the common case and cannot produce a failing color.
 
-**Cost:** Six presets cannot hold a brand color, so the custom field carries the real work anyway. And a preset row that never changes starts to look like the whole choice.
+**Cost:** Six presets cannot hold a brand color, so the custom field carries the real work anyway, and a preset row that never changes starts to look like the whole choice.
 
 **Reference:** Slack
 
@@ -2340,9 +2340,9 @@ page
     action primary "Save accent"
 ```
 
-**Rationale:** Mailchimp previews a brand color on the button the customer presses, because a ratio is believed once it is seen. The user reads white on #1F2937 instead of reading 14.7:1.
+**Rationale:** Mailchimp previews a brand color on the button the customer presses, because a ratio is believed once it is seen. You read white on `#1F2937` instead of reading `14.7:1`.
 
-**Cost:** A preview is a second surface to keep honest. It shows the typed value, not the saved one, and updates as the user types. A stale preview proves nothing.
+**Cost:** A preview is a second surface to keep honest. It shows the typed value, not the saved one, and updates as you type. A stale preview proves nothing.
 
 **Reference:** Mailchimp
 
@@ -2366,9 +2366,9 @@ page
     action primary "Save accent"
 ```
 
-**Rationale:** The browser native color well is the only picker that costs no code. One input holds the platform dialog and a hex the user can still type. MDN documents it as the accessible default.
+**Rationale:** The browser native color well is the only picker that costs no code. One input holds the platform dialog and a hex you can still type. MDN documents it as the accessible default.
 
-**Cost:** The well draws the browser chrome instead of the back-office control. It renders differently everywhere, which is the same charge the native date input faces. It also offers colors that fail 4.5:1 without saying so.
+**Cost:** The well draws the browser chrome instead of the back-office control. It renders differently everywhere, which is the same charge the native date input faces. It also offers colors that fail `4.5:1` without saying so.
 
 **Reference:** MDN
 
@@ -2389,9 +2389,9 @@ page
     action primary "Save accent"
 ```
 
-**Rationale:** The validation rule worded on screen in the GOV.UK template: the message names the value, states both ratios, and says what to do. The user learns the rule from the refusal, not from documentation.
+**Rationale:** The validation rule appears worded on screen in the GOV.UK template. The message names the value, states both ratios, and says what to do. You learn the rule from the refusal, not from documentation.
 
-**Cost:** A refusal that only says darker leaves the user guessing how much darker. It earns its place fully only beside presets that all pass.
+**Cost:** A refusal that only says darker leaves you guessing how much darker. It earns its place fully only beside presets that all pass.
 
 **Reference:** GOV.UK
 
@@ -2412,13 +2412,13 @@ page
 
 **Rationale:** Figma variables inherit down the tree and override at one level. The source stays named, so a product can differ without hiding where its value came from. The company default stays the decider.
 
-**Cost:** An inherited value with an override is two values and a rule about which wins. A reader who never opens this screen cannot tell which products differ.
+**Cost:** An inherited value with an override is two values and a rule about which wins. If you never open this screen you cannot tell which products differ.
 
 **Reference:** Figma
 
 ### Repeatable group for price tiers
 
-**Question:** The Oak desk lamp sells in Standard, Trade and Bulk: three groups with the same fields, each with its own name, price and allocation. The group repeats, and the stock counts every repetition.
+**Question:** The Oak desk lamp sells in Standard, Trade, and Bulk: three groups with the same fields, each with its own name, price, and allocation. The group repeats, and the stock counts every repetition.
 
 **Default:** `stacked-cards-one-per-type`
 
@@ -2442,9 +2442,9 @@ page
     action primary "Save order"
 ```
 
-**Rationale:** Shopify draws product variants as one row per variant with its price readable at once, because the user compares repetitions before editing one. Sold tiers stay visible but lose their Remove.
+**Rationale:** Shopify draws product variants as one row per variant with its price readable at once, because you compare repetitions before editing one. Sold tiers stay visible but lose their Remove.
 
-**Cost:** A row shows the price but hides the dates, the discount rule and the description, so editing still opens each tier. The list answers what, never why.
+**Cost:** A row shows the price but hides the dates, the discount rule, and the description, so editing still opens each tier. The list answers what, never why.
 
 **Reference:** Shopify
 
@@ -2510,7 +2510,7 @@ page
     action primary "Save tiers"
 ```
 
-**Rationale:** GOV.UK add-another repeats the full group once per entry with its own remove. Each repetition deserves the same labels, help and errors as the first. Nothing about tier 2 is abbreviated.
+**Rationale:** GOV.UK `add-another` repeats the full group once per entry with its own remove. Each repetition deserves the same labels, help, and errors as the first. Nothing about tier 2 is abbreviated.
 
 **Cost:** Three full groups make a long page, and the stock total has nowhere to sit. It fits creation, where each tier is new. It drags for review, where each tier is known.
 
@@ -2533,7 +2533,7 @@ page
     action primary "Save steps"
 ```
 
-**Rationale:** A launch tiers its prices by date, because early customers pay less for committing first. The dates are part of each step, so the price on any day is answered by reading one row.
+**Rationale:** A launch tiers its prices by date, because early customers pay less for committing first. The dates are part of each step, so you answer the price on any day by reading one row.
 
 **Cost:** Dated steps plus per-tier allocations divide one stock in two ways. They can disagree. A step can close with units left, or sell out with days left. One of the two has to win.
 
@@ -2555,7 +2555,7 @@ page
 
 **Rationale:** Linear and Trello order by dragging with button equivalents beside each row, because drag alone strands keyboard users. The customer order is numbered, so the back-office order and the storefront order cannot drift apart silently.
 
-**Cost:** Order is one more field per tier with its own conflicts: two users reordering at once, and a tier added in the middle. It needs the same version check as every shared write.
+**Cost:** Order is one more field per tier with its own conflicts: two people reordering at once, and a tier added in the middle. It needs the same version check as every shared write.
 
 **Reference:** Linear
 
@@ -2578,7 +2578,7 @@ page
 
 **Rationale:** The refusal sits above the group and names the offending row below it. GOV.UK puts the summary first and the message on the field. Here the field is a row. Standard carries the overage because Standard grew last.
 
-**Cost:** Blaming one row for a stock total is a guess the page makes about intent: the user may sooner cut Bulk than Standard. The message must offer both, not decide.
+**Cost:** Blaming one row for a stock total is a guess the page makes about intent: you may sooner cut Bulk than Standard. The message must offer both, not decide.
 
 **Reference:** GOV.UK
 
@@ -2590,7 +2590,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The chips with type-to-add and suggestions are the pick: new words are allowed and old ones are offered, so oak is spelled once. The checkbox list is the runner-up where the tag set is closed and counted. Never ship free text with no suggestions: it grows oak, Oak and oak-desk side by side.
+**Rationale:** The chips with type-to-add and suggestions are the pick: new words are allowed and old ones are offered, so `oak` is spelled once. The checkbox list is the runner-up where the tag set is closed and counted. Never ship free text with no suggestions: it grows `oak`, `Oak`, and `oak-desk` side by side.
 
 #### `chips-with-type-to-add-and-suggestions`: Chips with type-to-add and suggestions
 
@@ -2616,9 +2616,9 @@ page
     text "Use tra as a new tag"
 ```
 
-**Rationale:** GitHub and Linear offer existing labels as the user types. They accept a new word on Enter, so the old spelling wins without forbidding the new one. The count beside each suggestion says how shared it is.
+**Rationale:** GitHub and Linear offer existing labels as you type. They accept a new word on Enter, so the old spelling wins without forbidding the new one. The count beside each suggestion says how shared it is.
 
-**Cost:** Suggestions must search across every product on every keystroke pause, and a slow search answers after the user has already pressed Enter. The new word wins by timing, not by choice.
+**Cost:** Suggestions must search across every product on every keystroke pause, and a slow search answers after you have already pressed Enter. The new word wins by timing, not by choice.
 
 **Reference:** GitHub
 
@@ -2653,7 +2653,7 @@ page
 
 **Rationale:** Shopify and Jira draw a closed tag set as checkboxes with a count on the button. Ticking is faster than typing when the words already exist. Managing the list is a separate task with its own dialog.
 
-**Cost:** A closed set cannot take a new word where it is needed, so the user leaves the form to make one. It fits a governed vocabulary. It fights a growing one.
+**Cost:** A closed set cannot take a new word where it is needed, so you leave the form to make one. It fits a governed vocabulary. It fights a growing one.
 
 **Reference:** Shopify
 
@@ -2680,7 +2680,7 @@ page
 
 **Rationale:** Stack Overflow and WordPress take tags as one comma-separated line with the parsed chips read back below. Pasting a list from elsewhere works without retyping. The readout is what makes the parsing honest.
 
-**Cost:** No suggestions means no shared spelling: oak and Oak become two tags and nobody is told. The readout shows the split but cannot judge the words.
+**Cost:** No suggestions means no shared spelling: `oak` and `Oak` become two tags and nobody is told. The readout shows the split but cannot judge the words.
 
 **Reference:** WordPress
 
@@ -2731,9 +2731,9 @@ page
     action primary "Save tags"
 ```
 
-**Rationale:** The GOV.UK error template on the tag being added: the good chips stay and the bad word carries the message. The rule is stated with the value that broke it.
+**Rationale:** The GOV.UK error template applies to the tag being added. The good chips stay and the bad word carries the message. The rule is stated with the value that broke it.
 
-**Cost:** The message judges one word while the field holds a list, so the user must tell which word failed. The chips above carry that by staying put.
+**Cost:** The message judges one word while the field holds a list, so you must tell which word failed. The chips above carry that by staying put.
 
 **Reference:** GOV.UK
 
@@ -2758,21 +2758,21 @@ page
     action primary "Save tags"
 ```
 
-**Rationale:** HubSpot shows inherited properties with their source beside the local ones. A tier page answers the whole label set without hiding where each word came from. Removing an inherited word is refused by pointing at its source.
+**Rationale:** HubSpot shows inherited properties with their source beside the local ones. A tier page answers the whole label set without hiding where each word came from. The page refuses removing an inherited word by pointing at its source.
 
-**Cost:** Two lists where one was expected, and the inherited one cannot be edited here. A reader who wants the tier untagged must walk up the tree.
+**Cost:** The page shows two lists where one was expected, and the inherited one cannot be edited here. If you want the tier untagged you must walk up the tree.
 
 **Reference:** HubSpot
 
 ### Address field
 
-**Question:** Acme Supply answers for its orders with a name, an address and a telephone number on every customer message. The address field takes the street the law asks for and the postcode the mail needs.
+**Question:** Acme Supply answers for its orders with a name, an address, and a telephone number on every customer message. The address field takes the street the law asks for and the postcode the mail needs.
 
 **Default:** `postcode-lookup-that-fills-the-street`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The postcode lookup is the pick: two short values the user knows produce the street they would mistype. The country-first manual entry is the runner-up for companies outside the lookup coverage. Never ship a single free-text address box: one line cannot be split into street, postcode and city again.
+**Rationale:** The postcode lookup is the pick: two short values you know produce the street you would mistype. The country-first manual entry is the runner-up for companies outside the lookup coverage. Never ship a single free-text address box: one line cannot be split into street, postcode, and city again.
 
 #### `postcode-lookup-that-fills-the-street`: Postcode lookup that fills the street
 
@@ -2796,9 +2796,9 @@ page
     action primary "Save address"
 ```
 
-**Rationale:** Postcode.nl and GOV.UK ask for postcode plus number first, because the user knows both by heart. The lookup then fills the street the user would mistype. Two short fields beat one long one.
+**Rationale:** Postcode.nl and GOV.UK ask for postcode plus number first, because you know both by heart. The lookup then fills the street you would mistype. Two short fields beat one long one.
 
-**Cost:** The lookup covers the Netherlands and nowhere else, so every other country falls back to manual entry. Two paths through one field is two paths to test.
+**Cost:** The lookup covers the Netherlands and nowhere else, so every other country falls back to manual entry. Two paths through one field are two paths to test.
 
 **Reference:** GOV.UK
 
@@ -2821,9 +2821,9 @@ page
     link "Type the address by hand instead"
 ```
 
-**Rationale:** Google Places resolves a half-typed street to a full address, because the user knows where they are but not how the database spells it. One field holds the whole search.
+**Rationale:** Google Places resolves a half-typed street to a full address, because you know where you are but not how the database spells it. One field holds the whole search.
 
-**Cost:** An address search reads a provider the back office pays per keystroke, and a wrong first result is chosen without reading. The manual fallback must stay one tap away.
+**Cost:** An address search reads a provider the back office pays per keystroke, and you may choose a wrong first result without reading. The manual fallback must stay one tap away.
 
 **Reference:** Google Places
 
@@ -2849,7 +2849,7 @@ page
 
 **Rationale:** Stripe Checkout asks for the country first because the shape of an address follows it: a Dutch postcode is nothing like a German one. The labels and the validation change with the country.
 
-**Cost:** Every supported country needs its own shape, its own labels and its own validation. Three countries fit this pattern. Thirty need a library.
+**Cost:** Every supported country needs its own shape, its own labels, and its own validation. Three countries fit this pattern. Thirty need a library.
 
 **Reference:** Stripe
 
@@ -2871,7 +2871,7 @@ page
     action primary "Save address"
 ```
 
-**Rationale:** The warehouse is pinned on a map beside its address, because drivers navigate to a pin, not to a street name. The pin is placed by the company, not guessed from the postcode.
+**Rationale:** The warehouse is pinned on a map beside its address, because drivers navigate to a pin, not to a street name. The company places the pin instead of guessing it from the postcode.
 
 **Cost:** A map is a third-party surface with its own terms and its own load time. A static pin box proves the pattern. The live map is a dependency, not a field.
 
@@ -2894,7 +2894,7 @@ page
     action primary "Save address"
 ```
 
-**Rationale:** The GOV.UK error template on a postcode states the shape and gives the example. The user repairs 1011 without opening a second page. The example is the company postcode.
+**Rationale:** The GOV.UK error template on a postcode states the shape and gives the example. You repair 1011 without opening a second page. The example is the company postcode.
 
 **Cost:** The shape differs per country, so the message must follow the country field. A Dutch message under a Belgian address refuses a value that was right.
 
@@ -2917,19 +2917,19 @@ page
     action "Change the address"
 ```
 
-**Rationale:** Banks and company registers show a verified address as a fact with a change command. A verified value is depended upon by payouts and invoices. The badge states what the last check found.
+**Rationale:** Banks and company registers show a verified address as a fact with a change command. Payouts and invoices depend on a verified value. The badge states what the last check found.
 
 **Cost:** Verification is a check against a register the back office does not hold, so the badge can only age. A move the company forgets to report leaves a true badge on a false address.
 
 ### Email body editor
 
-**Question:** Acme Supply mails every customer when goods are dispatched, and the message carries the customer name, the order number and the delivery window. The editor takes the company words once and fills the customer facts per order.
+**Question:** Acme Supply mails every customer when goods are dispatched, and the message carries the customer name, the order number, and the delivery window. The editor takes the company words once and fills the customer facts per order.
 
 **Default:** `subject-plus-body-with-variable-chips`
 
-**Compact:** The preview sits below the editor. The user scrolls between writing and reading. The compact option is `side-by-side-preview-of-the-customer-message`.
+**Compact:** The preview sits below the editor. You scroll between writing and reading. The compact option is `side-by-side-preview-of-the-customer-message`.
 
-**Rationale:** The subject plus body with variable chips is the pick: the user writes the sentence and places the facts where they belong. The side-by-side customer preview is the runner-up beside it, because a template is believed once it is seen filled. Never ship a template with no preview: variables are spelled in one place and filled in another, and only the filled copy proves they meet.
+**Rationale:** The subject plus body with variable chips is the pick: you write the sentence and place the facts where they belong. The side-by-side customer preview is the runner-up beside it, because a template is believed once it is seen filled. Never ship a template with no preview: variables are spelled in one place and filled in another, and only the filled copy proves they meet.
 
 #### `subject-plus-body-with-variable-chips`: Subject plus body with variable chips
 
@@ -2953,9 +2953,9 @@ page
     action primary "Save message"
 ```
 
-**Rationale:** Klaviyo and Mailchimp draw template variables as chips inside the sentence, because a variable is a word with a value, not code. The user reads the message as the customer will, with the facts marked.
+**Rationale:** Klaviyo and Mailchimp draw template variables as chips inside the sentence, because a variable is a word with a value, not code. You read the message as the customer will, with the facts marked.
 
-**Cost:** Chips inside an editable body are a small rich-text editor, not a textarea. Backspace across a chip, paste with chips, and undo all need answers. The plain-text option exists for that reason.
+**Cost:** Chips inside an editable body are a small rich-text editor, not a `textarea`. Backspace across a chip, paste with chips, and undo all need answers. The plain-text option exists for that reason.
 
 **Reference:** Mailchimp
 
@@ -2983,7 +2983,7 @@ page
 
 **Rationale:** Postmark and SendGrid preview a template beside the editor with a real record filled in, because a variable is only proven by its value. The order of Maria Garcia fills every variable this template holds.
 
-**Cost:** Two columns collapse to one on a phone, so the preview sits below the editor and the user scrolls between them. A long template makes a long round trip.
+**Cost:** Two columns collapse to one on a phone, so the preview sits below the editor and you scroll between them. A long template makes a long round trip.
 
 **Reference:** Postmark
 
@@ -3009,9 +3009,9 @@ page
     action primary "Save message"
 ```
 
-**Rationale:** GOV.UK Notify writes templates as plain text with ((double bracket)) variables and lists each one beside the editor with an example value. Nothing about the message can break in a mail client that reads text.
+**Rationale:** GOV.UK Notify writes templates as plain text with `((double bracket))` variables and lists each one beside the editor with an example value. Nothing about the message can break in a mail client that reads text.
 
-**Cost:** Double brackets are learned, not guessed: ((delivery window)) with one bracket fails silently or loudly depending on the parser. The editor must highlight what it recognizes as you type.
+**Cost:** Double brackets are learned, not guessed: `((delivery window))` with one bracket fails silently or loudly depending on the parser. The editor must highlight what it recognizes as you type.
 
 **Reference:** GOV.UK
 
@@ -3032,9 +3032,9 @@ page
     action primary "Save message"
 ```
 
-**Rationale:** Contentful and Shopify Translate keep one tab per locale with the missing ones badged. A customer reads exactly one language, and the user knows which ones exist. The badge names the gap instead of hiding it.
+**Rationale:** Contentful and Shopify Translate keep one tab per locale with the missing ones badged. A customer reads exactly one language, and you know which ones exist. The badge names the gap instead of hiding it.
 
-**Cost:** Two tabs is two templates to keep in step. A variable added to one is added to the other. The Dutch sentence grows while the English one waits. Tabs hide the drift they also cause.
+**Cost:** Two tabs are two templates to keep in step. A variable added to one is added to the other. The Dutch sentence grows while the English one waits. Tabs hide the drift they also cause.
 
 **Reference:** Shopify
 
@@ -3081,7 +3081,7 @@ page
     action "Resend"
 ```
 
-**Rationale:** Postmark activity keeps the sent copy with every variable filled. A dispute about what the customer was told is settled by reading what was sent. The record is read-only: history does not take edits.
+**Rationale:** Postmark activity keeps the sent copy with every variable filled. Reading what was sent settles a dispute about what the customer was told. The record is read-only: history does not take edits.
 
 **Cost:** A copy per sending is storage that grows with every order, and each copy holds personal data under retention rules. The record must expire with the order, not live beside it.
 

@@ -2,13 +2,13 @@
 
 ## Intent
 
-A list or a table shows many records of one kind, so a reader can find, compare and act on them. These patterns answer how columns, sorting, filters, selection, paging and the states of a table behave. Each pattern offers drawn options and names a default.
+A list or a table shows many records of one kind, so a reader can find, compare, and act on them. These patterns answer how columns, sorting, filters, selection, paging, and the states of a table behave. Each pattern offers drawn options and names a default.
 
 ## Standards
 
 ### Keep a list's view in its address
 
-**Requirement:** A list MUST keep its filters, sort order and page in the URL.
+**Requirement:** A list MUST keep its filters, sort order, and page in the URL.
 
 **Rationale:** A reader who opens a record and comes back finds the same view. A colleague who receives the link sees the same rows.
 
@@ -22,13 +22,13 @@ A list or a table shows many records of one kind, so a reader can find, compare 
 
 ### Choosing the columns
 
-**Question:** Which columns does an orders table show. The reader chooses rows by order, customer, date, state and money. The delivery rides under the order code.
+**Question:** Which columns does an orders table show. The reader chooses rows by order, customer, date, state, and money. The delivery rides under the order code.
 
 **Default:** `five-columns-nothing-removable`
 
-**Compact:** The recommended option reflows below md. One column, header actions under the title, and a table scrolls inside its own region.
+**Compact:** The recommended option reflows below `md`. One column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the default five columns. They answer which order, who, when, what state and how much. The runner-up is the Columns popover. Add it once more than one team asks for a sixth fact such as method or channel.
+**Rationale:** Keep the default five columns. They answer which order, who, when, what state, and how much. The runner-up is the Columns popover. Add it once more than one team asks for a sixth fact such as method or channel.
 
 Saved views are the later answer, when finance and the warehouse want different tables. Never ship the question-shaped headers. They cost width and read as a form.
 
@@ -51,7 +51,7 @@ page
     action quiet "Next ›"
 ```
 
-**Rationale:** The default set. Five columns is what fits 1440 without scrolling and covers the four questions: which order, who, when, what state, what money.
+**Rationale:** The default set. Five columns is what fits 1440 without scrolling and covers the four questions: which order, who, when, what state, and what money.
 
 **Cost:** Nothing can be dropped or added. A team that wants the delivery as its own column, or that hides the email, has no way to get there.
 
@@ -113,7 +113,7 @@ page
     action quiet "Next ›"
 ```
 
-**Rationale:** The Columns control opens a list of every column with a checkbox, a drag handle and a Reset to default. The reader sees what they are looking at rather than picking from memory.
+**Rationale:** The Columns control opens a list of every column with a checkbox, a drag handle, and a Reset to default. The reader sees what they are looking at rather than picking from memory.
 
 **Cost:** Two panes, so the table is squeezed while the chooser is open. A popover narrow enough to fit beside the button avoids that.
 
@@ -243,7 +243,7 @@ page
     action quiet "Reset to default"
 ```
 
-**Rationale:** The Columns control opens a popover with every column, a checkbox each and Reset to default. The order column is always shown and says so. This is the shadcn/ui data-table view-options menu, and Linear Display panel works the same way.
+**Rationale:** The Columns control opens a popover with every column, a checkbox each, and Reset to default. The order column is always shown and says so. This is the shadcn/ui data-table view-options menu, and Linear Display panel works the same way.
 
 **Cost:** The popover covers the table while it is open, and drag-to-reorder inside it is a second feature that most back-office users would never find.
 
@@ -270,9 +270,9 @@ page
     action quiet "Next ›"
 ```
 
-**Rationale:** HubSpot and Linear tie a column set to a saved view. All orders keeps the default five, Finance swaps in method, paid and refunded, and Dispatch list shows customer, delivery and lines. Each role opens the table it needs, and a support reply can name the view.
+**Rationale:** HubSpot and Linear tie a column set to a saved view. All orders keep the default five, Finance swaps in method, paid, and refunded, and Dispatch list shows customer, delivery, and lines. Each role opens the table it needs, and a support reply can name the view.
 
-**Cost:** Views are a feature with its own lifecycle: who creates one, whether shared, and what follows when a column retires. Too much for a first release.
+**Cost:** Views are a feature with their own lifecycle: who creates one, whether shared, and what follows when a column retires. Too much for a first release.
 
 **Reference:** HubSpot
 
@@ -503,7 +503,7 @@ page
 
 **Default:** `one-filter-per-category-visible`
 
-**Compact:** The recommended option reflows below md. One column, header actions under the title, and a table scrolls inside its own region.
+**Compact:** The recommended option reflows below `md`. One column, header actions under the title, and a table scrolls inside its own region.
 
 **Rationale:** Show one visible control per category. A reader sees what can narrow the table without opening anything, and each category keeps its own control. The runner-up is faceted buttons with counts. Prefer it once a category holds more than a few values and the reader needs the split before choosing.
 
@@ -532,7 +532,7 @@ page
     action quiet "Next ›"
 ```
 
-**Rationale:** Delivery, state, date and channel each get their own control in one row. No menu holds more than one category, so a reader can see what is available without opening anything.
+**Rationale:** Delivery, state, date, and channel each get their own control in one row. No menu holds more than one category, so a reader can see what is available without opening anything.
 
 **Cost:** Four controls plus a search box is a wide toolbar. Below about 700 pixels they have to wrap or collapse, which is where the complexity moves.
 
@@ -767,15 +767,15 @@ page
     action quiet "Next ›"
 ```
 
-**Rationale:** Linear states each condition as a chip with its field, its operator and its value, and the chip removes itself. A compound filter reads as a sentence, and clearing one condition never touches the others.
+**Rationale:** Linear states each condition as a chip with its field, its operator, and its value, and the chip removes itself. A compound filter reads as a sentence, and clearing one condition never touches the others.
 
-**Cost:** Chips wrap to several rows on a narrow screen. Building a condition needs a field menu, an operator menu and a value menu in sequence.
+**Cost:** Chips wrap to several rows on a narrow screen. Building a condition needs a field menu, an operator menu, and a value menu in sequence.
 
 **Reference:** Linear
 
 ### Row density
 
-**Question:** How tall is a row in an orders table. Carbon defines five heights from 24 to 64 pixels, and the header, toolbar and pagination match the row size. The default table runs near 47 pixels per row, between md and lg.
+**Question:** How tall is a row in an orders table. Carbon defines five heights from 24 to 64 pixels, and the header, toolbar, and pagination match the row size. The default table runs near 47 pixels per row, between `md` and `lg`.
 
 **Default:** `40-pixels-the-default`
 
@@ -804,7 +804,7 @@ page
     action quiet "Next ›"
 ```
 
-**Rationale:** Carbon md default. Two lines of text fit and the row scans.
+**Rationale:** Carbon `md` default. Two lines of text fit and the row scans.
 
 **Cost:** Twenty-five rows is 1000 pixels, so a 268-row table is eleven screens. Fine for browsing, slow for counting.
 
@@ -830,7 +830,7 @@ page
     action quiet "Next ›"
 ```
 
-**Rationale:** Carbon xs. One line per row, so the eye can travel straight down a column. The right choice for a queue a back-office user works through rather than reads.
+**Rationale:** Carbon `xs`. One line per row, so the eye can travel straight down a column. The right choice for a queue a back-office user works through rather than reads.
 
 **Cost:** One line means the delivery name and the customer email have nowhere to go. Both have to be dropped or opened from the row.
 
@@ -856,7 +856,7 @@ page
     action quiet "Next ›"
 ```
 
-**Rationale:** Carbon sm. Enough for a badge and one line, which covers a working table where every row gets an action.
+**Rationale:** Carbon `sm`. Enough for a badge and one line, which covers a working table where every row gets an action.
 
 **Cost:** A two-line cell such as order number over delivery name does not fit, so the delivery has to become a column or drop.
 
@@ -997,7 +997,7 @@ page
 
 **Default:** `a-bar-above-the-table-naming-the-count`
 
-**Compact:** The recommended option reflows below md. One column, header actions under the title, and a table scrolls inside its own region.
+**Compact:** The recommended option reflows below `md`. One column, header actions under the title, and a table scrolls inside its own region.
 
 **Rationale:** Keep a bar above the table naming the count and the money. On a refunds page the total is the thing a reader checks before acting. The runner-up is a floating pill, for reversible bulk work such as resending confirmations or tagging, where the bar leaves the table in place.
 
@@ -1701,7 +1701,7 @@ page
 
 **Rationale:** Skeleton rows shaped like real rows at the real height, so nothing shifts when the data lands. Carbon asks for skeletons rather than a spinner over the body.
 
-**Cost:** Carbon also requires the header, the toolbar and the pagination to match the row size. A skeleton page has to get all four heights right or it jitters.
+**Cost:** Carbon also requires the header, the toolbar, and the pagination to match the row size. A skeleton page has to get all four heights right or it jitters.
 
 **Reference:** Carbon
 
@@ -2268,7 +2268,7 @@ page
       item: text "7K4Q2M" · text "Maria Garcia" · text "8 Oct 09:32" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** The Print button opens the browser print path and the print stylesheet keeps only the rows: order, customer, placed, state and paid. The pickup counter gets a pickup sheet that works when the network does not.
+**Rationale:** The Print button opens the browser print path and the print stylesheet keeps only the rows: order, customer, placed, state, and paid. The pickup counter gets a pickup sheet that works when the network does not.
 
 **Cost:** Paper freezes the list at print time. An order paid after printing is missing. Nothing on the sheet says how old it is except the printed date.
 
@@ -2309,7 +2309,7 @@ page
   toast positive "25 visible orders copied as tab-separated values."
 ```
 
-**Rationale:** One button copies the visible rows as tab-separated values, which paste straight into a spreadsheet. Nothing downloads, so there is no file to find, rename or delete afterwards.
+**Rationale:** One button copies the visible rows as tab-separated values, which paste straight into a spreadsheet. Nothing downloads, so there is no file to find, rename, or delete afterwards.
 
 **Cost:** Only the visible page is copied. Pasting 25 rows when the filter holds 268 silently drops the rest unless the reader notices the pager.
 
@@ -2352,7 +2352,7 @@ page
       item: text "garcia-restock-orders-oct.csv" · text "268" · text "8 Oct 09:41" · text "Priya Shah" · action "Download"
 ```
 
-**Rationale:** The dashboard keeps every export in a list with its rows, its date and who asked for it, and each one downloads again. The Monday figures are re-downloaded rather than re-built, and finance can see what left the back office.
+**Rationale:** The dashboard keeps every export in a list with its rows, its date, and who asked for it, and each one downloads again. The Monday figures are re-downloaded rather than re-built, and finance can see what left the back office.
 
 **Cost:** Stored files with customer data need their own retention and access rule. A history nobody prunes becomes a second database of personal data.
 
@@ -2777,7 +2777,7 @@ page
 
 **Rationale:** Carbon's accordion rule applied to the table: opening a row closes the last one. The list never grows past one detail, so the reader cannot lose their place in it.
 
-**Cost:** Comparing two orders means opening, memorizing, closing and opening. The rule trades comparison for tidiness.
+**Cost:** Comparing two orders means opening, memorizing, closing, and opening. The rule trades comparison for tidiness.
 
 **Reference:** Carbon
 
@@ -2991,7 +2991,7 @@ page
       action "Open"
 ```
 
-**Rationale:** Each delivery is a card with its date, its warehouse and how full it is. Four deliveries a week read as four runs, not as four rows of a table.
+**Rationale:** Each delivery is a card with its date, its warehouse, and how full it is. Four deliveries a week read as four runs, not as four rows of a table.
 
 **Cost:** Cards stop scanning past a dozen deliveries: no column to sort, no state to scan down. The pattern fits a handful, not a hundred.
 
@@ -3120,7 +3120,7 @@ page
 
 **Compact:** Below 640 pixels the table becomes two-line rows with the amount right. Sorting moves to a Sort control. The compact option is `two-line-rows-with-money-right`.
 
-**Rationale:** The pick is (a), two-line rows with money right. It reads well at 390 pixels and keeps the order code, the customer and the amount. It pairs with a Sort control where sorting matters. The runner-up is (c), a scroll container with a sticky first column, for the rare phone task that needs every column. Never ship (f), search hiding the list: a list that starts empty teaches the reader there is nothing to see.
+**Rationale:** The pick is (a), two-line rows with money right. It reads well at 390 pixels and keeps the order code, the customer, and the amount. It pairs with a Sort control where sorting matters. The runner-up is (c), a scroll container with a sticky first column, for the rare phone task that needs every column. Never ship (f), search hiding the list: a list that starts empty teaches the reader there is nothing to see.
 
 #### `two-line-rows-with-money-right`: Two-line rows with money right
 
@@ -3204,9 +3204,9 @@ page
     item: text "Maria Garcia" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** Financial tables keep customer, state and money on a narrow screen and drop the rest. Three columns fit 390 pixels without scrolling, and opening the row recovers the dropped facts.
+**Rationale:** Financial tables keep customer, state, and money on a narrow screen and drop the rest. Three columns fit 390 pixels without scrolling, and opening the row recovers the dropped facts.
 
-**Cost:** The order code, the placed time and the delivery all leave. Support identifying a caller by code finds the one column they need is gone.
+**Cost:** The order code, the placed time, and the delivery all leave. Support identifying a caller by code finds the one column they need is gone.
 
 #### `a-card-per-order-with-its-actions`: A card per order with its actions
 

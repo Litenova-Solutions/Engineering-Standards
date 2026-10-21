@@ -8,13 +8,13 @@ Configuration in a .NET backend pins the SDK, build settings, packages, and tool
 
 ### Set the SDK floor at the workspace root
 
-**Requirement:** Root `global.json` MUST set the first feature band of the manifest dotnet major release as its SDK version and roll forward with `latestMajor`.
+**Requirement:** The root `global.json` MUST set the first feature band of the manifest .NET major release as its SDK version and roll forward with `latestMajor`.
 
-**Rationale:** Any SDK from that major release on builds the workspace, so a patch or feature band release needs no change to the repository. The manifest names the major release, and `Directory.Build.props` sets its target framework.
+**Rationale:** Any SDK from that major release builds the workspace, so a patch or feature band release needs no change to the workspace. The manifest names the major release, and `Directory.Build.props` sets its target framework.
 
 ### Centralize .NET build settings
 
-**Requirement:** `apps/api/Directory.Build.props` MUST set the target framework of the manifest dotnet stack release, and enable nullable types, implicit usings, and warnings as errors.
+**Requirement:** `apps/api/Directory.Build.props` MUST set the target framework of the manifest .NET stack release, and enable nullable types, implicit usings, and warnings as errors.
 
 **Rationale:** One file then owns the settings that would otherwise drift between projects.
 
@@ -26,9 +26,9 @@ Configuration in a .NET backend pins the SDK, build settings, packages, and tool
 
 ### Commit the tool manifest
 
-**Requirement:** Root `.config/dotnet-tools.json` MUST pin every local .NET tool a documented repository command invokes.
+**Requirement:** The root `.config/dotnet-tools.json` MUST pin every local .NET tool that a documented command invokes.
 
-**Rationale:** When a tool ships in the manifest dotnet stack release, its pin matches that release, so local and CI runs use one version.
+**Rationale:** When a tool ships in the manifest .NET stack release, its pin matches that release, so local and CI runs use one version.
 
 ### Validate backend options at startup
 
@@ -44,8 +44,8 @@ None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/backend/dotnet/config#set-the-sdk-floor-at-the-workspace-root | guidance | Does root global.json set the manifest major release's first feature band, such as `10.0.100`, with `latestMajor` roll-forward? |
-| litespec/backend/dotnet/config#centralize-net-build-settings | guidance | Does Directory.Build.props set the manifest target framework, nullable types, implicit usings, and warnings as errors? |
-| litespec/backend/dotnet/config#centralize-nuget-versions | guidance | Does Directory.Packages.props enable central management with the manifest pins, and do projects omit versions? |
-| litespec/backend/dotnet/config#commit-the-tool-manifest | guidance | Does .config/dotnet-tools.json pin each local tool a documented command invokes? |
+| litespec/backend/dotnet/config#set-the-sdk-floor-at-the-workspace-root | guidance | Does the root `global.json` set the manifest major release's first feature band, such as `10.0.100`, with `latestMajor` roll-forward? |
+| litespec/backend/dotnet/config#centralize-net-build-settings | guidance | Does `Directory.Build.props` set the manifest target framework, nullable types, implicit usings, and warnings as errors? |
+| litespec/backend/dotnet/config#centralize-nuget-versions | guidance | Does `Directory.Packages.props` enable central management with the manifest pins, and do projects omit versions? |
+| litespec/backend/dotnet/config#commit-the-tool-manifest | guidance | Does `.config/dotnet-tools.json` pin each local tool a documented command invokes? |
 | litespec/backend/dotnet/config#validate-backend-options-at-startup | guidance | Does each configuration section bind a validated options class that fails startup on bad values? |

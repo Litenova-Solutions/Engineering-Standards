@@ -2,7 +2,7 @@
 
 ## Intent
 
-These patterns answer how a back office writes amounts, statements, moments and periods. They also answer how many rows fit before a page breaks and how figures and charts read. Each pattern offers drawn options and names a default.
+These patterns answer how a back office writes amounts, statements, moments, and periods. They also answer how many rows fit before a page breaks and how figures and charts read. Each pattern offers drawn options and names a default.
 
 ## Standards
 
@@ -16,19 +16,19 @@ These patterns answer how a back office writes amounts, statements, moments and 
 
 **Requirement:** A moment shown to readers in different time zones MUST state its time zone.
 
-**Rationale:** A delivery window read in two time zones without a zone is two different windows. The zone makes the moment one fact for every reader.
+**Rationale:** Readers in two time zones read a delivery window without a zone as two different windows. The zone makes the moment one fact for every reader.
 
 ## Patterns
 
 ### Writing an amount
 
-**Question:** Amounts meet a reader in tables, statements and exports. One table writes EUR 45.00 and one statement writes the euro sign before 45.00. The question is which form the product keeps. It also asks how a negative reads and which separator the product uses.
+**Question:** Amounts meet a reader in tables, statements, and exports. One table writes EUR 45.00, and one statement writes the euro sign before 45.00. The question is which form the product keeps. It also asks how a negative reads and which separator the product uses.
 
 **Default:** `code-and-two-decimals-in-the-reader-s-language-with-a-true-m`
 
 **Compact:** The recommended option reflows. One column carries the content. Header actions sit under the title. A table scrolls inside its own region.
 
-**Rationale:** Ship the code format in the reader language with a true minus. It keeps one convention and answers negatives and separators. The runner-up is the plain code table. It shows the same choice without refund rows.
+**Rationale:** Ship the code format in the reader's language with a true minus. It keeps one convention and answers negatives and separators. The runner-up is the plain code table. It shows the same choice without refund rows.
 
 Choose the symbol with code in the header only when back office and customer surface show the same form. Never ship the no currency option. It loses the currency in exports. Never ship mixed decimals. It breaks the alignment tables exist for.
 
@@ -113,7 +113,7 @@ page
 
 **Rationale:** The label names the currency in words. The cell carries the euro sign. A screen reader hears Paid in euros. A sighted reader sees the sign.
 
-**Cost:** Two carriers for one fact. The label grows and the column header stops being a field name.
+**Cost:** Two carriers for one fact. The label grows, and the column header stops being a field name.
 
 #### `the-customer-s-currency-beside-the-company-s`: The customer's currency beside the company's
 
@@ -171,9 +171,9 @@ page
     fact "Total of every match" "EUR 33,480.00"
 ```
 
-**Rationale:** This option keeps the code convention. It adds a page total and an all match total. Both totals follow the filters. The reader checks the column without exporting it.
+**Rationale:** This option keeps the code convention. It adds a page total and an all-match total. Both totals follow the filters. The reader checks the column without exporting it.
 
-**Cost:** Two totals disagree by design. Labels need to survive a glance. The all match total adds a second read on every filter change.
+**Cost:** Two totals disagree by design. Labels need to survive a glance. The all-match total adds a second read on every filter change.
 
 #### `code-and-two-decimals-in-the-reader-s-language-with-a-true-m`: Code and two decimals, in the reader's language, with a true minus
 
@@ -192,7 +192,7 @@ page
     text muted "A Dutch page writes EUR 125,00. A refund uses a true minus."
 ```
 
-**Rationale:** Stripe dashboard and Shopify admin keep one amount format. The reader language decides the separators. English shows EUR 1,203.65 and Dutch shows EUR 1.203,65. A refund uses a true minus before the code. The minus lines up with digits in a tabular column.
+**Rationale:** Stripe dashboard and Shopify admin keep one amount format. The reader's language decides the separators. English shows EUR 1,203.65, and Dutch shows EUR 1.203,65. A refund uses a true minus before the code. The minus lines up with digits in a tabular column.
 
 **Cost:** Two colleagues on the same account see different separators, so a screenshot in a support case has to be read in its language. The minus is the only signal of money out, so the State column has to say Refunded as well.
 
@@ -252,7 +252,7 @@ page
 
 **Compact:** The recommended option reflows. One column carries the content. Header actions sit under the title. A table scrolls inside its own region.
 
-**Rationale:** Keep groups, subtotals and a grand total. Keep a count under each line. The count is the only completeness check. The runner-up ends in the payouts it became. It fits finance work against bank lines.
+**Rationale:** Keep groups, subtotals, and a grand total. Keep a count under each line. The count is the only completeness check. The runner-up ends in the payouts it became. It fits finance work against bank lines.
 
 Add links on every line later as a behavior of the pick. Never ship the one figure option as the statement. It hides how the figure was reached.
 
@@ -327,7 +327,7 @@ page
     text "This one moves with every order."
 ```
 
-**Rationale:** A paid out month states the past. The running month states the present. The closed month sits beside the running figure. Each reads as a different moment.
+**Rationale:** A paid-out month states the past. The running month states the present. The closed month sits beside the running figure. Each reads as a different moment.
 
 **Cost:** Two figures share one page and only one is final. A reader can take the wrong one. Every figure needs its date.
 
@@ -555,7 +555,7 @@ page
     text "12 of 40 pallets."
 ```
 
-**Rationale:** The deliveries list writes weekday, date and place. It keeps the year. A delivery list crosses years. A reader in November plans for March.
+**Rationale:** The deliveries list writes weekday, date, and place. It keeps the year. A delivery list crosses years. A reader in November plans for March.
 
 **Cost:** The year adds noise for lists within one year. It widens a column in a table of six.
 
@@ -849,13 +849,13 @@ page
 
 ### How much fits before it breaks
 
-**Question:** A table can run at 47 pixels a row. Three columns hold two lines each. At 390 pixels a five column table has to drop a column. It truncates names to Garcia with an ellipsis unless the page changes shape.
+**Question:** A table can run at 47 pixels a row. Three columns hold two lines each. At 390 pixels a five-column table has to drop a column. It truncates names to Garcia with an ellipsis unless the page changes shape.
 
 **Default:** `the-full-width-with-nothing-truncated`
 
-**Compact:** Under 640 pixels the table becomes a record list. One block per order holds customer, delivery and amount. Newest comes first. Sorting by column goes with the table. The compact option is `at-390-pixels-a-record-list-rather-than-a-table`.
+**Compact:** Under 640 pixels the table becomes a record list. One block per order holds customer, delivery, and amount. Newest comes first. Sorting by column goes with the table. The compact option is `at-390-pixels-a-record-list-rather-than-a-table`.
 
-**Rationale:** Keep the table at desktop width. Use two line cells with no truncation. Switch to the record list under 640 pixels. That pair answers honestly at both widths.
+**Rationale:** Keep the table at desktop width. Use two-line cells with no truncation. Switch to the record list under 640 pixels. That pair answers honestly at both widths.
 
 The runner-up wraps rather than truncates. It fits where one column holds names of any length. Never ship shortened figures near a statement. A rounded money figure is not a money figure.
 
@@ -947,7 +947,7 @@ page
       item: text "SO-1042" · text "Maria Garcia" · text "8 Oct 2026, 09:32" · status "Paid" positive · text "EUR 125.00"
 ```
 
-**Rationale:** Carbon defines five heights. This option keeps three. It offers 24 to scan, 32 to work and 40 to read. A reader sets it once.
+**Rationale:** Carbon defines five heights. This option keeps three. It offers 24 to scan, 32 to work, and 40 to read. A reader sets it once.
 
 **Cost:** Screenshot tests hold three versions of every page. The setting is per user. Two colleagues can see different screens.
 
@@ -988,7 +988,7 @@ page
     text muted "Scroll sideways for the rest. The order stays pinned."
 ```
 
-**Rationale:** Linear and Notion pin the name column while the rest scrolls. A seven column table stays readable without dropping anything. The pinned cell keeps the card background.
+**Rationale:** Linear and Notion pin the name column while the rest scrolls. A seven-column table stays readable without dropping anything. The pinned cell keeps the card background.
 
 **Cost:** The pinned column narrows everything else. A second pinned column takes more than the screen allows. The scroll hint is part of the pattern.
 
@@ -1009,7 +1009,7 @@ page
       item: text "SO-1036" · text "Tom Becker" · text "Garcia Interiors restock" · text "8 Oct 2026, 09:30" · status "Paid" positive · action "Close"
 ```
 
-**Rationale:** Shopify mobile orders show one line per order. A tap opens the row in place. The open row carries customer, delivery and state. Many orders fit a phone with no dropped column.
+**Rationale:** Shopify mobile orders show one line per order. A tap opens the row in place. The open row carries customer, delivery, and state. Many orders fit a phone with no dropped column.
 
 **Cost:** Comparing customers takes a tap per row. The open row stays open across refresh. One open row at a time is the rule.
 
@@ -1037,7 +1037,7 @@ page
 
 ### Counting things
 
-**Question:** One rule governs this whole category: a number that can be counted from the system is read, never typed. A hand-maintained table will not be updated and a reviewer will trust it anyway.
+**Question:** One rule governs this whole category: read a number the system can count; never type it. A hand-maintained table will not be updated and a reviewer will trust it anyway.
 
 **Default:** `counts-in-the-sidebar-on-the-rows-that-hold-work`
 
@@ -1309,7 +1309,7 @@ page
 
 **Rationale:** Plausible dashboards mark the average across the bars, so a glance says which weeks pulled their weight. Weekly columns suit a company that plans marketing spend by week, not by day.
 
-**Cost:** Weeks split the story the season tells: launch, steady sale and last call. A week that holds two of them averages them away, and the final two-day column is not a week at all.
+**Cost:** Weeks split the story the season tells: launch, steady sale, and last call. A week that holds two of them averages them away, and the final two-day column is not a week at all.
 
 **Reference:** Plausible
 
@@ -1384,7 +1384,7 @@ page
     text muted "EUR 25.00, 126 guides. Guides keep their own scale."
 ```
 
-**Rationale:** Shopify product performance lists each variant with its bar and its money, so the ranking and the figures share one row. Every variant carries its price, its count and its income, which is the whole question in one glance.
+**Rationale:** Shopify product performance lists each variant with its bar and its money, so the ranking and the figures share one row. Every variant carries its price, its count, and its income, which is the whole question in one glance.
 
 **Cost:** Bars share one scale, so the guide EUR 3,150.00 is a sliver beside the lamps. A second product line that matters needs its own scale, which this option refuses to give it.
 
@@ -1504,7 +1504,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Ship the progress bar with sold, held and left in words. One glance says how far the run has sold and what is still movable. The runner-up is the per-variant sell-through table.
+**Rationale:** Ship the progress bar with sold, held, and left in words. One glance says how far the run has sold and what is still movable. The runner-up is the per-variant sell-through table.
 
 It is the better choice when one variant is gone and the others are not. Never ship the countdown alone, since 468 left without the run size hides whether the stock is nearly gone or barely touched.
 
@@ -1527,7 +1527,7 @@ page
     text muted "Held lamps are reserved for open quotes and samples."
 ```
 
-**Rationale:** A commerce app draws sales as a bar against the run with the counts in words, so the glance and the figures agree. Sold, held and left are three different decisions, which is why all three are named.
+**Rationale:** A commerce app draws sales as a bar against the run with the counts in words, so the glance and the figures agree. Sold, held, and left are three different decisions, which is why all three are named.
 
 **Cost:** One bar hides which variant is gone, so a sold-out brass lamp behind a half-empty run reads as room to spare. The per-variant rows answer that, not this bar.
 
@@ -1670,7 +1670,7 @@ page
 
 **Rationale:** Stripe home tiles compare each figure against the previous period with the basis stated under the delta. No reader asks compared to what. The pill carries direction and size. The words carry the basis.
 
-**Cost:** Three tiles each with a pill, a basis and a note are three small paragraphs, which is heavy for a home page. A fourth KPI wraps the row and the comparison wraps with it.
+**Cost:** Three tiles each with a pill, a basis, and a note are three small paragraphs, which is heavy for a home page. A fourth KPI wraps the row and the comparison wraps with it.
 
 **Reference:** Stripe
 
@@ -1907,7 +1907,7 @@ page
       item: text "Mon 5 Oct, paid out" · text muted "Sales of 28 to 30 September" · text "EUR 6,117.46"
 ```
 
-**Rationale:** The Google Calendar month answers 'when' faster than any list, because payout Mondays form a rhythm the eye keeps. The amounts sit under the month, so the calendar plans and the list below it states.
+**Rationale:** The Google Calendar month answers "when" faster than any list, because payout Mondays form a rhythm the eye keeps. The amounts sit under the month, so the calendar plans and the list below it states.
 
 **Cost:** A month shows rhythm and hides amounts, so every figure lives below the fold of the calendar. A reader who wants the total scrolls past the pattern to find it.
 
@@ -1929,7 +1929,7 @@ page
       link "September statement"
 ```
 
-**Rationale:** The Monzo upcoming payments lead with the next arrival and keep the rest one tap away. This suits a home page where the payout question is asked in passing. The tile states the date, the amount and what it holds.
+**Rationale:** The Monzo upcoming payments lead with the next arrival and keep the rest one tap away. This suits a home page where the payout question is asked in passing. The tile states the date, the amount, and what it holds.
 
 **Cost:** One arrival without the ones after it cannot plan a month, so the tile is a pointer rather than a page. A reader who stops at the tile mistakes the next payout for the position.
 
@@ -2000,7 +2000,7 @@ page
 
 **Rationale:** The Moneybird invoice view lists the lines the way they were entered, with no document chrome. The statement shape suits a reader who checks figures rather than files documents, and it is the shape the rest of finance already uses.
 
-**Cost:** A statement is not an invoice: it carries no seller address, no VAT number and no mandate reference. Finance can check it but cannot file it, so the document has to exist behind it.
+**Cost:** A statement is not an invoice: it carries no seller address, no VAT number, and no mandate reference. Finance can check it but cannot file it, so the document has to exist behind it.
 
 **Reference:** Moneybird
 
@@ -2026,7 +2026,7 @@ page
     fact "Paid 15 August 2026" "EUR 190.45"
 ```
 
-**Rationale:** The Wise paid receipts carry the reference and the date above the lines. A filed invoice answers 'when and how' without being read. The stamp states the state in the words of the document, not in the words of the dashboard.
+**Rationale:** The Wise paid receipts carry the reference and the date above the lines. A filed invoice answers "when and how" without being read. The stamp states the state in the words of the document, not in the words of the dashboard.
 
 **Cost:** A stamp is final in a way a badge is not, so a payment that later fails leaves a stamped invoice that lies. The state must follow the mandate, not the page the reader printed.
 
@@ -2049,7 +2049,7 @@ page
     fact "If unpaid on 29 October 2026, the plan pauses" "Plan pauses"
 ```
 
-**Rationale:** The GitHub failed-payment notice states what is owed, how to pay it and what happens if it is not paid, in that order. The company owes the vendor money on this page, so the page says the remedy before it says the consequence.
+**Rationale:** The GitHub failed-payment notice states what is owed, how to pay it, and what happens if it is not paid, in that order. The company owes the vendor money on this page, so the page says the remedy before it says the consequence.
 
 **Cost:** A consequence with a date is a threat with a date, however plainly it is worded. The date is the real one from the agreement, which the page reads from the subscription.
 
@@ -2069,7 +2069,7 @@ page
     text muted "Subscription and usage fee, including VAT. Open an invoice for its lines."
 ```
 
-**Rationale:** The Stripe invoices table lists each invoice with its period, its amount and its state. The list answers 'do I owe anything' before any invoice is opened.
+**Rationale:** The Stripe invoices table lists each invoice with its period, its amount, and its state. The list answers "do I owe anything" before any invoice is opened.
 
 **Cost:** A list of invoices says nothing about what any invoice holds, so a surprising total needs the document. Each row opens the invoice, which must then carry the usage this list omits.
 
@@ -2255,7 +2255,7 @@ page
 
 ### Numbers at phone width
 
-**Question:** Alex Morgan checks the dispatch of the day from the warehouse floor on a phone. At 390 pixels a money column, a date column and a state badge do not fit side by side. The page chooses what the number needs beside it.
+**Question:** Alex Morgan checks the dispatch of the day from the warehouse floor on a phone. At 390 pixels a money column, a date column, and a state badge do not fit side by side. The page chooses what the number needs beside it.
 
 **Default:** `kpis-in-pairs-with-the-orders-under-them`
 
@@ -2560,7 +2560,7 @@ page
   toast "Bank reference SH-88213 copied." positive
 ```
 
-**Rationale:** Vercel copies a deployment address on click and answers 'Copied', so the identifier is its own control with no button beside it. The code stays monospaced and labeled, and the confirmation is the feedback the click needs.
+**Rationale:** Vercel copies a deployment address on click and answers "Copied", so the identifier is its own control with no button beside it. The code stays monospaced and labeled, and the confirmation is the feedback the click needs.
 
 **Cost:** There is no visible affordance until hover, so a reader may never try. Keyboard users need the code to be a real button, which it is, with its label read aloud.
 

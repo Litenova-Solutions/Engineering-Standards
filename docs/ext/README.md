@@ -4,7 +4,7 @@
 
 Extensions add conditional standards to the baseline stacks. An extension stays inactive until a current requirement meets its activation criteria. The consumer lists its ID in `selectedExtensions` within `litespec.project.json`, with the criterion it met and a review date.
 
-An extension may add requirements, packages, projects, and verification. It replaces a baseline rule only when its document names that provision ID, and the manifest repeats that list where checks read it.
+An extension may add requirements, packages, projects, and verification. It replaces a baseline rule only when its document names that provision ID. The manifest repeats that list where checks read it.
 
 ## Selection
 
@@ -21,7 +21,7 @@ An extension may add requirements, packages, projects, and verification. It repl
 | [locale](locale.md) | `project` | None | None | The product commits to more than one locale. |
 | [mcp](mcp.md) | `project` | None | None | The product ships a Model Context Protocol server an LLM client starts on a user's own machine. |
 | [tenancy](tenancy.md) | `project` | None | None | Independent customer organizations share one deployment. |
-| [outbox](outbox.md) | `local` | `litespec/backend/persistence#collect-events-without-a-public-unit-of-work` | `event`, `limit`, `runbook` | A committed change requires delivery that cannot be lost. |
+| [outbox](outbox.md) | `local` | `litespec/backend/persistence#collect-events-without-a-public-unit-of-work` | `event`, `limit`, and `runbook` | A committed change requires delivery that cannot be lost. |
 | [efcore](../backend/dotnet/ext/efcore.md) | `local` | The persistence and dependency provisions its Baseline relationship section names | None | Selected aggregates require relational persistence instead of Marten. |
 | [realtime](realtime.md) | `local` | None | `event`, `limit` | Polling cannot meet a measured update-latency requirement. |
 | [report](report.md) | `local` | None | `limit` | Complex reports or large exports exceed normal request reads. |
@@ -55,4 +55,4 @@ The project selects both `locale` and `outbox`, each with the criterion it met a
 }
 ```
 
-`litespec/core/scope#select-conditional-extensions-explicitly` requires that an extension is selected only when its criteria apply, and the object form records which criterion that was. The consumer validator reports a selection whose `reviewBy` has passed. A selection that costs nothing to keep is a selection nobody removes.
+`litespec/core/scope#select-conditional-extensions-explicitly` requires that an extension is selected only when its criteria apply. The object form records which criterion that was. The consumer validator reports a selection whose `reviewBy` has passed. A selection that costs nothing to keep is a selection no one removes.

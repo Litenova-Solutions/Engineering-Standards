@@ -72,9 +72,9 @@ This extension switches on no optional record type.
 
 **Rationale:** Project-owned outcomes remain stable when provider responses or SDK types change.
 
-The stable codes come from the project's own error catalog, which is the same register `litespec/backend/api#return-stable-problem-details` returns a code from. An integration that invents a code per provider produces one code space per provider. A client branching on failure then has to learn all of them. [A provider's own error taxonomy](https://stripe.com/docs/api/errors) is the input to the mapping rather than its output.
+The project's own error catalog holds the stable codes. `litespec/backend/api#return-stable-problem-details` returns a code from that catalog. An integration that invents one code per provider creates one code space per provider. A client that branches on failure learns every code space. [A provider's own error taxonomy](https://stripe.com/docs/api/errors) is the input to the mapping, not its output.
 
-**Example:** A declined card and a declined direct debit both map to the project's payment-refused code, and the provider's own code travels in diagnostics.
+**Example:** A declined card and a declined direct debit both map to the project's `payment-refused` code. The provider's own code travels in diagnostics.
 
 ### Exclude provider internals
 
@@ -88,9 +88,9 @@ The stable codes come from the project's own error catalog, which is the same re
 
 **Rationale:** Each check protects a different part of the trust boundary for a provider message.
 
-The order is not free. The signature is verified first, over the raw body, before the body is parsed or any other check reads it. A parser that runs first is attacker-reachable code behind no authentication, and a body already deserialized is no longer the bytes the signature covered. [Stripe's signature guidance](https://stripe.com/docs/webhooks/signatures) states the same requirement.
+Order matters here. Verify the signature first, over the raw body, before parsing the body or running any other check. An unauthenticated caller can reach a parser that runs first. A deserialized body is no longer the bytes that the signature covered. [Stripe's signature guidance](https://stripe.com/docs/webhooks/signatures) states the same requirement.
 
-**Example:** A failed signature returns 401 with no body, because a message explaining which check failed tells an unauthenticated caller how to pass it.
+**Example:** A failed signature returns `401` with no body. A message that names the failed check tells an unauthenticated caller how to pass it.
 
 ### Process duplicate messages safely
 
@@ -102,9 +102,9 @@ The order is not free. The signature is verified first, over the raw body, befor
 
 **Requirement:** A CSV or spreadsheet import MUST reject or neutralize a value that begins with a formula-leading character.
 
-**Rationale:** The formula-leading characters are the equals sign, the plus sign, the minus sign, the at sign, the tab, and the carriage return. Escaping on the way out protects the reader of this export. It does not protect the reader of the next one. An imported value stored unchanged is re-exported by a different report that may not escape it. [CSV injection](https://owasp.org/www-community/attacks/CSV_Injection) travels through the store, so the boundary that admits the value is where it stops.
+**Rationale:** The formula-leading characters are the equals sign, the plus sign, the minus sign, the at sign, the tab, and the carriage return. Escaping when you export protects the reader of that export. It does not protect the reader of the next export. A different report can re-export an unchanged imported value without escaping it. [CSV injection](https://owasp.org/www-community/attacks/CSV_Injection) travels through the store, so the boundary that admits the value is where it stops.
 
-**Example:** An import that rejects the value reports the row and the field. An import that neutralizes it records what it changed, because a silently altered value is a data defect the owner cannot see.
+**Example:** An import that rejects the value reports the row and the field. An import that neutralizes it records what it changed. A silently altered value is a data defect the owner cannot see.
 
 ### Simulate integration boundaries
 
@@ -118,7 +118,7 @@ The order is not free. The signature is verified first, over the raw body, befor
 
 **Rationale:** Each failure mode can affect retry, mapping, or idempotency behavior.
 
-An unexpected response shape is the mode a provider produces without failing. A well-formed response can carry a field that moved, a type that changed, or a value nobody planned for. It parses and then behaves wrongly. Every other listed mode would have caught that as an error. [A provider that versions its API](https://stripe.com/docs/api/versioning) changes shape on a schedule, and a pinned version still changes on the day it is raised.
+An unexpected response shape is the mode a provider produces without failing. A well-formed response can carry a field that moved, a type that changed, or a value no one planned for. The response parses. The behavior is still wrong. Every other listed mode reports that response as an error. [A provider that versions its API](https://stripe.com/docs/api/versioning) changes shape on a schedule. A pinned version still changes on the day the provider raises it.
 
 ## Conventions
 
@@ -126,7 +126,7 @@ An unexpected response shape is the mode a provider produces without failing. A 
 
 **Default:** Place provider code under `Infrastructure/Integrations/{Provider}/`.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
 **Rationale:** One provider folder gives transport code a clear Infrastructure boundary.
 
@@ -134,7 +134,7 @@ An unexpected response shape is the mode a provider produces without failing. A 
 
 **Default:** Keep one options class, client, transport models, mappings, and registration module in each provider folder.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
 **Rationale:** Related provider implementation details remain discoverable together.
 
@@ -142,7 +142,7 @@ An unexpected response shape is the mode a provider produces without failing. A 
 
 **Default:** Keep business-action ports with their Application use cases.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
 **Rationale:** The use case states why it needs the external behavior.
 
@@ -170,5 +170,5 @@ An unexpected response shape is the mode a provider produces without failing. A 
 | litespec/ext/integrations#simulate-integration-boundaries | checkable | `ExternalTestTests` run each provider contract against a controllable local endpoint. |
 | litespec/ext/integrations#cover-provider-failure-modes | checkable | `ExternalTestTests` suite covers every declared failure mode. |
 | litespec/ext/integrations#group-provider-code | guidance | Does each provider folder hold its code or record an Exception? |
-| litespec/ext/integrations#keep-provider-components-together | guidance | Does each provider folder hold its options, client, models, mappings and registration? |
+| litespec/ext/integrations#keep-provider-components-together | guidance | Does each provider folder hold its options, client, models, mappings, and registration? |
 | litespec/ext/integrations#keep-ports-near-use-cases | guidance | Does each business-action port stay with its owning Application use case? |

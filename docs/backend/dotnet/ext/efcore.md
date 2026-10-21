@@ -19,7 +19,7 @@ For Entity Framework Core-owned aggregate paths, this extension replaces:
 - `litespec/backend/dotnet/persistence#query-through-iquerysession`: EF Core queries use `IApplicationDbContext`.
 - `litespec/backend/persistence#keep-mappings-and-aliases-explicit`: EF Core mappings use `IEntityTypeConfiguration<T>` classes.
 - `litespec/backend/dotnet/packages#keep-application-dependencies-narrow`: Application references the Entity Framework Core query surface its query interface needs.
-- `litespec/backend/architecture#separate-command-and-query-behavior`: the read half only; the invariant half still binds.
+- `litespec/backend/architecture#separate-command-and-query-behavior`: it replaces only the read half, and the invariant half still binds.
 
 For an EF Core-owned command with durable delivery, this extension also replaces:
 
@@ -90,11 +90,11 @@ This extension switches on no optional record type.
 
 **Requirement:** Application MUST own one public `IApplicationDbContext` exposing required generic sets or named query roots, referencing only the Entity Framework Core abstractions that interface needs.
 
-**Rationale:** The interface defines the EF Core query boundary without exposing the Infrastructure DbContext. The permitted surface is the query types the interface exposes and the manifest-pinned `Microsoft.EntityFrameworkCore` package that declares them.
+**Rationale:** The interface defines the EF Core query boundary without exposing the Infrastructure `DbContext`. The permitted surface is the query types the interface exposes and the manifest-pinned `Microsoft.EntityFrameworkCore` package that declares them.
 
 ### Implement query roots in Infrastructure
 
-**Requirement:** Infrastructure MUST implement `IApplicationDbContext` with the application DbContext.
+**Requirement:** Infrastructure MUST implement `IApplicationDbContext` with the application `DbContext`.
 
 **Rationale:** The provider implementation remains behind Application's query interface.
 
@@ -108,7 +108,7 @@ This extension switches on no optional record type.
 
 **Requirement:** An EF Core query handler MUST use `AsNoTracking`, filter before materialization, order and limit deterministically, and project records.
 
-**Rationale:** The implementation reads handlers return shaped results without loading mutable aggregate state. No command enforces an invariant from a read projection.
+**Rationale:** Handlers return shaped results without loading mutable aggregate state. No command enforces an invariant from a read projection.
 
 ### Avoid per-aggregate read stores
 
@@ -118,7 +118,7 @@ This extension switches on no optional record type.
 
 ### Resolve the tenant at context creation
 
-**Requirement:** An EF Core DbContext MUST resolve the tenant when the context is created and apply the tenant filter to tenant-owned sets.
+**Requirement:** An EF Core `DbContext` MUST resolve the tenant when the context is created and apply the tenant filter to tenant-owned sets.
 
 **Rationale:** Resolution at creation keeps the tenant out of every query, and the filter convention applies it to each tenant-owned set.
 
@@ -130,7 +130,7 @@ This extension switches on no optional record type.
 
 ### Process changed aggregate events
 
-**Requirement:** An EF Core post-handler MUST collect Domain Events from changed aggregates and follow their documented delivery classification.
+**Requirement:** An EF Core post-handler MUST collect Domain events from changed aggregates and follow their documented delivery classification.
 
 **Rationale:** Event delivery follows the same aggregate changes that the handler commits.
 
@@ -142,9 +142,9 @@ This extension switches on no optional record type.
 
 ### Stage EF Core outbox records together
 
-**Requirement:** An EF Core-owned Command MUST map and stage outbox records with aggregate changes through the same DbContext.
+**Requirement:** An EF Core-owned Command MUST map and stage outbox records with aggregate changes through the same `DbContext`.
 
-**Rationale:** The DbContext transaction makes the outbox record and business work durable together.
+**Rationale:** The `DbContext` transaction makes the outbox record and business work durable together.
 
 ### Reject cross-provider outbox storage
 
@@ -188,7 +188,7 @@ A relational column holds the active state record and its discriminator, which i
 
 **Requirement:** An unsupported direct state mapping MUST use an Infrastructure persistence type with discriminator and state-specific columns.
 
-**Rationale:** The repository maps the persistence type to and from the Domain hierarchy.
+**Rationale:** The Infrastructure repository maps the persistence type to and from the Domain hierarchy.
 
 ### Review new persisted states
 
@@ -260,15 +260,15 @@ The previous release database is the schema of the last released artifact, not t
 
 **Default:** Use `Infrastructure/Persistence/EfCore/` for `ApplicationDbContext`, factory, post-handler, configurations, migrations, and repositories.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
-**Example:** `Infrastructure/Persistence/EfCore/Configurations/` holds entity mapping classes.
+**Example:** `Infrastructure/Persistence/EfCore/Configurations/` holds persistence mapping classes.
 
 ### Use snake-case relational names
 
 **Default:** Use the pinned naming-conventions package and verify generated names in each migration, with casing owned by `litespec/backend/persistence#use-database-naming-conventions`.
 
-**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date and removal condition.
+**Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
 **Rationale:** The migration shows the exact names that reach the database.
 
@@ -282,25 +282,25 @@ The previous release database is the schema of the last released artifact, not t
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/backend/dotnet/ext/efcore#record-ef-core-replacement-scope | guidance | Does the decision name aggregates, evolution, transactions, queries, packages and rollback? |
+| litespec/backend/dotnet/ext/efcore#record-ef-core-replacement-scope | guidance | Does the decision name aggregates, evolution, transactions, queries, packages, and rollback? |
 | litespec/backend/dotnet/ext/efcore#retain-unaffected-baseline-persistence | guidance | Does every unaffected aggregate path retain its baseline persistence behavior? |
 | litespec/backend/dotnet/ext/efcore#use-one-write-provider | checkable | `EfCoreTransactionTests` stage aggregate work through one selected provider. |
 | litespec/backend/dotnet/ext/efcore#reject-mixed-provider-writes | checkable | `EfCoreTransactionTests` assert no mixed Marten and EF Core aggregate repository writes. |
 | litespec/backend/dotnet/ext/efcore#record-provider-selection | guidance | Does the decision name each Command path's provider and its test evidence? |
 | litespec/backend/dotnet/ext/efcore#register-one-command-post-handler | checkable | `EfCoreTransactionTests` assert each command resolves only its selected provider post-handler. |
 | litespec/backend/dotnet/ext/efcore#resolve-cross-provider-invariants | guidance | Does each cross-provider invariant use one provider or a reviewed shared transaction? |
-| litespec/backend/dotnet/ext/efcore#stage-aggregate-writes-in-repositories | checkable | `EfCoreWriteTests` stage changes through the scoped DbContext. |
-| litespec/backend/dotnet/ext/efcore#exclude-direct-handler-commits | checkable | `EfCoreWriteTests` assert handlers inject no DbContext and call no `SaveChangesAsync`. |
+| litespec/backend/dotnet/ext/efcore#stage-aggregate-writes-in-repositories | checkable | `EfCoreWriteTests` stage changes through the scoped `DbContext`. |
+| litespec/backend/dotnet/ext/efcore#exclude-direct-handler-commits | checkable | `EfCoreWriteTests` assert handlers inject no `DbContext` and call no `SaveChangesAsync`. |
 | litespec/backend/dotnet/ext/efcore#define-ef-core-query-roots | checkable | `EfCoreReadTests` assert one owned `IApplicationDbContext` and no wider EF surface. |
-| litespec/backend/dotnet/ext/efcore#implement-query-roots-in-infrastructure | checkable | `EfCoreReadTests` assert the Infrastructure DbContext implements the owned query interface. |
+| litespec/backend/dotnet/ext/efcore#implement-query-roots-in-infrastructure | checkable | `EfCoreReadTests` assert the Infrastructure `DbContext` implements the owned query interface. |
 | litespec/backend/dotnet/ext/efcore#retain-marten-query-boundary | checkable | `EfCoreReadTests` assert Marten query handlers retain `IQuerySession`. |
 | litespec/backend/dotnet/ext/efcore#project-ef-core-queries-directly | checkable | `EfCoreReadTests` assert no tracking, authorized filters, deterministic limits, projections, and no invariant from a projection. |
 | litespec/backend/dotnet/ext/efcore#avoid-per-aggregate-read-stores | checkable | `EfCoreReadTests` assert no per-aggregate read-store interface pattern exists. |
 | litespec/backend/dotnet/ext/efcore#resolve-the-tenant-at-context-creation | checkable | `EfCoreReadTests` assert tenant resolution at creation and tenant filters on owned sets. |
 | litespec/backend/dotnet/ext/efcore#commit-ef-core-command-work-once | checkable | `EfCoreCommitTests` observe one post-handler `SaveChangesAsync` call per owned Command. |
-| litespec/backend/dotnet/ext/efcore#process-changed-aggregate-events | checkable | `EfCoreCommitTests` classify and stage Domain Events correctly. |
+| litespec/backend/dotnet/ext/efcore#process-changed-aggregate-events | checkable | `EfCoreCommitTests` classify and stage Domain events correctly. |
 | litespec/backend/dotnet/ext/efcore#use-durable-outbox-delivery | checkable | `EfCoreCommitTests` assert EF Core durable Commands commit no Marten session. |
-| litespec/backend/dotnet/ext/efcore#stage-ef-core-outbox-records-together | checkable | `EfCoreOutboxTests` stage message and business work through one DbContext. |
+| litespec/backend/dotnet/ext/efcore#stage-ef-core-outbox-records-together | checkable | `EfCoreOutboxTests` stage message and business work through one `DbContext`. |
 | litespec/backend/dotnet/ext/efcore#reject-cross-provider-outbox-storage | checkable | `EfCoreOutboxTests` assert EF Core Commands write no outbox record through Marten. |
 | litespec/backend/dotnet/ext/efcore#configure-ef-core-mappings-in-infrastructure | checkable | `EfCoreMappingTests` assert EF Core mappings use Infrastructure-owned configuration classes. |
 | litespec/backend/dotnet/ext/efcore#configure-relational-details-explicitly | guidance | Does the mapping review record every declared relational configuration category? |
@@ -308,7 +308,7 @@ The previous release database is the schema of the last released artifact, not t
 | litespec/backend/dotnet/ext/efcore#map-stable-relational-state-shape | checkable | `EfCoreStateTests` assert no relational lifecycle flags or duplicate nullable state values. |
 | litespec/backend/dotnet/ext/efcore#use-direct-state-mapping-only-when-supported | checkable | `EfCoreStateTests` materialize, track, and round-trip every state case. |
 | litespec/backend/dotnet/ext/efcore#map-unsupported-state-shapes-in-infrastructure | checkable | `EfCoreStateTests` map valid discriminator values to Domain states. |
-| litespec/backend/dotnet/ext/efcore#review-new-persisted-states | guidance | Does the new state review cover migration, mixed versions, rollback and a fixture? |
+| litespec/backend/dotnet/ext/efcore#review-new-persisted-states | guidance | Does the new state review cover migration, mixed versions, rollback, and a fixture? |
 | litespec/backend/dotnet/ext/efcore#generate-migrations-for-schema-changes | checkable | `EfCoreMigrationsTests` assert EF Core schema diffs include a generated migration. |
 | litespec/backend/dotnet/ext/efcore#review-migration-effects | guidance | Does the migration review cover every declared storage and rollback effect? |
 | litespec/backend/dotnet/ext/efcore#apply-migrations-as-release-work | checkable | `EfCoreMigrationsTests` place migration application before replica startup in the release record. |
