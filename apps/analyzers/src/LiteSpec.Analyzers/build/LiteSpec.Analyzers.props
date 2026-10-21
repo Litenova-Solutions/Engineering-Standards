@@ -1,0 +1,11 @@
+<Project>
+    <!--
+        Lets a project name its LiteSpec layer explicitly:
+            <LiteSpecLayer>Domain</LiteSpecLayer>
+        Values: Domain, Application.Abstractions, Application, Infrastructure, WebApi, None.
+        Without it, the analyzers read the layer from the assembly name suffix.
+    -->
+    <ItemGroup>
+        <CompilerVisibleProperty Include="LiteSpecLayer" />
+    </ItemGroup>
+</Project>

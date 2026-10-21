@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- Analyzers load into every compiler host, so they target netstandard2.0. -->
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <RootNamespace>LiteSpec.Analyzers</RootNamespace>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+        <PackageId>LiteSpec.Analyzers</PackageId>
+        <Version>2.0.0</Version>
+        <Authors>Litenova Solutions</Authors>
+        <Description>Roslyn analyzers that check a .NET application against the LiteSpec standard: layer boundaries, Domain modeling and naming. Every diagnostic links to the provision it enforces.</Description>
+        <PackageTags>litespec;analyzers;roslyn;ddd;architecture</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://litespec.dev</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Litenova-Solutions/LiteSpec</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <!--
+            NU5128: the package ships an analyzer, not a library, so it has no lib folder.
+            RS1012, RS1013: LayerAnalyzer registers each rule from its compilation start action and hands
+            that context to Register, so the meta-analyzer cannot see the registrations it looks for.
+        -->
+        <NoWarn>$(NoWarn);NU5128;RS1012;RS1013</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- The oldest compiler the package supports: the .NET 9.0.300 SDK and Visual Studio 17.14. -->
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" VersionOverride="4.14.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+        <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="LiteSpec.Analyzers.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="build/LiteSpec.Analyzers.props" Pack="true" PackagePath="build" />
+        <None Include="README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+</Project>

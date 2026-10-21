@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/apps/analyzers/">
+    <Project Path="apps/analyzers/src/LiteSpec.Analyzers/LiteSpec.Analyzers.csproj" />
+    <Project Path="apps/analyzers/tests/LiteSpec.Analyzers.Tests/LiteSpec.Analyzers.Tests.csproj" />
+  </Folder>
   <Folder Name="/apps/cli/">
     <Project Path="apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj" />
     <Project Path="apps/cli/tests/LiteSpec.Cli.Tests/LiteSpec.Cli.Tests.csproj" />
